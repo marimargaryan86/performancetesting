@@ -20,6 +20,7 @@ _METHOD_PATCH = "PATCH"
 _METHOD_DELETE = "DELETE"
 _EMAIL_KEY = "email"
 _PASSWORD_KEY = "password"  # nosec
+_CRITERIA_KEY = "criteria"
 
 trip_includes = Literal["segments", "segments.legs", "segments.legs.legType"]
 offer_includes = Literal[
@@ -260,6 +261,78 @@ class TripsClient(_BaseClient):
             method=_METHOD_GET,
             url="/trips/searches/{0}/trips".format(trips_search_id),
             query_parameters=query_parameters,
+        )
+
+    async def create_trip_candidates_search(  # noqa: WPS211
+        self,
+        origin: tuple[float, float],
+        destination: tuple[float, float],
+        departure_after: datetime.datetime,
+        passengers_dates_of_birth: Sequence[datetime.date],
+        maximum_connections: int | None = None,
+        allowed_segment_types: Sequence[LegType] | None = None,
+    ) -> dict[str, Any]:
+        attributes: dict[str, Any] = {
+            _PASSENGERS_KEY: [
+                {"dateOfBirth": dob.strftime("%Y-%m-%d")}
+                for dob in passengers_dates_of_birth
+            ],
+            _CRITERIA_KEY: [
+                {
+                    "origin": {
+                        "latitude": origin[0],
+                        "longitude": origin[1],
+                    },
+                    "destination": {
+                        "latitude": destination[0],
+                        "longitude": destination[1],
+                    },
+                    "departureAfter": departure_after.isoformat(),
+                },
+            ],
+        }
+        if maximum_connections:
+            attributes[_CRITERIA_KEY]["maximumConnections"] = maximum_connections
+        body = {
+            _DATA_KEY: {
+                _ATTRIBUTES_KEY: attributes,
+                _TYPE_KEY: "trip-candidate-searches",
+            },
+        }
+        if allowed_segment_types:
+            body[_DATA_KEY][_RELATIONSHIPS_KEY] = {
+                "allowedSegmentTypes": {
+                    _DATA_KEY: [
+                        {
+                            _ID_KEY: leg_type.value,
+                            "type": "leg-types",
+                        }
+                        for leg_type in allowed_segment_types
+                    ],
+                },
+            }
+        return await self._make_request(
+            method=_METHOD_POST,
+            url="/trip-candidates/searches",
+            payload=body,
+        )
+
+    async def get_trip_candidate_search(
+        self,
+        trip_candidate_search_id: str,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/trip-candidates/searches/{0}".format(trip_candidate_search_id),
+        )
+
+    async def get_trip_candidate_search_offers(
+        self,
+        trip_candidate_search_id: str,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/trip-candidates/searches/{0}/offers".format(trip_candidate_search_id),
         )
 
 
