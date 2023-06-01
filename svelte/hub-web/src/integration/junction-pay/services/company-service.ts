@@ -4,7 +4,9 @@ import JunctionPayService from "./junction-pay-service";
 
 export default class CompanyService extends JunctionPayService {
   async getCompanyDetails(token: string, id: string): Promise<CompanyModel> {
-    const resp = await this.makeRequest(`/companies/${id}`, { token });
+    const resp = await this.makeRequest<GetCompanyDetailsResponseSchema>(`/companies/${id}`, {
+      token,
+    });
 
     if (resp.status === 404) {
       throw new Error("Company does not exist");
@@ -14,7 +16,7 @@ export default class CompanyService extends JunctionPayService {
       throw new Error(`Junction Pay error: ${resp.status}`);
     }
 
-    const data = (await resp.json()) as GetCompanyDetailsResponseSchema;
+    const data = await resp.json();
 
     return {
       id: data.data.id,

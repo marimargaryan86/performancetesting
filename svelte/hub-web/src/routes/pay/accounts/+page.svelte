@@ -48,7 +48,7 @@
     <h2 class="typography title-medium bold">Sub accounts</h2>
 
     <ul class="accounts" data-sveltekit-preload-data="off" use:scrollLoad={{ func: loadMore }}>
-      {#each accounts as account}
+      {#each accounts as account (account.id)}
         <li>
           <a href={routeConfig.pay.accounts.account(account.id)} class="account">
             <EntityAvatar name={account.name} size="72px" />

@@ -84,7 +84,7 @@
   </THead>
 
   <TBody>
-    {#each conversions as conversion}
+    {#each conversions as conversion (conversion.id)}
       <TRow>
         <TCol maxWidth="96px" copyable>{conversion.transaction?.bookingId ?? ""}</TCol>
         <TCol>{yymmdd(conversion.createdAt)}</TCol>

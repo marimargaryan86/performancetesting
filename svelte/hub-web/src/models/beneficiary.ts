@@ -5,5 +5,5 @@ export type BeneficiaryModel = {
   name: string;
   currency: CurrencyModel;
   countryName: string;
-  type: "priority";
+  type: "priority" | "regular";
 };

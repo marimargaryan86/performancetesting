@@ -122,7 +122,7 @@
   </THead>
 
   <TBody>
-    {#each transactions as item}
+    {#each transactions as item (item.id)}
       <TRow on:click={createShowDetailsFunc(item)}>
         <TCol maxWidth="96px" copyable>{item.bookingId}</TCol>
         <TCol>{yymmdd(item.createdAt)}</TCol>

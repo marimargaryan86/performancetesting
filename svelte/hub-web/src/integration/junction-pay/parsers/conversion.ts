@@ -1,9 +1,9 @@
 import type { ConversionModel } from "models/conversion";
 import type { ConversionSchema } from "../schemas/conversion";
-import { parseTransaction } from "./transaction";
+import { parseTransactionSchema } from "./transaction";
 import type { TransactionSchema } from "../schemas/transaction";
 
-export function parseConversion(
+export function parseConversionSchema(
   conversion: ConversionSchema,
   transactions: TransactionSchema[] = [],
 ): ConversionModel {
@@ -20,6 +20,6 @@ export function parseConversion(
     fxStatus: conversion.attributes.fxStatus,
     sellAmount: conversion.attributes.sellAmount,
     settledAt: new Date(conversion.attributes.settledAt),
-    transaction: transaction ? parseTransaction(transaction, []) : undefined,
+    transaction: transaction ? parseTransactionSchema(transaction, []) : undefined,
   };
 }

@@ -54,6 +54,14 @@ export type FlattenedObject_<
 
 export type FlattenedObject<T extends Record<string, unknown>> = FlattenedObject_<Required<T>>;
 
+export type RecursivePartial<T> = {
+  [P in keyof T]?: T[P] extends (infer U)[]
+    ? RecursivePartial<U>[]
+    : T[P] extends object
+    ? RecursivePartial<T[P]>
+    : T[P];
+};
+
 export async function callAction(action: string, data?: Record<string, unknown>): Promise<void> {
   const body = new FormData();
 

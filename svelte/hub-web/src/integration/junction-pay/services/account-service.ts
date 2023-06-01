@@ -6,7 +6,7 @@ import type { PaginatedData } from "models/common";
 
 export default class AccountService extends JunctionPayService {
   async listAccounts(token: string, cursor?: string): Promise<PaginatedData<AccountModel>> {
-    const resp = await this.makeRequest("/accounts", {
+    const resp = await this.makeRequest<ListAccountsResponseSchema>("/accounts", {
       token,
       queryParams: { "page[cursor]": cursor },
     });
@@ -15,7 +15,7 @@ export default class AccountService extends JunctionPayService {
       throw new Error(`Junction Pay error: ${resp.status}`);
     }
 
-    const data = (await resp.json()) as ListAccountsResponseSchema;
+    const data = await resp.json();
 
     return {
       data: data.data.map(parseAccount),
@@ -24,14 +24,14 @@ export default class AccountService extends JunctionPayService {
   }
 
   async getAccount(token: string, accountId: string): Promise<AccountModel> {
-    const resp = await this.makeRequest(`/accounts/${accountId}`, { token });
+    const resp = await this.makeRequest<GetAccountResponseSchema>(`/accounts/${accountId}`, {
+      token,
+    });
 
     if (resp.status !== 200) {
       throw new Error(`Junction Pay error: ${resp.status}`);
     }
 
-    const data = (await resp.json()) as GetAccountResponseSchema;
-
-    return parseAccount(data.data);
+    return parseAccount((await resp.json()).data);
   }
 }

@@ -1,49 +1,64 @@
 import type { BeneficiaryModel } from "models/beneficiary";
+import { parseBeneficiarySchema } from "../parsers/beneficiary";
+import type {
+  CreateBeneficiaryResponseSchema,
+  GetBeneficiaryResponseSchema,
+  ListBeneficiariesResponseSchema,
+} from "../schemas/beneficiaty";
 import JunctionPayService from "./junction-pay-service";
+import type { PaginatedData } from "models/common";
 
 export default class BeneficiaryService extends JunctionPayService {
-  private readonly beneficiaries: BeneficiaryModel[] = [
-    ...[
-      "Air France",
-      "American Airlines",
-      "Snowfall",
-      "Etihad Airways",
-      "United Airlines",
-      "Sabre",
-    ].map<BeneficiaryModel>((name, idx) => ({
-      id: `00000000-0000-0000-0000-00000000000${idx}`,
-      countryName: "United Kingdom",
-      currency: {
-        code: "GBP",
-        minorUnits: 2,
-        name: "British Pound",
-      },
-      name,
-      type: "priority",
-    })),
-  ];
+  async listBeneficiaries(
+    token: string,
+    cursor?: string,
+  ): Promise<PaginatedData<BeneficiaryModel>> {
+    const resp = await this.makeRequest<ListBeneficiariesResponseSchema>("/beneficiaries", {
+      token,
+      queryParams: { "page[cursor]": cursor },
+    });
 
-  listBeneficiaries(): BeneficiaryModel[] {
-    return this.beneficiaries;
-  }
-
-  getBeneficiary(id: string): BeneficiaryModel {
-    const beneficiary = this.beneficiaries.find((item) => item.id === id);
-
-    if (!beneficiary) {
-      throw new Error(`Junction Pay error: 404`);
+    if (resp.status !== 200) {
+      throw new Error(`Junction Pay error: ${resp.status}`);
     }
 
-    return beneficiary;
+    const data = await resp.json();
+
+    return {
+      data: data.data.map(parseBeneficiarySchema),
+      cursor: BeneficiaryService.getCursor(data),
+    };
   }
 
-  removeBeneficiary(id: string): void {
-    const idx = this.beneficiaries.findIndex((item) => item.id === id);
+  async getBeneficiary(token: string, id: string): Promise<BeneficiaryModel> {
+    const resp = await this.makeRequest<GetBeneficiaryResponseSchema>(`/beneficiaries/${id}`, {
+      token,
+    });
 
-    if (idx === -1) {
-      return;
+    if (resp.status === 404) {
+      throw new Error("Beneficiary not found");
     }
 
-    this.beneficiaries.splice(idx, 1);
+    if (resp.status !== 200) {
+      throw new Error(`Junction Pay error: ${resp.status}`);
+    }
+
+    return parseBeneficiarySchema((await resp.json()).data);
+  }
+
+  async createBeneficiary(token: string, beneficiary: unknown): Promise<BeneficiaryModel> {
+    const resp = await this.makeRequest("/beneficiaries", {
+      method: "POST",
+      token,
+      data: beneficiary,
+    });
+
+    if (resp.status !== 201) {
+      throw new Error(`Junction Pay error: ${resp.status}`);
+    }
+
+    const data = (await resp.json()) as CreateBeneficiaryResponseSchema;
+
+    return parseBeneficiarySchema(data.data);
   }
 }

@@ -5,7 +5,7 @@
   import THead from "components/ui/table/t-head.svelte";
   import TRow from "components/ui/table/t-row.svelte";
   import Table from "components/ui/table/table.svelte";
-  import { capitalize, type FlattenedObject } from "utils/common";
+  import { callAction, capitalize, type FlattenedObject } from "utils/common";
   import type { DirectionY } from "models/spatial";
   import SearchField from "components/ui/search-field.svelte";
   import Button from "components/ui/button.svelte";
@@ -13,26 +13,39 @@
   import type { BeneficiaryModel } from "models/beneficiary";
   import EditIcon from "components/icons/edit-icon.svelte";
   import RemoveIcon from "components/icons/remove-icon.svelte";
-  import integrationInstances from "integration-instances";
   import routeConfig from "routeConfig";
 
   export let data;
+  export let form;
 
   let sortGroup: FlattenedObject<BeneficiaryModel> = "name";
   let sortDirection: DirectionY = "down";
   let searchQuery = "";
 
-  $: ({ beneficiaries } = data);
+  $: beneficiaries = data.beneficiaries.data;
 
-  function createRemoveFunc(id: string): () => void {
+  async function loadMore(): Promise<void> {
+    if (!data.beneficiaries.cursor) {
+      return;
+    }
+
+    await callAction(routeConfig.pay.beneficiaries.actions.listBeneficiaries, {
+      cursor: data.beneficiaries.cursor,
+    });
+
+    if (form?.beneficiaries) {
+      data.beneficiaries = {
+        cursor: form.beneficiaries.cursor,
+        data: [...data.beneficiaries.data, ...form.beneficiaries.data],
+      };
+    }
+  }
+
+  function createRemoveFunc(): () => void {
     return () => {
       if (!confirm("Are you sure you want to delete this beneficiary?")) {
         return;
       }
-
-      integrationInstances.junctionPay.beneficiaries.removeBeneficiary(id);
-
-      data.beneficiaries = data.beneficiaries.filter((item) => item.id !== id);
     };
   }
 </script>
@@ -55,7 +68,7 @@
 </div>
 
 <div class="content">
-  <Table class="beneficiaries-table">
+  <Table class="beneficiaries-table" {loadMore}>
     <THead>
       <Header bind:sortGroup bind:sortDirection sortValue="name">Company</Header>
       <Header>Currency</Header>
@@ -65,7 +78,7 @@
     </THead>
 
     <TBody>
-      {#each beneficiaries as item}
+      {#each beneficiaries as item (item.id)}
         <TRow alternatingBackground={false}>
           <TCol class="company-name typography body-medium bold">{item.name}</TCol>
           <TCol>
@@ -80,7 +93,7 @@
             <div class="beneficiary-actions">
               <a href={routeConfig.pay.beneficiaries.beneficiary(item.id)}><EditIcon /></a>
 
-              <button on:click={createRemoveFunc(item.id)}>
+              <button on:click={createRemoveFunc()}>
                 <RemoveIcon variant="trash-can" />
               </button>
 

@@ -16,7 +16,7 @@ export default abstract class JunctionPayService {
     return new URL(data.links.next).searchParams.get("page[cursor]") ?? undefined;
   }
 
-  protected makeRequest(
+  protected makeRequest<TResp = unknown>(
     resource: string,
     options: {
       method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
@@ -25,7 +25,7 @@ export default abstract class JunctionPayService {
       data?: unknown;
       token?: string;
     } = {},
-  ): Promise<Response> {
+  ): Promise<Omit<Response, "json"> & { json: () => Promise<TResp> }> {
     const url = new URL(resource, this.baseUrl);
 
     if (options.queryParams) {

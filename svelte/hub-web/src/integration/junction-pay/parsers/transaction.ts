@@ -6,8 +6,7 @@ import {
 } from "models/transaction";
 import type { TransactionSchema } from "../schemas/transaction";
 
-/* eslint-disable max-lines-per-function */
-export function parseTransaction(
+export function parseTransactionSchema(
   transaction: TransactionSchema,
   companies: CompanyModel[] = [],
 ): TransactionModel {
@@ -33,9 +32,8 @@ export function parseTransaction(
       salesMarkup: attributes.rates.salesMarkup,
     },
     reference: attributes.invoiceReference,
-    /* eslint-disable no-warning-comments */
+    // eslint-disable-next-line no-warning-comments
     // TODO: Use real status.
     status: transactionStatus[Math.floor(Math.random() * 3)] as TransactionStatus,
   };
 }
-/* eslint-enable max-lines-per-function */

@@ -26,8 +26,11 @@ export default {
     },
     beneficiaries: {
       root: "/pay/beneficiaries",
-      beneficiary: (id: string): string => `/pay/beneficiaries/${id}`,
+      beneficiary: (id?: string): string => `/pay/beneficiaries/${id ?? "add"}`,
       addBeneficiary: "/pay/beneficiaries/add",
+      actions: {
+        listBeneficiaries: "/pay/beneficiaries?/listBeneficiaries",
+      },
     },
   },
 };
