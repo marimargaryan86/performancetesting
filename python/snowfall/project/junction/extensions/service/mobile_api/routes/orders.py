@@ -209,6 +209,7 @@ class Orders(endpoints.HTTPEndpoint):
                     ),
                     phone_number=contact_details["phoneNumber"],
                 ),
+                body.get("residenceAddress"),
                 include=["journey"],
             )
         except httpx.HTTPStatusError as error:

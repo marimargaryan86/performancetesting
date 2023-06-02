@@ -684,11 +684,12 @@ class Client(_BaseClient):  # noqa: WPS214
             payload=body,
         )
 
-    async def create_order(
+    async def create_order(  # noqa: WPS211
         self,
         quote_id: str,
         passengers: Sequence[models.Passenger],
         contact_details: models.ContactDetails,
+        residence_address: models.Address | None = None,
         include: Sequence[order_includes] | None = None,
     ) -> dict[str, Any]:
         body = {
@@ -704,6 +705,14 @@ class Client(_BaseClient):  # noqa: WPS214
                     "contactDetails": dataclasses.asdict(
                         contact_details,
                         dict_factory=models.dict_factory_to_camel,
+                    ),
+                    "residenceAddress": (
+                        dataclasses.asdict(
+                            residence_address,
+                            dict_factory=models.dict_factory_to_camel,
+                        )
+                        if residence_address
+                        else None
                     ),
                 },
                 _RELATIONSHIPS_KEY: {

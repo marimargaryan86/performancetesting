@@ -63,11 +63,12 @@ class MobileApiClient(Client):  # noqa: WPS214
         response.raise_for_status()
         return response.status_code
 
-    async def create_order(
+    async def create_order(  # noqa: WPS211
         self,
         quote_id: str,
         passengers: Sequence[models.Passenger],
         contact_details: models.ContactDetails,
+        residence_address: models.Address | None = None,
         include: Sequence[order_includes] | None = None,
     ) -> dict[str, Any]:
         raise RuntimeError(
