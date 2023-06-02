@@ -1,18 +1,19 @@
 from typing import Callable
 
-from lagom.integrations import starlette
 from starlette.applications import Starlette
+from starlette.middleware import Middleware
 
 from snowfall.project.pay.adapter.payments import GrpcClient
 from snowfall.project.pay.service.payments.v1alpha import payments_pb2_grpc
-from snowfall.project.pay.service.webhooks import boostrap, payments
+from snowfall.project.pay.service.webhooks import bootstrap, routers
+from snowfall.project.pay.service.webhooks.middlewares import HmacHeaderMiddleware
 from snowfall.stdlib import service
 from snowfall.stdlib.integration.starlette import application
 from snowfall.stdlib.transport.grpc.client import create_channel
 
 
 def _factory(
-    app: service.Application[boostrap.Settings],
+    app: service.Application[bootstrap.Settings],
 ) -> Callable[[], Starlette]:
     def decorator() -> Starlette:
         payments_channel = create_channel(
@@ -21,17 +22,22 @@ def _factory(
         grpc_payment_client = GrpcClient(
             payments_pb2_grpc.PaymentsServiceStub(payments_channel),
         )
-        dependencies = boostrap.create_dependencies(payment_client=grpc_payment_client)
-        integrations = starlette.StarletteIntegration(dependencies)
-        routes = [
-            integrations.route("/webhooks/payments", payments.Payment, name="Payments"),
-        ]
-        return Starlette(routes=routes)
+        return application.create_starlette_app(
+            routers.get_routes(
+                bootstrap.create_dependencies(
+                    payment_client=grpc_payment_client,
+                ),
+            ),
+            custom_middlewares=[
+                Middleware(HmacHeaderMiddleware, secret_key=app.settings.secret_key),
+            ],
+            openapi_path=None,
+        )
 
     return decorator
 
 
-def _serve(app: service.Application[boostrap.Settings]) -> None:
+def _serve(app: service.Application[bootstrap.Settings]) -> None:
     application.serve(
         factory=_factory(app),
         host=str(app.settings.http_address),
@@ -47,6 +53,6 @@ if __name__ == "__main__":
         service.Command(
             name="http",
             callback=_serve,
-            settings_class=boostrap.Settings,
+            settings_class=bootstrap.Settings,
         ),
     )

@@ -30,7 +30,10 @@ class Payment(endpoints.HTTPEndpoint):
         event_status = await payment_state.run(json_data["header"]["notification_type"])
 
         if not event_status:
-            raise exceptions.HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+            raise exceptions.HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Resource not found",
+            )
 
         raise exceptions.HTTPException(
             status_code=status.HTTP_202_ACCEPTED,

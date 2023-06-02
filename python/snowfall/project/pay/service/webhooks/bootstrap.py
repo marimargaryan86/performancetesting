@@ -6,6 +6,7 @@ from snowfall.stdlib.integration.starlette import application
 
 class Settings(application.Settings):
     payments_address: str
+    secret_key: str
 
 
 def create_dependencies(
