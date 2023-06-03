@@ -24,9 +24,10 @@ class UpdateBackUpRatesJob(object):
 
     async def run(self) -> None:
         backup_rates = await self._get_rates()
-        await self._backup_rates_repository.delete_all()
-        await self._backup_rates_repository.insert_many(backup_rates)
-        await self._cache_rates(backup_rates)
+        if backup_rates:
+            await self._backup_rates_repository.delete_all()
+            await self._backup_rates_repository.insert_many(backup_rates)
+            await self._cache_rates(backup_rates)
 
     def _generate_pairs(self) -> list[str]:
         possible_currency_pairs = itertools.permutations(self._available_currencies, 2)
