@@ -7,7 +7,7 @@
     }
   },
   "production": {
-    "deploy": true,
+    "deploy": false,
     "variables": {
       "count": 5,
       "provider_company_id": "4f4f78cf-626f-4298-9864-4a14a0fd2be7",

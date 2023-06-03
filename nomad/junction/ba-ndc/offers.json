@@ -8,7 +8,7 @@
     }
   },
   "production": {
-    "deploy": true,
+    "deploy": false,
     "variables": {
       "api_base_url": "https://ndc.junction.travel",
       "count": 5,
