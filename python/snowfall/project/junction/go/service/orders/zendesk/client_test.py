@@ -16,10 +16,12 @@ class TestZendeskClient(object):
         httpx_mock: pytest_httpx.HTTPXMock,
         zendesk_client: ZendeskClient,
         booking_repository: orders.BookingRepository,
+        journey_repository: orders.JourneyRepository,
         order: models_pb2.Order,
     ) -> None:
         booking_id = more_itertools.first(order.bookings).id
         booking = await booking_repository.find_by_id(booking_id)
+        journey = await journey_repository.find_by_id(order.journey_id)
 
         httpx_mock.add_response(
             url="https://test.api.com/api/v2/tickets",
@@ -40,6 +42,7 @@ class TestZendeskClient(object):
         cancel_request_payload = zendesk_client.create_cancel_request_payload(
             booking,  # type: ignore[arg-type]
             order,
+            journey,  # type: ignore[arg-type]
         )
         support_ticket_id = await zendesk_client.create_support_ticket(
             cancel_request_payload,

@@ -9,14 +9,18 @@ from snowfall.stdlib.format.protobuf import protobuf_to_datetime
 def parse_booking_and_order_for_cancel_request(
     booking: models_pb2.Booking,
     order: models_pb2.Order,
+    journey: models_pb2.Journey,
     convert_to_html: bool = True,
 ) -> dict[str, Any] | str:
     total_price = money.from_protobuf(booking.total_price)
     parsed_details = {
         "Booking ID": booking.id,
         "Order ID": order.id,
+        "Reseller ID": journey.reseller_id,
+        "Super PNR": journey.passenger_name_record,
         "Provider Name": booking.provider_name,
         "Trip Reference": booking.trip_result.record_locator,
+        "Operator Booking References": _parse_operator_booking_references(booking),
         "Total Price": "{0} {1}".format(
             str(total_price),
             total_price.currency.code,
@@ -29,6 +33,17 @@ def parse_booking_and_order_for_cancel_request(
         return _dict_to_html_ul(parsed_details)
 
     return parsed_details
+
+
+def _parse_operator_booking_references(
+    booking: models_pb2.Booking,
+) -> list[dict[str, Any]]:
+    return [
+        {
+            "Operator Booking Reference": booking_ref,
+        }
+        for booking_ref in booking.trip_result.operator_booking_references
+    ]
 
 
 def _parse_passengers(order: models_pb2.Order) -> list[dict[str, Any]]:

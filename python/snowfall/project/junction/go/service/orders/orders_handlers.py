@@ -41,15 +41,19 @@ class CreateBookingsCancellationHandler(object):  # noqa: WPS214
             journeys,
             booking_ids,
         )
-        bookings = [booking for booking, _ in bookings_and_orders.values()]
+        bookings = [booking for booking, _, _ in bookings_and_orders.values()]
 
         await self._validate(booking_ids, journeys, bookings)
 
         for booking_cancellation in document.booking_cancellations:
-            booking, order = bookings_and_orders.get(  # type: ignore[misc]
+            booking, order, journey = bookings_and_orders.get(  # type: ignore[misc]
                 booking_cancellation.booking_id,
             )
-            ticket_id = await self._create_zendesk_support_ticket(booking, order)
+            ticket_id = await self._create_zendesk_support_ticket(
+                booking,
+                order,
+                journey,
+            )
             booking_cancellation.ticket_id = ticket_id
             booking_cancellation.status = models_pb2.BookingCancellation.STATUS_PENDING
 
@@ -160,12 +164,11 @@ class CreateBookingsCancellationHandler(object):  # noqa: WPS214
         self,
         journeys: Sequence[models_pb2.Journey],
         booking_ids: Sequence[str],
-    ) -> dict[str, tuple[models_pb2.Booking, models_pb2.Order]]:
-        orders = [order for journey in journeys for order in journey.orders]
-
-        return {
-            booking.id: (booking, order)
-            for order in orders
+    ) -> dict[str, tuple[models_pb2.Booking, models_pb2.Order, models_pb2.Journey]]:
+        return {  # noqa: WPS224
+            booking.id: (booking, order, journey)
+            for journey in journeys
+            for order in journey.orders
             for booking in order.bookings
             if booking.id in booking_ids
         }
@@ -174,12 +177,14 @@ class CreateBookingsCancellationHandler(object):  # noqa: WPS214
         self,
         booking: models_pb2.Booking,
         order: models_pb2.Order,
+        journey: models_pb2.Journey,
     ) -> str:
         try:
             ticket_id = await self._zendesk_client.create_support_ticket(
                 payload=self._zendesk_client.create_cancel_request_payload(
                     booking,
                     order,
+                    journey,
                 ),
             )
         except HttpStatusError as exc:

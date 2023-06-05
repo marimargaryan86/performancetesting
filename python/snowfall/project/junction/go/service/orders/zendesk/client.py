@@ -40,6 +40,7 @@ class ZendeskClient(client.HttpClient):
         self,
         booking: models_pb2.Booking,
         order: models_pb2.Order,
+        journey: models_pb2.Journey,
     ) -> dict[str, Any]:
         return {
             "ticket": {
@@ -47,11 +48,13 @@ class ZendeskClient(client.HttpClient):
                     "html_body": parsers.parse_booking_and_order_for_cancel_request(
                         booking=booking,
                         order=order,
+                        journey=journey,
                         convert_to_html=True,
                     ),
                 },
                 "subject": "Booking Cancellation Request",
                 "tags": "[BookingCancellationRequest, {0}]".format(self._env),
+                "group_id": 4849404548637,
             },
         }
 
