@@ -1,4 +1,5 @@
 import dataclasses
+from datetime import date, datetime
 from typing import Any, Dict, Mapping, Sequence
 
 from snowfall.vendor.junction.go import models
@@ -16,6 +17,7 @@ from snowfall.vendor.junction.go.client import (  # noqa: WPS450,WPS235
     _RELATIONSHIPS_KEY,
     _TYPE_KEY,
     Client,
+    LegType,
     _make_pagination,
     order_includes,
 )
@@ -446,6 +448,82 @@ class MobileApiClient(Client):  # noqa: WPS214
             method=_METHOD_PATCH,
             url="/users/{0}".format(email),
             payload=body,
+        )
+
+    async def create_trip_candidates_search(  # noqa: WPS211
+        self,
+        origin: tuple[float, float],
+        destination: tuple[float, float],
+        departure_after: datetime,
+        passengers_dates_of_birth: Sequence[date],
+        maximum_connections: int | None = None,
+        allowed_segment_types: Sequence[LegType] | None = None,
+    ) -> dict[str, Any]:
+        attributes: dict[str, Any] = {
+            _PASSENGERS_KEY: [
+                {"dateOfBirth": dob.strftime("%Y-%m-%d")}
+                for dob in passengers_dates_of_birth
+            ],
+            "criteria": [  # TODO: replace with _CRITERIA_KEY after #2178 MR merge
+                {
+                    "origin": {
+                        "latitude": origin[0],
+                        "longitude": origin[1],
+                    },
+                    "destination": {
+                        "latitude": destination[0],
+                        "longitude": destination[1],
+                    },
+                    "departureAfter": departure_after.isoformat(),
+                },
+            ],
+        }
+        if maximum_connections:
+            attributes["criteria"][0]["maximumConnections"] = maximum_connections
+        body = {
+            _DATA_KEY: {
+                _ATTRIBUTES_KEY: attributes,
+                _TYPE_KEY: "trip-candidate-searches",
+            },
+        }
+        if allowed_segment_types:
+            body[_DATA_KEY][_RELATIONSHIPS_KEY] = {
+                "allowedSegmentTypes": {
+                    _DATA_KEY: [
+                        {
+                            _ID_KEY: leg_type.value,
+                            "type": "leg-types",
+                        }
+                        for leg_type in allowed_segment_types
+                    ],
+                },
+            }
+        return await self._make_request(
+            method=_METHOD_POST,
+            url="/trip-candidates/searches",
+            payload=body,
+        )
+
+    async def get_trip_candidate_search(
+        self,
+        trip_candidate_search: str,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/trip-candidates/searches/{0}".format(
+                trip_candidate_search,
+            ),
+        )
+
+    async def list_trip_candidates_offers(
+        self,
+        trip_candidate_search_id: str,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/trip-candidates/searches/{0}/offers".format(
+                trip_candidate_search_id,
+            ),
         )
 
     async def get_user(

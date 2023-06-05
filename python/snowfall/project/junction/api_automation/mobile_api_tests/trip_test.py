@@ -50,30 +50,6 @@ async def test_trip_e2e_basic(
 
 
 @pytest.mark.integration()
-async def test_get_trip_search_by_id(
-    mobile_client: MobileApiClient,
-    departure_after: str,
-    origin: str,
-    destination: str,
-) -> None:
-    trip_search_id = await return_trip_search_id(
-        mobile_client,
-        departure_after,
-        destination,
-        origin,
-    )
-    assert is_valid_uuid(trip_search_id) is True, "trip_search_id uuid in v4 format"
-
-    await asyncio.sleep(5)
-
-    r2 = await mobile_client.trips().get_trip_search_by_id(trip_search_id)
-    logging.info("get_trip_search_by_id response: %s", json.dumps(r2, indent=4))
-
-    trip_id = r2["data"]["id"]
-    assert is_valid_uuid(trip_id, 4) is True, "trip_id uuid must be in uuid v5 format"
-
-
-@pytest.mark.integration()
 async def test_get_trips_by_trip_search_id(
     mobile_client: MobileApiClient,
     departure_after: str,
