@@ -330,7 +330,29 @@ class ConversionResource(models.Resource):
         conversion_resource = cls(
             id=conversion.id,
             type=ConversionResource.api_type,
-            attributes={
+            links={
+                _SELF_HREF: str(
+                    request.url_for(
+                        "Conversion",
+                        conversionId=conversion.id,
+                    ),
+                ),
+            },
+        )
+        if conversion.status == conversion.Status.STATUS_FAILED:
+            attributes = {
+                "createdAt": protobuf.protobuf_to_datetime(
+                    conversion.created_at,
+                ),
+                "buyAmount": Money.from_proto(conversion.buy_amount),
+                "executedRate": round(conversion.executed_rate, 3),
+                "fxStatus": protobuf.enum_value_to_slug(
+                    conversion.Status.DESCRIPTOR,
+                    conversion.status,
+                ),
+            }
+        else:
+            attributes = {
                 "createdAt": protobuf.protobuf_to_datetime(
                     conversion.created_at,
                 ),
@@ -345,16 +367,8 @@ class ConversionResource(models.Resource):
                     conversion.Status.DESCRIPTOR,
                     conversion.status,
                 ),
-            },
-            links={
-                _SELF_HREF: str(
-                    request.url_for(
-                        "Conversion",
-                        conversionId=conversion.id,
-                    ),
-                ),
-            },
-        )
+            }
+        conversion_resource.attributes = attributes
         if transaction_id is not None:
             conversion_resource.relationships = {
                 "transactions": {
