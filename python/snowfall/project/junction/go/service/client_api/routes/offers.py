@@ -367,6 +367,7 @@ class OfferSearches(object):
                     )
                     for passenger in cast(_Passengers, request.body["passengers"])
                 ],
+                reseller_id=reseller_id,
             ),
             session_token=cast(
                 str,

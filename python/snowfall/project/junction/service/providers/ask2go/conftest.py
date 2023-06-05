@@ -177,7 +177,10 @@ def h3_mapping_repository(
 def criteria_generator(
     h3_mapping_repository: h3.H3MappingRepository[airports.Airport],
 ) -> criteria.CriteriaGenerator:
-    return criteria.CriteriaGenerator(h3_mapping=h3_mapping_repository)
+    return criteria.CriteriaGenerator(
+        h3_mapping=h3_mapping_repository,
+        reseller_id_affiliate_id_map={"test-reseller": "test-affiliate"},
+    )
 
 
 @pytest.fixture()

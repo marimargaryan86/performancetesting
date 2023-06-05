@@ -29,6 +29,7 @@ message TripOfferSearch {
   repeated snowfall.project.junction.go.v1alpha.Trip trips = 1;
   repeated Passenger passengers = 2;
   LoyaltyCard loyalty_card = 3;
+  string reseller_id = 4;
 }
 
 message Passenger {

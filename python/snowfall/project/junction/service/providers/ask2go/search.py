@@ -73,6 +73,7 @@ class Adapter(object):
             adults=search_task.criteria.adults,
             children=search_task.criteria.children,
             infants=search_task.criteria.infants,
+            affiliate_id=search_task.criteria.affiliate_id,
         )
 
         if search_task.criteria.HasField("inbound_departure"):

@@ -64,6 +64,9 @@ def parse_search_request(criteria: search.CreateSearchCriteria) -> dict[str, Any
     if criteria.transaction_id:
         request_body["transactionId"] = str(criteria.transaction_id)
 
+    if criteria.affiliate_id:
+        request_body["affiliateId"] = int(criteria.affiliate_id)
+
     return request_body
 
 

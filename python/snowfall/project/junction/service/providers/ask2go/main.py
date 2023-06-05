@@ -63,6 +63,7 @@ class _Settings(service.ProviderSettings):
     poll_retries_limit: int = 10
     wait_time_between_polling: float = 1
     mongo_dsn: Sequence[pydantic.AnyUrl]
+    reseller_affiliate_mapping: dict[str, str] = {}
 
 
 class _PriceQuotesSettings(service.PriceQuoteSettings):
@@ -137,6 +138,7 @@ async def _offers(
                 mapping=airport_repo.all_(),
                 resolution=7,
             ),
+            reseller_id_affiliate_id_map=app.settings.reseller_affiliate_mapping,
         ).from_search,
         search_criteria_generator=search_adapter.search_criteria_generator,
         offer_group_cache_key_generator=search_adapter.generate_cache_key,

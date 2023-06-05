@@ -23,4 +23,5 @@ message Criteria {
   uint32 adults = 6;
   uint32 children = 7;
   uint32 infants = 8;
+  optional string affiliate_id = 9;
 }

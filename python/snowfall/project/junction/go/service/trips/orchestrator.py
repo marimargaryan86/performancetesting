@@ -196,6 +196,7 @@ class OfferOrchestrator(object):
                     trip=offer_models_pb2.TripOfferSearch(
                         passengers=trip_candidate_search.passengers,
                         trips=trip_combination,
+                        reseller_id=trip_candidate_search.reseller_id,
                     ),
                     session_token=trip_candidate_search.session_token,
                 ),

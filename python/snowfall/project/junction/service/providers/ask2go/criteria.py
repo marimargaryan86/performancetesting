@@ -1,7 +1,7 @@
 import datetime
 import itertools
 from collections.abc import Iterator
-from typing import Sequence
+from typing import Mapping, Sequence
 
 import more_itertools
 
@@ -26,8 +26,10 @@ class CriteriaGenerator(object):
     def __init__(
         self,
         h3_mapping: h3.H3MappingRepository[airports.Airport],
+        reseller_id_affiliate_id_map: Mapping[str, str],
     ):
         self._mapping = h3_mapping
+        self._reseller_id_affiliate_id_map = reseller_id_affiliate_id_map
         self._grouper = segment_grouper.SegmentGrouper(h3_mapping)
 
     def from_search(
@@ -49,6 +51,9 @@ class CriteriaGenerator(object):
                 _generate_search_criteria(
                     trip_criteria=trip_criteria,
                     number_of_types=number_of_types,
+                    affiliate_id=self._reseller_id_affiliate_id_map.get(
+                        search.reseller_id,
+                    ),
                 ),
             )
 
@@ -58,6 +63,7 @@ class CriteriaGenerator(object):
 def _generate_search_criteria(
     trip_criteria: segment_grouper.TripCriteria,
     number_of_types: tuple[int, int, int],
+    affiliate_id: str | None = None,
 ) -> Iterator[provider_amqp_pb2.SearchCriteriaTask]:
     for origin, destination in trip_criteria.get_combinations():
         task = provider_amqp_pb2.SearchCriteriaTask(
@@ -72,6 +78,7 @@ def _generate_search_criteria(
                 adults=number_of_types[0],
                 children=number_of_types[1],
                 infants=number_of_types[2],
+                affiliate_id=affiliate_id,
             ),
         )
 

@@ -40,3 +40,4 @@ class CreateSearchCriteria(CamelCaseBaseModel):
     children: int = 0
     infants: int = 0
     transaction_id: uuid.UUID | None = None
+    affiliate_id: str | None = None
