@@ -1,26 +1,48 @@
+import datetime
 import ipaddress
 import random
 from typing import Sequence
 
 import pydantic
 from motor import motor_asyncio
+from redis import asyncio as aioredis
 
-from snowfall.project.pay.service.transactions import transactions
-from snowfall.project.pay.service.transactions.grpc import TransactionsService
+from snowfall.project.pay.adapter import currencies
+from snowfall.project.pay.service.currencies.v1alpha import currencies_pb2_grpc
+from snowfall.project.pay.service.transactions import cache, transactions
+from snowfall.project.pay.service.transactions.grpc import (
+    QuotationsService,
+    TransactionsService,
+)
 from snowfall.stdlib import service
+from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.grpc import server
+from snowfall.stdlib.transport.grpc.client import create_channel
 
 
 class _GrpcSettings(service.Settings):
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
     mongo_dsn: Sequence[pydantic.AnyUrl]
+    redis_dsn: Sequence[pydantic.AnyUrl]
+    currencies_address: Sequence[str]
 
 
-async def _serve(app: service.Application[_GrpcSettings]) -> None:
+async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         random.choice(app.settings.mongo_dsn),  # nosec
     )
+    redis_conn = await app.stack.enter_async_context(
+        aioredis.from_url(
+            random.choice(app.settings.redis_dsn),  # nosec
+            decode_responses=True,
+        ).client(),
+    )
+    redis_client = redis.Client[str](
+        redis_conn,
+        prefix=app.name,
+    )
+
     grpc_server = server.create_server(
         app.settings.grpc_address,
         app.settings.grpc_port,
@@ -28,6 +50,22 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
             TransactionsService(
                 transactions=transactions.TransactionsRepository(
                     mongo.transactions.transactions,
+                ),
+            ),
+            QuotationsService(
+                quotations=transactions.QuotationsRepository(
+                    mongo.transactions.quotations,
+                ),
+                user_sessions=cache.UserSessionRepository(
+                    redis_client=redis_client,
+                    cache_ttl=datetime.timedelta(minutes=15),
+                ),
+                currencies_client=currencies.GrpcClient(
+                    currencies_pb2_grpc.CurrencyServiceStub(
+                        create_channel(
+                            random.choice(app.settings.currencies_address),  # nosec
+                        ),
+                    ),
                 ),
             ),
         ],

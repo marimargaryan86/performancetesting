@@ -2,12 +2,19 @@ syntax = "proto3";
 
 package snowfall.project.pay.service.transactions.v1alpha;
 
+import "snowfall/project/pay/service/companies/v1alpha/models.proto";
 import "snowfall/project/pay/service/transactions/v1alpha/models.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/transactions/v1alpha";
 
 service TransactionsService {
   rpc ListTransactions(ListTransactionsRequest) returns (ListTransactionsResponse) {}
+}
+
+service QuotationsService {
+  rpc CreateQuotation(CreateQuotationRequest) returns (CreateQuotationResponse) {}
+  rpc GetQuotation(GetQuotationRequest) returns (GetQuotationResponse) {}
+  rpc UpdateQuotationStatus(UpdateQuotationStatusRequest) returns (UpdateQuotationStatusResponse) {}
 }
 
 message ListTransactionsRequest {
@@ -18,4 +25,34 @@ message ListTransactionsRequest {
 message ListTransactionsResponse {
   string next_page_token = 1;
   repeated Transaction transactions = 2;
+}
+
+message CreateQuotationRequest {
+  string from_currency = 1;
+  string to_currency = 2;
+  int32 amount = 3;
+  snowfall.project.pay.service.companies.v1alpha.Company payer = 4;
+  snowfall.project.pay.service.companies.v1alpha.Company beneficiary_company = 5;
+  string session_token = 6;
+}
+
+message CreateQuotationResponse {
+  Quotation quotation = 1;
+}
+
+message GetQuotationRequest {
+  string id = 1;
+}
+
+message GetQuotationResponse {
+  Quotation quotation = 1;
+}
+
+message UpdateQuotationStatusRequest {
+  string id = 1;
+  Quotation.Status status = 2;
+}
+
+message UpdateQuotationStatusResponse {
+  bool is_success = 1;
 }
