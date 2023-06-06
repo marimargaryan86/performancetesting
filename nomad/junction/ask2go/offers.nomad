@@ -97,6 +97,7 @@ AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://
 MONGO_DSN={{range $index, $service := service (printf "mongodb-%s" (env "NOMAD_NAMESPACE"))}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 RESELLER_PROVIDERS={{keyOrDefault "${var.environment}/providers/reseller-providers" "{}" | toJSON }}
+RESELLER_AFFILIATE_MAPPING={{keyOrDefault "${var.environment}/providers/ask2go/reseller-affiliate-ids" "{}" | toJSON }}
 EOH
         destination = "services.env"
         env         = true
