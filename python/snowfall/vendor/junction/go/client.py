@@ -692,7 +692,7 @@ class Client(_BaseClient):  # noqa: WPS214
         residence_address: models.Address | None = None,
         include: Sequence[order_includes] | None = None,
     ) -> dict[str, Any]:
-        body = {
+        body: dict[str, Any] = {
             _DATA_KEY: {
                 _ATTRIBUTES_KEY: {
                     _PASSENGERS_KEY: [
@@ -706,14 +706,6 @@ class Client(_BaseClient):  # noqa: WPS214
                         contact_details,
                         dict_factory=models.dict_factory_to_camel,
                     ),
-                    "residenceAddress": (
-                        dataclasses.asdict(
-                            residence_address,
-                            dict_factory=models.dict_factory_to_camel,
-                        )
-                        if residence_address
-                        else None
-                    ),
                 },
                 _RELATIONSHIPS_KEY: {
                     "quote": {
@@ -726,6 +718,12 @@ class Client(_BaseClient):  # noqa: WPS214
                 _TYPE_KEY: "orders",
             },
         }
+        if residence_address:
+            body[_DATA_KEY][_ATTRIBUTES_KEY]["residenceAddress"] = dataclasses.asdict(
+                residence_address,
+                dict_factory=models.dict_factory_to_camel,
+            )
+
         query_parameters: dict[str, str] = {}
         if include:
             query_parameters["include"] = ",".join(include)
