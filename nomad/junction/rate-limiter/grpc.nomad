@@ -6,6 +6,9 @@ variable "environment" {
   type = string
 }
 
+variable "count" {
+  type = number
+}
 
 job "rate-limiter-grpc" {
   datacenters = ["${var.datacenter}"]
@@ -22,7 +25,7 @@ job "rate-limiter-grpc" {
   }
 
   group "grpc" {
-    count = 1
+    count = "${var.count}"
 
     restart {
       attempts = 3
