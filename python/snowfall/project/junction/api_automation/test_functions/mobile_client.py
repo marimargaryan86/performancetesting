@@ -39,6 +39,9 @@ class MobileApiClient(Client):  # noqa: WPS214
             },
         )
 
+    async def list_cabin_classes(self) -> dict[str, Any]:
+        return await self._make_request(method=_METHOD_GET, url="/cabin-classes")
+
     async def update_payment(
         self,
         payment_intent_id: str,
