@@ -224,8 +224,9 @@ async def _async_wrapper(
 
         try:
             await asyncio.gather(*tasks)
-        except Exception:  # noqa: PIE786
+        except Exception as err:
             logger.exception()
+            raise SystemExit(1) from err
 
 
 def _sync_wrapper(
@@ -241,8 +242,9 @@ def _sync_wrapper(
 
     try:
         callback(application)
-    except Exception:  # noqa: PIE786
+    except Exception as err:
         logger.exception()
+        raise SystemExit(1) from err
 
 
 def _command(
