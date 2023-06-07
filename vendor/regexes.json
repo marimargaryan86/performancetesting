@@ -3,6 +3,7 @@
     "all_python_files": [
       "no_file_level_flake8_noqa",
       "no_file_level_mypy",
+      "no_file_level_ruff_noqa",
       "no_pytest_mark_asyncio"
     ]
   },
@@ -21,6 +22,11 @@
     {
       "name": "no_file_level_mypy",
       "pattern": "# mypy: ",
+      "inverted": true
+    },
+    {
+      "name": "no_file_level_ruff_noqa",
+      "pattern": "# ruff: noqa",
       "inverted": true
     },
     {
