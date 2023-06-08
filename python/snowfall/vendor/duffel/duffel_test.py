@@ -1,8 +1,8 @@
+import asyncio
 import datetime
 import hashlib
 import json
 import os
-from time import sleep
 
 import pytest
 
@@ -147,7 +147,7 @@ async def test_order_create(duffel_client: client.DuffelClient) -> None:
 
 
 @disable_by_default
-async def test_offer_after_order_create(  # noqa: WPS210
+async def test_offer_after_order_create(  # noqa: WPS210,WPS217
     duffel_client: client.DuffelClient,
 ) -> None:
     offer_request_create = OffersRequestBuilder()
@@ -199,7 +199,7 @@ async def test_offer_after_order_create(  # noqa: WPS210
 
     order = await duffel_client.order_request(order_request.build())
     assert order is not None
-    sleep(10)
+    await asyncio.sleep(10)
 
     # get offer after order creation
     single_offer = await duffel_client.get_single_offer(offer.identifier)

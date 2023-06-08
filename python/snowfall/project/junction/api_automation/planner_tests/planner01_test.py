@@ -1,12 +1,14 @@
+import asyncio
 import csv
 import datetime
 import json
 import logging
 import os
 import tempfile
-import time
 from typing import Any, Mapping, Sequence
 
+import aiocsv
+import aiofiles
 import allure
 import pytest
 from dateutil.parser import parse as datetime_parse
@@ -69,9 +71,9 @@ async def save_mct_to_csv(
     trip_ids: Sequence[str],
     file_name: str,
 ) -> None:
-    with open(file_name, "w") as f0:
-        writer = csv.writer(f0)
-        writer.writerow(
+    async with aiofiles.open(file_name, "w") as f0:
+        writer = aiocsv.AsyncWriter(f0)
+        await writer.writerow(
             [
                 "trip_id",
                 "leg_id",
@@ -229,7 +231,7 @@ async def return_trip_search_final_response(
         if status in {"completed", "unspecified", "failed"}:
             do_condition = False
         else:
-            time.sleep(2)
+            await asyncio.sleep(2)
             r1 = await client.trips().get_trip_search_by_id(response["data"]["id"])
             status = r1["data"]["attributes"]["status"]
             safety_counter += 1

@@ -84,7 +84,6 @@ interpreter_constraints = ["CPython==3.11.*"]
 [flake8]
 requirements = [
     "flake8",
-    "flake8-async",
     "flake8-deprecated",
     "flake8-if-expr",
     "flake8-noqa",

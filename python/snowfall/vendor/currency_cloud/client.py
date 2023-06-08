@@ -48,12 +48,15 @@ class CurrencyCloudAuth(httpx.Auth):
         base_url: str,
         login_id: str,
         api_key: str,
+        client: httpx.AsyncClient | None = None,
     ):
         self._base_url = base_url
         self._login_id = login_id
         self._api_key = api_key
         self._token = ""  # nosec
         self._async_lock = asyncio.Lock()
+        self._client = client or httpx.AsyncClient()
+        self._client.base_url = httpx.URL(base_url)
 
     async def async_auth_flow(
         self,
@@ -61,25 +64,34 @@ class CurrencyCloudAuth(httpx.Auth):
     ) -> AsyncGenerator[httpx.Request, httpx.Response]:
         request.headers["X-Auth-Token"] = self._token
         response = yield request
-        if response.status_code == httpx.codes.UNAUTHORIZED:
-            login_response = await self._login()
-            if login_response.get("error_code") == "auth_failed":
-                raise CurrencyCloudError(
-                    [login_response["error_messages"]["username"][0]["message"]],
-                )
-            self._token = login_response["auth_token"]
+
+        if response.status_code != httpx.codes.UNAUTHORIZED:
+            return
+
+        async with self._async_lock:
+            if self._token == request.headers["X-Auth-Token"]:
+                login_response = await self._login()
+
+                if login_response.get("error_code") == "auth_failed":
+                    raise CurrencyCloudError(
+                        [login_response["error_messages"]["username"][0]["message"]],
+                    )
+
+                self._token = login_response["auth_token"]
+
             request.headers["X-Auth-Token"] = self._token
             yield request
 
     async def _login(self) -> dict[str, Any]:
-        async with self._async_lock:
-            return httpx.post(
-                url="{0}/authenticate/api".format(self._base_url),
-                data={
-                    "login_id": self._login_id,
-                    "api_key": self._api_key,
-                },
-            ).json()
+        response = await self._client.post(
+            url="/authenticate/api",
+            data={
+                "login_id": self._login_id,
+                "api_key": self._api_key,
+            },
+        )
+
+        return response.json()
 
 
 def encode_arrays(

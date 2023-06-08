@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 import time
@@ -114,7 +115,7 @@ async def return_get_price_offer_quote_final_values(
             if safety_counter == (max_safety_counter - 1):
                 return "{0}_{1}".format(response["data"]["id"], status)
         else:
-            time.sleep(2)
+            await asyncio.sleep(2)
             do_condition = False
             safety_counter += 1
     return response["data"]["id"]

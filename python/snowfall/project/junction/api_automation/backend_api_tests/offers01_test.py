@@ -2,7 +2,6 @@ import asyncio
 import datetime
 import json
 import logging
-import time
 from typing import Any, Mapping, Sequence
 
 import pytest
@@ -163,7 +162,7 @@ async def return_offer_id(
 ) -> str:
     attempts = 5
     for i0 in range(attempts):
-        time.sleep(2)
+        await asyncio.sleep(2)
         response = await junction_client.get_offers_by_offer_search_id(
             trips_search_id,
             cabin_class=["economy"],
@@ -316,7 +315,7 @@ async def return_offer_searches_ids_final_values(
             if safety_counter == (max_safety_counter - 1):
                 return "{0}_{1}".format(response["data"]["id"], status)
         else:
-            time.sleep(2)
+            await asyncio.sleep(2)
             do_condition = False
             safety_counter += 1
 
@@ -507,7 +506,7 @@ async def return_trip_search_final_response(
         if status in {"completed", "unspecified", "failed"}:
             do_condition = False
         else:
-            time.sleep(2)
+            await asyncio.sleep(2)
             r1 = await junction_client.trips().get_trip_search_by_id(
                 response["data"]["id"],
             )
