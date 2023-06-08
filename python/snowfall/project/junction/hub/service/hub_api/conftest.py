@@ -1,7 +1,7 @@
 import pytest
 from starlette import applications
 
-from snowfall.project.junction.hub.service.web_api import bootstrap, router
+from snowfall.project.junction.hub.service.hub_api import bootstrap, router
 from snowfall.stdlib.integration.starlette import application
 
 

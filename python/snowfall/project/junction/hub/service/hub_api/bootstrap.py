@@ -4,7 +4,7 @@ from snowfall.stdlib.integration.starlette import application
 
 
 class Settings(application.Settings):
-    """Settings for HUB web-api."""
+    """Settings for hub-api."""
 
 
 def create_dependencies() -> lagom.Container:

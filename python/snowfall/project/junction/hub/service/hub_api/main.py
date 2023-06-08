@@ -2,7 +2,7 @@ from typing import Callable
 
 from starlette import applications
 
-from snowfall.project.junction.hub.service.web_api import bootstrap, router
+from snowfall.project.junction.hub.service.hub_api import bootstrap, router
 from snowfall.stdlib import service
 from snowfall.stdlib.integration.starlette import application
 
@@ -32,7 +32,7 @@ def _serve(app: service.Application[bootstrap.Settings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name="web-api")
+    entrypoint = service.Entrypoint(name="hub-api")
 
     entrypoint.enter_with_commands(
         service.Command(
