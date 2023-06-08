@@ -139,15 +139,35 @@ class TripSearchService(service.Service, trips_pb2_grpc.TripSearchServiceService
         return trips_pb2.GetTripSearchDetailsResponse(trip_search=trip_search)
 
 
+_FINAL_STATUSES = frozenset(
+    (
+        std_amqp_pb2.Trackable.Status.STATUS_COMPLETED,
+        std_amqp_pb2.Trackable.Status.STATUS_FAILED,
+    ),
+)
+
+
+def status_from_statuses(
+    statuses: Sequence[std_amqp_pb2.Trackable.Status.ValueType],
+) -> std_amqp_pb2.Trackable.Status.ValueType:
+    statuses_set = set(statuses)
+
+    if statuses_set and all(status in _FINAL_STATUSES for status in statuses_set):
+        if std_amqp_pb2.Trackable.Status.STATUS_COMPLETED in statuses_set:
+            return std_amqp_pb2.Trackable.Status.STATUS_COMPLETED
+
+        return std_amqp_pb2.Trackable.Status.STATUS_FAILED
+
+    if std_amqp_pb2.Trackable.Status.STATUS_PROCESSING in statuses_set:
+        return std_amqp_pb2.Trackable.Status.STATUS_PROCESSING
+
+    return std_amqp_pb2.Trackable.Status.STATUS_PENDING
+
+
 class TripCandidateSearchService(
     service.Service,
     trips_pb2_grpc.TripCandidateSearchServiceServicer,
 ):
-    _final_statuses = {
-        std_amqp_pb2.Trackable.Status.STATUS_COMPLETED,
-        std_amqp_pb2.Trackable.Status.STATUS_FAILED,
-    }
-
     def __init__(
         self,
         repository: trips.TripCandidateSearchRepository,
@@ -200,7 +220,7 @@ class TripCandidateSearchService(
             ids=trip_candidate_search.offer_search_ids,  # type: ignore[union-attr]
         )
 
-        trip_candidate_search.status = self._status_from_statuses(  # type: ignore[union-attr]
+        trip_candidate_search.status = status_from_statuses(  # type: ignore[union-attr]
             statuses=[
                 offer_search_object.status
                 for offer_search_object in offer_search_objectes
@@ -210,23 +230,6 @@ class TripCandidateSearchService(
         return trips_pb2.GetTripCandidateSearchDetailsResponse(
             trip_candidate_search=trip_candidate_search,
         )
-
-    def _status_from_statuses(
-        self,
-        statuses: Sequence[std_amqp_pb2.Trackable.Status.ValueType],
-    ) -> std_amqp_pb2.Trackable.Status.ValueType:
-        statuses_set = set(statuses)
-
-        if all(status in self._final_statuses for status in statuses):
-            if std_amqp_pb2.Trackable.Status.STATUS_COMPLETED in statuses_set:
-                return std_amqp_pb2.Trackable.Status.STATUS_COMPLETED
-
-            return std_amqp_pb2.Trackable.Status.STATUS_FAILED
-
-        if std_amqp_pb2.Trackable.Status.STATUS_PROCESSING in statuses_set:
-            return std_amqp_pb2.Trackable.Status.STATUS_PROCESSING
-
-        return std_amqp_pb2.Trackable.Status.STATUS_PENDING
 
 
 class TripCandidateService(
