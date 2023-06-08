@@ -2504,9 +2504,6 @@
                     "items": {
                       "$ref": "./../client_api/openapi.json#/components/schemas/OrderPassenger"
                     }
-                  },
-                  "residenceAddress": {
-                    "$ref": "./../client_api/openapi.json#/components/schemas/Address"
                   }
                 }
               },
