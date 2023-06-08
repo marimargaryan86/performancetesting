@@ -198,7 +198,7 @@ report_dir = "dist/test_results"
 
 [tailor]
 ignore_paths = [
-    "bash/tests/schedule_tests/**"
+    "bash/tests/schedule_tests/**",
 ]
 
 [update-build-files]

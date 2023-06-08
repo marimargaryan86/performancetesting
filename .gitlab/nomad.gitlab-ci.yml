@@ -14,35 +14,3 @@ nomad:validate:
     NOMAD_VAR_registry_address: "${CI_REGISTRY}"
     NOMAD_VAR_registry_password: "${CI_REGISTRY_PASSWORD}"
     NOMAD_VAR_registry_username: "${CI_REGISTRY_USER}"
-
-nomad:deploy:
-  stage: deploy
-  interruptible: false
-  image: "${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG}"
-  services:
-    - name: docker:dind
-      alias: dockerdaemon
-  before_script:
-    - mkdir -p ~/.ssh/
-    - mv "${NOMAD_SSH_KEY}" ~/.ssh/id_ed25519
-    - mv "${NOMAD_SSH_KNOWN_HOSTS}" ~/.ssh/known_hosts
-    - chmod 700 ~/.ssh/
-    - chmod 600 ~/.ssh/id_ed25519
-    - chmod 644 ~/.ssh/known_hosts
-    - git config --global user.email "${NOMAD_GIT_EMAIL}"
-    - git config --global user.name "${NOMAD_GIT_NAME}"
-  script:
-    - ./bash/push-deployables.sh
-  variables:
-    DOCKER_HOST: tcp://dockerdaemon:2375/
-    DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: ""
-  retry: 2
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule"'
-      when: never
-    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
-  needs:
-    - "pants:package"
-  tags:
-    - docker

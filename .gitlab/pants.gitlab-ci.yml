@@ -33,21 +33,56 @@ pants:setup:
     PANTS_DOCKER_REGISTRIES: "{'${CI_REGISTRY}': {'address': '${CI_REGISTRY}', 'default': True}}"
     SCIE_BASE: "${CI_PROJECT_DIR}/.cache/scie"
   cache:
-    - key: "python-3.11.3-go-1.19.7-scie-0.6.0-pants-2.16.0rc5-0"
-      when: always
-      paths:
-        - "${SCIE_BASE}"
+    key: "python-3.11.3-go-1.19.7-scie-0.8.2-pants-2.16.0rc5-0"
+    when: always
+    policy: pull
+    paths:
+      - "${SCIE_BASE}"
   needs:
     - "pants:setup"
   tags:
     - docker
 
-pants:test:
+pants:check:
   extends: .pants
   stage: test
   interruptible: true
   script:
-    - ./bash/lint-pants.sh
+    - "pants check ::"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
+    - if: '$CI_MERGE_REQUEST_IID'
+
+pants:lint:
+  extends: .pants
+  stage: test
+  interruptible: true
+  script:
+    - "pants lint ::"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
+    - if: '$CI_MERGE_REQUEST_IID'
+
+pants:tailor:
+  extends: .pants
+  stage: test
+  interruptible: true
+  script:
+    - "pants tailor --check ::"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
+    - if: '$CI_MERGE_REQUEST_IID'
+
+pants:test:
+  extends: .pants
+  stage: test
+  interruptible: true
+  parallel: 3
+  script:
+    - 'pants test --shard="$((${CI_NODE_INDEX}-1))/${CI_NODE_TOTAL}" --pytest-args="--disable-socket --allow-unix-socket" ::'
   coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   artifacts:
     reports:
@@ -55,6 +90,19 @@ pants:test:
       coverage_report:
         coverage_format: cobertura
         path: dist/coverage/python/coverage.xml
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
+    - if: '$CI_MERGE_REQUEST_IID'
+
+pants:update-build-files:
+  extends: .pants
+  stage: test
+  interruptible: true
+  script:
+    - "pants update-build-files --check ::"
+  cache:
+    policy: pull-push
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: never
@@ -84,3 +132,35 @@ pants:package:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: never
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+
+pants:release:
+  stage: deploy
+  interruptible: false
+  image: "${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG}"
+  services:
+    - name: docker:dind
+      alias: dockerdaemon
+  before_script:
+    - mkdir -p ~/.ssh/
+    - mv "${NOMAD_SSH_KEY}" ~/.ssh/id_ed25519
+    - mv "${NOMAD_SSH_KNOWN_HOSTS}" ~/.ssh/known_hosts
+    - chmod 700 ~/.ssh/
+    - chmod 600 ~/.ssh/id_ed25519
+    - chmod 644 ~/.ssh/known_hosts
+    - git config --global user.email "${NOMAD_GIT_EMAIL}"
+    - git config --global user.name "${NOMAD_GIT_NAME}"
+  script:
+    - ./bash/push-deployables.sh
+  variables:
+    DOCKER_HOST: tcp://dockerdaemon:2375/
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ""
+  retry: 2
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+  needs:
+    - "pants:package"
+  tags:
+    - docker
