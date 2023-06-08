@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package snowfall.project.junction.provider.v1alpha;
 
+import "google/protobuf/timestamp.proto";
+
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/provider/v1alpha";
 
 service BookingService {
@@ -22,4 +24,32 @@ message MakeBookingRequest {
 }
 message MakeBookingResponse {}
 
-message Booking {}
+message Booking {
+  string id = 1;
+  message Provider {
+    string id = 1;
+    string name = 2;
+    string booking_reference = 3;
+  }
+  Provider provider = 2;
+  message Trip {
+    string record_locator = 1;
+    repeated string operator_booking_references = 2;
+  }
+  oneof itinerary {
+    Trip trip = 3;
+  }
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_PENDING = 1;
+    STATUS_CONFIRMED = 2;
+    STATUS_CANCELLED = 3;
+    STATUS_REJECTED = 4;
+    STATUS_NOT_TICKETED = 5;
+    STATUS_ERROR = 6;
+  }
+  Status status = 4;
+  string raw_data = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}

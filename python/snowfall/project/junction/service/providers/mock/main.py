@@ -7,6 +7,7 @@ import uuid
 import pydantic
 from redis import asyncio as aioredis
 
+from snowfall.project.junction.provider import bookings as provider_bookings
 from snowfall.project.junction.provider import meta
 from snowfall.project.junction.provider import offers as provider_offers
 from snowfall.project.junction.provider import service
@@ -16,6 +17,7 @@ from snowfall.project.junction.service.providers.mock import (
     offers,
     pricing,
 )
+from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 
@@ -25,6 +27,7 @@ _PROVIDER_NAME = "Mock"
 
 class _Settings(service.ProviderSettings):
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
+    storage_dsn: service.AnyDsn
 
 
 class _PriceQuotesSettings(service.Settings):
@@ -37,6 +40,7 @@ class _PriceQuotesSettings(service.Settings):
 class _BookingsSettings(service.Settings):
     amqp_dsn: pydantic.AnyUrl
     redis_dsn: pydantic.AnyUrl
+    storage_dsn: service.AnyDsn
 
 
 async def _price_quotes(app: service.AsyncApplication[_PriceQuotesSettings]) -> None:
@@ -83,6 +87,9 @@ async def _bookings(app: service.AsyncApplication[_BookingsSettings]) -> None:
     amqp_connection = await app.stack.enter_async_context(
         types.Connection(app.settings.amqp_dsn),
     )
+    storage = await app.stack.enter_async_context(
+        filesystem.Storage.from_dsn(app.settings.storage_dsn),
+    )
 
     await bookings.Consumer(
         consumer_obj=consumer.Consumer(
@@ -98,6 +105,9 @@ async def _bookings(app: service.AsyncApplication[_BookingsSettings]) -> None:
             price_quote_cache=cache.PriceQuoteCache(
                 client=redis.Client(redis_connection, prefix=app.name),
             ),
+            booking_storage=storage,
+            provider_id=_PROVIDER_ID,
+            provider_name=_PROVIDER_NAME,
         ),
     ).consume()
 
@@ -127,12 +137,26 @@ async def _offers_factory(
     )
 
 
+async def _bookings_factory(
+    app: service.AsyncApplication[_Settings],
+) -> provider_bookings.Implementation:
+    storage = await app.stack.enter_async_context(
+        filesystem.Storage.from_dsn(app.settings.storage_dsn),
+    )
+
+    return provider_bookings.Implementation(
+        storage=storage,
+        transformer=bookings.Transformer().raw_to_booking,
+    )
+
+
 if __name__ == "__main__":
     entrypoint = service.Entrypoint(
         name="mock",
         settings_class=_Settings,
         meta_factory=_meta_factory,
         offers_factory=_offers_factory,
+        bookings_factory=_bookings_factory,
     )
 
     entrypoint.enter_with_commands(

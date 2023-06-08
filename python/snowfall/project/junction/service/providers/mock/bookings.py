@@ -1,18 +1,29 @@
 import datetime
+import pathlib
 import string as pystring
+import uuid
 
 from snowfall.project.junction.go.service.orders.v1alpha import amqp_pb2, models_pb2
+from snowfall.project.junction.provider.v1alpha import bookings_pb2
 from snowfall.project.junction.service.providers.mock import cache
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.transport.amqp import consumer, producer, types
-
-_PROVIDER_NAME = "Mock"
 
 
 class Booker(object):
-    def __init__(self, price_quote_cache: cache.PriceQuoteCache):
+    def __init__(
+        self,
+        price_quote_cache: cache.PriceQuoteCache,
+        booking_storage: filesystem.Storage,
+        provider_id: uuid.UUID,
+        provider_name: str,
+    ):
         self._cache = price_quote_cache
+        self._storage = booking_storage
+        self._provider_id = str(provider_id)
+        self._provider_name = provider_name
 
     async def book(
         self,
@@ -28,7 +39,8 @@ class Booker(object):
         new_booking.MergeFrom(
             models_pb2.Booking(
                 status=models_pb2.Booking.STATUS_CONFIRMED,
-                provider_name=_PROVIDER_NAME,
+                provider_id=self._provider_id,
+                provider_name=self._provider_name,
                 provider_total_price=money.Money(
                     amount=price_quote.amount,
                     currency=money.Currency(price_quote.currency),
@@ -41,6 +53,10 @@ class Booker(object):
                     ),
                 ),
             ),
+        )
+        await self._storage.put(
+            pathlib.Path(new_booking.trip_result.provider_booking_reference),
+            protobuf.AnySerializer[models_pb2.Booking].serialize(new_booking),
         )
 
         return new_booking
@@ -75,3 +91,25 @@ class Consumer(object):
         )
 
         await message.ack()
+
+
+class Transformer(object):
+    def __init__(self) -> None:
+        self._serializer = protobuf.AnySerializer[models_pb2.Booking]()
+
+    async def raw_to_booking(self, raw: bytes) -> bookings_pb2.Booking:
+        booking = self._serializer.deserialize(raw)
+        return bookings_pb2.Booking(
+            id=booking.trip_result.provider_booking_reference,
+            status=bookings_pb2.Booking.STATUS_CONFIRMED,
+            provider=bookings_pb2.Booking.Provider(
+                id=booking.provider_id,
+                name=booking.provider_name,
+                booking_reference=booking.trip_result.provider_booking_reference,
+            ),
+            trip=bookings_pb2.Booking.Trip(
+                record_locator=booking.trip_result.record_locator,
+            ),
+            created_at=booking.created_at,
+            updated_at=booking.updated_at,
+        )

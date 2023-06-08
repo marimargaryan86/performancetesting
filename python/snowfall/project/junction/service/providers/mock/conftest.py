@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import contextlib
 import datetime
+import uuid
 from typing import AsyncIterator
 from unittest import mock
 
@@ -23,6 +24,7 @@ from snowfall.project.junction.service.providers.mock import (
 )
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import types
 
@@ -193,9 +195,19 @@ async def price_quote(
 
 
 @pytest.fixture()
+async def storage() -> AsyncIterator[filesystem.Storage]:
+    async with filesystem.Storage.from_dsn("memory://") as storage_obj:
+        yield storage_obj
+
+
+@pytest.fixture()
 def booker(
     price_quote_cache: cache.PriceQuoteCache,
+    storage: filesystem.Storage,
 ) -> bookings.Booker:
     return bookings.Booker(
         price_quote_cache=price_quote_cache,
+        booking_storage=storage,
+        provider_id=uuid.uuid4(),
+        provider_name="Mock",
     )

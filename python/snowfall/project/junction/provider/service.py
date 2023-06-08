@@ -9,13 +9,14 @@ import pydantic
 from google.protobuf import message
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.provider import meta, offers
+from snowfall.project.junction.provider import bookings, meta, offers
 from snowfall.stdlib import service
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import types
 from snowfall.stdlib.transport.grpc import server as grpc_server
 
 # Re-export some service types
+AnyDsn = service.AnyDsn
 Application = service.Application
 AsyncApplication = service.AsyncApplication
 Command = service.Command
@@ -57,13 +58,20 @@ if TYPE_CHECKING:
     OptionalOF = Optional[
         OffersFactory[_Settings, _SearchCriteriaTask, _SearchCriteria]
     ]
+    BookingFactory = Callable[
+        [service.AsyncApplication[_Settings]],
+        Awaitable[bookings.Implementation],
+    ]
 
 
-def _grpc_command(  # noqa: WPS210
+def _grpc_command(  # noqa: WPS210, WPS217
     meta_factory: MetaFactory,
     offers_factory: OptionalOF[_Settings, _SearchCriteriaTask, _SearchCriteria] = None,
+    bookings_factory: BookingFactory[_Settings] | None = None,
 ) -> service.Callback[_Settings]:
-    async def wrapper(app: service.AsyncApplication[_Settings]) -> None:  # noqa: WPS210
+    async def wrapper(  # noqa: WPS210, WPS217
+        app: service.AsyncApplication[_Settings],
+    ) -> None:
         meta_implementation = await meta_factory()
         services: list[grpc_server.Service] = [
             meta.MetaService(
@@ -95,6 +103,12 @@ def _grpc_command(  # noqa: WPS210
                         redis_client=redis.Client[bytes](redis_conn, prefix=app.name),
                     ),
                 ),
+            )
+
+        if bookings_factory:
+            bookings_implementation = await bookings_factory(app)
+            services.append(
+                bookings.BookingService(implementation=bookings_implementation),
             )
 
         server = grpc_server.create_server(
@@ -150,13 +164,18 @@ class Entrypoint(
         _SearchCriteriaTask,
         _SearchCriteria,
     ] | None = None
+    bookings_factory: BookingFactory[_Settings] | None = None
 
     def __post_init__(self) -> None:
         super().__post_init__()
         self.add_command(
             service.Command(
                 name="grpc",
-                callback=_grpc_command(self.meta_factory, self.offers_factory),
+                callback=_grpc_command(
+                    self.meta_factory,
+                    self.offers_factory,
+                    self.bookings_factory,
+                ),
                 settings_class=self.settings_class,
             ),
         )

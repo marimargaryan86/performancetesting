@@ -49,6 +49,10 @@ def _print_debug_info(
         ctx.exit()
 
 
+class AnyDsn(pydantic.AnyUrl):
+    host_required = False
+
+
 @dataclasses.dataclass(frozen=True)
 class SentrySettings(object):
     additional_integrations: Optional[sentry.Integrations] = None

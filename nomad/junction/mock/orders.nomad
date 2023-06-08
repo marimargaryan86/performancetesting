@@ -84,6 +84,9 @@ job "mock-orders" {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
+{{ with secret "kv/data/${var.environment}/mock" }}
+STORAGE_DSN=s3://{{ .Data.data.aws_access_key_id }}:{{ .Data.data.aws_secret_access_key }}@/{{ .Data.data.bucket }}
+{{ end }}
 EOH
         destination = "services.env"
         env         = true
