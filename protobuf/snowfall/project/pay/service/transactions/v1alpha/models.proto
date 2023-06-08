@@ -8,18 +8,6 @@ import "snowfall/stdlib/v1/money.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/transactions/v1alpha";
 
-message Transaction {
-  string id = 1;
-  string external_reference_id = 2;
-  string invoice_reference_id = 3;
-  google.protobuf.Timestamp created_at = 4;
-  string conversion_id = 5;
-  snowfall.project.pay.service.quotations.v1alpha.QuotationAmounts amounts = 6;
-  snowfall.project.pay.service.quotations.v1alpha.QuotationRates rates = 7;
-  string payer_id = 8;
-  string beneficiary_id = 9;
-}
-
 message QuotationAmounts {
   snowfall.stdlib.v1.Money beneficiary = 1;
   snowfall.stdlib.v1.Money base_converted = 2;
@@ -37,10 +25,22 @@ message QuotationRates {
   float processing_markup = 5;
 }
 
+message Transaction {
+  string id = 1;
+  string external_reference_id = 2;
+  string invoice_reference_id = 3;
+  google.protobuf.Timestamp created_at = 4;
+  string conversion_id = 5;
+  snowfall.project.pay.service.quotations.v1alpha.QuotationAmounts amounts = 6;
+  snowfall.project.pay.service.quotations.v1alpha.QuotationRates rates = 7;
+  string payer_id = 8;
+  string beneficiary_id = 9;
+}
+
 message Quotation {
   string id = 1;
-  QuotationAmounts amounts = 2;
-  QuotationRates rates = 3;
+  snowfall.project.pay.service.quotations.v1alpha.QuotationAmounts amounts = 2;
+  snowfall.project.pay.service.quotations.v1alpha.QuotationRates rates = 3;
   google.protobuf.Timestamp expires_at = 4;
   enum Status {
     STATUS_UNSPECIFIED = 0;
@@ -55,4 +55,20 @@ message Quotation {
   string transaction_id = 8;
   google.protobuf.Timestamp created_at = 9;
   google.protobuf.Timestamp updated_at = 10;
+}
+
+message Conversion {
+  string id = 1;
+  string external_id = 2;
+  google.protobuf.Timestamp settlement_date = 3;
+  google.protobuf.Timestamp created_at = 4;
+  snowfall.stdlib.v1.Money buy_amount = 5;
+  snowfall.stdlib.v1.Money sell_amount = 6;
+  float executed_rate = 7;
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_EXECUTED = 1;
+    STATUS_FAILED = 2;
+  }
+  Status status = 8;
 }

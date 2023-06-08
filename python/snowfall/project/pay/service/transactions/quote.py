@@ -2,6 +2,9 @@ import datetime
 from decimal import Decimal
 
 from snowfall.project.pay.service.companies.v1alpha import models_pb2 as company_models
+from snowfall.project.pay.service.quotations.v1alpha import (
+    models_pb2 as quotation_models_pb2,
+)
 from snowfall.project.pay.service.transactions.v1alpha import models_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.format.protobuf import datetime_to_protobuf
@@ -34,7 +37,7 @@ class Quote(object):
         return models_pb2.Quotation(
             id=string.uuid(),
             status=models_pb2.Quotation.Status.STATUS_QUOTED,
-            amounts=models_pb2.QuotationAmounts(
+            amounts=quotation_models_pb2.QuotationAmounts(
                 beneficiary=self._quotation_amounts["beneficiary"].protobuf(),
                 base_converted=self._quotation_amounts["base_converted"].protobuf(),
                 sales_margin=self._quotation_amounts["sales_margin"].protobuf(),
@@ -44,7 +47,7 @@ class Quote(object):
                     "processing_margin"
                 ].protobuf(),
             ),
-            rates=models_pb2.QuotationRates(
+            rates=quotation_models_pb2.QuotationRates(
                 fx_quote=self._rate,
                 fx_buffer=self._calculate_fx_buffer_rate(self._company.fx_markup),
                 fx_markup=self._company.fx_markup,

@@ -4,17 +4,25 @@ package snowfall.project.pay.service.transactions.v1alpha;
 
 import "snowfall/project/pay/service/companies/v1alpha/models.proto";
 import "snowfall/project/pay/service/transactions/v1alpha/models.proto";
+import "snowfall/stdlib/v1/money.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/transactions/v1alpha";
 
 service TransactionsService {
   rpc ListTransactions(ListTransactionsRequest) returns (ListTransactionsResponse) {}
+  rpc GetTransaction(GetTransactionRequest) returns (GetTransactionResponse) {}
+  rpc CreateTransaction(CreateTransactionRequest) returns (CreateTransactionResponse) {}
 }
 
 service QuotationsService {
   rpc CreateQuotation(CreateQuotationRequest) returns (CreateQuotationResponse) {}
   rpc GetQuotation(GetQuotationRequest) returns (GetQuotationResponse) {}
   rpc UpdateQuotationStatus(UpdateQuotationStatusRequest) returns (UpdateQuotationStatusResponse) {}
+}
+
+service ConversionsService {
+  rpc GetConversion(GetConversionRequest) returns (GetConversionResponse) {}
+  rpc ListConversions(ListConversionsRequest) returns (ListConversionsResponse) {}
 }
 
 message ListTransactionsRequest {
@@ -25,6 +33,24 @@ message ListTransactionsRequest {
 message ListTransactionsResponse {
   string next_page_token = 1;
   repeated Transaction transactions = 2;
+}
+
+message GetTransactionRequest {
+  string id = 1;
+}
+
+message GetTransactionResponse {
+  Transaction transaction = 1;
+}
+
+message CreateTransactionRequest {
+  Quotation quotation = 1;
+  string external_reference = 3;
+  string invoice_reference = 4;
+}
+
+message CreateTransactionResponse {
+  Transaction transaction = 1;
 }
 
 message CreateQuotationRequest {
@@ -55,4 +81,32 @@ message UpdateQuotationStatusRequest {
 
 message UpdateQuotationStatusResponse {
   bool is_success = 1;
+}
+
+message CreateConversionRequest {
+  snowfall.stdlib.v1.Money beneficiary_amount = 1;
+  snowfall.stdlib.v1.Money base_converted_amount = 2;
+  string transaction_id = 3;
+}
+
+message CreateConversionResponse {
+  Conversion conversion = 1;
+}
+
+message GetConversionRequest {
+  string id = 1;
+}
+
+message GetConversionResponse {
+  Conversion conversion = 1;
+}
+
+message ListConversionsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+}
+
+message ListConversionsResponse {
+  string next_page_token = 1;
+  repeated Conversion conversions = 2;
 }

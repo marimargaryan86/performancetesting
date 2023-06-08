@@ -11,6 +11,7 @@ from snowfall.project.pay.adapter import currencies
 from snowfall.project.pay.service.currencies.v1alpha import currencies_pb2_grpc
 from snowfall.project.pay.service.transactions import cache, transactions
 from snowfall.project.pay.service.transactions.grpc import (
+    ConversionsService,
     QuotationsService,
     TransactionsService,
 )
@@ -18,6 +19,7 @@ from snowfall.stdlib import service
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.grpc import server
 from snowfall.stdlib.transport.grpc.client import create_channel
+from snowfall.vendor.currency_cloud.client import CurrencyCloudAuth, PaymentClient
 
 
 class _GrpcSettings(service.Settings):
@@ -26,6 +28,9 @@ class _GrpcSettings(service.Settings):
     mongo_dsn: Sequence[pydantic.AnyUrl]
     redis_dsn: Sequence[pydantic.AnyUrl]
     currencies_address: Sequence[str]
+    cc_login: str
+    cc_api_key: str
+    cc_address: str
 
 
 async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
@@ -51,6 +56,17 @@ async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
                 transactions=transactions.TransactionsRepository(
                     mongo.transactions.transactions,
                 ),
+                conversions=transactions.ConversionsRepository(
+                    mongo.trasactions.conversions,
+                ),
+                payment_client=PaymentClient(
+                    base_url=app.settings.cc_address,
+                    auth=CurrencyCloudAuth(
+                        base_url=app.settings.cc_address,
+                        login_id=app.settings.cc_login,
+                        api_key=app.settings.cc_api_key,
+                    ),
+                ),
             ),
             QuotationsService(
                 quotations=transactions.QuotationsRepository(
@@ -66,6 +82,11 @@ async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
                             random.choice(app.settings.currencies_address),  # nosec
                         ),
                     ),
+                ),
+            ),
+            ConversionsService(
+                conversions=transactions.ConversionsRepository(
+                    mongo.trasactions.conversions,
                 ),
             ),
         ],
