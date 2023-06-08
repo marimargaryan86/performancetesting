@@ -75,6 +75,12 @@ job "offers-pricing" {
       port "prometheus" {}
     }
 
+    scaling {
+      enabled = false
+      min     = 1
+      max     = 20
+    }
+
     service {
       name = "offers-pricing-${var.environment}"
       port = "prometheus"
