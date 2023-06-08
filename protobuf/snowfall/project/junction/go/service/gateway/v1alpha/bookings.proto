@@ -15,5 +15,10 @@ message GetBookingsRequest {
 }
 
 message GetBookingsResponse {
-  repeated snowfall.project.junction.provider.v1alpha.Booking bookings = 1;
+  repeated Booking bookings = 1;
+}
+
+message Booking {
+  string id = 1;
+  snowfall.project.junction.provider.v1alpha.Booking booking = 2;
 }

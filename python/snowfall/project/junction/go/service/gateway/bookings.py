@@ -1,4 +1,5 @@
 import asyncio
+from collections.abc import Sequence
 from typing import cast
 
 from grpc import aio
@@ -28,7 +29,7 @@ class Service(service.Service, bookings_pb2_grpc.BookingServiceServicer):
         context: aio.ServicerContext,
     ) -> bookings_pb2.GetBookingsResponse:
         group_unmarshal_results_mapping = providers.unmarshal_resource_ids(request.ids)
-        bookings: list[providers_pb2.Booking] = []
+        bookings: list[bookings_pb2.Booking] = []
         tasks = []
 
         for provider_id, booking_ids in group_unmarshal_results_mapping.items():
@@ -37,15 +38,32 @@ class Service(service.Service, bookings_pb2_grpc.BookingServiceServicer):
             if not provider:
                 continue
 
-            tasks.append(
-                provider.connection.bookings.GetBookings(
-                    providers_pb2.GetBookingsRequest(ids=booking_ids),
-                ),
-            )
+            tasks.append(get_bookings(provider, booking_ids))
 
         for task in asyncio.as_completed(tasks):
-            bookings.extend(
-                list(cast(providers_pb2.GetBookingsResponse, await task).bookings),
-            )
+            bookings.extend(await task)
 
         return bookings_pb2.GetBookingsResponse(bookings=bookings)
+
+
+async def get_bookings(
+    provider: providers.Provider,
+    booking_ids: Sequence[str],
+) -> list[bookings_pb2.Booking]:
+    try:
+        response = cast(
+            providers_pb2.GetBookingsResponse,
+            await provider.connection.bookings.GetBookings(
+                providers_pb2.GetBookingsRequest(ids=booking_ids),
+            ),
+        )
+    except aio.AioRpcError:
+        return []
+
+    return [
+        bookings_pb2.Booking(
+            id=provider.marshal_resource_id(booking.id),
+            booking=booking,
+        )
+        for booking in response.bookings
+    ]
