@@ -35,7 +35,10 @@ class Journey(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: orders_adapter.Client = lagom.injectable,
     ) -> responses.Response:
-        journey = await client.get_journey(request.path_params["journeyId"])
+        journey = await client.get_journey(
+            request.path_params["journeyId"],
+            reseller_id=request.user.username,
+        )
 
         return await messages.create_response(
             body=models.Body(
@@ -64,6 +67,7 @@ class Journeys(endpoints.HTTPEndpoint):
             limit=pagination.limit,
             cursor=pagination.cursor,
             sort_by=sorting.get_sort(request, self._sort),
+            reseller_id=request.user.username,
         )
 
         return await messages.create_response(
@@ -88,7 +92,10 @@ class Order(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: orders_adapter.Client = lagom.injectable,
     ) -> responses.Response:
-        order = await client.get_order(request.path_params["orderId"])
+        order = await client.get_order(
+            request.path_params["orderId"],
+            reseller_id=request.user.username,
+        )
 
         return await messages.create_response(
             body=models.Body(
@@ -149,6 +156,7 @@ class OrdersByJourney(endpoints.HTTPEndpoint):
         pagination = pagination_helpers.get_pagination(request)
         response = await client.find_orders_by_journey_id(
             journey_id=journey_id,
+            reseller_id=request.user.username,
             limit=pagination.limit,
             cursor=pagination.cursor,
         )
@@ -207,7 +215,10 @@ class Booking(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: orders_adapter.Client = lagom.injectable,
     ) -> responses.Response:
-        booking = await client.get_booking(request.path_params["bookingId"])
+        booking = await client.get_booking(
+            request.path_params["bookingId"],
+            reseller_id=request.user.username,
+        )
 
         return await messages.create_response(
             body=models.Body(
@@ -232,6 +243,7 @@ class BookingsByOrder(endpoints.HTTPEndpoint):
             order_id=order_id,
             limit=pagination.limit,
             cursor=pagination.cursor,
+            reseller_id=request.user.username,
         )
 
         return await messages.create_response(
@@ -353,6 +365,7 @@ class BookingDetails(endpoints.HTTPEndpoint):
     ) -> responses.Response:
         details = await client.get_booking_details(
             request.path_params["bookingDetailsId"],
+            reseller_id=request.user.username,
         )
 
         return await messages.create_response(
@@ -376,6 +389,7 @@ class BookingDetailsByBooking(endpoints.HTTPEndpoint):
         pagination = pagination_helpers.get_pagination(request)
         response = await client.find_booking_details_by_booking_id(
             booking_id=booking_id,
+            reseller_id=request.user.username,
             limit=pagination.limit,
             cursor=pagination.cursor,
         )

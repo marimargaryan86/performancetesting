@@ -35,6 +35,7 @@ message CreateJourneyResponse {
 
 message GetJourneyRequest {
   string id = 1;
+  string reseller_id = 2;
 }
 
 message GetJourneyResponse {
@@ -46,6 +47,7 @@ message ListJourneysRequest {
   string page_token = 2;
   repeated string ids = 3;
   snowfall.stdlib.v1.Sort sort_by = 4;
+  string reseller_id = 5;
 }
 
 message ListJourneysResponse {
@@ -71,6 +73,7 @@ message PlaceOrderResponse {
 
 message GetOrderRequest {
   string id = 1;
+  string reseller_id = 2;
 }
 
 message GetOrderResponse {
@@ -84,6 +87,7 @@ message ListOrdersRequest {
     string journey_id = 3;
     ListOfIds ids = 4;
   }
+  string reseller_id = 5;
 }
 
 message ListOrdersResponse {
@@ -93,6 +97,7 @@ message ListOrdersResponse {
 
 message GetBookingRequest {
   string id = 1;
+  string reseller_id = 2;
 }
 
 message GetBookingResponse {
@@ -106,6 +111,7 @@ message ListBookingsRequest {
     string order_id = 3;
     ListOfIds ids = 4;
   }
+  string reseller_id = 5;
 }
 
 message ListBookingsResponse {
@@ -115,6 +121,7 @@ message ListBookingsResponse {
 
 message GetBookingDetailsRequest {
   string id = 1;
+  string reseller_id = 2;
 }
 
 message GetBookingDetailsResponse {
@@ -128,6 +135,7 @@ message ListBookingDetailsRequest {
     string booking_id = 3;
     ListOfIds ids = 4;
   }
+  string reseller_id = 5;
 }
 
 message ListBookingDetailsResponse {

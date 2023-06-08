@@ -44,7 +44,10 @@ def _journeys_resolver(
         identifiers: Sequence[str],
         request: requests.Request,
     ) -> Sequence[resources.JourneyResource]:
-        response = await orders_client.find_journeys(identifiers, len(identifiers))
+        response = await orders_client.find_journeys(
+            identifiers,
+            limit=len(identifiers),
+        )
 
         return [
             resources.JourneyResource.from_proto(journey, request)
@@ -149,7 +152,10 @@ def _orders_resolver(
         identifiers: Sequence[str],
         request: requests.Request,
     ) -> Sequence[resources.OrderResource]:
-        response = await orders_client.find_orders(identifiers, len(identifiers))
+        response = await orders_client.find_orders(
+            identifiers,
+            limit=len(identifiers),
+        )
 
         return [
             resources.OrderResource.from_proto(order, request)
@@ -195,7 +201,10 @@ def _trip_bookings_resolver(
         identifiers: Sequence[str],
         request: requests.Request,
     ) -> Sequence[resources.TripBookingResource]:
-        response = await orders_client.find_bookings(identifiers, len(identifiers))
+        response = await orders_client.find_bookings(
+            identifiers,
+            limit=len(identifiers),
+        )
 
         return [
             resources.TripBookingResource.from_proto(booking, request)
@@ -214,7 +223,7 @@ def _trip_booking_details_resolver(
     ) -> Sequence[resources.TripBookingDetailsResource]:
         response = await orders_client.find_booking_details(
             identifiers,
-            len(identifiers),
+            limit=len(identifiers),
         )
 
         return [

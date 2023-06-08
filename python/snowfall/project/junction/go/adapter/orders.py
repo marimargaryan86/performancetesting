@@ -53,28 +53,42 @@ class Client(abc.ABC):
         """Create a new bookings cancellation resource."""
 
     @abc.abstractmethod
-    async def get_journey(self, identifier: str) -> models_pb2.Journey:
+    async def get_journey(
+        self,
+        identifier: str,
+        reseller_id: str | None = None,
+    ) -> models_pb2.Journey:
         """Fetch a journey resource."""
 
     @abc.abstractmethod
-    async def get_order(self, identifier: str) -> models_pb2.Order:
+    async def get_order(
+        self,
+        identifier: str,
+        reseller_id: str | None = None,
+    ) -> models_pb2.Order:
         """Fetch an order resource."""
 
     @abc.abstractmethod
-    async def get_booking(self, identifier: str) -> models_pb2.Booking:
+    async def get_booking(
+        self,
+        identifier: str,
+        reseller_id: str | None = None,
+    ) -> models_pb2.Booking:
         """Fetch a booking resource."""
 
     @abc.abstractmethod
     async def get_booking_details(
         self,
         identifier: str,
+        reseller_id: str | None = None,
     ) -> models_pb2.TripOptionDetails:
         """Fetch a booking details resource."""
 
     @abc.abstractmethod
-    async def find_journeys(
+    async def find_journeys(  # noqa: WPS211
         self,
         identifiers: Sequence[str] | None = None,
+        reseller_id: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
         sort_by: sort_pb2.Sort | None = None,
@@ -85,6 +99,7 @@ class Client(abc.ABC):
     async def find_orders(
         self,
         identifiers: Sequence[str],
+        reseller_id: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
     ) -> orders_pb2.ListOrdersResponse:
@@ -94,6 +109,7 @@ class Client(abc.ABC):
     async def find_orders_by_journey_id(
         self,
         journey_id: str,
+        reseller_id: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
     ) -> orders_pb2.ListOrdersResponse:
@@ -103,6 +119,7 @@ class Client(abc.ABC):
     async def find_bookings(
         self,
         identifiers: Sequence[str],
+        reseller_id: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
     ) -> orders_pb2.ListBookingsResponse:
@@ -112,6 +129,7 @@ class Client(abc.ABC):
     async def find_bookings_by_order_id(
         self,
         order_id: str,
+        reseller_id: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
     ) -> orders_pb2.ListBookingsResponse:
@@ -121,6 +139,7 @@ class Client(abc.ABC):
     async def find_booking_details(
         self,
         identifiers: Sequence[str],
+        reseller_id: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
     ) -> orders_pb2.ListBookingDetailsResponse:
@@ -130,6 +149,7 @@ class Client(abc.ABC):
     async def find_booking_details_by_booking_id(
         self,
         booking_id: str,
+        reseller_id: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
     ) -> orders_pb2.ListBookingDetailsResponse:
@@ -188,10 +208,10 @@ class DictClient(Client):
     async def get_journey(
         self,
         identifier: str,
+        reseller_id: str | None = None,
     ) -> models_pb2.Journey:
         if identifier not in self._journeys:
             raise errors.NotFoundError()
-
         return self._journeys[identifier]
 
     async def get_bookings_cancellation(
@@ -222,14 +242,22 @@ class DictClient(Client):
 
         return request
 
-    async def get_order(self, identifier: str) -> models_pb2.Order:
+    async def get_order(
+        self,
+        identifier: str,
+        reseller_id: str | None = None,
+    ) -> models_pb2.Order:
         for order in self._iterate_orders():
             if identifier == order.id:
                 return order
 
         raise errors.NotFoundError()
 
-    async def get_booking(self, identifier: str) -> models_pb2.Booking:
+    async def get_booking(
+        self,
+        identifier: str,
+        reseller_id: str | None = None,
+    ) -> models_pb2.Booking:
         for booking in self._iterate_bookings():
             if identifier == booking.id:
                 return booking
@@ -239,6 +267,7 @@ class DictClient(Client):
     async def get_booking_details(
         self,
         identifier: str,
+        reseller_id: str | None = None,
     ) -> models_pb2.TripOptionDetails:
         for booking in self._iterate_bookings():
             for detail in booking.trip_option.details:
@@ -247,9 +276,10 @@ class DictClient(Client):
 
         raise errors.NotFoundError()
 
-    async def find_journeys(
+    async def find_journeys(  # noqa: WPS211
         self,
         identifiers: Sequence[str] | None = None,
+        reseller_id: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
         sort_by: sort_pb2.Sort | None = None,
@@ -277,6 +307,7 @@ class DictClient(Client):
     async def find_orders(
         self,
         identifiers: Sequence[str],
+        reseller_id: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
     ) -> orders_pb2.ListOrdersResponse:
@@ -296,6 +327,7 @@ class DictClient(Client):
     async def find_orders_by_journey_id(
         self,
         journey_id: str,
+        reseller_id: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
     ) -> orders_pb2.ListOrdersResponse:
@@ -318,6 +350,7 @@ class DictClient(Client):
     async def find_bookings(
         self,
         identifiers: Sequence[str],
+        reseller_id: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
     ) -> orders_pb2.ListBookingsResponse:
@@ -342,6 +375,7 @@ class DictClient(Client):
     async def find_bookings_by_order_id(
         self,
         order_id: str,
+        reseller_id: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
     ) -> orders_pb2.ListBookingsResponse:
@@ -366,6 +400,7 @@ class DictClient(Client):
     async def find_booking_details(
         self,
         identifiers: Sequence[str],
+        reseller_id: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
     ) -> orders_pb2.ListBookingDetailsResponse:
@@ -390,6 +425,7 @@ class DictClient(Client):
     async def find_booking_details_by_booking_id(
         self,
         booking_id: str,
+        reseller_id: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
     ) -> orders_pb2.ListBookingDetailsResponse:
@@ -506,10 +542,17 @@ class GrpcClient(Client):
 
         return response.order
 
-    async def get_journey(self, identifier: str) -> models_pb2.Journey:
+    async def get_journey(
+        self,
+        identifier: str,
+        reseller_id: str | None = None,
+    ) -> models_pb2.Journey:
         response = await errors.handle_grpc_errors(
             self._orders.GetJourney(
-                orders_pb2.GetJourneyRequest(id=identifier),
+                orders_pb2.GetJourneyRequest(
+                    id=identifier,
+                    reseller_id=reseller_id or "",
+                ),
                 timeout=self._timeout,
             ),
         )
@@ -556,20 +599,34 @@ class GrpcClient(Client):
 
         return response.cancellation
 
-    async def get_order(self, identifier: str) -> models_pb2.Order:
+    async def get_order(
+        self,
+        identifier: str,
+        reseller_id: str | None = None,
+    ) -> models_pb2.Order:
         response = await errors.handle_grpc_errors(
             self._orders.GetOrder(
-                orders_pb2.GetOrderRequest(id=identifier),
+                orders_pb2.GetOrderRequest(
+                    id=identifier,
+                    reseller_id=reseller_id or "",
+                ),
                 timeout=self._timeout,
             ),
         )
 
         return response.order
 
-    async def get_booking(self, identifier: str) -> models_pb2.Booking:
+    async def get_booking(
+        self,
+        identifier: str,
+        reseller_id: str | None = None,
+    ) -> models_pb2.Booking:
         response = await errors.handle_grpc_errors(
             self._orders.GetBooking(
-                orders_pb2.GetBookingRequest(id=identifier),
+                orders_pb2.GetBookingRequest(
+                    id=identifier,
+                    reseller_id=reseller_id or "",
+                ),
                 timeout=self._timeout,
             ),
         )
@@ -579,19 +636,24 @@ class GrpcClient(Client):
     async def get_booking_details(
         self,
         identifier: str,
+        reseller_id: str | None = None,
     ) -> models_pb2.TripOptionDetails:
         response = await errors.handle_grpc_errors(
             self._orders.GetBookingDetails(
-                orders_pb2.GetBookingDetailsRequest(id=identifier),
+                orders_pb2.GetBookingDetailsRequest(
+                    id=identifier,
+                    reseller_id=reseller_id or "",
+                ),
                 timeout=self._timeout,
             ),
         )
 
         return response.details
 
-    async def find_journeys(
+    async def find_journeys(  # noqa: WPS211
         self,
         identifiers: Sequence[str] | None = None,
+        reseller_id: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
         sort_by: sort_pb2.Sort | None = None,
@@ -600,6 +662,7 @@ class GrpcClient(Client):
             ids=identifiers,
             page_token=cursor or "",
             sort_by=sort_by,
+            reseller_id=reseller_id or "",
         )
 
         if limit is not None:
@@ -612,12 +675,14 @@ class GrpcClient(Client):
     async def find_orders(
         self,
         identifiers: Sequence[str],
+        reseller_id: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
     ) -> orders_pb2.ListOrdersResponse:
         request = orders_pb2.ListOrdersRequest(
             ids=orders_pb2.ListOfIds(ids=identifiers),
             page_token=cursor or "",
+            reseller_id=reseller_id or "",
         )
 
         if limit is not None:
@@ -630,12 +695,14 @@ class GrpcClient(Client):
     async def find_orders_by_journey_id(
         self,
         journey_id: str,
+        reseller_id: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
     ) -> orders_pb2.ListOrdersResponse:
         request = orders_pb2.ListOrdersRequest(
             journey_id=journey_id,
             page_token=cursor or "",
+            reseller_id=reseller_id or "",
         )
 
         if limit is not None:
@@ -648,12 +715,14 @@ class GrpcClient(Client):
     async def find_bookings(
         self,
         identifiers: Sequence[str],
+        reseller_id: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
     ) -> orders_pb2.ListBookingsResponse:
         request = orders_pb2.ListBookingsRequest(
             ids=orders_pb2.ListOfIds(ids=identifiers),
             page_token=cursor or "",
+            reseller_id=reseller_id or "",
         )
 
         if limit is not None:
@@ -666,12 +735,14 @@ class GrpcClient(Client):
     async def find_bookings_by_order_id(
         self,
         order_id: str,
+        reseller_id: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
     ) -> orders_pb2.ListBookingsResponse:
         request = orders_pb2.ListBookingsRequest(
             order_id=order_id,
             page_token=cursor or "",
+            reseller_id=reseller_id or "",
         )
 
         if limit is not None:
@@ -684,12 +755,14 @@ class GrpcClient(Client):
     async def find_booking_details(
         self,
         identifiers: Sequence[str],
+        reseller_id: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
     ) -> orders_pb2.ListBookingDetailsResponse:
         request = orders_pb2.ListBookingDetailsRequest(
             ids=orders_pb2.ListOfIds(ids=identifiers),
             page_token=cursor or "",
+            reseller_id=reseller_id or "",
         )
 
         if limit is not None:
@@ -702,12 +775,14 @@ class GrpcClient(Client):
     async def find_booking_details_by_booking_id(
         self,
         booking_id: str,
+        reseller_id: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
     ) -> orders_pb2.ListBookingDetailsResponse:
         request = orders_pb2.ListBookingDetailsRequest(
             booking_id=booking_id,
             page_token=cursor or "",
+            reseller_id=reseller_id or "",
         )
 
         if limit is not None:

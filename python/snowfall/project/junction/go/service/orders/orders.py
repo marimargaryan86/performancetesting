@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import datetime
-from typing import Any, Sequence
+from typing import Any, Mapping, Sequence
 
 import pymongo
 
 from snowfall.project.junction.go.adapter import (
     passenger_name_records as passenger_name_records_adapter,
 )
+from snowfall.project.junction.go.service.orders import mixins as orders_mixins
 from snowfall.project.junction.go.service.orders.v1alpha import models_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
@@ -15,8 +16,18 @@ from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 from snowfall.stdlib.v1 import postal_address_pb2
 
 
+def _add_reseller_id_to_filter(
+    reseller_id: str,
+    filter_: Mapping[str, Any],
+) -> dict[str, Any]:
+    filter_ = dict(filter_)
+    if reseller_id:
+        filter_["reseller_id"] = reseller_id
+    return filter_
+
+
 class JourneyRepository(
-    mixins.FindByIdMixin[models_pb2.Journey],
+    orders_mixins.FindByIdMixin[models_pb2.Journey],
     repository.ProtoRepository[models_pb2.Journey],
 ):
     _proto = models_pb2.Journey
@@ -58,6 +69,7 @@ class JourneyRepository(
         ids: Sequence[str],
         cursor: str,
         sort: tuple[str, int] | None = None,
+        reseller_id: str = "",
     ) -> resultset.ResultSet[models_pb2.Journey]:
         filter_ = (
             {
@@ -68,6 +80,8 @@ class JourneyRepository(
             if ids
             else {}
         )
+
+        filter_ = _add_reseller_id_to_filter(reseller_id, filter_)
 
         return await self._find_with_cursor(
             cur=cursor,
@@ -137,13 +151,17 @@ class OrderRepository(repository.ProtoRepository[models_pb2.Order]):
     async def find_by_id(
         self,
         document_id: str,
+        reseller_id: str = "",
     ) -> models_pb2.Order | None:
-        options = await self._find_with_cursor(
-            filter_={
-                "orders._id": {
-                    "$eq": document_id,
-                },
+        filter_ = {
+            "orders._id": {
+                "$eq": document_id,
             },
+        }
+        filter_ = _add_reseller_id_to_filter(reseller_id, filter_)
+
+        options = await self._find_with_cursor(
+            filter_=filter_,
         )
 
         try:
@@ -155,6 +173,7 @@ class OrderRepository(repository.ProtoRepository[models_pb2.Order]):
         self,
         ids: Sequence[str],
         cursor: str,
+        reseller_id: str = "",
     ) -> resultset.ResultSet[models_pb2.Order]:
         filter_ = (
             {
@@ -165,7 +184,7 @@ class OrderRepository(repository.ProtoRepository[models_pb2.Order]):
             if ids
             else {}
         )
-
+        filter_ = _add_reseller_id_to_filter(reseller_id, filter_)
         return await self._find_with_cursor(
             cur=cursor,
             filter_=filter_,
@@ -175,14 +194,17 @@ class OrderRepository(repository.ProtoRepository[models_pb2.Order]):
         self,
         journey_id: str,
         cursor: str,
+        reseller_id: str = "",
     ) -> resultset.ResultSet[models_pb2.Order]:
+        filter_ = {
+            "orders.journey_id": {
+                "$eq": journey_id,
+            },
+        }
+        filter_ = _add_reseller_id_to_filter(reseller_id, filter_)
         return await self._find_with_cursor(
             cur=cursor,
-            filter_={
-                "orders.journey_id": {
-                    "$eq": journey_id,
-                },
-            },
+            filter_=filter_,
         )
 
     def _generate_bookings(
@@ -236,13 +258,16 @@ class BookingRepository(repository.ProtoRepository[models_pb2.Booking]):
     async def find_by_id(
         self,
         document_id: str,
+        reseller_id: str = "",
     ) -> models_pb2.Booking | None:
-        bookings = await self._find_with_cursor(
-            filter_={
-                "orders.bookings._id": {
-                    "$eq": document_id,
-                },
+        filter_ = {
+            "orders.bookings._id": {
+                "$eq": document_id,
             },
+        }
+        filter_ = _add_reseller_id_to_filter(reseller_id, filter_)
+        bookings = await self._find_with_cursor(
+            filter_=filter_,
         )
 
         try:
@@ -254,6 +279,7 @@ class BookingRepository(repository.ProtoRepository[models_pb2.Booking]):
         self,
         ids: Sequence[str],
         cursor: str,
+        reseller_id: str = "",
     ) -> resultset.ResultSet[models_pb2.Booking]:
         filter_ = (
             {
@@ -265,6 +291,8 @@ class BookingRepository(repository.ProtoRepository[models_pb2.Booking]):
             else {}
         )
 
+        filter_ = _add_reseller_id_to_filter(reseller_id, filter_)
+
         return await self._find_with_cursor(
             cur=cursor,
             filter_=filter_,
@@ -274,14 +302,17 @@ class BookingRepository(repository.ProtoRepository[models_pb2.Booking]):
         self,
         order_id: str,
         cursor: str,
+        reseller_id: str = "",
     ) -> resultset.ResultSet[models_pb2.Booking]:
+        filter_ = {
+            "orders.bookings.order_id": {
+                "$eq": order_id,
+            },
+        }
+        filter_ = _add_reseller_id_to_filter(reseller_id, filter_)
         return await self._find_with_cursor(
             cur=cursor,
-            filter_={
-                "orders.bookings.order_id": {
-                    "$eq": order_id,
-                },
-            },
+            filter_=filter_,
         )
 
     async def update(
@@ -326,13 +357,16 @@ class BookingDetailsRepository(
     async def find_by_id(
         self,
         document_id: str,
+        reseller_id: str = "",
     ) -> models_pb2.TripOptionDetails | None:
-        options = await self._find_with_cursor(
-            filter_={
-                "orders.bookings.trip_option.details._id": {
-                    "$eq": document_id,
-                },
+        filter_ = {
+            "orders.bookings.trip_option.details._id": {
+                "$eq": document_id,
             },
+        }
+        filter_ = _add_reseller_id_to_filter(reseller_id, filter_)
+        options = await self._find_with_cursor(
+            filter_=filter_,
         )
 
         try:
@@ -344,6 +378,7 @@ class BookingDetailsRepository(
         self,
         ids: Sequence[str],
         cursor: str,
+        reseller_id: str = "",
     ) -> resultset.ResultSet[models_pb2.TripOptionDetails]:
         filter_ = (
             {
@@ -355,6 +390,8 @@ class BookingDetailsRepository(
             else {}
         )
 
+        filter_ = _add_reseller_id_to_filter(reseller_id, filter_)
+
         return await self._find_with_cursor(
             cur=cursor,
             filter_=filter_,
@@ -364,14 +401,17 @@ class BookingDetailsRepository(
         self,
         booking_id: str,
         cursor: str,
+        reseller_id: str = "",
     ) -> resultset.ResultSet[models_pb2.TripOptionDetails]:
+        filter_ = {
+            "orders.bookings.trip_option.details.booking_id": {
+                "$eq": booking_id,
+            },
+        }
+        filter_ = _add_reseller_id_to_filter(reseller_id, filter_)
         return await self._find_with_cursor(
             cur=cursor,
-            filter_={
-                "orders.bookings.trip_option.details.booking_id": {
-                    "$eq": booking_id,
-                },
-            },
+            filter_=filter_,
         )
 
 

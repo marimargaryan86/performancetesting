@@ -82,7 +82,10 @@ class OrderService(
         request: orders_pb2.GetJourneyRequest,
         context: aio.ServicerContext,
     ) -> orders_pb2.GetJourneyResponse:
-        journey = await self._journeys.find_by_id(request.id)
+        journey = await self._journeys.find_by_id(
+            request.id,
+            reseller_id=request.reseller_id,
+        )
 
         if journey is None:
             await context.abort(StatusCode.NOT_FOUND)
@@ -98,6 +101,7 @@ class OrderService(
             ids=list(request.ids),
             cursor=request.page_token,
             sort=sorting.get_sort(request.sort_by, self._journey_sort),
+            reseller_id=request.reseller_id,
         )
 
         journeys_result.limit(
@@ -138,7 +142,10 @@ class OrderService(
         request: orders_pb2.GetOrderRequest,
         context: aio.ServicerContext,
     ) -> orders_pb2.GetOrderResponse:
-        order = await self._orders.find_by_id(request.id)
+        order = await self._orders.find_by_id(
+            request.id,
+            reseller_id=request.reseller_id,
+        )
 
         if order is None:
             await context.abort(StatusCode.NOT_FOUND)
@@ -154,11 +161,13 @@ class OrderService(
             orders_result = await self._orders.find_by_journey_id(
                 journey_id=request.journey_id,
                 cursor=request.page_token,
+                reseller_id=request.reseller_id,
             )
         else:
             orders_result = await self._orders.find(
                 ids=list(request.ids.ids),
                 cursor=request.page_token,
+                reseller_id=request.reseller_id,
             )
 
         orders_result.limit(
@@ -175,7 +184,7 @@ class OrderService(
         request: orders_pb2.GetBookingRequest,
         context: aio.ServicerContext,
     ) -> orders_pb2.GetBookingResponse:
-        booking = await self._bookings.find_by_id(request.id)
+        booking = await self._bookings.find_by_id(request.id, request.reseller_id)
 
         if booking is None:
             await context.abort(StatusCode.NOT_FOUND)
@@ -191,11 +200,13 @@ class OrderService(
             bookings_result = await self._bookings.find_by_order_id(
                 order_id=request.order_id,
                 cursor=request.page_token,
+                reseller_id=request.reseller_id,
             )
         else:
             bookings_result = await self._bookings.find(
                 ids=list(request.ids.ids),
                 cursor=request.page_token,
+                reseller_id=request.reseller_id,
             )
 
         bookings_result.limit(
@@ -212,7 +223,10 @@ class OrderService(
         request: orders_pb2.GetBookingDetailsRequest,
         context: aio.ServicerContext,
     ) -> orders_pb2.GetBookingDetailsResponse:
-        details = await self._booking_details.find_by_id(request.id)
+        details = await self._booking_details.find_by_id(
+            request.id,
+            reseller_id=request.reseller_id,
+        )
 
         if details is None:
             await context.abort(StatusCode.NOT_FOUND)
@@ -228,11 +242,13 @@ class OrderService(
             details_result = await self._booking_details.find_by_booking_id(
                 booking_id=request.booking_id,
                 cursor=request.page_token,
+                reseller_id=request.reseller_id,
             )
         else:
             details_result = await self._booking_details.find(
                 ids=list(request.ids.ids),
                 cursor=request.page_token,
+                reseller_id=request.reseller_id,
             )
 
         details_result.limit(
