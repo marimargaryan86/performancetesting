@@ -66,7 +66,7 @@ func (mr *mergeRequest) closesIssues() ([]*gitlab.Issue, error) {
 	}
 
 	for i, issue := range all {
-		newIssue, _, err := mr.client.Issues.GetIssue(issue.ProjectID, issue.IID)
+		newIssue, _, err := mr.client.Issues.GetIssueByID(issue.ID)
 
 		if err != nil {
 			return all, err
