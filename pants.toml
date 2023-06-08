@@ -1,5 +1,5 @@
 [GLOBAL]
-pants_version = "2.17.0rc0"
+pants_version = "2.16.0rc5"
 level = "warn"
 pantsd_max_memory_usage = "8GiB"
 build_file_prelude_globs = ["python/snowfall/plugin/pants/macros.py"]
@@ -14,7 +14,6 @@ backend_packages = [
     "pants.backend.experimental.codegen.protobuf.go",
     "pants.backend.experimental.go",
     "pants.backend.experimental.python.lint.add_trailing_comma",
-    "pants.backend.experimental.python.lint.ruff",
     "pants.backend.experimental.visibility",
     "pants.backend.project_info",
     "pants.backend.python",
@@ -160,17 +159,12 @@ resolves = {python-default = "vendor/constraints.txt"}
 
 [python-infer]
 unowned_dependency_behavior = "error"
-use_rust_parser = true
 
 [python-protobuf]
 mypy_plugin = true
 
 [regex-lint]
 config = "@vendor/regexes.json"
-
-[ruff]
-config = "vendor/pyproject.toml"
-install_from_resolve = "python-default"
 
 [shellcheck]
 version = "v0.9.0"
