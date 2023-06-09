@@ -17,6 +17,8 @@
   export let value: TValue | undefined = undefined;
   export let error: string | boolean = false;
   export let name: string | undefined = undefined;
+  export let readonly = false;
+  export let helpText: string | undefined = undefined;
 
   let inputRef: HTMLInputElement;
 
@@ -55,17 +57,23 @@
       {id}
       {type}
       {name}
+      {readonly}
+      {placeholder}
+      value={displayValue}
+      on:click
       on:focus
       on:blur
-      value={displayValue}
       on:input={onInput}
-      {placeholder}
       bind:this={inputRef}
       class="typography body-medium"
     />
 
     <slot name="icon-after" />
   </div>
+
+  {#if !error && helpText}
+    <span class="help-text" transition:slide|local={{ duration: 300 }}>{helpText}</span>
+  {/if}
 
   {#if typeof error === "string"}
     <span class="error-message" transition:slide|local={{ duration: 300 }}>{error}</span>
@@ -77,11 +85,13 @@
     --x-height: var(--height, 52px);
     --x-icon-padding: var(--icon-padding, 16px);
     --x-font-size: var(--font-size, 14px);
+    --x-label-font-size: var(--label-font-size, 12px);
+    --x-label-font-weight: var(--label-font-weight, 400);
     --x-border-color: var(--border-color, var(--color-common-line-medium));
 
     display: inline-flex;
     flex-flow: column;
-    gap: 4px;
+    gap: 8px;
   }
 
   .text-field:focus-within {
@@ -90,11 +100,10 @@
 
   label {
     color: var(--color-main-neutral-900);
-    font-weight: 400;
-    font-size: 12px;
+    font-weight: var(--x-label-font-weight);
+    font-size: var(--x-label-font-size);
     font-family: Poppins, Arial, Helvetica, sans-serif;
     font-style: normal;
-    line-height: 16px;
     letter-spacing: 0.5px;
   }
 
@@ -118,12 +127,10 @@
 
   .wrapper > :global(svg:first-child) {
     left: var(--x-icon-padding);
-    transition: left 150ms ease;
   }
 
   .wrapper > :global(svg:last-child) {
     right: var(--x-icon-padding);
-    transition: right 150ms ease;
   }
 
   input {
@@ -165,5 +172,13 @@
     font-family: Poppins, Arial, Helvetica, sans-serif;
     font-style: normal;
     line-height: 16px;
+  }
+
+  .help-text {
+    color: var(--color-common-light-medium);
+    font-weight: 400;
+    font-size: 12px;
+    font-family: Inter, Arial, Helvetica, sans-serif;
+    line-height: 1.3;
   }
 </style>

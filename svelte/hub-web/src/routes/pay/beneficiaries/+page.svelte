@@ -18,7 +18,7 @@
   export let data;
   export let form;
 
-  let sortGroup: FlattenedObject<BeneficiaryModel> = "name";
+  let sortGroup: FlattenedObject<BeneficiaryModel> = "bankAccountHolderName";
   let sortDirection: DirectionY = "down";
   let searchQuery = "";
 
@@ -70,25 +70,29 @@
 <div class="content">
   <Table class="beneficiaries-table" {loadMore}>
     <THead>
-      <Header bind:sortGroup bind:sortDirection sortValue="name">Company</Header>
+      <Header bind:sortGroup bind:sortDirection sortValue="bankAccountHolderName">Company</Header>
       <Header>Currency</Header>
-      <Header bind:sortGroup bind:sortDirection sortValue="countryName">Bank Country</Header>
+      <Header bind:sortGroup bind:sortDirection sortValue="bankDetails.address.countryCode">
+        Bank Country
+      </Header>
       <Header>Type</Header>
       <Header />
     </THead>
 
     <TBody>
       {#each beneficiaries as item (item.id)}
+        {@const currency = data.currencies.get(item.currencyCode)}
+
         <TRow alternatingBackground={false}>
-          <TCol class="company-name typography body-medium bold">{item.name}</TCol>
+          <TCol class="company-name typography body-medium bold">{item.bankAccountHolderName}</TCol>
           <TCol>
             <div class="currency">
-              <strong class="typography body-medium bold">{item.currency.code}</strong>
-              <span class="typography body-small">{item.currency.name}</span>
+              <strong class="typography body-medium bold">{item.currencyCode}</strong>
+              <span class="typography body-small">{currency?.name ?? ""}</span>
             </div>
           </TCol>
-          <TCol class="typography body-medium bold">{item.countryName}</TCol>
-          <TCol class="typography body-medium">{capitalize(item.type)}</TCol>
+          <TCol class="typography body-medium bold">{item.bankDetails.address.countryCode}</TCol>
+          <TCol class="typography body-medium">{capitalize(item.bankDetails.paymentTypes)}</TCol>
           <TCol width="172px">
             <div class="beneficiary-actions">
               <a href={routeConfig.pay.beneficiaries.beneficiary(item.id)}><EditIcon /></a>

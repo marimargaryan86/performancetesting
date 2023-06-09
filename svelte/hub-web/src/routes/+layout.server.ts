@@ -1,5 +1,6 @@
 import type { MaybePromise } from "@sveltejs/kit";
 import integrationInstances from "integration-instances";
+import type { CountryModel } from "models/location.js";
 import type { CurrencyModel } from "models/money";
 import type { UserModel } from "models/user";
 
@@ -9,16 +10,18 @@ export function load(event): {
     token: string;
     sessionExpiresAt: Date;
   };
-  currencies: MaybePromise<CurrencyModel[]>;
+  currencies: MaybePromise<Map<string, CurrencyModel>>;
+  countries: Map<string, CountryModel>;
 } {
   const user = event.locals.user;
 
   if (!user) {
-    return { currencies: [] };
+    return { currencies: new Map(), countries: new Map() };
   }
 
   return {
     user,
     currencies: integrationInstances.junctionPay.currencies.listCurrencies(user.token),
+    countries: integrationInstances.common.countries.findCountries(),
   };
 }

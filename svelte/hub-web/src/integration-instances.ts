@@ -1,5 +1,6 @@
 import { env } from "$env/dynamic/public";
 import junctionPay from "integration/junction-pay/services";
+import common from "integration/common/services";
 
 const junctionPayCompanyService = new junctionPay.CompanyService(env.PUBLIC_PAY_ADMIN_API_BASE_URL);
 
@@ -16,5 +17,8 @@ export default {
     balances: new junctionPay.BalanceService(env.PUBLIC_PAY_ADMIN_API_BASE_URL),
     currencies: new junctionPay.CurrencyService(env.PUBLIC_PAY_API_BASE_URL),
     beneficiaries: new junctionPay.BeneficiaryService(env.PUBLIC_PAY_ADMIN_API_BASE_URL),
+  },
+  common: {
+    countries: new common.CountryService(),
   },
 };

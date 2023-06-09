@@ -1,51 +1,132 @@
-import { writable, type StartStopNotifier, type Writable } from "svelte/store";
+import { writable, type StartStopNotifier, type Writable, type Readable } from "svelte/store";
 import * as devalue from "devalue";
+import { deleteCookie, getCookie, setCookie } from "./cookies";
+
+type VerificationFunc<T> = (data: T) => boolean;
 
 type WritableStorage<T> = Writable<T> & {
   /** Removes the item from storage. */
   remove: () => void;
 };
 
-function writableStorage<T>({
-  storage: storageKey,
-  key,
-  value,
-  start,
-}: {
-  storage: "localStorage" | "sessionStorage";
+interface StoreOptions<T> {
   key: string;
   value?: T;
   start?: StartStopNotifier<T>;
-}): WritableStorage<T> {
-  const storage = typeof window === "undefined" ? undefined : window[storageKey];
-  const storageValue = storage?.getItem(key);
-  const initialValue = typeof storageValue === "string" ? devalue.parse(storageValue) : value;
-  const store = writable(initialValue, start);
+  verify?: VerificationFunc<T>;
+}
 
-  store.subscribe((nextValue) => {
-    storage?.setItem(key, devalue.stringify(nextValue));
+function writableStorage<T>(
+  options: StoreOptions<T> & {
+    storageType: "localStorage" | "sessionStorage";
+  },
+): WritableStorage<T> {
+  const store = writable(options.value, options.start);
+  const returnValue = {
+    ...store,
+    remove(): void {
+      //
+    },
+  };
+
+  if (typeof window === "undefined") {
+    return returnValue;
+  }
+
+  const storage = window[options.storageType];
+
+  if (!storage) {
+    return returnValue;
+  }
+
+  const initialValue = storage.getItem(options.key);
+
+  if (initialValue) {
+    const data = devalue.parse(initialValue);
+
+    if (options.verify?.(data) ?? true) {
+      store.set(data);
+    } else {
+      storage.removeItem(options.key);
+    }
+  }
+
+  store.subscribe((value) => {
+    storage.setItem(options.key, devalue.stringify(value));
   });
 
   return {
     ...store,
     remove(): void {
-      storage?.removeItem(key);
+      storage?.removeItem(options.key);
     },
   };
 }
 
-export function writableLocal<T>(
-  key: string,
-  value?: T,
-  start?: StartStopNotifier<T>,
-): WritableStorage<T> {
-  return writableStorage({ storage: "localStorage", key, value, start });
+export function writableLocalStorage<T>(options: StoreOptions<T>): WritableStorage<T> {
+  return writableStorage({
+    storageType: "localStorage",
+    ...options,
+  });
 }
 
-export function writableSession<T>(
-  key: string,
-  value?: T,
-  start?: StartStopNotifier<T>,
+export function readableLocalStorage<T>(options: StoreOptions<T>): Readable<T> {
+  return writableLocalStorage(options);
+}
+
+export function writableSessionStorage<T>(options: StoreOptions<T>): WritableStorage<T> {
+  return writableStorage({
+    storageType: "sessionStorage",
+    key: options.key,
+    start: options.start,
+    value: options.value,
+    verify: options.verify,
+  });
+}
+
+export function readableSessionStorage<T>(options: StoreOptions<T>): Readable<T> {
+  return writableSessionStorage(options);
+}
+
+export function writableCookie<T>(
+  options: StoreOptions<T> & { overwrite?: boolean },
 ): WritableStorage<T> {
-  return writableStorage({ storage: "sessionStorage", key, value, start });
+  const store = writable(options.value, options.start);
+  const returnValue = {
+    ...store,
+    remove(): void {
+      //
+    },
+  };
+
+  if (typeof window === "undefined") {
+    return returnValue;
+  }
+
+  const initialValue = getCookie(options.key);
+
+  if (!options.overwrite && initialValue) {
+    const data = devalue.parse(decodeURIComponent(window.atob(initialValue)));
+
+    if (options.verify?.(data) ?? true) {
+      store.set(data);
+    } else {
+      deleteCookie(options.key);
+    }
+  }
+
+  store.subscribe((value) => {
+    setCookie(options.key, window.btoa(encodeURIComponent(devalue.stringify(value))));
+  });
+
+  return {
+    ...store,
+    remove(): void {
+      deleteCookie(options.key);
+    },
+  };
+}
+
+export function readableCookie<T>(options: StoreOptions<T>): Readable<T> {
+  return writableCookie(options);
 }

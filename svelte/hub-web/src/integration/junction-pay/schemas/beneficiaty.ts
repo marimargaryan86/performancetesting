@@ -2,6 +2,14 @@ import type { AccountIdentifierSchema } from "./account";
 import type { RelationshipSchema } from "./common";
 import type { CurrencyIdentifierSchema } from "./money";
 
+export const paymentTypes = ["priority", "regular"] as const;
+
+export type PaymentType = (typeof paymentTypes)[number];
+
+export const accountTypes = ["checking", "savings"] as const;
+
+export type AccountType = (typeof accountTypes)[number];
+
 export interface AddressDetails {
   addressLines: string[];
   countryCode: string;
@@ -13,22 +21,24 @@ export interface EnhancedAddressDetails extends AddressDetails {
   state?: string | null;
 }
 
-export interface BaseBankDetails {
+export interface BaseBankDetailsSchema {
   name: string;
   bicSwift?: string | null;
-  accountType: "checking" | "savings";
-  paymentTypes: "priority" | "regular";
+  accountType: AccountType;
+  paymentTypes: PaymentType;
   address: AddressDetails;
 }
 
-export interface BankDetailsAba extends BaseBankDetails {
+export interface BankDetailsAbaSchema extends BaseBankDetailsSchema {
   accountNumber: string | null;
   aba: string | null;
 }
 
-export interface BankDetailsIban extends BaseBankDetails {
+export interface BankDetailsIbanSchema extends BaseBankDetailsSchema {
   iban: string | null;
 }
+
+export type BankDetailsSchema = BankDetailsAbaSchema | BankDetailsIbanSchema;
 
 export interface BeneficiaryIdentifierSchema {
   id: string;
@@ -40,7 +50,7 @@ export interface BeneficiarySchema extends BeneficiaryIdentifierSchema {
     bankAccountHolderName: string;
     email: string;
     beneficiaryAddress: EnhancedAddressDetails;
-    bankDetails: BankDetailsAba | BankDetailsIban;
+    bankDetails: BankDetailsSchema;
   };
   relationships: {
     currency: RelationshipSchema<CurrencyIdentifierSchema>;

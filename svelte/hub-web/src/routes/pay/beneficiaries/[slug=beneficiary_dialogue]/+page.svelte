@@ -35,25 +35,27 @@
   import Button from "components/ui/button.svelte";
   import { page } from "$app/stores";
   import { goto } from "$app/navigation";
-  import { writableSession } from "utils/persistent-store";
-  import type { RecursivePartial } from "utils/common";
-  import type { BeneficiaryModel } from "models/beneficiary";
+  import { writableCookie } from "utils/persistent-store";
+  import type { CreateBeneficiaryModel } from "models/beneficiary";
   import StepView from "components/page/step-view.svelte";
   import routeConfig from "routeConfig";
+  import BeneficiaryDetails from "./beneficiary-details.svelte";
+  import BankAccountDetails from "./bank-account-details.svelte";
+  import Summary from "./summary.svelte";
 
   export let data: PageData;
 
-  const nextBeneficiary = writableSession<RecursivePartial<BeneficiaryModel>>(
-    "beneficiary",
-    data.beneficiary ?? {},
-  );
+  const beneficiary = writableCookie<CreateBeneficiaryModel>({
+    key: "beneficiary-data",
+    value: data.beneficiary ?? {},
+    overwrite: true,
+  });
 
-  $: $nextBeneficiary = data.beneficiary ?? $nextBeneficiary;
   $: step = ($page.url.searchParams.get("step") ?? "beneficiary") as Step;
   $: title = `${data.beneficiary ? "Edit" : "Add"} Beneficiary`;
   $: breadCrumbs = [
     { label: "Beneficiaries", url: routeConfig.pay.beneficiaries.root },
-    { label: title, url: routeConfig.pay.beneficiaries.beneficiary(data.beneficiary?.id) },
+    { label: title, url: routeConfig.pay.beneficiaries.beneficiary(data.beneficiary.id) },
   ];
 
   async function goToPrevious(): Promise<void> {
@@ -102,12 +104,15 @@
 <div class="content">
   <div class="wrapper">
     {#if step === "beneficiary"}
-      <div>{JSON.stringify($nextBeneficiary)}</div>
-      <span>TODO: Beneficiary</span>
+      <BeneficiaryDetails bind:data={$beneficiary} countries={data.countries} />
     {:else if step === "account"}
-      <span>TODO: Account</span>
+      <BankAccountDetails
+        bind:data={$beneficiary}
+        countries={data.countries}
+        currencies={data.currencies}
+      />
     {:else if step === "summary"}
-      <span>TODO: Summary</span>
+      <Summary data={$beneficiary} countries={data.countries} currencies={data.currencies} />
     {/if}
   </div>
 </div>
@@ -136,8 +141,11 @@
   }
 
   .wrapper {
+    display: flex;
+    flex-flow: column;
+    gap: 40px;
     height: 100%;
-    padding: 16px;
+    padding: 56px 16px;
     overflow: auto;
     background-color: var(--color-common-background-light-main);
     border-radius: 16px;

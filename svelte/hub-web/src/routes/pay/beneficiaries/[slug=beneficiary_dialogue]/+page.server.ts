@@ -1,21 +1,28 @@
-import { error } from "@sveltejs/kit";
 import integrationInstances from "integration-instances";
-import type { BeneficiaryModel } from "models/beneficiary";
-import { getToken } from "utils/auth.js";
+import type { CreateBeneficiaryModel } from "models/beneficiary";
+import { getToken } from "utils/auth";
+import * as devalue from "devalue";
 
-export function load(event): { beneficiary?: Promise<BeneficiaryModel> } {
+export async function load(event): Promise<{
+  beneficiary: CreateBeneficiaryModel;
+}> {
+  const cookieData = event.cookies.get("beneficiary-data");
+  let beneficiary: CreateBeneficiaryModel | undefined = cookieData
+    ? devalue.parse(decodeURIComponent(Buffer.from(cookieData, "base64").toString()))
+    : undefined;
+
   if (event.params.slug === "add") {
-    return {};
+    if (beneficiary?.id) {
+      beneficiary = undefined;
+    }
+  } else if (beneficiary?.id !== event.params.slug) {
+    beneficiary = await integrationInstances.junctionPay.beneficiaries.getBeneficiary(
+      getToken(event),
+      event.params.slug,
+    );
   }
 
-  try {
-    return {
-      beneficiary: integrationInstances.junctionPay.beneficiaries.getBeneficiary(
-        getToken(event),
-        event.params.slug,
-      ),
-    };
-  } catch {
-    throw error(404, { message: "Not found" });
-  }
+  return {
+    beneficiary: beneficiary ?? {},
+  };
 }

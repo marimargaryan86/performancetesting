@@ -13,7 +13,7 @@
   export let token: string | undefined;
   export let accountId: string;
   export let exclude: MoneyModel[];
-  export let currencies: CurrencyModel[];
+  export let currencies: Map<string, CurrencyModel>;
 
   export function close(): void {
     visible = false;
@@ -37,7 +37,7 @@
 
   const dispatch = createEventDispatcher<{ addbalances: MoneyModel[] }>();
 
-  $: filteredBalances = currencies.filter(
+  $: filteredBalances = Array.from(currencies.values()).filter(
     (balance) =>
       balance.code.toLowerCase().includes(searchQuery.toLowerCase()) &&
       !exclude.find((money) => money.currency === balance.code),
