@@ -206,7 +206,10 @@ class ListAndViewEnum(object):
         pagination = pagination_helpers.get_pagination(request)
         sequence_page = sequence.paginate(
             sequence=sorted(
-                (enum_value.number for enum_value in self._enum.DESCRIPTOR.values),
+                (
+                    enum_value.number
+                    for enum_value in self._enum.DESCRIPTOR.values  # noqa: PD011
+                ),
                 key=self._to_id,
             ),
             cursor=pagination.cursor,

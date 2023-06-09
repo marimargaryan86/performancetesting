@@ -14,7 +14,7 @@ class PassengerTypeEnum(enum.Enum):
     # age above 15
     adult = "adult"
     # age 12 - 15
-    # YOUNG_ADULT = "young_adult"  # TODO: Impl?
+    # YOUNG_ADULT = "young_adult"  # TODO: Impl?   # noqa: ERA001
     # age 2 - 11
     child = "child"
     # age under 2

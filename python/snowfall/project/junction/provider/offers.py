@@ -218,7 +218,7 @@ class TripOfferSearchConsumer(Generic[_SearchCriteriaTask, _SearchCriteria]):
             )
 
 
-def create_trip_offer_search_consumer(  # noqa:WPS211
+def create_trip_offer_search_consumer(  # noqa: WPS211
     amqp_connection: amqp_types.Connection,
     redis_client: redis.Client[bytes],
     implementation: OfferSearchImplementation[_SearchCriteriaTask, _SearchCriteria],

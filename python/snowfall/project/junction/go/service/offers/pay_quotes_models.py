@@ -15,21 +15,21 @@ class PayQuoteAttributes(PayBaseModel):
 
 
 class PayQuoteCompanyData(PayBaseModel):
-    id: str  # noqa:A003
-    type: Literal["companies"] = "companies"  # noqa:A003
+    id: str  # noqa: A003
+    type: Literal["companies"] = "companies"  # noqa: A003
 
 
 class PayQuoteCompany(PayBaseModel):
-    data: PayQuoteCompanyData  # noqa:WPS110
+    data: PayQuoteCompanyData  # noqa: WPS110
 
 
 class PayQuoteCurrencyData(PayBaseModel):
-    id: str  # noqa:A003
-    type: Literal["currencies"] = "currencies"  # noqa:A003
+    id: str  # noqa: A003
+    type: Literal["currencies"] = "currencies"  # noqa: A003
 
 
 class PayQuoteCurrency(PayBaseModel):
-    data: PayQuoteCurrencyData  # noqa:WPS110
+    data: PayQuoteCurrencyData  # noqa: WPS110
 
 
 class PayQuoteRelationships(PayBaseModel):
@@ -40,18 +40,18 @@ class PayQuoteRelationships(PayBaseModel):
 
 
 class PayQuoteData(PayBaseModel):
-    type: Literal["quotes"] = "quotes"  # noqa:A003
+    type: Literal["quotes"] = "quotes"  # noqa: A003
     attributes: PayQuoteAttributes
     relationships: PayQuoteRelationships
 
 
 class PayQuoteResponseData(PayQuoteData):
-    id: str  # noqa:A003
+    id: str  # noqa: A003
 
 
 class PayQuoteRequest(PayBaseModel):
-    data: PayQuoteData  # noqa:WPS110
+    data: PayQuoteData  # noqa: WPS110
 
 
 class PayQuoteResponse(PayBaseModel):
-    data: PayQuoteResponseData  # noqa:WPS110
+    data: PayQuoteResponseData  # noqa: WPS110

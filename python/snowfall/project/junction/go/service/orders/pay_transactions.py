@@ -39,7 +39,7 @@ class PayTransactionCreator(object):
         external_reference: str,
         invoice_reference: str,
     ) -> PayTransactionResponse:
-        try:  # noqa:WPS229
+        try:  # noqa: WPS229
             resp = await self._pay_client.create_transactions(
                 external_reference=external_reference,
                 invoice_reference=invoice_reference,

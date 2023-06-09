@@ -26,8 +26,8 @@ from snowfall.project.pss.service.pss_api_v2.schemas.transactions import (
 from snowfall.project.pss.service.pss_api_v2.validators.validator import Validator
 
 
-class TransactionValidator(Validator[TransactionPostSchema]):  # noqa:WPS214
-    def __init__(  # noqa:WPS211
+class TransactionValidator(Validator[TransactionPostSchema]):  # noqa: WPS214
+    def __init__(  # noqa: WPS211
         self,
         transaction_statuses_repository: Repository[TransactionStatus] = Depends(
             Repository.factory(TransactionStatus),
@@ -63,7 +63,7 @@ class TransactionValidator(Validator[TransactionPostSchema]):  # noqa:WPS214
         self._passenger_types_repository = passenger_types_repository
         self._seat_types_repository = seat_types_repository
 
-    async def is_valid(  # noqa:WPS217
+    async def is_valid(  # noqa: WPS217
         self,
         to_validate: TransactionPostSchema,
     ) -> tuple[bool, list[str]]:

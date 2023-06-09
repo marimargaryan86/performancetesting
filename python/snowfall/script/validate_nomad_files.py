@@ -107,8 +107,7 @@ def _validate_tasks(
                 errors = True
                 _log_error(
                     (
-                        '{0}: task "{1}" in group "{2}" in job "{3}"'
-                        + ' should be "{4}"'
+                        '{0}: task "{1}" in group "{2}" in job "{3}" should be "{4}"'
                     ).format(
                         template_path,
                         task_name,

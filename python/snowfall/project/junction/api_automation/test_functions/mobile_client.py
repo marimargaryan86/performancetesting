@@ -76,8 +76,10 @@ class MobileApiClient(Client):  # noqa: WPS214
         include: Sequence[order_includes] | None = None,
     ) -> dict[str, Any]:
         raise RuntimeError(
-            "This client cannot create orders without payments. "
-            + "Please, use create_order_with_payments",
+            (
+                "This client cannot create orders without payments. "
+                "Please, use create_order_with_payments"
+            ),
         )
 
     async def create_order_with_payment(  # noqa: WPS211

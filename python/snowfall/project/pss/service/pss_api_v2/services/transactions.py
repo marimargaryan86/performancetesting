@@ -67,7 +67,7 @@ class TransactionService(object):
     ) -> TransactionPostSchema:
         return self._blank_transaction_for_stubbing
 
-    async def _has_multiple_passengers_in_same_seat(  # noqa:WPS210
+    async def _has_multiple_passengers_in_same_seat(  # noqa: WPS210
         self,
         transaction: TransactionPostSchema,
     ) -> bool:

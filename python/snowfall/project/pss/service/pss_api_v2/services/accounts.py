@@ -22,7 +22,7 @@ from snowfall.project.pss.service.pss_api_v2.schemas.accounts import AccountUpda
 from snowfall.project.pss.service.pss_api_v2.services.emails import SMTPEmailService
 
 
-class AccountsService(object):  # noqa:WPS214
+class AccountsService(object):  # noqa: WPS214
     _token_expiry_length_seconds = 3600
 
     def __init__(

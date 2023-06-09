@@ -29,7 +29,7 @@ from snowfall.project.pss.service.pss_api_v2.validators.transaction import (
 )
 
 
-class TestTransactionValidation:  # noqa:WPS306,WPS214
+class TestTransactionValidation:  # noqa: WPS306,WPS214
     _schema = TransactionPostSchema(
         directions={"outbound"},
         channel="desktop",
@@ -435,7 +435,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
         assert (
             reasons[0]
             == "No entry in passenger_types for"
-            + " outbound.passengers[0].passenger_type_id: 1"
+            " outbound.passengers[0].passenger_type_id: 1"
         )
 
     async def test_that_none_outbound_passenger_passenger_type_id_validates(
@@ -501,7 +501,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
         assert (
             reasons[0]
             == "No entry in passenger_types for"
-            + " inbound.passengers[0].passenger_type_id: 1"
+            " inbound.passengers[0].passenger_type_id: 1"
         )
 
     async def test_that_none_inbound_passenger_passenger_type_id_validates(
@@ -706,7 +706,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
         assert is_valid
         assert not reasons
 
-    async def test_that_wholly_invalid_transaction_has_all_errors(  # noqa:WPS218
+    async def test_that_wholly_invalid_transaction_has_all_errors(  # noqa: WPS218
         self,
     ) -> None:
         to_validate = deepcopy(self._schema)
@@ -765,7 +765,7 @@ class TestTransactionValidation:  # noqa:WPS306,WPS214
         assert "No entry in products for inbound.product_id: 1" in reasons
         assert (
             "No entry in passenger_types for"
-            + " outbound.passengers[0].passenger_type_id: 1"
+            " outbound.passengers[0].passenger_type_id: 1"
             in reasons
         )
         assert (

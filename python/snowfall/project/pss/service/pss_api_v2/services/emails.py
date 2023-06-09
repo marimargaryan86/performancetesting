@@ -78,5 +78,9 @@ class SMTPEmailService(object):
         async with self._client:
             try:
                 await self._client.send_message(email)
-            except Exception as error:
+            except (
+                ValueError,
+                aiosmtplib.SMTPResponseException,
+                aiosmtplib.SMTPRecipientsRefused,
+            ) as error:
                 raise SMTPEmailError("Error when sending email") from error

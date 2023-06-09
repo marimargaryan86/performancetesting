@@ -3,14 +3,14 @@ from typing import Any, Callable, Generic, Mapping, Sequence, TypeVar
 from fastapi import Depends
 from sqlalchemy import ColumnElement, select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
-from sqlalchemy.sql._typing import _DMLColumnArgument  # noqa:WPS436,WPS450
+from sqlalchemy.sql._typing import _DMLColumnArgument  # noqa: WPS436,WPS450
 
 from snowfall.project.pss.service.pss_api_v2.db.db import get_db
 
 REPOSITORY_MODEL = TypeVar("REPOSITORY_MODEL")
 
 
-class Repository(Generic[REPOSITORY_MODEL]):  # noqa:WPS214
+class Repository(Generic[REPOSITORY_MODEL]):  # noqa: WPS214
     def __init__(self, db: async_sessionmaker[AsyncSession]):
         self._db = db
 

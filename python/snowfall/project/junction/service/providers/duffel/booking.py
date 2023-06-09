@@ -70,7 +70,7 @@ class BookingHandler(object):  # noqa: WPS214
         if abs(price_difference_percent) > self._price_change_tolerance_percent:
             error_text = (
                 "Offer price changed from {original_price} to {updated_price}."
-                + "Price change exceeded {price_change_tolerance}%"
+                "Price change exceeded {price_change_tolerance}%"
             ).format(
                 updated_price=updated_price,
                 original_price=original_price,

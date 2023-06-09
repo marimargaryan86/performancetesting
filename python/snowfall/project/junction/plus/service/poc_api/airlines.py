@@ -489,7 +489,7 @@ airlines_mapping = {
     "G3": "GOL Linhas Aereas S.A.",
     "Y5": (
         "Golden Myanmar Airlines Public Co. Ltd dbaGolden Myanmar Airlines Public"
-        + " Co.Ltd"
+        " Co.Ltd"
     ),
     "IV": "GP Aviation Ltd",
     "YR": "Grand Canyon Airlines, Inc. dba Scenic Airlines",

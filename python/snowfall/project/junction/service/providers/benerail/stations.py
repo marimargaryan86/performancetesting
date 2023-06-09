@@ -1,4 +1,3 @@
-# type: ignore
 import contextlib
 import json
 import random
@@ -14,7 +13,7 @@ from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.transport.grpc import client as grpc_client
 from snowfall.stdlib.v1 import latlng_pb2
 from snowfall.vendor.benerail import client
-from snowfall.vendor.benerail.models.enumeration import response
+from snowfall.vendor.benerail.models.enumeration import response, results
 
 
 async def dump_stations(app: service.Application[config.DumpStationsSettings]) -> None:
@@ -54,7 +53,7 @@ async def dump_stations(app: service.Application[config.DumpStationsSettings]) -
         )
 
 
-async def _to_stations(
+async def _to_stations(  # noqa: WPS231
     station_responses: Sequence[response.PlacesResponse],
     geocoder: geocoding_pb2_grpc.GeocodingServiceStub,
     output_file_path: str,
@@ -62,32 +61,63 @@ async def _to_stations(
     stations = []
 
     for response_obj in station_responses:
+        if not response_obj.response_result or not response_obj.response_result.places:
+            continue
+
         for place_result in response_obj.response_result.places:
             name = ""
 
-            with contextlib.suppress(KeyError):
-                name = place_result.place.labels["*"].code_long or ""
+            if not isinstance(place_result.place, results.Station):
+                continue
+
+            if place_result.place.labels:
+                with contextlib.suppress(KeyError):
+                    name = place_result.place.labels["*"].code_long or ""
 
             stations.append(
                 {
-                    "id": place_result.place.codes.get("bnds"),
+                    "id": (
+                        place_result.place.codes.get("bnds")
+                        if place_result.place.codes
+                        else None
+                    ),
                     "name": name,
                     "time_zone": (
                         await geocoder.TimeZoneLookup(
                             geocoding_pb2.TimeZoneLookupRequest(
                                 coordinates=latlng_pb2.LatLng(
                                     latitude=float(
-                                        place_result.geo_coordinate.latitude,
+                                        (
+                                            place_result.geo_coordinate.latitude
+                                            if place_result.geo_coordinate
+                                            else 0
+                                        ),
                                     ),
                                     longitude=float(
-                                        place_result.geo_coordinate.longitude,
+                                        (
+                                            place_result.geo_coordinate.longitude
+                                            if place_result.geo_coordinate
+                                            else 0
+                                        ),
                                     ),
                                 ),
                             ),
                         )
                     ).time_zone.id,
-                    "latitude": float(place_result.geo_coordinate.latitude),
-                    "longitude": float(place_result.geo_coordinate.longitude),
+                    "latitude": float(
+                        (
+                            place_result.geo_coordinate.latitude
+                            if place_result.geo_coordinate
+                            else 0
+                        ),
+                    ),
+                    "longitude": float(
+                        (
+                            place_result.geo_coordinate.longitude
+                            if place_result.geo_coordinate
+                            else 0
+                        ),
+                    ),
                 },
             )
 

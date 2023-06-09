@@ -31,7 +31,7 @@ class BookingImporter(object):
         await self._bookings.update(booking=message.body)
 
         if message.body.trip_option.pay_quote_id:
-            try:  # noqa:WPS229
+            try:  # noqa: WPS229
                 booking_with_transaction = (
                     await self._pay_transaction_creator.create_transaction_and_set_id(
                         message.body,

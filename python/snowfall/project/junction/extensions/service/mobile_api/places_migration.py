@@ -1,8 +1,8 @@
 import datetime
 from collections.abc import AsyncIterable
 
-import numpy
-import pandas
+import numpy as np
+import pandas as pd
 from google.protobuf import timestamp_pb2
 from motor import motor_asyncio
 from pycountry import countries
@@ -25,7 +25,7 @@ _ATTRIBUTES_KEY = "attributes"
 async def migrate(settings: bootstrap.MigrateSettings) -> None:  # noqa: WPS210
     mongo = motor_asyncio.AsyncIOMotorClient(settings.mongo_dsn)
     places_repository = repository.PlacesRepository(mongo[settings.mongo_db]["places"])
-    osm_data = pandas.read_csv(
+    osm_data = pd.read_csv(
         filesystem.resource_path(
             "snowfall.project.junction.extensions.service.mobile_api.main",
             "cities_populations.csv",
@@ -51,7 +51,7 @@ async def migrate(settings: bootstrap.MigrateSettings) -> None:  # noqa: WPS210
 async def _save_enrich_data(  # noqa: WPS210
     places: AsyncIterable[Place],
     repo: repository.PlacesRepository,
-    osm_data: pandas.DataFrame,
+    osm_data: pd.DataFrame,
 ) -> None:
     updated = timestamp_pb2.Timestamp()
     updated.FromDatetime(datetime.datetime.now(tz=datetime.timezone.utc))
@@ -60,12 +60,12 @@ async def _save_enrich_data(  # noqa: WPS210
         # fmt: off
         osm_place = (
             osm_data[
-                (numpy.isclose(osm_data["lat"], loc.coordinates.latitude))
-                & (numpy.isclose(osm_data["long"], loc.coordinates.longitude))
+                (np.isclose(osm_data["lat"], loc.coordinates.latitude))
+                & (np.isclose(osm_data["long"], loc.coordinates.longitude))
             ].head(
                 1,
             ).replace(
-                {numpy.nan: None},
+                {np.nan: None},
             ).to_dict(
                 orient="records",
             )[0]

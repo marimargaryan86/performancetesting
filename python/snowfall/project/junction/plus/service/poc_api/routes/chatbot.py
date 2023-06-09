@@ -83,7 +83,7 @@ class Whatsapp(endpoints.HTTPEndpoint):
                 )
                 twiml_response.message(
                     "Multiple journeys are available. Please choose one of the "
-                    + "following options \n"
+                    "following options \n"
                     + "\n".join(
                         [
                             chatbot_utils.journey_signature_str(journey, idx)
@@ -124,7 +124,7 @@ class Whatsapp(endpoints.HTTPEndpoint):
                 except IndexError:
                     twiml_response.message(
                         "Multiple journeys are available. Please type CHECKIN <space> "
-                        + "followed by  journey option number: \n"
+                        "followed by  journey option number: \n"
                         + "\n".join(
                             [
                                 chatbot_utils.journey_signature_str(journey, idx)

@@ -7,7 +7,7 @@ if __name__ == "__main__":
     entrypoint.enter_with_commands(
         service.Command(
             name="dump-stations",
-            callback=stations.dump_stations,  # type: ignore[attr-defined]
+            callback=stations.dump_stations,
             settings_class=config.DumpStationsSettings,
         ),
     )

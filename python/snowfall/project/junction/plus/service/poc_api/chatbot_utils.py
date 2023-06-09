@@ -188,7 +188,7 @@ async def get_flight_status(
 def home_message() -> str:
     return (
         "Sorry I am unable to understand your request, please choose from then"
-        + " available commands below"
+        " available commands below"
     )
 
 
@@ -342,8 +342,10 @@ async def send_subscription(
     mobile: str,
 ) -> None:
     twilio_client.send_message(
-        body="Thank you for your booking. "
-        + "Would you like to receive travel related updates via WhatsApp?",
+        body=(
+            "Thank you for your booking. "
+            "Would you like to receive travel related updates via WhatsApp?"
+        ),
         receiver=mobile,
     )
 

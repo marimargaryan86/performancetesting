@@ -27,7 +27,7 @@ class TestTransactions(object):
         for event_log in event_logs:
             assert event_log["event"] == (  # type: ignore[index]
                 "Conversion of GBP equivalent 0.89 is"
-                + " less than your lower limit of 1.00"
+                " less than your lower limit of 1.00"
             )
 
     async def test_get_all_transactions_success(

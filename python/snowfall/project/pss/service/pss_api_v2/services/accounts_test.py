@@ -28,7 +28,7 @@ async def test_that_get_all_accounts_returns_results_from_database() -> None:
     assert returned_accounts == accounts
 
 
-class UpdateAccountTestCase(TestCase):  # noqa:WPS230
+class UpdateAccountTestCase(TestCase):  # noqa: WPS230
     def setUp(self) -> None:
         self.new_email = "updated@test.com"
         self.new_password = "new_test_password"  # nosec

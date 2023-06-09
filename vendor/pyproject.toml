@@ -34,7 +34,7 @@ select = [
     #"ARG",
     "ASYNC", # flake8-async
     "B", # flake8-bugbear
-    #"BLE",
+    "BLE", # flake8-blind-except
     "C4", # flake8-comprehensions
     "C90", # mccabe
     "COM", # flake8-commas
@@ -42,22 +42,20 @@ select = [
     #"DTZ",
     "E", # pycodestyle
     #"EM",
-    #"ERA",
+    "ERA", # eradicate
     "EXE", # flake8-executable
     "F", # Pyflakes
     "FA", # flake8-future-annotations
     #"FBT",
-    #"FLY",
     "G", # flake8-logging-format
     #"I",
-    #"ISC",
-    #"ICN",
-    #"INP",
+    "ISC", # flake8-implicit-str-concat
+    "ICN", # flake8-import-conventions
     "INT", # flake8-gettext
     "N", # pep8-naming
     "NPY", # NumPy-specific rules
-    #"PD",
-    #"PGH",
+    "PD", # pandas-vet
+    "PGH", # pygrep-hooks
     "PIE", # flake8-pie
     #"PL",
     #"RET",
@@ -90,5 +88,5 @@ mypy-init-return = true
 "python/snowfall/project/pss/service/pss_api_v2/**/*.py" = ["B008"]
 "python/snowfall/project/pss/service/pss_api_v2/db/models/**/*.py" = ["A003"]
 "python/snowfall/vendor/carnect/models/**/*.py" = ["A003"]
-"python/snowfall/vendor/gubernator/gubernator_pb2.py" = ["E402"]
+"python/snowfall/vendor/gubernator/gubernator_pb2.py" = ["E402", "ERA001"]
 "python/snowfall/vendor/gubernator/gubernator_pb2_grpc.py" = ["ANN001", "ANN201", "ANN204", "ANN205", "N802"]

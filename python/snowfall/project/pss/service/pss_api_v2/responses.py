@@ -6,7 +6,7 @@ from snowfall.project.pss.service.pss_api_v2.schemas.responses import FAIL, SUCC
 
 
 class SuccessResponse(JSONResponse):
-    def __init__(self, status_code: int, data: Any):  # noqa:WPS110
+    def __init__(self, status_code: int, data: Any):  # noqa: WPS110
         super().__init__(
             status_code=status_code,
             content={"status": SUCCESS, "data": data},

@@ -194,12 +194,12 @@ async def test_can_initiate_forgot_password_if_account_exists(
 
     async with db_session() as session:
         statement = select(AccountForgottenPassword).filter(
-            AccountForgottenPassword.used == False,  # noqa:E712
+            AccountForgottenPassword.used == False,  # noqa: E712
         )
         res = await session.execute(statement)
         latest_account_forgotten_password = res.scalars().first()
         statement = select(AccountForgottenPassword).filter(
-            AccountForgottenPassword.used == True,  # noqa:E712
+            AccountForgottenPassword.used == True,  # noqa: E712
         )
         res = await session.execute(statement)
         used_account_forgotten_password_count = len(res.scalars().all())

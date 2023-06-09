@@ -148,7 +148,7 @@ class CreateBookingsCancellationHandler(object):  # noqa: WPS214
                     subject="booking_ids",
                     description=(
                         "One or more bookings from the provided list are already"
-                        + " requested for cancellation"
+                        " requested for cancellation"
                     ),
                 ),
             )

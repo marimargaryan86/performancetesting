@@ -39,21 +39,21 @@ class PayTransactionAttributes(PayBaseModel):
 
 
 class PayTransactionConversionData(PayBaseModel):
-    id: str  # noqa:A003
-    type: Literal["conversions"] = "conversions"  # noqa:A003
+    id: str  # noqa: A003
+    type: Literal["conversions"] = "conversions"  # noqa: A003
 
 
 class PayTransactionConversion(PayBaseModel):
-    data: PayTransactionConversionData  # noqa:WPS110
+    data: PayTransactionConversionData  # noqa: WPS110
 
 
 class PayTransactionCompanyData(PayBaseModel):
-    id: str  # noqa:A003
-    type: Literal["companies"] = "companies"  # noqa:A003
+    id: str  # noqa: A003
+    type: Literal["companies"] = "companies"  # noqa: A003
 
 
 class PayTransactionCompany(PayBaseModel):
-    data: PayTransactionCompanyData  # noqa:WPS110
+    data: PayTransactionCompanyData  # noqa: WPS110
 
 
 class PayTransactionRelationships(PayBaseModel):
@@ -63,11 +63,11 @@ class PayTransactionRelationships(PayBaseModel):
 
 
 class PayTransactionData(PayBaseModel):
-    id: str  # noqa:A003
-    type: Literal["transactions"] = "transactions"  # noqa:A003
+    id: str  # noqa: A003
+    type: Literal["transactions"] = "transactions"  # noqa: A003
     attributes: PayTransactionAttributes
     relationships: PayTransactionRelationships
 
 
 class PayTransactionResponse(PayBaseModel):
-    data: PayTransactionData  # noqa:WPS110
+    data: PayTransactionData  # noqa: WPS110
