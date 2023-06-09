@@ -5879,6 +5879,28 @@
           "amount"
         ]
       },
+      "PriceBreakdown": {
+        "title": "Price Breakdown",
+        "description": "Breakdown of price into its individual components (base fare, tax, etc)",
+        "type": "object",
+        "properties": {
+          "price": {
+            "$ref": "#/components/schemas/Price"
+          },
+          "breakdownType": {
+            "type": "string",
+            "example": "tax",
+            "enum": [
+              "base-fare",
+              "tax"
+            ]
+          }
+        },
+        "required": [
+          "price",
+          "breakdownType"
+        ]
+      },
       "TripOfferGroupDetails": {
         "title": "Trip Offer Group Details",
         "description": "Segment details related to a Trip Offer Group.",
@@ -6451,6 +6473,14 @@
                         "nullable": true
                       }
                     ]
+                  },
+                  "priceBreakdown": {
+                    "readOnly": true,
+                    "nullable": true,
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/PriceBreakdown"
+                    }
                   },
                   "penalties": {
                     "type": "array",
