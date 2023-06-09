@@ -4,7 +4,7 @@ import lagom
 from pydantic import AnyUrl
 
 from snowfall.adapter import authentication
-from snowfall.project.pay.adapter import accounts, currencies
+from snowfall.project.pay.adapter import accounts, currencies, payments
 from snowfall.project.pay.service.accounts.repositories import ContactsRepository
 from snowfall.project.pay.service.pay_api import includes
 from snowfall.project.pay.service.pay_api.cache import UserSessionRepository
@@ -41,6 +41,7 @@ class AdminSettings(application.Settings):
     cc_address: str
     authentication_address: str
     accounts_address: str
+    payments_address: str
     jwt_public_key: str
     mongo_dsn: Sequence[AnyUrl]
     redis_dsn: Sequence[AnyUrl]
@@ -56,10 +57,11 @@ def create_admin_dependencies(  # noqa: WPS211
     currencies_repository: CurrencyRepository,
     beneficiaries_repository: BeneficiaryRepository,
     accounts_client: accounts.GrpcClient,
-    payment_client: client.PaymentClient,
+    cc_payment_client: client.PaymentClient,
+    payments_client: payments.GrpcClient,
 ) -> lagom.Container:
     container = lagom.Container()
-    container[client.PaymentClient] = payment_client
+    container[client.PaymentClient] = cc_payment_client
     container[authentication.Client] = authentication_client  # type: ignore[type-abstract]
     container[CompanyRepository] = companies_repository
     container[ContactsRepository] = contacts_repository
@@ -68,6 +70,7 @@ def create_admin_dependencies(  # noqa: WPS211
     container[CurrencyRepository] = currencies_repository
     container[BeneficiaryRepository] = beneficiaries_repository
     container[accounts.GrpcClient] = accounts_client
+    container[payments.GrpcClient] = payments_client
 
     includes.register_resolvers(transactions_repository)
 

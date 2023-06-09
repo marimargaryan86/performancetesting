@@ -11,7 +11,7 @@ from starlette.middleware import Middleware, authentication
 from snowfall.adapter import authentication as auth
 from snowfall.project.junction.go.adapter import errors
 from snowfall.project.pay.adapter import accounts as accounts_adapter
-from snowfall.project.pay.adapter import currencies
+from snowfall.project.pay.adapter import currencies, payments
 from snowfall.project.pay.service.accounts import repositories
 from snowfall.project.pay.service.accounts.v1alpha.accounts_pb2_grpc import (
     AccountsServiceStub,
@@ -27,6 +27,9 @@ from snowfall.project.pay.service.pay_api.repositories import (
     TransactionRepository,
 )
 from snowfall.project.pay.service.pay_api.routes import router
+from snowfall.project.pay.service.payments.v1alpha.payments_pb2_grpc import (
+    PaymentsServiceStub,
+)
 from snowfall.project.pay.service.quotations.quotations import QuotationsRepository
 from snowfall.stdlib import service
 from snowfall.stdlib.integration.starlette import application, handlers
@@ -145,7 +148,10 @@ def _admin_factory(
         accounts_channel = create_channel(
             app.settings.accounts_address,
         )
-        payment_client = PaymentClient(
+        payments_channel = create_channel(
+            app.settings.payments_address,
+        )
+        cc_payment_client = PaymentClient(
             base_url=app.settings.cc_address,
             auth=CurrencyCloudAuth(
                 base_url=app.settings.cc_address,
@@ -172,7 +178,7 @@ def _admin_factory(
             ],
             routes=router.get_admin_routes(
                 bootstrap.create_admin_dependencies(
-                    payment_client=payment_client,
+                    cc_payment_client=cc_payment_client,
                     authentication_client=auth.GrpcClient(
                         auth.auth_pb2_grpc.AuthenticationServiceStub(
                             authentication_channel,
@@ -201,13 +207,18 @@ def _admin_factory(
                             accounts_channel,
                         ),
                     ),
+                    payments_client=payments.GrpcClient(
+                        PaymentsServiceStub(
+                            payments_channel,
+                        ),
+                    ),
                 ),
             ),
             openapi_path=filesystem.resource_path(
                 "junction.pay_admin_api",
                 "openapi.json",
             ),
-            lifespan=_lifespan(payment_client, redis_client),
+            lifespan=_lifespan(cc_payment_client, redis_client),
         )
 
         asgi_app.add_exception_handler(

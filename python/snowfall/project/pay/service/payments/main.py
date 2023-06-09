@@ -16,7 +16,6 @@ class _GrpcSettings(service.Settings):
     mongo_dsn: AnyUrl
     cc_login: str
     cc_api_key: str
-    cc_env: str
     cc_address: str
 
 

@@ -10,6 +10,7 @@ from snowfall.project.pay.service.beneficiaries.v1alpha import (
 )
 from snowfall.project.pay.service.companies.v1alpha import models_pb2
 from snowfall.project.pay.service.conversions.v1alpha.models_pb2 import Conversion
+from snowfall.project.pay.service.payments.v1alpha.models_pb2 import Payment
 from snowfall.project.pay.service.quotations.v1alpha import (
     models_pb2 as quotation_models,
 )
@@ -473,6 +474,51 @@ class BeneficiariesResource(models.Resource):
                     request.url_for(
                         "Beneficiary",
                         beneficiaryId=beneficiary.id,
+                    ),
+                ),
+            },
+        )
+
+
+class PaymentsResource(models.Resource):
+    api_type: ClassVar[str] = "payments"
+
+    @classmethod
+    def from_models(
+        cls,
+        payment: Payment,
+        request: requests.Request,
+    ) -> PaymentsResource:
+        return cls(
+            id=payment.id,
+            type=PaymentsResource.api_type,
+            attributes={
+                "amount": Money.from_proto(payment.amount).amount,
+                "reason": payment.reason,
+                "reference": payment.reference,
+                "paymentAt": protobuf.protobuf_to_date(
+                    payment.payment_due_date,
+                ),
+            },
+            relationships={
+                "beneficiary": {
+                    "data": {
+                        "id": payment.beneficiary_id,
+                        "type": "beneficiaries",
+                    },
+                },
+                "transaction": {
+                    "data": [
+                        {"id": transaction_id, "type": "transactions"}
+                        for transaction_id in payment.transactions
+                    ],
+                },
+            },
+            links={
+                _SELF_HREF: str(
+                    request.url_for(
+                        "Payment",
+                        paymentId=payment.id,
                     ),
                 ),
             },

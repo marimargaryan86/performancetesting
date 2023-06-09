@@ -72,6 +72,18 @@ class TransactionRepository(
             cur=cursor or "",
         )
 
+    async def find_by_ids(
+        self,
+        fields: Sequence[str],
+        selector: str = "_id",
+    ) -> resultset.ResultSet[Transaction]:
+        query = {
+            selector: {
+                "$in": fields,
+            },
+        }
+        return await self._execute(self._collection.find, query)
+
 
 class ConversionRepository(
     mixins.FindByIdMixin[Conversion],

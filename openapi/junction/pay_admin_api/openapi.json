@@ -1244,6 +1244,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         }
       },
@@ -2981,8 +2984,8 @@
                   },
                   "paymentAt": {
                     "type": "string",
-                    "format": "date-time",
-                    "example": "2023-03-06T14:30:00+00:00",
+                    "format": "date",
+                    "example": "2023-03-06",
                     "description": "when the payment will be paid"
                   }
                 }

@@ -16,7 +16,8 @@ from starlette.middleware import Middleware, authentication
 
 from snowfall.adapter import authentication as auth
 from snowfall.project.junction.go.adapter import errors
-from snowfall.project.pay.adapter import accounts, currencies
+from snowfall.project.pay import fixtures
+from snowfall.project.pay.adapter import accounts, currencies, payments
 from snowfall.project.pay.service.accounts import repositories
 from snowfall.project.pay.service.pay_api import authenticator, bootstrap
 from snowfall.project.pay.service.pay_api import repositories as pay_repos
@@ -126,11 +127,12 @@ def _create_app(  # noqa: WPS211
 
 
 def _create_admin_app(  # noqa: WPS211
-    payment_client: PaymentClient,
+    cc_payment_client: PaymentClient,
     authentication_client: auth.Client,
     companies_repository: pay_repos.CompanyRepository,
     contacts_repository: repositories.ContactsRepository,
     accounts_client: accounts.GrpcClient,
+    payment_client: payments.GrpcClient,
     conversions_repository: pay_repos.ConversionRepository,
     transactions_repository: pay_repos.TransactionRepository,
     currencies_repository: pay_repos.CurrencyRepository,
@@ -151,7 +153,8 @@ def _create_admin_app(  # noqa: WPS211
                 currencies_repository=currencies_repository,
                 beneficiaries_repository=beneficiaries_repository,
                 accounts_client=accounts_client,
-                payment_client=payment_client,
+                cc_payment_client=cc_payment_client,
+                payments_client=payment_client,
             ),
         ),
     )
@@ -333,7 +336,7 @@ def beneficiary_response() -> BeneficiaryResponse:
 
 
 @pytest.fixture()
-def payment_client(
+def cc_payment_client(
     accounts_list_from_cc: Sequence[mock.Mock],
     balance: BalanceResponse,
     beneficiary_response: BeneficiaryResponse,
@@ -376,6 +379,11 @@ def authentication_client() -> auth.DictClient:
 
 
 @pytest.fixture()
+def payment_client() -> payments.Client:
+    return payments.DictClient(fixtures.get_payments())
+
+
+@pytest.fixture()
 def jwt_token(private_key: str) -> str:
     jwt_encoder = Encoder(
         private_key=base64.b64encode(private_key.encode()).decode(),
@@ -408,12 +416,12 @@ def app(  # noqa: WPS211
     redis_repository: UserSessionRepository,
     transactions_repository: pay_repos.TransactionRepository,
     conversions_repository: pay_repos.ConversionRepository,
-    payment_client: PaymentClient,
+    cc_payment_client: PaymentClient,
     companies_repository: pay_repos.CompanyRepository,
     currencies_repository: pay_repos.CurrencyRepository,
 ) -> applications.Starlette:
     return _create_app(
-        payment_client=payment_client,
+        payment_client=cc_payment_client,
         currencies_client=currencies_client,
         quotations_repository=quotations_repository,
         redis_repository=redis_repository,
@@ -429,9 +437,10 @@ def app(  # noqa: WPS211
 def admin_app(  # noqa: WPS211
     authentication_client: auth.Client,
     companies_repository: pay_repos.CompanyRepository,
-    payment_client: PaymentClient,
+    cc_payment_client: PaymentClient,
     contacts_repository: repositories.ContactsRepository,
     accounts_client: accounts.GrpcClient,
+    payment_client: payments.GrpcClient,
     conversions_repository: pay_repos.ConversionRepository,
     transactions_repository: pay_repos.TransactionRepository,
     currencies_repository: pay_repos.CurrencyRepository,
@@ -439,11 +448,12 @@ def admin_app(  # noqa: WPS211
     custom_middlewares: Sequence[Middleware],
 ) -> applications.Starlette:
     return _create_admin_app(
-        payment_client=payment_client,
+        cc_payment_client=cc_payment_client,
         authentication_client=authentication_client,
         companies_repository=companies_repository,
         contacts_repository=contacts_repository,
         accounts_client=accounts_client,
+        payment_client=payment_client,
         conversions_repository=conversions_repository,
         transactions_repository=transactions_repository,
         currencies_repository=currencies_repository,

@@ -11,6 +11,7 @@ from snowfall.project.pay.service.pay_api.routes import (  # noqa: WPS235
     contacts,
     conversions,
     currencies,
+    payments,
     quotations,
     rates,
     transactions,
@@ -161,5 +162,16 @@ def get_admin_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             beneficiaries.Beneficiary,
             name="Beneficiary",
             methods=["GET", "PATCH"],
+        ),
+        integration.route(
+            "/payments",
+            payments.Payments,
+            name="Payments",
+            methods=["GET", "POST"],
+        ),
+        integration.route(
+            "/payments/{paymentId}",
+            payments.Payment,
+            name="Payment",
         ),
     ]
