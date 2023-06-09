@@ -1,9 +1,11 @@
+import contextlib
 import datetime
 from typing import Sequence
 
 import pymongo
 from google.protobuf import timestamp_pb2
 from motor import motor_asyncio
+from pymongo import errors as pymongo_errors
 
 from snowfall.project.junction.go.service.planner.v1alpha import planner_pb2
 from snowfall.project.junction.go.service.trips.v1alpha import trips_pb2
@@ -86,12 +88,16 @@ class TripRepository(
         )
 
         if missing_ids:
-            await self._execute(
-                self._collection.insert_many,
-                documents=[
-                    self._coder.encode(trip) for trip in trips if trip.id in missing_ids
-                ],
-            )
+            with contextlib.suppress(pymongo_errors.BulkWriteError):
+                await self._execute(
+                    self._collection.insert_many,
+                    documents=[
+                        self._coder.encode(trip)
+                        for trip in trips
+                        if trip.id in missing_ids
+                    ],
+                    ordered=False,
+                )
 
     async def find(
         self,
