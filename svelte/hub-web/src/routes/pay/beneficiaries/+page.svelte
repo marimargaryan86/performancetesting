@@ -18,7 +18,7 @@
   export let data;
   export let form;
 
-  let sortGroup: FlattenedObject<BeneficiaryModel> = "bankAccountHolderName";
+  let sortGroup: FlattenedObject<BeneficiaryModel> = "companyName";
   let sortDirection: DirectionY = "down";
   let searchQuery = "";
 
@@ -70,7 +70,7 @@
 <div class="content">
   <Table class="beneficiaries-table" {loadMore}>
     <THead>
-      <Header bind:sortGroup bind:sortDirection sortValue="bankAccountHolderName">Company</Header>
+      <Header bind:sortGroup bind:sortDirection sortValue="companyName">Company</Header>
       <Header>Currency</Header>
       <Header bind:sortGroup bind:sortDirection sortValue="bankDetails.address.countryCode">
         Bank Country
@@ -84,7 +84,7 @@
         {@const currency = data.currencies.get(item.currencyCode)}
 
         <TRow alternatingBackground={false}>
-          <TCol class="company-name typography body-medium bold">{item.bankAccountHolderName}</TCol>
+          <TCol class="company-name typography body-medium bold">{item.companyName}</TCol>
           <TCol>
             <div class="currency">
               <strong class="typography body-medium bold">{item.currencyCode}</strong>
@@ -92,7 +92,7 @@
             </div>
           </TCol>
           <TCol class="typography body-medium bold">{item.bankDetails.address.countryCode}</TCol>
-          <TCol class="typography body-medium">{capitalize(item.bankDetails.paymentTypes)}</TCol>
+          <TCol class="typography body-medium">{capitalize(item.bankDetails.paymentType)}</TCol>
           <TCol width="172px">
             <div class="beneficiary-actions">
               <a href={routeConfig.pay.beneficiaries.beneficiary(item.id)}><EditIcon /></a>

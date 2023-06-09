@@ -18,6 +18,7 @@
   export let error: string | boolean = false;
   export let name: string | undefined = undefined;
   export let readonly = false;
+  export let required = false;
   export let helpText: string | undefined = undefined;
 
   let inputRef: HTMLInputElement;
@@ -43,7 +44,12 @@
 
 <div class="text-field {className ? className : ''}" class:error>
   {#if label}
-    <label for={id}>{label}</label>
+    <label for={id}>
+      {label}
+      {#if required}
+        <span>*</span>
+      {/if}
+    </label>
   {/if}
 
   <div
@@ -105,6 +111,10 @@
     font-family: Poppins, Arial, Helvetica, sans-serif;
     font-style: normal;
     letter-spacing: 0.5px;
+  }
+
+  label > span {
+    color: var(--color-main-primary-500);
   }
 
   .wrapper {

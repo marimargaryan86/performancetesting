@@ -1,61 +1,115 @@
+<script lang="ts" context="module">
+  const schema = beneficiaryModel.pick({ currencyCode: true, bankDetails: true });
+</script>
+
 <script lang="ts">
   import SelectField from "components/ui/select-field.svelte";
-  import type { CreateBeneficiaryModel } from "models/beneficiary";
+  import { beneficiaryModel, type CreateBeneficiaryModel } from "models/beneficiary";
   import Section from "./section.svelte";
   import type { CurrencyModel } from "models/money";
   import TextField from "components/ui/text-field.svelte";
   import RegularPaymentIcon from "components/icons/regular-payment-icon.svelte";
   import PriorityPaymentIcon from "components/icons/priority-payment-icon.svelte";
   import type { CountryModel } from "models/location";
+  import { z } from "zod";
+  import { formatError, type FormattedError } from "utils/zod";
 
   export let data: CreateBeneficiaryModel;
   export let currencies: Map<string, CurrencyModel>;
   export let countries: Map<string, CountryModel>;
 
-  let country = data.bankDetails?.address?.countryCode
-    ? countries.get(data.bankDetails.address.countryCode)
-    : undefined;
-  let currency = data.currencyCode ? currencies.get(data.currencyCode) : undefined;
-  let bankDetails = data.bankDetails ?? { paymentTypes: "regular", type: "iban" };
+  let errors: FormattedError<z.infer<typeof schema>> | undefined = undefined;
+  let bankDetails = data.bankDetails ?? {};
   let address = bankDetails.address ?? {};
+  let addressLine = address.addressLines?.[0];
 
-  $: address.countryCode = country?.code;
-  $: bankDetails.type = bankDetails.paymentTypes === "regular" ? "aba" : bankDetails.type;
-  $: bankDetails.address = address;
-  $: data = {
-    ...data,
-    bankDetails,
-    currencyCode: currency?.code,
+  $: address = { ...address, addressLines: addressLine ? [addressLine] : [] };
+  $: bankDetails = {
+    ...bankDetails,
+    address,
+    paymentType: bankDetails.paymentType ?? "regular",
+    type: bankDetails.type ?? "iban",
+    accountType: "checking",
   };
+  $: data = { ...data, bankDetails };
 
-  function formatCountryOption(value?: { name: string; code: string }): string {
-    return value?.name ?? "";
+  function formatCountryOption(code?: string): string {
+    return countries.get(code ?? "")?.name ?? "";
   }
 
-  function formatCurrencyOption(value?: CurrencyModel): string {
-    return value ? `${value.name} (${value.code})` : "";
+  function formatCurrencyOption(code?: string): string {
+    const currency = currencies.get(code ?? "");
+
+    return currency ? `${currency.name} (${currency.code})` : "";
+  }
+
+  export function validate(): boolean {
+    const nextData: CreateBeneficiaryModel = {
+      currencyCode: data.currencyCode,
+      bankDetails: {
+        ...bankDetails,
+        ...(data.bankDetails.type === "iban"
+          ? { iban: data.bankDetails.iban?.trim() }
+          : {
+              aba: data.bankDetails.aba?.trim(),
+              accountNumber: data.bankDetails.accountNumber?.trim(),
+            }),
+      },
+    };
+
+    try {
+      data = { ...data, ...schema.parse(nextData) };
+
+      return true;
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        errors = formatError<z.infer<typeof schema>>(err);
+      }
+    }
+
+    return false;
   }
 </script>
 
 <Section
   title="Bank Account Details"
-  intro="Location and currency"
-  description="Provide the company company bank information"
+  intro="Bank name and address"
+  description="Provide the bank name and address"
 >
   <form>
+    <TextField
+      label="Bank name"
+      required
+      placeholder="Enter bank name"
+      error={errors?.bankDetails?.name}
+      bind:value={bankDetails.name}
+    />
+
+    <TextField
+      label="Bank address"
+      required
+      placeholder="Enter address"
+      error={errors?.bankDetails?.address?.addressLines}
+      bind:value={addressLine}
+    />
+
     <SelectField
       label="Country"
-      placeholder="Select bank account country"
-      options={Array.from(countries.values())}
+      placeholder="Select country"
+      options={Array.from(countries.values()).map((c) => c.code)}
       formatter={formatCountryOption}
-      bind:value={country}
+      required
+      error={errors?.bankDetails?.address?.countryCode}
+      bind:value={address.countryCode}
     />
     <SelectField
       label="Currency"
-      placeholder="Select bank account currency"
-      options={Array.from(currencies.values())}
+      placeholder="Select currency"
+      options={Array.from(currencies.values()).map((c) => c.code)}
       formatter={formatCurrencyOption}
-      bind:value={currency}
+      required
+      error={errors?.currencyCode}
+      bind:value={data.currencyCode}
     />
   </form>
 </Section>
@@ -68,7 +122,7 @@
 >
   <form>
     <div class="options">
-      <label class="option" class:selected={bankDetails.paymentTypes === "regular"}>
+      <label class="option" class:selected={bankDetails.paymentType === "regular"}>
         <RegularPaymentIcon />
 
         <div>
@@ -78,9 +132,9 @@
           </span>
         </div>
 
-        <input type="radio" bind:group={bankDetails.paymentTypes} value="regular" />
+        <input type="radio" bind:group={bankDetails.paymentType} value="regular" />
       </label>
-      <label class="option" class:selected={bankDetails.paymentTypes === "priority"}>
+      <label class="option" class:selected={bankDetails.paymentType === "priority"}>
         <PriorityPaymentIcon />
 
         <div>
@@ -91,7 +145,7 @@
           </span>
         </div>
 
-        <input type="radio" bind:group={bankDetails.paymentTypes} value="priority" />
+        <input type="radio" bind:group={bankDetails.paymentType} value="priority" />
       </label>
     </div>
   </form>
@@ -104,48 +158,49 @@
   description="Select the type of banking information you wish to use and fill in the fields."
 >
   <form>
-    {#if bankDetails.paymentTypes === "priority"}
-      <div class="options">
-        <label
-          class="option typography body-large bold"
-          class:selected={bankDetails.type === "iban"}
-        >
-          SWIFT/BIC
+    <div class="options">
+      <label class="option typography body-large bold" class:selected={bankDetails.type === "iban"}>
+        IBAN
 
-          <input type="radio" bind:group={bankDetails.type} value="iban" />
-        </label>
-        <label
-          class="option typography body-large bold"
-          class:selected={bankDetails.type === "aba"}
-        >
-          Sort code
+        <input type="radio" bind:group={bankDetails.type} value="iban" />
+      </label>
+      <label class="option typography body-large bold" class:selected={bankDetails.type === "aba"}>
+        Sort Code
 
-          <input type="radio" bind:group={bankDetails.type} value="aba" />
-        </label>
-      </div>
-
-      <TextField label="Company Name" placeholder="Full name of the company holding the account" />
-
-      {#if bankDetails.type === "iban"}
-        <TextField label="IBAN Code" placeholder="Enter the IBAN code of the beneficiary bank" />
-        <TextField
-          label="SWIFT/BIC Code"
-          placeholder="Enter the SWIFT/BIC code of the beneficiary bank"
-          bind:value={bankDetails.bicSwift}
-        />
-      {/if}
-    {/if}
+        <input type="radio" bind:group={bankDetails.type} value="aba" />
+      </label>
+    </div>
 
     <TextField
-      label="Sort Code"
-      placeholder="Enter the sort code"
-      helpText="Only one Sort Code value is permitted per beneficiary. Please note that changing the Sort Code value for one payment type will amend it for both."
+      label="SWIFT/BIC Code"
+      required
+      placeholder="Enter SWIFT/BIC Code"
+      error={errors?.bankDetails?.bicSwift}
+      bind:value={bankDetails.bicSwift}
     />
 
-    {#if bankDetails.type === "aba"}
+    <!-- TODO: Fix error handling. -->
+    {#if bankDetails.type === "iban"}
+      <TextField
+        label="IBAN Code"
+        required
+        placeholder="Enter IBAN Code"
+        error={errors?.bankDetails?.iban}
+        bind:value={bankDetails.iban}
+      />
+    {:else}
+      <TextField
+        label="Sort Code"
+        required
+        placeholder="00-00-00"
+        error={errors?.bankDetails?.aba}
+        bind:value={bankDetails.aba}
+      />
       <TextField
         label="Account Number"
-        placeholder="Enter the account number"
+        required
+        placeholder="00000000"
+        error={errors?.bankDetails?.accountNumber}
         bind:value={bankDetails.accountNumber}
       />
     {/if}

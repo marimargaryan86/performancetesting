@@ -2,6 +2,7 @@
   import type { CreateBeneficiaryModel } from "models/beneficiary";
   import type { CountryModel } from "models/location";
   import type { CurrencyModel } from "models/money";
+  import { capitalize } from "utils/common";
 
   export let data: CreateBeneficiaryModel;
   export let countries: Map<string, CountryModel>;
@@ -11,10 +12,9 @@
   $: beneficiaryCountry = data.address?.countryCode
     ? countries.get(data.address.countryCode)
     : undefined;
-  $: bankCountry = data.bankDetails?.address?.countryCode
+  $: bankCountry = data.bankDetails.address?.countryCode
     ? countries.get(data.bankDetails.address.countryCode)
     : undefined;
-  $: accountNumber = data.bankDetails?.type === "aba" ? data.bankDetails.accountNumber : undefined;
 </script>
 
 <div class="summary">
@@ -23,10 +23,18 @@
   <div class="section">
     <h3 class="typography title-medium bold">Beneficiary Details</h3>
     <div class="table typography body-medium">
-      <strong>Beneficiary name:</strong>
-      <span>{data.bankAccountHolderName ?? "-"}</span>
+      <strong>Personalised name:</strong>
+      <span>{data.companyName ?? "-"}</span>
+      <strong>Email:</strong>
+      <span>{data.email ?? "-"}</span>
       <strong>Address:</strong>
       <span>{data.address?.addressLines?.join(", ") ?? "-"}</span>
+      <strong>City:</strong>
+      <span>{data.address?.city ?? "-"}</span>
+      <strong>Postcode:</strong>
+      <span>{data.address?.postalCode ?? "-"}</span>
+      <strong>State:</strong>
+      <span>{data.address?.state ?? "-"}</span>
       <strong>Country:</strong>
       <span>
         {beneficiaryCountry ? `${beneficiaryCountry.name} (${beneficiaryCountry.code})` : "-"}
@@ -38,9 +46,9 @@
     <h3 class="typography title-medium bold">Bank Account Details</h3>
     <div class="table typography body-medium">
       <strong>Bank Name:</strong>
-      <span>{data.bankDetails?.name ?? "-"}</span>
+      <span>{data.bankDetails.name ?? "-"}</span>
       <strong>Bank Address:</strong>
-      <span>{data.bankDetails?.address?.addressLines?.join(", ") ?? "-"}</span>
+      <span>{data.bankDetails.address?.addressLines?.join(", ") ?? "-"}</span>
       <strong>Country:</strong>
       <span>
         {bankCountry ? `${bankCountry.name} (${bankCountry.code})` : "-"}
@@ -49,26 +57,22 @@
       <span>{currency ? `${currency.name} (${currency.code})` : "-"}</span>
 
       <hr />
-      <h4 class="typography body-medium bold">Priority Payment</h4>
+      <h4 class="typography body-medium bold">
+        {capitalize(data.bankDetails.paymentType ?? "")} Payment
+      </h4>
 
-      <strong>State/Province:</strong>
-      <span>AL</span>
-      <strong>Postcode:</strong>
-      <span>10286</span>
-      <strong>Beneficiary Type:</strong>
-      <span>Company</span>
-      <strong>Address:</strong>
-      <span>225 Liberty Street, New York, NY 10286</span>
-      <strong>City:</strong>
-      <span>New York</span>
-      <strong>Beneficiary Country:</strong>
-      <span>
-        {beneficiaryCountry ? `${beneficiaryCountry.name} (${beneficiaryCountry.code})` : "-"}
-      </span>
-      <strong>Account Number:</strong>
-      <span>{accountNumber ?? "-"}</span>
       <strong>BIC/SWIFT:</strong>
-      <span>{data.bankDetails?.bicSwift ?? "-"}</span>
+      <span>{data.bankDetails.bicSwift ?? "-"}</span>
+
+      {#if data.bankDetails.type === "aba"}
+        <strong>Sort Code:</strong>
+        <span>{data.bankDetails.aba ?? "-"}</span>
+        <strong>Account Number:</strong>
+        <span>{data.bankDetails.accountNumber ?? "-"}</span>
+      {:else}
+        <strong>IBAN Code:</strong>
+        <span>{data.bankDetails.iban ?? "-"}</span>
+      {/if}
     </div>
   </div>
 </div>

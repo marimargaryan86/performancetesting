@@ -11,6 +11,8 @@
   export let formatter: (nextValue?: TValue) => string = (nextValue) => String(nextValue ?? "");
   export let label: string | undefined = undefined;
   export let placeholder: string | undefined = undefined;
+  export let required = false;
+  export let error: string | boolean = false;
 
   let expanded = false;
 
@@ -39,7 +41,15 @@
 </script>
 
 <div class="select-field" use:clickOutside={close}>
-  <TextField {label} {placeholder} readonly on:click={toggleExpanded} value={formatter(value)}>
+  <TextField
+    {required}
+    {label}
+    {placeholder}
+    readonly
+    on:click={toggleExpanded}
+    value={formatter(value)}
+    {error}
+  >
     <ChevronIcon slot="icon-after" direction={expanded ? "up" : "down"} />
   </TextField>
 

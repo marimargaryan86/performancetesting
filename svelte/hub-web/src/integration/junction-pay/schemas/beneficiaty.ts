@@ -1,14 +1,15 @@
+import { z } from "zod";
 import type { AccountIdentifierSchema } from "./account";
 import type { RelationshipSchema } from "./common";
 import type { CurrencyIdentifierSchema } from "./money";
 
-export const paymentTypes = ["priority", "regular"] as const;
+export const paymentTypes = z.enum(["priority", "regular"]);
 
-export type PaymentType = (typeof paymentTypes)[number];
+export type PaymentType = z.infer<typeof paymentTypes>;
 
-export const accountTypes = ["checking", "savings"] as const;
+export const accountTypes = z.enum(["checking", "savings"]);
 
-export type AccountType = (typeof accountTypes)[number];
+export type AccountType = z.infer<typeof accountTypes>;
 
 export interface AddressDetails {
   addressLines: string[];

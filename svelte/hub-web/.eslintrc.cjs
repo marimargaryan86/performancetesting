@@ -73,7 +73,6 @@ module.exports = {
     "no-script-url": "error",
     "no-shadow": "error",
     "no-throw-literal": "error",
-    "no-underscore-dangle": "error",
     "no-unneeded-ternary": "error",
     "no-useless-computed-key": "error",
     "no-useless-concat": "error",

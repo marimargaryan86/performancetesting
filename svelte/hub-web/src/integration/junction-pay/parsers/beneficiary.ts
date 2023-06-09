@@ -27,7 +27,7 @@ export function parseBankDetailsSchema(bankDetails: BankDetailsSchema): BankDeta
     accountType: bankDetails.accountType,
     address: bankDetails.address,
     name: bankDetails.name,
-    paymentTypes: bankDetails.paymentTypes,
+    paymentType: bankDetails.paymentTypes,
     bicSwift: bankDetails.bicSwift ?? undefined,
   };
 
@@ -52,7 +52,7 @@ export function parseBeneficiarySchema(beneficiary: BeneficiarySchema): Benefici
 
   return {
     id: beneficiary.id,
-    bankAccountHolderName: attributes.bankAccountHolderName,
+    companyName: attributes.bankAccountHolderName,
     email: attributes.email,
     address: parseEnhancesAddressDetailsSchema(attributes.beneficiaryAddress),
     bankDetails: parseBankDetailsSchema(attributes.bankDetails),

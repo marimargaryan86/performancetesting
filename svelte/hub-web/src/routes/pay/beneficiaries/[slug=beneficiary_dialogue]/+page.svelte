@@ -45,6 +45,8 @@
 
   export let data: PageData;
 
+  let validate: (() => boolean) | undefined;
+
   const beneficiary = writableCookie<CreateBeneficiaryModel>({
     key: "beneficiary-data",
     value: data.beneficiary ?? {},
@@ -77,7 +79,9 @@
       url.searchParams.set("step", next);
     }
 
-    await goto(url);
+    if (!validate || validate()) {
+      await goto(url);
+    }
   }
 
   async function cancel(): Promise<void> {
@@ -104,12 +108,13 @@
 <div class="content">
   <div class="wrapper">
     {#if step === "beneficiary"}
-      <BeneficiaryDetails bind:data={$beneficiary} countries={data.countries} />
+      <BeneficiaryDetails bind:data={$beneficiary} countries={data.countries} bind:validate />
     {:else if step === "account"}
       <BankAccountDetails
         bind:data={$beneficiary}
         countries={data.countries}
         currencies={data.currencies}
+        bind:validate
       />
     {:else if step === "summary"}
       <Summary data={$beneficiary} countries={data.countries} currencies={data.currencies} />

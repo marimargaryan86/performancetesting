@@ -51,8 +51,8 @@
     max-width: 540px;
   }
 
-  .layout > :global(form > .text-field),
-  .layout > :global(form > .select-field) {
+  .layout > :global(form .text-field),
+  .layout > :global(form .select-field) {
     --height: 40px;
     --label-font-size: 16px;
     --label-font-weight: 600;
