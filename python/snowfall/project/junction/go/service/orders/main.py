@@ -32,7 +32,7 @@ class _GrpcSettings(service.Settings):
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
     mongo_dsn: Sequence[pydantic.AnyUrl]
-    passenger_name_records_address: Sequence[str]
+    passenger_name_records_address: str
     zendesk_base_url: pydantic.AnyUrl
     zendesk_api_key: str
 
@@ -40,7 +40,7 @@ class _GrpcSettings(service.Settings):
 class _ImportSettings(pay_integration.Settings, service.Settings):
     amqp_dsn: pydantic.AnyUrl
     mongo_dsn: Sequence[pydantic.AnyUrl]
-    passenger_name_records_address: Sequence[str]
+    passenger_name_records_address: str
     use_pay_to_create_transaction: bool = False
 
 
@@ -51,9 +51,7 @@ async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
 
     passenger_name_records_client = passenger_name_records.GrpcClient(
         passenger_name_records=passenger_name_records_pb2_grpc.PassengerNameRecordServiceStub(
-            client.create_channel(
-                random.choice(app.settings.passenger_name_records_address),  # nosec
-            ),
+            client.create_channel(app.settings.passenger_name_records_address),
         ),
     )
 

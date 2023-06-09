@@ -34,23 +34,23 @@ _DEFAULT_TTL = datetime.timedelta(minutes=15)
 
 class _ConsumeSettings(service.Settings):
     amqp_dsn: AnyUrl
-    planner_address: Sequence[str]
+    planner_address: str
     mongo_dsn: Sequence[AnyUrl]
     trip_search_ttl: datetime.timedelta = _DEFAULT_TTL
 
 
 class _ConsumeTripCandidateSearchSettings(service.Settings):
     amqp_dsn: AnyUrl
-    planner_address: Sequence[str]
-    offers_address: Sequence[str]
-    schedules_address: Sequence[str]
+    planner_address: str
+    offers_address: str
+    schedules_address: str
     mongo_dsn: Sequence[AnyUrl]
     trip_candidate_search_ttl: datetime.timedelta = _DEFAULT_TTL
 
 
 class _GrpcSettings(service.Settings):
     amqp_dsn: AnyUrl
-    offers_address: Sequence[str]
+    offers_address: str
     default_page_size: int = 100
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
@@ -71,9 +71,7 @@ async def _consume(app: service.Application[_ConsumeSettings]) -> None:
                 binds=[(types.Exchange(_TRIPS), "trips.search")],
             ),
             planner=planner_pb2_grpc.PlannerServiceStub(
-                create_channel(
-                    random.choice(app.settings.planner_address),  # nosec
-                ),
+                create_channel(app.settings.planner_address),
             ),
             trip_search_repository=trips.TripSearchRepository(
                 mongo[_TRIPS]["trip_searches"],
@@ -91,16 +89,10 @@ async def _consume_trip_candidate_search_tasks(
     mongo = motor_asyncio.AsyncIOMotorClient(
         random.choice(app.settings.mongo_dsn),  # nosec
     )
-    offers_channel = create_channel(
-        random.choice(app.settings.offers_address),  # nosec
-    )
-    schedules_channel = create_channel(
-        random.choice(app.settings.schedules_address),  # nosec
-    )
+    offers_channel = create_channel(app.settings.offers_address)
+    schedules_channel = create_channel(app.settings.schedules_address)
     planner = planner_pb2_grpc.PlannerServiceStub(
-        create_channel(
-            random.choice(app.settings.planner_address),  # nosec
-        ),
+        create_channel(app.settings.planner_address),
     )
     trips_db = mongo[_TRIPS]
     trip_repository = trips.TripRepository(trips_db[_TRIPS])
@@ -139,9 +131,7 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
         random.choice(app.settings.mongo_dsn),  # nosec
     )
 
-    offers_channel = create_channel(
-        random.choice(app.settings.offers_address),  # nosec
-    )
+    offers_channel = create_channel(app.settings.offers_address)
 
     trips_db = mongo[_TRIPS]
 

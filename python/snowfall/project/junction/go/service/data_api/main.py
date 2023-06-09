@@ -1,4 +1,3 @@
-import random
 from typing import Callable
 
 from starlette import applications
@@ -17,9 +16,7 @@ def _factory(
 ) -> Callable[[], applications.Starlette]:
     def decorator() -> applications.Starlette:
         geocoder = geocoding_pb2_grpc.GeocodingServiceStub(
-            grpc_client.create_channel(
-                random.choice(app.settings.geodata_address),  # nosec
-            ),
+            grpc_client.create_channel(app.settings.geodata_address),
         )
         return application.create_starlette_app(
             routes=router.get_routes(

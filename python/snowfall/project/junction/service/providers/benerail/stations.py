@@ -1,6 +1,5 @@
 import contextlib
 import json
-import random
 from typing import Sequence
 
 import aiofiles
@@ -37,9 +36,7 @@ async def dump_stations(app: service.Application[config.DumpStationsSettings]) -
 
         place_responses = await benerail_client.place.get_all_places()
         geocoder = geocoding_pb2_grpc.GeocodingServiceStub(
-            grpc_client.create_channel(
-                random.choice(app.settings.geodata_address),  # nosec
-            ),
+            grpc_client.create_channel(app.settings.geodata_address),
         )
         await _to_stations(
             station_responses=place_responses,

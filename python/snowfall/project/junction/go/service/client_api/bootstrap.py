@@ -1,5 +1,3 @@
-from typing import Sequence
-
 import lagom
 
 from snowfall.adapter import authentication
@@ -25,12 +23,12 @@ from snowfall.stdlib.integration.starlette import application
 class Settings(application.Settings):
     jwt_public_key: str
     jwt_token_version: str
-    places_address: Sequence[str]
-    offers_address: Sequence[str]
-    orders_address: Sequence[str]
-    trips_address: Sequence[str]
-    schedules_address: Sequence[str]
-    authentication_address: Sequence[str]
+    places_address: str
+    offers_address: str
+    orders_address: str
+    trips_address: str
+    schedules_address: str
+    authentication_address: str
     validate_responses_against_spec: bool = True
     reseller_currencies: dict[str, str] = {}
     reseller_pay_companies: dict[str, str] = {}

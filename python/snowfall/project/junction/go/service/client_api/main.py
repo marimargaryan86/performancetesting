@@ -1,4 +1,3 @@
-import random
 from typing import Callable
 
 from starlette import applications
@@ -41,24 +40,12 @@ def _factory(
     app: service.Application[bootstrap.Settings],
 ) -> Callable[[], applications.Starlette]:
     def decorator() -> applications.Starlette:
-        places_channel = create_channel(
-            random.choice(app.settings.places_address),  # nosec
-        )
-        orders_channel = create_channel(
-            random.choice(app.settings.orders_address),  # nosec
-        )
-        offers_channel = create_channel(
-            random.choice(app.settings.offers_address),  # nosec
-        )
-        trips_channel = create_channel(
-            random.choice(app.settings.trips_address),  # nosec
-        )
-        schedules_channel = create_channel(
-            random.choice(app.settings.schedules_address),  # nosec
-        )
-        authentication_channel = create_channel(
-            random.choice(app.settings.authentication_address),  # nosec
-        )
+        places_channel = create_channel(app.settings.places_address)
+        orders_channel = create_channel(app.settings.orders_address)
+        offers_channel = create_channel(app.settings.offers_address)
+        trips_channel = create_channel(app.settings.trips_address)
+        schedules_channel = create_channel(app.settings.schedules_address)
+        authentication_channel = create_channel(app.settings.authentication_address)
 
         asgi_app = application.create_starlette_app(
             routes=router.get_routes(

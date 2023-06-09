@@ -26,7 +26,7 @@ class Settings(application.Settings):
     cc_api_key: str
     cc_env: str
     cc_address: str
-    currencies_address: Sequence[str]
+    currencies_address: str
     authentication_address: str
     jwt_public_key: str
     mongo_dsn: Sequence[AnyUrl]

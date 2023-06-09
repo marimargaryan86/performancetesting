@@ -73,11 +73,11 @@ def _factory(
     def decorator() -> applications.Starlette:
         stripe.api_key = app.settings.stripe_api_key
         junction_client = client.Client(
-            base_url=random.choice(app.settings.junction_api_address),  # nosec
+            base_url=app.settings.junction_api_address,
             auth=auth.TokenAuth(app.settings.junction_api_token),
         )
         plus_http_client = plus_client.PlusClient(
-            api_url=random.choice(app.settings.plus_api_address),  # nosec
+            api_url=app.settings.plus_api_address,
             activated=app.settings.plus_activated,
         )
         redis_client = redis.Client[str](

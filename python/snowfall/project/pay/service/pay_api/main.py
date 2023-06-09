@@ -68,9 +68,7 @@ def _factory(
             prefix=app.name,
         )
 
-        orders_channel = create_channel(
-            random.choice(app.settings.currencies_address),  # nosec
-        )
+        orders_channel = create_channel(app.settings.currencies_address)
         quotations_repo = QuotationsRepository(mongo.quotations.quotations)
         asgi_app = application.create_starlette_app(
             custom_middlewares=[

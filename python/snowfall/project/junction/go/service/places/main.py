@@ -26,13 +26,13 @@ from snowfall.stdlib.transport.grpc.client import create_channel
 
 
 class _CitiesSettings(service.Settings):
-    geodata_address: Sequence[str]
+    geodata_address: str
     mongo_dsn: Sequence[AnyUrl]
 
 
 class _GrpcSettings(service.Settings):
     default_page_size: int = 100
-    geodata_address: Sequence[str]
+    geodata_address: str
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
     mongo_dsn: Sequence[AnyUrl]
@@ -57,9 +57,7 @@ async def _generate_cities(app: service.Application[_CitiesSettings]) -> None:
         random.choice(app.settings.mongo_dsn),  # nosec
     )
     geocoding_service = geocoding_pb2_grpc.GeocodingServiceStub(
-        create_channel(
-            random.choice(app.settings.geodata_address),  # nosec
-        ),
+        create_channel(app.settings.geodata_address),
     )
     locations_repository = LocationRepository(mongo.places.locations)
     places_repository = PlaceRepository(
@@ -85,9 +83,7 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
         random.choice(app.settings.mongo_dsn),  # nosec
     )
     geocoding_service = geocoding_pb2_grpc.GeocodingServiceStub(
-        create_channel(
-            random.choice(app.settings.geodata_address),  # nosec
-        ),
+        create_channel(app.settings.geodata_address),
     )
     grpc_server = server.create_server(
         app.settings.grpc_address,

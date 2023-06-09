@@ -2,7 +2,6 @@ import contextlib
 import csv
 import datetime
 import io
-import random
 from typing import Any, Mapping, Sequence
 
 import aiosmtplib
@@ -24,7 +23,7 @@ class Settings(application.Settings):
     smtp_dsn: AnyUrl
     mongo_dsn: Sequence[AnyUrl]
     orders_report_email: str
-    junction_api_address: Sequence[str]
+    junction_api_address: str
     junction_api_token: str
 
 
@@ -33,7 +32,7 @@ async def orders_report(app: service.Application[Settings]) -> None:
         app.settings.mongo_dsn,  # nosec
     )[app.name]
     junction_client = client.Client(
-        base_url=random.choice(app.settings.junction_api_address),  # nosec
+        base_url=app.settings.junction_api_address,
         auth=auth.TokenAuth(app.settings.junction_api_token),
     )
     smtp_cl = smtp.EmailClient(

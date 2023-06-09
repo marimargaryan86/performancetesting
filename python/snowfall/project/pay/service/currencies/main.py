@@ -1,5 +1,4 @@
 import ipaddress
-import random
 from typing import Sequence
 
 from pydantic import AnyUrl
@@ -16,13 +15,11 @@ class _Settings(service.Settings):
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
     mongo_dsn: Sequence[AnyUrl]
-    rates_address: Sequence[str]
+    rates_address: str
 
 
 async def _main(app: service.Application[_Settings]) -> None:
-    rates_channel = create_channel(
-        random.choice(app.settings.rates_address),  # nosec
-    )
+    rates_channel = create_channel(app.settings.rates_address)
 
     grpc_server = server.create_server(
         app.settings.grpc_address,

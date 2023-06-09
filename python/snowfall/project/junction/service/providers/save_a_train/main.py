@@ -59,7 +59,7 @@ class _SatConfig(pydantic.BaseModel):
 
 
 class _DumpStationsSettings(_SatConfig, service.Settings):
-    geodata_address: Sequence[str]
+    geodata_address: str
     output_file: str = pydantic.Field(hidden=True, argument=True)
 
 
@@ -401,9 +401,7 @@ async def _dump_stations(app: service.AsyncApplication[_DumpStationsSettings]) -
         client=http_client,
     )
     geocoder = geocoding_pb2_grpc.GeocodingServiceStub(
-        grpc_client.create_channel(
-            random.choice(app.settings.geodata_address),  # nosec
-        ),
+        grpc_client.create_channel(app.settings.geodata_address),
     )
 
     await train_stations.dump_sat_stations(

@@ -17,12 +17,12 @@ from snowfall.vendor.junction.go import client
 
 
 class Settings(application.Settings):
-    junction_api_address: Sequence[str]
+    junction_api_address: str
     junction_api_token: str
-    flight_stats_api_address: Sequence[str]
+    flight_stats_api_address: str
     flight_stats_app_id: str
     flight_stats_app_key: str
-    icoupon_api_address: Sequence[str]
+    icoupon_api_address: str
     icoupon_client_id: str
     icoupon_client_secret: str
     aws_access_key: str
@@ -33,7 +33,7 @@ class Settings(application.Settings):
     twilio_sid: str
     twilio_token: str
     twilio_sender: str
-    tf_api_address: Sequence[str]
+    tf_api_address: str
     tf_client_key: str
     validate_responses_against_spec: bool = True
 

@@ -1,5 +1,4 @@
 import datetime
-from typing import Sequence
 
 import pydantic
 
@@ -9,7 +8,7 @@ _DEFAULT_API_TIMEOUT_IN_SECONDS = 30
 
 
 class DumpStationsSettings(service.Settings):
-    geodata_address: Sequence[str]
+    geodata_address: str
     api_base_url: pydantic.AnyUrl
     subscription_key: str
     api_timeout: datetime.timedelta = datetime.timedelta(

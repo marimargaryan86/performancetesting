@@ -1,9 +1,9 @@
 import asyncio
-import random
-import string
 import types
 
 from motor import core
+
+from snowfall.stdlib import string
 
 
 class TemporaryDatabase(object):
@@ -15,9 +15,7 @@ class TemporaryDatabase(object):
         self._mongo = mongo
         self._db_name = "{prefix}_{random}".format(
             prefix=(prefix or "temp"),
-            random="".join(
-                random.choices(string.ascii_uppercase + string.digits, k=8),  # nosec
-            ),
+            random=string.random(8),
         )
 
     async def __aenter__(self) -> core.AgnosticDatabase:

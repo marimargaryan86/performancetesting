@@ -1,5 +1,3 @@
-from typing import Sequence
-
 import lagom
 
 from snowfall.project.junction.go.adapter import locations, places
@@ -8,7 +6,7 @@ from snowfall.stdlib.integration.starlette import application
 
 
 class Settings(application.Settings):
-    places_address: Sequence[str]
+    places_address: str
     validate_responses_against_spec: bool = True
 
 

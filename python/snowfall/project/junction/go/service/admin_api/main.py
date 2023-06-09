@@ -1,4 +1,3 @@
-import random
 from typing import Callable
 
 from starlette import applications
@@ -16,9 +15,7 @@ def _factory(
     app: service.Application[bootstrap.Settings],
 ) -> Callable[[], applications.Starlette]:
     def decorator() -> applications.Starlette:
-        places_channel = create_channel(
-            random.choice(app.settings.places_address),  # nosec
-        )
+        places_channel = create_channel(app.settings.places_address)
 
         asgi_app = application.create_starlette_app(
             routes=router.get_routes(

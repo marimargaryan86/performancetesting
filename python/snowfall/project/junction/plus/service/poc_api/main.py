@@ -33,11 +33,11 @@ def _factory(
 ) -> Callable[[], applications.Starlette]:
     def decorator() -> applications.Starlette:
         junction_client = client.Client(
-            base_url=random.choice(app.settings.junction_api_address),  # nosec
+            base_url=app.settings.junction_api_address,
             auth=auth.TokenAuth(app.settings.junction_api_token),
         )
         fs_client = flight_stats_client.FlightStatusClient(
-            api_url=random.choice(app.settings.flight_stats_api_address),  # nosec
+            api_url=app.settings.flight_stats_api_address,
             app_id=app.settings.flight_stats_app_id,
             app_key=app.settings.flight_stats_app_key,
         )
@@ -46,12 +46,12 @@ def _factory(
             app.settings.aws_secret_key,
         )
         icoupon_client = icoupon.ICouponClient(
-            api_url=random.choice(app.settings.icoupon_api_address),  # nosec
+            api_url=app.settings.icoupon_api_address,
             client_id=app.settings.icoupon_client_id,
             client_secret=app.settings.icoupon_client_secret,
         )
         tf_client = travel_fusion.TravelFusionClient(
-            api_url=random.choice(app.settings.tf_api_address),  # nosec
+            api_url=app.settings.tf_api_address,
             client_key=app.settings.tf_client_key,
         )
         mongo = motor_asyncio.AsyncIOMotorClient(

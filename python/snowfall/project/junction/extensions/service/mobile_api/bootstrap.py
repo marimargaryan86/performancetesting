@@ -20,9 +20,9 @@ class MigrateSettings(application.Settings):
 
 
 class Settings(application.Settings):
-    junction_api_address: Sequence[str]
+    junction_api_address: str
     junction_api_token: str
-    plus_api_address: Sequence[str] = [""]
+    plus_api_address: str = ""
     plus_activated: bool = False
     redis_dsn: Sequence[AnyUrl]
     places_cache_ttl: datetime.timedelta = datetime.timedelta(hours=1)

@@ -1,5 +1,3 @@
-from typing import Sequence
-
 import lagom
 
 from snowfall.service.geodata.v1 import geocoding_pb2_grpc
@@ -7,7 +5,7 @@ from snowfall.stdlib.integration.starlette import application
 
 
 class Settings(application.Settings):
-    geodata_address: Sequence[str]
+    geodata_address: str
     validate_responses_against_spec: bool = True
 
 

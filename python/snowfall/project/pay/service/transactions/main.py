@@ -27,7 +27,7 @@ class _GrpcSettings(service.Settings):
     grpc_port: int = 50051
     mongo_dsn: Sequence[pydantic.AnyUrl]
     redis_dsn: Sequence[pydantic.AnyUrl]
-    currencies_address: Sequence[str]
+    currencies_address: str
     cc_login: str
     cc_api_key: str
     cc_address: str
@@ -78,9 +78,7 @@ async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
                 ),
                 currencies_client=currencies.GrpcClient(
                     currencies_pb2_grpc.CurrencyServiceStub(
-                        create_channel(
-                            random.choice(app.settings.currencies_address),  # nosec
-                        ),
+                        create_channel(app.settings.currencies_address),
                     ),
                 ),
             ),
