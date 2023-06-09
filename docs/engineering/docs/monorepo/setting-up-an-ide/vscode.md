@@ -54,7 +54,7 @@ For whatever reason VS Code won't let you select the exported environment in `di
 
 ### Resolve imports:
 
-In order to resolve 3rd party imports simply use poetry (recommended) or even pip to install all the packages in our requirements.txt file.
+In order to resolve 3rd party imports simply use poetry (recommended) or even pip to install all the packages in our requirements.txt file. You'll want to make sure you're environment stays up to date with changes to our dependencies (this could be a good candidate for another file watcher command!)
 
 In order for VS Code to be able to resolve relative imports throughtout the codebase you'll want to add the following to your VS Code settings.json file:
 ```
@@ -82,6 +82,7 @@ In order for VS Code to be able to resolve relative imports throughtout the code
 - [OpenAPI (Swagger) Editor](https://marketplace.visualstudio.com/items?itemName=42Crunch.vscode-openapi)
 - [vscode-proto3](https://marketplace.visualstudio.com/items?itemName=zxh404.vscode-proto3)
 - [Markdown Preview Mermaid Support](https://marketplace.visualstudio.com/items?itemName=bierner.markdown-mermaid)
+- [Redocly OpenAPI](https://marketplace.visualstudio.com/items?itemName=Redocly.openapi-vs-code)
 
 Some other recommended settings:
 - **Format on Save** - add the following to VS Code settings.json: ```"editor.formatOnSave": true```
