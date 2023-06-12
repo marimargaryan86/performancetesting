@@ -129,7 +129,9 @@ class OfferSearchService(service.Service, offers_pb2_grpc.OfferServiceServicer):
     def __init__(
         self,
         trip_offer_searcher: TripOfferSearcher[_SearchCriteriaTask, _SearchCriteria],
+        enabled_resellers: Sequence[str],
     ):
+        self._enabled_resellers = enabled_resellers
         self._trip_offer_searcher = trip_offer_searcher
 
     def get_name(self) -> str:
@@ -144,6 +146,9 @@ class OfferSearchService(service.Service, offers_pb2_grpc.OfferServiceServicer):
         context: aio.ServicerContext,
     ) -> offers_pb2.SearchOffersResponse:
         if request.WhichOneof("offer_search_task") != "trip_offer_search_task":
+            return offers_pb2.SearchOffersResponse()
+
+        if request.trip_offer_search_task.reseller_id not in self._enabled_resellers:
             return offers_pb2.SearchOffersResponse()
 
         return offers_pb2.SearchOffersResponse(

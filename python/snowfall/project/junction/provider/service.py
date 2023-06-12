@@ -102,6 +102,12 @@ def _grpc_command(  # noqa: WPS210, WPS217
                         implementation=offers_implementation,
                         redis_client=redis.Client[bytes](redis_conn, prefix=app.name),
                     ),
+                    enabled_resellers=[
+                        reseller_id
+                        for reseller_id, providers in app.settings.reseller_providers.items()
+                        if meta_implementation.name in providers
+                        or meta_implementation.name.lower() in providers
+                    ],
                 ),
             )
 
