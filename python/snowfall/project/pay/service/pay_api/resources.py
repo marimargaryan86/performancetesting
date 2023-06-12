@@ -419,6 +419,12 @@ class BeneficiariesResource(models.Resource):
         cc_beneficiary: beneficiary_cc_models.BeneficiaryResponse,
         request: requests.Request,
     ) -> BeneficiariesResource:
+        bank_address_lines: list[str] = []
+        if cc_beneficiary.bank_address is not None:
+            for address in cc_beneficiary.bank_address:
+                bank_address_lines.extend(
+                    address.split("\\n"),  # noqa: WPS342
+                )
         return cls(
             id=beneficiary.id,
             type=BeneficiariesResource.api_type,
@@ -450,7 +456,7 @@ class BeneficiariesResource(models.Resource):
                         cc_beneficiary.payment_types and cc_beneficiary.payment_types[0]
                     ),
                     "address": {
-                        "addressLines": cc_beneficiary.bank_address,
+                        "addressLines": bank_address_lines,
                         "countryCode": cc_beneficiary.bank_country,
                     },
                 },

@@ -53,7 +53,7 @@ class CurrencyCloudAuth(httpx.Auth):
         self._base_url = base_url
         self._login_id = login_id
         self._api_key = api_key
-        self._token = ""  # nosec
+        self._token = self._initiate_token()
         self._async_lock = asyncio.Lock()
         self._client = client or httpx.AsyncClient()
         self._client.base_url = httpx.URL(base_url)
@@ -65,33 +65,49 @@ class CurrencyCloudAuth(httpx.Auth):
         request.headers["X-Auth-Token"] = self._token
         response = yield request
 
-        if response.status_code != httpx.codes.UNAUTHORIZED:
-            return
+        if response.status_code == httpx.codes.UNAUTHORIZED:
+            async with self._async_lock:
+                _logger.info("Getting token")
+                await self._authenticate()
 
-        async with self._async_lock:
-            if self._token == request.headers["X-Auth-Token"]:
-                login_response = await self._login()
+                request.headers["X-Auth-Token"] = self._token
+                yield request
 
-                if login_response.get("error_code") == "auth_failed":
-                    raise CurrencyCloudError(
-                        [login_response["error_messages"]["username"][0]["message"]],
-                    )
+    async def _authenticate(self) -> None:
+        response = (
+            await self._client.post(
+                url="/authenticate/api",
+                data={
+                    "login_id": self._login_id,
+                    "api_key": self._api_key,
+                },
+            )
+        ).json()
 
-                self._token = login_response["auth_token"]
+        if response.get("error_code") == "auth_failed":
+            raise CurrencyCloudError(
+                [response["error_messages"]["username"][0]["message"]],
+            )
 
-            request.headers["X-Auth-Token"] = self._token
-            yield request
+        self._token = response["auth_token"]
 
-    async def _login(self) -> dict[str, Any]:
-        response = await self._client.post(
-            url="/authenticate/api",
-            data={
-                "login_id": self._login_id,
-                "api_key": self._api_key,
-            },
-        )
+    def _initiate_token(self) -> str:
+        response = (
+            httpx.post(
+                url="{0}/authenticate/api".format(self._base_url),
+                data={
+                    "login_id": self._login_id,
+                    "api_key": self._api_key,
+                },
+            )
+        ).json()
 
-        return response.json()
+        if response.get("error_code") == "auth_failed":
+            raise CurrencyCloudError(
+                [response["error_messages"]["username"][0]["message"]],
+            )
+
+        return response["auth_token"]
 
 
 def encode_arrays(
