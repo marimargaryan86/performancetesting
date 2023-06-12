@@ -111,6 +111,10 @@ job "pay-api-admin" {
               local_bind_port  = 8040
               destination_name = "accounts-${var.environment}"
             }
+            upstreams {
+              local_bind_port  = 8050
+              destination_name = "pay-payments-${var.environment}"
+            }
           }
         }
       }
@@ -153,6 +157,7 @@ REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis:
 CURRENCIES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_currencies-${var.environment}"))}}
 AUTHENTICATION_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_authentication-${var.environment}"))}}
 ACCOUNTS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_accounts-${var.environment}"))}}
+PAYMENTS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_pay-payments-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/currencycloud" }}
 CC_LOGIN={{ .Data.data.cc_login }}
 CC_API_KEY={{ .Data.data.cc_api_key }}
@@ -186,7 +191,7 @@ EOH
         SENTRY_DSN            = "https://025704ebb5d24063b1153935db50ffd5@sentry.snowfall.se/42"
         PROMETHEUS_PORT       = "${NOMAD_PORT_prometheus}"
         CURRENCIES            = "AUD JPY SAR BHD KES SGD BGN KWD ZAR CAD SEK CNY CHF CZK NZD THB DKK NOK TRY EUR OMR UGX HKD GBP HUF PLN AED QAR USD RON ILS"
-        CC_ADDRESS            = var.cc_address
+        CC_ADDRESS            = "${var.cc_address}"
       }
     }
   }

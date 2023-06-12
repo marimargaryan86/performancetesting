@@ -95,7 +95,6 @@ job "payments-grpc" {
         data        = <<EOH
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 {{ with secret "kv/data/${var.environment}/currencycloud" }}
-CC_ADDRESS={{ .Data.data.cc_address }}
 CC_LOGIN={{ .Data.data.cc_login }}
 CC_API_KEY={{ .Data.data.cc_api_key }}
 {{ end }}
@@ -123,7 +122,7 @@ EOH
         GRPC_PORT             = "${NOMAD_PORT_grpc}"
         SENTRY_DSN            = "https://6f9c5db73a6d45e6b38e64994484dd6f@sentry.snowfall.se/150"
         PROMETHEUS_PORT       = "${NOMAD_PORT_prometheus}"
-        CC_ADDRESS            = var.cc_address
+        CC_ADDRESS            = "${var.cc_address}"
       }
     }
   }
