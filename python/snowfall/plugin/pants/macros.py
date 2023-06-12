@@ -18,6 +18,7 @@ def nomad_template(  # noqa: WPS210
             args=["--debug-info"],
             stdout=config_path,
             output_files=[config_path],
+            workdir="/",
         )
 
     for command_def in commands:

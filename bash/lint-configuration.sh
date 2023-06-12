@@ -4,6 +4,11 @@ set -eu
 
 FAILURE=0
 
+if [ ! -f "${3}" ]; then
+	echo "${3}: does not exist"
+	exit 1
+fi
+
 mapfile -t REQUIRED_VARS < <(jq -r ".command.params[] | select( .required == true ) | .envvar" "${3}")
 
 for v in "${REQUIRED_VARS[@]}"; do

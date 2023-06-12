@@ -26,6 +26,10 @@ variable "count" {
   type = number
 }
 
+variable "cc_address" {
+  type = string
+}
+
 job "transactions-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -66,7 +70,14 @@ job "transactions-grpc" {
       tags = ["grpc"]
 
       connect {
-        sidecar_service {}
+        sidecar_service {
+          proxy {
+            upstreams {
+              local_bind_port  = 8020
+              destination_name = "currencies-${var.environment}"
+            }
+          }
+        }
       }
 
       check {
@@ -100,6 +111,7 @@ job "transactions-grpc" {
         data        = <<EOH
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
+CURRENCIES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_currencies-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/currencycloud" }}
 CC_LOGIN={{ .Data.data.cc_login }}
 CC_API_KEY={{ .Data.data.cc_api_key }}
@@ -131,6 +143,7 @@ EOH
         GRPC_PORT       = "${NOMAD_PORT_grpc}"
         SENTRY_DSN      = "https://0c052cf147584d4391a5243202168e20@sentry.snowfall.se/153"
         PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
+        CC_ADDRESS      = var.cc_address
       }
     }
   }
