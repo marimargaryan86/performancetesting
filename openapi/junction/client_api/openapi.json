@@ -6937,6 +6937,12 @@
                   "totalPrice": {
                     "$ref": "#/components/schemas/Price"
                   },
+                  "priceBreakdown": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/PriceBreakdown"
+                    }
+                  },
                   "operatorBookingReferences": {
                     "type": "array",
                     "example": [
