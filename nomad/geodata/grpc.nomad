@@ -84,8 +84,8 @@ job "geodata-grpc" {
       check {
         type     = "http"
         path     = "/"
-        interval = "10s"
-        timeout  = "2s"
+        interval = "30s"
+        timeout  = "4s"
       }
     }
 
