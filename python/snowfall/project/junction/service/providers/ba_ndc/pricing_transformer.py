@@ -1,4 +1,4 @@
-from typing import List, Sequence
+from collections.abc import Sequence
 
 from snowfall.project.junction.go.service.offers.v1alpha import models_pb2 as offers_pb2
 from snowfall.project.junction.service.providers.ba_ndc import cache
@@ -40,7 +40,7 @@ def _to_penalties(penalties: Sequence[cache.OfferPenalty]) -> list[offers_pb2.Pe
 def _to_document_requirement(
     offer_details: cache.OfferDetails,
 ) -> list[offers_pb2.PriceQuote.Required.ValueType]:
-    required_docs: List[offers_pb2.PriceQuote.Required.ValueType] = []
+    required_docs: list[offers_pb2.PriceQuote.Required.ValueType] = []
 
     if offer_details.international_flight:
         required_docs.extend(

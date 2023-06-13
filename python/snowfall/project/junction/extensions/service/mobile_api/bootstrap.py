@@ -1,5 +1,5 @@
 import datetime
-from typing import Sequence
+from collections.abc import Sequence
 
 import lagom
 from pydantic import AnyUrl

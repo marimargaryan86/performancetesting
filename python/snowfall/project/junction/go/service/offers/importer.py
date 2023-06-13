@@ -1,7 +1,7 @@
 import asyncio
 import contextlib
 import datetime
-from typing import Sequence, Union
+from collections.abc import Sequence
 
 import prometheus_client
 import structlog
@@ -29,11 +29,11 @@ from snowfall.stdlib.transport.amqp import consumer, trackable
 from snowfall.stdlib.transport.amqp import types as amqp_types
 from snowfall.stdlib.v1 import amqp_pb2 as trackable_pb2
 
-ExpectedMessages = Union[
-    amqp_pb2.TripOfferSearchResult,
-    trackable_pb2.Trackable,
-    amqp_pb2.TripOfferSearchTask,
-]
+ExpectedMessages = (
+    amqp_pb2.TripOfferSearchResult
+    | trackable_pb2.Trackable
+    | amqp_pb2.TripOfferSearchTask
+)
 _PROVIDERS_TO_DISABLED_OPERATORS = dict[str, list[str]]
 RESELLERS_TO_PROVIDER_OPERATORS = dict[str, _PROVIDERS_TO_DISABLED_OPERATORS]
 
@@ -78,7 +78,7 @@ class StatusHandler(trackable.AnySizeStatusHandler):
             (
                 protobuf.protobuf_to_datetime(record.expires_at)
                 if record
-                else datetime.datetime.now(tz=datetime.timezone.utc)
+                else datetime.datetime.now(tz=datetime.UTC)
             ),
         )
 

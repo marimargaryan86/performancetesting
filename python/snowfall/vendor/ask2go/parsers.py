@@ -1,5 +1,6 @@
 import datetime
-from typing import Any, Sequence
+from collections.abc import Sequence
+from typing import Any
 
 import more_itertools
 import unidecode

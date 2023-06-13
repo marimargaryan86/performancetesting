@@ -31,7 +31,7 @@ class Quoter(object):
         if not offer_details:
             raise cache.OptionNotFoundError()
 
-        expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl
+        expires_at = datetime.datetime.now(tz=datetime.UTC) + self._ttl
         price = money.Money(
             amount=offer_details.amount,
             currency=money.Currency(offer_details.currency),

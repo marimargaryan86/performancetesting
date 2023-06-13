@@ -3,7 +3,7 @@ from __future__ import annotations
 import abc
 import dataclasses
 import datetime
-from typing import Sequence
+from collections.abc import Sequence
 
 from snowfall.project.junction.go.adapter import errors
 from snowfall.project.junction.go.service.trips.v1alpha import trips_pb2, trips_pb2_grpc
@@ -56,7 +56,7 @@ class DictClient(Client):
         self,
         trip_search_request: TripSearchRequest,
     ) -> trips_pb2.TripSearch:
-        expires_at = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(
+        expires_at = datetime.datetime.now(datetime.UTC) + datetime.timedelta(
             days=1,
         )
         trip_search = trips_pb2.TripSearch(

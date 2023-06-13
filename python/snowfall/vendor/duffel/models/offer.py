@@ -1,5 +1,4 @@
 import datetime
-from typing import List
 
 import pydantic
 
@@ -37,8 +36,8 @@ class Service(DuffelBaseModel):
     identifier: str = pydantic.Field(..., alias="id")
     maximum_quantity: int
     metadata: ServiceMetadata
-    passenger_ids: List[str]
-    segment_ids: List[str]
+    passenger_ids: list[str]
+    segment_ids: list[str]
     total_amount: str
     total_currency: str
     service_type: str | None = pydantic.Field(..., alias="type")
@@ -50,14 +49,14 @@ class OfferPassenger(DuffelBaseModel):
     passenger_type: str = pydantic.Field(alias="type")
     given_name: str | None
     family_name: str | None
-    loyalty_programme_accounts: List[LoyaltyProgrammeAccount]
+    loyalty_programme_accounts: list[LoyaltyProgrammeAccount]
 
 
 class Offer(DuffelBaseModel):
     identifier: str = pydantic.Field(..., alias="id")
     live_mode: bool
-    allowed_passenger_identity_document_types: List[str]
-    available_services: List[Service] | None
+    allowed_passenger_identity_document_types: list[str]
+    available_services: list[Service] | None
     base_amount: str
     base_currency: str
     conditions: OfferConditions
@@ -66,9 +65,9 @@ class Offer(DuffelBaseModel):
     expires_at: datetime.datetime
     owner: Airline
     passenger_identity_documents_required: bool
-    passengers: List[OfferPassenger]
+    passengers: list[OfferPassenger]
     payment_requirements: PaymentRequirements
-    slices: List[OfferSlice]
+    slices: list[OfferSlice]
     tax_amount: str | None
     tax_currency: str | None
     total_emissions_kg: str

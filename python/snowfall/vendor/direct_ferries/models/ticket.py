@@ -1,4 +1,4 @@
-from typing import Optional, Sequence
+from collections.abc import Sequence
 
 import pydantic
 
@@ -15,7 +15,7 @@ class TicketType(base.CamelCaseBaseModel):
     is_amendment_fee_charged: bool
     is_cancellable: bool
     is_refund_fee_charged: bool
-    sales_messages: Optional[Sequence[str]]
+    sales_messages: Sequence[str] | None
     compulsory_accommodation_id: int
     tariff_type: str
     tariff_band: str
@@ -27,5 +27,5 @@ class TicketType(base.CamelCaseBaseModel):
 
 
 class TicketTypesResponse(base.CamelCaseBaseModel):
-    ticket_type_message: Optional[str]
+    ticket_type_message: str | None
     ticket_types: Sequence[TicketType]

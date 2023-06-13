@@ -1,5 +1,5 @@
 import dataclasses
-from typing import Optional, cast
+from typing import cast
 
 import jsonschema
 import openapi_core
@@ -21,7 +21,7 @@ class OpenAPIRequest(object):
     host_url: str
     path: str
     method: str
-    body: Optional[str]
+    body: str | None
     mimetype: str
     parameters: RequestParameters = dataclasses.field(  # noqa: WPS110
         default_factory=RequestParameters,

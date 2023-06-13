@@ -4,8 +4,9 @@ import copy
 import datetime
 import os
 import re
+from collections.abc import Mapping
 from dataclasses import dataclass, field
-from typing import Any, Dict, Mapping, NamedTuple, Type
+from typing import Any, NamedTuple
 
 import httpx
 import structlog
@@ -33,8 +34,8 @@ class Config(NamedTuple):
     location: str
     transport: str
     soap_action: str
-    input: Type[Any]  # noqa: A003
-    output: Type[Any]
+    input: type[Any]  # noqa: A003
+    output: type[Any]
 
     @classmethod
     def from_service(cls, service: Any, **kwargs: Any) -> Config:
@@ -55,7 +56,7 @@ class Singleton(type):
 
     def __call__(cls, *args: Any, **kwargs: Any) -> Any:
         if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(  # noqa: WPS608
+            cls._instances[cls] = super().__call__(  # noqa: WPS608
                 *args,
                 **kwargs,
             )
@@ -231,7 +232,7 @@ class AsyncSoapClient(object):
         :raises ClientValueError: If the config input type doesn't match the given
             input.
         """
-        if isinstance(rq_obj, Dict):
+        if isinstance(rq_obj, dict):
             rq_obj = self.dict_converter.convert(rq_obj, self.config.input)
 
         if not isinstance(rq_obj, self.config.input):

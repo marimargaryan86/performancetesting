@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -47,7 +46,7 @@ class SearchResponse(BaseModel):
     complete: bool
     route: Route
     departure_datetime: datetime
-    return_departure_datetime: Optional[datetime]
+    return_departure_datetime: datetime | None
     expiration_time_left: timedelta
     search_results: list[SearchResult] = Field(..., alias="results")
 

@@ -1,7 +1,8 @@
 import datetime
 import json
 import logging
-from typing import Any, Mapping
+from collections.abc import Mapping
+from typing import Any
 
 import httpx
 import pytest

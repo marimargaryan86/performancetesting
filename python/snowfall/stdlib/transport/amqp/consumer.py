@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import asyncio
 import os
-from typing import Sequence, TypeVar, cast
+from collections.abc import Sequence
+from typing import TypeVar, cast
 
 from aio_pika import abc
 from google.protobuf import message

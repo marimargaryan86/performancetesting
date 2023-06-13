@@ -8,7 +8,8 @@ import pathlib
 import pkgutil
 import random
 import uuid
-from typing import Sequence, cast
+from collections.abc import Sequence
+from typing import cast
 
 import aiosmtplib
 import httpx

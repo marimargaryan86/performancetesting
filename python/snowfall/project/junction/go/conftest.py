@@ -147,7 +147,7 @@ async def trip_search_request(
                 time_zone=destination.location.time_zone,
             ),
         ],
-        departure_after=datetime.datetime.now(datetime.timezone.utc),
+        departure_after=datetime.datetime.now(datetime.UTC),
         maximum_connections=None,
         allowed_segment_types=[],
     )

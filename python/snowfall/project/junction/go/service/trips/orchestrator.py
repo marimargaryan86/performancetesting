@@ -2,7 +2,7 @@ import asyncio
 import datetime
 import itertools
 import zoneinfo
-from typing import Mapping, Sequence
+from collections.abc import Mapping, Sequence
 
 import structlog
 import timezonefinder

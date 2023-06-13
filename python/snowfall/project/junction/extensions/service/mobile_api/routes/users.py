@@ -1,6 +1,7 @@
 import random
+from collections.abc import Mapping
 from string import digits
-from typing import Any, Mapping
+from typing import Any
 
 import aiofiles
 import bcrypt
@@ -28,7 +29,7 @@ from snowfall.stdlib.v1 import phone_number_pb2
 
 _id_key = "_id"
 _email_key = "email"
-_password_key = str("password")
+_password_key = "password"  # nosec
 
 
 class Users(endpoints.HTTPEndpoint):

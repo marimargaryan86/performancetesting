@@ -131,7 +131,7 @@ class PriceQuoteConsumer(object):
 
         price_quote_id = await self._cache.store(
             record=offer_details,
-            expires_at=datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl,
+            expires_at=datetime.datetime.now(tz=datetime.UTC) + self._ttl,
         )
 
         await self._producer.publish(

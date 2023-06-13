@@ -4,8 +4,9 @@ import dataclasses
 import datetime
 import pathlib
 import re
+from collections.abc import AsyncIterator, Mapping, Sequence
 from functools import partial
-from typing import Any, AsyncIterator, Mapping, Sequence, TypedDict
+from typing import Any, TypedDict
 from unittest import mock
 
 import aiosmtplib
@@ -80,10 +81,9 @@ def new_user() -> models_pb2.User:
     )
 
 
-ExistingUser = TypedDict(
-    "ExistingUser",
-    {"model": models_pb2.User, "unhashed_password": str},
-)
+class ExistingUser(TypedDict):
+    model: models_pb2.User
+    unhashed_password: str
 
 
 @pytest.fixture()
@@ -120,15 +120,11 @@ def load_json_fixture(path: str, base_path: str = _FIXTURES_PATH) -> Any:
         return json_util.loads(json_file.read())
 
 
-Response = TypedDict(
-    "Response",
-    {
-        "url": re.Pattern[str],
-        "method": str,
-        "status_code": int,
-        "json": dict[str, Any],
-    },
-)
+class Response(TypedDict):
+    url: re.Pattern[str]
+    method: str
+    status_code: int
+    json: dict[str, Any]
 
 
 def load_response_fixture(path: str) -> Response:

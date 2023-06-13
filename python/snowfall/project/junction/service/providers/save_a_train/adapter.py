@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import AsyncIterator, Sequence
+from collections.abc import AsyncIterator, Sequence
 
 import httpx
 import phonenumbers
@@ -158,7 +158,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
             except httpx.HTTPStatusError:
                 continue
 
-            expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl
+            expires_at = datetime.datetime.now(tz=datetime.UTC) + self._ttl
             offer_segment_id = string.uuid()
 
             yield offer_models_pb2.OfferGroup(
@@ -313,7 +313,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                     provider_booking_reference=booking_responses.make_booking.search_identifier,
                     record_locator=booking_responses.get_ticket.confirmation_code,
                     created_at=protobuf.datetime_to_protobuf(
-                        datetime.datetime.now(tz=datetime.timezone.utc),
+                        datetime.datetime.now(tz=datetime.UTC),
                     ),
                 ),
                 raw_data=(

@@ -1,5 +1,3 @@
-from typing import List
-
 import pydantic
 
 from snowfall.vendor.duffel.models.base import DuffelBaseModel
@@ -14,21 +12,21 @@ class AvailableService(DuffelBaseModel):
 
 class Element(DuffelBaseModel):
     identifier: str = pydantic.Field(..., alias="id")
-    available_services: List[AvailableService] | None
+    available_services: list[AvailableService] | None
     designator: str | None
-    disclosures: List[str] | None
+    disclosures: list[str] | None
     name: str | None
     element_type: str = pydantic.Field(alias="type")
 
 
 class Section(DuffelBaseModel):
     identifier: str = pydantic.Field(..., alias="id")
-    elements: List[Element]
+    elements: list[Element]
 
 
 class Row(DuffelBaseModel):
     identifier: str = pydantic.Field(..., alias="id")
-    sections: List[Section]
+    sections: list[Section]
 
 
 class Wings(DuffelBaseModel):
@@ -40,16 +38,16 @@ class Cabin(DuffelBaseModel):
     aisles: int
     cabin_class: str
     deck: int
-    rows: List[Row]
+    rows: list[Row]
     wings: Wings
 
 
 class Seats(DuffelBaseModel):
-    cabins: List[Cabin]
+    cabins: list[Cabin]
     identifier: str = pydantic.Field(..., alias="id")
     segment_id: str
     slice_id: str
 
 
 class SeatResponse(DuffelBaseModel):
-    response_data: List[Seats] = pydantic.Field(..., alias="data")
+    response_data: list[Seats] = pydantic.Field(..., alias="data")

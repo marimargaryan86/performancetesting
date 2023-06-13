@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import datetime
-from typing import Any, ClassVar, Mapping, Optional, Sequence, cast
+from collections.abc import Mapping, Sequence
+from typing import Any, ClassVar, cast
 
 import pydantic
 from starlette import background as starlette_background
@@ -27,10 +28,10 @@ class ResourceIdentifier(BaseModel):
 
 
 class Resource(ResourceIdentifier):
-    attributes: Optional[AnyMapping] = None
-    relationships: Optional[AnyMapping] = None
-    links: Optional[Mapping[str, str]] = None
-    meta: Optional[AnyMapping] = None
+    attributes: AnyMapping | None = None
+    relationships: AnyMapping | None = None
+    links: Mapping[str, str] | None = None
+    meta: AnyMapping | None = None
 
 
 ResourceType = (
@@ -54,19 +55,19 @@ ErrorSource = ErrorSourceHeader | ErrorSourceParameter | ErrorSourcePointer
 
 
 class Error(BaseModel, frozen=True):
-    status: Optional[str]
-    code: Optional[str]
-    title: Optional[str]
-    detail: Optional[str]
-    source: Optional[ErrorSource]
+    status: str | None
+    code: str | None
+    title: str | None
+    detail: str | None
+    source: ErrorSource | None
 
 
 class Body(BaseModel):
-    resource_data: Optional[ResourceType] = pydantic.Field(None, alias="data")
-    errors: Optional[Sequence[Error]] = None
-    meta: Optional[AnyMapping] = None
-    links: Optional[AnyMapping] = None
-    included: Optional[Sequence[Resource]] = None
+    resource_data: ResourceType | None = pydantic.Field(None, alias="data")
+    errors: Sequence[Error] | None = None
+    meta: AnyMapping | None = None
+    links: AnyMapping | None = None
+    included: Sequence[Resource] | None = None
 
 
 class JsonApiResponse(responses.Response):

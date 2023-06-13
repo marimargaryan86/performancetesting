@@ -4,7 +4,7 @@ import abc
 import dataclasses
 import datetime
 import zoneinfo
-from typing import AbstractSet, Sequence
+from collections.abc import Sequence
 
 from google.protobuf import timestamp_pb2
 
@@ -52,14 +52,14 @@ class Validators(Validator):
         self.validators = args
 
     def matches(self, offer: Offer) -> bool:
-        return all((validator.matches(offer) for validator in self.validators))
+        return all(validator.matches(offer) for validator in self.validators)
 
 
 class AirlineValidator(Validator):
     def __init__(
         self,
-        enabled_airlines: AbstractSet[str] | None = None,
-        disabled_airlines: AbstractSet[str] | None = None,
+        enabled_airlines: frozenset[str] | None = None,
+        disabled_airlines: frozenset[str] | None = None,
     ) -> None:
         self._enabled_airlines = enabled_airlines
         self._disabled_airlines = disabled_airlines

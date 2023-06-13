@@ -1,6 +1,7 @@
 import json
 import pkgutil
-from typing import Any, Mapping, Sequence
+from collections.abc import Mapping, Sequence
+from typing import Any
 
 import aiofiles
 

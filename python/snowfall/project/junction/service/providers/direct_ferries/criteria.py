@@ -1,4 +1,4 @@
-from typing import Iterator, Sequence
+from collections.abc import Iterator, Sequence
 
 from snowfall.project.junction.go.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,

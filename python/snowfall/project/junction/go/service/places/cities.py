@@ -3,7 +3,7 @@ import logging
 import math
 import os
 import uuid
-from typing import AsyncIterable, Sequence
+from collections.abc import AsyncIterable, Sequence
 
 from aiocsv import AsyncDictReader, protocols
 
@@ -113,7 +113,7 @@ async def parse_csv(
                 ),
                 types=[models_pb2.Location.TYPE_CITY],
                 updated_at=protobuf.datetime_to_protobuf(
-                    datetime.datetime.now(tz=datetime.timezone.utc),
+                    datetime.datetime.now(tz=datetime.UTC),
                 ),
             ),
         )

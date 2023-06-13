@@ -1,5 +1,5 @@
 import itertools
-from typing import Collection, Sequence
+from collections.abc import Collection, Sequence
 
 import more_itertools
 

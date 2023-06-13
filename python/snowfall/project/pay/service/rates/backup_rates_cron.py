@@ -1,5 +1,5 @@
 import itertools
-from typing import Sequence
+from collections.abc import Sequence
 
 from snowfall.project.pay.service.rates.cache import RateRepository
 from snowfall.project.pay.service.rates.rates import BackUpRatesRepository

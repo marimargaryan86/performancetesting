@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any
 
 import pydantic
 
@@ -54,7 +54,7 @@ class FareClass(DistribusionBaseModel):
     iata_category: Any | None
     journey_type: str | None
     name: str | None
-    fare_features: List[FareFeature] | None
+    fare_features: list[FareFeature] | None
 
 
 class PassengerType(DistribusionBaseModel):
@@ -72,8 +72,8 @@ class MarketingCarrier(DistribusionBaseModel):
     code: str | None
     legal_name: str | None
     trade_name: str | None
-    fare_classes: List[FareClass] | None
-    passenger_types: List[PassengerType] | None
+    fare_classes: list[FareClass] | None
+    passenger_types: list[PassengerType] | None
 
 
 class OperatingCarrier(DistribusionBaseModel):
@@ -121,9 +121,9 @@ class Connection(DistribusionBaseModel):
     duration: int | None
     arrival_station: Station
     departure_station: Station
-    fares: List[FaresRelFareClassPrice] | None
+    fares: list[FaresRelFareClassPrice] | None
     marketing_carrier: MarketingCarrier | None
-    segments: List[Segment]
+    segments: list[Segment]
     currency: str
 
 
@@ -131,7 +131,7 @@ class ConnectionVacancy(DistribusionBaseModel):
     identifier: str = pydantic.Field(..., alias="id")
     total_price: int | None
     vacant: bool
-    fees: Dict[str, Any] | None
+    fees: dict[str, Any] | None
     currency: str
 
 
@@ -162,7 +162,7 @@ class SeatsSegment(DistribusionBaseModel):
 class Car(DistribusionBaseModel):
     identifier: str = pydantic.Field(..., alias="id")
     index: int | None
-    seats: List[Seat] | None
+    seats: list[Seat] | None
 
 
 class ConnectionSeat(DistribusionBaseModel):

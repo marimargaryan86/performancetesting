@@ -5,8 +5,8 @@ import base64
 import dataclasses
 import datetime
 import itertools
-from collections.abc import Sequence
-from typing import AsyncIterable, ClassVar, NamedTuple
+from collections.abc import AsyncIterable, Sequence
+from typing import ClassVar, NamedTuple
 
 from grpc import aio
 

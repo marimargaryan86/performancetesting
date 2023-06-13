@@ -1,5 +1,5 @@
 import copy
-from typing import Mapping
+from collections.abc import Mapping
 from unittest import mock
 
 import httpx

@@ -77,7 +77,7 @@ def search_adapter_no_ba(
             client=redis.Client(redis_client),
         ),
         ttl=datetime.timedelta(minutes=_TTL_MINUTES),
-        disabled_airlines={"BA"},
+        disabled_airlines=frozenset(("BA",)),
     )
 
 
@@ -92,7 +92,7 @@ def search_adapter_ba_only(
             client=redis.Client(redis_client),
         ),
         ttl=datetime.timedelta(minutes=_TTL_MINUTES),
-        enabled_airlines={"BA"},
+        enabled_airlines=frozenset(("BA",)),
     )
 
 

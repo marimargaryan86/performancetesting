@@ -1,5 +1,5 @@
 import functools
-from typing import Optional, Sequence
+from collections.abc import Sequence
 
 import pydantic
 import timezonefinder
@@ -12,31 +12,31 @@ _tz_finder = timezonefinder.TimezoneFinder()
 
 class Pet(base.CamelCaseBaseModel):
     pet_type: enums.PetType
-    name: Optional[str]
-    max_allowed: Optional[int]
-    number_of_pets: Optional[int]
+    name: str | None
+    max_allowed: int | None
+    number_of_pets: int | None
 
 
 class ResidentDiscount(base.CamelCaseBaseModel):
     identifier: int = pydantic.Field(..., alias="id")
-    name: Optional[str]
-    conditions: Optional[str]
+    name: str | None
+    conditions: str | None
 
 
 class City(base.CamelCaseBaseModel):
-    code: Optional[str]
-    name: Optional[str]
+    code: str | None
+    name: str | None
 
 
 class DiscountDetails(base.CamelCaseBaseModel):
-    resident_discounts: Optional[Sequence[ResidentDiscount]]
-    cities: Optional[Sequence[City]]
+    resident_discounts: Sequence[ResidentDiscount] | None
+    cities: Sequence[City] | None
 
 
 class Port(base.CamelCaseBaseModel):
-    name: Optional[str]
+    name: str | None
     code: str
-    address: Optional[str]
+    address: str | None
     latitude: float
     longitude: float
 
@@ -52,7 +52,7 @@ class Port(base.CamelCaseBaseModel):
 
 class Route(base.CamelCaseBaseModel):
     route_id: int
-    name: Optional[str]
+    name: str | None
     is_foot_passenger: bool
     is_vehicle: bool
     port_from: Port
@@ -60,8 +60,8 @@ class Route(base.CamelCaseBaseModel):
     operator_details: operator.OperatorDetails
     discount_details: DiscountDetails
     allow_pets: bool
-    pets: Optional[Sequence[Pet]]
-    pet_conditions: Optional[str]
+    pets: Sequence[Pet] | None
+    pet_conditions: str | None
 
 
 class RouteData(base.CamelCaseBaseModel):

@@ -1,5 +1,6 @@
 import datetime
-from typing import Any, Mapping, Optional, Sequence
+from collections.abc import Mapping, Sequence
+from typing import Any
 
 import pydantic
 
@@ -7,14 +8,14 @@ from snowfall.stdlib import string
 
 
 class User(pydantic.BaseModel):
-    first_name: Optional[str]
-    last_name: Optional[str]
-    phone: Optional[Mapping[str, str]]
-    gender: Optional[str]
-    country_code: Optional[str]
-    date_of_birth: Optional[Mapping[str, int]]
-    title: Optional[str]
-    loyalty_programs: Optional[Sequence[Mapping[str, str]]]  # noqa: WPS234
+    first_name: str | None
+    last_name: str | None
+    phone: Mapping[str, str] | None
+    gender: str | None
+    country_code: str | None
+    date_of_birth: Mapping[str, int] | None
+    title: str | None
+    loyalty_programs: Sequence[Mapping[str, str]] | None  # noqa: WPS234
 
     class Config(object):
         alias_generator = string.to_lower_camel
@@ -39,4 +40,4 @@ class User(pydantic.BaseModel):
 
 
 class UserGroupMember(User):
-    email: Optional[str]
+    email: str | None

@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import dataclasses
-from typing import TYPE_CHECKING, NotRequired, Sequence, TypedDict
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, NotRequired, TypedDict
 
 from snowfall.service.geodata.v1 import models_pb2
 from snowfall.stdlib.v1 import datetime_pb2, latlng_pb2
@@ -9,18 +10,15 @@ from snowfall.stdlib.v1 import datetime_pb2, latlng_pb2
 if TYPE_CHECKING:
     from mypy_boto3_location import client
 
-LocationSearchParams = TypedDict(
-    "LocationSearchParams",
-    {
-        "IndexName": str,
-        "Text": str,
-        "BiasPosition": NotRequired[Sequence[float]],
-        "FilterBBox": NotRequired[Sequence[float]],
-        "FilterCountries": NotRequired[Sequence[str]],
-        "Language": NotRequired[str],
-        "MaxResults": NotRequired[int],
-    },
-)
+
+class LocationSearchParams(TypedDict):
+    IndexName: str  # noqa: WPS115
+    Text: str  # noqa: WPS115
+    BiasPosition: NotRequired[Sequence[float]]  # noqa: WPS115
+    FilterBBox: NotRequired[Sequence[float]]  # noqa: WPS115
+    FilterCountries: NotRequired[Sequence[str]]  # noqa: WPS115
+    Language: NotRequired[str]  # noqa: WPS115
+    MaxResults: NotRequired[int]  # noqa: WPS115
 
 
 @dataclasses.dataclass(frozen=True)

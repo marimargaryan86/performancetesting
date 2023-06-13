@@ -1,13 +1,13 @@
 from dataclasses import dataclass, field
 from decimal import Decimal
-from typing import Dict, List, Optional
+from typing import Optional
 
 __NAMESPACE__ = "http://www.opentravel.org/OTA/2003/05"
 
 
 @dataclass
 class Airport(object):
-    city_id: Optional[int] = field(
+    city_id: int | None = field(
         default=None,
         metadata={
             "name": "CityID",
@@ -16,7 +16,7 @@ class Airport(object):
             "required": True,
         },
     )
-    name: Optional[str] = field(
+    name: str | None = field(
         default=None,
         metadata={
             "name": "Name",
@@ -24,34 +24,34 @@ class Airport(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    id: Optional[int] = field(
+    id: int | None = field(
         default=None,
         metadata={
             "type": "Attribute",
             "required": True,
         },
     )
-    iata: Optional[str] = field(
+    iata: str | None = field(
         default=None,
         metadata={
             "type": "Attribute",
         },
     )
-    latitude: Optional[Decimal] = field(
-        default=None,
-        metadata={
-            "type": "Attribute",
-            "required": True,
-        },
-    )
-    longitude: Optional[Decimal] = field(
+    latitude: Decimal | None = field(
         default=None,
         metadata={
             "type": "Attribute",
             "required": True,
         },
     )
-    state_code: Optional[str] = field(
+    longitude: Decimal | None = field(
+        default=None,
+        metadata={
+            "type": "Attribute",
+            "required": True,
+        },
+    )
+    state_code: str | None = field(
         default=None,
         metadata={
             "name": "state-code",
@@ -62,7 +62,7 @@ class Airport(object):
 
 @dataclass
 class City(object):
-    name: Optional[str] = field(
+    name: str | None = field(
         default=None,
         metadata={
             "name": "Name",
@@ -70,7 +70,7 @@ class City(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    region_id: Optional[int] = field(
+    region_id: int | None = field(
         default=None,
         metadata={
             "name": "RegionID",
@@ -79,34 +79,34 @@ class City(object):
             "required": True,
         },
     )
-    id: Optional[int] = field(
+    id: int | None = field(
         default=None,
         metadata={
             "type": "Attribute",
             "required": True,
         },
     )
-    state_code: Optional[str] = field(
+    state_code: str | None = field(
         default=None,
         metadata={
             "name": "state-code",
             "type": "Attribute",
         },
     )
-    iata: Optional[str] = field(
+    iata: str | None = field(
         default=None,
         metadata={
             "type": "Attribute",
         },
     )
-    latitude: Optional[float] = field(
+    latitude: float | None = field(
         default=None,
         metadata={
             "type": "Attribute",
             "required": True,
         },
     )
-    longitude: Optional[float] = field(
+    longitude: float | None = field(
         default=None,
         metadata={
             "type": "Attribute",
@@ -117,7 +117,7 @@ class City(object):
 
 @dataclass
 class Country(object):
-    name: Optional[str] = field(
+    name: str | None = field(
         default=None,
         metadata={
             "name": "Name",
@@ -125,7 +125,7 @@ class Country(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    iso: Optional[str] = field(
+    iso: str | None = field(
         default=None,
         metadata={
             "name": "ISO",
@@ -133,7 +133,7 @@ class Country(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    id: Optional[int] = field(
+    id: int | None = field(
         default=None,
         metadata={
             "type": "Attribute",
@@ -144,7 +144,7 @@ class Country(object):
 
 @dataclass
 class ErrorMessage(object):
-    name: Optional[str] = field(
+    name: str | None = field(
         default=None,
         metadata={
             "name": "Name",
@@ -152,7 +152,7 @@ class ErrorMessage(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    type: Optional[int] = field(
+    type: int | None = field(
         default=None,
         metadata={
             "name": "Type",
@@ -161,7 +161,7 @@ class ErrorMessage(object):
             "required": True,
         },
     )
-    id: Optional[int] = field(
+    id: int | None = field(
         default=None,
         metadata={
             "type": "Attribute",
@@ -175,7 +175,7 @@ class InformationHeader1(object):
     class Meta(object):
         name = "InformationHeader"
 
-    successfully: Optional[bool] = field(
+    successfully: bool | None = field(
         default=None,
         metadata={
             "name": "Successfully",
@@ -184,7 +184,7 @@ class InformationHeader1(object):
             "required": True,
         },
     )
-    processing_time: Optional[float] = field(
+    processing_time: float | None = field(
         default=None,
         metadata={
             "name": "ProcessingTime",
@@ -193,7 +193,7 @@ class InformationHeader1(object):
             "required": True,
         },
     )
-    any_attributes: Dict[str, str] = field(
+    any_attributes: dict[str, str] = field(
         default_factory=dict,
         metadata={
             "type": "Attributes",
@@ -204,7 +204,7 @@ class InformationHeader1(object):
 
 @dataclass
 class Region(object):
-    name: Optional[str] = field(
+    name: str | None = field(
         default=None,
         metadata={
             "name": "Name",
@@ -212,7 +212,7 @@ class Region(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    country_id: Optional[int] = field(
+    country_id: int | None = field(
         default=None,
         metadata={
             "name": "countryID",
@@ -221,14 +221,14 @@ class Region(object):
             "required": True,
         },
     )
-    id: Optional[int] = field(
+    id: int | None = field(
         default=None,
         metadata={
             "type": "Attribute",
             "required": True,
         },
     )
-    state_code: Optional[str] = field(
+    state_code: str | None = field(
         default=None,
         metadata={
             "name": "state-code",
@@ -242,7 +242,7 @@ class VehicleAirportRequest(object):
     class Meta(object):
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
-    region_id: Optional[int] = field(
+    region_id: int | None = field(
         default=None,
         metadata={
             "name": "RegionId",
@@ -250,14 +250,14 @@ class VehicleAirportRequest(object):
             "required": True,
         },
     )
-    language: Optional[str] = field(
+    language: str | None = field(
         default=None,
         metadata={
             "name": "Language",
             "type": "Element",
         },
     )
-    city_id: Optional[int] = field(
+    city_id: int | None = field(
         default=None,
         metadata={
             "name": "CityID",
@@ -265,7 +265,7 @@ class VehicleAirportRequest(object):
             "required": True,
         },
     )
-    country_id: Optional[int] = field(
+    country_id: int | None = field(
         default=None,
         metadata={
             "name": "CountryID",
@@ -280,7 +280,7 @@ class VehicleCityRequest(object):
     class Meta(object):
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
-    region_id: Optional[int] = field(
+    region_id: int | None = field(
         default=None,
         metadata={
             "name": "RegionId",
@@ -288,7 +288,7 @@ class VehicleCityRequest(object):
             "required": True,
         },
     )
-    country_id: Optional[int] = field(
+    country_id: int | None = field(
         default=None,
         metadata={
             "name": "CountryID",
@@ -296,14 +296,14 @@ class VehicleCityRequest(object):
             "required": True,
         },
     )
-    country_iso: Optional[str] = field(
+    country_iso: str | None = field(
         default=None,
         metadata={
             "name": "CountryISO",
             "type": "Element",
         },
     )
-    language: Optional[str] = field(
+    language: str | None = field(
         default=None,
         metadata={
             "name": "Language",
@@ -317,7 +317,7 @@ class VehicleCountryRequest(object):
     class Meta(object):
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
-    language: Optional[str] = field(
+    language: str | None = field(
         default=None,
         metadata={
             "name": "Language",
@@ -331,14 +331,14 @@ class VehicleRegionRequest(object):
     class Meta(object):
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
-    language: Optional[str] = field(
+    language: str | None = field(
         default=None,
         metadata={
             "name": "Language",
             "type": "Element",
         },
     )
-    country_iso: Optional[str] = field(
+    country_iso: str | None = field(
         default=None,
         metadata={
             "name": "CountryISO",
@@ -349,7 +349,7 @@ class VehicleRegionRequest(object):
 
 @dataclass
 class ArrayOfAirport(object):
-    airport: List[Airport] = field(
+    airport: list[Airport] = field(
         default_factory=list,
         metadata={
             "name": "Airport",
@@ -361,7 +361,7 @@ class ArrayOfAirport(object):
 
 @dataclass
 class ArrayOfCity(object):
-    city: List[City] = field(
+    city: list[City] = field(
         default_factory=list,
         metadata={
             "name": "City",
@@ -373,7 +373,7 @@ class ArrayOfCity(object):
 
 @dataclass
 class ArrayOfCountry(object):
-    country: List[Country] = field(
+    country: list[Country] = field(
         default_factory=list,
         metadata={
             "name": "Country",
@@ -385,7 +385,7 @@ class ArrayOfCountry(object):
 
 @dataclass
 class ArrayOfErrorMessage(object):
-    error_message: List[ErrorMessage] = field(
+    error_message: list[ErrorMessage] = field(
         default_factory=list,
         metadata={
             "name": "ErrorMessage",
@@ -398,7 +398,7 @@ class ArrayOfErrorMessage(object):
 
 @dataclass
 class ArrayOfRegion(object):
-    region: List[Region] = field(
+    region: list[Region] = field(
         default_factory=list,
         metadata={
             "name": "Region",
@@ -424,7 +424,7 @@ class DestinationSoapGetAirportsInput(object):
 
     @dataclass
     class Body(object):
-        vehicle_airport_request: Optional[VehicleAirportRequest] = field(
+        vehicle_airport_request: VehicleAirportRequest | None = field(
             default=None,
             metadata={
                 "name": "VehicleAirportRequest",
@@ -450,7 +450,7 @@ class DestinationSoapGetCitiesInput(object):
 
     @dataclass
     class Body(object):
-        vehicle_city_request: Optional[VehicleCityRequest] = field(
+        vehicle_city_request: VehicleCityRequest | None = field(
             default=None,
             metadata={
                 "name": "VehicleCityRequest",
@@ -476,7 +476,7 @@ class DestinationSoapGetCountriesInput(object):
 
     @dataclass
     class Body(object):
-        vehicle_country_request: Optional[VehicleCountryRequest] = field(
+        vehicle_country_request: VehicleCountryRequest | None = field(
             default=None,
             metadata={
                 "name": "VehicleCountryRequest",
@@ -502,7 +502,7 @@ class DestinationSoapGetRegionsInput(object):
 
     @dataclass
     class Body(object):
-        vehicle_region_request: Optional[VehicleRegionRequest] = field(
+        vehicle_region_request: VehicleRegionRequest | None = field(
             default=None,
             metadata={
                 "name": "VehicleRegionRequest",
@@ -521,7 +521,7 @@ class InformationHeader(InformationHeader1):
 
 @dataclass
 class DestinationResponse(object):
-    errors: Optional[ArrayOfErrorMessage] = field(
+    errors: ArrayOfErrorMessage | None = field(
         default=None,
         metadata={
             "name": "Errors",
@@ -536,7 +536,7 @@ class VehicleAirportResponse(DestinationResponse):
     class Meta(object):
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
-    airports: Optional[ArrayOfAirport] = field(
+    airports: ArrayOfAirport | None = field(
         default=None,
         metadata={
             "name": "Airports",
@@ -550,7 +550,7 @@ class VehicleCityResponse(DestinationResponse):
     class Meta(object):
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
-    cities: Optional[ArrayOfCity] = field(
+    cities: ArrayOfCity | None = field(
         default=None,
         metadata={
             "name": "Cities",
@@ -564,7 +564,7 @@ class VehicleCountryResponse(DestinationResponse):
     class Meta(object):
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
-    countries: Optional[ArrayOfCountry] = field(
+    countries: ArrayOfCountry | None = field(
         default=None,
         metadata={
             "name": "Countries",
@@ -578,7 +578,7 @@ class VehicleRegionResponse(DestinationResponse):
     class Meta(object):
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
-    regions: Optional[ArrayOfRegion] = field(
+    regions: ArrayOfRegion | None = field(
         default=None,
         metadata={
             "name": "Regions",
@@ -610,7 +610,7 @@ class DestinationSoapGetAirportsOutput(object):
 
     @dataclass
     class Body(object):
-        vehicle_airport_response: Optional[VehicleAirportResponse] = field(
+        vehicle_airport_response: VehicleAirportResponse | None = field(
             default=None,
             metadata={
                 "name": "VehicleAirportResponse",
@@ -628,28 +628,28 @@ class DestinationSoapGetAirportsOutput(object):
 
         @dataclass
         class Fault(object):
-            faultcode: Optional[str] = field(
+            faultcode: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultstring: Optional[str] = field(
+            faultstring: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultactor: Optional[str] = field(
+            faultactor: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            detail: Optional[str] = field(
+            detail: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
@@ -659,7 +659,7 @@ class DestinationSoapGetAirportsOutput(object):
 
     @dataclass
     class Header(object):
-        information_header: Optional[InformationHeader] = field(
+        information_header: InformationHeader | None = field(
             default=None,
             metadata={
                 "name": "informationHeader",
@@ -692,7 +692,7 @@ class DestinationSoapGetCitiesOutput(object):
 
     @dataclass
     class Body(object):
-        vehicle_city_response: Optional[VehicleCityResponse] = field(
+        vehicle_city_response: VehicleCityResponse | None = field(
             default=None,
             metadata={
                 "name": "VehicleCityResponse",
@@ -710,28 +710,28 @@ class DestinationSoapGetCitiesOutput(object):
 
         @dataclass
         class Fault(object):
-            faultcode: Optional[str] = field(
+            faultcode: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultstring: Optional[str] = field(
+            faultstring: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultactor: Optional[str] = field(
+            faultactor: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            detail: Optional[str] = field(
+            detail: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
@@ -741,7 +741,7 @@ class DestinationSoapGetCitiesOutput(object):
 
     @dataclass
     class Header(object):
-        information_header: Optional[InformationHeader] = field(
+        information_header: InformationHeader | None = field(
             default=None,
             metadata={
                 "name": "informationHeader",
@@ -774,7 +774,7 @@ class DestinationSoapGetCountriesOutput(object):
 
     @dataclass
     class Body(object):
-        vehicle_country_response: Optional[VehicleCountryResponse] = field(
+        vehicle_country_response: VehicleCountryResponse | None = field(
             default=None,
             metadata={
                 "name": "VehicleCountryResponse",
@@ -792,28 +792,28 @@ class DestinationSoapGetCountriesOutput(object):
 
         @dataclass
         class Fault(object):
-            faultcode: Optional[str] = field(
+            faultcode: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultstring: Optional[str] = field(
+            faultstring: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultactor: Optional[str] = field(
+            faultactor: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            detail: Optional[str] = field(
+            detail: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
@@ -823,7 +823,7 @@ class DestinationSoapGetCountriesOutput(object):
 
     @dataclass
     class Header(object):
-        information_header: Optional[InformationHeader] = field(
+        information_header: InformationHeader | None = field(
             default=None,
             metadata={
                 "name": "informationHeader",
@@ -856,7 +856,7 @@ class DestinationSoapGetRegionsOutput(object):
 
     @dataclass
     class Body(object):
-        vehicle_region_response: Optional[VehicleRegionResponse] = field(
+        vehicle_region_response: VehicleRegionResponse | None = field(
             default=None,
             metadata={
                 "name": "VehicleRegionResponse",
@@ -874,28 +874,28 @@ class DestinationSoapGetRegionsOutput(object):
 
         @dataclass
         class Fault(object):
-            faultcode: Optional[str] = field(
+            faultcode: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultstring: Optional[str] = field(
+            faultstring: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultactor: Optional[str] = field(
+            faultactor: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            detail: Optional[str] = field(
+            detail: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
@@ -905,7 +905,7 @@ class DestinationSoapGetRegionsOutput(object):
 
     @dataclass
     class Header(object):
-        information_header: Optional[InformationHeader] = field(
+        information_header: InformationHeader | None = field(
             default=None,
             metadata={
                 "name": "informationHeader",

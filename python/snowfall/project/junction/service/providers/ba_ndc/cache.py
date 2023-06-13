@@ -1,6 +1,5 @@
 import datetime
 import uuid
-from typing import List, Type
 
 from snowfall.stdlib.persistence.redis.repository import (
     PydanticRepository as RedisRepository,
@@ -25,15 +24,15 @@ class OfferDetailsPassenger(RedisRecord):
 
 class OfferDetails(RedisRecord):
     offer_id: uuid.UUID
-    passengers: List[OfferDetailsPassenger]
+    passengers: list[OfferDetailsPassenger]
     price: Price
     international_flight: bool = False
     return_flight_to_usa: bool = False
     expires_at: datetime.datetime
-    penalties: List[OfferPenalty]
+    penalties: list[OfferPenalty]
 
 
 class OfferCache(RedisRepository[OfferDetails]):
     """Stores offer details in the cache."""
 
-    _record_type: Type[OfferDetails] = OfferDetails
+    _record_type: type[OfferDetails] = OfferDetails

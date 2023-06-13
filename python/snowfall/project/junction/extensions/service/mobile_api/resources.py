@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import datetime
 import enum
-from typing import Any, Mapping
+from collections.abc import Mapping
+from typing import Any
 
 from google.protobuf.json_format import MessageToDict
 

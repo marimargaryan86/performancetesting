@@ -1,8 +1,8 @@
 import copy
 import datetime
 import itertools
+from collections.abc import Iterable, Iterator, Sequence
 from dataclasses import dataclass
-from typing import Iterable, Iterator, Optional, Sequence
 
 import more_itertools
 
@@ -24,7 +24,7 @@ class SubTrip(object):
 @dataclass(frozen=True)
 class TripCriteria(object):
     outbound: SubTrip
-    inbound: Optional[SubTrip] = None
+    inbound: SubTrip | None = None
 
     def get_combinations(self) -> Iterator[tuple[str, str]]:
         return itertools.product(

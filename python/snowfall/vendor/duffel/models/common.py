@@ -1,5 +1,4 @@
 import datetime
-from typing import List
 
 import pydantic
 
@@ -49,7 +48,7 @@ class Place(DuffelBaseModel):
     time_zone: str | None
     city_name: str | None
     city: City | None
-    airports: List[Airport] | None
+    airports: list[Airport] | None
 
 
 class Refund(DuffelBaseModel):

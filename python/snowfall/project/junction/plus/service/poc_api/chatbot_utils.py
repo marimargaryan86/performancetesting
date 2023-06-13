@@ -1,7 +1,8 @@
 import asyncio
 import datetime
+from collections.abc import Mapping, Sequence
 from io import BytesIO
-from typing import Any, Mapping, Sequence
+from typing import Any
 
 import httpx
 import json_api_doc

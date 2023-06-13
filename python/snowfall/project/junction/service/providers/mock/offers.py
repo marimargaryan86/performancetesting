@@ -1,7 +1,6 @@
 import dataclasses
 import datetime
-from collections.abc import AsyncIterator
-from typing import Callable, Sequence
+from collections.abc import AsyncIterator, Callable, Sequence
 
 import faker
 import more_itertools
@@ -50,7 +49,7 @@ class Generator(object):
         search: Criteria,
     ) -> AsyncIterator[offers_pb2.OfferGroup]:
         fake = faker.Faker()
-        expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl
+        expires_at = datetime.datetime.now(tz=datetime.UTC) + self._ttl
         offer_segments = [
             offers_pb2.OfferSegment(
                 id=string.uuid(),

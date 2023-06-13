@@ -1,6 +1,5 @@
 import dataclasses
 import inspect
-from typing import Optional
 
 import httpx
 
@@ -12,8 +11,8 @@ from snowfall.vendor.direct_ferries.clients import auth
 class RequestDetails(object):
     url: str
     method: str
-    payload: Optional[str] = None
-    query_params: Optional[httpx.QueryParams] = None
+    payload: str | None = None
+    query_params: httpx.QueryParams | None = None
 
 
 @dataclasses.dataclass(frozen=True)
@@ -23,7 +22,7 @@ class ClientConfig(object):
     api_url: str
     partner_code: str
     timeout: int = 120
-    api_version: Optional[str] = "v1.0"
+    api_version: str | None = "v1.0"
 
 
 class BaseClient(object):
@@ -38,7 +37,7 @@ class BaseClient(object):
         self._http_client = http_client
         self._auth_client = auth_client
         self._config = config
-        self._auth_response: Optional[auth.AuthServiceResponse] = None
+        self._auth_response: auth.AuthServiceResponse | None = None
 
     async def _make_request(
         self,

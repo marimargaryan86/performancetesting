@@ -1,4 +1,5 @@
-from typing import ClassVar, Sequence
+from collections.abc import Sequence
+from typing import ClassVar
 
 import pytest
 from starlette import requests

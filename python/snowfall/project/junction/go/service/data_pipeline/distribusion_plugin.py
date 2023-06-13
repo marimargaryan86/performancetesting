@@ -9,8 +9,9 @@ URL to download the data Returns a tuple of URLs and other stuff.
 Note it also does a ClientSession.head call on each code URL to check it is valid.
 """
 import os
+from collections.abc import Iterator
 from pprint import pprint
-from typing import Any, Iterator
+from typing import Any
 
 from httpx import AsyncClient
 

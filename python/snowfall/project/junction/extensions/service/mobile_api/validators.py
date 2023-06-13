@@ -1,5 +1,6 @@
 import functools
-from typing import Awaitable, Callable, ParamSpec, TypeVar, cast
+from collections.abc import Awaitable, Callable
+from typing import ParamSpec, TypeVar, cast
 
 from starlette import status
 

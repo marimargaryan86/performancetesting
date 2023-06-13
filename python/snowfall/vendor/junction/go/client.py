@@ -1,7 +1,8 @@
 import dataclasses
 import datetime
 import enum
-from typing import Any, Literal, Mapping, Sequence, cast
+from collections.abc import Mapping, Sequence
+from typing import Any, Literal, cast
 
 from snowfall.vendor.junction import client as base_client
 from snowfall.vendor.junction.go import models

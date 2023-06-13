@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -7,8 +6,8 @@ from snowfall.vendor.save_a_train.models.search import StationName
 
 
 class Train(BaseModel):
-    category: Optional[str]
-    number: Optional[str]
+    category: str | None
+    number: str | None
 
 
 class SearchResultTransferChange(BaseModel):

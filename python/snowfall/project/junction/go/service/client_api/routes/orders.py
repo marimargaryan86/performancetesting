@@ -1,5 +1,6 @@
 import datetime
-from typing import Any, Mapping, Sequence
+from collections.abc import Mapping, Sequence
+from typing import Any
 
 import lagom
 import more_itertools

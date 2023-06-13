@@ -1,5 +1,4 @@
 import datetime
-from typing import Optional
 
 import pydantic
 
@@ -12,8 +11,8 @@ class Account(CamelCaseBaseModel):
     street: str
     city: str
     country: str
-    postal_code: Optional[str]
-    state_or_province: Optional[str]
+    postal_code: str | None
+    state_or_province: str | None
     spread_table: str = "flat_0.00"
     api_trading: bool = True
     online_trading: bool = True

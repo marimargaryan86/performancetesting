@@ -1,6 +1,6 @@
 import contextlib
 import json
-from typing import Sequence
+from collections.abc import Sequence
 
 import aiofiles
 import httpx

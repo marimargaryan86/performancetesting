@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import datetime
-from typing import Any, Mapping, Sequence
+from collections.abc import Mapping, Sequence
+from typing import Any
 
 import pymongo
 
@@ -139,7 +140,7 @@ class OrderRepository(repository.ProtoRepository[models_pb2.Order]):
                 "$push": {
                     "orders": self._coder.encode(order),
                 },
-                "$set": {"updated_at": datetime.datetime.now(tz=datetime.timezone.utc)},
+                "$set": {"updated_at": datetime.datetime.now(tz=datetime.UTC)},
             },
         )
 
@@ -214,7 +215,7 @@ class OrderRepository(repository.ProtoRepository[models_pb2.Order]):
     ) -> list[models_pb2.Booking]:
         bookings = []
         now = protobuf.datetime_to_protobuf(
-            datetime.datetime.now(tz=datetime.timezone.utc),
+            datetime.datetime.now(tz=datetime.UTC),
         )
 
         for option in options:
@@ -319,7 +320,7 @@ class BookingRepository(repository.ProtoRepository[models_pb2.Booking]):
         self,
         booking: models_pb2.Booking,
     ) -> models_pb2.Booking:
-        now = datetime.datetime.now(tz=datetime.timezone.utc)
+        now = datetime.datetime.now(tz=datetime.UTC)
 
         await self._execute(
             self._collection.update_one,

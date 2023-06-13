@@ -1,4 +1,4 @@
-from typing import Optional, Sequence
+from collections.abc import Sequence
 
 from pydantic import BaseModel
 
@@ -6,7 +6,7 @@ from pydantic import BaseModel
 class VendorStation(BaseModel):
     uid: str
     name: str
-    location: Optional[str]
+    location: str | None
     searchable: bool
 
 

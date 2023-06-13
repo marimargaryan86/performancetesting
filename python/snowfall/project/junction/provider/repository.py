@@ -1,6 +1,7 @@
 import datetime
 import types as std_types
-from typing import AsyncIterable, AsyncIterator, Callable, Generic, TypeVar
+from collections.abc import AsyncIterable, AsyncIterator, Callable
+from typing import Generic, TypeVar
 
 import prometheus_client
 from google.protobuf import message
@@ -66,7 +67,7 @@ class OfferGroupCache(object):
         # only claim to have cached results if we were successful
         if not exc_type:
             fallback_expiry = datetime.datetime.now(
-                tz=datetime.timezone.utc,
+                tz=datetime.UTC,
             ) + datetime.timedelta(
                 hours=1,
             )  # TODO: tweak to what we want
@@ -98,7 +99,7 @@ class OfferGroupCache(object):
         await redis_types.put_expires_at_if_less_than_current(
             self._redis,
             self._offers,
-            offer.expires_at.ToDatetime(tzinfo=datetime.timezone.utc),
+            offer.expires_at.ToDatetime(tzinfo=datetime.UTC),
         )
 
 

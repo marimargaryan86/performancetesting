@@ -147,7 +147,7 @@ def test_protobuf_to_date(
     [
         (
             timestamp_pb2.Timestamp(seconds=0),
-            datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc),
+            datetime.datetime(1970, 1, 1, tzinfo=datetime.UTC),
         ),
         (
             datetime_pb2.DateTime(
@@ -283,7 +283,7 @@ def test_datetime_to_protobuf(
                 minute=5,
                 second=6,
                 microsecond=7,
-                tzinfo=datetime.timezone.utc,
+                tzinfo=datetime.UTC,
             ),
             datetime_pb2.DateTime(
                 year=1984,

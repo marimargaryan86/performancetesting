@@ -1,6 +1,7 @@
 import datetime
 import zoneinfo
-from typing import Any, Iterable, Mapping, Sequence
+from collections.abc import Iterable, Mapping, Sequence
+from typing import Any
 from unittest import mock
 
 import pytest

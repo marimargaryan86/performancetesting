@@ -1,5 +1,6 @@
 import dataclasses
-from typing import Any, Mapping, Optional, Sequence
+from collections.abc import Mapping, Sequence
+from typing import Any
 
 from snowfall.stdlib import string
 
@@ -26,7 +27,7 @@ class TravelerDocument(object):
     document_issue_country: str
     document_expiration_date: str
     nationality: str
-    residence_country_code: Optional[str] = None
+    residence_country_code: str | None = None
 
 
 @dataclasses.dataclass(frozen=True)
@@ -36,7 +37,7 @@ class Passenger(object):
     title: str
     gender: str
     date_of_birth: str
-    traveler_document: Optional[TravelerDocument] = None
+    traveler_document: TravelerDocument | None = None
 
 
 @dataclasses.dataclass(frozen=True)

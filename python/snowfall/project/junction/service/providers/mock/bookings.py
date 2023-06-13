@@ -49,7 +49,7 @@ class Booker(object):
                     provider_booking_reference=string.uuid(),
                     record_locator=string.random(6, charset=pystring.ascii_uppercase),
                     created_at=protobuf.datetime_to_protobuf(
-                        datetime.datetime.now(tz=datetime.timezone.utc),
+                        datetime.datetime.now(tz=datetime.UTC),
                     ),
                 ),
             ),

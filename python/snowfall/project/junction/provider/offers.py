@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import dataclasses
 import datetime
-from typing import AsyncIterator, Callable, Generic, Mapping, Sequence, TypeVar
+from collections.abc import AsyncIterator, Callable, Mapping, Sequence
+from typing import Generic, TypeVar
 
 from aiostream import stream
 from google.protobuf import message

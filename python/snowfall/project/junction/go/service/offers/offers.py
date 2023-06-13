@@ -1,6 +1,6 @@
 import copy
 import datetime
-from typing import Sequence
+from collections.abc import Sequence
 
 import pymongo
 from google.protobuf import timestamp_pb2
@@ -287,7 +287,7 @@ class OfferSearchRepository(  # noqa: WPS215
         offer_search = models_pb2.OfferSearch()
         expires_at = timestamp_pb2.Timestamp()
         expires_at.FromDatetime(
-            datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl,
+            datetime.datetime.now(tz=datetime.UTC) + self._ttl,
         )
 
         offer_search.CopyFrom(document)

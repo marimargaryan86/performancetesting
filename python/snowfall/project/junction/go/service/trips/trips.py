@@ -1,6 +1,6 @@
 import contextlib
 import datetime
-from typing import Sequence
+from collections.abc import Sequence
 
 import pymongo
 from google.protobuf import timestamp_pb2
@@ -177,7 +177,7 @@ class TripSearchRepository(  # noqa: WPS215
         expires_at = timestamp_pb2.Timestamp()
 
         expires_at.FromDatetime(
-            datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl,
+            datetime.datetime.now(tz=datetime.UTC) + self._ttl,
         )
         new_trip_search.expires_at.CopyFrom(expires_at)
 
@@ -209,7 +209,7 @@ class TripCandidateSearchRepository(  # noqa: WPS215
         new_trip_candidate_search = trips_pb2.TripCandidateSearch()
         expires_at = timestamp_pb2.Timestamp()
         expires_at.FromDatetime(
-            datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl,
+            datetime.datetime.now(tz=datetime.UTC) + self._ttl,
         )
 
         new_trip_candidate_search.CopyFrom(trip_candidate_search)

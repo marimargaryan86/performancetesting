@@ -1,5 +1,4 @@
 import datetime
-from typing import List
 
 import pydantic
 
@@ -23,7 +22,7 @@ class OfferSliceSegmentPassengerBaggage(DuffelBaseModel):
 
 
 class OfferSliceSegmentPassenger(DuffelBaseModel):
-    baggages: List[OfferSliceSegmentPassengerBaggage]
+    baggages: list[OfferSliceSegmentPassengerBaggage]
     cabin_class: str
     cabin_class_marketing_name: str
     passenger_id: str
@@ -40,7 +39,7 @@ class Stop(DuffelBaseModel):
 
 class OfferSliceSegment(DuffelBaseModel):
     identifier: str = pydantic.Field(..., alias="id")
-    stops: List[Stop] | None
+    stops: list[Stop] | None
     aircraft: Aircraft | None
     arriving_at: datetime.datetime
     departing_at: datetime.datetime
@@ -54,7 +53,7 @@ class OfferSliceSegment(DuffelBaseModel):
     marketing_carrier_flight_number: str
     operating_carrier: Airline
     operating_carrier_flight_number: str | None
-    passengers: List[OfferSliceSegmentPassenger]
+    passengers: list[OfferSliceSegmentPassenger]
 
 
 class OfferSlice(DuffelBaseModel):
@@ -65,5 +64,5 @@ class OfferSlice(DuffelBaseModel):
     origin_terminal: str | None
     duration: datetime.timedelta | None
     fare_brand_name: str | None
-    segments: List[OfferSliceSegment]
+    segments: list[OfferSliceSegment]
     conditions: OfferSliceConditions

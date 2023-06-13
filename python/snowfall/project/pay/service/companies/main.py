@@ -1,6 +1,6 @@
 import ipaddress
 import random
-from typing import Sequence
+from collections.abc import Sequence
 
 import pydantic
 from motor import motor_asyncio

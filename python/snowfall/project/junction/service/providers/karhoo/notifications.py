@@ -44,7 +44,7 @@ Destination location : {destination}
             "booking_id": self._meta_data.booking_id,
             "spnr": self._meta_data.passenger_name_record,
             "created_at": datetime.datetime.now(
-                tz=datetime.timezone.utc,
+                tz=datetime.UTC,
             ).isoformat(timespec="seconds"),
             "follow_code": (
                 self._booking.follow_code if self._booking.follow_code else ""

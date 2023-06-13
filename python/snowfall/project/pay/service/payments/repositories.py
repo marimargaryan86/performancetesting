@@ -1,5 +1,6 @@
 import datetime
-from typing import Any, Mapping
+from collections.abc import Mapping
+from typing import Any
 
 from snowfall.project.pay.service.payments.v1alpha.models_pb2 import Payment
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset

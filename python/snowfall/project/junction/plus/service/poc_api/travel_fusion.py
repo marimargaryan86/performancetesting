@@ -1,6 +1,7 @@
 import copy
 import datetime
-from typing import Any, Mapping, Sequence
+from collections.abc import Mapping, Sequence
+from typing import Any
 
 import httpx
 import qrcode
@@ -75,13 +76,13 @@ def json2xml(
     if json_obj_type is dict:
         for tag_name in json_obj:  # noqa: WPS528
             sub_obj = json_obj[tag_name]
-            result_list.append("%s<%s>" % (line_padding, tag_name))
+            result_list.append("{0}<{1}>".format(line_padding, tag_name))
             result_list.append(json2xml(sub_obj, line_padding))
-            result_list.append("%s</%s>" % (line_padding, tag_name))
+            result_list.append("{0}</{1}>".format(line_padding, tag_name))
 
         return "".join(result_list)
 
-    return "%s%s" % (line_padding, json_obj)
+    return "{0}{1}".format(line_padding, json_obj)
 
 
 tf_availability: dict[str, Any] = {

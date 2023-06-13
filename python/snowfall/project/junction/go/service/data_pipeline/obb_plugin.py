@@ -4,8 +4,9 @@ OBB has an awkward (seemingly undocumented) API to retrieve their datasets.
 """
 
 import re
+from collections.abc import Iterator
 from datetime import date
-from typing import Any, Iterator
+from typing import Any
 
 from httpx import AsyncClient
 

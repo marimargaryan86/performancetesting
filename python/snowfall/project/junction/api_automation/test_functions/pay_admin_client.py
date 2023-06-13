@@ -3,7 +3,8 @@ from __future__ import annotations
 import json
 import logging
 import sys
-from typing import Any, Awaitable, Callable, Literal, Sequence
+from collections.abc import Awaitable, Callable, Sequence
+from typing import Any, Literal
 from urllib.parse import parse_qs, urlparse
 
 import httpx

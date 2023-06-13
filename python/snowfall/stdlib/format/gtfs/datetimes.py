@@ -1,6 +1,6 @@
 import contextlib
 import datetime
-from typing import AsyncIterable
+from collections.abc import AsyncIterable
 
 from snowfall.stdlib.format.gtfs import models
 

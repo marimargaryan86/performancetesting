@@ -1,7 +1,7 @@
 import datetime
 import random
-from collections.abc import AsyncGenerator
-from typing import Any, Callable
+from collections.abc import AsyncGenerator, Callable
+from typing import Any
 
 from motor import motor_asyncio
 from redis import asyncio as aioredis

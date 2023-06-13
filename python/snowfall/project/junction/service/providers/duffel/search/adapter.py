@@ -1,6 +1,6 @@
 import datetime
 from collections import defaultdict
-from typing import AbstractSet, AsyncIterator, Callable, Mapping, Sequence
+from collections.abc import AsyncIterator, Callable, Mapping, Sequence
 
 import structlog
 
@@ -71,8 +71,8 @@ class DuffelSearchAdapter(object):
         duffel_client: client.DuffelClient,
         offers_cache: cache.OfferCache,
         ttl: datetime.timedelta,
-        enabled_airlines: AbstractSet[str] | None = None,
-        disabled_airlines: AbstractSet[str] | None = None,
+        enabled_airlines: frozenset[str] | None = None,
+        disabled_airlines: frozenset[str] | None = None,
     ) -> None:
         self._client = duffel_client
         self._offer_parser = OfferParser(default_ttl=ttl, offer_cache=offers_cache)

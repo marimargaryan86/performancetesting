@@ -38,7 +38,7 @@ class SubtaskStatusHandler(trackable.FixedSizeStatusHandler):
     ) -> tuple[amqp_pb2.Trackable.Status.ValueType, datetime.datetime]:
         return (
             amqp_pb2.Trackable.Status.STATUS_PROCESSING,
-            datetime.datetime.now(tz=datetime.timezone.utc)
+            datetime.datetime.now(tz=datetime.UTC)
             + datetime.timedelta(
                 minutes=_SUBTASK_TIMEOUT_MINUTES,
             ),

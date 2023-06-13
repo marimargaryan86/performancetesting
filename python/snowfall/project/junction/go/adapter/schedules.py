@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import abc
-from typing import Sequence
+from collections.abc import Sequence
 
 from snowfall.project.junction.go.adapter import errors
 from snowfall.project.junction.go.service.schedules.v1alpha import (

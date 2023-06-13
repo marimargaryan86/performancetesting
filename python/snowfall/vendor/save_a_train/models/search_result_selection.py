@@ -1,5 +1,3 @@
-from typing import Optional
-
 from pydantic import BaseModel
 
 from snowfall.vendor.save_a_train.models.search import SearchResult
@@ -8,7 +6,7 @@ from snowfall.vendor.save_a_train.models.search import SearchResult
 class SearchResultSeatPreferenceOption(BaseModel):
     code: str
     name: str
-    description: Optional[str]
+    description: str | None
 
 
 class SearchResultSeatPreference(BaseModel):
@@ -19,10 +17,10 @@ class SearchResultSeatPreference(BaseModel):
 
 
 class SearchResultSelected(SearchResult):
-    seat_preference: Optional[SearchResultSeatPreference]
+    seat_preference: SearchResultSeatPreference | None
 
 
 class SearchResultSelectionResponse(BaseModel):
     search_identifier: str
     outbound_selected_result: SearchResultSelected
-    inbound_selected_result: Optional[SearchResultSelected]
+    inbound_selected_result: SearchResultSelected | None

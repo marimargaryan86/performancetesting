@@ -3,7 +3,8 @@ from __future__ import annotations
 import abc
 import asyncio
 import datetime
-from typing import Any, Mapping, TypeVar
+from collections.abc import Mapping
+from typing import Any, TypeVar
 
 from google.protobuf import message
 

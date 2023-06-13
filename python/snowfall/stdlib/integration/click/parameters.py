@@ -1,17 +1,8 @@
 from __future__ import annotations
 
 import pathlib
-from collections import abc
-from typing import (
-    Any,
-    Callable,
-    Mapping,
-    Sequence,
-    cast,
-    get_args,
-    get_origin,
-    get_type_hints,
-)
+from collections.abc import Callable, Mapping, Sequence
+from typing import Any, cast, get_args, get_origin, get_type_hints
 
 import click
 import orjson
@@ -78,7 +69,7 @@ def _create_from_pydantic_field(
     arg_types: Mapping[str, type],
 ) -> click.Parameter:
     arg_type = get_origin(arg_types[arg.name]) or arg_types[arg.name]
-    is_multi = arg_type in {abc.Sequence, Sequence, list, set, tuple}
+    is_multi = arg_type in {Sequence, list, set, tuple}
     callback = arg.field_info.extra.get("callback")
 
     if arg.field_info.extra.get("argument", False):
@@ -186,11 +177,15 @@ def _get_parameter_default(
 
     if isinstance(arg.default, _iterables) or sequence.is_a(arg.default):
         return [
-            default if isinstance(default, (bool, float, int, str)) else str(default)
+            (
+                default
+                if isinstance(default, bool | float | int | str)  # noqa: WPS221
+                else str(default)
+            )
             for default in arg.default
         ]
 
-    if isinstance(arg.default, (bool, float, int, str)):
+    if isinstance(arg.default, bool | float | int | str):
         return arg.default
 
     return str(arg.default)

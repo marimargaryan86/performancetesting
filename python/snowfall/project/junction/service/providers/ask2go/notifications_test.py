@@ -15,7 +15,7 @@ _BOOKING_LOCATOR = "FOOBAR"
 _CHECKIN_LOCATOR = "BAZQUX"
 _FIRST_NAME = "First"
 _LAST_NAME = "Last"
-_TRAVEL_DATE = datetime.datetime(2000, 1, 1, tzinfo=datetime.timezone.utc)
+_TRAVEL_DATE = datetime.datetime(2000, 1, 1, tzinfo=datetime.UTC)
 _METADATA = amqp_pb2.OrderMetadata(
     journey_id="JOURNEY_ID",
     order_id="ORDER_ID",

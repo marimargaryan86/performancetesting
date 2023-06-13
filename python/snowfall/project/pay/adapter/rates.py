@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import abc
-from typing import Mapping
+from collections.abc import Mapping
 
 from snowfall.project.junction.go.adapter import errors
 from snowfall.project.pay.service.rates.v1alpha import (

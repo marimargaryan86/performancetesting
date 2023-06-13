@@ -1,6 +1,7 @@
 import dataclasses
+from collections.abc import Mapping, Sequence
 from datetime import date, datetime
-from typing import Any, Dict, Mapping, Sequence
+from typing import Any
 
 from snowfall.vendor.junction.go import models
 from snowfall.vendor.junction.go.client import (  # noqa: WPS450,WPS235
@@ -92,7 +93,7 @@ class MobileApiClient(Client):  # noqa: WPS214
         voucher_id: str | None = None,
         include: Sequence[order_includes] | None = None,
     ) -> dict[str, Any]:
-        body: Dict[str, Dict[str, Any]]
+        body: dict[str, dict[str, Any]]
         body = {
             _DATA_KEY: {
                 _ATTRIBUTES_KEY: {

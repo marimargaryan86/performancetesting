@@ -1,5 +1,5 @@
 import pathlib
-from typing import AsyncIterator, Mapping, Sequence
+from collections.abc import AsyncIterator, Mapping, Sequence
 
 import httpx
 import pytest

@@ -2,7 +2,7 @@ import csv
 import enum
 import os
 import zipfile
-from typing import Generator, Optional, Sequence
+from collections.abc import Generator, Sequence
 
 import orjson
 import pydantic
@@ -36,14 +36,14 @@ class CompressFileList(enum.Enum):
 
 class Place(pydantic.BaseModel):
     port_code: str
-    latitude: Optional[float]
-    longitude: Optional[float]
+    latitude: float | None
+    longitude: float | None
 
 
 class RouteMapping(pydantic.BaseModel):
     route_id: str
-    origin: Optional[str]
-    destination: Optional[str]
+    origin: str | None
+    destination: str | None
 
 
 def _models_to_csv(

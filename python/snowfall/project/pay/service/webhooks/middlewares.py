@@ -1,6 +1,6 @@
 import hashlib
 import hmac
-from typing import Awaitable, Callable
+from collections.abc import Awaitable, Callable
 
 from starlette import applications, exceptions, requests, responses, status
 from starlette.middleware.base import BaseHTTPMiddleware

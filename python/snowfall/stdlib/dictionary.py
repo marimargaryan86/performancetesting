@@ -1,5 +1,6 @@
 import copy
-from typing import Any, Awaitable, Callable, Mapping, Sequence
+from collections.abc import Awaitable, Callable, Mapping, Sequence
+from typing import Any
 
 
 def set_nested_value(

@@ -1,6 +1,7 @@
 import abc
 import contextlib
-from typing import Any, Generic, Mapping, TypeVar, cast
+from collections.abc import Mapping
+from typing import Any, Generic, TypeVar, cast
 
 import orjson
 import pydantic

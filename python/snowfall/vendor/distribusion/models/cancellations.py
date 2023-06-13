@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any
 
 import pydantic
 
@@ -7,15 +7,15 @@ from snowfall.vendor.distribusion.models.base import DistribusionBaseModel
 
 class CancellationCondition(DistribusionBaseModel):
     identifier: str = pydantic.Field(..., alias="id")
-    allowed: Optional[bool] = None
-    cutoff: Optional[str] = None
-    fee: Optional[int] = None
-    deductions: Optional[Dict[str, Any]] = None
+    allowed: bool | None = None
+    cutoff: str | None = None
+    fee: int | None = None
+    deductions: dict[str, Any] | None = None
 
 
 class Cancellation(DistribusionBaseModel):
     identifier: str = pydantic.Field(..., alias="id")
-    created_at: Optional[str] = None
-    fee: Optional[int] = None
-    total_price: Optional[int] = None
-    total_refund: Optional[int] = None
+    created_at: str | None = None
+    fee: int | None = None
+    total_price: int | None = None
+    total_refund: int | None = None

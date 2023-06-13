@@ -1,4 +1,5 @@
-from typing import Any, Mapping, Sequence
+from collections.abc import Mapping, Sequence
+from typing import Any
 from urllib import parse as parse_url
 
 from snowfall.stdlib.transport.http import client

@@ -40,7 +40,7 @@ def parse_phone_number(
 
 def date_to_proto_now() -> timestamp_pb2.Timestamp:
     return protobuf.datetime_to_protobuf(
-        datetime.datetime.now(tz=datetime.timezone.utc),
+        datetime.datetime.now(tz=datetime.UTC),
     )
 
 

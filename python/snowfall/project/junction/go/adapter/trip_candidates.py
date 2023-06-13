@@ -1,5 +1,5 @@
 import abc
-from typing import Sequence
+from collections.abc import Sequence
 
 from snowfall.project.junction.go.adapter import errors
 from snowfall.project.junction.go.service.trips.v1alpha import trips_pb2, trips_pb2_grpc

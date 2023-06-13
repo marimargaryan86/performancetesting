@@ -1,7 +1,8 @@
 import dataclasses
 import datetime
 import enum
-from typing import Any, Generic, Mapping, TypeVar
+from collections.abc import Mapping
+from typing import Any, Generic, TypeVar
 
 from aio_pika import abc, connection, robust_connection
 from google.protobuf import message
@@ -74,7 +75,7 @@ class Message(Generic[_Proto]):  # noqa: WPS214
         except KeyError:
             return None
 
-        return datetime.datetime.fromtimestamp(enqueued_at, tz=datetime.timezone.utc)
+        return datetime.datetime.fromtimestamp(enqueued_at, tz=datetime.UTC)
 
     @property
     def exchange(self) -> str:

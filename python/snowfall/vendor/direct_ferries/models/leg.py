@@ -1,5 +1,6 @@
 import datetime
-from typing import Any, Optional, Sequence
+from collections.abc import Sequence
+from typing import Any
 
 import pydantic
 
@@ -30,7 +31,7 @@ class Accommodation(base.CamelCaseBaseModel):
     quantity: int
     availability: int
     gender: Gender
-    message: Optional[str]
+    message: str | None
     minimum_occupancy: int
 
 
@@ -42,24 +43,24 @@ class LegBase(base.CamelCaseBaseModel):
 
 
 class Leg(LegBase):
-    ticket_reference: Optional[str]
-    operator: Optional[operator.Operator]
-    route_name: Optional[str]
-    accommodation_message: Optional[str]
-    departure_port_name: Optional[str]
-    departure_port_id: Optional[int]
+    ticket_reference: str | None
+    operator: operator.Operator | None
+    route_name: str | None
+    accommodation_message: str | None
+    departure_port_name: str | None
+    departure_port_id: int | None
     departure_port_code: str
-    arrival_port_name: Optional[str]
-    arrival_port_id: Optional[int]
+    arrival_port_name: str | None
+    arrival_port_id: int | None
     arrival_port_code: str
     arrival_date_time: datetime.datetime
-    duration_minutes: Optional[int]
-    is_accommodation_compulsory: Optional[bool]
-    latest_check_in_minutes: Optional[int]
-    ship: Optional[ship.Ship]
-    vehicles: Optional[Sequence[vehicle.Vehicle]]
+    duration_minutes: int | None
+    is_accommodation_compulsory: bool | None
+    latest_check_in_minutes: int | None
+    ship: ship.Ship | None
+    vehicles: Sequence[vehicle.Vehicle] | None
     passengers: Sequence[passenger.Passenger]
     accommodations: Sequence[Accommodation]
-    meals: Optional[Any]
-    pdf_url: Optional[str]
-    pets: Optional[Any]
+    meals: Any | None
+    pdf_url: str | None
+    pets: Any | None

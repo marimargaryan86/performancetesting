@@ -1,4 +1,5 @@
-from typing import AsyncGenerator, cast
+from collections.abc import AsyncGenerator
+from typing import cast
 
 import bcrypt
 import pytest

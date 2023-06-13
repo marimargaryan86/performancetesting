@@ -1,7 +1,8 @@
 import contextlib
 import contextvars
 import logging
-from typing import Any, Iterator, Protocol, Sequence
+from collections.abc import Iterator, Sequence
+from typing import Any, Protocol
 
 import structlog
 

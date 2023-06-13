@@ -1,7 +1,6 @@
 import datetime
 import itertools
-from collections.abc import Iterator
-from typing import Mapping, Sequence
+from collections.abc import Iterator, Mapping, Sequence
 
 import more_itertools
 

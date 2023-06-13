@@ -17,7 +17,7 @@ class RateRepository(object):
 
         await self._redis.put_expires_at(
             currency_pair,
-            datetime.datetime.now(tz=datetime.timezone.utc)
+            datetime.datetime.now(tz=datetime.UTC)
             + datetime.timedelta(minutes=self._default_ttl),
         )
 

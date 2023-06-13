@@ -1,7 +1,7 @@
 import datetime
 import itertools
 import zoneinfo
-from typing import Sequence
+from collections.abc import Sequence
 
 import more_itertools
 
@@ -63,7 +63,7 @@ class OfferParser(object):  # noqa: WPS214
         if expires_at is not None:
             return expires_at
 
-        return datetime.datetime.now(tz=datetime.timezone.utc) + self._default_ttl
+        return datetime.datetime.now(tz=datetime.UTC) + self._default_ttl
 
     def _segment_to_proto(
         self,

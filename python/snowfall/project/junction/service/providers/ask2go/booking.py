@@ -2,7 +2,7 @@ import asyncio
 import datetime
 import pathlib
 import uuid
-from typing import Sequence
+from collections.abc import Sequence
 
 import more_itertools
 import orjson
@@ -106,7 +106,7 @@ class BookingHandler(object):
                     operator_booking_references=booking_result.information.check_in_locators
                     or [],
                     created_at=protobuf.datetime_to_protobuf(
-                        datetime.datetime.now(tz=datetime.timezone.utc),
+                        datetime.datetime.now(tz=datetime.UTC),
                     ),
                 ),
                 raw_data=booking_result.json(),

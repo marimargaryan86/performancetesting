@@ -1,12 +1,13 @@
 import datetime
-from typing import Any, Optional, Sequence, Union
+from collections.abc import Sequence
+from typing import Any
 
 from snowfall.vendor.direct_ferries.models import base, common, leg
 
 
 class QuoteBase(base.CamelCaseBaseModel):
     selected_currency: str
-    partner_code: Optional[str]
+    partner_code: str | None
     is_different_outbound_return: bool
     return_alternative_routes: bool
     is_open_ticket: bool
@@ -14,19 +15,19 @@ class QuoteBase(base.CamelCaseBaseModel):
 
 
 class Quote(QuoteBase):
-    quote_token: Optional[str]
-    created_date_time: Optional[Union[datetime.datetime, str]]
-    is_success: Optional[bool]
+    quote_token: str | None
+    created_date_time: datetime.datetime | str | None
+    is_success: bool | None
     price: common.Price
-    is_special_offer: Optional[bool]
-    has_ticket_types: Optional[bool]
-    has_accommodations: Optional[bool]
+    is_special_offer: bool | None
+    has_ticket_types: bool | None
+    has_accommodations: bool | None
     legs: Sequence[leg.Leg]
-    pet_instructions: Optional[str]
-    ticket_conditions: Optional[str]
-    quote_messages: Optional[str]
-    accommodation_message: Optional[str]
-    required_passenger_information: Optional[Sequence[Any]]
+    pet_instructions: str | None
+    ticket_conditions: str | None
+    quote_messages: str | None
+    accommodation_message: str | None
+    required_passenger_information: Sequence[Any] | None
 
 
 class AccommodationResponse(base.CamelCaseBaseModel):
@@ -39,7 +40,7 @@ class AccommodationResponse(base.CamelCaseBaseModel):
 
 class GenerateQuoteResponse(base.CamelCaseBaseModel):
     quote_token: str
-    created_date_time: Optional[datetime.datetime]
+    created_date_time: datetime.datetime | None
     selected_currency: str
     partner_code: str
     is_different_outbound_return: bool

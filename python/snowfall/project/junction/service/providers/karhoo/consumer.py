@@ -1,6 +1,6 @@
 import asyncio
 import datetime
-from typing import AsyncIterator
+from collections.abc import AsyncIterator
 
 from snowfall.project.junction.go.service.offers.v1alpha import (
     amqp_pb2 as offers_amqp_pb2,
@@ -135,7 +135,7 @@ class TripOfferSearchConsumer(object):  # noqa: WPS214
     ) -> AsyncIterator[offer_models_pb2.OfferGroup]:
         quote_list = await self._poll_quote_list(quote_id)
 
-        expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl
+        expires_at = datetime.datetime.now(tz=datetime.UTC) + self._ttl
 
         for quote_obj in quote_list.quotes:
             if quote_obj.quote_type != "FIXED":

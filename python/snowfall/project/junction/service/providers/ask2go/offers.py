@@ -1,4 +1,4 @@
-from typing import AsyncIterator, Callable
+from collections.abc import AsyncIterator, Callable
 
 from snowfall.project.junction.go.service.offers.v1alpha import models_pb2 as offers_pb2
 from snowfall.project.junction.service.providers.ask2go import search, transformer

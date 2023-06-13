@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import abc
 import datetime
-from typing import Sequence
+from collections.abc import Sequence
 
 from snowfall.project.junction.go.adapter import errors
 from snowfall.project.junction.go.service.offers.v1alpha import (
@@ -41,7 +41,7 @@ class DictClient(Client):
         self,
         request: models_pb2.OfferSearch,
     ) -> models_pb2.OfferSearch:
-        expires_at = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(
+        expires_at = datetime.datetime.now(datetime.UTC) + datetime.timedelta(
             days=1,
         )
         offer_search = models_pb2.OfferSearch(

@@ -4,17 +4,8 @@ import asyncio
 import contextlib
 import dataclasses
 import inspect
-from typing import (  # noqa: WPS235
-    Any,
-    AsyncIterator,
-    Awaitable,
-    Callable,
-    Generic,
-    Optional,
-    Type,
-    TypeVar,
-    cast,
-)
+from collections.abc import AsyncIterator, Awaitable, Callable
+from typing import Any, Generic, TypeVar, cast
 
 import click
 import orjson
@@ -55,8 +46,8 @@ class AnyDsn(pydantic.AnyUrl):
 
 @dataclasses.dataclass(frozen=True)
 class SentrySettings(object):
-    additional_integrations: Optional[sentry.Integrations] = None
-    tag_keys: Optional[list[str]] = None
+    additional_integrations: sentry.Integrations | None = None
+    tag_keys: list[str] | None = None
 
 
 class _GlobalSettings(Settings):
@@ -107,7 +98,7 @@ Callback = SyncCallback[_Settings] | AsyncCallback[_Settings]
 class Command(Generic[_Settings]):
     name: str
     callback: Callback[_Settings]
-    settings_class: Type[_Settings]
+    settings_class: type[_Settings]
 
 
 @dataclasses.dataclass(frozen=True, kw_only=True)

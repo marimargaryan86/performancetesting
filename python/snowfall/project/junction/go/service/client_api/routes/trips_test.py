@@ -1,5 +1,6 @@
 import datetime
-from typing import Any, Mapping
+from collections.abc import Mapping
+from typing import Any
 
 import freezegun
 import httpx
@@ -184,7 +185,7 @@ class TestTripSearches(object):
             "data": {
                 "attributes": {
                     "departureAfter": datetime.datetime.now(
-                        tz=datetime.timezone.utc,
+                        tz=datetime.UTC,
                     ).isoformat(timespec="seconds"),
                 },
                 "relationships": {

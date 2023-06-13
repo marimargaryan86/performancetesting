@@ -1,6 +1,6 @@
 import ast
 from collections.abc import Iterator
-from typing import NamedTuple, Type
+from typing import NamedTuple
 
 
 def resolve_fullname(node: ast.AST) -> str:
@@ -74,7 +74,7 @@ class Visitor(ast.NodeVisitor):
 
 
 class Plugin(object):
-    visitor: Type[Visitor]
+    visitor: type[Visitor]
 
     def __init__(self, tree: ast.Module) -> None:
         self._tree = tree

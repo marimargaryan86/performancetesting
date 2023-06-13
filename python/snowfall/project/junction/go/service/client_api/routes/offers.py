@@ -3,7 +3,8 @@ from __future__ import annotations
 import dataclasses
 import datetime
 import itertools
-from typing import Any, Mapping, Sequence, cast
+from collections.abc import Mapping, Sequence
+from typing import Any, cast
 
 import lagom
 from starlette import endpoints, requests, responses, status

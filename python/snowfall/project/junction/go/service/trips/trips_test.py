@@ -92,7 +92,7 @@ async def test_trip_search_repository(
 
     trip = trips_pb2.TripSearch(
         departure_after=protobuf.datetime_to_protobuf_datetime(
-            datetime.datetime.now(datetime.timezone.utc),
+            datetime.datetime.now(datetime.UTC),
         ),
     )
     inserted_trip = await _insert_trip_search(repo, trip)

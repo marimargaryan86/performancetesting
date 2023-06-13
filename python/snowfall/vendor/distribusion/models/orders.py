@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any
 
 import pydantic
 
@@ -30,7 +30,7 @@ class Segment(DistribusionBaseModel):
     arrival_time: str | None
     departure_time: str | None
     index: int | None
-    segment_passengers: List[SegmentPassenger] | None
+    segment_passengers: list[SegmentPassenger] | None
 
 
 class FareClass(DistribusionBaseModel):
@@ -39,9 +39,9 @@ class FareClass(DistribusionBaseModel):
     iata_category: Any | None
     journey_type: str | None
     name: str | None
-    fare_features: List[FareFeature] | None
-    passenger_group_rules: List[Dict[str, Any]] | None
-    ticket_validity_rules: List[Dict[str, Any]] | None
+    fare_features: list[FareFeature] | None
+    passenger_group_rules: list[dict[str, Any]] | None
+    ticket_validity_rules: list[dict[str, Any]] | None
 
 
 class Booking(DistribusionBaseModel):
@@ -57,8 +57,8 @@ class Booking(DistribusionBaseModel):
     pax: int | None
     total_price: int | None
     fare_class: FareClass | None
-    passengers: List[Passenger] | None
-    segments: List[Segment] | None
+    passengers: list[Passenger] | None
+    segments: list[Segment] | None
 
 
 class OrderCreateResponse(DistribusionBaseModel):

@@ -1,5 +1,5 @@
 import datetime
-from typing import Mapping
+from collections.abc import Mapping
 
 from snowfall.vendor.ba_ndc.models import (
     response_common_offer_schemas,

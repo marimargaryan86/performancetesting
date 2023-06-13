@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 import abc
-from collections.abc import Iterator
-from typing import Sequence
+from collections.abc import Iterator, Sequence
 
 from snowfall.project.junction.go.adapter import errors
 from snowfall.project.junction.go.service.offers.v1alpha import (

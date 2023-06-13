@@ -49,7 +49,7 @@ class BookingHandler(object):
                     record_locator=booking_response.booking.booking_reference,
                     created_at=protobuf.datetime_to_protobuf(
                         booking_response.booking.created_date_time.replace(
-                            tzinfo=datetime.timezone.utc,
+                            tzinfo=datetime.UTC,
                         ),
                     ),
                     operator_booking_references=[

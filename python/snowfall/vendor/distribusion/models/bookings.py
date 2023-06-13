@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any
 
 import pydantic
 
@@ -95,9 +95,9 @@ class FareClass(DistribusionBaseModel):
     iata_category: Any | None
     journey_type: str | None
     name: str | None
-    fare_features: List[FareFeature] | None
-    passenger_group_rules: List[Dict[str, Any]] | None
-    ticket_validity_rules: List[Dict[str, Any]] | None
+    fare_features: list[FareFeature] | None
+    passenger_group_rules: list[dict[str, Any]] | None
+    ticket_validity_rules: list[dict[str, Any]] | None
 
 
 class Vehicle(DistribusionBaseModel):
@@ -113,7 +113,7 @@ class Segment(DistribusionBaseModel):
     arrival_station: Station | None
     departure_station: Station | None
     operating_carrier: OperatingCarrier | None
-    segment_passengers: List[SegmentPassenger] | None
+    segment_passengers: list[SegmentPassenger] | None
     vehicle: Vehicle | None
 
 
@@ -123,9 +123,9 @@ class Connection(DistribusionBaseModel):
     departure_time: str | None
     arrival_station: Station | None
     departure_station: Station | None
-    fees: Dict[str, Any] | None
+    fees: dict[str, Any] | None
     marketing_carrier: MarketingCarrier | None
-    segments: List[Segment] | None
+    segments: list[Segment] | None
 
 
 class Booking(DistribusionBaseModel):
@@ -159,14 +159,14 @@ class Booking(DistribusionBaseModel):
     zip_code: str | None
     arrival_station: Station | None
     cancellation: CancellationsId | None
-    custom_fields: Dict[str, Any] | None
+    custom_fields: dict[str, Any] | None
     departure_station: Station | None
-    extras: Dict[str, Any] | None
+    extras: dict[str, Any] | None
     fare_class: FareClass | None
-    fees: Dict[str, Any] | None
+    fees: dict[str, Any] | None
     inbound_connection: Any | None
     installments: Any | None
     marketing_carrier: MarketingCarrier | None
     outbound_connection: Connection | None
-    passengers: List[Passenger] | None
-    segments: List[Segment] | None
+    passengers: list[Passenger] | None
+    segments: list[Segment] | None

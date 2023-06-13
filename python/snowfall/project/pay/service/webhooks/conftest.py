@@ -1,4 +1,4 @@
-from typing import AsyncIterator, Mapping
+from collections.abc import AsyncIterator, Mapping
 
 import httpx
 import pytest

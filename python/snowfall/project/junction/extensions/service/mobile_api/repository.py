@@ -18,7 +18,7 @@ _ID_ACCESSOR = "id"
 _ID_KEY = "_id"
 _ATTRIBUTES_ACCESSOR = "attributes"
 _EMAIL_KEY = "email"
-_PASSWORD_KEY = str("password")
+_PASSWORD_KEY = "password"  # nosec
 _DEFAULT_PAGE_SIZE = 20
 _DICT_SEQUENCE = Sequence[dict[str, Any]]
 
@@ -37,7 +37,7 @@ class RedisRepository(object):
         if self._ttl:
             await self._redis.put_expires_at(
                 identifier,
-                datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl,
+                datetime.datetime.now(tz=datetime.UTC) + self._ttl,
             )
 
 
@@ -284,7 +284,7 @@ class PreferencesRepository(
             {
                 "$set": {
                     "preferences": new_preferences,
-                    "updated_at": datetime.datetime.now(datetime.timezone.utc),
+                    "updated_at": datetime.datetime.now(datetime.UTC),
                 },
             },
             upsert=True,

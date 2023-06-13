@@ -2,8 +2,9 @@ import abc
 import collections
 import datetime
 import functools
+from collections.abc import Mapping
 from enum import IntEnum
-from typing import Any, Mapping, Type, TypeVar, cast
+from typing import Any, TypeVar, cast
 
 import pydantic
 from dateutil import parser
@@ -13,7 +14,7 @@ from snowfall.stdlib.v1 import latlng_pb2
 
 AnyValue = TypeVar("AnyValue", bound=Any)
 
-_Metadata = descriptor.Descriptor | Type[pydantic.BaseModel]
+_Metadata = descriptor.Descriptor | type[pydantic.BaseModel]
 _TypesMap = Mapping[str, Mapping[str, str]]
 
 _MONGO_ID_KEY = "_id"
@@ -98,7 +99,7 @@ class _TimestampNormalizer(Normalizer):
         maybe_dict: AnyValue,
     ) -> AnyValue:
         if not maybe_dict.tzinfo:
-            maybe_dict = maybe_dict.replace(tzinfo=datetime.timezone.utc)
+            maybe_dict = maybe_dict.replace(tzinfo=datetime.UTC)
 
         return maybe_dict.isoformat()
 

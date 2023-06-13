@@ -38,7 +38,7 @@ class TestPriceQuoteModel(object):
         assert price_quote.id
 
     def test_has_expiry(self, price_quote: offers_pb2.PriceQuote) -> None:
-        now = datetime.datetime.now(tz=datetime.timezone.utc)
+        now = datetime.datetime.now(tz=datetime.UTC)
         assert protobuf.protobuf_to_datetime(price_quote.expires_at) > now
 
     def test_has_option_id(

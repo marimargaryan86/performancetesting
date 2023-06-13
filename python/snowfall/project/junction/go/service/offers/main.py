@@ -1,7 +1,7 @@
 import datetime
 import ipaddress
 import random
-from typing import Sequence
+from collections.abc import Sequence
 
 import httpx
 import pydantic

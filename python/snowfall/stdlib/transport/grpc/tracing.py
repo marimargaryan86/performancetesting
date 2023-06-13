@@ -1,5 +1,5 @@
 import contextlib
-from typing import Callable, Iterator
+from collections.abc import Callable, Iterator
 
 from google.protobuf.message import Message
 from grpc import aio

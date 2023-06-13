@@ -1,4 +1,5 @@
-from typing import Any, Awaitable, Callable, Mapping, Sequence, TypeVar
+from collections.abc import Awaitable, Callable, Mapping, Sequence
+from typing import Any, TypeVar
 
 import lagom
 from starlette import endpoints, requests, responses, status

@@ -1,4 +1,5 @@
-from typing import Any, Callable, Generic, Mapping, Sequence, TypeVar
+from collections.abc import Callable, Mapping, Sequence
+from typing import Any, Generic, TypeVar
 
 from fastapi import Depends
 from sqlalchemy import ColumnElement, select, update

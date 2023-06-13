@@ -1,7 +1,7 @@
 import itertools
 import sys
+from collections.abc import Mapping, Sequence
 from os import path
-from typing import Mapping, Sequence
 
 import hcl2
 import pydantic
@@ -208,7 +208,7 @@ def _main() -> bool:
             0
         ].replace("_", "-")
 
-        with open(template_path, "r") as template_file:
+        with open(template_path) as template_file:
             parsed = hcl2.load(template_file)
 
             if _validate_jobs(template_path, filename, parsed.get("job", [])):

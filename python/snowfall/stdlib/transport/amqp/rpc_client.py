@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import asyncio
-from typing import Any, Generic, MutableMapping, TypeVar
+from collections.abc import MutableMapping
+from typing import Any, Generic, TypeVar
 
 from aio_pika import Message, abc, connect
 from google.protobuf import message

@@ -1,5 +1,4 @@
 from datetime import date, datetime, timedelta
-from typing import Optional
 
 from pydantic import BaseModel
 
@@ -36,10 +35,10 @@ class TripInfo(BaseModel):
 class BookingResult(BaseModel):
     search_identifier: str
     outbound_trip_info: TripInfo
-    inbound_trip_info: Optional[TripInfo]
+    inbound_trip_info: TripInfo | None
     price: str
     outbound_seat_reservation_fee: str
-    inbound_seat_reservation_fee: Optional[str]
+    inbound_seat_reservation_fee: str | None
     total_price: str
 
 

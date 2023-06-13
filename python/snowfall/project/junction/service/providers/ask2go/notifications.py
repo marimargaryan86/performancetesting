@@ -53,7 +53,7 @@ Travel departure date : {departure_at}
             "first_name": first_passenger.get("firstName", ""),
             "last_name": first_passenger.get("lastName", ""),
             "created_at": datetime.datetime.now(
-                tz=datetime.timezone.utc,
+                tz=datetime.UTC,
             ).isoformat(timespec="seconds"),
             "departure_at": more_itertools.first(
                 self._booking.air_itinerary.trips,

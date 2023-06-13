@@ -1,5 +1,4 @@
 import datetime
-from typing import Optional
 
 from snowfall.vendor.ask2go.enums import DocumentType, Gender, PassengerType
 from snowfall.vendor.ask2go.models.base import CamelCaseBaseModel
@@ -7,23 +6,23 @@ from snowfall.vendor.ask2go.models.base import CamelCaseBaseModel
 
 class AirportChildren(CamelCaseBaseModel):
     iata: str
-    airport_name: Optional[str]
-    city: Optional[str]
-    country: Optional[str]
+    airport_name: str | None
+    city: str | None
+    country: str | None
 
 
 class Airport(CamelCaseBaseModel):
-    airport_name: Optional[str]
-    city: Optional[str]
-    country: Optional[str]
+    airport_name: str | None
+    city: str | None
+    country: str | None
     iata: str
-    city_code: Optional[str]
+    city_code: str | None
     is_parent: bool = False
     is_child: bool = False
-    language: Optional[str]
-    fts_code: Optional[str]
-    fts_composite: Optional[str]
-    fts_full: Optional[str]
+    language: str | None
+    fts_code: str | None
+    fts_composite: str | None
+    fts_full: str | None
     popularity: int = 0
     airport_children: list[AirportChildren] = []
 
@@ -62,4 +61,4 @@ class Passenger(CamelCaseBaseModel):
     gender: Gender
     type: PassengerType  # noqa: A003
     birth_date: datetime.date
-    traveler_document: Optional[TravelerDocument]
+    traveler_document: TravelerDocument | None

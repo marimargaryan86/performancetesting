@@ -58,8 +58,8 @@ async def offers_factory(
             client=redis.Client[bytes](redis_connection, prefix=app.name),
         ),
         ttl=app.settings.ttl,
-        enabled_airlines=app.settings.enabled_airlines,
-        disabled_airlines=app.settings.disabled_airlines,
+        enabled_airlines=frozenset(app.settings.enabled_airlines),
+        disabled_airlines=frozenset(app.settings.disabled_airlines),
     )
     airport_mapping = airports.AirportRepository(
         airports_data=cast(

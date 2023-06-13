@@ -1,5 +1,4 @@
 import dataclasses
-from typing import Optional
 
 from starlette import datastructures, requests
 
@@ -9,13 +8,13 @@ PAGE_LIMIT_KEY = "page[limit]"
 
 @dataclasses.dataclass(frozen=True)
 class Pagination(object):
-    cursor: Optional[str] = None
-    limit: Optional[int] = None
+    cursor: str | None = None
+    limit: int | None = None
 
 
 def get_pagination(request: requests.Request) -> Pagination:
     limit_str = request.scope["parsed_query_string"].get(PAGE_LIMIT_KEY)
-    limit: Optional[int] = None
+    limit: int | None = None
 
     if limit_str is not None:
         limit = int(limit_str)

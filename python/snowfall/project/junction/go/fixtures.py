@@ -1,6 +1,6 @@
 import datetime
 import random
-from typing import Sequence
+from collections.abc import Sequence
 
 from snowfall.project.junction.go.service.offers.v1alpha import models_pb2 as offers_pb2
 from snowfall.project.junction.go.service.orders.v1alpha import (
@@ -121,7 +121,7 @@ def generate_location(identifier: str) -> place_models_pb2.Location:
         time_zone="Europe/Stockholm",
         types=[place_models_pb2.Location.TYPE_UNSPECIFIED],
         updated_at=protobuf.datetime_to_protobuf(
-            datetime.datetime.now(tz=datetime.timezone.utc),
+            datetime.datetime.now(tz=datetime.UTC),
         ),
     )
 

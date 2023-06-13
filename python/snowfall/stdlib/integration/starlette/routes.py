@@ -4,7 +4,8 @@ import functools
 import json
 import os
 import re
-from typing import TYPE_CHECKING, Any, Awaitable, Callable, Sequence, TypeVar
+from collections.abc import Awaitable, Callable, Sequence
+from typing import TYPE_CHECKING, Any, TypeVar
 
 import httpx
 from starlette import (

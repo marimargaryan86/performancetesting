@@ -1,4 +1,4 @@
-from typing import Sequence
+from collections.abc import Sequence
 
 from snowfall.vendor.carnect.adapters.veh_rate_rule_adapter import VehRateRuleAdapter
 from snowfall.vendor.carnect.builders.veh_rate_rule_builder import VehRateRuleRqBuilder

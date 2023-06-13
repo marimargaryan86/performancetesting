@@ -87,7 +87,7 @@ def search_task_from_offer(
                 destination_iata=last_segment.destination.code or "",
                 outbound_departure=protobuf.datetime_to_protobuf_datetime(
                     first_segment.departure_date_time.replace(
-                        tzinfo=datetime.timezone.utc,
+                        tzinfo=datetime.UTC,
                     ),
                 ),
                 adults=1,

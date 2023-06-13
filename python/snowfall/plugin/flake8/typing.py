@@ -1,7 +1,7 @@
 import ast
 import contextlib
 import types
-from typing import Mapping
+from collections.abc import Mapping
 
 from snowfall.plugin.flake8 import plugin
 

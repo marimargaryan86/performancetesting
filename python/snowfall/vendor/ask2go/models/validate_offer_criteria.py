@@ -1,5 +1,4 @@
 import datetime
-from typing import Optional
 
 import pydantic
 
@@ -28,18 +27,18 @@ class SegmentCriteria(CamelCaseBaseModel):
     marketing_airline: str
     operating_airline: str
     equipment: str
-    res_book_desig_code: Optional[str]
+    res_book_desig_code: str | None
 
 
 class ValidateOfferCriteria(CamelCaseBaseModel):
     search_id: str
     itinerary_id: str
     transaction_id: str
-    client_ip: Optional[str]
+    client_ip: str | None
     currency: str
-    flight_segments: Optional[list[SegmentCriteria]]
-    passengers: Optional[list[PassengerCriteria]]
-    ancillaries: Optional[list[AncillaryCriteria]]
+    flight_segments: list[SegmentCriteria] | None
+    passengers: list[PassengerCriteria] | None
+    ancillaries: list[AncillaryCriteria] | None
 
 
 class ValidateOfferResponse(CamelCaseBaseModel):

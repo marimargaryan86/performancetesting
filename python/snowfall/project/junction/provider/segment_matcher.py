@@ -3,7 +3,7 @@ from __future__ import annotations
 import dataclasses
 import datetime
 import zoneinfo
-from typing import Sequence
+from collections.abc import Sequence
 
 import more_itertools
 import structlog

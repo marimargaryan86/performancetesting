@@ -1,7 +1,7 @@
 import collections
 import datetime
 import itertools
-from typing import Mapping, Sequence
+from collections.abc import Mapping, Sequence
 
 import prometheus_client
 import structlog
@@ -241,7 +241,7 @@ class OfferAggregator(object):
                 offer_search_id=offer_search.id,
                 offer_group_id=search_result.offer.id,
                 delay_seconds=(
-                    datetime.datetime.now(tz=datetime.timezone.utc)
+                    datetime.datetime.now(tz=datetime.UTC)
                     - protobuf.protobuf_to_datetime(offer_search.updated_at)
                 ).total_seconds(),
             )

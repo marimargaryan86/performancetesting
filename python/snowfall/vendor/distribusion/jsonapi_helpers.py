@@ -1,5 +1,6 @@
 import copy
-from typing import Any, Collection, Mapping, Sequence
+from collections.abc import Collection, Mapping, Sequence
+from typing import Any
 
 
 def flatten_list(content: Any) -> list[Any]:

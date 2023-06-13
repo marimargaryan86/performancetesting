@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from decimal import Decimal
 from enum import Enum
-from typing import Dict, List, Optional
+from typing import Optional
 
 from xsdata.models.datatype import XmlDate, XmlDateTime, XmlDuration, XmlPeriod
 
@@ -42,7 +42,7 @@ class AdvanceBookingOffsetDropTime(Enum):
 
 @dataclass
 class ArrayOfAcceptablePaymentCardsInfoTypeAcceptablePaymentCard(object):
-    acceptable_payment_card: List[
+    acceptable_payment_card: list[
         "ArrayOfAcceptablePaymentCardsInfoTypeAcceptablePaymentCard.AcceptablePaymentCard"
     ] = field(
         default_factory=list,
@@ -55,28 +55,28 @@ class ArrayOfAcceptablePaymentCardsInfoTypeAcceptablePaymentCard(object):
 
     @dataclass
     class AcceptablePaymentCard(object):
-        card_type: Optional[str] = field(
+        card_type: str | None = field(
             default=None,
             metadata={
                 "name": "CardType",
                 "type": "Attribute",
             },
         )
-        card_name: Optional[str] = field(
+        card_name: str | None = field(
             default=None,
             metadata={
                 "name": "CardName",
                 "type": "Attribute",
             },
         )
-        usage_percentage: Optional[Decimal] = field(
+        usage_percentage: Decimal | None = field(
             default=None,
             metadata={
                 "name": "UsagePercentage",
                 "type": "Attribute",
             },
         )
-        usage_amount: Optional[Decimal] = field(
+        usage_amount: Decimal | None = field(
             default=None,
             metadata={
                 "name": "UsageAmount",
@@ -87,7 +87,7 @@ class ArrayOfAcceptablePaymentCardsInfoTypeAcceptablePaymentCard(object):
 
 @dataclass
 class ArrayOfOperationScheduleTypeOperationTime(object):
-    operation_time: List["ArrayOfOperationScheduleTypeOperationTime.OperationTime"] = (
+    operation_time: list["ArrayOfOperationScheduleTypeOperationTime.OperationTime"] = (
         field(
             default_factory=list,
             metadata={
@@ -100,91 +100,91 @@ class ArrayOfOperationScheduleTypeOperationTime(object):
 
     @dataclass
     class OperationTime(object):
-        mon: Optional[bool] = field(
+        mon: bool | None = field(
             default=None,
             metadata={
                 "name": "Mon",
                 "type": "Attribute",
             },
         )
-        tue: Optional[bool] = field(
+        tue: bool | None = field(
             default=None,
             metadata={
                 "name": "Tue",
                 "type": "Attribute",
             },
         )
-        weds: Optional[bool] = field(
+        weds: bool | None = field(
             default=None,
             metadata={
                 "name": "Weds",
                 "type": "Attribute",
             },
         )
-        thur: Optional[bool] = field(
+        thur: bool | None = field(
             default=None,
             metadata={
                 "name": "Thur",
                 "type": "Attribute",
             },
         )
-        fri: Optional[bool] = field(
+        fri: bool | None = field(
             default=None,
             metadata={
                 "name": "Fri",
                 "type": "Attribute",
             },
         )
-        sat: Optional[bool] = field(
+        sat: bool | None = field(
             default=None,
             metadata={
                 "name": "Sat",
                 "type": "Attribute",
             },
         )
-        sun: Optional[bool] = field(
+        sun: bool | None = field(
             default=None,
             metadata={
                 "name": "Sun",
                 "type": "Attribute",
             },
         )
-        start: Optional[str] = field(
+        start: str | None = field(
             default=None,
             metadata={
                 "name": "Start",
                 "type": "Attribute",
             },
         )
-        duration: Optional[str] = field(
+        duration: str | None = field(
             default=None,
             metadata={
                 "name": "Duration",
                 "type": "Attribute",
             },
         )
-        end: Optional[str] = field(
+        end: str | None = field(
             default=None,
             metadata={
                 "name": "End",
                 "type": "Attribute",
             },
         )
-        additional_operation_info_code: Optional[str] = field(
+        additional_operation_info_code: str | None = field(
             default=None,
             metadata={
                 "name": "AdditionalOperationInfoCode",
                 "type": "Attribute",
             },
         )
-        frequency: Optional[str] = field(
+        frequency: str | None = field(
             default=None,
             metadata={
                 "name": "Frequency",
                 "type": "Attribute",
             },
         )
-        text: Optional[str] = field(
+        text: str | None = field(
             default=None,
             metadata={
                 "name": "Text",
@@ -195,7 +195,7 @@ class ArrayOfOperationScheduleTypeOperationTime(object):
 
 @dataclass
 class ArrayOfString(object):
-    additional_person_name: List[str] = field(
+    additional_person_name: list[str] = field(
         default_factory=list,
         metadata={
             "name": "AdditionalPersonName",
@@ -210,7 +210,7 @@ class ArrayOfVehicleAvailRqadditionalInfoTypeCoveragePref(object):
     class Meta(object):
         name = "ArrayOfVehicleAvailRQAdditionalInfoTypeCoveragePref"
 
-    coverage_pref: List[object] = field(
+    coverage_pref: list[object] = field(
         default_factory=list,
         metadata={
             "name": "CoveragePref",
@@ -222,7 +222,7 @@ class ArrayOfVehicleAvailRqadditionalInfoTypeCoveragePref(object):
 
 @dataclass
 class ArrayOfVehicleChargeTypeTaxAmount(object):
-    tax_amount: List["ArrayOfVehicleChargeTypeTaxAmount.TaxAmount"] = field(
+    tax_amount: list["ArrayOfVehicleChargeTypeTaxAmount.TaxAmount"] = field(
         default_factory=list,
         metadata={
             "name": "TaxAmount",
@@ -233,7 +233,7 @@ class ArrayOfVehicleChargeTypeTaxAmount(object):
 
     @dataclass
     class TaxAmount(object):
-        total: Optional[Decimal] = field(
+        total: Decimal | None = field(
             default=None,
             metadata={
                 "name": "Total",
@@ -241,28 +241,28 @@ class ArrayOfVehicleChargeTypeTaxAmount(object):
                 "required": True,
             },
         )
-        currency_code: Optional[str] = field(
+        currency_code: str | None = field(
             default=None,
             metadata={
                 "name": "CurrencyCode",
                 "type": "Attribute",
             },
         )
-        tax_code: Optional[str] = field(
+        tax_code: str | None = field(
             default=None,
             metadata={
                 "name": "TaxCode",
                 "type": "Attribute",
             },
         )
-        percentage: Optional[Decimal] = field(
+        percentage: Decimal | None = field(
             default=None,
             metadata={
                 "name": "Percentage",
                 "type": "Attribute",
             },
         )
-        description: Optional[str] = field(
+        description: str | None = field(
             default=None,
             metadata={
                 "name": "Description",
@@ -276,7 +276,7 @@ class ArrayOfVehicleReservationRqadditionalInfoTypeCoveragePref(object):
     class Meta(object):
         name = "ArrayOfVehicleReservationRQAdditionalInfoTypeCoveragePref"
 
-    coverage_pref: List[object] = field(
+    coverage_pref: list[object] = field(
         default_factory=list,
         metadata={
             "name": "CoveragePref",
@@ -319,42 +319,42 @@ class CompanyNameType(object):
             "required": True,
         },
     )
-    company_short_name: Optional[str] = field(
+    company_short_name: str | None = field(
         default=None,
         metadata={
             "name": "CompanyShortName",
             "type": "Attribute",
         },
     )
-    travel_sector: Optional[str] = field(
+    travel_sector: str | None = field(
         default=None,
         metadata={
             "name": "TravelSector",
             "type": "Attribute",
         },
     )
-    code: Optional[str] = field(
+    code: str | None = field(
         default=None,
         metadata={
             "name": "Code",
             "type": "Attribute",
         },
     )
-    code_context: Optional[str] = field(
+    code_context: str | None = field(
         default=None,
         metadata={
             "name": "CodeContext",
             "type": "Attribute",
         },
     )
-    division: Optional[str] = field(
+    division: str | None = field(
         default=None,
         metadata={
             "name": "Division",
             "type": "Attribute",
         },
     )
-    department: Optional[str] = field(
+    department: str | None = field(
         default=None,
         metadata={
             "name": "Department",
@@ -383,7 +383,7 @@ class CountryNameType(object):
             "required": True,
         },
     )
-    code: Optional[str] = field(
+    code: str | None = field(
         default=None,
         metadata={
             "name": "Code",
@@ -394,7 +394,7 @@ class CountryNameType(object):
 
 @dataclass
 class CoverageType(object):
-    details: List["CoveragePricedType"] = field(
+    details: list["CoveragePricedType"] = field(
         default_factory=list,
         metadata={
             "name": "Details",
@@ -402,14 +402,14 @@ class CoverageType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    coverage_type: Optional[str] = field(
+    coverage_type: str | None = field(
         default=None,
         metadata={
             "name": "CoverageType",
             "type": "Attribute",
         },
     )
-    code: Optional[str] = field(
+    code: str | None = field(
         default=None,
         metadata={
             "name": "Code",
@@ -496,28 +496,28 @@ class EmployeeInfoType(object):
             "required": True,
         },
     )
-    employee_id: Optional[str] = field(
+    employee_id: str | None = field(
         default=None,
         metadata={
             "name": "EmployeeId",
             "type": "Attribute",
         },
     )
-    employee_level: Optional[str] = field(
+    employee_level: str | None = field(
         default=None,
         metadata={
             "name": "EmployeeLevel",
             "type": "Attribute",
         },
     )
-    employee_title: Optional[str] = field(
+    employee_title: str | None = field(
         default=None,
         metadata={
             "name": "EmployeeTitle",
             "type": "Attribute",
         },
     )
-    employee_status: Optional[str] = field(
+    employee_status: str | None = field(
         default=None,
         metadata={
             "name": "EmployeeStatus",
@@ -540,14 +540,14 @@ class FormattedTextTextType(object):
             "required": True,
         },
     )
-    formatted: Optional[bool] = field(
+    formatted: bool | None = field(
         default=None,
         metadata={
             "name": "Formatted",
             "type": "Attribute",
         },
     )
-    language: Optional[str] = field(
+    language: str | None = field(
         default=None,
         metadata={
             "name": "Language",
@@ -564,7 +564,7 @@ class FreeTextType(object):
             "required": True,
         },
     )
-    language: Optional[str] = field(
+    language: str | None = field(
         default=None,
         metadata={
             "name": "Language",
@@ -585,7 +585,7 @@ class InformationHeader1(object):
     class Meta(object):
         name = "InformationHeader"
 
-    successfully: Optional[bool] = field(
+    successfully: bool | None = field(
         default=None,
         metadata={
             "name": "Successfully",
@@ -594,7 +594,7 @@ class InformationHeader1(object):
             "required": True,
         },
     )
-    processing_time: Optional[float] = field(
+    processing_time: float | None = field(
         default=None,
         metadata={
             "name": "ProcessingTime",
@@ -603,7 +603,7 @@ class InformationHeader1(object):
             "required": True,
         },
     )
-    any_attributes: Dict[str, str] = field(
+    any_attributes: dict[str, str] = field(
         default_factory=dict,
         metadata={
             "type": "Attributes",
@@ -679,7 +679,7 @@ class LocationType(object):
             "required": True,
         },
     )
-    location_code: Optional[str] = field(
+    location_code: str | None = field(
         default=None,
         metadata={
             "name": "LocationCode",
@@ -708,35 +708,35 @@ class MonetaryRuleType(object):
             "required": True,
         },
     )
-    amount: Optional[Decimal] = field(
+    amount: Decimal | None = field(
         default=None,
         metadata={
             "name": "Amount",
             "type": "Attribute",
         },
     )
-    rule_type: Optional[str] = field(
+    rule_type: str | None = field(
         default=None,
         metadata={
             "name": "RuleType",
             "type": "Attribute",
         },
     )
-    percent: Optional[Decimal] = field(
+    percent: Decimal | None = field(
         default=None,
         metadata={
             "name": "Percent",
             "type": "Attribute",
         },
     )
-    date_time: Optional[XmlDateTime] = field(
+    date_time: XmlDateTime | None = field(
         default=None,
         metadata={
             "name": "DateTime",
             "type": "Attribute",
         },
     )
-    payment_type: Optional[str] = field(
+    payment_type: str | None = field(
         default=None,
         metadata={
             "name": "PaymentType",
@@ -924,7 +924,7 @@ class StateProvType(object):
             "required": True,
         },
     )
-    state_code: Optional[str] = field(
+    state_code: str | None = field(
         default=None,
         metadata={
             "name": "StateCode",
@@ -941,7 +941,7 @@ class StreetNmbrType(object):
             "required": True,
         },
     )
-    po_box: Optional[str] = field(
+    po_box: str | None = field(
         default=None,
         metadata={
             "name": "PO_Box",
@@ -960,7 +960,7 @@ class TpaExtensionsType(object):
     class Meta(object):
         name = "TPA_ExtensionsType"
 
-    any_element: List[object] = field(
+    any_element: list[object] = field(
         default_factory=list,
         metadata={
             "type": "Wildcard",
@@ -1241,14 +1241,14 @@ class VehicleCoreTypeFuelType(Enum):
 
 @dataclass
 class VehicleEquipmentCoreType(object):
-    equip_type: Optional[str] = field(
+    equip_type: str | None = field(
         default=None,
         metadata={
             "name": "EquipType",
             "type": "Attribute",
         },
     )
-    quantity: Optional[int] = field(
+    quantity: int | None = field(
         default=None,
         metadata={
             "name": "Quantity",
@@ -1282,7 +1282,7 @@ class VehicleWhereAtFacilityType(object):
             "required": True,
         },
     )
-    location: Optional[str] = field(
+    location: str | None = field(
         default=None,
         metadata={
             "name": "Location",
@@ -1306,7 +1306,7 @@ class AddressType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    bldg_room: List["AddressType.BldgRoom"] = field(
+    bldg_room: list["AddressType.BldgRoom"] = field(
         default_factory=list,
         metadata={
             "name": "BldgRoom",
@@ -1314,7 +1314,7 @@ class AddressType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    address_line: List[str] = field(
+    address_line: list[str] = field(
         default_factory=list,
         metadata={
             "name": "AddressLine",
@@ -1322,7 +1322,7 @@ class AddressType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    city_name: Optional[str] = field(
+    city_name: str | None = field(
         default=None,
         metadata={
             "name": "CityName",
@@ -1330,7 +1330,7 @@ class AddressType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    postal_code: Optional[str] = field(
+    postal_code: str | None = field(
         default=None,
         metadata={
             "name": "PostalCode",
@@ -1338,7 +1338,7 @@ class AddressType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    county: Optional[str] = field(
+    county: str | None = field(
         default=None,
         metadata={
             "name": "County",
@@ -1346,7 +1346,7 @@ class AddressType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    state_prov: Optional[StateProvType] = field(
+    state_prov: StateProvType | None = field(
         default=None,
         metadata={
             "name": "StateProv",
@@ -1354,7 +1354,7 @@ class AddressType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    country_name: Optional[CountryNameType] = field(
+    country_name: CountryNameType | None = field(
         default=None,
         metadata={
             "name": "CountryName",
@@ -1369,21 +1369,21 @@ class AddressType(object):
             "type": "Attribute",
         },
     )
-    share_synch_ind: Optional[AddressTypeShareSynchInd] = field(
+    share_synch_ind: AddressTypeShareSynchInd | None = field(
         default=None,
         metadata={
             "name": "ShareSynchInd",
             "type": "Attribute",
         },
     )
-    share_market_ind: Optional[AddressTypeShareMarketInd] = field(
+    share_market_ind: AddressTypeShareMarketInd | None = field(
         default=None,
         metadata={
             "name": "ShareMarketInd",
             "type": "Attribute",
         },
     )
-    type: Optional[str] = field(
+    type: str | None = field(
         default=None,
         metadata={
             "name": "Type",
@@ -1393,21 +1393,21 @@ class AddressType(object):
 
     @dataclass
     class StreetNmbr(StreetNmbrType):
-        street_nmbr_suffix: Optional[str] = field(
+        street_nmbr_suffix: str | None = field(
             default=None,
             metadata={
                 "name": "StreetNmbrSuffix",
                 "type": "Attribute",
             },
         )
-        street_direction: Optional[str] = field(
+        street_direction: str | None = field(
             default=None,
             metadata={
                 "name": "StreetDirection",
                 "type": "Attribute",
             },
         )
-        rural_route_nmbr: Optional[str] = field(
+        rural_route_nmbr: str | None = field(
             default=None,
             metadata={
                 "name": "RuralRouteNmbr",
@@ -1423,7 +1423,7 @@ class AddressType(object):
                 "required": True,
             },
         )
-        bldg_name_indicator: Optional[bool] = field(
+        bldg_name_indicator: bool | None = field(
             default=None,
             metadata={
                 "name": "BldgNameIndicator",
@@ -1434,7 +1434,7 @@ class AddressType(object):
 
 @dataclass
 class ArrayOfMonetaryRuleType(object):
-    payment_rule: List[MonetaryRuleType] = field(
+    payment_rule: list[MonetaryRuleType] = field(
         default_factory=list,
         metadata={
             "name": "PaymentRule",
@@ -1449,7 +1449,7 @@ class ArrayOfOtaVehRateRuleRqrentalInfoSpecialEquipPref(object):
     class Meta(object):
         name = "ArrayOfOTA_VehRateRuleRQRentalInfoSpecialEquipPref"
 
-    special_equip_pref: List[
+    special_equip_pref: list[
         "ArrayOfOtaVehRateRuleRqrentalInfoSpecialEquipPref.SpecialEquipPref"
     ] = field(
         default_factory=list,
@@ -1462,7 +1462,7 @@ class ArrayOfOtaVehRateRuleRqrentalInfoSpecialEquipPref(object):
 
     @dataclass
     class SpecialEquipPref(object):
-        action: Optional[ActionType] = field(
+        action: ActionType | None = field(
             default=None,
             metadata={
                 "name": "Action",
@@ -1473,7 +1473,7 @@ class ArrayOfOtaVehRateRuleRqrentalInfoSpecialEquipPref(object):
 
 @dataclass
 class ArrayOfRateQualifierTypeRateComment(object):
-    rate_comment: List["ArrayOfRateQualifierTypeRateComment.RateComment"] = field(
+    rate_comment: list["ArrayOfRateQualifierTypeRateComment.RateComment"] = field(
         default_factory=list,
         metadata={
             "name": "RateComment",
@@ -1484,7 +1484,7 @@ class ArrayOfRateQualifierTypeRateComment(object):
 
     @dataclass
     class RateComment(FormattedTextTextType):
-        name: Optional[str] = field(
+        name: str | None = field(
             default=None,
             metadata={
                 "name": "Name",
@@ -1498,7 +1498,7 @@ class ArrayOfVehicleAvailRqcoreTypeSpecialEquipPref(object):
     class Meta(object):
         name = "ArrayOfVehicleAvailRQCoreTypeSpecialEquipPref"
 
-    special_equip_pref: List[
+    special_equip_pref: list[
         "ArrayOfVehicleAvailRqcoreTypeSpecialEquipPref.SpecialEquipPref"
     ] = field(
         default_factory=list,
@@ -1511,7 +1511,7 @@ class ArrayOfVehicleAvailRqcoreTypeSpecialEquipPref(object):
 
     @dataclass
     class SpecialEquipPref(object):
-        action: Optional[ActionType] = field(
+        action: ActionType | None = field(
             default=None,
             metadata={
                 "name": "Action",
@@ -1522,7 +1522,7 @@ class ArrayOfVehicleAvailRqcoreTypeSpecialEquipPref(object):
 
 @dataclass
 class ArrayOfVehicleLocationAdditionalDetailsTypeOneWayDropLocation(object):
-    one_way_drop_location: List[
+    one_way_drop_location: list[
         "ArrayOfVehicleLocationAdditionalDetailsTypeOneWayDropLocation.OneWayDropLocation"
     ] = field(
         default_factory=list,
@@ -1535,7 +1535,7 @@ class ArrayOfVehicleLocationAdditionalDetailsTypeOneWayDropLocation(object):
 
     @dataclass
     class OneWayDropLocation(LocationType):
-        extended_location_code: Optional[str] = field(
+        extended_location_code: str | None = field(
             default=None,
             metadata={
                 "name": "ExtendedLocationCode",
@@ -1546,7 +1546,7 @@ class ArrayOfVehicleLocationAdditionalDetailsTypeOneWayDropLocation(object):
 
 @dataclass
 class BankAcctType(object):
-    bank_acct_name: Optional[str] = field(
+    bank_acct_name: str | None = field(
         default=None,
         metadata={
             "name": "BankAcctName",
@@ -1554,42 +1554,42 @@ class BankAcctType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    share_synch_ind: Optional[BankAcctTypeShareSynchInd] = field(
+    share_synch_ind: BankAcctTypeShareSynchInd | None = field(
         default=None,
         metadata={
             "name": "ShareSynchInd",
             "type": "Attribute",
         },
     )
-    share_market_ind: Optional[BankAcctTypeShareMarketInd] = field(
+    share_market_ind: BankAcctTypeShareMarketInd | None = field(
         default=None,
         metadata={
             "name": "ShareMarketInd",
             "type": "Attribute",
         },
     )
-    bank_id: Optional[str] = field(
+    bank_id: str | None = field(
         default=None,
         metadata={
             "name": "BankID",
             "type": "Attribute",
         },
     )
-    acct_type: Optional[str] = field(
+    acct_type: str | None = field(
         default=None,
         metadata={
             "name": "AcctType",
             "type": "Attribute",
         },
     )
-    bank_acct_number: Optional[str] = field(
+    bank_acct_number: str | None = field(
         default=None,
         metadata={
             "name": "BankAcctNumber",
             "type": "Attribute",
         },
     )
-    checks_accepted_ind: Optional[bool] = field(
+    checks_accepted_ind: bool | None = field(
         default=None,
         metadata={
             "name": "ChecksAcceptedInd",
@@ -1617,14 +1617,14 @@ class EmailType(object):
             "required": True,
         },
     )
-    share_synch_ind: Optional[EmailTypeShareSynchInd] = field(
+    share_synch_ind: EmailTypeShareSynchInd | None = field(
         default=None,
         metadata={
             "name": "ShareSynchInd",
             "type": "Attribute",
         },
     )
-    share_market_ind: Optional[EmailTypeShareMarketInd] = field(
+    share_market_ind: EmailTypeShareMarketInd | None = field(
         default=None,
         metadata={
             "name": "ShareMarketInd",
@@ -1638,14 +1638,14 @@ class EmailType(object):
             "type": "Attribute",
         },
     )
-    email_type: Optional[str] = field(
+    email_type: str | None = field(
         default=None,
         metadata={
             "name": "EmailType",
             "type": "Attribute",
         },
     )
-    rph: Optional[str] = field(
+    rph: str | None = field(
         default=None,
         metadata={
             "name": "RPH",
@@ -1656,56 +1656,56 @@ class EmailType(object):
 
 @dataclass
 class ErrorType(FreeTextType):
-    type: Optional[str] = field(
+    type: str | None = field(
         default=None,
         metadata={
             "name": "Type",
             "type": "Attribute",
         },
     )
-    short_text: Optional[str] = field(
+    short_text: str | None = field(
         default=None,
         metadata={
             "name": "ShortText",
             "type": "Attribute",
         },
     )
-    code: Optional[str] = field(
+    code: str | None = field(
         default=None,
         metadata={
             "name": "Code",
             "type": "Attribute",
         },
     )
-    doc_url: Optional[str] = field(
+    doc_url: str | None = field(
         default=None,
         metadata={
             "name": "DocURL",
             "type": "Attribute",
         },
     )
-    status: Optional[str] = field(
+    status: str | None = field(
         default=None,
         metadata={
             "name": "Status",
             "type": "Attribute",
         },
     )
-    tag: Optional[str] = field(
+    tag: str | None = field(
         default=None,
         metadata={
             "name": "Tag",
             "type": "Attribute",
         },
     )
-    record_id: Optional[str] = field(
+    record_id: str | None = field(
         default=None,
         metadata={
             "name": "RecordID",
             "type": "Attribute",
         },
     )
-    node_list: Optional[str] = field(
+    node_list: str | None = field(
         default=None,
         metadata={
             "name": "NodeList",
@@ -1716,7 +1716,7 @@ class ErrorType(FreeTextType):
 
 @dataclass
 class OperationScheduleType(object):
-    operation_times: Optional[ArrayOfOperationScheduleTypeOperationTime] = field(
+    operation_times: ArrayOfOperationScheduleTypeOperationTime | None = field(
         default=None,
         metadata={
             "name": "OperationTimes",
@@ -1724,21 +1724,21 @@ class OperationScheduleType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    start: Optional[str] = field(
+    start: str | None = field(
         default=None,
         metadata={
             "name": "Start",
             "type": "Attribute",
         },
     )
-    duration: Optional[str] = field(
+    duration: str | None = field(
         default=None,
         metadata={
             "name": "Duration",
             "type": "Attribute",
         },
     )
-    end: Optional[str] = field(
+    end: str | None = field(
         default=None,
         metadata={
             "name": "End",
@@ -1749,7 +1749,7 @@ class OperationScheduleType(object):
 
 @dataclass
 class ParagraphType(object):
-    text: List[FormattedTextTextType] = field(
+    text: list[FormattedTextTextType] = field(
         default_factory=list,
         metadata={
             "name": "Text",
@@ -1757,7 +1757,7 @@ class ParagraphType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    image: List[str] = field(
+    image: list[str] = field(
         default_factory=list,
         metadata={
             "name": "Image",
@@ -1765,7 +1765,7 @@ class ParagraphType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    url: List[str] = field(
+    url: list[str] = field(
         default_factory=list,
         metadata={
             "name": "URL",
@@ -1773,7 +1773,7 @@ class ParagraphType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    list_item: List["ParagraphType.ListItem"] = field(
+    list_item: list["ParagraphType.ListItem"] = field(
         default_factory=list,
         metadata={
             "name": "ListItem",
@@ -1781,56 +1781,56 @@ class ParagraphType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    name: Optional[str] = field(
+    name: str | None = field(
         default=None,
         metadata={
             "name": "Name",
             "type": "Attribute",
         },
     )
-    paragraph_number: Optional[int] = field(
+    paragraph_number: int | None = field(
         default=None,
         metadata={
             "name": "ParagraphNumber",
             "type": "Attribute",
         },
     )
-    create_date_time: Optional[XmlDateTime] = field(
+    create_date_time: XmlDateTime | None = field(
         default=None,
         metadata={
             "name": "CreateDateTime",
             "type": "Attribute",
         },
     )
-    creator_id: Optional[str] = field(
+    creator_id: str | None = field(
         default=None,
         metadata={
             "name": "CreatorID",
             "type": "Attribute",
         },
     )
-    last_modify_date_time: Optional[XmlDateTime] = field(
+    last_modify_date_time: XmlDateTime | None = field(
         default=None,
         metadata={
             "name": "LastModifyDateTime",
             "type": "Attribute",
         },
     )
-    last_modifier_id: Optional[str] = field(
+    last_modifier_id: str | None = field(
         default=None,
         metadata={
             "name": "LastModifierID",
             "type": "Attribute",
         },
     )
-    purge_date: Optional[XmlDate] = field(
+    purge_date: XmlDate | None = field(
         default=None,
         metadata={
             "name": "PurgeDate",
             "type": "Attribute",
         },
     )
-    language: Optional[str] = field(
+    language: str | None = field(
         default=None,
         metadata={
             "name": "Language",
@@ -1840,7 +1840,7 @@ class ParagraphType(object):
 
     @dataclass
     class ListItem(FormattedTextTextType):
-        list_item: Optional[int] = field(
+        list_item: int | None = field(
             default=None,
             metadata={
                 "name": "ListItem",
@@ -1851,7 +1851,7 @@ class ParagraphType(object):
 
 @dataclass
 class PaymentRulesType(object):
-    payment_rule: List[MonetaryRuleType] = field(
+    payment_rule: list[MonetaryRuleType] = field(
         default_factory=list,
         metadata={
             "name": "PaymentRule",
@@ -1863,7 +1863,7 @@ class PaymentRulesType(object):
 
 @dataclass
 class PersonNameType(object):
-    name_prefix: List[str] = field(
+    name_prefix: list[str] = field(
         default_factory=list,
         metadata={
             "name": "NamePrefix",
@@ -1871,7 +1871,7 @@ class PersonNameType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    given_name: List[str] = field(
+    given_name: list[str] = field(
         default_factory=list,
         metadata={
             "name": "GivenName",
@@ -1879,7 +1879,7 @@ class PersonNameType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    middle_name: List[str] = field(
+    middle_name: list[str] = field(
         default_factory=list,
         metadata={
             "name": "MiddleName",
@@ -1887,7 +1887,7 @@ class PersonNameType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    surname_prefix: Optional[str] = field(
+    surname_prefix: str | None = field(
         default=None,
         metadata={
             "name": "SurnamePrefix",
@@ -1895,7 +1895,7 @@ class PersonNameType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    surname: Optional[str] = field(
+    surname: str | None = field(
         default=None,
         metadata={
             "name": "Surname",
@@ -1903,7 +1903,7 @@ class PersonNameType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    name_suffix: List[str] = field(
+    name_suffix: list[str] = field(
         default_factory=list,
         metadata={
             "name": "NameSuffix",
@@ -1911,7 +1911,7 @@ class PersonNameType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    name_title: List[str] = field(
+    name_title: list[str] = field(
         default_factory=list,
         metadata={
             "name": "NameTitle",
@@ -1919,21 +1919,21 @@ class PersonNameType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    share_synch_ind: Optional[PersonNameTypeShareSynchInd] = field(
+    share_synch_ind: PersonNameTypeShareSynchInd | None = field(
         default=None,
         metadata={
             "name": "ShareSynchInd",
             "type": "Attribute",
         },
     )
-    share_market_ind: Optional[PersonNameTypeShareMarketInd] = field(
+    share_market_ind: PersonNameTypeShareMarketInd | None = field(
         default=None,
         metadata={
             "name": "ShareMarketInd",
             "type": "Attribute",
         },
     )
-    name_type: Optional[str] = field(
+    name_type: str | None = field(
         default=None,
         metadata={
             "name": "NameType",
@@ -1948,21 +1948,21 @@ class PingRq(object):
         name = "PingRQ"
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
-    echo_data: Optional[str] = field(
+    echo_data: str | None = field(
         default=None,
         metadata={
             "name": "EchoData",
             "type": "Element",
         },
     )
-    echo_token: Optional[str] = field(
+    echo_token: str | None = field(
         default=None,
         metadata={
             "name": "EchoToken",
             "type": "Attribute",
         },
     )
-    time_stamp: Optional[XmlDateTime] = field(
+    time_stamp: XmlDateTime | None = field(
         default=None,
         metadata={
             "name": "TimeStamp",
@@ -1976,7 +1976,7 @@ class PingRq(object):
             "type": "Attribute",
         },
     )
-    version: Optional[Decimal] = field(
+    version: Decimal | None = field(
         default=None,
         metadata={
             "name": "Version",
@@ -1984,28 +1984,28 @@ class PingRq(object):
             "required": True,
         },
     )
-    transaction_identifier: Optional[str] = field(
+    transaction_identifier: str | None = field(
         default=None,
         metadata={
             "name": "TransactionIdentifier",
             "type": "Attribute",
         },
     )
-    sequence_nmbr: Optional[int] = field(
+    sequence_nmbr: int | None = field(
         default=None,
         metadata={
             "name": "SequenceNmbr",
             "type": "Attribute",
         },
     )
-    transaction_status_code: Optional[PingRqTransactionStatusCode] = field(
+    transaction_status_code: PingRqTransactionStatusCode | None = field(
         default=None,
         metadata={
             "name": "TransactionStatusCode",
             "type": "Attribute",
         },
     )
-    retransmission_indicator: Optional[bool] = field(
+    retransmission_indicator: bool | None = field(
         default=None,
         metadata={
             "name": "RetransmissionIndicator",
@@ -2025,21 +2025,21 @@ class UrlType(object):
             "required": True,
         },
     )
-    share_synch_ind: Optional[UrlTypeShareSynchInd] = field(
+    share_synch_ind: UrlTypeShareSynchInd | None = field(
         default=None,
         metadata={
             "name": "ShareSynchInd",
             "type": "Attribute",
         },
     )
-    share_market_ind: Optional[UrlTypeShareMarketInd] = field(
+    share_market_ind: UrlTypeShareMarketInd | None = field(
         default=None,
         metadata={
             "name": "ShareMarketInd",
             "type": "Attribute",
         },
     )
-    type: Optional[str] = field(
+    type: str | None = field(
         default=None,
         metadata={
             "name": "Type",
@@ -2060,7 +2060,7 @@ class UniqueIdType(object):
     class Meta(object):
         name = "UniqueID_Type"
 
-    company_name: Optional[CompanyNameType] = field(
+    company_name: CompanyNameType | None = field(
         default=None,
         metadata={
             "name": "CompanyName",
@@ -2068,35 +2068,35 @@ class UniqueIdType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    url: Optional[str] = field(
+    url: str | None = field(
         default=None,
         metadata={
             "name": "URL",
             "type": "Attribute",
         },
     )
-    type: Optional[str] = field(
+    type: str | None = field(
         default=None,
         metadata={
             "name": "Type",
             "type": "Attribute",
         },
     )
-    instance: Optional[str] = field(
+    instance: str | None = field(
         default=None,
         metadata={
             "name": "Instance",
             "type": "Attribute",
         },
     )
-    id: Optional[str] = field(
+    id: str | None = field(
         default=None,
         metadata={
             "name": "ID",
             "type": "Attribute",
         },
     )
-    id_context: Optional[str] = field(
+    id_context: str | None = field(
         default=None,
         metadata={
             "name": "ID_Context",
@@ -2107,7 +2107,7 @@ class UniqueIdType(object):
 
 @dataclass
 class VehicleArrivalDetailsType(object):
-    arrival_location: Optional[LocationType] = field(
+    arrival_location: LocationType | None = field(
         default=None,
         metadata={
             "name": "ArrivalLocation",
@@ -2115,7 +2115,7 @@ class VehicleArrivalDetailsType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    marketing_company: Optional[CompanyNameType] = field(
+    marketing_company: CompanyNameType | None = field(
         default=None,
         metadata={
             "name": "MarketingCompany",
@@ -2123,7 +2123,7 @@ class VehicleArrivalDetailsType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    operating_company: Optional[CompanyNameType] = field(
+    operating_company: CompanyNameType | None = field(
         default=None,
         metadata={
             "name": "OperatingCompany",
@@ -2131,21 +2131,21 @@ class VehicleArrivalDetailsType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    transportation_code: Optional[str] = field(
+    transportation_code: str | None = field(
         default=None,
         metadata={
             "name": "TransportationCode",
             "type": "Attribute",
         },
     )
-    number: Optional[str] = field(
+    number: str | None = field(
         default=None,
         metadata={
             "name": "Number",
             "type": "Attribute",
         },
     )
-    arrival_date_time: Optional[XmlDateTime] = field(
+    arrival_date_time: XmlDateTime | None = field(
         default=None,
         metadata={
             "name": "ArrivalDateTime",
@@ -2167,7 +2167,7 @@ class VehicleCancelRqadditionalInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    telephone: Optional[object] = field(
+    telephone: object | None = field(
         default=None,
         metadata={
             "name": "Telephone",
@@ -2175,7 +2175,7 @@ class VehicleCancelRqadditionalInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    vendor: Optional[CompanyNameType] = field(
+    vendor: CompanyNameType | None = field(
         default=None,
         metadata={
             "name": "Vendor",
@@ -2191,7 +2191,7 @@ class VehicleCancelRqadditionalInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    tpa_extensions: Optional[TpaExtensionsType] = field(
+    tpa_extensions: TpaExtensionsType | None = field(
         default=None,
         metadata={
             "name": "TPA_Extensions",
@@ -2202,35 +2202,35 @@ class VehicleCancelRqadditionalInfoType(object):
 
     @dataclass
     class CustLoyalty(object):
-        program_id: Optional[str] = field(
+        program_id: str | None = field(
             default=None,
             metadata={
                 "name": "ProgramID",
                 "type": "Attribute",
             },
         )
-        membership_id: Optional[str] = field(
+        membership_id: str | None = field(
             default=None,
             metadata={
                 "name": "MembershipID",
                 "type": "Attribute",
             },
         )
-        travel_sector: Optional[str] = field(
+        travel_sector: str | None = field(
             default=None,
             metadata={
                 "name": "TravelSector",
                 "type": "Attribute",
             },
         )
-        rph: Optional[str] = field(
+        rph: str | None = field(
             default=None,
             metadata={
                 "name": "RPH",
                 "type": "Attribute",
             },
         )
-        vendor_code: List[str] = field(
+        vendor_code: list[str] = field(
             default_factory=list,
             metadata={
                 "name": "VendorCode",
@@ -2241,7 +2241,7 @@ class VehicleCancelRqadditionalInfoType(object):
 
     @dataclass
     class RentalInfo(object):
-        pick_up_location: Optional[LocationType] = field(
+        pick_up_location: LocationType | None = field(
             default=None,
             metadata={
                 "name": "PickUpLocation",
@@ -2249,7 +2249,7 @@ class VehicleCancelRqadditionalInfoType(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        return_location: Optional[LocationType] = field(
+        return_location: LocationType | None = field(
             default=None,
             metadata={
                 "name": "ReturnLocation",
@@ -2257,14 +2257,14 @@ class VehicleCancelRqadditionalInfoType(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        pick_up_date_time: Optional[XmlDateTime] = field(
+        pick_up_date_time: XmlDateTime | None = field(
             default=None,
             metadata={
                 "name": "PickUpDateTime",
                 "type": "Attribute",
             },
         )
-        return_date_time: Optional[XmlDateTime] = field(
+        return_date_time: XmlDateTime | None = field(
             default=None,
             metadata={
                 "name": "ReturnDateTime",
@@ -2275,7 +2275,7 @@ class VehicleCancelRqadditionalInfoType(object):
 
 @dataclass
 class VehicleChargeType(object):
-    tax_amounts: Optional[ArrayOfVehicleChargeTypeTaxAmount] = field(
+    tax_amounts: ArrayOfVehicleChargeTypeTaxAmount | None = field(
         default=None,
         metadata={
             "name": "TaxAmounts",
@@ -2291,7 +2291,7 @@ class VehicleChargeType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    calculation: List["VehicleChargeType.Calculation"] = field(
+    calculation: list["VehicleChargeType.Calculation"] = field(
         default_factory=list,
         metadata={
             "name": "Calculation",
@@ -2299,35 +2299,35 @@ class VehicleChargeType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    currency_code: Optional[str] = field(
+    currency_code: str | None = field(
         default=None,
         metadata={
             "name": "CurrencyCode",
             "type": "Attribute",
         },
     )
-    amount: Optional[Decimal] = field(
+    amount: Decimal | None = field(
         default=None,
         metadata={
             "name": "Amount",
             "type": "Attribute",
         },
     )
-    tax_inclusive: Optional[bool] = field(
+    tax_inclusive: bool | None = field(
         default=None,
         metadata={
             "name": "TaxInclusive",
             "type": "Attribute",
         },
     )
-    description: Optional[str] = field(
+    description: str | None = field(
         default=None,
         metadata={
             "name": "Description",
             "type": "Attribute",
         },
     )
-    guaranteed_ind: Optional[bool] = field(
+    guaranteed_ind: bool | None = field(
         default=None,
         metadata={
             "name": "GuaranteedInd",
@@ -2341,7 +2341,7 @@ class VehicleChargeType(object):
             "type": "Attribute",
         },
     )
-    included_in_est_total_ind: Optional[bool] = field(
+    included_in_est_total_ind: bool | None = field(
         default=None,
         metadata={
             "name": "IncludedInEstTotalInd",
@@ -2351,21 +2351,21 @@ class VehicleChargeType(object):
 
     @dataclass
     class MinMax(object):
-        max_charge: Optional[Decimal] = field(
+        max_charge: Decimal | None = field(
             default=None,
             metadata={
                 "name": "MaxCharge",
                 "type": "Attribute",
             },
         )
-        min_charge: Optional[Decimal] = field(
+        min_charge: Decimal | None = field(
             default=None,
             metadata={
                 "name": "MinCharge",
                 "type": "Attribute",
             },
         )
-        max_charge_days: Optional[int] = field(
+        max_charge_days: int | None = field(
             default=None,
             metadata={
                 "name": "MaxChargeDays",
@@ -2375,42 +2375,42 @@ class VehicleChargeType(object):
 
     @dataclass
     class Calculation(object):
-        unit_charge: Optional[Decimal] = field(
+        unit_charge: Decimal | None = field(
             default=None,
             metadata={
                 "name": "UnitCharge",
                 "type": "Attribute",
             },
         )
-        unit_name: Optional[str] = field(
+        unit_name: str | None = field(
             default=None,
             metadata={
                 "name": "UnitName",
                 "type": "Attribute",
             },
         )
-        quantity: Optional[int] = field(
+        quantity: int | None = field(
             default=None,
             metadata={
                 "name": "Quantity",
                 "type": "Attribute",
             },
         )
-        percentage: Optional[Decimal] = field(
+        percentage: Decimal | None = field(
             default=None,
             metadata={
                 "name": "Percentage",
                 "type": "Attribute",
             },
         )
-        applicability: Optional[CalculationApplicability] = field(
+        applicability: CalculationApplicability | None = field(
             default=None,
             metadata={
                 "name": "Applicability",
                 "type": "Attribute",
             },
         )
-        max_quantity: Optional[int] = field(
+        max_quantity: int | None = field(
             default=None,
             metadata={
                 "name": "MaxQuantity",
@@ -2437,28 +2437,28 @@ class VehicleCoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    air_condition_ind: Optional[bool] = field(
+    air_condition_ind: bool | None = field(
         default=None,
         metadata={
             "name": "AirConditionInd",
             "type": "Attribute",
         },
     )
-    transmission_type: Optional[VehicleTransmissionType] = field(
+    transmission_type: VehicleTransmissionType | None = field(
         default=None,
         metadata={
             "name": "TransmissionType",
             "type": "Attribute",
         },
     )
-    fuel_type: Optional[VehicleCoreTypeFuelType] = field(
+    fuel_type: VehicleCoreTypeFuelType | None = field(
         default=None,
         metadata={
             "name": "FuelType",
             "type": "Attribute",
         },
     )
-    drive_type: Optional[VehicleCoreTypeDriveType] = field(
+    drive_type: VehicleCoreTypeDriveType | None = field(
         default=None,
         metadata={
             "name": "DriveType",
@@ -2468,14 +2468,14 @@ class VehicleCoreType(object):
 
     @dataclass
     class VehType(object):
-        vehicle_category: Optional[str] = field(
+        vehicle_category: str | None = field(
             default=None,
             metadata={
                 "name": "VehicleCategory",
                 "type": "Attribute",
             },
         )
-        door_count: Optional[str] = field(
+        door_count: str | None = field(
             default=None,
             metadata={
                 "name": "DoorCount",
@@ -2485,7 +2485,7 @@ class VehicleCoreType(object):
 
     @dataclass
     class VehClass(object):
-        size: Optional[str] = field(
+        size: str | None = field(
             default=None,
             metadata={
                 "name": "Size",
@@ -2496,7 +2496,7 @@ class VehicleCoreType(object):
 
 @dataclass
 class VehicleEquipmentType(object):
-    description: Optional[str] = field(
+    description: str | None = field(
         default=None,
         metadata={
             "name": "Description",
@@ -2504,21 +2504,21 @@ class VehicleEquipmentType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    equip_type: Optional[str] = field(
+    equip_type: str | None = field(
         default=None,
         metadata={
             "name": "EquipType",
             "type": "Attribute",
         },
     )
-    quantity: Optional[int] = field(
+    quantity: int | None = field(
         default=None,
         metadata={
             "name": "Quantity",
             "type": "Attribute",
         },
     )
-    restriction: Optional[EquipmentRestrictionType] = field(
+    restriction: EquipmentRestrictionType | None = field(
         default=None,
         metadata={
             "name": "Restriction",
@@ -2529,7 +2529,7 @@ class VehicleEquipmentType(object):
 
 @dataclass
 class VehicleRentalCoreType(object):
-    pick_up_location: List["VehicleRentalCoreType.PickUpLocation"] = field(
+    pick_up_location: list["VehicleRentalCoreType.PickUpLocation"] = field(
         default_factory=list,
         metadata={
             "name": "PickUpLocation",
@@ -2545,56 +2545,56 @@ class VehicleRentalCoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    pick_up_date_time: Optional[XmlDateTime] = field(
+    pick_up_date_time: XmlDateTime | None = field(
         default=None,
         metadata={
             "name": "PickUpDateTime",
             "type": "Attribute",
         },
     )
-    return_date_time: Optional[XmlDateTime] = field(
+    return_date_time: XmlDateTime | None = field(
         default=None,
         metadata={
             "name": "ReturnDateTime",
             "type": "Attribute",
         },
     )
-    start_charges_date_time: Optional[XmlDateTime] = field(
+    start_charges_date_time: XmlDateTime | None = field(
         default=None,
         metadata={
             "name": "StartChargesDateTime",
             "type": "Attribute",
         },
     )
-    stop_charges_date_time: Optional[XmlDateTime] = field(
+    stop_charges_date_time: XmlDateTime | None = field(
         default=None,
         metadata={
             "name": "StopChargesDateTime",
             "type": "Attribute",
         },
     )
-    one_way_indicator: Optional[bool] = field(
+    one_way_indicator: bool | None = field(
         default=None,
         metadata={
             "name": "OneWayIndicator",
             "type": "Attribute",
         },
     )
-    multi_island_rental_days: Optional[int] = field(
+    multi_island_rental_days: int | None = field(
         default=None,
         metadata={
             "name": "MultiIslandRentalDays",
             "type": "Attribute",
         },
     )
-    quantity: Optional[int] = field(
+    quantity: int | None = field(
         default=None,
         metadata={
             "name": "Quantity",
             "type": "Attribute",
         },
     )
-    dist_unit_name: Optional[DistanceUnitNameType] = field(
+    dist_unit_name: DistanceUnitNameType | None = field(
         default=None,
         metadata={
             "name": "DistUnitName",
@@ -2604,14 +2604,14 @@ class VehicleRentalCoreType(object):
 
     @dataclass
     class PickUpLocation(LocationType):
-        extended_location_code: Optional[str] = field(
+        extended_location_code: str | None = field(
             default=None,
             metadata={
                 "name": "ExtendedLocationCode",
                 "type": "Attribute",
             },
         )
-        counter_location: Optional[str] = field(
+        counter_location: str | None = field(
             default=None,
             metadata={
                 "name": "CounterLocation",
@@ -2621,14 +2621,14 @@ class VehicleRentalCoreType(object):
 
     @dataclass
     class ReturnLocation(LocationType):
-        extended_location_code: Optional[str] = field(
+        extended_location_code: str | None = field(
             default=None,
             metadata={
                 "name": "ExtendedLocationCode",
                 "type": "Attribute",
             },
         )
-        counter_location: Optional[str] = field(
+        counter_location: str | None = field(
             default=None,
             metadata={
                 "name": "CounterLocation",
@@ -2642,7 +2642,7 @@ class VehicleResRsadditionalInfoType(object):
     class Meta(object):
         name = "VehicleResRSAdditionalInfoType"
 
-    tpa_extensions: Optional[TpaExtensionsType] = field(
+    tpa_extensions: TpaExtensionsType | None = field(
         default=None,
         metadata={
             "name": "TPA_Extensions",
@@ -2666,7 +2666,7 @@ class VehicleReservationRqcoreTypeSpecialEquipPrefsSpecialEquipPref(
             "type": "Attribute",
         },
     )
-    action: Optional[ActionType] = field(
+    action: ActionType | None = field(
         default=None,
         metadata={
             "name": "Action",
@@ -2680,7 +2680,7 @@ class VehicleRetrieveResRsadditionalInfoType(object):
     class Meta(object):
         name = "VehicleRetrieveResRSAdditionalInfoType"
 
-    tpa_extensions: Optional[TpaExtensionsType] = field(
+    tpa_extensions: TpaExtensionsType | None = field(
         default=None,
         metadata={
             "name": "TPA_Extensions",
@@ -2709,7 +2709,7 @@ class VehicleSpecialReqPrefType(object):
 
 @dataclass
 class VehicleTourInfoType(object):
-    tour_operator: Optional[CompanyNameType] = field(
+    tour_operator: CompanyNameType | None = field(
         default=None,
         metadata={
             "name": "TourOperator",
@@ -2717,7 +2717,7 @@ class VehicleTourInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    tour_number: Optional[str] = field(
+    tour_number: str | None = field(
         default=None,
         metadata={
             "name": "TourNumber",
@@ -2728,49 +2728,49 @@ class VehicleTourInfoType(object):
 
 @dataclass
 class WarningType(FreeTextType):
-    type: Optional[str] = field(
+    type: str | None = field(
         default=None,
         metadata={
             "name": "Type",
             "type": "Attribute",
         },
     )
-    short_text: Optional[str] = field(
+    short_text: str | None = field(
         default=None,
         metadata={
             "name": "ShortText",
             "type": "Attribute",
         },
     )
-    code: Optional[str] = field(
+    code: str | None = field(
         default=None,
         metadata={
             "name": "Code",
             "type": "Attribute",
         },
     )
-    doc_url: Optional[str] = field(
+    doc_url: str | None = field(
         default=None,
         metadata={
             "name": "DocURL",
             "type": "Attribute",
         },
     )
-    status: Optional[str] = field(
+    status: str | None = field(
         default=None,
         metadata={
             "name": "Status",
             "type": "Attribute",
         },
     )
-    tag: Optional[str] = field(
+    tag: str | None = field(
         default=None,
         metadata={
             "name": "Tag",
             "type": "Attribute",
         },
     )
-    record_id: Optional[str] = field(
+    record_id: str | None = field(
         default=None,
         metadata={
             "name": "RecordID",
@@ -2795,14 +2795,14 @@ class AddressInfoType(AddressType):
             "type": "Attribute",
         },
     )
-    use_type: Optional[str] = field(
+    use_type: str | None = field(
         default=None,
         metadata={
             "name": "UseType",
             "type": "Attribute",
         },
     )
-    rph: Optional[str] = field(
+    rph: str | None = field(
         default=None,
         metadata={
             "name": "RPH",
@@ -2813,7 +2813,7 @@ class AddressInfoType(AddressType):
 
 @dataclass
 class ArrayOfErrorType(object):
-    error: List[ErrorType] = field(
+    error: list[ErrorType] = field(
         default_factory=list,
         metadata={
             "name": "Error",
@@ -2825,7 +2825,7 @@ class ArrayOfErrorType(object):
 
 @dataclass
 class ArrayOfVehicleCoreType(object):
-    vehicle: List[VehicleCoreType] = field(
+    vehicle: list[VehicleCoreType] = field(
         default_factory=list,
         metadata={
             "name": "Vehicle",
@@ -2837,7 +2837,7 @@ class ArrayOfVehicleCoreType(object):
 
 @dataclass
 class ArrayOfWarningType(object):
-    warning: List[WarningType] = field(
+    warning: list[WarningType] = field(
         default_factory=list,
         metadata={
             "name": "Warning",
@@ -2852,7 +2852,7 @@ class CancelInfoRqtype(object):
     class Meta(object):
         name = "CancelInfoRQType"
 
-    unique_id: List[UniqueIdType] = field(
+    unique_id: list[UniqueIdType] = field(
         default_factory=list,
         metadata={
             "name": "UniqueID",
@@ -2860,7 +2860,7 @@ class CancelInfoRqtype(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    person_name: Optional[PersonNameType] = field(
+    person_name: PersonNameType | None = field(
         default=None,
         metadata={
             "name": "PersonName",
@@ -2868,7 +2868,7 @@ class CancelInfoRqtype(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    cancel_type: Optional[TransactionActionType] = field(
+    cancel_type: TransactionActionType | None = field(
         default=None,
         metadata={
             "name": "CancelType",
@@ -2880,7 +2880,7 @@ class CancelInfoRqtype(object):
 
 @dataclass
 class CoveragePricedType(object):
-    coverage: Optional[CoverageType] = field(
+    coverage: CoverageType | None = field(
         default=None,
         metadata={
             "name": "Coverage",
@@ -2888,7 +2888,7 @@ class CoveragePricedType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    charge: Optional[VehicleChargeType] = field(
+    charge: VehicleChargeType | None = field(
         default=None,
         metadata={
             "name": "Charge",
@@ -2907,7 +2907,7 @@ class CoveragePricedType(object):
 
 @dataclass
 class DocumentType(object):
-    doc_holder_name: Optional[str] = field(
+    doc_holder_name: str | None = field(
         default=None,
         metadata={
             "name": "DocHolderName",
@@ -2915,7 +2915,7 @@ class DocumentType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    doc_holder_formatted_name: Optional[PersonNameType] = field(
+    doc_holder_formatted_name: PersonNameType | None = field(
         default=None,
         metadata={
             "name": "DocHolderFormattedName",
@@ -2923,7 +2923,7 @@ class DocumentType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    doc_limitations: List[str] = field(
+    doc_limitations: list[str] = field(
         default_factory=list,
         metadata={
             "name": "DocLimitations",
@@ -2931,7 +2931,7 @@ class DocumentType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    additional_person_names: Optional[ArrayOfString] = field(
+    additional_person_names: ArrayOfString | None = field(
         default=None,
         metadata={
             "name": "AdditionalPersonNames",
@@ -2939,98 +2939,98 @@ class DocumentType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    share_synch_ind: Optional[DocumentTypeShareSynchInd] = field(
+    share_synch_ind: DocumentTypeShareSynchInd | None = field(
         default=None,
         metadata={
             "name": "ShareSynchInd",
             "type": "Attribute",
         },
     )
-    share_market_ind: Optional[DocumentTypeShareMarketInd] = field(
+    share_market_ind: DocumentTypeShareMarketInd | None = field(
         default=None,
         metadata={
             "name": "ShareMarketInd",
             "type": "Attribute",
         },
     )
-    doc_issue_authority: Optional[str] = field(
+    doc_issue_authority: str | None = field(
         default=None,
         metadata={
             "name": "DocIssueAuthority",
             "type": "Attribute",
         },
     )
-    doc_issue_location: Optional[str] = field(
+    doc_issue_location: str | None = field(
         default=None,
         metadata={
             "name": "DocIssueLocation",
             "type": "Attribute",
         },
     )
-    doc_id: Optional[str] = field(
+    doc_id: str | None = field(
         default=None,
         metadata={
             "name": "DocID",
             "type": "Attribute",
         },
     )
-    doc_type: Optional[str] = field(
+    doc_type: str | None = field(
         default=None,
         metadata={
             "name": "DocType",
             "type": "Attribute",
         },
     )
-    gender: Optional[DocumentTypeGender] = field(
+    gender: DocumentTypeGender | None = field(
         default=None,
         metadata={
             "name": "Gender",
             "type": "Attribute",
         },
     )
-    birth_date: Optional[XmlDate] = field(
+    birth_date: XmlDate | None = field(
         default=None,
         metadata={
             "name": "BirthDate",
             "type": "Attribute",
         },
     )
-    effective_date: Optional[XmlDate] = field(
+    effective_date: XmlDate | None = field(
         default=None,
         metadata={
             "name": "EffectiveDate",
             "type": "Attribute",
         },
     )
-    expire_date: Optional[XmlDate] = field(
+    expire_date: XmlDate | None = field(
         default=None,
         metadata={
             "name": "ExpireDate",
             "type": "Attribute",
         },
     )
-    doc_issue_state_prov: Optional[str] = field(
+    doc_issue_state_prov: str | None = field(
         default=None,
         metadata={
             "name": "DocIssueStateProv",
             "type": "Attribute",
         },
     )
-    doc_issue_country: Optional[str] = field(
+    doc_issue_country: str | None = field(
         default=None,
         metadata={
             "name": "DocIssueCountry",
             "type": "Attribute",
         },
     )
-    birth_country: Optional[str] = field(
+    birth_country: str | None = field(
         default=None,
         metadata={
             "name": "BirthCountry",
             "type": "Attribute",
         },
     )
-    doc_holder_nationality: Optional[str] = field(
+    doc_holder_nationality: str | None = field(
         default=None,
         metadata={
             "name": "DocHolderNationality",
@@ -3041,7 +3041,7 @@ class DocumentType(object):
 
 @dataclass
 class FormattedTextSubSectionType(object):
-    paragraph: List[ParagraphType] = field(
+    paragraph: list[ParagraphType] = field(
         default_factory=list,
         metadata={
             "name": "Paragraph",
@@ -3049,21 +3049,21 @@ class FormattedTextSubSectionType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    sub_title: Optional[str] = field(
+    sub_title: str | None = field(
         default=None,
         metadata={
             "name": "SubTitle",
             "type": "Attribute",
         },
     )
-    sub_code: Optional[str] = field(
+    sub_code: str | None = field(
         default=None,
         metadata={
             "name": "SubCode",
             "type": "Attribute",
         },
     )
-    sub_section_number: Optional[int] = field(
+    sub_section_number: int | None = field(
         default=None,
         metadata={
             "name": "SubSectionNumber",
@@ -3090,7 +3090,7 @@ class ItemSearchCriterionType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    telephone: Optional[object] = field(
+    telephone: object | None = field(
         default=None,
         metadata={
             "name": "Telephone",
@@ -3098,7 +3098,7 @@ class ItemSearchCriterionType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    ref_point: List["ItemSearchCriterionType.RefPoint"] = field(
+    ref_point: list["ItemSearchCriterionType.RefPoint"] = field(
         default_factory=list,
         metadata={
             "name": "RefPoint",
@@ -3130,21 +3130,21 @@ class ItemSearchCriterionType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    exact_match: Optional[bool] = field(
+    exact_match: bool | None = field(
         default=None,
         metadata={
             "name": "ExactMatch",
             "type": "Attribute",
         },
     )
-    importance_type: Optional[ItemSearchCriterionTypeImportanceType] = field(
+    importance_type: ItemSearchCriterionTypeImportanceType | None = field(
         default=None,
         metadata={
             "name": "ImportanceType",
             "type": "Attribute",
         },
     )
-    ranking: Optional[int] = field(
+    ranking: int | None = field(
         default=None,
         metadata={
             "name": "Ranking",
@@ -3154,28 +3154,28 @@ class ItemSearchCriterionType(object):
 
     @dataclass
     class Position(object):
-        latitude: Optional[str] = field(
+        latitude: str | None = field(
             default=None,
             metadata={
                 "name": "Latitude",
                 "type": "Attribute",
             },
         )
-        longitude: Optional[str] = field(
+        longitude: str | None = field(
             default=None,
             metadata={
                 "name": "Longitude",
                 "type": "Attribute",
             },
         )
-        altitude: Optional[str] = field(
+        altitude: str | None = field(
             default=None,
             metadata={
                 "name": "Altitude",
                 "type": "Attribute",
             },
         )
-        altitude_unit_of_measure_code: Optional[str] = field(
+        altitude_unit_of_measure_code: str | None = field(
             default=None,
             metadata={
                 "name": "AltitudeUnitOfMeasureCode",
@@ -3185,7 +3185,7 @@ class ItemSearchCriterionType(object):
 
     @dataclass
     class Address(AddressType):
-        same_country_ind: Optional[bool] = field(
+        same_country_ind: bool | None = field(
             default=None,
             metadata={
                 "name": "SameCountryInd",
@@ -3201,42 +3201,42 @@ class ItemSearchCriterionType(object):
                 "required": True,
             },
         )
-        state_prov: Optional[str] = field(
+        state_prov: str | None = field(
             default=None,
             metadata={
                 "name": "StateProv",
                 "type": "Attribute",
             },
         )
-        country_code: Optional[str] = field(
+        country_code: str | None = field(
             default=None,
             metadata={
                 "name": "CountryCode",
                 "type": "Attribute",
             },
         )
-        uri: Optional[str] = field(
+        uri: str | None = field(
             default=None,
             metadata={
                 "name": "URI",
                 "type": "Attribute",
             },
         )
-        ref_point_type: Optional[str] = field(
+        ref_point_type: str | None = field(
             default=None,
             metadata={
                 "name": "RefPointType",
                 "type": "Attribute",
             },
         )
-        name: Optional[str] = field(
+        name: str | None = field(
             default=None,
             metadata={
                 "name": "Name",
                 "type": "Attribute",
             },
         )
-        city_name: Optional[str] = field(
+        city_name: str | None = field(
             default=None,
             metadata={
                 "name": "CityName",
@@ -3246,7 +3246,7 @@ class ItemSearchCriterionType(object):
 
     @dataclass
     class CodeRef(LocationType):
-        vicinity_code: Optional[str] = field(
+        vicinity_code: str | None = field(
             default=None,
             metadata={
                 "name": "VicinityCode",
@@ -3256,84 +3256,84 @@ class ItemSearchCriterionType(object):
 
     @dataclass
     class HotelRef(object):
-        chain_code: Optional[str] = field(
+        chain_code: str | None = field(
             default=None,
             metadata={
                 "name": "ChainCode",
                 "type": "Attribute",
             },
         )
-        brand_code: Optional[str] = field(
+        brand_code: str | None = field(
             default=None,
             metadata={
                 "name": "BrandCode",
                 "type": "Attribute",
             },
         )
-        hotel_code: Optional[str] = field(
+        hotel_code: str | None = field(
             default=None,
             metadata={
                 "name": "HotelCode",
                 "type": "Attribute",
             },
         )
-        hotel_city_code: Optional[str] = field(
+        hotel_city_code: str | None = field(
             default=None,
             metadata={
                 "name": "HotelCityCode",
                 "type": "Attribute",
             },
         )
-        hotel_name: Optional[str] = field(
+        hotel_name: str | None = field(
             default=None,
             metadata={
                 "name": "HotelName",
                 "type": "Attribute",
             },
         )
-        hotel_code_context: Optional[str] = field(
+        hotel_code_context: str | None = field(
             default=None,
             metadata={
                 "name": "HotelCodeContext",
                 "type": "Attribute",
             },
         )
-        chain_name: Optional[str] = field(
+        chain_name: str | None = field(
             default=None,
             metadata={
                 "name": "ChainName",
                 "type": "Attribute",
             },
         )
-        brand_name: Optional[str] = field(
+        brand_name: str | None = field(
             default=None,
             metadata={
                 "name": "BrandName",
                 "type": "Attribute",
             },
         )
-        segment_category_code: Optional[str] = field(
+        segment_category_code: str | None = field(
             default=None,
             metadata={
                 "name": "SegmentCategoryCode",
                 "type": "Attribute",
             },
         )
-        property_class_code: Optional[str] = field(
+        property_class_code: str | None = field(
             default=None,
             metadata={
                 "name": "PropertyClassCode",
                 "type": "Attribute",
             },
         )
-        architectural_style_code: Optional[str] = field(
+        architectural_style_code: str | None = field(
             default=None,
             metadata={
                 "name": "ArchitecturalStyleCode",
                 "type": "Attribute",
             },
         )
-        supplier_integration_level: Optional[int] = field(
+        supplier_integration_level: int | None = field(
             default=None,
             metadata={
                 "name": "SupplierIntegrationLevel",
@@ -3343,28 +3343,28 @@ class ItemSearchCriterionType(object):
 
     @dataclass
     class Radius(object):
-        distance: Optional[str] = field(
+        distance: str | None = field(
             default=None,
             metadata={
                 "name": "Distance",
                 "type": "Attribute",
             },
         )
-        distance_measure: Optional[str] = field(
+        distance_measure: str | None = field(
             default=None,
             metadata={
                 "name": "DistanceMeasure",
                 "type": "Attribute",
             },
         )
-        direction: Optional[str] = field(
+        direction: str | None = field(
             default=None,
             metadata={
                 "name": "Direction",
                 "type": "Attribute",
             },
         )
-        distance_max: Optional[str] = field(
+        distance_max: str | None = field(
             default=None,
             metadata={
                 "name": "DistanceMax",
@@ -3383,7 +3383,7 @@ class OffLocationServiceCoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    type: Optional[OffLocationServiceIdType] = field(
+    type: OffLocationServiceIdType | None = field(
         default=None,
         metadata={
             "name": "Type",
@@ -3394,14 +3394,14 @@ class OffLocationServiceCoreType(object):
 
     @dataclass
     class Address(AddressType):
-        site_id: Optional[str] = field(
+        site_id: str | None = field(
             default=None,
             metadata={
                 "name": "SiteID",
                 "type": "Attribute",
             },
         )
-        site_name: Optional[str] = field(
+        site_name: str | None = field(
             default=None,
             metadata={
                 "name": "SiteName",
@@ -3412,7 +3412,7 @@ class OffLocationServiceCoreType(object):
 
 @dataclass
 class OperationSchedulesType(object):
-    operation_schedule: List[OperationScheduleType] = field(
+    operation_schedule: list[OperationScheduleType] = field(
         default_factory=list,
         metadata={
             "name": "OperationSchedule",
@@ -3420,21 +3420,21 @@ class OperationSchedulesType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    start: Optional[str] = field(
+    start: str | None = field(
         default=None,
         metadata={
             "name": "Start",
             "type": "Attribute",
         },
     )
-    duration: Optional[str] = field(
+    duration: str | None = field(
         default=None,
         metadata={
             "name": "Duration",
             "type": "Attribute",
         },
     )
-    end: Optional[str] = field(
+    end: str | None = field(
         default=None,
         metadata={
             "name": "End",
@@ -3445,7 +3445,7 @@ class OperationSchedulesType(object):
 
 @dataclass
 class PaymentCardType(object):
-    card_holder_name: Optional[str] = field(
+    card_holder_name: str | None = field(
         default=None,
         metadata={
             "name": "CardHolderName",
@@ -3461,7 +3461,7 @@ class PaymentCardType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    address: Optional[AddressType] = field(
+    address: AddressType | None = field(
         default=None,
         metadata={
             "name": "Address",
@@ -3469,7 +3469,7 @@ class PaymentCardType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    tpa_extensions: Optional[TpaExtensionsType] = field(
+    tpa_extensions: TpaExtensionsType | None = field(
         default=None,
         metadata={
             "name": "TPA_Extensions",
@@ -3477,77 +3477,77 @@ class PaymentCardType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    share_synch_ind: Optional[PaymentCardTypeShareSynchInd] = field(
+    share_synch_ind: PaymentCardTypeShareSynchInd | None = field(
         default=None,
         metadata={
             "name": "ShareSynchInd",
             "type": "Attribute",
         },
     )
-    share_market_ind: Optional[PaymentCardTypeShareMarketInd] = field(
+    share_market_ind: PaymentCardTypeShareMarketInd | None = field(
         default=None,
         metadata={
             "name": "ShareMarketInd",
             "type": "Attribute",
         },
     )
-    card_type: Optional[str] = field(
+    card_type: str | None = field(
         default=None,
         metadata={
             "name": "CardType",
             "type": "Attribute",
         },
     )
-    card_code: Optional[str] = field(
+    card_code: str | None = field(
         default=None,
         metadata={
             "name": "CardCode",
             "type": "Attribute",
         },
     )
-    card_number: Optional[str] = field(
+    card_number: str | None = field(
         default=None,
         metadata={
             "name": "CardNumber",
             "type": "Attribute",
         },
     )
-    series_code: Optional[str] = field(
+    series_code: str | None = field(
         default=None,
         metadata={
             "name": "SeriesCode",
             "type": "Attribute",
         },
     )
-    effective_date: Optional[str] = field(
+    effective_date: str | None = field(
         default=None,
         metadata={
             "name": "EffectiveDate",
             "type": "Attribute",
         },
     )
-    expire_date: Optional[str] = field(
+    expire_date: str | None = field(
         default=None,
         metadata={
             "name": "ExpireDate",
             "type": "Attribute",
         },
     )
-    masked_card_number: Optional[str] = field(
+    masked_card_number: str | None = field(
         default=None,
         metadata={
             "name": "MaskedCardNumber",
             "type": "Attribute",
         },
     )
-    card_holder_rph: Optional[str] = field(
+    card_holder_rph: str | None = field(
         default=None,
         metadata={
             "name": "CardHolderRPH",
             "type": "Attribute",
         },
     )
-    extend_payment_indicator: Optional[bool] = field(
+    extend_payment_indicator: bool | None = field(
         default=None,
         metadata={
             "name": "ExtendPaymentIndicator",
@@ -3557,7 +3557,7 @@ class PaymentCardType(object):
 
     @dataclass
     class CardIssuerName(object):
-        bank_id: Optional[str] = field(
+        bank_id: str | None = field(
             default=None,
             metadata={
                 "name": "BankID",
@@ -3572,7 +3572,7 @@ class PingRs(OtaResponse):
         name = "PingRS"
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
-    echo_data: List[str] = field(
+    echo_data: list[str] = field(
         default_factory=list,
         metadata={
             "name": "EchoData",
@@ -3580,7 +3580,7 @@ class PingRs(OtaResponse):
             "sequential": True,
         },
     )
-    errors: List[ErrorType] = field(
+    errors: list[ErrorType] = field(
         default_factory=list,
         metadata={
             "name": "Errors",
@@ -3588,7 +3588,7 @@ class PingRs(OtaResponse):
             "sequential": True,
         },
     )
-    success: List[SuccessType] = field(
+    success: list[SuccessType] = field(
         default_factory=list,
         metadata={
             "name": "Success",
@@ -3596,7 +3596,7 @@ class PingRs(OtaResponse):
             "sequential": True,
         },
     )
-    warnings: List[WarningType] = field(
+    warnings: list[WarningType] = field(
         default_factory=list,
         metadata={
             "name": "Warnings",
@@ -3604,14 +3604,14 @@ class PingRs(OtaResponse):
             "sequential": True,
         },
     )
-    echo_token: Optional[str] = field(
+    echo_token: str | None = field(
         default=None,
         metadata={
             "name": "EchoToken",
             "type": "Attribute",
         },
     )
-    time_stamp: Optional[XmlDateTime] = field(
+    time_stamp: XmlDateTime | None = field(
         default=None,
         metadata={
             "name": "TimeStamp",
@@ -3625,7 +3625,7 @@ class PingRs(OtaResponse):
             "type": "Attribute",
         },
     )
-    version: Optional[Decimal] = field(
+    version: Decimal | None = field(
         default=None,
         metadata={
             "name": "Version",
@@ -3633,28 +3633,28 @@ class PingRs(OtaResponse):
             "required": True,
         },
     )
-    transaction_identifier: Optional[str] = field(
+    transaction_identifier: str | None = field(
         default=None,
         metadata={
             "name": "TransactionIdentifier",
             "type": "Attribute",
         },
     )
-    sequence_nmbr: Optional[int] = field(
+    sequence_nmbr: int | None = field(
         default=None,
         metadata={
             "name": "SequenceNmbr",
             "type": "Attribute",
         },
     )
-    transaction_status_code: Optional[PingRsTransactionStatusCode] = field(
+    transaction_status_code: PingRsTransactionStatusCode | None = field(
         default=None,
         metadata={
             "name": "TransactionStatusCode",
             "type": "Attribute",
         },
     )
-    retransmission_indicator: Optional[bool] = field(
+    retransmission_indicator: bool | None = field(
         default=None,
         metadata={
             "name": "RetransmissionIndicator",
@@ -3665,7 +3665,7 @@ class PingRs(OtaResponse):
 
 @dataclass
 class RateQualifierType(object):
-    promo_desc: Optional[str] = field(
+    promo_desc: str | None = field(
         default=None,
         metadata={
             "name": "PromoDesc",
@@ -3673,7 +3673,7 @@ class RateQualifierType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    rate_comments: Optional[ArrayOfRateQualifierTypeRateComment] = field(
+    rate_comments: ArrayOfRateQualifierTypeRateComment | None = field(
         default=None,
         metadata={
             "name": "RateComments",
@@ -3681,42 +3681,42 @@ class RateQualifierType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    travel_purpose: Optional[str] = field(
+    travel_purpose: str | None = field(
         default=None,
         metadata={
             "name": "TravelPurpose",
             "type": "Attribute",
         },
     )
-    rate_category: Optional[str] = field(
+    rate_category: str | None = field(
         default=None,
         metadata={
             "name": "RateCategory",
             "type": "Attribute",
         },
     )
-    corp_discount_nmbr: Optional[str] = field(
+    corp_discount_nmbr: str | None = field(
         default=None,
         metadata={
             "name": "CorpDiscountNmbr",
             "type": "Attribute",
         },
     )
-    rate_qualifier: Optional[str] = field(
+    rate_qualifier: str | None = field(
         default=None,
         metadata={
             "name": "RateQualifier",
             "type": "Attribute",
         },
     )
-    rate_period: Optional[RateQualifierTypeRatePeriod] = field(
+    rate_period: RateQualifierTypeRatePeriod | None = field(
         default=None,
         metadata={
             "name": "RatePeriod",
             "type": "Attribute",
         },
     )
-    guaranteed_ind: Optional[bool] = field(
+    guaranteed_ind: bool | None = field(
         default=None,
         metadata={
             "name": "GuaranteedInd",
@@ -3730,14 +3730,14 @@ class RateQualifierType(object):
             "type": "Attribute",
         },
     )
-    rate_authorization_code: Optional[str] = field(
+    rate_authorization_code: str | None = field(
         default=None,
         metadata={
             "name": "RateAuthorizationCode",
             "type": "Attribute",
         },
     )
-    vendor_rate_id: Optional[str] = field(
+    vendor_rate_id: str | None = field(
         default=None,
         metadata={
             "name": "VendorRateID",
@@ -3748,7 +3748,7 @@ class RateQualifierType(object):
 
 @dataclass
 class RelatedTravelerType(object):
-    unique_id: Optional[UniqueIdType] = field(
+    unique_id: UniqueIdType | None = field(
         default=None,
         metadata={
             "name": "UniqueID",
@@ -3756,7 +3756,7 @@ class RelatedTravelerType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    person_name: Optional[PersonNameType] = field(
+    person_name: PersonNameType | None = field(
         default=None,
         metadata={
             "name": "PersonName",
@@ -3764,21 +3764,21 @@ class RelatedTravelerType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    share_synch_ind: Optional[RelatedTravelerTypeShareSynchInd] = field(
+    share_synch_ind: RelatedTravelerTypeShareSynchInd | None = field(
         default=None,
         metadata={
             "name": "ShareSynchInd",
             "type": "Attribute",
         },
     )
-    share_market_ind: Optional[RelatedTravelerTypeShareMarketInd] = field(
+    share_market_ind: RelatedTravelerTypeShareMarketInd | None = field(
         default=None,
         metadata={
             "name": "ShareMarketInd",
             "type": "Attribute",
         },
     )
-    relation: Optional[str] = field(
+    relation: str | None = field(
         default=None,
         metadata={
             "name": "Relation",
@@ -3803,7 +3803,7 @@ class ServiceSoapGetPingInput(object):
 
     @dataclass
     class Body(object):
-        ping_rq: Optional[PingRq] = field(
+        ping_rq: PingRq | None = field(
             default=None,
             metadata={
                 "name": "PingRQ",
@@ -3839,70 +3839,70 @@ class SourceType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    agent_sine: Optional[str] = field(
+    agent_sine: str | None = field(
         default=None,
         metadata={
             "name": "AgentSine",
             "type": "Attribute",
         },
     )
-    pseudo_city_code: Optional[str] = field(
+    pseudo_city_code: str | None = field(
         default=None,
         metadata={
             "name": "PseudoCityCode",
             "type": "Attribute",
         },
     )
-    isocountry: Optional[str] = field(
+    isocountry: str | None = field(
         default=None,
         metadata={
             "name": "ISOCountry",
             "type": "Attribute",
         },
     )
-    isocurrency: Optional[str] = field(
+    isocurrency: str | None = field(
         default=None,
         metadata={
             "name": "ISOCurrency",
             "type": "Attribute",
         },
     )
-    agent_duty_code: Optional[str] = field(
+    agent_duty_code: str | None = field(
         default=None,
         metadata={
             "name": "AgentDutyCode",
             "type": "Attribute",
         },
     )
-    airline_vendor_id: Optional[str] = field(
+    airline_vendor_id: str | None = field(
         default=None,
         metadata={
             "name": "AirlineVendorID",
             "type": "Attribute",
         },
     )
-    airport_code: Optional[str] = field(
+    airport_code: str | None = field(
         default=None,
         metadata={
             "name": "AirportCode",
             "type": "Attribute",
         },
     )
-    first_depart_point: Optional[str] = field(
+    first_depart_point: str | None = field(
         default=None,
         metadata={
             "name": "FirstDepartPoint",
             "type": "Attribute",
         },
     )
-    ersp_user_id: Optional[str] = field(
+    ersp_user_id: str | None = field(
         default=None,
         metadata={
             "name": "ERSP_UserID",
             "type": "Attribute",
         },
     )
-    terminal_id: Optional[str] = field(
+    terminal_id: str | None = field(
         default=None,
         metadata={
             "name": "TerminalID",
@@ -3912,7 +3912,7 @@ class SourceType(object):
 
     @dataclass
     class RequestorId(UniqueIdType):
-        message_password: Optional[str] = field(
+        message_password: str | None = field(
             default=None,
             metadata={
                 "name": "MessagePassword",
@@ -3922,28 +3922,28 @@ class SourceType(object):
 
     @dataclass
     class Position(object):
-        latitude: Optional[str] = field(
+        latitude: str | None = field(
             default=None,
             metadata={
                 "name": "Latitude",
                 "type": "Attribute",
             },
         )
-        longitude: Optional[str] = field(
+        longitude: str | None = field(
             default=None,
             metadata={
                 "name": "Longitude",
                 "type": "Attribute",
             },
         )
-        altitude: Optional[str] = field(
+        altitude: str | None = field(
             default=None,
             metadata={
                 "name": "Altitude",
                 "type": "Attribute",
             },
         )
-        altitude_unit_of_measure_code: Optional[str] = field(
+        altitude_unit_of_measure_code: str | None = field(
             default=None,
             metadata={
                 "name": "AltitudeUnitOfMeasureCode",
@@ -3953,7 +3953,7 @@ class SourceType(object):
 
     @dataclass
     class BookingChannel(object):
-        company_name: Optional[CompanyNameType] = field(
+        company_name: CompanyNameType | None = field(
             default=None,
             metadata={
                 "name": "CompanyName",
@@ -3961,14 +3961,14 @@ class SourceType(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        type: Optional[str] = field(
+        type: str | None = field(
             default=None,
             metadata={
                 "name": "Type",
                 "type": "Attribute",
             },
         )
-        primary: Optional[bool] = field(
+        primary: bool | None = field(
             default=None,
             metadata={
                 "name": "Primary",
@@ -3979,14 +3979,14 @@ class SourceType(object):
 
 @dataclass
 class VehicleChargePurposeType(VehicleChargeType):
-    purpose: Optional[str] = field(
+    purpose: str | None = field(
         default=None,
         metadata={
             "name": "Purpose",
             "type": "Attribute",
         },
     )
-    rate_convert_ind: Optional[bool] = field(
+    rate_convert_ind: bool | None = field(
         default=None,
         metadata={
             "name": "RateConvertInd",
@@ -3997,7 +3997,7 @@ class VehicleChargePurposeType(VehicleChargeType):
 
 @dataclass
 class VehicleEquipmentPricedType(object):
-    equipment: Optional[VehicleEquipmentType] = field(
+    equipment: VehicleEquipmentType | None = field(
         default=None,
         metadata={
             "name": "Equipment",
@@ -4005,7 +4005,7 @@ class VehicleEquipmentPricedType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    charge: Optional[VehicleChargeType] = field(
+    charge: VehicleChargeType | None = field(
         default=None,
         metadata={
             "name": "Charge",
@@ -4024,56 +4024,56 @@ class VehicleEquipmentPricedType(object):
 
 @dataclass
 class VehiclePrefType(VehicleCoreType):
-    type_pref: Optional[PreferLevelType] = field(
+    type_pref: PreferLevelType | None = field(
         default=None,
         metadata={
             "name": "TypePref",
             "type": "Attribute",
         },
     )
-    class_pref: Optional[PreferLevelType] = field(
+    class_pref: PreferLevelType | None = field(
         default=None,
         metadata={
             "name": "ClassPref",
             "type": "Attribute",
         },
     )
-    air_condition_pref: Optional[PreferLevelType] = field(
+    air_condition_pref: PreferLevelType | None = field(
         default=None,
         metadata={
             "name": "AirConditionPref",
             "type": "Attribute",
         },
     )
-    transmission_pref: Optional[PreferLevelType] = field(
+    transmission_pref: PreferLevelType | None = field(
         default=None,
         metadata={
             "name": "TransmissionPref",
             "type": "Attribute",
         },
     )
-    vendor_car_type: Optional[str] = field(
+    vendor_car_type: str | None = field(
         default=None,
         metadata={
             "name": "VendorCarType",
             "type": "Attribute",
         },
     )
-    vehicle_qty: Optional[int] = field(
+    vehicle_qty: int | None = field(
         default=None,
         metadata={
             "name": "VehicleQty",
             "type": "Attribute",
         },
     )
-    code: Optional[str] = field(
+    code: str | None = field(
         default=None,
         metadata={
             "name": "Code",
             "type": "Attribute",
         },
     )
-    code_context: Optional[str] = field(
+    code_context: str | None = field(
         default=None,
         metadata={
             "name": "CodeContext",
@@ -4087,7 +4087,7 @@ class VehicleRetrieveResRqadditionalInfoType(object):
     class Meta(object):
         name = "VehicleRetrieveResRQAdditionalInfoType"
 
-    pick_up_location: Optional[LocationType] = field(
+    pick_up_location: LocationType | None = field(
         default=None,
         metadata={
             "name": "PickUpLocation",
@@ -4095,7 +4095,7 @@ class VehicleRetrieveResRqadditionalInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    telephone: Optional[object] = field(
+    telephone: object | None = field(
         default=None,
         metadata={
             "name": "Telephone",
@@ -4103,7 +4103,7 @@ class VehicleRetrieveResRqadditionalInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    vendor: Optional[CompanyNameType] = field(
+    vendor: CompanyNameType | None = field(
         default=None,
         metadata={
             "name": "Vendor",
@@ -4111,7 +4111,7 @@ class VehicleRetrieveResRqadditionalInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    email: Optional[EmailType] = field(
+    email: EmailType | None = field(
         default=None,
         metadata={
             "name": "Email",
@@ -4119,7 +4119,7 @@ class VehicleRetrieveResRqadditionalInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    tpa_extensions: Optional[TpaExtensionsType] = field(
+    tpa_extensions: TpaExtensionsType | None = field(
         default=None,
         metadata={
             "name": "TPA_Extensions",
@@ -4127,7 +4127,7 @@ class VehicleRetrieveResRqadditionalInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    pick_up_date_time: Optional[XmlDateTime] = field(
+    pick_up_date_time: XmlDateTime | None = field(
         default=None,
         metadata={
             "name": "PickUpDateTime",
@@ -4141,7 +4141,7 @@ class VehicleRetrieveResRqcoreType(object):
     class Meta(object):
         name = "VehicleRetrieveResRQCoreType"
 
-    unique_id: Optional[UniqueIdType] = field(
+    unique_id: UniqueIdType | None = field(
         default=None,
         metadata={
             "name": "UniqueID",
@@ -4149,7 +4149,7 @@ class VehicleRetrieveResRqcoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    person_name: Optional[PersonNameType] = field(
+    person_name: PersonNameType | None = field(
         default=None,
         metadata={
             "name": "PersonName",
@@ -4165,7 +4165,7 @@ class VehicleRetrieveResRqcoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    tpa_extensions: Optional[TpaExtensionsType] = field(
+    tpa_extensions: TpaExtensionsType | None = field(
         default=None,
         metadata={
             "name": "TPA_Extensions",
@@ -4176,35 +4176,35 @@ class VehicleRetrieveResRqcoreType(object):
 
     @dataclass
     class CustLoyalty(object):
-        program_id: Optional[str] = field(
+        program_id: str | None = field(
             default=None,
             metadata={
                 "name": "ProgramID",
                 "type": "Attribute",
             },
         )
-        membership_id: Optional[str] = field(
+        membership_id: str | None = field(
             default=None,
             metadata={
                 "name": "MembershipID",
                 "type": "Attribute",
             },
         )
-        travel_sector: Optional[str] = field(
+        travel_sector: str | None = field(
             default=None,
             metadata={
                 "name": "TravelSector",
                 "type": "Attribute",
             },
         )
-        rph: Optional[str] = field(
+        rph: str | None = field(
             default=None,
             metadata={
                 "name": "RPH",
                 "type": "Attribute",
             },
         )
-        vendor_code: List[str] = field(
+        vendor_code: list[str] = field(
             default_factory=list,
             metadata={
                 "name": "VendorCode",
@@ -4224,7 +4224,7 @@ class VehicleType(VehicleCoreType):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    picture_url: Optional[str] = field(
+    picture_url: str | None = field(
         default=None,
         metadata={
             "name": "PictureURL",
@@ -4240,84 +4240,84 @@ class VehicleType(VehicleCoreType):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    passenger_quantity: Optional[str] = field(
+    passenger_quantity: str | None = field(
         default=None,
         metadata={
             "name": "PassengerQuantity",
             "type": "Attribute",
         },
     )
-    baggage_quantity: Optional[int] = field(
+    baggage_quantity: int | None = field(
         default=None,
         metadata={
             "name": "BaggageQuantity",
             "type": "Attribute",
         },
     )
-    vendor_car_type: Optional[str] = field(
+    vendor_car_type: str | None = field(
         default=None,
         metadata={
             "name": "VendorCarType",
             "type": "Attribute",
         },
     )
-    code: Optional[str] = field(
+    code: str | None = field(
         default=None,
         metadata={
             "name": "Code",
             "type": "Attribute",
         },
     )
-    code_context: Optional[str] = field(
+    code_context: str | None = field(
         default=None,
         metadata={
             "name": "CodeContext",
             "type": "Attribute",
         },
     )
-    unit_of_measure_quantity: Optional[Decimal] = field(
+    unit_of_measure_quantity: Decimal | None = field(
         default=None,
         metadata={
             "name": "UnitOfMeasureQuantity",
             "type": "Attribute",
         },
     )
-    unit_of_measure: Optional[str] = field(
+    unit_of_measure: str | None = field(
         default=None,
         metadata={
             "name": "UnitOfMeasure",
             "type": "Attribute",
         },
     )
-    unit_of_measure_code: Optional[str] = field(
+    unit_of_measure_code: str | None = field(
         default=None,
         metadata={
             "name": "UnitOfMeasureCode",
             "type": "Attribute",
         },
     )
-    start: Optional[str] = field(
+    start: str | None = field(
         default=None,
         metadata={
             "name": "Start",
             "type": "Attribute",
         },
     )
-    duration: Optional[str] = field(
+    duration: str | None = field(
         default=None,
         metadata={
             "name": "Duration",
             "type": "Attribute",
         },
     )
-    end: Optional[str] = field(
+    end: str | None = field(
         default=None,
         metadata={
             "name": "End",
             "type": "Attribute",
         },
     )
-    odometer_unit_of_measure: Optional[DistanceUnitNameType] = field(
+    odometer_unit_of_measure: DistanceUnitNameType | None = field(
         default=None,
         metadata={
             "name": "OdometerUnitOfMeasure",
@@ -4327,21 +4327,21 @@ class VehicleType(VehicleCoreType):
 
     @dataclass
     class VehMakeModel(object):
-        model_year: Optional[XmlPeriod] = field(
+        model_year: XmlPeriod | None = field(
             default=None,
             metadata={
                 "name": "ModelYear",
                 "type": "Attribute",
             },
         )
-        name: Optional[str] = field(
+        name: str | None = field(
             default=None,
             metadata={
                 "name": "Name",
                 "type": "Attribute",
             },
         )
-        code: Optional[str] = field(
+        code: str | None = field(
             default=None,
             metadata={
                 "name": "Code",
@@ -4351,42 +4351,42 @@ class VehicleType(VehicleCoreType):
 
     @dataclass
     class VehIdentity(object):
-        vehicle_asset_number: Optional[str] = field(
+        vehicle_asset_number: str | None = field(
             default=None,
             metadata={
                 "name": "VehicleAssetNumber",
                 "type": "Attribute",
             },
         )
-        license_plate_number: Optional[str] = field(
+        license_plate_number: str | None = field(
             default=None,
             metadata={
                 "name": "LicensePlateNumber",
                 "type": "Attribute",
             },
         )
-        state_prov_code: Optional[str] = field(
+        state_prov_code: str | None = field(
             default=None,
             metadata={
                 "name": "StateProvCode",
                 "type": "Attribute",
             },
         )
-        country_code: Optional[str] = field(
+        country_code: str | None = field(
             default=None,
             metadata={
                 "name": "CountryCode",
                 "type": "Attribute",
             },
         )
-        vehicle_id_number: Optional[str] = field(
+        vehicle_id_number: str | None = field(
             default=None,
             metadata={
                 "name": "VehicleID_Number",
                 "type": "Attribute",
             },
         )
-        vehicle_color: Optional[str] = field(
+        vehicle_color: str | None = field(
             default=None,
             metadata={
                 "name": "VehicleColor",
@@ -4397,7 +4397,7 @@ class VehicleType(VehicleCoreType):
 
 @dataclass
 class WrittenConfInstType(object):
-    supplemental_data: Optional[ParagraphType] = field(
+    supplemental_data: ParagraphType | None = field(
         default=None,
         metadata={
             "name": "SupplementalData",
@@ -4405,7 +4405,7 @@ class WrittenConfInstType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    email: Optional[EmailType] = field(
+    email: EmailType | None = field(
         default=None,
         metadata={
             "name": "Email",
@@ -4413,35 +4413,35 @@ class WrittenConfInstType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    language_id: Optional[str] = field(
+    language_id: str | None = field(
         default=None,
         metadata={
             "name": "LanguageID",
             "type": "Attribute",
         },
     )
-    addressee_name: Optional[str] = field(
+    addressee_name: str | None = field(
         default=None,
         metadata={
             "name": "AddresseeName",
             "type": "Attribute",
         },
     )
-    address: Optional[str] = field(
+    address: str | None = field(
         default=None,
         metadata={
             "name": "Address",
             "type": "Attribute",
         },
     )
-    telephone: Optional[str] = field(
+    telephone: str | None = field(
         default=None,
         metadata={
             "name": "Telephone",
             "type": "Attribute",
         },
     )
-    confirm_ind: Optional[bool] = field(
+    confirm_ind: bool | None = field(
         default=None,
         metadata={
             "name": "ConfirmInd",
@@ -4452,7 +4452,7 @@ class WrittenConfInstType(object):
 
 @dataclass
 class ArrayOfCoveragePricedType(object):
-    priced_coverage: List[CoveragePricedType] = field(
+    priced_coverage: list[CoveragePricedType] = field(
         default_factory=list,
         metadata={
             "name": "PricedCoverage",
@@ -4464,7 +4464,7 @@ class ArrayOfCoveragePricedType(object):
 
 @dataclass
 class ArrayOfSourceType(object):
-    source: List[SourceType] = field(
+    source: list[SourceType] = field(
         default_factory=list,
         metadata={
             "name": "Source",
@@ -4479,7 +4479,7 @@ class ArrayOfVehicleAvailRqcoreTypeVehPref(object):
     class Meta(object):
         name = "ArrayOfVehicleAvailRQCoreTypeVehPref"
 
-    veh_pref: List["ArrayOfVehicleAvailRqcoreTypeVehPref.VehPref"] = field(
+    veh_pref: list["ArrayOfVehicleAvailRqcoreTypeVehPref.VehPref"] = field(
         default_factory=list,
         metadata={
             "name": "VehPref",
@@ -4490,7 +4490,7 @@ class ArrayOfVehicleAvailRqcoreTypeVehPref(object):
 
     @dataclass
     class VehPref(VehiclePrefType):
-        up_sell_ind: Optional[bool] = field(
+        up_sell_ind: bool | None = field(
             default=None,
             metadata={
                 "name": "UpSellInd",
@@ -4501,7 +4501,7 @@ class ArrayOfVehicleAvailRqcoreTypeVehPref(object):
 
 @dataclass
 class ArrayOfVehicleChargePurposeType(object):
-    vehicle_charge: List[VehicleChargePurposeType] = field(
+    vehicle_charge: list[VehicleChargePurposeType] = field(
         default_factory=list,
         metadata={
             "name": "VehicleCharge",
@@ -4513,7 +4513,7 @@ class ArrayOfVehicleChargePurposeType(object):
 
 @dataclass
 class ArrayOfVehicleChargePurposeType1(object):
-    fee: List[VehicleChargePurposeType] = field(
+    fee: list[VehicleChargePurposeType] = field(
         default_factory=list,
         metadata={
             "name": "Fee",
@@ -4525,7 +4525,7 @@ class ArrayOfVehicleChargePurposeType1(object):
 
 @dataclass
 class ArrayOfVehicleEquipmentPricedType(object):
-    priced_equip: List[VehicleEquipmentPricedType] = field(
+    priced_equip: list[VehicleEquipmentPricedType] = field(
         default_factory=list,
         metadata={
             "name": "PricedEquip",
@@ -4537,7 +4537,7 @@ class ArrayOfVehicleEquipmentPricedType(object):
 
 @dataclass
 class ArrayOfVehicleLocationLiabilitiesTypeCoverageCoverageFeeVehicle(object):
-    vehicle: List[
+    vehicle: list[
         "ArrayOfVehicleLocationLiabilitiesTypeCoverageCoverageFeeVehicle.Vehicle"
     ] = field(
         default_factory=list,
@@ -4550,7 +4550,7 @@ class ArrayOfVehicleLocationLiabilitiesTypeCoverageCoverageFeeVehicle(object):
 
     @dataclass
     class Vehicle(VehicleType):
-        include_exclude: Optional[IncludeExcludeType] = field(
+        include_exclude: IncludeExcludeType | None = field(
             default=None,
             metadata={
                 "name": "IncludeExclude",
@@ -4563,7 +4563,7 @@ class ArrayOfVehicleLocationLiabilitiesTypeCoverageCoverageFeeVehicle(object):
 class ArrayOfVehicleLocationServicesOfferedTypeOffLocationServiceOffLocServiceCharge(
     object,
 ):
-    off_loc_service_charge: List[
+    off_loc_service_charge: list[
         "ArrayOfVehicleLocationServicesOfferedTypeOffLocationServiceOffLocServiceCharge.OffLocServiceCharge"
     ] = field(
         default_factory=list,
@@ -4576,7 +4576,7 @@ class ArrayOfVehicleLocationServicesOfferedTypeOffLocationServiceOffLocServiceCh
 
     @dataclass
     class OffLocServiceCharge(VehicleChargeType):
-        vehicles: Optional[ArrayOfVehicleCoreType] = field(
+        vehicles: ArrayOfVehicleCoreType | None = field(
             default=None,
             metadata={
                 "name": "Vehicles",
@@ -4590,7 +4590,7 @@ class ArrayOfVehicleLocationServicesOfferedTypeOffLocationServiceOffLocServiceCh
 class ArrayOfVehicleLocationServicesOfferedTypeOnLocationServiceOnLocServiceCharge(
     object,
 ):
-    on_loc_service_charge: List[
+    on_loc_service_charge: list[
         "ArrayOfVehicleLocationServicesOfferedTypeOnLocationServiceOnLocServiceCharge.OnLocServiceCharge"
     ] = field(
         default_factory=list,
@@ -4603,7 +4603,7 @@ class ArrayOfVehicleLocationServicesOfferedTypeOnLocationServiceOnLocServiceChar
 
     @dataclass
     class OnLocServiceCharge(VehicleChargeType):
-        vehicles: Optional[ArrayOfVehicleCoreType] = field(
+        vehicles: ArrayOfVehicleCoreType | None = field(
             default=None,
             metadata={
                 "name": "Vehicles",
@@ -4615,7 +4615,7 @@ class ArrayOfVehicleLocationServicesOfferedTypeOnLocationServiceOnLocServiceChar
 
 @dataclass
 class ArrayOfVehicleLocationServicesOfferedTypeSpecialEquipmentEquipCharge(object):
-    equip_charge: List[
+    equip_charge: list[
         "ArrayOfVehicleLocationServicesOfferedTypeSpecialEquipmentEquipCharge.EquipCharge"
     ] = field(
         default_factory=list,
@@ -4628,7 +4628,7 @@ class ArrayOfVehicleLocationServicesOfferedTypeSpecialEquipmentEquipCharge(objec
 
     @dataclass
     class EquipCharge(VehicleChargeType):
-        vehicles: Optional[ArrayOfVehicleCoreType] = field(
+        vehicles: ArrayOfVehicleCoreType | None = field(
             default=None,
             metadata={
                 "name": "Vehicles",
@@ -4640,7 +4640,7 @@ class ArrayOfVehicleLocationServicesOfferedTypeSpecialEquipmentEquipCharge(objec
 
 @dataclass
 class CancelRuleType(object):
-    payment_card: Optional[PaymentCardType] = field(
+    payment_card: PaymentCardType | None = field(
         default=None,
         metadata={
             "name": "PaymentCard",
@@ -4648,28 +4648,28 @@ class CancelRuleType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    cancel_by_date: Optional[str] = field(
+    cancel_by_date: str | None = field(
         default=None,
         metadata={
             "name": "CancelByDate",
             "type": "Attribute",
         },
     )
-    amount: Optional[Decimal] = field(
+    amount: Decimal | None = field(
         default=None,
         metadata={
             "name": "Amount",
             "type": "Attribute",
         },
     )
-    percent: Optional[Decimal] = field(
+    percent: Decimal | None = field(
         default=None,
         metadata={
             "name": "Percent",
             "type": "Attribute",
         },
     )
-    type: Optional[CancelRuleTypeType] = field(
+    type: CancelRuleTypeType | None = field(
         default=None,
         metadata={
             "name": "Type",
@@ -4680,7 +4680,7 @@ class CancelRuleType(object):
 
 @dataclass
 class ContactPersonType(object):
-    person_name: Optional[PersonNameType] = field(
+    person_name: PersonNameType | None = field(
         default=None,
         metadata={
             "name": "PersonName",
@@ -4688,7 +4688,7 @@ class ContactPersonType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    telephone: List["ContactPersonType.Telephone"] = field(
+    telephone: list["ContactPersonType.Telephone"] = field(
         default_factory=list,
         metadata={
             "name": "Telephone",
@@ -4696,7 +4696,7 @@ class ContactPersonType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    address: List[AddressInfoType] = field(
+    address: list[AddressInfoType] = field(
         default_factory=list,
         metadata={
             "name": "Address",
@@ -4704,7 +4704,7 @@ class ContactPersonType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    email: List[EmailType] = field(
+    email: list[EmailType] = field(
         default_factory=list,
         metadata={
             "name": "Email",
@@ -4712,7 +4712,7 @@ class ContactPersonType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    url: List[UrlType] = field(
+    url: list[UrlType] = field(
         default_factory=list,
         metadata={
             "name": "URL",
@@ -4720,7 +4720,7 @@ class ContactPersonType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    company_name: List[CompanyNameType] = field(
+    company_name: list[CompanyNameType] = field(
         default_factory=list,
         metadata={
             "name": "CompanyName",
@@ -4728,7 +4728,7 @@ class ContactPersonType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    employee_info: List[EmployeeInfoType] = field(
+    employee_info: list[EmployeeInfoType] = field(
         default_factory=list,
         metadata={
             "name": "EmployeeInfo",
@@ -4736,14 +4736,14 @@ class ContactPersonType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    share_synch_ind: Optional[ContactPersonTypeShareSynchInd] = field(
+    share_synch_ind: ContactPersonTypeShareSynchInd | None = field(
         default=None,
         metadata={
             "name": "ShareSynchInd",
             "type": "Attribute",
         },
     )
-    share_market_ind: Optional[ContactPersonTypeShareMarketInd] = field(
+    share_market_ind: ContactPersonTypeShareMarketInd | None = field(
         default=None,
         metadata={
             "name": "ShareMarketInd",
@@ -4757,14 +4757,14 @@ class ContactPersonType(object):
             "type": "Attribute",
         },
     )
-    contact_type: Optional[str] = field(
+    contact_type: str | None = field(
         default=None,
         metadata={
             "name": "ContactType",
             "type": "Attribute",
         },
     )
-    relation: Optional[str] = field(
+    relation: str | None = field(
         default=None,
         metadata={
             "name": "Relation",
@@ -4778,7 +4778,7 @@ class ContactPersonType(object):
             "type": "Attribute",
         },
     )
-    rph: Optional[str] = field(
+    rph: str | None = field(
         default=None,
         metadata={
             "name": "RPH",
@@ -4788,7 +4788,7 @@ class ContactPersonType(object):
 
     @dataclass
     class Telephone(object):
-        rph: Optional[str] = field(
+        rph: str | None = field(
             default=None,
             metadata={
                 "name": "RPH",
@@ -4807,7 +4807,7 @@ class DirectBillType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    address: Optional[AddressInfoType] = field(
+    address: AddressInfoType | None = field(
         default=None,
         metadata={
             "name": "Address",
@@ -4815,28 +4815,28 @@ class DirectBillType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    share_synch_ind: Optional[DirectBillTypeShareSynchInd] = field(
+    share_synch_ind: DirectBillTypeShareSynchInd | None = field(
         default=None,
         metadata={
             "name": "ShareSynchInd",
             "type": "Attribute",
         },
     )
-    share_market_ind: Optional[DirectBillTypeShareMarketInd] = field(
+    share_market_ind: DirectBillTypeShareMarketInd | None = field(
         default=None,
         metadata={
             "name": "ShareMarketInd",
             "type": "Attribute",
         },
     )
-    direct_bill_id: Optional[str] = field(
+    direct_bill_id: str | None = field(
         default=None,
         metadata={
             "name": "DirectBill_ID",
             "type": "Attribute",
         },
     )
-    billing_number: Optional[str] = field(
+    billing_number: str | None = field(
         default=None,
         metadata={
             "name": "BillingNumber",
@@ -4846,7 +4846,7 @@ class DirectBillType(object):
 
     @dataclass
     class CompanyName(CompanyNameType):
-        contact_name: Optional[str] = field(
+        contact_name: str | None = field(
             default=None,
             metadata={
                 "name": "ContactName",
@@ -4857,7 +4857,7 @@ class DirectBillType(object):
 
 @dataclass
 class FormattedTextType(object):
-    sub_section: List[FormattedTextSubSectionType] = field(
+    sub_section: list[FormattedTextSubSectionType] = field(
         default_factory=list,
         metadata={
             "name": "SubSection",
@@ -4865,14 +4865,14 @@ class FormattedTextType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    title: Optional[str] = field(
+    title: str | None = field(
         default=None,
         metadata={
             "name": "Title",
             "type": "Attribute",
         },
     )
-    language: Optional[str] = field(
+    language: str | None = field(
         default=None,
         metadata={
             "name": "Language",
@@ -4883,7 +4883,7 @@ class FormattedTextType(object):
 
 @dataclass
 class OffLocationServiceType(OffLocationServiceCoreType):
-    person_name: Optional[PersonNameType] = field(
+    person_name: PersonNameType | None = field(
         default=None,
         metadata={
             "name": "PersonName",
@@ -4891,7 +4891,7 @@ class OffLocationServiceType(OffLocationServiceCoreType):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    telephone: Optional[object] = field(
+    telephone: object | None = field(
         default=None,
         metadata={
             "name": "Telephone",
@@ -4899,7 +4899,7 @@ class OffLocationServiceType(OffLocationServiceCoreType):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    spec_instructions: Optional[str] = field(
+    spec_instructions: str | None = field(
         default=None,
         metadata={
             "name": "SpecInstructions",
@@ -4931,7 +4931,7 @@ class ServiceSoapGetPingOutput(object):
 
     @dataclass
     class Body(object):
-        ping_rs: Optional[PingRs] = field(
+        ping_rs: PingRs | None = field(
             default=None,
             metadata={
                 "name": "PingRS",
@@ -4949,28 +4949,28 @@ class ServiceSoapGetPingOutput(object):
 
         @dataclass
         class Fault(object):
-            faultcode: Optional[str] = field(
+            faultcode: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultstring: Optional[str] = field(
+            faultstring: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultactor: Optional[str] = field(
+            faultactor: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            detail: Optional[str] = field(
+            detail: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
@@ -4980,7 +4980,7 @@ class ServiceSoapGetPingOutput(object):
 
     @dataclass
     class Header(object):
-        information_header: Optional[InformationHeader] = field(
+        information_header: InformationHeader | None = field(
             default=None,
             metadata={
                 "name": "informationHeader",
@@ -4992,7 +4992,7 @@ class ServiceSoapGetPingOutput(object):
 
 @dataclass
 class VehicleReservationSummaryType(object):
-    conf_id: Optional[UniqueIdType] = field(
+    conf_id: UniqueIdType | None = field(
         default=None,
         metadata={
             "name": "ConfID",
@@ -5000,7 +5000,7 @@ class VehicleReservationSummaryType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    pick_up_location: Optional[LocationType] = field(
+    pick_up_location: LocationType | None = field(
         default=None,
         metadata={
             "name": "PickUpLocation",
@@ -5008,7 +5008,7 @@ class VehicleReservationSummaryType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    return_location: Optional[LocationType] = field(
+    return_location: LocationType | None = field(
         default=None,
         metadata={
             "name": "ReturnLocation",
@@ -5016,7 +5016,7 @@ class VehicleReservationSummaryType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    person_name: Optional[PersonNameType] = field(
+    person_name: PersonNameType | None = field(
         default=None,
         metadata={
             "name": "PersonName",
@@ -5024,7 +5024,7 @@ class VehicleReservationSummaryType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    vehicle: Optional[VehicleType] = field(
+    vehicle: VehicleType | None = field(
         default=None,
         metadata={
             "name": "Vehicle",
@@ -5032,7 +5032,7 @@ class VehicleReservationSummaryType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    tpa_extensions: Optional[TpaExtensionsType] = field(
+    tpa_extensions: TpaExtensionsType | None = field(
         default=None,
         metadata={
             "name": "TPA_Extensions",
@@ -5040,14 +5040,14 @@ class VehicleReservationSummaryType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    pick_up_date_time: Optional[XmlDateTime] = field(
+    pick_up_date_time: XmlDateTime | None = field(
         default=None,
         metadata={
             "name": "PickUpDateTime",
             "type": "Attribute",
         },
     )
-    return_date_time: Optional[XmlDateTime] = field(
+    return_date_time: XmlDateTime | None = field(
         default=None,
         metadata={
             "name": "ReturnDateTime",
@@ -5058,9 +5058,7 @@ class VehicleReservationSummaryType(object):
 
 @dataclass
 class AcceptablePaymentCardsInfoType(object):
-    acceptable_payment_cards: Optional[
-        ArrayOfAcceptablePaymentCardsInfoTypeAcceptablePaymentCard
-    ] = field(
+    acceptable_payment_cards: ArrayOfAcceptablePaymentCardsInfoTypeAcceptablePaymentCard | None = field(
         default=None,
         metadata={
             "name": "AcceptablePaymentCards",
@@ -5068,7 +5066,7 @@ class AcceptablePaymentCardsInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    info: Optional[FormattedTextType] = field(
+    info: FormattedTextType | None = field(
         default=None,
         metadata={
             "name": "Info",
@@ -5080,7 +5078,7 @@ class AcceptablePaymentCardsInfoType(object):
 
 @dataclass
 class ArrayOfCancelRuleType(object):
-    cancel_rule: List[CancelRuleType] = field(
+    cancel_rule: list[CancelRuleType] = field(
         default_factory=list,
         metadata={
             "name": "CancelRule",
@@ -5092,7 +5090,7 @@ class ArrayOfCancelRuleType(object):
 
 @dataclass
 class ArrayOfFormattedTextType(object):
-    vendor_message: List[FormattedTextType] = field(
+    vendor_message: list[FormattedTextType] = field(
         default_factory=list,
         metadata={
             "name": "VendorMessage",
@@ -5104,7 +5102,7 @@ class ArrayOfFormattedTextType(object):
 
 @dataclass
 class ArrayOfVehicleLocationAdditionalDetailsTypeShuttleShuttleInfo(object):
-    shuttle_info: List[
+    shuttle_info: list[
         "ArrayOfVehicleLocationAdditionalDetailsTypeShuttleShuttleInfo.ShuttleInfo"
     ] = field(
         default_factory=list,
@@ -5117,7 +5115,7 @@ class ArrayOfVehicleLocationAdditionalDetailsTypeShuttleShuttleInfo(object):
 
     @dataclass
     class ShuttleInfo(FormattedTextType):
-        type: Optional[LocationDetailShuttleInfoType] = field(
+        type: LocationDetailShuttleInfoType | None = field(
             default=None,
             metadata={
                 "name": "Type",
@@ -5129,7 +5127,7 @@ class ArrayOfVehicleLocationAdditionalDetailsTypeShuttleShuttleInfo(object):
 
 @dataclass
 class ArrayOfVehicleLocationLiabilitiesTypeCoverageCoverageFee(object):
-    coverage_fee: List[
+    coverage_fee: list[
         "ArrayOfVehicleLocationLiabilitiesTypeCoverageCoverageFee.CoverageFee"
     ] = field(
         default_factory=list,
@@ -5142,7 +5140,7 @@ class ArrayOfVehicleLocationLiabilitiesTypeCoverageCoverageFee(object):
 
     @dataclass
     class CoverageFee(object):
-        charge: Optional[VehicleChargeType] = field(
+        charge: VehicleChargeType | None = field(
             default=None,
             metadata={
                 "name": "Charge",
@@ -5150,9 +5148,7 @@ class ArrayOfVehicleLocationLiabilitiesTypeCoverageCoverageFee(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        vehicles: Optional[
-            ArrayOfVehicleLocationLiabilitiesTypeCoverageCoverageFeeVehicle
-        ] = field(
+        vehicles: ArrayOfVehicleLocationLiabilitiesTypeCoverageCoverageFeeVehicle | None = field(
             default=None,
             metadata={
                 "name": "Vehicles",
@@ -5173,14 +5169,14 @@ class ArrayOfVehicleLocationLiabilitiesTypeCoverageCoverageFee(object):
 
         @dataclass
         class Deductible(object):
-            amount: Optional[Decimal] = field(
+            amount: Decimal | None = field(
                 default=None,
                 metadata={
                     "name": "Amount",
                     "type": "Attribute",
                 },
             )
-            liability_amount: Optional[Decimal] = field(
+            liability_amount: Decimal | None = field(
                 default=None,
                 metadata={
                     "name": "LiabilityAmount",
@@ -5191,7 +5187,7 @@ class ArrayOfVehicleLocationLiabilitiesTypeCoverageCoverageFee(object):
 
 @dataclass
 class ArrayOfVehicleLocationRequirementsTypeAdditionalDriverAddlDriverInfo(object):
-    addl_driver_info: List[
+    addl_driver_info: list[
         "ArrayOfVehicleLocationRequirementsTypeAdditionalDriverAddlDriverInfo.AddlDriverInfo"
     ] = field(
         default_factory=list,
@@ -5204,7 +5200,7 @@ class ArrayOfVehicleLocationRequirementsTypeAdditionalDriverAddlDriverInfo(objec
 
     @dataclass
     class AddlDriverInfo(FormattedTextType):
-        type: Optional[LocationDetailRequirementAddlDriverInfoType] = field(
+        type: LocationDetailRequirementAddlDriverInfoType | None = field(
             default=None,
             metadata={
                 "name": "Type",
@@ -5216,7 +5212,7 @@ class ArrayOfVehicleLocationRequirementsTypeAdditionalDriverAddlDriverInfo(objec
 
 @dataclass
 class ArrayOfVehicleLocationRequirementsTypeAgeAgeInfo(object):
-    age_info: List["ArrayOfVehicleLocationRequirementsTypeAgeAgeInfo.AgeInfo"] = field(
+    age_info: list["ArrayOfVehicleLocationRequirementsTypeAgeAgeInfo.AgeInfo"] = field(
         default_factory=list,
         metadata={
             "name": "AgeInfo",
@@ -5227,7 +5223,7 @@ class ArrayOfVehicleLocationRequirementsTypeAgeAgeInfo(object):
 
     @dataclass
     class AgeInfo(FormattedTextType):
-        type: Optional[LocationDetailRequirementAgeInfoType] = field(
+        type: LocationDetailRequirementAgeInfoType | None = field(
             default=None,
             metadata={
                 "name": "Type",
@@ -5239,7 +5235,7 @@ class ArrayOfVehicleLocationRequirementsTypeAgeAgeInfo(object):
 
 @dataclass
 class ArrayOfVehicleLocationRequirementsTypeRequirementInfo(object):
-    requirement_info: List[
+    requirement_info: list[
         "ArrayOfVehicleLocationRequirementsTypeRequirementInfo.RequirementInfo"
     ] = field(
         default_factory=list,
@@ -5252,7 +5248,7 @@ class ArrayOfVehicleLocationRequirementsTypeRequirementInfo(object):
 
     @dataclass
     class RequirementInfo(FormattedTextType):
-        type: Optional[LocationDetailRequirementInfoType] = field(
+        type: LocationDetailRequirementInfoType | None = field(
             default=None,
             metadata={
                 "name": "Type",
@@ -5264,7 +5260,7 @@ class ArrayOfVehicleLocationRequirementsTypeRequirementInfo(object):
 
 @dataclass
 class ArrayOfVehicleLocationServicesOfferedTypeOffLocationService(object):
-    off_location_service: List[
+    off_location_service: list[
         "ArrayOfVehicleLocationServicesOfferedTypeOffLocationService.OffLocationService"
     ] = field(
         default_factory=list,
@@ -5277,7 +5273,7 @@ class ArrayOfVehicleLocationServicesOfferedTypeOffLocationService(object):
 
     @dataclass
     class OffLocationService(object):
-        off_loc_service_desc: Optional[FormattedTextType] = field(
+        off_loc_service_desc: FormattedTextType | None = field(
             default=None,
             metadata={
                 "name": "OffLocServiceDesc",
@@ -5285,7 +5281,7 @@ class ArrayOfVehicleLocationServicesOfferedTypeOffLocationService(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        operation_schedules: Optional[OperationSchedulesType] = field(
+        operation_schedules: OperationSchedulesType | None = field(
             default=None,
             metadata={
                 "name": "OperationSchedules",
@@ -5293,9 +5289,7 @@ class ArrayOfVehicleLocationServicesOfferedTypeOffLocationService(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        off_loc_service_charges: Optional[
-            ArrayOfVehicleLocationServicesOfferedTypeOffLocationServiceOffLocServiceCharge
-        ] = field(
+        off_loc_service_charges: ArrayOfVehicleLocationServicesOfferedTypeOffLocationServiceOffLocServiceCharge | None = field(
             default=None,
             metadata={
                 "name": "OffLocServiceCharges",
@@ -5303,7 +5297,7 @@ class ArrayOfVehicleLocationServicesOfferedTypeOffLocationService(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        type: Optional[OffLocationServiceIdType] = field(
+        type: OffLocationServiceIdType | None = field(
             default=None,
             metadata={
                 "name": "Type",
@@ -5315,7 +5309,7 @@ class ArrayOfVehicleLocationServicesOfferedTypeOffLocationService(object):
 
 @dataclass
 class ArrayOfVehicleLocationServicesOfferedTypeOnLocationService(object):
-    on_location_service: List[
+    on_location_service: list[
         "ArrayOfVehicleLocationServicesOfferedTypeOnLocationService.OnLocationService"
     ] = field(
         default_factory=list,
@@ -5328,7 +5322,7 @@ class ArrayOfVehicleLocationServicesOfferedTypeOnLocationService(object):
 
     @dataclass
     class OnLocationService(object):
-        on_loc_service_desc: Optional[FormattedTextType] = field(
+        on_loc_service_desc: FormattedTextType | None = field(
             default=None,
             metadata={
                 "name": "OnLocServiceDesc",
@@ -5336,7 +5330,7 @@ class ArrayOfVehicleLocationServicesOfferedTypeOnLocationService(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        operation_schedules: Optional[OperationSchedulesType] = field(
+        operation_schedules: OperationSchedulesType | None = field(
             default=None,
             metadata={
                 "name": "OperationSchedules",
@@ -5344,9 +5338,7 @@ class ArrayOfVehicleLocationServicesOfferedTypeOnLocationService(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        on_loc_service_charges: Optional[
-            ArrayOfVehicleLocationServicesOfferedTypeOnLocationServiceOnLocServiceCharge
-        ] = field(
+        on_loc_service_charges: ArrayOfVehicleLocationServicesOfferedTypeOnLocationServiceOnLocServiceCharge | None = field(
             default=None,
             metadata={
                 "name": "OnLocServiceCharges",
@@ -5354,7 +5346,7 @@ class ArrayOfVehicleLocationServicesOfferedTypeOnLocationService(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        type: Optional[OnLocationServiceIdType] = field(
+        type: OnLocationServiceIdType | None = field(
             default=None,
             metadata={
                 "name": "Type",
@@ -5366,7 +5358,7 @@ class ArrayOfVehicleLocationServicesOfferedTypeOnLocationService(object):
 
 @dataclass
 class ArrayOfVehicleLocationServicesOfferedTypeSpecialEquipment(object):
-    special_equipment: List[
+    special_equipment: list[
         "ArrayOfVehicleLocationServicesOfferedTypeSpecialEquipment.SpecialEquipment"
     ] = field(
         default_factory=list,
@@ -5379,7 +5371,7 @@ class ArrayOfVehicleLocationServicesOfferedTypeSpecialEquipment(object):
 
     @dataclass
     class SpecialEquipment(object):
-        equip_desc: Optional[FormattedTextType] = field(
+        equip_desc: FormattedTextType | None = field(
             default=None,
             metadata={
                 "name": "EquipDesc",
@@ -5387,9 +5379,7 @@ class ArrayOfVehicleLocationServicesOfferedTypeSpecialEquipment(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        equip_charges: Optional[
-            ArrayOfVehicleLocationServicesOfferedTypeSpecialEquipmentEquipCharge
-        ] = field(
+        equip_charges: ArrayOfVehicleLocationServicesOfferedTypeSpecialEquipmentEquipCharge | None = field(
             default=None,
             metadata={
                 "name": "EquipCharges",
@@ -5397,7 +5387,7 @@ class ArrayOfVehicleLocationServicesOfferedTypeSpecialEquipment(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        type: Optional[str] = field(
+        type: str | None = field(
             default=None,
             metadata={
                 "name": "Type",
@@ -5408,7 +5398,7 @@ class ArrayOfVehicleLocationServicesOfferedTypeSpecialEquipment(object):
 
 @dataclass
 class ArrayOfVehicleLocationVehiclesTypeVehicleInfo(object):
-    vehicle_info: List["ArrayOfVehicleLocationVehiclesTypeVehicleInfo.VehicleInfo"] = (
+    vehicle_info: list["ArrayOfVehicleLocationVehiclesTypeVehicleInfo.VehicleInfo"] = (
         field(
             default_factory=list,
             metadata={
@@ -5421,7 +5411,7 @@ class ArrayOfVehicleLocationVehiclesTypeVehicleInfo(object):
 
     @dataclass
     class VehicleInfo(FormattedTextType):
-        type: Optional[LocationDetailVehicleInfoType] = field(
+        type: LocationDetailVehicleInfoType | None = field(
             default=None,
             metadata={
                 "name": "Type",
@@ -5433,7 +5423,7 @@ class ArrayOfVehicleLocationVehiclesTypeVehicleInfo(object):
 
 @dataclass
 class ArrayOfVehicleReservationSummaryType(object):
-    veh_res_summary: List[VehicleReservationSummaryType] = field(
+    veh_res_summary: list[VehicleReservationSummaryType] = field(
         default_factory=list,
         metadata={
             "name": "VehResSummary",
@@ -5445,7 +5435,7 @@ class ArrayOfVehicleReservationSummaryType(object):
 
 @dataclass
 class OffLocationServicePricedType(object):
-    off_loc_service: Optional[OffLocationServiceType] = field(
+    off_loc_service: OffLocationServiceType | None = field(
         default=None,
         metadata={
             "name": "OffLocService",
@@ -5453,7 +5443,7 @@ class OffLocationServicePricedType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    charge: Optional[VehicleChargeType] = field(
+    charge: VehicleChargeType | None = field(
         default=None,
         metadata={
             "name": "Charge",
@@ -5465,7 +5455,7 @@ class OffLocationServicePricedType(object):
 
 @dataclass
 class PaymentFormType(object):
-    payment_card: Optional[PaymentCardType] = field(
+    payment_card: PaymentCardType | None = field(
         default=None,
         metadata={
             "name": "PaymentCard",
@@ -5473,7 +5463,7 @@ class PaymentFormType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    bank_acct: Optional[BankAcctType] = field(
+    bank_acct: BankAcctType | None = field(
         default=None,
         metadata={
             "name": "BankAcct",
@@ -5481,7 +5471,7 @@ class PaymentFormType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    direct_bill: Optional[DirectBillType] = field(
+    direct_bill: DirectBillType | None = field(
         default=None,
         metadata={
             "name": "DirectBill",
@@ -5521,82 +5511,82 @@ class PaymentFormType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    share_synch_ind: Optional[PaymentFormTypeShareSynchInd] = field(
+    share_synch_ind: PaymentFormTypeShareSynchInd | None = field(
         default=None,
         metadata={
             "name": "ShareSynchInd",
             "type": "Attribute",
         },
     )
-    share_market_ind: Optional[PaymentFormTypeShareMarketInd] = field(
+    share_market_ind: PaymentFormTypeShareMarketInd | None = field(
         default=None,
         metadata={
             "name": "ShareMarketInd",
             "type": "Attribute",
         },
     )
-    cost_center_id: Optional[str] = field(
+    cost_center_id: str | None = field(
         default=None,
         metadata={
             "name": "CostCenterID",
             "type": "Attribute",
         },
     )
-    rph: Optional[str] = field(
+    rph: str | None = field(
         default=None,
         metadata={
             "name": "RPH",
             "type": "Attribute",
         },
     )
-    payment_transaction_type_code: Optional[
-        PaymentFormTypePaymentTransactionTypeCode
-    ] = field(
-        default=None,
-        metadata={
-            "name": "PaymentTransactionTypeCode",
-            "type": "Attribute",
-        },
+    payment_transaction_type_code: PaymentFormTypePaymentTransactionTypeCode | None = (
+        field(
+            default=None,
+            metadata={
+                "name": "PaymentTransactionTypeCode",
+                "type": "Attribute",
+            },
+        )
     )
 
     @dataclass
     class Voucher(object):
-        series_code: Optional[str] = field(
+        series_code: str | None = field(
             default=None,
             metadata={
                 "name": "SeriesCode",
                 "type": "Attribute",
             },
         )
-        billing_number: Optional[str] = field(
+        billing_number: str | None = field(
             default=None,
             metadata={
                 "name": "BillingNumber",
                 "type": "Attribute",
             },
         )
-        supplier_identifier: Optional[str] = field(
+        supplier_identifier: str | None = field(
             default=None,
             metadata={
                 "name": "SupplierIdentifier",
                 "type": "Attribute",
             },
         )
-        identifier: Optional[str] = field(
+        identifier: str | None = field(
             default=None,
             metadata={
                 "name": "Identifier",
                 "type": "Attribute",
             },
         )
-        value_type: Optional[str] = field(
+        value_type: str | None = field(
             default=None,
             metadata={
                 "name": "ValueType",
                 "type": "Attribute",
             },
         )
-        electronic_indicator: Optional[bool] = field(
+        electronic_indicator: bool | None = field(
             default=None,
             metadata={
                 "name": "ElectronicIndicator",
@@ -5606,7 +5596,7 @@ class PaymentFormType(object):
 
     @dataclass
     class LoyaltyRedemption(object):
-        loyalty_certificate: List[
+        loyalty_certificate: list[
             "PaymentFormType.LoyaltyRedemption.LoyaltyCertificate"
         ] = field(
             default_factory=list,
@@ -5616,35 +5606,35 @@ class PaymentFormType(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        certificate_number: Optional[str] = field(
+        certificate_number: str | None = field(
             default=None,
             metadata={
                 "name": "CertificateNumber",
                 "type": "Attribute",
             },
         )
-        member_number: Optional[str] = field(
+        member_number: str | None = field(
             default=None,
             metadata={
                 "name": "MemberNumber",
                 "type": "Attribute",
             },
         )
-        program_name: Optional[str] = field(
+        program_name: str | None = field(
             default=None,
             metadata={
                 "name": "ProgramName",
                 "type": "Attribute",
             },
         )
-        promotion_code: Optional[str] = field(
+        promotion_code: str | None = field(
             default=None,
             metadata={
                 "name": "PromotionCode",
                 "type": "Attribute",
             },
         )
-        promotion_vendor_code: List[str] = field(
+        promotion_vendor_code: list[str] = field(
             default_factory=list,
             metadata={
                 "name": "PromotionVendorCode",
@@ -5652,7 +5642,7 @@ class PaymentFormType(object):
                 "tokens": True,
             },
         )
-        redemption_quantity: Optional[int] = field(
+        redemption_quantity: int | None = field(
             default=None,
             metadata={
                 "name": "RedemptionQuantity",
@@ -5662,28 +5652,28 @@ class PaymentFormType(object):
 
         @dataclass
         class LoyaltyCertificate(object):
-            id_context: Optional[str] = field(
+            id_context: str | None = field(
                 default=None,
                 metadata={
                     "name": "ID_Context",
                     "type": "Attribute",
                 },
             )
-            nmbr_of_nights: Optional[int] = field(
+            nmbr_of_nights: int | None = field(
                 default=None,
                 metadata={
                     "name": "NmbrOfNights",
                     "type": "Attribute",
                 },
             )
-            format: Optional[LoyaltyCertificateFormat] = field(
+            format: LoyaltyCertificateFormat | None = field(
                 default=None,
                 metadata={
                     "name": "Format",
                     "type": "Attribute",
                 },
             )
-            status: Optional[str] = field(
+            status: str | None = field(
                 default=None,
                 metadata={
                     "name": "Status",
@@ -5693,7 +5683,7 @@ class PaymentFormType(object):
 
     @dataclass
     class MiscChargeOrder(object):
-        ticket_number: Optional[str] = field(
+        ticket_number: str | None = field(
             default=None,
             metadata={
                 "name": "TicketNumber",
@@ -5727,35 +5717,35 @@ class VehCancelResRq(object):
         name = "VehCancelResRQ"
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
-    pos: Optional[ArrayOfSourceType] = field(
+    pos: ArrayOfSourceType | None = field(
         default=None,
         metadata={
             "name": "POS",
             "type": "Element",
         },
     )
-    veh_cancel_rqcore: Optional[CancelInfoRqtype] = field(
+    veh_cancel_rqcore: CancelInfoRqtype | None = field(
         default=None,
         metadata={
             "name": "VehCancelRQCore",
             "type": "Element",
         },
     )
-    veh_cancel_rqinfo: Optional[VehicleCancelRqadditionalInfoType] = field(
+    veh_cancel_rqinfo: VehicleCancelRqadditionalInfoType | None = field(
         default=None,
         metadata={
             "name": "VehCancelRQInfo",
             "type": "Element",
         },
     )
-    echo_token: Optional[str] = field(
+    echo_token: str | None = field(
         default=None,
         metadata={
             "name": "EchoToken",
             "type": "Attribute",
         },
     )
-    time_stamp: Optional[XmlDateTime] = field(
+    time_stamp: XmlDateTime | None = field(
         default=None,
         metadata={
             "name": "TimeStamp",
@@ -5769,7 +5759,7 @@ class VehCancelResRq(object):
             "type": "Attribute",
         },
     )
-    version: Optional[Decimal] = field(
+    version: Decimal | None = field(
         default=None,
         metadata={
             "name": "Version",
@@ -5777,35 +5767,35 @@ class VehCancelResRq(object):
             "required": True,
         },
     )
-    transaction_identifier: Optional[str] = field(
+    transaction_identifier: str | None = field(
         default=None,
         metadata={
             "name": "TransactionIdentifier",
             "type": "Attribute",
         },
     )
-    sequence_nmbr: Optional[int] = field(
+    sequence_nmbr: int | None = field(
         default=None,
         metadata={
             "name": "SequenceNmbr",
             "type": "Attribute",
         },
     )
-    transaction_status_code: Optional[VehCancelResRqTransactionStatusCode] = field(
+    transaction_status_code: VehCancelResRqTransactionStatusCode | None = field(
         default=None,
         metadata={
             "name": "TransactionStatusCode",
             "type": "Attribute",
         },
     )
-    retransmission_indicator: Optional[bool] = field(
+    retransmission_indicator: bool | None = field(
         default=None,
         metadata={
             "name": "RetransmissionIndicator",
             "type": "Attribute",
         },
     )
-    req_resp_version: Optional[str] = field(
+    req_resp_version: str | None = field(
         default=None,
         metadata={
             "name": "ReqRespVersion",
@@ -5820,7 +5810,7 @@ class VehLocDetailRq(object):
         name = "VehLocDetailRQ"
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
-    pos: Optional[ArrayOfSourceType] = field(
+    pos: ArrayOfSourceType | None = field(
         default=None,
         metadata={
             "name": "POS",
@@ -5834,7 +5824,7 @@ class VehLocDetailRq(object):
             "type": "Element",
         },
     )
-    vendor: Optional[CompanyNameType] = field(
+    vendor: CompanyNameType | None = field(
         default=None,
         metadata={
             "name": "Vendor",
@@ -5855,28 +5845,28 @@ class VehLocDetailRq(object):
             "type": "Element",
         },
     )
-    keyword: List["VehLocDetailRq.Keyword"] = field(
+    keyword: list["VehLocDetailRq.Keyword"] = field(
         default_factory=list,
         metadata={
             "name": "Keyword",
             "type": "Element",
         },
     )
-    tpa_extensions: Optional[TpaExtensionsType] = field(
+    tpa_extensions: TpaExtensionsType | None = field(
         default=None,
         metadata={
             "name": "TPA_Extensions",
             "type": "Element",
         },
     )
-    echo_token: Optional[str] = field(
+    echo_token: str | None = field(
         default=None,
         metadata={
             "name": "EchoToken",
             "type": "Attribute",
         },
     )
-    time_stamp: Optional[XmlDateTime] = field(
+    time_stamp: XmlDateTime | None = field(
         default=None,
         metadata={
             "name": "TimeStamp",
@@ -5890,7 +5880,7 @@ class VehLocDetailRq(object):
             "type": "Attribute",
         },
     )
-    version: Optional[Decimal] = field(
+    version: Decimal | None = field(
         default=None,
         metadata={
             "name": "Version",
@@ -5898,35 +5888,35 @@ class VehLocDetailRq(object):
             "required": True,
         },
     )
-    transaction_identifier: Optional[str] = field(
+    transaction_identifier: str | None = field(
         default=None,
         metadata={
             "name": "TransactionIdentifier",
             "type": "Attribute",
         },
     )
-    sequence_nmbr: Optional[int] = field(
+    sequence_nmbr: int | None = field(
         default=None,
         metadata={
             "name": "SequenceNmbr",
             "type": "Attribute",
         },
     )
-    transaction_status_code: Optional[VehLocDetailRqTransactionStatusCode] = field(
+    transaction_status_code: VehLocDetailRqTransactionStatusCode | None = field(
         default=None,
         metadata={
             "name": "TransactionStatusCode",
             "type": "Attribute",
         },
     )
-    retransmission_indicator: Optional[bool] = field(
+    retransmission_indicator: bool | None = field(
         default=None,
         metadata={
             "name": "RetransmissionIndicator",
             "type": "Attribute",
         },
     )
-    req_resp_version: Optional[str] = field(
+    req_resp_version: str | None = field(
         default=None,
         metadata={
             "name": "ReqRespVersion",
@@ -5936,7 +5926,7 @@ class VehLocDetailRq(object):
 
     @dataclass
     class Location(LocationType):
-        extended_location_code: Optional[str] = field(
+        extended_location_code: str | None = field(
             default=None,
             metadata={
                 "name": "ExtendedLocationCode",
@@ -5998,14 +5988,14 @@ class VehLocDetailRq(object):
 
     @dataclass
     class Date(object):
-        pick_up_date_time: Optional[str] = field(
+        pick_up_date_time: str | None = field(
             default=None,
             metadata={
                 "name": "PickUpDateTime",
                 "type": "Attribute",
             },
         )
-        return_date_time: Optional[str] = field(
+        return_date_time: str | None = field(
             default=None,
             metadata={
                 "name": "ReturnDateTime",
@@ -6015,7 +6005,7 @@ class VehLocDetailRq(object):
 
     @dataclass
     class Keyword(object):
-        code: Optional[str] = field(
+        code: str | None = field(
             default=None,
             metadata={
                 "name": "Code",
@@ -6030,42 +6020,42 @@ class VehLocationSearchRq(object):
         name = "VehLocationSearchRQ"
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
-    pos: Optional[ArrayOfSourceType] = field(
+    pos: ArrayOfSourceType | None = field(
         default=None,
         metadata={
             "name": "POS",
             "type": "Element",
         },
     )
-    veh_loc_search_criterion: List[ItemSearchCriterionType] = field(
+    veh_loc_search_criterion: list[ItemSearchCriterionType] = field(
         default_factory=list,
         metadata={
             "name": "VehLocSearchCriterion",
             "type": "Element",
         },
     )
-    vendor: Optional[CompanyNameType] = field(
+    vendor: CompanyNameType | None = field(
         default=None,
         metadata={
             "name": "Vendor",
             "type": "Element",
         },
     )
-    tpa_extensions: Optional[TpaExtensionsType] = field(
+    tpa_extensions: TpaExtensionsType | None = field(
         default=None,
         metadata={
             "name": "TPA_Extensions",
             "type": "Element",
         },
     )
-    echo_token: Optional[str] = field(
+    echo_token: str | None = field(
         default=None,
         metadata={
             "name": "EchoToken",
             "type": "Attribute",
         },
     )
-    time_stamp: Optional[XmlDateTime] = field(
+    time_stamp: XmlDateTime | None = field(
         default=None,
         metadata={
             "name": "TimeStamp",
@@ -6079,49 +6069,49 @@ class VehLocationSearchRq(object):
             "type": "Attribute",
         },
     )
-    version: Optional[str] = field(
+    version: str | None = field(
         default=None,
         metadata={
             "name": "Version",
             "type": "Attribute",
         },
     )
-    transaction_identifier: Optional[str] = field(
+    transaction_identifier: str | None = field(
         default=None,
         metadata={
             "name": "TransactionIdentifier",
             "type": "Attribute",
         },
     )
-    sequence_nmbr: Optional[int] = field(
+    sequence_nmbr: int | None = field(
         default=None,
         metadata={
             "name": "SequenceNmbr",
             "type": "Attribute",
         },
     )
-    transaction_status_code: Optional[VehLocationSearchRqTransactionStatusCode] = field(
+    transaction_status_code: VehLocationSearchRqTransactionStatusCode | None = field(
         default=None,
         metadata={
             "name": "TransactionStatusCode",
             "type": "Attribute",
         },
     )
-    retransmission_indicator: Optional[bool] = field(
+    retransmission_indicator: bool | None = field(
         default=None,
         metadata={
             "name": "RetransmissionIndicator",
             "type": "Attribute",
         },
     )
-    max_responses: Optional[int] = field(
+    max_responses: int | None = field(
         default=None,
         metadata={
             "name": "MaxResponses",
             "type": "Attribute",
         },
     )
-    req_resp_version: Optional[str] = field(
+    req_resp_version: str | None = field(
         default=None,
         metadata={
             "name": "ReqRespVersion",
@@ -6143,14 +6133,14 @@ class VehRateRuleRq(object):
         name = "VehRateRuleRQ"
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
-    pos: Optional[ArrayOfSourceType] = field(
+    pos: ArrayOfSourceType | None = field(
         default=None,
         metadata={
             "name": "POS",
             "type": "Element",
         },
     )
-    reference: Optional[UniqueIdType] = field(
+    reference: UniqueIdType | None = field(
         default=None,
         metadata={
             "name": "Reference",
@@ -6164,14 +6154,14 @@ class VehRateRuleRq(object):
             "type": "Element",
         },
     )
-    echo_token: Optional[str] = field(
+    echo_token: str | None = field(
         default=None,
         metadata={
             "name": "EchoToken",
             "type": "Attribute",
         },
     )
-    time_stamp: Optional[XmlDateTime] = field(
+    time_stamp: XmlDateTime | None = field(
         default=None,
         metadata={
             "name": "TimeStamp",
@@ -6185,7 +6175,7 @@ class VehRateRuleRq(object):
             "type": "Attribute",
         },
     )
-    version: Optional[Decimal] = field(
+    version: Decimal | None = field(
         default=None,
         metadata={
             "name": "Version",
@@ -6193,56 +6183,56 @@ class VehRateRuleRq(object):
             "required": True,
         },
     )
-    transaction_identifier: Optional[str] = field(
+    transaction_identifier: str | None = field(
         default=None,
         metadata={
             "name": "TransactionIdentifier",
             "type": "Attribute",
         },
     )
-    sequence_nmbr: Optional[int] = field(
+    sequence_nmbr: int | None = field(
         default=None,
         metadata={
             "name": "SequenceNmbr",
             "type": "Attribute",
         },
     )
-    transaction_status_code: Optional[VehRateRuleRqTransactionStatusCode] = field(
+    transaction_status_code: VehRateRuleRqTransactionStatusCode | None = field(
         default=None,
         metadata={
             "name": "TransactionStatusCode",
             "type": "Attribute",
         },
     )
-    retransmission_indicator: Optional[bool] = field(
+    retransmission_indicator: bool | None = field(
         default=None,
         metadata={
             "name": "RetransmissionIndicator",
             "type": "Attribute",
         },
     )
-    company_short_name: Optional[str] = field(
+    company_short_name: str | None = field(
         default=None,
         metadata={
             "name": "CompanyShortName",
             "type": "Attribute",
         },
     )
-    travel_sector: Optional[str] = field(
+    travel_sector: str | None = field(
         default=None,
         metadata={
             "name": "TravelSector",
             "type": "Attribute",
         },
     )
-    code: Optional[str] = field(
+    code: str | None = field(
         default=None,
         metadata={
             "name": "Code",
             "type": "Attribute",
         },
     )
-    code_context: Optional[str] = field(
+    code_context: str | None = field(
         default=None,
         metadata={
             "name": "CodeContext",
@@ -6252,30 +6242,28 @@ class VehRateRuleRq(object):
 
     @dataclass
     class RentalInfo(object):
-        veh_rental_core: Optional[VehicleRentalCoreType] = field(
+        veh_rental_core: VehicleRentalCoreType | None = field(
             default=None,
             metadata={
                 "name": "VehRentalCore",
                 "type": "Element",
             },
         )
-        vehicle_info: Optional[VehiclePrefType] = field(
+        vehicle_info: VehiclePrefType | None = field(
             default=None,
             metadata={
                 "name": "VehicleInfo",
                 "type": "Element",
             },
         )
-        special_equip_prefs: Optional[
-            ArrayOfOtaVehRateRuleRqrentalInfoSpecialEquipPref
-        ] = field(
+        special_equip_prefs: ArrayOfOtaVehRateRuleRqrentalInfoSpecialEquipPref | None = field(
             default=None,
             metadata={
                 "name": "SpecialEquipPrefs",
                 "type": "Element",
             },
         )
-        cust_loyalty: List["VehRateRuleRq.RentalInfo.CustLoyalty"] = field(
+        cust_loyalty: list["VehRateRuleRq.RentalInfo.CustLoyalty"] = field(
             default_factory=list,
             metadata={
                 "name": "CustLoyalty",
@@ -6289,35 +6277,35 @@ class VehRateRuleRq(object):
                 "type": "Element",
             },
         )
-        off_loc_service: Optional[OffLocationServiceType] = field(
+        off_loc_service: OffLocationServiceType | None = field(
             default=None,
             metadata={
                 "name": "OffLocService",
                 "type": "Element",
             },
         )
-        arrival_details: Optional[VehicleArrivalDetailsType] = field(
+        arrival_details: VehicleArrivalDetailsType | None = field(
             default=None,
             metadata={
                 "name": "ArrivalDetails",
                 "type": "Element",
             },
         )
-        tour_info: Optional[VehicleTourInfoType] = field(
+        tour_info: VehicleTourInfoType | None = field(
             default=None,
             metadata={
                 "name": "TourInfo",
                 "type": "Element",
             },
         )
-        customer_id: Optional[UniqueIdType] = field(
+        customer_id: UniqueIdType | None = field(
             default=None,
             metadata={
                 "name": "CustomerID",
                 "type": "Element",
             },
         )
-        tpa_extensions: Optional[TpaExtensionsType] = field(
+        tpa_extensions: TpaExtensionsType | None = field(
             default=None,
             metadata={
                 "name": "TPA_Extensions",
@@ -6327,35 +6315,35 @@ class VehRateRuleRq(object):
 
         @dataclass
         class CustLoyalty(object):
-            program_id: Optional[str] = field(
+            program_id: str | None = field(
                 default=None,
                 metadata={
                     "name": "ProgramID",
                     "type": "Attribute",
                 },
             )
-            membership_id: Optional[str] = field(
+            membership_id: str | None = field(
                 default=None,
                 metadata={
                     "name": "MembershipID",
                     "type": "Attribute",
                 },
             )
-            travel_sector: Optional[str] = field(
+            travel_sector: str | None = field(
                 default=None,
                 metadata={
                     "name": "TravelSector",
                     "type": "Attribute",
                 },
             )
-            rph: Optional[str] = field(
+            rph: str | None = field(
                 default=None,
                 metadata={
                     "name": "RPH",
                     "type": "Attribute",
                 },
             )
-            vendor_code: List[str] = field(
+            vendor_code: list[str] = field(
                 default_factory=list,
                 metadata={
                     "name": "VendorCode",
@@ -6366,35 +6354,35 @@ class VehRateRuleRq(object):
 
         @dataclass
         class RateQualifier(object):
-            travel_purpose: Optional[str] = field(
+            travel_purpose: str | None = field(
                 default=None,
                 metadata={
                     "name": "TravelPurpose",
                     "type": "Attribute",
                 },
             )
-            rate_category: Optional[str] = field(
+            rate_category: str | None = field(
                 default=None,
                 metadata={
                     "name": "RateCategory",
                     "type": "Attribute",
                 },
             )
-            corp_discount_nmbr: Optional[str] = field(
+            corp_discount_nmbr: str | None = field(
                 default=None,
                 metadata={
                     "name": "CorpDiscountNmbr",
                     "type": "Attribute",
                 },
             )
-            rate_qualifier: Optional[str] = field(
+            rate_qualifier: str | None = field(
                 default=None,
                 metadata={
                     "name": "RateQualifier",
                     "type": "Attribute",
                 },
             )
-            rate_period: Optional[OtaVehRateRuleRqrentalInfoRateQualifierRatePeriod] = (
+            rate_period: OtaVehRateRuleRqrentalInfoRateQualifierRatePeriod | None = (
                 field(
                     default=None,
                     metadata={
@@ -6403,28 +6391,28 @@ class VehRateRuleRq(object):
                     },
                 )
             )
-            guaranteed_ind: Optional[bool] = field(
+            guaranteed_ind: bool | None = field(
                 default=None,
                 metadata={
                     "name": "GuaranteedInd",
                     "type": "Attribute",
                 },
             )
-            rate_authorization_code: Optional[str] = field(
+            rate_authorization_code: str | None = field(
                 default=None,
                 metadata={
                     "name": "RateAuthorizationCode",
                     "type": "Attribute",
                 },
             )
-            vendor_rate_id: Optional[str] = field(
+            vendor_rate_id: str | None = field(
                 default=None,
                 metadata={
                     "name": "VendorRateID",
                     "type": "Attribute",
                 },
             )
-            rate_modified_ind: Optional[bool] = field(
+            rate_modified_ind: bool | None = field(
                 default=None,
                 metadata={
                     "name": "RateModifiedInd",
@@ -6439,35 +6427,35 @@ class VehRetResRq(object):
         name = "VehRetResRQ"
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
-    pos: Optional[ArrayOfSourceType] = field(
+    pos: ArrayOfSourceType | None = field(
         default=None,
         metadata={
             "name": "POS",
             "type": "Element",
         },
     )
-    veh_ret_res_rqcore: Optional[VehicleRetrieveResRqcoreType] = field(
+    veh_ret_res_rqcore: VehicleRetrieveResRqcoreType | None = field(
         default=None,
         metadata={
             "name": "VehRetResRQCore",
             "type": "Element",
         },
     )
-    veh_ret_res_rqinfo: Optional[VehicleRetrieveResRqadditionalInfoType] = field(
+    veh_ret_res_rqinfo: VehicleRetrieveResRqadditionalInfoType | None = field(
         default=None,
         metadata={
             "name": "VehRetResRQInfo",
             "type": "Element",
         },
     )
-    echo_token: Optional[str] = field(
+    echo_token: str | None = field(
         default=None,
         metadata={
             "name": "EchoToken",
             "type": "Attribute",
         },
     )
-    time_stamp: Optional[XmlDateTime] = field(
+    time_stamp: XmlDateTime | None = field(
         default=None,
         metadata={
             "name": "TimeStamp",
@@ -6481,7 +6469,7 @@ class VehRetResRq(object):
             "type": "Attribute",
         },
     )
-    version: Optional[Decimal] = field(
+    version: Decimal | None = field(
         default=None,
         metadata={
             "name": "Version",
@@ -6489,35 +6477,35 @@ class VehRetResRq(object):
             "required": True,
         },
     )
-    transaction_identifier: Optional[str] = field(
+    transaction_identifier: str | None = field(
         default=None,
         metadata={
             "name": "TransactionIdentifier",
             "type": "Attribute",
         },
     )
-    sequence_nmbr: Optional[int] = field(
+    sequence_nmbr: int | None = field(
         default=None,
         metadata={
             "name": "SequenceNmbr",
             "type": "Attribute",
         },
     )
-    transaction_status_code: Optional[VehRetResRqTransactionStatusCode] = field(
+    transaction_status_code: VehRetResRqTransactionStatusCode | None = field(
         default=None,
         metadata={
             "name": "TransactionStatusCode",
             "type": "Attribute",
         },
     )
-    retransmission_indicator: Optional[bool] = field(
+    retransmission_indicator: bool | None = field(
         default=None,
         metadata={
             "name": "RetransmissionIndicator",
             "type": "Attribute",
         },
     )
-    req_resp_version: Optional[str] = field(
+    req_resp_version: str | None = field(
         default=None,
         metadata={
             "name": "ReqRespVersion",
@@ -6528,7 +6516,7 @@ class VehRetResRq(object):
 
 @dataclass
 class VehicleAvailAdditionalInfoType(object):
-    priced_coverages: Optional[ArrayOfCoveragePricedType] = field(
+    priced_coverages: ArrayOfCoveragePricedType | None = field(
         default=None,
         metadata={
             "name": "PricedCoverages",
@@ -6536,7 +6524,7 @@ class VehicleAvailAdditionalInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    payment_rules: Optional[ArrayOfMonetaryRuleType] = field(
+    payment_rules: ArrayOfMonetaryRuleType | None = field(
         default=None,
         metadata={
             "name": "PaymentRules",
@@ -6544,7 +6532,7 @@ class VehicleAvailAdditionalInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    tpa_extensions: Optional[TpaExtensionsType] = field(
+    tpa_extensions: TpaExtensionsType | None = field(
         default=None,
         metadata={
             "name": "TPA_Extensions",
@@ -6552,7 +6540,7 @@ class VehicleAvailAdditionalInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    chargeable_period: Optional[XmlDuration] = field(
+    chargeable_period: XmlDuration | None = field(
         default=None,
         metadata={
             "name": "ChargeablePeriod",
@@ -6566,7 +6554,7 @@ class VehicleAvailRqcoreType(object):
     class Meta(object):
         name = "VehicleAvailRQCoreType"
 
-    rate_query_parameter_type: Optional[str] = field(
+    rate_query_parameter_type: str | None = field(
         default=None,
         metadata={
             "name": "RateQueryParameterType",
@@ -6574,7 +6562,7 @@ class VehicleAvailRqcoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    veh_rental_core: Optional[VehicleRentalCoreType] = field(
+    veh_rental_core: VehicleRentalCoreType | None = field(
         default=None,
         metadata={
             "name": "VehRentalCore",
@@ -6590,7 +6578,7 @@ class VehicleAvailRqcoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    veh_prefs: Optional[ArrayOfVehicleAvailRqcoreTypeVehPref] = field(
+    veh_prefs: ArrayOfVehicleAvailRqcoreTypeVehPref | None = field(
         default=None,
         metadata={
             "name": "VehPrefs",
@@ -6598,7 +6586,7 @@ class VehicleAvailRqcoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    driver_type: List["VehicleAvailRqcoreType.DriverType"] = field(
+    driver_type: list["VehicleAvailRqcoreType.DriverType"] = field(
         default_factory=list,
         metadata={
             "name": "DriverType",
@@ -6606,7 +6594,7 @@ class VehicleAvailRqcoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    rate_qualifier: List["VehicleAvailRqcoreType.RateQualifier"] = field(
+    rate_qualifier: list["VehicleAvailRqcoreType.RateQualifier"] = field(
         default_factory=list,
         metadata={
             "name": "RateQualifier",
@@ -6622,17 +6610,15 @@ class VehicleAvailRqcoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    special_equip_prefs: Optional[ArrayOfVehicleAvailRqcoreTypeSpecialEquipPref] = (
-        field(
-            default=None,
-            metadata={
-                "name": "SpecialEquipPrefs",
-                "type": "Element",
-                "namespace": "http://www.opentravel.org/OTA/2003/05",
-            },
-        )
+    special_equip_prefs: ArrayOfVehicleAvailRqcoreTypeSpecialEquipPref | None = field(
+        default=None,
+        metadata={
+            "name": "SpecialEquipPrefs",
+            "type": "Element",
+            "namespace": "http://www.opentravel.org/OTA/2003/05",
+        },
     )
-    tpa_extensions: Optional[TpaExtensionsType] = field(
+    tpa_extensions: TpaExtensionsType | None = field(
         default=None,
         metadata={
             "name": "TPA_Extensions",
@@ -6640,7 +6626,7 @@ class VehicleAvailRqcoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    rate_query_type: Optional[RateQueryType] = field(
+    rate_query_type: RateQueryType | None = field(
         default=None,
         metadata={
             "name": "RateQueryType",
@@ -6648,14 +6634,14 @@ class VehicleAvailRqcoreType(object):
             "required": True,
         },
     )
-    status: Optional[InventoryStatusType] = field(
+    status: InventoryStatusType | None = field(
         default=None,
         metadata={
             "name": "Status",
             "type": "Attribute",
         },
     )
-    target_source: Optional[str] = field(
+    target_source: str | None = field(
         default=None,
         metadata={
             "name": "TargetSource",
@@ -6665,7 +6651,7 @@ class VehicleAvailRqcoreType(object):
 
     @dataclass
     class VendorPrefs(object):
-        vendor_pref: List["VehicleAvailRqcoreType.VendorPrefs.VendorPref"] = field(
+        vendor_pref: list["VehicleAvailRqcoreType.VendorPrefs.VendorPref"] = field(
             default_factory=list,
             metadata={
                 "name": "VendorPref",
@@ -6673,14 +6659,14 @@ class VehicleAvailRqcoreType(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        participation_level_code: Optional[str] = field(
+        participation_level_code: str | None = field(
             default=None,
             metadata={
                 "name": "ParticipationLevelCode",
                 "type": "Attribute",
             },
         )
-        location_category: Optional[str] = field(
+        location_category: str | None = field(
             default=None,
             metadata={
                 "name": "LocationCategory",
@@ -6690,7 +6676,7 @@ class VehicleAvailRqcoreType(object):
 
         @dataclass
         class VendorPref(CompanyNamePrefType):
-            corp_discount_nmbr: Optional[str] = field(
+            corp_discount_nmbr: str | None = field(
                 default=None,
                 metadata={
                     "name": "CorpDiscountNmbr",
@@ -6700,28 +6686,28 @@ class VehicleAvailRqcoreType(object):
 
     @dataclass
     class DriverType(object):
-        age: Optional[int] = field(
+        age: int | None = field(
             default=None,
             metadata={
                 "name": "Age",
                 "type": "Attribute",
             },
         )
-        code: Optional[str] = field(
+        code: str | None = field(
             default=None,
             metadata={
                 "name": "Code",
                 "type": "Attribute",
             },
         )
-        code_context: Optional[str] = field(
+        code_context: str | None = field(
             default=None,
             metadata={
                 "name": "CodeContext",
                 "type": "Attribute",
             },
         )
-        uri: Optional[str] = field(
+        uri: str | None = field(
             default=None,
             metadata={
                 "name": "URI",
@@ -6731,42 +6717,42 @@ class VehicleAvailRqcoreType(object):
 
     @dataclass
     class RateQualifier(object):
-        travel_purpose: Optional[str] = field(
+        travel_purpose: str | None = field(
             default=None,
             metadata={
                 "name": "TravelPurpose",
                 "type": "Attribute",
             },
         )
-        rate_category: Optional[str] = field(
+        rate_category: str | None = field(
             default=None,
             metadata={
                 "name": "RateCategory",
                 "type": "Attribute",
             },
         )
-        corp_discount_nmbr: Optional[str] = field(
+        corp_discount_nmbr: str | None = field(
             default=None,
             metadata={
                 "name": "CorpDiscountNmbr",
                 "type": "Attribute",
             },
         )
-        rate_qualifier: Optional[str] = field(
+        rate_qualifier: str | None = field(
             default=None,
             metadata={
                 "name": "RateQualifier",
                 "type": "Attribute",
             },
         )
-        rate_period: Optional[VehicleAvailRqcoreTypeRateQualifierRatePeriod] = field(
+        rate_period: VehicleAvailRqcoreTypeRateQualifierRatePeriod | None = field(
             default=None,
             metadata={
                 "name": "RatePeriod",
                 "type": "Attribute",
             },
         )
-        guaranteed_ind: Optional[bool] = field(
+        guaranteed_ind: bool | None = field(
             default=None,
             metadata={
                 "name": "GuaranteedInd",
@@ -6776,28 +6762,28 @@ class VehicleAvailRqcoreType(object):
 
     @dataclass
     class RateRange(object):
-        min_rate: Optional[Decimal] = field(
+        min_rate: Decimal | None = field(
             default=None,
             metadata={
                 "name": "MinRate",
                 "type": "Attribute",
             },
         )
-        max_rate: Optional[Decimal] = field(
+        max_rate: Decimal | None = field(
             default=None,
             metadata={
                 "name": "MaxRate",
                 "type": "Attribute",
             },
         )
-        fixed_rate: Optional[Decimal] = field(
+        fixed_rate: Decimal | None = field(
             default=None,
             metadata={
                 "name": "FixedRate",
                 "type": "Attribute",
             },
         )
-        rate_time_unit: Optional[TimeUnitType] = field(
+        rate_time_unit: TimeUnitType | None = field(
             default=None,
             metadata={
                 "name": "RateTimeUnit",
@@ -6842,7 +6828,7 @@ class VehicleLocationAdditionalFeesType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    tpa_extensions: Optional[TpaExtensionsType] = field(
+    tpa_extensions: TpaExtensionsType | None = field(
         default=None,
         metadata={
             "name": "TPA_Extensions",
@@ -6853,7 +6839,7 @@ class VehicleLocationAdditionalFeesType(object):
 
     @dataclass
     class Taxes(object):
-        tax: List["VehicleLocationAdditionalFeesType.Taxes.Tax"] = field(
+        tax: list["VehicleLocationAdditionalFeesType.Taxes.Tax"] = field(
             default_factory=list,
             metadata={
                 "name": "Tax",
@@ -6861,7 +6847,7 @@ class VehicleLocationAdditionalFeesType(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        info: Optional[FormattedTextType] = field(
+        info: FormattedTextType | None = field(
             default=None,
             metadata={
                 "name": "Info",
@@ -6869,21 +6855,21 @@ class VehicleLocationAdditionalFeesType(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        start: Optional[str] = field(
+        start: str | None = field(
             default=None,
             metadata={
                 "name": "Start",
                 "type": "Attribute",
             },
         )
-        duration: Optional[str] = field(
+        duration: str | None = field(
             default=None,
             metadata={
                 "name": "Duration",
                 "type": "Attribute",
             },
         )
-        end: Optional[str] = field(
+        end: str | None = field(
             default=None,
             metadata={
                 "name": "End",
@@ -6893,7 +6879,7 @@ class VehicleLocationAdditionalFeesType(object):
 
         @dataclass
         class Tax(object):
-            info: Optional[FormattedTextType] = field(
+            info: FormattedTextType | None = field(
                 default=None,
                 metadata={
                     "name": "Info",
@@ -6901,14 +6887,14 @@ class VehicleLocationAdditionalFeesType(object):
                     "namespace": "http://www.opentravel.org/OTA/2003/05",
                 },
             )
-            tax_code: Optional[str] = field(
+            tax_code: str | None = field(
                 default=None,
                 metadata={
                     "name": "TaxCode",
                     "type": "Attribute",
                 },
             )
-            percentage: Optional[Decimal] = field(
+            percentage: Decimal | None = field(
                 default=None,
                 metadata={
                     "name": "Percentage",
@@ -6918,7 +6904,7 @@ class VehicleLocationAdditionalFeesType(object):
 
     @dataclass
     class Fees(object):
-        fee: List["VehicleLocationAdditionalFeesType.Fees.Fee"] = field(
+        fee: list["VehicleLocationAdditionalFeesType.Fees.Fee"] = field(
             default_factory=list,
             metadata={
                 "name": "Fee",
@@ -6926,7 +6912,7 @@ class VehicleLocationAdditionalFeesType(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        info: Optional[FormattedTextType] = field(
+        info: FormattedTextType | None = field(
             default=None,
             metadata={
                 "name": "Info",
@@ -6937,7 +6923,7 @@ class VehicleLocationAdditionalFeesType(object):
 
         @dataclass
         class Fee(VehicleChargeType):
-            info: Optional[FormattedTextType] = field(
+            info: FormattedTextType | None = field(
                 default=None,
                 metadata={
                     "name": "Info",
@@ -6948,7 +6934,7 @@ class VehicleLocationAdditionalFeesType(object):
 
     @dataclass
     class Surcharges(object):
-        surcharge: List["VehicleLocationAdditionalFeesType.Surcharges.Surcharge"] = (
+        surcharge: list["VehicleLocationAdditionalFeesType.Surcharges.Surcharge"] = (
             field(
                 default_factory=list,
                 metadata={
@@ -6958,7 +6944,7 @@ class VehicleLocationAdditionalFeesType(object):
                 },
             )
         )
-        info: Optional[FormattedTextType] = field(
+        info: FormattedTextType | None = field(
             default=None,
             metadata={
                 "name": "Info",
@@ -6966,21 +6952,21 @@ class VehicleLocationAdditionalFeesType(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        start: Optional[str] = field(
+        start: str | None = field(
             default=None,
             metadata={
                 "name": "Start",
                 "type": "Attribute",
             },
         )
-        duration: Optional[str] = field(
+        duration: str | None = field(
             default=None,
             metadata={
                 "name": "Duration",
                 "type": "Attribute",
             },
         )
-        end: Optional[str] = field(
+        end: str | None = field(
             default=None,
             metadata={
                 "name": "End",
@@ -6990,7 +6976,7 @@ class VehicleLocationAdditionalFeesType(object):
 
         @dataclass
         class Surcharge(VehicleChargeType):
-            info: Optional[FormattedTextType] = field(
+            info: FormattedTextType | None = field(
                 default=None,
                 metadata={
                     "name": "Info",
@@ -7001,7 +6987,7 @@ class VehicleLocationAdditionalFeesType(object):
 
     @dataclass
     class MiscellaneousCharges(object):
-        miscellaneous_charge: List[
+        miscellaneous_charge: list[
             "VehicleLocationAdditionalFeesType.MiscellaneousCharges.MiscellaneousCharge"
         ] = field(
             default_factory=list,
@@ -7011,7 +6997,7 @@ class VehicleLocationAdditionalFeesType(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        info: Optional[FormattedTextType] = field(
+        info: FormattedTextType | None = field(
             default=None,
             metadata={
                 "name": "Info",
@@ -7022,7 +7008,7 @@ class VehicleLocationAdditionalFeesType(object):
 
         @dataclass
         class MiscellaneousCharge(VehicleChargeType):
-            info: Optional[FormattedTextType] = field(
+            info: FormattedTextType | None = field(
                 default=None,
                 metadata={
                     "name": "Info",
@@ -7034,7 +7020,7 @@ class VehicleLocationAdditionalFeesType(object):
 
 @dataclass
 class VehicleLocationInformationType(FormattedTextType):
-    type: Optional[str] = field(
+    type: str | None = field(
         default=None,
         metadata={
             "name": "Type",
@@ -7045,7 +7031,7 @@ class VehicleLocationInformationType(FormattedTextType):
 
 @dataclass
 class VehicleRentalRateType(object):
-    rate_distance: List["VehicleRentalRateType.RateDistance"] = field(
+    rate_distance: list["VehicleRentalRateType.RateDistance"] = field(
         default_factory=list,
         metadata={
             "name": "RateDistance",
@@ -7053,7 +7039,7 @@ class VehicleRentalRateType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    vehicle_charges: Optional[ArrayOfVehicleChargePurposeType] = field(
+    vehicle_charges: ArrayOfVehicleChargePurposeType | None = field(
         default=None,
         metadata={
             "name": "VehicleCharges",
@@ -7061,7 +7047,7 @@ class VehicleRentalRateType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    rate_qualifier: Optional[RateQualifierType] = field(
+    rate_qualifier: RateQualifierType | None = field(
         default=None,
         metadata={
             "name": "RateQualifier",
@@ -7085,7 +7071,7 @@ class VehicleRentalRateType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    pickup_return_rule: List["VehicleRentalRateType.PickupReturnRule"] = field(
+    pickup_return_rule: list["VehicleRentalRateType.PickupReturnRule"] = field(
         default_factory=list,
         metadata={
             "name": "PickupReturnRule",
@@ -7096,7 +7082,7 @@ class VehicleRentalRateType(object):
 
     @dataclass
     class RateDistance(object):
-        unlimited: Optional[bool] = field(
+        unlimited: bool | None = field(
             default=None,
             metadata={
                 "name": "Unlimited",
@@ -7104,21 +7090,21 @@ class VehicleRentalRateType(object):
                 "required": True,
             },
         )
-        quantity: Optional[int] = field(
+        quantity: int | None = field(
             default=None,
             metadata={
                 "name": "Quantity",
                 "type": "Attribute",
             },
         )
-        dist_unit_name: Optional[DistanceUnitNameType] = field(
+        dist_unit_name: DistanceUnitNameType | None = field(
             default=None,
             metadata={
                 "name": "DistUnitName",
                 "type": "Attribute",
             },
         )
-        vehicle_period_unit_name: Optional[VehiclePeriodUnitNameType] = field(
+        vehicle_period_unit_name: VehiclePeriodUnitNameType | None = field(
             default=None,
             metadata={
                 "name": "VehiclePeriodUnitName",
@@ -7128,7 +7114,7 @@ class VehicleRentalRateType(object):
 
     @dataclass
     class RateRestrictions(object):
-        minimum_age: Optional[int] = field(
+        minimum_age: int | None = field(
             default=None,
             metadata={
                 "name": "MinimumAge",
@@ -7137,7 +7123,7 @@ class VehicleRentalRateType(object):
                 "required": True,
             },
         )
-        maximum_age: Optional[int] = field(
+        maximum_age: int | None = field(
             default=None,
             metadata={
                 "name": "MaximumAge",
@@ -7146,7 +7132,7 @@ class VehicleRentalRateType(object):
                 "required": True,
             },
         )
-        no_show_fee_ind: Optional[bool] = field(
+        no_show_fee_ind: bool | None = field(
             default=None,
             metadata={
                 "name": "NoShowFeeInd",
@@ -7162,77 +7148,77 @@ class VehicleRentalRateType(object):
                 "type": "Attribute",
             },
         )
-        minimum_day_ind: Optional[bool] = field(
+        minimum_day_ind: bool | None = field(
             default=None,
             metadata={
                 "name": "MinimumDayInd",
                 "type": "Attribute",
             },
         )
-        maximum_day_ind: Optional[bool] = field(
+        maximum_day_ind: bool | None = field(
             default=None,
             metadata={
                 "name": "MaximumDayInd",
                 "type": "Attribute",
             },
         )
-        advanced_booking_ind: Optional[bool] = field(
+        advanced_booking_ind: bool | None = field(
             default=None,
             metadata={
                 "name": "AdvancedBookingInd",
                 "type": "Attribute",
             },
         )
-        restricted_mileage_ind: Optional[bool] = field(
+        restricted_mileage_ind: bool | None = field(
             default=None,
             metadata={
                 "name": "RestrictedMileageInd",
                 "type": "Attribute",
             },
         )
-        corporate_rate_ind: Optional[bool] = field(
+        corporate_rate_ind: bool | None = field(
             default=None,
             metadata={
                 "name": "CorporateRateInd",
                 "type": "Attribute",
             },
         )
-        guarantee_req_ind: Optional[bool] = field(
+        guarantee_req_ind: bool | None = field(
             default=None,
             metadata={
                 "name": "GuaranteeReqInd",
                 "type": "Attribute",
             },
         )
-        maximum_vehicles_allowed: Optional[int] = field(
+        maximum_vehicles_allowed: int | None = field(
             default=None,
             metadata={
                 "name": "MaximumVehiclesAllowed",
                 "type": "Attribute",
             },
         )
-        overnight_ind: Optional[bool] = field(
+        overnight_ind: bool | None = field(
             default=None,
             metadata={
                 "name": "OvernightInd",
                 "type": "Attribute",
             },
         )
-        one_way_policy: Optional[RateRestrictionsOneWayPolicy] = field(
+        one_way_policy: RateRestrictionsOneWayPolicy | None = field(
             default=None,
             metadata={
                 "name": "OneWayPolicy",
                 "type": "Attribute",
             },
         )
-        cancellation_penalty_ind: Optional[bool] = field(
+        cancellation_penalty_ind: bool | None = field(
             default=None,
             metadata={
                 "name": "CancellationPenaltyInd",
                 "type": "Attribute",
             },
         )
-        modification_penalty_ind: Optional[bool] = field(
+        modification_penalty_ind: bool | None = field(
             default=None,
             metadata={
                 "name": "ModificationPenaltyInd",
@@ -7242,7 +7228,7 @@ class VehicleRentalRateType(object):
 
     @dataclass
     class RateGuarantee(object):
-        description: Optional[FormattedTextTextType] = field(
+        description: FormattedTextTextType | None = field(
             default=None,
             metadata={
                 "name": "Description",
@@ -7250,28 +7236,28 @@ class VehicleRentalRateType(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        absolute_deadline: Optional[str] = field(
+        absolute_deadline: str | None = field(
             default=None,
             metadata={
                 "name": "AbsoluteDeadline",
                 "type": "Attribute",
             },
         )
-        offset_time_unit: Optional[TimeUnitType] = field(
+        offset_time_unit: TimeUnitType | None = field(
             default=None,
             metadata={
                 "name": "OffsetTimeUnit",
                 "type": "Attribute",
             },
         )
-        offset_unit_multiplier: Optional[int] = field(
+        offset_unit_multiplier: int | None = field(
             default=None,
             metadata={
                 "name": "OffsetUnitMultiplier",
                 "type": "Attribute",
             },
         )
-        offset_drop_time: Optional[RateGuaranteeOffsetDropTime] = field(
+        offset_drop_time: RateGuaranteeOffsetDropTime | None = field(
             default=None,
             metadata={
                 "name": "OffsetDropTime",
@@ -7281,21 +7267,21 @@ class VehicleRentalRateType(object):
 
     @dataclass
     class PickupReturnRule(object):
-        day_of_week: Optional[DayOfWeekType] = field(
+        day_of_week: DayOfWeekType | None = field(
             default=None,
             metadata={
                 "name": "DayOfWeek",
                 "type": "Attribute",
             },
         )
-        time: Optional[str] = field(
+        time: str | None = field(
             default=None,
             metadata={
                 "name": "Time",
                 "type": "Attribute",
             },
         )
-        rule_type: Optional[PickupReturnRuleRuleType] = field(
+        rule_type: PickupReturnRuleRuleType | None = field(
             default=None,
             metadata={
                 "name": "RuleType",
@@ -7306,7 +7292,7 @@ class VehicleRentalRateType(object):
 
 @dataclass
 class VendorMessageType(FormattedTextType):
-    info_type: Optional[str] = field(
+    info_type: str | None = field(
         default=None,
         metadata={
             "name": "InfoType",
@@ -7317,7 +7303,7 @@ class VendorMessageType(FormattedTextType):
 
 @dataclass
 class ArrayOfVehicleLocationInformationType(object):
-    veh_rent_loc_info: List[VehicleLocationInformationType] = field(
+    veh_rent_loc_info: list[VehicleLocationInformationType] = field(
         default_factory=list,
         metadata={
             "name": "VehRentLocInfo",
@@ -7329,7 +7315,7 @@ class ArrayOfVehicleLocationInformationType(object):
 
 @dataclass
 class ArrayOfVehicleLocationLiabilitiesTypeCoverage(object):
-    coverage: List["ArrayOfVehicleLocationLiabilitiesTypeCoverage.Coverage"] = field(
+    coverage: list["ArrayOfVehicleLocationLiabilitiesTypeCoverage.Coverage"] = field(
         default_factory=list,
         metadata={
             "name": "Coverage",
@@ -7340,7 +7326,7 @@ class ArrayOfVehicleLocationLiabilitiesTypeCoverage(object):
 
     @dataclass
     class Coverage(object):
-        coverage_info: Optional[FormattedTextType] = field(
+        coverage_info: FormattedTextType | None = field(
             default=None,
             metadata={
                 "name": "CoverageInfo",
@@ -7348,9 +7334,7 @@ class ArrayOfVehicleLocationLiabilitiesTypeCoverage(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        coverage_fees: Optional[
-            ArrayOfVehicleLocationLiabilitiesTypeCoverageCoverageFee
-        ] = field(
+        coverage_fees: ArrayOfVehicleLocationLiabilitiesTypeCoverageCoverageFee | None = field(
             default=None,
             metadata={
                 "name": "CoverageFees",
@@ -7358,14 +7342,14 @@ class ArrayOfVehicleLocationLiabilitiesTypeCoverage(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        type: Optional[str] = field(
+        type: str | None = field(
             default=None,
             metadata={
                 "name": "Type",
                 "type": "Attribute",
             },
         )
-        required_ind: Optional[bool] = field(
+        required_ind: bool | None = field(
             default=None,
             metadata={
                 "name": "RequiredInd",
@@ -7376,7 +7360,7 @@ class ArrayOfVehicleLocationLiabilitiesTypeCoverage(object):
 
 @dataclass
 class ArrayOfVendorMessageType(object):
-    vendor_message: List[VendorMessageType] = field(
+    vendor_message: list[VendorMessageType] = field(
         default_factory=list,
         metadata={
             "name": "VendorMessage",
@@ -7391,7 +7375,7 @@ class CancelInfoRstype(object):
     class Meta(object):
         name = "CancelInfoRSType"
 
-    cancel_rules: Optional[ArrayOfCancelRuleType] = field(
+    cancel_rules: ArrayOfCancelRuleType | None = field(
         default=None,
         metadata={
             "name": "CancelRules",
@@ -7399,7 +7383,7 @@ class CancelInfoRstype(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    unique_id: Optional[UniqueIdType] = field(
+    unique_id: UniqueIdType | None = field(
         default=None,
         metadata={
             "name": "UniqueID",
@@ -7411,7 +7395,7 @@ class CancelInfoRstype(object):
 
 @dataclass
 class CustomerType(object):
-    person_name: Optional[PersonNameType] = field(
+    person_name: PersonNameType | None = field(
         default=None,
         metadata={
             "name": "PersonName",
@@ -7419,7 +7403,7 @@ class CustomerType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    telephone: List["CustomerType.Telephone"] = field(
+    telephone: list["CustomerType.Telephone"] = field(
         default_factory=list,
         metadata={
             "name": "Telephone",
@@ -7427,7 +7411,7 @@ class CustomerType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    email: List[EmailType] = field(
+    email: list[EmailType] = field(
         default_factory=list,
         metadata={
             "name": "Email",
@@ -7435,7 +7419,7 @@ class CustomerType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    address: List["CustomerType.Address"] = field(
+    address: list["CustomerType.Address"] = field(
         default_factory=list,
         metadata={
             "name": "Address",
@@ -7443,7 +7427,7 @@ class CustomerType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    url: List[UrlType] = field(
+    url: list[UrlType] = field(
         default_factory=list,
         metadata={
             "name": "URL",
@@ -7451,7 +7435,7 @@ class CustomerType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    citizen_country_name: List["CustomerType.CitizenCountryName"] = field(
+    citizen_country_name: list["CustomerType.CitizenCountryName"] = field(
         default_factory=list,
         metadata={
             "name": "CitizenCountryName",
@@ -7459,7 +7443,7 @@ class CustomerType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    phys_chall_name: List[str] = field(
+    phys_chall_name: list[str] = field(
         default_factory=list,
         metadata={
             "name": "PhysChallName",
@@ -7467,7 +7451,7 @@ class CustomerType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    pet_info: List[str] = field(
+    pet_info: list[str] = field(
         default_factory=list,
         metadata={
             "name": "PetInfo",
@@ -7475,7 +7459,7 @@ class CustomerType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    payment_form: List[PaymentFormType] = field(
+    payment_form: list[PaymentFormType] = field(
         default_factory=list,
         metadata={
             "name": "PaymentForm",
@@ -7483,7 +7467,7 @@ class CustomerType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    related_traveler: List[RelatedTravelerType] = field(
+    related_traveler: list[RelatedTravelerType] = field(
         default_factory=list,
         metadata={
             "name": "RelatedTraveler",
@@ -7491,7 +7475,7 @@ class CustomerType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    contact_person: List[ContactPersonType] = field(
+    contact_person: list[ContactPersonType] = field(
         default_factory=list,
         metadata={
             "name": "ContactPerson",
@@ -7499,7 +7483,7 @@ class CustomerType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    document: List[DocumentType] = field(
+    document: list[DocumentType] = field(
         default_factory=list,
         metadata={
             "name": "Document",
@@ -7507,7 +7491,7 @@ class CustomerType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    cust_loyalty: List["CustomerType.CustLoyalty"] = field(
+    cust_loyalty: list["CustomerType.CustLoyalty"] = field(
         default_factory=list,
         metadata={
             "name": "CustLoyalty",
@@ -7515,7 +7499,7 @@ class CustomerType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    employee_info: List[EmployeeInfoType] = field(
+    employee_info: list[EmployeeInfoType] = field(
         default_factory=list,
         metadata={
             "name": "EmployeeInfo",
@@ -7523,7 +7507,7 @@ class CustomerType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    employer_info: Optional[CompanyNameType] = field(
+    employer_info: CompanyNameType | None = field(
         default=None,
         metadata={
             "name": "EmployerInfo",
@@ -7531,7 +7515,7 @@ class CustomerType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    tpa_extensions: Optional[TpaExtensionsType] = field(
+    tpa_extensions: TpaExtensionsType | None = field(
         default=None,
         metadata={
             "name": "TPA_Extensions",
@@ -7539,63 +7523,63 @@ class CustomerType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    gender: Optional[CustomerTypeGender] = field(
+    gender: CustomerTypeGender | None = field(
         default=None,
         metadata={
             "name": "Gender",
             "type": "Attribute",
         },
     )
-    deceased: Optional[bool] = field(
+    deceased: bool | None = field(
         default=None,
         metadata={
             "name": "Deceased",
             "type": "Attribute",
         },
     )
-    lockout_type: Optional[str] = field(
+    lockout_type: str | None = field(
         default=None,
         metadata={
             "name": "LockoutType",
             "type": "Attribute",
         },
     )
-    birth_date: Optional[XmlDate] = field(
+    birth_date: XmlDate | None = field(
         default=None,
         metadata={
             "name": "BirthDate",
             "type": "Attribute",
         },
     )
-    currency_code: Optional[str] = field(
+    currency_code: str | None = field(
         default=None,
         metadata={
             "name": "CurrencyCode",
             "type": "Attribute",
         },
     )
-    decimal_places: Optional[int] = field(
+    decimal_places: int | None = field(
         default=None,
         metadata={
             "name": "DecimalPlaces",
             "type": "Attribute",
         },
     )
-    vip_indicator: Optional[bool] = field(
+    vip_indicator: bool | None = field(
         default=None,
         metadata={
             "name": "VIP_Indicator",
             "type": "Attribute",
         },
     )
-    text: Optional[str] = field(
+    text: str | None = field(
         default=None,
         metadata={
             "name": "Text",
             "type": "Attribute",
         },
     )
-    language: Optional[str] = field(
+    language: str | None = field(
         default=None,
         metadata={
             "name": "Language",
@@ -7605,35 +7589,35 @@ class CustomerType(object):
 
     @dataclass
     class Telephone(object):
-        phone_tech_type: Optional[str] = field(
+        phone_tech_type: str | None = field(
             default=None,
             metadata={
                 "name": "PhoneTechType",
                 "type": "Attribute",
             },
         )
-        phone_number: Optional[str] = field(
+        phone_number: str | None = field(
             default=None,
             metadata={
                 "name": "PhoneNumber",
                 "type": "Attribute",
             },
         )
-        effective_date: Optional[XmlDate] = field(
+        effective_date: XmlDate | None = field(
             default=None,
             metadata={
                 "name": "EffectiveDate",
                 "type": "Attribute",
             },
         )
-        expire_date: Optional[XmlDate] = field(
+        expire_date: XmlDate | None = field(
             default=None,
             metadata={
                 "name": "ExpireDate",
                 "type": "Attribute",
             },
         )
-        rph: Optional[str] = field(
+        rph: str | None = field(
             default=None,
             metadata={
                 "name": "RPH",
@@ -7643,7 +7627,7 @@ class CustomerType(object):
 
     @dataclass
     class Address(AddressInfoType):
-        company_name: Optional[CompanyNameType] = field(
+        company_name: CompanyNameType | None = field(
             default=None,
             metadata={
                 "name": "CompanyName",
@@ -7651,14 +7635,14 @@ class CustomerType(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        effective_date: Optional[XmlDate] = field(
+        effective_date: XmlDate | None = field(
             default=None,
             metadata={
                 "name": "EffectiveDate",
                 "type": "Attribute",
             },
         )
-        expire_date: Optional[XmlDate] = field(
+        expire_date: XmlDate | None = field(
             default=None,
             metadata={
                 "name": "ExpireDate",
@@ -7668,7 +7652,7 @@ class CustomerType(object):
 
     @dataclass
     class CitizenCountryName(object):
-        code: Optional[str] = field(
+        code: str | None = field(
             default=None,
             metadata={
                 "name": "Code",
@@ -7678,35 +7662,35 @@ class CustomerType(object):
 
     @dataclass
     class CustLoyalty(object):
-        program_id: Optional[str] = field(
+        program_id: str | None = field(
             default=None,
             metadata={
                 "name": "ProgramID",
                 "type": "Attribute",
             },
         )
-        membership_id: Optional[str] = field(
+        membership_id: str | None = field(
             default=None,
             metadata={
                 "name": "MembershipID",
                 "type": "Attribute",
             },
         )
-        travel_sector: Optional[str] = field(
+        travel_sector: str | None = field(
             default=None,
             metadata={
                 "name": "TravelSector",
                 "type": "Attribute",
             },
         )
-        rph: Optional[str] = field(
+        rph: str | None = field(
             default=None,
             metadata={
                 "name": "RPH",
                 "type": "Attribute",
             },
         )
-        vendor_code: List[str] = field(
+        vendor_code: list[str] = field(
             default_factory=list,
             metadata={
                 "name": "VendorCode",
@@ -7729,14 +7713,14 @@ class PaymentDetailType(PaymentFormType):
 
     @dataclass
     class PaymentAmount(object):
-        amount: Optional[Decimal] = field(
+        amount: Decimal | None = field(
             default=None,
             metadata={
                 "name": "Amount",
                 "type": "Attribute",
             },
         )
-        approval_code: Optional[str] = field(
+        approval_code: str | None = field(
             default=None,
             metadata={
                 "name": "ApprovalCode",
@@ -7761,7 +7745,7 @@ class ServiceSoapGetVehCancelReservationInput(object):
 
     @dataclass
     class Body(object):
-        veh_cancel_res_rq: Optional[VehCancelResRq] = field(
+        veh_cancel_res_rq: VehCancelResRq | None = field(
             default=None,
             metadata={
                 "name": "VehCancelResRQ",
@@ -7787,7 +7771,7 @@ class ServiceSoapGetVehLocDetailInput(object):
 
     @dataclass
     class Body(object):
-        veh_loc_detail_rq: Optional[VehLocDetailRq] = field(
+        veh_loc_detail_rq: VehLocDetailRq | None = field(
             default=None,
             metadata={
                 "name": "VehLocDetailRQ",
@@ -7813,7 +7797,7 @@ class ServiceSoapGetVehLocationSearchInput(object):
 
     @dataclass
     class Body(object):
-        veh_location_search_rq: Optional[VehLocationSearchRq] = field(
+        veh_location_search_rq: VehLocationSearchRq | None = field(
             default=None,
             metadata={
                 "name": "VehLocationSearchRQ",
@@ -7839,7 +7823,7 @@ class ServiceSoapGetVehRateRuleInput(object):
 
     @dataclass
     class Body(object):
-        veh_rate_rule_rq: Optional[VehRateRuleRq] = field(
+        veh_rate_rule_rq: VehRateRuleRq | None = field(
             default=None,
             metadata={
                 "name": "VehRateRuleRQ",
@@ -7865,7 +7849,7 @@ class ServiceSoapGetVehRetReservationInput(object):
 
     @dataclass
     class Body(object):
-        veh_ret_res_rq: Optional[VehRetResRq] = field(
+        veh_ret_res_rq: VehRetResRq | None = field(
             default=None,
             metadata={
                 "name": "VehRetResRQ",
@@ -7877,7 +7861,7 @@ class ServiceSoapGetVehRetReservationInput(object):
 
 @dataclass
 class VehicleAvailCoreType(object):
-    vehicle: Optional[VehicleType] = field(
+    vehicle: VehicleType | None = field(
         default=None,
         metadata={
             "name": "Vehicle",
@@ -7885,7 +7869,7 @@ class VehicleAvailCoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    rental_rate: List[VehicleRentalRateType] = field(
+    rental_rate: list[VehicleRentalRateType] = field(
         default_factory=list,
         metadata={
             "name": "RentalRate",
@@ -7893,7 +7877,7 @@ class VehicleAvailCoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    total_charge: List["VehicleAvailCoreType.TotalCharge"] = field(
+    total_charge: list["VehicleAvailCoreType.TotalCharge"] = field(
         default_factory=list,
         metadata={
             "name": "TotalCharge",
@@ -7901,7 +7885,7 @@ class VehicleAvailCoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    priced_equips: Optional[ArrayOfVehicleEquipmentPricedType] = field(
+    priced_equips: ArrayOfVehicleEquipmentPricedType | None = field(
         default=None,
         metadata={
             "name": "PricedEquips",
@@ -7909,7 +7893,7 @@ class VehicleAvailCoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    fees: Optional[ArrayOfVehicleChargePurposeType1] = field(
+    fees: ArrayOfVehicleChargePurposeType1 | None = field(
         default=None,
         metadata={
             "name": "Fees",
@@ -7949,7 +7933,7 @@ class VehicleAvailCoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    tpa_extensions: Optional[TpaExtensionsType] = field(
+    tpa_extensions: TpaExtensionsType | None = field(
         default=None,
         metadata={
             "name": "TPA_Extensions",
@@ -7957,7 +7941,7 @@ class VehicleAvailCoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    status: Optional[InventoryStatusType] = field(
+    status: InventoryStatusType | None = field(
         default=None,
         metadata={
             "name": "Status",
@@ -7965,7 +7949,7 @@ class VehicleAvailCoreType(object):
             "required": True,
         },
     )
-    is_alternate_ind: Optional[bool] = field(
+    is_alternate_ind: bool | None = field(
         default=None,
         metadata={
             "name": "IsAlternateInd",
@@ -7975,28 +7959,28 @@ class VehicleAvailCoreType(object):
 
     @dataclass
     class TotalCharge(object):
-        currency_code: Optional[str] = field(
+        currency_code: str | None = field(
             default=None,
             metadata={
                 "name": "CurrencyCode",
                 "type": "Attribute",
             },
         )
-        rate_total_amount: Optional[Decimal] = field(
+        rate_total_amount: Decimal | None = field(
             default=None,
             metadata={
                 "name": "RateTotalAmount",
                 "type": "Attribute",
             },
         )
-        estimated_total_amount: Optional[Decimal] = field(
+        estimated_total_amount: Decimal | None = field(
             default=None,
             metadata={
                 "name": "EstimatedTotalAmount",
                 "type": "Attribute",
             },
         )
-        rate_convert_ind: Optional[bool] = field(
+        rate_convert_ind: bool | None = field(
             default=None,
             metadata={
                 "name": "RateConvertInd",
@@ -8006,7 +7990,7 @@ class VehicleAvailCoreType(object):
 
     @dataclass
     class Reference(UniqueIdType):
-        date_time: Optional[XmlDateTime] = field(
+        date_time: XmlDateTime | None = field(
             default=None,
             metadata={
                 "name": "DateTime",
@@ -8016,7 +8000,7 @@ class VehicleAvailCoreType(object):
 
     @dataclass
     class Vendor(CompanyNameType):
-        participation_level_code: Optional[str] = field(
+        participation_level_code: str | None = field(
             default=None,
             metadata={
                 "name": "ParticipationLevelCode",
@@ -8026,28 +8010,28 @@ class VehicleAvailCoreType(object):
 
     @dataclass
     class VendorLocation(LocationType):
-        extended_location_code: Optional[str] = field(
+        extended_location_code: str | None = field(
             default=None,
             metadata={
                 "name": "ExtendedLocationCode",
                 "type": "Attribute",
             },
         )
-        counter_location: Optional[str] = field(
+        counter_location: str | None = field(
             default=None,
             metadata={
                 "name": "CounterLocation",
                 "type": "Attribute",
             },
         )
-        name: Optional[str] = field(
+        name: str | None = field(
             default=None,
             metadata={
                 "name": "Name",
                 "type": "Attribute",
             },
         )
-        counter_loc_info: Optional[VendorLocationCounterLocInfo] = field(
+        counter_loc_info: VendorLocationCounterLocInfo | None = field(
             default=None,
             metadata={
                 "name": "CounterLocInfo",
@@ -8057,21 +8041,21 @@ class VehicleAvailCoreType(object):
 
     @dataclass
     class DropOffLocation(LocationType):
-        extended_location_code: Optional[str] = field(
+        extended_location_code: str | None = field(
             default=None,
             metadata={
                 "name": "ExtendedLocationCode",
                 "type": "Attribute",
             },
         )
-        counter_location: Optional[str] = field(
+        counter_location: str | None = field(
             default=None,
             metadata={
                 "name": "CounterLocation",
                 "type": "Attribute",
             },
         )
-        name: Optional[str] = field(
+        name: str | None = field(
             default=None,
             metadata={
                 "name": "Name",
@@ -8108,17 +8092,17 @@ class VehicleLocationRequirementsType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    requirement_infos: Optional[
-        ArrayOfVehicleLocationRequirementsTypeRequirementInfo
-    ] = field(
-        default=None,
-        metadata={
-            "name": "RequirementInfos",
-            "type": "Element",
-            "namespace": "http://www.opentravel.org/OTA/2003/05",
-        },
+    requirement_infos: ArrayOfVehicleLocationRequirementsTypeRequirementInfo | None = (
+        field(
+            default=None,
+            metadata={
+                "name": "RequirementInfos",
+                "type": "Element",
+                "namespace": "http://www.opentravel.org/OTA/2003/05",
+            },
+        )
     )
-    tpa_extensions: Optional[TpaExtensionsType] = field(
+    tpa_extensions: TpaExtensionsType | None = field(
         default=None,
         metadata={
             "name": "TPA_Extensions",
@@ -8129,7 +8113,7 @@ class VehicleLocationRequirementsType(object):
 
     @dataclass
     class Age(object):
-        age_surcharge: List["VehicleLocationRequirementsType.Age.AgeSurcharge"] = field(
+        age_surcharge: list["VehicleLocationRequirementsType.Age.AgeSurcharge"] = field(
             default_factory=list,
             metadata={
                 "name": "AgeSurcharge",
@@ -8137,7 +8121,7 @@ class VehicleLocationRequirementsType(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        age_infos: Optional[ArrayOfVehicleLocationRequirementsTypeAgeAgeInfo] = field(
+        age_infos: ArrayOfVehicleLocationRequirementsTypeAgeAgeInfo | None = field(
             default=None,
             metadata={
                 "name": "AgeInfos",
@@ -8145,14 +8129,14 @@ class VehicleLocationRequirementsType(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        minimum_age: Optional[int] = field(
+        minimum_age: int | None = field(
             default=None,
             metadata={
                 "name": "MinimumAge",
                 "type": "Attribute",
             },
         )
-        maximum_age: Optional[int] = field(
+        maximum_age: int | None = field(
             default=None,
             metadata={
                 "name": "MaximumAge",
@@ -8162,14 +8146,14 @@ class VehicleLocationRequirementsType(object):
 
         @dataclass
         class AgeSurcharge(object):
-            age: Optional[str] = field(
+            age: str | None = field(
                 default=None,
                 metadata={
                     "name": "Age",
                     "type": "Attribute",
                 },
             )
-            amount: Optional[Decimal] = field(
+            amount: Decimal | None = field(
                 default=None,
                 metadata={
                     "name": "Amount",
@@ -8179,9 +8163,7 @@ class VehicleLocationRequirementsType(object):
 
     @dataclass
     class AdditionalDriver(object):
-        addl_driver_infos: Optional[
-            ArrayOfVehicleLocationRequirementsTypeAdditionalDriverAddlDriverInfo
-        ] = field(
+        addl_driver_infos: ArrayOfVehicleLocationRequirementsTypeAdditionalDriverAddlDriverInfo | None = field(
             default=None,
             metadata={
                 "name": "AddlDriverInfos",
@@ -8192,7 +8174,7 @@ class VehicleLocationRequirementsType(object):
 
     @dataclass
     class PaymentOptions(object):
-        credit_card: Optional[AcceptablePaymentCardsInfoType] = field(
+        credit_card: AcceptablePaymentCardsInfoType | None = field(
             default=None,
             metadata={
                 "name": "CreditCard",
@@ -8200,7 +8182,7 @@ class VehicleLocationRequirementsType(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        debit_card: Optional[AcceptablePaymentCardsInfoType] = field(
+        debit_card: AcceptablePaymentCardsInfoType | None = field(
             default=None,
             metadata={
                 "name": "DebitCard",
@@ -8266,7 +8248,7 @@ class VehicleLocationRequirementsType(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        deposit: Optional[AcceptablePaymentCardsInfoType] = field(
+        deposit: AcceptablePaymentCardsInfoType | None = field(
             default=None,
             metadata={
                 "name": "Deposit",
@@ -8274,7 +8256,7 @@ class VehicleLocationRequirementsType(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        guarantee: Optional[AcceptablePaymentCardsInfoType] = field(
+        guarantee: AcceptablePaymentCardsInfoType | None = field(
             default=None,
             metadata={
                 "name": "Guarantee",
@@ -8282,7 +8264,7 @@ class VehicleLocationRequirementsType(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        pre_payment: Optional[AcceptablePaymentCardsInfoType] = field(
+        pre_payment: AcceptablePaymentCardsInfoType | None = field(
             default=None,
             metadata={
                 "name": "PrePayment",
@@ -8290,7 +8272,7 @@ class VehicleLocationRequirementsType(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        payment_options_info: Optional[FormattedTextType] = field(
+        payment_options_info: FormattedTextType | None = field(
             default=None,
             metadata={
                 "name": "PaymentOptionsInfo",
@@ -8301,7 +8283,7 @@ class VehicleLocationRequirementsType(object):
 
         @dataclass
         class Cash(object):
-            info: Optional[FormattedTextType] = field(
+            info: FormattedTextType | None = field(
                 default=None,
                 metadata={
                     "name": "Info",
@@ -8312,7 +8294,7 @@ class VehicleLocationRequirementsType(object):
 
         @dataclass
         class Voucher(object):
-            info: Optional[FormattedTextType] = field(
+            info: FormattedTextType | None = field(
                 default=None,
                 metadata={
                     "name": "Info",
@@ -8323,7 +8305,7 @@ class VehicleLocationRequirementsType(object):
 
         @dataclass
         class BankAcct(object):
-            info: Optional[FormattedTextType] = field(
+            info: FormattedTextType | None = field(
                 default=None,
                 metadata={
                     "name": "Info",
@@ -8334,7 +8316,7 @@ class VehicleLocationRequirementsType(object):
 
         @dataclass
         class DirectBill(object):
-            info: Optional[FormattedTextType] = field(
+            info: FormattedTextType | None = field(
                 default=None,
                 metadata={
                     "name": "Info",
@@ -8345,7 +8327,7 @@ class VehicleLocationRequirementsType(object):
 
         @dataclass
         class LoyaltyRedemption(object):
-            info: Optional[FormattedTextType] = field(
+            info: FormattedTextType | None = field(
                 default=None,
                 metadata={
                     "name": "Info",
@@ -8356,7 +8338,7 @@ class VehicleLocationRequirementsType(object):
 
         @dataclass
         class MiscChargeOrder(object):
-            info: Optional[FormattedTextType] = field(
+            info: FormattedTextType | None = field(
                 default=None,
                 metadata={
                     "name": "Info",
@@ -8368,9 +8350,7 @@ class VehicleLocationRequirementsType(object):
 
 @dataclass
 class VehicleLocationServicesOfferedType(object):
-    on_location_services: Optional[
-        ArrayOfVehicleLocationServicesOfferedTypeOnLocationService
-    ] = field(
+    on_location_services: ArrayOfVehicleLocationServicesOfferedTypeOnLocationService | None = field(
         default=None,
         metadata={
             "name": "OnLocationServices",
@@ -8378,9 +8358,7 @@ class VehicleLocationServicesOfferedType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    off_location_services: Optional[
-        ArrayOfVehicleLocationServicesOfferedTypeOffLocationService
-    ] = field(
+    off_location_services: ArrayOfVehicleLocationServicesOfferedTypeOffLocationService | None = field(
         default=None,
         metadata={
             "name": "OffLocationServices",
@@ -8388,9 +8366,7 @@ class VehicleLocationServicesOfferedType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    special_equipments: Optional[
-        ArrayOfVehicleLocationServicesOfferedTypeSpecialEquipment
-    ] = field(
+    special_equipments: ArrayOfVehicleLocationServicesOfferedTypeSpecialEquipment | None = field(
         default=None,
         metadata={
             "name": "SpecialEquipments",
@@ -8398,7 +8374,7 @@ class VehicleLocationServicesOfferedType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    tpa_extensions: Optional[TpaExtensionsType] = field(
+    tpa_extensions: TpaExtensionsType | None = field(
         default=None,
         metadata={
             "name": "TPA_Extensions",
@@ -8410,7 +8386,7 @@ class VehicleLocationServicesOfferedType(object):
 
 @dataclass
 class VehicleLocationVehiclesType(object):
-    vehicle_infos: Optional[ArrayOfVehicleLocationVehiclesTypeVehicleInfo] = field(
+    vehicle_infos: ArrayOfVehicleLocationVehiclesTypeVehicleInfo | None = field(
         default=None,
         metadata={
             "name": "VehicleInfos",
@@ -8418,7 +8394,7 @@ class VehicleLocationVehiclesType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    vehicle: List["VehicleLocationVehiclesType.Vehicle"] = field(
+    vehicle: list["VehicleLocationVehiclesType.Vehicle"] = field(
         default_factory=list,
         metadata={
             "name": "Vehicle",
@@ -8429,7 +8405,7 @@ class VehicleLocationVehiclesType(object):
 
     @dataclass
     class Vehicle(VehicleType):
-        text: List[FormattedTextType] = field(
+        text: list[FormattedTextType] = field(
             default_factory=list,
             metadata={
                 "name": "Text",
@@ -8437,21 +8413,21 @@ class VehicleLocationVehiclesType(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        is_confirmable_ind: Optional[bool] = field(
+        is_confirmable_ind: bool | None = field(
             default=None,
             metadata={
                 "name": "IsConfirmableInd",
                 "type": "Attribute",
             },
         )
-        distance_unit: Optional[DistanceUnitNameType] = field(
+        distance_unit: DistanceUnitNameType | None = field(
             default=None,
             metadata={
                 "name": "DistanceUnit",
                 "type": "Attribute",
             },
         )
-        distance_per_fuel_unit: Optional[int] = field(
+        distance_per_fuel_unit: int | None = field(
             default=None,
             metadata={
                 "name": "DistancePerFuelUnit",
@@ -8462,7 +8438,7 @@ class VehicleLocationVehiclesType(object):
 
 @dataclass
 class VehicleSegmentCoreType(object):
-    conf_id: List[UniqueIdType] = field(
+    conf_id: list[UniqueIdType] = field(
         default_factory=list,
         metadata={
             "name": "ConfID",
@@ -8470,7 +8446,7 @@ class VehicleSegmentCoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    vendor: Optional[CompanyNameType] = field(
+    vendor: CompanyNameType | None = field(
         default=None,
         metadata={
             "name": "Vendor",
@@ -8478,7 +8454,7 @@ class VehicleSegmentCoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    veh_rental_core: Optional[VehicleRentalCoreType] = field(
+    veh_rental_core: VehicleRentalCoreType | None = field(
         default=None,
         metadata={
             "name": "VehRentalCore",
@@ -8486,7 +8462,7 @@ class VehicleSegmentCoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    vehicle: Optional[VehicleType] = field(
+    vehicle: VehicleType | None = field(
         default=None,
         metadata={
             "name": "Vehicle",
@@ -8494,7 +8470,7 @@ class VehicleSegmentCoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    rental_rate: Optional[VehicleRentalRateType] = field(
+    rental_rate: VehicleRentalRateType | None = field(
         default=None,
         metadata={
             "name": "RentalRate",
@@ -8502,7 +8478,7 @@ class VehicleSegmentCoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    priced_equips: Optional[ArrayOfVehicleEquipmentPricedType] = field(
+    priced_equips: ArrayOfVehicleEquipmentPricedType | None = field(
         default=None,
         metadata={
             "name": "PricedEquips",
@@ -8510,7 +8486,7 @@ class VehicleSegmentCoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    fees: Optional[ArrayOfVehicleChargePurposeType1] = field(
+    fees: ArrayOfVehicleChargePurposeType1 | None = field(
         default=None,
         metadata={
             "name": "Fees",
@@ -8526,7 +8502,7 @@ class VehicleSegmentCoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    tpa_extensions: Optional[TpaExtensionsType] = field(
+    tpa_extensions: TpaExtensionsType | None = field(
         default=None,
         metadata={
             "name": "TPA_Extensions",
@@ -8534,7 +8510,7 @@ class VehicleSegmentCoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    index_number: Optional[int] = field(
+    index_number: int | None = field(
         default=None,
         metadata={
             "name": "IndexNumber",
@@ -8544,21 +8520,21 @@ class VehicleSegmentCoreType(object):
 
     @dataclass
     class TotalCharge(object):
-        rate_total_amount: Optional[Decimal] = field(
+        rate_total_amount: Decimal | None = field(
             default=None,
             metadata={
                 "name": "RateTotalAmount",
                 "type": "Attribute",
             },
         )
-        currency_code: Optional[str] = field(
+        currency_code: str | None = field(
             default=None,
             metadata={
                 "name": "CurrencyCode",
                 "type": "Attribute",
             },
         )
-        estimated_total_amount: Optional[Decimal] = field(
+        estimated_total_amount: Decimal | None = field(
             default=None,
             metadata={
                 "name": "EstimatedTotalAmount",
@@ -8577,7 +8553,7 @@ class CustomerPrimaryAdditionalType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    additional: List["CustomerPrimaryAdditionalType.Additional"] = field(
+    additional: list["CustomerPrimaryAdditionalType.Additional"] = field(
         default_factory=list,
         metadata={
             "name": "Additional",
@@ -8588,7 +8564,7 @@ class CustomerPrimaryAdditionalType(object):
 
     @dataclass
     class Primary(CustomerType):
-        customer_id: Optional[UniqueIdType] = field(
+        customer_id: UniqueIdType | None = field(
             default=None,
             metadata={
                 "name": "CustomerID",
@@ -8599,70 +8575,70 @@ class CustomerPrimaryAdditionalType(object):
 
     @dataclass
     class Additional(CustomerType):
-        start: Optional[str] = field(
+        start: str | None = field(
             default=None,
             metadata={
                 "name": "Start",
                 "type": "Attribute",
             },
         )
-        duration: Optional[str] = field(
+        duration: str | None = field(
             default=None,
             metadata={
                 "name": "Duration",
                 "type": "Attribute",
             },
         )
-        end: Optional[str] = field(
+        end: str | None = field(
             default=None,
             metadata={
                 "name": "End",
                 "type": "Attribute",
             },
         )
-        corp_discount_name: Optional[str] = field(
+        corp_discount_name: str | None = field(
             default=None,
             metadata={
                 "name": "CorpDiscountName",
                 "type": "Attribute",
             },
         )
-        corp_discount_nmbr: Optional[str] = field(
+        corp_discount_nmbr: str | None = field(
             default=None,
             metadata={
                 "name": "CorpDiscountNmbr",
                 "type": "Attribute",
             },
         )
-        qualification_method: Optional[AdditionalQualificationMethod] = field(
+        qualification_method: AdditionalQualificationMethod | None = field(
             default=None,
             metadata={
                 "name": "QualificationMethod",
                 "type": "Attribute",
             },
         )
-        age: Optional[int] = field(
+        age: int | None = field(
             default=None,
             metadata={
                 "name": "Age",
                 "type": "Attribute",
             },
         )
-        code: Optional[str] = field(
+        code: str | None = field(
             default=None,
             metadata={
                 "name": "Code",
                 "type": "Attribute",
             },
         )
-        code_context: Optional[str] = field(
+        code_context: str | None = field(
             default=None,
             metadata={
                 "name": "CodeContext",
                 "type": "Attribute",
             },
         )
-        uri: Optional[str] = field(
+        uri: str | None = field(
             default=None,
             metadata={
                 "name": "URI",
@@ -8673,7 +8649,7 @@ class CustomerPrimaryAdditionalType(object):
 
 @dataclass
 class VehicleLocationAdditionalDetailsType(object):
-    veh_rent_loc_infos: Optional[ArrayOfVehicleLocationInformationType] = field(
+    veh_rent_loc_infos: ArrayOfVehicleLocationInformationType | None = field(
         default=None,
         metadata={
             "name": "VehRentLocInfos",
@@ -8681,7 +8657,7 @@ class VehicleLocationAdditionalDetailsType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    park_location: Optional[VehicleWhereAtFacilityType] = field(
+    park_location: VehicleWhereAtFacilityType | None = field(
         default=None,
         metadata={
             "name": "ParkLocation",
@@ -8689,7 +8665,7 @@ class VehicleLocationAdditionalDetailsType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    counter_location: Optional[VehicleWhereAtFacilityType] = field(
+    counter_location: VehicleWhereAtFacilityType | None = field(
         default=None,
         metadata={
             "name": "CounterLocation",
@@ -8697,7 +8673,7 @@ class VehicleLocationAdditionalDetailsType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    operation_schedules: Optional[OperationSchedulesType] = field(
+    operation_schedules: OperationSchedulesType | None = field(
         default=None,
         metadata={
             "name": "OperationSchedules",
@@ -8713,9 +8689,7 @@ class VehicleLocationAdditionalDetailsType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    one_way_drop_locations: Optional[
-        ArrayOfVehicleLocationAdditionalDetailsTypeOneWayDropLocation
-    ] = field(
+    one_way_drop_locations: ArrayOfVehicleLocationAdditionalDetailsTypeOneWayDropLocation | None = field(
         default=None,
         metadata={
             "name": "OneWayDropLocations",
@@ -8723,7 +8697,7 @@ class VehicleLocationAdditionalDetailsType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    tpa_extensions: Optional[TpaExtensionsType] = field(
+    tpa_extensions: TpaExtensionsType | None = field(
         default=None,
         metadata={
             "name": "TPA_Extensions",
@@ -8734,9 +8708,7 @@ class VehicleLocationAdditionalDetailsType(object):
 
     @dataclass
     class Shuttle(object):
-        shuttle_infos: Optional[
-            ArrayOfVehicleLocationAdditionalDetailsTypeShuttleShuttleInfo
-        ] = field(
+        shuttle_infos: ArrayOfVehicleLocationAdditionalDetailsTypeShuttleShuttleInfo | None = field(
             default=None,
             metadata={
                 "name": "ShuttleInfos",
@@ -8744,7 +8716,7 @@ class VehicleLocationAdditionalDetailsType(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        operation_schedules: Optional[OperationSchedulesType] = field(
+        operation_schedules: OperationSchedulesType | None = field(
             default=None,
             metadata={
                 "name": "OperationSchedules",
@@ -8756,7 +8728,7 @@ class VehicleLocationAdditionalDetailsType(object):
 
 @dataclass
 class VehicleLocationLiabilitiesType(object):
-    coverages: Optional[ArrayOfVehicleLocationLiabilitiesTypeCoverage] = field(
+    coverages: ArrayOfVehicleLocationLiabilitiesTypeCoverage | None = field(
         default=None,
         metadata={
             "name": "Coverages",
@@ -8764,7 +8736,7 @@ class VehicleLocationLiabilitiesType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    info: Optional[FormattedTextType] = field(
+    info: FormattedTextType | None = field(
         default=None,
         metadata={
             "name": "Info",
@@ -8772,7 +8744,7 @@ class VehicleLocationLiabilitiesType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    tpa_extensions: Optional[TpaExtensionsType] = field(
+    tpa_extensions: TpaExtensionsType | None = field(
         default=None,
         metadata={
             "name": "TPA_Extensions",
@@ -8787,7 +8759,7 @@ class VehicleReservationRqadditionalInfoType(object):
     class Meta(object):
         name = "VehicleReservationRQAdditionalInfoType"
 
-    special_req_pref: List[VehicleSpecialReqPrefType] = field(
+    special_req_pref: list[VehicleSpecialReqPrefType] = field(
         default_factory=list,
         metadata={
             "name": "SpecialReqPref",
@@ -8795,17 +8767,17 @@ class VehicleReservationRqadditionalInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    coverage_prefs: Optional[
-        ArrayOfVehicleReservationRqadditionalInfoTypeCoveragePref
-    ] = field(
-        default=None,
-        metadata={
-            "name": "CoveragePrefs",
-            "type": "Element",
-            "namespace": "http://www.opentravel.org/OTA/2003/05",
-        },
+    coverage_prefs: ArrayOfVehicleReservationRqadditionalInfoTypeCoveragePref | None = (
+        field(
+            default=None,
+            metadata={
+                "name": "CoveragePrefs",
+                "type": "Element",
+                "namespace": "http://www.opentravel.org/OTA/2003/05",
+            },
+        )
     )
-    off_loc_service: List[OffLocationServiceType] = field(
+    off_loc_service: list[OffLocationServiceType] = field(
         default_factory=list,
         metadata={
             "name": "OffLocService",
@@ -8813,7 +8785,7 @@ class VehicleReservationRqadditionalInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    arrival_details: Optional[VehicleArrivalDetailsType] = field(
+    arrival_details: VehicleArrivalDetailsType | None = field(
         default=None,
         metadata={
             "name": "ArrivalDetails",
@@ -8821,7 +8793,7 @@ class VehicleReservationRqadditionalInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    rental_payment_pref: List[
+    rental_payment_pref: list[
         "VehicleReservationRqadditionalInfoType.RentalPaymentPref"
     ] = field(
         default_factory=list,
@@ -8839,7 +8811,7 @@ class VehicleReservationRqadditionalInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    tour_info: Optional[VehicleTourInfoType] = field(
+    tour_info: VehicleTourInfoType | None = field(
         default=None,
         metadata={
             "name": "TourInfo",
@@ -8847,7 +8819,7 @@ class VehicleReservationRqadditionalInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    written_conf_inst: Optional[WrittenConfInstType] = field(
+    written_conf_inst: WrittenConfInstType | None = field(
         default=None,
         metadata={
             "name": "WrittenConfInst",
@@ -8855,7 +8827,7 @@ class VehicleReservationRqadditionalInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    tpa_extensions: Optional[TpaExtensionsType] = field(
+    tpa_extensions: TpaExtensionsType | None = field(
         default=None,
         metadata={
             "name": "TPA_Extensions",
@@ -8863,14 +8835,14 @@ class VehicleReservationRqadditionalInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    luggage_qty: Optional[int] = field(
+    luggage_qty: int | None = field(
         default=None,
         metadata={
             "name": "LuggageQty",
             "type": "Attribute",
         },
     )
-    passenger_qty: Optional[int] = field(
+    passenger_qty: int | None = field(
         default=None,
         metadata={
             "name": "PassengerQty",
@@ -8894,14 +8866,14 @@ class VehicleReservationRqadditionalInfoType(object):
 
     @dataclass
     class RentalPaymentPref(PaymentDetailType):
-        payment_type: Optional[str] = field(
+        payment_type: str | None = field(
             default=None,
             metadata={
                 "name": "PaymentType",
                 "type": "Attribute",
             },
         )
-        type: Optional[RentalPaymentPrefType] = field(
+        type: RentalPaymentPrefType | None = field(
             default=None,
             metadata={
                 "name": "Type",
@@ -8911,28 +8883,28 @@ class VehicleReservationRqadditionalInfoType(object):
 
     @dataclass
     class Reference(UniqueIdType):
-        date_time: Optional[XmlDateTime] = field(
+        date_time: XmlDateTime | None = field(
             default=None,
             metadata={
                 "name": "DateTime",
                 "type": "Attribute",
             },
         )
-        amount: Optional[Decimal] = field(
+        amount: Decimal | None = field(
             default=None,
             metadata={
                 "name": "Amount",
                 "type": "Attribute",
             },
         )
-        currency_code: Optional[str] = field(
+        currency_code: str | None = field(
             default=None,
             metadata={
                 "name": "CurrencyCode",
                 "type": "Attribute",
             },
         )
-        decimal_places: Optional[int] = field(
+        decimal_places: int | None = field(
             default=None,
             metadata={
                 "name": "DecimalPlaces",
@@ -8946,7 +8918,7 @@ class VehicleAvailRqadditionalInfoType(object):
     class Meta(object):
         name = "VehicleAvailRQAdditionalInfoType"
 
-    customer: Optional[CustomerPrimaryAdditionalType] = field(
+    customer: CustomerPrimaryAdditionalType | None = field(
         default=None,
         metadata={
             "name": "Customer",
@@ -8954,7 +8926,7 @@ class VehicleAvailRqadditionalInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    special_req_pref: List[VehicleSpecialReqPrefType] = field(
+    special_req_pref: list[VehicleSpecialReqPrefType] = field(
         default_factory=list,
         metadata={
             "name": "SpecialReqPref",
@@ -8962,17 +8934,15 @@ class VehicleAvailRqadditionalInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    coverage_prefs: Optional[ArrayOfVehicleAvailRqadditionalInfoTypeCoveragePref] = (
-        field(
-            default=None,
-            metadata={
-                "name": "CoveragePrefs",
-                "type": "Element",
-                "namespace": "http://www.opentravel.org/OTA/2003/05",
-            },
-        )
+    coverage_prefs: ArrayOfVehicleAvailRqadditionalInfoTypeCoveragePref | None = field(
+        default=None,
+        metadata={
+            "name": "CoveragePrefs",
+            "type": "Element",
+            "namespace": "http://www.opentravel.org/OTA/2003/05",
+        },
     )
-    off_loc_service: List[OffLocationServiceType] = field(
+    off_loc_service: list[OffLocationServiceType] = field(
         default_factory=list,
         metadata={
             "name": "OffLocService",
@@ -8980,7 +8950,7 @@ class VehicleAvailRqadditionalInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    arrival_details: Optional[VehicleArrivalDetailsType] = field(
+    arrival_details: VehicleArrivalDetailsType | None = field(
         default=None,
         metadata={
             "name": "ArrivalDetails",
@@ -8988,7 +8958,7 @@ class VehicleAvailRqadditionalInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    tour_info: Optional[VehicleTourInfoType] = field(
+    tour_info: VehicleTourInfoType | None = field(
         default=None,
         metadata={
             "name": "TourInfo",
@@ -8996,7 +8966,7 @@ class VehicleAvailRqadditionalInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    tpa_extensions: Optional[TpaExtensionsType] = field(
+    tpa_extensions: TpaExtensionsType | None = field(
         default=None,
         metadata={
             "name": "TPA_Extensions",
@@ -9004,14 +8974,14 @@ class VehicleAvailRqadditionalInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    luggage_qty: Optional[int] = field(
+    luggage_qty: int | None = field(
         default=None,
         metadata={
             "name": "LuggageQty",
             "type": "Attribute",
         },
     )
-    passenger_qty: Optional[int] = field(
+    passenger_qty: int | None = field(
         default=None,
         metadata={
             "name": "PassengerQty",
@@ -9032,7 +9002,7 @@ class VehicleAvailRqadditionalInfoType(object):
             "type": "Attribute",
         },
     )
-    single_quote: Optional[bool] = field(
+    single_quote: bool | None = field(
         default=None,
         metadata={
             "name": "SingleQuote",
@@ -9046,7 +9016,7 @@ class VehicleAvailRsadditionalInfoType(object):
     class Meta(object):
         name = "VehicleAvailRSAdditionalInfoType"
 
-    customer: Optional[CustomerPrimaryAdditionalType] = field(
+    customer: CustomerPrimaryAdditionalType | None = field(
         default=None,
         metadata={
             "name": "Customer",
@@ -9058,7 +9028,7 @@ class VehicleAvailRsadditionalInfoType(object):
 
 @dataclass
 class VehicleLocationDetailsType(object):
-    address: List[AddressInfoType] = field(
+    address: list[AddressInfoType] = field(
         default_factory=list,
         metadata={
             "name": "Address",
@@ -9066,7 +9036,7 @@ class VehicleLocationDetailsType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    telephone: List["VehicleLocationDetailsType.Telephone"] = field(
+    telephone: list["VehicleLocationDetailsType.Telephone"] = field(
         default_factory=list,
         metadata={
             "name": "Telephone",
@@ -9074,7 +9044,7 @@ class VehicleLocationDetailsType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    additional_info: Optional[VehicleLocationAdditionalDetailsType] = field(
+    additional_info: VehicleLocationAdditionalDetailsType | None = field(
         default=None,
         metadata={
             "name": "AdditionalInfo",
@@ -9082,42 +9052,42 @@ class VehicleLocationDetailsType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    at_airport: Optional[bool] = field(
+    at_airport: bool | None = field(
         default=None,
         metadata={
             "name": "AtAirport",
             "type": "Attribute",
         },
     )
-    code: Optional[str] = field(
+    code: str | None = field(
         default=None,
         metadata={
             "name": "Code",
             "type": "Attribute",
         },
     )
-    name: Optional[str] = field(
+    name: str | None = field(
         default=None,
         metadata={
             "name": "Name",
             "type": "Attribute",
         },
     )
-    code_context: Optional[str] = field(
+    code_context: str | None = field(
         default=None,
         metadata={
             "name": "CodeContext",
             "type": "Attribute",
         },
     )
-    extended_location_code: Optional[str] = field(
+    extended_location_code: str | None = field(
         default=None,
         metadata={
             "name": "ExtendedLocationCode",
             "type": "Attribute",
         },
     )
-    assoc_airport_loc_list: List[str] = field(
+    assoc_airport_loc_list: list[str] = field(
         default_factory=list,
         metadata={
             "name": "AssocAirportLocList",
@@ -9128,21 +9098,21 @@ class VehicleLocationDetailsType(object):
 
     @dataclass
     class Telephone(object):
-        phone_tech_type: Optional[str] = field(
+        phone_tech_type: str | None = field(
             default=None,
             metadata={
                 "name": "PhoneTechType",
                 "type": "Attribute",
             },
         )
-        phone_number: Optional[str] = field(
+        phone_number: str | None = field(
             default=None,
             metadata={
                 "name": "PhoneNumber",
                 "type": "Attribute",
             },
         )
-        rph: Optional[str] = field(
+        rph: str | None = field(
             default=None,
             metadata={
                 "name": "RPH",
@@ -9156,7 +9126,7 @@ class VehicleReservationRqcoreType(object):
     class Meta(object):
         name = "VehicleReservationRQCoreType"
 
-    unique_id: List[UniqueIdType] = field(
+    unique_id: list[UniqueIdType] = field(
         default_factory=list,
         metadata={
             "name": "UniqueID",
@@ -9164,7 +9134,7 @@ class VehicleReservationRqcoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    veh_rental_core: Optional[VehicleRentalCoreType] = field(
+    veh_rental_core: VehicleRentalCoreType | None = field(
         default=None,
         metadata={
             "name": "VehRentalCore",
@@ -9172,7 +9142,7 @@ class VehicleReservationRqcoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    customer: Optional[CustomerPrimaryAdditionalType] = field(
+    customer: CustomerPrimaryAdditionalType | None = field(
         default=None,
         metadata={
             "name": "Customer",
@@ -9180,7 +9150,7 @@ class VehicleReservationRqcoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    vendor_pref: Optional[CompanyNamePrefType] = field(
+    vendor_pref: CompanyNamePrefType | None = field(
         default=None,
         metadata={
             "name": "VendorPref",
@@ -9188,7 +9158,7 @@ class VehicleReservationRqcoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    veh_pref: Optional[VehiclePrefType] = field(
+    veh_pref: VehiclePrefType | None = field(
         default=None,
         metadata={
             "name": "VehPref",
@@ -9196,7 +9166,7 @@ class VehicleReservationRqcoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    driver_type: List["VehicleReservationRqcoreType.DriverType"] = field(
+    driver_type: list["VehicleReservationRqcoreType.DriverType"] = field(
         default_factory=list,
         metadata={
             "name": "DriverType",
@@ -9204,7 +9174,7 @@ class VehicleReservationRqcoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    rate_qualifier: Optional[RateQualifierType] = field(
+    rate_qualifier: RateQualifierType | None = field(
         default=None,
         metadata={
             "name": "RateQualifier",
@@ -9212,7 +9182,7 @@ class VehicleReservationRqcoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    fees: Optional[ArrayOfVehicleChargePurposeType1] = field(
+    fees: ArrayOfVehicleChargePurposeType1 | None = field(
         default=None,
         metadata={
             "name": "Fees",
@@ -9220,7 +9190,7 @@ class VehicleReservationRqcoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    vehicle_charges: Optional[ArrayOfVehicleChargePurposeType] = field(
+    vehicle_charges: ArrayOfVehicleChargePurposeType | None = field(
         default=None,
         metadata={
             "name": "VehicleCharges",
@@ -9238,7 +9208,7 @@ class VehicleReservationRqcoreType(object):
             },
         )
     )
-    rate_distance: List["VehicleReservationRqcoreType.RateDistance"] = field(
+    rate_distance: list["VehicleReservationRqcoreType.RateDistance"] = field(
         default_factory=list,
         metadata={
             "name": "RateDistance",
@@ -9262,7 +9232,7 @@ class VehicleReservationRqcoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    tpa_extensions: Optional[TpaExtensionsType] = field(
+    tpa_extensions: TpaExtensionsType | None = field(
         default=None,
         metadata={
             "name": "TPA_Extensions",
@@ -9270,7 +9240,7 @@ class VehicleReservationRqcoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    status: Optional[str] = field(
+    status: str | None = field(
         default=None,
         metadata={
             "name": "Status",
@@ -9280,28 +9250,28 @@ class VehicleReservationRqcoreType(object):
 
     @dataclass
     class DriverType(object):
-        age: Optional[int] = field(
+        age: int | None = field(
             default=None,
             metadata={
                 "name": "Age",
                 "type": "Attribute",
             },
         )
-        code: Optional[str] = field(
+        code: str | None = field(
             default=None,
             metadata={
                 "name": "Code",
                 "type": "Attribute",
             },
         )
-        code_context: Optional[str] = field(
+        code_context: str | None = field(
             default=None,
             metadata={
                 "name": "CodeContext",
                 "type": "Attribute",
             },
         )
-        uri: Optional[str] = field(
+        uri: str | None = field(
             default=None,
             metadata={
                 "name": "URI",
@@ -9311,7 +9281,7 @@ class VehicleReservationRqcoreType(object):
 
     @dataclass
     class SpecialEquipPrefs(object):
-        special_equip_pref: List[
+        special_equip_pref: list[
             VehicleReservationRqcoreTypeSpecialEquipPrefsSpecialEquipPref
         ] = field(
             default_factory=list,
@@ -9321,7 +9291,7 @@ class VehicleReservationRqcoreType(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        charge: Optional[VehicleChargeType] = field(
+        charge: VehicleChargeType | None = field(
             default=None,
             metadata={
                 "name": "Charge",
@@ -9332,7 +9302,7 @@ class VehicleReservationRqcoreType(object):
 
     @dataclass
     class RateDistance(object):
-        unlimited: Optional[bool] = field(
+        unlimited: bool | None = field(
             default=None,
             metadata={
                 "name": "Unlimited",
@@ -9340,21 +9310,21 @@ class VehicleReservationRqcoreType(object):
                 "required": True,
             },
         )
-        quantity: Optional[int] = field(
+        quantity: int | None = field(
             default=None,
             metadata={
                 "name": "Quantity",
                 "type": "Attribute",
             },
         )
-        dist_unit_name: Optional[DistanceUnitNameType] = field(
+        dist_unit_name: DistanceUnitNameType | None = field(
             default=None,
             metadata={
                 "name": "DistUnitName",
                 "type": "Attribute",
             },
         )
-        vehicle_period_unit_name: Optional[VehiclePeriodUnitNameType] = field(
+        vehicle_period_unit_name: VehiclePeriodUnitNameType | None = field(
             default=None,
             metadata={
                 "name": "VehiclePeriodUnitName",
@@ -9364,14 +9334,14 @@ class VehicleReservationRqcoreType(object):
 
     @dataclass
     class TotalCharge(object):
-        rate_total_amount: Optional[Decimal] = field(
+        rate_total_amount: Decimal | None = field(
             default=None,
             metadata={
                 "name": "RateTotalAmount",
                 "type": "Attribute",
             },
         )
-        estimated_total_amount: Optional[Decimal] = field(
+        estimated_total_amount: Decimal | None = field(
             default=None,
             metadata={
                 "name": "EstimatedTotalAmount",
@@ -9381,35 +9351,35 @@ class VehicleReservationRqcoreType(object):
 
     @dataclass
     class Queue(object):
-        pseudo_city_code: Optional[str] = field(
+        pseudo_city_code: str | None = field(
             default=None,
             metadata={
                 "name": "PseudoCityCode",
                 "type": "Attribute",
             },
         )
-        queue_number: Optional[str] = field(
+        queue_number: str | None = field(
             default=None,
             metadata={
                 "name": "QueueNumber",
                 "type": "Attribute",
             },
         )
-        queue_category: Optional[str] = field(
+        queue_category: str | None = field(
             default=None,
             metadata={
                 "name": "QueueCategory",
                 "type": "Attribute",
             },
         )
-        system_code: Optional[str] = field(
+        system_code: str | None = field(
             default=None,
             metadata={
                 "name": "SystemCode",
                 "type": "Attribute",
             },
         )
-        queue_id: Optional[str] = field(
+        queue_id: str | None = field(
             default=None,
             metadata={
                 "name": "QueueID",
@@ -9424,42 +9394,42 @@ class VehAvailRateRq(object):
         name = "VehAvailRateRQ"
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
-    pos: Optional[ArrayOfSourceType] = field(
+    pos: ArrayOfSourceType | None = field(
         default=None,
         metadata={
             "name": "POS",
             "type": "Element",
         },
     )
-    customer_id: List[UniqueIdType] = field(
+    customer_id: list[UniqueIdType] = field(
         default_factory=list,
         metadata={
             "name": "CustomerID",
             "type": "Element",
         },
     )
-    veh_avail_rqcore: Optional[VehicleAvailRqcoreType] = field(
+    veh_avail_rqcore: VehicleAvailRqcoreType | None = field(
         default=None,
         metadata={
             "name": "VehAvailRQCore",
             "type": "Element",
         },
     )
-    veh_avail_rqinfo: Optional[VehicleAvailRqadditionalInfoType] = field(
+    veh_avail_rqinfo: VehicleAvailRqadditionalInfoType | None = field(
         default=None,
         metadata={
             "name": "VehAvailRQInfo",
             "type": "Element",
         },
     )
-    echo_token: Optional[str] = field(
+    echo_token: str | None = field(
         default=None,
         metadata={
             "name": "EchoToken",
             "type": "Attribute",
         },
     )
-    time_stamp: Optional[XmlDateTime] = field(
+    time_stamp: XmlDateTime | None = field(
         default=None,
         metadata={
             "name": "TimeStamp",
@@ -9473,7 +9443,7 @@ class VehAvailRateRq(object):
             "type": "Attribute",
         },
     )
-    version: Optional[Decimal] = field(
+    version: Decimal | None = field(
         default=None,
         metadata={
             "name": "Version",
@@ -9481,49 +9451,49 @@ class VehAvailRateRq(object):
             "required": True,
         },
     )
-    transaction_identifier: Optional[str] = field(
+    transaction_identifier: str | None = field(
         default=None,
         metadata={
             "name": "TransactionIdentifier",
             "type": "Attribute",
         },
     )
-    sequence_nmbr: Optional[int] = field(
+    sequence_nmbr: int | None = field(
         default=None,
         metadata={
             "name": "SequenceNmbr",
             "type": "Attribute",
         },
     )
-    transaction_status_code: Optional[VehAvailRateRqTransactionStatusCode] = field(
+    transaction_status_code: VehAvailRateRqTransactionStatusCode | None = field(
         default=None,
         metadata={
             "name": "TransactionStatusCode",
             "type": "Attribute",
         },
     )
-    retransmission_indicator: Optional[bool] = field(
+    retransmission_indicator: bool | None = field(
         default=None,
         metadata={
             "name": "RetransmissionIndicator",
             "type": "Attribute",
         },
     )
-    req_resp_version: Optional[str] = field(
+    req_resp_version: str | None = field(
         default=None,
         metadata={
             "name": "ReqRespVersion",
             "type": "Attribute",
         },
     )
-    max_responses: Optional[int] = field(
+    max_responses: int | None = field(
         default=None,
         metadata={
             "name": "MaxResponses",
             "type": "Attribute",
         },
     )
-    max_per_vendor_ind: Optional[bool] = field(
+    max_per_vendor_ind: bool | None = field(
         default=None,
         metadata={
             "name": "MaxPerVendorInd",
@@ -9538,63 +9508,63 @@ class VehLocDetailRs(OtaResponse):
         name = "VehLocDetailRS"
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
-    success: Optional[SuccessType] = field(
+    success: SuccessType | None = field(
         default=None,
         metadata={
             "name": "Success",
             "type": "Element",
         },
     )
-    warnings: Optional[ArrayOfWarningType] = field(
+    warnings: ArrayOfWarningType | None = field(
         default=None,
         metadata={
             "name": "Warnings",
             "type": "Element",
         },
     )
-    vendor: Optional[CompanyNameType] = field(
+    vendor: CompanyNameType | None = field(
         default=None,
         metadata={
             "name": "Vendor",
             "type": "Element",
         },
     )
-    location_detail: Optional[VehicleLocationDetailsType] = field(
+    location_detail: VehicleLocationDetailsType | None = field(
         default=None,
         metadata={
             "name": "LocationDetail",
             "type": "Element",
         },
     )
-    vehicles: Optional[VehicleLocationVehiclesType] = field(
+    vehicles: VehicleLocationVehiclesType | None = field(
         default=None,
         metadata={
             "name": "Vehicles",
             "type": "Element",
         },
     )
-    requirements: Optional[VehicleLocationRequirementsType] = field(
+    requirements: VehicleLocationRequirementsType | None = field(
         default=None,
         metadata={
             "name": "Requirements",
             "type": "Element",
         },
     )
-    additional_fees: Optional[VehicleLocationAdditionalFeesType] = field(
+    additional_fees: VehicleLocationAdditionalFeesType | None = field(
         default=None,
         metadata={
             "name": "AdditionalFees",
             "type": "Element",
         },
     )
-    liabilities: Optional[VehicleLocationLiabilitiesType] = field(
+    liabilities: VehicleLocationLiabilitiesType | None = field(
         default=None,
         metadata={
             "name": "Liabilities",
             "type": "Element",
         },
     )
-    services_offered: Optional[VehicleLocationServicesOfferedType] = field(
+    services_offered: VehicleLocationServicesOfferedType | None = field(
         default=None,
         metadata={
             "name": "ServicesOffered",
@@ -9608,28 +9578,28 @@ class VehLocDetailRs(OtaResponse):
             "type": "Element",
         },
     )
-    tpa_extensions: Optional[TpaExtensionsType] = field(
+    tpa_extensions: TpaExtensionsType | None = field(
         default=None,
         metadata={
             "name": "TPA_Extensions",
             "type": "Element",
         },
     )
-    errors: Optional[ArrayOfErrorType] = field(
+    errors: ArrayOfErrorType | None = field(
         default=None,
         metadata={
             "name": "Errors",
             "type": "Element",
         },
     )
-    echo_token: Optional[str] = field(
+    echo_token: str | None = field(
         default=None,
         metadata={
             "name": "EchoToken",
             "type": "Attribute",
         },
     )
-    time_stamp: Optional[XmlDateTime] = field(
+    time_stamp: XmlDateTime | None = field(
         default=None,
         metadata={
             "name": "TimeStamp",
@@ -9643,35 +9613,35 @@ class VehLocDetailRs(OtaResponse):
             "type": "Attribute",
         },
     )
-    version: Optional[str] = field(
+    version: str | None = field(
         default=None,
         metadata={
             "name": "Version",
             "type": "Attribute",
         },
     )
-    transaction_identifier: Optional[str] = field(
+    transaction_identifier: str | None = field(
         default=None,
         metadata={
             "name": "TransactionIdentifier",
             "type": "Attribute",
         },
     )
-    sequence_nmbr: Optional[int] = field(
+    sequence_nmbr: int | None = field(
         default=None,
         metadata={
             "name": "SequenceNmbr",
             "type": "Attribute",
         },
     )
-    transaction_status_code: Optional[VehLocDetailRsTransactionStatusCode] = field(
+    transaction_status_code: VehLocDetailRsTransactionStatusCode | None = field(
         default=None,
         metadata={
             "name": "TransactionStatusCode",
             "type": "Attribute",
         },
     )
-    retransmission_indicator: Optional[bool] = field(
+    retransmission_indicator: bool | None = field(
         default=None,
         metadata={
             "name": "RetransmissionIndicator",
@@ -9681,14 +9651,14 @@ class VehLocDetailRs(OtaResponse):
 
     @dataclass
     class Date(object):
-        pick_up_date_time: Optional[str] = field(
+        pick_up_date_time: str | None = field(
             default=None,
             metadata={
                 "name": "PickUpDateTime",
                 "type": "Attribute",
             },
         )
-        return_date_time: Optional[str] = field(
+        return_date_time: str | None = field(
             default=None,
             metadata={
                 "name": "ReturnDateTime",
@@ -9703,14 +9673,14 @@ class VehRateRuleRs(OtaResponse):
         name = "VehRateRuleRS"
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
-    success: Optional[SuccessType] = field(
+    success: SuccessType | None = field(
         default=None,
         metadata={
             "name": "Success",
             "type": "Element",
         },
     )
-    warnings: Optional[ArrayOfWarningType] = field(
+    warnings: ArrayOfWarningType | None = field(
         default=None,
         metadata={
             "name": "Warnings",
@@ -9731,7 +9701,7 @@ class VehRateRuleRs(OtaResponse):
             "type": "Element",
         },
     )
-    rental_rate: List["VehRateRuleRs.RentalRate"] = field(
+    rental_rate: list["VehRateRuleRs.RentalRate"] = field(
         default_factory=list,
         metadata={
             "name": "RentalRate",
@@ -9752,63 +9722,63 @@ class VehRateRuleRs(OtaResponse):
             "type": "Element",
         },
     )
-    priced_equips: Optional[ArrayOfVehicleEquipmentPricedType] = field(
+    priced_equips: ArrayOfVehicleEquipmentPricedType | None = field(
         default=None,
         metadata={
             "name": "PricedEquips",
             "type": "Element",
         },
     )
-    fees: Optional[ArrayOfVehicleChargePurposeType1] = field(
+    fees: ArrayOfVehicleChargePurposeType1 | None = field(
         default=None,
         metadata={
             "name": "Fees",
             "type": "Element",
         },
     )
-    priced_coverages: Optional[ArrayOfCoveragePricedType] = field(
+    priced_coverages: ArrayOfCoveragePricedType | None = field(
         default=None,
         metadata={
             "name": "PricedCoverages",
             "type": "Element",
         },
     )
-    location_details: List["VehRateRuleRs.LocationDetails"] = field(
+    location_details: list["VehRateRuleRs.LocationDetails"] = field(
         default_factory=list,
         metadata={
             "name": "LocationDetails",
             "type": "Element",
         },
     )
-    vendor_messages: Optional[ArrayOfVendorMessageType] = field(
+    vendor_messages: ArrayOfVendorMessageType | None = field(
         default=None,
         metadata={
             "name": "VendorMessages",
             "type": "Element",
         },
     )
-    tpa_extensions: Optional[TpaExtensionsType] = field(
+    tpa_extensions: TpaExtensionsType | None = field(
         default=None,
         metadata={
             "name": "TPA_Extensions",
             "type": "Element",
         },
     )
-    errors: Optional[ArrayOfErrorType] = field(
+    errors: ArrayOfErrorType | None = field(
         default=None,
         metadata={
             "name": "Errors",
             "type": "Element",
         },
     )
-    echo_token: Optional[str] = field(
+    echo_token: str | None = field(
         default=None,
         metadata={
             "name": "EchoToken",
             "type": "Attribute",
         },
     )
-    time_stamp: Optional[XmlDateTime] = field(
+    time_stamp: XmlDateTime | None = field(
         default=None,
         metadata={
             "name": "TimeStamp",
@@ -9822,7 +9792,7 @@ class VehRateRuleRs(OtaResponse):
             "type": "Attribute",
         },
     )
-    version: Optional[Decimal] = field(
+    version: Decimal | None = field(
         default=None,
         metadata={
             "name": "Version",
@@ -9830,28 +9800,28 @@ class VehRateRuleRs(OtaResponse):
             "required": True,
         },
     )
-    transaction_identifier: Optional[str] = field(
+    transaction_identifier: str | None = field(
         default=None,
         metadata={
             "name": "TransactionIdentifier",
             "type": "Attribute",
         },
     )
-    sequence_nmbr: Optional[int] = field(
+    sequence_nmbr: int | None = field(
         default=None,
         metadata={
             "name": "SequenceNmbr",
             "type": "Attribute",
         },
     )
-    transaction_status_code: Optional[VehRateRuleRsTransactionStatusCode] = field(
+    transaction_status_code: VehRateRuleRsTransactionStatusCode | None = field(
         default=None,
         metadata={
             "name": "TransactionStatusCode",
             "type": "Attribute",
         },
     )
-    retransmission_indicator: Optional[bool] = field(
+    retransmission_indicator: bool | None = field(
         default=None,
         metadata={
             "name": "RetransmissionIndicator",
@@ -9861,42 +9831,42 @@ class VehRateRuleRs(OtaResponse):
 
     @dataclass
     class VehRentalCore(VehicleRentalCoreType):
-        day_of_week: Optional[DayOfWeekType] = field(
+        day_of_week: DayOfWeekType | None = field(
             default=None,
             metadata={
                 "name": "DayOfWeek",
                 "type": "Attribute",
             },
         )
-        currency_code: Optional[str] = field(
+        currency_code: str | None = field(
             default=None,
             metadata={
                 "name": "CurrencyCode",
                 "type": "Attribute",
             },
         )
-        company_short_name: Optional[str] = field(
+        company_short_name: str | None = field(
             default=None,
             metadata={
                 "name": "CompanyShortName",
                 "type": "Attribute",
             },
         )
-        travel_sector: Optional[str] = field(
+        travel_sector: str | None = field(
             default=None,
             metadata={
                 "name": "TravelSector",
                 "type": "Attribute",
             },
         )
-        code: Optional[str] = field(
+        code: str | None = field(
             default=None,
             metadata={
                 "name": "Code",
                 "type": "Attribute",
             },
         )
-        code_context: Optional[str] = field(
+        code_context: str | None = field(
             default=None,
             metadata={
                 "name": "CodeContext",
@@ -9906,21 +9876,21 @@ class VehRateRuleRs(OtaResponse):
 
     @dataclass
     class Vehicle(VehicleType):
-        description: Optional[FormattedTextTextType] = field(
+        description: FormattedTextTextType | None = field(
             default=None,
             metadata={
                 "name": "Description",
                 "type": "Element",
             },
         )
-        low_mileage: Optional[int] = field(
+        low_mileage: int | None = field(
             default=None,
             metadata={
                 "name": "LowMileage",
                 "type": "Attribute",
             },
         )
-        high_mileage: Optional[int] = field(
+        high_mileage: int | None = field(
             default=None,
             metadata={
                 "name": "HighMileage",
@@ -9930,7 +9900,7 @@ class VehRateRuleRs(OtaResponse):
 
     @dataclass
     class RentalRate(VehicleRentalRateType):
-        written_conf_ind: Optional[bool] = field(
+        written_conf_ind: bool | None = field(
             default=None,
             metadata={
                 "name": "WrittenConfInd",
@@ -9940,21 +9910,21 @@ class VehRateRuleRs(OtaResponse):
 
     @dataclass
     class TotalCharge(object):
-        currency_code: Optional[str] = field(
+        currency_code: str | None = field(
             default=None,
             metadata={
                 "name": "CurrencyCode",
                 "type": "Attribute",
             },
         )
-        rate_total_amount: Optional[Decimal] = field(
+        rate_total_amount: Decimal | None = field(
             default=None,
             metadata={
                 "name": "RateTotalAmount",
                 "type": "Attribute",
             },
         )
-        estimated_total_amount: Optional[Decimal] = field(
+        estimated_total_amount: Decimal | None = field(
             default=None,
             metadata={
                 "name": "EstimatedTotalAmount",
@@ -9994,7 +9964,7 @@ class VehRateRuleRs(OtaResponse):
                 "type": "Element",
             },
         )
-        cancel_penalty_info: List["VehRateRuleRs.RateRules.CancelPenaltyInfo"] = field(
+        cancel_penalty_info: list["VehRateRuleRs.RateRules.CancelPenaltyInfo"] = field(
             default_factory=list,
             metadata={
                 "name": "CancelPenaltyInfo",
@@ -10008,21 +9978,21 @@ class VehRateRuleRs(OtaResponse):
                 "type": "Element",
             },
         )
-        minimum_keep: Optional[XmlDuration] = field(
+        minimum_keep: XmlDuration | None = field(
             default=None,
             metadata={
                 "name": "MinimumKeep",
                 "type": "Attribute",
             },
         )
-        maximum_keep: Optional[XmlDuration] = field(
+        maximum_keep: XmlDuration | None = field(
             default=None,
             metadata={
                 "name": "MaximumKeep",
                 "type": "Attribute",
             },
         )
-        maximum_rental: Optional[XmlDuration] = field(
+        maximum_rental: XmlDuration | None = field(
             default=None,
             metadata={
                 "name": "MaximumRental",
@@ -10032,35 +10002,35 @@ class VehRateRuleRs(OtaResponse):
 
         @dataclass
         class AdvanceBooking(object):
-            absolute_deadline: Optional[str] = field(
+            absolute_deadline: str | None = field(
                 default=None,
                 metadata={
                     "name": "AbsoluteDeadline",
                     "type": "Attribute",
                 },
             )
-            offset_time_unit: Optional[TimeUnitType] = field(
+            offset_time_unit: TimeUnitType | None = field(
                 default=None,
                 metadata={
                     "name": "OffsetTimeUnit",
                     "type": "Attribute",
                 },
             )
-            offset_unit_multiplier: Optional[int] = field(
+            offset_unit_multiplier: int | None = field(
                 default=None,
                 metadata={
                     "name": "OffsetUnitMultiplier",
                     "type": "Attribute",
                 },
             )
-            offset_drop_time: Optional[AdvanceBookingOffsetDropTime] = field(
+            offset_drop_time: AdvanceBookingOffsetDropTime | None = field(
                 default=None,
                 metadata={
                     "name": "OffsetDropTime",
                     "type": "Attribute",
                 },
             )
-            required_ind: Optional[bool] = field(
+            required_ind: bool | None = field(
                 default=None,
                 metadata={
                     "name": "RequiredInd",
@@ -10100,14 +10070,14 @@ class VehRateRuleRs(OtaResponse):
 
             @dataclass
             class EarliestPickup(object):
-                day_of_week: Optional[DayOfWeekType] = field(
+                day_of_week: DayOfWeekType | None = field(
                     default=None,
                     metadata={
                         "name": "DayOfWeek",
                         "type": "Attribute",
                     },
                 )
-                time: Optional[str] = field(
+                time: str | None = field(
                     default=None,
                     metadata={
                         "name": "Time",
@@ -10117,14 +10087,14 @@ class VehRateRuleRs(OtaResponse):
 
             @dataclass
             class LatestPickup(object):
-                day_of_week: Optional[DayOfWeekType] = field(
+                day_of_week: DayOfWeekType | None = field(
                     default=None,
                     metadata={
                         "name": "DayOfWeek",
                         "type": "Attribute",
                     },
                 )
-                time: Optional[str] = field(
+                time: str | None = field(
                     default=None,
                     metadata={
                         "name": "Time",
@@ -10134,14 +10104,14 @@ class VehRateRuleRs(OtaResponse):
 
             @dataclass
             class LatestReturn(object):
-                day_of_week: Optional[DayOfWeekType] = field(
+                day_of_week: DayOfWeekType | None = field(
                     default=None,
                     metadata={
                         "name": "DayOfWeek",
                         "type": "Attribute",
                     },
                 )
-                time: Optional[str] = field(
+                time: str | None = field(
                     default=None,
                     metadata={
                         "name": "Time",
@@ -10151,35 +10121,35 @@ class VehRateRuleRs(OtaResponse):
 
         @dataclass
         class RateGuarantee(object):
-            description: Optional[FormattedTextTextType] = field(
+            description: FormattedTextTextType | None = field(
                 default=None,
                 metadata={
                     "name": "Description",
                     "type": "Element",
                 },
             )
-            absolute_deadline: Optional[str] = field(
+            absolute_deadline: str | None = field(
                 default=None,
                 metadata={
                     "name": "AbsoluteDeadline",
                     "type": "Attribute",
                 },
             )
-            offset_time_unit: Optional[TimeUnitType] = field(
+            offset_time_unit: TimeUnitType | None = field(
                 default=None,
                 metadata={
                     "name": "OffsetTimeUnit",
                     "type": "Attribute",
                 },
             )
-            offset_unit_multiplier: Optional[int] = field(
+            offset_unit_multiplier: int | None = field(
                 default=None,
                 metadata={
                     "name": "OffsetUnitMultiplier",
                     "type": "Attribute",
                 },
             )
-            offset_drop_time: Optional[RateGuaranteeOffsetDropTime] = field(
+            offset_drop_time: RateGuaranteeOffsetDropTime | None = field(
                 default=None,
                 metadata={
                     "name": "OffsetDropTime",
@@ -10189,7 +10159,7 @@ class VehRateRuleRs(OtaResponse):
 
         @dataclass
         class PaymentRules(PaymentRulesType):
-            acceptable_payments: List[
+            acceptable_payments: list[
                 "VehRateRuleRs.RateRules.PaymentRules.AcceptablePayments"
             ] = field(
                 default_factory=list,
@@ -10201,7 +10171,7 @@ class VehRateRuleRs(OtaResponse):
 
             @dataclass
             class AcceptablePayments(object):
-                acceptable_payment: List[
+                acceptable_payment: list[
                     "VehRateRuleRs.RateRules.PaymentRules.AcceptablePayments.AcceptablePayment"
                 ] = field(
                     default_factory=list,
@@ -10210,7 +10180,7 @@ class VehRateRuleRs(OtaResponse):
                         "type": "Element",
                     },
                 )
-                payment_type_code: Optional[str] = field(
+                payment_type_code: str | None = field(
                     default=None,
                     metadata={
                         "name": "PaymentTypeCode",
@@ -10220,7 +10190,7 @@ class VehRateRuleRs(OtaResponse):
 
                 @dataclass
                 class AcceptablePayment(object):
-                    credit_card_code: Optional[str] = field(
+                    credit_card_code: str | None = field(
                         default=None,
                         metadata={
                             "name": "CreditCardCode",
@@ -10230,7 +10200,7 @@ class VehRateRuleRs(OtaResponse):
 
         @dataclass
         class CancelPenaltyInfo(object):
-            deadline: List["VehRateRuleRs.RateRules.CancelPenaltyInfo.Deadline"] = (
+            deadline: list["VehRateRuleRs.RateRules.CancelPenaltyInfo.Deadline"] = (
                 field(
                     default_factory=list,
                     metadata={
@@ -10248,21 +10218,21 @@ class VehRateRuleRs(OtaResponse):
                     "type": "Element",
                 },
             )
-            description: Optional[FormattedTextTextType] = field(
+            description: FormattedTextTextType | None = field(
                 default=None,
                 metadata={
                     "name": "Description",
                     "type": "Element",
                 },
             )
-            guarantee_required_ind: Optional[bool] = field(
+            guarantee_required_ind: bool | None = field(
                 default=None,
                 metadata={
                     "name": "GuaranteeRequiredInd",
                     "type": "Attribute",
                 },
             )
-            modify_penalty_ind: Optional[bool] = field(
+            modify_penalty_ind: bool | None = field(
                 default=None,
                 metadata={
                     "name": "ModifyPenaltyInd",
@@ -10272,28 +10242,28 @@ class VehRateRuleRs(OtaResponse):
 
             @dataclass
             class Deadline(object):
-                absolute_deadline: Optional[str] = field(
+                absolute_deadline: str | None = field(
                     default=None,
                     metadata={
                         "name": "AbsoluteDeadline",
                         "type": "Attribute",
                     },
                 )
-                offset_time_unit: Optional[TimeUnitType] = field(
+                offset_time_unit: TimeUnitType | None = field(
                     default=None,
                     metadata={
                         "name": "OffsetTimeUnit",
                         "type": "Attribute",
                     },
                 )
-                offset_unit_multiplier: Optional[int] = field(
+                offset_unit_multiplier: int | None = field(
                     default=None,
                     metadata={
                         "name": "OffsetUnitMultiplier",
                         "type": "Attribute",
                     },
                 )
-                offset_drop_time: Optional[DeadlineOffsetDropTime] = field(
+                offset_drop_time: DeadlineOffsetDropTime | None = field(
                     default=None,
                     metadata={
                         "name": "OffsetDropTime",
@@ -10303,7 +10273,7 @@ class VehRateRuleRs(OtaResponse):
 
             @dataclass
             class PenaltyFee(object):
-                amount: Optional[Decimal] = field(
+                amount: Decimal | None = field(
                     default=None,
                     metadata={
                         "name": "Amount",
@@ -10313,35 +10283,35 @@ class VehRateRuleRs(OtaResponse):
 
         @dataclass
         class RateDeposit(object):
-            absolute_deadline: Optional[str] = field(
+            absolute_deadline: str | None = field(
                 default=None,
                 metadata={
                     "name": "AbsoluteDeadline",
                     "type": "Attribute",
                 },
             )
-            offset_time_unit: Optional[TimeUnitType] = field(
+            offset_time_unit: TimeUnitType | None = field(
                 default=None,
                 metadata={
                     "name": "OffsetTimeUnit",
                     "type": "Attribute",
                 },
             )
-            offset_unit_multiplier: Optional[int] = field(
+            offset_unit_multiplier: int | None = field(
                 default=None,
                 metadata={
                     "name": "OffsetUnitMultiplier",
                     "type": "Attribute",
                 },
             )
-            offset_drop_time: Optional[RateDepositOffsetDropTime] = field(
+            offset_drop_time: RateDepositOffsetDropTime | None = field(
                 default=None,
                 metadata={
                     "name": "OffsetDropTime",
                     "type": "Attribute",
                 },
             )
-            deposit_required_ind: Optional[bool] = field(
+            deposit_required_ind: bool | None = field(
                 default=None,
                 metadata={
                     "name": "DepositRequiredInd",
@@ -10351,7 +10321,7 @@ class VehRateRuleRs(OtaResponse):
 
     @dataclass
     class LocationDetails(VehicleLocationDetailsType):
-        drop_off_indicator: Optional[bool] = field(
+        drop_off_indicator: bool | None = field(
             default=None,
             metadata={
                 "name": "DropOffIndicator",
@@ -10366,7 +10336,7 @@ class VehResRq(object):
         name = "VehResRQ"
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
-    pos: Optional[ArrayOfSourceType] = field(
+    pos: ArrayOfSourceType | None = field(
         default=None,
         metadata={
             "name": "POS",
@@ -10387,14 +10357,14 @@ class VehResRq(object):
             "type": "Element",
         },
     )
-    echo_token: Optional[str] = field(
+    echo_token: str | None = field(
         default=None,
         metadata={
             "name": "EchoToken",
             "type": "Attribute",
         },
     )
-    time_stamp: Optional[XmlDateTime] = field(
+    time_stamp: XmlDateTime | None = field(
         default=None,
         metadata={
             "name": "TimeStamp",
@@ -10408,7 +10378,7 @@ class VehResRq(object):
             "type": "Attribute",
         },
     )
-    version: Optional[Decimal] = field(
+    version: Decimal | None = field(
         default=None,
         metadata={
             "name": "Version",
@@ -10416,35 +10386,35 @@ class VehResRq(object):
             "required": True,
         },
     )
-    transaction_identifier: Optional[str] = field(
+    transaction_identifier: str | None = field(
         default=None,
         metadata={
             "name": "TransactionIdentifier",
             "type": "Attribute",
         },
     )
-    sequence_nmbr: Optional[int] = field(
+    sequence_nmbr: int | None = field(
         default=None,
         metadata={
             "name": "SequenceNmbr",
             "type": "Attribute",
         },
     )
-    transaction_status_code: Optional[VehResRqTransactionStatusCode] = field(
+    transaction_status_code: VehResRqTransactionStatusCode | None = field(
         default=None,
         metadata={
             "name": "TransactionStatusCode",
             "type": "Attribute",
         },
     )
-    retransmission_indicator: Optional[bool] = field(
+    retransmission_indicator: bool | None = field(
         default=None,
         metadata={
             "name": "RetransmissionIndicator",
             "type": "Attribute",
         },
     )
-    req_resp_version: Optional[str] = field(
+    req_resp_version: str | None = field(
         default=None,
         metadata={
             "name": "ReqRespVersion",
@@ -10454,7 +10424,7 @@ class VehResRq(object):
 
     @dataclass
     class VehResRqcore(VehicleReservationRqcoreType):
-        option_change_indicator: Optional[bool] = field(
+        option_change_indicator: bool | None = field(
             default=None,
             metadata={
                 "name": "OptionChangeIndicator",
@@ -10464,7 +10434,7 @@ class VehResRq(object):
 
     @dataclass
     class VehResRqinfo(VehicleReservationRqadditionalInfoType):
-        res_status: Optional[TransactionActionType] = field(
+        res_status: TransactionActionType | None = field(
             default=None,
             metadata={
                 "name": "ResStatus",
@@ -10475,7 +10445,7 @@ class VehResRq(object):
 
 @dataclass
 class VehicleAvailVendorInfoType(object):
-    vendor_messages: Optional[ArrayOfVendorMessageType] = field(
+    vendor_messages: ArrayOfVendorMessageType | None = field(
         default=None,
         metadata={
             "name": "VendorMessages",
@@ -10483,7 +10453,7 @@ class VehicleAvailVendorInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    off_loc_services: List[OffLocationServiceType] = field(
+    off_loc_services: list[OffLocationServiceType] = field(
         default_factory=list,
         metadata={
             "name": "OffLocServices",
@@ -10491,7 +10461,7 @@ class VehicleAvailVendorInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    payment_rules: Optional[ArrayOfMonetaryRuleType] = field(
+    payment_rules: ArrayOfMonetaryRuleType | None = field(
         default=None,
         metadata={
             "name": "PaymentRules",
@@ -10499,7 +10469,7 @@ class VehicleAvailVendorInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    location_details: List[VehicleLocationDetailsType] = field(
+    location_details: list[VehicleLocationDetailsType] = field(
         default_factory=list,
         metadata={
             "name": "LocationDetails",
@@ -10507,7 +10477,7 @@ class VehicleAvailVendorInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    tour_info: Optional[VehicleTourInfoType] = field(
+    tour_info: VehicleTourInfoType | None = field(
         default=None,
         metadata={
             "name": "TourInfo",
@@ -10515,7 +10485,7 @@ class VehicleAvailVendorInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    tpa_extensions: Optional[TpaExtensionsType] = field(
+    tpa_extensions: TpaExtensionsType | None = field(
         default=None,
         metadata={
             "name": "TPA_Extensions",
@@ -10527,7 +10497,7 @@ class VehicleAvailVendorInfoType(object):
 
 @dataclass
 class VehicleMatchedLocationType(object):
-    location_detail: Optional[VehicleLocationDetailsType] = field(
+    location_detail: VehicleLocationDetailsType | None = field(
         default=None,
         metadata={
             "name": "LocationDetail",
@@ -10535,7 +10505,7 @@ class VehicleMatchedLocationType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    veh_loc_search_criterion: List[ItemSearchCriterionType] = field(
+    veh_loc_search_criterion: list[ItemSearchCriterionType] = field(
         default_factory=list,
         metadata={
             "name": "VehLocSearchCriterion",
@@ -10543,7 +10513,7 @@ class VehicleMatchedLocationType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    alternate_loc_ind: Optional[bool] = field(
+    alternate_loc_ind: bool | None = field(
         default=None,
         metadata={
             "name": "AlternateLocInd",
@@ -10554,7 +10524,7 @@ class VehicleMatchedLocationType(object):
 
 @dataclass
 class VehicleSegmentAdditionalInfoType(object):
-    payment_rules: Optional[ArrayOfMonetaryRuleType] = field(
+    payment_rules: ArrayOfMonetaryRuleType | None = field(
         default=None,
         metadata={
             "name": "PaymentRules",
@@ -10562,7 +10532,7 @@ class VehicleSegmentAdditionalInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    rental_payment_amount: List[PaymentDetailType] = field(
+    rental_payment_amount: list[PaymentDetailType] = field(
         default_factory=list,
         metadata={
             "name": "RentalPaymentAmount",
@@ -10570,7 +10540,7 @@ class VehicleSegmentAdditionalInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    priced_coverages: Optional[ArrayOfCoveragePricedType] = field(
+    priced_coverages: ArrayOfCoveragePricedType | None = field(
         default=None,
         metadata={
             "name": "PricedCoverages",
@@ -10578,7 +10548,7 @@ class VehicleSegmentAdditionalInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    priced_off_loc_service: List[OffLocationServicePricedType] = field(
+    priced_off_loc_service: list[OffLocationServicePricedType] = field(
         default_factory=list,
         metadata={
             "name": "PricedOffLocService",
@@ -10586,7 +10556,7 @@ class VehicleSegmentAdditionalInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    vendor_messages: Optional[ArrayOfFormattedTextType] = field(
+    vendor_messages: ArrayOfFormattedTextType | None = field(
         default=None,
         metadata={
             "name": "VendorMessages",
@@ -10594,7 +10564,7 @@ class VehicleSegmentAdditionalInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    location_details: List[VehicleLocationDetailsType] = field(
+    location_details: list[VehicleLocationDetailsType] = field(
         default_factory=list,
         metadata={
             "name": "LocationDetails",
@@ -10602,7 +10572,7 @@ class VehicleSegmentAdditionalInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    tour_info: Optional[VehicleTourInfoType] = field(
+    tour_info: VehicleTourInfoType | None = field(
         default=None,
         metadata={
             "name": "TourInfo",
@@ -10610,7 +10580,7 @@ class VehicleSegmentAdditionalInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    tpa_extensions: Optional[TpaExtensionsType] = field(
+    tpa_extensions: TpaExtensionsType | None = field(
         default=None,
         metadata={
             "name": "TPA_Extensions",
@@ -10618,7 +10588,7 @@ class VehicleSegmentAdditionalInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    written_conf_ind: Optional[bool] = field(
+    written_conf_ind: bool | None = field(
         default=None,
         metadata={
             "name": "WrittenConfInd",
@@ -10629,7 +10599,7 @@ class VehicleSegmentAdditionalInfoType(object):
 
 @dataclass
 class ArrayOfVehicleMatchedLocationType(object):
-    veh_matched_loc: List[VehicleMatchedLocationType] = field(
+    veh_matched_loc: list[VehicleMatchedLocationType] = field(
         default_factory=list,
         metadata={
             "name": "VehMatchedLoc",
@@ -10655,7 +10625,7 @@ class ServiceSoapGetVehAvailRateInput(object):
 
     @dataclass
     class Body(object):
-        veh_avail_rate_rq: Optional[VehAvailRateRq] = field(
+        veh_avail_rate_rq: VehAvailRateRq | None = field(
             default=None,
             metadata={
                 "name": "VehAvailRateRQ",
@@ -10688,7 +10658,7 @@ class ServiceSoapGetVehLocDetailOutput(object):
 
     @dataclass
     class Body(object):
-        veh_loc_detail_rs: Optional[VehLocDetailRs] = field(
+        veh_loc_detail_rs: VehLocDetailRs | None = field(
             default=None,
             metadata={
                 "name": "VehLocDetailRS",
@@ -10706,28 +10676,28 @@ class ServiceSoapGetVehLocDetailOutput(object):
 
         @dataclass
         class Fault(object):
-            faultcode: Optional[str] = field(
+            faultcode: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultstring: Optional[str] = field(
+            faultstring: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultactor: Optional[str] = field(
+            faultactor: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            detail: Optional[str] = field(
+            detail: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
@@ -10737,7 +10707,7 @@ class ServiceSoapGetVehLocDetailOutput(object):
 
     @dataclass
     class Header(object):
-        information_header: Optional[InformationHeader] = field(
+        information_header: InformationHeader | None = field(
             default=None,
             metadata={
                 "name": "informationHeader",
@@ -10770,7 +10740,7 @@ class ServiceSoapGetVehRateRuleOutput(object):
 
     @dataclass
     class Body(object):
-        veh_rate_rule_rs: Optional[VehRateRuleRs] = field(
+        veh_rate_rule_rs: VehRateRuleRs | None = field(
             default=None,
             metadata={
                 "name": "VehRateRuleRS",
@@ -10788,28 +10758,28 @@ class ServiceSoapGetVehRateRuleOutput(object):
 
         @dataclass
         class Fault(object):
-            faultcode: Optional[str] = field(
+            faultcode: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultstring: Optional[str] = field(
+            faultstring: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultactor: Optional[str] = field(
+            faultactor: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            detail: Optional[str] = field(
+            detail: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
@@ -10819,7 +10789,7 @@ class ServiceSoapGetVehRateRuleOutput(object):
 
     @dataclass
     class Header(object):
-        information_header: Optional[InformationHeader] = field(
+        information_header: InformationHeader | None = field(
             default=None,
             metadata={
                 "name": "informationHeader",
@@ -10845,7 +10815,7 @@ class ServiceSoapGetVehReservationInput(object):
 
     @dataclass
     class Body(object):
-        veh_res_rq: Optional[VehResRq] = field(
+        veh_res_rq: VehResRq | None = field(
             default=None,
             metadata={
                 "name": "VehResRQ",
@@ -10857,7 +10827,7 @@ class ServiceSoapGetVehReservationInput(object):
 
 @dataclass
 class VehicleReservationType(object):
-    customer: Optional[CustomerPrimaryAdditionalType] = field(
+    customer: CustomerPrimaryAdditionalType | None = field(
         default=None,
         metadata={
             "name": "Customer",
@@ -10873,7 +10843,7 @@ class VehicleReservationType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    veh_segment_info: Optional[VehicleSegmentAdditionalInfoType] = field(
+    veh_segment_info: VehicleSegmentAdditionalInfoType | None = field(
         default=None,
         metadata={
             "name": "VehSegmentInfo",
@@ -10881,42 +10851,42 @@ class VehicleReservationType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    reservation_status: Optional[str] = field(
+    reservation_status: str | None = field(
         default=None,
         metadata={
             "name": "ReservationStatus",
             "type": "Attribute",
         },
     )
-    create_date_time: Optional[XmlDateTime] = field(
+    create_date_time: XmlDateTime | None = field(
         default=None,
         metadata={
             "name": "CreateDateTime",
             "type": "Attribute",
         },
     )
-    creator_id: Optional[str] = field(
+    creator_id: str | None = field(
         default=None,
         metadata={
             "name": "CreatorID",
             "type": "Attribute",
         },
     )
-    last_modify_date_time: Optional[XmlDateTime] = field(
+    last_modify_date_time: XmlDateTime | None = field(
         default=None,
         metadata={
             "name": "LastModifyDateTime",
             "type": "Attribute",
         },
     )
-    last_modifier_id: Optional[str] = field(
+    last_modifier_id: str | None = field(
         default=None,
         metadata={
             "name": "LastModifierID",
             "type": "Attribute",
         },
     )
-    purge_date: Optional[XmlDate] = field(
+    purge_date: XmlDate | None = field(
         default=None,
         metadata={
             "name": "PurgeDate",
@@ -10926,7 +10896,7 @@ class VehicleReservationType(object):
 
     @dataclass
     class VehSegmentCore(VehicleSegmentCoreType):
-        option_change_allowed_indicator: Optional[bool] = field(
+        option_change_allowed_indicator: bool | None = field(
             default=None,
             metadata={
                 "name": "OptionChangeAllowedIndicator",
@@ -10937,7 +10907,7 @@ class VehicleReservationType(object):
 
 @dataclass
 class VehicleVendorAvailabilityType(object):
-    vendor: Optional[CompanyNameType] = field(
+    vendor: CompanyNameType | None = field(
         default=None,
         metadata={
             "name": "Vendor",
@@ -10953,7 +10923,7 @@ class VehicleVendorAvailabilityType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    info: Optional[VehicleAvailVendorInfoType] = field(
+    info: VehicleAvailVendorInfoType | None = field(
         default=None,
         metadata={
             "name": "Info",
@@ -10964,7 +10934,7 @@ class VehicleVendorAvailabilityType(object):
 
     @dataclass
     class VehAvails(object):
-        veh_avail: List["VehicleVendorAvailabilityType.VehAvails.VehAvail"] = field(
+        veh_avail: list["VehicleVendorAvailabilityType.VehAvails.VehAvail"] = field(
             default_factory=list,
             metadata={
                 "name": "VehAvail",
@@ -10972,7 +10942,7 @@ class VehicleVendorAvailabilityType(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        rate_category: Optional[str] = field(
+        rate_category: str | None = field(
             default=None,
             metadata={
                 "name": "RateCategory",
@@ -10982,7 +10952,7 @@ class VehicleVendorAvailabilityType(object):
 
         @dataclass
         class VehAvail(object):
-            veh_avail_core: Optional[VehicleAvailCoreType] = field(
+            veh_avail_core: VehicleAvailCoreType | None = field(
                 default=None,
                 metadata={
                     "name": "VehAvailCore",
@@ -10990,7 +10960,7 @@ class VehicleVendorAvailabilityType(object):
                     "namespace": "http://www.opentravel.org/OTA/2003/05",
                 },
             )
-            veh_avail_info: Optional[VehicleAvailAdditionalInfoType] = field(
+            veh_avail_info: VehicleAvailAdditionalInfoType | None = field(
                 default=None,
                 metadata={
                     "name": "VehAvailInfo",
@@ -11011,35 +10981,35 @@ class VehicleVendorAvailabilityType(object):
 
             @dataclass
             class AdvanceBooking(object):
-                absolute_deadline: Optional[str] = field(
+                absolute_deadline: str | None = field(
                     default=None,
                     metadata={
                         "name": "AbsoluteDeadline",
                         "type": "Attribute",
                     },
                 )
-                offset_time_unit: Optional[TimeUnitType] = field(
+                offset_time_unit: TimeUnitType | None = field(
                     default=None,
                     metadata={
                         "name": "OffsetTimeUnit",
                         "type": "Attribute",
                     },
                 )
-                offset_unit_multiplier: Optional[int] = field(
+                offset_unit_multiplier: int | None = field(
                     default=None,
                     metadata={
                         "name": "OffsetUnitMultiplier",
                         "type": "Attribute",
                     },
                 )
-                offset_drop_time: Optional[AdvanceBookingOffsetDropTime] = field(
+                offset_drop_time: AdvanceBookingOffsetDropTime | None = field(
                     default=None,
                     metadata={
                         "name": "OffsetDropTime",
                         "type": "Attribute",
                     },
                 )
-                rules_apply_ind: Optional[bool] = field(
+                rules_apply_ind: bool | None = field(
                     default=None,
                     metadata={
                         "name": "RulesApplyInd",
@@ -11050,7 +11020,7 @@ class VehicleVendorAvailabilityType(object):
 
 @dataclass
 class ArrayOfVehicleVendorAvailabilityType(object):
-    veh_vendor_avail: List[VehicleVendorAvailabilityType] = field(
+    veh_vendor_avail: list[VehicleVendorAvailabilityType] = field(
         default_factory=list,
         metadata={
             "name": "VehVendorAvail",
@@ -11084,56 +11054,56 @@ class VehLocationSearchRs(OtaResponse):
         name = "VehLocationSearchRS"
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
-    success: Optional[SuccessType] = field(
+    success: SuccessType | None = field(
         default=None,
         metadata={
             "name": "Success",
             "type": "Element",
         },
     )
-    warnings: Optional[ArrayOfWarningType] = field(
+    warnings: ArrayOfWarningType | None = field(
         default=None,
         metadata={
             "name": "Warnings",
             "type": "Element",
         },
     )
-    veh_matched_locs: Optional[ArrayOfVehicleMatchedLocationType] = field(
+    veh_matched_locs: ArrayOfVehicleMatchedLocationType | None = field(
         default=None,
         metadata={
             "name": "VehMatchedLocs",
             "type": "Element",
         },
     )
-    vendor: Optional[CompanyNameType] = field(
+    vendor: CompanyNameType | None = field(
         default=None,
         metadata={
             "name": "Vendor",
             "type": "Element",
         },
     )
-    tpa_extensions: Optional[TpaExtensionsType] = field(
+    tpa_extensions: TpaExtensionsType | None = field(
         default=None,
         metadata={
             "name": "TPA_Extensions",
             "type": "Element",
         },
     )
-    errors: Optional[ArrayOfErrorType] = field(
+    errors: ArrayOfErrorType | None = field(
         default=None,
         metadata={
             "name": "Errors",
             "type": "Element",
         },
     )
-    echo_token: Optional[str] = field(
+    echo_token: str | None = field(
         default=None,
         metadata={
             "name": "EchoToken",
             "type": "Attribute",
         },
     )
-    time_stamp: Optional[XmlDateTime] = field(
+    time_stamp: XmlDateTime | None = field(
         default=None,
         metadata={
             "name": "TimeStamp",
@@ -11147,35 +11117,35 @@ class VehLocationSearchRs(OtaResponse):
             "type": "Attribute",
         },
     )
-    version: Optional[str] = field(
+    version: str | None = field(
         default=None,
         metadata={
             "name": "Version",
             "type": "Attribute",
         },
     )
-    transaction_identifier: Optional[str] = field(
+    transaction_identifier: str | None = field(
         default=None,
         metadata={
             "name": "TransactionIdentifier",
             "type": "Attribute",
         },
     )
-    sequence_nmbr: Optional[int] = field(
+    sequence_nmbr: int | None = field(
         default=None,
         metadata={
             "name": "SequenceNmbr",
             "type": "Attribute",
         },
     )
-    transaction_status_code: Optional[VehLocationSearchRsTransactionStatusCode] = field(
+    transaction_status_code: VehLocationSearchRsTransactionStatusCode | None = field(
         default=None,
         metadata={
             "name": "TransactionStatusCode",
             "type": "Attribute",
         },
     )
-    retransmission_indicator: Optional[bool] = field(
+    retransmission_indicator: bool | None = field(
         default=None,
         metadata={
             "name": "RetransmissionIndicator",
@@ -11189,7 +11159,7 @@ class VehicleCancelRsadditionalInfoType(object):
     class Meta(object):
         name = "VehicleCancelRSAdditionalInfoType"
 
-    veh_reservation: Optional[VehicleReservationType] = field(
+    veh_reservation: VehicleReservationType | None = field(
         default=None,
         metadata={
             "name": "VehReservation",
@@ -11197,7 +11167,7 @@ class VehicleCancelRsadditionalInfoType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    tpa_extensions: Optional[TpaExtensionsType] = field(
+    tpa_extensions: TpaExtensionsType | None = field(
         default=None,
         metadata={
             "name": "TPA_Extensions",
@@ -11212,7 +11182,7 @@ class VehicleResRscoreType(object):
     class Meta(object):
         name = "VehicleResRSCoreType"
 
-    veh_reservation: Optional[VehicleReservationType] = field(
+    veh_reservation: VehicleReservationType | None = field(
         default=None,
         metadata={
             "name": "VehReservation",
@@ -11220,7 +11190,7 @@ class VehicleResRscoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    tpa_extensions: Optional[TpaExtensionsType] = field(
+    tpa_extensions: TpaExtensionsType | None = field(
         default=None,
         metadata={
             "name": "TPA_Extensions",
@@ -11235,7 +11205,7 @@ class VehicleRetrieveResRscoreType(object):
     class Meta(object):
         name = "VehicleRetrieveResRSCoreType"
 
-    veh_reservation: Optional[VehicleReservationType] = field(
+    veh_reservation: VehicleReservationType | None = field(
         default=None,
         metadata={
             "name": "VehReservation",
@@ -11243,7 +11213,7 @@ class VehicleRetrieveResRscoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    veh_res_summaries: Optional[ArrayOfVehicleReservationSummaryType] = field(
+    veh_res_summaries: ArrayOfVehicleReservationSummaryType | None = field(
         default=None,
         metadata={
             "name": "VehResSummaries",
@@ -11276,7 +11246,7 @@ class ServiceSoapGetVehLocationSearchOutput(object):
 
     @dataclass
     class Body(object):
-        veh_location_search_rs: Optional[VehLocationSearchRs] = field(
+        veh_location_search_rs: VehLocationSearchRs | None = field(
             default=None,
             metadata={
                 "name": "VehLocationSearchRS",
@@ -11294,28 +11264,28 @@ class ServiceSoapGetVehLocationSearchOutput(object):
 
         @dataclass
         class Fault(object):
-            faultcode: Optional[str] = field(
+            faultcode: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultstring: Optional[str] = field(
+            faultstring: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultactor: Optional[str] = field(
+            faultactor: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            detail: Optional[str] = field(
+            detail: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
@@ -11325,7 +11295,7 @@ class ServiceSoapGetVehLocationSearchOutput(object):
 
     @dataclass
     class Header(object):
-        information_header: Optional[InformationHeader] = field(
+        information_header: InformationHeader | None = field(
             default=None,
             metadata={
                 "name": "informationHeader",
@@ -11341,14 +11311,14 @@ class VehCancelResRs(OtaResponse):
         name = "VehCancelResRS"
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
-    success: Optional[SuccessType] = field(
+    success: SuccessType | None = field(
         default=None,
         metadata={
             "name": "Success",
             "type": "Element",
         },
     )
-    warnings: Optional[ArrayOfWarningType] = field(
+    warnings: ArrayOfWarningType | None = field(
         default=None,
         metadata={
             "name": "Warnings",
@@ -11362,28 +11332,28 @@ class VehCancelResRs(OtaResponse):
             "type": "Element",
         },
     )
-    veh_cancel_rsinfo: Optional[VehicleCancelRsadditionalInfoType] = field(
+    veh_cancel_rsinfo: VehicleCancelRsadditionalInfoType | None = field(
         default=None,
         metadata={
             "name": "VehCancelRSInfo",
             "type": "Element",
         },
     )
-    errors: Optional[ArrayOfErrorType] = field(
+    errors: ArrayOfErrorType | None = field(
         default=None,
         metadata={
             "name": "Errors",
             "type": "Element",
         },
     )
-    echo_token: Optional[str] = field(
+    echo_token: str | None = field(
         default=None,
         metadata={
             "name": "EchoToken",
             "type": "Attribute",
         },
     )
-    time_stamp: Optional[XmlDateTime] = field(
+    time_stamp: XmlDateTime | None = field(
         default=None,
         metadata={
             "name": "TimeStamp",
@@ -11397,7 +11367,7 @@ class VehCancelResRs(OtaResponse):
             "type": "Attribute",
         },
     )
-    version: Optional[Decimal] = field(
+    version: Decimal | None = field(
         default=None,
         metadata={
             "name": "Version",
@@ -11405,28 +11375,28 @@ class VehCancelResRs(OtaResponse):
             "required": True,
         },
     )
-    transaction_identifier: Optional[str] = field(
+    transaction_identifier: str | None = field(
         default=None,
         metadata={
             "name": "TransactionIdentifier",
             "type": "Attribute",
         },
     )
-    sequence_nmbr: Optional[int] = field(
+    sequence_nmbr: int | None = field(
         default=None,
         metadata={
             "name": "SequenceNmbr",
             "type": "Attribute",
         },
     )
-    transaction_status_code: Optional[VehCancelResRsTransactionStatusCode] = field(
+    transaction_status_code: VehCancelResRsTransactionStatusCode | None = field(
         default=None,
         metadata={
             "name": "TransactionStatusCode",
             "type": "Attribute",
         },
     )
-    retransmission_indicator: Optional[bool] = field(
+    retransmission_indicator: bool | None = field(
         default=None,
         metadata={
             "name": "RetransmissionIndicator",
@@ -11436,7 +11406,7 @@ class VehCancelResRs(OtaResponse):
 
     @dataclass
     class VehCancelRscore(CancelInfoRstype):
-        cancel_status: Optional[TransactionStatusType] = field(
+        cancel_status: TransactionStatusType | None = field(
             default=None,
             metadata={
                 "name": "CancelStatus",
@@ -11452,14 +11422,14 @@ class VehResRs(OtaResponse):
         name = "VehResRS"
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
-    success: Optional[SuccessType] = field(
+    success: SuccessType | None = field(
         default=None,
         metadata={
             "name": "Success",
             "type": "Element",
         },
     )
-    warnings: Optional[ArrayOfWarningType] = field(
+    warnings: ArrayOfWarningType | None = field(
         default=None,
         metadata={
             "name": "Warnings",
@@ -11473,28 +11443,28 @@ class VehResRs(OtaResponse):
             "type": "Element",
         },
     )
-    veh_res_rsinfo: Optional[VehicleResRsadditionalInfoType] = field(
+    veh_res_rsinfo: VehicleResRsadditionalInfoType | None = field(
         default=None,
         metadata={
             "name": "VehResRSInfo",
             "type": "Element",
         },
     )
-    errors: Optional[ArrayOfErrorType] = field(
+    errors: ArrayOfErrorType | None = field(
         default=None,
         metadata={
             "name": "Errors",
             "type": "Element",
         },
     )
-    echo_token: Optional[str] = field(
+    echo_token: str | None = field(
         default=None,
         metadata={
             "name": "EchoToken",
             "type": "Attribute",
         },
     )
-    time_stamp: Optional[XmlDateTime] = field(
+    time_stamp: XmlDateTime | None = field(
         default=None,
         metadata={
             "name": "TimeStamp",
@@ -11508,35 +11478,35 @@ class VehResRs(OtaResponse):
             "type": "Attribute",
         },
     )
-    version: Optional[str] = field(
+    version: str | None = field(
         default=None,
         metadata={
             "name": "Version",
             "type": "Attribute",
         },
     )
-    transaction_identifier: Optional[str] = field(
+    transaction_identifier: str | None = field(
         default=None,
         metadata={
             "name": "TransactionIdentifier",
             "type": "Attribute",
         },
     )
-    sequence_nmbr: Optional[int] = field(
+    sequence_nmbr: int | None = field(
         default=None,
         metadata={
             "name": "SequenceNmbr",
             "type": "Attribute",
         },
     )
-    transaction_status_code: Optional[VehResRsTransactionStatusCode] = field(
+    transaction_status_code: VehResRsTransactionStatusCode | None = field(
         default=None,
         metadata={
             "name": "TransactionStatusCode",
             "type": "Attribute",
         },
     )
-    retransmission_indicator: Optional[bool] = field(
+    retransmission_indicator: bool | None = field(
         default=None,
         metadata={
             "name": "RetransmissionIndicator",
@@ -11546,7 +11516,7 @@ class VehResRs(OtaResponse):
 
     @dataclass
     class VehResRscore(VehicleResRscoreType):
-        reservation_status: Optional[str] = field(
+        reservation_status: str | None = field(
             default=None,
             metadata={
                 "name": "ReservationStatus",
@@ -11561,49 +11531,49 @@ class VehRetResRs(OtaResponse):
         name = "VehRetResRS"
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
-    success: Optional[SuccessType] = field(
+    success: SuccessType | None = field(
         default=None,
         metadata={
             "name": "Success",
             "type": "Element",
         },
     )
-    warnings: Optional[ArrayOfWarningType] = field(
+    warnings: ArrayOfWarningType | None = field(
         default=None,
         metadata={
             "name": "Warnings",
             "type": "Element",
         },
     )
-    veh_ret_res_rscore: Optional[VehicleRetrieveResRscoreType] = field(
+    veh_ret_res_rscore: VehicleRetrieveResRscoreType | None = field(
         default=None,
         metadata={
             "name": "VehRetResRSCore",
             "type": "Element",
         },
     )
-    veh_ret_res_rsinfo: Optional[VehicleRetrieveResRsadditionalInfoType] = field(
+    veh_ret_res_rsinfo: VehicleRetrieveResRsadditionalInfoType | None = field(
         default=None,
         metadata={
             "name": "VehRetResRSInfo",
             "type": "Element",
         },
     )
-    errors: Optional[ArrayOfErrorType] = field(
+    errors: ArrayOfErrorType | None = field(
         default=None,
         metadata={
             "name": "Errors",
             "type": "Element",
         },
     )
-    echo_token: Optional[str] = field(
+    echo_token: str | None = field(
         default=None,
         metadata={
             "name": "EchoToken",
             "type": "Attribute",
         },
     )
-    time_stamp: Optional[XmlDateTime] = field(
+    time_stamp: XmlDateTime | None = field(
         default=None,
         metadata={
             "name": "TimeStamp",
@@ -11617,7 +11587,7 @@ class VehRetResRs(OtaResponse):
             "type": "Attribute",
         },
     )
-    version: Optional[Decimal] = field(
+    version: Decimal | None = field(
         default=None,
         metadata={
             "name": "Version",
@@ -11625,28 +11595,28 @@ class VehRetResRs(OtaResponse):
             "required": True,
         },
     )
-    transaction_identifier: Optional[str] = field(
+    transaction_identifier: str | None = field(
         default=None,
         metadata={
             "name": "TransactionIdentifier",
             "type": "Attribute",
         },
     )
-    sequence_nmbr: Optional[int] = field(
+    sequence_nmbr: int | None = field(
         default=None,
         metadata={
             "name": "SequenceNmbr",
             "type": "Attribute",
         },
     )
-    transaction_status_code: Optional[VehRetResRsTransactionStatusCode] = field(
+    transaction_status_code: VehRetResRsTransactionStatusCode | None = field(
         default=None,
         metadata={
             "name": "TransactionStatusCode",
             "type": "Attribute",
         },
     )
-    retransmission_indicator: Optional[bool] = field(
+    retransmission_indicator: bool | None = field(
         default=None,
         metadata={
             "name": "RetransmissionIndicator",
@@ -11660,7 +11630,7 @@ class VehicleAvailRscoreType(object):
     class Meta(object):
         name = "VehicleAvailRSCoreType"
 
-    veh_rental_core: Optional[VehicleRentalCoreType] = field(
+    veh_rental_core: VehicleRentalCoreType | None = field(
         default=None,
         metadata={
             "name": "VehRentalCore",
@@ -11668,7 +11638,7 @@ class VehicleAvailRscoreType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    veh_vendor_avails: Optional[ArrayOfVehicleVendorAvailabilityType] = field(
+    veh_vendor_avails: ArrayOfVehicleVendorAvailabilityType | None = field(
         default=None,
         metadata={
             "name": "VehVendorAvails",
@@ -11701,7 +11671,7 @@ class ServiceSoapGetVehCancelReservationOutput(object):
 
     @dataclass
     class Body(object):
-        veh_cancel_res_rs: Optional[VehCancelResRs] = field(
+        veh_cancel_res_rs: VehCancelResRs | None = field(
             default=None,
             metadata={
                 "name": "VehCancelResRS",
@@ -11719,28 +11689,28 @@ class ServiceSoapGetVehCancelReservationOutput(object):
 
         @dataclass
         class Fault(object):
-            faultcode: Optional[str] = field(
+            faultcode: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultstring: Optional[str] = field(
+            faultstring: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultactor: Optional[str] = field(
+            faultactor: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            detail: Optional[str] = field(
+            detail: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
@@ -11750,7 +11720,7 @@ class ServiceSoapGetVehCancelReservationOutput(object):
 
     @dataclass
     class Header(object):
-        information_header: Optional[InformationHeader] = field(
+        information_header: InformationHeader | None = field(
             default=None,
             metadata={
                 "name": "informationHeader",
@@ -11792,7 +11762,7 @@ class ServiceSoapGetVehReservationOutput(object):
 
     @dataclass
     class Body(object):
-        veh_res_rs: Optional[VehResRs] = field(
+        veh_res_rs: VehResRs | None = field(
             default=None,
             metadata={
                 "name": "VehResRS",
@@ -11810,28 +11780,28 @@ class ServiceSoapGetVehReservationOutput(object):
 
         @dataclass
         class Fault(object):
-            faultcode: Optional[str] = field(
+            faultcode: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultstring: Optional[str] = field(
+            faultstring: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultactor: Optional[str] = field(
+            faultactor: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            detail: Optional[str] = field(
+            detail: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
@@ -11841,7 +11811,7 @@ class ServiceSoapGetVehReservationOutput(object):
 
     @dataclass
     class Header(object):
-        information_header: Optional[InformationHeader] = field(
+        information_header: InformationHeader | None = field(
             default=None,
             metadata={
                 "name": "informationHeader",
@@ -11874,7 +11844,7 @@ class ServiceSoapGetVehRetReservationOutput(object):
 
     @dataclass
     class Body(object):
-        veh_ret_res_rs: Optional[VehRetResRs] = field(
+        veh_ret_res_rs: VehRetResRs | None = field(
             default=None,
             metadata={
                 "name": "VehRetResRS",
@@ -11892,28 +11862,28 @@ class ServiceSoapGetVehRetReservationOutput(object):
 
         @dataclass
         class Fault(object):
-            faultcode: Optional[str] = field(
+            faultcode: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultstring: Optional[str] = field(
+            faultstring: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultactor: Optional[str] = field(
+            faultactor: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            detail: Optional[str] = field(
+            detail: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
@@ -11923,7 +11893,7 @@ class ServiceSoapGetVehRetReservationOutput(object):
 
     @dataclass
     class Header(object):
-        information_header: Optional[InformationHeader] = field(
+        information_header: InformationHeader | None = field(
             default=None,
             metadata={
                 "name": "informationHeader",
@@ -11939,49 +11909,49 @@ class VehAvailRateRs(OtaResponse):
         name = "VehAvailRateRS"
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
-    success: Optional[SuccessType] = field(
+    success: SuccessType | None = field(
         default=None,
         metadata={
             "name": "Success",
             "type": "Element",
         },
     )
-    warnings: Optional[ArrayOfWarningType] = field(
+    warnings: ArrayOfWarningType | None = field(
         default=None,
         metadata={
             "name": "Warnings",
             "type": "Element",
         },
     )
-    veh_avail_rscore: Optional[VehicleAvailRscoreType] = field(
+    veh_avail_rscore: VehicleAvailRscoreType | None = field(
         default=None,
         metadata={
             "name": "VehAvailRSCore",
             "type": "Element",
         },
     )
-    veh_avail_rsinfo: Optional[VehicleAvailRsadditionalInfoType] = field(
+    veh_avail_rsinfo: VehicleAvailRsadditionalInfoType | None = field(
         default=None,
         metadata={
             "name": "VehAvailRSInfo",
             "type": "Element",
         },
     )
-    errors: Optional[ArrayOfErrorType] = field(
+    errors: ArrayOfErrorType | None = field(
         default=None,
         metadata={
             "name": "Errors",
             "type": "Element",
         },
     )
-    echo_token: Optional[str] = field(
+    echo_token: str | None = field(
         default=None,
         metadata={
             "name": "EchoToken",
             "type": "Attribute",
         },
     )
-    time_stamp: Optional[XmlDateTime] = field(
+    time_stamp: XmlDateTime | None = field(
         default=None,
         metadata={
             "name": "TimeStamp",
@@ -11995,35 +11965,35 @@ class VehAvailRateRs(OtaResponse):
             "type": "Attribute",
         },
     )
-    version: Optional[str] = field(
+    version: str | None = field(
         default=None,
         metadata={
             "name": "Version",
             "type": "Attribute",
         },
     )
-    transaction_identifier: Optional[str] = field(
+    transaction_identifier: str | None = field(
         default=None,
         metadata={
             "name": "TransactionIdentifier",
             "type": "Attribute",
         },
     )
-    sequence_nmbr: Optional[int] = field(
+    sequence_nmbr: int | None = field(
         default=None,
         metadata={
             "name": "SequenceNmbr",
             "type": "Attribute",
         },
     )
-    transaction_status_code: Optional[VehAvailRateRsTransactionStatusCode] = field(
+    transaction_status_code: VehAvailRateRsTransactionStatusCode | None = field(
         default=None,
         metadata={
             "name": "TransactionStatusCode",
             "type": "Attribute",
         },
     )
-    retransmission_indicator: Optional[bool] = field(
+    retransmission_indicator: bool | None = field(
         default=None,
         metadata={
             "name": "RetransmissionIndicator",
@@ -12055,7 +12025,7 @@ class ServiceSoapGetVehAvailRateOutput(object):
 
     @dataclass
     class Body(object):
-        veh_avail_rate_rs: Optional[VehAvailRateRs] = field(
+        veh_avail_rate_rs: VehAvailRateRs | None = field(
             default=None,
             metadata={
                 "name": "VehAvailRateRS",
@@ -12073,28 +12043,28 @@ class ServiceSoapGetVehAvailRateOutput(object):
 
         @dataclass
         class Fault(object):
-            faultcode: Optional[str] = field(
+            faultcode: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultstring: Optional[str] = field(
+            faultstring: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            faultactor: Optional[str] = field(
+            faultactor: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "namespace": "",
                 },
             )
-            detail: Optional[str] = field(
+            detail: str | None = field(
                 default=None,
                 metadata={
                     "type": "Element",
@@ -12104,7 +12074,7 @@ class ServiceSoapGetVehAvailRateOutput(object):
 
     @dataclass
     class Header(object):
-        information_header: Optional[InformationHeader] = field(
+        information_header: InformationHeader | None = field(
             default=None,
             metadata={
                 "name": "informationHeader",

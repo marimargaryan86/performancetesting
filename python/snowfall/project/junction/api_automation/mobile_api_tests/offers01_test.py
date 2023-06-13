@@ -2,7 +2,7 @@ import asyncio
 import datetime
 import json
 import logging
-from typing import Sequence
+from collections.abc import Sequence
 
 import pytest
 

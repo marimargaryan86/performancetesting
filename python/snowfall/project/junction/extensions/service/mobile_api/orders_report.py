@@ -2,7 +2,8 @@ import contextlib
 import csv
 import datetime
 import io
-from typing import Any, Mapping, Sequence
+from collections.abc import Mapping, Sequence
+from typing import Any
 
 import aiosmtplib
 import httpx

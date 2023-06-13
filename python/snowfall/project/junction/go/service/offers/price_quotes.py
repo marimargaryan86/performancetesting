@@ -1,5 +1,5 @@
 import datetime
-from typing import Sequence
+from collections.abc import Sequence
 
 import pymongo
 from motor import motor_asyncio
@@ -38,7 +38,7 @@ class PriceQuoteContainerRepository(
         price_quote = models_pb2.PriceQuoteContainer(
             id=string.uuid(),
             expires_at=protobuf.datetime_to_protobuf(
-                datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl,
+                datetime.datetime.now(tz=datetime.UTC) + self._ttl,
             ),
             offer_id=offer_id,
             option_ids=option_ids,

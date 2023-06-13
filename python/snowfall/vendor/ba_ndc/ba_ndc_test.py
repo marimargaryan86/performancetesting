@@ -327,7 +327,7 @@ async def call_get_offers(
         request_offer_search_schemas.Trip(
             origin=origin,
             destination=destination,
-            date=datetime.datetime.now(datetime.timezone.utc)
+            date=datetime.datetime.now(datetime.UTC)
             + datetime.timedelta(
                 days=45,
             ),

@@ -1,5 +1,3 @@
-from typing import Optional
-
 import pydantic
 
 from snowfall.vendor.direct_ferries.models import base
@@ -21,5 +19,5 @@ class Vehicle(base.CamelCaseBaseModel):
     length: int
     additional_height: int
     additional_length: float
-    trailer: Optional[Trailer]
+    trailer: Trailer | None
     registration: str

@@ -82,7 +82,7 @@ class TestTripBookingModel(object):
         assert booking.trip_result.record_locator
 
     def test_has_created_at(self, booking: orders_pb2.Booking) -> None:
-        now = datetime.datetime.now(tz=datetime.timezone.utc)
+        now = datetime.datetime.now(tz=datetime.UTC)
         recently = now - datetime.timedelta(minutes=1)
         created_at = protobuf.protobuf_to_datetime(booking.trip_result.created_at)
         assert created_at > recently

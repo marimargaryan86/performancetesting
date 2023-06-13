@@ -2,7 +2,7 @@ import asyncio
 import base64
 import datetime
 import pathlib
-from typing import AsyncIterator, Mapping, Sequence
+from collections.abc import AsyncIterator, Mapping, Sequence
 from unittest import mock
 
 import httpx

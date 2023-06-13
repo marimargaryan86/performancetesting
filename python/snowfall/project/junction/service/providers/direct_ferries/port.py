@@ -2,7 +2,7 @@ import dataclasses
 import json
 import pkgutil
 import zoneinfo
-from typing import Mapping, Optional, Sequence
+from collections.abc import Mapping, Sequence
 
 import aiofiles
 import timezonefinder
@@ -15,7 +15,7 @@ _tz_finder = timezonefinder.TimezoneFinder()
 
 @dataclasses.dataclass(frozen=True)
 class Port(h3.CoordinatesItem):
-    name: Optional[str]
+    name: str | None
 
 
 def _make_port(port: Mapping[str, str | float]) -> Port:

@@ -1,6 +1,6 @@
 import asyncio
-from collections.abc import AsyncGenerator
-from typing import Any, Mapping, Sequence
+from collections.abc import AsyncGenerator, Mapping, Sequence
+from typing import Any
 
 import httpx
 import structlog

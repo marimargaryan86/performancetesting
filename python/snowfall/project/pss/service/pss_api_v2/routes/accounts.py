@@ -1,5 +1,3 @@
-from typing import List
-
 import bcrypt
 from fastapi import Depends, status
 from fastapi.routing import APIRouter
@@ -26,7 +24,7 @@ from snowfall.project.pss.service.pss_api_v2.services.auth import get_current_ac
 router = APIRouter()
 
 
-@router.get("", response_model=ResponseSchema[List[AccountResponseSchema]])
+@router.get("", response_model=ResponseSchema[list[AccountResponseSchema]])
 async def read_accounts(
     account_service: AccountsService = Depends(AccountsService),
 ) -> SuccessResponse:

@@ -1,6 +1,6 @@
 import datetime
 import json
-from typing import AsyncIterator
+from collections.abc import AsyncIterator
 
 import structlog
 
@@ -74,7 +74,7 @@ class DfAdapter(object):
                 departure_date_time=protobuf.protobuf_to_datetime(
                     search_task.criteria.outbound_departure_datetime,
                 )
-                .astimezone(datetime.timezone.utc)  # noqa: WPS348
+                .astimezone(datetime.UTC)  # noqa: WPS348
                 .replace(tzinfo=None),  # noqa: WPS348
                 passengers=passengers,
             ),
@@ -88,7 +88,7 @@ class DfAdapter(object):
                     departure_date_time=protobuf.protobuf_to_datetime(
                         search_task.criteria.inbound_departure_datetime,
                     )
-                    .astimezone(datetime.timezone.utc)  # noqa: WPS348
+                    .astimezone(datetime.UTC)  # noqa: WPS348
                     .replace(tzinfo=None),  # noqa: WPS348
                     passengers=passengers,
                 ),
@@ -145,7 +145,7 @@ class DfAdapter(object):
 
             return
 
-        expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl
+        expires_at = datetime.datetime.now(tz=datetime.UTC) + self._ttl
 
         for quote_obj in quotes:
             currency = money.Currency(quote_obj.selected_currency)

@@ -1,5 +1,4 @@
 import datetime
-from typing import List
 
 import pydantic
 
@@ -22,7 +21,7 @@ class OfferRequestPassenger(DuffelBaseModel):
     passenger_type: str | None = pydantic.Field(alias="type")
     given_name: str | None
     family_name: str | None
-    loyalty_programme_accounts: List[LoyaltyProgrammeAccount]
+    loyalty_programme_accounts: list[LoyaltyProgrammeAccount]
 
 
 class OfferRequest(DuffelBaseModel):
@@ -30,9 +29,9 @@ class OfferRequest(DuffelBaseModel):
     live_mode: bool
     cabin_class: str | None
     created_at: datetime.datetime
-    offers: List[Offer]
-    slices: List[OfferRequestSlice]
-    passengers: List[OfferRequestPassenger]
+    offers: list[Offer]
+    slices: list[OfferRequestSlice]
+    passengers: list[OfferRequestPassenger]
 
 
 class OfferRequestResponse(DuffelBaseModel):

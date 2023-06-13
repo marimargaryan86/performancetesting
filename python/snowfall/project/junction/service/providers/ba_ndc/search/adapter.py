@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import AsyncIterator, Mapping
+from collections.abc import AsyncIterator, Mapping
 
 from snowfall.project.junction.go.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,

@@ -1,7 +1,7 @@
 import asyncio
 import json
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 
@@ -232,7 +232,7 @@ async def return_trip_search_id(
         destination_id=destination,
         departure_after=datetime.fromisoformat(
             departure_after[:-1],
-        ).astimezone(timezone.utc),
+        ).astimezone(UTC),
         allowed_segment_types=[LegType.air],
     )
     logging.info("create_trip_search response: %s", json.dumps(r1, indent=4))

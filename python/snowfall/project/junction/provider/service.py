@@ -3,7 +3,8 @@ from __future__ import annotations
 import contextlib
 import dataclasses
 import ipaddress
-from typing import TYPE_CHECKING, Awaitable, Callable, Generic, Optional, TypeVar
+from collections.abc import Awaitable, Callable
+from typing import TYPE_CHECKING, Generic, TypeVar
 
 import pydantic
 from google.protobuf import message
@@ -55,9 +56,10 @@ if TYPE_CHECKING:
         ],
     ]
 
-    OptionalOF = Optional[
-        OffersFactory[_Settings, _SearchCriteriaTask, _SearchCriteria]
-    ]
+    OptionalOF = (
+        OffersFactory[_Settings, _SearchCriteriaTask, _SearchCriteria]  # noqa: WPS465
+        | None
+    )
     BookingFactory = Callable[
         [service.AsyncApplication[_Settings]],
         Awaitable[bookings.Implementation],

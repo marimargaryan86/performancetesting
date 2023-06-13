@@ -2,7 +2,7 @@ import dataclasses
 import json
 import pathlib
 import zoneinfo
-from typing import Mapping, Optional, Sequence
+from collections.abc import Mapping, Sequence
 
 import aiofiles
 
@@ -14,7 +14,7 @@ from snowfall.vendor.save_a_train.models.misc import VendorStationsResponse
 
 @dataclasses.dataclass(frozen=True)
 class TrainStation(h3.CoordinatesItem):
-    name: Optional[str]
+    name: str | None
 
 
 class TrainStationRepository(object):

@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import dataclasses
-from typing import Any, AsyncIterable, Iterable, Literal
+from collections.abc import AsyncIterable, Iterable
+from typing import Any, Literal
 
 import httpx
 

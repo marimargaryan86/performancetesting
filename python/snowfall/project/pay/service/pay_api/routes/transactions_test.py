@@ -1,4 +1,4 @@
-from typing import Collection, Sequence
+from collections.abc import Collection, Sequence
 
 import httpx
 import pytest

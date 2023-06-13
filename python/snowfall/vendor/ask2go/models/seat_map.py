@@ -1,4 +1,4 @@
-from typing import Sequence
+from collections.abc import Sequence
 
 from snowfall.project.junction.go.v1alpha import seat_maps_pb2
 from snowfall.stdlib import money

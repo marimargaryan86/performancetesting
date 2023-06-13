@@ -2,7 +2,7 @@ import re
 import secrets
 import string as pystring
 import uuid as pyuuid
-from typing import Sequence
+from collections.abc import Sequence
 
 _DEFAULT_CHARSET = pystring.ascii_uppercase + pystring.ascii_lowercase + pystring.digits
 _DEFAULT_UUID_NAMESPACE = pyuuid.UUID("6ce93636-ac39-4130-a4f9-ea8361d61bd4")

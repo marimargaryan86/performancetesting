@@ -1,7 +1,8 @@
 import asyncio
 import dataclasses
 import datetime
-from typing import Any, Mapping, Sequence, cast
+from collections.abc import Mapping, Sequence
+from typing import Any, cast
 
 import lagom
 from dateutil import parser
@@ -158,13 +159,13 @@ class TripSearches(endpoints.HTTPEndpoint):
         if body.get("departureAfter"):
             departure_after = parser.isoparse(body["departureAfter"])
             current_time = datetime.datetime.now(
-                datetime.timezone.utc,
+                datetime.UTC,
             ) - datetime.timedelta(minutes=1)
 
             if departure_after < current_time:
                 raise exceptions.HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY)
         else:
-            departure_after = datetime.datetime.now(datetime.timezone.utc)
+            departure_after = datetime.datetime.now(datetime.UTC)
 
         location_ids = {*origin.merged_ids, *destination.merged_ids}
         response = await locations_client.find(

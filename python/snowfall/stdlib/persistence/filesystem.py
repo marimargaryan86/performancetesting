@@ -6,9 +6,10 @@ import os
 import pathlib
 import pkgutil
 import zipfile
+from collections.abc import AsyncGenerator
 from importlib import _bootstrap, util  # type: ignore[attr-defined] # noqa: WPS450
 from sys import modules
-from typing import Any, AsyncGenerator, Union
+from typing import Any
 from urllib import parse as urllib_parse
 
 import aiofiles
@@ -19,10 +20,7 @@ from fsspec.implementations import memory
 
 from snowfall.stdlib import string
 
-_PkgLoaderReturn = Union[
-    list[dict[str, Any]],
-    dict[str, Any],
-]
+_PkgLoaderReturn = list[dict[str, Any]] | dict[str, Any]  # noqa: WPS221
 
 
 class UnsupportedStorageSchemeError(Exception):

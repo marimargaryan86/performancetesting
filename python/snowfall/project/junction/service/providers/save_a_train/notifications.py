@@ -42,7 +42,7 @@ Travel departure date : {departure_at}
             "confirmation_code": self._message.ticket_confirmation_code,
             "ticket_url": self._message.ticket_url,
             "created_at": datetime.datetime.now(
-                tz=datetime.timezone.utc,
+                tz=datetime.UTC,
             ).isoformat(timespec="seconds"),
             "departure_at": self._message.departure_at,
         }

@@ -1,5 +1,6 @@
 import dataclasses
-from typing import Any, Mapping, Sequence
+from collections.abc import Mapping, Sequence
+from typing import Any
 
 from starlette import status
 

@@ -1,6 +1,7 @@
 import datetime
 import functools
-from typing import Awaitable, Callable, ParamSpec, Sequence, TypeVar, cast
+from collections.abc import Awaitable, Callable, Sequence
+from typing import ParamSpec, TypeVar, cast
 
 import structlog
 from starlette import requests, status

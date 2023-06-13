@@ -1,8 +1,7 @@
 import datetime
 import itertools
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Mapping, Sequence
 from contextlib import suppress
-from typing import Mapping, Sequence, Tuple
 
 from dateutil import relativedelta
 
@@ -15,7 +14,7 @@ from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1 import latlng_pb2, money_pb2
 from snowfall.vendor.ask2go.models import booking, offers, price
 
-_GroupedOfferSegment = Tuple[offers.TripSegment, offers_pb2.OfferSegment]
+_GroupedOfferSegment = tuple[offers.TripSegment, offers_pb2.OfferSegment]
 _AdultMinAge = 18
 _InfantMaxAge = 2
 
@@ -47,7 +46,7 @@ class OfferTransformer(object):  # noqa: WPS214
         price_result: price.OfferPriceResponse,
         option_id: str,
     ) -> offers_pb2.PriceQuote:
-        expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl
+        expires_at = datetime.datetime.now(tz=datetime.UTC) + self._ttl
 
         passenger_applicable_dates = self._get_passenger_type_to_applicable_dates(
             price_result.itinerary.trips[0],
@@ -110,7 +109,7 @@ class OfferTransformer(object):  # noqa: WPS214
         self,
         offer: offers.Offer,
     ) -> offers_pb2.OfferGroup:
-        expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl
+        expires_at = datetime.datetime.now(tz=datetime.UTC) + self._ttl
 
         grouped_offer_segments = [
             (

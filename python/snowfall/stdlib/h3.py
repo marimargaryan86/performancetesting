@@ -2,7 +2,8 @@ import collections
 import dataclasses
 import itertools
 import zoneinfo
-from typing import Generic, Iterable, TypeVar
+from collections.abc import Iterable
+from typing import Generic, TypeVar
 
 from h3.api import numpy_int as h3
 

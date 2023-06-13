@@ -1,7 +1,8 @@
 import asyncio
 import datetime
 import time
-from typing import Any, AsyncGenerator, Generator, Sequence
+from collections.abc import AsyncGenerator, Generator, Sequence
+from typing import Any
 
 import structlog
 import tenacity

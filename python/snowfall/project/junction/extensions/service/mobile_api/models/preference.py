@@ -1,5 +1,6 @@
 import enum
-from typing import Any, Mapping, Sequence
+from collections.abc import Mapping, Sequence
+from typing import Any
 
 import pydantic
 from starlette import exceptions, status
@@ -108,49 +109,49 @@ preference_defaults = [
                 _TITLE_KEY: "Nature",
                 _REF_KEY: "nature",
                 _VALUE_KEY: False,
-                _IMAGE_URL_KEY: _IMAGE_BASE_URL + str("Nature.png"),
+                _IMAGE_URL_KEY: "{0}Nature.png".format(_IMAGE_BASE_URL),
             },
             {
                 _TITLE_KEY: "Sightseeing",
                 _REF_KEY: "sightseeing",
                 _VALUE_KEY: False,
-                _IMAGE_URL_KEY: _IMAGE_BASE_URL + str("Sightseeing.png"),
+                _IMAGE_URL_KEY: "{0}Sightseeing.png".format(_IMAGE_BASE_URL),
             },
             {
                 _TITLE_KEY: "Hiking",
                 _REF_KEY: "hiking",
                 _VALUE_KEY: False,
-                _IMAGE_URL_KEY: _IMAGE_BASE_URL + str("Hiking.png"),
+                _IMAGE_URL_KEY: "{0}Hiking.png".format(_IMAGE_BASE_URL),
             },
             {
                 _TITLE_KEY: "Action",
                 _REF_KEY: "action",
                 _VALUE_KEY: False,
-                _IMAGE_URL_KEY: _IMAGE_BASE_URL + str("Action.png"),
+                _IMAGE_URL_KEY: "{0}Action.png".format(_IMAGE_BASE_URL),
             },
             {
                 _TITLE_KEY: "Wildlife",
                 _REF_KEY: "wildlife",
                 _VALUE_KEY: False,
-                _IMAGE_URL_KEY: _IMAGE_BASE_URL + str("Wildlife.png"),
+                _IMAGE_URL_KEY: "{0}Wildlife.png".format(_IMAGE_BASE_URL),
             },
             {
                 _TITLE_KEY: "Food",
                 _REF_KEY: "food",
                 _VALUE_KEY: False,
-                _IMAGE_URL_KEY: _IMAGE_BASE_URL + str("Food.png"),
+                _IMAGE_URL_KEY: "{0}Food.png".format(_IMAGE_BASE_URL),
             },
             {
                 _TITLE_KEY: "Nightlife",
                 _REF_KEY: "nightlife",
                 _VALUE_KEY: False,
-                _IMAGE_URL_KEY: _IMAGE_BASE_URL + str("Nightlife.png"),
+                _IMAGE_URL_KEY: "{0}Nightlife.png".format(_IMAGE_BASE_URL),
             },
             {
                 _TITLE_KEY: "Relaxing",
                 _REF_KEY: "relaxing",
                 _VALUE_KEY: False,
-                _IMAGE_URL_KEY: _IMAGE_BASE_URL + str("Relaxing.png"),
+                _IMAGE_URL_KEY: "{0}Relaxing.png".format(_IMAGE_BASE_URL),
             },
         ],
     },

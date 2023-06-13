@@ -1,6 +1,6 @@
 import abc
 import datetime
-from typing import Sequence
+from collections.abc import Sequence
 
 from snowfall.project.junction.go.adapter import errors
 from snowfall.project.junction.go.service.offers.v1alpha import (
@@ -41,7 +41,7 @@ class DictClient(Client):
         session_token: str,
         pay_company_id: str,
     ) -> models_pb2.PriceQuoteContainer:
-        expires_at = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(
+        expires_at = datetime.datetime.now(datetime.UTC) + datetime.timedelta(
             days=1,
         )
         price_quote = models_pb2.PriceQuoteContainer(

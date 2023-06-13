@@ -1,5 +1,5 @@
 import datetime
-from typing import Optional, Sequence
+from collections.abc import Sequence
 
 import pydantic
 
@@ -12,42 +12,42 @@ class Price(base.CamelCaseBaseModel):
 
 
 class Customer(base.CamelCaseBaseModel):
-    identifier: Optional[int] = pydantic.Field(..., alias="id")
-    first_name: Optional[str]
-    last_name: Optional[str]
-    email: Optional[str]
-    telephone: Optional[str]
-    dial_code: Optional[str]
-    is_mobile_number_valid: Optional[bool]
+    identifier: int | None = pydantic.Field(..., alias="id")
+    first_name: str | None
+    last_name: str | None
+    email: str | None
+    telephone: str | None
+    dial_code: str | None
+    is_mobile_number_valid: bool | None
 
 
 class Booking(base.CamelCaseBaseModel):
     identifier: int = pydantic.Field(..., alias="id")
     booking_reference: str
     booking_token: str
-    is_cancelled: Optional[bool]
-    is_amended: Optional[bool]
-    is_confirmed: Optional[bool]
+    is_cancelled: bool | None
+    is_amended: bool | None
+    is_confirmed: bool | None
     created_date_time: datetime.datetime
-    selected_currency: Optional[str]
+    selected_currency: str | None
     partner_code: str
-    is_different_outbound_return: Optional[bool]
-    return_alternative_routes: Optional[bool]
-    is_success: Optional[bool]
-    no_quote_reason: Optional[str]
+    is_different_outbound_return: bool | None
+    return_alternative_routes: bool | None
+    is_success: bool | None
+    no_quote_reason: str | None
     price: Price
-    is_special_offer: Optional[bool]
-    is_open_ticket: Optional[bool]
-    has_ticket_types: Optional[bool]
-    has_accommodations: Optional[bool]
-    customer: Optional[Customer]
+    is_special_offer: bool | None
+    is_open_ticket: bool | None
+    has_ticket_types: bool | None
+    has_accommodations: bool | None
+    customer: Customer | None
     legs: Sequence[leg.Leg]
-    pet_instructions: Optional[str]
-    ticket_conditions: Optional[str]
-    quote_messages: Optional[str]
-    accommodation_message: Optional[str]
-    required_passenger_information: Optional[Sequence[str]]
-    culture: Optional[str]
+    pet_instructions: str | None
+    ticket_conditions: str | None
+    quote_messages: str | None
+    accommodation_message: str | None
+    required_passenger_information: Sequence[str] | None
+    culture: str | None
 
     _normalize_booking_token = pydantic.validator(
         "booking_token",

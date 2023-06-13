@@ -1,4 +1,5 @@
-from typing import Mapping, cast
+from collections.abc import Mapping
+from typing import cast
 
 from starlette import requests
 

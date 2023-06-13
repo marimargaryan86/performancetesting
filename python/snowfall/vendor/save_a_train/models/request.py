@@ -1,5 +1,5 @@
+from collections.abc import Sequence
 from datetime import date, datetime
-from typing import Optional, Sequence
 
 from pydantic import BaseModel
 
@@ -13,7 +13,7 @@ class GeneralSearchResultsRequest(BaseModel):
     trip_type: TripType
     number_of_passengers: int
     departure_date: date
-    return_date: Optional[date] = None
+    return_date: date | None = None
 
 
 class CreateSearchRequest(BaseModel):

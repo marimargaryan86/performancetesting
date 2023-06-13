@@ -2,7 +2,7 @@ import asyncio
 import dataclasses
 import itertools
 from collections import defaultdict
-from typing import Awaitable, Callable, Sequence, Type
+from collections.abc import Awaitable, Callable, Sequence
 
 import structlog
 from starlette import requests
@@ -18,12 +18,12 @@ ResolverFunc = Callable[
 
 @dataclasses.dataclass(frozen=True)
 class Resolver(object):
-    resource: Type[models.Resource]
+    resource: type[models.Resource]
     func: ResolverFunc
 
 
-_resolvers: dict[Type[models.Resource], Resolver] = {}
-_lookup: dict[str, Type[models.Resource]] = {}
+_resolvers: dict[type[models.Resource], Resolver] = {}
+_lookup: dict[str, type[models.Resource]] = {}
 
 
 def add_resolver(resolver: Resolver) -> None:

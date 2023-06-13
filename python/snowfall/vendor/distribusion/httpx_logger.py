@@ -1,8 +1,8 @@
 import datetime
-import io
 import json
 import os
 
+import aiofiles
 import httpx
 import structlog
 
@@ -60,12 +60,12 @@ class RequestLogHandler(LogHandler):
                 file_name = self.get_file_name(request.url.path, "-rq")
                 os.makedirs(file_path, exist_ok=True)
 
-                with io.open(
+                async with aiofiles.open(
                     os.path.join(file_path, file_name),
                     "w",
                     encoding="utf-8",
                 ) as log_file:
-                    log_file.write(rq_content)
+                    await log_file.write(rq_content)
 
 
 class ResponseLogHandler(LogHandler):
@@ -86,12 +86,12 @@ class ResponseLogHandler(LogHandler):
             file_name = self.get_file_name(response.url.path, "-rs")
             os.makedirs(file_path, exist_ok=True)
 
-            with io.open(
+            async with aiofiles.open(
                 os.path.join(file_path, file_name),
                 "w",
                 encoding="utf-8",
             ) as log_file:
-                log_file.write(json.dumps(json_data, ensure_ascii=False))
+                await log_file.write(json.dumps(json_data, ensure_ascii=False))
 
             self._logger.info(
                 "Response",

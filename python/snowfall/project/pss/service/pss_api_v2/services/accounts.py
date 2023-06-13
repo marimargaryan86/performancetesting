@@ -1,6 +1,7 @@
 import datetime
 import hashlib
-from typing import Any, Dict, Sequence
+from collections.abc import Sequence
+from typing import Any
 from uuid import uuid4
 
 import bcrypt
@@ -88,7 +89,7 @@ class AccountsService(object):  # noqa: WPS214
                 password=account_data.password,
             )
 
-        filtered_account_data: Dict[Any, Any] = account_data.dict(
+        filtered_account_data: dict[Any, Any] = account_data.dict(
             exclude_unset=True,
             exclude={"email", "password"},
         )

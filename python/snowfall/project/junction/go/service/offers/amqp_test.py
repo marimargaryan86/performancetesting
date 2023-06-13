@@ -1,4 +1,4 @@
-from typing import AsyncIterator
+from collections.abc import AsyncIterator
 from unittest.mock import create_autospec
 
 from snowfall.project.junction.go.service.offers.amqp import PriceQuoteProducer

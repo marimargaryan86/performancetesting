@@ -73,9 +73,7 @@ async def observe_wait_time(
 ) -> None:
     if msg.enqueued_at:
         _histogram_wait_time.labels(**_prometheus_labels(msg)).observe(
-            (
-                datetime.datetime.now(tz=datetime.timezone.utc) - msg.enqueued_at
-            ).total_seconds(),
+            (datetime.datetime.now(tz=datetime.UTC) - msg.enqueued_at).total_seconds(),
         )
 
     return await next_func(msg)

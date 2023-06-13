@@ -1,5 +1,3 @@
-from typing import Optional
-
 from pydantic import EmailStr
 from pydantic.fields import Field
 
@@ -12,11 +10,11 @@ class AccountLoginSchema(BaseSchema):
 
 
 class AccountUpdateSchema(BaseSchema):
-    email: Optional[EmailStr]
-    password: Optional[str]
-    firstname: Optional[str]
-    lastname: Optional[str]
-    mobile: Optional[str]
+    email: EmailStr | None
+    password: str | None
+    firstname: str | None
+    lastname: str | None
+    mobile: str | None
 
 
 class AccountForgotPasswordSchema(BaseSchema):
@@ -39,8 +37,8 @@ class AccountDetailedResponseSchema(AccountResponseSchema):
     mobile: str
     active: bool
     token: str
-    created: Optional[int]
-    modified: Optional[int]
+    created: int | None
+    modified: int | None
 
 
 class AdminAccountDetailedResponseSchema(AccountDetailedResponseSchema):

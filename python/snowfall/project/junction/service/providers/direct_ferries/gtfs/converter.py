@@ -1,5 +1,5 @@
 import datetime
-from typing import Generator, Sequence
+from collections.abc import Generator, Sequence
 
 import pydantic
 import structlog
@@ -211,7 +211,7 @@ class DFDataConverter(object):  # noqa: WPS214
     ) -> Generator[gtfs_models.StopTime, None, None]:
         departure_at_utc = schedule.departure_time.replace(
             tzinfo=tz.gettz(route.port_from.timezone),
-        ).astimezone(datetime.timezone.utc)
+        ).astimezone(datetime.UTC)
         arrival_at_utc = departure_at_utc + datetime.timedelta(
             minutes=schedule.duration_in_minutes,
         )

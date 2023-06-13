@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime
-from typing import Type
 
 from redis import asyncio as aioredis
 
@@ -20,7 +19,7 @@ class TestRecord(RedisRecord):
 class TestRepository(RedisRepository[TestRecord]):
     """Test repository."""
 
-    _record_type: Type[TestRecord] = TestRecord
+    _record_type: type[TestRecord] = TestRecord
 
 
 async def test_record_can_be_created(

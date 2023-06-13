@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any
 
 from snowfall.vendor.ask2go.models import offers
 from snowfall.vendor.ask2go.models.base import CamelCaseBaseModel
@@ -6,17 +6,17 @@ from snowfall.vendor.ask2go.models.base import CamelCaseBaseModel
 
 class InformationError(CamelCaseBaseModel):
     code: int
-    message: Optional[str]
+    message: str | None
 
 
 class Information(CamelCaseBaseModel):
-    record_locators: Optional[list[str]]
-    check_in_locators: Optional[list[str]]
+    record_locators: list[str] | None
+    check_in_locators: list[str] | None
     booking_id: int
-    display_booking_id: Optional[str]
+    display_booking_id: str | None
     status: str
-    errors: Optional[list[InformationError]]
-    warnings: Optional[str]
+    errors: list[InformationError] | None
+    warnings: str | None
 
 
 class ContactDetailsAddress(CamelCaseBaseModel):
@@ -53,7 +53,7 @@ class Booking(CamelCaseBaseModel):
     price_information: dict[str, Any]
     travelers: list[dict[str, Any]]
     fare_rules: list[FareRules]
-    contact_details: Optional[ContactDetails]
+    contact_details: ContactDetails | None
     transaction_id: str
     pricing_id: str
     search_id: str

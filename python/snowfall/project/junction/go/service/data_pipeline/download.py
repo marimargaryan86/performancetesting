@@ -10,9 +10,10 @@ PIPELINE_GTFS_DE_USERNAME=some_user
 import asyncio
 import json
 import os
+from collections.abc import Awaitable, Callable, Iterable
 from pathlib import Path
 from types import MappingProxyType
-from typing import Any, Awaitable, Callable, Iterable, TypeAlias
+from typing import Any, TypeAlias
 
 import httpx
 

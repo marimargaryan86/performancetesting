@@ -1,4 +1,4 @@
-from typing import List, Sequence
+from collections.abc import Sequence
 
 from fastapi import Depends
 from fastapi.routing import APIRouter
@@ -10,7 +10,7 @@ from snowfall.project.pss.service.pss_api_v2.services.countries import Countries
 router = APIRouter()
 
 
-@router.get("", response_model=List[CountrySchema])
+@router.get("", response_model=list[CountrySchema])
 async def _get_all_countries(
     countries: CountriesService = Depends(CountriesService),
 ) -> Sequence[Country]:

@@ -54,7 +54,7 @@ async def _save_enrich_data(  # noqa: WPS210
     osm_data: pd.DataFrame,
 ) -> None:
     updated = timestamp_pb2.Timestamp()
-    updated.FromDatetime(datetime.datetime.now(tz=datetime.timezone.utc))
+    updated.FromDatetime(datetime.datetime.now(tz=datetime.UTC))
     async for place in places:
         loc = place.location
         # fmt: off

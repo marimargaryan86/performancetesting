@@ -1,4 +1,4 @@
-from typing import Optional, Sequence
+from collections.abc import Sequence
 
 import pydantic
 
@@ -29,18 +29,18 @@ class BookingResponse(base.CamelCaseBaseModel):
 class CancellationEnquiryInformation(base.CamelCaseBaseModel):
     fee: str
     refund_amount: str
-    message: Optional[str]
-    booking_token: Optional[str]
+    message: str | None
+    booking_token: str | None
 
 
 class CancellationStatus(base.CamelCaseBaseModel):
     identifier: int = pydantic.Field(..., alias="id")
-    name: Optional[str]
+    name: str | None
 
 
 class CancellationResponse(base.CamelCaseBaseModel):
     cancellation_status: CancellationStatus
     fee: str
     refund_amount: str
-    error_message: Optional[str]
-    success_message: Optional[str]
+    error_message: str | None
+    success_message: str | None

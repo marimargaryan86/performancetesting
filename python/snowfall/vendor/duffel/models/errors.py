@@ -1,5 +1,3 @@
-from typing import List
-
 import pydantic
 
 from snowfall.vendor.duffel.models.base import DuffelBaseModel
@@ -26,4 +24,4 @@ class Error(DuffelBaseModel):
 
 class ErrorResponse(DuffelBaseModel):
     meta: Meta | None
-    errors: List[Error] | None
+    errors: list[Error] | None

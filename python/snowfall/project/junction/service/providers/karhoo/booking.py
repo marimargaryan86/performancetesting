@@ -55,7 +55,7 @@ class BookingHandler(object):
                                 booking_response.date_booked,
                                 "%Y-%m-%dT%H:%M",
                             ).replace(
-                                tzinfo=datetime.timezone.utc,
+                                tzinfo=datetime.UTC,
                             )
                             if booking_response.date_booked
                             else datetime.datetime.now()

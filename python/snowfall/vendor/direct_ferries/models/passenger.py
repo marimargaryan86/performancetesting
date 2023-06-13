@@ -1,5 +1,4 @@
 import datetime
-from typing import Optional
 
 import pydantic
 
@@ -22,23 +21,23 @@ class RoutePassengerInfo(base.CamelCaseBaseModel):
 
 
 class ExtraInfo(base.CamelCaseBaseModel):
-    ticket_reference: Optional[str]
-    visa_number: Optional[str]
-    visa_expiry: Optional[str]
+    ticket_reference: str | None
+    visa_number: str | None
+    visa_expiry: str | None
 
 
 class PassengerBase(base.CamelCaseBaseModel):
     age_range: AgeRange
     is_wheelchair_user: bool
     is_lead_passenger: bool
-    first_name: Optional[str] = None
-    sur_name: Optional[str] = None
-    email: Optional[str] = None
-    telephone: Optional[str] = None
-    nationality: Optional[str] = None
-    passport_number: Optional[str] = None
-    passport_place_of_issue: Optional[str] = None
-    date_of_birth: Optional[datetime.date] = None
+    first_name: str | None = None
+    sur_name: str | None = None
+    email: str | None = None
+    telephone: str | None = None
+    nationality: str | None = None
+    passport_number: str | None = None
+    passport_place_of_issue: str | None = None
+    date_of_birth: datetime.date | None = None
 
     _normalize_date_of_birth = pydantic.validator(
         "date_of_birth",
@@ -56,14 +55,14 @@ class PassengerBase(base.CamelCaseBaseModel):
 
 class Passenger(PassengerBase):
     identifier: int = pydantic.Field(..., alias="id")
-    title: Optional[str]
+    title: str | None
     passenger_type: enums.PassengerType = pydantic.Field(..., alias="type")
     sequence_no: int
-    place_of_birth: Optional[str]
-    passport_start_date: Optional[str]
-    passport_expiry_date: Optional[str]
-    city_code: Optional[str]
-    extra_info: Optional[ExtraInfo]
+    place_of_birth: str | None
+    passport_start_date: str | None
+    passport_expiry_date: str | None
+    city_code: str | None
+    extra_info: ExtraInfo | None
 
 
 class RoutePassengerInfoExtended(base.CamelCaseBaseModel):

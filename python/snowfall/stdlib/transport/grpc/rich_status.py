@@ -1,4 +1,5 @@
-from typing import Awaitable, Iterator, NoReturn, cast
+from collections.abc import Awaitable, Iterator
+from typing import NoReturn, cast
 
 import grpc
 from google.protobuf import any_pb2, message, symbol_database

@@ -109,7 +109,7 @@ Travel departure date : {departure_at}
             "first_name": first_passenger.given_name or "",
             "last_name": first_passenger.family_name or "",
             "created_at": datetime.datetime.now(
-                tz=datetime.timezone.utc,
+                tz=datetime.UTC,
             ).isoformat(timespec="seconds"),
             "departure_at": (
                 first_segment.departing_at.isoformat(timespec="seconds") or ""

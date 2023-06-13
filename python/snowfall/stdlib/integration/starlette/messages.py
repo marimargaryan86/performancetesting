@@ -1,5 +1,5 @@
 import dataclasses
-from typing import Mapping
+from collections.abc import Mapping
 
 from starlette import background as starlette_background
 from starlette import requests

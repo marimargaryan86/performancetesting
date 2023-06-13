@@ -1,7 +1,7 @@
 import asyncio
 import collections
-from collections.abc import AsyncIterable, Iterable
-from typing import Awaitable, TypeVar
+from collections.abc import AsyncIterable, Awaitable, Iterable
+from typing import TypeVar
 
 _DataType = TypeVar("_DataType")
 

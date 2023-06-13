@@ -1,5 +1,6 @@
 import datetime
-from typing import Any, Callable, Sequence, TypeVar
+from collections.abc import Callable, Sequence
+from typing import Any, TypeVar
 
 from dateutil.parser import parse as date_parser
 from pydantic import typing, validator

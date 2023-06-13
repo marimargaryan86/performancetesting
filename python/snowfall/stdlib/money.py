@@ -4,7 +4,7 @@ import contextlib
 import dataclasses
 import decimal
 import functools
-from typing import Iterable
+from collections.abc import Iterable
 
 import iso4217
 

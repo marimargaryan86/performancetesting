@@ -1,6 +1,6 @@
 import dataclasses
 import datetime
-from typing import Annotated, Optional
+from typing import Annotated
 
 import pydantic
 
@@ -26,14 +26,14 @@ class _BaseModel(pydantic.BaseModel):
 
 
 class Agency(_BaseModel):
-    agency_id: Optional[str]
+    agency_id: str | None
     agency_name: str
     agency_url: pydantic.HttpUrl
     agency_timezone: str
-    agency_lang: Optional[str]
-    agency_phone: Optional[str]
-    agency_fare_url: Optional[pydantic.HttpUrl]
-    agency_email: Optional[pydantic.EmailStr]
+    agency_lang: str | None
+    agency_phone: str | None
+    agency_fare_url: pydantic.HttpUrl | None
+    agency_email: pydantic.EmailStr | None
 
     _normalize_language_code = normalizers.normalizer(
         ("agency_lang",),
@@ -79,12 +79,12 @@ class FeedInfo(_BaseModel):
     feed_publisher_name: str
     feed_publisher_url: pydantic.HttpUrl
     feed_lang: str
-    default_lang: Optional[str]
-    feed_start_date: Optional[datetime.date]
-    feed_end_date: Optional[datetime.date]
-    feed_version: Optional[str]
-    feed_contact_email: Optional[pydantic.EmailStr]
-    feed_contact_url: Optional[pydantic.HttpUrl]
+    default_lang: str | None
+    feed_start_date: datetime.date | None
+    feed_end_date: datetime.date | None
+    feed_version: str | None
+    feed_contact_email: pydantic.EmailStr | None
+    feed_contact_url: pydantic.HttpUrl | None
 
     _normalize_date = normalizers.normalizer(
         (
@@ -104,46 +104,40 @@ class FeedInfo(_BaseModel):
 
 class Route(_BaseModel):
     route_id: str
-    agency_id: Optional[str]
-    route_short_name: Optional[str]
-    route_long_name: Optional[str]
-    route_desc: Optional[str]
+    agency_id: str | None
+    route_short_name: str | None
+    route_long_name: str | None
+    route_desc: str | None
     route_type: enums.RouteType
-    route_url: Optional[pydantic.HttpUrl]
-    route_color: Optional[Annotated[str, pydantic.Field(regex=constants.COLOR_REGEX)]]
-    route_text_color: Optional[
-        Annotated[str, pydantic.Field(regex=constants.COLOR_REGEX)]
-    ]
-    route_sort_order: Optional[pydantic.NonNegativeInt]
-    continuous_pickup: Optional[pydantic.NonNegativeInt]
-    continuous_drop_off: Optional[pydantic.NonNegativeInt]
+    route_url: pydantic.HttpUrl | None
+    route_color: Annotated[str, pydantic.Field(regex=constants.COLOR_REGEX)] | None
+    route_text_color: Annotated[str, pydantic.Field(regex=constants.COLOR_REGEX)] | None
+    route_sort_order: pydantic.NonNegativeInt | None
+    continuous_pickup: pydantic.NonNegativeInt | None
+    continuous_drop_off: pydantic.NonNegativeInt | None
 
 
 class Stop(_BaseModel):
     stop_id: str
-    stop_code: Optional[str]
-    stop_name: Optional[str]
-    stop_desc: Optional[str]
-    stop_lat: Optional[
-        Annotated[
-            float,
-            pydantic.Field(ge=constants.LATITUDE_MIN, le=constants.LATITUDE_MAX),
-        ]
-    ]
-    stop_lon: Optional[
-        Annotated[
-            float,
-            pydantic.Field(ge=constants.LONGITUDE_MIN, le=constants.LONGITUDE_MAX),
-        ]
-    ]
-    zone_id: Optional[str]
-    stop_url: Optional[pydantic.HttpUrl]
+    stop_code: str | None
+    stop_name: str | None
+    stop_desc: str | None
+    stop_lat: Annotated[
+        float,
+        pydantic.Field(ge=constants.LATITUDE_MIN, le=constants.LATITUDE_MAX),
+    ] | None
+    stop_lon: Annotated[
+        float,
+        pydantic.Field(ge=constants.LONGITUDE_MIN, le=constants.LONGITUDE_MAX),
+    ] | None
+    zone_id: str | None
+    stop_url: pydantic.HttpUrl | None
     location_type: enums.LocationType
-    parent_station: Optional[str]
-    stop_timezone: Optional[str]
+    parent_station: str | None
+    stop_timezone: str | None
     wheelchair_boarding: pydantic.NonNegativeInt = 0
-    level_id: Optional[str]
-    platform_code: Optional[str]
+    level_id: str | None
+    platform_code: str | None
 
     _normalize_time_zone = normalizers.normalizer(
         ("stop_timezone",),
@@ -153,16 +147,16 @@ class Stop(_BaseModel):
 
 class StopTime(_BaseModel):
     trip_id: str
-    arrival_time: Optional[datetime.timedelta]
-    departure_time: Optional[datetime.timedelta]
+    arrival_time: datetime.timedelta | None
+    departure_time: datetime.timedelta | None
     stop_id: str
     stop_sequence: pydantic.NonNegativeInt
-    stop_headsign: Optional[str]
+    stop_headsign: str | None
     pickup_type: enums.PickupType
     drop_off_type: enums.DropOffType
     continuous_pickup: pydantic.NonNegativeInt = 1
     continuous_drop_off: pydantic.NonNegativeInt = 1
-    shape_dist_traveled: Optional[pydantic.NonNegativeFloat]
+    shape_dist_traveled: pydantic.NonNegativeFloat | None
     timepoint: pydantic.NonNegativeInt = 1
 
     _normalize_time = normalizers.normalizer(
@@ -178,11 +172,11 @@ class Trip(_BaseModel):
     route_id: str
     service_id: str
     trip_id: str
-    trip_headsign: Optional[str]
-    trip_short_name: Optional[str]
-    direction_id: Optional[pydantic.NonNegativeInt]
-    block_id: Optional[str]
-    shape_id: Optional[str]
+    trip_headsign: str | None
+    trip_short_name: str | None
+    direction_id: pydantic.NonNegativeInt | None
+    block_id: str | None
+    shape_id: str | None
     wheelchair_accessible: pydantic.NonNegativeInt = 0
     bikes_allowed: pydantic.NonNegativeInt = 0
 
@@ -191,7 +185,7 @@ class Transfer(_BaseModel):
     from_stop_id: str
     to_stop_id: str
     transfer_type: int
-    min_transfer_time: Optional[pydantic.NonNegativeInt]
+    min_transfer_time: pydantic.NonNegativeInt | None
 
 
 @dataclasses.dataclass(frozen=True)
@@ -199,7 +193,7 @@ class Feed(object):
     agencies: list[Agency]
     calendars: list[Calendar]
     calendar_dates: list[CalendarDate]
-    feed_info: Optional[FeedInfo]
+    feed_info: FeedInfo | None
     ref: str
     routes: list[Route]
     stops: list[Stop]

@@ -94,7 +94,7 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
                             offerSearchId=request.path_params["offerSearchId"],
                         ),
                     )
-                    + str("?"),
+                    + "?",
                     offers_response["links"]["next"],
                 ),
             },

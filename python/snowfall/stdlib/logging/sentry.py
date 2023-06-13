@@ -1,5 +1,6 @@
+from collections.abc import Sequence
 from importlib import import_module, util
-from typing import Any, Sequence
+from typing import Any
 
 import sentry_sdk
 import structlog

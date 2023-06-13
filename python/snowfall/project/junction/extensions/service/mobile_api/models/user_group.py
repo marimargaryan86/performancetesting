@@ -1,12 +1,10 @@
-from typing import Optional
-
 import pydantic
 
 from snowfall.stdlib import string
 
 
 class UserGroup(pydantic.BaseModel):
-    name: Optional[str]
+    name: str | None
 
     class Config(object):
         alias_generator = string.to_lower_camel

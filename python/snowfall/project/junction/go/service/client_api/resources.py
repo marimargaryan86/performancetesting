@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import datetime
 import zoneinfo
-from typing import Any, ClassVar, Iterable, Optional, Sequence
+from collections.abc import Iterable, Sequence
+from typing import Any, ClassVar
 
 import pydantic
 from starlette import datastructures, requests
@@ -150,7 +151,7 @@ class OfferSegmentLeg(models.BaseModel):
 
 class RouteIdentifiers(models.BaseModel):
     vendor: str
-    operator: Optional[str] = None
+    operator: str | None = None
 
 
 class TripOfferGroupDetailsResource(models.Resource):
@@ -226,10 +227,10 @@ class Price(models.BaseModel):
 
 
 class PenaltyApplicableTo(models.BaseModel):
-    date_of_birth_after: Optional[datetime.date] = pydantic.Field(
+    date_of_birth_after: datetime.date | None = pydantic.Field(
         alias="dateOfBirthAfter",
     )
-    date_of_birth_before: Optional[datetime.date] = pydantic.Field(
+    date_of_birth_before: datetime.date | None = pydantic.Field(
         alias="dateOfBirthBefore",
     )
 
@@ -260,10 +261,10 @@ class Penalty(models.BaseModel):
     applicable_to: PenaltyApplicableTo = pydantic.Field(alias="applicableTo")
     penalty_type: str = pydantic.Field(alias="penaltyType")
     changeable: bool
-    refundable: Optional[bool]
-    conditions_apply: Optional[bool] = pydantic.Field(alias="conditionsApply")
+    refundable: bool | None
+    conditions_apply: bool | None = pydantic.Field(alias="conditionsApply")
     applicability: str
-    price: Optional[Price]
+    price: Price | None
 
     @classmethod
     def from_proto(cls, penalty: offer_models_pb2.Penalty) -> Penalty:

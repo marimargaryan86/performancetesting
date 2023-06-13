@@ -1,11 +1,14 @@
 import abc
 import functools
-from typing import Awaitable, Callable, Optional
+from collections.abc import Awaitable, Callable
 
 from google.protobuf import message
 from grpc import HandlerCallDetails, RpcMethodHandler, aio, experimental
 
-Continuation = Callable[[HandlerCallDetails], Awaitable[Optional[RpcMethodHandler]]]
+Continuation = Callable[
+    [HandlerCallDetails],
+    Awaitable[RpcMethodHandler | None],  # noqa: WPS465
+]
 UnaryUnary = Callable[
     [message.Message, aio.ServicerContext],
     Awaitable[message.Message],

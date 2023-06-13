@@ -1,4 +1,5 @@
-from typing import Awaitable, Callable, Container, cast
+from collections.abc import Awaitable, Callable, Container
+from typing import cast
 
 import sentry_sdk
 import structlog

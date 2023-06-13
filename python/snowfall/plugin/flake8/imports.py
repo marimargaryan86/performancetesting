@@ -1,5 +1,5 @@
 import ast
-from typing import Iterator
+from collections.abc import Iterator
 
 from snowfall.plugin.flake8 import plugin
 

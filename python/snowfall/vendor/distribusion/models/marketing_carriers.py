@@ -1,5 +1,3 @@
-from typing import List
-
 import pydantic
 
 from snowfall.vendor.distribusion.models.base import DistribusionBaseModel
@@ -51,8 +49,8 @@ class FareClass(DistribusionBaseModel):
     iata_category: str | None
     journey_type: str | None
     name: str | None
-    fare_features: List[FareFeature] | None
-    ticket_validity_rules: List[TicketValidityRule] | None
+    fare_features: list[FareFeature] | None
+    ticket_validity_rules: list[TicketValidityRule] | None
 
 
 class MarketingCarrierDetails(DistribusionBaseModel):
@@ -85,12 +83,12 @@ class MarketingCarrierDetails(DistribusionBaseModel):
     cancellation_fee: int
     cancellation_cutoff: int | None
     default_passenger_type: PassengerType | None
-    fare_classes: List[FareClass] | None
-    passenger_types: List[PassengerType] | None
-    vehicle_types: List[VehicleType] | None
+    fare_classes: list[FareClass] | None
+    passenger_types: list[PassengerType] | None
+    vehicle_types: list[VehicleType] | None
 
 
 class BookingSchema(DistribusionBaseModel):
     identifier: str = pydantic.Field(..., alias="id")
-    mandatory: List[str] | None
-    optional: List[str] | None
+    mandatory: list[str] | None
+    optional: list[str] | None

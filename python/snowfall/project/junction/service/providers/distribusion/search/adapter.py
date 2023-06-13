@@ -1,6 +1,6 @@
 import datetime
 import zoneinfo
-from typing import AsyncIterator, Collection, Sequence
+from collections.abc import AsyncIterator, Collection, Sequence
 
 import structlog
 
@@ -67,11 +67,11 @@ class MarketingCarrierAdapter(object):  # noqa: WPS214
     def get_fare_feature_codes(
         self,
         fare: connections.FaresRelFareClassPrice | None,
-    ) -> set[str] | None:
+    ) -> frozenset[str] | None:
         fare_features = self._get_fare_features(fare)
 
         if fare_features:
-            return {feature.code for feature in fare_features if feature.code}
+            return frozenset(feature.code for feature in fare_features if feature.code)
 
         return None
 
@@ -276,7 +276,7 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
         search_criteria: FindConnectionsCriteria,
         connection_list: Sequence[connections.Connection],
     ) -> AsyncIterator[offer_models_pb2.OfferGroup]:
-        expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl
+        expires_at = datetime.datetime.now(tz=datetime.UTC) + self._ttl
         carriers = MarketingCarrierAdapters()
 
         self._logger.info(

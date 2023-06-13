@@ -4,7 +4,7 @@ import asyncio
 import itertools
 import types as std_types
 import zoneinfo
-from typing import Sequence
+from collections.abc import Sequence
 
 import more_itertools
 import structlog

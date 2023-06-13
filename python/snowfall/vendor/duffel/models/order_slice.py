@@ -1,5 +1,4 @@
 import datetime
-from typing import List
 
 import pydantic
 
@@ -10,7 +9,7 @@ from snowfall.vendor.duffel.models.common import Aircraft, Airline, Airport, Pla
 class OrderSliceSegmentPassengerSeat(DuffelBaseModel):
     designator: str
     name: str
-    disclosures: List[str]
+    disclosures: list[str]
 
 
 class OrderSliceSegmentPassengerBaggage(DuffelBaseModel):
@@ -19,7 +18,7 @@ class OrderSliceSegmentPassengerBaggage(DuffelBaseModel):
 
 
 class OrderSliceSegmentPassenger(DuffelBaseModel):
-    baggages: List[OrderSliceSegmentPassengerBaggage]
+    baggages: list[OrderSliceSegmentPassengerBaggage]
     cabin_class: str
     cabin_class_marketing_name: str
     passenger_id: str
@@ -41,7 +40,7 @@ class OrderSliceSegment(DuffelBaseModel):
     marketing_carrier_flight_number: str
     operating_carrier: Airline
     operating_carrier_flight_number: str | None
-    passengers: List[OrderSliceSegmentPassenger]
+    passengers: list[OrderSliceSegmentPassenger]
 
 
 class OrderSliceConditionChangeBeforeDeparture(DuffelBaseModel):
@@ -62,5 +61,5 @@ class OrderSlice(DuffelBaseModel):
     origin_type: str
     origin: Place
     duration: datetime.timedelta | None
-    segments: List[OrderSliceSegment]
+    segments: list[OrderSliceSegment]
     conditions: OrderSliceConditions

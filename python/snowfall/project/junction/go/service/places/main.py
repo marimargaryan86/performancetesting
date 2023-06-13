@@ -2,7 +2,7 @@ import asyncio
 import ipaddress
 import logging
 import random
-from typing import Sequence
+from collections.abc import Sequence
 
 import aiofiles
 from motor import motor_asyncio

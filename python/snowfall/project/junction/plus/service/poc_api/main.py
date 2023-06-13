@@ -1,6 +1,6 @@
 import random
+from collections.abc import Callable
 from functools import partial
-from typing import Callable
 
 import httpx
 from motor import motor_asyncio

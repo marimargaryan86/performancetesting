@@ -1,7 +1,8 @@
 import http
 import ipaddress
 import pathlib
-from typing import Any, Awaitable, Callable, Mapping, Sequence, cast
+from collections.abc import Awaitable, Callable, Mapping, Sequence
+from typing import Any, cast
 
 import uvicorn
 from asgiref.typing import ASGIApplication

@@ -77,7 +77,7 @@ class PriceQuoteConsumer(object):
         if not offer_details:
             return
 
-        expires_at = datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl
+        expires_at = datetime.datetime.now(tz=datetime.UTC) + self._ttl
 
         price_quote_id = await self._cache.store(offer_details, expires_at)
 

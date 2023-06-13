@@ -3,7 +3,7 @@ from __future__ import annotations
 import contextlib
 import datetime
 import uuid
-from typing import AsyncIterator
+from collections.abc import AsyncIterator
 from unittest import mock
 
 import faker

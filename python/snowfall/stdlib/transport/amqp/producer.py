@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import Mapping
+from collections.abc import Mapping
 
 import prometheus_client
 from aio_pika import Message as PikaMessage
@@ -61,7 +61,7 @@ class Producer(protocol.Producer):
                             **span_headers,
                             "x-enqueued-at": int(
                                 datetime.datetime.now(
-                                    tz=datetime.timezone.utc,
+                                    tz=datetime.UTC,
                                 ).timestamp(),
                             ),
                         },

@@ -1,6 +1,5 @@
 import dataclasses
 import datetime
-from typing import Optional
 
 import httpx
 
@@ -24,7 +23,7 @@ class AuthClient(object):
         self._client_id = client_id
         self._client_secret = client_secret
 
-        self._auth_response: Optional[AuthServiceResponse] = None
+        self._auth_response: AuthServiceResponse | None = None
 
     async def get_token(self) -> str:
         if not self._is_token_valid():

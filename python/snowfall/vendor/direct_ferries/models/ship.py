@@ -1,4 +1,4 @@
-from typing import Optional, Sequence
+from collections.abc import Sequence
 
 import pydantic
 
@@ -11,5 +11,5 @@ class OnboardFacility(base.CamelCaseBaseModel):
 
 
 class Ship(base.CamelCaseBaseModel):
-    name: Optional[str]
-    onboard_facilities: Optional[Sequence[OnboardFacility]]
+    name: str | None
+    onboard_facilities: Sequence[OnboardFacility] | None

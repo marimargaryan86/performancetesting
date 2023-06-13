@@ -3,7 +3,8 @@ from __future__ import annotations
 import datetime
 import struct
 import zoneinfo
-from typing import TYPE_CHECKING, AsyncIterator, Generic, Optional, Type, TypeVar, cast
+from collections.abc import AsyncIterator
+from typing import TYPE_CHECKING, Generic, TypeVar, cast
 
 from aiofiles.threadpool import binary
 from dateutil import tz
@@ -46,7 +47,7 @@ class AnySerializer(Generic[_Proto]):
 
         packed_message.ParseFromString(blob)
 
-        symbol = cast(Type[_Proto], cls._db.GetSymbol(packed_message.TypeName()))
+        symbol = cast(type[_Proto], cls._db.GetSymbol(packed_message.TypeName()))
         unpacked_message = symbol()
 
         packed_message.Unpack(unpacked_message)
@@ -89,8 +90,8 @@ def datetime_to_protobuf(timestamp: datetime.datetime) -> timestamp_pb2.Timestam
 def datetime_to_protobuf_datetime(
     timestamp: datetime.datetime,
 ) -> datetime_pb2.DateTime:
-    time_zone: Optional[datetime_pb2.TimeZone] = None
-    utc_offset: Optional[duration_pb2.Duration] = None
+    time_zone: datetime_pb2.TimeZone | None = None
+    utc_offset: duration_pb2.Duration | None = None
     timestamp_offset = timestamp.utcoffset()
 
     if timestamp_offset is None:
@@ -126,7 +127,7 @@ def protobuf_to_datetime(
     tzinfo: datetime.tzinfo
 
     if isinstance(proto, timestamp_pb2.Timestamp):
-        return proto.ToDatetime(tzinfo=datetime.timezone.utc)
+        return proto.ToDatetime(tzinfo=datetime.UTC)
 
     if proto.HasField("time_zone"):
         tzinfo = zoneinfo.ZoneInfo(proto.time_zone.id)

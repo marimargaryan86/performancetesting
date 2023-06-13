@@ -1,12 +1,10 @@
-from typing import AbstractSet
-
 from snowfall.project.junction.go.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
 
 
 def parse_amenities(
-    fare_feature_codes: AbstractSet[str],
+    fare_feature_codes: frozenset[str],
 ) -> offer_models_pb2.SegmentAmenities | None:
     if fare_feature_codes:
         return offer_models_pb2.SegmentAmenities(
@@ -21,7 +19,7 @@ def parse_amenities(
 
 
 def _parse_amenity(
-    fare_feature_codes: AbstractSet[str],
+    fare_feature_codes: frozenset[str],
     code: str,
 ) -> offer_models_pb2.SegmentAmenity:
     if code in fare_feature_codes:

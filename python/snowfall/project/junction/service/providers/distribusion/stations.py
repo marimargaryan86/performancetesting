@@ -3,7 +3,7 @@ import json
 import pathlib
 import pkgutil
 import zoneinfo
-from typing import Mapping, Optional, Sequence
+from collections.abc import Mapping, Sequence
 
 import aiofiles
 import httpx
@@ -24,7 +24,7 @@ class DumpStationsSettings(DistribusionConfig, service.Settings):
 
 @dataclasses.dataclass(frozen=True)
 class Station(h3.CoordinatesItem):
-    name: Optional[str]
+    name: str | None
 
 
 class StationRepository(object):

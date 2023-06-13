@@ -2,8 +2,9 @@ import json
 import logging
 import secrets
 import string
+from collections.abc import Callable
 from functools import wraps
-from typing import Any, Callable, ParamSpec
+from typing import Any, ParamSpec
 from uuid import UUID
 
 

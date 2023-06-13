@@ -4,7 +4,8 @@ import contextlib
 import datetime
 import random
 import uuid
-from typing import Any, Sequence, cast
+from collections.abc import Sequence
+from typing import Any, cast
 
 import aiosmtplib
 import httpx

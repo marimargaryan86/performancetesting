@@ -1,5 +1,6 @@
 import datetime
-from typing import Any, Mapping
+from collections.abc import Mapping
+from typing import Any
 
 from snowfall.project.junction.extensions.service.mobile_api.v1alpha import (
     models_pb2 as mobile_models_pb2,

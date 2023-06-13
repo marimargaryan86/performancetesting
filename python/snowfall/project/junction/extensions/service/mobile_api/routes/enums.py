@@ -1,5 +1,6 @@
 import json
-from typing import Any, Awaitable, Callable, Mapping
+from collections.abc import Awaitable, Callable, Mapping
+from typing import Any
 
 from starlette import requests, responses, routing, status
 

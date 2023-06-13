@@ -6,7 +6,8 @@ for this year and next year (if available).
 
 import datetime
 import re
-from typing import Any, Iterator
+from collections.abc import Iterator
+from typing import Any
 
 from httpx import AsyncClient
 

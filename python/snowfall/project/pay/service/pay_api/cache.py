@@ -25,9 +25,7 @@ class UserSessionRepository(object):
             ttl = await self._redis.get_expires_at(identifier)
 
             if not ttl:
-                ttl = (
-                    datetime.datetime.now(tz=datetime.timezone.utc) + self._default_ttl
-                )
+                ttl = datetime.datetime.now(tz=datetime.UTC) + self._default_ttl
 
             await session.put(currency_pair, str(rate))
 

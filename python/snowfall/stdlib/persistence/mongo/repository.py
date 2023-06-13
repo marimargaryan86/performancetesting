@@ -2,16 +2,8 @@ import abc
 import datetime
 import functools
 import types
-from typing import (
-    Any,
-    Awaitable,
-    Callable,
-    Generic,
-    Mapping,
-    Protocol,
-    TypeVar,
-    overload,
-)
+from collections.abc import Awaitable, Callable, Mapping
+from typing import Any, Generic, Protocol, TypeVar, overload
 
 import pymongo
 from google.protobuf.message import Message
@@ -121,7 +113,7 @@ def _configure_collection(
         return collection.with_options(
             codec_options=collection.codec_options.with_options(
                 tz_aware=True,
-                tzinfo=datetime.timezone.utc,
+                tzinfo=datetime.UTC,
             ),
         )
     except NotImplementedError:

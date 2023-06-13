@@ -1,5 +1,6 @@
 import datetime
-from typing import Awaitable, Callable, Mapping, Protocol, TypeVar
+from collections.abc import Awaitable, Callable, Mapping
+from typing import Protocol, TypeVar
 
 from google.protobuf import message
 

@@ -1,8 +1,7 @@
 import re
-from typing import Tuple
 
 FILTERED_WORD = "[Filtered]"
-SECRET_WORDS: Tuple[str, ...] = (
+SECRET_WORDS: tuple[str, ...] = (
     "AggregatorID",
     "AgencyID",
     "IATA_Number",

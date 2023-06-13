@@ -1,6 +1,6 @@
 import dataclasses
 import datetime
-from typing import Mapping
+from collections.abc import Mapping
 
 from snowfall.service.authentication.v1alpha import models_pb2
 from snowfall.stdlib import string
@@ -34,6 +34,6 @@ class JWTFactory(object):
                 email=user.email,
                 metadata=dict(user.metadata),
             ),
-            exp=datetime.datetime.now(tz=datetime.timezone.utc) + self._ttl,
+            exp=datetime.datetime.now(tz=datetime.UTC) + self._ttl,
             jti=string.uuid(),
         )

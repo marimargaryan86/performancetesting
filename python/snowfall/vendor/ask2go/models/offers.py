@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-from typing import Optional
 from uuid import UUID
 
 import pydantic
@@ -22,11 +21,11 @@ class TripPlattingCarrier(CamelCaseBaseModel):
 
 class TripBaggageAllowance(CamelCaseBaseModel):
     weight: float
-    unit: Optional[str]
+    unit: str | None
     pieces: int
     has_free_baggage: bool
     passenger_type: str
-    segment_index: Optional[int]
+    segment_index: int | None
 
 
 class SegmentAircraft(CamelCaseBaseModel):
@@ -46,38 +45,38 @@ class TripSegmentCarrier(CamelCaseBaseModel):
 class SegmentAmenity(CamelCaseBaseModel):
     exists: bool
     free: bool
-    information: Optional[str]
+    information: str | None
 
 
 class SegmentAmenities(CamelCaseBaseModel):
-    beverage: Optional[SegmentAmenity]
-    entertainment: Optional[SegmentAmenity]
-    food: Optional[SegmentAmenity]
-    power: Optional[SegmentAmenity]
-    wifi: Optional[SegmentAmenity]
+    beverage: SegmentAmenity | None
+    entertainment: SegmentAmenity | None
+    food: SegmentAmenity | None
+    power: SegmentAmenity | None
+    wifi: SegmentAmenity | None
 
 
 class TripSegment(CamelCaseBaseModel):
-    id: Optional[UUID]  # noqa: A003
+    id: UUID | None  # noqa: A003
     duration: timedelta
     distance: float
-    cabin: Optional[str]
+    cabin: str | None
     aircraft: SegmentAircraft
-    availability: Optional[SegmentAvailability]
+    availability: SegmentAvailability | None
     origin: TripOriginDestination
     destination: TripOriginDestination
     departure: TripDepartureArrival
     arrival: TripDepartureArrival
     marketing_carrier: TripSegmentCarrier
     operating_carrier: TripSegmentCarrier
-    origin_terminal: Optional[str]
-    destination_terminal: Optional[str]
+    origin_terminal: str | None
+    destination_terminal: str | None
     on_time_performance: float
-    meal: Optional[str]
+    meal: str | None
     layover: str
-    change_of_plane: Optional[bool]
-    segment_index: Optional[int]
-    segment_amenities: Optional[SegmentAmenities]
+    change_of_plane: bool | None
+    segment_index: int | None
+    segment_amenities: SegmentAmenities | None
 
     _normalize_duration = pydantic.validator("duration", pre=True, allow_reuse=True)(
         normalizers.normalize_duration,
@@ -85,7 +84,7 @@ class TripSegment(CamelCaseBaseModel):
 
 
 class Trip(CamelCaseBaseModel):
-    id: Optional[UUID]  # noqa: A003
+    id: UUID | None  # noqa: A003
     duration: timedelta
     direction: str
     is_red_eye: bool
@@ -112,11 +111,11 @@ class PricingInformationBase(CamelCaseBaseModel):
     original_cost: str
     service_fee: str
     currency: str
-    brand_name: Optional[str]
+    brand_name: str | None
 
 
 class BrandedPriceInformationfeature(CamelCaseBaseModel):
-    baggage: Optional[list[TripBaggageAllowance]]
+    baggage: list[TripBaggageAllowance] | None
 
 
 class BrandedPriceInformation(CamelCaseBaseModel):
@@ -126,11 +125,11 @@ class BrandedPriceInformation(CamelCaseBaseModel):
     original_cost: str
     service_fee: str
     currency: str
-    brand_name: Optional[str]
-    brand_id: Optional[str]
-    fare_basis: Optional[list[str]]
+    brand_name: str | None
+    brand_id: str | None
+    fare_basis: list[str] | None
     is_refundable: bool = False
-    features: Optional[list[BrandedPriceInformationfeature]]
+    features: list[BrandedPriceInformationfeature] | None
 
 
 class PricingInformation(CamelCaseBaseModel):
@@ -145,12 +144,12 @@ class PassengerPricing(CamelCaseBaseModel):
 
 
 class Offer(CamelCaseBaseModel):
-    id: Optional[str]  # noqa: A003
+    id: str | None  # noqa: A003
     is_refundable: bool
-    docs_required: Optional[bool]
+    docs_required: bool | None
     gds: str
     direction: str
     trips: list[Trip]
     pricing_information: PricingInformation
     passenger_pricing: list[PassengerPricing]
-    search_id: Optional[str]
+    search_id: str | None

@@ -4,8 +4,8 @@ import contextlib
 import datetime
 import hashlib
 import json
-from collections.abc import AsyncIterator
-from typing import Any, Iterator, cast
+from collections.abc import AsyncIterator, Iterator
+from typing import Any, cast
 
 import httpx
 import pytest

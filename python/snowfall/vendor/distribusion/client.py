@@ -2,7 +2,8 @@ import contextlib
 import http
 import inspect
 import json
-from typing import Any, Mapping
+from collections.abc import Mapping
+from typing import Any
 
 import httpx
 import structlog

@@ -2,7 +2,8 @@ import datetime
 import json
 import logging
 import os
-from typing import Any, Callable, Iterator, Mapping, Sequence
+from collections.abc import Callable, Iterator, Mapping, Sequence
+from typing import Any
 
 import httpx
 import hvac

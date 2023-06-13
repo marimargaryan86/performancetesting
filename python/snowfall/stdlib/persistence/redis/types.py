@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import datetime
-from typing import AnyStr, AsyncIterable, Generic
+from collections.abc import AsyncIterable
+from typing import AnyStr, Generic
 
 from redis.asyncio import Redis, lock
 
@@ -176,7 +177,7 @@ class Client(Generic[AnyStr]):  # noqa: WPS214
             return None
 
         return datetime.datetime.now(
-            tz=datetime.timezone.utc,
+            tz=datetime.UTC,
         ) + datetime.timedelta(milliseconds=expiry)
 
     def _prefix_name(self, name: object) -> str:

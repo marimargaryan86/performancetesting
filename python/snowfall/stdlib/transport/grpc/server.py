@@ -1,7 +1,6 @@
 import asyncio
 import ipaddress
-from collections.abc import AsyncGenerator
-from typing import Sequence
+from collections.abc import AsyncGenerator, Sequence
 
 import asyncstdlib
 import grpc

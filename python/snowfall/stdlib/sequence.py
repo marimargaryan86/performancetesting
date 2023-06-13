@@ -23,7 +23,7 @@ def ensure(maybe_list: Sequence[_NotList] | _NotList) -> Sequence[_NotList]:
 
 
 def is_a(maybe_list: Sequence[_NotList] | _NotList) -> TypeGuard[Sequence[_NotList]]:
-    return isinstance(maybe_list, Sequence) and not isinstance(maybe_list, (str, bytes))
+    return isinstance(maybe_list, Sequence) and not isinstance(maybe_list, str | bytes)
 
 
 def paginate(

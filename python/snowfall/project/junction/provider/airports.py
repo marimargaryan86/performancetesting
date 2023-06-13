@@ -1,13 +1,14 @@
 import dataclasses
 import zoneinfo
-from typing import Any, Iterator, Mapping, Optional, Sequence
+from collections.abc import Iterator, Mapping, Sequence
+from typing import Any
 
 from snowfall.stdlib import h3
 
 
 @dataclasses.dataclass(frozen=True)
 class Airport(h3.CoordinatesItem):
-    airport_name: Optional[str]
+    airport_name: str | None
     iata_country_code: str
 
 

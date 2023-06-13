@@ -66,7 +66,7 @@ class TripSearchesTrips(endpoints.HTTPEndpoint):
                             tripSearchId=request.path_params["tripSearchId"],
                         ),
                     )
-                    + str("?"),
+                    + "?",
                     trip_search["links"]["next"],
                 ),
             },

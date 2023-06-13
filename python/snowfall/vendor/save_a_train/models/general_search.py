@@ -1,5 +1,4 @@
 from datetime import date, time, timedelta
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -14,14 +13,14 @@ class GeneralTrip(BaseModel):
     duration: timedelta
     arrival_date: date
     arrival_time: time
-    changes: Optional[int]
+    changes: int | None
     operator: str
-    connections: Optional[str]
+    connections: str | None
     price: dict[str, str]  # fare class: price
     train_numbers: str
-    departure_connections: Optional[str]
-    arrival_connections: Optional[str]
-    layover_connections: Optional[str]
+    departure_connections: str | None
+    arrival_connections: str | None
+    layover_connections: str | None
 
     _normalize_nullable_fields = save_a_train_normalizers.normalizer(
         (
@@ -41,7 +40,7 @@ class GeneralTrip(BaseModel):
 
 class GeneralSearchResult(BaseModel):
     outbound: list[GeneralTrip]
-    inbound: Optional[list[GeneralTrip]]
+    inbound: list[GeneralTrip] | None
 
 
 class GeneralSearchResponse(BaseModel):

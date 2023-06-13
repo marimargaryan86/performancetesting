@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import datetime
-from typing import Generic, Sequence, TypeVar
+from collections.abc import Sequence
+from typing import Generic, TypeVar
 
 import pymongo
 
@@ -97,7 +98,7 @@ class StatusMixin(Generic[Record]):
             {
                 "$set": {
                     "status": amqp_pb2.Trackable.STATUS_COMPLETED,
-                    "updated_at": datetime.datetime.now(tz=datetime.timezone.utc),
+                    "updated_at": datetime.datetime.now(tz=datetime.UTC),
                 },
             },
             return_document=pymongo.ReturnDocument.AFTER,
@@ -113,7 +114,7 @@ class StatusMixin(Generic[Record]):
             {
                 "$set": {
                     "status": amqp_pb2.Trackable.STATUS_FAILED,
-                    "updated_at": datetime.datetime.now(tz=datetime.timezone.utc),
+                    "updated_at": datetime.datetime.now(tz=datetime.UTC),
                 },
             },
             return_document=pymongo.ReturnDocument.AFTER,
@@ -129,7 +130,7 @@ class StatusMixin(Generic[Record]):
             {
                 "$set": {
                     "status": amqp_pb2.Trackable.STATUS_PROCESSING,
-                    "updated_at": datetime.datetime.now(tz=datetime.timezone.utc),
+                    "updated_at": datetime.datetime.now(tz=datetime.UTC),
                 },
             },
             return_document=pymongo.ReturnDocument.AFTER,

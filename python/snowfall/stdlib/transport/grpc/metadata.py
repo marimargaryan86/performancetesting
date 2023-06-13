@@ -1,6 +1,7 @@
 import contextlib
 import contextvars
-from typing import Any, Callable, Iterator, NoReturn
+from collections.abc import Callable, Iterator
+from typing import Any, NoReturn
 
 import jwt
 from google.protobuf.message import Message

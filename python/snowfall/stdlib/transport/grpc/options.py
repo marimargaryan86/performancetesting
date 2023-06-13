@@ -1,4 +1,5 @@
-from typing import Iterable, cast
+from collections.abc import Iterable
+from typing import cast
 
 from google.protobuf import descriptor, message
 from grpc import aio

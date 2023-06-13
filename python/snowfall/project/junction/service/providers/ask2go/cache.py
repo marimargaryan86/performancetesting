@@ -1,5 +1,3 @@
-from typing import Type
-
 from snowfall.stdlib.persistence.redis.repository import (
     PydanticRepository as RedisRepository,
 )
@@ -15,7 +13,7 @@ class OfferDetails(RedisRecord):
 class OfferCache(RedisRepository[OfferDetails]):
     """Stores offer details in the cache."""
 
-    _record_type: Type[OfferDetails] = OfferDetails
+    _record_type: type[OfferDetails] = OfferDetails
 
 
 class PriceQuote(RedisRecord):
@@ -26,4 +24,4 @@ class PriceQuote(RedisRecord):
 class PriceQuoteCache(RedisRepository[PriceQuote]):
     """Stores price quotes in the cache."""
 
-    _record_type: Type[PriceQuote] = PriceQuote
+    _record_type: type[PriceQuote] = PriceQuote

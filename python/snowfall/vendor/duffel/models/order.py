@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, Dict, List
+from typing import Any
 
 import pydantic
 
@@ -12,7 +12,7 @@ from snowfall.vendor.duffel.models.order_slice import OrderSlice
 class OrderServiceMetadataSeat(DuffelBaseModel):
     designator: str
     name: str
-    disclosures: List[str]
+    disclosures: list[str]
 
 
 class OrderServiceMetadataBaggage(DuffelBaseModel):
@@ -26,9 +26,9 @@ class OrderServiceMetadataBaggage(DuffelBaseModel):
 class OrderService(DuffelBaseModel):
     identifier: str = pydantic.Field(..., alias="id")
     metadata: OrderServiceMetadataSeat | OrderServiceMetadataBaggage
-    passenger_ids: List[str]
+    passenger_ids: list[str]
     quantity: int
-    segment_ids: List[str]
+    segment_ids: list[str]
     total_amount: str
     total_currency: str
     service_type: str = pydantic.Field(..., alias="type")
@@ -49,7 +49,7 @@ class OrderPassenger(DuffelBaseModel):
     gender: str
     title: str | None
     born_on: datetime.date | None
-    loyalty_programme_accounts: List[LoyaltyProgrammeAccount]
+    loyalty_programme_accounts: list[LoyaltyProgrammeAccount]
 
 
 class OrderDocument(DuffelBaseModel):
@@ -60,7 +60,7 @@ class OrderDocument(DuffelBaseModel):
 class Order(DuffelBaseModel):
     identifier: str = pydantic.Field(..., alias="id")
     live_mode: bool
-    available_actions: List[str]
+    available_actions: list[str]
     base_amount: str | None
     base_currency: str | None
     booking_reference: str
@@ -68,18 +68,18 @@ class Order(DuffelBaseModel):
     content: str  # noqa: WPS110
     created_at: datetime.datetime
     synced_at: datetime.datetime | None
-    documents: List[OrderDocument]
-    passengers: List[OrderPassenger]
+    documents: list[OrderDocument]
+    passengers: list[OrderPassenger]
     payment_status: OrderPaymentStatus
-    services: List[OrderService]
-    slices: List[OrderSlice]
+    services: list[OrderService]
+    slices: list[OrderSlice]
     conditions: OrderConditions
     owner: Airline
     tax_amount: str
     tax_currency: str | None
     total_amount: str
     total_currency: str
-    metadata: Dict[str, Any] | None
+    metadata: dict[str, Any] | None
 
 
 class OrderResponse(DuffelBaseModel):

@@ -1,5 +1,5 @@
 import asyncio
-from typing import Awaitable, Callable, Optional
+from collections.abc import Awaitable, Callable
 
 import shapefile
 import tenacity
@@ -8,7 +8,7 @@ from geopy import adapters, geocoders
 from pycountry import countries
 from shapely import geometry
 
-_LookupFunc = Callable[[float, float], Awaitable[Optional[str]]]
+_LookupFunc = Callable[[float, float], Awaitable[str | None]]  # noqa: WPS465
 
 
 class Geocoder(object):

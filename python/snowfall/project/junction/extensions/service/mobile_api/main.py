@@ -1,9 +1,8 @@
 import base64
 import contextlib
 import random
-from collections.abc import AsyncGenerator
+from collections.abc import AsyncGenerator, Callable
 from functools import partial
-from typing import Callable
 
 import aiosmtplib
 import httpx
@@ -36,7 +35,7 @@ from snowfall.vendor.junction.go import client
 
 
 def replace_in_file(path: str, find: str, replace: str) -> None:
-    with open(path, "r") as file_r:
+    with open(path) as file_r:
         file_content = file_r.read()
     file_content = file_content.replace(
         find,

@@ -1,5 +1,5 @@
 import datetime
-from typing import Sequence
+from collections.abc import Sequence
 
 from snowfall.vendor.carnect.adapters.cancel_reservation_adapter import (
     CancelReservationAdapter,

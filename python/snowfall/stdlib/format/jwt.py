@@ -1,7 +1,8 @@
 import base64
 import dataclasses
 import datetime
-from typing import Any, Mapping, Sequence
+from collections.abc import Mapping, Sequence
+from typing import Any
 
 import jwt
 

@@ -86,7 +86,7 @@ class BookingHandler(object):
                             else []
                         ),
                         created_at=protobuf.datetime_to_protobuf(
-                            datetime.datetime.now(tz=datetime.timezone.utc),
+                            datetime.datetime.now(tz=datetime.UTC),
                         ),
                     ),
                     raw_data=booking_result.json(),

@@ -80,7 +80,7 @@ class TestOfferGroupModel(object):
         assert offer_group.id
 
     def test_has_expiry(self, offer_group: offers_pb2.OfferGroup) -> None:
-        now = datetime.datetime.now(tz=datetime.timezone.utc)
+        now = datetime.datetime.now(tz=datetime.UTC)
         assert protobuf.protobuf_to_datetime(offer_group.expires_at) > now
 
     def test_has_offers(self, offer_group: offers_pb2.OfferGroup) -> None:
