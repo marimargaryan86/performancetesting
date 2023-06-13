@@ -60,7 +60,7 @@ select = [
     #"PL",
     "RET", # flake8-return
     #"RSE",
-    #"PT",
+    "PT", # flake8-pytest-style
     #"PTH",
     "PYI", # flake8-pyi
     "Q", # flake8-quotes

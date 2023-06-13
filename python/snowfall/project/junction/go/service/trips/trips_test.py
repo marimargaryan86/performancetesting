@@ -59,7 +59,8 @@ async def test_trip_and_segments_repository(
     for trip_id in ("trip_1", "trip_2"):
         trip = await trips_repo.find_by_id(trip_id)
 
-        assert trip and trip.id == trip_id
+        assert trip
+        assert trip.id == trip_id
 
     returned_trips = await trips_repo.find(["trip_1"], cursor="")
 

@@ -46,4 +46,5 @@ async def test_get_offer_option_detail_rules(  # noqa: WPS210
         )
         for detail in resp["data"]:
             for rule in detail["attributes"]["rules"]:
-                assert "data" in rule and "title" in rule
+                assert "data" in rule
+                assert "title" in rule

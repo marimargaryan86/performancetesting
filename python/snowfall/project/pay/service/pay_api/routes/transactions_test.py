@@ -51,7 +51,8 @@ class TestTransactions(object):
         error = response.json()["errors"][0]
         assert error["detail"] == "Quotation not valid"
         assert response.status_code == status.HTTP_404_NOT_FOUND
-        assert error["status"] == "404" and error["code"] == "not_found"
+        assert error["status"] == "404"
+        assert error["code"] == "not_found"
 
     async def test_creation_when_cc_is_failed(
         self,

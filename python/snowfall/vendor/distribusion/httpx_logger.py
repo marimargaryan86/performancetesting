@@ -58,9 +58,7 @@ class RequestLogHandler(LogHandler):
             if rq_content:
                 file_path = self.get_file_path()
                 file_name = self.get_file_name(request.url.path, "-rq")
-
-                if not os.path.isdir(file_path):
-                    os.makedirs(file_path)
+                os.makedirs(file_path, exist_ok=True)
 
                 with io.open(
                     os.path.join(file_path, file_name),
@@ -86,9 +84,7 @@ class ResponseLogHandler(LogHandler):
             json_data = json.loads(response.content)
             file_path = self.get_file_path()
             file_name = self.get_file_name(response.url.path, "-rs")
-
-            if not os.path.isdir(file_path):
-                os.makedirs(file_path)
+            os.makedirs(file_path, exist_ok=True)
 
             with io.open(
                 os.path.join(file_path, file_name),

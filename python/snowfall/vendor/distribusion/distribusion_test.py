@@ -316,12 +316,13 @@ async def test_get_tickets(
 
 
 @disable_by_default
-async def test_get_cancellation_conditions(
+async def test_get_cancellation_conditions(  # noqa: WPS218
     distribusion_client: client.DistribusionClient,
 ) -> None:
     order_id = "VICA-66bbc46a-7bfd-4c5b-bcdd-d984ff247f0b"
     order_details = await distribusion_client.get_order(order_id)
-    assert order_details.booking and order_details.booking.identifier
+    assert order_details.booking
+    assert order_details.booking.identifier
 
     cancellation_conditions = await distribusion_client.get_cancellation_conditions(
         order_details.booking.identifier,
@@ -333,12 +334,13 @@ async def test_get_cancellation_conditions(
 
 
 @disable_by_default
-async def test_create_cancellation(
+async def test_create_cancellation(  # noqa: WPS218
     distribusion_client: client.DistribusionClient,
 ) -> None:
     order_id = "VICA-4be6700c-4dcd-4513-987b-6d64669367ea"
     order_details = await distribusion_client.get_order(order_id)
-    assert order_details.booking and order_details.booking.identifier
+    assert order_details.booking
+    assert order_details.booking.identifier
 
     cancellation = await distribusion_client.create_cancellation(
         order_details.booking.identifier,

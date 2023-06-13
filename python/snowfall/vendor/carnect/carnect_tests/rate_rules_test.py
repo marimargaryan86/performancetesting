@@ -9,7 +9,7 @@ from snowfall.vendor.carnect.models.service import VehicleVendorAvailabilityType
 
 
 @disable_by_default
-async def test_rate_rule(
+async def test_rate_rule(  # noqa: WPS218
     carnect_client: CarnectClient,
     carnect_config: Config,
     offers: Sequence[VehicleVendorAvailabilityType],
@@ -18,9 +18,11 @@ async def test_rate_rule(
     offer = offers[0]
     rule_rq = VehRateRuleRqBuilder(carnect_config)
 
-    assert offer.veh_avails and offer.veh_avails.veh_avail
+    assert offer.veh_avails
+    assert offer.veh_avails.veh_avail
     veh_avail = offer.veh_avails.veh_avail[0]
-    assert veh_avail.veh_avail_core and veh_avail.veh_avail_core.reference
+    assert veh_avail.veh_avail_core
+    assert veh_avail.veh_avail_core.reference
 
     rule_rq.reference(veh_avail.veh_avail_core.reference.id_context or "")
 

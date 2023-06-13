@@ -96,7 +96,7 @@ async def test_create_order(
     assert response.state == "created"
 
 
-async def test_get_order(
+async def test_get_order(  # noqa: WPS218
     distribusion_client: client.DistribusionClient,
     httpx_mock: pytest_httpx.HTTPXMock,
 ) -> None:
@@ -116,14 +116,11 @@ async def test_get_order(
 
     assert response.identifier == order_id
     assert response.currency == "GBP"
-    assert response.booking and response.booking.total_price == 2148
-    assert (
-        response.booking.fare_class
-        and response.booking.fare_class.fare_features
-        and response.booking.fare_class.fare_features[10].name  # noqa: WPS219
-        == "Accessible area for wheelchairs"
-    )
-    assert (
-        response.booking.passengers
-        and response.booking.passengers[0].first_name == "TEST"
-    )
+    assert response.booking
+    assert response.booking.total_price == 2148
+    assert response.booking.fare_class
+    assert response.booking.fare_class.fare_features
+    fare_features = response.booking.fare_class.fare_features
+    assert fare_features[10].name == "Accessible area for wheelchairs"
+    assert response.booking.passengers
+    assert response.booking.passengers[0].first_name == "TEST"
