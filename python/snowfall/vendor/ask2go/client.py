@@ -124,7 +124,7 @@ class Ask2GoClient(object):  # noqa: WPS214
         self,
         booking_ref_id: str,
         transaction_id: str,
-    ) -> booking.Booking:
+    ) -> tuple[booking.Booking, bytes]:
         response = await self._make_request(
             "GET",
             self._api_booking_base_url.copy_with(
@@ -136,7 +136,7 @@ class Ask2GoClient(object):  # noqa: WPS214
             ),
         )
 
-        return booking.Booking(**response.json())
+        return booking.Booking(**response.json()), response.content
 
     async def synchronize_booking(self, booking_id: int) -> None:
         await self._make_request(

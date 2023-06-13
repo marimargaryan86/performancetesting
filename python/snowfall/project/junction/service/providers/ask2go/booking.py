@@ -1,8 +1,11 @@
 import asyncio
 import datetime
+import pathlib
+import uuid
 from typing import Sequence
 
 import more_itertools
+import orjson
 import phonenumbers
 import prometheus_client
 import pycountry
@@ -10,6 +13,7 @@ import structlog
 
 from snowfall.project.junction.go.service.orders.v1alpha import amqp_pb2, models_pb2
 from snowfall.project.junction.provider import notifications as base_notifications
+from snowfall.project.junction.provider.v1alpha import bookings_pb2
 from snowfall.project.junction.service.providers.ask2go import (
     cache,
     criteria,
@@ -18,6 +22,7 @@ from snowfall.project.junction.service.providers.ask2go import (
 )
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.persistence import filesystem
 from snowfall.vendor.ask2go import client, errors
 from snowfall.vendor.ask2go.models import booking, common
 
@@ -48,11 +53,13 @@ class BookingHandler(object):
         self,
         ask2go_client: client.Ask2GoClient,
         notifier: base_notifications.Notifier,
+        booking_storage: filesystem.Storage,
         override_double_booking_check: bool,
     ):
         self._client = ask2go_client
         self._logger = structlog.get_logger(__name__)
         self._notifier = notifier
+        self._storage = booking_storage
         self._override_double_booking_check = override_double_booking_check
 
     async def book(
@@ -193,8 +200,9 @@ class BookingHandler(object):
             transaction_id=booking_result.transaction_id,
             override_double_booking_check=self._override_double_booking_check,
         )
-        booking_result = await self._poll_booking(booking_result)
+        booking_result, raw_response = await self._poll_booking(booking_result)
         self._validate_booking_is_done(booking_result)
+        await self._storage.put(pathlib.Path(booking_result.id), raw_response)
 
         try:
             # TODO: this should be handled in a separate service
@@ -206,15 +214,18 @@ class BookingHandler(object):
 
         return booking_result
 
-    async def _poll_booking(self, booking_result: booking.Booking) -> booking.Booking:
+    async def _poll_booking(
+        self,
+        booking_result: booking.Booking,
+    ) -> tuple[booking.Booking, bytes]:
         for _ in range(self._poll_retries_limit):
-            booking_result = await self._client.get_booking(
+            booking_result, raw_response = await self._client.get_booking(
                 booking_ref_id=booking_result.id,
                 transaction_id=booking_result.transaction_id,
             )
 
             if booking_result.contact_details:
-                return booking_result
+                return booking_result, raw_response
 
             await asyncio.sleep(self._wait_time_between_polling)
 
@@ -244,3 +255,31 @@ class BookingHandler(object):
                 status=booking_result.information.status,
                 details=booking_result.information.errors,
             )
+
+
+class Transformer(object):
+    def __init__(self, provider_identifier: uuid.UUID, provider_name: str):
+        self._provider_id = str(provider_identifier)
+        self._provider_name = provider_name
+
+    async def raw_to_booking(self, raw: bytes) -> bookings_pb2.Booking:
+        booking_result = booking.Booking(**orjson.loads(raw))
+
+        # TODO: How to figure out real status?
+        booking_status = bookings_pb2.Booking.STATUS_NOT_TICKETED
+
+        return bookings_pb2.Booking(
+            id=str(booking_result.information.booking_id),
+            status=booking_status,
+            provider=bookings_pb2.Booking.Provider(
+                id=self._provider_id,
+                name=self._provider_name,
+            ),
+            trip=bookings_pb2.Booking.Trip(
+                record_locator=more_itertools.first(
+                    booking_result.information.record_locators or [""],
+                ),
+                operator_booking_references=booking_result.information.check_in_locators,
+            ),
+            # TODO: No idea how to get created_at or updated_at from the booking model.
+        )

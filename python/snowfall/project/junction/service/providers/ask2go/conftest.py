@@ -184,10 +184,20 @@ def criteria_generator(
 
 
 @pytest.fixture()
-def booking_handler(ask2go_client: client.Ask2GoClient) -> booking.BookingHandler:
+async def storage() -> AsyncIterator[filesystem.Storage]:
+    async with filesystem.Storage.from_dsn("memory://") as storage_obj:
+        yield storage_obj
+
+
+@pytest.fixture()
+def booking_handler(
+    ask2go_client: client.Ask2GoClient,
+    storage: filesystem.Storage,
+) -> booking.BookingHandler:
     return booking.BookingHandler(
         ask2go_client=ask2go_client,
         notifier=notifications.LogNotifier(),
+        booking_storage=storage,
         override_double_booking_check=False,
     )
 

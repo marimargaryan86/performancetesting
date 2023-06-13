@@ -14,6 +14,7 @@ from redis import asyncio as aioredis
 
 from snowfall.project.junction.provider import (
     airports,
+    bookings,
     cabin_classes,
     meta,
     notifications,
@@ -53,6 +54,7 @@ class _OrdersSettings(service.Settings):
     smtp_recipient: pydantic.EmailStr
     http_timeout: float = 60.0
     override_double_booking_check: bool = False
+    storage_dsn: service.AnyDsn
 
 
 class _Settings(service.ProviderSettings):
@@ -64,6 +66,7 @@ class _Settings(service.ProviderSettings):
     wait_time_between_polling: float = 1
     mongo_dsn: Sequence[pydantic.AnyUrl]
     reseller_affiliate_mapping: dict[str, str] = {}
+    storage_dsn: service.AnyDsn
 
 
 class _PriceQuotesSettings(service.PriceQuoteSettings):
@@ -189,6 +192,9 @@ async def _orders(app: service.AsyncApplication[_OrdersSettings]) -> None:
         api_booking_base_url=app.settings.api_booking_base_url,
         http_client=http_client,
     )
+    storage = await app.stack.enter_async_context(
+        filesystem.Storage.from_dsn(app.settings.storage_dsn),
+    )
 
     await consumer.OrderConsumer(
         consumer_obj=amqp_consumer.Consumer(
@@ -213,6 +219,7 @@ async def _orders(app: service.AsyncApplication[_OrdersSettings]) -> None:
                 sender=app.settings.smtp_sender,
                 recipient=app.settings.smtp_recipient,
             ),
+            booking_storage=storage,
             override_double_booking_check=app.settings.override_double_booking_check,
         ),
         price_quote_cache=cache.PriceQuoteCache(
@@ -316,12 +323,29 @@ async def _seat_maps(app: service.AsyncApplication[_SeatMapsSettings]) -> None:
     ).consume()
 
 
+async def _bookings_factory(
+    app: service.AsyncApplication[_Settings],
+) -> bookings.Implementation:
+    storage = await app.stack.enter_async_context(
+        filesystem.Storage.from_dsn(app.settings.storage_dsn),
+    )
+
+    return bookings.Implementation(
+        storage=storage,
+        transformer=booking.Transformer(
+            provider_identifier=_PROVIDER_ID,
+            provider_name=_PROVIDER_NAME,
+        ).raw_to_booking,
+    )
+
+
 if __name__ == "__main__":
     entrypoint = service.Entrypoint(
         name="ask2go",
         settings_class=_Settings,
         meta_factory=_meta_factory,
         offers_factory=_offers,
+        bookings_factory=_bookings_factory,
     )
 
     entrypoint.enter_with_commands(

@@ -127,6 +127,7 @@ EOH
         WAIT_TIME_BETWEEN_POLLING = "2"
         API_BASE_URL              = "${var.api_base_url}"
         API_BOOKING_BASE_URL      = "${var.api_booking_base_url}"
+        STORAGE_DSN               = "memory://"
       }
     }
   }

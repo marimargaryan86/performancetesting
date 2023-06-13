@@ -1,0 +1,139 @@
+variable "docker_image" {
+  type = string
+}
+
+variable "provider_company_id" {
+  type = string
+}
+
+variable "registry_address" {
+  type = string
+}
+
+variable "registry_password" {
+  type = string
+}
+
+variable "registry_username" {
+  type = string
+}
+
+variable "environment" {
+  type = string
+}
+
+variable "datacenter" {
+  type = string
+}
+
+variable "count" {
+  type = number
+}
+
+variable "api_base_url" {
+  type = string
+}
+
+variable "api_booking_base_url" {
+  type = string
+}
+
+job "ask2go-grpc" {
+  datacenters = ["${var.datacenter}"]
+  type        = "service"
+
+  update {
+    max_parallel      = 1
+    auto_revert       = true
+    auto_promote      = true
+    canary            = 1
+    healthy_deadline  = "60s"
+    progress_deadline = "2m"
+  }
+
+  group "grpc" {
+    count = "${var.count}"
+
+    restart {
+      attempts = 3
+      delay    = "15s"
+      interval = "10m"
+      mode     = "delay"
+    }
+
+    network {
+      mode = "bridge"
+      port "prometheus" {}
+    }
+
+    scaling {
+      enabled = false
+      min     = 1
+      max     = 20
+    }
+
+    service {
+      name = "ask2go-grpc-${var.environment}"
+      port = "prometheus"
+      tags = ["metrics"]
+
+      connect {
+        sidecar_service {}
+      }
+
+      check {
+        type     = "http"
+        path     = "/"
+        interval = "10s"
+        timeout  = "2s"
+      }
+    }
+    task "grpc" {
+      driver = "docker"
+
+      vault {
+        policies = ["ask2go-${var.environment}"]
+      }
+
+      template {
+        data        = <<EOH
+AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
+MONGO_DSN={{range $index, $service := service (printf "mongodb-%s" (env "NOMAD_NAMESPACE"))}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
+REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
+RESELLER_PROVIDERS={{keyOrDefault "${var.environment}/providers/reseller-providers" "{}" | toJSON }}
+{{ with secret "kv/data/${var.environment}/ask2go" }}
+STORAGE_DSN=s3://{{ .Data.data.aws_access_key_id }}:{{ .Data.data.aws_secret_access_key }}@/{{ .Data.data.bucket }}
+{{ end }}
+EOH
+        destination = "services.env"
+        env         = true
+        change_mode = "restart"
+      }
+
+      config {
+        image = var.docker_image
+        ports = ["prometheus"]
+        args = [
+          "grpc",
+        ]
+
+        auth {
+          username       = var.registry_username
+          password       = var.registry_password
+          server_address = var.registry_address
+        }
+      }
+
+      env {
+        ENV_NAME                  = "${var.environment}"
+        SENTRY_DSN                = "https://c299617e39d446ccb1053a04d9ac12b8@sentry.snowfall.se/34"
+        PROMETHEUS_PORT           = "${NOMAD_PORT_prometheus}"
+        PROVIDER_COMPANY_ID       = "${var.provider_company_id}"
+        POLL_RETRIES_LIMIT        = "60"
+        WAIT_TIME_BETWEEN_POLLING = "2"
+        API_BASE_URL              = "${var.api_base_url}"
+        API_BOOKING_BASE_URL      = "${var.api_booking_base_url}"
+      }
+    }
+  }
+}
