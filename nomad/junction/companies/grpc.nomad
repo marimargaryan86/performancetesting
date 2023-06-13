@@ -93,21 +93,12 @@ job "companies-grpc" {
     task "grpc" {
       driver = "docker"
 
-      vault {
-        policies = ["currencycloud-${var.environment}"]
-      }
-
       template {
         destination = "services.env"
         env         = true
         change_mode = "restart"
         data        = <<EOH
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
-{{ with secret "kv/data/${var.environment}/currencycloud" }}
-CC_LOGIN={{ .Data.data.cc_login }}
-CC_API_KEY={{ .Data.data.cc_api_key }}
-CC_ENV={{ .Data.data.cc_env }}
-{{ end }}
 EOH
       }
 
@@ -126,12 +117,11 @@ EOH
       }
 
       env {
-        ENV_NAME              = "${var.environment}"
-        FORWARDED_ALLOWED_IPS = "0.0.0.0"
-        GRPC_ADDRESS          = "0.0.0.0"
-        GRPC_PORT             = "${NOMAD_PORT_grpc}"
-        SENTRY_DSN            = "https://29671bbbf0174dc895a038d20b89d269@sentry.snowfall.se/157"
-        PROMETHEUS_PORT       = "${NOMAD_PORT_prometheus}"
+        ENV_NAME        = "${var.environment}"
+        GRPC_ADDRESS    = "0.0.0.0"
+        GRPC_PORT       = "${NOMAD_PORT_grpc}"
+        SENTRY_DSN      = "https://29671bbbf0174dc895a038d20b89d269@sentry.snowfall.se/157"
+        PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
       }
     }
   }

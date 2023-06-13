@@ -82,11 +82,10 @@ EOH
 
 
       env {
-        ENV_NAME          = "${var.environment}"
-        SENTRY_DSN        = "https://0ab9747b3f7042d9882a664f0e31f229@sentry.snowfall.se/46"
-        CURRENCIES        = "AUD JPY SAR BHD KES SGD BGN KWD ZAR CAD SEK CNY MXN CHF CZK NZD THB DKK NOK TRY EUR OMR UGX HKD GBP HUF PLN AED QAR USD RON ILS"
-        SOURCE_CURRENCIES = "USD EUR GBP SEK"
-        CC_ADDRESS        = var.cc_address
+        ENV_NAME   = "${var.environment}"
+        SENTRY_DSN = "https://0ab9747b3f7042d9882a664f0e31f229@sentry.snowfall.se/46"
+        CURRENCIES = "AUD JPY SAR BHD KES SGD BGN KWD ZAR CAD SEK CNY MXN CHF CZK NZD THB DKK NOK TRY EUR OMR UGX HKD GBP HUF PLN AED QAR USD RON ILS"
+        CC_ADDRESS = var.cc_address
       }
     }
   }

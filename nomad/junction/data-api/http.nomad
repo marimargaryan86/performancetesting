@@ -34,10 +34,6 @@ variable "count" {
   type = number
 }
 
-variable "data_api_host" {
-  type = string
-}
-
 job "data-api-http" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -153,7 +149,6 @@ EOH
         SENTRY_DSN                      = "https://07b6d5a555bc4b7d88c6b552488016ae@sentry.snowfall.se/70"
         PROMETHEUS_PORT                 = "${NOMAD_PORT_prometheus}"
         VALIDATE_RESPONSES_AGAINST_SPEC = false
-        DATA_API_HOST                   = "${var.data_api_host}"
       }
     }
   }

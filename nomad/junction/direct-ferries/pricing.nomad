@@ -98,17 +98,11 @@ job "direct-ferries-pricing" {
     }
     task "pricing" {
       driver = "docker"
-      vault {
-        policies = ["direct-ferries-${var.environment}"]
-      }
 
       template {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
-{{ with secret "kv/data/${var.environment}/direct-ferries" }}
-CLIENT_SECRET={{ .Data.data.client_secret }}
-{{ end }}
 EOH
         destination = "services.env"
         env         = true
@@ -134,10 +128,6 @@ EOH
         SENTRY_DSN          = "https://8375ccf16be441df8c8a5c04743d3f96@sentry.snowfall.se/59"
         PROMETHEUS_PORT     = "${NOMAD_PORT_prometheus}"
         PROVIDER_COMPANY_ID = "${var.provider_company_id}"
-        PARTNER_CODE        = "${var.partner_code}"
-        CLIENT_ID           = "${var.client_id}"
-        AFFILIATE_API_URL   = "${var.affiliate_api_url}"
-        API_URL             = "${var.api_url}"
       }
     }
   }

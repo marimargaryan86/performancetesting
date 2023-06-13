@@ -99,7 +99,6 @@ job "distribusion-pricing" {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
-SMTP_DSN={{range $index, $service := service "smtp"}}smtp://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}{{end}}
 {{ with secret "kv/data/${var.environment}/distribusion" }}
 API_KEY={{ .Data.data.api_key }}
 {{ end }}
@@ -126,8 +125,6 @@ EOH
       env {
         ENV_NAME                = "${var.environment}"
         SENTRY_DSN              = "https://81042716a3fa4b4fb9dc654b0fc5fd58@sentry.snowfall.se/56"
-        SMTP_SENDER             = "noreply@junction.travel"
-        SMTP_RECIPIENT          = "DistribusionBooking@snowfalltravel.com"
         PROMETHEUS_PORT         = "${NOMAD_PORT_prometheus}"
         PROVIDER_COMPANY_ID     = "${var.provider_company_id}"
         API_BASE_URL            = "${var.api_base_url}"

@@ -92,10 +92,6 @@ job "mobile-api-http-res-se" {
         sidecar_service {
           proxy {
             upstreams {
-              local_bind_port  = 8020
-              destination_name = "currencies-${var.environment}"
-            }
-            upstreams {
               local_bind_port  = 8070
               destination_name = "client-api-${var.environment}"
             }
@@ -140,7 +136,6 @@ job "mobile-api-http-res-se" {
         env         = true
         change_mode = "restart"
         data        = <<EOH
-CURRENCIES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_currencies-${var.environment}"))}}
 JUNCTION_API_ADDRESS={{(printf "http://%s" (env "NOMAD_UPSTREAM_ADDR_client-api-${var.environment}"))}}
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}

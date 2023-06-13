@@ -117,14 +117,12 @@ EOH
       }
 
       env {
-        ENV_NAME                  = "${var.environment}"
-        SENTRY_DSN                = "https://c299617e39d446ccb1053a04d9ac12b8@sentry.snowfall.se/34"
-        PROMETHEUS_PORT           = "${NOMAD_PORT_prometheus}"
-        PROVIDER_COMPANY_ID       = "${var.provider_company_id}"
-        WAIT_TIME_BETWEEN_POLLING = "2"
-        POLL_RETRIES_LIMIT        = "60"
-        API_BASE_URL              = "${var.api_base_url}"
-        API_BOOKING_BASE_URL      = "${var.api_booking_base_url}"
+        ENV_NAME             = "${var.environment}"
+        SENTRY_DSN           = "https://c299617e39d446ccb1053a04d9ac12b8@sentry.snowfall.se/34"
+        PROMETHEUS_PORT      = "${NOMAD_PORT_prometheus}"
+        PROVIDER_COMPANY_ID  = "${var.provider_company_id}"
+        API_BASE_URL         = "${var.api_base_url}"
+        API_BOOKING_BASE_URL = "${var.api_booking_base_url}"
       }
     }
   }

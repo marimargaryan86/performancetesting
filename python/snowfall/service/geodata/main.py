@@ -19,6 +19,9 @@ class _Settings(service.Settings):
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
     redis_dsn: Sequence[AnyUrl]
+    aws_default_region: str
+    aws_access_key_id: str
+    aws_secret_access_key: str
 
 
 async def _main(app: service.Application[_Settings]) -> None:

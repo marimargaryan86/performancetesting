@@ -54,7 +54,7 @@ def nomad_template(  # noqa: WPS210
                     ":{name}_debug_info".format(name=name),
                     "bash/lint-configuration.sh",
                 ],
-                tools=["bash", "grep", "jq"],
+                tools=["bash", "jq", "perl"],
                 workdir="/",
             )
 

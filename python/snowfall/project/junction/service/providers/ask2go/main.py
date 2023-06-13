@@ -77,6 +77,8 @@ class _PriceQuotesSettings(service.PriceQuoteSettings):
     redis_dsn: Sequence[pydantic.AnyUrl]
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
     http_timeout: float = 20.0
+    poll_retries_limit: int = 10
+    wait_time_between_polling: float = 1
     mongo_dsn: Sequence[pydantic.AnyUrl]
 
 
@@ -123,6 +125,7 @@ async def _offers(
     search_adapter = search.Adapter(
         ask2go_client=ask2go_client,
         poll_retries_limit=app.settings.poll_retries_limit,
+        wait_time_between_polling=app.settings.wait_time_between_polling,
     )
     airport_repo = airports.AirportRepository(
         airports_data=cast(
@@ -288,7 +291,11 @@ async def _price_quotes(app: service.AsyncApplication[_PriceQuotesSettings]) -> 
             ),
             offer_ttl=app.settings.ttl,
         ),
-        pricing_adapter=pricing.Adapter(ask2go_client=ask2go_client),
+        pricing_adapter=pricing.Adapter(
+            ask2go_client=ask2go_client,
+            poll_retries_limit=app.settings.poll_retries_limit,
+            wait_time_between_polling=app.settings.wait_time_between_polling,
+        ),
         provider_company_id=app.settings.provider_company_id,
     ).consume()
 

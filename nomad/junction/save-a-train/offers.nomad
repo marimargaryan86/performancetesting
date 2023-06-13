@@ -106,7 +106,6 @@ job "save-a-train-offers" {
       template {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
-GEODATA_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_geodata-${var.environment}"))}}
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 {{ with secret "kv/data/${var.environment}/save-a-train" }}

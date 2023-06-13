@@ -100,10 +100,6 @@ job "pay-api-admin" {
         sidecar_service {
           proxy {
             upstreams {
-              local_bind_port  = 8020
-              destination_name = "currencies-${var.environment}"
-            }
-            upstreams {
               local_bind_port  = 8030
               destination_name = "authentication-${var.environment}"
             }
@@ -158,7 +154,6 @@ job "pay-api-admin" {
         data        = <<EOH
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
-CURRENCIES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_currencies-${var.environment}"))}}
 AUTHENTICATION_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_authentication-${var.environment}"))}}
 ACCOUNTS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_accounts-${var.environment}"))}}
 PAYMENTS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_pay-payments-${var.environment}"))}}
