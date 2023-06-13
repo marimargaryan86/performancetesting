@@ -29,8 +29,6 @@ oag:
     - docker login git.snowfall.se:4567 -u "${REGISTRY_USERNAME}" -p "${REGISTRY_PASSWORD}"
     - docker pull git.snowfall.se:4567/junction/junction/service/ssim-convert:latest
     - docker run -u "${UID}" --rm -v "$(pwd)/:/data" git.snowfall.se:4567/junction/junction/service/ssim-convert:latest convert /data/SIMSFL.DAT /data/data-input/
-  tags:
-    - autoscaler-XL
 
 feeds:
   stage: download
@@ -43,8 +41,6 @@ feeds:
     - docker login git.snowfall.se:4567 -u "${REGISTRY_USERNAME}" -p "${REGISTRY_PASSWORD}"
     - docker pull git.snowfall.se:4567/junction/junction/service/data_pipeline:latest
     - docker run -u "${UID}" $(env | grep '^PIPELINE_' | cut -f1 -d= | sed 's/^/-e /') --rm -v "$(pwd)/:/data" git.snowfall.se:4567/junction/junction/service/data_pipeline:latest download --path /data/data-input/
-  tags:
-    - autoscaler-XL
 
 directferries:
   stage: download
@@ -56,8 +52,6 @@ directferries:
     - docker login git.snowfall.se:4567 -u "${REGISTRY_USERNAME}" -p "${REGISTRY_PASSWORD}"
     - docker pull git.snowfall.se:4567/junction/junction/service/direct_ferries:latest
     - docker run -u "${UID}" --rm -v "$(pwd)/:/data" -e CLIENT_ID="${DF_CLIENT_ID}" -e CLIENT_SECRET="${DF_CLIENT_SECRET}" git.snowfall.se:4567/junction/junction/service/direct_ferries:latest export --api-url 'https://sandbox-api.test.directferriesconnect.com' --affiliate-api-url 'https://tf-test-affiliate-api-sandbox.auth.eu-west-1.amazoncognito.com' --partner-code 'F5152' --output-path /data/data-input/
-  tags:
-    - autoscaler-XL
 
 import:
   stage: export
@@ -144,3 +138,56 @@ import-to-dev:
   - mongorestore --db=schedules --collection=schedules_import --stopOnError --numInsertionWorkersPerCollection=10 "${DEV_MONGODSN}" data-import/schedules.bson
   tags:
     - autoscaler-XL
+
+deploy-in-dev:
+  stage: deploy
+  needs: ["export", "import-to-dev", "validate"]
+  resource_group: planner
+  services:
+  - name: docker:dind
+    alias: dockerdaemon
+  - name: mongo:latest
+  script:
+  - curl https://pgp.mongodb.com/server-6.0.asc | apt-key add -
+  - echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+  - apt update && apt install nfs-common mongodb-mongosh -y
+  - docker login git.snowfall.se:4567 -u "${REGISTRY_USERNAME}" -p "${REGISTRY_PASSWORD}"
+  - docker pull git.snowfall.se:4567/junction/junction/service/mobile_api:latest
+  - mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,X-mount.mkdir ${EFS_IP}:/ /planner-efs
+  - cp data-export/*.bin /planner-efs/development/
+  - |
+    export NOMAD_ADDR="${DEV_NOMAD_ADDR}"
+    export NOMAD_NAMESPACE="development"
+    # Get existing allocs
+    mapfile -t allocation_ids < <(nomad job status planner-grpc | awk '/Allocations/{flag=1; next} flag && $6=="running" && !/^ID/{print $1}')
+
+    # Get job spec and increase count by one
+    nomad job inspect planner-grpc > job.json
+    json_data=$(cat job.json)
+    echo "$json_data" | jq '.Job.TaskGroups[0].Count += 1' > newjob.json
+
+    nomad job run -json newjob.json
+    for element in "${allocation_ids[@]}"; do
+        nomad alloc restart "${element}"
+    done
+
+    while [[ -n $(curl -s ${NOMAD_ADDR%:*}:8500/v1/health/checks/planner-development | jq '.[] | select(.Status != \"passing\")') ]]
+    do
+        echo "Waiting for restarted service to become healthy. Checking health in 60 seconds"
+        sleep 60
+    done
+    nomad job run -json job.json
+  - |
+    mongosh "${DEV_MONGODSN}/places" --eval '
+      let now = new Date().toISOString().replaceAll("-", "").replaceAll(":", "").split(".")[0];
+      try {db.places.renameCollection("places_backup_" + now);} catch (e) {}
+      db.places_import.renameCollection("places");
+      try {db.locations.renameCollection("locations_backup_" + now);} catch (e) {}
+      db.locations_import.renameCollection("locations");
+      db = db.getMongo().getDB("schedules");
+      try {db.schedules.renameCollection("schedules_backup_" + now);} catch (e) {}
+      db.schedules_import.renameCollection("schedules");'
+  - docker run -u "${UID}" --rm -v "$(pwd)/:/data" git.snowfall.se:4567/junction/junction/service/mobile_api:latest migrate --mongo-db='mobile-api' --mongo-dsn="${DEV_MONGODSN}"
+  - docker run -u "${UID}" --rm -v "$(pwd)/:/data" git.snowfall.se:4567/junction/junction/service/mobile_api:latest migrate --mongo-db='res-se-mobile-api' --mongo-dsn="${DEV_MONGODSN}"
+  tags:
+    - docker
