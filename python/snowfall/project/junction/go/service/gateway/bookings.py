@@ -33,7 +33,7 @@ class Service(service.Service, bookings_pb2_grpc.BookingServiceServicer):
         tasks = []
 
         for provider_id, booking_ids in group_unmarshal_results_mapping.items():
-            provider = self._providers.find_by_id(provider_id)
+            provider = await self._providers.find_by_id(provider_id)
 
             if not provider:
                 continue

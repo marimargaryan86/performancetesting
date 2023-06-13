@@ -11,7 +11,9 @@ service MetaService {
 
 message GetCapabilitiesRequest {}
 
-message GetCapabilitiesResponse {}
+message GetCapabilitiesResponse {
+  TripSearchCapabilities trip_search_capabilities = 1;
+}
 
 message GetIdentityRequest {}
 
@@ -19,3 +21,5 @@ message GetIdentityResponse {
   string id = 1;
   string name = 2;
 }
+
+message TripSearchCapabilities {}

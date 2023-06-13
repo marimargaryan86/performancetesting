@@ -83,7 +83,7 @@ class Consumer(object):
     ) -> None:
         tasks = []
 
-        for provider in self._providers.all_():
+        async for provider in self._providers.all_():
             tasks.append(_do_trip_offer_search(provider, msg, self._timeout))
 
         async with asyncio.TaskGroup() as tg:
