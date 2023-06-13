@@ -19,6 +19,7 @@ from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.vendor.duffel import client
+from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
 _PROVIDER_NAME = "Duffel"
 
@@ -40,6 +41,12 @@ async def orders(app: service.AsyncApplication[OrdersSettings]) -> None:
     )
     logging.register(http_client)
     metrics.register(http_client)
+    rate_limit_client = await app.stack.enter_async_context(
+        RateLimitClient(
+            app.settings.rate_limiter_grpc_host,
+            app.settings.rate_limiter_service_configs.get("duffel"),
+        ),
+    )
     redis_connection = await app.stack.enter_async_context(
         aioredis.from_url(
             random.choice(app.settings.redis_dsn),  # nosec
@@ -54,6 +61,7 @@ async def orders(app: service.AsyncApplication[OrdersSettings]) -> None:
         api_key=app.settings.api_key,
         version=app.settings.api_version,
         http_client=http_client,
+        rate_limit_client=rate_limit_client,
     )
 
     await OrderConsumer(

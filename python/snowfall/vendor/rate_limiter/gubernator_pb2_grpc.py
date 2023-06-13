@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-from snowfall.vendor.gubernator import gubernator_pb2 as gubernator__pb2
+from snowfall.vendor.rate_limiter import gubernator_pb2 as gubernator__pb2
 
 
 class V1Stub(object):

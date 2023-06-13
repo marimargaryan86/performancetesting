@@ -17,6 +17,7 @@ from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import types
 from snowfall.vendor.duffel import client
 from snowfall.vendor.duffel.builders import offer_request
+from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
 _Impl = offers.OfferSearchImplementation[
     amqp_pb2.SearchCriteriaTask,
@@ -37,12 +38,19 @@ async def offers_factory(
     )
     logging.register(http_client)
     metrics.register(http_client)
+    rate_limit_client = await stack.enter_async_context(
+        RateLimitClient(
+            app.settings.rate_limiter_grpc_host,
+            app.settings.rate_limiter_service_configs.get("duffel"),
+        ),
+    )
 
     duffel_client = client.DuffelClient(
         api_base_url=app.settings.api_base_url,
         api_key=app.settings.api_key,
         version=app.settings.api_version,
         http_client=http_client,
+        rate_limit_client=rate_limit_client,
     )
     duffle_adapter = adapter.DuffelSearchAdapter(
         duffel_client=duffel_client,

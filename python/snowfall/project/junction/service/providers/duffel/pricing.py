@@ -21,9 +21,10 @@ from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer
 from snowfall.stdlib.transport.amqp import types as amqp_types
 from snowfall.vendor.duffel import client
+from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
 
-async def price_quotes(
+async def price_quotes(  # noqa: WPS210
     app: service.AsyncApplication[PricingSettings],
 ) -> None:
     http_client = await app.stack.enter_async_context(
@@ -33,6 +34,12 @@ async def price_quotes(
     )
     logging.register(http_client)
     metrics.register(http_client)
+    rate_limit_client = await app.stack.enter_async_context(
+        RateLimitClient(
+            app.settings.rate_limiter_grpc_host,
+            app.settings.rate_limiter_service_configs["duffel"],
+        ),
+    )
     redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
         aioredis.from_url(
             random.choice(app.settings.redis_dsn),  # nosec
@@ -47,6 +54,7 @@ async def price_quotes(
         api_key=app.settings.api_key,
         version=app.settings.api_version,
         http_client=http_client,
+        rate_limit_client=rate_limit_client,
     )
     offer_cache = cache.OfferCache(
         client=redis.Client[bytes](redis_connection, prefix=app.name),
