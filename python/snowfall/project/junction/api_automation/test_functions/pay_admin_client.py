@@ -377,21 +377,27 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
 
     async def create_payment(  # noqa: WPS211
         self,
-        amount: int,
         reason: str,
         reference: str,
         payment_at: str,
         beneficiary_id: str,
         transactions_ids: Sequence[str],
+        amount: int | None = None,
     ) -> dict[str, Any]:
         payload = {
             _DATA_KEY: {
                 _TYPE_KEY: "payments",
                 _ATTRIBUTES_KEY: {
-                    "amount": amount,
+                    **(
+                        {
+                            "amount": amount,  # type:ignore[dict-item]
+                        }
+                        if amount
+                        else {}
+                    ),
                     "reason": reason,
                     "reference": reference,
-                    "payment_at": payment_at,
+                    "paymentAt": payment_at,
                 },
                 _RELATIONSHIPS_KEY: {
                     "beneficiary": {
@@ -400,12 +406,18 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
                             _TYPE_KEY: "beneficiaries",
                         },
                     },
-                    "transactions": {
-                        _DATA_KEY: [
-                            {_ID_KEY: transaction_id, _TYPE_KEY: "transactions"}
-                            for transaction_id in transactions_ids
-                        ],
-                    },
+                    **(
+                        {
+                            "transactions": {
+                                _DATA_KEY: [  # type:ignore[dict-item]
+                                    {_ID_KEY: transaction_id, _TYPE_KEY: "transactions"}
+                                    for transaction_id in transactions_ids
+                                ],
+                            },
+                        }
+                        if transactions_ids
+                        else {}
+                    ),
                 },
             },
         }

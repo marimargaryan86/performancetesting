@@ -40,12 +40,59 @@ async def pay_create_account(
     except httpx.HTTPStatusError as err:
         logger.info("response_create_account: %s", err.response.headers)
         logger.info("response_create_account body: %s", err.response.json())
-        pytest.fail(err.response.json(), pytrace=False)  # noqa: WPS204
+        err_msg = json.dumps(err.response.json(), indent=4)  # noqa: WPS204
+        pytest.fail(err_msg, pytrace=False)  # noqa: WPS204
     logger.info(
         "response_create_account: %s",
         json.dumps(response_create_account, indent=4),
     )
     return response_create_account
+
+
+@pytest.fixture()
+async def pay_create_beneficiary(
+    pay_admin_client: PayAdminClient,
+) -> dict[str, Any]:
+    try:
+        response_create_beneficiary = await pay_admin_client.create_beneficiary(
+            bank_account_holder_name="EUR test Account Holder",
+            email="example@example.com",
+            beneficiary_address_lines=[
+                "Radhuset",
+                "Våksalagatan 2",
+                "United Spaces",
+                "Sweden",
+            ],
+            beneficiary_country_code="DE",
+            bank_name="mBank S.A.",
+            account_type="checking",
+            payment_types="priority",
+            bank_address_lines=[
+                "mBank S.A.",
+                "Bankowość detaliczna",
+                "Skrytka Pocztowa 2108",
+                "90-959",
+                "Łódź 2",
+            ],
+            bank_country_code="DE",
+            currency_id="EUR",
+            account_id=PAY_TEST_ACCOUNT01,
+            beneficiary_postal_code="12345",
+            beneficiary_city="Uppsala",
+            bic_swift="BREXPLPWMBK",
+            iban="DE89370400440532013000",
+        )
+    except httpx.HTTPStatusError as err:
+        logger.info("response_create_beneficiary err: %s", err.response.headers)
+        logger.info("response_create_beneficiary body: %s", err.response.json())
+        err_msg = json.dumps(err.response.json(), indent=4)
+        pytest.fail(err_msg, pytrace=False)
+
+    logger.info(
+        "create_beneficiary: %s",
+        json.dumps(response_create_beneficiary, indent=4),
+    )
+    return response_create_beneficiary
 
 
 @pytest.fixture()
@@ -70,7 +117,41 @@ async def pay_create_transaction_eur_sek(
     except httpx.HTTPStatusError as err:
         logger.info("response err: %s", err.response.headers)
         logger.info("response_create_transactions body: %s", err.response.json())
-        pytest.fail(err.response.json(), pytrace=False)
+        err_msg = json.dumps(err.response.json(), indent=4)
+        pytest.fail(err_msg, pytrace=False)
+
+    logger.info(
+        "create_transactions: %s",
+        json.dumps(response_create_transactions, indent=4),
+    )
+
+    return response_create_transactions
+
+
+@pytest.fixture()
+async def pay_create_transaction_eur_usd(
+    pay_client: PayClient,
+    pay_admin_client: PayAdminClient,
+    pay_create_quote_eur_usd: Mapping[str, Any],
+) -> dict[str, Any]:
+    external_reference = string.uuid()
+    logger.info(": %s", external_reference)
+    invoice_reference = string.uuid()
+    logger.info("invoice_reference: %s", invoice_reference)
+    logger.info("quotation_id: %s", pay_create_quote_eur_usd["data"]["id"])
+
+    try:
+        response_create_transactions = await pay_client.create_transactions(
+            external_reference=external_reference,
+            invoice_reference=invoice_reference,
+            quotation_id=pay_create_quote_eur_usd["data"]["id"],
+        )
+
+    except httpx.HTTPStatusError as err:
+        logger.info("response err: %s", err.response.headers)
+        logger.info("response_create_transactions body: %s", err.response.json())
+        err_msg = json.dumps(err.response.json(), indent=4)
+        pytest.fail(err_msg, pytrace=False)
 
     logger.info(
         "create_transactions: %s",
@@ -102,7 +183,8 @@ async def pay_create_transaction_sek_eur(
     except httpx.HTTPStatusError as err:
         logger.info("response err: %s", err.response.headers)
         logger.info("response_create_transactions body: %s", err.response.json())
-        pytest.fail(err.response.json(), pytrace=False)
+        err_msg = json.dumps(err.response.json(), indent=4)
+        pytest.fail(err_msg, pytrace=False)
 
     logger.info(
         "create_transactions: %s",
@@ -137,7 +219,8 @@ async def pay_create_contact(
     except httpx.HTTPStatusError as err:
         logger.info("response_create_contact err: %s", err.response.headers)
         logger.info("response_create_contact body: %s", err.response.json())
-        pytest.fail(err.response.json(), pytrace=False)
+        err_msg = json.dumps(err.response.json(), indent=4)
+        pytest.fail(err_msg, pytrace=False)
     logger.info(
         "create_contacts: %s",
         json.dumps(response_create_contact, indent=4),
@@ -154,7 +237,8 @@ async def pay_list_all_currencies(
     except httpx.HTTPStatusError as err:
         logger.info("response_list_all_currencies err: %s", err.response.headers)
         logger.info("response_list_all_currencies body: %s", err.response.json())
-        pytest.fail(err.response.json(), pytrace=False)
+        err_msg = json.dumps(err.response.json(), indent=4)
+        pytest.fail(err_msg, pytrace=False)
     logger.info(
         "list_all_currencies: %s",
         json.dumps(response_list_all_currencies, indent=4),
@@ -172,7 +256,8 @@ async def pay_get_accounts(
     except httpx.HTTPStatusError as err:
         logger.info("response_get_accounts err: %s", err.response.headers)
         logger.info("response_get_accounts body: %s", err.response.json())
-        pytest.fail(err.response.json(), pytrace=False)
+        err_msg = json.dumps(err.response.json(), indent=4)
+        pytest.fail(err_msg, pytrace=False)
     logger.info("get_accounts: %s", json.dumps(response_get_accounts, indent=4))
     return response_get_accounts
 
@@ -186,7 +271,8 @@ async def pay_list_accounts(
     except httpx.HTTPStatusError as err:
         logger.info("response_list_accounts err: %s", err.response.headers)
         logger.info("response_list_accounts body: %s", err.response.json())
-        pytest.fail(err.response.json(), pytrace=False)
+        err_msg = json.dumps(err.response.json(), indent=4)
+        pytest.fail(err_msg, pytrace=False)
     logger.info("list_accounts: %s", json.dumps(response_list_accounts, indent=4))
     return response_list_accounts
 
@@ -200,7 +286,8 @@ async def pay_list_beneficiaries(
     except httpx.HTTPStatusError as err:
         logger.info("response_list_beneficiaries err: %s", err.response.headers)
         logger.info("response_list_beneficiaries body: %s", err.response.json())
-        pytest.fail(err.response.json(), pytrace=False)
+        err_msg = json.dumps(err.response.json(), indent=4)
+        pytest.fail(err_msg, pytrace=False)
     logger.info("list_accounts: %s", json.dumps(response_list_beneficiaries, indent=4))
     return response_list_beneficiaries
 
@@ -214,7 +301,8 @@ async def pay_list_payments(
     except httpx.HTTPStatusError as err:
         logger.info("response_list_payments err: %s", err.response.headers)
         logger.info("response_list_payments body: %s", err.response.json())
-        pytest.fail(err.response.json(), pytrace=False)
+        err_msg = json.dumps(err.response.json(), indent=4)
+        pytest.fail(err_msg, pytrace=False)
 
     logger.info(
         "list_payments: %s",
@@ -291,7 +379,8 @@ async def create_company(
     except httpx.HTTPStatusError as err:
         logger.info("response_company err: %s", err.response.headers)
         logger.info("response_company body: %s", err.response.json())
-        pytest.fail(err.response.json(), pytrace=False)
+        err_msg = json.dumps(err.response.json(), indent=4)
+        pytest.fail(err_msg, pytrace=False)
     logger.info("create_company: %s", json.dumps(response_company, indent=4))
     return response_company
 
@@ -375,7 +464,8 @@ async def pay_create_company_beneficiary(
     except httpx.HTTPStatusError as err:
         logger.info("response_beneficiary err: %s", err.response.headers)
         logger.info("response_beneficiary body: %s", err.response.json())
-        pytest.fail(err.response.json(), pytrace=False)
+        err_msg = json.dumps(err.response.json(), indent=4)
+        pytest.fail(err_msg, pytrace=False)
     return response_beneficiary
 
 
@@ -398,7 +488,8 @@ async def pay_create_company_payer(
     except httpx.HTTPStatusError as err:
         logger.info("response_payer err: %s", err.response.headers)
         logger.info("response_payer body: %s", err.response.json())
-        pytest.fail(err.response.json(), pytrace=False)
+        err_msg = json.dumps(err.response.json(), indent=4)
+        pytest.fail(err_msg, pytrace=False)
     return response_payer
 
 
@@ -423,7 +514,35 @@ async def pay_create_quote_eur_sek(
             err.response.headers,
         )
         logger.info("response_create_quote body: %s", err.response.json())
-        pytest.fail(err.response.json(), pytrace=False)
+        err_msg = json.dumps(err.response.json(), indent=4)
+        pytest.fail(err_msg, pytrace=False)
+    logger.info("create_quote: %s", json.dumps(response_create_quote, indent=4))
+    return response_create_quote
+
+
+@pytest.fixture()
+async def pay_create_quote_eur_usd(
+    pay_client: PayClient,
+    pay_create_company_payer: Mapping[str, Any],
+    pay_create_company_beneficiary: Mapping[str, Any],
+) -> dict[str, Any]:
+    try:
+        response_create_quote = await pay_client.create_quote(
+            amount=1000,
+            external_reference=string.uuid(),
+            payer_id=pay_create_company_payer["data"]["id"],
+            beneficiary_id=pay_create_company_beneficiary["data"]["id"],
+            from_currency="EUR",
+            to_currency="USD",
+        )
+    except httpx.HTTPStatusError as err:
+        logger.info(
+            "response_create_quote err: %s",
+            err.response.headers,
+        )
+        logger.info("response_create_quote body: %s", err.response.json())
+        err_msg = json.dumps(err.response.json(), indent=4)
+        pytest.fail(err_msg, pytrace=False)
     logger.info("create_quote: %s", json.dumps(response_create_quote, indent=4))
     return response_create_quote
 
@@ -449,6 +568,7 @@ async def pay_create_quote_sek_eur(
             err.response.headers,
         )
         logger.info("response_create_quote body: %s", err.response.json())
-        pytest.fail(err.response.json(), pytrace=False)
+        err_msg = json.dumps(err.response.json(), indent=4)
+        pytest.fail(err_msg, pytrace=False)
     logger.info("create_quote: %s", json.dumps(response_create_quote, indent=4))
     return response_create_quote
