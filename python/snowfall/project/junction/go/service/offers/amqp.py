@@ -9,7 +9,7 @@ from snowfall.stdlib.transport.amqp import protocol, trackable
 class OfferSearchProducer(object):
     def __init__(
         self,
-        producer: trackable.TrackableProducer,
+        producer: trackable.TrackableProducer | protocol.Producer,
         routing_key: str,
         ttl: datetime.timedelta | None = None,
     ):
@@ -21,19 +21,25 @@ class OfferSearchProducer(object):
         self,
         offer_search: models_pb2.OfferSearch,
     ) -> None:
-        await asyncio.gather(
-            self._producer.publish(
-                msg=amqp_pb2.TripOfferSearchTask(
-                    offer_search_id=offer_search.id,
-                    search=offer_search.trip,
-                    session_token=offer_search.session_token,
-                    reseller_id=offer_search.reseller_id,
-                ),
+        msg = amqp_pb2.TripOfferSearchTask(
+            offer_search_id=offer_search.id,
+            search=offer_search.trip,
+            session_token=offer_search.session_token,
+            reseller_id=offer_search.reseller_id,
+        )
+
+        if isinstance(self._producer, trackable.TrackableProducer):
+            await self._producer.publish(
+                msg=msg,
                 routing_key=self._routing_key,
                 expiration=self._ttl,
                 trackable_id=offer_search.id,
-            ),
-        )
+            )
+        else:
+            await self._producer.publish(
+                msg=msg,
+                routing_key=self._routing_key,
+            )
 
 
 class PriceQuoteProducer(object):

@@ -86,7 +86,14 @@ job "offers-import" {
       tags = ["metrics"]
 
       connect {
-        sidecar_service {}
+        sidecar_service {
+          proxy {
+            upstreams {
+              local_bind_port  = 8010
+              destination_name = "gateway-${var.environment}"
+            }
+          }
+        }
       }
 
       check {
@@ -110,6 +117,7 @@ job "offers-import" {
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
+GATEWAY_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_gateway-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/offers" }}
 PAY_ADMIN_USERNAME={{ .Data.data.pay_admin_username }}
 PAY_ADMIN_PASSWORD={{ .Data.data.pay_admin_password }}

@@ -9,6 +9,7 @@ from motor import motor_asyncio
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.go import pay_integration
+from snowfall.project.junction.go.service.gateway.v1alpha import offers_pb2_grpc
 from snowfall.project.junction.go.service.offers import (
     aggregator,
     importer,
@@ -29,11 +30,12 @@ from snowfall.stdlib import service
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer, producer, trackable, types
-from snowfall.stdlib.transport.grpc import server
+from snowfall.stdlib.transport.grpc import client, server
 from snowfall.vendor.junction.auth import UserAuth
 from snowfall.vendor.junction.pay.client import Client as PayClient
 
 _TRIP_OFFER_SEARCH_ROUTING_KEY = "offers.search.trip"
+_TRIP_OFFER_SEARCH_GATEWAY_KEY = "offer_searches.trip"
 
 
 class _GrpcSettings(service.Settings):
@@ -43,6 +45,7 @@ class _GrpcSettings(service.Settings):
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
     mongo_dsn: Sequence[pydantic.AnyUrl]
+    use_gateway: bool = False
 
 
 class _PaySettings(service.Settings):
@@ -57,6 +60,8 @@ class _ImportSettings(pay_integration.Settings, _PaySettings, service.Settings):
     mongo_dsn: Sequence[pydantic.AnyUrl]
     redis_dsn: Sequence[pydantic.AnyUrl]
     reseller_disabled_operators: importer.RESELLERS_TO_PROVIDER_OPERATORS = {}
+    gateway_address: str
+    gateway_timeout: datetime.timedelta = datetime.timedelta(seconds=45)
 
 
 class _GatherPriceQuoteSettings(
@@ -74,6 +79,10 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
         random.choice(app.settings.mongo_dsn),  # nosec
     )
     async with types.Connection(app.settings.amqp_dsn) as connection:
+        amqp_producer = producer.Producer(
+            connection=connection,
+            exchange=types.Exchange("offers"),
+        )
         grpc_server = server.create_server(
             app.settings.grpc_address,
             app.settings.grpc_port,
@@ -84,13 +93,18 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
                         app.settings.default_ttl,
                     ),
                     publisher=OfferSearchProducer(
-                        producer=trackable.TrackableProducer(
-                            producer.Producer(
-                                connection=connection,
-                                exchange=types.Exchange("offers"),
-                            ),
+                        producer=(
+                            amqp_producer
+                            if app.settings.use_gateway
+                            else trackable.TrackableProducer(
+                                amqp_producer,
+                            )
                         ),
-                        routing_key=_TRIP_OFFER_SEARCH_ROUTING_KEY,
+                        routing_key=(
+                            _TRIP_OFFER_SEARCH_GATEWAY_KEY
+                            if app.settings.use_gateway
+                            else _TRIP_OFFER_SEARCH_ROUTING_KEY
+                        ),
                         ttl=app.settings.default_ttl,
                     ),
                     default_page_size=app.settings.default_page_size,
@@ -141,6 +155,7 @@ async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
         random.choice(app.settings.mongo_dsn),  # nosec
     )
 
+    gateway_channel = client.create_channel(app.settings.gateway_address)
     http_client = await app.stack.enter_async_context(httpx.AsyncClient())
     connection = await app.stack.enter_async_context(
         types.Connection(
@@ -168,6 +183,7 @@ async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
                         _TRIP_OFFER_SEARCH_ROUTING_KEY,
                     ),
                 ),
+                (types.Exchange("offers"), _TRIP_OFFER_SEARCH_GATEWAY_KEY),
                 (types.Exchange("offers"), "offers.result.trip"),
             ],
         ),
@@ -229,6 +245,8 @@ async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
             payer_currency=app.settings.payer_currency_code,
         ),
         reseller_disabled_operators=app.settings.reseller_disabled_operators,
+        gateway_stubs=offers_pb2_grpc.OfferServiceStub(gateway_channel),
+        gateway_timeout=app.settings.gateway_timeout,
     )
     await offer_importer.consume()
 

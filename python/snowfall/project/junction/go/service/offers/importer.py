@@ -7,6 +7,10 @@ import prometheus_client
 import structlog
 from pymongo import errors
 
+from snowfall.project.junction.go.service.gateway.v1alpha import (
+    offers_pb2,
+    offers_pb2_grpc,
+)
 from snowfall.project.junction.go.service.offers import (
     aggregator,
     offers,
@@ -14,7 +18,10 @@ from snowfall.project.junction.go.service.offers import (
     price_quotes,
 )
 from snowfall.project.junction.go.service.offers.v1alpha import amqp_pb2
-from snowfall.project.junction.go.service.offers.v1alpha.models_pb2 import OfferGroup
+from snowfall.project.junction.go.service.offers.v1alpha.models_pb2 import (
+    OfferGroup,
+    OfferSearch,
+)
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.instrumentation import prometheus
 from snowfall.stdlib.persistence.redis import types
@@ -25,6 +32,7 @@ from snowfall.stdlib.v1 import amqp_pb2 as trackable_pb2
 ExpectedMessages = Union[
     amqp_pb2.TripOfferSearchResult,
     trackable_pb2.Trackable,
+    amqp_pb2.TripOfferSearchTask,
 ]
 _PROVIDERS_TO_DISABLED_OPERATORS = dict[str, list[str]]
 RESELLERS_TO_PROVIDER_OPERATORS = dict[str, _PROVIDERS_TO_DISABLED_OPERATORS]
@@ -109,6 +117,8 @@ class OfferImporter(object):
         offer_searches: offers.OfferSearchRepository,
         pay_quote_fetcher: pay_quotes.PayQuoteFetcher,
         reseller_disabled_operators: RESELLERS_TO_PROVIDER_OPERATORS,
+        gateway_stubs: offers_pb2_grpc.OfferServiceStub,
+        gateway_timeout: datetime.timedelta,
     ):
         self._consumer = consumer_obj
         self._offers = trip_offers
@@ -119,6 +129,8 @@ class OfferImporter(object):
         self._searches = offer_searches
         self._pay_quote_fetcher = pay_quote_fetcher
         self._reseller_disabled_operators = reseller_disabled_operators
+        self._gateway_stubs = gateway_stubs
+        self._gateway_timeout = gateway_timeout
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
@@ -129,21 +141,73 @@ class OfferImporter(object):
     ) -> None:
         match message.body:
             case amqp_pb2.TripOfferSearchResult():
-                await self._process_trip_offer_search_result(message.body)
+                offer_search = await self._searches.find_by_id(
+                    message.body.offer_search_id,
+                )
+
+                if not offer_search:
+                    raise SkippedOfferError()
+
+                await self._process_trip_offer_search_result(offer_search, message.body)
             case trackable_pb2.Trackable():
                 await self._status_handler.on_message(message.body)
+            case amqp_pb2.TripOfferSearchTask():
+                try:
+                    await self._process_trip_offer_search(message.body)
+                except Exception as err:
+                    await self._searches.mark_as_failed(message.body.offer_search_id)
+                    raise err
 
-    async def _process_trip_offer_search_result(
+    async def _process_trip_offer_search(  # noqa: WPS217
         self,
-        message: amqp_pb2.TripOfferSearchResult,
+        message: amqp_pb2.TripOfferSearchTask,
     ) -> None:
-        redis_lock = "results:{0}".format(message.offer_search_id)
-
         offer_search = await self._searches.find_by_id(message.offer_search_id)
 
         if not offer_search:
             raise SkippedOfferError()
 
+        await self._searches.mark_as_processing(offer_search.id)
+
+        response = await self._gateway_stubs.EnqueueOfferSearch(
+            offers_pb2.EnqueueOfferSearchRequest(
+                trip_offer_search_task=message,
+            ),
+            timeout=self._gateway_timeout.total_seconds(),
+        )
+
+        # should be identical to what we've already
+        # got, but let's not make any assumptions.
+        gw_offer_search_id = response.id
+        cutoff = datetime.datetime.now(tz=datetime.UTC) + self._gateway_timeout
+
+        while datetime.datetime.now(tz=datetime.UTC) < cutoff:
+            response = await self._gateway_stubs.PopOfferSearchResults(
+                offers_pb2.PopOfferSearchResultsRequest(
+                    id=gw_offer_search_id,
+                ),
+                timeout=self._gateway_timeout.total_seconds(),
+            )
+
+            await asyncio.gather(
+                *[
+                    self._process_trip_offer_search_result(offer_search, offer_result)
+                    for offer_result in response.trip_offer_search_results.results
+                ],
+            )
+
+            if not response.is_in_progress:
+                break
+
+            await asyncio.sleep(1)
+
+        await self._searches.mark_as_completed(offer_search.id)
+
+    async def _process_trip_offer_search_result(
+        self,
+        offer_search: OfferSearch,
+        message: amqp_pb2.TripOfferSearchResult,
+    ) -> None:
         disabled_operators = self._reseller_disabled_operators.get(
             offer_search.reseller_id,
             {},
@@ -152,6 +216,7 @@ class OfferImporter(object):
         if self._contains_disabled_operator(disabled_operators, message.offer):
             return
 
+        redis_lock = "results:{0}".format(message.offer_search_id)
         message = await self._pay_quote_fetcher.handle_offer_search_result(
             message=message,
             session_token=offer_search.session_token,
