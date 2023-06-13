@@ -67,11 +67,12 @@ class CurrencyCloudAuth(httpx.Auth):
 
         if response.status_code == httpx.codes.UNAUTHORIZED:
             async with self._async_lock:
-                _logger.info("Getting token")
-                await self._authenticate()
+                if self._token == request.headers["X-Auth-Token"]:
+                    _logger.info("Getting token")
+                    await self._authenticate()
 
-                request.headers["X-Auth-Token"] = self._token
-                yield request
+            request.headers["X-Auth-Token"] = self._token
+            yield request
 
     async def _authenticate(self) -> None:
         response = (
