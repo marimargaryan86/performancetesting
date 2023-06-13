@@ -36,7 +36,7 @@ def filter_secrets_list(event_list: Sequence[Any]) -> list[Any]:
 def filter_secrets_value(item_value: Any) -> Any:
     if isinstance(item_value, dict):
         return filter_secrets_dict(item_value)
-    elif isinstance(item_value, list):
+    if isinstance(item_value, list):
         return filter_secrets_list(item_value)
 
     return item_value

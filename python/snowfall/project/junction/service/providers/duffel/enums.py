@@ -28,7 +28,7 @@ def cabin_to_proto(cabin: str | None) -> models_pb2.CabinClass.Type.ValueType:
 def gender_from_proto(gender: orders_models.Passenger.Gender.ValueType) -> str:
     if gender == orders_models.Passenger.GENDER_MALE:
         return "m"
-    elif gender == orders_models.Passenger.GENDER_FEMALE:
+    if gender == orders_models.Passenger.GENDER_FEMALE:
         return "f"
 
     return "u"

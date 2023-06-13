@@ -311,7 +311,7 @@ async def return_offer_searches_ids_final_values(
         status = response["data"]["attributes"]["status"]
         if status in {"completed", "failed", "unspecified"}:
             return "{0}_{1}".format(response["data"]["id"], status)
-        elif status in {"pending", "processing"}:
+        if status in {"pending", "processing"}:
             if safety_counter == (max_safety_counter - 1):
                 return "{0}_{1}".format(response["data"]["id"], status)
         else:

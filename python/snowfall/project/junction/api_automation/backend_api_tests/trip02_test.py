@@ -143,12 +143,7 @@ async def calculate_updated_departure(
         all_legs_array[idx]["attributes"]["departureAt"],
     ).utcoffset()
 
-    if utcoffset_dd is not None:
-        difference = replace_dd - utcoffset_dd
-    else:
-        difference = replace_dd
-
-    return difference
+    return replace_dd - utcoffset_dd if utcoffset_dd is not None else replace_dd
 
 
 async def calculate_updated_arrival(
@@ -165,12 +160,7 @@ async def calculate_updated_arrival(
         all_legs_array[idx - 1]["attributes"]["arrivalAt"],
     ).utcoffset()
 
-    if utcoffset_da is not None:
-        difference = replace_da - utcoffset_da
-    else:
-        difference = replace_da
-
-    return difference
+    return replace_da - utcoffset_da if utcoffset_da is not None else replace_da
 
 
 async def get_trip_ids_with_minimum_segments(

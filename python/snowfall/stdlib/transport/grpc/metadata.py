@@ -58,7 +58,7 @@ async def get_auth_token(context: aio.ServicerContext) -> dict[str, Any]:
             except jwt.exceptions.PyJWTError:
                 await _abort(context, "Authentication token invalid")
 
-    await _abort(context, "Authentication token not found")
+    return await _abort(context, "Authentication token not found")
 
 
 async def _abort(context: aio.ServicerContext, description: str) -> NoReturn:

@@ -77,7 +77,7 @@ async def test_get_beneficiary(  # noqa: WPS218
         rgb_data["attributes"]["bankDetails"]["bicSwift"],
         type(None) | str,
     )
-    assert rgb_data["attributes"]["bankDetails"]["accountType"], "checking" or "savings"
+    assert rgb_data["attributes"]["bankDetails"]["accountType"], "checking"
     assert (
         rgb_data["attributes"]["bankDetails"]["paymentTypes"] == "priority" or "regular"
     )

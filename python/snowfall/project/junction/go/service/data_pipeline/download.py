@@ -95,7 +95,7 @@ async def download_url(  # noqa: WPS210,WPS231
                 async for chunk in resp.aiter_bytes(2**20):  # noqa: WPS432
                     zip_file.write(chunk)
 
-    print(  # noqa: WPS421
+    print(  # noqa: T201,WPS421
         "DONE: {n} (country: {c})".format(n=name, c=dataset["country"]),
     )
 

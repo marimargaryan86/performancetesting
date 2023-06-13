@@ -33,7 +33,7 @@ def gender_from_proto(
 ) -> passenger_enums.GenderEnum:
     if gender == orders_models.Passenger.GENDER_MALE:
         return passenger_enums.GenderEnum.male
-    elif gender == orders_models.Passenger.GENDER_FEMALE:
+    if gender == orders_models.Passenger.GENDER_FEMALE:
         return passenger_enums.GenderEnum.female
 
     return passenger_enums.GenderEnum.unspecified

@@ -44,7 +44,7 @@ class AuthenticationService(
         self,
         request: auth_pb2.AuthenticateRequest,
         context: grpc.aio.ServicerContext,
-    ) -> auth_pb2.AuthenticateResponse | None:
+    ) -> auth_pb2.AuthenticateResponse:
         if request.email:
             email = request.email.lower()
 
@@ -73,7 +73,7 @@ class AuthenticationService(
         self,
         request: auth_pb2.CreateUserRequest,
         context: grpc.aio.ServicerContext,
-    ) -> auth_pb2.CreateUserResponse | None:
+    ) -> auth_pb2.CreateUserResponse:
         email = request.email.lower()
         email_error = validate_email(email)
         if email_error:
@@ -135,11 +135,11 @@ class AuthenticationService(
 
         return auth_pb2.CreateUserResponse(user=user)
 
-    async def ChangePassword(  # type: ignore[override, return] # noqa: N802, WPS217, C901
+    async def ChangePassword(  # type: ignore[override] # noqa: N802, WPS217, C901
         self,
         request: auth_pb2.ChangePasswordRequest,
         context: grpc.ServicerContext,
-    ) -> auth_pb2.ChangePasswordResponse | None:
+    ) -> auth_pb2.ChangePasswordResponse:
         error = validate_password(request.password)
         if error:
             return await rich_status.abort_with_rich_status(
@@ -175,8 +175,7 @@ class AuthenticationService(
                 user=user,
             )
 
-        if updated_result.matched_count == 0:
-            return await context.abort(
-                grpc.StatusCode.NOT_FOUND,
-                details="Password is not changed",
-            )
+        return await context.abort(
+            grpc.StatusCode.NOT_FOUND,
+            details="Password is not changed",
+        )

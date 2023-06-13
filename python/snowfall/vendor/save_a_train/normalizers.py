@@ -8,9 +8,6 @@ from pydantic import typing, validator
 def normalize_time(
     time: int | float | str | None,
 ) -> float | datetime.timedelta | None:
-    if time is None:
-        return None
-
     if isinstance(time, str):
         # duration: str, e.g. 2h22m
         hours, minutes = date_parser(time).hour, date_parser(time).minute
@@ -23,13 +20,15 @@ def normalize_time(
     if isinstance(time, float):
         return datetime.timedelta(seconds=time)
 
+    return None
+
 
 _Input = TypeVar("_Input")
 
 
 def normalize_nullable_fields(field_value: _Input | None) -> _Input | None:
     if isinstance(field_value, str) and field_value.upper() == "NULL":
-        field_value = None
+        return None
 
     return field_value
 

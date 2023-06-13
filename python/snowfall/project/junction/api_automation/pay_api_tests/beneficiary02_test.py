@@ -55,9 +55,7 @@ async def test_list_beneficiaries(  # noqa: WPS218
         first_item["attributes"]["bankDetails"]["bicSwift"],
         type(None) | str,
     )
-    assert first_item["attributes"]["bankDetails"]["accountType"], (
-        "checking" or "savings"
-    )
+    assert first_item["attributes"]["bankDetails"]["accountType"], "checking"
     assert (
         first_item["attributes"]["bankDetails"]["paymentTypes"] == "priority"
         or "regular"

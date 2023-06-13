@@ -37,9 +37,9 @@ class MockResultSet(object):
     async def __anext__(self) -> Offer:
         if self._index >= len(self._offers):
             raise StopAsyncIteration
-        offer = self._offers[self._index]
         self._index += 1
-        return offer
+
+        return self._offers[self._index - 1]
 
 
 async def test_original_id_is_always_published() -> None:  # noqa: WPS210

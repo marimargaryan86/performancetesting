@@ -58,7 +58,7 @@ def gender_from_proto(
 ) -> common.Gender:
     if gender == orders_models.Passenger.GENDER_MALE:
         return common.Gender.male
-    elif gender == orders_models.Passenger.GENDER_FEMALE:
+    if gender == orders_models.Passenger.GENDER_FEMALE:
         return common.Gender.female
     return common.Gender.unknown
 

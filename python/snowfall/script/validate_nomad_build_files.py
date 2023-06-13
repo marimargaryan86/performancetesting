@@ -100,7 +100,7 @@ def _validate_build_file(
 
 
 def _log_error(msg: str) -> None:
-    print(msg, file=sys.stderr)  # noqa: WPS421
+    print(msg, file=sys.stderr)  # noqa: T201,WPS421
 
 
 def _main(root_path: pathlib.Path) -> bool:

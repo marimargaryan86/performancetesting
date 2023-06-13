@@ -35,7 +35,7 @@ async def distribusion_plugin(
         dataset["url"] + "/retailers/v4/marketing_carriers",  # noqa: WPS336
         headers=headers,
     )
-    print("Distribusion: Available codes:")  # noqa: WPS421
+    print("Distribusion: Available codes:")  # noqa: T201,WPS421
     pprint(resp.json()["data"])  # noqa: WPS421,T203
 
     url = (

@@ -27,6 +27,7 @@ ignore = [
     "ANN102", # Missing type annotation for cls in classmethod
     "ANN401", # Dynamically typed expressions (typing.Any) are disallowed
     "E501", # Line too long
+    "SIM118", # Use `key in dict` instead of `key in dict.keys()`
 ]
 select = [
     "A", # flake8-builtins
@@ -48,7 +49,6 @@ select = [
     "FA", # flake8-future-annotations
     #"FBT",
     "G", # flake8-logging-format
-    #"I",
     "ISC", # flake8-implicit-str-concat
     "ICN", # flake8-import-conventions
     "INT", # flake8-gettext
@@ -58,19 +58,17 @@ select = [
     "PGH", # pygrep-hooks
     "PIE", # flake8-pie
     #"PL",
-    #"RET",
+    "RET", # flake8-return
     #"RSE",
     #"PT",
     #"PTH",
     "PYI", # flake8-pyi
     "Q", # flake8-quotes
     #"RUF",
-    #"S",
-    #"SIM",
+    "SIM", # flake8-simplify
     #"SLF",
-    #"T",
     "T10", # flake8-debugger
-    #"T20",
+    "T20", # flake8-print
     #"TCH",
     #"TD",
     "TID", # flake8-tidy-imports
