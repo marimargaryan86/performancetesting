@@ -54,3 +54,4 @@ The following ports are configured in local environments by default:
 | 50072 | duffel                 | gRPC Server       |
 | 50073 | save-a-train           | gRPC Server       |
 | 50074 | transactions           | gRPC Server       |
+| 50075 | companies              | gRPC Server       |

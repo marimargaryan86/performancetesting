@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package snowfall.project.pay.service.companies.v1alpha;
+
+import "snowfall/project/pay/service/companies/v1alpha/models.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/companies/v1alpha";
+
+service CompaniesService {
+  rpc CreateCompany(CreateCompanyRequest) returns (CreateCompanyResponse) {}
+  rpc GetCompany(GetCompanyRequest) returns (GetCompanyResponse) {}
+  rpc UpdateCompany(UpdateCompanyRequest) returns (UpdateCompanyResponse) {}
+  rpc ListCompanies(ListCompaniesRequest) returns (ListCompaniesResponse) {}
+}
+
+message CreateCompanyRequest {
+  Company company = 1;
+}
+
+message CreateCompanyResponse {
+  Company company = 1;
+}
+
+message GetCompanyRequest {
+  string id = 1;
+}
+
+message GetCompanyResponse {
+  Company company = 1;
+}
+
+message UpdateCompanyRequest {
+  Company company = 1;
+}
+
+message UpdateCompanyResponse {
+  Company company = 1;
+}
+message ListCompaniesRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  bool is_accountless = 3;
+}
+
+message ListCompaniesResponse {
+  repeated Company companies = 1;
+  string next_page_token = 2;
+}
