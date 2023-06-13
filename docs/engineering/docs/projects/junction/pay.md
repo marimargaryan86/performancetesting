@@ -1,6 +1,6 @@
 # Junction Pay
 
-## Junction pay System Flow Diagram
+## Junction Pay System Flow Diagram
 
 ```mermaid
     flowchart LR

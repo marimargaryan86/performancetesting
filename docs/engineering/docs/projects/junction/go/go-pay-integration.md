@@ -1,6 +1,4 @@
-# Junction Go
-
-## Go Pay Integration Flow
+# Go - Pay Integration Flow
 
 so lets explain the Go - Pay integration process below.
 
