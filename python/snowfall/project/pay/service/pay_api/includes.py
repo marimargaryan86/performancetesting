@@ -2,42 +2,39 @@ from collections.abc import Sequence
 
 from starlette import requests
 
-from snowfall.project.pay.service.pay_api import repositories, resources
+from snowfall.project.pay.adapter import transactions
+from snowfall.project.pay.service.pay_api import resources
 from snowfall.stdlib.integration.starlette import includes
 
 
 def _transactions_resolver(
-    transaction_repositories: repositories.TransactionRepository,
+    transactions_client: transactions.Client,
 ) -> includes.ResolverFunc:
     async def wrapper(
         identifiers: Sequence[str],
         request: requests.Request,
     ) -> Sequence[resources.Transaction]:
-        transactions = []
+        included_transactions = []
         for identifier in identifiers:
-            transaction = await transaction_repositories.find_by_id(identifier)
-            if not transaction:
-                raise ValueError(
-                    "Transaction is not found for {0} id".format(identifier),
-                )
-            transactions.append(
+            transaction = await transactions_client.get(identifier)
+            included_transactions.append(
                 resources.Transaction.from_proto(
                     transaction=transaction,
                     request=request,
                 ),
             )
-        return transactions
+        return included_transactions
 
     return wrapper
 
 
 def register_resolvers(
-    transaction_repositories: repositories.TransactionRepository,
+    transactions_client: transactions.Client,
 ) -> None:
     resolvers = (
         includes.Resolver(
             resource=resources.Transaction,
-            func=_transactions_resolver(transaction_repositories),
+            func=_transactions_resolver(transactions_client),
         ),
     )
     for resolver in resolvers:

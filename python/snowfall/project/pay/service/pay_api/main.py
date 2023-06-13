@@ -11,7 +11,7 @@ from starlette.middleware import Middleware, authentication
 from snowfall.adapter import authentication as auth
 from snowfall.project.junction.go.adapter import errors
 from snowfall.project.pay.adapter import accounts as accounts_adapter
-from snowfall.project.pay.adapter import currencies, payments
+from snowfall.project.pay.adapter import currencies, payments, transactions
 from snowfall.project.pay.service.accounts import repositories
 from snowfall.project.pay.service.accounts.v1alpha.accounts_pb2_grpc import (
     AccountsServiceStub,
@@ -31,6 +31,9 @@ from snowfall.project.pay.service.payments.v1alpha.payments_pb2_grpc import (
     PaymentsServiceStub,
 )
 from snowfall.project.pay.service.quotations.quotations import QuotationsRepository
+from snowfall.project.pay.service.transactions.v1alpha import (
+    grpc_pb2_grpc as transactions_pb2_grpc,
+)
 from snowfall.stdlib import service
 from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import cursor, filesystem
@@ -69,6 +72,9 @@ def _factory(
         )
 
         orders_channel = create_channel(app.settings.currencies_address)
+        transactions_channel = create_channel(
+            app.settings.transactions_address,
+        )
         quotations_repo = QuotationsRepository(mongo.quotations.quotations)
         asgi_app = application.create_starlette_app(
             custom_middlewares=[
@@ -110,6 +116,11 @@ def _factory(
                     currencies_repository=CurrencyRepository(
                         app.settings.currencies,
                     ),
+                    transactions_client=transactions.GrpcClient(
+                        transactions_pb2_grpc.TransactionsServiceStub(
+                            transactions_channel,
+                        ),
+                    ),
                 ),
             ),
             openapi_path=filesystem.resource_path("junction.pay_api", "openapi.json"),
@@ -148,6 +159,9 @@ def _admin_factory(
         )
         payments_channel = create_channel(
             app.settings.payments_address,
+        )
+        transactions_channel = create_channel(
+            app.settings.transactions_address,
         )
         cc_payment_client = PaymentClient(
             base_url=app.settings.cc_address,
@@ -191,9 +205,6 @@ def _admin_factory(
                     conversions_repository=ConversionRepository(
                         mongo.conversions.conversions,
                     ),
-                    transactions_repository=TransactionRepository(
-                        mongo.transactions.transactions,
-                    ),
                     currencies_repository=CurrencyRepository(
                         app.settings.currencies,
                     ),
@@ -204,6 +215,14 @@ def _admin_factory(
                         AccountsServiceStub(
                             accounts_channel,
                         ),
+                    ),
+                    transactions_client=transactions.GrpcClient(
+                        transactions_pb2_grpc.TransactionsServiceStub(
+                            transactions_channel,
+                        ),
+                    ),
+                    transactions_repository=TransactionRepository(
+                        mongo.transactions.transactions,
                     ),
                     payments_client=payments.GrpcClient(
                         PaymentsServiceStub(

@@ -4,7 +4,7 @@ import lagom
 from pydantic import AnyUrl
 
 from snowfall.adapter import authentication
-from snowfall.project.pay.adapter import accounts, currencies, payments
+from snowfall.project.pay.adapter import accounts, currencies, payments, transactions
 from snowfall.project.pay.service.accounts.repositories import ContactsRepository
 from snowfall.project.pay.service.pay_api import includes
 from snowfall.project.pay.service.pay_api.cache import UserSessionRepository
@@ -28,6 +28,7 @@ class Settings(application.Settings):
     cc_address: str
     currencies_address: str
     authentication_address: str
+    transactions_address: str
     jwt_public_key: str
     mongo_dsn: Sequence[AnyUrl]
     redis_dsn: Sequence[AnyUrl]
@@ -42,6 +43,7 @@ class AdminSettings(application.Settings):
     authentication_address: str
     accounts_address: str
     payments_address: str
+    transactions_address: str
     jwt_public_key: str
     mongo_dsn: Sequence[AnyUrl]
     redis_dsn: Sequence[AnyUrl]
@@ -53,26 +55,28 @@ def create_admin_dependencies(  # noqa: WPS211
     companies_repository: CompanyRepository,
     contacts_repository: ContactsRepository,
     conversions_repository: ConversionRepository,
-    transactions_repository: TransactionRepository,
     currencies_repository: CurrencyRepository,
     beneficiaries_repository: BeneficiaryRepository,
+    transactions_repository: TransactionRepository,
     accounts_client: accounts.GrpcClient,
     cc_payment_client: client.PaymentClient,
+    transactions_client: transactions.Client,
     payments_client: payments.GrpcClient,
 ) -> lagom.Container:
     container = lagom.Container()
     container[client.PaymentClient] = cc_payment_client
     container[authentication.Client] = authentication_client  # type: ignore[type-abstract]
     container[CompanyRepository] = companies_repository
+    container[TransactionRepository] = transactions_repository
     container[ContactsRepository] = contacts_repository
     container[ConversionRepository] = conversions_repository
-    container[TransactionRepository] = transactions_repository
     container[CurrencyRepository] = currencies_repository
     container[BeneficiaryRepository] = beneficiaries_repository
     container[accounts.GrpcClient] = accounts_client
+    container[transactions.Client] = transactions_client  # type: ignore[type-abstract]
     container[payments.GrpcClient] = payments_client
 
-    includes.register_resolvers(transactions_repository)
+    includes.register_resolvers(transactions_client)
 
     return container
 
@@ -82,6 +86,7 @@ def create_dependencies(  # noqa: WPS211
     quotations_repository: quotations.QuotationsRepository,
     redis_client: UserSessionRepository,
     transactions_repository: TransactionRepository,
+    transactions_client: transactions.Client,
     conversions_repository: ConversionRepository,
     companies_repository: CompanyRepository,
     currencies_repository: CurrencyRepository,
@@ -94,6 +99,7 @@ def create_dependencies(  # noqa: WPS211
     container[UserSessionRepository] = redis_client
     container[TransactionRepository] = transactions_repository
     container[ConversionRepository] = conversions_repository
+    container[transactions.Client] = transactions_client  # type: ignore[type-abstract]
     container[CompanyRepository] = companies_repository
     container[CurrencyRepository] = currencies_repository
     return container

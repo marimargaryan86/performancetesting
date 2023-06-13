@@ -17,7 +17,7 @@ from starlette.middleware import Middleware, authentication
 from snowfall.adapter import authentication as auth
 from snowfall.project.junction.go.adapter import errors
 from snowfall.project.pay import fixtures
-from snowfall.project.pay.adapter import accounts, currencies, payments
+from snowfall.project.pay.adapter import accounts, currencies, payments, transactions
 from snowfall.project.pay.service.accounts import repositories
 from snowfall.project.pay.service.pay_api import authenticator, bootstrap
 from snowfall.project.pay.service.pay_api import repositories as pay_repos
@@ -101,6 +101,7 @@ def _create_app(  # noqa: WPS211
     conversion_repository: pay_repos.ConversionRepository,
     companies_repository: pay_repos.CompanyRepository,
     currencies_repository: pay_repos.CurrencyRepository,
+    transactions_client: transactions.Client,
     openapi_path: pathlib.Path,
     custom_middlewares: Sequence[Middleware] | None = None,
 ) -> applications.Starlette:
@@ -113,6 +114,7 @@ def _create_app(  # noqa: WPS211
                 quotations_repository,
                 redis_repository,
                 transactions_repository,
+                transactions_client,
                 conversion_repository,
                 companies_repository,
                 currencies_repository,
@@ -134,6 +136,7 @@ def _create_admin_app(  # noqa: WPS211
     accounts_client: accounts.GrpcClient,
     payment_client: payments.GrpcClient,
     conversions_repository: pay_repos.ConversionRepository,
+    transactions_client: transactions.Client,
     transactions_repository: pay_repos.TransactionRepository,
     currencies_repository: pay_repos.CurrencyRepository,
     beneficiaries_repository: pay_repos.BeneficiaryRepository,
@@ -149,10 +152,11 @@ def _create_admin_app(  # noqa: WPS211
                 companies_repository,
                 contacts_repository,
                 conversions_repository=conversions_repository,
-                transactions_repository=transactions_repository,
                 currencies_repository=currencies_repository,
                 beneficiaries_repository=beneficiaries_repository,
                 accounts_client=accounts_client,
+                transactions_client=transactions_client,
+                transactions_repository=transactions_repository,
                 cc_payment_client=cc_payment_client,
                 payments_client=payment_client,
             ),
@@ -218,6 +222,15 @@ def contacts_repository(
 @pytest.fixture()
 def accounts_client() -> accounts.DictClient:
     return accounts.DictClient()
+
+
+@pytest.fixture()
+def transactions_client(
+    transaction_ids: Sequence[str],
+) -> transactions.Client:
+    return transactions.DictClient(
+        [get_transaction(transaction_id) for transaction_id in transaction_ids],
+    )
 
 
 @pytest.fixture()
@@ -415,6 +428,7 @@ def app(  # noqa: WPS211
     quotations_repository: quotations.QuotationsRepository,
     redis_repository: UserSessionRepository,
     transactions_repository: pay_repos.TransactionRepository,
+    transactions_client: transactions.Client,
     conversions_repository: pay_repos.ConversionRepository,
     cc_payment_client: PaymentClient,
     companies_repository: pay_repos.CompanyRepository,
@@ -429,6 +443,7 @@ def app(  # noqa: WPS211
         conversion_repository=conversions_repository,
         companies_repository=companies_repository,
         currencies_repository=currencies_repository,
+        transactions_client=transactions_client,
         openapi_path=filesystem.resource_path("junction.pay_api", "openapi.json"),
     )
 
@@ -442,6 +457,7 @@ def admin_app(  # noqa: WPS211
     accounts_client: accounts.GrpcClient,
     payment_client: payments.GrpcClient,
     conversions_repository: pay_repos.ConversionRepository,
+    transactions_client: transactions.Client,
     transactions_repository: pay_repos.TransactionRepository,
     currencies_repository: pay_repos.CurrencyRepository,
     beneficiaries_repository: pay_repos.BeneficiaryRepository,
@@ -452,10 +468,11 @@ def admin_app(  # noqa: WPS211
         authentication_client=authentication_client,
         companies_repository=companies_repository,
         contacts_repository=contacts_repository,
+        transactions_repository=transactions_repository,
         accounts_client=accounts_client,
         payment_client=payment_client,
         conversions_repository=conversions_repository,
-        transactions_repository=transactions_repository,
+        transactions_client=transactions_client,
         currencies_repository=currencies_repository,
         beneficiaries_repository=beneficiaries_repository,
         custom_middlewares=custom_middlewares,

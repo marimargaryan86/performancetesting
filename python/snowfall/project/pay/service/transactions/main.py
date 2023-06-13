@@ -57,7 +57,7 @@ async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
                     mongo.transactions.transactions,
                 ),
                 conversions=transactions.ConversionsRepository(
-                    mongo.trasactions.conversions,
+                    mongo.transactions.conversions,
                 ),
                 payment_client=PaymentClient(
                     base_url=app.settings.cc_address,
@@ -84,7 +84,7 @@ async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
             ),
             ConversionsService(
                 conversions=transactions.ConversionsRepository(
-                    mongo.trasactions.conversions,
+                    mongo.transactions.conversions,
                 ),
             ),
         ],
