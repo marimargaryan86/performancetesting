@@ -37,7 +37,7 @@ async def price_quotes(  # noqa: WPS210
     rate_limit_client = await app.stack.enter_async_context(
         RateLimitClient(
             app.settings.rate_limiter_grpc_host,
-            app.settings.rate_limiter_service_configs["duffel"],
+            app.settings.rate_limiter_service_configs.get("duffel"),
         ),
     )
     redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
