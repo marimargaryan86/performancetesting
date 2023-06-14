@@ -106,9 +106,16 @@ def test_slug_to_enum_value() -> None:
             datetime.date(year=1984, month=2, day=3),
             date_pb2.Date(year=1984, month=2, day=3),
         ),
+        (
+            datetime.datetime(year=1984, month=2, day=3, hour=4, tzinfo=datetime.UTC),
+            date_pb2.Date(year=1984, month=2, day=3),
+        ),
     ],
 )
-def test_date_to_protobuf(date: datetime.date, expected: date_pb2.Date) -> None:
+def test_date_to_protobuf(
+    date: datetime.date | datetime.datetime,
+    expected: date_pb2.Date,
+) -> None:
     assert protobuf.date_to_protobuf(date) == expected
 
 
@@ -132,10 +139,14 @@ def test_date_to_protobuf(date: datetime.date, expected: date_pb2.Date) -> None:
             date_pb2.Date(year=1984, month=2, day=3),
             datetime.date(year=1984, month=2, day=3),
         ),
+        (
+            timestamp_pb2.Timestamp(seconds=444656942),
+            datetime.date(year=1984, month=2, day=3),
+        ),
     ],
 )
 def test_protobuf_to_date(
-    proto: date_pb2.Date | datetime_pb2.DateTime,
+    proto: date_pb2.Date | datetime_pb2.DateTime | timestamp_pb2.Timestamp,
     expected: datetime.date,
 ) -> None:
     assert protobuf.protobuf_to_date(proto) == expected

@@ -25,9 +25,7 @@ def get_last_travel_date(
     )
 
     return max(
-        protobuf.protobuf_to_datetime(
-            more_itertools.last(segment.legs).departure_at,
-        ).date()
+        protobuf.protobuf_to_date(more_itertools.last(segment.legs).departure_at)
         for segment in segments
     )
 

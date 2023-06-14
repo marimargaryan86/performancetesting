@@ -152,7 +152,7 @@ def protobuf_to_datetime(
     )
 
 
-def date_to_protobuf(date: datetime.date) -> date_pb2.Date:
+def date_to_protobuf(date: datetime.date | datetime.datetime) -> date_pb2.Date:
     return date_pb2.Date(
         year=date.year,
         month=date.month,
@@ -161,8 +161,11 @@ def date_to_protobuf(date: datetime.date) -> date_pb2.Date:
 
 
 def protobuf_to_date(
-    proto: date_pb2.Date | datetime_pb2.DateTime,
+    proto: date_pb2.Date | datetime_pb2.DateTime | timestamp_pb2.Timestamp,
 ) -> datetime.date:
+    if isinstance(proto, timestamp_pb2.Timestamp):
+        return proto.ToDatetime(tzinfo=datetime.UTC).date()
+
     return datetime.date(year=proto.year, month=proto.month, day=proto.day)
 
 

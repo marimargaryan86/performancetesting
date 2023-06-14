@@ -170,9 +170,9 @@ class OfferParser(object):  # noqa: WPS214
     ) -> datetime.date:
         last_segment = more_itertools.last(offer_segments)
 
-        return protobuf.protobuf_to_datetime(
+        return protobuf.protobuf_to_date(
             more_itertools.last(last_segment.legs).departure_at,
-        ).date()
+        )
 
     def _parse_segment_details(
         self,

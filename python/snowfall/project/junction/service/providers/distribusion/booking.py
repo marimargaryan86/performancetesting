@@ -213,8 +213,7 @@ class BookingHandler(object):
         details: cache.OfferDetails,
         passenger: models_pb2.Passenger,
     ) -> str:
-        departure_time = protobuf.protobuf_to_datetime(first_segment.departure_at)
-        departure_date = departure_time.replace(tzinfo=None).date()
+        departure_date = protobuf.protobuf_to_date(first_segment.departure_at)
         birth_date = protobuf.protobuf_to_date(passenger.date_of_birth)
         age = relativedelta(departure_date, birth_date)
 

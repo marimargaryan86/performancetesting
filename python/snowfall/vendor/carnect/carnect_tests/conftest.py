@@ -63,6 +63,7 @@ async def offers(
         datetime.datetime.now(tz=datetime.UTC).date()
         + datetime.timedelta(days=PICKUP_DATE_IN_DAYS),
         datetime.time(hour=NOON_HOURS),
+        tzinfo=datetime.UTC,
     )
     rental_core.pick_up_date(pickup_datetime)
     rental_core.return_date(pickup_datetime + datetime.timedelta(days=RENT_PERIOD_DAYS))
