@@ -51,6 +51,7 @@ select = [
     "F", # Pyflakes
     "FA", # flake8-future-annotations
     #"FBT",
+    #"FIX",
     "G", # flake8-logging-format
     "ISC", # flake8-implicit-str-concat
     "ICN", # flake8-import-conventions

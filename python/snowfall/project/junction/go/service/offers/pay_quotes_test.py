@@ -141,7 +141,7 @@ async def test_that_pay_quotes_invoked_and_response_returned(
     )
 
 
-async def test_that_all_amounts_in_trip_offer_search_result_replaced_with_conversions(  # noqa: B950,WPS218
+async def test_that_all_amounts_in_trip_offer_search_result_replaced_with_conversions(  # noqa: WPS218
     mock_pay_client: mock.Mock,
     pay_quotes: PayQuotes,
 ) -> None:

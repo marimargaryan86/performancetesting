@@ -16,7 +16,6 @@ class UserSessionRepository(object):
 
     async def store(self, identifier: str, currency_pair: str, rate: float) -> None:
         session = self._redis.hash_(identifier)
-
         cache_key = "{0}:{1}".format(identifier, currency_pair)
 
         async with self._redis.lock(cache_key):

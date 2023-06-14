@@ -47,7 +47,7 @@ class ProtoCoder(Generic[Proto], BaseCoder[Proto]):
 
         # Only set created if it hasn't been set already.
         if (  # noqa: WPS337
-            "created_at" in fields and proto.created_at.seconds == 0  # type: ignore[attr-defined]  # noqa: B950
+            "created_at" in fields and proto.created_at.seconds == 0  # type: ignore[attr-defined]
         ):
             proto.created_at.GetCurrentTime()  # type: ignore[attr-defined]
 

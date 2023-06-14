@@ -16,7 +16,6 @@ class UserSessionRepository(object):
 
     async def store(self, identifier: str, currency_pair: str, rate: float) -> None:
         session = self._redis.hash_(identifier)
-
         ttl = datetime.datetime.now(tz=datetime.UTC) + self._default_ttl
 
         await session.put(currency_pair, str(rate))

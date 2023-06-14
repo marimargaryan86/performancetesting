@@ -49,7 +49,6 @@ class AnySerializer(Generic[_Proto]):
 
         symbol = cast(type[_Proto], cls._db.GetSymbol(packed_message.TypeName()))
         unpacked_message = symbol()
-
         packed_message.Unpack(unpacked_message)
 
         return unpacked_message

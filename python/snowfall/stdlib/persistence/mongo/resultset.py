@@ -39,7 +39,7 @@ class ResultSet(abc.ABC, Generic[_Record], AsyncIterator[_Record]):
         return self
 
     async def __anext__(self) -> _Record:
-        document = cast(dict[str, Any], await self._cursor.__anext__())  # noqa: WPS609
+        document = cast(dict[str, Any], await self._cursor.__anext__())
         self._last = document.get(_mongo_id_key, document.get(_proto_id_key))
 
         if self._custom_sort_field:

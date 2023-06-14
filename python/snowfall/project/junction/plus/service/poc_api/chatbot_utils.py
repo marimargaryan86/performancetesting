@@ -186,7 +186,7 @@ async def get_flight_status(
     )
 
 
-def home_message() -> str:
+def home_message() -> str:  # noqa: WPS473
     return (
         "Sorry I am unable to understand your request, please choose from then"
         " available commands below"

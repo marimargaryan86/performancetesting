@@ -67,7 +67,7 @@ class TestEncoder(object):
         assert encoder.encode(jwt.Payload())
 
     def test_faulty_algorithm_raises_error(self, private_key: str) -> None:
-        with pytest.raises(TypeError, match="_Ed25519PrivateKey.sign"):
+        with pytest.raises(TypeError, match="Ed25519PrivateKey.sign"):
             jwt.Encoder(private_key=private_key, algorithm="RS256")
 
     def test_faulty_key_raises_error(self) -> None:

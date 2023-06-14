@@ -19,7 +19,6 @@ async def test_result_set(mock_repository: conftest.MockRepository) -> None:
     )
 
     documents = await mock_repository.all_()
-
     documents.limit(3)
 
     assert len([document async for document in documents]) == 3
