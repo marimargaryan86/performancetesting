@@ -4,7 +4,6 @@ import zoneinfo
 import isodate
 import pytest
 from aiofiles import tempfile
-from dateutil import tz
 from google.protobuf import duration_pb2, timestamp_pb2
 
 from snowfall.stdlib.format import protobuf
@@ -190,7 +189,7 @@ def test_protobuf_to_date(
                 minute=5,
                 second=6,
                 microsecond=7,
-                tzinfo=tz.tzoffset("UTC+01:00", 3600),
+                tzinfo=datetime.timezone(datetime.timedelta(seconds=3600), "UTC+01:00"),
             ),
         ),
     ],
@@ -305,7 +304,7 @@ def test_datetime_to_protobuf(
                 minute=5,
                 second=6,
                 microsecond=7,
-                tzinfo=tz.UTC,
+                tzinfo=datetime.UTC,
             ),
             datetime_pb2.DateTime(
                 year=1984,
@@ -349,7 +348,7 @@ def test_datetime_to_protobuf(
                 minute=5,
                 second=6,
                 microsecond=7,
-                tzinfo=tz.tzoffset("CET", 3600),
+                tzinfo=datetime.timezone(datetime.timedelta(seconds=3600), "CET"),
             ),
             datetime_pb2.DateTime(
                 year=1984,

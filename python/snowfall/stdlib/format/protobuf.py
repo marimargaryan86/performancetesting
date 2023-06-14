@@ -7,7 +7,6 @@ from collections.abc import AsyncIterator
 from typing import TYPE_CHECKING, Generic, TypeVar, cast
 
 from aiofiles.threadpool import binary
-from dateutil import tz
 from google.protobuf import (
     any_pb2,
     descriptor,
@@ -132,13 +131,13 @@ def protobuf_to_datetime(
         tzinfo = zoneinfo.ZoneInfo(proto.time_zone.id)
     else:
         delta = datetime.timedelta(seconds=proto.utc_offset.seconds)
-        tzinfo = tz.tzoffset(
+        tzinfo = datetime.timezone(
+            delta,
             "UTC{symbol}{hours:02d}:{minutes:02d}".format(
                 symbol="+" if delta.total_seconds() >= 0 else "-",
                 hours=delta.seconds // 60 * 60,
                 minutes=(delta.seconds // 60) % 60,
             ),
-            delta.total_seconds(),
         )
 
     return datetime.datetime(

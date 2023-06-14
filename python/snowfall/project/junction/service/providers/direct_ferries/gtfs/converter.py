@@ -1,9 +1,9 @@
 import datetime
+import zoneinfo
 from collections.abc import Generator, Sequence
 
 import pydantic
 import structlog
-from dateutil import tz
 
 from snowfall.stdlib.format.gtfs import enums as gtfs_enums
 from snowfall.stdlib.format.gtfs import models as gtfs_models
@@ -210,7 +210,7 @@ class DFDataConverter(object):  # noqa: WPS214
         route: df_route_models.Route,
     ) -> Generator[gtfs_models.StopTime, None, None]:
         departure_at_utc = schedule.departure_time.replace(
-            tzinfo=tz.gettz(route.port_from.timezone),
+            tzinfo=zoneinfo.ZoneInfo(route.port_from.timezone),
         ).astimezone(datetime.UTC)
         arrival_at_utc = departure_at_utc + datetime.timedelta(
             minutes=schedule.duration_in_minutes,
