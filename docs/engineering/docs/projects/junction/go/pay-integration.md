@@ -1,4 +1,4 @@
-# Go - Pay Integration Flow
+# Pay Integration Flow
 
 so lets explain the Go - Pay integration process below.
 

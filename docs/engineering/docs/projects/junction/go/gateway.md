@@ -1,4 +1,4 @@
-# Junction Go Gateway
+# Gateway
 
 ## Why?
 
