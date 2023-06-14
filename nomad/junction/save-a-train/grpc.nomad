@@ -129,7 +129,7 @@ EOH
         image = var.docker_image
         ports = ["grpc", "prometheus"]
         args = [
-          "serve",
+          "grpc",
         ]
 
         auth {
