@@ -76,31 +76,27 @@ class Client(object):
         if not self._config:
             return
 
-        current_time_ms = 1.0
-        reset_time_ms = 0
+        cutoff_time_ms = (time.time() + timeout) * SECOND
 
-        while reset_time_ms < current_time_ms + timeout * SECOND:
-            limits = await self._get_rate_limits(hits)
+        limit = await self._get_rate_limits(hits)
+        while limit.status != Status.UNDER_LIMIT:
+            if limit.reset_time >= cutoff_time_ms:
+                structlog.get_logger(__name__).warning(
+                    "Timeout occurred for %s (%ss)",
+                    self._config["name"],
+                    timeout,
+                )
+                raise asyncio.TimeoutError()
 
-            if limits.status == Status.UNDER_LIMIT:
-                return  # Success response
-
+            time_diff_s = (limit.reset_time / SECOND) - time.time()
             structlog.get_logger(__name__).info(
-                "Rate limit was reached for %s",
+                "Rate limit was reached for %s (retry after %.1fs)",
                 self._config["name"],
+                time_diff_s,
             )
+            await asyncio.sleep(time_diff_s)
 
-            reset_time_ms = limits.reset_time
-            current_time_ms = time.time() * SECOND
-            time_diff_ms = reset_time_ms - current_time_ms
-            await asyncio.sleep(time_diff_ms / SECOND)
-
-        structlog.get_logger(__name__).warning(
-            "Timeout occurred for %s (%ss)",
-            self._config["name"],
-            timeout,
-        )
-        raise asyncio.TimeoutError()
+            limit = await self._get_rate_limits(hits)
 
     async def _get_rate_limits(self, hits: int) -> RateLimitResp:
         rate_limit_req = RateLimitReq(hits=hits, unique_key="1", **self._config)
