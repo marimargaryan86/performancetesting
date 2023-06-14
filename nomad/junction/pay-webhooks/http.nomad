@@ -126,7 +126,6 @@ job "pay-webhooks-http" {
 
     task "http" {
       driver = "docker"
-
       vault {
         policies = ["pay-webhooks-${var.environment}"]
       }
