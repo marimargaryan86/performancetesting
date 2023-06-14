@@ -1,3 +1,7 @@
+variables:
+  BAZEL_REMOTE_S3_ACCESS_KEY_ID: $PANTS_CACHE_S3_ACCESS_KEY_ID
+  BAZEL_REMOTE_S3_SECRET_ACCESS_KEY: $PANTS_CACHE_S3_SECRET_ACCESS_KEY
+
 pants:setup:
   stage: setup
   interruptible: true
@@ -32,6 +36,14 @@ pants:setup:
     PANTS_DOCKER_DEFAULT_REPOSITORY: "${CI_PROJECT_PATH}/service/{directory}"
     PANTS_DOCKER_REGISTRIES: "{'${CI_REGISTRY}': {'address': '${CI_REGISTRY}', 'default': True}}"
     SCIE_BASE: "${CI_PROJECT_DIR}/.cache/scie"
+  services:
+    - name: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/buchgr/bazel-remote-cache:v2.4.1"
+      alias: bazel-remote
+      variables:
+        BAZEL_REMOTE_MAX_SIZE: 30
+        BAZEL_REMOTE_S3_AUTH_METHOD: access_key
+        BAZEL_REMOTE_S3_BUCKET: snowfall-gitlab-bazel-remote-cache
+        BAZEL_REMOTE_S3_ENDPOINT: s3.eu-west-2.amazonaws.com
   cache:
     key: "python-3.11.3-go-1.19.7-scie-0.8.2-pants-2.16.0rc5-0"
     when: always

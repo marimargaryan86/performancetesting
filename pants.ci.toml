@@ -5,7 +5,7 @@ cache_content_behavior = "defer"
 remote_cache_read = true
 remote_cache_rpc_timeout_millis = 15000
 remote_cache_write = true
-remote_store_address = "grpc://10.0.135.64:9092"
+remote_store_address = "grpc://bazel-remote:9092"
 watch_filesystem = false
 
 [anonymous-telemetry]
