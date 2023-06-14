@@ -101,7 +101,7 @@ async def timetables_from_routes(
             days=_DEFAULT_REQUEST_DATE_INTERVAL_DAYS,
         )
 
-    current_datetime = datetime.datetime.now()
+    current_datetime = datetime.datetime.now(tz=datetime.UTC)
 
     return await _request_by_chunks(
         [

@@ -106,7 +106,7 @@ def _init_test_driver(driver: CustomerPrimaryBuilder) -> None:  # noqa: WPS213
     driver.email("testcheck@carnect.com")
     age = datetime.timedelta(days=365 * DRIVER_AGE + 150)
     driver.birth_date(
-        datetime.datetime.now().date() - age,
+        datetime.datetime.now(tz=datetime.UTC).date() - age,
     )
     driver.gender(CustomerTypeGender.MALE)
     driver.language("EN")

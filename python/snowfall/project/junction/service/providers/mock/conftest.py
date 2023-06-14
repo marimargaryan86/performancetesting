@@ -49,10 +49,10 @@ def generate_offer_search(
                                     time_zone="UTC",
                                 ),
                                 departure_at=protobuf.datetime_to_protobuf(
-                                    datetime.datetime.now(),
+                                    datetime.datetime.now(tz=datetime.UTC),
                                 ),
                                 arrival_at=protobuf.datetime_to_protobuf(
-                                    datetime.datetime.now(),
+                                    datetime.datetime.now(tz=datetime.UTC),
                                 ),
                                 type=common_pb2.Schedule.TYPE_AIR,
                             )

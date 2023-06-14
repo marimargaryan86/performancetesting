@@ -38,7 +38,7 @@ class PaymentsRepository(
                 "$set": {
                     "status": status,
                     "status_description": status_description,
-                    "updated_at": datetime.datetime.utcnow(),
+                    "updated_at": datetime.datetime.now(tz=datetime.UTC),
                 },
             },
         )

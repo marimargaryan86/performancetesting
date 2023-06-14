@@ -191,7 +191,8 @@ class OfferOrchestrator(object):
                     currency_code=trip_candidate_search.currency_code,
                     pay_company_id=trip_candidate_search.pay_company_id,
                     expires_at=protobuf.datetime_to_protobuf(
-                        datetime.datetime.now() + datetime.timedelta(hours=2),
+                        datetime.datetime.now(tz=datetime.UTC)
+                        + datetime.timedelta(hours=2),
                     ),
                     trip=offer_models_pb2.TripOfferSearch(
                         passengers=trip_candidate_search.passengers,

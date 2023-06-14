@@ -174,6 +174,6 @@ def order_details_by_date(
         key=lambda leg: datetime.datetime.strptime(
             leg["departureAt"],
             "%A %d %b %Y %H:%M",
-        ),
+        ).replace(tzinfo=datetime.UTC),
     )
     return ordered_details

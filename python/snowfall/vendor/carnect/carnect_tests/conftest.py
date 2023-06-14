@@ -60,7 +60,8 @@ async def offers(
     rq.add_driver_age(DRIVER_AGE)
     rental_core = rq.get_rental_core()
     pickup_datetime = datetime.datetime.combine(
-        datetime.datetime.now().date() + datetime.timedelta(days=PICKUP_DATE_IN_DAYS),
+        datetime.datetime.now(tz=datetime.UTC).date()
+        + datetime.timedelta(days=PICKUP_DATE_IN_DAYS),
         datetime.time(hour=NOON_HOURS),
     )
     rental_core.pick_up_date(pickup_datetime)

@@ -64,7 +64,7 @@ async def test_that_transactions_returns_error_response_when_invalid_transaction
         "booking_id": 0,
         "agreement_id": 0,
         "outbound": {
-            "date": datetime.date.today().strftime("%Y-%m-%d"),
+            "date": datetime.datetime.now(tz=datetime.UTC).date().strftime("%Y-%m-%d"),
             "destination_id": 0,
             "origin_id": 0,
             "schedule_id": 0,
@@ -72,7 +72,7 @@ async def test_that_transactions_returns_error_response_when_invalid_transaction
             "passengers": [{"seat_id": 0, "passenger_type_id": 1, "seat_type_id": 0}],
         },
         "inbound": {
-            "date": datetime.date.today().strftime("%Y-%m-%d"),
+            "date": datetime.datetime.now(tz=datetime.UTC).date().strftime("%Y-%m-%d"),
             "destination_id": 0,
             "origin_id": 0,
             "schedule_id": 0,

@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime
 
 import grpc
 
@@ -62,7 +62,7 @@ class PaymentsService(service.Service, payments_pb2_grpc.PaymentsServiceServicer
                 status=models_pb2.Status.STATUS_PENDING,
                 external_reference_id=cc_payment.identifier,
                 created_at=protobuf.datetime_to_protobuf(
-                    datetime.now(),
+                    datetime.datetime.now(tz=datetime.UTC),
                 ),
                 created_by=payment.created_by,
                 payment_due_date=protobuf.date_to_protobuf(cc_payment.payment_date),

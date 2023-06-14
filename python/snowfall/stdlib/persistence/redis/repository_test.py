@@ -28,7 +28,10 @@ async def test_record_can_be_created(
     repository = TestRepository(
         client=redis.Client(redis_client),
     )
-    record = TestRecord(test_id="test", created_at=datetime.datetime.now())
+    record = TestRecord(
+        test_id="test",
+        created_at=datetime.datetime.now(tz=datetime.UTC),
+    )
     key = await repository.store(record)
     stored_record = await repository.fetch(key)
     assert record == stored_record

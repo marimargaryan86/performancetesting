@@ -63,7 +63,9 @@ class Quote(object):
         )
 
     def _calculate_expires_at(self) -> datetime.datetime:
-        return datetime.datetime.now() + datetime.timedelta(minutes=_EXPIRATION_MINUTES)
+        return datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(
+            minutes=_EXPIRATION_MINUTES,
+        )
 
     def _calculate_fx_buffer_rate(self, buffer_rate: float) -> float:
         return self._rate * buffer_rate / 100

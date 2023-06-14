@@ -34,7 +34,7 @@ class AuthClient(object):
     def _is_token_valid(self) -> bool:
         return bool(
             self._auth_response
-            and self._auth_response.expires_at > datetime.datetime.now(),
+            and self._auth_response.expires_at > datetime.datetime.now(tz=datetime.UTC),
         )
 
     async def _create_token(self) -> AuthServiceResponse:
@@ -44,7 +44,7 @@ class AuthClient(object):
             "grant_type": "client_credentials",
         }
 
-        start = datetime.datetime.now()
+        start = datetime.datetime.now(tz=datetime.UTC)
 
         response = await self._http_client.post(
             url="{0}/oauth2/token".format(self._api_url),

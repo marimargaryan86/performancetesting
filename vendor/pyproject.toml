@@ -43,7 +43,7 @@ select = [
     "C90", # mccabe
     "COM", # flake8-commas
     #"D",
-    #"DTZ",
+    "DTZ", # flake8-datetimez
     "E", # pycodestyle
     #"EM",
     "ERA", # eradicate

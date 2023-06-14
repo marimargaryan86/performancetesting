@@ -1,5 +1,5 @@
+import datetime
 from collections.abc import Sequence
-from datetime import datetime, timedelta
 from unittest import mock
 
 import pytest
@@ -139,10 +139,10 @@ async def valid_conversion(
         id="ed7b9b96-6c5a-4a6b-adee-2af14564e42b",
         external_id="f8144974-530f-477f-bbe1-c2eaedddec88",
         settlement_date=protobuf.datetime_to_protobuf(
-            datetime.now() - timedelta(hours=1),
+            datetime.datetime.now(tz=datetime.UTC) - datetime.timedelta(hours=1),
         ),
         created_at=protobuf.datetime_to_protobuf(
-            datetime.now() - timedelta(hours=2),
+            datetime.datetime.now(tz=datetime.UTC) - datetime.timedelta(hours=2),
         ),
         buy_amount=usd.protobuf(),
         sell_amount=gbp.protobuf(),

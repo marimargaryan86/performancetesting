@@ -169,7 +169,9 @@ class BookingHandler(object):
                     gender=models.gender_from_proto(passenger.gender),
                     type=criteria.get_passenger_type(
                         protobuf.protobuf_to_date(passenger.date_of_birth),
-                        datetime.date.today(),  # TODO: date of travel
+                        datetime.datetime.now(
+                            tz=datetime.UTC,
+                        ).date(),  # TODO: date of travel
                     ),
                     birth_date=protobuf.protobuf_to_date(passenger.date_of_birth),
                     traveler_document=models.traveler_document_from_proto(

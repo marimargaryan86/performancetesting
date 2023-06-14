@@ -250,10 +250,10 @@ def generate_offer(identifier: str) -> offers_pb2.OfferAggregate:
                                 origin=generate_point(string.uuid()),
                                 destination=generate_point(string.uuid()),
                                 departure_at=protobuf.datetime_to_protobuf(
-                                    datetime.datetime.now(),
+                                    datetime.datetime.now(tz=datetime.UTC),
                                 ),
                                 arrival_at=protobuf.datetime_to_protobuf(
-                                    datetime.datetime.now(),
+                                    datetime.datetime.now(tz=datetime.UTC),
                                 ),
                             ),
                         ],
@@ -267,7 +267,9 @@ def generate_offer(identifier: str) -> offers_pb2.OfferAggregate:
                         segment_sequence=1,
                     ),
                 ],
-                expires_at=protobuf.datetime_to_protobuf(datetime.datetime.now()),
+                expires_at=protobuf.datetime_to_protobuf(
+                    datetime.datetime.now(tz=datetime.UTC),
+                ),
             ),
             offers_pb2.OfferGroup(
                 id=OFFER_GROUPS[1],
@@ -319,10 +321,10 @@ def generate_offer(identifier: str) -> offers_pb2.OfferAggregate:
                                 origin=generate_point(string.uuid()),
                                 destination=generate_point(string.uuid()),
                                 departure_at=protobuf.datetime_to_protobuf(
-                                    datetime.datetime.now(),
+                                    datetime.datetime.now(tz=datetime.UTC),
                                 ),
                                 arrival_at=protobuf.datetime_to_protobuf(
-                                    datetime.datetime.now(),
+                                    datetime.datetime.now(tz=datetime.UTC),
                                 ),
                             ),
                         ],
@@ -336,7 +338,9 @@ def generate_offer(identifier: str) -> offers_pb2.OfferAggregate:
                         segment_sequence=1,
                     ),
                 ],
-                expires_at=protobuf.datetime_to_protobuf(datetime.datetime.now()),
+                expires_at=protobuf.datetime_to_protobuf(
+                    datetime.datetime.now(tz=datetime.UTC),
+                ),
             ),
         ],
     )
@@ -458,10 +462,14 @@ def generate_journey(
                                                     string.uuid(),
                                                 ),
                                                 departure_at=protobuf.datetime_to_protobuf(
-                                                    datetime.datetime.now(),
+                                                    datetime.datetime.now(
+                                                        tz=datetime.UTC,
+                                                    ),
                                                 ),
                                                 arrival_at=protobuf.datetime_to_protobuf(
-                                                    datetime.datetime.now(),
+                                                    datetime.datetime.now(
+                                                        tz=datetime.UTC,
+                                                    ),
                                                 ),
                                             ),
                                         ],
@@ -526,10 +534,10 @@ def generate_leg(identifier: str) -> models_pb2.Leg:
         origin=generate_point(string.uuid()),
         destination=generate_point(string.uuid()),
         departure_at=protobuf.datetime_to_protobuf(
-            datetime.datetime.now(),
+            datetime.datetime.now(tz=datetime.UTC),
         ),
         arrival_at=protobuf.datetime_to_protobuf(
-            datetime.datetime.now(),
+            datetime.datetime.now(tz=datetime.UTC),
         ),
     )
 

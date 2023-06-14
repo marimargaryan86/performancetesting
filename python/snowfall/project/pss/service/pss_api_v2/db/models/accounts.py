@@ -32,5 +32,9 @@ class AccountForgottenPassword(Base):
     id = Column(Integer, primary_key=True)
     account_id = Column(Integer, nullable=False)
     token = Column(Integer, unique=True, nullable=False)
-    created = Column(DateTime, nullable=False, default=datetime.datetime.utcnow())
+    created = Column(
+        DateTime,
+        nullable=False,
+        default=datetime.datetime.now(tz=datetime.UTC),
+    )
     used = Column(Boolean, nullable=False, default=False)

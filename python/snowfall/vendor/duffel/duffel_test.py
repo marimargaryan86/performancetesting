@@ -69,14 +69,16 @@ async def test_request_round_trip_offers(duffel_client: client.DuffelClient) -> 
         OfferRequestSlice(
             destination="JFK",
             origin="LHR",
-            departure_date=datetime.date.today() + datetime.timedelta(days=10),
+            departure_date=datetime.datetime.now(tz=datetime.UTC).date()
+            + datetime.timedelta(days=10),
         ),
     )
     offer_request_create.add_slice(
         OfferRequestSlice(
             destination="LHR",
             origin="JFK",
-            departure_date=datetime.date.today() + datetime.timedelta(days=15),
+            departure_date=datetime.datetime.now(tz=datetime.UTC).date()
+            + datetime.timedelta(days=15),
         ),
     )
 
@@ -106,7 +108,8 @@ async def test_order_create(duffel_client: client.DuffelClient) -> None:
         OfferRequestSlice(
             destination="JFK",
             origin="LHR",
-            departure_date=datetime.date.today() + datetime.timedelta(days=14),
+            departure_date=datetime.datetime.now(tz=datetime.UTC).date()
+            + datetime.timedelta(days=14),
         ),
     )
     offers = await duffel_client.create_offer_request(offer_request_create.build())
@@ -123,13 +126,15 @@ async def test_order_create(duffel_client: client.DuffelClient) -> None:
             gender="m",
             family_name="TRAVEL",
             email="conelia.corde@duffel.com",
-            born_on=datetime.date.today() - datetime.timedelta(weeks=1300),
+            born_on=datetime.datetime.now(tz=datetime.UTC).date()
+            - datetime.timedelta(weeks=1300),
             identity_documents=[
                 IdentityDocument(
                     unique_identifier="19KL56147",
                     document_type="passport",
                     issuing_country_code="GB",
-                    expires_on=datetime.date.today() + datetime.timedelta(weeks=210),
+                    expires_on=datetime.datetime.now(tz=datetime.UTC).date()
+                    + datetime.timedelta(weeks=210),
                 ),
             ],
         ),
@@ -156,7 +161,8 @@ async def test_offer_after_order_create(  # noqa: WPS210,WPS217
         OfferRequestSlice(
             destination="JFK",
             origin="LHR",
-            departure_date=datetime.date.today() + datetime.timedelta(days=14),
+            departure_date=datetime.datetime.now(tz=datetime.UTC).date()
+            + datetime.timedelta(days=14),
         ),
     )
     offers = await duffel_client.create_offer_request(offer_request_create.build())
@@ -168,7 +174,8 @@ async def test_offer_after_order_create(  # noqa: WPS210,WPS217
                 unique_identifier="19KL56147",
                 document_type="passport",
                 issuing_country_code="GB",
-                expires_on=datetime.date.today() + datetime.timedelta(weeks=210),
+                expires_on=datetime.datetime.now(tz=datetime.UTC).date()
+                + datetime.timedelta(weeks=210),
             ),
         ]
     else:
@@ -185,7 +192,8 @@ async def test_offer_after_order_create(  # noqa: WPS210,WPS217
             gender="m",
             family_name="TRAVEL",
             email="conelia.corde@duffel.com",
-            born_on=datetime.date.today() - datetime.timedelta(weeks=1300),
+            born_on=datetime.datetime.now(tz=datetime.UTC).date()
+            - datetime.timedelta(weeks=1300),
             identity_documents=identity_documents,
         ),
     )
@@ -214,7 +222,8 @@ async def test_offer_after_order_create(  # noqa: WPS210,WPS217
                 unique_identifier="19KL56147",
                 document_type="passport",
                 issuing_country_code="GB",
-                expires_on=datetime.date.today() + datetime.timedelta(weeks=210),
+                expires_on=datetime.datetime.now(tz=datetime.UTC).date()
+                + datetime.timedelta(weeks=210),
             ),
         ]
     else:
@@ -231,7 +240,8 @@ async def test_offer_after_order_create(  # noqa: WPS210,WPS217
             gender="m",
             family_name="TRAVEL",
             email="conelia.corde@duffel.com",
-            born_on=datetime.date.today() - datetime.timedelta(weeks=1300),
+            born_on=datetime.datetime.now(tz=datetime.UTC).date()
+            - datetime.timedelta(weeks=1300),
             identity_documents=identity_documents,
         ),
     )
@@ -355,7 +365,8 @@ async def test_order_create_with_infant(duffel_client: client.DuffelClient) -> N
         OfferRequestSlice(
             destination="JFK",
             origin="LHR",
-            departure_date=datetime.date.today() + datetime.timedelta(days=14),
+            departure_date=datetime.datetime.now(tz=datetime.UTC).date()
+            + datetime.timedelta(days=14),
         ),
     )
     offers = await duffel_client.create_offer_request(offer_request_create.build())
@@ -373,7 +384,8 @@ async def test_order_create_with_infant(duffel_client: client.DuffelClient) -> N
             gender="m",
             family_name="TRAVEL",
             email="conelia.corde@duffel.com",
-            born_on=datetime.date.today() - datetime.timedelta(weeks=1300),
+            born_on=datetime.datetime.now(tz=datetime.UTC).date()
+            - datetime.timedelta(weeks=1300),
         ),
     )
     order_request.add_passenger(
@@ -385,7 +397,8 @@ async def test_order_create_with_infant(duffel_client: client.DuffelClient) -> N
             gender="m",
             family_name="TRAVEL",
             email="conelia.corde@duffel.com",
-            born_on=datetime.date.today() - datetime.timedelta(weeks=52),
+            born_on=datetime.datetime.now(tz=datetime.UTC).date()
+            - datetime.timedelta(weeks=52),
         ),
     )
     order_request.add_payment(

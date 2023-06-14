@@ -20,7 +20,8 @@ _DEBERCBS_FRPARPGB_CRITERIA = amqp_pb2.Criteria(
     origin_ids=["DEBERCBS"],
     destination_ids=["FRPARPGB"],
     outbound_departure=protobuf.date_to_protobuf(
-        datetime.date.today() + datetime.timedelta(days=_DEPARTURE_IN_DAYS),
+        datetime.datetime.now(tz=datetime.UTC).date()
+        + datetime.timedelta(days=_DEPARTURE_IN_DAYS),
     ),
     passengers_age=[40],
     locale="en",

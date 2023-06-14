@@ -19,9 +19,12 @@ async def test_avail_rate(
     rq.rate_query_type(RateQueryType.LIVE)
     rq.rate_query_parameter_type("4")
     rental_core = rq.get_rental_core()
-    rental_core.pick_up_date(datetime.datetime.now() + datetime.timedelta(days=10))
+    rental_core.pick_up_date(
+        datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(days=10),
+    )
     rental_core.return_date(
-        datetime.datetime.now() + datetime.timedelta(days=15),  # noqa: WPS432
+        datetime.datetime.now(tz=datetime.UTC)
+        + datetime.timedelta(days=15),  # noqa: WPS432
     )
     rental_core.add_pick_up_location("LHR", "2")
     rental_core.return_location("LHR", "2")

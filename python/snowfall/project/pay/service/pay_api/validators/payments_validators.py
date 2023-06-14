@@ -108,7 +108,7 @@ def _validate_prerequisite(
                 ),
             ],
         )
-    if payment_at < datetime.datetime.now().date():
+    if payment_at < datetime.datetime.now(tz=datetime.UTC).date():
         errors.append(
             messages.models.Error(
                 status=str(status.HTTP_400_BAD_REQUEST),

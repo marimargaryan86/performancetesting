@@ -44,7 +44,7 @@ async def calculate_serviceable_dates(
     calendars: AsyncIterable[models.Calendar],
     calendar_dates: AsyncIterable[models.CalendarDate],
 ) -> set[datetime.date]:
-    now_date = datetime.date.today()
+    now_date = datetime.datetime.now(tz=datetime.UTC).date()
     service_dates: set[datetime.date] = {
         date async for date in _yield_calendars(calendars, now_date)
     }

@@ -19,7 +19,7 @@ async def sbb_plugin(  # noqa: WPS210
     dataset: Dataset,
 ) -> Iterator[dict[str, Any]]:
     root_url = dataset["url"].removesuffix("/dataset")
-    curr_year = datetime.date.today().year
+    curr_year = datetime.datetime.now(tz=datetime.UTC).year
     pattern = r'<a href="(.+?)">.*Fahrplan\s*({curr}|{next}).*GTFS.*</a>'.format(
         curr=curr_year,
         next=curr_year + 1,

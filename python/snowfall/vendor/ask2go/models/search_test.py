@@ -5,7 +5,7 @@ from snowfall.vendor.ask2go.models import search
 
 
 def test_inbound_and_outbound_are_datetimes() -> None:
-    now = datetime.datetime.now()
+    now = datetime.datetime.now(tz=datetime.UTC)
     search_criteria = search.CreateSearchCriteria(
         origin_iata="ARN",
         destination_iata="LHR",

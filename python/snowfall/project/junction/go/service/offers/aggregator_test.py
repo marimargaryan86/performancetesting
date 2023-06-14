@@ -76,7 +76,7 @@ _OFFER_SEARCHES = (
     ),
 )
 
-_OFFER_RESULT_DATE = datetime.datetime(2000, 1, 1)
+_OFFER_RESULT_DATE = datetime.datetime(2000, 1, 1, tzinfo=datetime.UTC)
 _OFFER_RESULT_EXPIRY = _OFFER_RESULT_DATE + datetime.timedelta(days=1)
 _OFFER_RESULT_EXPIRY_PROTO = protobuf.datetime_to_protobuf(_OFFER_RESULT_EXPIRY)
 
@@ -270,6 +270,9 @@ class TestAggregator(object):
         expected_sorted = [sorted(aggregate) for aggregate in expected]
         async for aggregate in offer_aggregate_collection.find():
             assert sorted(aggregate["offer_result_ids"]) in expected_sorted
-            assert aggregate["expires_at"] == _OFFER_RESULT_EXPIRY
+            assert (
+                aggregate["expires_at"].replace(tzinfo=datetime.UTC)
+                == _OFFER_RESULT_EXPIRY
+            )
 
         assert await offer_aggregate_collection.count_documents({}) == len(expected)

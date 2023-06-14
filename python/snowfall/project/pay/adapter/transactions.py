@@ -53,7 +53,9 @@ class DictClient(Client):
             id=string.uuid(),
             external_reference_id=external_reference,
             invoice_reference_id=invoice_reference,
-            created_at=protobuf.datetime_to_protobuf(datetime.datetime.now()),
+            created_at=protobuf.datetime_to_protobuf(
+                datetime.datetime.now(tz=datetime.UTC),
+            ),
             conversion_id=string.uuid(),
             amounts=quotation.amounts,
             rates=quotation.rates,

@@ -28,7 +28,7 @@ class RatesRepository(  # noqa: WPS215
         return await super().insert_many(documents)
 
     async def find_outdated_rates(self) -> resultset.ResultSet[models_pb2.Rate]:
-        date_threshold = datetime.datetime.now() - datetime.timedelta(
+        date_threshold = datetime.datetime.now(tz=datetime.UTC) - datetime.timedelta(
             days=VALID_RATE_DAYS,
         )
 

@@ -29,7 +29,8 @@ async def test_offer_request(
         OfferRequestSlice(
             destination="JFK",
             origin="LHR",
-            departure_date=datetime.date.today() + datetime.timedelta(days=10),
+            departure_date=datetime.datetime.now(tz=datetime.UTC).date()
+            + datetime.timedelta(days=10),
         ),
     )
     json_res = conftest.load_file_fixture("offer_request_response.json")
@@ -139,13 +140,15 @@ async def test_order_create(
             gender="m",
             family_name="TRAVEL",
             email="conelia.corde@duffel.com",
-            born_on=datetime.date.today() - datetime.timedelta(weeks=1300),
+            born_on=datetime.datetime.now(tz=datetime.UTC).date()
+            - datetime.timedelta(weeks=1300),
             identity_documents=[
                 IdentityDocument(
                     unique_identifier="19KL56147",
                     document_type="passport",
                     issuing_country_code="GB",
-                    expires_on=datetime.date.today() + datetime.timedelta(weeks=210),
+                    expires_on=datetime.datetime.now(tz=datetime.UTC).date()
+                    + datetime.timedelta(weeks=210),
                 ),
             ],
         ),

@@ -1,5 +1,5 @@
+import datetime
 from collections.abc import Mapping, Sequence
-from datetime import datetime, timedelta
 from typing import Any
 
 import httpx
@@ -20,10 +20,10 @@ class ICouponClient(object):
         self._client = client or httpx.AsyncClient()
         self._client.base_url = httpx.URL(api_url)
         self._token = None
-        self._token_expires = datetime.utcnow()
+        self._token_expires = datetime.datetime.now(tz=datetime.UTC)
 
     async def create_campaign(self, quantity: int) -> Sequence[Mapping[str, Any]]:
-        now = datetime.utcnow()
+        now = datetime.datetime.now(tz=datetime.UTC)
 
         response = await self._client.request(
             method="POST",
@@ -32,8 +32,8 @@ class ICouponClient(object):
                 "customerCode": "SNO",
                 "voucherTypeRef": "GR20EUR",
                 "reference": string.uuid(),
-                "validFrom": (now + timedelta(minutes=5)).isoformat(),
-                "validTo": (now + timedelta(hours=5)).isoformat(),
+                "validFrom": (now + datetime.timedelta(minutes=5)).isoformat(),
+                "validTo": (now + datetime.timedelta(hours=5)).isoformat(),
                 "quantity": quantity,
             },
             headers={
@@ -47,7 +47,7 @@ class ICouponClient(object):
         return response.json()["barcodes"]
 
     async def _get_token(self) -> str:
-        if datetime.utcnow() < self._token_expires:
+        if datetime.datetime.now(tz=datetime.UTC) < self._token_expires:
             return self._token  # type: ignore[return-value]
         response = await self._client.request(
             method="POST",
@@ -60,8 +60,8 @@ class ICouponClient(object):
             headers={"Content-Type": "application/x-www-form-urlencoded"},
         )
         self._token = response.json()["access_token"]
-        self._token_expires = datetime.strptime(
+        self._token_expires = datetime.datetime.strptime(
             response.json()[".expires"],
             "%a, %d %b %Y %H:%M:%S %Z",
-        )
+        ).replace(tzinfo=datetime.UTC)
         return self._token  # type: ignore[return-value]

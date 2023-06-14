@@ -154,7 +154,7 @@ class UsersRepository(
                         password.encode(),
                         bcrypt.gensalt(),
                     ).decode(),
-                    "updated_at": datetime.datetime.utcnow(),
+                    "updated_at": datetime.datetime.now(tz=datetime.UTC),
                 },
             },
             upsert=False,
@@ -179,7 +179,7 @@ class UsersRepository(
         input_dict: Mapping[str, Any],
     ) -> None:
         user = dict(copy.deepcopy(input_dict))
-        user["updated_at"] = datetime.datetime.utcnow()
+        user["updated_at"] = datetime.datetime.now(tz=datetime.UTC)
         await self._execute(
             self._collection.update_one,
             {_ID_KEY: user_id},
@@ -345,7 +345,10 @@ class VouchersRepository(
         )
         if not voucher:
             return None
-        if protobuf.protobuf_to_date(voucher.expires_at) < datetime.date.today():
+
+        now = datetime.datetime.now(tz=datetime.UTC)
+
+        if protobuf.protobuf_to_date(voucher.expires_at) < now.date():
             valid_status = models_pb2.Voucher.Status.STATUS_VALID
             if voucher.status == valid_status:
                 voucher.status = models_pb2.Voucher.Status.STATUS_EXPIRED
@@ -364,7 +367,9 @@ class VouchersRepository(
         )
         if not voucher:
             return None
-        if protobuf.protobuf_to_date(voucher.expires_at) < datetime.date.today():
+
+        now = datetime.datetime.now(tz=datetime.UTC)
+        if protobuf.protobuf_to_date(voucher.expires_at) < now.date():
             return None
         return voucher
 
@@ -380,7 +385,7 @@ class VouchersRepository(
                 "$set": {
                     "status": models_pb2.Voucher.Status.STATUS_USED,
                     "payment_intent_id": payment_intent_id,
-                    "updated_at": datetime.datetime.utcnow(),
+                    "updated_at": datetime.datetime.now(tz=datetime.UTC),
                 },
             },
             upsert=False,
@@ -397,7 +402,7 @@ class VouchersRepository(
                 "$set": {
                     "status": models_pb2.Voucher.Status.STATUS_VALID,
                     "payment_intent_id": "",
-                    "updated_at": datetime.datetime.utcnow(),
+                    "updated_at": datetime.datetime.now(tz=datetime.UTC),
                 },
             },
             upsert=False,
@@ -445,7 +450,7 @@ class NotificationTokensRepository(
             {
                 "$set": {
                     "notification_token": notification_token,
-                    "updated_at": datetime.datetime.utcnow(),
+                    "updated_at": datetime.datetime.now(tz=datetime.UTC),
                 },
             },
             upsert=False,
@@ -476,7 +481,7 @@ class UserGroupsRepository(
         input_dict: Mapping[str, Any],
     ) -> None:
         group = dict(copy.deepcopy(input_dict))
-        group["updated_at"] = datetime.datetime.utcnow()
+        group["updated_at"] = datetime.datetime.now(tz=datetime.UTC)
         await self._execute(
             self._collection.update_one,
             {_ID_KEY: group_id, "user_id": user_id},
@@ -502,8 +507,8 @@ class UserGroupsRepository(
     ) -> None:
         member = dict(copy.deepcopy(input_dict))
         member["_id"] = member_id
-        member["created_at"] = datetime.datetime.utcnow()
-        member["updated_at"] = datetime.datetime.utcnow()
+        member["created_at"] = datetime.datetime.now(tz=datetime.UTC)
+        member["updated_at"] = datetime.datetime.now(tz=datetime.UTC)
         # TODO: check somehow for limit of members from env_var
         await self._execute(
             self._collection.update_one,
@@ -520,7 +525,7 @@ class UserGroupsRepository(
     ) -> None:
         member = dict(copy.deepcopy(input_dict))
         member["_id"] = member_id
-        member["updated_at"] = datetime.datetime.utcnow()
+        member["updated_at"] = datetime.datetime.now(tz=datetime.UTC)
         await self._execute(
             self._collection.update_one,
             filter={

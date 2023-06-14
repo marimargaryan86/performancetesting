@@ -127,8 +127,10 @@ class AccountsService(object):  # noqa: WPS214
                 "Token: {0} already used".format(account_forgotten_password.token),
             )
 
-        now = datetime.datetime.utcnow()
-        time_delta = now - account_forgotten_password.created
+        now = datetime.datetime.now(tz=datetime.UTC)
+        time_delta = now - account_forgotten_password.created.replace(
+            tzinfo=datetime.UTC,
+        )
         if time_delta.seconds > self._token_expiry_length_seconds:
             raise AccountForgottenPasswordTokenExpiredError(
                 "Token: {0} has expired".format(account_forgotten_password.token),

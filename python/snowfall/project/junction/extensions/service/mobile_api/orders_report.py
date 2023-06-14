@@ -66,7 +66,9 @@ async def _generate_report(  # noqa: WPS210
     mobile_orders = orders_repository.find(
         {
             "created_at": {
-                "$gt": datetime.datetime.now() - relativedelta.relativedelta(months=1),
+                "$gt": datetime.datetime.now(
+                    tz=datetime.UTC,
+                ) - relativedelta.relativedelta(months=1),
             },
         },
     )

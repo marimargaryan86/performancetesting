@@ -207,7 +207,7 @@ async def test_that_reset_password_with_unused_token_updates_account_and_sets_to
     account_forgotten_password = AccountForgottenPassword(
         token=token,
         account_id=1,
-        created=datetime.datetime.utcnow(),
+        created=datetime.datetime.now(tz=datetime.UTC),
     )
     account_forgotten_password_repository_mock = create_autospec(
         Repository,
@@ -321,7 +321,10 @@ async def test_that_reset_password_with_expired_token_raises_exception() -> None
         token=token,
         account_id=1,
         used=False,
-        created=datetime.datetime.strptime("2023-01-01 00:00:00", "%Y-%m-%d %H:%M:%S"),
+        created=datetime.datetime.strptime(
+            "2023-01-01 00:00:00",
+            "%Y-%m-%d %H:%M:%S",
+        ).replace(tzinfo=datetime.UTC),
     )
     account_forgotten_password_repository_mock = create_autospec(
         Repository,

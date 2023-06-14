@@ -3,9 +3,9 @@
 OBB has an awkward (seemingly undocumented) API to retrieve their datasets.
 """
 
+import datetime
 import re
 from collections.abc import Iterator
-from datetime import date
 from typing import Any
 
 from httpx import AsyncClient
@@ -31,7 +31,7 @@ def is_old_name(name: str) -> bool:
     if match is None:
         return False
     year = int(match.group(0).strip("_"))
-    return year < date.today().year
+    return year < datetime.datetime.now(tz=datetime.UTC).year
 
 
 async def obb_plugin(  # noqa: WPS210

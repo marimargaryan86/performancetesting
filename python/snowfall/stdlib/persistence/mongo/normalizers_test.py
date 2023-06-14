@@ -61,7 +61,7 @@ def test_latlng_normalizer() -> None:
 
 
 def test_timestamp_normalizer() -> None:
-    expected_dt = datetime.datetime.now()
+    expected_dt = datetime.datetime.now(tz=datetime.UTC)
     expected_ts = timestamp_pb2.Timestamp()
     expected_ts.FromDatetime(expected_dt)
     normalized = normalizers.normalize(
@@ -76,4 +76,4 @@ def test_timestamp_normalizer() -> None:
         timestamp_pb2.Timestamp(),
     )
 
-    assert expected_dt == actual_ts.ToDatetime()
+    assert expected_dt == actual_ts.ToDatetime(tzinfo=datetime.UTC)

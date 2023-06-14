@@ -96,7 +96,7 @@ class DelayWebhookRepository(
                 "$push": {
                     "delay_history": {
                         "delay_minutes": delay_minutes,
-                        "created_at": datetime.datetime.now(),
+                        "created_at": datetime.datetime.now(tz=datetime.UTC),
                     },
                 },
             },

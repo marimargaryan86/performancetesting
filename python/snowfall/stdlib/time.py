@@ -1,8 +1,9 @@
-from datetime import date
+import datetime
 
 
-def date_to_age(date_of_birth: date) -> int:
-    today = date.today()
+def date_to_age(date_of_birth: datetime.date) -> int:
+    today = datetime.datetime.now(tz=datetime.UTC)
+
     return (
         today.year
         - date_of_birth.year

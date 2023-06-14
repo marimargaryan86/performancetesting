@@ -74,10 +74,13 @@ def departure_after(departures_after: Sequence[str]) -> str:
 
 @pytest.fixture(scope="package", autouse=True)
 def departures_after(request: pytest.FixtureRequest) -> Sequence[str]:
-    tomorrow = datetime.date.today() + datetime.timedelta(days=1)
-    departures = request.config.getoption("DEPARTURE_AFTER") or tomorrow.strftime(
-        "%Y-%m-%dT00:00:00.000Z",
-    )
+    departures = request.config.getoption("DEPARTURE_AFTER")
+
+    if not departures:
+        departures = (
+            datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(days=1)
+        ).strftime("%Y-%m-%dT00:00:00.000Z")
+
     return departures.split(",")
 
 

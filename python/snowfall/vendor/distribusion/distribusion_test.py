@@ -85,7 +85,8 @@ async def test_connections_find(
         FindConnectionsCriteria(
             departure_stations=["DEBERCBS"],
             arrival_stations=["FRPARPGB"],
-            departure_date=datetime.date.today() + datetime.timedelta(days=10),
+            departure_date=datetime.datetime.now(tz=datetime.UTC).date()
+            + datetime.timedelta(days=10),
             pax_ages=[30],
             pax=1,
             locale="en",
@@ -104,7 +105,8 @@ async def test_city_connections_find(
         FindConnectionsCriteria(
             departure_stations=["DEBER"],
             arrival_stations=["FRPAR"],
-            departure_date=datetime.date.today() + datetime.timedelta(days=10),
+            departure_date=datetime.datetime.now(tz=datetime.UTC).date()
+            + datetime.timedelta(days=10),
             pax_ages=[30],
             pax=1,
             locale="en",
@@ -123,8 +125,10 @@ async def test_connections_find_round_trip(
         FindConnectionsCriteria(
             departure_stations=["DEBERCBS"],
             arrival_stations=["FRPARPGB"],
-            departure_date=datetime.date.today() + datetime.timedelta(days=10),
-            return_date=datetime.date.today() + datetime.timedelta(days=12),
+            departure_date=datetime.datetime.now(tz=datetime.UTC).date()
+            + datetime.timedelta(days=10),
+            return_date=datetime.datetime.now(tz=datetime.UTC).date()
+            + datetime.timedelta(days=12),
             pax_ages=[30],
             pax=1,
             locale="en",
@@ -150,9 +154,15 @@ async def test_connection_vacancy(
             marketing_carrier="VICA",
             departure_station="DEBERCBS",
             arrival_station="FRPARPGB",
-            departure_time=datetime.datetime.now().replace(hour=10, minute=18)
+            departure_time=datetime.datetime.now(tz=datetime.UTC).replace(
+                hour=10,
+                minute=18,
+            )
             + datetime.timedelta(days=20),
-            arrival_time=datetime.datetime.now().replace(hour=22, minute=30)
+            arrival_time=datetime.datetime.now(tz=datetime.UTC).replace(
+                hour=22,
+                minute=30,
+            )
             + datetime.timedelta(days=20),
             pax=[1],
             passenger_type=["PNOS"],
@@ -188,9 +198,15 @@ async def test_connection_seats(
             marketing_carrier="VICA",
             departure_station="DEBERCBS",
             arrival_station="FRPARPGB",
-            departure_time=datetime.datetime.now().replace(hour=10, minute=18)
+            departure_time=datetime.datetime.now(tz=datetime.UTC).replace(
+                hour=10,
+                minute=18,
+            )
             + datetime.timedelta(days=20),
-            arrival_time=datetime.datetime.now().replace(hour=22, minute=30)
+            arrival_time=datetime.datetime.now(tz=datetime.UTC).replace(
+                hour=22,
+                minute=30,
+            )
             + datetime.timedelta(days=20),
         ),
     )
@@ -218,7 +234,8 @@ async def test_order_create(  # noqa: WPS210
         FindConnectionsCriteria(
             departure_stations=[departure_station],
             arrival_stations=[arrival_station],
-            departure_date=datetime.date.today() + datetime.timedelta(days=10),
+            departure_date=datetime.datetime.now(tz=datetime.UTC).date()
+            + datetime.timedelta(days=10),
             pax_ages=[30],
             pax=1,
             locale="en",

@@ -106,7 +106,9 @@ class SoapLogger(object):
 
         file_name = "-".join(
             [
-                datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S.%f%z"),
+                datetime.datetime.now(tz=datetime.UTC).strftime(
+                    "%Y-%m-%dT%H-%M-%S.%f%z",
+                ),
                 self._operation_name_re.sub(r"\2", operation_name),
                 postfix,
             ],

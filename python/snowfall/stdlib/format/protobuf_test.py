@@ -373,4 +373,4 @@ def test_datetime_to_protobuf_datetime(
 
 def test_datetime_to_protobuf_datetime_with_naive_datetime() -> None:
     with pytest.raises(RuntimeError):
-        protobuf.datetime_to_protobuf_datetime(datetime.datetime.now())
+        protobuf.datetime_to_protobuf_datetime(datetime.datetime.now())  # noqa: DTZ005

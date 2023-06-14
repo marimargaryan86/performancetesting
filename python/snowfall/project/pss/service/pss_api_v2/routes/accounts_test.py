@@ -325,7 +325,10 @@ async def test_cant_reset_password_if_token_expired(
     await account_forgotten_password_factory.create(
         token=token,
         used=False,
-        created=datetime.datetime.strptime("2023-01-01 00:00:00", "%Y-%m-%d %H:%M:%S"),
+        created=datetime.datetime.strptime(
+            "2023-01-01 00:00:00",
+            "%Y-%m-%d %H:%M:%S",
+        ).replace(tzinfo=datetime.UTC),
     )
     payload = {
         "token": token,

@@ -1,5 +1,5 @@
+import datetime
 from copy import deepcopy
-from datetime import date
 from unittest.mock import create_autospec
 
 from snowfall.project.pss.service.pss_api_v2.db.models.accounts import Account
@@ -34,7 +34,7 @@ class TestTransactionValidation:  # noqa: WPS306,WPS214
         directions={"outbound"},
         channel="desktop",
         outbound=TransactionDirectionSchema(
-            date=date.today(),
+            date=datetime.datetime.now(tz=datetime.UTC).date(),
             destination_id=0,
             origin_id=0,
         ),

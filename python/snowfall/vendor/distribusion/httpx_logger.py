@@ -19,7 +19,7 @@ class LogHandler(object):
     def get_file_path(self) -> str:
         return "{log_path}/{date_path}".format(
             log_path=self.log_path,
-            date_path=datetime.datetime.now().date().isoformat(),
+            date_path=datetime.datetime.now(tz=datetime.UTC).date().isoformat(),
         )
 
     def get_file_name(self, url: str, suffix: str) -> str:
@@ -29,7 +29,7 @@ class LogHandler(object):
         else:
             name = url.split("/")[-1]
 
-        rq_time = datetime.datetime.now().time()
+        rq_time = datetime.datetime.now(tz=datetime.UTC).time()
         stamp = rq_time.isoformat(timespec="seconds").replace(":", "-")
 
         return "{stamp}-{name}{suffix}.json".format(

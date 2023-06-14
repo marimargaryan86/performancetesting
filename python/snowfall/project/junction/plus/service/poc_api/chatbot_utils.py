@@ -235,8 +235,8 @@ def filter_future_orders(
             doc["bookings"][0]["details"][0]["legs"][0][  # noqa: WPS219 EXTRA COM
                 "departureAt"
             ],
-        ).replace(tzinfo=None)
-        > datetime.datetime.now()
+        )
+        > datetime.datetime.now(tz=datetime.UTC)
     ]
 
 
@@ -289,8 +289,8 @@ async def auto_checkin(
     if checkin_minutes:
         checkin_from = datetime.datetime.fromisoformat(
             signature["departure_at_iso"],
-        ).replace(tzinfo=None) - datetime.timedelta(minutes=checkin_minutes)
-        if datetime.datetime.now() > checkin_from:
+        ) - datetime.timedelta(minutes=checkin_minutes)
+        if datetime.datetime.now(tz=datetime.UTC) > checkin_from:
             twilio_client.send_message(
                 body="Here is your boarding pass",
                 receiver=mobile,

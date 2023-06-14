@@ -12,7 +12,7 @@ from snowfall.stdlib import h3
 
 
 class _IncrementalTime(object):
-    _current = datetime.datetime.now()
+    _current = datetime.datetime.now(tz=datetime.UTC)
 
     @classmethod
     def get_time(cls) -> datetime.datetime:
@@ -248,8 +248,8 @@ def test_trip_outbound_criteria_are_generated(
                     trip_id=sub_trip["id"],
                     origins=frozenset(sub_trip["org"]),
                     destinations=frozenset(sub_trip["dest"]),
-                    departure=datetime.datetime.now(),
-                    arrival=datetime.datetime.now(),
+                    departure=datetime.datetime.now(tz=datetime.UTC),
+                    arrival=datetime.datetime.now(tz=datetime.UTC),
                     segments=[],
                 )
                 for sub_trip in sub_trips

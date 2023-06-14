@@ -58,7 +58,7 @@ class BookingHandler(object):
                                 tzinfo=datetime.UTC,
                             )
                             if booking_response.date_booked
-                            else datetime.datetime.now()
+                            else datetime.datetime.now(tz=datetime.UTC)
                         ),
                     ),
                 ),

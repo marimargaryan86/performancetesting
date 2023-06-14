@@ -28,7 +28,8 @@ def normalize_date(date: str | None) -> datetime.date | None:
         return None
 
     with contextlib.suppress(ValueError):
-        return datetime.datetime.strptime(date, "%Y%m%d").date()
+        parsed = datetime.datetime.strptime(date, "%Y%m%d").replace(tzinfo=datetime.UTC)
+        return parsed.date()
 
     try:
         # A JSON-serialized model will contain ISO.
