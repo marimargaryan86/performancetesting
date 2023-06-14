@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import datetime
+from collections.abc import Mapping, Sequence
 
 import pydantic
 
 from snowfall.vendor.duffel.builders.base import DuffelRequestBaseModel
-from snowfall.vendor.duffel.models.offer import Offer
+from snowfall.vendor.duffel.models.offer import Offer, PrivateFare
 
 
 class OfferRequestSliceTimeRange(DuffelRequestBaseModel):
@@ -37,6 +38,7 @@ class OfferRequestPassenger(DuffelRequestBaseModel):
 class OfferRequestDataList(DuffelRequestBaseModel):
     passengers: list[OfferRequestPassenger]
     slices: list[OfferRequestSlice]
+    private_fares: Mapping[str, Sequence[PrivateFare]] | None
 
 
 class OfferRequestData(DuffelRequestBaseModel):
@@ -47,8 +49,13 @@ class OffersRequestBuilder(object):
     def __init__(self) -> None:
         self._passengers: list[OfferRequestPassenger] = []
         self._slices: list[OfferRequestSlice] = []
+        self.private_fares: Mapping[str, Sequence[PrivateFare]] | None = None
 
-    def with_offer(self, offer: Offer) -> OffersRequestBuilder:
+    def with_offer(
+        self,
+        offer: Offer,
+        private_fares: Mapping[str, Sequence[PrivateFare]] | None = None,
+    ) -> OffersRequestBuilder:
         for passenger in offer.passengers:
             self.add_passenger(
                 OfferRequestPassenger(
@@ -56,6 +63,8 @@ class OffersRequestBuilder(object):
                     age=passenger.age,
                 ),
             )
+
+        self.private_fares = private_fares
 
         for offer_slice in offer.slices:
             first_segment = offer_slice.segments[0]
@@ -95,5 +104,6 @@ class OffersRequestBuilder(object):
             offer_data=OfferRequestDataList(
                 passengers=self._passengers,
                 slices=self._slices,
+                private_fares=self.private_fares,
             ),
         )

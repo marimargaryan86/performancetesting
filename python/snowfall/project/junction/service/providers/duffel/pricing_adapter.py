@@ -1,5 +1,6 @@
 import hashlib
 import json
+from collections.abc import Mapping, Sequence
 
 import structlog
 
@@ -7,7 +8,7 @@ from snowfall.project.junction.service.providers.duffel import cache
 from snowfall.vendor.duffel import client
 from snowfall.vendor.duffel.builders.offer_request import OffersRequestBuilder
 from snowfall.vendor.duffel.errors import DuffelError, ServiceError
-from snowfall.vendor.duffel.models.offer import Offer
+from snowfall.vendor.duffel.models.offer import Offer, PrivateFare
 from snowfall.vendor.duffel.models.offer_request import OfferRequest
 
 
@@ -28,7 +29,11 @@ class PricingAdapter(object):
 
         return offer
 
-    async def refresh_offer(self, offer_details: cache.OfferDetails) -> Offer:
+    async def refresh_offer(
+        self,
+        offer_details: cache.OfferDetails,
+        private_fares: Mapping[str, Sequence[PrivateFare]] | None = None,
+    ) -> Offer:
         try:
             offer = await self._client.get_single_offer(offer_details.offer_id)
         except ServiceError as get_offer_ex:
@@ -38,7 +43,7 @@ class PricingAdapter(object):
             )
             raise
 
-        offers_request_builder = OffersRequestBuilder().with_offer(offer)
+        offers_request_builder = OffersRequestBuilder().with_offer(offer, private_fares)
 
         try:
             offers = await self._client.create_offer_request(

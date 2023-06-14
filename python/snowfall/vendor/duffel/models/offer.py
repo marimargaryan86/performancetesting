@@ -1,4 +1,5 @@
 import datetime
+import enum
 
 import pydantic
 
@@ -52,6 +53,19 @@ class OfferPassenger(DuffelBaseModel):
     loyalty_programme_accounts: list[LoyaltyProgrammeAccount]
 
 
+class PrivateFareType(enum.StrEnum):
+    corporate = "corporate"
+    leisure = "leisure"
+    negotiated = "negotiated"
+
+
+class PrivateFare(DuffelBaseModel):
+    corporate_code: str | None
+    tracking_reference: str | None
+    tour_code: str | None
+    fare_type: PrivateFareType | None = pydantic.Field(None, alias="type")
+
+
 class Offer(DuffelBaseModel):
     identifier: str = pydantic.Field(..., alias="id")
     live_mode: bool
@@ -73,3 +87,4 @@ class Offer(DuffelBaseModel):
     total_emissions_kg: str
     total_amount: str
     total_currency: str
+    private_fares: list[PrivateFare] | None
