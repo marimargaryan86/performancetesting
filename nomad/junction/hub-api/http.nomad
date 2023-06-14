@@ -75,7 +75,7 @@ job "hub-api-http" {
       tags = [
         "http",
         "traefik.enable=true",
-        "traefik.consulcatalog.connect=true",
+        "traefik.http.routers.hub-api-${var.environment}.middlewares=hub-api-vpn-only-${var.environment}",
         "traefik.http.routers.hub-api-${var.environment}.entrypoints=${var.traefik_entrypoints}",
         "traefik.http.routers.hub-api-${var.environment}.rule=Host(`${var.traaefik_host_URL}`)",
         "traefik.http.middlewares.hub-api-vpn-only-${var.environment}.ipwhitelist.sourcerange=52.56.69.33",
