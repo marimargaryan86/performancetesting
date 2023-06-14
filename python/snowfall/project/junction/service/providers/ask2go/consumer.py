@@ -1,3 +1,5 @@
+import uuid
+
 import structlog
 from aio_pika import Message, connect
 from aio_pika.abc import AbstractIncomingMessage
@@ -20,8 +22,6 @@ from snowfall.stdlib.transport.amqp import consumer, producer
 from snowfall.stdlib.transport.amqp import types as amqp_types
 from snowfall.vendor.ask2go import client
 from snowfall.vendor.ask2go.models import seat_map
-
-_PROVIDER_NAME = "Ask2Go"
 
 
 class PriceQuoteConsumer(object):
@@ -72,18 +72,22 @@ class PriceQuoteConsumer(object):
 
 
 class OrderConsumer(object):
-    def __init__(
+    def __init__(  # noqa: WPS211
         self,
         consumer_obj: consumer.Consumer[orders_amqp_pb2.PlaceOrderTask],
         producer_obj: producer.Producer,
         booking_handler: booking.BookingHandler,
         price_quote_cache: cache.PriceQuoteCache,
+        provider_id: uuid.UUID,
+        provider_name: str,
     ):
         self._booking = booking_handler
         self._cache = price_quote_cache
         self._consumer = consumer_obj
         self._logger = structlog.get_logger(__name__)
         self._producer = producer_obj
+        self._provider_id = str(provider_id)
+        self._provider_name = provider_name
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
@@ -95,7 +99,8 @@ class OrderConsumer(object):
         price_quote = await self._cache.fetch(
             amqp_message.body.booking.trip_option.price_quote_id,
         )
-        amqp_message.body.booking.provider_name = _PROVIDER_NAME
+        amqp_message.body.booking.provider_id = self._provider_id
+        amqp_message.body.booking.provider_name = self._provider_name
 
         if not price_quote:
             self._logger.warning(

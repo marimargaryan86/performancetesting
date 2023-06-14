@@ -229,6 +229,8 @@ async def _orders(app: service.AsyncApplication[_OrdersSettings]) -> None:
         price_quote_cache=cache.PriceQuoteCache(
             client=redis.Client(redis_connection, prefix=app.name),
         ),
+        provider_id=_PROVIDER_ID,
+        provider_name=_PROVIDER_NAME,
     ).consume()
 
 
