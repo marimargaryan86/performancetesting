@@ -2,18 +2,27 @@ import ipaddress
 import random
 from collections.abc import Sequence
 
-import pydantic
 from motor import motor_asyncio
+from pydantic import AnyUrl
 
-from snowfall.project.pay.service.companies import grpc, repositories
+from snowfall.project.pay.service.companies import cron_jobs, grpc, repositories
 from snowfall.stdlib import service
 from snowfall.stdlib.transport.grpc import server
+from snowfall.vendor.currency_cloud.client import CurrencyCloudAuth, PaymentClient
 
 
 class _GrpcSettings(service.Settings):
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
-    mongo_dsn: Sequence[pydantic.AnyUrl]
+    mongo_dsn: Sequence[AnyUrl]
+
+
+class _AccountSyncSettings(service.Settings):
+    mongo_dsn: AnyUrl
+    cc_login: str
+    cc_api_key: str
+    cc_env: str
+    cc_address: str
 
 
 async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
@@ -30,6 +39,9 @@ async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
                     mongo.companies.companies,
                 ),
             ),
+            grpc.AccountsService(
+                accounts=repositories.AccountsRepository(mongo.accounts.accounts),
+            ),
         ],
     )
 
@@ -37,9 +49,33 @@ async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
         await running.wait_for_termination()
 
 
+async def _sync_accounts_cron_run(
+    app: service.Application[_AccountSyncSettings],
+) -> None:
+    mongo = motor_asyncio.AsyncIOMotorClient(app.settings.mongo_dsn)
+    payment_client = PaymentClient(
+        base_url=app.settings.cc_address,
+        auth=CurrencyCloudAuth(
+            base_url=app.settings.cc_address,
+            login_id=app.settings.cc_login,
+            api_key=app.settings.cc_api_key,
+        ),
+    )
+    sync_account = cron_jobs.SyncAccounts(
+        payment_client,
+        repositories.AccountsRepository(mongo.accounts.accounts),
+    )
+    await sync_account.sync_accounts()
+
+
 if __name__ == "__main__":
     entrypoint = service.Entrypoint(name="companies")
 
     entrypoint.enter_with_commands(
         service.Command(name="grpc", callback=_serve, settings_class=_GrpcSettings),
+        service.Command(
+            name="sync_accounts",
+            callback=_sync_accounts_cron_run,
+            settings_class=_AccountSyncSettings,
+        ),
     )

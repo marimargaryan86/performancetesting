@@ -1,1 +1,3 @@
-nomad_template(["grpc"], "python/snowfall/project/pay/service/companies:main")
+nomad_template(
+    ["grpc", "sync_accounts"], "python/snowfall/project/pay/service/companies:main"
+)

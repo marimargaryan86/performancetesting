@@ -2,9 +2,9 @@ import abc
 
 import grpc
 
-from snowfall.project.pay.service.accounts.v1alpha import (
-    accounts_pb2,
-    accounts_pb2_grpc,
+from snowfall.project.pay.service.companies.v1alpha import (
+    grpc_pb2,
+    grpc_pb2_grpc,
     models_pb2,
 )
 
@@ -29,7 +29,7 @@ class Client(abc.ABC):
         self,
         limit: int | None = None,
         cursor: str | None = None,
-    ) -> accounts_pb2.ListAccountsResponse:
+    ) -> grpc_pb2.ListAccountsResponse:
         """Fetch sequence of accounts."""
 
 
@@ -53,8 +53,8 @@ class DictClient(Client):
         self,
         limit: int | None = None,
         cursor: str | None = None,
-    ) -> accounts_pb2.ListAccountsResponse:
-        return accounts_pb2.ListAccountsResponse(
+    ) -> grpc_pb2.ListAccountsResponse:
+        return grpc_pb2.ListAccountsResponse(
             accounts=list(self._accounts.values()),
         )
 
@@ -62,7 +62,7 @@ class DictClient(Client):
 class GrpcClient(Client):
     def __init__(
         self,
-        account_stub: accounts_pb2_grpc.AccountsServiceStub,
+        account_stub: grpc_pb2_grpc.AccountsServiceStub,
         timeout: int = 5,
     ):
         self._client = account_stub
@@ -75,7 +75,7 @@ class GrpcClient(Client):
     ) -> models_pb2.Account:
         return (
             await self._client.CreateAccount(
-                accounts_pb2.CreateAccountRequest(
+                grpc_pb2.CreateAccountRequest(
                     account=account,
                 ),
             )
@@ -84,7 +84,7 @@ class GrpcClient(Client):
     async def get(self, account_id: str) -> models_pb2.Account | None:
         try:
             response = await self._client.GetAccount(
-                accounts_pb2.GetAccountRequest(id=account_id),
+                grpc_pb2.GetAccountRequest(id=account_id),
             )
         except grpc.aio.AioRpcError:
             return None
@@ -94,9 +94,9 @@ class GrpcClient(Client):
         self,
         limit: int | None = None,
         cursor: str | None = None,
-    ) -> accounts_pb2.ListAccountsResponse:
+    ) -> grpc_pb2.ListAccountsResponse:
         return await self._client.ListAccounts(
-            accounts_pb2.ListAccountsRequest(
+            grpc_pb2.ListAccountsRequest(
                 page_size=limit or self._default_page_size,
                 page_token=cursor or "",
             ),

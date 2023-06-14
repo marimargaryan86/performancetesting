@@ -7,10 +7,10 @@ import structlog
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.project.pay.adapter import accounts as accounts_adapter
-from snowfall.project.pay.service.accounts.v1alpha.models_pb2 import Account
 from snowfall.project.pay.service.beneficiaries.v1alpha.models_pb2 import (
     Beneficiary as BeneficiaryModel,
 )
+from snowfall.project.pay.service.companies.v1alpha.models_pb2 import Account
 from snowfall.project.pay.service.pay_api import resources
 from snowfall.project.pay.service.pay_api.repositories import (
     BeneficiaryRepository,

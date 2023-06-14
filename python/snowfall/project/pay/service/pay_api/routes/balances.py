@@ -2,7 +2,7 @@ import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.project.pay.adapter import accounts as accounts_adapter
-from snowfall.project.pay.service.accounts import repositories
+from snowfall.project.pay.service.companies import repositories
 from snowfall.project.pay.service.pay_api import resources
 from snowfall.project.pay.service.pay_api.repositories import CurrencyRepository
 from snowfall.stdlib.integration.starlette import messages, models, request_helpers

@@ -2,8 +2,7 @@ import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.project.pay.adapter import accounts as accounts_adapter
-from snowfall.project.pay.service.accounts import repositories
-from snowfall.project.pay.service.accounts.v1alpha import models_pb2 as account_models
+from snowfall.project.pay.service.companies import repositories
 from snowfall.project.pay.service.companies.v1alpha import models_pb2 as company_models
 from snowfall.project.pay.service.pay_api import resources
 from snowfall.project.pay.service.pay_api.repositories import CompanyRepository
@@ -161,7 +160,7 @@ class Accounts(endpoints.HTTPEndpoint):
         )
 
         account = await accounts_client.create(
-            account_models.Account(
+            company_models.Account(
                 id=string.uuid(),
                 external_reference=cc_account.identifier,
                 company_id=company.id,
@@ -215,7 +214,7 @@ class Accounts(endpoints.HTTPEndpoint):
     async def _create_cc_contact(
         self,
         account_id: str,
-        contact: account_models.Contact,
+        contact: company_models.Contact,
         payment_client: PaymentClient,
     ) -> cc_contact_models.ContactResponse:
         return await payment_client.create_contact(

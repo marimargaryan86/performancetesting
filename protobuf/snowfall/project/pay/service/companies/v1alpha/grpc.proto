@@ -13,6 +13,12 @@ service CompaniesService {
   rpc ListCompanies(ListCompaniesRequest) returns (ListCompaniesResponse) {}
 }
 
+service AccountsService {
+  rpc CreateAccount(CreateAccountRequest) returns (CreateAccountResponse) {}
+  rpc GetAccount(GetAccountRequest) returns (GetAccountResponse) {}
+  rpc ListAccounts(ListAccountsRequest) returns (ListAccountsResponse) {}
+}
+
 message CreateCompanyRequest {
   Company company = 1;
 }
@@ -44,5 +50,31 @@ message ListCompaniesRequest {
 
 message ListCompaniesResponse {
   repeated Company companies = 1;
+  string next_page_token = 2;
+}
+
+message CreateAccountRequest {
+  Account account = 1;
+}
+
+message CreateAccountResponse {
+  Account account = 1;
+}
+
+message GetAccountRequest {
+  string id = 1;
+}
+
+message GetAccountResponse {
+  Account account = 1;
+}
+
+message ListAccountsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+}
+
+message ListAccountsResponse {
+  repeated Account accounts = 1;
   string next_page_token = 2;
 }

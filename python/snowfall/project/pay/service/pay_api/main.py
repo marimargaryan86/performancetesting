@@ -12,8 +12,8 @@ from snowfall.adapter import authentication as auth
 from snowfall.project.junction.go.adapter import errors
 from snowfall.project.pay.adapter import accounts as accounts_adapter
 from snowfall.project.pay.adapter import currencies, payments, transactions
-from snowfall.project.pay.service.accounts import repositories
-from snowfall.project.pay.service.accounts.v1alpha.accounts_pb2_grpc import (
+from snowfall.project.pay.service.companies import repositories
+from snowfall.project.pay.service.companies.v1alpha.grpc_pb2_grpc import (
     AccountsServiceStub,
 )
 from snowfall.project.pay.service.currencies.v1alpha import currencies_pb2_grpc

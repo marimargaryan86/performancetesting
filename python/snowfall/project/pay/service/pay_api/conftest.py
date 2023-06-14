@@ -18,7 +18,7 @@ from snowfall.adapter import authentication as auth
 from snowfall.project.junction.go.adapter import errors
 from snowfall.project.pay import fixtures
 from snowfall.project.pay.adapter import accounts, currencies, payments, transactions
-from snowfall.project.pay.service.accounts import repositories
+from snowfall.project.pay.service.companies import repositories
 from snowfall.project.pay.service.pay_api import authenticator, bootstrap
 from snowfall.project.pay.service.pay_api import repositories as pay_repos
 from snowfall.project.pay.service.pay_api.cache import UserSessionRepository

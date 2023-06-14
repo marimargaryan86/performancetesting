@@ -4,7 +4,7 @@ from unittest import mock
 import httpx
 from starlette import status
 
-from snowfall.project.pay.service.accounts.v1alpha.models_pb2 import Account, Contact
+from snowfall.project.pay.service.companies.v1alpha.models_pb2 import Account, Contact
 
 
 class TestAccounts(object):

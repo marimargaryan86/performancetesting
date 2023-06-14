@@ -1,8 +1,8 @@
 import lagom
 from starlette import endpoints, requests, responses, status
 
-from snowfall.project.pay.service.accounts import repositories
-from snowfall.project.pay.service.accounts.v1alpha import models_pb2
+from snowfall.project.pay.service.companies import repositories
+from snowfall.project.pay.service.companies.v1alpha import models_pb2
 from snowfall.project.pay.service.pay_api import resources
 from snowfall.project.pay.service.pay_api.repositories import CompanyRepository
 from snowfall.stdlib import string

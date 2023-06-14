@@ -5,8 +5,7 @@ import httpx
 from snowfall.project.junction.api_automation.test_functions.helpers_api import (
     is_valid_uuid,
 )
-from snowfall.project.pay.service.accounts.v1alpha.models_pb2 import Account
-from snowfall.project.pay.service.companies.v1alpha.models_pb2 import Company
+from snowfall.project.pay.service.companies.v1alpha.models_pb2 import Account, Company
 from snowfall.project.pay.service.pay_api.repositories import BeneficiaryRepository
 from snowfall.stdlib import money
 from snowfall.stdlib.format import jsonapi

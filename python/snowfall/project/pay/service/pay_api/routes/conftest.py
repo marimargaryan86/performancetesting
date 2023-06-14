@@ -5,9 +5,12 @@ from unittest import mock
 import pytest
 
 from snowfall.project.pay.adapter import accounts
-from snowfall.project.pay.service.accounts.repositories import ContactsRepository
-from snowfall.project.pay.service.accounts.v1alpha.models_pb2 import Account, Contact
-from snowfall.project.pay.service.companies.v1alpha.models_pb2 import Company
+from snowfall.project.pay.service.companies.repositories import ContactsRepository
+from snowfall.project.pay.service.companies.v1alpha.models_pb2 import (
+    Account,
+    Company,
+    Contact,
+)
 from snowfall.project.pay.service.conversions.v1alpha.models_pb2 import Conversion
 from snowfall.project.pay.service.pay_api.conftest import get_transaction
 from snowfall.project.pay.service.pay_api.repositories import (

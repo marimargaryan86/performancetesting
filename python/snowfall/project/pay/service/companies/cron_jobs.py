@@ -1,7 +1,7 @@
 import structlog
 
-from snowfall.project.pay.service.accounts.grpc import AccountsRepository
-from snowfall.project.pay.service.accounts.v1alpha.models_pb2 import Account
+from snowfall.project.pay.service.companies.repositories import AccountsRepository
+from snowfall.project.pay.service.companies.v1alpha.models_pb2 import Account
 from snowfall.stdlib import string
 from snowfall.stdlib.format.protobuf import datetime_to_protobuf, protobuf_to_datetime
 from snowfall.vendor.currency_cloud.client import PaymentClient

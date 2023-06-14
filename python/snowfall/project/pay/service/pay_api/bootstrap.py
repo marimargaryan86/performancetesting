@@ -5,7 +5,7 @@ from pydantic import AnyUrl
 
 from snowfall.adapter import authentication
 from snowfall.project.pay.adapter import accounts, currencies, payments, transactions
-from snowfall.project.pay.service.accounts.repositories import ContactsRepository
+from snowfall.project.pay.service.companies.repositories import ContactsRepository
 from snowfall.project.pay.service.pay_api import includes
 from snowfall.project.pay.service.pay_api.cache import UserSessionRepository
 from snowfall.project.pay.service.pay_api.repositories import (

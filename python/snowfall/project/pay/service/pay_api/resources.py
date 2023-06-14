@@ -4,7 +4,6 @@ from typing import Any, ClassVar
 
 from starlette import requests
 
-from snowfall.project.pay.service.accounts.v1alpha import models_pb2 as account_models
 from snowfall.project.pay.service.beneficiaries.v1alpha import (
     models_pb2 as beneficiary_models,
 )
@@ -216,7 +215,7 @@ class ContactResource(models.Resource):
     @classmethod
     def from_proto(
         cls,
-        contact: account_models.Contact,
+        contact: models_pb2.Contact,
     ) -> ContactResource:
         return cls(
             id=contact.id,
@@ -278,7 +277,7 @@ class AccountResource(models.Resource):
     @classmethod
     def from_proto(
         cls,
-        account: account_models.Account,
+        account: models_pb2.Account,
         request: requests.Request,
     ) -> AccountResource:
         relationships: dict[str, Any] = {

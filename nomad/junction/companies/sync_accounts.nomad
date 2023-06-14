@@ -26,7 +26,7 @@ variable "cc_address" {
   type = string
 }
 
-job "accounts-sync" {
+job "companies-sync-accounts" {
   datacenters = ["${var.datacenter}"]
   type        = "batch"
 
@@ -35,7 +35,7 @@ job "accounts-sync" {
     prohibit_overlap = true
   }
 
-  group "sync" {
+  group "sync-accounts" {
     count = 1
 
     restart {
@@ -45,7 +45,7 @@ job "accounts-sync" {
       mode     = "delay"
     }
 
-    task "sync" {
+    task "sync-accounts" {
       driver = "docker"
 
       vault {
@@ -69,7 +69,7 @@ EOH
       config {
         image = var.docker_image
         args = [
-          "sync"
+          "sync_accounts"
         ]
 
         auth {
@@ -82,7 +82,7 @@ EOH
 
       env {
         ENV_NAME   = "${var.environment}"
-        SENTRY_DSN = "https://14777b869dcb4cecacb590784567ff31@sentry.snowfall.se/115"
+        SENTRY_DSN = "https://29671bbbf0174dc895a038d20b89d269@sentry.snowfall.se/157"
         CC_ADDRESS = var.cc_address
       }
     }
