@@ -334,7 +334,7 @@ class TripCandidateSearches(object):
                     departure_after=protobuf.datetime_to_protobuf_datetime(
                         parser.isoparse(criteria["departureAfter"]),
                     ),
-                    maximum_connections=criteria["maximumConnections"],
+                    maximum_connections=criteria.get("maximumConnections"),
                 )
                 for criteria in criteria
             ],
