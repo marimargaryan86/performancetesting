@@ -32,11 +32,9 @@
     expanded = false;
   }
 
-  function createSelectFunc(option: TValue): () => void {
-    return () => {
-      value = option;
-      close();
-    };
+  function select(option: TValue): void {
+    value = option;
+    close();
   }
 </script>
 
@@ -60,7 +58,7 @@
     >
       {#each options as option}
         <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <li class="option" on:click={createSelectFunc(option)}>{formatter(option)}</li>
+        <li class="option" on:click={select.bind(select, option)}>{formatter(option)}</li>
       {/each}
     </ul>
   {/if}

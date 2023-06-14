@@ -1,12 +1,10 @@
 <script lang="ts" context="module">
-  const schema = beneficiaryModel
-    .pick({
-      companyName: true,
-      email: true,
-    })
-    .extend({
-      address: beneficiaryModel._def.shape().address.required(),
-    });
+  const schema = beneficiaryModel.pick({
+    accountId: true,
+    companyName: true,
+    email: true,
+    address: true,
+  });
 </script>
 
 <script lang="ts">
@@ -17,37 +15,32 @@
   import type { CountryModel } from "models/location";
   import { z } from "zod";
   import { formatError, type FormattedError } from "utils/zod";
+  import { updateBeneficiaryData } from "./helpers";
+  import type { AccountModel } from "models/account";
 
   export let data: CreateBeneficiaryModel;
   export let countries: Map<string, CountryModel>;
+  export let accounts: AccountModel[];
 
-  let errors: FormattedError<z.infer<typeof schema>>;
+  let errors: FormattedError<z.infer<typeof schema>> | undefined = undefined;
   let address = data.address ?? {};
   let addressLine = address.addressLines?.[0];
 
+  $: accountIds = accounts.map((a) => a.id);
   $: address = { ...address, addressLines: addressLine ? [addressLine] : [] };
   $: data = { ...data, address };
 
-  function formatOption(code?: string): string {
+  function formatCountryOption(code?: string): string {
     return countries.get(code ?? "")?.name ?? "";
   }
 
-  export function validate(): boolean {
-    const nextData: CreateBeneficiaryModel = {
-      ...data,
-      companyName: data.companyName?.trim(),
-      email: data.email?.trim(),
-      address: {
-        ...data.address,
-        addressLines: data.address?.addressLines?.map((al) => al.trim()),
-        city: data.address?.city?.trim(),
-        postalCode: data.address?.postalCode?.trim(),
-        state: data.address?.state?.trim(),
-      },
-    };
+  function formatAccountOption(id?: string): string {
+    return accounts.find((a) => a.id === id)?.name ?? "";
+  }
 
+  export function validate(): boolean {
     try {
-      data = { ...data, ...schema.parse(nextData) };
+      data = { ...data, ...schema.parse(updateBeneficiaryData(data)) };
 
       return true;
     } catch (err) {
@@ -66,27 +59,36 @@
   description="Provide the company information"
 >
   <form>
+    <SelectField
+      required
+      label="Account"
+      placeholder="Select account"
+      options={accountIds}
+      formatter={formatAccountOption}
+      error={errors?.accountId}
+      bind:value={data.accountId}
+    />
     <TextField
       required
       label="Personalised name"
       placeholder="E.g. Air France"
-      bind:value={data.companyName}
       error={errors?.companyName}
+      bind:value={data.companyName}
     />
     <TextField
       required
       type="email"
       label="Email"
       placeholder="Enter email"
-      bind:value={data.email}
       error={errors?.email}
+      bind:value={data.email}
     />
     <TextField
       required
       label="Address"
       placeholder="Enter address"
-      bind:value={addressLine}
       error={errors?.address?.addressLines}
+      bind:value={addressLine}
     />
 
     <div>
@@ -94,31 +96,30 @@
         required
         label="City"
         placeholder="Enter city"
-        bind:value={address.city}
         error={errors?.address?.city}
+        bind:value={address.city}
       />
       <TextField
         required
         label="Postcode"
         placeholder="Enter postcode"
-        bind:value={address.postalCode}
         error={errors?.address?.postalCode}
+        bind:value={address.postalCode}
       />
       <TextField
-        required
         label="State"
         placeholder="Enter state"
-        bind:value={address.state}
         error={errors?.address?.state}
+        bind:value={address.state}
       />
       <SelectField
         required
         label="Country"
         placeholder="Select country"
         options={Array.from(countries.values()).map((c) => c.code)}
-        formatter={formatOption}
-        bind:value={address.countryCode}
+        formatter={formatCountryOption}
         error={errors?.address?.countryCode}
+        bind:value={address.countryCode}
       />
     </div>
   </form>

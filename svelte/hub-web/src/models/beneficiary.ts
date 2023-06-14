@@ -7,8 +7,8 @@ export const addressDetails = z.object({
 });
 
 export const enhancedAddressDetailsModel = addressDetails.extend({
-  postalCode: z.string().min(1).trim().optional(),
-  city: z.string().min(1).max(255).min(1).trim().optional(),
+  postalCode: z.string().min(1).trim(),
+  city: z.string().min(1).max(255).min(1).trim(),
   state: z.string().min(1).trim().optional(),
 });
 
@@ -37,8 +37,8 @@ export const bankDetailsModel = z.discriminatedUnion("type", [
 ]);
 
 export const partialBankDetailsModel = z.discriminatedUnion("type", [
-  bankDetailsIbanModel.deepPartial().extend({ type: bankDetailsIbanModel._def.shape().type }),
-  bankDetailsAbaModel.deepPartial().extend({ type: bankDetailsAbaModel._def.shape().type }),
+  bankDetailsIbanModel.deepPartial().extend({ type: bankDetailsIbanModel.shape.type }),
+  bankDetailsAbaModel.deepPartial().extend({ type: bankDetailsAbaModel.shape.type }),
 ]);
 
 export const beneficiaryModel = z.object({

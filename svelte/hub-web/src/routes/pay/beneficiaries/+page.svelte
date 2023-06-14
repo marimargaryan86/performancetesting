@@ -41,12 +41,10 @@
     }
   }
 
-  function createRemoveFunc(): () => void {
-    return () => {
-      if (!confirm("Are you sure you want to delete this beneficiary?")) {
-        return;
-      }
-    };
+  function remove(): void {
+    if (!confirm("Are you sure you want to delete this beneficiary?")) {
+      return;
+    }
   }
 </script>
 
@@ -60,7 +58,7 @@
   <div class="actions">
     <SearchField bind:value={searchQuery} />
 
-    <Button size="small" href={routeConfig.pay.beneficiaries.addBeneficiary}>
+    <Button size="small" href={routeConfig.pay.beneficiaries.addBeneficiary} preload={false}>
       Add Beneficiary
       <PlusIcon />
     </Button>
@@ -95,9 +93,12 @@
           <TCol class="typography body-medium">{capitalize(item.bankDetails.paymentType)}</TCol>
           <TCol width="172px">
             <div class="beneficiary-actions">
-              <a href={routeConfig.pay.beneficiaries.beneficiary(item.id)}><EditIcon /></a>
+              <a
+                href={routeConfig.pay.beneficiaries.beneficiary(item.id)}
+                data-sveltekit-preload-data="off"><EditIcon /></a
+              >
 
-              <button on:click={createRemoveFunc()}>
+              <button on:click={remove.bind(remove)}>
                 <RemoveIcon variant="trash-can" />
               </button>
 

@@ -1,32 +1,36 @@
 <script lang="ts" context="module">
   export type Step = "beneficiary" | "account" | "summary";
 
-  const steps: Record<
+  function getSteps(
+    mode: "edit" | "create",
+  ): Record<
     Step,
     { prev?: Step; next?: Step; buttonLabel: string; number: number; label: string }
-  > = {
-    beneficiary: {
-      prev: undefined,
-      next: "account",
-      buttonLabel: "Next",
-      number: 1,
-      label: "Beneficiary Details",
-    },
-    account: {
-      prev: "beneficiary",
-      next: "summary",
-      buttonLabel: "Verify",
-      number: 2,
-      label: "Bank Account Details",
-    },
-    summary: {
-      prev: "account",
-      next: undefined,
-      buttonLabel: "Create Beneficiary",
-      number: 3,
-      label: "Summary",
-    },
-  };
+  > {
+    return {
+      beneficiary: {
+        prev: undefined,
+        next: "account",
+        buttonLabel: "Next",
+        number: 1,
+        label: "Beneficiary Details",
+      },
+      account: {
+        prev: "beneficiary",
+        next: "summary",
+        buttonLabel: "Verify",
+        number: 2,
+        label: "Bank Account Details",
+      },
+      summary: {
+        prev: "account",
+        next: undefined,
+        buttonLabel: `${mode === "edit" ? "Update" : "Create"} Beneficiary`,
+        number: 3,
+        label: "Summary",
+      },
+    };
+  }
 </script>
 
 <script lang="ts">
@@ -42,19 +46,21 @@
   import BeneficiaryDetails from "./beneficiary-details.svelte";
   import BankAccountDetails from "./bank-account-details.svelte";
   import Summary from "./summary.svelte";
+  import { slide } from "svelte/transition";
 
   export let data: PageData;
 
-  let validate: (() => boolean) | undefined;
+  let stepComponent: BeneficiaryDetails | BankAccountDetails | Summary | undefined;
+  let error: string | undefined = undefined;
 
   const beneficiary = writableCookie<CreateBeneficiaryModel>({
     key: "beneficiary-data",
-    value: data.beneficiary ?? {},
-    overwrite: true,
+    value: data.beneficiary,
   });
 
+  $: steps = getSteps(data.beneficiary.id ? "edit" : "create");
   $: step = ($page.url.searchParams.get("step") ?? "beneficiary") as Step;
-  $: title = `${data.beneficiary ? "Edit" : "Add"} Beneficiary`;
+  $: title = `${data.beneficiary.id ? "Edit" : "Add"} Beneficiary`;
   $: breadCrumbs = [
     { label: "Beneficiaries", url: routeConfig.pay.beneficiaries.root },
     { label: title, url: routeConfig.pay.beneficiaries.beneficiary(data.beneficiary.id) },
@@ -79,7 +85,7 @@
       url.searchParams.set("step", next);
     }
 
-    if (!validate || validate()) {
+    if ((await stepComponent?.validate()) ?? true) {
       await goto(url);
     }
   }
@@ -88,6 +94,8 @@
     if (!confirm("Are you sure you want to cancel?")) {
       return;
     }
+
+    beneficiary.remove();
 
     await goto(routeConfig.pay.beneficiaries.root);
   }
@@ -106,18 +114,35 @@
 <StepView steps={Object.values(steps)} activeStep={steps[step].number} />
 
 <div class="content">
+  {#if error}
+    <div class="error typography body-medium" transition:slide|local={{ duration: 150 }}>
+      <strong>Error</strong> <span>{error}</span>
+    </div>
+  {/if}
+
   <div class="wrapper">
     {#if step === "beneficiary"}
-      <BeneficiaryDetails bind:data={$beneficiary} countries={data.countries} bind:validate />
+      <BeneficiaryDetails
+        countries={data.countries}
+        accounts={data.accounts}
+        bind:this={stepComponent}
+        bind:data={$beneficiary}
+      />
     {:else if step === "account"}
       <BankAccountDetails
-        bind:data={$beneficiary}
         countries={data.countries}
         currencies={data.currencies}
-        bind:validate
+        bind:this={stepComponent}
+        bind:data={$beneficiary}
       />
     {:else if step === "summary"}
-      <Summary data={$beneficiary} countries={data.countries} currencies={data.currencies} />
+      <Summary
+        countries={data.countries}
+        currencies={data.currencies}
+        bind:this={stepComponent}
+        bind:data={$beneficiary}
+        bind:error
+      />
     {/if}
   </div>
 </div>
@@ -138,10 +163,27 @@
     padding: 8px 24px 24px;
   }
 
+  .error {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    padding: 18px;
+    color: var(--color-common-light-strong);
+    background-color: var(--color-semantic-error-100);
+    border: var(--color-semantic-error-600) 1px solid;
+    border-radius: 8px;
+  }
+
+  .error > strong {
+    font-weight: 600;
+  }
+
   .content {
+    display: flex;
+    flex-flow: column;
     flex-grow: 1;
     padding: 24px;
-    overflow: auto;
+    overflow: hidden;
     background-image: var(--color-gradient-extensions-horizontal);
   }
 

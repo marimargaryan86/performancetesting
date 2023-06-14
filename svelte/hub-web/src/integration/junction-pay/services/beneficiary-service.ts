@@ -1,5 +1,5 @@
 import type { BeneficiaryModel } from "models/beneficiary";
-import { parseBeneficiarySchema } from "../parsers/beneficiary";
+import { parseBeneficiaryModel, parseBeneficiarySchema } from "../parsers/beneficiary";
 import type {
   CreateBeneficiaryResponseSchema,
   GetBeneficiaryResponseSchema,
@@ -19,7 +19,7 @@ export default class BeneficiaryService extends JunctionPayService {
     });
 
     if (resp.status !== 200) {
-      throw new Error(`Junction Pay error: ${resp.status}`);
+      throw new Error(await resp.text());
     }
 
     const data = await resp.json();
@@ -40,24 +40,51 @@ export default class BeneficiaryService extends JunctionPayService {
     }
 
     if (resp.status !== 200) {
-      throw new Error(`Junction Pay error: ${resp.status}`);
+      throw new Error(await resp.text());
     }
 
     return parseBeneficiarySchema((await resp.json()).data);
   }
 
-  async createBeneficiary(token: string, beneficiary: unknown): Promise<BeneficiaryModel> {
-    const resp = await this.makeRequest("/beneficiaries", {
+  async createBeneficiary(
+    token: string,
+    beneficiary: Omit<BeneficiaryModel, "id">,
+  ): Promise<BeneficiaryModel> {
+    const resp = await this.makeRequest<CreateBeneficiaryResponseSchema>("/beneficiaries", {
       method: "POST",
       token,
-      data: beneficiary,
+      data: {
+        data: parseBeneficiaryModel(beneficiary),
+      },
     });
 
     if (resp.status !== 201) {
-      throw new Error(`Junction Pay error: ${resp.status}`);
+      throw new Error(await resp.text());
     }
 
-    const data = (await resp.json()) as CreateBeneficiaryResponseSchema;
+    const data = await resp.json();
+
+    return parseBeneficiarySchema(data.data);
+  }
+
+  async updateBeneficiary(
+    token: string,
+    id: string,
+    beneficiary: BeneficiaryModel,
+  ): Promise<BeneficiaryModel> {
+    const resp = await this.makeRequest<GetBeneficiaryResponseSchema>(`/beneficiaries/${id}`, {
+      method: "PATCH",
+      token,
+      data: {
+        data: parseBeneficiaryModel(beneficiary),
+      },
+    });
+
+    if (resp.status !== 200) {
+      throw new Error(await resp.text());
+    }
+
+    const data = await resp.json();
 
     return parseBeneficiarySchema(data.data);
   }

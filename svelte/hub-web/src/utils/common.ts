@@ -1,4 +1,5 @@
 import { applyAction, deserialize } from "$app/forms";
+import type { ActionResult } from "@sveltejs/kit";
 
 export function isUpperCase(value: string): boolean {
   return value.toUpperCase() === value;
@@ -62,7 +63,14 @@ export type RecursivePartial<T> = {
     : T[P];
 };
 
-export async function callAction(action: string, data?: Record<string, unknown>): Promise<void> {
+export async function callAction<
+  TResult extends Record<string, unknown> = Record<string, unknown>,
+  TFailure extends Record<string, unknown> = Record<string, unknown>,
+>(
+  action: string,
+  data?: Record<string, unknown>,
+  apply = true,
+): Promise<ActionResult<TResult, TFailure>> {
   const body = new FormData();
 
   if (data) {
@@ -74,7 +82,11 @@ export async function callAction(action: string, data?: Record<string, unknown>)
   }
 
   const resp = await fetch(action, { method: "POST", body });
-  const result = deserialize(await resp.text());
+  const result = deserialize<TResult, TFailure>(await resp.text());
 
-  await applyAction(result);
+  if (apply) {
+    await applyAction(result);
+  }
+
+  return result;
 }

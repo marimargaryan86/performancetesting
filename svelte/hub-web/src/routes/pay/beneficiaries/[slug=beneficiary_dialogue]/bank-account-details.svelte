@@ -13,6 +13,7 @@
   import type { CountryModel } from "models/location";
   import { z } from "zod";
   import { formatError, type FormattedError } from "utils/zod";
+  import { updateBeneficiaryData } from "./helpers";
 
   export let data: CreateBeneficiaryModel;
   export let currencies: Map<string, CurrencyModel>;
@@ -44,21 +45,8 @@
   }
 
   export function validate(): boolean {
-    const nextData: CreateBeneficiaryModel = {
-      currencyCode: data.currencyCode,
-      bankDetails: {
-        ...bankDetails,
-        ...(data.bankDetails.type === "iban"
-          ? { iban: data.bankDetails.iban?.trim() }
-          : {
-              aba: data.bankDetails.aba?.trim(),
-              accountNumber: data.bankDetails.accountNumber?.trim(),
-            }),
-      },
-    };
-
     try {
-      data = { ...data, ...schema.parse(nextData) };
+      data = { ...data, ...schema.parse(updateBeneficiaryData(data)) };
 
       return true;
     } catch (err) {
@@ -165,7 +153,7 @@
         <input type="radio" bind:group={bankDetails.type} value="iban" />
       </label>
       <label class="option typography body-large bold" class:selected={bankDetails.type === "aba"}>
-        Sort Code
+        Sort code and account no.
 
         <input type="radio" bind:group={bankDetails.type} value="aba" />
       </label>
@@ -179,13 +167,14 @@
       bind:value={bankDetails.bicSwift}
     />
 
-    <!-- TODO: Fix error handling. -->
     {#if bankDetails.type === "iban"}
       <TextField
         label="IBAN Code"
         required
         placeholder="Enter IBAN Code"
-        error={errors?.bankDetails?.iban}
+        error={errors?.bankDetails && "iban" in errors.bankDetails
+          ? errors.bankDetails.iban
+          : undefined}
         bind:value={bankDetails.iban}
       />
     {:else}
@@ -193,14 +182,18 @@
         label="Sort Code"
         required
         placeholder="00-00-00"
-        error={errors?.bankDetails?.aba}
+        error={errors?.bankDetails && "aba" in errors.bankDetails
+          ? errors.bankDetails.aba
+          : undefined}
         bind:value={bankDetails.aba}
       />
       <TextField
         label="Account Number"
         required
         placeholder="00000000"
-        error={errors?.bankDetails?.accountNumber}
+        error={errors?.bankDetails && "accountNumber" in errors.bankDetails
+          ? errors.bankDetails.accountNumber
+          : undefined}
         bind:value={bankDetails.accountNumber}
       />
     {/if}

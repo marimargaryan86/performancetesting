@@ -26,32 +26,30 @@
     ...[...Array(paddingRight)].map((_, idx) => new Date(year, month + 1, idx + 1)),
   ];
 
-  function createSelectFunc(date: Date): () => void {
-    return () => {
-      if (!range) {
-        const nextValue = dirtyValue && datesEq(date, dirtyValue as Date) ? undefined : date;
-
-        dirtyValue = nextValue as TDirtyValue;
-        value = nextValue as TValue;
-
-        return;
-      }
-
-      let nextValue = dirtyValue as Partial<DateRange> | undefined;
-
-      if (nextValue?.from) {
-        if (nextValue.to || nextValue.from > date) {
-          nextValue = { from: date };
-        } else {
-          nextValue = { ...nextValue, to: date };
-        }
-      } else {
-        nextValue = { from: date };
-      }
+  function select(date: Date): void {
+    if (!range) {
+      const nextValue = dirtyValue && datesEq(date, dirtyValue as Date) ? undefined : date;
 
       dirtyValue = nextValue as TDirtyValue;
-      value = nextValue?.from && nextValue.to ? (nextValue as TValue) : undefined;
-    };
+      value = nextValue as TValue;
+
+      return;
+    }
+
+    let nextValue = dirtyValue as Partial<DateRange> | undefined;
+
+    if (nextValue?.from) {
+      if (nextValue.to || nextValue.from > date) {
+        nextValue = { from: date };
+      } else {
+        nextValue = { ...nextValue, to: date };
+      }
+    } else {
+      nextValue = { from: date };
+    }
+
+    dirtyValue = nextValue as TDirtyValue;
+    value = nextValue?.from && nextValue.to ? (nextValue as TValue) : undefined;
   }
 
   function isStart(date: Date, currValue: TDirtyValue | undefined): boolean {
@@ -125,7 +123,7 @@
       class:in-range={isInRange(day, dirtyValue)}
       class:start={isStart(day, dirtyValue)}
       class:end={isEnd(day, dirtyValue)}
-      on:click={createSelectFunc(day)}
+      on:click={select.bind(select, day)}
     >
       <span>{day.getDate()}</span>
     </button>

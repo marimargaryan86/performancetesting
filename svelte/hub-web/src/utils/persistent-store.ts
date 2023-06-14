@@ -88,9 +88,7 @@ export function readableSessionStorage<T>(options: StoreOptions<T>): Readable<T>
   return writableSessionStorage(options);
 }
 
-export function writableCookie<T>(
-  options: StoreOptions<T> & { overwrite?: boolean },
-): WritableStorage<T> {
+export function writableCookie<T>(options: StoreOptions<T>): WritableStorage<T> {
   const store = writable(options.value, options.start);
   const returnValue = {
     ...store,
@@ -103,10 +101,10 @@ export function writableCookie<T>(
     return returnValue;
   }
 
-  const initialValue = getCookie(options.key);
+  const cookieValue = getCookie(options.key);
 
-  if (!options.overwrite && initialValue) {
-    const data = devalue.parse(decodeURIComponent(window.atob(initialValue)));
+  if (cookieValue) {
+    const data = devalue.parse(decodeURIComponent(window.atob(cookieValue)));
 
     if (options.verify?.(data) ?? true) {
       store.set(data);

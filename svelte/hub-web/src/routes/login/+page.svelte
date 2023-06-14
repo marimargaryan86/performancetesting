@@ -13,18 +13,16 @@
   let data = { email: "", password: "" };
   let pending = false;
 
-  function createClearErrorFunc(key: keyof Exclude<ActionData, null>): () => void {
-    return () => {
-      if (!form) {
-        return;
-      }
+  function clearError(key: keyof NonNullable<ActionData>): void {
+    if (!form) {
+      return;
+    }
 
-      if (key === "password" && form.email === true) {
-        form = {};
-      } else {
-        form[key] = undefined;
-      }
-    };
+    if (form.unauthorized) {
+      form = {};
+    } else {
+      form[key] = undefined;
+    }
   }
 
   async function submit(): Promise<void> {
@@ -59,7 +57,7 @@
         bind:value={data.email}
         error={form?.email}
         placeholder="Enter your email"
-        on:input={createClearErrorFunc("email")}
+        on:input={clearError.bind(clearError, "email")}
       >
         <EmailIcon slot="icon-before" color="var(--color-main-primary-500)" />
       </TextField>
@@ -71,7 +69,7 @@
         bind:value={data.password}
         error={form?.password}
         placeholder="Enter your password"
-        on:input={createClearErrorFunc("password")}
+        on:input={clearError.bind(clearError, "password")}
       >
         <LockIcon slot="icon-before" color="var(--color-main-primary-500)" />
       </TextField>

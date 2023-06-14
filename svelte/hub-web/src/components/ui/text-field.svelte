@@ -97,7 +97,6 @@
 
     display: inline-flex;
     flex-flow: column;
-    gap: 8px;
   }
 
   .text-field:focus-within {
@@ -105,6 +104,7 @@
   }
 
   label {
+    margin-bottom: 8px;
     color: var(--color-main-neutral-900);
     font-weight: var(--x-label-font-weight);
     font-size: var(--x-label-font-size);
@@ -176,6 +176,7 @@
   }
 
   .error-message {
+    margin-top: 8px;
     color: #fe4e4e;
     font-weight: 400;
     font-size: 10px;

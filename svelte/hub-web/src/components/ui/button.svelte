@@ -4,12 +4,14 @@
   export let variant: "primary" | "outline" | "text" = "primary";
   export let size: "large" | "medium" | "small" | "x-small" = "large";
   export let href: string | undefined = undefined;
+  export let preload = true;
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <svelte:element
   this={href ? "a" : "button"}
   {href}
+  data-sveltekit-preload-data={!href || preload ? undefined : "off"}
   on:click
   {type}
   {disabled}

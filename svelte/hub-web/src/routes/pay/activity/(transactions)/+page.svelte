@@ -45,14 +45,12 @@
     { by: sortGroup, direction: sortDirection },
   );
 
-  function createShowDetailsFunc(transaction: TransactionModel): () => void {
-    return () => {
-      selectedTransaction = transaction;
+  function showDetails(transaction: TransactionModel): void {
+    selectedTransaction = transaction;
 
-      if (selectedTransaction) {
-        bookingRequest = getBooking(selectedTransaction.bookingId);
-      }
-    };
+    if (selectedTransaction) {
+      bookingRequest = getBooking(selectedTransaction.bookingId);
+    }
   }
 
   function deselectTransaction(): void {
@@ -123,7 +121,7 @@
 
   <TBody>
     {#each transactions as item (item.id)}
-      <TRow on:click={createShowDetailsFunc(item)}>
+      <TRow on:click={showDetails.bind(showDetails, item)}>
         <TCol maxWidth="96px" copyable>{item.bookingId}</TCol>
         <TCol>{yymmdd(item.createdAt)}</TCol>
         <TCol maxWidth="160px">

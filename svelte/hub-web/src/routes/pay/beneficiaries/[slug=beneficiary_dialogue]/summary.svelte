@@ -1,13 +1,18 @@
 <script lang="ts">
-  import type { CreateBeneficiaryModel } from "models/beneficiary";
+  import type { BeneficiaryModel, CreateBeneficiaryModel } from "models/beneficiary";
   import type { CountryModel } from "models/location";
   import type { CurrencyModel } from "models/money";
-  import { capitalize } from "utils/common";
+  import { callAction, capitalize } from "utils/common";
+  import { updateBeneficiaryData } from "./helpers";
+  import { page } from "$app/stores";
+  import type { FormattedError } from "utils/zod";
 
   export let data: CreateBeneficiaryModel;
   export let countries: Map<string, CountryModel>;
   export let currencies: Map<string, CurrencyModel>;
+  export let error: string | undefined = undefined;
 
+  $: data = updateBeneficiaryData(data);
   $: currency = data.currencyCode ? currencies.get(data.currencyCode) : undefined;
   $: beneficiaryCountry = data.address?.countryCode
     ? countries.get(data.address.countryCode)
@@ -15,6 +20,21 @@
   $: bankCountry = data.bankDetails.address?.countryCode
     ? countries.get(data.bankDetails.address.countryCode)
     : undefined;
+
+  export async function validate(): Promise<boolean> {
+    error = undefined;
+
+    const result = await callAction<
+      { beneficiary: BeneficiaryModel },
+      { validation?: FormattedError<BeneficiaryModel>; service?: string }
+    >($page.url.toString());
+
+    if (result.type === "failure") {
+      error = String(result.data?.service ?? result.data?.validation);
+    }
+
+    return result.type === "success";
+  }
 </script>
 
 <div class="summary">

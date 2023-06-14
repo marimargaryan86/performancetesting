@@ -63,12 +63,10 @@
     },
   ];
 
-  function createToggleFunc(menuItem: SubMenu): () => void {
-    return () => {
-      menuItem.expanded = !menuItem.expanded;
+  function toggle(menuItem: SubMenu): void {
+    menuItem.expanded = !menuItem.expanded;
 
-      menuItems = [...menuItems];
-    };
+    menuItems = [...menuItems];
   }
 </script>
 
@@ -94,7 +92,7 @@
           class="typography body-small"
           type="button"
           title={expanded ? undefined : item.label}
-          on:click={createToggleFunc(item)}
+          on:click={toggle.bind(toggle, item)}
         >
           <span>{item.label}</span>
           <ChevronIcon
