@@ -1,5 +1,7 @@
+import more_itertools
 from grpc import StatusCode, aio
 
+from snowfall.project.junction.go.service.orders import bookings
 from snowfall.project.junction.go.service.orders.amqp import OrderProducer
 from snowfall.project.junction.go.service.orders.orders import (
     BookingDetailsRepository,
@@ -33,7 +35,8 @@ class OrderService(
         self,
         journeys: JourneyRepository,
         orders: OrderRepository,
-        bookings: BookingRepository,
+        booking_handler: bookings.BookingHandler,
+        booking_repository: BookingRepository,
         booking_details: BookingDetailsRepository,
         cancellations: BookingsCancellationsRepository,
         publisher: OrderProducer,
@@ -43,7 +46,8 @@ class OrderService(
         self._default_page_size = default_page_size
         self._journeys = journeys
         self._orders = orders
-        self._bookings = bookings
+        self._booking_handler = booking_handler
+        self._bookings = booking_repository
         self._booking_details = booking_details
         self._cancellations = cancellations
         self._publisher = publisher
@@ -189,7 +193,13 @@ class OrderService(
         if booking is None:
             await context.abort(StatusCode.NOT_FOUND)
 
-        return orders_pb2.GetBookingResponse(booking=booking)
+        return orders_pb2.GetBookingResponse(
+            booking=more_itertools.first(
+                await self._booking_handler.get_latest(
+                    [booking],  # type: ignore[list-item]
+                ),
+            ),
+        )
 
     async def ListBookings(  # type: ignore[override] # noqa: N802
         self,
@@ -214,7 +224,9 @@ class OrderService(
         )
 
         return orders_pb2.ListBookingsResponse(
-            bookings=[order async for order in bookings_result],
+            bookings=await self._booking_handler.get_latest(
+                [order async for order in bookings_result],
+            ),
             next_page_token=await bookings_result.cursor(),
         )
 

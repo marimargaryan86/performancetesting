@@ -8,7 +8,8 @@ from motor import motor_asyncio
 
 from snowfall.project.junction.go import pay_integration
 from snowfall.project.junction.go.adapter import passenger_name_records
-from snowfall.project.junction.go.service.orders import importer, orders
+from snowfall.project.junction.go.service.gateway.v1alpha import bookings_pb2_grpc
+from snowfall.project.junction.go.service.orders import bookings, importer, orders
 from snowfall.project.junction.go.service.orders.amqp import OrderProducer
 from snowfall.project.junction.go.service.orders.grpc import OrderService
 from snowfall.project.junction.go.service.orders.pay_transactions import (
@@ -29,6 +30,7 @@ from snowfall.vendor.junction.pay.client import Client as PayClient
 class _GrpcSettings(service.Settings):
     amqp_dsn: pydantic.AnyUrl
     default_page_size: int = 100
+    gateway_address: str
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
     mongo_dsn: Sequence[pydantic.AnyUrl]
@@ -69,6 +71,9 @@ async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
     amqp_connection = await app.stack.enter_async_context(
         types.Connection(app.settings.amqp_dsn),
     )
+    booking_repository = orders.BookingRepository(
+        collection=mongo.orders.journeys,
+    )
 
     grpc_server = server.create_server(
         app.settings.grpc_address,
@@ -82,9 +87,13 @@ async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
                 orders=orders.OrderRepository(
                     collection=mongo.orders.journeys,
                 ),
-                bookings=orders.BookingRepository(
-                    collection=mongo.orders.journeys,
+                booking_handler=bookings.BookingHandler(
+                    gateway=bookings_pb2_grpc.BookingServiceStub(
+                        client.create_channel(app.settings.gateway_address),
+                    ),
+                    fallback_bookings=booking_repository,
                 ),
+                booking_repository=booking_repository,
                 booking_details=orders.BookingDetailsRepository(
                     collection=mongo.orders.journeys,
                 ),

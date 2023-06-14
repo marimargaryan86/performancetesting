@@ -1,3 +1,4 @@
+import datetime
 from collections.abc import AsyncIterator
 
 import httpx
@@ -9,6 +10,7 @@ from snowfall.project.junction.go.service.orders import orders
 from snowfall.project.junction.go.service.orders.v1alpha import models_pb2
 from snowfall.project.junction.go.service.orders.zendesk.client import ZendeskClient
 from snowfall.stdlib import money
+from snowfall.stdlib.format import protobuf
 
 
 @pytest.fixture()
@@ -116,4 +118,15 @@ async def order(
             ),
         ],
         residence_address=None,
+    )
+
+
+@pytest.fixture()
+async def booking() -> models_pb2.Booking:
+    return models_pb2.Booking(
+        id="foo",
+        trip_result=models_pb2.TripBooking(provider_booking_reference="bar"),
+        updated_at=protobuf.datetime_to_protobuf(
+            datetime.datetime.now(datetime.UTC),
+        ),
     )

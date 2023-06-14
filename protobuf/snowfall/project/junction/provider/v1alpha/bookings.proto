@@ -3,6 +3,7 @@ syntax = "proto3";
 package snowfall.project.junction.provider.v1alpha;
 
 import "google/protobuf/timestamp.proto";
+import "snowfall/stdlib/v1/money.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/provider/v1alpha";
 
@@ -29,7 +30,6 @@ message Booking {
   message Provider {
     string id = 1;
     string name = 2;
-    string booking_reference = 3;
   }
   Provider provider = 2;
   message Trip {
@@ -49,6 +49,15 @@ message Booking {
     STATUS_ERROR = 6;
   }
   Status status = 4;
+  message Price {
+    enum Type {
+      TYPE_UNSPECIFIED = 0;
+      TYPE_TOTAL = 1;
+    }
+    Type type = 1;
+    snowfall.stdlib.v1.Money amount = 2;
+  }
+  repeated Price prices = 8;
   string raw_data = 5;
   google.protobuf.Timestamp created_at = 6;
   google.protobuf.Timestamp updated_at = 7;

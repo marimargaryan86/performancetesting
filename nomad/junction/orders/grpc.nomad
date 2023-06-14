@@ -77,6 +77,10 @@ job "orders-grpc" {
               local_bind_port  = 8020
               destination_name = "passenger-name-records-${var.environment}"
             }
+            upstreams {
+              local_bind_port  = 8010
+              destination_name = "gateway-${var.environment}"
+            }
           }
         }
       }
@@ -110,6 +114,7 @@ job "orders-grpc" {
       template {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
+GATEWAY_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_gateway-${var.environment}"))}}
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 PASSENGER_NAME_RECORDS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_passenger-name-records-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/zendesk" }}

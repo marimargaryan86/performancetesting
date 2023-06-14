@@ -321,6 +321,7 @@ class BookingRepository(repository.ProtoRepository[models_pb2.Booking]):
         booking: models_pb2.Booking,
     ) -> models_pb2.Booking:
         now = datetime.datetime.now(tz=datetime.UTC)
+        booking.updated_at.CopyFrom(protobuf.datetime_to_protobuf(now))
 
         await self._execute(
             self._collection.update_one,

@@ -105,7 +105,6 @@ class Transformer(object):
             provider=bookings_pb2.Booking.Provider(
                 id=booking.provider_id,
                 name=booking.provider_name,
-                booking_reference=booking.trip_result.provider_booking_reference,
             ),
             trip=bookings_pb2.Booking.Trip(
                 record_locator=booking.trip_result.record_locator,
