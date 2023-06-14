@@ -10,6 +10,7 @@ from snowfall.project.pay.service.beneficiaries.v1alpha import (
 )
 from snowfall.project.pay.service.companies.v1alpha import models_pb2
 from snowfall.project.pay.service.conversions.v1alpha.models_pb2 import Conversion
+from snowfall.project.pay.service.payments.v1alpha import models_pb2 as payment_models
 from snowfall.project.pay.service.payments.v1alpha.models_pb2 import Payment
 from snowfall.project.pay.service.quotations.v1alpha import (
     models_pb2 as quotation_models,
@@ -504,6 +505,10 @@ class PaymentsResource(models.Resource):
                 "reference": payment.reference,
                 "paymentAt": protobuf.protobuf_to_date(
                     payment.payment_due_date,
+                ),
+                "status": protobuf.enum_value_to_slug(
+                    payment_models.Status.DESCRIPTOR,
+                    payment.status,
                 ),
             },
             relationships={

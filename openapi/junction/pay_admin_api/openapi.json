@@ -2987,6 +2987,17 @@
                     "format": "date",
                     "example": "2023-03-06",
                     "description": "when the payment will be paid"
+                  },
+                  "status": {
+                    "type": "string",
+                    "example": "ready-to-send",
+                    "enum": [
+                      "pending",
+                      "ready-to-send",
+                      "completed",
+                      "failed"
+                    ],
+                    "readOnly": true
                   }
                 }
               },
