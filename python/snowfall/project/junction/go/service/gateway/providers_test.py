@@ -1,5 +1,7 @@
+import pytest
+
 from snowfall.project.junction.go.service.gateway import providers
-from snowfall.stdlib import string
+from snowfall.stdlib import sequence, string
 from snowfall.stdlib.testing import asserts
 
 _IDENTIFIERS = frozenset(string.uuid() for _ in range(10))
@@ -44,3 +46,8 @@ async def test_unmarshal_resource_ids() -> None:
 
     for group_provider_ids in grouped_unmarshal_results.values():
         await asserts.assert_iterable(group_provider_ids, _IDENTIFIERS)
+
+
+async def test_unmarshal_resource_id_invalid_length() -> None:
+    with pytest.raises(sequence.InvalidCompositeError):
+        providers.unmarshal_resource_id(sequence.to_composite_id(["foo", "bar", "baz"]))

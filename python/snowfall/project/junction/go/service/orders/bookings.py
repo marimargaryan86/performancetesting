@@ -1,4 +1,3 @@
-import base64
 import datetime
 import types
 from collections.abc import Sequence
@@ -12,6 +11,7 @@ from snowfall.project.junction.go.service.gateway.v1alpha import bookings_pb2_gr
 from snowfall.project.junction.go.service.orders import orders
 from snowfall.project.junction.go.service.orders.v1alpha import models_pb2
 from snowfall.project.junction.provider.v1alpha import bookings_pb2
+from snowfall.stdlib import sequence
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
 
@@ -52,9 +52,11 @@ class BookingHandler(object):
             response = await self._gateway.GetBookings(
                 request=gateway_bookings_pb2.GetBookingsRequest(
                     ids=[
-                        _marshal_resource_id(
-                            booking.provider_id,
-                            booking.trip_result.provider_booking_reference,
+                        sequence.to_composite_id(
+                            [
+                                booking.provider_id,
+                                booking.trip_result.provider_booking_reference,
+                            ],
                         )
                         for booking in bookings
                         if (
@@ -123,13 +125,3 @@ def _provider_booking_is_newer(
     return protobuf.protobuf_to_datetime(
         local_booking.updated_at,
     ) < protobuf.protobuf_to_datetime(provider_booking.updated_at)
-
-
-def _marshal_resource_id(provider_id: str, resource_id: str) -> str:
-    """Duplicate this code from gateway until all bookings are made over gRPC."""
-    raw = "\x00".join([provider_id, resource_id])
-
-    while len(raw) % 3 != 0:
-        raw = "{0}\x00".format(raw)
-
-    return base64.urlsafe_b64encode(raw.encode()).decode()

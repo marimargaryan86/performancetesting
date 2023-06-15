@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import asyncio
-import base64
 import dataclasses
 import datetime
 import itertools
@@ -16,6 +15,7 @@ from snowfall.project.junction.provider.v1alpha import (
     meta_pb2_grpc,
     offers_pb2_grpc,
 )
+from snowfall.stdlib import sequence
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.transport.grpc import client
 
@@ -151,12 +151,7 @@ class Provider(object):
     )
 
     def marshal_resource_id(self, resource_id: str) -> str:
-        raw = "\x00".join([self.identifier, resource_id])
-
-        while len(raw) % 3 != 0:
-            raw = "{0}\x00".format(raw)
-
-        return base64.urlsafe_b64encode(raw.encode()).decode()
+        return sequence.to_composite_id([self.identifier, resource_id])
 
 
 class Connection(object):
@@ -180,10 +175,12 @@ class Connection(object):
 
 
 def unmarshal_resource_id(resource_id: str) -> UnmarshalResult:
-    raw = base64.urlsafe_b64decode(resource_id).decode()
-    provider_id, resource_id = raw.rstrip("\x00").split("\x00")
+    parts = sequence.from_composite_id(resource_id)
 
-    return UnmarshalResult(provider_id, resource_id)
+    if len(parts) != 2:
+        raise sequence.InvalidCompositeError
+
+    return UnmarshalResult(parts[0], parts[1])
 
 
 def unmarshal_resource_ids(resource_ids: Sequence[str]) -> dict[str, list[str]]:

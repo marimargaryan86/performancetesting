@@ -1,3 +1,5 @@
+import base64
+import binascii
 import dataclasses
 from collections.abc import Sequence
 from typing import Generic, TypeGuard, TypeVar, cast
@@ -43,3 +45,25 @@ def paginate(
         sequence=sequence[start_index:end_index],
         cursor=cursor,
     )
+
+
+class InvalidCompositeError(ValueError):
+    """Raised when an invalid composite ID is unmarshalled."""
+
+
+def from_composite_id(identifier: str) -> Sequence[str]:
+    try:
+        raw = base64.urlsafe_b64decode(identifier).decode()
+    except binascii.Error as err:
+        raise InvalidCompositeError from err
+
+    return raw.rstrip("\x00").split("\x00")
+
+
+def to_composite_id(parts: Sequence[str]) -> str:
+    raw = "\x00".join(parts)
+
+    while len(raw) % 3 != 0:
+        raw = "{0}\x00".format(raw)
+
+    return base64.urlsafe_b64encode(raw.encode()).decode()
