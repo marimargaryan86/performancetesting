@@ -6,11 +6,11 @@ import zoneinfo
 from collections.abc import Sequence
 
 import more_itertools
-import structlog
 
 from snowfall.project.junction.go.service.offers.v1alpha import models_pb2 as offers_pb2
 from snowfall.project.junction.go.v1alpha import models_pb2
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.logging import stdout
 
 
 @dataclasses.dataclass(frozen=True)
@@ -48,7 +48,7 @@ class SegmentMatcher(object):
         allowed_window_td: datetime.timedelta,
     ) -> None:
         self._segments = segments
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
         self._allowed_window_td = allowed_window_td
 
     def offer_group_matches(self, offer_group: offers_pb2.OfferGroup) -> bool:

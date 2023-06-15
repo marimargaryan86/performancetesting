@@ -3,10 +3,10 @@ import zoneinfo
 from collections.abc import Generator, Sequence
 
 import pydantic
-import structlog
 
 from snowfall.stdlib.format.gtfs import enums as gtfs_enums
 from snowfall.stdlib.format.gtfs import models as gtfs_models
+from snowfall.stdlib.logging import stdout
 from snowfall.vendor.direct_ferries.models import route as df_route_models
 from snowfall.vendor.direct_ferries.models import timetable
 from snowfall.vendor.direct_ferries.models import timetable as df_timetable_models
@@ -40,7 +40,7 @@ class DFDataConverter(object):  # noqa: WPS214
     ):
         self._timetable_responses = timetable_responses
         self._calendar_dates_mapping: dict[int, str] = {}
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
 
     def convert_agency(self) -> Generator[gtfs_models.Agency, None, None]:
         yield gtfs_models.Agency(

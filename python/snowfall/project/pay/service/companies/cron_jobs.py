@@ -1,9 +1,8 @@
-import structlog
-
 from snowfall.project.pay.service.companies.repositories import AccountsRepository
 from snowfall.project.pay.service.companies.v1alpha.models_pb2 import Account
 from snowfall.stdlib import string
 from snowfall.stdlib.format.protobuf import datetime_to_protobuf, protobuf_to_datetime
+from snowfall.stdlib.logging import stdout
 from snowfall.vendor.currency_cloud.client import PaymentClient
 from snowfall.vendor.currency_cloud.models.account import AccountResponse
 
@@ -15,7 +14,7 @@ class SyncAccounts(object):
         accounts_repository: AccountsRepository,
     ):
         self._payment_client = payment_client
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
         self._accounts_repository = accounts_repository
 
     async def sync_accounts(

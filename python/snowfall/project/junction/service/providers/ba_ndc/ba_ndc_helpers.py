@@ -5,12 +5,12 @@ from typing import Any
 
 import more_itertools
 import phonenumbers
-import structlog
 from google.protobuf import timestamp_pb2
 
 from snowfall.project.junction.go.service.orders.v1alpha import amqp_pb2
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.v1 import date_pb2, datetime_pb2, money_pb2
 from snowfall.vendor.ba_ndc.models import response_common_order_schemas
 
@@ -66,4 +66,4 @@ def str_to_uuid(char_string: str) -> str:
 
 
 def get_logger(name: str) -> Any:
-    return structlog.get_logger(name)
+    return stdout.get_logger()

@@ -1,12 +1,12 @@
 import httpx
-import structlog
 
 from snowfall.stdlib.instrumentation.httpx import _discovery  # noqa: WPS450
+from snowfall.stdlib.logging import stdout
 
 
 class _ResponseHandler(object):
     def __init__(self) -> None:
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
 
     async def __call__(self, response: httpx.Response) -> None:
         await response.aread()

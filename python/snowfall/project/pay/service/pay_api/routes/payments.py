@@ -2,7 +2,6 @@ from collections.abc import Mapping
 from typing import Any
 
 import lagom
-import structlog
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.project.pay.adapter.payments import GrpcClient
@@ -20,8 +19,9 @@ from snowfall.stdlib.integration.starlette import (
     pagination_helpers,
     request_helpers,
 )
+from snowfall.stdlib.logging import stdout
 
-_logger = structlog.get_logger(__name__)
+_logger = stdout.get_logger()
 
 
 class Payment(endpoints.HTTPEndpoint):

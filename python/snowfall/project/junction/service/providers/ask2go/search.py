@@ -4,11 +4,10 @@ import math
 import uuid
 from collections.abc import AsyncIterator
 
-import structlog
-
 from snowfall.project.junction.service.providers.ask2go.v1alpha import amqp_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.logging import stdout
 from snowfall.vendor.ask2go import client, enums
 from snowfall.vendor.ask2go.models import offers, search
 
@@ -45,7 +44,7 @@ class Adapter(object):
         self._client = ask2go_client
         self._poll_retries_limit = poll_retries_limit
         self._wait_time_between_polling = wait_time_between_polling
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
 
     async def gather_search_results(
         self,

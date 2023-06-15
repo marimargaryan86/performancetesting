@@ -1,3 +1,17 @@
+__dependents_rules__(
+    (
+        ("//vendor#freezegun",),
+        "**_test.py",
+        "!*",
+    ),
+    (
+        ("//vendor#structlog",),
+        "python/snowfall/stdlib/logging/*.py",
+        "!*",
+    ),
+    ("*", "*"),
+)
+
 python_requirements(
     module_mapping={
         "googleapis-common-protos": [

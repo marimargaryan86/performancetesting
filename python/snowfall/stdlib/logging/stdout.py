@@ -2,7 +2,7 @@ import contextlib
 import contextvars
 import logging
 from collections.abc import Iterator, Sequence
-from typing import Any, Protocol
+from typing import Any, Protocol, Self
 
 import structlog
 
@@ -27,6 +27,12 @@ class Logger(Protocol):
 
     def critical(self, event: str, *args: Any, **kw: Any) -> None:
         """Log at **critical** level."""
+
+    def bind(self, **kwargs: Any) -> Self:
+        """Bind values."""
+
+
+capture_logs = structlog.testing.capture_logs
 
 
 def get_logger() -> Logger:

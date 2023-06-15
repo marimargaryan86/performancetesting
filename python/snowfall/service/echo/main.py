@@ -2,10 +2,10 @@ import ipaddress
 
 from grpc import aio
 from pydantic import AnyUrl
-from structlog import get_logger
 
 from snowfall.service.echo.v1 import echo_pb2, echo_pb2_grpc
 from snowfall.stdlib import service
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.stdlib.transport.grpc import server as grpc_server
 from snowfall.stdlib.transport.grpc import service as grpc_service
@@ -62,7 +62,7 @@ async def _produce(app: service.Application[_AmqpSettings]) -> None:
 
 
 async def _echo_message(message: types.Message[echo_pb2.EchoRequest]) -> None:
-    get_logger(__name__).info(message.body.echo)
+    stdout.get_logger().info(message.body.echo)
 
 
 async def _consume(app: service.Application[_AmqpSettings]) -> None:

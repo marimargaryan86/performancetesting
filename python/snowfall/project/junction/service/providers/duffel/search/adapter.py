@@ -2,8 +2,6 @@ import datetime
 from collections import defaultdict
 from collections.abc import AsyncIterator, Callable, Mapping, Sequence
 
-import structlog
-
 from snowfall.project.junction.go.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
@@ -16,6 +14,7 @@ from snowfall.project.junction.service.providers.duffel.search.validator import 
 from snowfall.project.junction.service.providers.duffel.v1alpha import amqp_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.logging import stdout
 from snowfall.vendor.duffel import client
 from snowfall.vendor.duffel.builders.offer_request import (
     OfferRequestData,
@@ -76,7 +75,7 @@ class DuffelSearchAdapter(object):
     ) -> None:
         self._client = duffel_client
         self._offer_parser = OfferParser(default_ttl=ttl, offer_cache=offers_cache)
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
         self._airline_validator = AirlineValidator(
             enabled_airlines=enabled_airlines,
             disabled_airlines=disabled_airlines,

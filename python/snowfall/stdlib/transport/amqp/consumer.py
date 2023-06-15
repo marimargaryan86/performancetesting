@@ -8,8 +8,8 @@ from typing import TypeVar, cast
 from aio_pika import abc
 from google.protobuf import message
 from pamqp import common
-from structlog import get_logger
 
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.transport.amqp import middlewares, protocol, types
 
 _Proto = TypeVar("_Proto", bound=message.Message)
@@ -41,7 +41,7 @@ class Consumer(protocol.Consumer[_Proto]):
                 *reversed(middleware_stack or []),
             ],
         )
-        self._logger = get_logger(__name__)
+        self._logger = stdout.get_logger()
         self._queue_name = queue_name
         self._queue_arguments = queue_arguments
 

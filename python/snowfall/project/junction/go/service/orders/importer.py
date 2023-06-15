@@ -1,11 +1,10 @@
-import structlog
-
 from snowfall.project.junction.go.service.orders import orders
 from snowfall.project.junction.go.service.orders.pay_transactions import (
     PayTransactionCreationError,
     PayTransactionCreator,
 )
 from snowfall.project.junction.go.service.orders.v1alpha import models_pb2
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.transport.amqp import consumer, types
 
 
@@ -18,7 +17,7 @@ class BookingImporter(object):
     ):
         self._consumer = consumer_obj
         self._bookings = booking_repository
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
         self._pay_transaction_creator = pay_transaction_creator
 
     async def consume(self) -> None:

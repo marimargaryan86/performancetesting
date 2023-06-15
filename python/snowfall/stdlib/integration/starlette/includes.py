@@ -4,11 +4,11 @@ import itertools
 from collections import defaultdict
 from collections.abc import Awaitable, Callable, Sequence
 
-import structlog
 from starlette import requests
 
 from snowfall.stdlib import sequence
 from snowfall.stdlib.integration.starlette import models
+from snowfall.stdlib.logging import stdout
 
 ResolverFunc = Callable[
     [Sequence[str], requests.Request],
@@ -34,7 +34,7 @@ def add_resolver(resolver: Resolver) -> None:
 class _IncludesResolver(object):
     def __init__(self, wanted_includes: frozenset[str]):
         self._known_resources: set[tuple[str, str]] = set()
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
         self._wanted_includes = wanted_includes
 
     async def resolve(  # noqa: WPS210

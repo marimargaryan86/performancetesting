@@ -3,11 +3,11 @@ import time
 from typing import TypeVar
 
 import prometheus_client
-import structlog
 from google.protobuf import message
 from sentry_sdk import Hub, set_tag, tracing
 
 from snowfall.stdlib.instrumentation import prometheus
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.transport.amqp import protocol, types
 
 _Proto = TypeVar("_Proto", bound=message.Message)
@@ -120,7 +120,7 @@ async def with_sentry_context(
 
 
 def auto_ack_and_nack_factory() -> protocol.ConsumerMiddleware[_Proto]:
-    logger = structlog.get_logger(__name__)
+    logger = stdout.get_logger()
 
     async def wrapper(
         msg: types.Message[_Proto],

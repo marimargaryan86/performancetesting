@@ -3,7 +3,6 @@ import functools
 from collections.abc import Awaitable, Callable, Sequence
 from typing import ParamSpec, TypeVar, cast
 
-import structlog
 from starlette import requests, status
 
 from snowfall.project.pay.service.beneficiaries.v1alpha.models_pb2 import Beneficiary
@@ -13,8 +12,9 @@ from snowfall.project.pay.service.pay_api.repositories import (
 )
 from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import Transaction
 from snowfall.stdlib.integration.starlette import messages, models, request_helpers
+from snowfall.stdlib.logging import stdout
 
-_logger = structlog.get_logger(__name__)
+_logger = stdout.get_logger()
 _In = ParamSpec("_In")
 _Out = TypeVar("_Out")
 

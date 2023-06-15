@@ -2,7 +2,6 @@ from collections.abc import Awaitable, Callable, Container
 from typing import cast
 
 import sentry_sdk
-import structlog
 from openapi_core.exceptions import OpenAPIError
 from openapi_core.templating.paths.exceptions import PathNotFound
 from openapi_core.templating.security import exceptions as security_exceptions
@@ -12,6 +11,7 @@ from starlette import applications, exceptions, requests, responses, status, typ
 from starlette.middleware import base
 
 from snowfall.stdlib.integration.starlette import handlers, validation
+from snowfall.stdlib.logging import stdout
 
 
 class RequestWithBody(requests.Request):
@@ -110,8 +110,8 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
         validate_response: bool = True,
     ):
         super().__init__(app)
-        self._logger = structlog.get_logger(__name__)
-        self._response_logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
+        self._response_logger = stdout.get_logger()
         self._validator = validator
         self._excluded_status_codes = excluded_status_codes or []
         self._validate_response = validate_response

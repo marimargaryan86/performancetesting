@@ -3,8 +3,8 @@ from collections.abc import AsyncGenerator, Mapping, Sequence
 from typing import Any
 
 import httpx
-import structlog
 
+from snowfall.stdlib.logging import stdout
 from snowfall.vendor.currency_cloud.errors import CurrencyCloudError
 from snowfall.vendor.currency_cloud.models.account import (
     AccountRequest,
@@ -35,7 +35,7 @@ from snowfall.vendor.currency_cloud.models.payment import (
 )
 from snowfall.vendor.currency_cloud.models.rate import BasicRateResponse
 
-_logger = structlog.get_logger(__name__)
+_logger = stdout.get_logger()
 _METHOD_GET = "GET"
 _METHOD_POST = "POST"
 

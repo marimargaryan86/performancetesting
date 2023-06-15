@@ -4,7 +4,8 @@ import os
 
 import aiofiles
 import httpx
-import structlog
+
+from snowfall.stdlib.logging import stdout
 
 
 class LogHandler(object):
@@ -46,7 +47,7 @@ class RequestLogHandler(LogHandler):
         log_path: str | None = None,
     ) -> None:
         super().__init__(base_url=base_url, log_path=log_path)
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
 
     async def __call__(self, request: httpx.Request) -> None:
         self._logger.info("Request", url=request.url, headers=request.headers)
@@ -75,7 +76,7 @@ class ResponseLogHandler(LogHandler):
         log_path: str | None = None,
     ) -> None:
         super().__init__(base_url=base_url, log_path=log_path)
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
 
     async def __call__(self, response: httpx.Response) -> None:
         await response.aread()

@@ -9,13 +9,13 @@ from dataclasses import dataclass, field
 from typing import Any, NamedTuple
 
 import httpx
-import structlog
 from xsdata.exceptions import ClientValueError
 from xsdata.formats.dataclass.parsers import XmlParser
 from xsdata.formats.dataclass.parsers.config import ParserConfig
 from xsdata.formats.dataclass.parsers.json import DictConverter
 from xsdata.formats.dataclass.serializers import XmlSerializer
 
+from snowfall.stdlib.logging import stdout
 from snowfall.vendor.carnect.soap.log_filter import LogFilter
 
 
@@ -70,7 +70,7 @@ class SoapLogger(object):
         export_files: bool | None = False,
         export_dir: str | None = None,
     ) -> None:
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
         self._log_filter = LogFilter(secret_words=secret_words)
         self._export_files = export_files
         self._operation_name_re = re.compile(r"^(.*?)(\w+)$")

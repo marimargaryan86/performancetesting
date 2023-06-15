@@ -1,7 +1,5 @@
 import datetime
 
-import structlog
-
 from snowfall.project.junction.go.service.offers.v1alpha import (
     amqp_pb2 as offers_amqp_pb2,
 )
@@ -16,6 +14,7 @@ from snowfall.project.junction.service.providers.direct_ferries import (
 )
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.stdlib.v1 import amqp_pb2 as trackable_pb2
 
@@ -43,7 +42,7 @@ class PriceQuoteConsumer(object):
         self._offer_cache = offer_cache
         self._ttl = price_ttl
         self._consumer = consumer_obj
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
         self._producer = producer_obj
         self._provider_company_id = provider_company_id
         self._routes = routes
@@ -129,7 +128,7 @@ class OrdersConsumer(object):
         self._consumer = consumer_obj
         self._producer = producer_obj
         self._bookings = bookings
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)

@@ -7,7 +7,6 @@ import zoneinfo
 from collections.abc import Sequence
 
 import more_itertools
-import structlog
 
 from snowfall.project.junction.go.service.planner.v1alpha import (
     planner_pb2,
@@ -16,6 +15,7 @@ from snowfall.project.junction.go.service.planner.v1alpha import (
 from snowfall.project.junction.go.service.trips import orchestrator, trips
 from snowfall.project.junction.go.service.trips.v1alpha import amqp_pb2, trips_pb2
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.transport.amqp import consumer, types
 from snowfall.stdlib.v1 import latlng_pb2
 
@@ -53,7 +53,7 @@ class TripSearchConsumer(object):
         trip_repository: trips.TripRepository,
     ):
         self._consumer = consumer_obj
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
         self._planner = planner
         self._trip_search_repository = trip_search_repository
         self._trip_repository = trip_repository
@@ -136,7 +136,7 @@ class TripCandidateSearchConsumer(object):
         self._trip_candidate_search_repository = trip_candidate_search_repository
         self._trip_orchestrator = trip_orchestrator
         self._offer_orchestrator = offer_orchestrator
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)

@@ -17,7 +17,7 @@ def _decode_log(capsys: capture.CaptureFixture[str]) -> dict[str, Any]:
 class TestStructlog(object):
     def test_format_is_json(self, capsys: capture.CaptureFixture[str]) -> None:
         stdout.configure_logger()
-        logger = structlog.get_logger("testing")
+        logger = stdout.get_logger()
         logger.info("test")
         json_message = capsys.readouterr().out.strip()
         assert orjson.loads(json_message)
@@ -28,7 +28,6 @@ class TestStructlog(object):
         [
             ("event", "test"),
             ("level", "info"),
-            ("logger", "testing"),
             ("source", "application"),
             ("timestamp", "2021-12-21T12:12:12.121212Z"),
         ],
@@ -40,21 +39,21 @@ class TestStructlog(object):
         expected: str,
     ) -> None:
         stdout.configure_logger()
-        logger = structlog.get_logger("testing")
+        logger = stdout.get_logger()
         logger.info("test")
         json_message = _decode_log(capsys)
         assert json_message.get(field) == expected
 
     def test_kwargs(self, capsys: capture.CaptureFixture[str]) -> None:
         stdout.configure_logger()
-        logger = structlog.get_logger("testing")
+        logger = stdout.get_logger()
         logger.info("test", field="testing")
         json_message = _decode_log(capsys)
         assert json_message.get("field") == "testing"
 
     def test_bound_kwarg(self, capsys: capture.CaptureFixture[str]) -> None:
         stdout.configure_logger()
-        logger = structlog.get_logger("testing")
+        logger = stdout.get_logger()
         logger = logger.bind(field="testing")
         logger.info("test")
         json_message = _decode_log(capsys)
@@ -67,7 +66,7 @@ class TestStructlog(object):
         capsys: capture.CaptureFixture[str],
     ) -> None:
         stdout.configure_logger()
-        logger = structlog.get_logger("testing")
+        logger = stdout.get_logger()
         logger.info("test", **{field: "testing"})
         json_message = _decode_log(capsys)
         assert json_message.get(field) == filtering.FILTERED_WORD
@@ -77,7 +76,7 @@ class TestStructlog(object):
         capsys: capture.CaptureFixture[str],
     ) -> None:
         stdout.configure_logger()
-        logger = structlog.get_logger("testing")
+        logger = stdout.get_logger()
 
         with stdout.context_binding(field="testing"):
             logger.info("test")
@@ -90,7 +89,7 @@ class TestStructlog(object):
         capsys: capture.CaptureFixture[str],
     ) -> None:
         stdout.configure_logger()
-        logger = structlog.get_logger("testing")
+        logger = stdout.get_logger()
 
         with stdout.context_binding(field="testing"):
             logger.info("test")
@@ -106,7 +105,7 @@ class TestStructlog(object):
         capsys: capture.CaptureFixture[str],
     ) -> None:
         stdout.configure_logger()
-        logger = structlog.get_logger("testing")
+        logger = stdout.get_logger()
 
         with stdout.context_binding() as context:
             context.bind(field="testing")
@@ -120,7 +119,7 @@ class TestStructlog(object):
         capsys: capture.CaptureFixture[str],
     ) -> None:
         stdout.configure_logger()
-        logger = structlog.get_logger("testing")
+        logger = stdout.get_logger()
 
         with stdout.context_binding(first="testing"):
             logger.info("test")
@@ -163,7 +162,6 @@ class TestStandardLogger(object):
         [
             ("event", "test"),
             ("level", "info"),
-            ("logger", "testing"),
             ("source", "application"),
             ("timestamp", "2021-12-21T12:12:12.121212Z"),
         ],

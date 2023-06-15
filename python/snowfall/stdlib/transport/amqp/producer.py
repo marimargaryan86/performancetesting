@@ -7,10 +7,10 @@ import prometheus_client
 from aio_pika import Message as PikaMessage
 from aio_pika import abc
 from google.protobuf import message
-from structlog import get_logger
 
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.instrumentation.sentry import get_span
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.transport.amqp import protocol, types
 
 _SPAN_PRODUCER_OP = "amqp.produce"
@@ -30,7 +30,7 @@ class Producer(protocol.Producer):
     ):
         self._connection = connection
         self._exchange = exchange
-        self._logger = get_logger(__name__)
+        self._logger = stdout.get_logger()
 
     async def publish(
         self,

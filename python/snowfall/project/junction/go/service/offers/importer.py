@@ -4,7 +4,6 @@ import datetime
 from collections.abc import Sequence
 
 import prometheus_client
-import structlog
 from pymongo import errors
 
 from snowfall.project.junction.go.service.gateway.v1alpha import (
@@ -24,6 +23,7 @@ from snowfall.project.junction.go.service.offers.v1alpha.models_pb2 import (
 )
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.instrumentation import prometheus
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.redis import types
 from snowfall.stdlib.transport.amqp import consumer, trackable
 from snowfall.stdlib.transport.amqp import types as amqp_types
@@ -123,7 +123,7 @@ class OfferImporter(object):
         self._consumer = consumer_obj
         self._offers = trip_offers
         self._aggregator = offer_aggregator
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
         self._redis = redis
         self._status_handler = status_handler
         self._searches = offer_searches

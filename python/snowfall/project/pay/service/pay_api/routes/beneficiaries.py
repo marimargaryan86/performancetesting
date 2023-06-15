@@ -3,7 +3,6 @@ from collections.abc import Mapping
 from typing import Any, cast
 
 import lagom
-import structlog
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.project.pay.adapter import accounts as accounts_adapter
@@ -24,9 +23,10 @@ from snowfall.stdlib.integration.starlette import (
     pagination_helpers,
     request_helpers,
 )
+from snowfall.stdlib.logging import stdout
 from snowfall.vendor.currency_cloud import client
 
-_logger = structlog.get_logger(__name__)
+_logger = stdout.get_logger()
 
 
 class Beneficiary(endpoints.HTTPEndpoint):

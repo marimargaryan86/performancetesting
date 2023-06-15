@@ -2,8 +2,6 @@ import datetime
 import zoneinfo
 from collections.abc import AsyncIterator, Collection, Sequence
 
-import structlog
-
 from snowfall.project.junction.go.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
@@ -13,6 +11,7 @@ from snowfall.project.junction.service.providers.distribusion.search import amen
 from snowfall.project.junction.service.providers.distribusion.v1alpha import amqp_pb2
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.v1 import latlng_pb2
 from snowfall.vendor.distribusion import client
 from snowfall.vendor.distribusion.models import connections
@@ -219,7 +218,7 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
         self._client = distribusion_client
         self._offers_cache = offers_cache
         self._ttl = ttl
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
 
     def search_criteria_generator(
         self,

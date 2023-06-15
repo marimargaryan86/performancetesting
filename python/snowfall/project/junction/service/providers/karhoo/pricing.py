@@ -1,7 +1,6 @@
 import datetime
 import random
 
-import structlog
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.go.service.offers.v1alpha import (
@@ -11,6 +10,7 @@ from snowfall.project.junction.go.service.offers.v1alpha import models_pb2 as of
 from snowfall.project.junction.service.providers.karhoo import cache, config
 from snowfall.stdlib import money, service
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer
@@ -61,7 +61,7 @@ class PriceQuoteConsumer(object):
         self._cache = offer_cache
         self._consumer = consumer_obj
         self._producer = producer_obj
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
         self._ttl = ttl
         self._provider_company_id = provider_company_id
 

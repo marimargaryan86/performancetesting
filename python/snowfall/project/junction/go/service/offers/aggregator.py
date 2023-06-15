@@ -4,12 +4,12 @@ import itertools
 from collections.abc import Mapping, Sequence
 
 import prometheus_client
-import structlog
 
 from snowfall.project.junction.go.service.offers import offers
 from snowfall.project.junction.go.service.offers.v1alpha import amqp_pb2, models_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.v1 import amqp_pb2 as trackable_pb2
 
@@ -178,7 +178,7 @@ class OfferAggregator(object):
         self._searches = offer_searches
         self._buckets = offer_buckets
         self._aggregates = offer_aggregates
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
 
     async def aggregate(
         self,

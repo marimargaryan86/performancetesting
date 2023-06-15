@@ -6,7 +6,6 @@ from collections.abc import AsyncIterator, Sequence
 import httpx
 import phonenumbers
 import pycountry
-import structlog
 
 from snowfall.project.junction.go.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
@@ -28,6 +27,7 @@ from snowfall.project.junction.service.providers.save_a_train import (
 from snowfall.project.junction.service.providers.save_a_train.v1alpha import amqp_pb2
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.transport.amqp import producer
 from snowfall.stdlib.v1 import latlng_pb2
 from snowfall.vendor.save_a_train import client, enums, exceptions
@@ -37,7 +37,7 @@ from snowfall.vendor.save_a_train.models import (
     search_result_selection,
 )
 
-logger = structlog.get_logger(__name__)
+logger = stdout.get_logger()
 
 
 class SaveATrainAdapterError(Exception):
@@ -73,7 +73,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         self._ttl = ttl
         self._notifier = notifier
         self._notifications_producer = notifications_producer
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
 
     def search_criteria_generator(
         self,

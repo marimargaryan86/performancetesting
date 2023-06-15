@@ -1,7 +1,5 @@
 import uuid
 
-import structlog
-
 from snowfall.project.junction.go.service.offers import offers
 from snowfall.project.junction.go.service.offers.pay_quotes_models import (
     PayQuoteResponse,
@@ -12,6 +10,7 @@ from snowfall.project.junction.go.service.offers.v1alpha.amqp_pb2 import (
     TripPriceQuoteResult,
 )
 from snowfall.stdlib import money, string
+from snowfall.stdlib.logging import stdout
 from snowfall.vendor.junction.pay.client import Client as PayClient
 
 
@@ -27,7 +26,7 @@ class PayQuotes(object):
     ):
         self._pay_client = pay_client
         self._offer_options_repository = offer_options_repository
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
 
     async def get_offer_search_quotes(
         self,

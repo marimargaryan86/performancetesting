@@ -2,7 +2,8 @@ import abc
 from email import message
 
 import aiosmtplib
-import structlog
+
+from snowfall.stdlib.logging import stdout
 
 
 class NotificationError(Exception):
@@ -35,7 +36,7 @@ class Notifier(abc.ABC):
 
 class LogNotifier(Notifier):
     def __init__(self) -> None:
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
 
     async def send(self, notification: Notification) -> None:
         self._logger.info("Message sent", **notification.template_parameters)

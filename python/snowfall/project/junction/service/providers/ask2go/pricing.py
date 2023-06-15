@@ -1,6 +1,5 @@
 import asyncio
 
-import structlog
 import tenacity
 
 from snowfall.project.junction.service.providers.ask2go import cache
@@ -31,7 +30,7 @@ class Adapter(object):
         self._client = ask2go_client
         self._poll_retries_limit = poll_retries_limit
         self._wait_time_between_polling = wait_time_between_polling
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
 
     async def get_price_quote(
         self,

@@ -2,7 +2,6 @@ import datetime
 import random
 
 import httpx
-import structlog
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.go.service.offers.v1alpha import (
@@ -16,6 +15,7 @@ from snowfall.project.junction.service.providers.duffel import (
 from snowfall.project.junction.service.providers.duffel.config import PricingSettings
 from snowfall.stdlib import service
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer
@@ -93,7 +93,7 @@ class PriceQuoteConsumer(object):
         self._pricing = pricing_adapter
         self._cache = offer_cache
         self._consumer = consumer_obj
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
         self._producer = producer_obj
         self._adapter = adapter
         self._transformer = transformer

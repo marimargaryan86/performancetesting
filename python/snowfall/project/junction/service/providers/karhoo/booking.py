@@ -1,12 +1,11 @@
 import datetime
 
-import structlog
-
 from snowfall.project.junction.go.service.orders.v1alpha import amqp_pb2, models_pb2
 from snowfall.project.junction.provider import notifications as base_notifications
 from snowfall.project.junction.service.providers.karhoo import cache, notifications
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.logging import stdout
 from snowfall.vendor.karhoo import client
 from snowfall.vendor.karhoo.models import bookings, passenger
 
@@ -21,7 +20,7 @@ class BookingHandler(object):
         notifier: base_notifications.Notifier,
     ):
         self._client = karhoo_client
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
         self._notifier = notifier
 
     async def book(

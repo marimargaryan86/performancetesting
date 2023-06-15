@@ -1,5 +1,4 @@
 import phonenumbers
-import structlog
 from dateutil.relativedelta import relativedelta
 
 from snowfall.project.junction.go.service.orders.v1alpha import amqp_pb2, models_pb2
@@ -7,6 +6,7 @@ from snowfall.project.junction.service.providers.duffel import cache, notificati
 from snowfall.project.junction.service.providers.duffel.enums import gender_from_proto
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.v1 import date_pb2
 from snowfall.vendor.duffel import client, errors
 from snowfall.vendor.duffel.builders.order_request import (
@@ -31,7 +31,7 @@ class BookingHandler(object):  # noqa: WPS214
         price_change_tolerance_percent: float,
     ):
         self._client = duffel_client
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
         self._notifier = notifier
         self._price_change_tolerance_percent = price_change_tolerance_percent
 

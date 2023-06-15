@@ -6,8 +6,8 @@ from collections.abc import Mapping
 from typing import Any
 
 import httpx
-import structlog
 
+from snowfall.stdlib.logging import stdout
 from snowfall.vendor.distribusion import errors, jsonapi_helpers
 from snowfall.vendor.distribusion.models import (
     bookings,
@@ -50,7 +50,7 @@ class DistribusionClient(object):  # noqa: WPS214
         self._retailer_partner_number = retailer_partner_number
         self._http_client = http_client
         self._http_client.base_url = self._api_base_url
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
 
     async def get_marketing_carriers(self) -> list[marketing_carriers.MarketingCarrier]:
         response = await self._make_request(

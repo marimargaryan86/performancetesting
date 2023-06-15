@@ -2,12 +2,12 @@ import datetime
 
 import more_itertools
 import pytest_httpx
-from structlog import testing
 
 from snowfall.project.junction.go.service.orders.v1alpha import amqp_pb2, models_pb2
 from snowfall.project.junction.service.providers.ask2go import booking, cache, conftest
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.v1 import phone_number_pb2, postal_address_pb2
 
 _GET_BOOKING_URL = "https://test_url/api/Booking?id={id}&transactionId={transaction_id}"
@@ -96,7 +96,7 @@ async def test_booking_errors(
     booking_handler: booking.BookingHandler,
     magic_mocker: conftest.MagicMocker,
 ) -> None:
-    with testing.capture_logs() as cap_logs:
+    with stdout.capture_logs() as cap_logs:
         with magic_mocker.with_fixture_path("booking_error"):
             booking_proto = await booking_handler.book(
                 task=_ORDER_TASK,
@@ -123,7 +123,7 @@ async def test_unhandled_booking_error(
         url="https://test_url/api/Booking",
     )
 
-    with testing.capture_logs() as cap_logs:
+    with stdout.capture_logs() as cap_logs:
         await booking_handler.book(
             task=_ORDER_TASK,
             quote=cache.PriceQuote(pricing_id="foo", transaction_id="bar"),

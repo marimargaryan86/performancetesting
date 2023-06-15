@@ -2,7 +2,6 @@ import random
 
 import aiosmtplib
 import httpx
-import structlog
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.go.service.orders.v1alpha import amqp_pb2
@@ -16,6 +15,7 @@ from snowfall.project.junction.service.providers.distribusion.booking import (
 )
 from snowfall.stdlib import service
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer, types
@@ -91,7 +91,7 @@ class OrderConsumer(object):
         self._producer = producer_obj
         self._booking = booking_handler
         self._cache = offer_cache
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)

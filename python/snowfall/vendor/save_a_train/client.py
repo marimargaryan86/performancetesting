@@ -4,8 +4,8 @@ import types
 from datetime import date, timedelta
 
 import httpx
-import structlog
 
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.time import date_to_age
 from snowfall.vendor.save_a_train.enums import PassengerType
 from snowfall.vendor.save_a_train.exceptions import SATValidationError, SATValueError
@@ -364,7 +364,7 @@ class SATClient(object):  # noqa: WPS214
             for global_station_id, station_ids in _ALL_STATIONS.items()
             for station_id in station_ids
         }
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
 
     async def get_vendor_stations(self) -> VendorStationsResponse:
         response = await self._session.get(

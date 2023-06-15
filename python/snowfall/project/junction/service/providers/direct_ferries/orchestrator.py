@@ -4,13 +4,13 @@ import time
 from collections.abc import AsyncGenerator, Generator, Sequence
 from typing import Any
 
-import structlog
 import tenacity
 
+from snowfall.stdlib.logging import stdout
 from snowfall.vendor.direct_ferries import client, errors
 from snowfall.vendor.direct_ferries.models import operator, passenger, route, timetable
 
-_logger = structlog.get_logger(__name__)
+_logger = stdout.get_logger()
 _DAYS_IN_YEAR = 365
 _DEFAULT_REQUEST_DATE_INTERVAL_DAYS = 30
 

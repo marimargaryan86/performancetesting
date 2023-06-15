@@ -5,8 +5,8 @@ from collections.abc import AsyncGenerator, Sequence
 import asyncstdlib
 import grpc
 from grpc_reflection.v1alpha import reflection
-from structlog import get_logger
 
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.transport.grpc import handler, logging, metrics, options, tracing
 from snowfall.stdlib.transport.grpc.service import HealthService, Service
 
@@ -14,7 +14,7 @@ from snowfall.stdlib.transport.grpc.service import HealthService, Service
 class Server(object):
     def __init__(self, server: grpc.aio.Server, address: str):
         self._address = address
-        self._logger = get_logger(__name__)
+        self._logger = stdout.get_logger()
         self._server = server
 
     @asyncstdlib.contextmanager

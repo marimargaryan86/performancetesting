@@ -10,7 +10,6 @@ from typing import Any, cast
 import httpx
 import pytest
 import pytest_httpx
-import structlog
 from motor import motor_asyncio
 from redis import asyncio as aioredis
 
@@ -24,6 +23,7 @@ from snowfall.project.junction.service.providers.ask2go import (
     transformer,
 )
 from snowfall.stdlib import h3
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.vendor.ask2go import client
@@ -47,7 +47,7 @@ class MagicMocker(object):
     def __init__(self, httpx_mock: pytest_httpx.HTTPXMock):
         self._mock = httpx_mock
         self._path = ""
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
 
     @contextlib.contextmanager
     def with_fixture_path(self, path: str) -> Iterator[None]:

@@ -2,7 +2,6 @@ from collections.abc import Callable
 from typing import Any
 
 import pytest
-import structlog
 from sentry_sdk import Transport, envelope
 
 from snowfall.stdlib import types
@@ -53,16 +52,15 @@ def fixture_sentry_events() -> SentryEvents:
 
 def test_breadcrumb_is_added(breadcrumbs: Breadcrumbs) -> None:
     stdout.configure_logger()
-    logger = structlog.get_logger("testing")
+    logger = stdout.get_logger()
     logger.info("test")
     assert len(breadcrumbs) == 1
     breadcrumb = breadcrumbs[-1]
-    assert breadcrumb["category"] == "testing"
     assert breadcrumb["level"] == "info"
 
 
 def test_event_is_logged(sentry_events: SentryEvents) -> None:
     stdout.configure_logger()
-    logger = structlog.get_logger("testing")
+    logger = stdout.get_logger()
     logger.error("test")
     assert len(sentry_events) == 1

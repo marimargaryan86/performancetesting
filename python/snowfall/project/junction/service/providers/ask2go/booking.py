@@ -9,7 +9,6 @@ import orjson
 import phonenumbers
 import prometheus_client
 import pycountry
-import structlog
 
 from snowfall.project.junction.go.service.orders.v1alpha import amqp_pb2, models_pb2
 from snowfall.project.junction.provider import notifications as base_notifications
@@ -22,6 +21,7 @@ from snowfall.project.junction.service.providers.ask2go import (
 )
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence import filesystem
 from snowfall.vendor.ask2go import client, errors
 from snowfall.vendor.ask2go.models import booking, common
@@ -57,7 +57,7 @@ class BookingHandler(object):
         override_double_booking_check: bool,
     ):
         self._client = ask2go_client
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
         self._notifier = notifier
         self._storage = booking_storage
         self._override_double_booking_check = override_double_booking_check

@@ -1,6 +1,5 @@
 import uuid
 
-import structlog
 from aio_pika import Message, connect
 from aio_pika.abc import AbstractIncomingMessage
 
@@ -18,6 +17,7 @@ from snowfall.project.junction.service.providers.ask2go import (
     transformer,
 )
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.transport.amqp import consumer, producer
 from snowfall.stdlib.transport.amqp import types as amqp_types
 from snowfall.vendor.ask2go import client
@@ -38,7 +38,7 @@ class PriceQuoteConsumer(object):
         self._transformer = offer_transformer
         self._cache = offer_cache
         self._consumer = consumer_obj
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
         self._producer = producer_obj
         self._provider_company_id = provider_company_id
 
@@ -84,7 +84,7 @@ class OrderConsumer(object):
         self._booking = booking_handler
         self._cache = price_quote_cache
         self._consumer = consumer_obj
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
         self._producer = producer_obj
         self._provider_id = str(provider_id)
         self._provider_name = provider_name

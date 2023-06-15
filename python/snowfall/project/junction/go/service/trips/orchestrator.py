@@ -4,7 +4,6 @@ import itertools
 import zoneinfo
 from collections.abc import Mapping, Sequence
 
-import structlog
 import timezonefinder
 
 from snowfall.project.junction.go.adapter import legs, offer_searches
@@ -20,6 +19,7 @@ from snowfall.project.junction.go.service.trips.v1alpha import trips_pb2
 from snowfall.project.junction.go.v1alpha import models_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.v1 import latlng_pb2
 
 _tz_finder = timezonefinder.TimezoneFinder()
@@ -49,7 +49,7 @@ class TripOrchestrator(object):
         self._planner = planner
         self._trip_repository = trip_repository
         self._legs_adapter = legs_adapter
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
 
     async def get_trip_reference_groups(
         self,
@@ -176,7 +176,7 @@ class TripOrchestrator(object):
 class OfferOrchestrator(object):
     def __init__(self, offer_search_adapter: offer_searches.Client) -> None:
         self._offer_search_adapter = offer_search_adapter
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
 
     async def offer_searches_from_trip_groups(
         self,

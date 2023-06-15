@@ -2,9 +2,8 @@ import hashlib
 import json
 from collections.abc import Mapping, Sequence
 
-import structlog
-
 from snowfall.project.junction.service.providers.duffel import cache
+from snowfall.stdlib.logging import stdout
 from snowfall.vendor.duffel import client
 from snowfall.vendor.duffel.builders.offer_request import OffersRequestBuilder
 from snowfall.vendor.duffel.errors import DuffelError, ServiceError
@@ -18,7 +17,7 @@ class PricingAdapter(object):
         duffel_client: client.DuffelClient,
     ) -> None:
         self._client = duffel_client
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
 
     async def get_price_quote(self, offer_details: cache.OfferDetails) -> Offer:
         try:

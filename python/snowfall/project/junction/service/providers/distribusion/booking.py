@@ -2,7 +2,6 @@ import asyncio
 import datetime
 import zoneinfo
 
-import structlog
 from dateutil.relativedelta import relativedelta
 
 from snowfall.project.junction.go.service.offers.v1alpha.models_pb2 import (
@@ -15,6 +14,7 @@ from snowfall.project.junction.service.providers.distribusion import (
 )
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.logging import stdout
 from snowfall.vendor.distribusion import client, enums, errors
 from snowfall.vendor.distribusion.models import criterias
 from snowfall.vendor.distribusion.models import orders as model_orders
@@ -31,7 +31,7 @@ class BookingHandler(object):
         send_customer_email: bool = True,
     ):
         self._client = distribusion_client
-        self._logger = structlog.get_logger(__name__)
+        self._logger = stdout.get_logger()
         self._notifier = notifier
         self._send_customer_email = send_customer_email
 

@@ -3,8 +3,7 @@ import time
 from types import TracebackType
 from typing import Self
 
-import structlog
-
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.transport.grpc.client import create_channel
 from snowfall.vendor.rate_limiter.config import (
     RateLimitConfig,
@@ -33,6 +32,7 @@ class Client(object):
         self._channel = create_channel(grpc_host)
         self._stub = V1Stub(self._channel)
         self._config: dict[str, str] | RateLimitConfigsApi = {}
+        self._logger = stdout.get_logger()
 
         if config is not None:
             if isinstance(config.duration_s, str):
@@ -81,7 +81,7 @@ class Client(object):
         limit = await self._get_rate_limits(hits)
         while limit.status != Status.UNDER_LIMIT:
             if limit.reset_time >= cutoff_time_ms:
-                structlog.get_logger(__name__).warning(
+                self._logger.warning(
                     "Timeout occurred for %s (%ss)",
                     self._config["name"],
                     timeout,
@@ -89,7 +89,7 @@ class Client(object):
                 raise asyncio.TimeoutError()
 
             time_diff_s = (limit.reset_time / SECOND) - time.time()
-            structlog.get_logger(__name__).info(
+            self._logger.info(
                 "Rate limit was reached for %s (retry after %.1fs)",
                 self._config["name"],
                 time_diff_s,

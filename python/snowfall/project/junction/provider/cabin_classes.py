@@ -1,7 +1,7 @@
-import structlog
 from pymongo import IndexModel
 
 from snowfall.project.junction.go.v1alpha import models_pb2
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.mongo import mixins, repository
 
 
@@ -10,7 +10,7 @@ class CabinMappingRepository(
     repository.ProtoRepository[models_pb2.CabinClassMapping],
 ):
     _proto = models_pb2.CabinClassMapping
-    _logger = structlog.get_logger(__name__)
+    _logger = stdout.get_logger()
     _indexes = [
         IndexModel("fare_brand", background=True),
         IndexModel("operator", background=True),
