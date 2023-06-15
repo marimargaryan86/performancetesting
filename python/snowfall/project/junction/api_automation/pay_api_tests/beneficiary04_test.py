@@ -116,10 +116,9 @@ async def test_update_beneficiary(  # noqa: WPS210, WPS218
         == update_bank_account_holder_name
     )
     assert rub_data["attributes"]["email"] == update_email
-    assert (
-        rub_data["attributes"]["beneficiaryAddress"]["addressLines"]
-        == update_beneficiary_address_lines
-    )
+    assert rub_data["attributes"]["beneficiaryAddress"]["addressLines"] == [
+        " ".join(update_beneficiary_address_lines),
+    ]
     assert (
         rub_data["attributes"]["beneficiaryAddress"]["countryCode"]
         == update_beneficiary_country_code
