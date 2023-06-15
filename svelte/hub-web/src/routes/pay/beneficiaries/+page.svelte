@@ -14,6 +14,7 @@
   import EditIcon from "components/icons/edit-icon.svelte";
   import RemoveIcon from "components/icons/remove-icon.svelte";
   import routeConfig from "routeConfig";
+  import TActionsCol from "components/ui/table/t-actions-col.svelte";
 
   export let data;
   export let form;
@@ -91,20 +92,21 @@
           </TCol>
           <TCol class="typography body-medium bold">{item.bankDetails.address.countryCode}</TCol>
           <TCol class="typography body-medium">{capitalize(item.bankDetails.paymentType)}</TCol>
-          <TCol width="172px">
-            <div class="beneficiary-actions">
-              <a
-                href={routeConfig.pay.beneficiaries.beneficiary(item.id)}
-                data-sveltekit-preload-data="off"><EditIcon /></a
-              >
+          <TActionsCol>
+            <a
+              href={routeConfig.pay.beneficiaries.beneficiary(item.id)}
+              data-sveltekit-preload-data="off"
+              class="action"
+            >
+              <EditIcon />
+            </a>
 
-              <button on:click={remove.bind(remove)}>
-                <RemoveIcon variant="trash-can" />
-              </button>
+            <button on:click={remove.bind(remove)} class="action">
+              <RemoveIcon variant="trash-can" />
+            </button>
 
-              <button class="outline typography body-medium bold">Pay</button>
-            </div>
-          </TCol>
+            <button class="outline action typography body-medium bold">Pay</button>
+          </TActionsCol>
         </TRow>
       {/each}
     </TBody>
@@ -148,15 +150,7 @@
     color: var(--color-common-light-soft);
   }
 
-  .beneficiary-actions {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    opacity: 0;
-    pointer-events: 0;
-  }
-
-  .content :global(tr:hover .beneficiary-actions) {
+  .content :global(tr:hover .actions) {
     opacity: 1;
     pointer-events: all;
   }
@@ -165,8 +159,7 @@
     color: var(--color-common-light-text-link);
   }
 
-  .beneficiary-actions > button,
-  .beneficiary-actions > a {
+  .action {
     padding: 0;
     text-decoration: none;
     background-color: transparent;
@@ -174,7 +167,7 @@
     cursor: pointer;
   }
 
-  .beneficiary-actions > .outline {
+  .action.outline {
     padding: 6px 16px;
     color: var(--color-common-light-strong);
     background-color: var(--color-common-dark-strong);
@@ -182,8 +175,7 @@
     border-radius: 8px;
   }
 
-  .beneficiary-actions > button > :global(svg),
-  .beneficiary-actions > a > :global(svg) {
+  .action > :global(svg) {
     vertical-align: top;
   }
 </style>

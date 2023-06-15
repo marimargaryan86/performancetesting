@@ -25,6 +25,7 @@
   import ChevronIcon from "components/icons/chevron-icon.svelte";
   import BeneficiaryIcon from "components/icons/beneficiary-icon.svelte";
   import routeConfig from "routeConfig";
+  import BookingsIcon from "components/icons/bookings-icon.svelte";
 
   export let expanded: boolean;
   export let transitionTimeMs: number;
@@ -58,6 +59,19 @@
           url: routeConfig.pay.beneficiaries.root,
           label: "Beneficiaries",
           icon: BeneficiaryIcon,
+        },
+      ],
+    },
+    {
+      type: "sub-menu",
+      label: "Go",
+      expanded: $page.url.pathname.startsWith(routeConfig.go.root),
+      items: [
+        {
+          type: "menu-item",
+          url: routeConfig.go.bookings.root,
+          label: "Bookings",
+          icon: BookingsIcon,
         },
       ],
     },

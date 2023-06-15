@@ -96,6 +96,7 @@
       </li>
     </ul>
   {/if}
+
   <Tabs items={tabs} />
 </div>
 

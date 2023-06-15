@@ -13,10 +13,10 @@
 
 <style>
   .dashboard {
+    align-self: center;
     width: 100%;
     max-width: 1440px;
     height: 100%;
-    margin: 0 auto;
     padding: 16px 24px 24px;
     background: rgb(255 255 255 / 0.4);
     border: var(--color-common-dark-strong) 1px solid;

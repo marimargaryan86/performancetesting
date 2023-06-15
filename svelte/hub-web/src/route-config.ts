@@ -33,4 +33,11 @@ export default {
       },
     },
   },
+  go: {
+    root: "/go",
+    bookings: {
+      root: "/go/bookings",
+      refunds: "/go/bookings/refunds",
+    },
+  },
 };
