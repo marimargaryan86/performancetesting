@@ -1,3 +1,4 @@
+import contextlib
 import pathlib
 import sys
 import tokenize
@@ -62,7 +63,7 @@ def _parse_build_file(build_fp: BinaryIO) -> str | None:
     return "".join([relevant_token.string for relevant_token in relevant_tokens])
 
 
-def _validate_build_file(
+def _validate_build_file(  # noqa: WPS210
     build_line: str,
     nomad_files: frozenset[pathlib.Path],
     relative_path: str,
@@ -90,11 +91,25 @@ def _validate_build_file(
             if "docker_image" in nomad_fp.read():
                 is_built_service = True
 
-    if is_built_service and all(string not in build_line for string in _ENTRY_POINTS):
-        errors = True
-        _log_error(
-            "{0}: service entry point missing".format(relative_path),
-        )
+    if is_built_service:
+        if all(string not in build_line for string in _ENTRY_POINTS):
+            errors = True
+            _log_error(
+                "{0}: service entry point missing".format(relative_path),
+            )
+
+        with contextlib.suppress(ValueError):
+            runnable_parts = build_line[: build_line.index(":")].split("/")
+            service_name = runnable_parts[-1].replace("_", "-")
+
+            if service_name != pathlib.Path(relative_path).parent.name:
+                errors = True
+                _log_error(
+                    "{0}: path should be changed to {1}".format(
+                        relative_path,
+                        pathlib.Path(relative_path).parent.parent / service_name,
+                    ),
+                )
 
     return errors
 
