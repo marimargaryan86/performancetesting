@@ -54,6 +54,7 @@ class BookingHandler(object):
         ask2go_client: client.Ask2GoClient,
         notifier: base_notifications.Notifier,
         booking_storage: filesystem.Storage,
+        *,
         override_double_booking_check: bool,
     ):
         self._client = ask2go_client

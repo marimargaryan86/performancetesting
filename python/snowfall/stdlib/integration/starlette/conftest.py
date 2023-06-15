@@ -12,6 +12,7 @@ from snowfall.stdlib.integration.starlette import application
 def _create_app(
     openapi_path: pathlib.Path | None,
     custom_middlewares: Sequence[Middleware] | None = None,
+    *,
     validate_response: bool = True,
 ) -> applications.Starlette:
     return application.create_starlette_app(

@@ -31,6 +31,7 @@ def create_starlette_app(  # noqa: WPS211
     routes: Sequence[routing.BaseRoute],
     openapi_path: pathlib.Path | None,
     custom_middlewares: Sequence[Middleware] | None = None,
+    *,
     validate_response: bool = True,
     security_headers: bool = True,
     lifespan: Any = None,

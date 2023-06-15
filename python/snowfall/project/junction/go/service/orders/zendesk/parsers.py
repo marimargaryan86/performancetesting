@@ -11,6 +11,7 @@ def parse_booking_and_order_for_cancel_request(
     booking: models_pb2.Booking,
     order: models_pb2.Order,
     journey: models_pb2.Journey,
+    *,
     convert_to_html: bool = True,
 ) -> dict[str, Any] | str:
     total_price = money.from_protobuf(booking.total_price)

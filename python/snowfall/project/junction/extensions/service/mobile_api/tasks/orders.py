@@ -89,8 +89,9 @@ async def poll_order_status(  # noqa: WPS211
 async def send_booking_confirmation(  # noqa: WPS210
     order: Mapping[str, Any],
     smtp_client: smtp.EmailClient,
-    forward_to_support: bool = True,
     forward_email: str | None = None,
+    *,
+    forward_to_support: bool = True,
 ) -> None:
     details: Sequence[Mapping[str, Any]] = [
         detail for booking in order["bookings"] for detail in booking["details"]

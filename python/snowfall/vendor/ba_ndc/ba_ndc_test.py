@@ -342,6 +342,7 @@ async def generate_order(
     ba_ndc_client: client.BaNdcClient,
     origin: str,
     destination: str,
+    *,
     set_passport_info: bool = False,
     set_residence_address: bool = False,
     set_residence_country_code: bool = False,

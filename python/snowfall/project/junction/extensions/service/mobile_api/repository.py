@@ -46,6 +46,7 @@ class OtpRepository(RedisRepository):
         self,
         email: str,
         verification_code: str,
+        *,
         delete_after: bool = False,
     ) -> bool:
         otp = await self._redis.get(email)

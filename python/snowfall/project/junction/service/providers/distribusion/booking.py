@@ -28,6 +28,7 @@ class BookingHandler(object):
         self,
         distribusion_client: client.DistribusionClient,
         notifier: notifications.Notifier,
+        *,
         send_customer_email: bool = True,
     ):
         self._client = distribusion_client
@@ -99,6 +100,7 @@ class BookingHandler(object):
         self,
         task: amqp_pb2.PlaceOrderTask,
         details: cache.OfferDetails,
+        *,
         send_customer_email: bool = True,
     ) -> model_orders.OrderResponse:
         first_trip_details = task.booking.trip_option.details[0]

@@ -218,6 +218,7 @@ def execute_response_create_beneficiary_assertions(  # noqa: WPS218
     state: str | None,
     currency: str,
     account_number: str | None,
+    *,
     is_beneficiary_state: bool = True,
     is_aba: bool = True,
     is_iban: bool = True,

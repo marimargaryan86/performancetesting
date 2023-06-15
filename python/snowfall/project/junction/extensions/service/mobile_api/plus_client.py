@@ -8,8 +8,9 @@ class PlusClient(object):
     def __init__(
         self,
         api_url: str,
-        activated: bool,
         client: httpx.AsyncClient | None = None,
+        *,
+        activated: bool,
     ) -> None:
         self._client = client or httpx.AsyncClient()
         self._client.base_url = httpx.URL(api_url)

@@ -14,8 +14,9 @@ class PayTransactionCreationError(Exception):
 class PayTransactionCreator(object):
     def __init__(
         self,
-        use_pay_to_create_transaction: bool,
         pay_client: PayClient,
+        *,
+        use_pay_to_create_transaction: bool,
     ):
         self._use_pay_to_create_transaction = use_pay_to_create_transaction
         self._pay_client = pay_client

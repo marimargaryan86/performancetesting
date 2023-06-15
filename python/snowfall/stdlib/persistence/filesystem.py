@@ -188,7 +188,7 @@ class _AsyncMemoryFile(asyn.AbstractAsyncStreamedFile):
     async def _fetch_range(self, start: int, end: int) -> Any:
         raise NotImplementedError
 
-    async def _upload_chunk(self, final: bool = False) -> Any:
+    async def _upload_chunk(self, final: bool = False) -> Any:  # noqa: FBT001,FBT002
         raise NotImplementedError
 
 
@@ -239,5 +239,10 @@ class _AsyncMemoryFileSystem(  # noqa: WPS214
     async def _info(self, path: str, **kwargs: Any) -> dict[str, Any]:  # noqa: WPS110
         return self.info(path, **kwargs)
 
-    async def _ls(self, path: str, detail: bool = True, **kwargs: Any) -> list[str]:
+    async def _ls(
+        self,
+        path: str,
+        detail: bool = True,  # noqa: FBT001,FBT002
+        **kwargs: Any,
+    ) -> list[str]:
         return self.ls(path, detail, **kwargs)

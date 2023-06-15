@@ -36,6 +36,7 @@ def _resolve(  # noqa: C901,WPS210,WPS231
     data: Any,
     included: Mapping[tuple[Any, Any], Any],
     resolved: Collection[tuple[Any, Any]],
+    *,
     deep: bool = True,
 ) -> Any:
     if not isinstance(data, dict):

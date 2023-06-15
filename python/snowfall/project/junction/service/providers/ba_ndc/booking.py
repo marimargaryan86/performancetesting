@@ -35,8 +35,9 @@ def _format_country(
 
 
 def _get_residence_address(
-    return_flight_to_usa: bool,
     residence_address: postal_address_pb2.PostalAddress | None,
+    *,
+    return_flight_to_usa: bool,
 ) -> payer_details.Address | None:
     if residence_address is not None and return_flight_to_usa:
         return payer_details.Address(
@@ -51,6 +52,7 @@ def _get_residence_address(
 
 def _get_passport_document(
     passenger: models_pb2.Passenger,
+    *,
     is_international_flight: bool,
 ) -> request_order_schemas.IdentityDocument | None:
     is_passport = (
@@ -154,8 +156,8 @@ class BookingHandler(object):
 
         for index, passenger in enumerate(task.passengers):
             passport_document = _get_passport_document(
-                passenger,
-                details.international_flight,
+                passenger=passenger,
+                is_international_flight=details.international_flight,
             )
 
             order_request.add_passenger(
@@ -191,8 +193,8 @@ class BookingHandler(object):
             )
 
             order_request.residence_address = _get_residence_address(
-                details.return_flight_to_usa,
-                task.residence_address,
+                residence_address=task.residence_address,
+                return_flight_to_usa=details.return_flight_to_usa,
             )
 
         order_request.set_cash_payment_info(

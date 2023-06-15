@@ -67,8 +67,9 @@ class SoapLogger(object):
     def __init__(
         self,
         secret_words: tuple[str, ...] | None = None,
-        export_files: bool | None = False,
         export_dir: str | None = None,
+        *,
+        export_files: bool | None = False,
     ) -> None:
         self._logger = stdout.get_logger()
         self._log_filter = LogFilter(secret_words=secret_words)

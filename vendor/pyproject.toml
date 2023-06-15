@@ -50,7 +50,7 @@ select = [
     "EXE", # flake8-executable
     "F", # Pyflakes
     "FA", # flake8-future-annotations
-    #"FBT",
+    "FBT", # flake8-boolean-trap
     #"FIX",
     "G", # flake8-logging-format
     "ISC", # flake8-implicit-str-concat

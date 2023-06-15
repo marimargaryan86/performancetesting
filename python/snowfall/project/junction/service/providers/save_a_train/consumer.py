@@ -59,7 +59,7 @@ class NotificationsConsumer(object):
                 notifications.BookingNotification(message.body),
             )
         else:
-            await message.nack(requeue=False)
+            await message.nack()
 
 
 class PriceQuoteConsumer(object):

@@ -133,10 +133,11 @@ class PayQuotes(object):
 class PayQuoteFetcher(object):
     def __init__(
         self,
-        use_pay_for_currency_conversions: bool,
         pay_quotes: PayQuotes,
         payer_id: str,
         payer_currency: str,
+        *,
+        use_pay_for_currency_conversions: bool,
     ):
         self._use_pay_for_currency_conversions = use_pay_for_currency_conversions
         self._pay_quotes = pay_quotes

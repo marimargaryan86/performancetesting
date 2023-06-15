@@ -147,6 +147,7 @@ class Client(Generic[AnyStr]):  # noqa: WPS214
     def lock(  # noqa: WPS211
         self,
         name: str,
+        *,
         timeout: float | None = None,
         sleep: float = 0.1,
         blocking: bool = True,

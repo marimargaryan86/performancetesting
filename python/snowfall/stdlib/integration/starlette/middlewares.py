@@ -107,6 +107,7 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
         app: applications.Starlette,
         validator: validation.Validator,
         excluded_status_codes: Container[int] | None = None,
+        *,
         validate_response: bool = True,
     ):
         super().__init__(app)

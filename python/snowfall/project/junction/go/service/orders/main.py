@@ -141,7 +141,7 @@ async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
             mongo.orders.journeys,
         ),
         pay_transaction_creator=PayTransactionCreator(
-            app.settings.use_pay_to_create_transaction,
+            use_pay_to_create_transaction=app.settings.use_pay_to_create_transaction,
             pay_client=PayClient(
                 base_url=app.settings.public_pay_api_dsn,
                 auth=UserAuth(

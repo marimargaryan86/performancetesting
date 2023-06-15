@@ -97,13 +97,20 @@ class Message(Generic[_Proto]):  # noqa: WPS214
     def requeued(self) -> bool:
         return self.status == MessageStatus.requeued
 
-    async def nack(self, requeue: bool = False) -> None:
+    async def nack(self) -> None:
+        if self.processed:
+            return
+
+        await self._message.nack(requeue=False)
+        self.status = MessageStatus.nacked
+
+    async def requeue(self) -> None:
         if self.processed:
             return
 
         # TODO: make sure we don't requeue forever?
-        await self._message.nack(requeue=requeue)
-        self.status = MessageStatus.requeued if requeue else MessageStatus.nacked
+        await self._message.nack(requeue=True)
+        self.status = MessageStatus.requeued
 
     @property
     def routing_key(self) -> str:
