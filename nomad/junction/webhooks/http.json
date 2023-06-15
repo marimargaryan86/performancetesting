@@ -1,0 +1,25 @@
+{
+  "development": {
+    "variables": {
+      "count": 1,
+      "traefik_entrypoints": "websecure",
+      "traefik_host_URL": "webhooks.pay.junction.dev"
+    }
+  },
+  "production": {
+    "deploy": false,
+    "variables": {
+      "count": 2,
+      "traefik_entrypoints": "web",
+      "traefik_host_URL": "webhooks.pay.junction.travel"
+    }
+  },
+  "sandbox": {
+    "deploy": false,
+    "variables": {
+      "count": 1,
+      "traefik_entrypoints": "websecure",
+      "traefik_host_URL": "webhooks.pay.sandbox.junction.dev"
+    }
+  }
+}

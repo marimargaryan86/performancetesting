@@ -30,19 +30,11 @@ variable "traefik_host_URL" {
   type = string
 }
 
-variable "traefik_headers_accesscontrolalloworiginlist" {
-  type = string
-}
-
-variable "traefik_headers_accessControlAllowHeaders" {
-  type = string
-}
-
 variable "count" {
   type = number
 }
 
-job "pay-webhooks-http" {
+job "webhooks-http" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 
@@ -78,18 +70,14 @@ job "pay-webhooks-http" {
     }
 
     service {
-      name = "pay-webhooks-${var.environment}"
+      name = "webhooks-${var.environment}"
       port = "http"
       tags = [
         "http",
         "traefik.enable=true",
         "traefik.consulcatalog.connect=true",
-        "traefik.http.middlewares.pay-webhooks-${var.environment}-cors-headers.headers.accesscontrolalloworiginlist=${var.traefik_headers_accesscontrolalloworiginlist}",
-        "traefik.http.middlewares.pay-webhooks-${var.environment}-cors-headers.headers.accessControlAllowHeaders=${var.traefik_headers_accessControlAllowHeaders}",
-        "traefik.http.middlewares.pay-webhooks-${var.environment}-cors-headers.headers.addvaryheader=true",
-        "traefik.http.routers.pay-webhooks-${var.environment}.entrypoints=${var.traefik_entrypoints}",
-        "traefik.http.routers.pay-webhooks-${var.environment}.rule=Host(`${var.traefik_host_URL}`)",
-        "traefik.http.routers.pay-webhooks-${var.environment}.middlewares=pay-webhooks-${var.environment}-cors-headers",
+        "traefik.http.routers.webhooks-${var.environment}.entrypoints=${var.traefik_entrypoints}",
+        "traefik.http.routers.webhooks-${var.environment}.rule=Host(`${var.traefik_host_URL}`)"
       ]
 
       connect {
@@ -112,7 +100,7 @@ job "pay-webhooks-http" {
     }
 
     service {
-      name = "pay-webhooks-${var.environment}"
+      name = "webhooks-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
 
@@ -127,7 +115,7 @@ job "pay-webhooks-http" {
     task "http" {
       driver = "docker"
       vault {
-        policies = ["pay-webhooks-${var.environment}"]
+        policies = ["webhooks-${var.environment}"]
       }
 
       template {
@@ -136,7 +124,7 @@ job "pay-webhooks-http" {
         change_mode = "restart"
         data        = <<EOH
 PAYMENTS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_payments-${var.environment}"))}}
-{{ with secret "kv/data/${var.environment}/pay-webhooks" }}
+{{ with secret "kv/data/${var.environment}/webhooks" }}
 SECRET_KEY={{ .Data.data.secret_key }}
 {{ end }}
 EOH
@@ -161,7 +149,7 @@ EOH
         FORWARDED_ALLOWED_IPS = "0.0.0.0"
         HTTP_ADDRESS          = "0.0.0.0"
         HTTP_PORT             = "${NOMAD_PORT_http}"
-        SENTRY_DSN            = "https://aa58fc6a35984c71a157b35134bdf583@sentry.snowfall.se/156"
+        SENTRY_DSN            = "https://21175839a3ec41b89f1da88031ec25a8@sentry.snowfall.se/155"
         PROMETHEUS_PORT       = "${NOMAD_PORT_prometheus}"
       }
     }
