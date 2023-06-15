@@ -55,34 +55,12 @@ pants:setup:
   tags:
     - docker
 
-pants:check:
+pants:lint-check:
   extends: .pants
   stage: test
   interruptible: true
   script:
-    - "pants check ::"
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule"'
-      when: never
-    - if: '$CI_MERGE_REQUEST_IID'
-
-pants:lint:
-  extends: .pants
-  stage: test
-  interruptible: true
-  script:
-    - "pants lint ::"
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule"'
-      when: never
-    - if: '$CI_MERGE_REQUEST_IID'
-
-pants:tailor:
-  extends: .pants
-  stage: test
-  interruptible: true
-  script:
-    - "pants tailor --check ::"
+    - "pants lint check ::"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: never
@@ -107,12 +85,12 @@ pants:test:
       when: never
     - if: '$CI_MERGE_REQUEST_IID'
 
-pants:update-build-files:
+pants:tailor-update-build-files:
   extends: .pants
   stage: test
   interruptible: true
   script:
-    - "pants update-build-files --check ::"
+    - "pants tailor --check update-build-files --check ::"
   cache:
     policy: pull-push
   rules:
