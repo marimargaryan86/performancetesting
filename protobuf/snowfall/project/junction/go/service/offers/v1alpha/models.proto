@@ -100,6 +100,16 @@ message Offer {
   // isRefundable
 }
 
+message PriceBreakdown {
+  snowfall.stdlib.v1.Money price = 1;
+  enum BreakdownType {
+    BREAKDOWN_TYPE_UNSPECIFIED = 0;
+    BREAKDOWN_TYPE_BASE_FEE = 1;
+    BREAKDOWN_TYPE_TAX = 2;
+  }
+  BreakdownType breakdown_type = 2;
+}
+
 message PriceQuote {
   string id = 1;
   string option_id = 2;
@@ -120,6 +130,7 @@ message PriceQuote {
   repeated Penalty penalties = 6;
   repeated FareRule rules = 7;
   string pay_quote_id = 8;
+  repeated PriceBreakdown price_breakdown = 9;
 }
 
 message PriceQuoteContainer {
