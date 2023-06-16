@@ -40,6 +40,12 @@ class Storage(object):
         self._filesystem = filesystem
         self._base_path = base_path or pathlib.Path("")
 
+    async def boot(self) -> None:
+        await self._filesystem._makedirs(  # noqa: WPS437
+            str(self._base_path),
+            exist_ok=True,
+        )
+
     async def put(self, path: pathlib.Path, file_contents: bytes) -> None:
         file_path = self._base_path.joinpath(path)
 
@@ -66,9 +72,12 @@ class Storage(object):
     @contextlib.asynccontextmanager
     async def from_dsn(cls, dsn: str) -> AsyncGenerator[Storage, None]:
         filesystem, base_path = cls._parse_dsn_to_instance(dsn)
+        storage = cls(filesystem=filesystem, base_path=base_path)
+
+        await storage.boot()
 
         try:
-            yield cls(filesystem=filesystem, base_path=base_path)
+            yield storage
         finally:
             if isinstance(filesystem, s3fs.S3FileSystem):
                 s3fs.S3FileSystem.close_session(asyn.get_loop(), filesystem.s3)
