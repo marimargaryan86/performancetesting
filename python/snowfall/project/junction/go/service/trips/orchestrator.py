@@ -205,7 +205,7 @@ class OfferOrchestrator(object):
             for trip_combination in itertools.product(*trip_groups)
         ]
 
-        searches = await asyncio.gather(*tasks)
+        searches = await asyncio.gather(*tasks, return_exceptions=True)
 
         offer_search_objects = []
 
