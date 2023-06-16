@@ -83,18 +83,11 @@ job "mock-offers" {
     task "offers" {
       driver = "docker"
 
-      vault {
-        policies = ["mock-${var.environment}"]
-      }
-
       template {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 RESELLER_PROVIDERS={{keyOrDefault "${var.environment}/providers/reseller-providers" "{}" | toJSON }}
-{{ with secret "kv/data/${var.environment}/mock" }}
-STORAGE_DSN=s3://{{ .Data.data.aws_access_key_id }}:{{ .Data.data.aws_secret_access_key }}@/{{ .Data.data.bucket }}
-{{ end }}
 EOH
         destination = "services.env"
         env         = true
@@ -120,6 +113,7 @@ EOH
         SENTRY_DSN          = "https://e319b016d1b149299757a338479d7de7@sentry.snowfall.se/28"
         PROMETHEUS_PORT     = "${NOMAD_PORT_prometheus}"
         PROVIDER_COMPANY_ID = "${var.provider_company_id}"
+        STORAGE_DSN         = "memory://"
       }
     }
   }

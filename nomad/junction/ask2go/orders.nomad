@@ -38,6 +38,10 @@ variable "api_booking_base_url" {
   type = string
 }
 
+variable "bucket" {
+  type = string
+}
+
 job "ask2go-orders" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -102,7 +106,7 @@ AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 SMTP_DSN={{range $index, $service := service "smtp"}}smtp://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}{{end}}
 {{ with secret "kv/data/${var.environment}/ask2go" }}
-STORAGE_DSN=s3://{{ .Data.data.aws_access_key_id }}:{{ .Data.data.aws_secret_access_key }}@/{{ .Data.data.bucket }}
+STORAGE_DSN=s3://{{ .Data.data.aws_access_key_id }}:{{ .Data.data.aws_secret_access_key }}@/${var.bucket}/ask2go
 {{ end }}
 EOH
         destination = "services.env"

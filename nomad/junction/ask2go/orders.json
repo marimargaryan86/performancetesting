@@ -4,7 +4,8 @@
       "count": 2,
       "override_double_booking_check": "true",
       "api_base_url": "https://search.ask2go.com",
-      "api_booking_base_url": "https://booking.ask2go.com"
+      "api_booking_base_url": "https://booking.ask2go.com",
+      "bucket": "junction-provider-data-development"
     }
   },
   "production": {
@@ -12,7 +13,8 @@
       "count": 2,
       "override_double_booking_check": "false",
       "api_base_url": "https://search.production.ask2go.com/",
-      "api_booking_base_url": "https://book.production.ask2go.com/"
+      "api_booking_base_url": "https://book.production.ask2go.com/",
+      "bucket": "junction-provider-data-production"
     }
   },
   "sandbox": {
@@ -20,7 +22,8 @@
       "count": 1,
       "override_double_booking_check": "true",
       "api_base_url": "https://search.ask2go.com",
-      "api_booking_base_url": "https://booking.ask2go.com"
+      "api_booking_base_url": "https://booking.ask2go.com",
+      "bucket": "junction-provider-data-sandbox"
     }
   }
 }

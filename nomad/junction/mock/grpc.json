@@ -2,20 +2,23 @@
   "development": {
     "variables": {
       "count": 1,
-      "provider_company_id": "8eaaa801-d2b5-4365-89e7-54b928179776"
+      "provider_company_id": "8eaaa801-d2b5-4365-89e7-54b928179776",
+      "bucket": "junction-provider-data-development"
     }
   },
   "production": {
     "deploy": false,
     "variables": {
       "count": 1,
-      "provider_company_id": "???"
+      "provider_company_id": "???",
+      "bucket": "junction-provider-data-production"
     }
   },
   "sandbox": {
     "variables": {
       "count": 1,
-      "provider_company_id": "8eaaa801-d2b5-4365-89e7-54b928179776"
+      "provider_company_id": "8eaaa801-d2b5-4365-89e7-54b928179776",
+      "bucket": "junction-provider-data-sandbox"
     }
   }
 }

@@ -1,18 +1,21 @@
 {
   "development": {
     "variables": {
-      "count": 2
+      "count": 2,
+      "bucket": "junction-provider-data-development"
     }
   },
   "production": {
     "deploy": false,
     "variables": {
-      "count": 2
+      "count": 2,
+      "bucket": "junction-provider-data-production"
     }
   },
   "sandbox": {
     "variables": {
-      "count": 1
+      "count": 1,
+      "bucket": "junction-provider-data-sandbox"
     }
   }
 }
