@@ -161,3 +161,37 @@ class AccountsService(service.Service, grpc_pb2_grpc.AccountsServiceServicer):
             accounts=[account async for account in db_accounts],
             next_page_token=await db_accounts.cursor(),
         )
+
+
+class ContactsService(service.Service, grpc_pb2_grpc.ContactsServiceServicer):
+    def __init__(self, contacts: repositories.ContactsRepository):
+        self._contacts = contacts
+        self._default_page_size = 20
+
+    def get_name(self) -> str:
+        return grpc_pb2.DESCRIPTOR.services_by_name["ContactsService"].full_name
+
+    def register(self, server: grpc.aio.Server) -> None:
+        grpc_pb2_grpc.add_ContactsServiceServicer_to_server(self, server)
+
+    async def CreateContact(  # type: ignore[override] # noqa: N802
+        self,
+        request: grpc_pb2.CreateContactRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.CreateContactResponse:
+        request.contact.id = string.uuid()
+        inserted_contact = await self._contacts.insert(request.contact)
+
+        return grpc_pb2.CreateContactResponse(contact=inserted_contact)
+
+    async def GetContact(  # type: ignore[override] # noqa: N802
+        self,
+        request: grpc_pb2.GetContactRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.GetContactResponse:
+        contact = await self._contacts.find_by_id(request.id)
+
+        if not contact:
+            await context.abort(grpc.StatusCode.NOT_FOUND)
+
+        return grpc_pb2.GetContactResponse(contact=contact)

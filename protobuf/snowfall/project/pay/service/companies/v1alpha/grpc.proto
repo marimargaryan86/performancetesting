@@ -19,6 +19,27 @@ service AccountsService {
   rpc ListAccounts(ListAccountsRequest) returns (ListAccountsResponse) {}
 }
 
+service ContactsService {
+  rpc CreateContact(CreateContactRequest) returns (CreateContactResponse) {}
+  rpc GetContact(GetContactRequest) returns (GetContactResponse) {}
+}
+
+message CreateContactRequest {
+  Contact contact = 1;
+}
+
+message CreateContactResponse {
+  Contact contact = 1;
+}
+
+message GetContactRequest {
+  string id = 1;
+}
+
+message GetContactResponse {
+  Contact contact = 1;
+}
+
 message CreateCompanyRequest {
   Company company = 1;
 }

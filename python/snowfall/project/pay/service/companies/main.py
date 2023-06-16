@@ -40,7 +40,10 @@ async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
                 ),
             ),
             grpc.AccountsService(
-                accounts=repositories.AccountsRepository(mongo.accounts.accounts),
+                accounts=repositories.AccountsRepository(mongo.companies.accounts),
+            ),
+            grpc.ContactsService(
+                contacts=repositories.ContactsRepository(mongo.companies.contacts),
             ),
         ],
     )
@@ -63,7 +66,7 @@ async def _sync_accounts_cron_run(
     )
     sync_account = cron_jobs.SyncAccounts(
         payment_client,
-        repositories.AccountsRepository(mongo.accounts.accounts),
+        repositories.AccountsRepository(mongo.companies.accounts),
     )
     await sync_account.sync_accounts()
 
