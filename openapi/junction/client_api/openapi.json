@@ -6814,6 +6814,9 @@
                     "items": {
                       "$ref": "#/components/schemas/OrderPassenger"
                     }
+                  },
+                  "residenceAddress": {
+                    "$ref": "#/components/schemas/Address"
                   }
                 }
               },
@@ -7397,38 +7400,7 @@
             "example": "john.smith@example.com"
           },
           "address": {
-            "type": "object",
-            "required": [
-              "addressLines",
-              "countryCode",
-              "postalCode",
-              "city"
-            ],
-            "properties": {
-              "addressLines": {
-                "type": "array",
-                "example": [
-                  "Street name 7"
-                ],
-                "items": {
-                  "type": "string",
-                  "example": "Street name 7"
-                }
-              },
-              "countryCode": {
-                "type": "string",
-                "format": "country",
-                "example": "GB"
-              },
-              "postalCode": {
-                "type": "string",
-                "example": "12345"
-              },
-              "city": {
-                "type": "string",
-                "example": "London"
-              }
-            }
+            "$ref": "#/components/schemas/Address"
           },
           "phoneNumber": {
             "type": "string",
@@ -7441,6 +7413,41 @@
           "address",
           "phoneNumber"
         ]
+      },
+      "Address": {
+        "title": "Address",
+        "type": "object",
+        "required": [
+          "addressLines",
+          "countryCode",
+          "postalCode",
+          "city"
+        ],
+        "properties": {
+          "addressLines": {
+            "type": "array",
+            "example": [
+              "Street name 7"
+            ],
+            "items": {
+              "type": "string",
+              "example": "Street name 7"
+            }
+          },
+          "countryCode": {
+            "type": "string",
+            "format": "country",
+            "example": "GB"
+          },
+          "postalCode": {
+            "type": "string",
+            "example": "12345"
+          },
+          "city": {
+            "type": "string",
+            "example": "London"
+          }
+        }
       },
       "LoyaltyCard": {
         "title": "LoyaltyCard",

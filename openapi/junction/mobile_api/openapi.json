@@ -2504,6 +2504,9 @@
                     "items": {
                       "$ref": "./../client_api/openapi.json#/components/schemas/OrderPassenger"
                     }
+                  },
+                  "residenceAddress": {
+                    "$ref": "./../client_api/openapi.json#/components/schemas/Address"
                   }
                 }
               },
@@ -3776,32 +3779,7 @@
             "example": "john.smith@example.com"
           },
           "address": {
-            "type": "object",
-            "properties": {
-              "addressLines": {
-                "type": "array",
-                "items": {
-                  "type": "string",
-                  "example": "Street name 7"
-                },
-                "example": [
-                  "Street name 7"
-                ]
-              },
-              "countryCode": {
-                "type": "string",
-                "format": "country",
-                "example": "GB"
-              },
-              "postalCode": {
-                "type": "string",
-                "example": "12345"
-              },
-              "city": {
-                "type": "string",
-                "example": "London"
-              }
-            }
+            "$ref": "./../client_api/openapi.json#/components/schemas/Address"
           },
           "phoneNumber": {
             "type": "string",
