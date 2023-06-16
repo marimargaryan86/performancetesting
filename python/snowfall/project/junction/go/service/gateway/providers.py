@@ -40,7 +40,7 @@ class UnmarshalResult(NamedTuple):
 class _ProviderWrapper(object):
     provider: Provider
     is_healthy: bool = False
-    _lock: asyncio.Lock = asyncio.Lock()
+    _lock: asyncio.Lock = dataclasses.field(default_factory=asyncio.Lock)
     _last_checked_at: datetime.datetime = dataclasses.field(
         default_factory=lambda: datetime.datetime.min.replace(tzinfo=datetime.UTC),
     )

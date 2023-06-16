@@ -33,4 +33,4 @@ class VehRateRuleRqBuilder(BaseBuilderRq[VehRateRuleRq]):
             self._rq.reference = UniqueIdType()
 
         self._rq.reference.id_context = reference
-        self._rq.reference.type = "16"  # unique id type ‘reference’
+        self._rq.reference.type = "16"  # unique id type 'reference'

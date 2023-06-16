@@ -27,6 +27,8 @@ ignore = [
     "ANN102", # Missing type annotation for cls in classmethod
     "ANN401", # Dynamically typed expressions (typing.Any) are disallowed
     "E501", # Line too long
+    "RUF001", # String contains ambiguous
+    "RUF100", # Unused `noqa` directive
     "SIM118", # Use `key in dict` instead of `key in dict.keys()`
     "UP004", # Class inherits from `object`
     "UP030", # Use implicit references for positional format fields
@@ -68,7 +70,7 @@ select = [
     #"PTH",
     "PYI", # flake8-pyi
     "Q", # flake8-quotes
-    #"RUF",
+    "RUF", # Ruff-specific rules
     "SIM", # flake8-simplify
     #"SLF",
     "T10", # flake8-debugger

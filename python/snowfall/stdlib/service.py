@@ -105,7 +105,9 @@ class Command(Generic[_Settings]):
 class Entrypoint(object):
     name: str
     _group: click.Group = dataclasses.field(init=False)
-    sentry_settings: SentrySettings = SentrySettings()
+    sentry_settings: SentrySettings = dataclasses.field(
+        default_factory=SentrySettings,
+    )
 
     def __post_init__(self) -> None:
         object.__setattr__(  # noqa: WPS609
