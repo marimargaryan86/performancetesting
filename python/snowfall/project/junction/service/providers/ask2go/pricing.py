@@ -49,11 +49,7 @@ class Adapter(object):
                 transaction_id=string.to_uuid(session_token),
             )
 
-            try:
-                return await self._get_async_price_result(async_offer)
-            except (NoPricingError, PricingTimeoutError) as err:
-                self._logger.error("Pricing failed", exception=str(type(err).__name__))
-                raise
+            return await self._get_async_price_result(async_offer)
 
     @tenacity.retry(
         stop=tenacity.stop_after_attempt(10),

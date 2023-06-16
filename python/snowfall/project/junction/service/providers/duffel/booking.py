@@ -131,14 +131,7 @@ class BookingHandler(object):  # noqa: WPS214
         self,
         details: cache.OfferDetails,
     ) -> cache.OfferDetails:
-        try:
-            offer = await self._client.get_single_offer(details.offer_id)
-        except errors.ServiceError as get_offer_ex:
-            self._logger.error(
-                "Could not get offer from Duffel",
-                exception=str(type(get_offer_ex).__name__),
-            )
-            raise
+        offer = await self._client.get_single_offer(details.offer_id)
 
         return cache.OfferDetails(
             offer_id=details.offer_id,

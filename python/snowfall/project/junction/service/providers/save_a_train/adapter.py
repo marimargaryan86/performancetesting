@@ -134,7 +134,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
             if status_code != httpx.codes.INTERNAL_SERVER_ERROR:
                 if http_status_error.response.text:
                     raise_http_error_with_text(http_status_error)
-                raise http_status_error
+                raise
 
         try:
             search_response = await self._client.create_search(search_criteria)
@@ -143,7 +143,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         except httpx.HTTPStatusError as http_error:
             if http_error.response.text:
                 raise_http_error_with_text(http_error)
-            raise http_error
+            raise
 
         for search_result in search_response.search_results:
             try:
@@ -339,7 +339,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         except httpx.HTTPStatusError as http_error:
             if http_error.response.text:
                 raise_http_error_with_text(http_error)
-            raise http_error
+            raise
 
     async def _create_booking(
         self,
@@ -381,7 +381,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         except httpx.HTTPStatusError as http_error:
             if http_error.response.text:
                 raise_http_error_with_text(http_error)
-            raise http_error
+            raise
 
     def _extract_search_id_and_seat_preference_code(
         self,
@@ -461,7 +461,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         except httpx.HTTPStatusError as http_error:
             if http_error.response.text:
                 raise_http_error_with_text(http_error)
-            raise http_error
+            raise
 
     async def _confirm_booking(
         self,
@@ -474,7 +474,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         except httpx.HTTPStatusError as http_error:
             if http_error.response.text:
                 raise_http_error_with_text(http_error)
-            raise http_error
+            raise
 
 
 def raise_http_error_with_text(http_error: httpx.HTTPStatusError) -> None:

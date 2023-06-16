@@ -35,7 +35,6 @@ from snowfall.vendor.currency_cloud.models.payment import (
 )
 from snowfall.vendor.currency_cloud.models.rate import BasicRateResponse
 
-_logger = stdout.get_logger()
 _METHOD_GET = "GET"
 _METHOD_POST = "POST"
 
@@ -57,6 +56,7 @@ class CurrencyCloudAuth(httpx.Auth):
         self._async_lock = asyncio.Lock()
         self._client = client or httpx.AsyncClient()
         self._client.base_url = httpx.URL(base_url)
+        self._logger = stdout.get_logger()
 
     async def async_auth_flow(
         self,
@@ -68,7 +68,7 @@ class CurrencyCloudAuth(httpx.Auth):
         if response.status_code == httpx.codes.UNAUTHORIZED:
             async with self._async_lock:
                 if self._token == request.headers["X-Auth-Token"]:
-                    _logger.info("Getting token")
+                    self._logger.info("Getting token")
                     await self._authenticate()
 
             request.headers["X-Auth-Token"] = self._token
@@ -138,6 +138,7 @@ class PaymentClient(object):  # noqa: WPS214
             base_url=self._base_url,
             auth=auth,
         )
+        self._logger = stdout.get_logger()
 
     async def create_conversion(
         self,
@@ -301,7 +302,7 @@ class PaymentClient(object):  # noqa: WPS214
         response_data = response.json()
 
         if response_data["unavailable"]:
-            _logger.error(
+            self._logger.error(
                 "Unavailable currency pairs",
                 pairs=",".join(response_data["unavailable"]),
             )
@@ -359,7 +360,6 @@ class PaymentClient(object):  # noqa: WPS214
                 data=encode_arrays(payload),
             )
         except httpx.ReadTimeout as exc:
-            _logger.error("ReadTimeout", url=url, payload=payload)
             raise CurrencyCloudError(messages=["{0}".format(exc)]) from exc
 
         if response.is_client_error:

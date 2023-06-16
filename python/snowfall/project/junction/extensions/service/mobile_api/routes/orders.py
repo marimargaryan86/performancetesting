@@ -212,9 +212,9 @@ class Orders(endpoints.HTTPEndpoint):
                 body.get("residenceAddress"),
                 include=["journey"],
             )
-        except httpx.HTTPStatusError as error:
+        except httpx.HTTPStatusError:
             await payments.cancel(payment)
-            raise error
+            raise
         mobile_order = models_pb2.MobileOrder(
             id=junction_order["data"]["id"],
             payment_intent_id=payment,

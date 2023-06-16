@@ -6,7 +6,7 @@ from snowfall.project.junction.service.providers.duffel import cache
 from snowfall.stdlib.logging import stdout
 from snowfall.vendor.duffel import client
 from snowfall.vendor.duffel.builders.offer_request import OffersRequestBuilder
-from snowfall.vendor.duffel.errors import DuffelError, ServiceError
+from snowfall.vendor.duffel.errors import DuffelError
 from snowfall.vendor.duffel.models.offer import Offer, PrivateFare
 from snowfall.vendor.duffel.models.offer_request import OfferRequest
 
@@ -20,41 +20,20 @@ class PricingAdapter(object):
         self._logger = stdout.get_logger()
 
     async def get_price_quote(self, offer_details: cache.OfferDetails) -> Offer:
-        try:
-            offer = await self._client.get_single_offer(offer_details.offer_id)
-        except ServiceError as ex:
-            self._logger.error("Pricing failed", exception=str(type(ex).__name__))
-            raise
-
-        return offer
+        return await self._client.get_single_offer(offer_details.offer_id)
 
     async def refresh_offer(
         self,
         offer_details: cache.OfferDetails,
         private_fares: Mapping[str, Sequence[PrivateFare]] | None = None,
     ) -> Offer:
-        try:
-            offer = await self._client.get_single_offer(offer_details.offer_id)
-        except ServiceError as get_offer_ex:
-            self._logger.error(
-                "Pricing failed",
-                exception=str(type(get_offer_ex).__name__),
-            )
-            raise
+        offer = await self._client.get_single_offer(offer_details.offer_id)
 
         offers_request_builder = OffersRequestBuilder().with_offer(offer, private_fares)
 
-        try:
-            offers = await self._client.create_offer_request(
-                offers_request_builder.build(),
-            )
-        except ServiceError as offers_request_ex:
-            self._logger.error(
-                "Pricing failed",
-                exception=str(type(offers_request_ex).__name__),
-                resons="Could not get new offers",
-            )
-            raise
+        offers = await self._client.create_offer_request(
+            offers_request_builder.build(),
+        )
 
         renewed_offer = self._find_same_offer(offers, offer)
 

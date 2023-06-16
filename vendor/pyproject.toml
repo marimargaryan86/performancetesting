@@ -30,6 +30,7 @@ ignore = [
     "RUF001", # String contains ambiguous
     "RUF100", # Unused `noqa` directive
     "SIM118", # Use `key in dict` instead of `key in dict.keys()`
+    "TRY003", # Avoid specifying long messages outside the exception class # TODO: fix
     "UP004", # Class inherits from `object`
     "UP030", # Use implicit references for positional format fields
     "UP032", # Use f-string instead of `format` call
@@ -78,7 +79,7 @@ select = [
     #"TCH",
     #"TD",
     "TID", # flake8-tidy-imports
-    #"TRY",
+    "TRY",
     "UP", # pyupgrade
     "W", # pycodestyle
     "YTT", # flake8-2020

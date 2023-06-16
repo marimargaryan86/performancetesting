@@ -154,9 +154,9 @@ class OfferImporter(object):
             case amqp_pb2.TripOfferSearchTask():
                 try:
                     await self._process_trip_offer_search(message.body)
-                except Exception as err:
+                except Exception:
                     await self._searches.mark_as_failed(message.body.offer_search_id)
-                    raise err
+                    raise
 
     async def _process_trip_offer_search(  # noqa: WPS217
         self,

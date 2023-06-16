@@ -17,6 +17,11 @@ class CursorError(ValueError):
     """Base error that all other errors extends."""
 
 
+class InvalidCursorError(CursorError):
+    def __init__(self, problem: str) -> None:
+        super().__init__("Invalid {0}.".format(problem))
+
+
 def unmarshal(
     encoded: str,
     filter_: Any = None,
@@ -33,17 +38,17 @@ def unmarshal(
     )
 
     if not hmac.compare_digest(cursor.digest, expected_digest):
-        raise CursorError("Invalid digest.")
+        raise InvalidCursorError("digest")
 
     expected_filter_hash = _hash_parameters(cursor.id, filter_)
 
     if not hmac.compare_digest(cursor.filter, expected_filter_hash):
-        raise CursorError("Invalid filter.")
+        raise InvalidCursorError("filter")
 
     expected_sort_hash = _hash_parameters(cursor.id, sort)
 
     if not hmac.compare_digest(cursor.sort, expected_sort_hash):
-        raise CursorError("Invalid sort.")
+        raise InvalidCursorError("sort")
 
     return cursor
 
@@ -96,13 +101,13 @@ def _parse(encoded: str) -> Cursor:
     try:
         raw = base64.urlsafe_b64decode(encoded.encode()).decode()
     except (binascii.Error, UnicodeDecodeError) as err:
-        raise CursorError("Invalid payload.") from err
+        raise InvalidCursorError("payload") from err
 
     cursor = Cursor()
 
     try:
         text_format.Parse(raw, cursor, allow_field_number=True)
     except text_format.ParseError as parse_err:
-        raise CursorError("Invalid payload.") from parse_err
+        raise InvalidCursorError("payload") from parse_err
 
     return cursor

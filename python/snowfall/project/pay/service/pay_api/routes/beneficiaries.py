@@ -229,7 +229,7 @@ class Beneficiaries(endpoints.HTTPEndpoint):
                     ),
                     status_code=exc.status,
                 )
-            raise exc
+            raise
 
         payment_type = (
             ""
