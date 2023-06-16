@@ -4,7 +4,7 @@ from unittest import mock
 
 import pytest
 
-from snowfall.project.pay.adapter import accounts
+from snowfall.project.pay.adapter import accounts, quotations
 from snowfall.project.pay.service.companies.repositories import ContactsRepository
 from snowfall.project.pay.service.companies.v1alpha.models_pb2 import (
     Account,
@@ -18,12 +18,11 @@ from snowfall.project.pay.service.pay_api.repositories import (
     ConversionRepository,
     TransactionRepository,
 )
-from snowfall.project.pay.service.quotations.quotations import QuotationsRepository
-from snowfall.project.pay.service.quotations.v1alpha.models_pb2 import (
+from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import (
     Quotation,
-    QuotationAmounts,
+    QuotationStatus,
+    Transaction,
 )
-from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import Transaction
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1 import phone_number_pb2, postal_address_pb2
@@ -32,65 +31,59 @@ from snowfall.vendor.currency_cloud.models.balance import BalanceResponse
 
 @pytest.fixture()
 async def quote_is_less_than_the_limit(
-    quotations_repository: QuotationsRepository,
+    quotations_client: quotations.Client,
+    valid_company: Company,
 ) -> Quotation:
     usd = money.Money(8, money.Currency("USD"))
     gbp = money.Money(1, money.Currency("GBP"))
-    quote = Quotation(
-        id=string.uuid(),
-        amounts=QuotationAmounts(
-            beneficiary=gbp.protobuf(),
-            base_converted=usd.protobuf(),
-            quotation=usd.protobuf(),
-            sales_margin=usd.protobuf(),
-            fx_margin=usd.protobuf(),
-            processing_margin=usd.protobuf(),
-        ),
-        beneficiary_id=string.uuid(),
-        payer_id=string.uuid(),
-        status=Quotation.Status.STATUS_QUOTED,
+    return await quotations_client.create(
+        from_currency=gbp.currency.code,
+        to_currency=usd.currency.code,
+        amount=8,
+        payer=valid_company,
+        beneficiary_company=valid_company,
+        session_token=string.uuid(),
     )
-    return await quotations_repository.insert(quote)
 
 
 @pytest.fixture()
 async def booked_quote(
-    quotations_repository: QuotationsRepository,
+    quotations_client: quotations.Client,
+    valid_company: Company,
 ) -> Quotation:
     usd = money.Money(1, money.Currency("USD"))
     gbp = money.Money(1, money.Currency("GBP"))
-    quote = Quotation(
-        id=string.uuid(),
-        amounts=QuotationAmounts(
-            beneficiary=gbp.protobuf(),
-            base_converted=usd.protobuf(),
-        ),
-        status=Quotation.Status.STATUS_CONFIRMED,
+    quote = await quotations_client.create(
+        from_currency=gbp.currency.code,
+        to_currency=usd.currency.code,
+        amount=8,
+        payer=valid_company,
+        beneficiary_company=valid_company,
+        session_token=string.uuid(),
     )
-    return await quotations_repository.insert(quote)
+    await quotations_client.update_status(
+        quote.id,
+        QuotationStatus.QUOTATION_STATUS_CONFIRMED,
+    )
+
+    return await quotations_client.get(quote.id)
 
 
 @pytest.fixture()
 async def booked_quote_quoted(
-    quotations_repository: QuotationsRepository,
+    quotations_client: quotations.Client,
+    valid_company: Company,
 ) -> Quotation:
     usd = money.Money(8, money.Currency("USD"))
     gbp = money.Money(4, money.Currency("GBP"))
-    quote = Quotation(
-        id=string.uuid(),
-        amounts=QuotationAmounts(
-            beneficiary=gbp.protobuf(),
-            base_converted=usd.protobuf(),
-            quotation=usd.protobuf(),
-            sales_margin=usd.protobuf(),
-            fx_margin=usd.protobuf(),
-            processing_margin=usd.protobuf(),
-        ),
-        beneficiary_id=string.uuid(),
-        payer_id=string.uuid(),
-        status=Quotation.Status.STATUS_QUOTED,
+    return await quotations_client.create(
+        from_currency=gbp.currency.code,
+        to_currency=usd.currency.code,
+        amount=8,
+        payer=valid_company,
+        beneficiary_company=valid_company,
+        session_token=string.uuid(),
     )
-    return await quotations_repository.insert(quote)
 
 
 @pytest.fixture()

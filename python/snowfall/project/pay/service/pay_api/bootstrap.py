@@ -4,7 +4,13 @@ import lagom
 from pydantic import AnyUrl
 
 from snowfall.adapter import authentication
-from snowfall.project.pay.adapter import accounts, currencies, payments, transactions
+from snowfall.project.pay.adapter import (
+    accounts,
+    currencies,
+    payments,
+    quotations,
+    transactions,
+)
 from snowfall.project.pay.service.companies.repositories import ContactsRepository
 from snowfall.project.pay.service.pay_api import includes
 from snowfall.project.pay.service.pay_api.cache import UserSessionRepository
@@ -15,7 +21,6 @@ from snowfall.project.pay.service.pay_api.repositories import (
     CurrencyRepository,
     TransactionRepository,
 )
-from snowfall.project.pay.service.quotations import quotations
 from snowfall.stdlib import money
 from snowfall.stdlib.integration.starlette import application
 from snowfall.vendor.currency_cloud import client
@@ -83,10 +88,10 @@ def create_admin_dependencies(  # noqa: WPS211
 
 def create_dependencies(  # noqa: WPS211
     currencies_client: currencies.Client,
-    quotations_repository: quotations.QuotationsRepository,
     redis_client: UserSessionRepository,
     transactions_repository: TransactionRepository,
     transactions_client: transactions.Client,
+    quotations_client: quotations.Client,
     conversions_repository: ConversionRepository,
     companies_repository: CompanyRepository,
     currencies_repository: CurrencyRepository,
@@ -95,7 +100,7 @@ def create_dependencies(  # noqa: WPS211
     container = lagom.Container()
     container[client.PaymentClient] = payment_client
     container[currencies.Client] = currencies_client  # type: ignore[type-abstract]
-    container[quotations.QuotationsRepository] = quotations_repository
+    container[quotations.Client] = quotations_client  # type: ignore[type-abstract]
     container[UserSessionRepository] = redis_client
     container[TransactionRepository] = transactions_repository
     container[ConversionRepository] = conversions_repository

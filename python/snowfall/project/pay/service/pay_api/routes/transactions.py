@@ -1,10 +1,10 @@
 import lagom
 from starlette import endpoints, requests, status
 
+from snowfall.project.pay.adapter import quotations
 from snowfall.project.pay.adapter import transactions as transactions_adapter
 from snowfall.project.pay.service.pay_api import resources
-from snowfall.project.pay.service.quotations import quotations
-from snowfall.project.pay.service.quotations.v1alpha.models_pb2 import Quotation
+from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import QuotationStatus
 from snowfall.stdlib.integration.starlette import (
     messages,
     models,
@@ -17,21 +17,20 @@ class Transactions(endpoints.HTTPEndpoint):
     async def post(  # noqa: WPS210, WPS211, WPS217
         self,
         request: requests.Request,
-        quotation_repository: quotations.QuotationsRepository = lagom.injectable,
+        quotations_client: quotations.Client = lagom.injectable,
         transactions_client: transactions_adapter.Client = lagom.injectable,
     ) -> models.JsonApiResponse:
         body = await request_helpers.flatten_request(request)
-        quot = await quotation_repository.find_by_id(body["quotation"])
-        if quot and quot.status == Quotation.Status.STATUS_QUOTED:
+        quote = await quotations_client.get(identifier=body["quotation"])
+        if quote.status == QuotationStatus.QUOTATION_STATUS_QUOTED:
             transaction = await transactions_client.create(
-                quotation=quot,  # type: ignore[arg-type]
+                quotation=quote,
                 external_reference=body["externalReference"],
                 invoice_reference=body["invoiceReference"],
             )
-
-            await quotation_repository.update_status(
-                quot.id,
-                Quotation.Status.STATUS_CONFIRMED,
+            await quotations_client.update_status(
+                identifier=quote.id,
+                status=QuotationStatus.QUOTATION_STATUS_CONFIRMED,
             )
             return await messages.create_response(
                 body=messages.models.Body(

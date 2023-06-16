@@ -76,7 +76,7 @@ message GetQuotationResponse {
 
 message UpdateQuotationStatusRequest {
   string id = 1;
-  Quotation.Status status = 2;
+  QuotationStatus status = 2;
 }
 
 message UpdateQuotationStatusResponse {

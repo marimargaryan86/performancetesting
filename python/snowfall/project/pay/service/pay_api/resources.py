@@ -11,9 +11,6 @@ from snowfall.project.pay.service.companies.v1alpha import models_pb2
 from snowfall.project.pay.service.conversions.v1alpha.models_pb2 import Conversion
 from snowfall.project.pay.service.payments.v1alpha import models_pb2 as payment_models
 from snowfall.project.pay.service.payments.v1alpha.models_pb2 import Payment
-from snowfall.project.pay.service.quotations.v1alpha import (
-    models_pb2 as quotation_models,
-)
 from snowfall.project.pay.service.transactions.v1alpha import (
     models_pb2 as transaction_models,
 )
@@ -33,7 +30,7 @@ class QuoteResource(models.Resource):
     @classmethod
     def from_proto(
         cls,
-        quotation: quotation_models.Quotation,
+        quotation: transaction_models.Quotation,
         request: requests.Request,
     ) -> QuoteResource:
         return cls(

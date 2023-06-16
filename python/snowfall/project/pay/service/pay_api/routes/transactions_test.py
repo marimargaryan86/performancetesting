@@ -4,7 +4,7 @@ import httpx
 import pytest
 from starlette import status
 
-from snowfall.project.pay.service.quotations.v1alpha.models_pb2 import Quotation
+from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import Quotation
 from snowfall.stdlib.integration.starlette import request_helpers
 
 

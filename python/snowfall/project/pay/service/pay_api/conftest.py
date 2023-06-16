@@ -17,18 +17,24 @@ from starlette.middleware import Middleware, authentication
 from snowfall.adapter import authentication as auth
 from snowfall.project.junction.go.adapter import errors
 from snowfall.project.pay import fixtures
-from snowfall.project.pay.adapter import accounts, currencies, payments, transactions
+from snowfall.project.pay.adapter import (
+    accounts,
+    currencies,
+    payments,
+    quotations,
+    transactions,
+)
 from snowfall.project.pay.service.companies import repositories
 from snowfall.project.pay.service.pay_api import authenticator, bootstrap
 from snowfall.project.pay.service.pay_api import repositories as pay_repos
 from snowfall.project.pay.service.pay_api.cache import UserSessionRepository
 from snowfall.project.pay.service.pay_api.routes import router
-from snowfall.project.pay.service.quotations import quotations
-from snowfall.project.pay.service.quotations.v1alpha.models_pb2 import (
+from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import (
+    Quotation,
     QuotationAmounts,
     QuotationRates,
+    Transaction,
 )
-from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import Transaction
 from snowfall.service.authentication.auth import JWTFactory
 from snowfall.service.authentication.v1alpha.models_pb2 import User
 from snowfall.stdlib import money, string
@@ -47,6 +53,13 @@ def transaction_ids() -> Sequence[str]:
     return [
         "e719b289-982c-42f0-99a2-63fa70f8f8c0",
         "c36649e6-71f1-4dfa-aa5a-01c0ede6e538",
+    ]
+
+
+@pytest.fixture()
+def quotations_ids() -> list[str]:
+    return [
+        "766f0893-727e-430c-9531-ebb01d579b2d",
     ]
 
 
@@ -95,7 +108,7 @@ def custom_middlewares(public_key: str) -> Sequence[Middleware]:
 def _create_app(  # noqa: WPS211
     payment_client: PaymentClient,
     currencies_client: currencies.Client,
-    quotations_repository: quotations.QuotationsRepository,
+    quotations_client: quotations.Client,
     redis_repository: UserSessionRepository,
     transactions_repository: pay_repos.TransactionRepository,
     conversion_repository: pay_repos.ConversionRepository,
@@ -111,10 +124,10 @@ def _create_app(  # noqa: WPS211
         routes=router.get_routes(
             bootstrap.create_dependencies(
                 currencies_client,
-                quotations_repository,
                 redis_repository,
                 transactions_repository,
                 transactions_client,
+                quotations_client,
                 conversion_repository,
                 companies_repository,
                 currencies_repository,
@@ -202,15 +215,6 @@ def cc_env() -> str:
 
 
 @pytest.fixture()
-def quotations_repository(
-    mongo_client: motor_asyncio.AsyncIOMotorClient,
-) -> quotations.QuotationsRepository:
-    return quotations.QuotationsRepository(
-        collection=mongo_client.test.quotations,
-    )
-
-
-@pytest.fixture()
 def contacts_repository(
     mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> repositories.ContactsRepository:
@@ -230,6 +234,15 @@ def transactions_client(
 ) -> transactions.Client:
     return transactions.DictClient(
         [get_transaction(transaction_id) for transaction_id in transaction_ids],
+    )
+
+
+@pytest.fixture()
+def quotations_client(
+    quotations_ids: Sequence[str],
+) -> quotations.Client:
+    return quotations.DictClient(
+        [get_quotation(quotations_id) for quotations_id in quotations_ids],
     )
 
 
@@ -264,6 +277,31 @@ def get_transaction(transaction_id: str) -> Transaction:
             fx_markup=float(1),
             sales_markup=float(1),
             processing_markup=float(2),
+        ),
+        payer_id=string.uuid(),
+        beneficiary_id=string.uuid(),
+    )
+
+
+def get_quotation(quotation_id: str) -> Quotation:
+    money_usd = money.from_string("1000", money.Currency("USD")).protobuf()
+    basic_rate = float(1)
+    return Quotation(
+        id=quotation_id,
+        amounts=QuotationAmounts(
+            beneficiary=money_usd,
+            base_converted=money_usd,
+            fx_margin=money_usd,
+            processing_margin=money_usd,
+            sales_margin=money_usd,
+            quotation=money_usd,
+        ),
+        rates=QuotationRates(
+            fx_quote=basic_rate,
+            fx_buffer=basic_rate,
+            fx_markup=basic_rate,
+            sales_markup=basic_rate,
+            processing_markup=basic_rate,
         ),
         payer_id=string.uuid(),
         beneficiary_id=string.uuid(),
@@ -425,7 +463,7 @@ def headers(jwt_token: str) -> dict[str, str]:
 @pytest.fixture()
 def app(  # noqa: WPS211
     currencies_client: currencies.Client,
-    quotations_repository: quotations.QuotationsRepository,
+    quotations_client: quotations.Client,
     redis_repository: UserSessionRepository,
     transactions_repository: pay_repos.TransactionRepository,
     transactions_client: transactions.Client,
@@ -437,7 +475,7 @@ def app(  # noqa: WPS211
     return _create_app(
         payment_client=cc_payment_client,
         currencies_client=currencies_client,
-        quotations_repository=quotations_repository,
+        quotations_client=quotations_client,
         redis_repository=redis_repository,
         transactions_repository=transactions_repository,
         conversion_repository=conversions_repository,

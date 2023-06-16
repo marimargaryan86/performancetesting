@@ -11,7 +11,7 @@ from starlette.middleware import Middleware, authentication
 from snowfall.adapter import authentication as auth
 from snowfall.project.junction.go.adapter import errors
 from snowfall.project.pay.adapter import accounts as accounts_adapter
-from snowfall.project.pay.adapter import currencies, payments, transactions
+from snowfall.project.pay.adapter import currencies, payments, quotations, transactions
 from snowfall.project.pay.service.companies import repositories
 from snowfall.project.pay.service.companies.v1alpha.grpc_pb2_grpc import (
     AccountsServiceStub,
@@ -30,7 +30,6 @@ from snowfall.project.pay.service.pay_api.routes import router
 from snowfall.project.pay.service.payments.v1alpha.payments_pb2_grpc import (
     PaymentsServiceStub,
 )
-from snowfall.project.pay.service.quotations.quotations import QuotationsRepository
 from snowfall.project.pay.service.transactions.v1alpha import (
     grpc_pb2_grpc as transactions_pb2_grpc,
 )
@@ -75,7 +74,6 @@ def _factory(
         transactions_channel = create_channel(
             app.settings.transactions_address,
         )
-        quotations_repo = QuotationsRepository(mongo.quotations.quotations)
         asgi_app = application.create_starlette_app(
             custom_middlewares=[
                 Middleware(
@@ -99,7 +97,6 @@ def _factory(
                     currencies_client=currencies.GrpcClient(
                         currencies_pb2_grpc.CurrencyServiceStub(orders_channel),
                     ),
-                    quotations_repository=quotations_repo,
                     redis_client=UserSessionRepository(
                         redis_client=redis_client,
                         cache_ttl=datetime.timedelta(minutes=15),
@@ -118,6 +115,11 @@ def _factory(
                     ),
                     transactions_client=transactions.GrpcClient(
                         transactions_pb2_grpc.TransactionsServiceStub(
+                            transactions_channel,
+                        ),
+                    ),
+                    quotations_client=quotations.GrpcClient(
+                        transactions_pb2_grpc.QuotationsServiceStub(
                             transactions_channel,
                         ),
                     ),

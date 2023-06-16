@@ -3,7 +3,6 @@ syntax = "proto3";
 package snowfall.project.pay.service.transactions.v1alpha;
 
 import "google/protobuf/timestamp.proto";
-import "snowfall/project/pay/service/quotations/v1alpha/models.proto";
 import "snowfall/stdlib/v1/money.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/transactions/v1alpha";
@@ -31,25 +30,26 @@ message Transaction {
   string invoice_reference_id = 3;
   google.protobuf.Timestamp created_at = 4;
   string conversion_id = 5;
-  snowfall.project.pay.service.quotations.v1alpha.QuotationAmounts amounts = 6;
-  snowfall.project.pay.service.quotations.v1alpha.QuotationRates rates = 7;
+  QuotationAmounts amounts = 6;
+  QuotationRates rates = 7;
   string payer_id = 8;
   string beneficiary_id = 9;
 }
 
+enum QuotationStatus {
+  QUOTATION_STATUS_UNSPECIFIED = 0;
+  QUOTATION_STATUS_QUOTED = 1;
+  QUOTATION_STATUS_CONFIRMED = 2;
+  QUOTATION_STATUS_INVALIDATED = 3;
+  QUOTATION_STATUS_UTILIZED = 4;
+}
+
 message Quotation {
   string id = 1;
-  snowfall.project.pay.service.quotations.v1alpha.QuotationAmounts amounts = 2;
-  snowfall.project.pay.service.quotations.v1alpha.QuotationRates rates = 3;
+  QuotationAmounts amounts = 2;
+  QuotationRates rates = 3;
   google.protobuf.Timestamp expires_at = 4;
-  enum Status {
-    STATUS_UNSPECIFIED = 0;
-    STATUS_QUOTED = 1;
-    STATUS_CONFIRMED = 2;
-    STATUS_INVALIDATED = 3;
-    STATUS_UTILIZED = 4;
-  }
-  Status status = 5;
+  QuotationStatus status = 5;
   string payer_id = 6;
   string beneficiary_id = 7;
   string transaction_id = 8;
