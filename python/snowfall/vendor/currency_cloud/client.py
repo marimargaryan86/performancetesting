@@ -362,7 +362,7 @@ class PaymentClient(object):  # noqa: WPS214
             _logger.error("ReadTimeout", url=url, payload=payload)
             raise CurrencyCloudError(messages=["{0}".format(exc)]) from exc
 
-        if 400 <= response.status_code < 500:  # noqa: WPS432
+        if response.is_client_error:
             error_messages = response.json()["error_messages"]
             raise CurrencyCloudError(
                 [
