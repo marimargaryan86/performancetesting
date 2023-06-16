@@ -41,7 +41,7 @@ class AdminSettings(application.Settings):
     cc_env: str
     cc_address: str
     authentication_address: str
-    accounts_address: str
+    companies_address: str
     payments_address: str
     transactions_address: str
     jwt_public_key: str

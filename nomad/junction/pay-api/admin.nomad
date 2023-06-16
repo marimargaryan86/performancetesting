@@ -105,7 +105,7 @@ job "pay-api-admin" {
             }
             upstreams {
               local_bind_port  = 8040
-              destination_name = "accounts-${var.environment}"
+              destination_name = "companies-${var.environment}"
             }
             upstreams {
               local_bind_port  = 8050
@@ -155,7 +155,7 @@ job "pay-api-admin" {
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 AUTHENTICATION_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_authentication-${var.environment}"))}}
-ACCOUNTS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_accounts-${var.environment}"))}}
+COMPANIES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_companies-${var.environment}"))}}
 PAYMENTS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_pay-payments-${var.environment}"))}}
 TRANSACTIONS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_transactions-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/currencycloud" }}

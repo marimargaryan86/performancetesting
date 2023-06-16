@@ -154,8 +154,8 @@ def _admin_factory(
         authentication_channel = create_channel(
             app.settings.authentication_address,
         )
-        accounts_channel = create_channel(
-            app.settings.accounts_address,
+        companies_channel = create_channel(
+            app.settings.companies_address,
         )
         payments_channel = create_channel(
             app.settings.payments_address,
@@ -213,7 +213,7 @@ def _admin_factory(
                     ),
                     accounts_client=accounts_adapter.GrpcClient(
                         AccountsServiceStub(
-                            accounts_channel,
+                            companies_channel,
                         ),
                     ),
                     transactions_client=transactions.GrpcClient(
