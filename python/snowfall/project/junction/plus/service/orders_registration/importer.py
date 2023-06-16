@@ -1,0 +1,28 @@
+from snowfall.project.junction.plus.service.orders_registration import (
+    orders_registration,
+)
+from snowfall.project.junction.plus.service.orders_registration.v1alpha import (
+    models_pb2,
+)
+from snowfall.stdlib.logging import stdout
+from snowfall.stdlib.transport.amqp import consumer, types
+
+
+class OrderImporter(object):
+    def __init__(
+        self,
+        consumer_obj: consumer.Consumer[models_pb2.Order],
+        order_repository: orders_registration.OrderRepository,
+    ):
+        self._consumer = consumer_obj
+        self._orders = order_repository
+        self._logger = stdout.get_logger()
+
+    async def consume(self) -> None:
+        await self._consumer.consume(self._process_message)
+
+    async def _process_message(
+        self,
+        message: types.Message[models_pb2.Order],
+    ) -> None:
+        self._logger.warning(str(message.body))

@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package snowfall.project.junction.plus.service.orders_registration.v1alpha;
+
+import "google/protobuf/timestamp.proto";
+import "snowfall/stdlib/v1/date.proto";
+import "snowfall/stdlib/v1/phone_number.proto";
+import "snowfall/stdlib/v1/postal_address.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/plus/service/orders_registration/v1alpha";
+
+message Order {
+  string id = 1;
+  string reseller_id = 2;
+  string external_ref_id = 3;
+  string subscriber_id = 4;
+  ContactDetails contact_details = 5;
+  repeated Passenger passengers = 6;
+  repeated Booking bookings = 7;
+}
+
+message ContactDetails {
+  string email = 1;
+  snowfall.stdlib.v1.PostalAddress address = 2;
+  snowfall.stdlib.v1.PhoneNumber phone = 3;
+}
+
+message Passenger {
+  string first_name = 1;
+  string last_name = 2;
+  enum Title {
+    TITLE_UNSPECIFIED = 0;
+    TITLE_MR = 1;
+    TITLE_MRS = 2;
+    TITLE_MISS = 3;
+    TITLE_MS = 4;
+  }
+  Title title = 3;
+  enum Gender {
+    GENDER_UNSPECIFIED = 0;
+    GENDER_MALE = 1;
+    GENDER_FEMALE = 2;
+  }
+  Gender gender = 4;
+  snowfall.stdlib.v1.Date date_of_birth = 5;
+}
+
+message Booking {
+  oneof booking {
+    AirBooking value = 1;
+  }
+}
+
+message AirBooking {
+  string id = 1;
+  google.protobuf.Timestamp departure_at = 2;
+  google.protobuf.Timestamp arrival_at = 3;
+  string origin = 4;
+  string destination = 5;
+  string route_identifier = 6;
+  string cabin_class = 7;
+}
