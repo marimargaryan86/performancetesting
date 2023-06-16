@@ -46,6 +46,7 @@ def create_dependencies(  # noqa: WPS211
     plus_http_client: plus_client.PlusClient,
     places_repository: repository.PlacesRepository,
     users_repository: repository.UsersRepository,
+    guests_repository: repository.GuestsRepository,
     otp_repository: repository.OtpRepository,
     enums_values_repository: repository.EnumsValuesRepository,
     smtp_client: smtp.EmailClient,
@@ -63,6 +64,7 @@ def create_dependencies(  # noqa: WPS211
     container[plus_client.PlusClient] = plus_http_client
     container[repository.PlacesRepository] = places_repository
     container[repository.UsersRepository] = users_repository
+    container[repository.GuestsRepository] = guests_repository
     container[repository.OtpRepository] = otp_repository
     container[repository.EnumsValuesRepository] = enums_values_repository
     container[smtp.EmailClient] = smtp_client

@@ -23,22 +23,29 @@ _stripe_version = "2020-08-27"
 async def get_or_create_stripe_customer(
     stripe_users_repository: repository.StripeUsersRepository,
     users_repository: repository.UsersRepository,
+    guests_repository: repository.GuestsRepository,
     user_id: str,
 ) -> str:
     stripe_user = await stripe_users_repository.get(user_id)
-    if not stripe_user:
-        user = await users_repository.find_by_id(user_id)
-        if user is None:
-            raise exceptions.HTTPException(status.HTTP_502_BAD_GATEWAY)
+    if stripe_user:
+        return stripe_user.id
+
+    user = await users_repository.find_by_id(user_id)
+    if user:
         api_response_user = stripe.Customer.create(
             email=user.email,
             name=user.first_name,
         )
-        stripe_user = models_pb2.StripeUser(
-            id=api_response_user.stripe_id,
-            internal_user_id=user_id,
-        )
-        await stripe_users_repository.insert(stripe_user)
+    else:
+        guest = await guests_repository.find_by_id(user_id)
+        if not guest:
+            raise exceptions.HTTPException(status.HTTP_502_BAD_GATEWAY)
+        api_response_user = stripe.Customer.create()
+    stripe_user = models_pb2.StripeUser(
+        id=api_response_user.stripe_id,
+        internal_user_id=user_id,
+    )
+    await stripe_users_repository.insert(stripe_user)
     return stripe_user.id
 
 
@@ -47,6 +54,7 @@ class Payments(endpoints.HTTPEndpoint):
         self,
         request: requests.Request,
         users_repository: repository.UsersRepository = lagom.injectable,
+        guests_repository: repository.GuestsRepository = lagom.injectable,
         stripe_users_repository: repository.StripeUsersRepository = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
@@ -60,6 +68,7 @@ class Payments(endpoints.HTTPEndpoint):
             stripe_user_id = await get_or_create_stripe_customer(
                 stripe_users_repository,
                 users_repository,
+                guests_repository,
                 request.user.username,
             )
             ephemeral_key_secret = stripe.EphemeralKey.create(

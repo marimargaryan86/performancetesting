@@ -10,6 +10,11 @@ import "snowfall/stdlib/v1/phone_number.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/extensions/service/mobile_api/v1alpha";
 
+message Guest {
+  string id = 1;
+  google.protobuf.Timestamp created_at = 2;
+}
+
 message User {
   string id = 1;
   string email = 2;

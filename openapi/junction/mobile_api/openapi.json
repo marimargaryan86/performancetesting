@@ -23,6 +23,12 @@
       ]
     },
     {
+      "name": "Guests",
+      "tags": [
+        "guests"
+      ]
+    },
+    {
       "name": "Internal",
       "tags": [
         "internal"
@@ -113,6 +119,11 @@
       "x-displayName": "Groups"
     },
     {
+      "name": "guests",
+      "description": "Endpoints for guest users.",
+      "x-displayName": "Guests"
+    },
+    {
       "name": "internal",
       "description": "Endpoints not for public use.",
       "x-displayName": "Internal"
@@ -174,6 +185,107 @@
     }
   ],
   "paths": {
+    "/guests": {
+      "post": {
+        "summary": "Create guest user",
+        "tags": [
+          "guests"
+        ],
+        "security": [],
+        "operationId": "post-guests",
+        "description": "Used to create a new guest user.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/Guest"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Guest"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        }
+      }
+    },
+    "/guests/sessions": {
+      "post": {
+        "tags": [
+          "guests"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/GuestSession"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "./../client_api/openapi.json#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Unauthorized"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/GuestSession"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "post-guests-sessions",
+        "description": "Guest login",
+        "security": [],
+        "summary": "Create Guest Session"
+      }
+    },
     "/cabin-classes": {
       "$ref": "./../client_api/openapi.json#/paths/~1cabin-classes"
     },
@@ -289,7 +401,7 @@
           "$ref": "#/components/parameters/groupId"
         }
       ],
-      "get":{
+      "get": {
         "summary": "Get user group",
         "tags": [
           "groups"
@@ -442,7 +554,7 @@
           }
         }
       },
-      "get":{
+      "get": {
         "summary": "List user group members",
         "tags": [
           "groups"
@@ -951,7 +1063,7 @@
       "get": {
         "parameters": [
           {
-          "$ref": "#/components/parameters/orderInclude"
+            "$ref": "#/components/parameters/orderInclude"
           }
         ],
         "summary": "Get Order",
@@ -1378,7 +1490,7 @@
                 "type": "object",
                 "properties": {
                   "data": {
-                      "$ref": "#/components/schemas/UpdatePaymentIntent"
+                    "$ref": "#/components/schemas/UpdatePaymentIntent"
                   }
                 },
                 "required": [
@@ -1473,7 +1585,7 @@
                   "type": "object",
                   "properties": {
                     "data": {
-                        "$ref": "#/components/schemas/Place"
+                      "$ref": "#/components/schemas/Place"
                     }
                   },
                   "required": [
@@ -1671,7 +1783,6 @@
           "description": "Target userEmail you want to change the password"
         }
       ],
-
       "patch": {
         "tags": [
           "user"
@@ -1712,7 +1823,7 @@
         "summary": "Update password - forgot password"
       }
     },
-    "/users/me":{
+    "/users/me": {
       "get": {
         "summary": "Get User",
         "tags": [
@@ -1747,7 +1858,7 @@
           }
         }
       },
-      "delete":{
+      "delete": {
         "summary": "Delete User",
         "tags": [
           "user"
@@ -1809,8 +1920,12 @@
             "application/vnd.api+json": {
               "schema": {
                 "allOf": [
-                  {"$ref": "#/components/schemas/UserProfile"},
-                  {"$ref": "#/components/schemas/ChangePasswordBody"}
+                  {
+                    "$ref": "#/components/schemas/UserProfile"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ChangePasswordBody"
+                  }
                 ]
               }
             }
@@ -1839,8 +1954,8 @@
               "application/vnd.api+json": {
                 "schema": {
                   "type": "object",
-                  "properties":{
-                    "data":{
+                  "properties": {
+                    "data": {
                       "type": "array",
                       "items": {
                         "$ref": "#/components/schemas/Preference"
@@ -1882,7 +1997,7 @@
                 "type": "object",
                 "properties": {
                   "data": {
-                      "$ref": "#/components/schemas/UpdatePreference"
+                    "$ref": "#/components/schemas/UpdatePreference"
                   }
                 },
                 "required": [
@@ -2062,10 +2177,16 @@
                 }
               }
             },
-            "required": ["id", "type", "attributes"]
+            "required": [
+              "id",
+              "type",
+              "attributes"
+            ]
           }
         },
-        "required": ["data"]
+        "required": [
+          "data"
+        ]
       },
       "CabinClassIdentifier": {
         "title": "Cabin Class Identifier",
@@ -2174,7 +2295,7 @@
             ],
             "example": "loyalty-programs"
           },
-          "attributes":{
+          "attributes": {
             "type": "object",
             "properties": {
               "iata": {
@@ -2190,10 +2311,18 @@
                 "example": "Miles+Bonus"
               }
             },
-            "required": ["iata", "airline", "name"]
+            "required": [
+              "iata",
+              "airline",
+              "name"
+            ]
           }
         },
-        "required": ["id", "type", "attributes"]
+        "required": [
+          "id",
+          "type",
+          "attributes"
+        ]
       },
       "Voucher": {
         "title": "Voucher",
@@ -2212,7 +2341,7 @@
             ],
             "example": "vouchers"
           },
-          "attributes":{
+          "attributes": {
             "type": "object",
             "properties": {
               "code": {
@@ -2230,14 +2359,27 @@
               },
               "status": {
                 "type": "string",
-                "enum": ["used", "valid", "expired"],
+                "enum": [
+                  "used",
+                  "valid",
+                  "expired"
+                ],
                 "example": "valid"
               }
             },
-            "required": ["code", "expiresAt", "price", "status"]
+            "required": [
+              "code",
+              "expiresAt",
+              "price",
+              "status"
+            ]
           }
         },
-        "required": ["id", "type", "attributes"]
+        "required": [
+          "id",
+          "type",
+          "attributes"
+        ]
       },
       "UserGroupMemberIdentifier": {
         "title": "Trip Group Member Identifier",
@@ -3076,6 +3218,43 @@
         ],
         "description": "Details for a Trip Booking."
       },
+      "Guest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "guests"
+            ],
+            "example": "guests"
+          },
+          "attributes": {
+            "type": "object",
+            "properties": {
+              "createdAt": {
+                "type": "string",
+                "example": "2019-08-24T14:15:22Z",
+                "format": "date-time",
+                "readOnly": true
+              }
+            },
+            "required": [
+              "createdAt"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ],
+        "title": "Guest",
+        "description": ""
+      },
       "User": {
         "type": "object",
         "properties": {
@@ -3141,6 +3320,27 @@
                   "phone",
                   "createdAt"
                 ]
+              },
+              "relationships": {
+                "type": "object",
+                "properties": {
+                  "guest": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+                      },
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "guests"
+                        ],
+                        "example": "guests"
+                      }
+                    }
+                  }
+                }
               }
             },
             "required": [
@@ -3185,7 +3385,7 @@
               {
                 "type": "object",
                 "properties": {
-                  "attributes":{
+                  "attributes": {
                     "$ref": "#/components/schemas/UserProfileAttributes"
                   }
                 },
@@ -3230,7 +3430,7 @@
           {
             "type": "object",
             "properties": {
-              "attributes":{
+              "attributes": {
                 "$ref": "#/components/schemas/UserProfileAttributes"
               }
             },
@@ -3392,6 +3592,66 @@
           "id",
           "type",
           "attributes"
+        ]
+      },
+      "GuestSession": {
+        "type": "object",
+        "title": "Guest Session",
+        "description": "",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiI0MDBkMzI0NC04ZTBlLTQxMTktOWNlMi1hMjQwMDhjMDYxODciLCJ2ZXJzaW9uIjoiMS4wLjAifQ.Eh8BjN_dpv0kiN5oK2mYl8r9L9l45AYAArXljyDN-KY",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "example": "guest-sessions",
+            "enum": [
+              "guest-sessions"
+            ]
+          },
+          "relationships": {
+            "type": "object",
+            "required": [
+              "guest"
+            ],
+            "properties": {
+              "guest": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "id",
+                      "type"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+                      },
+                      "type": {
+                        "type": "string",
+                        "example": "guests",
+                        "enum": [
+                          "guests"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "relationships"
         ]
       },
       "VerificationCode": {
@@ -3717,14 +3977,25 @@
           },
           "value": {
             "oneOf": [
-              {"$ref": "#/components/schemas/BooleanPreferenceValue"},
-              {"$ref": "#/components/schemas/IntegerPreferenceValue"},
-              {"$ref": "#/components/schemas/BooleanCollectionPreferenceValue"}
-
+              {
+                "$ref": "#/components/schemas/BooleanPreferenceValue"
+              },
+              {
+                "$ref": "#/components/schemas/IntegerPreferenceValue"
+              },
+              {
+                "$ref": "#/components/schemas/BooleanCollectionPreferenceValue"
+              }
             ]
           }
         },
-        "required": ["title", "ref", "type", "category", "value"]
+        "required": [
+          "title",
+          "ref",
+          "type",
+          "category",
+          "value"
+        ]
       },
       "BooleanPreferenceValue": {
         "title": "Boolean Preference Value",
@@ -3767,7 +4038,12 @@
             "readOnly": true
           }
         },
-        "required": ["title", "ref", "value", "imageUrl"]
+        "required": [
+          "title",
+          "ref",
+          "value",
+          "imageUrl"
+        ]
       },
       "ContactDetails": {
         "title": "ContactDetails",
@@ -3840,7 +4116,7 @@
         "title": "LoyaltyProgramUserProfile",
         "type": "object",
         "properties": {
-          "program" :{
+          "program": {
             "type": "string",
             "example": "Miles+Bonus"
           },

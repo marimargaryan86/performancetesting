@@ -130,6 +130,20 @@ class PlacesRepository(
         return response
 
 
+class GuestsRepository(
+    mixins.FindByIdMixin[models_pb2.Guest],
+    mixins.InsertMixin[models_pb2.Guest],
+    repository.ProtoRepository[models_pb2.Guest],
+):
+    _proto = models_pb2.Guest
+
+    async def delete(self, guest_id: str) -> None:
+        await self._execute(
+            self._collection.delete_one,
+            filter={"_id": guest_id},
+        )
+
+
 class UsersRepository(
     mixins.FindByIdMixin[models_pb2.User],
     mixins.InsertMixin[models_pb2.User],

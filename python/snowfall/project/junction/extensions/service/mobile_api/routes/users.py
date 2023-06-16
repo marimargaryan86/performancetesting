@@ -38,6 +38,7 @@ class Users(endpoints.HTTPEndpoint):
         request: requests.Request,
         otp_repository: repository.OtpRepository = lagom.injectable,
         users_repository: repository.UsersRepository = lagom.injectable,
+        guests_repository: repository.GuestsRepository = lagom.injectable,
     ) -> responses.Response:
         """User signup."""
         body = await request_helpers.flatten_request(request)
@@ -51,8 +52,12 @@ class Users(endpoints.HTTPEndpoint):
         if not authorized:
             raise exceptions.HTTPException(status.HTTP_401_UNAUTHORIZED)
 
+        new_user_id = string.uuid()
+        if body.get("guest"):
+            new_user_id = body["guest"]
+
         user = UserModel(
-            id=string.uuid(),
+            id=new_user_id,
             email=body[_email_key],
             password=bcrypt.hashpw(
                 body[_password_key].encode(),
@@ -80,6 +85,10 @@ class Users(endpoints.HTTPEndpoint):
                 ),
                 status_code=status.HTTP_400_BAD_REQUEST,
             )
+
+        if body.get("guest"):
+            await guests_repository.delete(new_user_id)
+
         return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
 
 

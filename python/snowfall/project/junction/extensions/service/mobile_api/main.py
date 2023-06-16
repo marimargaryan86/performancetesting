@@ -115,6 +115,9 @@ def _factory(
                     users_repository=repository.UsersRepository(
                         mongo["users"],
                     ),
+                    guests_repository=repository.GuestsRepository(
+                        mongo["guests"],
+                    ),
                     otp_repository=repository.OtpRepository(
                         redis_client=redis_client,
                         cache_ttl=app.settings.otp_cache_ttl,

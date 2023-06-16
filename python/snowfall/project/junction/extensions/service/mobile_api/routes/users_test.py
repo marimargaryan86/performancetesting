@@ -116,6 +116,7 @@ class TestUsers(object):
         users_repository: repository.UsersRepository,
         new_user_verification_code: conftest.VerificationCode,
         new_user: models_pb2.User,
+        existing_guest: models_pb2.Guest,
     ) -> None:
         otp_headers = dict(copy.deepcopy(headers))
         otp_headers["Authorization"] = "Bearer {otp}".format(
@@ -133,6 +134,14 @@ class TestUsers(object):
                         "email": new_user.email,
                         "phone": new_user.phone.e164_number,
                     },
+                    "relationships": {
+                        "guest": {
+                            "data": {
+                                "type": "guests",
+                                "id": existing_guest.id,
+                            },
+                        },
+                    },
                 },
             },
             headers=otp_headers,
@@ -140,6 +149,7 @@ class TestUsers(object):
 
         user = await users_repository.find_user_by_email(new_user.email)
         assert user is not None
+        assert user.id == existing_guest.id
 
     async def test_user_login(
         self,

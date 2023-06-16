@@ -5,6 +5,7 @@ from starlette import routing
 from snowfall.project.junction.extensions.service.mobile_api import repository
 from snowfall.project.junction.extensions.service.mobile_api.routes import (  # noqa: WPS235
     enums,
+    guests,
     loyalty_programs,
     notification_tokens,
     offers,
@@ -60,6 +61,8 @@ def get_routes(
         integration.route("/offers/quotes/{offerPriceQuoteId}", quotes.OfferQuote),
         integration.route("/verification-code", users.OTPGenerate),
         integration.route("/verification-code/{userEmail}", users.OTPVerify),
+        integration.route("/guests", guests.Guests),
+        integration.route("/guests/sessions", guests.Session),
         integration.route("/users/sessions", users.Session),
         integration.route("/users", users.Users),
         integration.route("/users/me", users.UserLoggedIn),

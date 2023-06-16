@@ -53,6 +53,21 @@ class TripSearchTripsResource(models.Resource):
         return cls(**trip_search_trip)
 
 
+class GuestResource(models.Resource):
+    @classmethod
+    def from_proto(
+        cls,
+        guest: models_pb2.Guest,
+    ) -> GuestResource:
+        return cls(
+            id=guest.id,
+            type="guests",
+            attributes={
+                "createdAt": protobuf.protobuf_to_datetime(guest.created_at),
+            },
+        )
+
+
 class UserResource(models.Resource):
     @classmethod
     def from_proto(

@@ -99,6 +99,13 @@ def existing_user() -> ExistingUser:
     return {"model": user, "unhashed_password": "ReallyStrong1!"}
 
 
+@pytest.fixture()
+def existing_guest() -> models_pb2.Guest:
+    return models_pb2.Guest(
+        id=string.uuid(),
+    )
+
+
 @dataclasses.dataclass(frozen=True)
 class VerificationCode(object):
     email: str
@@ -270,6 +277,18 @@ async def users_repository(
 
 
 @pytest.fixture()
+async def guests_repository(
+    mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
+    existing_guest: models_pb2.Guest,
+) -> repository.GuestsRepository:
+    guests_repo = repository.GuestsRepository(
+        mongo_test_db["guests"],
+    )
+    await guests_repo.insert(existing_guest)
+    return guests_repo
+
+
+@pytest.fixture()
 async def otp_repository(
     redis_client: redis.Client[str],
     new_user_verification_code: VerificationCode,
@@ -352,6 +371,7 @@ def non_mocked_hosts() -> list[str]:
 def app(  # noqa: WPS211
     places_repository: repository.PlacesRepository,
     users_repository: repository.UsersRepository,
+    guests_repository: repository.GuestsRepository,
     otp_repository: repository.OtpRepository,
     enums_values_repository: repository.EnumsValuesRepository,
     smtp_client: smtp.EmailClient,
@@ -373,6 +393,7 @@ def app(  # noqa: WPS211
             plus_http_client,
             places_repository,
             users_repository,
+            guests_repository,
             otp_repository,
             enums_values_repository,
             smtp_client,
