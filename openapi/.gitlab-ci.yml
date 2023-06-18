@@ -52,3 +52,21 @@ openapi:test:
         - openapi/**/*
   tags:
     - docker
+
+openapi:changelog:
+  stage: deploy
+  image: "${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG}"
+  interruptible: true
+  variables:
+    GIT_DEPTH: 0
+    GIT_STRATEGY: clone
+  script: |
+    - ./bash/post-openapi-changelog.sh
+  needs:
+    - "pants:setup"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+  tags:
+    - docker
