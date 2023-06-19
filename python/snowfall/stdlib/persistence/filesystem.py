@@ -93,10 +93,22 @@ class Storage(object):
             return _AsyncMemoryFileSystem(), pathlib.Path(string.random(24))
 
         if parsed_dsn.scheme == "s3":
+            custom_endpoint_url = None
+
+            if parsed_dsn.hostname:
+                custom_endpoint_url = "http://{0}".format(parsed_dsn.hostname)
+
+            if custom_endpoint_url and parsed_dsn.port:
+                custom_endpoint_url = "{0}:{1}".format(
+                    custom_endpoint_url,
+                    parsed_dsn.port,
+                )
+
             return s3fs.S3FileSystem(
                 asynchronous=True,
                 key=parsed_dsn.username,
                 secret=urllib_parse.unquote(str(parsed_dsn.password)),
+                endpoint_url=custom_endpoint_url,
             ), pathlib.Path(parsed_dsn.path.strip("/"))
 
         raise UnsupportedStorageSchemeError(
