@@ -44,7 +44,7 @@ async def orders(app: service.AsyncApplication[OrdersSettings]) -> None:
     rate_limit_client = await app.stack.enter_async_context(
         RateLimitClient(
             app.settings.rate_limiter_grpc_host,
-            app.settings.rate_limiter_service_configs.get("duffel"),
+            app.settings.rate_limiter_service_configs["duffel"],
         ),
     )
     redis_connection = await app.stack.enter_async_context(

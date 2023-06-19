@@ -41,7 +41,7 @@ async def offers_factory(
     rate_limit_client = await stack.enter_async_context(
         RateLimitClient(
             app.settings.rate_limiter_grpc_host,
-            app.settings.rate_limiter_service_configs.get("duffel"),
+            app.settings.rate_limiter_service_configs["duffel"],
         ),
     )
 

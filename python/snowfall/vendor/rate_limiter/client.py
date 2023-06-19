@@ -27,33 +27,32 @@ class Client(object):
     def __init__(
         self,
         grpc_host: str,
-        config: RateLimitConfig | None,
+        config: RateLimitConfig,
     ):
         self._channel = create_channel(grpc_host)
         self._stub = V1Stub(self._channel)
-        self._config: dict[str, str] | RateLimitConfigsApi = {}
+        self._config: RateLimitConfigsApi
         self._logger = stdout.get_logger()
 
-        if config is not None:
-            if isinstance(config.duration_s, str):
-                duration = durations_mapping[config.duration_s]
-                behavior = Behavior.DURATION_IS_GREGORIAN
-            else:
-                duration = config.duration_s * SECOND
-                behavior = Behavior.BATCHING
+        if isinstance(config.duration_s, str):
+            duration = durations_mapping[config.duration_s]
+            behavior = Behavior.DURATION_IS_GREGORIAN
+        else:
+            duration = config.duration_s * SECOND
+            behavior = Behavior.BATCHING
 
-            if config.algorithm == "token":
-                algorithm = Algorithm.TOKEN_BUCKET
-            else:
-                algorithm = Algorithm.LEAKY_BUCKET
+        if config.algorithm == "token":
+            algorithm = Algorithm.TOKEN_BUCKET
+        else:
+            algorithm = Algorithm.LEAKY_BUCKET
 
-            self._config = RateLimitConfigsApi(
-                name=config.name,
-                limit=config.limit,
-                duration=duration,
-                algorithm=algorithm,
-                behavior=behavior,
-            )
+        self._config = RateLimitConfigsApi(
+            name=config.name,
+            limit=config.limit,
+            duration=duration,
+            algorithm=algorithm,
+            behavior=behavior,
+        )
 
     async def __aenter__(self) -> Self:
         await self._channel.__aenter__()  # noqa: WPS609
@@ -72,10 +71,6 @@ class Client(object):
         )
 
     async def rate_limit(self, timeout: float = 0, hits: int = 1) -> None:
-        # TODO: It's just for testing purposes, to be removed after testing
-        if not self._config:
-            return
-
         cutoff_time_ms = (time.time() + timeout) * SECOND
 
         limit = await self._get_rate_limits(hits)
