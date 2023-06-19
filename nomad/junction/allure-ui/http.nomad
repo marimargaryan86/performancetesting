@@ -62,7 +62,7 @@ job "allure-ui-http" {
         type     = "http"
         path     = "/"
         interval = "30s"
-        timeout  = "10s"
+        timeout  = "4s"
       }
     }
 

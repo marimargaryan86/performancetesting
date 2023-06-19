@@ -91,8 +91,8 @@ job "dogfood-ui-http" {
       check {
         type     = "http"
         path     = "/health"
-        interval = "10s"
-        timeout  = "2s"
+        interval = "30s"
+        timeout  = "4s"
       }
     }
 

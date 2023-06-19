@@ -97,7 +97,7 @@ job "vector-vector-loki" {
           type     = "http"
           path     = "/health"
           interval = "30s"
-          timeout  = "5s"
+          timeout  = "4s"
         }
       }
       kill_timeout = "30s"

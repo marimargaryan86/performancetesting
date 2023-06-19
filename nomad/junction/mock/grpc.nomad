@@ -80,8 +80,8 @@ job "mock-grpc" {
 
       check {
         type     = "grpc"
-        interval = "10s"
-        timeout  = "2s"
+        interval = "30s"
+        timeout  = "4s"
       }
     }
     service {

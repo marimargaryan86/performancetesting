@@ -76,8 +76,8 @@ job "ba-ndc-orders" {
       check {
         type     = "http"
         path     = "/"
-        interval = "20s"
-        timeout  = "10s"
+        interval = "30s"
+        timeout  = "4s"
       }
     }
 

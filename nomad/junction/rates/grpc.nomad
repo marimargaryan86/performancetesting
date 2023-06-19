@@ -65,7 +65,7 @@ job "rates-grpc" {
       check {
         type     = "grpc"
         interval = "30s"
-        timeout  = "2s"
+        timeout  = "4s"
       }
     }
 

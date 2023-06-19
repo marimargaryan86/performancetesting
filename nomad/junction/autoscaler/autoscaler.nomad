@@ -82,8 +82,8 @@ strategy "target-value" {
         check {
           type     = "http"
           path     = "/v1/health"
-          interval = "3s"
-          timeout  = "1s"
+          interval = "30s"
+          timeout  = "4s"
         }
       }
     }

@@ -60,7 +60,7 @@ job "rate-limiter-grpc" {
         type     = "http"
         path     = "/v1/HealthCheck"
         interval = "30s"
-        timeout  = "10s"
+        timeout  = "4s"
       }
     }
 
