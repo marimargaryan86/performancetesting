@@ -32,6 +32,8 @@ class HmacHeaderMiddleware(BaseHTTPMiddleware):
         request: requests.Request,
         call_next: Callable[[requests.Request], Awaitable[responses.Response]],
     ) -> responses.Response:
+        if request.scope["path"].endswith("health"):
+            return await call_next(request)
         resolved_request = await resolve_request(request)
         received_hmac = request.headers.get("X-Hmac-Digest-Sha-512")
         if not received_hmac:
