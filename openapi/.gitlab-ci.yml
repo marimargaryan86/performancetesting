@@ -60,7 +60,7 @@ openapi:changelog:
   variables:
     GIT_DEPTH: 0
     GIT_STRATEGY: clone
-  script: |
+  script:
     - ./bash/post-openapi-changelog.sh
   needs:
     - "pants:setup"
