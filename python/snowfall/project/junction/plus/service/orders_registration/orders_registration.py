@@ -4,5 +4,5 @@ from snowfall.project.junction.plus.service.orders_registration.v1alpha import (
 from snowfall.stdlib.persistence.mongo import repository
 
 
-class OrderRepository(repository.ProtoRepository[models_pb2.Order]):
-    _proto = models_pb2.Order
+class OrderRepository(repository.ProtoRepository[models_pb2.PersistedOrder]):
+    _proto = models_pb2.PersistedOrder

@@ -9,14 +9,21 @@ import "snowfall/stdlib/v1/postal_address.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/plus/service/orders_registration/v1alpha";
 
-message Order {
+message IncomingOrder {
+  string reseller_id = 1;
+  string external_ref_id = 2;
+  ContactDetails contact_details = 3;
+  repeated Passenger passengers = 4;
+  repeated Booking bookings = 5;
+}
+
+message PersistedOrder {
   string id = 1;
   string reseller_id = 2;
   string external_ref_id = 3;
   string subscriber_id = 4;
-  ContactDetails contact_details = 5;
-  repeated Passenger passengers = 6;
-  repeated Booking bookings = 7;
+  repeated Passenger passengers = 5;
+  repeated Booking bookings = 6;
 }
 
 message ContactDetails {
