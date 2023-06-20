@@ -9,6 +9,7 @@ from snowfall.vendor.currency_cloud.errors import CurrencyCloudError
 from snowfall.vendor.currency_cloud.models.account import (
     AccountRequest,
     AccountResponse,
+    AccountUpdateRequest,
 )
 from snowfall.vendor.currency_cloud.models.balance import (
     BalanceRequest,
@@ -182,6 +183,19 @@ class PaymentClient(object):  # noqa: WPS214
                 _METHOD_POST,
                 "/accounts/create",
                 payload=account_request.dict(exclude_none=True),
+            ),
+        )
+
+    async def update_account(
+        self,
+        account_id: str,
+        account_update_request: AccountUpdateRequest,
+    ) -> AccountResponse:
+        return AccountResponse(
+            **await self._make_request(
+                _METHOD_POST,
+                "/accounts/{0}".format(account_id),
+                payload=account_update_request.dict(exclude_none=True),
             ),
         )
 

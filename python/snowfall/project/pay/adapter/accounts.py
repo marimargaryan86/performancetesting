@@ -1,12 +1,16 @@
 import abc
+import datetime
+from collections.abc import Sequence
 
 import grpc
 
+from snowfall.project.junction.go.adapter import errors
 from snowfall.project.pay.service.companies.v1alpha import (
     grpc_pb2,
     grpc_pb2_grpc,
     models_pb2,
 )
+from snowfall.stdlib.format import protobuf
 
 
 class Client(abc.ABC):
@@ -27,10 +31,19 @@ class Client(abc.ABC):
     @abc.abstractmethod
     async def find(
         self,
+        filter_by: str,
         limit: int | None = None,
         cursor: str | None = None,
     ) -> grpc_pb2.ListAccountsResponse:
         """Fetch sequence of accounts."""
+
+    @abc.abstractmethod
+    async def update_account_status(
+        self,
+        document_id: str,
+        status: str,
+    ) -> models_pb2.Account:
+        """Update status field of account."""
 
 
 class DictClient(Client):
@@ -51,12 +64,39 @@ class DictClient(Client):
 
     async def find(
         self,
+        filter_by: str,
         limit: int | None = None,
         cursor: str | None = None,
     ) -> grpc_pb2.ListAccountsResponse:
+        statuses = [
+            protobuf.slug_to_enum_value(
+                models_pb2.Status,
+                filter_status,
+            )
+            for filter_status in filter_by
+        ]
         return grpc_pb2.ListAccountsResponse(
-            accounts=list(self._accounts.values()),
+            accounts=[
+                account
+                for account in self._accounts.values()
+                if account.status in statuses
+            ],
         )
+
+    async def update_account_status(
+        self,
+        document_id: str,
+        status: str,
+    ) -> models_pb2.Account:
+        account = self._accounts.get(document_id)
+        if account is None:
+            raise errors.NotFoundError("Account is not found")
+        account.status = protobuf.slug_to_enum_value(models_pb2.Status, status)
+        account.updated_at = protobuf.datetime_to_protobuf(  # type: ignore[misc]
+            datetime.datetime.now(tz=datetime.UTC),
+        )
+        self._accounts[document_id] = account
+        return account
 
 
 class GrpcClient(Client):
@@ -92,6 +132,7 @@ class GrpcClient(Client):
 
     async def find(
         self,
+        filter_by: Sequence[str],
         limit: int | None = None,
         cursor: str | None = None,
     ) -> grpc_pb2.ListAccountsResponse:
@@ -99,5 +140,24 @@ class GrpcClient(Client):
             grpc_pb2.ListAccountsRequest(
                 page_size=limit or self._default_page_size,
                 page_token=cursor or "",
+                filter_by=filter_by,
             ),
         )
+
+    async def update_account_status(
+        self,
+        document_id: str,
+        status: str,
+    ) -> models_pb2.Account:
+        response = await errors.handle_grpc_errors(
+            self._client.UpdateAccountStatus(
+                grpc_pb2.UpdateAccountStatusRequest(
+                    id=document_id,
+                    status=protobuf.slug_to_enum_value(
+                        models_pb2.Status,
+                        status,
+                    ),
+                ),
+            ),
+        )
+        return response.account

@@ -10,6 +10,7 @@ from snowfall.project.pay.service.companies.v1alpha.models_pb2 import (
     Account,
     Company,
     Contact,
+    Status,
 )
 from snowfall.project.pay.service.conversions.v1alpha.models_pb2 import Conversion
 from snowfall.project.pay.service.pay_api.conftest import get_transaction
@@ -211,7 +212,10 @@ async def accounts_based_on_cc_accounts(
                     contact_id=string.uuid(),
                     company_id=string.uuid(),
                     name="Snowfall",
-                    status="enabled",
+                    status=protobuf.slug_to_enum_value(
+                        Status,
+                        "enabled",
+                    ),
                 ),
             ),
         )

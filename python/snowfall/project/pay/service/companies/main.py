@@ -15,19 +15,29 @@ class _GrpcSettings(service.Settings):
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
     mongo_dsn: Sequence[AnyUrl]
+    cc_login: str
+    cc_api_key: str
+    cc_address: str
 
 
 class _AccountSyncSettings(service.Settings):
     mongo_dsn: AnyUrl
     cc_login: str
     cc_api_key: str
-    cc_env: str
     cc_address: str
 
 
 async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         random.choice(app.settings.mongo_dsn),  # nosec
+    )
+    payment_client = PaymentClient(
+        base_url=app.settings.cc_address,
+        auth=CurrencyCloudAuth(
+            base_url=app.settings.cc_address,
+            login_id=app.settings.cc_login,
+            api_key=app.settings.cc_api_key,
+        ),
     )
 
     grpc_server = server.create_server(
@@ -40,10 +50,8 @@ async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
                 ),
             ),
             grpc.AccountsService(
-                accounts=repositories.AccountsRepository(mongo.companies.accounts),
-            ),
-            grpc.ContactsService(
-                contacts=repositories.ContactsRepository(mongo.companies.contacts),
+                accounts=repositories.AccountsRepository(mongo.accounts.accounts),
+                payment_client=payment_client,
             ),
         ],
     )

@@ -17,6 +17,7 @@ service AccountsService {
   rpc CreateAccount(CreateAccountRequest) returns (CreateAccountResponse) {}
   rpc GetAccount(GetAccountRequest) returns (GetAccountResponse) {}
   rpc ListAccounts(ListAccountsRequest) returns (ListAccountsResponse) {}
+  rpc UpdateAccountStatus(UpdateAccountStatusRequest) returns (UpdateAccountStatusResponse) {}
 }
 
 service ContactsService {
@@ -93,9 +94,19 @@ message GetAccountResponse {
 message ListAccountsRequest {
   int32 page_size = 1;
   string page_token = 2;
+  repeated string filter_by = 3;
 }
 
 message ListAccountsResponse {
   repeated Account accounts = 1;
   string next_page_token = 2;
+}
+
+message UpdateAccountStatusRequest {
+  string id = 1;
+  Status status = 2;
+}
+
+message UpdateAccountStatusResponse {
+  Account account = 1;
 }

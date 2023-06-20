@@ -300,7 +300,10 @@ class AccountResource(models.Resource):
             type=AccountResource.api_type,
             attributes={
                 "name": account.name,
-                "status": account.status,
+                "status": protobuf.enum_value_to_slug(
+                    models_pb2.Status.DESCRIPTOR,
+                    account.status,
+                ),
             },
             relationships=relationships,
             links={

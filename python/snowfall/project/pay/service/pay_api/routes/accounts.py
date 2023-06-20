@@ -7,6 +7,7 @@ from snowfall.project.pay.service.companies.v1alpha import models_pb2 as company
 from snowfall.project.pay.service.pay_api import resources
 from snowfall.project.pay.service.pay_api.repositories import CompanyRepository
 from snowfall.stdlib import string
+from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import (
     messages,
     models,
@@ -39,6 +40,25 @@ class Account(endpoints.HTTPEndpoint):
             request=request,
         )
 
+    async def post(
+        self,
+        request: requests.Request,
+        accounts_client: accounts_adapter.GrpcClient = lagom.injectable,
+    ) -> responses.Response:
+        account = await accounts_client.update_account_status(
+            document_id=request.path_params["accountId"],
+            status="disabled",
+        )
+        return await messages.create_response(
+            body=messages.models.Body(
+                data=resources.AccountResource.from_proto(
+                    account,
+                    request,
+                ),
+            ),
+            request=request,
+        )
+
 
 class Accounts(endpoints.HTTPEndpoint):
     async def get(
@@ -47,9 +67,11 @@ class Accounts(endpoints.HTTPEndpoint):
         accounts_client: accounts_adapter.GrpcClient = lagom.injectable,
     ) -> responses.Response:
         pagination = pagination_helpers.get_pagination(request)
+        filter_by = request.query_params.get("filter[status][eq]", "enabled").split(",")
         db_accounts = await accounts_client.find(
             limit=pagination.limit,
             cursor=pagination.cursor,
+            filter_by=filter_by,
         )
         return await messages.create_response(
             body=messages.models.Body(
@@ -166,7 +188,10 @@ class Accounts(endpoints.HTTPEndpoint):
                 company_id=company.id,
                 contact_id=contact.id,
                 name=cc_account.account_name,
-                status=cc_account.status,
+                status=protobuf.slug_to_enum_value(
+                    company_models.Status,
+                    cc_account.dict(exclude_none=True)["status"],
+                ),
             ),
         )
         cc_contact = await self._create_cc_contact(

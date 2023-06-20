@@ -24,7 +24,7 @@ message Account {
   string company_id = 3;
   string contact_id = 4;
   string name = 5;
-  string status = 6;
+  Status status = 6;
   google.protobuf.Timestamp updated_at = 7;
 }
 
@@ -37,4 +37,11 @@ message Contact {
   string company_id = 6;
   google.protobuf.Timestamp created_at = 7;
   string external_reference = 8;
+}
+
+enum Status {
+  STATUS_UNSPECIFIED = 0;
+  STATUS_ENABLED = 1;
+  STATUS_ENABLED_NO_TRADING = 2;
+  STATUS_DISABLED = 3;
 }

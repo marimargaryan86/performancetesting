@@ -1,9 +1,10 @@
 import datetime
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 
 import pymongo
 
 from snowfall.project.pay.service.companies.v1alpha import models_pb2
+from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 
 
@@ -58,17 +59,30 @@ class AccountsRepository(
 
     async def find(
         self,
-        cursor: str | None,
+        limit: int,
+        filter_by: Sequence[str],
+        cursor: str | None = None,
     ) -> resultset.ResultSet[models_pb2.Account]:
-        return await self._find_with_cursor(
+        query = {
+            "status": {
+                "$in": [
+                    protobuf.slug_to_enum_value(models_pb2.Status, filter_status)
+                    for filter_status in filter_by
+                ],
+            },
+        }
+        accounts = await self._find_with_cursor(
             cur=cursor or "",
+            filter_=query,
         )
+        accounts.limit(limit)
+        return accounts
 
     async def update(
         self,
         account_id: str,
-        new_values: Mapping[str, str | datetime.datetime],
-    ) -> models_pb2.Contact:
+        new_values: Mapping[str, str | datetime.datetime | int],
+    ) -> pymongo.results.UpdateResult:
         return await self._execute(
             self._collection.update_one,
             filter={"_id": account_id},

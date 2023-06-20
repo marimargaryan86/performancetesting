@@ -1,7 +1,11 @@
 from snowfall.project.pay.service.companies.repositories import AccountsRepository
-from snowfall.project.pay.service.companies.v1alpha.models_pb2 import Account
+from snowfall.project.pay.service.companies.v1alpha.models_pb2 import Account, Status
 from snowfall.stdlib import string
-from snowfall.stdlib.format.protobuf import datetime_to_protobuf, protobuf_to_datetime
+from snowfall.stdlib.format.protobuf import (
+    datetime_to_protobuf,
+    protobuf_to_datetime,
+    slug_to_enum_value,
+)
 from snowfall.stdlib.logging import stdout
 from snowfall.vendor.currency_cloud.client import PaymentClient
 from snowfall.vendor.currency_cloud.models.account import AccountResponse
@@ -34,7 +38,10 @@ class SyncAccounts(object):
                         id=string.uuid(),
                         external_reference=cc_account.identifier,
                         name=cc_account.account_name,
-                        status=cc_account.status,
+                        status=slug_to_enum_value(
+                            Status,
+                            cc_account.dict(exclude_none=True)["status"],
+                        ),
                         updated_at=datetime_to_protobuf(cc_account.updated_at),
                     ),
                 )
@@ -43,7 +50,10 @@ class SyncAccounts(object):
                     account.id,
                     {
                         "name": cc_account.account_name,
-                        "status": cc_account.status,
+                        "status": slug_to_enum_value(
+                            Status,
+                            cc_account.dict(exclude_none=True)["status"],
+                        ),
                         "updated_at": cc_account.updated_at,
                     },
                 )

@@ -860,6 +860,43 @@
             "$ref": "#/components/responses/NotFound"
           }
         }
+      },
+      "post": {
+        "summary": "Disable account",
+        "description": "Disable account",
+        "tags": [
+          "accounts"
+        ],
+        "operationId": "post-accounts-id",
+        "responses": {
+          "200": {
+            "description": "Account is disabled",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Account"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
       }
     },
     "/accounts": {
@@ -920,6 +957,9 @@
           },
           {
             "$ref": "#/components/parameters/page-limit"
+          },
+          {
+            "$ref": "#/components/parameters/filterAccountsStatus"
           }
         ]
       },
@@ -1675,6 +1715,25 @@
           ]
         },
         "description": "Customize which related resources to return",
+        "style": "form",
+        "explode": false
+      },
+      "filterAccountsStatus": {
+        "name": "filter[status][eq]",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "example": ["enabled"],
+          "items": {
+            "type": "string",
+            "enum": [
+              "enabled",
+              "disabled"
+            ]
+          }
+        },
+        "description": "Filters accounts based on the status",
         "style": "form",
         "explode": false
       },

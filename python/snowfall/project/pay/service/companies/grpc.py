@@ -1,10 +1,20 @@
+import datetime
+from typing import cast
+
 import grpc
 from pymongo.errors import DuplicateKeyError
 
 from snowfall.project.pay.service.companies import repositories
-from snowfall.project.pay.service.companies.v1alpha import grpc_pb2, grpc_pb2_grpc
+from snowfall.project.pay.service.companies.v1alpha import (
+    grpc_pb2,
+    grpc_pb2_grpc,
+    models_pb2,
+)
 from snowfall.stdlib import string
+from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.transport.grpc import rich_status, service
+from snowfall.vendor.currency_cloud.client import PaymentClient
+from snowfall.vendor.currency_cloud.models import account as cc_account_models
 
 
 class CompaniesService(  # noqa: WPS214
@@ -115,9 +125,14 @@ class CompaniesService(  # noqa: WPS214
 
 
 class AccountsService(service.Service, grpc_pb2_grpc.AccountsServiceServicer):
-    def __init__(self, accounts: repositories.AccountsRepository):
+    def __init__(
+        self,
+        accounts: repositories.AccountsRepository,
+        payment_client: PaymentClient,
+    ):
         self._accounts = accounts
         self._default_page_size = 20
+        self._payment_client = payment_client
 
     def get_name(self) -> str:
         return grpc_pb2.DESCRIPTOR.services_by_name["AccountsService"].full_name
@@ -154,12 +169,49 @@ class AccountsService(service.Service, grpc_pb2_grpc.AccountsServiceServicer):
     ) -> grpc_pb2.ListAccountsResponse:
         db_accounts = await self._accounts.find(
             cursor=request.page_token,
+            limit=request.page_size or self._default_page_size,
+            filter_by=request.filter_by,
         )
-        db_accounts.limit(request.page_size or self._default_page_size)
-
         return grpc_pb2.ListAccountsResponse(
             accounts=[account async for account in db_accounts],
             next_page_token=await db_accounts.cursor(),
+        )
+
+    async def UpdateAccountStatus(  # type: ignore[override] # noqa: N802
+        self,
+        request: grpc_pb2.UpdateAccountStatusRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.UpdateAccountStatusResponse:
+        account = await self._accounts.find_by_id(request.id)
+        if account is None:
+            await context.abort(grpc.StatusCode.NOT_FOUND)
+
+        account = cast(models_pb2.Account, account)
+        await self._payment_client.update_account(
+            account.external_reference,
+            cc_account_models.AccountUpdateRequest(
+                status=cc_account_models.StatusEnum(
+                    protobuf.enum_value_to_slug(
+                        models_pb2.Status.DESCRIPTOR,
+                        request.status,
+                    ).replace("-", "_"),
+                ),
+            ),
+        )
+        update_result = await self._accounts.update(
+            request.id,
+            {
+                "status": request.status,
+                "updated_at": datetime.datetime.now(tz=datetime.UTC),
+            },
+        )
+        if update_result.matched_count == 0:
+            await context.abort(grpc.StatusCode.NOT_FOUND)
+
+        account.status = request.status
+
+        return grpc_pb2.UpdateAccountStatusResponse(
+            account=account,
         )
 
 
