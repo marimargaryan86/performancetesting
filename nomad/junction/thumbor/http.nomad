@@ -49,7 +49,7 @@ job "thumbor-http" {
       tags = [
         "http",
         "traefik.enable=true",
-        "traefik.http.routers.client-api.entrypoints=${var.traefik_entrypoints}",
+        "traefik.http.routers.thumbor-http.entrypoints=${var.traefik_entrypoints}",
         "traefik.http.routers.thumbor-http.rule=Host(`${var.traefik_host_URL}`)",
       ]
 
