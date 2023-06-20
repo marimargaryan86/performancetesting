@@ -67,9 +67,29 @@ A list of allowed operators are:
 * `lt` - Lesser than
 * `ge` - Greater than or equal
 * `le` - Lesser than or equal
+* `like` - Partial match. Should match using `/value/i` to get
+  case-insensitive partial matching.
 
 If a user applies multiple filters, all most validate for the resource to
 be returned.
+
+:::caution
+
+Think twice before deciding to add filters. Some of them can be quite
+taxing on MongoDB. It's important to analyze how the filter is being used in
+conjunction with sort parameters to figure out the most efficient
+compound indexes to create for the collection.
+
+:::
+
+:::danger
+
+Be vary when adding filters for an attribute of a relationship, because that
+data might reside in a different service than the resource being filtered,
+meaning it's virtually impossible to have proper filtering that also supports
+sorting and pagination.
+
+:::
 
 ### Operator examples
 
@@ -93,6 +113,14 @@ Filter on `birthDate` being between two dates:
 
 ```
 ?filter[birthDate][ge]=2010-10-10&filter[birthDate][le]=2011-11-11
+```
+
+#### Partial match
+
+Filter on `name` containing the string `foo`:
+
+```
+?filter[name][like]=foo
 ```
 
 ### Filter parameter definition example
