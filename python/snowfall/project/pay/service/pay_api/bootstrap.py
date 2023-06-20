@@ -29,7 +29,6 @@ from snowfall.vendor.currency_cloud import client
 class Settings(application.Settings):
     cc_login: str
     cc_api_key: str
-    cc_env: str
     cc_address: str
     currencies_address: str
     authentication_address: str
@@ -43,7 +42,6 @@ class Settings(application.Settings):
 class AdminSettings(application.Settings):
     cc_login: str
     cc_api_key: str
-    cc_env: str
     cc_address: str
     authentication_address: str
     companies_address: str

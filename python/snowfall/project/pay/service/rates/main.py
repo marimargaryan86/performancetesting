@@ -28,7 +28,6 @@ class _BackUpCronJobSettings(service.Settings):
     redis_dsn: Sequence[AnyUrl]
     cc_login: str
     cc_api_key: str
-    cc_env: str
     cc_address: str
     currencies: Sequence[str]
 

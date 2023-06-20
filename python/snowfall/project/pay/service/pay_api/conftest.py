@@ -210,11 +210,6 @@ def cc_api_key() -> str:
 
 
 @pytest.fixture()
-def cc_env() -> str:
-    return "demo"
-
-
-@pytest.fixture()
 def contacts_repository(
     mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> repositories.ContactsRepository:

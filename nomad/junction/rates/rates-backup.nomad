@@ -59,7 +59,6 @@ MONGO_DSN={{range $index, $service := service (printf "mongodb-%s" (env "NOMAD_N
 {{ with secret "kv/data/${var.environment}/currencycloud" }}
 CC_LOGIN={{ .Data.data.cc_login }}
 CC_API_KEY={{ .Data.data.cc_api_key }}
-CC_ENV={{ .Data.data.cc_env }}
 {{ end }}
 EOH
         destination = "services.env"
