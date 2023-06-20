@@ -32,7 +32,7 @@ pants:setup:
   variables:
     GIT_DEPTH: 0
     GIT_STRATEGY: clone
-    PANTS_CONFIG_FILES: ./pants.ci.toml
+    PANTS_CONFIG_FILES: "+['pants.ci.toml','pants.go.toml']"
     PANTS_DOCKER_DEFAULT_REPOSITORY: "${CI_PROJECT_PATH}/service/{directory}"
     PANTS_DOCKER_REGISTRIES: "{'${CI_REGISTRY}': {'address': '${CI_REGISTRY}', 'default': True}}"
     SCIE_BASE: "${CI_PROJECT_DIR}/.cache/scie"

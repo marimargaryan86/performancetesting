@@ -1,0 +1,6 @@
+[GLOBAL]
+backend_packages = "+['pants.backend.experimental.codegen.protobuf.go','pants.backend.experimental.go']"
+pants_ignore = "-['/golang/']"
+
+[golang]
+minimum_expected_version = "1.19"
