@@ -3,7 +3,7 @@
 /.gitlab/
 /buf.yaml
 /nomad/ @sre
-/openapi/.spectral.yaml
+/openapi/.spectral.yml
 /openapi/rules/
 /python/snowfall/plugin/
 /python/snowfall/script/
