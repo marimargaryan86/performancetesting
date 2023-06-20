@@ -117,7 +117,7 @@ rules:
     then:
       function: pattern
       functionOptions:
-        match: "^include|sort|page\\[(limit|cursor)\\]|filter\[[a-z]([A-Za-z]|\\.[a-z][A-Za-z])+\\]$"
+        match: "^include|sort|page\\[(limit|cursor)\\]|filter\\[[a-z]([A-Za-z]|\\.[a-z][A-Za-z])+\\]\\[(eq|ne|gt|lt|ge|le)\\]$"
   json-api-ensure-sort-default:
     description: "`sort` query parameters should have a default value."
     given: $.components.parameters[?(@.in=="query" && @.name=="sort")]
