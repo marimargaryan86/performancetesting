@@ -57,5 +57,7 @@ commits:
       - "python/snowfall/vendor/duffel"
     vendor/karhoo:
       - "python/snowfall/vendor/karhoo"
+    vendor/rate-limiter:
+      - "python/snowfall/vendor/rate_limiter"
     vendor/save-a-train:
       - "python/snowfall/vendor/save-a-train"
