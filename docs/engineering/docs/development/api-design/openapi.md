@@ -1,5 +1,57 @@
 # OpenAPI
 
+## Sorting
+
+Sorting can be added to a resource by defining a query parameter:
+
+```json
+{
+  "components": {
+    "parameters": {
+      "exampleSort": {
+        "name": "sort",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "id",
+            "-id",
+            "title",
+            "-title"
+          ],
+          "default": "id",
+          "example": "id"
+        },
+        "description": "Customize which field to sort examples by.",
+        "style": "form",
+        "explode": false
+      }
+    }
+  }
+}
+```
+
+Then add it to endpoint's `parameters`.
+
+```json
+{
+  "paths": {
+    "/examples": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/exampleSort"
+        }
+      ]
+    }
+  }
+}
+```
+
+Every value that can be sorted on should be an attribute of the resource.
+
+Also see the related [example implementation](../../standard-library/python/sorting.md)
+
 ## Filtering
 
 The simplest filter to use is the exact filter, using the `eq` operator:
