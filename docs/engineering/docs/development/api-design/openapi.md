@@ -1,5 +1,7 @@
 # OpenAPI
 
+Our APIs follow the [JSON:API](https://jsonapi.org) specification.
+
 ## Sorting
 
 Sorting can be added to a resource by defining a query parameter:
