@@ -72,7 +72,7 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
         offers_response = await junction_client.get_offers_by_offer_search_id(
             offers_search_id=request.path_params["offerSearchId"],
             cabin_class=query_string.get(
-                "filter[groups.options.details.cabinClass]",
+                "filter[groups.options.details.cabinClass][eq]",
                 [],
             ),
             include=query_string.get(

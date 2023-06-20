@@ -451,7 +451,9 @@ class Client(_BaseClient):  # noqa: WPS214
             _make_pagination(limit, cursor),
         )
         if cabin_class:
-            query_parameters["filter[groups.options.details.cabinClass]"] = cabin_class
+            query_parameters["filter[groups.options.details.cabinClass][eq]"] = (
+                cabin_class
+            )
         if include:
             query_parameters["include"] = ",".join(include)
         return await self._make_request(

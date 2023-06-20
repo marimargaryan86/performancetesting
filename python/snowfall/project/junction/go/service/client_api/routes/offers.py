@@ -603,7 +603,7 @@ def _get_cabin_class_filter(
     request: requests.Request,
 ) -> list[common_pb2.CabinClass.Type.ValueType]:
     cabin_classes_raw = request.scope["parsed_query_string"].get(
-        "filter[groups.options.details.cabinClass]",
+        "filter[groups.options.details.cabinClass][eq]",
         [],
     )
 

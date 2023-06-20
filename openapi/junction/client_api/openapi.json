@@ -8411,7 +8411,7 @@
         "explode": false
       },
       "filterOffersCabinClass": {
-        "name": "filter[groups.options.details.cabinClass]",
+        "name": "filter[groups.options.details.cabinClass][eq]",
         "in": "query",
         "required": false,
         "schema": {

@@ -391,7 +391,10 @@ class TestOfferSearches(object):
                 id=fixtures.OFFER_SEARCHES[0],
             ),
             params=[
-                ("filter[groups.options.details.cabinClass]", ",".join(cabin_classes)),
+                (
+                    "filter[groups.options.details.cabinClass][eq]",
+                    ",".join(cabin_classes),
+                ),
             ],
         )
         assert len(response.json()["data"]) == expected
