@@ -5,7 +5,7 @@
       "traefik_entrypoints": "websecure",
       "traefik_host_URL": "superapp.junction.dev",
       "plus_api_address": "https://plus.api.junction.dev",
-      "plus_activated": true
+      "plus_activated": false
     }
   },
   "production": {
@@ -23,7 +23,7 @@
       "traefik_entrypoints": "websecure",
       "traefik_host_URL": "superapp.sandbox.junction.dev",
       "plus_api_address": "https://plus.api.sandbox.junction.dev",
-      "plus_activated": true
+      "plus_activated": false
     }
   }
 }
