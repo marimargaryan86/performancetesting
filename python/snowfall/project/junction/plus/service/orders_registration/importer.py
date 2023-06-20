@@ -14,9 +14,11 @@ class OrderImporter(object):
         self,
         consumer_obj: consumer.Consumer[models_pb2.IncomingOrder],
         order_repository: orders_registration.OrderRepository,
+        subscriber_repository: orders_registration.SubscriberRepository,
     ):
         self._consumer = consumer_obj
         self._orders = order_repository
+        self._subscribers = subscriber_repository
         self._logger = stdout.get_logger()
 
     async def consume(self) -> None:
@@ -30,4 +32,8 @@ class OrderImporter(object):
             await validators.validate_orders(message.body)
         except* validators.ProtobufValidationError:
             self._logger.warning("Validation Error", exc_info=True)
+        else:
+            subscriber = await self._subscribers.get_or_create(message.body)
+            await self._orders.create(message.body, subscriber)
+
         self._logger.warning(str(message.body))

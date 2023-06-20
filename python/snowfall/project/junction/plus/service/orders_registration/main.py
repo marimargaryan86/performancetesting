@@ -43,6 +43,9 @@ async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
         order_repository=orders_registration.OrderRepository(
             mongo.plus.orders,
         ),
+        subscriber_repository=orders_registration.SubscriberRepository(
+            mongo.plus.subscribers,
+        ),
     )
     await order_importer.consume()
 
