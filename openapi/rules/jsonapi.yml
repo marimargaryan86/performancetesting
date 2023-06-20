@@ -1,3 +1,5 @@
+extends:
+  - rules/filters.yml
 functions:
   - ensureArrayContains
   - ensureRefs
@@ -117,7 +119,7 @@ rules:
     then:
       function: pattern
       functionOptions:
-        match: "^include|sort|page\\[(limit|cursor)\\]|filter\\[[a-z]([A-Za-z]|\\.[a-z][A-Za-z])+\\]\\[(eq|ne|gt|lt|ge|le)\\]$"
+        match: "^include|sort|page\\[(limit|cursor)\\]|filter\\[[a-z]([A-Za-z]|\\.[a-z][A-Za-z])+\\]\\[(eq|ne|gt|lt|ge|le|like)\\]$"
   json-api-ensure-sort-default:
     description: "`sort` query parameters should have a default value."
     given: $.components.parameters[?(@.in=="query" && @.name=="sort")]

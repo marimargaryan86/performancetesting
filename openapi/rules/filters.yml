@@ -1,0 +1,79 @@
+rules:
+
+  json-api-filtering-eq-ne:
+    description: "Ensure that `eq` and `ne` filters are properly configured."
+    message: "{{error}}"
+    given: $.components.parameters[?(@.in=="query" && @.name.match(/(^filter.*\[(eq|ne)\]$)/))]
+    severity: error
+    then:
+      - field: schema.type
+        function: enumeration
+        functionOptions:
+          values:
+            - array
+      - field: style
+        function: truthy
+      - field: style
+        function: enumeration
+        functionOptions:
+          values:
+            - form
+      - field: explode
+        function: defined
+      - field: explode
+        function: falsy
+
+  json-api-filtering-gt-lt:
+    description: "Ensure that `gt`, `lt`, `ge` and `le` filters are properly configured."
+    message: "{{error}}"
+    given: $.components.parameters[?(@.in=="query" && @.name.match(/(^filter.*\[(gt|lt|ge|le)\]$)/))]
+    severity: error
+    then:
+      - field: schema.type
+        function: enumeration
+        functionOptions:
+          values:
+            - integer
+            - number
+            - string
+      - field: schema.format
+        function: defined
+      - field: schema.format
+        function: enumeration
+        functionOptions:
+          values:
+            - int32
+            - int64
+            - float
+            - double
+            - date
+            - date-time
+      - field: style
+        function: undefined
+      - field: explode
+        function: undefined
+
+  json-api-filtering-like:
+    description: "Ensure that `like` filters are properly configured."
+    message: "{{error}}"
+    given: $.components.parameters[?(@.in=="query" && @.name.match(/(^filter.*\[like\]$)/))]
+    severity: error
+    then:
+      - field: schema.type
+        function: enumeration
+        functionOptions:
+          values:
+            - string
+      - field: schema.minLength
+        function: defined
+      - field: schema.minLength
+        function: enumeration
+        functionOptions:
+          values:
+            - 3
+      - field: schema.format
+        function: undefined
+      - field: style
+        function: undefined
+      - field: explode
+        function: undefined

@@ -70,8 +70,16 @@ A list of allowed operators are:
 * `like` - Partial match. Should match using `/value/i` to get
   case-insensitive partial matching.
 
-If a user applies multiple filters, all most validate for the resource to
-be returned.
+If a user applies multiple filters, all must validate for the resource to
+be returned, meaning they _must_ be implemented as `AND`, _never_ as `OR`.
+
+:::tip
+
+Because of the restriction that all filters must be used as `AND` multiple
+`like` filters on the same endpoint makes little sense, consider
+solving searching for resources with a dedicated search endpoint.
+
+:::
 
 :::caution
 
@@ -125,7 +133,7 @@ Filter on `name` containing the string `foo`:
 
 ### Filter parameter definition example
 
-Adding a simple `eq` filter for the `example` resource:
+#### eq
 
 ```json
 {
@@ -148,6 +156,50 @@ Adding a simple `eq` filter for the `example` resource:
         "description": "Filters examples based on the value of field",
         "style": "form",
         "explode": false
+      }
+    }
+  }
+}
+```
+
+#### le
+
+```json
+{
+  "components": {
+    "parameters": {
+      "filterCreateAtEq": {
+        "name": "filter[createdAt][le]",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "date-time",
+          "example": "2019-08-24T14:15:22Z"
+        },
+        "description": "Filters resources where created at is less than or equal to value"
+      }
+    }
+  }
+}
+```
+
+#### like
+
+```json
+{
+  "components": {
+    "parameters": {
+      "filterCreateAtEq": {
+        "name": "filter[field][like]",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "minLength": 3,
+          "example": "foo"
+        },
+        "description": "Filters resources where created at is less than or equal to value"
       }
     }
   }
