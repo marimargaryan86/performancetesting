@@ -5,7 +5,7 @@ shopt -s nullglob globstar
 rm -rf repo
 git clone git@git.snowfall.se:junction/nomad.git repo
 
-if [ -f "dist/deliverables.json" ]; then
+if [[ -f "dist/deliverables.json" ]]; then
 	readarray -t <<<"$(jq -r '.[] | select(.publisher == "docker") | select(.published == true) | .names[0] + "|" + .target' <"dist/deliverables.json")"
 
 	for i in "${MAPFILE[@]}"; do
@@ -48,9 +48,8 @@ done
 
 for i in nomad/**/*.nomad; do
 	filename=$(basename "${i}")
-	config="$(dirname "${i}")/${filename%.*}.json"
+	config="${i%.*}.json"
 	service_name=$(basename "$(dirname "${i}")" | sed s/_/-/g)
-
 	mkdir -p "repo/development/${service_name}"
 	cp "${i}" "repo/development/${service_name}/${filename}"
 
@@ -58,11 +57,11 @@ for i in nomad/**/*.nomad; do
 		template_path="repo/${environment}/${service_name}"
 		mkdir -p "${template_path}"
 
-		if [ -f "${config}" ]; then
-			if [ "$(jq -r ".${environment}.deploy" "${config}")" = "false" ]; then
+		if [[ -f "${config}" ]]; then
+			if [[ "$(jq -r ".${environment}.deploy" "${config}")" == "false" ]]; then
 				touch "${template_path}/.skip_deploy"
 			else
-				jq -r ".${environment}.variables|to_entries|map(\"\\(.key)=\\\"\\(.value|tostring)\\\"\")|.[]" "${config}" >"${template_path}/${filename%.*}.vars"
+				jq -r ".${environment}.variables" "${config}" >"${template_path}/${filename%.*}.vars"
 			fi
 		fi
 	done
@@ -79,7 +78,7 @@ chmod +x "repo/promote-environment.sh"
 cd repo
 git add --all .
 
-if [ -n "$(git status --porcelain)" ]; then
+if [[ -n "$(git status --porcelain)" ]]; then
 	git commit --author "${CI_COMMIT_AUTHOR}" -m "${CI_COMMIT_TITLE}" -m "Refs: ${CI_PROJECT_PATH}@${CI_COMMIT_SHORT_SHA}"
 	git push
 fi

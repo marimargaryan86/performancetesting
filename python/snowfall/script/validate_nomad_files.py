@@ -10,7 +10,10 @@ import pydantic
 class _Configuration(pydantic.BaseModel):
     class _Environment(pydantic.BaseModel):  # noqa: WPS431
         deploy: bool = True
-        variables: Mapping[str, str | bool | int | float] = {}
+        variables: Mapping[
+            str,
+            str | bool | int | float | list[str | bool | int | float],
+        ] = {}
 
     development: _Environment
     production: _Environment

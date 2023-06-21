@@ -9,7 +9,6 @@ pants run python/snowfall/script/validate_nomad_build_files.py -- "nomad/"
 
 FAILURE=0
 ENVIRONMENTS=("development" "production" "sandbox")
-SENTRY_PROJECTS=$(sentry-cli projects list | awk -F '|' '{if (NR>3){print $2$3}}' | sed 's/^ *//;s/ *$//')
 CHANGED_SINCE=""
 ENFORCE_FULL_LINTING=0
 FULL_LINTING_REQUIRED=(
@@ -20,13 +19,18 @@ FULL_LINTING_REQUIRED=(
 	"python/snowfall/script/validate_nomad_files.py"
 )
 
-if [ -n "${CI_MERGE_REQUEST_DIFF_BASE_SHA+x}" ]; then
+declare -A SENTRY_PROJECTS
+while read -r project id; do
+	SENTRY_PROJECTS["$project"]="$id"
+done <<<"$(sentry-cli projects list | awk 'NR>4 {print last} {last=$4" "$2}')"
+
+if [[ -n "${CI_MERGE_REQUEST_DIFF_BASE_SHA+x}" ]]; then
 	CHANGED_SINCE="${CI_MERGE_REQUEST_DIFF_BASE_SHA}"
-elif [ -n "${CI_COMMIT_BEFORE_SHA+x}" ] && [ "${CI_COMMIT_BEFORE_SHA}" != "0000000000000000000000000000000000000000" ]; then
+elif [[ -n "${CI_COMMIT_BEFORE_SHA+x}" ]] && [[ "${CI_COMMIT_BEFORE_SHA}" != "0000000000000000000000000000000000000000" ]]; then
 	CHANGED_SINCE="${CI_COMMIT_BEFORE_SHA}"
 fi
 
-if [ -n "${CI_COMMIT_SHA+x}" ] && [ "${CHANGED_SINCE}" != "" ]; then
+if [[ -n "${CI_COMMIT_SHA+x}" ]] && [[ -n "${CHANGED_SINCE}" ]]; then
 	for path in "${FULL_LINTING_REQUIRED[@]}"; do
 		if git diff --name-only -r "${CHANGED_SINCE}" "${CI_COMMIT_SHA}" | grep -q "^${path}"; then
 			ENFORCE_FULL_LINTING=1
@@ -35,57 +39,56 @@ if [ -n "${CI_COMMIT_SHA+x}" ] && [ "${CHANGED_SINCE}" != "" ]; then
 	done
 fi
 
-if [ "${ENFORCE_FULL_LINTING}" -eq "1" ] || [ "${CHANGED_SINCE}" == "" ]; then
+if [[ "${ENFORCE_FULL_LINTING}" -eq 1 ]] || [[ -z "${CHANGED_SINCE}" ]]; then
 	mapfile -t NOMAD_FILES < <(pants --filter-address-regex='_nomad$' peek :: | jq -r ".[] | .sources[0]")
 else
 	mapfile -t NOMAD_FILES < <(pants --changed-since="${CHANGED_SINCE}" --changed-dependents=transitive --filter-address-regex='_nomad$' peek | jq -r ".[] | .sources[0]")
 fi
 
 for f in "${NOMAD_FILES[@]}"; do
-	if SENTRY_MATCH=$(echo "${SENTRY_PROJECTS}" | grep "$(dirname "${f}" | xargs basename)"); then
-		SENTRY_ID=$(echo "$SENTRY_MATCH" | cut -d " " -f 1)
 
-		if grep -q "SENTRY_DSN" "${f}" && ! grep "SENTRY_DSN" "${f}" | grep -q "/${SENTRY_ID}"; then
+	if [[ "${SENTRY_PROJECTS[$(basename "${f%/*}")]-0}" -ne 0 ]]; then
+
+		if grep -q "SENTRY_DSN" "${f}" && ! grep -q "SENTRY_DSN.*\/${SENTRY_PROJECTS[$(basename "${f%/*}")]}\"" "${f}"; then
 			echo "${f}: invalid Sentry DSN"
 			FAILURE=1
 		fi
+
 	elif grep -q "SENTRY_DSN" "${f}"; then
 		echo "${f}: project does not exist in Sentry"
 		FAILURE=1
 	fi
 
-	FILENAME=$(basename "${f}")
-	CONFIG="$(dirname "${f}")/${FILENAME%.*}.json"
+	CONFIG="${f%.*}.json"
 
 	for e in "${ENVIRONMENTS[@]}"; do
-		VARIABLES=()
+		if [[ -f "${CONFIG}" ]]; then
 
-		if [ -f "${CONFIG}" ]; then
-			SHOULD_DEPLOY=$(jq ".${e} | if has(\"deploy\") then .deploy else true end" "${CONFIG}")
-
-			if [ "${SHOULD_DEPLOY}" = "false" ]; then
+			if [[ $(jq ".${e} | if has(\"deploy\") then .deploy else true end" "${CONFIG}") == "false" ]]; then
 				continue
 			fi
 
-			mapfile -t VARIABLES < <(jq -r ".${e}.variables|to_entries|map(\"-var=\\(.key)=\\(.value|tostring)\")|.[]" "${CONFIG}")
+			VARIABLES=$(jq -e "select(.${e}.variables != null).${e}.variables" "${CONFIG}") || FAILURE=1
 		fi
 
-		if ! env nomad validate "${VARIABLES[@]}" "${f}" >/dev/null 2>&1; then
-			nomad validate "${VARIABLES[@]}" "${f}" || true
-			FAILURE=1
+		if [[ -n ${VARIABLES} ]]; then
+			(nomad validate -var-file /dev/stdin "${f}" >/dev/null 2>&1) <<<"${VARIABLES}" || FAILURE=1
+		else
+			nomad validate "${f}" >/dev/null 2>&1 || FAILURE=1
 		fi
 
-		if ! env nomad fmt -check -write=false "${f}" >/dev/null 2>&1; then
+		nomad fmt -check -write=false "${f}" >/dev/null 2>&1 || {
 			echo "${f}: file is not formatted correctly"
 			FAILURE=1
-		fi
+		}
+
 	done
 done
 
-if [ "${FAILURE}" -eq 1 ]; then
+if [[ "${FAILURE}" -eq 1 ]]; then
 	exit 1
 fi
 
-if ! [ ${#NOMAD_FILES[@]} -eq 0 ]; then
+if [[ -n ${NOMAD_FILES[*]} ]]; then
 	pants run python/snowfall/script/validate_nomad_files.py -- "${NOMAD_FILES[@]}"
 fi

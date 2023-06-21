@@ -4,38 +4,34 @@ set -eu
 SERVICE_NAME="${1}"
 SERVICE_VERSION="${2}"
 ENVIRONMENT_NAME="${3}"
-ARGS=("$@")
+shift 3
 
-for ((idx = 3; idx < ${#ARGS[@]}; ++idx)); do
-	TEMPLATE_FILE="${ARGS[idx]}"
-	VARS_FILE="${TEMPLATE_FILE%.*}.vars"
-	ADDITIONAL_ARGS=()
+for TEMPLATE_FILE in "$@"; do
 
-	if [ -f "$VARS_FILE" ]; then
-		ADDITIONAL_ARGS=("-var-file=${VARS_FILE}")
-	fi
+	unset ADDITIONAL_ARGS
+	[[ -f ${TEMPLATE_FILE%.*}.vars ]] && ADDITIONAL_ARGS="-var-file=${TEMPLATE_FILE%.*}.vars"
 
 	echo "Deploying '${TEMPLATE_FILE%.*}' of '${SERVICE_NAME}' to '${NOMAD_ADDR}'..."
 
-	if PLAN_OUTPUT=$(nomad plan "${ADDITIONAL_ARGS[@]}" "${TEMPLATE_FILE}"); then
-		true # can't do ! negation above if we want to check the exact status code
-	elif [ $? -eq 255 ]; then
-		echo "${PLAN_OUTPUT}"
-		exit 1
-	fi
+	PLAN_OUTPUT=$(nomad plan "${ADDITIONAL_ARGS}" "${TEMPLATE_FILE}" &>/dev/stdout) || {
+		[[ $? -eq 255 ]] && {
+			echo "${PLAN_OUTPUT}"
+			exit 1
+		}
+	}
 
-	CHECK_INDEX=$(echo "${PLAN_OUTPUT}" | grep "Job Modify Index:" | awk -F": " '{ print $2 }')
+	CHECK_INDEX=$(awk '/Job Modify Index:/ {print $NF}' <<<"${PLAN_OUTPUT}")
 	echo "Check Index: ${CHECK_INDEX}"
 
-	if ! RUN_OUTPUT=$(nomad run "${ADDITIONAL_ARGS[@]}" -check-index="${CHECK_INDEX}" -detach "${TEMPLATE_FILE}"); then
+	RUN_OUTPUT=$(nomad run "${ADDITIONAL_ARGS}" -check-index="${CHECK_INDEX}" -detach "${TEMPLATE_FILE}" &>/dev/stdout) || {
 		echo "${RUN_OUTPUT}"
 		exit 1
-	fi
+	}
 
-	EVALUATION_ID=$(echo "${RUN_OUTPUT}" | grep "Evaluation ID:" | awk -F": " '{ print $2 }')
+	EVALUATION_ID=$(awk '/Evaluation ID:/ {print $NF}' <<<"${RUN_OUTPUT}")
 	echo "Evaluation ID: ${EVALUATION_ID}"
 
-	if [ "${EVALUATION_ID}" = "" ]; then
+	if [[ -z "${EVALUATION_ID}" ]]; then
 		echo "WARN: No Evaluation ID found, skipping."
 		continue
 	fi
@@ -45,22 +41,24 @@ for ((idx = 3; idx < ${#ARGS[@]}; ++idx)); do
 	fi
 
 	DEPLOYMENT_ID=$(nomad eval status -json "${EVALUATION_ID}" | jq -e -r ".DeploymentID")
-	echo "Deployment ID: ${DEPLOYMENT_ID}"
 
-	if [ "${DEPLOYMENT_ID}" = "" ]; then
+	[[ -z "${DEPLOYMENT_ID}" ]] && {
 		echo "WARN: No Deployment ID found, skipping."
 		continue
-	fi
+	}
 
+	echo "Deployment ID: ${DEPLOYMENT_ID}"
 	nomad deployment status "${DEPLOYMENT_ID}"
 
-	mapfile -t ALLOC_IDS < <(nomad deployment status -json "${DEPLOYMENT_ID}" | jq -e -r ".TaskGroups[].PlacedCanaries | if . == null then [] else . end | join(\"\\n\")")
-	echo "Allocation IDs: ${ALLOC_IDS[*]}"
+	mapfile -t ALLOC_IDS < <(nomad deployment status -json "${DEPLOYMENT_ID}" | jq -e -r '.TaskGroups[] | select(.PlacedCanaries != null).PlacedCanaries[]')
 
-	if [ ${#ALLOC_IDS[@]} -eq 0 ]; then
+	if [[ ${#ALLOC_IDS[@]} -eq 0 ]]; then
 		echo "WARN: No Allocation IDs found, skipping."
 		continue
 	fi
+
+	echo "Allocation IDs:"
+	printf "%s\n" "${ALLOC_IDS[@]}"
 
 	for ALLOC_ID in "${ALLOC_IDS[@]}"; do
 		echo "-- Allocation ${ALLOC_ID} --"
@@ -76,6 +74,6 @@ for ((idx = 3; idx < ${#ARGS[@]}; ++idx)); do
 	exit 1
 done
 
-if sentry-cli projects list | awk -F '|' '{print $3}' | sed 's/^ *//;s/ *$//' | grep -q "${SERVICE_NAME}"; then
+if sentry-cli projects list | awk 'NR>4 {print last} {last=$4}' | grep -q "^${SERVICE_NAME}$"; then
 	sentry-cli releases deploys "${SERVICE_NAME}@${SERVICE_VERSION}" new -e "${ENVIRONMENT_NAME}"
 fi

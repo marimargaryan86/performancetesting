@@ -1,0 +1,119 @@
+{
+  "development": {
+    "variables": {
+      "traefik_entrypoints": "websecure",
+      "traefik_ui_host_rule": "Host(`traefik.junction.dev`, `gw.dev.res.se`)",
+      "traefik_nomad_ui_host_rule": "Host(`nomad.junction.dev`)",
+      "traefik_consul_ui_host_rule": "Host(`consul.junction.dev`)",
+      "traefik_vault_ui_host_rule": "Host(`vault.junction.dev`)",
+      "static_port": "81",
+      "traefik_ui_users": [
+        "ara@snowfalltravel.com:$2y$05$4YUMkM/Ka8xbPRN9pjJO0O/og964WHUf4NbjZBIMbd7hIYt6FWl/i",
+        "gb@snowfalltravel.com:$2y$05$pPN8AGky4pCnlrL9ilO2XuFzs1ts/REJnhvtmyLrory.YFy1aCiY.",
+        "js@snowfall.se:$2y$05$JQ9IiPseWy5SzsePumd7iOnMFzMPBGfDMhvOMYktin8ctNnA74FSC",
+        "nathan.s@snowfalltravel.com:$2y$05$7S57RO1PNsWP9rqEQypmp.mp80XbfizFIPWFFhfmnYfYnnpYlYZnS",
+        "sa@snowfall.se:$2y$10$azniZzO5nOofU4AfhurZUuxVTE5bzXvc2Sl6nBoV.awYbzQ5Niq.K",
+        "sevak@snowfalltravel.com:$2y$05$bDjUgk9B1CITpYet2mGWReqjVpWKTGkg1VdbmCYZoQgBiQebJcvoC",
+        "vm@snowfalltravel.com:$2y$05$Q6NFa5Ca9v6TcvccjuWyGeZbcQ6s2wFJckOEaSgHOzcIN59yWoLi2"
+      ],
+      "traefik_nomad_ui_users": [
+        "ara@snowfalltravel.com:$2y$05$4YUMkM/Ka8xbPRN9pjJO0O/og964WHUf4NbjZBIMbd7hIYt6FWl/i",
+        "gb@snowfalltravel.com:$2y$05$pPN8AGky4pCnlrL9ilO2XuFzs1ts/REJnhvtmyLrory.YFy1aCiY.",
+        "js@snowfall.se:$2y$05$JQ9IiPseWy5SzsePumd7iOnMFzMPBGfDMhvOMYktin8ctNnA74FSC",
+        "nathan.s@snowfalltravel.com:$2y$05$7S57RO1PNsWP9rqEQypmp.mp80XbfizFIPWFFhfmnYfYnnpYlYZnS",
+        "sa@snowfall.se:$2y$10$azniZzO5nOofU4AfhurZUuxVTE5bzXvc2Sl6nBoV.awYbzQ5Niq.K",
+        "sevak@snowfalltravel.com:$2y$05$bDjUgk9B1CITpYet2mGWReqjVpWKTGkg1VdbmCYZoQgBiQebJcvoC",
+        "vm@snowfalltravel.com:$2y$05$Q6NFa5Ca9v6TcvccjuWyGeZbcQ6s2wFJckOEaSgHOzcIN59yWoLi2"
+      ],
+      "traefik_consul_ui_users": [
+        "ara@snowfalltravel.com:$2y$05$4YUMkM/Ka8xbPRN9pjJO0O/og964WHUf4NbjZBIMbd7hIYt6FWl/i",
+        "ciaran.e@snowfalltravel.com:$2y$05$XaScwfxtGfKxDeNyQHeb6eprqu650daShtvdphX2P.XTm7eOGoxb2",
+        "gb@snowfalltravel.com:$2y$05$pPN8AGky4pCnlrL9ilO2XuFzs1ts/REJnhvtmyLrory.YFy1aCiY.",
+        "js@snowfall.se:$2y$05$JQ9IiPseWy5SzsePumd7iOnMFzMPBGfDMhvOMYktin8ctNnA74FSC",
+        "mb@snowfall.se:$2y$05$omi1jMJ9y2dYfAGtx9wCPeZ0xSm4dTXGBi8hk/2jMlVFqCnLu7l2G",
+        "nathan.s@snowfalltravel.com:$2y$05$7S57RO1PNsWP9rqEQypmp.mp80XbfizFIPWFFhfmnYfYnnpYlYZnS",
+        "sa@snowfall.se:$2y$10$azniZzO5nOofU4AfhurZUuxVTE5bzXvc2Sl6nBoV.awYbzQ5Niq.K",
+        "sevak@snowfalltravel.com:$2y$05$bDjUgk9B1CITpYet2mGWReqjVpWKTGkg1VdbmCYZoQgBiQebJcvoC",
+        "vm@snowfalltravel.com:$2y$05$Q6NFa5Ca9v6TcvccjuWyGeZbcQ6s2wFJckOEaSgHOzcIN59yWoLi2"
+      ],
+      "traefik_vault_ui_users": [
+        "ara@snowfalltravel.com:$2y$05$4YUMkM/Ka8xbPRN9pjJO0O/og964WHUf4NbjZBIMbd7hIYt6FWl/i",
+        "gb@snowfalltravel.com:$2y$05$pPN8AGky4pCnlrL9ilO2XuFzs1ts/REJnhvtmyLrory.YFy1aCiY.",
+        "js@snowfall.se:$2y$05$JQ9IiPseWy5SzsePumd7iOnMFzMPBGfDMhvOMYktin8ctNnA74FSC",
+        "nathan.s@snowfalltravel.com:$2y$05$7S57RO1PNsWP9rqEQypmp.mp80XbfizFIPWFFhfmnYfYnnpYlYZnS",
+        "sa@snowfall.se:$2y$10$azniZzO5nOofU4AfhurZUuxVTE5bzXvc2Sl6nBoV.awYbzQ5Niq.K",
+        "sevak@snowfalltravel.com:$2y$05$bDjUgk9B1CITpYet2mGWReqjVpWKTGkg1VdbmCYZoQgBiQebJcvoC",
+        "vm@snowfalltravel.com:$2y$05$Q6NFa5Ca9v6TcvccjuWyGeZbcQ6s2wFJckOEaSgHOzcIN59yWoLi2"
+      ],
+      "ip_whitelist_sourcerange": [
+        "13.53.111.11",
+        "18.169.86.34",
+        "18.170.153.6",
+        "52.56.69.33",
+        "18.169.107.197"
+      ],
+      "ip_whitelist_excludedips": [
+        "172.16.0.0/16"
+      ]
+    }
+  },
+  "production": {
+    "variables": {
+      "traefik_entrypoints": "web",
+      "traefik_ui_host_rule": "Host(`traefik.junction.travel`, `gw.junction.travel`)",
+      "traefik_nomad_ui_host_rule": "Host(`nomad.junction.travel`)",
+      "traefik_consul_ui_host_rule": "Host(`consul.junction.travel`)",
+      "traefik_vault_ui_host_rule": "Host(`vault.junction.travel`)",
+      "static_port": "80",
+      "traefik_ui_users": [
+        "ara@snowfalltravel.com:$2y$05$4YUMkM/Ka8xbPRN9pjJO0O/og964WHUf4NbjZBIMbd7hIYt6FWl/i",
+        "gb@snowfalltravel.com:$2y$05$pPN8AGky4pCnlrL9ilO2XuFzs1ts/REJnhvtmyLrory.YFy1aCiY.",
+        "js@snowfall.se:$2y$05$JQ9IiPseWy5SzsePumd7iOnMFzMPBGfDMhvOMYktin8ctNnA74FSC",
+        "nathan.s@snowfalltravel.com:$2y$05$7S57RO1PNsWP9rqEQypmp.mp80XbfizFIPWFFhfmnYfYnnpYlYZnS",
+        "sa@snowfall.se:$2y$10$azniZzO5nOofU4AfhurZUuxVTE5bzXvc2Sl6nBoV.awYbzQ5Niq.K",
+        "sevak@snowfalltravel.com:$2y$05$bDjUgk9B1CITpYet2mGWReqjVpWKTGkg1VdbmCYZoQgBiQebJcvoC",
+        "vm@snowfalltravel.com:$2y$05$Q6NFa5Ca9v6TcvccjuWyGeZbcQ6s2wFJckOEaSgHOzcIN59yWoLi2"
+      ],
+      "traefik_nomad_ui_users": [
+        "ara@snowfalltravel.com:$2y$05$4YUMkM/Ka8xbPRN9pjJO0O/og964WHUf4NbjZBIMbd7hIYt6FWl/i",
+        "gb@snowfalltravel.com:$2y$05$pPN8AGky4pCnlrL9ilO2XuFzs1ts/REJnhvtmyLrory.YFy1aCiY.",
+        "js@snowfall.se:$2y$05$JQ9IiPseWy5SzsePumd7iOnMFzMPBGfDMhvOMYktin8ctNnA74FSC",
+        "nathan.s@snowfalltravel.com:$2y$05$7S57RO1PNsWP9rqEQypmp.mp80XbfizFIPWFFhfmnYfYnnpYlYZnS",
+        "sa@snowfall.se:$2y$10$azniZzO5nOofU4AfhurZUuxVTE5bzXvc2Sl6nBoV.awYbzQ5Niq.K",
+        "sevak@snowfalltravel.com:$2y$05$bDjUgk9B1CITpYet2mGWReqjVpWKTGkg1VdbmCYZoQgBiQebJcvoC",
+        "vm@snowfalltravel.com:$2y$05$Q6NFa5Ca9v6TcvccjuWyGeZbcQ6s2wFJckOEaSgHOzcIN59yWoLi2"
+      ],
+      "traefik_consul_ui_users": [
+        "ara@snowfalltravel.com:$2y$05$4YUMkM/Ka8xbPRN9pjJO0O/og964WHUf4NbjZBIMbd7hIYt6FWl/i",
+        "js@snowfall.se:$2y$05$JQ9IiPseWy5SzsePumd7iOnMFzMPBGfDMhvOMYktin8ctNnA74FSC",
+        "nathan.s@snowfalltravel.com:$2y$05$7S57RO1PNsWP9rqEQypmp.mp80XbfizFIPWFFhfmnYfYnnpYlYZnS",
+        "sa@snowfall.se:$2y$10$azniZzO5nOofU4AfhurZUuxVTE5bzXvc2Sl6nBoV.awYbzQ5Niq.K",
+        "sevak@snowfalltravel.com:$2y$05$bDjUgk9B1CITpYet2mGWReqjVpWKTGkg1VdbmCYZoQgBiQebJcvoC",
+        "vm@snowfalltravel.com:$2y$05$Q6NFa5Ca9v6TcvccjuWyGeZbcQ6s2wFJckOEaSgHOzcIN59yWoLi2",
+        "gb@snowfalltravel.com:$2y$05$pPN8AGky4pCnlrL9ilO2XuFzs1ts/REJnhvtmyLrory.YFy1aCiY."
+      ],
+      "traefik_vault_ui_users": [
+        "ara@snowfalltravel.com:$2y$05$4YUMkM/Ka8xbPRN9pjJO0O/og964WHUf4NbjZBIMbd7hIYt6FWl/i",
+        "gb@snowfalltravel.com:$2y$05$pPN8AGky4pCnlrL9ilO2XuFzs1ts/REJnhvtmyLrory.YFy1aCiY.",
+        "js@snowfall.se:$2y$05$JQ9IiPseWy5SzsePumd7iOnMFzMPBGfDMhvOMYktin8ctNnA74FSC",
+        "nathan.s@snowfalltravel.com:$2y$05$7S57RO1PNsWP9rqEQypmp.mp80XbfizFIPWFFhfmnYfYnnpYlYZnS",
+        "sa@snowfall.se:$2y$10$azniZzO5nOofU4AfhurZUuxVTE5bzXvc2Sl6nBoV.awYbzQ5Niq.K",
+        "sevak@snowfalltravel.com:$2y$05$bDjUgk9B1CITpYet2mGWReqjVpWKTGkg1VdbmCYZoQgBiQebJcvoC",
+        "vm@snowfalltravel.com:$2y$05$Q6NFa5Ca9v6TcvccjuWyGeZbcQ6s2wFJckOEaSgHOzcIN59yWoLi2"
+      ],
+      "ip_whitelist_sourcerange": [
+        "13.53.111.11",
+        "18.169.86.34",
+        "18.170.153.6",
+        "52.56.69.33",
+        "18.169.107.197"
+      ],
+      "ip_whitelist_excludedips": [
+        "172.16.0.0/16"
+      ]
+    }
+  },
+  "sandbox": {
+    "deploy": false
+  }
+}
