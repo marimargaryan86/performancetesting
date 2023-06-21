@@ -1,4 +1,5 @@
 import pymongo
+from pymongo.errors import PyMongoError
 
 from snowfall.project.junction.plus.service.orders_registration.v1alpha import (
     models_pb2,
@@ -28,14 +29,13 @@ class OrderRepository(repository.ProtoRepository[models_pb2.PersistedOrder]):
             passengers=order.passengers,
             bookings=order.bookings,
         )
-
         insert = await self._execute(
             self._collection.insert_one,
             self._coder.encode(persisted_order),
         )
 
         if not insert.acknowledged:
-            raise RuntimeError()
+            raise PyMongoError("Insert was not acknowledged")
 
         return persisted_order
 
@@ -60,6 +60,7 @@ class SubscriberRepository(repository.ProtoRepository[models_pb2.Subscriber]):
                 "email": order.contact_details.email,
             },
         )
+
         if subscriber:
             return subscriber
 
@@ -76,6 +77,6 @@ class SubscriberRepository(repository.ProtoRepository[models_pb2.Subscriber]):
         )
 
         if not insert.acknowledged:
-            raise RuntimeError()
+            raise PyMongoError("Insert was not acknowledged")
 
         return subscriber

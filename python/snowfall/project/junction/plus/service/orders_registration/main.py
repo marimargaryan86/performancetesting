@@ -11,7 +11,7 @@ from snowfall.project.junction.plus.service.orders_registration import (
 )
 from snowfall.stdlib import service
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
-from snowfall.stdlib.transport.amqp import consumer, types
+from snowfall.stdlib.transport.amqp import consumer, producer, types
 
 
 class _ImportSettings(service.Settings):
@@ -39,6 +39,10 @@ async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
             connection=connection,
             queue_name="plus_{0}".format(app.name),
             binds=[(types.Exchange("plus_import_orders"), "plus.orders")],
+        ),
+        producer_obj=producer.Producer(
+            connection=connection,
+            exchange=types.Exchange(name="plus_events"),
         ),
         order_repository=orders_registration.OrderRepository(
             mongo.plus.orders,

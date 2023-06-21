@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package snowfall.project.junction.plus.service.notification_center.v1alpha;
+
+import "snowfall/project/junction/plus/service/orders_registration/v1alpha/models.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/plus/service/notification_center/v1alpha";
+
+message NotificationEvent {
+  string sender_id = 1;
+  string receiver_id = 2;
+  oneof event {
+    snowfall.project.junction.plus.service.orders_registration.v1alpha.PersistedOrder body = 3;
+  }
+  enum Type {
+    TYPE_UNSPECIFIED = 0;
+    TYPE_ORDER_CONFIRMATION = 1;
+  }
+  Type event_type = 4;
+  enum Channel {
+    CHANNEL_UNSPECIFIED = 0;
+    CHANNEL_EMAIL = 1;
+    CHANNEL_WHATSAPP = 2;
+  }
+  Channel channel = 5;
+}
