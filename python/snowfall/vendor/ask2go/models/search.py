@@ -32,6 +32,7 @@ class CreateSearchCriteria(CamelCaseBaseModel):
     origin_iata: str
     destination_iata: str
     outbound_date: datetime.datetime | datetime.date
+    affiliate_id: str
     outbound_departure_window: tuple[datetime.time, datetime.time] | None
     inbound_date: datetime.datetime | datetime.date | None
     inbound_departure_window: tuple[datetime.time, datetime.time] | None
@@ -40,4 +41,3 @@ class CreateSearchCriteria(CamelCaseBaseModel):
     children: int = 0
     infants: int = 0
     transaction_id: uuid.UUID | None = None
-    affiliate_id: str | None = None

@@ -14,6 +14,7 @@ def test_inbound_and_outbound_are_datetimes() -> None:
         adults=1,
         children=0,
         infants=0,
+        affiliate_id="",
     )
 
     search_criteria.inbound_date = now

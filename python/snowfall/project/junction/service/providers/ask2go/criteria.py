@@ -77,7 +77,7 @@ def _generate_search_criteria(
                 adults=number_of_types[0],
                 children=number_of_types[1],
                 infants=number_of_types[2],
-                affiliate_id=affiliate_id,
+                affiliate_id=affiliate_id or "",
             ),
         )
 

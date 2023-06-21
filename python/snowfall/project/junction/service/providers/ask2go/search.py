@@ -104,6 +104,7 @@ class Adapter(object):
                     str(search_criteria.destination_iata),
                     str(search_criteria.inbound_departure_window),
                     str(search_criteria.outbound_departure_window),
+                    search_criteria.affiliate_id,
                 ],
             ),
         )
