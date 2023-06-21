@@ -1,3 +1,4 @@
+from snowfall.project.junction.go.service.offers.v1alpha import models_pb2 as offers_pb2
 from snowfall.project.junction.service.providers.ask2go import (
     cache,
     conftest,
@@ -7,7 +8,7 @@ from snowfall.project.junction.service.providers.ask2go import (
 from snowfall.stdlib import money
 
 
-async def test_search_result_data(
+async def test_search_result_data(  # noqa: WPS218, WPS210
     pricing_adapter: pricing.Adapter,
     offer_transformer: transformer.OfferTransformer,
     magic_mocker: conftest.MagicMocker,
@@ -26,3 +27,15 @@ async def test_search_result_data(
     price = money.from_protobuf(price_quote.price)
     assert str(price) == "69.54"
     assert price.currency.code == "EUR"
+
+    base_fare = price_quote.price_breakdown[0]
+    base_fare_price = money.from_protobuf(base_fare.price)
+    assert str(base_fare_price) == "27.00"
+    assert base_fare_price.currency.code == "EUR"
+    assert base_fare.breakdown_type == offers_pb2.PriceBreakdown.BREAKDOWN_TYPE_BASE_FEE
+
+    tax = price_quote.price_breakdown[1]
+    tax_price = money.from_protobuf(tax.price)
+    assert str(tax_price) == "42.54"
+    assert tax_price.currency.code == "EUR"
+    assert tax.breakdown_type == offers_pb2.PriceBreakdown.BREAKDOWN_TYPE_TAX

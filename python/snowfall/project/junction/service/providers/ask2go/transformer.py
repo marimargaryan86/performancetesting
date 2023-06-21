@@ -68,6 +68,9 @@ class OfferTransformer(object):  # noqa: WPS214
                     price_result.itinerary.pricing_information.base.currency,
                 ),
             ).protobuf(),
+            price_breakdown=self._get_price_breakdown(
+                price_result.itinerary.pricing_information.base,
+            ),
             required_documents=(
                 self._get_offer_price_requirements(price_result.docs)
                 if price_result.docs
@@ -441,3 +444,24 @@ class OfferTransformer(object):  # noqa: WPS214
                 ),
             ),
         }
+
+    def _get_price_breakdown(
+        self,
+        pricing_information: offers.PricingInformationBase,
+    ) -> list[offers_pb2.PriceBreakdown]:
+        return [
+            offers_pb2.PriceBreakdown(
+                price=money.from_string(
+                    pricing_information.base_fare,
+                    money.Currency(pricing_information.currency),
+                ).protobuf(),
+                breakdown_type=offers_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_BASE_FEE,
+            ),
+            offers_pb2.PriceBreakdown(
+                price=money.from_string(
+                    pricing_information.total_tax,
+                    money.Currency(pricing_information.currency),
+                ).protobuf(),
+                breakdown_type=offers_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_TAX,
+            ),
+        ]
