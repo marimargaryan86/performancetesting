@@ -113,7 +113,7 @@ EOH
 
       env {
         ENV_NAME        = "${var.environment}"
-        SENTRY_DSN      = "https://712e1df2af844a329d91e5b5dec013f7@sentry.snowfall.se/159"
+        SENTRY_DSN      = "https://0bd9d1f79de14b349046c6abbb0b7d25@sentry.snowfall.se/160"
         PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
       }
     }
