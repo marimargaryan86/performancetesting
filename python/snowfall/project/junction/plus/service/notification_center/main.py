@@ -1,0 +1,47 @@
+from collections.abc import Sequence
+
+import httpx
+import pydantic
+
+from snowfall.project.junction.plus.service.notification_center import importer
+from snowfall.stdlib import service
+from snowfall.stdlib.instrumentation.httpx import logging, metrics
+from snowfall.stdlib.transport.amqp import consumer, types
+
+
+class _ImportSettings(service.Settings):
+    amqp_dsn: pydantic.AnyUrl
+    mongo_dsn: Sequence[pydantic.AnyUrl]
+
+
+async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
+    http_client = await app.stack.enter_async_context(httpx.AsyncClient())
+    connection = await app.stack.enter_async_context(
+        types.Connection(
+            app.settings.amqp_dsn,
+        ),
+    )
+
+    logging.register(http_client)
+    metrics.register(http_client)
+
+    notification_event_importer = importer.NotificationEventImporter(
+        consumer_obj=consumer.Consumer(
+            connection=connection,
+            queue_name="plus_{0}".format(app.name),
+            binds=[(types.Exchange("plus_events"), "plus.events")],
+        ),
+    )
+    await notification_event_importer.consume()
+
+
+if __name__ == "__main__":
+    entrypoint = service.Entrypoint(name="notification_center")
+
+    entrypoint.enter_with_commands(
+        service.Command(
+            name="import",
+            callback=_import,
+            settings_class=_ImportSettings,
+        ),
+    )
