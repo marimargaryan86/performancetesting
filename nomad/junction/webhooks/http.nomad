@@ -85,7 +85,7 @@ job "webhooks-http" {
           proxy {
             upstreams {
               local_bind_port  = 8040
-              destination_name = "payments-${var.environment}"
+              destination_name = "pay-payments-${var.environment}"
             }
           }
         }
@@ -123,7 +123,7 @@ job "webhooks-http" {
         env         = true
         change_mode = "restart"
         data        = <<EOH
-PAYMENTS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_payments-${var.environment}"))}}
+PAYMENTS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_pay-payments-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/webhooks" }}
 SECRET_KEY={{ .Data.data.secret_key }}
 {{ end }}
