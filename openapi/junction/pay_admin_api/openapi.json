@@ -861,13 +861,31 @@
           }
         }
       },
-      "post": {
-        "summary": "Disable account",
-        "description": "Disable account",
+      "patch": {
+        "summary": "Update account",
+        "description": "Update account status",
         "tags": [
           "accounts"
         ],
-        "operationId": "post-accounts-id",
+        "operationId": "patch-accounts-id",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/UpdateAccount"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Account is disabled",
@@ -1724,7 +1742,9 @@
         "required": false,
         "schema": {
           "type": "array",
-          "example": ["enabled"],
+          "example": [
+            "enabled"
+          ],
           "items": {
             "type": "string",
             "enum": [
@@ -1885,6 +1905,47 @@
                 "format": "password",
                 "example": "myPassword",
                 "writeOnly": true
+              }
+            }
+          }
+        }
+      },
+      "UpdateAccount": {
+        "title": "Update Account",
+        "description": "Update Account",
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "attributes"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "271f6d54-9e59-407e-a860-b0771d9e3d26",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "example": "accounts",
+            "enum": [
+              "accounts"
+            ]
+          },
+          "attributes": {
+            "type": "object",
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "type": "string",
+                "example": "enabled",
+                "enum": [
+                  "enabled",
+                  "disabled"
+                ]
               }
             }
           }

@@ -40,14 +40,15 @@ class Account(endpoints.HTTPEndpoint):
             request=request,
         )
 
-    async def post(
+    async def patch(
         self,
         request: requests.Request,
         accounts_client: accounts_adapter.GrpcClient = lagom.injectable,
     ) -> responses.Response:
+        body = await request_helpers.flatten_request(request)
         account = await accounts_client.update_account_status(
             document_id=request.path_params["accountId"],
-            status="disabled",
+            status=body["status"],
         )
         return await messages.create_response(
             body=messages.models.Body(
