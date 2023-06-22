@@ -1,9 +1,10 @@
 from collections.abc import Callable
 
+import httpx
 from starlette import applications
 from starlette.middleware import Middleware, authentication
 
-from snowfall.adapter import authentication as auth
+from snowfall.adapter import authentication as auth_adapter
 from snowfall.project.junction.go.adapter import (
     errors,
     legs,
@@ -34,6 +35,7 @@ from snowfall.stdlib.format import jwt
 from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import cursor, filesystem
 from snowfall.stdlib.transport.grpc.client import create_channel
+from snowfall.stdlib.transport.http import auth
 
 
 def _factory(
@@ -50,8 +52,8 @@ def _factory(
         asgi_app = application.create_starlette_app(
             routes=router.get_routes(
                 bootstrap.create_dependencies(
-                    authentication_client=auth.GrpcClient(
-                        auth.auth_pb2_grpc.AuthenticationServiceStub(
+                    authentication_client=auth_adapter.GrpcClient(
+                        auth_adapter.auth_pb2_grpc.AuthenticationServiceStub(
                             authentication_channel,
                         ),
                     ),
@@ -117,11 +119,23 @@ def _factory(
                 Middleware(
                     authentication.AuthenticationMiddleware,
                     backend=authentication_backends.JWTAuthenticationBackend(
-                        jwt_version=app.settings.jwt_token_version,
-                        decoder=jwt.Decoder(
-                            public_key=app.settings.jwt_public_key,
-                            algorithms=["RS256"],
-                        ),
+                        authentication_backends.OryAuth(
+                            jwk_client=authentication_backends.AsyncJWKClient(
+                                base_url=app.settings.ory_application_url,
+                                key_ttl=app.settings.ory_jwk_ttl,
+                            ),
+                            legacy_fallback=authentication_backends.LegacyAuth(
+                                jwt_version=app.settings.jwt_token_version,
+                                decoder=jwt.Decoder(
+                                    public_key=app.settings.jwt_public_key,
+                                    algorithms=["RS256"],
+                                ),
+                            ).get_reseller_id_from_jwt,
+                            client=httpx.AsyncClient(
+                                base_url=app.settings.ory_application_url,
+                                auth=auth.TokenAuth(token=app.settings.ory_api_key),
+                            ),
+                        ).get_reseller_id_from_jwt,
                     ),
                     on_error=handlers.auth_error_handler,
                 ),

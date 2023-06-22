@@ -1,4 +1,7 @@
+import datetime
+
 import lagom
+import pydantic
 
 from snowfall.adapter import authentication
 from snowfall.project.junction.go.adapter import (  # noqa: WPS235
@@ -29,6 +32,9 @@ class Settings(application.Settings):
     trips_address: str
     schedules_address: str
     authentication_address: str
+    ory_application_url: pydantic.AnyUrl
+    ory_api_key: str
+    ory_jwk_ttl: datetime.timedelta = datetime.timedelta(hours=1)
     validate_responses_against_spec: bool = True
     reseller_currencies: dict[str, str] = {}
     reseller_pay_companies: dict[str, str] = {}

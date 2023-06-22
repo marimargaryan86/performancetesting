@@ -118,6 +118,15 @@ def headers(jwt_token: str) -> dict[str, str]:
     }
 
 
+async def mock_jwt_to_reseller_id(token: str) -> str:
+    auth = authentication_backends.LegacyAuth(
+        jwt.Decoder(),
+        jwt_version="1.0.0",
+    )
+
+    return auth.get_reseller_id_from_jwt(token)
+
+
 @pytest.fixture()
 def app(  # noqa: WPS211
     authentication_client: auth_adapter.DictClient,
@@ -141,8 +150,7 @@ def app(  # noqa: WPS211
             Middleware(
                 authentication.AuthenticationMiddleware,
                 backend=authentication_backends.JWTAuthenticationBackend(
-                    jwt.Decoder(),
-                    jwt_version="1.0.0",
+                    jwt_to_reseller_id=mock_jwt_to_reseller_id,
                 ),
                 on_error=handlers.auth_error_handler,
             ),
