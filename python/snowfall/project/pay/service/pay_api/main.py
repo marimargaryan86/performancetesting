@@ -11,7 +11,13 @@ from starlette.middleware import Middleware, authentication
 from snowfall.adapter import authentication as auth
 from snowfall.project.junction.go.adapter import errors
 from snowfall.project.pay.adapter import accounts as accounts_adapter
-from snowfall.project.pay.adapter import currencies, payments, quotations, transactions
+from snowfall.project.pay.adapter import (
+    conversions,
+    currencies,
+    payments,
+    quotations,
+    transactions,
+)
 from snowfall.project.pay.service.companies import repositories
 from snowfall.project.pay.service.companies.v1alpha.grpc_pb2_grpc import (
     AccountsServiceStub,
@@ -220,6 +226,11 @@ def _admin_factory(
                     ),
                     transactions_client=transactions.GrpcClient(
                         transactions_pb2_grpc.TransactionsServiceStub(
+                            transactions_channel,
+                        ),
+                    ),
+                    conversions_client=conversions.GrpcClient(
+                        transactions_pb2_grpc.ConversionsServiceStub(
                             transactions_channel,
                         ),
                     ),

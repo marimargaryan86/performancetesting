@@ -19,6 +19,7 @@ from snowfall.project.junction.go.adapter import errors
 from snowfall.project.pay import fixtures
 from snowfall.project.pay.adapter import (
     accounts,
+    conversions,
     currencies,
     payments,
     quotations,
@@ -150,6 +151,7 @@ def _create_admin_app(  # noqa: WPS211
     payment_client: payments.GrpcClient,
     conversions_repository: pay_repos.ConversionRepository,
     transactions_client: transactions.Client,
+    conversions_client: conversions.Client,
     transactions_repository: pay_repos.TransactionRepository,
     currencies_repository: pay_repos.CurrencyRepository,
     beneficiaries_repository: pay_repos.BeneficiaryRepository,
@@ -169,6 +171,7 @@ def _create_admin_app(  # noqa: WPS211
                 beneficiaries_repository=beneficiaries_repository,
                 accounts_client=accounts_client,
                 transactions_client=transactions_client,
+                conversions_client=conversions_client,
                 transactions_repository=transactions_repository,
                 cc_payment_client=cc_payment_client,
                 payments_client=payment_client,
@@ -229,6 +232,18 @@ def transactions_client(
 ) -> transactions.Client:
     return transactions.DictClient(
         [get_transaction(transaction_id) for transaction_id in transaction_ids],
+    )
+
+
+@pytest.fixture()
+def conversions_client(
+    transaction_ids: Sequence[str],
+) -> conversions.DictClient:
+    return conversions.DictClient(
+        [
+            fixtures.generate_conversion(conversion_id)
+            for conversion_id in fixtures.CONVERSIONS
+        ],
     )
 
 
@@ -491,6 +506,7 @@ def admin_app(  # noqa: WPS211
     payment_client: payments.GrpcClient,
     conversions_repository: pay_repos.ConversionRepository,
     transactions_client: transactions.Client,
+    conversions_client: conversions.Client,
     transactions_repository: pay_repos.TransactionRepository,
     currencies_repository: pay_repos.CurrencyRepository,
     beneficiaries_repository: pay_repos.BeneficiaryRepository,
@@ -506,6 +522,7 @@ def admin_app(  # noqa: WPS211
         payment_client=payment_client,
         conversions_repository=conversions_repository,
         transactions_client=transactions_client,
+        conversions_client=conversions_client,
         currencies_repository=currencies_repository,
         beneficiaries_repository=beneficiaries_repository,
         custom_middlewares=custom_middlewares,

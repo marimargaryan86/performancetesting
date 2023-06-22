@@ -1,18 +1,17 @@
 import httpx
 from starlette import status
 
-from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import Transaction
+from snowfall.project.pay import fixtures
 
 
 class TestConversions(object):
     async def test_get_conversion_details_success(
         self,
         admin_client: httpx.AsyncClient,
-        valid_transaction: Transaction,
     ) -> None:
         response = await admin_client.get(
             "/conversions/{conversion_id}".format(
-                conversion_id=valid_transaction.conversion_id,
+                conversion_id=fixtures.CONVERSIONS[0],
             ),
         )
 

@@ -13,16 +13,13 @@ from snowfall.project.pay.service.companies.v1alpha.models_pb2 import (
     Status,
 )
 from snowfall.project.pay.service.conversions.v1alpha.models_pb2 import Conversion
-from snowfall.project.pay.service.pay_api.conftest import get_transaction
 from snowfall.project.pay.service.pay_api.repositories import (
     CompanyRepository,
     ConversionRepository,
-    TransactionRepository,
 )
 from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import (
     Quotation,
     QuotationStatus,
-    Transaction,
 )
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
@@ -147,16 +144,6 @@ async def valid_conversion(
     )
 
     return await conversions_repository.insert(conversion)
-
-
-@pytest.fixture()
-async def valid_transaction(
-    transactions_repository: TransactionRepository,
-    valid_conversion: Conversion,
-) -> Transaction:
-    transaction = get_transaction(string.uuid())
-    transaction.conversion_id = valid_conversion.id
-    return await transactions_repository.insert(transaction)
 
 
 @pytest.fixture()
