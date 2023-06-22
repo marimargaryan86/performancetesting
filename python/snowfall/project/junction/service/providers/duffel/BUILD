@@ -17,3 +17,4 @@ files(
     name="fixtures",
     sources=["fixtures/*"],
 )
+python_tests(name="tests")

@@ -1,0 +1,318 @@
+{
+  "data": {
+    "updated_at": "2022-12-09T19:29:04.035292Z",
+    "total_emissions_kg": "947",
+    "total_currency": "GBP",
+    "total_amount": "500.16",
+    "tax_currency": "GBP",
+    "tax_amount": "305.47",
+    "slices": [
+      {
+        "segments": [
+          {
+            "stops": [],
+            "passengers": [
+              {
+                "passenger_id": "pas_0000AQRKiv6xePaMLvdagK",
+                "fare_basis_code": "SR21AUIO",
+                "cabin_class_marketing_name": "Economy",
+                "cabin_class": "economy",
+                "baggages": [
+                  {
+                    "type": "checked",
+                    "quantity": 1
+                  }
+                ]
+              }
+            ],
+            "origin_terminal": null,
+            "origin": {
+              "type": "airport",
+              "time_zone": "Australia/Sydney",
+              "name": "Sydney Airport",
+              "longitude": 151.176138,
+              "latitude": -33.943011,
+              "id": "arp_syd_au",
+              "icao_code": "YSSY",
+              "iata_country_code": "AU",
+              "iata_code": "SYD",
+              "iata_city_code": "SYD",
+              "city_name": "Sydney",
+              "city": {
+                "type": "city",
+                "time_zone": null,
+                "name": "Sydney",
+                "longitude": null,
+                "latitude": null,
+                "id": "cit_syd_au",
+                "icao_code": null,
+                "iata_country_code": "AU",
+                "iata_code": "SYD",
+                "iata_city_code": "SYD",
+                "city_name": null
+              },
+              "airports": null
+            },
+            "operating_carrier_flight_number": "100",
+            "operating_carrier": {
+              "name": "Cathay Pacific",
+              "logo_symbol_url": "https://assets.duffel.com/img/airlines/for-light-background/full-color-logo/CX.svg",
+              "logo_lockup_url": "https://assets.duffel.com/img/airlines/for-light-background/full-color-lockup/CX.svg",
+              "id": "arl_00009VME7DBgd2sGtBN3GD",
+              "iata_code": "CX",
+              "conditions_of_carriage_url": "https://www.cathaypacific.com/content/dam/cx/legal-and-privacy/general-conditions-of-carriage-for-passengers-baggage-en.pdf"
+            },
+            "marketing_carrier_flight_number": "100",
+            "marketing_carrier": {
+              "name": "Cathay Pacific",
+              "logo_symbol_url": "https://assets.duffel.com/img/airlines/for-light-background/full-color-logo/CX.svg",
+              "logo_lockup_url": "https://assets.duffel.com/img/airlines/for-light-background/full-color-lockup/CX.svg",
+              "id": "arl_00009VME7DBgd2sGtBN3GD",
+              "iata_code": "CX",
+              "conditions_of_carriage_url": "https://www.cathaypacific.com/content/dam/cx/legal-and-privacy/general-conditions-of-carriage-for-passengers-baggage-en.pdf"
+            },
+            "id": "seg_0000AQRKj9nf2S3luPitBC",
+            "duration": "PT9H10M",
+            "distance": null,
+            "destination_terminal": null,
+            "destination": {
+              "type": "airport",
+              "time_zone": "Asia/Hong_Kong",
+              "name": "Hong Kong International Airport",
+              "longitude": 113.91732,
+              "latitude": 22.308331,
+              "id": "arp_hkg_hk",
+              "icao_code": "VHHH",
+              "iata_country_code": "HK",
+              "iata_code": "HKG",
+              "iata_city_code": "HKG",
+              "city_name": "Hong Kong",
+              "city": {
+                "type": "city",
+                "time_zone": null,
+                "name": "Hong Kong",
+                "longitude": null,
+                "latitude": null,
+                "id": "cit_hkg_hk",
+                "icao_code": null,
+                "iata_country_code": "HK",
+                "iata_code": "HKG",
+                "iata_city_code": "HKG",
+                "city_name": null
+              },
+              "airports": null
+            },
+            "departing_at": "2023-02-23T15:15:00",
+            "arriving_at": "2023-02-23T21:25:00",
+            "aircraft": {
+              "name": "Airbus A350-1000",
+              "id": "arc_00009oBdrPiW5WkC9haUCo",
+              "iata_code": "351"
+            }
+          },
+          {
+            "stops": [],
+            "passengers": [
+              {
+                "passenger_id": "pas_0000AQRKiv6xePaMLvdagK",
+                "fare_basis_code": "SR21AUIO",
+                "cabin_class_marketing_name": "Economy",
+                "cabin_class": "economy",
+                "baggages": [
+                  {
+                    "type": "checked",
+                    "quantity": 1
+                  }
+                ]
+              }
+            ],
+            "origin_terminal": null,
+            "origin": {
+              "type": "airport",
+              "time_zone": "Asia/Hong_Kong",
+              "name": "Hong Kong International Airport",
+              "longitude": 113.91732,
+              "latitude": 22.308331,
+              "id": "arp_hkg_hk",
+              "icao_code": "VHHH",
+              "iata_country_code": "HK",
+              "iata_code": "HKG",
+              "iata_city_code": "HKG",
+              "city_name": "Hong Kong",
+              "city": {
+                "type": "city",
+                "time_zone": null,
+                "name": "Hong Kong",
+                "longitude": null,
+                "latitude": null,
+                "id": "cit_hkg_hk",
+                "icao_code": null,
+                "iata_country_code": "HK",
+                "iata_code": "HKG",
+                "iata_city_code": "HKG",
+                "city_name": null
+              },
+              "airports": null
+            },
+            "operating_carrier_flight_number": "251",
+            "operating_carrier": {
+              "name": "Cathay Pacific",
+              "logo_symbol_url": "https://assets.duffel.com/img/airlines/for-light-background/full-color-logo/CX.svg",
+              "logo_lockup_url": "https://assets.duffel.com/img/airlines/for-light-background/full-color-lockup/CX.svg",
+              "id": "arl_00009VME7DBgd2sGtBN3GD",
+              "iata_code": "CX",
+              "conditions_of_carriage_url": "https://www.cathaypacific.com/content/dam/cx/legal-and-privacy/general-conditions-of-carriage-for-passengers-baggage-en.pdf"
+            },
+            "marketing_carrier_flight_number": "251",
+            "marketing_carrier": {
+              "name": "Cathay Pacific",
+              "logo_symbol_url": "https://assets.duffel.com/img/airlines/for-light-background/full-color-logo/CX.svg",
+              "logo_lockup_url": "https://assets.duffel.com/img/airlines/for-light-background/full-color-lockup/CX.svg",
+              "id": "arl_00009VME7DBgd2sGtBN3GD",
+              "iata_code": "CX",
+              "conditions_of_carriage_url": "https://www.cathaypacific.com/content/dam/cx/legal-and-privacy/general-conditions-of-carriage-for-passengers-baggage-en.pdf"
+            },
+            "id": "seg_0000AQRKj9nf2S3luPitBD",
+            "duration": "PT14H40M",
+            "distance": null,
+            "destination_terminal": null,
+            "destination": {
+              "type": "airport",
+              "time_zone": "Europe/London",
+              "name": "Heathrow Airport",
+              "longitude": -0.458118,
+              "latitude": 51.470311,
+              "id": "arp_lhr_gb",
+              "icao_code": "EGLL",
+              "iata_country_code": "GB",
+              "iata_code": "LHR",
+              "iata_city_code": "LON",
+              "city_name": "London",
+              "city": {
+                "type": "city",
+                "time_zone": null,
+                "name": "London",
+                "longitude": null,
+                "latitude": null,
+                "id": "cit_lon_gb",
+                "icao_code": null,
+                "iata_country_code": "GB",
+                "iata_code": "LON",
+                "iata_city_code": "LON",
+                "city_name": null
+              },
+              "airports": null
+            },
+            "departing_at": "2023-02-23T22:20:00",
+            "arriving_at": "2023-02-24T05:00:00",
+            "aircraft": {
+              "name": "Boeing 777-300ER",
+              "id": "arc_00009VMF8AhXSSRnQDI6HH",
+              "iata_code": "77W"
+            }
+          }
+        ],
+        "origin_type": "airport",
+        "origin": {
+          "type": "airport",
+          "time_zone": "Australia/Sydney",
+          "name": "Sydney Airport",
+          "longitude": 151.176138,
+          "latitude": -33.943011,
+          "id": "arp_syd_au",
+          "icao_code": "YSSY",
+          "iata_country_code": "AU",
+          "iata_code": "SYD",
+          "iata_city_code": "SYD",
+          "city_name": "Sydney",
+          "city": {
+            "type": "city",
+            "time_zone": null,
+            "name": "Sydney",
+            "longitude": null,
+            "latitude": null,
+            "id": "cit_syd_au",
+            "icao_code": null,
+            "iata_country_code": "AU",
+            "iata_code": "SYD",
+            "iata_city_code": "SYD",
+            "city_name": null
+          },
+          "airports": null
+        },
+        "id": "sli_0000AQRKj9nf2S3luPitBB",
+        "fare_brand_name": "ECONOMY LIGHT",
+        "duration": "P1DT45M",
+        "destination_type": "airport",
+        "destination": {
+          "type": "airport",
+          "time_zone": "Europe/London",
+          "name": "Heathrow Airport",
+          "longitude": -0.458118,
+          "latitude": 51.470311,
+          "id": "arp_lhr_gb",
+          "icao_code": "EGLL",
+          "iata_country_code": "GB",
+          "iata_code": "LHR",
+          "iata_city_code": "LON",
+          "city_name": "London",
+          "city": {
+            "type": "city",
+            "time_zone": null,
+            "name": "London",
+            "longitude": null,
+            "latitude": null,
+            "id": "cit_lon_gb",
+            "icao_code": null,
+            "iata_country_code": "GB",
+            "iata_code": "LON",
+            "iata_city_code": "LON",
+            "city_name": null
+          },
+          "airports": null
+        },
+        "conditions": {
+          "change_before_departure": null
+        }
+      }
+    ],
+    "private_fares": [],
+    "payment_requirements": {
+      "requires_instant_payment": true,
+      "price_guarantee_expires_at": null,
+      "payment_required_by": null
+    },
+    "passengers": [
+      {
+        "type": "adult",
+        "loyalty_programme_accounts": [],
+        "id": "pas_0000AQRKiv6xePaMLvdagK",
+        "given_name": null,
+        "family_name": null,
+        "age": null
+      }
+    ],
+    "passenger_identity_documents_required": false,
+    "partial": false,
+    "owner": {
+      "name": "Cathay Pacific",
+      "logo_symbol_url": "https://assets.duffel.com/img/airlines/for-light-background/full-color-logo/CX.svg",
+      "logo_lockup_url": "https://assets.duffel.com/img/airlines/for-light-background/full-color-lockup/CX.svg",
+      "id": "arl_00009VME7DBgd2sGtBN3GD",
+      "iata_code": "CX",
+      "conditions_of_carriage_url": "https://www.cathaypacific.com/content/dam/cx/legal-and-privacy/general-conditions-of-carriage-for-passengers-baggage-en.pdf"
+    },
+    "live_mode": false,
+    "id": "off_0000AQRKj9nf2S3luPitBA",
+    "expires_at": "2022-12-09T20:29:04.031447Z",
+    "created_at": "2022-12-09T19:26:52.423570Z",
+    "conditions": {
+      "refund_before_departure": null,
+      "change_before_departure": null
+    },
+    "base_currency": "GBP",
+    "base_amount": "194.69",
+    "available_services": [],
+    "allowed_passenger_identity_document_types": []
+  }
+}
