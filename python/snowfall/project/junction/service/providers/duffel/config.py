@@ -1,5 +1,6 @@
 import datetime
 from collections.abc import Sequence
+from typing import Any
 
 import pydantic
 
@@ -16,6 +17,7 @@ class DuffelConfig(pydantic.BaseModel):
     http_timeout: int = 30
     rate_limiter_grpc_host: str
     rate_limiter_service_configs: dict[str, RateLimitConfig]
+    resellers_map: dict[str, dict[str, Any]] = {}
 
 
 class Settings(DuffelConfig, service.ProviderSettings):

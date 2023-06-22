@@ -1,11 +1,16 @@
+import dataclasses
 import datetime
 from collections import defaultdict
 from collections.abc import AsyncIterator, Callable, Mapping, Sequence
+from typing import Any
 
 from snowfall.project.junction.go.service.offers.v1alpha import (
     models_pb2 as offer_models_pb2,
 )
 from snowfall.project.junction.service.providers.duffel import cache
+from snowfall.project.junction.service.providers.duffel.client_factory import (
+    DuffelClientFactory,
+)
 from snowfall.project.junction.service.providers.duffel.search.parser import OfferParser
 from snowfall.project.junction.service.providers.duffel.search.validator import (
     AirlineValidator,
@@ -15,15 +20,42 @@ from snowfall.project.junction.service.providers.duffel.v1alpha import amqp_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
-from snowfall.vendor.duffel import client
 from snowfall.vendor.duffel.builders.offer_request import (
     OfferRequestData,
     OfferRequestPassenger,
     OfferRequestSlice,
     OffersRequestBuilder,
 )
-from snowfall.vendor.duffel.models.offer import Offer
+from snowfall.vendor.duffel.models.offer import Offer, PrivateFare
 from snowfall.vendor.duffel.models.offer_slice import OfferSliceSegment
+
+
+def _fares_sort_key(
+    elem: PrivateFare,
+) -> tuple[str, str]:
+    return elem.corporate_code or "", elem.tracking_reference or ""
+
+
+def _generate_private_fares_keys(  # noqa: WPS210
+    private_fares: Mapping[str, Sequence[PrivateFare]],
+) -> Sequence[str]:
+    private_fare_keys = []
+
+    for name, fares in sorted(private_fares.items()):
+        fare_keys = []
+        for fare in sorted(fares, key=_fares_sort_key):
+            fare_keys.append(
+                b"\x00".decode().join(
+                    [
+                        "{0}-{1}".format(key, fare_value)
+                        for key, fare_value in fare.dict().items()
+                    ],
+                ),
+            )
+        private_fare_keys.append(
+            "{0}-{1}".format(name, b"\x00".decode().join(fare_keys)),
+        )
+    return private_fare_keys
 
 
 class OfferGrouper(object):
@@ -64,27 +96,35 @@ class OfferGrouper(object):
         )
 
 
+@dataclasses.dataclass(frozen=True)
+class SearchCriteriaWrapper(object):
+    search_criteria: OfferRequestData
+    reseller_id: str
+
+
 class DuffelSearchAdapter(object):
     def __init__(  # noqa: WPS211
         self,
-        duffel_client: client.DuffelClient,
+        resellers_map: Mapping[str, Mapping[str, Any]],
+        duffel_client_factory: DuffelClientFactory,
         offers_cache: cache.OfferCache,
         ttl: datetime.timedelta,
         enabled_airlines: frozenset[str] | None = None,
         disabled_airlines: frozenset[str] | None = None,
     ) -> None:
-        self._client = duffel_client
+        self._offers_client_factory = duffel_client_factory
         self._offer_parser = OfferParser(default_ttl=ttl, offer_cache=offers_cache)
         self._logger = stdout.get_logger()
         self._airline_validator = AirlineValidator(
             enabled_airlines=enabled_airlines,
             disabled_airlines=disabled_airlines,
         )
+        self._resellers_map = resellers_map
 
-    def search_criteria_generator(
+    def search_criteria_generator(  # noqa: WPS210
         self,
         search_task: amqp_pb2.SearchCriteriaTask,
-    ) -> OfferRequestData:
+    ) -> SearchCriteriaWrapper:
         offer_request_builder = OffersRequestBuilder()
         outbound_date = protobuf.protobuf_to_datetime(
             search_task.criteria.outbound_departure,
@@ -114,16 +154,29 @@ class DuffelSearchAdapter(object):
                     departure_date=inbound_date,
                 ),
             )
+        account_config = self._resellers_map.get(search_task.criteria.reseller_id)
+        if account_config:
+            offer_request_builder.private_fares = {
+                key: [PrivateFare.parse_obj(fare) for fare in fares]
+                for key, fares in account_config["private_fares"].items()
+            }
+        return SearchCriteriaWrapper(
+            search_criteria=offer_request_builder.build(),
+            reseller_id=search_task.criteria.reseller_id,
+        )
 
-        return offer_request_builder.build()
-
-    def generate_cache_key(self, search_criteria: OfferRequestData) -> str:
+    def generate_cache_key(self, search_criteria_wrapper: SearchCriteriaWrapper) -> str:
+        private_fares_keys: Sequence[str] = []
+        if search_criteria_wrapper.search_criteria.offer_data.private_fares:
+            private_fares_keys = _generate_private_fares_keys(
+                search_criteria_wrapper.search_criteria.offer_data.private_fares,
+            )
         return string.to_uuid(
             b"\x00".decode().join(
                 [
                     *[
                         str(passenger.age)
-                        for passenger in search_criteria.offer_data.passengers
+                        for passenger in search_criteria_wrapper.search_criteria.offer_data.passengers
                     ],
                     *[
                         "{origin}-{destination}-{departure_date}".format(
@@ -131,18 +184,22 @@ class DuffelSearchAdapter(object):
                             destination=offer_slice.destination,
                             departure_date=offer_slice.departure_date,
                         )
-                        for offer_slice in search_criteria.offer_data.slices
+                        for offer_slice in search_criteria_wrapper.search_criteria.offer_data.slices
                     ],
+                    *private_fares_keys,
                 ],
             ),
         )
 
-    async def gather_search_results(
+    async def gather_search_results(  # noqa: WPS210
         self,
-        search_criteria: OfferRequestData,
+        search_criteria_wrapper: SearchCriteriaWrapper,
     ) -> AsyncIterator[offer_models_pb2.OfferGroup]:
-        res = await self._client.create_offer_request(
-            search_criteria,
+        duffel_client = self._offers_client_factory.for_reseller(
+            search_criteria_wrapper.reseller_id,
+        )
+        res = await duffel_client.create_offer_request(
+            search_criteria_wrapper.search_criteria,
         )
 
         if res.offers:

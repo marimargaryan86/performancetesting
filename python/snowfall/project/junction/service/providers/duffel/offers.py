@@ -8,6 +8,9 @@ from redis import asyncio as aioredis
 
 from snowfall.project.junction.provider import airports, offers, service
 from snowfall.project.junction.service.providers.duffel import cache, config, criteria
+from snowfall.project.junction.service.providers.duffel.client_factory import (
+    DuffelClientFactory,
+)
 from snowfall.project.junction.service.providers.duffel.search import adapter
 from snowfall.project.junction.service.providers.duffel.v1alpha import amqp_pb2
 from snowfall.stdlib import h3
@@ -15,13 +18,11 @@ from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import types
-from snowfall.vendor.duffel import client
-from snowfall.vendor.duffel.builders import offer_request
 from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
 _Impl = offers.OfferSearchImplementation[
     amqp_pb2.SearchCriteriaTask,
-    offer_request.OfferRequestData,
+    adapter.SearchCriteriaWrapper,
 ]
 
 
@@ -44,16 +45,17 @@ async def offers_factory(
             app.settings.rate_limiter_service_configs["duffel"],
         ),
     )
-
-    duffel_client = client.DuffelClient(
+    offer_client_factory = DuffelClientFactory(
         api_base_url=app.settings.api_base_url,
         api_key=app.settings.api_key,
         version=app.settings.api_version,
         http_client=http_client,
         rate_limit_client=rate_limit_client,
+        resellers_map=app.settings.resellers_map,
     )
     duffle_adapter = adapter.DuffelSearchAdapter(
-        duffel_client=duffel_client,
+        resellers_map=app.settings.resellers_map,
+        duffel_client_factory=offer_client_factory,
         offers_cache=cache.OfferCache(
             client=redis.Client[bytes](redis_connection, prefix=app.name),
         ),

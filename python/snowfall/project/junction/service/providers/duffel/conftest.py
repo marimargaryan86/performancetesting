@@ -13,6 +13,9 @@ from redis import asyncio as aioredis
 
 from snowfall.project.junction.go.v1alpha import models_pb2
 from snowfall.project.junction.service.providers.duffel import cache
+from snowfall.project.junction.service.providers.duffel.offers import (
+    DuffelClientFactory,
+)
 from snowfall.project.junction.service.providers.duffel.search import adapter, parser
 from snowfall.project.junction.service.providers.duffel.v1alpha import amqp_pb2
 from snowfall.stdlib.format import protobuf
@@ -35,9 +38,36 @@ def http_client() -> httpx.AsyncClient:
 
 
 @pytest.fixture()
-async def duffel_client(
-    http_client: httpx.AsyncClient,
-) -> client.DuffelClient:
+def duffel_client_factory(http_client: httpx.AsyncClient) -> DuffelClientFactory:
+    mock_rate_limit_client = mock.create_autospec(
+        RateLimitClient,
+        spec_set=True,
+        instance=True,
+    )
+    return DuffelClientFactory(
+        api_base_url=API_BASE_URL,
+        api_key="duffel_test_mwCE9C8Ai452UaenWhexo9PQuz1VWbmzzU9ejcVDy3p",
+        version="v1",
+        http_client=http_client,
+        resellers_map={
+            "res1": {
+                "api_key": "token1",
+                "private_fares": {
+                    "QF": [
+                        {
+                            "tracking_reference": "ABN:2345678",
+                            "corporate_code": "FLX53",
+                        },
+                    ],
+                },
+            },
+        },
+        rate_limit_client=mock_rate_limit_client,
+    )
+
+
+@pytest.fixture()
+def duffel_client(http_client: httpx.AsyncClient) -> client.DuffelClient:
     mock_rate_limit_client = mock.create_autospec(
         RateLimitClient,
         spec_set=True,
@@ -54,30 +84,56 @@ async def duffel_client(
 
 @pytest.fixture()
 def search_adapter(
-    duffel_client: client.DuffelClient,
     redis_client: aioredis.Redis[bytes],
+    duffel_client_factory: DuffelClientFactory,
 ) -> adapter.DuffelSearchAdapter:
     return adapter.DuffelSearchAdapter(
-        duffel_client=duffel_client,
+        duffel_client_factory=duffel_client_factory,
         offers_cache=cache.OfferCache(
             client=redis.Client(redis_client),
         ),
         ttl=datetime.timedelta(minutes=_TTL_MINUTES),
+        resellers_map={
+            "res1": {
+                "api_key": "token1",
+                "private_fares": {
+                    "QF": [
+                        {
+                            "tracking_reference": "ABN:2345678",
+                            "corporate_code": "FLX53",
+                        },
+                    ],
+                },
+            },
+        },
     )
 
 
 @pytest.fixture()
 def search_adapter_no_ba(
-    duffel_client: client.DuffelClient,
     redis_client: aioredis.Redis[bytes],
+    duffel_client_factory: DuffelClientFactory,
 ) -> adapter.DuffelSearchAdapter:
     return adapter.DuffelSearchAdapter(
-        duffel_client=duffel_client,
+        duffel_client_factory=duffel_client_factory,
         offers_cache=cache.OfferCache(
             client=redis.Client(redis_client),
         ),
         ttl=datetime.timedelta(minutes=_TTL_MINUTES),
         disabled_airlines=frozenset(("BA",)),
+        resellers_map={
+            "res1": {
+                "api_key": "token1",
+                "private_fares": {
+                    "QF": [
+                        {
+                            "tracking_reference": "ABN:2345678",
+                            "corporate_code": "FLX53",
+                        },
+                    ],
+                },
+            },
+        },
     )
 
 
@@ -85,14 +141,28 @@ def search_adapter_no_ba(
 def search_adapter_ba_only(
     duffel_client: client.DuffelClient,
     redis_client: aioredis.Redis[bytes],
+    duffel_client_factory: DuffelClientFactory,
 ) -> adapter.DuffelSearchAdapter:
     return adapter.DuffelSearchAdapter(
-        duffel_client=duffel_client,
+        duffel_client_factory=duffel_client_factory,
         offers_cache=cache.OfferCache(
             client=redis.Client(redis_client),
         ),
         ttl=datetime.timedelta(minutes=_TTL_MINUTES),
         enabled_airlines=frozenset(("BA",)),
+        resellers_map={
+            "res1": {
+                "api_key": "token1",
+                "private_fares": {
+                    "QF": [
+                        {
+                            "tracking_reference": "ABN:2345678",
+                            "corporate_code": "FLX53",
+                        },
+                    ],
+                },
+            },
+        },
     )
 
 

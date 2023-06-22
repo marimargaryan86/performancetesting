@@ -1,3 +1,6 @@
+from collections.abc import Mapping, Sequence
+
+import pytest
 import pytest_httpx
 
 from snowfall.project.junction.service.providers.duffel.conftest import (
@@ -6,6 +9,7 @@ from snowfall.project.junction.service.providers.duffel.conftest import (
     search_task_from_offer,
 )
 from snowfall.project.junction.service.providers.duffel.search import adapter
+from snowfall.vendor.duffel.models.offer import PrivateFare
 from snowfall.vendor.duffel.models.offer_request import OfferRequestResponse
 
 
@@ -158,3 +162,36 @@ async def test_airline_validator(  # noqa: WPS210
     ]
 
     assert len(offer_groups) == 7
+
+
+@pytest.mark.parametrize(
+    "fares",
+    [
+        {
+            "QF": [
+                PrivateFare(corporate_code="C1", tracking_reference="TR1"),
+                PrivateFare(corporate_code="C2", tracking_reference="TR2"),
+            ],
+            "TF": [
+                PrivateFare(corporate_code="C1", tracking_reference="TR1"),
+                PrivateFare(corporate_code="C2", tracking_reference="TR2"),
+            ],
+        },
+        {
+            "TF": [
+                PrivateFare(corporate_code="C2", tracking_reference="TR2"),
+                PrivateFare(corporate_code="C1", tracking_reference="TR1"),
+            ],
+            "QF": [
+                PrivateFare(corporate_code="C2", tracking_reference="TR2"),
+                PrivateFare(corporate_code="C1", tracking_reference="TR1"),
+            ],
+        },
+    ],
+)
+def test_adapter_cache_generate(fares: Mapping[str, Sequence[PrivateFare]]) -> None:
+    expected = [
+        "QF-corporate_code-C1\x00tracking_reference-TR1\x00tour_code-None\x00fare_type-None\x00corporate_code-C2\x00tracking_reference-TR2\x00tour_code-None\x00fare_type-None",
+        "TF-corporate_code-C1\x00tracking_reference-TR1\x00tour_code-None\x00fare_type-None\x00corporate_code-C2\x00tracking_reference-TR2\x00tour_code-None\x00fare_type-None",
+    ]
+    assert adapter._generate_private_fares_keys(fares) == expected  # noqa: WPS437

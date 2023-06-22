@@ -20,4 +20,5 @@ message Criteria {
   snowfall.stdlib.v1.DateTime outbound_departure = 3;
   optional snowfall.stdlib.v1.DateTime inbound_departure = 4;
   repeated uint32 passenger_ages = 5;
+  string reseller_id = 6;
 }

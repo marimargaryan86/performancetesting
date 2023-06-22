@@ -47,6 +47,7 @@ class CriteriaGenerator(object):
                 _generate_search_criteria(
                     trip_criteria=trip_criteria,
                     passenger_ages=passenger_ages,
+                    reseller_id=search.reseller_id,
                 ),
             )
 
@@ -67,6 +68,7 @@ def _get_last_travel_date(
 def _generate_search_criteria(
     trip_criteria: segment_grouper.TripCriteria,
     passenger_ages: Sequence[int],
+    reseller_id: str,
 ) -> Iterator[provider_amqp_pb2.SearchCriteriaTask]:
     for origin, destination in trip_criteria.get_combinations():
         task = provider_amqp_pb2.SearchCriteriaTask(
@@ -78,6 +80,7 @@ def _generate_search_criteria(
                     trip_criteria.outbound.departure,
                 ),
                 passenger_ages=passenger_ages,
+                reseller_id=reseller_id,
             ),
         )
 
