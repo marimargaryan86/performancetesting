@@ -67,9 +67,9 @@ async def test_get_trips_by_trip_search_id(
     await asyncio.sleep(5)
 
     r2 = await mobile_client.trips().get_trips_by_trip_search_id(trip_search_id)
-    logging.info("get_trips_by_trip_search_id response: %s", json.dumps(r2, indent=4))
 
     trip_id = r2["data"][0]["id"]
+    assert trip_id is not None
     assert is_valid_uuid(trip_id, 5) is True, "trip_id uuid must be in uuid v5 format"
 
 

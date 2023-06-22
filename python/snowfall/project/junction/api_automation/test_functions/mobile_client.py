@@ -1,7 +1,11 @@
 import dataclasses
+import json
+import logging
 from collections.abc import Mapping, Sequence
 from datetime import date, datetime
 from typing import Any
+
+import httpx
 
 from snowfall.vendor.junction.go import models
 from snowfall.vendor.junction.go.client import (  # noqa: WPS450,WPS235
@@ -25,29 +29,45 @@ from snowfall.vendor.junction.go.client import (  # noqa: WPS450,WPS235
 
 
 class MobileApiClient(Client):  # noqa: WPS214
-    async def create_payment(self, currency: str, amount: str) -> dict[str, Any]:
-        return await self._make_request(
-            method=_METHOD_POST,
-            url="/payments",
-            payload={
-                _DATA_KEY: {
-                    _TYPE_KEY: "payments",
-                    _ATTRIBUTES_KEY: {
-                        "currency": currency,
-                        "amount": amount,
-                    },
-                },
-            },
-        )
+    def __init__(
+        self,
+        base_url: str,
+        auth: httpx.Auth | None = None,
+        client: httpx.AsyncClient | None = None,
+    ):
+        super().__init__(base_url=base_url, auth=auth, client=client)
+        self.logger = logging.getLogger()
+        self.logger.setLevel(logging.DEBUG)
 
     async def list_cabin_classes(self) -> dict[str, Any]:
         return await self._make_request(method=_METHOD_GET, url="/cabin-classes")
+
+    async def create_payment(
+        self,
+        currency: str,
+        amount: str,
+    ) -> dict[str, Any]:
+        body = {
+            _DATA_KEY: {
+                _ATTRIBUTES_KEY: {
+                    "amount": amount,
+                    "currency": currency,
+                },
+                _TYPE_KEY: "payments",
+            },
+        }
+        self.logger.info("create_payment: %s", json.dumps(body, indent=4))
+        return await self._make_request(
+            method=_METHOD_POST,
+            url="/payments",
+            payload=body,
+        )
 
     async def update_payment(
         self,
         payment_intent_id: str,
         voucher_id: str,
-    ) -> int:
+    ) -> dict[str, Any]:
         body = {
             _DATA_KEY: {
                 _TYPE_KEY: "payments",
@@ -61,13 +81,11 @@ class MobileApiClient(Client):  # noqa: WPS214
                 },
             },
         }
-        response = await self.client.request(
+        return await self._make_request(
             method=_METHOD_PATCH,
             url="/payments/{0}".format(payment_intent_id),
-            json=body,
+            payload=body,
         )
-        response.raise_for_status()
-        return response.status_code
 
     async def create_order(  # noqa: WPS211
         self,
@@ -82,6 +100,48 @@ class MobileApiClient(Client):  # noqa: WPS214
                 "This client cannot create orders without payments. "
                 "Please, use create_order_with_payments"
             ),
+        )
+
+    async def create_offer_price_quote(
+        self,
+        options_id: str,
+        offer_id: str,
+    ) -> dict[str, Any]:
+        body = {
+            _DATA_KEY: {
+                _TYPE_KEY: "trip-offer-price-quotes",
+                _ATTRIBUTES_KEY: {},
+                _RELATIONSHIPS_KEY: {
+                    "offer": {
+                        _DATA_KEY: {
+                            _ID_KEY: offer_id,
+                            _TYPE_KEY: "offers",
+                        },
+                    },
+                    "options": {
+                        _DATA_KEY: [
+                            {
+                                _ID_KEY: options_id,
+                                _TYPE_KEY: "offer-options",
+                            },
+                        ],
+                    },
+                },
+            },
+        }
+        return await self._make_request(
+            method=_METHOD_POST,
+            url="/offers/quotes",
+            payload=body,
+        )
+
+    async def get_offer_price_quote(
+        self,
+        offer_price_quote_id: str,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/offers/quotes/{0}".format(offer_price_quote_id),
         )
 
     async def create_order_with_payment(  # noqa: WPS211
@@ -318,6 +378,15 @@ class MobileApiClient(Client):  # noqa: WPS214
             url="/users/groups/{group_id}/members".format(group_id=group_id),
         )
 
+    async def list_offers_by_offer_search(
+        self,
+        offer_search_id: str,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/offers/searches/{0}/offers".format(offer_search_id),
+        )
+
     async def delete_user_group(
         self,
         group_id: str,
@@ -530,6 +599,9 @@ class MobileApiClient(Client):  # noqa: WPS214
             url="/trip-candidates/searches/{0}/offers".format(
                 trip_candidate_search_id,
             ),
+            query_parameters={
+                "include": "groups.options",
+            },
         )
 
     async def get_user(
