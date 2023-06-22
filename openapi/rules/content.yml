@@ -1,0 +1,11 @@
+rules:
+  content-media-types:
+    description: "`content` must have at least one media type defined"
+    given:
+      - $.paths[*].[*].requestBody.content
+      - $.paths[*].[*].responses.[*].content
+    severity: error
+    then:
+      - function: length
+        functionOptions:
+          min: 1

@@ -1,5 +1,6 @@
 extends:
   - rules/arrays.yml
+  - rules/content.yml
   - rules/date-types.yml
   - rules/ensure-examples.yml
   - rules/jsonapi.yml
