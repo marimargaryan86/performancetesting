@@ -129,3 +129,34 @@ class ContactsRepository(
         contacts.limit(limit or self._default_page_size)
 
         return contacts
+
+
+class BeneficiaryRepository(
+    mixins.FindByIdMixin[models_pb2.Beneficiary],
+    mixins.InsertMixin[models_pb2.Beneficiary],
+    repository.ProtoRepository[models_pb2.Beneficiary],
+):
+    _proto = models_pb2.Beneficiary
+    _default_page_size = 20
+
+    async def find(
+        self,
+        cursor: str | None,
+    ) -> resultset.ResultSet[models_pb2.Beneficiary]:
+        return await self._find_with_cursor(
+            cur=cursor or "",
+        )
+
+    async def update(
+        self,
+        document_id: str,
+        beneficiary: models_pb2.Beneficiary,
+    ) -> pymongo.results.UpdateResult:
+        replacement = self._coder.encode(beneficiary)
+        replacement.pop("_id")
+
+        return await self._execute(
+            self._collection.replace_one,
+            filter={"_id": document_id},
+            replacement=replacement,
+        )

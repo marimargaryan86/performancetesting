@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 from typing import cast
 
@@ -10,11 +11,14 @@ from snowfall.project.pay.service.companies.v1alpha import (
     grpc_pb2_grpc,
     models_pb2,
 )
+from snowfall.project.pay.service.pay_api.repositories import CurrencyRepository
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.transport.grpc import rich_status, service
-from snowfall.vendor.currency_cloud.client import PaymentClient
+from snowfall.stdlib.v1 import postal_address_pb2
+from snowfall.vendor.currency_cloud import client
 from snowfall.vendor.currency_cloud.models import account as cc_account_models
+from snowfall.vendor.currency_cloud.models.beneficiary import BeneficiaryResponse
 
 
 class CompaniesService(  # noqa: WPS214
@@ -65,7 +69,7 @@ class CompaniesService(  # noqa: WPS214
         company = await self._companies.find_by_id(request.id)
 
         if not company:
-            await context.abort(grpc.StatusCode.NOT_FOUND)
+            await context.abort(grpc.StatusCode.NOT_FOUND)  # noqa: WPS204
 
         return grpc_pb2.GetCompanyResponse(company=company)
 
@@ -128,7 +132,7 @@ class AccountsService(service.Service, grpc_pb2_grpc.AccountsServiceServicer):
     def __init__(
         self,
         accounts: repositories.AccountsRepository,
-        payment_client: PaymentClient,
+        payment_client: client.PaymentClient,
     ):
         self._accounts = accounts
         self._default_page_size = 20
@@ -247,3 +251,337 @@ class ContactsService(service.Service, grpc_pb2_grpc.ContactsServiceServicer):
             await context.abort(grpc.StatusCode.NOT_FOUND)
 
         return grpc_pb2.GetContactResponse(contact=contact)
+
+
+class BeneficiariesService(  # noqa: WPS214
+    service.Service,
+    grpc_pb2_grpc.BeneficiariesServiceServicer,
+):  # noqa: WPS214
+    _default_page_size = 20
+
+    def __init__(  # noqa: WPS211
+        self,
+        beneficiaries: repositories.BeneficiaryRepository,
+        companies: repositories.CompaniesRepository,
+        accounts: repositories.AccountsRepository,
+        currencies: CurrencyRepository,  # TODO: chenage to grpc call when it's ready
+        payment_client: client.PaymentClient,
+    ):
+        self._beneficiaries = beneficiaries
+        self._companies = companies
+        self._accounts = accounts
+        self._currencies = currencies
+        self._payment_client = payment_client
+
+    def get_name(self) -> str:
+        return grpc_pb2.DESCRIPTOR.services_by_name["BeneficiariesService"].full_name
+
+    def register(self, server: grpc.aio.Server) -> None:
+        grpc_pb2_grpc.add_BeneficiariesServiceServicer_to_server(self, server)
+
+    async def CreateBeneficiary(  # type: ignore[override] # noqa: N802, WPS217, WPS210
+        self,
+        request: grpc_pb2.CreateBeneficiaryRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.CreateBeneficiaryResponse:
+        currency = self._currencies.find_by_id(request.beneficiary.currency)
+        if not currency:
+            await rich_status.abort_with_rich_status(
+                context=context,
+                status=rich_status.build_bad_request(
+                    field_name="currency",
+                    field_description="Currency is not supported",
+                ),
+            )
+
+        account = await self._accounts.find_by_id(request.beneficiary.account_id)
+        if not account:
+            await rich_status.abort_with_rich_status(
+                context=context,
+                status=rich_status.build_bad_request(
+                    field_name="account_id",
+                    field_description="Account is not found",
+                ),
+            )
+
+        company = await self._companies.find_by_id(account.company_id)
+
+        if not company:
+            await context.abort(
+                grpc.StatusCode.INVALID_ARGUMENT,
+                details="Company is not found",
+            )
+
+        beneficiary_validate_request = self._get_beneficiary_validate_model(
+            request.beneficiary.currency,
+            request.beneficiary.meta_data,
+            company_name=company.name,  # type: ignore[union-attr]
+        )
+        beneficiary_request = self._get_beneficiary_model(
+            request.beneficiary.meta_data,
+            beneficiary_validate_request,
+            company_name=company.name,  # type: ignore[union-attr]
+        )
+
+        try:  # noqa: WPS229
+            await self._payment_client.validate_beneficiary(
+                beneficiary_validate_request,
+            )
+            created_beneficiary = await self._payment_client.create_beneficiary(
+                beneficiary_request,
+            )
+        except client.CurrencyCloudError as exc:
+            await context.abort(
+                grpc.StatusCode.ABORTED,
+                details=str(exc.messages),
+            )
+
+        payment_type = (
+            ""
+            if created_beneficiary.payment_types is None
+            else created_beneficiary.payment_types[0]
+        )
+
+        beneficiary = await self._beneficiaries.insert(
+            models_pb2.Beneficiary(
+                id=string.uuid(),
+                external_reference=created_beneficiary.identifier,
+                account_id=account.id,
+                created_by=request.beneficiary.created_by,
+                payment_type=payment_type,
+                currency=created_beneficiary.currency,
+            ),
+        )
+
+        return grpc_pb2.CreateBeneficiaryResponse(beneficiary=beneficiary)
+
+    async def UpdateBeneficiary(  # type: ignore[override] # noqa: N802, WPS217, WPS210, WPS231
+        self,
+        request: grpc_pb2.UpdateBeneficiaryRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.UpdateBeneficiaryResponse:
+        beneficiary = await self._beneficiaries.find_by_id(request.beneficiary.id)
+        if not beneficiary:
+            await context.abort(grpc.StatusCode.NOT_FOUND)
+
+        if (  # noqa: WPS337
+            request.beneficiary.currency
+            and request.beneficiary.currency != beneficiary.currency  # type: ignore[union-attr]
+        ):
+            currency = self._currencies.find_by_id(request.beneficiary.currency)
+            if not currency:
+                await rich_status.abort_with_rich_status(
+                    context=context,
+                    status=rich_status.build_bad_request(
+                        field_name="currency",
+                        field_description="Currency is not supported",
+                    ),
+                )
+
+        company_name = None
+        if (  # noqa: WPS337
+            request.beneficiary.account_id
+            and request.beneficiary.account_id != beneficiary.account_id  # type: ignore[union-attr]
+        ):
+            account = await self._accounts.find_by_id(
+                request.beneficiary.account_id,
+            )
+            if not account:
+                await rich_status.abort_with_rich_status(
+                    context=context,
+                    status=rich_status.build_bad_request(
+                        field_name="account_id",
+                        field_description="Account is not found",
+                    ),
+                )
+
+            company = await self._companies.find_by_id(account.company_id)
+            if not company:
+                await context.abort(
+                    grpc.StatusCode.INVALID_ARGUMENT,
+                    details="Company is not found",
+                )
+            company_name = company.name  # type: ignore[union-attr]
+
+        if request.beneficiary.HasField("meta_data"):
+            beneficiary_validate_request = self._get_beneficiary_validate_model(
+                (
+                    request.beneficiary.currency
+                    if request.beneficiary.currency
+                    else beneficiary.currency  # type: ignore[union-attr]
+                ),
+                request.beneficiary.meta_data,
+                company_name=company_name,
+            )
+            beneficiary_request = self._get_beneficiary_model(
+                request.beneficiary.meta_data,
+                beneficiary_validate_request,
+                company_name=company_name,
+            )
+
+            await self._payment_client.update_beneficiary(
+                beneficiary_id=beneficiary.external_reference,  # type: ignore[union-attr]
+                new_beneficiary=beneficiary_request,
+            )
+
+        request.beneficiary.ClearField("meta_data")
+        beneficiary.MergeFrom(request.beneficiary)  # type: ignore[union-attr]
+
+        await self._beneficiaries.update(
+            beneficiary.id,  # type: ignore[union-attr]
+            beneficiary,  # type: ignore[arg-type]
+        )
+
+        return grpc_pb2.UpdateBeneficiaryResponse(beneficiary=beneficiary)
+
+    async def GetBeneficiary(  # type: ignore[override] # noqa: N802
+        self,
+        request: grpc_pb2.GetBeneficiaryRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.GetBeneficiaryResponse:
+        beneficiary = await self._beneficiaries.find_by_id(request.id)
+
+        if not beneficiary:
+            await context.abort(grpc.StatusCode.NOT_FOUND)
+
+        cc_beneficiary = await self._payment_client.get_beneficiary(
+            beneficiary_id=beneficiary.external_reference,  # type: ignore[union-attr]
+        )
+
+        return grpc_pb2.GetBeneficiaryResponse(
+            beneficiary=models_pb2.Beneficiary(
+                id=beneficiary.id,  # type: ignore[union-attr]
+                currency=beneficiary.currency,  # type: ignore[union-attr]
+                account_id=beneficiary.account_id,  # type: ignore[union-attr]
+                payment_type=beneficiary.payment_type,  # type: ignore[union-attr]
+                meta_data=self._build_meta_data_model(cc_beneficiary),
+            ),
+        )
+
+    async def ListBeneficiaries(  # type: ignore[override] # noqa: N802, WPS210, WPS231
+        self,
+        request: grpc_pb2.ListBeneficiariesRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.ListBeneficiariesResponse:
+        db_beneficiaries = await self._beneficiaries.find(
+            cursor=request.page_token,
+        )
+        db_beneficiaries.limit(request.page_size or self._default_page_size)
+
+        beneficiaries = []
+        coroutines = []
+
+        async for db_beneficiary in db_beneficiaries:
+            beneficiaries.append(db_beneficiary)
+            coroutines.append(
+                self._payment_client.get_beneficiary(
+                    beneficiary_id=db_beneficiary.external_reference,
+                ),
+            )
+        gathers = await asyncio.gather(*coroutines, return_exceptions=True)
+        response_beneficiaries = []
+        for beneficiary, cc_beneficiary in zip(beneficiaries, gathers, strict=True):
+            if isinstance(cc_beneficiary, client.CurrencyCloudError):
+                continue
+
+            beneficiary.meta_data.CopyFrom(self._build_meta_data_model(cc_beneficiary))
+            response_beneficiaries.append(
+                beneficiary,
+            )
+
+        return grpc_pb2.ListBeneficiariesResponse(
+            beneficiaries=response_beneficiaries,
+            next_page_token=await db_beneficiaries.cursor(),
+        )
+
+    def _get_beneficiary_validate_model(
+        self,
+        currency: str,
+        meta_data: models_pb2.MetaData,
+        company_name: str | None,
+    ) -> client.BeneficiaryValidateRequest:
+        bank_details = meta_data.bank_details
+        beneficiary_address = meta_data.beneficiary_address
+        bank_address = bank_details.address
+        return client.BeneficiaryValidateRequest(
+            bank_country=bank_address.region_code,
+            currency=currency,
+            beneficiary_company_name=company_name,
+            beneficiary_address=list(beneficiary_address.address_lines),
+            beneficiary_country=beneficiary_address.region_code,
+            account_number=(
+                bank_details.account_number if bank_details.account_number else None
+            ),
+            routing_code_type_1=bank_details.aba and "aba",
+            routing_code_value_1=bank_details.aba,
+            bic_swift=bank_details.bic_swift if bank_details.bic_swift else None,
+            iban=bank_details.iban if bank_details.iban else None,
+            bank_address=list(bank_address.address_lines),
+            bank_name=bank_details.name,
+            bank_account_type=bank_details.account_type,
+            beneficiary_city=beneficiary_address.locality,
+            beneficiary_postcode=beneficiary_address.postal_code,
+            beneficiary_state_or_province=beneficiary_address.administrative_area,
+            payment_types=[bank_details.payment_types],
+        )
+
+    def _get_beneficiary_model(
+        self,
+        meta_data: models_pb2.MetaData,
+        validated_beneficiary: client.BeneficiaryValidateRequest,
+        company_name: str | None,
+    ) -> client.BeneficiaryRequest:
+        return client.BeneficiaryRequest(
+            **validated_beneficiary.dict(),
+            name=company_name,
+            bank_account_holder_name=meta_data.bank_account_holder_name,
+            email=meta_data.email,
+        )
+
+    def _build_meta_data_model(
+        self,
+        cc_beneficiary: BeneficiaryResponse,
+    ) -> models_pb2.MetaData:
+        return models_pb2.MetaData(
+            bank_account_holder_name=cc_beneficiary.bank_account_holder_name,
+            email=cc_beneficiary.email,  # type: ignore[arg-type]
+            beneficiary_address=postal_address_pb2.PostalAddress(
+                address_lines=cc_beneficiary.beneficiary_address,
+                region_code=cc_beneficiary.beneficiary_country,  # type: ignore[arg-type]
+                postal_code=cc_beneficiary.beneficiary_postcode or "",
+                locality=cc_beneficiary.beneficiary_city,  # type: ignore[arg-type]
+                administrative_area=cc_beneficiary.beneficiary_state_or_province,  # type: ignore[arg-type]
+            ),
+            bank_details=models_pb2.BankDetails(
+                name=cc_beneficiary.bank_name,  # type: ignore[arg-type]
+                bic_swift=cc_beneficiary.bic_swift,  # type: ignore[arg-type]
+                account_type=cc_beneficiary.bank_account_type,  # type: ignore[arg-type]
+                payment_types=cc_beneficiary.payment_types  # type: ignore[arg-type]
+                and cc_beneficiary.payment_types[0],
+                address=postal_address_pb2.PostalAddress(
+                    address_lines=(
+                        cc_beneficiary.bank_address[0].split(
+                            "\\n",  # noqa: WPS342
+                        )
+                        if cc_beneficiary.bank_address
+                        else None
+                    ),
+                    region_code=cc_beneficiary.bank_country,
+                ),
+                account_number=(
+                    cc_beneficiary.account_number  # type: ignore[arg-type]
+                    if cc_beneficiary.account_number
+                    else None
+                ),
+                aba=(
+                    cc_beneficiary.routing_code_value_1  # type: ignore[arg-type]
+                    if cc_beneficiary.account_number
+                    else None
+                ),
+                iban=(
+                    None  # type: ignore[arg-type]
+                    if cc_beneficiary.account_number
+                    else cc_beneficiary.iban
+                ),
+            ),
+        )

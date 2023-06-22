@@ -45,3 +45,31 @@ enum Status {
   STATUS_ENABLED_NO_TRADING = 2;
   STATUS_DISABLED = 3;
 }
+message BankDetails {
+  string name = 1;
+  string bic_swift = 2;
+  string account_type = 3;
+  string payment_types = 4;
+  snowfall.stdlib.v1.PostalAddress address = 5;
+  string account_number = 6;
+  string aba = 7;
+  string iban = 8;
+}
+
+message MetaData {
+  string bank_account_holder_name = 1;
+  string email = 2;
+  snowfall.stdlib.v1.PostalAddress beneficiary_address = 3;
+  BankDetails bank_details = 4;
+}
+
+message Beneficiary {
+  string id = 1;
+  string external_reference = 2;
+  string account_id = 3;
+  string created_by = 4;
+  string updated_by = 5;
+  string payment_type = 6;
+  string currency = 7;
+  MetaData meta_data = 8;
+}

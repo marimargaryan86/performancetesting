@@ -25,7 +25,7 @@ class BeneficiaryValidate(CamelCaseBaseModel):
 
 
 class Beneficiary(BeneficiaryValidate):
-    name: str
+    name: str | None
     bank_account_holder_name: str
     email: str | None = None
 

@@ -6,7 +6,8 @@ from motor import motor_asyncio
 from pydantic import AnyUrl
 
 from snowfall.project.pay.service.companies import cron_jobs, grpc, repositories
-from snowfall.stdlib import service
+from snowfall.project.pay.service.pay_api.repositories import CurrencyRepository
+from snowfall.stdlib import money, service
 from snowfall.stdlib.transport.grpc import server
 from snowfall.vendor.currency_cloud.client import CurrencyCloudAuth, PaymentClient
 
@@ -15,9 +16,11 @@ class _GrpcSettings(service.Settings):
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
     mongo_dsn: Sequence[AnyUrl]
+    currencies_address: str
     cc_login: str
     cc_api_key: str
     cc_address: str
+    currencies: Sequence[money.Currency]
 
 
 class _AccountSyncSettings(service.Settings):
@@ -50,8 +53,28 @@ async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
                 ),
             ),
             grpc.AccountsService(
-                accounts=repositories.AccountsRepository(mongo.accounts.accounts),
+                accounts=repositories.AccountsRepository(mongo.companies.accounts),
                 payment_client=payment_client,
+            ),
+            grpc.BeneficiariesService(
+                beneficiaries=repositories.BeneficiaryRepository(
+                    mongo.companies.beneficiaries,
+                ),
+                companies=repositories.CompaniesRepository(
+                    mongo.companies.companies,
+                ),
+                accounts=repositories.AccountsRepository(mongo.companies.accounts),
+                currencies=CurrencyRepository(
+                    app.settings.currencies,
+                ),
+                payment_client=PaymentClient(
+                    base_url=app.settings.cc_address,
+                    auth=CurrencyCloudAuth(
+                        base_url=app.settings.cc_address,
+                        login_id=app.settings.cc_login,
+                        api_key=app.settings.cc_api_key,
+                    ),
+                ),
             ),
         ],
     )

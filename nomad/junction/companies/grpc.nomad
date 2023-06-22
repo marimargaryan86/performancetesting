@@ -71,7 +71,14 @@ job "companies-grpc" {
       tags = ["grpc"]
 
       connect {
-        sidecar_service {}
+        sidecar_service {
+          proxy {
+            upstreams {
+              local_bind_port  = 8020
+              destination_name = "currencies-${var.environment}"
+            }
+          }
+        }
       }
 
       check {
@@ -106,7 +113,8 @@ job "companies-grpc" {
         env         = true
         change_mode = "restart"
         data        = <<EOH
-MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
+MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}}
+CURRENCIES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_currencies-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/currencycloud" }}
 CC_LOGIN={{ .Data.data.cc_login }}
 CC_API_KEY={{ .Data.data.cc_api_key }}
@@ -134,6 +142,7 @@ EOH
         GRPC_PORT       = "${NOMAD_PORT_grpc}"
         SENTRY_DSN      = "https://29671bbbf0174dc895a038d20b89d269@sentry.snowfall.se/157"
         PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
+        CURRENCIES      = "AUD JPY SAR BHD KES SGD BGN KWD ZAR CAD SEK CNY CHF CZK NZD THB DKK NOK TRY EUR OMR UGX HKD GBP HUF PLN AED QAR USD RON ILS"
         CC_ADDRESS      = "${var.cc_address}"
       }
     }

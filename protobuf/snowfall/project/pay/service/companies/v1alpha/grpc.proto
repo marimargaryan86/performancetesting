@@ -25,6 +25,13 @@ service ContactsService {
   rpc GetContact(GetContactRequest) returns (GetContactResponse) {}
 }
 
+service BeneficiariesService {
+  rpc CreateBeneficiary(CreateBeneficiaryRequest) returns (CreateBeneficiaryResponse) {}
+  rpc GetBeneficiary(GetBeneficiaryRequest) returns (GetBeneficiaryResponse) {}
+  rpc UpdateBeneficiary(UpdateBeneficiaryRequest) returns (UpdateBeneficiaryResponse) {}
+  rpc ListBeneficiaries(ListBeneficiariesRequest) returns (ListBeneficiariesResponse) {}
+}
+
 message CreateContactRequest {
   Contact contact = 1;
 }
@@ -109,4 +116,37 @@ message UpdateAccountStatusRequest {
 
 message UpdateAccountStatusResponse {
   Account account = 1;
+}
+message CreateBeneficiaryRequest {
+  Beneficiary beneficiary = 1;
+}
+
+message CreateBeneficiaryResponse {
+  Beneficiary beneficiary = 1;
+}
+
+message GetBeneficiaryRequest {
+  string id = 1;
+}
+
+message GetBeneficiaryResponse {
+  Beneficiary beneficiary = 1;
+}
+
+message UpdateBeneficiaryRequest {
+  Beneficiary beneficiary = 1;
+}
+
+message UpdateBeneficiaryResponse {
+  Beneficiary beneficiary = 1;
+}
+
+message ListBeneficiariesRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+}
+
+message ListBeneficiariesResponse {
+  repeated Beneficiary beneficiaries = 1;
+  string next_page_token = 2;
 }
