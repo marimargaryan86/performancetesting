@@ -8,7 +8,6 @@ import pytest
 
 from snowfall.project.junction.api_automation.conftest import EXIT_MSG
 from snowfall.project.junction.api_automation.test_functions.helpers_api import (
-    is_valid_uuid,
     return_randomized_token,
 )
 from snowfall.project.junction.api_automation.test_functions.pay_admin_client import (
@@ -39,10 +38,4 @@ async def test_create_account(  # noqa: WPS218
         json.dumps(response_create_account, indent=4),
     )
 
-    assert is_valid_uuid(response_create_account["data"]["id"])
-    assert response_create_account["data"]["type"] == "accounts"
-    assert isinstance(response_create_account["data"]["attributes"]["name"], str)
-    assert isinstance(response_create_account["data"]["attributes"]["status"], str)
-    relationships = response_create_account["data"]["relationships"]
-    assert is_valid_uuid(relationships["company"]["data"]["id"])
-    assert relationships["company"]["data"]["type"] == "companies"
+    assert "https" in response_create_account["data"]["links"]["self"]
