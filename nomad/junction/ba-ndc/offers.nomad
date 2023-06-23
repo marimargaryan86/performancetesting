@@ -43,7 +43,7 @@ job "ba-ndc-offers" {
     auto_revert       = true
     auto_promote      = true
     canary            = 1
-    healthy_deadline  = "30s"
+    healthy_deadline  = "60s"
     progress_deadline = "2m"
   }
 
@@ -80,7 +80,7 @@ job "ba-ndc-offers" {
       check {
         type     = "http"
         path     = "/"
-        interval = "30s"
+        interval = "60s"
         timeout  = "4s"
       }
     }
