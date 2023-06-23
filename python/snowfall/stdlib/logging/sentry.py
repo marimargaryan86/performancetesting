@@ -4,7 +4,7 @@ from typing import Any
 
 import sentry_sdk
 import structlog
-from sentry_sdk.integrations import asyncio, logging
+from sentry_sdk.integrations import logging as sentry_logging
 
 Integrations = Sequence[sentry_sdk.integrations.Integration]
 _DEFAULT_TRACE_SAMPLE_RATE = 0.05
@@ -30,8 +30,7 @@ def configure_sentry(
     **kwargs: Any,
 ) -> None:
     integrations: Integrations = [
-        logging.LoggingIntegration(event_level=None, level=None),
-        asyncio.AsyncioIntegration(),
+        sentry_logging.LoggingIntegration(event_level=None, level=None),
     ]
 
     if additional_integrations:
