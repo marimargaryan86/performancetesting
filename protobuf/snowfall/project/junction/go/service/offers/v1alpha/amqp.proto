@@ -24,6 +24,7 @@ message TripPriceQuoteTask {
   string price_quote_container_id = 1;
   string option_id = 2;
   string session_token = 3;
+  string reseller_id = 4;
 }
 
 message TripPriceQuoteResult {

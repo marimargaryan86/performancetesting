@@ -14,12 +14,13 @@ from snowfall.stdlib.format import protobuf
 
 class Client(abc.ABC):
     @abc.abstractmethod
-    async def create(
+    async def create(  # noqa: WPS211
         self,
         offer_id: str,
         option_ids: Sequence[str],
         session_token: str,
         pay_company_id: str,
+        reseller_id: str,
     ) -> models_pb2.PriceQuoteContainer:
         """Create a price quote."""
 
@@ -34,12 +35,13 @@ class DictClient(Client):
             price_quote.id: price_quote for price_quote in price_quotes
         }
 
-    async def create(
+    async def create(  # noqa: WPS211
         self,
         offer_id: str,
         option_ids: Sequence[str],
         session_token: str,
         pay_company_id: str,
+        reseller_id: str,
     ) -> models_pb2.PriceQuoteContainer:
         expires_at = datetime.datetime.now(datetime.UTC) + datetime.timedelta(
             days=1,
@@ -79,12 +81,13 @@ class GrpcClient(Client):
         self._price_quotes = price_quotes
         self._timeout = timeout
 
-    async def create(
+    async def create(  # noqa: WPS211
         self,
         offer_id: str,
         option_ids: Sequence[str],
         session_token: str,
         pay_company_id: str,
+        reseller_id: str,
     ) -> models_pb2.PriceQuoteContainer:
         response = await errors.handle_grpc_errors(
             self._price_quotes.CreatePriceQuote(
@@ -93,6 +96,7 @@ class GrpcClient(Client):
                     option_ids=option_ids,
                     session_token=session_token,
                     pay_company_id=pay_company_id,
+                    reseller_id=reseller_id,
                 ),
                 timeout=self._timeout,
             ),

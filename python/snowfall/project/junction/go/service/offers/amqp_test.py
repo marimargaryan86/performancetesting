@@ -59,7 +59,7 @@ async def test_original_id_is_always_published() -> None:  # noqa: WPS210
         id="price-quote-container-id",
         session_token="a-session-token",
     )
-    await to_test.publish(price_quote_container)
+    await to_test.publish(price_quote_container, "reseller_id")
 
     publish_calls = mock_producer.publish.mock_calls
     assert mock_producer.publish.call_count == 2

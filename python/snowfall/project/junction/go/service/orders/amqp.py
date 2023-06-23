@@ -10,6 +10,7 @@ class OrderProducer(object):
         self,
         journey: models_pb2.Journey,
         order: models_pb2.Order,
+        reseller_id: str,
     ) -> None:
         for booking in order.bookings:
             await self._producer.publish(
@@ -24,6 +25,7 @@ class OrderProducer(object):
                         booking_id=booking.id,
                         passenger_name_record=journey.passenger_name_record,
                     ),
+                    reseller_id=reseller_id,
                 ),
                 "orders.offers",
             )

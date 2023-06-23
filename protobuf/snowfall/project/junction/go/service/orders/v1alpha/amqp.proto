@@ -13,6 +13,7 @@ message PlaceOrderTask {
   repeated Passenger passengers = 3;
   OrderMetadata metadata = 4;
   snowfall.stdlib.v1.PostalAddress residence_address = 5;
+  string reseller_id = 6;
 }
 
 message OrderMetadata {

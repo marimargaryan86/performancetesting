@@ -56,6 +56,7 @@ class PriceQuoteProducer(object):
     async def publish(
         self,
         price_quote_container: models_pb2.PriceQuoteContainer,
+        reseller_id: str,
     ) -> None:
         options = await self._offers_options_repository.find(
             list(price_quote_container.option_ids),
@@ -73,6 +74,7 @@ class PriceQuoteProducer(object):
                         price_quote_container_id=price_quote_container.id,
                         option_id=option_id,
                         session_token=price_quote_container.session_token,
+                        reseller_id=reseller_id,
                     ),
                     routing_key=self._routing_key,
                 )

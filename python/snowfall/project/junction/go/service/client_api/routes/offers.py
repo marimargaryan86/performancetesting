@@ -479,7 +479,10 @@ class PriceQuotes(object):
     _price_quotes_client: price_quotes.Client
     _reseller_pay_companies: Mapping[str, str]
 
-    async def post(self, request: messages.Request) -> responses.Response:
+    async def post(  # noqa: WPS210
+        self,
+        request: messages.Request,
+    ) -> responses.Response:
         offer_id = cast(str, request.body["offer"])
 
         try:
@@ -512,6 +515,7 @@ class PriceQuotes(object):
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             )
 
+        reseller_id = request.starlette_request.user.username
         price_quote = await self._price_quotes_client.create(
             offer_id=offer_id,
             option_ids=option_ids,
@@ -525,10 +529,11 @@ class PriceQuotes(object):
             pay_company_id=cast(
                 str,
                 self._reseller_pay_companies.get(
-                    request.starlette_request.user.username,
+                    reseller_id,
                     "",
                 ),
             ),
+            reseller_id=reseller_id,
         )
 
         return await messages.create_response(

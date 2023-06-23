@@ -137,6 +137,7 @@ class OrderService(
         await self._publisher.publish(
             journey=journey,  # type: ignore[arg-type]
             order=order,
+            reseller_id=journey.reseller_id,  # type: ignore[union-attr]
         )
 
         return orders_pb2.PlaceOrderResponse(order=order)

@@ -172,6 +172,7 @@ message CreatePriceQuoteRequest {
   repeated string option_ids = 2;
   string session_token = 3;
   string pay_company_id = 4;
+  string reseller_id = 5;
 }
 
 message CreatePriceQuoteResponse {
