@@ -18,13 +18,9 @@ from snowfall.project.junction.api_automation.test_functions.pay_admin_client im
 )
 from snowfall.stdlib import string
 from snowfall.vendor.currency_cloud.client import CurrencyCloudAuth, PaymentClient
-from snowfall.vendor.junction.auth import UserAuth
 from snowfall.vendor.junction.pay.client import Client as PayClient
 
 logger = logging.getLogger()
-
-PAY_TEST_ACCOUNT01 = "7e249624-535d-418a-8009-0908675136e1"
-PAY_TEST_ACCOUNT02 = "026b616f-8e6b-42e4-abc7-559ef58a4d69"
 
 
 @pytest.fixture()
@@ -48,52 +44,6 @@ async def pay_create_account(
         json.dumps(response_create_account, indent=4),
     )
     return response_create_account
-
-
-@pytest.fixture()
-async def pay_create_beneficiary(
-    pay_admin_client: PayAdminClient,
-) -> dict[str, Any]:
-    try:
-        response_create_beneficiary = await pay_admin_client.create_beneficiary(
-            bank_account_holder_name="EUR test Account Holder",
-            email="example@example.com",
-            beneficiary_address_lines=[
-                "Radhuset",
-                "Våksalagatan 2",
-                "United Spaces",
-                "Sweden",
-            ],
-            beneficiary_country_code="DE",
-            bank_name="mBank S.A.",
-            account_type="checking",
-            payment_types="priority",
-            bank_address_lines=[
-                "mBank S.A.",
-                "Bankowość detaliczna",
-                "Skrytka Pocztowa 2108",
-                "90-959",
-                "Łódź 2",
-            ],
-            bank_country_code="DE",
-            currency_id="EUR",
-            account_id=PAY_TEST_ACCOUNT01,
-            beneficiary_postal_code="12345",
-            beneficiary_city="Uppsala",
-            bic_swift="BREXPLPWMBK",
-            iban="DE89370400440532013000",
-        )
-    except httpx.HTTPStatusError as err:
-        logger.info("response_create_beneficiary err: %s", err.response.headers)
-        logger.info("response_create_beneficiary body: %s", err.response.json())
-        err_msg = json.dumps(err.response.json(), indent=4)
-        pytest.fail(err_msg, pytrace=False)
-
-    logger.info(
-        "create_beneficiary: %s",
-        json.dumps(response_create_beneficiary, indent=4),
-    )
-    return response_create_beneficiary
 
 
 @pytest.fixture()
@@ -316,34 +266,6 @@ async def pay_list_payments(
 
 
 @pytest.fixture()
-def pay_client(
-    api_token: str,
-    host: str,
-) -> PayClient:
-    email = get_variable_value(host, api_token, "pay_api_test_email")
-    password = get_variable_value(host, api_token, "pay_api_test_password")
-    base_url_admin_api = "{0}{1}".format(
-        HTTPS_PREFIX,
-        get_variable_value(host, api_token, "pay_admin_api_host"),
-    )
-    base_url = "{0}{1}".format(
-        HTTPS_PREFIX,
-        get_variable_value(host, api_token, "pay_api_host"),
-    )
-
-    auth = UserAuth(
-        base_url=base_url_admin_api,
-        email=email,
-        password=password,
-    )
-
-    return PayClient(
-        base_url=base_url,
-        auth=auth,
-    )
-
-
-@pytest.fixture()
 def payment_test_client(
     api_token: str,
     host: str,
@@ -419,31 +341,6 @@ expected_currencies_list = [
     "AED",
     "USD",
 ]
-
-
-@pytest.fixture()
-def pay_admin_client(
-    api_token: str,
-    host: str,
-) -> PayAdminClient:
-    email = get_variable_value(host, api_token, "pay_api_test_email")
-    password = get_variable_value(host, api_token, "pay_api_test_password")
-
-    base_url_admin_api = "{0}{1}".format(
-        HTTPS_PREFIX,
-        get_variable_value(host, api_token, "pay_admin_api_host"),
-    )
-
-    auth = UserAuth(
-        base_url=base_url_admin_api,
-        email=email,
-        password=password,
-    )
-
-    return PayAdminClient(
-        base_url=base_url_admin_api,
-        auth=auth,
-    )
 
 
 @pytest.fixture()

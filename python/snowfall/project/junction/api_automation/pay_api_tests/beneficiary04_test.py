@@ -4,7 +4,7 @@ import logging
 import httpx
 import pytest
 
-from snowfall.project.junction.api_automation.pay_api_tests.conftest import (
+from snowfall.project.junction.api_automation.conftest import (
     PAY_TEST_ACCOUNT01,
     PAY_TEST_ACCOUNT02,
 )

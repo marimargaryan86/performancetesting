@@ -68,9 +68,7 @@ async def test_create_payment_amount(
             reason="Payment for API test purposes",
             reference="Reference for API test purposes",
             payment_at=str(
-                (
-                    datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(days=1)
-                ).date(),
+                (datetime.datetime.now(tz=datetime.UTC)).date(),
             ),
             beneficiary_id=pay_create_beneficiary["data"]["id"],
             transactions_ids=[],
@@ -100,9 +98,7 @@ async def test_create_payment_transactions(
             reason="Payment for API test purposes",
             reference="Reference for API test purposes",
             payment_at=str(
-                (
-                    datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(days=1)
-                ).date(),
+                (datetime.datetime.now(tz=datetime.UTC)).date(),
             ),
             beneficiary_id=pay_create_beneficiary["data"]["id"],
             transactions_ids=[

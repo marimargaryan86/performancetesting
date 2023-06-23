@@ -4,9 +4,7 @@ import logging
 import httpx
 import pytest
 
-from snowfall.project.junction.api_automation.pay_api_tests.conftest import (
-    PAY_TEST_ACCOUNT01,
-)
+from snowfall.project.junction.api_automation.conftest import PAY_TEST_ACCOUNT01
 from snowfall.project.junction.api_automation.test_functions.helpers_api import (
     is_valid_uuid,
 )
