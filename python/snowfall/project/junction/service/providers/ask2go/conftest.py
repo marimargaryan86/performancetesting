@@ -6,6 +6,7 @@ import hashlib
 import json
 from collections.abc import AsyncIterator, Iterator
 from typing import Any, cast
+from unittest import mock
 
 import httpx
 import pytest
@@ -27,6 +28,7 @@ from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.vendor.ask2go import client
+from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
 
 def load_json_fixture(
@@ -115,10 +117,16 @@ async def http_client(magic_mocker: MagicMocker) -> AsyncIterator[httpx.AsyncCli
 
 @pytest.fixture()
 def ask2go_client(http_client: httpx.AsyncClient) -> client.Ask2GoClient:
+    mock_rate_limit_client = mock.create_autospec(
+        RateLimitClient,
+        spec_set=True,
+        instance=True,
+    )
     return client.Ask2GoClient(
         api_base_url="https://test_url",
         api_booking_base_url="https://test_url",
         http_client=http_client,
+        rate_limit_client=mock_rate_limit_client,
     )
 
 

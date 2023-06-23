@@ -90,6 +90,10 @@ class TimeOutError(RequestError):
     """Raised when a request times out."""
 
 
+class AsyncTimeOutError(Ask2GoError):
+    """Raised when the async function exceeds the timeout duration."""
+
+
 def _get_response_error_message(response: httpx.Response) -> str:
     status = http.HTTPStatus(response.status_code)
     description = status.description

@@ -82,7 +82,14 @@ job "ask2go-grpc" {
       tags = ["metrics"]
 
       connect {
-        sidecar_service {}
+        sidecar_service {
+          proxy {
+            upstreams {
+              local_bind_port  = 9081
+              destination_name = "rate-limiter-grpc-${var.environment}"
+            }
+          }
+        }
       }
 
       check {
@@ -101,6 +108,8 @@ job "ask2go-grpc" {
 
       template {
         data        = <<EOH
+RATE_LIMITER_GRPC_HOST={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_rate-limiter-grpc-${var.environment}"))}}
+RATE_LIMITER_SERVICE_CONFIGS={{keyOrDefault "${var.environment}/providers/ask2go/rate-limiter-service-configs" "{}" | toJSON }}
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 MONGO_DSN={{range $index, $service := service (printf "mongodb-%s" (env "NOMAD_NAMESPACE"))}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}

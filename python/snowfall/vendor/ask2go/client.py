@@ -1,3 +1,5 @@
+import asyncio
+import inspect
 from collections.abc import Sequence
 from typing import Any
 
@@ -14,6 +16,7 @@ from snowfall.vendor.ask2go.models import (
     validate_offer_criteria,
     validated_offer,
 )
+from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
 
 class Ask2GoClient(object):  # noqa: WPS214
@@ -22,10 +25,12 @@ class Ask2GoClient(object):  # noqa: WPS214
         api_base_url: str,
         api_booking_base_url: str,
         http_client: httpx.AsyncClient,
+        rate_limit_client: RateLimitClient | None = None,
     ) -> None:
         self._api_base_url = httpx.URL(api_base_url)
         self._api_booking_base_url = httpx.URL(api_booking_base_url)
         self._http_client = http_client
+        self._rate_limit_client = rate_limit_client
 
     async def get_airports(self) -> list[common.Airport]:
         response = await self._make_request(
@@ -40,6 +45,7 @@ class Ask2GoClient(object):  # noqa: WPS214
     async def create_search(
         self,
         criteria: search.CreateSearchCriteria,
+        rate_limit_timeout: float = 60,
     ) -> search.CreateSearchResponse:
         if criteria.inbound_date and criteria.inbound_date < criteria.outbound_date:
             raise errors.DateError(
@@ -56,6 +62,7 @@ class Ask2GoClient(object):  # noqa: WPS214
                 path="/api/search",
             ),
             payload=parsers.parse_search_request(criteria),
+            rate_limit_timeout=rate_limit_timeout,
         )
 
         return search.CreateSearchResponse(**response.json())
@@ -65,6 +72,7 @@ class Ask2GoClient(object):  # noqa: WPS214
         transaction_id: str,
         search_id: str,
         page_offset: int,
+        rate_limit_timeout: float = 60,
     ) -> search.SearchResultsResponse:
         response = await self._make_request(
             "GET",
@@ -75,10 +83,12 @@ class Ask2GoClient(object):  # noqa: WPS214
                     page_offset=page_offset,
                 ),
             ),
+            rate_limit_timeout=rate_limit_timeout,
         )
 
         return search.SearchResultsResponse(**response.json())
 
+    # Orders
     async def update_booking_billing_address(
         self,
         booking_ref_id: str,
@@ -100,6 +110,7 @@ class Ask2GoClient(object):  # noqa: WPS214
 
         return booking.Booking(**response.json())
 
+    # Orders
     async def create_booking(
         self,
         pricing_id: str,
@@ -122,6 +133,7 @@ class Ask2GoClient(object):  # noqa: WPS214
 
         return booking.Booking(**response.json())
 
+    # Orders
     async def get_booking(
         self,
         booking_ref_id: str,
@@ -181,12 +193,14 @@ class Ask2GoClient(object):  # noqa: WPS214
 
         return price.OfferPriceResponse(**response.json())
 
+    # pricing
     async def create_air_offer_async(
         self,
         search_id: str,
         offer_id: str,
         transaction_id: str | None = None,
         brand_id: str | None = None,
+        rate_limit_timeout: float = 60,
     ) -> price.AsyncOfferPriceResponse:
         response = await self._make_request(
             "PUT",
@@ -197,14 +211,17 @@ class Ask2GoClient(object):  # noqa: WPS214
                 **({"brandId": brand_id} if brand_id else {}),
                 **({"transactionId": transaction_id} if transaction_id else {}),
             },
+            rate_limit_timeout=rate_limit_timeout,
         )
 
         return price.AsyncOfferPriceResponse(**response.json())
 
+    # pricing
     async def get_air_offer_result(
         self,
         transaction_id: str,
         pricing_id: str,
+        rate_limit_timeout: float = 60,
     ) -> price.OfferPriceResponse | None:
         response = await self._make_request(
             "GET",
@@ -214,6 +231,7 @@ class Ask2GoClient(object):  # noqa: WPS214
                     pricing_id=pricing_id,
                 ),
             ),
+            rate_limit_timeout=rate_limit_timeout,
         )
 
         json_data = response.json()
@@ -280,12 +298,18 @@ class Ask2GoClient(object):  # noqa: WPS214
         )
         return seat_map.SeatMapResponse(**response.json())
 
-    async def _make_request(
+    async def _make_request(  # noqa: WPS238
         self,
         method: str,
         url: httpx.URL,
         payload: Any | None = None,
+        rate_limit_timeout: float = 60,
     ) -> httpx.Response:
+        if self._rate_limit_client:
+            try:
+                await self._rate_limit_client.rate_limit(timeout=rate_limit_timeout)
+            except asyncio.TimeoutError as raw_exc:
+                raise errors.AsyncTimeOutError(inspect.getdoc(raw_exc)) from raw_exc
         try:
             response = await self._http_client.request(
                 method=method,

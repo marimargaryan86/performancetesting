@@ -43,6 +43,8 @@ from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer, types
 from snowfall.vendor.ask2go import client
 from snowfall.vendor.ask2go.models import search as search_models
+from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
+from snowfall.vendor.rate_limiter.config import RateLimitConfig
 
 
 class _OrdersSettings(service.Settings):
@@ -68,6 +70,8 @@ class _Settings(service.ProviderSettings):
     mongo_dsn: Sequence[pydantic.AnyUrl]
     reseller_affiliate_mapping: dict[str, str] = {}
     storage_dsn: service.AnyDsn
+    rate_limiter_grpc_host: str
+    rate_limiter_service_configs: dict[str, RateLimitConfig]
 
 
 class _PriceQuotesSettings(service.PriceQuoteSettings):
@@ -80,6 +84,8 @@ class _PriceQuotesSettings(service.PriceQuoteSettings):
     poll_retries_limit: int = 10
     wait_time_between_polling: float = 1
     mongo_dsn: Sequence[pydantic.AnyUrl]
+    rate_limiter_grpc_host: str
+    rate_limiter_service_configs: dict[str, RateLimitConfig]
 
 
 class _SeatMapsSettings(service.Settings):
@@ -94,7 +100,6 @@ _Impl = offers.OfferSearchImplementation[
     amqp_pb2.SearchCriteriaTask,
     search_models.CreateSearchCriteria,
 ]
-
 
 _PROVIDER_ID = uuid.UUID("4b7d12db-7735-4c67-9645-5fc82f7c4fe8")
 _PROVIDER_NAME = "Ask2Go"
@@ -117,10 +122,18 @@ async def _offers(
     )
     logging.register(http_client)
     metrics.register(http_client)
+    rate_limit_client = await stack.enter_async_context(
+        RateLimitClient(
+            app.settings.rate_limiter_grpc_host,
+            app.settings.rate_limiter_service_configs["ask2go"],
+        ),
+    )
+
     ask2go_client = client.Ask2GoClient(
         api_base_url=app.settings.api_base_url,
         api_booking_base_url=app.settings.api_booking_base_url,
         http_client=http_client,
+        rate_limit_client=rate_limit_client,
     )
     search_adapter = search.Adapter(
         ask2go_client=ask2go_client,
@@ -245,6 +258,13 @@ async def _price_quotes(app: service.AsyncApplication[_PriceQuotesSettings]) -> 
     )
     logging.register(http_client)
     metrics.register(http_client)
+    rate_limit_client = await app.stack.enter_async_context(
+        RateLimitClient(
+            app.settings.rate_limiter_grpc_host,
+            app.settings.rate_limiter_service_configs["ask2go"],
+        ),
+    )
+
     redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
         aioredis.from_url(
             random.choice(app.settings.redis_dsn),  # nosec
@@ -258,6 +278,7 @@ async def _price_quotes(app: service.AsyncApplication[_PriceQuotesSettings]) -> 
         api_base_url=app.settings.api_base_url,
         api_booking_base_url=app.settings.api_booking_base_url,
         http_client=http_client,
+        rate_limit_client=rate_limit_client,
     )
 
     await consumer.PriceQuoteConsumer(
