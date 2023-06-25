@@ -6,6 +6,7 @@ from pydantic import AnyUrl
 from snowfall.adapter import authentication
 from snowfall.project.pay.adapter import (
     accounts,
+    companies,
     conversions,
     currencies,
     payments,
@@ -63,6 +64,7 @@ def create_admin_dependencies(  # noqa: WPS211
     beneficiaries_repository: BeneficiaryRepository,
     transactions_repository: TransactionRepository,
     accounts_client: accounts.GrpcClient,
+    companies_client: companies.GrpcClient,
     cc_payment_client: client.PaymentClient,
     transactions_client: transactions.Client,
     conversions_client: conversions.Client,
@@ -78,6 +80,7 @@ def create_admin_dependencies(  # noqa: WPS211
     container[CurrencyRepository] = currencies_repository
     container[BeneficiaryRepository] = beneficiaries_repository
     container[accounts.GrpcClient] = accounts_client
+    container[companies.GrpcClient] = companies_client
     container[transactions.Client] = transactions_client  # type: ignore[type-abstract]
     container[conversions.Client] = conversions_client  # type: ignore[type-abstract]
     container[payments.GrpcClient] = payments_client

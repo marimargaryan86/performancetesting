@@ -1,11 +1,15 @@
 import datetime
 
+from snowfall.project.pay.service.companies.v1alpha import (
+    models_pb2 as company_model_pb2,
+)
 from snowfall.project.pay.service.payments.v1alpha import models_pb2
 from snowfall.project.pay.service.transactions.v1alpha import (
     models_pb2 as transactions_models_pb2,
 )
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.v1.postal_address_pb2 import PostalAddress
 
 NOT_FOUND = "00000000-0000-0000-0000-000000000000"
 CONVERSIONS = (
@@ -17,9 +21,31 @@ PAYMENTS = (
     "d184081a-92bd-4ec8-af9a-1faaa8dfbbeb",
 )
 
+COMPANIES = (
+    "5a93b5ae-9590-4561-a664-fbaead485e96",
+    "d184081a-92bd-4ec8-af9a-1faaa8dfbbeb",
+)
+
+ACCOUNTLESS_COMPANIES = (
+    "1a93b5ae-9590-4561-a664-fbaead485e96",
+    "b184081a-92bd-4ec8-af9a-1faaa8dfbbeb",
+)
+
 
 def get_payments() -> list[models_pb2.Payment]:
     return [generate_payment(identifier) for identifier in PAYMENTS]
+
+
+def get_companies() -> list[company_model_pb2.Company]:
+    companies = [generate_company(identifier) for identifier in COMPANIES]
+    companies.extend(
+        [
+            generate_accountless_company(identifier)
+            for identifier in ACCOUNTLESS_COMPANIES
+        ],
+    )
+
+    return companies
 
 
 def generate_payment(identifier: str) -> models_pb2.Payment:
@@ -54,3 +80,27 @@ def generate_conversion(identifier: str) -> transactions_models_pb2.Conversion:
         sell_amount=gbp.protobuf(),
         executed_rate=1,
     )
+
+
+def generate_accountless_company(identifier: str) -> company_model_pb2.Company:
+    return company_model_pb2.Company(
+        id=identifier,
+        name="Company name",
+        fx_markup=float(1),
+        processing_markup=float(2),
+        sales_markup=float(3),
+        address=PostalAddress(
+            postal_code="123",
+            address_lines=["address1", "address2"],
+            region_code="US",
+            locality="New York",
+            revision=0,
+        ),
+    )
+
+
+def generate_company(identifier: str) -> company_model_pb2.Company:
+    company = generate_accountless_company(identifier)
+    company.account_id = string.uuid()
+
+    return company
