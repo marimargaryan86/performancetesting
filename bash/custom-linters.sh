@@ -9,41 +9,24 @@ pants run python/snowfall/script/validate_nomad_build_files.py -- "nomad/"
 
 FAILURE=0
 ENVIRONMENTS=("development" "production" "sandbox")
-CHANGED_SINCE=""
-ENFORCE_FULL_LINTING=0
-FULL_LINTING_REQUIRED=(
-	".gitlab/pants.Dockerfile"
-	"bash/lint-nomad.sh"
-	"pants.ci.toml"
-	"pants.toml"
-	"python/snowfall/script/validate_nomad_files.py"
-)
 
 declare -A SENTRY_PROJECTS
 while read -r project id; do
 	SENTRY_PROJECTS["$project"]="$id"
 done <<<"$(sentry-cli projects list | awk 'NR>4 {print last} {last=$4" "$2}')"
 
-if [[ -n "${CI_MERGE_REQUEST_DIFF_BASE_SHA+x}" ]]; then
-	CHANGED_SINCE="${CI_MERGE_REQUEST_DIFF_BASE_SHA}"
-elif [[ -n "${CI_COMMIT_BEFORE_SHA+x}" ]] && [[ "${CI_COMMIT_BEFORE_SHA}" != "0000000000000000000000000000000000000000" ]]; then
-	CHANGED_SINCE="${CI_COMMIT_BEFORE_SHA}"
-fi
+mapfile -t NOMAD_FILES < <(pants --filter-address-regex='_nomad$' peek :: | jq -r ".[] | .sources[0]")
+mapfile -t DOCKER_IMAGES < <(pants --filter-target-type='docker_image' peek :: | jq -r ".[] | .address")
 
-if [[ -n "${CI_COMMIT_SHA+x}" ]] && [[ -n "${CHANGED_SINCE}" ]]; then
-	for path in "${FULL_LINTING_REQUIRED[@]}"; do
-		if git diff --name-only -r "${CHANGED_SINCE}" "${CI_COMMIT_SHA}" | grep -q "^${path}"; then
-			ENFORCE_FULL_LINTING=1
-			break
-		fi
-	done
-fi
+for i in "${DOCKER_IMAGES[@]}"; do
+	SERVICE_NAME=$(basename "${i%:*}")
+	SERVICE_NAME="${SERVICE_NAME//_/-}"
 
-if [[ "${ENFORCE_FULL_LINTING}" -eq 1 ]] || [[ -z "${CHANGED_SINCE}" ]]; then
-	mapfile -t NOMAD_FILES < <(pants --filter-address-regex='_nomad$' peek :: | jq -r ".[] | .sources[0]")
-else
-	mapfile -t NOMAD_FILES < <(pants --changed-since="${CHANGED_SINCE}" --changed-dependents=transitive --filter-address-regex='_nomad$' peek | jq -r ".[] | .sources[0]")
-fi
+	if [[ "${SENTRY_PROJECTS[${SERVICE_NAME}]-0}" -eq 0 ]]; then
+		echo "${SERVICE_NAME}: project does not exist in Sentry"
+		FAILURE=1
+	fi
+done
 
 for f in "${NOMAD_FILES[@]}"; do
 
