@@ -74,7 +74,7 @@ def go_image(  # type: ignore[no-untyped-def]
     )
 
     # latest
-    tag_sha = "ccaef5ee2f1850270d453fdf700a5392534f8d1a8ca2acda391fbb6a06b81c86"
+    tag_sha = "73deaaf6a207c1a33850257ba74e0f196bc418636cada9943a03d7abea980d6d"
 
     docker_image(  # type: ignore[name-defined]  # noqa: F821
         name="{name}_docker".format(name=name),
@@ -120,8 +120,8 @@ def python_image(  # type: ignore[no-untyped-def]
         ),
     )
 
-    # python:3.11.3-slim-bullseye
-    tag_sha = "dcca7339f0426d2fdb33e8fbbe05cca4b39af30430602c8c894822cf81d618ab"
+    # python:3.11.4-slim-bookworm
+    tag_sha = "55221704bcc5432f978bc5184d58f54c93ad25313363a1d0db20606a4cf2aef7"
 
     docker_image(  # type: ignore[name-defined]  # noqa: F821
         name="{name}_docker".format(name=name),

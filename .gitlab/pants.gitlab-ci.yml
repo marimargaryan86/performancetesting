@@ -45,7 +45,7 @@ pants:setup:
         BAZEL_REMOTE_S3_BUCKET: snowfall-gitlab-bazel-remote-cache
         BAZEL_REMOTE_S3_ENDPOINT: s3.eu-west-2.amazonaws.com
   cache:
-    key: "python-3.11.3-go-1.19.7-scie-0.8.2-pants-2.16.0rc5-0"
+    key: "python-3.11.4-go-1.19.10-scie-0.8.2-pants-2.16.0-0"
     when: always
     policy: pull
     paths:
