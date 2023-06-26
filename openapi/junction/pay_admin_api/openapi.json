@@ -2440,7 +2440,8 @@
                     "type": "string",
                     "enum": [
                       "unspecified",
-                      "executed"
+                      "executed",
+                      "failed"
                     ],
                     "example": "executed"
                   }
