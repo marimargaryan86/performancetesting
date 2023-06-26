@@ -2,7 +2,7 @@ import pytest
 
 from snowfall.project.junction.go import fixtures
 from snowfall.project.junction.go.adapter import errors, offer_searches
-from snowfall.project.junction.go.service.offers.v1alpha import models_pb2
+from snowfall.project.junction.go.service.offers.v1 import models_pb2
 
 
 async def test_offer_search_can_be_saved(

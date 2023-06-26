@@ -4,7 +4,7 @@ import uuid
 
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.go.service.offers.v1alpha import models_pb2 as offers_pb2
+from snowfall.project.junction.go.service.offers.v1 import models_pb2 as offers_pb2
 from snowfall.project.junction.service.providers.duffel import cache, conftest
 from snowfall.project.junction.service.providers.duffel.pricing_transformer import (
     PriceQuoteTransformer,

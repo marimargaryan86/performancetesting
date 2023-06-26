@@ -1,11 +1,11 @@
 syntax = "proto3";
 
-package snowfall.project.junction.go.service.offers.v1alpha;
+package snowfall.project.junction.go.service.offers.v1;
 
-import "snowfall/project/junction/go/service/offers/v1alpha/models.proto";
+import "snowfall/project/junction/go/service/offers/v1/models.proto";
 import "snowfall/project/junction/go/v1alpha/models.proto";
 
-option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/offers/v1alpha";
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/offers/v1";
 
 service OfferSearchService {
   rpc EnqueueOfferSearch(EnqueueOfferSearchRequest) returns (EnqueueOfferSearchResponse) {}

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package snowfall.project.junction.provider.v1alpha;
 
-import "snowfall/project/junction/go/service/offers/v1alpha/amqp.proto";
+import "snowfall/project/junction/go/service/offers/v1/amqp.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/provider/v1alpha";
 
@@ -12,7 +12,7 @@ service OfferService {
 
 message SearchOffersRequest {
   oneof offer_search_task {
-    snowfall.project.junction.go.service.offers.v1alpha.TripOfferSearchTask trip_offer_search_task = 1;
+    snowfall.project.junction.go.service.offers.v1.TripOfferSearchTask trip_offer_search_task = 1;
   }
 }
 
@@ -23,5 +23,5 @@ message SearchOffersResponse {
 }
 
 message TripOfferSearchResults {
-  repeated snowfall.project.junction.go.service.offers.v1alpha.TripOfferSearchResult results = 1;
+  repeated snowfall.project.junction.go.service.offers.v1.TripOfferSearchResult results = 1;
 }

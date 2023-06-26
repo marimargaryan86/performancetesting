@@ -3,7 +3,7 @@ from unittest.mock import create_autospec
 
 from snowfall.project.junction.go.service.offers.amqp import PriceQuoteProducer
 from snowfall.project.junction.go.service.offers.offers import OfferOptionsRepository
-from snowfall.project.junction.go.service.offers.v1alpha.models_pb2 import (
+from snowfall.project.junction.go.service.offers.v1.models_pb2 import (
     Offer,
     PriceQuoteContainer,
 )

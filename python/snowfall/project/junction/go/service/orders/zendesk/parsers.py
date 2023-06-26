@@ -1,7 +1,7 @@
 from collections.abc import Mapping
 from typing import Any
 
-from snowfall.project.junction.go.service.offers.v1alpha.models_pb2 import OfferSegment
+from snowfall.project.junction.go.service.offers.v1.models_pb2 import OfferSegment
 from snowfall.project.junction.go.service.orders.v1alpha import models_pb2
 from snowfall.stdlib import money
 from snowfall.stdlib.format.protobuf import protobuf_to_datetime

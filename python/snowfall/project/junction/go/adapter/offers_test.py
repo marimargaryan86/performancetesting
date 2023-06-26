@@ -6,7 +6,7 @@ import pytest
 
 from snowfall.project.junction.go import fixtures
 from snowfall.project.junction.go.adapter import errors, offers
-from snowfall.project.junction.go.service.offers.v1alpha import (
+from snowfall.project.junction.go.service.offers.v1 import (
     grpc_pb2,
     grpc_pb2_grpc,
     models_pb2,

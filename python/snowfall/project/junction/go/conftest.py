@@ -23,7 +23,7 @@ from snowfall.project.junction.go.adapter import (
     trip_searches,
     trips,
 )
-from snowfall.project.junction.go.service.offers.v1alpha import (
+from snowfall.project.junction.go.service.offers.v1 import (
     models_pb2 as offer_models_pb2,
 )
 from snowfall.project.junction.go.v1alpha import models_pb2

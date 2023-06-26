@@ -18,8 +18,8 @@ from snowfall.project.junction.go.service.offers.pay_quotes_models import (
     PayQuoteRelationships,
     PayQuoteResponseData,
 )
-from snowfall.project.junction.go.service.offers.v1alpha import models_pb2
-from snowfall.project.junction.go.service.offers.v1alpha.amqp_pb2 import (
+from snowfall.project.junction.go.service.offers.v1 import models_pb2
+from snowfall.project.junction.go.service.offers.v1.amqp_pb2 import (
     TripOfferSearchResult,
     TripPriceQuoteResult,
 )

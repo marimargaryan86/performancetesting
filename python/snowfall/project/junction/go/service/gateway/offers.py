@@ -12,7 +12,7 @@ from snowfall.project.junction.go.service.gateway.v1alpha import (
     offers_pb2,
     offers_pb2_grpc,
 )
-from snowfall.project.junction.go.service.offers.v1alpha import amqp_pb2
+from snowfall.project.junction.go.service.offers.v1 import amqp_pb2
 from snowfall.project.junction.provider.v1alpha import offers_pb2 as providers_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence.redis import types

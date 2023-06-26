@@ -3,7 +3,7 @@ import datetime
 from collections.abc import Sequence
 
 from snowfall.project.junction.go.adapter import errors
-from snowfall.project.junction.go.service.offers.v1alpha import (
+from snowfall.project.junction.go.service.offers.v1 import (
     grpc_pb2,
     grpc_pb2_grpc,
     models_pb2,

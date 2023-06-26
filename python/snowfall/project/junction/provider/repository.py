@@ -6,10 +6,8 @@ from typing import Generic, TypeVar
 import prometheus_client
 from google.protobuf import message
 
-from snowfall.project.junction.go.service.offers.v1alpha import (
-    amqp_pb2 as offers_amqp_pb2,
-)
-from snowfall.project.junction.go.service.offers.v1alpha import models_pb2 as offers_pb2
+from snowfall.project.junction.go.service.offers.v1 import amqp_pb2 as offers_amqp_pb2
+from snowfall.project.junction.go.service.offers.v1 import models_pb2 as offers_pb2
 from snowfall.stdlib.persistence.redis import types as redis_types
 from snowfall.stdlib.v1 import amqp_pb2 as stdlib_amqp_pb2
 

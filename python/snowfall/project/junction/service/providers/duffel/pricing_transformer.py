@@ -1,4 +1,4 @@
-from snowfall.project.junction.go.service.offers.v1alpha import models_pb2 as offers_pb2
+from snowfall.project.junction.go.service.offers.v1 import models_pb2 as offers_pb2
 from snowfall.project.junction.service.providers.duffel import cache
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf

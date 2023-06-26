@@ -3,9 +3,7 @@ import random
 
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.go.service.offers.v1alpha import (
-    amqp_pb2 as offers_amqp_pb2,
-)
+from snowfall.project.junction.go.service.offers.v1 import amqp_pb2 as offers_amqp_pb2
 from snowfall.project.junction.service.providers.ba_ndc import (
     ba_ndc_helpers,
     cache,

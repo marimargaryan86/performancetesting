@@ -7,7 +7,7 @@ from collections.abc import Mapping, Sequence
 import timezonefinder
 
 from snowfall.project.junction.go.adapter import legs, offer_searches
-from snowfall.project.junction.go.service.offers.v1alpha import (
+from snowfall.project.junction.go.service.offers.v1 import (
     models_pb2 as offer_models_pb2,
 )
 from snowfall.project.junction.go.service.planner.v1alpha import (

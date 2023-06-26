@@ -1,9 +1,7 @@
 import datetime
 
-from snowfall.project.junction.go.service.offers.v1alpha import (
-    amqp_pb2 as offers_amqp_pb2,
-)
-from snowfall.project.junction.go.service.offers.v1alpha import models_pb2 as offers_pb2
+from snowfall.project.junction.go.service.offers.v1 import amqp_pb2 as offers_amqp_pb2
+from snowfall.project.junction.go.service.offers.v1 import models_pb2 as offers_pb2
 from snowfall.project.junction.go.service.orders.v1alpha import (
     amqp_pb2 as orders_amqp_pb2,
 )

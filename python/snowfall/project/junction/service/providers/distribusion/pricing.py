@@ -3,10 +3,8 @@ import datetime
 import httpx
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.go.service.offers.v1alpha import (
-    amqp_pb2 as offers_amqp_pb2,
-)
-from snowfall.project.junction.go.service.offers.v1alpha import models_pb2 as offers_pb2
+from snowfall.project.junction.go.service.offers.v1 import amqp_pb2 as offers_amqp_pb2
+from snowfall.project.junction.go.service.offers.v1 import models_pb2 as offers_pb2
 from snowfall.project.junction.service.providers.distribusion import cache, config
 from snowfall.stdlib import money, service
 from snowfall.stdlib.format import protobuf

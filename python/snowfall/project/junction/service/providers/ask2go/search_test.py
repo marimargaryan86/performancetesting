@@ -4,7 +4,7 @@ import zoneinfo
 
 import pytest
 
-from snowfall.project.junction.go.service.offers.v1alpha import models_pb2 as offers_pb2
+from snowfall.project.junction.go.service.offers.v1 import models_pb2 as offers_pb2
 from snowfall.project.junction.go.v1alpha import models_pb2
 from snowfall.project.junction.service.providers.ask2go import (
     conftest,

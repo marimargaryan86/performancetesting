@@ -16,8 +16,8 @@ from snowfall.project.junction.go.service.offers import (
     pay_quotes,
     price_quotes,
 )
-from snowfall.project.junction.go.service.offers.v1alpha import amqp_pb2
-from snowfall.project.junction.go.service.offers.v1alpha.models_pb2 import (
+from snowfall.project.junction.go.service.offers.v1 import amqp_pb2
+from snowfall.project.junction.go.service.offers.v1.models_pb2 import (
     OfferGroup,
     OfferSearch,
 )

@@ -7,7 +7,7 @@ import pydantic
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.go.service.gateway import bookings, offers, providers
-from snowfall.project.junction.go.service.offers.v1alpha import amqp_pb2
+from snowfall.project.junction.go.service.offers.v1 import amqp_pb2
 from snowfall.stdlib import service
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer, producer, types

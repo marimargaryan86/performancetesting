@@ -4,7 +4,7 @@ from collections import defaultdict
 from collections.abc import AsyncIterator, Callable, Mapping, Sequence
 from typing import Any
 
-from snowfall.project.junction.go.service.offers.v1alpha import (
+from snowfall.project.junction.go.service.offers.v1 import (
     models_pb2 as offer_models_pb2,
 )
 from snowfall.project.junction.service.providers.duffel import cache

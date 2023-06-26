@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-package snowfall.project.junction.go.service.offers.v1alpha;
+package snowfall.project.junction.go.service.offers.v1;
 
-import "snowfall/project/junction/go/service/offers/v1alpha/models.proto";
+import "snowfall/project/junction/go/service/offers/v1/models.proto";
 
-option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/offers/v1alpha";
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/offers/v1";
 
 message TripOfferSearchTask {
   string offer_search_id = 1;

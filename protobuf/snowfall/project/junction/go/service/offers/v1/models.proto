@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package snowfall.project.junction.go.service.offers.v1alpha;
+package snowfall.project.junction.go.service.offers.v1;
 
 import "google/protobuf/timestamp.proto";
 import "snowfall/project/junction/go/v1alpha/models.proto";
@@ -8,7 +8,7 @@ import "snowfall/stdlib/v1/amqp.proto";
 import "snowfall/stdlib/v1/date.proto";
 import "snowfall/stdlib/v1/money.proto";
 
-option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/offers/v1alpha";
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/offers/v1";
 
 message OfferSearch {
   string id = 1;

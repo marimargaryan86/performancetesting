@@ -6,7 +6,7 @@ from collections.abc import Mapping, Sequence
 import prometheus_client
 
 from snowfall.project.junction.go.service.offers import offers
-from snowfall.project.junction.go.service.offers.v1alpha import amqp_pb2, models_pb2
+from snowfall.project.junction.go.service.offers.v1 import amqp_pb2, models_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout

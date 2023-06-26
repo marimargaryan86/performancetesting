@@ -3,7 +3,7 @@ syntax = "proto3";
 package snowfall.project.junction.go.service.trips.v1alpha;
 
 import "google/protobuf/timestamp.proto";
-import "snowfall/project/junction/go/service/offers/v1alpha/models.proto";
+import "snowfall/project/junction/go/service/offers/v1/models.proto";
 import "snowfall/project/junction/go/v1alpha/models.proto";
 import "snowfall/stdlib/v1/amqp.proto";
 import "snowfall/stdlib/v1/datetime.proto";
@@ -127,7 +127,7 @@ message TripCandidateSearch {
   google.protobuf.Timestamp expires_at = 2 [(snowfall.stdlib.v1.read_only) = true];
   snowfall.stdlib.v1.Trackable.Status status = 3 [(snowfall.stdlib.v1.read_only) = true];
   repeated TripCandidateSearchCriteria criteria = 4;
-  repeated snowfall.project.junction.go.service.offers.v1alpha.Passenger passengers = 5;
+  repeated snowfall.project.junction.go.service.offers.v1.Passenger passengers = 5;
   repeated snowfall.project.junction.go.v1alpha.Schedule.Type allowed_segment_types = 6;
   repeated string offer_search_ids = 7 [(snowfall.stdlib.v1.read_only) = true];
   string reseller_id = 8;
@@ -151,5 +151,5 @@ message ListTripCandidatesRequest {
 
 message ListTripCandidatesResponse {
   string next_page_token = 1;
-  repeated snowfall.project.junction.go.service.offers.v1alpha.OfferAggregate offers = 2;
+  repeated snowfall.project.junction.go.service.offers.v1.OfferAggregate offers = 2;
 }

@@ -1,7 +1,7 @@
 import grpc
 
 from snowfall.project.junction.go.service.offers import amqp, offers, price_quotes
-from snowfall.project.junction.go.service.offers.v1alpha import (
+from snowfall.project.junction.go.service.offers.v1 import (
     grpc_pb2,
     grpc_pb2_grpc,
     models_pb2,
