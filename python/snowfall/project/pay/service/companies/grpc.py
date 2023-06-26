@@ -5,13 +5,13 @@ from typing import cast
 import grpc
 from pymongo.errors import DuplicateKeyError
 
+from snowfall.project.pay.adapter import currencies
 from snowfall.project.pay.service.companies import repositories
 from snowfall.project.pay.service.companies.v1alpha import (
     grpc_pb2,
     grpc_pb2_grpc,
     models_pb2,
 )
-from snowfall.project.pay.service.pay_api.repositories import CurrencyRepository
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.transport.grpc import rich_status, service
@@ -264,13 +264,13 @@ class BeneficiariesService(  # noqa: WPS214
         beneficiaries: repositories.BeneficiaryRepository,
         companies: repositories.CompaniesRepository,
         accounts: repositories.AccountsRepository,
-        currencies: CurrencyRepository,  # TODO: chenage to grpc call when it's ready
+        currencies_client: currencies.GrpcClient,
         payment_client: client.PaymentClient,
     ):
         self._beneficiaries = beneficiaries
         self._companies = companies
         self._accounts = accounts
-        self._currencies = currencies
+        self._currencies_client = currencies_client
         self._payment_client = payment_client
 
     def get_name(self) -> str:
@@ -284,16 +284,7 @@ class BeneficiariesService(  # noqa: WPS214
         request: grpc_pb2.CreateBeneficiaryRequest,
         context: grpc.aio.ServicerContext,
     ) -> grpc_pb2.CreateBeneficiaryResponse:
-        currency = self._currencies.find_by_id(request.beneficiary.currency)
-        if not currency:
-            await rich_status.abort_with_rich_status(
-                context=context,
-                status=rich_status.build_bad_request(
-                    field_name="currency",
-                    field_description="Currency is not supported",
-                ),
-            )
-
+        await self._currencies_client.get(request.beneficiary.currency)
         account = await self._accounts.find_by_id(request.beneficiary.account_id)
         if not account:
             await rich_status.abort_with_rich_status(
@@ -368,16 +359,7 @@ class BeneficiariesService(  # noqa: WPS214
             request.beneficiary.currency
             and request.beneficiary.currency != beneficiary.currency  # type: ignore[union-attr]
         ):
-            currency = self._currencies.find_by_id(request.beneficiary.currency)
-            if not currency:
-                await rich_status.abort_with_rich_status(
-                    context=context,
-                    status=rich_status.build_bad_request(
-                        field_name="currency",
-                        field_description="Currency is not supported",
-                    ),
-                )
-
+            await self._currencies_client.get(request.beneficiary.currency)
         company_name = None
         if (  # noqa: WPS337
             request.beneficiary.account_id

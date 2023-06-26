@@ -128,20 +128,6 @@ class ConversionRepository(
         )
 
 
-class CurrencyRepository(object):
-    def __init__(self, available_currencies: Sequence[money.Currency]):
-        self._currencies = available_currencies
-
-    def find(self) -> Sequence[money.Currency]:
-        return self._currencies
-
-    def find_by_id(self, currency_id: str) -> money.Currency | None:
-        for currency in self._currencies:
-            if currency.code == currency_id:
-                return currency
-        return None
-
-
 class BeneficiaryRepository(
     mixins.FindByIdMixin[Beneficiary],
     mixins.InsertMixin[Beneficiary],

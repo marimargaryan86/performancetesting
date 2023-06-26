@@ -31,7 +31,6 @@ from snowfall.project.pay.service.pay_api.repositories import (
     BeneficiaryRepository,
     CompanyRepository,
     ConversionRepository,
-    CurrencyRepository,
     TransactionRepository,
 )
 from snowfall.project.pay.service.pay_api.routes import router
@@ -78,9 +77,11 @@ def _factory(
             prefix=app.name,
         )
 
-        orders_channel = create_channel(app.settings.currencies_address)
         transactions_channel = create_channel(
             app.settings.transactions_address,
+        )
+        currencies_channel = create_channel(
+            app.settings.currencies_address,
         )
         asgi_app = application.create_starlette_app(
             custom_middlewares=[
@@ -103,7 +104,9 @@ def _factory(
                         ),
                     ),
                     currencies_client=currencies.GrpcClient(
-                        currencies_pb2_grpc.CurrencyServiceStub(orders_channel),
+                        currencies_pb2_grpc.CurrencyServiceStub(
+                            currencies_channel,
+                        ),
                     ),
                     redis_client=UserSessionRepository(
                         redis_client=redis_client,
@@ -117,9 +120,6 @@ def _factory(
                     ),
                     companies_repository=CompanyRepository(
                         mongo.companies.companies,
-                    ),
-                    currencies_repository=CurrencyRepository(
-                        app.settings.currencies,
                     ),
                     transactions_client=transactions.GrpcClient(
                         transactions_pb2_grpc.TransactionsServiceStub(
@@ -173,6 +173,9 @@ def _admin_factory(
         transactions_channel = create_channel(
             app.settings.transactions_address,
         )
+        currencies_channel = create_channel(
+            app.settings.currencies_address,
+        )
         cc_payment_client = PaymentClient(
             base_url=app.settings.cc_address,
             auth=CurrencyCloudAuth(
@@ -215,9 +218,6 @@ def _admin_factory(
                     conversions_repository=ConversionRepository(
                         mongo.conversions.conversions,
                     ),
-                    currencies_repository=CurrencyRepository(
-                        app.settings.currencies,
-                    ),
                     beneficiaries_repository=BeneficiaryRepository(
                         mongo.beneficiaries.beneficiaries,
                     ),
@@ -239,6 +239,11 @@ def _admin_factory(
                     conversions_client=conversions.GrpcClient(
                         transactions_pb2_grpc.ConversionsServiceStub(
                             transactions_channel,
+                        ),
+                    ),
+                    currencies_client=currencies.GrpcClient(
+                        currencies_pb2_grpc.CurrencyServiceStub(
+                            currencies_channel,
                         ),
                     ),
                     transactions_repository=TransactionRepository(

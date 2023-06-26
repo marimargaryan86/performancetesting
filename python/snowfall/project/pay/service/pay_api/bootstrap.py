@@ -20,10 +20,8 @@ from snowfall.project.pay.service.pay_api.repositories import (
     BeneficiaryRepository,
     CompanyRepository,
     ConversionRepository,
-    CurrencyRepository,
     TransactionRepository,
 )
-from snowfall.stdlib import money
 from snowfall.stdlib.integration.starlette import application
 from snowfall.vendor.currency_cloud import client
 
@@ -38,7 +36,6 @@ class Settings(application.Settings):
     jwt_public_key: str
     mongo_dsn: Sequence[AnyUrl]
     redis_dsn: Sequence[AnyUrl]
-    currencies: Sequence[money.Currency]
 
 
 class AdminSettings(application.Settings):
@@ -52,7 +49,7 @@ class AdminSettings(application.Settings):
     jwt_public_key: str
     mongo_dsn: Sequence[AnyUrl]
     redis_dsn: Sequence[AnyUrl]
-    currencies: Sequence[money.Currency]
+    currencies_address: str
 
 
 def create_admin_dependencies(  # noqa: WPS211
@@ -60,7 +57,6 @@ def create_admin_dependencies(  # noqa: WPS211
     companies_repository: CompanyRepository,
     contacts_repository: ContactsRepository,
     conversions_repository: ConversionRepository,
-    currencies_repository: CurrencyRepository,
     beneficiaries_repository: BeneficiaryRepository,
     transactions_repository: TransactionRepository,
     accounts_client: accounts.GrpcClient,
@@ -68,6 +64,7 @@ def create_admin_dependencies(  # noqa: WPS211
     cc_payment_client: client.PaymentClient,
     transactions_client: transactions.Client,
     conversions_client: conversions.Client,
+    currencies_client: currencies.Client,
     payments_client: payments.GrpcClient,
 ) -> lagom.Container:
     container = lagom.Container()
@@ -77,13 +74,13 @@ def create_admin_dependencies(  # noqa: WPS211
     container[TransactionRepository] = transactions_repository
     container[ContactsRepository] = contacts_repository
     container[ConversionRepository] = conversions_repository
-    container[CurrencyRepository] = currencies_repository
     container[BeneficiaryRepository] = beneficiaries_repository
     container[accounts.GrpcClient] = accounts_client
     container[companies.GrpcClient] = companies_client
     container[transactions.Client] = transactions_client  # type: ignore[type-abstract]
     container[conversions.Client] = conversions_client  # type: ignore[type-abstract]
     container[payments.GrpcClient] = payments_client
+    container[currencies.Client] = currencies_client  # type: ignore[type-abstract]
 
     includes.register_resolvers(transactions_client)
 
@@ -98,7 +95,6 @@ def create_dependencies(  # noqa: WPS211
     quotations_client: quotations.Client,
     conversions_repository: ConversionRepository,
     companies_repository: CompanyRepository,
-    currencies_repository: CurrencyRepository,
     payment_client: client.PaymentClient,
 ) -> lagom.Container:
     container = lagom.Container()
@@ -110,5 +106,4 @@ def create_dependencies(  # noqa: WPS211
     container[ConversionRepository] = conversions_repository
     container[transactions.Client] = transactions_client  # type: ignore[type-abstract]
     container[CompanyRepository] = companies_repository
-    container[CurrencyRepository] = currencies_repository
     return container

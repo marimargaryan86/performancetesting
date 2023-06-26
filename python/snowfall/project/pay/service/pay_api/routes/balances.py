@@ -2,9 +2,9 @@ import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.project.pay.adapter import accounts as accounts_adapter
+from snowfall.project.pay.adapter import currencies
 from snowfall.project.pay.service.companies import repositories
 from snowfall.project.pay.service.pay_api import resources
-from snowfall.project.pay.service.pay_api.repositories import CurrencyRepository
 from snowfall.stdlib.integration.starlette import messages, models, request_helpers
 from snowfall.vendor.currency_cloud.client import PaymentClient
 from snowfall.vendor.currency_cloud.models.balance import BalanceRequest
@@ -46,12 +46,12 @@ class Balances(endpoints.HTTPEndpoint):
             request=request,
         )
 
-    async def post(  # noqa: WPS211
+    async def post(  # noqa: WPS211, WPS217
         self,
         request: requests.Request,
         accounts_client: accounts_adapter.GrpcClient = lagom.injectable,
         contacts_repository: repositories.ContactsRepository = lagom.injectable,
-        currencies_repository: CurrencyRepository = lagom.injectable,
+        currencies_client: currencies.Client = lagom.injectable,
         payment_client: PaymentClient = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
@@ -65,8 +65,7 @@ class Balances(endpoints.HTTPEndpoint):
         contact = await contacts_repository.find_by_id(account.contact_id)
         if not contact:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
-
-        if not currencies_repository.find_by_id(body["currency"]):
+        if not await currencies_client.get(body["currency"], no_exist_ok=True):
             return models.JsonApiResponse(
                 models.Body(
                     errors=[

@@ -115,6 +115,7 @@ EOH
         GRPC_ADDRESS = "0.0.0.0"
         GRPC_PORT    = "${NOMAD_PORT_grpc}"
         SENTRY_DSN   = "https://862dba8da99649d28747c88ad44699e8@sentry.snowfall.se/35"
+        CURRENCIES   = "AUD JPY SAR BHD KES SGD BGN KWD ZAR CAD SEK CNY CHF CZK NZD THB DKK NOK TRY EUR OMR UGX HKD GBP HUF PLN AED QAR USD RON ILS"
       }
     }
   }

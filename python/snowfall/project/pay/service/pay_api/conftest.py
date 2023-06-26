@@ -115,7 +115,6 @@ def _create_app(  # noqa: WPS211
     transactions_repository: pay_repos.TransactionRepository,
     conversion_repository: pay_repos.ConversionRepository,
     companies_repository: pay_repos.CompanyRepository,
-    currencies_repository: pay_repos.CurrencyRepository,
     transactions_client: transactions.Client,
     openapi_path: pathlib.Path,
     custom_middlewares: Sequence[Middleware] | None = None,
@@ -132,7 +131,6 @@ def _create_app(  # noqa: WPS211
                 quotations_client,
                 conversion_repository,
                 companies_repository,
-                currencies_repository,
                 payment_client=payment_client,
             ),
         ),
@@ -154,8 +152,8 @@ def _create_admin_app(  # noqa: WPS211
     conversions_repository: pay_repos.ConversionRepository,
     transactions_client: transactions.Client,
     conversions_client: conversions.Client,
+    currencies_client: currencies.Client,
     transactions_repository: pay_repos.TransactionRepository,
-    currencies_repository: pay_repos.CurrencyRepository,
     beneficiaries_repository: pay_repos.BeneficiaryRepository,
     openapi_path: pathlib.Path,
     custom_middlewares: Sequence[Middleware] | None = None,
@@ -169,7 +167,6 @@ def _create_admin_app(  # noqa: WPS211
                 companies_repository,
                 contacts_repository,
                 conversions_repository=conversions_repository,
-                currencies_repository=currencies_repository,
                 beneficiaries_repository=beneficiaries_repository,
                 accounts_client=accounts_client,
                 companies_client=companies_client,
@@ -177,6 +174,7 @@ def _create_admin_app(  # noqa: WPS211
                 conversions_client=conversions_client,
                 transactions_repository=transactions_repository,
                 cc_payment_client=cc_payment_client,
+                currencies_client=currencies_client,
                 payments_client=payment_client,
             ),
         ),
@@ -354,27 +352,10 @@ def conversions_repository(
 
 
 @pytest.fixture()
-def currencies_repository(
-    available_currencies: Sequence[money.Currency],
-) -> pay_repos.CurrencyRepository:
-    return pay_repos.CurrencyRepository(available_currencies)
-
-
-@pytest.fixture()
 def beneficiaries_repository(
     mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> pay_repos.BeneficiaryRepository:
     return pay_repos.BeneficiaryRepository(collection=mongo_client.test.beneficiaries)
-
-
-@pytest.fixture()
-def available_currencies() -> Sequence[money.Currency]:
-    return [
-        money.Currency("USD"),
-        money.Currency("GBP"),
-        money.Currency("AMD"),
-        money.Currency("SEK"),
-    ]
 
 
 @pytest.fixture()
@@ -438,11 +419,6 @@ def cc_payment_client(
 
 
 @pytest.fixture()
-def currencies_client() -> mock.Mock:
-    return mock.Mock()
-
-
-@pytest.fixture()
 def authentication_client() -> auth.DictClient:
     return auth.DictClient()
 
@@ -468,8 +444,6 @@ def jwt_token(private_key: str) -> str:
     )
 
 
-# TODO: need to use our authentication mechanism to generate jwt token and include it
-# TODO: into the headers, also create fixture for middlewares and use it
 @pytest.fixture()
 def headers(jwt_token: str) -> dict[str, str]:
     return {
@@ -488,7 +462,6 @@ def app(  # noqa: WPS211
     conversions_repository: pay_repos.ConversionRepository,
     cc_payment_client: PaymentClient,
     companies_repository: pay_repos.CompanyRepository,
-    currencies_repository: pay_repos.CurrencyRepository,
 ) -> applications.Starlette:
     return _create_app(
         payment_client=cc_payment_client,
@@ -498,7 +471,6 @@ def app(  # noqa: WPS211
         transactions_repository=transactions_repository,
         conversion_repository=conversions_repository,
         companies_repository=companies_repository,
-        currencies_repository=currencies_repository,
         transactions_client=transactions_client,
         openapi_path=filesystem.resource_path("junction.pay_api", "openapi.json"),
     )
@@ -516,8 +488,8 @@ def admin_app(  # noqa: WPS211
     conversions_repository: pay_repos.ConversionRepository,
     transactions_client: transactions.Client,
     conversions_client: conversions.Client,
+    currencies_client: currencies.Client,
     transactions_repository: pay_repos.TransactionRepository,
-    currencies_repository: pay_repos.CurrencyRepository,
     beneficiaries_repository: pay_repos.BeneficiaryRepository,
     custom_middlewares: Sequence[Middleware],
 ) -> applications.Starlette:
@@ -533,7 +505,7 @@ def admin_app(  # noqa: WPS211
         conversions_repository=conversions_repository,
         transactions_client=transactions_client,
         conversions_client=conversions_client,
-        currencies_repository=currencies_repository,
+        currencies_client=currencies_client,
         beneficiaries_repository=beneficiaries_repository,
         custom_middlewares=custom_middlewares,
         openapi_path=filesystem.resource_path("junction.pay_admin_api", "openapi.json"),

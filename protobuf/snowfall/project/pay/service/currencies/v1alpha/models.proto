@@ -8,3 +8,9 @@ message Quote {
   uint32 amount = 1;
   float rate = 2;
 }
+
+message Currency {
+  string code = 1;
+  string name = 2;
+  int32 exponent = 3;
+}

@@ -8,6 +8,9 @@ from snowfall.project.pay.service.beneficiaries.v1alpha import (
     models_pb2 as beneficiary_models,
 )
 from snowfall.project.pay.service.companies.v1alpha import models_pb2
+from snowfall.project.pay.service.currencies.v1alpha.models_pb2 import (
+    Currency as CurrencyModel,
+)
 from snowfall.project.pay.service.payments.v1alpha import models_pb2 as payment_models
 from snowfall.project.pay.service.payments.v1alpha.models_pb2 import Payment
 from snowfall.project.pay.service.transactions.v1alpha import (
@@ -388,14 +391,14 @@ class CurrenciesResource(models.Resource):
     @classmethod
     def from_model(
         cls,
-        currency: money.Currency,
+        currency: CurrencyModel,
         request: requests.Request,
     ) -> CurrenciesResource:
         return cls(
             id=currency.code,
             type=CurrenciesResource.api_type,
             attributes={
-                "name": currency.currency_name,
+                "name": currency.name,
                 "minorUnits": currency.exponent or 0,
             },
             links={

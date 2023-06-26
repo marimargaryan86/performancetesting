@@ -3,15 +3,12 @@ from typing import cast
 import lagom
 from starlette import endpoints, requests, responses, status
 
-from snowfall.project.pay.adapter import quotations
+from snowfall.project.pay.adapter import currencies, quotations
 from snowfall.project.pay.service.companies.v1alpha import models_pb2 as company_models
+from snowfall.project.pay.service.currencies.v1alpha.models_pb2 import Currency
 from snowfall.project.pay.service.pay_api import resources
-from snowfall.project.pay.service.pay_api.repositories import (
-    CompanyRepository,
-    CurrencyRepository,
-)
+from snowfall.project.pay.service.pay_api.repositories import CompanyRepository
 from snowfall.stdlib.integration.starlette import messages, models, request_helpers
-from snowfall.stdlib.money import Currency
 
 
 class Quotations(endpoints.HTTPEndpoint):
@@ -20,16 +17,18 @@ class Quotations(endpoints.HTTPEndpoint):
         request: requests.Request,
         quotations_client: quotations.Client = lagom.injectable,
         companies_repository: CompanyRepository = lagom.injectable,
-        currencies_repository: CurrencyRepository = lagom.injectable,
+        currency_client: currencies.GrpcClient = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
         session_token = body.get("externalReference")
 
         if session_token:
             session_token = session_token + request.user.username
-
-        from_currency = currencies_repository.find_by_id(body["fromCurrency"])
-        to_currency = currencies_repository.find_by_id(body["toCurrency"])
+        from_currency = await currency_client.get(
+            body["fromCurrency"],
+            no_exist_ok=True,
+        )
+        to_currency = await currency_client.get(body["toCurrency"], no_exist_ok=True)
         company = await companies_repository.find_by_id(body["payer"])
         beneficiary_company = await companies_repository.find_by_id(body["beneficiary"])
         errors = self._validate(

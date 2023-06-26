@@ -5,18 +5,18 @@ from typing import Any, cast
 import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
-from snowfall.project.pay.adapter import accounts as accounts_adapter
+from snowfall.project.pay.adapter import accounts, currencies
 from snowfall.project.pay.service.beneficiaries.v1alpha.models_pb2 import (
     Beneficiary as BeneficiaryModel,
 )
 from snowfall.project.pay.service.companies.v1alpha.models_pb2 import Account
+from snowfall.project.pay.service.currencies.v1alpha.models_pb2 import Currency
 from snowfall.project.pay.service.pay_api import resources
 from snowfall.project.pay.service.pay_api.repositories import (
     BeneficiaryRepository,
     CompanyRepository,
-    CurrencyRepository,
 )
-from snowfall.stdlib import money, string
+from snowfall.stdlib import string
 from snowfall.stdlib.integration.starlette import (
     messages,
     models,
@@ -59,17 +59,16 @@ class Beneficiary(endpoints.HTTPEndpoint):
         request: requests.Request,
         payment_client: client.PaymentClient = lagom.injectable,
         beneficiaries_repository: BeneficiaryRepository = lagom.injectable,
-        currencies_repository: CurrencyRepository = lagom.injectable,
+        currencies_client: currencies.Client = lagom.injectable,
         companies_repository: CompanyRepository = lagom.injectable,
-        accounts_client: accounts_adapter.GrpcClient = lagom.injectable,
+        accounts_client: accounts.GrpcClient = lagom.injectable,
     ) -> responses.Response:
         beneficiary_id = request.path_params["beneficiaryId"]
         body = await request_helpers.flatten_request(request)
         beneficiary = await beneficiaries_repository.find_by_id(beneficiary_id)
         if beneficiary is None:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
-
-        currency = currencies_repository.find_by_id(body["currency"])
+        currency = await currencies_client.get(body["currency"], no_exist_ok=True)
         account = await accounts_client.get(body["account"])
 
         errors = _validate(currency, account)
@@ -174,12 +173,12 @@ class Beneficiaries(endpoints.HTTPEndpoint):
         request: requests.Request,
         payment_client: client.PaymentClient = lagom.injectable,
         beneficiaries_repository: BeneficiaryRepository = lagom.injectable,
-        currencies_repository: CurrencyRepository = lagom.injectable,
-        accounts_client: accounts_adapter.GrpcClient = lagom.injectable,
+        currencies_client: currencies.Client = lagom.injectable,
+        accounts_client: accounts.GrpcClient = lagom.injectable,
         companies_repository: CompanyRepository = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
-        currency = currencies_repository.find_by_id(body["currency"])
+        currency = await currencies_client.get(body["currency"], no_exist_ok=True)
         account = await accounts_client.get(body["account"])
 
         errors = _validate(currency, account)
@@ -262,7 +261,7 @@ class Beneficiaries(endpoints.HTTPEndpoint):
 
 
 def _validate(
-    currency: money.Currency | None,
+    currency: Currency | None,
     account: Account | None,
 ) -> list[messages.models.Error]:
     errors = []

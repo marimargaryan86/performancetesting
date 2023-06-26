@@ -42,7 +42,7 @@ async def handle_grpc_errors(grpc_request: Awaitable[Proto]) -> Proto:
             case grpc.StatusCode.UNAVAILABLE:
                 raise ServiceUnavailableError(err.details()) from err
 
-        raise UnhandledError() from err
+        raise UnhandledError(err.details()) from err
 
 
 def _handle_bad_request(

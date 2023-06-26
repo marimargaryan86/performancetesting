@@ -2,10 +2,14 @@ syntax = "proto3";
 
 package snowfall.project.pay.service.currencies.v1alpha;
 
+import "snowfall/project/pay/service/currencies/v1alpha/models.proto";
+
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/currencies/v1alpha";
 
 service CurrencyService {
   rpc Convert(ConvertRequest) returns (ConvertResponse) {}
+  rpc Get(GetRequest) returns (GetResponse) {}
+  rpc Find(FindRequest) returns (FindResponse) {}
 }
 
 message ConvertRequest {
@@ -17,4 +21,22 @@ message ConvertRequest {
 message ConvertResponse {
   uint32 amount = 1;
   float rate = 2;
+}
+
+message GetRequest {
+  string currency = 1;
+}
+
+message GetResponse {
+  Currency currency = 1;
+}
+
+message FindRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+}
+
+message FindResponse {
+  repeated Currency currencies = 1;
+  string next_page_token = 2;
 }

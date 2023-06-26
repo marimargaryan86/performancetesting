@@ -5,8 +5,9 @@ from collections.abc import Sequence
 from motor import motor_asyncio
 from pydantic import AnyUrl
 
+from snowfall.project.pay.adapter import currencies
 from snowfall.project.pay.service.companies import cron_jobs, grpc, repositories
-from snowfall.project.pay.service.pay_api.repositories import CurrencyRepository
+from snowfall.project.pay.service.currencies.v1alpha import currencies_pb2_grpc
 from snowfall.stdlib import money, service
 from snowfall.stdlib.transport.grpc import server
 from snowfall.vendor.currency_cloud.client import CurrencyCloudAuth, PaymentClient
@@ -64,8 +65,10 @@ async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
                     mongo.companies.companies,
                 ),
                 accounts=repositories.AccountsRepository(mongo.companies.accounts),
-                currencies=CurrencyRepository(
-                    app.settings.currencies,
+                currencies_client=currencies.GrpcClient(
+                    currencies_pb2_grpc.CurrencyServiceStub(
+                        app.settings.currencies_address,
+                    ),
                 ),
                 payment_client=PaymentClient(
                     base_url=app.settings.cc_address,

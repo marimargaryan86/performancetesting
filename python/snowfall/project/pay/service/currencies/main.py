@@ -5,8 +5,9 @@ from pydantic import AnyUrl
 
 from snowfall.project.pay.adapter import rates
 from snowfall.project.pay.service.currencies.grpc import CurrencyService
+from snowfall.project.pay.service.currencies.repositories import CurrencyRepository
 from snowfall.project.pay.service.rates.v1alpha import rates_pb2_grpc
-from snowfall.stdlib import service
+from snowfall.stdlib import money, service
 from snowfall.stdlib.transport.grpc import server
 from snowfall.stdlib.transport.grpc.client import create_channel
 
@@ -16,6 +17,7 @@ class _Settings(service.Settings):
     grpc_port: int = 50051
     mongo_dsn: Sequence[AnyUrl]
     rates_address: str
+    currencies: Sequence[money.Currency]
 
 
 async def _main(app: service.Application[_Settings]) -> None:
@@ -28,6 +30,9 @@ async def _main(app: service.Application[_Settings]) -> None:
             CurrencyService(
                 rates.GrpcClient(
                     rates_pb2_grpc.RatesServiceStub(rates_channel),
+                ),
+                CurrencyRepository(
+                    app.settings.currencies,
                 ),
             ),
         ],
