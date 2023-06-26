@@ -23,18 +23,24 @@
         "nathan.s@snowfalltravel.com:$2y$05$7S57RO1PNsWP9rqEQypmp.mp80XbfizFIPWFFhfmnYfYnnpYlYZnS",
         "sa@snowfall.se:$2y$10$azniZzO5nOofU4AfhurZUuxVTE5bzXvc2Sl6nBoV.awYbzQ5Niq.K",
         "sevak@snowfalltravel.com:$2y$05$bDjUgk9B1CITpYet2mGWReqjVpWKTGkg1VdbmCYZoQgBiQebJcvoC",
-        "vm@snowfalltravel.com:$2y$05$Q6NFa5Ca9v6TcvccjuWyGeZbcQ6s2wFJckOEaSgHOzcIN59yWoLi2"
+        "vm@snowfalltravel.com:$2y$05$Q6NFa5Ca9v6TcvccjuWyGeZbcQ6s2wFJckOEaSgHOzcIN59yWoLi2",
+        "mb@snowfall.se:$2y$05$omi1jMJ9y2dYfAGtx9wCPeZ0xSm4dTXGBi8hk/2jMlVFqCnLu7l2G",
+        "ciaran.e@snowfalltravel.com:$2y$05$XaScwfxtGfKxDeNyQHeb6eprqu650daShtvdphX2P.XTm7eOGoxb2",
+        "reuben.t@snowfalltravel.com:$2y$05$fRBnmne91ayBKODDqp20ou4azWGxUZSre3nmDjAz86.mb/dRDa2rm",
+        "karen.h@snowfalltravel.com:$2y$05$/Ze9p5kmB6Kp.V86gc85AOxvWGMXodV/4bYCzNzHXA3ZJYWRVUY3W"
       ],
       "traefik_consul_ui_users": [
         "ara@snowfalltravel.com:$2y$05$4YUMkM/Ka8xbPRN9pjJO0O/og964WHUf4NbjZBIMbd7hIYt6FWl/i",
-        "ciaran.e@snowfalltravel.com:$2y$05$XaScwfxtGfKxDeNyQHeb6eprqu650daShtvdphX2P.XTm7eOGoxb2",
         "gb@snowfalltravel.com:$2y$05$pPN8AGky4pCnlrL9ilO2XuFzs1ts/REJnhvtmyLrory.YFy1aCiY.",
         "js@snowfall.se:$2y$05$JQ9IiPseWy5SzsePumd7iOnMFzMPBGfDMhvOMYktin8ctNnA74FSC",
-        "mb@snowfall.se:$2y$05$omi1jMJ9y2dYfAGtx9wCPeZ0xSm4dTXGBi8hk/2jMlVFqCnLu7l2G",
         "nathan.s@snowfalltravel.com:$2y$05$7S57RO1PNsWP9rqEQypmp.mp80XbfizFIPWFFhfmnYfYnnpYlYZnS",
         "sa@snowfall.se:$2y$10$azniZzO5nOofU4AfhurZUuxVTE5bzXvc2Sl6nBoV.awYbzQ5Niq.K",
         "sevak@snowfalltravel.com:$2y$05$bDjUgk9B1CITpYet2mGWReqjVpWKTGkg1VdbmCYZoQgBiQebJcvoC",
-        "vm@snowfalltravel.com:$2y$05$Q6NFa5Ca9v6TcvccjuWyGeZbcQ6s2wFJckOEaSgHOzcIN59yWoLi2"
+        "vm@snowfalltravel.com:$2y$05$Q6NFa5Ca9v6TcvccjuWyGeZbcQ6s2wFJckOEaSgHOzcIN59yWoLi2",
+        "mb@snowfall.se:$2y$05$omi1jMJ9y2dYfAGtx9wCPeZ0xSm4dTXGBi8hk/2jMlVFqCnLu7l2G",
+        "ciaran.e@snowfalltravel.com:$2y$05$XaScwfxtGfKxDeNyQHeb6eprqu650daShtvdphX2P.XTm7eOGoxb2",
+        "reuben.t@snowfalltravel.com:$2y$05$fRBnmne91ayBKODDqp20ou4azWGxUZSre3nmDjAz86.mb/dRDa2rm",
+        "karen.h@snowfalltravel.com:$2y$05$/Ze9p5kmB6Kp.V86gc85AOxvWGMXodV/4bYCzNzHXA3ZJYWRVUY3W"
       ],
       "traefik_vault_ui_users": [
         "ara@snowfalltravel.com:$2y$05$4YUMkM/Ka8xbPRN9pjJO0O/og964WHUf4NbjZBIMbd7hIYt6FWl/i",
