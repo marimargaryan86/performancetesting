@@ -31,7 +31,9 @@ from snowfall.project.junction.go.service.client_api import bootstrap, router
 from snowfall.service.authentication import auth
 from snowfall.service.authentication.v1alpha import models_pb2 as auth_models_pb2
 from snowfall.stdlib.format import jwt
-from snowfall.stdlib.integration.starlette import application, handlers
+from snowfall.stdlib.integration.starlette import application
+from snowfall.stdlib.integration.starlette import authentication as stdlib_auth
+from snowfall.stdlib.integration.starlette import handlers
 from snowfall.stdlib.persistence import cursor, filesystem
 
 
@@ -149,8 +151,8 @@ def app(  # noqa: WPS211
         custom_middlewares=[
             Middleware(
                 authentication.AuthenticationMiddleware,
-                backend=authentication_backends.JWTAuthenticationBackend(
-                    jwt_to_reseller_id=mock_jwt_to_reseller_id,
+                backend=stdlib_auth.JWTAuthenticationBackend(
+                    jwt_to_user_id=mock_jwt_to_reseller_id,
                 ),
                 on_error=handlers.auth_error_handler,
             ),

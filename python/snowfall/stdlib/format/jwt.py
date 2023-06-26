@@ -4,9 +4,108 @@ import datetime
 from collections.abc import Mapping, Sequence
 from typing import Any
 
+import httpx
 import jwt
+from jwt.jwk_set_cache import JWKSetCache
 
 from snowfall.stdlib import types
+
+
+def _match_kid(signing_keys: Sequence[jwt.PyJWK], kid: str) -> jwt.PyJWK | None:
+    for key in signing_keys:
+        if key.key_id == kid:
+            return key
+
+    return None
+
+
+class AsyncJWKClient(object):
+    def __init__(
+        self,
+        base_url: str,
+        key_ttl: datetime.timedelta,
+        client: httpx.AsyncClient | None = None,
+    ):
+        self._client = client or httpx.AsyncClient()
+        self._client.base_url = httpx.URL(base_url)
+        self._jwk_set_cache = JWKSetCache(int(key_ttl.total_seconds()))
+
+    async def get_signing_key_from_jwt(self, token: str) -> tuple[jwt.PyJWK, str]:
+        unverified = jwt.api_jwt.decode_complete(
+            token,
+            options={"verify_signature": False},
+        )
+        header = unverified["header"]
+
+        return await self._get_signing_key(header.get("kid")), header["alg"]
+
+    async def _get_signing_key(self, kid: str) -> jwt.PyJWK:
+        signing_keys = await self._get_signing_keys()
+        signing_key = _match_kid(signing_keys, kid)
+
+        if not signing_key:
+            # If no matching signing key from the jwk set, refresh the jwk set and try again.
+            signing_keys = await self._get_signing_keys(refresh=True)
+            signing_key = _match_kid(signing_keys, kid)
+
+            if not signing_key:
+                raise jwt.PyJWKClientError(
+                    "Unable to find a signing key that matches",
+                )
+
+        return signing_key
+
+    async def _get_signing_keys(self, *, refresh: bool = False) -> list[jwt.PyJWK]:
+        jwk_set = await self._get_jwk_set(refresh=refresh)
+        signing_keys = [
+            jwk_set_key
+            for jwk_set_key in jwk_set.keys
+            if jwk_set_key.public_key_use in {"sig", None} and jwk_set_key.key_id
+        ]
+
+        if not signing_keys:
+            raise jwt.PyJWKClientError(
+                "The JWKS endpoint did not contain any signing keys",
+            )
+
+        return signing_keys
+
+    async def _get_jwk_set(self, *, refresh: bool = False) -> jwt.PyJWKSet:
+        jwk_set = None
+
+        if not refresh:
+            jwk_set = self._jwk_set_cache.get()
+
+        if jwk_set is None:
+            jwk_set = await self._fetch_data()
+
+        if not isinstance(jwk_set, dict):
+            raise jwt.PyJWKClientError(
+                "The JWKS endpoint did not return a JSON object",
+            )
+
+        return jwt.PyJWKSet.from_dict(jwk_set)
+
+    async def _fetch_data(self) -> Any:
+        jwk_set: Any = None
+
+        try:
+            jwk_set = await self._fetch_keys_from_url()
+        except httpx.HTTPError as err:
+            raise jwt.exceptions.PyJWKClientConnectionError(
+                "Fail to fetch data from the url",
+            ) from err
+        else:
+            return jwk_set
+        finally:
+            if self._jwk_set_cache is not None:
+                self._jwk_set_cache.put(jwk_set)
+
+    async def _fetch_keys_from_url(self) -> Any:
+        response = await self._client.get(url="/.well-known/jwks.json")
+        response.raise_for_status()
+
+        return response.json()
 
 
 @dataclasses.dataclass(frozen=True)

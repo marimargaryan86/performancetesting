@@ -33,7 +33,9 @@ from snowfall.project.junction.go.service.trips.v1alpha import trips_pb2_grpc
 from snowfall.service.authentication.v1alpha import authentication_pb2_grpc
 from snowfall.stdlib import service
 from snowfall.stdlib.format import jwt
-from snowfall.stdlib.integration.starlette import application, handlers
+from snowfall.stdlib.integration.starlette import application
+from snowfall.stdlib.integration.starlette import authentication as stdlib_auth
+from snowfall.stdlib.integration.starlette import handlers
 from snowfall.stdlib.persistence import cursor, filesystem
 from snowfall.stdlib.transport.grpc.client import create_channel
 from snowfall.stdlib.transport.http import auth
@@ -119,9 +121,9 @@ def _factory(
             custom_middlewares=[
                 Middleware(
                     authentication.AuthenticationMiddleware,
-                    backend=authentication_backends.JWTAuthenticationBackend(
-                        authentication_backends.OryAuth(
-                            jwk_client=authentication_backends.AsyncJWKClient(
+                    backend=stdlib_auth.JWTAuthenticationBackend(
+                        stdlib_auth.OryAuth(
+                            jwk_client=jwt.AsyncJWKClient(
                                 base_url=app.settings.ory_application_url,
                                 key_ttl=app.settings.ory_jwk_ttl,
                             ),
@@ -136,7 +138,7 @@ def _factory(
                                 base_url=app.settings.ory_application_url,
                                 auth=auth.TokenAuth(token=app.settings.ory_api_key),
                             ),
-                        ).get_reseller_id_from_jwt,
+                        ).get_owner_from_jwt,
                     ),
                     on_error=handlers.auth_error_handler,
                 ),
