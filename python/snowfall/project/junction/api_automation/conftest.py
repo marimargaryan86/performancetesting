@@ -231,9 +231,11 @@ def get_variable_value(
     is_authenticated = client.is_authenticated()
     returned_data = {}
     if is_authenticated:
-        returned_data = get_variable_from_server(client, "development")
+        returned_data = get_variable_from_server(client, "sandbox")
         if not returned_data:
-            returned_data = get_variable_from_server(client, "production")
+            returned_data = get_variable_from_server(client, "development")
+            if not returned_data:
+                returned_data = get_variable_from_server(client, "production")
 
     return str(returned_data["data"]["data"][variable_name])
 
