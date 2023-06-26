@@ -1,21 +1,12 @@
 syntax = "proto3";
 
-package snowfall.project.junction.plus.service.orders_registration.v1alpha;
+package snowfall.project.junction.plus.service.notifications.v1alpha;
 
 import "google/protobuf/timestamp.proto";
 import "snowfall/stdlib/v1/date.proto";
 import "snowfall/stdlib/v1/phone_number.proto";
-import "snowfall/stdlib/v1/postal_address.proto";
 
-option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/plus/service/orders_registration/v1alpha";
-
-message IncomingOrder {
-  string reseller_id = 1;
-  string external_ref_id = 2;
-  ContactDetails contact_details = 3;
-  repeated Passenger passengers = 4;
-  repeated Booking bookings = 5;
-}
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/plus/service/notifications/v1alpha";
 
 message PersistedOrder {
   string id = 1;
@@ -28,8 +19,15 @@ message PersistedOrder {
 
 message ContactDetails {
   string email = 1;
-  snowfall.stdlib.v1.PostalAddress address = 2;
+  PostalAddress address = 2;
   snowfall.stdlib.v1.PhoneNumber phone = 3;
+}
+
+message PostalAddress {
+  repeated string address_lines = 1;
+  string region_code = 2;
+  string postal_code = 3;
+  string locality = 4;
 }
 
 message Passenger {

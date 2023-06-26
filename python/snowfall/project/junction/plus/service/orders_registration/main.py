@@ -1,29 +1,22 @@
-import random
-from collections.abc import Sequence
-
 import httpx
 import pydantic
-from motor import motor_asyncio
 
-from snowfall.project.junction.plus.service.orders_registration import (
-    importer,
-    orders_registration,
+from snowfall.project.junction.plus.service.notifications.v1alpha import (
+    grpc_pb2_grpc as notifications_pb2_grpc,
 )
+from snowfall.project.junction.plus.service.orders_registration import importer
 from snowfall.stdlib import service
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.transport.amqp import consumer, producer, types
+from snowfall.stdlib.transport.grpc.client import create_channel
 
 
 class _ImportSettings(service.Settings):
     amqp_dsn: pydantic.AnyUrl
-    mongo_dsn: Sequence[pydantic.AnyUrl]
+    notifications_address: str
 
 
 async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
-    mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # nosec
-    )
-
     http_client = await app.stack.enter_async_context(httpx.AsyncClient())
     connection = await app.stack.enter_async_context(
         types.Connection(
@@ -44,11 +37,8 @@ async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
             connection=connection,
             exchange=types.Exchange(name="plus_events"),
         ),
-        order_repository=orders_registration.OrderRepository(
-            mongo.plus.orders,
-        ),
-        subscriber_repository=orders_registration.SubscriberRepository(
-            mongo.plus.subscribers,
+        orders=notifications_pb2_grpc.OrderServiceStub(
+            create_channel(app.settings.notifications_address),
         ),
     )
     await order_importer.consume()

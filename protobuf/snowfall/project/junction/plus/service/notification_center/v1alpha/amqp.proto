@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package snowfall.project.junction.plus.service.notification_center.v1alpha;
 
-import "snowfall/project/junction/plus/service/orders_registration/v1alpha/models.proto";
+import "snowfall/project/junction/plus/service/notifications/v1alpha/models.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/plus/service/notification_center/v1alpha";
 
@@ -10,7 +10,7 @@ message NotificationEvent {
   string sender_id = 1;
   string receiver_id = 2;
   oneof event {
-    snowfall.project.junction.plus.service.orders_registration.v1alpha.PersistedOrder body = 3;
+    snowfall.project.junction.plus.service.notifications.v1alpha.PersistedOrder body = 3;
   }
   enum Type {
     TYPE_UNSPECIFIED = 0;

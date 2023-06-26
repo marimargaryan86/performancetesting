@@ -1,9 +1,8 @@
-import pymongo
-from pymongo.errors import PyMongoError
+from collections.abc import Sequence
 
-from snowfall.project.junction.plus.service.orders_registration.v1alpha import (
-    models_pb2,
-)
+import pymongo
+
+from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.persistence.mongo import repository
 
@@ -16,18 +15,21 @@ class OrderRepository(repository.ProtoRepository[models_pb2.PersistedOrder]):
         pymongo.IndexModel("bookings.route_identifier", background=True),
     ]
 
-    async def create(
+    async def create(  # noqa: WPS211
         self,
-        order: models_pb2.IncomingOrder,
+        reseller_id: str,
+        external_ref_id: str,
+        passengers: Sequence[models_pb2.Passenger],
+        bookings: Sequence[models_pb2.Booking],
         subscriber: models_pb2.Subscriber,
     ) -> models_pb2.PersistedOrder:
         persisted_order = models_pb2.PersistedOrder(
             id=string.uuid(),
             subscriber_id=subscriber.id,
-            reseller_id=order.reseller_id,
-            external_ref_id=order.external_ref_id,
-            passengers=order.passengers,
-            bookings=order.bookings,
+            reseller_id=reseller_id,
+            external_ref_id=external_ref_id,
+            passengers=passengers,
+            bookings=bookings,
         )
         insert = await self._execute(
             self._collection.insert_one,
@@ -35,7 +37,7 @@ class OrderRepository(repository.ProtoRepository[models_pb2.PersistedOrder]):
         )
 
         if not insert.acknowledged:
-            raise PyMongoError("Insert was not acknowledged")
+            raise RuntimeError()
 
         return persisted_order
 
@@ -50,14 +52,15 @@ class SubscriberRepository(repository.ProtoRepository[models_pb2.Subscriber]):
 
     async def get_or_create(
         self,
-        order: models_pb2.IncomingOrder,
+        reseller_id: str,
+        contact_details: models_pb2.ContactDetails,
     ) -> models_pb2.Subscriber:
         subscriber = await self._execute(
             self._collection.find_one,
             filter={
-                "reseller_id": order.reseller_id,
-                "phone_number.e164_number": order.contact_details.phone.e164_number,
-                "email": order.contact_details.email,
+                "reseller_id": reseller_id,
+                "phone_number.e164_number": contact_details.phone.e164_number,
+                "email": contact_details.email,
             },
         )
 
@@ -66,9 +69,9 @@ class SubscriberRepository(repository.ProtoRepository[models_pb2.Subscriber]):
 
         subscriber = models_pb2.Subscriber(
             id=string.uuid(),
-            reseller_id=order.reseller_id,
-            phone_number=order.contact_details.phone,
-            email=order.contact_details.email,
+            reseller_id=reseller_id,
+            phone_number=contact_details.phone,
+            email=contact_details.email,
         )
 
         insert = await self._execute(
@@ -77,6 +80,6 @@ class SubscriberRepository(repository.ProtoRepository[models_pb2.Subscriber]):
         )
 
         if not insert.acknowledged:
-            raise PyMongoError("Insert was not acknowledged")
+            raise RuntimeError()
 
         return subscriber

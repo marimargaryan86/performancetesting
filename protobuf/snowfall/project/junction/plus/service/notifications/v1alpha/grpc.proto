@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package snowfall.project.junction.plus.service.notifications.v1alpha;
+
+import "snowfall/project/junction/plus/service/notifications/v1alpha/models.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/plus/service/notifications/v1alpha";
+
+service OrderService {
+  rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse) {}
+}
+
+message CreateOrderRequest {
+  string reseller_id = 1;
+  string external_ref_id = 2;
+  snowfall.project.junction.plus.service.notifications.v1alpha.ContactDetails contact_details = 3;
+  repeated snowfall.project.junction.plus.service.notifications.v1alpha.Passenger passengers = 4;
+  repeated snowfall.project.junction.plus.service.notifications.v1alpha.Booking bookings = 5;
+}
+
+message CreateOrderResponse {
+  snowfall.project.junction.plus.service.notifications.v1alpha.PersistedOrder order = 1;
+}

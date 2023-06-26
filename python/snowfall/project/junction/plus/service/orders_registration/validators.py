@@ -1,10 +1,10 @@
+from collections.abc import Sequence
+
 import email_validator
 import phonenumbers
-from google.protobuf import message
+from google.protobuf import descriptor, message
 
-from snowfall.project.junction.plus.service.orders_registration.v1alpha import (
-    models_pb2,
-)
+from snowfall.project.junction.plus.service.orders_registration.v1alpha import amqp_pb2
 from snowfall.stdlib.format import protobuf
 
 
@@ -13,7 +13,7 @@ class ProtobufValidationError(Exception):
 
 
 async def validate_orders(
-    order: models_pb2.IncomingOrder,
+    order: amqp_pb2.IncomingOrder,
 ) -> None:
     errors = await validate_completeness(order)
     email_error = await validate_email(order.contact_details.email)
@@ -29,11 +29,36 @@ async def validate_orders(
         )
 
 
-async def validate_completeness(  # noqa: WPS231
+async def get_one_of_unused_fields(  # noqa: WPS210
+    model: message.Message,
+) -> list[str]:
+    fields_to_skip = []
+    for field in model.DESCRIPTOR.fields:
+        if field.containing_oneof:
+            one_of_title = field.containing_oneof.name
+            one_of_field = model.WhichOneof(one_of_title)
+            if one_of_field and field.name != one_of_field:
+                fields_to_skip.append(field.name)
+    return fields_to_skip
+
+
+async def get_descriptor_fields(
+    fields: Sequence[descriptor.FieldDescriptor],
+    fields_to_skip: Sequence[str],
+) -> list[descriptor.FieldDescriptor]:
+    return [field for field in fields if field.name not in fields_to_skip]
+
+
+async def validate_completeness(  # noqa: WPS231, WPS210
     model: message.Message,
 ) -> list[str]:
     errors = []
-    for field in model.DESCRIPTOR.fields:
+    one_of_list_to_skip = await get_one_of_unused_fields(model)
+    descriptor_fields = await get_descriptor_fields(
+        model.DESCRIPTOR.fields,
+        one_of_list_to_skip,
+    )
+    for field in descriptor_fields:
         field_value = getattr(model, field.name)
         if field.label == protobuf.descriptor.FieldDescriptor.LABEL_REPEATED:
             if not field_value:

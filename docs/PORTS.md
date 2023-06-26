@@ -55,3 +55,4 @@ The following ports are configured in local environments by default:
 | 50073 | save-a-train           | gRPC Server       |
 | 50074 | transactions           | gRPC Server       |
 | 50075 | companies              | gRPC Server       |
+| 50076 | notifications          | gRPC Server       |

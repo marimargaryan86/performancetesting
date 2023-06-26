@@ -69,8 +69,8 @@ job "orders-registration-import" {
         sidecar_service {
           proxy {
             upstreams {
-              local_bind_port  = 8020
-              destination_name = "orders-registration-import-${var.environment}"
+              local_bind_port  = 8010
+              destination_name = "notifications-${var.environment}"
             }
           }
         }
@@ -90,7 +90,7 @@ job "orders-registration-import" {
       template {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
-MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
+NOTIFICATIONS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_notifications-${var.environment}"))}}
 EOH
         destination = "services.env"
         env         = true
