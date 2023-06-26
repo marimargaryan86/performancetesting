@@ -10,6 +10,7 @@ from snowfall.project.pay.service.companies import cron_jobs, grpc, repositories
 from snowfall.project.pay.service.currencies.v1alpha import currencies_pb2_grpc
 from snowfall.stdlib import money, service
 from snowfall.stdlib.transport.grpc import server
+from snowfall.stdlib.transport.grpc.client import create_channel
 from snowfall.vendor.currency_cloud.client import CurrencyCloudAuth, PaymentClient
 
 
@@ -44,6 +45,9 @@ async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
         ),
     )
 
+    currencies_channel = create_channel(
+        app.settings.currencies_address,
+    )
     grpc_server = server.create_server(
         app.settings.grpc_address,
         app.settings.grpc_port,
@@ -67,7 +71,7 @@ async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
                 accounts=repositories.AccountsRepository(mongo.companies.accounts),
                 currencies_client=currencies.GrpcClient(
                     currencies_pb2_grpc.CurrencyServiceStub(
-                        app.settings.currencies_address,
+                        currencies_channel,
                     ),
                 ),
                 payment_client=PaymentClient(
