@@ -264,7 +264,7 @@ class BeneficiariesService(  # noqa: WPS214
         beneficiaries: repositories.BeneficiaryRepository,
         companies: repositories.CompaniesRepository,
         accounts: repositories.AccountsRepository,
-        currencies_client: currencies.GrpcClient,
+        currencies_client: currencies.Client,
         payment_client: client.PaymentClient,
     ):
         self._beneficiaries = beneficiaries

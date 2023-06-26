@@ -17,7 +17,7 @@ class Quotations(endpoints.HTTPEndpoint):
         request: requests.Request,
         quotations_client: quotations.Client = lagom.injectable,
         companies_repository: CompanyRepository = lagom.injectable,
-        currency_client: currencies.GrpcClient = lagom.injectable,
+        currency_client: currencies.Client = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
         session_token = body.get("externalReference")
