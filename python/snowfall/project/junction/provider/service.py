@@ -15,6 +15,7 @@ from snowfall.stdlib import service
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import types
 from snowfall.stdlib.transport.grpc import server as grpc_server
+from snowfall.stdlib.transport.grpc import service as grpc_service
 
 # Re-export some service types
 AnyDsn = service.AnyDsn
@@ -75,7 +76,7 @@ def _grpc_command(  # noqa: WPS210, WPS217
         app: service.AsyncApplication[_Settings],
     ) -> None:
         meta_implementation = await meta_factory()
-        services: list[grpc_server.Service] = [
+        services: list[grpc_service.Service] = [
             meta.MetaService(
                 provider_id=meta_implementation.identifier,
                 provider_name=meta_implementation.name,

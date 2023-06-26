@@ -30,6 +30,7 @@ from snowfall.project.junction.go.service.orders.v1alpha import orders_pb2_grpc
 from snowfall.project.junction.go.service.places.v1alpha import places_pb2_grpc
 from snowfall.project.junction.go.service.schedules.v1alpha import schedules_pb2_grpc
 from snowfall.project.junction.go.service.trips.v1alpha import trips_pb2_grpc
+from snowfall.service.authentication.v1alpha import authentication_pb2_grpc
 from snowfall.stdlib import service
 from snowfall.stdlib.format import jwt
 from snowfall.stdlib.integration.starlette import application, handlers
@@ -53,7 +54,7 @@ def _factory(
             routes=router.get_routes(
                 bootstrap.create_dependencies(
                     authentication_client=auth_adapter.GrpcClient(
-                        auth_adapter.auth_pb2_grpc.AuthenticationServiceStub(
+                        authentication_pb2_grpc.AuthenticationServiceStub(
                             authentication_channel,
                         ),
                     ),

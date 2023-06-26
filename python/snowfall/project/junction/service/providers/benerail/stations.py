@@ -12,7 +12,7 @@ from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.transport.grpc import client as grpc_client
 from snowfall.stdlib.v1 import latlng_pb2
 from snowfall.vendor.benerail import client
-from snowfall.vendor.benerail.models.enumeration import response, results
+from snowfall.vendor.benerail.models.enumeration import position, response
 
 
 async def dump_stations(app: service.Application[config.DumpStationsSettings]) -> None:
@@ -64,7 +64,7 @@ async def _to_stations(  # noqa: WPS231
         for place_result in response_obj.response_result.places:
             name = ""
 
-            if not isinstance(place_result.place, results.Station):
+            if not isinstance(place_result.place, position.Station):
                 continue
 
             if place_result.place.labels:

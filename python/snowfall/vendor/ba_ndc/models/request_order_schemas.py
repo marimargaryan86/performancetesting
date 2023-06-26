@@ -5,12 +5,13 @@ import uuid
 import pydantic
 
 from snowfall.vendor.ba_ndc.models.base_schema import BaseSchema
-from snowfall.vendor.ba_ndc.models.payer_details import Address, Contact
+from snowfall.vendor.ba_ndc.models.payer_details import Address
 from snowfall.vendor.ba_ndc.models.payment_type_schemas import (
     CashPayment,
     CreditCardPayment,
     VoucherPayment,
 )
+from snowfall.vendor.ba_ndc.models.response_common_passenger_schemas import Contact
 from snowfall.vendor.ba_ndc.models.util import passenger_enums
 
 

@@ -33,7 +33,7 @@ class Transactions(endpoints.HTTPEndpoint):
                 status=QuotationStatus.QUOTATION_STATUS_CONFIRMED,
             )
             return await messages.create_response(
-                body=messages.models.Body(
+                body=models.Body(
                     data=resources.Transaction.from_proto(
                         transaction=transaction,
                         request=request,
@@ -43,13 +43,13 @@ class Transactions(endpoints.HTTPEndpoint):
                 status_code=status.HTTP_201_CREATED,
             )
         return models.JsonApiResponse(
-            body=messages.models.Body(
+            body=models.Body(
                 errors=[
-                    messages.models.Error(
+                    models.Error(
                         status=str(status.HTTP_404_NOT_FOUND),
                         code="not_found",
                         detail="Quotation not valid",
-                        source=messages.models.ErrorSourcePointer(
+                        source=models.ErrorSourcePointer(
                             pointer="/data/relationships/quotation/data/id",
                         ),
                     ),

@@ -1,3 +1,4 @@
+import jwt as jwtlib
 from starlette import authentication, requests
 
 from snowfall.stdlib.format import jwt
@@ -20,9 +21,9 @@ class Authenticator(jwt.Decoder):
 
         try:
             decoded = self.decode(jwt_token)
-        except jwt.jwt.exceptions.ExpiredSignatureError as err:
+        except jwtlib.exceptions.ExpiredSignatureError as err:
             raise authentication.AuthenticationError(str(err)) from err
-        except jwt.jwt.exceptions.DecodeError as err:
+        except jwtlib.exceptions.DecodeError as err:
             # TODO: does not handle the exception proeprly (like not showing the err msg)
             raise authentication.AuthenticationError("Invalid JWT token") from err
 

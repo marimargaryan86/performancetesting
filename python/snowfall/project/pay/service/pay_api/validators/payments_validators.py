@@ -90,19 +90,19 @@ def _validate_prerequisite(
     if amount and transactions or not amount and not transactions:  # noqa: WPS408
         errors.extend(
             [
-                messages.models.Error(
+                models.Error(
                     status=str(status.HTTP_400_BAD_REQUEST),
                     code="bad_request",
                     detail="Need to provide amount or transactions",
-                    source=messages.models.ErrorSourcePointer(
+                    source=models.ErrorSourcePointer(
                         pointer="/data/relationships/transactions",
                     ),
                 ),
-                messages.models.Error(
+                models.Error(
                     status=str(status.HTTP_400_BAD_REQUEST),
                     code="bad_request",
                     detail="Need to provide amount or transactions",
-                    source=messages.models.ErrorSourcePointer(
+                    source=models.ErrorSourcePointer(
                         pointer="/data/attributes/amount",
                     ),
                 ),
@@ -110,11 +110,11 @@ def _validate_prerequisite(
         )
     if payment_at < datetime.datetime.now(tz=datetime.UTC).date():
         errors.append(
-            messages.models.Error(
+            models.Error(
                 status=str(status.HTTP_400_BAD_REQUEST),
                 code="bad_request",
                 detail="The payment date not valid",
-                source=messages.models.ErrorSourcePointer(
+                source=models.ErrorSourcePointer(
                     pointer="/data/attributes/paymentAt",
                 ),
             ),
@@ -126,15 +126,15 @@ def _validate_existence_resources(
     beneficiary: Beneficiary | None,
     transactions: Sequence[str],
     transactions_models: Sequence[Transaction],
-) -> list[messages.models.Error]:
+) -> list[models.Error]:
     errors = []
     if not beneficiary:
         errors.append(
-            messages.models.Error(
+            models.Error(
                 status=str(status.HTTP_404_NOT_FOUND),
                 code="not_found",
                 detail="Beneficiary Not Found",
-                source=messages.models.ErrorSourcePointer(
+                source=models.ErrorSourcePointer(
                     pointer="/data/relationships/beneficiary/data/id",
                 ),
             ),
@@ -149,11 +149,11 @@ def _validate_existence_resources(
                 currency=transaction.amounts.beneficiary.currency_code,
             )
             errors.append(
-                messages.models.Error(
+                models.Error(
                     status=str(status.HTTP_400_BAD_REQUEST),
                     code="bad_request",
                     detail="Currency not accepted",
-                    source=messages.models.ErrorSourcePointer(
+                    source=models.ErrorSourcePointer(
                         pointer="/data/relationships/transactions/data/id/{0}".format(
                             transaction.id,
                         ),
@@ -163,11 +163,11 @@ def _validate_existence_resources(
     for transaction_id in set(transactions) - found_transactions_ids:
         _logger.error("Transaction not found", id=transaction_id)
         errors.append(
-            messages.models.Error(
+            models.Error(
                 status=str(status.HTTP_404_NOT_FOUND),
                 code="not_found",
                 detail="Transaction Not Found",
-                source=messages.models.ErrorSourcePointer(
+                source=models.ErrorSourcePointer(
                     pointer="/data/relationships/transactions/data/id/{0}".format(
                         transaction_id,
                     ),

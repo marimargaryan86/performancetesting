@@ -1,4 +1,5 @@
 import grpc
+from google.rpc import error_details_pb2
 
 from snowfall.service.authentication import auth, repository
 from snowfall.service.authentication.v1alpha import authentication_pb2 as auth_pb2
@@ -103,9 +104,9 @@ class AuthenticationService(
                 context,
                 rich_status.build_rich_status(
                     code=grpc.StatusCode.ALREADY_EXISTS,
-                    error=rich_status.error_details_pb2.BadRequest(
+                    error=error_details_pb2.BadRequest(
                         field_violations=[
-                            rich_status.error_details_pb2.BadRequest.FieldViolation(
+                            error_details_pb2.BadRequest.FieldViolation(
                                 field="user",
                                 description="User already exists",
                             ),

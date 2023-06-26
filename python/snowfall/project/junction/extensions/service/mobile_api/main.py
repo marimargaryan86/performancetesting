@@ -9,7 +9,7 @@ import httpx
 import stripe
 from motor import motor_asyncio
 from redis import asyncio as aioredis
-from starlette import applications
+from starlette import applications, types
 from starlette.middleware import Middleware, authentication
 
 from snowfall.project.junction.extensions.service.mobile_api import bootstrap
@@ -46,7 +46,7 @@ def replace_in_file(path: str, find: str, replace: str) -> None:
 
 
 @contextlib.asynccontextmanager
-async def lifespan(app: applications.ASGIApp) -> AsyncGenerator[None, None]:
+async def lifespan(app: types.ASGIApp) -> AsyncGenerator[None, None]:
     client_api_spec_path = str(
         filesystem.resource_path(
             "junction.client_api",

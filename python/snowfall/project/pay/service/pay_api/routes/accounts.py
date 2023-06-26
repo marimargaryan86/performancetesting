@@ -31,7 +31,7 @@ class Account(endpoints.HTTPEndpoint):
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
 
         return await messages.create_response(
-            body=messages.models.Body(
+            body=models.Body(
                 data=resources.AccountResource.from_proto(
                     account,
                     request,
@@ -51,7 +51,7 @@ class Account(endpoints.HTTPEndpoint):
             status=body["status"],
         )
         return await messages.create_response(
-            body=messages.models.Body(
+            body=models.Body(
                 data=resources.AccountResource.from_proto(
                     account,
                     request,
@@ -75,7 +75,7 @@ class Accounts(endpoints.HTTPEndpoint):
             filter_by=filter_by,
         )
         return await messages.create_response(
-            body=messages.models.Body(
+            body=models.Body(
                 data=[
                     resources.AccountResource.from_proto(
                         account,
@@ -103,13 +103,13 @@ class Accounts(endpoints.HTTPEndpoint):
         body = await request.json()
         if body["data"]["relationships"]["contact"] is None:
             return models.JsonApiResponse(
-                body=messages.models.Body(
+                body=models.Body(
                     errors=[
-                        messages.models.Error(
+                        models.Error(
                             status=str(status.HTTP_400_BAD_REQUEST),
                             code="bad_request",
                             detail="Contact should not be null",
-                            source=messages.models.ErrorSourcePointer(
+                            source=models.ErrorSourcePointer(
                                 pointer="/data/relationships/contact",
                             ),
                         ),
@@ -126,13 +126,13 @@ class Accounts(endpoints.HTTPEndpoint):
 
         if not contact:
             return models.JsonApiResponse(
-                body=messages.models.Body(
+                body=models.Body(
                     errors=[
-                        messages.models.Error(
+                        models.Error(
                             status=str(status.HTTP_404_NOT_FOUND),
                             code="not_found",
                             detail="Contact does not exists",
-                            source=messages.models.ErrorSourcePointer(
+                            source=models.ErrorSourcePointer(
                                 pointer="/data/relationships/contact/data/id",
                             ),
                         ),
@@ -142,13 +142,13 @@ class Accounts(endpoints.HTTPEndpoint):
             )
         if contact.external_reference:
             return models.JsonApiResponse(
-                body=messages.models.Body(
+                body=models.Body(
                     errors=[
-                        messages.models.Error(
+                        models.Error(
                             status=str(status.HTTP_400_BAD_REQUEST),
                             code="bad_request",
                             detail="Contact already in use for another account",
-                            source=messages.models.ErrorSourcePointer(
+                            source=models.ErrorSourcePointer(
                                 pointer="/data/relationships/contact/data/id",
                             ),
                         ),
@@ -161,13 +161,13 @@ class Accounts(endpoints.HTTPEndpoint):
 
         if not company:
             return models.JsonApiResponse(
-                body=messages.models.Body(
+                body=models.Body(
                     errors=[
-                        messages.models.Error(
+                        models.Error(
                             status=str(status.HTTP_400_BAD_REQUEST),
                             code="bad_request",
                             detail="Contact missing company",
-                            source=messages.models.ErrorSourcePointer(
+                            source=models.ErrorSourcePointer(
                                 pointer="/data/relationships/contact/data/id",
                             ),
                         ),

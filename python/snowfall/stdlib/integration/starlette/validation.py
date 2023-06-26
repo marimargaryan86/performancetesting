@@ -2,13 +2,11 @@ import dataclasses
 from typing import cast
 
 import jsonschema
-import openapi_core
 import orjson
+from openapi_core import protocols, shortcuts, spec
 from openapi_core.unmarshalling.request import datatypes as request_datatypes
 from openapi_core.unmarshalling.response import datatypes as response_datatypes
-from openapi_core.validation.request import protocols as request_protocols
 from openapi_core.validation.request.datatypes import RequestParameters
-from openapi_core.validation.response import protocols as response_protocols
 from openapi_core.validation.schemas import exceptions as validation_exceptions
 from starlette import requests, responses
 from werkzeug.datastructures import Headers
@@ -36,9 +34,9 @@ class OpenAPIResponse(object):
     headers: Headers = dataclasses.field(default_factory=Headers)
 
 
-async def request_to_openapi(request: requests.Request) -> request_protocols.Request:
+async def request_to_openapi(request: requests.Request) -> protocols.Request:
     return cast(
-        request_protocols.Request,
+        protocols.Request,
         OpenAPIRequest(
             host_url="{scheme}://{hostname}".format(
                 scheme=request.url.scheme,
@@ -62,9 +60,9 @@ async def request_to_openapi(request: requests.Request) -> request_protocols.Req
 
 async def response_to_openapi(
     response: responses.Response,
-) -> response_protocols.Response:
+) -> protocols.Response:
     return cast(
-        response_protocols.Response,
+        protocols.Response,
         OpenAPIResponse(
             data=response.body.decode("utf-8"),
             mimetype=str(response.media_type) if response.media_type else "",
@@ -99,7 +97,7 @@ class Validator(object):
         spec_path: str,
     ):
         with open(spec_path) as spec_file:
-            self._spec = openapi_core.Spec.from_dict(
+            self._spec = spec.Spec.from_dict(
                 orjson.loads(spec_file.read()),
                 spec_url="file://{0}".format(spec_path),
             )
@@ -112,9 +110,9 @@ class Validator(object):
 
     async def validate_request(
         self,
-        request: request_protocols.Request,
+        request: protocols.Request,
     ) -> request_datatypes.RequestUnmarshalResult:
-        return openapi_core.unmarshal_request(
+        return shortcuts.unmarshal_request(
             request=request,
             spec=self._spec,
             extra_media_type_deserializers=self._media_type_deserializers,
@@ -124,10 +122,10 @@ class Validator(object):
 
     async def validate_response(
         self,
-        request: request_protocols.Request,
-        response: response_protocols.Response,
+        request: protocols.Request,
+        response: protocols.Response,
     ) -> response_datatypes.ResponseUnmarshalResult:
-        return openapi_core.unmarshal_response(
+        return shortcuts.unmarshal_response(
             request=request,
             response=response,
             spec=self._spec,

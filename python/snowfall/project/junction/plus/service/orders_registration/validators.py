@@ -5,7 +5,6 @@ import phonenumbers
 from google.protobuf import descriptor, message
 
 from snowfall.project.junction.plus.service.orders_registration.v1alpha import amqp_pb2
-from snowfall.stdlib.format import protobuf
 
 
 class ProtobufValidationError(Exception):
@@ -60,12 +59,12 @@ async def validate_completeness(  # noqa: WPS231, WPS210
     )
     for field in descriptor_fields:
         field_value = getattr(model, field.name)
-        if field.label == protobuf.descriptor.FieldDescriptor.LABEL_REPEATED:
+        if field.label == descriptor.FieldDescriptor.LABEL_REPEATED:
             if not field_value:
                 errors.append("Message '{0}' is missing or unset".format(field.name))
                 continue
             for nested_value in field_value:
-                if isinstance(nested_value, protobuf.message.Message):
+                if isinstance(nested_value, message.Message):
                     errors.extend(await validate_completeness(nested_value))
         elif field.message_type:
             errors.extend(await validate_completeness(field_value))

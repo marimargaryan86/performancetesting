@@ -5,7 +5,7 @@ import os
 import uuid
 from collections.abc import AsyncIterable, Sequence
 
-from aiocsv import AsyncDictReader, protocols
+from aiocsv import protocols, readers
 
 from snowfall.project.junction.go.service.places import places
 from snowfall.project.junction.go.service.places.v1alpha import models_pb2
@@ -82,7 +82,7 @@ async def parse_csv(
     locations_repository: places.LocationRepository,
     csv_file: protocols.WithAsyncRead,
 ) -> AsyncIterable[models_pb2.Place]:
-    async for row in AsyncDictReader(csv_file):
+    async for row in readers.AsyncDictReader(csv_file):
         locations = [
             location
             async for location in await locations_repository.find_within_area(

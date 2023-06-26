@@ -188,7 +188,7 @@ class TripCandidateSearchRepository(  # noqa: WPS215
     mixins.FindByIdMixin[trips_pb2.TripCandidateSearch],
     mixins.InsertMixin[trips_pb2.TripCandidateSearch],
     mixins.StatusMixin[trips_pb2.TripCandidateSearch],
-    mixins.repository.ProtoRepository[trips_pb2.TripCandidateSearch],
+    repository.ProtoRepository[trips_pb2.TripCandidateSearch],
 ):
     _proto = trips_pb2.TripCandidateSearch
     _indexes = [pymongo.IndexModel("expires_at", expireAfterSeconds=1, background=True)]

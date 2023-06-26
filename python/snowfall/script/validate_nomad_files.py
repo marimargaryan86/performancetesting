@@ -3,8 +3,8 @@ import sys
 from collections.abc import Mapping, Sequence
 from os import path
 
-import hcl2
 import pydantic
+from hcl2 import api as hcl2_api
 
 
 class _Configuration(pydantic.BaseModel):
@@ -212,7 +212,7 @@ def _main() -> bool:
         ].replace("_", "-")
 
         with open(template_path) as template_file:
-            parsed = hcl2.load(template_file)
+            parsed = hcl2_api.load(template_file)
 
             if _validate_jobs(template_path, filename, parsed.get("job", [])):
                 errors = True

@@ -2,10 +2,10 @@ from collections.abc import Awaitable, Callable, Container
 from typing import cast
 
 import sentry_sdk
+from openapi_core import protocols
 from openapi_core.exceptions import OpenAPIError
 from openapi_core.templating.paths.exceptions import PathNotFound
 from openapi_core.templating.security import exceptions as security_exceptions
-from openapi_core.validation.request import protocols as request_protocols
 from openapi_core.validation.schemas import exceptions as validation_exceptions
 from starlette import applications, exceptions, requests, responses, status, types
 from starlette.middleware import base
@@ -138,7 +138,7 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
     async def _dispatch(
         self,
         call_next: Callable[[requests.Request], Awaitable[responses.Response]],
-        openapi_request: request_protocols.Request,
+        openapi_request: protocols.Request,
         resolved_request: requests.Request,
     ) -> responses.Response:
         response = await call_next(resolved_request)

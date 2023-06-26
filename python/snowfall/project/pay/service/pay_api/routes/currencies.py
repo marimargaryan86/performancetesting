@@ -37,7 +37,7 @@ class ListCurrencies(endpoints.HTTPEndpoint):
             limit=pagination.limit,
         )
         return await messages.create_response(
-            body=messages.models.Body(
+            body=models.Body(
                 data=[
                     resources.CurrenciesResource.from_model(
                         currency,

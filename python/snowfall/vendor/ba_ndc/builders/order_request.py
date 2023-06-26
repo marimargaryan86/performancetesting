@@ -4,8 +4,8 @@ import uuid
 from decimal import Decimal
 
 from snowfall.vendor.ba_ndc.models.payer_details import Address, PayerDetailsPassenger
+from snowfall.vendor.ba_ndc.models.payment_type_schemas import CashPayment
 from snowfall.vendor.ba_ndc.models.request_order_schemas import (
-    CashPayment,
     CreateOrderRequest,
     PassengerExtended,
 )

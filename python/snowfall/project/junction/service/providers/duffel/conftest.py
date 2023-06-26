@@ -12,10 +12,7 @@ from bson import json_util
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.go.v1alpha import models_pb2
-from snowfall.project.junction.service.providers.duffel import cache
-from snowfall.project.junction.service.providers.duffel.offers import (
-    DuffelClientFactory,
-)
+from snowfall.project.junction.service.providers.duffel import cache, client_factory
 from snowfall.project.junction.service.providers.duffel.search import adapter, parser
 from snowfall.project.junction.service.providers.duffel.v1alpha import amqp_pb2
 from snowfall.stdlib.format import protobuf
@@ -38,13 +35,15 @@ def http_client() -> httpx.AsyncClient:
 
 
 @pytest.fixture()
-def duffel_client_factory(http_client: httpx.AsyncClient) -> DuffelClientFactory:
+def duffel_client_factory(
+    http_client: httpx.AsyncClient,
+) -> client_factory.DuffelClientFactory:
     mock_rate_limit_client = mock.create_autospec(
         RateLimitClient,
         spec_set=True,
         instance=True,
     )
-    return DuffelClientFactory(
+    return client_factory.DuffelClientFactory(
         api_base_url=API_BASE_URL,
         api_key="duffel_test_mwCE9C8Ai452UaenWhexo9PQuz1VWbmzzU9ejcVDy3p",
         version="v1",
@@ -85,7 +84,7 @@ def duffel_client(http_client: httpx.AsyncClient) -> client.DuffelClient:
 @pytest.fixture()
 def search_adapter(
     redis_client: aioredis.Redis[bytes],
-    duffel_client_factory: DuffelClientFactory,
+    duffel_client_factory: client_factory.DuffelClientFactory,
 ) -> adapter.DuffelSearchAdapter:
     return adapter.DuffelSearchAdapter(
         duffel_client_factory=duffel_client_factory,
@@ -112,7 +111,7 @@ def search_adapter(
 @pytest.fixture()
 def search_adapter_no_ba(
     redis_client: aioredis.Redis[bytes],
-    duffel_client_factory: DuffelClientFactory,
+    duffel_client_factory: client_factory.DuffelClientFactory,
 ) -> adapter.DuffelSearchAdapter:
     return adapter.DuffelSearchAdapter(
         duffel_client_factory=duffel_client_factory,
@@ -141,7 +140,7 @@ def search_adapter_no_ba(
 def search_adapter_ba_only(
     duffel_client: client.DuffelClient,
     redis_client: aioredis.Redis[bytes],
-    duffel_client_factory: DuffelClientFactory,
+    duffel_client_factory: client_factory.DuffelClientFactory,
 ) -> adapter.DuffelSearchAdapter:
     return adapter.DuffelSearchAdapter(
         duffel_client_factory=duffel_client_factory,

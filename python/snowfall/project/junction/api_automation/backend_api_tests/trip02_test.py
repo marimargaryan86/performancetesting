@@ -8,10 +8,10 @@ import tempfile
 from collections.abc import Mapping, Sequence
 from typing import Any
 
-import aiocsv
 import aiofiles
 import allure
 import pytest
+from aiocsv import writers
 from dateutil.parser import parse as datetime_parse
 
 from snowfall.vendor.junction.go.client import Client, LegType
@@ -66,7 +66,7 @@ async def save_mct_to_csv(
     file_name: str,
 ) -> None:
     async with aiofiles.open(file_name, "w") as f0:
-        writer = aiocsv.AsyncWriter(f0)
+        writer = writers.AsyncWriter(f0)
         await writer.writerow(
             [
                 "trip_id",

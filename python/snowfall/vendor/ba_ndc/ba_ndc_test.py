@@ -368,7 +368,7 @@ async def generate_order(
             name_title="MR",
             birth_date=datetime.date.fromisoformat("1970-01-01"),
             gender=passenger_enums.GenderEnum.male,
-            contact=request_order_schemas.Contact(
+            contact=response_common_passenger_schemas.Contact(
                 email="john.doe@snowfall.com",
                 phone=response_common_passenger_schemas.Phone(
                     phone_type=passenger_enums.PhoneTypeEnum.mobile,

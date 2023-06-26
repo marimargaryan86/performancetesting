@@ -12,6 +12,7 @@ from snowfall.project.junction.go.service.orders.v1alpha import (
 )
 from snowfall.project.junction.go.v1alpha import models_pb2
 from snowfall.stdlib.format import protobuf
+from snowfall.vendor.ask2go import enums
 from snowfall.vendor.ask2go.models import common
 
 _PENALTY_TYPE_MAPPING = types.MappingProxyType(
@@ -55,19 +56,19 @@ def applicability_type_to_proto(
 
 def gender_from_proto(
     gender: orders_models.Passenger.Gender.ValueType,
-) -> common.Gender:
+) -> enums.Gender:
     if gender == orders_models.Passenger.GENDER_MALE:
-        return common.Gender.male
+        return enums.Gender.male
     if gender == orders_models.Passenger.GENDER_FEMALE:
-        return common.Gender.female
-    return common.Gender.unknown
+        return enums.Gender.female
+    return enums.Gender.unknown
 
 
 def document_type_from_proto(
     document_type: orders_models.DocumentDetails.Type.ValueType,
-) -> common.DocumentType | None:
+) -> enums.DocumentType | None:
     if document_type == orders_models.DocumentDetails.Type.TYPE_PASSPORT:
-        return common.DocumentType.passport
+        return enums.DocumentType.passport
 
     return None
 

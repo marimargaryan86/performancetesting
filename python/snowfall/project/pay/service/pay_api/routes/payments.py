@@ -16,6 +16,7 @@ from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import (
     messages,
+    models,
     pagination_helpers,
     request_helpers,
 )
@@ -36,7 +37,7 @@ class Payment(endpoints.HTTPEndpoint):
         if payment is None:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
         return await messages.create_response(
-            body=messages.models.Body(
+            body=models.Body(
                 data=resources.PaymentsResource.from_models(
                     payment=payment,
                     request=request,
@@ -94,7 +95,7 @@ class Payments(endpoints.HTTPEndpoint):
         )
 
         return await messages.create_response(
-            body=messages.models.Body(
+            body=models.Body(
                 data=resources.PaymentsResource.from_models(
                     payment=payment,
                     request=request,
@@ -124,7 +125,7 @@ class Payments(endpoints.HTTPEndpoint):
             for payment in payments.payments
         ]
         return await messages.create_response(
-            body=messages.models.Body(
+            body=models.Body(
                 data=response_data,
                 links=pagination_helpers.get_next_url(
                     request.url_for("Payments"),

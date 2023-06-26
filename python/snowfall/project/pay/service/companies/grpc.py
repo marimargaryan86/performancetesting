@@ -16,9 +16,9 @@ from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.transport.grpc import rich_status, service
 from snowfall.stdlib.v1 import postal_address_pb2
-from snowfall.vendor.currency_cloud import client
+from snowfall.vendor.currency_cloud import client, errors
 from snowfall.vendor.currency_cloud.models import account as cc_account_models
-from snowfall.vendor.currency_cloud.models.beneficiary import BeneficiaryResponse
+from snowfall.vendor.currency_cloud.models import beneficiary as beneficiary_models
 
 
 class CompaniesService(  # noqa: WPS214
@@ -321,7 +321,7 @@ class BeneficiariesService(  # noqa: WPS214
             created_beneficiary = await self._payment_client.create_beneficiary(
                 beneficiary_request,
             )
-        except client.CurrencyCloudError as exc:
+        except errors.CurrencyCloudError as exc:
             await context.abort(
                 grpc.StatusCode.ABORTED,
                 details=str(exc.messages),
@@ -463,7 +463,7 @@ class BeneficiariesService(  # noqa: WPS214
         gathers = await asyncio.gather(*coroutines, return_exceptions=True)
         response_beneficiaries = []
         for beneficiary, cc_beneficiary in zip(beneficiaries, gathers, strict=True):
-            if isinstance(cc_beneficiary, client.CurrencyCloudError):
+            if isinstance(cc_beneficiary, errors.CurrencyCloudError):
                 continue
 
             beneficiary.meta_data.CopyFrom(self._build_meta_data_model(cc_beneficiary))
@@ -481,11 +481,11 @@ class BeneficiariesService(  # noqa: WPS214
         currency: str,
         meta_data: models_pb2.MetaData,
         company_name: str | None,
-    ) -> client.BeneficiaryValidateRequest:
+    ) -> beneficiary_models.BeneficiaryValidateRequest:
         bank_details = meta_data.bank_details
         beneficiary_address = meta_data.beneficiary_address
         bank_address = bank_details.address
-        return client.BeneficiaryValidateRequest(
+        return beneficiary_models.BeneficiaryValidateRequest(
             bank_country=bank_address.region_code,
             currency=currency,
             beneficiary_company_name=company_name,
@@ -510,10 +510,10 @@ class BeneficiariesService(  # noqa: WPS214
     def _get_beneficiary_model(
         self,
         meta_data: models_pb2.MetaData,
-        validated_beneficiary: client.BeneficiaryValidateRequest,
+        validated_beneficiary: beneficiary_models.BeneficiaryValidateRequest,
         company_name: str | None,
-    ) -> client.BeneficiaryRequest:
-        return client.BeneficiaryRequest(
+    ) -> beneficiary_models.BeneficiaryRequest:
+        return beneficiary_models.BeneficiaryRequest(
             **validated_beneficiary.dict(),
             name=company_name,
             bank_account_holder_name=meta_data.bank_account_holder_name,
@@ -522,7 +522,7 @@ class BeneficiariesService(  # noqa: WPS214
 
     def _build_meta_data_model(
         self,
-        cc_beneficiary: BeneficiaryResponse,
+        cc_beneficiary: beneficiary_models.BeneficiaryResponse,
     ) -> models_pb2.MetaData:
         return models_pb2.MetaData(
             bank_account_holder_name=cc_beneficiary.bank_account_holder_name,

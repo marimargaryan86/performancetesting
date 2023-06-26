@@ -18,6 +18,7 @@ from snowfall.vendor.ba_ndc.models import (
     request_order_schemas,
     response_common_passenger_schemas,
 )
+from snowfall.vendor.ba_ndc.models.util import passenger_enums
 
 _PASSPORT_DOCUMENT_TYPE = "PT"
 
@@ -177,7 +178,7 @@ class BookingHandler(object):
                     contact=response_common_passenger_schemas.Contact(
                         email=task.contact_details.email,
                         phone=response_common_passenger_schemas.Phone(
-                            phone_type=enums.passenger_enums.PhoneTypeEnum.mobile,
+                            phone_type=passenger_enums.PhoneTypeEnum.mobile,
                             number="+{country_code}{national_number}".format(
                                 country_code=str(number.country_code),
                                 national_number=str(number.national_number),

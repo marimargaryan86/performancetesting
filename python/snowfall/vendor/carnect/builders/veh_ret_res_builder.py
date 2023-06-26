@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from pydantic.types import Decimal
+import decimal
 
 from snowfall.vendor.carnect import config
 from snowfall.vendor.carnect.builders.common import (
@@ -18,7 +18,7 @@ from snowfall.vendor.carnect.models.service import (
 class VehRetResRqBuilder(object):
     def __init__(self, conf: config.Config) -> None:
         self._rq = VehRetResRq()
-        self._rq.version = Decimal("1.0")
+        self._rq.version = decimal.Decimal("1.0")
         self._pos = PosBuilder()
         self._pos.set_credentials(conf)
         self._rq.pos = self._pos.get()

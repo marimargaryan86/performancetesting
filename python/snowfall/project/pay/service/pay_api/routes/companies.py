@@ -40,7 +40,7 @@ class AdminCompany(endpoints.HTTPEndpoint):
         )
 
         return await messages.create_response(
-            body=messages.models.Body(
+            body=models.Body(
                 data=resources.Company.from_proto(
                     company=company,
                     request=request,
@@ -57,7 +57,7 @@ class AdminCompany(endpoints.HTTPEndpoint):
         company = await companies_client.get(request.path_params["companyId"])
 
         return await messages.create_response(
-            body=messages.models.Body(
+            body=models.Body(
                 data=resources.Company.from_proto(
                     company=company,
                     request=request,
@@ -95,7 +95,7 @@ class AdminCompanies(endpoints.HTTPEndpoint):
         )
 
         return await messages.create_response(
-            body=messages.models.Body(
+            body=models.Body(
                 data=resources.Company.from_proto(
                     company=company,
                     request=request,

@@ -30,13 +30,13 @@ class Contacts(endpoints.HTTPEndpoint):
 
         if not company:
             return models.JsonApiResponse(
-                body=messages.models.Body(
+                body=models.Body(
                     errors=[
-                        messages.models.Error(
+                        models.Error(
                             status=str(status.HTTP_404_NOT_FOUND),
                             code="not_found",
                             detail="Company does not exists",
-                            source=messages.models.ErrorSourcePointer(
+                            source=models.ErrorSourcePointer(
                                 pointer="/data/relationships/company/data/id",
                             ),
                         ),

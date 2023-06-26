@@ -61,7 +61,7 @@ def parse_luggage(
 
 
 def parse_passengers(
-    passengers: bookings.Passengers,
+    passengers: passenger.Passengers,
 ) -> dict[str, Any]:
     return {
         "additional_passengers": passengers.additional_passengers,

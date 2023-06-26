@@ -23,7 +23,7 @@ class Conversions(endpoints.HTTPEndpoint):
             transaction = await transactions_client.get(conversion.id)
         except errors.NotFoundError:
             return await messages.create_response(
-                body=messages.models.Body(
+                body=models.Body(
                     data=resources.ConversionResource.from_proto(
                         conversion=conversion,
                         fx_delta=None,
@@ -35,7 +35,7 @@ class Conversions(endpoints.HTTPEndpoint):
             )
 
         return await messages.create_response(
-            body=messages.models.Body(
+            body=models.Body(
                 data=resources.ConversionResource.from_proto(
                     conversion=conversion,
                     fx_delta=round(
@@ -100,7 +100,7 @@ class ListConversions(endpoints.HTTPEndpoint):
             )
 
         return await messages.create_response(
-            body=messages.models.Body(
+            body=models.Body(
                 data=conversion_resources,
                 links=pagination_helpers.get_next_url(
                     list_conversion_url,

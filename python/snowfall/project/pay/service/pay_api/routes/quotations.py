@@ -40,7 +40,7 @@ class Quotations(endpoints.HTTPEndpoint):
 
         if errors:
             return models.JsonApiResponse(
-                body=messages.models.Body(
+                body=models.Body(
                     errors=errors,
                 ),
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -74,26 +74,26 @@ class Quotations(endpoints.HTTPEndpoint):
         to_currency: Currency | None,
         company: company_models.Company | None,
         beneficiary_company: company_models.Company | None,
-    ) -> list[messages.models.Error]:
+    ) -> list[models.Error]:
         errors = []
         if not from_currency:
             errors.append(
-                messages.models.Error(
+                models.Error(
                     status=str(status.HTTP_404_NOT_FOUND),
                     code="not_found",
                     detail="Provided currency is not supported",
-                    source=messages.models.ErrorSourcePointer(
+                    source=models.ErrorSourcePointer(
                         pointer="data/relationships/fromCurrency",
                     ),
                 ),
             )
         if not to_currency:
             errors.append(
-                messages.models.Error(
+                models.Error(
                     status=str(status.HTTP_404_NOT_FOUND),
                     code="not_found",
                     detail="Provided currency is not supported",
-                    source=messages.models.ErrorSourcePointer(
+                    source=models.ErrorSourcePointer(
                         pointer="data/relationships/toCurrency",
                     ),
                 ),
@@ -101,11 +101,11 @@ class Quotations(endpoints.HTTPEndpoint):
 
         if not company:
             errors.append(
-                messages.models.Error(
+                models.Error(
                     status=str(status.HTTP_404_NOT_FOUND),
                     code="not_found",
                     detail="Provided company not found",
-                    source=messages.models.ErrorSourcePointer(
+                    source=models.ErrorSourcePointer(
                         pointer="data/relationships/payer",
                     ),
                 ),
@@ -113,11 +113,11 @@ class Quotations(endpoints.HTTPEndpoint):
 
         if not beneficiary_company:
             errors.append(
-                messages.models.Error(
+                models.Error(
                     status=str(status.HTTP_404_NOT_FOUND),
                     code="not_found",
                     detail="Provided company not found",
-                    source=messages.models.ErrorSourcePointer(
+                    source=models.ErrorSourcePointer(
                         pointer="data/relationships/beneficiary",
                     ),
                 ),

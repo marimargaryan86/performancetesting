@@ -14,7 +14,7 @@ from snowfall.project.junction.service.providers.ba_ndc.v1alpha import (
 )
 from snowfall.stdlib import h3
 from snowfall.stdlib.format import protobuf
-from snowfall.vendor.ask2go.models import common
+from snowfall.vendor.ask2go import enums
 from snowfall.vendor.ba_ndc.models.util import passenger_enums
 
 _ADULT_YEARS = 12
@@ -99,16 +99,16 @@ def _generate_search_criteria(
 def get_passenger_type(
     date_of_birth: datetime.date,
     date_of_travel: datetime.date,
-) -> common.PassengerType:
+) -> enums.PassengerType:
     age = _get_age_at_date(date_of_birth, date_of_travel)
 
     if age >= _ADULT_YEARS:
-        return common.PassengerType.adult
+        return enums.PassengerType.adult
 
     if age >= _CHILD_YEARS:
-        return common.PassengerType.child
+        return enums.PassengerType.child
 
-    return common.PassengerType.infant
+    return enums.PassengerType.infant
 
 
 def get_passenger_type_enum(
@@ -148,9 +148,9 @@ def get_num_of_passenger_types(
             date,
         )
 
-        if pax_type == common.PassengerType.adult:
+        if pax_type == enums.PassengerType.adult:
             adults += 1
-        elif pax_type == common.PassengerType.child:
+        elif pax_type == enums.PassengerType.child:
             children += 1
         else:
             infants += 1

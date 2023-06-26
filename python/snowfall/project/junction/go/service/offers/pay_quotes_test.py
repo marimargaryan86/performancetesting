@@ -5,10 +5,7 @@ from unittest import mock
 import pytest
 
 from snowfall.project.junction.go.service.offers import offers
-from snowfall.project.junction.go.service.offers.pay_quotes import (
-    PayQuoteResponse,
-    PayQuotes,
-)
+from snowfall.project.junction.go.service.offers.pay_quotes import PayQuotes
 from snowfall.project.junction.go.service.offers.pay_quotes_models import (
     PayQuoteAttributes,
     PayQuoteCompany,
@@ -16,6 +13,7 @@ from snowfall.project.junction.go.service.offers.pay_quotes_models import (
     PayQuoteCurrency,
     PayQuoteCurrencyData,
     PayQuoteRelationships,
+    PayQuoteResponse,
     PayQuoteResponseData,
 )
 from snowfall.project.junction.go.service.offers.v1 import models_pb2
