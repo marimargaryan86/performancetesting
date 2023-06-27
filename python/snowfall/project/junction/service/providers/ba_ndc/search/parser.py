@@ -349,6 +349,11 @@ class OfferParser(object):
                                 amount=offer.price.total_amount,
                                 currency=offer.price.currency,
                             ),
+                            price_breakdown=cache.PriceBreakdown(
+                                currency=offer.price.currency,
+                                tax_amount=offer.price.tax_amount,
+                                base_amount=offer.price.base_amount,
+                            ),
                             passengers=[
                                 cache.OfferDetailsPassenger(
                                     identifier=passenger_info.identifier,
