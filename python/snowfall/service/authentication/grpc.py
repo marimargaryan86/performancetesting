@@ -1,8 +1,11 @@
+import bcrypt
+import email_validator
 import grpc
 import httpx
 from google.rpc import error_details_pb2
 
-from snowfall.service.authentication import auth, repository
+from snowfall.adapter import authentication
+from snowfall.service.authentication import repository
 from snowfall.service.authentication.v1alpha import authentication_pb2 as auth_pb2
 from snowfall.service.authentication.v1alpha import (
     authentication_pb2_grpc as auth_pb2_grpc,
@@ -12,14 +15,8 @@ from snowfall.service.authentication.v1alpha import (
     oauth_pb2,
     oauth_pb2_grpc,
 )
-from snowfall.service.authentication.validators import (
-    match_passwords,
-    password2hash,
-    validate_email,
-    validate_password,
-)
+from snowfall.stdlib import string
 from snowfall.stdlib.format import jwt
-from snowfall.stdlib.string import uuid
 from snowfall.stdlib.transport.grpc import rich_status, service
 from snowfall.vendor.ory import client
 
@@ -31,7 +28,7 @@ class AuthenticationService(
     def __init__(
         self,
         users: repository.UsersRepository,
-        jwt_factory: auth.JWTFactory,
+        jwt_factory: authentication.JWTFactory,
         jwt_encoder: jwt.Encoder,
     ):
         self._users = users
@@ -60,7 +57,7 @@ class AuthenticationService(
         elif request.id:
             user = await self._users.find_user_by_id(request.id)
 
-        if not user or not match_passwords(request.password, user.password):
+        if not user or not _match_passwords(request.password, user.password):
             return await rich_status.abort_with_rich_status(
                 context,
                 rich_status.build_bad_request(
@@ -82,7 +79,7 @@ class AuthenticationService(
         context: grpc.aio.ServicerContext,
     ) -> auth_pb2.CreateUserResponse:
         email = request.email.lower()
-        email_error = validate_email(email)
+        email_error = _validate_email(email)
         if email_error:
             return await rich_status.abort_with_rich_status(
                 context,
@@ -92,7 +89,7 @@ class AuthenticationService(
                     description=email_error,
                 ),
             )
-        password_error = validate_password(request.password)
+        password_error = _validate_password(request.password)
         if password_error:
             return await rich_status.abort_with_rich_status(
                 context,
@@ -122,12 +119,13 @@ class AuthenticationService(
                 ),
             )
 
-        hashed_password = password2hash(request.password)
-
         user = models_pb2.User(
-            id=uuid(),
+            id=string.uuid(),
             email=email,
-            password=hashed_password,
+            password=bcrypt.hashpw(
+                request.password.encode(),
+                bcrypt.gensalt(),
+            ).decode(),
         )
 
         try:
@@ -147,7 +145,7 @@ class AuthenticationService(
         request: auth_pb2.ChangePasswordRequest,
         context: grpc.ServicerContext,
     ) -> auth_pb2.ChangePasswordResponse:
-        error = validate_password(request.password)
+        error = _validate_password(request.password)
         if error:
             return await rich_status.abort_with_rich_status(
                 context,
@@ -168,15 +166,12 @@ class AuthenticationService(
                 details="User is not found",
             )
 
-        hashed_password = password2hash(request.password)
         updated_result = await self._users.update(
             user,
-            hashed_password,
+            bcrypt.hashpw(request.password.encode(), bcrypt.gensalt()).decode(),
         )
 
         if updated_result.matched_count >= 1:
-            # Need to reconsider matched_count > 1 case
-            user.password = hashed_password
             context.set_code(grpc.StatusCode.OK)
             return auth_pb2.ChangePasswordResponse(
                 user=user,
@@ -229,3 +224,24 @@ class OAuthService(service.Service, oauth_pb2_grpc.OAuthServiceServicer):
         return oauth_pb2.GetJWKUrlResponse(
             url=self._client.jwk_url,
         )
+
+
+def _match_passwords(
+    password: str,
+    password_hashed: str,
+) -> bool:
+    return bcrypt.checkpw(password.encode(), password_hashed.encode())
+
+
+def _validate_password(password: str) -> str:
+    if len(password) < 8:
+        return "The password should be more than 8 characters"
+    return ""
+
+
+def _validate_email(email: str) -> str:
+    try:
+        email_validator.validate_email(email=email, check_deliverability=False)
+    except email_validator.EmailSyntaxError as err:
+        return str(err)
+    return ""

@@ -15,6 +15,7 @@ from starlette import applications
 from starlette.middleware import Middleware, authentication
 
 from snowfall.adapter import authentication as auth
+from snowfall.adapter.authentication import JWTFactory
 from snowfall.project.junction.go.adapter import errors
 from snowfall.project.pay import fixtures
 from snowfall.project.pay.adapter import (
@@ -37,7 +38,6 @@ from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import (
     QuotationRates,
     Transaction,
 )
-from snowfall.service.authentication.auth import JWTFactory
 from snowfall.service.authentication.v1alpha.models_pb2 import User
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format.jwt import Encoder

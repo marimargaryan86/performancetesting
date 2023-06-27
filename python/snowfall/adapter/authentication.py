@@ -1,20 +1,15 @@
 import abc
+import dataclasses
 import datetime
+from collections.abc import Mapping
 
 import grpc
 
-from snowfall.service.authentication import auth
 from snowfall.service.authentication.v1alpha import authentication_pb2 as auth_pb2
 from snowfall.service.authentication.v1alpha import (
     authentication_pb2_grpc as auth_pb2_grpc,
 )
 from snowfall.service.authentication.v1alpha import models_pb2
-from snowfall.service.authentication.validators import (
-    match_passwords,
-    password2hash,
-    validate_email,
-    validate_password,
-)
 from snowfall.stdlib import string
 from snowfall.stdlib.format import jwt
 
@@ -29,10 +24,6 @@ class InvalidArgumentError(Exception):
 
 class AlreadyExistsError(Exception):
     """Raise when the resource already exists."""
-
-
-class UnhandledError(Exception):
-    """Raised when an unhandled error occurs."""
 
 
 class Client(abc.ABC):
@@ -65,10 +56,10 @@ class Client(abc.ABC):
 
 class DictClient(Client):
     def __init__(self) -> None:
-        self.email2user: dict[str, models_pb2.User] = {}
-        self.id2user: dict[str, models_pb2.User] = {}
+        self._email2user: dict[str, models_pb2.User] = {}
+        self._id2user: dict[str, models_pb2.User] = {}
         self._encoder = jwt.Encoder()
-        self._jwt_factory = auth.JWTFactory(
+        self._jwt_factory = JWTFactory(
             ttl=datetime.timedelta(hours=1),
         )
 
@@ -80,7 +71,7 @@ class DictClient(Client):
     ) -> str:
         user = self._get_user(uuid, email)
 
-        if not user or not match_passwords(password, user.password):
+        if not user or password != user.password:
             raise InvalidArgumentError("Password is not correct")
 
         return self._encoder.encode(self._jwt_factory.from_user(user))
@@ -90,32 +81,13 @@ class DictClient(Client):
         email: str,
         password: str,
     ) -> models_pb2.User:
-        email = email.lower()
-
-        errors = []
-        email_error = validate_email(email)
-        if email_error:
-            errors.append(email_error)
-        password_error = validate_password(password)
-        if password_error:
-            errors.append(password_error)
-
-        if errors:
-            raise InvalidArgumentError("\n".join(errors))
-
-        user = self._get_user(None, email)
-
-        if user:
-            raise AlreadyExistsError("User already exists")
-
-        uuid = string.uuid()
         new_user = models_pb2.User(
-            id=uuid,
-            email=email,
-            password=password2hash(password),
+            id=string.uuid(),
+            email=email.lower(),
+            password=password,
         )
-        self.email2user[email] = new_user
-        self.id2user[uuid] = new_user
+        self._email2user[new_user.email] = new_user
+        self._id2user[new_user.id] = new_user
 
         return new_user
 
@@ -125,18 +97,14 @@ class DictClient(Client):
         uuid: str = "",
         email: str = "",
     ) -> models_pb2.User:
-        error = validate_password(password)
-        if error:
-            raise InvalidArgumentError(error)
+        user = self._get_user(uuid, email.lower())
 
-        if email:
-            email = email.lower()
-
-        user = self._get_user(uuid, email)
         if not user:
             raise NotFoundError("User is not found")
 
-        user.password = password2hash(password)
+        user.password = password
+        self._email2user[user.email] = user
+        self._id2user[user.id] = user
 
         return user
 
@@ -147,10 +115,10 @@ class DictClient(Client):
     ) -> models_pb2.User | None:
         user = None
         if uuid:
-            user = self.id2user.get(uuid)
+            user = self._id2user.get(uuid)
 
         if email and not user:
-            user = self.email2user.get(email)
+            user = self._email2user.get(email)
 
         return user
 
@@ -182,7 +150,7 @@ class GrpcClient(Client):
             if exc.code() == grpc.StatusCode.INVALID_ARGUMENT:
                 raise InvalidArgumentError(exc.details()) from exc
 
-            raise UnhandledError() from exc
+            raise
 
         return response.auth_token
 
@@ -205,7 +173,7 @@ class GrpcClient(Client):
             if exc.code() == grpc.StatusCode.ALREADY_EXISTS:
                 raise AlreadyExistsError(exc.details()) from exc
 
-            raise UnhandledError() from exc
+            raise
 
         return response.user
 
@@ -229,6 +197,38 @@ class GrpcClient(Client):
             if exc.code() == grpc.StatusCode.NOT_FOUND:
                 raise NotFoundError(exc.details()) from exc
 
-            raise UnhandledError() from exc
+            raise
 
         return response.user
+
+
+@dataclasses.dataclass(frozen=True)
+class _UserInfo(object):
+    id: str  # noqa: A003
+    email: str
+    metadata: Mapping[str, str] = dataclasses.field(default_factory=dict)
+
+
+@dataclasses.dataclass(kw_only=True, frozen=True)
+class _Version2Payload(jwt.Payload):
+    user_info: _UserInfo
+    version: str = dataclasses.field(default="2.0.0", init=False)
+
+
+class JWTFactory(object):
+    def __init__(
+        self,
+        ttl: datetime.timedelta,
+    ):
+        self._ttl = ttl
+
+    def from_user(self, user: models_pb2.User) -> _Version2Payload:
+        return _Version2Payload(
+            user_info=_UserInfo(
+                id=user.id,
+                email=user.email,
+                metadata=dict(user.metadata),
+            ),
+            exp=datetime.datetime.now(tz=datetime.UTC) + self._ttl,
+            jti=string.uuid(),
+        )

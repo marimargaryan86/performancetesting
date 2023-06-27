@@ -5,7 +5,8 @@ from collections.abc import Sequence
 import pydantic
 from motor import motor_asyncio
 
-from snowfall.service.authentication import auth, grpc, repository
+from snowfall.adapter import authentication
+from snowfall.service.authentication import grpc, repository
 from snowfall.stdlib import service
 from snowfall.stdlib.format import jwt
 from snowfall.stdlib.transport.grpc import server
@@ -36,7 +37,7 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
                 repository.UsersRepository(
                     collection=mongo.authentication.users,
                 ),
-                auth.JWTFactory(
+                authentication.JWTFactory(
                     ttl=app.settings.jwt_ttl,
                 ),
                 jwt_encoder=jwt.Encoder(

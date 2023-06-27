@@ -28,7 +28,6 @@ from snowfall.project.junction.go.service.client_api import (
     authentication as authentication_backends,
 )
 from snowfall.project.junction.go.service.client_api import bootstrap, router
-from snowfall.service.authentication import auth
 from snowfall.service.authentication.v1alpha import models_pb2 as auth_models_pb2
 from snowfall.stdlib.format import jwt
 from snowfall.stdlib.integration.starlette import application
@@ -108,7 +107,7 @@ def _create_app(  # noqa: WPS211
 @pytest.fixture()
 def jwt_token(user: auth_models_pb2.User) -> str:
     return jwt.Encoder().encode(
-        auth.JWTFactory(ttl=datetime.timedelta(hours=1)).from_user(user),
+        auth_adapter.JWTFactory(ttl=datetime.timedelta(hours=1)).from_user(user),
     )
 
 
