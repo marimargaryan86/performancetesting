@@ -86,11 +86,12 @@ for e in "${ENVIRONMENTS[@]}"; do
 	chmod +x "repo/promote-environment.sh"
 
 	cd repo
-
 	git add --all .
 
 	if [[ -n "$(git status --porcelain)" ]]; then
 		git commit --author "${CI_COMMIT_AUTHOR}" -m "${CI_COMMIT_TITLE}" -m "Refs: ${CI_PROJECT_PATH}@${CI_COMMIT_SHORT_SHA}"
 		git push -u origin "${e}"
 	fi
+
+	cd ..
 done

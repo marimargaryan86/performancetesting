@@ -48,7 +48,7 @@ EOF
 
 services=()
 
-for DIR in *; do
+for DIR in templates/*; do
 	if ! [ -d "${DIR}" ]; then
 		continue
 	fi
