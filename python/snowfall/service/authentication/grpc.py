@@ -220,3 +220,12 @@ class OAuthService(service.Service, oauth_pb2_grpc.OAuthServiceServicer):
                 owner=oauth2_client.owner,
             ),
         )
+
+    async def GetJWKUrl(  # type: ignore[override] # noqa: N802
+        self,
+        request: oauth_pb2.GetJWKUrlRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> oauth_pb2.GetJWKUrlResponse:
+        return oauth_pb2.GetJWKUrlResponse(
+            url=self._client.jwk_url,
+        )

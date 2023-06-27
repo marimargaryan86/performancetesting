@@ -6,6 +6,7 @@ option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/
 
 service OAuthService {
   rpc GetClient(GetClientRequest) returns (GetClientResponse);
+  rpc GetJWKUrl(GetJWKUrlRequest) returns (GetJWKUrlResponse);
 }
 
 message GetClientRequest {
@@ -19,4 +20,10 @@ message GetClientResponse {
 message Client {
   string id = 1;
   string owner = 2;
+}
+
+message GetJWKUrlRequest {}
+
+message GetJWKUrlResponse {
+  string url = 1;
 }

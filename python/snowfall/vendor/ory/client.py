@@ -17,6 +17,10 @@ class OryClient(object):
         if auth:
             self._client.auth = auth
 
+    @property
+    def jwk_url(self) -> str:
+        return str(self._base_url.join("/.well-known/jwks.json"))
+
     async def get_client_by_id(self, identifier: str) -> models.OAuth2Client:
         response = await self._client.get(url="/admin/clients/{0}".format(identifier))
         response.raise_for_status()
