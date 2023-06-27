@@ -1,13 +1,22 @@
+import hashlib
+import hmac
 import json
 import logging
 from typing import Any
 
-from snowfall.project.pay.service.webhooks.test_webhooks import count_hmac
 from snowfall.stdlib import string
 from snowfall.vendor.junction.client import BaseClient
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
+
+
+def _count_hmac(message: str, secret_key: str) -> str:
+    return hmac.new(
+        secret_key.encode(),
+        message.encode(),
+        hashlib.sha512,
+    ).hexdigest()
 
 
 class PayWebhookClient(BaseClient):  # noqa: WPS214
@@ -53,7 +62,7 @@ class PayWebhookClient(BaseClient):  # noqa: WPS214
         content_body = json.dumps(payload)
         logger.info("webhook payload: %s", json.dumps(content_body, indent=4))
 
-        calculated_hmac = count_hmac(
+        calculated_hmac = _count_hmac(
             content_body,
             pay_webhook_secret_key,
         )

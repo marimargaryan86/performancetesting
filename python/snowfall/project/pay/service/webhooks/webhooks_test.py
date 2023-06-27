@@ -7,7 +7,7 @@ import pytest
 from starlette import exceptions, status
 
 
-def count_hmac(message: str, secret_key: str) -> str:
+def _count_hmac(message: str, secret_key: str) -> str:
     return hmac.new(
         secret_key.encode(),
         message.encode(),
@@ -50,7 +50,7 @@ class TestPaymentWebhooks(object):
             },
         }
         content_body = json.dumps(payload)
-        calculated_hmac = count_hmac(content_body, secret_key)
+        calculated_hmac = _count_hmac(content_body, secret_key)
         response = await webhook_client.post(
             "/webhooks/payments",
             json=payload,
