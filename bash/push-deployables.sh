@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -eu
-shopt -s nullglob globstar
+shopt -s nullglob globstar extglob
 
 rm -rf repo
 git clone git@git.snowfall.se:junction/nomad.git repo
@@ -46,12 +46,12 @@ for e in "${ENVIRONMENTS[@]}"; do
 			done
 		fi
 
-		for i in repo/**/*.nomad; do
+		for i in repo/templates/**/*.nomad; do
 			rm "${i}"
 		done
 	fi
 
-	for i in repo/**/{.skip_deploy,*.vars}; do
+	for i in repo/templates/**/{.skip_deploy,*.vars}; do
 		rm "${i}"
 	done
 
@@ -75,6 +75,9 @@ for e in "${ENVIRONMENTS[@]}"; do
 			fi
 		fi
 	done
+
+	# clean up our past mistakes
+	cd repo && rm -rf !(templates) && cd ..
 
 	cp ".gitlab/deploy.gitlab-ci.yml" "repo/.gitlab-ci.yml"
 	cp "bash/deploy.sh" "repo/deploy.sh"
