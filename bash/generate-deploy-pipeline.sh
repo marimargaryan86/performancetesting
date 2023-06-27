@@ -4,7 +4,10 @@ shopt -s nullglob
 
 DEPLOYMENT_ENVIRONMENT=$(basename "$1")
 DEPLOYMENT_TIER=${DEPLOYMENT_ENVIRONMENT}
-[[ $DEPLOYMENT_TIER == "sandbox" ]] && DEPLOYMENT_TIER="staging"
+
+if [[ $DEPLOYMENT_TIER == "sandbox" ]]; then
+	DEPLOYMENT_TIER="staging"
+fi
 
 # editorconfig-checker-disable
 cat <<EOF
@@ -31,8 +34,8 @@ make-uninterruptible:
     action: start
   variables:
     NOMAD_NAMESPACE: "${DEPLOYMENT_ENVIRONMENT}"
-    NOMAD_ADDR: "${2}"
-    NOMAD_VAR_datacenter: "${3}"
+    NOMAD_ADDR: "\${NOMAD_${DEPLOYMENT_ENVIRONMENT^^}_ADDR}"
+    NOMAD_VAR_datacenter: "\${NOMAD_${DEPLOYMENT_ENVIRONMENT^^}_DATACENTER}"
     NOMAD_VAR_environment: "${DEPLOYMENT_ENVIRONMENT}"
     NOMAD_VAR_registry_address: "\${CI_REGISTRY}"
     NOMAD_VAR_registry_password: "\${NOMAD_REGISTRY_PASSWORD}"
@@ -45,7 +48,7 @@ EOF
 
 services=()
 
-for DIR in "${1}"/*; do
+for DIR in *; do
 	if ! [ -d "${DIR}" ]; then
 		continue
 	fi
@@ -111,7 +114,7 @@ ${service_name}:
   extends: .deploy
   resource_group: ${service_name}
   environment:
-    name: $(basename "${1}")/${service_name}
+    name: "${DEPLOYMENT_ENVIRONMENT}/${service_name}"
     deployment_tier: ${DEPLOYMENT_TIER}
   variables:
     NOMAD_VAR_docker_image: ${docker_image}
@@ -145,13 +148,12 @@ for service in "${services[@]}"; do
 	echo "  - ${service}"
 done
 
-if [ "$(basename "${1}")" == "development" ]; then
+if [ "${DEPLOYMENT_ENVIRONMENT}" == "development" ]; then
 	# editorconfig-checker-disable
 	cat <<EOF
 
 .promote:
-  stage: promote 
-  resource_group: promote_env
+  stage: promote
   interruptible: false
   before_script:
     - mkdir -p ~/.ssh/
@@ -170,12 +172,12 @@ if [ "$(basename "${1}")" == "development" ]; then
 promote-to-production:
   extends: .promote
   script:
-    - ./promote-environment.sh development production ${services[@]}
+    - ./promote-environment.sh production ${services[@]}
 
 promote-to-sandbox:
   extends: .promote
   script:
-    - ./promote-environment.sh development sandbox ${services[@]}
+    - ./promote-environment.sh sandbox ${services[@]}
 
 EOF
 # editorconfig-checker-enable
