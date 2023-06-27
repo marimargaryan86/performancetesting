@@ -106,6 +106,7 @@ AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 {{ with secret "kv/data/${var.environment}/duffel" }}
 API_KEY={{ .Data.data.api_key }}
+RESELLERS_MAP={{ .Data.data.resellers_map }}
 {{ end }}
 EOH
         destination = "services.env"

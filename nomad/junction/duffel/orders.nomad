@@ -107,6 +107,7 @@ REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis:
 SMTP_DSN={{range $index, $service := service "smtp"}}smtp://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}{{end}}
 {{ with secret "kv/data/${var.environment}/duffel" }}
 API_KEY={{ .Data.data.api_key }}
+RESELLERS_MAP={{ .Data.data.resellers_map }}
 {{ end }}
 EOH
         destination = "services.env"
