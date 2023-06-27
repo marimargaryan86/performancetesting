@@ -23,3 +23,5 @@ deploy:
     include:
       - artifact: dist/${CI_COMMIT_BRANCH}.yml
         job: generate
+    strategy: depend
+  resource_group: deploy-${CI_COMMIT_BRANCH}

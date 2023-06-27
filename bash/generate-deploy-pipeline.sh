@@ -30,6 +30,7 @@ make-uninterruptible:
   image: git.snowfall.se:4567/junction/junction/pants:main
   script:
     - ./deploy.sh "\${service}" "\${version}" "${DEPLOYMENT_ENVIRONMENT}" \${templates}
+  retry: 2
   environment:
     action: start
   variables:
@@ -98,7 +99,6 @@ for DIR in templates/*; do
 
 ${service_name}:
   stage: deploy
-  resource_group: ${service_name}
   script:
     - echo "Skipped due to ${skip_deploy}."
   needs: []
@@ -112,7 +112,6 @@ EOF
 
 ${service_name}:
   extends: .deploy
-  resource_group: ${service_name}
   environment:
     name: "${DEPLOYMENT_ENVIRONMENT}/${service_name}"
     deployment_tier: ${DEPLOYMENT_TIER}

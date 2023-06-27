@@ -112,7 +112,7 @@ pants:package:
     - !reference [.pants, services]
     - name: "docker@sha256:ed6220b0de0f309f0844cf8cf1a6b861e981fb7f5c28bec6acc97abc910bd0a8"
       alias: dockerdaemon
-  resource_group: package # needed due to Docker images disappearing :(
+  resource_group: pants-package
   artifacts:
     paths:
       - dist/
@@ -126,6 +126,7 @@ pants:package:
 
 pants:release:
   stage: deploy
+  resource_group: pants-release
   interruptible: false
   image: "${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG}"
   services:
