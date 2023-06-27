@@ -9,7 +9,7 @@ ENVIRONMENTS=("development" "production" "sandbox")
 
 for e in "${ENVIRONMENTS[@]}"; do
 	cd repo
-	git switch "${e}" 2>/dev/null || git switch -c "${e}"
+	git switch "${e}" 2>/dev/null || git switch --orphan "${e}"
 	cd ..
 
 	if [[ "${e}" == "development" ]]; then
@@ -91,6 +91,6 @@ for e in "${ENVIRONMENTS[@]}"; do
 
 	if [[ -n "$(git status --porcelain)" ]]; then
 		git commit --author "${CI_COMMIT_AUTHOR}" -m "${CI_COMMIT_TITLE}" -m "Refs: ${CI_PROJECT_PATH}@${CI_COMMIT_SHORT_SHA}"
-		git push
+		git push -u origin "${e}"
 	fi
 done
