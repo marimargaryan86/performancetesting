@@ -115,9 +115,6 @@ def python_image(  # type: ignore[no-untyped-def]
             "python/snowfall/project/junction/plus/service/notification_center/importer.py",
             "python/snowfall/project/junction/plus/service/notification_center/validators.py",
         },
-        "python/snowfall/project/junction/extensions/service/mobile_api/handlers.py": {
-            "python/snowfall/project/junction/plus/service/poc_api/main.py",
-        },
         "python/snowfall/project/pay/service/companies/repositories.py": {
             "python/snowfall/project/pay/service/pay_api/bootstrap.py",
             "python/snowfall/project/pay/service/pay_api/conftest.py",

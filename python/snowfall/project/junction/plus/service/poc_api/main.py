@@ -7,12 +7,10 @@ from motor import motor_asyncio
 from redis import asyncio as aioredis
 from starlette import applications
 
-from snowfall.project.junction.extensions.service.mobile_api import (
-    handlers as mobile_handlers,
-)
 from snowfall.project.junction.plus.service.poc_api import (
     bootstrap,
     flight_stats_client,
+    handlers,
     icoupon,
     repository,
     s3,
@@ -99,7 +97,7 @@ def _factory(
         asgi_app.add_exception_handler(
             httpx.HTTPStatusError,
             partial(
-                mobile_handlers.go_status_error_handler,
+                handlers.go_status_error_handler,
                 go_urls=app.settings.junction_api_address,
             ),
         )
