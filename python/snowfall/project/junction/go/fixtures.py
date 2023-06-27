@@ -347,6 +347,16 @@ def generate_offer(identifier: str) -> offers_pb2.OfferAggregate:
 
 
 def get_price_quotes() -> list[offers_pb2.PriceQuoteContainer]:
+    price_breakdown = [
+        offers_pb2.PriceBreakdown(
+            price=money.from_string("3.37", money.Currency("SEK")).protobuf(),
+            breakdown_type=offers_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_BASE_FEE,
+        ),
+        offers_pb2.PriceBreakdown(
+            price=money.from_string("10.00", money.Currency("SEK")).protobuf(),
+            breakdown_type=offers_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_TAX,
+        ),
+    ]
     return [
         offers_pb2.PriceQuoteContainer(
             id=PRICE_QUOTES[0],
@@ -357,6 +367,7 @@ def get_price_quotes() -> list[offers_pb2.PriceQuoteContainer]:
                         string_amount="13.37",
                         currency=money.Currency("SEK"),
                     ).protobuf(),
+                    price_breakdown=price_breakdown,
                 ),
                 offers_pb2.PriceQuote(
                     option_id=PROVIDER_OFFERS[2],
@@ -364,6 +375,7 @@ def get_price_quotes() -> list[offers_pb2.PriceQuoteContainer]:
                         string_amount="13.37",
                         currency=money.Currency("SEK"),
                     ).protobuf(),
+                    price_breakdown=price_breakdown,
                 ),
             ],
             offer_id=OFFERS[0],

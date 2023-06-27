@@ -46,6 +46,16 @@ class DictClient(Client):
         expires_at = datetime.datetime.now(datetime.UTC) + datetime.timedelta(
             days=1,
         )
+        price_breakdown = [
+            models_pb2.PriceBreakdown(
+                price=money.from_string("3.37", money.Currency("EUR")).protobuf(),
+                breakdown_type=models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_BASE_FEE,
+            ),
+            models_pb2.PriceBreakdown(
+                price=money.from_string("10.00", money.Currency("EUR")).protobuf(),
+                breakdown_type=models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_TAX,
+            ),
+        ]
         price_quote = models_pb2.PriceQuoteContainer(
             id=string.uuid(),
             expires_at=protobuf.datetime_to_protobuf(expires_at),
@@ -54,6 +64,7 @@ class DictClient(Client):
                     id=string.uuid(),
                     expires_at=protobuf.datetime_to_protobuf(expires_at),
                     price=money.from_string("13.37", money.Currency("EUR")).protobuf(),
+                    price_breakdown=price_breakdown,
                 )
                 for _ in option_ids
             ],
