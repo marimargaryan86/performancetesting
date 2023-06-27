@@ -107,11 +107,51 @@ def python_image(  # type: ignore[no-untyped-def]
     except KeyError:
         name = build_file_dir().name  # type: ignore[name-defined]  # noqa: F821
 
+    offenders = {
+        "python/snowfall/project/junction/api_automation/test_functions/pay_webhook_client.py": {
+            "python/snowfall/project/junction/extensions/service/mobile_api/places_migration.py",
+        },
+        "python/snowfall/project/junction/plus/service/orders_registration/validators.py": {
+            "python/snowfall/project/junction/plus/service/notification_center/importer.py",
+            "python/snowfall/project/junction/plus/service/notification_center/validators.py",
+        },
+        "python/snowfall/project/junction/extensions/service/mobile_api/handlers.py": {
+            "python/snowfall/project/junction/plus/service/poc_api/main.py",
+        },
+        "python/snowfall/project/pay/service/transactions/quote.py": {
+            "python/snowfall/project/pay/adapter/quotations.py",
+        },
+        "python/snowfall/project/pay/service/companies/repositories.py": {
+            "python/snowfall/project/pay/service/pay_api/bootstrap.py",
+            "python/snowfall/project/pay/service/pay_api/conftest.py",
+            "python/snowfall/project/pay/service/pay_api/main.py",
+            "python/snowfall/project/pay/service/pay_api/routes/accounts.py",
+            "python/snowfall/project/pay/service/pay_api/routes/balances.py",
+            "python/snowfall/project/pay/service/pay_api/routes/conftest.py",
+            "python/snowfall/project/pay/service/pay_api/routes/contacts.py",
+        },
+        "python/snowfall/project/junction/go/service/places/places.py": {
+            "python/snowfall/project/junction/extensions/service/mobile_api/places_migration.py",
+        },
+    }
+
     __dependents_rules__(  # type: ignore[name-defined]  # noqa: F821
+        *(
+            (
+                {"path": "//{0}".format(offended_file)},
+                "/**",
+                *(
+                    "?//{0}".format(offending_file)
+                    for offending_file in offending_files
+                ),
+                "!*",
+            )
+            for offended_file, offending_files in offenders.items()
+        ),
         (
             {"path": "/**"},
             "/**",
-            "?*",
+            "!*",
         ),
         ("*", "!*"),
     )
