@@ -107,6 +107,15 @@ def python_image(  # type: ignore[no-untyped-def]
     except KeyError:
         name = build_file_dir().name  # type: ignore[name-defined]  # noqa: F821
 
+    __dependents_rules__(  # type: ignore[name-defined]  # noqa: F821
+        (
+            {"path": "/**"},
+            "/**",
+            "?*",
+        ),
+        ("*", "!*"),
+    )
+
     pex_binary(  # type: ignore[name-defined]  # noqa: F821
         **(
             {
