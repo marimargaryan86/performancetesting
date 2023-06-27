@@ -10,6 +10,7 @@ from snowfall.stdlib.integration.click import parameters
 class _TestModel(pydantic.BaseModel):
     bool_option: bool
     dict_string_string_option_default: dict[str, str] = {"foo": "bar"}
+    dict_option_default_factory: dict[str, str] = pydantic.Field(default_factory=dict)
     float_option: float
     integer_option: int
     list_string_option_default: list[str] = ["foobar"]
@@ -43,6 +44,13 @@ def test_create_from_pydantic_model() -> None:
                     ["--dict-string-string-option-default"],
                     default='{"foo":"bar"}',
                     envvar="DICT_STRING_STRING_OPTION_DEFAULT",
+                    required=False,
+                    type=parameters.JSONParameterType(),
+                ),
+                click.Option(
+                    ["--dict-option-default-factory"],
+                    default="{}",  # noqa: P103
+                    envvar="DICT_OPTION_DEFAULT_FACTORY",
                     required=False,
                     type=parameters.JSONParameterType(),
                 ),

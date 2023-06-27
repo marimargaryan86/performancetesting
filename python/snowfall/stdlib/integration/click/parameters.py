@@ -169,23 +169,25 @@ _iterables = (list, set, tuple)
 def _get_parameter_default(
     arg: pydantic.fields.ModelField,
 ) -> types.Primitive | list[types.Primitive] | None:
-    if arg.default == pydantic.fields.UndefinedType or arg.default is None:
+    resolved_default = arg.get_default()
+
+    if resolved_default == pydantic.fields.UndefinedType or resolved_default is None:
         return None
 
-    if isinstance(arg.default, dict):
-        return orjson.dumps(arg.default).decode()
+    if isinstance(resolved_default, dict):
+        return orjson.dumps(resolved_default).decode()
 
-    if isinstance(arg.default, _iterables) or sequence.is_a(arg.default):
+    if isinstance(resolved_default, _iterables) or sequence.is_a(resolved_default):
         return [
             (
                 default
                 if isinstance(default, bool | float | int | str)  # noqa: WPS221
                 else str(default)
             )
-            for default in arg.default
+            for default in resolved_default
         ]
 
-    if isinstance(arg.default, bool | float | int | str):
-        return arg.default
+    if isinstance(resolved_default, bool | float | int | str):
+        return resolved_default
 
-    return str(arg.default)
+    return str(resolved_default)
