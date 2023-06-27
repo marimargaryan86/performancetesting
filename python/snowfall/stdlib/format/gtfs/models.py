@@ -1,5 +1,6 @@
 import dataclasses
 import datetime
+from types import MappingProxyType
 from typing import Annotated
 
 import pydantic
@@ -19,10 +20,12 @@ def _timedelta_to_time(td: datetime.timedelta) -> str:
 
 class _BaseModel(pydantic.BaseModel):
     class Config(object):
-        json_encoders = {
-            datetime.date: lambda date_obj: date_obj.strftime("%Y%m%d"),
-            datetime.timedelta: _timedelta_to_time,
-        }
+        json_encoders = MappingProxyType(
+            {
+                datetime.date: lambda date_obj: date_obj.strftime("%Y%m%d"),
+                datetime.timedelta: _timedelta_to_time,
+            },
+        )
 
 
 class Agency(_BaseModel):

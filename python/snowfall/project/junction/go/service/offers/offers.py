@@ -23,9 +23,9 @@ class TripOfferRepository(
     repository.ProtoRepository[models_pb2.OfferGroup],
 ):
     _proto = models_pb2.OfferGroup
-    _indexes = [
+    _indexes = (
         pymongo.IndexModel("expires_at", expireAfterSeconds=1, background=True),
-    ]
+    )
 
     async def find(
         self,
@@ -53,7 +53,7 @@ class TripOfferGroupDetailsRepository(
 ):
     _proto = models_pb2.OfferSegment
     _nested_path = "segments"
-    _indexes = [pymongo.IndexModel("segments._id", background=True)]
+    _indexes = (pymongo.IndexModel("segments._id", background=True),)
 
     async def find(
         self,
@@ -95,7 +95,7 @@ class OfferOptionsRepository(
 ):
     _proto = models_pb2.Offer
     _nested_path = "offers"
-    _indexes = [pymongo.IndexModel("offers._id", background=True)]
+    _indexes = (pymongo.IndexModel("offers._id", background=True),)
 
     async def find(
         self,
@@ -137,10 +137,10 @@ class OfferOptionDetailsRepository(
 ):
     _proto = models_pb2.OfferSegmentDetails
     _nested_path = "offers.segment_details"
-    _indexes = [
+    _indexes = (
         pymongo.IndexModel("offers.segment_details._id", background=True),
         pymongo.IndexModel("offers.segment_details.cabin_class.type", background=True),
-    ]
+    )
 
     async def find(
         self,
@@ -186,11 +186,11 @@ class OfferAggregateMappingRepository(
     repository.ProtoRepository[models_pb2.OfferAggregateMapping],
 ):
     _proto = models_pb2.OfferAggregateMapping
-    _indexes = [
+    _indexes = (
         pymongo.IndexModel(_OFFER_SEARCH_ID, background=True),
         pymongo.IndexModel("offer_result_ids", background=True),
         pymongo.IndexModel("expires_at", expireAfterSeconds=1, background=True),
-    ]
+    )
 
     async def find_by_offer_search_ids(
         self,
@@ -270,7 +270,9 @@ class OfferSearchRepository(  # noqa: WPS215
     repository.ProtoRepository[models_pb2.OfferSearch],
 ):
     _proto = models_pb2.OfferSearch
-    _indexes = [pymongo.IndexModel("expires_at", expireAfterSeconds=1, background=True)]
+    _indexes = (
+        pymongo.IndexModel("expires_at", expireAfterSeconds=1, background=True),
+    )
 
     def __init__(
         self,

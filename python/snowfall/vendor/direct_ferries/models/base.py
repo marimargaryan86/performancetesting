@@ -1,5 +1,6 @@
 import datetime
 import functools
+from types import MappingProxyType
 
 import pydantic
 
@@ -12,8 +13,10 @@ class CamelCaseBaseModel(pydantic.BaseModel):
         allow_population_by_field_name = True
         keep_untouched = (functools.cached_property,)
 
-        json_encoders = {
-            datetime.datetime: lambda datetime_object: datetime_object.isoformat(
-                timespec="seconds",
-            ),
-        }
+        json_encoders = MappingProxyType(
+            {
+                datetime.datetime: lambda datetime_object: datetime_object.isoformat(
+                    timespec="seconds",
+                ),
+            },
+        )

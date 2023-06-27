@@ -10,10 +10,10 @@ from snowfall.stdlib.persistence.mongo import repository
 class OrderRepository(repository.ProtoRepository[models_pb2.PersistedOrder]):
     _proto = models_pb2.PersistedOrder
     _nested_path = "bookings"
-    _indexes = [
+    _indexes = (
         pymongo.IndexModel("subscriber_id", background=True),
         pymongo.IndexModel("bookings.route_identifier", background=True),
-    ]
+    )
 
     async def create(  # noqa: WPS211
         self,
@@ -44,11 +44,11 @@ class OrderRepository(repository.ProtoRepository[models_pb2.PersistedOrder]):
 
 class SubscriberRepository(repository.ProtoRepository[models_pb2.Subscriber]):
     _proto = models_pb2.Subscriber
-    _indexes = [
+    _indexes = (
         pymongo.IndexModel("email", background=True),
         pymongo.IndexModel("phone_number", background=True),
         pymongo.IndexModel("reseller_id", background=True),
-    ]
+    )
 
     async def get_or_create(
         self,

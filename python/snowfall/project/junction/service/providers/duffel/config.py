@@ -22,8 +22,8 @@ class DuffelConfig(pydantic.BaseModel):
 
 class Settings(DuffelConfig, service.ProviderSettings):
     ttl: datetime.timedelta = datetime.timedelta(minutes=DEFAULT_TTL_IN_MINUTES)
-    enabled_airlines: set[str] = set()
-    disabled_airlines: set[str] = set()
+    enabled_airlines: set[str] = pydantic.Field(default_factory=set)
+    disabled_airlines: set[str] = pydantic.Field(default_factory=set)
 
 
 class PricingSettings(DuffelConfig, service.Settings):

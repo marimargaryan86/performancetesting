@@ -14,9 +14,7 @@ class CompaniesRepository(
     repository.ProtoRepository[models_pb2.Company],
 ):
     _proto = models_pb2.Company
-    _indexes = [
-        pymongo.IndexModel("name", background=True, unique=True),
-    ]
+    _indexes = (pymongo.IndexModel("name", background=True, unique=True),)
 
     async def update(
         self,

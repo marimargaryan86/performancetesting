@@ -1,5 +1,6 @@
 import time
 from collections.abc import Callable
+from types import MappingProxyType
 
 import prometheus_client
 from google.protobuf.message import Message
@@ -80,9 +81,9 @@ class MetricsServerInterceptor(interceptor.ServerInterceptor):
         ["rpc", "status"],
     )
 
-    _status_codes: dict[int, StatusCode] = {
-        status_code.value[0]: status_code for status_code in StatusCode
-    }
+    _status_codes: MappingProxyType[int, StatusCode] = MappingProxyType(
+        {status_code.value[0]: status_code for status_code in StatusCode},
+    )
 
     async def intercept_unary_unary(
         self,

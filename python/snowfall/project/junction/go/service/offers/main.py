@@ -59,7 +59,9 @@ class _ImportSettings(pay_integration.Settings, _PaySettings, service.Settings):
     default_ttl: datetime.timedelta = datetime.timedelta(minutes=15)
     mongo_dsn: Sequence[pydantic.AnyUrl]
     redis_dsn: Sequence[pydantic.AnyUrl]
-    reseller_disabled_operators: importer.RESELLERS_TO_PROVIDER_OPERATORS = {}
+    reseller_disabled_operators: importer.RESELLERS_TO_PROVIDER_OPERATORS = (
+        pydantic.Field(default_factory=dict)
+    )
     gateway_address: str
     gateway_timeout: datetime.timedelta = datetime.timedelta(seconds=45)
 

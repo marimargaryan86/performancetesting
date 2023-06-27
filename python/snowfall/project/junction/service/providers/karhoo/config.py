@@ -24,7 +24,7 @@ class OfferSettings(service.Settings, KarhooConfig):
     polling_wait_time_seconds: int = 10
     polling_retries_attempts: int = 4
     provider_company_id: str
-    reseller_providers: dict[str, list[str]] = {}
+    reseller_providers: dict[str, list[str]] = pydantic.Field(default_factory=dict)
 
 
 class OrderSettings(service.Settings, KarhooConfig):

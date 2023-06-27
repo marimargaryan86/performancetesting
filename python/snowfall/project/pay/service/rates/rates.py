@@ -54,10 +54,10 @@ class BackUpRatesRepository(
     repository.ProtoRepository[models_pb2.BackUpRate],
 ):
     _proto = models_pb2.BackUpRate
-    _indexes = [
+    _indexes = (
         pymongo.IndexModel("buy_currency", background=True),
         pymongo.IndexModel("sell_currency", background=True),
-    ]
+    )
 
     async def insert_many(
         self,

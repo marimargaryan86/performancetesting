@@ -47,9 +47,7 @@ class LocationRepository(
     mixins.FindByIdMixin[models_pb2.Location],
     repository.ProtoRepository[models_pb2.Location],
 ):
-    _indexes = [
-        IndexModel([("coordinates", GEOSPHERE)], background=True),
-    ]
+    _indexes = (IndexModel([("coordinates", GEOSPHERE)], background=True),)
     _proto = models_pb2.Location
 
     async def find(
@@ -149,9 +147,7 @@ class PlaceRepository(  # noqa: WPS215
     repository.ProtoRepository[models_pb2.Place],
 ):
     _proto = models_pb2.Place
-    _indexes = [
-        IndexModel([("location.coordinates", GEOSPHERE)], background=True),
-    ]
+    _indexes = (IndexModel([("location.coordinates", GEOSPHERE)], background=True),)
 
     def __init__(
         self,

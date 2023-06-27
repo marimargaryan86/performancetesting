@@ -1,5 +1,6 @@
 import random
 from argparse import ArgumentParser
+from typing import ClassVar
 
 from locust import HttpUser, constant_pacing, events, task
 
@@ -22,7 +23,7 @@ class Quotes(HttpUser):
     # --token $PAY_TOKEN --host https://api.pay.junction.dev -t 10s
     # --headless --autostart --quotes $QUOTES_AMOUNT
 
-    quotations_list: list[str] = []
+    quotations_list: ClassVar[list[str]] = []
     wait_time = constant_pacing(3)  # type: ignore[no-untyped-call]
 
     @task

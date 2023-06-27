@@ -1,6 +1,7 @@
 import logging
 import random
 from argparse import ArgumentParser
+from typing import ClassVar
 
 from locust import HttpUser, events, task
 
@@ -36,7 +37,7 @@ class Quotes(HttpUser):
     # --payer-uuid e6cb9cbe-b81b-4fc0-83b5-2794a1eed179
     # --beneficiary-uuid dded3966-5c57-46dc-a8f8-212ae4287bde
 
-    quotations_list: list[str] = []
+    quotations_list: ClassVar[list[str]] = []
 
     @task
     def test_get_quotations(self) -> None:  # noqa: WPS210

@@ -68,7 +68,7 @@ class PlacesRepository(
     repository.ProtoRepository[models_pb2.Place],
 ):
     _proto = models_pb2.Place
-    _indexes = [
+    _indexes = (
         pymongo.IndexModel("name", background=True),
         pymongo.IndexModel("no_accent_name", background=True),
         pymongo.IndexModel("no_accent_local_name", background=True),
@@ -79,7 +79,7 @@ class PlacesRepository(
             [("coordinates", pymongo.GEOSPHERE)],
             background=True,
         ),
-    ]
+    )
 
     async def match(
         self,
@@ -150,9 +150,7 @@ class UsersRepository(
     repository.ProtoRepository[models_pb2.User],
 ):
     _proto = models_pb2.User
-    _indexes = [
-        pymongo.IndexModel("email", background=True, unique=True),
-    ]
+    _indexes = (pymongo.IndexModel("email", background=True, unique=True),)
 
     async def update_password(
         self,
@@ -320,10 +318,10 @@ class OrdersRepository(
     repository.ProtoRepository[models_pb2.MobileOrder],
 ):
     _proto = models_pb2.MobileOrder
-    _indexes = [
+    _indexes = (
         pymongo.IndexModel("userId", background=True),
         pymongo.IndexModel("created_at", background=True),
-    ]
+    )
 
     async def get_user_orders(
         self,
@@ -344,9 +342,7 @@ class VouchersRepository(
     repository.ProtoRepository[models_pb2.Voucher],
 ):
     _proto = models_pb2.Voucher
-    _indexes = [
-        pymongo.IndexModel("code", background=True, unique=True),
-    ]
+    _indexes = (pymongo.IndexModel("code", background=True, unique=True),)
 
     async def find_voucher(
         self,
@@ -430,11 +426,11 @@ class NotificationTokensRepository(
     repository.ProtoRepository[models_pb2.NotificationToken],
 ):
     _proto = models_pb2.NotificationToken
-    _indexes = [
+    _indexes = (
         pymongo.IndexModel("user_id", background=True),
         pymongo.IndexModel("device_token", background=True, unique=True),
         pymongo.IndexModel("notification_token", background=True, unique=True),
-    ]
+    )
 
     async def delete(self, document_id: str, user_id: str) -> int:
         delete = await self._execute(
@@ -478,9 +474,7 @@ class UserGroupsRepository(
     repository.ProtoRepository[models_pb2.UserGroup],
 ):
     _proto = models_pb2.UserGroup
-    _indexes = [
-        pymongo.IndexModel("user_id", background=True),
-    ]
+    _indexes = (pymongo.IndexModel("user_id", background=True),)
 
     # TODO: Add pagination
     async def find_by_user(

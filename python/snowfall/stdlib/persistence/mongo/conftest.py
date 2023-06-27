@@ -44,7 +44,7 @@ class MockRepository(
     mixins.InsertMixin[dict[str, Any]],
     repository.DefaultRepository,
 ):
-    _indexes = [pymongo.IndexModel("field")]
+    _indexes = (pymongo.IndexModel("field"),)
 
     async def find_subset(
         self,
@@ -66,10 +66,10 @@ class NestedMockRepository(
     repository.DefaultRepository,
 ):
     _nested_path = "nested"
-    _indexes = [
+    _indexes = (
         pymongo.IndexModel("nested._id"),
         pymongo.IndexModel("nested.field"),
-    ]
+    )
 
 
 @pytest.fixture()

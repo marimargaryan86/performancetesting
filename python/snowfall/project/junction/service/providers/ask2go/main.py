@@ -68,7 +68,7 @@ class _Settings(service.ProviderSettings):
     poll_retries_limit: int = 10
     wait_time_between_polling: float = 1
     mongo_dsn: Sequence[pydantic.AnyUrl]
-    reseller_affiliate_mapping: dict[str, str] = {}
+    reseller_affiliate_mapping: dict[str, str] = pydantic.Field(default_factory=dict)
     storage_dsn: service.AnyDsn
     rate_limiter_grpc_host: str
     rate_limiter_service_configs: dict[str, RateLimitConfig]

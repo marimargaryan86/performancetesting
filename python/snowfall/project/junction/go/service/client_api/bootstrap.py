@@ -36,8 +36,8 @@ class Settings(application.Settings):
     ory_api_key: str
     ory_jwk_ttl: datetime.timedelta = datetime.timedelta(hours=1)
     validate_responses_against_spec: bool = True
-    reseller_currencies: dict[str, str] = {}
-    reseller_pay_companies: dict[str, str] = {}
+    reseller_currencies: dict[str, str] = pydantic.Field(default_factory=dict)
+    reseller_pay_companies: dict[str, str] = pydantic.Field(default_factory=dict)
 
 
 def create_dependencies(  # noqa: WPS211

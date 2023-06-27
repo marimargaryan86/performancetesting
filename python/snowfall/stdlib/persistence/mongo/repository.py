@@ -149,23 +149,25 @@ class RepositoryProtocol(Protocol[Record]):
 
 class _AbstractRepository(abc.ABC, Generic[Record]):
     _nested_path: str | None = None
-    _indexes: list[pymongo.IndexModel] = []
-    _timeout_kwargs = {
-        core.AgnosticCollection.aggregate: _MAX_TIME_MS_CAMEL,
-        core.AgnosticCollection.count_documents: _MAX_TIME_MS_CAMEL,
-        core.AgnosticCollection.create_index: _MAX_TIME_MS_CAMEL,
-        core.AgnosticCollection.create_indexes: _MAX_TIME_MS_CAMEL,
-        core.AgnosticCollection.distinct: _MAX_TIME_MS_CAMEL,
-        core.AgnosticCollection.drop_index: _MAX_TIME_MS_CAMEL,
-        core.AgnosticCollection.drop_indexes: _MAX_TIME_MS_CAMEL,
-        core.AgnosticCollection.estimated_document_count: _MAX_TIME_MS_CAMEL,
-        core.AgnosticCollection.find: _MAX_TIME_MS_SNAKE,
-        core.AgnosticCollection.find_one: _MAX_TIME_MS_SNAKE,
-        core.AgnosticCollection.find_one_and_delete: _MAX_TIME_MS_CAMEL,
-        core.AgnosticCollection.find_one_and_replace: _MAX_TIME_MS_CAMEL,
-        core.AgnosticCollection.find_one_and_update: _MAX_TIME_MS_CAMEL,
-        core.AgnosticCollection.find_raw_batches: _MAX_TIME_MS_SNAKE,
-    }
+    _indexes: tuple[pymongo.IndexModel, ...] = ()
+    _timeout_kwargs = types.MappingProxyType(
+        {
+            core.AgnosticCollection.aggregate: _MAX_TIME_MS_CAMEL,
+            core.AgnosticCollection.count_documents: _MAX_TIME_MS_CAMEL,
+            core.AgnosticCollection.create_index: _MAX_TIME_MS_CAMEL,
+            core.AgnosticCollection.create_indexes: _MAX_TIME_MS_CAMEL,
+            core.AgnosticCollection.distinct: _MAX_TIME_MS_CAMEL,
+            core.AgnosticCollection.drop_index: _MAX_TIME_MS_CAMEL,
+            core.AgnosticCollection.drop_indexes: _MAX_TIME_MS_CAMEL,
+            core.AgnosticCollection.estimated_document_count: _MAX_TIME_MS_CAMEL,
+            core.AgnosticCollection.find: _MAX_TIME_MS_SNAKE,
+            core.AgnosticCollection.find_one: _MAX_TIME_MS_SNAKE,
+            core.AgnosticCollection.find_one_and_delete: _MAX_TIME_MS_CAMEL,
+            core.AgnosticCollection.find_one_and_replace: _MAX_TIME_MS_CAMEL,
+            core.AgnosticCollection.find_one_and_update: _MAX_TIME_MS_CAMEL,
+            core.AgnosticCollection.find_raw_batches: _MAX_TIME_MS_SNAKE,
+        },
+    )
 
     def __init__(
         self,

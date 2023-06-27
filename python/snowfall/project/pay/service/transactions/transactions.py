@@ -16,9 +16,9 @@ class TransactionsRepository(
     repository.ProtoRepository[models_pb2.Transaction],
 ):
     _proto = models_pb2.Transaction
-    _indexes = [
+    _indexes = (
         pymongo.IndexModel("external_reference_id", background=True, unique=True),
-    ]
+    )
 
     async def list_transactions(
         self,
@@ -34,7 +34,9 @@ class QuotationsRepository(
 ):
     _proto = models_pb2.Quotation
 
-    _indexes = [pymongo.IndexModel("expires_at", expireAfterSeconds=1, background=True)]
+    _indexes = (
+        pymongo.IndexModel("expires_at", expireAfterSeconds=1, background=True),
+    )
 
     async def update_status(
         self,

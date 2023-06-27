@@ -6,7 +6,7 @@ import os
 import re
 from collections.abc import Mapping
 from dataclasses import dataclass, field
-from typing import Any, NamedTuple
+from typing import Any, ClassVar, NamedTuple
 
 import httpx
 from xsdata.exceptions import ClientValueError
@@ -52,7 +52,7 @@ class TransportTypes(object):
 
 
 class Singleton(type):
-    _instances: dict[Any, Any] = {}
+    _instances: ClassVar[dict[Any, Any]] = {}
 
     def __call__(cls, *args: Any, **kwargs: Any) -> Any:
         if cls not in cls._instances:

@@ -1,3 +1,5 @@
+from types import MappingProxyType
+
 import more_itertools
 from grpc import StatusCode, aio
 
@@ -23,10 +25,12 @@ class OrderService(
     service.Service,
     orders_pb2_grpc.OrderServiceServicer,
 ):
-    _journey_sort = {
-        "id": "_id",
-        "passenger_name_record": "passenger_name_record",
-    }
+    _journey_sort = MappingProxyType(
+        {
+            "id": "_id",
+            "passenger_name_record": "passenger_name_record",
+        },
+    )
 
     def __init__(
         self,

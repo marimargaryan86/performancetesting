@@ -16,13 +16,13 @@ _Proto = TypeVar("_Proto", bound=message.Message)
 
 
 class Consumer(protocol.Consumer[_Proto]):
-    _default_middlewares = [
+    _default_middlewares: tuple[protocol.ConsumerMiddleware[_Proto], ...] = (
         middlewares.with_sentry_context,
         middlewares.count_messages,
         middlewares.observe_wait_time,
         middlewares.observe_processing_time,
         middlewares.auto_ack_and_nack_factory(),
-    ]
+    )
 
     def __init__(  # noqa: WPS211
         self,

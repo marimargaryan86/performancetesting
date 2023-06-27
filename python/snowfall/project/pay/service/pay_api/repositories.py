@@ -19,9 +19,7 @@ class CompanyRepository(
     repository.ProtoRepository[models_pb2.Company],
 ):
     _proto = models_pb2.Company
-    _indexes = [
-        pymongo.IndexModel("name", background=True, unique=True),
-    ]
+    _indexes = (pymongo.IndexModel("name", background=True, unique=True),)
 
     async def insert(
         self,
@@ -61,9 +59,9 @@ class TransactionRepository(
 ):
     _proto = Transaction
     _default_page_size = 20
-    _indexes = [
+    _indexes = (
         pymongo.IndexModel("external_reference_id", background=True, unique=True),
-    ]
+    )
 
     async def find(
         self,

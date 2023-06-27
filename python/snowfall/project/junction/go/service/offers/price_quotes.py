@@ -16,9 +16,9 @@ class PriceQuoteContainerRepository(
     repository.ProtoRepository[models_pb2.PriceQuoteContainer],
 ):
     _proto = models_pb2.PriceQuoteContainer
-    _indexes = [
+    _indexes = (
         pymongo.IndexModel("expires_at", expireAfterSeconds=1, background=True),
-    ]
+    )
 
     def __init__(
         self,
@@ -51,9 +51,7 @@ class PriceQuoteContainerRepository(
 
 class PriceQuoteRepository(repository.ProtoRepository[models_pb2.PriceQuote]):
     _proto = models_pb2.PriceQuote
-    _indexes = [
-        pymongo.IndexModel("quotes._id", background=True),
-    ]
+    _indexes = (pymongo.IndexModel("quotes._id", background=True),)
 
     async def add_to_container(
         self,

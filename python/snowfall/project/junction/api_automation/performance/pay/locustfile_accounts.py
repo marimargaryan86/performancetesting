@@ -1,5 +1,6 @@
 import string as pystring
 from argparse import ArgumentParser
+from typing import ClassVar
 
 from locust import HttpUser, events, task
 
@@ -23,7 +24,7 @@ class Accounts(HttpUser):
     # locust -f locustfile.py
     # --token $PAY_TOKEN --host https://api.pay.junction.dev -t 20s
 
-    expected_currencies_list = [
+    expected_currencies_list: ClassVar[list[str]] = [
         "AUD",
         "BHD",
         "BGN",

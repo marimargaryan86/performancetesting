@@ -11,9 +11,7 @@ LEGS_ID = "legs._id"
 class LegRepository(repository.ProtoRepository[models_pb2.Leg]):
     _proto = models_pb2.Leg
     _nested_path = "legs"
-    _indexes: list[IndexModel] = [
-        IndexModel(LEGS_ID, background=True, unique=True),
-    ]
+    _indexes = (IndexModel(LEGS_ID, background=True, unique=True),)
 
     async def find(
         self,
@@ -56,9 +54,7 @@ class ScheduleRepository(
     repository.ProtoRepository[models_pb2.Schedule],
 ):
     _proto = models_pb2.Schedule
-    _indexes: list[IndexModel] = [
-        IndexModel("updated_at", background=True),
-    ]
+    _indexes = (IndexModel("updated_at", background=True),)
 
     async def find(
         self,

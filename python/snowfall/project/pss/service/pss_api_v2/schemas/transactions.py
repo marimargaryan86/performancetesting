@@ -37,7 +37,7 @@ class TransactionDirectionSchema(BaseSchema):
     origin_id: int
     schedule_id: int | None
     product_id: int | None
-    passengers: list[TransactionPassengerSchema] = []
+    passengers: list[TransactionPassengerSchema] = Field(default_factory=list)
 
 
 class TransactionPostSchema(BaseSchema):

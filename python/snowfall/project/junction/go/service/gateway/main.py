@@ -16,7 +16,7 @@ from snowfall.stdlib.transport.grpc import server as grpc_server
 
 class _ConsumeSettings(service.Settings):
     amqp_dsn: pydantic.AnyUrl
-    providers: dict[str, str] = {}
+    providers: dict[str, str] = pydantic.Field(default_factory=dict)
     redis_dsn: pydantic.AnyUrl
     search_timeout: datetime.timedelta = datetime.timedelta(seconds=30)
 
@@ -25,7 +25,7 @@ class _ServeSettings(service.Settings):
     amqp_dsn: pydantic.AnyUrl
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
-    providers: dict[str, str] = {}
+    providers: dict[str, str] = pydantic.Field(default_factory=dict)
     redis_dsn: pydantic.AnyUrl
 
 

@@ -1,4 +1,5 @@
 import datetime
+from types import MappingProxyType
 
 import pydantic
 
@@ -46,11 +47,13 @@ class PassengerBase(base.CamelCaseBaseModel):
     )(normalizers.datetime_str_to_date)
 
     class Config(object):
-        json_encoders = {
-            datetime.date: lambda date_object: "{0}T00:00:00".format(
-                date_object.isoformat(),
-            ),
-        }
+        json_encoders = MappingProxyType(
+            {
+                datetime.date: lambda date_object: "{0}T00:00:00".format(
+                    date_object.isoformat(),
+                ),
+            },
+        )
 
 
 class Passenger(PassengerBase):

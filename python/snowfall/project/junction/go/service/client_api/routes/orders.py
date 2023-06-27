@@ -1,14 +1,13 @@
 import datetime
 from collections.abc import Mapping, Sequence
+from types import MappingProxyType
 from typing import Any
 
 import lagom
 import more_itertools
 from starlette import endpoints, requests, responses, status
 
-from snowfall.project.junction.go.adapter import offers as offers_adapter
-from snowfall.project.junction.go.adapter import orders as orders_adapter
-from snowfall.project.junction.go.adapter import price_quotes as price_quotes_adapter
+from snowfall.project.junction.go.adapter import offers, orders, price_quotes
 from snowfall.project.junction.go.service.client_api import resources, validators
 from snowfall.project.junction.go.service.offers.v1 import (
     models_pb2 as offer_models_pb2,
@@ -34,7 +33,7 @@ class Journey(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
-        client: orders_adapter.Client = lagom.injectable,
+        client: orders.Client = lagom.injectable,
     ) -> responses.Response:
         journey = await client.get_journey(
             request.path_params["journeyId"],
@@ -53,15 +52,17 @@ class Journey(endpoints.HTTPEndpoint):
 
 
 class Journeys(endpoints.HTTPEndpoint):
-    _sort = {
-        "id": "id",
-        "reference": "passenger_name_record",
-    }
+    _sort = MappingProxyType(
+        {
+            "id": "id",
+            "reference": "passenger_name_record",
+        },
+    )
 
     async def get(
         self,
         request: requests.Request,
-        client: orders_adapter.Client = lagom.injectable,
+        client: orders.Client = lagom.injectable,
     ) -> responses.Response:
         pagination = pagination_helpers.get_pagination(request)
         response = await client.find_journeys(
@@ -91,7 +92,7 @@ class Order(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
-        client: orders_adapter.Client = lagom.injectable,
+        client: orders.Client = lagom.injectable,
     ) -> responses.Response:
         order = await client.get_order(
             request.path_params["orderId"],
@@ -114,9 +115,9 @@ class Orders(endpoints.HTTPEndpoint):
     async def post(  # noqa: WPS217
         self,
         request: requests.Request,
-        price_quotes_client: price_quotes_adapter.Client = lagom.injectable,
-        offers_client: offers_adapter.Client = lagom.injectable,
-        orders_client: orders_adapter.Client = lagom.injectable,
+        price_quotes_client: price_quotes.Client = lagom.injectable,
+        offers_client: offers.Client = lagom.injectable,
+        orders_client: orders.Client = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
         price_quote = await price_quotes_client.get(body["quote"])
@@ -151,7 +152,7 @@ class OrdersByJourney(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
-        client: orders_adapter.Client = lagom.injectable,
+        client: orders.Client = lagom.injectable,
     ) -> responses.Response:
         journey_id = request.path_params["journeyId"]
         pagination = pagination_helpers.get_pagination(request)
@@ -180,9 +181,9 @@ class OrdersByJourney(endpoints.HTTPEndpoint):
     async def post(
         self,
         request: requests.Request,
-        price_quotes_client: price_quotes_adapter.Client = lagom.injectable,
-        offers_client: offers_adapter.Client = lagom.injectable,
-        orders_client: orders_adapter.Client = lagom.injectable,
+        price_quotes_client: price_quotes.Client = lagom.injectable,
+        offers_client: offers.Client = lagom.injectable,
+        orders_client: orders.Client = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
         price_quote = await price_quotes_client.get(body["quote"])
@@ -214,7 +215,7 @@ class Booking(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
-        client: orders_adapter.Client = lagom.injectable,
+        client: orders.Client = lagom.injectable,
     ) -> responses.Response:
         booking = await client.get_booking(
             request.path_params["bookingId"],
@@ -236,7 +237,7 @@ class BookingsByOrder(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
-        client: orders_adapter.Client = lagom.injectable,
+        client: orders.Client = lagom.injectable,
     ) -> responses.Response:
         order_id = request.path_params["orderId"]
         pagination = pagination_helpers.get_pagination(request)
@@ -362,7 +363,7 @@ class BookingDetails(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
-        client: orders_adapter.Client = lagom.injectable,
+        client: orders.Client = lagom.injectable,
     ) -> responses.Response:
         details = await client.get_booking_details(
             request.path_params["bookingDetailsId"],
@@ -384,7 +385,7 @@ class BookingDetailsByBooking(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
-        client: orders_adapter.Client = lagom.injectable,
+        client: orders.Client = lagom.injectable,
     ) -> responses.Response:
         booking_id = request.path_params["bookingId"]
         pagination = pagination_helpers.get_pagination(request)
@@ -455,7 +456,7 @@ class BookingsCancellation(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
-        client: orders_adapter.Client = lagom.injectable,
+        client: orders.Client = lagom.injectable,
     ) -> responses.Response:
         cancellation = await client.get_bookings_cancellation(
             identifier=request.path_params["bookingsCancellationId"],
@@ -475,7 +476,7 @@ class BookingsCancellation(endpoints.HTTPEndpoint):
     async def post(
         self,
         request: requests.Request,
-        client: orders_adapter.Client = lagom.injectable,
+        client: orders.Client = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
         cancellation = await client.create_bookings_cancellation(

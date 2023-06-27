@@ -41,7 +41,7 @@ class Refs(enum.Enum):
 
 
 class BooleanCollectionValues(enum.Enum):
-    travel_preferences = [
+    travel_preferences = (
         "nature",
         "sightseeing",
         "hiking",
@@ -50,7 +50,7 @@ class BooleanCollectionValues(enum.Enum):
         "food",
         "nightlife",
         "relaxing",
-    ]
+    )
 
 
 def check_boolean_collection_value(preference: Preference) -> bool:

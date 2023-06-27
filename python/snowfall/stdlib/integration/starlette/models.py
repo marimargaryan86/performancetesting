@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 from collections.abc import Mapping, Sequence
+from types import MappingProxyType
 from typing import Any, ClassVar, cast
 
 import pydantic
@@ -14,11 +15,13 @@ AnyMapping = Mapping[str, Any]
 class BaseModel(pydantic.BaseModel):
     class Config(object):
         extra = pydantic.Extra.forbid
-        json_encoders = {
-            datetime.datetime: lambda datetime_object: datetime_object.isoformat(
-                timespec="seconds",
-            ),
-        }
+        json_encoders = MappingProxyType(
+            {
+                datetime.datetime: lambda datetime_object: datetime_object.isoformat(
+                    timespec="seconds",
+                ),
+            },
+        )
 
 
 class ResourceIdentifier(BaseModel):

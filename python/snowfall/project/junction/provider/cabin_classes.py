@@ -11,10 +11,10 @@ class CabinMappingRepository(
 ):
     _proto = models_pb2.CabinClassMapping
     _logger = stdout.get_logger()
-    _indexes = [
+    _indexes = (
         IndexModel("fare_brand", background=True),
         IndexModel("operator", background=True),
-    ]
+    )
 
     async def resolve_cabin_class(
         self,

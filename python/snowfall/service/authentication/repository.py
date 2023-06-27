@@ -12,9 +12,7 @@ class UsersRepository(
     """Repository for keeping users information."""
 
     _proto = models_pb2.User
-    _indexes = [
-        pymongo.IndexModel("email", background=True, unique=True),
-    ]
+    _indexes = (pymongo.IndexModel("email", background=True, unique=True),)
 
     async def update(
         self,

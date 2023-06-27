@@ -32,7 +32,7 @@ class JourneyRepository(
     repository.ProtoRepository[models_pb2.Journey],
 ):
     _proto = models_pb2.Journey
-    _indexes = [pymongo.IndexModel("passenger_name_record", background=True)]
+    _indexes = (pymongo.IndexModel("passenger_name_record", background=True),)
 
     def __init__(
         self,
@@ -113,10 +113,10 @@ class JourneyRepository(
 class OrderRepository(repository.ProtoRepository[models_pb2.Order]):
     _proto = models_pb2.Order
     _nested_path = "orders"
-    _indexes = [
+    _indexes = (
         pymongo.IndexModel("orders._id", background=True),
         pymongo.IndexModel("orders.journey_id", background=True),
-    ]
+    )
 
     async def create_from_options(
         self,
@@ -251,10 +251,10 @@ class OrderRepository(repository.ProtoRepository[models_pb2.Order]):
 class BookingRepository(repository.ProtoRepository[models_pb2.Booking]):
     _proto = models_pb2.Booking
     _nested_path = "orders.bookings"
-    _indexes = [
+    _indexes = (
         pymongo.IndexModel("orders.bookings._id", background=True),
         pymongo.IndexModel("orders.bookings.order_id", background=True),
-    ]
+    )
 
     async def find_by_id(
         self,
@@ -351,10 +351,10 @@ class BookingDetailsRepository(
 ):
     _proto = models_pb2.TripOptionDetails
     _nested_path = "orders.bookings.trip_option.details"
-    _indexes = [
+    _indexes = (
         pymongo.IndexModel("orders.bookings.trip_option._id", background=True),
         pymongo.IndexModel("orders.bookings.trip_option.details._id", background=True),
-    ]
+    )
 
     async def find_by_id(
         self,

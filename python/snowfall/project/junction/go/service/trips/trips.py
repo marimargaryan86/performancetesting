@@ -18,9 +18,7 @@ from snowfall.stdlib.v1 import amqp_pb2
 class SegmentRepository(repository.ProtoRepository[models_pb2.SegmentReference]):
     _proto = models_pb2.SegmentReference
     _nested_path = "segments"
-    _indexes = [
-        pymongo.IndexModel("segments._id", background=True),
-    ]
+    _indexes = (pymongo.IndexModel("segments._id", background=True),)
 
     async def find(
         self,
@@ -127,7 +125,9 @@ class TripSearchRepository(  # noqa: WPS215
     repository.ProtoRepository[trips_pb2.TripSearch],
 ):
     _proto = trips_pb2.TripSearch
-    _indexes = [pymongo.IndexModel("expires_at", expireAfterSeconds=1, background=True)]
+    _indexes = (
+        pymongo.IndexModel("expires_at", expireAfterSeconds=1, background=True),
+    )
 
     def __init__(
         self,
@@ -191,7 +191,9 @@ class TripCandidateSearchRepository(  # noqa: WPS215
     repository.ProtoRepository[trips_pb2.TripCandidateSearch],
 ):
     _proto = trips_pb2.TripCandidateSearch
-    _indexes = [pymongo.IndexModel("expires_at", expireAfterSeconds=1, background=True)]
+    _indexes = (
+        pymongo.IndexModel("expires_at", expireAfterSeconds=1, background=True),
+    )
 
     def __init__(
         self,

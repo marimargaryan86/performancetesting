@@ -29,7 +29,6 @@ ignore = [
     "E501", # Line too long
     "RUF001", # String contains ambiguous
     "RUF100", # Unused `noqa` directive
-    "RUF012", # Mutable class attributes should be annotated with `typing.ClassVar` # TODO: fix
     "SIM118", # Use `key in dict` instead of `key in dict.keys()`
     "TRY003", # Avoid specifying long messages outside the exception class # TODO: fix
     "UP004", # Class inherits from `object`

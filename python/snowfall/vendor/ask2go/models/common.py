@@ -1,5 +1,7 @@
 import datetime
 
+import pydantic
+
 from snowfall.vendor.ask2go.enums import DocumentType, Gender, PassengerType
 from snowfall.vendor.ask2go.models.base import CamelCaseBaseModel
 
@@ -24,7 +26,7 @@ class Airport(CamelCaseBaseModel):
     fts_composite: str | None
     fts_full: str | None
     popularity: int = 0
-    airport_children: list[AirportChildren] = []
+    airport_children: list[AirportChildren] = pydantic.Field(default_factory=list)
 
 
 class Phone(CamelCaseBaseModel):

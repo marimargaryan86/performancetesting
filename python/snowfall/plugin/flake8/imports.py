@@ -1,4 +1,5 @@
 import ast
+import types
 from collections.abc import Iterator
 
 from snowfall.plugin.flake8 import plugin
@@ -8,12 +9,14 @@ PLUGIN_VERSION = "1.0.0"
 
 SF30 = "SF30 Found restricted import: not allowed to import {0} here"
 
+_CALLEE_WHITELIST = types.MappingProxyType(
+    {
+        "redis.asyncio": frozenset(("snowfall.stdlib.persistence.redis.types",)),
+    },
+)
+
 
 class Visitor(plugin.Visitor):
-    _callee_whitelist = {
-        "redis.asyncio": frozenset(("snowfall.stdlib.persistence.redis.types",)),
-    }
-
     def __init__(self, module: str):
         self._module = module
         super().__init__()
@@ -34,7 +37,7 @@ class Visitor(plugin.Visitor):
         self.generic_visit(import_from)
 
     def _enforce_callee_whitelist(self, node: ast.AST, import_: str) -> None:
-        for callee, whitelisted in self._callee_whitelist.items():
+        for callee, whitelisted in _CALLEE_WHITELIST.items():
             if not import_.startswith(callee):
                 continue
 
