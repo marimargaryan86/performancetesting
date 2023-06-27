@@ -71,11 +71,10 @@ async def _generate_cities(app: service.Application[_CitiesSettings]) -> None:
 
     sem = asyncio.Semaphore(100)
     count = 1
-    async with asyncio.TaskGroup() as tg:
-        async with aiofiles.open(csv_path) as csv_file:
-            async for city in cities.parse_csv(locations_repository, csv_file):
-                tg.create_task(create(places_repository, city, sem, count))  # type: ignore[unused-awaitable]
-                count += 1
+    async with asyncio.TaskGroup() as tg, aiofiles.open(csv_path) as csv_file:
+        async for city in cities.parse_csv(locations_repository, csv_file):
+            tg.create_task(create(places_repository, city, sem, count))  # type: ignore[unused-awaitable]
+            count += 1
 
 
 async def _serve(app: service.Application[_GrpcSettings]) -> None:

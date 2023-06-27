@@ -57,10 +57,7 @@ if TYPE_CHECKING:
         ],
     ]
 
-    OptionalOF = (
-        OffersFactory[_Settings, _SearchCriteriaTask, _SearchCriteria]  # noqa: WPS465
-        | None
-    )
+    OF = OffersFactory[_Settings, _SearchCriteriaTask, _SearchCriteria]
     BookingFactory = Callable[
         [service.AsyncApplication[_Settings]],
         Awaitable[bookings.Implementation],
@@ -69,7 +66,7 @@ if TYPE_CHECKING:
 
 def _grpc_command(  # noqa: WPS210, WPS217
     meta_factory: MetaFactory,
-    offers_factory: OptionalOF[_Settings, _SearchCriteriaTask, _SearchCriteria] = None,
+    offers_factory: OF[_Settings, _SearchCriteriaTask, _SearchCriteria] | None = None,
     bookings_factory: BookingFactory[_Settings] | None = None,
 ) -> service.Callback[_Settings]:
     async def wrapper(  # noqa: WPS210, WPS217

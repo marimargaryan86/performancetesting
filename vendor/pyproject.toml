@@ -29,6 +29,7 @@ ignore = [
     "E501", # Line too long
     "RUF001", # String contains ambiguous
     "RUF100", # Unused `noqa` directive
+    "RUF012", # Mutable class attributes should be annotated with `typing.ClassVar` # TODO: fix
     "SIM118", # Use `key in dict` instead of `key in dict.keys()`
     "TRY003", # Avoid specifying long messages outside the exception class # TODO: fix
     "UP004", # Class inherits from `object`
@@ -67,6 +68,7 @@ select = [
     #"PL",
     "RET", # flake8-return
     #"RSE",
+    "PERF", # Perflint
     "PT", # flake8-pytest-style
     #"PTH",
     "PYI", # flake8-pyi
@@ -74,6 +76,7 @@ select = [
     "RUF", # Ruff-specific rules
     "SIM", # flake8-simplify
     #"SLF",
+    "SLOT", # flake8-slots
     "T10", # flake8-debugger
     "T20", # flake8-print
     #"TCH",

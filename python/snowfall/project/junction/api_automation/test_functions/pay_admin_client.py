@@ -391,7 +391,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
                 _ATTRIBUTES_KEY: {
                     **(
                         {
-                            "amount": amount,  # type:ignore[dict-item]
+                            "amount": amount,
                         }
                         if amount
                         else {}
@@ -410,7 +410,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
                     **(
                         {
                             "transactions": {
-                                _DATA_KEY: [  # type:ignore[dict-item]
+                                _DATA_KEY: [
                                     {_ID_KEY: transaction_id, _TYPE_KEY: "transactions"}
                                     for transaction_id in transactions_ids
                                 ],
