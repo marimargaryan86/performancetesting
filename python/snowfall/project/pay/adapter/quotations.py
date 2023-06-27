@@ -7,12 +7,11 @@ from snowfall.project.junction.go.adapter import errors
 from snowfall.project.pay.service.companies.v1alpha import (
     models_pb2 as companies_models,
 )
-from snowfall.project.pay.service.transactions.quote import Quote
 from snowfall.project.pay.service.transactions.v1alpha import grpc_pb2, grpc_pb2_grpc
 from snowfall.project.pay.service.transactions.v1alpha import (
     models_pb2 as transactions_models,
 )
-from snowfall.stdlib import money
+from snowfall.stdlib import money, string
 
 
 class Client(abc.ABC):
@@ -56,15 +55,29 @@ class DictClient(Client):
         beneficiary_company: companies_models.Company,
         session_token: str,
     ) -> transactions_models.Quotation:
-        quote = Quote(
-            amount,
-            money.Currency(from_currency),
-            money.Currency(to_currency),
-            1.0,
-            payer,
-            beneficiary_company.id,
+        mock_from_amount = money.Money(amount, money.Currency(from_currency))
+        mock_to_amount = money.Money(amount, money.Currency(to_currency))
+        quotation = transactions_models.Quotation(
+            id=string.uuid(),
+            status=transactions_models.QuotationStatus.QUOTATION_STATUS_QUOTED,
+            amounts=transactions_models.QuotationAmounts(
+                beneficiary=mock_from_amount.protobuf(),
+                base_converted=mock_to_amount.protobuf(),
+                sales_margin=mock_to_amount.protobuf(),
+                quotation=mock_to_amount.protobuf(),
+                fx_margin=mock_to_amount.protobuf(),
+                processing_margin=mock_to_amount.protobuf(),
+            ),
+            rates=transactions_models.QuotationRates(
+                fx_quote=1.0,
+                fx_buffer=1.0,
+                fx_markup=1.0,
+                sales_markup=1.0,
+                processing_markup=1.0,
+            ),
+            payer_id=payer.id,
+            beneficiary_id=beneficiary_company.id,
         )
-        quotation = quote.to_proto()
         self._quotations[quotation.id] = quotation
 
         return quotation

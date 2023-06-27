@@ -118,9 +118,6 @@ def python_image(  # type: ignore[no-untyped-def]
         "python/snowfall/project/junction/extensions/service/mobile_api/handlers.py": {
             "python/snowfall/project/junction/plus/service/poc_api/main.py",
         },
-        "python/snowfall/project/pay/service/transactions/quote.py": {
-            "python/snowfall/project/pay/adapter/quotations.py",
-        },
         "python/snowfall/project/pay/service/companies/repositories.py": {
             "python/snowfall/project/pay/service/pay_api/bootstrap.py",
             "python/snowfall/project/pay/service/pay_api/conftest.py",
