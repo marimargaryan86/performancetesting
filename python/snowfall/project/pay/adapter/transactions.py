@@ -25,7 +25,11 @@ class Client(abc.ABC):
         """Create a transaction resource."""
 
     @abc.abstractmethod
-    async def get(self, identifier: str) -> models_pb2.Transaction:
+    async def get(
+        self,
+        identifier: str,
+        selector: str | None = None,
+    ) -> models_pb2.Transaction:
         """Fetch a transaction resource."""
 
     @abc.abstractmethod
@@ -66,9 +70,13 @@ class DictClient(Client):
 
         return transaction
 
-    async def get(self, transaction_id: str) -> models_pb2.Transaction:
+    async def get(
+        self,
+        identifier: str,
+        selector: str | None = None,
+    ) -> models_pb2.Transaction:
         try:
-            return self._transactions[transaction_id]
+            return self._transactions[identifier]
         except KeyError as err:
             raise errors.NotFoundError() from err
 
@@ -116,10 +124,14 @@ class GrpcClient(Client):
 
         return response.transaction
 
-    async def get(self, transaction_id: str) -> models_pb2.Transaction:
+    async def get(
+        self,
+        identifier: str,
+        selector: str | None = None,
+    ) -> models_pb2.Transaction:
         response = await errors.handle_grpc_errors(
             self._transactions.GetTransaction(
-                grpc_pb2.GetTransactionRequest(id=transaction_id),
+                grpc_pb2.GetTransactionRequest(id=identifier, selector=selector),  # type: ignore[arg-type]
                 timeout=self._timeout,
             ),
         )

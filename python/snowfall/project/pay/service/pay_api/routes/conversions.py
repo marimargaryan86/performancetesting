@@ -20,7 +20,7 @@ class Conversions(endpoints.HTTPEndpoint):
         conversion = await conversion_client.get(conversion_id)
 
         try:
-            transaction = await transactions_client.get(conversion.id)
+            transaction = await transactions_client.get(conversion.id, "conversion_id")
         except errors.NotFoundError:
             return await messages.create_response(
                 body=models.Body(
@@ -69,7 +69,10 @@ class ListConversions(endpoints.HTTPEndpoint):
         conversion_resources = []
         for conversion in response.conversions:
             try:
-                transaction = await transactions_client.get(conversion.id)
+                transaction = await transactions_client.get(
+                    conversion.id,
+                    "conversion_id",
+                )
             except errors.NotFoundError:
                 conversion_resources.append(
                     resources.ConversionResource.from_proto(

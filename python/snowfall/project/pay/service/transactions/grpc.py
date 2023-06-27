@@ -67,7 +67,10 @@ class TransactionsService(
         request: grpc_pb2.GetTransactionRequest,
         context: grpc.aio.ServicerContext,
     ) -> grpc_pb2.GetTransactionResponse:
-        transaction = await self._transactions.find_by_id(request.id)
+        transaction = await self._transactions.find_by_id(
+            request.id,
+            request.selector if request.selector else "_id",
+        )
 
         if transaction is None:
             await context.abort(grpc.StatusCode.NOT_FOUND)
