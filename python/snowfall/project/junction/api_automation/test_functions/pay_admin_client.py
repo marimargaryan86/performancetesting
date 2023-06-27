@@ -509,6 +509,27 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         response.raise_for_status()
         return response.json()
 
+    async def update_account(
+        self,
+        account_id: str,
+        status: str,
+    ) -> dict[str, Any]:
+        payload = {
+            _DATA_KEY: {
+                _TYPE_KEY: "accounts",
+                _ATTRIBUTES_KEY: {
+                    "status": status,
+                },
+            },
+        }
+        logger.info("payload %s", json.dumps(payload, indent=4))
+        response = await self.client.patch(
+            "/accounts/{0}".format(account_id),
+            json=payload,
+        )
+        response.raise_for_status()
+        return response.json()
+
     async def update_beneficiary(  # noqa: WPS211
         self,
         beneficiary_id: str,
