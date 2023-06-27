@@ -4,7 +4,8 @@ from collections.abc import Mapping, Sequence
 from os import path
 
 import pydantic
-from hcl2 import api as hcl2_api
+
+from snowfall.stdlib.format import hcl2
 
 
 class _Configuration(pydantic.BaseModel):
@@ -20,13 +21,10 @@ class _Configuration(pydantic.BaseModel):
     sandbox: _Environment
 
 
-_Mapping = Sequence[Mapping[str, Mapping[str, "_Mapping"]]]
-
-
 def _validate_jobs(  # noqa: WPS210
     template_path: str,
     filename: str,
-    jobs: _Mapping,
+    jobs: Sequence[Mapping[str, hcl2.Job]],
 ) -> bool:
     errors = False
     expected_job_name = "{0}-{1}".format(
@@ -50,7 +48,7 @@ def _validate_jobs(  # noqa: WPS210
                 template_path,
                 filename,
                 job_name,
-                job_data.get("group", []),
+                job_data.group,
             )
 
             if has_errors:
@@ -63,7 +61,7 @@ def _validate_groups(
     template_path: str,
     filename: str,
     job_name: str,
-    groups: _Mapping,
+    groups: Sequence[Mapping[str, hcl2.Group]],
 ) -> bool:
     errors = False
 
@@ -86,7 +84,7 @@ def _validate_groups(
                 filename,
                 job_name,
                 group_name,
-                group_data.get("task", []),
+                group_data.task,
             )
 
             if has_errors:
@@ -100,13 +98,13 @@ def _validate_tasks(
     filename: str,
     job_name: str,
     group_name: str,
-    tasks: _Mapping,
+    tasks: Sequence[Mapping[str, hcl2.Task]],
 ) -> bool:
     errors = False
 
     for task in tasks:
         for task_name, task_data in task.items():
-            if "lifecycle" not in task_data and task_name != filename:
+            if not task_data.lifecycle and task_name != filename:
                 errors = True
                 _log_error(
                     (
@@ -123,7 +121,9 @@ def _validate_tasks(
     return errors
 
 
-def _expected_variables(variables: _Mapping) -> frozenset[str]:
+def _expected_variables(
+    variables: Sequence[Mapping[str, hcl2.Variable]],
+) -> frozenset[str]:
     return frozenset(
         (
             variable_name
@@ -164,7 +164,7 @@ def _load_config_file(
 
 def _validate_variables(
     template_path: str,
-    variables: _Mapping,
+    variables: Sequence[Mapping[str, hcl2.Variable]],
 ) -> bool:
     config_data = _load_config_file(template_path)
 
@@ -212,12 +212,12 @@ def _main() -> bool:
         ].replace("_", "-")
 
         with open(template_path) as template_file:
-            parsed = hcl2_api.load(template_file)
+            parsed = hcl2.loads(template_file.read())
 
-            if _validate_jobs(template_path, filename, parsed.get("job", [])):
+            if _validate_jobs(template_path, filename, parsed.job):
                 errors = True
 
-            if _validate_variables(template_path, parsed.get("variable", [])):
+            if _validate_variables(template_path, parsed.variable):
                 errors = True
 
     return errors

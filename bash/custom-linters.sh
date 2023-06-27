@@ -74,4 +74,5 @@ fi
 
 if [[ -n ${NOMAD_FILES[*]} ]]; then
 	pants run python/snowfall/script/validate_nomad_files.py -- "${NOMAD_FILES[@]}"
+	pants run python/snowfall/script/validate_consul_templates.py -- "${NOMAD_FILES[@]}"
 fi

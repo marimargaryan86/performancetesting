@@ -113,7 +113,7 @@ job "gateway-serve" {
         change_mode = "restart"
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
-PROVIDERS={{- "{\"" }}f9ce75d1-2025-4ab5-b5d7-69e4c14c053e{{- "\":\"" }}{{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_mock-${var.environment}"))}}{{- "\",\"" }}4b7d12db-7735-4c67-9645-5fc82f7c4fe8{{- "\":\"" }}{{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_ask2go-${var.environment}"))}}{{- "\",\"" }}a5547dae-9c65-4746-8637-d0601865508e{{- "\":\"" }}{{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_save-a-train-${var.environment}{{- "\"" }}))}}{{- "\"}" }}
+PROVIDERS={{- "{\"" }}f9ce75d1-2025-4ab5-b5d7-69e4c14c053e{{- "\":\"" }}{{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_mock-${var.environment}"))}}{{- "\",\"" }}4b7d12db-7735-4c67-9645-5fc82f7c4fe8{{- "\":\"" }}{{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_ask2go-${var.environment}"))}}{{- "\",\"" }}a5547dae-9c65-4746-8637-d0601865508e{{- "\":\"" }}{{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_save-a-train-${var.environment}"))}}{{- "\"}" }}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 EOH
       }
