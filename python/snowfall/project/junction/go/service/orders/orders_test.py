@@ -5,7 +5,7 @@ import pymongo
 import pytest
 
 from snowfall.project.junction.go.service.orders import orders
-from snowfall.project.junction.go.service.orders.v1alpha import models_pb2
+from snowfall.project.junction.go.service.orders.v1 import models_pb2
 
 
 @pytest.fixture()

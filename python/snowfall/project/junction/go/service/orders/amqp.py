@@ -1,4 +1,4 @@
-from snowfall.project.junction.go.service.orders.v1alpha import amqp_pb2, models_pb2
+from snowfall.project.junction.go.service.orders.v1 import amqp_pb2, models_pb2
 from snowfall.stdlib.transport.amqp import producer
 
 

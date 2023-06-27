@@ -3,8 +3,8 @@ import datetime
 import pytest
 
 from snowfall.project.junction.go.service.offers.v1 import models_pb2 as offers_pb2
-from snowfall.project.junction.go.service.orders.v1alpha import amqp_pb2
-from snowfall.project.junction.go.service.orders.v1alpha import models_pb2 as orders_pb2
+from snowfall.project.junction.go.service.orders.v1 import amqp_pb2
+from snowfall.project.junction.go.service.orders.v1 import models_pb2 as orders_pb2
 from snowfall.project.junction.service.providers.mock import bookings, cache
 from snowfall.stdlib.format import protobuf
 

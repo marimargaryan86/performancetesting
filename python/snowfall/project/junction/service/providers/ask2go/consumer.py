@@ -4,9 +4,7 @@ from aio_pika import Message, connect
 from aio_pika.abc import AbstractIncomingMessage
 
 from snowfall.project.junction.go.service.offers.v1 import amqp_pb2 as offers_amqp_pb2
-from snowfall.project.junction.go.service.orders.v1alpha import (
-    amqp_pb2 as orders_amqp_pb2,
-)
+from snowfall.project.junction.go.service.orders.v1 import amqp_pb2 as orders_amqp_pb2
 from snowfall.project.junction.go.v1alpha import seat_maps_pb2
 from snowfall.project.junction.service.providers.ask2go import (
     booking,

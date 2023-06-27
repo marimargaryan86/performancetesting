@@ -1,6 +1,4 @@
-from snowfall.project.junction.go.service.orders.v1alpha.models_pb2 import (
-    DocumentDetails,
-)
+from snowfall.project.junction.go.service.orders.v1.models_pb2 import DocumentDetails
 from snowfall.project.junction.service.providers.ask2go.models import (
     traveler_document_from_proto,
 )

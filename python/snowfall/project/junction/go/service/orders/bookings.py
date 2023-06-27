@@ -9,7 +9,7 @@ from snowfall.project.junction.go.service.gateway.v1alpha import (
 )
 from snowfall.project.junction.go.service.gateway.v1alpha import bookings_pb2_grpc
 from snowfall.project.junction.go.service.orders import orders
-from snowfall.project.junction.go.service.orders.v1alpha import models_pb2
+from snowfall.project.junction.go.service.orders.v1 import models_pb2
 from snowfall.project.junction.provider.v1alpha import bookings_pb2
 from snowfall.stdlib import sequence
 from snowfall.stdlib.format import protobuf

@@ -4,7 +4,7 @@ import abc
 from collections.abc import Iterator, Sequence
 
 from snowfall.project.junction.go.adapter import errors
-from snowfall.project.junction.go.service.orders.v1alpha import (
+from snowfall.project.junction.go.service.orders.v1 import (
     models_pb2,
     orders_pb2,
     orders_pb2_grpc,

@@ -3,7 +3,7 @@ import httpx
 from snowfall.project.junction.go.service.orders.pay_transactions_models import (
     PayTransactionResponse,
 )
-from snowfall.project.junction.go.service.orders.v1alpha import models_pb2
+from snowfall.project.junction.go.service.orders.v1 import models_pb2
 from snowfall.vendor.junction.pay.client import Client as PayClient
 
 

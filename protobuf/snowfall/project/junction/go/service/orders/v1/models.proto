@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package snowfall.project.junction.go.service.orders.v1alpha;
+package snowfall.project.junction.go.service.orders.v1;
 
 import "google/protobuf/timestamp.proto";
 import "snowfall/project/junction/go/service/offers/v1/models.proto";
@@ -11,7 +11,7 @@ import "snowfall/stdlib/v1/options.proto";
 import "snowfall/stdlib/v1/phone_number.proto";
 import "snowfall/stdlib/v1/postal_address.proto";
 
-option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/orders/v1alpha";
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/orders/v1";
 
 message Journey {
   string id = 1;

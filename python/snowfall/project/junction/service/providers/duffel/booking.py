@@ -1,7 +1,7 @@
 import phonenumbers
 from dateutil.relativedelta import relativedelta
 
-from snowfall.project.junction.go.service.orders.v1alpha import amqp_pb2, models_pb2
+from snowfall.project.junction.go.service.orders.v1 import amqp_pb2, models_pb2
 from snowfall.project.junction.service.providers.duffel import cache, notifications
 from snowfall.project.junction.service.providers.duffel.enums import gender_from_proto
 from snowfall.stdlib import money

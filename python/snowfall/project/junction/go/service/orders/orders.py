@@ -10,7 +10,7 @@ from snowfall.project.junction.go.adapter import (
     passenger_name_records as passenger_name_records_adapter,
 )
 from snowfall.project.junction.go.service.orders import mixins as orders_mixins
-from snowfall.project.junction.go.service.orders.v1alpha import models_pb2
+from snowfall.project.junction.go.service.orders.v1 import models_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset

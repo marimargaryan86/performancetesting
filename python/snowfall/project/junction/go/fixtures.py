@@ -3,7 +3,7 @@ import random
 from collections.abc import Sequence
 
 from snowfall.project.junction.go.service.offers.v1 import models_pb2 as offers_pb2
-from snowfall.project.junction.go.service.orders.v1alpha import (
+from snowfall.project.junction.go.service.orders.v1 import (
     models_pb2 as order_models_pb2,
 )
 from snowfall.project.junction.go.service.passenger_name_records.v1alpha import (

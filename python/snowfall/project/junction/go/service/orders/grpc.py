@@ -14,10 +14,7 @@ from snowfall.project.junction.go.service.orders.orders_handlers import (
     CancellationTicketCompletedHandler,
     CreateBookingsCancellationHandler,
 )
-from snowfall.project.junction.go.service.orders.v1alpha import (
-    orders_pb2,
-    orders_pb2_grpc,
-)
+from snowfall.project.junction.go.service.orders.v1 import orders_pb2, orders_pb2_grpc
 from snowfall.project.junction.go.service.orders.zendesk.client import ZendeskClient
 from snowfall.stdlib.transport.grpc import rich_status, service, sorting
 

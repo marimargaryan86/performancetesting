@@ -3,7 +3,7 @@ from snowfall.project.junction.go.service.orders.pay_transactions import (
     PayTransactionCreationError,
     PayTransactionCreator,
 )
-from snowfall.project.junction.go.service.orders.v1alpha import models_pb2
+from snowfall.project.junction.go.service.orders.v1 import models_pb2
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.transport.amqp import consumer, types
 

@@ -4,7 +4,7 @@ from unittest import mock
 import freezegun
 import pytest
 
-from snowfall.project.junction.go.service.orders.v1alpha import amqp_pb2
+from snowfall.project.junction.go.service.orders.v1 import amqp_pb2
 from snowfall.project.junction.service.providers.karhoo import notifications
 from snowfall.vendor.karhoo.models import bookings, location
 

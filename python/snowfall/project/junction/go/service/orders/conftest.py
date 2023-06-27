@@ -7,7 +7,7 @@ from motor import motor_asyncio
 
 from snowfall.project.junction.go.adapter import passenger_name_records
 from snowfall.project.junction.go.service.orders import orders
-from snowfall.project.junction.go.service.orders.v1alpha import models_pb2
+from snowfall.project.junction.go.service.orders.v1 import models_pb2
 from snowfall.project.junction.go.service.orders.zendesk.client import ZendeskClient
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf

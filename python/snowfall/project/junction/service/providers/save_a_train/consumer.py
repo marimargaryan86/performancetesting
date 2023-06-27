@@ -2,9 +2,7 @@ import datetime
 
 from snowfall.project.junction.go.service.offers.v1 import amqp_pb2 as offers_amqp_pb2
 from snowfall.project.junction.go.service.offers.v1 import models_pb2 as offers_pb2
-from snowfall.project.junction.go.service.orders.v1alpha import (
-    amqp_pb2 as orders_amqp_pb2,
-)
+from snowfall.project.junction.go.service.orders.v1 import amqp_pb2 as orders_amqp_pb2
 from snowfall.project.junction.provider import notifications as base_notifications
 from snowfall.project.junction.service.providers.save_a_train import (
     adapter as save_a_train_adapter,

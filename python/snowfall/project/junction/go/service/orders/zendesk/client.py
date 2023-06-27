@@ -3,7 +3,7 @@ from typing import Any
 
 import httpx
 
-from snowfall.project.junction.go.service.orders.v1alpha import models_pb2
+from snowfall.project.junction.go.service.orders.v1 import models_pb2
 from snowfall.project.junction.go.service.orders.zendesk import parsers
 from snowfall.stdlib.transport.http import client
 

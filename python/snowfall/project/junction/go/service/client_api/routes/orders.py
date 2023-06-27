@@ -13,7 +13,7 @@ from snowfall.project.junction.go.service.client_api import resources, validator
 from snowfall.project.junction.go.service.offers.v1 import (
     models_pb2 as offer_models_pb2,
 )
-from snowfall.project.junction.go.service.orders.v1alpha import (
+from snowfall.project.junction.go.service.orders.v1 import (
     models_pb2 as order_models_pb2,
 )
 from snowfall.stdlib.format.protobuf import date_to_protobuf, slug_to_enum_value

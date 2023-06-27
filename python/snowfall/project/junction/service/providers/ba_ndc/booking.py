@@ -1,7 +1,7 @@
 import more_itertools
 import pycountry
 
-from snowfall.project.junction.go.service.orders.v1alpha import amqp_pb2, models_pb2
+from snowfall.project.junction.go.service.orders.v1 import amqp_pb2, models_pb2
 from snowfall.project.junction.service.providers.ba_ndc import (
     ba_ndc_helpers,
     cache,

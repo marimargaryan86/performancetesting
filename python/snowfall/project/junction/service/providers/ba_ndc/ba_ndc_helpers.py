@@ -7,7 +7,7 @@ import more_itertools
 import phonenumbers
 from google.protobuf import timestamp_pb2
 
-from snowfall.project.junction.go.service.orders.v1alpha import amqp_pb2
+from snowfall.project.junction.go.service.orders.v1 import amqp_pb2
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
