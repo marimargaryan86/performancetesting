@@ -1,7 +1,7 @@
 import httpx
 from starlette import status
 
-from snowfall.service.authentication.v1alpha import models_pb2 as auth_models_pb2
+from snowfall.service.authentication.v1 import models_pb2 as auth_models_pb2
 
 
 class TestAuth(object):

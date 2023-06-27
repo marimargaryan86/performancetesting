@@ -40,7 +40,7 @@ from snowfall.project.pay.service.payments.v1alpha.payments_pb2_grpc import (
 from snowfall.project.pay.service.transactions.v1alpha import (
     grpc_pb2_grpc as transactions_pb2_grpc,
 )
-from snowfall.service.authentication.v1alpha import authentication_pb2_grpc
+from snowfall.service.authentication.v1 import authentication_pb2_grpc
 from snowfall.stdlib import service
 from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import cursor, filesystem

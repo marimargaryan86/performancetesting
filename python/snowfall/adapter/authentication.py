@@ -5,11 +5,9 @@ from collections.abc import Mapping
 
 import grpc
 
-from snowfall.service.authentication.v1alpha import authentication_pb2 as auth_pb2
-from snowfall.service.authentication.v1alpha import (
-    authentication_pb2_grpc as auth_pb2_grpc,
-)
-from snowfall.service.authentication.v1alpha import models_pb2
+from snowfall.service.authentication.v1 import authentication_pb2 as auth_pb2
+from snowfall.service.authentication.v1 import authentication_pb2_grpc as auth_pb2_grpc
+from snowfall.service.authentication.v1 import models_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.format import jwt
 

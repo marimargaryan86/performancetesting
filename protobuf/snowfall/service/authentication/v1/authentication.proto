@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-package snowfall.service.authentication.v1alpha;
+package snowfall.service.authentication.v1;
 
-import "snowfall/service/authentication/v1alpha/models.proto";
+import "snowfall/service/authentication/v1/models.proto";
 
-option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/service/authentication/v1alpha";
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/service/authentication/v1";
 
 service AuthenticationService {
   rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse);

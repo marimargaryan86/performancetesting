@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package snowfall.service.authentication.v1alpha;
+package snowfall.service.authentication.v1;
 
-option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/service/authentication/v1alpha";
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/service/authentication/v1";
 
 service OAuthService {
   rpc GetClient(GetClientRequest) returns (GetClientResponse);

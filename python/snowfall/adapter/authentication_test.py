@@ -3,7 +3,7 @@ import datetime
 import pytest
 
 from snowfall.adapter import authentication
-from snowfall.service.authentication.v1alpha import models_pb2
+from snowfall.service.authentication.v1 import models_pb2
 
 
 @pytest.fixture()

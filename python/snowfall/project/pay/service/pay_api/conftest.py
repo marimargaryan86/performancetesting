@@ -38,7 +38,7 @@ from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import (
     QuotationRates,
     Transaction,
 )
-from snowfall.service.authentication.v1alpha.models_pb2 import User
+from snowfall.service.authentication.v1.models_pb2 import User
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format.jwt import Encoder
 from snowfall.stdlib.integration.starlette import application, handlers

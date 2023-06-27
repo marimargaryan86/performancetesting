@@ -1,6 +1,6 @@
 import pymongo
 
-from snowfall.service.authentication.v1alpha import models_pb2
+from snowfall.service.authentication.v1 import models_pb2
 from snowfall.stdlib.persistence.mongo import mixins, repository
 
 
