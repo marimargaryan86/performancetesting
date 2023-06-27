@@ -1,4 +1,5 @@
 import grpc
+import httpx
 from google.rpc import error_details_pb2
 
 from snowfall.service.authentication import auth, repository
@@ -6,7 +7,11 @@ from snowfall.service.authentication.v1alpha import authentication_pb2 as auth_p
 from snowfall.service.authentication.v1alpha import (
     authentication_pb2_grpc as auth_pb2_grpc,
 )
-from snowfall.service.authentication.v1alpha import models_pb2
+from snowfall.service.authentication.v1alpha import (
+    models_pb2,
+    oauth_pb2,
+    oauth_pb2_grpc,
+)
 from snowfall.service.authentication.validators import (
     match_passwords,
     password2hash,
@@ -16,6 +21,7 @@ from snowfall.service.authentication.validators import (
 from snowfall.stdlib.format import jwt
 from snowfall.stdlib.string import uuid
 from snowfall.stdlib.transport.grpc import rich_status, service
+from snowfall.vendor.ory import client
 
 
 class AuthenticationService(
@@ -179,4 +185,38 @@ class AuthenticationService(
         return await context.abort(
             grpc.StatusCode.NOT_FOUND,
             details="Password is not changed",
+        )
+
+
+class OAuthService(service.Service, oauth_pb2_grpc.OAuthServiceServicer):
+    def __init__(self, ory_client: client.OryClient):
+        self._client = ory_client
+
+    def get_name(self) -> str:
+        return oauth_pb2.DESCRIPTOR.services_by_name["OAuthService"].full_name
+
+    def register(
+        self,
+        server: grpc.aio.Server,
+    ) -> None:
+        oauth_pb2_grpc.add_OAuthServiceServicer_to_server(self, server)
+
+    async def GetClient(  # type: ignore[override] # noqa: N802
+        self,
+        request: oauth_pb2.GetClientRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> oauth_pb2.GetClientResponse:
+        try:
+            oauth2_client = await self._client.get_client_by_id(request.id)
+        except httpx.HTTPStatusError as err:
+            if err.response.status_code == httpx.codes.NOT_FOUND.value:
+                await context.abort(grpc.StatusCode.NOT_FOUND)
+
+            return await context.abort(grpc.StatusCode.UNKNOWN)
+
+        return oauth_pb2.GetClientResponse(
+            client=oauth_pb2.Client(
+                id=oauth2_client.client_id,
+                owner=oauth2_client.owner,
+            ),
         )

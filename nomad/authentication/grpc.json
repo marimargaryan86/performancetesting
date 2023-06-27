@@ -2,19 +2,22 @@
   "development": {
     "variables": {
       "count": 1,
-      "jwt_ttl": "PT24H"
+      "jwt_ttl": "PT24H",
+      "ory_application_url": "https://optimistic-tereshkova-36hc6vayw4.projects.oryapis.com"
     }
   },
   "production": {
     "variables": {
       "count": 2,
-      "jwt_ttl": "PT1H"
+      "jwt_ttl": "PT1H",
+      "ory_application_url": "https://optimistic-tereshkova-36hc6vayw4.projects.oryapis.com"
     }
   },
   "sandbox": {
     "variables": {
       "count": 1,
-      "jwt_ttl": "PT24H"
+      "jwt_ttl": "PT24H",
+      "ory_application_url": "https://optimistic-tereshkova-36hc6vayw4.projects.oryapis.com"
     }
   }
 }

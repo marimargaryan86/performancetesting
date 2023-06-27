@@ -30,6 +30,10 @@ variable "jwt_ttl" {
   type = string
 }
 
+variable "ory_application_url" {
+  type = string
+}
+
 job "authentication-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -109,6 +113,7 @@ MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mong
 {{ with secret "kv/data/${var.environment}/authentication" }}
 JWT_PRIVATE_KEY={{ .Data.data.jwt_private_key }}
 JWT_PUBLIC_KEY={{ .Data.data.jwt_public_key }}
+ORY_API_KEY={{ .Data.data.ory_api_key }}
 {{ end }}
 EOH
       }
@@ -128,12 +133,13 @@ EOH
       }
 
       env {
-        ENV_NAME        = "${var.environment}"
-        GRPC_ADDRESS    = "0.0.0.0"
-        GRPC_PORT       = "${NOMAD_PORT_grpc}"
-        PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
-        SENTRY_DSN      = "https://e2ada9cd07e84150b39bfd606d7c4634@sentry.snowfall.se/53"
-        JWT_TTL         = var.jwt_ttl
+        ENV_NAME            = "${var.environment}"
+        GRPC_ADDRESS        = "0.0.0.0"
+        GRPC_PORT           = "${NOMAD_PORT_grpc}"
+        PROMETHEUS_PORT     = "${NOMAD_PORT_prometheus}"
+        SENTRY_DSN          = "https://e2ada9cd07e84150b39bfd606d7c4634@sentry.snowfall.se/53"
+        JWT_TTL             = var.jwt_ttl
+        ORY_APPLICATION_URL = "${var.ory_application_url}"
       }
     }
   }

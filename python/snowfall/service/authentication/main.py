@@ -5,11 +5,12 @@ from collections.abc import Sequence
 import pydantic
 from motor import motor_asyncio
 
-from snowfall.service.authentication import auth, repository
-from snowfall.service.authentication.grpc import AuthenticationService
+from snowfall.service.authentication import auth, grpc, repository
 from snowfall.stdlib import service
 from snowfall.stdlib.format import jwt
 from snowfall.stdlib.transport.grpc import server
+from snowfall.stdlib.transport.http import auth as stdlib_auth
+from snowfall.vendor.ory import client
 
 
 class _GrpcSettings(service.Settings):
@@ -20,6 +21,8 @@ class _GrpcSettings(service.Settings):
     jwt_public_key: str
     jwt_ttl: datetime.timedelta = datetime.timedelta(hours=1)
     mongo_dsn: Sequence[pydantic.AnyUrl]
+    ory_application_url: pydantic.AnyUrl
+    ory_api_key: str
 
 
 async def _serve(app: service.Application[_GrpcSettings]) -> None:
@@ -29,7 +32,7 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
         app.settings.grpc_address,
         app.settings.grpc_port,
         [
-            AuthenticationService(
+            grpc.AuthenticationService(
                 repository.UsersRepository(
                     collection=mongo.authentication.users,
                 ),
@@ -39,6 +42,12 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
                 jwt_encoder=jwt.Encoder(
                     private_key=app.settings.jwt_private_key,
                     algorithm="RS256",
+                ),
+            ),
+            grpc.OAuthService(
+                ory_client=client.OryClient(
+                    base_url=app.settings.ory_application_url,
+                    auth=stdlib_auth.TokenAuth(token=app.settings.ory_api_key),
                 ),
             ),
         ],

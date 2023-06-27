@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package snowfall.service.authentication.v1alpha;
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/service/authentication/v1alpha";
+
+service OAuthService {
+  rpc GetClient(GetClientRequest) returns (GetClientResponse);
+}
+
+message GetClientRequest {
+  string id = 1;
+}
+
+message GetClientResponse {
+  Client client = 1;
+}
+
+message Client {
+  string id = 1;
+  string owner = 2;
+}
