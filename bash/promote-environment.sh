@@ -15,7 +15,7 @@ cd repo
 git switch "${TO_ENV}" 2>/dev/null || git switch -c "${TO_ENV}"
 cd ..
 
-rsync -arv "${ARGS[@]}" --include="*.nomad" --delete --include="image.txt" --exclude="*" "templates/" "repo/templates/"
+rsync -avc "${ARGS[@]}" --include="*.nomad" --delete --include="image.txt" --exclude="*" "templates/" "repo/templates/"
 
 cd repo
 git add --all .
