@@ -1,8 +1,6 @@
+from snowfall.project.junction.plus.adapter import validation
 from snowfall.project.junction.plus.service.notification_center import validators
 from snowfall.project.junction.plus.service.notification_center.v1alpha import amqp_pb2
-from snowfall.project.junction.plus.service.orders_registration.validators import (
-    ProtobufValidationError,
-)
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.transport.amqp import consumer, types
 
@@ -23,7 +21,7 @@ class NotificationEventImporter(object):
         message: types.Message[amqp_pb2.NotificationEvent],
     ) -> None:
         try:
-            await validators.validate_notifications(message.body)
-        except* ProtobufValidationError:
+            validators.validate_notifications(message.body)
+        except* validation.ProtobufValidationError:
             self._logger.warning("Validation Error", exc_info=True)
         self._logger.warning(str(message.body))

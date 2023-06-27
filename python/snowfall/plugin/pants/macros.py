@@ -108,10 +108,6 @@ def python_image(  # type: ignore[no-untyped-def]
         name = build_file_dir().name  # type: ignore[name-defined]  # noqa: F821
 
     offenders = {
-        "python/snowfall/project/junction/plus/service/orders_registration/validators.py": {
-            "python/snowfall/project/junction/plus/service/notification_center/importer.py",
-            "python/snowfall/project/junction/plus/service/notification_center/validators.py",
-        },
         "python/snowfall/project/pay/service/companies/repositories.py": {
             "python/snowfall/project/pay/service/pay_api/bootstrap.py",
             "python/snowfall/project/pay/service/pay_api/conftest.py",

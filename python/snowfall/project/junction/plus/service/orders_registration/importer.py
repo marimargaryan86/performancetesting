@@ -1,4 +1,4 @@
-from snowfall.project.junction.plus.adapter import errors
+from snowfall.project.junction.plus.adapter import errors, validation
 from snowfall.project.junction.plus.service.notification_center.v1alpha import (
     amqp_pb2 as notif_amqp_pb2,
 )
@@ -53,8 +53,8 @@ class OrderImporter(object):
         message: types.Message[amqp_pb2.IncomingOrder],
     ) -> None:
         try:
-            await validators.validate_orders(message.body)
-        except* validators.ProtobufValidationError:
+            validators.validate_orders(message.body)
+        except* validation.ProtobufValidationError:
             self._logger.warning("Validation Error", exc_info=True)
         else:
             response = await errors.handle_grpc_errors(
