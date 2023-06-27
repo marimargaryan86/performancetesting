@@ -5,15 +5,27 @@
       "no_file_level_mypy",
       "no_file_level_ruff_noqa",
       "no_pytest_mark_asyncio"
+    ],
+    "invalid_pytest_files": [
+      "forbidden_filename"
     ]
   },
   "path_patterns": [
     {
       "name": "all_python_files",
-      "pattern": ".*\\.py$"
+      "pattern": ".+\\.py$"
+    },
+    {
+      "name": "invalid_pytest_files",
+      "pattern": "test_[^\/]+\\.py$"
     }
   ],
   "content_patterns": [
+    {
+      "name": "forbidden_filename",
+      "pattern": ".*",
+      "inverted": true
+    },
     {
       "name": "no_file_level_flake8_noqa",
       "pattern": "# flake8: noqa",
