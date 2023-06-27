@@ -2,6 +2,9 @@ from snowfall.project.junction.plus.adapter import errors
 from snowfall.project.junction.plus.service.notification_center.v1alpha import (
     amqp_pb2 as notif_amqp_pb2,
 )
+from snowfall.project.junction.plus.service.notification_center.v1alpha import (
+    models_pb2 as notif_models_pb2,
+)
 from snowfall.project.junction.plus.service.notifications.v1alpha import (
     grpc_pb2 as notifications_pb2,
 )
@@ -41,7 +44,7 @@ class OrderImporter(object):
             receiver_id=order.subscriber_id,
             body=order,
             event_type=notif_amqp_pb2.NotificationEvent.TYPE_ORDER_CONFIRMATION,
-            channel=notif_amqp_pb2.NotificationEvent.CHANNEL_WHATSAPP,
+            channel=notif_models_pb2.Channel.CHANNEL_WHATSAPP,
         )
         await self._producer.publish(notification_event, "plus.events")
 
