@@ -69,7 +69,7 @@
     "active": true,
     "country": "Austria",
     "name": "OBB",
-    "url": "https://api-gateway.oebb.at/gateway/OpenDataSets_API/1.0/opendata"
+    "url": "https://data.oebb.at/de/datensaetze~soll-fahrplan-gtfs~"
   },
   {
     "active": true,
