@@ -30,6 +30,66 @@ def time_to_window(
     )
 
 
+def search_criteria_generator(
+    search_task: amqp_pb2.SearchCriteriaTask,
+) -> search.CreateSearchCriteria:
+    outbound_date = protobuf.protobuf_to_datetime(
+        search_task.criteria.outbound_departure,
+    )
+    affiliate_id = None
+
+    if search_task.criteria.affiliate_id:
+        affiliate_id = int(search_task.criteria.affiliate_id)
+
+    search_criteria = search.CreateSearchCriteria(
+        transaction_id=None,
+        origin_iata=search_task.criteria.origin_iata,
+        destination_iata=search_task.criteria.destination_iata,
+        outbound_date=outbound_date.date(),
+        outbound_departure_window=time_to_window(outbound_date.time()),
+        cabin_class=enums.AirCabinClassType(search_task.criteria.cabin_class),
+        adults=search_task.criteria.adults,
+        children=search_task.criteria.children,
+        infants=search_task.criteria.infants,
+        affiliate_id=affiliate_id,
+    )
+
+    if search_task.criteria.HasField("inbound_departure"):
+        inbound_date = protobuf.protobuf_to_datetime(
+            search_task.criteria.inbound_departure,
+        )
+        search_criteria.inbound_date = inbound_date.date()
+        search_criteria.inbound_departure_window = time_to_window(
+            inbound_date.time(),
+        )
+
+    search_criteria.transaction_id = uuid.UUID(
+        generate_cache_key(search_criteria),
+    )
+
+    return search_criteria
+
+
+def generate_cache_key(search_criteria: search.CreateSearchCriteria) -> str:
+    return string.to_uuid(
+        b"\x00".decode().join(
+            [
+                search_criteria.cabin_class.name,
+                str(search_criteria.adults),
+                str(search_criteria.children),
+                str(search_criteria.infants),
+                str(search_criteria.inbound_date),
+                str(search_criteria.outbound_date),
+                str(search_criteria.origin_iata),
+                str(search_criteria.destination_iata),
+                str(search_criteria.inbound_departure_window),
+                str(search_criteria.outbound_departure_window),
+                str(search_criteria.affiliate_id),
+            ],
+        ),
+    )
+
+
 class NoResultsError(Exception):
     """Raised when a result page has not results."""
 
@@ -54,60 +114,6 @@ class Adapter(object):
 
         async for offer in self._gather_offers(identifiers):
             yield offer
-
-    def search_criteria_generator(
-        self,
-        search_task: amqp_pb2.SearchCriteriaTask,
-    ) -> search.CreateSearchCriteria:
-        outbound_date = protobuf.protobuf_to_datetime(
-            search_task.criteria.outbound_departure,
-        )
-        search_criteria = search.CreateSearchCriteria(
-            transaction_id=None,
-            origin_iata=search_task.criteria.origin_iata,
-            destination_iata=search_task.criteria.destination_iata,
-            outbound_date=outbound_date.date(),
-            outbound_departure_window=time_to_window(outbound_date.time()),
-            cabin_class=enums.AirCabinClassType(search_task.criteria.cabin_class),
-            adults=search_task.criteria.adults,
-            children=search_task.criteria.children,
-            infants=search_task.criteria.infants,
-            affiliate_id=search_task.criteria.affiliate_id,
-        )
-
-        if search_task.criteria.HasField("inbound_departure"):
-            inbound_date = protobuf.protobuf_to_datetime(
-                search_task.criteria.inbound_departure,
-            )
-            search_criteria.inbound_date = inbound_date.date()
-            search_criteria.inbound_departure_window = time_to_window(
-                inbound_date.time(),
-            )
-
-        search_criteria.transaction_id = uuid.UUID(
-            self.generate_cache_key(search_criteria),
-        )
-
-        return search_criteria
-
-    def generate_cache_key(self, search_criteria: search.CreateSearchCriteria) -> str:
-        return string.to_uuid(
-            b"\x00".decode().join(
-                [
-                    search_criteria.cabin_class.name,
-                    str(search_criteria.adults),
-                    str(search_criteria.children),
-                    str(search_criteria.infants),
-                    str(search_criteria.inbound_date),
-                    str(search_criteria.outbound_date),
-                    str(search_criteria.origin_iata),
-                    str(search_criteria.destination_iata),
-                    str(search_criteria.inbound_departure_window),
-                    str(search_criteria.outbound_departure_window),
-                    search_criteria.affiliate_id,
-                ],
-            ),
-        )
 
     async def _gather_offers(
         self,

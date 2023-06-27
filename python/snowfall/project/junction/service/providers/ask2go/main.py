@@ -135,11 +135,6 @@ async def _offers(
         http_client=http_client,
         rate_limit_client=rate_limit_client,
     )
-    search_adapter = search.Adapter(
-        ask2go_client=ask2go_client,
-        poll_retries_limit=app.settings.poll_retries_limit,
-        wait_time_between_polling=app.settings.wait_time_between_polling,
-    )
     airport_repo = airports.AirportRepository(
         airports_data=cast(
             list[dict[str, Any]],
@@ -160,10 +155,14 @@ async def _offers(
             ),
             reseller_id_affiliate_id_map=app.settings.reseller_affiliate_mapping,
         ).from_search,
-        search_criteria_generator=search_adapter.search_criteria_generator,
-        offer_group_cache_key_generator=search_adapter.generate_cache_key,
+        search_criteria_generator=search.search_criteria_generator,
+        offer_group_cache_key_generator=search.generate_cache_key,
         offer_group_generator=a2g_offers.offer_group_generator(
-            a2g_adapter=search_adapter,
+            a2g_adapter=search.Adapter(
+                ask2go_client=ask2go_client,
+                poll_retries_limit=app.settings.poll_retries_limit,
+                wait_time_between_polling=app.settings.wait_time_between_polling,
+            ),
             a2g_transformer=transformer.OfferTransformer(
                 airport_repository=airport_repo,
                 cabin_mapping_repository=cabin_classes.CabinMappingRepository(

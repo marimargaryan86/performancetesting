@@ -35,8 +35,11 @@ class CriteriaGenerator(object):
         search: offer_models_pb2.TripOfferSearch,
     ) -> list[provider_amqp_pb2.SearchCriteriaTask]:
         number_of_types = get_num_of_passenger_types(
-            passengers=search.passengers,
-            date=_get_last_travel_date(search),
+            passenger_dobs=[
+                protobuf.protobuf_to_date(passenger.date_of_birth)
+                for passenger in search.passengers
+            ],
+            date_of_travel=_get_last_travel_date(search),
         )
         sub_trips = self._grouper.trips_to_sub_trips(
             trips=search.trips,
@@ -120,17 +123,17 @@ def get_passenger_type(
 
 
 def get_num_of_passenger_types(
-    passengers: Sequence[offer_models_pb2.Passenger],
-    date: datetime.date,
+    passenger_dobs: Sequence[datetime.date],
+    date_of_travel: datetime.date,
 ) -> tuple[int, int, int]:
     adults = 0
     children = 0
     infants = 0
 
-    for passenger in passengers:
+    for date_of_birth in passenger_dobs:
         pax_type = get_passenger_type(
-            protobuf.protobuf_to_date(passenger.date_of_birth),
-            date,
+            date_of_birth=date_of_birth,
+            date_of_travel=date_of_travel,
         )
 
         if pax_type == enums.PassengerType.adult:
