@@ -4,7 +4,7 @@ from typing import ClassVar
 
 from starlette import requests
 
-from snowfall.project.junction.go.service.places.v1alpha import models_pb2
+from snowfall.project.junction.go.service.places.v1 import models_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import models
 

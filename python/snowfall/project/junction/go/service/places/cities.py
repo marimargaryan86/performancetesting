@@ -8,7 +8,7 @@ from collections.abc import AsyncIterable, Sequence
 from aiocsv import protocols, readers
 
 from snowfall.project.junction.go.service.places import places
-from snowfall.project.junction.go.service.places.v1alpha import models_pb2
+from snowfall.project.junction.go.service.places.v1 import models_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1 import latlng_pb2

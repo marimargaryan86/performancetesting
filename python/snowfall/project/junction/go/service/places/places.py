@@ -6,7 +6,7 @@ from typing import Any
 
 from pymongo import GEOSPHERE, IndexModel, results
 
-from snowfall.project.junction.go.service.places.v1alpha import models_pb2
+from snowfall.project.junction.go.service.places.v1 import models_pb2
 from snowfall.service.geodata.v1 import geocoding_pb2, geocoding_pb2_grpc
 from snowfall.stdlib import string
 from snowfall.stdlib.persistence.mongo import mixins, normalizers, repository, resultset

@@ -35,7 +35,7 @@ import (
 	"time"
 
 	"git.snowfall.se/junction/junction/golang/gtfs"
-	v1alphaLocations "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/places/v1alpha"
+	v1Locations "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/places/v1"
 	v1alpha "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/v1alpha"
 	v1Stdlib "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1"
 	"git.snowfall.se/junction/junction/golang/protoio"
@@ -100,14 +100,14 @@ type mongoSchedule struct {
 }
 
 type mongoLocation struct {
-	// json (for MongoDB load) match to *v1alphaLocations.Locations
-	Id          string                           `json:"_id"`
-	Name        string                           `json:"name"`
-	Coordinates mongoCoordinate                  `json:"coordinates"`
-	TimeZone    string                           `json:"time_zone"`
-	UpdatedAt   *ConvertibleTime                 `json:"updated_at"`
-	SourceRef   string                           `json:"source_ref"`
-	Types       []v1alphaLocations.Location_Type `json:"types"`
+	// json (for MongoDB load) match to *v1Locations.Locations
+	Id          string                      `json:"_id"`
+	Name        string                      `json:"name"`
+	Coordinates mongoCoordinate             `json:"coordinates"`
+	TimeZone    string                      `json:"time_zone"`
+	UpdatedAt   *ConvertibleTime            `json:"updated_at"`
+	SourceRef   string                      `json:"source_ref"`
+	Types       []v1Locations.Location_Type `json:"types"`
 }
 
 var bsonRegistry *bsoncodec.Registry
@@ -193,7 +193,7 @@ func newMongoSchedule(sched *v1alpha.Schedule) *mongoSchedule {
 	}
 }
 
-func newMongoLocation(locationBuff *v1alphaLocations.Location, now time.Time) *mongoLocation {
+func newMongoLocation(locationBuff *v1Locations.Location, now time.Time) *mongoLocation {
 	return &mongoLocation{
 		Id:   locationBuff.Id,
 		Name: locationBuff.Name,
@@ -415,7 +415,7 @@ func GetWriteScheduleObj(schedFile *os.File, wg *sync.WaitGroup) chan *v1alpha.S
 	return schedulesChannel
 }
 
-func writeLocationObj(schedulesObjFile *os.File, locationBuff *v1alphaLocations.Location, t time.Time) error {
+func writeLocationObj(schedulesObjFile *os.File, locationBuff *v1Locations.Location, t time.Time) error {
 	for i := range locationBuff.Types {
 		if int(i) > 2 {
 			panic(fmt.Sprintf("ERROR: bad key: %d\n", int(i)))
@@ -542,7 +542,7 @@ func getFileMap(zf *zip.ReadCloser) map[string]*zip.File {
 
 // ******** MAIN
 
-type locationTypesMap map[v1alphaLocations.Location_Type]bool
+type locationTypesMap map[v1Locations.Location_Type]bool
 
 func main() {
 	// JSONFallback will cause BSON to be generated with the correct tags.
@@ -592,7 +592,7 @@ func main() {
 	check(err)
 	defer closeFile(locationBinFile)
 	bufLocationWriter := bufio.NewWriter(locationBinFile)
-	locationWriter := protoio.NewProtoWriter[*v1alphaLocations.Location](bufLocationWriter)
+	locationWriter := protoio.NewProtoWriter[*v1Locations.Location](bufLocationWriter)
 
 	feedFiles, err := os.ReadDir(inputDir)
 	check(err)
@@ -844,7 +844,7 @@ func main() {
 			db.Find(&stops)
 
 			for _, stop := range stops {
-				newLocation := v1alphaLocations.Location{
+				newLocation := v1Locations.Location{
 					Id:   uuid.NewSHA1(fileNamespace, []byte(stop.Id)).String(),
 					Name: stop.Name,
 					Coordinates: &v1Stdlib.LatLng{
@@ -879,8 +879,8 @@ func getOnOff(agency gtfs.Agency, stopTimes []*gtfs.StopTime, index int) (bool, 
 	return stopTimes[index].PickupType == 0, stopTimes[index+1].DropOffType == 0
 }
 
-func getTypeSlice(travelType locationTypesMap) []v1alphaLocations.Location_Type {
-	types := make([]v1alphaLocations.Location_Type, 0, len(travelType))
+func getTypeSlice(travelType locationTypesMap) []v1Locations.Location_Type {
+	types := make([]v1Locations.Location_Type, 0, len(travelType))
 	for key := range travelType {
 		types = append(types, key)
 	}

@@ -1,11 +1,11 @@
 syntax = "proto3";
 
-package snowfall.project.junction.go.service.places.v1alpha;
+package snowfall.project.junction.go.service.places.v1;
 
-import "snowfall/project/junction/go/service/places/v1alpha/models.proto";
+import "snowfall/project/junction/go/service/places/v1/models.proto";
 import "snowfall/stdlib/v1/latlng.proto";
 
-option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/places/v1alpha";
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/places/v1";
 
 service LocationsService {
   rpc GetLocation(GetLocationRequest) returns (GetLocationResponse) {}

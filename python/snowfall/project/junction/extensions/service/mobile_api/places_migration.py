@@ -14,7 +14,7 @@ from snowfall.project.junction.extensions.service.mobile_api import (
 )
 from snowfall.project.junction.extensions.service.mobile_api.v1alpha import models_pb2
 from snowfall.project.junction.go.service.places.places import PlaceRepository
-from snowfall.project.junction.go.service.places.v1alpha.models_pb2 import Place
+from snowfall.project.junction.go.service.places.v1.models_pb2 import Place
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.v1 import latlng_pb2
 

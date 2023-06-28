@@ -17,7 +17,7 @@ from snowfall.project.junction.go.service.places.places import (
     LocationRepository,
     PlaceRepository,
 )
-from snowfall.project.junction.go.service.places.v1alpha.models_pb2 import Place
+from snowfall.project.junction.go.service.places.v1.models_pb2 import Place
 from snowfall.service.geodata.v1 import geocoding_pb2_grpc
 from snowfall.stdlib import service
 from snowfall.stdlib.persistence import filesystem

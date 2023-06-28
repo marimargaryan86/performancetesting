@@ -3,7 +3,7 @@ import uuid
 from grpc import StatusCode, aio
 
 from snowfall.project.junction.go.service.places import places
-from snowfall.project.junction.go.service.places.v1alpha import (
+from snowfall.project.junction.go.service.places.v1 import (
     models_pb2,
     places_pb2,
     places_pb2_grpc,
