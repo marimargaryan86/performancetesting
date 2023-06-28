@@ -24,10 +24,12 @@ for f in "${PROTOBUF_FILES[@]}"; do
 
 	if ! grep -q -e "^option go_package = \"git.snowfall.se/junction/junction/golang/protobuf/${NAMESPACE}\";$" "${f}"; then
 		echo "${f}: invalid value for option \"go_package\", expected \"git.snowfall.se/junction/junction/golang/protobuf/${NAMESPACE}\""
+		FAILURE=1
 	fi
 
 	if ! grep -q -e "^package ${NAMESPACE//\//.};$" "${f}"; then
 		echo "${f}: invalid value for \"package\" package, expected \"${NAMESPACE//\//.}\""
+		FAILURE=1
 	fi
 done
 

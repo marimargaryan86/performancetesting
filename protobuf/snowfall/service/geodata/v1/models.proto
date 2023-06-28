@@ -5,7 +5,7 @@ package snowfall.service.geodata.v1;
 import "snowfall/stdlib/v1/datetime.proto";
 import "snowfall/stdlib/v1/latlng.proto";
 
-option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/service/geocoding/v1";
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/service/geodata/v1";
 
 message Location {
   string name = 1;
