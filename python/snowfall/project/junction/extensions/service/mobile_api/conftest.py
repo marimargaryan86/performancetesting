@@ -139,7 +139,7 @@ class Response(TypedDict):
 def load_response_fixture(path: str) -> Response:
     response_dict = load_json_fixture(path, _RESPONSE_FIXTURES_PATH)
     response_dict["url"] = re.compile(
-        r".*{path_regex}".format(path_regex=response_dict["url"]),  # noqa: WPS360
+        ".*{path_regex}".format(path_regex=response_dict["url"]),
     )
     return response_dict
 

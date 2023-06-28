@@ -134,7 +134,6 @@ external = [
     "WPS342", # Forbid \\ escape sequences inside regular strings
     "WPS348", # Forbid starting lines with a dot
     "WPS352", # Forbid multiline loops
-    "WPS360", # Forbid the use of raw strings when there is no backslash in the string
     "WPS408", # Forbid using the same logical conditions in one expression
     "WPS420", # Forbid some python keywords
     "WPS421", # Forbid calling some built-in functions
