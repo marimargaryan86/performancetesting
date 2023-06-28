@@ -27,10 +27,6 @@ from snowfall.stdlib.integration.starlette import models, request_helpers
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.v1 import phone_number_pb2
 
-_id_key = "_id"
-_email_key = "email"
-_password_key = "password"  # noqa: S105
-
 
 class Users(endpoints.HTTPEndpoint):
     async def post(
@@ -45,7 +41,7 @@ class Users(endpoints.HTTPEndpoint):
 
         verification_code = request.user.username
         authorized = await otp_repository.check(
-            body[_email_key],
+            body["email"],
             verification_code,
             delete_after=True,
         )
@@ -58,9 +54,9 @@ class Users(endpoints.HTTPEndpoint):
 
         user = UserModel(
             id=new_user_id,
-            email=body[_email_key],
+            email=body["email"],
             password=bcrypt.hashpw(
-                body[_password_key].encode(),
+                body["password"].encode(),
                 bcrypt.gensalt(),
             ).decode(),
             phone=phone_number_pb2.PhoneNumber(e164_number=body["phone"]),
@@ -114,9 +110,9 @@ class User(endpoints.HTTPEndpoint):
             raise exceptions.HTTPException(status.HTTP_401_UNAUTHORIZED)
 
         await users_repository.update_password(
-            body[_password_key],
+            body["password"],
             user_mail,
-            _email_key,
+            "email",
         )
         return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -236,11 +232,11 @@ class Session(endpoints.HTTPEndpoint):
         jwt_gen: jwt_generator.JwtGenerator = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
-        user = await users_repository.find_user_by_email(body[_email_key])
+        user = await users_repository.find_user_by_email(body["email"])
         if not user:
             raise exceptions.HTTPException(status.HTTP_401_UNAUTHORIZED)
         password_match = bcrypt.checkpw(
-            body[_password_key].encode(),
+            body["password"].encode(),
             user.password.encode(),
         )
         if not password_match:
@@ -274,7 +270,7 @@ class OTPGenerate(endpoints.HTTPEndpoint):
 
         otp = await otp_generation()
 
-        await otp_repository.create(body[_email_key], otp)
+        await otp_repository.create(body["email"], otp)
         async with aiofiles.open(
             filesystem.resource_path(
                 "snowfall.project.junction.extensions.service.mobile_api.html_templates",
@@ -284,7 +280,7 @@ class OTPGenerate(endpoints.HTTPEndpoint):
             template = Template(await template_file.read())
         email_body = template.render(company_name=smtp_client.client_name, otp=otp)
         await smtp_client.send_email_html_template(
-            body[_email_key],
+            body["email"],
             "Your One Time Pin: {}".format(otp),
             email_body,
         )

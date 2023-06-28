@@ -11,12 +11,6 @@ from snowfall.project.junction.extensions.service.mobile_api.v1alpha import mode
 from snowfall.stdlib import money
 from snowfall.stdlib.integration.starlette import models, request_helpers
 
-_email_key = "email"
-_id_key = "_id"
-_user_key = "user_id"
-_name_key = "name"
-_stripe_customer_id_key = "stripe_customer_id"
-_password_key = "password"  # noqa: S105
 _stripe_version = "2020-08-27"
 
 

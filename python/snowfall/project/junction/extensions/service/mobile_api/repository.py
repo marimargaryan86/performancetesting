@@ -1,7 +1,7 @@
 import copy
 import datetime
 import re
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Iterable, Mapping
 from typing import Any
 
 import bcrypt
@@ -13,14 +13,7 @@ from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 from snowfall.stdlib.persistence.redis import types as redis
 
-_DATA_ACCESSOR = "data"
-_ID_ACCESSOR = "id"
-_ID_KEY = "_id"
-_ATTRIBUTES_ACCESSOR = "attributes"
-_EMAIL_KEY = "email"
-_PASSWORD_KEY = "password"  # noqa: S105
 _DEFAULT_PAGE_SIZE = 20
-_DICT_SEQUENCE = Sequence[dict[str, Any]]
 
 
 class RedisRepository(object):
@@ -163,7 +156,7 @@ class UsersRepository(
             {selector: document_id},
             {
                 "$set": {
-                    _PASSWORD_KEY: bcrypt.hashpw(
+                    "password": bcrypt.hashpw(
                         password.encode(),
                         bcrypt.gensalt(),
                     ).decode(),
@@ -174,12 +167,12 @@ class UsersRepository(
         )
 
     async def find_user_by_email(self, email: str) -> models_pb2.User | None:
-        return await self._execute(self._collection.find_one, {_EMAIL_KEY: email})
+        return await self._execute(self._collection.find_one, {"email": email})
 
     async def find_user_hide_password(self, user_id: str) -> models_pb2.User | None:
         return await self._execute(
             self._collection.find_one,
-            {_ID_KEY: user_id},
+            {repository.mongo_id_key: user_id},
             {"password": 0},
         )
 
@@ -195,7 +188,7 @@ class UsersRepository(
         user["updated_at"] = datetime.datetime.now(tz=datetime.UTC)
         await self._execute(
             self._collection.update_one,
-            {_ID_KEY: user_id},
+            {repository.mongo_id_key: user_id},
             {"$set": user},
             upsert=False,
         )
@@ -493,7 +486,7 @@ class UserGroupsRepository(
         group["updated_at"] = datetime.datetime.now(tz=datetime.UTC)
         await self._execute(
             self._collection.update_one,
-            {_ID_KEY: group_id, "user_id": user_id},
+            {repository.mongo_id_key: group_id, "user_id": user_id},
             {"$set": group},
             upsert=False,
         )
@@ -521,7 +514,7 @@ class UserGroupsRepository(
         # TODO: check somehow for limit of members from env_var
         await self._execute(
             self._collection.update_one,
-            {_ID_KEY: group_id, "user_id": user_id},
+            {repository.mongo_id_key: group_id, "user_id": user_id},
             {"$push": {"members": member}},
             upsert=False,
         )
