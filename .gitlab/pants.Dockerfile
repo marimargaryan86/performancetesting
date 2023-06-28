@@ -1,6 +1,6 @@
-# python:3.11.4-slim-bookworm
+# python:3.11.4-slim-bullseye
 ARG REGISTRY
-FROM ${REGISTRY}python@sha256:55221704bcc5432f978bc5184d58f54c93ad25313363a1d0db20606a4cf2aef7
+FROM ${REGISTRY}python@sha256:ed0e7c504b2b8c4517f703252811a6d2ddff5c9320272103d8cc72befbf950a9
 ENV PATH=/usr/local/go/bin:$PATH
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
@@ -30,4 +30,4 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     nomad=1.5.6-1 \
     /tmp/oasdiff.deb \
 && rm -rf /var/lib/apt/lists/* /tmp/oasdiff.deb
-COPY --from=golang:1.19.10 /usr/local/go/ /usr/local/go/
+COPY --from=golang:1.19.10-bullseye /usr/local/go/ /usr/local/go/

@@ -156,8 +156,8 @@ def python_image(  # type: ignore[no-untyped-def]
         ),
     )
 
-    # python:3.11.4-slim-bookworm
-    tag_sha = "55221704bcc5432f978bc5184d58f54c93ad25313363a1d0db20606a4cf2aef7"
+    # python:3.11.4-slim-bullseye
+    tag_sha = "ed0e7c504b2b8c4517f703252811a6d2ddff5c9320272103d8cc72befbf950a9"
 
     docker_image(  # type: ignore[name-defined]  # noqa: F821
         name="{name}_docker".format(name=name),

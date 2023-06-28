@@ -1,9 +1,9 @@
 [GLOBAL]
 colors = true
 pantsd = false
-remote_cache_read = true
+remote_cache_read = false
 remote_cache_rpc_timeout_millis = 30000
-remote_cache_write = true
+remote_cache_write = false
 remote_store_address = "grpc://bazel-remote:9092"
 watch_filesystem = false
 
