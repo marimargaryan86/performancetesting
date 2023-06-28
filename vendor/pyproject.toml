@@ -147,7 +147,6 @@ external = [
     "WPS465", # Forbid comparisons between bitwise and boolean expressions
     "WPS473", # Limit empty lines in functions or methods body
     "WPS508", # Forbid not with compare expressions
-    "WPS509", # Forbid nesting ternary expressions in certain places
     "WPS528", # Forbid implicit .items() iterator
     "WPS601", # Forbid shadowing class level attributes with instance level attributes
     "WPS609", # Forbid directly calling certain magic attributes and methods

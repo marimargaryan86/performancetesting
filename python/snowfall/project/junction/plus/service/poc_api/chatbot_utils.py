@@ -106,44 +106,47 @@ async def build_travel_essential(  # noqa: WPS210
         delay_minutes = detail["delayMinutes"]
         departure_terminal = "[terminal], [gate]\n" if fs else ""
         arrival_terminal = "[terminal]\n" if fs else ""
+        delayed_departure = (
+            "Delayed: by +{0}m, {1}\n".format(
+                delay_minutes,
+                format_dt(
+                    datetime.datetime.fromisoformat(
+                        detail["departureAt"],
+                    )
+                    + datetime.timedelta(
+                        minutes=delay_minutes,
+                    ),
+                ),
+            )
+            if delay_minutes
+            else ""
+        )
+        delayed_arrival = (
+            "Delayed: by +{0}m, {1}\n".format(
+                delay_minutes,
+                format_dt(
+                    datetime.datetime.fromisoformat(
+                        detail["arrivalAt"],
+                    )
+                    + datetime.timedelta(
+                        minutes=delay_minutes,
+                    ),
+                ),
+            )
+            if delay_minutes
+            else ""
+        )
+
         leg_tem = (
             "----------------------\n"
             + "Departure from: {0}\n".format(detail["origin"]["name"])
             + departure_terminal
             + "Departure time: {0}\n".format(format_dt_str(detail["departureAt"]))
-            + (
-                "Delayed: by +{0}m, {1}\n".format(  # noqa: WPS509
-                    delay_minutes,
-                    format_dt(
-                        datetime.datetime.fromisoformat(
-                            detail["departureAt"],
-                        )
-                        + datetime.timedelta(
-                            minutes=delay_minutes,
-                        ),
-                    ),
-                )
-                if delay_minutes
-                else ""
-            )
+            + delayed_departure
             + "Arrival to: {0}\n".format(detail["destination"]["name"])
             + arrival_terminal
             + "Arrival time: {0}\n".format(format_dt_str(detail["arrivalAt"]))
-            + (
-                "Delayed: by +{0}m, {1}\n".format(  # noqa: WPS509
-                    delay_minutes,
-                    format_dt(
-                        datetime.datetime.fromisoformat(
-                            detail["arrivalAt"],
-                        )
-                        + datetime.timedelta(
-                            minutes=delay_minutes,
-                        ),
-                    ),
-                )
-                if delay_minutes
-                else ""
-            )
+            + delayed_arrival
             + "Duration: {0}h{1}m\n".format(
                 seconds_to_hours_and_minutes(detail["durationSeconds"])["hours"],
                 seconds_to_hours_and_minutes(detail["durationSeconds"])["minutes"],
