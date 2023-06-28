@@ -3,29 +3,34 @@ import json
 import logging
 from collections.abc import Mapping, Sequence
 from datetime import date, datetime
-from typing import Any
+from typing import Any, Literal, TypeAlias
 
 import httpx
 
+from snowfall.vendor.junction.client import make_pagination_params
 from snowfall.vendor.junction.go import models
-from snowfall.vendor.junction.go.client import (  # noqa: WPS450,WPS235
-    _ATTRIBUTES_KEY,
-    _DATA_KEY,
-    _EMAIL_KEY,
-    _ID_KEY,
-    _METHOD_DELETE,
-    _METHOD_GET,
-    _METHOD_PATCH,
-    _METHOD_POST,
-    _PASSENGERS_KEY,
-    _PASSWORD_KEY,
-    _RELATIONSHIPS_KEY,
-    _TYPE_KEY,
-    Client,
-    LegType,
-    _make_pagination,
-    order_includes,
-)
+from snowfall.vendor.junction.go.client import Client, LegType
+
+_OrderIncludes: TypeAlias = Literal[
+    "journey",
+    "bookings",
+    "bookings.details",
+    "bookings.details.cabinClass",
+    "bookings.details.legType",
+]
+
+_DATA_KEY = "data"
+_ID_KEY = "id"
+_TYPE_KEY = "type"
+_RELATIONSHIPS_KEY = "relationships"
+_ATTRIBUTES_KEY = "attributes"
+_PASSENGERS_KEY = "passengers"
+_METHOD_GET = "GET"
+_METHOD_POST = "POST"
+_METHOD_PATCH = "PATCH"
+_METHOD_DELETE = "DELETE"
+_EMAIL_KEY = "email"
+_CRITERIA_KEY = "criteria"
 
 
 class MobileApiClient(Client):  # noqa: WPS214
@@ -93,7 +98,7 @@ class MobileApiClient(Client):  # noqa: WPS214
         passengers: Sequence[models.Passenger],
         contact_details: models.ContactDetails,
         residence_address: models.Address | None = None,
-        include: Sequence[order_includes] | None = None,
+        include: Sequence[_OrderIncludes] | None = None,
     ) -> dict[str, Any]:
         raise RuntimeError(
             (
@@ -152,7 +157,7 @@ class MobileApiClient(Client):  # noqa: WPS214
         contact_details: models.ContactDetails,
         payment_id: str,
         voucher_id: str | None = None,
-        include: Sequence[order_includes] | None = None,
+        include: Sequence[_OrderIncludes] | None = None,
     ) -> dict[str, Any]:
         body: dict[str, dict[str, Any]]
         body = {
@@ -357,7 +362,7 @@ class MobileApiClient(Client):  # noqa: WPS214
         return await self._make_request(
             method=_METHOD_GET,
             url="/users/groups",
-            query_parameters=_make_pagination(limit, cursor),
+            query_parameters=make_pagination_params(limit, cursor),
         )
 
     async def get_user_group(
@@ -539,7 +544,7 @@ class MobileApiClient(Client):  # noqa: WPS214
                 {"dateOfBirth": dob.strftime("%Y-%m-%d")}
                 for dob in passengers_dates_of_birth
             ],
-            "criteria": [  # TODO: replace with _CRITERIA_KEY after #2178 MR merge
+            _CRITERIA_KEY: [
                 {
                     "origin": {
                         "latitude": origin[0],
@@ -632,6 +637,6 @@ class MobileApiClient(Client):  # noqa: WPS214
             method=_METHOD_DELETE,
             url="/users/me",
             query_parameters={
-                _PASSWORD_KEY: password,
+                "password": password,
             },
         )

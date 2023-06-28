@@ -1,30 +1,19 @@
 import dataclasses
 import datetime
 import enum
-from collections.abc import Mapping, Sequence
-from typing import Any, Literal, cast
+from collections.abc import Sequence
+from typing import Any, Literal, TypeAlias, cast
 
 from snowfall.vendor.junction import client as base_client
 from snowfall.vendor.junction.go import models
 
-_DATA_KEY = "data"
-_ID_KEY = "id"
-_TYPE_KEY = "type"
-_RELATIONSHIPS_KEY = "relationships"
-_ATTRIBUTES_KEY = "attributes"
-_PASSENGERS_KEY = "passengers"
-_LIMIT_KEY = "page[limit]"
-_CURSOR_KEY = "page[cursor]"
 _METHOD_GET = "GET"
 _METHOD_POST = "POST"
 _METHOD_PATCH = "PATCH"
 _METHOD_DELETE = "DELETE"
-_EMAIL_KEY = "email"
-_PASSWORD_KEY = "password"  # noqa: S105
-_CRITERIA_KEY = "criteria"
 
-trip_includes = Literal["segments", "segments.legs", "segments.legs.legType"]
-offer_includes = Literal[
+_TripIncludes: TypeAlias = Literal["segments", "segments.legs", "segments.legs.legType"]
+_OfferIncludes: TypeAlias = Literal[
     "groups",
     "groups.details",
     "groups.details.legType",
@@ -33,7 +22,7 @@ offer_includes = Literal[
     "groups.options.details.cabinClass",
     "groups.options.details.details",
 ]
-offer_search_includes = Literal[
+_OfferSearchIncludes: TypeAlias = Literal[
     "offers.groups",
     "offers.groups.details",
     "offers.groups.details.legType",
@@ -42,7 +31,7 @@ offer_search_includes = Literal[
     "offers.groups.options.details.cabinClass",
     "offers.groups.options.details.details",
 ]
-order_includes = Literal[
+_OrderIncludes: TypeAlias = Literal[
     "journey",
     "bookings",
     "bookings.details",
@@ -58,33 +47,7 @@ class LegType(enum.Enum):
     rail = "rail"
 
 
-class _BaseClient(base_client.BaseClient):
-    def __repr__(self) -> str:
-        return "{cls}({url}".format(
-            cls=self.__class__.__name__,
-            url=self._base_url,
-        )
-
-    async def _make_request(
-        self,
-        method: str,
-        url: str,
-        query_parameters: Mapping[str, Any] | None = None,
-        payload: Mapping[str, Any] | None = None,
-    ) -> dict[str, Any]:
-        response = await self.client.request(
-            method=method,
-            url=url,
-            params=query_parameters,
-            json=payload,
-        )
-
-        response.raise_for_status()
-
-        return response.json()
-
-
-class LegsClient(_BaseClient):
+class LegsClient(base_client.BaseClient):
     async def get_leg_by_id(self, leg_id: str) -> dict[str, Any]:
         return await self._make_request(
             method=_METHOD_GET,
@@ -112,7 +75,10 @@ class LegsClient(_BaseClient):
         return await self._make_request(
             method=_METHOD_GET,
             url="/segments/{0}/legs".format(segment_id),
-            query_parameters=_make_pagination(limit, cursor),  # noqa: WPS204
+            query_parameters=base_client.make_pagination_params(  # noqa: WPS204
+                limit,
+                cursor,
+            ),
         )
 
     async def get_legs_by_trip_id(self, trip_id: str) -> dict[str, Any]:
@@ -128,7 +94,7 @@ class LegsClient(_BaseClient):
         )
 
 
-class PlacesClient(_BaseClient):
+class PlacesClient(base_client.BaseClient):
     async def list_places(
         self,
         limit: int | None = None,
@@ -137,7 +103,7 @@ class PlacesClient(_BaseClient):
         return await self._make_request(
             method=_METHOD_GET,
             url="/places",
-            query_parameters=_make_pagination(limit, cursor),
+            query_parameters=base_client.make_pagination_params(limit, cursor),
         )
 
     async def get_place_by_id(self, place_id: str) -> dict[str, Any]:
@@ -154,7 +120,7 @@ class PlacesClient(_BaseClient):
         return await self._make_request(
             method=_METHOD_GET,
             url="/places/types",
-            query_parameters=_make_pagination(limit, cursor),
+            query_parameters=base_client.make_pagination_params(limit, cursor),
         )
 
     async def get_places_type(
@@ -167,7 +133,7 @@ class PlacesClient(_BaseClient):
         )
 
 
-class SegmentsClient(_BaseClient):
+class SegmentsClient(base_client.BaseClient):
     async def get_segment_by_id(self, segment_id: str) -> dict[str, Any]:
         return await self._make_request(
             method=_METHOD_GET,
@@ -183,7 +149,7 @@ class SegmentsClient(_BaseClient):
         return await self._make_request(
             method=_METHOD_GET,
             url="/trips/{0}/segments".format(trip_id),
-            query_parameters=_make_pagination(limit, cursor),
+            query_parameters=base_client.make_pagination_params(limit, cursor),
         )
 
     async def get_segments_by_trip_search(
@@ -195,11 +161,11 @@ class SegmentsClient(_BaseClient):
         return await self._make_request(
             method=_METHOD_GET,
             url="/trips/searches/{0}/segments".format(trip_search_id),
-            query_parameters=_make_pagination(limit, cursor),
+            query_parameters=base_client.make_pagination_params(limit, cursor),
         )
 
 
-class TripsClient(_BaseClient):
+class TripsClient(base_client.BaseClient):
     async def get_trip_by_id(self, trip_id: str) -> dict[str, Any]:
         return await self._make_request(
             method=_METHOD_GET,
@@ -214,23 +180,23 @@ class TripsClient(_BaseClient):
         allowed_segment_types: Sequence[LegType],
     ) -> dict[str, Any]:
         body = {
-            _DATA_KEY: {
-                _ATTRIBUTES_KEY: {
+            "data": {
+                "attributes": {
                     "departureAfter": departure_after.isoformat(),
                 },
-                _RELATIONSHIPS_KEY: {
-                    "origin": {_DATA_KEY: {_ID_KEY: origin_id, _TYPE_KEY: "places"}},
+                "relationships": {
+                    "origin": {"data": {"id": origin_id, "type": "places"}},
                     "destination": {
-                        _DATA_KEY: {_ID_KEY: destination_id, _TYPE_KEY: "places"},
+                        "data": {"id": destination_id, "type": "places"},
                     },
                     "allowedSegmentTypes": {
-                        _DATA_KEY: [
-                            {_ID_KEY: leg_type.value, "type": "leg-types"}
+                        "data": [
+                            {"id": leg_type.value, "type": "leg-types"}
                             for leg_type in allowed_segment_types
                         ],
                     },
                 },
-                _TYPE_KEY: "trip-searches",
+                "type": "trip-searches",
             },
         }
         return await self._make_request(
@@ -248,13 +214,13 @@ class TripsClient(_BaseClient):
     async def get_trips_by_trip_search_id(
         self,
         trips_search_id: str,
-        include: Sequence[trip_includes] | None = None,
+        include: Sequence[_TripIncludes] | None = None,
         limit: int | None = None,
         cursor: str | None = None,
     ) -> dict[str, Any]:
         query_parameters = cast(
-            dict[str, int | str | Sequence[trip_includes]],
-            _make_pagination(limit, cursor),
+            dict[str, int | str | Sequence[_TripIncludes]],
+            base_client.make_pagination_params(limit, cursor),
         )
         if include:
             query_parameters["include"] = include
@@ -274,11 +240,11 @@ class TripsClient(_BaseClient):
         allowed_segment_types: Sequence[LegType] | None = None,
     ) -> dict[str, Any]:
         attributes: dict[str, Any] = {
-            _PASSENGERS_KEY: [
+            "passengers": [
                 {"dateOfBirth": dob.strftime("%Y-%m-%d")}
                 for dob in passengers_dates_of_birth
             ],
-            _CRITERIA_KEY: [
+            "criteria": [
                 {
                     "origin": {
                         "latitude": origin[0],
@@ -293,19 +259,19 @@ class TripsClient(_BaseClient):
             ],
         }
         if maximum_connections:
-            attributes[_CRITERIA_KEY]["maximumConnections"] = maximum_connections
+            attributes["criteria"]["maximumConnections"] = maximum_connections
         body = {
-            _DATA_KEY: {
-                _ATTRIBUTES_KEY: attributes,
-                _TYPE_KEY: "trip-candidate-searches",
+            "data": {
+                "attributes": attributes,
+                "type": "trip-candidate-searches",
             },
         }
         if allowed_segment_types:
-            body[_DATA_KEY][_RELATIONSHIPS_KEY] = {
+            body["data"]["relationships"] = {
                 "allowedSegmentTypes": {
-                    _DATA_KEY: [
+                    "data": [
                         {
-                            _ID_KEY: leg_type.value,
+                            "id": leg_type.value,
                             "type": "leg-types",
                         }
                         for leg_type in allowed_segment_types
@@ -337,18 +303,18 @@ class TripsClient(_BaseClient):
         )
 
 
-class Client(_BaseClient):  # noqa: WPS214
+class Client(base_client.BaseClient):  # noqa: WPS214
     def legs(self) -> LegsClient:
-        return LegsClient(base_url=str(self._base_url), client=self.client)
+        return LegsClient(base_url=str(self._base_url), client=self._client)
 
     def places(self) -> PlacesClient:
-        return PlacesClient(base_url=str(self._base_url), client=self.client)
+        return PlacesClient(base_url=str(self._base_url), client=self._client)
 
     def segments(self) -> SegmentsClient:
-        return SegmentsClient(base_url=str(self._base_url), client=self.client)
+        return SegmentsClient(base_url=str(self._base_url), client=self._client)
 
     def trips(self) -> TripsClient:
-        return TripsClient(base_url=str(self._base_url), client=self.client)
+        return TripsClient(base_url=str(self._base_url), client=self._client)
 
     async def health(self) -> dict[str, Any]:
         return await self._make_request(
@@ -376,7 +342,7 @@ class Client(_BaseClient):  # noqa: WPS214
         return await self._make_request(
             method=_METHOD_GET,
             url="/passengers/genders",
-            query_parameters=_make_pagination(limit, cursor),
+            query_parameters=base_client.make_pagination_params(limit, cursor),
         )
 
     async def get_passenger_gender(self, passenger_gender_id: str) -> dict[str, Any]:
@@ -393,7 +359,7 @@ class Client(_BaseClient):  # noqa: WPS214
         return await self._make_request(
             method=_METHOD_GET,
             url="/passengers/titles",
-            query_parameters=_make_pagination(limit, cursor),
+            query_parameters=base_client.make_pagination_params(limit, cursor),
         )
 
     async def get_passenger_title(self, passenger_title_id: str) -> dict[str, Any]:
@@ -409,7 +375,7 @@ class Client(_BaseClient):  # noqa: WPS214
         session_token: str | None = None,
     ) -> dict[str, Any]:
         attributes: dict[str, Any] = {
-            _PASSENGERS_KEY: [
+            "passengers": [
                 {"dateOfBirth": dob.isoformat()} for dob in passengers_dates_of_birth
             ],
         }
@@ -418,17 +384,16 @@ class Client(_BaseClient):  # noqa: WPS214
             attributes["sessionToken"] = session_token
 
         body = {
-            _DATA_KEY: {
-                _ATTRIBUTES_KEY: attributes,
-                _RELATIONSHIPS_KEY: {
+            "data": {
+                "attributes": attributes,
+                "relationships": {
                     "trips": {
-                        _DATA_KEY: [
-                            {_ID_KEY: trip_id, _TYPE_KEY: "trips"}
-                            for trip_id in trip_ids
+                        "data": [
+                            {"id": trip_id, "type": "trips"} for trip_id in trip_ids
                         ],
                     },
                 },
-                _TYPE_KEY: "trip-offer-searches",
+                "type": "trip-offer-searches",
             },
         }
 
@@ -442,13 +407,13 @@ class Client(_BaseClient):  # noqa: WPS214
         self,
         offers_search_id: str,
         cabin_class: Sequence[str] | None,
-        include: Sequence[offer_includes] | None = None,
+        include: Sequence[_OfferIncludes] | None = None,
         limit: int | None = None,
         cursor: str | None = None,
     ) -> dict[str, Any]:
         query_parameters = cast(
             dict[str, int | str | Sequence[str]],
-            _make_pagination(limit, cursor),
+            base_client.make_pagination_params(limit, cursor),
         )
         if cabin_class:
             query_parameters["filter[groups.options.details.cabinClass][eq]"] = (
@@ -465,7 +430,7 @@ class Client(_BaseClient):  # noqa: WPS214
     async def get_offer_search(
         self,
         offers_search_id: str,
-        include: Sequence[offer_search_includes] | None = None,
+        include: Sequence[_OfferSearchIncludes] | None = None,
     ) -> dict[str, Any]:
         query_parameters = {}
         if include:
@@ -530,7 +495,7 @@ class Client(_BaseClient):  # noqa: WPS214
         return await self._make_request(
             method=_METHOD_GET,
             url="offers/{0}/groups".format(offer_id),
-            query_parameters=_make_pagination(limit, cursor),
+            query_parameters=base_client.make_pagination_params(limit, cursor),
         )
 
     async def get_offer_group_details_by_offer_group_id(
@@ -542,7 +507,7 @@ class Client(_BaseClient):  # noqa: WPS214
         return await self._make_request(
             method=_METHOD_GET,
             url="/offers/groups/{0}/details".format(offer_group_id),
-            query_parameters=_make_pagination(limit, cursor),
+            query_parameters=base_client.make_pagination_params(limit, cursor),
         )
 
     async def get_offer_options_by_offer_group_id(
@@ -554,7 +519,7 @@ class Client(_BaseClient):  # noqa: WPS214
         return await self._make_request(
             method=_METHOD_GET,
             url="/offers/groups/{0}/options".format(offer_group_id),
-            query_parameters=_make_pagination(limit, cursor),
+            query_parameters=base_client.make_pagination_params(limit, cursor),
         )
 
     async def get_offer_option_details_by_offer_option_id(
@@ -566,7 +531,7 @@ class Client(_BaseClient):  # noqa: WPS214
         return await self._make_request(
             method=_METHOD_GET,
             url="/offers/options/{0}/details".format(offer_option_id),
-            query_parameters=_make_pagination(limit, cursor),
+            query_parameters=base_client.make_pagination_params(limit, cursor),
         )
 
     async def create_offer_quote(
@@ -576,31 +541,31 @@ class Client(_BaseClient):  # noqa: WPS214
         session_token: str | None = None,
     ) -> dict[str, Any]:
         body = {
-            _DATA_KEY: {
-                _RELATIONSHIPS_KEY: {
+            "data": {
+                "relationships": {
                     "offer": {
-                        _DATA_KEY: {
-                            _ID_KEY: offer_id,
-                            _TYPE_KEY: "offers",
+                        "data": {
+                            "id": offer_id,
+                            "type": "offers",
                         },
                     },
                     "options": {
-                        _DATA_KEY: [
+                        "data": [
                             {
-                                _ID_KEY: option_id,
-                                _TYPE_KEY: "offer-options",
+                                "id": option_id,
+                                "type": "offer-options",
                             }
                             for option_id in option_ids
                         ],
                     },
                 },
-                _TYPE_KEY: "trip-offer-price-quotes",
+                "type": "trip-offer-price-quotes",
             },
         }
         if session_token:
-            body[_DATA_KEY][_ATTRIBUTES_KEY] = {"sessionToken": session_token}
+            body["data"]["attributes"] = {"sessionToken": session_token}
         else:
-            body[_DATA_KEY][_ATTRIBUTES_KEY] = {}
+            body["data"]["attributes"] = {}
         return await self._make_request(
             method=_METHOD_POST,
             url="/offers/quotes",
@@ -621,7 +586,7 @@ class Client(_BaseClient):  # noqa: WPS214
         return await self._make_request(
             method=_METHOD_GET,
             url="/journeys",
-            query_parameters=_make_pagination(limit, cursor),
+            query_parameters=base_client.make_pagination_params(limit, cursor),
         )
 
     async def get_journey_by_id(self, identifier: str) -> dict[str, Any]:
@@ -639,7 +604,7 @@ class Client(_BaseClient):  # noqa: WPS214
         return await self._make_request(
             method=_METHOD_GET,
             url="/journeys/{0}/orders".format(identifier),
-            query_parameters=_make_pagination(limit, cursor),
+            query_parameters=base_client.make_pagination_params(limit, cursor),
         )
 
     async def add_order_to_journey(
@@ -650,9 +615,9 @@ class Client(_BaseClient):  # noqa: WPS214
         passengers: Sequence[models.Passenger],
     ) -> dict[str, Any]:
         body = {
-            _DATA_KEY: {
-                _ATTRIBUTES_KEY: {
-                    _PASSENGERS_KEY: [
+            "data": {
+                "attributes": {
+                    "passengers": [
                         dataclasses.asdict(
                             passenger,
                             dict_factory=models.dict_factory_to_camel,
@@ -660,24 +625,24 @@ class Client(_BaseClient):  # noqa: WPS214
                         for passenger in passengers
                     ],
                 },
-                _RELATIONSHIPS_KEY: {
+                "relationships": {
                     "offer": {
-                        _DATA_KEY: {
-                            _ID_KEY: offer_aggregate_id,
-                            _TYPE_KEY: "offers",
+                        "data": {
+                            "id": offer_aggregate_id,
+                            "type": "offers",
                         },
                     },
                     "options": {
-                        _DATA_KEY: [
+                        "data": [
                             {
-                                _ID_KEY: offer_id,
-                                _TYPE_KEY: "offer-options",
+                                "id": offer_id,
+                                "type": "offer-options",
                             }
                             for offer_id in offer_ids
                         ],
                     },
                 },
-                _TYPE_KEY: "orders",
+                "type": "orders",
             },
         }
 
@@ -693,12 +658,12 @@ class Client(_BaseClient):  # noqa: WPS214
         passengers: Sequence[models.Passenger],
         contact_details: models.ContactDetails,
         residence_address: models.Address | None = None,
-        include: Sequence[order_includes] | None = None,
+        include: Sequence[_OrderIncludes] | None = None,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {
-            _DATA_KEY: {
-                _ATTRIBUTES_KEY: {
-                    _PASSENGERS_KEY: [
+            "data": {
+                "attributes": {
+                    "passengers": [
                         dataclasses.asdict(
                             passenger,
                             dict_factory=models.dict_factory_to_camel,
@@ -710,19 +675,19 @@ class Client(_BaseClient):  # noqa: WPS214
                         dict_factory=models.dict_factory_to_camel,
                     ),
                 },
-                _RELATIONSHIPS_KEY: {
+                "relationships": {
                     "quote": {
-                        _DATA_KEY: {
-                            _ID_KEY: quote_id,
-                            _TYPE_KEY: "trip-offer-price-quotes",
+                        "data": {
+                            "id": quote_id,
+                            "type": "trip-offer-price-quotes",
                         },
                     },
                 },
-                _TYPE_KEY: "orders",
+                "type": "orders",
             },
         }
         if residence_address:
-            body[_DATA_KEY][_ATTRIBUTES_KEY]["residenceAddress"] = dataclasses.asdict(
+            body["data"]["attributes"]["residenceAddress"] = dataclasses.asdict(
                 residence_address,
                 dict_factory=models.dict_factory_to_camel,
             )
@@ -739,7 +704,7 @@ class Client(_BaseClient):  # noqa: WPS214
     async def get_order_by_id(
         self,
         identifier: str,
-        include: Sequence[order_includes] | None = None,
+        include: Sequence[_OrderIncludes] | None = None,
     ) -> dict[str, Any]:
         query_parameters: dict[str, str] = {}
         if include:
@@ -759,7 +724,7 @@ class Client(_BaseClient):  # noqa: WPS214
         return await self._make_request(
             method=_METHOD_GET,
             url="/orders/{0}/bookings".format(identifier),
-            query_parameters=_make_pagination(limit, cursor),
+            query_parameters=base_client.make_pagination_params(limit, cursor),
         )
 
     async def get_booking_by_id(self, identifier: str) -> dict[str, Any]:
@@ -777,7 +742,7 @@ class Client(_BaseClient):  # noqa: WPS214
         return await self._make_request(
             method=_METHOD_GET,
             url="/bookings/{0}/details".format(identifier),
-            query_parameters=_make_pagination(limit, cursor),
+            query_parameters=base_client.make_pagination_params(limit, cursor),
         )
 
     async def get_booking_details_by_id(self, identifier: str) -> dict[str, Any]:
@@ -803,7 +768,7 @@ class Client(_BaseClient):  # noqa: WPS214
         return await self._make_request(
             method=_METHOD_GET,
             url="/orders",
-            query_parameters=_make_pagination(limit, cursor),
+            query_parameters=base_client.make_pagination_params(limit, cursor),
         )
 
     async def get_orders_id(
@@ -814,14 +779,3 @@ class Client(_BaseClient):  # noqa: WPS214
             method=_METHOD_GET,
             url="/orders/{0}".format(orders_id),
         )
-
-
-def _make_pagination(
-    limit: int | None,
-    cursor: str | None,
-) -> dict[str, int | str]:
-    return {
-        key: pagination_value
-        for key, pagination_value in ((_LIMIT_KEY, limit), (_CURSOR_KEY, cursor))
-        if pagination_value
-    }

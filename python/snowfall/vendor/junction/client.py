@@ -1,4 +1,5 @@
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
+from typing import Any
 
 import httpx
 
@@ -11,19 +12,51 @@ class BaseClient(object):
         client: httpx.AsyncClient | None = None,
     ):
         self._base_url = httpx.URL(base_url)
-        self.client = client or httpx.AsyncClient()
-        self.client.base_url = self._base_url
-        self.client.headers.update(
-            httpx.Headers(
-                {
-                    "Accept": "application/vnd.api+json",
-                    "Content-Type": "application/vnd.api+json",
-                },
-            ),
+        self._client = create_httpx_client(
+            base_url=base_url,
+            auth=auth,
+            client=client,
         )
 
-        if auth:
-            self.client.auth = auth
+    async def _make_request(
+        self,
+        method: str,
+        url: str,
+        query_parameters: Mapping[str, Any] | None = None,
+        payload: Mapping[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        response = await self._client.request(
+            method=method,
+            url=url,
+            params=query_parameters,
+            json=payload,
+        )
+
+        response.raise_for_status()
+
+        return response.json()
+
+
+def create_httpx_client(
+    base_url: str,
+    auth: httpx.Auth | None = None,
+    client: httpx.AsyncClient | None = None,
+) -> httpx.AsyncClient:
+    client = client or httpx.AsyncClient()
+    client.base_url = httpx.URL(base_url)
+    client.headers.update(
+        httpx.Headers(
+            {
+                "Accept": "application/vnd.api+json",
+                "Content-Type": "application/vnd.api+json",
+            },
+        ),
+    )
+
+    if auth:
+        client.auth = auth
+
+    return client
 
 
 def make_pagination_params(

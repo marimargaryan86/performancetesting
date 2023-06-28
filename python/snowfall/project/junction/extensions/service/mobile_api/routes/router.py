@@ -1,3 +1,4 @@
+import httpx
 import lagom
 from lagom.integrations import starlette
 from starlette import routing
@@ -29,7 +30,7 @@ def get_routes(
     integration = starlette.StarletteIntegration(dependencies)
 
     reverse_proxy_view = stdlib_routes.Proxy(
-        client=dependencies[client.Client].client,
+        client=dependencies[httpx.AsyncClient],
     ).to_route()
 
     return [

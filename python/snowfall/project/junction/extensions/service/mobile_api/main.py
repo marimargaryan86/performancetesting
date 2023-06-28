@@ -31,6 +31,7 @@ from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.http import auth
+from snowfall.vendor.junction import client as base_client
 from snowfall.vendor.junction.go import client
 
 
@@ -71,9 +72,13 @@ def _factory(
 ) -> Callable[[], applications.Starlette]:
     def decorator() -> applications.Starlette:
         stripe.api_key = app.settings.stripe_api_key
-        junction_client = client.Client(
+        httpx_client = base_client.create_httpx_client(
             base_url=app.settings.junction_api_address,
             auth=auth.TokenAuth(app.settings.junction_api_token),
+        )
+        junction_client = client.Client(
+            base_url=app.settings.junction_api_address,
+            client=httpx_client,
         )
         plus_http_client = plus_client.PlusClient(
             api_url=app.settings.plus_api_address,
@@ -151,6 +156,7 @@ def _factory(
                     junction_client=junction_client,
                     plus_http_client=plus_http_client,
                     jwt_gen=jwt_gen,
+                    httpx_client=httpx_client,
                 ),
             ),
             custom_middlewares=[

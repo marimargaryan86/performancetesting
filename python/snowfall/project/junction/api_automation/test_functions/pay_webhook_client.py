@@ -66,7 +66,7 @@ class PayWebhookClient(BaseClient):  # noqa: WPS214
             content_body,
             pay_webhook_secret_key,
         )
-        response = await self.client.post(
+        response = await self._client.post(
             url="/webhooks/payments",
             json=payload,
             headers={

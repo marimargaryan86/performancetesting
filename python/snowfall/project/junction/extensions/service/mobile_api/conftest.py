@@ -41,6 +41,7 @@ from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.v1 import phone_number_pb2
+from snowfall.vendor.junction import client as base_client
 from snowfall.vendor.junction.go import client
 
 _FIXTURES_PATH = (
@@ -392,6 +393,7 @@ def app(  # noqa: WPS211
         dependencies=bootstrap.create_dependencies(
             orders_repository,
             junction_client,
+            base_client.create_httpx_client(base_url=junction_api_address),
             plus_http_client,
             places_repository,
             users_repository,

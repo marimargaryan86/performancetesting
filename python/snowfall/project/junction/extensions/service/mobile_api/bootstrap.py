@@ -1,6 +1,7 @@
 import datetime
 from collections.abc import Sequence
 
+import httpx
 import lagom
 from pydantic import AnyUrl
 
@@ -43,6 +44,7 @@ class Settings(application.Settings):
 def create_dependencies(  # noqa: WPS211
     orders_repository: repository.OrdersRepository,
     junction_client: client.Client,
+    httpx_client: httpx.AsyncClient,
     plus_http_client: plus_client.PlusClient,
     places_repository: repository.PlacesRepository,
     users_repository: repository.UsersRepository,
@@ -61,6 +63,7 @@ def create_dependencies(  # noqa: WPS211
     container = lagom.Container()
     container[repository.OrdersRepository] = orders_repository
     container[client.Client] = junction_client
+    container[httpx.AsyncClient] = httpx_client
     container[plus_client.PlusClient] = plus_http_client
     container[repository.PlacesRepository] = places_repository
     container[repository.UsersRepository] = users_repository

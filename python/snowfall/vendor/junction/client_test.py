@@ -12,13 +12,13 @@ _AUTH_TOKEN = "Bearer foo"
 
 class _TestClient(client.BaseClient):
     async def test_endpoint(self) -> dict[str, Any]:
-        response = await self.client.get("/bar")
+        response = await self._client.get("/bar")
         response.raise_for_status()
 
         return response.json()
 
     async def unnecessary_format_endpoint(self) -> dict[str, Any]:
-        response = await self.client.get("{0}/bar".format(self._base_url))
+        response = await self._client.get("{0}/bar".format(self._base_url))
         response.raise_for_status()
 
         return response.json()

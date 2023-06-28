@@ -54,7 +54,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
             },
         }
         logger.info("payload %s", json.dumps(payload, indent=4))  # noqa: WPS204
-        response = await self.client.post(
+        response = await self._client.post(
             "/companies",
             json=payload,
         )
@@ -65,7 +65,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         self,
         account_id: str,
     ) -> dict[str, Any]:
-        response = await self.client.get(
+        response = await self._client.get(
             "/accounts/{0}".format(account_id),
         )
         response.raise_for_status()
@@ -77,7 +77,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         cursor: str | None = None,
         sort: str | None = None,
     ) -> dict[str, Any]:
-        response = await self.client.get(
+        response = await self._client.get(
             "accounts",
             params=make_pagination_params(limit, cursor, sort),
         )
@@ -90,7 +90,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         limit: int | None = None,
         cursor: str | None = None,
     ) -> dict[str, Any]:
-        response = await self.client.get(
+        response = await self._client.get(
             "/accounts/{0}/balances".format(account_id),
             params=make_pagination_params(limit, cursor),
         )
@@ -101,7 +101,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         self,
         company_id: str,
     ) -> dict[str, Any]:
-        response = await self.client.get(
+        response = await self._client.get(
             "/companies/{0}".format(company_id),
         )
         response.raise_for_status()
@@ -112,7 +112,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         conversion_id: str,
         include: Sequence[conversion_includes] | None = None,
     ) -> dict[str, Any]:
-        response = await self.client.get(
+        response = await self._client.get(
             "/conversions/{0}".format(conversion_id),
             params=make_pagination_params(limit=None, cursor=None, include=include),
         )
@@ -123,7 +123,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         self,
         payment_id: str,
     ) -> dict[str, Any]:
-        response = await self.client.get(
+        response = await self._client.get(
             "/payments/{0}".format(payment_id),
         )
         response.raise_for_status()
@@ -133,7 +133,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         self,
         transaction_id: str,
     ) -> dict[str, Any]:
-        response = await self.client.get(
+        response = await self._client.get(
             "/transactions/{0}".format(transaction_id),
         )
 
@@ -143,7 +143,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
     async def get_transactions(
         self,
     ) -> dict[str, Any]:
-        response = await self.client.get(
+        response = await self._client.get(
             "/transactions",
         )
         response.raise_for_status()
@@ -179,7 +179,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
             },
         }
         logger.info("payload %s", json.dumps(payload, indent=4))
-        response = await self.client.patch(
+        response = await self._client.patch(
             "/companies/{0}".format(company_id),
             json=payload,
         )
@@ -191,7 +191,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         limit: int,
         cursor: str,
     ) -> dict[str, Any]:
-        response = await self.client.get(
+        response = await self._client.get(
             "/companies",
             params=make_pagination_params(limit, cursor),
         )
@@ -203,7 +203,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         limit: int,
         cursor: str,
     ) -> dict[str, Any]:
-        response = await self.client.get(
+        response = await self._client.get(
             "/companies/accountless",
             params=make_pagination_params(limit, cursor),
         )
@@ -215,7 +215,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         limit: int | None = None,
         cursor: str | None = None,
     ) -> dict[str, Any]:
-        response = await self.client.get(
+        response = await self._client.get(
             "/payments",
             params=make_pagination_params(limit, cursor),
         )
@@ -241,7 +241,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
             },
         }
         logger.info("payload %s", json.dumps(payload, indent=4))
-        response = await self.client.post(
+        response = await self._client.post(
             "/accounts/{0}/relationships/currencies".format(
                 account_id,
             ),
@@ -255,7 +255,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         limit: int | None = None,
         cursor: str | None = None,
     ) -> dict[str, Any]:
-        response = await self.client.get(
+        response = await self._client.get(
             "/beneficiaries",
             params=make_pagination_params(limit, cursor),
         )
@@ -266,7 +266,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         self,
         beneficiary_id: str,
     ) -> dict[str, Any]:
-        response = await self.client.get(
+        response = await self._client.get(
             "/beneficiaries/{0}".format(beneficiary_id),
         )
         response.raise_for_status()
@@ -292,7 +292,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
             },
         }
         logger.info("payload %s", json.dumps(payload, indent=4))
-        response = await self.client.post(
+        response = await self._client.post(
             "/companies/{0}/contacts".format(company_id),
             json=payload,
         )
@@ -305,7 +305,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         limit: int | None = None,
         cursor: str | None = None,
     ) -> dict[str, Any]:
-        response = await self.client.get(
+        response = await self._client.get(
             "/companies/{0}/contacts".format(company_id),
             params=make_pagination_params(limit, cursor),
         )
@@ -318,7 +318,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
         limit: int | None = None,
         cursor: str | None = None,
     ) -> dict[str, Any]:
-        response = await self.client.get(
+        response = await self._client.get(
             "/conversions",
             params=make_pagination_params(limit, cursor, include=include),
         )
@@ -347,7 +347,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
             },
         }
         logger.info("payload %s", json.dumps(payload, indent=4))
-        response = await self.client.post(
+        response = await self._client.post(
             "/accounts",
             json=payload,
         )
@@ -369,7 +369,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
             },
         }
         logger.info("payload %s", json.dumps(payload, indent=4))
-        response = await self.client.post(
+        response = await self._client.post(
             "/users",
             json=payload,
         )
@@ -423,7 +423,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
             },
         }
         logger.info("payload %s", json.dumps(payload, indent=4))
-        response = await self.client.post(
+        response = await self._client.post(
             "/payments",
             json=payload,
         )
@@ -502,7 +502,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
             },
         }
         logger.info("payload %s", json.dumps(payload, indent=4))
-        response = await self.client.post(
+        response = await self._client.post(
             "/beneficiaries",
             json=payload,
         )
@@ -523,7 +523,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
             },
         }
         logger.info("payload %s", json.dumps(payload, indent=4))
-        response = await self.client.patch(
+        response = await self._client.patch(
             "/accounts/{0}".format(account_id),
             json=payload,
         )
@@ -603,7 +603,7 @@ class PayAdminClient(BaseClient):  # noqa: WPS214
             },
         }
         logger.info("payload %s", json.dumps(payload, indent=4))
-        response = await self.client.patch(
+        response = await self._client.patch(
             "/beneficiaries/{0}".format(beneficiary_id),
             json=payload,
         )

@@ -41,7 +41,7 @@ class Client(BaseClient):
             },
         }
 
-        response = await self.client.post(
+        response = await self._client.post(
             url="/quotes",
             json=payload,
         )
@@ -73,7 +73,7 @@ class Client(BaseClient):
             },
         }
 
-        response = await self.client.post(
+        response = await self._client.post(
             url="/transactions",
             json=payload,
         )
@@ -87,7 +87,7 @@ class Client(BaseClient):
         cursor: str | None = None,
         sort: str | None = None,
     ) -> dict[str, Any]:
-        response = await self.client.get(
+        response = await self._client.get(
             url="/currencies",
             params=make_pagination_params(limit, cursor, sort),
         )
