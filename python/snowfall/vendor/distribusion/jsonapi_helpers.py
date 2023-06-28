@@ -42,9 +42,7 @@ def _resolve(  # noqa: WPS210, WPS231
     if not isinstance(data, dict):
         return data
 
-    keys = data.keys()
-
-    if keys == {"type", "id"} or keys == {"type", "id", "meta"}:  # noqa: WPS514
+    if {"id", "meta", "type"}.issuperset(data.keys()):
         type_id = data["type"], data["id"]
         meta = data.get("meta")
         resolved_item = included.get(type_id, data)
