@@ -1,6 +1,5 @@
 from collections.abc import Callable
 
-import httpx
 from starlette import applications
 from starlette.middleware import Middleware, authentication
 
@@ -30,14 +29,13 @@ from snowfall.project.junction.go.service.orders.v1 import orders_pb2_grpc
 from snowfall.project.junction.go.service.places.v1 import places_pb2_grpc
 from snowfall.project.junction.go.service.schedules.v1alpha import schedules_pb2_grpc
 from snowfall.project.junction.go.service.trips.v1alpha import trips_pb2_grpc
-from snowfall.service.authentication.v1 import authentication_pb2_grpc
+from snowfall.service.authentication.v1 import authentication_pb2_grpc, oauth_pb2_grpc
 from snowfall.stdlib import service
 from snowfall.stdlib.format import jwt
 from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.integration.starlette import authentication as stdlib_auth
 from snowfall.stdlib.persistence import cursor, filesystem
 from snowfall.stdlib.transport.grpc.client import create_channel
-from snowfall.stdlib.transport.http import auth
 
 
 def _factory(
@@ -50,6 +48,9 @@ def _factory(
         trips_channel = create_channel(app.settings.trips_address)
         schedules_channel = create_channel(app.settings.schedules_address)
         authentication_channel = create_channel(app.settings.authentication_address)
+        oath_client = oauth_pb2_grpc.OAuthServiceStub(
+            authentication_channel,
+        )
 
         asgi_app = application.create_starlette_app(
             routes=router.get_routes(
@@ -123,7 +124,9 @@ def _factory(
                     backend=stdlib_auth.JWTAuthenticationBackend(
                         stdlib_auth.OryAuth(
                             jwk_client=jwt.AsyncJWKClient(
-                                base_url=app.settings.ory_application_url,
+                                jwk_url=auth_adapter.get_jwk_url(
+                                    app.settings.authentication_address,
+                                ),
                                 key_ttl=app.settings.ory_jwk_ttl,
                             ),
                             legacy_fallback=authentication_backends.LegacyAuth(
@@ -133,9 +136,8 @@ def _factory(
                                     algorithms=["RS256"],
                                 ),
                             ).get_reseller_id_from_jwt,
-                            client=httpx.AsyncClient(
-                                base_url=app.settings.ory_application_url,
-                                auth=auth.TokenAuth(token=app.settings.ory_api_key),
+                            client_resolver=auth_adapter.oauth_client_resolver(
+                                oath_client=oath_client,
                             ),
                         ).get_owner_from_jwt,
                     ),

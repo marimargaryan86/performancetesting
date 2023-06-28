@@ -1,13 +1,14 @@
 import abc
 import dataclasses
 import datetime
-from collections.abc import Mapping
+from collections.abc import Awaitable, Callable, Mapping
 
+import asyncstdlib
 import grpc
 
 from snowfall.service.authentication.v1 import authentication_pb2 as auth_pb2
 from snowfall.service.authentication.v1 import authentication_pb2_grpc as auth_pb2_grpc
-from snowfall.service.authentication.v1 import models_pb2
+from snowfall.service.authentication.v1 import models_pb2, oauth_pb2, oauth_pb2_grpc
 from snowfall.stdlib import string
 from snowfall.stdlib.format import jwt
 
@@ -230,3 +231,24 @@ class JWTFactory(object):
             exp=datetime.datetime.now(tz=datetime.UTC) + self._ttl,
             jti=string.uuid(),
         )
+
+
+def get_jwk_url(authentication_address: str) -> str:
+    authentication_channel = grpc.insecure_channel(authentication_address)
+    oath_client = oauth_pb2_grpc.OAuthServiceStub(
+        authentication_channel,
+    )
+
+    return oath_client.GetJWKUrl(oauth_pb2.GetJWKUrlRequest()).url
+
+
+def oauth_client_resolver(
+    oath_client: oauth_pb2_grpc.OAuthServiceStub,
+) -> Callable[[str], Awaitable[str]]:
+    @asyncstdlib.lru_cache()
+    async def wrapper(client_id: str) -> str:
+        response = await oath_client.GetClient(oauth_pb2.GetClientRequest(id=client_id))
+
+        return response.owner
+
+    return wrapper

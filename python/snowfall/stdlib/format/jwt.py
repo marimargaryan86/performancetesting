@@ -22,12 +22,12 @@ def _match_kid(signing_keys: Sequence[jwt.PyJWK], kid: str) -> jwt.PyJWK | None:
 class AsyncJWKClient(object):
     def __init__(
         self,
-        base_url: str,
+        jwk_url: str,
         key_ttl: datetime.timedelta,
         client: httpx.AsyncClient | None = None,
     ):
         self._client = client or httpx.AsyncClient()
-        self._client.base_url = httpx.URL(base_url)
+        self._jwk_url = jwk_url
         self._jwk_set_cache = JWKSetCache(int(key_ttl.total_seconds()))
 
     async def get_signing_key_from_jwt(self, token: str) -> tuple[jwt.PyJWK, str]:
@@ -102,7 +102,7 @@ class AsyncJWKClient(object):
                 self._jwk_set_cache.put(jwk_set)
 
     async def _fetch_keys_from_url(self) -> Any:
-        response = await self._client.get(url="/.well-known/jwks.json")
+        response = await self._client.get(url=self._jwk_url)
         response.raise_for_status()
 
         return response.json()

@@ -1,7 +1,5 @@
 from collections.abc import Awaitable, Callable
 
-import asyncstdlib
-import httpx
 import jwt as jwtlib
 from starlette import authentication, requests
 
@@ -12,12 +10,12 @@ class OryAuth(object):
     def __init__(
         self,
         jwk_client: jwt.AsyncJWKClient,
-        client: httpx.AsyncClient,
+        client_resolver: Callable[[str], Awaitable[str]],
         legacy_fallback: Callable[[str], str] | None = None,
     ):
         self._jwk_client = jwk_client
+        self._client_resolver = client_resolver
         self._legacy_fallback = legacy_fallback
-        self._client = client
 
     async def get_owner_from_jwt(self, token: str) -> str:
         try:
@@ -37,13 +35,7 @@ class OryAuth(object):
         except jwtlib.PyJWTError as err:
             raise authentication.AuthenticationError("Invalid jwt token.") from err
 
-        return await self._get_reseller_id_from_client_id(payload["client_id"])
-
-    @asyncstdlib.lru_cache()
-    async def _get_reseller_id_from_client_id(self, client_id: str) -> str:
-        response = await self._client.get(url="/admin/clients/{0}".format(client_id))
-
-        return response.json()["owner"]
+        return await self._client_resolver(payload["client_id"])
 
 
 class JWTAuthenticationBackend(authentication.AuthenticationBackend):

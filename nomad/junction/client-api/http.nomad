@@ -38,10 +38,6 @@ variable "validate_responses_against_spec" {
   type = bool
 }
 
-variable "ory_application_url" {
-  type = string
-}
-
 job "client-api-http" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -164,7 +160,6 @@ TRIPS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_trips-${var.environment}"
 AUTHENTICATION_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_authentication-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/client-api" }}
 JWT_PUBLIC_KEY={{ .Data.data.jwt_public_key }}
-ORY_API_KEY={{ .Data.data.ory_api_key }}
 {{ end }}
 RESELLER_CURRENCIES={{keyOrDefault "${var.environment}/client-api/reseller-currencies" "{}" | toJSON }}
 RESELLER_PAY_COMPANIES={{keyOrDefault "${var.environment}/client-api/reseller-pay-companies" "{}" | toJSON }}
@@ -194,7 +189,6 @@ EOH
         SENTRY_DSN                      = "https://c674550aaa124dd9b5f02bf6c49b1983@sentry.snowfall.se/19"
         PROMETHEUS_PORT                 = "${NOMAD_PORT_prometheus}"
         VALIDATE_RESPONSES_AGAINST_SPEC = "${var.validate_responses_against_spec}"
-        ORY_APPLICATION_URL             = "${var.ory_application_url}"
       }
     }
   }

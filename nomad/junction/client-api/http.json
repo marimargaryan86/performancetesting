@@ -4,8 +4,7 @@
       "count": 2,
       "traefik_entrypoints": "websecure",
       "traaefik_host_URL": "api.junction.dev",
-      "validate_responses_against_spec": "true",
-      "ory_application_url": "https://optimistic-tereshkova-36hc6vayw4.projects.oryapis.com"
+      "validate_responses_against_spec": "true"
     }
   },
   "production": {
@@ -13,8 +12,7 @@
       "count": 2,
       "traefik_entrypoints": "web",
       "traaefik_host_URL": "api.junction.travel",
-      "validate_responses_against_spec": "false",
-      "ory_application_url":  "https://optimistic-tereshkova-36hc6vayw4.projects.oryapis.com"
+      "validate_responses_against_spec": "false"
     }
   },
   "sandbox": {
@@ -22,8 +20,7 @@
       "count": 1,
       "traefik_entrypoints": "websecure",
       "traaefik_host_URL": "api.sandbox.junction.dev",
-      "validate_responses_against_spec": "true",
-      "ory_application_url":  "https://optimistic-tereshkova-36hc6vayw4.projects.oryapis.com"
+      "validate_responses_against_spec": "true"
     }
   }
 }
