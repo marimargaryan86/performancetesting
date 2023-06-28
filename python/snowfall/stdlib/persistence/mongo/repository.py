@@ -193,7 +193,7 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
 
         await self._execute(
             self._collection.create_indexes,
-            self._indexes,
+            list(self._indexes),
         )
 
     @property
