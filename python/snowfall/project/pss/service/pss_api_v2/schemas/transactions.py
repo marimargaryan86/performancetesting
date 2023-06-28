@@ -1,5 +1,5 @@
 import datetime
-from enum import Enum
+from enum import IntEnum
 from typing import Literal
 
 from pydantic import Field
@@ -13,7 +13,7 @@ EXTERNAL_REF_MAX_LENGTH = 255
 Direction = Literal["outbound", "inbound"]
 
 
-class PassengerType(int, Enum):  # noqa: WPS600 # Enable values in Swagger
+class PassengerType(IntEnum):  # Enable values in Swagger
     adult = 1
     senior = 2
     youth = 3

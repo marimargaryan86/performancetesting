@@ -153,7 +153,6 @@ external = [
     "WPS514", # Forbid multiple equality comparisons with the same variable
     "WPS528", # Forbid implicit .items() iterator
     "WPS529", # Forbid implicit .get() dict method
-    "WPS600", # Forbid subclassing lowercase builtins
     "WPS601", # Forbid shadowing class level attributes with instance level attributes
     "WPS608", # Forbid super() with parameters or outside of methods
     "WPS609", # Forbid directly calling certain magic attributes and methods
