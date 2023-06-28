@@ -219,11 +219,13 @@ async def test_private_fares_and_specific_token(
     assert private_fares == {
         "QF": [PrivateFare(corporate_code="FLX53", tracking_reference="ABN:2345678")],
     }
-    _ = [  # noqa: WPS122
+
+    offer_groups = [
         offer_group
         async for offer_group in search_adapter.gather_search_results(
             search_criteria_wrapper,
         )
     ]
 
+    assert offer_groups
     assert httpx_mock.get_requests()[0].headers["authorization"] == "Bearer token1"

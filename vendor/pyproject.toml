@@ -105,7 +105,6 @@ external = [
     "WPS114", # Forbid names with underscored numbers pattern
     "WPS115", # Require snake_case for naming class attributes
     "WPS118", # Forbid long variable or module names
-    "WPS122", # Forbid explicit unused variables
     "WPS204", # Forbid overused expressions in a module, function or method
     "WPS210", # Forbid too many local variables in the unit of code
     "WPS211", # Forbid too many arguments for a function or method
