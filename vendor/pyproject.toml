@@ -11,6 +11,87 @@ branch = true
 omit = ["*_pb2.py", "*_pb2_grpc.py"]
 relative_files = true
 
+[tool.mypy]
+plugins = [
+    "pydantic.mypy",
+]
+check_untyped_defs = true
+disallow_any_generics = true
+disallow_incomplete_defs = true
+disallow_untyped_calls = true
+disallow_untyped_decorators = true
+disallow_untyped_defs = true
+enable_error_code = [
+    "ignore-without-code",
+    "redundant-expr",
+    "truthy-bool",
+    "unused-awaitable",
+]
+explicit_package_bases = true
+follow_imports = "normal"
+follow_imports_for_stubs = true
+no_implicit_reexport = true
+local_partial_types = true
+pretty = true
+show_error_codes = true
+strict_optional = true
+strict_equality = true
+namespace_packages = true
+no_implicit_optional = true
+warn_incomplete_stub = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_return_any = false
+warn_unused_configs = true
+warn_unreachable = true
+warn_no_return = true
+
+[[tool.mypy.overrides]]
+module = [
+    "snowfall.vendor.rate_limiter.gubernator_pb2",
+    "snowfall.vendor.rate_limiter.gubernator_pb2_grpc",
+]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = [
+    "aiostream.*", # https://github.com/vxgmichel/aiostream/issues/36
+    "alchemy_mock.*", # https://github.com/rajivsarvepalli/mock-alchemy/issues/14
+    "allure.*", # https://github.com/allure-framework/allure-python/issues/731
+    "async_factory_boy.*",
+    "authlib.*", # https://github.com/lepture/authlib/issues/460
+    "factory.*", # https://github.com/FactoryBoy/factory_boy/issues/468
+    "fsspec.*", # https://github.com/fsspec/filesystem_spec/issues/625
+    "furl.*", # https://github.com/gruns/furl/issues/148
+    "geopy.*",
+    "google.rpc.*", # https://github.com/nipunn1313/mypy-protobuf/issues/507
+    "grpc.*", # https://github.com/nipunn1313/mypy-protobuf/issues/507
+    "grpc_health.*", # https://github.com/nipunn1313/mypy-protobuf/issues/507
+    "grpc_reflection.*", # https://github.com/nipunn1313/mypy-protobuf/issues/507
+    "grpc_status.*", # https://github.com/nipunn1313/mypy-protobuf/issues/507
+    "h3.*", # https://github.com/uber/h3-py/pull/216
+    "hvac.*", # https://github.com/hvac/hvac/issues/800
+    "isodate.*",
+    "json_api_doc.*",
+    "mongomock_motor.*", # https://github.com/michaelkryukov/mongomock_motor/issues/29
+    "motor.*",
+    "pandas.*",
+    "pycountry.*", # https://github.com/flyingcircusio/pycountry/issues/135
+    "qrcode.*", # https://github.com/lincolnloop/python-qrcode/pull/321
+    "rfc3339_validator.*",
+    "s3fs.*", # https://github.com/fsspec/s3fs/issues/383
+    "shapefile.*",
+    "shapely.*", # https://github.com/shapely/shapely/issues/721
+]
+ignore_missing_imports = true
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+warn_untyped_fields = true
+
+
 [tool.pytest.ini_options]
 addopts = "--import-mode=importlib --asyncio-mode=auto -W ignore::DeprecationWarning:aioredis.connection: -W ignore::DeprecationWarning:jsonschema.validators: -W ignore::DeprecationWarning:openapi_core.unmarshalling.schemas.unmarshallers: -W ignore::DeprecationWarning:openapi_spec_validator.validators: -W ignore::DeprecationWarning:openapi_spec_validator.factories: -W ignore::DeprecationWarning:openapi_schema_validator.validators: -W ignore::DeprecationWarning:openapi_schema_validator.validators: -W ignore::DeprecationWarning:pkg_resources: -W ignore::DeprecationWarning:google.rpc:"
 

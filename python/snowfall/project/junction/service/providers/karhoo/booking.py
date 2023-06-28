@@ -90,14 +90,6 @@ class BookingHandler(object):
                 luggage=passenger.Luggage(
                     total=len(task.passengers),
                 ),
-                # TODO: currently ignoring these fields
-                meta=None,
-                partner_trip_id=None,
-                flight_number=None,
-                train_number=None,
-                cost_center_reference=None,
-                comments=None,
-                train_time=None,
             ),
         )
         booking_result = await self._client.book_trip(booking)

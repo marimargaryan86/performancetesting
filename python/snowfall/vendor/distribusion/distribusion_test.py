@@ -166,7 +166,6 @@ async def test_connection_vacancy(
             + datetime.timedelta(days=20),
             pax=[1],
             passenger_type=["PNOS"],
-            locale="en",
             currency="EUR",
         ),
     )
@@ -259,7 +258,6 @@ async def test_order_create(  # noqa: WPS210
         arrival_time=arrival_time,
         pax=[1],
         passenger_type=["PNOS"],
-        locale="en",
         currency="EUR",
     )
 

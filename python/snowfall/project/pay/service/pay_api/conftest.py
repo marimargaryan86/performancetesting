@@ -380,7 +380,6 @@ def beneficiary_response() -> BeneficiaryResponse:
         name="Company",
         bank_account_holder_name="bankAccountHolderName",
         email="example@email.com",
-        aba=None,
         identifier="e82060fe-894f-43e0-9b96-3ffaf6117431",
     )
 
