@@ -19,8 +19,10 @@ class LegacyAuth(object):
         except jwtlib.PyJWTError as err:
             raise authentication.AuthenticationError("Invalid jwt token.") from err
 
-        if "client_id" in payload:
-            return payload["client_id"]  # noqa: WPS529
+        client_id = payload.get("client_id")
+
+        if client_id:
+            return client_id
 
         if payload.get("version", "0.0.0") < self._jwt_version:
             raise authentication.AuthenticationError(
