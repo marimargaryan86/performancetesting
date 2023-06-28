@@ -127,7 +127,6 @@ external = [
     "WPS306", # Forbid writing classes without base classes
     "WPS320", # Forbid multi-line function type annotations.
     "WPS323", # Forbid % formatting on strings
-    "WPS326", # Forbid implicit string concatenation
     "WPS336", # Forbid explicit string concatanation in favour of .format method
     "WPS337", # Forbid multiline conditions
     "WPS348", # Forbid starting lines with a dot
