@@ -17,6 +17,19 @@ done <<<"$(sentry-cli projects list | awk 'NR>4 {print last} {last=$4" "$2}')"
 
 mapfile -t NOMAD_FILES < <(pants --filter-address-regex='_nomad$' peek :: | jq -r ".[] | .sources[0]")
 mapfile -t DOCKER_IMAGES < <(pants --filter-target-type='docker_image' peek :: | jq -r ".[] | .address")
+mapfile -t PROTOBUF_FILES < <(pants --filter-target-type="protobuf_source" list ::)
+
+for f in "${PROTOBUF_FILES[@]}"; do
+	NAMESPACE=$(dirname "${f#protobuf/}")
+
+	if ! grep -q -e "^option go_package = \"git.snowfall.se/junction/junction/golang/protobuf/${NAMESPACE}\";$" "${f}"; then
+		echo "${f}: invalid value for option \"go_package\", expected \"git.snowfall.se/junction/junction/golang/protobuf/${NAMESPACE}\""
+	fi
+
+	if ! grep -q -e "^package ${NAMESPACE//\//.};$" "${f}"; then
+		echo "${f}: invalid value for \"package\" package, expected \"${NAMESPACE//\//.}\""
+	fi
+done
 
 for i in "${DOCKER_IMAGES[@]}"; do
 	SERVICE_NAME=$(basename "${i%:*}")
