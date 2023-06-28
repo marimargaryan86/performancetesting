@@ -43,7 +43,7 @@ def _create_authorization(
         base_url=_BASE_URL,
         client=httpx.AsyncClient(transport=transport),
         email="foo",
-        password="bar",  # nosec
+        password="bar",
     )
 
 

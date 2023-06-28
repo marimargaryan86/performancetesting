@@ -54,7 +54,7 @@ async def create(
 
 async def _generate_cities(app: service.Application[_CitiesSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # nosec
+        random.choice(app.settings.mongo_dsn),  # noqa: S311
     )
     geocoding_service = geocoding_pb2_grpc.GeocodingServiceStub(
         create_channel(app.settings.geodata_address),
@@ -79,7 +79,7 @@ async def _generate_cities(app: service.Application[_CitiesSettings]) -> None:
 
 async def _serve(app: service.Application[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # nosec
+        random.choice(app.settings.mongo_dsn),  # noqa: S311
     )
     geocoding_service = geocoding_pb2_grpc.GeocodingServiceStub(
         create_channel(app.settings.geodata_address),

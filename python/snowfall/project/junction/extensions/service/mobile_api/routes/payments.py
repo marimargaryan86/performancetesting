@@ -16,7 +16,7 @@ _id_key = "_id"
 _user_key = "user_id"
 _name_key = "name"
 _stripe_customer_id_key = "stripe_customer_id"
-_password_key = "password"  # nosec
+_password_key = "password"  # noqa: S105
 _stripe_version = "2020-08-27"
 
 

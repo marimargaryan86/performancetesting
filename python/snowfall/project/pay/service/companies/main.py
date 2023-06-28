@@ -34,7 +34,7 @@ class _AccountSyncSettings(service.Settings):
 
 async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # nosec
+        random.choice(app.settings.mongo_dsn),  # noqa: S311
     )
     payment_client = PaymentClient(
         base_url=app.settings.cc_address,

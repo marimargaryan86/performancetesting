@@ -12,11 +12,8 @@ from redis import asyncio as aioredis
 from starlette import applications, types
 from starlette.middleware import Middleware, authentication
 
-from snowfall.project.junction.extensions.service.mobile_api import bootstrap
 from snowfall.project.junction.extensions.service.mobile_api import (
-    handlers as mobile_handlers,
-)
-from snowfall.project.junction.extensions.service.mobile_api import (
+    bootstrap,
     jwt_generator,
     middleware,
     orders_report,
@@ -24,6 +21,9 @@ from snowfall.project.junction.extensions.service.mobile_api import (
     plus_client,
     repository,
     smtp,
+)
+from snowfall.project.junction.extensions.service.mobile_api import (
+    handlers as mobile_handlers,
 )
 from snowfall.project.junction.extensions.service.mobile_api.routes import router
 from snowfall.stdlib import service
@@ -81,13 +81,13 @@ def _factory(
         )
         redis_client = redis.Client[str](
             aioredis.from_url(
-                random.choice(app.settings.redis_dsn),  # nosec
+                random.choice(app.settings.redis_dsn),  # noqa: S311
                 decode_responses=True,
             ).client(),
             prefix=app.name,
         )
         mongo = motor_asyncio.AsyncIOMotorClient(
-            app.settings.mongo_dsn,  # nosec
+            app.settings.mongo_dsn,
         )[app.settings.mongo_db]
         smtp_cl = smtp.EmailClient(
             aiosmtplib.SMTP(

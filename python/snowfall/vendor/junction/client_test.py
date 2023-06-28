@@ -7,7 +7,7 @@ from snowfall.vendor.junction import client
 
 _BASE_URL = "https://snowfalltravel.com/foo"
 _AUTH_HEADER = "Authorization"
-_AUTH_TOKEN = "Bearer foo"  # nosec
+_AUTH_TOKEN = "Bearer foo"
 
 
 class _TestClient(client.BaseClient):

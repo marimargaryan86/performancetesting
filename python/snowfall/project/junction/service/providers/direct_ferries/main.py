@@ -14,15 +14,13 @@ from snowfall.project.junction.service.providers.direct_ferries import (
     booking,
     cache,
     config,
-)
-from snowfall.project.junction.service.providers.direct_ferries import (
-    consumer as df_consumer,
-)
-from snowfall.project.junction.service.providers.direct_ferries import (
     criteria,
     orchestrator,
     port,
     route,
+)
+from snowfall.project.junction.service.providers.direct_ferries import (
+    consumer as df_consumer,
 )
 from snowfall.project.junction.service.providers.direct_ferries.gtfs import (
     converter,
@@ -124,11 +122,11 @@ async def _orders(app: service.AsyncApplication[config.OrdersSettings]) -> None:
     logging.register(http_client)
     metrics.register(http_client)
     amqp_conn = await app.stack.enter_async_context(
-        types.Connection(app.settings.amqp_dsn),  # nosec
+        types.Connection(app.settings.amqp_dsn),
     )
     redis_conn = await app.stack.enter_async_context(
         aioredis.from_url(
-            random.choice(app.settings.redis_dsn),  # nosec
+            random.choice(app.settings.redis_dsn),  # noqa: S311
             decode_responses=True,
         ).client(),
     )

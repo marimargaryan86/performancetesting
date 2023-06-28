@@ -4,9 +4,8 @@ from collections.abc import Sequence
 import httpx
 
 from snowfall.vendor.direct_ferries.clients import base
-from snowfall.vendor.direct_ferries.models import common, quote
+from snowfall.vendor.direct_ferries.models import common, quote, ticket
 from snowfall.vendor.direct_ferries.models import request as request_models
-from snowfall.vendor.direct_ferries.models import ticket
 
 _GET_METHOD = "get"
 _POST_METHOD = "post"

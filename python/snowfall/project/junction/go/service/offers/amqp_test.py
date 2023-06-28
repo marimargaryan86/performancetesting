@@ -55,7 +55,7 @@ async def test_original_id_is_always_published() -> None:  # noqa: WPS210
         routing_key="a-routing-key",
         offers_options_repository=mock_offer_options_repository,
     )
-    price_quote_container = PriceQuoteContainer(  # nosec
+    price_quote_container = PriceQuoteContainer(
         id="price-quote-container-id",
         session_token="a-session-token",
     )

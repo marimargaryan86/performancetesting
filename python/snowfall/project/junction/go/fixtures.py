@@ -114,8 +114,8 @@ def generate_location(identifier: str) -> place_models_pb2.Location:
         id=identifier,
         name="Foobar",
         coordinates=latlng_pb2.LatLng(
-            latitude=random.uniform(*LATITUDE_RANGE),  # nosec
-            longitude=random.uniform(*LONGITUDE_RANGE),  # nosec
+            latitude=random.uniform(*LATITUDE_RANGE),  # noqa: S311
+            longitude=random.uniform(*LONGITUDE_RANGE),  # noqa: S311
         ),
         country_code="SE",
         time_zone="Europe/Stockholm",

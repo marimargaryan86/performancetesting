@@ -119,7 +119,7 @@ async def test_that_pay_quotes_invoked_and_response_returned(
         ),
     )
 
-    quote = await pay_quotes._get_quote(  # noqa: WPS437  # nosec
+    quote = await pay_quotes._get_quote(  # noqa: WPS437
         amount=1000,
         session_token="session-token",
         payer_id="payer-id",

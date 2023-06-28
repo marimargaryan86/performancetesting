@@ -32,7 +32,7 @@ async def _main(app: service.Application[_Settings]) -> None:
     shp_file = shapefile.Reader(shp_path)
 
     async with aioredis.from_url(
-        random.choice(app.settings.redis_dsn),  # nosec
+        random.choice(app.settings.redis_dsn),  # noqa: S311
         decode_responses=True,
     ).client() as redis_conn:
         grpc_server = server.create_server(

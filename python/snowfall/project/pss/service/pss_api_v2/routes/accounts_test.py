@@ -256,11 +256,11 @@ async def test_can_reset_password_if_token_unused_and_not_expired(
         account_id=account.id,
     )
 
-    raw_password = "test-password"  # nosec
+    raw_password = "test-password"
     payload = {
         "token": account_forgotten_password.token,
         "password": raw_password,
-    }  # nosec
+    }
     response = client.post("/accounts/resetpassword", json=payload)
 
     assert response.status_code == status.HTTP_200_OK
@@ -287,7 +287,7 @@ async def test_cant_reset_password_if_token_doesnt_exist(
     payload = {
         "token": "fake-token",
         "password": "not-used",
-    }  # nosec
+    }
 
     response = client.post("/accounts/resetpassword", json=payload)
 
@@ -301,12 +301,12 @@ async def test_cant_reset_password_if_token_already_used(
     client: TestClient,
     account_forgotten_password_factory: type[AsyncSQLAlchemyFactory],
 ) -> None:
-    token = "test-token"  # nosec
-    await account_forgotten_password_factory.create(token=token, used=True)  # nosec
+    token = "test-token"
+    await account_forgotten_password_factory.create(token=token, used=True)
     payload = {
         "token": token,
         "password": "not-used",
-    }  # nosec
+    }
 
     response = client.post("/accounts/resetpassword", json=payload)
 
@@ -321,7 +321,7 @@ async def test_cant_reset_password_if_token_expired(
     client: TestClient,
     account_forgotten_password_factory: type[AsyncSQLAlchemyFactory],
 ) -> None:
-    token = "test-token"  # nosec
+    token = "test-token"
     await account_forgotten_password_factory.create(
         token=token,
         used=False,
@@ -333,7 +333,7 @@ async def test_cant_reset_password_if_token_expired(
     payload = {
         "token": token,
         "password": "not-used",
-    }  # nosec
+    }
 
     response = client.post("/accounts/resetpassword", json=payload)
 

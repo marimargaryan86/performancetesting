@@ -114,7 +114,7 @@ async def _offers_factory(
 ) -> _Impl:
     stations = await _load_train_stations()
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # nosec
+        random.choice(app.settings.mongo_dsn),  # noqa: S311
     )
     http_client = await stack.enter_async_context(
         httpx.AsyncClient(
@@ -170,7 +170,7 @@ async def _offers_factory(
 
 async def _orders(app: service.AsyncApplication[_OrdersSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # nosec
+        random.choice(app.settings.mongo_dsn),  # noqa: S311
     )
     http_client = await app.stack.enter_async_context(
         httpx.AsyncClient(
@@ -184,7 +184,7 @@ async def _orders(app: service.AsyncApplication[_OrdersSettings]) -> None:
     )
     redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
         aioredis.from_url(
-            random.choice(app.settings.redis_dsn),  # nosec
+            random.choice(app.settings.redis_dsn),  # noqa: S311
             decode_responses=False,
         ).client(),
     )
@@ -249,7 +249,7 @@ async def _orders(app: service.AsyncApplication[_OrdersSettings]) -> None:
 async def _price_quotes(app: service.AsyncApplication[_PriceQuoteSettings]) -> None:
     redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
         aioredis.from_url(
-            random.choice(app.settings.redis_dsn),  # nosec
+            random.choice(app.settings.redis_dsn),  # noqa: S311
             decode_responses=False,
         ).client(),
     )
@@ -280,7 +280,7 @@ async def _price_quotes(app: service.AsyncApplication[_PriceQuoteSettings]) -> N
 
 async def _notifications(app: service.AsyncApplication[_NotificationsSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # nosec
+        random.choice(app.settings.mongo_dsn),  # noqa: S311
     )
     http_client = await app.stack.enter_async_context(
         httpx.AsyncClient(
@@ -294,7 +294,7 @@ async def _notifications(app: service.AsyncApplication[_NotificationsSettings]) 
     )
     redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
         aioredis.from_url(
-            random.choice(app.settings.redis_dsn),  # nosec
+            random.choice(app.settings.redis_dsn),  # noqa: S311
             decode_responses=False,
         ).client(),
     )

@@ -29,7 +29,7 @@ from snowfall.stdlib.v1 import phone_number_pb2
 
 _id_key = "_id"
 _email_key = "email"
-_password_key = "password"  # nosec
+_password_key = "password"  # noqa: S105
 
 
 class Users(endpoints.HTTPEndpoint):

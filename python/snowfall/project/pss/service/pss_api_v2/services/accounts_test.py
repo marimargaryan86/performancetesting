@@ -31,7 +31,7 @@ async def test_that_get_all_accounts_returns_results_from_database() -> None:
 class UpdateAccountTestCase(TestCase):  # noqa: WPS230
     def setUp(self) -> None:
         self.new_email = "updated@test.com"
-        self.new_password = "new_test_password"  # nosec
+        self.new_password = "new_test_password"
         self.payload = {
             "firstname": "test_name",
             "lastname": "test_surname",
@@ -160,7 +160,11 @@ async def test_that_forgotten_password_with_existing_email_tracks_attempt_and_in
     )
 
     account_forgotten_passwords = [
-        AccountForgottenPassword(account_id=1, token="token1", used=False),  # nosec
+        AccountForgottenPassword(
+            account_id=1,
+            token="token1",
+            used=False,
+        ),
     ]
     account_forgotten_password_repository_mock.get_all_by_filter.return_value = (
         account_forgotten_passwords
@@ -192,7 +196,7 @@ async def test_that_forgotten_password_with_existing_email_tracks_attempt_and_in
     )
     assert inserted_forgotten_password.account_id == 1
 
-    email_service_mock.send_forgotten_password_email.assert_called_once_with(  # nosec
+    email_service_mock.send_forgotten_password_email.assert_called_once_with(
         token=ANY,
         recipient="test@email.com",
     )
@@ -201,8 +205,8 @@ async def test_that_forgotten_password_with_existing_email_tracks_attempt_and_in
 async def test_that_reset_password_with_unused_token_updates_account_and_sets_token_to_used() -> (
     None
 ):
-    raw_password = "a-password"  # nosec
-    token = "a-token"  # nosec
+    raw_password = "a-password"
+    token = "a-token"
     account_repository_mock = create_autospec(Repository, spec_set=True, instance=True)
     account_forgotten_password = AccountForgottenPassword(
         token=token,
@@ -253,7 +257,7 @@ async def test_that_reset_password_with_unused_token_updates_account_and_sets_to
 
 
 async def test_that_reset_password_with_used_token_raises_exception() -> None:
-    token = "a-token"  # nosec
+    token = "a-token"
     account_repository_mock = create_autospec(Repository, spec_set=True, instance=True)
     account_forgotten_password = AccountForgottenPassword(
         token=token,
@@ -278,7 +282,7 @@ async def test_that_reset_password_with_used_token_raises_exception() -> None:
     )
 
     with pytest.raises(exceptions.AccountForgottenPasswordTokenAlreadyUsedError):
-        await accounts_service.reset_password(  # nosec
+        await accounts_service.reset_password(
             token=token,
             password="wont-be-used",
         )
@@ -304,7 +308,7 @@ async def test_that_reset_password_with_no_matching_token_raises_exception() -> 
     )
 
     with pytest.raises(exceptions.AccountForgottenPasswordNotFoundError):
-        await accounts_service.reset_password(  # nosec
+        await accounts_service.reset_password(
             token="a-token",
             password="wont-be-used",
         )
@@ -315,7 +319,7 @@ async def test_that_reset_password_with_no_matching_token_raises_exception() -> 
 
 @freezegun.freeze_time("2023-01-01 01:00:01")
 async def test_that_reset_password_with_expired_token_raises_exception() -> None:
-    token = "a-token"  # nosec
+    token = "a-token"
     account_repository_mock = create_autospec(Repository, spec_set=True, instance=True)
     account_forgotten_password = AccountForgottenPassword(
         token=token,
@@ -343,7 +347,7 @@ async def test_that_reset_password_with_expired_token_raises_exception() -> None
     )
 
     with pytest.raises(exceptions.AccountForgottenPasswordTokenExpiredError):
-        await accounts_service.reset_password(  # nosec
+        await accounts_service.reset_password(
             token="a-token",
             password="wont-be-used",
         )

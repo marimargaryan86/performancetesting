@@ -22,4 +22,4 @@ async def test_cabin_classes_ids_mobile(
     for idx, _ in enumerate(r0["data"]):
         cabin_classes_ids.append(r0["data"][idx]["id"])
     logging.info("cabin_classes: %s", cabin_classes_ids)
-    assert set(cabin_classes_ids) == expected_classes  # nosec
+    assert set(cabin_classes_ids) == expected_classes

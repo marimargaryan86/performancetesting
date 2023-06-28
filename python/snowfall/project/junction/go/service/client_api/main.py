@@ -33,9 +33,8 @@ from snowfall.project.junction.go.service.trips.v1alpha import trips_pb2_grpc
 from snowfall.service.authentication.v1 import authentication_pb2_grpc
 from snowfall.stdlib import service
 from snowfall.stdlib.format import jwt
-from snowfall.stdlib.integration.starlette import application
+from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.integration.starlette import authentication as stdlib_auth
-from snowfall.stdlib.integration.starlette import handlers
 from snowfall.stdlib.persistence import cursor, filesystem
 from snowfall.stdlib.transport.grpc.client import create_channel
 from snowfall.stdlib.transport.http import auth

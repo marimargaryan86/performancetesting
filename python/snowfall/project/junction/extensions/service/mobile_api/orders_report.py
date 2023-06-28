@@ -30,7 +30,7 @@ class Settings(application.Settings):
 
 async def orders_report(app: service.Application[Settings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        app.settings.mongo_dsn,  # nosec
+        app.settings.mongo_dsn,
     )[app.name]
     junction_client = client.Client(
         base_url=app.settings.junction_api_address,

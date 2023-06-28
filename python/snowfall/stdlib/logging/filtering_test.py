@@ -30,7 +30,7 @@ def test_secret_keys_are_filtered() -> None:  # noqa: WPS218
             ],
         ],
         "quz": [
-            OrderedDict(password="foobar"),  # nosec
+            OrderedDict(password="foobar"),
         ],
         "secret": {
             "info": "foobar",

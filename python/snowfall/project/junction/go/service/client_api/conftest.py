@@ -30,9 +30,8 @@ from snowfall.project.junction.go.service.client_api import (
 from snowfall.project.junction.go.service.client_api import bootstrap, router
 from snowfall.service.authentication.v1 import models_pb2 as auth_models_pb2
 from snowfall.stdlib.format import jwt
-from snowfall.stdlib.integration.starlette import application
+from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.integration.starlette import authentication as stdlib_auth
-from snowfall.stdlib.integration.starlette import handlers
 from snowfall.stdlib.persistence import cursor, filesystem
 
 
@@ -47,7 +46,7 @@ async def user(
 ) -> auth_models_pb2.User:
     user = await authentication_client.create_user(
         email="example@example.com",
-        password="myPassword",  # nosec
+        password="myPassword",
     )
 
     user.metadata["client_id"] = "foo"

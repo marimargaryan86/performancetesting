@@ -8,7 +8,7 @@ from snowfall.project.junction.api_automation.test_functions.mobile_client impor
 
 @pytest.mark.integration()
 async def test_create_users(mobile_client: MobileApiClient) -> None:
-    resp = await mobile_client.create_users(  # nosec
+    resp = await mobile_client.create_users(
         first_name="John",
         last_name="Weak",
         password="Snowfall",
@@ -22,7 +22,7 @@ async def test_create_users(mobile_client: MobileApiClient) -> None:
 
 @pytest.mark.integration()
 async def test_create_users_session(mobile_client: MobileApiClient) -> None:
-    resp = await mobile_client.create_users_session(  # nosec
+    resp = await mobile_client.create_users_session(
         password="Snowfall",
         email="arega_y@snowfalltravel.com",
     )
@@ -55,7 +55,7 @@ async def test_verification_code_status(mobile_client: MobileApiClient) -> None:
 @pytest.mark.integration()
 async def test_update_password(mobile_client: MobileApiClient) -> None:
     user_id = "???"
-    resp = await mobile_client.update_password(  # nosec
+    resp = await mobile_client.update_password(
         email="arega_y@snowfalltravel.com",
         password="123",
         user_id=user_id,

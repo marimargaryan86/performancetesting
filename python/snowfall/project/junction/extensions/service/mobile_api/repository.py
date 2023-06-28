@@ -18,7 +18,7 @@ _ID_ACCESSOR = "id"
 _ID_KEY = "_id"
 _ATTRIBUTES_ACCESSOR = "attributes"
 _EMAIL_KEY = "email"
-_PASSWORD_KEY = "password"  # nosec
+_PASSWORD_KEY = "password"  # noqa: S105
 _DEFAULT_PAGE_SIZE = 20
 _DICT_SEQUENCE = Sequence[dict[str, Any]]
 

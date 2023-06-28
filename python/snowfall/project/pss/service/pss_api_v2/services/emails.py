@@ -15,7 +15,7 @@ from snowfall.project.pss.service.pss_api_v2.translations.translations import (
 from snowfall.stdlib.persistence import filesystem
 
 _TEMPLATES_PACKAGE_PATH = "snowfall.project.pss.service.pss_api_v2.templates"
-_FORGOTTEN_PASSWORD_EMAIL_PATH = "forgot-password-email.html"  # nosec
+_FORGOTTEN_PASSWORD_EMAIL_PATH = "forgot-password-email.html"  # noqa: S105
 
 
 class SMTPEmailError(Exception):

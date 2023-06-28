@@ -35,11 +35,11 @@ class _GrpcSettings(service.Settings):
 
 async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # nosec
+        random.choice(app.settings.mongo_dsn),  # noqa: S311
     )
     redis_conn = await app.stack.enter_async_context(
         aioredis.from_url(
-            random.choice(app.settings.redis_dsn),  # nosec
+            random.choice(app.settings.redis_dsn),  # noqa: S311
             decode_responses=True,
         ).client(),
     )

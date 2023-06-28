@@ -48,7 +48,7 @@ class _ImportSettings(pay_integration.Settings, service.Settings):
 
 async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # nosec
+        random.choice(app.settings.mongo_dsn),  # noqa: S311
     )
 
     passenger_name_records_client = passenger_name_records.GrpcClient(
@@ -118,7 +118,7 @@ async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
 
 async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # nosec
+        random.choice(app.settings.mongo_dsn),  # noqa: S311
     )
 
     http_client = await app.stack.enter_async_context(httpx.AsyncClient())

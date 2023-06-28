@@ -5,9 +5,8 @@ from urllib import parse as parse_url
 from snowfall.stdlib.transport.http import client
 from snowfall.vendor.benerail.clients import base
 from snowfall.vendor.benerail.models import metadata
-from snowfall.vendor.benerail.models.enumeration import rcode_types
+from snowfall.vendor.benerail.models.enumeration import rcode_types, results
 from snowfall.vendor.benerail.models.enumeration import response as rcodes_response
-from snowfall.vendor.benerail.models.enumeration import results
 
 _BASE_RCODE_PATH = "/rcode/rcode"
 _BASE_RCODE_TYPE_PATH = "/rcode/rcode-types"

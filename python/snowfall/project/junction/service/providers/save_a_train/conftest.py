@@ -44,7 +44,7 @@ async def http_client() -> AsyncIterator[httpx.AsyncClient]:
 
 @pytest.fixture()
 def save_a_train_client(http_client: httpx.AsyncClient) -> client.SATClient:
-    return client.SATClient(  # nosec
+    return client.SATClient(
         email="test@snowfall.com",
         password="secret",
         password_search="secret",

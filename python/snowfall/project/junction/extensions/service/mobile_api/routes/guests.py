@@ -10,9 +10,7 @@ from snowfall.project.junction.extensions.service.mobile_api.v1alpha.models_pb2 
     Guest as GuestModel,
 )
 from snowfall.stdlib import string
-from snowfall.stdlib.integration.starlette import models
-from snowfall.stdlib.integration.starlette import models as stdlib_models
-from snowfall.stdlib.integration.starlette import request_helpers
+from snowfall.stdlib.integration.starlette import models, request_helpers
 
 
 class Guests(endpoints.HTTPEndpoint):
@@ -26,8 +24,8 @@ class Guests(endpoints.HTTPEndpoint):
                 id=string.uuid(),
             ),
         )
-        return stdlib_models.JsonApiResponse(
-            stdlib_models.Body(
+        return models.JsonApiResponse(
+            models.Body(
                 data=resources.GuestResource.from_proto(guest),
             ),
             status.HTTP_201_CREATED,

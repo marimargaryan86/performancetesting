@@ -27,13 +27,11 @@ from snowfall.project.junction.service.providers.ask2go import (
     cache,
     consumer,
     criteria,
-)
-from snowfall.project.junction.service.providers.ask2go import offers as a2g_offers
-from snowfall.project.junction.service.providers.ask2go import (
     pricing,
     search,
     transformer,
 )
+from snowfall.project.junction.service.providers.ask2go import offers as a2g_offers
 from snowfall.project.junction.service.providers.ask2go.v1 import amqp_pb2
 from snowfall.stdlib import h3
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
@@ -144,7 +142,7 @@ async def _offers(
         ),
     )
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # nosec
+        random.choice(app.settings.mongo_dsn),  # noqa: S311
     )
 
     return offers.OfferSearchImplementation(
@@ -196,7 +194,7 @@ async def _orders(app: service.AsyncApplication[_OrdersSettings]) -> None:
     metrics.register(http_client)
     redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
         aioredis.from_url(
-            random.choice(app.settings.redis_dsn),  # nosec
+            random.choice(app.settings.redis_dsn),  # noqa: S311
             decode_responses=False,
         ).client(),
     )
@@ -248,7 +246,7 @@ async def _orders(app: service.AsyncApplication[_OrdersSettings]) -> None:
 
 async def _price_quotes(app: service.AsyncApplication[_PriceQuotesSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # nosec
+        random.choice(app.settings.mongo_dsn),  # noqa: S311
     )
     http_client = await app.stack.enter_async_context(
         httpx.AsyncClient(
@@ -266,7 +264,7 @@ async def _price_quotes(app: service.AsyncApplication[_PriceQuotesSettings]) -> 
 
     redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
         aioredis.from_url(
-            random.choice(app.settings.redis_dsn),  # nosec
+            random.choice(app.settings.redis_dsn),  # noqa: S311
             decode_responses=False,
         ).client(),
     )
@@ -325,7 +323,7 @@ async def _price_quotes(app: service.AsyncApplication[_PriceQuotesSettings]) -> 
 async def _seat_maps(app: service.AsyncApplication[_SeatMapsSettings]) -> None:
     redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
         aioredis.from_url(
-            random.choice(app.settings.redis_dsn),  # nosec
+            random.choice(app.settings.redis_dsn),  # noqa: S311
             decode_responses=False,
         ).client(),
     )

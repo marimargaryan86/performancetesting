@@ -24,7 +24,7 @@ async def test_that_send_forgotten_password_email_invokes_client() -> None:
     )
 
     emails_service = SMTPEmailService(client_mock, settings)
-    await emails_service.send_forgotten_password_email(  # nosec
+    await emails_service.send_forgotten_password_email(
         token="test-token",
         recipient="test-recipient",
     )

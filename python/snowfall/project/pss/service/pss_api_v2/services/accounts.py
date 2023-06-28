@@ -58,7 +58,7 @@ class AccountsService(object):  # noqa: WPS214
             values_to_update={"used": True},
         )
 
-        token = hashlib.md5(uuid4().bytes).hexdigest()  # nosec
+        token = hashlib.md5(uuid4().bytes).hexdigest()  # noqa: S324
 
         await self._account_forgotten_password_repository.insert(
             AccountForgottenPassword(

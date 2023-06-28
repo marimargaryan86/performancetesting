@@ -34,7 +34,7 @@ async def orders(app: service.AsyncApplication[config.OrdersSettings]) -> None:
     metrics.register(http_client)
     redis_connection = await app.stack.enter_async_context(
         aioredis.from_url(
-            random.choice(app.settings.redis_dsn),  # nosec
+            random.choice(app.settings.redis_dsn),  # noqa: S311
             decode_responses=False,
         ).client(),
     )

@@ -34,11 +34,11 @@ class _BackUpCronJobSettings(service.Settings):
 
 async def _serve(app: service.Application[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # nosec
+        random.choice(app.settings.mongo_dsn),  # noqa: S311
     )
     redis_client = redis.Client[str](
         aioredis.from_url(
-            random.choice(app.settings.redis_dsn),  # nosec
+            random.choice(app.settings.redis_dsn),  # noqa: S311
             decode_responses=True,
         ).client(),
         prefix=app.name,
@@ -62,11 +62,11 @@ async def _backup_rates_cron_run(
     app: service.Application[_BackUpCronJobSettings],
 ) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # nosec
+        random.choice(app.settings.mongo_dsn),  # noqa: S311
     )
     redis_client = redis.Client[str](
         aioredis.from_url(
-            random.choice(app.settings.redis_dsn),  # nosec
+            random.choice(app.settings.redis_dsn),  # noqa: S311
             decode_responses=True,
         ).client(),
         prefix=app.name,

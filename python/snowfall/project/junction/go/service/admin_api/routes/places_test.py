@@ -21,8 +21,8 @@ async def test_create_place(client: httpx.AsyncClient) -> None:
         "type": "places",
         "attributes": {
             "name": "Foobar",
-            "latitude": random.uniform(*fixtures.LATITUDE_RANGE),  # nosec
-            "longitude": random.uniform(*fixtures.LONGITUDE_RANGE),  # nosec
+            "latitude": random.uniform(*fixtures.LATITUDE_RANGE),  # noqa: S311
+            "longitude": random.uniform(*fixtures.LONGITUDE_RANGE),  # noqa: S311
         },
         "relationships": {
             "locations": {
@@ -58,8 +58,8 @@ async def test_create_place_invalid_relationships(client: httpx.AsyncClient) -> 
         "type": "places",
         "attributes": {
             "name": "Foobar",
-            "latitude": random.uniform(*fixtures.LATITUDE_RANGE),  # nosec
-            "longitude": random.uniform(*fixtures.LONGITUDE_RANGE),  # nosec
+            "latitude": random.uniform(*fixtures.LATITUDE_RANGE),  # noqa: S311
+            "longitude": random.uniform(*fixtures.LONGITUDE_RANGE),  # noqa: S311
         },
         "relationships": {
             "locations": {
@@ -101,8 +101,8 @@ async def test_update_place(client: httpx.AsyncClient) -> None:
         "type": "places",
         "attributes": {
             "name": "Foobar",
-            "latitude": random.uniform(*fixtures.LATITUDE_RANGE),  # nosec
-            "longitude": random.uniform(*fixtures.LONGITUDE_RANGE),  # nosec
+            "latitude": random.uniform(*fixtures.LATITUDE_RANGE),  # noqa: S311
+            "longitude": random.uniform(*fixtures.LONGITUDE_RANGE),  # noqa: S311
         },
         "relationships": {
             "locations": {

@@ -20,7 +20,7 @@ class _GrpcSettings(service.Settings):
 
 async def _serve(app: service.Application[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # nosec
+        random.choice(app.settings.mongo_dsn),  # noqa: S311
     )
     grpc_server = server.create_server(
         app.settings.grpc_address,

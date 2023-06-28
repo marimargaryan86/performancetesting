@@ -59,7 +59,7 @@ class TestPaymentWebhooks(object):
             },
         )
 
-        assert response.status_code == status.HTTP_202_ACCEPTED  # nosec
+        assert response.status_code == status.HTTP_202_ACCEPTED
 
 
 class TestCustomHeaderMiddleware(object):

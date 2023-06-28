@@ -33,7 +33,7 @@ async def http_client() -> AsyncIterator[httpx.AsyncClient]:
 
 @pytest.fixture()
 def karhoo_client(http_client: httpx.AsyncClient) -> client.KarhooClient:
-    return client.KarhooClient(  # nosec
+    return client.KarhooClient(
         api_key="key",
         base_url="https://test_url",
         http_client=http_client,

@@ -18,7 +18,7 @@ class UserAuth(base_client.BaseClient, httpx.Auth):
     ):
         self._email = email
         self._password = password
-        self._token = ""  # nosec
+        self._token = ""
         super().__init__(base_url=base_url, client=client)
 
     async def async_auth_flow(

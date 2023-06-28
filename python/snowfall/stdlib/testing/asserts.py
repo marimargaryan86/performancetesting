@@ -14,7 +14,7 @@ async def assert_awaitables(
     )
 
     for index, expected in enumerate([expected for aws, expected in aws_and_expected]):
-        assert returned_values[index] == expected  # nosec
+        assert returned_values[index] == expected
 
 
 async def assert_iterable(
@@ -22,10 +22,10 @@ async def assert_iterable(
     expected: Iterable[_DataType],
 ) -> None:
     if isinstance(generator, AsyncIterable):
-        assert collections.Counter(expected) == collections.Counter(  # nosec
+        assert collections.Counter(expected) == collections.Counter(
             [gen_item async for gen_item in generator],
         )
     else:
-        assert collections.Counter(expected) == collections.Counter(  # nosec
+        assert collections.Counter(expected) == collections.Counter(
             list(generator),
         )

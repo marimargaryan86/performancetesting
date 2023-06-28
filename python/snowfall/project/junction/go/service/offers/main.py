@@ -78,7 +78,7 @@ class _GatherPriceQuoteSettings(
 
 async def _serve(app: service.Application[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # nosec
+        random.choice(app.settings.mongo_dsn),  # noqa: S311
     )
     async with types.Connection(app.settings.amqp_dsn) as connection:
         amqp_producer = producer.Producer(
@@ -154,7 +154,7 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
 
 async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # nosec
+        random.choice(app.settings.mongo_dsn),  # noqa: S311
     )
 
     gateway_channel = client.create_channel(app.settings.gateway_address)
@@ -166,7 +166,7 @@ async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
     )
     redis_conn = await app.stack.enter_async_context(
         aioredis.from_url(
-            random.choice(app.settings.redis_dsn),  # nosec
+            random.choice(app.settings.redis_dsn),  # noqa: S311
             decode_responses=True,
         ).client(),
     )
@@ -257,7 +257,7 @@ async def _gather_price_quotes(
     app: service.AsyncApplication[_GatherPriceQuoteSettings],
 ) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # nosec
+        random.choice(app.settings.mongo_dsn),  # noqa: S311
     )
 
     http_client = await app.stack.enter_async_context(httpx.AsyncClient())

@@ -8,9 +8,8 @@ import pydantic
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.provider import bookings as provider_bookings
-from snowfall.project.junction.provider import meta
+from snowfall.project.junction.provider import meta, service
 from snowfall.project.junction.provider import offers as provider_offers
-from snowfall.project.junction.provider import service
 from snowfall.project.junction.service.providers.mock import (
     bookings,
     cache,

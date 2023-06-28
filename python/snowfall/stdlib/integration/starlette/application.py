@@ -10,9 +10,8 @@ from starlette import applications, exceptions, requests, responses, routing, st
 from starlette.middleware import Middleware, errors
 
 from snowfall.stdlib import service
-from snowfall.stdlib.integration.starlette import handlers, middlewares
+from snowfall.stdlib.integration.starlette import handlers, middlewares, validation
 from snowfall.stdlib.integration.starlette import routes as common_routes
-from snowfall.stdlib.integration.starlette import validation
 
 ExceptionHandlerResponse = responses.Response | Awaitable[responses.Response]
 ExceptionHandler = Callable[[requests.Request, Exception], ExceptionHandlerResponse]
@@ -94,7 +93,7 @@ def serve(
         ws="none",
         forwarded_allow_ips=",".join(
             [
-                "*" if str(address) == "0.0.0.0" else str(address)  # nosec
+                "*" if str(address) == "0.0.0.0" else str(address)  # noqa: S104
                 for address in allowed_proxy_ips
             ],
         ),

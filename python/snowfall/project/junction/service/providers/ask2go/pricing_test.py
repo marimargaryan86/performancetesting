@@ -14,7 +14,7 @@ async def test_search_result_data(  # noqa: WPS218, WPS210
     magic_mocker: conftest.MagicMocker,
 ) -> None:
     with magic_mocker.with_fixture_path("branded_search"):
-        price_result = await pricing_adapter.get_price_quote(  # nosec
+        price_result = await pricing_adapter.get_price_quote(
             session_token="FOOBAR",
             offer_details=cache.OfferDetails(
                 search_id="87380906a4cd4f5b812ac9328a82e54f",

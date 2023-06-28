@@ -20,7 +20,7 @@ _METHOD_POST = "POST"
 _METHOD_PATCH = "PATCH"
 _METHOD_DELETE = "DELETE"
 _EMAIL_KEY = "email"
-_PASSWORD_KEY = "password"  # nosec
+_PASSWORD_KEY = "password"  # noqa: S105
 _CRITERIA_KEY = "criteria"
 
 trip_includes = Literal["segments", "segments.legs", "segments.legs.legType"]

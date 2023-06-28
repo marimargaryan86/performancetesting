@@ -22,17 +22,17 @@ from fakeredis import aioredis as fakeredis
 from starlette import applications
 from starlette.middleware import Middleware, authentication
 
-from snowfall.project.junction.extensions.service.mobile_api import bootstrap
 from snowfall.project.junction.extensions.service.mobile_api import (
-    handlers as mobile_handlers,
-)
-from snowfall.project.junction.extensions.service.mobile_api import (
+    bootstrap,
     jwt_generator,
     main,
     middleware,
     plus_client,
     repository,
     smtp,
+)
+from snowfall.project.junction.extensions.service.mobile_api import (
+    handlers as mobile_handlers,
 )
 from snowfall.project.junction.extensions.service.mobile_api.routes import router
 from snowfall.project.junction.extensions.service.mobile_api.v1alpha import models_pb2
@@ -48,7 +48,7 @@ _FIXTURES_PATH = (
 )
 _RESPONSE_FIXTURES_PATH = "python/snowfall/project/junction/extensions/service/mobile_api/fixtures/junction_responses/{path}"
 
-jwt_token_version = "1.0.0"  # nosec
+jwt_token_version = "1.0.0"
 jwt_payload = {"version": jwt_token_version, "client_id": "test"}
 public_exponent = 65537
 key_size = 2048
@@ -73,7 +73,7 @@ plus_api_address = "https://plus.junction.dev"
 
 @pytest.fixture()
 def new_user() -> models_pb2.User:
-    return models_pb2.User(  # nosec
+    return models_pb2.User(
         id=string.uuid(),
         email="new_user@gmail.com",
         password="ReallyString1!",
@@ -90,7 +90,7 @@ class ExistingUser(TypedDict):
 
 @pytest.fixture()
 def existing_user() -> ExistingUser:
-    user = models_pb2.User(  # nosec
+    user = models_pb2.User(
         id=string.uuid(),
         email="existing_user@gmail.com",
         password="$2a$12$bb8.n1wWBXhUdJUToN.qoebWG2aZb7bMJD820mfcMDt2MW5e21VaK",

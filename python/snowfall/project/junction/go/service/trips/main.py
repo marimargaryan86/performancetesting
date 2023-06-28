@@ -60,7 +60,7 @@ class _GrpcSettings(service.Settings):
 
 async def _consume(app: service.Application[_ConsumeSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # nosec
+        random.choice(app.settings.mongo_dsn),  # noqa: S311
     )
 
     async with types.Connection(app.settings.amqp_dsn) as connection:
@@ -87,7 +87,7 @@ async def _consume_trip_candidate_search_tasks(
     app: service.Application[_ConsumeTripCandidateSearchSettings],
 ) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # nosec
+        random.choice(app.settings.mongo_dsn),  # noqa: S311
     )
     offers_channel = create_channel(app.settings.offers_address)
     schedules_channel = create_channel(app.settings.schedules_address)
@@ -128,7 +128,7 @@ async def _consume_trip_candidate_search_tasks(
 
 async def _serve(app: service.Application[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # nosec
+        random.choice(app.settings.mongo_dsn),  # noqa: S311
     )
 
     offers_channel = create_channel(app.settings.offers_address)
