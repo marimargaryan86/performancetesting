@@ -426,7 +426,7 @@ class BeneficiariesResource(models.Resource):
         if cc_beneficiary.bank_address is not None:
             for address in cc_beneficiary.bank_address:
                 bank_address_lines.extend(
-                    address.split("\\n"),  # noqa: WPS342
+                    address.split(r"\n"),
                 )
         return cls(
             id=beneficiary.id,

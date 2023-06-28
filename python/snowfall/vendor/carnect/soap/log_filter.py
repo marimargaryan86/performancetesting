@@ -20,16 +20,14 @@ class LogFilter(object):
         self._replace_re: str | None = None
 
         if secret_words:
-            ns = "(?:\\w{1,6}:)?"  # noqa: WPS342
+            ns = r"(?:\w{1,6}:)?"
             fields = "|".join([re.escape(vi) for vi in secret_words])
-            search_re = (
-                "(<({ns}(?:{fields}))[^>]*>)[^<]+(</\\2>)".format(  # noqa: WPS342
-                    ns=ns,
-                    fields=fields,
-                )
+            search_re = r"(<({ns}(?:{fields}))[^>]*>)[^<]+(</\2>)".format(
+                ns=ns,
+                fields=fields,
             )
             self._search_re = re.compile(search_re, re.DOTALL)
-            self._replace_re = "\\1{filtered_word}\\3".format(  # noqa: WPS342
+            self._replace_re = r"\1{filtered_word}\3".format(
                 filtered_word=filtered_word,
             )
 

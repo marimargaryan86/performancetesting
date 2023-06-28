@@ -543,7 +543,7 @@ class BeneficiariesService(  # noqa: WPS214
                 address=postal_address_pb2.PostalAddress(
                     address_lines=(
                         cc_beneficiary.bank_address[0].split(
-                            "\\n",  # noqa: WPS342
+                            r"\n",
                         )
                         if cc_beneficiary.bank_address
                         else None
