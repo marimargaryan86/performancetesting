@@ -32,7 +32,7 @@ from snowfall.project.junction.service.providers.save_a_train import (
     criteria,
     train_stations,
 )
-from snowfall.project.junction.service.providers.save_a_train.v1alpha import amqp_pb2
+from snowfall.project.junction.service.providers.save_a_train.v1 import amqp_pb2
 from snowfall.service.geodata.v1 import geocoding_pb2_grpc
 from snowfall.stdlib import h3
 from snowfall.stdlib.instrumentation.httpx import logging, metrics

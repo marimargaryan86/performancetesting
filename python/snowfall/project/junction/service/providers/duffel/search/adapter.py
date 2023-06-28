@@ -19,7 +19,7 @@ from snowfall.project.junction.service.providers.duffel.search.validator import 
     AirlineValidator,
     Validators,
 )
-from snowfall.project.junction.service.providers.duffel.v1alpha import amqp_pb2
+from snowfall.project.junction.service.providers.duffel.v1 import amqp_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout

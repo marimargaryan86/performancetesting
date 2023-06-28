@@ -9,7 +9,7 @@ from snowfall.project.junction.service.providers.duffel.conftest import (
     search_task_from_offer,
 )
 from snowfall.project.junction.service.providers.duffel.search import adapter
-from snowfall.project.junction.service.providers.duffel.v1alpha.amqp_pb2 import (
+from snowfall.project.junction.service.providers.duffel.v1.amqp_pb2 import (
     SearchCriteriaTask,
 )
 from snowfall.vendor.duffel.models.offer import PrivateFare

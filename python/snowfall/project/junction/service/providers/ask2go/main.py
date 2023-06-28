@@ -34,7 +34,7 @@ from snowfall.project.junction.service.providers.ask2go import (
     search,
     transformer,
 )
-from snowfall.project.junction.service.providers.ask2go.v1alpha import amqp_pb2
+from snowfall.project.junction.service.providers.ask2go.v1 import amqp_pb2
 from snowfall.stdlib import h3
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence import filesystem

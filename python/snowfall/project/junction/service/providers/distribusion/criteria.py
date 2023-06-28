@@ -8,7 +8,7 @@ from snowfall.project.junction.go.service.offers.v1 import (
 )
 from snowfall.project.junction.go.v1alpha import models_pb2
 from snowfall.project.junction.service.providers.distribusion import stations
-from snowfall.project.junction.service.providers.distribusion.v1alpha import amqp_pb2
+from snowfall.project.junction.service.providers.distribusion.v1 import amqp_pb2
 from snowfall.stdlib import h3
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.time import date_to_age

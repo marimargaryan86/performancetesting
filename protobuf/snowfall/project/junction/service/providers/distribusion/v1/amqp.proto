@@ -1,11 +1,11 @@
 syntax = "proto3";
 
-package snowfall.project.junction.service.providers.distribusion.v1alpha;
+package snowfall.project.junction.service.providers.distribusion.v1;
 
 import "snowfall/project/junction/go/v1alpha/models.proto";
 import "snowfall/stdlib/v1/date.proto";
 
-option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/providers/distribusion/v1alpha";
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/providers/distribusion/v1";
 
 message SearchCriteriaTask {
   string offer_search_id = 1;

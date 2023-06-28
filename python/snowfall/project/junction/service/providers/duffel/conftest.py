@@ -14,7 +14,7 @@ from redis import asyncio as aioredis
 from snowfall.project.junction.go.v1alpha import models_pb2
 from snowfall.project.junction.service.providers.duffel import cache, client_factory
 from snowfall.project.junction.service.providers.duffel.search import adapter, parser
-from snowfall.project.junction.service.providers.duffel.v1alpha import amqp_pb2
+from snowfall.project.junction.service.providers.duffel.v1 import amqp_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis

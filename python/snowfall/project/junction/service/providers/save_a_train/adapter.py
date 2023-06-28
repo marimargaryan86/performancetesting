@@ -22,7 +22,7 @@ from snowfall.project.junction.service.providers.save_a_train import (
     models,
     train_stations,
 )
-from snowfall.project.junction.service.providers.save_a_train.v1alpha import amqp_pb2
+from snowfall.project.junction.service.providers.save_a_train.v1 import amqp_pb2
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout

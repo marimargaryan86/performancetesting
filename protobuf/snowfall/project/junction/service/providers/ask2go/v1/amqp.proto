@@ -1,17 +1,17 @@
 syntax = "proto3";
 
-package snowfall.project.junction.service.providers.duffel.v1alpha;
+package snowfall.project.junction.service.providers.ask2go.v1;
 
 import "snowfall/project/junction/go/v1alpha/models.proto";
 import "snowfall/stdlib/v1/datetime.proto";
 
-option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/providers/duffel/v1alpha";
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/providers/ask2go/v1";
 
 message SearchCriteriaTask {
-  string offer_search_id = 1;
+  reserved 1, 4;
+  reserved "offer_search_id", "session_token";
   repeated snowfall.project.junction.go.v1alpha.Segment segments = 2;
   Criteria criteria = 3;
-  string session_token = 4;
 }
 
 message Criteria {
@@ -19,6 +19,9 @@ message Criteria {
   string destination_iata = 2;
   snowfall.stdlib.v1.DateTime outbound_departure = 3;
   optional snowfall.stdlib.v1.DateTime inbound_departure = 4;
-  repeated uint32 passenger_ages = 5;
-  string reseller_id = 6;
+  string cabin_class = 5;
+  uint32 adults = 6;
+  uint32 children = 7;
+  uint32 infants = 8;
+  string affiliate_id = 9;
 }

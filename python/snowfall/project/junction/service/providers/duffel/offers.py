@@ -12,7 +12,7 @@ from snowfall.project.junction.service.providers.duffel.client_factory import (
     DuffelClientFactory,
 )
 from snowfall.project.junction.service.providers.duffel.search import adapter
-from snowfall.project.junction.service.providers.duffel.v1alpha import amqp_pb2
+from snowfall.project.junction.service.providers.duffel.v1 import amqp_pb2
 from snowfall.stdlib import h3
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence import filesystem

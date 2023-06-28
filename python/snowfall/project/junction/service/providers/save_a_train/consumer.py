@@ -11,7 +11,7 @@ from snowfall.project.junction.service.providers.save_a_train import (
     cache,
     notifications,
 )
-from snowfall.project.junction.service.providers.save_a_train.v1alpha import (
+from snowfall.project.junction.service.providers.save_a_train.v1 import (
     amqp_pb2 as sat_amqp_pb2,
 )
 from snowfall.stdlib import money

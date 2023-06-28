@@ -11,7 +11,7 @@ from snowfall.project.junction.service.providers.distribusion.conftest import (
 from snowfall.project.junction.service.providers.distribusion.search.adapter import (
     DistribusionSearchAdapter,
 )
-from snowfall.project.junction.service.providers.distribusion.v1alpha import amqp_pb2
+from snowfall.project.junction.service.providers.distribusion.v1 import amqp_pb2
 from snowfall.stdlib.format import protobuf
 
 _DEFAULT_PASSENGER_AGE = 40
