@@ -1,4 +1,5 @@
-from snowfall.project.junction.plus.adapter import errors, validation
+from snowfall.project.junction.plus.adapter import orders as orders_adapter
+from snowfall.project.junction.plus.adapter import validation
 from snowfall.project.junction.plus.service.notification_center.v1alpha import (
     amqp_pb2 as notif_amqp_pb2,
 )
@@ -8,9 +9,6 @@ from snowfall.project.junction.plus.service.notification_center.v1alpha import (
 from snowfall.project.junction.plus.service.notifications.v1alpha import (
     grpc_pb2 as notifications_pb2,
 )
-from snowfall.project.junction.plus.service.notifications.v1alpha import (
-    grpc_pb2_grpc as notifications_pb2_grpc,
-)
 from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
 from snowfall.project.junction.plus.service.orders_registration import validators
 from snowfall.project.junction.plus.service.orders_registration.v1alpha import amqp_pb2
@@ -19,18 +17,19 @@ from snowfall.stdlib.transport.amqp import consumer, producer, types
 
 
 class OrderImporter(object):
-    def __init__(
+    def __init__(  # noqa: WPS211
         self,
         consumer_obj: consumer.Consumer[amqp_pb2.IncomingOrder],
         producer_obj: producer.Producer,
-        orders: notifications_pb2_grpc.OrderServiceStub,
+        orders: orders_adapter.Client,
         timeout: int = 10,
+        logger: stdout.Logger | None = None,
     ):
         self._consumer = consumer_obj
         self._producer = producer_obj
         self._orders = orders
         self._timeout = timeout
-        self._logger = stdout.get_logger()
+        self._logger = logger or stdout.get_logger()
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
@@ -57,17 +56,14 @@ class OrderImporter(object):
         except* validation.ProtobufValidationError:
             self._logger.warning("Validation Error", exc_info=True)
         else:
-            response = await errors.handle_grpc_errors(
-                self._orders.CreateOrder(
-                    notifications_pb2.CreateOrderRequest(
-                        reseller_id=message.body.reseller_id,
-                        external_ref_id=message.body.external_ref_id,
-                        contact_details=message.body.contact_details,
-                        passengers=message.body.passengers,
-                        bookings=message.body.bookings,
-                    ),
-                    timeout=self._timeout,
+            persisted_order = await self._orders.create(
+                notifications_pb2.CreateOrderRequest(
+                    reseller_id=message.body.reseller_id,
+                    external_ref_id=message.body.external_ref_id,
+                    contact_details=message.body.contact_details,
+                    passengers=message.body.passengers,
+                    bookings=message.body.bookings,
                 ),
             )
-            await self.publish_event(response.order)
-            self._logger.warning(str(response.order))
+            await self.publish_event(persisted_order)
+            self._logger.warning(str(persisted_order))

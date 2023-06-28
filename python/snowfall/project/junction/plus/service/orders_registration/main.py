@@ -1,6 +1,7 @@
 import httpx
 import pydantic
 
+from snowfall.project.junction.plus.adapter import orders
 from snowfall.project.junction.plus.service.notifications.v1alpha import (
     grpc_pb2_grpc as notifications_pb2_grpc,
 )
@@ -37,8 +38,10 @@ async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
             connection=connection,
             exchange=types.Exchange(name="plus_events"),
         ),
-        orders=notifications_pb2_grpc.OrderServiceStub(
-            create_channel(app.settings.notifications_address),
+        orders=orders.GrpcClient(
+            orders=notifications_pb2_grpc.OrderServiceStub(
+                create_channel(app.settings.notifications_address),
+            ),
         ),
     )
     await order_importer.consume()

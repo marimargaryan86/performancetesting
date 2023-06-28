@@ -1,0 +1,112 @@
+from collections.abc import AsyncGenerator, Mapping
+from typing import Any
+from unittest.mock import AsyncMock, patch
+
+import pytest
+
+from snowfall.project.junction.plus.adapter import orders as orders_adapter
+from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
+from snowfall.project.junction.plus.service.orders_registration.importer import (
+    OrderImporter,
+)
+from snowfall.project.junction.plus.service.orders_registration.v1alpha import amqp_pb2
+from snowfall.stdlib import string
+from snowfall.stdlib.transport.amqp import types
+from snowfall.stdlib.v1 import phone_number_pb2
+
+
+@pytest.fixture(autouse=True)
+def mock_dependencies(monkeypatch: pytest.MonkeyPatch) -> Mapping[str, Any]:
+    mock_consumer = AsyncMock()
+    monkeypatch.setattr(
+        "snowfall.stdlib.transport.amqp.consumer.Consumer",
+        mock_consumer,
+    )
+
+    mock_producer = AsyncMock()
+    monkeypatch.setattr(
+        "snowfall.stdlib.transport.amqp.producer.Producer",
+        mock_producer,
+    )
+
+    mock_logger = AsyncMock()
+    monkeypatch.setattr(
+        "snowfall.stdlib.logging.stdout.Logger",
+        mock_logger,
+    )
+
+    return {
+        "consumer_obj": mock_consumer.return_value,
+        "producer_obj": mock_producer.return_value,
+        "orders": orders_adapter.DictClient([]),
+        "logger": mock_logger.return_value,
+    }
+
+
+@pytest.fixture()
+async def invalid_message() -> (
+    AsyncGenerator[types.Message[amqp_pb2.IncomingOrder], None]
+):
+    with patch("snowfall.stdlib.transport.amqp.types.Message") as mock_message:
+        message = mock_message.return_value
+        message.body = amqp_pb2.IncomingOrder(
+            reseller_id="reseller_id",
+        )
+        message.processed = False
+        message.exchange = None
+        message.routing_key = None
+
+        yield message
+
+
+@pytest.fixture()
+async def valid_message() -> (
+    AsyncGenerator[types.Message[amqp_pb2.IncomingOrder], None]
+):
+    with patch("snowfall.stdlib.transport.amqp.types.Message") as mock_message:
+        message = mock_message.return_value
+        message.body = amqp_pb2.IncomingOrder(
+            reseller_id="reseller_id",
+            external_ref_id="external_ref_id",
+            contact_details=models_pb2.ContactDetails(
+                email="dsada@gmail.com",
+                address=models_pb2.PostalAddress(
+                    address_lines=["Street name 7"],
+                    region_code="GB",
+                    postal_code="12345",
+                    locality="London",
+                ),
+                phone=phone_number_pb2.PhoneNumber(
+                    e164_number="+46708443755",
+                ),
+            ),
+            passengers=[
+                models_pb2.Passenger(
+                    first_name="John",
+                    last_name="Wick",
+                    title=models_pb2.Passenger.Title.TITLE_MR,
+                    gender=models_pb2.Passenger.Gender.GENDER_MALE,
+                ),
+            ],
+            bookings=[
+                models_pb2.Booking(
+                    value=models_pb2.AirBooking(
+                        id=string.uuid(),
+                        origin="London",
+                        destination="Amsterdam",
+                        route_identifier="U22512",
+                        cabin_class="Economy",
+                    ),
+                ),
+            ],
+        )
+        message.processed = False
+        message.exchange = None
+        message.routing_key = None
+
+        yield message
+
+
+@pytest.fixture()
+def order_importer(mock_dependencies: Mapping[str, Any]) -> OrderImporter:
+    return OrderImporter(**mock_dependencies)
