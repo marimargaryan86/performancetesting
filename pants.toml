@@ -12,8 +12,6 @@ backend_packages = [
     "pants.backend.docker",
     "pants.backend.docker.lint.hadolint",
     "pants.backend.experimental.adhoc",
-    "pants.backend.experimental.codegen.protobuf.go",
-    "pants.backend.experimental.go",
     "pants.backend.experimental.python.lint.add_trailing_comma",
     "pants.backend.experimental.python.lint.ruff",
     "pants.backend.experimental.visibility",
