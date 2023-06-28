@@ -2,8 +2,8 @@ import abc
 import datetime
 import functools
 import types
-from collections.abc import Awaitable, Callable, Mapping
-from typing import Any, Generic, Protocol, TypeVar, overload
+from collections.abc import Callable, Mapping
+from typing import Any, Generic, Protocol, TypeVar
 
 import pymongo
 from google.protobuf.message import Message
@@ -132,7 +132,7 @@ class RepositoryProtocol(Protocol[Record]):
 
     async def _execute(
         self,
-        query: Callable[[Any], Any],
+        query: Callable[..., Any],
         *args: Any,
         **kwargs: Any,
     ) -> Any:
@@ -201,27 +201,9 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
     def _coder(self) -> coders.BaseCoder[Record]:
         raise NotImplementedError()
 
-    @overload
-    async def _execute(  # type: ignore[misc]
-        self,
-        query: Callable[[Any], Awaitable[_MongoDict]],
-        *args: Any,
-        **kwargs: Any,
-    ) -> Record:
-        """Return a `Record` if the query returns a dict."""
-
-    @overload
     async def _execute(
         self,
-        query: Callable[[Any], core.AgnosticBaseCursor],
-        *args: Any,
-        **kwargs: Any,
-    ) -> resultset.ResultSet[Record]:
-        """Return a `ResultSet[Record]` if the query returns a cursor."""
-
-    async def _execute(
-        self,
-        query: Callable[[Any], Any],
+        query: Callable[..., Any],
         *args: Any,
         **kwargs: Any,
     ) -> Any:
