@@ -22,13 +22,75 @@ relative_files = true
 addopts = "--import-mode=importlib --asyncio-mode=auto -W ignore::DeprecationWarning:aioredis.connection: -W ignore::DeprecationWarning:jsonschema.validators: -W ignore::DeprecationWarning:openapi_core.unmarshalling.schemas.unmarshallers: -W ignore::DeprecationWarning:openapi_spec_validator.validators: -W ignore::DeprecationWarning:openapi_spec_validator.factories: -W ignore::DeprecationWarning:openapi_schema_validator.validators: -W ignore::DeprecationWarning:openapi_schema_validator.validators: -W ignore::DeprecationWarning:pkg_resources: -W ignore::DeprecationWarning:google.rpc:"
 
 [tool.ruff]
+external = [
+    "P103", # other string does contain unindexed parameters
+    "SF10", # All dataclasses should be frozen
+    "SF20", # Found mutable argument type
+    "WPS110", # Forbid blacklisted variable names
+    "WPS111", # Forbid short variable or module names
+    "WPS114", # Forbid names with underscored numbers pattern
+    "WPS115", # Require snake_case for naming class attributes
+    "WPS118", # Forbid long variable or module names
+    "WPS122", # Forbid explicit unused variables
+    "WPS204", # Forbid overused expressions in a module, function or method
+    "WPS210", # Forbid too many local variables in the unit of code
+    "WPS211", # Forbid too many arguments for a function or method
+    "WPS213", # Forbid putting too many expressions in a single function
+    "WPS214", # Forbid too many methods in a single class
+    "WPS215", # Restrict the maximum number of base classes
+    "WPS217", # Forbid placing too many await expressions in a function
+    "WPS218", # Forbid placing too many assert statements into a function
+    "WPS219", # Forbid consecutive expressions with too deep access level
+    "WPS220", # Forbid nesting blocks too deep
+    "WPS221", # Forbid complex lines
+    "WPS223", # Forbid too many elif branches
+    "WPS224", # Forbid too many for statements within a comprehension
+    "WPS229", # Forbid try blocks with bodies that are too long
+    "WPS230", # Forbid instances with too many public attributes
+    "WPS231", # Forbid functions with too much cognitive complexity
+    "WPS234", # Forbid overly complex annotations
+    "WPS235", # Forbid from ... import ... with too many imported names
+    "WPS238", # Forbids too many raise statements in a function
+    "WPS306", # Forbid writing classes without base classes
+    "WPS320", # Forbid multi-line function type annotations.
+    "WPS323", # Forbid % formatting on strings
+    "WPS326", # Forbid implicit string concatenation
+    "WPS336", # Forbid explicit string concatanation in favour of .format method
+    "WPS337", # Forbid multiline conditions
+    "WPS342", # Forbid \\ escape sequences inside regular strings
+    "WPS348", # Forbid starting lines with a dot
+    "WPS352", # Forbid multiline loops
+    "WPS360", # Forbid the use of raw strings when there is no backslash in the string
+    "WPS408", # Forbid using the same logical conditions in one expression
+    "WPS420", # Forbid some python keywords
+    "WPS421", # Forbid calling some built-in functions
+    "WPS426", # Forbid lambda inside loops
+    "WPS430", # Forbid nested functions
+    "WPS431", # Forbid nested classes
+    "WPS432", # Forbid magic numbers
+    "WPS436", # Forbid importing protected modules
+    "WPS437", # Forbid protected attributes and methods
+    "WPS441", # Forbid control variables after the block body
+    "WPS450", # Forbid importing protected objects from modules
+    "WPS465", # Forbid comparisons between bitwise and boolean expressions
+    "WPS473", # Limit empty lines in functions or methods body
+    "WPS504", # Forbid negated conditions together with else clause
+    "WPS508", # Forbid not with compare expressions
+    "WPS509", # Forbid nesting ternary expressions in certain places
+    "WPS514", # Forbid multiple equality comparisons with the same variable
+    "WPS528", # Forbid implicit .items() iterator
+    "WPS529", # Forbid implicit .get() dict method
+    "WPS600", # Forbid subclassing lowercase builtins
+    "WPS601", # Forbid shadowing class level attributes with instance level attributes
+    "WPS608", # Forbid super() with parameters or outside of methods
+    "WPS609", # Forbid directly calling certain magic attributes and methods
+]
 ignore = [
     "ANN101", # Missing type annotation for self in method
     "ANN102", # Missing type annotation for cls in classmethod
     "ANN401", # Dynamically typed expressions (typing.Any) are disallowed
     "E501", # Line too long
     "RUF001", # String contains ambiguous
-    "RUF100", # Unused `noqa` directive
     "SIM118", # Use `key in dict` instead of `key in dict.keys()`
     "TRY003", # Avoid specifying long messages outside the exception class # TODO: fix
     "UP004", # Class inherits from `object`

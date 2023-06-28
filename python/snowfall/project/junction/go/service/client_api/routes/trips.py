@@ -124,7 +124,7 @@ class TripSearch(endpoints.HTTPEndpoint):
 
 
 class TripSearches(endpoints.HTTPEndpoint):
-    async def post(  # noqa: WPS210,C901
+    async def post(  # noqa: WPS210
         self,
         request: requests.Request,
         locations_client: locations.Client = lagom.injectable,

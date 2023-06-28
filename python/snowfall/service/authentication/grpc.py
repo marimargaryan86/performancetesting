@@ -134,7 +134,7 @@ class AuthenticationService(
 
         return auth_pb2.CreateUserResponse(user=user)
 
-    async def ChangePassword(  # type: ignore[override] # noqa: N802, WPS217, C901
+    async def ChangePassword(  # type: ignore[override] # noqa: N802, WPS217
         self,
         request: auth_pb2.ChangePasswordRequest,
         context: grpc.ServicerContext,

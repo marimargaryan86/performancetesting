@@ -22,7 +22,7 @@ logger.setLevel(logging.DEBUG)
 
 
 @pytest.mark.integration()
-async def test_create_quote(  # noqa: WPS210, WPS213, C901
+async def test_create_quote(  # noqa: WPS210, WPS213
     pay_admin_client: PayAdminClient,
     pay_client: Client,
 ) -> None:

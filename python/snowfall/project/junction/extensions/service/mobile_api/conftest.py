@@ -43,8 +43,10 @@ from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.v1 import phone_number_pb2
 from snowfall.vendor.junction.go import client
 
-_FIXTURES_PATH = "python/snowfall/project/junction/extensions/service/mobile_api/fixtures/{path}"  # noqa: B950
-_RESPONSE_FIXTURES_PATH = "python/snowfall/project/junction/extensions/service/mobile_api/fixtures/junction_responses/{path}"  # noqa: B950
+_FIXTURES_PATH = (
+    "python/snowfall/project/junction/extensions/service/mobile_api/fixtures/{path}"
+)
+_RESPONSE_FIXTURES_PATH = "python/snowfall/project/junction/extensions/service/mobile_api/fixtures/junction_responses/{path}"
 
 jwt_token_version = "1.0.0"  # nosec
 jwt_payload = {"version": jwt_token_version, "client_id": "test"}

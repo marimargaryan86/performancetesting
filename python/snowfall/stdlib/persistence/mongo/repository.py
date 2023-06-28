@@ -42,7 +42,7 @@ class UnindexedSortFieldError(Exception):
     """Raised when a sort field is not indexed."""
 
 
-def with_cursor_filters(  # noqa: C901
+def with_cursor_filters(
     cursor_obj: cursor_pb2.Cursor,
     filter_: Mapping[str, Any],
     sort: tuple[str, int] | None = None,

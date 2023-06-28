@@ -32,7 +32,7 @@ def flatten_object(content: Any) -> Mapping[str, Any]:
     return {}
 
 
-def _resolve(  # noqa: C901,WPS210,WPS231
+def _resolve(  # noqa: WPS210, WPS231
     data: Any,
     included: Mapping[tuple[Any, Any], Any],
     resolved: Collection[tuple[Any, Any]],

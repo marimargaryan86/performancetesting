@@ -58,7 +58,7 @@ class TransactionPostSchema(BaseSchema):
     agreement_id: int | None
 
     @root_validator()
-    def check_outbound_or_inbound(cls, values):  # type: ignore[no-untyped-def] # noqa: B902,N805,ANN001,WPS110,ANN201
+    def check_outbound_or_inbound(cls, values):  # type: ignore[no-untyped-def] # noqa: N805, ANN001, WPS110, ANN201
         """Above noqa ignores are due to below issue.
 
         https://github.com/pydantic/pydantic/issues/506#issuecomment-1127789412

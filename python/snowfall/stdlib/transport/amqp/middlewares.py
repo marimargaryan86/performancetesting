@@ -128,7 +128,7 @@ def auto_ack_and_nack_factory() -> protocol.ConsumerMiddleware[_Proto]:
     ) -> None:
         try:
             await next_func(msg)
-        except Exception:  # noqa: PIE786
+        except Exception:
             logger.exception("An error occurred in consumer callback")
             await msg.nack()
         else:

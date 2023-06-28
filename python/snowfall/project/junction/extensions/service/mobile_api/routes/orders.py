@@ -137,7 +137,7 @@ class Orders(endpoints.HTTPEndpoint):
         return stdlib_models.JsonApiResponse(response_body)
 
     @validators.voucher_validator
-    async def post(  # noqa: WPS211, WPS210, WPS217, C901
+    async def post(  # noqa: WPS211, WPS210, WPS217
         self,
         request: requests.Request,
         voucher: models_pb2.Voucher | None,

@@ -15,7 +15,7 @@ class PushNotificationTokens(endpoints.HTTPEndpoint):
     async def post(
         self,
         request: requests.Request,
-        notification_tokens_repository: repository.NotificationTokensRepository = lagom.injectable,  # noqa: B950
+        notification_tokens_repository: repository.NotificationTokensRepository = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
         try:
@@ -50,7 +50,7 @@ class PushNotificationTokens(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
-        notification_tokens_repository: repository.NotificationTokensRepository = lagom.injectable,  # noqa: B950
+        notification_tokens_repository: repository.NotificationTokensRepository = lagom.injectable,
     ) -> responses.Response:
         tokens = await notification_tokens_repository.find_by_user(
             request.user.username,
@@ -77,7 +77,7 @@ class PushNotificationToken(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
-        notification_tokens_repository: repository.NotificationTokensRepository = lagom.injectable,  # noqa: B950
+        notification_tokens_repository: repository.NotificationTokensRepository = lagom.injectable,
     ) -> responses.Response:
         token = await notification_tokens_repository.find_by_id(
             request.path_params["deviceToken"],
@@ -94,7 +94,7 @@ class PushNotificationToken(endpoints.HTTPEndpoint):
     async def patch(
         self,
         request: requests.Request,
-        notification_tokens_repository: repository.NotificationTokensRepository = lagom.injectable,  # noqa: B950
+        notification_tokens_repository: repository.NotificationTokensRepository = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
         update_result = await notification_tokens_repository.refresh_token(
@@ -119,7 +119,7 @@ class PushNotificationToken(endpoints.HTTPEndpoint):
     async def delete(
         self,
         request: requests.Request,
-        notification_tokens_repository: repository.NotificationTokensRepository = lagom.injectable,  # noqa: B950
+        notification_tokens_repository: repository.NotificationTokensRepository = lagom.injectable,
     ) -> responses.Response:
         device_id = request.path_params["deviceToken"]
         deleted_count = await notification_tokens_repository.delete(

@@ -38,7 +38,7 @@ class BookingHandler(object):  # noqa: WPS214
         self._notifier = notifier
         self._price_change_tolerance_percent = price_change_tolerance_percent
 
-    async def book(  # noqa: C901, WPS210
+    async def book(  # noqa: WPS210
         self,
         task: amqp_pb2.PlaceOrderTask,
         details: cache.OfferDetails,

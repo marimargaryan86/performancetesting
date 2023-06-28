@@ -78,7 +78,7 @@ class Consumer(protocol.Consumer[_Proto]):
 
             try:
                 await self._process(msg, callback)
-            except Exception:  # noqa: PIE786
+            except Exception:
                 self._logger.exception(
                     "An error occurred while processing message",
                     type=msg.body.DESCRIPTOR.full_name,
