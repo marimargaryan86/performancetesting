@@ -70,9 +70,15 @@ for f in "${NOMAD_FILES[@]}"; do
 		fi
 
 		if [[ -n ${VARIABLES} ]]; then
-			(nomad validate -var-file /dev/stdin "${f}") <<<"${VARIABLES}" || FAILURE=1
+			(nomad validate -var-file /dev/stdin "${f}" >/dev/null 2>&1) <<<"${VARIABLES}" || {
+				echo "${f}: file did not validate"
+				FAILURE=1
+			}
 		else
-			nomad validate "${f}" || FAILURE=1
+			nomad validate "${f}" >/dev/null 2>&1 || {
+				echo "${f}: file did not validate"
+				FAILURE=1
+			}
 		fi
 
 		nomad fmt -check -write=false "${f}" >/dev/null 2>&1 || {
