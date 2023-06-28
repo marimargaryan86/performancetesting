@@ -82,7 +82,7 @@ class JourneyRepository(
             else {}
         )
 
-        filter_ = _add_reseller_id_to_filter(reseller_id, filter_)
+        filter_ = _add_reseller_id_to_filter(reseller_id, filter_)  # noqa: WPS204
 
         return await self._find_with_cursor(
             cur=cursor,

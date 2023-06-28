@@ -194,7 +194,7 @@ class Ask2GoClient(object):  # noqa: WPS214
         return price.OfferPriceResponse(**response.json())
 
     # pricing
-    async def create_air_offer_async(
+    async def create_air_offer_async(  # noqa: WPS211
         self,
         search_id: str,
         offer_id: str,

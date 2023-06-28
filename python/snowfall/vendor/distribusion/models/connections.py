@@ -136,9 +136,9 @@ class ConnectionVacancy(DistribusionBaseModel):
 
 
 class Coordinates(DistribusionBaseModel):
-    x: int | None
-    y: int | None
-    z: int | None
+    x: int | None  # noqa: WPS111
+    y: int | None  # noqa: WPS111
+    z: int | None  # noqa: WPS111
 
 
 class Seat(DistribusionBaseModel):

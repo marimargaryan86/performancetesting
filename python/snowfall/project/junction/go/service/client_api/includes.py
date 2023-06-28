@@ -46,7 +46,7 @@ def _journeys_resolver(
     ) -> Sequence[resources.JourneyResource]:
         response = await orders_client.find_journeys(
             identifiers,
-            limit=len(identifiers),
+            limit=len(identifiers),  # noqa: WPS204
         )
 
         return [

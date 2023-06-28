@@ -21,7 +21,7 @@ from snowfall.project.junction.go.service.orders.zendesk.client import ZendeskCl
 from snowfall.stdlib.transport.grpc import rich_status, service, sorting
 
 
-class OrderService(
+class OrderService(  # noqa: WPS214
     service.Service,
     orders_pb2_grpc.OrderServiceServicer,
 ):
@@ -32,7 +32,7 @@ class OrderService(
         },
     )
 
-    def __init__(
+    def __init__(  # noqa: WPS211
         self,
         journeys: JourneyRepository,
         orders: OrderRepository,

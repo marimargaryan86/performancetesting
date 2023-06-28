@@ -16,7 +16,7 @@ _MOCK_PRICE_UNITS = 13
 _MOCK_PRICE_NANOS = 370000000
 
 
-class Client(abc.ABC):
+class Client(abc.ABC):  # noqa: WPS214
     @abc.abstractmethod
     async def create_journey(
         self,
@@ -155,7 +155,7 @@ class Client(abc.ABC):
         """Fetch all booking details resources related to a booking."""
 
 
-class DictClient(Client):
+class DictClient(Client):  # noqa: WPS214
     def __init__(
         self,
         journeys: Sequence[models_pb2.Journey],
@@ -493,7 +493,7 @@ class DictClient(Client):
             detail.booking_id = booking_id
 
 
-class GrpcClient(Client):
+class GrpcClient(Client):  # noqa: WPS214
     def __init__(self, orders: orders_pb2_grpc.OrderServiceStub, timeout: int = 10):
         self._orders = orders
         self._timeout = timeout
@@ -550,7 +550,7 @@ class GrpcClient(Client):
             self._orders.GetJourney(
                 orders_pb2.GetJourneyRequest(
                     id=identifier,
-                    reseller_id=reseller_id or "",
+                    reseller_id=reseller_id or "",  # noqa: WPS204
                 ),
                 timeout=self._timeout,
             ),

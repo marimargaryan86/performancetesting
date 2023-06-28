@@ -23,8 +23,7 @@ from snowfall.stdlib import service
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
-from snowfall.stdlib.transport.amqp import producer
+from snowfall.stdlib.transport.amqp import consumer, producer
 from snowfall.stdlib.transport.amqp import types as amqp_types
 from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
@@ -66,7 +65,7 @@ async def price_quotes(  # noqa: WPS210
         client=redis.Client[bytes](redis_connection, prefix=app.name),
     )
     await PriceQuoteConsumer(
-        consumer_obj=amqp_consumer.Consumer(
+        consumer_obj=consumer.Consumer(
             connection=amqp_connection,
             queue_name="{0}_prices".format(app.name),
             binds=[(amqp_types.Exchange("prices"), "offers.pricing")],
@@ -89,7 +88,7 @@ async def price_quotes(  # noqa: WPS210
 class PriceQuoteConsumer(object):
     def __init__(  # noqa: WPS211
         self,
-        consumer_obj: amqp_consumer.Consumer[offers_amqp_pb2.TripPriceQuoteTask],
+        consumer_obj: consumer.Consumer[offers_amqp_pb2.TripPriceQuoteTask],
         producer_obj: producer.Producer,
         transformer: pricing_transformer.PriceQuoteTransformer,
         adapter_factory: pricing_adapter.PricingAdapterFactory,

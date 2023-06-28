@@ -444,7 +444,7 @@ def generate_journey(
                         title=order_models_pb2.Passenger.TITLE_MR,
                         gender=order_models_pb2.Passenger.Gender.GENDER_MALE,
                         date_of_birth=date_pb2.Date(
-                            year=1987,
+                            year=1987,  # noqa: WPS432
                             month=5,
                             day=24,
                         ),

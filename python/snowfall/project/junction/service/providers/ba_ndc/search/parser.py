@@ -154,7 +154,7 @@ def to_offer_penalty(
     )
 
 
-class OfferParser(object):
+class OfferParser(object):  # noqa: WPS214
     def __init__(
         self,
         offer_cache: cache.OfferCache,

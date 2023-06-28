@@ -35,7 +35,7 @@ class BookingsClient(base.BenerailBaseClient):  # noqa: WPS214
         response = await self._make_request(
             client.RequestOptions(
                 method="GET",
-                path="{base_path}/{booking_id}".format(
+                path="{base_path}/{booking_id}".format(  # noqa: WPS204
                     base_path=_BASE_PATH,
                     booking_id=booking_id,
                 ),
@@ -79,7 +79,7 @@ class BookingsClient(base.BenerailBaseClient):  # noqa: WPS214
                             base_path=_BASE_PATH,
                             booking_id=booking_id,
                         ),
-                        "/orders/{order_id}".format(order_id=order_id),
+                        "/orders/{order_id}".format(order_id=order_id),  # noqa: WPS204
                         "/booked-offers/{booked_offer_id}".format(
                             booked_offer_id=booked_offer_id,
                         ),

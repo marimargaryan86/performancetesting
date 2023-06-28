@@ -337,6 +337,15 @@ async def _notifications(app: service.AsyncApplication[_NotificationsSettings]) 
             mongo.sat.provider_cabin_mapping,
         ),
     )
+    await _consume_notifications(app, amqp_connection, sat_adapter, notifier)
+
+
+async def _consume_notifications(
+    app: service.AsyncApplication[_NotificationsSettings],
+    amqp_connection: abc.AbstractConnection,
+    sat_adapter: adapter.SaveATrainAdapter,
+    notifier: notifications.SmtpNotifier,
+) -> None:
     notifications_consumer = consumer.NotificationsConsumer(
         consumer_obj=amqp_consumer.Consumer(
             connection=amqp_connection,
@@ -350,6 +359,14 @@ async def _notifications(app: service.AsyncApplication[_NotificationsSettings]) 
         adapter=sat_adapter,
         notifier=notifier,
     )
+    await _configure_queue(app, amqp_connection)
+    await notifications_consumer.consume()
+
+
+async def _configure_queue(
+    app: service.AsyncApplication[_NotificationsSettings],
+    amqp_connection: abc.AbstractConnection,
+) -> None:
     channel = await app.stack.enter_async_context(
         cast(
             contextlib.AbstractAsyncContextManager[abc.AbstractChannel],
@@ -359,7 +376,6 @@ async def _notifications(app: service.AsyncApplication[_NotificationsSettings]) 
     await channel.set_qos(
         prefetch_count=((os.cpu_count() or 1) * 2) + 1,
     )
-
     queue = await channel.declare_queue(
         name="notifications.retry",
         durable=True,
@@ -370,16 +386,12 @@ async def _notifications(app: service.AsyncApplication[_NotificationsSettings]) 
         },
     )
     exchange = types.Exchange("notifications.retry")
-
     declared_exchange = await channel.declare_exchange(
         name=exchange.name,
         type=exchange.type_,
         durable=True,
     )
-
     await queue.bind(declared_exchange, "notifications.retry")
-
-    await notifications_consumer.consume()
 
 
 async def _dump_stations(app: service.AsyncApplication[_DumpStationsSettings]) -> None:

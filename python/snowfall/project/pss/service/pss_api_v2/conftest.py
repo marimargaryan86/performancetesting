@@ -85,7 +85,7 @@ async def client(
 
 
 @pytest.fixture()
-def account_factory(
+def account_factory(  # noqa: WPS210
     db_session: async_sessionmaker[AsyncSession],
 ) -> type[AsyncSQLAlchemyFactory]:
     class AccountFactory(AsyncSQLAlchemyFactory):
@@ -117,7 +117,7 @@ def account_factory(
 
 
 @pytest.fixture()
-def country_factory(
+def country_factory(  # noqa: WPS210
     db_session: async_sessionmaker[AsyncSession],
 ) -> type[AsyncSQLAlchemyFactory]:
     class CountryFactory(AsyncSQLAlchemyFactory):

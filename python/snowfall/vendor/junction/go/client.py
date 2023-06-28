@@ -112,7 +112,7 @@ class LegsClient(_BaseClient):
         return await self._make_request(
             method=_METHOD_GET,
             url="/segments/{0}/legs".format(segment_id),
-            query_parameters=_make_pagination(limit, cursor),
+            query_parameters=_make_pagination(limit, cursor),  # noqa: WPS204
         )
 
     async def get_legs_by_trip_id(self, trip_id: str) -> dict[str, Any]:

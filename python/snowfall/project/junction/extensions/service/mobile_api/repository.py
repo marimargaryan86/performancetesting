@@ -37,7 +37,7 @@ class RedisRepository(object):
         if self._ttl:
             await self._redis.put_expires_at(
                 identifier,
-                datetime.datetime.now(tz=datetime.UTC) + self._ttl,
+                datetime.datetime.now(tz=datetime.UTC) + self._ttl,  # noqa: WPS204
             )
 
 
