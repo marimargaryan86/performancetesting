@@ -9,15 +9,18 @@ from snowfall.project.junction.service.providers.duffel.conftest import (
     search_task_from_offer,
 )
 from snowfall.project.junction.service.providers.duffel.search import adapter
+from snowfall.project.junction.service.providers.duffel.v1alpha.amqp_pb2 import (
+    SearchCriteriaTask,
+)
 from snowfall.vendor.duffel.models.offer import PrivateFare
 from snowfall.vendor.duffel.models.offer_request import OfferRequestResponse
 
 
-async def test_adapter(
+def get_search_task_for_fixture(
     httpx_mock: pytest_httpx.HTTPXMock,
-    search_adapter: adapter.DuffelSearchAdapter,
-) -> None:
-    json = load_file_fixture("offer_request_response.json")
+    name: str,
+) -> SearchCriteriaTask:
+    json = load_file_fixture(name)
     assert json is not None
 
     httpx_mock.add_response(
@@ -29,7 +32,14 @@ async def test_adapter(
     )
 
     offer_response = OfferRequestResponse.parse_obj(json)
-    search_task = search_task_from_offer(offer_response.response_data.offers[0])
+    return search_task_from_offer(offer_response.response_data.offers[0])
+
+
+async def test_adapter(
+    httpx_mock: pytest_httpx.HTTPXMock,
+    search_adapter: adapter.DuffelSearchAdapter,
+) -> None:
+    search_task = get_search_task_for_fixture(httpx_mock, "offer_request_response.json")
 
     offer_groups = [
         offer_group
@@ -195,3 +205,25 @@ def test_adapter_cache_generate(fares: Mapping[str, Sequence[PrivateFare]]) -> N
         "TF-corporate_code-C1\x00tracking_reference-TR1\x00tour_code-None\x00fare_type-None\x00corporate_code-C2\x00tracking_reference-TR2\x00tour_code-None\x00fare_type-None",
     ]
     assert adapter._generate_private_fares_keys(fares) == expected  # noqa: WPS437
+
+
+async def test_private_fares_and_specific_token(
+    httpx_mock: pytest_httpx.HTTPXMock,
+    search_adapter: adapter.DuffelSearchAdapter,
+) -> None:
+    search_task = get_search_task_for_fixture(httpx_mock, "offer_request_response.json")
+
+    search_task.criteria.reseller_id = "res1"
+    search_criteria_wrapper = search_adapter.search_criteria_generator(search_task)
+    private_fares = search_criteria_wrapper.search_criteria.offer_data.private_fares
+    assert private_fares == {
+        "QF": [PrivateFare(corporate_code="FLX53", tracking_reference="ABN:2345678")],
+    }
+    _ = [  # noqa: WPS122
+        offer_group
+        async for offer_group in search_adapter.gather_search_results(
+            search_criteria_wrapper,
+        )
+    ]
+
+    assert httpx_mock.get_requests()[0].headers["authorization"] == "Bearer token1"

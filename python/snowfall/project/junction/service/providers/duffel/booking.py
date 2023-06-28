@@ -3,6 +3,9 @@ from dateutil.relativedelta import relativedelta
 
 from snowfall.project.junction.go.service.orders.v1 import amqp_pb2, models_pb2
 from snowfall.project.junction.service.providers.duffel import cache, notifications
+from snowfall.project.junction.service.providers.duffel.client_factory import (
+    DuffelClientFactory,
+)
 from snowfall.project.junction.service.providers.duffel.enums import gender_from_proto
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
@@ -26,11 +29,11 @@ class BookingHandler(object):  # noqa: WPS214
 
     def __init__(
         self,
-        duffel_client: client.DuffelClient,
+        duffel_client_factory: DuffelClientFactory,
         notifier: notifications.Notifier,
         price_change_tolerance_percent: float,
     ):
-        self._client = duffel_client
+        self._duffel_client_factory = duffel_client_factory
         self._logger = stdout.get_logger()
         self._notifier = notifier
         self._price_change_tolerance_percent = price_change_tolerance_percent
@@ -41,9 +44,13 @@ class BookingHandler(object):  # noqa: WPS214
         details: cache.OfferDetails,
     ) -> models_pb2.Booking:
         new_booking = task.booking
+        duffel_client = self._duffel_client_factory.for_reseller(task.reseller_id)
 
         try:
-            updated_details: cache.OfferDetails = await self._refresh_details(details)
+            updated_details: cache.OfferDetails = await self._refresh_details(
+                details,
+                duffel_client,
+            )
         except errors.ServiceError as offer_refresh_error:
             self._logger.exception(
                 "Booking failed",
@@ -84,6 +91,7 @@ class BookingHandler(object):  # noqa: WPS214
             booking_result: Order = await self._make_booking(
                 task=task,
                 details=updated_details,
+                duffel_client=duffel_client,
             )
         except errors.ServiceError as booking_error:
             self._logger.exception(
@@ -130,8 +138,9 @@ class BookingHandler(object):  # noqa: WPS214
     async def _refresh_details(
         self,
         details: cache.OfferDetails,
+        duffel_client: client.DuffelClient,
     ) -> cache.OfferDetails:
-        offer = await self._client.get_single_offer(details.offer_id)
+        offer = await duffel_client.get_single_offer(details.offer_id)
 
         return cache.OfferDetails(
             offer_id=details.offer_id,
@@ -146,6 +155,7 @@ class BookingHandler(object):  # noqa: WPS214
         self,
         task: amqp_pb2.PlaceOrderTask,
         details: cache.OfferDetails,
+        duffel_client: client.DuffelClient,
     ) -> Order:
         number = phonenumbers.parse(task.contact_details.phone.e164_number)
         order_request = OrderBuilder()
@@ -202,7 +212,7 @@ class BookingHandler(object):  # noqa: WPS214
 
             order_request.add_passenger(order_passenger)
 
-        order_response = await self._client.order_request(order_request.build())
+        order_response = await duffel_client.order_request(order_request.build())
 
         try:
             # TODO: this should be handled in a separate service

@@ -1,7 +1,8 @@
 import datetime
 import itertools
 import zoneinfo
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
+from typing import Any
 
 import more_itertools
 
@@ -13,7 +14,7 @@ from snowfall.project.junction.service.providers.duffel import cache, enums
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1 import latlng_pb2
-from snowfall.vendor.duffel.models.offer import Offer
+from snowfall.vendor.duffel.models.offer import Offer, PrivateFare
 from snowfall.vendor.duffel.models.offer_slice import OfferSlice, OfferSliceSegment
 
 
@@ -262,3 +263,12 @@ def segment_to_legs(
         last_leg.arriving_at = stop.arriving_at
 
     return legs
+
+
+def dict_to_private_fares(
+    private_fares: Mapping[str, Any],
+) -> Mapping[str, Sequence[PrivateFare]]:
+    return {
+        key: [PrivateFare.parse_obj(fare) for fare in fares]
+        for key, fares in private_fares.items()
+    }

@@ -11,7 +11,10 @@ from snowfall.project.junction.service.providers.duffel import cache
 from snowfall.project.junction.service.providers.duffel.client_factory import (
     DuffelClientFactory,
 )
-from snowfall.project.junction.service.providers.duffel.search.parser import OfferParser
+from snowfall.project.junction.service.providers.duffel.search.parser import (
+    OfferParser,
+    dict_to_private_fares,
+)
 from snowfall.project.junction.service.providers.duffel.search.validator import (
     AirlineValidator,
     Validators,
@@ -155,11 +158,9 @@ class DuffelSearchAdapter(object):
                 ),
             )
         account_config = self._resellers_map.get(search_task.criteria.reseller_id)
-        if account_config:
-            offer_request_builder.private_fares = {
-                key: [PrivateFare.parse_obj(fare) for fare in fares]
-                for key, fares in account_config["private_fares"].items()
-            }
+        offer_request_builder.private_fares = dict_to_private_fares(
+            account_config.get("private_fares", {}) if account_config else {},
+        )
         return SearchCriteriaWrapper(
             search_criteria=offer_request_builder.build(),
             reseller_id=search_task.criteria.reseller_id,

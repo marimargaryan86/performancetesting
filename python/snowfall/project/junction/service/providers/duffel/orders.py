@@ -13,12 +13,14 @@ from snowfall.project.junction.service.providers.duffel import (
     notifications,
 )
 from snowfall.project.junction.service.providers.duffel.booking import BookingHandler
+from snowfall.project.junction.service.providers.duffel.client_factory import (
+    DuffelClientFactory,
+)
 from snowfall.stdlib import service
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer, producer, types
-from snowfall.vendor.duffel import client
 from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
 _PROVIDER_NAME = "Duffel"
@@ -56,12 +58,13 @@ async def orders(app: service.AsyncApplication[OrdersSettings]) -> None:
     amqp_connection = await app.stack.enter_async_context(
         types.Connection(app.settings.amqp_dsn),
     )
-    duffel_client = client.DuffelClient(
+    duffel_client_factory = DuffelClientFactory(
         api_base_url=app.settings.api_base_url,
         api_key=app.settings.api_key,
         version=app.settings.api_version,
         http_client=http_client,
         rate_limit_client=rate_limit_client,
+        resellers_map=app.settings.resellers_map,
     )
 
     await OrderConsumer(
@@ -75,7 +78,7 @@ async def orders(app: service.AsyncApplication[OrdersSettings]) -> None:
             exchange=types.Exchange("orders"),
         ),
         booking_handler=BookingHandler(
-            duffel_client=duffel_client,
+            duffel_client_factory=duffel_client_factory,
             notifier=notifications.SmtpNotifier(
                 smtp_client=aiosmtplib.SMTP(
                     hostname=app.settings.smtp_dsn.host,

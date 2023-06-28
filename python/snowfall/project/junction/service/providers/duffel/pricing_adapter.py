@@ -3,6 +3,9 @@ import json
 from collections.abc import Mapping, Sequence
 
 from snowfall.project.junction.service.providers.duffel import cache
+from snowfall.project.junction.service.providers.duffel.client_factory import (
+    DuffelClientFactory,
+)
 from snowfall.stdlib.logging import stdout
 from snowfall.vendor.duffel import client
 from snowfall.vendor.duffel.builders.offer_request import OffersRequestBuilder
@@ -101,3 +104,13 @@ class PricingAdapter(object):
             json.dumps(reduced_offer, sort_keys=True, default=str).encode(),
             usedforsecurity=False,
         ).hexdigest()
+
+
+class PricingAdapterFactory(object):
+    def __init__(self, duffel_client_factory: DuffelClientFactory):
+        self._duffel_client_factory = duffel_client_factory
+
+    def for_reseller(self, reseller_id: str) -> PricingAdapter:
+        return PricingAdapter(
+            duffel_client=self._duffel_client_factory.for_reseller(reseller_id),
+        )

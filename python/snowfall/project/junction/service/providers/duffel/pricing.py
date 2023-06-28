@@ -1,5 +1,7 @@
 import datetime
 import random
+from collections.abc import Mapping
+from typing import Any
 
 import httpx
 from redis import asyncio as aioredis
@@ -10,7 +12,13 @@ from snowfall.project.junction.service.providers.duffel import (
     pricing_adapter,
     pricing_transformer,
 )
+from snowfall.project.junction.service.providers.duffel.client_factory import (
+    DuffelClientFactory,
+)
 from snowfall.project.junction.service.providers.duffel.config import PricingSettings
+from snowfall.project.junction.service.providers.duffel.search.parser import (
+    dict_to_private_fares,
+)
 from snowfall.stdlib import service
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.logging import stdout
@@ -18,7 +26,6 @@ from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer
 from snowfall.stdlib.transport.amqp import types as amqp_types
-from snowfall.vendor.duffel import client
 from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
 
@@ -47,12 +54,13 @@ async def price_quotes(  # noqa: WPS210
     amqp_connection = await app.stack.enter_async_context(
         amqp_types.Connection(app.settings.amqp_dsn),
     )
-    duffel_client = client.DuffelClient(
+    duffel_client_factory = DuffelClientFactory(
         api_base_url=app.settings.api_base_url,
         api_key=app.settings.api_key,
         version=app.settings.api_version,
         http_client=http_client,
         rate_limit_client=rate_limit_client,
+        resellers_map=app.settings.resellers_map,
     )
     offer_cache = cache.OfferCache(
         client=redis.Client[bytes](redis_connection, prefix=app.name),
@@ -71,9 +79,10 @@ async def price_quotes(  # noqa: WPS210
         transformer=pricing_transformer.PriceQuoteTransformer(
             offer_cache=offer_cache,
         ),
-        adapter=pricing_adapter.PricingAdapter(duffel_client=duffel_client),
+        adapter_factory=pricing_adapter.PricingAdapterFactory(duffel_client_factory),
         provider_company_id=app.settings.provider_company_id,
         offer_ttl=app.settings.ttl,
+        resellers_map=app.settings.resellers_map,
     ).consume()
 
 
@@ -83,25 +92,27 @@ class PriceQuoteConsumer(object):
         consumer_obj: amqp_consumer.Consumer[offers_amqp_pb2.TripPriceQuoteTask],
         producer_obj: producer.Producer,
         transformer: pricing_transformer.PriceQuoteTransformer,
-        adapter: pricing_adapter.PricingAdapter,
+        adapter_factory: pricing_adapter.PricingAdapterFactory,
         offer_cache: cache.OfferCache,
         provider_company_id: str,
         offer_ttl: datetime.timedelta,
+        resellers_map: Mapping[str, Mapping[str, Any]],
     ):
         self._pricing = pricing_adapter
         self._cache = offer_cache
         self._consumer = consumer_obj
         self._logger = stdout.get_logger()
         self._producer = producer_obj
-        self._adapter = adapter
+        self._adapter_factory = adapter_factory
         self._transformer = transformer
         self._provider_company_id = provider_company_id
         self._ttl = offer_ttl
+        self._resellers_map = resellers_map
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
 
-    async def _process_message(
+    async def _process_message(  # noqa: WPS210
         self,
         amqp_message: amqp_types.Message[offers_amqp_pb2.TripPriceQuoteTask],
     ) -> None:
@@ -109,9 +120,14 @@ class PriceQuoteConsumer(object):
 
         if not offer_details:
             return
+        adapter = self._adapter_factory.for_reseller(amqp_message.body.reseller_id)
+        reseller_config = self._resellers_map.get(amqp_message.body.reseller_id)
+        private_fares = dict_to_private_fares(
+            reseller_config.get("private_fares", {}) if reseller_config else {},
+        )
 
         last_travel_date = offer_details.last_travel_date
-        offer = await self._adapter.refresh_offer(offer_details)
+        offer = await adapter.refresh_offer(offer_details, private_fares)
         offer_details = cache.OfferDetails(
             offer_id=offer.identifier,
             total_amount=offer.total_amount,
@@ -138,7 +154,7 @@ class PriceQuoteConsumer(object):
                 option_id=amqp_message.body.option_id,
                 price_quote=self._transformer.to_price_quote(
                     price_quote_id=price_quote_id,
-                    offer=await self._adapter.get_price_quote(offer_details),
+                    offer=await adapter.get_price_quote(offer_details),
                     option_id=amqp_message.body.option_id,
                 ),
                 provider_company_id=self._provider_company_id,
