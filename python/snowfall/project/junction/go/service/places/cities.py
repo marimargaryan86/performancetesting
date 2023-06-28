@@ -61,9 +61,9 @@ def filter_location_by_type(
     }
 
     for location in locations:
-        if not unconditional.isdisjoint(location.types):  # noqa: WPS504
+        if unconditional.intersection(location.types):
             valid_locations.append(location.id)
-        elif not distance.isdisjoint(location.types):  # noqa: WPS504
+        elif distance.intersection(location.types):
             loc = (location.coordinates.longitude, location.coordinates.latitude)
             if calc_distance((longitude, latitude), loc) <= _MAX_DISTANCE_RAIL_M:
                 # It's close enough, add it.

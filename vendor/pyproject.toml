@@ -146,7 +146,6 @@ external = [
     "WPS450", # Forbid importing protected objects from modules
     "WPS465", # Forbid comparisons between bitwise and boolean expressions
     "WPS473", # Limit empty lines in functions or methods body
-    "WPS504", # Forbid negated conditions together with else clause
     "WPS508", # Forbid not with compare expressions
     "WPS509", # Forbid nesting ternary expressions in certain places
     "WPS528", # Forbid implicit .items() iterator
