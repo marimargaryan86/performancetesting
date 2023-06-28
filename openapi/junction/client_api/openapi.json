@@ -28,12 +28,6 @@
       ]
     },
     {
-      "name": "Draft",
-      "tags": [
-        "draft"
-      ]
-    },
-    {
       "name": "Internal",
       "tags": [
         "internal"
@@ -82,11 +76,6 @@
       "name": "cabins",
       "description": "Cabin class information.",
       "x-displayName": "Cabins"
-    },
-    {
-      "name": "draft",
-      "description": "Endpoints still being drafted.",
-      "x-displayName": "Draft"
     },
     {
       "name": "internal",
@@ -1626,70 +1615,6 @@
         ]
       }
     },
-    "/trips/{tripId}/prices": {
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/tripId"
-        }
-      ],
-      "get": {
-        "x-sunset": "2023-09-01",
-        "summary": "List Prices by Trip",
-        "tags": [
-          "draft"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/vnd.api+json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/PriceResource"
-                          }
-                        }
-                      },
-                      "required": [
-                        "data"
-                      ]
-                    },
-                    {
-                      "$ref": "#/components/schemas/NextLink"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          }
-        },
-        "operationId": "get-trips-id-prices",
-        "description": "Upcoming endpoint to retrieve cached offer prices for a particular trip. Not yet implemented.",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/page-cursor"
-          },
-          {
-            "$ref": "#/components/parameters/page-limit"
-          }
-        ],
-        "x-internal": true
-      }
-    },
     "/trips/searches": {
       "post": {
         "x-sunset": "2023-09-01",
@@ -2337,71 +2262,6 @@
             "$ref": "#/components/parameters/filterOffersCabinClass"
           }
         ]
-      }
-    },
-    "/offers/searches/{offerSearchId}/related": {
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/offerSearchId"
-        }
-      ],
-      "get": {
-        "summary": "List Related Searches by Offer Search",
-        "tags": [
-          "draft"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/vnd.api+json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "type": "array",
-                          "uniqueItems": true,
-                          "minItems": 0,
-                          "items": {
-                            "$ref": "#/components/schemas/RelatedSearch"
-                          }
-                        }
-                      },
-                      "required": [
-                        "data"
-                      ]
-                    },
-                    {
-                      "$ref": "#/components/schemas/NextLink"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          }
-        },
-        "operationId": "get-offers-searches-id-related",
-        "description": "Upcoming endpoint to retrieve related Offers that could be searched. Not yet implemented.",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/page-cursor"
-          },
-          {
-            "$ref": "#/components/parameters/page-limit"
-          }
-        ],
-        "x-internal": true
       }
     },
     "/offers/{offerId}": {
@@ -5318,45 +5178,6 @@
         ],
         "description": "A Coordinate represented via latitude and longitude"
       },
-      "PriceResource": {
-        "title": "PriceResource",
-        "allOf": [
-          {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string",
-                "format": "uuid",
-                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
-                "readOnly": true
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "prices"
-                ],
-                "example": "prices"
-              },
-              "attributes": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/Price"
-                  }
-                ]
-              }
-            },
-            "required": [
-              "id",
-              "type",
-              "attributes"
-            ]
-          },
-          {
-            "$ref": "#/components/schemas/SelfLink"
-          }
-        ],
-        "description": "Description of an amount in a currency."
-      },
       "Offer": {
         "title": "Offer",
         "allOf": [
@@ -6608,54 +6429,6 @@
         "type": "object",
         "description": "",
         "title": "Trip Offer Price Quote Identifier"
-      },
-      "RelatedSearch": {
-        "title": "Related Search",
-        "allOf": [
-          {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string",
-                "format": "uuid",
-                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
-                "readOnly": true
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "related-searches"
-                ],
-                "example": "related-searches"
-              },
-              "attributes": {
-                "type": "object"
-              },
-              "relationships": {
-                "type": "object",
-                "properties": {
-                  "place": {
-                    "type": "object",
-                    "properties": {
-                      "data": {
-                        "$ref": "#/components/schemas/PlaceIdentifier"
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            "required": [
-              "id",
-              "type",
-              "attributes"
-            ]
-          },
-          {
-            "$ref": "#/components/schemas/SelfLink"
-          }
-        ],
-        "description": "Not yet implemented."
       },
       "Journey": {
         "title": "Journey",
