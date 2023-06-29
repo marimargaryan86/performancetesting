@@ -110,7 +110,7 @@ AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 RESELLER_PROVIDERS={{keyOrDefault "${var.environment}/providers/reseller-providers" "{}" | toJSON }}
 {{ with secret "kv/data/${var.environment}/mock" }}
-STORAGE_DSN=s3://{{ .Data.data.aws_access_key_id }}:{{ .Data.data.aws_secret_access_key }}@/${var.bucket}/mock
+STORAGE_DSN=s3://{{ .Data.data.aws_access_key_id }}:{{ .Data.data.aws_secret_access_key | urlquery }}@/${var.bucket}/mock
 {{ end }}
 EOH
         destination = "services.env"

@@ -114,7 +114,7 @@ MONGO_DSN={{range $index, $service := service (printf "mongodb-%s" (env "NOMAD_N
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 RESELLER_PROVIDERS={{keyOrDefault "${var.environment}/providers/reseller-providers" "{}" | toJSON }}
 {{ with secret "kv/data/${var.environment}/ask2go" }}
-STORAGE_DSN=s3://{{ .Data.data.aws_access_key_id }}:{{ .Data.data.aws_secret_access_key }}@/${var.bucket}/ask2go
+STORAGE_DSN=s3://{{ .Data.data.aws_access_key_id }}:{{ .Data.data.aws_secret_access_key | urlquery }}@/${var.bucket}/ask2go
 {{ end }}
 EOH
         destination = "services.env"
