@@ -1,17 +1,20 @@
-from collections.abc import Sequence
-
 import httpx
 import pydantic
 
+from snowfall.project.junction.plus.adapter import configuration_vectors
 from snowfall.project.junction.plus.service.notification_center import importer
+from snowfall.project.junction.plus.service.notifications.v1alpha import (
+    grpc_pb2_grpc as notifications_pb2_grpc,
+)
 from snowfall.stdlib import service
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.transport.amqp import consumer, types
+from snowfall.stdlib.transport.grpc.client import create_channel
 
 
 class _ImportSettings(service.Settings):
     amqp_dsn: pydantic.AnyUrl
-    mongo_dsn: Sequence[pydantic.AnyUrl]
+    notifications_address: str
 
 
 async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
@@ -30,6 +33,11 @@ async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
             connection=connection,
             queue_name="plus_{0}".format(app.name),
             binds=[(types.Exchange("plus_events"), "plus.events")],
+        ),
+        configuration_vectors=configuration_vectors.GrpcClient(
+            configuration_vectors=notifications_pb2_grpc.ConfigurationVectorServiceStub(
+                create_channel(app.settings.notifications_address),
+            ),
         ),
     )
     await notification_event_importer.consume()
