@@ -146,11 +146,14 @@ cat <<EOF
 
 verify:
   stage: verify
+  image:
+  	name: git.snowfall.se:4567/junction/junction/service/deploy:latest
+  	entrypoint: /bin/bash
   interruptible: false
   script:
-    - exit 0
+    - /usr/local/bin/python3.11 -Wdefault /bin/main verify
   tags:
-    - shell
+    - docker
   needs:
 EOF
 # editorconfig-checker-enable
