@@ -131,7 +131,6 @@ external = [
     "WPS337", # Forbid multiline conditions
     "WPS348", # Forbid starting lines with a dot
     "WPS352", # Forbid multiline loops
-    "WPS408", # Forbid using the same logical conditions in one expression
     "WPS420", # Forbid some python keywords
     "WPS421", # Forbid calling some built-in functions
     "WPS426", # Forbid lambda inside loops

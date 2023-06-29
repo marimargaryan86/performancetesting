@@ -87,7 +87,7 @@ def _validate_prerequisite(
     payment_at: datetime.date,
 ) -> list[models.Error]:
     errors = []
-    if amount and transactions or not amount and not transactions:  # noqa: WPS408
+    if bool(amount) == bool(transactions):
         errors.extend(
             [
                 models.Error(
