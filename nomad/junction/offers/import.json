@@ -24,7 +24,7 @@
       "count": 1,
       "payer_company_id": "e084bf91-500b-4a10-8c79-a0694797d490",
       "payer_currency_code": "SEK",
-      "api_pay_base_url": "https://api.sandbox.pay.junction.dev",
+      "api_pay_base_url": "https://api.pay.sandbox.junction.dev",
       "pay_admin_api_base_url": "https://adminapi.pay.sandbox.junction.dev",
       "use_pay_for_currency_conversions": true
     }
