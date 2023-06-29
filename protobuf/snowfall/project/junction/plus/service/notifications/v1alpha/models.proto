@@ -81,3 +81,19 @@ message Subscriber {
   SubscribedStatus phone_subscription_status = 7;
   SubscribedStatus email_subscription_status = 8;
 }
+
+message ConfigurationVector {
+  string id = 1;
+  string reseller_id = 2;
+  Channel channel = 3;
+  snowfall.stdlib.v1.PhoneNumber mobile_phone = 4;
+  string email = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+enum Channel {
+  CHANNEL_UNSPECIFIED = 0;
+  CHANNEL_EMAIL = 1;
+  CHANNEL_WHATSAPP = 2;
+}

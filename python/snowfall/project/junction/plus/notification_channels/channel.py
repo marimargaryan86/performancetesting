@@ -1,8 +1,5 @@
 import abc
 
-from snowfall.project.junction.plus.service.notification_center.v1alpha import (
-    models_pb2 as notification_center_models,
-)
 from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
 
 
@@ -12,7 +9,7 @@ class AbstractChannel(abc.ABC):
         self,
         order: models_pb2.PersistedOrder,
         receiver: models_pb2.Subscriber,
-        sender_configuration: notification_center_models.ConfigurationVector,
+        sender_configuration: models_pb2.ConfigurationVector,
     ) -> None:
         """Send notification for order confirmation."""
 

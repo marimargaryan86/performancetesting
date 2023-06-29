@@ -3,13 +3,13 @@ from snowfall.project.junction.plus.adapter import validation
 from snowfall.project.junction.plus.service.notification_center.v1alpha import (
     amqp_pb2 as notif_amqp_pb2,
 )
-from snowfall.project.junction.plus.service.notification_center.v1alpha import (
-    models_pb2 as notif_models_pb2,
-)
 from snowfall.project.junction.plus.service.notifications.v1alpha import (
     grpc_pb2 as notifications_pb2,
 )
 from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
+from snowfall.project.junction.plus.service.notifications.v1alpha import (
+    models_pb2 as notifications_models_pb2,
+)
 from snowfall.project.junction.plus.service.orders_registration import validators
 from snowfall.project.junction.plus.service.orders_registration.v1alpha import amqp_pb2
 from snowfall.stdlib.logging import stdout
@@ -43,7 +43,7 @@ class OrderImporter(object):
             receiver_id=order.subscriber_id,
             body=order,
             event_type=notif_amqp_pb2.NotificationEvent.TYPE_ORDER_CONFIRMATION,
-            channel=notif_models_pb2.Channel.CHANNEL_WHATSAPP,
+            channel=notifications_models_pb2.Channel.CHANNEL_WHATSAPP,
         )
         await self._producer.publish(notification_event, "plus.events")
 

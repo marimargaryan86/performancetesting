@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package snowfall.project.junction.plus.service.notification_center.v1alpha;
 
-import "snowfall/project/junction/plus/service/notification_center/v1alpha/models.proto";
 import "snowfall/project/junction/plus/service/notifications/v1alpha/models.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/plus/service/notification_center/v1alpha";
@@ -18,5 +17,5 @@ message NotificationEvent {
     TYPE_ORDER_CONFIRMATION = 1;
   }
   Type event_type = 4;
-  snowfall.project.junction.plus.service.notification_center.v1alpha.Channel channel = 5;
+  snowfall.project.junction.plus.service.notifications.v1alpha.Channel channel = 5;
 }

@@ -3,9 +3,6 @@ import pathlib
 from twilio.rest import Client as twilioClient
 
 from snowfall.project.junction.plus.notification_channels.channel import AbstractChannel
-from snowfall.project.junction.plus.service.notification_center.v1alpha import (
-    models_pb2 as notification_center_models,
-)
 from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
 
 
@@ -16,7 +13,7 @@ class Channel(AbstractChannel):
         self,
         order: models_pb2.PersistedOrder,
         receiver: models_pb2.Subscriber,
-        sender_configuration: notification_center_models.ConfigurationVector,
+        sender_configuration: models_pb2.ConfigurationVector,
     ) -> None:
         raise NotImplementedError()
 
@@ -44,7 +41,7 @@ class ProviderChannel(Channel):
         self,
         order: models_pb2.PersistedOrder,
         receiver: models_pb2.Subscriber,
-        sender_configuration: notification_center_models.ConfigurationVector,
+        sender_configuration: models_pb2.ConfigurationVector,
     ) -> None:
         raise NotImplementedError("Method not implemented for this channel!")
 
@@ -77,7 +74,7 @@ class MockChannel(Channel):
         self,
         order: models_pb2.PersistedOrder,
         receiver: models_pb2.Subscriber,
-        sender_configuration: notification_center_models.ConfigurationVector,
+        sender_configuration: models_pb2.ConfigurationVector,
     ) -> None:
         self._sent_messages.append(
             "order: {0} from {1} to {2}".format(

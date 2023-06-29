@@ -4,7 +4,7 @@ import pymongo
 
 from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
 from snowfall.stdlib import string
-from snowfall.stdlib.persistence.mongo import repository
+from snowfall.stdlib.persistence.mongo import mixins, repository
 
 
 class OrderRepository(repository.ProtoRepository[models_pb2.PersistedOrder]):
@@ -83,3 +83,11 @@ class SubscriberRepository(repository.ProtoRepository[models_pb2.Subscriber]):
             raise RuntimeError()
 
         return subscriber
+
+
+class ConfigurationVectorRepository(
+    mixins.FindByIdMixin[models_pb2.ConfigurationVector],
+    repository.ProtoRepository[models_pb2.ConfigurationVector],
+):
+    _proto = models_pb2.ConfigurationVector
+    _indexes = (pymongo.IndexModel("reseller_id", background=True),)

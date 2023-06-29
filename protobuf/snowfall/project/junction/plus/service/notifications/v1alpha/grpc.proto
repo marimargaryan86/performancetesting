@@ -21,3 +21,15 @@ message CreateOrderRequest {
 message CreateOrderResponse {
   snowfall.project.junction.plus.service.notifications.v1alpha.PersistedOrder order = 1;
 }
+
+service ConfigurationVectorService {
+  rpc GetConfigurationVector(GetConfigurationVectorRequest) returns (GetConfigurationVectorResponse) {}
+}
+
+message GetConfigurationVectorRequest {
+  string reseller_id = 1;
+}
+
+message GetConfigurationVectorResponse {
+  snowfall.project.junction.plus.service.notifications.v1alpha.ConfigurationVector configuration_vector = 1;
+}

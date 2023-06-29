@@ -5,8 +5,12 @@ from collections.abc import Sequence
 import pydantic
 from motor import motor_asyncio
 
-from snowfall.project.junction.plus.service.notifications.grpc import OrderService
+from snowfall.project.junction.plus.service.notifications.grpc import (
+    ConfigurationVectorService,
+    OrderService,
+)
 from snowfall.project.junction.plus.service.notifications.notifications import (
+    ConfigurationVectorRepository,
     OrderRepository,
     SubscriberRepository,
 )
@@ -31,6 +35,11 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
             OrderService(
                 orders=OrderRepository(mongo.plus.orders),
                 subscribers=SubscriberRepository(mongo.plus.subscribers),
+            ),
+            ConfigurationVectorService(
+                configuration_vectors=ConfigurationVectorRepository(
+                    mongo.plus.configuration_vectors,
+                ),
             ),
         ],
     )

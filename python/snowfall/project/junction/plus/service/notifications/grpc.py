@@ -1,6 +1,7 @@
-from grpc import aio
+from grpc import StatusCode, aio
 
 from snowfall.project.junction.plus.service.notifications.notifications import (
+    ConfigurationVectorRepository,
     OrderRepository,
     SubscriberRepository,
 )
@@ -49,3 +50,42 @@ class OrderService(
         )
 
         return notifications_pb2.CreateOrderResponse(order=order)
+
+
+class ConfigurationVectorService(
+    service.Service,
+    notifications_pb2_grpc.ConfigurationVectorServiceServicer,
+):
+    def __init__(
+        self,
+        configuration_vectors: ConfigurationVectorRepository,
+    ):
+        self._configuration_vectors = configuration_vectors
+
+    def get_name(self) -> str:
+        return notifications_pb2.DESCRIPTOR.services_by_name[
+            "ConfigurationVectorService"
+        ].full_name
+
+    def register(self, server: aio.Server) -> None:
+        notifications_pb2_grpc.add_ConfigurationVectorServiceServicer_to_server(
+            self,
+            server,
+        )
+
+    async def GetConfigurationVector(  # type: ignore[override] # noqa: N802
+        self,
+        request: notifications_pb2.GetConfigurationVectorRequest,
+        context: aio.ServicerContext,
+    ) -> notifications_pb2.GetConfigurationVectorResponse:
+        configuration_vector = await self._configuration_vectors.find_by_id(
+            request.reseller_id,
+            "reseller_id",
+        )
+
+        if configuration_vector is None:
+            await context.abort(StatusCode.NOT_FOUND)
+
+        return notifications_pb2.GetConfigurationVectorResponse(
+            configuration_vector=configuration_vector,
+        )
