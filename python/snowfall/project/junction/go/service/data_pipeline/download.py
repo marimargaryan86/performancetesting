@@ -78,7 +78,7 @@ async def download_url(  # noqa: WPS210,WPS231
         suffix = "-{i}".format(i=it) if it > 0 else ""
         data_file_path = settings.path / "{n}{s}.zip".format(n=name, s=suffix)
         async with sess.stream("GET", **args) as resp:
-            if not 200 <= resp.status_code < 300:  # noqa: WPS432,WPS508
+            if not resp.is_success:
                 msg = "Error fetching {n}: {s} (auth={a}):\n{b!r}".format(
                     n=name,
                     s=resp.status_code,

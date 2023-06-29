@@ -26,7 +26,7 @@ async def sbb_plugin(  # noqa: WPS210
     )
 
     resp = await sess.get(dataset["url"])
-    if not 200 <= resp.status_code < 300:  # noqa: WPS432,WPS508
+    if not resp.is_success:
         raise RuntimeError("SBB: Lookup failed")
 
     page = resp.text

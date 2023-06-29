@@ -71,7 +71,7 @@ async def obb_plugin(  # noqa: WPS210
     dataset: Dataset,
 ) -> Iterator[dict[str, Any]]:
     resp = await sess.get(dataset["url"])
-    if not 200 <= resp.status_code < 300:  # noqa: WPS432,WPS508
+    if not resp.is_success:
         raise RuntimeError("OBB: Failed to fetch opendata.")
 
     parser = OBBParser()
