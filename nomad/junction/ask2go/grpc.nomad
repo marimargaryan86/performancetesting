@@ -101,7 +101,6 @@ job "ask2go-grpc" {
     }
     task "grpc" {
       driver = "docker"
-
       vault {
         policies = ["ask2go-${var.environment}"]
       }
