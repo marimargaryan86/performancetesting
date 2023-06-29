@@ -1,3 +1,8 @@
+variables:
+  SERVICES:
+    value: ""
+    description: "A comma-separated list of services to deploy. An empty list will deploy all services."
+
 stages:
   - generate
   - deploy
@@ -6,7 +11,7 @@ generate:
   stage: generate
   script:
     - mkdir dist
-    - ./generate-deploy-pipeline.sh "${CI_COMMIT_BRANCH}" > "dist/${CI_COMMIT_BRANCH}.yml"
+    - ./generate-deploy-pipeline.sh "${CI_COMMIT_BRANCH}" "${SERVICES}" > "dist/${CI_COMMIT_BRANCH}.yml"
   needs: []
   artifacts:
     paths:

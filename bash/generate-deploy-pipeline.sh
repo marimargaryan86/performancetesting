@@ -9,6 +9,12 @@ if [[ $DEPLOYMENT_TIER == "sandbox" ]]; then
 	DEPLOYMENT_TIER="staging"
 fi
 
+DESIRED_SERVICES=()
+
+if [ -n "${2:+x}" ]; then
+	IFS="," read -r -a DESIRED_SERVICES <<<"$2"
+fi
+
 # editorconfig-checker-disable
 cat <<EOF
 stages:
@@ -75,6 +81,12 @@ for DIR in templates/*; do
 	if [ -n "${CI_COMMIT_BEFORE_SHA+x}" ] && [ "${CI_COMMIT_BEFORE_SHA}" != "0000000000000000000000000000000000000000" ]; then
 		if ! git diff --name-only -r "${CI_COMMIT_BEFORE_SHA}" "${CI_COMMIT_SHA}" | grep -q "^${DIR}\/"; then
 			echo >&2 "skip: no changed files in \"${DIR}\""
+			continue
+		fi
+	elif [ ${#DESIRED_SERVICES[@]} -ne 0 ]; then
+		# shellcheck disable=SC2076
+		if [[ ! " ${DESIRED_SERVICES[*]} " =~ " ${service_name} " ]]; then
+			echo >&2 "skip: not included in services list"
 			continue
 		fi
 	fi
