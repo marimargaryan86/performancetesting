@@ -65,17 +65,14 @@ def json2xml(
 ) -> str:
     result_list = []
 
-    json_obj_type = type(json_obj)
-
-    if json_obj_type is list:
+    if isinstance(json_obj, list):
         for sub_elem in json_obj:
             result_list.append(json2xml(sub_elem, line_padding))
 
         return "\n".join(result_list)
 
-    if json_obj_type is dict:
-        for tag_name in json_obj:  # noqa: WPS528
-            sub_obj = json_obj[tag_name]
+    if isinstance(json_obj, dict):
+        for tag_name, sub_obj in json_obj.items():
             result_list.append("{0}<{1}>".format(line_padding, tag_name))
             result_list.append(json2xml(sub_obj, line_padding))
             result_list.append("{0}</{1}>".format(line_padding, tag_name))
