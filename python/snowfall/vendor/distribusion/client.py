@@ -1,3 +1,4 @@
+import asyncio
 import contextlib
 import http
 import inspect
@@ -18,6 +19,7 @@ from snowfall.vendor.distribusion.models import (
     orders,
     stations,
 )
+from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
 
 def _get_response_error_message(response: httpx.Response) -> str:
@@ -38,12 +40,13 @@ def _get_response_error_message(response: httpx.Response) -> str:
 
 
 class DistribusionClient(object):  # noqa: WPS214
-    def __init__(
+    def __init__(  # noqa: WPS211
         self,
         api_base_url: str,
         api_key: str,
         retailer_partner_number: str,
         http_client: httpx.AsyncClient,
+        rate_limit_client: RateLimitClient | None = None,
     ) -> None:
         self._api_base_url = httpx.URL(api_base_url).copy_with(path="/retailers/v4")
         self._api_key = api_key
@@ -51,6 +54,7 @@ class DistribusionClient(object):  # noqa: WPS214
         self._http_client = http_client
         self._http_client.base_url = self._api_base_url
         self._logger = stdout.get_logger()
+        self._rate_limit_client = rate_limit_client
 
     async def get_marketing_carriers(self) -> list[marketing_carriers.MarketingCarrier]:
         response = await self._make_request(
@@ -136,6 +140,7 @@ class DistribusionClient(object):  # noqa: WPS214
     async def find_connections(
         self,
         criteria: criterias.FindConnectionsCriteria,
+        rate_limit_timeout: float = 30,
     ) -> list[connections.Connection]:
         query_params = {
             "locale": criteria.locale,
@@ -165,6 +170,7 @@ class DistribusionClient(object):  # noqa: WPS214
             "GET",
             "/connections/find",
             query_params=query_params,
+            rate_limit_timeout=rate_limit_timeout,
         )
 
         return [
@@ -201,6 +207,7 @@ class DistribusionClient(object):  # noqa: WPS214
     async def get_connection_vacancy(
         self,
         criteria: criterias.ConnectionVacancyCriteria,
+        rate_limit_timeout: float = 60,
     ) -> connections.ConnectionVacancy:
         query_params = {
             "marketing_carrier": criteria.marketing_carrier,
@@ -228,6 +235,7 @@ class DistribusionClient(object):  # noqa: WPS214
             "GET",
             "/connections/vacancy",
             query_params,
+            rate_limit_timeout=rate_limit_timeout,
         )
 
         return connections.ConnectionVacancy(
@@ -258,6 +266,7 @@ class DistribusionClient(object):  # noqa: WPS214
     async def create_order(
         self,
         criteria: criterias.CreateOrder,
+        rate_limit_timeout: float = 60,
     ) -> orders.OrderCreateResponse:
         response = await self._make_request(
             "POST",
@@ -295,16 +304,22 @@ class DistribusionClient(object):  # noqa: WPS214
                     for passenger in criteria.passengers
                 ],
             },
+            rate_limit_timeout=rate_limit_timeout,
         )
 
         return orders.OrderCreateResponse(
             **jsonapi_helpers.flatten_object(response.json()),
         )
 
-    async def get_order(self, order_id: str) -> orders.OrderResponse:
+    async def get_order(
+        self,
+        order_id: str,
+        rate_limit_timeout: float = 60,
+    ) -> orders.OrderResponse:
         response = await self._make_request(
             "GET",
             "/orders/{order_id}".format(order_id=order_id),
+            rate_limit_timeout=rate_limit_timeout,
         )
 
         return orders.OrderResponse(**jsonapi_helpers.flatten_object(response.json()))
@@ -347,13 +362,21 @@ class DistribusionClient(object):  # noqa: WPS214
             **jsonapi_helpers.flatten_object(response.json()),
         )
 
-    async def _make_request(
+    async def _make_request(  # noqa: WPS211
         self,
         method: str,
         path: str,
         query_params: Mapping[str, Any] | None = None,
         payload: Any | None = None,
+        rate_limit_timeout: float = 60,
     ) -> httpx.Response:
+        if self._rate_limit_client:
+            try:
+                await self._rate_limit_client.rate_limit(timeout=rate_limit_timeout)
+            except asyncio.TimeoutError as timeout_exc:
+                raise errors.AsyncTimeOutError(
+                    inspect.getdoc(timeout_exc),
+                ) from timeout_exc
         try:
             response = await self._http_client.request(
                 method=method,

@@ -4,3 +4,7 @@ class DistribusionError(Exception):
 
 class ServiceError(DistribusionError):
     """Raised when the Distribusion service is unhealthy."""
+
+
+class AsyncTimeOutError(DistribusionError):
+    """Raised when the async function exceeds the timeout duration."""

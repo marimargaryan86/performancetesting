@@ -14,13 +14,14 @@ from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.vendor.distribusion import client
 from snowfall.vendor.distribusion.models import connections, criterias
+from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
 
 class NoPricingError(Exception):
     """Raised when a failed pricing result is received."""
 
 
-async def price_quotes(
+async def price_quotes(  # noqa: WPS210
     app: service.AsyncApplication[config.PricingSettings],
 ) -> None:
     http_client = await app.stack.enter_async_context(
@@ -30,6 +31,12 @@ async def price_quotes(
     )
     logging.register(http_client)
     metrics.register(http_client)
+    rate_limit_client = await app.stack.enter_async_context(
+        RateLimitClient(
+            app.settings.rate_limiter_grpc_host,
+            app.settings.rate_limiter_service_configs["distribusion"],
+        ),
+    )
     redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
         aioredis.from_url(
             app.settings.redis_dsn[0],
@@ -41,6 +48,7 @@ async def price_quotes(
         api_key=app.settings.api_key,
         retailer_partner_number=app.settings.retailer_partner_number,
         http_client=http_client,
+        rate_limit_client=rate_limit_client,
     )
     amqp_connection = await app.stack.enter_async_context(
         types.Connection(app.settings.amqp_dsn),

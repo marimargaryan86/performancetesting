@@ -20,6 +20,7 @@ from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import types
 from snowfall.vendor.distribusion import client
 from snowfall.vendor.distribusion.models import criterias
+from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
 _OFFERS = "offers"
 
@@ -43,12 +44,19 @@ async def offers_factory(
     )
     logging.register(http_client)
     metrics.register(http_client)
+    rate_limit_client = await stack.enter_async_context(
+        RateLimitClient(
+            app.settings.rate_limiter_grpc_host,
+            app.settings.rate_limiter_service_configs["distribusion"],
+        ),
+    )
 
     distribusion_client = client.DistribusionClient(
         api_base_url=app.settings.api_base_url,
         api_key=app.settings.api_key,
         retailer_partner_number=app.settings.retailer_partner_number,
         http_client=http_client,
+        rate_limit_client=rate_limit_client,
     )
     distribusion_adapter = adapter.DistribusionSearchAdapter(
         distribusion_client=distribusion_client,

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 import os
+from unittest import mock
 
 import httpx
 import pytest
@@ -14,6 +15,7 @@ from snowfall.project.junction.service.providers.distribusion.search.adapter imp
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.vendor.distribusion import client
 from snowfall.vendor.distribusion.httpx_logger import with_logging
+from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
 TIMEOUT = 10.0
 API_BASE_URL = "https://api.demo.distribusion.com"
@@ -31,11 +33,18 @@ def http_client() -> httpx.AsyncClient:
 
 @pytest.fixture()
 def distribusion_client(http_client: httpx.AsyncClient) -> client.DistribusionClient:
+    mock_rate_limit_client = mock.create_autospec(
+        RateLimitClient,
+        spec_set=True,
+        instance=True,
+    )
+
     return client.DistribusionClient(
         api_base_url=API_BASE_URL,
         api_key="MkQQ6J6BO2ooqwZYpM6fUmDu6rGwWXP1obaQuITo",
         retailer_partner_number="431926",
         http_client=http_client,
+        rate_limit_client=mock_rate_limit_client,
     )
 
 

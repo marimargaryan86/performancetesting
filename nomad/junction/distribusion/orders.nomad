@@ -74,7 +74,14 @@ job "distribusion-orders" {
       tags = ["metrics"]
 
       connect {
-        sidecar_service {}
+        sidecar_service {
+          proxy {
+            upstreams {
+              local_bind_port  = 9081
+              destination_name = "rate-limiter-grpc-${var.environment}"
+            }
+          }
+        }
       }
 
       check {
@@ -93,6 +100,8 @@ job "distribusion-orders" {
 
       template {
         data        = <<EOH
+RATE_LIMITER_GRPC_HOST={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_rate-limiter-grpc-${var.environment}"))}}
+RATE_LIMITER_SERVICE_CONFIGS={{keyOrDefault "${var.environment}/providers/distribusion/rate-limiter-service-configs" "{}" | toJSON }}
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 SMTP_DSN={{range $index, $service := service "smtp"}}smtp://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}{{end}}
