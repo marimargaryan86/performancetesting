@@ -148,7 +148,8 @@ verify:
   stage: verify
   image:
     name: git.snowfall.se:4567/junction/junction/service/deploy:latest
-    entrypoint: /bin/bash
+    entrypoint:
+      - /bin/bash
   interruptible: false
   script:
     - /usr/local/bin/python3.11 -Wdefault /bin/main verify
