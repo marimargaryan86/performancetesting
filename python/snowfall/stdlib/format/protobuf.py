@@ -184,9 +184,9 @@ _EnumValue = TypeVar("_EnumValue", bound=int)
 
 
 def slug_to_enum_value(
-    enum: enum_type_wrapper._EnumTypeWrapper[_EnumValue],  # noqa: WPS437
+    enum: enum_type_wrapper._EnumTypeWrapper[_EnumValue],  # noqa: SLF001
     name: str,
-) -> _EnumValue:  # noqa: WPS437
+) -> _EnumValue:
     enum_name = "{0}_{1}".format(
         string.to_snake(enum.DESCRIPTOR.name).upper(),
         name.replace("-", "_").upper(),

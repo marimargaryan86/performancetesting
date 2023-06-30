@@ -104,9 +104,8 @@ class UserResource(models.Resource):
         user: Mapping[str, Any],
     ) -> UserResource:
         attributes = {}
-        for field in user.keys():
+        for field, attribute in user.items():
             camel_field = string.to_lower_camel(field)
-            attribute = user[field]
             if camel_field == "phone":
                 attributes[camel_field] = attribute["e164_number"]
             elif camel_field == "dateOfBirth":

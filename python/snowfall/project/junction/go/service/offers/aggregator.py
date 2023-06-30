@@ -31,17 +31,17 @@ def generate_offer_aggregates(
     expires_at: datetime.datetime,
 ) -> list[models_pb2.OfferAggregateMapping]:
     offer_ids_to_segment_ids = collections.defaultdict(list)
-    for segment_id in segment_ids_to_offer_ids.keys():
-        for offer_id in segment_ids_to_offer_ids[segment_id]:
+    for segment_id, offer_ids in segment_ids_to_offer_ids.items():
+        for offer_id in offer_ids:
             offer_ids_to_segment_ids[offer_id].append(segment_id)
 
     return [
         models_pb2.OfferAggregateMapping(
             id=string.uuid(),
             expires_at=protobuf.datetime_to_protobuf(expires_at),
-            offer_result_ids=offer_ids,
+            offer_result_ids=offer_result_ids,
         )
-        for offer_ids in generate_offer_aggregates_recursive(
+        for offer_result_ids in generate_offer_aggregates_recursive(
             segment_ids=list(segment_ids_to_offer_ids),
             segment_ids_to_offer_ids=segment_ids_to_offer_ids,
             offer_ids_to_segment_ids=offer_ids_to_segment_ids,

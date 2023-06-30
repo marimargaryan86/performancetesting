@@ -326,7 +326,7 @@ async def places_repository(
     places_repo = repository.PlacesRepository(
         mongo_test_db["places"],
     )
-    await places_repo._collection.insert_many(places_fixture)  # noqa: WPS437
+    await places_repo._collection.insert_many(places_fixture)  # noqa: SLF001
     return places_repo
 
 

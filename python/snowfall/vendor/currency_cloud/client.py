@@ -118,11 +118,11 @@ def encode_arrays(
     if payload is not None:
         encoded_payload = {}
 
-        for key in payload.keys():
-            if isinstance(payload[key], list):
-                encoded_payload["{0}[]".format(key)] = payload[key]
+        for payload_key, payload_value in payload.values():
+            if isinstance(payload_value, list):
+                encoded_payload["{0}[]".format(payload_key)] = payload_value
             else:
-                encoded_payload[key] = payload[key]
+                encoded_payload[payload_key] = payload_value
 
         return encoded_payload
     return None

@@ -105,7 +105,7 @@ async def _generate_report(  # noqa: WPS210
                 "status": (
                     "failed"
                     if {booking["status"]["id"] for booking in bookings}.difference(
-                        orders._SUCCESS_STATUSES,  # noqa: WPS437
+                        orders._SUCCESS_STATUSES,  # noqa: SLF001
                     )
                     else "success"
                 ),

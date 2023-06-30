@@ -36,7 +36,7 @@ async def test_rates_limit_was_under_limit() -> None:
     client = RateLimitClient("dummy_host:1111", config)
 
     with mock.patch.object(
-        client._stub,  # noqa: WPS437
+        client._stub,  # noqa: SLF001
         "GetRateLimits",
         new=mock.AsyncMock(),
     ) as mock_obj:
@@ -51,7 +51,7 @@ async def test_rates_limit_was_over_limit() -> None:
     first_resp = create_response("OVER_LIMIT", 1)
     second_resp = create_response("UNDER_LIMIT")
     with mock.patch.object(
-        client._stub,  # noqa: WPS437
+        client._stub,  # noqa: SLF001
         "GetRateLimits",
         new=mock.AsyncMock(),
     ) as mock_obj:
@@ -65,7 +65,7 @@ async def test_rates_limit_raises_an_exception() -> None:
     client = RateLimitClient("dummy_host:1111", config)
 
     with mock.patch.object(
-        client._stub,  # noqa: WPS437
+        client._stub,  # noqa: SLF001
         "GetRateLimits",
         new=mock.AsyncMock(),
     ) as mock_obj:
@@ -83,7 +83,7 @@ async def test_rate_limit_raises_smaller_reset(
     sleep = asyncio.sleep
 
     with mock.patch.object(
-        client._stub,  # noqa: WPS437
+        client._stub,  # noqa: SLF001
         "GetRateLimits",
         new=mock.AsyncMock(),
     ) as mock_obj:
@@ -104,7 +104,7 @@ async def test_rate_limit_no_timeout(
     client = RateLimitClient("dummy_host:1111", config)
 
     with mock.patch.object(
-        client._stub,  # noqa: WPS437
+        client._stub,  # noqa: SLF001
         "GetRateLimits",
         new=mock.AsyncMock(),
     ) as mock_obj:

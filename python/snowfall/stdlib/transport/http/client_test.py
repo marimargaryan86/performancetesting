@@ -22,7 +22,7 @@ async def test_http_status_error(
     )
 
     with pytest.raises(errors.HttpStatusError) as exc:
-        await http_client._make_request(  # noqa: WPS437
+        await http_client._make_request(  # noqa: SLF001
             client.RequestOptions(method="GET", path="/hello", query={"a": "24"}),
         )
 
@@ -40,7 +40,7 @@ async def test_empty_title_error_message(
     )
 
     with pytest.raises(errors.HttpStatusError) as exc:
-        await http_client._make_request(  # noqa: WPS437
+        await http_client._make_request(  # noqa: SLF001
             client.RequestOptions(method="POST", path="/hello", payload={"a": 24}),
         )
 
@@ -57,7 +57,7 @@ async def test_default_error_message(
     )
 
     with pytest.raises(errors.RequestError) as exc:
-        await http_client._make_request(  # noqa: WPS437
+        await http_client._make_request(  # noqa: SLF001
             client.RequestOptions(
                 method="PATCH",
                 path="/hello",
@@ -78,7 +78,7 @@ async def test_timeout_error_message(
     )
 
     with pytest.raises(errors.TimeOutError) as exc:
-        await http_client._make_request(  # noqa: WPS437
+        await http_client._make_request(  # noqa: SLF001
             client.RequestOptions(method="DELETE", path="/hello"),
         )
 

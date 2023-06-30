@@ -105,7 +105,7 @@ translations = {
     ),
     "top_info": _(
         (
-            "<strong>Your Travel certificate – Identification (for us to see that you"
+            "<strong>Your Travel certificate - Identification (for us to see that you"
             " have a ticket)</strong><br>All you need to have with you aboard is a"
             " valid identification with picture.<br><br><strong>Travel information -"
             " Mail and SMS (to facilitate your trip)</strong><br>Your travel"
@@ -128,7 +128,7 @@ translations = {
     ),
     "top_info_short": _(
         (
-            "<strong>Your Travel certificate – Identification (for us to see that you"
+            "<strong>Your Travel certificate - Identification (for us to see that you"
             " have a ticket)</strong><br>All you need to have with you aboard is a"
             " valid identification with picture."
         ),
@@ -181,12 +181,11 @@ translations = {
     ),
     "booking_confirmation_offer_box_1_txt2": _(
         (
-            'Go to <a href="https://uber.com/app">uber.com/app</a> and use this code to'
-            " utulise this offer and to book your first ride. You’ll also recieve this"
-            " code"
-            " by text message when you’re approaching your final destination if you"
-            " prefer"
-            " to book your taxi then. The taxi ride has to be made by August 15, 2016."
+            'Go to <a href="https://uber.com/app">uber.com/app</a> and use this code'
+            " to utulise this offer and to book your first ride. You'll also recieve"
+            " this code by text message when you're approaching your final destination"
+            " if you prefer to book your taxi then. The taxi ride has to be made by"
+            " August 15, 2016."
         ),
     ),
     "booking_confirmation_offer_box_1_txt3": _(
@@ -300,10 +299,10 @@ translations = {
     "referral_link": _(" http://snowfall.se/en/refer/"),
     "travel_conditions_txt": _(
         (
-            "Split EXPRESS (SWEDEN) AB´s and the passenger´s rights and obligations are"
-            " governed by the provisions of the EUROPEAN PARLIAMENT AND COUNCIL"
+            "Split EXPRESS (SWEDEN) AB's and the passenger's rights and obligations"
+            " are governed by the provisions of the EUROPEAN PARLIAMENT AND COUNCIL"
             " REGULATION (EC) No 1371/2007 of 23 October 2007 on the rights and"
-            " obligations of passengers, and Split EXPRESS (SWEDEN) AB´s General"
+            " obligations of passengers, and Split EXPRESS (SWEDEN) AB's General"
             " conditions for the transport of passengers by rail. Please contact <a"
             ' href="mailto:kundservice@snowfallexpress.se"'
             ' style="color:#ce0506;">kundservice@snowfallexpress.se</a> for questions'

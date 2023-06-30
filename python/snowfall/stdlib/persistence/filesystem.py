@@ -41,7 +41,7 @@ class Storage(object):
         self._base_path = base_path or pathlib.Path("")
 
     async def boot(self) -> None:
-        await self._filesystem._makedirs(  # noqa: WPS437
+        await self._filesystem._makedirs(  # noqa: SLF001
             str(self._base_path),
             exist_ok=True,
         )
@@ -50,7 +50,7 @@ class Storage(object):
         file_path = self._base_path.joinpath(path)
 
         try:
-            await self._filesystem._pipe(str(file_path), file_contents)  # noqa: WPS437
+            await self._filesystem._pipe(str(file_path), file_contents)  # noqa: SLF001
         except FileNotFoundError as err:
             raise NotFoundError() from err
 
@@ -143,7 +143,7 @@ def package_path(package: str) -> pathlib.Path:
     if spec is None:
         raise RuntimeError()
 
-    mod = modules.get(package) or _bootstrap._load(spec)  # noqa: WPS437
+    mod = modules.get(package) or _bootstrap._load(spec)  # noqa: SLF001
 
     if mod is None:
         raise RuntimeError()

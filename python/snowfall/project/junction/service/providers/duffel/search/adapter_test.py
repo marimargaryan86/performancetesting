@@ -204,7 +204,7 @@ def test_adapter_cache_generate(fares: Mapping[str, Sequence[PrivateFare]]) -> N
         "QF-corporate_code-C1\x00tracking_reference-TR1\x00tour_code-None\x00fare_type-None\x00corporate_code-C2\x00tracking_reference-TR2\x00tour_code-None\x00fare_type-None",
         "TF-corporate_code-C1\x00tracking_reference-TR1\x00tour_code-None\x00fare_type-None\x00corporate_code-C2\x00tracking_reference-TR2\x00tour_code-None\x00fare_type-None",
     ]
-    assert adapter._generate_private_fares_keys(fares) == expected  # noqa: WPS437
+    assert adapter._generate_private_fares_keys(fares) == expected  # noqa: SLF001
 
 
 async def test_private_fares_and_specific_token(

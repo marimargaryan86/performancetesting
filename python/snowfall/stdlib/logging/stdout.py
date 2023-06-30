@@ -36,7 +36,7 @@ capture_logs = structlog.testing.capture_logs
 
 
 def get_logger() -> Logger:
-    _, caller_name = structlog._frames._find_first_app_frame_and_name(  # noqa: WPS437
+    _, caller_name = structlog._frames._find_first_app_frame_and_name(  # noqa: SLF001
         additional_ignores=["snowfall.stdlib.logging.stdout"],
     )
 
@@ -142,7 +142,7 @@ def _configure_standard_logger(
 ) -> None:
     log_handler = processors.get_log_handler(common_processors)
     logging.basicConfig(
-        format="%(message)s",  # noqa: WPS323
+        format="%(message)s",
         level=level,
         handlers=[log_handler],
     )
