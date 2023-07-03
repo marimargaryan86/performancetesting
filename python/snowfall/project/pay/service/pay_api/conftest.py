@@ -1,5 +1,4 @@
 import asyncio
-import base64
 import datetime
 import pathlib
 from collections.abc import AsyncIterator, Mapping, Sequence
@@ -7,8 +6,6 @@ from unittest import mock
 
 import httpx
 import pytest
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import rsa
 from fakeredis import aioredis as fakeredis
 from motor import motor_asyncio
 from starlette import applications
@@ -40,8 +37,9 @@ from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import (
 )
 from snowfall.service.authentication.v1.models_pb2 import User
 from snowfall.stdlib import money, string
-from snowfall.stdlib.format.jwt import Encoder
+from snowfall.stdlib.format import jwt
 from snowfall.stdlib.integration.starlette import application, handlers
+from snowfall.stdlib.integration.starlette import authentication as stdlib_auth
 from snowfall.stdlib.persistence import cursor, filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.vendor.currency_cloud.client import PaymentClient
@@ -65,42 +63,17 @@ def quotations_ids() -> list[str]:
     ]
 
 
-@pytest.fixture()
-def rsa_private_key() -> rsa.RSAPrivateKey:
-    public_exponent = 65537
-    key_size = 2048
-    return rsa.generate_private_key(
-        public_exponent=public_exponent,
-        key_size=key_size,
-    )
+async def mock_jwt_to_user_id(token: str) -> str:
+    return authenticator.LegacyAuth(jwt.Decoder()).get_user_id_from_jwt(token)
 
 
 @pytest.fixture()
-def private_key(rsa_private_key: rsa.RSAPrivateKey) -> str:
-    encrypted_pem_private_key = rsa_private_key.private_bytes(
-        encoding=serialization.Encoding.PEM,
-        format=serialization.PrivateFormat.TraditionalOpenSSL,
-        encryption_algorithm=serialization.NoEncryption(),
-    )
-    return encrypted_pem_private_key.decode()
-
-
-@pytest.fixture()
-def public_key(rsa_private_key: rsa.RSAPrivateKey) -> str:
-    pem_public_key = rsa_private_key.public_key().public_bytes(
-        encoding=serialization.Encoding.PEM,
-        format=serialization.PublicFormat.SubjectPublicKeyInfo,
-    )
-    return pem_public_key.decode()
-
-
-@pytest.fixture()
-def custom_middlewares(public_key: str) -> Sequence[Middleware]:
+def custom_middlewares() -> Sequence[Middleware]:
     return [
         Middleware(
             authentication.AuthenticationMiddleware,
-            backend=authenticator.Authenticator(
-                public_key_content=base64.b64encode(public_key.encode()).decode(),
+            backend=stdlib_auth.JWTAuthenticationBackend(
+                jwt_to_user_id=mock_jwt_to_user_id,
             ),
             on_error=handlers.auth_error_handler,
         ),
@@ -428,18 +401,11 @@ def payment_client() -> payments.Client:
 
 
 @pytest.fixture()
-def jwt_token(private_key: str) -> str:
-    jwt_encoder = Encoder(
-        private_key=base64.b64encode(private_key.encode()).decode(),
-        algorithm="RS256",
-    )
-    jwt_factory = JWTFactory(
-        ttl=datetime.timedelta(hours=1),
-    )
-    user = User(email="example@example.com", id=string.uuid())
-
-    return jwt_encoder.encode(
-        jwt_factory.from_user(user),
+def jwt_token() -> str:
+    return jwt.Encoder().encode(
+        JWTFactory(
+            ttl=datetime.timedelta(hours=1),
+        ).from_user(User(email="example@example.com", id=string.uuid())),
     )
 
 

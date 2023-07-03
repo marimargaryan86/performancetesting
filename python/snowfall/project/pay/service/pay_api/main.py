@@ -8,7 +8,7 @@ from redis import asyncio as aioredis
 from starlette import applications
 from starlette.middleware import Middleware, authentication
 
-from snowfall.adapter import authentication as auth
+from snowfall.adapter import authentication as auth_adapter
 from snowfall.project.junction.go.adapter import errors
 from snowfall.project.pay.adapter import accounts as accounts_adapter
 from snowfall.project.pay.adapter import companies as companies_adapter
@@ -40,9 +40,11 @@ from snowfall.project.pay.service.payments.v1alpha.payments_pb2_grpc import (
 from snowfall.project.pay.service.transactions.v1alpha import (
     grpc_pb2_grpc as transactions_pb2_grpc,
 )
-from snowfall.service.authentication.v1 import authentication_pb2_grpc
+from snowfall.service.authentication.v1 import authentication_pb2_grpc, oauth_pb2_grpc
 from snowfall.stdlib import service
+from snowfall.stdlib.format import jwt
 from snowfall.stdlib.integration.starlette import application, handlers
+from snowfall.stdlib.integration.starlette import authentication as stdlib_auth
 from snowfall.stdlib.persistence import cursor, filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.grpc.client import create_channel
@@ -78,6 +80,9 @@ def _factory(
             prefix=app.name,
         )
 
+        authentication_channel = create_channel(
+            app.settings.authentication_address,
+        )
         transactions_channel = create_channel(
             app.settings.transactions_address,
         )
@@ -88,8 +93,26 @@ def _factory(
             custom_middlewares=[
                 Middleware(
                     authentication.AuthenticationMiddleware,
-                    backend=authenticator.Authenticator(
-                        public_key_content=app.settings.jwt_public_key,
+                    backend=stdlib_auth.JWTAuthenticationBackend(
+                        stdlib_auth.OryAuth(
+                            jwk_client=jwt.AsyncJWKClient(
+                                jwk_url=auth_adapter.get_jwk_url(
+                                    app.settings.authentication_address,
+                                ),
+                                key_ttl=app.settings.ory_jwk_ttl,
+                            ),
+                            legacy_fallback=authenticator.LegacyAuth(
+                                decoder=jwt.Decoder(
+                                    public_key=app.settings.jwt_public_key,
+                                    algorithms=["RS256"],
+                                ),
+                            ).get_user_id_from_jwt,
+                            client_resolver=auth_adapter.oauth_client_resolver(
+                                oath_client=oauth_pb2_grpc.OAuthServiceStub(
+                                    authentication_channel,
+                                ),
+                            ),
+                        ).get_owner_from_jwt,
                     ),
                     on_error=handlers.auth_error_handler,
                 ),
@@ -196,8 +219,26 @@ def _admin_factory(
             custom_middlewares=[
                 Middleware(
                     authentication.AuthenticationMiddleware,
-                    backend=authenticator.Authenticator(
-                        public_key_content=app.settings.jwt_public_key,
+                    backend=stdlib_auth.JWTAuthenticationBackend(
+                        stdlib_auth.OryAuth(
+                            jwk_client=jwt.AsyncJWKClient(
+                                jwk_url=auth_adapter.get_jwk_url(
+                                    app.settings.authentication_address,
+                                ),
+                                key_ttl=app.settings.ory_jwk_ttl,
+                            ),
+                            legacy_fallback=authenticator.LegacyAuth(
+                                decoder=jwt.Decoder(
+                                    public_key=app.settings.jwt_public_key,
+                                    algorithms=["RS256"],
+                                ),
+                            ).get_user_id_from_jwt,
+                            client_resolver=auth_adapter.oauth_client_resolver(
+                                oath_client=oauth_pb2_grpc.OAuthServiceStub(
+                                    authentication_channel,
+                                ),
+                            ),
+                        ).get_owner_from_jwt,
                     ),
                     on_error=handlers.auth_error_handler,
                 ),
@@ -205,7 +246,7 @@ def _admin_factory(
             routes=router.get_admin_routes(
                 bootstrap.create_admin_dependencies(
                     cc_payment_client=cc_payment_client,
-                    authentication_client=auth.GrpcClient(
+                    authentication_client=auth_adapter.GrpcClient(
                         authentication_pb2_grpc.AuthenticationServiceStub(
                             authentication_channel,
                         ),

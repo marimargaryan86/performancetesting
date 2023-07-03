@@ -1,3 +1,4 @@
+import datetime
 from collections.abc import Sequence
 
 import lagom
@@ -34,22 +35,14 @@ class Settings(application.Settings):
     authentication_address: str
     transactions_address: str
     jwt_public_key: str
+    ory_jwk_ttl: datetime.timedelta = datetime.timedelta(hours=1)
     mongo_dsn: Sequence[AnyUrl]
     redis_dsn: Sequence[AnyUrl]
 
 
-class AdminSettings(application.Settings):
-    cc_login: str
-    cc_api_key: str
-    cc_address: str
-    authentication_address: str
+class AdminSettings(Settings):
     companies_address: str
     payments_address: str
-    transactions_address: str
-    jwt_public_key: str
-    mongo_dsn: Sequence[AnyUrl]
-    redis_dsn: Sequence[AnyUrl]
-    currencies_address: str
 
 
 def create_admin_dependencies(  # noqa: WPS211

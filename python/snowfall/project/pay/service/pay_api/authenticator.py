@@ -1,34 +1,34 @@
 import jwt as jwtlib
-from starlette import authentication, requests
+from starlette import authentication
 
 from snowfall.stdlib.format import jwt
 
 
-class Authenticator(jwt.Decoder):
-    def __init__(self, public_key_content: str):
-        super().__init__(public_key_content, ["RS256"])
-
-    async def authenticate(
+class LegacyAuth(object):
+    def __init__(
         self,
-        conn: requests.HTTPConnection,
-    ) -> tuple[authentication.AuthCredentials, authentication.BaseUser] | None:
-        jwt_token = conn.scope["security"].get("jwt")
-        if not jwt_token:
-            return (
-                authentication.AuthCredentials(),
-                authentication.UnauthenticatedUser(),
+        decoder: jwt.Decoder,
+    ):
+        self._decoder = decoder
+
+    def get_user_id_from_jwt(self, token: str) -> str:
+        try:
+            payload = self._decoder.decode(token)
+        except jwtlib.PyJWTError as err:
+            raise authentication.AuthenticationError("Invalid jwt token.") from err
+
+        user_info = payload.get("user_info")
+
+        if not user_info:
+            raise authentication.AuthenticationError(
+                "Wrong version of jwt token. Refresh your token.",
             )
 
-        try:
-            decoded = self.decode(jwt_token)
-        except jwtlib.exceptions.ExpiredSignatureError as err:
-            raise authentication.AuthenticationError(str(err)) from err
-        except jwtlib.exceptions.DecodeError as err:
-            # TODO: does not handle the exception proeprly (like not showing the err msg)
-            raise authentication.AuthenticationError("Invalid JWT token") from err
+        user_id = user_info.get("id")
 
-        client_id: str = decoded["user_info"]["id"]
+        if not user_info:
+            raise authentication.AuthenticationError(
+                "Wrong version of jwt token. Refresh your token.",
+            )
 
-        return authentication.AuthCredentials(
-            ["authenticated"],
-        ), authentication.SimpleUser(client_id)
+        return user_id
