@@ -3,6 +3,7 @@ stages:
   - test
   - package
   - deploy
+  - schedule
 
 variables:
   ARTIFACT_COMPRESSION_LEVEL: fastest
@@ -87,3 +88,12 @@ misc:validate:
     NOMAD_VAR_registry_address: "${CI_REGISTRY}"
     NOMAD_VAR_registry_password: "${CI_REGISTRY_PASSWORD}"
     NOMAD_VAR_registry_username: "${CI_REGISTRY_USER}"
+
+schedule:post-git-changelog:
+  stage: schedule
+  image: "${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG}"
+  script:
+    - ./bash/post-git-changelog.sh
+  interruptible: false
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $SCHEDULED_JOB == "post-git-changelog"'

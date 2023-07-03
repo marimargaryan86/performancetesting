@@ -7,15 +7,15 @@ body = """
     | filter(attribute="scope")
     | sort(attribute="scope") %}
         - _({{commit.scope}})_{% if commit.breaking %} [*breaking*]{% endif %} \
-            [{{ commit.message | upper_first }}](https://git.snowfall.se/junction/junction/-/commit/{{ commit.id }}) \
+            <https://git.snowfall.se/junction/junction/-/commit/{{ commit.id }}|{{ commit.message | upper_first }}> \
             by {{ commit.author.name }} \
             {% for footer in commit.footers | filter(attribute="token", value="Closes") -%}
                 {%- set parts = footer.value | split(pat="#") -%}
-                ([{{ footer.value }}](https://git.snowfall.se/{{ parts[0] }}/-/issues/{{ parts[1] }}))
+                (<https://git.snowfall.se/{{ parts[0] }}/-/issues/{{ parts[1] }}|{{ footer.value }}>)
             {%- endfor -%}
     {%- endfor -%}
-    {% raw %}\n{% endraw %}
-{% endfor %}\n
+    {% raw %}\n{% endraw -%}
+{% endfor %}
 """
 trim = true
 footer = ""
@@ -25,17 +25,17 @@ conventional_commits = true
 filter_unconventional = true
 split_commits = false
 commit_parsers = [
-    { message = "^feat", group = "<!-- a -->⛰️  Features", default_scope = "uncategorized" },
+    { message = "^feat", group = "<!-- a -->⛰️ Features", default_scope = "uncategorized" },
     { message = "^fix", group = "<!-- b -->🐛 Bug Fixes", default_scope = "uncategorized"  },
     { message = "^refactor", group = "<!-- c -->🚜 Refactor", default_scope = "uncategorized" },
     { message = "^revert", group = "<!-- d -->❌ Reverts", default_scope = "uncategorized" },
-    { message = "^build", group = "<!-- e -->🛠  Build", default_scope = "uncategorized" },
-    { message = "^ci", group = "<!-- f -->♻️  CI/CD", default_scope = "uncategorized" },
+    { message = "^build", group = "<!-- e -->🛠 Build", default_scope = "uncategorized" },
+    { message = "^ci", group = "<!-- f -->♻️ CI/CD", default_scope = "uncategorized" },
     { message = "^docs", group = "<!-- g -->📚 Documentation", default_scope = "uncategorized" },
     { message = "^perf", group = "<!-- h -->⚡ Performance", default_scope = "uncategorized" },
     { message = "^style", group = "<!-- i -->🎨 Styling", default_scope = "uncategorized" },
     { message = "^test", group = "<!-- j -->🧪 Testing", default_scope = "uncategorized" },
-    { message = "^chore", group = "<!-- k -->⚙️  Miscellaneous Tasks", default_scope = "uncategorized" },
+    { message = "^chore", group = "<!-- k -->⚙️ Miscellaneous Tasks", default_scope = "uncategorized" },
 ]
 protect_breaking_commits = true
 filter_commits = false
