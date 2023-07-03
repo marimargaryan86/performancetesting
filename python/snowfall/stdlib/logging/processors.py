@@ -78,11 +78,17 @@ def _dumps(*args: Any, **kwargs: Any) -> str:
 
 def get_log_handler(
     common_processors: Sequence[Processor],
+    *,
+    format_as_json: bool,
 ) -> logging.Handler:
     log_handler = logging.StreamHandler(sys.stdout)
     formatter = structlog.stdlib.ProcessorFormatter(
-        processor=structlog.processors.JSONRenderer(
-            serializer=_dumps,
+        processor=(
+            structlog.processors.JSONRenderer(
+                serializer=_dumps,
+            )
+            if format_as_json
+            else structlog.dev.ConsoleRenderer()
         ),
         foreign_pre_chain=common_processors,
     )

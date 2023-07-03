@@ -53,6 +53,7 @@ class SentrySettings(object):
 class _GlobalSettings(Settings):
     debug_info: bool = pydantic.Field(default=False, callback=_print_debug_info)
     env_name: str = pydantic.Field(default="local", hidden=True)
+    json_output: bool = True
     log_level: str = "INFO"
     prometheus_port: int | None = None
     sentry_dsn: str = ""
@@ -105,6 +106,7 @@ class Command(Generic[_Settings]):
 class Entrypoint(object):
     name: str
     _group: click.Group = dataclasses.field(init=False)
+    cli_tool: bool = False
     sentry_settings: SentrySettings = dataclasses.field(
         default_factory=SentrySettings,
     )
@@ -172,15 +174,19 @@ def _configure(
     entrypoint: Entrypoint,
     global_settings: _GlobalSettings,
 ) -> stdout.Logger:
-    stdout.configure_logger(level=global_settings.log_level)
+    stdout.configure_logger(
+        level=global_settings.log_level,
+        format_as_json=global_settings.json_output and not entrypoint.cli_tool,
+    )
     logger = stdout.get_logger()
 
-    logger.info(
-        "Application bootstrapped.",
-        name=entrypoint.name,
-        version=global_settings.version,
-        environment=global_settings.env_name,
-    )
+    if not entrypoint.cli_tool:
+        logger.info(
+            "Application bootstrapped.",
+            name=entrypoint.name,
+            version=global_settings.version,
+            environment=global_settings.env_name,
+        )
 
     if global_settings.sentry_dsn:
         sentry.configure_sentry(
@@ -193,10 +199,12 @@ def _configure(
             additional_integrations=entrypoint.sentry_settings.additional_integrations,
             tag_keys=entrypoint.sentry_settings.tag_keys,
         )
-        logger.info(
-            "Sentry configured.",
-            dsn=global_settings.sentry_dsn,
-        )
+
+        if not entrypoint.cli_tool:
+            logger.info(
+                "Sentry configured.",
+                dsn=global_settings.sentry_dsn,
+            )
 
     return logger
 

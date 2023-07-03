@@ -47,6 +47,8 @@ def configure_logger(
     level: str | int | None = None,
     additional_processors: Sequence[processors.Processor] | None = None,
     wrapper_class: type[structlog.types.BindableLogger] | None = None,
+    *,
+    format_as_json: bool = True,
 ) -> None:
     if not level:
         level = logging.INFO
@@ -65,7 +67,7 @@ def configure_logger(
         processors=processors.get_all_processors(common_processors),
         logger_factory=structlog.stdlib.LoggerFactory(),
     )
-    _configure_standard_logger(level, common_processors)
+    _configure_standard_logger(level, common_processors, format_as_json=format_as_json)
 
 
 class LogContext(object):
@@ -139,8 +141,13 @@ def _is_structlog_context(
 def _configure_standard_logger(
     level: str | int,
     common_processors: Sequence[processors.Processor],
+    *,
+    format_as_json: bool,
 ) -> None:
-    log_handler = processors.get_log_handler(common_processors)
+    log_handler = processors.get_log_handler(
+        common_processors,
+        format_as_json=format_as_json,
+    )
     logging.basicConfig(
         format="%(message)s",
         level=level,
