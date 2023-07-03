@@ -95,5 +95,8 @@ schedule:post-git-changelog:
   script:
     - ./bash/post-git-changelog.sh
   interruptible: false
+  variables:
+    GIT_DEPTH: 0
+    GIT_STRATEGY: clone
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $SCHEDULED_JOB == "post-git-changelog"'

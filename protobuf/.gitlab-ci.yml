@@ -34,6 +34,9 @@ protobuf:breaking:
   needs:
     - job: "allow-breaking-changes"
       artifacts: true
+  variables:
+    GIT_DEPTH: 0
+    GIT_STRATEGY: clone
   allow_failure:
     exit_codes:
       - 2
