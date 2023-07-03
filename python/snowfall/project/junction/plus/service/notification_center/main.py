@@ -1,7 +1,12 @@
+import pathlib
+
 import httpx
 import pydantic
 
 from snowfall.project.junction.plus.adapter import configuration_vectors, subscribers
+from snowfall.project.junction.plus.notification_channels.whatsapp import (
+    ProviderChannel,
+)
 from snowfall.project.junction.plus.service.notification_center import importer
 from snowfall.project.junction.plus.service.notifications.v1alpha import (
     grpc_pb2_grpc as notifications_pb2_grpc,
@@ -15,6 +20,8 @@ from snowfall.stdlib.transport.grpc.client import create_channel
 class _ImportSettings(service.Settings):
     amqp_dsn: pydantic.AnyUrl
     notifications_address: str
+    twilio_sid: str
+    twilio_token: str
 
 
 async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
@@ -43,6 +50,11 @@ async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
             subscribers=notifications_pb2_grpc.SubscriberServiceStub(
                 notifications_channel,
             ),
+        ),
+        whatsapp_provider=ProviderChannel(
+            sid=app.settings.twilio_sid,
+            token=app.settings.twilio_token,
+            templates_root_path=pathlib.Path("."),
         ),
     )
     await notification_event_importer.consume()

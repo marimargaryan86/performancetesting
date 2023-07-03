@@ -35,6 +35,7 @@ class DictClient(Client):
             id=string.uuid(),
             reseller_id=create_order_request.reseller_id,
             external_ref_id=create_order_request.external_ref_id,
+            booking_reference=create_order_request.booking_reference,
             subscriber_id=string.uuid(),
             passengers=create_order_request.passengers,
             bookings=create_order_request.bookings,

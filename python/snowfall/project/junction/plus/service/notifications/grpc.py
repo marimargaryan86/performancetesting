@@ -44,6 +44,7 @@ class OrderService(
         order = await self._orders.create(
             request.reseller_id,
             request.external_ref_id,
+            request.booking_reference,
             request.passengers,
             request.bookings,
             subscriber,

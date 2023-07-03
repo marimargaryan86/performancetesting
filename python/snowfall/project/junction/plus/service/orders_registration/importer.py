@@ -60,6 +60,7 @@ class OrderImporter(object):
                 notifications_pb2.CreateOrderRequest(
                     reseller_id=message.body.reseller_id,
                     external_ref_id=message.body.external_ref_id,
+                    booking_reference=message.body.booking_reference,
                     contact_details=message.body.contact_details,
                     passengers=message.body.passengers,
                     bookings=message.body.bookings,

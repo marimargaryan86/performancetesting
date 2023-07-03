@@ -5,6 +5,7 @@ from snowfall.project.junction.plus.adapter import (
     subscribers as subscribers_adapter,
 )
 from snowfall.project.junction.plus.adapter import validation
+from snowfall.project.junction.plus.notification_channels.whatsapp import Channel
 from snowfall.project.junction.plus.service.notification_center import validators
 from snowfall.project.junction.plus.service.notification_center.v1alpha import amqp_pb2
 from snowfall.stdlib.logging import stdout
@@ -17,10 +18,12 @@ class NotificationEventImporter(object):
         consumer_obj: consumer.Consumer[amqp_pb2.NotificationEvent],
         configuration_vectors: configuration_vectors_adapter.Client,
         subscribers: subscribers_adapter.Client,
+        whatsapp_provider: Channel,
     ):
         self._consumer = consumer_obj
         self._configuration_vectors = configuration_vectors
         self._subscribers = subscribers
+        self._whatsapp_provider = whatsapp_provider
         self._logger = stdout.get_logger()
 
     async def consume(self) -> None:
@@ -44,5 +47,11 @@ class NotificationEventImporter(object):
 
             self._logger.warning(str(configuration_vector))
             self._logger.warning(str(subscriber))
+
+            await self._whatsapp_provider.send_order_confirmation(
+                sender_configuration=configuration_vector,
+                receiver=subscriber,
+                order=message.body.body,
+            )
 
         self._logger.warning(str(message.body))

@@ -19,6 +19,7 @@ class OrderRepository(repository.ProtoRepository[models_pb2.PersistedOrder]):
         self,
         reseller_id: str,
         external_ref_id: str,
+        booking_reference: str,
         passengers: Sequence[models_pb2.Passenger],
         bookings: Sequence[models_pb2.Booking],
         subscriber: models_pb2.Subscriber,
@@ -28,6 +29,7 @@ class OrderRepository(repository.ProtoRepository[models_pb2.PersistedOrder]):
             subscriber_id=subscriber.id,
             reseller_id=reseller_id,
             external_ref_id=external_ref_id,
+            booking_reference=booking_reference,
             passengers=passengers,
             bookings=bookings,
         )

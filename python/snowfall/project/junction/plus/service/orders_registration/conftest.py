@@ -68,6 +68,7 @@ async def valid_message() -> (
         message.body = amqp_pb2.IncomingOrder(
             reseller_id="reseller_id",
             external_ref_id="external_ref_id",
+            booking_reference="booking_reference",
             contact_details=models_pb2.ContactDetails(
                 email="dsada@gmail.com",
                 address=models_pb2.PostalAddress(

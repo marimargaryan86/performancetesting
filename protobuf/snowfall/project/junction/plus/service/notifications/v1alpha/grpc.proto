@@ -21,9 +21,10 @@ service ConfigurationVectorService {
 message CreateOrderRequest {
   string reseller_id = 1;
   string external_ref_id = 2;
-  snowfall.project.junction.plus.service.notifications.v1alpha.ContactDetails contact_details = 3;
-  repeated snowfall.project.junction.plus.service.notifications.v1alpha.Passenger passengers = 4;
-  repeated snowfall.project.junction.plus.service.notifications.v1alpha.Booking bookings = 5;
+  string booking_reference = 3;
+  snowfall.project.junction.plus.service.notifications.v1alpha.ContactDetails contact_details = 4;
+  repeated snowfall.project.junction.plus.service.notifications.v1alpha.Passenger passengers = 5;
+  repeated snowfall.project.junction.plus.service.notifications.v1alpha.Booking bookings = 6;
 }
 
 message CreateOrderResponse {

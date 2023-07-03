@@ -12,9 +12,10 @@ message PersistedOrder {
   string id = 1;
   string reseller_id = 2;
   string external_ref_id = 3;
-  string subscriber_id = 4;
-  repeated Passenger passengers = 5;
-  repeated Booking bookings = 6;
+  string booking_reference = 4;
+  string subscriber_id = 5;
+  repeated Passenger passengers = 6;
+  repeated Booking bookings = 7;
 }
 
 message ContactDetails {
