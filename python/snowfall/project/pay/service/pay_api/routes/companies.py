@@ -17,7 +17,7 @@ class AdminCompany(endpoints.HTTPEndpoint):
     async def patch(
         self,
         request: requests.Request,
-        companies_client: companies_adapter.GrpcClient = lagom.injectable,
+        companies_client: companies_adapter.Client = lagom.injectable,
     ) -> models.JsonApiResponse:
         company_id = request.path_params["companyId"]
         payload = await request_helpers.flatten_request(request)
@@ -52,7 +52,7 @@ class AdminCompany(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
-        companies_client: companies_adapter.GrpcClient = lagom.injectable,
+        companies_client: companies_adapter.Client = lagom.injectable,
     ) -> models.JsonApiResponse:
         company = await companies_client.get(request.path_params["companyId"])
 
@@ -73,7 +73,7 @@ class AdminCompanies(endpoints.HTTPEndpoint):
     async def post(
         self,
         request: requests.Request,
-        companies_client: companies_adapter.GrpcClient = lagom.injectable,
+        companies_client: companies_adapter.Client = lagom.injectable,
     ) -> models.JsonApiResponse:
         body = await request_helpers.flatten_request(request)
         address = body["address"]
@@ -108,7 +108,7 @@ class AdminCompanies(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
-        companies_client: companies_adapter.GrpcClient = lagom.injectable,
+        companies_client: companies_adapter.Client = lagom.injectable,
     ) -> models.JsonApiResponse:
         pagination = pagination_helpers.get_pagination(request)
 
@@ -142,7 +142,7 @@ class AdminAccountlessCompanies(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
-        companies_client: companies_adapter.GrpcClient = lagom.injectable,
+        companies_client: companies_adapter.Client = lagom.injectable,
     ) -> models.JsonApiResponse:
         pagination = pagination_helpers.get_pagination(request)
 

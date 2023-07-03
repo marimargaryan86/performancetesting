@@ -6,6 +6,7 @@ import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.project.pay.adapter import accounts, currencies
+from snowfall.project.pay.adapter import companies as companies_adapter
 from snowfall.project.pay.service.beneficiaries.v1alpha.models_pb2 import (
     Beneficiary as BeneficiaryModel,
 )
@@ -57,7 +58,7 @@ class Beneficiary(endpoints.HTTPEndpoint):
         payment_client: client.PaymentClient = lagom.injectable,
         beneficiaries_repository: repositories.BeneficiaryRepository = lagom.injectable,
         currencies_client: currencies.Client = lagom.injectable,
-        companies_repository: repositories.CompanyRepository = lagom.injectable,
+        companies_client: companies_adapter.Client = lagom.injectable,
         accounts_client: accounts.GrpcClient = lagom.injectable,
     ) -> responses.Response:
         beneficiary_id = request.path_params["beneficiaryId"]
@@ -80,10 +81,7 @@ class Beneficiary(endpoints.HTTPEndpoint):
             )
 
         account = cast(Account, account)
-
-        company = await companies_repository.find_by_id(account.company_id)
-        if company is None:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+        company = await companies_client.get(account.company_id)
 
         beneficiary_validate_request = _get_beneficiary_validate_model(
             body,
@@ -172,7 +170,7 @@ class Beneficiaries(endpoints.HTTPEndpoint):
         beneficiaries_repository: repositories.BeneficiaryRepository = lagom.injectable,
         currencies_client: currencies.Client = lagom.injectable,
         accounts_client: accounts.GrpcClient = lagom.injectable,
-        companies_repository: repositories.CompanyRepository = lagom.injectable,
+        companies_client: companies_adapter.Client = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
         currency = await currencies_client.get(body["currency"], no_exist_ok=True)
@@ -190,10 +188,7 @@ class Beneficiaries(endpoints.HTTPEndpoint):
             )
 
         account = cast(Account, account)
-
-        company = await companies_repository.find_by_id(account.company_id)
-        if company is None:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+        company = await companies_client.get(account.company_id)
 
         beneficiary_validate_request = _get_beneficiary_validate_model(
             body,

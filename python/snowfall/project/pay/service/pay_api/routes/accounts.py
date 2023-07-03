@@ -1,11 +1,12 @@
 import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
+from snowfall.project.junction.go.adapter import errors
 from snowfall.project.pay.adapter import accounts as accounts_adapter
-from snowfall.project.pay.service.companies import repositories
+from snowfall.project.pay.adapter import companies as companies_adapter
+from snowfall.project.pay.adapter import contacts as contacts_adapter
 from snowfall.project.pay.service.companies.v1alpha import models_pb2 as company_models
 from snowfall.project.pay.service.pay_api import resources
-from snowfall.project.pay.service.pay_api.repositories import CompanyRepository
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import (
@@ -96,8 +97,8 @@ class Accounts(endpoints.HTTPEndpoint):
         self,
         request: requests.Request,
         accounts_client: accounts_adapter.GrpcClient = lagom.injectable,
-        contact_repository: repositories.ContactsRepository = lagom.injectable,
-        companies_repository: CompanyRepository = lagom.injectable,
+        contacts_client: contacts_adapter.Client = lagom.injectable,
+        companies_client: companies_adapter.Client = lagom.injectable,
         payment_client: PaymentClient = lagom.injectable,
     ) -> responses.Response:
         body = await request.json()
@@ -120,11 +121,9 @@ class Accounts(endpoints.HTTPEndpoint):
 
         flatten_body = request_helpers.flatten_request_body(body)
 
-        contact = await contact_repository.find_by_id(
-            flatten_body["contact"],
-        )
-
-        if not contact:
+        try:
+            contact = await contacts_client.get(flatten_body["contact"])
+        except errors.NotFoundError:
             return models.JsonApiResponse(
                 body=models.Body(
                     errors=[
@@ -156,10 +155,9 @@ class Accounts(endpoints.HTTPEndpoint):
                 ),
                 status_code=status.HTTP_400_BAD_REQUEST,
             )
-
-        company = await companies_repository.find_by_id(contact.company_id)
-
-        if not company:
+        try:
+            company = await companies_client.get(contact.company_id)
+        except errors.NotFoundError:
             return models.JsonApiResponse(
                 body=models.Body(
                     errors=[
@@ -201,13 +199,13 @@ class Accounts(endpoints.HTTPEndpoint):
             payment_client,
         )
 
-        await contact_repository.update_reference(
-            contact,
+        await contacts_client.update_reference(
+            contact.id,
             cc_contact.identifier,
         )
 
         company.account_id = account.id
-        await companies_repository.update(company.id, company)
+        await companies_client.update(company)
 
         return await messages.create_response(
             body=models.Body(

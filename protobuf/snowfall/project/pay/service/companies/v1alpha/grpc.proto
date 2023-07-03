@@ -23,6 +23,8 @@ service AccountsService {
 service ContactsService {
   rpc CreateContact(CreateContactRequest) returns (CreateContactResponse) {}
   rpc GetContact(GetContactRequest) returns (GetContactResponse) {}
+  rpc ListCompanyContacts(ListCompanyContactsRequest) returns (ListCompanyContactsResponse) {}
+  rpc UpdateContactReference(UpdateContactReferenceRequest) returns (UpdateContactReferenceResponse) {}
 }
 
 service BeneficiariesService {
@@ -45,6 +47,26 @@ message GetContactRequest {
 }
 
 message GetContactResponse {
+  Contact contact = 1;
+}
+
+message ListCompanyContactsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  string company_id = 3;
+}
+
+message ListCompanyContactsResponse {
+  repeated Contact contacts = 1;
+  string next_page_token = 2;
+}
+
+message UpdateContactReferenceRequest {
+  string contact_id = 1;
+  string external_reference = 2;
+}
+
+message UpdateContactReferenceResponse {
   Contact contact = 1;
 }
 

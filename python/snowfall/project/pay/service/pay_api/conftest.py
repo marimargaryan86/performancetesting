@@ -18,13 +18,13 @@ from snowfall.project.pay import fixtures
 from snowfall.project.pay.adapter import (
     accounts,
     companies,
+    contacts,
     conversions,
     currencies,
     payments,
     quotations,
     transactions,
 )
-from snowfall.project.pay.service.companies import repositories
 from snowfall.project.pay.service.pay_api import authenticator, bootstrap
 from snowfall.project.pay.service.pay_api import repositories as pay_repos
 from snowfall.project.pay.service.pay_api.cache import UserSessionRepository
@@ -87,7 +87,6 @@ def _create_app(  # noqa: WPS211
     redis_repository: UserSessionRepository,
     transactions_repository: pay_repos.TransactionRepository,
     conversion_repository: pay_repos.ConversionRepository,
-    companies_repository: pay_repos.CompanyRepository,
     transactions_client: transactions.Client,
     openapi_path: pathlib.Path,
     custom_middlewares: Sequence[Middleware] | None = None,
@@ -103,7 +102,6 @@ def _create_app(  # noqa: WPS211
                 transactions_client,
                 quotations_client,
                 conversion_repository,
-                companies_repository,
                 payment_client=payment_client,
             ),
         ),
@@ -117,10 +115,9 @@ def _create_app(  # noqa: WPS211
 def _create_admin_app(  # noqa: WPS211
     cc_payment_client: PaymentClient,
     authentication_client: auth.Client,
-    companies_repository: pay_repos.CompanyRepository,
-    contacts_repository: repositories.ContactsRepository,
     accounts_client: accounts.GrpcClient,
-    companies_client: companies.GrpcClient,
+    companies_client: companies.Client,
+    contacts_client: contacts.Client,
     payment_client: payments.GrpcClient,
     conversions_repository: pay_repos.ConversionRepository,
     transactions_client: transactions.Client,
@@ -137,12 +134,11 @@ def _create_admin_app(  # noqa: WPS211
         routes=router.get_admin_routes(
             bootstrap.create_admin_dependencies(
                 authentication_client,
-                companies_repository,
-                contacts_repository,
                 conversions_repository=conversions_repository,
                 beneficiaries_repository=beneficiaries_repository,
                 accounts_client=accounts_client,
                 companies_client=companies_client,
+                contacts_client=contacts_client,
                 transactions_client=transactions_client,
                 conversions_client=conversions_client,
                 transactions_repository=transactions_repository,
@@ -187,15 +183,6 @@ def cc_api_key() -> str:
 
 
 @pytest.fixture()
-def contacts_repository(
-    mongo_client: motor_asyncio.AsyncIOMotorClient,
-) -> repositories.ContactsRepository:
-    return repositories.ContactsRepository(
-        collection=mongo_client.test.contacts,
-    )
-
-
-@pytest.fixture()
 def accounts_client() -> accounts.DictClient:
     return accounts.DictClient()
 
@@ -203,6 +190,16 @@ def accounts_client() -> accounts.DictClient:
 @pytest.fixture()
 def companies_client() -> companies.DictClient:
     return companies.DictClient(fixtures.get_companies())
+
+
+@pytest.fixture()
+def contacts_client() -> contacts.DictClient:
+    return contacts.DictClient(
+        [
+            fixtures.generate_contact(fixtures.CONTACTS[0]),
+            fixtures.generate_contact_with_bad_company_id(fixtures.CONTACTS[1]),
+        ],
+    )
 
 
 @pytest.fixture()
@@ -232,15 +229,6 @@ def quotations_client(
 ) -> quotations.Client:
     return quotations.DictClient(
         [get_quotation(quotations_id) for quotations_id in quotations_ids],
-    )
-
-
-@pytest.fixture()
-async def companies_repository(
-    mongo_client: motor_asyncio.AsyncIOMotorClient,
-) -> pay_repos.CompanyRepository:
-    return pay_repos.CompanyRepository(
-        collection=mongo_client.test.companies,
     )
 
 
@@ -426,7 +414,6 @@ def app(  # noqa: WPS211
     transactions_client: transactions.Client,
     conversions_repository: pay_repos.ConversionRepository,
     cc_payment_client: PaymentClient,
-    companies_repository: pay_repos.CompanyRepository,
 ) -> applications.Starlette:
     return _create_app(
         payment_client=cc_payment_client,
@@ -435,7 +422,6 @@ def app(  # noqa: WPS211
         redis_repository=redis_repository,
         transactions_repository=transactions_repository,
         conversion_repository=conversions_repository,
-        companies_repository=companies_repository,
         transactions_client=transactions_client,
         openapi_path=filesystem.resource_path("junction.pay_api", "openapi.json"),
     )
@@ -444,11 +430,10 @@ def app(  # noqa: WPS211
 @pytest.fixture()
 def admin_app(  # noqa: WPS211
     authentication_client: auth.Client,
-    companies_repository: pay_repos.CompanyRepository,
     cc_payment_client: PaymentClient,
-    contacts_repository: repositories.ContactsRepository,
     accounts_client: accounts.GrpcClient,
-    companies_client: companies.GrpcClient,
+    companies_client: companies.Client,
+    contacts_client: contacts.Client,
     payment_client: payments.GrpcClient,
     conversions_repository: pay_repos.ConversionRepository,
     transactions_client: transactions.Client,
@@ -461,11 +446,10 @@ def admin_app(  # noqa: WPS211
     return _create_admin_app(
         cc_payment_client=cc_payment_client,
         authentication_client=authentication_client,
-        companies_repository=companies_repository,
-        contacts_repository=contacts_repository,
         transactions_repository=transactions_repository,
         accounts_client=accounts_client,
         companies_client=companies_client,
+        contacts_client=contacts_client,
         payment_client=payment_client,
         conversions_repository=conversions_repository,
         transactions_client=transactions_client,

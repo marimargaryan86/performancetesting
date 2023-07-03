@@ -4,7 +4,8 @@ from unittest import mock
 import httpx
 from starlette import status
 
-from snowfall.project.pay.service.companies.v1alpha.models_pb2 import Account, Contact
+from snowfall.project.pay import fixtures
+from snowfall.project.pay.service.companies.v1alpha.models_pb2 import Account
 
 
 class TestAccounts(object):
@@ -34,7 +35,6 @@ class TestAccounts(object):
     async def test_contact_with_bad_company_id(
         self,
         admin_client: httpx.AsyncClient,
-        contact_with_bad_company_id: Contact,
     ) -> None:
         request = {
             "data": {
@@ -43,7 +43,7 @@ class TestAccounts(object):
                 "relationships": {
                     "contact": {
                         "data": {
-                            "id": contact_with_bad_company_id.id,
+                            "id": fixtures.CONTACTS[1],
                             "type": "contacts",
                         },
                     },

@@ -13,23 +13,23 @@ from snowfall.project.junction.go.adapter import errors
 from snowfall.project.pay.adapter import accounts as accounts_adapter
 from snowfall.project.pay.adapter import companies as companies_adapter
 from snowfall.project.pay.adapter import (
+    contacts,
     conversions,
     currencies,
     payments,
     quotations,
     transactions,
 )
-from snowfall.project.pay.service.companies import repositories
 from snowfall.project.pay.service.companies.v1alpha.grpc_pb2_grpc import (
     AccountsServiceStub,
     CompaniesServiceStub,
+    ContactsServiceStub,
 )
 from snowfall.project.pay.service.currencies.v1alpha import currencies_pb2_grpc
 from snowfall.project.pay.service.pay_api import authenticator, bootstrap
 from snowfall.project.pay.service.pay_api.cache import UserSessionRepository
 from snowfall.project.pay.service.pay_api.repositories import (
     BeneficiaryRepository,
-    CompanyRepository,
     ConversionRepository,
     TransactionRepository,
 )
@@ -142,9 +142,6 @@ def _factory(
                     conversions_repository=ConversionRepository(
                         mongo.conversions.conversions,
                     ),
-                    companies_repository=CompanyRepository(
-                        mongo.companies.companies,
-                    ),
                     transactions_client=transactions.GrpcClient(
                         transactions_pb2_grpc.TransactionsServiceStub(
                             transactions_channel,
@@ -251,12 +248,6 @@ def _admin_factory(
                             authentication_channel,
                         ),
                     ),
-                    companies_repository=CompanyRepository(
-                        mongo.companies.companies,
-                    ),
-                    contacts_repository=repositories.ContactsRepository(
-                        mongo.contacts.contacts,
-                    ),
                     conversions_repository=ConversionRepository(
                         mongo.conversions.conversions,
                     ),
@@ -270,6 +261,11 @@ def _admin_factory(
                     ),
                     companies_client=companies_adapter.GrpcClient(
                         CompaniesServiceStub(
+                            companies_channel,
+                        ),
+                    ),
+                    contacts_client=contacts.GrpcClient(
+                        ContactsServiceStub(
                             companies_channel,
                         ),
                     ),

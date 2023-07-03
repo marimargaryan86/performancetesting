@@ -2,8 +2,8 @@ import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.project.pay.adapter import accounts as accounts_adapter
+from snowfall.project.pay.adapter import contacts as contacts_adapter
 from snowfall.project.pay.adapter import currencies
-from snowfall.project.pay.service.companies import repositories
 from snowfall.project.pay.service.pay_api import resources
 from snowfall.stdlib.integration.starlette import messages, models, request_helpers
 from snowfall.vendor.currency_cloud.client import PaymentClient
@@ -15,20 +15,15 @@ class Balances(endpoints.HTTPEndpoint):
         self,
         request: requests.Request,
         accounts_client: accounts_adapter.GrpcClient = lagom.injectable,
-        contact_repository: repositories.ContactsRepository = lagom.injectable,
+        contacts_client: contacts_adapter.Client = lagom.injectable,
         payment_client: PaymentClient = lagom.injectable,
     ) -> responses.Response:
-        account = await accounts_client.get(
-            request.path_params["accountId"],
-        )
+        account = await accounts_client.get(request.path_params["accountId"])
 
         if not account:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
 
-        contact = await contact_repository.find_by_id(account.contact_id)
-
-        if not contact:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+        contact = await contacts_client.get(account.contact_id)
 
         per_page = 50
         balances = await payment_client.get_balances(
@@ -50,7 +45,7 @@ class Balances(endpoints.HTTPEndpoint):
         self,
         request: requests.Request,
         accounts_client: accounts_adapter.GrpcClient = lagom.injectable,
-        contacts_repository: repositories.ContactsRepository = lagom.injectable,
+        contacts_client: contacts_adapter.Client = lagom.injectable,
         currencies_client: currencies.Client = lagom.injectable,
         payment_client: PaymentClient = lagom.injectable,
     ) -> responses.Response:
@@ -62,9 +57,8 @@ class Balances(endpoints.HTTPEndpoint):
         if not account:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
 
-        contact = await contacts_repository.find_by_id(account.contact_id)
-        if not contact:
-            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+        contact = await contacts_client.get(account.contact_id)
+
         if not await currencies_client.get(body["currency"], no_exist_ok=True):
             return models.JsonApiResponse(
                 models.Body(

@@ -9,6 +9,7 @@ from snowfall.project.pay.service.transactions.v1alpha import (
 )
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.v1 import phone_number_pb2
 from snowfall.stdlib.v1.postal_address_pb2 import PostalAddress
 
 NOT_FOUND = "00000000-0000-0000-0000-000000000000"
@@ -22,13 +23,18 @@ PAYMENTS = (
 )
 
 COMPANIES = (
-    "5a93b5ae-9590-4561-a664-fbaead485e96",
+    "9b4a1e83-a0e9-49b3-aa79-fccb6add617c",
     "d184081a-92bd-4ec8-af9a-1faaa8dfbbeb",
 )
 
 ACCOUNTLESS_COMPANIES = (
     "1a93b5ae-9590-4561-a664-fbaead485e96",
     "b184081a-92bd-4ec8-af9a-1faaa8dfbbeb",
+)
+
+CONTACTS = (
+    "8304c0ff-7ba6-4431-9788-1d486be3a033",
+    "946a7e4b-519a-4f3d-8169-bcb4dbb3af94",
 )
 
 
@@ -104,3 +110,30 @@ def generate_company(identifier: str) -> company_model_pb2.Company:
     company.account_id = string.uuid()
 
     return company
+
+
+def generate_contact(identifier: str) -> company_model_pb2.Contact:
+    return company_model_pb2.Contact(
+        id=identifier,
+        first_name="FirstName",
+        last_name="LastName",
+        email="example@example.com",
+        company_id="9b4a1e83-a0e9-49b3-aa79-fccb6add617c",
+        phone_number=phone_number_pb2.PhoneNumber(
+            e164_number="+385996666666",
+        ),
+        external_reference=string.uuid(),
+    )
+
+
+def generate_contact_with_bad_company_id(identifier: str) -> company_model_pb2.Contact:
+    return company_model_pb2.Contact(
+        id=identifier,
+        first_name="John",
+        last_name="Doe",
+        email="example@email.com",
+        phone_number=phone_number_pb2.PhoneNumber(
+            e164_number="+385996666666",
+        ),
+        company_id="bad_company_id",
+    )

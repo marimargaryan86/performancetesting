@@ -61,6 +61,12 @@ async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
                 accounts=repositories.AccountsRepository(mongo.companies.accounts),
                 payment_client=payment_client,
             ),
+            grpc.ContactsService(
+                contacts=repositories.ContactsRepository(mongo.companies.contacts),
+                companies=repositories.CompaniesRepository(
+                    mongo.companies.companies,
+                ),
+            ),
             grpc.BeneficiariesService(
                 beneficiaries=repositories.BeneficiaryRepository(
                     mongo.companies.beneficiaries,

@@ -1,11 +1,9 @@
 import lagom
 from starlette import endpoints, requests, responses, status
 
-from snowfall.project.pay.service.companies import repositories
+from snowfall.project.pay.adapter import contacts as contacts_adapter
 from snowfall.project.pay.service.companies.v1alpha import models_pb2
 from snowfall.project.pay.service.pay_api import resources
-from snowfall.project.pay.service.pay_api.repositories import CompanyRepository
-from snowfall.stdlib import string
 from snowfall.stdlib.integration.starlette import (
     messages,
     models,
@@ -19,42 +17,19 @@ class Contacts(endpoints.HTTPEndpoint):
     async def post(
         self,
         request: requests.Request,
-        contacts_repository: repositories.ContactsRepository = lagom.injectable,
-        companies_repository: CompanyRepository = lagom.injectable,
+        contacts_client: contacts_adapter.Client = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
 
-        company = await companies_repository.find_by_id(
-            request.path_params["companyId"],
-        )
-
-        if not company:
-            return models.JsonApiResponse(
-                body=models.Body(
-                    errors=[
-                        models.Error(
-                            status=str(status.HTTP_404_NOT_FOUND),
-                            code="not_found",
-                            detail="Company does not exists",
-                            source=models.ErrorSourcePointer(
-                                pointer="/data/relationships/company/data/id",
-                            ),
-                        ),
-                    ],
-                ),
-                status_code=status.HTTP_404_NOT_FOUND,
-            )
-
-        contact = await contacts_repository.insert(
+        contact = await contacts_client.create(
             models_pb2.Contact(
-                id=string.uuid(),
                 first_name=body["firstName"],
                 last_name=body["lastName"],
                 email=body["emailAddress"],
                 phone_number=phone_number_pb2.PhoneNumber(
                     e164_number=body["phoneNumber"],
                 ),
-                company_id=company.id,
+                company_id=request.path_params["companyId"],
             ),
         )
 
@@ -71,11 +46,11 @@ class Contacts(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
-        contact_repository: repositories.ContactsRepository = lagom.injectable,
+        contacts_client: contacts_adapter.Client = lagom.injectable,
     ) -> responses.Response:
         pagination = pagination_helpers.get_pagination(request)
 
-        contacts = await contact_repository.find_by_company_id(
+        response = await contacts_client.find_by_company_id(
             request.path_params["companyId"],
             pagination.cursor,
             pagination.limit,
@@ -85,14 +60,14 @@ class Contacts(endpoints.HTTPEndpoint):
             body=models.Body(
                 data=[
                     resources.ContactResource.from_proto(contact)
-                    async for contact in contacts
+                    for contact in response.contacts
                 ],
                 links=pagination_helpers.get_next_url(
                     request.url_for(
                         "Contact",
                         companyId=request.path_params["companyId"],
                     ),
-                    await contacts.cursor(),
+                    response.next_page_token,
                     pagination,
                 ),
             ),

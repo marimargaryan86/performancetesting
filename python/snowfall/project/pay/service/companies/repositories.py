@@ -96,6 +96,14 @@ class ContactsRepository(
     _proto = models_pb2.Contact
     _default_page_size = 20
 
+    async def find(
+        self,
+        cursor: str,
+    ) -> resultset.ResultSet[models_pb2.Contact]:
+        return await self._find_with_cursor(
+            cur=cursor,
+        )
+
     async def update_reference(
         self,
         contact: models_pb2.Contact,
