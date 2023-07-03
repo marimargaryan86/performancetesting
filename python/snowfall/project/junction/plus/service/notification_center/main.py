@@ -1,7 +1,7 @@
 import httpx
 import pydantic
 
-from snowfall.project.junction.plus.adapter import configuration_vectors
+from snowfall.project.junction.plus.adapter import configuration_vectors, subscribers
 from snowfall.project.junction.plus.service.notification_center import importer
 from snowfall.project.junction.plus.service.notifications.v1alpha import (
     grpc_pb2_grpc as notifications_pb2_grpc,
@@ -27,7 +27,7 @@ async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
 
     logging.register(http_client)
     metrics.register(http_client)
-
+    notifications_channel = create_channel(app.settings.notifications_address)
     notification_event_importer = importer.NotificationEventImporter(
         consumer_obj=consumer.Consumer(
             connection=connection,
@@ -36,7 +36,12 @@ async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
         ),
         configuration_vectors=configuration_vectors.GrpcClient(
             configuration_vectors=notifications_pb2_grpc.ConfigurationVectorServiceStub(
-                create_channel(app.settings.notifications_address),
+                notifications_channel,
+            ),
+        ),
+        subscribers=subscribers.GrpcClient(
+            subscribers=notifications_pb2_grpc.SubscriberServiceStub(
+                notifications_channel,
             ),
         ),
     )

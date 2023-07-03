@@ -10,6 +10,14 @@ service OrderService {
   rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse) {}
 }
 
+service SubscriberService {
+  rpc GetSubscriber(GetSubscriberRequest) returns (GetSubscriberResponse) {}
+}
+
+service ConfigurationVectorService {
+  rpc GetConfigurationVector(GetConfigurationVectorRequest) returns (GetConfigurationVectorResponse) {}
+}
+
 message CreateOrderRequest {
   string reseller_id = 1;
   string external_ref_id = 2;
@@ -22,8 +30,12 @@ message CreateOrderResponse {
   snowfall.project.junction.plus.service.notifications.v1alpha.PersistedOrder order = 1;
 }
 
-service ConfigurationVectorService {
-  rpc GetConfigurationVector(GetConfigurationVectorRequest) returns (GetConfigurationVectorResponse) {}
+message GetSubscriberRequest {
+  string id = 1;
+}
+
+message GetSubscriberResponse {
+  snowfall.project.junction.plus.service.notifications.v1alpha.Subscriber subscriber = 1;
 }
 
 message GetConfigurationVectorRequest {

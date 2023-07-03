@@ -42,7 +42,10 @@ class OrderRepository(repository.ProtoRepository[models_pb2.PersistedOrder]):
         return persisted_order
 
 
-class SubscriberRepository(repository.ProtoRepository[models_pb2.Subscriber]):
+class SubscriberRepository(
+    mixins.FindByIdMixin[models_pb2.Subscriber],
+    repository.ProtoRepository[models_pb2.Subscriber],
+):
     _proto = models_pb2.Subscriber
     _indexes = (
         pymongo.IndexModel("email", background=True),

@@ -17,7 +17,7 @@ class Client(abc.ABC):
     @abc.abstractmethod
     async def get(
         self,
-        get_configuration_vector: notifications_grpc_pb2.GetConfigurationVectorRequest,
+        reseller_id: str,
     ) -> notifications_models_pb2.ConfigurationVector:
         """Get Reseller configuration vector."""
 
@@ -34,11 +34,9 @@ class DictClient(Client):
 
     async def get(
         self,
-        get_configuration_vector_request: notifications_grpc_pb2.GetConfigurationVectorRequest,
+        reseller_id: str,
     ) -> notifications_models_pb2.ConfigurationVector:
-        configuration_vector = self._configuration_vectors.get(
-            get_configuration_vector_request.reseller_id,
-        )
+        configuration_vector = self._configuration_vectors.get(reseller_id)
 
         if not configuration_vector:
             raise errors.NotFoundError()
@@ -57,11 +55,14 @@ class GrpcClient(Client):
 
     async def get(
         self,
-        get_configuration_vector: notifications_grpc_pb2.GetConfigurationVectorRequest,
+        reseller_id: str,
     ) -> notifications_models_pb2.ConfigurationVector:
+        request = notifications_grpc_pb2.GetConfigurationVectorRequest(
+            reseller_id=reseller_id,
+        )
         response = await errors.handle_grpc_errors(
             self._configuration_vectors.GetConfigurationVector(
-                get_configuration_vector,
+                request,
                 timeout=self._timeout,
             ),
         )

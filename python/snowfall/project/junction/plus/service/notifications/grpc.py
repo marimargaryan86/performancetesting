@@ -52,6 +52,39 @@ class OrderService(
         return notifications_pb2.CreateOrderResponse(order=order)
 
 
+class SubscriberService(
+    service.Service,
+    notifications_pb2_grpc.SubscriberServiceServicer,
+):
+    def __init__(
+        self,
+        subscribers: SubscriberRepository,
+    ):
+        self._subscribers = subscribers
+
+    def get_name(self) -> str:
+        return notifications_pb2.DESCRIPTOR.services_by_name[
+            "SubscriberService"
+        ].full_name
+
+    def register(self, server: aio.Server) -> None:
+        notifications_pb2_grpc.add_SubscriberServiceServicer_to_server(self, server)
+
+    async def GetSubscriber(  # type: ignore[override] # noqa: N802
+        self,
+        request: notifications_pb2.GetSubscriberRequest,
+        context: aio.ServicerContext,
+    ) -> notifications_pb2.GetSubscriberResponse:
+        subscriber = await self._subscribers.find_by_id(request.id)
+
+        if subscriber is None:
+            await context.abort(StatusCode.NOT_FOUND)
+
+        return notifications_pb2.GetSubscriberResponse(
+            subscriber=subscriber,
+        )
+
+
 class ConfigurationVectorService(
     service.Service,
     notifications_pb2_grpc.ConfigurationVectorServiceServicer,
