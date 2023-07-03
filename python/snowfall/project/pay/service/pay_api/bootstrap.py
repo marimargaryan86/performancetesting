@@ -33,6 +33,7 @@ class Settings(application.Settings):
     currencies_address: str
     authentication_address: str
     transactions_address: str
+    companies_address: str
     jwt_public_key: str
     ory_jwk_ttl: datetime.timedelta = datetime.timedelta(hours=1)
     mongo_dsn: Sequence[AnyUrl]
@@ -40,7 +41,6 @@ class Settings(application.Settings):
 
 
 class AdminSettings(Settings):
-    companies_address: str
     payments_address: str
 
 
@@ -83,6 +83,7 @@ def create_dependencies(  # noqa: WPS211
     transactions_repository: TransactionRepository,
     transactions_client: transactions.Client,
     quotations_client: quotations.Client,
+    companies_client: companies.Client,
     conversions_repository: ConversionRepository,
     payment_client: client.PaymentClient,
 ) -> lagom.Container:
@@ -90,6 +91,7 @@ def create_dependencies(  # noqa: WPS211
     container[client.PaymentClient] = payment_client
     container[currencies.Client] = currencies_client  # type: ignore[type-abstract]
     container[quotations.Client] = quotations_client  # type: ignore[type-abstract]
+    container[companies.Client] = companies_client  # type: ignore[type-abstract]
     container[UserSessionRepository] = redis_client
     container[TransactionRepository] = transactions_repository
     container[ConversionRepository] = conversions_repository

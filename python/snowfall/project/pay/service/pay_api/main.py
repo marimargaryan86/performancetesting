@@ -89,6 +89,9 @@ def _factory(
         currencies_channel = create_channel(
             app.settings.currencies_address,
         )
+        companies_channel = create_channel(
+            app.settings.companies_address,
+        )
         asgi_app = application.create_starlette_app(
             custom_middlewares=[
                 Middleware(
@@ -150,6 +153,11 @@ def _factory(
                     quotations_client=quotations.GrpcClient(
                         transactions_pb2_grpc.QuotationsServiceStub(
                             transactions_channel,
+                        ),
+                    ),
+                    companies_client=companies_adapter.GrpcClient(
+                        CompaniesServiceStub(
+                            companies_channel,
                         ),
                     ),
                 ),
