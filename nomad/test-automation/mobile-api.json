@@ -1,0 +1,16 @@
+{
+  "development": {
+      "variables": {
+        "vault_api_URL":"http://172.16.104.79:8200"
+      }
+  },
+  "production": {
+    "deploy": false,
+      "variables": {
+      }
+  },
+  "sandbox": {
+    "deploy": false,
+    "variables": {}
+  }
+}

@@ -1,1 +1,1 @@
-nomad_template(["pay-api"], None)
+nomad_template(["mobile-api", "pay-api"], None)
