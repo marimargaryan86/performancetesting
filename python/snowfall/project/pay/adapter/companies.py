@@ -171,4 +171,6 @@ class GrpcClient(Client):
         if limit is not None:
             request.page_size = limit
 
-        return self._companies.ListCompanies(request, timeout=self._timeout)
+        return await errors.handle_grpc_errors(
+            self._companies.ListCompanies(request, timeout=self._timeout),
+        )
