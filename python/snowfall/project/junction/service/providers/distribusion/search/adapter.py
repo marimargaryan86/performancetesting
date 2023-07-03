@@ -5,7 +5,7 @@ from collections.abc import AsyncIterator, Collection, Sequence
 from snowfall.project.junction.go.service.offers.v1 import (
     models_pb2 as offer_models_pb2,
 )
-from snowfall.project.junction.go.v1alpha import models_pb2
+from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.project.junction.service.providers.distribusion import cache
 from snowfall.project.junction.service.providers.distribusion.search import amenities
 from snowfall.project.junction.service.providers.distribusion.v1 import amqp_pb2

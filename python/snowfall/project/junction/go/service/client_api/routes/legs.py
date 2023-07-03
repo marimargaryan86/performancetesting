@@ -6,7 +6,7 @@ from snowfall.project.junction.go.adapter import segments as segments_adapter
 from snowfall.project.junction.go.adapter import trip_searches as trip_searches_adapter
 from snowfall.project.junction.go.adapter import trips as trips_adapter
 from snowfall.project.junction.go.service.client_api import resources
-from snowfall.project.junction.go.v1alpha import models_pb2
+from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.stdlib.integration.starlette import messages, models, pagination_helpers
 
 _NOT_FOUND_STATUS = status.HTTP_404_NOT_FOUND

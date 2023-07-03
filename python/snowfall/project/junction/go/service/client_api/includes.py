@@ -11,7 +11,7 @@ from snowfall.project.junction.go.adapter import (
     segments,
 )
 from snowfall.project.junction.go.service.client_api import resources
-from snowfall.project.junction.go.v1alpha import models_pb2
+from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import includes
 

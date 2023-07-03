@@ -3,7 +3,7 @@ syntax = "proto3";
 package snowfall.project.junction.go.service.offers.v1;
 
 import "google/protobuf/timestamp.proto";
-import "snowfall/project/junction/go/v1alpha/models.proto";
+import "snowfall/project/junction/go/v1/models.proto";
 import "snowfall/stdlib/v1/amqp.proto";
 import "snowfall/stdlib/v1/date.proto";
 import "snowfall/stdlib/v1/money.proto";
@@ -26,7 +26,7 @@ message OfferSearch {
 }
 
 message TripOfferSearch {
-  repeated snowfall.project.junction.go.v1alpha.Trip trips = 1;
+  repeated snowfall.project.junction.go.v1.Trip trips = 1;
   repeated Passenger passengers = 2;
   LoyaltyCard loyalty_card = 3;
   string reseller_id = 4;
@@ -174,7 +174,7 @@ message SegmentAmenities {
 message OfferSegmentDetails {
   string id = 1;
   string offer_segment_id = 3;
-  snowfall.project.junction.go.v1alpha.CabinClass cabin_class = 2;
+  snowfall.project.junction.go.v1.CabinClass cabin_class = 2;
   repeated BaggageAllowance baggage_allowances = 5;
   SegmentAmenities amenities = 6;
   // meal
@@ -189,7 +189,7 @@ message OfferSegment {
   string operator = 4;
   string vendor = 5;
   string terminal = 6;
-  snowfall.project.junction.go.v1alpha.Schedule.Type type = 8;
+  snowfall.project.junction.go.v1.Schedule.Type type = 8;
   uint32 trip_sequence = 9;
   uint32 segment_sequence = 10;
   // direction?
@@ -203,8 +203,8 @@ message Vehicle {
 
 message OfferSegmentLeg {
   string id = 1;
-  snowfall.project.junction.go.v1alpha.Point origin = 2;
-  snowfall.project.junction.go.v1alpha.Point destination = 3;
+  snowfall.project.junction.go.v1.Point origin = 2;
+  snowfall.project.junction.go.v1.Point destination = 3;
   google.protobuf.Timestamp departure_at = 4;
   google.protobuf.Timestamp arrival_at = 5;
 }

@@ -14,7 +14,7 @@ from snowfall.project.junction.go.service.orders.v1 import amqp_pb2 as order_amq
 from snowfall.project.junction.go.service.orders.v1 import (
     models_pb2 as order_models_pb2,
 )
-from snowfall.project.junction.go.v1alpha import models_pb2
+from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.project.junction.provider import cabin_classes
 from snowfall.project.junction.provider import notifications as base_notifications
 from snowfall.project.junction.service.providers.save_a_train import (

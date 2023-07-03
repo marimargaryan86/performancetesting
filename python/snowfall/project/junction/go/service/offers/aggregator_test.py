@@ -9,7 +9,7 @@ from motor import motor_asyncio
 from snowfall.project.junction.go.service.offers import aggregator, offers
 from snowfall.project.junction.go.service.offers.v1 import amqp_pb2
 from snowfall.project.junction.go.service.offers.v1 import models_pb2 as offer_protos
-from snowfall.project.junction.go.v1alpha import models_pb2
+from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.stdlib.format import protobuf
 
 _OFFER_SEARCHES = (

@@ -6,7 +6,7 @@ from dataclasses import dataclass
 
 import more_itertools
 
-from snowfall.project.junction.go.v1alpha import models_pb2
+from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.stdlib import h3
 from snowfall.stdlib.format import protobuf
 

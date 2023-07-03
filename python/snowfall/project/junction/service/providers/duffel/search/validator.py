@@ -8,7 +8,7 @@ from collections.abc import Sequence
 
 from google.protobuf import timestamp_pb2
 
-from snowfall.project.junction.go.v1alpha import models_pb2
+from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.vendor.duffel.models.offer import Offer
 

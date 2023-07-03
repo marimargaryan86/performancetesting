@@ -4,7 +4,7 @@ import zoneinfo
 from snowfall.project.junction.go.service.offers.v1 import (
     models_pb2 as offer_models_pb2,
 )
-from snowfall.project.junction.go.v1alpha import models_pb2
+from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.project.junction.service.providers.distribusion.conftest import (
     disable_by_default,
 )

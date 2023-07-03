@@ -31,7 +31,7 @@ from snowfall.project.junction.go.service.client_api.routes import (
 )
 from snowfall.project.junction.go.service.orders.v1 import models_pb2 as orders_pb2
 from snowfall.project.junction.go.service.places.v1 import models_pb2 as places_pb2
-from snowfall.project.junction.go.v1alpha import models_pb2
+from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.stdlib.integration.starlette import routes
 
 

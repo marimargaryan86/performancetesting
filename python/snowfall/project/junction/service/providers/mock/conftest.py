@@ -12,7 +12,7 @@ import pytest
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.go.service.offers.v1 import models_pb2 as offers_pb2
-from snowfall.project.junction.go.v1alpha import models_pb2 as common_pb2
+from snowfall.project.junction.go.v1 import models_pb2 as common_pb2
 from snowfall.project.junction.provider import offers as provider_offers
 from snowfall.project.junction.provider import service
 from snowfall.project.junction.service.providers.mock import (

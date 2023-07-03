@@ -1,11 +1,11 @@
 syntax = "proto3";
 
-package snowfall.project.junction.go.v1alpha;
+package snowfall.project.junction.go.v1;
 
 import "google/protobuf/timestamp.proto";
 import "snowfall/stdlib/v1/latlng.proto";
 
-option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/v1alpha";
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/v1";
 
 message Point {
   string ref = 1;

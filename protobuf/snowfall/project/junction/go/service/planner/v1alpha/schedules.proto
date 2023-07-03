@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package snowfall.project.junction.go.service.planner.v1alpha;
 
-import "snowfall/project/junction/go/v1alpha/models.proto";
+import "snowfall/project/junction/go/v1/models.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/planner/v1alpha";
 
@@ -33,13 +33,13 @@ message Transfer {
   uint64 from_stop = 2; // index of the stop in the stops.bin
   uint64 to_stop = 3; // index of the stop in the stops.bin
   uint32 transfer_time = 4; // time to transfer from one stop to another in seconds
-  snowfall.project.junction.go.v1alpha.Schedule.Type type = 5;
+  snowfall.project.junction.go.v1.Schedule.Type type = 5;
 }
 
 message Schedule {
   uint64 sequence = 1; // index of the schedule in schedules.bin
   string id = 2;
-  snowfall.project.junction.go.v1alpha.Schedule.Type type = 3;
+  snowfall.project.junction.go.v1.Schedule.Type type = 3;
   uint64 route = 4; // index of the route in routes.bin associated with this schedule
   repeated uint64 schedule_stops = 5; // indices of schedule_stops in this schedule
 }

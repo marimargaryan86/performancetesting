@@ -2,7 +2,7 @@ from collections.abc import Sequence
 
 from pymongo import IndexModel
 
-from snowfall.project.junction.go.v1alpha import models_pb2
+from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 
 LEGS_ID = "legs._id"

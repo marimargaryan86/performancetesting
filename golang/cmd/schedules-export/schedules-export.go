@@ -22,7 +22,7 @@ import (
 	"time"
 
 	plannerv1alpha "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/planner/v1alpha"
-	v1alpha "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/v1alpha"
+	v1 "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/v1"
 	"git.snowfall.se/junction/junction/golang/protoio"
 	"github.com/google/uuid"
 	"github.com/schollz/progressbar/v3"
@@ -40,8 +40,8 @@ const (
 type StopSource uint8
 
 type routesJob struct {
-	schedule    *v1alpha.Schedule
-	stops       []*v1alpha.Stop
+	schedule    *v1.Schedule
+	stops       []*v1.Stop
 	newSchedule uint64
 	toRoute     uint64
 }
@@ -51,7 +51,7 @@ type scheduleStopDataStruct struct {
 	startTime      int64
 }
 type stopJob struct {
-	point                  *v1alpha.Point
+	point                  *v1.Point
 	source                 StopSource
 	parentScheduleStop     uint64
 	parentSchedStopSeconds int64
@@ -512,12 +512,12 @@ func closeFile(f io.ReadCloser) {
 	check(f.Close())
 }
 
-func generateStopsFromLegs(legs []*v1alpha.Leg) (*[]*v1alpha.Stop, *[]*boardingInfo) {
-	stops := make([]*v1alpha.Stop, 0, len(legs)+1)
+func generateStopsFromLegs(legs []*v1.Leg) (*[]*v1.Stop, *[]*boardingInfo) {
+	stops := make([]*v1.Stop, 0, len(legs)+1)
 	onOffs := make([]*boardingInfo, 0, len(legs)+1)
 
 	for i, leg := range legs {
-		stop := v1alpha.Stop{
+		stop := v1.Stop{
 			Id:          leg.Origin.Ref,
 			DepartureAt: leg.DepartureAt,
 			ArrivalAt:   nil,
@@ -541,7 +541,7 @@ func generateStopsFromLegs(legs []*v1alpha.Leg) (*[]*v1alpha.Stop, *[]*boardingI
 
 	lastLeg := legs[len(legs)-1]
 
-	lastStop := v1alpha.Stop{
+	lastStop := v1.Stop{
 		Id:          lastLeg.Destination.Ref,
 		DepartureAt: nil,
 		ArrivalAt:   lastLeg.ArrivalAt,
@@ -557,7 +557,7 @@ func generateStopsFromLegs(legs []*v1alpha.Leg) (*[]*v1alpha.Stop, *[]*boardingI
 	return &stops, &onOffs
 }
 
-func buildScheduleStops(schedule *v1alpha.Schedule, sequence uint64) ([]uint64, []*v1alpha.Stop) {
+func buildScheduleStops(schedule *v1.Schedule, sequence uint64) ([]uint64, []*v1.Stop) {
 	ScheduleStops := make([]scheduleStopDataStruct, 0, len(schedule.Stops))
 
 	stops, boardingInfo := generateStopsFromLegs(schedule.Legs)
@@ -679,13 +679,13 @@ func main() {
 	)
 
 	barReader := progressbar.NewReader(f, bar)
-	protoReader := protoio.NewProtoReader[*v1alpha.Schedule](bufio.NewReader(&barReader))
+	protoReader := protoio.NewProtoReader[*v1.Schedule](bufio.NewReader(&barReader))
 
 	sequence := uint64(0)
 	lastSource := ""
 	for {
 		// Read the input intermediate Schedules protobuf file
-		var msg v1alpha.Schedule
+		var msg v1.Schedule
 
 		err = protoReader.ReadNext(&msg) // Each Intermediate Schedules protobuf doc
 		if err == io.EOF {

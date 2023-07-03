@@ -4,7 +4,7 @@ import abc
 import asyncio
 from collections.abc import Sequence
 
-from snowfall.project.junction.go.v1alpha import seat_maps_pb2
+from snowfall.project.junction.go.v1 import seat_maps_pb2
 from snowfall.stdlib.transport.amqp import rpc_client
 
 

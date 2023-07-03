@@ -2,14 +2,14 @@ syntax = "proto3";
 
 package snowfall.project.junction.service.providers.distribusion.v1;
 
-import "snowfall/project/junction/go/v1alpha/models.proto";
+import "snowfall/project/junction/go/v1/models.proto";
 import "snowfall/stdlib/v1/date.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/providers/distribusion/v1";
 
 message SearchCriteriaTask {
   string offer_search_id = 1;
-  repeated snowfall.project.junction.go.v1alpha.Segment segments = 2;
+  repeated snowfall.project.junction.go.v1.Segment segments = 2;
   Criteria criteria = 3;
   string session_token = 4;
 }

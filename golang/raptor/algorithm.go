@@ -3,7 +3,7 @@ package raptor
 import (
 	"git.snowfall.se/junction/junction/golang/legacy"
 	planner "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/planner/v1alpha"
-	models "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/v1alpha"
+	models "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/v1"
 	"github.com/uber/h3-go/v4"
 	"math"
 	"sort"

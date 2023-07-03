@@ -9,7 +9,7 @@ import pytest
 from bson import json_util
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.go.v1alpha import models_pb2
+from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.project.junction.provider import airports
 from snowfall.project.junction.service.providers.ba_ndc import cache
 from snowfall.project.junction.service.providers.ba_ndc.search import adapter

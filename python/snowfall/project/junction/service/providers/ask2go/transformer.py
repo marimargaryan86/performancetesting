@@ -6,7 +6,7 @@ from contextlib import suppress
 from dateutil import relativedelta
 
 from snowfall.project.junction.go.service.offers.v1 import models_pb2 as offers_pb2
-from snowfall.project.junction.go.v1alpha import models_pb2
+from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.project.junction.provider import airports, cabin_classes
 from snowfall.project.junction.service.providers.ask2go import cache, models
 from snowfall.stdlib import money, string

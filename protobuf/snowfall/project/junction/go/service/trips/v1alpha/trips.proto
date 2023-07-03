@@ -4,7 +4,7 @@ package snowfall.project.junction.go.service.trips.v1alpha;
 
 import "google/protobuf/timestamp.proto";
 import "snowfall/project/junction/go/service/offers/v1/models.proto";
-import "snowfall/project/junction/go/v1alpha/models.proto";
+import "snowfall/project/junction/go/v1/models.proto";
 import "snowfall/stdlib/v1/amqp.proto";
 import "snowfall/stdlib/v1/datetime.proto";
 import "snowfall/stdlib/v1/latlng.proto";
@@ -29,7 +29,7 @@ message GetSegmentRequest {
 }
 
 message GetSegmentResponse {
-  snowfall.project.junction.go.v1alpha.SegmentReference segment = 1;
+  snowfall.project.junction.go.v1.SegmentReference segment = 1;
 }
 
 message GetTripRequest {
@@ -37,7 +37,7 @@ message GetTripRequest {
 }
 
 message GetTripResponse {
-  snowfall.project.junction.go.v1alpha.TripReference trip = 1;
+  snowfall.project.junction.go.v1.TripReference trip = 1;
 }
 
 message EnqueueTripSearchRequest {
@@ -63,7 +63,7 @@ message ListSegmentsRequest {
 }
 
 message ListSegmentsResponse {
-  repeated snowfall.project.junction.go.v1alpha.SegmentReference segments = 1;
+  repeated snowfall.project.junction.go.v1.SegmentReference segments = 1;
   string next_page_token = 2;
 }
 
@@ -74,20 +74,20 @@ message ListTripsRequest {
 }
 
 message ListTripsResponse {
-  repeated snowfall.project.junction.go.v1alpha.TripReference trips = 1;
+  repeated snowfall.project.junction.go.v1.TripReference trips = 1;
   string next_page_token = 2;
 }
 
 message TripSearch {
   string id = 1 [(snowfall.stdlib.v1.read_only) = true];
   google.protobuf.Timestamp expires_at = 2 [(snowfall.stdlib.v1.read_only) = true];
-  repeated snowfall.project.junction.go.v1alpha.Point origins = 3;
-  repeated snowfall.project.junction.go.v1alpha.Point destinations = 4;
+  repeated snowfall.project.junction.go.v1.Point origins = 3;
+  repeated snowfall.project.junction.go.v1.Point destinations = 4;
   snowfall.stdlib.v1.DateTime departure_after = 5;
   repeated string trip_ids = 6 [(snowfall.stdlib.v1.read_only) = true];
   snowfall.stdlib.v1.Trackable.Status status = 7 [(snowfall.stdlib.v1.read_only) = true];
   optional uint32 maximum_connections = 8;
-  repeated snowfall.project.junction.go.v1alpha.Schedule.Type allowed_segment_types = 9;
+  repeated snowfall.project.junction.go.v1.Schedule.Type allowed_segment_types = 9;
   google.protobuf.Timestamp created_at = 10;
   google.protobuf.Timestamp updated_at = 11;
 }
@@ -128,7 +128,7 @@ message TripCandidateSearch {
   snowfall.stdlib.v1.Trackable.Status status = 3 [(snowfall.stdlib.v1.read_only) = true];
   repeated TripCandidateSearchCriteria criteria = 4;
   repeated snowfall.project.junction.go.service.offers.v1.Passenger passengers = 5;
-  repeated snowfall.project.junction.go.v1alpha.Schedule.Type allowed_segment_types = 6;
+  repeated snowfall.project.junction.go.v1.Schedule.Type allowed_segment_types = 6;
   repeated string offer_search_ids = 7 [(snowfall.stdlib.v1.read_only) = true];
   string reseller_id = 8;
   string currency_code = 9;
@@ -146,7 +146,7 @@ message ListTripCandidatesRequest {
   oneof payload {
     string trip_candidate_search_id = 3;
   }
-  repeated snowfall.project.junction.go.v1alpha.CabinClass.Type cabin_class_types = 4;
+  repeated snowfall.project.junction.go.v1.CabinClass.Type cabin_class_types = 4;
 }
 
 message ListTripCandidatesResponse {

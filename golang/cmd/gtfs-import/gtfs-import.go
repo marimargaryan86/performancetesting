@@ -36,7 +36,7 @@ import (
 
 	"git.snowfall.se/junction/junction/golang/gtfs"
 	v1Locations "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/places/v1"
-	v1alpha "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/v1alpha"
+	v1 "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/v1"
 	v1Stdlib "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1"
 	"git.snowfall.se/junction/junction/golang/protoio"
 	"github.com/bits-and-blooms/bloom"
@@ -57,7 +57,7 @@ const namespace = "3cbbd269-773c-481b-bc1c-c59dfc19a063"
  ******** Type Defs
 	These are the structs to define the Json output for MongoDB input
 	Based on but significantly different to type Schedule and Locations (Places)
-	See protobuf/snowfall/stdlib/v1alpha/models.pb.go
+	See protobuf/snowfall/project/junction/go/v1/models.pb.go
 */
 
 type mongoCoordinate struct {
@@ -77,26 +77,26 @@ type ConvertibleTime timestamppb.Timestamp
 // For an interface function, below
 
 type mongoLeg struct {
-	Id               string                `json:"_id"`
-	Origin           mongoNode             `json:"origin"`
-	Destination      mongoNode             `json:"destination"`
-	DepartureAt      *ConvertibleTime      `json:"departure_at"`
-	ArrivalAt        *ConvertibleTime      `json:"arrival_at"`
-	Type             v1alpha.Schedule_Type `json:"type"`
-	AgencyName       string                `json:"agency_name"`
-	BoardingAllowed  bool                  `json:"boarding_allowed"`
-	AlightingAllowed bool                  `json:"alighting_allowed"`
+	Id               string           `json:"_id"`
+	Origin           mongoNode        `json:"origin"`
+	Destination      mongoNode        `json:"destination"`
+	DepartureAt      *ConvertibleTime `json:"departure_at"`
+	ArrivalAt        *ConvertibleTime `json:"arrival_at"`
+	Type             v1.Schedule_Type `json:"type"`
+	AgencyName       string           `json:"agency_name"`
+	BoardingAllowed  bool             `json:"boarding_allowed"`
+	AlightingAllowed bool             `json:"alighting_allowed"`
 }
 
 type mongoSchedule struct {
-	// json (for MongoDB load) match to *v1alpha.Schedule
-	Id         string                `json:"_id"`
-	Name       string                `json:"name"`
-	AgencyName string                `json:"agency_name"`
-	UpdatedAt  *ConvertibleTime      `json:"updated_at"`
-	SourceRef  string                `json:"source_ref"`
-	Type       v1alpha.Schedule_Type `json:"type"`
-	Legs       []mongoLeg            `json:"legs"`
+	// json (for MongoDB load) match to *v1.Schedule
+	Id         string           `json:"_id"`
+	Name       string           `json:"name"`
+	AgencyName string           `json:"agency_name"`
+	UpdatedAt  *ConvertibleTime `json:"updated_at"`
+	SourceRef  string           `json:"source_ref"`
+	Type       v1.Schedule_Type `json:"type"`
+	Legs       []mongoLeg       `json:"legs"`
 }
 
 type mongoLocation struct {
@@ -127,7 +127,7 @@ func (t *ConvertibleTime) MarshalBSONValue() (bsontype.Type, []byte, error) {
 
 // ******** Functions
 
-func newMongoPointCoords(point *v1alpha.Point) *mongoCoordinate {
+func newMongoPointCoords(point *v1.Point) *mongoCoordinate {
 	if point.Coordinates.Latitude > 90 || point.Coordinates.Latitude < -90 ||
 		point.Coordinates.Longitude > 180 || point.Coordinates.Longitude < -180 {
 		panic(fmt.Sprintf("Cordinates out of range: %v", point.Coordinates))
@@ -138,7 +138,7 @@ func newMongoPointCoords(point *v1alpha.Point) *mongoCoordinate {
 	}
 }
 
-func newMongoNode(node *v1alpha.Point) *mongoNode {
+func newMongoNode(node *v1.Point) *mongoNode {
 	return &mongoNode{
 		Ref:      node.Ref,
 		Name:     node.Name,
@@ -147,7 +147,7 @@ func newMongoNode(node *v1alpha.Point) *mongoNode {
 	}
 }
 
-func newMongoLeg(leg *v1alpha.Leg) *mongoLeg {
+func newMongoLeg(leg *v1.Leg) *mongoLeg {
 	// Note, some times are nil !!
 	var depAt, arrAt *ConvertibleTime
 
@@ -176,7 +176,7 @@ func newMongoLeg(leg *v1alpha.Leg) *mongoLeg {
 	}
 }
 
-func newMongoSchedule(sched *v1alpha.Schedule) *mongoSchedule {
+func newMongoSchedule(sched *v1.Schedule) *mongoSchedule {
 	legs := make([]mongoLeg, 0, len(sched.Legs))
 	for _, leg := range sched.Legs {
 		legs = append(legs, *newMongoLeg(leg))
@@ -368,10 +368,10 @@ func discardEncodingKeyword(br *bufio.Reader) {
 	}
 }
 
-func getScheduleProtoWriter(schedulesBinFile *os.File, wg *sync.WaitGroup) chan *v1alpha.Schedule {
+func getScheduleProtoWriter(schedulesBinFile *os.File, wg *sync.WaitGroup) chan *v1.Schedule {
 	bufScheduleWriter := bufio.NewWriter(schedulesBinFile)
-	writer := protoio.NewProtoWriter[*v1alpha.Schedule](bufScheduleWriter)
-	scheduleProtoChannel := make(chan *v1alpha.Schedule)
+	writer := protoio.NewProtoWriter[*v1.Schedule](bufScheduleWriter)
+	scheduleProtoChannel := make(chan *v1.Schedule)
 
 	go func() {
 		defer wg.Done()
@@ -389,9 +389,9 @@ func getScheduleProtoWriter(schedulesBinFile *os.File, wg *sync.WaitGroup) chan 
 	return scheduleProtoChannel
 }
 
-func GetWriteScheduleObj(schedFile *os.File, wg *sync.WaitGroup) chan *v1alpha.Schedule {
+func GetWriteScheduleObj(schedFile *os.File, wg *sync.WaitGroup) chan *v1.Schedule {
 	schedFileWriter := bufio.NewWriter(schedFile)
-	schedulesChannel := make(chan *v1alpha.Schedule)
+	schedulesChannel := make(chan *v1.Schedule)
 
 	go func() {
 		defer wg.Done()
@@ -427,8 +427,8 @@ func writeLocationObj(schedulesObjFile *os.File, locationBuff *v1Locations.Locat
 	return err
 }
 
-func destinationId(destination *gtfs.Stop, stopTz map[string]string) *v1alpha.Point {
-	return &v1alpha.Point{
+func destinationId(destination *gtfs.Stop, stopTz map[string]string) *v1.Point {
+	return &v1.Point{
 		Ref:  destination.Id,
 		Name: destination.Name,
 		Coordinates: &v1Stdlib.LatLng{
@@ -439,8 +439,8 @@ func destinationId(destination *gtfs.Stop, stopTz map[string]string) *v1alpha.Po
 	}
 }
 
-func originId(origin *gtfs.Stop, stopTz map[string]string) *v1alpha.Point {
-	return &v1alpha.Point{
+func originId(origin *gtfs.Stop, stopTz map[string]string) *v1.Point {
+	return &v1.Point{
 		Ref:  origin.Id,
 		Name: origin.Name,
 		Coordinates: &v1Stdlib.LatLng{
@@ -492,7 +492,7 @@ func processTripFile(files map[string]*zip.File, db *gorm.DB, tripsFilter *bloom
 		})
 }
 
-func processRoutes(files map[string]*zip.File, db *gorm.DB, routesFilter *bloom.BloomFilter, validRouteTypes map[v1alpha.Schedule_Type]struct{}) {
+func processRoutes(files map[string]*zip.File, db *gorm.DB, routesFilter *bloom.BloomFilter, validRouteTypes map[v1.Schedule_Type]struct{}) {
 	indexFile[gtfs.Route](
 		files["routes.txt"], db,
 		func(row gtfs.Route) {
@@ -653,7 +653,7 @@ func main() {
 			tripsFilter := bloom.NewWithEstimates(1000000, 0.001)
 			servicesFilter := bloom.NewWithEstimates(1000000, 0.001)
 			stopTimesFilter := bloom.NewWithEstimates(1000000, 0.001)
-			validRouteTypes := make(map[v1alpha.Schedule_Type]struct{})
+			validRouteTypes := make(map[v1.Schedule_Type]struct{})
 			fileStem := strings.TrimSuffix(feedFileName.Name(), filepath.Ext(feedFileName.Name()))
 			whitelist, ok := routesWhitelist[fileStem]
 			if !ok {
@@ -776,7 +776,7 @@ func main() {
 						}
 
 						for _, serviceDate := range serviceDates(trip.ServiceId, calendarDates, calendars, agency.Timezone, cutoffDate) {
-							legs := make([]*v1alpha.Leg, 0, len(stopTimes))
+							legs := make([]*v1.Leg, 0, len(stopTimes))
 							scheduleId := uuid.NewSHA1(fileNamespace, []byte(strings.Join([]string{
 								trip.Id,
 								serviceDate.Format("2006-01-02"),
@@ -794,7 +794,7 @@ func main() {
 
 								BoardingAllowed, AlightingAllowed := getOnOff(agency, stopTimes, j)
 
-								legs = append(legs, &v1alpha.Leg{
+								legs = append(legs, &v1.Leg{
 									Id:               generateLegId(scheduleId, j),
 									Origin:           originId(tripStops[stopTimes[j].StopId], stopTz),
 									Destination:      destinationId(tripStops[stopTimes[j+1].StopId], stopTz),
@@ -811,7 +811,7 @@ func main() {
 								break
 							}
 
-							newSchedule := v1alpha.Schedule{
+							newSchedule := v1.Schedule{
 								Id:         scheduleId.String(),
 								Name:       routeName,
 								AgencyName: agency.Name,

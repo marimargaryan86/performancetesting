@@ -13,7 +13,7 @@ from snowfall.project.junction.go.service.offers.v1 import amqp_pb2 as offers_am
 from snowfall.project.junction.go.service.offers.v1 import (
     models_pb2 as legacy_offers_pb2,
 )
-from snowfall.project.junction.go.v1alpha import models_pb2
+from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.project.junction.provider import repository
 from snowfall.project.junction.provider.segment_matcher import SegmentMatcher
 from snowfall.project.junction.provider.v1alpha import offers_pb2, offers_pb2_grpc

@@ -6,7 +6,7 @@ from unittest import mock
 
 import pytest
 
-from snowfall.project.junction.go.v1alpha import models_pb2
+from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.project.junction.provider import segment_grouper
 from snowfall.stdlib import h3
 
