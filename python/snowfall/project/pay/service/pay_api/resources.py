@@ -4,9 +4,6 @@ from typing import Any, ClassVar
 
 from starlette import requests
 
-from snowfall.project.pay.service.beneficiaries.v1alpha import (
-    models_pb2 as beneficiary_models,
-)
 from snowfall.project.pay.service.companies.v1alpha import models_pb2
 from snowfall.project.pay.service.currencies.v1alpha.models_pb2 import (
     Currency as CurrencyModel,
@@ -22,7 +19,6 @@ from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import models
 from snowfall.stdlib.v1 import money_pb2
 from snowfall.vendor.currency_cloud.models import balance as balance_models
-from snowfall.vendor.currency_cloud.models import beneficiary as beneficiary_cc_models
 
 _SELF_HREF = "self"
 
@@ -418,49 +414,43 @@ class BeneficiariesResource(models.Resource):
     @classmethod
     def from_models(
         cls,
-        beneficiary: beneficiary_models.Beneficiary,
-        cc_beneficiary: beneficiary_cc_models.BeneficiaryResponse,
+        beneficiary: models_pb2.Beneficiary,
         request: requests.Request,
     ) -> BeneficiariesResource:
-        bank_address_lines: list[str] = []
-        if cc_beneficiary.bank_address is not None:
-            for address in cc_beneficiary.bank_address:
-                bank_address_lines.extend(
-                    address.split(r"\n"),
-                )
+        meta_data = beneficiary.meta_data
+        bank_details = meta_data.bank_details
+        beneficiary_address = meta_data.beneficiary_address
         return cls(
             id=beneficiary.id,
             type=BeneficiariesResource.api_type,
             attributes={
-                "bankAccountHolderName": cc_beneficiary.bank_account_holder_name,
-                "email": cc_beneficiary.email,
+                "bankAccountHolderName": meta_data.bank_account_holder_name,
+                "email": meta_data.email,
                 "beneficiaryAddress": {
-                    "addressLines": cc_beneficiary.beneficiary_address,
-                    "countryCode": cc_beneficiary.beneficiary_country,
-                    "postalCode": cc_beneficiary.beneficiary_postcode or "",
-                    "city": cc_beneficiary.beneficiary_city,
-                    "state": cc_beneficiary.beneficiary_state_or_province,
+                    "addressLines": list(beneficiary_address.address_lines),
+                    "countryCode": beneficiary_address.region_code,
+                    "postalCode": beneficiary_address.postal_code or "",
+                    "city": beneficiary_address.locality,
+                    "state": beneficiary_address.administrative_area,
                 },
                 "bankDetails": {
                     **(
                         {
-                            "accountNumber": cc_beneficiary.account_number,
-                            "aba": cc_beneficiary.routing_code_value_1,
+                            "accountNumber": bank_details.account_number,
+                            "aba": bank_details.aba,
                         }
-                        if cc_beneficiary.account_number
+                        if bank_details.account_number
                         else {
-                            "iban": cc_beneficiary.iban,
+                            "iban": bank_details.iban,
                         }
                     ),
-                    "name": cc_beneficiary.bank_name,
-                    "bicSwift": cc_beneficiary.bic_swift,
-                    "accountType": cc_beneficiary.bank_account_type,
-                    "paymentTypes": (
-                        cc_beneficiary.payment_types and cc_beneficiary.payment_types[0]
-                    ),
+                    "name": bank_details.name,
+                    "bicSwift": bank_details.bic_swift,
+                    "accountType": bank_details.account_type,
+                    "paymentTypes": bank_details.payment_types,
                     "address": {
-                        "addressLines": bank_address_lines,
-                        "countryCode": cc_beneficiary.bank_country,
+                        "addressLines": list(bank_details.address.address_lines),
+                        "countryCode": bank_details.address.region_code,
                     },
                 },
             },
@@ -473,7 +463,7 @@ class BeneficiariesResource(models.Resource):
                 },
                 "currency": {
                     "data": {
-                        "id": cc_beneficiary.currency,
+                        "id": beneficiary.currency,
                         "type": "currencies",
                     },
                 },

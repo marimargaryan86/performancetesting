@@ -17,6 +17,7 @@ from snowfall.project.junction.go.adapter import errors
 from snowfall.project.pay import fixtures
 from snowfall.project.pay.adapter import (
     accounts,
+    beneficiaries,
     companies,
     contacts,
     conversions,
@@ -126,7 +127,7 @@ def _create_admin_app(  # noqa: WPS211
     conversions_client: conversions.Client,
     currencies_client: currencies.Client,
     transactions_repository: pay_repos.TransactionRepository,
-    beneficiaries_repository: pay_repos.BeneficiaryRepository,
+    beneficiaries_client: beneficiaries.Client,
     openapi_path: pathlib.Path,
     custom_middlewares: Sequence[Middleware] | None = None,
 ) -> applications.Starlette:
@@ -137,7 +138,7 @@ def _create_admin_app(  # noqa: WPS211
             bootstrap.create_admin_dependencies(
                 authentication_client,
                 conversions_repository=conversions_repository,
-                beneficiaries_repository=beneficiaries_repository,
+                beneficiaries_client=beneficiaries_client,
                 accounts_client=accounts_client,
                 companies_client=companies_client,
                 contacts_client=contacts_client,
@@ -315,10 +316,20 @@ def conversions_repository(
 
 
 @pytest.fixture()
-def beneficiaries_repository(
-    mongo_client: motor_asyncio.AsyncIOMotorClient,
-) -> pay_repos.BeneficiaryRepository:
-    return pay_repos.BeneficiaryRepository(collection=mongo_client.test.beneficiaries)
+def beneficiaries_client() -> beneficiaries.DictClient:
+    return beneficiaries.DictClient(
+        (
+            beneficiaries.models_pb2.Beneficiary(  # type: ignore[attr-defined]
+                id=string.uuid(),
+                external_reference=string.uuid(),
+                account_id=string.uuid(),
+                created_by="ByMe",
+                updated_by="ByMe",
+                payment_type="priority",
+                currency="USD",
+            ),
+        ),
+    )
 
 
 @pytest.fixture()
@@ -444,7 +455,7 @@ def admin_app(  # noqa: WPS211
     conversions_client: conversions.Client,
     currencies_client: currencies.Client,
     transactions_repository: pay_repos.TransactionRepository,
-    beneficiaries_repository: pay_repos.BeneficiaryRepository,
+    beneficiaries_client: beneficiaries.Client,
     custom_middlewares: Sequence[Middleware],
 ) -> applications.Starlette:
     return _create_admin_app(
@@ -459,7 +470,7 @@ def admin_app(  # noqa: WPS211
         transactions_client=transactions_client,
         conversions_client=conversions_client,
         currencies_client=currencies_client,
-        beneficiaries_repository=beneficiaries_repository,
+        beneficiaries_client=beneficiaries_client,
         custom_middlewares=custom_middlewares,
         openapi_path=filesystem.resource_path("junction.pay_admin_api", "openapi.json"),
     )

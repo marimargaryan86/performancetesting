@@ -5,8 +5,9 @@ import lagom
 from pydantic import AnyUrl
 
 from snowfall.adapter import authentication
-from snowfall.project.pay.adapter import (
+from snowfall.project.pay.adapter import (  # noqa: WPS235
     accounts,
+    beneficiaries,
     companies,
     contacts,
     conversions,
@@ -18,7 +19,6 @@ from snowfall.project.pay.adapter import (
 from snowfall.project.pay.service.pay_api import includes
 from snowfall.project.pay.service.pay_api.cache import UserSessionRepository
 from snowfall.project.pay.service.pay_api.repositories import (
-    BeneficiaryRepository,
     ConversionRepository,
     TransactionRepository,
 )
@@ -47,7 +47,7 @@ class AdminSettings(Settings):
 def create_admin_dependencies(  # noqa: WPS211
     authentication_client: authentication.Client,
     conversions_repository: ConversionRepository,
-    beneficiaries_repository: BeneficiaryRepository,
+    beneficiaries_client: beneficiaries.Client,
     transactions_repository: TransactionRepository,
     accounts_client: accounts.GrpcClient,
     companies_client: companies.Client,
@@ -63,7 +63,7 @@ def create_admin_dependencies(  # noqa: WPS211
     container[authentication.Client] = authentication_client  # type: ignore[type-abstract]
     container[TransactionRepository] = transactions_repository
     container[ConversionRepository] = conversions_repository
-    container[BeneficiaryRepository] = beneficiaries_repository
+    container[beneficiaries.Client] = beneficiaries_client  # type: ignore[type-abstract]
     container[accounts.GrpcClient] = accounts_client
     container[companies.Client] = companies_client  # type: ignore[type-abstract]
     container[contacts.Client] = contacts_client  # type: ignore[type-abstract]

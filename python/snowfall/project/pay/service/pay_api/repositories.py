@@ -3,7 +3,6 @@ from typing import Any
 
 import pymongo
 
-from snowfall.project.pay.service.beneficiaries.v1alpha.models_pb2 import Beneficiary
 from snowfall.project.pay.service.conversions.v1alpha.models_pb2 import Conversion
 from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import Transaction
 from snowfall.stdlib import money, string
@@ -83,40 +82,4 @@ class ConversionRepository(
         return await self._find_with_cursor(
             cur=cursor or "",
             filter_=filter_,
-        )
-
-
-class BeneficiaryRepository(
-    mixins.FindByIdMixin[Beneficiary],
-    mixins.InsertMixin[Beneficiary],
-    repository.ProtoRepository[Beneficiary],
-):
-    _proto = Beneficiary
-    _default_page_size = 20
-
-    async def find(
-        self,
-        cursor: str | None,
-        limit: int | None,
-        filter_: Mapping[str, Any] | None = None,
-    ) -> resultset.ResultSet[Beneficiary]:
-        beneficiaries = await self._find_with_cursor(
-            cur=cursor or "",
-            filter_=filter_,
-        )
-        beneficiaries.limit(limit or self._default_page_size)
-        return beneficiaries
-
-    async def update(
-        self,
-        document_id: str,
-        beneficiary: Beneficiary,
-    ) -> pymongo.results.UpdateResult:
-        replacement = self._coder.encode(beneficiary)
-        replacement.pop("_id")
-
-        return await self._execute(
-            self._collection.replace_one,
-            filter={"_id": document_id},
-            replacement=replacement,
         )

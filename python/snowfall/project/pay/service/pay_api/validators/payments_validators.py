@@ -7,7 +7,6 @@ from starlette import requests, status
 
 from snowfall.project.pay.service.beneficiaries.v1alpha.models_pb2 import Beneficiary
 from snowfall.project.pay.service.pay_api.repositories import (
-    BeneficiaryRepository,
     TransactionRepository,
 )
 from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import Transaction
@@ -27,13 +26,12 @@ def payment_validator(  # noqa: WPS217, WPS210
         *args: _In.args,
         **kwargs: _In.kwargs,
     ) -> _Out | models.JsonApiResponse:
-        request, beneficiaries_repository, transaction_repository = (
+        request, beneficiaries_client, transaction_repository = (
             args[1],
-            kwargs["beneficiaries_repository"],
+            kwargs["beneficiaries_client"],
             kwargs["transaction_repository"],
         )
         request = cast(requests.Request, request)
-        beneficiaries_repository = cast(BeneficiaryRepository, beneficiaries_repository)
         transaction_repository = cast(TransactionRepository, transaction_repository)
         body = await request_helpers.flatten_request(request)
         amount, transactions = body.get("amount"), body.get("transactions", [])
@@ -48,7 +46,7 @@ def payment_validator(  # noqa: WPS217, WPS210
                 request=request,
                 status_code=status.HTTP_400_BAD_REQUEST,
             )
-        beneficiary = await beneficiaries_repository.find_by_id(
+        beneficiary = await beneficiaries_client.get(  # type: ignore[attr-defined]
             body["beneficiary"],
         )
         transaction_models: Sequence[Transaction] = []

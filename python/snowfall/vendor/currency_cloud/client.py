@@ -114,18 +114,26 @@ class CurrencyCloudAuth(httpx.Auth):
 
 def encode_arrays(
     payload: Mapping[str, Any] | None,
-) -> Mapping[str, Any] | None:
-    if payload is not None:
-        encoded_payload = {}
-
-        for payload_key, payload_value in payload.items():
-            if isinstance(payload_value, list):
-                encoded_payload["{0}[]".format(payload_key)] = payload_value
-            else:
-                encoded_payload[payload_key] = payload_value
-
+) -> Mapping[str, Any]:
+    encoded_payload: dict[str, Any] = {}
+    if payload is None:
         return encoded_payload
-    return None
+
+    for payload_key, payload_value in payload.items():
+        if isinstance(payload_value, list):
+            encoded_payload["{0}[]".format(payload_key)] = payload_value
+        else:
+            encoded_payload[payload_key] = payload_value
+
+    return encoded_payload
+
+
+def remove_blank_string(
+    payload: Mapping[str, Any],
+) -> Mapping[str, Any]:
+    return {
+        key: payload_val for key, payload_val in payload.items() if payload_val != ""
+    }
 
 
 class PaymentClient(object):  # noqa: WPS214
@@ -277,7 +285,9 @@ class PaymentClient(object):  # noqa: WPS214
             **await self._make_request(
                 method=_METHOD_POST,
                 url="/beneficiaries/{0}".format(beneficiary_id),
-                payload=new_beneficiary.dict(exclude_none=True),
+                payload=remove_blank_string(
+                    new_beneficiary.dict(exclude_none=True),
+                ),
             ),
         )
 
@@ -301,7 +311,9 @@ class PaymentClient(object):  # noqa: WPS214
             **await self._make_request(
                 method=_METHOD_POST,
                 url="/beneficiaries/create",
-                payload=beneficiary.dict(exclude_none=True),
+                payload=remove_blank_string(
+                    beneficiary.dict(exclude_none=True),
+                ),
             ),
         )
 

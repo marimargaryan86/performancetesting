@@ -5,8 +5,8 @@ import httpx
 from snowfall.project.junction.api_automation.test_functions.helpers_api import (
     is_valid_uuid,
 )
+from snowfall.project.pay.adapter import beneficiaries
 from snowfall.project.pay.service.companies.v1alpha.models_pb2 import Account, Company
-from snowfall.project.pay.service.pay_api.repositories import BeneficiaryRepository
 from snowfall.stdlib import money
 from snowfall.stdlib.format import jsonapi
 
@@ -18,7 +18,7 @@ class TestBeneficiary(object):
         account: Account,
         company: Company,
         available_currencies: Sequence[money.Currency],
-        beneficiaries_repository: BeneficiaryRepository,
+        beneficiaries_client: beneficiaries.Client,
     ) -> None:
         request = {
             "data": {
@@ -81,7 +81,7 @@ class TestBeneficiary(object):
         assert flatten_payload["currency"] == flatten_request["currency"]
         assert flatten_payload["account"] == flatten_request["account"]
 
-        beneficiary = await beneficiaries_repository.find_by_id(payload["id"])
+        beneficiary = await beneficiaries_client.get(payload["id"])
 
         assert beneficiary is not None
         assert is_valid_uuid(beneficiary.created_by)

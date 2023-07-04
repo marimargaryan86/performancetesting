@@ -4,10 +4,10 @@ from typing import Any
 import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
+from snowfall.project.pay.adapter import beneficiaries
 from snowfall.project.pay.adapter.payments import GrpcClient
 from snowfall.project.pay.service.pay_api import resources
 from snowfall.project.pay.service.pay_api.repositories import (
-    BeneficiaryRepository,
     TransactionRepository,
 )
 from snowfall.project.pay.service.pay_api.validators import payments_validators
@@ -54,7 +54,7 @@ class Payments(endpoints.HTTPEndpoint):
         request: requests.Request,
         body: Mapping[str, Any],
         payment_client: GrpcClient = lagom.injectable,
-        beneficiaries_repository: BeneficiaryRepository = lagom.injectable,
+        beneficiaries_client: beneficiaries.Client = lagom.injectable,
         transaction_repository: TransactionRepository = lagom.injectable,
     ) -> responses.Response:
         original_body = await request_helpers.flatten_request(request)

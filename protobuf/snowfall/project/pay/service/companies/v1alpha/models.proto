@@ -45,6 +45,7 @@ enum Status {
   STATUS_ENABLED_NO_TRADING = 2;
   STATUS_DISABLED = 3;
 }
+
 message BankDetails {
   string name = 1;
   string bic_swift = 2;
