@@ -39,6 +39,7 @@ func (mr *mergeRequest) merge() error {
 	}
 
 	commitMessage := mr.object.Title + "\n\n"
+	commitMessage += mr.object.Description + "\n\n"
 
 	if err != nil {
 		return err
