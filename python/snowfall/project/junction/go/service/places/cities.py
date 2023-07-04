@@ -16,9 +16,9 @@ from snowfall.stdlib.v1 import latlng_pb2
 _MIN_POPULATION = 20000
 _NAMESPACE = uuid.UUID("105eba69-b787-48ba-9159-6078e0b76e46")
 _MAX_DISTANCE_AIRPORT_M = int(
-    os.getenv("MAX_DISTANCE_AIRPORT_M", 50000),  # noqa: WPS432
+    os.getenv("MAX_DISTANCE_AIRPORT_M", "50000"),  # noqa: WPS432
 )
-_MAX_DISTANCE_RAIL_M = int(os.getenv("MAX_DISTANCE_RAIL_M", 10000))  # noqa: WPS432
+_MAX_DISTANCE_RAIL_M = int(os.getenv("MAX_DISTANCE_RAIL_M", "10000"))  # noqa: WPS432
 
 
 def calc_distance(  # noqa: WPS210

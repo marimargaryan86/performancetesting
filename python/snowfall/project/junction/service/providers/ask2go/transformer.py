@@ -331,13 +331,12 @@ class OfferTransformer(object):  # noqa: WPS214
     ) -> offers_pb2.SegmentAmenity:
         if amenity is None:
             availability = offers_pb2.SegmentAmenity.Type.TYPE_UNSPECIFIED
+        elif amenity.exists and amenity.free:
+            availability = offers_pb2.SegmentAmenity.Type.TYPE_INCLUDED
+        elif amenity.exists and not amenity.free:
+            availability = offers_pb2.SegmentAmenity.Type.TYPE_AVAILABLE
         else:
-            if amenity.exists and amenity.free:
-                availability = offers_pb2.SegmentAmenity.Type.TYPE_INCLUDED
-            elif amenity.exists and not amenity.free:
-                availability = offers_pb2.SegmentAmenity.Type.TYPE_AVAILABLE
-            else:
-                availability = offers_pb2.SegmentAmenity.Type.TYPE_UNAVAILABLE
+            availability = offers_pb2.SegmentAmenity.Type.TYPE_UNAVAILABLE
 
         return offers_pb2.SegmentAmenity(availability=availability)
 
