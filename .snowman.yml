@@ -1,7 +1,7 @@
 commits:
   scopes:
-    golang:
-      - "golang"
+    golang/stdlib:
+      - "golang/stdlib"
     junction/base:
       - "python/snowfall/project/pss"
     junction/extensions:
@@ -12,29 +12,41 @@ commits:
     junction/go:
       - ".gitlab/junction"
       - "golang/cmd/gtfs-import"
+      - "golang/cmd/gtfs-timeslice-import"
       - "golang/cmd/planner"
       - "golang/cmd/schedules-export"
       - "golang/cmd/ssim-convert"
       - "golang/cmd/validate-dataset"
       - "openapi/junction/admin_api"
       - "openapi/junction/client_api"
-      - "protobuf/snowfall/project/junction"
-      - "python/snowfall/project/junction"
+      - "openapi/junction/data_api"
+      - "protobuf/snowfall/project/junction/go"
+      - "protobuf/snowfall/project/junction/provider"
+      - "protobuf/snowfall/project/junction/service"
+      - "python/snowfall/project/junction/api_automation/backend_api_tests"
+      - "python/snowfall/project/junction/api_automation/planner_tests"
       - "python/snowfall/project/junction/go"
+      - "python/snowfall/project/junction/provider"
+      - "python/snowfall/project/junction/service"
       - "svelte/junction-admin"
     junction/hub:
+      - "python/snowfall/project/junction/hub"
       - "svelte/hub-web"
     junction/pay:
       - "openapi/junction/pay_admin_api"
       - "openapi/junction/pay_api"
       - "protobuf/snowfall/project/pay"
       - "python/snowfall/project/junction/api_automation/pay_api_tests"
+      - "python/snowfall/project/junction/api_automation/grpc/pay"
+      - "python/snowfall/project/junction/api_automation/performance/pay"
       - "python/snowfall/project/pay"
+      - "svelte/pay-web"
     junction/plus:
+      - "openapi/junction/plus_poc_api"
       - "protobuf/snowfall/project/junction/plus"
       - "python/snowfall/project/junction/plus"
-    python:
-      - "python"
+    protobuf/stdlib:
+      - "protobuf/snowfall/stdlib"
     python/stdlib:
       - "python/snowfall/stdlib"
     snowman:
@@ -45,19 +57,21 @@ commits:
       - "python/snowfall/vendor/ba_ndc"
     vendor/benerail:
       - "python/snowfall/vendor/benerail"
-    vendor/bound:
-      - "python/snowfall/vendor/bound"
     vendor/carnect:
       - "python/snowfall/vendor/carnect"
+    vendor/currency-cloud:
+      - "python/snowfall/vendor/currency_cloud"
     vendor/direct-ferries:
-      - "python/snowfall/vendor/direct-ferries"
+      - "python/snowfall/vendor/direct_ferries"
     vendor/distribusion:
       - "python/snowfall/vendor/distribusion"
     vendor/duffel:
       - "python/snowfall/vendor/duffel"
     vendor/karhoo:
       - "python/snowfall/vendor/karhoo"
+    vendor/ory:
+      - "python/snowfall/vendor/ory"
     vendor/rate-limiter:
       - "python/snowfall/vendor/rate_limiter"
     vendor/save-a-train:
-      - "python/snowfall/vendor/save-a-train"
+      - "python/snowfall/vendor/save_a_train"

@@ -1,5 +1,6 @@
 [CI/CD] @platform-engineers
 .gitlab-ci.yml
+.snowman.yml
 /.gitlab/
 /buf.yaml
 /nomad/ @sre
