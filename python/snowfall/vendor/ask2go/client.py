@@ -45,7 +45,7 @@ class Ask2GoClient(object):  # noqa: WPS214
     async def create_search(
         self,
         criteria: search.CreateSearchCriteria,
-        rate_limit_timeout: float = 60,
+        rate_limit_timeout: float = 30,
     ) -> search.CreateSearchResponse:
         if criteria.inbound_date and criteria.inbound_date < criteria.outbound_date:
             raise errors.DateError(

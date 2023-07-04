@@ -201,6 +201,7 @@ class DuffelSearchAdapter(object):
         )
         res = await duffel_client.create_offer_request(
             search_criteria_wrapper.search_criteria,
+            rate_limit_timeout=30,  # noqa: WPS432
         )
 
         if res.offers:
