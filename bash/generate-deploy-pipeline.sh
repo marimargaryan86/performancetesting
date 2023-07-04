@@ -151,7 +151,7 @@ verify:
     entrypoint: [""]
   interruptible: false
   script:
-    - /usr/local/bin/python3.11 -Wdefault /bin/main verify
+    - /usr/local/bin/python3.11 -Wdefault /bin/main --env-name "${DEPLOYMENT_ENVIRONMENT}" verify --nomad-address="\${NOMAD_${DEPLOYMENT_ENVIRONMENT^^}_ADDR}" ${services[@]}
   tags:
     - docker
   needs:

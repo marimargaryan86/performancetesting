@@ -14,6 +14,7 @@ __dependents_rules__(
 
 python_requirements(
     module_mapping={
+        "dnspython": ["dns"],
         "googleapis-common-protos": [
             "google.api",
             "google.cloud",

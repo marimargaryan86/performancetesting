@@ -35,6 +35,7 @@
 //     "boto3==1.26.76",
 //     "click==8.1.3",
 //     "cryptography==41.0.1",
+//     "dnspython==2.3.0",
 //     "docformatter==1.5.1",
 //     "email-validator==2.0.0.post2",
 //     "factory-boy==3.2.1",
@@ -1761,13 +1762,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "27cb01b06579c3993a8893ae7e457bb48ad1d70fb5f9c3e192e2d67b6dd9f014",
-              "url": "https://files.pythonhosted.org/packages/89/82/523fad73df18d3fb98b4ff3eaa2b0004aafd687b28d28eb00859b22274d3/botocore_stubs-1.29.162-py3-none-any.whl"
+              "hash": "9ad67195e9697bfa2d005a9a2672acc148c49c5db8e5e63a59ef08fbdca809b9",
+              "url": "https://files.pythonhosted.org/packages/fb/c4/8f521f442eec6b234c3ddcc0b9c096866310dd9c6386326c45f07653f8f2/botocore_stubs-1.29.163-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "f96dd04a161eb0787f4ec95f93da272098f1d9fdb279067763a1fd0a89926dd5",
-              "url": "https://files.pythonhosted.org/packages/48/07/7559bd5730565aece7d55f7b41b738cda9a30fb22f9a9582c46ff70b2eb4/botocore_stubs-1.29.162.tar.gz"
+              "hash": "ff50f9f611142a8a60ecb0cfab374a3d23459db41b99be8610f774cb52cd7077",
+              "url": "https://files.pythonhosted.org/packages/78/cd/099a3e6d943846bc2e9e644d3ef7e0430fe70c492c5c2052edfdbab86dc6/botocore_stubs-1.29.163.tar.gz"
             }
           ],
           "project_name": "botocore-stubs",
@@ -1776,7 +1777,7 @@
             "typing-extensions>=4.1.0; python_version < \"3.9\""
           ],
           "requires_python": "<4.0,>=3.7",
-          "version": "1.29.162"
+          "version": "1.29.163"
         },
         {
           "artifacts": [
@@ -7241,19 +7242,19 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "88a4153d8505aabbb4e13aacb7c486c2b4a33ca3b3f807914a9b4c844c471c26",
-              "url": "https://files.pythonhosted.org/packages/5f/86/d9b1518d8e75b346a33eb59fa31bdbbee11459a7e2cc5be502fa779e96c5/typing_extensions-4.6.3-py3-none-any.whl"
+              "hash": "5d8c9dac95c27d20df12fb1d97b9793ab8b2af8a3a525e68c80e21060c161771",
+              "url": "https://files.pythonhosted.org/packages/7e/4d/b0185d077dc1cd070a56859a0ba3bb6e76618393ec693e59faf1368da8f6/typing_extensions-4.7.0-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "d91d5919357fe7f681a9f2b5b4cb2a5f1ef0a1e9f59c4d8ff0d3491e05c0ffd5",
-              "url": "https://files.pythonhosted.org/packages/42/56/cfaa7a5281734dadc842f3a22e50447c675a1c5a5b9f6ad8a07b467bffe7/typing_extensions-4.6.3.tar.gz"
+              "hash": "935ccf31549830cda708b42289d44b6f74084d616a00be651601a4f968e77c82",
+              "url": "https://files.pythonhosted.org/packages/57/e3/b37a6b1ce6c1b2b75d05997ec24f73c794bc05a587e0f30a532d0ab13cb2/typing_extensions-4.7.0.tar.gz"
             }
           ],
           "project_name": "typing-extensions",
           "requires_dists": [],
           "requires_python": ">=3.7",
-          "version": "4.6.3"
+          "version": "4.7.0"
         },
         {
           "artifacts": [
@@ -7916,6 +7917,7 @@
     "boto3==1.26.76",
     "click==8.1.3",
     "cryptography==41.0.1",
+    "dnspython==2.3.0",
     "docformatter==1.5.1",
     "email-validator==2.0.0.post2",
     "factory-boy==3.2.1",
