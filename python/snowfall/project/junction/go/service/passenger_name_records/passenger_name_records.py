@@ -4,7 +4,7 @@ import secrets
 
 import pymongo
 
-from snowfall.project.junction.go.service.passenger_name_records.v1alpha import (
+from snowfall.project.junction.go.service.passenger_name_records.v1 import (
     passenger_name_records_pb2,
 )
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset

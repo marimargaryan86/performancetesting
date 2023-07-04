@@ -3,7 +3,7 @@ import grpc
 from snowfall.project.junction.go.service.passenger_name_records.passenger_name_records import (
     PassengerNameRecordRepository,
 )
-from snowfall.project.junction.go.service.passenger_name_records.v1alpha import (
+from snowfall.project.junction.go.service.passenger_name_records.v1 import (
     passenger_name_records_pb2,
     passenger_name_records_pb2_grpc,
 )

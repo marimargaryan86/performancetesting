@@ -16,7 +16,7 @@ from snowfall.project.junction.go.service.orders.pay_transactions import (
     PayTransactionCreator,
 )
 from snowfall.project.junction.go.service.orders.zendesk.client import ZendeskClient
-from snowfall.project.junction.go.service.passenger_name_records.v1alpha import (
+from snowfall.project.junction.go.service.passenger_name_records.v1 import (
     passenger_name_records_pb2_grpc,
 )
 from snowfall.stdlib import service

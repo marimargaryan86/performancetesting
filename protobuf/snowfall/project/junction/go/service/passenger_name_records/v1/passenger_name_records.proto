@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-package snowfall.project.junction.go.service.passenger_name_records.v1alpha;
+package snowfall.project.junction.go.service.passenger_name_records.v1;
 
 import "google/protobuf/timestamp.proto";
 
-option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/passenger_name_records/v1alpha";
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/passenger_name_records/v1";
 
 service PassengerNameRecordService {
   rpc CreatePassengerNameRecord(CreatePassengerNameRecordRequest) returns (CreatePassengerNameRecordResponse) {}
