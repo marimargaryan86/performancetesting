@@ -1,8 +1,9 @@
 import copy
-from collections.abc import Mapping
-from typing import Any
+from collections.abc import Mapping, Sequence
+from typing import Any, cast
 
 import lagom
+import more_itertools
 from starlette import endpoints, requests, responses, status
 
 from snowfall.project.junction.extensions.service.mobile_api import (
@@ -14,13 +15,6 @@ from snowfall.project.junction.extensions.service.mobile_api.models import (
 )
 from snowfall.stdlib.integration.starlette import models, request_helpers
 
-_REF_KEY = "ref"
-_VALUE_KEY = "value"
-_TITLE_KEY = "title"
-_IMAGE_URL_KEY = "imageUrl"
-_TYPE_KEY = "type"
-_CATEGORY_KEY = "category"
-
 
 class Preferences(endpoints.HTTPEndpoint):
     async def get(
@@ -29,12 +23,12 @@ class Preferences(endpoints.HTTPEndpoint):
         preferences_repository: repository.PreferencesRepository = lagom.injectable,
     ) -> responses.Response:
         user_id = request.user.username
-        defaults = copy.deepcopy(preference_model.preference_defaults)
         stored_preferences = await preferences_repository.find_by_id(user_id, "user_id")
         updated_preferences = sync_template(
-            defaults,
+            preference_model.preference_defaults,
             stored_preferences,
         )
+
         return models.JsonApiResponse(
             models.Body(
                 data=[
@@ -66,27 +60,60 @@ def sync_template(
     defaults: Any,
     stored: Mapping[str, Any] | None,
 ) -> Any:
-    if stored:
-        for preference in stored["preferences"]:  # noqa: WPS426
-            default_preference = list(
-                filter(
-                    lambda pref, lambda_preference=preference: (  # type: ignore[arg-type]
-                        pref[_REF_KEY] == lambda_preference[_REF_KEY]
-                    ),
-                    defaults,
-                ),
-            )[0]
-            if default_preference[_TYPE_KEY] in {"boolean", "integer"}:
-                default_preference[_VALUE_KEY] = preference[_VALUE_KEY]
-            else:  # If type==boolean_collection
-                for collection_item in preference[_VALUE_KEY]:  # noqa: WPS426
-                    default_collection_item = list(
-                        filter(
-                            lambda col, lambda_item=collection_item: (  # type: ignore[arg-type]
-                                col[_REF_KEY] == lambda_item[_REF_KEY]
-                            ),
-                            default_preference[_VALUE_KEY],
-                        ),
-                    )[0]
-                    default_collection_item[_VALUE_KEY] = collection_item[_VALUE_KEY]
+    if not stored or not stored.get("preferences"):
+        preferences = defaults
+    else:
+        preferences = _fill_defaults(stored["preferences"])
+
+    return preferences
+
+
+def _fill_defaults(preferences: Sequence[Mapping[str, Any]]) -> Any:
+    defaults = cast(
+        list[dict[str, Any]],
+        copy.deepcopy(preference_model.preference_defaults),
+    )
+
+    for default in defaults:
+        preference = _get_preference_by_ref(preferences, default["ref"])
+
+        if not preference:
+            continue
+
+        default["value"] = _get_updated_default(default, preference)
+
     return defaults
+
+
+def _get_updated_default(
+    default: Mapping[str, Any],
+    preference: Mapping[str, Any],
+) -> Any:
+    if default["type"] in {"boolean", "integer"}:
+        return preference["value"]
+
+    if isinstance(default["value"], list):
+        updated_default = copy.deepcopy(default["value"])
+
+        for collection_item in preference["value"]:
+            default_collection_item = more_itertools.first(
+                (
+                    pref
+                    for pref in updated_default
+                    if pref["ref"] == collection_item["ref"]
+                ),
+            )
+            default_collection_item["value"] = collection_item["value"]
+
+        return updated_default
+    return None
+
+
+def _get_preference_by_ref(
+    preferences: Sequence[Mapping[str, Any]],
+    ref: str,
+) -> Mapping[str, Any] | None:
+    return more_itertools.first(
+        (pref for pref in preferences if pref["ref"] == ref),
+        default=None,
+    )

@@ -132,7 +132,6 @@ external = [
     "WPS352", # Forbid multiline loops
     "WPS420", # Forbid some python keywords
     "WPS421", # Forbid calling some built-in functions
-    "WPS426", # Forbid lambda inside loops
     "WPS430", # Forbid nested functions
     "WPS431", # Forbid nested classes
     "WPS432", # Forbid magic numbers
