@@ -87,6 +87,10 @@ job "notification-center-import" {
     task "import" {
       driver = "docker"
 
+      vault {
+        policies = ["notification-center-${var.environment}"]
+      }
+
       template {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
