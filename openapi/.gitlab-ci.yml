@@ -15,7 +15,7 @@ openapi:breaking:
       if [ ! -f "/tmp/${CI_MERGE_REQUEST_DIFF_BASE_SHA}/${f}" ]; then
         continue
       fi
-      if ! oasdiff -format text -base "/tmp/${CI_MERGE_REQUEST_DIFF_BASE_SHA}/${f}" -revision "${f}" -check-breaking -fail-on-diff -include-checks request-body-enum-value-removed,response-mediatype-enum-value-removed; then
+      if ! oasdiff breaking "/tmp/${CI_MERGE_REQUEST_DIFF_BASE_SHA}/${f}" "${f}" --fail-on=WARN --include-checks=request-body-enum-value-removed,response-mediatype-enum-value-removed; then
         if [ "$BREAKING" -eq "1" ]; then
           exit 2
         else

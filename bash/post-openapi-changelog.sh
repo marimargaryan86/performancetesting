@@ -16,7 +16,7 @@ for f in openapi/**/openapi.json; do
 		continue
 	fi
 
-	DIFF=$(oasdiff -format text -base "/tmp/${CI_COMMIT_BEFORE_SHA}/${f}" -revision "${f}")
+	DIFF=$(oasdiff changelog "/tmp/${CI_COMMIT_BEFORE_SHA}/${f}" "${f}" --include-checks=request-body-enum-value-removed,response-mediatype-enum-value-removed)
 
 	if echo "$DIFF" | grep -q "No changes" || echo "$DIFF" | grep -q "No endpoint changes"; then
 		continue
