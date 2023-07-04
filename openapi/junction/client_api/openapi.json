@@ -3973,61 +3973,6 @@
         "description": "Used to lookup data for a Booking Identifier."
       }
     },
-    "/users/tokens": {
-      "post": {
-        "summary": "Create authentication token",
-        "description": "Authenticate user and provide JWT token",
-        "security": [],
-        "tags": [
-          "authentication"
-        ],
-        "operationId": "post-users-tokens",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/vnd.api+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "$ref": "#/components/schemas/Authentication"
-                    }
-                  },
-                  "required": [
-                    "data"
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          }
-        },
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/vnd.api+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "data": {
-                    "$ref": "#/components/schemas/Authentication"
-                  }
-                },
-                "required": [
-                  "data"
-                ]
-              }
-            }
-          }
-        }
-      }
-    },
     "/health": {
       "get": {
         "summary": "Health",
@@ -4086,55 +4031,6 @@
   },
   "components": {
     "schemas": {
-      "Authentication": {
-        "title": "Authentication",
-        "type": "object",
-        "required": [
-          "id",
-          "type",
-          "attributes"
-        ],
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "user-tokens"
-            ],
-            "example": "user-tokens"
-          },
-          "id": {
-            "type": "string",
-            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
-            "readOnly": true
-          },
-          "attributes": {
-            "type": "object",
-            "required": [
-              "email",
-              "password"
-            ],
-            "properties": {
-              "email": {
-                "type": "string",
-                "format": "email",
-                "example": "example@example.com",
-                "writeOnly": true
-              },
-              "password": {
-                "type": "string",
-                "format": "password",
-                "example": "myPassword",
-                "writeOnly": true
-              },
-              "token": {
-                "type": "string",
-                "readOnly": true,
-                "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
-              }
-            }
-          }
-        }
-      },
       "PassengerGender": {
         "title": "Passenger Gender",
         "allOf": [

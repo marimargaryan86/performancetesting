@@ -4,7 +4,6 @@ import lagom
 from lagom.integrations import starlette
 from starlette import routing
 
-from snowfall.adapter import authentication as auth_adapter
 from snowfall.project.junction.go.adapter import legs as legs_adapter
 from snowfall.project.junction.go.adapter import locations as locations_adapter
 from snowfall.project.junction.go.adapter import (
@@ -21,7 +20,6 @@ from snowfall.project.junction.go.adapter import (
 from snowfall.project.junction.go.adapter import trips as trips_adapter
 from snowfall.project.junction.go.service.client_api import resources
 from snowfall.project.junction.go.service.client_api.routes import (
-    authentication,
     legs,
     offers,
     orders,
@@ -41,9 +39,6 @@ def get_routes(  # noqa: WPS210
     reseller_pay_companies: Mapping[str, str],
 ) -> list[routing.BaseRoute]:
     integration = starlette.StarletteIntegration(dependencies)
-    auth_handler = authentication.Authenticate(
-        dependencies[auth_adapter.Client],  # type: ignore[type-abstract]
-    )
     place_handler = places.Places(
         dependencies[places_adapter.Client],  # type: ignore[type-abstract]
     )
@@ -303,10 +298,4 @@ def get_routes(  # noqa: WPS210
             resource_factory=resources.CabinClassResource.from_proto,
             path="/cabin-classes",
         ).to_routes(),
-        routes.to_route(
-            "/users/tokens",
-            auth_handler.create,
-            name="Authenticate",
-            methods=["POST"],
-        ),
     ]
