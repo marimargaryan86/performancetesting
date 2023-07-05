@@ -1,17 +1,20 @@
 {
   "development": {
     "variables": {
-      "count": 1
+      "count": 1,
+      "use_gateway": true
     }
   },
   "production": {
     "variables": {
-      "count": 2
+      "count": 2,
+      "use_gateway": false
     }
   },
   "sandbox": {
     "variables": {
-      "count": 1
+      "count": 1,
+      "use_gateway": false
     }
   }
 }

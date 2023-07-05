@@ -26,6 +26,10 @@ variable "count" {
   type = number
 }
 
+variable "use_gateway" {
+  type = bool
+}
+
 job "offers-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -122,6 +126,7 @@ EOH
         GRPC_PORT       = "${NOMAD_PORT_grpc}"
         SENTRY_DSN      = "https://7c600c1c458d403e8047091398239f20@sentry.snowfall.se/27"
         PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
+        USE_GATEWAY     = var.use_gateway
       }
     }
   }
