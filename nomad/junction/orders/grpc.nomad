@@ -79,7 +79,7 @@ job "orders-grpc" {
             }
             upstreams {
               local_bind_port  = 8010
-              destination_name = "gateway-${var.environment}"
+              destination_name = "gateway-serve-${var.environment}"
             }
           }
         }

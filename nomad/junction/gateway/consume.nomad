@@ -61,7 +61,7 @@ job "gateway-consume" {
     }
 
     service {
-      name = "gateway-${var.environment}"
+      name = "${JOB}-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
 

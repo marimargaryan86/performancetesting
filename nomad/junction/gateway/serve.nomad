@@ -62,7 +62,7 @@ job "gateway-serve" {
     }
 
     service {
-      name = "gateway-${var.environment}"
+      name = "${JOB}-${var.environment}"
       port = "grpc"
       tags = ["grpc"]
 
@@ -108,7 +108,7 @@ job "gateway-serve" {
       }
     }
     service {
-      name = "gateway-${var.environment}"
+      name = "${JOB}-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
 
