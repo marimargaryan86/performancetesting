@@ -108,6 +108,8 @@ def _grpc_command(  # noqa: WPS210, WPS217
                         if meta_implementation.name in providers
                         or meta_implementation.name.lower() in providers
                     ],
+                    provider_company_id=meta_implementation.name,
+                    provider_name=app.settings.provider_company_id,
                 ),
             )
 

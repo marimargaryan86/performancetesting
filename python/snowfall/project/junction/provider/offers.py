@@ -129,8 +129,12 @@ class OfferSearchService(service.Service, offers_pb2_grpc.OfferServiceServicer):
         self,
         trip_offer_searcher: TripOfferSearcher[_SearchCriteriaTask, _SearchCriteria],
         enabled_resellers: Sequence[str],
+        provider_company_id: str,
+        provider_name: str,
     ):
         self._enabled_resellers = enabled_resellers
+        self._provider_company_id = provider_company_id
+        self._provider_name = provider_name
         self._trip_offer_searcher = trip_offer_searcher
 
     def get_name(self) -> str:
@@ -156,8 +160,8 @@ class OfferSearchService(service.Service, offers_pb2_grpc.OfferServiceServicer):
                     offers_amqp_pb2.TripOfferSearchResult(
                         offer_search_id=request.trip_offer_search_task.offer_search_id,
                         offer=offer_group,
-                        provider_company_id="",  # TODO: real value
-                        provider_name="",  # TODO: real value
+                        provider_company_id=self._provider_company_id,
+                        provider_name=self._provider_name,
                     )
                     async for offer_group in self._trip_offer_searcher.search(
                         request.trip_offer_search_task.search,
