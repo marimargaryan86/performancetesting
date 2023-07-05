@@ -1,6 +1,7 @@
 import datetime
 from unittest import mock
 
+import pytest
 import pytest_httpx
 
 from snowfall.project.junction.go.service.orders.v1 import amqp_pb2, models_pb2
@@ -12,6 +13,17 @@ from snowfall.project.junction.service.providers.save_a_train import (
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1 import phone_number_pb2, postal_address_pb2
+from snowfall.vendor.save_a_train import enums
+from snowfall.vendor.save_a_train.models import request
+
+_BASE_SEARCH_URL = "https://test_url/searches"
+_ORIGIN = "SAT_NL_AM_GVFLE"
+_DESTINATION = "SAT_NL_RO_LCHPY"
+_TRIP_TYPE = 1
+_PASSENGER_COUNT = 1
+_DATE = "2023-07-02"
+_EMAIL = "test%40snowfall.com"
+_PASSWORD = "secret"
 
 _ORDER_TASK = amqp_pb2.PlaceOrderTask(
     booking=models_pb2.Booking(),
@@ -95,3 +107,36 @@ async def test_booking_can_be_placed(
     assert booking_proto.trip_result.record_locator == "GTRHSFL"
     assert not booking_proto.trip_result.operator_booking_references
     save_a_train_adapter._notifications_producer.publish.assert_awaited_once()  # noqa: SLF001
+
+
+async def test_perform_general_search_route_not_allowed(
+    httpx_mock: pytest_httpx.HTTPXMock,
+    save_a_train_adapter: adapter.SaveATrainAdapter,
+) -> None:
+    expected_error_message = "{'errors': ['This route is not allowed']}"
+    httpx_mock.add_response(
+        url="{0}/{1}/{2}?triptype={3}&passengers={4}&ddate={5}&rdate=&email={6}&password={7}".format(
+            _BASE_SEARCH_URL,
+            _ORIGIN,
+            _DESTINATION,
+            _TRIP_TYPE,
+            _PASSENGER_COUNT,
+            _DATE,
+            _EMAIL,
+            _PASSWORD,
+        ),
+        json=expected_error_message,
+    )
+
+    with pytest.raises(adapter.RouteNotAllowedError) as excinfo:
+        await save_a_train_adapter.perform_general_search(
+            search_request=request.GeneralSearchResultsRequest(
+                origin_id=_ORIGIN,
+                destination_id=_DESTINATION,
+                trip_type=enums.TripType.one_way,
+                number_of_passengers=_PASSENGER_COUNT,
+                departure_date=datetime.date(2023, 7, 2),
+            ),
+        )
+
+    assert str(excinfo.value) == expected_error_message  # noqa: WPS441

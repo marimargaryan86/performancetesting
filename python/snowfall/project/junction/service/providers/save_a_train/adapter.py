@@ -50,6 +50,10 @@ class BookingError(SaveATrainAdapterError):
     """Raised when a booking error is encountered."""
 
 
+class RouteNotAllowedError(SaveATrainAdapterError):
+    """Raised when a route is not available for valid stations."""
+
+
 class SaveATrainAdapter(object):  # noqa: WPS214
     _poll_retries_limit = 10
     _wait_time_between_polling = 1
@@ -104,7 +108,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
             ),
         )
 
-    async def gather_search_results(  # noqa: C901,WPS210,WPS231
+    async def gather_search_results(  # noqa: WPS210, WPS231
         self,
         search_criteria: request.CreateSearchRequest,
     ) -> AsyncIterator[offer_models_pb2.OfferGroup]:
@@ -115,24 +119,15 @@ class SaveATrainAdapter(object):  # noqa: WPS214
             search_criteria.destination_id,
         )
 
-        try:
-            await self._client.get_general_search_results(
-                request.GeneralSearchResultsRequest(
-                    origin_id=origin.identifier,
-                    destination_id=destination.identifier,
-                    trip_type=enums.TripType.one_way,
-                    number_of_passengers=len(search_criteria.passengers_ages),
-                    departure_date=search_criteria.departure_datetime.date(),
-                ),
-            )
-        except httpx.TimeoutException as timeout_error:
-            self._logger.info("SAT timeout error occurred.", error=timeout_error)
-        except httpx.HTTPStatusError as http_status_error:
-            status_code = http_status_error.response.status_code
-            if status_code != httpx.codes.INTERNAL_SERVER_ERROR:
-                if http_status_error.response.text:
-                    raise_http_error_with_text(http_status_error)
-                raise
+        await self.perform_general_search(
+            search_request=request.GeneralSearchResultsRequest(
+                origin_id=origin.identifier,
+                destination_id=destination.identifier,
+                trip_type=enums.TripType.one_way,
+                number_of_passengers=len(search_criteria.passengers_ages),
+                departure_date=search_criteria.departure_datetime.date(),
+            ),
+        )
 
         try:
             search_response = await self._client.create_search(search_criteria)
@@ -257,6 +252,27 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                     if transfer_change.transport_type == "train"
                 ],
             )
+
+    async def perform_general_search(
+        self,
+        search_request: request.GeneralSearchResultsRequest,
+    ) -> None:
+        try:
+            await self._client.get_general_search_results(
+                request=search_request,
+            )
+        except exceptions.SATValidationError as no_route_error:
+            raise RouteNotAllowedError(no_route_error) from no_route_error
+
+        except httpx.TimeoutException as timeout_error:
+            self._logger.info("SAT timeout error occurred.", error=timeout_error)
+
+        except httpx.HTTPStatusError as http_status_error:
+            status_code = http_status_error.response.status_code
+            if status_code != httpx.codes.INTERNAL_SERVER_ERROR:
+                if http_status_error.response.text:
+                    raise_http_error_with_text(http_status_error)
+                raise
 
     async def create_booking(
         self,

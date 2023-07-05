@@ -50,7 +50,7 @@ def save_a_train_client(http_client: httpx.AsyncClient) -> client.SATClient:
         password_search="secret",
         token="token",
         api_url="https://test_url",
-        api_search_url="https://test_url",
+        api_search_url="https://test_url/searches",
         api_search_timeout=10,
         api_search_requests_limit=1,
         client=http_client,
