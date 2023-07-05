@@ -42,28 +42,19 @@ class ProviderChannel(Channel):
         receiver: models_pb2.Subscriber,
         sender_configuration: models_pb2.ConfigurationVector,
     ) -> None:
-        bookings_message = "\n".join(
-            [
-                "from {0} to {1} on {2}".format(
-                    booking.value.origin,
-                    booking.value.destination,
-                    protobuf.protobuf_to_datetime(booking.value.departure_at).strftime(
-                        "%A %d %b %Y %H:%M",
-                    ),
-                )
-                for booking in order.bookings
-            ],
-        )
-
         self.send_message(
             receiver=receiver.phone_number.e164_number,
             sender_number=sender_configuration.mobile_phone.e164_number,
             body=(
-                "We are pleased to confirm that your trip: \n"
-                + bookings_message
-                + "\nis booked! \n"
-                + "Booking Reference: "
-                + order.booking_reference
+                "We are pleased to confirm that your trip from "
+                + "{0} to {1} on {2} is booked!".format(
+                    order.bookings[0].value.origin,
+                    order.bookings[0].value.destination,
+                    protobuf.protobuf_to_datetime(
+                        order.bookings[0].value.departure_at,
+                    ).strftime("%A %d %b %Y %H:%M"),
+                )
+                + "\nBooking Reference: {0}".format(order.booking_reference)
             ),
         )
 
