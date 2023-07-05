@@ -105,8 +105,7 @@ def _grpc_command(  # noqa: WPS210, WPS217
                     enabled_resellers=[
                         reseller_id
                         for reseller_id, providers in app.settings.reseller_providers.items()
-                        if meta_implementation.name in providers
-                        or meta_implementation.name.lower() in providers
+                        if str(meta_implementation.identifier) in providers
                     ],
                     provider_company_id=app.settings.provider_company_id,
                     provider_name=meta_implementation.name,
@@ -132,9 +131,11 @@ def _grpc_command(  # noqa: WPS210, WPS217
 
 
 def _offers_command(
-    factory: OffersFactory[_Settings, _SearchCriteriaTask, _SearchCriteria],
+    meta_factory: MetaFactory,
+    offers_factory: OffersFactory[_Settings, _SearchCriteriaTask, _SearchCriteria],
 ) -> service.Callback[_Settings]:
     async def wrapper(app: service.AsyncApplication[_Settings]) -> None:
+        meta_implementation = await meta_factory()
         redis_conn: aioredis.Redis[bytes] = await app.stack.enter_async_context(
             aioredis.from_url(
                 app.settings.redis_dsn,
@@ -148,10 +149,11 @@ def _offers_command(
         trip_search_consumer = offers.create_trip_offer_search_consumer(
             amqp_connection=connection,
             redis_client=redis.Client[bytes](redis_conn, prefix=app.name),
-            implementation=await factory(app, connection, redis_conn, app.stack),
+            implementation=await offers_factory(app, connection, redis_conn, app.stack),
             app_name=app.name,
             pay_company_id=app.settings.provider_company_id,
-            provider_name=app.name,
+            provider_name=meta_implementation.name,
+            provider_id=str(meta_implementation.identifier),
             reseller_providers=app.settings.reseller_providers,
         )
 
@@ -193,7 +195,7 @@ class Entrypoint(
             self.add_command(
                 service.Command(
                     name="offers",
-                    callback=_offers_command(self.offers_factory),
+                    callback=_offers_command(self.meta_factory, self.offers_factory),
                     settings_class=self.settings_class,
                 ),
             )

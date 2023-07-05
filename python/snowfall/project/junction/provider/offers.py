@@ -179,6 +179,7 @@ class TripOfferSearchConsumer(Generic[_SearchCriteriaTask, _SearchCriteria]):
         trip_offer_searcher: TripOfferSearcher[_SearchCriteriaTask, _SearchCriteria],
         pay_company_id: str,
         provider_name: str,
+        provider_id: str,
         reseller_providers: Mapping[str, Sequence[str]],
     ):
         self._consumer = consumer
@@ -186,6 +187,7 @@ class TripOfferSearchConsumer(Generic[_SearchCriteriaTask, _SearchCriteria]):
         self._trip_offer_searcher = trip_offer_searcher
         self._pay_company_id = pay_company_id
         self._provider_name = provider_name
+        self._provider_id = provider_id
         self._reseller_providers = reseller_providers
 
     async def consume(self) -> None:
@@ -204,7 +206,7 @@ class TripOfferSearchConsumer(Generic[_SearchCriteriaTask, _SearchCriteria]):
             await amqp_message.requeue()
 
     def _provider_blocked_for_reseller(self, reseller_id: str) -> bool:
-        return self._provider_name not in self._reseller_providers.get(reseller_id, [])
+        return self._provider_id not in self._reseller_providers.get(reseller_id, [])
 
     async def _publish_trip_offer_search_results(
         self,
@@ -233,6 +235,7 @@ def create_trip_offer_search_consumer(  # noqa: WPS211
     app_name: str,
     pay_company_id: str,
     provider_name: str,
+    provider_id: str,
     reseller_providers: Mapping[str, Sequence[str]],
 ) -> TripOfferSearchConsumer[_SearchCriteriaTask, _SearchCriteria]:
     producer = amqp_producer.Producer(
@@ -262,6 +265,7 @@ def create_trip_offer_search_consumer(  # noqa: WPS211
         ),
         pay_company_id=pay_company_id,
         provider_name=provider_name,
+        provider_id=provider_id,
         reseller_providers=reseller_providers,
     )
 
