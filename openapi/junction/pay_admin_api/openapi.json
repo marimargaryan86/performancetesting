@@ -71,6 +71,12 @@
       ]
     },
     {
+      "name": "Refunds",
+      "tags": [
+        "refunds"
+      ]
+    },
+    {
       "name": "Transactions",
       "tags": [
         "transactions"
@@ -122,6 +128,11 @@
       "name": "payments",
       "description": "Payments",
       "x-displayName": "Payments"
+    },
+    {
+      "name": "refunds",
+      "description": "Refunds",
+      "x-desplayName": "Refunds"
     },
     {
       "name": "transactions",
@@ -1407,6 +1418,216 @@
         "description": "Get payments"
       }
     },
+    "/refunds": {
+      "get": {
+        "summary": "List Refunds",
+        "tags": [
+          "refunds"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "minItems": 0,
+                          "items": {
+                            "$ref": "#/components/schemas/Refund"
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "operationId": "get-refunds",
+        "description": "Get refunds"
+      },
+      "post": {
+        "summary": "Create refund",
+        "description": "Create refund",
+        "tags": [
+          "refunds"
+        ],
+        "operationId": "post-refunds",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/Refund"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Refund created successfully",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Refund"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/refunds/{refundId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/refundId"
+        }
+      ],
+      "get": {
+        "summary": "Get refund",
+        "tags": [
+          "refunds"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Refund"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-refunds-id",
+        "description": "Get refunds"
+      },
+      "patch": {
+        "summary": "Update refund",
+        "description": "Update refund",
+        "tags": [
+          "refunds"
+        ],
+        "operationId": "patch-refunds-id",
+        "responses": {
+          "200": {
+            "description": "Refund is updated",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Refund"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/Refund"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
     "/companies/{companyId}/contacts": {
       "get": {
         "summary": "List Contacts",
@@ -1682,6 +1903,17 @@
           "example": "271f6d54-9e59-407e-a860-b0771d9e3d26"
         },
         "description": "payment id"
+      },
+      "refundId": {
+        "name": "refundId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "271f6d54-9e59-407e-a860-b0771d9e3d26"
+        },
+        "description": "refund id"
       },
       "accountId": {
         "name": "accountId",
@@ -3185,6 +3417,140 @@
         },
         "required": [
           "links"
+        ]
+      },
+      "Refund": {
+        "title": "Refund",
+        "description": "Refund schema",
+        "allOf": [
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "type",
+              "attributes",
+              "relationships"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "271f6d54-9e59-407e-a860-b0771d9e3d26",
+                "format": "uuid",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "example": "refunds",
+                "enum": [
+                  "refunds"
+                ]
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "status",
+                  "refundReceived",
+                  "note",
+                  "refundedUs",
+                  "refundedUsInPayerCurrency",
+                  "refundedReseller"
+                ],
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "readOnly": true,
+                    "enum": [
+                      "pending",
+                      "executed"
+                    ],
+                    "example": "pending"
+                  },
+                  "refundReceived": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "note": {
+                    "type": "string",
+                    "maxLength": 256,
+                    "example": "Refund reason"
+                  },
+                  "refundedUs": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Money"
+                      }
+                    ],
+                    "description": "The amount, we receive from provider "
+                  },
+                  "refundedUsInPayerCurrency": {
+                    "readOnly": true,
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Money"
+                      }
+                    ],
+                    "description": "The amount, we receive from provider in reseller currency"
+                  },
+                  "refundedReseller": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Money"
+                      }
+                    ],
+                    "description": "The amount, we pay to reseller"
+                  },
+                  "refundPosition": {
+                    "readOnly": true,
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Money"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "gain" : {
+                            "type": "boolean",
+                            "example": false,
+                            "description": "false - we lose, true - we profit"
+                          }
+                        }
+                      }
+                    ],
+                    "description": "Profit or loss due to conversion the funds to original currency"
+                  }
+                }
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "transaction",
+                  "conversion"
+                ],
+                "properties": {
+                  "transaction": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/TransactionIdentifier"
+                      }
+                    }
+                  },
+                  "conversion": {
+                    "type": "object",
+                    "readOnly": true,
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/ConversionIdentifier"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
         ]
       },
       "NextLink": {
