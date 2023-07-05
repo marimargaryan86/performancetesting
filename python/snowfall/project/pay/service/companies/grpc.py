@@ -22,7 +22,7 @@ from snowfall.vendor.currency_cloud.models import account as cc_account_models
 from snowfall.vendor.currency_cloud.models import beneficiary as beneficiary_models
 
 
-class CompaniesService(  # noqa: WPS214
+class CompaniesService(
     service.Service,
     grpc_pb2_grpc.CompaniesServiceServicer,
 ):

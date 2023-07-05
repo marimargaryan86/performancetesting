@@ -51,7 +51,7 @@ class TestOrders(object):
             }
 
         def mock_anything(*args: Any, **kwargs: Any) -> None:  # noqa: WPS430
-            pass  # noqa: WPS420
+            """Do nothing."""
 
         monkeypatch.setattr(stripe.PaymentIntent, "retrieve", mock_stripe_retrieve)
         monkeypatch.setattr(stripe.PaymentIntent, "cancel", mock_anything)

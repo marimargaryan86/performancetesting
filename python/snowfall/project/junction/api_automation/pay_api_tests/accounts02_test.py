@@ -19,7 +19,7 @@ logger.setLevel(logging.DEBUG)
 
 
 @pytest.mark.integration()
-async def test_create_account(  # noqa: WPS218
+async def test_create_account(
     pay_admin_client: PayAdminClient,
     pay_create_contact: Mapping[str, Any],
 ) -> None:

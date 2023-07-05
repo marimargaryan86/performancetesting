@@ -140,10 +140,9 @@ async def test_that_exception_raised_if_error_creating_transaction_with_client()
         created_at=None,
         updated_at=None,
     )
-    with pytest.raises(  # noqa: PT012 - otherwise we get WPS441
-        PayTransactionCreationError,
-    ) as ex:
+    with pytest.raises(PayTransactionCreationError) as ex:
         await pay_transactions.create_transaction_and_set_id(
             booking=booking,
         )
-        assert ex.value.__cause__ == expected_error
+
+    assert ex.value.__cause__ == expected_error  # noqa: WPS441

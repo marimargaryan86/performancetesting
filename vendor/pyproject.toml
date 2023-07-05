@@ -119,9 +119,7 @@ external = [
     "WPS223", # Forbid too many elif branches
     "WPS224", # Forbid too many for statements within a comprehension
     "WPS229", # Forbid try blocks with bodies that are too long
-    "WPS230", # Forbid instances with too many public attributes
     "WPS231", # Forbid functions with too much cognitive complexity
-    "WPS234", # Forbid overly complex annotations
     "WPS235", # Forbid from ... import ... with too many imported names
     "WPS238", # Forbids too many raise statements in a function
     "WPS306", # Forbid writing classes without base classes
@@ -130,7 +128,6 @@ external = [
     "WPS337", # Forbid multiline conditions
     "WPS348", # Forbid starting lines with a dot
     "WPS352", # Forbid multiline loops
-    "WPS420", # Forbid some python keywords
     "WPS421", # Forbid calling some built-in functions
     "WPS430", # Forbid nested functions
     "WPS431", # Forbid nested classes

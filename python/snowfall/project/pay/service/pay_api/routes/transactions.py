@@ -14,7 +14,7 @@ from snowfall.stdlib.integration.starlette import (
 
 
 class Transactions(endpoints.HTTPEndpoint):
-    async def post(  # noqa: WPS210, WPS211, WPS217
+    async def post(
         self,
         request: requests.Request,
         quotations_client: quotations.Client = lagom.injectable,

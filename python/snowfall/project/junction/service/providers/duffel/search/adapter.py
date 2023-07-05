@@ -124,7 +124,7 @@ class DuffelSearchAdapter(object):
         )
         self._resellers_map = resellers_map
 
-    def search_criteria_generator(  # noqa: WPS210
+    def search_criteria_generator(
         self,
         search_task: amqp_pb2.SearchCriteriaTask,
     ) -> SearchCriteriaWrapper:

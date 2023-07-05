@@ -51,10 +51,10 @@ class OBBParser(HTMLParser):
         if self.inside_title and "GTFS Fahrplan ÖBB" in data and not is_old_name(data):
             self.save_current = True
 
-    def _get_attr(self, attrs: Sequence[tuple[str, str | None]], name: str) -> str:
+    def _get_attr(self, attributes: Sequence[tuple[str, str | None]], name: str) -> str:
         return next(
-            txt for tag, txt in attrs if tag == name and txt is not None
-        )  # noqa: WPS221
+            text for tag, text in attributes if tag == name and text is not None
+        )
 
 
 def is_old_name(name: str) -> bool:
@@ -66,7 +66,7 @@ def is_old_name(name: str) -> bool:
     return year < datetime.datetime.now(tz=datetime.UTC).year
 
 
-async def obb_plugin(  # noqa: WPS210
+async def obb_plugin(
     sess: AsyncClient,
     dataset: Dataset,
 ) -> Iterator[dict[str, Any]]:

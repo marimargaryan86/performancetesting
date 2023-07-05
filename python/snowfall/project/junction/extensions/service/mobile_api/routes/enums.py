@@ -1,17 +1,19 @@
 import json
 from collections.abc import Awaitable, Callable, Mapping
-from typing import Any
+from typing import Any, TypeAlias
 
 from starlette import requests, responses, routing, status
 
 from snowfall.project.junction.extensions.service.mobile_api import repository
 from snowfall.stdlib.integration.starlette import models
 
+_ResourceFunction: TypeAlias = Callable[[], Awaitable[Mapping[str, Any]]]
+
 
 class CacheAndListEnum(object):
-    def __init__(  # noqa: WPS234
+    def __init__(
         self,
-        resource_function: Callable[[], Awaitable[Mapping[str, Any]]],
+        resource_function: _ResourceFunction,
         cache_repo: repository.EnumsValuesRepository,
         path: str,
     ):

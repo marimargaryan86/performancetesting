@@ -1,7 +1,7 @@
 import asyncio
 import json
 import logging
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 
 import pytest
 
@@ -27,9 +27,7 @@ async def create_trip_candidate_search(
         destination=DESTINATION,
         departure_after=datetime.fromisoformat(
             departure_after,
-        ).astimezone(
-            timezone.utc,  # noqa: UP017
-        ),
+        ).astimezone(UTC),
         allowed_segment_types=[LegType.air],
         passengers_dates_of_birth=[date(year=1980, month=2, day=3)],
         maximum_connections=1,

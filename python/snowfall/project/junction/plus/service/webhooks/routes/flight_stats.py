@@ -2,7 +2,7 @@ from starlette import endpoints, requests, responses, status
 
 
 class Alerts(endpoints.HTTPEndpoint):
-    async def post(  # noqa: WPS238
+    async def post(
         self,
         request: requests.Request,
     ) -> responses.Response:

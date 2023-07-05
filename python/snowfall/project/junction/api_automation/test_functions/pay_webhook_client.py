@@ -19,7 +19,7 @@ def _count_hmac(message: str, secret_key: str) -> str:
     ).hexdigest()
 
 
-class PayWebhookClient(BaseClient):  # noqa: WPS214
+class PayWebhookClient(BaseClient):
     async def trigger_payment_webhook(  # noqa: WPS211
         self,
         amount: str,

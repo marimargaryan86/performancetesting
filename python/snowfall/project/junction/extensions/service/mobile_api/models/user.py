@@ -15,7 +15,7 @@ class User(pydantic.BaseModel):
     country_code: str | None
     date_of_birth: Mapping[str, int] | None
     title: str | None
-    loyalty_programs: Sequence[Mapping[str, str]] | None  # noqa: WPS234
+    loyalty_programs: Sequence[Mapping[str, str]] | None
 
     class Config(object):
         alias_generator = string.to_lower_camel

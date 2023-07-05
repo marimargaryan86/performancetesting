@@ -55,7 +55,7 @@ class Client(object):
         )
 
     async def __aenter__(self) -> Self:
-        await self._channel.__aenter__()  # noqa: WPS609
+        await self._channel.__aenter__()
         return self
 
     async def __aexit__(
@@ -64,7 +64,7 @@ class Client(object):
         exc_value: BaseException | None,
         traceback: TracebackType | None,
     ) -> None:
-        await self._channel.__aexit__(  # noqa: WPS609
+        await self._channel.__aexit__(
             exc_type,
             exc_value,
             traceback,

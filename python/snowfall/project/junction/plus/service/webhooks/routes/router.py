@@ -5,7 +5,7 @@ from starlette import routing
 from snowfall.project.junction.plus.service.webhooks.routes import flight_stats
 
 
-def get_routes(  # noqa: WPS210
+def get_routes(
     dependencies: lagom.Container,
 ) -> list[routing.BaseRoute]:
     integration = starlette.StarletteIntegration(dependencies)

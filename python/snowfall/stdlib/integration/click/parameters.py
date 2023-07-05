@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pathlib
 from collections.abc import Callable, Mapping, Sequence
-from typing import Any, cast, get_args, get_origin, get_type_hints
+from typing import Any, TypeGuard, cast, get_args, get_origin, get_type_hints
 
 import click
 import orjson
@@ -166,6 +166,10 @@ def _validate_option(
 _iterables = (list, set, tuple)
 
 
+def _is_primitive(maybe_primitive: Any) -> TypeGuard[bool | float | int | str]:
+    return isinstance(maybe_primitive, bool | float | int | str)
+
+
 def _get_parameter_default(
     arg: pydantic.fields.ModelField,
 ) -> types.Primitive | list[types.Primitive] | None:
@@ -179,15 +183,11 @@ def _get_parameter_default(
 
     if isinstance(resolved_default, _iterables) or sequence.is_a(resolved_default):
         return [
-            (
-                default
-                if isinstance(default, bool | float | int | str)  # noqa: WPS221
-                else str(default)
-            )
+            (default if _is_primitive(default) else str(default))
             for default in resolved_default
         ]
 
-    if isinstance(resolved_default, bool | float | int | str):
+    if _is_primitive(resolved_default):
         return resolved_default
 
     return str(resolved_default)

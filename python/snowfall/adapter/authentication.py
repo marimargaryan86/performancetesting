@@ -75,7 +75,7 @@ class DictClient(Client):
 
         return self._encoder.encode(self._jwt_factory.from_user(user))
 
-    async def create_user(  # noqa: WPS210
+    async def create_user(
         self,
         email: str,
         password: str,
