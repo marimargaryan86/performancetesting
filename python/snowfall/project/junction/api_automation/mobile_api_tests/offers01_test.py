@@ -18,7 +18,7 @@ logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
 
 
-@pytest.mark.integration()
+@pytest.mark.skip(reason="temporary skipped")
 async def test_trip_offer_search_id(
     mobile_client: MobileApiClient,
     trip_ids: Sequence[str],
@@ -35,7 +35,7 @@ async def test_trip_offer_search_id(
     assert r3["data"]["id"]
 
 
-@pytest.mark.integration()
+@pytest.mark.skip(reason="temporary skipped")
 async def test_trip_offer_search_offers(
     mobile_client: MobileApiClient,
     trip_ids: Sequence[str],

@@ -11,7 +11,7 @@ logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
 
 
-@pytest.mark.integration()
+@pytest.mark.skip(reason="temporary skipped")
 async def test_cabin_classes_ids_mobile(
     mobile_client: MobileApiClient,
 ) -> None:

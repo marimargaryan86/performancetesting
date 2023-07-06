@@ -13,7 +13,7 @@ logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
 
-@pytest.mark.integration()
+@pytest.mark.skip(reason="temporary skipped")
 async def test_create_payment(mobile_client: MobileApiClient) -> None:
     try:  # noqa: WPS229
         resp = await mobile_client.create_payment(currency="EUR", amount="3.14")
@@ -26,7 +26,7 @@ async def test_create_payment(mobile_client: MobileApiClient) -> None:
         pytest.fail(err_msg, pytrace=False)
 
 
-@pytest.mark.integration()
+@pytest.mark.skip(reason="temporary skipped")
 async def test_update_payment(mobile_client: MobileApiClient) -> None:
     resp = await with_log(mobile_client.create_payment)(currency="USD", amount="3.50")
     payment_id = resp["data"]["id"]

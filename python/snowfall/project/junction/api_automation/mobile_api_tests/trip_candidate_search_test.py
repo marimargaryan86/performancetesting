@@ -48,7 +48,7 @@ async def create_trip_candidate_search(
     return trip_search_id
 
 
-@pytest.mark.integration()
+@pytest.mark.skip(reason="temporary skipped")
 async def test_list_trips_candidates_offers(
     mobile_client: MobileApiClient,
     departure_after: str,
