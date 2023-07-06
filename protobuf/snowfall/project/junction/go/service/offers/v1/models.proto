@@ -104,7 +104,7 @@ message PriceBreakdown {
   snowfall.stdlib.v1.Money price = 1;
   enum BreakdownType {
     BREAKDOWN_TYPE_UNSPECIFIED = 0;
-    BREAKDOWN_TYPE_BASE_FEE = 1;
+    BREAKDOWN_TYPE_BASE_FARE = 1;
     BREAKDOWN_TYPE_TAX = 2;
   }
   BreakdownType breakdown_type = 2;

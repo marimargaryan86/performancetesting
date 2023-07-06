@@ -32,7 +32,9 @@ async def test_search_result_data(  # noqa: WPS218, WPS210
     base_fare_price = money.from_protobuf(base_fare.price)
     assert str(base_fare_price) == "27.00"
     assert base_fare_price.currency.code == "EUR"
-    assert base_fare.breakdown_type == offers_pb2.PriceBreakdown.BREAKDOWN_TYPE_BASE_FEE
+    assert (
+        base_fare.breakdown_type == offers_pb2.PriceBreakdown.BREAKDOWN_TYPE_BASE_FARE
+    )
 
     tax = price_quote.price_breakdown[1]
     tax_price = money.from_protobuf(tax.price)

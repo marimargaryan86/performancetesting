@@ -41,7 +41,7 @@ class TestPricingTransformer(object):
         assert base_fare_price.currency.code == "GBP"
         assert (
             base_fare.breakdown_type
-            == offers_pb2.PriceBreakdown.BREAKDOWN_TYPE_BASE_FEE
+            == offers_pb2.PriceBreakdown.BREAKDOWN_TYPE_BASE_FARE
         )
 
         tax = price_quote.price_breakdown[1]

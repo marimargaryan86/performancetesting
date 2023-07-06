@@ -61,7 +61,7 @@ def _to_price_breakdown(
     return [
         offers_pb2.PriceBreakdown(
             price=_to_money(price_breakdown.base_amount, price_breakdown.currency),
-            breakdown_type=offers_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_BASE_FEE,
+            breakdown_type=offers_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_BASE_FARE,
         ),
         offers_pb2.PriceBreakdown(
             price=_to_money(price_breakdown.tax_amount, price_breakdown.currency),

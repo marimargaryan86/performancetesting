@@ -454,7 +454,7 @@ class OfferTransformer(object):  # noqa: WPS214
                     pricing_information.base_fare,
                     money.Currency(pricing_information.currency),
                 ).protobuf(),
-                breakdown_type=offers_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_BASE_FEE,
+                breakdown_type=offers_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_BASE_FARE,
             ),
             offers_pb2.PriceBreakdown(
                 price=money.from_string(

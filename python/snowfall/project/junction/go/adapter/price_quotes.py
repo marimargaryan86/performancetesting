@@ -49,7 +49,7 @@ class DictClient(Client):
         price_breakdown = [
             models_pb2.PriceBreakdown(
                 price=money.from_string("3.37", money.Currency("EUR")).protobuf(),
-                breakdown_type=models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_BASE_FEE,
+                breakdown_type=models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_BASE_FARE,
             ),
             models_pb2.PriceBreakdown(
                 price=money.from_string("10.00", money.Currency("EUR")).protobuf(),

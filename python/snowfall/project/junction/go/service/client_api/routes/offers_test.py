@@ -553,3 +553,26 @@ class TestPriceQuotes(object):
         assert response.json()["errors"][0][
             "detail"
         ] == "Multiple options chosen for group '{0}'".format(fixtures.OFFER_GROUPS[0])
+
+    async def test_price_quote_price_breakdown(  # noqa: WPS218
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        response = await client.post(
+            "/offers/quotes",
+            json=_get_price_quote_request(),
+            headers={"Content-Type": "application/vnd.api+json"},
+        )
+
+        price_breakdown = response.json()["data"]["attributes"]["priceBreakdown"]
+        assert len(price_breakdown) == 2
+
+        base_fare = price_breakdown[0]
+        assert base_fare["price"]["amount"] == "6.74"
+        assert base_fare["price"]["currency"] == "EUR"
+        assert base_fare["breakdownType"] == "base-fare"
+
+        tax = price_breakdown[1]
+        assert tax["price"]["amount"] == "20.00"
+        assert tax["price"]["currency"] == "EUR"
+        assert tax["breakdownType"] == "tax"

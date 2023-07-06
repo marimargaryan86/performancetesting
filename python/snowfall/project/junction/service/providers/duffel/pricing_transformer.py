@@ -96,7 +96,7 @@ class PriceQuoteTransformer(object):
         price_breakdown.append(
             offers_pb2.PriceBreakdown(
                 price=self._to_money(offer.base_amount, offer.base_currency),
-                breakdown_type=offers_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_BASE_FEE,
+                breakdown_type=offers_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_BASE_FARE,
             ),
         )
 

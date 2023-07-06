@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 import zoneinfo
+from collections import defaultdict
 from collections.abc import Iterable, Sequence
 from typing import Any, ClassVar
 
@@ -466,6 +467,38 @@ class OfferSegmentDetails(models.BaseModel):
         )
 
 
+class PriceBreakdown(models.BaseModel):
+    price: Price
+    breakdown_type: str = pydantic.Field(alias="breakdownType")
+
+    @classmethod
+    def from_protos(
+        cls,
+        price_breakdown_protos: Iterable[offer_models_pb2.PriceBreakdown],
+    ) -> list[PriceBreakdown]:
+        price_breakdowns_by_type = defaultdict[
+            offer_models_pb2.PriceBreakdown.BreakdownType.ValueType,
+            list[offer_models_pb2.PriceBreakdown],
+        ](list)
+        for price_breakdown in price_breakdown_protos:
+            price_breakdowns_by_type[price_breakdown.breakdown_type].append(
+                price_breakdown,
+            )
+
+        return [
+            cls(
+                price=Price.from_protos(
+                    [breakdown.price for breakdown in price_breakdowns],
+                ),
+                breakdownType=protobuf.enum_value_to_slug(
+                    enum_descriptor=offer_models_pb2.PriceBreakdown.BreakdownType.DESCRIPTOR,
+                    enum_value=breakdown_type,
+                ),
+            )
+            for breakdown_type, price_breakdowns in price_breakdowns_by_type.items()
+        ]
+
+
 class PriceQuoteResource(models.Resource):
     api_type: ClassVar[str] = "trip-offer-price-quotes"
 
@@ -490,6 +523,13 @@ class PriceQuoteResource(models.Resource):
             attributes={
                 "expiresAt": protobuf.protobuf_to_datetime(price_quote.expires_at),
                 "price": price,
+                "priceBreakdown": PriceBreakdown.from_protos(
+                    [
+                        price_breakdown
+                        for quote in price_quote.quotes
+                        for price_breakdown in quote.price_breakdown
+                    ],
+                ),
                 "penalties": [
                     Penalty.from_proto(penalty)
                     for quote in price_quote.quotes
