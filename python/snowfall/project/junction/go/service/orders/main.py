@@ -8,7 +8,7 @@ from motor import motor_asyncio
 
 from snowfall.project.junction.go import pay_integration
 from snowfall.project.junction.go.adapter import passenger_name_records
-from snowfall.project.junction.go.service.gateway.v1alpha import bookings_pb2_grpc
+from snowfall.project.junction.go.service.gateway.v1 import bookings_pb2_grpc
 from snowfall.project.junction.go.service.orders import bookings, importer, orders
 from snowfall.project.junction.go.service.orders.amqp import OrderProducer
 from snowfall.project.junction.go.service.orders.grpc import OrderService

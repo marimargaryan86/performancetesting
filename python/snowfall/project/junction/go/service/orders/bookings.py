@@ -4,10 +4,10 @@ from collections.abc import Sequence
 
 import grpc
 
-from snowfall.project.junction.go.service.gateway.v1alpha import (
+from snowfall.project.junction.go.service.gateway.v1 import (
     bookings_pb2 as gateway_bookings_pb2,
 )
-from snowfall.project.junction.go.service.gateway.v1alpha import bookings_pb2_grpc
+from snowfall.project.junction.go.service.gateway.v1 import bookings_pb2_grpc
 from snowfall.project.junction.go.service.orders import orders
 from snowfall.project.junction.go.service.orders.v1 import models_pb2
 from snowfall.project.junction.provider.v1alpha import bookings_pb2

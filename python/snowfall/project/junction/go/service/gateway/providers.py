@@ -131,7 +131,19 @@ class Collection(object):
             ],
         )
 
+    def is_healthy(self, identifier: str) -> bool:
+        try:
+            return self._providers[identifier].is_healthy
+        except KeyError as err:
+            raise ValueError("Unknown identifier") from err
+
     async def all_(self) -> AsyncIterable[Provider]:
+        for provider in self._providers.values():
+            await provider.refresh()
+
+            yield provider.provider
+
+    async def all_healthy(self) -> AsyncIterable[Provider]:
         for provider in self._providers.values():
             await provider.refresh()
 

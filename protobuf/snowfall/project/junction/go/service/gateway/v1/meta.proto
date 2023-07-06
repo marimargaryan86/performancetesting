@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package snowfall.project.junction.go.service.gateway.v1;
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/gateway/v1";
+
+service MetaService {
+  rpc ListProviders(ListProvidersRequest) returns (ListProvidersResponse) {}
+}
+
+message ListProvidersRequest {}
+
+message ListProvidersResponse {
+  repeated Provider providers = 1;
+}
+
+message Provider {
+  string id = 1;
+  string name = 2;
+  bool is_healthy = 3;
+}

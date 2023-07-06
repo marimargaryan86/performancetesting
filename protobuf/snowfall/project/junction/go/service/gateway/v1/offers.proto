@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-package snowfall.project.junction.go.service.gateway.v1alpha;
+package snowfall.project.junction.go.service.gateway.v1;
 
 import "snowfall/project/junction/go/service/offers/v1/amqp.proto";
 
-option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/gateway/v1alpha";
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/gateway/v1";
 
 service OfferService {
   rpc EnqueueOfferSearch(EnqueueOfferSearchRequest) returns (EnqueueOfferSearchResponse) {}

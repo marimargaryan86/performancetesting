@@ -8,7 +8,7 @@ import more_itertools
 import pytest
 from motor import motor_asyncio
 
-from snowfall.project.junction.go.service.gateway.v1alpha import (
+from snowfall.project.junction.go.service.gateway.v1 import (
     bookings_pb2,
     bookings_pb2_grpc,
 )

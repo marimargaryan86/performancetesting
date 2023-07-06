@@ -9,7 +9,7 @@ from motor import motor_asyncio
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.go import pay_integration
-from snowfall.project.junction.go.service.gateway.v1alpha import offers_pb2_grpc
+from snowfall.project.junction.go.service.gateway.v1 import offers_pb2_grpc
 from snowfall.project.junction.go.service.offers import (
     aggregator,
     importer,

@@ -5,7 +5,7 @@ from typing import cast
 from grpc import aio
 
 from snowfall.project.junction.go.service.gateway import providers
-from snowfall.project.junction.go.service.gateway.v1alpha import (
+from snowfall.project.junction.go.service.gateway.v1 import (
     bookings_pb2,
     bookings_pb2_grpc,
 )

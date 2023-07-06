@@ -8,7 +8,7 @@ from google.protobuf import message
 from grpc import StatusCode, aio
 
 from snowfall.project.junction.go.service.gateway import providers
-from snowfall.project.junction.go.service.gateway.v1alpha import (
+from snowfall.project.junction.go.service.gateway.v1 import (
     offers_pb2,
     offers_pb2_grpc,
 )
@@ -83,7 +83,7 @@ class Consumer(object):
     ) -> None:
         tasks = []
 
-        async for provider in self._providers.all_():
+        async for provider in self._providers.all_healthy():
             tasks.append(_do_trip_offer_search(provider, msg, self._timeout))
 
         async with asyncio.TaskGroup() as tg:

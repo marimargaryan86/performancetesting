@@ -6,7 +6,7 @@ from collections.abc import Sequence
 import prometheus_client
 from pymongo import errors
 
-from snowfall.project.junction.go.service.gateway.v1alpha import (
+from snowfall.project.junction.go.service.gateway.v1 import (
     offers_pb2,
     offers_pb2_grpc,
 )
