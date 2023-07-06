@@ -268,19 +268,19 @@ def session_cookie_resolver(
 ) -> Callable[[str], Awaitable[authentication.User]]:
     async def wrapper(cookie_value: str) -> authentication.User:
         try:
-            session = cast(
-                sessions_pb2.Session,
-                session_client.GetSession(
+            response = cast(
+                sessions_pb2.GetSessionResponse,
+                await session_client.GetSession(
                     sessions_pb2.GetSessionRequest(cookie=cookie_value),
                 ),
             )
         except grpc.RpcError as err:
             raise authentication.AuthenticationError("No session found.") from err
 
-        if not session.active:
+        if not response.session.active:
             raise authentication.AuthenticationError("No session found.")
 
-        identity = session.identity
+        identity = response.session.identity
 
         return authentication.User(identifier=identity.id, email=identity.email)
 
