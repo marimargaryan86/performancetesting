@@ -34,4 +34,4 @@ async def test_update_payment(mobile_client: MobileApiClient) -> None:
         payment_intent_id=payment_id,
         voucher_id="ABC00032",
     )
-    assert status == 204
+    assert status == 204  # noqa: WPS432

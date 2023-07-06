@@ -174,23 +174,16 @@ class MobileApiClient(Client):  # noqa: WPS214
                         contact_details,
                         dict_factory=models.dict_factory_to_camel,
                     ),
+                    "residenceAddress": {
+                        "addressLines": [
+                            "Street name 7",
+                        ],
+                        "countryCode": "GB",
+                        "postalCode": "12345",
+                        "city": "London",
+                    },
                 },
                 _RELATIONSHIPS_KEY: {
-                    "offer": {
-                        _DATA_KEY: {
-                            _ID_KEY: offer_id,
-                            _TYPE_KEY: "offers",
-                        },
-                    },
-                    "options": {
-                        _DATA_KEY: [
-                            {
-                                _ID_KEY: option_id,
-                                _TYPE_KEY: "offer-options",
-                            }
-                            for option_id in option_ids
-                        ],
-                    },
                     "payment": {
                         _DATA_KEY: {_TYPE_KEY: "payments", _ID_KEY: payment_id},
                     },
@@ -544,7 +537,7 @@ class MobileApiClient(Client):  # noqa: WPS214
                 {"dateOfBirth": dob.strftime("%Y-%m-%d")}
                 for dob in passengers_dates_of_birth
             ],
-            _CRITERIA_KEY: [
+            "criteria": [  # TODO: replace with _CRITERIA_KEY after #2178 MR merge
                 {
                     "origin": {
                         "latitude": origin[0],
