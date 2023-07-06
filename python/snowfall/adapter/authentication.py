@@ -2,14 +2,23 @@ import abc
 import dataclasses
 import datetime
 from collections.abc import Awaitable, Callable, Mapping
+from typing import cast
 
 import asyncstdlib
 import grpc
 
-from snowfall.service.authentication.v1 import authentication_pb2 as auth_pb2
+from snowfall.service.authentication.v1 import (
+    authentication_pb2 as auth_pb2,
+)
 from snowfall.service.authentication.v1 import authentication_pb2_grpc as auth_pb2_grpc
-from snowfall.service.authentication.v1 import models_pb2, oauth_pb2, oauth_pb2_grpc
-from snowfall.stdlib import string
+from snowfall.service.authentication.v1 import (
+    models_pb2,
+    oauth_pb2,
+    oauth_pb2_grpc,
+    sessions_pb2,
+    sessions_pb2_grpc,
+)
+from snowfall.stdlib import authentication, string
 from snowfall.stdlib.format import jwt
 
 
@@ -250,5 +259,29 @@ def oauth_client_resolver(
         response = await oath_client.GetClient(oauth_pb2.GetClientRequest(id=client_id))
 
         return response.owner
+
+    return wrapper
+
+
+def session_cookie_resolver(
+    session_client: sessions_pb2_grpc.SessionServiceStub,
+) -> Callable[[str], Awaitable[authentication.User]]:
+    async def wrapper(cookie_value: str) -> authentication.User:
+        try:
+            session = cast(
+                sessions_pb2.Session,
+                session_client.GetSession(
+                    sessions_pb2.GetSessionRequest(cookie=cookie_value),
+                ),
+            )
+        except grpc.RpcError as err:
+            raise authentication.AuthenticationError("No session found.") from err
+
+        if not session.active:
+            raise authentication.AuthenticationError("No session found.")
+
+        identity = session.identity
+
+        return authentication.User(identifier=identity.id, email=identity.email)
 
     return wrapper

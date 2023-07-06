@@ -1,8 +1,11 @@
+import dataclasses
 from collections.abc import Awaitable, Callable
+from typing import Literal
 
 import jwt as jwtlib
 from starlette import authentication, requests
 
+from snowfall.stdlib import authentication as stdlib_auth
 from snowfall.stdlib.format import jwt
 
 
@@ -54,3 +57,48 @@ class JWTAuthenticationBackend(authentication.AuthenticationBackend):
         return authentication.AuthCredentials(
             ["authenticated"],
         ), authentication.SimpleUser(await self._jwt_to_user_id(jwt_token))
+
+
+@dataclasses.dataclass(frozen=True)
+class AuthenticatedUser(authentication.BaseUser):
+    identifier: str
+    email: str
+
+    @property
+    def is_authenticated(self) -> Literal[True]:
+        return True
+
+    @property
+    def display_name(self) -> str:
+        return self.email
+
+    @property
+    def username(self) -> str:
+        return self.email
+
+    @property
+    def identity(self) -> str:
+        return self.identifier
+
+
+class CookieAuthenticationBackend(authentication.AuthenticationBackend):
+    def __init__(self, cookie_to_user: Callable[[str], Awaitable[stdlib_auth.User]]):
+        self._cookie_to_user = cookie_to_user
+
+    async def authenticate(
+        self,
+        conn: requests.HTTPConnection,
+    ) -> tuple[authentication.AuthCredentials, AuthenticatedUser] | None:
+        cookie_value = conn.scope["security"].get("cookie")
+
+        if not cookie_value:
+            return None
+
+        try:
+            ory_user = await self._cookie_to_user(cookie_value)
+        except stdlib_auth.AuthenticationError as err:
+            raise authentication.AuthenticationError("Session not found.") from err
+
+        return authentication.AuthCredentials(
+            ["authenticated"],
+        ), AuthenticatedUser(identifier=ory_user.identifier, email=ory_user.email)
