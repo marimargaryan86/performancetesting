@@ -52,14 +52,13 @@ async def return_flat_responses_get_offer_groups_by_offer_group_id(
     clean_offer_id_and_offer_group_ids: Sequence[tuple[Any, ...]],
     junction_client: Client,
 ) -> Sequence[dict[str, Any]]:
-    responses = []
-    for clean_offer_id_and_offer_group_id in clean_offer_id_and_offer_group_ids:
-        responses.append(
-            await responses_get_offer_groups_by_offer_group_id(
-                clean_offer_id_and_offer_group_id,
-                junction_client,
-            ),
+    responses = [
+        await responses_get_offer_groups_by_offer_group_id(
+            clean_offer_id_and_offer_group_id,
+            junction_client,
         )
+        for clean_offer_id_and_offer_group_id in clean_offer_id_and_offer_group_ids
+    ]
 
     return [data_item for sublist in responses for data_item in sublist]
 

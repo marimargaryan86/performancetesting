@@ -1,8 +1,6 @@
-import contextlib
 import datetime
 
 import more_itertools
-from redis import exceptions
 
 from snowfall.project.junction.go.service.offers.v1 import models_pb2 as offers_pb2
 from snowfall.project.junction.go.v1 import models_pb2 as common_pb2
@@ -65,14 +63,7 @@ class TestResults(object):
         searcher: provider_offers.TripOfferSearcher[offers.Criteria, offers.Criteria],
         offer_search: offers_pb2.TripOfferSearch,
     ) -> list[offers_pb2.OfferGroup]:
-        offer_groups = []
-
-        # This happens for some reason when collecting more than one result.
-        with contextlib.suppress(exceptions.NoScriptError):
-            async for offer_group in searcher.search(offer_search):
-                offer_groups.append(offer_group)
-
-        return offer_groups
+        return [offer_group async for offer_group in searcher.search(offer_search)]
 
 
 class TestOfferGroupModel(object):

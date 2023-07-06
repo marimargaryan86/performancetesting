@@ -101,8 +101,10 @@ def _dict_to_html_ul(dict_to_convert: Mapping[str, Any]) -> str:
                 ),
             )
         elif isinstance(item_val, list):
-            for seq in item_val:
-                html.append("{0}</li>".format(_dict_to_html_ul(seq)))
+            html = [
+                *html,
+                *["{0}</li>".format(_dict_to_html_ul(seq)) for seq in item_val],
+            ]
         else:
             html.append("{0}</li>".format(item_val))
     html.append("</ul>")

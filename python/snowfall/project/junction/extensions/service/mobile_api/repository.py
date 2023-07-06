@@ -274,8 +274,11 @@ class PreferencesRepository(
         # TODO: check if I can do it in 1 aggregation pipeline
         saved_preferences = await self.find_by_id(user_id, "user_id")
         if saved_preferences:
-            for preference in preferences:
-                saved_preferences["preferences"].append(preference)
+            saved_preferences["preferences"] = [
+                *saved_preferences["preferences"],
+                *list(preferences),
+            ]
+
             new_preferences = list(
                 {
                     saved_preference["ref"]: saved_preference

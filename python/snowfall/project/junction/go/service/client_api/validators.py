@@ -133,16 +133,16 @@ def _validate_residence_address(
             "city",
         ]
 
-        for attr in residence_address_attributes:
-            if not residence_address or not residence_address.get(attr):
-                validation_errors.append(
-                    _generate_mandatory_attribute_error_model(
-                        "residenceAddress.{0}".format(
-                            attr,
-                        ),
-                        quote_id,
-                    ),
-                )
+        validation_errors = [
+            _generate_mandatory_attribute_error_model(
+                "residenceAddress.{0}".format(
+                    attr,
+                ),
+                quote_id,
+            )
+            for attr in residence_address_attributes
+            if not residence_address or not residence_address.get(attr)
+        ]
 
     return validation_errors
 

@@ -229,13 +229,13 @@ def journey_signature_str(
 
 
 def filter_future_orders(
-    docs: Sequence[Mapping[str, Any]],
+    documents: Sequence[Mapping[str, Any]],
 ) -> Sequence[Mapping[str, Any]]:
     return [
-        doc
-        for doc in docs
+        document
+        for document in documents
         if datetime.datetime.fromisoformat(
-            doc["bookings"][0]["details"][0]["legs"][0][  # noqa: WPS219 EXTRA COM
+            document["bookings"][0]["details"][0]["legs"][0][  # noqa: WPS219
                 "departureAt"
             ],
         )

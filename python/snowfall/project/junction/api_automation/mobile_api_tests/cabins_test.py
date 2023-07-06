@@ -18,8 +18,6 @@ async def test_cabin_classes_ids_mobile(
     expected_classes = {"business", "economy", "first", "premium", "unspecified"}
     r0 = await mobile_client.list_cabin_classes()
     logging.info("list_cabin_classes: %s", json.dumps(r0, indent=4))
-    cabin_classes_ids = []
-    for idx, _ in enumerate(r0["data"]):
-        cabin_classes_ids.append(r0["data"][idx]["id"])
+    cabin_classes_ids = [cabin_class["id"] for cabin_class in r0["data"]]
     logging.info("cabin_classes: %s", cabin_classes_ids)
     assert set(cabin_classes_ids) == expected_classes

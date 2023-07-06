@@ -184,19 +184,17 @@ class OfferParser(object):  # noqa: WPS214
             segment for offer_slice in slices for segment in offer_slice.segments
         ]
 
-        segment_details = []
         segment_pairs = zip(duffel_segments, offer_segments, strict=True)
 
-        for duffel_segment, offer_segment in segment_pairs:
-            segment_details.append(
-                offer_models_pb2.OfferSegmentDetails(
-                    id=string.uuid(),
-                    offer_segment_id=offer_segment.id,
-                    cabin_class=self._parse_cabin_class(duffel_segment),
-                    baggage_allowances=self._parse_baggage_allowance(duffel_segment),
-                ),
+        return [
+            offer_models_pb2.OfferSegmentDetails(
+                id=string.uuid(),
+                offer_segment_id=offer_segment.id,
+                cabin_class=self._parse_cabin_class(duffel_segment),
+                baggage_allowances=self._parse_baggage_allowance(duffel_segment),
             )
-        return segment_details
+            for duffel_segment, offer_segment in segment_pairs
+        ]
 
     def _parse_cabin_class(self, segment: OfferSliceSegment) -> models_pb2.CabinClass:
         first_passenger = segment.passengers[0] if segment.passengers else None

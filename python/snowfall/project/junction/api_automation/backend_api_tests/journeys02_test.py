@@ -23,8 +23,6 @@ async def test_get_journey_by_id(junction_client: Client) -> None:
 async def return_journey_ids(junction_client: Client) -> Sequence[str]:
     r0 = await junction_client.get_journeys()
     logging.info("get_journeys: %s", json.dumps(r0, indent=4))
-    journey_ids = []
     journeys_data = r0["data"]
-    for idx, _ in enumerate(journeys_data):
-        journey_ids.append(journeys_data[idx]["id"])
-    return journey_ids
+
+    return [journey["id"] for journey in journeys_data]

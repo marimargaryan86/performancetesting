@@ -30,8 +30,9 @@ async def test_get_booking_by_id(
 async def return_some_order_ids(junction_client: Client) -> Sequence[str]:
     r0 = await junction_client.get_journeys(limit=5)
     logging.info("get_order_by_journey: %s", json.dumps(r0, indent=4))
-    order_ids = []
-    for journey in r0["data"]:
-        for order in journey["relationships"]["orders"]["data"]:
-            order_ids.append(order["id"])
-    return order_ids
+
+    return [
+        order["id"]
+        for journey in r0["data"]
+        for order in journey["relationships"]["orders"]["data"]
+    ]

@@ -146,25 +146,22 @@ async def accounts_based_on_cc_accounts(
     accounts_client: accounts.DictClient,
     accounts_list_from_cc: Sequence[mock.Mock],
 ) -> list[Account]:
-    proto_accounts = []
-    for account in accounts_list_from_cc:
-        proto_accounts.append(
-            await accounts_client.create(
-                Account(
-                    id=string.uuid(),
-                    external_reference=account.identifier,
-                    contact_id=string.uuid(),
-                    company_id=string.uuid(),
-                    name="Snowfall",
-                    status=protobuf.slug_to_enum_value(
-                        Status,
-                        "enabled",
-                    ),
+    return [
+        await accounts_client.create(
+            Account(
+                id=string.uuid(),
+                external_reference=account.identifier,
+                contact_id=string.uuid(),
+                company_id=string.uuid(),
+                name="Snowfall",
+                status=protobuf.slug_to_enum_value(
+                    Status,
+                    "enabled",
                 ),
             ),
         )
-
-    return proto_accounts
+        for account in accounts_list_from_cc
+    ]
 
 
 @pytest.fixture()

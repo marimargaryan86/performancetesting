@@ -82,9 +82,11 @@ async def return_options_by_order_groups(
     junction_client: Client,
     order_group_ids: Sequence[str],
 ) -> Sequence[str]:
-    option_ids = []
+    option_ids: list[str] = []
     for group_id in order_group_ids:
         resp = await junction_client.get_offer_options_by_offer_group_id(group_id)
-        for option in resp["data"]:
-            option_ids.append(option["id"])
+        option_ids = [
+            *option_ids,
+            *[option["id"] for option in resp["data"]],
+        ]
     return option_ids

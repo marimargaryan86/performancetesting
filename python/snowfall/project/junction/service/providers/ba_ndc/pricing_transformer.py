@@ -15,26 +15,20 @@ def _to_money(amount: str, currency: str) -> money_pb2.Money | None:
 
 
 def _to_penalties(penalties: Sequence[cache.OfferPenalty]) -> list[offers_pb2.Penalty]:
-    res = list[offers_pb2.Penalty]()
-
-    if penalties:
-        for penalty in penalties:
-            if penalty is not None:
-                res.append(
-                    offers_pb2.Penalty(
-                        penalty_type=(
-                            offers_pb2.Penalty.Type.TYPE_REFUND
-                            if penalty.penalty_type.lower().startswith("cancel")
-                            else offers_pb2.Penalty.Type.TYPE_EXCHANGE
-                        ),
-                        applicability=offers_pb2.Penalty.Applicability.APPLICABILITY_BEFORE,
-                        refundable=penalty.penalty_type.lower().startswith("cancel"),
-                        changeable=penalty.penalty_type.lower().startswith("change"),
-                        price=_to_money(penalty.price.amount, penalty.price.currency),
-                    ),
-                )
-
-    return res
+    return [
+        offers_pb2.Penalty(
+            penalty_type=(
+                offers_pb2.Penalty.Type.TYPE_REFUND
+                if penalty.penalty_type.lower().startswith("cancel")
+                else offers_pb2.Penalty.Type.TYPE_EXCHANGE
+            ),
+            applicability=offers_pb2.Penalty.Applicability.APPLICABILITY_BEFORE,
+            refundable=penalty.penalty_type.lower().startswith("cancel"),
+            changeable=penalty.penalty_type.lower().startswith("change"),
+            price=_to_money(penalty.price.amount, penalty.price.currency),
+        )
+        for penalty in penalties
+    ]
 
 
 def _to_document_requirement(

@@ -12,9 +12,10 @@ def _flatten_relationships(relationships: Mapping[str, Any]) -> dict[str, Any]:
         if isinstance(relationship[_DATA_KEY], dict):
             flattened[key] = relationship[_DATA_KEY][_IDENTIFIER]
         else:
-            flattened[key] = []
-            for relationship_data in relationship[_DATA_KEY]:
-                flattened[key].append(relationship_data[_IDENTIFIER])
+            flattened[key] = [
+                relationship_data[_IDENTIFIER]
+                for relationship_data in relationship[_DATA_KEY]
+            ]
 
     return flattened
 

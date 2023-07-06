@@ -160,8 +160,10 @@ def _add_parameters_from_settings(
     command: click.Command,
     settings: type[Settings],
 ) -> None:
-    for arg in parameters.create_from_pydantic_model(settings):
-        command.params.append(arg)
+    command.params = [
+        *command.params,
+        *parameters.create_from_pydantic_model(settings),
+    ]
 
 
 @click.pass_context

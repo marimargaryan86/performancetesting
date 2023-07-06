@@ -65,9 +65,10 @@ async def test_get_currencies(
         "AED",
         "USD",
     ]
-    actual_currencies_list = []
-    for currency_entry_value in response_list_all_currencies["data"]:
-        actual_currencies_list.append(currency_entry_value["id"])
+    actual_currencies_list = [
+        currency_entry_value["id"]
+        for currency_entry_value in response_list_all_currencies["data"]
+    ]
 
     logger.info("expected_currencies_list: %s", expected_currencies_list)
     logger.info("actual_currencies_list: %s", actual_currencies_list)

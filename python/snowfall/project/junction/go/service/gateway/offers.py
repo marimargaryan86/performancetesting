@@ -81,10 +81,10 @@ class Consumer(object):
         self,
         msg: amqp_pb2.TripOfferSearchTask,
     ) -> None:
-        tasks = []
-
-        async for provider in self._providers.all_healthy():
-            tasks.append(_do_trip_offer_search(provider, msg, self._timeout))
+        tasks = [
+            _do_trip_offer_search(provider, msg, self._timeout)
+            async for provider in self._providers.all_healthy()
+        ]
 
         async with asyncio.TaskGroup() as tg:
             for task in asyncio.as_completed(tasks):

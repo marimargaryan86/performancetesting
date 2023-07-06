@@ -70,9 +70,7 @@ async def test_get_places_type(
 ) -> None:
     response_places = await junction_client.places().get_places_types()
 
-    places_ids = []
-    for data_item in response_places["data"]:
-        places_ids.append(data_item["id"])
+    places_ids = [data_item["id"] for data_item in response_places["data"]]
 
     for places_id in places_ids:
         response_place = await junction_client.places().get_places_type(places_id)

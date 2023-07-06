@@ -42,23 +42,23 @@ def _fares_sort_key(
 def _generate_private_fares_keys(  # noqa: WPS210
     private_fares: Mapping[str, Sequence[PrivateFare]],
 ) -> Sequence[str]:
-    private_fare_keys = []
-
-    for name, fares in sorted(private_fares.items()):
-        fare_keys = []
-        for fare in sorted(fares, key=_fares_sort_key):
-            fare_keys.append(
-                b"\x00".decode().join(
-                    [
-                        "{0}-{1}".format(key, fare_value)
-                        for key, fare_value in fare.dict().items()
-                    ],
-                ),
-            )
-        private_fare_keys.append(
-            "{0}-{1}".format(name, b"\x00".decode().join(fare_keys)),
+    return [
+        "{0}-{1}".format(
+            name,
+            b"\x00".decode().join(
+                [
+                    b"\x00".decode().join(
+                        [
+                            "{0}-{1}".format(key, fare_value)
+                            for key, fare_value in fare.dict().items()
+                        ],
+                    )
+                    for fare in sorted(fares, key=_fares_sort_key)
+                ],
+            ),
         )
-    return private_fare_keys
+        for name, fares in sorted(private_fares.items())
+    ]
 
 
 class OfferGrouper(object):

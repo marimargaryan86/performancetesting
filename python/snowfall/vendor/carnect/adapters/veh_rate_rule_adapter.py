@@ -69,7 +69,9 @@ class VehRateRuleAdapter(BaseAdapter):
 
     def priced_equipments(self) -> list[PricedEquipmentAdapter]:
         if self._rs and self._rs.priced_equips and not self._priced_equipments:
-            for priced_equip in self._rs.priced_equips.priced_equip:
-                self._priced_equipments.append(PricedEquipmentAdapter(priced_equip))
+            self._priced_equipments = [
+                PricedEquipmentAdapter(priced_equip)
+                for priced_equip in self._rs.priced_equips.priced_equip
+            ]
 
         return self._priced_equipments

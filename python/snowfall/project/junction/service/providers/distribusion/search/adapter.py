@@ -87,21 +87,17 @@ class MarketingCarrierAdapter(object):  # noqa: WPS214
         return _DEFAULT_FARE_CLASS_NAME
 
     def passenger_types(self) -> list[cache.PassengerType]:
-        if self._passenger_types:
-            return self._passenger_types
-
-        self._passenger_types = []
-
-        for pax_type in self._marketing_carrier.passenger_types or []:
-            if pax_type.code and pax_type.min_age >= 0 and pax_type.max_age:
-                self._passenger_types.append(
-                    cache.PassengerType(
-                        type_name=pax_type.name,
-                        type_code=pax_type.code,
-                        min_age=pax_type.min_age,
-                        max_age=pax_type.max_age,
-                    ),
+        if not self._passenger_types:
+            self._passenger_types = [
+                cache.PassengerType(
+                    type_name=pax_type.name,
+                    type_code=pax_type.code,
+                    min_age=pax_type.min_age,
+                    max_age=pax_type.max_age,
                 )
+                for pax_type in self._marketing_carrier.passenger_types or []
+                if pax_type.code and pax_type.min_age >= 0 and pax_type.max_age
+            ]
 
         return self._passenger_types
 

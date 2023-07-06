@@ -63,18 +63,16 @@ async def _dump_stations(
     response: Sequence[VendorStation],
     output_file: pathlib.Path,
 ) -> None:
-    stations = []
-
-    for station in response:
-        stations.append(
-            {
-                "id": station.code,
-                "name": station.name,
-                "time_zone": station.time_zone,
-                "latitude": station.latitude,
-                "longitude": station.longitude,
-            },
-        )
+    stations = [
+        {
+            "id": station.code,
+            "name": station.name,
+            "time_zone": station.time_zone,
+            "latitude": station.latitude,
+            "longitude": station.longitude,
+        }
+        for station in response
+    ]
 
     async with aiofiles.open(str(output_file), "w") as out_file:
         await out_file.write(json.dumps(stations, indent=4))

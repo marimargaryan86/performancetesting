@@ -30,7 +30,5 @@ async def test_get_order_by_journey(
 async def return_some_journey_ids(junction_client: Client) -> Sequence[str]:
     r0 = await junction_client.get_journeys(limit=5)
     logging.info("get_order_by_journey: %s", json.dumps(r0, indent=4))
-    journey_ids = []
-    for journey in r0["data"]:
-        journey_ids.append(journey["id"])
-    return journey_ids
+
+    return [journey["id"] for journey in r0["data"]]

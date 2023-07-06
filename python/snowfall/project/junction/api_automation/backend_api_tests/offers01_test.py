@@ -84,16 +84,15 @@ async def return_offer_searches_id_and_offer_group_ids(
     junction_client: Client,
     trip_offer_search_ids: Sequence[str],
 ) -> Sequence[tuple[Any, ...]]:
-    tasks = []
-    for trip_offer_search_id in trip_offer_search_ids:
-        tasks.append(
-            asyncio.create_task(
-                return_offer_group_ids_and_offer_searches_id(
-                    junction_client,
-                    trip_offer_search_id,
-                ),
+    tasks = [
+        asyncio.create_task(
+            return_offer_group_ids_and_offer_searches_id(
+                junction_client,
+                trip_offer_search_id,
             ),
         )
+        for trip_offer_search_id in trip_offer_search_ids
+    ]
     offer_id_and_offer_group_ids = await asyncio.gather(*tasks)
     offer_id_and_offer_group_ids = list(filter(bool, offer_id_and_offer_group_ids))
     logging.info(
@@ -107,16 +106,15 @@ async def return_offer_ids(
     junction_client: Client,
     trip_offer_search_ids: Sequence[str],
 ) -> Sequence[str]:
-    tasks = []
-    for trip_offer_search_id in trip_offer_search_ids:
-        tasks.append(
-            asyncio.create_task(
-                return_offer_id(
-                    junction_client,
-                    trip_offer_search_id,
-                ),
+    tasks = [
+        asyncio.create_task(
+            return_offer_id(
+                junction_client,
+                trip_offer_search_id,
             ),
         )
+        for trip_offer_search_id in trip_offer_search_ids
+    ]
     offer_ids = await asyncio.gather(*tasks)
     logging.info(
         "offer_ids: %s",
@@ -207,11 +205,9 @@ async def return_offer_search_id_and_offer_group_ids(
 async def return_offer_group_ids_from_response(
     response: Mapping[str, Any],
 ) -> Sequence[str]:
-    offer_group_ids = []
     groups = response["data"][0]["relationships"]["groups"]
     groups_data = groups["data"]
-    for i1 in groups_data:
-        offer_group_ids.append(i1["id"])
+    offer_group_ids = [i1["id"] for i1 in groups_data]
     logging.info("offer_group_ids: %s", offer_group_ids)
 
     return offer_group_ids
@@ -251,16 +247,15 @@ async def return_final_trip_offer_search_ids(
     client: Client,
     trip_offer_search_ids: Sequence[str],
 ) -> Sequence[str]:
-    tasks = []
-    for trip_offer_search_id in trip_offer_search_ids:
-        tasks.append(
-            asyncio.create_task(
-                return_offer_searches_ids_final_values(
-                    client,
-                    trip_offer_search_id,
-                ),
+    tasks = [
+        asyncio.create_task(
+            return_offer_searches_ids_final_values(
+                client,
+                trip_offer_search_id,
             ),
         )
+        for trip_offer_search_id in trip_offer_search_ids
+    ]
     final_trip_offer_search_ids = await asyncio.gather(*tasks)
     logging.info(
         "final_trip_offer_search_ids: %s",
@@ -282,20 +277,18 @@ async def filter_sequence_for_ending_string(
     final_trip_offer_search_ids: Sequence[str],
     string_to_check: str,
 ) -> Sequence[str]:
-    filtered_trip_offer_search_ids = []
+    filtered_trip_offer_search_ids = [
+        final_trip_offer_search_id
+        for final_trip_offer_search_id in final_trip_offer_search_ids
+        if final_trip_offer_search_id.endswith(string_to_check)
+    ]
 
-    for final_trip_offer_search_id in final_trip_offer_search_ids:
-        if final_trip_offer_search_id.endswith(string_to_check):
-            filtered_trip_offer_search_ids.append(final_trip_offer_search_id)
-
-    completed_trip_offer_search_ids = []
-    for filtered_trip_offer_search_id in filtered_trip_offer_search_ids:
-        completed_trip_offer_search_ids.append(
-            filtered_trip_offer_search_id.removesuffix(
-                string_to_check,
-            ),
+    return [
+        filtered_trip_offer_search_id.removesuffix(
+            string_to_check,
         )
-    return completed_trip_offer_search_ids
+        for filtered_trip_offer_search_id in filtered_trip_offer_search_ids
+    ]
 
 
 async def return_offer_searches_ids_final_values(
@@ -448,9 +441,7 @@ async def get_trip_ids(
     r2 = await junction_client.trips().get_trips_by_trip_search_id(trip_search_id)
     logging.info("get_trips_by_trip_search_id: %s", json.dumps(r2, indent=4))
 
-    trip_ids = []
-    for idx, _ in enumerate(r2["data"]):
-        trip_ids.append(r2["data"][idx]["id"])
+    trip_ids = [trip["id"] for trip in r2["data"]]
     logging.info("trip_ids: %s", trip_ids)
 
     return trip_ids

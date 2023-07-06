@@ -35,9 +35,7 @@ async def test_get_passenger_gender(
 ) -> None:
     response_genders = await junction_client.get_passenger_genders()
 
-    gender_ids = []
-    for data_item in response_genders["data"]:
-        gender_ids.append(data_item["id"])
+    gender_ids = [data_item["id"] for data_item in response_genders["data"]]
 
     for gender_id in gender_ids:
         response_gender = await junction_client.get_passenger_gender(gender_id)
@@ -79,9 +77,7 @@ async def test_get_passenger_title(
 ) -> None:
     response_titles = await junction_client.get_passenger_titles()
 
-    title_ids = []
-    for data_item in response_titles["data"]:
-        title_ids.append(data_item["id"])
+    title_ids = [data_item["id"] for data_item in response_titles["data"]]
 
     for title_id in title_ids:
         response_title = await junction_client.get_passenger_title(title_id)

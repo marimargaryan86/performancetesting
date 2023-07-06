@@ -134,13 +134,15 @@ class OfferBucketRepository(object):
 
     async def get_offer_buckets(self, offer_search_id: str) -> dict[str, list[str]]:
         bucket_list = self._redis.set_(offer_search_id)
-        buckets = collections.defaultdict(list)
+        buckets: dict[str, list[str]] = collections.defaultdict(list)
 
         async for bucket_name in bucket_list.to_iterable():
             bucket = self._redis.list_(bucket_name)
-
-            async for offer_id in bucket.to_iterable():
-                buckets[bucket_name.split(":")[1]].append(offer_id)
+            bucket_key = bucket_name.split(":")[1]
+            buckets[bucket_key] = [
+                *buckets[bucket_key],
+                *[offer_id async for offer_id in bucket.to_iterable()],
+            ]
 
         return buckets
 
