@@ -6,7 +6,12 @@ import ipaddress
 import pydantic
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.go.service.gateway import bookings, offers, providers
+from snowfall.project.junction.go.service.gateway import (
+    bookings,
+    meta,
+    offers,
+    providers,
+)
 from snowfall.project.junction.go.service.offers.v1 import amqp_pb2
 from snowfall.stdlib import service
 from snowfall.stdlib.persistence.redis import types as redis
@@ -82,6 +87,9 @@ async def _serve(app: service.AsyncApplication[_ServeSettings]) -> None:
         app.settings.grpc_port,
         [
             bookings.Service(
+                providers_collection=all_providers,
+            ),
+            meta.Service(
                 providers_collection=all_providers,
             ),
             offers.Service(
