@@ -6,11 +6,19 @@ from google.rpc import error_details_pb2
 
 from snowfall.adapter import authentication
 from snowfall.service.authentication import repository
-from snowfall.service.authentication.v1 import authentication_pb2 as auth_pb2
+from snowfall.service.authentication.v1 import (
+    authentication_pb2 as auth_pb2,
+)
 from snowfall.service.authentication.v1 import authentication_pb2_grpc as auth_pb2_grpc
-from snowfall.service.authentication.v1 import models_pb2, oauth_pb2, oauth_pb2_grpc
+from snowfall.service.authentication.v1 import (
+    models_pb2,
+    oauth_pb2,
+    oauth_pb2_grpc,
+    sessions_pb2,
+    sessions_pb2_grpc,
+)
 from snowfall.stdlib import string
-from snowfall.stdlib.format import jwt
+from snowfall.stdlib.format import jwt, protobuf
 from snowfall.stdlib.transport.grpc import rich_status, service
 from snowfall.vendor.ory import client
 
@@ -239,3 +247,42 @@ def _validate_email(email: str) -> str:
     except email_validator.EmailSyntaxError as err:
         return str(err)
     return ""
+
+
+class SessionService(service.Service, sessions_pb2_grpc.SessionServiceServicer):
+    def __init__(self, ory_client: client.OryClient):
+        self._client = ory_client
+
+    def get_name(self) -> str:
+        return sessions_pb2.DESCRIPTOR.services_by_name["SessionService"].full_name
+
+    def register(
+        self,
+        server: grpc.aio.Server,
+    ) -> None:
+        sessions_pb2_grpc.add_SessionServiceServicer_to_server(self, server)
+
+    async def GetSession(  # type: ignore[override] # noqa: N802
+        self,
+        request: sessions_pb2.GetSessionRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> sessions_pb2.GetSessionResponse:
+        try:
+            session = await self._client.get_session(request.cookie)
+        except httpx.HTTPStatusError as err:
+            if err.response.status_code == httpx.codes.NOT_FOUND.value:
+                await context.abort(grpc.StatusCode.NOT_FOUND)
+
+            return await context.abort(grpc.StatusCode.UNKNOWN)
+
+        return sessions_pb2.GetSessionResponse(
+            session=sessions_pb2.Session(
+                id=session.identifier,
+                active=session.active,
+                expires_at=protobuf.datetime_to_protobuf(session.expires_at),
+                identity=sessions_pb2.Session.Identity(
+                    id=session.identity.identifier,
+                    email=session.identity.traits.email,
+                ),
+            ),
+        )

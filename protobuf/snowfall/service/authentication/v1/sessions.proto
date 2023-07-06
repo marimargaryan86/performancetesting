@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package snowfall.service.authentication.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/service/authentication/v1";
+
+service SessionService {
+  rpc GetSession(GetSessionRequest) returns (GetSessionResponse);
+}
+
+message GetSessionRequest {
+  string cookie = 1;
+}
+
+message GetSessionResponse {
+  Session session = 1;
+}
+
+message Session {
+  string id = 1;
+  bool active = 2;
+  google.protobuf.Timestamp expires_at = 3;
+  message Identity {
+    string id = 1;
+    string email = 2;
+  }
+  Identity identity = 4;
+}

@@ -28,6 +28,10 @@ class _GrpcSettings(service.Settings):
 
 async def _serve(app: service.Application[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(app.settings.mongo_dsn)
+    ory_client = client.OryClient(
+        base_url=app.settings.ory_application_url,
+        auth=stdlib_auth.TokenAuth(token=app.settings.ory_api_key),
+    )
 
     grpc_server = server.create_server(
         app.settings.grpc_address,
@@ -45,12 +49,8 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
                     algorithm="RS256",
                 ),
             ),
-            grpc.OAuthService(
-                ory_client=client.OryClient(
-                    base_url=app.settings.ory_application_url,
-                    auth=stdlib_auth.TokenAuth(token=app.settings.ory_api_key),
-                ),
-            ),
+            grpc.OAuthService(ory_client=ory_client),
+            grpc.SessionService(ory_client=ory_client),
         ],
     )
 
