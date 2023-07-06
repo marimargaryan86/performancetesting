@@ -1,4 +1,5 @@
 import httpx
+import more_itertools
 
 from snowfall.vendor.ory import models
 
@@ -13,6 +14,7 @@ class OryClient(object):
         self._base_url = httpx.URL(base_url)
         self._client = client or httpx.AsyncClient()
         self._client.base_url = self._base_url
+        self._cookie_name = self._calculate_cookie_name()
 
         if auth:
             self._client.auth = auth
@@ -26,3 +28,20 @@ class OryClient(object):
         response.raise_for_status()
 
         return models.OAuth2Client(**response.json())
+
+    async def get_session(self, cookie: str) -> models.Session:
+        response = await self._client.get(
+            url="/sessions/whoami",
+            cookies={self._cookie_name: cookie},
+        )
+        response.raise_for_status()
+
+        return models.Session(**response.json())
+
+    def _calculate_cookie_name(self) -> str:
+        if not self._base_url.host.endswith("projects.oryapis.com"):
+            return "ory_kratos_session"
+
+        ory_project_slug = more_itertools.first(self._base_url.host.split("."))
+
+        return "ory_session_{0}".format(ory_project_slug.replace("-", ""))
