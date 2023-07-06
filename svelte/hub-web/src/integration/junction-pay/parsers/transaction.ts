@@ -34,6 +34,6 @@ export function parseTransactionSchema(
     reference: attributes.invoiceReference,
     // eslint-disable-next-line no-warning-comments
     // TODO: Use real status.
-    status: transactionStatus[Math.floor(Math.random() * 3)] as TransactionStatus,
+    status: transactionStatus[0] as TransactionStatus,
   };
 }
