@@ -38,6 +38,20 @@ class OryClient(object):
 
         return models.Session(**response.json())
 
+    async def list_identities(self) -> list[models.Identity]:
+        response = await self._client.get(url="/admin/identities")
+        response.raise_for_status()
+
+        return [models.Identity(**identity) for identity in response.json()]
+
+    async def get_identity(self, identifier: str) -> models.Identity:
+        response = await self._client.get(
+            url="/admin/identities/{0}".format(identifier),
+        )
+        response.raise_for_status()
+
+        return models.Identity(**response.json())
+
     def _calculate_cookie_name(self) -> str:
         if not self._base_url.host.endswith("projects.oryapis.com"):
             return "ory_kratos_session"
