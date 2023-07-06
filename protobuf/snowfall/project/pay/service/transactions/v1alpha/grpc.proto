@@ -11,6 +11,7 @@ option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/
 service TransactionsService {
   rpc ListTransactions(ListTransactionsRequest) returns (ListTransactionsResponse) {}
   rpc GetTransaction(GetTransactionRequest) returns (GetTransactionResponse) {}
+  rpc GetTransactions(GetTransactionsRequest) returns (GetTransactionsResponse) {}
   rpc CreateTransaction(CreateTransactionRequest) returns (CreateTransactionResponse) {}
 }
 
@@ -38,6 +39,15 @@ message ListTransactionsResponse {
 message GetTransactionRequest {
   string id = 1;
   string selector = 2;
+}
+
+message GetTransactionsRequest {
+  repeated string ids = 1;
+  string selector = 2;
+}
+
+message GetTransactionsResponse {
+  repeated Transaction transactions = 1;
 }
 
 message GetTransactionResponse {

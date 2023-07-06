@@ -5,10 +5,8 @@ from typing import ParamSpec, TypeVar, cast
 
 from starlette import requests, status
 
+from snowfall.project.pay.adapter import transactions as transactions_adapter
 from snowfall.project.pay.service.beneficiaries.v1alpha.models_pb2 import Beneficiary
-from snowfall.project.pay.service.pay_api.repositories import (
-    TransactionRepository,
-)
 from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import Transaction
 from snowfall.stdlib.integration.starlette import messages, models, request_helpers
 from snowfall.stdlib.logging import stdout
@@ -26,13 +24,13 @@ def payment_validator(  # noqa: WPS217, WPS210
         *args: _In.args,
         **kwargs: _In.kwargs,
     ) -> _Out | models.JsonApiResponse:
-        request, beneficiaries_client, transaction_repository = (
+        request, beneficiaries_client, transaction_client = (
             args[1],
             kwargs["beneficiaries_client"],
-            kwargs["transaction_repository"],
+            kwargs["transactions_client"],
         )
         request = cast(requests.Request, request)
-        transaction_repository = cast(TransactionRepository, transaction_repository)
+        transaction_client = cast(transactions_adapter.Client, transaction_client)
         body = await request_helpers.flatten_request(request)
         amount, transactions = body.get("amount"), body.get("transactions", [])
         payment_at = datetime.date.fromisoformat(body["paymentAt"])
@@ -51,12 +49,9 @@ def payment_validator(  # noqa: WPS217, WPS210
         )
         transaction_models: Sequence[Transaction] = []
         if transactions:
-            transaction_models = [
-                transaction
-                async for transaction in await transaction_repository.find_by_ids(
-                    transactions,
-                )
-            ]
+            transaction_models = (
+                await transaction_client.find_by_ids(transactions)
+            ).transactions
             body["transactions"] = transaction_models
         not_found_errors = _validate_existence_resources(
             beneficiary,

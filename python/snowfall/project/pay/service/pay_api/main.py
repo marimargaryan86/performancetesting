@@ -32,7 +32,6 @@ from snowfall.project.pay.service.pay_api import authenticator, bootstrap
 from snowfall.project.pay.service.pay_api.cache import UserSessionRepository
 from snowfall.project.pay.service.pay_api.repositories import (
     ConversionRepository,
-    TransactionRepository,
 )
 from snowfall.project.pay.service.pay_api.routes import router
 from snowfall.project.pay.service.payments.v1alpha.payments_pb2_grpc import (
@@ -139,9 +138,6 @@ def _factory(
                     redis_client=UserSessionRepository(
                         redis_client=redis_client,
                         cache_ttl=datetime.timedelta(minutes=15),
-                    ),
-                    transactions_repository=TransactionRepository(
-                        mongo.transactions.transactions,
                     ),
                     conversions_repository=ConversionRepository(
                         mongo.conversions.conversions,
@@ -294,9 +290,6 @@ def _admin_factory(
                         currencies_pb2_grpc.CurrencyServiceStub(
                             currencies_channel,
                         ),
-                    ),
-                    transactions_repository=TransactionRepository(
-                        mongo.transactions.transactions,
                     ),
                     payments_client=payments.GrpcClient(
                         PaymentsServiceStub(

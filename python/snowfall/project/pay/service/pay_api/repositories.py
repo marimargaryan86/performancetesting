@@ -1,46 +1,11 @@
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping
 from typing import Any
 
-import pymongo
-
 from snowfall.project.pay.service.conversions.v1alpha.models_pb2 import Conversion
-from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import Transaction
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 from snowfall.vendor.currency_cloud.models.conversion import ConversionResponse
-
-
-class TransactionRepository(
-    mixins.FindByIdMixin[Transaction],
-    mixins.InsertMixin[Transaction],
-    repository.ProtoRepository[Transaction],
-):
-    _proto = Transaction
-    _default_page_size = 20
-    _indexes = (
-        pymongo.IndexModel("external_reference_id", background=True, unique=True),
-    )
-
-    async def find(
-        self,
-        cursor: str | None,
-    ) -> resultset.ResultSet[Transaction]:
-        return await self._find_with_cursor(
-            cur=cursor or "",
-        )
-
-    async def find_by_ids(
-        self,
-        fields: Sequence[str],
-        selector: str = "_id",
-    ) -> resultset.ResultSet[Transaction]:
-        query = {
-            selector: {
-                "$in": fields,
-            },
-        }
-        return await self._execute(self._collection.find, query)
 
 
 class ConversionRepository(

@@ -1,4 +1,3 @@
-import asyncio
 import datetime
 import pathlib
 from collections.abc import AsyncIterator, Mapping, Sequence
@@ -86,7 +85,6 @@ def _create_app(  # noqa: WPS211
     currencies_client: currencies.Client,
     quotations_client: quotations.Client,
     redis_repository: UserSessionRepository,
-    transactions_repository: pay_repos.TransactionRepository,
     conversion_repository: pay_repos.ConversionRepository,
     transactions_client: transactions.Client,
     companies_client: companies.Client,
@@ -100,7 +98,6 @@ def _create_app(  # noqa: WPS211
             bootstrap.create_dependencies(
                 currencies_client,
                 redis_repository,
-                transactions_repository,
                 transactions_client,
                 quotations_client,
                 companies_client,
@@ -126,7 +123,6 @@ def _create_admin_app(  # noqa: WPS211
     transactions_client: transactions.Client,
     conversions_client: conversions.Client,
     currencies_client: currencies.Client,
-    transactions_repository: pay_repos.TransactionRepository,
     beneficiaries_client: beneficiaries.Client,
     openapi_path: pathlib.Path,
     custom_middlewares: Sequence[Middleware] | None = None,
@@ -144,7 +140,6 @@ def _create_admin_app(  # noqa: WPS211
                 contacts_client=contacts_client,
                 transactions_client=transactions_client,
                 conversions_client=conversions_client,
-                transactions_repository=transactions_repository,
                 cc_payment_client=cc_payment_client,
                 currencies_client=currencies_client,
                 payments_client=payment_client,
@@ -289,24 +284,6 @@ def get_quotation(quotation_id: str) -> Quotation:
 
 
 @pytest.fixture()
-async def transactions_repository(
-    mongo_client: motor_asyncio.AsyncIOMotorClient,
-    transaction_ids: Sequence[str],
-) -> pay_repos.TransactionRepository:
-    repository = pay_repos.TransactionRepository(
-        collection=mongo_client.test.transactions,
-    )
-    await asyncio.gather(
-        *[
-            repository.insert(get_transaction(transaction_id))
-            for transaction_id in transaction_ids
-        ],
-    )
-
-    return repository
-
-
-@pytest.fixture()
 def conversions_repository(
     mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> pay_repos.ConversionRepository:
@@ -423,7 +400,6 @@ def app(  # noqa: WPS211
     currencies_client: currencies.Client,
     quotations_client: quotations.Client,
     redis_repository: UserSessionRepository,
-    transactions_repository: pay_repos.TransactionRepository,
     transactions_client: transactions.Client,
     companies_client: companies.Client,
     conversions_repository: pay_repos.ConversionRepository,
@@ -434,7 +410,6 @@ def app(  # noqa: WPS211
         currencies_client=currencies_client,
         quotations_client=quotations_client,
         redis_repository=redis_repository,
-        transactions_repository=transactions_repository,
         conversion_repository=conversions_repository,
         transactions_client=transactions_client,
         companies_client=companies_client,
@@ -454,14 +429,12 @@ def admin_app(  # noqa: WPS211
     transactions_client: transactions.Client,
     conversions_client: conversions.Client,
     currencies_client: currencies.Client,
-    transactions_repository: pay_repos.TransactionRepository,
     beneficiaries_client: beneficiaries.Client,
     custom_middlewares: Sequence[Middleware],
 ) -> applications.Starlette:
     return _create_admin_app(
         cc_payment_client=cc_payment_client,
         authentication_client=authentication_client,
-        transactions_repository=transactions_repository,
         accounts_client=accounts_client,
         companies_client=companies_client,
         contacts_client=contacts_client,

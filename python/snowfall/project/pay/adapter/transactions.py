@@ -40,6 +40,14 @@ class Client(abc.ABC):
     ) -> grpc_pb2.ListTransactionsResponse:
         """Fetch all transaction resources."""
 
+    @abc.abstractmethod
+    async def find_by_ids(
+        self,
+        fields: Sequence[str],
+        selector: str = "_id",
+    ) -> grpc_pb2.GetTransactionsResponse:
+        """Fetch all transaction resources."""
+
 
 class DictClient(Client):
     def __init__(self, transactions: Sequence[models_pb2.Transaction]) -> None:
@@ -96,6 +104,20 @@ class DictClient(Client):
             next_page_token=page.cursor,
         )
 
+    async def find_by_ids(
+        self,
+        fields: Sequence[str],
+        selector: str = "_id",
+    ) -> grpc_pb2.GetTransactionsResponse:
+        transactions = []
+
+        for field in fields:
+            transaction = self._transactions.get(field)
+            if transaction:
+                transactions.append(transaction)
+
+        return grpc_pb2.GetTransactionsResponse(transactions=transactions)
+
 
 class GrpcClient(Client):
     def __init__(
@@ -151,4 +173,15 @@ class GrpcClient(Client):
 
         return await errors.handle_grpc_errors(
             self._transactions.ListTransactions(request, timeout=self._timeout),
+        )
+
+    async def find_by_ids(
+        self,
+        fields: Sequence[str],
+        selector: str = "_id",
+    ) -> grpc_pb2.GetTransactionsResponse:
+        return await errors.handle_grpc_errors(
+            self._transactions.GetTransactions(
+                grpc_pb2.GetTransactionsRequest(ids=fields, selector=selector),
+            ),
         )

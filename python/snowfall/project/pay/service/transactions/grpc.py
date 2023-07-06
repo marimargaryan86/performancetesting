@@ -77,6 +77,20 @@ class TransactionsService(
 
         return grpc_pb2.GetTransactionResponse(transaction=transaction)
 
+    async def GetTransactions(  # type: ignore[override] # noqa: N802
+        self,
+        request: grpc_pb2.GetTransactionsRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.GetTransactionsResponse:
+        transactions = await self._transactions.find_by_ids(
+            list(request.ids),
+            request.selector if request.selector else "_id",
+        )
+
+        return grpc_pb2.GetTransactionsResponse(
+            transactions=[transaction async for transaction in transactions],
+        )
+
     async def CreateTransaction(  # type: ignore[override] # noqa: N802
         self,
         request: grpc_pb2.CreateTransactionRequest,

@@ -1,4 +1,4 @@
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from typing import Any
 
 import pymongo
@@ -25,6 +25,18 @@ class TransactionsRepository(
         cursor: str,
     ) -> resultset.ResultSet[models_pb2.Transaction]:
         return await self._find_with_cursor(cur=cursor)
+
+    async def find_by_ids(
+        self,
+        fields: Sequence[str],
+        selector: str = "_id",
+    ) -> resultset.ResultSet[models_pb2.Transaction]:
+        query = {
+            selector: {
+                "$in": fields,
+            },
+        }
+        return await self._execute(self._collection.find, query)
 
 
 class QuotationsRepository(

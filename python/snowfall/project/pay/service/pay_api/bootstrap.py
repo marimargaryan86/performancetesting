@@ -20,7 +20,6 @@ from snowfall.project.pay.service.pay_api import includes
 from snowfall.project.pay.service.pay_api.cache import UserSessionRepository
 from snowfall.project.pay.service.pay_api.repositories import (
     ConversionRepository,
-    TransactionRepository,
 )
 from snowfall.stdlib.integration.starlette import application
 from snowfall.vendor.currency_cloud import client
@@ -48,7 +47,6 @@ def create_admin_dependencies(  # noqa: WPS211
     authentication_client: authentication.Client,
     conversions_repository: ConversionRepository,
     beneficiaries_client: beneficiaries.Client,
-    transactions_repository: TransactionRepository,
     accounts_client: accounts.GrpcClient,
     companies_client: companies.Client,
     contacts_client: contacts.Client,
@@ -61,7 +59,6 @@ def create_admin_dependencies(  # noqa: WPS211
     container = lagom.Container()
     container[client.PaymentClient] = cc_payment_client
     container[authentication.Client] = authentication_client  # type: ignore[type-abstract]
-    container[TransactionRepository] = transactions_repository
     container[ConversionRepository] = conversions_repository
     container[beneficiaries.Client] = beneficiaries_client  # type: ignore[type-abstract]
     container[accounts.GrpcClient] = accounts_client
@@ -80,7 +77,6 @@ def create_admin_dependencies(  # noqa: WPS211
 def create_dependencies(  # noqa: WPS211
     currencies_client: currencies.Client,
     redis_client: UserSessionRepository,
-    transactions_repository: TransactionRepository,
     transactions_client: transactions.Client,
     quotations_client: quotations.Client,
     companies_client: companies.Client,
@@ -93,7 +89,6 @@ def create_dependencies(  # noqa: WPS211
     container[quotations.Client] = quotations_client  # type: ignore[type-abstract]
     container[companies.Client] = companies_client  # type: ignore[type-abstract]
     container[UserSessionRepository] = redis_client
-    container[TransactionRepository] = transactions_repository
     container[ConversionRepository] = conversions_repository
     container[transactions.Client] = transactions_client  # type: ignore[type-abstract]
     return container

@@ -5,11 +5,9 @@ import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.project.pay.adapter import beneficiaries
+from snowfall.project.pay.adapter import transactions as transactions_adapter
 from snowfall.project.pay.adapter.payments import GrpcClient
 from snowfall.project.pay.service.pay_api import resources
-from snowfall.project.pay.service.pay_api.repositories import (
-    TransactionRepository,
-)
 from snowfall.project.pay.service.pay_api.validators import payments_validators
 from snowfall.project.pay.service.payments.v1alpha import models_pb2
 from snowfall.stdlib import money
@@ -55,7 +53,7 @@ class Payments(endpoints.HTTPEndpoint):
         body: Mapping[str, Any],
         payment_client: GrpcClient = lagom.injectable,
         beneficiaries_client: beneficiaries.Client = lagom.injectable,
-        transaction_repository: TransactionRepository = lagom.injectable,
+        transactions_client: transactions_adapter.Client = lagom.injectable,
     ) -> responses.Response:
         original_body = await request_helpers.flatten_request(request)
         amount, beneficiary, transaction_models, payment_at = (
