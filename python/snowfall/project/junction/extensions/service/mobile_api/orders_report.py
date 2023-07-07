@@ -3,14 +3,14 @@ import csv
 import datetime
 import io
 from collections.abc import Mapping, Sequence
-from typing import Any
 
 import aiosmtplib
 import httpx
 import json_api_doc
+from authlib.integrations import httpx_client
 from dateutil import relativedelta
 from motor import motor_asyncio
-from pydantic import AnyUrl
+from pydantic import AnyUrl, HttpUrl
 
 from snowfall.project.junction.extensions.service.mobile_api import smtp
 from snowfall.project.junction.extensions.service.mobile_api.tasks import orders
@@ -25,7 +25,9 @@ class Settings(application.Settings):
     mongo_dsn: Sequence[AnyUrl]
     orders_report_email: str
     junction_api_address: str
-    junction_api_token: str
+    ory_client_token_endpoint: HttpUrl
+    ory_client_id: str
+    ory_client_secret: str
 
 
 async def orders_report(app: service.Application[Settings]) -> None:
@@ -34,7 +36,13 @@ async def orders_report(app: service.Application[Settings]) -> None:
     )[app.name]
     junction_client = client.Client(
         base_url=app.settings.junction_api_address,
-        auth=auth.TokenAuth(app.settings.junction_api_token),
+        auth=auth.ClientCredentialsAuth(
+            client=httpx_client.AsyncOAuth2Client(
+                client_id=app.settings.ory_client_id,
+                client_secret=app.settings.ory_client_secret,
+            ),
+            token_endpoint=app.settings.ory_client_token_endpoint,
+        ),
     )
     smtp_cl = smtp.EmailClient(
         aiosmtplib.SMTP(
@@ -61,7 +69,7 @@ async def orders_report(app: service.Application[Settings]) -> None:
 async def _generate_report(  # noqa: WPS210
     orders_repository: motor_asyncio.AsyncIOMotorCollection,
     junction_client: client.Client,
-) -> Sequence[Mapping[Any, Any]]:
+) -> Sequence[Mapping[str, str | int | float]]:
     junction_orders = []
     mobile_orders = orders_repository.find(
         {
@@ -129,7 +137,7 @@ async def _generate_report(  # noqa: WPS210
 
 
 async def _send_report(
-    rows: Sequence[Mapping[Any, Any]],
+    rows: Sequence[Mapping[str, str | int | float]],
     smtp_cl: smtp.EmailClient,
     email: str,
 ) -> None:

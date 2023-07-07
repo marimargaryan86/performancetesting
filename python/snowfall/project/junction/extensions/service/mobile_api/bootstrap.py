@@ -3,7 +3,7 @@ from collections.abc import Sequence
 
 import httpx
 import lagom
-from pydantic import AnyUrl
+from pydantic import AnyUrl, HttpUrl
 
 from snowfall.project.junction.extensions.service.mobile_api import (
     jwt_generator,
@@ -22,7 +22,9 @@ class MigrateSettings(application.Settings):
 
 class Settings(application.Settings):
     junction_api_address: str
-    junction_api_token: str
+    ory_client_token_endpoint: HttpUrl
+    ory_client_id: str
+    ory_client_secret: str
     plus_api_address: str = ""
     plus_activated: bool = False
     redis_dsn: Sequence[AnyUrl]

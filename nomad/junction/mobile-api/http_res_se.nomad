@@ -42,6 +42,14 @@ variable "plus_activated" {
   type = bool
 }
 
+variable "ory_client_token_endpoint" {
+  type = string
+}
+
+variable "ory_client_id" {
+  type = string
+}
+
 job "mobile-api-http-res-se" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -142,9 +150,9 @@ REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis:
 SMTP_DSN={{range $index, $service := service "smtp"}}smtp://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}{{end}}
 {{ with secret "kv/data/${var.environment}/res-se-mobile-api" }}
 STRIPE_API_KEY={{ .Data.data.stripe_api_key }}
-JUNCTION_API_TOKEN={{ .Data.data.junction_api_token }}
 JWT_PRIVATE_KEY={{ .Data.data.jwt_private_key }}
 JWT_PUBLIC_KEY={{ .Data.data.jwt_public_key }}
+ORY_CLIENT_SECRET={{ .Data.data.ory_client_secret }}
 {{ end }}
 EOH
       }
@@ -178,6 +186,8 @@ EOH
         SUPPORT_EMAIL                   = "res@snowfalltravel.com"
         PLUS_API_ADDRESS                = "${var.plus_api_address}"
         PLUS_ACTIVATED                  = var.plus_activated
+        ORY_CLIENT_TOKEN_ENDPOINT       = var.ory_client_token_endpoint
+        ORY_CLIENT_ID                   = var.ory_client_id
       }
     }
   }

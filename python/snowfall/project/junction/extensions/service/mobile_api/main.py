@@ -7,6 +7,7 @@ from functools import partial
 import aiosmtplib
 import httpx
 import stripe
+from authlib.integrations import httpx_client
 from motor import motor_asyncio
 from redis import asyncio as aioredis
 from starlette import applications, types
@@ -72,13 +73,19 @@ def _factory(
 ) -> Callable[[], applications.Starlette]:
     def decorator() -> applications.Starlette:
         stripe.api_key = app.settings.stripe_api_key
-        httpx_client = base_client.create_httpx_client(
+        junction_httpx_client = base_client.create_httpx_client(
             base_url=app.settings.junction_api_address,
-            auth=auth.TokenAuth(app.settings.junction_api_token),
+            auth=auth.ClientCredentialsAuth(
+                client=httpx_client.AsyncOAuth2Client(
+                    client_id=app.settings.ory_client_id,
+                    client_secret=app.settings.ory_client_secret,
+                ),
+                token_endpoint=app.settings.ory_client_token_endpoint,
+            ),
         )
         junction_client = client.Client(
             base_url=app.settings.junction_api_address,
-            client=httpx_client,
+            client=junction_httpx_client,
         )
         plus_http_client = plus_client.PlusClient(
             api_url=app.settings.plus_api_address,
@@ -156,7 +163,7 @@ def _factory(
                     junction_client=junction_client,
                     plus_http_client=plus_http_client,
                     jwt_gen=jwt_gen,
-                    httpx_client=httpx_client,
+                    httpx_client=junction_httpx_client,
                 ),
             ),
             custom_middlewares=[
