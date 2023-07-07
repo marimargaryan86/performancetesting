@@ -40,6 +40,7 @@ class OrderService(
         subscriber = await self._subscribers.get_or_create(
             request.reseller_id,
             request.contact_details,
+            request.passengers[0],
         )
         order = await self._orders.create(
             request.reseller_id,

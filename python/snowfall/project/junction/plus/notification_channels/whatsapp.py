@@ -46,8 +46,9 @@ class ProviderChannel(Channel):
             receiver=receiver.phone_number.e164_number,
             sender_number=sender_configuration.mobile_phone.e164_number,
             body=(
-                "We are pleased to confirm that your trip from "
-                + "{0} to {1} on {2} is booked!".format(
+                "Hi {0},".format(receiver.first_name)
+                + "\nWe are pleased to confirm that your trip is booked:"
+                + "\n\nFrom: {0}\nTo: {1}\nOn: {2}".format(
                     order.bookings[0].value.origin,
                     order.bookings[0].value.destination,
                     protobuf.protobuf_to_datetime(

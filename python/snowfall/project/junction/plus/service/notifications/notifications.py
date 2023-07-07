@@ -59,6 +59,7 @@ class SubscriberRepository(
         self,
         reseller_id: str,
         contact_details: models_pb2.ContactDetails,
+        passenger: models_pb2.Passenger,
     ) -> models_pb2.Subscriber:
         subscriber = await self._execute(
             self._collection.find_one,
@@ -77,6 +78,8 @@ class SubscriberRepository(
             reseller_id=reseller_id,
             phone_number=contact_details.phone,
             email=contact_details.email,
+            first_name=passenger.first_name,
+            last_name=passenger.last_name,
         )
 
         insert = await self._execute(
