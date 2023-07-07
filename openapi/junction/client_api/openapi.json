@@ -5295,6 +5295,12 @@
                   "price": {
                     "$ref": "#/components/schemas/Price"
                   },
+                  "priceBreakdown": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/PriceBreakdown"
+                    }
+                  },
                   "brandName": {
                     "type": "string",
                     "example": "PLUS",
