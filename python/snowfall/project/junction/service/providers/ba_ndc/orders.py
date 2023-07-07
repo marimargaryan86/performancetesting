@@ -19,6 +19,8 @@ from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.vendor.ba_ndc import client
+from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
+from snowfall.vendor.rate_limiter.config import RateLimitConfig
 
 
 class OrdersSettings(config.BaNdcConfig, service.Settings):
@@ -27,9 +29,13 @@ class OrdersSettings(config.BaNdcConfig, service.Settings):
     smtp_dsn: pydantic.AnyUrl
     smtp_sender: pydantic.EmailStr
     smtp_recipient: pydantic.EmailStr
+    rate_limiter_grpc_host: str
+    rate_limiter_service_configs: dict[str, RateLimitConfig]
 
 
-async def orders(app: service.AsyncApplication[OrdersSettings]) -> None:
+async def orders(  # noqa: WPS210, WPS217
+    app: service.AsyncApplication[OrdersSettings],
+) -> None:
     http_client = await app.stack.enter_async_context(
         httpx.AsyncClient(
             timeout=app.settings.http_timeout,
@@ -46,10 +52,23 @@ async def orders(app: service.AsyncApplication[OrdersSettings]) -> None:
     amqp_connection = await app.stack.enter_async_context(
         types.Connection(app.settings.amqp_dsn),
     )
+    rate_limit_client = await app.stack.enter_async_context(
+        RateLimitClient(
+            app.settings.rate_limiter_grpc_host,
+            app.settings.rate_limiter_service_configs["ba-ndc"],
+        ),
+    )
+    rate_limit_client_daily = await app.stack.enter_async_context(
+        RateLimitClient(
+            app.settings.rate_limiter_grpc_host,
+            app.settings.rate_limiter_service_configs["ba-ndc-daily"],
+        ),
+    )
     ba_ndc_client = client.BaNdcClient(
         api_base_url=app.settings.api_base_url,
         api_key=app.settings.api_key,
         http_client=http_client,
+        rate_limit_clients=(rate_limit_client, rate_limit_client_daily),
     )
 
     await OrderConsumer(

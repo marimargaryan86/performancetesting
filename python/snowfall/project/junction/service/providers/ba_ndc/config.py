@@ -4,6 +4,7 @@ from collections.abc import Sequence
 import pydantic
 
 from snowfall.project.junction.provider import service
+from snowfall.vendor.rate_limiter.config import RateLimitConfig
 
 _DEFAULT_TTL_IN_MINUTES = 45
 
@@ -18,6 +19,8 @@ class Settings(BaNdcConfig, service.ProviderSettings):
     amqp_dsn: pydantic.AnyUrl
     provider_company_id: str
     redis_dsn: pydantic.AnyUrl
+    rate_limiter_grpc_host: str
+    rate_limiter_service_configs: dict[str, RateLimitConfig]
 
 
 class PricingSettings(BaNdcConfig, service.Settings):

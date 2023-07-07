@@ -17,6 +17,7 @@ from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import types
 from snowfall.vendor.ba_ndc import client
 from snowfall.vendor.ba_ndc.models import request_offer_search_schemas
+from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
 _Impl = offers.OfferSearchImplementation[
     amqp_pb2.SearchCriteriaTask,
@@ -24,7 +25,7 @@ _Impl = offers.OfferSearchImplementation[
 ]
 
 
-async def offers_factory(
+async def offers_factory(  # noqa: WPS210
     app: service.Application[config.Settings],
     amqp_connection: types.Connection,
     redis_connection: aioredis.Redis[bytes],
@@ -43,12 +44,25 @@ async def offers_factory(
             timeout=app.settings.http_timeout,
         ),
     )
+    rate_limit_client = await stack.enter_async_context(
+        RateLimitClient(
+            app.settings.rate_limiter_grpc_host,
+            app.settings.rate_limiter_service_configs["ba-ndc"],
+        ),
+    )
+    rate_limit_client_daily = await stack.enter_async_context(
+        RateLimitClient(
+            app.settings.rate_limiter_grpc_host,
+            app.settings.rate_limiter_service_configs["ba-ndc-daily"],
+        ),
+    )
     logging.register(http_client)
     metrics.register(http_client)
     ba_ndc_client = client.BaNdcClient(
         api_base_url=app.settings.api_base_url,
         api_key=app.settings.api_key,
         http_client=http_client,
+        rate_limit_clients=(rate_limit_client, rate_limit_client_daily),
     )
     ba_ndc_adapter = adapter.BaNdcSearchAdapter(
         ba_ndc_client=ba_ndc_client,

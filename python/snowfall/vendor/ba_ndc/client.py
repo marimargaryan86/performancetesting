@@ -1,5 +1,6 @@
+import asyncio
 import inspect
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from typing import Any
 from uuid import UUID
 
@@ -22,6 +23,7 @@ from snowfall.vendor.ba_ndc.models import (  # noqa: WPS235
     response_seat_schemas,
     response_service_schemas,
 )
+from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
 
 def _request_query_params(offer_id: UUID | None, order_id: UUID | None) -> Any:
@@ -37,15 +39,18 @@ class BaNdcClient(object):  # noqa: WPS214
         api_base_url: str,
         api_key: str,
         http_client: httpx.AsyncClient,
+        rate_limit_clients: Sequence[RateLimitClient],
     ) -> None:
         self._api_base_url = httpx.URL(api_base_url)
         self._api_key = api_key
         self._http_client = http_client
         self._http_client.base_url = self._api_base_url
+        self._rate_limit_clients = rate_limit_clients
 
     async def get_offers(
         self,
         request: request_offer_search_schemas.OfferSearchRequest,
+        rate_limit_timeout: float = 30,
     ) -> OffersResponseAdapter:
         response = await self._make_request(
             "POST",
@@ -55,6 +60,7 @@ class BaNdcClient(object):  # noqa: WPS214
                 exclude_unset=True,
                 by_alias=True,
             ),
+            rate_limit_timeout=rate_limit_timeout,
         )
 
         return OffersResponseAdapter(
@@ -79,6 +85,7 @@ class BaNdcClient(object):  # noqa: WPS214
     async def create_order(
         self,
         request: request_order_schemas.CreateOrderRequest,
+        rate_limit_timeout: float = 60,
     ) -> response_order_schemas.OrderResponse:
         response = await self._make_request(
             "POST",
@@ -88,6 +95,7 @@ class BaNdcClient(object):  # noqa: WPS214
                 exclude_unset=True,
                 by_alias=True,
             ),
+            rate_limit_timeout=rate_limit_timeout,
         )
 
         return response_order_schemas.OrderResponse.parse_raw(
@@ -226,13 +234,24 @@ class BaNdcClient(object):  # noqa: WPS214
             response.content,
         )
 
-    async def _make_request(
+    async def _make_request(  # noqa: WPS211
         self,
         method: str,
         path: str,
         query_params: Mapping[str, Any] | None = None,
         payload: Any | None = None,
+        rate_limit_timeout: float = 60,
     ) -> httpx.Response:
+        try:
+            await asyncio.gather(
+                *(
+                    client.rate_limit(timeout=rate_limit_timeout)
+                    for client in self._rate_limit_clients
+                ),
+            )
+        except asyncio.TimeoutError as timeout_exc:
+            raise errors.AsyncTimeOutError(inspect.getdoc(timeout_exc)) from timeout_exc
+
         try:
             response = await self._http_client.request(
                 method=method,
