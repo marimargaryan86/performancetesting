@@ -77,9 +77,9 @@ job "ask2go-grpc" {
     }
 
     service {
-      name = "ask2go-grpc-${var.environment}"
-      port = "prometheus"
-      tags = ["metrics"]
+      name = "ask2go-${var.environment}"
+      port = "grpc"
+      tags = ["grpc"]
 
       connect {
         sidecar_service {
@@ -91,6 +91,18 @@ job "ask2go-grpc" {
           }
         }
       }
+
+      check {
+        type     = "grpc"
+        interval = "10s"
+        timeout  = "2s"
+      }
+    }
+
+    service {
+      name = "ask2go-grpc-${var.environment}"
+      port = "prometheus"
+      tags = ["metrics"]
 
       check {
         type     = "http"
