@@ -107,14 +107,13 @@ class ContactsRepository(
     async def update_reference(
         self,
         contact: models_pb2.Contact,
-        external_reference: str,
     ) -> models_pb2.Contact:
         return await self._execute(
             self._collection.update_one,
             filter={"_id": contact.id},
             update={
                 "$set": {
-                    "external_reference": external_reference,
+                    "external_reference": contact.external_reference,
                 },
             },
         )

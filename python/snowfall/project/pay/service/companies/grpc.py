@@ -302,10 +302,9 @@ class ContactsService(service.Service, grpc_pb2_grpc.ContactsServiceServicer):
                 ),
             )
 
-        contact = await self._contacts.update_reference(
-            contact,
-            request.external_reference,
-        )
+        contact.external_reference = request.external_reference
+
+        await self._contacts.update_reference(contact)
 
         return grpc_pb2.UpdateContactReferenceResponse(contact=contact)
 
