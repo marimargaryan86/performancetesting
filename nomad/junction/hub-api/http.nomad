@@ -34,6 +34,10 @@ variable "count" {
   type = number
 }
 
+variable "validate_responses_against_spec" {
+  type = bool
+}
+
 job "hub-api-http" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -75,12 +79,24 @@ job "hub-api-http" {
       tags = [
         "http",
         "traefik.enable=true",
+        "traefik.consulcatalog.connect=true",
         "traefik.http.routers.hub-api-${var.environment}.middlewares=hub-api-vpn-only-${var.environment}",
         "traefik.http.routers.hub-api-${var.environment}.entrypoints=${var.traefik_entrypoints}",
         "traefik.http.routers.hub-api-${var.environment}.rule=Host(`${var.traaefik_host_URL}`)",
         "traefik.http.middlewares.hub-api-vpn-only-${var.environment}.ipwhitelist.sourcerange=52.56.69.33",
         "traefik.http.middlewares.hub-api-vpn-only-${var.environment}.ipwhitelist.ipstrategy.excludedips=172.16.0.0/16",
       ]
+
+      connect {
+        sidecar_service {
+          proxy {
+            upstreams {
+              local_bind_port  = 8010
+              destination_name = "authentication-${var.environment}"
+            }
+          }
+        }
+      }
 
       check {
         type     = "http"
@@ -106,6 +122,16 @@ job "hub-api-http" {
     task "http" {
       driver = "docker"
 
+      template {
+        destination = "services.env"
+        env         = true
+        change_mode = "restart"
+        data        = <<EOH
+AUTHENTICATION_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_authentication-${var.environment}"))}}
+EOH
+      }
+
+
       config {
         image = var.docker_image
         ports = ["http", "prometheus"]
@@ -121,12 +147,13 @@ job "hub-api-http" {
       }
 
       env {
-        ENV_NAME              = "${var.environment}"
-        FORWARDED_ALLOWED_IPS = "0.0.0.0"
-        HTTP_ADDRESS          = "0.0.0.0"
-        HTTP_PORT             = "${NOMAD_PORT_http}"
-        SENTRY_DSN            = "https://7a9e03aa0fa24aed8155a1475b8be273@sentry.snowfall.se/147"
-        PROMETHEUS_PORT       = "${NOMAD_PORT_prometheus}"
+        ENV_NAME                        = "${var.environment}"
+        FORWARDED_ALLOWED_IPS           = "0.0.0.0"
+        HTTP_ADDRESS                    = "0.0.0.0"
+        HTTP_PORT                       = "${NOMAD_PORT_http}"
+        SENTRY_DSN                      = "https://7a9e03aa0fa24aed8155a1475b8be273@sentry.snowfall.se/147"
+        PROMETHEUS_PORT                 = "${NOMAD_PORT_prometheus}"
+        VALIDATE_RESPONSES_AGAINST_SPEC = "${var.validate_responses_against_spec}"
       }
     }
   }
