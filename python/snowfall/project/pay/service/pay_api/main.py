@@ -111,7 +111,7 @@ def _factory(
                                 ),
                             ).get_user_id_from_jwt,
                             client_resolver=auth_adapter.oauth_client_resolver(
-                                oath_client=oauth_pb2_grpc.OAuthServiceStub(
+                                oauth_client=oauth_pb2_grpc.OAuthServiceStub(
                                     authentication_channel,
                                 ),
                             ),
@@ -236,7 +236,7 @@ def _admin_factory(
                                 ),
                             ).get_user_id_from_jwt,
                             client_resolver=auth_adapter.oauth_client_resolver(
-                                oath_client=oauth_pb2_grpc.OAuthServiceStub(
+                                oauth_client=oauth_pb2_grpc.OAuthServiceStub(
                                     authentication_channel,
                                 ),
                             ),

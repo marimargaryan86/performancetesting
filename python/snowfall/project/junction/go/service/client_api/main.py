@@ -137,7 +137,7 @@ def _factory(
                                 ),
                             ).get_reseller_id_from_jwt,
                             client_resolver=auth_adapter.oauth_client_resolver(
-                                oath_client=oath_client,
+                                oauth_client=oath_client,
                             ),
                         ).get_owner_from_jwt,
                     ),

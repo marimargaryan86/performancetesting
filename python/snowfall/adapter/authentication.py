@@ -252,13 +252,16 @@ def get_jwk_url(authentication_address: str) -> str:
 
 
 def oauth_client_resolver(
-    oath_client: oauth_pb2_grpc.OAuthServiceStub,
+    oauth_client: oauth_pb2_grpc.OAuthServiceStub,
 ) -> Callable[[str], Awaitable[str]]:
     @asyncstdlib.lru_cache()
     async def wrapper(client_id: str) -> str:
-        response = await oath_client.GetClient(oauth_pb2.GetClientRequest(id=client_id))
+        response = cast(
+            oauth_pb2.GetClientResponse,
+            await oauth_client.GetClient(oauth_pb2.GetClientRequest(id=client_id)),
+        )
 
-        return response.owner
+        return response.client.owner
 
     return wrapper
 
