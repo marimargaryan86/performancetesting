@@ -8,7 +8,7 @@ import (
 )
 
 const commitTemplate = "%{title}"
-const mergeRequestTemplate = "# Merge Request\n\n## What does this MR do?\n\n## Related Issues\n"
+const mergeRequestTemplate = ""
 const suggestionCommitMessage = "fix: apply review suggestions"
 
 func verifyApprovalRules(client *gitlab.Client, logger *zap.SugaredLogger, p *gitlab.Project, snowman *gitlab.User) {
