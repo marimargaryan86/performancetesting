@@ -67,6 +67,7 @@ job "ask2go-grpc" {
 
     network {
       mode = "bridge"
+      port "grpc" {}
       port "prometheus" {}
     }
 
@@ -136,7 +137,7 @@ EOH
 
       config {
         image = var.docker_image
-        ports = ["prometheus"]
+        ports = ["grpc", "prometheus"]
         args = [
           "grpc",
         ]
@@ -150,6 +151,8 @@ EOH
 
       env {
         ENV_NAME                  = "${var.environment}"
+        GRPC_ADDRESS              = "0.0.0.0"
+        GRPC_PORT                 = "${NOMAD_PORT_grpc}"
         SENTRY_DSN                = "https://c299617e39d446ccb1053a04d9ac12b8@sentry.snowfall.se/34"
         PROMETHEUS_PORT           = "${NOMAD_PORT_prometheus}"
         PROVIDER_COMPANY_ID       = "${var.provider_company_id}"
