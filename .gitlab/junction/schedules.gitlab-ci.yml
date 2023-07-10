@@ -1,7 +1,9 @@
 stages:
   - download
-  - export
-  - deploy
+  - dev-export
+  - dev-deploy
+  - prod-export
+  - prod-deploy
 services:
   - name: docker:dind
     alias: dockerdaemon
@@ -53,75 +55,68 @@ directferries:
     - docker pull git.snowfall.se:4567/junction/junction/service/direct_ferries:latest
     - docker run -u "${UID}" --rm -v "$(pwd)/:/data" -e CLIENT_ID="${DF_CLIENT_ID}" -e CLIENT_SECRET="${DF_CLIENT_SECRET}" git.snowfall.se:4567/junction/junction/service/direct_ferries:latest export --api-url 'https://sandbox-api.test.directferriesconnect.com' --affiliate-api-url 'https://tf-test-affiliate-api-sandbox.auth.eu-west-1.amazoncognito.com' --partner-code 'F5152' --output-path /data/data-input/
 
-import:
-  stage: export
-  needs: ["directferries", "feeds", "oag"]
+.import:
   timeout: 6h
   script:
   - docker login git.snowfall.se:4567 -u "${REGISTRY_USERNAME}" -p "${REGISTRY_PASSWORD}"
-  - docker pull git.snowfall.se:4567/junction/junction/service/gtfs-import:latest
-  - docker run -u "${UID}" --rm -v "$(pwd)/:/data" git.snowfall.se:4567/junction/junction/service/gtfs-import:latest /data/data-input/ /data/data-import/ 28
+  - if [ "$DOCKERPULL" ]; then docker pull git.snowfall.se:4567/junction/junction/service/gtfs-import:latest; fi
+  - docker run -u "${UID}" --rm -v "$(pwd)/:/data" git.snowfall.se:4567/junction/junction/service/gtfs-import:latest /data/data-input/ /data/data-import/ $IMPORTDAYS
   - tar -czf data-import.tar.gz data-import/*
-  - docker run -u "${UID}" --rm -v "$(pwd)/:/data" -e AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" -e AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" amazon/aws-cli s3 cp /data/data-import.tar.gz  s3://junction-schedules-export/PipelineData/data-import.tar.gz --no-progress
-  - docker run -u "${UID}" --rm -v "$(pwd)/:/data" -e AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" -e AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" amazon/aws-cli s3 rm s3://junction-schedules-export/PipelineData/final/ --recursive
+  - docker run -u "${UID}" --rm -v "$(pwd)/:/data" -e AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" -e AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" amazon/aws-cli s3 cp /data/data-import.tar.gz  "s3://junction-schedules-export/PipelineData/$PREFIX-data-import.tar.gz" --no-progress
   tags:
     - autoscaler-XL
 
-export:
-  stage: export
-  needs: ["import"]
+.export:
   timeout: 6h
   artifacts:
-    expire_in: 1 day
+    expire_in: 6 days
     paths:
     - data-export/
   script:
-  - docker run -u "${UID}" --rm -v "$(pwd)/:/data" -e AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" -e AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" amazon/aws-cli s3 cp s3://junction-schedules-export/PipelineData/data-import.tar.gz /data/data-import.tar.gz --no-progress
+  - docker run -u "${UID}" --rm -v "$(pwd)/:/data" -e AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" -e AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" amazon/aws-cli s3 cp "s3://junction-schedules-export/PipelineData/$PREFIX-data-import.tar.gz" /data/data-import.tar.gz --no-progress
   - tar -xzf data-import.tar.gz
   - docker login git.snowfall.se:4567 -u "${REGISTRY_USERNAME}" -p "${REGISTRY_PASSWORD}"
-  - docker pull git.snowfall.se:4567/junction/junction/service/schedules-export:latest
+  - if [ "$DOCKERPULL" ]; then docker pull git.snowfall.se:4567/junction/junction/service/schedules-export:latest; fi
   - docker run -u "${UID}" --rm -v "$(pwd)/:/data" git.snowfall.se:4567/junction/junction/service/schedules-export:latest --input-dir=/data/data-import/ --output-dir=/data/data-export/
-  - docker run -u "${UID}" --rm -v "$(pwd)/:/data" -e AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" -e AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" amazon/aws-cli s3 cp /data/data-export/ s3://junction-schedules-export/PipelineData/final/ --recursive --exclude '*' --include '*.bin' --no-progress
   tags:
     - autoscaler-XL
 
-validate:
-  stage: export
-  needs: ["import", "export"]
+.validate:
   timeout: 6h
   script:
-  - docker run -u "${UID}" --rm -v "$(pwd)/:/data" -e AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" -e AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" amazon/aws-cli s3 cp s3://junction-schedules-export/PipelineData/data-import.tar.gz /data/data-import.tar.gz --no-progress
+  - docker run -u "${UID}" --rm -v "$(pwd)/:/data" -e AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" -e AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" amazon/aws-cli s3 cp "s3://junction-schedules-export/PipelineData/$PREFIX-data-import.tar.gz" /data/data-import.tar.gz --no-progress
   - tar -xzf data-import.tar.gz
   - docker login git.snowfall.se:4567 -u "${REGISTRY_USERNAME}" -p "${REGISTRY_PASSWORD}"
-  - docker pull git.snowfall.se:4567/junction/junction/service/validate-dataset:latest
+  - if [ "$DOCKERPULL" ]; then docker pull git.snowfall.se:4567/junction/junction/service/validate-dataset:latest; fi
   - docker run -u "${UID}" --rm -v "$(pwd)/:/data" git.snowfall.se:4567/junction/junction/service/validate-dataset:latest /data/data-export/ /data/data-import/schedules.bson /data/data-import/locations.bson
   tags:
     - autoscaler-XL
 
-import-to-dev:
-  stage: deploy
-  needs: ["import"]
+.import-to-server:
   timeout: 12h
   retry: 2
   services:
   - name: docker:dind
     alias: dockerdaemon
   - name: mongo:latest
+  variables:
+    MONGODSN: $MONGODSN_IMPORT
   script:
-  - docker run -u "${UID}" --rm -v "$(pwd)/:/data" -e AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" -e AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" amazon/aws-cli s3 cp s3://junction-schedules-export/PipelineData/data-import.tar.gz /data/data-import.tar.gz --no-progress
+  - docker run -u "${UID}" --rm -v "$(pwd)/:/data" -e AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" -e AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" amazon/aws-cli s3 cp "s3://junction-schedules-export/PipelineData/$PREFIX-data-import.tar.gz" /data/data-import.tar.gz --no-progress
   - tar -xzf data-import.tar.gz
   - curl https://fastdl.mongodb.org/tools/db/mongodb-database-tools-debian11-x86_64-100.6.1.deb --output mongodb.deb
   - curl https://pgp.mongodb.com/server-6.0.asc | apt-key add -
   - echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-6.0.list
   - apt update && apt install ./mongodb.deb dnsutils mongodb-mongosh -y
-  - mongorestore --db=places --collection=locations --stopOnError --numInsertionWorkersPerCollection=20 'mongodb://mongo:27017' data-import/locations.bson
+  # Don't stop on error as duplicates sometimes happen. These are checked in validate step, so won't cause an issue.
+  - mongorestore --db=places --collection=locations --drop --numInsertionWorkersPerCollection=20 'mongodb://mongo:27017' data-import/locations.bson
   - export GEODATA_ADDR="$(dig +short grpc.geodata-development.service.consul @172.16.110.215 -p 8600):$(dig +short SRV grpc.geodata-development.service.consul @172.16.110.215 -p 8600 | awk '{print $3}')"
   - docker login git.snowfall.se:4567 -u "${REGISTRY_USERNAME}" -p "${REGISTRY_PASSWORD}"
-  - docker pull git.snowfall.se:4567/junction/junction/service/places:latest
+  - if [ "$DOCKERPULL" ]; then docker pull git.snowfall.se:4567/junction/junction/service/places:latest; fi
   - docker run -u "${UID}" --network=host --rm -v "$(pwd)/:/data" git.snowfall.se:4567/junction/junction/service/places:latest generate-cities --geodata-address="${GEODATA_ADDR}" --mongo-dsn='mongodb://mongo:27017'
   - mongodump --db=places --collection=places --out="-" 'mongodb://mongo:27017' > data-import/places.bson
   - |
-    mongosh "${DEV_MONGODSN}/places" --eval '
+    mongosh "${MONGODSN}/places" --eval '
       try {db.places_import.drop();} catch (e) {}
       db.createCollection("places_import");
       db.places_import.createIndex({"location.coordinates": "2dsphere"});
@@ -133,52 +128,41 @@ import-to-dev:
       db.createCollection("schedules_import");
       db.schedules_import.createIndex({"legs._id": 1}, {unique: true});
       db.schedules_import.createIndex({"updated_at": 1});'
-  - mongorestore --db=places --collection=places_import --stopOnError --numInsertionWorkersPerCollection=10 "${DEV_MONGODSN}" data-import/places.bson
-  - mongorestore --db=places --collection=locations_import --stopOnError --numInsertionWorkersPerCollection=10 "${DEV_MONGODSN}" data-import/locations.bson
-  - mongorestore --db=schedules --collection=schedules_import --stopOnError --numInsertionWorkersPerCollection=10 "${DEV_MONGODSN}" data-import/schedules.bson
+  - mongorestore --db=places --collection=places_import --stopOnError --numInsertionWorkersPerCollection=10 "${MONGODSN}" data-import/places.bson
+  - mongorestore --db=places --collection=locations_import --numInsertionWorkersPerCollection=10 "${MONGODSN}" data-import/locations.bson
+  - mongorestore --db=schedules --collection=schedules_import --stopOnError --numInsertionWorkersPerCollection=10 "${MONGODSN}" data-import/schedules.bson
   tags:
     - autoscaler-XL
 
-deploy-in-dev:
-  stage: deploy
-  needs: ["export", "import-to-dev", "validate"]
+.deploy-in-server:
+  environment:
+    name: $PREFIX
   resource_group: planner
   services:
   - name: docker:dind
     alias: dockerdaemon
   - name: mongo:latest
+  variables:  # EFS_IP, MONGODSN_DEPLOY and NOMAD_ADDR must be defined in protected env.
+    MONGODSN: $MONGODSN_DEPLOY
+    NOMAD_NAMESPACE: $PREFIX
   script:
   - curl https://pgp.mongodb.com/server-6.0.asc | apt-key add -
   - echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-6.0.list
   - apt update && apt install nfs-common mongodb-mongosh -y
   - docker login git.snowfall.se:4567 -u "${REGISTRY_USERNAME}" -p "${REGISTRY_PASSWORD}"
-  - docker pull git.snowfall.se:4567/junction/junction/service/mobile_api:latest
+  - if [ "$DOCKERPULL" ]; then docker pull git.snowfall.se:4567/junction/junction/service/mobile_api:latest; fi
   - mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,X-mount.mkdir ${EFS_IP}:/ /planner-efs
-  - cp data-export/*.bin /planner-efs/development/
+  - mkdir "/planner-efs/$PREFIX-$CI_COMMIT_TIMESTAMP"
+  - cp /planner-efs/$PREFIX/*.bin "/planner-efs/$PREFIX-$CI_COMMIT_TIMESTAMP/"
+  - cp data-export/*.bin "/planner-efs/$PREFIX/"
+  # Get existing allocs
+  - mapfile -t allocation_ids < <(nomad job status planner-grpc | awk '/Allocations/{flag=1; next} flag && $6=="running" && !/^ID/{print $1}')
+  # Get job spec and increase count by one
+  - nomad job inspect planner-grpc > job.json
+  - cat job.json | jq '.Job.TaskGroups[0].Count += 1' > newjob.json
+  - nomad job run -json newjob.json
   - |
-    export NOMAD_ADDR="${DEV_NOMAD_ADDR}"
-    export NOMAD_NAMESPACE="development"
-    # Get existing allocs
-    mapfile -t allocation_ids < <(nomad job status planner-grpc | awk '/Allocations/{flag=1; next} flag && $6=="running" && !/^ID/{print $1}')
-
-    # Get job spec and increase count by one
-    nomad job inspect planner-grpc > job.json
-    json_data=$(cat job.json)
-    echo "$json_data" | jq '.Job.TaskGroups[0].Count += 1' > newjob.json
-
-    nomad job run -json newjob.json
-    for element in "${allocation_ids[@]}"; do
-        nomad alloc restart "${element}"
-    done
-
-    while [[ -n $(curl -s ${NOMAD_ADDR%:*}:8500/v1/health/checks/planner-development | jq '.[] | select(.Status != \"passing\")') ]]
-    do
-        echo "Waiting for restarted service to become healthy. Checking health in 60 seconds"
-        sleep 60
-    done
-    nomad job run -json job.json
-  - |
-    mongosh "${DEV_MONGODSN}/places" --eval '
+    mongosh "${MONGODSN}/places" --eval '
       let now = new Date().toISOString().replaceAll("-", "").replaceAll(":", "").split(".")[0];
       try {db.places.renameCollection("places_backup_" + now);} catch (e) {}
       db.places_import.renameCollection("places");
@@ -187,7 +171,96 @@ deploy-in-dev:
       db = db.getMongo().getDB("schedules");
       try {db.schedules.renameCollection("schedules_backup_" + now);} catch (e) {}
       db.schedules_import.renameCollection("schedules");'
-  - docker run -u "${UID}" --rm -v "$(pwd)/:/data" git.snowfall.se:4567/junction/junction/service/mobile_api:latest migrate --mongo-db='mobile-api' --mongo-dsn="${DEV_MONGODSN}"
-  - docker run -u "${UID}" --rm -v "$(pwd)/:/data" git.snowfall.se:4567/junction/junction/service/mobile_api:latest migrate --mongo-db='res-se-mobile-api' --mongo-dsn="${DEV_MONGODSN}"
+  - |
+    for element in "${allocation_ids[@]}"; do
+        nomad alloc restart "${element}"
+    done
+  - |
+    while [[ -n $(curl -s ${NOMAD_ADDR%:*}:8500/v1/health/checks/planner-development | jq '.[] | select(.Status != "passing")') ]]; do
+        echo "Waiting for restarted service to become healthy. Checking health in 60 seconds"
+        sleep 60
+    done
+  - nomad job run -json job.json
+  - docker run -u "${UID}" --rm -v "$(pwd)/:/data" git.snowfall.se:4567/junction/junction/service/mobile_api:latest migrate --mongo-db='mobile-api' --mongo-dsn="${MONGODSN}"
+  - docker run -u "${UID}" --rm -v "$(pwd)/:/data" git.snowfall.se:4567/junction/junction/service/mobile_api:latest migrate --mongo-db='res-se-mobile-api' --mongo-dsn="${MONGODSN}"
   tags:
     - docker
+
+.dev:
+  variables:
+    DOCKERPULL: 1  # Only first job should pull, so other jobs use the same code even if a deployment happens.
+    IMPORTDAYS: 28
+    MONGODSN_IMPORT: $DEV_MONGODSN_IMPORT
+    PREFIX: "development"
+
+.prod:
+  variables:
+    MONGODSN_IMPORT: $PROD_MONGODSN_IMPORT
+    PREFIX: "production"
+
+.sandbox:
+  variables:
+    MONGODSN_IMPORT: $SANDBOX_MONGODSN_IMPORT
+    PREFIX: "sandbox"
+
+dev-import:
+  extends: [".import", ".dev"]
+  stage: dev-export
+  needs: ["directferries", "feeds", "oag"]
+
+dev-export:
+  extends: [".export", ".dev"]
+  stage: dev-export
+  needs: ["dev-import"]
+
+dev-validate:
+  extends: [".validate", ".dev"]
+  stage: dev-export
+  needs: ["dev-import", "dev-export"]
+
+import-to-dev:
+  extends: [".import-to-server", ".dev"]
+  stage: dev-deploy
+  needs: ["dev-import"]
+
+deploy-in-dev:
+  extends: [".deploy-in-server", ".dev"]
+  stage: dev-deploy
+  needs: ["dev-export", "import-to-dev", "dev-validate"]
+
+import-to-sandbox:
+  extends: [".import-to-server", ".sandbox"]
+  stage: dev-deploy
+  needs: ["dev-import"]
+  variables:
+    PREFIX: "development"  # Use import artifact from dev job.
+
+deploy-in-sandbox:
+  extends: [".deploy-in-server", ".sandbox"]
+  stage: dev-deploy
+  needs: ["dev-export", "import-to-sandbox", "dev-validate"]
+
+prod-import:
+  extends: [".import", ".prod"]
+  stage: prod-export
+  needs: ["directferries", "feeds", "oag", "dev-validate"]
+
+prod-export:
+  extends: [".export", ".prod"]
+  stage: prod-export
+  needs: ["prod-import"]
+
+prod-validate:
+  extends: [".validate", ".prod"]
+  stage: prod-export
+  needs: ["prod-import", "prod-export"]
+
+import-to-prod:
+  extends: [".import-to-server", ".prod"]
+  stage: prod-deploy
+  needs: ["prod-import"]
+
+deploy-in-prod:
+  extends: [".deploy-in-server", ".prod"]
+  stage: prod-deploy
+  needs: ["prod-export", "import-to-prod", "prod-validate"]
