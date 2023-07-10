@@ -173,18 +173,49 @@ class TripOrchestrator(object):
         return await asyncio.gather(*tasks, return_exceptions=True)
 
 
+_OFFER_SEARCH_LIMIT = 50
+
+
 class OfferOrchestrator(object):
     def __init__(self, offer_search_adapter: offer_searches.Client) -> None:
         self._offer_search_adapter = offer_search_adapter
         self._logger = stdout.get_logger()
+        self._semaphore = asyncio.Semaphore(_OFFER_SEARCH_LIMIT)
 
     async def offer_searches_from_trip_groups(
         self,
         trip_groups: Sequence[TripGroup],
         trip_candidate_search: trips_pb2.TripCandidateSearch,
     ) -> list[offer_models_pb2.OfferSearch]:
-        tasks = [
-            self._offer_search_adapter.create(
+        coros = (
+            self._create_offer_search(trip_combination, trip_candidate_search)
+            for trip_combination in itertools.product(*trip_groups)
+        )
+
+        searches = await asyncio.gather(*coros, return_exceptions=True)
+
+        offer_search_objects = []
+
+        for search in searches:
+            if isinstance(search, Exception):
+                self._logger.exception(
+                    "Failed to create an offer search",
+                    exception=search,
+                )
+
+                continue
+
+            offer_search_objects.append(search)
+
+        return offer_search_objects
+
+    async def _create_offer_search(
+        self,
+        trip_combination: Sequence[models_pb2.Trip],
+        trip_candidate_search: trips_pb2.TripCandidateSearch,
+    ) -> offer_models_pb2.OfferSearch:
+        async with self._semaphore:
+            return await self._offer_search_adapter.create(
                 request=offer_models_pb2.OfferSearch(
                     id=string.uuid(),
                     reseller_id=trip_candidate_search.reseller_id,
@@ -202,22 +233,3 @@ class OfferOrchestrator(object):
                     session_token=trip_candidate_search.session_token,
                 ),
             )
-            for trip_combination in itertools.product(*trip_groups)
-        ]
-
-        searches = await asyncio.gather(*tasks, return_exceptions=True)
-
-        offer_search_objects = []
-
-        for search in searches:
-            if isinstance(search, Exception):
-                self._logger.exception(
-                    "Failed to create an offer search",
-                    exception=search,
-                )
-
-                continue
-
-            offer_search_objects.append(search)
-
-        return offer_search_objects
