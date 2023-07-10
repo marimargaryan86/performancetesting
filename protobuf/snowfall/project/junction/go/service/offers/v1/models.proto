@@ -97,6 +97,7 @@ message Offer {
   snowfall.stdlib.v1.Money price = 3;
   string brand_name = 4;
   repeated BaggageAllowance baggage_allowances = 5;
+  repeated PriceBreakdown price_breakdown = 7;
   // isRefundable
 }
 
