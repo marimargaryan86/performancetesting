@@ -1,8 +1,12 @@
 from collections.abc import Callable
 
 from starlette.applications import Starlette
+from starlette.middleware import Middleware
 
-from snowfall.project.junction.plus.service.webhooks import bootstrap
+from snowfall.project.junction.plus.service.webhooks import (
+    bootstrap,
+    middlewares,
+)
 from snowfall.project.junction.plus.service.webhooks.routes import router
 from snowfall.stdlib import service
 from snowfall.stdlib.integration.starlette import application
@@ -16,6 +20,12 @@ def _factory(
             router.get_routes(
                 bootstrap.create_dependencies(),
             ),
+            custom_middlewares=[
+                Middleware(
+                    middlewares.HmacHeaderMiddleware,
+                    secret_key=app.settings.flight_stats_app_key,
+                ),
+            ],
             openapi_path=None,
         )
 
