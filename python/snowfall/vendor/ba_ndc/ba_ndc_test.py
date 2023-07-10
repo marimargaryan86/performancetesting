@@ -410,7 +410,7 @@ async def generate_order(
             amount=decimal.Decimal(offer.price.total_amount),
         )
 
-    return await ba_ndc_client.create_order(order_request_builder.build())
+    return (await ba_ndc_client.create_order(order_request_builder.build()))[0]
 
 
 async def call_cancel_order(

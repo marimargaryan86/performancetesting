@@ -21,6 +21,7 @@ class Settings(BaNdcConfig, service.ProviderSettings):
     redis_dsn: pydantic.AnyUrl
     rate_limiter_grpc_host: str
     rate_limiter_service_configs: dict[str, RateLimitConfig]
+    storage_dsn: service.AnyDsn
 
 
 class PricingSettings(BaNdcConfig, service.Settings):

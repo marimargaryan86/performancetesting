@@ -1,7 +1,11 @@
+import pathlib
+import uuid
+
 import more_itertools
 import pycountry
 
 from snowfall.project.junction.go.service.orders.v1 import amqp_pb2, models_pb2
+from snowfall.project.junction.provider.v1alpha import bookings_pb2
 from snowfall.project.junction.service.providers.ba_ndc import (
     ba_ndc_helpers,
     cache,
@@ -9,6 +13,7 @@ from snowfall.project.junction.service.providers.ba_ndc import (
     enums,
     notifications,
 )
+from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.v1 import postal_address_pb2
 from snowfall.vendor.ba_ndc import client, errors
 from snowfall.vendor.ba_ndc.adapters.order_view_adapter import OrderViewAdapter
@@ -17,6 +22,7 @@ from snowfall.vendor.ba_ndc.models import (
     payer_details,
     request_order_schemas,
     response_common_passenger_schemas,
+    response_order_schemas,
 )
 from snowfall.vendor.ba_ndc.models.util import passenger_enums
 
@@ -92,10 +98,12 @@ class BookingHandler(object):
         self,
         ba_ndc_client: client.BaNdcClient,
         notifier: notifications.Notifier,
+        booking_storage: filesystem.Storage,
     ):
         self._client = ba_ndc_client
         self._logger = ba_ndc_helpers.get_logger(__name__)
         self._notifier = notifier
+        self._storage = booking_storage
 
     async def book(
         self,
@@ -203,9 +211,13 @@ class BookingHandler(object):
             details.price.currency,
             ba_ndc_helpers.str_to_decimal(details.price.amount),
         )
-
-        adapter = OrderViewAdapter(
-            await self._client.create_order(order_request.build()),
+        order_response, raw_response = await self._client.create_order(
+            order_request.build(),
+        )
+        adapter = OrderViewAdapter(order_response)
+        await self._storage.put(
+            pathlib.Path(str(order_response.identifier)),
+            raw_response,
         )
 
         try:
@@ -217,3 +229,29 @@ class BookingHandler(object):
             self._logger.exception()
 
         return adapter
+
+
+class Transformer(object):
+    def __init__(self, provider_identifier: uuid.UUID, provider_name: str):
+        self._provider_id = str(provider_identifier)
+        self._provider_name = provider_name
+
+    async def raw_to_booking(self, raw: bytes) -> bookings_pb2.Booking:
+        order_response = response_order_schemas.OrderResponse.parse_raw(raw)
+
+        # TODO: How to figure out real status?
+        booking_status = bookings_pb2.Booking.STATUS_NOT_TICKETED
+
+        return bookings_pb2.Booking(
+            id=str(order_response.identifier),
+            status=booking_status,
+            provider=bookings_pb2.Booking.Provider(
+                id=self._provider_id,
+                name=self._provider_name,
+            ),
+            trip=bookings_pb2.Booking.Trip(
+                record_locator=order_response.order.pnr,
+                operator_booking_references=[order_response.order.pnr],
+            ),
+            # TODO: No idea how to get created_at or updated_at from the booking model.
+        )

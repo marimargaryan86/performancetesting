@@ -133,6 +133,7 @@ EOH
         API_BASE_URL        = "${var.api_base_url}"
         SENTRY_DSN          = "https://5e8ffcd08b434ebf955ecd889fe82947@sentry.snowfall.se/58"
         PROVIDER_COMPANY_ID = "${var.provider_company_id}"
+        STORAGE_DSN         = "memory://"
       }
     }
   }

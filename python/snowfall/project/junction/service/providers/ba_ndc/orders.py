@@ -16,6 +16,7 @@ from snowfall.project.junction.service.providers.ba_ndc import (
 from snowfall.project.junction.service.providers.ba_ndc.booking import BookingHandler
 from snowfall.stdlib import service
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
+from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.vendor.ba_ndc import client
@@ -31,6 +32,7 @@ class OrdersSettings(config.BaNdcConfig, service.Settings):
     smtp_recipient: pydantic.EmailStr
     rate_limiter_grpc_host: str
     rate_limiter_service_configs: dict[str, RateLimitConfig]
+    storage_dsn: service.AnyDsn
 
 
 async def orders(  # noqa: WPS210, WPS217
@@ -70,6 +72,9 @@ async def orders(  # noqa: WPS210, WPS217
         http_client=http_client,
         rate_limit_clients=(rate_limit_client, rate_limit_client_daily),
     )
+    storage = await app.stack.enter_async_context(
+        filesystem.Storage.from_dsn(app.settings.storage_dsn),
+    )
 
     await OrderConsumer(
         consumer_obj=consumer.Consumer(
@@ -94,6 +99,7 @@ async def orders(  # noqa: WPS210, WPS217
                 sender=app.settings.smtp_sender,
                 recipient=app.settings.smtp_recipient,
             ),
+            booking_storage=storage,
         ),
         offer_cache=cache.OfferCache(
             client=redis.Client(redis_connection, prefix=app.name),

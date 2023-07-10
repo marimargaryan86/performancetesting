@@ -86,7 +86,7 @@ class BaNdcClient(object):  # noqa: WPS214
         self,
         request: request_order_schemas.CreateOrderRequest,
         rate_limit_timeout: float = 60,
-    ) -> response_order_schemas.OrderResponse:
+    ) -> tuple[response_order_schemas.OrderResponse, bytes]:
         response = await self._make_request(
             "POST",
             "/orders",
@@ -98,7 +98,10 @@ class BaNdcClient(object):  # noqa: WPS214
             rate_limit_timeout=rate_limit_timeout,
         )
 
-        return response_order_schemas.OrderResponse.parse_raw(
+        return (
+            response_order_schemas.OrderResponse.parse_raw(
+                response.content,
+            ),
             response.content,
         )
 
