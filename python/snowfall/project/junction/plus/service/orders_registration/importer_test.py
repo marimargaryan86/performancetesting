@@ -1,4 +1,4 @@
-from unittest.mock import call
+import pytest
 
 from snowfall.project.junction.plus.service.orders_registration import importer
 from snowfall.project.junction.plus.service.orders_registration.v1alpha import amqp_pb2
@@ -9,8 +9,5 @@ async def test_order_fail_validation(
     order_importer: importer.OrderImporter,
     invalid_message: types.Message[amqp_pb2.IncomingOrder],
 ) -> None:
-    await order_importer._process_message(invalid_message)  # noqa: SLF001
-    assert order_importer._logger.warning.call_args_list[0] == call(  # type: ignore[attr-defined] # noqa: SLF001
-        "Validation Error",
-        exc_info=True,
-    )
+    with pytest.raises(ExceptionGroup, match="ProtobufValidationErrors"):
+        await order_importer._process_message(invalid_message)  # noqa: SLF001

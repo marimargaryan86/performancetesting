@@ -1,6 +1,5 @@
-from collections.abc import AsyncGenerator, Mapping
-from typing import Any
-from unittest.mock import AsyncMock, patch
+from collections.abc import AsyncGenerator
+from unittest import mock
 
 import pytest
 
@@ -12,42 +11,33 @@ from snowfall.project.junction.plus.service.orders_registration.importer import 
 from snowfall.project.junction.plus.service.orders_registration.v1alpha import amqp_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.transport.amqp import types
+from snowfall.stdlib.transport.amqp.consumer import Consumer
+from snowfall.stdlib.transport.amqp.producer import Producer
 from snowfall.stdlib.v1 import phone_number_pb2
 
 
-@pytest.fixture(autouse=True)
-def mock_dependencies(monkeypatch: pytest.MonkeyPatch) -> Mapping[str, Any]:
-    mock_consumer = AsyncMock()
-    monkeypatch.setattr(
-        "snowfall.stdlib.transport.amqp.consumer.Consumer",
-        mock_consumer,
-    )
+@pytest.fixture()
+def consumer() -> mock.AsyncMock:
+    mock_consumer = mock.create_autospec(Consumer)
+    return mock_consumer.return_value
 
-    mock_producer = AsyncMock()
-    monkeypatch.setattr(
-        "snowfall.stdlib.transport.amqp.producer.Producer",
-        mock_producer,
-    )
 
-    mock_logger = AsyncMock()
-    monkeypatch.setattr(
-        "snowfall.stdlib.logging.stdout.Logger",
-        mock_logger,
-    )
+@pytest.fixture()
+def producer() -> mock.AsyncMock:
+    mock_producer = mock.create_autospec(Producer)
+    return mock_producer.return_value
 
-    return {
-        "consumer_obj": mock_consumer.return_value,
-        "producer_obj": mock_producer.return_value,
-        "orders": orders_adapter.DictClient([]),
-        "logger": mock_logger.return_value,
-    }
+
+@pytest.fixture()
+def orders_client() -> orders_adapter.Client:
+    return orders_adapter.DictClient([])
 
 
 @pytest.fixture()
 async def invalid_message() -> (
     AsyncGenerator[types.Message[amqp_pb2.IncomingOrder], None]
 ):
-    with patch("snowfall.stdlib.transport.amqp.types.Message") as mock_message:
+    with mock.patch("snowfall.stdlib.transport.amqp.types.Message") as mock_message:
         message = mock_message.return_value
         message.body = amqp_pb2.IncomingOrder(
             reseller_id="reseller_id",
@@ -63,7 +53,7 @@ async def invalid_message() -> (
 async def valid_message() -> (
     AsyncGenerator[types.Message[amqp_pb2.IncomingOrder], None]
 ):
-    with patch("snowfall.stdlib.transport.amqp.types.Message") as mock_message:
+    with mock.patch("snowfall.stdlib.transport.amqp.types.Message") as mock_message:
         message = mock_message.return_value
         message.body = amqp_pb2.IncomingOrder(
             reseller_id="reseller_id",
@@ -109,5 +99,13 @@ async def valid_message() -> (
 
 
 @pytest.fixture()
-def order_importer(mock_dependencies: Mapping[str, Any]) -> OrderImporter:
-    return OrderImporter(**mock_dependencies)
+def order_importer(
+    consumer: mock.AsyncMock,
+    producer: mock.AsyncMock,
+    orders_client: orders_adapter.Client,
+) -> OrderImporter:
+    return OrderImporter(
+        consumer,
+        producer,
+        orders_client,
+    )

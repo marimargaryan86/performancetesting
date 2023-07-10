@@ -1,5 +1,4 @@
 from snowfall.project.junction.plus.adapter import orders as orders_adapter
-from snowfall.project.junction.plus.adapter import validation
 from snowfall.project.junction.plus.service.notification_center.v1alpha import (
     amqp_pb2 as notif_amqp_pb2,
 )
@@ -23,13 +22,12 @@ class OrderImporter(object):
         producer_obj: producer.Producer,
         orders: orders_adapter.Client,
         timeout: int = 10,
-        logger: stdout.Logger | None = None,
     ):
         self._consumer = consumer_obj
         self._producer = producer_obj
         self._orders = orders
         self._timeout = timeout
-        self._logger = logger or stdout.get_logger()
+        self._logger = stdout.get_logger()
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
@@ -51,20 +49,17 @@ class OrderImporter(object):
         self,
         message: types.Message[amqp_pb2.IncomingOrder],
     ) -> None:
-        try:
-            validators.validate_orders(message.body)
-        except* validation.ProtobufValidationError:
-            self._logger.warning("Validation Error", exc_info=True)
-        else:
-            persisted_order = await self._orders.create(
-                notifications_pb2.CreateOrderRequest(
-                    reseller_id=message.body.reseller_id,
-                    external_ref_id=message.body.external_ref_id,
-                    booking_reference=message.body.booking_reference,
-                    contact_details=message.body.contact_details,
-                    passengers=message.body.passengers,
-                    bookings=message.body.bookings,
-                ),
-            )
-            await self.publish_event(persisted_order)
-            self._logger.warning(str(persisted_order))
+        validators.validate_orders(message.body)
+        persisted_order = await self._orders.create(
+            notifications_pb2.CreateOrderRequest(
+                reseller_id=message.body.reseller_id,
+                external_ref_id=message.body.external_ref_id,
+                booking_reference=message.body.booking_reference,
+                contact_details=message.body.contact_details,
+                passengers=message.body.passengers,
+                bookings=message.body.bookings,
+            ),
+        )
+        await self.publish_event(persisted_order)
+
+        self._logger.warning(str(persisted_order))
