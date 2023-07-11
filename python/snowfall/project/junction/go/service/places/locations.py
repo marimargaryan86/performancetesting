@@ -1,6 +1,6 @@
 import datetime
 import uuid
-from collections.abc import AsyncIterable, Mapping
+from collections.abc import AsyncIterable, Mapping, Sequence
 from typing import Any
 
 from snowfall.project.junction.go.service.places import places
@@ -65,9 +65,9 @@ def resolve_osm_properties(  # noqa: WPS231
 
 async def node_to_place(  # noqa: WPS231, WPS210
     locations_repository: places.LocationRepository,
-    nodes_collection: Any,
+    nodes: Sequence[Mapping[str, Any]],
 ) -> AsyncIterable[models_pb2.Place]:
-    async for node in nodes_collection.find({}):
+    for node in nodes:
         name = validate_name(node)
         if not name:
             continue
