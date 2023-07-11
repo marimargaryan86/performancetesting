@@ -1,6 +1,6 @@
 import asyncio
 import ipaddress
-import pkgutil
+import pathlib
 import random
 from collections.abc import Sequence
 from typing import Any
@@ -25,6 +25,7 @@ from snowfall.stdlib.transport.grpc.client import create_channel
 class _CitiesSettings(service.Settings):
     geodata_address: str
     mongo_dsn: Sequence[AnyUrl]
+    places_dump: pathlib.Path
 
 
 class _GrpcSettings(service.Settings):
@@ -51,13 +52,8 @@ async def _generate_cities(app: service.Application[_CitiesSettings]) -> None:
         "cities.csv",
     )
 
-    bson_content = pkgutil.get_data(
-        "snowfall.project.junction.go.service.places.main",
-        "places.bson",
-    )
-
+    bson_content = app.settings.places_dump.read_bytes()
     places_dump: list[Any] = bson.decode_all(bson_content) if bson_content else []
-
     locations_collection = mongo.places.locations
     nodes_collection = mongo.places.nodes
     places_collection = mongo.places.places
