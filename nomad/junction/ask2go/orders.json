@@ -18,7 +18,7 @@
     }
   },
   "sandbox": {
-    "deploy": false,
+    "deploy": true,
     "variables": {
       "count": 1,
       "override_double_booking_check": "true",

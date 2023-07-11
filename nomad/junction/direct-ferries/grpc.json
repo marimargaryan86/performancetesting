@@ -22,7 +22,7 @@
     }
   },
   "sandbox": {
-    "deploy": false,
+    "deploy": true,
     "variables": {
       "count": 1,
       "api_url": "https://sandbox-api.test.directferriesconnect.com",

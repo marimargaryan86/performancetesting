@@ -14,7 +14,7 @@
     }
   },
   "sandbox": {
-    "deploy": false,
+    "deploy": true,
     "variables": {
       "count": 1,
       "api_base_url": "https://apibook.saveatrain.com/api",
