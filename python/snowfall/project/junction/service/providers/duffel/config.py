@@ -24,6 +24,7 @@ class Settings(DuffelConfig, service.ProviderSettings):
     ttl: datetime.timedelta = datetime.timedelta(minutes=DEFAULT_TTL_IN_MINUTES)
     enabled_airlines: set[str] = pydantic.Field(default_factory=set)
     disabled_airlines: set[str] = pydantic.Field(default_factory=set)
+    storage_dsn: service.AnyDsn
 
 
 class PricingSettings(DuffelConfig, service.Settings):

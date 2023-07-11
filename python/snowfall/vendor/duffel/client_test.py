@@ -167,6 +167,6 @@ async def test_order_create(
         json=json_res,
     )
 
-    response = await duffel_client.order_request(order_request.build())
+    response, _ = await duffel_client.order_request(order_request.build())
 
     assert response.identifier

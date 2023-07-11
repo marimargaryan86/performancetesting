@@ -99,7 +99,7 @@ class DuffelClient(object):  # noqa: WPS214
         self,
         order_data: OrderData,
         rate_limit_timeout: float = 60,
-    ) -> Order:
+    ) -> tuple[Order, bytes]:
         response = await self._make_request(
             "POST",
             "/air/orders",
@@ -111,7 +111,7 @@ class DuffelClient(object):  # noqa: WPS214
             rate_limit_timeout=rate_limit_timeout,
         )
 
-        return OrderResponse.parse_raw(response.content).response_data
+        return OrderResponse.parse_raw(response.content).response_data, response.content
 
     async def get_order(
         self,

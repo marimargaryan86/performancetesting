@@ -147,7 +147,7 @@ async def test_order_create(duffel_client: client.DuffelClient) -> None:
         ),
     )
 
-    order = await duffel_client.order_request(order_request.build())
+    order, _ = await duffel_client.order_request(order_request.build())
     assert order is not None
 
 
@@ -205,7 +205,7 @@ async def test_offer_after_order_create(  # noqa: WPS210,WPS217
         ),
     )
 
-    order = await duffel_client.order_request(order_request.build())
+    order, _ = await duffel_client.order_request(order_request.build())
     assert order is not None
     await asyncio.sleep(10)
 
@@ -253,7 +253,7 @@ async def test_offer_after_order_create(  # noqa: WPS210,WPS217
         ),
     )
 
-    order2 = await duffel_client.order_request(order_request.build())
+    order2, _ = await duffel_client.order_request(order_request.build())
     assert order2 is not None
 
 
@@ -409,7 +409,7 @@ async def test_order_create_with_infant(duffel_client: client.DuffelClient) -> N
         ),
     )
 
-    order = await duffel_client.order_request(order_request.build())
+    order, _ = await duffel_client.order_request(order_request.build())
     assert order is not None
 
 

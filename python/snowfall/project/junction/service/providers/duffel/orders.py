@@ -19,6 +19,7 @@ from snowfall.project.junction.service.providers.duffel.client_factory import (
 from snowfall.stdlib import service
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.logging import stdout
+from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
@@ -33,9 +34,10 @@ class OrdersSettings(config.DuffelConfig, service.Settings):
     smtp_sender: pydantic.EmailStr
     smtp_recipient: pydantic.EmailStr
     price_change_tolerance_percent: float = 1.0
+    storage_dsn: service.AnyDsn
 
 
-async def orders(app: service.AsyncApplication[OrdersSettings]) -> None:
+async def orders(app: service.AsyncApplication[OrdersSettings]) -> None:  # noqa: WPS217
     http_client = await app.stack.enter_async_context(
         httpx.AsyncClient(
             timeout=app.settings.http_timeout,
@@ -91,6 +93,9 @@ async def orders(app: service.AsyncApplication[OrdersSettings]) -> None:
                 recipient=app.settings.smtp_recipient,
             ),
             price_change_tolerance_percent=app.settings.price_change_tolerance_percent,
+            booking_storage=await app.stack.enter_async_context(
+                filesystem.Storage.from_dsn(app.settings.storage_dsn),
+            ),
         ),
         offer_cache=cache.OfferCache(
             client=redis.Client(redis_connection, prefix=app.name),

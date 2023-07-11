@@ -1,8 +1,16 @@
+import pathlib
+import uuid
+
+import orjson
 import phonenumbers
 from dateutil.relativedelta import relativedelta
 
 from snowfall.project.junction.go.service.orders.v1 import amqp_pb2, models_pb2
-from snowfall.project.junction.service.providers.duffel import cache, notifications
+from snowfall.project.junction.provider.v1alpha import bookings_pb2
+from snowfall.project.junction.service.providers.duffel import (
+    cache,
+    notifications,
+)
 from snowfall.project.junction.service.providers.duffel.client_factory import (
     DuffelClientFactory,
 )
@@ -10,6 +18,7 @@ from snowfall.project.junction.service.providers.duffel.enums import gender_from
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
+from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.v1 import date_pb2
 from snowfall.vendor.duffel import client, errors
 from snowfall.vendor.duffel.builders.order_request import (
@@ -18,7 +27,43 @@ from snowfall.vendor.duffel.builders.order_request import (
     OrderPassenger,
     OrderPayment,
 )
-from snowfall.vendor.duffel.models.order import Order
+from snowfall.vendor.duffel.models.order import Order, OrderResponse
+
+
+class Transformer(object):
+    def __init__(
+        self,
+        provider_identifier: uuid.UUID,
+        provider_name: str,
+    ) -> None:
+        self._provider_id = str(provider_identifier)
+        self._provider_name = provider_name
+
+    async def raw_to_booking(self, raw: bytes) -> bookings_pb2.Booking:
+        booking_result = OrderResponse(**orjson.loads(raw)).response_data
+
+        return bookings_pb2.Booking(
+            id=booking_result.identifier,
+            status=bookings_pb2.Booking.STATUS_CONFIRMED,
+            provider=bookings_pb2.Booking.Provider(
+                id=self._provider_id,
+                name=self._provider_name,
+            ),
+            trip=bookings_pb2.Booking.Trip(
+                record_locator=booking_result.booking_reference,
+                operator_booking_references=(
+                    [booking_result.booking_reference]
+                    if booking_result.booking_reference
+                    else []
+                ),
+            ),
+            created_at=protobuf.datetime_to_protobuf(booking_result.created_at),
+            updated_at=(
+                protobuf.datetime_to_protobuf(booking_result.synced_at)
+                if booking_result.synced_at is not None
+                else None
+            ),
+        )
 
 
 class BookingHandler(object):  # noqa: WPS214
@@ -32,11 +77,13 @@ class BookingHandler(object):  # noqa: WPS214
         duffel_client_factory: DuffelClientFactory,
         notifier: notifications.Notifier,
         price_change_tolerance_percent: float,
+        booking_storage: filesystem.Storage,
     ):
         self._duffel_client_factory = duffel_client_factory
         self._logger = stdout.get_logger()
         self._notifier = notifier
         self._price_change_tolerance_percent = price_change_tolerance_percent
+        self._storage = booking_storage
 
     async def book(  # noqa: WPS210
         self,
@@ -88,7 +135,7 @@ class BookingHandler(object):  # noqa: WPS214
             return new_booking
 
         try:
-            booking_result: Order = await self._make_booking(
+            booking_result, raw_response = await self._make_booking(
                 task=task,
                 details=updated_details,
                 duffel_client=duffel_client,
@@ -102,6 +149,8 @@ class BookingHandler(object):  # noqa: WPS214
             new_booking.status = models_pb2.Booking.STATUS_ERROR
             new_booking.raw_data = repr(booking_error)
             return new_booking
+
+        await self._storage.put(pathlib.Path(booking_result.identifier), raw_response)
 
         if booking_result is not None:
             new_booking.MergeFrom(
@@ -156,7 +205,7 @@ class BookingHandler(object):  # noqa: WPS214
         task: amqp_pb2.PlaceOrderTask,
         details: cache.OfferDetails,
         duffel_client: client.DuffelClient,
-    ) -> Order:
+    ) -> tuple[Order, bytes]:
         number = phonenumbers.parse(task.contact_details.phone.e164_number)
         order_request = OrderBuilder()
         order_request.add_offer_id(details.offer_id)
@@ -212,7 +261,9 @@ class BookingHandler(object):  # noqa: WPS214
 
             order_request.add_passenger(order_passenger)
 
-        order_response = await duffel_client.order_request(order_request.build())
+        order_response, raw_response = await duffel_client.order_request(
+            order_data=order_request.build(),
+        )
 
         try:
             # TODO: this should be handled in a separate service
@@ -222,7 +273,7 @@ class BookingHandler(object):  # noqa: WPS214
         except notifications.NotificationError:
             self._logger.exception()
 
-        return order_response
+        return order_response, raw_response
 
     def _is_infant(
         self,

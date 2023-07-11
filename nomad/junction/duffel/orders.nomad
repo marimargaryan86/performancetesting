@@ -34,6 +34,10 @@ variable "http_timeout" {
   type = string
 }
 
+variable "bucket" {
+  type = string
+}
+
 job "duffel-orders" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -108,6 +112,7 @@ SMTP_DSN={{range $index, $service := service "smtp"}}smtp://{{.ServiceMeta.usern
 {{ with secret "kv/data/${var.environment}/duffel" }}
 API_KEY={{ .Data.data.api_key }}
 RESELLERS_MAP={{ .Data.data.resellers_map }}
+STORAGE_DSN=s3://{{ .Data.data.aws_access_key_id }}:{{ .Data.data.aws_secret_access_key | urlquery }}@/${var.bucket}/duffel
 {{ end }}
 EOH
         destination = "services.env"

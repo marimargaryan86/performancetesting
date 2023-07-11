@@ -38,6 +38,10 @@ variable "disabled_airlines" {
   type = string
 }
 
+variable "bucket" {
+  type = string
+}
+
 job "duffel-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -128,6 +132,7 @@ REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis:
 API_KEY={{ .Data.data.api_key }}
 {{ end }}
 RESELLER_PROVIDERS={{keyOrDefault "${var.environment}/providers/reseller-providers" "{}" | toJSON }}
+STORAGE_DSN=s3://{{ .Data.data.aws_access_key_id }}:{{ .Data.data.aws_secret_access_key | urlquery }}@/${var.bucket}/duffel
 EOH
       }
 
