@@ -34,7 +34,11 @@ from snowfall.vendor.currency_cloud.models.payment import (
     PaymentRequest,
     PaymentResponse,
 )
-from snowfall.vendor.currency_cloud.models.rate import BasicRateResponse
+from snowfall.vendor.currency_cloud.models.rate import (
+    BasicRateResponse,
+    DetailedRateRequest,
+    DetailedRateResponse,
+)
 
 _METHOD_GET = "GET"
 _METHOD_POST = "POST"
@@ -314,6 +318,18 @@ class PaymentClient(object):  # noqa: WPS214
                 payload=remove_blank_string(
                     beneficiary.dict(exclude_none=True),
                 ),
+            ),
+        )
+
+    async def get_detailed_rates(
+        self,
+        detailed_rates_request: DetailedRateRequest,
+    ) -> DetailedRateResponse:
+        return DetailedRateResponse(
+            **await self._make_request(
+                method=_METHOD_GET,
+                url="rates/detailed",
+                query_parameters=detailed_rates_request.dict(exclude_none=True),
             ),
         )
 

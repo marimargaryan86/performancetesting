@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package snowfall.project.pay.service.refunds.v1alpha;
+
+import "snowfall/stdlib/v1/money.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/refunds/v1alpha";
+
+message Refund {
+  string id = 1;
+  string transaction_id = 2;
+  string conversion_id = 3;
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_PENDING = 1;
+    STATUS_EXECUTED = 2;
+  }
+  Status status = 4;
+  bool refund_received = 5;
+  string note = 6;
+  snowfall.stdlib.v1.Money refunded_us = 7;
+  snowfall.stdlib.v1.Money refunded_us_in_payer_currency = 8;
+  snowfall.stdlib.v1.Money refunded_reseller = 9;
+  snowfall.stdlib.v1.Money refund_position = 10;
+}

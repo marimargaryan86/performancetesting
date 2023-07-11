@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package snowfall.project.pay.service.refunds.v1alpha;
+
+import "snowfall/project/pay/service/refunds/v1alpha/models.proto";
+import "snowfall/stdlib/v1/money.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/refunds/v1alpha";
+
+service RefundsService {
+  rpc CreateRefund(CreateRefundRequest) returns (CreateRefundResponse) {}
+  rpc GetRefund(GetRefundRequest) returns (GetRefundResponse) {}
+  rpc ListRefunds(ListRefundsRequest) returns (ListRefundsResponse) {}
+  rpc UpdateRefund(UpdateRefundRequest) returns (UpdateRefundResponse) {}
+  rpc CalculateRefundPosition(CalculateRefundPositionRequest) returns (CalculateRefundPositionResponse) {}
+}
+
+message GetRefundRequest {
+  string id = 1;
+}
+
+message GetRefundResponse {
+  Refund refund = 1;
+}
+
+message ListRefundsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+}
+
+message ListRefundsResponse {
+  repeated Refund refunds = 1;
+  string next_page_token = 2;
+}
+
+message UpdateRefundRequest {
+  string refund_id = 1;
+  snowfall.stdlib.v1.Money refunded_by_provider = 2;
+  snowfall.stdlib.v1.Money refunded_to_reseller = 3;
+}
+
+message UpdateRefundResponse {
+  Refund refund = 1;
+}
+
+message CreateRefundRequest {
+  Refund refund = 1;
+}
+
+message CreateRefundResponse {
+  Refund refund = 1;
+}
+
+message CalculateRefundPositionRequest {
+  string refund_id = 1;
+  snowfall.stdlib.v1.Money refunded_by_provider = 2;
+  snowfall.stdlib.v1.Money refunded_to_reseller = 3;
+}
+
+message CalculateRefundPositionResponse {
+  snowfall.stdlib.v1.Money refund_position = 1;
+}
