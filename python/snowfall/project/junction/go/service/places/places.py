@@ -261,7 +261,7 @@ async def create(
     """Create, then release the semaphore."""
     async with sem:
         if count % 1000 == 0:
-            logging.info("Rows parsed: %s", count)
+            logging.info("Places created: %s", count)
 
         return await repo.create(place)
 
@@ -269,11 +269,14 @@ async def create(
 async def replace_one(
     collection: motor_asyncio.AsyncIOMotorCollection,
     place: Mapping[str, Any],
+    sem: asyncio.Semaphore,
     count: int,
 ) -> None:
-    await collection.replace_one(
-        filter={"_id": place["_id"]},
-        replacement=place,
-    )
-    if count % 1000 == 0:
-        logging.info("Rows parsed: %s", count)
+    async with sem:
+        if count % 1000 == 0:
+            logging.info("Places created: %s", count)
+
+        await collection.replace_one(
+            filter={"_id": place["_id"]},
+            replacement=place,
+        )

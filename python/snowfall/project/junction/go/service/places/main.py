@@ -1,6 +1,7 @@
 import asyncio
 import ipaddress
 import json
+import logging
 import pathlib
 import pkgutil
 import random
@@ -82,6 +83,7 @@ async def _generate_cities(app: service.Application[_CitiesSettings]) -> None:
                 places.replace_one(
                     places_collection,
                     place,
+                    sem,
                     count,
                 )
                 if place
@@ -103,6 +105,7 @@ async def _generate_cities(app: service.Application[_CitiesSettings]) -> None:
                     places.replace_one(
                         places_collection,
                         place,
+                        sem,
                         count,
                     )
                     if place
@@ -115,6 +118,7 @@ async def _generate_cities(app: service.Application[_CitiesSettings]) -> None:
                 )
                 tg.create_task(task)  # type: ignore[unused-awaitable]
 
+    logging.info("Generate places completed.")
     places_count = places_collection.count_documents({})
     if places_count < 10000:
         raise RuntimeError(
