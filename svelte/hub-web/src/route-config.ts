@@ -1,5 +1,6 @@
 export default {
   home: "/",
+  book: "/book",
   login: "/login",
   settings: "/settings",
   pay: {

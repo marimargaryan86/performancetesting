@@ -6,6 +6,14 @@
   line-height: 28px;
 }
 
+.typography.body-xlarge-weight-600 {
+  font-weight: 600;
+  font-size: 18px;
+  font-family: Inter, Arial, Helvetica, sans-serif;
+  font-style: normal;
+  line-height: 28px;
+}
+
 .typography.body-large {
   font-weight: 400;
   font-size: 16px;
@@ -16,6 +24,14 @@
 
 .typography.body-medium {
   font-weight: 400;
+  font-size: 14px;
+  font-family: Inter, Arial, Helvetica, sans-serif;
+  font-style: normal;
+  line-height: 20px;
+}
+
+.typography.body-medium-weight-600 {
+  font-weight: 600;
   font-size: 14px;
   font-family: Inter, Arial, Helvetica, sans-serif;
   font-style: normal;
