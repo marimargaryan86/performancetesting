@@ -119,7 +119,7 @@ async def _generate_cities(app: service.Application[_CitiesSettings]) -> None:
                 tg.create_task(task)  # type: ignore[unused-awaitable]
 
     logging.info("Generate places completed.")
-    places_count = places_collection.count_documents({})
+    places_count = await places_collection.count_documents({})
     if places_count < 10000:
         raise RuntimeError(
             "Failed to export places (found {0})".format(places_count),
