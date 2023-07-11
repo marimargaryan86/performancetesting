@@ -1,9 +1,11 @@
 import asyncio
 import dataclasses
+import logging
 import uuid
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, Mapping, Sequence
 from typing import Any
 
+from motor import motor_asyncio
 from pymongo import GEOSPHERE, IndexModel, results
 
 from snowfall.project.junction.go.service.places.v1 import models_pb2
@@ -118,6 +120,30 @@ class LocationRepository(
 
         return _unique(locations)
 
+    async def find_within_area_by_type(  # noqa: WPS211
+        self,
+        cursor: str,
+        longitude: float,
+        latitude: float,
+        max_distance_meters: int,
+        types: int,
+    ) -> resultset.ResultSet[models_pb2.Location]:
+        return await self._find_with_cursor(
+            cur=cursor,
+            filter_={
+                "types": [types],
+                "coordinates": {
+                    "$nearSphere": {
+                        "$geometry": {
+                            "type": "Point",
+                            "coordinates": [longitude, latitude],
+                        },
+                        "$maxDistance": max_distance_meters,
+                    },
+                },
+            },
+        )
+
 
 class _PlaceNormalizer(normalizers.Normalizer):
     def denormalize(
@@ -224,3 +250,30 @@ class PlaceRepository(  # noqa: WPS215
             self._collection.delete_one,
             filter={_mongo_id_key: identifier},
         )
+
+
+async def create(
+    repo: PlaceRepository,
+    place: models_pb2.Place,
+    sem: asyncio.Semaphore,
+    count: int,
+) -> bool:
+    """Create, then release the semaphore."""
+    async with sem:
+        if count % 1000 == 0:
+            logging.info("Rows parsed: %s", count)
+
+        return await repo.create(place)
+
+
+async def replace_one(
+    collection: motor_asyncio.AsyncIOMotorCollection,
+    place: Mapping[str, Any],
+    count: int,
+) -> None:
+    await collection.replace_one(
+        filter={"_id": place["_id"]},
+        replacement=place,
+    )
+    if count % 1000 == 0:
+        logging.info("Rows parsed: %s", count)

@@ -14,7 +14,9 @@ from snowfall.project.junction.extensions.service.mobile_api import (
 )
 from snowfall.project.junction.extensions.service.mobile_api.v1alpha import models_pb2
 from snowfall.project.junction.go.service.places.places import PlaceRepository
-from snowfall.project.junction.go.service.places.v1.models_pb2 import Place
+from snowfall.project.junction.go.service.places.v1 import (
+    models_pb2 as places_models_pb2,
+)
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.v1 import latlng_pb2
 
@@ -48,57 +50,61 @@ async def migrate(settings: bootstrap.MigrateSettings) -> None:  # noqa: WPS210
     await places_repository.delete_ids(to_remove)
 
 
-async def _save_enrich_data(  # noqa: WPS210
-    places: AsyncIterable[Place],
+async def _save_enrich_data(  # noqa: WPS210, WPS231
+    places: AsyncIterable[places_models_pb2.Place],
     repo: repository.PlacesRepository,
     osm_data: pd.DataFrame,
 ) -> None:
     updated = timestamp_pb2.Timestamp()
     updated.FromDatetime(datetime.datetime.now(tz=datetime.UTC))
+
     async for place in places:
         loc = place.location
-        # fmt: off
-        osm_place = (
-            osm_data[
-                (np.isclose(osm_data["lat"], loc.coordinates.latitude))
-                & (np.isclose(osm_data["long"], loc.coordinates.longitude))
-            ].head(
-                1,
-            ).replace(
-                {np.nan: None},
-            ).to_dict(
-                orient="records",
-            )[0]
-        )
-        # fmt: on
-
-        population_str = "".join(
-            char for char in osm_place.get("population") or "" if char.isdigit()
-        )
-        population = int(population_str) if population_str else 0
-        await repo.insert(
-            models_pb2.Place(
-                id=loc.id,
-                name=loc.name,
-                no_accent_name=unidecode(loc.name),
-                coordinates=latlng_pb2.LatLng(
-                    latitude=loc.coordinates.latitude,
-                    longitude=loc.coordinates.longitude,
-                ),
-                time_zone=loc.time_zone,
-                country_code=loc.country_code,
-                country_name=countries.get(alpha_2=loc.country_code).name,
-                updated_at=updated,
-                source_ref="junction",
-                types=[models_pb2.Place.Type.TYPE_UNSPECIFIED],
-                population=population,
-                local_name=(
-                    osm_place["local_name"] if loc.country_code == "SE" else ""
-                ),
-                no_accent_local_name=(
-                    unidecode(osm_place["local_name"])
-                    if loc.country_code == "SE"
-                    else ""
-                ),
+        types = [models_pb2.Place.Type.ValueType(loc_types) for loc_types in loc.types]
+        place_data = models_pb2.Place(
+            id=loc.id,
+            name=loc.name,
+            no_accent_name=unidecode(loc.name),
+            coordinates=latlng_pb2.LatLng(
+                latitude=loc.coordinates.latitude,
+                longitude=loc.coordinates.longitude,
             ),
+            time_zone=loc.time_zone,
+            country_code=loc.country_code,
+            country_name=countries.get(alpha_2=loc.country_code).name,
+            updated_at=updated,
+            source_ref="junction",
+            types=types,
         )
+
+        if loc.types == [models_pb2.Place.TYPE_CITY]:
+            # fmt: off
+            osm_place = (
+                osm_data[
+                    (np.isclose(osm_data["lat"], loc.coordinates.latitude))
+                    & (np.isclose(osm_data["long"], loc.coordinates.longitude))
+                ].head(
+                    1,
+                ).replace(
+                    {np.nan: None},
+                ).to_dict(
+                    orient="records",
+                )[0]
+            )
+            # fmt: on
+
+            population_str = "".join(
+                char for char in osm_place.get("population") or "" if char.isdigit()
+            )
+
+            population = int(population_str) if population_str else 0
+
+            place_data.population = population
+            place_data.local_name = (
+                osm_place["local_name"] if loc.country_code == "SE" else ""
+            )
+            place_data.no_accent_local_name = (
+                unidecode(osm_place["local_name"]) if loc.country_code == "SE" else ""
+            )
+
+        await repo.insert(place_data)

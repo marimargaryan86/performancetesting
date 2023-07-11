@@ -47,6 +47,11 @@ message Place {
   string source_ref = 8;
   enum Type {
     TYPE_UNSPECIFIED = 0;
+    TYPE_CITY = 1;
+    TYPE_RAILWAY_STATION = 2;
+    TYPE_AIRPORT = 3;
+    TYPE_BUS_STATION = 4;
+    TYPE_FERRY_PORT = 5;
   }
   repeated Type types = 9;
   int32 population = 10;

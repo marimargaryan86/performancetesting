@@ -1,23 +1,20 @@
 import asyncio
 import ipaddress
-import logging
+import pkgutil
 import random
 from collections.abc import Sequence
+from typing import Any
 
 import aiofiles
+import bson
 from motor import motor_asyncio
 from pydantic import AnyUrl
 
-from snowfall.project.junction.go.service.places import cities
+from snowfall.project.junction.go.service.places import cities, locations, places
 from snowfall.project.junction.go.service.places.grpc import (
     LocationsService,
     PlacesService,
 )
-from snowfall.project.junction.go.service.places.places import (
-    LocationRepository,
-    PlaceRepository,
-)
-from snowfall.project.junction.go.service.places.v1.models_pb2 import Place
 from snowfall.service.geodata.v1 import geocoding_pb2_grpc
 from snowfall.stdlib import service
 from snowfall.stdlib.persistence import filesystem
@@ -38,20 +35,6 @@ class _GrpcSettings(service.Settings):
     mongo_dsn: Sequence[AnyUrl]
 
 
-async def create(
-    repo: PlaceRepository,
-    city: Place,
-    sem: asyncio.Semaphore,
-    count: int,
-) -> bool:
-    """Create, then release the semaphore."""
-    async with sem:
-        if count % 1000 == 0:
-            logging.info("Rows parsed: %s", count)
-
-        return await repo.create(city)
-
-
 async def _generate_cities(app: service.Application[_CitiesSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         random.choice(app.settings.mongo_dsn),  # noqa: S311
@@ -59,8 +42,7 @@ async def _generate_cities(app: service.Application[_CitiesSettings]) -> None:
     geocoding_service = geocoding_pb2_grpc.GeocodingServiceStub(
         create_channel(app.settings.geodata_address),
     )
-    locations_repository = LocationRepository(mongo.places.locations)
-    places_repository = PlaceRepository(
+    places_repository = places.PlaceRepository(
         geocoding=geocoding_service,
         collection=mongo.places.places,
     )
@@ -69,12 +51,61 @@ async def _generate_cities(app: service.Application[_CitiesSettings]) -> None:
         "cities.csv",
     )
 
+    bson_content = pkgutil.get_data(
+        "snowfall.project.junction.go.service.places.main",
+        "places.bson",
+    )
+
+    places_dump: list[Any] = bson.decode_all(bson_content) if bson_content else []
+
+    locations_collection = mongo.places.locations
+    nodes_collection = mongo.places.nodes
+    places_collection = mongo.places.places
+    places_cache = {place["_id"]: place for place in places_dump}
+    locations_repo = places.LocationRepository(locations_collection)
     sem = asyncio.Semaphore(100)
     count = 1
-    async with asyncio.TaskGroup() as tg, aiofiles.open(csv_path) as csv_file:
-        async for city in cities.parse_csv(locations_repository, csv_file):
-            tg.create_task(create(places_repository, city, sem, count))  # type: ignore[unused-awaitable]
+
+    async with asyncio.TaskGroup() as tg:
+        async for node in locations.node_to_place(locations_repo, nodes_collection):
             count += 1
+            place = places_cache.get(node.location.id)
+            task = (
+                places.replace_one(
+                    places_collection,
+                    place,
+                    count,
+                )
+                if place
+                else places.create(
+                    places_repository,
+                    node,
+                    sem,
+                    count,
+                )
+            )
+
+            tg.create_task(task)  # type: ignore[unused-awaitable]
+
+        async with aiofiles.open(csv_path) as csv_file:
+            async for city in cities.parse_csv(locations_repo, csv_file):
+                count += 1
+                place = places_cache.get(city.location.id)
+                task = (
+                    places.replace_one(
+                        places_collection,
+                        place,
+                        count,
+                    )
+                    if place
+                    else places.create(
+                        places_repository,
+                        city,
+                        sem,
+                        count,
+                    )
+                )
+                tg.create_task(task)  # type: ignore[unused-awaitable]
 
 
 async def _serve(app: service.Application[_GrpcSettings]) -> None:
@@ -89,14 +120,14 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
         app.settings.grpc_port,
         [
             PlacesService(
-                PlaceRepository(
+                places.PlaceRepository(
                     geocoding=geocoding_service,
                     collection=mongo.places.places,
                 ),
                 app.settings.default_page_size,
             ),
             LocationsService(
-                LocationRepository(mongo.places.locations),
+                places.LocationRepository(mongo.places.locations),
                 app.settings.default_page_size,
             ),
         ],
