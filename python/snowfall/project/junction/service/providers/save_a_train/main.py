@@ -67,7 +67,7 @@ class _DumpStationsSettings(_SatConfig, service.Settings):
 class _Settings(_SatConfig, service.ProviderSettings):
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
     mongo_dsn: tuple[pydantic.AnyUrl]
-    allowed_window_td: datetime.timedelta = datetime.timedelta(minutes=10)
+    allowed_window_td: datetime.timedelta = datetime.timedelta(minutes=0)
 
 
 class _PriceQuoteSettings(service.PriceQuoteSettings):
@@ -165,6 +165,7 @@ async def _offers_factory(
         search_criteria_generator=sat_adapter.search_criteria_generator,
         offer_group_cache_key_generator=sat_adapter.generate_cache_key,
         offer_group_generator=sat_adapter.gather_search_results,
+        allowed_window_td=app.settings.allowed_window_td,
     )
 
 

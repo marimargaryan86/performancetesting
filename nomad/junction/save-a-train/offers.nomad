@@ -38,6 +38,10 @@ variable "api_search_base_url" {
   type = string
 }
 
+variable "allowed_window_td" {
+  type = string
+}
+
 job "save-a-train-offers" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -142,6 +146,7 @@ EOH
         API_BASE_URL        = "${var.api_base_url}"
         API_EMAIL           = "gb@snowfalltravel.com"
         API_SEARCH_BASE_URL = "${var.api_search_base_url}"
+        ALLOWED_WINDOW_TD   = "${var.allowed_window_td}"
       }
     }
   }
