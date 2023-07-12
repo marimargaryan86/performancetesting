@@ -12,7 +12,7 @@
     }
   },
   "sandbox": {
-    "deploy": false,
+    "deploy": true,
     "variables": {
       "count": 1
     }
