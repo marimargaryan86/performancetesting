@@ -29,7 +29,7 @@
       "plus_api_address": "https://plus.api.sandbox.junction.dev",
       "plus_activated": false,
       "ory_client_token_endpoint": "https://optimistic-tereshkova-36hc6vayw4.projects.oryapis.com/oauth2/token",
-      "ory_client_id":  "d66f28e6-0acf-4ceb-a1c5-d2e8b3b62d6f"
+      "ory_client_id":  "aa1b5ba5-9cba-43f2-afe6-98797ecd0d7e"
     }
   }
 }
