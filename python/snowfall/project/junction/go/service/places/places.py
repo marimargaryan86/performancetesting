@@ -279,4 +279,5 @@ async def replace_one(
         await collection.replace_one(
             filter={"_id": place["_id"]},
             replacement=place,
+            upsert=True,
         )
