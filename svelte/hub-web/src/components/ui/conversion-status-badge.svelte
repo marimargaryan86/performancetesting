@@ -5,9 +5,10 @@
 
   export let value: ConversionStatus;
 
-  const variants: Record<ConversionStatus, StatusBadgeVariant> = {
+  const variants: { unspecified: string; executed: string; failed: string } = {
     executed: "ok",
     unspecified: "warn",
+    failed: "error",
   };
 
   $: variant = variants[value];

@@ -87,10 +87,18 @@
     {#each conversions as conversion (conversion.id)}
       <TRow>
         <TCol maxWidth="96px" copyable>{conversion.transaction?.bookingId ?? ""}</TCol>
-        <TCol>{yymmdd(conversion.createdAt)}</TCol>
-        <TCol>{yymmdd(conversion.settledAt)}</TCol>
-        <TCol class="currency typography bold">{conversion.sellAmount.currency}</TCol>
-        <TCol class="currency typography bold">{conversion.buyAmount.currency}</TCol>
+        <TCol class="currency typography bold"
+          >{conversion.createdAt ? yymmdd(conversion.createdAt) : ""}</TCol
+        >
+        <TCol class="currency typography bold"
+          >{conversion.settledAt ? yymmdd(conversion.settledAt) : ""}</TCol
+        >
+        <TCol class="currency typography bold"
+          >{conversion.sellAmount?.currency ? conversion.sellAmount.currency : ""}</TCol
+        >
+        <TCol class="currency typography bold"
+          >{conversion.buyAmount?.currency ? conversion.buyAmount.currency : ""}</TCol
+        >
         <TCol>{conversion.transaction?.rates.fxQuote ?? ""}</TCol>
         <TCol>{conversion.executedRate}</TCol>
         <TCol>{conversion.fxDelta ?? ""}</TCol>

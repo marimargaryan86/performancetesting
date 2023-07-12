@@ -7,15 +7,15 @@ export interface ConversionIdentifierSchema {
   type: "conversions";
 }
 
-export const conversionStatus = ["unspecified", "executed"] as const;
+export const conversionStatus = ["unspecified", "executed", "failed"] as const;
 
 export type ConversionStatus = (typeof conversionStatus)[number];
 
 export interface ConversionSchema extends ConversionIdentifierSchema {
   attributes: {
-    createdAt: string;
-    settledAt: string;
-    sellAmount: MoneySchema;
+    createdAt: string | null;
+    settledAt: string | null;
+    sellAmount: MoneySchema | null;
     buyAmount: MoneySchema;
     executedRate: number;
     fxDelta: number | null;

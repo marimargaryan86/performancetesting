@@ -14,12 +14,16 @@ export function parseConversionSchema(
   return {
     id: conversion.id,
     buyAmount: conversion.attributes.buyAmount,
-    createdAt: new Date(conversion.attributes.createdAt),
+    createdAt: conversion.attributes.createdAt
+      ? new Date(conversion.attributes.createdAt)
+      : undefined,
     executedRate: conversion.attributes.executedRate,
     fxDelta: conversion.attributes.fxDelta ?? undefined,
     fxStatus: conversion.attributes.fxStatus,
-    sellAmount: conversion.attributes.sellAmount,
-    settledAt: new Date(conversion.attributes.settledAt),
+    sellAmount: conversion.attributes.sellAmount ?? undefined,
+    settledAt: conversion.attributes.settledAt
+      ? new Date(conversion.attributes.settledAt)
+      : undefined,
     transaction: transaction ? parseTransactionSchema(transaction, []) : undefined,
   };
 }
