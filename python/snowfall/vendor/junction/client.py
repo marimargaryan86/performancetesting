@@ -18,17 +18,19 @@ class BaseClient(object):
             client=client,
         )
 
-    async def _make_request(
+    async def _make_request(  # noqa: WPS211
         self,
         method: str,
         url: str,
         query_parameters: Mapping[str, Any] | None = None,
+        headers: Mapping[str, Any] | None = None,
         payload: Mapping[str, Any] | None = None,
     ) -> dict[str, Any]:
         response = await self._client.request(
             method=method,
             url=url,
             params=query_parameters,
+            headers=headers,
             json=payload,
         )
 

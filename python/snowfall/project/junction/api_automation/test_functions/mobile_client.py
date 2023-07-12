@@ -11,12 +11,23 @@ from snowfall.vendor.junction.client import make_pagination_params
 from snowfall.vendor.junction.go import models
 from snowfall.vendor.junction.go.client import Client, LegType
 
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
 _OrderIncludes: TypeAlias = Literal[
     "journey",
     "bookings",
     "bookings.details",
     "bookings.details.cabinClass",
     "bookings.details.legType",
+]
+_OfferSearchIncludes: TypeAlias = Literal[
+    "offers.groups",
+    "offers.groups.details",
+    "offers.groups.details.legType",
+    "offers.groups.options",
+    "offers.groups.options.details",
+    "offers.groups.options.details.cabinClass",
+    "offers.groups.options.details.details",
 ]
 
 _DATA_KEY = "data"
@@ -31,6 +42,8 @@ _METHOD_PATCH = "PATCH"
 _METHOD_DELETE = "DELETE"
 _EMAIL_KEY = "email"
 _CRITERIA_KEY = "criteria"
+
+_TripIncludes: TypeAlias = Literal["segments", "segments.legs", "segments.legs.legType"]
 
 
 class MobileApiClient(Client):  # noqa: WPS214
@@ -632,4 +645,98 @@ class MobileApiClient(Client):  # noqa: WPS214
             query_parameters={
                 "password": password,
             },
+        )
+
+    async def get_places(self, name: str) -> dict[str, Any]:
+        query_parameters = {
+            "query[name]": name,
+        }
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/places",
+            query_parameters=query_parameters,
+        )
+
+    async def create_trip_search(
+        self,
+        origin_id: str,
+        destination_id: str,
+        departure_after: datetime,
+    ) -> dict[str, Any]:
+        body = {
+            "data": {
+                "attributes": {
+                    "departureAfter": departure_after,
+                },
+                "relationships": {
+                    "origin": {"data": {"id": origin_id, "type": "places"}},
+                    "destination": {
+                        "data": {"id": destination_id, "type": "places"},
+                    },
+                },
+                "type": "trip-searches",
+            },
+        }
+        return await self._make_request(
+            method=_METHOD_POST,
+            url="/trips/searches",
+            payload=body,
+        )
+
+    async def get_trips_list(
+        self,
+        trips_search_id: str,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/trips/searches/{0}/trips".format(trips_search_id),
+        )
+
+    async def create_offers_search(
+        self,
+        trip_id: str,
+        passengers_dates_of_birth: Sequence[date],
+        session_token: str | None = None,
+    ) -> dict[str, Any]:
+        attributes: dict[str, Any] = {
+            "passengers": [
+                {"dateOfBirth": dob.isoformat()} for dob in passengers_dates_of_birth
+            ],
+        }
+
+        body = {
+            "data": {
+                "attributes": attributes,
+                "relationships": {
+                    "trips": {
+                        "data": [
+                            {"id": trip_id, "type": "trips"},
+                        ],
+                    },
+                },
+                "type": "trip-offer-searches",
+            },
+        }
+        headers = {
+            "Session-Token": "YMSXrOAhIOdvIbxAmfSt7vJtRBkurNb6",
+        }
+        return await self._make_request(
+            method=_METHOD_POST,
+            url="/offers/searches",
+            headers=headers,
+            payload=body,
+        )
+
+    async def get_offer_search(
+        self,
+        offers_search_id: str,
+        include: Sequence[_OfferSearchIncludes] | None = None,
+    ) -> dict[str, Any]:
+        query_parameters = {}
+        if include:
+            query_parameters["include"] = ",".join(include)
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/offers/searches/{0}".format(offers_search_id),
+            query_parameters=query_parameters,
         )
