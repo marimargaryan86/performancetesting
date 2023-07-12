@@ -16,9 +16,9 @@ resource(
 resource(
     name="nodes",
     source=http_source(
-        url="https://junction-build-artifacts.s3.eu-west-2.amazonaws.com/places_nodes-79d79366c231e8ad9b8e3ce31859a51ec0b4c846844a63f804e10fd5c8509d80.json",
-        len=96083693,
-        sha256="79d79366c231e8ad9b8e3ce31859a51ec0b4c846844a63f804e10fd5c8509d80",
+        url="https://junction-build-artifacts.s3.eu-west-2.amazonaws.com/places_nodes-dcc421f8da7c34e8d00ff1f835c4bf81c5a225ead3c562434981203c5dd06d68.json",
+        len=101574333,
+        sha256="dcc421f8da7c34e8d00ff1f835c4bf81c5a225ead3c562434981203c5dd06d68",
         filename="nodes.json",
     ),
 )
