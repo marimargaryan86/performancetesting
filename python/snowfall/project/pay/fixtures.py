@@ -4,6 +4,9 @@ from snowfall.project.pay.service.companies.v1alpha import (
     models_pb2 as company_model_pb2,
 )
 from snowfall.project.pay.service.payments.v1alpha import models_pb2
+from snowfall.project.pay.service.refunds.v1alpha import (
+    models_pb2 as refunds_models_pb2,
+)
 from snowfall.project.pay.service.transactions.v1alpha import (
     models_pb2 as transactions_models_pb2,
 )
@@ -33,6 +36,11 @@ ACCOUNTLESS_COMPANIES = (
 )
 
 CONTACTS = (
+    "8304c0ff-7ba6-4431-9788-1d486be3a033",
+    "946a7e4b-519a-4f3d-8169-bcb4dbb3af94",
+)
+
+REFUNDS = (
     "8304c0ff-7ba6-4431-9788-1d486be3a033",
     "946a7e4b-519a-4f3d-8169-bcb4dbb3af94",
 )
@@ -85,6 +93,24 @@ def generate_conversion(identifier: str) -> transactions_models_pb2.Conversion:
         buy_amount=usd.protobuf(),
         sell_amount=gbp.protobuf(),
         executed_rate=1,
+    )
+
+
+def generate_refund(identifier: str) -> refunds_models_pb2.Refund:
+    usd = money.Money(100, money.Currency("USD"))
+    gbp = money.Money(100, money.Currency("GBP"))
+
+    return refunds_models_pb2.Refund(
+        id=identifier,
+        transaction_id="f8144974-530f-477f-bbe1-c2eaedddec88",
+        conversion_id="f8144974-530f-477f-bbe1-c2eaedddec88",
+        status=refunds_models_pb2.Refund.Status.STATUS_PENDING,
+        refund_received=True,
+        note="simple note",
+        refunded_us=usd.protobuf(),
+        refunded_us_in_payer_currency=gbp.protobuf(),
+        refunded_reseller=usd.protobuf(),
+        refund_position=gbp.protobuf(),
     )
 
 

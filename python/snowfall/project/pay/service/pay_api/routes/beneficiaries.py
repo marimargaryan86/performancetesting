@@ -41,7 +41,7 @@ class Beneficiary(endpoints.HTTPEndpoint):
             request=request,
         )
 
-    @routes_handlers.beneficiary_grpc_errors_handler
+    @routes_handlers.grpc_errors_handler
     async def patch(
         self,
         request: requests.Request,
@@ -125,7 +125,7 @@ class Beneficiaries(endpoints.HTTPEndpoint):
             request=request,
         )
 
-    @routes_handlers.beneficiary_grpc_errors_handler
+    @routes_handlers.grpc_errors_handler
     async def post(  # noqa: WPS210, WPS211, WPS217
         self,
         request: requests.Request,

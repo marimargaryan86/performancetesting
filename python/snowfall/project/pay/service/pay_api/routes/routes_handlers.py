@@ -24,6 +24,9 @@ async def _handle_invalid_argument(
         "currency": models.ErrorSourcePointer(
             pointer="/data/relationships/currency/data/id",
         ),
+        "transaction": models.ErrorSourcePointer(
+            pointer="/data/relationships/transaction/data/id",
+        ),
     }
     rich_error = list(rich_status.iter_rich_statuses(err))
     if not rich_error:
@@ -50,7 +53,7 @@ async def _handle_invalid_argument(
     )
 
 
-def beneficiary_grpc_errors_handler(
+def grpc_errors_handler(
     func: Callable[_In, Awaitable[_Out]],
 ) -> Callable[_In, Awaitable[_Out | models.JsonApiResponse]]:
     @functools.wraps(func)

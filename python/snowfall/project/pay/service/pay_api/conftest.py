@@ -23,6 +23,7 @@ from snowfall.project.pay.adapter import (
     currencies,
     payments,
     quotations,
+    refunds,
     transactions,
 )
 from snowfall.project.pay.service.pay_api import authenticator, bootstrap
@@ -124,6 +125,7 @@ def _create_admin_app(  # noqa: WPS211
     conversions_client: conversions.Client,
     currencies_client: currencies.Client,
     beneficiaries_client: beneficiaries.Client,
+    refunds_client: refunds.Client,
     openapi_path: pathlib.Path,
     custom_middlewares: Sequence[Middleware] | None = None,
 ) -> applications.Starlette:
@@ -143,6 +145,7 @@ def _create_admin_app(  # noqa: WPS211
                 cc_payment_client=cc_payment_client,
                 currencies_client=currencies_client,
                 payments_client=payment_client,
+                refunds_client=refunds_client,
             ),
         ),
     )
@@ -218,6 +221,13 @@ def conversions_client(
             fixtures.generate_conversion(conversion_id)
             for conversion_id in fixtures.CONVERSIONS
         ],
+    )
+
+
+@pytest.fixture()
+def refunds_client() -> refunds.DictClient:
+    return refunds.DictClient(
+        [fixtures.generate_refund(refund_id) for refund_id in fixtures.REFUNDS],
     )
 
 
@@ -430,6 +440,7 @@ def admin_app(  # noqa: WPS211
     conversions_client: conversions.Client,
     currencies_client: currencies.Client,
     beneficiaries_client: beneficiaries.Client,
+    refunds_client: refunds.Client,
     custom_middlewares: Sequence[Middleware],
 ) -> applications.Starlette:
     return _create_admin_app(
@@ -444,6 +455,7 @@ def admin_app(  # noqa: WPS211
         conversions_client=conversions_client,
         currencies_client=currencies_client,
         beneficiaries_client=beneficiaries_client,
+        refunds_client=refunds_client,
         custom_middlewares=custom_middlewares,
         openapi_path=filesystem.resource_path("junction.pay_admin_api", "openapi.json"),
     )

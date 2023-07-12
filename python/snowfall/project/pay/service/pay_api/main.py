@@ -18,6 +18,7 @@ from snowfall.project.pay.adapter import (
     currencies,
     payments,
     quotations,
+    refunds,
     transactions,
 )
 from snowfall.project.pay.adapter import companies as companies_adapter
@@ -36,6 +37,9 @@ from snowfall.project.pay.service.pay_api.repositories import (
 from snowfall.project.pay.service.pay_api.routes import router
 from snowfall.project.pay.service.payments.v1alpha.payments_pb2_grpc import (
     PaymentsServiceStub,
+)
+from snowfall.project.pay.service.refunds.v1alpha.grpc_pb2_grpc import (
+    RefundsServiceStub,
 )
 from snowfall.project.pay.service.transactions.v1alpha import (
     grpc_pb2_grpc as transactions_pb2_grpc,
@@ -202,6 +206,9 @@ def _admin_factory(
         currencies_channel = create_channel(
             app.settings.currencies_address,
         )
+        refunds_channel = create_channel(
+            app.settings.refunds_address,
+        )
         cc_payment_client = PaymentClient(
             base_url=app.settings.cc_address,
             auth=CurrencyCloudAuth(
@@ -294,6 +301,11 @@ def _admin_factory(
                     payments_client=payments.GrpcClient(
                         PaymentsServiceStub(
                             payments_channel,
+                        ),
+                    ),
+                    refunds_client=refunds.GrpcClient(
+                        RefundsServiceStub(
+                            refunds_channel,
                         ),
                     ),
                 ),

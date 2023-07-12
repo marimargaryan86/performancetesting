@@ -2889,7 +2889,6 @@
         "title": "Money amount",
         "type": "integer",
         "example": 1337,
-        "minimum": 0,
         "description": "A positive integer representing an amount of currency defined in the currency's smallest unit. This means that for currencies that have minor units, like EUR, 1 euro would be represented as 100, indicating 100 cents."
       },
       "Money": {
@@ -3452,7 +3451,6 @@
                   "refundReceived",
                   "note",
                   "refundedUs",
-                  "refundedUsInPayerCurrency",
                   "refundedReseller"
                 ],
                 "properties": {
@@ -3484,9 +3482,13 @@
                   },
                   "refundedUsInPayerCurrency": {
                     "readOnly": true,
-                    "allOf": [
+                    "nullable": true,
+                    "anyOf": [
                       {
                         "$ref": "#/components/schemas/Money"
+                      },
+                      {
+                        "nullable": true
                       }
                     ],
                     "description": "The amount, we receive from provider in reseller currency"
@@ -3501,7 +3503,8 @@
                   },
                   "refundPosition": {
                     "readOnly": true,
-                    "allOf": [
+                    "nullable": true,
+                    "anyOf": [
                       {
                         "$ref": "#/components/schemas/Money"
                       },
@@ -3514,6 +3517,9 @@
                             "description": "false - we lose, true - we profit"
                           }
                         }
+                      },
+                      {
+                        "nullable": true
                       }
                     ],
                     "description": "Profit or loss due to conversion the funds to original currency"
@@ -3523,8 +3529,7 @@
               "relationships": {
                 "type": "object",
                 "required": [
-                  "transaction",
-                  "conversion"
+                  "transaction"
                 ],
                 "properties": {
                   "transaction": {
@@ -3537,6 +3542,7 @@
                   },
                   "conversion": {
                     "type": "object",
+                    "nullable": true,
                     "readOnly": true,
                     "properties": {
                       "data": {

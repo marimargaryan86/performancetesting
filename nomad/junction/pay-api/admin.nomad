@@ -119,6 +119,10 @@ job "pay-api-admin" {
               local_bind_port  = 8060
               destination_name = "transactions-${var.environment}"
             }
+            upstreams {
+              local_bind_port  = 8070
+              destination_name = "refunds-${var.environment}"
+            }
           }
         }
       }
@@ -163,6 +167,7 @@ AUTHENTICATION_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_authentication-$
 COMPANIES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_companies-${var.environment}"))}}
 PAYMENTS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_pay-payments-${var.environment}"))}}
 TRANSACTIONS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_transactions-${var.environment}"))}}
+REFUNDS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_refunds-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/currencycloud" }}
 CC_LOGIN={{ .Data.data.cc_login }}
 CC_API_KEY={{ .Data.data.cc_api_key }}

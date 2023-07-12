@@ -14,6 +14,7 @@ from snowfall.project.pay.adapter import (  # noqa: WPS235
     currencies,
     payments,
     quotations,
+    refunds,
     transactions,
 )
 from snowfall.project.pay.service.pay_api import includes
@@ -41,6 +42,7 @@ class Settings(application.Settings):
 
 class AdminSettings(Settings):
     payments_address: str
+    refunds_address: str
 
 
 def create_admin_dependencies(  # noqa: WPS211
@@ -55,6 +57,7 @@ def create_admin_dependencies(  # noqa: WPS211
     conversions_client: conversions.Client,
     currencies_client: currencies.Client,
     payments_client: payments.GrpcClient,
+    refunds_client: refunds.Client,
 ) -> lagom.Container:
     container = lagom.Container()
     container[client.PaymentClient] = cc_payment_client
@@ -68,6 +71,7 @@ def create_admin_dependencies(  # noqa: WPS211
     container[conversions.Client] = conversions_client  # type: ignore[type-abstract]
     container[payments.GrpcClient] = payments_client
     container[currencies.Client] = currencies_client  # type: ignore[type-abstract]
+    container[refunds.Client] = refunds_client  # type: ignore[type-abstract]
 
     includes.register_resolvers(transactions_client)
 

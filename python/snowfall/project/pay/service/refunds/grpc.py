@@ -54,8 +54,8 @@ class RefundsService(  # noqa: WPS214
             await rich_status.abort_with_rich_status(
                 context=context,
                 status=rich_status.build_bad_request(
-                    field_name="transaction_id",
-                    field_description="Transactions ID is not found",
+                    field_name="transaction",
+                    field_description="Transaction ID is not found",
                 ),
             )
 
@@ -110,8 +110,8 @@ class RefundsService(  # noqa: WPS214
             await rich_status.abort_with_rich_status(
                 context=context,
                 status=rich_status.build_bad_request(
-                    field_name="transaction_id",
-                    field_description="Transactions ID is not found",
+                    field_name="transaction",
+                    field_description="Transaction ID is not found",
                 ),
             )
 
