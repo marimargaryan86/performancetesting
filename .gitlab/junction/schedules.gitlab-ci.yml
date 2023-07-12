@@ -113,7 +113,9 @@ directferries:
   - export GEODATA_ADDR="$(dig +short grpc.geodata-development.service.consul @172.16.110.215 -p 8600):$(dig +short SRV grpc.geodata-development.service.consul @172.16.110.215 -p 8600 | awk '{print $3}')"
   - docker login git.snowfall.se:4567 -u "${REGISTRY_USERNAME}" -p "${REGISTRY_PASSWORD}"
   - if [ "$DOCKERPULL" ]; then docker pull git.snowfall.se:4567/junction/junction/service/places:latest; fi
-  - docker run -u "${UID}" --network=host --rm -v "$(pwd)/:/data" git.snowfall.se:4567/junction/junction/service/places:latest generate-cities --geodata-address="${GEODATA_ADDR}" --mongo-dsn='mongodb://mongo:27017'
+  # We reuse the DEV DB as our places cache for all envs.
+  - mongodump --db=places --collection=places --out="-" "$DEV_MONGODSN_IMPORT" > places-cache.bson
+  - docker run -u "${UID}" --network=host --rm -v "$(pwd)/:/data" git.snowfall.se:4567/junction/junction/service/places:latest generate-cities --geodata-address="${GEODATA_ADDR}" --mongo-dsn='mongodb://mongo:27017' --places-dump='/data/places-cache.bson'
   - mongodump --db=places --collection=places --out="-" 'mongodb://mongo:27017' > data-import/places.bson
   - |
     mongosh "${MONGODSN}/places" --eval '
@@ -152,8 +154,8 @@ directferries:
   - docker login git.snowfall.se:4567 -u "${REGISTRY_USERNAME}" -p "${REGISTRY_PASSWORD}"
   - if [ "$DOCKERPULL" ]; then docker pull git.snowfall.se:4567/junction/junction/service/mobile_api:latest; fi
   - mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,X-mount.mkdir ${EFS_IP}:/ /planner-efs
-  - mkdir "/planner-efs/$PREFIX-$CI_COMMIT_TIMESTAMP"
-  - cp /planner-efs/$PREFIX/*.bin "/planner-efs/$PREFIX-$CI_COMMIT_TIMESTAMP/"
+  - mkdir "/planner-efs/$PREFIX-$CI_PIPELINE_ID"
+  - cp /planner-efs/$PREFIX/*.bin "/planner-efs/$PREFIX-$CI_PIPELINE_ID/"
   - cp data-export/*.bin "/planner-efs/$PREFIX/"
   # Get existing allocs
   - mapfile -t allocation_ids < <(nomad job status planner-grpc | awk '/Allocations/{flag=1; next} flag && $6=="running" && !/^ID/{print $1}')
