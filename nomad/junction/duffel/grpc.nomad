@@ -114,7 +114,6 @@ job "duffel-grpc" {
 
     task "grpc" {
       driver = "docker"
-
       vault {
         policies = ["duffel-${var.environment}"]
       }

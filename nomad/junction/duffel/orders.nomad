@@ -98,6 +98,7 @@ job "duffel-orders" {
 
     task "orders" {
       driver = "docker"
+
       vault {
         policies = ["duffel-${var.environment}"]
       }
