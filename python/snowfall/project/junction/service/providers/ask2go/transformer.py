@@ -7,7 +7,7 @@ from dateutil import relativedelta
 
 from snowfall.project.junction.go.service.offers.v1 import models_pb2 as offers_pb2
 from snowfall.project.junction.go.v1 import models_pb2
-from snowfall.project.junction.provider import airports, cabin_classes
+from snowfall.project.junction.provider import airports, cabin_classes, parsers
 from snowfall.project.junction.service.providers.ask2go import cache, models
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
@@ -52,6 +52,8 @@ class OfferTransformer(object):  # noqa: WPS214
             price_result.itinerary.trips[0],
         )
 
+        pricing_information = price_result.itinerary.pricing_information.base
+
         return offers_pb2.PriceQuote(
             id=await self._price_cache.store(
                 cache.PriceQuote(
@@ -68,8 +70,10 @@ class OfferTransformer(object):  # noqa: WPS214
                     price_result.itinerary.pricing_information.base.currency,
                 ),
             ).protobuf(),
-            price_breakdown=self._get_price_breakdown(
-                price_result.itinerary.pricing_information.base,
+            price_breakdown=parsers.parse_price_breakdown(
+                pricing_information.base_fare,
+                pricing_information.total_tax,
+                pricing_information.currency,
             ),
             required_documents=(
                 self._get_offer_price_requirements(price_result.docs)
@@ -242,6 +246,11 @@ class OfferTransformer(object):  # noqa: WPS214
                         else []
                     ),
                     price=amount.protobuf(),
+                    price_breakdown=parsers.parse_price_breakdown(
+                        brand.base_fare,
+                        brand.total_tax,
+                        brand.currency,
+                    ),
                     brand_name=str(brand.brand_name),
                 ),
             )
@@ -443,24 +452,3 @@ class OfferTransformer(object):  # noqa: WPS214
                 ),
             ),
         }
-
-    def _get_price_breakdown(
-        self,
-        pricing_information: offers.PricingInformationBase,
-    ) -> list[offers_pb2.PriceBreakdown]:
-        return [
-            offers_pb2.PriceBreakdown(
-                price=money.from_string(
-                    pricing_information.base_fare,
-                    money.Currency(pricing_information.currency),
-                ).protobuf(),
-                breakdown_type=offers_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_BASE_FARE,
-            ),
-            offers_pb2.PriceBreakdown(
-                price=money.from_string(
-                    pricing_information.total_tax,
-                    money.Currency(pricing_information.currency),
-                ).protobuf(),
-                breakdown_type=offers_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_TAX,
-            ),
-        ]

@@ -141,6 +141,24 @@ def _assert_offer(  # noqa: WPS218
     assert price.currency.code == "EUR"
     assert offer.brand_name == "LOWEST FARE AVAILABLE"
 
+    _assert_price_breakdown(offer)
+
+
+def _assert_price_breakdown(offer: offers_pb2.Offer) -> None:  # noqa: WPS218
+    base_fare = offer.price_breakdown[0]
+    base_fare_price = money.from_protobuf(base_fare.price)
+    assert str(base_fare_price) == "13.00"
+    assert base_fare_price.currency.code == "EUR"
+    assert (
+        base_fare.breakdown_type == offers_pb2.PriceBreakdown.BREAKDOWN_TYPE_BASE_FARE
+    )
+
+    tax = offer.price_breakdown[1]
+    tax_price = money.from_protobuf(tax.price)
+    assert str(tax_price) == "42.54"
+    assert tax_price.currency.code == "EUR"
+    assert tax.breakdown_type == offers_pb2.PriceBreakdown.BREAKDOWN_TYPE_TAX
+
 
 @pytest.mark.parametrize(
     ("departure_time", "expected"),
