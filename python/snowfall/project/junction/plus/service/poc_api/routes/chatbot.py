@@ -192,12 +192,10 @@ class Whatsapp(endpoints.HTTPEndpoint):
             )
             twiml_response.message("Goodbye")
         else:
-            response_message = (
-                await ai_bot.handle_prompt(
-                    message_body,
-                    message_from_mobile,
-                    redis_client,
-                ),
+            response_message = await ai_bot.handle_prompt(
+                message_body,
+                message_from_mobile,
+                redis_client,
             )
             twiml_response.message(response_message)
         return responses.Response(
