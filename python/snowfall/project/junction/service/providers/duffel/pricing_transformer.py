@@ -1,4 +1,5 @@
 from snowfall.project.junction.go.service.offers.v1 import models_pb2 as offers_pb2
+from snowfall.project.junction.provider import parsers
 from snowfall.project.junction.service.providers.duffel import cache
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
@@ -24,7 +25,11 @@ class PriceQuoteTransformer(object):
             option_id=option_id,
             expires_at=protobuf.datetime_to_protobuf(offer.expires_at),
             price=self._to_money(offer.total_amount, offer.total_currency),
-            price_breakdown=self._to_price_breakdown(offer),
+            price_breakdown=parsers.parse_price_breakdown(
+                offer.base_amount,
+                offer.tax_amount,
+                offer.base_currency,
+            ),
             required_documents=self._to_document_requirement(duffel_offer=offer),
             penalties=self._to_penalties(duffel_offer=offer),
         )
@@ -86,26 +91,3 @@ class PriceQuoteTransformer(object):
         )
 
         return penalties
-
-    def _to_price_breakdown(
-        self,
-        offer: Offer,
-    ) -> list[offers_pb2.PriceBreakdown]:
-        price_breakdown = list[offers_pb2.PriceBreakdown]()
-
-        price_breakdown.append(
-            offers_pb2.PriceBreakdown(
-                price=self._to_money(offer.base_amount, offer.base_currency),
-                breakdown_type=offers_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_BASE_FARE,
-            ),
-        )
-
-        if offer.tax_amount is not None and offer.tax_currency is not None:
-            price_breakdown.append(
-                offers_pb2.PriceBreakdown(
-                    price=self._to_money(offer.tax_amount, offer.tax_currency),
-                    breakdown_type=offers_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_TAX,
-                ),
-            )
-
-        return price_breakdown

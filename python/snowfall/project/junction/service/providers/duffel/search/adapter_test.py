@@ -3,6 +3,7 @@ from collections.abc import Mapping, Sequence
 import pytest
 import pytest_httpx
 
+from snowfall.project.junction.go.service.offers.v1 import models_pb2 as offers_pb2
 from snowfall.project.junction.service.providers.duffel.conftest import (
     API_BASE_URL,
     load_file_fixture,
@@ -12,6 +13,7 @@ from snowfall.project.junction.service.providers.duffel.search import adapter
 from snowfall.project.junction.service.providers.duffel.v1.amqp_pb2 import (
     SearchCriteriaTask,
 )
+from snowfall.stdlib import money
 from snowfall.vendor.duffel.models.offer import PrivateFare
 from snowfall.vendor.duffel.models.offer_request import OfferRequestResponse
 
@@ -229,3 +231,33 @@ async def test_private_fares_and_specific_token(
 
     assert offer_groups
     assert httpx_mock.get_requests()[0].headers["authorization"] == "Bearer token1"
+
+
+async def test_offer_price_breakdown(  # noqa: WPS210, WPS218
+    httpx_mock: pytest_httpx.HTTPXMock,
+    search_adapter: adapter.DuffelSearchAdapter,
+) -> None:
+    search_task = get_search_task_for_fixture(httpx_mock, "offer_request_response.json")
+
+    offer_groups = [
+        offer_group
+        async for offer_group in search_adapter.gather_search_results(
+            search_adapter.search_criteria_generator(search_task),
+        )
+    ]
+
+    offer = offer_groups[0].offers[0]
+
+    base_fare = offer.price_breakdown[0]
+    base_fare_price = money.from_protobuf(base_fare.price)
+    assert str(base_fare_price) == "195.57"
+    assert base_fare_price.currency.code == "GBP"
+    assert (
+        base_fare.breakdown_type == offers_pb2.PriceBreakdown.BREAKDOWN_TYPE_BASE_FARE
+    )
+
+    tax = offer.price_breakdown[1]
+    tax_price = money.from_protobuf(tax.price)
+    assert str(tax_price) == "306.86"
+    assert tax_price.currency.code == "GBP"
+    assert tax.breakdown_type == offers_pb2.PriceBreakdown.BREAKDOWN_TYPE_TAX
