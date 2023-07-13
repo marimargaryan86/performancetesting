@@ -63,8 +63,15 @@ message AirBooking {
   google.protobuf.Timestamp arrival_at = 3;
   string origin = 4;
   string destination = 5;
-  string route_identifier = 6;
-  string cabin_class = 7;
+  string origin_iata = 6;
+  string destination_iata = 7;
+  RouteIdentifier route_identifier = 8;
+  string cabin_class = 9;
+}
+
+message RouteIdentifier {
+  string carrier = 1;
+  int32 flight_number = 2;
 }
 
 message Subscriber {

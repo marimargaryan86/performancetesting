@@ -84,6 +84,7 @@ async def invalid_message() -> (
 async def valid_message() -> (
     AsyncGenerator[types.Message[amqp_pb2.NotificationEvent], None]
 ):
+    flight_number = 2512
     with mock.patch("snowfall.stdlib.transport.amqp.types.Message") as mock_message:
         message = mock_message.return_value
         message.body = amqp_pb2.NotificationEvent(
@@ -109,7 +110,12 @@ async def valid_message() -> (
                             id="id",
                             origin="London",
                             destination="Amsterdam",
-                            route_identifier="U22512",
+                            origin_iata="LND",
+                            destination_iata="AMS",
+                            route_identifier=notifications_models_pb2.RouteIdentifier(
+                                carrier="U2",
+                                flight_number=flight_number,
+                            ),
                             cabin_class="Economy",
                         ),
                     ),

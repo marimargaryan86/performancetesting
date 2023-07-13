@@ -5,7 +5,10 @@ from snowfall.project.junction.plus.adapter import orders
 from snowfall.project.junction.plus.service.notifications.v1alpha import (
     grpc_pb2_grpc as notifications_pb2_grpc,
 )
-from snowfall.project.junction.plus.service.orders_registration import importer
+from snowfall.project.junction.plus.service.orders_registration import (
+    flight_stats,
+    importer,
+)
 from snowfall.stdlib import service
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.transport.amqp import consumer, producer, types
@@ -15,6 +18,10 @@ from snowfall.stdlib.transport.grpc.client import create_channel
 class _ImportSettings(service.Settings):
     amqp_dsn: pydantic.AnyUrl
     notifications_address: str
+    flight_stats_api_url: str
+    flight_stats_app_id: str
+    flight_stats_app_key: str
+    flight_stats_webhook_url: str
 
 
 async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
@@ -42,6 +49,12 @@ async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
             orders=notifications_pb2_grpc.OrderServiceStub(
                 create_channel(app.settings.notifications_address),
             ),
+        ),
+        flight_stats_client=flight_stats.FlightStatsClient(
+            app.settings.flight_stats_api_url,
+            app.settings.flight_stats_app_id,
+            app.settings.flight_stats_app_key,
+            app.settings.flight_stats_webhook_url,
         ),
     )
     await order_importer.consume()

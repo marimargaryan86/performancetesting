@@ -9,7 +9,10 @@ from snowfall.project.junction.plus.service.notifications.v1alpha import models_
 from snowfall.project.junction.plus.service.notifications.v1alpha import (
     models_pb2 as notifications_models_pb2,
 )
-from snowfall.project.junction.plus.service.orders_registration import validators
+from snowfall.project.junction.plus.service.orders_registration import (
+    flight_stats,
+    validators,
+)
 from snowfall.project.junction.plus.service.orders_registration.v1alpha import amqp_pb2
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.transport.amqp import consumer, producer, types
@@ -21,11 +24,13 @@ class OrderImporter(object):
         consumer_obj: consumer.Consumer[amqp_pb2.IncomingOrder],
         producer_obj: producer.Producer,
         orders: orders_adapter.Client,
+        flight_stats_client: flight_stats.Client,
         timeout: int = 10,
     ):
         self._consumer = consumer_obj
         self._producer = producer_obj
         self._orders = orders
+        self._flight_stats_client = flight_stats_client
         self._timeout = timeout
         self._logger = stdout.get_logger()
 
@@ -61,5 +66,6 @@ class OrderImporter(object):
             ),
         )
         await self.publish_event(persisted_order)
-
+        for booking in persisted_order.bookings:
+            await self._flight_stats_client.create_monitoring_rule(booking)
         self._logger.warning(str(persisted_order))

@@ -26,6 +26,10 @@ variable "count" {
   type = number
 }
 
+variable "flight_stats_webhook_url" {
+  type = string
+}
+
 job "orders-registration-import" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -87,10 +91,18 @@ job "orders-registration-import" {
     task "import" {
       driver = "docker"
 
+      vault {
+        policies = ["plus-flight-stats-${var.environment}"]
+      }
+
       template {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 NOTIFICATIONS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_notifications-${var.environment}"))}}
+{{ with secret "kv/data/${var.environment}/plus-flight-stats" }}
+FLIGHT_STATS_APP_ID={{ .Data.data.app_id }}
+FLIGHT_STATS_APP_KEY={{ .Data.data.app_key }}
+{{ end }}
 EOH
         destination = "services.env"
         env         = true
@@ -112,9 +124,11 @@ EOH
       }
 
       env {
-        ENV_NAME        = "${var.environment}"
-        SENTRY_DSN      = "https://0bd9d1f79de14b349046c6abbb0b7d25@sentry.snowfall.se/160"
-        PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
+        ENV_NAME                 = "${var.environment}"
+        SENTRY_DSN               = "https://0bd9d1f79de14b349046c6abbb0b7d25@sentry.snowfall.se/160"
+        PROMETHEUS_PORT          = "${NOMAD_PORT_prometheus}"
+        FLIGHT_STATS_API_URL     = "https://api.flightstats.com"
+        FLIGHT_STATS_WEBHOOK_URL = "{var.flight_stats_webhook_url}"
       }
     }
   }

@@ -1,7 +1,8 @@
 {
   "development": {
     "variables": {
-      "count": 1
+      "count": 1,
+      "flight_stats_webhook_url": "https://webhooks.plus.junction.dev/webhooks/alerts"
     }
   },
   "production": {

@@ -5,6 +5,7 @@ import pytest
 
 from snowfall.project.junction.plus.adapter import orders as orders_adapter
 from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
+from snowfall.project.junction.plus.service.orders_registration import flight_stats
 from snowfall.project.junction.plus.service.orders_registration.importer import (
     OrderImporter,
 )
@@ -34,6 +35,11 @@ def orders_client() -> orders_adapter.Client:
 
 
 @pytest.fixture()
+def flight_stats_client() -> flight_stats.Client:
+    return flight_stats.DictClient()
+
+
+@pytest.fixture()
 async def invalid_message() -> (
     AsyncGenerator[types.Message[amqp_pb2.IncomingOrder], None]
 ):
@@ -53,6 +59,7 @@ async def invalid_message() -> (
 async def valid_message() -> (
     AsyncGenerator[types.Message[amqp_pb2.IncomingOrder], None]
 ):
+    flight_number = 2512
     with mock.patch("snowfall.stdlib.transport.amqp.types.Message") as mock_message:
         message = mock_message.return_value
         message.body = amqp_pb2.IncomingOrder(
@@ -85,7 +92,10 @@ async def valid_message() -> (
                         id=string.uuid(),
                         origin="London",
                         destination="Amsterdam",
-                        route_identifier="U22512",
+                        route_identifier=models_pb2.RouteIdentifier(
+                            carrier="U2",
+                            flight_number=flight_number,
+                        ),
                         cabin_class="Economy",
                     ),
                 ),
@@ -103,9 +113,11 @@ def order_importer(
     consumer: mock.AsyncMock,
     producer: mock.AsyncMock,
     orders_client: orders_adapter.Client,
+    flight_stats_client: flight_stats.Client,
 ) -> OrderImporter:
     return OrderImporter(
         consumer,
         producer,
         orders_client,
+        flight_stats_client,
     )
