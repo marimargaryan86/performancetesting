@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+import base64
 import datetime
+import json
+import pathlib
+import uuid
 from collections.abc import AsyncIterator, Sequence
 
 import httpx
+import orjson
 import phonenumbers
 import pycountry
 
@@ -17,6 +22,7 @@ from snowfall.project.junction.go.service.orders.v1 import (
 from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.project.junction.provider import cabin_classes
 from snowfall.project.junction.provider import notifications as base_notifications
+from snowfall.project.junction.provider.v1alpha import bookings_pb2
 from snowfall.project.junction.service.providers.save_a_train import (
     cache,
     models,
@@ -26,6 +32,7 @@ from snowfall.project.junction.service.providers.save_a_train.v1 import amqp_pb2
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
+from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.transport.amqp import producer
 from snowfall.stdlib.v1 import latlng_pb2
 from snowfall.vendor.save_a_train import client, enums, exceptions
@@ -67,6 +74,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         notifier: base_notifications.Notifier,
         provider_cabin_class_mapping: cabin_classes.CabinMappingRepository,
         notifications_producer: producer.Producer,
+        booking_storage: filesystem.Storage,
     ) -> None:
         self._train_stations = train_station_repository
         self._cabin_mapping = provider_cabin_class_mapping
@@ -76,6 +84,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         self._notifier = notifier
         self._notifications_producer = notifications_producer
         self._logger = stdout.get_logger()
+        self._storage = booking_storage
 
     def search_criteria_generator(
         self,
@@ -345,7 +354,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
     async def get_ticket(
         self,
         search_id: str,
-    ) -> booking.TicketInfo:
+    ) -> tuple[booking.TicketInfo, bytes]:
         try:
             return await self._client.get_ticket(search_id)
         except exceptions.SATValidationError as booking_error:
@@ -355,7 +364,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                 raise_http_error_with_text(http_error)
             raise
 
-    async def _create_booking(
+    async def _create_booking(  # noqa: WPS217, WPS210
         self,
         task: order_amqp_pb2.PlaceOrderTask,
         offer_details: cache.OfferDetails,
@@ -363,14 +372,22 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         search_id, seat_code = self._extract_search_id_and_seat_preference_code(
             await self._select_search_result(offer_details),
         )
-        booking_result = await self._make_booking(
+        booking_result, raw_information = await self._make_booking(
             contact_details=task.contact_details,
             passengers=task.passengers,
             search_id=search_id,
             seat_code=seat_code,
         )
+        get_ticket_result, raw_ticket = await self.get_ticket(search_id=search_id)
+        combined_data = {
+            "booking_information": base64.b64encode(raw_information).decode(),
+            "ticket_information": base64.b64encode(raw_ticket).decode(),
+        }
+        await self._storage.put(
+            pathlib.Path(str(booking_result.search_identifier)),
+            json.dumps(combined_data).encode(),
+        )
         confirm_booking_result = await self._confirm_booking(search_id=search_id)
-        get_ticket_result = await self.get_ticket(search_id=search_id)
         return models.CombinedBookingResults(
             make_booking=booking_result,
             confirm_booking=confirm_booking_result,
@@ -426,7 +443,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         passengers: Sequence[order_models_pb2.Passenger],
         search_id: str,
         seat_code: str | None,
-    ) -> booking.BookingResult:
+    ) -> tuple[booking.BookingResult, bytes]:
         title_map = {  # TODO: map unspecified to something else?
             order_models_pb2.Passenger.Title.TITLE_UNSPECIFIED: enums.PassengerTitle.mr,
             order_models_pb2.Passenger.Title.TITLE_MR: enums.PassengerTitle.mr,
@@ -504,3 +521,35 @@ def _resolve_train_operator(
     train_number: str | None,
 ) -> str | None:
     return train_category + train_number if train_category and train_number else None
+
+
+class Transformer(object):
+    def __init__(self, provider_identifier: uuid.UUID, provider_name: str):
+        self._provider_id = str(provider_identifier)
+        self._provider_name = provider_name
+
+    async def raw_to_booking(self, raw: bytes) -> bookings_pb2.Booking:
+        combined = json.loads(raw.decode())
+        booking_info = booking.BookingResult(
+            **orjson.loads(base64.b64decode(combined["booking_information"])),
+        )
+        ticket_info = booking.TicketInfo(
+            **orjson.loads(base64.b64decode(combined["ticket_information"])),
+        )
+
+        # TODO: How to figure out real status?
+        booking_status = bookings_pb2.Booking.STATUS_CONFIRMED
+
+        return bookings_pb2.Booking(
+            id=str(booking_info.search_identifier),
+            status=booking_status,
+            provider=bookings_pb2.Booking.Provider(
+                id=self._provider_id,
+                name=self._provider_name,
+            ),
+            trip=bookings_pb2.Booking.Trip(
+                record_locator=ticket_info.confirmation_code,
+                operator_booking_references=[booking_info.search_identifier],
+            ),
+            # TODO: No idea how to get created_at or updated_at from the booking model.
+        )

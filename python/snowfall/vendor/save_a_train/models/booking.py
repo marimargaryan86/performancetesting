@@ -51,3 +51,16 @@ class TicketInfo(BaseModel):
     url: str
     confirmation_code: str
     status: str
+
+
+class BookingInformation(BaseModel):
+    identifier: str
+    outbound_trip_info: TripInfo
+    inbound_trip_info: TripInfo | None
+    placed_on: str
+    outbound_seat_reservation_fee: str
+    inbound_seat_reservation_fee: str | None
+    total_price: str
+    order_status: str
+    order_email: str
+    order_phone: str

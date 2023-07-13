@@ -37,6 +37,12 @@ def load_json_fixture(
 
 
 @pytest.fixture()
+async def storage() -> AsyncIterator[filesystem.Storage]:
+    async with filesystem.Storage.from_dsn("memory://") as storage_obj:
+        yield storage_obj
+
+
+@pytest.fixture()
 async def http_client() -> AsyncIterator[httpx.AsyncClient]:
     async with httpx.AsyncClient() as http_client:
         yield http_client
@@ -77,6 +83,7 @@ def save_a_train_adapter(
     train_station_repository: train_stations.TrainStationRepository,
     provider_cabin_class_mapping: cabin_classes.CabinMappingRepository,
     redis_client: aioredis.Redis[bytes],
+    storage: filesystem.Storage,
 ) -> adapter.SaveATrainAdapter:
     return adapter.SaveATrainAdapter(
         save_a_train_client=save_a_train_client,
@@ -91,4 +98,5 @@ def save_a_train_adapter(
             types.Connection(""),
             types.Exchange("notifications"),
         ),
+        booking_storage=storage,
     )

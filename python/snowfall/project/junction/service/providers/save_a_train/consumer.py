@@ -46,7 +46,7 @@ class NotificationsConsumer(object):
             )
             return
 
-        get_ticket_result = await self._adapter.get_ticket(
+        get_ticket_result, raw_ticket = await self._adapter.get_ticket(
             search_id=message.body.search_identifier,
         )
         if get_ticket_result.url:

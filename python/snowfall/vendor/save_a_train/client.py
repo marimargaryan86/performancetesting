@@ -11,6 +11,7 @@ from snowfall.vendor.save_a_train.enums import PassengerType
 from snowfall.vendor.save_a_train.exceptions import SATValidationError, SATValueError
 from snowfall.vendor.save_a_train.models.booking import (
     BookingConfirmationResult,
+    BookingInformation,
     BookingResult,
     TicketInfo,
 )
@@ -576,7 +577,10 @@ class SATClient(object):  # noqa: WPS214
 
         return TariffConditionsResponse(**response_data)
 
-    async def create_booking(self, request: CreateBookingRequest) -> BookingResult:
+    async def create_booking(
+        self,
+        request: CreateBookingRequest,
+    ) -> tuple[BookingResult, bytes]:
         """Create a booking for search identified by ``search_id``."""
         order_passenger = request.passengers[0]
         body = {
@@ -625,7 +629,7 @@ class SATClient(object):  # noqa: WPS214
 
         response.raise_for_status()
 
-        return BookingResult(**response.json())
+        return BookingResult(**response.json()), response.content
 
     async def confirm_booking(self, search_id: str) -> BookingConfirmationResult:
         """Confirm booking.
@@ -655,7 +659,7 @@ class SATClient(object):  # noqa: WPS214
 
         return BookingConfirmationResult(**response_data)
 
-    async def get_ticket(self, search_id: str) -> TicketInfo:
+    async def get_ticket(self, search_id: str) -> tuple[TicketInfo, bytes]:
         """Get ticket information.
 
         :param search_id: Search identifier
@@ -674,7 +678,40 @@ class SATClient(object):  # noqa: WPS214
 
         response_data = response.json()
 
-        return TicketInfo(**response_data)
+        return TicketInfo(**response_data), response.content
+
+    async def manage_bookings(
+        self,
+        search_id: str,
+        email: str,
+    ) -> BookingInformation:
+        """Retrieve booking information for a confirmed booking.
+
+        :param search_id: Search identifier
+        :type search_id: str
+        :param email: Customer email address
+        :type email: str
+        :raises httpx.TimeoutException: If request times out
+        :raises httpx.HTTPStatusError: If request fails
+        """
+        body = {
+            "id": search_id,
+            "email": email,
+        }
+        response = await self._session.post(
+            "{0}/manage_bookings".format(self._api_url),
+            headers=self._auth_headers,
+            json=body,
+        )
+
+        if response.status_code == httpx.codes.NOT_FOUND:
+            raise SATValueError()
+
+        response.raise_for_status()
+
+        response_data = response.json()
+
+        return BookingInformation(**response_data)
 
     @property
     def _auth_headers(self) -> dict[str, str]:

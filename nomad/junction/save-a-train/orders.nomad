@@ -34,6 +34,10 @@ variable "api_search_base_url" {
   type = string
 }
 
+variable "bucket" {
+  type = string
+}
+
 job "save-a-train-orders" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -108,6 +112,7 @@ SMTP_DSN={{range $index, $service := service "smtp"}}smtp://{{.ServiceMeta.usern
 API_PASSWORD={{ .Data.data.api_password }}
 API_SEARCH_PASSWORD={{ .Data.data.api_search_password }}
 API_BOOKING_TOKEN={{ .Data.data.api_booking_token }}
+STORAGE_DSN=s3://{{ .Data.data.aws_access_key_id }}:{{ .Data.data.aws_secret_access_key | urlquery }}@/${var.bucket}/save-a-train
 {{ end }}
 EOH
         destination = "services.env"

@@ -19,6 +19,7 @@ from motor import motor_asyncio
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.provider import (
+    bookings,
     cabin_classes,
     meta,
     notifications,
@@ -36,6 +37,7 @@ from snowfall.project.junction.service.providers.save_a_train.v1 import amqp_pb2
 from snowfall.service.geodata.v1 import geocoding_pb2_grpc
 from snowfall.stdlib import h3
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
+from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer, types
@@ -68,6 +70,7 @@ class _Settings(_SatConfig, service.ProviderSettings):
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
     mongo_dsn: tuple[pydantic.AnyUrl]
     allowed_window_td: datetime.timedelta = datetime.timedelta(minutes=0)
+    storage_dsn: service.AnyDsn
 
 
 class _PriceQuoteSettings(service.PriceQuoteSettings):
@@ -84,6 +87,7 @@ class _OrdersSettings(_SatConfig, service.Settings):
     smtp_sender: pydantic.EmailStr
     smtp_recipient: pydantic.EmailStr
     mongo_dsn: tuple[pydantic.AnyUrl]
+    storage_dsn: service.AnyDsn
 
 
 class _NotificationsSettings(_SatConfig, service.Settings):
@@ -94,6 +98,7 @@ class _NotificationsSettings(_SatConfig, service.Settings):
     smtp_sender: pydantic.EmailStr
     smtp_recipient: pydantic.EmailStr
     mongo_dsn: tuple[pydantic.AnyUrl]
+    storage_dsn: service.AnyDsn
 
 
 _Impl = offers.OfferSearchImplementation[
@@ -134,7 +139,9 @@ async def _offers_factory(
         api_search_requests_limit=app.settings.api_search_requests_limit,
         client=http_client,
     )
-
+    booking_storage = await stack.enter_async_context(
+        filesystem.Storage.from_dsn(app.settings.storage_dsn),
+    )
     # TODO: do we need to call get_token on the save_a_train_client?
     sat_adapter = adapter.SaveATrainAdapter(
         save_a_train_client=save_a_train_client,
@@ -153,6 +160,7 @@ async def _offers_factory(
             amqp_conn,
             types.Exchange("notifications"),
         ),
+        booking_storage=booking_storage,
     )
 
     return offers.OfferSearchImplementation(
@@ -169,7 +177,25 @@ async def _offers_factory(
     )
 
 
-async def _orders(app: service.AsyncApplication[_OrdersSettings]) -> None:
+async def _bookings_factory(
+    app: service.AsyncApplication[_Settings],
+) -> bookings.Implementation:
+    storage = await app.stack.enter_async_context(
+        filesystem.Storage.from_dsn(app.settings.storage_dsn),
+    )
+
+    return bookings.Implementation(
+        storage=storage,
+        transformer=adapter.Transformer(
+            provider_identifier=_PROVIDER_ID,
+            provider_name=_PROVIDER_NAME,
+        ).raw_to_booking,
+    )
+
+
+async def _orders(  # noqa: WPS217
+    app: service.AsyncApplication[_OrdersSettings],
+) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         random.choice(app.settings.mongo_dsn),  # noqa: S311
     )
@@ -204,6 +230,9 @@ async def _orders(app: service.AsyncApplication[_OrdersSettings]) -> None:
     # TODO: do we need to call get_token on the save_a_train_client?
     offer_cache = cache.OffersCache(
         client=redis.Client(redis_connection, prefix=app.name),
+    )
+    booking_storage = await app.stack.enter_async_context(
+        filesystem.Storage.from_dsn(app.settings.storage_dsn),
     )
     orders_consumer = consumer.OrdersConsumer(
         consumer_obj=amqp_consumer.Consumer(
@@ -240,6 +269,7 @@ async def _orders(app: service.AsyncApplication[_OrdersSettings]) -> None:
                 amqp_connection,
                 types.Exchange("notifications"),
             ),
+            booking_storage=booking_storage,
         ),
         offers_cache=offer_cache,
     )
@@ -279,7 +309,9 @@ async def _price_quotes(app: service.AsyncApplication[_PriceQuoteSettings]) -> N
     ).consume()
 
 
-async def _notifications(app: service.AsyncApplication[_NotificationsSettings]) -> None:
+async def _notifications(  # noqa: WPS217
+    app: service.AsyncApplication[_NotificationsSettings],
+) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         random.choice(app.settings.mongo_dsn),  # noqa: S311
     )
@@ -310,6 +342,9 @@ async def _notifications(app: service.AsyncApplication[_NotificationsSettings]) 
         sender=app.settings.smtp_sender,
         recipient=app.settings.smtp_recipient,
     )
+    booking_storage = await app.stack.enter_async_context(
+        filesystem.Storage.from_dsn(app.settings.storage_dsn),
+    )
     sat_adapter = adapter.SaveATrainAdapter(
         save_a_train_client=client.SATClient(
             email=app.settings.api_email,
@@ -337,6 +372,7 @@ async def _notifications(app: service.AsyncApplication[_NotificationsSettings]) 
         provider_cabin_class_mapping=cabin_classes.CabinMappingRepository(
             mongo.sat.provider_cabin_mapping,
         ),
+        booking_storage=booking_storage,
     )
     await _consume_notifications(app, amqp_connection, sat_adapter, notifier)
 
@@ -444,6 +480,7 @@ if __name__ == "__main__":
         settings_class=_Settings,
         meta_factory=_meta_factory,
         offers_factory=_offers_factory,
+        bookings_factory=_bookings_factory,
     )
 
     entrypoint.enter_with_commands(

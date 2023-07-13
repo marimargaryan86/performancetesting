@@ -4,7 +4,8 @@
       "count": 2,
       "provider_company_id": "87e7fda0-b672-487c-bf93-aac43cd02a79",
       "api_base_url": "https://apibook.saveatrain.com/api",
-      "api_search_base_url": "https://apisearch.saveatrain.com/search"
+      "api_search_base_url": "https://apisearch.saveatrain.com/search",
+      "bucket": "junction-provider-data-development"
     }
   },
   "production": {
@@ -12,7 +13,8 @@
       "count": 2,
       "provider_company_id": "4b156b8f-6558-4f26-98c4-e2eb5c0d2ff2",
       "api_base_url": "https://apibook.saveatrain.com/api",
-      "api_search_base_url": "https://apisearch.saveatrain.com/search"
+      "api_search_base_url": "https://apisearch.saveatrain.com/search",
+      "bucket": "junction-provider-data-production"
     }
   },
   "sandbox": {
@@ -21,7 +23,8 @@
       "count": 1,
       "provider_company_id": "87e7fda0-b672-487c-bf93-aac43cd02a79",
       "api_base_url": "https://apibook.saveatrain.com/api",
-      "api_search_base_url": "https://apisearch.saveatrain.com/search"
+      "api_search_base_url": "https://apisearch.saveatrain.com/search",
+      "bucket": "junction-provider-data-sandbox"
     }
   }
 }
