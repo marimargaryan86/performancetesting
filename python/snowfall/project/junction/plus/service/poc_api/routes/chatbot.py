@@ -4,6 +4,7 @@ from starlette import endpoints, requests, responses, status
 from twilio.twiml.messaging_response import MessagingResponse
 
 from snowfall.project.junction.plus.service.poc_api import (
+    ai_utils,
     chatbot_utils,
     flight_stats_client,
     repository,
@@ -28,6 +29,7 @@ class Whatsapp(endpoints.HTTPEndpoint):
         twilio_client: twilio.TwilioClient = lagom.injectable,
         tf_client: travel_fusion.TravelFusionClient = lagom.injectable,
         s3_client: s3.S3Client = lagom.injectable,
+        ai_bot: ai_utils.AIBot = lagom.injectable,
     ) -> responses.Response:
         msg = await request.form()
         message_body = str(msg["Body"])
@@ -190,7 +192,14 @@ class Whatsapp(endpoints.HTTPEndpoint):
             )
             twiml_response.message("Goodbye")
         else:
-            twiml_response.message(chatbot_utils.home_message())
+            response_message = (
+                await ai_bot.handle_prompt(
+                    message_body,
+                    message_from_mobile,
+                    redis_client,
+                ),
+            )
+            twiml_response.message(response_message)
         return responses.Response(
             content=twiml_response.to_xml(),
             status_code=status.HTTP_200_OK,

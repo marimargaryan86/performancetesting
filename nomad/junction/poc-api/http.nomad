@@ -140,6 +140,7 @@ ICOUPON_CLIENT_SECRET={{ .Data.data.icoupon_client_secret }}
 AWS_ACCESS_KEY={{ .Data.data.aws_access_key }}
 AWS_SECRET_KEY={{ .Data.data.aws_secret_key }}
 TF_CLIENT_KEY={{ .Data.data.tf_client_key }}
+OPENAI_API_KEY={{ .Data.data.openai_api_key }}
 {{ end }}
 EOH
       }

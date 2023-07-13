@@ -59,6 +59,7 @@ mypy-boto3-location==1.26.78
 mypy-protobuf==3.4.0
 mypy==1.4.1
 numpy==1.25.0
+openai==0.27.8
 openapi-core==0.17.2
 openapi-schema-validator==0.4.4
 orjson==3.9.1

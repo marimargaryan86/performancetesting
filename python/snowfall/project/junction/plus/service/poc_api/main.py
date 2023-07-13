@@ -3,11 +3,13 @@ from collections.abc import Callable
 from functools import partial
 
 import httpx
+import openai
 from motor import motor_asyncio
 from redis import asyncio as aioredis
 from starlette import applications
 
 from snowfall.project.junction.plus.service.poc_api import (
+    ai_utils,
     bootstrap,
     flight_stats_client,
     handlers,
@@ -30,6 +32,7 @@ def _factory(
     app: service.Application[bootstrap.Settings],
 ) -> Callable[[], applications.Starlette]:
     def decorator() -> applications.Starlette:
+        openai.api_key = app.settings.openai_api_key
         junction_client = client.Client(
             base_url=app.settings.junction_api_address,
             auth=auth.TokenAuth(app.settings.junction_api_token),
@@ -72,6 +75,7 @@ def _factory(
                     icoupon_client=icoupon_client,
                     s3_client=s3_client,
                     tf_client=tf_client,
+                    ai_bot=ai_utils.AIBot(),
                     twilio_client=twilio.TwilioClient(
                         sid=app.settings.twilio_sid,
                         token=app.settings.twilio_token,

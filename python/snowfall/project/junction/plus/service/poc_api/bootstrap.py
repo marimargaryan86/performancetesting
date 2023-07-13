@@ -4,6 +4,7 @@ import lagom
 from pydantic import AnyUrl
 
 from snowfall.project.junction.plus.service.poc_api import (
+    ai_utils,
     flight_stats_client,
     icoupon,
     repository,
@@ -35,6 +36,7 @@ class Settings(application.Settings):
     twilio_sender: str
     tf_api_address: str
     tf_client_key: str
+    openai_api_key: str
     validate_responses_against_spec: bool = True
 
 
@@ -46,6 +48,7 @@ def create_dependencies(  # noqa: WPS211
     twilio_client: twilio.TwilioClient,
     s3_client: s3.S3Client,
     tf_client: travel_fusion.TravelFusionClient,
+    ai_bot: ai_utils.AIBot,
     orders_repository: repository.OrdersRepository,
     subscriptions_repository: repository.SubscriptionsRepository,
     delay_webhook_repository: repository.DelayWebhookRepository,
@@ -58,6 +61,7 @@ def create_dependencies(  # noqa: WPS211
     container[twilio.TwilioClient] = twilio_client
     container[travel_fusion.TravelFusionClient] = tf_client
     container[s3.S3Client] = s3_client
+    container[ai_utils.AIBot] = ai_bot
     container[repository.OrdersRepository] = orders_repository
     container[repository.SubscriptionsRepository] = subscriptions_repository
     container[repository.DelayWebhookRepository] = delay_webhook_repository
