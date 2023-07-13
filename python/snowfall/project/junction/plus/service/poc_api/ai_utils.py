@@ -82,18 +82,21 @@ class AIBot(object):
             functions=self.functions,
         )
         assistant_message = ai_response["choices"][0]["message"].to_dict()
-        if assistant_message.get("function_call"):  # noqa: SIM114
+        if assistant_message.get("function_call"):
             # Call function with assistant_message["function_call"]["arguments"]
             # and return the results
             message_history = []
+            return_message = json.dumps(assistant_message["function_call"]["arguments"])
         elif assistant_message["content"] == "irrelevant prompt":
             # Return the home message from chatbot_utils
             message_history = []
+            return_message = "irrelevant prompt"
         else:
             # Return the assistant_message["content"]
             message_history.append(assistant_message)
+            return_message = json.dumps(assistant_message["content"])
         await redis_client.put(
             "ai_message_history:{0}".format(mobile_phone),
             json.dumps(message_history),
         )
-        return ""
+        return return_message
