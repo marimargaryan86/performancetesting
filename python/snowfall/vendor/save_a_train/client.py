@@ -278,6 +278,7 @@ _ALL_STATIONS = types.MappingProxyType(
         ],
     },
 )
+_SEARCH_API_CONNECT_TIMEOUT = 5
 
 
 def _get_passenger_type_by_age(age: int) -> str:
@@ -410,7 +411,10 @@ class SATClient(object):  # noqa: WPS214
                     ),
                 ),
                 params=request_params,
-                timeout=self._api_search_timeout,
+                timeout=httpx.Timeout(
+                    timeout=self._api_search_timeout,
+                    connect=_SEARCH_API_CONNECT_TIMEOUT,
+                ),
             )
 
         response.raise_for_status()
