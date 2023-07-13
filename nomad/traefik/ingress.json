@@ -31,7 +31,9 @@
         "karen.h@snowfalltravel.com:$2y$05$/Ze9p5kmB6Kp.V86gc85AOxvWGMXodV/4bYCzNzHXA3ZJYWRVUY3W",
         "ak@snowfalltravel.com:$2y$05$0iW1TCLAU7wtHL4aNnq0Meb05sLrj9v9YkzLpI4y8YdApt3y3RWQ6",
         "justin.k@snowfalltravel.com:$2y$05$CT0UuD8KoqXQo8RU2zziheZSsH91dQ96zQfd376fA3Sy9okDJLnPu",
-        "msm@snowfalltravel.com:$2y$05$pP/BDRnXN2jv9NBJiZWlteceTMSF9/5ouDKQWk96JD1UBP9tES2Si"
+        "msm@snowfalltravel.com:$2y$05$pP/BDRnXN2jv9NBJiZWlteceTMSF9/5ouDKQWk96JD1UBP9tES2Si",
+        "hovhannes.d@snowfalltravel.com:$2y$05$VVy95Nj0wCewSNMg4M99N.TlFRCgHctD8nX2Z5HH6oWeIPNlXipnS",
+        "aramh@snowfalltravel.com:$2y$05$Da0Ed8d0OxkV33TyQjI0keySB/xgOzhQbgchne26BOPJRxpaodb5S"
       ],
       "traefik_consul_ui_users": [
         "ara@snowfalltravel.com:$2y$05$4YUMkM/Ka8xbPRN9pjJO0O/og964WHUf4NbjZBIMbd7hIYt6FWl/i",
@@ -47,7 +49,9 @@
         "karen.h@snowfalltravel.com:$2y$05$/Ze9p5kmB6Kp.V86gc85AOxvWGMXodV/4bYCzNzHXA3ZJYWRVUY3W",
         "ak@snowfalltravel.com:$2y$05$0iW1TCLAU7wtHL4aNnq0Meb05sLrj9v9YkzLpI4y8YdApt3y3RWQ6",
         "justin.k@snowfalltravel.com:$2y$05$CT0UuD8KoqXQo8RU2zziheZSsH91dQ96zQfd376fA3Sy9okDJLnPu",
-        "msm@snowfalltravel.com:$2y$05$pP/BDRnXN2jv9NBJiZWlteceTMSF9/5ouDKQWk96JD1UBP9tES2Si"
+        "msm@snowfalltravel.com:$2y$05$pP/BDRnXN2jv9NBJiZWlteceTMSF9/5ouDKQWk96JD1UBP9tES2Si",
+        "hovhannes.d@snowfalltravel.com:$2y$05$VVy95Nj0wCewSNMg4M99N.TlFRCgHctD8nX2Z5HH6oWeIPNlXipnS",
+        "aramh@snowfalltravel.com:$2y$05$Da0Ed8d0OxkV33TyQjI0keySB/xgOzhQbgchne26BOPJRxpaodb5S"
       ],
       "traefik_vault_ui_users": [
         "ara@snowfalltravel.com:$2y$05$4YUMkM/Ka8xbPRN9pjJO0O/og964WHUf4NbjZBIMbd7hIYt6FWl/i",
