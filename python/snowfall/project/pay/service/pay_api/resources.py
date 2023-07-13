@@ -594,3 +594,22 @@ class RefundsResource(models.Resource):
                 ),
             },
         )
+
+
+class RefundPosition(models.Resource):
+    api_type: ClassVar[str] = "refund-position"
+
+    @classmethod
+    def from_models(
+        cls,
+        refund_id: str,
+        refund_position: money.Money,
+    ) -> RefundPosition:
+        return cls(
+            id=refund_id,
+            type=RefundPosition.api_type,
+            attributes={
+                "currency": refund_position.currency.code,
+                "amount": refund_position.amount,
+            },
+        )

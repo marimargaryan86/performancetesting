@@ -9,8 +9,16 @@ from snowfall.project.pay.service.refunds.v1alpha import (
     grpc_pb2_grpc,
     models_pb2,
 )
-from snowfall.stdlib import sequence
+from snowfall.project.pay.service.transactions.v1alpha import (
+    models_pb2 as transaction_model,
+)
+from snowfall.stdlib import money, sequence
 from snowfall.stdlib.v1 import money_pb2
+from snowfall.vendor.currency_cloud.client import PaymentClient
+from snowfall.vendor.currency_cloud.models.rate import (
+    DetailedRateRequest,
+    FixedSideEnum,
+)
 
 
 class Client(abc.ABC):
@@ -39,10 +47,28 @@ class Client(abc.ABC):
     ) -> grpc_pb2.ListRefundsResponse:
         """Fetch all refund resources."""
 
+    @abc.abstractmethod
+    async def calculate_refund_position(
+        self,
+        refund_id: str,
+        refunded_by_provider: money.Money,
+        refunded_to_reseller: money.Money,
+    ) -> money.Money:
+        """Calculate refund position."""
+
 
 class DictClient(Client):
-    def __init__(self, refunds: Sequence[models_pb2.Refund]):
+    def __init__(
+        self,
+        refunds: Sequence[models_pb2.Refund],
+        transactions: Sequence[transaction_model.Transaction],
+        payment_client: PaymentClient,
+    ):
         self._refunds = {refund.id: refund for refund in refunds}
+        self._transactions = {
+            transaction.id: transaction for transaction in transactions
+        }
+        self._payment_client = payment_client
 
     async def create(self, refund: models_pb2.Refund) -> models_pb2.Refund:
         self._refunds[refund.id] = refund
@@ -77,6 +103,44 @@ class DictClient(Client):
         return grpc_pb2.ListRefundsResponse(
             refunds=page.sequence,
             next_page_token=page.cursor,
+        )
+
+    async def calculate_refund_position(
+        self,
+        refund_id: str,
+        refunded_by_provider: money.Money,
+        refunded_to_reseller: money.Money,
+    ) -> money.Money:
+        refund = self._refunds.get(refund_id)
+        if not refund:
+            raise errors.NotFoundError("Refund not found")
+        transaction = self._transactions.get(refund.transaction_id)
+        if not transaction:
+            raise errors.NotFoundError("Transaction not found")
+        detailed_rate_response = await self._payment_client.get_detailed_rates(
+            DetailedRateRequest(
+                sell_currency=refunded_by_provider.currency.code,
+                buy_currency=refunded_to_reseller.currency.code,
+                fixed_side=FixedSideEnum.sell,
+                amount=str(refunded_by_provider.amount),
+            ),
+        )
+        total_amount = money.total(
+            [
+                money.Money(
+                    int(detailed_rate_response.client_buy_amount),
+                    money.Currency(refunded_to_reseller.currency.code),
+                ),
+                money.from_protobuf(transaction.amounts.sales_margin),
+                money.from_protobuf(transaction.amounts.fx_margin),
+                money.from_protobuf(transaction.amounts.processing_margin),
+            ],
+        ).amount
+
+        calculated_amount = total_amount - refunded_to_reseller.amount
+        return money.Money(
+            calculated_amount,
+            money.Currency(refunded_to_reseller.currency.code),
         )
 
 
@@ -141,3 +205,20 @@ class GrpcClient(Client):
         return await errors.handle_grpc_errors(
             self._refunds.ListRefunds(request, timeout=self._timeout),
         )
+
+    async def calculate_refund_position(
+        self,
+        refund_id: str,
+        refunded_by_provider: money.Money,
+        refunded_to_reseller: money.Money,
+    ) -> money.Money:
+        refund_position_response = await errors.handle_grpc_errors(
+            self._refunds.CalculateRefundPosition(
+                grpc_pb2.CalculateRefundPositionRequest(
+                    refund_id=refund_id,
+                    refunded_by_provider=refunded_by_provider.protobuf(),
+                    refunded_to_reseller=refunded_to_reseller.protobuf(),
+                ),
+            ),
+        )
+        return money.from_protobuf(refund_position_response.refund_position)

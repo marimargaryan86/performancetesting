@@ -1628,6 +1628,68 @@
         }
       }
     },
+    "/refunds/{refundId}/refund-position": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/refundId"
+        }
+      ],
+      "post": {
+        "summary": "Get refund position",
+        "tags": [
+          "refunds"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/RefundPosition"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/RefundPosition"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "post-refunds-id-refund-position",
+        "description": "Get refund position for specific refund"
+      }
+    },
     "/companies/{companyId}/contacts": {
       "get": {
         "summary": "List Contacts",
@@ -3500,29 +3562,6 @@
                       }
                     ],
                     "description": "The amount, we pay to reseller"
-                  },
-                  "refundPosition": {
-                    "readOnly": true,
-                    "nullable": true,
-                    "anyOf": [
-                      {
-                        "$ref": "#/components/schemas/Money"
-                      },
-                      {
-                        "type": "object",
-                        "properties": {
-                          "gain" : {
-                            "type": "boolean",
-                            "example": false,
-                            "description": "false - we lose, true - we profit"
-                          }
-                        }
-                      },
-                      {
-                        "nullable": true
-                      }
-                    ],
-                    "description": "Profit or loss due to conversion the funds to original currency"
                   }
                 }
               },
@@ -3549,6 +3588,15 @@
                         "$ref": "#/components/schemas/ConversionIdentifier"
                       }
                     }
+                  },
+                  "refundPosition": {
+                    "readOnly": true,
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/RefundPosition"
+                      }
+                    ],
+                    "description": "Profit or loss due to conversion the funds to original currency"
                   }
                 }
               }
@@ -3558,6 +3606,67 @@
             "$ref": "#/components/schemas/SelfLink"
           }
         ]
+      },
+      "RefundPosition": {
+        "title": "RefundPosition",
+        "description": "Refund Position schema",
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "attributes"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "271f6d54-9e59-407e-a860-b0771d9e3d26",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "example": "refund-position",
+            "enum": [
+              "refund-position"
+            ]
+          },
+          "attributes": {
+            "type": "object",
+            "required": [
+              "refundedUs",
+              "refundedReseller"
+            ],
+            "properties": {
+              "refundPosition": {
+                "type": "object",
+                "readOnly": true,
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Money"
+                  }
+                ]
+              },
+              "refundedUs": {
+                "writeOnly": true,
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Money"
+                  }
+                ],
+                "description": "The amount, we receive from provider in reseller currency"
+              },
+              "refundedReseller": {
+                "writeOnly": true,
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Money"
+                  }
+                ],
+                "description": "The amount, we pay to reseller"
+              }
+            }
+          }
+        }
       },
       "NextLink": {
         "title": "Next Link",

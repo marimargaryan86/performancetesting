@@ -186,4 +186,9 @@ def get_admin_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             name="Refund",
             methods=["PATCH", "GET"],
         ),
+        integration.route(
+            "/refunds/{refundId}/refund-position",
+            refunds.RefundPosition,
+            name="RefundPosition",
+        ),
     ]

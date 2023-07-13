@@ -131,3 +131,36 @@ class Refunds(endpoints.HTTPEndpoint):
             ),
             request=request,
         )
+
+
+class RefundPosition(endpoints.HTTPEndpoint):
+    async def post(
+        self,
+        request: requests.Request,
+        refunds_client: refunds_adapter.Client = lagom.injectable,
+    ) -> models.JsonApiResponse:
+        refund_id = request.path_params["refundId"]
+        body = await request_helpers.flatten_request(request)
+
+        calculated_refund_position = await refunds_client.calculate_refund_position(
+            refund_id,
+            money.Money(
+                body["refundedUs"]["amount"],
+                money.Currency(body["refundedUs"]["currency"]),
+            ),
+            money.Money(
+                body["refundedReseller"]["amount"],
+                money.Currency(
+                    body["refundedReseller"]["currency"],
+                ),
+            ),
+        )
+        return await messages.create_response(
+            body=models.Body(
+                data=resources.RefundPosition.from_models(
+                    refund_id,
+                    calculated_refund_position,
+                ),
+            ),
+            request=request,
+        )

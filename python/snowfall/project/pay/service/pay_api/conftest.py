@@ -1,5 +1,6 @@
 import datetime
 import pathlib
+import random
 from collections.abc import AsyncIterator, Mapping, Sequence
 from unittest import mock
 
@@ -225,9 +226,14 @@ def conversions_client(
 
 
 @pytest.fixture()
-def refunds_client() -> refunds.DictClient:
+def refunds_client(cc_payment_client: mock.Mock) -> refunds.DictClient:
+    refund_data = [
+        fixtures.generate_refund(refund_id) for refund_id in fixtures.REFUNDS
+    ]
     return refunds.DictClient(
-        [fixtures.generate_refund(refund_id) for refund_id in fixtures.REFUNDS],
+        refund_data,
+        [get_transaction(refund.transaction_id) for refund in refund_data],
+        cc_payment_client,
     )
 
 
@@ -373,6 +379,12 @@ def cc_payment_client(
 
     payment_client.create_beneficiary = mock.AsyncMock(
         return_value=beneficiary_response,
+    )
+
+    detailed_rate = mock.Mock()
+    detailed_rate.client_buy_amount = random.randint(1, 10000)  # noqa: S311, WPS432
+    payment_client.get_detailed_rates = mock.AsyncMock(
+        return_value=detailed_rate,
     )
 
     return payment_client
