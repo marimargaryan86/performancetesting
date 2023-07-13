@@ -3,6 +3,7 @@ from typing import Any, ClassVar
 
 import openai
 
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.redis import types as redis
 
 
@@ -61,6 +62,9 @@ class AIBot(object):
         },
     ]
 
+    def __init__(self) -> None:
+        self._logger = stdout.get_logger()
+
     async def handle_prompt(
         self,
         message: str,
@@ -98,5 +102,9 @@ class AIBot(object):
         await redis_client.put(
             "ai_message_history:{0}".format(mobile_phone),
             json.dumps(message_history),
+        )
+        self._logger.info(
+            "AI bot response",
+            response=return_message,
         )
         return return_message
