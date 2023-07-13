@@ -64,4 +64,5 @@ class EmailClient(object):
             self._logger.info(
                 "Got response for sending message",
                 response=send_message_resp,
+                recipient=mail_to,
             )
