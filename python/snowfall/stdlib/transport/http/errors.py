@@ -63,18 +63,20 @@ class RequestError(HttpError):
 class HttpStatusError(HttpError):
     """Raised when a response is not 2XX."""
 
-    def __init__(
+    def __init__(  # noqa: WPS211
         self,
         body: Any,
         status: http.HTTPStatus,
         request: RequestMetaData,
         response: ResponseMetaData,
+        raw_response: httpx.Response,
     ):
         super().__init__(status.description)
         self.body = body
         self.status = status
         self.request = request
         self.response = response
+        self.raw_response = raw_response
 
     @classmethod
     def from_error(cls, error: httpx.HTTPStatusError) -> HttpStatusError:
@@ -88,6 +90,7 @@ class HttpStatusError(HttpError):
             status=http.HTTPStatus(error.response.status_code),
             request=RequestMetaData.from_error(error),
             response=ResponseMetaData.from_error(error),
+            raw_response=error.response,
         )
 
 

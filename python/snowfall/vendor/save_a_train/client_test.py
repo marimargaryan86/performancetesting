@@ -36,7 +36,7 @@ async def test_get_general_results_no_route(
     )
 
     with pytest.raises(exceptions.SATValidationError) as excinfo:
-        await save_a_train_client.get_general_search_results(
+        await save_a_train_client.search_api_client.get_general_search_results(
             request=request.GeneralSearchResultsRequest(
                 origin_id=_ORIGIN,
                 destination_id=_DESTINATION,

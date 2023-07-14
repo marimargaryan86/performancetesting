@@ -71,6 +71,7 @@ class _Settings(_SatConfig, service.ProviderSettings):
     mongo_dsn: tuple[pydantic.AnyUrl]
     allowed_window_td: datetime.timedelta = datetime.timedelta(minutes=0)
     storage_dsn: service.AnyDsn
+    search_api_enabled: bool = False
 
 
 class _PriceQuoteSettings(service.PriceQuoteSettings):
@@ -161,6 +162,7 @@ async def _offers_factory(
             types.Exchange("notifications"),
         ),
         booking_storage=booking_storage,
+        search_api_enabled=app.settings.search_api_enabled,
     )
 
     return offers.OfferSearchImplementation(
@@ -456,7 +458,7 @@ async def _dump_stations(app: service.AsyncApplication[_DumpStationsSettings]) -
 
     await train_stations.dump_sat_stations(
         geocoder,
-        await save_a_train_client.get_vendor_stations(),
+        await save_a_train_client.api_client.get_vendor_stations(),
         pathlib.Path(app.settings.output_file),
     )
 

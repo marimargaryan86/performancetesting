@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import base64
 import datetime
+import http
 import json
 import pathlib
 import uuid
 from collections.abc import AsyncIterator, Sequence
 
-import httpx
 import orjson
 import phonenumbers
 import pycountry
@@ -34,6 +34,7 @@ from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.transport.amqp import producer
+from snowfall.stdlib.transport.http import errors
 from snowfall.stdlib.v1 import latlng_pb2
 from snowfall.vendor.save_a_train import client, enums, exceptions
 from snowfall.vendor.save_a_train.models import (
@@ -75,6 +76,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         provider_cabin_class_mapping: cabin_classes.CabinMappingRepository,
         notifications_producer: producer.Producer,
         booking_storage: filesystem.Storage,
+        search_api_enabled: bool = True,  # noqa: FBT001,FBT002
     ) -> None:
         self._train_stations = train_station_repository
         self._cabin_mapping = provider_cabin_class_mapping
@@ -83,6 +85,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         self._ttl = ttl
         self._notifier = notifier
         self._notifications_producer = notifications_producer
+        self._search_api_enabled = search_api_enabled
         self._logger = stdout.get_logger()
         self._storage = booking_storage
 
@@ -128,36 +131,39 @@ class SaveATrainAdapter(object):  # noqa: WPS214
             search_criteria.destination_id,
         )
 
-        await self.perform_general_search(
-            search_request=request.GeneralSearchResultsRequest(
-                origin_id=origin.identifier,
-                destination_id=destination.identifier,
-                trip_type=enums.TripType.one_way,
-                number_of_passengers=len(search_criteria.passengers_ages),
-                departure_date=search_criteria.departure_datetime.date(),
-            ),
-        )
+        if self._search_api_enabled:
+            await self.perform_general_search(
+                search_request=request.GeneralSearchResultsRequest(
+                    origin_id=origin.identifier,
+                    destination_id=destination.identifier,
+                    trip_type=enums.TripType.one_way,
+                    number_of_passengers=len(search_criteria.passengers_ages),
+                    departure_date=search_criteria.departure_datetime.date(),
+                ),
+            )
 
         try:
-            search_response = await self._client.create_search(search_criteria)
+            search_response = await self._client.api_client.create_search(
+                search_criteria,
+            )
         except exceptions.SATValidationError as search_error:
             raise NoResultsError(search_error) from search_error
-        except httpx.HTTPStatusError as http_error:
-            if http_error.response.text:
+        except errors.HttpStatusError as http_error:
+            if http_error.response.body:
                 raise_http_error_with_text(http_error)
             raise
 
         for search_result in search_response.search_results:
             try:
-                search_details = await self._client.get_search_result_details(
-                    request.SearchResultRequest(
-                        search_id=search_response.identifier,
-                        search_result_id=search_result.identifier,
-                    ),
+                search_details = (
+                    await self._client.api_client.get_search_result_details(
+                        request.SearchResultRequest(
+                            search_id=search_response.identifier,
+                            search_result_id=search_result.identifier,
+                        ),
+                    )
                 )
-            except exceptions.SATValidationError:
-                continue
-            except httpx.HTTPStatusError:
+            except (exceptions.SATValidationError, errors.HttpStatusError):
                 continue
 
             expires_at = datetime.datetime.now(tz=datetime.UTC) + self._ttl
@@ -267,19 +273,19 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         search_request: request.GeneralSearchResultsRequest,
     ) -> None:
         try:
-            await self._client.get_general_search_results(
+            await self._client.search_api_client.get_general_search_results(
                 request=search_request,
             )
         except exceptions.SATValidationError as no_route_error:
             raise RouteNotAllowedError(no_route_error) from no_route_error
 
-        except httpx.TimeoutException as timeout_error:
+        except errors.TimeOutError as timeout_error:
             self._logger.info("SAT timeout error occurred.", error=timeout_error)
 
-        except httpx.HTTPStatusError as http_status_error:
+        except errors.HttpStatusError as http_status_error:
             status_code = http_status_error.response.status_code
-            if status_code != httpx.codes.INTERNAL_SERVER_ERROR:
-                if http_status_error.response.text:
+            if status_code != http.HTTPStatus.INTERNAL_SERVER_ERROR:
+                if http_status_error.response.body:
                     raise_http_error_with_text(http_status_error)
                 raise
 
@@ -356,11 +362,11 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         search_id: str,
     ) -> tuple[booking.TicketInfo, bytes]:
         try:
-            return await self._client.get_ticket(search_id)
+            return await self._client.api_client.get_ticket(search_id)
         except exceptions.SATValidationError as booking_error:
             raise BookingError(booking_error) from booking_error
-        except httpx.HTTPStatusError as http_error:
-            if http_error.response.text:
+        except errors.HttpStatusError as http_error:
+            if http_error.response.body:
                 raise_http_error_with_text(http_error)
             raise
 
@@ -399,7 +405,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         offer_details: cache.OfferDetails,
     ) -> search_result_selection.SearchResultSelectionResponse:
         try:
-            return await self._client.select_search_result(
+            return await self._client.api_client.select_search_result(
                 request.SelectSearchResultRequest(
                     search_id=offer_details.search_id,
                     search_result_id=offer_details.search_result_id,
@@ -409,8 +415,8 @@ class SaveATrainAdapter(object):  # noqa: WPS214
             )
         except exceptions.SATValidationError as search_error:
             raise BookingError(search_error) from search_error
-        except httpx.HTTPStatusError as http_error:
-            if http_error.response.text:
+        except errors.HttpStatusError as http_error:
+            if http_error.response.body:
                 raise_http_error_with_text(http_error)
             raise
 
@@ -457,7 +463,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         )
 
         try:
-            return await self._client.create_booking(
+            return await self._client.api_client.create_booking(
                 request.CreateBookingRequest(
                     search_id=search_id,
                     seat_preference_code=seat_code or None,
@@ -489,8 +495,8 @@ class SaveATrainAdapter(object):  # noqa: WPS214
             )
         except exceptions.SATValidationError as booking_error:
             raise BookingError(booking_error) from booking_error
-        except httpx.HTTPStatusError as http_error:
-            if http_error.response.text:
+        except errors.HttpStatusError as http_error:
+            if http_error.response.body:
                 raise_http_error_with_text(http_error)
             raise
 
@@ -499,19 +505,19 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         search_id: str,
     ) -> booking.BookingConfirmationResult:
         try:
-            return await self._client.confirm_booking(search_id)
+            return await self._client.api_client.confirm_booking(search_id)
         except exceptions.SATValidationError as booking_error:
             raise BookingError(booking_error) from booking_error
-        except httpx.HTTPStatusError as http_error:
-            if http_error.response.text:
+        except errors.HttpStatusError as http_error:
+            if http_error.response.body:
                 raise_http_error_with_text(http_error)
             raise
 
 
-def raise_http_error_with_text(http_error: httpx.HTTPStatusError) -> None:
+def raise_http_error_with_text(http_error: errors.HttpStatusError) -> None:
     raise SaveATrainAdapterError(
         "HTTPStatusError text: {0}".format(
-            http_error.response.text,
+            http_error.response.body,
         ),
     ) from http_error
 

@@ -83,3 +83,69 @@ async def test_timeout_error_message(
         )
 
     assert str(exc.value) == inspect.getdoc(httpx.ReadTimeout)  # noqa: WPS441
+
+
+_BASE_URL = "https://test.com"
+_BASE_URL_WITH_PATH = "https://test.com/base-path"
+_BASE_URL_WITH_PATH_TRAILING_STASH = "https://test.com/base-path/"
+
+
+@pytest.mark.parametrize(
+    ("options", "expected_str", "base_url"),
+    [
+        (
+            client.RequestOptions(
+                method="GET",
+                path="test-path",
+            ),
+            "https://test.com/test-path",
+            _BASE_URL,
+        ),
+        (
+            client.RequestOptions(
+                method="GET",
+                path="/test-path",
+            ),
+            "https://test.com/test-path",
+            _BASE_URL,
+        ),
+        (
+            client.RequestOptions(
+                method="GET",
+                path="test-path",
+            ),
+            "https://test.com/base-path/test-path",
+            _BASE_URL_WITH_PATH,
+        ),
+        (
+            client.RequestOptions(
+                method="GET",
+                path="/test-path",
+            ),
+            "https://test.com/test-path",
+            _BASE_URL_WITH_PATH,
+        ),
+        (
+            client.RequestOptions(
+                method="GET",
+                path="test-path",
+            ),
+            "https://test.com/base-path/test-path",
+            _BASE_URL_WITH_PATH_TRAILING_STASH,
+        ),
+        (
+            client.RequestOptions(
+                method="GET",
+                path="/test-path",
+            ),
+            "https://test.com/test-path",
+            _BASE_URL_WITH_PATH_TRAILING_STASH,
+        ),
+    ],
+)
+async def test_url_for_options(
+    options: client.RequestOptions,
+    expected_str: str,
+    base_url: str,
+) -> None:
+    assert str(client.url_for_options(base_url, options)) == expected_str

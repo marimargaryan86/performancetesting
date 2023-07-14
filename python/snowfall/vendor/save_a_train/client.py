@@ -7,14 +7,11 @@ import httpx
 
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.time import date_to_age
+from snowfall.stdlib.transport.http import client as http_client
+from snowfall.stdlib.transport.http import errors as http_errors
 from snowfall.vendor.save_a_train.enums import PassengerType
 from snowfall.vendor.save_a_train.exceptions import SATValidationError, SATValueError
-from snowfall.vendor.save_a_train.models.booking import (
-    BookingConfirmationResult,
-    BookingInformation,
-    BookingResult,
-    TicketInfo,
-)
+from snowfall.vendor.save_a_train.models import booking
 from snowfall.vendor.save_a_train.models.general_search import GeneralSearchResponse
 from snowfall.vendor.save_a_train.models.misc import (
     VendorStation,
@@ -320,111 +317,102 @@ def _exception_message_from_response(response: httpx.Response) -> str:
     return message
 
 
-class SATClient(object):  # noqa: WPS214
-    """Save A Train API client library."""
-
+class _SATSearchApiClient(http_client.HttpClient):
     def __init__(  # noqa: WPS211
         self,
+        api_url: str,
+        client: httpx.AsyncClient,
         email: str,
         password: str,
-        password_search: str,
-        token: str | None,
-        api_url: str,
-        api_search_url: str,
-        api_search_timeout: int,
         api_search_requests_limit: int,
-        client: httpx.AsyncClient,
+        timeout: int,
     ) -> None:
-        """Construct Save A Train API client library.
-
-        :param email: Email that identifies agent user, under whose privileges the
-            requested operation executes
-        :type email: str
-        :param password: Password used to generate token for API requests
-        :type password: str
-        :param password_search: Password used to authorize Search API requests
-        :type: str
-        :param token: Secret key specific to each agent, used to authorize API requests
-        :type token: str
-        :param api_url: API base URL
-        :type api_url: str
-        :param api_search_url: Search API base URL
-        :type api_search_url: str
-        :type api_search_timeout: int
-        """
+        super().__init__(api_url, client)
         self._email = email
         self._password = password
-        self._password_search = password_search or password
-        self._token = token or ""
-        self._api_url = api_url
-        self._api_search_url = api_search_url
-        self._api_search_timeout = api_search_timeout
-        self._session = client
+        self._timeout = timeout
         self._semaphore = asyncio.BoundedSemaphore(api_search_requests_limit)
         self._all_stations = {
             station_id: global_station_id
             for global_station_id, station_ids in _ALL_STATIONS.items()
             for station_id in station_ids
         }
-        self._logger = stdout.get_logger()
-
-    async def get_vendor_stations(self) -> VendorStationsResponse:
-        response = await self._session.get(
-            "{0}vendor_stations".format(self._api_url),
-            headers=self._auth_headers,
-        )
-
-        response.raise_for_status()
-
-        response_data = response.json()
-
-        return VendorStationsResponse(
-            stations=[VendorStation(**station) for station in response_data],
-        )
 
     async def get_general_search_results(
         self,
         request: GeneralSearchResultsRequest,
     ) -> GeneralSearchResponse:
         """Perform a search through Search API."""
-        request_params = httpx.QueryParams(
-            triptype=request.trip_type.value,
-            passengers=request.number_of_passengers,
-            ddate=(request.departure_date - timedelta(hours=1)).isoformat(),
-            rdate=(
+        request_params = {
+            "triptype": str(request.trip_type.value),
+            "passengers": str(request.number_of_passengers),
+            "ddate": (request.departure_date - timedelta(hours=1)).isoformat(),
+            "rdate": (
                 (request.return_date - timedelta(hours=1)).isoformat()
                 if request.return_date
                 else ""
             ),
-            email=self._email,
-            password=self._password_search,
-        )
+            "email": self._email,
+            "password": self._password,
+        }
 
         async with self._semaphore:
             # As per SAT docs it is preferable to use city's "all stations" variant
-            response = await self._session.get(
-                "{0}/{1}/{2}".format(
-                    self._api_search_url,
-                    self._all_stations.get(request.origin_id, request.origin_id),
-                    self._all_stations.get(
-                        request.destination_id,
-                        request.destination_id,
+            response = await self._make_request(
+                http_client.RequestOptions(
+                    method="GET",
+                    path="{0}/{1}".format(
+                        self._all_stations.get(request.origin_id, request.origin_id),
+                        self._all_stations.get(
+                            request.destination_id,
+                            request.destination_id,
+                        ),
                     ),
+                    query=request_params,
                 ),
-                params=request_params,
                 timeout=httpx.Timeout(
-                    timeout=self._api_search_timeout,
+                    timeout=self._timeout,
                     connect=_SEARCH_API_CONNECT_TIMEOUT,
                 ),
             )
-
-        response.raise_for_status()
 
         response_data = response.json()
         if "errors" in response_data:
             raise SATValidationError(response_data)
 
         return GeneralSearchResponse(**response_data)
+
+
+class _SATApiClient(http_client.HttpClient):  # noqa: WPS214
+    def __init__(  # noqa: WPS211
+        self,
+        api_url: str,
+        token: str,
+        client: httpx.AsyncClient,
+        email: str,
+        password: str,
+    ) -> None:
+        super().__init__(api_url, client)
+
+        self._email = email
+        self._password = password
+        self._token = token
+        self._logger = stdout.get_logger()
+
+    async def get_vendor_stations(self) -> VendorStationsResponse:
+        response = await self._make_request(
+            http_client.RequestOptions(
+                method="GET",
+                path="vendor_stations",
+                headers=self._auth_headers,
+            ),
+        )
+
+        response_data = response.json()
+
+        return VendorStationsResponse(
+            stations=[VendorStation(**station) for station in response_data],
+        )
 
     async def create_token(self) -> str:
         """Create token.
@@ -437,12 +425,14 @@ class SATClient(object):  # noqa: WPS214
             "password": self._password,
         }
 
-        response = await self._session.post(
-            "{0}/sales_agent_sessions".format(self._api_url),
-            params=request_params,
+        response = await self._make_request(
+            http_client.RequestOptions(
+                method="POST",
+                path="sales_agent_sessions",
+                query=request_params,
+                headers=self._auth_headers,
+            ),
         )
-
-        response.raise_for_status()
 
         response_data = response.json()
 
@@ -477,16 +467,22 @@ class SATClient(object):  # noqa: WPS214
 
         self._logger.info("SAT book search request", request=json.dumps(body))
 
-        response = await self._session.post(
-            "{0}/searches".format(self._api_url),
-            json=body,
-            headers=self._auth_headers,
-        )
+        try:
+            response = await self._make_request(
+                http_client.RequestOptions(
+                    method="POST",
+                    path="searches",
+                    payload=body,
+                    headers=self._auth_headers,
+                ),
+            )
+        except http_errors.HttpStatusError as exc:
+            if exc.response.status_code == httpx.codes.UNPROCESSABLE_ENTITY:
+                raise SATValidationError(
+                    _exception_message_from_response(exc.raw_response),
+                ) from exc
 
-        if response.status_code == httpx.codes.UNPROCESSABLE_ENTITY:
-            raise SATValidationError(_exception_message_from_response(response))
-
-        response.raise_for_status()
+            raise
 
         response_data = response.json()
 
@@ -497,19 +493,24 @@ class SATClient(object):  # noqa: WPS214
         request: SearchResultRequest,
     ) -> SearchResultDetails:
         """Get search result's details: transfers and fares."""
-        response = await self._session.get(
-            "{0}/searches/{1}/results/{2}/sub_routes".format(
-                self._api_url,
-                request.search_id,
-                request.search_result_id,
-            ),
-            headers=self._auth_headers,
-        )
+        try:
+            response = await self._make_request(
+                http_client.RequestOptions(
+                    method="GET",
+                    path="searches/{0}/results/{1}/sub_routes".format(
+                        request.search_id,
+                        request.search_result_id,
+                    ),
+                    headers=self._auth_headers,
+                ),
+            )
+        except http_errors.HttpStatusError as exc:
+            if exc.response.status_code == httpx.codes.UNPROCESSABLE_ENTITY:
+                raise SATValidationError(
+                    _exception_message_from_response(exc.raw_response),
+                ) from exc
 
-        if response.status_code == httpx.codes.UNPROCESSABLE_ENTITY:
-            raise SATValidationError(_exception_message_from_response(response))
-
-        response.raise_for_status()
+            raise
 
         response_data = response.json()
 
@@ -535,19 +536,22 @@ class SATClient(object):  # noqa: WPS214
 
         self._logger.info("SAT select search request", request=json.dumps(body))
 
-        response = await self._session.post(
-            "{0}/searches/{1}/confirm_selection".format(
-                self._api_url,
-                request.search_id,
-            ),
-            json=body,
-            headers=self._auth_headers,
-        )
+        try:
+            response = await self._make_request(
+                http_client.RequestOptions(
+                    method="POST",
+                    path="searches/{0}/confirm_selection".format(request.search_id),
+                    payload=body,
+                    headers=self._auth_headers,
+                ),
+            )
+        except http_errors.HttpStatusError as exc:
+            if exc.response.status_code == httpx.codes.UNPROCESSABLE_ENTITY:
+                raise SATValidationError(
+                    _exception_message_from_response(exc.raw_response),
+                ) from exc
 
-        if response.status_code == httpx.codes.UNPROCESSABLE_ENTITY:
-            raise SATValidationError(_exception_message_from_response(response))
-
-        response.raise_for_status()
+            raise
 
         response_data = response.json()
 
@@ -558,20 +562,25 @@ class SATClient(object):  # noqa: WPS214
         request: GetTariffConditionsRequest,
     ) -> TariffConditionsResponse:
         """Get fare's tariff conditions."""
-        response = await self._session.get(
-            "{0}/searches/{1}/results/{2}/tariff_conditions/{3}".format(
-                self._api_url,
-                request.search_id,
-                request.search_result_id,
-                request.tariff_condition_id,
-            ),
-            headers=self._auth_headers,
-        )
+        try:
+            response = await self._make_request(
+                http_client.RequestOptions(
+                    method="GET",
+                    path="searches/{0}/results/{1}/tariff_conditions/{2}".format(
+                        request.search_id,
+                        request.search_result_id,
+                        request.tariff_condition_id,
+                    ),
+                    headers=self._auth_headers,
+                ),
+            )
+        except http_errors.HttpStatusError as exc:
+            if exc.response.status_code == httpx.codes.UNPROCESSABLE_ENTITY:
+                raise SATValidationError(
+                    _exception_message_from_response(exc.raw_response),
+                ) from exc
 
-        if response.status_code == httpx.codes.UNPROCESSABLE_ENTITY:
-            raise SATValidationError(_exception_message_from_response(response))
-
-        response.raise_for_status()
+            raise
 
         response_data = response.json()
 
@@ -580,7 +589,7 @@ class SATClient(object):  # noqa: WPS214
     async def create_booking(
         self,
         request: CreateBookingRequest,
-    ) -> tuple[BookingResult, bytes]:
+    ) -> tuple[booking.BookingResult, bytes]:
         """Create a booking for search identified by ``search_id``."""
         order_passenger = request.passengers[0]
         body = {
@@ -618,20 +627,29 @@ class SATClient(object):  # noqa: WPS214
 
         self._logger.info("SAT booking request", request=json.dumps(body))
 
-        response = await self._session.post(
-            "{0}/bookings".format(self._api_url),
-            json=body,
-            headers=self._auth_headers,
-        )
+        try:
+            response = await self._make_request(
+                http_client.RequestOptions(
+                    method="POST",
+                    path="bookings",
+                    payload=body,
+                    headers=self._auth_headers,
+                ),
+            )
+        except http_errors.HttpStatusError as exc:
+            if exc.response.status_code == httpx.codes.UNPROCESSABLE_ENTITY:
+                raise SATValidationError(
+                    _exception_message_from_response(exc.raw_response),
+                ) from exc
 
-        if response.status_code == httpx.codes.UNPROCESSABLE_ENTITY:
-            raise SATValidationError(_exception_message_from_response(response))
+            raise
 
-        response.raise_for_status()
+        return booking.BookingResult(**response.json()), response.content
 
-        return BookingResult(**response.json()), response.content
-
-    async def confirm_booking(self, search_id: str) -> BookingConfirmationResult:
+    async def confirm_booking(
+        self,
+        search_id: str,
+    ) -> booking.BookingConfirmationResult:
         """Confirm booking.
 
         :param search_id: Search identifier
@@ -644,47 +662,57 @@ class SATClient(object):  # noqa: WPS214
             },
         }
 
-        response = await self._session.post(
-            "{0}/bookings/confirm".format(self._api_url),
-            json=body,
-            headers=self._auth_headers,
-        )
+        try:
+            response = await self._make_request(
+                http_client.RequestOptions(
+                    method="POST",
+                    path="bookings/confirm",
+                    payload=body,
+                    headers=self._auth_headers,
+                ),
+            )
+        except http_errors.HttpStatusError as exc:
+            if exc.response.status_code == httpx.codes.UNPROCESSABLE_ENTITY:
+                raise SATValidationError(
+                    _exception_message_from_response(exc.raw_response),
+                ) from exc
 
-        if response.status_code == httpx.codes.UNPROCESSABLE_ENTITY:
-            raise SATValidationError(_exception_message_from_response(response))
-
-        response.raise_for_status()
+            raise
 
         response_data = response.json()
 
-        return BookingConfirmationResult(**response_data)
+        return booking.BookingConfirmationResult(**response_data)
 
-    async def get_ticket(self, search_id: str) -> tuple[TicketInfo, bytes]:
+    async def get_ticket(self, search_id: str) -> tuple[booking.TicketInfo, bytes]:
         """Get ticket information.
 
         :param search_id: Search identifier
         :raises httpx.TimeoutException: If request times out
         :raises httpx.HTTPStatusError: If request fails
         """
-        response = await self._session.get(
-            "{0}/order_images/{1}".format(self._api_url, search_id),
-            headers=self._auth_headers,
-        )
+        try:
+            response = await self._make_request(
+                http_client.RequestOptions(
+                    method="GET",
+                    path="order_images/{0}".format(search_id),
+                    headers=self._auth_headers,
+                ),
+            )
+        except http_errors.HttpStatusError as exc:
+            if exc.response.status_code == httpx.codes.NOT_FOUND:
+                raise SATValueError() from exc
 
-        if response.status_code == httpx.codes.NOT_FOUND:
-            raise SATValueError()
-
-        response.raise_for_status()
+            raise
 
         response_data = response.json()
 
-        return TicketInfo(**response_data), response.content
+        return booking.TicketInfo(**response_data), response.content
 
     async def manage_bookings(
         self,
         search_id: str,
         email: str,
-    ) -> BookingInformation:
+    ) -> booking.BookingInformation:
         """Retrieve booking information for a confirmed booking.
 
         :param search_id: Search identifier
@@ -698,20 +726,25 @@ class SATClient(object):  # noqa: WPS214
             "id": search_id,
             "email": email,
         }
-        response = await self._session.post(
-            "{0}/manage_bookings".format(self._api_url),
-            headers=self._auth_headers,
-            json=body,
-        )
 
-        if response.status_code == httpx.codes.NOT_FOUND:
-            raise SATValueError()
+        try:
+            response = await self._make_request(
+                http_client.RequestOptions(
+                    method="POST",
+                    path="manage_bookings",
+                    headers=self._auth_headers,
+                    payload=body,
+                ),
+            )
+        except http_errors.HttpStatusError as exc:
+            if exc.response.status_code == httpx.codes.NOT_FOUND:
+                raise SATValueError() from exc
 
-        response.raise_for_status()
+            raise
 
         response_data = response.json()
 
-        return BookingInformation(**response_data)
+        return booking.BookingInformation(**response_data)
 
     @property
     def _auth_headers(self) -> dict[str, str]:
@@ -720,3 +753,60 @@ class SATClient(object):  # noqa: WPS214
             "X-Agent-Email": self._email,
             "X-Agent-Token": self._token,
         }
+
+
+class SATClient(object):  # noqa: WPS214
+    """Save A Train API client library."""
+
+    def __init__(  # noqa: WPS211
+        self,
+        email: str,
+        password: str,
+        password_search: str,
+        token: str | None,
+        api_url: str,
+        api_search_url: str,
+        api_search_timeout: int,
+        api_search_requests_limit: int,
+        client: httpx.AsyncClient,
+    ) -> None:
+        """Construct Save A Train API client library.
+
+        :param email: Email that identifies agent user, under whose privileges the
+            requested operation executes
+        :type email: str
+        :param password: Password used to generate token for API requests
+        :type password: str
+        :param password_search: Password used to authorize Search API requests
+        :type: str
+        :param token: Secret key specific to each agent, used to authorize API requests
+        :type token: str
+        :param api_url: API base URL
+        :type api_url: str
+        :param api_search_url: Search API base URL
+        :type api_search_url: str
+        :type api_search_timeout: int
+        """
+        self._api_client = _SATApiClient(
+            api_url=api_url,
+            token=token or "",
+            client=client,
+            email=email,
+            password=password,
+        )
+        self._search_api_client = _SATSearchApiClient(
+            api_url=api_search_url,
+            client=client,
+            email=email,
+            password=password_search or password,
+            api_search_requests_limit=api_search_requests_limit,
+            timeout=api_search_timeout,
+        )
+
+    @property
+    def api_client(self) -> _SATApiClient:
+        return self._api_client
+
+    @property
+    def search_api_client(self) -> _SATSearchApiClient:
+        return self._search_api_client
