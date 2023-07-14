@@ -7,7 +7,7 @@ from snowfall.project.junction.go.service.offers.v1 import (
     models_pb2 as offer_models_pb2,
 )
 from snowfall.project.junction.go.v1 import models_pb2
-from snowfall.project.junction.provider import airports
+from snowfall.project.junction.provider import airports, parsers
 from snowfall.project.junction.service.providers.ba_ndc import cache, enums
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
@@ -380,6 +380,11 @@ class OfferParser(object):  # noqa: WPS214
                         offers_adapter,
                     ),
                     price=amount.protobuf(),
+                    price_breakdown=parsers.parse_price_breakdown(
+                        offer.price.base_amount,
+                        offer.price.tax_amount,
+                        offer.price.currency,
+                    ),
                     brand_name=offers_adapter.get_brand_name(offer),
                 ),
             )

@@ -1,6 +1,7 @@
 from collections.abc import Sequence
 
 from snowfall.project.junction.go.service.offers.v1 import models_pb2 as offers_pb2
+from snowfall.project.junction.provider import parsers
 from snowfall.project.junction.service.providers.ba_ndc import cache
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
@@ -55,21 +56,6 @@ def _to_document_requirement(
     return required_docs
 
 
-def _to_price_breakdown(
-    price_breakdown: cache.PriceBreakdown,
-) -> list[offers_pb2.PriceBreakdown]:
-    return [
-        offers_pb2.PriceBreakdown(
-            price=_to_money(price_breakdown.base_amount, price_breakdown.currency),
-            breakdown_type=offers_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_BASE_FARE,
-        ),
-        offers_pb2.PriceBreakdown(
-            price=_to_money(price_breakdown.tax_amount, price_breakdown.currency),
-            breakdown_type=offers_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_TAX,
-        ),
-    ]
-
-
 class PriceQuoteTransformer(object):
     def __init__(
         self,
@@ -88,7 +74,11 @@ class PriceQuoteTransformer(object):
             option_id=option_id,
             expires_at=protobuf.datetime_to_protobuf(offer_details.expires_at),
             price=_to_money(offer_details.price.amount, offer_details.price.currency),
-            price_breakdown=_to_price_breakdown(offer_details.price_breakdown),
+            price_breakdown=parsers.parse_price_breakdown(
+                offer_details.price_breakdown.base_amount,
+                offer_details.price_breakdown.tax_amount,
+                offer_details.price_breakdown.currency,
+            ),
             penalties=_to_penalties(offer_details.penalties),
             required_documents=_to_document_requirement(offer_details),
         )
