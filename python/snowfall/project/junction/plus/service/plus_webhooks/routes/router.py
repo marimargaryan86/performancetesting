@@ -2,7 +2,7 @@ import lagom
 from lagom.integrations import starlette
 from starlette import routing
 
-from snowfall.project.junction.plus.service.webhooks.routes import flight_stats
+from snowfall.project.junction.plus.service.plus_webhooks.routes import flight_stats
 
 
 def get_routes(

@@ -3,11 +3,11 @@ from collections.abc import Callable
 from starlette.applications import Starlette
 from starlette.middleware import Middleware
 
-from snowfall.project.junction.plus.service.webhooks import (
+from snowfall.project.junction.plus.service.plus_webhooks import (
     bootstrap,
     middlewares,
 )
-from snowfall.project.junction.plus.service.webhooks.routes import router
+from snowfall.project.junction.plus.service.plus_webhooks.routes import router
 from snowfall.stdlib import service
 from snowfall.stdlib.integration.starlette import application
 
