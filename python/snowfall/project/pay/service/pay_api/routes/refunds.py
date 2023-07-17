@@ -1,10 +1,9 @@
 import lagom
-from starlette import endpoints, requests, status
+from starlette import endpoints, requests
 
 from snowfall.project.pay.adapter import refunds as refunds_adapter
 from snowfall.project.pay.service.pay_api import resources
 from snowfall.project.pay.service.pay_api.routes import routes_handlers
-from snowfall.project.pay.service.refunds.v1alpha import models_pb2
 from snowfall.stdlib import money
 from snowfall.stdlib.integration.starlette import (
     messages,
@@ -66,41 +65,6 @@ class Refund(endpoints.HTTPEndpoint):
 
 class Refunds(endpoints.HTTPEndpoint):
     _default_page_size = 20
-
-    @routes_handlers.grpc_errors_handler
-    async def post(
-        self,
-        request: requests.Request,
-        refunds_client: refunds_adapter.Client = lagom.injectable,
-    ) -> models.JsonApiResponse:
-        payload = await request_helpers.flatten_request(request)
-
-        refund = await refunds_client.create(
-            models_pb2.Refund(
-                transaction_id=payload.get("transaction"),  # type: ignore[arg-type]
-                refund_received=payload.get("refundReceived"),  # type: ignore[arg-type]
-                note=payload.get("note"),  # type: ignore[arg-type]
-                refunded_us=money.from_string(
-                    str(payload["refundedUs"]["amount"]),
-                    money.Currency(payload["refundedUs"]["currency"]),
-                ).protobuf(),
-                refunded_reseller=money.from_string(
-                    str(payload["refundedReseller"]["amount"]),
-                    money.Currency(payload["refundedReseller"]["currency"]),
-                ).protobuf(),
-            ),
-        )
-
-        return await messages.create_response(
-            body=models.Body(
-                data=resources.RefundsResource.from_proto(
-                    refund=refund,
-                    request=request,
-                ),
-            ),
-            request=request,
-            status_code=status.HTTP_201_CREATED,
-        )
 
     async def get(
         self,

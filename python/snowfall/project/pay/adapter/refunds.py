@@ -23,10 +23,6 @@ from snowfall.vendor.currency_cloud.models.rate import (
 
 class Client(abc.ABC):
     @abc.abstractmethod
-    async def create(self, refund: models_pb2.Refund) -> models_pb2.Refund:
-        """Create a refund resource."""
-
-    @abc.abstractmethod
     async def get(self, identifier: str) -> models_pb2.Refund:
         """Fetch a refund resource."""
 
@@ -69,11 +65,6 @@ class DictClient(Client):
             transaction.id: transaction for transaction in transactions
         }
         self._payment_client = payment_client
-
-    async def create(self, refund: models_pb2.Refund) -> models_pb2.Refund:
-        self._refunds[refund.id] = refund
-
-        return refund
 
     async def get(self, refund_id: str) -> models_pb2.Refund:
         try:
@@ -152,16 +143,6 @@ class GrpcClient(Client):
     ):
         self._refunds = refunds
         self._timeout = timeout
-
-    async def create(self, refund: models_pb2.Refund) -> models_pb2.Refund:
-        return (
-            await self._refunds.CreateRefund(
-                grpc_pb2.CreateRefundRequest(
-                    refund=refund,
-                ),
-                timeout=self._timeout,
-            )
-        ).refund
 
     async def get(self, refund_id: str) -> models_pb2.Refund:
         response = await errors.handle_grpc_errors(

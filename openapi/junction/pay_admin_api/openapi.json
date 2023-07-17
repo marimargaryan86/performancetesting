@@ -1472,61 +1472,6 @@
         },
         "operationId": "get-refunds",
         "description": "Get refunds"
-      },
-      "post": {
-        "summary": "Create refund",
-        "description": "Create refund",
-        "tags": [
-          "refunds"
-        ],
-        "operationId": "post-refunds",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/vnd.api+json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "data"
-                ],
-                "properties": {
-                  "data": {
-                    "$ref": "#/components/schemas/Refund"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Refund created successfully",
-            "content": {
-              "application/vnd.api+json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "data"
-                  ],
-                  "properties": {
-                    "data": {
-                      "$ref": "#/components/schemas/Refund"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          }
-        }
       }
     },
     "/refunds/{refundId}": {

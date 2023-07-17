@@ -15,6 +15,7 @@ from snowfall.vendor.currency_cloud.client import PaymentClient
 from snowfall.vendor.currency_cloud.models import conversion
 from snowfall.vendor.currency_cloud.models.rate import (
     DetailedRateRequest,
+    DetailedRateResponse,
     FixedSideEnum,
 )
 
@@ -115,9 +116,14 @@ class RefundsService(  # noqa: WPS214
                 ),
             )
 
+        detailed_rate = await self._get_detailed_rate(
+            request.refunded_by_provider,
+            request.refunded_to_reseller,
+        )
+
         refund.refund_position.CopyFrom(  # type: ignore[union-attr]
             await self._get_refund_position(
-                request.refunded_by_provider,
+                detailed_rate,
                 request.refunded_to_reseller,
                 transaction.amounts.sales_margin,
                 transaction.amounts.fx_margin,
@@ -138,12 +144,18 @@ class RefundsService(  # noqa: WPS214
 
         refund.status = models_pb2.Refund.Status.STATUS_EXECUTED  # type: ignore[union-attr]
         refund.conversion_id = cc_conversion.identifier  # type: ignore[union-attr]
+        refund.refunded_us_in_payer_currency.CopyFrom(  # type: ignore[union-attr]
+            money.from_string(
+                detailed_rate.client_buy_amount,
+                money.Currency(detailed_rate.client_buy_currency),
+            ).protobuf(),
+        )
 
         await self._refunds.update(refund)  # type: ignore[arg-type]
 
         return grpc_pb2.UpdateRefundResponse(refund=refund)
 
-    async def CalculateRefundPosition(  # type: ignore[override] # noqa: N802
+    async def CalculateRefundPosition(  # type: ignore[override] # noqa: N802, WPS217
         self,
         request: grpc_pb2.CalculateRefundPositionRequest,
         context: grpc.aio.ServicerContext,
@@ -162,8 +174,13 @@ class RefundsService(  # noqa: WPS214
                 ),
             )
 
-        refund_position = await self._get_refund_position(
+        detailed_rate = await self._get_detailed_rate(
             request.refunded_by_provider,
+            request.refunded_to_reseller,
+        )
+
+        refund_position = await self._get_refund_position(
+            detailed_rate,
             request.refunded_to_reseller,
             transaction.amounts.sales_margin,
             transaction.amounts.fx_margin,
@@ -174,27 +191,18 @@ class RefundsService(  # noqa: WPS214
 
     async def _get_refund_position(  # noqa: WPS211
         self,
-        refunded_by_provider: money_pb2.Money,
+        detailed_rate: DetailedRateResponse,
         refunded_to_reseller: money_pb2.Money,
         sales_margin: money_pb2.Money,
         fx_margin: money_pb2.Money,
         processing_margin: money_pb2.Money,
     ) -> money_pb2.Money:
-        detailed_rate_response = await self._payment_client.get_detailed_rates(
-            DetailedRateRequest(
-                sell_currency=refunded_by_provider.currency_code,
-                buy_currency=refunded_to_reseller.currency_code,
-                fixed_side=FixedSideEnum.sell,
-                amount=str(money.from_protobuf(refunded_by_provider)),
-            ),
-        )
-
         calculated_amount = (
             money.total(
                 [
                     money.from_string(
-                        detailed_rate_response.client_buy_amount,
-                        money.Currency(refunded_to_reseller.currency_code),
+                        detailed_rate.client_buy_amount,
+                        money.Currency(detailed_rate.client_buy_currency),
                     ),
                     money.from_protobuf(sales_margin),
                     money.from_protobuf(fx_margin),
@@ -206,5 +214,19 @@ class RefundsService(  # noqa: WPS214
 
         return money.Money(
             calculated_amount,
-            money.Currency(refunded_to_reseller.currency_code),
+            money.Currency(detailed_rate.client_buy_currency),
         ).protobuf()
+
+    async def _get_detailed_rate(  # noqa: WPS211
+        self,
+        refunded_by_provider: money_pb2.Money,
+        refunded_to_reseller: money_pb2.Money,
+    ) -> DetailedRateResponse:
+        return await self._payment_client.get_detailed_rates(
+            DetailedRateRequest(
+                sell_currency=refunded_by_provider.currency_code,
+                buy_currency=refunded_to_reseller.currency_code,
+                fixed_side=FixedSideEnum.sell,
+                amount=str(money.from_protobuf(refunded_by_provider)),
+            ),
+        )
