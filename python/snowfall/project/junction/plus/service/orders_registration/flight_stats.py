@@ -13,6 +13,7 @@ class Client(abc.ABC):
     async def create_monitoring_rule(
         self,
         booking: models_pb2.Booking,
+        monitoring_rule_id: str,
     ) -> dict[str, Any]:
         """Set flight alert on flightstats-api."""
 
@@ -26,6 +27,7 @@ class DictClient(Client):
     async def create_monitoring_rule(
         self,
         booking: models_pb2.Booking,
+        monitoring_rule_id: str,
     ) -> dict[str, Any]:
         return {}
 
@@ -58,6 +60,7 @@ class FlightStatsClient(Client):
     async def create_monitoring_rule(
         self,
         booking: models_pb2.Booking,
+        monitoring_rule_id: str,
     ) -> dict[str, Any]:
         air_booking = booking.value
         departure_at_datetime = protobuf.protobuf_to_datetime(air_booking.departure_at)
@@ -85,6 +88,7 @@ class FlightStatsClient(Client):
             "deliverTo": self._webhook_url,
             "type": "JSON",
             "extendedOptions": "useHttpErrors",
+            "_resource_id": monitoring_rule_id,
         }
         return await self._make_request(
             method="GET",

@@ -105,3 +105,10 @@ enum Channel {
   CHANNEL_EMAIL = 1;
   CHANNEL_WHATSAPP = 2;
 }
+
+message MonitoringRule {
+  string id = 1;
+  string ext_rule_id = 2;
+  Booking booking = 3;
+  repeated string subscriber_ids = 4;
+}

@@ -1,7 +1,10 @@
 import httpx
 import pydantic
 
-from snowfall.project.junction.plus.adapter import orders
+from snowfall.project.junction.plus.adapter import (
+    monitoring_rules,
+    orders,
+)
 from snowfall.project.junction.plus.service.notifications.v1alpha import (
     grpc_pb2_grpc as notifications_pb2_grpc,
 )
@@ -34,7 +37,7 @@ async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
 
     logging.register(http_client)
     metrics.register(http_client)
-
+    notifications_channel = create_channel(app.settings.notifications_address)
     order_importer = importer.OrderImporter(
         consumer_obj=consumer.Consumer(
             connection=connection,
@@ -46,8 +49,11 @@ async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
             exchange=types.Exchange(name="plus_events"),
         ),
         orders=orders.GrpcClient(
-            orders=notifications_pb2_grpc.OrderServiceStub(
-                create_channel(app.settings.notifications_address),
+            orders=notifications_pb2_grpc.OrderServiceStub(notifications_channel),
+        ),
+        monitoring_rules=monitoring_rules.GrpcClient(
+            monitoring_rules=notifications_pb2_grpc.MonitoringRuleServiceStub(
+                notifications_channel,
             ),
         ),
         flight_stats_client=flight_stats.FlightStatsClient(

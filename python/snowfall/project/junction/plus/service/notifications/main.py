@@ -7,11 +7,13 @@ from motor import motor_asyncio
 
 from snowfall.project.junction.plus.service.notifications.grpc import (
     ConfigurationVectorService,
+    MonitoringRuleService,
     OrderService,
     SubscriberService,
 )
 from snowfall.project.junction.plus.service.notifications.notifications import (
     ConfigurationVectorRepository,
+    MonitoringRuleRepository,
     OrderRepository,
     SubscriberRepository,
 )
@@ -44,6 +46,9 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
             ),
             SubscriberService(
                 subscribers=SubscriberRepository(mongo.plus.subscribers),
+            ),
+            MonitoringRuleService(
+                monitoring_rules=MonitoringRuleRepository(mongo.plus.monitoring_rules),
             ),
         ],
     )

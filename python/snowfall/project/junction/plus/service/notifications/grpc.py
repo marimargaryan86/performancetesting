@@ -2,6 +2,7 @@ from grpc import StatusCode, aio
 
 from snowfall.project.junction.plus.service.notifications.notifications import (
     ConfigurationVectorRepository,
+    MonitoringRuleRepository,
     OrderRepository,
     SubscriberRepository,
 )
@@ -123,4 +124,58 @@ class ConfigurationVectorService(
 
         return notifications_pb2.GetConfigurationVectorResponse(
             configuration_vector=configuration_vector,
+        )
+
+
+class MonitoringRuleService(
+    service.Service,
+    notifications_pb2_grpc.MonitoringRuleServiceServicer,
+):
+    def __init__(
+        self,
+        monitoring_rules: MonitoringRuleRepository,
+    ):
+        self._monitoring_rules = monitoring_rules
+
+    def get_name(self) -> str:
+        return notifications_pb2.DESCRIPTOR.services_by_name[
+            "MonitoringRuleService"
+        ].full_name
+
+    def register(self, server: aio.Server) -> None:
+        notifications_pb2_grpc.add_MonitoringRuleServiceServicer_to_server(
+            self,
+            server,
+        )
+
+    async def GetMonitoringRule(  # type: ignore[override] # noqa: N802
+        self,
+        request: notifications_pb2.GetMonitoringRuleRequest,
+        context: aio.ServicerContext,
+    ) -> notifications_pb2.GetMonitoringRuleResponse:
+        monitoring_rule = await self._monitoring_rules.find_by_booking(request.booking)
+        if not monitoring_rule:
+            await context.abort(StatusCode.NOT_FOUND)
+        return notifications_pb2.GetMonitoringRuleResponse(
+            monitoring_rule=monitoring_rule,
+        )
+
+    async def CreateMonitoringRule(  # type: ignore[override] # noqa: N802
+        self,
+        request: notifications_pb2.CreateMonitoringRuleRequest,
+        context: aio.ServicerContext,
+    ) -> notifications_pb2.CreateMonitoringRuleResponse:
+        await self._monitoring_rules.insert(request.monitoring_rule)
+        return notifications_pb2.CreateMonitoringRuleResponse(
+            monitoring_rule=request.monitoring_rule,
+        )
+
+    async def UpdateMonitoringRule(  # type: ignore[override] # noqa: N802
+        self,
+        request: notifications_pb2.UpdateMonitoringRuleRequest,
+        context: aio.ServicerContext,
+    ) -> notifications_pb2.UpdateMonitoringRuleResponse:
+        update_status = await self._monitoring_rules.upsert(request.monitoring_rule)
+        return notifications_pb2.UpdateMonitoringRuleResponse(
+            is_success=update_status,
         )

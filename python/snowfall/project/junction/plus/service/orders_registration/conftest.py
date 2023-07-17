@@ -3,7 +3,12 @@ from unittest import mock
 
 import pytest
 
-from snowfall.project.junction.plus.adapter import orders as orders_adapter
+from snowfall.project.junction.plus.adapter import (
+    monitoring_rules as monitoring_rules_adapter,
+)
+from snowfall.project.junction.plus.adapter import (
+    orders as orders_adapter,
+)
 from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
 from snowfall.project.junction.plus.service.orders_registration import flight_stats
 from snowfall.project.junction.plus.service.orders_registration.importer import (
@@ -32,6 +37,11 @@ def producer() -> mock.AsyncMock:
 @pytest.fixture()
 def orders_client() -> orders_adapter.Client:
     return orders_adapter.DictClient([])
+
+
+@pytest.fixture()
+def monitoring_rules_client() -> monitoring_rules_adapter.Client:
+    return monitoring_rules_adapter.DictClient([])
 
 
 @pytest.fixture()
@@ -113,11 +123,13 @@ def order_importer(
     consumer: mock.AsyncMock,
     producer: mock.AsyncMock,
     orders_client: orders_adapter.Client,
+    monitoring_rules_client: monitoring_rules_adapter.Client,
     flight_stats_client: flight_stats.Client,
 ) -> OrderImporter:
     return OrderImporter(
         consumer,
         producer,
         orders_client,
+        monitoring_rules_client,
         flight_stats_client,
     )

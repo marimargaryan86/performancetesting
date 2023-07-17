@@ -18,6 +18,12 @@ service ConfigurationVectorService {
   rpc GetConfigurationVector(GetConfigurationVectorRequest) returns (GetConfigurationVectorResponse) {}
 }
 
+service MonitoringRuleService {
+  rpc GetMonitoringRule(GetMonitoringRuleRequest) returns (GetMonitoringRuleResponse) {}
+  rpc CreateMonitoringRule(CreateMonitoringRuleRequest) returns (CreateMonitoringRuleResponse) {}
+  rpc UpdateMonitoringRule(UpdateMonitoringRuleRequest) returns (UpdateMonitoringRuleResponse) {}
+}
+
 message CreateOrderRequest {
   string reseller_id = 1;
   string external_ref_id = 2;
@@ -45,4 +51,23 @@ message GetConfigurationVectorRequest {
 
 message GetConfigurationVectorResponse {
   snowfall.project.junction.plus.service.notifications.v1alpha.ConfigurationVector configuration_vector = 1;
+}
+
+message GetMonitoringRuleRequest {
+  snowfall.project.junction.plus.service.notifications.v1alpha.Booking booking = 1;
+}
+message GetMonitoringRuleResponse {
+  snowfall.project.junction.plus.service.notifications.v1alpha.MonitoringRule monitoring_rule = 1;
+}
+message CreateMonitoringRuleRequest {
+  snowfall.project.junction.plus.service.notifications.v1alpha.MonitoringRule monitoring_rule = 1;
+}
+message CreateMonitoringRuleResponse {
+  snowfall.project.junction.plus.service.notifications.v1alpha.MonitoringRule monitoring_rule = 1;
+}
+message UpdateMonitoringRuleRequest {
+  snowfall.project.junction.plus.service.notifications.v1alpha.MonitoringRule monitoring_rule = 1;
+}
+message UpdateMonitoringRuleResponse {
+  bool is_success = 1;
 }

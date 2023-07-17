@@ -4,6 +4,7 @@ import pymongo
 
 from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
 from snowfall.stdlib import string
+from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence.mongo import mixins, repository
 
 
@@ -99,3 +100,34 @@ class ConfigurationVectorRepository(
 ):
     _proto = models_pb2.ConfigurationVector
     _indexes = (pymongo.IndexModel("reseller_id", background=True),)
+
+
+class MonitoringRuleRepository(
+    mixins.InsertMixin[models_pb2.MonitoringRule],
+    mixins.UpsertMixin[models_pb2.MonitoringRule],
+    repository.ProtoRepository[models_pb2.MonitoringRule],
+):
+    _proto = models_pb2.MonitoringRule
+    _indexes = (
+        pymongo.IndexModel("booking.value.route_identifier", background=True),
+        pymongo.IndexModel("booking.value.departure_at", background=True),
+    )
+
+    async def find_by_booking(
+        self,
+        booking: models_pb2.Booking,
+    ) -> models_pb2.MonitoringRule | None:
+        return await self._execute(
+            self._collection.find_one,
+            {
+                "booking.value.route_identifier.carrier": (
+                    booking.value.route_identifier.carrier
+                ),
+                "booking.value.route_identifier.flight_number": (
+                    booking.value.route_identifier.flight_number
+                ),
+                "booking.value.departure_at": protobuf.protobuf_to_datetime(
+                    booking.value.departure_at,
+                ),
+            },
+        )
