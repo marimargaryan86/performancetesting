@@ -4,7 +4,7 @@ shopt -s nullglob
 
 ALLURE_PROJECT_ID=${1}
 ALLURE_SERVER="https://allureapi.junction.dev/allure-docker-service"
-allure_dir="/allure-integration-report/"
+allure_dir="/tmp/allure-integration-report"
 
 LOGIN_STRING='{"username": "'"$ALLURE_USERNAME"'", "password": "'"$ALLURE_PASSWORD"'"}'
 # login
