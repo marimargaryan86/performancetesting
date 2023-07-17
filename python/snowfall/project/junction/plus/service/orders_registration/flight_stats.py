@@ -70,8 +70,8 @@ class FlightStatsClient(Client):
             + "{0}/{1}/from/{2}/to/{3}/departing/{4}/{5}/{6}".format(
                 air_booking.route_identifier.carrier,
                 air_booking.route_identifier.flight_number,
-                air_booking.destination_iata,
                 air_booking.origin_iata,
+                air_booking.destination_iata,
                 departure_at_datetime.year,
                 departure_at_datetime.month,
                 departure_at_datetime.day,
