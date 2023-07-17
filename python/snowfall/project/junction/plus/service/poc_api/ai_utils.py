@@ -136,7 +136,7 @@ class AIBot(object):
             return_message = "irrelevant prompt"
         else:
             message_history.append(assistant_message)
-            return_message = json.dumps(assistant_message["content"])
+            return_message = assistant_message["content"]
             await redis_client.put(
                 "ai_message_history:{0}".format(mobile_phone),
                 json.dumps(message_history),
