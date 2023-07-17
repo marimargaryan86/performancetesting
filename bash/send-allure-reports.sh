@@ -19,7 +19,7 @@ CRSF_ACCESS_TOKEN_VALUE=$(grep <cookiesFile -o 'csrf_access_token.*' | cut -f2)
 counter=1
 amount=$(find ${allure_dir}* -prune -print | wc -l)
 for file in "${allure_dir}"*; do
-	etext=$(base64 -w 0 "${file}")
+	etext=$(base64 "${file}")
 	all_data+="{\"file_name\": \"${file##*/}\", \"content_base64\": \"$etext\"}"
 	# Add a comma unless it is the last element in the array
 	if [ $counter -lt "$amount" ]; then
