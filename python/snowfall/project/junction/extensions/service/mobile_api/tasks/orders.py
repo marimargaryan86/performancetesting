@@ -14,7 +14,6 @@ from snowfall.project.junction.extensions.service.mobile_api import (
     resources,
     smtp,
 )
-from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence import filesystem
 from snowfall.vendor.junction.go import client
 
@@ -27,7 +26,6 @@ _SUCCESS_STATUSES = frozenset(
         resources.OrderStatus.not_ticketed.value,
     ),
 )
-_LOGGER = stdout.get_logger()
 
 
 async def _handle_new_order_results(  # noqa: WPS211
@@ -41,9 +39,7 @@ async def _handle_new_order_results(  # noqa: WPS211
     booking_statuses = {booking["status"]["id"] for booking in order["bookings"]}
     if booking_statuses and not booking_statuses.difference(_SUCCESS_STATUSES):
         await payments.capture(payment_intent_id)
-        _LOGGER.info("Going to send booking confirmation", order_id=order_id)
         await send_booking_confirmation(order, smtp_client)
-        _LOGGER.info("Gone past sending booking confirmation", order_id=order_id)
         await plus_http_client.register_order(order_id)
         return True
 

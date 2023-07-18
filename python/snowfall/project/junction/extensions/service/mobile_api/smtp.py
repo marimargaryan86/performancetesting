@@ -5,8 +5,6 @@ from email.mime.text import MIMEText
 
 import aiosmtplib
 
-from snowfall.stdlib.logging import stdout
-
 
 @dataclasses.dataclass(frozen=True)
 class Attachment(object):
@@ -21,7 +19,6 @@ class EmailClient(object):
         self._smtp = client
         self.client_name = client_name
         self.support_email = support_email
-        self._logger = stdout.get_logger()
 
     async def send_email_notification(
         self,
@@ -60,9 +57,4 @@ class EmailClient(object):
         email.attach(MIMEText(body, "html", "utf-8"))
 
         async with self._smtp:
-            send_message_resp = await self._smtp.send_message(email)
-            self._logger.info(
-                "Got response for sending message",
-                response=send_message_resp,
-                recipient=mail_to,
-            )
+            await self._smtp.send_message(email)
