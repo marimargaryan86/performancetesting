@@ -106,6 +106,38 @@ class TestOfferOptions(object):
             ),
         )
 
+    async def test_offer_options_price_breakdown(  # noqa: WPS218
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        response = await client.get(
+            "/offers/options/{id}".format(id=fixtures.PROVIDER_OFFERS[0]),
+        )
+
+        price_breakdown = response.json()["data"]["attributes"]["priceBreakdown"]
+        assert len(price_breakdown) == 2
+
+        base_fare = price_breakdown[0]
+        assert base_fare["price"]["amount"] == "3.37"
+        assert base_fare["price"]["currency"] == "SEK"
+        assert base_fare["breakdownType"] == "base-fare"
+
+        tax = price_breakdown[1]
+        assert tax["price"]["amount"] == "10.00"
+        assert tax["price"]["currency"] == "SEK"
+        assert tax["breakdownType"] == "tax"
+
+    async def test_offer_options_no_price_breakdown(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        response = await client.get(
+            "/offers/options/{id}".format(id=fixtures.PROVIDER_OFFERS[1]),
+        )
+
+        price_breakdown = response.json()["data"]["attributes"]["priceBreakdown"]
+        assert not price_breakdown
+
 
 class TestOfferOptionDetails(object):
     async def test_unknown_offer_option_details_returns_not_found(

@@ -300,6 +300,10 @@ class OfferOptionResource(models.Resource):
             type=OfferOptionResource.api_type,
             attributes={
                 "price": Price.from_proto(option.price),
+                "priceBreakdown": [
+                    PriceBreakdown.from_proto(price_breakdown)
+                    for price_breakdown in option.price_breakdown
+                ],
                 "brandName": option.brand_name,
                 "baggageAllowances": [
                     BaggageAllowance.from_proto(baggage)
@@ -470,6 +474,19 @@ class OfferSegmentDetails(models.BaseModel):
 class PriceBreakdown(models.BaseModel):
     price: Price
     breakdown_type: str = pydantic.Field(alias="breakdownType")
+
+    @classmethod
+    def from_proto(
+        cls,
+        price_breakdown: offer_models_pb2.PriceBreakdown,
+    ) -> PriceBreakdown:
+        return cls(
+            price=Price.from_proto(price_breakdown.price),
+            breakdownType=protobuf.enum_value_to_slug(
+                enum_descriptor=offer_models_pb2.PriceBreakdown.BreakdownType.DESCRIPTOR,
+                enum_value=price_breakdown.breakdown_type,
+            ),
+        )
 
     @classmethod
     def from_protos(
