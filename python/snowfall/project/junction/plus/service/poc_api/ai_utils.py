@@ -7,7 +7,7 @@ import httpx
 import json_api_doc
 import openai
 from dateutil import parser, tz
-from starlette import status
+from starlette import exceptions, status
 from starlette.background import BackgroundTask
 
 from snowfall.project.junction.plus.service.poc_api import airlines, twilio
@@ -31,7 +31,7 @@ class AIBot(object):
         When you are able to complete the data structure, suggest the usage of a function
 
         If the user prompts are completely irrelevant with that scope, respond with the following message "irrelevant prompt"
-        """
+    """
     functions: ClassVar[Any] = [
         {
             "name": "fetch_trip_offers",
@@ -245,6 +245,15 @@ async def fetch_trip_offers(  # noqa: WPS211,WPS217,WPS210
     offer_group = offers[0]["groups"][0]
     offer_group_details = offer_group["details"][0]
     offer_group_options = offer_group["options"]
+    try:
+        short_link = await shorten_link(
+            origin,
+            destination,
+            departure_at,
+            num_of_travelers,
+        )
+    except exceptions.HTTPException:
+        short_link = "phoenix.junction.dev/"
     twilio_client.send_message(
         body=(
             "Operator: {0}\n".format(
@@ -267,6 +276,35 @@ async def fetch_trip_offers(  # noqa: WPS211,WPS217,WPS210
                     for option in offer_group_options
                 ],
             )
+            + "\nBook it here: {0}".format(short_link)
         ),
         receiver=receiver_mobile,
     )
+
+
+async def shorten_link(
+    origin: str,
+    destination: str,
+    date: str,
+    num_of_passengers: int,
+) -> str:
+    original_link = "https://phoenix.junction.dev/book?type=oneway&adults={0}&children=0&infants=0&originId={1}&destinationId={2}&departureDate={3}".format(
+        num_of_passengers,
+        origin,
+        destination,
+        date,
+    )
+    async with httpx.AsyncClient() as link_client:
+        response = await link_client.post(
+            "https://api.short.io/links",
+            headers={
+                "accept": "application/json",
+                "content-type": "application/json",
+                "Authorization": "sk_NVVkt7ci4TIVmxOp",
+            },
+            json={
+                "domain": "ahm0.short.gy",
+                "originalURL": original_link,
+            },
+        )
+        return response.json()["shortURL"]
