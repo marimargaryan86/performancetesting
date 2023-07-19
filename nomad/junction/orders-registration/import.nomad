@@ -100,8 +100,8 @@ job "orders-registration-import" {
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 NOTIFICATIONS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_notifications-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/plus-flight-stats" }}
-FLIGHT_STATS_APP_ID={{ .Data.data.app_id }}
-FLIGHT_STATS_APP_KEY={{ .Data.data.app_key }}
+FLIGHT_STATS_APP_ID={{ .Data.data.flight_stats_app_id }}
+FLIGHT_STATS_APP_KEY={{ .Data.data.flight_stats_app_key }}
 {{ end }}
 EOH
         destination = "services.env"
