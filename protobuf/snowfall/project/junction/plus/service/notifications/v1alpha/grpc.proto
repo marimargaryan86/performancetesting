@@ -20,6 +20,7 @@ service ConfigurationVectorService {
 
 service MonitoringRuleService {
   rpc GetMonitoringRule(GetMonitoringRuleRequest) returns (GetMonitoringRuleResponse) {}
+  rpc GetMonitoringRuleByBooking(GetMonitoringRuleByBookingRequest) returns (GetMonitoringRuleByBookingResponse) {}
   rpc CreateMonitoringRule(CreateMonitoringRuleRequest) returns (CreateMonitoringRuleResponse) {}
   rpc UpdateMonitoringRule(UpdateMonitoringRuleRequest) returns (UpdateMonitoringRuleResponse) {}
 }
@@ -54,9 +55,16 @@ message GetConfigurationVectorResponse {
 }
 
 message GetMonitoringRuleRequest {
-  snowfall.project.junction.plus.service.notifications.v1alpha.Booking booking = 1;
+  string monitoring_rule_id = 1;
 }
 message GetMonitoringRuleResponse {
+  snowfall.project.junction.plus.service.notifications.v1alpha.MonitoringRule monitoring_rule = 1;
+}
+
+message GetMonitoringRuleByBookingRequest {
+  snowfall.project.junction.plus.service.notifications.v1alpha.Booking booking = 1;
+}
+message GetMonitoringRuleByBookingResponse {
   snowfall.project.junction.plus.service.notifications.v1alpha.MonitoringRule monitoring_rule = 1;
 }
 message CreateMonitoringRuleRequest {

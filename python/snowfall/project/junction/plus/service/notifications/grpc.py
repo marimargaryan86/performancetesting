@@ -153,10 +153,25 @@ class MonitoringRuleService(
         request: notifications_pb2.GetMonitoringRuleRequest,
         context: aio.ServicerContext,
     ) -> notifications_pb2.GetMonitoringRuleResponse:
+        monitoring_rule = await self._monitoring_rules.find_by_id(
+            request.monitoring_rule_id,
+        )
+        if monitoring_rule is None:
+            await context.abort(StatusCode.NOT_FOUND)
+
+        return notifications_pb2.GetMonitoringRuleResponse(
+            monitoring_rule=monitoring_rule,
+        )
+
+    async def GetMonitoringRuleByBooking(  # type: ignore[override] # noqa: N802
+        self,
+        request: notifications_pb2.GetMonitoringRuleByBookingRequest,
+        context: aio.ServicerContext,
+    ) -> notifications_pb2.GetMonitoringRuleByBookingResponse:
         monitoring_rule = await self._monitoring_rules.find_by_booking(request.booking)
         if not monitoring_rule:
             await context.abort(StatusCode.NOT_FOUND)
-        return notifications_pb2.GetMonitoringRuleResponse(
+        return notifications_pb2.GetMonitoringRuleByBookingResponse(
             monitoring_rule=monitoring_rule,
         )
 

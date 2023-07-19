@@ -102,7 +102,8 @@ class ConfigurationVectorRepository(
     _indexes = (pymongo.IndexModel("reseller_id", background=True),)
 
 
-class MonitoringRuleRepository(
+class MonitoringRuleRepository(  # noqa: WPS215
+    mixins.FindByIdMixin[models_pb2.MonitoringRule],
     mixins.InsertMixin[models_pb2.MonitoringRule],
     mixins.UpsertMixin[models_pb2.MonitoringRule],
     repository.ProtoRepository[models_pb2.MonitoringRule],

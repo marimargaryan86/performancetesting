@@ -5,6 +5,12 @@ import pytest
 from starlette import applications
 from starlette.middleware import Middleware
 
+from snowfall.project.junction.plus.adapter import (
+    monitoring_rules as monitoring_rules_adapter,
+)
+from snowfall.project.junction.plus.service.notifications.v1alpha import (
+    models_pb2 as notifications_models_pb2,
+)
 from snowfall.project.junction.plus.service.plus_webhooks import (
     bootstrap,
     middlewares,
@@ -32,7 +38,21 @@ def cirium_flex_alert_hash(cirium_flex_alert_key: str, secret_key: str) -> str:
 
 
 @pytest.fixture()
-def app(secret_key: str) -> applications.Starlette:
+def monitoring_rules_client() -> monitoring_rules_adapter.Client:
+    return monitoring_rules_adapter.DictClient(
+        [
+            notifications_models_pb2.MonitoringRule(
+                id="monitoring_rule_1",
+            ),
+        ],
+    )
+
+
+@pytest.fixture()
+def app(
+    secret_key: str,
+    monitoring_rules_client: monitoring_rules_adapter.Client,
+) -> applications.Starlette:
     return application.create_starlette_app(
         custom_middlewares=[
             Middleware(
@@ -41,7 +61,9 @@ def app(secret_key: str) -> applications.Starlette:
             ),
         ],
         routes=router.get_routes(
-            bootstrap.create_dependencies(),
+            bootstrap.create_dependencies(
+                monitoring_rules_client=monitoring_rules_client,
+            ),
         ),
         openapi_path=None,
     )

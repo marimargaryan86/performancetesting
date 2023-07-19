@@ -79,7 +79,7 @@ class OrderImporter(object):
         await self.publish_event(persisted_order)
         for booking in persisted_order.bookings:
             try:
-                existing_rule = await self._monitoring_rules.get(booking)
+                existing_rule = await self._monitoring_rules.get_by_booking(booking)
             except errors_adapter.NotFoundError:
                 monitoring_rule_id = string.uuid()
                 rule = await self._flight_stats_client.create_monitoring_rule(

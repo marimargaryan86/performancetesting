@@ -17,9 +17,16 @@ class Client(abc.ABC):
     @abc.abstractmethod
     async def get(
         self,
+        identifier: str,
+    ) -> notifications_models_pb2.MonitoringRule:
+        """Get Monitoring Rule By ID."""
+
+    @abc.abstractmethod
+    async def get_by_booking(
+        self,
         booking: notifications_models_pb2.Booking,
     ) -> notifications_models_pb2.MonitoringRule:
-        """Get Monitoring Rule."""
+        """Get Monitoring Rule By Booking."""
 
     @abc.abstractmethod
     async def create(
@@ -41,16 +48,30 @@ class DictClient(Client):
         self,
         monitoring_rules: Sequence[notifications_models_pb2.MonitoringRule],
     ) -> None:
-        self._monitoring_rules = {
+        self._monitoring_rules_id = {
+            monitoring_rule.id: monitoring_rule for monitoring_rule in monitoring_rules
+        }
+        self._monitoring_rules_booking = {
             monitoring_rule.booking.value.id: monitoring_rule
             for monitoring_rule in monitoring_rules
         }
 
     async def get(
         self,
+        identifier: str,
+    ) -> notifications_models_pb2.MonitoringRule:
+        monitoring_rule = self._monitoring_rules_id.get(identifier)
+
+        if not monitoring_rule:
+            raise errors.NotFoundError()
+
+        return monitoring_rule
+
+    async def get_by_booking(
+        self,
         booking: notifications_models_pb2.Booking,
     ) -> notifications_models_pb2.MonitoringRule:
-        monitoring_rule = self._monitoring_rules.get(
+        monitoring_rule = self._monitoring_rules_booking.get(
             booking.value.id,
         )
 
@@ -63,14 +84,20 @@ class DictClient(Client):
         self,
         monitoring_rule: notifications_models_pb2.MonitoringRule,
     ) -> notifications_models_pb2.MonitoringRule:
-        self._monitoring_rules[monitoring_rule.booking.value.id] = monitoring_rule
+        self._monitoring_rules_id[monitoring_rule.id] = monitoring_rule
+        self._monitoring_rules_booking[monitoring_rule.booking.value.id] = (
+            monitoring_rule
+        )
         return monitoring_rule
 
     async def update(
         self,
         monitoring_rule: notifications_models_pb2.MonitoringRule,
     ) -> None:
-        self._monitoring_rules[monitoring_rule.booking.value.id] = monitoring_rule
+        self._monitoring_rules_id[monitoring_rule.id] = monitoring_rule
+        self._monitoring_rules_booking[monitoring_rule.booking.value.id] = (
+            monitoring_rule
+        )
 
 
 class GrpcClient(Client):
@@ -84,11 +111,30 @@ class GrpcClient(Client):
 
     async def get(
         self,
-        booking: notifications_models_pb2.Booking,
+        identifier: str,
     ) -> notifications_models_pb2.MonitoringRule:
-        request = notifications_grpc_pb2.GetMonitoringRuleRequest(booking=booking)
+        request = notifications_grpc_pb2.GetMonitoringRuleRequest(
+            monitoring_rule_id=identifier,
+        )
+
         response = await errors.handle_grpc_errors(
             self._monitoring_rules.GetMonitoringRule(
+                request,
+                timeout=self._timeout,
+            ),
+        )
+
+        return response.monitoring_rule
+
+    async def get_by_booking(
+        self,
+        booking: notifications_models_pb2.Booking,
+    ) -> notifications_models_pb2.MonitoringRule:
+        request = notifications_grpc_pb2.GetMonitoringRuleByBookingRequest(
+            booking=booking,
+        )
+        response = await errors.handle_grpc_errors(
+            self._monitoring_rules.GetMonitoringRuleByBooking(
                 request,
                 timeout=self._timeout,
             ),

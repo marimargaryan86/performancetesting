@@ -3,6 +3,10 @@ from collections.abc import Callable
 from starlette.applications import Starlette
 from starlette.middleware import Middleware
 
+from snowfall.project.junction.plus.adapter import monitoring_rules
+from snowfall.project.junction.plus.service.notifications.v1alpha import (
+    grpc_pb2_grpc as notifications_pb2_grpc,
+)
 from snowfall.project.junction.plus.service.plus_webhooks import (
     bootstrap,
     middlewares,
@@ -10,6 +14,7 @@ from snowfall.project.junction.plus.service.plus_webhooks import (
 from snowfall.project.junction.plus.service.plus_webhooks.routes import router
 from snowfall.stdlib import service
 from snowfall.stdlib.integration.starlette import application
+from snowfall.stdlib.transport.grpc.client import create_channel
 
 
 def _factory(
@@ -18,7 +23,13 @@ def _factory(
     def decorator() -> Starlette:
         return application.create_starlette_app(
             router.get_routes(
-                bootstrap.create_dependencies(),
+                bootstrap.create_dependencies(
+                    monitoring_rules_client=monitoring_rules.GrpcClient(
+                        monitoring_rules=notifications_pb2_grpc.MonitoringRuleServiceStub(
+                            create_channel(app.settings.notifications_address),
+                        ),
+                    ),
+                ),
             ),
             custom_middlewares=[
                 Middleware(

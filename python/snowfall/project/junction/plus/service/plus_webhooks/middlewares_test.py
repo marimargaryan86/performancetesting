@@ -27,7 +27,20 @@ class TestCustomHeaderMiddleware(object):
     ) -> None:
         response = await client.post(
             "/webhooks/alerts",
-            json={},
+            json={
+                "alert": {
+                    "rule": {
+                        "nameValues": {
+                            "nameValue": [
+                                {
+                                    "name": "resource_id",
+                                    "value": "monitoring_rule_1",
+                                },
+                            ],
+                        },
+                    },
+                },
+            },
             headers={
                 "Cirium-Flex-Alert-Key": cirium_flex_alert_key,
                 "Cirium-Flex-Alert-Hash": cirium_flex_alert_hash,

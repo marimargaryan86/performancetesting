@@ -93,6 +93,17 @@ job "plus-webhooks-http" {
       port = "prometheus"
       tags = ["metrics"]
 
+      connect {
+        sidecar_service {
+          proxy {
+            upstreams {
+              local_bind_port  = 8010
+              destination_name = "notifications-${var.environment}"
+            }
+          }
+        }
+      }
+
       check {
         type     = "http"
         path     = "/"
@@ -112,6 +123,7 @@ job "plus-webhooks-http" {
         env         = true
         change_mode = "restart"
         data        = <<EOH
+NOTIFICATIONS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_notifications-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/plus-webhooks" }}
 FLIGHT_STATS_APP_KEY={{ .Data.data.flight_stats_app_key }}
 {{ end }}
