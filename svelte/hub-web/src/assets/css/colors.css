@@ -39,6 +39,7 @@
   --color-main-primary-700: #317665;
   --color-main-primary-800: #24574a;
   --color-main-primary-900: #17372f;
+  --color-primary-50: #d2ede6;
 
   /* Semantic */
   --color-semantic-warning-50: #fefbf3;
@@ -54,5 +55,5 @@
 
   /* Gradients */
   --color-gradient-extensions-horizontal: linear-gradient(270deg, #d2ede6 0%, #edf8f5 100%);
-  --color-gradient-booking-flow: linear-gradient(180deg, #4ab69c 0%, #d3eee9 100%);
+  --color-gradient-booking-flow: linear-gradient(180deg, #9ad7c8 0%, #d3eee9 100%);
 }

@@ -3,6 +3,7 @@
 
   export let value: string | null = null;
   export let direction: string;
+  export let firstStep = false;
 
   function handleChange(event): void {
     value = event.target.value;
@@ -14,16 +15,33 @@
 </script>
 
 <div class="input-wrapper">
-  <label for={direction}>{direction} <span class="required-fields">*</span></label>
-  <input id={direction} type="text" placeholder="City or Station" {value} on:input={handleChange} />
+  <label for={direction} class={firstStep ? "" : "typography body-small"}
+    >{direction} <span class="required-fields">{firstStep ? "*" : ""}</span></label
+  >
+  <input
+    id={direction}
+    class={firstStep ? "first-step-input" : ""}
+    type="text"
+    placeholder="City or Station"
+    {value}
+    on:input={handleChange}
+  />
   {#if value}
-    <button type="button" on:click|stopPropagation={clearValue} class="clear">
+    <button
+      type="button"
+      on:click|stopPropagation={clearValue}
+      class="clear {firstStep ? '' : 'not-first-step-clear'}"
+    >
       <RemoveIcon color="var(--color-common-dark-strong)" />
     </button>
   {/if}
 </div>
 
 <style>
+  .required-fields {
+    color: var(--color-main-primary-500);
+  }
+
   .clear {
     position: absolute;
     top: 58%;
@@ -40,6 +58,10 @@
     cursor: pointer;
   }
 
+  .clear.not-first-step-clear {
+    top: 53%;
+  }
+
   .input-wrapper {
     position: relative;
     display: flex;
@@ -53,13 +75,16 @@
   }
 
   .input-wrapper input {
-    height: 52px;
-    padding: 13px 16px;
+    height: 40px;
+    padding: 10px 16px;
     border: 1px solid var(--color-common-line-medium);
     border-radius: 8px;
   }
 
-  .required-fields {
-    color: var(--color-main-primary-500);
+  .input-wrapper .first-step-input {
+    height: 52px;
+    padding: 13px 16px;
+    border: 1px solid var(--color-common-line-medium);
+    border-radius: 8px;
   }
 </style>

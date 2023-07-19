@@ -1,6 +1,11 @@
 export default {
   home: "/",
-  book: "/book",
+  book: {
+    root: "/book",
+    select: {
+      root: "/book/select-offer",
+    },
+  },
   login: "/login",
   settings: "/settings",
   pay: {

@@ -80,7 +80,7 @@
     position: absolute;
     top: calc(100% + 4px);
     left: 0;
-    z-index: 1;
+    z-index: 2;
     width: 100%;
     max-height: 400px;
     overflow-y: auto;

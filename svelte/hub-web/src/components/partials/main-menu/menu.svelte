@@ -40,7 +40,7 @@
     },
     {
       type: "menu-item",
-      url: routeConfig.book,
+      url: routeConfig.book.root,
       label: "Book",
       icon: BookIcon,
     },
