@@ -38,7 +38,7 @@ job "test-automation-mobile-api" {
       template {
         data        = <<EOH
 {{ with secret "kv/data/${var.environment}/api-automation" }}
-SLACK_NOTIFICATION_TOKEN={{ .Data.data.slack_notifcation_token }}
+SLACK_NOTIFICATION_TOKEN={{ .Data.data.slack_notification_token }}
 PIPELINE_GITLAB_TOKEN={{ .Data.data.pipeline_gitlab_token }}
 {{ end }}
 EOH
