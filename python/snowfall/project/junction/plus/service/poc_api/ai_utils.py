@@ -8,9 +8,12 @@ import json_api_doc
 import openai
 from dateutil import parser, tz
 from starlette import exceptions, status
-from starlette.background import BackgroundTask
 
-from snowfall.project.junction.plus.service.poc_api import airlines, twilio
+from snowfall.project.junction.plus.service.poc_api import (
+    airlines,
+    chatbot_utils,
+    twilio,
+)
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.vendor.junction.go import client
@@ -18,19 +21,16 @@ from snowfall.vendor.junction.go import client
 
 class AIBot(object):
     system_setup = """
-        You are a travel planner.
-        Users will prompt you with their trip requests and you will interpret these into the follow data structure:
-        {
-        DepartureLoc: {departureLoc},
-        ArrivalLoc: {ArrivalLoc},
-        DepartureAt: {departureAt},
-        NumTravellers: {numTravellers}
-        }
-
-        If you are missing the information to any of these items. Ask the user for them. You cannot let them blank.
-        When you are able to complete the data structure, suggest the usage of a function
-
-        If the user prompts are completely irrelevant with that scope, respond with the following message "irrelevant prompt"
+        You are an AI travel assistant dedicated to creating personalized travel recommendations.
+Your role is to help users find the best travel options based on their specific interests but also to give suggestions if the user does not give you enough information until you are able to fill out the fetch_trip_offers function parameters.
+Engage in a conversation with the user, who wants assistance in planning a trip and desires recommendations for activities like visiting museums, shopping, enjoying beaches, checking the weather, and finding suitable hotels based on their budget. Provide tailored suggestions, consider preferences, and offer helpful information to ensure a memorable travel experience. Avoid creating links to anything.
+If the user gives you a total budget try to find a prefect holiday or break manageable within that budget.
+Check weather conditions in case the users asks you to find a hot climate or a chilled one.
+If the user is unsure of any given suggestion,  comfort the user with positive messaging.
+The year is 2023
+        If the request from the user is unrelated with travel planning, please respond
+        only with the text with "irrelevant prompt"
+        in your answers, never exceed the 1500 characters
     """
     functions: ClassVar[Any] = [
         {
@@ -74,14 +74,14 @@ class AIBot(object):
     def __init__(self) -> None:
         self._logger = stdout.get_logger()
 
-    async def handle_prompt(  # noqa: WPS211, WPS210
+    async def handle_prompt(  # noqa: WPS211, WPS210, WPS217
         self,
         message: str,
         mobile_phone: str,
         redis_client: redis.Client[str],
         junction_client: client.Client,
         twilio_client: twilio.TwilioClient,
-    ) -> Any:
+    ) -> None:
         cached_message_history = await redis_client.get(
             "ai_message_history:{0}".format(mobile_phone),
         )
@@ -95,6 +95,7 @@ class AIBot(object):
             model="gpt-3.5-turbo",
             messages=message_history,
             functions=self.functions,
+            temperature=0.6,  # noqa: WPS432
         )
         assistant_message = ai_response["choices"][0]["message"].to_dict()
         if assistant_message.get("function_call"):
@@ -110,42 +111,33 @@ class AIBot(object):
                     "departure_at": "2023-07-29",
                     "num_of_travelers": 1,
                 }
-            task = (
-                BackgroundTask(
-                    fetch_trip_offers_wrapper,
-                    arguments["departureLoc"],
-                    arguments["arrivalLoc"],
-                    arguments["departure_at"],
-                    arguments["num_of_travelers"],
-                    junction_client,
-                    twilio_client,
-                    mobile_phone,
-                ),
+            await fetch_trip_offers_wrapper(
+                arguments["departureLoc"],
+                arguments["arrivalLoc"],
+                arguments["departure_at"],
+                arguments["num_of_travelers"],
+                junction_client,
+                twilio_client,
+                mobile_phone,
             )
-            return [
-                (
-                    "Alright, I've got all the necessary information. I will fetch you"
-                    " an offer for that right away."
-                ),
-                task[0],
-            ]
-        if assistant_message["content"] == "irrelevant prompt":
+        elif assistant_message["content"] == "irrelevant prompt":
             await redis_client.delete(
                 "ai_message_history:{0}".format(mobile_phone),
             )
-            return_message = "irrelevant prompt"
+            twilio_client.send_message(
+                body=chatbot_utils.home_message(),
+                receiver=mobile_phone,
+            )
         else:
             message_history.append(assistant_message)
-            return_message = assistant_message["content"]
             await redis_client.put(
                 "ai_message_history:{0}".format(mobile_phone),
                 json.dumps(message_history),
             )
-        self._logger.info(
-            "AI bot response",
-            response=return_message,
-        )
-        return [return_message, None]
+            twilio_client.send_message(
+                body=assistant_message["content"],
+                receiver=mobile_phone,
+            )
 
 
 async def get_place(key: str) -> Any:

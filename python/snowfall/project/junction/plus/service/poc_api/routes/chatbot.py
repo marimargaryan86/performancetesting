@@ -1,6 +1,7 @@
 import json_api_doc
 import lagom
 from starlette import endpoints, requests, responses, status
+from starlette.background import BackgroundTask
 from twilio.twiml.messaging_response import MessagingResponse
 
 from snowfall.project.junction.plus.service.poc_api import (
@@ -36,7 +37,6 @@ class Whatsapp(endpoints.HTTPEndpoint):
         message_from = str(msg["From"])
         message_from_mobile = message_from.split(":")[1]
         twiml_response = MessagingResponse()
-        background_task = None
         if message_body.isdigit():  # noqa: WPS223
             travel_status_sessions = await redis_client.get(
                 "travel_status_sessions:{0}".format(message_from),
@@ -193,18 +193,21 @@ class Whatsapp(endpoints.HTTPEndpoint):
             )
             twiml_response.message("Goodbye")
         else:
-            ai_returns = await ai_bot.handle_prompt(
+            task = BackgroundTask(
+                ai_bot.handle_prompt,
                 message_body,
                 message_from_mobile,
                 redis_client,
                 junction_client,
                 twilio_client,
             )
-            twiml_response.message(ai_returns[0])
-            background_task = ai_returns[1]
+            return responses.Response(
+                status_code=status.HTTP_200_OK,
+                media_type="application/xml",
+                background=task,
+            )
         return responses.Response(
             content=twiml_response.to_xml(),
             status_code=status.HTTP_200_OK,
             media_type="application/xml",
-            background=background_task,
         )
