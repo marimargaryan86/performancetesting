@@ -1,4 +1,4 @@
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from typing import Any
 
 import httpx
@@ -106,7 +106,7 @@ class TestOfferOptions(object):
             ),
         )
 
-    async def test_offer_options_price_breakdown(  # noqa: WPS218
+    async def test_offer_options_price_breakdown(
         self,
         client: httpx.AsyncClient,
     ) -> None:
@@ -115,17 +115,28 @@ class TestOfferOptions(object):
         )
 
         price_breakdown = response.json()["data"]["attributes"]["priceBreakdown"]
-        assert len(price_breakdown) == 2
+        assert len(price_breakdown) == 5
 
-        base_fare = price_breakdown[0]
-        assert base_fare["price"]["amount"] == "3.37"
-        assert base_fare["price"]["currency"] == "SEK"
-        assert base_fare["breakdownType"] == "base-fare"
-
-        tax = price_breakdown[1]
-        assert tax["price"]["amount"] == "10.00"
-        assert tax["price"]["currency"] == "SEK"
-        assert tax["breakdownType"] == "tax"
+        self._assert_price_breakdown(price_breakdown[0], "3.37", "SEK", "base-fare")
+        self._assert_price_breakdown(price_breakdown[1], "7.00", "SEK", "tax")
+        self._assert_price_breakdown(
+            price_breakdown[2],
+            "1.00",
+            "SEK",
+            "reseller-mark-up",
+        )
+        self._assert_price_breakdown(
+            price_breakdown[3],
+            "1.00",
+            "SEK",
+            "company-mark-up",
+        )
+        self._assert_price_breakdown(
+            price_breakdown[4],
+            "1.00",
+            "SEK",
+            "service-mark-up",
+        )
 
     async def test_offer_options_no_price_breakdown(
         self,
@@ -137,6 +148,17 @@ class TestOfferOptions(object):
 
         price_breakdown = response.json()["data"]["attributes"]["priceBreakdown"]
         assert not price_breakdown
+
+    def _assert_price_breakdown(
+        self,
+        price_breakdown: Mapping[str, Any],
+        expected_amount: str,
+        expected_currency: str,
+        expected_type: str,
+    ) -> None:
+        assert price_breakdown["price"]["amount"] == expected_amount
+        assert price_breakdown["price"]["currency"] == expected_currency
+        assert price_breakdown["breakdownType"] == expected_type
 
 
 class TestOfferOptionDetails(object):

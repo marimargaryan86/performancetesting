@@ -203,8 +203,20 @@ def get_price_breakdown() -> list[offers_pb2.PriceBreakdown]:
             breakdown_type=offers_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_BASE_FARE,
         ),
         offers_pb2.PriceBreakdown(
-            price=money.from_string("10.00", money.Currency("SEK")).protobuf(),
+            price=money.from_string("7.00", money.Currency("SEK")).protobuf(),
             breakdown_type=offers_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_TAX,
+        ),
+        offers_pb2.PriceBreakdown(
+            price=money.from_string("1.00", money.Currency("SEK")).protobuf(),
+            breakdown_type=offers_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_RESELLER_MARK_UP,
+        ),
+        offers_pb2.PriceBreakdown(
+            price=money.from_string("1.00", money.Currency("SEK")).protobuf(),
+            breakdown_type=offers_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_COMPANY_MARK_UP,
+        ),
+        offers_pb2.PriceBreakdown(
+            price=money.from_string("1.00", money.Currency("SEK")).protobuf(),
+            breakdown_type=offers_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_SERVICE_MARK_UP,
         ),
     ]
 
