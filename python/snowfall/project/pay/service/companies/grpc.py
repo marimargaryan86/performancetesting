@@ -129,6 +129,38 @@ class CompaniesService(
         )
 
 
+class LeadCompaniesService(
+    service.Service,
+    grpc_pb2_grpc.LeadCompaniesServiceServicer,
+):
+    def __init__(
+        self,
+        lead_companies: repositories.LeadCompaniesRepository,
+    ):
+        self._lead_companies = lead_companies
+
+    def get_name(self) -> str:
+        return grpc_pb2.DESCRIPTOR.services_by_name["LeadCompaniesService"].full_name
+
+    def register(self, server: grpc.aio.Server) -> None:
+        grpc_pb2_grpc.add_LeadCompaniesServiceServicer_to_server(
+            self,
+            server,
+        )
+
+    async def GetLeadCompany(  # type: ignore[override] # noqa: N802
+        self,
+        request: grpc_pb2.GetLeadCompanyRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.GetLeadCompanyResponse:
+        lead_company = await self._lead_companies.find_by_id(request.id)
+
+        if not lead_company:
+            await context.abort(grpc.StatusCode.NOT_FOUND)  # noqa: WPS204
+
+        return grpc_pb2.GetLeadCompanyResponse(lead_company=lead_company)
+
+
 class AccountsService(service.Service, grpc_pb2_grpc.AccountsServiceServicer):
     def __init__(
         self,

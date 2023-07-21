@@ -48,6 +48,14 @@ class CompaniesRepository(
         )
 
 
+class LeadCompaniesRepository(
+    mixins.FindByIdMixin[models_pb2.LeadCompany],
+    repository.ProtoRepository[models_pb2.LeadCompany],
+):
+    _proto = models_pb2.LeadCompany
+    _indexes = (pymongo.IndexModel("name", background=True, unique=True),)
+
+
 class AccountsRepository(
     mixins.InsertMixin[models_pb2.Account],
     mixins.FindByIdMixin[models_pb2.Account],
