@@ -59,6 +59,7 @@ job "plus-webhooks-http" {
 
     network {
       mode = "bridge"
+      port "http" {}
       port "prometheus" {}
     }
 
@@ -79,19 +80,6 @@ job "plus-webhooks-http" {
         "traefik.http.routers.plus-webhooks-${var.environment}.rule=Host(`${var.traefik_host_URL}`)"
       ]
 
-      check {
-        type     = "http"
-        path     = "/health"
-        interval = "30s"
-        timeout  = "4s"
-      }
-    }
-
-    service {
-      name = "plus-webhooks-${var.environment}"
-      port = "prometheus"
-      tags = ["metrics"]
-
       connect {
         sidecar_service {
           proxy {
@@ -105,6 +93,19 @@ job "plus-webhooks-http" {
 
       check {
         type     = "http"
+        path     = "/health"
+        interval = "30s"
+        timeout  = "4s"
+      }
+    }
+
+    service {
+      name = "plus-webhooks-${var.environment}"
+      port = "prometheus"
+      tags = ["metrics"]
+
+      check {
+        type     = "http"
         path     = "/"
         interval = "30s"
         timeout  = "4s"
@@ -114,7 +115,7 @@ job "plus-webhooks-http" {
     task "http" {
       driver = "docker"
       vault {
-        policies = ["plus-webhooks-${var.environment}"]
+        policies = ["plus-webhooks-${var.environment}", "notification-center-${var.environment}"]
       }
 
       template {
