@@ -65,7 +65,7 @@ class Whatsapp(endpoints.HTTPEndpoint):
                     )
             else:
                 twiml_response.message("Invalid command.")
-        elif message_body.lower().startswith("travel status"):
+        elif message_body.lower() == "travel status":
             mobile_orders = await orders_repository.get_user_orders(
                 message_from_mobile,
                 "mobile_number",
@@ -106,7 +106,7 @@ class Whatsapp(endpoints.HTTPEndpoint):
                 twiml_response.message(
                     "No upcoming trips",
                 )
-        elif message_body.lower().startswith("checkin"):
+        elif message_body.lower() == "checkin":
             mobile_orders = await orders_repository.get_user_orders(
                 message_from_mobile,
                 "mobile_number",
@@ -172,7 +172,7 @@ class Whatsapp(endpoints.HTTPEndpoint):
                 twiml_response.message(
                     "No upcoming trips",
                 )
-        elif message_body.lower().startswith("yes"):
+        elif message_body.lower() == "yes":
             subscription = await subscriptions_repository.subscribe(
                 message_from_mobile,
             )
@@ -187,11 +187,15 @@ class Whatsapp(endpoints.HTTPEndpoint):
                 status_code=status.HTTP_200_OK,
                 media_type="application/xml",
             )
-        elif message_body.lower().startswith("no"):
+        elif message_body.lower() == "no":
             await subscriptions_repository.unsubscribe(
                 message_from_mobile,
             )
             twiml_response.message("Goodbye")
+        elif message_body.lower() == "reset":
+            await redis_client.delete(
+                "ai_message_history:{0}".format(message_from_mobile),
+            )
         else:
             task = BackgroundTask(
                 ai_bot.handle_prompt,
