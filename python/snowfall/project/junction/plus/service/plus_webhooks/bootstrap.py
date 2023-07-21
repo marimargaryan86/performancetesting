@@ -7,6 +7,7 @@ from snowfall.stdlib.integration.starlette import application
 class Settings(application.Settings):
     flight_stats_app_key: str
     notifications_address: str
+    twilio_token: str
 
 
 def create_dependencies(

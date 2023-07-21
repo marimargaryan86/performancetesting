@@ -1,3 +1,5 @@
+from collections.abc import Mapping
+
 import httpx
 import pytest
 from starlette import exceptions, status
@@ -46,4 +48,23 @@ class TestCustomHeaderMiddleware(object):
                 "Cirium-Flex-Alert-Hash": cirium_flex_alert_hash,
             },
         )
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+
+class TestWhatsappMiddleware(object):
+    async def test_valid_hmac(
+        self,
+        client: httpx.AsyncClient,
+        whatsapp_body: Mapping[str, str],
+        whatsapp_body_hash: str,
+    ) -> None:
+        response = await client.post(
+            url="/webhooks/whatsapp",
+            data=whatsapp_body,
+            headers={
+                "content-type": "application/x-www-form-urlencoded",
+                "x-twilio-signature": whatsapp_body_hash,
+            },
+        )
+
         assert response.status_code == status.HTTP_204_NO_CONTENT

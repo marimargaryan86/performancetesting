@@ -1,9 +1,10 @@
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Mapping
 
 import httpx
 import pytest
 from starlette import applications
 from starlette.middleware import Middleware
+from twilio.request_validator import RequestValidator
 
 from snowfall.project.junction.plus.adapter import (
     monitoring_rules as monitoring_rules_adapter,
@@ -30,11 +31,36 @@ def cirium_flex_alert_key() -> str:
 
 
 @pytest.fixture()
+def whatsapp_body() -> Mapping[str, str]:
+    return {
+        "Body": "Test body",
+        "From": "FromAcc",
+        "To": "ToAcc",
+    }
+
+
+@pytest.fixture()
+def whatsapp_body_hash(
+    whatsapp_body: Mapping[str, str],
+    twilio_validator: RequestValidator,
+) -> str:
+    return twilio_validator.compute_signature(  # type: ignore[no-untyped-call]
+        "https://example.com/webhooks/whatsapp",
+        whatsapp_body,
+    )
+
+
+@pytest.fixture()
 def cirium_flex_alert_hash(cirium_flex_alert_key: str, secret_key: str) -> str:
     return middlewares.calculate_hash(
         cirium_flex_alert_key.encode(),
         secret_key.encode(),
     )
+
+
+@pytest.fixture()
+def twilio_validator(secret_key: str) -> RequestValidator:
+    return RequestValidator(secret_key)
 
 
 @pytest.fixture()
@@ -52,12 +78,14 @@ def monitoring_rules_client() -> monitoring_rules_adapter.Client:
 def app(
     secret_key: str,
     monitoring_rules_client: monitoring_rules_adapter.Client,
+    twilio_validator: RequestValidator,
 ) -> applications.Starlette:
     return application.create_starlette_app(
         custom_middlewares=[
             Middleware(
                 middlewares.HmacHeaderMiddleware,
                 secret_key=secret_key,
+                twilio_validator=twilio_validator,
             ),
         ],
         routes=router.get_routes(

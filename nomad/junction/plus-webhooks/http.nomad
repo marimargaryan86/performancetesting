@@ -59,7 +59,6 @@ job "plus-webhooks-http" {
 
     network {
       mode = "bridge"
-      port "http" {}
       port "prometheus" {}
     }
 
@@ -126,6 +125,9 @@ job "plus-webhooks-http" {
 NOTIFICATIONS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_notifications-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/plus-webhooks" }}
 FLIGHT_STATS_APP_KEY={{ .Data.data.flight_stats_app_key }}
+{{ end }}
+{{ with secret "kv/data/${var.environment}/notification-center" }}
+TWILIO_TOKEN={{ .Data.data.twilio_token }}
 {{ end }}
 EOH
       }

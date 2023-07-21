@@ -2,6 +2,7 @@ from collections.abc import Callable
 
 from starlette.applications import Starlette
 from starlette.middleware import Middleware
+from twilio.request_validator import RequestValidator
 
 from snowfall.project.junction.plus.adapter import monitoring_rules
 from snowfall.project.junction.plus.service.notifications.v1alpha import (
@@ -35,6 +36,7 @@ def _factory(
                 Middleware(
                     middlewares.HmacHeaderMiddleware,
                     secret_key=app.settings.flight_stats_app_key,
+                    twilio_validator=RequestValidator(app.settings.twilio_token),
                 ),
             ],
             openapi_path=None,

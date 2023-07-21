@@ -4,6 +4,7 @@ from collections.abc import Awaitable, Callable
 
 from starlette import applications, exceptions, requests, responses, status
 from starlette.middleware.base import BaseHTTPMiddleware
+from twilio.request_validator import RequestValidator
 
 from snowfall.stdlib.integration.starlette.middlewares import resolve_request
 
@@ -30,17 +31,36 @@ def validate_hmac(
 
 
 class HmacHeaderMiddleware(BaseHTTPMiddleware):
-    def __init__(self, app: applications.Starlette, secret_key: str):
+    def __init__(
+        self,
+        app: applications.Starlette,
+        secret_key: str,
+        twilio_validator: RequestValidator,
+    ):
         super().__init__(app)
         self._secret_key = secret_key
+        self._twilio_validator = twilio_validator
 
     async def dispatch(
         self,
         request: requests.Request,
         call_next: Callable[[requests.Request], Awaitable[responses.Response]],
     ) -> responses.Response:
-        if request.scope["path"].endswith("health"):
-            return await call_next(request)
+        if request.scope["path"].endswith("alerts"):
+            return await call_next(
+                await self.flight_stats_dispatch(request),
+            )
+
+        if request.scope["path"].endswith("whatsapp"):
+            return await call_next(
+                await self.whatsapp_dispatch(request),
+            )
+        return await call_next(request)
+
+    async def flight_stats_dispatch(
+        self,
+        request: requests.Request,
+    ) -> requests.Request:
         resolved_request = await resolve_request(request)
         received_hash = request.headers.get("Cirium-Flex-Alert-Hash")
         received_key = request.headers.get("Cirium-Flex-Alert-Key")
@@ -53,5 +73,18 @@ class HmacHeaderMiddleware(BaseHTTPMiddleware):
         )
         if not is_valid_hmac:
             raise exceptions.HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        return resolved_request
 
-        return await call_next(resolved_request)
+    async def whatsapp_dispatch(
+        self,
+        request: requests.Request,
+    ) -> requests.Request:
+        resolved_request = await resolve_request(request)
+        is_valid = self._twilio_validator.validate(  # type: ignore[no-untyped-call]
+            str(request.url),
+            await request.form(),
+            request.headers.get("x-twilio-signature"),
+        )
+        if not is_valid:
+            raise exceptions.HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        return resolved_request
