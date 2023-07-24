@@ -1,6 +1,10 @@
 import lagom
 
-from snowfall.project.junction.plus.adapter import monitoring_rules
+from snowfall.project.junction.plus.adapter import (
+    monitoring_rules,
+    notification_event_publisher,
+    subscribers,
+)
 from snowfall.stdlib.integration.starlette import application
 
 
@@ -12,7 +16,11 @@ class Settings(application.Settings):
 
 def create_dependencies(
     monitoring_rules_client: monitoring_rules.Client,
+    subscribers_client: subscribers.Client,
+    notification_event_publisher_client: notification_event_publisher.Client,
 ) -> lagom.Container:
     container = lagom.Container()
     container[monitoring_rules.Client] = monitoring_rules_client  # type: ignore[type-abstract]
+    container[subscribers.Client] = subscribers_client  # type: ignore[type-abstract]
+    container[notification_event_publisher.Client] = notification_event_publisher_client  # type: ignore[type-abstract]
     return container

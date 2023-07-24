@@ -1,9 +1,9 @@
 from snowfall.project.junction.plus.adapter import validation
-from snowfall.project.junction.plus.service.notification_center.v1alpha import amqp_pb2
+from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
 
 
 def validate_notifications(
-    notification: amqp_pb2.NotificationEvent,
+    notification: models_pb2.NotificationEvent,
 ) -> None:
     errors = validation.validate_completeness(notification)
     if errors:

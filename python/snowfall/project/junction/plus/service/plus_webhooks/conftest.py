@@ -9,6 +9,12 @@ from twilio.request_validator import RequestValidator
 from snowfall.project.junction.plus.adapter import (
     monitoring_rules as monitoring_rules_adapter,
 )
+from snowfall.project.junction.plus.adapter import (
+    notification_event_publisher as notification_event_publisher_adapter,
+)
+from snowfall.project.junction.plus.adapter import (
+    subscribers as subscribers_adapter,
+)
 from snowfall.project.junction.plus.service.notifications.v1alpha import (
     models_pb2 as notifications_models_pb2,
 )
@@ -69,15 +75,36 @@ def monitoring_rules_client() -> monitoring_rules_adapter.Client:
         [
             notifications_models_pb2.MonitoringRule(
                 id="monitoring_rule_1",
+                subscriber_ids=["1"],
             ),
         ],
     )
 
 
 @pytest.fixture()
+def subscribers_client() -> subscribers_adapter.Client:
+    return subscribers_adapter.DictClient(
+        [
+            notifications_models_pb2.Subscriber(
+                id="1",
+            ),
+        ],
+    )
+
+
+@pytest.fixture()
+def notification_event_publisher_client() -> (
+    notification_event_publisher_adapter.Client
+):
+    return notification_event_publisher_adapter.DictClient()
+
+
+@pytest.fixture()
 def app(
     secret_key: str,
     monitoring_rules_client: monitoring_rules_adapter.Client,
+    subscribers_client: subscribers_adapter.Client,
+    notification_event_publisher_client: notification_event_publisher_adapter.Client,
     twilio_validator: RequestValidator,
 ) -> applications.Starlette:
     return application.create_starlette_app(
@@ -91,6 +118,8 @@ def app(
         routes=router.get_routes(
             bootstrap.create_dependencies(
                 monitoring_rules_client=monitoring_rules_client,
+                subscribers_client=subscribers_client,
+                notification_event_publisher_client=notification_event_publisher_client,
             ),
         ),
         openapi_path=None,

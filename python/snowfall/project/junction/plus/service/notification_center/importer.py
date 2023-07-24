@@ -6,7 +6,7 @@ from snowfall.project.junction.plus.adapter import (
 )
 from snowfall.project.junction.plus.notification_channels.whatsapp import Channel
 from snowfall.project.junction.plus.service.notification_center import validators
-from snowfall.project.junction.plus.service.notification_center.v1alpha import amqp_pb2
+from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.transport.amqp import consumer, types
 
@@ -14,7 +14,7 @@ from snowfall.stdlib.transport.amqp import consumer, types
 class NotificationEventImporter(object):
     def __init__(  # noqa: WPS211
         self,
-        consumer_obj: consumer.Consumer[amqp_pb2.NotificationEvent],
+        consumer_obj: consumer.Consumer[models_pb2.NotificationEvent],
         configuration_vectors: configuration_vectors_adapter.Client,
         subscribers: subscribers_adapter.Client,
         whatsapp_provider: Channel,
@@ -30,7 +30,7 @@ class NotificationEventImporter(object):
 
     async def _process_message(
         self,
-        message: types.Message[amqp_pb2.NotificationEvent],
+        message: types.Message[models_pb2.NotificationEvent],
     ) -> None:
         validators.validate_notifications(message.body)
         subscriber = await self._subscribers.get(

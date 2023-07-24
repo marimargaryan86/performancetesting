@@ -12,6 +12,7 @@ from snowfall.project.junction.plus.service.notifications.v1alpha import (
 from snowfall.project.junction.plus.service.notifications.v1alpha import (
     grpc_pb2_grpc as notifications_pb2_grpc,
 )
+from snowfall.stdlib.transport.amqp import producer
 from snowfall.stdlib.transport.grpc import service
 
 
@@ -193,4 +194,36 @@ class MonitoringRuleService(
         update_status = await self._monitoring_rules.upsert(request.monitoring_rule)
         return notifications_pb2.UpdateMonitoringRuleResponse(
             is_success=update_status,
+        )
+
+
+class NotificationEventPublisherService(
+    service.Service,
+    notifications_pb2_grpc.NotificationEventPublisherServiceServicer,
+):
+    def __init__(
+        self,
+        producer_obj: producer.Producer,
+    ):
+        self._producer = producer_obj
+
+    def get_name(self) -> str:
+        return notifications_pb2.DESCRIPTOR.services_by_name[
+            "NotificationEventPublisherService"
+        ].full_name
+
+    def register(self, server: aio.Server) -> None:
+        notifications_pb2_grpc.add_NotificationEventPublisherServiceServicer_to_server(
+            self,
+            server,
+        )
+
+    async def PublishNotificationEvent(  # type: ignore[override] # noqa: N802
+        self,
+        request: notifications_pb2.PublishNotificationEventRequest,
+        context: aio.ServicerContext,
+    ) -> notifications_pb2.PublishNotificationEventResponse:
+        await self._producer.publish(request.event, "plus.events")
+        return notifications_pb2.PublishNotificationEventResponse(
+            is_success=True,
         )

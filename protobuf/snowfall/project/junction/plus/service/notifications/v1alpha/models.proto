@@ -112,3 +112,39 @@ message MonitoringRule {
   Booking booking = 3;
   repeated string subscriber_ids = 4;
 }
+
+message FlightStatsAlert {
+  string monitoring_role_id = 1;
+  string type = 2;
+  string value = 3;
+  Booking booking = 4;
+  repeated UpdatedDateField updates = 5;
+}
+
+message UpdatedDateField {
+  enum Field {
+    FIELD_UNSPECIFIED = 0;
+    FIELD_SGD = 1;
+    FIELD_EGD = 2;
+    FIELD_AGD = 3;
+  }
+  Field field = 1;
+  google.protobuf.Timestamp original_date_local = 2;
+  google.protobuf.Timestamp new_date_local = 3;
+}
+
+message NotificationEvent {
+  string sender_id = 1;
+  string receiver_id = 2;
+  oneof event {
+    PersistedOrder body = 3;
+    FlightStatsAlert alert = 4;
+  }
+  enum Type {
+    TYPE_UNSPECIFIED = 0;
+    TYPE_ORDER_CONFIRMATION = 1;
+    TYPE_FLIGHT_STATS_ALERT = 2;
+  }
+  Type event_type = 5;
+  Channel channel = 6;
+}

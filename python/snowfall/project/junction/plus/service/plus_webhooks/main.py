@@ -4,7 +4,11 @@ from starlette.applications import Starlette
 from starlette.middleware import Middleware
 from twilio.request_validator import RequestValidator
 
-from snowfall.project.junction.plus.adapter import monitoring_rules
+from snowfall.project.junction.plus.adapter import (
+    monitoring_rules,
+    notification_event_publisher,
+    subscribers,
+)
 from snowfall.project.junction.plus.service.notifications.v1alpha import (
     grpc_pb2_grpc as notifications_pb2_grpc,
 )
@@ -27,6 +31,16 @@ def _factory(
                 bootstrap.create_dependencies(
                     monitoring_rules_client=monitoring_rules.GrpcClient(
                         monitoring_rules=notifications_pb2_grpc.MonitoringRuleServiceStub(
+                            create_channel(app.settings.notifications_address),
+                        ),
+                    ),
+                    subscribers_client=subscribers.GrpcClient(
+                        subscribers=notifications_pb2_grpc.SubscriberServiceStub(
+                            create_channel(app.settings.notifications_address),
+                        ),
+                    ),
+                    notification_event_publisher_client=notification_event_publisher.GrpcClient(
+                        notification_event_publisher=notifications_pb2_grpc.NotificationEventPublisherServiceStub(
                             create_channel(app.settings.notifications_address),
                         ),
                     ),

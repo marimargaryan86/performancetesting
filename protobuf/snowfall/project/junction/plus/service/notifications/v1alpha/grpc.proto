@@ -25,6 +25,10 @@ service MonitoringRuleService {
   rpc UpdateMonitoringRule(UpdateMonitoringRuleRequest) returns (UpdateMonitoringRuleResponse) {}
 }
 
+service NotificationEventPublisherService {
+  rpc PublishNotificationEvent(PublishNotificationEventRequest) returns (PublishNotificationEventResponse) {}
+}
+
 message CreateOrderRequest {
   string reseller_id = 1;
   string external_ref_id = 2;
@@ -77,5 +81,12 @@ message UpdateMonitoringRuleRequest {
   snowfall.project.junction.plus.service.notifications.v1alpha.MonitoringRule monitoring_rule = 1;
 }
 message UpdateMonitoringRuleResponse {
+  bool is_success = 1;
+}
+
+message PublishNotificationEventRequest {
+  snowfall.project.junction.plus.service.notifications.v1alpha.NotificationEvent event = 1;
+}
+message PublishNotificationEventResponse {
   bool is_success = 1;
 }

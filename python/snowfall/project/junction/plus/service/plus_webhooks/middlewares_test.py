@@ -41,6 +41,34 @@ class TestCustomHeaderMiddleware(object):
                             ],
                         },
                     },
+                    "flightStatus": {
+                        "flightStatusUpdates": {
+                            "flightStatusUpdate": [
+                                {
+                                    "updatedAt": {
+                                        "dateUtc": "2023-07-18T08:07:13.848Z",
+                                    },
+                                    "source": "Simulated Event Source",
+                                    "updatedDateFields": {
+                                        "updatedDateField": [
+                                            {
+                                                "field": "EGD",
+                                                "originalDateLocal": (
+                                                    "2023-07-18T08:07:13.848"
+                                                ),
+                                                "newDateLocal": (
+                                                    "2023-07-18T08:37:13.848"
+                                                ),
+                                            },
+                                        ],
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                    "event": {
+                        "type": "DEPARTURE_DELAY",
+                    },
                 },
             },
             headers={

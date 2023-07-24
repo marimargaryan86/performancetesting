@@ -11,7 +11,6 @@ from snowfall.project.junction.plus.notification_channels import whatsapp
 from snowfall.project.junction.plus.service.notification_center.importer import (
     NotificationEventImporter,
 )
-from snowfall.project.junction.plus.service.notification_center.v1alpha import amqp_pb2
 from snowfall.project.junction.plus.service.notifications.v1alpha import (
     models_pb2 as notifications_models_pb2,
 )
@@ -66,11 +65,11 @@ def whatsapp_provider() -> whatsapp.Channel:
 
 @pytest.fixture()
 async def invalid_message() -> (
-    AsyncGenerator[types.Message[amqp_pb2.NotificationEvent], None]
+    AsyncGenerator[types.Message[notifications_models_pb2.NotificationEvent], None]
 ):
     with mock.patch("snowfall.stdlib.transport.amqp.types.Message") as mock_message:
         message = mock_message.return_value
-        message.body = amqp_pb2.NotificationEvent(
+        message.body = notifications_models_pb2.NotificationEvent(
             sender_id="sender_id",
         )
         message.processed = False
@@ -82,12 +81,12 @@ async def invalid_message() -> (
 
 @pytest.fixture()
 async def valid_message() -> (
-    AsyncGenerator[types.Message[amqp_pb2.NotificationEvent], None]
+    AsyncGenerator[types.Message[notifications_models_pb2.NotificationEvent], None]
 ):
     flight_number = 2512
     with mock.patch("snowfall.stdlib.transport.amqp.types.Message") as mock_message:
         message = mock_message.return_value
-        message.body = amqp_pb2.NotificationEvent(
+        message.body = notifications_models_pb2.NotificationEvent(
             sender_id="reseller_id",
             receiver_id="subscriber_id",
             body=notifications_models_pb2.PersistedOrder(
@@ -121,7 +120,7 @@ async def valid_message() -> (
                     ),
                 ],
             ),
-            event_type=amqp_pb2.NotificationEvent.TYPE_ORDER_CONFIRMATION,
+            event_type=notifications_models_pb2.NotificationEvent.TYPE_ORDER_CONFIRMATION,
             channel=notifications_models_pb2.Channel.CHANNEL_WHATSAPP,
         )
         message.processed = False
