@@ -65,7 +65,7 @@ class Whatsapp(endpoints.HTTPEndpoint):
                     )
             else:
                 twiml_response.message("Invalid command.")
-        elif message_body.lower() == "travel status":
+        elif message_body.lower().startswith("travel status"):
             mobile_orders = await orders_repository.get_user_orders(
                 message_from_mobile,
                 "mobile_number",
@@ -106,7 +106,7 @@ class Whatsapp(endpoints.HTTPEndpoint):
                 twiml_response.message(
                     "No upcoming trips",
                 )
-        elif message_body.lower() == "checkin":
+        elif message_body.lower().startswith("checkin"):
             mobile_orders = await orders_repository.get_user_orders(
                 message_from_mobile,
                 "mobile_number",
@@ -172,7 +172,7 @@ class Whatsapp(endpoints.HTTPEndpoint):
                 twiml_response.message(
                     "No upcoming trips",
                 )
-        elif message_body.lower() == "yes":
+        elif message_body.lower().startswith("yes"):
             subscription = await subscriptions_repository.subscribe(
                 message_from_mobile,
             )
@@ -187,7 +187,7 @@ class Whatsapp(endpoints.HTTPEndpoint):
                 status_code=status.HTTP_200_OK,
                 media_type="application/xml",
             )
-        elif message_body.lower() == "no":
+        elif message_body.lower().startswith("no"):
             await subscriptions_repository.unsubscribe(
                 message_from_mobile,
             )
