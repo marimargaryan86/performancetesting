@@ -42,6 +42,10 @@ variable "count" {
   type = number
 }
 
+variable "junction_api_address" {
+  type = string
+}
+
 job "poc-api-http" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -170,7 +174,7 @@ EOH
         TWILIO_SENDER                   = "+15674831787"
         FLIGHT_STATS_APP_ID             = "4fb1a656"
         SENTRY_DSN                      = "https://edddac6f53a345bfa2b49ac386a69e9b@sentry.snowfall.se/80"
-        JUNCTION_API_ADDRESS            = "https://api.junction.dev"
+        JUNCTION_API_ADDRESS            = "${var.junction_api_address}"
         FLIGHT_STATS_API_ADDRESS        = "https://api.flightstats.com/flex/flightstatus/rest/v2/json/flight/status/"
         ICOUPON_CLIENT_ID               = "Snowfall"
         ICOUPON_API_ADDRESS             = "https://ppd.icoupon.global/api"
