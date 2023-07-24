@@ -27,7 +27,7 @@
       "traefik_entrypoints": "websecure",
       "traefik_host_URL": "superapp.sandbox.junction.dev",
       "plus_api_address": "https://plus.api.sandbox.junction.dev",
-      "plus_activated": true,
+      "plus_activated": false,
       "ory_client_token_endpoint":  "https://optimistic-tereshkova-36hc6vayw4.projects.oryapis.com/oauth2/token",
       "ory_client_id":  "b4f8a92f-b287-4a67-96a9-7500724fa28d"
     }
