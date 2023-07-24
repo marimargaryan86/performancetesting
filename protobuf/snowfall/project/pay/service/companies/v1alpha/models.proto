@@ -17,6 +17,8 @@ message Company {
   float processing_markup = 5;
   float sales_markup = 6;
   string account_id = 7;
+  string lead_company_id = 8;
+  repeated snowfall.stdlib.v1.Money reseller_markups = 9;
 }
 
 message LeadCompany {

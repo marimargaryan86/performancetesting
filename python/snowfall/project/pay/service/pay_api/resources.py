@@ -77,18 +77,21 @@ class Company(models.Resource):
         company: models_pb2.Company,
         request: requests.Request,
     ) -> Company:
-        relationships = (
-            {
-                "account": {
-                    "data": {
-                        "id": company.account_id,
-                        "type": "accounts",
-                    },
+        relationships = {}
+        if company.account_id:
+            relationships["account"] = {
+                "data": {
+                    "id": company.account_id,
+                    "type": "accounts",
                 },
             }
-            if company.account_id
-            else {}
-        )
+        if company.lead_company_id:
+            relationships["leadCompany"] = {
+                "data": {
+                    "id": company.lead_company_id,
+                    "type": "lead-companies",
+                },
+            }
 
         return cls(
             id=company.id,
@@ -104,6 +107,10 @@ class Company(models.Resource):
                 "fxMarkup": round(company.fx_markup, 3),
                 "processingMarkup": round(company.processing_markup, 3),
                 "salesMarkup": round(company.sales_markup, 3),
+                "resellerMarkups": [
+                    Money.from_proto(reseller_markup)
+                    for reseller_markup in company.reseller_markups
+                ],
             },
             relationships=relationships,
             links={
