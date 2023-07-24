@@ -201,10 +201,9 @@ async def fetch_trip_offers(  # noqa: WPS211,WPS217,WPS210
         departure_after=parser.parse(departure_at).replace(tzinfo=tz.tzutc()),
         allowed_segment_types=[],
     )
-    await asyncio.sleep(1)
+    await asyncio.sleep(2)
     trips = await junction_client.trips().get_trips_by_trip_search_id(
         trip_search["data"]["id"],
-        limit=1,
     )
     if not trips["data"]:
         raise RuntimeError(
@@ -212,28 +211,33 @@ async def fetch_trip_offers(  # noqa: WPS211,WPS217,WPS210
                 trip_search["data"]["id"],
             ),
         )
-    offer_search = await junction_client.create_offer_search(
-        trip_ids=[trips["data"][0]["id"]],
-        passengers_dates_of_birth=[
-            datetime.date.fromisoformat("1990-02-03") for _ in range(num_of_travelers)
+    offers_searches = await asyncio.gather(
+        *[
+            junction_client.create_offer_search(
+                trip_ids=[trip["id"]],
+                passengers_dates_of_birth=[
+                    datetime.date.fromisoformat("1990-02-03")
+                    for _ in range(num_of_travelers)
+                ],
+                session_token="YMSXrOAhIOdvIbxAmfSt7vJtRBkurNb6",  # noqa: S106
+            )
+            for trip in trips["data"]
         ],
-        session_token="YMSXrOAhIOdvIbxAmfSt7vJtRBkurNb6",  # noqa: S106
     )
     await asyncio.sleep(5)
-    offers = json_api_doc.deserialize(
-        await junction_client.get_offers_by_offer_search_id(
-            offer_search["data"]["id"],
-            limit=1,
-            cabin_class=None,
-            include=["groups.options", "groups.details"],
-        ),
-    )
-    if not offers:
-        raise RuntimeError(
-            "Couldn't find offers for this offer search: {0}".format(
-                offer_search["data"]["id"],
+    for offers_search in offers_searches:
+        offers = json_api_doc.deserialize(
+            await junction_client.get_offers_by_offer_search_id(
+                offers_search["data"]["id"],
+                limit=1,
+                cabin_class=None,
+                include=["groups.options", "groups.details"],
             ),
         )
+        if offers:
+            break
+    else:
+        raise RuntimeError("Couldn't find offers")
     offer_group = offers[0]["groups"][0]
     offer_group_details = offer_group["details"][0]
     offer_group_options = offer_group["options"]
