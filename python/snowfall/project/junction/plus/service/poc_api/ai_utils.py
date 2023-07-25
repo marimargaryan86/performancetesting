@@ -135,7 +135,7 @@ The year is 2023
                 json.dumps(message_history),
             )
             twilio_client.send_message(
-                body=assistant_message["content"],
+                body=assistant_message["content"][:1600],  # noqa: WPS432
                 receiver=mobile_phone,
             )
 
