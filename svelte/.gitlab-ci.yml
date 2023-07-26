@@ -27,3 +27,12 @@ svelte:lint-hub-web:
         - "svelte/hub-web/yarn.lock"
   variables:
     PROJECT_PATH: svelte/hub-web
+
+svelte:lint-booking-hub-web:
+  extends: .svelte:lint
+  cache:
+    key:
+      files:
+        - "svelte/booking-hub-web/yarn.lock"
+  variables:
+    PROJECT_PATH: svelte/booking-hub-web
