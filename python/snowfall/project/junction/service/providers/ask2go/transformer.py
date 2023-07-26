@@ -200,7 +200,7 @@ class OfferTransformer(object):  # noqa: WPS214
                 ),
                 features=[
                     offers.BrandedPriceInformationfeature(
-                        baggage=offer.trips[0].baggage_allowance,
+                        baggage=offer.trips[0].baggage_allowance or [],
                     ),
                 ],
             ),
@@ -267,7 +267,7 @@ class OfferTransformer(object):  # noqa: WPS214
         segment_baggage_allowances = {
             segment_index: list(baggage_allowances)
             for segment_index, baggage_allowances in itertools.groupby(
-                [baggage for trip in trips for baggage in trip.baggage_allowance],
+                [baggage for trip in trips for baggage in trip.baggage_allowance or []],
                 lambda baggage: baggage.segment_index,
             )
         }

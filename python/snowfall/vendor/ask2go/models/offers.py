@@ -96,7 +96,7 @@ class Trip(CamelCaseBaseModel):
     arrival: TripDepartureArrival
     platting_carrier: TripPlattingCarrier
     segments: list[TripSegment]
-    baggage_allowance: list[TripBaggageAllowance]
+    baggage_allowance: list[TripBaggageAllowance] | None
     gds: str
 
     _normalize_duration = pydantic.validator("duration", pre=True, allow_reuse=True)(
