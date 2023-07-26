@@ -561,13 +561,9 @@ func validateSequenceNumbers(d dataset, sizes map[string]uint64, objSchedules ch
 		}
 		last_t = t
 	}
-	if last_t != nil {
-		panic("No transfers expected. Remove this check if transfers are now being processed.")
-		// And uncomment below check.
+	if last_t.Sequence != sizes["transfers"]-1 {
+		panic(fmt.Errorf("Wrong transfers count %s, expected %s", last_t.Sequence, sizes["transfers"]-1))
 	}
-	//if last_t.Sequence != sizes["transfers"] - 1 {
-	//	panic(fmt.Errorf("Wrong trtansfers count %s, expected %s", last_t.Sequence, sizes["transfers"] - 1))
-	//}
 }
 
 func validateDataIntegrity(d dataset, sm map[string]schedule) []error {
