@@ -58,6 +58,8 @@ message Place {
   string no_accent_name = 11;
   string local_name = 12;
   string no_accent_local_name = 13;
+  string iata = 14;
+  string main_city = 15;
 }
 
 message StripeUser {

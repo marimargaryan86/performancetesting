@@ -271,23 +271,53 @@
                           }
                         },
                         {
-                          "id": "air",
+                          "id": "city",
                           "type": "place-types",
                           "attributes": {
-                            "name": "air"
+                            "name": "city"
                           },
                           "links": {
-                            "self": "https://example.com/places/types/air"
+                            "self": "https://example.com/places/types/city"
                           }
                         },
                         {
-                          "id": "rail",
+                          "id": "railway-station",
                           "type": "place-types",
                           "attributes": {
                             "name": "rail"
                           },
                           "links": {
                             "self": "https://example.com/places/types/rail"
+                          }
+                        },
+                        {
+                          "id": "airport",
+                          "type": "place-types",
+                          "attributes": {
+                            "name": "airport"
+                          },
+                          "links": {
+                            "self": "https://example.com/places/types/airport"
+                          }
+                        },
+                        {
+                          "id": "bus-station",
+                          "type": "place-types",
+                          "attributes": {
+                            "name": "bus-station"
+                          },
+                          "links": {
+                            "self": "https://example.com/places/types/bus-station"
+                          }
+                        },
+                        {
+                          "id": "ferry-port",
+                          "type": "place-types",
+                          "attributes": {
+                            "name": "ferry-port"
+                          },
+                          "links": {
+                            "self": "https://example.com/places/types/ferry-port"
                           }
                         }
                       ],
@@ -524,12 +554,12 @@
               }
             }
           },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          }
+        "401": {
+          "$ref": "#/components/responses/Unauthorized"
+        },
+        "404": {
+          "$ref": "#/components/responses/NotFound"
+        }
         },
         "operationId": "get-passengers-genders-id",
         "description": "Used to lookup data for a Passenger Gender Identifier."
@@ -4271,8 +4301,7 @@
                   "latitude",
                   "longitude",
                   "countryCode",
-                  "timeZone",
-                  "iataCode"
+                  "timeZone"
                 ],
                 "properties": {
                   "name": {
@@ -4308,9 +4337,7 @@
                   "iataCode": {
                     "type": "string",
                     "example": "ARN",
-                    "pattern": "^[A-Z]{3}$",
-                    "minLength": 3,
-                    "maxLength": 3,
+                    "pattern": "(|^[A-Z]{3}$)",
                     "nullable": true,
                     "readOnly": true
                   },

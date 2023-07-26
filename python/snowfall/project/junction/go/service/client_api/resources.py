@@ -839,7 +839,7 @@ class PlaceResource(models.Resource):
             type=PlaceResource.api_type,
             attributes={
                 "countryCode": place.location.country_code or "GB",
-                "iataCode": None,
+                "iataCode": place.place_attributes.iata,
                 "latitude": place.location.coordinates.latitude,
                 "longitude": place.location.coordinates.longitude,
                 "name": place.location.name,

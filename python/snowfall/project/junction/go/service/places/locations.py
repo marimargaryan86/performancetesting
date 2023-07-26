@@ -35,73 +35,78 @@ def validate_name(node: Mapping[str, Any]) -> str | None:
     )
 
 
-def resolve_osm_properties(  # noqa: WPS231
+def resolve_osm_properties(  # noqa: WPS231, WPS210
     properties: Mapping[str, Any],
-) -> Mapping[str, models_pb2.Location.Type.ValueType | int]:
+) -> Mapping[str, Any]:
     useful_properties = {
         "type": models_pb2.Location.Type.TYPE_UNSPECIFIED,
         "distance": 0,
+        "iata": "",
     }
-    railway = properties.get("railway")
-    aeroway_type = properties.get("aeroway")
-    amenity = properties.get("amenity")
-    highway = properties.get("highway")
 
-    if railway == "station":
+    iata = properties.get("iata")
+
+    if properties.get("railway") == "station":
         useful_properties["type"] = models_pb2.Location.Type.TYPE_RAILWAY_STATION
         useful_properties["distance"] = _MAX_DISTANCE_GENERAL_TRANSPORT_M
-    elif aeroway_type == "aerodrome":
-        useful_properties["type"] = models_pb2.Location.Type.TYPE_AIRPORT
-        useful_properties["distance"] = _MAX_DISTANCE_AIRPORT_M
-    elif amenity == "bus_station" or highway == "bus_stop":
+    elif properties.get("aeroway") == "aerodrome":
+        if iata:
+            useful_properties["iata"] = iata
+            useful_properties["type"] = models_pb2.Location.Type.TYPE_AIRPORT
+            useful_properties["distance"] = _MAX_DISTANCE_AIRPORT_M
+    elif properties.get("amenity") == "bus_station":
         useful_properties["type"] = models_pb2.Location.Type.TYPE_BUS_STATION
         useful_properties["distance"] = _MAX_DISTANCE_BUS_STATION_M
-    elif amenity == "ferry_terminal":
+    elif properties.get("amenity") == "ferry_terminal":
         useful_properties["type"] = models_pb2.Location.Type.TYPE_FERRY_PORT
         useful_properties["distance"] = _MAX_DISTANCE_GENERAL_TRANSPORT_M
 
     return useful_properties
 
 
-async def node_to_place(  # noqa: WPS231, WPS210
+async def node_to_place(  # noqa: WPS231
     locations_repository: places.LocationRepository,
     nodes: Sequence[Mapping[str, Any]],
 ) -> AsyncIterable[models_pb2.Place]:
     for node in nodes:
         name = validate_name(node)
-        if not name:
+        if not name or invalid_coordinates(node):
             continue
 
-        if invalid_coordinates(node):
-            continue
         properties = resolve_osm_properties(node["properties"])
         types = properties["type"]
-        locations = [
-            location.id
-            async for location in await locations_repository.find_within_area_by_type(
-                cursor="",
-                longitude=node["geometry"]["coordinates"][0],
-                latitude=node["geometry"]["coordinates"][1],
-                max_distance_meters=properties["distance"],
-                types=types,
-            )
-        ]
-        if not locations:
-            continue
 
-        yield models_pb2.Place(
-            location=models_pb2.Location(
-                id=string.to_uuid(node["id"], _NAMESPACE),
-                name=name,
-                coordinates=latlng_pb2.LatLng(
-                    latitude=float(node["geometry"]["coordinates"][1]),
-                    longitude=float(node["geometry"]["coordinates"][0]),
+        if types != models_pb2.Location.Type.TYPE_UNSPECIFIED:
+            locations = [
+                loc.id
+                async for loc in await locations_repository.find_within_area_by_type(
+                    cursor="",
+                    longitude=node["geometry"]["coordinates"][0],
+                    latitude=node["geometry"]["coordinates"][1],
+                    max_distance_meters=properties["distance"],
+                    types=types,
+                )
+            ]
+
+            if not locations:
+                continue
+
+            yield models_pb2.Place(
+                location=models_pb2.Location(
+                    id=string.to_uuid(node["id"], _NAMESPACE),
+                    name=name,
+                    coordinates=latlng_pb2.LatLng(
+                        latitude=float(node["geometry"]["coordinates"][1]),
+                        longitude=float(node["geometry"]["coordinates"][0]),
+                    ),
+                    types=[types],
+                    source_ref=node["id"],
+                    updated_at=protobuf.datetime_to_protobuf(
+                        datetime.datetime.now(tz=datetime.UTC),
+                    ),
                 ),
-                types=[types],  # type: ignore[list-item]
-                source_ref=node["id"],
-                updated_at=protobuf.datetime_to_protobuf(
-                    datetime.datetime.now(tz=datetime.UTC),
+                merged_ids=locations,
+                place_attributes=models_pb2.PlaceAttributes(
+                    iata=properties["iata"],
                 ),
-            ),
-            merged_ids=locations,
-        )
+            )

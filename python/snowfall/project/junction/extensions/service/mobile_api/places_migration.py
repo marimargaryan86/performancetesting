@@ -1,4 +1,5 @@
 import datetime
+import os
 from collections.abc import AsyncIterable
 
 import numpy as np
@@ -23,8 +24,12 @@ from snowfall.stdlib.v1 import latlng_pb2
 _SERVICE_NAME = "mobile-api"
 _ATTRIBUTES_KEY = "attributes"
 
+_CITY_RADIUS_DEGREES = float(
+    os.getenv("_CITY_RADIUS_DEGREES", "0.6"),  # noqa: WPS432
+)
 
-async def migrate(settings: bootstrap.MigrateSettings) -> None:  # noqa: WPS210
+
+async def migrate(settings: bootstrap.MigrateSettings) -> None:  # noqa: WPS210, WPS217
     mongo = motor_asyncio.AsyncIOMotorClient(settings.mongo_dsn)
     places_repository = repository.PlacesRepository(mongo[settings.mongo_db]["places"])
     osm_data = pd.read_csv(
@@ -48,6 +53,7 @@ async def migrate(settings: bootstrap.MigrateSettings) -> None:  # noqa: WPS210
     places_to_add = await go_repo.get_by_ids(to_add)
     await _save_enrich_data(places_to_add, places_repository, osm_data)
     await places_repository.delete_ids(to_remove)
+    await _main_cities(repo=places_repository)
 
 
 async def _save_enrich_data(  # noqa: WPS210, WPS231
@@ -75,6 +81,7 @@ async def _save_enrich_data(  # noqa: WPS210, WPS231
             updated_at=updated,
             source_ref="junction",
             types=types,
+            iata=place.place_attributes.iata,
         )
 
         if loc.types == [models_pb2.Place.TYPE_CITY]:
@@ -108,3 +115,20 @@ async def _save_enrich_data(  # noqa: WPS210, WPS231
             )
 
         await repo.insert(place_data)
+
+
+async def _main_cities(
+    repo: repository.PlacesRepository,
+) -> None:
+    async for place in await repo.find_non_cities():
+        place_main_city = await repo.find_main_city(
+            latitude=place.coordinates.latitude,
+            longitude=place.coordinates.longitude,
+            max_distance_degrees=_CITY_RADIUS_DEGREES,
+            types=models_pb2.Place.TYPE_CITY,
+        )
+
+        if place_main_city and place_main_city.name != place.main_city:
+            place.main_city = place_main_city.name
+
+        await repo.update(place)

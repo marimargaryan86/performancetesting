@@ -33,4 +33,9 @@ message Location {
 message Place {
   Location location = 1;
   repeated string merged_ids = 2;
+  PlaceAttributes place_attributes = 3;
+}
+
+message PlaceAttributes {
+  string iata = 1;
 }

@@ -146,12 +146,13 @@ class PlaceResource(models.Resource):
             attributes={
                 "countryCode": place.country_code,
                 "countryName": place.country_name,
-                "iataCode": None,
+                "iataCode": place.iata,
                 "latitude": place.coordinates.latitude,
                 "longitude": place.coordinates.longitude,
                 "name": name,
                 "timeZone": place.time_zone,
                 "population": place.population,
+                "mainCity": place.main_city,
             },
             relationships={
                 "types": {

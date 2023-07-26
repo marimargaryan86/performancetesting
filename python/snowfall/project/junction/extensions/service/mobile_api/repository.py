@@ -122,6 +122,51 @@ class PlacesRepository(
         response.limit(30)  # noqa: WPS432
         return response
 
+    async def find_non_cities(  # noqa: WPS211
+        self,
+    ) -> resultset.ResultSet[models_pb2.Place]:
+        return await self._execute(
+            self._collection.find,
+            filter={
+                "types": {"$nin": [models_pb2.Place.TYPE_CITY]},
+            },
+        )
+
+    async def find_main_city(  # noqa: WPS211
+        self,
+        longitude: float,
+        latitude: float,
+        max_distance_degrees: float,
+        types: int,
+    ) -> models_pb2.Place | None:
+        main_cities = await self._execute(
+            self._collection.find,
+            filter={
+                "types": [types],
+                "coordinates": {
+                    "$geoWithin": {
+                        "$center": [[longitude, latitude], max_distance_degrees],
+                    },
+                },
+            },
+            sort=("population", pymongo.DESCENDING),
+            limit=1,
+        )
+        main_city = [city async for city in main_cities]
+        return main_city[0] if main_city else None
+
+    async def update(self, resource: models_pb2.Place) -> bool:
+        replacement = self._coder.encode(resource)
+        replacement.pop("_id")
+
+        update: pymongo.results.UpdateResult = await self._execute(
+            self._collection.replace_one,
+            filter={"_id": resource.id},
+            replacement=replacement,
+        )
+
+        return update.acknowledged
+
 
 class GuestsRepository(
     mixins.FindByIdMixin[models_pb2.Guest],

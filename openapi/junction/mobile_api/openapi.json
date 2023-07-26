@@ -556,6 +556,14 @@
       },
       "get": {
         "summary": "List user group members",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ],
         "tags": [
           "groups"
         ],
@@ -2448,8 +2456,7 @@
               "latitude",
               "longitude",
               "countryCode",
-              "timeZone",
-              "iataCode"
+              "timeZone"
             ],
             "properties": {
               "name": {
@@ -2491,15 +2498,18 @@
               "iataCode": {
                 "type": "string",
                 "example": "ARN",
-                "pattern": "^[A-Z]{3}$",
-                "minLength": 3,
-                "maxLength": 3,
+                "pattern": "(|^[A-Z]{3}$)",
                 "nullable": true,
                 "readOnly": true
               },
               "population": {
                 "type": "integer",
                 "example": 1984,
+                "readOnly": true
+              },
+              "mainCity": {
+                "type": "string",
+                "example": "Stockholm",
                 "readOnly": true
               }
             }
@@ -2535,7 +2545,7 @@
             "attributes": {
               "countryCode": "ES",
               "countryName": "Spain",
-              "iataCode": null,
+              "iataCode": "",
               "latitude": 42.424701,
               "longitude": 3.158034,
               "name": "Portbou",

@@ -115,5 +115,6 @@ async def parse_csv(
                 updated_at=protobuf.datetime_to_protobuf(
                     datetime.datetime.now(tz=datetime.UTC),
                 ),
+                source_ref="cities",
             ),
         )

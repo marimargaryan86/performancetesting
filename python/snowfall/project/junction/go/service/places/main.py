@@ -46,6 +46,12 @@ async def _generate_cities(app: service.Application[_CitiesSettings]) -> None:
     geocoding_service = geocoding_pb2_grpc.GeocodingServiceStub(
         create_channel(app.settings.geodata_address),
     )
+
+    cities_csv_path = filesystem.resource_path(
+        "snowfall.project.junction.go.service.places.main",
+        "cities.csv",
+    )
+
     places_repository = places.PlaceRepository(
         geocoding=geocoding_service,
         collection=mongo.places.places,
@@ -55,7 +61,7 @@ async def _generate_cities(app: service.Application[_CitiesSettings]) -> None:
         "nodes.json",
     )
 
-    cities_csv_path = filesystem.resource_path(
+    filesystem.resource_path(
         "snowfall.project.junction.go.service.places.main",
         "cities.csv",
     )
@@ -76,27 +82,6 @@ async def _generate_cities(app: service.Application[_CitiesSettings]) -> None:
     sem = asyncio.Semaphore(100)
     count = 1
     async with asyncio.TaskGroup() as tg:
-        async for node in locations.node_to_place(locations_repo, nodes):
-            count += 1
-            place = places_cache.get(node.location.id)
-            task = (
-                places.replace_one(
-                    places_collection,
-                    place,
-                    sem,
-                    count,
-                )
-                if place
-                else places.create(
-                    places_repository,
-                    node,
-                    sem,
-                    count,
-                )
-            )
-
-            tg.create_task(task)  # type: ignore[unused-awaitable]
-
         async with aiofiles.open(cities_csv_path) as csv_file:
             async for city in cities.parse_csv(locations_repo, csv_file):
                 count += 1
@@ -117,6 +102,27 @@ async def _generate_cities(app: service.Application[_CitiesSettings]) -> None:
                     )
                 )
                 tg.create_task(task)  # type: ignore[unused-awaitable]
+
+        async for node in locations.node_to_place(locations_repo, nodes):
+            count += 1
+            place = places_cache.get(node.location.id)
+            task = (
+                places.replace_one(
+                    places_collection,
+                    place,
+                    sem,
+                    count,
+                )
+                if place
+                else places.create(
+                    places_repository,
+                    node,
+                    sem,
+                    count,
+                )
+            )
+
+            tg.create_task(task)  # type: ignore[unused-awaitable]
 
     logging.info("Generate places completed.")
     places_count = await places_collection.count_documents({})

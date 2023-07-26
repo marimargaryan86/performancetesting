@@ -12,19 +12,20 @@
   "country_code": "TH",
   "country_name": "Thailand",
   "updated_at": {
-    "$date": {
-      "$numberLong": "1676467569981"
-    }
+    "$date": "2023-07-23T18:25:17.691Z"
   },
   "source_ref": "junction",
   "types": [
-    0
+    1
   ],
   "no_accent_name": "Suthep",
   "population": 0,
   "local_name": "",
-  "no_accent_local_name": ""
-},{
+  "no_accent_local_name": "",
+  "iata": "",
+  "main_city": ""
+},
+{
   "_id": "00014b89-ad87-5b9d-ac7d-9beb69980259",
   "name": "Green",
   "coordinates": {
@@ -38,19 +39,101 @@
   "country_code": "US",
   "country_name": "United States",
   "updated_at": {
-    "$date": {
-      "$numberLong": "1676467570151"
-    }
+    "$date": "2023-07-23T18:25:17.695Z"
   },
   "source_ref": "junction",
   "types": [
-    0
+    1
   ],
   "population": 23532,
   "no_accent_name": "Green",
   "local_name": "",
-  "no_accent_local_name": ""
-},{
+  "no_accent_local_name": "",
+  "iata": "",
+  "main_city": ""
+},
+{
+  "_id": "0002a2c7-0b4c-555b-ac7e-dbf76de4edbf",
+  "name": "Blumenthal",
+  "coordinates": {
+    "type": "Point",
+    "coordinates": [
+      12.3339439,
+      53.0765413
+    ]
+  },
+  "time_zone": "Europe/Berlin",
+  "country_code": "DE",
+  "country_name": "Germany",
+  "updated_at": {
+    "$date": "2023-07-23T18:25:17.696Z"
+  },
+  "source_ref": "junction",
+  "types": [
+    2
+  ],
+  "no_accent_name": "Blumenthal",
+  "population": 0,
+  "local_name": "",
+  "no_accent_local_name": "",
+  "iata": "",
+  "main_city": ""
+},
+{
+  "_id": "0002ad56-f55e-5dc4-92af-2aa6a74f3834",
+  "name": "Bremgarten West",
+  "coordinates": {
+    "type": "Point",
+    "coordinates": [
+      8.3370901,
+      47.3456909
+    ]
+  },
+  "time_zone": "Europe/Zurich",
+  "country_code": "CH",
+  "country_name": "Switzerland",
+  "updated_at": {
+    "$date": "2023-07-23T18:25:17.697Z"
+  },
+  "source_ref": "junction",
+  "types": [
+    2
+  ],
+  "no_accent_name": "Bremgarten West",
+  "population": 0,
+  "local_name": "",
+  "no_accent_local_name": "",
+  "iata": "",
+  "main_city": ""
+},
+{
+  "_id": "00053fcb-1554-5572-af46-f21b862b2918",
+  "name": "Haspelmoor",
+  "coordinates": {
+    "type": "Point",
+    "coordinates": [
+      11.0982923,
+      48.2232685
+    ]
+  },
+  "time_zone": "Europe/Berlin",
+  "country_code": "DE",
+  "country_name": "Germany",
+  "updated_at": {
+    "$date": "2023-07-23T18:25:17.698Z"
+  },
+  "source_ref": "junction",
+  "types": [
+    2
+  ],
+  "no_accent_name": "Haspelmoor",
+  "population": 0,
+  "local_name": "",
+  "no_accent_local_name": "",
+  "iata": "",
+  "main_city": ""
+},
+{
   "_id": "0005cf6c-f17e-5a2f-b46e-2889d75620c3",
   "name": "Waipu",
   "coordinates": {
@@ -64,19 +147,20 @@
   "country_code": "NZ",
   "country_name": "New Zealand",
   "updated_at": {
-    "$date": {
-      "$numberLong": "1676467570156"
-    }
+    "$date": "2023-07-23T18:25:17.699Z"
   },
   "source_ref": "junction",
   "types": [
-    0
+    1
   ],
   "population": 1110,
   "no_accent_name": "Waipu",
   "local_name": "",
-  "no_accent_local_name": ""
-},{
+  "no_accent_local_name": "",
+  "iata": "",
+  "main_city": ""
+},
+{
   "_id": "0007f664-a6cb-5bd9-b073-d80bc74ee2cf",
   "name": "Formby",
   "coordinates": {
@@ -90,19 +174,20 @@
   "country_code": "GB",
   "country_name": "United Kingdom",
   "updated_at": {
-    "$date": {
-      "$numberLong": "1676467570159"
-    }
+    "$date": "2023-07-23T18:25:17.701Z"
   },
   "source_ref": "junction",
   "types": [
-    0
+    1
   ],
   "population": 22419,
   "no_accent_name": "Formby",
   "local_name": "",
-  "no_accent_local_name": ""
-},{
+  "no_accent_local_name": "",
+  "iata": "",
+  "main_city": ""
+},
+{
   "_id": "000850e0-6a79-549e-b4c6-ddc8247e5164",
   "name": "Forreston",
   "coordinates": {
@@ -116,19 +201,20 @@
   "country_code": "AU",
   "country_name": "Australia",
   "updated_at": {
-    "$date": {
-      "$numberLong": "1676467570162"
-    }
+    "$date": "2023-07-23T18:25:17.703Z"
   },
   "source_ref": "junction",
   "types": [
-    0
+    1
   ],
   "population": 388,
   "no_accent_name": "Forreston",
   "local_name": "",
-  "no_accent_local_name": ""
-},{
+  "no_accent_local_name": "",
+  "iata": "",
+  "main_city": ""
+},
+{
   "_id": "000af18d-89b7-5da9-94a8-9ab0e46b4cfd",
   "name": "Chengxiang",
   "coordinates": {
@@ -142,19 +228,47 @@
   "country_code": "CN",
   "country_name": "China",
   "updated_at": {
-    "$date": {
-      "$numberLong": "1676467570166"
-    }
+    "$date": "2023-07-23T18:25:17.705Z"
   },
   "source_ref": "junction",
   "types": [
-    0
+    1
   ],
   "no_accent_name": "Chengxiang",
   "population": 0,
   "local_name": "",
-  "no_accent_local_name": ""
-},{
+  "no_accent_local_name": "",
+  "iata": "",
+  "main_city": ""
+},
+{
+  "_id": "000cbff9-60f7-58f0-9538-16945e0547cd",
+  "name": "Shijiahe",
+  "coordinates": {
+    "type": "Point",
+    "coordinates": [
+      108.6139118,
+      29.2376072
+    ]
+  },
+  "time_zone": "Asia/Shanghai",
+  "country_code": "CN",
+  "country_name": "China",
+  "updated_at": {
+    "$date": "2023-07-23T18:25:17.706Z"
+  },
+  "source_ref": "junction",
+  "types": [
+    1
+  ],
+  "no_accent_name": "Shijiahe",
+  "population": 0,
+  "local_name": "",
+  "no_accent_local_name": "",
+  "iata": "",
+  "main_city": ""
+},
+{
   "_id": "000ccc51-ef00-5867-acbc-2cb294fb3b13",
   "name": "Phaung Gyi",
   "coordinates": {
@@ -168,19 +282,20 @@
   "country_code": "MM",
   "country_name": "Myanmar",
   "updated_at": {
-    "$date": {
-      "$numberLong": "1676467570171"
-    }
+    "$date": "2023-07-23T18:25:17.708Z"
   },
   "source_ref": "junction",
   "types": [
-    0
+    1
   ],
   "no_accent_name": "Phaung Gyi",
   "population": 0,
   "local_name": "",
-  "no_accent_local_name": ""
-},{
+  "no_accent_local_name": "",
+  "iata": "",
+  "main_city": ""
+},
+{
   "_id": "00111a7f-9d93-573b-a9dc-68cfa85e1dd2",
   "name": "Acayucan",
   "coordinates": {
@@ -194,19 +309,20 @@
   "country_code": "MX",
   "country_name": "Mexico",
   "updated_at": {
-    "$date": {
-      "$numberLong": "1676467570174"
-    }
+    "$date": "2023-07-23T18:25:17.710Z"
   },
   "source_ref": "junction",
   "types": [
-    0
+    1
   ],
   "population": 50934,
   "no_accent_name": "Acayucan",
   "local_name": "",
-  "no_accent_local_name": ""
-},{
+  "no_accent_local_name": "",
+  "iata": "",
+  "main_city": ""
+},
+{
   "_id": "00121381-d422-5f75-a219-370c0ab5925e",
   "name": "Karratha",
   "coordinates": {
@@ -220,19 +336,20 @@
   "country_code": "AU",
   "country_name": "Australia",
   "updated_at": {
-    "$date": {
-      "$numberLong": "1676467570177"
-    }
+    "$date": "2023-07-23T18:25:17.712Z"
   },
   "source_ref": "junction",
   "types": [
-    0
+    1
   ],
   "population": 15828,
   "no_accent_name": "Karratha",
   "local_name": "",
-  "no_accent_local_name": ""
-},{
+  "no_accent_local_name": "",
+  "iata": "",
+  "main_city": ""
+},
+{
   "_id": "001307e8-ea1f-51e5-8e42-dc667e255441",
   "name": "Khrew",
   "coordinates": {
@@ -246,16 +363,16 @@
   "country_code": "IN",
   "country_name": "India",
   "updated_at": {
-    "$date": {
-      "$numberLong": "1676467570186"
-    }
+    "$date": "2023-07-23T18:25:17.714Z"
   },
   "source_ref": "junction",
   "types": [
-    0
+    1
   ],
   "population": 9851,
   "no_accent_name": "Khrew",
   "local_name": "",
-  "no_accent_local_name": ""
+  "no_accent_local_name": "",
+  "iata": "",
+  "main_city": ""
 }]
