@@ -307,6 +307,7 @@ var schedulesExporter = schedulesExporterType{
 	IdKey:             make(map[string]bool),
 	count:             0,
 }
+var transfersSequence = uint64(0)
 var routesChan chan<- *routesWriterJob
 var routeStopsChan chan<- *plannerv1alpha.RouteStop
 var schedulesChan chan<- *schedulesWriterJob
@@ -519,7 +520,6 @@ func stopsWriterTask(writer io.Writer, wg *sync.WaitGroup) chan<- *stopsWriterJo
 func transfersWriterTask(writer io.Writer, wg *sync.WaitGroup) chan<- *transfersWriterJob {
 	ch := make(chan *transfersWriterJob) // becomes the global transfersChan
 	cache := map[uint64]*transfersWriterJob{}
-	sequence := uint64(0)
 	seconds_per_km := float64(1020) // 17 mins
 
 	go func() {
@@ -541,25 +541,25 @@ func transfersWriterTask(writer io.Writer, wg *sync.WaitGroup) chan<- *transfers
 				distance_m := calculate_distance(s.coordinates, job.coordinates)
 				if distance_m < 4000 {
 					transferProto := plannerv1alpha.Transfer{
-						Sequence:     sequence,
+						Sequence:     transfersSequence,
 						FromStop:     job.sequence,
 						ToStop:       s.sequence,
 						TransferTime: uint32(distance_m / 1000 * seconds_per_km),
 						Type:         0,
 					}
 					check(protoWriter.Write(&transferProto))
-					sequence++
+					transfersSequence++
 
 					// Reverse direction
 					transferProto = plannerv1alpha.Transfer{
-						Sequence:     sequence,
+						Sequence:     transfersSequence,
 						FromStop:     s.sequence,
 						ToStop:       job.sequence,
 						TransferTime: uint32(distance_m / 1000 * seconds_per_km),
 						Type:         0,
 					}
 					check(protoWriter.Write(&transferProto))
-					sequence++
+					transfersSequence++
 				}
 			}
 
@@ -847,7 +847,7 @@ func main() {
 	_, err = fmt.Fprintf(
 		f, "scheduleStops %d\nschedules %d\nrouteStops %d\nroutes %d\nstops %d\ntransfers %d",
 		scheduleStopsSequence, schedulesExporter.count, routesExporter.routeStopSequence,
-		routesExporter.sequence, stopsExporter.sequence, 0,
+		routesExporter.sequence, stopsExporter.sequence, transfersSequence,
 	)
 	check(err)
 	closeFile(f)
