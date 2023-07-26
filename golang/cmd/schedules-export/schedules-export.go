@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"hash/fnv"
 	"io"
+	"math"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -23,6 +24,7 @@ import (
 
 	plannerv1alpha "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/planner/v1alpha"
 	v1 "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/v1"
+	latlng "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1"
 	"git.snowfall.se/junction/junction/golang/protoio"
 	"github.com/google/uuid"
 	"github.com/schollz/progressbar/v3"
@@ -71,6 +73,10 @@ type routesWriterJob struct {
 type schedulesWriterJob struct {
 	cache             schedulesCache
 	cacheSequenceList []uint64
+}
+type transfersWriterJob struct {
+	sequence    uint64
+	coordinates *latlng.LatLng
 }
 
 type stopCache map[uint64]*stopCacheData
@@ -144,6 +150,11 @@ func (self *stopsExporterType) add(job *stopJob) uint64 {
 		departureTime: job.departureTime,
 	}
 	thisStop.addReferences(job)
+
+	transfersChan <- &transfersWriterJob{
+		sequence:    self.sequence,
+		coordinates: job.point.Coordinates,
+	}
 
 	self.cache[identifier] = &thisStop
 	self.cacheSequenceList = append(self.cacheSequenceList, identifier)
@@ -302,6 +313,32 @@ var schedulesChan chan<- *schedulesWriterJob
 var scheduleStopsChan chan<- *plannerv1alpha.ScheduleStop
 var stopsChan chan<- *stopsWriterJob
 var scheduleStopsSequence = uint64(0)
+var transfersChan chan<- *transfersWriterJob
+
+// Calculate the distance in metres between 2 coordinates.
+// https://www.geodatasource.com/developers/go
+// License: LGPLv3
+func calculate_distance(pos1 *latlng.LatLng, pos2 *latlng.LatLng) float64 {
+	const PI float64 = 3.141592653589793
+
+	radlat1 := float64(PI * pos1.Latitude / 180)
+	radlat2 := float64(PI * pos2.Latitude / 180)
+
+	theta := float64(pos1.Longitude - pos2.Longitude)
+	radtheta := float64(PI * theta / 180)
+
+	dist := math.Sin(radlat1)*math.Sin(radlat2) + math.Cos(radlat1)*math.Cos(radlat2)*math.Cos(radtheta)
+
+	if dist > 1 {
+		dist = 1
+	}
+
+	dist = math.Acos(dist)
+	dist = dist * 180 / PI
+	dist = dist * 60 * 1.1515
+
+	return dist * 1.609344 * 1000
+}
 
 func idHash(idBuilder strings.Builder) uint64 {
 	h := fnv.New64a()
@@ -472,6 +509,61 @@ func stopsWriterTask(writer io.Writer, wg *sync.WaitGroup) chan<- *stopsWriterJo
 				}
 				check(protoWriter.Write(&stopProto))
 			}
+		}
+		check(w.Flush())
+	}()
+
+	return ch
+}
+
+func transfersWriterTask(writer io.Writer, wg *sync.WaitGroup) chan<- *transfersWriterJob {
+	ch := make(chan *transfersWriterJob) // becomes the global transfersChan
+	cache := map[uint64]*transfersWriterJob{}
+	sequence := uint64(0)
+	seconds_per_km := float64(1020) // 17 mins
+
+	go func() {
+		defer wg.Done()
+
+		w := bufio.NewWriter(writer)
+		protoWriter := protoio.NewProtoWriter[*plannerv1alpha.Transfer](w)
+
+		for job := range ch {
+			if job == nil {
+				break
+			}
+
+			if _, ok := cache[job.sequence]; ok {
+				continue
+			}
+
+			for _, s := range cache {
+				distance_m := calculate_distance(s.coordinates, job.coordinates)
+				if distance_m < 4000 {
+					transferProto := plannerv1alpha.Transfer{
+						Sequence:     sequence,
+						FromStop:     job.sequence,
+						ToStop:       s.sequence,
+						TransferTime: uint32(distance_m / 1000 * seconds_per_km),
+						Type:         0,
+					}
+					check(protoWriter.Write(&transferProto))
+					sequence++
+
+					// Reverse direction
+					transferProto = plannerv1alpha.Transfer{
+						Sequence:     sequence,
+						FromStop:     s.sequence,
+						ToStop:       job.sequence,
+						TransferTime: uint32(distance_m / 1000 * seconds_per_km),
+						Type:         0,
+					}
+					check(protoWriter.Write(&transferProto))
+					sequence++
+				}
+			}
+
+			cache[job.sequence] = job
 		}
 		check(w.Flush())
 	}()
@@ -651,7 +743,9 @@ func main() {
 	// Create an empty transfers.bin
 	f, err = os.OpenFile(filepath.Join(env.outputPath, "transfers.bin"), os.O_CREATE|os.O_WRONLY, 0644)
 	check(err)
-	closeFile(f)
+	defer closeFile(f)
+	fileWriterWg.Add(1)
+	transfersChan = transfersWriterTask(f, &fileWriterWg)
 
 	// Now open the main Input file
 	f, err = os.OpenFile(filepath.Join(env.dataPath, "/schedules.bin"), os.O_RDONLY, 0644)
@@ -737,6 +831,7 @@ func main() {
 	routeStopsChan <- nil
 	routesChan <- nil
 	stopsChan <- nil
+	transfersChan <- nil
 
 	fileWriterWg.Wait()
 	close(stopsChan)
@@ -744,6 +839,7 @@ func main() {
 	close(routeStopsChan)
 	close(schedulesChan)
 	close(scheduleStopsChan)
+	close(transfersChan)
 
 	// Store total number of records in each file to aid validate step.
 	f, err = os.Create(filepath.Join(env.outputPath, "_sizes"))
