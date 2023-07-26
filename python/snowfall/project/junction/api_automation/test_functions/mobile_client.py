@@ -29,6 +29,15 @@ _OfferSearchIncludes: TypeAlias = Literal[
     "offers.groups.options.details.cabinClass",
     "offers.groups.options.details.details",
 ]
+_OfferIncludes: TypeAlias = Literal[
+    "groups",
+    "groups.details",
+    "groups.details.legType",
+    "groups.options",
+    "groups.options.details",
+    "groups.options.details.cabinClass",
+    "groups.options.details.details",
+]
 
 _DATA_KEY = "data"
 _ID_KEY = "id"
@@ -42,6 +51,9 @@ _METHOD_PATCH = "PATCH"
 _METHOD_DELETE = "DELETE"
 _EMAIL_KEY = "email"
 _CRITERIA_KEY = "criteria"
+_CONTACT_DETAILS_KEY = "contactDetails"
+_RESIDENCE_ADDRESS_KEY = "residenceAddress"
+_ADDRESS_KEY = "address"
 
 _TripIncludes: TypeAlias = Literal["segments", "segments.legs", "segments.legs.legType"]
 
@@ -122,13 +134,13 @@ class MobileApiClient(Client):  # noqa: WPS214
 
     async def create_offer_price_quote(
         self,
-        options_id: str,
+        option_id: str,
         offer_id: str,
     ) -> dict[str, Any]:
         body = {
             _DATA_KEY: {
                 _TYPE_KEY: "trip-offer-price-quotes",
-                _ATTRIBUTES_KEY: {},
+                _ATTRIBUTES_KEY: {"sessionToken": "FMSXrOAhIOdvIbxAmfSt7vJtRBkurNbn"},
                 _RELATIONSHIPS_KEY: {
                     "offer": {
                         _DATA_KEY: {
@@ -139,7 +151,7 @@ class MobileApiClient(Client):  # noqa: WPS214
                     "options": {
                         _DATA_KEY: [
                             {
-                                _ID_KEY: options_id,
+                                _ID_KEY: option_id,
                                 _TYPE_KEY: "offer-options",
                             },
                         ],
@@ -164,10 +176,10 @@ class MobileApiClient(Client):  # noqa: WPS214
 
     async def create_order_with_payment(  # noqa: WPS211
         self,
-        offer_id: str,
-        option_ids: Sequence[str],
+        quote_id: str,
         passengers: Sequence[models.Passenger],
         contact_details: models.ContactDetails,
+        address: models.Address,
         payment_id: str,
         voucher_id: str | None = None,
         include: Sequence[_OrderIncludes] | None = None,
@@ -183,22 +195,24 @@ class MobileApiClient(Client):  # noqa: WPS214
                         )
                         for passenger in passengers
                     ],
-                    "contactDetails": dataclasses.asdict(
+                    _CONTACT_DETAILS_KEY: dataclasses.asdict(
                         contact_details,
                         dict_factory=models.dict_factory_to_camel,
                     ),
-                    "residenceAddress": {
-                        "addressLines": [
-                            "Street name 7",
-                        ],
-                        "countryCode": "GB",
-                        "postalCode": "12345",
-                        "city": "London",
-                    },
+                    _ADDRESS_KEY: dataclasses.asdict(
+                        address,
+                        dict_factory=models.dict_factory_to_camel,
+                    ),
                 },
                 _RELATIONSHIPS_KEY: {
                     "payment": {
                         _DATA_KEY: {_TYPE_KEY: "payments", _ID_KEY: payment_id},
+                    },
+                    "quote": {
+                        _DATA_KEY: {
+                            _TYPE_KEY: "trip-offer-price-quotes",
+                            _ID_KEY: quote_id,
+                        },
                     },
                 },
                 _TYPE_KEY: "orders",
@@ -396,6 +410,7 @@ class MobileApiClient(Client):  # noqa: WPS214
         return await self._make_request(
             method=_METHOD_GET,
             url="/offers/searches/{0}/offers".format(offer_search_id),
+            query_parameters={"include": "groups.details"},
         )
 
     async def delete_user_group(
