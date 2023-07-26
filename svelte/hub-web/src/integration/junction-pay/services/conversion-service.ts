@@ -8,9 +8,17 @@ import { parseConversionSchema } from "../parsers/conversion";
 import type { PaginatedData } from "models/common";
 
 export default class ConversionService extends JunctionPayService {
-  async listConversions(token: string, cursor?: string): Promise<PaginatedData<ConversionModel>> {
+  async listConversions(
+    token: string,
+    cursor?: string,
+    limit = 100,
+  ): Promise<PaginatedData<ConversionModel>> {
     const resp = await this.makeRequest<ListConversionDetailsResponseSchema>("/conversions", {
-      queryParams: { include: "transactions", "page[cursor]": cursor },
+      queryParams: {
+        include: "transactions",
+        "page[cursor]": cursor,
+        "page[limit]": limit,
+      },
       token,
     });
 

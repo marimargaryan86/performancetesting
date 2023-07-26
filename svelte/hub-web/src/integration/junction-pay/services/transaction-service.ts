@@ -36,10 +36,17 @@ export default class TransactionService extends JunctionPayService {
     return Promise.all(companyRequests);
   }
 
-  async listTransactions(token: string, cursor?: string): Promise<PaginatedData<TransactionModel>> {
+  async listTransactions(
+    token: string,
+    cursor?: string,
+    limit = 100,
+  ): Promise<PaginatedData<TransactionModel>> {
     const resp = await this.makeRequest<ListTransactionsResponseSchema>("/transactions", {
       token,
-      queryParams: { "page[cursor]": cursor },
+      queryParams: {
+        "page[cursor]": cursor,
+        "page[limit]": limit,
+      },
     });
 
     if (resp.status !== 200) {
