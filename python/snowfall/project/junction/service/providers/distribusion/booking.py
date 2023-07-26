@@ -1,11 +1,15 @@
 import asyncio
 import datetime
+import pathlib
+import uuid
 import zoneinfo
 
+import orjson
 from dateutil.relativedelta import relativedelta
 
 from snowfall.project.junction.go.service.offers.v1.models_pb2 import OfferSegmentLeg
 from snowfall.project.junction.go.service.orders.v1 import amqp_pb2, models_pb2
+from snowfall.project.junction.provider.v1alpha import bookings_pb2
 from snowfall.project.junction.service.providers.distribusion import (
     cache,
     notifications,
@@ -13,8 +17,9 @@ from snowfall.project.junction.service.providers.distribusion import (
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
-from snowfall.vendor.distribusion import client, enums, errors
-from snowfall.vendor.distribusion.models import criterias
+from snowfall.stdlib.persistence import filesystem
+from snowfall.vendor.distribusion import client, enums, errors, jsonapi_helpers
+from snowfall.vendor.distribusion.models import criterias, orders
 from snowfall.vendor.distribusion.models import orders as model_orders
 
 
@@ -28,11 +33,13 @@ class BookingHandler(object):
         notifier: notifications.Notifier,
         *,
         send_customer_email: bool = True,
+        booking_storage: filesystem.Storage,
     ):
         self._client = distribusion_client
         self._logger = stdout.get_logger()
         self._notifier = notifier
         self._send_customer_email = send_customer_email
+        self._storage = booking_storage
 
     async def book(
         self,
@@ -179,7 +186,11 @@ class BookingHandler(object):
             ),
         )
 
-        order_response = await self._poll_booking(order_create_response)
+        order_response, raw_response = await self._poll_booking(order_create_response)
+        await self._storage.put(
+            pathlib.Path(order_response.identifier),
+            raw_response,
+        )
 
         try:
             # TODO: this should be handled in a separate service
@@ -194,12 +205,12 @@ class BookingHandler(object):
     async def _poll_booking(
         self,
         model: model_orders.OrderCreateResponse,
-    ) -> model_orders.OrderResponse:
+    ) -> tuple[model_orders.OrderResponse, bytes]:
         for _ in range(self._poll_retries_limit):
-            order = await self._client.get_order(model.identifier)
+            order, raw_data = await self._client.get_order(model.identifier)
 
             if order.state == "executed":
-                return order
+                return order, raw_data
 
             await asyncio.sleep(self._wait_time_between_polling)
 
@@ -222,3 +233,50 @@ class BookingHandler(object):
                 return pax_type.type_code
 
         return "PNOS"
+
+
+class Transformer(object):
+    def __init__(self, provider_identifier: uuid.UUID, provider_name: str):
+        self._provider_id = str(provider_identifier)
+        self._provider_name = provider_name
+
+    async def raw_to_booking(self, raw: bytes) -> bookings_pb2.Booking:  # noqa: WPS210
+        booking_result = orders.OrderResponse(
+            **jsonapi_helpers.flatten_object(orjson.loads(raw)),
+        )
+
+        booking_status = bookings_pb2.Booking.STATUS_UNSPECIFIED
+        record_locator = ""
+        booking_references = []
+        created_at = None
+        # TODO: How to figure out real status?
+        if booking_result.booking:
+            booking = booking_result.booking
+
+            booking_status = bookings_pb2.Booking.STATUS_NOT_TICKETED
+            if booking.marketing_carrier_booking_number:
+                booking_status = bookings_pb2.Booking.STATUS_CONFIRMED
+
+            record_locator = booking.marketing_carrier_booking_number or ""
+
+            if booking.distribusion_booking_number:
+                booking_references = [booking.distribusion_booking_number]
+            if booking.created_at:
+                created_at = protobuf.datetime_to_protobuf(
+                    datetime.datetime.fromisoformat(booking.created_at),
+                )
+
+        return bookings_pb2.Booking(
+            id=booking_result.identifier,
+            status=booking_status,
+            provider=bookings_pb2.Booking.Provider(
+                id=self._provider_id,
+                name=self._provider_name,
+            ),
+            trip=bookings_pb2.Booking.Trip(
+                record_locator=record_locator,
+                operator_booking_references=booking_references,
+            ),
+            created_at=created_at,
+            # TODO: No idea how to get updated_at from the booking model.
+        )

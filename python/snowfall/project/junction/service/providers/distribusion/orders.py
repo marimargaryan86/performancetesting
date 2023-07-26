@@ -16,6 +16,7 @@ from snowfall.project.junction.service.providers.distribusion.booking import (
 from snowfall.stdlib import service
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.logging import stdout
+from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer, types
@@ -25,7 +26,9 @@ from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 _PROVIDER_NAME = "Distribusion"
 
 
-async def orders(app: service.AsyncApplication[config.OrdersSettings]) -> None:
+async def orders(  # noqa: WPS217, WPS210
+    app: service.AsyncApplication[config.OrdersSettings],
+) -> None:
     http_client = await app.stack.enter_async_context(
         httpx.AsyncClient(
             timeout=app.settings.api_timeout,
@@ -55,7 +58,9 @@ async def orders(app: service.AsyncApplication[config.OrdersSettings]) -> None:
         http_client=http_client,
         rate_limit_client=rate_limit_client,
     )
-
+    booking_storage = await app.stack.enter_async_context(
+        filesystem.Storage.from_dsn(app.settings.storage_dsn),
+    )
     await OrderConsumer(
         consumer_obj=amqp_consumer.Consumer(
             connection=amqp_connection,
@@ -80,6 +85,7 @@ async def orders(app: service.AsyncApplication[config.OrdersSettings]) -> None:
                 recipient=app.settings.smtp_recipient,
             ),
             send_customer_email=app.settings.send_customer_email,
+            booking_storage=booking_storage,
         ),
         offer_cache=cache.OffersCache(
             client=redis.Client(redis_connection, prefix=app.name),

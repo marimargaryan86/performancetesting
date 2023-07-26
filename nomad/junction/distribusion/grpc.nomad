@@ -38,6 +38,10 @@ variable "retailer_partner_number" {
   type = string
 }
 
+variable "bucket" {
+  type = string
+}
+
 job "distribusion-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -126,6 +130,7 @@ AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 {{ with secret "kv/data/${var.environment}/distribusion" }}
 API_KEY={{ .Data.data.api_key }}
+STORAGE_DSN=s3://{{ .Data.data.aws_access_key_id }}:{{ .Data.data.aws_secret_access_key | urlquery }}@/${var.bucket}/distribusion
 {{ end }}
 RESELLER_PROVIDERS={{keyOrDefault "${var.environment}/providers/reseller-providers" "{}" | toJSON }}
 EOH

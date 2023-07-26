@@ -303,7 +303,7 @@ async def test_order_create(  # noqa: WPS210
     assert order.identifier
     logging.info("Order ID: %s", order.identifier)
 
-    order_details = await distribusion_client.get_order(order.identifier)
+    order_details, raw_data = await distribusion_client.get_order(order.identifier)
     assert order_details.state
     logging.info("Order state: %s", order_details.state)
 
@@ -313,7 +313,7 @@ async def test_get_order_by_id(
     distribusion_client: client.DistribusionClient,
 ) -> None:
     order_id = "VICA-66bbc46a-7bfd-4c5b-bcdd-d984ff247f0b"
-    order_details = await distribusion_client.get_order(order_id)
+    order_details, raw_data = await distribusion_client.get_order(order_id)
     assert order_details.identifier
 
 
@@ -322,7 +322,7 @@ async def test_get_tickets(
     distribusion_client: client.DistribusionClient,
 ) -> None:
     order_id = "VICA-66bbc46a-7bfd-4c5b-bcdd-d984ff247f0b"
-    order_details = await distribusion_client.get_order(order_id)
+    order_details, raw_data = await distribusion_client.get_order(order_id)
     assert order_details.booking
     assert order_details.booking.identifier
 
@@ -335,7 +335,7 @@ async def test_get_cancellation_conditions(  # noqa: WPS218
     distribusion_client: client.DistribusionClient,
 ) -> None:
     order_id = "VICA-66bbc46a-7bfd-4c5b-bcdd-d984ff247f0b"
-    order_details = await distribusion_client.get_order(order_id)
+    order_details, raw_data = await distribusion_client.get_order(order_id)
     assert order_details.booking
     assert order_details.booking.identifier
 
@@ -353,7 +353,7 @@ async def test_create_cancellation(  # noqa: WPS218
     distribusion_client: client.DistribusionClient,
 ) -> None:
     order_id = "VICA-4be6700c-4dcd-4513-987b-6d64669367ea"
-    order_details = await distribusion_client.get_order(order_id)
+    order_details, raw_data = await distribusion_client.get_order(order_id)
     assert order_details.booking
     assert order_details.booking.identifier
 

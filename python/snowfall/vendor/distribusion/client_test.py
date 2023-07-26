@@ -112,7 +112,7 @@ async def test_get_order(  # noqa: WPS218
         json=json_res,
     )
 
-    response = await distribusion_client.get_order(order_id)
+    response, raw_data = await distribusion_client.get_order(order_id)
 
     assert response.identifier == order_id
     assert response.currency == "GBP"

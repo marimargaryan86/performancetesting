@@ -34,6 +34,10 @@ variable "retailer_partner_number" {
   type = string
 }
 
+variable "bucket" {
+  type = string
+}
+
 job "distribusion-orders" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -107,6 +111,7 @@ REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis:
 SMTP_DSN={{range $index, $service := service "smtp"}}smtp://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}{{end}}
 {{ with secret "kv/data/${var.environment}/distribusion" }}
 API_KEY={{ .Data.data.api_key }}
+STORAGE_DSN=s3://{{ .Data.data.aws_access_key_id }}:{{ .Data.data.aws_secret_access_key | urlquery }}@/${var.bucket}/distribusion
 {{ end }}
 EOH
         destination = "services.env"

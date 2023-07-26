@@ -20,15 +20,17 @@ class DistribusionConfig(pydantic.BaseModel):
 
 class Settings(service.ProviderSettings, DistribusionConfig):
     ttl: datetime.timedelta = datetime.timedelta(minutes=DEFAULT_TTL_IN_MINUTES)
+    storage_dsn: service.AnyDsn
 
 
-class OrdersSettings(DistribusionConfig, service.Settings):
+class OrdersSettings(service.Settings, DistribusionConfig):
     amqp_dsn: pydantic.AnyUrl
     redis_dsn: Sequence[pydantic.AnyUrl]
     smtp_dsn: pydantic.AnyUrl
     smtp_sender: pydantic.EmailStr
     smtp_recipient: pydantic.EmailStr
     send_customer_email: bool = True
+    storage_dsn: service.AnyDsn
 
 
 class PricingSettings(DistribusionConfig, service.Settings):

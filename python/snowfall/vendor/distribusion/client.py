@@ -315,14 +315,15 @@ class DistribusionClient(object):  # noqa: WPS214
         self,
         order_id: str,
         rate_limit_timeout: float = 60,
-    ) -> orders.OrderResponse:
+    ) -> tuple[orders.OrderResponse, bytes]:
         response = await self._make_request(
             "GET",
             "/orders/{order_id}".format(order_id=order_id),
             rate_limit_timeout=rate_limit_timeout,
         )
 
-        return orders.OrderResponse(**jsonapi_helpers.flatten_object(response.json()))
+        order = orders.OrderResponse(**jsonapi_helpers.flatten_object(response.json()))
+        return order, response.content
 
     async def get_tickets(self, booking_id: str) -> orders.TicketDocument:
         response = await self._make_request(
