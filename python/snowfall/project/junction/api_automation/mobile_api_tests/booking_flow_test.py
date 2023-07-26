@@ -177,12 +177,16 @@ async def create_order(  # noqa: WPS210
     return order["data"]
 
 
+iata_codes = [("latvia", "lithuania"), ("funchal", "lisbon")]
+
+
 @pytest.mark.integration()
+@pytest.mark.parametrize("iata_codes", iata_codes)
 async def test_booking_flow(  # noqa: WPS217, WPS210
     mobile_client: MobileApiClient,
     departure_after: datetime.datetime,
+    iata_codes: str,
 ) -> None:
-    iata_codes = ["lon", "ath"]
     origin, destination = await get_place_id(mobile_client, iata_codes)
 
     create_trip_search_id = await create_trip_search(
