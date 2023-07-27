@@ -9,9 +9,11 @@
   import Button from "components/ui/button.svelte";
   import Offer from "./offer.svelte";
   import { fade } from "svelte/transition";
-  import OffersMockup from "./offers-mockup.ts";
+  import OffersMockup from "../offers-mockup.ts";
   import type { BookingSearchForm } from "../booking-search-form";
   import { onMount } from "svelte";
+  import routeConfig from "routeConfig";
+  import { page } from "$app/stores";
 
   let bookingSearchForm = {} as BookingSearchForm;
   export let offers = OffersMockup;
@@ -30,9 +32,11 @@
     offers = offers;
   }
 
+  let searchQuery: string;
+
   onMount(() => {
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
+    const urlParams = $page.url.searchParams;
+    searchQuery = urlParams.toString();
 
     bookingSearchForm.adults = Number(urlParams.get("adults")) ?? 0;
     bookingSearchForm.children = Number(urlParams.get("children")) ?? 0;
@@ -64,11 +68,20 @@
 
   function handleFareSelected(event): void {
     isFareSelected = event.detail.selected;
+
+    let urlParams = $page.url.searchParams;
+
     if (isFareSelected) {
       selectedFare = event.detail.fare;
+      urlParams.set("fare_id", selectedFare.id);
+      urlParams.set("offer_id", event.detail.offerId);
     } else {
       selectedFare = {};
+      urlParams.delete("fare_id");
+      urlParams.delete("offer_id");
     }
+
+    searchQuery = urlParams.toString();
   }
 
   function cancelSelectedOffer(): void {
@@ -81,6 +94,10 @@
     offers = offers;
     offerSelected = false;
     isFareSelected = false;
+  }
+
+  function goToSummaryPage(): void {
+    location.href = `${routeConfig.book.summary.root}?${searchQuery}`;
   }
 </script>
 
@@ -142,7 +159,9 @@
   {#if offerSelected}
     <div class="next-block" transition:fade|local={{ duration: 100 }}>
       <Button on:click={cancelSelectedOffer} size="medium" variant="outline">Cancel</Button>
-      <Button size="medium" disabled={!isFareSelected}><span class="next-btn">Next</span></Button>
+      <Button on:click={goToSummaryPage} size="medium" disabled={!isFareSelected}
+        ><span class="next-btn">Next</span></Button
+      >
     </div>
   {/if}
 </div>

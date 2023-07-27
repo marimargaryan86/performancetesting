@@ -5,6 +5,9 @@ export default {
     select: {
       root: "/book/select-offer",
     },
+    summary: {
+      root: "/book/summary",
+    },
   },
   login: "/login",
   settings: "/settings",

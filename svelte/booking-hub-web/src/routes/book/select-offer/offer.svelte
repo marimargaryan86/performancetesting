@@ -79,7 +79,11 @@
   </div>
   {#if offer.selected}
     <div class="expanded" transition:fly|local={{ duration: 200, x: 100 }}>
-      <AlternativeFares on:fareSelected alternativeFares={offer.alternativeFares} />
+      <AlternativeFares
+        on:fareSelected
+        alternativeFares={offer.alternativeFares}
+        offerId={offer.id}
+      />
     </div>
   {/if}
 </div>

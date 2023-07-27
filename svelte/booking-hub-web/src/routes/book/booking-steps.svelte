@@ -61,6 +61,7 @@
     align-content: center;
     align-items: center;
     max-width: 384px;
+    height: 56px;
   }
 
   .book-steps span {

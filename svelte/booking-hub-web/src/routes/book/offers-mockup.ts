@@ -29,7 +29,7 @@ const offers = [
         type: "Standard",
         description:
           "Changes cannot be made to a ticket with less than 1 hour remaining before departure.",
-        price: "149.00",
+        price: "159.00",
         selected: false,
       },
       {
@@ -38,7 +38,7 @@ const offers = [
         type: "Standard",
         description:
           "Changes cannot be made to a ticket with less than 1 hour remaining before departure.",
-        price: "149.00",
+        price: "179.00",
         selected: false,
       },
       {
@@ -47,7 +47,7 @@ const offers = [
         type: "Standard",
         description:
           "Changes cannot be made to a ticket with less than 1 hour remaining before departure.",
-        price: "149.00",
+        price: "229.00",
         selected: false,
       },
       {
@@ -56,7 +56,7 @@ const offers = [
         type: "Standard",
         description:
           "Changes cannot be made to a ticket with less than 1 hour remaining before departure.",
-        price: "149.00",
+        price: "349.00",
         selected: false,
       },
       {
@@ -65,7 +65,7 @@ const offers = [
         type: "Standard",
         description:
           "Changes cannot be made to a ticket with less than 1 hour remaining before departure.",
-        price: "149.00",
+        price: "449.00",
         selected: false,
       },
       {
@@ -74,7 +74,7 @@ const offers = [
         type: "Standard",
         description:
           "Changes cannot be made to a ticket with less than 1 hour remaining before departure.",
-        price: "149.00",
+        price: "459.00",
         selected: false,
       },
       {
@@ -83,7 +83,7 @@ const offers = [
         type: "Standard",
         description:
           "Changes cannot be made to a ticket with less than 1 hour remaining before departure.",
-        price: "149.00",
+        price: "466.00",
         selected: false,
       },
     ],
@@ -100,7 +100,7 @@ const offers = [
     arrivalStation: "Barcelona Sants",
     departureStationInfo: "Malaga, Spain",
     arrivalStationInfo: "Barcelona, Spain",
-    price: "€149",
+    price: "€157",
     selected: false,
     alternativeFares: [
       {
@@ -109,7 +109,7 @@ const offers = [
         type: "Standard",
         description:
           "Changes cannot be made to a ticket with less than 1 hour remaining before departure.",
-        price: "149.00",
+        price: "157.00",
         selected: false,
       },
       {
@@ -118,7 +118,7 @@ const offers = [
         type: "Standard",
         description:
           "Changes cannot be made to a ticket with less than 1 hour remaining before departure.",
-        price: "149.00",
+        price: "249.00",
         selected: false,
       },
       {
@@ -127,7 +127,7 @@ const offers = [
         type: "Standard",
         description:
           "Changes cannot be made to a ticket with less than 1 hour remaining before departure.",
-        price: "149.00",
+        price: "259.00",
         selected: false,
       },
       {
@@ -136,7 +136,7 @@ const offers = [
         type: "Standard",
         description:
           "Changes cannot be made to a ticket with less than 1 hour remaining before departure.",
-        price: "149.00",
+        price: "269.00",
         selected: false,
       },
       {
@@ -145,7 +145,7 @@ const offers = [
         type: "Standard",
         description:
           "Changes cannot be made to a ticket with less than 1 hour remaining before departure.",
-        price: "149.00",
+        price: "289.00",
         selected: false,
       },
       {
@@ -154,7 +154,7 @@ const offers = [
         type: "Standard",
         description:
           "Changes cannot be made to a ticket with less than 1 hour remaining before departure.",
-        price: "149.00",
+        price: "300.00",
         selected: false,
       },
       {
@@ -163,7 +163,7 @@ const offers = [
         type: "Standard",
         description:
           "Changes cannot be made to a ticket with less than 1 hour remaining before departure.",
-        price: "149.00",
+        price: "305.00",
         selected: false,
       },
       {
@@ -172,7 +172,7 @@ const offers = [
         type: "Standard",
         description:
           "Changes cannot be made to a ticket with less than 1 hour remaining before departure.",
-        price: "149.00",
+        price: "310.00",
         selected: false,
       },
     ],
@@ -189,7 +189,7 @@ const offers = [
     arrivalStation: "Barcelona Sants",
     departureStationInfo: "Malaga, Spain",
     arrivalStationInfo: "Barcelona, Spain",
-    price: "€149",
+    price: "€1351",
     selected: false,
     alternativeFares: [
       {
@@ -198,7 +198,7 @@ const offers = [
         type: "Standard",
         description:
           "Changes cannot be made to a ticket with less than 1 hour remaining before departure.",
-        price: "149.00",
+        price: "1351.00",
         selected: false,
       },
       {
@@ -207,7 +207,7 @@ const offers = [
         type: "Standard",
         description:
           "Changes cannot be made to a ticket with less than 1 hour remaining before departure.",
-        price: "149.00",
+        price: "1587.00",
         selected: false,
       },
       {
@@ -216,7 +216,7 @@ const offers = [
         type: "Standard",
         description:
           "Changes cannot be made to a ticket with less than 1 hour remaining before departure.",
-        price: "149.00",
+        price: "2030.00",
         selected: false,
       },
       {
@@ -225,43 +225,7 @@ const offers = [
         type: "Standard",
         description:
           "Changes cannot be made to a ticket with less than 1 hour remaining before departure.",
-        price: "149.00",
-        selected: false,
-      },
-      {
-        id: 5,
-        title: "Flex",
-        type: "Standard",
-        description:
-          "Changes cannot be made to a ticket with less than 1 hour remaining before departure.",
-        price: "149.00",
-        selected: false,
-      },
-      {
-        id: 6,
-        title: "Flex",
-        type: "Standard",
-        description:
-          "Changes cannot be made to a ticket with less than 1 hour remaining before departure.",
-        price: "149.00",
-        selected: false,
-      },
-      {
-        id: 7,
-        title: "Flex",
-        type: "Standard",
-        description:
-          "Changes cannot be made to a ticket with less than 1 hour remaining before departure.",
-        price: "149.00",
-        selected: false,
-      },
-      {
-        id: 8,
-        title: "Flex",
-        type: "Standard",
-        description:
-          "Changes cannot be made to a ticket with less than 1 hour remaining before departure.",
-        price: "149.00",
+        price: "2115.00",
         selected: false,
       },
     ],
