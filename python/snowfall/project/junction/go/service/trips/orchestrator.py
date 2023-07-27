@@ -3,6 +3,7 @@ import datetime
 import itertools
 import zoneinfo
 from collections.abc import Mapping, Sequence
+from typing import NamedTuple
 
 import timezonefinder
 
@@ -25,7 +26,11 @@ from snowfall.stdlib.v1 import latlng_pb2
 _tz_finder = timezonefinder.TimezoneFinder()
 
 TripReferenceGroup = Sequence[models_pb2.TripReference]
-TripGroup = Sequence[models_pb2.Trip]
+TripGroup = list[models_pb2.Trip]
+
+
+class JourneyCandidates(NamedTuple):
+    trip_groups: list[TripGroup]
 
 
 def _sort_keys(segment: models_pb2.Segment) -> tuple[int, int]:
@@ -70,10 +75,10 @@ class TripOrchestrator(object):
 
         return trip_groups
 
-    async def get_trip_groups_from_reference_groups(
+    async def get_journeys_from_reference_groups(
         self,
         trip_reference_groups: Sequence[TripReferenceGroup],
-    ) -> list[TripGroup]:
+    ) -> JourneyCandidates:
         trip_reference_map = {
             trip.id: trip
             async for trip in await self._trip_repository.find(
@@ -86,25 +91,29 @@ class TripOrchestrator(object):
         }
         legs_map = await self._make_legs_map(trip_reference_map)
 
-        return [
-            [
-                models_pb2.Trip(
-                    id=reference.id,
-                    segments=sorted(
-                        [
-                            models_pb2.Segment(
-                                id=segment.id,
-                                legs=[legs_map[leg_id] for leg_id in segment.leg_ids],
-                            )
-                            for segment in trip_reference_map[reference.id].segments
-                        ],
-                        key=_sort_keys,
-                    ),
-                )
-                for reference in reference_group
-            ]
-            for reference_group in trip_reference_groups
-        ]
+        return JourneyCandidates(
+            trip_groups=[
+                [
+                    models_pb2.Trip(
+                        id=reference.id,
+                        segments=sorted(
+                            [
+                                models_pb2.Segment(
+                                    id=segment.id,
+                                    legs=[
+                                        legs_map[leg_id] for leg_id in segment.leg_ids
+                                    ],
+                                )
+                                for segment in trip_reference_map[reference.id].segments
+                            ],
+                            key=_sort_keys,
+                        ),
+                    )
+                    for reference in reference_group
+                ]
+                for reference_group in trip_reference_groups
+            ],
+        )
 
     async def _make_legs_map(
         self,

@@ -26,6 +26,10 @@ variable "count" {
   type = number
 }
 
+variable "max_trip_length_factor" {
+  type = number
+}
+
 job "trips-consume-trip-candidate-searches" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -123,9 +127,10 @@ EOH
       }
 
       env {
-        ENV_NAME        = "${var.environment}"
-        SENTRY_DSN      = "https://9f6821dca30141bd8f3dc919b7806f6c@sentry.snowfall.se/26"
-        PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
+        ENV_NAME               = "${var.environment}"
+        SENTRY_DSN             = "https://9f6821dca30141bd8f3dc919b7806f6c@sentry.snowfall.se/26"
+        PROMETHEUS_PORT        = "${NOMAD_PORT_prometheus}"
+        MAX_TRIP_LENGTH_FACTOR = "${var.max_trip_length_factor}"
       }
     }
   }

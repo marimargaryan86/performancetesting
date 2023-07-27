@@ -12,7 +12,7 @@ from snowfall.project.junction.go.service.planner.v1alpha import (
     planner_pb2,
     planner_pb2_grpc,
 )
-from snowfall.project.junction.go.service.trips import orchestrator, trips
+from snowfall.project.junction.go.service.trips import filters, orchestrator, trips
 from snowfall.project.junction.go.service.trips.v1alpha import amqp_pb2, trips_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
@@ -130,12 +130,14 @@ class TripCandidateSearchConsumer(object):
         trip_candidate_search_repository: trips.TripCandidateSearchRepository,
         trip_orchestrator: orchestrator.TripOrchestrator,
         offer_orchestrator: orchestrator.OfferOrchestrator,
+        max_trip_length_factor: int | float | None = None,
     ):
         self._consumer = consumer_obj
         self._trip_repository = trip_repository
         self._trip_candidate_search_repository = trip_candidate_search_repository
         self._trip_orchestrator = trip_orchestrator
         self._offer_orchestrator = offer_orchestrator
+        self._max_trip_length_factor = max_trip_length_factor
         self._logger = stdout.get_logger()
 
     async def consume(self) -> None:
@@ -165,14 +167,21 @@ class TripCandidateSearchConsumer(object):
             list(itertools.chain(*reference_groups)),
         )
 
-        trip_groups = (
-            await self._trip_orchestrator.get_trip_groups_from_reference_groups(
+        journey_candidates = (
+            await self._trip_orchestrator.get_journeys_from_reference_groups(
                 trip_reference_groups=reference_groups,
             )
         )
+
+        if self._max_trip_length_factor:
+            journey_candidates = filters.filter_include_multimodal(
+                journey_candidates=journey_candidates,
+                max_trip_length_factor=self._max_trip_length_factor,
+            )
+
         await self._create_and_save_offer_searches(
             trip_candidate_search=body.trip_candidate_search,
-            trip_groups=trip_groups,
+            trip_groups=journey_candidates.trip_groups,
         )
 
     async def _create_and_save_offer_searches(

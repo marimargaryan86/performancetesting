@@ -45,6 +45,7 @@ class _ConsumeTripCandidateSearchSettings(service.Settings):
     offers_address: str
     schedules_address: str
     mongo_dsn: Sequence[AnyUrl]
+    max_trip_length_factor: int | float | None = None
     trip_candidate_search_ttl: datetime.timedelta = _DEFAULT_TTL
 
 
@@ -121,6 +122,7 @@ async def _consume_trip_candidate_search_tasks(
                     offers_grpc_pb2_grpc.OfferSearchServiceStub(offers_channel),
                 ),
             ),
+            max_trip_length_factor=app.settings.max_trip_length_factor,
         )
 
         await consumer_obj.consume()
