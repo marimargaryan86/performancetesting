@@ -24,6 +24,7 @@ class Client(abc.ABC):
         payer: companies_models.Company,
         beneficiary_company: companies_models.Company,
         session_token: str,
+        tax: int,
     ) -> transactions_models.Quotation:
         """Create a quotation resource."""
 
@@ -54,6 +55,7 @@ class DictClient(Client):
         payer: companies_models.Company,
         beneficiary_company: companies_models.Company,
         session_token: str,
+        tax: int,
     ) -> transactions_models.Quotation:
         mock_from_amount = money.Money(amount, money.Currency(from_currency))
         mock_to_amount = money.Money(amount, money.Currency(to_currency))
@@ -67,6 +69,9 @@ class DictClient(Client):
                 quotation=mock_to_amount.protobuf(),
                 fx_margin=mock_to_amount.protobuf(),
                 processing_margin=mock_to_amount.protobuf(),
+                total_amount=mock_to_amount.protobuf(),
+                total_markups=mock_to_amount.protobuf(),
+                tax=money.Money(tax, money.Currency(from_currency)).protobuf(),
             ),
             rates=transactions_models.QuotationRates(
                 fx_quote=1.0,
@@ -114,6 +119,7 @@ class GrpcClient(Client):
         payer: companies_models.Company,
         beneficiary_company: companies_models.Company,
         session_token: str,
+        tax: int,
     ) -> transactions_models.Quotation:
         response = await errors.handle_grpc_errors(
             self._quotations.CreateQuotation(
@@ -124,6 +130,7 @@ class GrpcClient(Client):
                     payer=payer,
                     beneficiary_company=beneficiary_company,
                     session_token=session_token,
+                    tax=tax,
                 ),
             ),
         )

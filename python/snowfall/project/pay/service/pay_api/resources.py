@@ -38,6 +38,19 @@ class QuoteResource(models.Resource):
             type=QuoteResource.api_type,
             attributes={
                 "amount": money.from_protobuf(quotation.amounts.quotation).amount,
+                "tax": money.from_protobuf(quotation.amounts.tax).amount,
+                "totalMarkups": money.from_protobuf(
+                    quotation.amounts.total_markups,
+                ).amount,
+                "totalAmount": money.from_protobuf(
+                    quotation.amounts.total_amount,
+                ).amount,
+                "resellerMarkup": money.from_protobuf(
+                    quotation.amounts.reseller_markup,
+                ).amount,
+                "leadCompanyMarkup": money.from_protobuf(
+                    quotation.amounts.lead_reseller_markup,
+                ).amount,
             },
             relationships={
                 "fromCurrency": {

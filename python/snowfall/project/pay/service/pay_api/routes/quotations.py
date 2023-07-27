@@ -79,6 +79,7 @@ class Quotations(endpoints.HTTPEndpoint):
             payer=company,
             beneficiary_company=beneficiary_company,
             session_token=session_token,
+            tax=body.get("tax", 0),
         )
 
         return await messages.create_response(

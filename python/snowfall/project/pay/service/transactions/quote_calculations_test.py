@@ -1,7 +1,7 @@
 import pytest
 
 from snowfall.project.pay.service.companies.v1alpha import models_pb2 as company_models
-from snowfall.project.pay.service.quotations.quote_calculations import Quote
+from snowfall.project.pay.service.transactions.quote import Quote
 from snowfall.stdlib import money
 
 
@@ -26,7 +26,9 @@ async def test_same_currencies(
         money.Currency("USD"),
         1,
         company,
+        None,
         "beneficiary_id",
+        0,
     ).to_proto()
 
     assert money.from_protobuf(quote.amounts.quotation).amount == expected_amount.amount
@@ -49,7 +51,9 @@ async def test_calculation(
         money.Currency("EUR"),
         1.16,
         company,
+        None,
         "beneficiary_id",
+        0,
     ).to_proto()
 
     assert (

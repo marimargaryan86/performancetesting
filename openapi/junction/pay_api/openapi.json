@@ -655,6 +655,45 @@
                   "amount": {
                     "$ref": "#/components/schemas/MoneyAmount"
                   },
+                  "tax": {
+                    "$ref": "#/components/schemas/MoneyAmount"
+                  },
+                  "totalMarkups": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/MoneyAmount"
+                      }
+                    ],
+                    "description": "Sum of all markups",
+                    "readOnly": true
+                  },
+                  "totalAmount": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/MoneyAmount"
+                      }
+                    ],
+                    "description": "Sum of amount, total markups and tax(if provided)",
+                    "readOnly": true
+                  },
+                  "resellerMarkup": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/MoneyAmount"
+                      }
+                    ],
+                    "description": "Company Markup",
+                    "readOnly": true
+                  },
+                  "leadCompanyMarkup": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/MoneyAmount"
+                      }
+                    ],
+                    "description": "Lead Company Markup",
+                    "readOnly": true
+                  },
                   "externalReference": {
                     "type": "string",
                     "example": "FMSXrOAhIOdvIbxAmfSt7vJtRBkurNbn",
@@ -662,7 +701,11 @@
                   }
                 },
                 "required": [
-                  "amount"
+                  "amount",
+                  "totalAmount",
+                  "totalMarkups",
+                  "resellerMarkup",
+                  "leadCompanyMarkup"
                 ]
               },
               "relationships": {

@@ -7,7 +7,10 @@ import pydantic
 from motor import motor_asyncio
 from redis import asyncio as aioredis
 
-from snowfall.project.pay.adapter import currencies
+from snowfall.project.pay.adapter import currencies, lead_companies
+from snowfall.project.pay.service.companies.v1alpha import (
+    grpc_pb2_grpc as lead_company_pb2_grpc,
+)
 from snowfall.project.pay.service.currencies.v1alpha import currencies_pb2_grpc
 from snowfall.project.pay.service.transactions import cache, transactions
 from snowfall.project.pay.service.transactions.grpc import (
@@ -28,6 +31,7 @@ class _GrpcSettings(service.Settings):
     mongo_dsn: Sequence[pydantic.AnyUrl]
     redis_dsn: Sequence[pydantic.AnyUrl]
     currencies_address: str
+    companies_address: str
     cc_login: str
     cc_api_key: str
     cc_address: str
@@ -79,6 +83,11 @@ async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
                 currencies_client=currencies.GrpcClient(
                     currencies_pb2_grpc.CurrencyServiceStub(
                         create_channel(app.settings.currencies_address),
+                    ),
+                ),
+                lead_company_client=lead_companies.GrpcClient(
+                    lead_company_pb2_grpc.LeadCompaniesServiceStub(
+                        create_channel(app.settings.companies_address),
                     ),
                 ),
             ),

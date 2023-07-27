@@ -1,11 +1,12 @@
 import datetime
+from collections.abc import Sequence
 from decimal import Decimal
 
 from snowfall.project.pay.service.companies.v1alpha import models_pb2 as company_models
 from snowfall.project.pay.service.transactions.v1alpha import models_pb2
-from snowfall.stdlib import string
+from snowfall.stdlib import money, string
 from snowfall.stdlib.format.protobuf import datetime_to_protobuf
-from snowfall.stdlib.money import Currency, Money, total
+from snowfall.stdlib.v1 import money_pb2
 
 _EXPIRATION_MINUTES = 15
 
@@ -14,17 +15,27 @@ class Quote(object):
     def __init__(  # noqa: WPS211
         self,
         amount: int,
-        from_currency: Currency,
-        to_currency: Currency,
+        from_currency: money.Currency,
+        to_currency: money.Currency,
         rate: float,
         company: company_models.Company,
+        lead_company: company_models.LeadCompany | None,
         beneficiary_id: str,
+        tax: int,
     ) -> None:
         self._amount = amount
         self._from_currency = from_currency
         self._to_currency = to_currency
         self._rate = rate
         self._company = company
+        self._lead_company = lead_company
+        self._reseller_markup = self._get_markup(
+            getattr(self._company, "reseller_markups", []),
+        )
+        self._lead_company_markup = self._get_markup(
+            getattr(self._lead_company, "sales_markups", []),
+        )
+        self._tax = money.Money(tax, currency=self._from_currency)
         self._quotation_amounts = self._calculate_margins()
         self._beneficiary_id = beneficiary_id
 
@@ -43,6 +54,12 @@ class Quote(object):
                 processing_margin=self._quotation_amounts[
                     "processing_margin"
                 ].protobuf(),
+                tax_converted=self._quotation_amounts["tax_converted"].protobuf(),
+                total_markups=self._quotation_amounts["total_markups"].protobuf(),
+                total_amount=self._quotation_amounts["total_amount"].protobuf(),
+                reseller_markup=self._reseller_markup.protobuf(),
+                lead_reseller_markup=self._lead_company_markup.protobuf(),
+                tax=self._tax.protobuf(),
             ),
             rates=models_pb2.QuotationRates(
                 fx_quote=self._rate,
@@ -64,20 +81,25 @@ class Quote(object):
     def _calculate_fx_buffer_rate(self, buffer_rate: float) -> float:
         return self._rate * buffer_rate / 100
 
-    def _calculate_margins(self) -> dict[str, Money]:
-        beneficiary = Money(self._amount, currency=self._from_currency)
+    def _calculate_margins(self) -> dict[str, money.Money]:  # noqa: WPS210, WPS204
+        beneficiary = money.Money(self._amount, currency=self._from_currency)
+        rate = Decimal(self._rate)
         base_converted = beneficiary.convert(
             self._to_currency,
-            Decimal(self._rate),
+            rate,
         )
         sales_margin = base_converted.convert(
             self._to_currency,
             Decimal(self._company.sales_markup / 100),
         )
+        tax_converted = self._tax.convert(
+            self._to_currency,
+            rate,
+        )
 
         if self._from_currency == self._to_currency:
-            fx_margin = Money(0, self._to_currency)
-            processing_margin = Money(0, self._to_currency)
+            fx_margin = money.Money(0, self._to_currency)
+            processing_margin = money.Money(0, self._to_currency)
         else:
             fx_margin = base_converted.convert(
                 self._to_currency,
@@ -88,13 +110,43 @@ class Quote(object):
                 Decimal(self._company.processing_markup / 100),
             )
 
+        total_markups = money.total(
+            [
+                fx_margin,
+                processing_margin,
+                sales_margin,
+                self._reseller_markup.convert(self._to_currency, rate),
+                self._lead_company_markup.convert(
+                    self._to_currency,
+                    rate,
+                ),
+            ],
+        )
+
         return {
             "beneficiary": beneficiary,
             "base_converted": base_converted,
             "sales_margin": sales_margin,
             "fx_margin": fx_margin,
             "processing_margin": processing_margin,
-            "quotation": total(
+            "tax_converted": tax_converted,
+            "total_markups": total_markups,
+            "total_amount": money.total(
+                [
+                    base_converted,
+                    total_markups,
+                    tax_converted,
+                    self._reseller_markup.convert(
+                        self._to_currency,
+                        rate,
+                    ),
+                    self._lead_company_markup.convert(
+                        self._to_currency,
+                        rate,
+                    ),
+                ],
+            ),
+            "quotation": money.total(
                 [
                     base_converted,
                     fx_margin,
@@ -103,3 +155,10 @@ class Quote(object):
                 ],
             ),
         }
+
+    def _get_markup(self, markups: Sequence[money_pb2.Money]) -> money.Money:
+        for proto_markup in markups:
+            markup = money.from_protobuf(proto_markup)
+            if markup.currency == self._to_currency:
+                return markup
+        return money.Money(0, self._to_currency)
