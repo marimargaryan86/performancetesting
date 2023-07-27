@@ -10,6 +10,7 @@ from typing import Any
 
 import aiofiles
 import bson
+from google.protobuf.json_format import MessageToDict
 from motor import motor_asyncio
 from pydantic import AnyUrl
 
@@ -105,7 +106,12 @@ async def _generate_cities(app: service.Application[_CitiesSettings]) -> None:
 
         async for node in locations.node_to_place(locations_repo, nodes):
             count += 1
-            place = places_cache.get(node.location.id)
+            potential_new_place = MessageToDict(node)
+            from_cache = places_cache.get(node.location.id)
+            place = None
+            if potential_new_place == from_cache:
+                place = from_cache
+
             task = (
                 places.replace_one(
                     places_collection,
