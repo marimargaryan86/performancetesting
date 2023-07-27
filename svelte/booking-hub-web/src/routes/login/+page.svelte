@@ -12,6 +12,9 @@
 
   let data = { email: "", password: "" };
   let pending = false;
+  let disabled = false;
+
+  $: disabled = data.email === "" || data.password === "";
 
   function clearError(key: keyof NonNullable<ActionData>): void {
     if (!form) {
@@ -50,6 +53,13 @@
     <JunctionLogo snowfallTechnology poweredBy />
 
     <form on:submit|preventDefault={submit}>
+      <div class="login-tabs">
+        <div class="login-tab">
+          <p class="typography headline-small bold">Log in</p>
+          <div class="underscore" />
+        </div>
+      </div>
+
       <TextField
         label="Email"
         type="email"
@@ -73,8 +83,7 @@
       >
         <LockIcon slot="icon-before" color="var(--color-main-primary-500)" />
       </TextField>
-
-      <Button type="submit">
+      <Button type="submit" {disabled}>
         Login
 
         {#if pending}
@@ -179,5 +188,27 @@
     gap: 24px;
     width: 100%;
     max-width: 448px;
+  }
+
+  .login-tabs {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .login-tab {
+    position: relative;
+  }
+
+  .login-tab p {
+    padding-bottom: 16px;
+  }
+
+  .underscore {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 45%;
+    height: 4px;
+    background-color: var(--color-main-primary-500);
   }
 </style>
