@@ -17,6 +17,39 @@ from snowfall.vendor.junction.go.models import (
     TravelerDocument,
 )
 
+PASSENGERS = (
+    Passenger(
+        first_name="John",
+        last_name="Smith",
+        title="mr",
+        gender="male",
+        date_of_birth="1980-02-03",
+        traveler_document=TravelerDocument(
+            document_type="passport",
+            document_number="1543343434",
+            document_issue_country="GB",
+            document_expiration_date="2025-02-03",
+            nationality="ES",
+            residence_country_code="NL",
+        ),
+    ),
+    Passenger(
+        first_name="John",
+        last_name="Smith",
+        title="mr",
+        gender="male",
+        date_of_birth="1999-02-03",
+        traveler_document=TravelerDocument(
+            document_type="passport",
+            document_number="9876543211",
+            document_issue_country="GB",
+            document_expiration_date="2029-02-03",
+            nationality="ES",
+            residence_country_code="NL",
+        ),
+    ),
+)
+
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
@@ -131,21 +164,6 @@ async def create_order(  # noqa: WPS210
     quote_id: str,
     payment: str,
 ) -> Mapping[str, Any]:
-    passenger = Passenger(
-        first_name="John",
-        last_name="Smith",
-        title="mr",
-        gender="male",
-        date_of_birth="1980-02-03",
-        traveler_document=TravelerDocument(
-            document_type="passport",
-            document_number="1543343434",
-            document_issue_country="GB",
-            document_expiration_date="2025-02-03",
-            nationality="ES",
-            residence_country_code="NL",
-        ),
-    )
     contact_details = ContactDetails(
         email="john.smith@example.com",
         phone_number="+37495878787",
@@ -169,7 +187,7 @@ async def create_order(  # noqa: WPS210
 
     order = await mobile_client.create_order_with_payment(
         quote_id=quote_id,
-        passengers=[passenger],
+        passengers=PASSENGERS,
         contact_details=contact_details,
         payment_id=payment,
         address=residence_address,
