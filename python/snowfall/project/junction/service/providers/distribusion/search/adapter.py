@@ -297,7 +297,7 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
 
                 yield offer_group
 
-    async def _parse_connection(
+    async def _parse_connection(  # noqa: WPS210
         self,
         search_criteria: FindConnectionsCriteria,
         connection: connections.Connection,
@@ -320,6 +320,11 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
                 )
                 for segment in segments
             ]
+
+            offer_price = money.Money(
+                amount=fare.price,
+                currency=money.Currency(connection.currency),
+            ).protobuf()
 
             offers.append(
                 offer_models_pb2.Offer(
@@ -354,10 +359,13 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
                         ),
                         expires_at=expires_at,
                     ),
-                    price=money.Money(
-                        amount=fare.price,
-                        currency=money.Currency(connection.currency),
-                    ).protobuf(),
+                    price=offer_price,
+                    price_breakdown=[
+                        offer_models_pb2.PriceBreakdown(
+                            price=offer_price,
+                            breakdown_type=offer_models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_BASE_FARE,
+                        ),
+                    ],
                     brand_name=carrier.get_fare_class_name(fare),
                     segment_details=offer_segment_details,
                 ),

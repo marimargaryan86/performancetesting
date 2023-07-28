@@ -212,6 +212,15 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                             string_amount=transfer_fare.price,
                             currency=money.Currency("EUR"),
                         ).protobuf(),
+                        price_breakdown=[
+                            offer_models_pb2.PriceBreakdown(
+                                price=money.from_string(
+                                    string_amount=transfer_fare.price,
+                                    currency=money.Currency("EUR"),
+                                ).protobuf(),
+                                breakdown_type=offer_models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_BASE_FARE,
+                            ),
+                        ],
                         brand_name=transfer_fare.name.replace(
                             "_",
                             " ",

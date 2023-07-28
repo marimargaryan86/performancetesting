@@ -69,6 +69,11 @@ class PriceQuoteConsumer(object):
                 ),
             )
 
+        price_quote_price = money.from_string(
+            str(offer_details.quote.price.total_in_selected_currency),
+            money.Currency(offer_details.quote.selected_currency),
+        ).protobuf()
+
         await self._producer.publish(
             offers_amqp_pb2.TripPriceQuoteResult(
                 price_quote_container_id=amqp_message.body.price_quote_container_id,
@@ -77,10 +82,13 @@ class PriceQuoteConsumer(object):
                     id=price_quote_id,
                     option_id=amqp_message.body.option_id,
                     expires_at=protobuf.datetime_to_protobuf(expires_at),
-                    price=money.from_string(
-                        str(offer_details.quote.price.total_in_selected_currency),
-                        money.Currency(offer_details.quote.selected_currency),
-                    ).protobuf(),
+                    price=price_quote_price,
+                    price_breakdown=[
+                        offers_pb2.PriceBreakdown(
+                            price=price_quote_price,
+                            breakdown_type=offers_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_BASE_FARE,
+                        ),
+                    ],
                     required_documents=list(
                         {
                             req

@@ -198,6 +198,11 @@ class DfAdapter(object):
                     ),
                 )
 
+            offer_price = money.from_string(
+                str(quote_obj.price.total_in_selected_currency),
+                currency,
+            ).protobuf()
+
             yield offer_models_pb2.OfferGroup(
                 id=string.uuid(),
                 expires_at=protobuf.datetime_to_protobuf(expires_at),
@@ -220,10 +225,13 @@ class DfAdapter(object):
                             )
                             for segment in segments
                         ],
-                        price=money.from_string(
-                            str(quote_obj.price.total_in_selected_currency),
-                            currency,
-                        ).protobuf(),
+                        price=offer_price,
+                        price_breakdown=[
+                            offer_models_pb2.PriceBreakdown(
+                                price=offer_price,
+                                breakdown_type=offer_models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_BASE_FARE,
+                            ),
+                        ],
                     ),
                 ],
                 segments=segments,

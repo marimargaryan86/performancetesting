@@ -140,7 +140,11 @@ class TripOfferSearchConsumer(object):  # noqa: WPS214
                 continue
 
             offer_segment_id = string.uuid()
-            currency = money.Currency(quote_obj.price.currency_code)
+
+            offer_price = money.from_string(
+                string_amount=str(quote_obj.price.high),
+                currency=money.Currency(quote_obj.price.currency_code),
+            ).protobuf()
 
             yield offer_models_pb2.OfferGroup(
                 id=string.uuid(),
@@ -152,7 +156,7 @@ class TripOfferSearchConsumer(object):  # noqa: WPS214
                                 quote_id=quote_obj.id,
                                 expires_at=expires_at,
                                 price=str(quote_obj.price.high),
-                                currency=currency,
+                                currency=money.Currency(quote_obj.price.currency_code),
                             ),
                         ),
                         segment_details=[
@@ -165,10 +169,13 @@ class TripOfferSearchConsumer(object):  # noqa: WPS214
                                 ),
                             ),
                         ],
-                        price=money.from_string(
-                            string_amount=str(quote_obj.price.high),
-                            currency=currency,
-                        ).protobuf(),
+                        price=offer_price,
+                        price_breakdown=[
+                            offer_models_pb2.PriceBreakdown(
+                                price=offer_price,
+                                breakdown_type=offer_models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_BASE_FARE,
+                            ),
+                        ],
                     ),
                 ],
                 segments=[
