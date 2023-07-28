@@ -40,6 +40,7 @@ job "test-automation-mobile-api" {
 {{ with secret "kv/data/${var.environment}/api-automation" }}
 SLACK_NOTIFICATION_TOKEN={{ .Data.data.slack_notification_token }}
 PIPELINE_GITLAB_TOKEN={{ .Data.data.pipeline_gitlab_token }}
+JUNCTION_TEST_VAULT_TOKEN={{ .Data.data.junction_test_vault_token}}
 {{ end }}
 EOH
         destination = "services.env"
@@ -61,17 +62,15 @@ EOH
           , "-F"
           , "variables[ALLURE_PROJECT_ID]=junction-mobile-api-smoke"
           , "-F"
-          , "variables[SLACK_NOTIFICATION_CHANNEL]=look-at-me"
+          , "variables[SLACK_NOTIFICATION_CHANNEL]=junction-mobile-tests"
           , "-F"
           , "variables[SLACK_NOTIFICATION_TOKEN]=${SLACK_NOTIFICATION_TOKEN}"
           , "-F"
-          , "variables[API_TOKEN]=JUNCTION_TEST_VAULT_TOKEN"
+          , "variables[API_TOKEN]=${JUNCTION_TEST_VAULT_TOKEN}"
           , "-F"
           , "variables[PROJECT_NAME]=api_automation"
           , "-F"
           , "variables[PROJECT_DIR]=mobile_api_tests/"
-          , "-F"
-          , "variables[DEPARTURE_AFTER]=$(date -d \"$(date +%Y-%m-%d) + 1 day\" +%Y-%m-%d)"
           , "-F"
           , "variables[CI_PIPELINE_SOURCE]=schedule"
           , "https://git.snowfall.se/api/v4/projects/406/trigger/pipeline"
