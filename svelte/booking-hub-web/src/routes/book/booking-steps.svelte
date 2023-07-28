@@ -1,13 +1,17 @@
 <script lang="ts">
   import CheckIcon from "components/icons/check-icon.svelte";
 
-  export let currentStep: 1 | 2 | 3 = 1;
+  export let currentStep: 1 | 2 | 3 | 4 | 5 = 1;
 </script>
 
 <div class="book-steps-wrapper">
   <div class="book-steps container">
     <div class="current-step">
-      <span class="{currentStep === 1 ? 'active' : 'successful'} step-circle typography body-small">
+      <span
+        class="step-circle typography body-small"
+        class:active={currentStep === 1}
+        class:successful={currentStep > 1}
+      >
         {#if currentStep === 1}
           1
         {:else}
@@ -16,12 +20,12 @@
       </span>
       <span class="step-text typography body-medium">Search</span>
     </div>
-    <div class="step-line {currentStep >= 1 ? 'active-line' : 'inactive-line'}" />
+    <div class="step-line" class:active-line={currentStep > 1} />
     <div class="current-step">
       <span
-        class="{currentStep === 2 ? 'active' : ''} {currentStep < 2
-          ? 'inactive'
-          : 'successful'} step-circle typography body-small"
+        class="step-circle typography body-small"
+        class:active={currentStep === 2}
+        class:successful={currentStep > 2}
       >
         {#if currentStep <= 2}
           2
@@ -31,18 +35,56 @@
       </span>
       <span class="step-text typography body-medium">Select</span>
     </div>
-    <div class="step-line {currentStep === 3 ? 'active-line' : 'inactive-line'}" />
+    <div class="step-line" class:active-line={currentStep > 2} />
     <div class="current-step">
-      <span class="{currentStep < 3 ? 'inactive' : 'active'} step-circle typography body-small"
-        >3</span
+      <span
+        class="step-circle typography body-small"
+        class:active={currentStep === 3}
+        class:successful={currentStep > 3}
       >
-      <span class="step-text typography body-medium">Summary</span>
+        {#if currentStep <= 3}
+          3
+        {:else}
+          <CheckIcon color="var(--color-main-primary-500)" />
+        {/if}
+      </span>
+      <span class="step-text typography body-medium">Passenger Details</span>
+    </div>
+    <div class="step-line" class:active-line={currentStep > 3} />
+    <div class="current-step">
+      <span
+        class="step-circle typography body-small"
+        class:active={currentStep === 4}
+        class:successful={currentStep > 4}
+      >
+        {#if currentStep <= 4}
+          4
+        {:else}
+          <CheckIcon color="var(--color-main-primary-500)" />
+        {/if}
+      </span>
+      <span class="step-text typography body-medium">Payment</span>
+    </div>
+    <div class="step-line" class:active-line={currentStep > 5} />
+    <div class="current-step">
+      <span
+        class="step-circle typography body-small"
+        class:active={currentStep === 5}
+        class:successful={currentStep > 5}
+      >
+        {#if currentStep <= 5}
+          5
+        {:else}
+          <CheckIcon color="var(--color-main-primary-500)" />
+        {/if}
+      </span>
+      <span class="step-text typography body-medium">Confirmation</span>
     </div>
   </div>
 </div>
 
 <style>
-  .successful {
+  .step-circle.successful {
     color: var(--color-common-dark-strong);
     background-color: var(--color-main-primary-100);
     border: 2px solid var(--color-main-primary-500);
@@ -60,7 +102,7 @@
     display: flex;
     align-content: center;
     align-items: center;
-    max-width: 384px;
+    max-width: 1100px;
     height: 56px;
   }
 
@@ -74,14 +116,11 @@
     width: 52px;
     height: 1px;
     margin-right: 8px;
+    border-top: 2px solid var(--color-main-primary-200);
   }
 
   .active-line {
     border-top: 2px solid var(--color-main-primary-500);
-  }
-
-  .inactive-line {
-    border-top: 2px solid var(--color-main-primary-200);
   }
 
   .current-step {
@@ -97,6 +136,9 @@
   .step-circle {
     width: 24px;
     height: 24px;
+    color: unset;
+    background-color: unset;
+    border: 2px solid var(--color-main-primary-200);
     border-radius: 50%;
   }
 
@@ -104,14 +146,5 @@
     color: var(--color-common-dark-strong);
     background-color: var(--color-main-primary-500);
     border: 2px solid var(--color-main-primary-500);
-  }
-
-  .current-step .inactive {
-    width: 24px;
-    height: 24px;
-    color: unset;
-    background-color: unset;
-    border: 2px solid var(--color-main-primary-200);
-    border-radius: 50%;
   }
 </style>

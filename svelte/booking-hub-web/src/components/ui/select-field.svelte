@@ -6,12 +6,16 @@
 
   type TValue = $$Generic;
 
+  let className: string | undefined = undefined;
+
+  export { className as class };
   export let value: TValue | undefined = undefined;
   export let options: TValue[];
   export let formatter: (nextValue?: TValue) => string = (nextValue) => String(nextValue ?? "");
   export let label: string | undefined = undefined;
   export let placeholder: string | undefined = undefined;
   export let required = false;
+  export let scroll = false;
   export let error: string | boolean = false;
 
   let expanded = false;
@@ -38,7 +42,7 @@
   }
 </script>
 
-<div class="select-field" use:clickOutside={close}>
+<div class="select-field {className ? className : ''}" use:clickOutside={close}>
   <TextField
     {required}
     {label}
@@ -54,6 +58,7 @@
   {#if expanded}
     <ul
       class="typography body-medium options"
+      class:scroll
       transition:scale|local={{ duration: 150, start: 0.8 }}
     >
       {#each options as option}
@@ -101,5 +106,10 @@
 
   .option:not(:last-child) {
     border-bottom: 1px solid var(--color-common-line-soft);
+  }
+
+  .scroll {
+    height: 107px;
+    overflow: scroll;
   }
 </style>
