@@ -30,6 +30,10 @@ variable "traefik_rule" {
   type = string
 }
 
+variable "traefik_doc_ui_users" {
+  type = list(string)
+}
+
 job "junction-http" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -74,7 +78,7 @@ job "junction-http" {
         "traefik.http.routers.docs-junction-${var.environment}.entrypoints=${var.traefik_entrypoints}",
         "traefik.http.routers.docs-junction-${var.environment}.rule=${var.traefik_rule}",
         "traefik.http.routers.docs-junction-${var.environment}.middlewares=docs-junction-auth",
-        "traefik.http.middlewares.docs-junction-auth.basicauth.users=snowfall:$apr1$nVeL//e6$BP5DcRDvCLbuXfWca.jzc." // snowfall / N6z5fu&dTvp7j4rgK4V1uPrG
+        "traefik.http.middlewares.docs-junction-auth.basicauth.users=${join(", ", var.traefik_doc_ui_users)}" // snowfall / N6z5fu&dTvp7j4rgK4V1uPrG
       ]
     }
 

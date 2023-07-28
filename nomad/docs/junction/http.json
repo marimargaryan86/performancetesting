@@ -5,7 +5,13 @@
   "production": {
     "variables": {
       "traefik_entrypoints": "web",
-      "traefik_rule": "(Host(`docs.junction.travel`) || Host(`developer.snowfalltravel.com`))"
+      "traefik_rule": "(Host(`docs.junction.travel`) || Host(`developer.snowfalltravel.com`))",
+      "traefik_doc_ui_users": [
+        "snowfall:$apr1$nVeL//e6$BP5DcRDvCLbuXfWca.jzc.",
+        "jmillan@gobeltrip.com:$2y$05$hCcELCWiJCAiZGzC0t72O.fMSbsfTUSvH/yv5smdFJWR8KilVqhUO",
+        "lvodanovich@gobeltrip.com:$2y$05$8wOmOm5bD2H2vOhApANFdeIBXU706DC3QmPmSJ4eKJpMNo8wzwUne",
+        "tony@tprofile.co.uk:$2y$05$96ujFi7mnuyzP7ZZPCQxJeL0NI7OjlzxmzXswh.z7keIoU2lQPhR2"
+      ]
     }
   },
   "sandbox": {
