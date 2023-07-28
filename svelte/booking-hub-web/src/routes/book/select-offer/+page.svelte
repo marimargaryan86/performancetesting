@@ -14,6 +14,7 @@
   import { onMount } from "svelte";
   import routeConfig from "routeConfig";
   import { page } from "$app/stores";
+  import { goto } from "$app/navigation";
 
   let bookingSearchForm = {} as BookingSearchForm;
   export let offers = OffersMockup;
@@ -97,7 +98,7 @@
   }
 
   function goToSummaryPage(): void {
-    location.href = `${routeConfig.book.summary.root}?${searchQuery}`;
+    goto(`${routeConfig.book.passengerDetails.root}?${searchQuery}`);
   }
 </script>
 

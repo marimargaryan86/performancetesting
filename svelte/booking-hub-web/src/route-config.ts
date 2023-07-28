@@ -5,8 +5,11 @@ export default {
     select: {
       root: "/book/select-offer",
     },
-    summary: {
-      root: "/book/summary",
+    passengerDetails: {
+      root: "/book/passenger-details",
+    },
+    payment: {
+      root: "/book/payment",
     },
   },
   login: "/login",

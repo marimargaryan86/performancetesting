@@ -10,6 +10,7 @@
   import OffersMockup from "../offers-mockup.ts";
   import routeConfig from "routeConfig";
   import { page } from "$app/stores";
+  import { goto } from "$app/navigation";
 
   const currentBookingStep = 3;
 
@@ -45,7 +46,11 @@
   });
 
   function goToSelectOfferPage(): void {
-    location.href = routeConfig.book.select.root + window.location.search;
+    goto(routeConfig.book.select.root + $page.url.search);
+  }
+
+  function goToPaymentPage(): void {
+    goto(routeConfig.book.payment.root + $page.url.search);
   }
 </script>
 
@@ -67,7 +72,7 @@
 
   <div class="next-block">
     <Button on:click={goToSelectOfferPage} size="medium" variant="outline">Previous</Button>
-    <Button size="medium"><span class="next-btn">Next</span></Button>
+    <Button on:click={goToPaymentPage} size="medium"><span class="next-btn">Next</span></Button>
   </div>
 </div>
 

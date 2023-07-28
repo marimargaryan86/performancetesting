@@ -5,6 +5,7 @@
   import SelectCityOrStation from "./select-city-or-station.svelte";
   import type { BookingSearchForm } from "./booking-search-form";
   import routeConfig from "routeConfig";
+  import { goto } from "$app/navigation";
 
   export let firstStep = true;
 
@@ -25,7 +26,7 @@
 
   function search(): void {
     if (isSearchParametersValid()) {
-      location.href = routeConfig.book.select.root + searchQuery;
+      goto(routeConfig.book.select.root + searchQuery);
     }
   }
 
