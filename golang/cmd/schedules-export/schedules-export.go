@@ -75,8 +75,10 @@ type schedulesWriterJob struct {
 	cacheSequenceList []uint64
 }
 type transfersWriterJob struct {
-	sequence    uint64
-	coordinates *latlng.LatLng
+	sequence   uint64
+	fromStop   uint64
+	toStop     uint64
+	distance_m float64
 }
 
 type stopCache map[uint64]*stopCacheData
@@ -91,6 +93,8 @@ type stopCacheData struct {
 	scheduleStops []stopCacheDataStop
 	scheduleId    string
 	departureTime int64
+	transfers     []uint64
+	coordinates   *latlng.LatLng
 }
 
 func (cacheData *stopCacheData) addReferences(job *stopJob) {
@@ -132,6 +136,7 @@ type stopsExporterType struct {
 	cache             stopCache
 	sequence          uint64
 	cacheSequenceList []uint64
+	transfersSequence uint64
 }
 
 func (self *stopsExporterType) add(job *stopJob) uint64 {
@@ -148,12 +153,33 @@ func (self *stopsExporterType) add(job *stopJob) uint64 {
 		scheduleStops: nil,
 		scheduleId:    job.scheduleId,
 		departureTime: job.departureTime,
+		transfers:     []uint64{},
+		coordinates:   job.point.Coordinates,
 	}
 	thisStop.addReferences(job)
 
-	transfersChan <- &transfersWriterJob{
-		sequence:    self.sequence,
-		coordinates: job.point.Coordinates,
+	for _, s := range self.cache {
+		distance_m := calculate_distance(s.coordinates, thisStop.coordinates)
+		if distance_m < 4000 {
+			transfersChan <- &transfersWriterJob{
+				sequence:   self.transfersSequence,
+				fromStop:   thisStop.stopId,
+				toStop:     s.stopId,
+				distance_m: distance_m,
+			}
+			thisStop.transfers = append(thisStop.transfers, self.transfersSequence)
+			self.transfersSequence++
+
+			// Reverse direction
+			transfersChan <- &transfersWriterJob{
+				sequence:   self.transfersSequence,
+				fromStop:   s.stopId,
+				toStop:     thisStop.stopId,
+				distance_m: distance_m,
+			}
+			s.transfers = append(s.transfers, self.transfersSequence)
+			self.transfersSequence++
+		}
 	}
 
 	self.cache[identifier] = &thisStop
@@ -307,7 +333,6 @@ var schedulesExporter = schedulesExporterType{
 	IdKey:             make(map[string]bool),
 	count:             0,
 }
-var transfersSequence = uint64(0)
 var routesChan chan<- *routesWriterJob
 var routeStopsChan chan<- *plannerv1alpha.RouteStop
 var schedulesChan chan<- *schedulesWriterJob
@@ -519,8 +544,7 @@ func stopsWriterTask(writer io.Writer, wg *sync.WaitGroup) chan<- *stopsWriterJo
 
 func transfersWriterTask(writer io.Writer, wg *sync.WaitGroup) chan<- *transfersWriterJob {
 	ch := make(chan *transfersWriterJob) // becomes the global transfersChan
-	cache := map[uint64]*transfersWriterJob{}
-	seconds_per_km := float64(1020) // 17 mins
+	seconds_per_km := float64(1020)      // 17 mins
 
 	go func() {
 		defer wg.Done()
@@ -533,37 +557,14 @@ func transfersWriterTask(writer io.Writer, wg *sync.WaitGroup) chan<- *transfers
 				break
 			}
 
-			if _, ok := cache[job.sequence]; ok {
-				continue
+			transferProto := plannerv1alpha.Transfer{
+				Sequence:     job.sequence,
+				FromStop:     job.fromStop,
+				ToStop:       job.toStop,
+				TransferTime: uint32(job.distance_m / 1000 * seconds_per_km),
+				Type:         0,
 			}
-
-			for _, s := range cache {
-				distance_m := calculate_distance(s.coordinates, job.coordinates)
-				if distance_m < 4000 {
-					transferProto := plannerv1alpha.Transfer{
-						Sequence:     transfersSequence,
-						FromStop:     job.sequence,
-						ToStop:       s.sequence,
-						TransferTime: uint32(distance_m / 1000 * seconds_per_km),
-						Type:         0,
-					}
-					check(protoWriter.Write(&transferProto))
-					transfersSequence++
-
-					// Reverse direction
-					transferProto = plannerv1alpha.Transfer{
-						Sequence:     transfersSequence,
-						FromStop:     s.sequence,
-						ToStop:       job.sequence,
-						TransferTime: uint32(distance_m / 1000 * seconds_per_km),
-						Type:         0,
-					}
-					check(protoWriter.Write(&transferProto))
-					transfersSequence++
-				}
-			}
-
-			cache[job.sequence] = job
+			check(protoWriter.Write(&transferProto))
 		}
 		check(w.Flush())
 	}()
@@ -847,7 +848,7 @@ func main() {
 	_, err = fmt.Fprintf(
 		f, "scheduleStops %d\nschedules %d\nrouteStops %d\nroutes %d\nstops %d\ntransfers %d",
 		scheduleStopsSequence, schedulesExporter.count, routesExporter.routeStopSequence,
-		routesExporter.sequence, stopsExporter.sequence, transfersSequence,
+		routesExporter.sequence, stopsExporter.sequence, stopsExporter.transfersSequence,
 	)
 	check(err)
 	closeFile(f)
