@@ -50,10 +50,33 @@ class CompaniesRepository(
 
 class LeadCompaniesRepository(
     mixins.FindByIdMixin[models_pb2.LeadCompany],
+    mixins.InsertMixin[models_pb2.LeadCompany],
     repository.ProtoRepository[models_pb2.LeadCompany],
 ):
     _proto = models_pb2.LeadCompany
     _indexes = (pymongo.IndexModel("name", background=True, unique=True),)
+
+    async def update(
+        self,
+        lead_company: models_pb2.LeadCompany,
+    ) -> models_pb2.LeadCompany:
+        replacement = self._coder.encode(lead_company)
+
+        await self._execute(
+            self._collection.replace_one,
+            filter={"_id": lead_company.id},
+            replacement=replacement,
+        )
+
+        return lead_company
+
+    async def find_all(
+        self,
+        cursor: str | None,
+    ) -> resultset.ResultSet[models_pb2.LeadCompany]:
+        return await self._find_with_cursor(
+            cur=cursor or "",
+        )
 
 
 class AccountsRepository(

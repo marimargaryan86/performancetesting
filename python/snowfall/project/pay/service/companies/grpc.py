@@ -138,6 +138,7 @@ class LeadCompaniesService(
         lead_companies: repositories.LeadCompaniesRepository,
     ):
         self._lead_companies = lead_companies
+        self._default_page_size = 20
 
     def get_name(self) -> str:
         return grpc_pb2.DESCRIPTOR.services_by_name["LeadCompaniesService"].full_name
@@ -147,6 +148,28 @@ class LeadCompaniesService(
             self,
             server,
         )
+
+    async def CreateLeadCompany(  # type: ignore[override] # noqa: N802
+        self,
+        request: grpc_pb2.CreateLeadCompanyRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.CreateLeadCompanyResponse:
+        request.lead_company.id = string.uuid()
+
+        try:
+            inserted_lead_company = await self._lead_companies.insert(
+                request.lead_company,
+            )
+        except DuplicateKeyError:
+            await rich_status.abort_with_rich_status(
+                context=context,
+                status=rich_status.build_bad_request(
+                    field_name="name",
+                    field_description="name already exists",
+                ),
+            )
+
+        return grpc_pb2.CreateLeadCompanyResponse(lead_company=inserted_lead_company)
 
     async def GetLeadCompany(  # type: ignore[override] # noqa: N802
         self,
@@ -159,6 +182,52 @@ class LeadCompaniesService(
             await context.abort(grpc.StatusCode.NOT_FOUND)  # noqa: WPS204
 
         return grpc_pb2.GetLeadCompanyResponse(lead_company=lead_company)
+
+    async def UpdateLeadCompany(  # type: ignore[override] # noqa: N802
+        self,
+        request: grpc_pb2.UpdateLeadCompanyRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.UpdateLeadCompanyResponse:
+        lead_company = await self._lead_companies.find_by_id(request.lead_company.id)
+
+        if not lead_company:
+            await context.abort(grpc.StatusCode.NOT_FOUND)
+
+        if request.lead_company.sales_markups and lead_company.sales_markups:  # type: ignore[union-attr]
+            lead_company.ClearField("sales_markups")  # type: ignore[union-attr]
+
+        lead_company.MergeFrom(request.lead_company)  # type: ignore[union-attr]
+
+        try:
+            await self._lead_companies.update(lead_company)  # type: ignore[arg-type]
+        except DuplicateKeyError:
+            await rich_status.abort_with_rich_status(
+                context=context,
+                status=rich_status.build_bad_request(
+                    field_name="name",
+                    field_description="name already exists",
+                ),
+            )
+
+        return grpc_pb2.UpdateLeadCompanyResponse(lead_company=lead_company)
+
+    async def ListLeadCompanies(  # type: ignore[override] # noqa: N802
+        self,
+        request: grpc_pb2.ListLeadCompaniesRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.ListLeadCompaniesResponse:
+        lead_companies = await self._lead_companies.find_all(
+            cursor=request.page_token,
+        )
+
+        lead_companies.limit(
+            request.page_size if request.page_size else self._default_page_size,
+        )
+
+        return grpc_pb2.ListLeadCompaniesResponse(
+            lead_companies=[lead_company async for lead_company in lead_companies],
+            next_page_token=await lead_companies.cursor(),
+        )
 
 
 class AccountsService(service.Service, grpc_pb2_grpc.AccountsServiceServicer):
