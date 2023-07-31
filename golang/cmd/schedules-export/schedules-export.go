@@ -531,7 +531,7 @@ func stopsWriterTask(writer io.Writer, wg *sync.WaitGroup) chan<- *stopsWriterJo
 					TransferTime:  0,
 					RouteStops:    extractAndSortRouteStopIds(value.routeStops),
 					ScheduleStops: extractAndSortRouteStopIds(value.scheduleStops),
-					Transfers:     nil,
+					Transfers:     value.transfers,
 				}
 				check(protoWriter.Write(&stopProto))
 			}
