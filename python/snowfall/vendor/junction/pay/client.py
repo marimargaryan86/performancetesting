@@ -15,6 +15,7 @@ class Client(BaseClient):
         beneficiary_id: str,
         from_currency: str,
         to_currency: str,
+        tax: int | None = None,
     ) -> dict[str, Any]:
         payload = {
             "data": {
@@ -22,6 +23,7 @@ class Client(BaseClient):
                 _ATTRIBUTES_KEY: {
                     "amount": amount,
                     "externalReference": external_reference,
+                    **({"tax": tax} if tax else {}),
                 },
                 "relationships": {
                     "fromCurrency": {
