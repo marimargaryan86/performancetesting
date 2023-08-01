@@ -8,6 +8,7 @@ import httpx
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.time import date_to_age
 from snowfall.stdlib.transport.http import client as http_client
+from snowfall.stdlib.transport.http import errors
 from snowfall.stdlib.transport.http import errors as http_errors
 from snowfall.vendor.save_a_train.enums import PassengerType
 from snowfall.vendor.save_a_train.exceptions import SATValidationError, SATValueError
@@ -745,6 +746,28 @@ class _SATApiClient(http_client.HttpClient):  # noqa: WPS214
         response_data = response.json()
 
         return booking.BookingInformation(**response_data)
+
+    async def get_ticket_pdf(self, url: str) -> bytes:
+        """Get ticket PDF document content.
+
+        :param url: Ticket document URL
+        :type url: str
+        :raises httpx.TimeoutException: If request times out
+        :raises httpx.HTTPStatusError: If request fails
+        """
+        try:
+            response = await httpx.AsyncClient().get(url)
+        except httpx.TimeoutException as timeout_exc:
+            raise errors.TimeOutError.from_error(timeout_exc) from timeout_exc
+        except httpx.RequestError as request_exc:
+            raise errors.RequestError.from_error(request_exc) from request_exc
+
+        try:
+            response.raise_for_status()
+        except httpx.HTTPStatusError as exc:
+            raise errors.HttpStatusError.from_error(exc) from exc
+
+        return response.content
 
     @property
     def _auth_headers(self) -> dict[str, str]:

@@ -76,6 +76,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         provider_cabin_class_mapping: cabin_classes.CabinMappingRepository,
         notifications_producer: producer.Producer,
         booking_storage: filesystem.Storage,
+        ticket_storage: filesystem.Storage,
         search_api_enabled: bool = True,  # noqa: FBT001,FBT002
     ) -> None:
         self._train_stations = train_station_repository
@@ -88,6 +89,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         self._search_api_enabled = search_api_enabled
         self._logger = stdout.get_logger()
         self._storage = booking_storage
+        self._ticket_storage = ticket_storage
 
     def search_criteria_generator(
         self,
@@ -402,6 +404,14 @@ class SaveATrainAdapter(object):  # noqa: WPS214
             pathlib.Path(str(booking_result.search_identifier)),
             json.dumps(combined_data).encode(),
         )
+        if get_ticket_result.url:
+            ticket_body = await self._client.api_client.get_ticket_pdf(
+                get_ticket_result.url,
+            )
+            await self._ticket_storage.put(
+                pathlib.Path(str(booking_result.search_identifier)),
+                ticket_body,
+            )
         confirm_booking_result = await self._confirm_booking(search_id=search_id)
         return models.CombinedBookingResults(
             make_booking=booking_result,

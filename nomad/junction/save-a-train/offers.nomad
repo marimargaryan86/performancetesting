@@ -148,6 +148,7 @@ EOH
         API_SEARCH_BASE_URL = "${var.api_search_base_url}"
         ALLOWED_WINDOW_TD   = "${var.allowed_window_td}"
         STORAGE_DSN         = "memory://"
+        TICKET_STORAGE_DSN  = "memory://"
       }
     }
   }
