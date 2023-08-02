@@ -4,7 +4,8 @@
       "count": 2,
       "api_base_url": "https://apibook.saveatrain.com/api",
       "api_search_base_url": "https://apisearch.saveatrain.com/search",
-      "bucket": "junction-provider-data-development"
+      "bucket": "junction-provider-data-development",
+      "ticket_bucket": "junction-provider-tickets-development"
     }
   },
   "production": {
@@ -12,7 +13,8 @@
       "count": 2,
       "api_base_url": "https://apibook.saveatrain.com/api",
       "api_search_base_url": "https://apisearch.saveatrain.com/search",
-      "bucket": "junction-provider-data-production"
+      "bucket": "junction-provider-data-production",
+      "ticket_bucket": "junction-provider-tickets-production"
     }
   },
   "sandbox": {
@@ -21,7 +23,8 @@
       "count": 1,
       "api_base_url": "https://apibook.saveatrain.com/api",
       "api_search_base_url": "https://apisearch.saveatrain.com/search",
-      "bucket": "junction-provider-data-sandbox"
+      "bucket": "junction-provider-data-sandbox",
+      "ticket_bucket": "junction-provider-tickets-sandbox"
     }
   }
 }

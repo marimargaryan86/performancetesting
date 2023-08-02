@@ -38,6 +38,10 @@ variable "bucket" {
   type = string
 }
 
+variable "ticket_bucket" {
+  type = string
+}
+
 job "save-a-train-notifications" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -113,8 +117,7 @@ API_PASSWORD={{ .Data.data.api_password }}
 API_SEARCH_PASSWORD={{ .Data.data.api_search_password }}
 API_BOOKING_TOKEN={{ .Data.data.api_booking_token }}
 STORAGE_DSN=s3://{{ .Data.data.aws_access_key_id }}:{{ .Data.data.aws_secret_access_key | urlquery }}@/${var.bucket}/save-a-train
-TICKET_STORAGE_DSN=s3://{{ .Data.data.aws_access_key_id }}:{{ .Data.data.aws_secret_access_key | urlquery }}@/${var.bucket}/tickets/save-a-train
-
+TICKET_STORAGE_DSN=s3://{{ .Data.data.aws_access_key_id }}:{{ .Data.data.aws_secret_access_key | urlquery }}@/${var.ticket_bucket}
 {{ end }}
 EOH
         destination = "services.env"

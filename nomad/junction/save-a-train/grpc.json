@@ -5,7 +5,8 @@
       "provider_company_id": "87e7fda0-b672-487c-bf93-aac43cd02a79",
       "api_base_url": "https://apibook.saveatrain.com/api",
       "api_search_base_url": "https://apisearch.saveatrain.com/search",
-      "bucket": "junction-provider-data-development"
+      "bucket": "junction-provider-data-development",
+      "ticket_bucket": "junction-provider-tickets-development"
     }
   },
   "production": {
@@ -14,7 +15,8 @@
       "provider_company_id": "4b156b8f-6558-4f26-98c4-e2eb5c0d2ff2",
       "api_base_url": "https://apibook.saveatrain.com/api",
       "api_search_base_url": "https://apisearch.saveatrain.com/search",
-      "bucket": "junction-provider-data-production"
+      "bucket": "junction-provider-data-production",
+      "ticket_bucket": "junction-provider-tickets-production"
     }
   },
   "sandbox": {
@@ -24,7 +26,8 @@
       "provider_company_id": "87e7fda0-b672-487c-bf93-aac43cd02a79",
       "api_base_url": "https://apibook.saveatrain.com/api",
       "api_search_base_url": "https://apisearch.saveatrain.com/search",
-      "bucket": "junction-provider-data-sandbox"
+      "bucket": "junction-provider-data-sandbox",
+      "ticket_bucket": "junction-provider-tickets-sandbox"
     }
   }
 }

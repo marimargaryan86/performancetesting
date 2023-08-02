@@ -401,17 +401,27 @@ class SaveATrainAdapter(object):  # noqa: WPS214
             "ticket_information": base64.b64encode(raw_ticket).decode(),
         }
         await self._storage.put(
-            pathlib.Path(str(booking_result.search_identifier)),
+            pathlib.Path(booking_result.search_identifier),
             json.dumps(combined_data).encode(),
         )
+
         if get_ticket_result.url:
             ticket_body = await self._client.api_client.get_ticket_pdf(
                 get_ticket_result.url,
             )
+
+            ticket_path = pathlib.Path(
+                task.reseller_id,
+                task.booking.provider_name,
+                task.booking.order_id,
+                booking_result.search_identifier,
+            ).with_suffix(".pdf")
+
             await self._ticket_storage.put(
-                pathlib.Path(str(booking_result.search_identifier)),
+                ticket_path,
                 ticket_body,
             )
+
         confirm_booking_result = await self._confirm_booking(search_id=search_id)
         return models.CombinedBookingResults(
             make_booking=booking_result,
@@ -566,7 +576,7 @@ class Transformer(object):
         booking_status = bookings_pb2.Booking.STATUS_CONFIRMED
 
         return bookings_pb2.Booking(
-            id=str(booking_info.search_identifier),
+            id=booking_info.search_identifier,
             status=booking_status,
             provider=bookings_pb2.Booking.Provider(
                 id=self._provider_id,
