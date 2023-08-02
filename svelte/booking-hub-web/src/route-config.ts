@@ -52,7 +52,6 @@ export default {
     root: "/go",
     bookings: {
       root: "/go/bookings",
-      refunds: "/go/bookings/refunds",
     },
   },
 };

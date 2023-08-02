@@ -29,7 +29,10 @@
     goto(routeConfig.book.passengerDetails.root + $page.url.search);
   }
   function goToConfirmationPage(): void {
-    goto(routeConfig.book.confirmation.root + $page.url.search);
+    const additionalInfo = {
+      alert: { type: "success", message: "We will send an email with a copy of your ticket." },
+    };
+    goto(routeConfig.book.confirmation.root + $page.url.search, { state: additionalInfo });
   }
 </script>
 

@@ -7,8 +7,26 @@
   import ClockInCircle from "components/icons/clock-in-circle-icon.svelte";
   import ChairInCircle from "components/icons/chair-in-circle-icon.svelte";
   import Button from "components/ui/button.svelte";
+  import { goto } from "$app/navigation";
+  import routeConfig from "routeConfig";
+  import Alert from "components/ui/alert.svelte";
+  import { onMount } from "svelte";
 
   const currentBookingStep = 5;
+  let alert = false;
+
+  function goToBookingsPage(): void {
+    const additionalInfo = { alert: { type: "success", message: "Booking successfully made" } };
+    goto(routeConfig.go.bookings.root, { state: additionalInfo });
+  }
+
+  onMount(() => {
+    alert = history.state?.alert;
+  });
+
+  function closeAlert(): void {
+    alert = false;
+  }
 </script>
 
 <svelte:head>
@@ -19,7 +37,12 @@
 <BookingSteps currentStep={currentBookingStep} />
 
 <div class="background">
-  <div class="page-wrapper container typography body-medium">
+  {#if alert}
+    <div class="container">
+      <Alert on:closeAlert={closeAlert} type={alert.type}>{alert.message}</Alert>
+    </div>
+  {/if}
+  <div class="page-wrapper container typography body-medium" class:alert>
     <div class="booking">
       <div class="congratulation">
         <span class="typography body-small">Congratulations!</span>
@@ -42,7 +65,7 @@
         </div>
       </div>
       <div class="view-ticket">
-        <Button>View ticket in bookings</Button>
+        <Button on:click={goToBookingsPage}>View ticket in bookings</Button>
       </div>
       <div class="prices typography body-small">
         <span>The price is for all passengers</span>
@@ -135,7 +158,7 @@
   </div>
 </div>
 <div class="next-block">
-  <Button size="medium"><span class="next-btn">Next</span></Button>
+  <Button size="medium" on:click={goToBookingsPage}><span class="next-btn">Next</span></Button>
 </div>
 
 <style>
@@ -150,7 +173,7 @@
   }
 
   .container {
-    margin: 0 24px 24px;
+    margin: 0 24px;
   }
 
   .header {
@@ -319,5 +342,14 @@
     width: 100%;
     padding: 16px 24px;
     background-color: var(--color-common-dark-strong);
+  }
+
+  .fare-rule :global(.dialogue) {
+    top: -70px;
+    right: 0;
+  }
+
+  .alert {
+    height: calc(100% - 78px);
   }
 </style>
