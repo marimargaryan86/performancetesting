@@ -11,6 +11,9 @@ export default {
     payment: {
       root: "/book/payment",
     },
+    confirmation: {
+      root: "/book/confirmation",
+    },
   },
   login: "/login",
   settings: "/settings",

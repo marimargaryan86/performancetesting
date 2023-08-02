@@ -65,7 +65,7 @@
       </span>
       <span class="step-text typography body-medium">Payment</span>
     </div>
-    <div class="step-line" class:active-line={currentStep > 5} />
+    <div class="step-line" class:active-line={currentStep > 4} />
     <div class="current-step">
       <span
         class="step-circle typography body-small"

@@ -28,6 +28,9 @@
   function goToPassengerDetailsPage(): void {
     goto(routeConfig.book.passengerDetails.root + $page.url.search);
   }
+  function goToConfirmationPage(): void {
+    goto(routeConfig.book.confirmation.root + $page.url.search);
+  }
 </script>
 
 <svelte:head>
@@ -81,7 +84,7 @@
 
   <div class="next-block">
     <Button on:click={goToPassengerDetailsPage} size="medium" variant="outline">Previous</Button>
-    <Button size="medium"><span class="next-btn">Pay</span></Button>
+    <Button on:click={goToConfirmationPage} size="medium"><span class="next-btn">Pay</span></Button>
   </div>
 </div>
 
