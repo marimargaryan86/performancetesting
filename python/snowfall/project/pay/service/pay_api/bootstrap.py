@@ -12,6 +12,7 @@ from snowfall.project.pay.adapter import (  # noqa: WPS235
     contacts,
     conversions,
     currencies,
+    lead_companies,
     payments,
     quotations,
     refunds,
@@ -51,6 +52,7 @@ def create_admin_dependencies(  # noqa: WPS211
     beneficiaries_client: beneficiaries.Client,
     accounts_client: accounts.GrpcClient,
     companies_client: companies.Client,
+    lead_companies_client: lead_companies.Client,
     contacts_client: contacts.Client,
     cc_payment_client: client.PaymentClient,
     transactions_client: transactions.Client,
@@ -66,6 +68,7 @@ def create_admin_dependencies(  # noqa: WPS211
     container[beneficiaries.Client] = beneficiaries_client  # type: ignore[type-abstract]
     container[accounts.GrpcClient] = accounts_client
     container[companies.Client] = companies_client  # type: ignore[type-abstract]
+    container[lead_companies.Client] = lead_companies_client  # type: ignore[type-abstract]
     container[contacts.Client] = contacts_client  # type: ignore[type-abstract]
     container[transactions.Client] = transactions_client  # type: ignore[type-abstract]
     container[conversions.Client] = conversions_client  # type: ignore[type-abstract]

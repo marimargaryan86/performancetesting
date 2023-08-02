@@ -22,6 +22,7 @@ from snowfall.project.pay.adapter import (
     contacts,
     conversions,
     currencies,
+    lead_companies,
     payments,
     quotations,
     refunds,
@@ -119,6 +120,7 @@ def _create_admin_app(  # noqa: WPS211
     authentication_client: auth.Client,
     accounts_client: accounts.GrpcClient,
     companies_client: companies.Client,
+    lead_companies_client: lead_companies.Client,
     contacts_client: contacts.Client,
     payment_client: payments.GrpcClient,
     conversions_repository: pay_repos.ConversionRepository,
@@ -140,6 +142,7 @@ def _create_admin_app(  # noqa: WPS211
                 beneficiaries_client=beneficiaries_client,
                 accounts_client=accounts_client,
                 companies_client=companies_client,
+                lead_companies_client=lead_companies_client,
                 contacts_client=contacts_client,
                 transactions_client=transactions_client,
                 conversions_client=conversions_client,
@@ -192,6 +195,11 @@ def accounts_client() -> accounts.DictClient:
 @pytest.fixture()
 def companies_client() -> companies.DictClient:
     return companies.DictClient(fixtures.get_companies())
+
+
+@pytest.fixture()
+def lead_companies_client() -> lead_companies.DictClient:
+    return lead_companies.DictClient(fixtures.get_lead_companies())
 
 
 @pytest.fixture()
@@ -445,6 +453,7 @@ def admin_app(  # noqa: WPS211
     cc_payment_client: PaymentClient,
     accounts_client: accounts.GrpcClient,
     companies_client: companies.Client,
+    lead_companies_client: lead_companies.Client,
     contacts_client: contacts.Client,
     payment_client: payments.GrpcClient,
     conversions_repository: pay_repos.ConversionRepository,
@@ -460,6 +469,7 @@ def admin_app(  # noqa: WPS211
         authentication_client=authentication_client,
         accounts_client=accounts_client,
         companies_client=companies_client,
+        lead_companies_client=lead_companies_client,
         contacts_client=contacts_client,
         payment_client=payment_client,
         conversions_repository=conversions_repository,

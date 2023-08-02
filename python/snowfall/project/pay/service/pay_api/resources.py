@@ -137,6 +137,36 @@ class Company(models.Resource):
         )
 
 
+class LeadCompany(models.Resource):
+    api_type: ClassVar[str] = "lead-companies"
+
+    @classmethod
+    def from_proto(
+        cls,
+        lead_company: models_pb2.LeadCompany,
+        request: requests.Request,
+    ) -> LeadCompany:
+        return cls(
+            id=lead_company.id,
+            type=LeadCompany.api_type,
+            attributes={
+                "name": lead_company.name,
+                "salesMarkups": [
+                    Money.from_proto(reseller_markup)
+                    for reseller_markup in lead_company.sales_markups
+                ],
+            },
+            links={
+                _SELF_HREF: str(
+                    request.url_for(
+                        "LeadCompany",
+                        leadCompanyId=lead_company.id,
+                    ),
+                ),
+            },
+        )
+
+
 class Money(models.BaseModel):
     currency: str
     amount: int

@@ -35,6 +35,11 @@ ACCOUNTLESS_COMPANIES = (
     "b184081a-92bd-4ec8-af9a-1faaa8dfbbeb",
 )
 
+LEAD_COMPANIES = (
+    "9b4a1e83-a0e9-49b3-aa79-fccb6add617c",
+    "d184081a-92bd-4ec8-af9a-1faaa8dfbbeb",
+)
+
 CONTACTS = (
     "8304c0ff-7ba6-4431-9788-1d486be3a033",
     "946a7e4b-519a-4f3d-8169-bcb4dbb3af94",
@@ -60,6 +65,10 @@ def get_companies() -> list[company_model_pb2.Company]:
     )
 
     return companies
+
+
+def get_lead_companies() -> list[company_model_pb2.LeadCompany]:
+    return [generate_lead_company(identifier) for identifier in LEAD_COMPANIES]
 
 
 def generate_payment(identifier: str) -> models_pb2.Payment:
@@ -136,6 +145,16 @@ def generate_company(identifier: str) -> company_model_pb2.Company:
     company.account_id = string.uuid()
 
     return company
+
+
+def generate_lead_company(identifier: str) -> company_model_pb2.LeadCompany:
+    return company_model_pb2.LeadCompany(
+        id=identifier,
+        name="Lead Company name",
+        sales_markups=[
+            money.Money(amount=100, currency=money.Currency("EUR")).protobuf(),
+        ],
+    )
 
 
 def generate_contact(identifier: str) -> company_model_pb2.Contact:
