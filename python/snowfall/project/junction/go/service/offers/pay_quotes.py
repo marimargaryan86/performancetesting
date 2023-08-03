@@ -129,7 +129,7 @@ class PayQuotes(object):
                 case models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_TAX:
                     tax = money.from_protobuf(breakdown.price)
 
-        if not base_fare:
+        if not base_fare or base_fare.amount == 0:
             base_fare = money.from_protobuf(quote_or_offer.price)
 
         return base_fare.amount, tax.amount if tax else None, base_fare.currency.code
