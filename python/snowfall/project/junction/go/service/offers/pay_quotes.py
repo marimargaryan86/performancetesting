@@ -28,7 +28,7 @@ class PayQuotes(object):
         self._offer_options_repository = offer_options_repository
         self._logger = stdout.get_logger()
 
-    async def get_offer_search_quotes(
+    async def get_offer_search_quotes(  # noqa: WPS210
         self,
         search_result: TripOfferSearchResult,
         session_token: str,
@@ -36,14 +36,18 @@ class PayQuotes(object):
         to_currency: str,
     ) -> TripOfferSearchResult:
         for offer in search_result.offer.offers:
-            offer_money = money.from_protobuf(offer.price)
+            amount, tax_amount, currency = self._get_amount_tax_and_currency(
+                offer,
+            )
+
             quote = await self._get_quote(
-                amount=offer_money.amount,
+                amount=amount,
                 session_token=session_token,
                 payer_id=payer_id,
                 beneficiary_id=search_result.provider_company_id,
-                from_currency=offer_money.currency.code,
+                from_currency=currency,
                 to_currency=to_currency,
+                tax=tax_amount,
             )
 
             converted_money = money.Money(
@@ -60,13 +64,15 @@ class PayQuotes(object):
         )
         return search_result
 
-    async def get_price_quote_quotes(
+    async def get_price_quote_quotes(  # noqa: WPS210
         self,
         session_token: str,
         search_result: TripPriceQuoteResult,
         payer_id: str,
     ) -> TripPriceQuoteResult:
-        price_quote_money = money.from_protobuf(search_result.price_quote.price)
+        amount, tax_amount, currency = self._get_amount_tax_and_currency(
+            search_result.price_quote,
+        )
 
         search_result.price_quote.option_id = string.to_uuid(
             session_token,
@@ -90,12 +96,13 @@ class PayQuotes(object):
 
         quote = (
             await self._get_quote(
-                amount=price_quote_money.amount,
+                amount=amount,
                 session_token=session_token,
                 payer_id=payer_id,
                 beneficiary_id=search_result.provider_company_id,
-                from_currency=price_quote_money.currency.code,
+                from_currency=currency,
                 to_currency=offer_option.price.currency_code,
+                tax=tax_amount,
             )
         ).data
 
@@ -110,6 +117,23 @@ class PayQuotes(object):
 
         return search_result
 
+    def _get_amount_tax_and_currency(
+        self,
+        quote_or_offer: models_pb2.PriceQuote | models_pb2.Offer,
+    ) -> tuple[int, int | None, str]:
+        base_fare, tax = None, None
+        for breakdown in quote_or_offer.price_breakdown:
+            match breakdown.breakdown_type:
+                case models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_BASE_FARE:
+                    base_fare = money.from_protobuf(breakdown.price)
+                case models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_TAX:
+                    tax = money.from_protobuf(breakdown.price)
+
+        if not base_fare:
+            base_fare = money.from_protobuf(quote_or_offer.price)
+
+        return base_fare.amount, tax.amount if tax else None, base_fare.currency.code
+
     async def _get_quote(  # noqa: WPS211
         self,
         amount: int,
@@ -118,6 +142,7 @@ class PayQuotes(object):
         beneficiary_id: str,
         from_currency: str,
         to_currency: str,
+        tax: int | None = None,
     ) -> PayQuoteResponse:
         resp = await self._pay_client.create_quote(
             amount=amount,
@@ -126,6 +151,7 @@ class PayQuotes(object):
             beneficiary_id=beneficiary_id,
             from_currency=from_currency,
             to_currency=to_currency,
+            tax=tax,
         )
         return PayQuoteResponse(**resp)
 

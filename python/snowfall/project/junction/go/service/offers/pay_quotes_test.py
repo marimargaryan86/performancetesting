@@ -5,7 +5,10 @@ from unittest import mock
 import pytest
 
 from snowfall.project.junction.go.service.offers import offers
-from snowfall.project.junction.go.service.offers.pay_quotes import PayQuotes
+from snowfall.project.junction.go.service.offers.pay_quotes import (
+    PayQuotes,
+    SkippedConversionError,
+)
 from snowfall.project.junction.go.service.offers.pay_quotes_models import (
     PayQuoteAttributes,
     PayQuoteCompany,
@@ -136,6 +139,7 @@ async def test_that_pay_quotes_invoked_and_response_returned(
         beneficiary_id="beneficiary-id",
         from_currency="EUR",
         to_currency="SEK",
+        tax=None,
     )
 
 
@@ -189,6 +193,7 @@ async def test_that_all_amounts_in_trip_offer_search_result_replaced_with_conver
         beneficiary_id="provider-id-1",
         from_currency="EUR",
         to_currency="SEK",
+        tax=None,
     )
     mock_pay_client.create_quote.assert_any_call(
         amount=10000,
@@ -197,6 +202,7 @@ async def test_that_all_amounts_in_trip_offer_search_result_replaced_with_conver
         beneficiary_id="provider-id-1",
         from_currency="EUR",
         to_currency="SEK",
+        tax=None,
     )
     assert mock_pay_client.create_quote.call_count == 2
 
@@ -214,6 +220,12 @@ async def test_that_price_in_trip_price_quote_result_replaced_with_conversion(
             option_id="487b5a88-a77c-4798-bedd-ec414a1f0e88",
             expires_at=None,
             price=money_pb2.Money(currency_code="EUR", units=500, nanos=0),
+            price_breakdown=[
+                models_pb2.PriceBreakdown(
+                    price=money_pb2.Money(currency_code="EUR", units=500, nanos=0),
+                    breakdown_type=models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_BASE_FARE,
+                ),
+            ],
             required_documents=None,
             penalties=None,
             rules=None,
@@ -255,4 +267,94 @@ async def test_that_price_in_trip_price_quote_result_replaced_with_conversion(
         beneficiary_id="provider-id-1",
         from_currency="EUR",
         to_currency="SEK",
+        tax=None,
     )
+
+
+async def test_that_pay_called_with_tax_when_tax_provided_in_price_quote(
+    mock_pay_client: mock.Mock,
+    pay_quotes: PayQuotes,
+    trip_offer_repository: offers.TripOfferRepository,
+) -> None:
+    price_quote_result = TripPriceQuoteResult(
+        price_quote_container_id="an-id",
+        option_id="an-id",
+        price_quote=models_pb2.PriceQuote(
+            id="009fd15a-c7f0-11ed-afa1-0242ac120002",
+            option_id="487b5a88-a77c-4798-bedd-ec414a1f0e88",
+            expires_at=None,
+            price=money_pb2.Money(currency_code="EUR", units=500, nanos=0),
+            price_breakdown=[
+                models_pb2.PriceBreakdown(
+                    price=money_pb2.Money(currency_code="EUR", units=400, nanos=0),
+                    breakdown_type=models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_BASE_FARE,
+                ),
+                models_pb2.PriceBreakdown(
+                    price=money_pb2.Money(currency_code="EUR", units=100, nanos=0),
+                    breakdown_type=models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_TAX,
+                ),
+            ],
+            required_documents=None,
+            penalties=None,
+            rules=None,
+        ),
+        provider_company_id="provider-id-1",
+    )
+
+    await trip_offer_repository.insert(
+        models_pb2.OfferGroup(
+            offers=[
+                models_pb2.Offer(
+                    id=string.to_uuid(
+                        "session-token",
+                        uuid.UUID("487b5a88-a77c-4798-bedd-ec414a1f0e88"),
+                    ),
+                    price=money_pb2.Money(
+                        currency_code="SEK",
+                    ),
+                ),
+            ],
+        ),
+    )
+
+    await pay_quotes.get_price_quote_quotes(
+        "session-token",
+        price_quote_result,
+        "payer-id",
+    )
+
+    mock_pay_client.create_quote.assert_called_once_with(
+        amount=40000,
+        external_reference="session-token",
+        payer_id="payer-id",
+        beneficiary_id="provider-id-1",
+        from_currency="EUR",
+        to_currency="SEK",
+        tax=10000,
+    )
+
+
+async def test_get_price_quote_quotes_no_offer_found_throws_skipped_conversion_error(
+    pay_quotes: PayQuotes,
+) -> None:
+    price_quote_result = TripPriceQuoteResult(
+        price_quote_container_id="an-id",
+        option_id="an-id",
+        price_quote=models_pb2.PriceQuote(
+            id="009fd15a-c7f0-11ed-afa1-0242ac120002",
+            option_id="487b5a88-a77c-4798-bedd-ec414a1f0e88",
+            expires_at=None,
+            price=money_pb2.Money(currency_code="EUR", units=500, nanos=0),
+            required_documents=None,
+            penalties=None,
+            rules=None,
+        ),
+        provider_company_id="provider-id-1",
+    )
+
+    with pytest.raises(SkippedConversionError):
+        await pay_quotes.get_price_quote_quotes(
+            "session-token",
+            price_quote_result,
+            "payer-id",
+        )
