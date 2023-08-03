@@ -76,5 +76,11 @@
     "country": "Various",
     "name": "distribusion",
     "url": "https://api.distribusion.com"
+  },
+  {
+    "active": true,
+    "country": "Various",
+    "name": "UIC",
+    "url": "https://junction-provider-tickets-development.s3.eu-west-2.amazonaws.com/gtfs+example+27+07+2023.zip"
   }
 ]
