@@ -5,18 +5,19 @@ from snowfall.project.junction.plus.service.notifications.v1alpha import models_
 
 class AbstractChannel(abc.ABC):
     @abc.abstractmethod
-    async def send_order_confirmation(
+    async def order_confirmation(
         self,
-        order: models_pb2.PersistedOrder,
+        event: models_pb2.NotificationEvent,
         receiver: models_pb2.Subscriber,
         sender_configuration: models_pb2.ConfigurationVector,
     ) -> None:
         """Send notification for order confirmation."""
 
     @abc.abstractmethod
-    async def send_delay_notification(
+    async def flight_stats_alert(
         self,
-        order: models_pb2.PersistedOrder,
+        event: models_pb2.NotificationEvent,
         receiver: models_pb2.Subscriber,
+        sender_configuration: models_pb2.ConfigurationVector,
     ) -> None:
-        """Send delay notification event."""
+        """Send alerts from flight stats."""

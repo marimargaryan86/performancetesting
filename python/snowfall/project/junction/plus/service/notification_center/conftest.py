@@ -8,8 +8,9 @@ from snowfall.project.junction.plus.adapter import (
     subscribers,
 )
 from snowfall.project.junction.plus.notification_channels import whatsapp
-from snowfall.project.junction.plus.service.notification_center.importer import (
-    NotificationEventImporter,
+from snowfall.project.junction.plus.service.notification_center import (
+    importer,
+    states,
 )
 from snowfall.project.junction.plus.service.notifications.v1alpha import (
     models_pb2 as notifications_models_pb2,
@@ -59,8 +60,15 @@ def subscribers_client() -> subscribers.Client:
 
 
 @pytest.fixture()
-def whatsapp_provider() -> whatsapp.Channel:
+def whatsapp_channel() -> whatsapp.Channel:
     return whatsapp.MockChannel()
+
+
+@pytest.fixture()
+def channels(whatsapp_channel: whatsapp.Channel) -> states.Channels:
+    return states.Channels(
+        whatsapp_channel=whatsapp_channel,
+    )
 
 
 @pytest.fixture()
@@ -135,11 +143,11 @@ def notification_event_importer(
     consumer: mock.AsyncMock,
     configuration_vectors_client: configuration_vectors.Client,
     subscribers_client: subscribers.Client,
-    whatsapp_provider: whatsapp.Channel,
-) -> NotificationEventImporter:
-    return NotificationEventImporter(
+    channels: states.Channels,
+) -> importer.NotificationEventImporter:
+    return importer.NotificationEventImporter(
         consumer,
         configuration_vectors_client,
         subscribers_client,
-        whatsapp_provider,
+        channels,
     )

@@ -7,7 +7,7 @@ from snowfall.project.junction.plus.adapter import configuration_vectors, subscr
 from snowfall.project.junction.plus.notification_channels.whatsapp import (
     ProviderChannel,
 )
-from snowfall.project.junction.plus.service.notification_center import importer
+from snowfall.project.junction.plus.service.notification_center import importer, states
 from snowfall.project.junction.plus.service.notifications.v1alpha import (
     grpc_pb2_grpc as notifications_pb2_grpc,
 )
@@ -51,10 +51,12 @@ async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
                 notifications_channel,
             ),
         ),
-        whatsapp_provider=ProviderChannel(
-            sid=app.settings.twilio_sid,
-            token=app.settings.twilio_token,
-            templates_root_path=pathlib.Path("."),
+        channels=states.Channels(
+            whatsapp_channel=ProviderChannel(
+                sid=app.settings.twilio_sid,
+                token=app.settings.twilio_token,
+                templates_root_path=pathlib.Path("."),
+            ),
         ),
     )
     await notification_event_importer.consume()

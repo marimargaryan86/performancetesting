@@ -73,7 +73,7 @@ class Alerts(endpoints.HTTPEndpoint):
                 sender_id=subscriber.reseller_id,
                 receiver_id=subscriber_id,
                 alert=notifications_models_pb2.FlightStatsAlert(
-                    monitoring_role_id=monitoring_rule_id,
+                    monitoring_rule_id=monitoring_rule_id,
                     type=alert_body["alert"]["event"].get("type", ""),
                     value=alert_body["alert"]["event"].get("value", ""),
                     booking=monitoring_rule.booking,

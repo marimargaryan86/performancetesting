@@ -20,4 +20,4 @@ async def test_notification_event(
     valid_message: types.Message[models_pb2.NotificationEvent],
 ) -> None:
     await notification_event_importer._process_message(valid_message)  # noqa: SLF001
-    assert len(notification_event_importer._whatsapp_provider._sent_messages) == 1  # type: ignore[attr-defined] # noqa: SLF001
+    assert len(notification_event_importer._channels._channels[2]._sent_messages) == 1  # type: ignore[attr-defined] # noqa: SLF001

@@ -114,7 +114,7 @@ message MonitoringRule {
 }
 
 message FlightStatsAlert {
-  string monitoring_role_id = 1;
+  string monitoring_rule_id = 1;
   string type = 2;
   string value = 3;
   Booking booking = 4;
