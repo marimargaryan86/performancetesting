@@ -16,6 +16,10 @@ from snowfall.stdlib.persistence.redis import types as redis
 _DEFAULT_PAGE_SIZE = 20
 
 
+def compile_regex(search_str: str) -> re.Pattern[str]:
+    return re.compile(unidecode.unidecode(search_str), re.IGNORECASE)
+
+
 class RedisRepository(object):
     def __init__(
         self,
@@ -66,6 +70,7 @@ class PlacesRepository(
         pymongo.IndexModel("no_accent_name", background=True),
         pymongo.IndexModel("no_accent_local_name", background=True),
         pymongo.IndexModel("country_name", background=True),
+        pymongo.IndexModel("country_code", background=True),
         pymongo.IndexModel("iata_code", background=True),
         pymongo.IndexModel("population", background=True),
         pymongo.IndexModel(
@@ -74,24 +79,40 @@ class PlacesRepository(
         ),
     )
 
-    async def match(
+    async def match(  # noqa: WPS210
         self,
         search_key: str,
     ) -> resultset.ResultSet[models_pb2.Place]:
-        search_keys = [key.strip() for key in search_key.split(",")]
-        name_regex = re.compile(unidecode.unidecode(search_keys[0]), re.IGNORECASE)
-        if len(search_keys) == 2:
-            country_regex = re.compile(search_keys[1], re.IGNORECASE)
-            query = {
+        # Regex is used to do partial matches (not supported on text indexes).
+        # Strip non-alphanumeric characters for improved search results.
+        # This also means that re.escape() is not needed to make this safe.
+        search_keys = [
+            re.sub(r"[^\w ]", "", key.strip()) for key in search_key.split(",")
+        ]
+        name_regex = compile_regex(search_keys[0])
+        if len(search_keys) > 1:
+            # Match "Heathrow, GB", "Heathrow, London, GB" etc.
+            country_regex = compile_regex(search_keys[-1])
+            if len(search_keys) > 2:
+                main_city_regex = compile_regex(search_keys[1])
+            else:
+                # Match "Heathrow, London" etc.
+                main_city_regex = country_regex
+            query: dict[str, Any] = {
                 "$and": [
                     {
                         "$or": [
                             {"no_accent_local_name": name_regex},
                             {"no_accent_name": name_regex},
+                            {"iata": name_regex},
                         ],
                     },
                     {
-                        "country_name": country_regex,
+                        "$or": [
+                            {"country_name": country_regex},
+                            {"country_code": country_regex},
+                            {"main_city": main_city_regex},
+                        ],
                     },
                 ],
             }
@@ -101,9 +122,11 @@ class PlacesRepository(
                     {"no_accent_local_name": name_regex},
                     {"no_accent_name": name_regex},
                     {"country_name": name_regex},
+                    {"country_code": name_regex},
+                    {"iata": name_regex},
+                    {"main_city": name_regex},
                 ],
             }
-
         response = await self._execute(self._collection.find, query)
         response.sort(("population", -1))
         response.limit(30)  # noqa: WPS432
