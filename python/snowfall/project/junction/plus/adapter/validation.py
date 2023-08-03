@@ -65,3 +65,10 @@ def _get_descriptor_fields(
     fields_to_skip: Sequence[str],
 ) -> list[descriptor.FieldDescriptor]:
     return [field for field in fields if field.name not in fields_to_skip]
+
+
+def get_whatsapp_number(field: str) -> str:
+    field_array = field.split("whatsapp:")
+    if len(field_array) == 2:
+        return field_array[1]
+    raise RuntimeError("Wrong format for whatsapp number: {0}".format(field))

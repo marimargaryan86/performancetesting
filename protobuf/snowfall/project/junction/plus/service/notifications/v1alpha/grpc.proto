@@ -12,6 +12,7 @@ service OrderService {
 
 service SubscriberService {
   rpc GetSubscriber(GetSubscriberRequest) returns (GetSubscriberResponse) {}
+  rpc GetSubscriberFromReseller(GetSubscriberFromResellerRequest) returns (GetSubscriberFromResellerResponse) {}
 }
 
 service ConfigurationVectorService {
@@ -50,8 +51,18 @@ message GetSubscriberResponse {
   snowfall.project.junction.plus.service.notifications.v1alpha.Subscriber subscriber = 1;
 }
 
-message GetConfigurationVectorRequest {
+message GetSubscriberFromResellerRequest {
   string reseller_id = 1;
+  string mobile_phone = 2;
+}
+
+message GetSubscriberFromResellerResponse {
+  snowfall.project.junction.plus.service.notifications.v1alpha.Subscriber subscriber = 1;
+}
+
+message GetConfigurationVectorRequest {
+  string identifier = 1;
+  string selector = 2;
 }
 
 message GetConfigurationVectorResponse {

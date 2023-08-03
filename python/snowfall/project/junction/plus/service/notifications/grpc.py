@@ -88,6 +88,23 @@ class SubscriberService(
             subscriber=subscriber,
         )
 
+    async def GetSubscriberFromReseller(  # type: ignore[override] # noqa: N802
+        self,
+        request: notifications_pb2.GetSubscriberFromResellerRequest,
+        context: aio.ServicerContext,
+    ) -> notifications_pb2.GetSubscriberResponse:
+        subscriber = await self._subscribers.find_by_reseller(
+            request.reseller_id,
+            request.mobile_phone,
+        )
+
+        if subscriber is None:
+            await context.abort(StatusCode.NOT_FOUND)
+
+        return notifications_pb2.GetSubscriberResponse(
+            subscriber=subscriber,
+        )
+
 
 class ConfigurationVectorService(
     service.Service,
@@ -116,8 +133,8 @@ class ConfigurationVectorService(
         context: aio.ServicerContext,
     ) -> notifications_pb2.GetConfigurationVectorResponse:
         configuration_vector = await self._configuration_vectors.find_by_id(
-            request.reseller_id,
-            "reseller_id",
+            request.identifier,
+            request.selector,
         )
 
         if configuration_vector is None:

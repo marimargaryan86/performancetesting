@@ -6,6 +6,7 @@ from starlette import applications
 from starlette.middleware import Middleware
 from twilio.request_validator import RequestValidator
 
+from snowfall.project.junction.plus.adapter import configuration_vectors
 from snowfall.project.junction.plus.adapter import (
     monitoring_rules as monitoring_rules_adapter,
 )
@@ -24,6 +25,7 @@ from snowfall.project.junction.plus.service.plus_webhooks import (
 )
 from snowfall.project.junction.plus.service.plus_webhooks.routes import router
 from snowfall.stdlib.integration.starlette import application
+from snowfall.stdlib.v1 import phone_number_pb2
 
 
 @pytest.fixture()
@@ -40,8 +42,8 @@ def cirium_flex_alert_key() -> str:
 def whatsapp_body() -> Mapping[str, str]:
     return {
         "Body": "Test body",
-        "From": "FromAcc",
-        "To": "ToAcc",
+        "From": "whatsapp:9900000002",
+        "To": "whatsapp:9900000001",
     }
 
 
@@ -93,6 +95,21 @@ def subscribers_client() -> subscribers_adapter.Client:
 
 
 @pytest.fixture()
+def configuration_vectors_client() -> configuration_vectors.Client:
+    return configuration_vectors.DictClient(
+        [
+            notifications_models_pb2.ConfigurationVector(
+                id="1",
+                reseller_id="1",
+                mobile_phone=phone_number_pb2.PhoneNumber(
+                    e164_number="9900000001",
+                ),
+            ),
+        ],
+    )
+
+
+@pytest.fixture()
 def notification_event_publisher_client() -> (
     notification_event_publisher_adapter.Client
 ):
@@ -100,10 +117,11 @@ def notification_event_publisher_client() -> (
 
 
 @pytest.fixture()
-def app(
+def app(  # noqa: WPS211
     secret_key: str,
     monitoring_rules_client: monitoring_rules_adapter.Client,
     subscribers_client: subscribers_adapter.Client,
+    configuration_vectors_client: configuration_vectors.Client,
     notification_event_publisher_client: notification_event_publisher_adapter.Client,
     twilio_validator: RequestValidator,
 ) -> applications.Starlette:
@@ -119,6 +137,7 @@ def app(
             bootstrap.create_dependencies(
                 monitoring_rules_client=monitoring_rules_client,
                 subscribers_client=subscribers_client,
+                configuration_vectors_client=configuration_vectors_client,
                 notification_event_publisher_client=notification_event_publisher_client,
             ),
         ),

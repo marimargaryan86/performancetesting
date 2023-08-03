@@ -93,6 +93,19 @@ class SubscriberRepository(
 
         return subscriber
 
+    async def find_by_reseller(
+        self,
+        reseller_id: str,
+        mobile_phone: str,
+    ) -> models_pb2.Subscriber | None:
+        return await self._execute(
+            self._collection.find_one,
+            {
+                "reseller_id": reseller_id,
+                "phone_number.e164_number": mobile_phone,
+            },
+        )
+
 
 class ConfigurationVectorRepository(
     mixins.FindByIdMixin[models_pb2.ConfigurationVector],

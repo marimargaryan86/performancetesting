@@ -5,6 +5,7 @@ from starlette.middleware import Middleware
 from twilio.request_validator import RequestValidator
 
 from snowfall.project.junction.plus.adapter import (
+    configuration_vectors,
     monitoring_rules,
     notification_event_publisher,
     subscribers,
@@ -36,6 +37,11 @@ def _factory(
                     ),
                     subscribers_client=subscribers.GrpcClient(
                         subscribers=notifications_pb2_grpc.SubscriberServiceStub(
+                            create_channel(app.settings.notifications_address),
+                        ),
+                    ),
+                    configuration_vectors_client=configuration_vectors.GrpcClient(
+                        configuration_vectors=notifications_pb2_grpc.ConfigurationVectorServiceStub(
                             create_channel(app.settings.notifications_address),
                         ),
                     ),

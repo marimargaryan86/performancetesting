@@ -21,6 +21,14 @@ class Client(abc.ABC):
     ) -> notifications_models_pb2.Subscriber:
         """Get Subscriber."""
 
+    @abc.abstractmethod
+    async def find_from_reseller(
+        self,
+        reseller_id: str,
+        mobile_phone: str,
+    ) -> notifications_models_pb2.Subscriber:
+        """Get Subscriber from reseller and phone."""
+
 
 class DictClient(Client):
     def __init__(
@@ -35,6 +43,20 @@ class DictClient(Client):
     ) -> notifications_models_pb2.Subscriber:
         subscriber = self._subscribers.get(
             subscriber_id,
+        )
+
+        if not subscriber:
+            raise errors.NotFoundError()
+
+        return subscriber
+
+    async def find_from_reseller(
+        self,
+        reseller_id: str,
+        mobile_phone: str,
+    ) -> notifications_models_pb2.Subscriber:
+        subscriber = self._subscribers.get(
+            reseller_id,
         )
 
         if not subscriber:
@@ -64,4 +86,21 @@ class GrpcClient(Client):
             ),
         )
 
+        return response.subscriber
+
+    async def find_from_reseller(
+        self,
+        reseller_id: str,
+        mobile_phone: str,
+    ) -> notifications_models_pb2.Subscriber:
+        request = notifications_grpc_pb2.GetSubscriberFromResellerRequest(
+            reseller_id=reseller_id,
+            mobile_phone=mobile_phone,
+        )
+        response = await errors.handle_grpc_errors(
+            self._subscribers.GetSubscriberFromReseller(
+                request,
+                timeout=self._timeout,
+            ),
+        )
         return response.subscriber

@@ -17,7 +17,8 @@ class Client(abc.ABC):
     @abc.abstractmethod
     async def get(
         self,
-        reseller_id: str,
+        identifier: str,
+        selector: str = "reseller_id",
     ) -> notifications_models_pb2.ConfigurationVector:
         """Get Reseller configuration vector."""
 
@@ -27,16 +28,29 @@ class DictClient(Client):
         self,
         configuration_vectors: Sequence[notifications_models_pb2.ConfigurationVector],
     ) -> None:
-        self._configuration_vectors = {
-            configuration_vector.reseller_id: configuration_vector
-            for configuration_vector in configuration_vectors
-        }
+        self._configuration_vectors = configuration_vectors
 
     async def get(
         self,
-        reseller_id: str,
+        identifier: str,
+        selector: str = "reseller_id",
     ) -> notifications_models_pb2.ConfigurationVector:
-        configuration_vector = self._configuration_vectors.get(reseller_id)
+        if selector == "reseller_id":
+            configuration_vector = next(
+                filter(
+                    lambda cv: cv.reseller_id == identifier,
+                    self._configuration_vectors,
+                ),
+                None,
+            )
+        else:
+            configuration_vector = next(
+                filter(
+                    lambda cv: cv.mobile_phone.e164_number == identifier,  # type: ignore[arg-type, union-attr]
+                    self._configuration_vectors,
+                ),
+                None,
+            )
 
         if not configuration_vector:
             raise errors.NotFoundError()
@@ -55,10 +69,12 @@ class GrpcClient(Client):
 
     async def get(
         self,
-        reseller_id: str,
+        identifier: str,
+        selector: str = "reseller_id",
     ) -> notifications_models_pb2.ConfigurationVector:
         request = notifications_grpc_pb2.GetConfigurationVectorRequest(
-            reseller_id=reseller_id,
+            identifier=identifier,
+            selector=selector,
         )
         response = await errors.handle_grpc_errors(
             self._configuration_vectors.GetConfigurationVector(

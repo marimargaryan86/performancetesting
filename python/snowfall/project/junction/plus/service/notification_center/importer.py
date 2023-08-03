@@ -40,7 +40,7 @@ class NotificationEventImporter(object):
             subscriber_id=message.body.receiver_id,
         )
         configuration_vector = await self._configuration_vectors.get(
-            reseller_id=message.body.sender_id,
+            identifier=message.body.sender_id,
         )
 
         self._logger.warning(str(configuration_vector))
