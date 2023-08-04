@@ -7,7 +7,6 @@ import (
 	"github.com/uber/h3-go/v4"
 	"math"
 	"sort"
-	"strconv"
 	"sync"
 	"time"
 )
@@ -349,38 +348,6 @@ func (r *raptor) scanTransfers() {
 	for _, p := range r.marked {
 		fromStop := r.data.StopBySequence(p)
 		departure, _ := r.rounds[r.round][fromStop.Sequence]
-		idInt, _ := strconv.ParseUint(fromStop.Id, 10, 0)
-		hex := h3.Cell(idInt)
-		neighbours := h3.GridDisk(hex, 2)
-
-		for _, n := range neighbours {
-			toStops, ok := r.stopsMap[n]
-
-			if !ok {
-				continue
-			}
-
-			for _, toStop := range toStops {
-				arrival := departure + (60 * 10) + toStop.TransferTime
-
-				if r.isBetter(toStop.Sequence, arrival) {
-					r.rounds[r.round][toStop.Sequence] = arrival
-					r.best[toStop.Sequence] = arrival
-
-					if _, ok := r.connections[toStop.Sequence]; !ok {
-						r.connections[toStop.Sequence] = make(map[uint8]interface{})
-					}
-
-					r.connections[toStop.Sequence][r.round] = transfer{
-						from:      fromStop,
-						to:        toStop,
-						departure: departure,
-						arrival:   departure + (60 * 10),
-						kind:      models.Schedule_TYPE_UNSPECIFIED,
-					}
-				}
-			}
-		}
 
 		for _, t := range fromStop.Transfers {
 			trans := r.data.TransferBySequence(t)
