@@ -6,6 +6,7 @@ from snowfall.project.junction.plus.adapter import (
     subscribers,
     validation,
 )
+from snowfall.project.junction.plus.service.plus_webhooks import state
 
 
 class IncomingMessages(endpoints.HTTPEndpoint):
@@ -14,6 +15,7 @@ class IncomingMessages(endpoints.HTTPEndpoint):
         request: requests.Request,
         subscribers_client: subscribers.Client = lagom.injectable,
         configuration_vectors_client: configuration_vectors.Client = lagom.injectable,
+        subscribers_state: state.SubscriberState = lagom.injectable,
     ) -> responses.Response:
         msg = await request.form()
         message_from = validation.get_whatsapp_number(str(msg["From"]))
@@ -26,6 +28,10 @@ class IncomingMessages(endpoints.HTTPEndpoint):
             cv.reseller_id,
             message_from,
         )
+        subscriber_state = await subscribers_state.get_state(message_from)
+
+        subscriber_state["last_message"] = msg["Body"]
+        await subscribers_state.store_state(message_from, subscriber_state)
         # Context Manager for now can be a function under this service, eventually
         # we could make it grpc methods under notification_center service
         # response = context_manager.create_response(  # Here we get also the state

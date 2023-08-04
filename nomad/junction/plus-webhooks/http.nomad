@@ -123,6 +123,7 @@ job "plus-webhooks-http" {
         env         = true
         change_mode = "restart"
         data        = <<EOH
+REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 NOTIFICATIONS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_notifications-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/plus-webhooks" }}
 FLIGHT_STATS_APP_KEY={{ .Data.data.flight_stats_app_key }}

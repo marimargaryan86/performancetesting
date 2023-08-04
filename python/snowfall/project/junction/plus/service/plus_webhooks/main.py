@@ -1,5 +1,8 @@
+import datetime
+import random
 from collections.abc import Callable
 
+from redis import asyncio as aioredis
 from starlette.applications import Starlette
 from starlette.middleware import Middleware
 from twilio.request_validator import RequestValidator
@@ -16,10 +19,12 @@ from snowfall.project.junction.plus.service.notifications.v1alpha import (
 from snowfall.project.junction.plus.service.plus_webhooks import (
     bootstrap,
     middlewares,
+    state,
 )
 from snowfall.project.junction.plus.service.plus_webhooks.routes import router
 from snowfall.stdlib import service
 from snowfall.stdlib.integration.starlette import application
+from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.grpc.client import create_channel
 
 
@@ -49,6 +54,16 @@ def _factory(
                         notification_event_publisher=notifications_pb2_grpc.NotificationEventPublisherServiceStub(
                             create_channel(app.settings.notifications_address),
                         ),
+                    ),
+                    subscribers_state=state.SubscriberState(
+                        redis_client=redis.Client[str](
+                            aioredis.from_url(
+                                random.choice(app.settings.redis_dsn),  # noqa: S311
+                                decode_responses=True,
+                            ).client(),
+                            prefix=app.name,
+                        ),
+                        cache_ttl=datetime.timedelta(minutes=15),
                     ),
                 ),
             ),

@@ -1,7 +1,9 @@
+import datetime
 from collections.abc import AsyncIterator, Mapping
 
 import httpx
 import pytest
+from fakeredis import aioredis as fakeredis
 from starlette import applications
 from starlette.middleware import Middleware
 from twilio.request_validator import RequestValidator
@@ -22,9 +24,11 @@ from snowfall.project.junction.plus.service.notifications.v1alpha import (
 from snowfall.project.junction.plus.service.plus_webhooks import (
     bootstrap,
     middlewares,
+    state,
 )
 from snowfall.project.junction.plus.service.plus_webhooks.routes import router
 from snowfall.stdlib.integration.starlette import application
+from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.v1 import phone_number_pb2
 
 
@@ -117,6 +121,14 @@ def notification_event_publisher_client() -> (
 
 
 @pytest.fixture()
+def redis_client(redis_client: fakeredis.FakeRedis) -> redis.Client[str]:
+    return redis.Client(
+        redis_client,
+        prefix="plus_webhooks",
+    )
+
+
+@pytest.fixture()
 def app(  # noqa: WPS211
     secret_key: str,
     monitoring_rules_client: monitoring_rules_adapter.Client,
@@ -124,6 +136,7 @@ def app(  # noqa: WPS211
     configuration_vectors_client: configuration_vectors.Client,
     notification_event_publisher_client: notification_event_publisher_adapter.Client,
     twilio_validator: RequestValidator,
+    redis_client: redis.Client[str],
 ) -> applications.Starlette:
     return application.create_starlette_app(
         custom_middlewares=[
@@ -139,6 +152,10 @@ def app(  # noqa: WPS211
                 subscribers_client=subscribers_client,
                 configuration_vectors_client=configuration_vectors_client,
                 notification_event_publisher_client=notification_event_publisher_client,
+                subscribers_state=state.SubscriberState(
+                    redis_client=redis_client,
+                    cache_ttl=datetime.timedelta(minutes=10),
+                ),
             ),
         ),
         openapi_path=None,
