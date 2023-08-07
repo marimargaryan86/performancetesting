@@ -9,6 +9,25 @@ pants run python/snowfall/script/validate_nomad_build_files.py -- "nomad/"
 
 FAILURE=0
 ENVIRONMENTS=("development" "production" "sandbox")
+UNSTABLE_REGEX="(v\d+(alpha|beta)\d*)|(v\d+p\d+(alpha|beta)\d*)|(v\d+test.*)"
+IGNORED_UNSTABLE_RUNNABLES=(
+	"python/snowfall/project/junction/extensions/service/mobile_api:main"
+	"python/snowfall/project/junction/go/service/client_api:main"
+	"python/snowfall/project/junction/go/service/gateway:main"
+	"python/snowfall/project/junction/go/service/orders:main"
+	"python/snowfall/project/junction/go/service/schedules:main"
+	"python/snowfall/project/junction/go/service/trips:main"
+	"python/snowfall/project/junction/service/providers/ask2go:main"
+	"python/snowfall/project/junction/service/providers/distribusion:main"
+	"python/snowfall/project/junction/service/providers/duffel:main"
+	"python/snowfall/project/junction/service/providers/save_a_train:main"
+	"python/snowfall/project/pay/service/companies:main"
+	"python/snowfall/project/pay/service/currencies:main"
+	"python/snowfall/project/pay/service/pay_api:main"
+	"python/snowfall/project/pay/service/rates:main"
+	"python/snowfall/project/pay/service/refunds:main"
+	"python/snowfall/project/pay/service/transactions:main"
+)
 
 declare -A SENTRY_PROJECTS
 while read -r project id; do
@@ -18,6 +37,9 @@ done <<<"$(sentry-cli projects list | awk 'NR>4 {print last} {last=$4" "$2}')"
 mapfile -t NOMAD_FILES < <(pants --filter-address-regex='_nomad$' peek :: | jq -r ".[] | .sources[0]")
 mapfile -t DOCKER_IMAGES < <(pants --filter-target-type='docker_image' peek :: | jq -r ".[] | .address")
 mapfile -t PROTOBUF_FILES < <(pants --filter-target-type="protobuf_source" list ::)
+mapfile -t VALID_DEBUG_INFO_ADDRESSES < <(pants --filter-address-regex='_debug_info$' peek :: | jq -r '.[] | .address')
+mapfile -t UNSTABLE_PROTOS < <(pants --filter-target-type="protobuf_source" list :: | grep -P -e "${UNSTABLE_REGEX}" | xargs pants dependents --transitive)
+mapfile -t CONFIG_FILES < <(pants --filter-address-regex='_config$' peek :: | jq -r '.[] | .sources[0] + "|" + .address')
 
 for f in "${PROTOBUF_FILES[@]}"; do
 	NAMESPACE=$(dirname "${f#protobuf/}")
@@ -41,6 +63,55 @@ for i in "${DOCKER_IMAGES[@]}"; do
 		echo "${SERVICE_NAME}: project does not exist in Sentry"
 		FAILURE=1
 	fi
+done
+
+POTENTIAL_DEBUG_INFO_ADDRESSES=()
+
+for i in "${CONFIG_FILES[@]}"; do
+	FILEPATH="${i%|*}"
+	FILENAME=$(basename "${FILEPATH}")
+	ADDRESS="${i#*|}"
+	# shellcheck disable=SC2001
+	DEBUG_INFO_ADDRESS=$(echo "${ADDRESS}" | sed "s/${FILENAME%.*}_config/debug_info/g")
+	SHOULD_DEPLOY=$(jq ".production | if has(\"deploy\") then .deploy else true end" "${FILEPATH}")
+
+	if [ "${SHOULD_DEPLOY}" = "false" ]; then
+		continue
+	fi
+
+	POTENTIAL_DEBUG_INFO_ADDRESSES+=("${DEBUG_INFO_ADDRESS}")
+done
+
+# shellcheck disable=SC2207
+POTENTIAL_DEBUG_INFO_ADDRESSES=($(for address in "${POTENTIAL_DEBUG_INFO_ADDRESSES[@]}"; do echo "${address}"; done | sort -u))
+WANTED_DEBUG_INFO_ADDRESSES=()
+
+for ADDRESS in "${POTENTIAL_DEBUG_INFO_ADDRESSES[@]}"; do
+	# shellcheck disable=SC2076
+	if [[ ! " ${VALID_DEBUG_INFO_ADDRESSES[*]} " =~ " ${ADDRESS} " ]]; then
+		continue
+	fi
+
+	WANTED_DEBUG_INFO_ADDRESSES+=("${ADDRESS}")
+done
+
+mapfile -t RUNNABLES < <(pants peek "${WANTED_DEBUG_INFO_ADDRESSES[@]}" | jq -r '.[] | .runnable')
+
+for RUNNABLE in "${RUNNABLES[@]}"; do
+	# shellcheck disable=SC2076
+	if [[ " ${IGNORED_UNSTABLE_RUNNABLES[*]} " =~ " ${RUNNABLE} " ]]; then
+		continue
+	fi
+
+	# shellcheck disable=SC2076
+	if [[ ! " ${UNSTABLE_PROTOS[*]} " =~ " ${RUNNABLE} " ]]; then
+		continue
+	fi
+
+	echo "${RUNNABLE} depends on unstable protocol buffers:"
+	pants dependencies --transitive "${RUNNABLE}" | grep -P -e "${UNSTABLE_REGEX}" | while read -r line; do echo "- $line"; done
+	echo ""
+	FAILURE=1
 done
 
 for f in "${NOMAD_FILES[@]}"; do
