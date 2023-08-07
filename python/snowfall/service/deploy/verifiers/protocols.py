@@ -7,13 +7,11 @@ Environments: TypeAlias = set[
     Literal["development"] | Literal["sandbox"] | Literal["production"]
 ]
 ResolvedDependencies: TypeAlias = Mapping[_DependencyTuple, tuple[str, int]]
-Triggers: TypeAlias = set[str]
 
 
 class Verifier(Protocol):
     dependencies: ClassVar[Dependencies]
     environments: ClassVar[Environments]
-    triggers: ClassVar[Triggers]
 
     async def run(self, environment: str, dependencies: ResolvedDependencies) -> None:
         """Run the verifier."""

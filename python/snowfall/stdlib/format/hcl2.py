@@ -12,12 +12,44 @@ class Template(pydantic.BaseModel):
     right_delimiter: str = "}}"
 
 
+class Upstream(pydantic.BaseModel):
+    destination_name: str
+    local_bind_port: int
+
+
+class Proxy(pydantic.BaseModel):
+    upstreams: Sequence[Upstream] = pydantic.Field(default_factory=list)
+
+
+class SidecarService(pydantic.BaseModel):
+    proxy: Sequence[Proxy] = pydantic.Field(default_factory=list)
+
+
+class Check(pydantic.BaseModel):
+    interval: str
+    timeout: str
+    type_: str = pydantic.Field(alias="type")
+
+
+class Connect(pydantic.BaseModel):
+    sidecar_service: Sequence[SidecarService] = pydantic.Field(default_factory=list)
+
+
+class Service(pydantic.BaseModel):
+    check: Sequence[Check] = pydantic.Field(default_factory=list)
+    connect: Sequence[Connect] = pydantic.Field(default_factory=list)
+    name: str = ""
+    port: str | None
+    tags: Sequence[str] = pydantic.Field(default_factory=list)
+
+
 class Task(pydantic.BaseModel):
     lifecycle: Sequence[Mapping[str, str]] = pydantic.Field(default_factory=list)
     template: Sequence[Template] = pydantic.Field(default_factory=list)
 
 
 class Group(pydantic.BaseModel):
+    service: Sequence[Service] = pydantic.Field(default_factory=list)
     task: Sequence[Mapping[str, Task]]
 
 

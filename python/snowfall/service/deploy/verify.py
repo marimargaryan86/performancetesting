@@ -1,17 +1,24 @@
+import functools
+import itertools
 from collections.abc import Sequence
 
-from snowfall.service.deploy import consul
+from snowfall.service.deploy import consul, dependencies
 from snowfall.service.deploy.verifiers import protocols
 from snowfall.stdlib.logging import stdout
 
 
+@functools.cache
+def _logger() -> stdout.Logger:
+    return stdout.get_logger()
+
+
 async def _resolve_dependencies(
     resolver: consul.Resolver,
-    dependencies: protocols.Dependencies,
+    service_dependencies: protocols.Dependencies,
 ) -> protocols.ResolvedDependencies:
     resolved = {}
 
-    for dependency in dependencies:
+    for dependency in service_dependencies:
         resolved[dependency] = await resolver.query_service(dependency)
 
     return resolved
@@ -21,11 +28,22 @@ async def run(
     verifier: protocols.Verifier,
     environment: str,
     changed_services: Sequence[str],
-    logger: stdout.Logger,
-    resolver: consul.Resolver,
+    dns_resolver: consul.Resolver,
+    deps_resolver: dependencies.Resolver,
 ) -> bool:
+    logger = _logger()
+
     with stdout.context_binding(verifier=type(verifier).__name__):
-        is_triggered = any(srv in verifier.triggers for srv in changed_services)
+        triggers = frozenset(
+            itertools.chain(
+                *[
+                    deps_resolver.get_transitive_dependencies_for(dependency[0])
+                    for dependency in verifier.dependencies
+                ],
+            ),
+        )
+
+        is_triggered = any(srv in triggers for srv in changed_services)
 
         if not is_triggered or environment not in verifier.environments:
             logger.warning("Skipped due to environments or triggers not matching.")
@@ -33,7 +51,7 @@ async def run(
 
         try:
             resolved_dependencies = await _resolve_dependencies(
-                resolver,
+                dns_resolver,
                 verifier.dependencies,
             )
         except Exception:

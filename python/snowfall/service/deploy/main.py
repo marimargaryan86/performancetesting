@@ -3,32 +3,34 @@ from urllib import parse as urllib_parse
 
 import pydantic
 
-from snowfall.service.deploy import consul, verify
+from snowfall.service.deploy import consul, dependencies, verify
 from snowfall.service.deploy.verifiers import junction_go, protocols
 from snowfall.stdlib import service
-from snowfall.stdlib.logging import stdout
 
 _verifiers: tuple[protocols.Verifier, ...] = (junction_go.OfferSearchFlow(),)
 
 
 class _VerifySettings(service.Settings):
     nomad_address: pydantic.HttpUrl
-    services: list[str] = pydantic.Field(argument=True)
+    nomad_templates_path: pydantic.DirectoryPath
+    changed_services: list[str] = pydantic.Field(argument=True)
 
 
 async def _verify(app: service.AsyncApplication[_VerifySettings]) -> None:
-    logger = stdout.get_logger()
     dns_address = str(urllib_parse.urlparse(app.settings.nomad_address).hostname)
-    resolver = consul.Resolver((dns_address, 8600), app.environment)
+    dns_resolver = consul.Resolver((dns_address, 8600), app.environment)
+    deps_resolver = await dependencies.resolver_from_nomad_templates(
+        app.settings.nomad_templates_path,
+    )
     deploy_is_ok = all(
         await asyncio.gather(
             *(
                 verify.run(
                     verifier=verifier,
                     environment=app.environment,
-                    changed_services=app.settings.services,
-                    logger=logger,
-                    resolver=resolver,
+                    changed_services=app.settings.changed_services,
+                    dns_resolver=dns_resolver,
+                    deps_resolver=deps_resolver,
                 )
                 for verifier in _verifiers
             ),

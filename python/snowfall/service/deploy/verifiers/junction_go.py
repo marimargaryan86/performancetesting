@@ -23,7 +23,6 @@ from snowfall.stdlib.v1 import latlng_pb2
 class OfferSearchFlow(object):
     dependencies: ClassVar[protocols.Dependencies] = {("offers", "grpc")}
     environments: ClassVar[protocols.Environments] = {"development"}
-    triggers: ClassVar[protocols.Triggers] = {"mock", "offers"}
     _cutoff = datetime.timedelta(seconds=30)  # noqa: WPS432
 
     async def run(
