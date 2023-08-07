@@ -29,10 +29,8 @@ class TestSerializer(object):
 
     def test_deserialize_memoryview(self) -> None:
         blob = memoryview(
-            (
-                b"\n-type.googleapis.com/google.protobuf.Timestamp\x12\x06\x08\xb7\x92\xef"
-                b"\x8d\x06"
-            ),
+            b"\n-type.googleapis.com/google.protobuf.Timestamp\x12\x06\x08\xb7\x92\xef"
+            b"\x8d\x06",
         )
         message = protobuf.AnySerializer[timestamp_pb2.Timestamp].deserialize(blob)
         assert isinstance(message, timestamp_pb2.Timestamp)

@@ -5,7 +5,7 @@ import contextlib
 import dataclasses
 import inspect
 from collections.abc import AsyncIterator, Awaitable, Callable
-from typing import Any, Generic, TypeVar, cast
+from typing import Any, Generic, Protocol, TypeVar, cast
 
 import click
 import orjson
@@ -254,9 +254,14 @@ def _sync_wrapper(
         raise SystemExit(1) from err
 
 
+class _Command(Protocol):
+    def __call__(self, ctx: click.Context, **kwargs: Any) -> None:
+        """Service command protocol."""
+
+
 def _command(
     command: Command[_Settings],
-) -> Callable[[click.Context], None]:
+) -> _Command:
     @click.pass_context
     def decorator(ctx: click.Context, **kwargs: Any) -> None:
         ctx.ensure_object(dict)
@@ -291,4 +296,5 @@ def _command(
                 cast(SyncCallback[_Settings], command.callback),
             )
 
-    return decorator
+    # need to cast because of dodgy type hinting in @click.pass_context
+    return cast(_Command, decorator)
