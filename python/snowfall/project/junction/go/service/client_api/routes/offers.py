@@ -644,7 +644,7 @@ def _validate_trips(
     validation_errors: list[models.Error] = []
 
     for trip_idx, trip_id in enumerate(body["trips"]):
-        if trip_id not in trips_map.keys():
+        if trip_id not in trips_map:
             validation_errors.append(
                 models.Error(
                     status=str(status.HTTP_404_NOT_FOUND),

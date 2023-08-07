@@ -9,8 +9,8 @@ from snowfall.stdlib import money
 def company() -> company_models.Company:
     return company_models.Company(
         name="Snowfall",
-        fx_markup=float(0.4),
-        processing_markup=float(0.2),
+        fx_markup=0.4,
+        processing_markup=0.2,
         sales_markup=float(1),
     )
 

@@ -178,7 +178,7 @@ def _validate_variables(
             continue
 
         for nomad_var in _expected_variables(variables):
-            if nomad_var not in env_data.variables.keys():
+            if nomad_var not in env_data.variables:
                 errors = True
                 _log_error(
                     '{0}: variable "{1}" is not configured in environment "{2}"'.format(

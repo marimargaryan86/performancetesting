@@ -88,7 +88,7 @@ python-multipart==0.0.6
 qrcode==7.4.2
 redis[hiredis]==4.6.0
 rfc3339-validator==0.1.4
-ruff==0.0.277
+ruff==0.0.282
 s3fs==2023.6.0
 sentry-sdk==1.27.0
 setuptools==68.0.0
