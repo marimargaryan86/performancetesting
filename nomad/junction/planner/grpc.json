@@ -14,7 +14,7 @@
   "sandbox": {
     "variables": {
       "count": 1,
-      "memory_value": 17410
+      "memory_value": 12288
     }
   }
 }
