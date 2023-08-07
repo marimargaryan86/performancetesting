@@ -5,6 +5,15 @@ export default {
     select: {
       root: "/book/select-offer",
     },
+    passengerDetails: {
+      root: "/book/passenger-details",
+    },
+    payment: {
+      root: "/book/payment",
+    },
+    confirmation: {
+      root: "/book/confirmation",
+    },
   },
   login: "/login",
   settings: "/settings",
@@ -43,7 +52,6 @@ export default {
     root: "/go",
     bookings: {
       root: "/go/bookings",
-      refunds: "/go/bookings/refunds",
     },
   },
 };

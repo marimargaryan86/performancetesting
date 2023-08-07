@@ -32,14 +32,14 @@
 </script>
 
 <div class="passenger-picker" use:clickOutside={close}>
-  <div on:click={toggle} class="passenger-select">
+  <button on:click={toggle} class="passenger-select">
     {#if adults + children + infants > 0}
       <span class="typography body-medium-weight-600">{passengerInfo}</span>
     {:else}
       <span class="typography body-medium-weight-600">Passengers</span>
     {/if}
     <ChevronIcon direction={expanded ? "up" : "down"} color="var(--color-main-primary-500)" />
-  </div>
+  </button>
 
   {#if expanded}
     <Dialogue bind:adults bind:children bind:infants />
@@ -48,10 +48,6 @@
 
 <style>
   .passenger-picker {
-    --x-height: var(--height, 52px);
-    --x-font-size: var(--font-size, 14px);
-    --x-icon-padding: var(--icon-padding, 16px);
-
     position: relative;
     display: inline-block;
   }
@@ -62,5 +58,10 @@
     align-items: center;
     color: var(--color-main-primary-500);
     cursor: pointer;
+  }
+
+  button {
+    background-color: transparent;
+    border: 0;
   }
 </style>

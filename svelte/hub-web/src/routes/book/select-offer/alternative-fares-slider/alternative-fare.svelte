@@ -3,10 +3,11 @@
   import FareRule from "./fare-rules/fare-rule.svelte";
   import CheckCircleIcon from "components/icons/check-circle-icon.svelte";
   import { createEventDispatcher } from "svelte";
+  import type { OfferModel } from "../offer.svelte";
 
   const dispatch = createEventDispatcher();
 
-  export let alternativeFare;
+  export let alternativeFare: OfferModel["alternativeFares"][number];
   export let selected = false;
 
   function toggleSelectedFare(): void {

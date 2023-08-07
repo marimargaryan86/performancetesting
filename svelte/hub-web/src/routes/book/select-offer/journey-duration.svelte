@@ -5,20 +5,24 @@
   const minJourneyDuration = fromJourneyDuration;
   const maxJourneyDuration = toJourneyDuration;
 
-  function handleMinJourneyDurationChange(event): void {
-    if (event.target.value > toJourneyDuration) {
+  function handleMinJourneyDurationChange(
+    event: Event & { currentTarget: EventTarget & HTMLInputElement },
+  ): void {
+    if (Number(event.currentTarget.value) > toJourneyDuration) {
       toJourneyDuration = fromJourneyDuration;
     }
 
-    fromJourneyDuration = event.target.value;
+    fromJourneyDuration = Number(event.currentTarget.value);
   }
 
-  function handleMaxJourneyDurationChange(event): void {
-    if (event.target.value < fromJourneyDuration) {
+  function handleMaxJourneyDurationChange(
+    event: Event & { currentTarget: EventTarget & HTMLInputElement },
+  ): void {
+    if (Number(event.currentTarget.value) < fromJourneyDuration) {
       fromJourneyDuration = toJourneyDuration;
     }
 
-    toJourneyDuration = event.target.value;
+    toJourneyDuration = Number(event.currentTarget.value);
   }
 </script>
 
@@ -64,7 +68,7 @@
     height: 4px;
     margin: 0;
     padding: 0;
-    background-color: var(--color-primary-50);
+    background-color: var(--color-main-primary-100);
     border-radius: 2px;
     outline: none;
     appearance: none;

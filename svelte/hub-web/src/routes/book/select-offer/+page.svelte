@@ -1,22 +1,25 @@
 <script lang="ts">
   import BookingSteps from "../booking-steps.svelte";
-  import SearchForm from "../search-form.svelte";
+  import SearchForm, { type BookingSearchData } from "../search-form.svelte";
   import SelectField from "components/ui/select-field.svelte";
-  import Check from "../check.svelte";
+  import Checkbox from "../checkbox.svelte";
   import TimeRange from "./time-range.svelte";
   import JourneyDuration from "./journey-duration.svelte";
   import RailwayOperators from "./railway-operators.svelte";
   import Button from "components/ui/button.svelte";
-  import Offer from "./offer.svelte";
+  import Offer, { type OfferModel } from "./offer.svelte";
   import { fade } from "svelte/transition";
-  import OffersMockup from "./offers-mockup.ts";
-  import type { BookingSearchForm } from "../booking-search-form";
+  import offersMock from "../offers-mockup";
   import { onMount } from "svelte";
+  import routeConfig from "routeConfig";
+  import { page } from "$app/stores";
+  import { goto } from "$app/navigation";
 
-  let bookingSearchForm = {} as BookingSearchForm;
-  export let offers = OffersMockup;
+  export let offers: OfferModel[] = offersMock;
 
-  function toggleSelectedOffer(event): void {
+  let searchData: Partial<BookingSearchData> = {};
+
+  function toggleSelectedOffer(event: CustomEvent<{ id: number }>): void {
     offers.forEach(function (offer) {
       offer.alternativeFares.forEach(function (fare) {
         fare.selected = false;
@@ -30,19 +33,9 @@
     offers = offers;
   }
 
-  onMount(() => {
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
+  let searchQuery: string;
+  let currentBookingStep = 2;
 
-    bookingSearchForm.adults = Number(urlParams.get("adults")) ?? 0;
-    bookingSearchForm.children = Number(urlParams.get("children")) ?? 0;
-    bookingSearchForm.infants = Number(urlParams.get("infants")) ?? 0;
-    bookingSearchForm.origin = urlParams.get("origin") ?? "";
-    bookingSearchForm.destination = urlParams.get("destination") ?? "";
-    bookingSearchForm.fromDate = new Date(Number(urlParams.get("from"))) ?? undefined;
-  });
-
-  const currentBookingStep = 2;
   const sortByFields = [
     "Lowest price",
     "Fastest",
@@ -51,24 +44,35 @@
     "Earlier arrival",
     "Latest arrival",
   ];
-  let sortBy = "";
 
+  let sortBy = "";
   let offerSelected = false;
   let isFareSelected = false;
-  let selectedFare = {};
+  let selectedFare: OfferModel["alternativeFares"][number] | undefined = undefined;
 
   $: {
     offerSelected = offers.some((offer) => offer.selected === true);
     isFareSelected = false;
   }
 
-  function handleFareSelected(event): void {
+  function handleFareSelected(
+    event: CustomEvent<OfferModel & { fare: OfferModel["alternativeFares"][number] }>,
+  ): void {
     isFareSelected = event.detail.selected;
+
+    let urlParams = $page.url.searchParams;
+
     if (isFareSelected) {
       selectedFare = event.detail.fare;
+      urlParams.set("fare_id", selectedFare.id.toString());
+      urlParams.set("offer_id", event.detail.id.toString());
     } else {
-      selectedFare = {};
+      selectedFare = undefined;
+      urlParams.delete("fare_id");
+      urlParams.delete("offer_id");
     }
+
+    searchQuery = urlParams.toString();
   }
 
   function cancelSelectedOffer(): void {
@@ -82,6 +86,22 @@
     offerSelected = false;
     isFareSelected = false;
   }
+
+  function goToSummaryPage(): void {
+    goto(`${routeConfig.book.passengerDetails.root}?${searchQuery}`);
+  }
+
+  onMount(() => {
+    const urlParams = $page.url.searchParams;
+    searchQuery = urlParams.toString();
+
+    searchData.adults = Number(urlParams.get("adults")) ?? 0;
+    searchData.children = Number(urlParams.get("children")) ?? 0;
+    searchData.infants = Number(urlParams.get("infants")) ?? 0;
+    searchData.origin = urlParams.get("origin") ?? "";
+    searchData.destination = urlParams.get("destination") ?? "";
+    searchData.outbound = new Date(Number(urlParams.get("from"))) ?? undefined;
+  });
 </script>
 
 <svelte:head>
@@ -92,7 +112,7 @@
   <h1 class="typography headline-medium bold container header">Select an offer</h1>
 
   <BookingSteps currentStep={currentBookingStep} />
-  <SearchForm {bookingSearchForm} firstStep={currentBookingStep === 1} />
+  <SearchForm data={searchData} firstStep={currentBookingStep === 1} />
 
   <div class="background">
     <div class="wrapper typography body-medium">
@@ -106,9 +126,9 @@
           </div>
           <div class="stops">
             <h3>Stops</h3>
-            <Check label="Direct" isChecked />
-            <Check label="Non-stop" />
-            <Check label="Indirect" />
+            <Checkbox label="Direct" checked />
+            <Checkbox label="Non-stop" />
+            <Checkbox label="Indirect" />
           </div>
           <hr />
           <div class="flex-gap">
@@ -142,7 +162,9 @@
   {#if offerSelected}
     <div class="next-block" transition:fade|local={{ duration: 100 }}>
       <Button on:click={cancelSelectedOffer} size="medium" variant="outline">Cancel</Button>
-      <Button size="medium" disabled={!isFareSelected}><span class="next-btn">Next</span></Button>
+      <Button on:click={goToSummaryPage} size="medium" disabled={!isFareSelected}
+        ><span class="next-btn">Next</span></Button
+      >
     </div>
   {/if}
 </div>

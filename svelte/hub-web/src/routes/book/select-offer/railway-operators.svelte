@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Check from "../check.svelte";
+  import Checkbox from "../checkbox.svelte";
 
   export let railwayOperators = [
     { label: "Renfe", isChecked: true },
@@ -22,12 +22,12 @@
     railwayOperators = railwayOperators;
   }
 
-  function handleKeyClear(event): void {
+  function handleKeyClear(event: KeyboardEvent): void {
     if (event.key === "Enter") {
       clearAll();
     }
   }
-  function handleKeySelect(event): void {
+  function handleKeySelect(event: KeyboardEvent): void {
     if (event.key === "Enter") {
       selectAll();
     }
@@ -39,8 +39,8 @@
     <span on:click={clearAll} on:keyup={handleKeyClear}>Clear all</span>
     <span on:click={selectAll} on:keyup={handleKeySelect}>Select all</span>
   </div>
-  {#each railwayOperators as operator, index (operator)}
-    <Check bind:isChecked={operator.isChecked} label={operator.label} />
+  {#each railwayOperators as operator (operator)}
+    <Checkbox bind:checked={operator.isChecked} label={operator.label} />
   {/each}
 </div>
 

@@ -21,7 +21,7 @@
       open();
     }
   }
-  function handleKeyToggle(event): void {
+  function handleKeyToggle(event: KeyboardEvent): void {
     if (event.key === "Enter") {
       toggle();
     }

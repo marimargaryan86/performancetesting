@@ -4,12 +4,17 @@
 
   export let maxWidth: string | undefined = undefined;
   export let companyName: string | undefined = undefined;
+  export let img: string | undefined = undefined;
 </script>
 
 <TCol {maxWidth}>
   {#if companyName}
     <div class="company">
-      <EntityAvatar name={companyName} size="24px" />
+      {#if img}
+        <img src={img} width="24" alt="logo" />
+      {:else}
+        <EntityAvatar name={companyName} size="24px" />
+      {/if}
       <span>{companyName}</span>
     </div>
   {/if}

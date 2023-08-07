@@ -1,80 +1,19 @@
 <script lang="ts">
   import { scale } from "svelte/transition";
-  import minusIcon from "components/icons/minus-passenger-icon.svelte";
-  import plusIcon from "components/icons/plus-passenger-icon.svelte";
+  import PassengerCounter from "./passenger-counter.svelte";
 
   export let adults = 0;
   export let children = 0;
   export let infants = 0;
-
-  function addAdult(): void {
-    adults++;
-  }
-  function minusAdult(): void {
-    if (adults === 0) {
-      return;
-    }
-    adults--;
-  }
-  function addChildren(): void {
-    children++;
-  }
-  function minusChildren(): void {
-    if (children === 0) {
-      return;
-    }
-    children--;
-  }
-  function addInfant(): void {
-    infants++;
-  }
-  function minusInfant(): void {
-    if (infants === 0) {
-      return;
-    }
-    infants--;
-  }
 </script>
 
 <div class="dialogue" transition:scale|local={{ duration: 150, start: 0.8 }}>
   <div class="header typography body-xlarge-weight-600">Passengers</div>
+
   <div class="navigation">
-    <div class="passenger-counter">
-      <div class="passenger-type">Adult</div>
-      <div class="counter">
-        <div class="counter-btn" on:click={minusAdult}>
-          <svelte:component this={minusIcon} color="var(--color-common-dark-strong)" />
-        </div>
-        <div>{adults}</div>
-        <div class="counter-btn" on:click={addAdult}>
-          <svelte:component this={plusIcon} color="var(--color-common-dark-strong)" />
-        </div>
-      </div>
-    </div>
-    <div class="passenger-counter">
-      <div class="passenger-type">Children 2-11</div>
-      <div class="counter">
-        <div class="counter-btn" on:click={minusChildren}>
-          <svelte:component this={minusIcon} color="var(--color-common-dark-strong)" />
-        </div>
-        <div>{children}</div>
-        <div class="counter-btn" on:click={addChildren}>
-          <svelte:component this={plusIcon} color="var(--color-common-dark-strong)" />
-        </div>
-      </div>
-    </div>
-    <div class="passenger-counter">
-      <div class="passenger-type">Infants (under 2)</div>
-      <div class="counter">
-        <div class="counter-btn" on:click={minusInfant}>
-          <svelte:component this={minusIcon} color="var(--color-common-dark-strong)" />
-        </div>
-        <div>{infants}</div>
-        <div class="counter-btn" on:click={addInfant}>
-          <svelte:component this={plusIcon} color="var(--color-common-dark-strong)" />
-        </div>
-      </div>
-    </div>
+    <PassengerCounter label="Adult" bind:amount={adults} />
+    <PassengerCounter label="Children (2-11)" bind:amount={children} />
+    <PassengerCounter label="Infants (under 2)" bind:amount={infants} />
   </div>
 </div>
 
@@ -108,32 +47,5 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
-  }
-
-  .passenger-counter {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .counter-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 30px;
-    height: 30px;
-    background-color: var(--color-main-primary-500);
-    border-radius: 8px;
-    cursor: pointer;
-  }
-
-  .counter-btn:hover {
-    background-color: var(--color-main-primary-600);
-  }
-
-  .counter {
-    display: flex;
-    gap: 16px;
-    justify-content: space-between;
   }
 </style>

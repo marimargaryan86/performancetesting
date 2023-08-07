@@ -1,83 +1,121 @@
+<script lang="ts" context="module">
+  export type BookingSearchData = {
+    adults: number;
+    children: number;
+    infants: number;
+    origin: string;
+    destination: string;
+    outbound: Date;
+    inbound?: Date;
+  };
+</script>
+
 <script lang="ts">
   import SearchIcon from "components/icons/book-search-icon.svelte";
   import DatePicker from "components/ui/date-picker/date-picker.svelte";
   import PassengerPicker from "./passenger-picker/passenger-picker.svelte";
-  import SelectCityOrStation from "./select-city-or-station.svelte";
-  import type { BookingSearchForm } from "./booking-search-form";
   import routeConfig from "routeConfig";
+  import { goto } from "$app/navigation";
+  import Button from "components/ui/button.svelte";
+  import TextField from "components/ui/text-field.svelte";
+  import { page } from "$app/stores";
 
   export let firstStep = true;
 
-  export let bookingSearchForm: BookingSearchForm = {
+  export let data: Partial<BookingSearchData> = {
     origin: "",
     destination: "",
-    fromDate: undefined,
+    outbound: undefined,
     adults: 0,
     children: 0,
     infants: 0,
   };
 
-  $: searchQuery = `?origin=${bookingSearchForm.origin}&destination=${
-    bookingSearchForm.destination
-  }&from=${new Date(bookingSearchForm.fromDate).getTime()}&adults=${
-    bookingSearchForm.adults
-  }&children=${bookingSearchForm.children}&infants=${bookingSearchForm.infants}`;
+  function getSearchQuery(nextData: Partial<BookingSearchData>): URL {
+    if (!formValid(nextData)) {
+      throw new Error("Invalid search data");
+    }
+
+    const url = new URL(routeConfig.book.select.root, $page.url.href);
+
+    url.searchParams.set("origin", nextData.origin);
+    url.searchParams.set("destination", nextData.destination);
+
+    if (nextData.adults) {
+      url.searchParams.set("adults", nextData.adults.toString());
+    }
+
+    if (nextData.children) {
+      url.searchParams.set("children", nextData.children.toString());
+    }
+
+    if (nextData.infants) {
+      url.searchParams.set("infants", nextData.infants.toString());
+    }
+
+    if (nextData.outbound) {
+      url.searchParams.set("from", nextData.outbound.getTime().toString());
+    }
+
+    return url;
+  }
 
   function search(): void {
-    if (isSearchParametersValid()) {
-      location.href = routeConfig.book.select.root + searchQuery;
+    try {
+      goto(getSearchQuery(data));
+    } catch {
+      //
     }
   }
 
-  function isSearchParametersValid(): boolean {
-    let valid = true;
-
-    if (
-      !bookingSearchForm.origin ||
-      !bookingSearchForm.destination ||
-      !bookingSearchForm.fromDate ||
-      bookingSearchForm.adults < 1
-    ) {
-      valid = false;
-    }
-
-    return valid;
+  function formValid(nextData: Partial<BookingSearchData>): nextData is BookingSearchData {
+    return Boolean(
+      nextData.origin && nextData.destination && nextData.outbound && (nextData.adults ?? 0) > 0,
+    );
   }
 </script>
 
-<div class="form-wrapper {firstStep ? '' : 'unset-margin'}">
+<div class="form-wrapper" class:unset-margin={!firstStep}>
   <div class="search-offers">
-    <SelectCityOrStation bind:value={bookingSearchForm.origin} direction="From" {firstStep} />
-    <SelectCityOrStation bind:value={bookingSearchForm.destination} direction="To" {firstStep} />
-    <div class="input-wrapper" class:select-date={!firstStep}>
-      <label for="depart-date" class={firstStep ? "" : "typography body-small"}
-        >Depart <span class="required-fields">{firstStep ? "*" : ""}</span></label
-      >
-      <DatePicker bind:value={bookingSearchForm.fromDate} id="depart-date" placeholder="Add date" />
-    </div>
-    <div class="search-btn {firstStep ? 'first-step-search-btn' : ''}" on:click={search}>
-      <svelte:component this={SearchIcon} color="var(--color-common-dark-strong)" />
-    </div>
+    <TextField
+      label="From"
+      required={firstStep}
+      placeholder="City or Station"
+      bind:value={data.origin}
+      clearable
+    />
+    <TextField
+      label="To"
+      required={firstStep}
+      placeholder="City or Station"
+      bind:value={data.destination}
+      clearable
+    />
+
+    <DatePicker
+      range={false}
+      label="Depart"
+      bind:value={data.outbound}
+      id="depart-date"
+      placeholder="Add date"
+      required={firstStep}
+    />
+
+    <Button on:click={search}>
+      <SearchIcon color="var(--color-common-dark-strong)" />
+    </Button>
   </div>
+
   <div class="passenger-select">
     <PassengerPicker
-      bind:adults={bookingSearchForm.adults}
-      bind:children={bookingSearchForm.children}
-      bind:infants={bookingSearchForm.infants}
+      bind:adults={data.adults}
+      bind:children={data.children}
+      bind:infants={data.infants}
     />
   </div>
 </div>
 
 <style>
-  .input-wrapper {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    width: 100%;
-    margin-right: 8px;
-  }
-
   .form-wrapper.unset-margin {
     margin: unset;
     padding: 16px 24px;
@@ -95,40 +133,15 @@
     margin-top: 16px;
   }
 
-  .required-fields {
-    color: var(--color-main-primary-500);
-  }
-
-  .search-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 52px;
-    min-height: 40px;
-    background-color: var(--color-main-primary-500);
-    border-radius: 8px;
-    cursor: pointer;
-  }
-
-  .first-step-search-btn {
-    min-width: 52px;
-    min-height: 52px;
-  }
-
-  .search-btn:hover {
-    background-color: var(--color-main-primary-600);
-  }
-
   .search-offers {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr min-content;
+    gap: 8px;
     align-items: flex-end;
   }
 
-  .select-date > :global(.date-picker) {
-    --height: 40px;
-  }
-
-  .input-wrapper > :global(.date-picker) {
-    --width: 100%;
+  .search-offers > :global(.text-field),
+  .search-offers > :global(.date-picker) {
+    --label-font-size: 16px;
   }
 </style>

@@ -5,11 +5,17 @@
 
   export let value: ConversionStatus;
 
-  const variants: { unspecified: string; executed: string; failed: string } = {
+  const variants: {
+    unspecified: StatusBadgeVariant;
+    executed: StatusBadgeVariant;
+    failed: StatusBadgeVariant;
+  } = {
     executed: "ok",
     unspecified: "warn",
     failed: "error",
   };
+
+  let variant: StatusBadgeVariant = variants[value];
 
   $: variant = variants[value];
 </script>

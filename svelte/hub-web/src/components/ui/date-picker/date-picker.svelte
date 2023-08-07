@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { getRandomId } from "utils/random";
+
   import ChevronIcon from "components/icons/chevron-icon.svelte";
   import RemoveIcon from "components/icons/remove-icon.svelte";
   import { clickOutside } from "directives/click-outside";
@@ -12,6 +14,9 @@
   export let range: TRange;
   export let value: TValue | undefined = undefined;
   export let placeholder: string | undefined = undefined;
+  export let id: string = getRandomId("date-picker");
+  export let label: string | undefined = undefined;
+  export let required = false;
 
   let expanded = false;
   let displayValue = getFormattedValue();
@@ -57,7 +62,16 @@
 </script>
 
 <div class="date-picker" use:clickOutside={close}>
-  <button class="header" on:click={toggle} type="button">
+  {#if label}
+    <label for={id}>
+      {label}
+      {#if required}
+        <span>*</span>
+      {/if}
+    </label>
+  {/if}
+
+  <button class="header" on:click={toggle} type="button" {id}>
     <span class:placeholder={placeholderShowing} class="typography body-medium">
       {displayValue ?? placeholder ?? ""}
     </span>
@@ -81,9 +95,26 @@
     --x-height: var(--height, 52px);
     --x-font-size: var(--font-size, 14px);
     --x-icon-padding: var(--icon-padding, 16px);
+    --x-label-font-size: var(--label-font-size, 12px);
+    --x-label-font-weight: var(--label-font-weight, 400);
 
     position: relative;
-    display: inline-block;
+    display: inline-flex;
+    flex-flow: column;
+  }
+
+  label {
+    margin-bottom: 8px;
+    color: var(--color-main-neutral-900);
+    font-weight: var(--x-label-font-weight);
+    font-size: var(--x-label-font-size);
+    font-family: Poppins, Arial, Helvetica, sans-serif;
+    font-style: normal;
+    letter-spacing: 0.5px;
+  }
+
+  label > span {
+    color: var(--color-main-primary-500);
   }
 
   .header {

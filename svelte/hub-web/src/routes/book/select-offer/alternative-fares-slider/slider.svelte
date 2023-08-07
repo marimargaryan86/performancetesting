@@ -2,13 +2,14 @@
   import AlternativeFare from "./alternative-fare.svelte";
   import Chevron from "components/icons/chevron-icon.svelte";
   import { createEventDispatcher } from "svelte";
+  import type { OfferModel } from "../offer.svelte";
 
   const dispatch = createEventDispatcher();
 
-  export let alternativeFares;
-  export let offerId;
+  export let alternativeFares: OfferModel["alternativeFares"];
+  export let offerId: number;
 
-  function toggleSelectedFare(event): void {
+  function toggleSelectedFare(event: CustomEvent<{ id: number }>): void {
     alternativeFares.forEach(function (fare) {
       if (fare.id === event.detail.id) {
         fare.selected = !fare.selected;
@@ -22,20 +23,27 @@
 
   function scrollToRight(): void {
     const container = document.getElementById("fares-slider");
-    container.scrollLeft += 168;
+
+    if (container) {
+      container.scrollLeft += 168;
+    }
   }
 
   function scrollToLeft(): void {
     const container = document.getElementById("fares-slider");
-    container.scrollLeft -= 168;
+
+    if (container) {
+      container.scrollLeft -= 168;
+    }
   }
 
-  function handleKeyScrollToRight(event): void {
+  function handleKeyScrollToRight(event: KeyboardEvent): void {
     if (event.key === "Enter") {
       scrollToRight();
     }
   }
-  function handleKeyScrollToLeft(event): void {
+
+  function handleKeyScrollToLeft(event: KeyboardEvent): void {
     if (event.key === "Enter") {
       scrollToLeft();
     }

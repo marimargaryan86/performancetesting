@@ -1,6 +1,8 @@
 <script lang="ts">
+  import RemoveIcon from "components/icons/remove-icon.svelte";
+
   import { createEventDispatcher } from "svelte";
-  import { slide } from "svelte/transition";
+  import { fade, slide } from "svelte/transition";
   import { getRandomId } from "utils/random";
 
   type InputEvent = Event & { currentTarget: EventTarget & HTMLInputElement };
@@ -20,6 +22,8 @@
   export let readonly = false;
   export let required = false;
   export let helpText: string | undefined = undefined;
+  export let clearable = false;
+  export let maxLength: number | undefined = undefined;
 
   let inputRef: HTMLInputElement;
 
@@ -33,6 +37,10 @@
     value = event.currentTarget.value as TValue;
 
     dispatch("input", event.currentTarget);
+  }
+
+  function clear(): void {
+    value = undefined;
   }
 
   export function focus(): void {
@@ -65,6 +73,7 @@
       {name}
       {readonly}
       {placeholder}
+      maxlength={maxLength}
       value={displayValue}
       on:click
       on:focus
@@ -73,6 +82,17 @@
       bind:this={inputRef}
       class="typography body-medium"
     />
+
+    {#if clearable && value}
+      <button
+        type="button"
+        on:click={clear}
+        class="clear"
+        transition:fade|local={{ duration: 150 }}
+      >
+        <RemoveIcon color="var(--color-common-dark-strong)" />
+      </button>
+    {/if}
 
     <slot name="icon-after" />
   </div>
@@ -161,6 +181,27 @@
   input::placeholder {
     color: var(--color-common-light-soft);
     transition: opacity 150ms ease;
+  }
+
+  .clear {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: calc(var(--x-height) * 0.5);
+    height: calc(var(--x-height) * 0.5);
+    margin-right: var(--x-icon-padding);
+    padding: 8px 2px;
+    background-color: var(--color-main-neutral-400);
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  .clear > :global(svg) {
+    width: calc(var(--x-height) * 0.3);
+    height: calc(var(--x-height) * 0.3);
+    margin-right: 0.4%;
   }
 
   .wrapper.icon-before > input {

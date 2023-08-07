@@ -1,3 +1,29 @@
+<script lang="ts" context="module">
+  export type OfferModel = {
+    id: number;
+    operator: string;
+    stops: string;
+    type: string;
+    departureTime: string;
+    arrivalTime: string;
+    journeyDuration: string;
+    departureStation: string;
+    arrivalStation: string;
+    departureStationInfo: string;
+    arrivalStationInfo: string;
+    price: string;
+    selected: boolean;
+    alternativeFares: {
+      id: number;
+      title: string;
+      type: string;
+      description: string;
+      price: string;
+      selected: boolean;
+    }[];
+  };
+</script>
+
 <script lang="ts">
   import Button from "components/ui/button.svelte";
   import ChevronIcon from "components/icons/chevron-icon.svelte";
@@ -6,7 +32,12 @@
   import { fly } from "svelte/transition";
   import { createEventDispatcher } from "svelte";
 
-  const dispatch = createEventDispatcher();
+  export let offer: OfferModel;
+
+  const dispatch = createEventDispatcher<{
+    toggleSelectedOffer: { id: number };
+    fareSelected: unknown;
+  }>();
 
   function toggleSelectedOffer(): void {
     dispatch("toggleSelectedOffer", {
@@ -14,13 +45,11 @@
     });
   }
 
-  function handleKeyToggleSelectedOffer(event): void {
+  function handleKeyToggleSelectedOffer(event: KeyboardEvent): void {
     if (event.key === "Enter") {
       toggleSelectedOffer();
     }
   }
-
-  export let offer: object;
 </script>
 
 <div class="offer" class:selected={offer.selected}>
@@ -79,7 +108,11 @@
   </div>
   {#if offer.selected}
     <div class="expanded" transition:fly|local={{ duration: 200, x: 100 }}>
-      <AlternativeFares on:fareSelected alternativeFares={offer.alternativeFares} />
+      <AlternativeFares
+        on:fareSelected
+        alternativeFares={offer.alternativeFares}
+        offerId={offer.id}
+      />
     </div>
   {/if}
 </div>

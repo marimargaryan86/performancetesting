@@ -1,7 +1,7 @@
 <script lang="ts">
   const twentyFourHoursInMins = 1440;
 
-  export let label;
+  export let label: string;
   export let startTime = 0;
   export let endTime = 1439;
   let formattedStartTime = "00:00";
@@ -21,20 +21,24 @@
   $: startTime = startTime === twentyFourHoursInMins ? startTime - 1 : startTime;
   $: endTime = endTime === twentyFourHoursInMins ? endTime - 1 : endTime;
 
-  function handleStartTimeChange(event): void {
-    if (event.target.value > endTime) {
+  function handleStartTimeChange(
+    event: Event & { currentTarget: EventTarget & HTMLInputElement },
+  ): void {
+    if (Number(event.currentTarget.value) > endTime) {
       endTime = startTime;
     }
 
-    startTime = event.target.value;
+    startTime = Number(event.currentTarget.value);
   }
 
-  function handleEndTimeChange(event): void {
-    if (event.target.value < startTime) {
+  function handleEndTimeChange(
+    event: Event & { currentTarget: EventTarget & HTMLInputElement },
+  ): void {
+    if (Number(event.currentTarget.value) < startTime) {
       startTime = endTime;
     }
 
-    endTime = event.target.value;
+    endTime = Number(event.currentTarget.value);
   }
 </script>
 
@@ -82,7 +86,7 @@
     height: 4px;
     margin: 0;
     padding: 0;
-    background-color: var(--color-primary-50);
+    background-color: var(--color-main-primary-100);
     border-radius: 2px;
     outline: none;
     appearance: none;

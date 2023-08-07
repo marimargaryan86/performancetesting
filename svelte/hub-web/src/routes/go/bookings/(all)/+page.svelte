@@ -9,45 +9,65 @@
   import TRow from "components/ui/table/t-row.svelte";
   import Table from "components/ui/table/table.svelte";
   import TransactionStatusBadge from "components/ui/transaction-status-badge.svelte";
+  import Alert from "components/ui/alert.svelte";
+  import TripletIcon from "components/icons/triplet-icon.svelte";
+  import type { FlattenedObject } from "utils/common";
+  import type { TransactionModel } from "models/transaction";
+  import type { DirectionY } from "models/spatial";
+  import { onMount } from "svelte";
 
-  const bookings: string[] = ["a", "b", "c"];
+  const bookings: string[] = ["a", "b", "c", "d", "e"];
+
+  let sortGroup: FlattenedObject<TransactionModel> = "createdAt";
+  let sortDirection: DirectionY = "down";
+  let alert = false;
+
+  onMount(() => {
+    alert = history.state?.alert;
+  });
 </script>
 
 <svelte:head>
   <title>All · Bookings · Go · Junction Hub</title>
 </svelte:head>
 
+{#if alert}
+  <Alert type={alert.type}>{alert.message}</Alert>
+{/if}
+
 <div class="content">
   <Table class="bookings-table">
     <THead>
       <Header>Booking Reference</Header>
       <Header>Passenger Name</Header>
-      <Header>Departure Date</Header>
+      <Header>Ticket</Header>
+      <Header bind:sortGroup bind:sortDirection sortValue="departure">Departure Date</Header>
       <Header>Provider</Header>
       <Header>Reseller</Header>
-      <Header>Created Date</Header>
+      <Header bind:sortGroup bind:sortDirection sortValue="createdAt">Created Date</Header>
       <Header>Total Price</Header>
-      <Header>Provider Status</Header>
-      <Header>Pay Transaction</Header>
+      <Header bind:sortGroup bind:sortDirection sortValue="status">Booking Status</Header>
+      <Header bind:sortGroup bind:sortDirection sortValue="refund.status">Refund Status</Header>
       <Header />
     </THead>
 
     <TBody>
       {#each bookings as _}
         <TRow alternatingBackground={false}>
-          <TCol maxWidth="96px" copyable>123ABC456</TCol>
+          <TCol maxWidth="96px" copyable class="green">123ABC456</TCol>
           <TCol>Jerry Smith</TCol>
+          <TCol class="green">Download</TCol>
           <TCol>02/11/23</TCol>
-          <TCompanyCol maxWidth="160px" companyName="Air France" />
-          <TCompanyCol maxWidth="160px" companyName="ABC Travel" />
+          <TCompanyCol maxWidth="160px" companyName="Renfe" img="/images/renfe-logo.png" />
+          <TCompanyCol maxWidth="160px" companyName="Malaga TA" />
           <TCol>02/11/23</TCol>
           <TMoneyCol money={{ amount: 2952.9, currency: "USD" }} />
           <TCol width="80px">
             <TransactionStatusBadge value="pending" />
           </TCol>
-          <TCol maxWidth="96px">View</TCol>
+          <TCol maxWidth="96px" class="green">View</TCol>
           <TActionsCol>
-            <button class="action outline typography body-medium bold">Cancel</button>
+            <TripletIcon />
           </TActionsCol>
         </TRow>
       {/each}
@@ -70,18 +90,16 @@
     cursor: pointer;
   }
 
-  .action.outline {
-    padding: 6px 16px;
-    color: var(--color-common-light-strong);
-    text-decoration: none;
-    background-color: var(--color-common-dark-strong);
-    border: var(--color-main-neutral-200) 1px solid;
-    border-radius: 8px;
-    cursor: pointer;
-  }
-
   .content :global(tr:hover .actions) {
     opacity: 1;
     pointer-events: all;
+  }
+
+  .content :global(.green) {
+    color: var(--color-main-primary-500);
+  }
+
+  .content :global(td:hover .green) {
+    color: var(--color-common-dark-strong);
   }
 </style>
