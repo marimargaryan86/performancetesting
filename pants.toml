@@ -49,12 +49,12 @@ interpreter_constraints = ["CPython==3.11.*"]
 
 [buf]
 config = "protobuf/buf.yaml"
-version = "v1.17.0"
+version = "v1.25.1"
 known_versions = [
-    "v1.17.0|linux_arm64 |7ae3d4bf6ff121172dd949bd4d25342e03a0b7f10cf8e8ccdc8f98a664b79794|15426236",
-    "v1.17.0|linux_x86_64|f79670efc64d0527e0b915a272aea8262b4864ad9298e8d1cf39b7b08517607c|17022175",
-    "v1.17.0|macos_arm64 |8b5d0285b11c14abd17fa8d76049e5ba90e8776784cc57aa0af77052ee335e99|17332365",
-    "v1.17.0|macos_x86_64|4a9a9af802630d7547dfbd79727c462ec7acd4978b91b922957438d4aec99ac9|17959744",
+    "v1.25.1|linux_arm64 |6940331d4b7c852da959513680b2249a0754484711a14ab9e8e3c1042f463749|15823775",
+    "v1.25.1|linux_x86_64|b9fe83630604dc1fecaf7d1cfdda12b581eb9601eac49308c976dcf8e71ebd6e|17393625",
+    "v1.25.1|macos_arm64 |324410e35186bc2a4b5c4ac984b5c1a599040fbb7e7c7e38b35427d55d14f66a|17734187",
+    "v1.25.1|macos_x86_64|18a23fd9fc5a1be2116957eca6ddddf8c15b0eb16e3b1156e43f3c9a516f5a74|18334627",
 ]
 
 [cli.alias]
@@ -105,13 +105,13 @@ install_from_resolve = "python-default"
 interpreter_constraints = ["CPython==3.11.*"]
 
 [protoc]
-version = "22.3"
+version = "23.4"
 url_platform_mapping = { linux_arm64 = "linux-aarch_64", linux_x86_64 = "linux-x86_64", macos_arm64 = "osx-aarch_64", macos_x86_64 = "osx-x86_64" }
 known_versions = [
-    "22.3|linux_arm64 |c6068d9d151c39723bc7db920759b55737a770b0c2ec544dd0197d4078d7a956|2788488",
-    "22.3|linux_x86_64|0f8070d762eb8a2f5a13a47713a553f989f9d9b556e7e3ebfa2bd6464e2ecaeb|2827739",
-    "22.3|macos_arm64 |79cc15d1b528061ea0a818b0abcf3be1e0bdcb063a0cc999af27974cccdc5cce|1878576",
-    "22.3|macos_x86_64|d644a65064a97fa3ed033a4a2314ab35816abbd9aed052f9b1b3374d2deaaae4|1841496",
+    "23.4|linux_arm64 |1c7750b6e038305b5a7fc3d0cda1ebefdf106a4f30a787bf826ed2fc47c3967d|2879347",
+    "23.4|linux_x86_64|0502f286ac9ed860b629a7965a14527b1f2dd131e4283fa23c2d7f184672aa9a|2916317",
+    "23.4|macos_arm64 |8c7afae8626b6811e7b5897d16d940c2dbf50b1e135ed958a01db6566bdda726|1974960",
+    "23.4|macos_x86_64|07e5fdcf1b0708d3367dc5e6eb8d135de7e407d75316c93155cfd8ab362eec80|2008727",
 ]
 
 [pytest]
@@ -158,12 +158,12 @@ known_versions = [
 ]
 
 [shfmt]
-version = "v3.6.0"
+version = "v3.7.0"
 known_versions = [
-    "v3.6.0|macos_arm64 |633f242246ee0a866c5f5df25cbf61b6af0d5e143555aca32950059cf13d91e0|3065202",
-    "v3.6.0|macos_x86_64|b8c9c025b498e2816b62f0b717f6032e9ab49e725a45b8205f52f66318f17185|3047552",
-    "v3.6.0|linux_arm64 |fb1cf0af3dbe9aac7d98e38e3c7426765208ecfe23cb2da51037bb234776fd70|2818048",
-    "v3.6.0|linux_x86_64|5741a02a641de7e56b8da170e71a97e58050d66a3cf485fb268d6a5a8bb74afb|2850816",
+    "v3.7.0|macos_arm64 |ad7ff6f666adba3d801eb17365a15539f07296718d39fb62cc2fde6b527178aa|3138130",
+    "v3.7.0|macos_x86_64|ae1d1ab961c113fb3dc2ff1150f33c3548983550d91da889b3171a5bcfaab14f|3101472",
+    "v3.7.0|linux_arm64 |111612560d15bd53d8e8f8f85731176ce12f3b418ec473d39a40ed6bbec772de|2883584",
+    "v3.7.0|linux_x86_64|0264c424278b18e22453fe523ec01a19805ce3b8ebf18eaf3aadc1edc23f42e3|2899968",
 ]
 
 [source]

@@ -1,6 +1,6 @@
-# python:3.11.4-slim-bullseye
+# python:3.11.5-slim-bullseye
 ARG REGISTRY
-FROM ${REGISTRY}python@sha256:ed0e7c504b2b8c4517f703252811a6d2ddff5c9320272103d8cc72befbf950a9
+FROM ${REGISTRY}python@sha256:815978d23592beccc59d199e1f6278c5873013fd47909a7b1055e5026a9707f6
 ENV PATH=/usr/local/go/bin:$PATH
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
@@ -16,8 +16,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     xz-utils \
 && curl -fsSL https://static.pantsbuild.org/setup/pantsup.sh | bash /dev/stdin --bin-dir /usr/local/bin --version 0.8.2 \
-&& curl -fsSL https://github.com/Tufin/oasdiff/releases/download/v1.6.4/oasdiff_1.6.4_linux_amd64.deb > /tmp/oasdiff.deb \
-&& curl -fsSL https://sentry.io/get-cli/ | SENTRY_CLI_VERSION=2.19.1 bash \
+&& curl -fsSL https://github.com/Tufin/oasdiff/releases/download/v1.7.4/oasdiff_1.7.4_linux_amd64.deb > /tmp/oasdiff.deb \
+&& curl -fsSL https://sentry.io/get-cli/ | SENTRY_CLI_VERSION=2.20.4 bash \
 && curl -fsSL https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg \
 && curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg \
 && curl -sfSL https://github.com/editorconfig-checker/editorconfig-checker/releases/download/2.7.0/ec-linux-amd64.tar.gz | tar xvz -C /usr/local bin/ec-linux-amd64 \
@@ -29,7 +29,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 && apt-get update && apt-get install -y --no-install-recommends \
     consul-template=0.32.0-1 \
     docker-ce-cli \
-    nomad=1.5.6-1 \
+    nomad=1.6.1-1 \
     /tmp/oasdiff.deb \
 && rm -rf /var/lib/apt/lists/* /tmp/oasdiff.deb
-COPY --from=golang:1.19.10-bullseye /usr/local/go/ /usr/local/go/
+COPY --from=golang:1.19.12-bullseye /usr/local/go/ /usr/local/go/
