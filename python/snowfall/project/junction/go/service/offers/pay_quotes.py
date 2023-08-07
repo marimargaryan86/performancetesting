@@ -2,6 +2,7 @@ import uuid
 
 from snowfall.project.junction.go.service.offers import offers
 from snowfall.project.junction.go.service.offers.pay_quotes_models import (
+    PayQuoteAttributes,
     PayQuoteResponse,
 )
 from snowfall.project.junction.go.service.offers.v1 import models_pb2
@@ -50,14 +51,24 @@ class PayQuotes(object):
                 tax=tax_amount,
             )
 
-            converted_money = money.Money(
-                amount=quote.data.attributes.amount,
-                currency=money.Currency(to_currency),
+            converted_to_currency = money.Currency(to_currency)
+            converted_total_amount = money.Money(
+                amount=quote.data.attributes.total_amount,
+                currency=converted_to_currency,
             )
+            offer.price.CopyFrom(converted_total_amount.protobuf())
 
-            offer.price.CopyFrom(converted_money.protobuf())
+            while offer.price_breakdown:
+                offer.price_breakdown.pop()
+            offer.price_breakdown.extend(
+                self._build_converted_price_breakdown(
+                    quote.data.attributes,
+                    converted_to_currency,
+                ),
+            )
             offer.initial_offer_id = offer.id
             offer.id = string.to_uuid(session_token, uuid.UUID(offer.id))
+
         search_result.offer.id = string.to_uuid(
             session_token,
             uuid.UUID(search_result.offer.id),
@@ -108,12 +119,21 @@ class PayQuotes(object):
 
         search_result.price_quote.pay_quote_id = quote.id
 
-        converted_money = money.Money(
-            amount=quote.attributes.amount,
-            currency=money.Currency(quote.relationships.to_currency.data.id),
+        converted_to_currency = money.Currency(quote.relationships.to_currency.data.id)
+        converted_total_amount = money.Money(
+            amount=quote.attributes.total_amount,
+            currency=converted_to_currency,
         )
+        search_result.price_quote.price.CopyFrom(converted_total_amount.protobuf())
 
-        search_result.price_quote.price.CopyFrom(converted_money.protobuf())
+        while search_result.price_quote.price_breakdown:
+            search_result.price_quote.price_breakdown.pop()
+        search_result.price_quote.price_breakdown.extend(
+            self._build_converted_price_breakdown(
+                quote.attributes,
+                converted_to_currency,
+            ),
+        )
 
         return search_result
 
@@ -154,6 +174,60 @@ class PayQuotes(object):
             tax=tax,
         )
         return PayQuoteResponse(**resp)
+
+    def _build_converted_price_breakdown(
+        self,
+        pay_quote_attributes: PayQuoteAttributes,
+        converted_to_currency: money.Currency,
+    ) -> list[models_pb2.PriceBreakdown]:
+        price_breakdown = list[models_pb2.PriceBreakdown](
+            [
+                models_pb2.PriceBreakdown(
+                    price=money.Money(
+                        amount=pay_quote_attributes.amount,
+                        currency=converted_to_currency,
+                    ).protobuf(),
+                    breakdown_type=models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_BASE_FARE,
+                ),
+            ],
+        )
+
+        # TODO: add BREAKDOWN_SERVICE_MARK_UP (pay needs to fix on their end first)
+
+        if pay_quote_attributes.tax:
+            price_breakdown.append(
+                models_pb2.PriceBreakdown(
+                    price=money.Money(
+                        amount=pay_quote_attributes.tax,
+                        currency=converted_to_currency,
+                    ).protobuf(),
+                    breakdown_type=models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_TAX,
+                ),
+            )
+
+        if pay_quote_attributes.reseller_markup:
+            price_breakdown.append(
+                models_pb2.PriceBreakdown(
+                    price=money.Money(
+                        amount=pay_quote_attributes.reseller_markup,
+                        currency=converted_to_currency,
+                    ).protobuf(),
+                    breakdown_type=models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_RESELLER_MARK_UP,
+                ),
+            )
+
+        if pay_quote_attributes.lead_company_markup:
+            price_breakdown.append(
+                models_pb2.PriceBreakdown(
+                    price=money.Money(
+                        amount=pay_quote_attributes.lead_company_markup,
+                        currency=converted_to_currency,
+                    ).protobuf(),
+                    breakdown_type=models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_COMPANY_MARK_UP,
+                ),
+            )
+
+        return price_breakdown
 
 
 class PayQuoteFetcher(object):
