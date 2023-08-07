@@ -6,14 +6,12 @@
     }
   },
   "production": {
-    "deploy": false,
     "variables": {
       "count": 1,
       "memory_value": 76800
     }
   },
   "sandbox": {
-    "deploy": false,
     "variables": {
       "count": 1,
       "memory_value": 17410
