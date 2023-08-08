@@ -3,6 +3,9 @@ from starlette import endpoints, requests, status
 
 from snowfall.project.pay.adapter import companies as companies_adapter
 from snowfall.project.pay.service.companies.v1alpha import models_pb2
+from snowfall.project.pay.service.companies.v1alpha import (
+    models_pb2 as company_models_pb2,
+)
 from snowfall.project.pay.service.pay_api import resources
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import (
@@ -37,6 +40,11 @@ class AdminCompany(endpoints.HTTPEndpoint):
                 fx_markup=payload.get("fxMarkup"),  # type: ignore[arg-type]
                 processing_markup=payload.get("processingMarkup"),  # type: ignore[arg-type]
                 sales_markup=payload.get("salesMarkup"),  # type: ignore[arg-type]
+                references=payload.get("references"),
+                company_type=protobuf.slug_to_enum_value(
+                    company_models_pb2.Company.Type,
+                    payload.get("companyType", "unspecified"),
+                ),
             ),
         )
 
@@ -99,6 +107,11 @@ class AdminCompanies(endpoints.HTTPEndpoint):
                 payment_type=protobuf.slug_to_enum_value(
                     models_pb2.PaymentType,
                     body["paymentType"],
+                ),
+                references=body.get("references"),
+                company_type=protobuf.slug_to_enum_value(
+                    company_models_pb2.Company.Type,
+                    body.get("companyType", "unspecified"),
                 ),
             ),
         )

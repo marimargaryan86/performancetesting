@@ -90,6 +90,9 @@ class CompaniesService(
         ):
             company.address.ClearField("address_lines")  # type: ignore[union-attr]
 
+        if request.company.references and company.references:  # type: ignore[union-attr]
+            company.ClearField("references")  # type: ignore[union-attr]
+
         company.MergeFrom(request.company)  # type: ignore[union-attr]
 
         try:
