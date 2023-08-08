@@ -116,6 +116,7 @@ job "hub-web-http" {
         data        = <<EOH
 {{ with secret "kv/data/${var.environment}/hub-web" }}
 CLIENT_API_KEY={{ .Data.data.client_api_key }}
+PUBLIC_STRIPE_KEY={{ .Data.data.public_stripe_key }}
 {{ end }}
 EOH
       }
