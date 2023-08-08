@@ -20,7 +20,7 @@
 
   let sortGroup: FlattenedObject<TransactionModel> = "createdAt";
   let sortDirection: DirectionY = "down";
-  let alert = false;
+  let alert: { type: "success" | "failed"; message: string } | undefined = undefined;
 
   onMount(() => {
     alert = history.state?.alert;
@@ -41,13 +41,13 @@
       <Header>Booking Reference</Header>
       <Header>Passenger Name</Header>
       <Header>Ticket</Header>
-      <Header bind:sortGroup bind:sortDirection sortValue="departure">Departure Date</Header>
+      <Header bind:sortGroup bind:sortDirection>Departure Date</Header>
       <Header>Provider</Header>
       <Header>Reseller</Header>
       <Header bind:sortGroup bind:sortDirection sortValue="createdAt">Created Date</Header>
       <Header>Total Price</Header>
       <Header bind:sortGroup bind:sortDirection sortValue="status">Booking Status</Header>
-      <Header bind:sortGroup bind:sortDirection sortValue="refund.status">Refund Status</Header>
+      <Header bind:sortGroup bind:sortDirection>Refund Status</Header>
       <Header />
     </THead>
 

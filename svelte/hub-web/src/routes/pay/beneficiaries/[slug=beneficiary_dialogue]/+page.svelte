@@ -35,7 +35,6 @@
 
 <script lang="ts">
   import BreadCrumbs from "components/page/bread-crumbs.svelte";
-  import type { PageData } from "./$types";
   import Button from "components/ui/button.svelte";
   import { page } from "$app/stores";
   import { goto } from "$app/navigation";
@@ -48,7 +47,7 @@
   import Summary from "./summary.svelte";
   import { slide } from "svelte/transition";
 
-  export let data: PageData;
+  export let data;
 
   let stepComponent: BeneficiaryDetails | BankAccountDetails | Summary | undefined;
   let error: string | undefined = undefined;

@@ -9,7 +9,7 @@ import type { PaginatedData } from "models/common";
 export default class TransactionService extends JunctionPayService {
   private readonly companyService: CompanyService;
 
-  constructor(baseUrl: string, companyService: CompanyService) {
+  constructor(baseUrl: string | undefined, companyService: CompanyService) {
     super(baseUrl);
 
     this.companyService = companyService;

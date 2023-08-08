@@ -15,11 +15,13 @@ export function sortConversions(
       case "transaction.reference":
         return 0 - ((a.transaction?.reference ?? 0) < (b.transaction?.reference ?? 0) ? 1 : -1);
       case "createdAt":
-        return 0 - (a.createdAt > b.createdAt ? 1 : -1);
+        return a.createdAt && b.createdAt ? 0 - (a.createdAt > b.createdAt ? 1 : -1) : 0;
       case "settledAt":
-        return 0 - (a.settledAt > b.settledAt ? 1 : -1);
+        return a.settledAt && b.settledAt ? 0 - (a.settledAt > b.settledAt ? 1 : -1) : 0;
       case "sellAmount.currency":
-        return 0 - ((a.sellAmount.currency ?? 0) < (b.sellAmount.currency ?? 0) ? 1 : -1);
+        return a.sellAmount && b.sellAmount
+          ? 0 - ((a.sellAmount.currency ?? 0) < (b.sellAmount.currency ?? 0) ? 1 : -1)
+          : 0;
       case "buyAmount.currency":
         return 0 - ((a.buyAmount.currency ?? 0) < (b.buyAmount.currency ?? 0) ? 1 : -1);
       case "transaction.rates.fxQuote":

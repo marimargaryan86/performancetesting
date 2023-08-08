@@ -3,7 +3,9 @@ import type { BeneficiaryModel } from "models/beneficiary";
 import type { PaginatedData } from "models/common";
 import { getToken } from "utils/auth";
 
-export function load(event): { beneficiaries: Promise<PaginatedData<BeneficiaryModel>> } {
+export function load(event): {
+  beneficiaries: Promise<PaginatedData<BeneficiaryModel>>;
+} {
   return {
     beneficiaries: integrationInstances.junctionPay.beneficiaries.listBeneficiaries(
       getToken(event),

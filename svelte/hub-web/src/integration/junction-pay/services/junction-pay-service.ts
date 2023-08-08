@@ -1,7 +1,11 @@
 export default abstract class JunctionPayService {
   private readonly baseUrl: string;
 
-  constructor(baseUrl: string) {
+  constructor(baseUrl?: string) {
+    if (!baseUrl) {
+      throw new Error("Base URL is not defined");
+    }
+
     this.baseUrl = baseUrl;
   }
 

@@ -6,7 +6,9 @@ import type { PaginatedData } from "models/common";
 import type { TransactionModel } from "models/transaction";
 import { getToken } from "utils/auth";
 
-export function load(event): { transactions: Promise<PaginatedData<TransactionModel>> } {
+export function load(event): {
+  transactions: Promise<PaginatedData<TransactionModel>>;
+} {
   return {
     transactions: integrationInstances.junctionPay.transactions.listTransactions(getToken(event)),
   };

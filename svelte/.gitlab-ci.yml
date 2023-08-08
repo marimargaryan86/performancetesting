@@ -9,6 +9,7 @@
     - yarn install
   script:
     - yarn run lint
+    - yarn run check
   cache:
     paths:
       - "${PROJECT_PATH}/.yarn-cache/"

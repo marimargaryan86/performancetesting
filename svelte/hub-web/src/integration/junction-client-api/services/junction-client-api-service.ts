@@ -2,7 +2,15 @@ export default abstract class JunctionClientApiService {
   private readonly baseUrl: string;
   private readonly apiKey: string;
 
-  constructor(baseUrl: string, apiKey: string) {
+  constructor(baseUrl?: string, apiKey?: string) {
+    if (!baseUrl) {
+      throw new Error("Base URL is not defined");
+    }
+
+    if (!apiKey) {
+      throw new Error("API key is not defined");
+    }
+
     this.baseUrl = baseUrl;
     this.apiKey = apiKey;
   }
