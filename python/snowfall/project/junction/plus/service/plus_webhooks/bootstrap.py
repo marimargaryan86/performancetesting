@@ -9,7 +9,7 @@ from snowfall.project.junction.plus.adapter import (
     notification_event_publisher,
     subscribers,
 )
-from snowfall.project.junction.plus.service.plus_webhooks import state
+from snowfall.project.junction.plus.service.plus_webhooks import chatbot_handlers
 from snowfall.stdlib.integration.starlette import application
 
 
@@ -25,12 +25,12 @@ def create_dependencies(
     subscribers_client: subscribers.Client,
     notification_event_publisher_client: notification_event_publisher.Client,
     configuration_vectors_client: configuration_vectors.Client,
-    subscribers_state: state.SubscriberState,
+    message_handler: chatbot_handlers.MessageHandler,
 ) -> lagom.Container:
     container = lagom.Container()
     container[monitoring_rules.Client] = monitoring_rules_client  # type: ignore[type-abstract]
     container[subscribers.Client] = subscribers_client  # type: ignore[type-abstract]
     container[notification_event_publisher.Client] = notification_event_publisher_client  # type: ignore[type-abstract]
     container[configuration_vectors.Client] = configuration_vectors_client  # type: ignore[type-abstract]
-    container[state.SubscriberState] = subscribers_state
+    container[chatbot_handlers.MessageHandler] = message_handler
     return container

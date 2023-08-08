@@ -95,4 +95,4 @@ class TestWhatsappMiddleware(object):
             },
         )
 
-        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert response.status_code == status.HTTP_200_OK

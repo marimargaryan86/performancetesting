@@ -1,21 +1,22 @@
 import lagom
 from starlette import endpoints, requests, responses, status
+from twilio.twiml.messaging_response import MessagingResponse
 
 from snowfall.project.junction.plus.adapter import (
     configuration_vectors,
     subscribers,
     validation,
 )
-from snowfall.project.junction.plus.service.plus_webhooks import state
+from snowfall.project.junction.plus.service.plus_webhooks import chatbot_handlers
 
 
 class IncomingMessages(endpoints.HTTPEndpoint):
-    async def post(
+    async def post(  # noqa: WPS210
         self,
         request: requests.Request,
         subscribers_client: subscribers.Client = lagom.injectable,
         configuration_vectors_client: configuration_vectors.Client = lagom.injectable,
-        subscribers_state: state.SubscriberState = lagom.injectable,
+        message_handler: chatbot_handlers.MessageHandler = lagom.injectable,
     ) -> responses.Response:
         msg = await request.form()
         message_from = validation.get_whatsapp_number(str(msg["From"]))
@@ -24,17 +25,16 @@ class IncomingMessages(endpoints.HTTPEndpoint):
             message_to,
             "mobile_phone.e164_number",
         )
-        await subscribers_client.find_from_reseller(
+        subscriber = await subscribers_client.find_from_reseller(
             cv.reseller_id,
             message_from,
         )
-        subscriber_state = await subscribers_state.get_state(message_from)
-
-        subscriber_state["last_message"] = msg["Body"]
-        await subscribers_state.store_state(message_from, subscriber_state)
-        # Context Manager for now can be a function under this service, eventually
-        # we could make it grpc methods under notification_center service
-        # response = context_manager.create_response(  # Here we get also the state
-        # This could be inside the context_manager as a call. Just showing it here
-
-        return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
+        twiml_response = MessagingResponse()
+        twiml_response.message(
+            await message_handler.handle_message(str(msg["Body"]), subscriber),
+        )
+        return responses.Response(
+            content=twiml_response.to_xml(),
+            status_code=status.HTTP_200_OK,
+            media_type="application/xml",
+        )

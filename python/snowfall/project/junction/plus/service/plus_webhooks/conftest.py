@@ -23,8 +23,8 @@ from snowfall.project.junction.plus.service.notifications.v1alpha import (
 )
 from snowfall.project.junction.plus.service.plus_webhooks import (
     bootstrap,
+    chatbot_handlers,
     middlewares,
-    state,
 )
 from snowfall.project.junction.plus.service.plus_webhooks.routes import router
 from snowfall.stdlib.integration.starlette import application
@@ -152,7 +152,7 @@ def app(  # noqa: WPS211
                 subscribers_client=subscribers_client,
                 configuration_vectors_client=configuration_vectors_client,
                 notification_event_publisher_client=notification_event_publisher_client,
-                subscribers_state=state.SubscriberState(
+                message_handler=chatbot_handlers.MessageHandler(
                     redis_client=redis_client,
                     cache_ttl=datetime.timedelta(minutes=10),
                 ),

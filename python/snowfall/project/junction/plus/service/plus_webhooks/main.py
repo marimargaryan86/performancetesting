@@ -18,8 +18,8 @@ from snowfall.project.junction.plus.service.notifications.v1alpha import (
 )
 from snowfall.project.junction.plus.service.plus_webhooks import (
     bootstrap,
+    chatbot_handlers,
     middlewares,
-    state,
 )
 from snowfall.project.junction.plus.service.plus_webhooks.routes import router
 from snowfall.stdlib import service
@@ -55,7 +55,7 @@ def _factory(
                             create_channel(app.settings.notifications_address),
                         ),
                     ),
-                    subscribers_state=state.SubscriberState(
+                    message_handler=chatbot_handlers.MessageHandler(
                         redis_client=redis.Client[str](
                             aioredis.from_url(
                                 random.choice(app.settings.redis_dsn),  # noqa: S311
