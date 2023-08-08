@@ -5,6 +5,10 @@ import datetime
 from collections.abc import Sequence
 
 from snowfall.project.junction.go.adapter import errors
+from snowfall.project.pay.service.companies.v1alpha.models_pb2 import (
+    PaymentMethod,
+    PaymentType,
+)
 from snowfall.project.pay.service.transactions.v1alpha import (
     grpc_pb2,
     grpc_pb2_grpc,
@@ -73,6 +77,14 @@ class DictClient(Client):
             rates=quotation.rates,
             payer_id=quotation.payer_id,
             beneficiary_id=quotation.beneficiary_id,
+            payment_type=protobuf.slug_to_enum_value(
+                PaymentType,
+                "card",
+            ),
+            payment_method=protobuf.slug_to_enum_value(
+                PaymentMethod,
+                "invoice",
+            ),
         )
         self._transactions[transaction.id] = transaction
 

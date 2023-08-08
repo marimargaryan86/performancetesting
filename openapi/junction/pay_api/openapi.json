@@ -879,7 +879,9 @@
                   "externalReference",
                   "createdAt",
                   "amounts",
-                  "rates"
+                  "rates",
+                  "paymentMethod",
+                  "paymentType"
                 ],
                 "properties": {
                   "externalReference": {
@@ -1013,6 +1015,26 @@
                       }
                     },
                     "readOnly": true
+                  },
+                  "paymentType": {
+                    "type": "string",
+                    "readOnly": true,
+                    "enum": [
+                      "unspecified",
+                      "card",
+                      "bank-transfer"
+                    ],
+                    "example": "card"
+                  },
+                  "paymentMethod": {
+                    "type": "string",
+                    "readOnly": true,
+                    "enum": [
+                      "unspecified",
+                      "transactional",
+                      "invoice"
+                    ],
+                    "example": "transactional"
                   }
                 }
               },

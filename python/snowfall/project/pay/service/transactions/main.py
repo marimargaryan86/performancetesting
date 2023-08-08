@@ -7,9 +7,9 @@ import pydantic
 from motor import motor_asyncio
 from redis import asyncio as aioredis
 
-from snowfall.project.pay.adapter import currencies, lead_companies
+from snowfall.project.pay.adapter import companies, currencies, lead_companies
 from snowfall.project.pay.service.companies.v1alpha import (
-    grpc_pb2_grpc as lead_company_pb2_grpc,
+    grpc_pb2_grpc as companies_grpc_pb2,
 )
 from snowfall.project.pay.service.currencies.v1alpha import currencies_pb2_grpc
 from snowfall.project.pay.service.transactions import cache, transactions
@@ -71,6 +71,11 @@ async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
                         api_key=app.settings.cc_api_key,
                     ),
                 ),
+                companies_client=companies.GrpcClient(
+                    companies_grpc_pb2.CompaniesServiceStub(
+                        create_channel(app.settings.companies_address),
+                    ),
+                ),
             ),
             QuotationsService(
                 quotations=transactions.QuotationsRepository(
@@ -86,7 +91,7 @@ async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
                     ),
                 ),
                 lead_company_client=lead_companies.GrpcClient(
-                    lead_company_pb2_grpc.LeadCompaniesServiceStub(
+                    companies_grpc_pb2.LeadCompaniesServiceStub(
                         create_channel(app.settings.companies_address),
                     ),
                 ),

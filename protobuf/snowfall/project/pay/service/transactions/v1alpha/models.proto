@@ -3,6 +3,7 @@ syntax = "proto3";
 package snowfall.project.pay.service.transactions.v1alpha;
 
 import "google/protobuf/timestamp.proto";
+import "snowfall/project/pay/service/companies/v1alpha/models.proto";
 import "snowfall/stdlib/v1/money.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/transactions/v1alpha";
@@ -40,6 +41,8 @@ message Transaction {
   QuotationRates rates = 7;
   string payer_id = 8;
   string beneficiary_id = 9;
+  snowfall.project.pay.service.companies.v1alpha.PaymentMethod payment_method = 10;
+  snowfall.project.pay.service.companies.v1alpha.PaymentType payment_type = 11;
 }
 
 enum QuotationStatus {

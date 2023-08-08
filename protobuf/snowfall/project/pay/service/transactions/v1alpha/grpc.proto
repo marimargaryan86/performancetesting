@@ -58,6 +58,8 @@ message CreateTransactionRequest {
   Quotation quotation = 1;
   string external_reference = 3;
   string invoice_reference = 4;
+  snowfall.project.pay.service.companies.v1alpha.PaymentMethod payment_method = 5;
+  snowfall.project.pay.service.companies.v1alpha.PaymentType payment_type = 6;
 }
 
 message CreateTransactionResponse {

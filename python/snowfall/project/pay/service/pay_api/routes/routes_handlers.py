@@ -27,6 +27,9 @@ async def _handle_invalid_argument(
         "transaction": models.ErrorSourcePointer(
             pointer="/data/relationships/transaction/data/id",
         ),
+        "refundedUs": models.ErrorSourcePointer(
+            pointer="/data/attributes/currency",
+        ),
     }
     rich_error = list(rich_status.iter_rich_statuses(err))
     if not rich_error:

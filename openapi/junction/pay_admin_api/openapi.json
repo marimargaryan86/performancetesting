@@ -400,6 +400,9 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
           }
@@ -510,6 +513,9 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
           },
@@ -558,6 +564,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
@@ -2961,6 +2970,10 @@
             "example": "companies"
           },
           "attributes": {
+            "required": [
+              "paymentType",
+              "paymentMethod"
+            ],
             "properties": {
               "name": {
                 "type": "string",
@@ -2990,6 +3003,24 @@
                 "items": {
                   "$ref": "#/components/schemas/Money"
                 }
+              },
+              "paymentType": {
+                "type": "string",
+                "enum": [
+                  "unspecified",
+                  "card",
+                  "bank-transfer"
+                ],
+                "example": "card"
+              },
+              "paymentMethod": {
+                "type": "string",
+                "enum": [
+                  "unspecified",
+                  "transactional",
+                  "invoice"
+                ],
+                "example": "transactional"
               }
             }
           },
@@ -3230,7 +3261,9 @@
                   "externalReference",
                   "createdAt",
                   "amounts",
-                  "rates"
+                  "rates",
+                  "paymentType",
+                  "paymentMethod"
                 ],
                 "properties": {
                   "externalReference": {
@@ -3356,6 +3389,24 @@
                       }
                     },
                     "readOnly": true
+                  },
+                  "paymentType": {
+                    "type": "string",
+                    "enum": [
+                      "unspecified",
+                      "card",
+                      "bank-transfer"
+                    ],
+                    "example": "card"
+                  },
+                  "paymentMethod": {
+                    "type": "string",
+                    "enum": [
+                      "unspecified",
+                      "transactional",
+                      "invoice"
+                    ],
+                    "example": "transactional"
                   }
                 }
               },

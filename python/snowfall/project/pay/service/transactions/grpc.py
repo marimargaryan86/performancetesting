@@ -2,7 +2,8 @@ import grpc
 
 from snowfall.project.junction.go.adapter import errors
 from snowfall.project.junction.go.adapter import errors as adapter_errors
-from snowfall.project.pay.adapter import currencies, lead_companies
+from snowfall.project.pay.adapter import companies, currencies, lead_companies
+from snowfall.project.pay.service.companies.v1alpha.models_pb2 import PaymentType
 from snowfall.project.pay.service.transactions.cache import UserSessionRepository
 from snowfall.project.pay.service.transactions.quote import Quote
 from snowfall.project.pay.service.transactions.transactions import (
@@ -31,10 +32,12 @@ class TransactionsService(
         transactions: TransactionsRepository,
         conversions: ConversionsRepository,
         payment_client: PaymentClient,
+        companies_client: companies.Client,
     ):
         self._transactions = transactions
         self._conversions = conversions
         self._payment_client = payment_client
+        self._companies = companies_client
         self._default_page_size = 20
 
     def get_name(self) -> str:
@@ -92,7 +95,7 @@ class TransactionsService(
             transactions=[transaction async for transaction in transactions],
         )
 
-    async def CreateTransaction(  # type: ignore[override] # noqa: N802
+    async def CreateTransaction(  # type: ignore[override] # noqa: N802, WPS210
         self,
         request: grpc_pb2.CreateTransactionRequest,
         context: grpc.aio.ServicerContext,
@@ -103,7 +106,11 @@ class TransactionsService(
             == request.quotation.amounts.beneficiary.currency_code
         )
         conversion_id = ""
-        if not are_currencies_same:
+        payer = await self._companies.get(request.quotation.payer_id)
+        if (  # noqa: WPS337
+            payer.payment_type != PaymentType.PAYMENT_TYPE_CARD
+            and not are_currencies_same
+        ):
             conversion_response = await _create_conversion(
                 grpc_pb2.CreateConversionRequest(
                     beneficiary_amount=request.quotation.amounts.beneficiary,
@@ -125,6 +132,8 @@ class TransactionsService(
                 rates=request.quotation.rates,
                 payer_id=request.quotation.payer_id,
                 beneficiary_id=request.quotation.beneficiary_id,
+                payment_type=payer.payment_type,
+                payment_method=payer.payment_method,
             ),
         )
 

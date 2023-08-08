@@ -4,6 +4,7 @@ from starlette import endpoints, requests, status
 from snowfall.project.pay.adapter import companies as companies_adapter
 from snowfall.project.pay.service.companies.v1alpha import models_pb2
 from snowfall.project.pay.service.pay_api import resources
+from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import (
     messages,
     models,
@@ -91,6 +92,14 @@ class AdminCompanies(endpoints.HTTPEndpoint):
                 fx_markup=float(body["fxMarkup"]),
                 processing_markup=float(body["processingMarkup"]),
                 sales_markup=float(body["salesMarkup"]),
+                payment_method=protobuf.slug_to_enum_value(
+                    models_pb2.PaymentMethod,
+                    body["paymentMethod"],
+                ),
+                payment_type=protobuf.slug_to_enum_value(
+                    models_pb2.PaymentType,
+                    body["paymentType"],
+                ),
             ),
         )
 

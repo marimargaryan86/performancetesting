@@ -2,6 +2,7 @@ import grpc
 
 from snowfall.project.junction.go.adapter.errors import NotFoundError
 from snowfall.project.pay.adapter import transactions as transactions_adapter
+from snowfall.project.pay.service.companies.v1alpha.models_pb2 import PaymentType
 from snowfall.project.pay.service.refunds import repositories
 from snowfall.project.pay.service.refunds.v1alpha import (
     grpc_pb2,
@@ -105,6 +106,20 @@ class RefundsService(  # noqa: WPS214
         if not refund:
             await context.abort(grpc.StatusCode.NOT_FOUND)  # noqa: WPS204
 
+        if (  # noqa: WPS337
+            request.refunded_by_provider.currency_code
+            == request.refunded_to_reseller.currency_code
+        ):
+            await rich_status.abort_with_rich_status(
+                context=context,
+                status=rich_status.build_bad_request(
+                    field_name="refundedUs",
+                    field_description=(
+                        "refundedUs should not be same as refundedReseller"
+                    ),
+                ),
+            )
+
         try:
             transaction = await self._transactions_client.get(refund.transaction_id)  # type: ignore[union-attr]
         except NotFoundError:
@@ -130,20 +145,22 @@ class RefundsService(  # noqa: WPS214
                 transaction.amounts.processing_margin,
             ),
         )
-
-        cc_conversion = await self._payment_client.create_conversion(
-            conversion.ConversionRequest(
-                buy_currency=request.refunded_by_provider.currency_code,
-                sell_currency=request.refunded_to_reseller.currency_code,
-                amount=str(
-                    money.from_protobuf(request.refunded_by_provider),
+        conversion_id = ""
+        if transaction.payment_type != PaymentType.PAYMENT_TYPE_CARD:
+            cc_conversion = await self._payment_client.create_conversion(
+                conversion.ConversionRequest(
+                    buy_currency=request.refunded_by_provider.currency_code,
+                    sell_currency=request.refunded_to_reseller.currency_code,
+                    amount=str(
+                        money.from_protobuf(request.refunded_by_provider),
+                    ),
+                    reason=transaction.id,
                 ),
-                reason=transaction.id,
-            ),
-        )
+            )
+            conversion_id = cc_conversion.identifier
 
         refund.status = models_pb2.Refund.Status.STATUS_EXECUTED  # type: ignore[union-attr]
-        refund.conversion_id = cc_conversion.identifier  # type: ignore[union-attr]
+        refund.conversion_id = conversion_id  # type: ignore[union-attr]
         refund.refunded_us_in_payer_currency.CopyFrom(  # type: ignore[union-attr]
             money.from_string(
                 detailed_rate.client_buy_amount,

@@ -124,6 +124,14 @@ class Company(models.Resource):
                     Money.from_proto(reseller_markup)
                     for reseller_markup in company.reseller_markups
                 ],
+                "paymentType": protobuf.enum_value_to_slug(
+                    models_pb2.PaymentType.DESCRIPTOR,
+                    company.payment_type,
+                ),
+                "paymentMethod": protobuf.enum_value_to_slug(
+                    models_pb2.PaymentMethod.DESCRIPTOR,
+                    company.payment_method,
+                ),
             },
             relationships=relationships,
             links={
@@ -220,6 +228,14 @@ class Transaction(models.Resource):
                     "fxMarkup": round(transaction.rates.fx_markup, 3),
                     "processingMarkup": round(transaction.rates.processing_markup, 3),
                 },
+                "paymentType": protobuf.enum_value_to_slug(
+                    models_pb2.PaymentType.DESCRIPTOR,
+                    transaction.payment_type,
+                ),
+                "paymentMethod": protobuf.enum_value_to_slug(
+                    models_pb2.PaymentMethod.DESCRIPTOR,
+                    transaction.payment_method,
+                ),
             },
             relationships={
                 "conversion": (
