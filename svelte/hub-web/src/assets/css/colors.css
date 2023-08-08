@@ -53,6 +53,9 @@
   --color-semantic-success-200: #dff8aa;
   --color-semantic-success-600: #60a51e;
 
+  /* Alpha channel */
+  --color-alpha-channel-black-50: rgb(0 0 0 / 0.5);
+
   /* Gradients */
   --color-gradient-extensions-horizontal: linear-gradient(270deg, #d2ede6 0%, #edf8f5 100%);
   --color-gradient-booking-flow: linear-gradient(180deg, #9ad7c8 0%, #d3eee9 100%);

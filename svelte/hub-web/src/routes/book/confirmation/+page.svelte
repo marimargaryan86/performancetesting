@@ -10,10 +10,15 @@
   import { goto } from "$app/navigation";
   import routeConfig from "routeConfig";
   import Alert from "components/ui/alert.svelte";
+  import PaymentModal from "../payment/payment-modal.svelte";
   import { onMount } from "svelte";
 
   const currentBookingStep = 5;
-  let alert: { type: "success" | "failed"; message: string } | undefined = undefined;
+  let alert: { type: "success" | "failed"; message: string } | undefined = {
+    type: "success",
+    message: "We will send an email with a copy of your ticket.",
+  };
+  let showPaymentSucceed = true;
 
   function goToBookingsPage(): void {
     const additionalInfo = { alert: { type: "success", message: "Booking successfully made" } };
@@ -21,7 +26,9 @@
   }
 
   onMount(() => {
-    alert = history.state?.alert;
+    setTimeout(() => {
+      showPaymentSucceed = false;
+    }, 2000);
   });
 
   function closeAlert(): void {
@@ -160,6 +167,10 @@
 <div class="next-block">
   <Button size="medium" on:click={goToBookingsPage}><span class="next-btn">Next</span></Button>
 </div>
+
+{#if showPaymentSucceed}
+  <PaymentModal paymentSucceed />
+{/if}
 
 <style>
   .background {

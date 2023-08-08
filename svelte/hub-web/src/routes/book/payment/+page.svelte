@@ -2,38 +2,138 @@
   import Summary from "../passenger-details/summary.svelte";
   import BookingSteps from "../booking-steps.svelte";
   import TextField from "components/ui/text-field.svelte";
-  import SelectField from "components/ui/select-field.svelte";
   import RadioIcon from "components/icons/radio-icon.svelte";
   import CreditCardIcon from "components/icons/credit-card-icon.svelte";
+  import { loadStripe, type Appearance, type Stripe, type StripeElements } from "@stripe/stripe-js";
   import { onMount } from "svelte";
   import OffersMockup from "../offers-mockup";
   import { page } from "$app/stores";
   import { goto } from "$app/navigation";
   import Button from "components/ui/button.svelte";
+  import PaymentModal from "./payment-modal.svelte";
+  import BillingAddress, { type BillingAddressModel } from "./billing-address.svelte";
   import routeConfig from "routeConfig";
+  import { env } from "$env/dynamic/public";
   import type { OfferModel } from "../select-offer/offer.svelte";
 
   const currentBookingStep = 4;
-  const countries = ["Spain", "Portugal", "France", "Andorra", "Gibraltar", "Morocco"];
 
   let offer: OfferModel | undefined = undefined;
   let fare: OfferModel["alternativeFares"][number] | undefined = undefined;
+  let paymentProcessing = false;
+  let stripeErrorMessage: string | undefined = undefined;
+  let paymentFormElement: HTMLFormElement | undefined;
+  let stripeFormElements: StripeElements | undefined = undefined;
+  let stripe: Stripe | null = null;
 
-  onMount(() => {
+  let billingAddress: BillingAddressModel = {
+    addressLine1: undefined,
+    addressLine2: undefined,
+    townOrCity: undefined,
+    country: undefined,
+    postcode: undefined,
+  };
+
+  $: payDisabled = Boolean(
+    !billingAddress.addressLine1 ||
+      !billingAddress.townOrCity ||
+      !billingAddress.country ||
+      !billingAddress.postcode,
+  );
+
+  const appearance: Appearance = {
+    theme: "stripe",
+    variables: {
+      colorPrimary: "#0570de",
+      colorBackground: "#ffffff",
+      colorText: "#17372F",
+      colorDanger: "#db3041",
+      fontFamily: "Inter, Open Sans, system-ui, sans-serif",
+      spacingUnit: "6px",
+      borderRadius: "4px",
+    },
+    rules: {
+      ".Error": {
+        fontSize: "12px",
+      },
+      ".Label": {
+        fontSize: "14px",
+        fontWeight: "600",
+      },
+      ".Input:focus": {
+        border: "1px solid #bcc2bd",
+        boxShadow: "none",
+      },
+      ".Input": {
+        border: "1px solid #D7DBD8",
+        fontSize: "14px",
+        borderRadius: "8px",
+        padding: "10px 16px",
+        boxShadow: "none",
+      },
+    },
+  };
+
+  onMount(async () => {
     const urlParams = $page.url.searchParams;
 
     offer = OffersMockup.find((item) => item.id === Number(urlParams.get("offer_id")));
     fare = offer?.alternativeFares.find((item) => item.id === Number(urlParams.get("fare_id")));
+
+    if (env.PUBLIC_STRIPE_KEY) {
+      stripe = await loadStripe(env.PUBLIC_STRIPE_KEY);
+    }
+
+    if (stripe) {
+      await renderForm();
+    }
   });
 
-  function goToPassengerDetailsPage(): void {
-    goto(routeConfig.book.passengerDetails.root + $page.url.search);
+  const renderForm = (): void => {
+    const paymentIntentClientSecret =
+      "pi_3NckxhBoi5kRFYub0YHx609g_secret_XLyhA1PwKfwDMBz6Z2LTIrMUr";
+
+    if (paymentIntentClientSecret) {
+      stripeFormElements = stripe?.elements({
+        clientSecret: paymentIntentClientSecret,
+        appearance,
+      });
+      const paymentElement = stripeFormElements?.create("payment");
+      paymentElement?.mount("#payment-element");
+    }
+  };
+
+  async function purchase(): Promise<void> {
+    if (paymentFormElement && stripe) {
+      paymentProcessing = true;
+      if (stripeFormElements) {
+        const returnUrl = new URL(routeConfig.book.confirmation.root, $page.url.href);
+        const { error } = await stripe.confirmPayment({
+          elements: stripeFormElements,
+          confirmParams: {
+            // eslint-disable-next-line camelcase
+            return_url: returnUrl.toString(),
+          },
+        });
+        if (error) {
+          stripeErrorMessage = error.message;
+        } else {
+          // Your customer will be redirected to your `return_url`. For some payment
+          // methods like iDEAL, your customer will be redirected to an intermediate
+          // site first to authorize the payment, then redirected to the `return_url`.
+        }
+      }
+    }
   }
-  function goToConfirmationPage(): void {
-    const additionalInfo = {
-      alert: { type: "success", message: "We will send an email with a copy of your ticket." },
-    };
-    goto(routeConfig.book.confirmation.root + $page.url.search, { state: additionalInfo });
+
+  function goToPassengerDetailsPage(): void {
+    const url = new URL(routeConfig.book.passengerDetails.root, $page.url.href);
+    goto(url);
+  }
+
+  function closePaymentModal(): void {
+    paymentProcessing = false;
+    stripeErrorMessage = undefined;
   }
 </script>
 
@@ -56,32 +156,16 @@
             <CreditCardIcon />
           </div>
         </div>
-        <TextField label="Card number" placeholder="4444 4444 4444 4444" required />
-        <div class="row">
-          <TextField label="Expiration date" placeholder="mm/yy" required />
-          <TextField label="CVC" placeholder="Required" required />
-        </div>
-        <div class="row">
-          <SelectField label="Country" placeholder="Select" options={countries} required />
-          <TextField label="Postcode" placeholder="Required" required />
-        </div>
+        <form
+          bind:this={paymentFormElement}
+          on:submit={purchase}
+          id="payment-form"
+          class="payment-form"
+        >
+          <div id="payment-element" />
+        </form>
       </div>
-      <div class="billing-address-form">
-        <h3>Billing address</h3>
-        <TextField label="Address line 1" placeholder="Required" required />
-        <TextField label="Address line 2" />
-        <div class="location">
-          <TextField class="city" placeholder="Málaga" label="Town / City" required />
-          <SelectField label="Country" required scroll placeholder="Select" options={countries} />
-          <TextField
-            class="post-code"
-            type="text"
-            placeholder="Postcode"
-            label="Postcode"
-            required
-          />
-        </div>
-      </div>
+      <BillingAddress bind:billingAddress />
     </div>
 
     {#if offer && fare}
@@ -91,9 +175,12 @@
 
   <div class="next-block">
     <Button on:click={goToPassengerDetailsPage} size="medium" variant="outline">Previous</Button>
-    <Button on:click={goToConfirmationPage} size="medium"><span class="next-btn">Pay</span></Button>
+    <Button form="payment-form" type="submit" disabled={payDisabled} size="medium"
+      ><span class="next-btn">Pay</span></Button
+    >
   </div>
 </div>
+<PaymentModal on:close={closePaymentModal} {paymentProcessing} {stripeErrorMessage} />
 
 <style>
   h3 {
@@ -147,12 +234,6 @@
     padding-bottom: 60px;
   }
 
-  .row {
-    display: flex;
-    flex-direction: row;
-    gap: 24px;
-  }
-
   .forms :global(.text-field) {
     width: 100%;
   }
@@ -170,16 +251,18 @@
   }
 
   .forms :global(.select-field label) {
+    color: var(--color-common-light-strong);
     font-weight: 600;
-    font-size: 16px;
+    font-size: 14px;
     font-family: Inter, Arial, Helvetica, sans-serif;
     font-style: normal;
     line-height: 26px;
   }
 
   .forms :global(.text-field label) {
+    color: var(--color-common-light-strong);
     font-weight: 600;
-    font-size: 16px;
+    font-size: 14px;
     font-family: Inter, Arial, Helvetica, sans-serif;
     font-style: normal;
     line-height: 26px;
@@ -203,28 +286,6 @@
     right: 16px;
   }
 
-  .billing-address-form {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    width: 100%;
-    padding: 40px 80px;
-    color: var(--color-common-light-strong);
-    background-color: var(--color-common-dark-strong);
-    border-radius: 16px;
-  }
-
-  .location {
-    display: flex;
-    flex-direction: row;
-    gap: 24px;
-    width: 100%;
-  }
-
-  .forms :global(.text-field.post-code) {
-    max-width: 112px;
-  }
-
   .next-block {
     position: sticky;
     bottom: 0;
@@ -242,5 +303,10 @@
     align-items: center;
     justify-content: center;
     width: 100px;
+  }
+
+  .pay-card :global(input) {
+    padding-right: 52px;
+    padding-left: 52px;
   }
 </style>
