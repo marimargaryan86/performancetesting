@@ -13,7 +13,7 @@ func TestIsImperativePresentTense(t *testing.T) {
 	} {
 		t.Run(tc.input, func(t *testing.T) {
 			if got := isImperativePresentTense(tc.input); got != tc.want {
-				t.Errorf("got %s; want %s", got, tc.want)
+				t.Errorf("got %v; want %v", got, tc.want)
 			}
 		})
 
