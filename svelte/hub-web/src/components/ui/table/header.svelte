@@ -1,8 +1,7 @@
-<script lang="ts">
+<script lang="ts" generics="TSortGroup">
+  /* global TSortGroup */
   import ChevronIcon from "components/icons/chevron-icon.svelte";
   import type { DirectionY } from "models/spatial";
-
-  type TSortGroup = $$Generic;
 
   export let sortDirection: DirectionY | undefined = undefined;
   export let sortValue: Readonly<TSortGroup> | undefined = undefined;

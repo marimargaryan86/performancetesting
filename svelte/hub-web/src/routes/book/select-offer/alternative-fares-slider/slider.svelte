@@ -60,12 +60,14 @@
       />
     {/each}
   </div>
-  <div class="prev" on:click={scrollToLeft} on:keyup={handleKeyScrollToLeft}>
+
+  <button class="prev" on:click={scrollToLeft} on:keyup={handleKeyScrollToLeft}>
     <Chevron direction="left" size="24px" color="var(--color-main-primary-500)" />
-  </div>
-  <div class="next" on:click={scrollToRight} on:keyup={handleKeyScrollToRight}>
+  </button>
+
+  <button class="next" on:click={scrollToRight} on:keyup={handleKeyScrollToRight}>
     <Chevron size="24px" color="var(--color-main-primary-500)" />
-  </div>
+  </button>
 </div>
 
 <style>
@@ -74,20 +76,22 @@
     padding: 18px 40px 0;
   }
 
-  .prev {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    padding: 8px;
-    cursor: pointer;
-  }
-
+  .prev,
   .next {
     position: absolute;
     top: 50%;
-    right: 0;
     padding: 8px;
+    background-color: transparent;
+    border: 0;
     cursor: pointer;
+  }
+
+  .prev {
+    left: 0;
+  }
+
+  .next {
+    right: 0;
   }
 
   .slider {

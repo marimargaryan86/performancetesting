@@ -1,4 +1,5 @@
-<script lang="ts">
+<script lang="ts" generics="TType extends 'text' | 'password' | 'email' | 'number'">
+  /* global TType */
   import RemoveIcon from "components/icons/remove-icon.svelte";
 
   import { createEventDispatcher } from "svelte";
@@ -6,7 +7,6 @@
   import { getRandomId } from "utils/random";
 
   type InputEvent = Event & { currentTarget: EventTarget & HTMLInputElement };
-  type TType = $$Generic<"text" | "password" | "email" | "number">;
   type TValue = TType extends "number" ? number : string;
 
   let className: string | undefined = undefined;
@@ -84,12 +84,7 @@
     />
 
     {#if clearable && value}
-      <button
-        type="button"
-        on:click={clear}
-        class="clear"
-        transition:fade|local={{ duration: 150 }}
-      >
+      <button type="button" on:click={clear} class="clear" transition:fade={{ duration: 150 }}>
         <RemoveIcon color="var(--color-common-dark-strong)" />
       </button>
     {/if}
@@ -98,11 +93,11 @@
   </div>
 
   {#if !error && helpText}
-    <span class="help-text" transition:slide|local={{ duration: 300 }}>{helpText}</span>
+    <span class="help-text" transition:slide={{ duration: 300 }}>{helpText}</span>
   {/if}
 
   {#if typeof error === "string"}
-    <span class="error-message" transition:slide|local={{ duration: 300 }}>{error}</span>
+    <span class="error-message" transition:slide={{ duration: 300 }}>{error}</span>
   {/if}
 </div>
 

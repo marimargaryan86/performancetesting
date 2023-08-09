@@ -1,8 +1,8 @@
-<script lang="ts">
+<script lang="ts" generics="TRange extends boolean">
+  /* global TRange */
   import type { DateRange } from "models/date-time";
   import { datesEq, getMonthLength, getWeekDays, getZeroTimeDate } from "utils/date-time";
 
-  type TRange = $$Generic<boolean>;
   type TValue = TRange extends true ? DateRange : Date;
   type TDirtyValue = TRange extends true ? Partial<DateRange> : Date;
 

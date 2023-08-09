@@ -88,7 +88,7 @@
           From <span class="price">{offer.price}</span>
         </div>
         {#if !offer.selected}
-          <div transition:fly|local={{ duration: 200, x: 100 }}>
+          <div transition:fly={{ duration: 200, x: 100 }}>
             <Button variant="outline" size="xl-small" on:click={toggleSelectedOffer}>
               <span class="typography body-small-weight-600">Details</span>
               <Arrow color="var(--color-main-primary-500)" />
@@ -98,16 +98,16 @@
       </div>
     </div>
   </div>
-  <div
+  <button
     on:click={toggleSelectedOffer}
     on:keyup={handleKeyToggleSelectedOffer}
     class="alternative-fares-toggle"
   >
     <span>Alternative fares</span>
     <ChevronIcon direction={offer.selected ? "up" : "down"} color="var(--color-main-primary-500)" />
-  </div>
+  </button>
   {#if offer.selected}
-    <div class="expanded" transition:fly|local={{ duration: 200, x: 100 }}>
+    <div class="expanded" transition:fly={{ duration: 200, x: 100 }}>
       <AlternativeFares
         on:fareSelected
         alternativeFares={offer.alternativeFares}
@@ -228,6 +228,8 @@
     justify-content: flex-end;
     margin-top: 26px;
     color: var(--color-main-primary-500);
+    background-color: transparent;
+    border: 0;
     cursor: pointer;
   }
 

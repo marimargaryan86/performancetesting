@@ -123,7 +123,7 @@
         </button>
 
         {#if item.expanded}
-          <ul transition:slide|local={{ duration: 250 }}>
+          <ul transition:slide={{ duration: 250 }}>
             {#each item.items as subItem}
               {@const active = $page.url.pathname.startsWith(subItem.url)}
               <li>

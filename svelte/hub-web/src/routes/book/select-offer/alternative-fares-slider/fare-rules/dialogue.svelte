@@ -4,8 +4,8 @@
   export let fareRule: string;
 </script>
 
-<div class="dialogue" transition:scale|local={{ duration: 150, start: 0.8 }}>
-  <div class="typography typography body-x-small ">
+<div class="dialogue" transition:scale={{ duration: 150, start: 0.8 }}>
+  <div class="typography typography body-x-small">
     {fareRule}
   </div>
 </div>

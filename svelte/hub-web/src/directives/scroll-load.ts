@@ -1,3 +1,5 @@
+import type { ActionReturn } from "svelte/action";
+
 interface ScrollLoadParams {
   threshold?: number;
   func?: () => Promise<void> | void;
@@ -8,7 +10,7 @@ const DEFAULT_THRESHOLD = 400;
 export function scrollLoad(
   node: HTMLElement,
   params: ScrollLoadParams,
-): { destroy: () => void; update: (p: ScrollLoadParams) => void } {
+): ActionReturn<ScrollLoadParams> {
   let { func, threshold = DEFAULT_THRESHOLD } = params;
   let pending = false;
 
@@ -36,7 +38,7 @@ export function scrollLoad(
     destroy(): void {
       node.removeEventListener("scroll", onScroll);
     },
-    update(p: ScrollLoadParams): void {
+    update(p): void {
       ({ func, threshold = DEFAULT_THRESHOLD } = p);
     },
   };

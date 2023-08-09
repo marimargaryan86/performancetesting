@@ -1,12 +1,11 @@
-<script lang="ts">
+<script lang="ts" generics="TStatus extends string">
+  /* global TStatus */
   import ChevronIcon from "components/icons/chevron-icon.svelte";
   import RemoveIcon from "components/icons/remove-icon.svelte";
   import { clickOutside } from "directives/click-outside";
   import { scale } from "svelte/transition";
   import { getRandomId } from "utils/random";
   import Checkbox from "./checkbox.svelte";
-
-  type TStatus = $$Generic<string>;
 
   export let value: Readonly<TStatus>[] | undefined = undefined;
   export let statuses: Readonly<TStatus[]>;
@@ -55,7 +54,7 @@
   </button>
 
   {#if expanded}
-    <ul class="dialogue" transition:scale|local={{ duration: 150, start: 0.8 }}>
+    <ul class="dialogue" transition:scale={{ duration: 150, start: 0.8 }}>
       {#each statuses as status}
         {@const id = getRandomId("status")}
 

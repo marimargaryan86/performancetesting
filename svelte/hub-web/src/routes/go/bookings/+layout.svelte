@@ -28,7 +28,7 @@
 
 {#if showFilters}
   <div class="tabs">
-    <ul class="filters" transition:slide|local={{ duration: 250 }}>
+    <ul class="filters" transition:slide={{ duration: 250 }}>
       <li>
         <DatePicker range placeholder="Date Range" />
       </li>

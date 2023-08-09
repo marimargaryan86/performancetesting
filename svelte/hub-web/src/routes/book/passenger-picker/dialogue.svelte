@@ -7,7 +7,7 @@
   export let infants = 0;
 </script>
 
-<div class="dialogue" transition:scale|local={{ duration: 150, start: 0.8 }}>
+<div class="dialogue" transition:scale={{ duration: 150, start: 0.8 }}>
   <div class="header typography body-xlarge-weight-600">Passengers</div>
 
   <div class="navigation">

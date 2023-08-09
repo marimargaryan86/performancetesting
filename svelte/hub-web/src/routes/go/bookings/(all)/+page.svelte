@@ -52,9 +52,9 @@
     </THead>
 
     <TBody>
-      {#each bookings as _}
+      {#each bookings as booking}
         <TRow alternatingBackground={false}>
-          <TCol maxWidth="96px" copyable class="green">123ABC456</TCol>
+          <TCol maxWidth="96px" copyable class="green">123ABC456{booking}</TCol>
           <TCol>Jerry Smith</TCol>
           <TCol class="green">Download</TCol>
           <TCol>02/11/23</TCol>

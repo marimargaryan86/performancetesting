@@ -1,10 +1,9 @@
-<script lang="ts">
+<script lang="ts" generics="TValue">
+  /* global TValue */
   import ChevronIcon from "components/icons/chevron-icon.svelte";
   import TextField from "./text-field.svelte";
   import { scale } from "svelte/transition";
   import { clickOutside } from "directives/click-outside";
-
-  type TValue = $$Generic;
 
   let className: string | undefined = undefined;
 
@@ -59,10 +58,10 @@
     <ul
       class="typography body-medium options"
       class:scroll
-      transition:scale|local={{ duration: 150, start: 0.8 }}
+      transition:scale={{ duration: 150, start: 0.8 }}
     >
       {#each options as option}
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
         <li class="option" on:click={select.bind(select, option)}>{formatter(option)}</li>
       {/each}
     </ul>

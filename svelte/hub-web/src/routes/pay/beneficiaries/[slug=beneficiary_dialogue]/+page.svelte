@@ -114,7 +114,7 @@
 
 <div class="content">
   {#if error}
-    <div class="error typography body-medium" transition:slide|local={{ duration: 150 }}>
+    <div class="error typography body-medium" transition:slide={{ duration: 150 }}>
       <strong>Error</strong> <span>{error}</span>
     </div>
   {/if}

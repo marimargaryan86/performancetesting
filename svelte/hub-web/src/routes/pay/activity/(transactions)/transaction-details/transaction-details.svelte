@@ -21,14 +21,14 @@
   }
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
 <div
   class="transaction-details"
   on:click|self={close}
   use:portal={document.body}
-  transition:fade|local={{ duration: 200 }}
+  transition:fade={{ duration: 200 }}
 >
-  <div class="dialogue" transition:fly|local={{ duration: 200, y: 24 }}>
+  <div class="dialogue" transition:fly={{ duration: 200, y: 24 }}>
     {#await bookingRequest}
       <div class="pending">
         <span class="typography headline-small">Fetching booking</span>

@@ -160,7 +160,7 @@
     </div>
   </div>
   {#if offerSelected}
-    <div class="next-block" transition:fade|local={{ duration: 100 }}>
+    <div class="next-block" transition:fade={{ duration: 100 }}>
       <Button on:click={cancelSelectedOffer} size="medium" variant="outline">Cancel</Button>
       <Button on:click={goToSummaryPage} size="medium" disabled={!isFareSelected}
         ><span class="next-btn">Next</span></Button

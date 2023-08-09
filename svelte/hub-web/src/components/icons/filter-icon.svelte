@@ -19,7 +19,7 @@
       cy="8"
       r="4"
       fill="var(--color-semantic-error-600)"
-      transition:fade|local={{ duration: 100 }}
+      transition:fade={{ duration: 100 }}
     />
   {/if}
 </svg>

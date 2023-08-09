@@ -1,4 +1,5 @@
-<script lang="ts">
+<script lang="ts" generics="TRange extends boolean">
+  /* global TRange */
   import ChevronIcon from "components/icons/chevron-icon.svelte";
   import { monthName } from "formatting/date-time";
   import type { DateRange } from "models/date-time";
@@ -6,7 +7,6 @@
   import { getZeroTimeDate } from "utils/date-time";
   import Calendar from "./calendar.svelte";
 
-  type TRange = $$Generic<boolean>;
   type TValue = TRange extends true ? DateRange : Date;
 
   export let range: TRange;
@@ -51,7 +51,7 @@
   }
 </script>
 
-<div class="dialogue" transition:scale|local={{ duration: 150, start: 0.8 }}>
+<div class="dialogue" transition:scale={{ duration: 150, start: 0.8 }}>
   <div class="header">
     <div class="typography body-large bold">
       {monthName(viewingMonth)}

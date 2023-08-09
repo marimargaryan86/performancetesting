@@ -1,6 +1,5 @@
-<script lang="ts">
-  type TValue = $$Generic;
-
+<script lang="ts" generics="TValue">
+  /* global TValue */
   export let value: TValue | undefined = undefined;
   export let group: TValue[] = [];
   export let id: string | undefined = undefined;

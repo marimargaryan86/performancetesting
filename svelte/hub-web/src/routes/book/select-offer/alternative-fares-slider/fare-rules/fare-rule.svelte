@@ -21,6 +21,7 @@
       open();
     }
   }
+
   function handleKeyToggle(event: KeyboardEvent): void {
     if (event.key === "Enter") {
       toggle();
@@ -29,9 +30,9 @@
 </script>
 
 <div use:clickOutside={close}>
-  <div on:click={toggle} on:keyup={handleKeyToggle} class="fare-rule">
-    <span class="typography typography body-small ">View fare rule</span>
-  </div>
+  <button on:click={toggle} on:keyup={handleKeyToggle} class="fare-rule">
+    <span class="typography typography body-small">View fare rule</span>
+  </button>
 
   {#if expanded}
     <Dialogue {fareRule} />
@@ -42,9 +43,12 @@
   .fare-rule {
     display: block;
     margin-top: 4px;
+    padding: 0;
     color: var(--color-common-light-text-link);
     text-align: right;
     text-decoration: underline;
+    background-color: transparent;
+    border: 0;
     cursor: pointer;
   }
 </style>
