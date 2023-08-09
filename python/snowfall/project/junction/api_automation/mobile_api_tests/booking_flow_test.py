@@ -90,39 +90,45 @@ async def get_trips_list(
 async def create_offer_lists(  # noqa: WPS210
     mobile_client: MobileApiClient,
     trips_list: Sequence[str],
-) -> Sequence[Mapping[str, Any]]:
+) -> list[dict[str, Any]]:
     year = 1980
     month = 2
     day = 3
+
     passenger_date_of_birth = [datetime.date(year, month, day)]
-    session_token = "YMSXrOAhIOdvIbxAmfSt7vJtRBkurNb6"
     offer_list = []
     for trip_id in trips_list:
         response = await mobile_client.create_offers_search(
             trip_id,
             passenger_date_of_birth,
-            session_token,
         )
         trip_offer_searches = response["data"]["id"]
         await asyncio.sleep(5)
-        response = await mobile_client.get_offer_search(trip_offer_searches)
-        if response["data"]["attributes"]["status"] == "completed":
-            response = await mobile_client.list_offers_by_offer_search(
-                trip_offer_searches,
+        response = await mobile_client.list_offers_by_offer_search(
+            trip_offer_searches,
+        )
+
+        if response["data"]:
+            offer = response["data"][0]
+            group = offer["relationships"]["groups"]["data"][0]
+            included_data = response["included"]
+            group_index = next(
+                (
+                    index
+                    for index, opt_data in enumerate(included_data)
+                    if "id" in opt_data and opt_data["id"] == group["id"]
+                ),
+                None,
             )
-            if response["data"]:
-                offer = response["data"][0]
-                group = offer["relationships"]["groups"]["data"][0]
-                options = response["included"][0]["relationships"]["options"]
-                options_data = options["data"][0]
-                offer_list.append(
-                    {
-                        "offer_id": offer["id"],
-                        "groups_id": group["id"],
-                        "options_id": options_data["id"],
-                    },
-                )
-                break
+            options = response["included"][group_index]["relationships"]["options"]
+            options_data = options["data"][0]
+            offer_list.append(
+                {
+                    "offer_id": offer["id"],
+                    "groups_id": group["id"],
+                    "options_id": options_data["id"],
+                },
+            )
     return offer_list
 
 
@@ -199,7 +205,7 @@ iata_codes = [("latvia", "lithuania"), ("funchal", "lisbon")]
 
 
 @pytest.mark.integration()
-@pytest.mark.parametrize("iata_codes", iata_codes)
+@pytest.mark.parametrize("iata_codes", iata_codes, ids=["Ask2Go", "DUFFEL"])
 async def test_booking_flow(  # noqa: WPS217, WPS210
     mobile_client: MobileApiClient,
     departure_after: datetime.datetime,
@@ -217,6 +223,7 @@ async def test_booking_flow(  # noqa: WPS217, WPS210
     trips_list = await get_trips_list(mobile_client, create_trip_search_id)
     assert trips_list, "no trips found"
     offer_list = await create_offer_lists(mobile_client, trips_list)
+    assert offer_list, "no offers"
     keys_to_check = ["offer_id", "groups_id", "options_id"]
     assert all(
         offer.get(key) != "" for offer in offer_list for key in keys_to_check
@@ -228,3 +235,27 @@ async def test_booking_flow(  # noqa: WPS217, WPS210
     assert quotes, "no quotes for offer"
     get_quote_id = await get_quote(mobile_client, quotes)
     assert get_quote_id
+
+
+@pytest.mark.smoke()
+@pytest.mark.parametrize("iata_codes", iata_codes, ids=["Ask2Go", "DUFFEL"])
+async def test_booking_flow_smoke(  # noqa: WPS217, WPS210
+    mobile_client: MobileApiClient,
+    departure_after: datetime.datetime,
+    iata_codes: str,
+) -> None:
+    origin, destination = await get_place_id(mobile_client, iata_codes)
+    create_trip_search_id = await create_trip_search(
+        mobile_client,
+        departure_after,
+        origin,
+        destination,
+    )
+    await asyncio.sleep(5)
+    trips_list = await get_trips_list(mobile_client, create_trip_search_id)
+    assert trips_list, "no trips found"
+    offer_list = await create_offer_lists(mobile_client, trips_list)
+    keys_to_check = ["offer_id", "groups_id", "options_id"]
+    assert all(
+        offer.get(key) != "" for offer in offer_list for key in keys_to_check
+    ), "no offers found"

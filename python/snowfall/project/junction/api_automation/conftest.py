@@ -45,6 +45,10 @@ def pytest_configure(config: pytest.Config) -> None:
         "markers",
         "integration: integration test that requires environment",
     )
+    config.addinivalue_line(
+        "markers",
+        "smoke: smoke test that requires environment",
+    )
 
 
 @pytest.fixture(scope="package")
@@ -159,10 +163,16 @@ def pytest_collection_modifyitems(
     items: Sequence[pytest.Item],  # noqa: WPS110
 ) -> None:
     if not config.getoption("-m"):
-        skip_me = pytest.mark.skip(reason="use `-m integration` to run this test")
-        for ii in items:
-            if "integration" in ii.keywords:
-                ii.add_marker(skip_me)
+        skip_integration = pytest.mark.skip(
+            reason="use `-m integration` to run this test",
+        )
+        for i_integration in items:
+            if "integration" in i_integration.keywords:
+                i_integration.add_marker(skip_integration)
+        skip_smoke = pytest.mark.skip(reason="use `-m smoke` to run this test")
+        for i_smoke in items:
+            if "smoke" in i_smoke.keywords:
+                i_smoke.add_marker(skip_smoke)
 
 
 @pytest.fixture()

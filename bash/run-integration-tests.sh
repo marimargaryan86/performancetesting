@@ -8,6 +8,7 @@ TESTS_DIR="${1}"
 TEST_E2E_HOST=${2}
 TEST_E2E_TOKEN=${3}
 ALLURE_PROJECT_ID=${4}
+TESTING_SUITE=${5}
 
 LOGIN_STRING='{"username": "'"$ALLURE_USERNAME"'", "password": "'"$ALLURE_PASSWORD"'"}'
 # login call
@@ -35,7 +36,7 @@ done
 
 echo "Executing tests"
 pants test --force --output=none python/snowfall/project/junction/api_automation/"${TESTS_DIR}" \
-	--pytest-args='-m integration' \
+	--pytest-args="-m ${TESTING_SUITE}" \
 	-- \
 	--API-TOKEN="${TEST_E2E_TOKEN}" \
 	--DEPARTURE_AFTER="${TEST_E2E_DEPARTURE_AFTER}" \

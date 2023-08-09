@@ -13,12 +13,13 @@ integration:api_automation-tests:
     PROJECT_DIR: "${PROJECT_DIR}"
     SLACK_NOTIFICATION_CHANNEL: "${SLACK_NOTIFICATION_CHANNEL}"
     SLACK_NOTIFICATION_TOKEN: "${SLACK_NOTIFICATION_TOKEN}"
+    $TESTING_SUITE: "${TESTING_SUITE}"
   before_script:
     - !reference [.pants, before_script]
     - SLACK_THREAD_NUMBER=$(./bash/slack-start-notification.sh $SLACK_NOTIFICATION_TOKEN $SLACK_NOTIFICATION_CHANNEL $ALLURE_PROJECT_ID)
     - echo $SLACK_THREAD_NUMBER > slack.txt
   script:
-    - ./bash/run-integration-tests.sh $PROJECT_DIR $TEST_E2E_HOSTNAME $API_TOKEN $ALLURE_PROJECT_ID
+    - ./bash/run-integration-tests.sh $PROJECT_DIR $TEST_E2E_HOSTNAME $API_TOKEN $ALLURE_PROJECT_ID $TESTING_SUITE
   after_script:
     - !reference [.pants, after_script]
     - SLACK_THREAD_NUMBER=$(cat slack.txt)
@@ -26,3 +27,4 @@ integration:api_automation-tests:
     - ./bash/slack-end-notification.sh $SLACK_THREAD_NUMBER $JOB_LINK
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $PROJECT_NAME == "api_automation"'
+

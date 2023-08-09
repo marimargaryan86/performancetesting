@@ -1,12 +1,15 @@
 {
   "development": {
       "variables": {
-        "vault_api_URL":"http://172.16.104.79:8200"
+        "vault_api_URL":"http://172.16.104.79:8200",
+        "testing_suite": "integration"
       }
   },
   "production": {
     "deploy": false,
       "variables": {
+        "vault_api_URL":"http://172.16.144.109:8200",
+        "testing_suite": "smoke"
       }
   },
   "sandbox": {
@@ -14,3 +17,4 @@
     "variables": {}
   }
 }
+

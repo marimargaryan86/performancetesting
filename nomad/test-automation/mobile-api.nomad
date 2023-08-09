@@ -7,7 +7,9 @@ variable "environment" {
 variable "vault_api_URL" {
   type = string
 }
-
+variable "testing_suite" {
+  type = string
+}
 job "test-automation-mobile-api" {
 
   datacenters = ["${var.datacenter}"]
@@ -15,7 +17,7 @@ job "test-automation-mobile-api" {
   type        = "batch"
 
   periodic {
-    cron             = "0 8 * * 1-5"
+    cron             = "0 10 * * 1"
     prohibit_overlap = true
     time_zone        = "Europe/Warsaw"
   }
@@ -76,6 +78,11 @@ EOH
           , "https://git.snowfall.se/api/v4/projects/406/trigger/pipeline"
         ]
       }
+      env {
+        ENV_NAME      = "${var.environment}"
+        TESTING_SUITE = "${var.testing_suite}"
+      }
+
     }
   }
 }
