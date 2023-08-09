@@ -4,6 +4,9 @@ from twilio.rest import Client as twilioClient
 
 from snowfall.project.junction.plus.adapter import format
 from snowfall.project.junction.plus.notification_channels.channel import AbstractChannel
+from snowfall.project.junction.plus.notification_channels.order_utils import (
+    compress_flights,
+)
 from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
 from snowfall.stdlib.format import protobuf
 
@@ -38,27 +41,64 @@ class ProviderChannel(Channel):
         self._client = twilioClient(sid, token)
         self._templates_root_path = templates_root_path
 
-    async def order_confirmation(
+    async def order_confirmation(  # noqa: WPS210
         self,
         event: models_pb2.NotificationEvent,
         receiver: models_pb2.Subscriber,
         sender_configuration: models_pb2.ConfigurationVector,
     ) -> None:
-        booking = event.body.bookings[0]
+        trip_type = ""
+        counter = 0
+        journey_details = ""
+        message_ending = ""
+        processed_bookings = compress_flights(
+            [
+                booking.value
+                for booking in event.body.bookings
+                if booking.value.DESCRIPTOR.name == "AirBooking"
+            ],
+        )
+        if (  # noqa: WPS337
+            len(processed_bookings) == 2
+            and processed_bookings[0].origin_iata
+            == processed_bookings[1].destination_iata
+        ):
+            trip_type = "round "
+        if len(processed_bookings) > 1:
+            counter = 1
+            message_ending = (
+                "\n\nTo check your *Trip Details*, please tap the button below"
+            )
+        for journey in processed_bookings:
+            if counter > 2:
+                message_ending = "\n\nAnd {0} more Journeys{1}".format(
+                    len(processed_bookings) - 2,
+                    message_ending,
+                )
+                break
+            journey_details += (
+                "\n\n*Journey{0}:*\n\n*From:* {1}\n*To:* {2}\n*On:* {3}".format(
+                    " {0}".format(counter) if counter else "",
+                    journey.origin,
+                    journey.destination,
+                    protobuf.protobuf_to_datetime(
+                        journey.departure_at,
+                    ).strftime("%A %d %b %Y %H:%M"),
+                )
+            )
+            counter += 1
+
         self.send_message(
             receiver=receiver.phone_number.e164_number,
             sender_number=sender_configuration.mobile_phone.e164_number,
             body=(
                 "Hi {0},".format(receiver.first_name)
-                + "\nWe are pleased to confirm that your trip is booked:"
-                + "\n\nFrom: {0}\nTo: {1}\nOn: {2}".format(
-                    booking.value.origin,
-                    booking.value.destination,
-                    protobuf.protobuf_to_datetime(
-                        booking.value.departure_at,
-                    ).strftime("%A %d %b %Y %H:%M"),
+                + "\nWe are pleased to confirm that your {0}trip is booked:".format(
+                    trip_type,
                 )
-                + "\nBooking Reference: {0}".format(event.body.booking_reference)
+                + "\n\n*Booking Reference:* {0}".format(event.body.booking_reference)
+                + journey_details
+                + message_ending
             ),
         )
 
