@@ -106,6 +106,22 @@ class SubscriberRepository(
             },
         )
 
+    async def unsubscribe(self, identifier: str) -> bool:
+        update = await self._execute(
+            self._collection.update_one,
+            {"_id": identifier},
+            {
+                "$set": {
+                    "phone_subscription_status": (
+                        models_pb2.Subscriber.SubscribedStatus.SUBSCRIBED_STATUS_UNSUBSCRIBED
+                    ),
+                },
+            },
+            upsert=False,
+        )
+
+        return update.matched_count
+
 
 class ConfigurationVectorRepository(
     mixins.FindByIdMixin[models_pb2.ConfigurationVector],

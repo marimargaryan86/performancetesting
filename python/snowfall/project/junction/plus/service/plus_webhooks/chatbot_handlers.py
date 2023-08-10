@@ -1,8 +1,9 @@
 import datetime
 import json
-from collections.abc import Callable, Mapping
+from collections.abc import Awaitable, Callable, Mapping
 from typing import Any
 
+from snowfall.project.junction.plus.adapter import subscribers
 from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.redis import types as redis
@@ -24,10 +25,11 @@ class MessageHandler(object):
         self,
         message: str,
         subscriber: models_pb2.Subscriber,
+        subscribers_client: subscribers.Client,
     ) -> str:
         subscriber_state = await self.get_state(subscriber)
         message_handler = message_handlers(message.lower())
-        response = message_handler()
+        response = await message_handler(subscriber, subscribers_client)
         subscriber_state["last_message"] = message
         subscriber_state["last_response"] = response
         subscriber_state["last_handler"] = message_handler.__name__
@@ -51,15 +53,28 @@ class MessageHandler(object):
 
 
 # TODO: Change this to class method and use it as decorator to register handlers
-def message_handlers(fun: str) -> Callable[..., str]:
+def message_handlers(fun: str) -> Callable[..., Awaitable[str]]:
     return {
-        "subscribe": subscribe,
+        "unsubscribe": unsubscribe,
     }.get(fun, handle_unknown)
 
 
-def subscribe() -> str:
-    return "Subscribed"
+async def unsubscribe(
+    subscriber: models_pb2.Subscriber,
+    subscribers_client: subscribers.Client,
+) -> str:  # noqa: WPS473
+    unsubscribe_status = await subscribers_client.unsubscribe(subscriber.id)
+    if unsubscribe_status:
+        return (
+            "You have unsubscribed from WhatsApp and will no longer receive"
+            " notifications regarding travel information. If you wish to resubscribe"
+            " please click the Subscribe button below."
+        )
+    raise RuntimeError("error while unsubscribing with id: {0}".format(subscriber.id))
 
 
-def handle_unknown() -> str:
+async def handle_unknown(
+    subscriber: models_pb2.Subscriber,
+    subscribers_client: subscribers.Client,
+) -> str:
     return "Sorry, didn't understand. Please try again"

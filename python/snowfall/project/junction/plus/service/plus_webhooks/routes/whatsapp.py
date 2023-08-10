@@ -31,7 +31,11 @@ class IncomingMessages(endpoints.HTTPEndpoint):
         )
         twiml_response = MessagingResponse()
         twiml_response.message(
-            await message_handler.handle_message(str(msg["Body"]), subscriber),
+            await message_handler.handle_message(
+                str(msg["Body"]),
+                subscriber,
+                subscribers_client,
+            ),
         )
         return responses.Response(
             content=twiml_response.to_xml(),

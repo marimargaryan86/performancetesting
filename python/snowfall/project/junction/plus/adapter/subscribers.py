@@ -29,6 +29,13 @@ class Client(abc.ABC):
     ) -> notifications_models_pb2.Subscriber:
         """Get Subscriber from reseller and phone."""
 
+    @abc.abstractmethod
+    async def unsubscribe(
+        self,
+        identifier: str,
+    ) -> bool:
+        """Unsubscribe subscriber."""
+
 
 class DictClient(Client):
     def __init__(
@@ -63,6 +70,19 @@ class DictClient(Client):
             raise errors.NotFoundError()
 
         return subscriber
+
+    async def unsubscribe(
+        self,
+        identifier: str,
+    ) -> bool:
+        subscriber = self._subscribers.get(identifier)
+        if not subscriber:
+            raise errors.NotFoundError()
+        subscriber.phone_subscription_status = (
+            notifications_models_pb2.Subscriber.SubscribedStatus.SUBSCRIBED_STATUS_UNSUBSCRIBED
+        )
+
+        return True
 
 
 class GrpcClient(Client):
@@ -104,3 +124,16 @@ class GrpcClient(Client):
             ),
         )
         return response.subscriber
+
+    async def unsubscribe(
+        self,
+        identifier: str,
+    ) -> bool:
+        response = await errors.handle_grpc_errors(
+            self._subscribers.Unsubscribe(
+                notifications_grpc_pb2.UnsubscribeRequest(
+                    identifier=identifier,
+                ),
+            ),
+        )
+        return response.is_success
