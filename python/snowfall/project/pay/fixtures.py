@@ -1,4 +1,5 @@
 import datetime
+import random
 
 from snowfall.project.pay.service.companies.v1alpha import (
     models_pb2 as company_model_pb2,
@@ -136,6 +137,19 @@ def generate_accountless_company(identifier: str) -> company_model_pb2.Company:
             region_code="US",
             locality="New York",
             revision=0,
+        ),
+        payment_method=protobuf.slug_to_enum_value(
+            company_model_pb2.PaymentMethod,
+            "transactional",
+        ),
+        payment_type=protobuf.slug_to_enum_value(
+            company_model_pb2.PaymentType,
+            "card",
+        ),
+        references=[string.uuid(), string.uuid()],
+        company_type=protobuf.slug_to_enum_value(
+            company_model_pb2.Company.Type,
+            random.choice(("reseller", "provider")),  # noqa: S311
         ),
     )
 

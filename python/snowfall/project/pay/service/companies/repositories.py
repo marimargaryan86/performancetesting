@@ -33,18 +33,46 @@ class CompaniesRepository(
     async def find_all(
         self,
         cursor: str | None,
+        filters: Sequence[str],
     ) -> resultset.ResultSet[models_pb2.Company]:
+        query = {
+            "company_type": {
+                "$in": [
+                    protobuf.slug_to_enum_value(
+                        models_pb2.Company.Type,
+                        company_type,
+                    )
+                    for company_type in filters
+                ],
+            },
+        }
         return await self._find_with_cursor(
             cur=cursor or "",
+            filter_=query,
         )
 
     async def find_accountless(
         self,
         cursor: str | None,
+        filters: Sequence[str],
     ) -> resultset.ResultSet[models_pb2.Company]:
+        query = {
+            "company_type": {
+                "$in": [
+                    protobuf.slug_to_enum_value(
+                        models_pb2.Company.Type,
+                        company_type,
+                    )
+                    for company_type in filters
+                ],
+            },
+        }
         return await self._find_with_cursor(
             cur=cursor or "",
-            filter_={"$or": [{"account_id": ""}, {"account_id": {"$exists": False}}]},
+            filter_={
+                "$or": [{"account_id": ""}, {"account_id": {"$exists": False}}],
+                **query,
+            },
         )
 
 

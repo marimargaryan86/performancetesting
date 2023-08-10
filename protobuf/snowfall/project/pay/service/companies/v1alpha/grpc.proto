@@ -104,6 +104,7 @@ message ListCompaniesRequest {
   int32 page_size = 1;
   string page_token = 2;
   bool is_accountless = 3;
+  repeated string filters = 4;
 }
 
 message ListCompaniesResponse {

@@ -116,14 +116,16 @@ class CompaniesService(
         if request.is_accountless:
             companies = await self._companies.find_accountless(
                 cursor=request.page_token,
+                filters=request.filters,
             )
         else:
             companies = await self._companies.find_all(
                 cursor=request.page_token,
+                filters=request.filters,
             )
 
         companies.limit(
-            request.page_size if request.page_size else self._default_page_size,
+            request.page_size or self._default_page_size,
         )
 
         return grpc_pb2.ListCompaniesResponse(

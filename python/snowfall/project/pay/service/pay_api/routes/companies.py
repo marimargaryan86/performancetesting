@@ -133,8 +133,13 @@ class AdminCompanies(endpoints.HTTPEndpoint):
         companies_client: companies_adapter.Client = lagom.injectable,
     ) -> models.JsonApiResponse:
         pagination = pagination_helpers.get_pagination(request)
+        filters = request.query_params.get(
+            "filter[type][eq]",
+            "reseller,provider",
+        ).split(",")
 
         response = await companies_client.find(
+            filters=filters,
             limit=pagination.limit or self._default_page_size,
             cursor=pagination.cursor,
         )

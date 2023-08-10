@@ -11,6 +11,7 @@ from snowfall.project.pay.service.companies.v1alpha import (
     models_pb2,
 )
 from snowfall.stdlib import sequence
+from snowfall.stdlib.format import protobuf
 
 
 class Client(abc.ABC):
@@ -29,6 +30,7 @@ class Client(abc.ABC):
     @abc.abstractmethod
     async def find(
         self,
+        filters: Sequence[str],
         limit: int | None = None,
         cursor: str | None = None,
     ) -> grpc_pb2.ListCompaniesResponse:
@@ -69,11 +71,24 @@ class DictClient(Client):
 
     async def find(
         self,
+        filters: Sequence[str],
         limit: int | None = None,
         cursor: str | None = None,
     ) -> grpc_pb2.ListCompaniesResponse:
+        filter_values = [
+            protobuf.slug_to_enum_value(
+                models_pb2.Company.Type,
+                company_type,
+            )
+            for company_type in filters
+        ]
+        companies = [
+            company
+            for company in self._companies.values()
+            if company.company_type in filter_values
+        ]
         page = sequence.paginate(
-            sequence=list(self._companies.values()),
+            sequence=companies,
             cursor=cursor,
             limit=limit,
         )
@@ -109,7 +124,10 @@ class GrpcClient(Client):
         self._companies = companies
         self._timeout = timeout
 
-    async def create(self, company: models_pb2.Company) -> models_pb2.Company:
+    async def create(
+        self,
+        company: models_pb2.Company,
+    ) -> models_pb2.Company:
         response = await errors.handle_grpc_errors(
             self._companies.CreateCompany(
                 grpc_pb2.CreateCompanyRequest(
@@ -144,12 +162,14 @@ class GrpcClient(Client):
 
     async def find(
         self,
+        filters: Sequence[str],
         limit: int | None = None,
         cursor: str | None = None,
     ) -> grpc_pb2.ListCompaniesResponse:
         # TODO: handle INVALID_ARGUMENT
         request = grpc_pb2.ListCompaniesRequest(
             page_token=cursor or "",
+            filters=filters,
         )
         if limit is not None:
             request.page_size = limit

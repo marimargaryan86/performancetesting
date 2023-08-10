@@ -1,5 +1,6 @@
 from collections.abc import Mapping, Sequence
 from typing import Any, cast
+from urllib.parse import ParseResult, urlparse
 
 import httpx
 from starlette import status
@@ -16,7 +17,15 @@ async def test_list_and_view_endpoints(
     expected_ids: Sequence[str],
     invalid_id: str = _NOT_FOUND,
 ) -> None:
-    url = "{0}?page[limit]=1".format(url)
+    url_parsed = urlparse(url)
+    url = ParseResult(
+        url_parsed.scheme,
+        url_parsed.netloc,
+        url_parsed.path,
+        url_parsed.params,
+        "{0}&page[limit]=1".format(url_parsed.query),
+        url_parsed.fragment,
+    ).geturl()
     resources: list[dict[str, Any]] = []
 
     while True:

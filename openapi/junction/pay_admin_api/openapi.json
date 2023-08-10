@@ -437,6 +437,9 @@
           },
           {
             "$ref": "#/components/parameters/page-limit"
+          },
+          {
+            "$ref": "#/components/parameters/filterCompaniesType"
           }
         ],
         "responses": {
@@ -2207,6 +2210,28 @@
           ]
         },
         "description": "Customize which related resources to return",
+        "style": "form",
+        "explode": false
+      },
+      "filterCompaniesType": {
+        "name": "filter[type][eq]",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "example": [
+            "reseller"
+          ],
+          "default": ["reseller", "provider"],
+          "items": {
+            "type": "string",
+            "enum": [
+              "reseller",
+              "provider"
+            ]
+          }
+        },
+        "description": "Filters companies based on the type",
         "style": "form",
         "explode": false
       },
