@@ -66,14 +66,10 @@ class ProviderChannel(Channel):
             trip_type = "round "
         if len(processed_bookings) > 1:
             counter = 1
-            message_ending = (
-                "\n\nTo check your *Trip Details*, please tap the button below"
-            )
         for journey in processed_bookings:
             if counter > 2:
-                message_ending = "\n\nAnd {0} more Journeys{1}".format(
+                message_ending = "\n\nAnd {0} more Journeys".format(
                     len(processed_bookings) - 2,
-                    message_ending,
                 )
                 break
             journey_details += (
@@ -99,6 +95,7 @@ class ProviderChannel(Channel):
                 + "\n\n*Booking Reference:* {0}".format(event.body.booking_reference)
                 + journey_details
                 + message_ending
+                + "\n\nTo check your *Trip Details*, please tap the button below"
             ),
         )
 
