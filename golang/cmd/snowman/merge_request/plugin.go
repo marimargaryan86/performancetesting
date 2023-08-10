@@ -106,6 +106,7 @@ func (plugin *MergeRequestPlugin) onTimer(pid int, iid int) {
 		wrapper.setReviewers,
 		wrapper.setAssignees,
 		wrapper.setStatus,
+		wrapper.informBreakingChanges,
 		wrapper.merge,
 	} {
 		if err = i(); err != nil {

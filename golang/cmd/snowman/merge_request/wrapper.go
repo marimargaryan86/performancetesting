@@ -123,6 +123,44 @@ func (mr *mergeRequest) projectLabels() ([]*gitlab.Label, error) {
 	return labels, g.Wait()
 }
 
+func (mr *mergeRequest) postComment(issue string, body string) error {
+	logger := mr.logger.With("issue", issue)
+	discussions, err := mr.discussions()
+
+	if err != nil {
+		return err
+	}
+
+	identifier := fmt.Sprintf("<!-- %s:%s -->", discussionPrefix, issue)
+
+	for _, discussion := range discussions {
+		for _, note := range discussion.Notes {
+			if strings.Contains(note.Body, identifier) {
+				logger.Debug("Comment already posted, skipping.")
+				return nil
+			}
+		}
+	}
+
+	fullBody := fmt.Sprintf("%s\n\n%s", body, identifier)
+	_, _, err = mr.client.Notes.CreateMergeRequestNote(
+		mr.object.ProjectID,
+		mr.object.IID,
+		&gitlab.CreateMergeRequestNoteOptions{
+			Body: &fullBody,
+		},
+	)
+
+	if err != nil {
+		return err
+	}
+
+	mr.hasChanged = true
+	logger.Info("Note posted.")
+
+	return nil
+}
+
 func (mr *mergeRequest) reportIssue(issue string, body string) error {
 	logger := mr.logger.With("issue", issue)
 	discussions, err := mr.discussions()
