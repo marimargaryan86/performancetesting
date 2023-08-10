@@ -33,6 +33,7 @@ class Refund(endpoints.HTTPEndpoint):
                 str(payload["refundedReseller"]["amount"]),
                 money.Currency(payload["refundedReseller"]["currency"]),
             ).protobuf(),
+            invoice_reference=payload["invoiceReference"],
         )
 
         return await messages.create_response(

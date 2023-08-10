@@ -22,4 +22,5 @@ message Refund {
   snowfall.stdlib.v1.Money refunded_us_in_payer_currency = 8;
   snowfall.stdlib.v1.Money refunded_reseller = 9;
   snowfall.stdlib.v1.Money refund_position = 10;
+  string invoice_reference = 11;
 }

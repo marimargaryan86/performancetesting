@@ -161,6 +161,7 @@ class RefundsService(  # noqa: WPS214
 
         refund.status = models_pb2.Refund.Status.STATUS_EXECUTED  # type: ignore[union-attr]
         refund.conversion_id = conversion_id  # type: ignore[union-attr]
+        refund.invoice_reference = request.invoice_reference  # type: ignore[union-attr]
         refund.refunded_us_in_payer_currency.CopyFrom(  # type: ignore[union-attr]
             money.from_string(
                 detailed_rate.client_buy_amount,

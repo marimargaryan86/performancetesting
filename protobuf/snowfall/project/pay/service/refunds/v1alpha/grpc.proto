@@ -37,6 +37,7 @@ message UpdateRefundRequest {
   string refund_id = 1;
   snowfall.stdlib.v1.Money refunded_by_provider = 2;
   snowfall.stdlib.v1.Money refunded_to_reseller = 3;
+  string invoice_reference = 4;
 }
 
 message UpdateRefundResponse {

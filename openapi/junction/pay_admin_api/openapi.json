@@ -3834,7 +3834,8 @@
                   "refundReceived",
                   "note",
                   "refundedUs",
-                  "refundedReseller"
+                  "refundedReseller",
+                  "invoiceReference"
                 ],
                 "properties": {
                   "status": {
@@ -3883,6 +3884,11 @@
                       }
                     ],
                     "description": "The amount, we pay to reseller"
+                  },
+                  "invoiceReference": {
+                    "type": "string",
+                    "maxLength": 256,
+                    "example": "0c1345da-3465-11ee-be56-0242ac120002"
                   }
                 }
               },

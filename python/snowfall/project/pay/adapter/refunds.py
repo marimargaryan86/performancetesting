@@ -32,6 +32,7 @@ class Client(abc.ABC):
         identifier: str,
         refunded_by_provider: money_pb2.Money,
         refunded_to_reseller: money_pb2.Money,
+        invoice_reference: str,
     ) -> models_pb2.Refund:
         """Update a refund resource."""
 
@@ -77,6 +78,7 @@ class DictClient(Client):
         identifier: str,
         refunded_by_provider: money_pb2.Money,
         refunded_to_reseller: money_pb2.Money,
+        invoice_reference: str,
     ) -> models_pb2.Refund:
         return self._refunds[identifier]
 
@@ -159,6 +161,7 @@ class GrpcClient(Client):
         identifier: str,
         refunded_by_provider: money_pb2.Money,
         refunded_to_reseller: money_pb2.Money,
+        invoice_reference: str,
     ) -> models_pb2.Refund:
         return (
             await self._refunds.UpdateRefund(
@@ -166,6 +169,7 @@ class GrpcClient(Client):
                     refund_id=identifier,
                     refunded_by_provider=refunded_by_provider,
                     refunded_to_reseller=refunded_to_reseller,
+                    invoice_reference=invoice_reference,
                 ),
                 timeout=self._timeout,
             )
