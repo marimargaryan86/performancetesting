@@ -12,6 +12,10 @@ def company() -> company_models.Company:
         fx_markup=0.4,
         processing_markup=0.2,
         sales_markup=float(1),
+        reseller_markups=[
+            money.Money(200, money.Currency("GBP")).protobuf(),  # noqa: WPS432
+            money.Money(100, money.Currency("EUR")).protobuf(),  # noqa: WPS432
+        ],
     )
 
 
@@ -34,7 +38,7 @@ async def test_same_currencies(
     assert money.from_protobuf(quote.amounts.quotation).amount == expected_amount.amount
 
 
-async def test_calculation(
+async def test_calculation(  # noqa: WPS218
     company: company_models.Company,
 ) -> None:
     expected_amounts = {
@@ -43,6 +47,8 @@ async def test_calculation(
         "base_converted": money.Money(116000, money.Currency("EUR")).amount,
         "fx_margin": money.Money(464, money.Currency("EUR")).amount,
         "processing_margin": money.Money(232, money.Currency("EUR")).amount,
+        "service_markup": money.Money(1856, money.Currency("EUR")).amount,
+        "total_markups": money.Money(1972, money.Currency("EUR")).amount,
     }
 
     quote = Quote(
@@ -75,4 +81,12 @@ async def test_calculation(
     assert (
         money.from_protobuf(quote.amounts.processing_margin).amount
         == expected_amounts["processing_margin"]
+    )
+    assert (
+        money.from_protobuf(quote.amounts.service_markup).amount
+        == expected_amounts["service_markup"]
+    )
+    assert (
+        money.from_protobuf(quote.amounts.total_markups).amount
+        == expected_amounts["total_markups"]
     )

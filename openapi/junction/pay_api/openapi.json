@@ -667,6 +667,15 @@
                     "description": "Sum of all markups",
                     "readOnly": true
                   },
+                  "serviceMarkup": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/MoneyAmount"
+                      }
+                    ],
+                    "description": "Sum of all markups",
+                    "readOnly": true
+                  },
                   "totalAmount": {
                     "allOf": [
                       {
@@ -704,6 +713,7 @@
                   "amount",
                   "totalAmount",
                   "totalMarkups",
+                  "serviceMarkup",
                   "resellerMarkup",
                   "leadCompanyMarkup"
                 ]

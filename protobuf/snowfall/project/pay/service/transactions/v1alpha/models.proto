@@ -21,6 +21,7 @@ message QuotationAmounts {
   snowfall.stdlib.v1.Money reseller_markup = 10;
   snowfall.stdlib.v1.Money lead_reseller_markup = 11;
   snowfall.stdlib.v1.Money tax = 12;
+  snowfall.stdlib.v1.Money service_markup = 13;
 }
 
 message QuotationRates {

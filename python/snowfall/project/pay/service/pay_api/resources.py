@@ -42,6 +42,9 @@ class QuoteResource(models.Resource):
                 "totalMarkups": money.from_protobuf(
                     quotation.amounts.total_markups,
                 ).amount,
+                "serviceMarkup": money.from_protobuf(
+                    quotation.amounts.service_markup,
+                ).amount,
                 "totalAmount": money.from_protobuf(
                     quotation.amounts.total_amount,
                 ).amount,

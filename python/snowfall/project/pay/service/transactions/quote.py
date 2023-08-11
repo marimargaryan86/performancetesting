@@ -56,6 +56,7 @@ class Quote(object):
                 ].protobuf(),
                 tax_converted=self._quotation_amounts["tax_converted"].protobuf(),
                 total_markups=self._quotation_amounts["total_markups"].protobuf(),
+                service_markup=self._quotation_amounts["service_markup"].protobuf(),
                 total_amount=self._quotation_amounts["total_amount"].protobuf(),
                 reseller_markup=self._reseller_markup.protobuf(),
                 lead_reseller_markup=self._lead_company_markup.protobuf(),
@@ -110,11 +111,17 @@ class Quote(object):
                 Decimal(self._company.processing_markup / 100),
             )
 
-        total_markups = money.total(
+        service_markup = money.total(
             [
                 fx_margin,
                 processing_margin,
                 sales_margin,
+            ],
+        )
+
+        total_markups = money.total(
+            [
+                service_markup,
                 self._reseller_markup.convert(self._to_currency, rate),
                 self._lead_company_markup.convert(
                     self._to_currency,
@@ -131,6 +138,7 @@ class Quote(object):
             "processing_margin": processing_margin,
             "tax_converted": tax_converted,
             "total_markups": total_markups,
+            "service_markup": service_markup,
             "total_amount": money.total(
                 [
                     base_converted,
