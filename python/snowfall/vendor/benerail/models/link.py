@@ -5,7 +5,7 @@ from snowfall.vendor.benerail.models.enums import Format, RequestType
 
 
 class ResourceLink(BenerailBaseModel):
-    href: AnyUrl | None = Field(None, description="callable url")
+    href: AnyUrl
     title: str | None = Field(
         None,
         description="human-readable string representing the linked resource",
@@ -13,7 +13,7 @@ class ResourceLink(BenerailBaseModel):
 
 
 class LinkToRcode(BenerailBaseModel):
-    href: AnyUrl | None = Field(None, description="callable url")
+    href: AnyUrl
     link_value: AnyUrl | None = Field(
         None,
         description="eg. urn:bnds:railteam_flexibility:MF",
@@ -22,7 +22,7 @@ class LinkToRcode(BenerailBaseModel):
 
 
 class RcodeLink(BenerailBaseModel):
-    href: AnyUrl | None = Field(None, description="callable url")
+    href: AnyUrl
     link_value: ConstrainedStr | None = Field(
         None,
         description="eg. urn:bnds:railteam_flexibility:MF",
@@ -32,7 +32,7 @@ class RcodeLink(BenerailBaseModel):
 
 
 class Link(BenerailBaseModel):
-    href: AnyUrl | None = None
+    href: AnyUrl
     title: str | None = None
     rel: str | None = None
     link_type: RequestType | None = Field(
@@ -56,6 +56,6 @@ class Supplier(BenerailBaseModel):
 
 
 class LinkToBinary(BenerailBaseModel):
-    href: AnyUrl | None = Field(None, description="callable url")
+    href: AnyUrl
     title: str | None = Field(None, description="Info on referred value")
     link_format: Format | None = Field(None, alias="format")

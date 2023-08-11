@@ -96,7 +96,7 @@ class PassengerRequest(BenerailBaseModel):
 
 
 class Passenger(BenerailBaseModel):
-    identifier: str | None = Field(None, alias="id")
+    identifier: str = Field(..., alias="id")
     external_reference: str | None = Field(
         None,
         description="For consumer use. Field will not be evaluated.",

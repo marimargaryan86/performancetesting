@@ -26,6 +26,7 @@ class TripsClient(base.BenerailBaseClient):
     async def get_trip_info(
         self,
         trip_id: str,
+        session_token: str | None = None,
     ) -> trip_response.GetTripResponse:
         response = await self._make_request(
             client.RequestOptions(
@@ -34,7 +35,7 @@ class TripsClient(base.BenerailBaseClient):
                     prefix=_BASE_PATH,
                     trip_id=trip_id,
                 ),
-                headers=self._get_headers(),
+                headers=self._get_headers(session_token=session_token),
             ),
         )
 

@@ -2,7 +2,7 @@ import pydantic
 
 
 class PlaceUrnStr(pydantic.ConstrainedStr):
-    regex = "^urn:[a-z]*:tstatn_id:[A-Z_]*$"
+    regex = "^urn:[a-z]*:tstatn_id:[A-Z_0-9]*$"
 
 
 class ZonedDatetimeStr(pydantic.ConstrainedStr):

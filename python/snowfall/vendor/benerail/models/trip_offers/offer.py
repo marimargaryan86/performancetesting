@@ -1,43 +1,27 @@
-from pydantic import AnyUrl, ConstrainedStr, Field
+from pydantic import Field
 
 from snowfall.vendor.benerail.models.base import BenerailBaseModel
-from snowfall.vendor.benerail.models.bookings.enums import Optionality, Severity
+from snowfall.vendor.benerail.models.bookings.enums import Severity
 from snowfall.vendor.benerail.models.bookings.payment import Price
 from snowfall.vendor.benerail.models.bookings.train import Flexibility
-from snowfall.vendor.benerail.models.link import ResourceLink
 from snowfall.vendor.benerail.models.products.product import ComfortClass
+from snowfall.vendor.benerail.models.trip_offers.features import Admission, Reservation
+from snowfall.vendor.benerail.models.trip_offers.link import (
+    OfferPartResourceLink,
+    PassengerResourceLink,
+    ProductResourceLink,
+    TripResourceLink,
+)
 
 
 class Offer(BenerailBaseModel):
-    identifier: str | None = Field(None, alias="id")
-    offer_parts: list[ResourceLink]
-    price: Price | None = None
+    identifier: str = Field(..., alias="id")
+    offer_parts: list[OfferPartResourceLink]
+    price: Price
     flexibility: Flexibility | None = None
     comfort_class: ComfortClass | None = None
-    trip: ResourceLink
-    passengers: list[ResourceLink]
-
-
-class Reservation(BenerailBaseModel):
-    reservation_type: str | None = Field(
-        None,
-        description="reservation",
-        example="reservation",
-        alias="type",
-    )
-    admission: ResourceLink | None = None
-    optionality: Optionality | None = None
-
-
-class Admission(BenerailBaseModel):
-    admission_type: str | None = Field(
-        None,
-        description="admission",
-        example="admission",
-        alias="type",
-    )
-    reservations: list[ResourceLink] | None = None
-    is_reservation_required: bool | None = None
+    trip: TripResourceLink
+    passengers: list[PassengerResourceLink]
 
 
 class OfferPartCommon(BenerailBaseModel):
@@ -45,8 +29,8 @@ class OfferPartCommon(BenerailBaseModel):
     price: Price | None = None
     flexibility: Flexibility | None = None
     comfort_class: ComfortClass | None = None
-    product: ResourceLink | None = None
-    passengers: list[ResourceLink] | None = None
+    product: ProductResourceLink | None = None
+    passengers: list[PassengerResourceLink] | None = None
     trip_leg_sequence: int | None = None
     is_required_in_offer: bool | None = None
 
@@ -60,16 +44,3 @@ class OfferPart(BenerailBaseModel):
 class Message(BenerailBaseModel):
     severity: Severity | None = None
     message: str | None = None
-
-
-class BookableStatus(BenerailBaseModel):
-    href: AnyUrl | None = Field(
-        None,
-        example="https://api.example.com/places/urn:bnds:bookable_status:BOOKABLE",
-    )
-    status_value: ConstrainedStr | None = Field(
-        None,
-        example="urn:bnds:bookable_status:BOOKABLE",
-        alias="value",
-        regex="^urn:[a-z]*:bookable_status:[A-Z_]*$",
-    )

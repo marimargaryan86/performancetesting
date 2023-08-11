@@ -2,8 +2,8 @@ from pydantic import Field
 
 from snowfall.vendor.benerail.models.base import BenerailBaseModel
 from snowfall.vendor.benerail.models.bookings.train import TrainType
-from snowfall.vendor.benerail.models.link import ResourceLink
 from snowfall.vendor.benerail.models.place import Place
+from snowfall.vendor.benerail.models.trip_offers.link import TripResourceLink
 
 
 class TripCo2Info(BenerailBaseModel):
@@ -16,7 +16,7 @@ class TripCo2Info(BenerailBaseModel):
 
 
 class TransferLeg(BenerailBaseModel):
-    transfer_leg_type: str = Field(..., description="transferLeg", alias="type")
+    leg_type: str = Field(..., description="transferLeg", alias="type")
     seq_id: float
     origin: Place
     destination: Place
@@ -24,8 +24,8 @@ class TransferLeg(BenerailBaseModel):
 
 
 class TimedLeg(BenerailBaseModel):
-    timed_leg_type: str = Field(..., description="TimedLeg", alias="type")
-    seq_d: float
+    leg_type: str = Field(..., description="TimedLeg", alias="type")
+    seq_id: float
     origin: Place
     destination: Place
     departure_at: str = Field(
@@ -66,9 +66,9 @@ class Trip(BenerailBaseModel):
         example=1,
     )
     co2_info: TripCo2Info | None = None
-    trip_legs: list[TimedLeg | TransferLeg] | None = None
+    trip_legs: list[TimedLeg | TransferLeg]
 
 
 class TripCollection(BenerailBaseModel):
     identifier: str | None = Field(None, alias="id")
-    trips: list[ResourceLink] | None = None
+    trips: list[TripResourceLink] | None = None

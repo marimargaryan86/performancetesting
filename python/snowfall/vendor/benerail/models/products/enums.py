@@ -5,11 +5,16 @@ class OrderStates(Enum):
     created = "created"
     info_required = "info_required"
     bookable = "bookable"
+    prebooked = "prebooked"
+    prerefunded = "prerefunded"
+    refunded_settlement_pending = "refunded_settlement_pending"
     provisional = "provisional"
     payment_pending = "payment_pending"
     confirmed = "confirmed"
     aborted = "aborted"
     order_error = "error"
+    ticketed = "ticketed"
+    cancelled = "cancelled"
 
 
 class ServiceClassType(Enum):

@@ -1,0 +1,39 @@
+{
+    "metadata": {
+        "apiVersion": "0.11.05",
+        "buildVersion": "mr62.0",
+        "environment": "accept-c02",
+        "respondedAt": "2023-03-29T14:35:18.428+02:00",
+        "resourceType": "TripFilter"
+    },
+    "result": {
+        "id": "00000000-0000-0000-0000-000000000000",
+        "origin": {
+            "href": "https://benerail-stg-apim.azure-api.net/rcode/rcode/value/urn:bnds:tstatn_id:BEBMI",
+            "value": "urn:bnds:tstatn_id:BEBMI"
+        },
+        "destination": {
+            "href": "https://benerail-stg-apim.azure-api.net/rcode/rcode/value/urn:bnds:tstatn_id:FRPNO",
+            "value": "urn:bnds:tstatn_id:FRPNO"
+        },
+        "departureDateTime": "2023-03-30T12:42:00Z",
+        "tripCollection": {
+            "href": "https://benerail-stg-apim.azure-api.net/trips/trip-collections/9ef30e58dbbfad0198b55120c9dbd880444c1ba44cbf9a45d86e8d7defb6892b",
+            "title": "Trip Collection"
+        }
+    },
+    "links": [
+        {
+            "href": "https://benerail-stg-apim.azure-api.net/dialogue-engine/dialogues/5b782519-2aa7-4e67-abb6-f29cfb910157",
+            "title": "Parent dialogue",
+            "rel": "parent",
+            "type": "GET"
+        },
+        {
+            "href": "https://benerail-stg-apim.azure-api.net/dialogue-engine/dialogues/5b782519-2aa7-4e67-abb6-f29cfb910157/trip-filters/9ef30e58dbbfad0198b55120c9dbd880444c1ba44cbf9a45d86e8d7defb6892b",
+            "title": "Self link",
+            "rel": "self",
+            "type": "GET"
+        }
+    ]
+}

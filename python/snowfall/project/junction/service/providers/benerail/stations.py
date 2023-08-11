@@ -15,16 +15,14 @@ from snowfall.vendor.benerail import client
 from snowfall.vendor.benerail.models.enumeration import position, response
 
 
-async def dump_stations(app: service.Application[config.DumpStationsSettings]) -> None:
+async def dump_stations(
+    app: service.Application[config.DumpStationsSettings],
+) -> None:
     settings = app.settings
 
     async with httpx.AsyncClient(
         timeout=int(settings.api_timeout.total_seconds()),
-        cert=(
-            str(settings.cert_path),
-            str(settings.private_key_path),
-            settings.private_key_password,
-        ),
+        cert=config.cert_tmp_path(settings.cert_base64),
     ) as http_client:
         logging.register(http_client)
         metrics.register(http_client)

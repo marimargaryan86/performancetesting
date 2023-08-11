@@ -18,17 +18,17 @@ class GetOfferPartResponse(BenerailBaseModel):
 
 class GetOfferResponse(BenerailBaseModel):
     metadata: Metadata | None = None
-    response_result: Offer | None = Field(None, alias="result")
+    response_result: Offer = Field(..., alias="result")
     links: list[Link] | None = None
 
 
 class GetTripOfferResponse(BenerailBaseModel):
     metadata: Metadata | None = None
-    response_result: TripOffer | None = Field(None, alias="result")
+    response_result: TripOffer = Field(..., alias="result")
     links: list[Link] | None = None
 
 
 class GetTripOfferCollectionResponse(BenerailBaseModel):
     metadata: Metadata | None = None
-    response_result: TripOfferCollection | None = Field(None, alias="result")
-    links: list[Link] | None = None
+    response_result: TripOfferCollection = Field(..., alias="result")
+    links: list[Link]

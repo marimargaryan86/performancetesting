@@ -39,7 +39,4 @@ class Place(BenerailBaseModel):
         None,
         example="https://api.example.com/places/urn:bnds:tstatn_id:NLASC",
     )
-    place_value: types.PlaceUrnStr | None = Field(
-        None,
-        alias="value",
-    )
+    place_value: types.PlaceUrnStr = Field(..., alias="value")

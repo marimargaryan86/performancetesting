@@ -1,0 +1,56 @@
+{
+    "metadata": {
+        "apiVersion": "0.11.05",
+        "buildVersion": "mr62.0",
+        "environment": "accept-c02",
+        "respondedAt": "2023-03-29T14:29:20.055+02:00",
+        "resourceType": "Passenger",
+        "resourceEtag": "fd03d4a4655899f07e35558edf85a607"
+    },
+    "result": {
+        "id": "00000000-0000-0000-0000-000000000000",
+        "dateOfBirth": "1993-03-10",
+        "cards": [],
+        "corporateContracts": [],
+        "details": {
+            "preferredLanguage": "EN",
+            "title": "Mr.",
+            "firstName": "John",
+            "lastName": "Massis",
+            "email": "john.massis@example.com",
+            "phoneNumber": "32475123456"
+        }
+    },
+    "links": [
+        {
+            "href": "https://benerail-stg-apim.azure-api.net/dialogue-engine/dialogues/5b782519-2aa7-4e67-abb6-f29cfb910157",
+            "title": "Parent dialogue",
+            "rel": "parent",
+            "type": "GET"
+        },
+        {
+            "href": "https://benerail-stg-apim.azure-api.net/dialogue-engine/dialogues/5b782519-2aa7-4e67-abb6-f29cfb910157/passengers/650cef10-9320-4907-a70c-0e08e42d5b63",
+            "title": "John Massis 1993-03-10",
+            "rel": "self",
+            "type": "GET"
+        },
+        {
+            "href": "https://benerail-stg-apim.azure-api.net/dialogue-engine/dialogues/5b782519-2aa7-4e67-abb6-f29cfb910157/passengers/650cef10-9320-4907-a70c-0e08e42d5b63",
+            "title": "John Massis 1993-03-10",
+            "rel": "self",
+            "type": "PATCH"
+        },
+        {
+            "href": "https://benerail-stg-apim.azure-api.net/dialogue-engine/dialogues/5b782519-2aa7-4e67-abb6-f29cfb910157/passengers/650cef10-9320-4907-a70c-0e08e42d5b63",
+            "title": "John Massis 1993-03-10",
+            "rel": "self",
+            "type": "PUT"
+        },
+        {
+            "href": "https://benerail-stg-apim.azure-api.net/dialogue-engine/dialogues/5b782519-2aa7-4e67-abb6-f29cfb910157/passengers/650cef10-9320-4907-a70c-0e08e42d5b63",
+            "title": "John Massis 1993-03-10",
+            "rel": "self",
+            "type": "DELETE"
+        }
+    ]
+}

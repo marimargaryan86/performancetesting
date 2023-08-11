@@ -6,7 +6,7 @@ from snowfall.vendor.benerail.models.products.enums import OrderStates
 
 
 class Order(BenerailBaseModel):
-    identifier: str | None = Field(None, alias="id")
+    identifier: str = Field(..., alias="id")
     booking_id: str | None = None
     payment_initiated: bool | None = None
     state: OrderStates | None = None

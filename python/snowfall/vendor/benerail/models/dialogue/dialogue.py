@@ -1,3 +1,5 @@
+import datetime
+
 from pydantic import Field
 
 from snowfall.vendor.benerail.models import types
@@ -35,11 +37,10 @@ class DialogueIdTripofferfiltersBody(BenerailBaseModel):
     return_trip_params: DialogueIdTripOfferFiltersReturnTripParams | None = None
     market_segment: str | None = None
     requested_offer_parts: RequestedOfferParts | None = None
-    etag: str | None = None
 
 
 class Dialogue(BenerailBaseModel):
-    identifier: str | None = Field(None, description="id of the dialogue", alias="id")
+    identifier: str = Field(..., description="id of the dialogue", alias="id")
     external_id: str | None = Field(
         None,
         description="For consumer use. Field will not be evaluated.",
@@ -62,3 +63,8 @@ class Dialogue(BenerailBaseModel):
     trip_offer_filters: list[ResourceLink] | None = None
     booking: ResourceLink | None = None
     booker: ResourceLink | None = None
+
+
+class DialogueCreateSearchRequest(BenerailBaseModel):
+    body: DialogueIdTripfiltersBody
+    passenger_dob: list[datetime.date]

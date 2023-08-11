@@ -8,7 +8,7 @@ from snowfall.vendor.benerail.models.trips.trips import Trip, TripCollection
 
 class GetTripResponse(BenerailBaseModel):
     metadata: Metadata | None
-    response_result: Trip | None = Field(..., alias="result")
+    response_result: Trip = Field(..., alias="result")
     links: list[Link] | None
 
 

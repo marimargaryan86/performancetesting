@@ -34,9 +34,9 @@ class Fulfillment(BenerailBaseModel):
 
 
 class Booking(BenerailBaseModel):
-    identifier: str | None = Field(None, alias="id")
-    dialogue_id: str | None = None
-    dnr: str | None = None
+    identifier: str = Field(..., alias="id")
+    dialogue_id: str
+    dnr: str
     orders: list[ResourceLink] | None = None
     fulfillments: list[ResourceLink] | None = None
 

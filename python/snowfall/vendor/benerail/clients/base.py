@@ -24,7 +24,11 @@ class BenerailBaseClient(client.HttpClient):
             ),
         }
 
-    def _get_headers(self, etag: str | None = None) -> dict[str, str]:
+    def _get_headers(
+        self,
+        etag: str | None = None,
+        session_token: str | None = None,
+    ) -> dict[str, str]:
         headers = {
             **self._auth_headers,
             "Content-Type": "application/json",
@@ -32,5 +36,8 @@ class BenerailBaseClient(client.HttpClient):
 
         if etag:
             headers["If-Match"] = etag
+
+        if session_token:
+            headers["x-bnds-user-token"] = session_token
 
         return headers

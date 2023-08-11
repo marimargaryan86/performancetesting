@@ -1,3 +1,5 @@
+import enum
+
 from pydantic import AnyUrl, ConstrainedStr, Field
 
 from snowfall.vendor.benerail.models.base import BenerailBaseModel
@@ -5,30 +7,34 @@ from snowfall.vendor.benerail.models.bookings.enums import PaymentStates
 from snowfall.vendor.benerail.models.regex import UrlRegex
 
 
+class PaymentMethod(enum.Enum):
+    ac = "urn:itti:form_of_payment:AC"
+
+
+class PaymentMethodProp(ConstrainedStr):
+    regex = "^urn:[a-z]*:form_of_payment:[A-Z]*$"
+
+
 class FormOfPaymentURN(BenerailBaseModel):
-    __root__: ConstrainedStr = Field(
-        ...,
-        example="urn:itti:form_of_payment:AC",
-        regex="^urn:[a-z]*:form_of_payment:[A-Z]*$",
-    )
+    __root__: PaymentMethodProp
 
 
 class Price(BenerailBaseModel):
-    amount: float | None = Field(
-        None,
+    amount: float = Field(
+        ...,
         description="the number of decimals show the accuracy",
     )
-    currency: str | None = Field(None, example="EUR")
+    currency: str = Field(..., example="EUR")
 
 
 class PaymentIdBody(BenerailBaseModel):
-    payment_method: FormOfPaymentURN
+    payment_method: PaymentMethodProp
     amount: Price | None = None
     state: PaymentStates | None = None
 
 
 class OrderIdPaymentsBody(BenerailBaseModel):
-    payment_method: FormOfPaymentURN
+    payment_method: PaymentMethodProp
     amount: Price | None = None
     additional_info: dict[str, str] | None = None
     payment_webhook: UrlRegex | None = Field(
@@ -42,16 +48,14 @@ class FormOfPayment(BenerailBaseModel):
         None,
         example="https://api.example.com/places/urn:itti:form_of_payment:AC",
     )
-    payment_value: ConstrainedStr | None = Field(
+    payment_value: PaymentMethodProp | None = Field(
         None,
-        example="urn:itti:form_of_payment:AC",
         alias="value",
-        regex="^urn:[a-z]*:form_of_payment:[A-Z]*$",
     )
 
 
 class Payment(BenerailBaseModel):
-    identifier: str | None = Field(None, alias="id")
+    identifier: str = Field(..., alias="id")
     booking_id: str | None = None
     order_id: str | None = None
     payment_method: FormOfPayment | None = None

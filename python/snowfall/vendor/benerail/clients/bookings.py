@@ -14,23 +14,27 @@ class BookingsClient(base.BenerailBaseClient):  # noqa: WPS214
         self,
         dialogue_id: str,
         etag: str,
+        session_token: str | None = None,
     ) -> booking_response.GetBookingResponse:
         response = await self._make_request(
             client.RequestOptions(
                 method="POST",
-                path="{dialogue_prefix}/{dialogue_id}/booking".format(
-                    dialogue_prefix=_BASE_PATH,
+                path="/dialogue-engine/dialogues/{dialogue_id}/booking".format(
                     dialogue_id=dialogue_id,
                 ),
-                headers=self._get_headers(etag),
+                headers=self._get_headers(etag, session_token),
             ),
         )
 
-        return booking_response.GetBookingResponse(**response.json())
+        return booking_response.GetBookingResponse(
+            **response.json(),
+            dialogue_etag=response.headers.get("etag"),
+        )
 
     async def get_booking(
         self,
         booking_id: str,
+        session_token: str | None = None,
     ) -> booking_response.GetBookingResponse:
         response = await self._make_request(
             client.RequestOptions(
@@ -39,16 +43,20 @@ class BookingsClient(base.BenerailBaseClient):  # noqa: WPS214
                     base_path=_BASE_PATH,
                     booking_id=booking_id,
                 ),
-                headers=self._get_headers(),
+                headers=self._get_headers(session_token=session_token),
             ),
         )
 
-        return booking_response.GetBookingResponse(**response.json())
+        return booking_response.GetBookingResponse(
+            **response.json(),
+            dialogue_etag=response.headers.get("etag"),
+        )
 
     async def create_order(
         self,
         booking_id: str,
         etag: str,
+        session_token: str | None = None,
     ) -> booking_response.GetOrderResponse:
         response = await self._make_request(
             client.RequestOptions(
@@ -57,11 +65,14 @@ class BookingsClient(base.BenerailBaseClient):  # noqa: WPS214
                     base_path=_BASE_PATH,
                     booking_id=booking_id,
                 ),
-                headers=self._get_headers(etag),
+                headers=self._get_headers(etag, session_token),
             ),
         )
 
-        return booking_response.GetOrderResponse(**response.json())
+        return booking_response.GetOrderResponse(
+            **response.json(),
+            booking_etag=response.headers.get("etag", "").replace('"', ""),
+        )
 
     async def booking_products(
         self,
@@ -182,6 +193,7 @@ class BookingsClient(base.BenerailBaseClient):  # noqa: WPS214
         self,
         booking_id: str,
         fulfillment_id: str,
+        etag: str,
     ) -> booking_response.GetFulfillmentResponse:
         response = await self._make_request(
             client.RequestOptions(
@@ -197,11 +209,14 @@ class BookingsClient(base.BenerailBaseClient):  # noqa: WPS214
                         ),
                     ],
                 ),
-                headers=self._get_headers(),
+                headers=self._get_headers(etag),
             ),
         )
 
-        return booking_response.GetFulfillmentResponse(**response.json())
+        return booking_response.GetFulfillmentResponse(
+            **response.json(),
+            booking_etag=response.headers.get("etag", "").replace('"', ""),
+        )
 
     async def get_refund_offer(
         self,
@@ -255,7 +270,10 @@ class OrdersClient(base.BenerailBaseClient):
             ),
         )
 
-        return booking_response.GetOrderResponse(**response.json())
+        return booking_response.GetOrderResponse(
+            **response.json(),
+            booking_etag=response.headers.get("etag", "").replace('"', ""),
+        )
 
     async def delete_order(
         self,
@@ -281,12 +299,13 @@ class OrdersClient(base.BenerailBaseClient):
 
         return response.status_code == http.HTTPStatus.NO_CONTENT
 
-    async def update_order_state(
+    async def update_order_state(  # noqa: WPS211
         self,
         booking_id: str,
         order_id: str,
         etag: str,
         body: order.OrderIdBody,
+        session_token: str | None = None,
     ) -> booking_response.GetOrderResponse:
         response = await self._make_request(
             client.RequestOptions(
@@ -300,19 +319,23 @@ class OrdersClient(base.BenerailBaseClient):
                         "/orders/{order_id}".format(order_id=order_id),
                     ],
                 ),
-                headers=self._get_headers(etag),
+                headers=self._get_headers(etag, session_token),
                 payload=body.dict(by_alias=True, exclude_unset=True),
             ),
         )
 
-        return booking_response.GetOrderResponse(**response.json())
+        return booking_response.GetOrderResponse(
+            **response.json(),
+            booking_etag=response.headers.get("etag", "").replace('"', ""),
+        )
 
-    async def add_selected_offer_to_order(
+    async def add_selected_offer_to_order(  # noqa: WPS211
         self,
         booking_id: str,
         order_id: str,
         etag: str,
         body: offer.SelectedOffersBody,
+        session_token: str | None = None,
     ) -> booking_response.GetSelectedOfferResponse:
         response = await self._make_request(
             client.RequestOptions(
@@ -327,12 +350,15 @@ class OrdersClient(base.BenerailBaseClient):
                         "/selected-offers",
                     ],
                 ),
-                headers=self._get_headers(etag),
+                headers=self._get_headers(etag, session_token),
                 payload=body.dict(by_alias=True, exclude_unset=True),
             ),
         )
 
-        return booking_response.GetSelectedOfferResponse(**response.json())
+        return booking_response.GetSelectedOfferResponse(
+            **response.json(),
+            order_etag=response.headers.get("etag").replace('"', ""),
+        )
 
     async def remove_selected_offer_from_order(
         self,
@@ -510,12 +536,13 @@ class SelectedOffersClient(base.BenerailBaseClient):
 
 
 class PaymentsClient(base.BenerailBaseClient):
-    async def create_payment_info_for_order(
+    async def create_payment_info_for_order(  # noqa: WPS211
         self,
         booking_id: str,
         order_id: str,
         etag: str,
         body: payment.OrderIdPaymentsBody,
+        session_token: str | None = None,
     ) -> booking_response.GetPaymentResourceResponse:
         response = await self._make_request(
             client.RequestOptions(
@@ -529,12 +556,15 @@ class PaymentsClient(base.BenerailBaseClient):
                         "/orders/{order_id}/payments".format(order_id=order_id),
                     ],
                 ),
-                headers=self._get_headers(etag),
+                headers=self._get_headers(etag, session_token),
                 payload=body.dict(by_alias=True, exclude_unset=True),
             ),
         )
 
-        return booking_response.GetPaymentResourceResponse(**response.json())
+        return booking_response.GetPaymentResourceResponse(
+            **response.json(),
+            order_etag=response.headers.get("etag").replace('"', ""),
+        )
 
     async def get_payment_resource(
         self,
@@ -559,7 +589,10 @@ class PaymentsClient(base.BenerailBaseClient):
             ),
         )
 
-        return booking_response.GetPaymentResourceResponse(**response.json())
+        return booking_response.GetPaymentResourceResponse(
+            **response.json(),
+            order_etag=response.headers.get("etag").replace('"', ""),
+        )
 
     async def confirm_order_payment(  # noqa: WPS211
         self,
@@ -568,6 +601,7 @@ class PaymentsClient(base.BenerailBaseClient):
         payment_id: str,
         etag: str,
         body: payment.PaymentIdBody,
+        session_token: str | None = None,
     ) -> booking_response.GetPaymentResourceResponse:
         response = await self._make_request(
             client.RequestOptions(
@@ -582,9 +616,12 @@ class PaymentsClient(base.BenerailBaseClient):
                         "/payments/{payment_id}".format(payment_id=payment_id),
                     ],
                 ),
-                headers=self._get_headers(etag),
+                headers=self._get_headers(etag, session_token),
                 payload=body.dict(by_alias=True, exclude_unset=True),
             ),
         )
 
-        return booking_response.GetPaymentResourceResponse(**response.json())
+        return booking_response.GetPaymentResourceResponse(
+            **response.json(),
+            order_etag=response.headers.get("etag").replace('"', ""),
+        )

@@ -13,7 +13,7 @@
     "dnr": "string",
     "orders": [
       {
-        "href": "http://example.com",
+        "href": "https://api.example.com",
         "title": "string",
         "summary": {
           "totalPrice": {
@@ -26,7 +26,7 @@
     ],
     "fulfillments": [
       {
-        "href": "http://example.com",
+        "href": "https://api.example.com",
         "title": "string"
       }
     ]

@@ -1,20 +1,55 @@
+import base64
 import datetime
+import tempfile
 
 import pydantic
 
-from snowfall.stdlib import service
+from snowfall.project.junction.provider import service
 
-_DEFAULT_API_TIMEOUT_IN_SECONDS = 30
+_DEFAULT_API_TIMEOUT_IN_SECONDS = 50
+_DEFAULT_TTL_IN_MINUTES = 45
 
 
-class DumpStationsSettings(service.Settings):
-    geodata_address: str
+def cert_tmp_path(cert_base64: str) -> str:
+    with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
+        tmp_file.write(base64.b64decode(cert_base64))
+
+        return tmp_file.name
+
+
+class BenerailSettings(pydantic.BaseModel):
     api_base_url: pydantic.AnyUrl
     subscription_key: str
     api_timeout: datetime.timedelta = datetime.timedelta(
         seconds=_DEFAULT_API_TIMEOUT_IN_SECONDS,
     )
-    cert_path: pydantic.FilePath
-    private_key_path: pydantic.FilePath
+    cert_base64: str
+
+
+class DumpStationsSettings(BenerailSettings, service.Settings):
+    geodata_address: str
     output_dir: pydantic.DirectoryPath = "."  # type: ignore[assignment]
-    private_key_password: str | None = None
+
+
+class Settings(BenerailSettings, service.ProviderSettings):
+    mongo_dsn: tuple[pydantic.AnyUrl]
+    ttl: datetime.timedelta = datetime.timedelta(minutes=_DEFAULT_TTL_IN_MINUTES)
+
+
+class PriceQuoteSettings(BenerailSettings, service.Settings):
+    redis_dsn: pydantic.AnyUrl
+    amqp_dsn: pydantic.AnyUrl
+    ttl: datetime.timedelta = datetime.timedelta(minutes=_DEFAULT_TTL_IN_MINUTES)
+    provider_company_id: str
+
+
+class OrdersSettings(BenerailSettings, service.Settings):
+    redis_dsn: pydantic.AnyUrl
+    amqp_dsn: pydantic.AnyUrl
+
+
+class NotificationsSettings(BenerailSettings, service.Settings):
+    amqp_dsn: pydantic.AnyUrl
+    smtp_dsn: pydantic.AnyUrl
+    smtp_sender: pydantic.EmailStr
+    smtp_recipient: pydantic.EmailStr

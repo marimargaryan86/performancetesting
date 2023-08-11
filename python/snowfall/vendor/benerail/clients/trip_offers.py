@@ -4,13 +4,13 @@ from snowfall.vendor.benerail.models.products import response as product_respons
 from snowfall.vendor.benerail.models.trip_offers import response as trip_offer_response
 
 _TRIP_OFFERS_BASE_PATH = "/trip-offers"
-_OFFERS_BASE_PATH = "/offers"
 
 
 class TripOffersClient(base.BenerailBaseClient):
     async def get_trip_offer_ids_in_collection(
         self,
         trip_offer_collection_id: str,
+        session_token: str | None = None,
     ) -> trip_offer_response.GetTripOfferCollectionResponse:
         response = await self._make_request(
             client.RequestOptions(
@@ -21,7 +21,7 @@ class TripOffersClient(base.BenerailBaseClient):
                         trip_offer_collection_id=trip_offer_collection_id,
                     )
                 ),
-                headers=self._get_headers(),
+                headers=self._get_headers(session_token=session_token),
             ),
         )
 
@@ -57,6 +57,7 @@ class TripOffersClient(base.BenerailBaseClient):
     async def get_trip_offer_info(
         self,
         trip_offer_id: str,
+        session_token: str | None = None,
     ) -> trip_offer_response.GetTripOfferResponse:
         response = await self._make_request(
             client.RequestOptions(
@@ -65,7 +66,7 @@ class TripOffersClient(base.BenerailBaseClient):
                     prefix=_TRIP_OFFERS_BASE_PATH,
                     trip_offer_id=trip_offer_id,
                 ),
-                headers=self._get_headers(),
+                headers=self._get_headers(session_token=session_token),
             ),
         )
 
@@ -76,15 +77,16 @@ class OffersClient(base.BenerailBaseClient):
     async def get_offer_info(
         self,
         offer_id: str,
+        session_token: str | None = None,
     ) -> trip_offer_response.GetOfferResponse:
         response = await self._make_request(
             client.RequestOptions(
                 method="GET",
                 path="{prefix}/offers/{offer_id}".format(
-                    prefix=_OFFERS_BASE_PATH,
+                    prefix=_TRIP_OFFERS_BASE_PATH,
                     offer_id=offer_id,
                 ),
-                headers=self._get_headers(),
+                headers=self._get_headers(session_token=session_token),
             ),
         )
 
@@ -100,8 +102,8 @@ class OffersClient(base.BenerailBaseClient):
                 method="GET",
                 path="".join(
                     [
-                        "{prefix}/{offer_id}".format(
-                            prefix=_OFFERS_BASE_PATH,
+                        "{prefix}/offers/{offer_id}".format(
+                            prefix=_TRIP_OFFERS_BASE_PATH,
                             offer_id=offer_id,
                         ),
                         "/offer-parts/{offer_part_id}".format(

@@ -1,0 +1,10 @@
+{   "dateOfBirth": "1993-03-10",
+    "details": {
+        "preferredLanguage": "EN",
+        "title": "Mr.",
+        "firstName": "John",
+        "lastName": "Massis",
+        "email": "john.massis@example.com",
+        "phoneNumber": "32475123456"
+    }
+}

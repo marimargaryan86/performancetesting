@@ -41,7 +41,7 @@ class RcodeClient(base.BenerailBaseClient):
         response = await self._make_request(
             client.RequestOptions(
                 method="GET",
-                path="{rcode_prefix}/{urn}".format(
+                path="{rcode_prefix}/value/{urn}".format(
                     rcode_prefix=_BASE_RCODE_PATH,
                     urn=urn,
                 ),

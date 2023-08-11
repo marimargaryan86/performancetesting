@@ -1,0 +1,57 @@
+{
+    "metadata": {
+        "apiVersion": "0.11.05",
+        "buildVersion": "mr62.0",
+        "environment": "accept-c02",
+        "respondedAt": "2023-03-29T14:35:44.452+02:00",
+        "resourceType": "TripOfferFilter"
+    },
+    "result": {
+        "id": "88a8d17b383245e04561d6023f0446ec25b4ec108d7153cdd0fa44a8d1655040",
+        "origin": {
+            "href": "https://benerail-stg-apim.azure-api.net/rcode/rcode/value/urn:bnds:tstatn_id:BEBMI",
+            "value": "urn:bnds:tstatn_id:BEBMI"
+        },
+        "destination": {
+            "href": "https://benerail-stg-apim.azure-api.net/rcode/rcode/value/urn:bnds:tstatn_id:FRPNO",
+            "value": "urn:bnds:tstatn_id:FRPNO"
+        },
+        "departureDateTime": "2023-03-30T12:42:00Z",
+        "marketSegment": "urn:itti:market_segment:PUBLIC",
+        "requestedOfferParts": "admission-and-reservation",
+        "tripOfferCollection": {
+            "href": "https://benerail-stg-apim.azure-api.net/trip-offers/trip-offer-collections/88a8d17b383245e04561d6023f0446ec25b4ec108d7153cdd0fa44a8d1655040",
+            "title": "Trip Offer Collection"
+        },
+        "passengers": [
+            {
+                "href": "https://benerail-stg-apim.azure-api.net/dialogue-engine/dialogues/5b782519-2aa7-4e67-abb6-f29cfb910157/passengers/63598351-e342-4b6c-b110-766c31d88640",
+                "title": "19930310-John Massis",
+                "summary": {
+                    "firstName": "John",
+                    "lastName": "Massis"
+                }
+            }
+        ]
+    },
+    "links": [
+        {
+            "href": "https://benerail-stg-apim.azure-api.net/dialogue-engine/dialogues/5b782519-2aa7-4e67-abb6-f29cfb910157",
+            "title": "Parent dialogue",
+            "rel": "parent",
+            "type": "GET"
+        },
+        {
+            "href": "https://benerail-stg-apim.azure-api.net/dialogue-engine/dialogues/5b782519-2aa7-4e67-abb6-f29cfb910157/trip-offer-filters/88a8d17b383245e04561d6023f0446ec25b4ec108d7153cdd0fa44a8d1655040",
+            "title": "Self link",
+            "rel": "self",
+            "type": "GET"
+        },
+        {
+            "href": "https://benerail-stg-apim.azure-api.net/dialogue-engine/dialogues/5b782519-2aa7-4e67-abb6-f29cfb910157/trip-offer-filters/88a8d17b383245e04561d6023f0446ec25b4ec108d7153cdd0fa44a8d1655040",
+            "title": "Delete trip offer filter from dialogue",
+            "rel": "self",
+            "type": "DELETE"
+        }
+    ]
+}

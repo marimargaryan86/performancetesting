@@ -1,0 +1,47 @@
+{
+  "result": {
+    "id": "00000000-0000-0000-0000-000000000000",
+    "dialogue": "https://api.example.com/dialogue/10001",
+    "externalId": "ABCDEFG",
+    "createdBy": "Id of the creating entity",
+    "createdAt": "2021-03-29T08:08",
+    "modifiedAt": "2021-03-29T09:10",
+    "expiresAt": "2021-03-30T09:10",
+    "dnr": "ABCDEFG",
+    "links": [
+      {
+        "href": "https://api.example.com/dialogues/10001/trip-filters",
+        "title": "Create a trip filter",
+        "rel": "trip-filters",
+        "type": "POST"
+      },
+      {
+        "href": "https://api.example.com/dialogues/10001/trip-filters",
+        "title": "List of trip filters",
+        "rel": "trip-filters"
+      },
+      {
+        "href": "https://api.example.com/dialogues/10001/bookers",
+        "title": "Information on the booker",
+        "rel": "booker"
+      },
+      {
+        "href": "https://api.example.com/dialogues/10001",
+        "title": "Delete this dialog",
+        "rel": "dialogues",
+        "type": "DELETE"
+      },
+      {
+        "href": "https://api.example.com/dialogues/10001/trip-filters/20001",
+        "title": "Remove a tripsfilter from the dialogue",
+        "rel": "tripsfilter",
+        "type": "DELETE"
+      },
+      {
+        "href": "https://api.example.com/bookings/10001",
+        "title": "Information on the booking",
+        "rel": "booker"
+      }
+    ]
+  }
+}

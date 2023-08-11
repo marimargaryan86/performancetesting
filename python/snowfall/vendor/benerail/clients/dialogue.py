@@ -29,6 +29,7 @@ class DialoguesClient(base.BenerailBaseClient):
     async def get_dialogue(
         self,
         dialogue_id: str,
+        session_token: str | None = None,
     ) -> dialogue_response.GetDialogueResponse:
         response = await self._make_request(
             client.RequestOptions(
@@ -37,7 +38,7 @@ class DialoguesClient(base.BenerailBaseClient):
                     dialogue_prefix=_BASE_PATH,
                     dialogue_id=dialogue_id,
                 ),
-                headers=self._get_headers(),
+                headers=self._get_headers(session_token=session_token),
             ),
         )
 
@@ -64,6 +65,7 @@ class DialoguesClient(base.BenerailBaseClient):
         self,
         from_dnr: str | None = None,
         external_id: str | None = None,
+        session_token: str | None = None,
     ) -> dialogue_response.GetDialogueResponse:
         query = {}
 
@@ -78,7 +80,7 @@ class DialoguesClient(base.BenerailBaseClient):
                 method="POST",
                 path=_BASE_PATH,
                 query=query,
-                headers=self._get_headers(),
+                headers=self._get_headers(session_token=session_token),
             ),
         )
 
@@ -94,7 +96,8 @@ class TripFiltersClient(base.BenerailBaseClient):
         dialogue_id: str,
         etag: str,
         body: dialogue.DialogueIdTripfiltersBody,
-    ) -> dialogue.DialogueIdTripofferfiltersBody:
+        session_token: str | None = None,
+    ) -> dialogue_response.GetTripFilterResponse:
         response = await self._make_request(
             client.RequestOptions(
                 method="POST",
@@ -102,12 +105,12 @@ class TripFiltersClient(base.BenerailBaseClient):
                     dialogue_prefix=_BASE_PATH,
                     dialogue_id=dialogue_id,
                 ),
-                headers=self._get_headers(etag),
+                headers=self._get_headers(etag, session_token),
                 payload=body.dict(by_alias=True, exclude_unset=True),
             ),
         )
 
-        return dialogue.DialogueIdTripofferfiltersBody(
+        return dialogue_response.GetTripFilterResponse(
             **response.json(),
             etag=response.headers.get("etag"),
         )
@@ -158,6 +161,7 @@ class TripOfferFiltersClient(base.BenerailBaseClient):
         dialogue_id: str,
         etag: str,
         body: dialogue.DialogueIdTripofferfiltersBody,
+        session_token: str | None = None,
     ) -> dialogue_response.GetTripOfferFilterResponse:
         response = await self._make_request(
             client.RequestOptions(
@@ -167,11 +171,14 @@ class TripOfferFiltersClient(base.BenerailBaseClient):
                     dialogue_id=dialogue_id,
                 ),
                 payload=body.dict(by_alias=True, exclude_unset=True),
-                headers=self._get_headers(etag),
+                headers=self._get_headers(etag, session_token),
             ),
         )
 
-        return dialogue_response.GetTripOfferFilterResponse(**response.json())
+        return dialogue_response.GetTripOfferFilterResponse(
+            **response.json(),
+            etag=response.headers.get("etag"),
+        )
 
     async def get_trip_offer_filter(
         self,
@@ -223,6 +230,7 @@ class PassengersClient(base.BenerailBaseClient):
         dialogue_id: str,
         etag: str,
         body: passenger.PassengerRequest,
+        session_token: str | None = None,
     ) -> dialogue_response.GetPassengerResponse:
         response = await self._make_request(
             client.RequestOptions(
@@ -232,11 +240,14 @@ class PassengersClient(base.BenerailBaseClient):
                     dialogue_id=dialogue_id,
                 ),
                 raw_content=body.json(by_alias=True, exclude_unset=True),
-                headers=self._get_headers(etag),
+                headers=self._get_headers(etag, session_token),
             ),
         )
 
-        return dialogue_response.GetPassengerResponse(**response.json())
+        return dialogue_response.GetPassengerResponse(
+            **response.json(),
+            etag=response.headers.get("etag"),
+        )
 
     async def get_passenger(
         self,
@@ -257,7 +268,10 @@ class PassengersClient(base.BenerailBaseClient):
             ),
         )
 
-        return dialogue_response.GetPassengerResponse(**response.json())
+        return dialogue_response.GetPassengerResponse(
+            **response.json(),
+            etag=response.headers.get("etag"),
+        )
 
     async def delete_passenger(
         self,
@@ -303,7 +317,10 @@ class PassengersClient(base.BenerailBaseClient):
             ),
         )
 
-        return dialogue_response.GetPassengerResponse(**response.json())
+        return dialogue_response.GetPassengerResponse(
+            **response.json(),
+            etag=response.headers.get("etag"),
+        )
 
 
 class BookersClient(base.BenerailBaseClient):

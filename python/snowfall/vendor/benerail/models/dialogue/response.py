@@ -2,6 +2,7 @@ from collections.abc import Sequence
 
 from pydantic import Field
 
+from snowfall.vendor.benerail.models import etag as etag_models
 from snowfall.vendor.benerail.models.base import BenerailBaseModel
 from snowfall.vendor.benerail.models.dialogue.customer import BookerResponse
 from snowfall.vendor.benerail.models.dialogue.dialogue import Dialogue
@@ -57,24 +58,35 @@ class GetDialoguesResponse(BenerailBaseModel):
 
 class GetDialogueResponse(BenerailBaseModel):
     metadata: Metadata | None = None
-    response_result: Dialogue | None = Field(None, alias="result")
+    response_result: Dialogue = Field(..., alias="result")
     links: list[Link] | None = None
-    etag: str | None = None
+    etag: str
+
+    def set_etags(self, etag_data: etag_models.EtagData) -> None:
+        etag_data.dialogue_etag = self.etag
 
 
 class GetPassengerResponse(BenerailBaseModel):
-    metadata: Metadata | None = None
-    response_result: Passenger | None = Field(None, alias="result")
+    metadata: Metadata
+    response_result: Passenger = Field(..., alias="result")
     links: list[Link] | None = None
+    etag: str
+
+    def set_etags(self, etag_data: etag_models.EtagData) -> None:
+        etag_data.passenger_etags[self.response_result.identifier] = (
+            self.metadata.resource_etag or ""
+        )
 
 
 class GetTripFilterResponse(BenerailBaseModel):
     metadata: Metadata | None = None
-    response_result: TripFilter | None = Field(None, alias="result")
+    response_result: TripFilter = Field(..., alias="result")
     links: list[Link] | None = None
+    etag: str
 
 
 class GetTripOfferFilterResponse(BenerailBaseModel):
     metadata: Metadata | None = None
-    response_result: TripOfferFilter | None = Field(None, alias="result")
+    response_result: TripOfferFilter = Field(..., alias="result")
     links: list[Link] | None = None
+    etag: str

@@ -1,0 +1,152 @@
+{
+    "metadata": {
+        "apiVersion": "0.11.10",
+        "buildVersion": "mr62.0",
+        "environment": "accept-c02",
+        "respondedAt": "2023-03-29T11:45:06.907+02:00",
+        "resourceType": "TripOffer"
+    },
+    "result": {
+        "id": "00000000-0000-0000-0000-000000000000",
+        "origin": {
+            "href": "https://benerail-stg-apim.azure-api.net/rcode/places/urn:bnds:tstatn_id:BEBMI",
+            "value": "urn:bnds:tstatn_id:BEBMI"
+        },
+        "destination": {
+            "href": "https://benerail-stg-apim.azure-api.net/rcode/places/urn:bnds:tstatn_id:FRPNO",
+            "value": "urn:bnds:tstatn_id:FRPNO"
+        },
+        "departureAt": "2023-03-30T15:16:00+02:00",
+        "duration": "PT1H22M",
+        "numberOfTransfers": 0,
+        "trip": {
+            "href": "https://benerail-stg-apim.azure-api.net/trips/trips/7f434910bc17a18530882553ac00f6046c2a0cb36bbb57ed4e39624ef2a2e34b_7acd248b19869bae2c07fdfa427e9959b06eb4e495e098acf5a76afe267e6f62",
+            "title": "BEBMI-FRPNO-20230330-1516-PT1H22M-#0",
+            "summary": {
+                "departureAt": "2023-03-30T15:16:00+02:00",
+                "arrivalAt": "2023-03-30T16:38:00+02:00",
+                "numberOfTransfers": 0,
+                "duration": "PT1H22M",
+                "trainTypes": [
+                    {
+                        "href": "https://benerail-stg-apim.azure-api.net/rcode/rcode/value/urn:itti:train_type:THA",
+                        "value": "urn:itti:train_type:THA"
+                    }
+                ]
+            }
+        },
+        "offers": [
+            {
+                "href": "https://benerail-stg-apim.azure-api.net/trip-offers/offers/c778c41ad2ccbca77f0277b0dfd85d83de3c0d7c8d44145dbad6ae6b88c17633",
+                "title": "BEBMI-FRPNO-20230330-1516-PT1H22M-#0-2-MF-29.00",
+                "summary": {
+                    "priceWithOptionalParts": {
+                        "amount": 29.00,
+                        "currency": "EUR"
+                    },
+                    "priceWithoutOptionalParts": {
+                        "amount": 29.00,
+                        "currency": "EUR"
+                    },
+                    "flexibility": {
+                        "href": "https://benerail-stg-apim.azure-api.net/rcode/rcode/value/urn:itti:railteam_flexibility:MF",
+                        "value": "urn:itti:railteam_flexibility:MF"
+                    },
+                    "comfortClass": {
+                        "href": "https://benerail-stg-apim.azure-api.net/rcode/rcode/value/urn:taco:class:2",
+                        "value": "urn:taco:class:2"
+                    },
+                    "accommodationType": {
+                        "href": "https://benerail-stg-apim.azure-api.net/rcode/rcode/value/urn:bnds:accommodation_type:SEAT",
+                        "value": "urn:bnds:accommodation_type:SEAT"
+                    }
+                }
+            },
+            {
+                "href": "https://benerail-stg-apim.azure-api.net/trip-offers/offers/e70af72eb7d997811c287907da2f3bdc83cf27df188169763d7c5542ff2079ac",
+                "title": "BEBMI-FRPNO-20230330-1516-PT1H22M-#0-1-MF-46.00",
+                "summary": {
+                    "priceWithOptionalParts": {
+                        "amount": 46.00,
+                        "currency": "EUR"
+                    },
+                    "priceWithoutOptionalParts": {
+                        "amount": 46.00,
+                        "currency": "EUR"
+                    },
+                    "flexibility": {
+                        "href": "https://benerail-stg-apim.azure-api.net/rcode/rcode/value/urn:itti:railteam_flexibility:MF",
+                        "value": "urn:itti:railteam_flexibility:MF"
+                    },
+                    "comfortClass": {
+                        "href": "https://benerail-stg-apim.azure-api.net/rcode/rcode/value/urn:taco:class:1",
+                        "value": "urn:taco:class:1"
+                    },
+                    "accommodationType": {
+                        "href": "https://benerail-stg-apim.azure-api.net/rcode/rcode/value/urn:bnds:accommodation_type:SEAT",
+                        "value": "urn:bnds:accommodation_type:SEAT"
+                    }
+                }
+            },
+            {
+                "href": "https://benerail-stg-apim.azure-api.net/trip-offers/offers/bb65fe6d2dfa61295c2bb004b6ba0af2f509be96b772e55be212099be22cf85f",
+                "title": "BEBMI-FRPNO-20230330-1516-PT1H22M-#0-1-FF-115.00",
+                "summary": {
+                    "priceWithOptionalParts": {
+                        "amount": 115.00,
+                        "currency": "EUR"
+                    },
+                    "priceWithoutOptionalParts": {
+                        "amount": 115.00,
+                        "currency": "EUR"
+                    },
+                    "flexibility": {
+                        "href": "https://benerail-stg-apim.azure-api.net/rcode/rcode/value/urn:itti:railteam_flexibility:FF",
+                        "value": "urn:itti:railteam_flexibility:FF"
+                    },
+                    "comfortClass": {
+                        "href": "https://benerail-stg-apim.azure-api.net/rcode/rcode/value/urn:taco:class:1",
+                        "value": "urn:taco:class:1"
+                    },
+                    "accommodationType": {
+                        "href": "https://benerail-stg-apim.azure-api.net/rcode/rcode/value/urn:bnds:accommodation_type:SEAT",
+                        "value": "urn:bnds:accommodation_type:SEAT"
+                    }
+                }
+            }
+        ],
+        "passengers": [
+            {
+                "href": "https://benerail-stg-apim.azure-api.net/dialogue-engine/dialogues/{dialogueId}/passengers/c9188cad-f2a7-4da3-a610-6685fef529d4?idType=xref",
+                "title": "ageCategory: urn:bdws:taco_passenger_type:A",
+                "summary": {
+                    "ageCategory": "urn:bdws:taco_passenger_type:A",
+                    "cards": "",
+                    "corporateContracts": ""
+                }
+            }
+        ],
+        "bookableStatus": {
+            "href": "https://benerail-stg-apim.azure-api.net/rcode/rcode/value/urn:bdws:bookable_status:BOOKABLE",
+            "value": "urn:bdws:bookable_status:BOOKABLE"
+        },
+        "accommodationType": {
+            "href": "https://benerail-stg-apim.azure-api.net/rcode/rcode/value/urn:bnds:accommodation_type:SEAT",
+            "value": "urn:bnds:accommodation_type:SEAT"
+        }
+    },
+    "links": [
+        {
+            "href": "https://benerail-stg-apim.azure-api.net/trip-offers/trip-offer-collections/88a8d17b383245e04561d6023f0446ec25b4ec108d7153cdd0fa44a8d1655040",
+            "title": "Parent",
+            "rel": "parent",
+            "type": "GET"
+        },
+        {
+            "href": "https://benerail-stg-apim.azure-api.net/trip-offers/trip-offers/88a8d17b383245e04561d6023f0446ec25b4ec108d7153cdd0fa44a8d1655040_7acd248b19869bae2c07fdfa427e9959b06eb4e495e098acf5a76afe267e6f62",
+            "title": "BEBMI-FRPNO-20230330-1516-PT1H22M-#0",
+            "rel": "self",
+            "type": "GET"
+        }
+    ]
+}

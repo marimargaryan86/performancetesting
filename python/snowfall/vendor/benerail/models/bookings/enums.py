@@ -8,8 +8,7 @@ class PreferenceType(Enum):
 
 class PaymentStates(Enum):
     initiated = "initiated"
-    confirmed = "confirmed"
-    succeeded = "succeeded"
+    completed = "completed"
     failed = "failed"
     aborted = "aborted"
 
