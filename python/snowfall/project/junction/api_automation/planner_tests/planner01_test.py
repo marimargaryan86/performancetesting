@@ -3,9 +3,9 @@ import csv
 import datetime
 import json
 import logging
-import os
 import tempfile
 from collections.abc import Mapping, Sequence
+from pathlib import Path
 from typing import Any
 
 import aiofiles
@@ -50,17 +50,11 @@ async def test_trip_windows_planner_many_origins(
         await save_mct_to_csv(
             junction_client,
             trip_ids,
-            "{0}{1}".format(
-                os.path.join(tempfile.gettempdir(), short_file_name),
-                ".csv",
-            ),
+            Path(tempfile.gettempdir(), short_file_name).with_suffix(".csv"),
         )
 
         allure.attach.file(
-            "{0}{1}".format(
-                os.path.join(tempfile.gettempdir(), short_file_name),
-                ".csv",
-            ),
+            str(Path(tempfile.gettempdir(), short_file_name).with_suffix(".csv")),
             short_file_name,
             allure.attachment_type.CSV,
             extension=csv,
@@ -70,7 +64,7 @@ async def test_trip_windows_planner_many_origins(
 async def save_mct_to_csv(
     client: Client,
     trip_ids: Sequence[str],
-    file_name: str,
+    file_name: Path,
 ) -> None:
     async with aiofiles.open(file_name, "w") as f0:
         writer = writers.AsyncWriter(f0)

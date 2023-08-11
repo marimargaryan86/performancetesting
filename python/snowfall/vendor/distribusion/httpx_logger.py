@@ -1,6 +1,6 @@
 import datetime
 import json
-import os
+from pathlib import Path
 
 import aiofiles
 import httpx
@@ -12,16 +12,14 @@ class LogHandler(object):
     def __init__(
         self,
         base_url: str | None = None,
-        log_path: str | None = "logs",
+        log_path: Path | None = None,
     ) -> None:
         self.base_url = base_url
-        self.log_path = log_path if log_path else "logs"
+        self.log_path = log_path if log_path else Path("logs")
 
-    def get_file_path(self) -> str:
-        return "{log_path}/{date_path}".format(
-            log_path=self.log_path,
-            date_path=datetime.datetime.now(tz=datetime.UTC).date().isoformat(),
-        )
+    def get_file_path(self) -> Path:
+        date = datetime.datetime.now(tz=datetime.UTC).date()
+        return self.log_path / date.isoformat()
 
     def get_file_name(self, url: str, suffix: str) -> str:
         if self.base_url and url.startswith(self.base_url):
@@ -44,7 +42,7 @@ class RequestLogHandler(LogHandler):
     def __init__(
         self,
         base_url: str | None = None,
-        log_path: str | None = None,
+        log_path: Path | None = None,
     ) -> None:
         super().__init__(base_url=base_url, log_path=log_path)
         self._logger = stdout.get_logger()
@@ -59,10 +57,10 @@ class RequestLogHandler(LogHandler):
             if rq_content:
                 file_path = self.get_file_path()
                 file_name = self.get_file_name(request.url.path, "-rq")
-                os.makedirs(file_path, exist_ok=True)
+                file_path.mkdir(parents=True, exist_ok=True)
 
                 async with aiofiles.open(
-                    os.path.join(file_path, file_name),
+                    file_path / file_name,
                     "w",
                     encoding="utf-8",
                 ) as log_file:
@@ -73,7 +71,7 @@ class ResponseLogHandler(LogHandler):
     def __init__(
         self,
         base_url: str | None = None,
-        log_path: str | None = None,
+        log_path: Path | None = None,
     ) -> None:
         super().__init__(base_url=base_url, log_path=log_path)
         self._logger = stdout.get_logger()
@@ -85,10 +83,10 @@ class ResponseLogHandler(LogHandler):
             json_data = json.loads(response.content)
             file_path = self.get_file_path()
             file_name = self.get_file_name(response.url.path, "-rs")
-            os.makedirs(file_path, exist_ok=True)
+            file_path.mkdir(parents=True, exist_ok=True)
 
             async with aiofiles.open(
-                os.path.join(file_path, file_name),
+                file_path / file_name,
                 "w",
                 encoding="utf-8",
             ) as log_file:

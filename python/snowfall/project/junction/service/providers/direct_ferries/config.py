@@ -1,5 +1,6 @@
 import datetime
 from collections.abc import Sequence
+from pathlib import Path
 
 import pydantic
 
@@ -46,4 +47,4 @@ class OrdersSettings(DfBaseSettings, service.Settings):
 
 
 class GtfsSetting(DfBaseSettings, service.Settings):
-    output_path: str = "dist/import/gtfs-feed/direct-ferries"
+    output_path: Path = Path("dist/import/gtfs-feed/direct-ferries")

@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import copy
 import datetime
-import os
 import re
 from collections.abc import Mapping
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any, ClassVar, NamedTuple
 
 import httpx
@@ -64,7 +64,7 @@ class SoapLogger(object):
     def __init__(
         self,
         secret_words: tuple[str, ...] | None = None,
-        export_dir: str | None = None,
+        export_dir: Path | None = None,
         *,
         export_files: bool | None = False,
     ) -> None:
@@ -76,7 +76,7 @@ class SoapLogger(object):
         if export_dir:
             self._export_dir = export_dir
         else:
-            self._export_dir = os.path.join(os.getcwd(), "soap_calls")
+            self._export_dir = Path.cwd() / "soap_calls"
 
     def log(
         self,
@@ -99,8 +99,7 @@ class SoapLogger(object):
         if not self._export_files:
             return
 
-        if not os.path.exists(self._export_dir):
-            os.mkdir(self._export_dir)
+        self._export_dir.mkdir(exist_ok=True)
 
         file_name = "-".join(
             [
@@ -115,14 +114,8 @@ class SoapLogger(object):
         if transaction_id:
             file_name = "-".join([file_name, transaction_id])
 
-        with open(
-            os.path.join(
-                self._export_dir,
-                "{file_name}.xml".format(file_name=file_name),
-            ),
-            "w",
-        ) as fi:
-            fi.write(data_content)
+        file_path = (self._export_dir / file_name).with_suffix(".xml")
+        file_path.write_text(data_content)
 
 
 class AsyncSoapTransport(object):

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import contextlib
 import hashlib
-import os
 import pathlib
 import pkgutil
 import zipfile
@@ -149,7 +148,7 @@ def package_path(package: str) -> pathlib.Path:
         raise RuntimeError()
 
     try:
-        return pathlib.Path(os.path.dirname(str(mod.__file__)))
+        return pathlib.Path(str(mod.__file__)).parent
     except AttributeError as err:
         raise RuntimeError() from err
 
@@ -163,7 +162,7 @@ def resource_path(package: str, resource: str) -> pathlib.Path:
     except AttributeError as err:
         raise RuntimeError() from err
 
-    return pathlib.Path(os.path.join(*parts))
+    return pathlib.Path(*parts)
 
 
 async def hash_file(filepath: pathlib.Path, chunk_size: int = 1024) -> str:

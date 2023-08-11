@@ -1,8 +1,8 @@
 import datetime
 import json
 import logging
-import os
 from collections.abc import Callable, Iterator, Mapping, Sequence
+from pathlib import Path
 from typing import Any
 
 import httpx
@@ -56,8 +56,8 @@ def local_config(
     request: pytest.FixtureRequest,
 ) -> Mapping[str, str]:
     config_file_name = request.path.parent.name
-    json_file_name = os.path.expanduser("~/{0}.json".format(config_file_name))
-    if not os.path.exists(json_file_name):
+    json_file_name = (Path.home() / config_file_name).with_suffix(".json")
+    if not json_file_name.exists():
         return {}
     with open(json_file_name) as json_file:
         config = json.load(json_file)
@@ -263,7 +263,7 @@ def get_variable_from_server(
 
 
 @pytest.fixture(scope="session", autouse=True)
-def add_allure_environment_property(
+def add_allure_environment_property(  # noqa: WPS210
     request: pytest.FixtureRequest,
 ) -> Iterator[Callable[[str, Any], None]]:
     environment_properties = {}
@@ -273,29 +273,21 @@ def add_allure_environment_property(
 
     yield maker
 
-    if not request.config.getoption(ALLUREDIR_OPTION):
-        return
-
-    if not os.path.isdir(request.config.getoption(ALLUREDIR_OPTION)):
+    allure_dir = request.config.getoption(ALLUREDIR_OPTION)
+    if not allure_dir or not allure_dir.is_dir():
         return
 
     if not environment_properties:
         return
 
-    with open(
-        os.path.join(
-            request.config.getoption(ALLUREDIR_OPTION),
-            ALLURE_ENVIRONMENT_PROPERTIES_FILE,
-        ),
-        "w",
-    ) as file_name:
-        file_data = "\n".join(
-            [
-                "{0}={1}".format(env_variable, env_value)
-                for env_variable, env_value in environment_properties.items()
-            ],
-        )
-        file_name.write(file_data)
+    allure_env_file = allure_dir / ALLURE_ENVIRONMENT_PROPERTIES_FILE
+    file_data = "\n".join(
+        [
+            "{0}={1}".format(env_variable, env_value)
+            for env_variable, env_value in environment_properties.items()
+        ],
+    )
+    allure_env_file.write_text(file_data)
 
 
 @pytest.fixture(autouse=True)

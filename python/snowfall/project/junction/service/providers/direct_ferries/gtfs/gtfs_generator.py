@@ -3,6 +3,7 @@ import enum
 import os
 import zipfile
 from collections.abc import Generator, Sequence
+from pathlib import Path
 
 import orjson
 import pydantic
@@ -64,7 +65,7 @@ def _models_to_csv(
 
 
 class GTFSGenerator(object):
-    def __init__(self, output_dir: str) -> None:
+    def __init__(self, output_dir: Path) -> None:
         self._output_dir = output_dir
 
     async def generate_feed(
@@ -110,10 +111,7 @@ class GTFSGenerator(object):
         self.compress_files()
 
     def compress_files(self) -> None:
-        with zipfile.ZipFile(
-            "{0}/directferries.zip".format(self._output_dir),
-            "w",
-        ) as zip_f:
+        with zipfile.ZipFile(self._output_dir / "directferries.zip", "w") as zip_f:
             for file_name in CompressFileList.file_list():
                 zip_f.write(file_name, compress_type=zipfile.ZIP_DEFLATED)
                 os.remove(file_name)

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import functools
 import json
-import os
 import re
 from collections.abc import Awaitable, Callable, Sequence
 from typing import TYPE_CHECKING, Any, TypeVar
@@ -101,7 +100,7 @@ class Proxy(object):
 
     def to_route(self) -> routing.Route:
         return routing.Route(
-            os.path.join(self._prefix, "{path:path}"),
+            "/".join((self._prefix.rstrip("/"), "{path:path}")),
             endpoint=self._route,
             methods=["POST", "GET", "PATCH", "DELETE"],
         )
