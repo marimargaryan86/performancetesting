@@ -637,6 +637,7 @@ class RefundsResource(models.Resource):
                     if refund.HasField("refund_position")
                     else None
                 ),
+                "invoiceReference": refund.invoice_reference,
             },
             relationships={
                 "transaction": {
