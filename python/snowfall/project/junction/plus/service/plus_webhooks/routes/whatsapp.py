@@ -37,6 +37,9 @@ class IncomingMessages(endpoints.HTTPEndpoint):
                 subscribers_client,
             ),
         )
+        twiml_response.message(
+            "Please select one of the following options",
+        )
         return responses.Response(
             content=twiml_response.to_xml(),
             status_code=status.HTTP_200_OK,

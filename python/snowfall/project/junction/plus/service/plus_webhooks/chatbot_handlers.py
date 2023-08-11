@@ -77,4 +77,4 @@ async def handle_unknown(
     subscriber: models_pb2.Subscriber,
     subscribers_client: subscribers.Client,
 ) -> str:
-    return "Sorry, didn't understand. Please try again"
+    return "Sorry I didn't understand your message."
