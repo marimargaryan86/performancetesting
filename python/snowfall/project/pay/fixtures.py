@@ -146,7 +146,7 @@ def generate_accountless_company(identifier: str) -> company_model_pb2.Company:
             company_model_pb2.PaymentType,
             "card",
         ),
-        references=[string.uuid(), string.uuid()],
+        reseller_providers=[string.uuid(), string.uuid()],
         company_type=protobuf.slug_to_enum_value(
             company_model_pb2.Company.Type,
             random.choice(("reseller", "provider")),  # noqa: S311

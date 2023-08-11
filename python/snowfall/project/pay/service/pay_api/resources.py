@@ -135,11 +135,12 @@ class Company(models.Resource):
                     models_pb2.PaymentMethod.DESCRIPTOR,
                     company.payment_method,
                 ),
-                "references": list(company.references),
+                "resellerProviders": list(company.reseller_providers),
                 "companyType": protobuf.enum_value_to_slug(
                     enum_descriptor=models_pb2.Company.Type.DESCRIPTOR,
                     enum_value=company.company_type,
                 ),
+                "defaultCurrency": company.default_currency,
             },
             relationships=relationships,
             links={

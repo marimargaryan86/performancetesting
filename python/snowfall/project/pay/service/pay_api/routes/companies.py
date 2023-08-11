@@ -40,11 +40,12 @@ class AdminCompany(endpoints.HTTPEndpoint):
                 fx_markup=payload.get("fxMarkup"),  # type: ignore[arg-type]
                 processing_markup=payload.get("processingMarkup"),  # type: ignore[arg-type]
                 sales_markup=payload.get("salesMarkup"),  # type: ignore[arg-type]
-                references=payload.get("references"),
+                reseller_providers=payload.get("resellerProviders"),
                 company_type=protobuf.slug_to_enum_value(
                     company_models_pb2.Company.Type,
                     payload.get("companyType", "unspecified"),
                 ),
+                default_currency=payload.get("defaultCurrency"),  # type: ignore[arg-type]
             ),
         )
 
@@ -108,11 +109,12 @@ class AdminCompanies(endpoints.HTTPEndpoint):
                     models_pb2.PaymentType,
                     body["paymentType"],
                 ),
-                references=body.get("references"),
+                reseller_providers=body.get("resellerProviders"),
                 company_type=protobuf.slug_to_enum_value(
                     company_models_pb2.Company.Type,
                     body.get("companyType", "unspecified"),
                 ),
+                default_currency=body.get("defaultCurrency"),  # type: ignore[arg-type]
             ),
         )
 
