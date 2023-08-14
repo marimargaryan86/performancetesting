@@ -98,8 +98,8 @@ REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis:
 {{ with secret "kv/data/${var.environment}/benerail" }}
 SUBSCRIPTION_KEY={{ .Data.data.subscription_key }}
 CERT_BASE64={{ .Data.data.cert_base64 }}
-RESELLER_PROVIDERS={{keyOrDefault "${var.environment}/providers/reseller-providers" "{}" | toJSON }}
 {{ end }}
+RESELLER_PROVIDERS={{keyOrDefault "${var.environment}/providers/reseller-providers" "{}" | toJSON }}
 EOH
         destination = "services.env"
         env         = true
