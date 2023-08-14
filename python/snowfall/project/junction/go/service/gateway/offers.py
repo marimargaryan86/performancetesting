@@ -2,9 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import datetime
-from typing import TypeVar
 
-from google.protobuf import message
 from grpc import StatusCode, aio
 
 from snowfall.project.junction.go.service.gateway import providers
@@ -19,8 +17,6 @@ from snowfall.stdlib.persistence.redis import types
 from snowfall.stdlib.transport.amqp import protocol
 from snowfall.stdlib.transport.amqp import types as amqp
 from snowfall.stdlib.transport.grpc import service
-
-_Proto = TypeVar("_Proto", bound=message.Message)
 
 
 class Service(service.Service, offers_pb2_grpc.OfferServiceServicer):

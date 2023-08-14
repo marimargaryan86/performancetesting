@@ -7,15 +7,12 @@ from pydantic import typing, validator
 
 
 def normalize_time(
-    time: int | float | str | None,
+    time: float | str | None,
 ) -> float | datetime.timedelta | None:
     if isinstance(time, str):
         # duration: str, e.g. 2h22m
         hours, minutes = date_parser(time).hour, date_parser(time).minute
         return datetime.timedelta(hours=hours, minutes=minutes)
-
-    if isinstance(time, int):
-        return datetime.timedelta(seconds=time)
 
     # A JSON-serialized model will contain float.
     if isinstance(time, float):

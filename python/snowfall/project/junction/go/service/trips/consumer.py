@@ -5,6 +5,7 @@ import itertools
 import types as std_types
 import zoneinfo
 from collections.abc import Sequence
+from typing import Self
 
 import more_itertools
 
@@ -29,7 +30,7 @@ class _TripSearchContext(object):
         self._message = message
         self._repository = repository
 
-    async def __aenter__(self) -> _TripSearchContext:
+    async def __aenter__(self) -> Self:
         return self
 
     async def __aexit__(
@@ -130,7 +131,7 @@ class TripCandidateSearchConsumer(object):
         trip_candidate_search_repository: trips.TripCandidateSearchRepository,
         trip_orchestrator: orchestrator.TripOrchestrator,
         offer_orchestrator: orchestrator.OfferOrchestrator,
-        max_trip_length_factor: int | float | None = None,
+        max_trip_length_factor: float | None = None,
     ):
         self._consumer = consumer_obj
         self._trip_repository = trip_repository

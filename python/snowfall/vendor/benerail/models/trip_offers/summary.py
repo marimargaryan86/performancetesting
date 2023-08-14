@@ -31,7 +31,7 @@ class TripSummary(BenerailBaseModel):
         description="Overall duration of the trip",
         example="PT20M",
     )
-    train_types: list[TrainType] | None | None
+    train_types: list[TrainType] | None
 
 
 class ProductSummary(BenerailBaseModel):

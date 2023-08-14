@@ -1,6 +1,6 @@
 import abc
 from collections.abc import AsyncIterator, Mapping
-from typing import Any, Generic, TypeVar, cast
+from typing import Any, Generic, Self, TypeVar, cast
 
 import pymongo
 from motor import core, motor_asyncio
@@ -35,7 +35,7 @@ class ResultSet(abc.ABC, Generic[_Record], AsyncIterator[_Record]):
         if sort and sort[0] != _mongo_id_key:
             self._custom_sort_field = sort[0]
 
-    def __aiter__(self) -> AsyncIterator[_Record]:
+    def __aiter__(self) -> Self:
         return self
 
     async def __anext__(self) -> _Record:

@@ -3,9 +3,7 @@ from typing import ClassVar, Literal, Protocol, TypeAlias
 
 _DependencyTuple: TypeAlias = tuple[str, str]
 Dependencies: TypeAlias = set[_DependencyTuple]
-Environments: TypeAlias = set[
-    Literal["development"] | Literal["sandbox"] | Literal["production"]
-]
+Environments: TypeAlias = set[Literal["development", "sandbox", "production"]]
 ResolvedDependencies: TypeAlias = Mapping[_DependencyTuple, tuple[str, int]]
 
 

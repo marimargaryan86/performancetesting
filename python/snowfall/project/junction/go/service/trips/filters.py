@@ -43,7 +43,7 @@ def _get_sorted_trip_duration_couples(
 
 def filter_trips(  # noqa: WPS210
     journey_candidates: orchestrator.JourneyCandidates,
-    max_trip_length_factor: int | float,
+    max_trip_length_factor: float,
 ) -> tuple[orchestrator.JourneyCandidates, orchestrator.JourneyCandidates]:
     filtered_groups: list[list[models_pb2.Trip]] = [
         [] for _ in range(len(journey_candidates.trip_groups))
@@ -69,7 +69,7 @@ def filter_trips(  # noqa: WPS210
 
 def filter_include_multimodal(
     journey_candidates: orchestrator.JourneyCandidates,
-    max_trip_length_factor: int | float,
+    max_trip_length_factor: float,
     max_multimodal_include: int = 2,
 ) -> orchestrator.JourneyCandidates:
     filtered_cands, filtered_out_cands = filter_trips(

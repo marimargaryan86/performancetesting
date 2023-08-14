@@ -15,7 +15,6 @@ from snowfall.stdlib.transport.amqp import protocol, types
 from snowfall.stdlib.v1 import amqp_pb2
 
 _Proto = TypeVar("_Proto", bound=message.Message)
-_Record_co = TypeVar("_Record_co", covariant=True)
 TRACKABLE_ID = "x-trackable-id"
 TRACKABLE_ROUTING_KEY = "x-trackable-routing-key"
 _TRACKABLE_HEADERS = (TRACKABLE_ID, TRACKABLE_ROUTING_KEY)

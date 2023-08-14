@@ -21,7 +21,7 @@ class Hash(Generic[AnyStr]):  # noqa: WPS214
     async def put(
         self,
         hash_key: str,
-        hash_value: bytes | float | int | str,
+        hash_value: bytes | float | str,
     ) -> None:
         await self._redis.hset(self._name, hash_key, hash_value)
 
@@ -61,7 +61,7 @@ class List(Generic[AnyStr]):
     async def pop(self, count: int = 1) -> list[AnyStr]:
         return await self._redis.lpop(self._name, count) or []
 
-    async def push(self, list_value: bytes | float | int | str) -> None:
+    async def push(self, list_value: bytes | float | str) -> None:
         await self._redis.rpush(self._name, list_value)
 
     async def to_iterable(self, chunk: int = 100) -> AsyncIterable[AnyStr]:
@@ -86,13 +86,13 @@ class Set(Generic[AnyStr]):
     def __str__(self) -> str:
         return self._name
 
-    async def add(self, set_value: bytes | float | int | str) -> None:
+    async def add(self, set_value: bytes | float | str) -> None:
         await self._redis.sadd(self._name, set_value)
 
-    async def has(self, set_value: bytes | float | int | str) -> bool:
+    async def has(self, set_value: bytes | float | str) -> bool:
         return await self._redis.sismember(self._name, set_value)
 
-    async def remove(self, set_value: bytes | float | int | str) -> None:
+    async def remove(self, set_value: bytes | float | str) -> None:
         await self._redis.srem(self._name, set_value)
 
     async def to_iterable(self) -> AsyncIterable[AnyStr]:
@@ -164,7 +164,7 @@ class Client(Generic[AnyStr]):  # noqa: WPS214
             thread_local=thread_local,
         )
 
-    async def put(self, name: str, raw_value: bytes | float | int | str) -> None:
+    async def put(self, name: str, raw_value: bytes | float | str) -> None:
         await self._redis.set(self._prefix + name, raw_value)
 
     async def put_expires_at(self, name: object, expiry: datetime.datetime) -> None:

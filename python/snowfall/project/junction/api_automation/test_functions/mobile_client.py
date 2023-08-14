@@ -29,15 +29,6 @@ _OfferSearchIncludes: TypeAlias = Literal[
     "offers.groups.options.details.cabinClass",
     "offers.groups.options.details.details",
 ]
-_OfferIncludes: TypeAlias = Literal[
-    "groups",
-    "groups.details",
-    "groups.details.legType",
-    "groups.options",
-    "groups.options.details",
-    "groups.options.details.cabinClass",
-    "groups.options.details.details",
-]
 
 _DATA_KEY = "data"
 _ID_KEY = "id"
@@ -54,8 +45,6 @@ _CRITERIA_KEY = "criteria"
 _CONTACT_DETAILS_KEY = "contactDetails"
 _RESIDENCE_ADDRESS_KEY = "residenceAddress"
 _ADDRESS_KEY = "address"
-
-_TripIncludes: TypeAlias = Literal["segments", "segments.legs", "segments.legs.legType"]
 
 
 class MobileApiClient(Client):  # noqa: WPS214

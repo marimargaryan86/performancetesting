@@ -36,7 +36,7 @@ class DownloadSettings(service.Settings):
     path: Path
 
 
-download_app: TypeAlias = service.Application[DownloadSettings]
+_DownloadApp: TypeAlias = service.Application[DownloadSettings]
 
 
 def _auth(name: str) -> tuple[str, str] | None:
@@ -101,7 +101,7 @@ async def download_url(  # noqa: WPS210,WPS231
     )
 
 
-async def run_download(app: download_app) -> None:
+async def run_download(app: _DownloadApp) -> None:
     """Entry point to start downloads."""
     app.settings.path.mkdir(parents=True, exist_ok=True)
 
