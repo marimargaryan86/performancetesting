@@ -128,7 +128,7 @@ EOH
         SENTRY_DSN               = "https://0bd9d1f79de14b349046c6abbb0b7d25@sentry.snowfall.se/160"
         PROMETHEUS_PORT          = "${NOMAD_PORT_prometheus}"
         FLIGHT_STATS_API_URL     = "https://api.flightstats.com"
-        FLIGHT_STATS_WEBHOOK_URL = "{var.flight_stats_webhook_url}"
+        FLIGHT_STATS_WEBHOOK_URL = "${var.flight_stats_webhook_url}"
       }
     }
   }
