@@ -9,7 +9,7 @@ from snowfall.project.pay.service.companies.v1alpha import (
     grpc_pb2_grpc,
     models_pb2,
 )
-from snowfall.stdlib import sequence
+from snowfall.stdlib import sequence, string
 
 
 class Client(abc.ABC):
@@ -50,6 +50,7 @@ class DictClient(Client):
         self,
         lead_company: models_pb2.LeadCompany,
     ) -> models_pb2.LeadCompany:
+        lead_company.id = string.uuid()
         self._lead_companies[lead_company.id] = lead_company
 
         return lead_company
