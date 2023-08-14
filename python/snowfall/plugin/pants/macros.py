@@ -134,6 +134,11 @@ def python_image(  # type: ignore[no-untyped-def]
         ("*", "!*"),
     )
 
+    if "dependencies" not in kwargs:
+        kwargs["dependencies"] = []
+
+    kwargs["dependencies"].append("vendor#tzdata")
+
     pex_binary(  # type: ignore[name-defined]  # noqa: F821
         **(
             {
@@ -161,6 +166,7 @@ def python_image(  # type: ignore[no-untyped-def]
             "ENV PYTHONFAULTHANDLER 1",
             'ENV PYTHONHASHSEED "random"',
             "ENV PYTHONUNBUFFERED 1",
+            'ENV PYTHONTZPATH ""',
             "COPY {namespace}/{name}.pex /bin/{name}".format(
                 namespace=".".join(
                     build_file_dir().parts,  # type: ignore[name-defined]  # noqa: F821
