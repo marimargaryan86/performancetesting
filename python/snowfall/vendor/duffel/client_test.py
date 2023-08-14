@@ -33,7 +33,7 @@ async def test_offer_request(
             + datetime.timedelta(days=10),
         ),
     )
-    json_res = conftest.load_file_fixture("offer_request_response.json")
+    json_res = await conftest.load_file_fixture("offer_request_response.json")
 
     httpx_mock.add_response(
         url=_BASE_URL.format(
@@ -54,7 +54,7 @@ async def test_single_offer(
     httpx_mock: pytest_httpx.HTTPXMock,
 ) -> None:
     offer_id = "off_0000AQRKj9nf2S3luPitBA"
-    json_res = conftest.load_file_fixture("single_offer.json")
+    json_res = await conftest.load_file_fixture("single_offer.json")
 
     httpx_mock.add_response(
         url=_BASE_URL.format(
@@ -75,7 +75,7 @@ async def test_error(
     httpx_mock: pytest_httpx.HTTPXMock,
 ) -> None:
     offer_id = "off_0000AQRKj9nf2S3luPitBA"
-    json_res = conftest.load_file_fixture("errors.json")
+    json_res = await conftest.load_file_fixture("errors.json")
     expected_title = (
         "422: Can't book multiple offers from the same offer request, Field"
         " 'selected_offers' has offers included in a offer request"
@@ -103,7 +103,7 @@ async def test_error_with_source_str(
     httpx_mock: pytest_httpx.HTTPXMock,
 ) -> None:
     offer_id = "off_0000AQRKj9nf2S3luPitBA"
-    json_res = conftest.load_file_fixture("order_create_error.json")
+    json_res = await conftest.load_file_fixture("order_create_error.json")
     expected_title = (
         "500: Internal Airline Error, The airline responded"
         " with an internal_error error. Please contact us."
@@ -156,7 +156,7 @@ async def test_order_create(
     order_request.add_payment(
         OrderPayment(payment_type="balance", currency="GBP", amount="1272.76"),
     )
-    json_res = conftest.load_file_fixture("order.json")
+    json_res = await conftest.load_file_fixture("order.json")
 
     httpx_mock.add_response(
         url=_BASE_URL.format(

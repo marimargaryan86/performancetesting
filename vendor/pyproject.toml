@@ -194,7 +194,7 @@ select = [
     #"RSE", # flake8-raise
     "PERF", # Perflint
     "PT", # flake8-pytest-style
-    #"PTH", # flake8-use-pathlib
+    "PTH", # flake8-use-pathlib
     "PYI", # flake8-pyi
     "Q", # flake8-quotes
     "RUF", # Ruff-specific rules

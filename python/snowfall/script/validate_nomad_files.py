@@ -1,7 +1,7 @@
 import itertools
+import pathlib
 import sys
 from collections.abc import Mapping, Sequence
-from os import path
 
 import pydantic
 
@@ -22,15 +22,12 @@ class _Configuration(pydantic.BaseModel):
 
 
 def _validate_jobs(  # noqa: WPS210
-    template_path: str,
+    template_path: pathlib.Path,
     filename: str,
     jobs: Sequence[Mapping[str, hcl2.Job]],
 ) -> bool:
     errors = False
-    expected_job_name = "{0}-{1}".format(
-        path.basename(path.dirname(template_path)),
-        filename,
-    )
+    expected_job_name = "{0}-{1}".format(template_path.parent.name, filename)
 
     for job in jobs:
         for job_name, job_data in job.items():
@@ -58,7 +55,7 @@ def _validate_jobs(  # noqa: WPS210
 
 
 def _validate_groups(
-    template_path: str,
+    template_path: pathlib.Path,
     filename: str,
     job_name: str,
     groups: Sequence[Mapping[str, hcl2.Group]],
@@ -94,7 +91,7 @@ def _validate_groups(
 
 
 def _validate_tasks(
-    template_path: str,
+    template_path: pathlib.Path,
     filename: str,
     job_name: str,
     group_name: str,
@@ -144,9 +141,9 @@ def _expected_variables(
 
 
 def _load_config_file(
-    template_path: str,
+    template_path: pathlib.Path,
 ) -> _Configuration | None:
-    config_path = "{0}.json".format(path.splitext(template_path)[0])
+    config_path = "{0}.json".format(template_path.stem)
 
     try:
         return _Configuration.parse_file(config_path)
@@ -163,7 +160,7 @@ def _load_config_file(
 
 
 def _validate_variables(
-    template_path: str,
+    template_path: pathlib.Path,
     variables: Sequence[Mapping[str, hcl2.Variable]],
 ) -> bool:
     config_data = _load_config_file(template_path)
@@ -204,20 +201,16 @@ def _main() -> bool:
 
     errors = False
 
-    for template_path in sys.argv[1:]:
-        filename = path.splitext(
-            path.basename(template_path),
-        )[
-            0
-        ].replace("_", "-")
+    for template_str in sys.argv[1:]:
+        path = pathlib.Path(template_str)
 
-        with open(template_path) as template_file:
+        with path.open() as template_file:
             parsed = hcl2.loads(template_file.read())
 
-            if _validate_jobs(template_path, filename, parsed.job):
+            if _validate_jobs(path, path.stem.replace("_", "-"), parsed.job):
                 errors = True
 
-            if _validate_variables(template_path, parsed.variable):
+            if _validate_variables(path, parsed.variable):
                 errors = True
 
     return errors

@@ -9,11 +9,13 @@ from functools import partial
 from typing import Any, TypedDict
 from unittest import mock
 
+import aiofiles
 import aiosmtplib
 import httpx
 import jwt as jwtlib
 import lagom
 import mongomock_motor
+import orjson
 import pytest
 from bson import json_util
 from cryptography.hazmat.primitives import serialization
@@ -125,9 +127,14 @@ def existing_user_verification_code(existing_user: ExistingUser) -> Verification
     return VerificationCode(existing_user["model"].email, "1337")
 
 
-def load_json_fixture(path: str, base_path: str = _FIXTURES_PATH) -> Any:
-    with open(base_path.format(path=path)) as json_file:
-        return json_util.loads(json_file.read())
+async def load_bson_fixture(path: str, base_path: str = _FIXTURES_PATH) -> Any:
+    async with aiofiles.open(base_path.format(path=path)) as json_file:
+        return json_util.loads(await json_file.read())
+
+
+async def load_json_fixture(path: str, base_path: str = _FIXTURES_PATH) -> Any:
+    async with aiofiles.open(base_path.format(path=path)) as json_file:
+        return orjson.loads(await json_file.read())
 
 
 class Response(TypedDict):
@@ -137,8 +144,8 @@ class Response(TypedDict):
     json: dict[str, Any]
 
 
-def load_response_fixture(path: str) -> Response:
-    response_dict = load_json_fixture(path, _RESPONSE_FIXTURES_PATH)
+async def load_response_fixture(path: str) -> Response:
+    response_dict = await load_json_fixture(path, _RESPONSE_FIXTURES_PATH)
     response_dict["url"] = re.compile(
         ".*{path_regex}".format(path_regex=response_dict["url"]),
     )
@@ -146,8 +153,8 @@ def load_response_fixture(path: str) -> Response:
 
 
 @pytest.fixture()
-def places_fixture() -> Sequence[dict[str, Any]]:
-    return load_json_fixture("places.json")
+async def places_fixture() -> Sequence[dict[str, Any]]:
+    return await load_bson_fixture("places.bson")
 
 
 @pytest.fixture()

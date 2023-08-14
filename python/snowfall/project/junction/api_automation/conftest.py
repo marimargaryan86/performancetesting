@@ -59,7 +59,7 @@ def local_config(
     json_file_name = (Path.home() / config_file_name).with_suffix(".json")
     if not json_file_name.exists():
         return {}
-    with open(json_file_name) as json_file:
+    with json_file_name.open() as json_file:
         config = json.load(json_file)
         malformed_keys = [
             key

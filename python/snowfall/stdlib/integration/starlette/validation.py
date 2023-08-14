@@ -1,4 +1,5 @@
 import dataclasses
+import pathlib
 from typing import cast
 
 import jsonschema
@@ -94,9 +95,9 @@ def invalid_schema_value_to_errors(
 class Validator(object):
     def __init__(
         self,
-        spec_path: str,
+        spec_path: pathlib.Path,
     ):
-        with open(spec_path) as spec_file:
+        with spec_path.open() as spec_file:
             self._spec = spec.Spec.from_dict(
                 orjson.loads(spec_file.read()),
                 spec_url="file://{0}".format(spec_path),

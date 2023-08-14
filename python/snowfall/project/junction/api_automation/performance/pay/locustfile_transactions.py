@@ -1,3 +1,4 @@
+import pathlib
 import uuid as pyuuid
 from argparse import ArgumentParser
 
@@ -21,7 +22,7 @@ class Transactions(HttpUser):
     wait_time = constant_pacing(1)  # type: ignore[no-untyped-call]
 
     def on_start(self) -> None:
-        with open("quotations.txt") as txt_file:
+        with pathlib.Path("quotations.txt").open() as txt_file:
             self.quotations_list = [line.strip() for line in txt_file]
 
     @task
@@ -58,6 +59,6 @@ class Transactions(HttpUser):
         )
         json_transaction_id = response.json()
         transaction_id = json_transaction_id["data"]["id"]
-        with open("transactions.txt", "a") as txt_file:
+        with pathlib.Path("transactions.txt").open("a") as txt_file:
             txt_file.write(transaction_id)
             txt_file.write("\n")

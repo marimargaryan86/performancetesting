@@ -19,7 +19,7 @@ class TestPricingTransformer(object):
         self,
         redis_client: aioredis.Redis[bytes],
     ) -> None:
-        json_res = conftest.load_file_fixture("single_offer.json")
+        json_res = await conftest.load_file_fixture("single_offer.json")
         offer = SingleOfferResponse.parse_obj(json_res).response_data
 
         transformer = PriceQuoteTransformer(

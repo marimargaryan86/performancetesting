@@ -12,7 +12,7 @@ class TestTrips(object):
         httpx_mock: pytest_httpx.HTTPXMock,
     ) -> None:
         httpx_mock.add_response(
-            **conftest.load_response_fixture("POST_TRIPS_SEARCHES.json"),
+            **await conftest.load_response_fixture("POST_TRIPS_SEARCHES.json"),
         )
 
         response = await authenticated_http_client.post(

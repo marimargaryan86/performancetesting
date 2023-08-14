@@ -3,12 +3,13 @@ from __future__ import annotations
 import contextlib
 import datetime
 import hashlib
-import json
 from collections.abc import AsyncIterator, Iterator
 from typing import Any, cast
 from unittest import mock
 
+import aiofiles
 import httpx
+import orjson
 import pytest
 import pytest_httpx
 from motor import motor_asyncio
@@ -31,7 +32,7 @@ from snowfall.vendor.ask2go import client
 from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
 
-def load_json_fixture(
+async def load_json_fixture(
     file_name: str,
 ) -> dict[str, Any]:
     file_path = filesystem.resource_path(
@@ -41,8 +42,8 @@ def load_json_fixture(
         ),
     )
 
-    with open(file_path) as file_handle:
-        return json.load(file_handle)
+    async with aiofiles.open(file_path) as file_handle:
+        return orjson.loads(await file_handle.read())
 
 
 class MagicMocker(object):
@@ -76,7 +77,7 @@ class MagicMocker(object):
             )
 
         try:
-            fixture = load_json_fixture(filename)
+            fixture = await load_json_fixture(filename)
         except FileNotFoundError:
             self._logger.info("File does not exist", file=filename)
             return

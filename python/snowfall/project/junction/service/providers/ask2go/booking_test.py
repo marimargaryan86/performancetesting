@@ -38,16 +38,18 @@ _ORDER_TASK = amqp_pb2.PlaceOrderTask(
 )
 
 
-def _mock_responses(
+async def _mock_responses(
     httpx_mock: pytest_httpx.HTTPXMock,
     trip: str,
 ) -> None:
     httpx_mock.add_response(
         method="POST",
-        json=conftest.load_json_fixture("{trip}_post_booking".format(trip=trip)),
+        json=await conftest.load_json_fixture("{trip}_post_booking".format(trip=trip)),
         url="https://test_url/api/Booking",
     )
-    put_response = conftest.load_json_fixture("{trip}_put_booking".format(trip=trip))
+    put_response = await conftest.load_json_fixture(
+        "{trip}_put_booking".format(trip=trip),
+    )
     httpx_mock.add_response(
         method="PUT",
         json=put_response,
@@ -55,7 +57,7 @@ def _mock_responses(
     )
     httpx_mock.add_response(
         method="GET",
-        json=conftest.load_json_fixture("{trip}_get_booking".format(trip=trip)),
+        json=await conftest.load_json_fixture("{trip}_get_booking".format(trip=trip)),
         url=_GET_BOOKING_URL.format(
             id=put_response["id"],
             transaction_id=put_response["transactionId"],
@@ -67,7 +69,7 @@ async def test_booking_can_be_placed(
     httpx_mock: pytest_httpx.HTTPXMock,
     booking_handler: booking.BookingHandler,
 ) -> None:
-    _mock_responses(httpx_mock, "ARN_LHR_2022-07-26")
+    await _mock_responses(httpx_mock, "ARN_LHR_2022-07-26")
     booking_proto = await booking_handler.book(
         task=_ORDER_TASK,
         quote=cache.PriceQuote(pricing_id="foo", transaction_id="bar"),
@@ -84,7 +86,7 @@ async def test_booking_failed(
     httpx_mock: pytest_httpx.HTTPXMock,
     booking_handler: booking.BookingHandler,
 ) -> None:
-    _mock_responses(httpx_mock, "ARN_LAX_2022-11-26")
+    await _mock_responses(httpx_mock, "ARN_LAX_2022-11-26")
     booking_proto = await booking_handler.book(
         task=_ORDER_TASK,
         quote=cache.PriceQuote(pricing_id="foo", transaction_id="bar"),

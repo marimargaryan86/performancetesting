@@ -1,3 +1,4 @@
+import pathlib
 import string as pystring
 from argparse import ArgumentParser
 from typing import ClassVar
@@ -137,7 +138,7 @@ class Accounts(HttpUser):
         json_balance_id = response.json()
         balance_id = json_balance_id["data"]["id"]
 
-        with open("add_currency.txt", "a") as txt_file:
+        with pathlib.Path("add_currency.txt").open("a") as txt_file:
             txt_file.write(balance_id)
             txt_file.write("\n")
 

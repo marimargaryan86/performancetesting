@@ -1,4 +1,5 @@
 import logging
+import pathlib
 import random
 from argparse import ArgumentParser
 from typing import ClassVar
@@ -94,7 +95,7 @@ class Quotes(HttpUser):
         logger.info("response quotes : %s", response.json())
         quotation_id = json_quotation_id["data"]["id"]
         self.quotations_list.append(quotation_id)
-        with open("quotations.txt", "a") as txt_file:
+        with pathlib.Path("quotations.txt").open("a") as txt_file:
             txt_file.write(quotation_id)
             txt_file.write("\n")
         if len(self.quotations_list) >= int(self.environment.parsed_options.quotes):

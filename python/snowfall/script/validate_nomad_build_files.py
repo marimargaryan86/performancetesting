@@ -21,7 +21,7 @@ def _validate_service(
         _log_error("{0}: file does not exist".format(relative_path))
         return True
 
-    with open(build_file, "rb") as build_fp:
+    with build_file.open("rb") as build_fp:
         relevant_line = _parse_build_file(build_fp)
 
     if not relevant_line:
@@ -87,7 +87,7 @@ def _validate_build_file(  # noqa: WPS210
             )
             continue
 
-        with open(nomad_file) as nomad_fp:
+        with nomad_file.open() as nomad_fp:
             if "docker_image" in nomad_fp.read():
                 is_built_service = True
 

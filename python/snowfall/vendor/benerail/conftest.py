@@ -1,9 +1,10 @@
 from collections.abc import AsyncIterator
 from typing import Any
 
+import aiofiles
 import httpx
+import orjson
 import pytest
-from bson import json_util
 
 from snowfall.stdlib.persistence import filesystem
 from snowfall.vendor.benerail import client
@@ -26,7 +27,7 @@ def benerail_client(httpx_client: httpx.AsyncClient) -> client.BenerailClient:
     )
 
 
-def load_file_fixture(
+async def load_file_fixture(
     file_name: str,
 ) -> Any:
     file_path = filesystem.resource_path(
@@ -36,5 +37,5 @@ def load_file_fixture(
         ),
     )
 
-    with open(file_path) as json_file:
-        return json_util.loads(json_file.read())
+    async with aiofiles.open(file_path) as json_file:
+        return orjson.loads(await json_file.read())

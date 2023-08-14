@@ -23,16 +23,16 @@ class TestOrders(object):
         monkeypatch: pytest.MonkeyPatch,
     ) -> httpx.Response:
         httpx_mock.add_response(
-            **conftest.load_response_fixture("POST_ORDERS.json"),
+            **await conftest.load_response_fixture("POST_ORDERS.json"),
         )
         httpx_mock.add_response(
-            **conftest.load_response_fixture("GET_ORDERS_{ID}.json"),
+            **await conftest.load_response_fixture("GET_ORDERS_{ID}.json"),
         )
         httpx_mock.add_response(
-            **conftest.load_response_fixture("GET_OFFERS_QUOTES_{ID}.json"),
+            **await conftest.load_response_fixture("GET_OFFERS_QUOTES_{ID}.json"),
         )
         httpx_mock.add_response(
-            **conftest.load_response_fixture("POST_REGISTER.json"),
+            **await conftest.load_response_fixture("POST_REGISTER.json"),
         )
 
         payments.cancel = mock.AsyncMock()

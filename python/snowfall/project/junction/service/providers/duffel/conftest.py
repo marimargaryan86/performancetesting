@@ -6,9 +6,10 @@ import zoneinfo
 from typing import Any
 from unittest import mock
 
+import aiofiles
 import httpx
+import orjson
 import pytest
-from bson import json_util
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.go.v1 import models_pb2
@@ -229,7 +230,7 @@ def search_task_from_offer(offer: Offer) -> amqp_pb2.SearchCriteriaTask:
     )
 
 
-def load_file_fixture(
+async def load_file_fixture(
     file_name: str,
 ) -> Any:
     file_path = filesystem.resource_path(
@@ -239,5 +240,5 @@ def load_file_fixture(
         ),
     )
 
-    with open(file_path) as json_file:
-        return json_util.loads(json_file.read())
+    async with aiofiles.open(file_path) as json_file:
+        return orjson.loads(await json_file.read())

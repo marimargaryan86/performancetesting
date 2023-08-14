@@ -12,7 +12,7 @@ class TestOffersQuotes(object):
         httpx_mock: pytest_httpx.HTTPXMock,
     ) -> None:
         httpx_mock.add_response(
-            **conftest.load_response_fixture("POST_OFFERS_QUOTES.json"),
+            **await conftest.load_response_fixture("POST_OFFERS_QUOTES.json"),
         )
         response = await authenticated_http_client.post(
             "/offers/quotes",
@@ -48,7 +48,7 @@ class TestOffersQuotes(object):
         httpx_mock: pytest_httpx.HTTPXMock,
     ) -> None:
         httpx_mock.add_response(
-            **conftest.load_response_fixture("GET_OFFERS_QUOTES_{ID}.json"),
+            **await conftest.load_response_fixture("GET_OFFERS_QUOTES_{ID}.json"),
         )
 
         response = await authenticated_http_client.get(

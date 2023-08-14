@@ -19,11 +19,11 @@ from snowfall.vendor.ba_ndc.models.response_offer_search_schemas import (
 )
 
 
-def get_search_task_for_fixture(
+async def get_search_task_for_fixture(
     httpx_mock: pytest_httpx.HTTPXMock,
     name: str,
 ) -> SearchCriteriaTask | None:
-    json = load_file_fixture(name)
+    json = await load_file_fixture(name)
     assert json is not None
 
     httpx_mock.add_response(
@@ -42,7 +42,10 @@ async def test_adapter(
     httpx_mock: pytest_httpx.HTTPXMock,
     search_adapter: adapter.BaNdcSearchAdapter,
 ) -> None:
-    search_task = get_search_task_for_fixture(httpx_mock, "get_offers_response.json")
+    search_task = await get_search_task_for_fixture(
+        httpx_mock,
+        "get_offers_response.json",
+    )
 
     if search_task is not None:
         offer_groups = [
@@ -62,7 +65,10 @@ async def test_offer_price_breakdown(  # noqa: WPS210, WPS218
     httpx_mock: pytest_httpx.HTTPXMock,
     search_adapter: adapter.BaNdcSearchAdapter,
 ) -> None:
-    search_task = get_search_task_for_fixture(httpx_mock, "get_offers_response.json")
+    search_task = await get_search_task_for_fixture(
+        httpx_mock,
+        "get_offers_response.json",
+    )
 
     if search_task is not None:
         offer_groups = [

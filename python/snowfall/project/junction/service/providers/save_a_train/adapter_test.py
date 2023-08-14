@@ -52,8 +52,8 @@ _ORDER_TASK = amqp_pb2.PlaceOrderTask(
 )
 
 
-def _mock_responses(httpx_mock: pytest_httpx.HTTPXMock) -> None:
-    responses = conftest.load_json_fixture("booking")
+async def _mock_responses(httpx_mock: pytest_httpx.HTTPXMock) -> None:
+    responses = await conftest.load_json_fixture("booking")
     httpx_mock.add_response(
         method="POST",
         json=responses["selectSearchResult"],
@@ -88,7 +88,7 @@ async def test_booking_can_be_placed(
         mock.AsyncMock()
     )
 
-    _mock_responses(httpx_mock)
+    await _mock_responses(httpx_mock)
     booking_proto = await save_a_train_adapter.create_booking(
         task=_ORDER_TASK,
         offer_details=cache.OfferDetails(

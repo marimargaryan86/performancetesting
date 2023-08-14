@@ -12,7 +12,9 @@ class TestHandlers(object):
         httpx_mock: pytest_httpx.HTTPXMock,
     ) -> None:
         httpx_mock.add_response(
-            **conftest.load_response_fixture("GET_TRIPS_SEARCHES_{ID}_TRIPS_404.json"),
+            **await conftest.load_response_fixture(
+                "GET_TRIPS_SEARCHES_{ID}_TRIPS_404.json",
+            ),
         )
 
         response = await authenticated_http_client.get(

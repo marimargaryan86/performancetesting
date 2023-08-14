@@ -44,7 +44,7 @@ def create_starlette_app(  # noqa: WPS211
         stack.append(
             Middleware(
                 middlewares.ValidationMiddleware,
-                validator=validation.Validator(str(openapi_path)),
+                validator=validation.Validator(openapi_path),
                 excluded_status_codes={
                     http.HTTPStatus.METHOD_NOT_ALLOWED,
                     http.HTTPStatus.INTERNAL_SERVER_ERROR,

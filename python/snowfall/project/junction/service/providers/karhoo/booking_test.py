@@ -35,10 +35,10 @@ _ORDER_TASK = amqp_pb2.PlaceOrderTask(
 )
 
 
-def _mock_responses(httpx_mock: pytest_httpx.HTTPXMock) -> None:
+async def _mock_responses(httpx_mock: pytest_httpx.HTTPXMock) -> None:
     httpx_mock.add_response(
         method="POST",
-        json=conftest.load_json_fixture("booking"),
+        json=await conftest.load_json_fixture("booking"),
         url="https://test_url/v1/bookings",
     )
 
@@ -47,7 +47,7 @@ async def test_booking_can_be_placed(
     httpx_mock: pytest_httpx.HTTPXMock,
     karhoo_booking_handler: booking.BookingHandler,
 ) -> None:
-    _mock_responses(httpx_mock)
+    await _mock_responses(httpx_mock)
 
     booking_proto = await karhoo_booking_handler.book(
         task=_ORDER_TASK,

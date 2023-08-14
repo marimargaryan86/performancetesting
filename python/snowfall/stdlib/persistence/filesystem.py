@@ -37,7 +37,7 @@ class Storage(object):
         base_path: pathlib.Path | None = None,
     ):
         self._filesystem = filesystem
-        self._base_path = base_path or pathlib.Path("")
+        self._base_path = base_path or pathlib.Path()
 
     async def boot(self) -> None:
         await self._filesystem._makedirs(  # noqa: SLF001

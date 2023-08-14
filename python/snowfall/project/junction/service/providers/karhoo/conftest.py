@@ -1,8 +1,9 @@
-import json
 from collections.abc import AsyncIterator
 from typing import Any
 
+import aiofiles
 import httpx
+import orjson
 import pytest
 
 from snowfall.project.junction.provider import notifications
@@ -11,7 +12,7 @@ from snowfall.stdlib.persistence import filesystem
 from snowfall.vendor.karhoo import client
 
 
-def load_json_fixture(
+async def load_json_fixture(
     file_name: str,
 ) -> dict[str, Any]:
     file_path = filesystem.resource_path(
@@ -21,8 +22,8 @@ def load_json_fixture(
         ),
     )
 
-    with open(file_path) as file_handle:
-        return json.load(file_handle)
+    async with aiofiles.open(file_path) as file_handle:
+        return orjson.loads(await file_handle.read())
 
 
 @pytest.fixture()

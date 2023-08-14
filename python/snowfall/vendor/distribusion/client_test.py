@@ -10,7 +10,7 @@ async def test_marketing_carriers(
     distribusion_client: client.DistribusionClient,
     httpx_mock: pytest_httpx.HTTPXMock,
 ) -> None:
-    json_res = conftest.load_file_fixture("marketing_carriers_response.json")
+    json_res = await conftest.load_file_fixture("marketing_carriers_response.json")
 
     httpx_mock.add_response(
         url=_BASE_URL.format(
@@ -33,7 +33,9 @@ async def test_marketing_carrier_details(
     distribusion_client: client.DistribusionClient,
     httpx_mock: pytest_httpx.HTTPXMock,
 ) -> None:
-    json_res = conftest.load_file_fixture("marketing_carrier_details_response.json")
+    json_res = await conftest.load_file_fixture(
+        "marketing_carrier_details_response.json",
+    )
 
     httpx_mock.add_response(
         url=_BASE_URL.format(
@@ -55,7 +57,7 @@ async def test_get_stations(
     distribusion_client: client.DistribusionClient,
     httpx_mock: pytest_httpx.HTTPXMock,
 ) -> None:
-    json_res = conftest.load_file_fixture("get_stations_response.json")
+    json_res = await conftest.load_file_fixture("get_stations_response.json")
 
     httpx_mock.add_response(
         url=_BASE_URL.format(
@@ -78,8 +80,8 @@ async def test_create_order(
     distribusion_client: client.DistribusionClient,
     httpx_mock: pytest_httpx.HTTPXMock,
 ) -> None:
-    json_req = conftest.load_file_fixture("create_order_request.json")
-    json_res = conftest.load_file_fixture("create_order_response.json")
+    json_req = await conftest.load_file_fixture("create_order_request.json")
+    json_res = await conftest.load_file_fixture("create_order_response.json")
 
     httpx_mock.add_response(
         url=_BASE_URL.format(
@@ -101,7 +103,7 @@ async def test_get_order(  # noqa: WPS218
     httpx_mock: pytest_httpx.HTTPXMock,
 ) -> None:
     order_id = "VICA-37de14da-6169-4afd-9d68-e90be76b51a1"
-    json_res = conftest.load_file_fixture("get_order_response.json")
+    json_res = await conftest.load_file_fixture("get_order_response.json")
 
     httpx_mock.add_response(
         url=_BASE_URL.format(

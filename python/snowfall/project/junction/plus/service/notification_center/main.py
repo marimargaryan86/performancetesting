@@ -55,7 +55,7 @@ async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
             whatsapp_channel=ProviderChannel(
                 sid=app.settings.twilio_sid,
                 token=app.settings.twilio_token,
-                templates_root_path=pathlib.Path("."),
+                templates_root_path=pathlib.Path(),
             ),
         ),
     )

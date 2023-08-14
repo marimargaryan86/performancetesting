@@ -18,11 +18,11 @@ from snowfall.vendor.duffel.models.offer import PrivateFare
 from snowfall.vendor.duffel.models.offer_request import OfferRequestResponse
 
 
-def get_search_task_for_fixture(
+async def get_search_task_for_fixture(
     httpx_mock: pytest_httpx.HTTPXMock,
     name: str,
 ) -> SearchCriteriaTask:
-    json = load_file_fixture(name)
+    json = await load_file_fixture(name)
     assert json is not None
 
     httpx_mock.add_response(
@@ -41,7 +41,10 @@ async def test_adapter(
     httpx_mock: pytest_httpx.HTTPXMock,
     search_adapter: adapter.DuffelSearchAdapter,
 ) -> None:
-    search_task = get_search_task_for_fixture(httpx_mock, "offer_request_response.json")
+    search_task = await get_search_task_for_fixture(
+        httpx_mock,
+        "offer_request_response.json",
+    )
 
     offer_groups = [
         offer_group
@@ -62,7 +65,7 @@ async def test_offer_with_stop(
     httpx_mock: pytest_httpx.HTTPXMock,
     search_adapter: adapter.DuffelSearchAdapter,
 ) -> None:
-    json = load_file_fixture("offers_with_stop.json")
+    json = await load_file_fixture("offers_with_stop.json")
     assert json is not None
 
     httpx_mock.add_response(
@@ -103,7 +106,7 @@ async def test_airline_validator(  # noqa: WPS210
     search_adapter_no_ba: adapter.DuffelSearchAdapter,
     search_adapter_ba_only: adapter.DuffelSearchAdapter,
 ) -> None:
-    json = load_file_fixture("offers_with_stop.json")
+    json = await load_file_fixture("offers_with_stop.json")
     assert json is not None
 
     httpx_mock.add_response(
@@ -213,7 +216,10 @@ async def test_private_fares_and_specific_token(
     httpx_mock: pytest_httpx.HTTPXMock,
     search_adapter: adapter.DuffelSearchAdapter,
 ) -> None:
-    search_task = get_search_task_for_fixture(httpx_mock, "offer_request_response.json")
+    search_task = await get_search_task_for_fixture(
+        httpx_mock,
+        "offer_request_response.json",
+    )
 
     search_task.criteria.reseller_id = "res1"
     search_criteria_wrapper = search_adapter.search_criteria_generator(search_task)
@@ -237,7 +243,10 @@ async def test_offer_price_breakdown(  # noqa: WPS210, WPS218
     httpx_mock: pytest_httpx.HTTPXMock,
     search_adapter: adapter.DuffelSearchAdapter,
 ) -> None:
-    search_task = get_search_task_for_fixture(httpx_mock, "offer_request_response.json")
+    search_task = await get_search_task_for_fixture(
+        httpx_mock,
+        "offer_request_response.json",
+    )
 
     offer_groups = [
         offer_group

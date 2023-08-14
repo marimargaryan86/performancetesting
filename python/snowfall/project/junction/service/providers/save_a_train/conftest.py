@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import datetime
-import json
 from collections.abc import AsyncIterator
 from typing import Any
 
+import aiofiles
 import httpx
+import orjson
 import pytest
 from motor import motor_asyncio
 from redis import asyncio as aioredis
@@ -22,7 +23,7 @@ from snowfall.stdlib.transport.amqp import producer, types
 from snowfall.vendor.save_a_train import client
 
 
-def load_json_fixture(
+async def load_json_fixture(
     file_name: str,
 ) -> dict[str, Any]:
     file_path = filesystem.resource_path(
@@ -32,8 +33,8 @@ def load_json_fixture(
         ),
     )
 
-    with open(file_path) as file_handle:
-        return json.load(file_handle)
+    async with aiofiles.open(file_path) as file_handle:
+        return orjson.loads(await file_handle.read())
 
 
 @pytest.fixture()

@@ -13,7 +13,7 @@ async def test_get_booking(
     httpx_mock: pytest_httpx.HTTPXMock,
     benerail_client: client.BenerailClient,
 ) -> None:
-    json_res = conftest.load_file_fixture("get_booking_response.json")
+    json_res = await conftest.load_file_fixture("get_booking_response.json")
 
     httpx_mock.add_response(
         url="{base_path}/{booking_path}/{booking_id}".format(
@@ -40,7 +40,7 @@ async def test_create_dialogue(
     httpx_mock: pytest_httpx.HTTPXMock,
     benerail_client: client.BenerailClient,
 ) -> None:
-    json_res = conftest.load_file_fixture("get_dialogue.json")
+    json_res = await conftest.load_file_fixture("get_dialogue.json")
 
     httpx_mock.add_response(
         url="{base_path}/{dialogue_path}".format(
@@ -61,8 +61,8 @@ async def test_create_passenger(
     httpx_mock: pytest_httpx.HTTPXMock,
     benerail_client: client.BenerailClient,
 ) -> None:
-    json_req = conftest.load_file_fixture("create_passenger_request.json")
-    json_res = conftest.load_file_fixture("create_passenger_response.json")
+    json_req = await conftest.load_file_fixture("create_passenger_request.json")
+    json_res = await conftest.load_file_fixture("create_passenger_response.json")
 
     httpx_mock.add_response(
         url="{base_path}/{dialogue_path}/{dialogue_id}/passengers".format(
@@ -88,7 +88,7 @@ async def test_get_dialogue(
     httpx_mock: pytest_httpx.HTTPXMock,
     benerail_client: client.BenerailClient,
 ) -> None:
-    json_res = conftest.load_file_fixture("get_dialogue.json")
+    json_res = await conftest.load_file_fixture("get_dialogue.json")
 
     httpx_mock.add_response(
         url="{base_path}/{dialogue_path}/{dialogue_id}".format(
@@ -112,7 +112,7 @@ async def test_get_trip_offer(
     httpx_mock: pytest_httpx.HTTPXMock,
     benerail_client: client.BenerailClient,
 ) -> None:
-    json_res = conftest.load_file_fixture("get_trip_offer.json")
+    json_res = await conftest.load_file_fixture("get_trip_offer.json")
 
     httpx_mock.add_response(
         url="{base_path}/{path}/trip-offers/{id}".format(
@@ -135,7 +135,7 @@ async def test_get_offer(
     httpx_mock: pytest_httpx.HTTPXMock,
     benerail_client: client.BenerailClient,
 ) -> None:
-    json_res = conftest.load_file_fixture("get_offer.json")
+    json_res = await conftest.load_file_fixture("get_offer.json")
 
     httpx_mock.add_response(
         url="{base_path}/{path}/offers/{id}".format(

@@ -1,5 +1,6 @@
 import base64
 import contextlib
+import pathlib
 import random
 from collections.abc import AsyncGenerator, Callable
 from functools import partial
@@ -37,13 +38,15 @@ from snowfall.vendor.junction.go import client
 
 
 def replace_in_file(path: str, find: str, replace: str) -> None:
-    with open(path) as file_r:
+    path_obj = pathlib.Path(path)
+
+    with path_obj.open("r") as file_r:
         file_content = file_r.read()
     file_content = file_content.replace(
         find,
         replace,
     )
-    with open(path, "w") as file_w:
+    with path_obj.open("w") as file_w:
         file_w.write(file_content)
 
 

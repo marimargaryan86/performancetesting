@@ -1,10 +1,11 @@
 import datetime
-import json
 from collections.abc import Mapping
 from typing import Any
 
+import aiofiles
 import freezegun
 import httpx
+import orjson
 import pytest
 import pytest_httpx
 
@@ -12,7 +13,7 @@ from snowfall.stdlib.persistence import filesystem
 from snowfall.vendor.ory import client, models
 
 
-def _load_json_fixture(
+async def _load_json_fixture(
     file_name: str,
 ) -> dict[str, Any]:
     file_path = filesystem.resource_path(
@@ -22,13 +23,13 @@ def _load_json_fixture(
         ),
     )
 
-    with open(file_path) as file_handle:
-        return json.load(file_handle)
+    async with aiofiles.open(file_path) as file_handle:
+        return orjson.loads(await file_handle.read())
 
 
 @pytest.fixture()
-def session_response() -> dict[str, Any]:
-    return _load_json_fixture("sessions_whoami")
+async def session_response() -> dict[str, Any]:
+    return await _load_json_fixture("sessions_whoami")
 
 
 @pytest.fixture()
@@ -56,7 +57,7 @@ class TestClient(object):
     ) -> None:
         httpx_mock.add_response(
             status_code=401,
-            json=_load_json_fixture("sessions_whoami_401"),
+            json=await _load_json_fixture("sessions_whoami_401"),
         )
 
         with pytest.raises(httpx.HTTPStatusError):
