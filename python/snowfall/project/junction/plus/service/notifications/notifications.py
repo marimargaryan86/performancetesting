@@ -122,6 +122,22 @@ class SubscriberRepository(
 
         return update.matched_count
 
+    async def subscribe(self, identifier: str) -> bool:
+        update = await self._execute(
+            self._collection.update_one,
+            {"_id": identifier},
+            {
+                "$set": {
+                    "phone_subscription_status": (
+                        models_pb2.Subscriber.SubscribedStatus.SUBSCRIBED_STATUS_SUBSCRIBED
+                    ),
+                },
+            },
+            upsert=False,
+        )
+
+        return update.matched_count
+
 
 class ConfigurationVectorRepository(
     mixins.FindByIdMixin[models_pb2.ConfigurationVector],

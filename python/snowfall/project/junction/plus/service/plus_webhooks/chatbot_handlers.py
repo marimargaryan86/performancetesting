@@ -55,6 +55,7 @@ class MessageHandler(object):
 # TODO: Change this to class method and use it as decorator to register handlers
 def message_handlers(fun: str) -> Callable[..., Awaitable[str]]:
     return {
+        "subscribe": subscribe,
         "unsubscribe": unsubscribe,
     }.get(fun, handle_unknown)
 
@@ -71,6 +72,19 @@ async def unsubscribe(
             " please click the Subscribe button below."
         )
     raise RuntimeError("error while unsubscribing with id: {0}".format(subscriber.id))
+
+
+async def subscribe(
+    subscriber: models_pb2.Subscriber,
+    subscribers_client: subscribers.Client,
+) -> str:  # noqa: WPS473
+    subscribe_status = await subscribers_client.subscribe(subscriber.id)
+    if subscribe_status:
+        return (
+            "You have successfully subscribed on WhatsApp!"
+            " You can now receive notifications regarding travel information."
+        )
+    raise RuntimeError("error while subscribing with id: {0}".format(subscriber.id))
 
 
 async def handle_unknown(

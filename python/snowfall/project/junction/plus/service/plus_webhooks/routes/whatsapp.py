@@ -7,6 +7,9 @@ from snowfall.project.junction.plus.adapter import (
     subscribers,
     validation,
 )
+from snowfall.project.junction.plus.service.notifications.v1alpha import (
+    models_pb2 as notifications_pb2,
+)
 from snowfall.project.junction.plus.service.plus_webhooks import chatbot_handlers
 
 
@@ -37,9 +40,14 @@ class IncomingMessages(endpoints.HTTPEndpoint):
                 subscribers_client,
             ),
         )
-        twiml_response.message(
-            "Please select one of the following options",
-        )
+        subscriber = await subscribers_client.get(subscriber_id=subscriber.id)
+        if (  # noqa: WPS337
+            subscriber.phone_subscription_status
+            is not notifications_pb2.Subscriber.SubscribedStatus.SUBSCRIBED_STATUS_UNSUBSCRIBED
+        ):
+            twiml_response.message(
+                "Please select one of the following options",
+            )
         return responses.Response(
             content=twiml_response.to_xml(),
             status_code=status.HTTP_200_OK,

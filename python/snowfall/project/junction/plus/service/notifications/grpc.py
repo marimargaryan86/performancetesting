@@ -115,6 +115,16 @@ class SubscriberService(
             is_success=unsubscribe_status,
         )
 
+    async def Subscribe(  # type: ignore[override]  # noqa: N802
+        self,
+        request: notifications_pb2.SubscribeRequest,
+        context: aio.ServicerContext,
+    ) -> notifications_pb2.SubscribeResponse:
+        subscribe_status = await self._subscribers.subscribe(request.identifier)
+        return notifications_pb2.SubscribeResponse(
+            is_success=subscribe_status,
+        )
+
 
 class ConfigurationVectorService(
     service.Service,

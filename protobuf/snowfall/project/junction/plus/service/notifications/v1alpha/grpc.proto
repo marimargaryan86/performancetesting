@@ -14,6 +14,7 @@ service SubscriberService {
   rpc GetSubscriber(GetSubscriberRequest) returns (GetSubscriberResponse) {}
   rpc GetSubscriberFromReseller(GetSubscriberFromResellerRequest) returns (GetSubscriberFromResellerResponse) {}
   rpc Unsubscribe(UnsubscribeRequest) returns (UnsubscribeResponse) {}
+  rpc Subscribe(SubscribeRequest) returns (SubscribeResponse) {}
 }
 
 service ConfigurationVectorService {
@@ -66,6 +67,14 @@ message UnsubscribeRequest {
 }
 
 message UnsubscribeResponse {
+  bool is_success = 1;
+}
+
+message SubscribeRequest {
+  string identifier = 1;
+}
+
+message SubscribeResponse {
   bool is_success = 1;
 }
 
