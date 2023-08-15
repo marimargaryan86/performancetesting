@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { AccountIdentifierSchema } from "./account";
-import type { RelationshipSchema } from "./common";
 import type { CurrencyIdentifierSchema } from "./money";
+import type { RelationshipSchema } from "integration/common/schemas";
 
 export const paymentTypes = z.enum(["priority", "regular"]);
 

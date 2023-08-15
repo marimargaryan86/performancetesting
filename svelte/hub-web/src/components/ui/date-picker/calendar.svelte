@@ -115,6 +115,7 @@
 
   {#each days as day, idx}
     <button
+      type="button"
       class="cell date"
       class:prev-month={idx < paddingLeft}
       class:next-month={idx >= days.length - paddingRight}

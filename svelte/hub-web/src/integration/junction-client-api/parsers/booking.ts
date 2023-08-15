@@ -8,7 +8,8 @@ import type { JourneySchema } from "../schemas/journey";
 import type { CabinClassSchema, LegTypeSchema } from "../schemas/offer";
 import type { OrderSchema } from "../schemas/order";
 import { parseOrder } from "./order";
-import { parsePrice } from "./money";
+import { parsePriceSchema } from "./money";
+import { parsePointSchema } from "./common";
 
 export function parseBookingDetails(
   bookingDetails: BookingDetailsSchema,
@@ -19,8 +20,8 @@ export function parseBookingDetails(
     legs: bookingDetails.attributes.legs.map((item) => ({
       arrivalAt: new Date(item.arrivalAt),
       departureAt: new Date(item.departureAt),
-      destination: item.destination,
-      origin: item.origin,
+      destination: parsePointSchema(item.destination),
+      origin: parsePointSchema(item.origin),
     })),
     operator: bookingDetails.attributes.operator ?? undefined,
     routeIdentifiers: {
@@ -55,7 +56,7 @@ export function parseBooking(
     id: booking.id,
     externalReference: externalReference.length ? externalReference : undefined,
     operatorReferences: booking.attributes.operatorBookingReferences,
-    price: parsePrice(booking.attributes.totalPrice),
+    price: parsePriceSchema(booking.attributes.totalPrice),
     status: booking.relationships.status.data.id,
     details: details ? parseBookingDetails(details, cabinClasses, legTypes) : undefined,
     order: order ? parseOrder(order, journeys) : undefined,

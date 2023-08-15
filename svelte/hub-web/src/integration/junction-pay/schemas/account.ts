@@ -1,4 +1,4 @@
-import type { RelationshipSchema } from "./common";
+import type { RelationshipSchema } from "integration/common/schemas";
 import type { CompanyIdentifierSchema } from "./company";
 import type { ContactPersonIdentifierSchema } from "./contact-person";
 

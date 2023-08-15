@@ -2,10 +2,6 @@
   import ChevronIcon from "components/icons/chevron-icon.svelte";
   import { onMount } from "svelte";
   import { page } from "$app/stores";
-  import type { OfferModel } from "../select-offer/offer.svelte";
-
-  export let offer: OfferModel;
-  export let fare: OfferModel["alternativeFares"][number];
 
   let passengerInfo = "";
   let expanded = false;
@@ -27,46 +23,41 @@
 
 <div class="summary">
   <h3>Summary</h3>
-  <p class="typography body-xlarge-weight-600">
-    {offer?.departureStation} <span class="typography body-medium">to</span>
-    {offer?.arrivalStation}
+  <p class="typography title-medium bold">
+    Stockholm
+    <span class="typography body-medium">to</span>
+    London
   </p>
   <div>
     <div class="typography body-medium">Passengers</div>
-    <div class="typography body-medium-weight-600">{passengerInfo}</div>
+    <div class="typography title-small bold">{passengerInfo}</div>
   </div>
   <hr />
-  <button class="itinerary-details typography body-medium-weight-600" on:click={toggleExpanded}>
+  <button class="itinerary-details typography title-small bold" on:click={toggleExpanded}>
     Itinerary details
     <ChevronIcon direction={expanded ? "up" : "down"} color="var(--color-main-primary-500)" />
   </button>
   {#if expanded}
     <div class="typography body-medium">Outbound</div>
-    <div class="offer-info typography body-medium-weight-600">
+    <div class="offer-info typography title-small bold">
       <div class="offer-direction">
         <div class="circle" />
         <div class="line" />
         <div class="circle" />
       </div>
       <div class="offer-time">
-        <div class="departure-time">{offer?.departureTime}</div>
-        <div class="journey-duration grey-color typography body-small">
-          {offer?.journeyDuration}
-        </div>
-        <div class="arrival-time">{offer?.arrivalTime}</div>
+        <div class="departure-time">12:00</div>
+        <div class="journey-duration grey-color typography body-small">1h 30m</div>
+        <div class="arrival-time">13:00</div>
       </div>
       <div class="offer-stations">
         <div class="departure-station station">
-          <span>{offer?.departureStation}</span>
-          <span class="grey-color station-info typography body-small"
-            >{offer?.departureStationInfo}</span
-          >
+          <span>Stockholm</span>
+          <span class="grey-color station-info typography body-small">Meep</span>
         </div>
         <div class="arrival-station station">
-          <span>{offer?.arrivalStation}</span>
-          <span class="grey-color station-info typography body-small"
-            >{offer?.arrivalStationInfo}</span
-          >
+          <span>London</span>
+          <span class="grey-color station-info typography body-small">Meep</span>
         </div>
       </div>
     </div>
@@ -91,9 +82,9 @@
       <p class="typography body-small-weight-600">€2.50</p>
     </div>
   </div>
-  <div class="total-price typography body-xlarge-weight-600">
+  <div class="total-price typography title-medium bold">
     <p>Total to pay</p>
-    <p>€{fare?.price}</p>
+    <p>€23.33</p>
   </div>
   <div class="caution">
     <p class="typography body-x-small">

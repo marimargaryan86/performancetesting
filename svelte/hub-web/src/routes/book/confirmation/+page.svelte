@@ -1,6 +1,4 @@
 <script lang="ts">
-  import BookingSteps from "../booking-steps.svelte";
-  import FareRule from "../select-offer/alternative-fares-slider/fare-rules/fare-rule.svelte";
   import TicketInCircle from "components/icons/ticket-in-circle-icon.svelte";
   import CheckInCircle from "components/icons/check-in-circle-icon.svelte";
   import UserInCircle from "components/icons/user-in-circle-icon.svelte";
@@ -13,7 +11,6 @@
   import PaymentModal from "../payment/payment-modal.svelte";
   import { onMount } from "svelte";
 
-  const currentBookingStep = 5;
   let alert: { type: "success" | "failed"; message: string } | undefined = {
     type: "success",
     message: "We will send an email with a copy of your ticket.",
@@ -41,7 +38,6 @@
 </svelte:head>
 
 <h1 class="typography headline-medium bold container header">Confirmation</h1>
-<BookingSteps currentStep={currentBookingStep} />
 
 <div class="background">
   {#if alert}
@@ -59,14 +55,14 @@
             <TicketInCircle color="var(--color-main-primary-500)" />
             <div class="column">
               <span class="typography body-x-small">Reservation number</span>
-              <span class="typography body-medium-weight-600">J98PLK17</span>
+              <span class="typography title-small bold">J98PLK17</span>
             </div>
           </div>
           <div class="booking-status">
             <CheckInCircle color="var(--color-main-primary-500)" />
             <div class="column">
               <span class="typography body-x-small">Status</span>
-              <span class="typography body-medium-weight-600">Confirmed</span>
+              <span class="typography title-small bold">Confirmed</span>
             </div>
           </div>
         </div>
@@ -96,7 +92,7 @@
           <span>Contractual mark-up</span>
           <span class="typography bold">€2.50</span>
         </div>
-        <div class="price-row total-price typography body-xlarge-weight-600">
+        <div class="price-row total-price typography title-medium bold">
           <span>Total to pay</span>
           <span class="typography bold">€149.00</span>
         </div>
@@ -144,21 +140,19 @@
             <ClockInCircle color="var(--color-main-primary-500)" />
             <div class="column">
               <span class="typography body-x-small">Trip duration</span>
-              <span class="typography body-medium-weight-600">1h 40m</span>
+              <span class="typography title-small bold">1h 40m</span>
             </div>
           </div>
           <div class="fare-class">
             <ChairInCircle color="var(--color-main-primary-500)" />
             <div class="column">
               <span class="typography body-x-small">Fare class</span>
-              <span class="typography body-medium-weight-600">Standard Flex</span>
+              <span class="typography title-small bold">Standard Flex</span>
             </div>
           </div>
         </div>
         <div class="fare-rule">
-          <FareRule
-            fareRule="Changes cannot be made to a ticket with less than 1 hour remaining before departure."
-          />
+          <span>Fare rule</span>
         </div>
       </div>
     </div>

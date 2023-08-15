@@ -30,8 +30,11 @@
       return;
     }
 
-    await callAction(routeConfig.pay.beneficiaries.actions.listBeneficiaries, {
-      cursor: data.beneficiaries.cursor,
+    await callAction({
+      action: routeConfig.pay.beneficiaries.actions.listBeneficiaries,
+      data: {
+        cursor: data.beneficiaries.cursor,
+      },
     });
 
     if (form?.beneficiaries) {

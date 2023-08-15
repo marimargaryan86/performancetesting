@@ -20,8 +20,11 @@
       return;
     }
 
-    await callAction(routeConfig.pay.accounts.actions.listAccounts, {
-      cursor: data.accounts.cursor,
+    await callAction({
+      action: routeConfig.pay.accounts.actions.listAccounts,
+      data: {
+        cursor: data.accounts.cursor,
+      },
     });
 
     if (form?.accounts) {

@@ -32,7 +32,7 @@ module.exports = {
     "@typescript-eslint/explicit-function-return-type": "error",
     "@typescript-eslint/no-unused-vars": ["error", { varsIgnorePattern: "^_$" }],
     "@typescript-eslint/no-explicit-any": "error",
-    "max-lines-per-function": ["error", { max: 40, skipBlankLines: true }],
+    "max-lines-per-function": ["error", { max: 50, skipBlankLines: true }],
     "no-await-in-loop": "error",
     "no-constructor-return": "error",
     "no-duplicate-imports": "error",

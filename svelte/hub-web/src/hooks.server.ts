@@ -1,11 +1,11 @@
 import { redirect, type MaybePromise } from "@sveltejs/kit";
 import type { UserJwtSchema } from "integration/junction-pay/schemas/user";
-import jwtDecode from "jwt-decode";
+import jwt from "jsonwebtoken";
 import routeConfig from "routeConfig";
 
 export function handle({ event, resolve }): MaybePromise<Response> {
   const token = event.cookies.get("session-token");
-  const user: UserJwtSchema | undefined = token ? jwtDecode(token) : undefined;
+  const user = token ? (jwt.decode(token) as UserJwtSchema) : undefined;
 
   if (token && user) {
     event.locals = {

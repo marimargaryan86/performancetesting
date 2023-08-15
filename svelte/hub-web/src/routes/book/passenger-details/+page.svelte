@@ -1,135 +1,128 @@
 <script lang="ts">
-  import BookingSteps from "../booking-steps.svelte";
-  import Button from "components/ui/button.svelte";
-  import AgentContactInfo from "./agent-contact-information.svelte";
-  import Passengers, { type Passenger } from "./passengers.svelte";
-  import Summary from "./summary.svelte";
-  import { onMount } from "svelte";
-  import type { BookingSearchData } from "../search-form.svelte";
-  import OffersMockup from "../offers-mockup";
-  import routeConfig from "routeConfig";
+  import { browser } from "$app/environment";
   import { page } from "$app/stores";
-  import { goto } from "$app/navigation";
-  import type { OfferModel } from "../select-offer/offer.svelte";
+  import type { MaybePromise } from "@sveltejs/kit";
+  import Button from "components/ui/button.svelte";
+  import type { OfferPriceQuoteModel } from "models/booking/offer";
+  import routeConfig from "routeConfig";
+  import { onDestroy } from "svelte";
+  import { callAction, sleep } from "utils/common";
+  import Countdown from "../countdown.svelte";
 
-  const currentBookingStep = 3;
+  export let data;
 
-  let data: Partial<BookingSearchData> = {};
-  let passengers: Partial<Passenger>[] = [];
-  let offer: OfferModel | undefined = undefined;
-  let fare: OfferModel["alternativeFares"][number] | undefined = undefined;
+  let getPriceQuoteTask: MaybePromise<OfferPriceQuoteModel | undefined> = data.priceQuote;
+  let priceQuoteId: string | undefined = data.priceQuote.id;
 
-  onMount(() => {
-    const urlParams = $page.url.searchParams;
+  $: backUrl = getBackUrl(data.searchData);
+  $: priceQuoteId = data.priceQuote.id;
+  $: if (browser && priceQuoteId) {
+    getPriceQuoteTask = pollPriceQuote(priceQuoteId);
+  }
 
-    data.adults = Number(urlParams.get("adults")) ?? 0;
-    data.children = Number(urlParams.get("children")) ?? 0;
-    data.infants = Number(urlParams.get("infants")) ?? 0;
-    data.origin = urlParams.get("origin") ?? "";
-    data.destination = urlParams.get("destination") ?? "";
-    data.outbound = new Date(Number(urlParams.get("from"))) ?? undefined;
+  function getBackUrl(searchData: typeof data.searchData): URL {
+    const url = new URL(routeConfig.book.select.root, $page.url.origin);
+    url.searchParams.set("origin", searchData.origin.id);
+    url.searchParams.set("destination", searchData.destination.id);
+    url.searchParams.set("adults", searchData.passengers.adults.toString());
+    url.searchParams.set("children", searchData.passengers.children.toString());
+    url.searchParams.set("infants", searchData.passengers.infants.toString());
+    url.searchParams.set("outbound", searchData.departureAfter.toLocaleDateString("sv-SE"));
 
-    offer = OffersMockup.find((item) => item.id === Number(urlParams.get("offer_id")));
-    fare = offer?.alternativeFares.find((item) => item.id === Number(urlParams.get("fare_id")));
+    return url;
+  }
 
-    for (let i = 1; i <= data.adults; i++) {
-      passengers.push({ type: "Adult" });
+  async function pollPriceQuote(id: string): Promise<OfferPriceQuoteModel | undefined> {
+    if (priceQuoteId !== id) {
+      return undefined;
     }
-    for (let i = 1; i <= data.children; i++) {
-      passengers.push({ type: "Child" });
-    }
-    for (let i = 1; i <= data.infants; i++) {
-      passengers.push({ type: "Infant" });
+
+    const result = await callAction<{ priceQuote: OfferPriceQuoteModel }>({
+      action: routeConfig.book.passengerDetails.actions.poll,
+      apply: false,
+    });
+
+    if (result.type !== "success") {
+      return undefined;
     }
 
-    passengers = passengers;
+    if (
+      result.data?.priceQuote.status === "unspecified" ||
+      result.data?.priceQuote.status === "failed"
+    ) {
+      return undefined;
+    }
+
+    if (result.data?.priceQuote.status === "completed") {
+      return result.data.priceQuote;
+    }
+
+    await sleep(2000);
+
+    return pollPriceQuote(id);
+  }
+
+  onDestroy(() => {
+    priceQuoteId = undefined;
   });
-
-  function goToSelectOfferPage(): void {
-    goto(routeConfig.book.select.root + $page.url.search);
-  }
-
-  function goToPaymentPage(): void {
-    goto(routeConfig.book.payment.root + $page.url.search);
-  }
 </script>
 
 <svelte:head>
-  <title>Summary · Junction Hub</title>
+  <title>Summary · Book · Junction Hub</title>
 </svelte:head>
 
-<h1 class="typography headline-medium bold container header">Summary</h1>
-<BookingSteps currentStep={currentBookingStep} />
+<div class="content">
+  <Countdown expiresAt={data.priceQuote.expiresAt} show />
 
-<div class="background">
-  <div class="page-wrapper container">
-    <div class="passengers">
-      <Passengers bind:passengers />
-      <AgentContactInfo />
-    </div>
-
-    {#if offer && fare}
-      <Summary {offer} {fare} />
-    {/if}
-  </div>
-
-  <div class="next-block">
-    <Button on:click={goToSelectOfferPage} size="medium" variant="outline">Previous</Button>
-    <Button on:click={goToPaymentPage} size="medium"><span class="next-btn">Next</span></Button>
+  <div>{data.searchData.origin.name} - {data.searchData.destination.name}</div>
+  <div>{data.searchData.departureAfter}</div>
+  <div>
+    {#await getPriceQuoteTask}
+      Loading price quote...
+    {:then priceQuote}
+      {JSON.stringify(priceQuote)}
+    {/await}
   </div>
 </div>
 
+<div class="actions">
+  <Button size="small" variant="outline" href={backUrl.toString()}>Previous</Button>
+  <Button size="small"><span class="next-btn">Next</span></Button>
+</div>
+
 <style>
-  .header {
-    padding-top: 16px;
-  }
-
-  h1 {
-    margin-bottom: 16px;
-  }
-
-  .container {
-    margin: 0 24px;
-  }
-
-  .background {
-    padding-top: 24px;
-    background: var(--color-gradient-booking-flow);
-  }
-
-  .page-wrapper {
-    position: relative;
+  .content {
     display: flex;
-    flex-direction: row;
-    gap: 16px;
-    align-items: flex-start;
-    justify-content: space-between;
-    padding-bottom: 24px;
-  }
-
-  .passengers {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+    flex-flow: column;
+    flex-grow: 1;
+    gap: 24px;
     width: 100%;
+    height: 100%;
+    padding: 24px;
+    overflow: auto;
   }
 
-  .next-block {
-    position: sticky;
-    bottom: 0;
-    z-index: 100;
+  .actions {
     display: flex;
     gap: 16px;
     justify-content: space-between;
-    width: 100%;
     padding: 16px 24px;
-    background-color: var(--color-common-dark-strong);
+    background-color: var(--color-common-background-light-main);
   }
 
-  .next-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100px;
+  .actions::after {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    display: block;
+    width: 100%;
+    height: 10px;
+    background-image: linear-gradient(0deg, rgb(0 0 0 / 0.05) 0%, rgb(0 0 0 / 0) 100%);
+    content: "";
+    pointer-events: none;
+  }
+
+  .actions > :global(button) {
+    width: 140px;
   }
 </style>

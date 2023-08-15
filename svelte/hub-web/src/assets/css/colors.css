@@ -12,6 +12,8 @@
   --color-common-light-medium: #5f716c;
   --color-common-light-strong: #17372f;
   --color-common-light-text-link: #41a089;
+  --color-common-dark-soft: #829792;
+  --color-common-dark-medium: #bfd0cc;
   --color-common-dark-strong: #ffffff;
   --color-common-background-light-green: #e2f3ef;
   --color-common-background-light-main: #ffffff;
@@ -42,6 +44,7 @@
 
   /* Semantic */
   --color-semantic-warning-50: #fefbf3;
+  --color-semantic-warning-100: #fef5d3;
   --color-semantic-warning-200: #fee9a8;
   --color-semantic-warning-600: #d68f1c;
   --color-semantic-error-100: #ffe5d9;
@@ -58,5 +61,4 @@
 
   /* Gradients */
   --color-gradient-extensions-horizontal: linear-gradient(270deg, #d2ede6 0%, #edf8f5 100%);
-  --color-gradient-booking-flow: linear-gradient(180deg, #9ad7c8 0%, #d3eee9 100%);
 }

@@ -4,15 +4,25 @@ export default {
     root: "/book",
     select: {
       root: "/book/select-offer",
+      actions: {
+        poll: "/book/select-offer?/poll",
+        select: "/book/select-offer?/select",
+      },
     },
     passengerDetails: {
       root: "/book/passenger-details",
+      actions: {
+        poll: "/book/passenger-details?/poll",
+      },
     },
     payment: {
       root: "/book/payment",
     },
     confirmation: {
       root: "/book/confirmation",
+    },
+    actions: {
+      listPlaces: "/book?/listPlaces",
     },
   },
   login: "/login",

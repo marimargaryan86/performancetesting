@@ -1,18 +1,35 @@
+<script lang="ts" context="module">
+  export type PassengerPickerData = {
+    adults: number;
+    children: number;
+    infants: number;
+  };
+</script>
+
 <script lang="ts">
   import ChevronIcon from "components/icons/chevron-icon.svelte";
   import { clickOutside } from "directives/click-outside";
-  import Dialogue from "./dialogue.svelte";
+  import PassengerCounter from "./passenger-counter.svelte";
+  import { scale } from "svelte/transition";
 
-  export let adults = 0;
-  export let children = 0;
-  export let infants = 0;
+  export let passengers: PassengerPickerData;
 
   let expanded = false;
-  let passengerInfo = "";
 
-  $: passengerInfo = `${adults} Adult${adults > 1 ? "s" : ""}${children > 0 ? "," : ""}
-    ${children > 0 ? `${children} Child${children > 1 ? "ren" : ""}` : ""}${infants > 0 ? "," : ""}
-    ${infants > 0 ? `${infants} Infant${infants > 1 ? "s" : ""}` : ""}`;
+  $: passengerInfo = [
+    passengers.adults
+      ? `${passengers.adults} Adult${passengers.adults === 1 ? "" : "s"}`
+      : undefined,
+    passengers.children
+      ? `${passengers.children} Child${passengers.children === 1 ? "" : "ren"}`
+      : undefined,
+    passengers.infants
+      ? `${passengers.infants} Infant${passengers.infants === 1 ? "" : "s"}`
+      : undefined,
+  ]
+    .filter((passenger): passenger is string => Boolean(passenger))
+    .join(", ");
+  $: totalPassengerCount = Object.values(passengers).reduce((prev, curr) => prev + curr, 0);
 
   function open(): void {
     expanded = true;
@@ -32,17 +49,28 @@
 </script>
 
 <div class="passenger-picker" use:clickOutside={close}>
-  <button on:click={toggle} class="passenger-select">
-    {#if adults + children + infants > 0}
-      <span class="typography body-medium-weight-600">{passengerInfo}</span>
-    {:else}
-      <span class="typography body-medium-weight-600">Passengers</span>
-    {/if}
+  <button on:click={toggle} type="button">
+    <span class="typography title-small bold title-small bold">
+      {#if totalPassengerCount > 0}
+        {passengerInfo}
+      {:else}
+        Passengers
+      {/if}
+    </span>
+
     <ChevronIcon direction={expanded ? "up" : "down"} color="var(--color-main-primary-500)" />
   </button>
 
   {#if expanded}
-    <Dialogue bind:adults bind:children bind:infants />
+    <div class="dialogue" transition:scale={{ duration: 150, start: 0.8 }}>
+      <div class="header typography title-medium bold title-medium bold">Passengers</div>
+
+      <div class="counters">
+        <PassengerCounter label="Adult" bind:amount={passengers.adults} />
+        <PassengerCounter label="Children (2-11)" bind:amount={passengers.children} />
+        <PassengerCounter label="Infants (under 2)" bind:amount={passengers.infants} />
+      </div>
+    </div>
   {/if}
 </div>
 
@@ -52,16 +80,44 @@
     display: inline-block;
   }
 
-  .passenger-select {
+  button {
     display: flex;
     gap: 8px;
     align-items: center;
     color: var(--color-main-primary-500);
+    background-color: transparent;
+    border: 0;
     cursor: pointer;
   }
 
-  button {
-    background-color: transparent;
-    border: 0;
+  .dialogue {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 100;
+    width: 300px;
+    margin-top: 4px;
+    padding: 20px;
+    color: var(--color-main-neutral-900);
+    background: #ffffff;
+    border: var(--color-main-neutral-200) 1px solid;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgb(17 24 39 / 0.05), 0 12px 16px rgb(17 24 39 / 0.1);
+    transform-origin: top left;
+  }
+
+  .header {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    white-space: nowrap;
+  }
+
+  .counters {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
   }
 </style>

@@ -20,11 +20,9 @@
   function setLogoutTimer(timeoutAt: Date): void {
     window.clearTimeout(logoutTimer);
 
-    logoutTimer = window.setTimeout(
-      callAction,
-      timeoutAt.getTime() - new Date().getTime(),
-      `${routeConfig.login}?/logout`,
-    );
+    logoutTimer = window.setTimeout(callAction, timeoutAt.getTime() - new Date().getTime(), {
+      action: `${routeConfig.login}?/logout`,
+    });
   }
 </script>
 

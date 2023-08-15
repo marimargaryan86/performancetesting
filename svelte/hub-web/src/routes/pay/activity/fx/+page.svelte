@@ -44,8 +44,11 @@
       return;
     }
 
-    await callAction(routeConfig.pay.activity.conversions.actions.listConversions, {
-      cursor: data.conversions.cursor,
+    await callAction({
+      action: routeConfig.pay.activity.conversions.actions.listConversions,
+      data: {
+        cursor: data.conversions.cursor,
+      },
     });
 
     if (form?.conversions) {

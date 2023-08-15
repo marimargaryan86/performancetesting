@@ -30,7 +30,7 @@
 
   async function submit(): Promise<void> {
     pending = true;
-    await callAction("?/login", data);
+    await callAction({ action: "?/login", data });
     pending = false;
   }
 </script>

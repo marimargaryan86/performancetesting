@@ -27,7 +27,7 @@
 
   let inputRef: HTMLInputElement;
 
-  const dispatch = createEventDispatcher<{ input: HTMLInputElement }>();
+  const dispatch = createEventDispatcher<{ input: HTMLInputElement; clear: void }>();
 
   function onInput(event: InputEvent): void {
     if (type === "number") {
@@ -41,6 +41,7 @@
 
   function clear(): void {
     value = undefined;
+    dispatch("clear");
   }
 
   export function focus(): void {
@@ -108,6 +109,7 @@
     --x-font-size: var(--font-size, 14px);
     --x-label-font-size: var(--label-font-size, 12px);
     --x-label-font-weight: var(--label-font-weight, 400);
+    --x-label-font-family: var(--label-font-family, "Poppins, Arial, Helvetica, sans-serif");
     --x-border-color: var(--border-color, var(--color-common-line-medium));
 
     display: inline-flex;
@@ -123,7 +125,7 @@
     color: var(--color-main-neutral-900);
     font-weight: var(--x-label-font-weight);
     font-size: var(--x-label-font-size);
-    font-family: Poppins, Arial, Helvetica, sans-serif;
+    font-family: var(--x-label-font-family);
     font-style: normal;
     letter-spacing: 0.5px;
   }
@@ -183,8 +185,8 @@
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    width: calc(var(--x-height) * 0.5);
-    height: calc(var(--x-height) * 0.5);
+    width: calc(var(--x-height) * 0.35);
+    height: calc(var(--x-height) * 0.35);
     margin-right: var(--x-icon-padding);
     padding: 8px 2px;
     background-color: var(--color-main-neutral-400);
@@ -194,9 +196,8 @@
   }
 
   .clear > :global(svg) {
-    width: calc(var(--x-height) * 0.3);
-    height: calc(var(--x-height) * 0.3);
-    margin-right: 0.4%;
+    width: calc(var(--x-height) * 0.2);
+    height: calc(var(--x-height) * 0.2);
   }
 
   .wrapper.icon-before > input {

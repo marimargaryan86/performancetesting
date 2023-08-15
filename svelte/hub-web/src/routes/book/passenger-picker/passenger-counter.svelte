@@ -15,14 +15,14 @@
 </script>
 
 <div class="passenger-counter">
-  <strong>{label}</strong>
+  <strong class="typography label-large">{label}</strong>
 
   <div class="counter">
-    <button class="counter-btn" on:click={decrement}>
+    <button class="counter-btn" on:click={decrement} type="button">
       <MinusPassengerIcon color="var(--color-common-dark-strong)" />
     </button>
 
-    <span>{amount}</span>
+    <span class="typography body-medium">{amount}</span>
 
     <button on:click={increment} type="button">
       <PlusPassengerIcon color="var(--color-common-dark-strong)" />
@@ -39,6 +39,7 @@
 
   .counter {
     display: flex;
+    align-items: center;
     width: 100px;
   }
 

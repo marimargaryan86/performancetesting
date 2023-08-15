@@ -8,15 +8,20 @@ export function formatAmountAndCode(
 }
 
 export function formatAmount(
-  amount: MoneyModel,
+  money: MoneyModel,
   currencies: Map<string, CurrencyModel> = new Map(),
+  sign = false,
 ): string {
-  const currency = currencies.get(amount.currency);
-  let finalAmount = amount.amount;
+  const currency = currencies.get(money.currency);
+  let finalAmount = money.amount;
 
   if (currency) {
     finalAmount /= 10 ** currency.minorUnits;
   }
 
-  return finalAmount.toLocaleString("en-GB", { minimumFractionDigits: 2 });
+  return finalAmount.toLocaleString("en-GB", {
+    minimumFractionDigits: 2,
+    style: sign ? "currency" : undefined,
+    currency: sign ? money.currency : undefined,
+  });
 }

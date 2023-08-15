@@ -1,12 +1,10 @@
 <script lang="ts">
   import Summary from "../passenger-details/summary.svelte";
-  import BookingSteps from "../booking-steps.svelte";
   import TextField from "components/ui/text-field.svelte";
   import RadioIcon from "components/icons/radio-icon.svelte";
   import CreditCardIcon from "components/icons/credit-card-icon.svelte";
   import { loadStripe, type Appearance, type Stripe, type StripeElements } from "@stripe/stripe-js";
   import { onMount } from "svelte";
-  import OffersMockup from "../offers-mockup";
   import { page } from "$app/stores";
   import { goto } from "$app/navigation";
   import Button from "components/ui/button.svelte";
@@ -14,12 +12,10 @@
   import BillingAddress, { type BillingAddressModel } from "./billing-address.svelte";
   import routeConfig from "routeConfig";
   import { env } from "$env/dynamic/public";
-  import type { OfferModel } from "../select-offer/offer.svelte";
-
-  const currentBookingStep = 4;
+  import type { OfferGroupModel, OfferModel } from "models/booking/offer";
 
   let offer: OfferModel | undefined = undefined;
-  let fare: OfferModel["alternativeFares"][number] | undefined = undefined;
+  let fare: OfferGroupModel | undefined = undefined;
   let paymentProcessing = false;
   let stripeErrorMessage: string | undefined = undefined;
   let paymentFormElement: HTMLFormElement | undefined;
@@ -75,17 +71,12 @@
   };
 
   onMount(async () => {
-    const urlParams = $page.url.searchParams;
-
-    offer = OffersMockup.find((item) => item.id === Number(urlParams.get("offer_id")));
-    fare = offer?.alternativeFares.find((item) => item.id === Number(urlParams.get("fare_id")));
-
     if (env.PUBLIC_STRIPE_KEY) {
       stripe = await loadStripe(env.PUBLIC_STRIPE_KEY);
     }
 
     if (stripe) {
-      await renderForm();
+      renderForm();
     }
   });
 
@@ -142,7 +133,6 @@
 </svelte:head>
 
 <h1 class="typography headline-medium bold container header">Payment</h1>
-<BookingSteps currentStep={currentBookingStep} />
 
 <div class="background">
   <div class="page-wrapper container">
@@ -169,7 +159,7 @@
     </div>
 
     {#if offer && fare}
-      <Summary {offer} {fare} />
+      <Summary />
     {/if}
   </div>
 

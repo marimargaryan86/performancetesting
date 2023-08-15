@@ -40,6 +40,7 @@
     align-items: center;
     justify-content: center;
     color: var(--color);
+    font-family: Inter, Arial, Helvetica, sans-serif;
     text-decoration: none;
     background-color: var(--background-color);
     border: 0;
@@ -155,6 +156,7 @@
   button > :global(svg),
   a > :global(svg) {
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     justify-content: center;
     width: var(--icon-size);

@@ -1,287 +1,256 @@
 <script lang="ts">
-  import BookingSteps from "../booking-steps.svelte";
-  import SearchForm, { type BookingSearchData } from "../search-form.svelte";
-  import SelectField from "components/ui/select-field.svelte";
-  import Checkbox from "../checkbox.svelte";
-  import TimeRange from "./time-range.svelte";
-  import JourneyDuration from "./journey-duration.svelte";
-  import RailwayOperators from "./railway-operators.svelte";
-  import Button from "components/ui/button.svelte";
-  import Offer, { type OfferModel } from "./offer.svelte";
-  import { fade } from "svelte/transition";
-  import offersMock from "../offers-mockup";
-  import { onMount } from "svelte";
-  import routeConfig from "routeConfig";
+  import TripSearch, { type PartialTripSearchData } from "../trip-search.svelte";
   import { page } from "$app/stores";
+  import SearchOptions, { type SearchOptionsData } from "./search-options.svelte";
+  import type { OfferModel } from "models/booking/offer";
+  import Offer from "./offer/offer.svelte";
+  import { callAction, sleep } from "utils/common";
+  import routeConfig from "routeConfig";
+  import type { TripCandidatesSearchStatus } from "integration/junction-mobile-api/schemas/trip";
   import { goto } from "$app/navigation";
+  import Button from "components/ui/button.svelte";
+  import { fade } from "svelte/transition";
+  import { browser } from "$app/environment";
+  import { onDestroy } from "svelte";
+  import type { MaybePromise } from "@sveltejs/kit";
+  import Countdown from "../countdown.svelte";
 
-  export let offers: OfferModel[] = offersMock;
+  export let data;
 
-  let searchData: Partial<BookingSearchData> = {};
+  let countdown: Countdown | undefined;
+  let getOffersTask: MaybePromise<OfferModel[]> = [];
+  let searchData = getSearchData($page.url);
+  let searchOptions: SearchOptionsData = {
+    sortBy: "price",
+    stops: [],
+    arrivalSpan: { start: 0, end: 1440 },
+    departureSpan: { start: 0, end: 1440 },
+    duration: 492,
+    operators: [0, 1, 2],
+  };
+  let searchRetries = 0;
+  let selected = data.selectedOffer;
 
-  function toggleSelectedOffer(event: CustomEvent<{ id: number }>): void {
-    offers.forEach(function (offer) {
-      offer.alternativeFares.forEach(function (fare) {
-        fare.selected = false;
-      });
-      if (offer.id === event.detail.id) {
-        offer.selected = !offer.selected;
-      } else {
-        offer.selected = false;
-      }
-    });
-    offers = offers;
+  $: tripCandidatesSearchId = data.tripCandidatesSearch?.id;
+  $: if (browser && tripCandidatesSearchId) {
+    beginPoll(tripCandidatesSearchId);
   }
 
-  let searchQuery: string;
-  let currentBookingStep = 2;
-
-  const sortByFields = [
-    "Lowest price",
-    "Fastest",
-    "Earlier departure",
-    "Later departure",
-    "Earlier arrival",
-    "Latest arrival",
-  ];
-
-  let sortBy = "";
-  let offerSelected = false;
-  let isFareSelected = false;
-  let selectedFare: OfferModel["alternativeFares"][number] | undefined = undefined;
-
-  $: {
-    offerSelected = offers.some((offer) => offer.selected === true);
-    isFareSelected = false;
+  function beginPoll(id: string): void {
+    searchRetries = 0;
+    countdown?.close();
+    getOffersTask = pollOffers(id);
   }
 
-  function handleFareSelected(
-    event: CustomEvent<OfferModel & { fare: OfferModel["alternativeFares"][number] }>,
-  ): void {
-    isFareSelected = event.detail.selected;
+  function getSearchData(url: URL): PartialTripSearchData {
+    const outboundStr = url.searchParams.get("outbound") ?? undefined;
 
-    let urlParams = $page.url.searchParams;
+    return {
+      destination: data.destination,
+      origin: data.origin,
+      outbound: outboundStr ? new Date(outboundStr) : undefined,
+      passengers: {
+        adults: Number(url.searchParams.get("adults") ?? 1),
+        children: Number(url.searchParams.get("children") ?? 0),
+        infants: Number(url.searchParams.get("infants") ?? 0),
+      },
+    };
+  }
 
-    if (isFareSelected) {
-      selectedFare = event.detail.fare;
-      urlParams.set("fare_id", selectedFare.id.toString());
-      urlParams.set("offer_id", event.detail.id.toString());
-    } else {
-      selectedFare = undefined;
-      urlParams.delete("fare_id");
-      urlParams.delete("offer_id");
+  async function pollOffers(id: string): Promise<OfferModel[]> {
+    if (tripCandidatesSearchId !== id) {
+      return [];
     }
 
-    searchQuery = urlParams.toString();
-  }
-
-  function cancelSelectedOffer(): void {
-    offers.forEach(function (offer) {
-      offer.selected = false;
-      offer.alternativeFares.forEach(function (fare) {
-        fare.selected = false;
-      });
+    const result = await callAction<{ status: TripCandidatesSearchStatus; offers: OfferModel[] }>({
+      action: routeConfig.book.select.actions.poll,
+      data: { tripCandidatesSearchId: id },
+      apply: false,
     });
-    offers = offers;
-    offerSelected = false;
-    isFareSelected = false;
+
+    if (result.type !== "success") {
+      return [];
+    }
+
+    if (result.data?.status === "unspecified" || result.data?.status === "failed") {
+      return [];
+    }
+
+    if (result.data?.status === "completed") {
+      if (result.data.offers.length) {
+        countdown?.open();
+      }
+
+      if (result.data.offers.length || searchRetries >= 3) {
+        return result.data.offers;
+      }
+
+      searchRetries++;
+    }
+
+    await sleep(2000);
+
+    return pollOffers(id);
   }
 
-  function goToSummaryPage(): void {
-    goto(`${routeConfig.book.passengerDetails.root}?${searchQuery}`);
+  function select(event: CustomEvent<{ offerId: string; optionIds: string[] }>): void {
+    selected = event.detail;
   }
 
-  onMount(() => {
-    const urlParams = $page.url.searchParams;
-    searchQuery = urlParams.toString();
+  function search(event: CustomEvent<URL>): void {
+    goto(event.detail);
+  }
 
-    searchData.adults = Number(urlParams.get("adults")) ?? 0;
-    searchData.children = Number(urlParams.get("children")) ?? 0;
-    searchData.infants = Number(urlParams.get("infants")) ?? 0;
-    searchData.origin = urlParams.get("origin") ?? "";
-    searchData.destination = urlParams.get("destination") ?? "";
-    searchData.outbound = new Date(Number(urlParams.get("from"))) ?? undefined;
-  });
+  async function goToNext(): Promise<void> {
+    await callAction({
+      action: routeConfig.book.select.actions.select,
+      data: selected,
+    });
+
+    goto(routeConfig.book.passengerDetails.root);
+  }
+
+  onDestroy(() => (tripCandidatesSearchId = undefined));
 </script>
 
 <svelte:head>
-  <title>Book · Junction Hub</title>
+  <title>Select an offer · Book · Junction Hub</title>
 </svelte:head>
 
-<div class="book typography body-large">
-  <h1 class="typography headline-medium bold container header">Select an offer</h1>
-
-  <BookingSteps currentStep={currentBookingStep} />
-  <SearchForm data={searchData} firstStep={currentBookingStep === 1} />
-
-  <div class="background">
-    <div class="wrapper typography body-medium">
-      <div class="left flex-gap">
-        <div class="left-content flex-gap">
-          <div class="flex-gap">
-            <h3>Sort by</h3>
-            <div class="sort-by">
-              <SelectField placeholder="Select" options={sortByFields} bind:value={sortBy} />
-            </div>
-          </div>
-          <div class="stops">
-            <h3>Stops</h3>
-            <Checkbox label="Direct" checked />
-            <Checkbox label="Non-stop" />
-            <Checkbox label="Indirect" />
-          </div>
-          <hr />
-          <div class="flex-gap">
-            <h3>Departure time</h3>
-            <TimeRange label="Departure" />
-            <TimeRange label="Arrival" />
-          </div>
-          <hr />
-          <div class="flex-gap">
-            <h3>Journey Duration</h3>
-            <JourneyDuration />
-          </div>
-          <hr />
-          <div class="flex-gap">
-            <h3>Railway Operators</h3>
-            <RailwayOperators />
-          </div>
-        </div>
-      </div>
-      <div class="right">
-        {#each offers as offer (offer.id)}
-          <Offer
-            {offer}
-            on:toggleSelectedOffer={toggleSelectedOffer}
-            on:fareSelected={handleFareSelected}
-          />
-        {/each}
-      </div>
-    </div>
-  </div>
-  {#if offerSelected}
-    <div class="next-block" transition:fade={{ duration: 100 }}>
-      <Button on:click={cancelSelectedOffer} size="medium" variant="outline">Cancel</Button>
-      <Button on:click={goToSummaryPage} size="medium" disabled={!isFareSelected}
-        ><span class="next-btn">Next</span></Button
-      >
-    </div>
-  {/if}
+<div class="search-wrapper">
+  <TripSearch bind:data={searchData} on:search={search} />
 </div>
 
+<div class="content">
+  {#if data.tripCandidatesSearch}
+    <Countdown expiresAt={data.tripCandidatesSearch.expiresAt} bind:this={countdown} />
+  {/if}
+
+  <div class="scroll">
+    <SearchOptions bind:data={searchOptions} />
+
+    <ul class="offer-result">
+      {#await getOffersTask}
+        <li class="pending">Searching for trips</li>
+      {:then offers}
+        {#each offers as offer}
+          <li>
+            <Offer
+              {offer}
+              selected={selected?.offerId === offer.id}
+              selectedOptionIds={selected?.offerId === offer.id ? selected.optionIds : undefined}
+              on:select={select}
+            />
+          </li>
+        {:else}
+          <li class="no-result">No trips found</li>
+        {/each}
+      {/await}
+    </ul>
+  </div>
+</div>
+
+{#if selected}
+  <div class="actions" transition:fade={{ duration: 200 }}>
+    <Button on:click={goToNext} size="small">Next</Button>
+  </div>
+{/if}
+
 <style>
-  .book {
+  .search-wrapper {
     position: relative;
-    align-self: center;
-    width: 100%;
-    height: 100%;
-    border-radius: 16px 16px 0 0;
+    background-color: #ffffff;
   }
 
-  .wrapper .left .sort-by :global(.wrapper) {
+  .search-wrapper > :global(.trip-search > .autocomplete-field),
+  .search-wrapper > :global(.trip-search > .date-picker) {
+    --height: 40px;
+  }
+
+  .search-wrapper > :global(.trip-search > button) {
+    width: 52px;
     height: 40px;
   }
 
-  h3 {
-    margin-bottom: 8px;
-  }
-
-  hr {
+  .search-wrapper::after {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    display: block;
     width: 100%;
-    border: none;
-    border-top: 1px solid var(--color-common-line-medium);
+    height: 10px;
+    background-image: linear-gradient(180deg, rgb(0 0 0 / 0.05) 0%, rgb(0 0 0 / 0) 100%);
+    content: "";
+    pointer-events: none;
   }
 
-  .stops {
+  .content {
+    --options-width: 240px;
+    --result-width: calc(1152px - var(--options-width) - 72px);
+
     display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 24px;
+    flex-flow: column;
+    flex-grow: 1;
+    width: 100%;
+    padding-top: 24px;
+    overflow: auto;
   }
 
-  .background {
-    min-height: 100%;
-    padding: 24px 0;
-    background: var(--color-gradient-booking-flow);
+  .content > :global(.countdown) {
+    max-width: 1104px;
+    margin: 0 24px 24px;
   }
 
-  .container {
-    margin: 0 24px;
+  .scroll {
+    --options-width: 240px;
+    --result-width: calc(1152px - var(--options-width) - 72px);
+
+    display: flex;
+    flex-grow: 1;
+    gap: 24px;
+    width: 100%;
+    padding: 0 24px 24px;
+    overflow: auto;
   }
 
-  .header {
-    padding-top: 16px;
-  }
-
-  h1 {
-    margin-bottom: 16px;
-  }
-
-  .left {
+  .scroll > :global(.search-options) {
     position: sticky;
     top: 0;
-    width: 30%;
-    height: 100lvh;
-    margin: 0 16px 0 24px;
-    overflow-y: hidden;
-    color: #28231b;
-    background-color: var(--color-common-dark-strong);
-    border-radius: 16px;
+    left: 0;
+    flex-shrink: 0;
+    width: var(--options-width);
   }
 
-  .left-content {
-    padding: 16px 24px;
-    overflow-y: scroll;
-  }
-
-  .left .left-content::-webkit-scrollbar {
-    width: 5px;
-  }
-
-  .left .left-content::-webkit-scrollbar-thumb {
-    height: 101px;
-    background-color: var(--color-main-neutral-300);
-    border-radius: 4px;
-  }
-
-  .left .left-content::-webkit-scrollbar-track {
-    background-color: var(--color-main-neutral-50);
-  }
-
-  .right {
+  .offer-result {
+    display: flex;
+    flex-flow: column;
+    gap: 24px;
+    align-self: flex-start;
     width: 100%;
-    margin-right: 16px;
-    overflow: hidden;
+    max-width: var(--result-width);
   }
 
-  .wrapper {
+  .actions {
+    position: relative;
     display: flex;
-    flex-direction: row;
-  }
-
-  .flex-gap {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .next-block {
-    position: sticky;
-    bottom: 0;
-    display: flex;
-    gap: 16px;
-    align-items: flex-end;
-    align-self: stretch;
-    justify-content: end;
-    width: 100%;
+    justify-content: flex-end;
     padding: 16px 24px;
-    background-color: var(--color-common-dark-strong);
+    background-color: var(--color-common-background-light-main);
   }
 
-  .next-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100px;
+  .actions::after {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    display: block;
+    width: 100%;
+    height: 10px;
+    background-image: linear-gradient(0deg, rgb(0 0 0 / 0.05) 0%, rgb(0 0 0 / 0) 100%);
+    content: "";
+    pointer-events: none;
+  }
+
+  .actions > :global(button) {
+    width: 140px;
   }
 </style>

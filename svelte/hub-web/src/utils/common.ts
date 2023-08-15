@@ -1,6 +1,10 @@
 import { applyAction, deserialize } from "$app/forms";
 import type { ActionResult } from "@sveltejs/kit";
 
+export function sleep(timeMs: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, timeMs));
+}
+
 export function isUpperCase(value: string): boolean {
   return value.toUpperCase() === value;
 }
@@ -63,24 +67,35 @@ export type RecursivePartial<T> = {
     : T[P];
 };
 
+function getActionRequestData(data?: Record<string, unknown>): FormData | undefined {
+  const formData = new FormData();
+
+  if (!data) {
+    return formData;
+  }
+
+  Object.entries(data).forEach(([key, val]) => {
+    if (val !== undefined) {
+      formData.set(key, String(val));
+    }
+  });
+
+  return formData;
+}
+
 export async function callAction<
   TResult extends Record<string, unknown> = Record<string, unknown>,
   TFailure extends Record<string, unknown> = Record<string, unknown>,
->(
-  action: string,
-  data?: Record<string, unknown>,
+>({
+  action,
+  data,
   apply = true,
-): Promise<ActionResult<TResult, TFailure>> {
-  const body = new FormData();
-
-  if (data) {
-    Object.entries(data).forEach(([key, val]) => {
-      if (val !== undefined) {
-        body.set(key, String(val));
-      }
-    });
-  }
-
+}: {
+  action: string;
+  data?: Record<string, unknown>;
+  apply?: boolean;
+}): Promise<ActionResult<TResult, TFailure>> {
+  const body = getActionRequestData(data);
   const resp = await fetch(action, { method: "POST", body });
   const result = deserialize<TResult, TFailure>(await resp.text());
 

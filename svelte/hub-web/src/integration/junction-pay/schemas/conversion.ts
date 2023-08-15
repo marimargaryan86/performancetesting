@@ -1,4 +1,4 @@
-import type { RelationshipSchema } from "./common";
+import type { RelationshipSchema } from "integration/common/schemas";
 import type { MoneySchema } from "./money";
 import type { TransactionIdentifierSchema, TransactionSchema } from "./transaction";
 

@@ -62,7 +62,7 @@
 
 <div class="date-picker" use:clickOutside={close}>
   {#if label}
-    <label for={id}>
+    <label for={id} class="label">
       {label}
       {#if required}
         <span>*</span>
@@ -70,7 +70,8 @@
     </label>
   {/if}
 
-  <button class="header" on:click={toggle} type="button" {id}>
+  <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+  <label class="header" on:click={toggle} on:keypress {id}>
     <span class:placeholder={placeholderShowing} class="typography body-medium">
       {displayValue ?? placeholder ?? ""}
     </span>
@@ -82,7 +83,7 @@
     {:else}
       <ChevronIcon direction={expanded ? "up" : "down"} color="var(--color-common-light-strong)" />
     {/if}
-  </button>
+  </label>
 
   {#if expanded}
     <Dialogue {range} bind:value />
@@ -96,23 +97,24 @@
     --x-icon-padding: var(--icon-padding, 16px);
     --x-label-font-size: var(--label-font-size, 12px);
     --x-label-font-weight: var(--label-font-weight, 400);
+    --x-label-font-family: var(--label-font-family, "Poppins, Arial, Helvetica, sans-serif");
 
     position: relative;
     display: inline-flex;
     flex-flow: column;
   }
 
-  label {
+  .label {
     margin-bottom: 8px;
     color: var(--color-main-neutral-900);
     font-weight: var(--x-label-font-weight);
     font-size: var(--x-label-font-size);
-    font-family: Poppins, Arial, Helvetica, sans-serif;
+    font-family: var(--x-label-font-family);
     font-style: normal;
     letter-spacing: 0.5px;
   }
 
-  label > span {
+  .label > span {
     color: var(--color-main-primary-500);
   }
 

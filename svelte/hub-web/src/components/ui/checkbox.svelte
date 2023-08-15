@@ -4,14 +4,21 @@
   export let group: TValue[] = [];
   export let id: string | undefined = undefined;
 
-  let checked = value && group.includes(value);
+  let checked = value !== undefined && group.includes(value);
 
-  $: {
-    if (checked && value) {
+  $: updateCheckedByGroup(group);
+  $: updateCheckedByChecked(checked);
+
+  function updateCheckedByChecked(nextChecked: boolean): void {
+    if (nextChecked && value !== undefined) {
       group = Array.from(new Set([...group, value]));
-    } else if (value) {
+    } else if (value !== undefined) {
       group = group.filter((item) => item !== value);
     }
+  }
+
+  function updateCheckedByGroup(nextGroup: TValue[]): void {
+    checked = value !== undefined && nextGroup.includes(value);
   }
 </script>
 

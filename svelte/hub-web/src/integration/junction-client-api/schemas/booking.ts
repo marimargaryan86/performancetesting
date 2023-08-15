@@ -1,4 +1,5 @@
-import type { PointSchema, RelationshipSchema } from "./common";
+import type { RelationshipSchema } from "integration/common/schemas";
+import type { PointSchema } from "./common";
 import type { JourneySchema } from "./journey";
 import type {
   CabinClassIdentifierSchema,

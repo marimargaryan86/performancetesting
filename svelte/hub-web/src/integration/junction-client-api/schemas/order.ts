@@ -1,5 +1,5 @@
+import type { RelationshipSchema } from "integration/common/schemas";
 import type { BookingIdentifierSchema } from "./booking";
-import type { RelationshipSchema } from "./common";
 import type { JourneyIdentifierSchema } from "./journey";
 import type { QuoteIdentifierSchema } from "./offer";
 

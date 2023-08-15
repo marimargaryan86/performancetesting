@@ -1,5 +1,5 @@
+import type { RelationshipSchema } from "integration/common/schemas";
 import type { AccountIdentifierSchema } from "./account";
-import type { RelationshipSchema } from "./common";
 import type { CurrencyIdentifierSchema } from "./money";
 
 export interface BalanceIdentifierSchema {

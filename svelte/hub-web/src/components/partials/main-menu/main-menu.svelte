@@ -21,7 +21,7 @@
   }
 
   function logout(): void {
-    callAction(`${routeConfig.login}?/logout`);
+    callAction({ action: `${routeConfig.login}?/logout` });
   }
 </script>
 

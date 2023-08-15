@@ -38,7 +38,6 @@
       bind:value={billingAddress.country}
       label="Country"
       required
-      scroll
       placeholder="Select"
       options={countries}
     />

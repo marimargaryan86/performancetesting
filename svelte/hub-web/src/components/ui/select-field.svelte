@@ -14,7 +14,6 @@
   export let label: string | undefined = undefined;
   export let placeholder: string | undefined = undefined;
   export let required = false;
-  export let scroll = false;
   export let error: string | boolean = false;
 
   let expanded = false;
@@ -55,11 +54,7 @@
   </TextField>
 
   {#if expanded}
-    <ul
-      class="typography body-medium options"
-      class:scroll
-      transition:scale={{ duration: 150, start: 0.8 }}
-    >
+    <ul class="typography body-medium options" transition:scale={{ duration: 150, start: 0.8 }}>
       {#each options as option}
         <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
         <li class="option" on:click={select.bind(select, option)}>{formatter(option)}</li>
@@ -84,7 +79,7 @@
     position: absolute;
     top: calc(100% + 4px);
     left: 0;
-    z-index: 2;
+    z-index: 1;
     width: 100%;
     max-height: 400px;
     overflow-y: auto;
@@ -105,10 +100,5 @@
 
   .option:not(:last-child) {
     border-bottom: 1px solid var(--color-common-line-soft);
-  }
-
-  .scroll {
-    height: 107px;
-    overflow: scroll;
   }
 </style>

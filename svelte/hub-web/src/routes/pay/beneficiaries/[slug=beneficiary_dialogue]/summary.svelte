@@ -27,7 +27,7 @@
     const result = await callAction<
       { beneficiary: BeneficiaryModel },
       { validation?: FormattedError<BeneficiaryModel>; service?: string }
-    >($page.url.toString());
+    >({ action: $page.url.toString() });
 
     if (result.type === "failure") {
       error = String(result.data?.service ?? result.data?.validation);
