@@ -33,21 +33,32 @@ class IncomingMessages(endpoints.HTTPEndpoint):
             message_from,
         )
         twiml_response = MessagingResponse()
-        twiml_response.message(
-            await message_handler.handle_message(
-                str(msg["Body"]),
-                subscriber,
-                subscribers_client,
-            ),
-        )
-        subscriber = await subscribers_client.get(subscriber_id=subscriber.id)
         if (  # noqa: WPS337
             subscriber.phone_subscription_status
-            is not notifications_pb2.Subscriber.SubscribedStatus.SUBSCRIBED_STATUS_UNSUBSCRIBED
+            is notifications_pb2.Subscriber.SubscribedStatus.SUBSCRIBED_STATUS_UNSUBSCRIBED
+            and str(msg["Body"]).lower() != "subscribe"
         ):
             twiml_response.message(
-                "Please select one of the following options",
+                "You are currently unsubscribed from WhatsApp."
+                " If you wish to receive notifications regarding travel information"
+                " please click the Subscribe option below.",
             )
+        else:
+            twiml_response.message(
+                await message_handler.handle_message(
+                    str(msg["Body"]),
+                    subscriber,
+                    subscribers_client,
+                ),
+            )
+            subscriber = await subscribers_client.get(subscriber_id=subscriber.id)
+            if (  # noqa: WPS337
+                subscriber.phone_subscription_status
+                is not notifications_pb2.Subscriber.SubscribedStatus.SUBSCRIBED_STATUS_UNSUBSCRIBED
+            ):
+                twiml_response.message(
+                    "Please select one of the following options",
+                )
         return responses.Response(
             content=twiml_response.to_xml(),
             status_code=status.HTTP_200_OK,
