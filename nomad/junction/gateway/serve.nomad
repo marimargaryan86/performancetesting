@@ -97,6 +97,10 @@ job "gateway-serve" {
               local_bind_port  = 8070
               destination_name = "duffel-${var.environment}"
             }
+            upstreams {
+              local_bind_port  = 8080
+              destination_name = "benerail-${var.environment}"
+            }
           }
         }
       }
