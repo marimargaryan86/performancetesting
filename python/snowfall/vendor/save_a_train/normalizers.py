@@ -8,14 +8,14 @@ from pydantic import typing, validator
 
 def normalize_time(
     time: float | str | None,
-) -> float | datetime.timedelta | None:
+) -> datetime.timedelta | None:
     if isinstance(time, str):
         # duration: str, e.g. 2h22m
         hours, minutes = date_parser(time).hour, date_parser(time).minute
         return datetime.timedelta(hours=hours, minutes=minutes)
 
     # A JSON-serialized model will contain float.
-    if isinstance(time, float):
+    if isinstance(time, int | float):
         return datetime.timedelta(seconds=time)
 
     return None
