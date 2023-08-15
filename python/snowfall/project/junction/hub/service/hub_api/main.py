@@ -4,7 +4,9 @@ from starlette import applications, middleware
 from starlette.middleware import authentication as auth_middleware
 
 from snowfall.adapter import authentication as auth_adapter
-from snowfall.project.junction.hub.service.hub_api import router
+from snowfall.project.junction.go.adapter import errors, orders
+from snowfall.project.junction.go.service.orders.v1 import orders_pb2_grpc
+from snowfall.project.junction.hub.service.hub_api import bootstrap, router
 from snowfall.service.authentication.v1 import sessions_pb2_grpc
 from snowfall.stdlib import service
 from snowfall.stdlib.integration.starlette import application, authentication, handlers
@@ -14,6 +16,7 @@ from snowfall.stdlib.transport.grpc import client
 
 class Settings(application.Settings):
     authentication_address: str
+    orders_address: str
     validate_responses_against_spec: bool = True
 
 
@@ -25,9 +28,18 @@ def _factory(
             app.settings.authentication_address,
         )
         session_client = sessions_pb2_grpc.SessionServiceStub(authentication_channel)
+        orders_channel = client.create_channel(app.settings.orders_address)
 
-        return application.create_starlette_app(
-            routes=router.get_routes(),
+        asgi_app = application.create_starlette_app(
+            routes=router.get_routes(
+                bootstrap.create_dependencies(
+                    orders_client=orders.GrpcClient(
+                        orders_pb2_grpc.OrderServiceStub(
+                            orders_channel,
+                        ),
+                    ),
+                ),
+            ),
             openapi_path=filesystem.resource_path("junction.hub_api", "openapi.json"),
             custom_middlewares=[
                 middleware.Middleware(
@@ -43,6 +55,15 @@ def _factory(
             security_headers=False,
             validate_response=app.settings.validate_responses_against_spec,
         )
+        asgi_app.add_exception_handler(
+            errors.NotFoundError,
+            handlers.not_found_error_handler,
+        )
+        asgi_app.add_exception_handler(
+            errors.ServiceUnavailableError,
+            handlers.service_unavailable_error_handler,
+        )
+        return asgi_app
 
     return decorator
 

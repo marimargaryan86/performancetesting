@@ -1,10 +1,13 @@
+import lagom
+from lagom.integrations import starlette
 from starlette import routing
 
-from snowfall.project.junction.hub.service.hub_api.routes import users
+from snowfall.project.junction.hub.service.hub_api.routes import go_orders, users
 from snowfall.stdlib.integration.starlette import routes
 
 
-def get_routes() -> list[routing.BaseRoute]:
+def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
+    integration = starlette.StarletteIntegration(dependencies)
     user_handler = users.Users()
 
     return [
@@ -17,5 +20,10 @@ def get_routes() -> list[routing.BaseRoute]:
             "/users/{userId}",
             user_handler.view,
             name="ViewUser",
+        ),
+        integration.route(
+            "/bookings/{bookingId}",
+            go_orders.Booking,
+            name="ViewBooking",
         ),
     ]
