@@ -38,8 +38,9 @@ _QUOTE_MOCK_RESPONSE = MappingProxyType(
             "attributes": {
                 "amount": 1000,
                 "tax": 700,
-                "totalMarkups": 100,
+                "totalMarkups": 300,
                 "totalAmount": 2000,
+                "serviceMarkup": 100,
                 "resellerMarkup": 100,
                 "leadCompanyMarkup": 100,
             },
@@ -104,8 +105,9 @@ async def test_that_pay_quotes_invoked_and_response_returned(
             attributes=PayQuoteAttributes(
                 amount=1000,
                 tax=700,
-                total_markups=100,
+                total_markups=300,
                 total_amount=2000,
+                service_markup=100,
                 reseller_markup=100,
                 lead_company_markup=100,
             ),
@@ -213,7 +215,7 @@ async def test_that_all_amounts_in_trip_offer_search_result_replaced_with_conver
             uuid.UUID("009fd15a-c7f0-11ed-afa1-0242ac120002"),
         )
         assert offer.initial_offer_id == "009fd15a-c7f0-11ed-afa1-0242ac120002"
-        _assert_price_breakdown(offer.price_breakdown, expected_num_breakdowns=4)
+        _assert_price_breakdown(offer.price_breakdown, expected_num_breakdowns=5)
 
     assert modified_result.offer.id == string.to_uuid(
         "session-token",
@@ -299,7 +301,7 @@ async def test_that_price_in_trip_price_quote_result_replaced_with_conversion(
     assert modified_result.price_quote.option_id == expected_uuid
     _assert_price_breakdown(
         modified_result.price_quote.price_breakdown,
-        expected_num_breakdowns=4,
+        expected_num_breakdowns=5,
     )
 
     mock_pay_client.create_quote.assert_called_once_with(
@@ -376,13 +378,14 @@ async def test_that_pay_called_with_tax_when_tax_provided_in_price_quote(
     )
 
 
-async def test_price_breakdown_when_no_tax_reseller_or_lead_company_markup_returned_by_pay(
+async def test_price_breakdown_when_no_tax_or_markups_returned_by_pay(
     mock_pay_client: mock.Mock,
     pay_quotes: PayQuotes,
     trip_offer_repository: offers.TripOfferRepository,
 ) -> None:
     no_tax_or_markups_response = dict[str, Any](_QUOTE_MOCK_RESPONSE)
     no_tax_or_markups_response["data"]["attributes"]["tax"] = 0
+    no_tax_or_markups_response["data"]["attributes"]["serviceMarkup"] = 0
     no_tax_or_markups_response["data"]["attributes"]["resellerMarkup"] = 0
     no_tax_or_markups_response["data"]["attributes"]["leadCompanyMarkup"] = 0
     mock_pay_client.create_quote.return_value = no_tax_or_markups_response

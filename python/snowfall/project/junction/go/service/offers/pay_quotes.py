@@ -192,8 +192,6 @@ class PayQuotes(object):
             ],
         )
 
-        # TODO: add BREAKDOWN_SERVICE_MARK_UP (pay needs to fix on their end first)
-
         if pay_quote_attributes.tax:
             price_breakdown.append(
                 models_pb2.PriceBreakdown(
@@ -202,6 +200,17 @@ class PayQuotes(object):
                         currency=converted_to_currency,
                     ).protobuf(),
                     breakdown_type=models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_TAX,
+                ),
+            )
+
+        if pay_quote_attributes.service_markup:
+            price_breakdown.append(
+                models_pb2.PriceBreakdown(
+                    price=money.Money(
+                        amount=pay_quote_attributes.service_markup,
+                        currency=converted_to_currency,
+                    ).protobuf(),
+                    breakdown_type=models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_SERVICE_MARK_UP,
                 ),
             )
 
