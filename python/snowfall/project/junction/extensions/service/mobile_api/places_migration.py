@@ -63,7 +63,6 @@ async def _save_enrich_data(  # noqa: WPS210, WPS231
 ) -> None:
     updated = timestamp_pb2.Timestamp()
     updated.FromDatetime(datetime.datetime.now(tz=datetime.UTC))
-
     async for place in places:
         loc = place.location
         types = [models_pb2.Place.Type.ValueType(loc_types) for loc_types in loc.types]
