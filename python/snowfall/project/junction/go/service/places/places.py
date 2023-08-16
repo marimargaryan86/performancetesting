@@ -225,11 +225,11 @@ class PlaceRepository(  # noqa: WPS215
                 ),
             )
 
+            resource.location.country_code = country_code.country_code
+            resource.location.time_zone = time_zone.time_zone.id
+
         if not resource.location.id:
             resource.location.id = string.uuid()
-
-        resource.location.country_code = country_code.country_code
-        resource.location.time_zone = time_zone.time_zone.id
 
         return await self.upsert(resource)
 
