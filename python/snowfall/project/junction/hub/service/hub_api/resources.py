@@ -98,3 +98,112 @@ class TripBookingResource(models.Resource):
                 ),
             },
         )
+
+
+class JourneyResource(models.Resource):
+    api_type: ClassVar[str] = "journeys"
+
+    @classmethod
+    def from_proto(
+        cls,
+        journey: order_models_pb2.Journey,
+        request: requests.Request,
+    ) -> JourneyResource:
+        return cls(
+            id=journey.id,
+            type=JourneyResource.api_type,
+            attributes={
+                "reference": journey.passenger_name_record,
+                "contactDetails": {
+                    "email": journey.contact_details.email,
+                    "address": {
+                        "addressLines": list(
+                            journey.contact_details.address.address_lines,
+                        ),
+                        "countryCode": journey.contact_details.address.region_code,
+                        "postalCode": journey.contact_details.address.postal_code,
+                        "city": journey.contact_details.address.locality,
+                    },
+                    "phoneNumber": journey.contact_details.phone.e164_number,
+                },
+            },
+            relationships={
+                "orders": {
+                    _RELATIONSHIPS_FIELD: [
+                        models.ResourceIdentifier(
+                            id=order.id,
+                            type="orders",
+                        )
+                        for order in journey.orders
+                    ],
+                },
+            },
+            links={
+                _SELF_HREF: str(
+                    request.url_for(
+                        "ViewJourney",
+                        journeyId=journey.id,
+                    ),
+                ),
+            },
+        )
+
+
+class OrderResource(models.Resource):
+    api_type: ClassVar[str] = "orders"
+
+    @classmethod
+    def from_proto(
+        cls,
+        order: order_models_pb2.Order,
+        request: requests.Request,
+    ) -> OrderResource:
+        return cls(
+            id=order.id,
+            type=OrderResource.api_type,
+            attributes={
+                "passengers": [
+                    {
+                        "firstName": passenger.first_name,
+                        "dateOfBirth": protobuf.protobuf_to_date(
+                            passenger.date_of_birth,
+                        ),
+                        "title": protobuf.enum_value_to_slug(
+                            enum_descriptor=order_models_pb2.Passenger.Title.DESCRIPTOR,
+                            enum_value=passenger.title,
+                        ),
+                        "lastName": passenger.last_name,
+                        "gender": protobuf.enum_value_to_slug(
+                            enum_descriptor=order_models_pb2.Passenger.Gender.DESCRIPTOR,
+                            enum_value=passenger.gender,
+                        ),
+                    }
+                    for passenger in order.passengers
+                ],
+            },
+            relationships={
+                "journey": {
+                    _RELATIONSHIPS_FIELD: models.ResourceIdentifier(
+                        id=order.journey_id,
+                        type=JourneyResource.api_type,
+                    ),
+                },
+                "bookings": {
+                    _RELATIONSHIPS_FIELD: [
+                        models.ResourceIdentifier(
+                            id=booking.id,
+                            type=TripBookingResource.api_type,
+                        )
+                        for booking in order.bookings
+                    ],
+                },
+            },
+            links={
+                _SELF_HREF: str(
+                    request.url_for(
+                        "ViewOrder",
+                        orderId=order.id,
+                    ),
+                ),
+            },
+        )
