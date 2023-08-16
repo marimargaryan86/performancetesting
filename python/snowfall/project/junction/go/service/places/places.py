@@ -2,10 +2,9 @@ import asyncio
 import dataclasses
 import logging
 import uuid
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Iterable, Sequence
 from typing import Any
 
-from motor import motor_asyncio
 from pymongo import GEOSPHERE, IndexModel, results
 
 from snowfall.project.junction.go.service.places.v1 import models_pb2
@@ -212,18 +211,19 @@ class PlaceRepository(  # noqa: WPS215
         if not self._geocoding:
             raise RuntimeError("Can't create without geocoding service.")
 
-        country_code, time_zone = await asyncio.gather(
-            self._geocoding.CountryCodeLookup(
-                geocoding_pb2.CountryCodeLookupRequest(
-                    coordinates=resource.location.coordinates,
+        if not resource.location.country_code:
+            country_code, time_zone = await asyncio.gather(
+                self._geocoding.CountryCodeLookup(
+                    geocoding_pb2.CountryCodeLookupRequest(
+                        coordinates=resource.location.coordinates,
+                    ),
                 ),
-            ),
-            self._geocoding.TimeZoneLookup(
-                geocoding_pb2.TimeZoneLookupRequest(
-                    coordinates=resource.location.coordinates,
+                self._geocoding.TimeZoneLookup(
+                    geocoding_pb2.TimeZoneLookupRequest(
+                        coordinates=resource.location.coordinates,
+                    ),
                 ),
-            ),
-        )
+            )
 
         if not resource.location.id:
             resource.location.id = string.uuid()
@@ -264,20 +264,3 @@ async def create(
             logging.info("Places created: %s", count)
 
         return await repo.create(place)
-
-
-async def replace_one(
-    collection: motor_asyncio.AsyncIOMotorCollection,
-    place: Mapping[str, Any],
-    sem: asyncio.Semaphore,
-    count: int,
-) -> None:
-    async with sem:
-        if count % 1000 == 0:
-            logging.info("Places created: %s", count)
-
-        await collection.replace_one(
-            filter={"_id": place["_id"]},
-            replacement=place,
-            upsert=True,
-        )

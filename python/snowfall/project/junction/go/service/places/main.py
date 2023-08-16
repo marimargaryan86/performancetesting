@@ -85,47 +85,23 @@ async def _generate_cities(app: service.Application[_CitiesSettings]) -> None:
         async with aiofiles.open(cities_csv_path) as csv_file:
             async for city in cities.parse_csv(locations_repo, csv_file):
                 count += 1
-                place = places_cache.get(city.location.id)
-                task = (
-                    places.replace_one(
-                        places_collection,
-                        place,
-                        sem,
-                        count,
-                    )
-                    if place
-                    else places.create(
-                        places_repository,
-                        city,
-                        sem,
-                        count,
-                    )
-                )
-                tg.create_task(task)  # type: ignore[unused-awaitable]
+                cache = places_cache.get(city.location.id)
+                if cache:
+                    # Restore geodata from cache in order to skip it in create().
+                    city.location.country_code = cache["location"]["country_code"]
+                    city.location.time_zone = cache["location"]["time_zone"]
+
+                tg.create_task(places.create(places_repository, city, sem, count))  # type: ignore[unused-awaitable]
 
         async for node in locations.node_to_place(locations_repo, nodes):
             count += 1
-            place = places_cache.get(node.location.id)
-            # TODO: figure out a better mechanism than this hack.
-            if node.place_attributes.iata:
-                place = None
-            task = (
-                places.replace_one(
-                    places_collection,
-                    place,
-                    sem,
-                    count,
-                )
-                if place
-                else places.create(
-                    places_repository,
-                    node,
-                    sem,
-                    count,
-                )
-            )
+            cache = places_cache.get(node.location.id)
+            if cache:
+                # Restore geodata from cache in order to skip it in create().
+                node.location.country_code = cache["location"]["country_code"]
+                node.location.time_zone = cache["location"]["time_zone"]
 
-            tg.create_task(task)  # type: ignore[unused-awaitable]
+            tg.create_task(places.create(places_repository, node, sem, count))  # type: ignore[unused-awaitable]
 
     logging.info("Generate places completed.")
     places_count = await places_collection.count_documents({})
