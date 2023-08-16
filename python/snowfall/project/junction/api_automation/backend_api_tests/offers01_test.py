@@ -178,8 +178,11 @@ async def return_offer_id(
                 response["data"]["id"],
             )
             break
+    else:
+        raise RuntimeError("Failed to get offer ID")
 
-    return response["data"][0]["id"]
+    # Mypy doesn't know how to guarantee the loop will be run.
+    return response["data"][0]["id"]  # type: ignore[possibly-undefined]
 
 
 async def return_offer_search_id_and_offer_group_ids(

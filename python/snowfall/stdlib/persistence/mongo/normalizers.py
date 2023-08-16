@@ -156,11 +156,14 @@ def _apply_normalizers(
     mode: _NormalizerMode,
     maybe_dict: AnyValue,
 ) -> AnyValue:
-    match mode:
-        case _NormalizerMode.normalize:
-            normalizers = [*_additional, *_normalizers]
-        case _NormalizerMode.denormalize:
-            normalizers = [*_normalizers, *_additional]
+    assert mode in {  # noqa: S101
+        _NormalizerMode.normalize,
+        _NormalizerMode.denormalize,
+    }
+    if mode is _NormalizerMode.normalize:
+        normalizers = (*_additional, *_normalizers)
+    else:
+        normalizers = (*_normalizers, *_additional)
 
     for normalizer in normalizers:
         if not normalizer.supports(fqn):

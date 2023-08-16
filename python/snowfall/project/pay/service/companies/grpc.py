@@ -500,6 +500,7 @@ class BeneficiariesService(  # noqa: WPS214
                 grpc.StatusCode.ABORTED,
                 details=str(exc.messages),
             )
+            raise RuntimeError() from None  # TODO: Remove when grpcio types are available.
 
         payment_type = (
             ""

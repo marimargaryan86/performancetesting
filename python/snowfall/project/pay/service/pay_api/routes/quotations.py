@@ -76,8 +76,9 @@ class Quotations(endpoints.HTTPEndpoint):
             from_currency=body["fromCurrency"],
             to_currency=body["toCurrency"],
             amount=body["amount"],
-            payer=company,
-            beneficiary_company=beneficiary_company,
+            # We return with errors above in the case that these are undefined.
+            payer=company,  # type: ignore[possibly-undefined]
+            beneficiary_company=beneficiary_company,  # type: ignore[possibly-undefined]
             session_token=session_token,
             tax=body.get("tax", 0),
         )

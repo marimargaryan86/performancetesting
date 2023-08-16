@@ -23,17 +23,23 @@ disallow_untyped_decorators = true
 disallow_untyped_defs = true
 enable_error_code = [
     "ignore-without-code",
+    "possibly-undefined",
     "redundant-expr",
+    "redundant-self",
     "truthy-bool",
+    "truthy-iterable",
     "unused-awaitable",
 ]
 explicit_package_bases = true
+extra_checks = true
 follow_imports = "normal"
 follow_imports_for_stubs = true
 no_implicit_reexport = true
 local_partial_types = true
 pretty = true
+show_column_numbers = true
 show_error_codes = true
+show_error_code_links = true
 strict_optional = true
 strict_equality = true
 namespace_packages = true

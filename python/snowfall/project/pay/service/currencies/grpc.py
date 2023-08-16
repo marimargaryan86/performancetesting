@@ -44,6 +44,7 @@ class CurrencyService(service.Service, currencies_pb2_grpc.CurrencyServiceServic
             )
         except errors.NotFoundError:
             await context.abort(grpc.StatusCode.NOT_FOUND)
+            raise RuntimeError() from None  # TODO: Remove when grpcio types are available.
 
         base_amount = Money(request.amount, Currency(request.from_currency))
         conversion = base_amount.convert(

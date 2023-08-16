@@ -36,7 +36,8 @@ class Alerts(endpoints.HTTPEndpoint):
                 break
         else:
             raise exceptions.HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
-        monitoring_rule = await monitoring_rules_client.get(monitoring_rule_id)
+        # Mypy bug: https://github.com/python/mypy/issues/14209
+        monitoring_rule = await monitoring_rules_client.get(monitoring_rule_id)  # type: ignore[possibly-undefined]
 
         flight_status_list = alert_body["alert"]["flightStatus"]["flightStatusUpdates"][
             "flightStatusUpdate"

@@ -183,6 +183,7 @@ class QuotationsService(  # noqa: WPS214
                 grpc.StatusCode.INVALID_ARGUMENT,
                 details="Currencies pair not supported",
             )
+            raise RuntimeError() from None  # TODO: Remove when grpcio types are available.
 
         try:
             lead_company = await self._lead_companies_client.get(

@@ -51,11 +51,10 @@ class AuthenticationService(
         request: auth_pb2.AuthenticateRequest,
         context: grpc.aio.ServicerContext,
     ) -> auth_pb2.AuthenticateResponse:
+        user = None
         if request.email:
             email = request.email.lower()
-
             user = await self._users.find_user_by_email(email)
-
         elif request.id:
             user = await self._users.find_user_by_id(request.id)
 
@@ -154,19 +153,19 @@ class AuthenticationService(
                 rich_status.build_bad_request("password", error, description=error),
             )
 
+        user = None
         if request.email:
             email = request.email.lower()
-
             user = await self._users.find_user_by_email(email)
-
         elif request.id:
             user = await self._users.find_user_by_id(request.id)
 
         if not user:
-            return await context.abort(
+            await context.abort(
                 grpc.StatusCode.NOT_FOUND,
                 details="User is not found",
             )
+            raise RuntimeError() from None  # TODO: Remove when grpcio types are available.
 
         updated_result = await self._users.update(
             user,

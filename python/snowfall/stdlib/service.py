@@ -167,7 +167,7 @@ def _add_parameters_from_settings(
 
 
 @click.pass_context
-def _group(ctx: click.Context, **kwargs: Any) -> None:
+def _group(ctx: click.Context, /, **kwargs: Any) -> None:
     ctx.ensure_object(dict)
     ctx.obj["global_settings"] = _GlobalSettings.construct(**kwargs)
 
@@ -263,7 +263,7 @@ def _command(
     command: Command[_Settings],
 ) -> _Command:
     @click.pass_context
-    def decorator(ctx: click.Context, **kwargs: Any) -> None:
+    def decorator(ctx: click.Context, /, **kwargs: Any) -> None:
         ctx.ensure_object(dict)
 
         entrypoint: Entrypoint = ctx.obj["entrypoint"]

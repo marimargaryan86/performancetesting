@@ -212,7 +212,7 @@ async def fetch_trip_offers(  # noqa: WPS211,WPS217,WPS210
             ),
         )
     offers_searches = await asyncio.gather(
-        *[
+        *(
             junction_client.create_offer_search(
                 trip_ids=[trip["id"]],
                 passengers_dates_of_birth=[
@@ -222,7 +222,7 @@ async def fetch_trip_offers(  # noqa: WPS211,WPS217,WPS210
                 session_token="YMSXrOAhIOdvIbxAmfSt7vJtRBkurNb6",  # noqa: S106
             )
             for trip in trips["data"]
-        ],
+        ),
     )
     await asyncio.sleep(5)
     for offers_search in offers_searches:
@@ -238,7 +238,8 @@ async def fetch_trip_offers(  # noqa: WPS211,WPS217,WPS210
             break
     else:
         raise RuntimeError("Couldn't find offers")
-    offer_group = offers[0]["groups"][0]
+    # Mypy bug: https://github.com/python/mypy/issues/14209
+    offer_group = offers[0]["groups"][0]  # type: ignore[possibly-undefined]
     offer_group_details = offer_group["details"][0]
     offer_group_options = offer_group["options"]
     try:

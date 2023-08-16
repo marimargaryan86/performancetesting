@@ -41,6 +41,7 @@ class Service(service.Service, offers_pb2_grpc.OfferServiceServicer):
                 )
             case _:
                 await context.abort(StatusCode.UNIMPLEMENTED)
+                raise RuntimeError() from None  # TODO: Remove when grpcio types are available.
 
         return offers_pb2.EnqueueOfferSearchResponse(id=identifier)
 
