@@ -125,9 +125,9 @@ EOH
 
       config {
         image = var.docker_image
-        ports = ["prometheus"]
+        ports = ["grpc", "prometheus"]
         args = [
-          "offers",
+          "grpc",
         ]
 
         auth {
