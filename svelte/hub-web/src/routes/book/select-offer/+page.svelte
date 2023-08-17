@@ -14,6 +14,7 @@
   import { onDestroy } from "svelte";
   import type { MaybePromise } from "@sveltejs/kit";
   import Countdown from "../countdown.svelte";
+  import LoadingSkelton from "./loading-skelton.svelte";
 
   export let data;
 
@@ -131,7 +132,11 @@
 
     <ul class="offer-result">
       {#await getOffersTask}
-        <li class="pending">Searching for trips</li>
+        <li><LoadingSkelton /></li>
+        <li><LoadingSkelton /></li>
+        <li><LoadingSkelton /></li>
+        <li><LoadingSkelton /></li>
+        <li><LoadingSkelton /></li>
       {:then offers}
         {#each offers as offer}
           <li>
