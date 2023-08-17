@@ -23,3 +23,11 @@ class TestStorage(object):
     async def test_file_raises_error(self, storage: filesystem.Storage) -> None:
         with pytest.raises(filesystem.NotFoundError):
             await storage.get(pathlib.Path("foo"))
+
+    async def test_url_can_be_created(self, storage: filesystem.Storage) -> None:
+        path = pathlib.Path("folder1/filename1.pdf")
+        expected_url = "http://mock.junction.dev/{0}/folder1/filename1.pdf".format(
+            storage._base_path,  # noqa: SLF001
+        )
+        url = await storage.url(path, 120)
+        assert url == expected_url

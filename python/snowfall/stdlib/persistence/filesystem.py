@@ -67,6 +67,13 @@ class Storage(object):
             except FileNotFoundError as file_read_error:
                 raise NotFoundError() from file_read_error
 
+    async def url(self, path: pathlib.Path, timeout: int) -> str | None:
+        key_path = str(pathlib.Path(self._base_path).joinpath(path))
+        if isinstance(self._filesystem, s3fs.S3FileSystem):
+            return await self._filesystem._url(key_path, timeout)  # noqa: SLF001
+
+        return "http://mock.junction.dev/{path}".format(path=key_path)
+
     @classmethod
     @contextlib.asynccontextmanager
     async def from_dsn(cls, dsn: str) -> AsyncGenerator[Storage, None]:
