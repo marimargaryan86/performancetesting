@@ -11,6 +11,7 @@ from snowfall.project.junction.plus.service.notification_center import (
 from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
+from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer, types
 
 
@@ -21,11 +22,13 @@ class NotificationEventImporter(object):
         configuration_vectors: configuration_vectors_adapter.Client,
         subscribers: subscribers_adapter.Client,
         channels: states.Channels,
+        redis_client: redis.Client[str],
     ):
         self._consumer = consumer_obj
         self._configuration_vectors = configuration_vectors
         self._subscribers = subscribers
         self._channels = channels
+        self._redis = redis_client
         self._logger = stdout.get_logger()
 
     async def consume(self) -> None:
@@ -49,10 +52,12 @@ class NotificationEventImporter(object):
             enum_descriptor=models_pb2.NotificationEvent.Type.DESCRIPTOR,
             enum_value=message.body.event_type,
         ).replace("-", "_")
-        await self._channels.run(
+        sid = await self._channels.run(
             message.body.channel,
             fun,
             configuration_vector,
             subscriber,
             message.body,
         )
+        session = self._redis.hash_("message_id_order_id")
+        await session.put(sid, message.body.body.id)

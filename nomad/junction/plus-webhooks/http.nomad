@@ -155,6 +155,7 @@ EOH
         HTTP_PORT             = "${NOMAD_PORT_http}"
         SENTRY_DSN            = "https://451b8cf11f0240d1884794af6d3d77f0@sentry.snowfall.se/165"
         PROMETHEUS_PORT       = "${NOMAD_PORT_prometheus}"
+        REDIS_PREFIX          = "junction-plus"
       }
     }
   }

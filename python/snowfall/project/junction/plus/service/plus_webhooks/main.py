@@ -61,7 +61,7 @@ def _factory(
                                 random.choice(app.settings.redis_dsn),  # noqa: S311
                                 decode_responses=True,
                             ).client(),
-                            prefix=app.name,
+                            prefix=app.settings.redis_prefix,
                         ),
                         cache_ttl=datetime.timedelta(minutes=15),
                     ),

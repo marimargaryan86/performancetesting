@@ -2,6 +2,7 @@ from collections.abc import AsyncGenerator
 from unittest import mock
 
 import pytest
+from fakeredis import aioredis as fakeredis
 
 from snowfall.project.junction.plus.adapter import (
     configuration_vectors,
@@ -15,6 +16,7 @@ from snowfall.project.junction.plus.service.notification_center import (
 from snowfall.project.junction.plus.service.notifications.v1alpha import (
     models_pb2 as notifications_models_pb2,
 )
+from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import types
 from snowfall.stdlib.transport.amqp.consumer import Consumer
 from snowfall.stdlib.v1 import phone_number_pb2
@@ -139,15 +141,25 @@ async def valid_message() -> (
 
 
 @pytest.fixture()
+def redis_client(redis_client: fakeredis.FakeRedis) -> redis.Client[str]:
+    return redis.Client(
+        redis_client,
+        prefix="junction-plus",
+    )
+
+
+@pytest.fixture()
 def notification_event_importer(
     consumer: mock.AsyncMock,
     configuration_vectors_client: configuration_vectors.Client,
     subscribers_client: subscribers.Client,
     channels: states.Channels,
+    redis_client: redis.Client[str],
 ) -> importer.NotificationEventImporter:
     return importer.NotificationEventImporter(
         consumer,
         configuration_vectors_client,
         subscribers_client,
         channels,
+        redis_client,
     )

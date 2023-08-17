@@ -1,7 +1,10 @@
 import pathlib
+import random
+from collections.abc import Sequence
 
 import httpx
 import pydantic
+from redis import asyncio as aioredis
 
 from snowfall.project.junction.plus.adapter import configuration_vectors, subscribers
 from snowfall.project.junction.plus.notification_channels.whatsapp import (
@@ -13,6 +16,7 @@ from snowfall.project.junction.plus.service.notifications.v1alpha import (
 )
 from snowfall.stdlib import service
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
+from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer, types
 from snowfall.stdlib.transport.grpc.client import create_channel
 
@@ -22,6 +26,8 @@ class _ImportSettings(service.Settings):
     notifications_address: str
     twilio_sid: str
     twilio_token: str
+    redis_dsn: Sequence[pydantic.AnyUrl]
+    redis_prefix: str
 
 
 async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
@@ -57,6 +63,13 @@ async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
                 token=app.settings.twilio_token,
                 templates_root_path=pathlib.Path(),
             ),
+        ),
+        redis_client=redis.Client[str](
+            aioredis.from_url(
+                random.choice(app.settings.redis_dsn),  # noqa: S311
+                decode_responses=True,
+            ).client(),
+            prefix=app.settings.redis_prefix,
         ),
     )
     await notification_event_importer.consume()

@@ -93,6 +93,7 @@ job "notification-center-import" {
 
       template {
         data        = <<EOH
+REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 NOTIFICATIONS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_notifications-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/notification-center" }}
@@ -124,6 +125,7 @@ EOH
         ENV_NAME        = "${var.environment}"
         SENTRY_DSN      = "https://060c09da336f4c0db7f7d87b8ccb5095@sentry.snowfall.se/162"
         PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
+        REDIS_PREFIX    = "junction-plus"
       }
     }
   }

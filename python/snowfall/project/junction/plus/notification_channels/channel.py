@@ -10,7 +10,7 @@ class AbstractChannel(abc.ABC):
         event: models_pb2.NotificationEvent,
         receiver: models_pb2.Subscriber,
         sender_configuration: models_pb2.ConfigurationVector,
-    ) -> None:
+    ) -> str:
         """Send notification for order confirmation."""
 
     @abc.abstractmethod
@@ -19,5 +19,5 @@ class AbstractChannel(abc.ABC):
         event: models_pb2.NotificationEvent,
         receiver: models_pb2.Subscriber,
         sender_configuration: models_pb2.ConfigurationVector,
-    ) -> None:
+    ) -> str:
         """Send alerts from flight stats."""

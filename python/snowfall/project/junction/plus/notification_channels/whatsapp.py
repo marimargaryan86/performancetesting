@@ -19,7 +19,7 @@ class Channel(AbstractChannel):
         event: models_pb2.NotificationEvent,
         receiver: models_pb2.Subscriber,
         sender_configuration: models_pb2.ConfigurationVector,
-    ) -> None:
+    ) -> str:
         raise NotImplementedError()
 
     async def flight_stats_alert(
@@ -27,7 +27,7 @@ class Channel(AbstractChannel):
         event: models_pb2.NotificationEvent,
         receiver: models_pb2.Subscriber,
         sender_configuration: models_pb2.ConfigurationVector,
-    ) -> None:
+    ) -> str:
         raise NotImplementedError()
 
 
@@ -46,7 +46,7 @@ class ProviderChannel(Channel):
         event: models_pb2.NotificationEvent,
         receiver: models_pb2.Subscriber,
         sender_configuration: models_pb2.ConfigurationVector,
-    ) -> None:
+    ) -> str:
         trip_type = ""
         counter = 0
         journey_details = ""
@@ -84,7 +84,7 @@ class ProviderChannel(Channel):
             )
             counter += 1
 
-        self.send_message(
+        return self.send_message(
             receiver=receiver.phone_number.e164_number,
             sender_number=sender_configuration.mobile_phone.e164_number,
             body=(
@@ -104,8 +104,8 @@ class ProviderChannel(Channel):
         event: models_pb2.NotificationEvent,
         receiver: models_pb2.Subscriber,
         sender_configuration: models_pb2.ConfigurationVector,
-    ) -> None:
-        self.send_message(
+    ) -> str:
+        return self.send_message(
             receiver=receiver.phone_number.e164_number,
             sender_number=sender_configuration.mobile_phone.e164_number,
             body="Gate number 7 for your flight {0} it's now open".format(
@@ -121,13 +121,14 @@ class ProviderChannel(Channel):
         sender_number: str,
         body: str | None,
         media_url: str | None = None,
-    ) -> None:
-        self._client.messages.create(  # type: ignore[no-untyped-call]
+    ) -> str:
+        response = self._client.messages.create(  # type: ignore[no-untyped-call]
             from_="whatsapp:{0}".format(sender_number),
             body=body,
             media_url=media_url,
             to="whatsapp:{0}".format("".join(receiver.split())),
         )
+        return response.sid
 
 
 class MockChannel(Channel):
@@ -139,7 +140,7 @@ class MockChannel(Channel):
         event: models_pb2.NotificationEvent,
         receiver: models_pb2.Subscriber,
         sender_configuration: models_pb2.ConfigurationVector,
-    ) -> None:
+    ) -> str:
         self._sent_messages.append(
             "order: {0} from {1} to {2}".format(
                 event.body.id,
@@ -147,16 +148,18 @@ class MockChannel(Channel):
                 receiver.id,
             ),
         )
+        return str(event.body.id)
 
     async def flight_stats_alert(
         self,
         event: models_pb2.NotificationEvent,
         receiver: models_pb2.Subscriber,
         sender_configuration: models_pb2.ConfigurationVector,
-    ) -> None:
+    ) -> str:
         self._sent_messages.append(
             "flight stats alert: {0} to {1}".format(
                 event.alert.monitoring_rule_id,
                 receiver.id,
             ),
         )
+        return str(event.body.id)

@@ -19,22 +19,21 @@ class Channels(object):
         configuration_vector: models_pb2.ConfigurationVector,
         subscriber: models_pb2.Subscriber,
         event: models_pb2.NotificationEvent,
-    ) -> None:
+    ) -> str:
         chan = self._get_channel(channel_type)
         if hasattr(chan, fun):  # noqa: WPS421
-            await getattr(chan, fun)(
+            self._logger.warning(str(event))
+            return await getattr(chan, fun)(
                 sender_configuration=configuration_vector,
                 receiver=subscriber,
                 event=event,
             )
-            self._logger.warning(str(event))
-        else:
-            raise NotImplementedError(
-                "Method: {0} not implemented for channel {1}".format(
-                    fun,
-                    chan,
-                ),
-            )
+        raise NotImplementedError(
+            "Method: {0} not implemented for channel {1}".format(
+                fun,
+                chan,
+            ),
+        )
 
     def _get_channel(self, channel_type: int) -> channel.AbstractChannel:
         try:

@@ -124,7 +124,7 @@ def notification_event_publisher_client() -> (
 def redis_client(redis_client: fakeredis.FakeRedis) -> redis.Client[str]:
     return redis.Client(
         redis_client,
-        prefix="plus_webhooks",
+        prefix="junction-plus",
     )
 
 

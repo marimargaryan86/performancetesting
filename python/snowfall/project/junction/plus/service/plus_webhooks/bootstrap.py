@@ -18,6 +18,7 @@ class Settings(application.Settings):
     notifications_address: str
     twilio_token: str
     redis_dsn: Sequence[pydantic.AnyUrl]
+    redis_prefix: str
 
 
 def create_dependencies(
