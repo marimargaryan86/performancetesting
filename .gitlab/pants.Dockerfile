@@ -1,6 +1,6 @@
-# python:3.11.5-slim-bullseye
+# python:3.11.4-slim-bullseye
 ARG REGISTRY
-FROM ${REGISTRY}python@sha256:815978d23592beccc59d199e1f6278c5873013fd47909a7b1055e5026a9707f6
+FROM ${REGISTRY}python@sha256:1226f32ad1c1c36e0b6e79706059761c58ada308f4a1ad798e55dab346e10e91
 ENV PATH=/usr/local/go/bin:$PATH
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
