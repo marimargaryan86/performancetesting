@@ -2019,6 +2019,66 @@
         "description": "User change preferences",
         "summary": "Update Preferences"
       }
+    },
+    "/bookings/cancellations": {
+      "post": {
+        "summary": "Create Bookings Cancellation",
+        "operationId": "post-bookings-cancellations",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "./../client_api/openapi.json#/components/schemas/BookingsCancellation"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "description": "Create a cancellation for multiple Bookings.",
+        "tags": [
+          "orders"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "./../client_api/openapi.json#/components/schemas/BookingsCancellation"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -4505,6 +4565,24 @@
               "required": [
                 "errors"
               ]
+            }
+          }
+        }
+      },
+      "UnprocessableEntity": {
+        "description": "Unprocessable Entity",
+        "content": {
+          "application/vnd.api+json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "errors": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "./../client_api/openapi.json#/components/schemas/Error"
+                  }
+                }
+              }
             }
           }
         }

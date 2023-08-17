@@ -156,3 +156,69 @@ class TestOrders(object):
             "data"
         ]["id"]
         assert response.status_code == 200
+
+    async def test_create_bookings_cancellations(
+        self,
+        authenticated_http_client: httpx.AsyncClient,
+        httpx_mock: pytest_httpx.HTTPXMock,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        httpx_mock.add_response(
+            **await conftest.load_response_fixture("GET_BOOKINGS_{ID}.json"),
+        )
+        httpx_mock.add_response(
+            **await conftest.load_response_fixture("POST_BOOKINGS_CANCELLATIONS.json"),
+        )
+        await self.create_order(authenticated_http_client, httpx_mock, monkeypatch)
+
+        response = await authenticated_http_client.post(
+            "/bookings/cancellations",
+            json={
+                "data": {
+                    "type": "bookings-cancellations",
+                    "relationships": {
+                        "bookings": {
+                            "data": [
+                                {
+                                    "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                                    "type": "trip-bookings",
+                                },
+                            ],
+                        },
+                    },
+                },
+            },
+        )
+
+        assert response.json()["data"]
+        assert response.status_code == 201
+
+    async def test_create_bookings_cancellations_mobile_order_not_found_throws404(
+        self,
+        authenticated_http_client: httpx.AsyncClient,
+        httpx_mock: pytest_httpx.HTTPXMock,
+    ) -> None:
+        httpx_mock.add_response(
+            **await conftest.load_response_fixture("GET_BOOKINGS_{ID}.json"),
+        )
+
+        response = await authenticated_http_client.post(
+            "/bookings/cancellations",
+            json={
+                "data": {
+                    "type": "bookings-cancellations",
+                    "relationships": {
+                        "bookings": {
+                            "data": [
+                                {
+                                    "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                                    "type": "trip-bookings",
+                                },
+                            ],
+                        },
+                    },
+                },
+            },
+        )
+
+        assert response.status_code == 404

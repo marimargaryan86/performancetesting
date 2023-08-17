@@ -1,0 +1,27 @@
+{
+  "url": "\/bookings\/cancellations",
+  "method": "POST",
+  "status_code": 201,
+  "json": {
+    "data": {
+      "id": "d6cfe9e8-bbc9-485f-912f-7ba97ab2cf34",
+      "type": "bookings-cancellations",
+      "attributes": {
+        "status": "pending"
+      },
+      "relationships": {
+        "bookings": {
+          "data": [
+            {
+              "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+              "type": "trip-bookings"
+            }
+          ]
+        }
+      },
+      "links": {
+        "self": "https://example.com/resource/04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+      }
+    }
+  }
+}

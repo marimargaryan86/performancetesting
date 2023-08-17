@@ -47,6 +47,11 @@ def get_routes(
             orders.MessageOrder,
             name="MessageOrder",
         ),
+        integration.route(
+            "/bookings/cancellations",
+            orders.BookingsCancellation,
+            name="CreateBookingsCancellation",
+        ),
         integration.route("/offers/searches", offers.OfferSearches),
         integration.route(
             "/offers/searches/{offerSearchId}",

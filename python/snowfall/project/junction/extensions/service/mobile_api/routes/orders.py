@@ -258,6 +258,37 @@ class Orders(endpoints.HTTPEndpoint):
         )
 
 
+class BookingsCancellation(endpoints.HTTPEndpoint):
+    async def post(  # noqa: WPS210
+        self,
+        request: requests.Request,
+        junction_client: client.Client = lagom.injectable,
+        orders_repository: repository.OrdersRepository = lagom.injectable,
+    ) -> responses.Response:
+        body = await request_helpers.flatten_request(request)
+        booking_ids = list(body["bookings"])
+
+        for booking_id in booking_ids:
+            booking_response = await junction_client.get_booking_by_id(booking_id)
+
+            order = booking_response["data"]["relationships"]["order"]
+            mobile_order = await orders_repository.find_by_id(order["data"]["id"])
+            if not mobile_order:
+                raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+
+            if mobile_order.user_id != request.user.username:
+                raise exceptions.HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+        cancellation_response = await junction_client.create_bookings_cancellation(
+            booking_ids,
+        )
+
+        return stdlib_models.JsonApiResponse(
+            stdlib_models.Body(data=cancellation_response["data"]),
+            status.HTTP_201_CREATED,
+        )
+
+
 async def check_payment_amount_and_state(
     payment_intent_id: str,
     quote: str,

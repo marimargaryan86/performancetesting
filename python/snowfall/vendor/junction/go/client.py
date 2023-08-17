@@ -779,3 +779,29 @@ class Client(base_client.BaseClient):  # noqa: WPS214
             method=_METHOD_GET,
             url="/orders/{0}".format(orders_id),
         )
+
+    async def create_bookings_cancellation(
+        self,
+        booking_ids: Sequence[str],
+    ) -> dict[str, Any]:
+        body: dict[str, Any] = {
+            "data": {
+                "type": "bookings-cancellations",
+                "relationships": {
+                    "bookings": {
+                        "data": [
+                            {
+                                "id": booking_id,
+                                "type": "trip-bookings",
+                            }
+                            for booking_id in booking_ids
+                        ],
+                    },
+                },
+            },
+        }
+        return await self._make_request(
+            method=_METHOD_POST,
+            url="/bookings/cancellations",
+            payload=body,
+        )
