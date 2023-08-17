@@ -813,3 +813,12 @@ class Client(base_client.BaseClient):  # noqa: WPS214
             url="/bookings/cancellations",
             payload=body,
         )
+
+    async def get_bookings_cancellation_by_id(
+        self,
+        bookings_cancellation_id: str,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/bookings/cancellations/{0}".format(bookings_cancellation_id),
+        )

@@ -1,0 +1,80 @@
+{
+  "url": "\/bookings\/cancellations\/.*",
+  "method": "GET",
+  "status_code": 200,
+  "json": {
+    "data": {
+      "id": "d6cfe9e8-bbc9-485f-912f-7ba97ab2cf34",
+      "type": "bookings-cancellations",
+      "attributes": {
+        "status": "pending"
+      },
+      "relationships": {
+        "bookings": {
+          "data": [
+            {
+              "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+              "type": "trip-bookings"
+            }
+          ]
+        }
+      },
+      "links": {
+        "self": "https://example.com/resource/04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+      }
+    },
+    "included": [
+      {
+        "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+        "type": "orders",
+        "attributes": {
+          "passengers": [
+            {
+              "firstName": "John",
+              "lastName": "Smith",
+              "title": "mr",
+              "gender": "male",
+              "dateOfBirth": "1980-02-03",
+              "travelerDocument": {
+                "documentType": "passport",
+                "documentNumber": "1543343434",
+                "documentIssueCountry": "GB",
+                "documentExpirationDate": "2025-02-03",
+                "documentIssueDate": "2025-02-03",
+                "nationality": "ES",
+                "residenceCountryCode": "NL"
+              }
+            }
+          ],
+          "residenceAddress": {
+            "addressLines": [
+              "Street name 7"
+            ],
+            "countryCode": "GB",
+            "postalCode": "12345",
+            "city": "London"
+          }
+        },
+        "relationships": {
+          "journey": {
+            "data": {
+              "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+              "type": "journeys"
+            }
+          },
+          "bookings": {
+            "data": [
+              {
+                "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "type": "trip-bookings"
+              }
+            ]
+          }
+        },
+        "links": {
+          "self": "https://example.com/resource/04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+        }
+      }
+    ]
+  }
+}

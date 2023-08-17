@@ -222,3 +222,21 @@ class TestOrders(object):
         )
 
         assert response.status_code == 404
+
+    async def test_get_bookings_cancellations(
+        self,
+        authenticated_http_client: httpx.AsyncClient,
+        httpx_mock: pytest_httpx.HTTPXMock,
+    ) -> None:
+        httpx_mock.add_response(
+            **await conftest.load_response_fixture(
+                "GET_BOOKINGS_CANCELLATION_{ID}.json",
+            ),
+        )
+
+        response = await authenticated_http_client.get(
+            "/bookings/cancellations/d6cfe9e8-bbc9-485f-912f-7ba97ab2cf34",
+        )
+
+        assert response.json()["data"]
+        assert response.status_code == 200

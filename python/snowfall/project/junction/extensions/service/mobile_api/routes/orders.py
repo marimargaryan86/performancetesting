@@ -288,6 +288,19 @@ class BookingsCancellation(endpoints.HTTPEndpoint):
             status.HTTP_201_CREATED,
         )
 
+    async def get(
+        self,
+        request: requests.Request,
+        junction_client: client.Client = lagom.injectable,
+    ) -> responses.Response:
+        cancellation_response = await junction_client.get_bookings_cancellation_by_id(
+            request.path_params["bookingsCancellationId"],
+        )
+
+        return stdlib_models.JsonApiResponse(
+            stdlib_models.Body(data=cancellation_response["data"]),
+        )
+
 
 async def check_payment_amount_and_state(
     payment_intent_id: str,

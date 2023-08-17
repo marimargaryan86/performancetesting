@@ -2082,6 +2082,53 @@
           }
         }
       }
+    },
+    "/bookings/cancellations/{bookingsCancellationId}": {
+      "parameters": [
+        {
+          "$ref": "./../client_api/openapi.json#/components/parameters/bookingsCancellationId"
+        },
+        {
+          "$ref": "./../client_api/openapi.json#/components/parameters/bookingsCancellationInclude"
+        }
+      ],
+      "get": {
+        "summary": "Get Bookings Cancellation",
+        "tags": [
+          "orders"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "./../client_api/openapi.json#/components/schemas/BookingsCancellation"
+                    },
+                    "included": {
+                      "$ref": "./../client_api/openapi.json#/components/schemas/BookingsCancellationIncluded"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-bookings-cancellations-id",
+        "description": "Used to lookup data for a Bookings Cancellation Identifier."
+      }
     }
   },
   "components": {
