@@ -392,6 +392,7 @@ class _SATApiClient(http_client.HttpClient):  # noqa: WPS214
         client: httpx.AsyncClient,
         email: str,
         password: str,
+        api_search_requests_limit: int,
     ) -> None:
         super().__init__(api_url, client)
 
@@ -399,15 +400,17 @@ class _SATApiClient(http_client.HttpClient):  # noqa: WPS214
         self._password = password
         self._token = token
         self._logger = stdout.get_logger()
+        self._semaphore = asyncio.BoundedSemaphore(api_search_requests_limit)
 
     async def get_vendor_stations(self) -> VendorStationsResponse:
-        response = await self._make_request(
-            http_client.RequestOptions(
-                method="GET",
-                path="vendor_stations",
-                headers=self._auth_headers,
-            ),
-        )
+        async with self._semaphore:
+            response = await self._make_request(
+                http_client.RequestOptions(
+                    method="GET",
+                    path="vendor_stations",
+                    headers=self._auth_headers,
+                ),
+            )
 
         response_data = response.json()
 
@@ -425,15 +428,15 @@ class _SATApiClient(http_client.HttpClient):  # noqa: WPS214
             "email": self._email,
             "password": self._password,
         }
-
-        response = await self._make_request(
-            http_client.RequestOptions(
-                method="POST",
-                path="sales_agent_sessions",
-                query=request_params,
-                headers=self._auth_headers,
-            ),
-        )
+        async with self._semaphore:
+            response = await self._make_request(
+                http_client.RequestOptions(
+                    method="POST",
+                    path="sales_agent_sessions",
+                    query=request_params,
+                    headers=self._auth_headers,
+                ),
+            )
 
         response_data = response.json()
 
@@ -468,22 +471,23 @@ class _SATApiClient(http_client.HttpClient):  # noqa: WPS214
 
         self._logger.info("SAT book search request", request=json.dumps(body))
 
-        try:
-            response = await self._make_request(
-                http_client.RequestOptions(
-                    method="POST",
-                    path="searches",
-                    payload=body,
-                    headers=self._auth_headers,
-                ),
-            )
-        except http_errors.HttpStatusError as exc:
-            if exc.response.status_code == httpx.codes.UNPROCESSABLE_ENTITY:
-                raise SATValidationError(
-                    _exception_message_from_response(exc.raw_response),
-                ) from exc
+        async with self._semaphore:
+            try:
+                response = await self._make_request(
+                    http_client.RequestOptions(
+                        method="POST",
+                        path="searches",
+                        payload=body,
+                        headers=self._auth_headers,
+                    ),
+                )
+            except http_errors.HttpStatusError as exc:
+                if exc.response.status_code == httpx.codes.UNPROCESSABLE_ENTITY:
+                    raise SATValidationError(
+                        _exception_message_from_response(exc.raw_response),
+                    ) from exc
 
-            raise
+                raise
 
         response_data = response.json()
 
@@ -494,24 +498,25 @@ class _SATApiClient(http_client.HttpClient):  # noqa: WPS214
         request: SearchResultRequest,
     ) -> SearchResultDetails:
         """Get search result's details: transfers and fares."""
-        try:
-            response = await self._make_request(
-                http_client.RequestOptions(
-                    method="GET",
-                    path="searches/{0}/results/{1}/sub_routes".format(
-                        request.search_id,
-                        request.search_result_id,
+        async with self._semaphore:
+            try:
+                response = await self._make_request(
+                    http_client.RequestOptions(
+                        method="GET",
+                        path="searches/{0}/results/{1}/sub_routes".format(
+                            request.search_id,
+                            request.search_result_id,
+                        ),
+                        headers=self._auth_headers,
                     ),
-                    headers=self._auth_headers,
-                ),
-            )
-        except http_errors.HttpStatusError as exc:
-            if exc.response.status_code == httpx.codes.UNPROCESSABLE_ENTITY:
-                raise SATValidationError(
-                    _exception_message_from_response(exc.raw_response),
-                ) from exc
+                )
+            except http_errors.HttpStatusError as exc:
+                if exc.response.status_code == httpx.codes.UNPROCESSABLE_ENTITY:
+                    raise SATValidationError(
+                        _exception_message_from_response(exc.raw_response),
+                    ) from exc
 
-            raise
+                raise
 
         response_data = response.json()
 
@@ -537,22 +542,23 @@ class _SATApiClient(http_client.HttpClient):  # noqa: WPS214
 
         self._logger.info("SAT select search request", request=json.dumps(body))
 
-        try:
-            response = await self._make_request(
-                http_client.RequestOptions(
-                    method="POST",
-                    path="searches/{0}/confirm_selection".format(request.search_id),
-                    payload=body,
-                    headers=self._auth_headers,
-                ),
-            )
-        except http_errors.HttpStatusError as exc:
-            if exc.response.status_code == httpx.codes.UNPROCESSABLE_ENTITY:
-                raise SATValidationError(
-                    _exception_message_from_response(exc.raw_response),
-                ) from exc
+        async with self._semaphore:
+            try:
+                response = await self._make_request(
+                    http_client.RequestOptions(
+                        method="POST",
+                        path="searches/{0}/confirm_selection".format(request.search_id),
+                        payload=body,
+                        headers=self._auth_headers,
+                    ),
+                )
+            except http_errors.HttpStatusError as exc:
+                if exc.response.status_code == httpx.codes.UNPROCESSABLE_ENTITY:
+                    raise SATValidationError(
+                        _exception_message_from_response(exc.raw_response),
+                    ) from exc
 
-            raise
+                raise
 
         response_data = response.json()
 
@@ -563,25 +569,26 @@ class _SATApiClient(http_client.HttpClient):  # noqa: WPS214
         request: GetTariffConditionsRequest,
     ) -> TariffConditionsResponse:
         """Get fare's tariff conditions."""
-        try:
-            response = await self._make_request(
-                http_client.RequestOptions(
-                    method="GET",
-                    path="searches/{0}/results/{1}/tariff_conditions/{2}".format(
-                        request.search_id,
-                        request.search_result_id,
-                        request.tariff_condition_id,
+        async with self._semaphore:
+            try:
+                response = await self._make_request(
+                    http_client.RequestOptions(
+                        method="GET",
+                        path="searches/{0}/results/{1}/tariff_conditions/{2}".format(
+                            request.search_id,
+                            request.search_result_id,
+                            request.tariff_condition_id,
+                        ),
+                        headers=self._auth_headers,
                     ),
-                    headers=self._auth_headers,
-                ),
-            )
-        except http_errors.HttpStatusError as exc:
-            if exc.response.status_code == httpx.codes.UNPROCESSABLE_ENTITY:
-                raise SATValidationError(
-                    _exception_message_from_response(exc.raw_response),
-                ) from exc
+                )
+            except http_errors.HttpStatusError as exc:
+                if exc.response.status_code == httpx.codes.UNPROCESSABLE_ENTITY:
+                    raise SATValidationError(
+                        _exception_message_from_response(exc.raw_response),
+                    ) from exc
 
-            raise
+                raise
 
         response_data = response.json()
 
@@ -627,23 +634,23 @@ class _SATApiClient(http_client.HttpClient):  # noqa: WPS214
         }
 
         self._logger.info("SAT booking request", request=json.dumps(body))
+        async with self._semaphore:
+            try:
+                response = await self._make_request(
+                    http_client.RequestOptions(
+                        method="POST",
+                        path="bookings",
+                        payload=body,
+                        headers=self._auth_headers,
+                    ),
+                )
+            except http_errors.HttpStatusError as exc:
+                if exc.response.status_code == httpx.codes.UNPROCESSABLE_ENTITY:
+                    raise SATValidationError(
+                        _exception_message_from_response(exc.raw_response),
+                    ) from exc
 
-        try:
-            response = await self._make_request(
-                http_client.RequestOptions(
-                    method="POST",
-                    path="bookings",
-                    payload=body,
-                    headers=self._auth_headers,
-                ),
-            )
-        except http_errors.HttpStatusError as exc:
-            if exc.response.status_code == httpx.codes.UNPROCESSABLE_ENTITY:
-                raise SATValidationError(
-                    _exception_message_from_response(exc.raw_response),
-                ) from exc
-
-            raise
+                raise
 
         return booking.BookingResult(**response.json()), response.content
 
@@ -662,23 +669,23 @@ class _SATApiClient(http_client.HttpClient):  # noqa: WPS214
                 "search_identifier": search_id,
             },
         }
+        async with self._semaphore:
+            try:
+                response = await self._make_request(
+                    http_client.RequestOptions(
+                        method="POST",
+                        path="bookings/confirm",
+                        payload=body,
+                        headers=self._auth_headers,
+                    ),
+                )
+            except http_errors.HttpStatusError as exc:
+                if exc.response.status_code == httpx.codes.UNPROCESSABLE_ENTITY:
+                    raise SATValidationError(
+                        _exception_message_from_response(exc.raw_response),
+                    ) from exc
 
-        try:
-            response = await self._make_request(
-                http_client.RequestOptions(
-                    method="POST",
-                    path="bookings/confirm",
-                    payload=body,
-                    headers=self._auth_headers,
-                ),
-            )
-        except http_errors.HttpStatusError as exc:
-            if exc.response.status_code == httpx.codes.UNPROCESSABLE_ENTITY:
-                raise SATValidationError(
-                    _exception_message_from_response(exc.raw_response),
-                ) from exc
-
-            raise
+                raise
 
         response_data = response.json()
 
@@ -691,19 +698,20 @@ class _SATApiClient(http_client.HttpClient):  # noqa: WPS214
         :raises httpx.TimeoutException: If request times out
         :raises httpx.HTTPStatusError: If request fails
         """
-        try:
-            response = await self._make_request(
-                http_client.RequestOptions(
-                    method="GET",
-                    path="order_images/{0}".format(search_id),
-                    headers=self._auth_headers,
-                ),
-            )
-        except http_errors.HttpStatusError as exc:
-            if exc.response.status_code == httpx.codes.NOT_FOUND:
-                raise SATValueError() from exc
+        async with self._semaphore:
+            try:
+                response = await self._make_request(
+                    http_client.RequestOptions(
+                        method="GET",
+                        path="order_images/{0}".format(search_id),
+                        headers=self._auth_headers,
+                    ),
+                )
+            except http_errors.HttpStatusError as exc:
+                if exc.response.status_code == httpx.codes.NOT_FOUND:
+                    raise SATValueError() from exc
 
-            raise
+                raise
 
         response_data = response.json()
 
@@ -727,21 +735,21 @@ class _SATApiClient(http_client.HttpClient):  # noqa: WPS214
             "id": search_id,
             "email": email,
         }
+        async with self._semaphore:
+            try:
+                response = await self._make_request(
+                    http_client.RequestOptions(
+                        method="POST",
+                        path="manage_bookings",
+                        headers=self._auth_headers,
+                        payload=body,
+                    ),
+                )
+            except http_errors.HttpStatusError as exc:
+                if exc.response.status_code == httpx.codes.NOT_FOUND:
+                    raise SATValueError() from exc
 
-        try:
-            response = await self._make_request(
-                http_client.RequestOptions(
-                    method="POST",
-                    path="manage_bookings",
-                    headers=self._auth_headers,
-                    payload=body,
-                ),
-            )
-        except http_errors.HttpStatusError as exc:
-            if exc.response.status_code == httpx.codes.NOT_FOUND:
-                raise SATValueError() from exc
-
-            raise
+                raise
 
         response_data = response.json()
 
@@ -755,17 +763,18 @@ class _SATApiClient(http_client.HttpClient):  # noqa: WPS214
         :raises httpx.TimeoutException: If request times out
         :raises httpx.HTTPStatusError: If request fails
         """
-        try:
-            response = await httpx.AsyncClient().get(url)
-        except httpx.TimeoutException as timeout_exc:
-            raise errors.TimeOutError.from_error(timeout_exc) from timeout_exc
-        except httpx.RequestError as request_exc:
-            raise errors.RequestError.from_error(request_exc) from request_exc
+        async with self._semaphore:
+            try:
+                response = await httpx.AsyncClient().get(url)
+            except httpx.TimeoutException as timeout_exc:
+                raise errors.TimeOutError.from_error(timeout_exc) from timeout_exc
+            except httpx.RequestError as request_exc:
+                raise errors.RequestError.from_error(request_exc) from request_exc
 
-        try:
-            response.raise_for_status()
-        except httpx.HTTPStatusError as exc:
-            raise errors.HttpStatusError.from_error(exc) from exc
+            try:
+                response.raise_for_status()
+            except httpx.HTTPStatusError as exc:
+                raise errors.HttpStatusError.from_error(exc) from exc
 
         return response.content
 
@@ -816,6 +825,7 @@ class SATClient(object):  # noqa: WPS214
             client=client,
             email=email,
             password=password,
+            api_search_requests_limit=api_search_requests_limit,
         )
         self._search_api_client = _SATSearchApiClient(
             api_url=api_search_url,

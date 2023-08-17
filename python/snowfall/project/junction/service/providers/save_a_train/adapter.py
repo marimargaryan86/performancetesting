@@ -194,14 +194,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                                 cabin_class=models_pb2.CabinClass(
                                     type=await self._cabin_mapping.resolve_cabin_class(
                                         fare_brand=transfer_fare.name,
-                                        operator=_resolve_train_operator(
-                                            train_category=transfer.changes[
-                                                0
-                                            ].train.category,
-                                            train_number=transfer.changes[
-                                                0
-                                            ].train.number,
-                                        ),
+                                        operator=transfer.changes[0].train.category,
                                     ),
                                     marketing_name=transfer_fare.name.replace(
                                         "_",
@@ -549,13 +542,6 @@ def raise_http_error_with_text(http_error: errors.HttpStatusError) -> None:
             http_error.response.body,
         ),
     ) from http_error
-
-
-def _resolve_train_operator(
-    train_category: str | None,
-    train_number: str | None,
-) -> str | None:
-    return train_category + train_number if train_category and train_number else None
 
 
 class Transformer(object):
