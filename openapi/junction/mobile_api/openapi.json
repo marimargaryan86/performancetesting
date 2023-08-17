@@ -1420,6 +1420,9 @@
     "/offers/searches/{offerSearchId}/offers": {
       "$ref": "./../client_api/openapi.json#/paths/~1offers~1searches~1{offerSearchId}~1offers"
     },
+    "/offers/{offerId}": {
+      "$ref": "./../client_api/openapi.json#/paths/~1offers~1{offerId}"
+    },
     "/offers/quotes": {
       "$ref": "./../client_api/openapi.json#/paths/~1offers~1quotes"
     },

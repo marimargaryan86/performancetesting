@@ -39,5 +39,10 @@ class OfferQuote(endpoints.HTTPEndpoint):
     ) -> responses.Response:
         offer_quote_response = await junction_client.get_offer_quote_by_id(
             request.path_params["offerPriceQuoteId"],
+            include=request.scope["parsed_query_string"].get("include", []),
         )
-        return models.JsonApiResponse(models.Body(data=offer_quote_response["data"]))
+        response_body = models.Body(data=offer_quote_response["data"])
+
+        response_body.included = offer_quote_response.get("included", [])
+
+        return models.JsonApiResponse(response_body)

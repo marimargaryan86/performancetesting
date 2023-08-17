@@ -64,6 +64,7 @@ def get_routes(
             name="OffersByOfferSearch",
         ),
         integration.route("/offers/quotes", quotes.OfferQuotes),
+        integration.route("/offers/{offerId}", offers.Offer),
         integration.route("/offers/quotes/{offerPriceQuoteId}", quotes.OfferQuote),
         integration.route("/verification-code", users.OTPGenerate),
         integration.route("/verification-code/{userEmail}", users.OTPVerify),

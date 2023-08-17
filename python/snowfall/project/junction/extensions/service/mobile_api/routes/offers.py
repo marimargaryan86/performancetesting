@@ -18,6 +18,18 @@ _TYPE_KEY = "type"
 _DETAILS_KEY = "details"
 
 
+class Offer(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        junction_client: client.Client = lagom.injectable,
+    ) -> responses.Response:
+        offer_response = await junction_client.get_offer(
+            request.path_params["offerId"],
+        )
+        return models.JsonApiResponse(models.Body(data=offer_response["data"]))
+
+
 class OfferSearches(endpoints.HTTPEndpoint):
     async def post(
         self,

@@ -56,3 +56,23 @@ class TestOffers(object):
         )
 
         assert response.status_code == status.HTTP_200_OK
+
+    async def test_get_offer(
+        self,
+        authenticated_http_client: httpx.AsyncClient,
+        httpx_mock: pytest_httpx.HTTPXMock,
+    ) -> None:
+        httpx_mock.add_response(
+            **await conftest.load_response_fixture(
+                "GET_OFFER_{ID}.json",
+            ),
+        )
+
+        response = await authenticated_http_client.get(
+            "/offers/{offerId}".format(
+                offerId="04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+            ),
+            headers={"Session-Token": "FMSXrOAhIOdvIbxAmfSt7vJtRBkurNbn"},
+        )
+
+        assert response.status_code == status.HTTP_200_OK

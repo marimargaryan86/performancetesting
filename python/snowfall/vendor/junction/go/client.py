@@ -572,10 +572,18 @@ class Client(base_client.BaseClient):  # noqa: WPS214
             payload=body,
         )
 
-    async def get_offer_quote_by_id(self, identifier: str) -> dict[str, Any]:
+    async def get_offer_quote_by_id(
+        self,
+        identifier: str,
+        include: Sequence[_OfferIncludes] | None = None,
+    ) -> dict[str, Any]:
+        query_parameters: dict[str, str] = {}
+        if include:
+            query_parameters["include"] = ",".join(include)
         return await self._make_request(
             method=_METHOD_GET,
             url="/offers/quotes/{0}".format(identifier),
+            query_parameters=query_parameters,
         )
 
     async def get_journeys(
