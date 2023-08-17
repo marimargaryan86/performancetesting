@@ -1,0 +1,10 @@
+rules:
+  redundant-path-ids:
+    severity: error
+    description: "Since every resource can be identified by it's unique identifier in a namespace, multiple identifiers in a path is unnecessary."
+    message: "Having multiple identifiers in a path is redundant."
+    given: $.paths[*]~
+    then:
+      function: pattern
+      functionOptions:
+        notMatch: "\\{.+?\\}.*\\{.+?\\}"
