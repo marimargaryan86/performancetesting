@@ -791,18 +791,27 @@
             "description": "An application-specific error code, expressed as a string value."
           },
           "source": {
-            "type": "object",
             "description": "An object containing references to the source of the error.",
             "properties": {
               "pointer": {
                 "type": "string",
                 "example": "/data/attributes/title",
                 "description": "A JSON Pointer to the associated entity in the request document."
+              },
+              "parameter": {
+                "type": "string",
+                "example": "page[cursor]",
+                "description": "A string indicating which URI query parameter caused the error."
+              },
+              "header": {
+                "type": "string",
+                "example": "X-Request-Id",
+                "description": "A string indicating the name of a single request header which caused the error."
               }
             },
-            "required": [
-              "pointer"
-            ]
+            "minProperties": 1,
+            "maxProperties": 1,
+            "type": "object"
           }
         },
         "required": [

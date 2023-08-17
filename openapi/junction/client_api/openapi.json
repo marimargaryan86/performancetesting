@@ -6740,44 +6740,25 @@
           },
           "source": {
             "description": "An object containing references to the source of the error.",
-            "oneOf": [
-              {
-                "properties": {
-                  "pointer": {
-                    "type": "string",
-                    "example": "/data/attributes/title",
-                    "description": "A JSON Pointer to the associated entity in the request document."
-                  }
-                },
-                "required": [
-                  "pointer"
-                ]
+            "properties": {
+              "pointer": {
+                "type": "string",
+                "example": "/data/attributes/title",
+                "description": "A JSON Pointer to the associated entity in the request document."
               },
-              {
-                "properties": {
-                  "parameter": {
-                    "type": "string",
-                    "example": "page[cursor]",
-                    "description": "A string indicating which URI query parameter caused the error."
-                  }
-                },
-                "required": [
-                  "parameter"
-                ]
+              "parameter": {
+                "type": "string",
+                "example": "page[cursor]",
+                "description": "A string indicating which URI query parameter caused the error."
               },
-              {
-                "properties": {
-                  "header": {
-                    "type": "string",
-                    "example": "X-Request-Id",
-                    "description": "A string indicating the name of a single request header which caused the error."
-                  }
-                },
-                "required": [
-                  "header"
-                ]
+              "header": {
+                "type": "string",
+                "example": "X-Request-Id",
+                "description": "A string indicating the name of a single request header which caused the error."
               }
-            ],
+            },
+            "minProperties": 1,
+            "maxProperties": 1,
             "type": "object"
           }
         },
