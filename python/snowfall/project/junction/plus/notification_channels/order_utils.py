@@ -1,6 +1,9 @@
 from collections.abc import Sequence
 
+from google.protobuf import timestamp_pb2
+
 from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
+from snowfall.stdlib.format import protobuf
 
 
 def compress_flights(  # noqa: WPS210
@@ -31,3 +34,14 @@ def compress_flights(  # noqa: WPS210
             else:
                 analyzed_flights.append(flight)
     return analyzed_flights
+
+
+def proto_to_route_identifier(identifier: models_pb2.RouteIdentifier) -> str:
+    return identifier.carrier + str(identifier.flight_number)
+
+
+def proto_to_format_dt(proto: timestamp_pb2.Timestamp) -> str:
+    dt = protobuf.protobuf_to_datetime(proto)
+    return dt.strftime(
+        "%A %d %b %Y %H:%M",
+    )
