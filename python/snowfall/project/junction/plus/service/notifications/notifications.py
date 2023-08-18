@@ -8,7 +8,10 @@ from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence.mongo import mixins, repository
 
 
-class OrderRepository(repository.ProtoRepository[models_pb2.PersistedOrder]):
+class OrderRepository(
+    mixins.FindByIdMixin[models_pb2.PersistedOrder],
+    repository.ProtoRepository[models_pb2.PersistedOrder],
+):
     _proto = models_pb2.PersistedOrder
     _nested_path = "bookings"
     _indexes = (

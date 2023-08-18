@@ -8,6 +8,7 @@ option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/
 
 service OrderService {
   rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse) {}
+  rpc GetOrder(GetOrderRequest) returns (GetOrderResponse) {}
 }
 
 service SubscriberService {
@@ -42,6 +43,14 @@ message CreateOrderRequest {
 }
 
 message CreateOrderResponse {
+  snowfall.project.junction.plus.service.notifications.v1alpha.PersistedOrder order = 1;
+}
+
+message GetOrderRequest {
+  string id = 1;
+}
+
+message GetOrderResponse {
   snowfall.project.junction.plus.service.notifications.v1alpha.PersistedOrder order = 1;
 }
 

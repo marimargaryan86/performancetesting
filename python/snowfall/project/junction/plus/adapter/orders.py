@@ -22,6 +22,13 @@ class Client(abc.ABC):
     ) -> notifications_models_pb2.PersistedOrder:
         """Persist an incoming order from orders registration queue."""
 
+    @abc.abstractmethod
+    async def get(
+        self,
+        order_id: str,
+    ) -> notifications_models_pb2.PersistedOrder:
+        """Get Order."""
+
 
 class DictClient(Client):
     def __init__(self, orders: Sequence[notifications_models_pb2.PersistedOrder]):
@@ -43,6 +50,19 @@ class DictClient(Client):
         self._orders[new_order.id] = new_order
         return new_order
 
+    async def get(
+        self,
+        order_id: str,
+    ) -> notifications_models_pb2.PersistedOrder:
+        order = self._orders.get(
+            order_id,
+        )
+
+        if not order:
+            raise errors.NotFoundError()
+
+        return order
+
 
 class GrpcClient(Client):
     def __init__(
@@ -60,6 +80,20 @@ class GrpcClient(Client):
         response = await errors.handle_grpc_errors(
             self._orders.CreateOrder(
                 create_order_request,
+                timeout=self._timeout,
+            ),
+        )
+
+        return response.order
+
+    async def get(
+        self,
+        order_id: str,
+    ) -> notifications_models_pb2.PersistedOrder:
+        request = notifications_grpc_pb2.GetOrderRequest(id=order_id)
+        response = await errors.handle_grpc_errors(
+            self._orders.GetOrder(
+                request,
                 timeout=self._timeout,
             ),
         )

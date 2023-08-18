@@ -11,6 +11,7 @@ from snowfall.project.junction.plus.adapter import (
     configuration_vectors,
     monitoring_rules,
     notification_event_publisher,
+    orders,
     subscribers,
 )
 from snowfall.project.junction.plus.service.notifications.v1alpha import (
@@ -32,27 +33,33 @@ def _factory(
     app: service.Application[bootstrap.Settings],
 ) -> Callable[[], Starlette]:
     def decorator() -> Starlette:
+        notifications_channel = create_channel(app.settings.notifications_address)
         return application.create_starlette_app(
             router.get_routes(
                 bootstrap.create_dependencies(
                     monitoring_rules_client=monitoring_rules.GrpcClient(
                         monitoring_rules=notifications_pb2_grpc.MonitoringRuleServiceStub(
-                            create_channel(app.settings.notifications_address),
+                            notifications_channel,
                         ),
                     ),
                     subscribers_client=subscribers.GrpcClient(
                         subscribers=notifications_pb2_grpc.SubscriberServiceStub(
-                            create_channel(app.settings.notifications_address),
+                            notifications_channel,
+                        ),
+                    ),
+                    orders_client=orders.GrpcClient(
+                        orders=notifications_pb2_grpc.OrderServiceStub(
+                            notifications_channel,
                         ),
                     ),
                     configuration_vectors_client=configuration_vectors.GrpcClient(
                         configuration_vectors=notifications_pb2_grpc.ConfigurationVectorServiceStub(
-                            create_channel(app.settings.notifications_address),
+                            notifications_channel,
                         ),
                     ),
                     notification_event_publisher_client=notification_event_publisher.GrpcClient(
                         notification_event_publisher=notifications_pb2_grpc.NotificationEventPublisherServiceStub(
-                            create_channel(app.settings.notifications_address),
+                            notifications_channel,
                         ),
                     ),
                     message_handler=chatbot_handlers.MessageHandler(

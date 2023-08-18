@@ -4,6 +4,7 @@ from twilio.twiml.messaging_response import MessagingResponse
 
 from snowfall.project.junction.plus.adapter import (
     configuration_vectors,
+    orders,
     subscribers,
     validation,
 )
@@ -14,9 +15,10 @@ from snowfall.project.junction.plus.service.plus_webhooks import chatbot_handler
 
 
 class IncomingMessages(endpoints.HTTPEndpoint):
-    async def post(  # noqa: WPS210
+    async def post(  # noqa: WPS210, WPS211
         self,
         request: requests.Request,
+        orders_client: orders.Client = lagom.injectable,
         subscribers_client: subscribers.Client = lagom.injectable,
         configuration_vectors_client: configuration_vectors.Client = lagom.injectable,
         message_handler: chatbot_handlers.MessageHandler = lagom.injectable,
@@ -47,8 +49,10 @@ class IncomingMessages(endpoints.HTTPEndpoint):
             twiml_response.message(
                 await message_handler.handle_message(
                     str(msg["Body"]),
+                    str(msg.get("OriginalRepliedMessageSid", "")),
                     subscriber,
                     subscribers_client,
+                    orders_client,
                 ),
             )
             subscriber = await subscribers_client.get(subscriber_id=subscriber.id)

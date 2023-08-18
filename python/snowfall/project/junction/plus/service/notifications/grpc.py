@@ -55,6 +55,20 @@ class OrderService(
 
         return notifications_pb2.CreateOrderResponse(order=order)
 
+    async def GetOrder(  # type: ignore[override] # noqa: N802
+        self,
+        request: notifications_pb2.GetOrderRequest,
+        context: aio.ServicerContext,
+    ) -> notifications_pb2.GetOrderResponse:
+        order = await self._orders.find_by_id(request.id)
+
+        if order is None:
+            await context.abort(StatusCode.NOT_FOUND)
+
+        return notifications_pb2.GetOrderResponse(
+            order=order,
+        )
+
 
 class SubscriberService(
     service.Service,

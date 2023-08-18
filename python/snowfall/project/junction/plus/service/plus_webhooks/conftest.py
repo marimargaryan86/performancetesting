@@ -16,6 +16,9 @@ from snowfall.project.junction.plus.adapter import (
     notification_event_publisher as notification_event_publisher_adapter,
 )
 from snowfall.project.junction.plus.adapter import (
+    orders as orders_adapter,
+)
+from snowfall.project.junction.plus.adapter import (
     subscribers as subscribers_adapter,
 )
 from snowfall.project.junction.plus.service.notifications.v1alpha import (
@@ -99,6 +102,46 @@ def subscribers_client() -> subscribers_adapter.Client:
 
 
 @pytest.fixture()
+def orders_client() -> orders_adapter.Client:
+    flight_number = 2512
+    return orders_adapter.DictClient(
+        [
+            notifications_models_pb2.PersistedOrder(
+                id="id",
+                reseller_id="reseller_id",
+                external_ref_id="external_ref_id",
+                booking_reference="booking_reference",
+                subscriber_id="subscriber_id",
+                passengers=[
+                    notifications_models_pb2.Passenger(
+                        first_name="John",
+                        last_name="Wick",
+                        title=notifications_models_pb2.Passenger.Title.TITLE_MR,
+                        gender=notifications_models_pb2.Passenger.Gender.GENDER_MALE,
+                    ),
+                ],
+                bookings=[
+                    notifications_models_pb2.Booking(
+                        value=notifications_models_pb2.AirBooking(
+                            id="id",
+                            origin="London",
+                            destination="Amsterdam",
+                            origin_iata="LND",
+                            destination_iata="AMS",
+                            route_identifier=notifications_models_pb2.RouteIdentifier(
+                                carrier="U2",
+                                flight_number=flight_number,
+                            ),
+                            cabin_class="Economy",
+                        ),
+                    ),
+                ],
+            ),
+        ],
+    )
+
+
+@pytest.fixture()
 def configuration_vectors_client() -> configuration_vectors.Client:
     return configuration_vectors.DictClient(
         [
@@ -133,6 +176,7 @@ def app(  # noqa: WPS211
     secret_key: str,
     monitoring_rules_client: monitoring_rules_adapter.Client,
     subscribers_client: subscribers_adapter.Client,
+    orders_client: orders_adapter.Client,
     configuration_vectors_client: configuration_vectors.Client,
     notification_event_publisher_client: notification_event_publisher_adapter.Client,
     twilio_validator: RequestValidator,
@@ -150,6 +194,7 @@ def app(  # noqa: WPS211
             bootstrap.create_dependencies(
                 monitoring_rules_client=monitoring_rules_client,
                 subscribers_client=subscribers_client,
+                orders_client=orders_client,
                 configuration_vectors_client=configuration_vectors_client,
                 notification_event_publisher_client=notification_event_publisher_client,
                 message_handler=chatbot_handlers.MessageHandler(
