@@ -23,7 +23,11 @@ from snowfall.vendor.currency_cloud.models.rate import (
 
 class Client(abc.ABC):
     @abc.abstractmethod
-    async def get(self, identifier: str) -> models_pb2.Refund:
+    async def get(
+        self,
+        identifier: str,
+        selector: str = "_id",
+    ) -> models_pb2.Refund:
         """Fetch a refund resource."""
 
     @abc.abstractmethod
@@ -67,11 +71,22 @@ class DictClient(Client):
         }
         self._payment_client = payment_client
 
-    async def get(self, refund_id: str) -> models_pb2.Refund:
-        try:
-            return self._refunds[refund_id]
-        except KeyError as err:
-            raise errors.NotFoundError() from err
+    async def get(
+        self,
+        identifier: str,
+        selector: str = "_id",
+    ) -> models_pb2.Refund:
+        refund = None
+        if selector == "_id":
+            refund = self._refunds.get(identifier, None)
+        else:
+            for refund_val in self._refunds.values():
+                if getattr(refund_val, selector) == identifier:
+                    refund = refund_val
+                    break
+        if refund is None:
+            raise errors.NotFoundError()
+        return refund
 
     async def update(
         self,
@@ -146,10 +161,14 @@ class GrpcClient(Client):
         self._refunds = refunds
         self._timeout = timeout
 
-    async def get(self, refund_id: str) -> models_pb2.Refund:
+    async def get(
+        self,
+        identifier: str,
+        selector: str = "_id",
+    ) -> models_pb2.Refund:
         response = await errors.handle_grpc_errors(
             self._refunds.GetRefund(
-                grpc_pb2.GetRefundRequest(id=refund_id),
+                grpc_pb2.GetRefundRequest(id=identifier, selector=selector),
                 timeout=self._timeout,
             ),
         )

@@ -66,6 +66,14 @@ def quotations_ids() -> list[str]:
     ]
 
 
+@pytest.fixture()
+async def booking_id(
+    transaction_ids: Sequence[str],
+    transactions_client: transactions.Client,
+) -> str:
+    return (await transactions_client.get(transaction_ids[0])).external_reference_id
+
+
 async def mock_jwt_to_user_id(token: str) -> str:
     return authenticator.LegacyAuth(jwt.Decoder()).get_user_id_from_jwt(token)
 

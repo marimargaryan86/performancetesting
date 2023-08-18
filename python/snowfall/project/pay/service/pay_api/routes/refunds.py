@@ -1,7 +1,12 @@
 import lagom
 from starlette import endpoints, requests
 
-from snowfall.project.pay.adapter import refunds as refunds_adapter
+from snowfall.project.pay.adapter import (
+    refunds as refunds_adapter,
+)
+from snowfall.project.pay.adapter import (
+    transactions as transactions_adapter,
+)
 from snowfall.project.pay.service.pay_api import resources
 from snowfall.project.pay.service.pay_api.routes import routes_handlers
 from snowfall.stdlib import money
@@ -125,6 +130,33 @@ class RefundPosition(endpoints.HTTPEndpoint):
                 data=resources.RefundPosition.from_models(
                     refund_id,
                     calculated_refund_position,
+                ),
+            ),
+            request=request,
+        )
+
+
+class RefundByBooking(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        transactions_client: transactions_adapter.Client = lagom.injectable,
+        refunds_client: refunds_adapter.Client = lagom.injectable,
+    ) -> models.JsonApiResponse:
+        transaction = await transactions_client.get(
+            request.path_params["bookingId"],
+            selector="external_reference_id",
+        )
+        refund = await refunds_client.get(
+            transaction.id,
+            selector="transaction_id",
+        )
+
+        return await messages.create_response(
+            body=models.Body(
+                data=resources.RefundsResource.from_proto(
+                    refund=refund,
+                    request=request,
                 ),
             ),
             request=request,

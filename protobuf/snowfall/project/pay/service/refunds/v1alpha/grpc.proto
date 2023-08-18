@@ -17,6 +17,7 @@ service RefundsService {
 
 message GetRefundRequest {
   string id = 1;
+  string selector = 2;
 }
 
 message GetRefundResponse {

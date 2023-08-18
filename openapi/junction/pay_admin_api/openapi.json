@@ -1800,6 +1800,50 @@
         }
       }
     },
+    "/refunds/bookings/{bookingId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/bookingId"
+        }
+      ],
+      "get": {
+        "summary": "Get refund",
+        "description": "Get refund based on booking id",
+        "operationId": "get-refunds-bookings-id",
+        "tags": [
+          "refunds"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Refund"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
     "/refunds/{refundId}/refund-position": {
       "parameters": [
         {
@@ -2193,6 +2237,17 @@
         },
         "description": "Conversion id"
       },
+      "bookingId": {
+        "name": "bookingId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "271f6d54-9e59-407e-a860-b0771d9e3d26"
+        },
+        "description": "booking id"
+      },
       "ConversionInclude": {
         "name": "include",
         "in": "query",
@@ -2222,7 +2277,10 @@
           "example": [
             "reseller"
           ],
-          "default": ["reseller", "provider"],
+          "default": [
+            "reseller",
+            "provider"
+          ],
           "items": {
             "type": "string",
             "enum": [

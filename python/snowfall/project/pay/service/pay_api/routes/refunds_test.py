@@ -32,3 +32,14 @@ class TestRefunds(object):
         )
 
         assert response.status_code == status.HTTP_200_OK
+
+    async def test_view_refund_by_booking_id(
+        self,
+        admin_client: httpx.AsyncClient,
+        booking_id: str,
+    ) -> None:
+        response = await admin_client.get(
+            "/refunds/bookings/{booking_id}".format(booking_id=booking_id),
+        )
+
+        assert response.status_code == status.HTTP_200_OK

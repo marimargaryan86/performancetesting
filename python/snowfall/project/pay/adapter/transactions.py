@@ -95,10 +95,17 @@ class DictClient(Client):
         identifier: str,
         selector: str | None = None,
     ) -> models_pb2.Transaction:
-        try:
-            return self._transactions[identifier]
-        except KeyError as err:
-            raise errors.NotFoundError() from err
+        transaction = None
+        if selector is None:
+            transaction = self._transactions.get(identifier, None)
+        else:
+            for transaction_val in self._transactions.values():
+                if getattr(transaction_val, selector) == identifier:
+                    transaction = transaction_val
+                    break
+        if transaction is None:
+            raise errors.NotFoundError()
+        return transaction
 
     async def find(
         self,
