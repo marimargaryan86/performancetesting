@@ -13,6 +13,10 @@ requirements_tmp=$(mktemp /tmp/requirements.XXXXXX)
 cp "${requirements_file}" "${requirements_tmp}"
 
 while IFS="" read -r line || [ -n "${line}" ]; do
+	if echo "${line}" | grep -q "  # freeze"; then
+		continue
+	fi
+
 	package="${line%==*}"
 	current_version="${line##*==}"
 	package_name="${package%[*}"

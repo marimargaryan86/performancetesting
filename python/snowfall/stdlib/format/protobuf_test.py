@@ -313,28 +313,6 @@ def test_datetime_to_protobuf(
                 minute=5,
                 second=6,
                 microsecond=7,
-                tzinfo=datetime.UTC,
-            ),
-            datetime_pb2.DateTime(
-                year=1984,
-                month=2,
-                day=3,
-                hours=4,
-                minutes=5,
-                seconds=6,
-                nanos=7000,
-                time_zone=datetime_pb2.TimeZone(id="UTC"),
-            ),
-        ),
-        (
-            datetime.datetime(
-                year=1984,
-                month=2,
-                day=3,
-                hour=4,
-                minute=5,
-                second=6,
-                microsecond=7,
                 tzinfo=isodate.tzinfo.Utc(),
             ),
             datetime_pb2.DateTime(

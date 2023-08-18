@@ -40,7 +40,7 @@ class Money(object):
                 unit=abs(self.amount) // _exponent(self.currency),
             )
 
-        return "{symbol}{unit}.{subunit:0{width}d}".format(  # noqa: PLE1300
+        return "{symbol}{unit}.{subunit:0{width}d}".format(
             symbol="-" if self.amount < 0 else "",
             unit=abs(self.amount) // _exponent(self.currency),
             subunit=abs(self.amount) % _exponent(self.currency),
