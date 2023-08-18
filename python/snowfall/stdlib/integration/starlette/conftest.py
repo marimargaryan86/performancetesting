@@ -1,5 +1,6 @@
 import pathlib
 from collections.abc import AsyncIterator, Sequence
+from typing import Any
 
 import httpx
 import pytest
@@ -23,13 +24,15 @@ def _create_app(
     )
 
 
-@pytest.fixture()
-def test_app() -> applications.Starlette:
-    return _create_app(
-        openapi_path=pathlib.Path(
-            "python/snowfall/stdlib/integration/starlette/fixtures/test.json",
-        ),
-    )
+@pytest.fixture(
+    params=[
+        "python/snowfall/stdlib/integration/starlette/fixtures/test.json",
+        "python/snowfall/stdlib/integration/starlette/fixtures/test.3.1.json",
+    ],
+    ids=["3.0", "3.1"],
+)
+def test_app(request: Any) -> applications.Starlette:
+    return _create_app(openapi_path=pathlib.Path(request.param))
 
 
 @pytest.fixture()
@@ -37,12 +40,18 @@ def test_app_without_spec() -> applications.Starlette:
     return _create_app(openapi_path=None)
 
 
-@pytest.fixture()
-def test_app_without_response_validation() -> applications.Starlette:
+@pytest.fixture(
+    params=[
+        "python/snowfall/stdlib/integration/starlette/fixtures/test.json",
+        "python/snowfall/stdlib/integration/starlette/fixtures/test.3.1.json",
+    ],
+    ids=["3.0", "3.1"],
+)
+def test_app_without_response_validation(
+    request: Any,
+) -> applications.Starlette:
     return _create_app(
-        openapi_path=pathlib.Path(
-            "python/snowfall/stdlib/integration/starlette/fixtures/test.json",
-        ),
+        openapi_path=pathlib.Path(request.param),
         validate_response=False,
     )
 

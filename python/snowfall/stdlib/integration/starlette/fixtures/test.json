@@ -98,6 +98,31 @@
                           "enum": [
                             "success"
                           ]
+                        },
+                        "attributes": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "array": {
+                              "type": "array",
+                              "items": {
+                                "oneOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "integer"
+                                  }
+                                ]
+                              }
+                            },
+                            "firstNullable": {
+                              "$ref": "#/components/schemas/NullableRef"
+                            },
+                            "secondNullable": {
+                              "$ref": "#/components/schemas/NullableRef"
+                            }
+                          }
                         }
                       }
                     }
@@ -210,6 +235,27 @@
       }
     },
     "schemas": {
+      "NullableRef": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/StringRef"
+          },
+          {
+            "additionalProperties": false,
+            "nullable": true
+          }
+        ],
+        "nullable": true
+      },
+      "StringRef": {
+        "type": "object",
+        "properties": {
+          "foo": {
+            "type": "string"
+          }
+        },
+        "required": ["foo"]
+      },
       "Error": {
         "title": "Error",
         "type": "object",

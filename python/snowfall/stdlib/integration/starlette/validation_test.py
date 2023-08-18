@@ -16,7 +16,17 @@ async def _failed_validation(request: requests.Request) -> responses.Response:
 
 async def _success_validation(request: requests.Request) -> responses.Response:
     return models.JsonApiResponse(
-        models.Body(data=models.ResourceIdentifier(id="1", type="success")),
+        models.Body(
+            data=models.Resource(
+                id="1",
+                type="success",
+                attributes={
+                    "array": ["foo", 1],
+                    "firstNullable": None,
+                    "secondNullable": {"foo": "bar"},
+                },
+            ),
+        ),
     )
 
 

@@ -1,0 +1,326 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Junction Test API",
+    "version": "1.0"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health",
+        "tags": [
+          "internal"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "description": "",
+                  "type": "object",
+                  "x-examples": {
+                    "example-1": {
+                      "meta": {
+                        "status": "ok"
+                      }
+                    }
+                  },
+                  "properties": {
+                    "meta": {
+                      "type": "object",
+                      "required": [
+                        "status"
+                      ],
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "description": "Health status",
+                          "enum": [
+                            "pass",
+                            "fail",
+                            "warn"
+                          ],
+                          "examples": ["pass"]
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "meta"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-health",
+        "description": "Check the application health.",
+        "x-internal": true,
+        "security": []
+      }
+    },
+    "/validation": {
+      "get": {
+        "summary": "Your GET endpoint",
+        "tags": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "description": "",
+                  "type": "object",
+                  "x-examples": {
+                    "example-1": {
+                      "data": {
+                        "id": "1",
+                        "type": "success"
+                      }
+                    }
+                  },
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "type"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "type": {
+                          "type": "string",
+                          "minLength": 1,
+                          "enum": [
+                            "success"
+                          ]
+                        },
+                        "attributes": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "array": {
+                              "type": "array",
+                              "items": {
+                                "type": ["string", "integer"]
+                              }
+                            },
+                            "firstNullable": {
+                              "$ref": "#/components/schemas/NullableRef"
+                            },
+                            "secondNullable": {
+                              "$ref": "#/components/schemas/NullableRef"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        },
+        "operationId": "get-validation",
+        "x-internal": true,
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/default-boolean"
+          }
+        ]
+      },
+      "post": {
+        "summary": "",
+        "operationId": "post-validation",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "description": "",
+                "type": "object",
+                "x-examples": {
+                  "example-1": {
+                    "data": {
+                      "type": "success"
+                    }
+                  }
+                },
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "type"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "minLength": 1,
+                        "enum": [
+                          "success"
+                        ]
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        },
+        "x-internal": true
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "default-boolean": {
+        "name": "defaultBoolean",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "boolean",
+          "default": true,
+          "examples": [true]
+        },
+        "description": "A limit on the number of objects to be returned, between 1 and 100."
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Bad Request",
+        "content": {
+          "application/vnd.api+json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "errors": {
+                  "type": "array",
+                  "uniqueItems": true,
+                  "minItems": 1,
+                  "items": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              },
+              "required": [
+                "errors"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "NullableRef": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/StringRef"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "StringRef": {
+        "type": "object",
+        "properties": {
+          "foo": {
+            "type": "string"
+          }
+        },
+        "required": ["foo"]
+      },
+      "Error": {
+        "title": "Error",
+        "type": "object",
+        "description": "JSON:API error",
+        "properties": {
+          "status": {
+            "type": "string",
+            "pattern": "^[45][0-9]{2}$",
+            "description": "The HTTP status code applicable to this problem, expressed as a string value.",
+            "examples": ["404"]
+          },
+          "title": {
+            "type": "string",
+            "examples": ["Not Found"],
+            "description": "A short, human-readable summary of the problem that SHOULD NOT change from occurrence to occurrence of the problem, except for purposes of localization."
+          },
+          "detail": {
+            "type": "string",
+            "description": "A human-readable explanation specific to this occurrence of the problem. Like `title`, this field’s value can be localized.",
+            "examples": ["Nothing matches the given URI"]
+          },
+          "code": {
+            "type": "string",
+            "examples": ["required"],
+            "description": "An application-specific error code, expressed as a string value."
+          },
+          "source": {
+            "description": "An object containing references to the source of the error.",
+            "oneOf": [
+              {
+                "properties": {
+                  "pointer": {
+                    "type": "string",
+                    "example": ["/data/attributes/title"],
+                    "description": "A JSON Pointer to the associated entity in the request document."
+                  }
+                },
+                "required": [
+                  "pointer"
+                ]
+              },
+              {
+                "properties": {
+                  "parameter": {
+                    "type": "string",
+                    "example": ["page[cursor]"],
+                    "description": "A string indicating which URI query parameter caused the error."
+                  }
+                },
+                "required": [
+                  "parameter"
+                ]
+              },
+              {
+                "properties": {
+                  "header": {
+                    "type": "string",
+                    "example": ["X-Request-Id"],
+                    "description": "A string indicating the name of a single request header which caused the error."
+                  }
+                },
+                "required": [
+                  "header"
+                ]
+              }
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "status",
+          "detail"
+        ]
+      }
+    }
+  }
+}
