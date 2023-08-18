@@ -159,7 +159,7 @@
     </div>
 
     {#if offer && fare}
-      <Summary />
+      <Summary passengers={[]} />
     {/if}
   </div>
 

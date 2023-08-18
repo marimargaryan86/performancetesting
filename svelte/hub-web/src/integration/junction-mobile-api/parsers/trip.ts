@@ -18,15 +18,13 @@ import {
   parseOfferSchema,
 } from "./offer";
 import type {
+  CabinClassSchema,
+  LegTypeSchema,
   OfferGroupSchema,
   OfferOptionSchema,
   TripOfferGroupDetailsSchema,
   TripOfferOptionDetailsSchema,
 } from "../schemas/offer";
-import type {
-  CabinClassSchema,
-  LegTypeSchema,
-} from "integration/junction-client-api/schemas/offer";
 
 export function parseCreateTripCandidatesSearchModel(
   data: CreateTripCandidatesModel,
@@ -83,34 +81,43 @@ export function parseGetTripCandidatesSearchResponseSchema(
 export function parseGetTripCandidatesOffersResponse(
   data: ListTripCandidatesOffersResponseSchema,
 ): OfferModel[] {
-  const legTypes =
-    data.included
-      ?.filter((item): item is LegTypeSchema => item.type === "leg-types")
-      .map(parseLegTypeSchema) ?? [];
-  const offerGroupDetails =
-    data.included
-      ?.filter(
-        (item): item is TripOfferGroupDetailsSchema => item.type === "trip-offer-group-details",
-      )
-      .map((item) => parseOfferGroupDetailsSchema(item, legTypes)) ?? [];
-  const cabinClasses =
-    data.included
-      ?.filter((item): item is CabinClassSchema => item.type === "cabin-classes")
-      .map(parseCabinClassSchema) ?? [];
-  const offerOptionDetails =
-    data.included
-      ?.filter(
-        (item): item is TripOfferOptionDetailsSchema => item.type === "trip-offer-option-details",
-      )
-      .map((item) => parseOfferOptionDetailsSchema(item, cabinClasses)) ?? [];
-  const offerOptions =
-    data.included
-      ?.filter((item): item is OfferOptionSchema => item.type === "offer-options")
-      .map((item) => parseOfferOptionSchema(item, offerOptionDetails)) ?? [];
-  const offerGroups =
-    data.included
-      ?.filter((item): item is OfferGroupSchema => item.type === "offer-groups")
-      .map((item) => parseOfferGroupSchema(item, offerOptions, offerGroupDetails)) ?? [];
+  const legTypes: LegTypeSchema[] = [];
+  const offerGroupDetails: TripOfferGroupDetailsSchema[] = [];
+  const cabinClasses: CabinClassSchema[] = [];
+  const offerOptionDetails: TripOfferOptionDetailsSchema[] = [];
+  const offerOptions: OfferOptionSchema[] = [];
+  const offerGroups: OfferGroupSchema[] = [];
 
-  return data.data.map((item) => parseOfferSchema(item, offerGroups));
+  data.included?.forEach((item) => {
+    if (item.type === "leg-types") {
+      legTypes.push(item);
+    } else if (item.type === "trip-offer-group-details") {
+      offerGroupDetails.push(item);
+    } else if (item.type === "cabin-classes") {
+      cabinClasses.push(item);
+    } else if (item.type === "trip-offer-option-details") {
+      offerOptionDetails.push(item);
+    } else if (item.type === "offer-options") {
+      offerOptions.push(item);
+    } else if (item.type === "offer-groups") {
+      offerGroups.push(item);
+    }
+  });
+
+  const legTypes_ = legTypes.map(parseLegTypeSchema);
+  const offerGroupDetails_ = offerGroupDetails.map((item) =>
+    parseOfferGroupDetailsSchema(item, legTypes_),
+  );
+  const cabinClasses_ = cabinClasses.map(parseCabinClassSchema);
+  const offerOptionDetails_ = offerOptionDetails.map((item) =>
+    parseOfferOptionDetailsSchema(item, cabinClasses_),
+  );
+  const offerOptions_ = offerOptions.map((item) =>
+    parseOfferOptionSchema(item, offerOptionDetails_),
+  );
+  const offerGroups_ = offerGroups.map((item) =>
+    parseOfferGroupSchema(item, offerOptions_, offerGroupDetails_),
+  );
+
+  return data.data.map((item) => parseOfferSchema(item, offerGroups_));
 }

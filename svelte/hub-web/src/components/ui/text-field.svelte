@@ -1,4 +1,7 @@
-<script lang="ts" generics="TType extends 'text' | 'password' | 'email' | 'number'">
+<script
+  lang="ts"
+  generics="TType extends 'text' | 'tel' | 'password' | 'email' | 'number' | 'date'"
+>
   /* global TType */
   import RemoveIcon from "components/icons/remove-icon.svelte";
 
@@ -7,7 +10,7 @@
   import { getRandomId } from "utils/random";
 
   type InputEvent = Event & { currentTarget: EventTarget & HTMLInputElement };
-  type TValue = TType extends "number" ? number : string;
+  type TValue = TType extends "number" ? number : TType extends "date" ? Date : string;
 
   let className: string | undefined = undefined;
 
@@ -32,9 +35,13 @@
   function onInput(event: InputEvent): void {
     if (type === "number") {
       value = Number(event.currentTarget.value) as TValue;
-    }
+    } else if (type === "date") {
+      const nextValue = new Date(event.currentTarget.value);
 
-    value = event.currentTarget.value as TValue;
+      value = isNaN(nextValue.getTime()) ? undefined : (nextValue as TValue);
+    } else {
+      value = event.currentTarget.value as TValue;
+    }
 
     dispatch("input", event.currentTarget);
   }
@@ -48,7 +55,7 @@
     inputRef.focus();
   }
 
-  $: displayValue = value ?? "";
+  $: displayValue = value instanceof Date ? value.toLocaleDateString("sv-SE") : value ?? "";
 </script>
 
 <div class="text-field {className ? className : ''}" class:error>
@@ -109,7 +116,7 @@
     --x-font-size: var(--font-size, 14px);
     --x-label-font-size: var(--label-font-size, 12px);
     --x-label-font-weight: var(--label-font-weight, 400);
-    --x-label-font-family: var(--label-font-family, "Poppins, Arial, Helvetica, sans-serif");
+    --x-label-font-family: var(--label-font-family, Poppins);
     --x-border-color: var(--border-color, var(--color-common-line-medium));
 
     display: inline-flex;
@@ -127,7 +134,6 @@
     font-size: var(--x-label-font-size);
     font-family: var(--x-label-font-family);
     font-style: normal;
-    letter-spacing: 0.5px;
   }
 
   label > span {

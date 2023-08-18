@@ -11,7 +11,7 @@ import type {
   OfferPriceQuoteModel,
 } from "models/booking/offer";
 import type {
-  BaggageAllowanceSchema,
+  BaggageAllowancesSchema,
   OfferGroupSchema,
   OfferOptionSchema,
   TripOfferSchema,
@@ -19,16 +19,11 @@ import type {
   TripOfferGroupDetailsSchema,
   TripOfferOptionDetailsSchema,
   TripOfferPriceQuoteSchema,
-} from "../schemas/offer";
-import {
-  parsePriceBreakdownSchema,
-  parsePriceSchema,
-} from "integration/junction-client-api/parsers/money";
-import type {
-  CabinClassSchema,
   LegTypeSchema,
-} from "integration/junction-client-api/schemas/offer";
-import { parsePointSchema } from "integration/junction-client-api/parsers/common";
+  CabinClassSchema,
+} from "../schemas/offer";
+import { parsePriceBreakdownSchema, parsePriceSchema } from "./money";
+import { parsePointSchema } from "./common";
 
 export function parseLegTypeSchema(data: LegTypeSchema): LegTypeModel {
   return {
@@ -98,7 +93,7 @@ export function parseOfferOptionDetailsSchema(
   };
 }
 
-export function parseBaggageAllowanceSchema(data: BaggageAllowanceSchema): BaggageAllowanceModel {
+export function parseBaggageAllowanceSchema(data: BaggageAllowancesSchema): BaggageAllowanceModel {
   return {
     isIncluded: data.isIncluded,
     applicableTo: {

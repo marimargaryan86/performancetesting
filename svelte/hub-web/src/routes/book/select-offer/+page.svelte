@@ -6,7 +6,6 @@
   import Offer from "./offer/offer.svelte";
   import { callAction, sleep } from "utils/common";
   import routeConfig from "routeConfig";
-  import type { TripCandidatesSearchStatus } from "integration/junction-mobile-api/schemas/trip";
   import { goto } from "$app/navigation";
   import Button from "components/ui/button.svelte";
   import { fade } from "svelte/transition";
@@ -15,6 +14,7 @@
   import type { MaybePromise } from "@sveltejs/kit";
   import Countdown from "../countdown.svelte";
   import LoadingSkelton from "./loading-skelton.svelte";
+  import type { TripCandidatesSearchStatus } from "integration/junction-mobile-api/schemas/trip";
 
   export let data;
 

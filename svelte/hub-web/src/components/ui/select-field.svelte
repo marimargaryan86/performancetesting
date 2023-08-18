@@ -1,15 +1,21 @@
 <script lang="ts" generics="TValue">
   /* global TValue */
+  import type { DirectionY } from "models/spatial";
   import ChevronIcon from "components/icons/chevron-icon.svelte";
   import TextField from "./text-field.svelte";
   import { scale } from "svelte/transition";
   import { clickOutside } from "directives/click-outside";
+  import { createEventDispatcher } from "svelte";
 
   let className: string | undefined = undefined;
 
+  const dispatch = createEventDispatcher<{ select: TValue | undefined }>();
+
+  export let direction: DirectionY = "down";
   export { className as class };
   export let value: TValue | undefined = undefined;
-  export let options: TValue[];
+  export let options: Readonly<(TValue | undefined)[]>;
+  // prettier-ignore
   export let formatter: (nextValue?: TValue) => string = (nextValue) => String(nextValue ?? "");
   export let label: string | undefined = undefined;
   export let placeholder: string | undefined = undefined;
@@ -34,20 +40,25 @@
     expanded = false;
   }
 
-  function select(option: TValue): void {
+  function select(option?: TValue): void {
     value = option;
+    dispatch("select", value);
     close();
   }
 </script>
 
-<div class="select-field {className ? className : ''}" use:clickOutside={close}>
+<div
+  class="select-field {className ? className : ''}"
+  use:clickOutside={close}
+  class:direction-up={direction === "up"}
+>
   <TextField
     {required}
     {label}
     {placeholder}
     readonly
     on:click={toggleExpanded}
-    value={formatter(value)}
+    value={value ? formatter(value) : undefined}
     {error}
   >
     <ChevronIcon slot="icon-after" direction={expanded ? "up" : "down"} />
@@ -65,6 +76,8 @@
 
 <style>
   .select-field {
+    --x-height: var(--height, 52px);
+
     position: relative;
     display: inline-block;
   }
@@ -90,6 +103,12 @@
     box-shadow: 0 0 12px rgb(0 0 0 / 0.2);
     transform-origin: top center;
     transition: border 150ms ease;
+  }
+
+  .select-field.direction-up .options {
+    top: unset;
+    bottom: calc(var(--x-height) + 4px);
+    transform-origin: bottom center;
   }
 
   .option {

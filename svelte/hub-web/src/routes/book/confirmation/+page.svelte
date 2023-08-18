@@ -54,14 +54,14 @@
           <div class="booking-number">
             <TicketInCircle color="var(--color-main-primary-500)" />
             <div class="column">
-              <span class="typography body-x-small">Reservation number</span>
+              <span class="typography body-xsmall">Reservation number</span>
               <span class="typography title-small bold">J98PLK17</span>
             </div>
           </div>
           <div class="booking-status">
             <CheckInCircle color="var(--color-main-primary-500)" />
             <div class="column">
-              <span class="typography body-x-small">Status</span>
+              <span class="typography body-xsmall">Status</span>
               <span class="typography title-small bold">Confirmed</span>
             </div>
           </div>
@@ -125,7 +125,7 @@
           <img src="/images/renfe-logo.png" width="26" height="26" alt="logo" />
           <span>Renfe • AVE 2123 • Direct • Standard</span>
         </div>
-        <div class="departure-arrival typography body-x-small">
+        <div class="departure-arrival typography">
           <div class="departure">
             <span>Departure</span>
             <span class="typography body-xlarge bold">8:50</span>
@@ -139,14 +139,14 @@
           <div class="trip-duration">
             <ClockInCircle color="var(--color-main-primary-500)" />
             <div class="column">
-              <span class="typography body-x-small">Trip duration</span>
+              <span class="typography body-xsmall">Trip duration</span>
               <span class="typography title-small bold">1h 40m</span>
             </div>
           </div>
           <div class="fare-class">
             <ChairInCircle color="var(--color-main-primary-500)" />
             <div class="column">
-              <span class="typography body-x-small">Fare class</span>
+              <span class="typography body-xsmall">Fare class</span>
               <span class="typography title-small bold">Standard Flex</span>
             </div>
           </div>

@@ -1,6 +1,6 @@
 import type { PointModel } from "models/spatial";
 import type { PointSchema } from "../schemas/common";
-import { parseCoordinatesSchema } from "integration/junction-mobile-api/parsers/place";
+import { parseCoordinatesSchema } from "./place";
 
 export function parsePointSchema(data: PointSchema): PointModel {
   return {

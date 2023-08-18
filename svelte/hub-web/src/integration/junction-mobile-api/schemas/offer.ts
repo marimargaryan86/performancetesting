@@ -1,13 +1,6 @@
 import type { RelationshipSchema } from "integration/common/schemas";
-import type { PointSchema } from "integration/junction-client-api/schemas/common";
-import type {
-  PriceBreakdownSchema,
-  PriceSchema,
-} from "integration/junction-client-api/schemas/price";
-import type {
-  CabinClassIdentifierSchema,
-  LegTypeIdentifierSchema,
-} from "integration/junction-client-api/schemas/offer";
+import type { PriceBreakdownSchema, PriceSchema } from "./price";
+import type { PointSchema } from "./common";
 
 export type Availability = "unspecified" | "unavailable" | "available" | "included";
 
@@ -41,7 +34,7 @@ export interface OfferOptionIdentifierSchema {
   type: "offer-options";
 }
 
-export interface BaggageAllowanceSchema {
+export interface BaggageAllowancesSchema {
   isIncluded: boolean;
   applicableTo: {
     dateOfBirthAfter: string;
@@ -49,12 +42,36 @@ export interface BaggageAllowanceSchema {
   };
 }
 
+export interface CabinClassIdentifierSchema {
+  id: string;
+  type: "cabin-classes";
+}
+
+export interface CabinClassSchema extends CabinClassIdentifierSchema {
+  attributes: {
+    name: string;
+  };
+  links: { self: string };
+}
+
+export interface LegTypeIdentifierSchema {
+  id: string;
+  type: "leg-types";
+}
+
+export interface LegTypeSchema extends LegTypeIdentifierSchema {
+  attributes: {
+    name: string;
+  };
+  links: { self: string };
+}
+
 export interface OfferOptionSchema extends OfferOptionIdentifierSchema {
   attributes: {
     price: PriceSchema;
     priceBreakdown?: PriceBreakdownSchema[];
     brandName: string;
-    baggageAllowances: BaggageAllowanceSchema[];
+    baggageAllowances: BaggageAllowancesSchema[];
   };
   relationships: {
     details: RelationshipSchema<TripOfferOptionDetailsIdentifierSchema[]>;
@@ -160,9 +177,12 @@ export type PriceQuoteRequiredPassengerInfoType =
   | "residence-address"
   | "issue-date";
 
-export interface TripOfferPriceQuoteSchema {
+export interface TripOfferPriceQuoteIdentifierSchema {
   id: string;
   type: "trip-offer-price-quotes";
+}
+
+export interface TripOfferPriceQuoteSchema extends TripOfferPriceQuoteIdentifierSchema {
   attributes: {
     expiresAt: string;
     price: PriceSchema | null;

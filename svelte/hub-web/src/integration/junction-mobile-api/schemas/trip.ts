@@ -6,12 +6,10 @@ import type {
   TripOfferSchema,
   TripOfferGroupDetailsSchema,
   TripOfferOptionDetailsSchema,
-} from "./offer";
-import type {
-  CabinClassSchema,
   LegTypeIdentifierSchema,
   LegTypeSchema,
-} from "integration/junction-client-api/schemas/offer";
+  CabinClassSchema,
+} from "./offer";
 
 export type TripSearchStatus = "unspecified" | "pending" | "processing" | "completed" | "failed";
 

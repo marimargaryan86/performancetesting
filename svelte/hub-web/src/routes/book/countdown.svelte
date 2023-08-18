@@ -1,7 +1,7 @@
 <script lang="ts" context="module">
   function getTimeLeft(date: Date): string {
     const secondsTotal = Math.max(0, Math.round((date.getTime() - new Date().getTime()) / 1000));
-    const minutes = Math.round(secondsTotal / 60);
+    const minutes = Math.floor(secondsTotal / 60);
     const seconds = secondsTotal % 60;
 
     return `${minutes < 10 ? "0" : ""}${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;

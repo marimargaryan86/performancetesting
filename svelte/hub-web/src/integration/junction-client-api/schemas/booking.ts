@@ -20,21 +20,25 @@ export interface BookingDetailsIdentifierSchema {
   type: "trip-booking-details";
 }
 
+export interface OfferSegmentLegSchema {
+  origin: PointSchema;
+  destination: PointSchema;
+  departureAt: string;
+  arrivalAt: string;
+}
+
+export interface RouteIdentifiersSchema {
+  vendor: string;
+  operator: string | null;
+}
+
 export interface BookingDetailsSchema extends BookingDetailsIdentifierSchema {
   attributes: {
     cabinClassName: string;
     vendor: string;
     operator: string | null;
-    routeIdentifiers: {
-      vendor: string;
-      operator: string | null;
-    };
-    legs: {
-      origin: PointSchema;
-      destination: PointSchema;
-      departureAt: string;
-      arrivalAt: string;
-    }[];
+    routeIdentifiers: RouteIdentifiersSchema;
+    legs: OfferSegmentLegSchema[];
   };
   relationships: {
     booking: RelationshipSchema<BookingIdentifierSchema>;

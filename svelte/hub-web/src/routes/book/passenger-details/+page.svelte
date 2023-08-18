@@ -1,3 +1,13 @@
+<script lang="ts" context="module">
+  function getDefaultPassengers(passengers: PassengerCountModel): PassengerData[] {
+    return [
+      ...Array<PassengerData>(passengers.adults).fill({ document: {}, type: "adult" }),
+      ...Array<PassengerData>(passengers.children).fill({ document: {}, type: "child" }),
+      ...Array<PassengerData>(passengers.infants).fill({ document: {}, type: "infant" }),
+    ];
+  }
+</script>
+
 <script lang="ts">
   import { browser } from "$app/environment";
   import { page } from "$app/stores";
@@ -8,11 +18,24 @@
   import { onDestroy } from "svelte";
   import { callAction, sleep } from "utils/common";
   import Countdown from "../countdown.svelte";
+  import Summary from "./summary.svelte";
+  import Passengers, { type PassengerData } from "./passengers.svelte";
+  import ContactInformation, { type ContactInformationData } from "./contact-information.svelte";
+  import type { PassengerCountModel } from "../common";
+  import { goto } from "$app/navigation";
 
   export let data;
 
   let getPriceQuoteTask: MaybePromise<OfferPriceQuoteModel | undefined> = data.priceQuote;
   let priceQuoteId: string | undefined = data.priceQuote.id;
+  let bookingDetails: { passengers: PassengerData[]; contactInformation: ContactInformationData } =
+    {
+      passengers: getDefaultPassengers(data.searchData.passengers),
+      contactInformation: {
+        phone: {},
+        address: {},
+      },
+    };
 
   $: backUrl = getBackUrl(data.searchData);
   $: priceQuoteId = data.priceQuote.id;
@@ -62,6 +85,10 @@
     return pollPriceQuote(id);
   }
 
+  function goToNext(): void {
+    goto(routeConfig.book.payment.root);
+  }
+
   onDestroy(() => {
     priceQuoteId = undefined;
   });
@@ -74,20 +101,27 @@
 <div class="content">
   <Countdown expiresAt={data.priceQuote.expiresAt} show />
 
-  <div>{data.searchData.origin.name} - {data.searchData.destination.name}</div>
-  <div>{data.searchData.departureAfter}</div>
-  <div>
-    {#await getPriceQuoteTask}
-      Loading price quote...
-    {:then priceQuote}
+  <div class="scroll">
+    {#await getPriceQuoteTask then priceQuote}
       {JSON.stringify(priceQuote)}
     {/await}
+
+    <div class="details">
+      <Passengers bind:passengers={bookingDetails.passengers} />
+
+      <ContactInformation
+        countries={data.countries}
+        bind:contactInformation={bookingDetails.contactInformation}
+      />
+    </div>
+
+    <Summary passengers={bookingDetails.passengers} />
   </div>
 </div>
 
 <div class="actions">
   <Button size="small" variant="outline" href={backUrl.toString()}>Previous</Button>
-  <Button size="small"><span class="next-btn">Next</span></Button>
+  <Button size="small" on:click={goToNext}><span class="next-btn">Next</span></Button>
 </div>
 
 <style>
@@ -95,14 +129,47 @@
     display: flex;
     flex-flow: column;
     flex-grow: 1;
-    gap: 24px;
     width: 100%;
-    height: 100%;
-    padding: 24px;
+    padding-top: 24px;
     overflow: auto;
   }
 
+  .content > :global(.countdown) {
+    max-width: 1104px;
+    margin: 0 24px 24px;
+  }
+
+  .scroll {
+    --summary-width: 320px;
+    --passengers-width: calc(1152px - var(--summary-width) - 72px);
+
+    display: flex;
+    flex-grow: 1;
+    gap: 24px;
+    width: 100%;
+    padding: 0 24px 24px;
+    overflow: auto;
+  }
+
+  .scroll > .details {
+    display: flex;
+    flex-flow: column;
+    gap: 24px;
+    align-self: flex-start;
+    width: 100%;
+    max-width: var(--passengers-width);
+  }
+
+  .scroll > :global(.summary) {
+    position: sticky;
+    top: 0;
+    left: 0;
+    flex-shrink: 0;
+    width: var(--summary-width);
+  }
+
   .actions {
+    position: relative;
     display: flex;
     gap: 16px;
     justify-content: space-between;

@@ -2,7 +2,6 @@ import integrationInstancesServer from "integration-instances-server";
 import type { PlaceModel } from "models/booking/location";
 import type { TripCandidatesModel } from "models/booking/trip";
 import type { RequestEvent } from "./$types";
-import type { TripCandidatesSearchStatus } from "integration/junction-mobile-api/schemas/trip";
 import type { OfferModel } from "models/booking/offer";
 import jwt from "jsonwebtoken";
 import {
@@ -13,6 +12,7 @@ import {
   JWT_SIGNATURE,
   getOrigDest,
 } from "../common";
+import type { TripCandidatesSearchStatus } from "integration/junction-mobile-api/schemas/trip";
 
 function isNewSearch(nextSearch: SearchData, existingSearch?: SearchData): boolean {
   return (
