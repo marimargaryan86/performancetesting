@@ -35,6 +35,59 @@ class Booking(endpoints.HTTPEndpoint):
         )
 
 
+class DetailsByBooking(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        client: orders.Client = lagom.injectable,
+    ) -> responses.Response:
+        booking_id = request.path_params["bookingId"]
+        pagination = pagination_helpers.get_pagination(request)
+        response = await client.find_booking_details_by_booking_id(
+            booking_id=booking_id,
+            reseller_id=request.user.username,
+            limit=pagination.limit,
+            cursor=pagination.cursor,
+        )
+
+        return await messages.create_response(
+            body=models.Body(
+                data=[
+                    resources.TripBookingDetailsResource.from_proto(details, request)
+                    for details in response.details
+                ],
+                links=pagination_helpers.get_next_url(
+                    request.url_for("ListDetailsByBooking", bookingId=booking_id),
+                    response.next_page_token,
+                    pagination,
+                ),
+            ),
+            request=request,
+        )
+
+
+class BookingDetails(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        client: orders.Client = lagom.injectable,
+    ) -> responses.Response:
+        details = await client.get_booking_details(
+            request.path_params["bookingDetailsId"],
+            reseller_id=request.user.username,
+        )
+
+        return await messages.create_response(
+            body=models.Body(
+                data=resources.TripBookingDetailsResource.from_proto(
+                    details=details,
+                    request=request,
+                ),
+            ),
+            request=request,
+        )
+
+
 class Journeys(endpoints.HTTPEndpoint):
     _sort = MappingProxyType(
         {
