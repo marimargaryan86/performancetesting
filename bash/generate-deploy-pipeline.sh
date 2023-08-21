@@ -146,14 +146,11 @@ cat <<EOF
 
 verify:
   stage: verify
-  image:
-    name: git.snowfall.se:4567/junction/junction/service/deploy:latest
-    entrypoint: [""]
   interruptible: false
   script:
-    - /usr/local/bin/python3.11 -Wdefault /bin/main --env-name "${DEPLOYMENT_ENVIRONMENT}" verify --nomad-address "\${NOMAD_${DEPLOYMENT_ENVIRONMENT^^}_ADDR}" --nomad-templates-path "templates/" ${services[@]}
+  	- docker run --rm -it --pull=always git.snowfall.se:4567/junction/junction/service/deploy:latest --env-name "${DEPLOYMENT_ENVIRONMENT}" verify --nomad-address "\${NOMAD_${DEPLOYMENT_ENVIRONMENT^^}_ADDR}" --nomad-templates-path "templates/" ${services[@]}
   tags:
-    - docker
+    - shell
   needs:
 EOF
 # editorconfig-checker-enable
