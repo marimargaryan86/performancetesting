@@ -22,6 +22,11 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             name="ViewUser",
         ),
         integration.route(
+            "/orders/{orderId}/bookings",
+            go_orders.BookingsByOrder,
+            name="ListBookingsByOrder",
+        ),
+        integration.route(
             "/bookings/{bookingId}",
             go_orders.Booking,
             name="ViewBooking",

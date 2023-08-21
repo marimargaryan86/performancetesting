@@ -35,6 +35,37 @@ class Booking(endpoints.HTTPEndpoint):
         )
 
 
+class BookingsByOrder(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        client: orders.Client = lagom.injectable,
+    ) -> responses.Response:
+        order_id = request.path_params["orderId"]
+        pagination = pagination_helpers.get_pagination(request)
+        response = await client.find_bookings_by_order_id(
+            order_id=order_id,
+            limit=pagination.limit,
+            cursor=pagination.cursor,
+            reseller_id=request.user.username,
+        )
+
+        return await messages.create_response(
+            body=models.Body(
+                data=[
+                    resources.TripBookingResource.from_proto(booking, request)
+                    for booking in response.bookings
+                ],
+                links=pagination_helpers.get_next_url(
+                    request.url_for("ListBookingsByOrder", orderId=order_id),
+                    response.next_page_token,
+                    pagination,
+                ),
+            ),
+            request=request,
+        )
+
+
 class DetailsByBooking(endpoints.HTTPEndpoint):
     async def get(
         self,
