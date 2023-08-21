@@ -134,11 +134,6 @@ def python_image(  # type: ignore[no-untyped-def]
         ("*", "!*"),
     )
 
-    if "dependencies" not in kwargs:
-        kwargs["dependencies"] = []
-
-    kwargs["dependencies"].append("vendor#tzdata")
-
     pex_binary(  # type: ignore[name-defined]  # noqa: F821
         **(
             {
@@ -152,21 +147,19 @@ def python_image(  # type: ignore[no-untyped-def]
         ),
     )
 
-    # python:3.11.4-slim-bullseye
-    tag_sha = "1226f32ad1c1c36e0b6e79706059761c58ada308f4a1ad798e55dab346e10e91"
-
     docker_image(  # type: ignore[name-defined]  # noqa: F821
         name="{name}_docker".format(name=name),
         dependencies=[":{name}".format(name=name)],
         image_tags=["{build_args.VERSION}"],
         instructions=[
-            "ARG REGISTRY",
-            "FROM ${{REGISTRY}}python@sha256:{hash} AS runtime".format(hash=tag_sha),
-            'ENV PIP_NO_CACHE_DIR "false"',
-            "ENV PYTHONFAULTHANDLER 1",
-            'ENV PYTHONHASHSEED "random"',
+            "FROM cgr.dev/chainguard/wolfi-base:latest@sha256:{hash} AS runtime".format(
+                hash="46d848cfc02366b9f44e8e9323935ecb349286bf8a047a9e83186d91a105fc3a",
+            ),
+            (
+                "RUN apk update && apk add --no-cache --update-cache"
+                " python-3.11~=3.11.4 tzdata~=2023c"
+            ),
             "ENV PYTHONUNBUFFERED 1",
-            'ENV PYTHONTZPATH ""',
             "COPY {namespace}/{name}.pex /bin/{name}".format(
                 namespace=".".join(
                     build_file_dir().parts,  # type: ignore[name-defined]  # noqa: F821
@@ -177,8 +170,7 @@ def python_image(  # type: ignore[no-untyped-def]
             "ENV VERSION $VERSION",
             'LABEL vendor="Snowfall Limited"',
             "LABEL com.snowfalltravel.version=$VERSION",
-            "RUN /usr/local/bin/python3.11 /bin/{name} --help".format(name=name),
-            'ENTRYPOINT ["/usr/local/bin/python3.11", "-Wdefault", "/bin/{0}"]'.format(
+            'ENTRYPOINT ["python", "-Wdefault", "-Xfaulthandler", "/bin/{0}"]'.format(
                 name,
             ),
         ],
