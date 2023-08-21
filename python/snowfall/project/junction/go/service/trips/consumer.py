@@ -9,7 +9,7 @@ from typing import Self
 
 import more_itertools
 
-from snowfall.project.junction.go.service.planner.v1alpha import (
+from snowfall.project.junction.go.service.planner.v1 import (
     planner_pb2,
     planner_pb2_grpc,
 )

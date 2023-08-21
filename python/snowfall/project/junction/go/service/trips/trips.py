@@ -7,7 +7,7 @@ from google.protobuf import timestamp_pb2
 from motor import motor_asyncio
 from pymongo import errors as pymongo_errors
 
-from snowfall.project.junction.go.service.planner.v1alpha import planner_pb2
+from snowfall.project.junction.go.service.planner.v1 import planner_pb2
 from snowfall.project.junction.go.service.trips.v1alpha import trips_pb2
 from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.stdlib import string

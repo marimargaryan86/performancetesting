@@ -22,7 +22,7 @@ import (
 	"sync"
 	"time"
 
-	plannerv1alpha "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/planner/v1alpha"
+	plannerv1 "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/planner/v1"
 	v1 "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/v1"
 	latlng "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1"
 	"git.snowfall.se/junction/junction/golang/protoio"
@@ -123,14 +123,14 @@ func (cacheData *stopCacheData) addReferences(job *stopJob) {
 	}
 }
 
-type schedulesCache map[uint64]*plannerv1alpha.Schedule
+type schedulesCache map[uint64]*plannerv1.Schedule
 
 type boardingInfo struct {
 	stopId           string
 	BoardingAllowed  bool
 	AlightingAllowed bool
 }
-type routeCacheType map[uint64]*plannerv1alpha.Route
+type routeCacheType map[uint64]*plannerv1.Route
 
 type stopsExporterType struct {
 	cache             stopCache
@@ -242,7 +242,7 @@ func (self *routesExporterType) add(job *routesJob) uint64 {
 			scheduleId:             job.schedule.Id,
 			departureTime:          getSafeDepartureTime(stop.DepartureAt),
 		})
-		thisRouteStop := plannerv1alpha.RouteStop{
+		thisRouteStop := plannerv1.RouteStop{
 			Sequence: self.routeStopSequence,
 			Route:    self.sequence,
 			Stop:     stopSequence,
@@ -256,7 +256,7 @@ func (self *routesExporterType) add(job *routesJob) uint64 {
 	}
 
 	// Not in cache, add new route
-	thisRoute := &plannerv1alpha.Route{
+	thisRoute := &plannerv1.Route{
 		Sequence:   self.sequence,
 		RouteStops: stops,
 	}
@@ -287,7 +287,7 @@ type schedulesExporterType struct {
 	count             uint64
 }
 
-func (self *schedulesExporterType) add(job *plannerv1alpha.Schedule) uint64 {
+func (self *schedulesExporterType) add(job *plannerv1.Schedule) uint64 {
 	if _, ok := self.IdKey[job.Id]; ok {
 		// It's IN the cache - should not be called twice!
 		panic(fmt.Errorf("schedule ID %v sequence %v received TWICE", job.Id, job.Sequence))
@@ -334,9 +334,9 @@ var schedulesExporter = schedulesExporterType{
 	count:             0,
 }
 var routesChan chan<- *routesWriterJob
-var routeStopsChan chan<- *plannerv1alpha.RouteStop
+var routeStopsChan chan<- *plannerv1.RouteStop
 var schedulesChan chan<- *schedulesWriterJob
-var scheduleStopsChan chan<- *plannerv1alpha.ScheduleStop
+var scheduleStopsChan chan<- *plannerv1.ScheduleStop
 var stopsChan chan<- *stopsWriterJob
 var scheduleStopsSequence = uint64(0)
 var transfersChan chan<- *transfersWriterJob
@@ -395,7 +395,7 @@ func routesWriterTask(writer io.Writer, wg *sync.WaitGroup) chan<- *routesWriter
 		defer wg.Done()
 
 		w := bufio.NewWriter(writer)
-		protoWriter := protoio.NewProtoWriter[*plannerv1alpha.Route](w)
+		protoWriter := protoio.NewProtoWriter[*plannerv1.Route](w)
 
 		for job := range ch {
 			if job == nil {
@@ -410,7 +410,7 @@ func routesWriterTask(writer io.Writer, wg *sync.WaitGroup) chan<- *routesWriter
 						job.departures[job.schedulesCache[value.Schedules[j]].ScheduleStops[0]]
 				})
 
-				stopProto := plannerv1alpha.Route{
+				stopProto := plannerv1.Route{
 					Sequence:   value.Sequence,
 					Schedules:  value.Schedules,
 					RouteStops: value.RouteStops,
@@ -424,13 +424,13 @@ func routesWriterTask(writer io.Writer, wg *sync.WaitGroup) chan<- *routesWriter
 	return ch
 }
 
-func routeStopsWriterTask(writer io.Writer, wg *sync.WaitGroup) chan<- *plannerv1alpha.RouteStop {
-	ch := make(chan *plannerv1alpha.RouteStop)
+func routeStopsWriterTask(writer io.Writer, wg *sync.WaitGroup) chan<- *plannerv1.RouteStop {
+	ch := make(chan *plannerv1.RouteStop)
 
 	go func() {
 		defer wg.Done()
 		w := bufio.NewWriter(writer)
-		protoWriter := protoio.NewProtoWriter[*plannerv1alpha.RouteStop](w)
+		protoWriter := protoio.NewProtoWriter[*plannerv1.RouteStop](w)
 
 		for job := range ch {
 			if job == nil {
@@ -454,7 +454,7 @@ func schedulesWriterTask(writer io.Writer, wg *sync.WaitGroup) chan<- *schedules
 	go func() {
 		defer wg.Done()
 		w := bufio.NewWriter(writer)
-		protoWriter := protoio.NewProtoWriter[*plannerv1alpha.Schedule](w)
+		protoWriter := protoio.NewProtoWriter[*plannerv1.Schedule](w)
 
 		for job := range ch {
 			if job == nil {
@@ -473,13 +473,13 @@ func schedulesWriterTask(writer io.Writer, wg *sync.WaitGroup) chan<- *schedules
 	return ch
 }
 
-func scheduleStopsWriterTask(writer io.Writer, wg *sync.WaitGroup) chan<- *plannerv1alpha.ScheduleStop {
-	ch := make(chan *plannerv1alpha.ScheduleStop)
+func scheduleStopsWriterTask(writer io.Writer, wg *sync.WaitGroup) chan<- *plannerv1.ScheduleStop {
+	ch := make(chan *plannerv1.ScheduleStop)
 
 	go func() {
 		defer wg.Done()
 		w := bufio.NewWriter(writer)
-		protoWriter := protoio.NewProtoWriter[*plannerv1alpha.ScheduleStop](w)
+		protoWriter := protoio.NewProtoWriter[*plannerv1.ScheduleStop](w)
 
 		for job := range ch {
 			if job == nil {
@@ -516,7 +516,7 @@ func stopsWriterTask(writer io.Writer, wg *sync.WaitGroup) chan<- *stopsWriterJo
 		defer wg.Done()
 
 		w := bufio.NewWriter(writer)
-		protoWriter := protoio.NewProtoWriter[*plannerv1alpha.Stop](w)
+		protoWriter := protoio.NewProtoWriter[*plannerv1.Stop](w)
 
 		for job := range ch {
 			if job == nil {
@@ -525,7 +525,7 @@ func stopsWriterTask(writer io.Writer, wg *sync.WaitGroup) chan<- *stopsWriterJo
 
 			for _, key := range job.cacheSequenceList {
 				value := job.cache[key]
-				stopProto := plannerv1alpha.Stop{
+				stopProto := plannerv1.Stop{
 					Sequence:      value.stopId,
 					Id:            strconv.FormatUint(key, 10), // The cache key IS the H3 geoidentifier
 					TransferTime:  0,
@@ -550,14 +550,14 @@ func transfersWriterTask(writer io.Writer, wg *sync.WaitGroup) chan<- *transfers
 		defer wg.Done()
 
 		w := bufio.NewWriter(writer)
-		protoWriter := protoio.NewProtoWriter[*plannerv1alpha.Transfer](w)
+		protoWriter := protoio.NewProtoWriter[*plannerv1.Transfer](w)
 
 		for job := range ch {
 			if job == nil {
 				break
 			}
 
-			transferProto := plannerv1alpha.Transfer{
+			transferProto := plannerv1.Transfer{
 				Sequence:     job.sequence,
 				FromStop:     job.fromStop,
 				ToStop:       job.toStop,
@@ -669,7 +669,7 @@ func buildScheduleStops(schedule *v1.Schedule, sequence uint64) ([]uint64, []*v1
 
 		schedStopId := generateScheduleStopId(schedule.Id, stop.Order-1)
 
-		scheduleStopsChan <- &plannerv1alpha.ScheduleStop{
+		scheduleStopsChan <- &plannerv1.ScheduleStop{
 			Id:               schedStopId,
 			Sequence:         scheduleStopsSequence,
 			Schedule:         sequence,
@@ -810,7 +810,7 @@ func main() {
 				newSchedule: sequence,
 			})
 
-			schedulesExporter.add(&plannerv1alpha.Schedule{
+			schedulesExporter.add(&plannerv1.Schedule{
 				Sequence:      sequence,
 				Id:            msg.Id,
 				Type:          msg.Type,

@@ -5,7 +5,7 @@ import freezegun
 import mongomock_motor
 import pytest
 
-from snowfall.project.junction.go.service.planner.v1alpha import planner_pb2
+from snowfall.project.junction.go.service.planner.v1 import planner_pb2
 from snowfall.project.junction.go.service.trips import trips
 from snowfall.project.junction.go.service.trips.v1alpha import trips_pb2
 from snowfall.project.junction.go.v1 import models_pb2

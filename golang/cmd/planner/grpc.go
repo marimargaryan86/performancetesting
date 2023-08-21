@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	planner "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/planner/v1alpha"
+	planner "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/planner/v1"
 	models "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/v1"
 	v1Stdlib "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1"
 	"git.snowfall.se/junction/junction/golang/raptor"
