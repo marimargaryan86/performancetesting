@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import types as std_types
 from collections.abc import AsyncIterable, AsyncIterator, Callable
@@ -36,19 +37,17 @@ class OfferCacheLockError(Exception):
 
 
 class OfferGroupCache(object):
-    _blocking_timeout = datetime.timedelta(seconds=10)
-    _lock_timeout = datetime.timedelta(seconds=30)  # noqa: WPS432
-
     def __init__(
         self,
         cache_key: str,
         redis: redis_types.Client[bytes],
     ) -> None:
         self._seen_key = "criteria_cache.seen:{0}".format(cache_key)
+        # This timeout is just a safety mechanism (in case the lock doesn't get
+        # released). In reality, it should never occur.
         self._lock = redis.lock(
-            name="criteria_cache.locks:{0}".format(cache_key),
-            timeout=self._lock_timeout.total_seconds(),
-            blocking_timeout=self._blocking_timeout.total_seconds(),
+            "criteria_cache.locks:{0}".format(cache_key),
+            timeout=60,
         )
         self._offers = redis.set_("criteria_cache.offers:{0}".format(cache_key))
         self._redis = redis
@@ -149,10 +148,22 @@ class OfferGroupRepository(Generic[_CriteriaType]):
                 yield cached_offer_group
 
         except NoCacheExistsError:
-            async for offer_result in self._offer_group_generator(search_criteria):
-                await offer_cache.put(offer_result)
-                self._counter_requests.labels(
-                    cached=False,
-                ).inc()
+            # Shield to ensure it writes to offer cache even if we timeout.
+            offers = await asyncio.shield(
+                self._create_offers(search_criteria, offer_cache),
+            )
+            for offer in offers:
+                yield offer
 
-                yield offer_result
+    async def _create_offers(
+        self,
+        search_criteria: _CriteriaType,
+        offer_cache: OfferGroupCache,
+    ) -> list[offers_pb2.OfferGroup]:
+        offer_results = []
+        async for offer_result in self._offer_group_generator(search_criteria):
+            await offer_cache.put(offer_result)
+            self._counter_requests.labels(cached=False).inc()
+
+            offer_results.append(offer_result)
+        return offer_results

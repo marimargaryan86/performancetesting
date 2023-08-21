@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import dataclasses
 import datetime
 from collections.abc import AsyncIterator, Callable, Mapping, Sequence
@@ -17,6 +18,7 @@ from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.project.junction.provider import repository
 from snowfall.project.junction.provider.segment_matcher import SegmentMatcher
 from snowfall.project.junction.provider.v1alpha import offers_pb2, offers_pb2_grpc
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer as amqp_producer
@@ -53,6 +55,8 @@ class OfferSearchImplementation(Generic[_SearchCriteriaTask, _SearchCriteria]):
 
 
 class TripOfferSearcher(Generic[_SearchCriteriaTask, _SearchCriteria]):
+    _search_timeout_s = 30  # noqa: WPS432
+
     def __init__(
         self,
         task_generator: TripOfferSearchCriteriaTaskGenerator[_SearchCriteriaTask],
@@ -67,6 +71,7 @@ class TripOfferSearcher(Generic[_SearchCriteriaTask, _SearchCriteria]):
         self._offer_group_repository = offer_group_repository
         self._search_criteria_task_generator = task_generator
         self._search_criteria_generator = criteria_generator
+        self._logger = stdout.get_logger()
 
     @classmethod
     def from_implementation(
@@ -117,11 +122,18 @@ class TripOfferSearcher(Generic[_SearchCriteriaTask, _SearchCriteria]):
 
         offer_groups = self._offer_group_repository.find(search_criteria)
 
-        async for offer_group in offer_groups:
-            if segment_matcher.offer_group_matches(offer_group):
-                set_segment_ids(task.segments, offer_group)
+        try:
+            # Timeout and return here, so if there are completed tasks in .search()
+            # it can still return a partial result.
+            async with asyncio.timeout(self._search_timeout_s):
+                async for offer_group in offer_groups:
+                    if not segment_matcher.offer_group_matches(offer_group):
+                        continue  # noqa: WPS220
 
-                yield offer_group
+                    set_segment_ids(task.segments, offer_group)
+                    yield offer_group
+        except TimeoutError:
+            self._logger.warning("Offer group matches timed out.")
 
 
 class OfferSearchService(service.Service, offers_pb2_grpc.OfferServiceServicer):
