@@ -171,26 +171,26 @@ class MockChannel(Channel):
 def transform_trip_details(order: models_pb2.PersistedOrder) -> str:
     return (
         "Here are the details of your upcoming trip:\n"
-        + "Booking Reference: {0}\n".format(order.booking_reference)
-        + "Duration: {0}\n".format(
+        + "*Booking Reference:* {0}\n".format(order.booking_reference)
+        + "*Duration:* {0}\n".format(
             str(
                 protobuf.protobuf_to_datetime(order.bookings[-1].value.arrival_at)
                 - protobuf.protobuf_to_datetime(order.bookings[0].value.departure_at),
             ),
         )
-        + "Stops: {0}\n\n".format(len(order.bookings))
+        + "*Stops:* {0}\n\n".format(len(order.bookings))
         + "\n".join(
             [
                 (
-                    "Departure from: {0}\n".format(booking.value.origin)
-                    + "Departure at: {0}\n".format(
+                    "*Departure from:* {0}\n".format(booking.value.origin)
+                    + "*Departure at:* {0}\n".format(
                         proto_to_format_dt(booking.value.departure_at),
                     )
-                    + "Arrival to: {0}\n".format(booking.value.destination)
-                    + "Arrival at: {0}\n".format(
+                    + "*Arrival to:* {0}\n".format(booking.value.destination)
+                    + "*Arrival at:* {0}\n".format(
                         proto_to_format_dt(booking.value.arrival_at),
                     )
-                    + "Flight Number: {0}\n".format(
+                    + "*Flight Number:* {0}\n".format(
                         proto_to_route_identifier(booking.value.route_identifier),
                     )
                     + calculate_layover(order.bookings, idx)

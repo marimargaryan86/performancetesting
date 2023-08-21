@@ -4,6 +4,9 @@ from collections.abc import Awaitable, Callable, Mapping
 from typing import Any
 
 from snowfall.project.junction.plus.adapter import orders, subscribers
+from snowfall.project.junction.plus.notification_channels.whatsapp import (
+    transform_trip_details,
+)
 from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.redis import types as redis
@@ -116,7 +119,7 @@ async def trip_details(
             order = await orders_client.get(order_id)
     if order is None:
         return "Sorry there are no details available for this trip."
-    return order.booking_reference
+    return transform_trip_details(order)
 
 
 async def handle_unknown(
