@@ -1,10 +1,106 @@
 import uuid
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 
 import click
 import pydantic
+import pytest
 
 from snowfall.stdlib.integration.click import parameters
+
+
+def test_json_parameter_type() -> None:
+    json_type = parameters.JSONParameterType()
+
+    assert json_type.convert('{"foo": "bar"}', None, None) == {"foo": "bar"}
+    assert repr(json_type) == "JSON"
+
+
+def test_json_parameter_type_invalid() -> None:
+    json_type = parameters.JSONParameterType()
+
+    with pytest.raises(click.BadParameter):
+        json_type.convert("{invalid}", None, None)
+
+
+class _TestCallbackModel(pydantic.BaseModel):
+    no_callback: int
+    no_callback_list: list[bool]
+    custom_callback: str = pydantic.Field(callback=lambda *args: "foobar")
+
+
+@pytest.fixture()
+def callback_params() -> Mapping[str, click.Parameter]:
+    return {
+        parameter.name or "": parameter
+        for parameter in parameters.create_from_pydantic_model(_TestCallbackModel)
+    }
+
+
+def test_validation_with_valid_value(
+    callback_params: Mapping[str, click.Parameter],
+) -> None:
+    assert callback_params["no_callback"].callback is not None
+    assert (
+        callback_params["no_callback"].callback(
+            click.Context(click.Command(None)),
+            callback_params["no_callback"],
+            123,
+        )
+        == 123
+    )
+
+
+def test_validation_with_invalid_value(
+    callback_params: Mapping[str, click.Parameter],
+) -> None:
+    assert callback_params["no_callback"].callback is not None
+
+    with pytest.raises(click.BadParameter):
+        callback_params["no_callback"].callback(
+            click.Context(click.Command(None)),
+            callback_params["no_callback"],
+            "foobar",
+        )
+
+
+def test_validation_with_invalid_list_value(
+    callback_params: Mapping[str, click.Parameter],
+) -> None:
+    assert callback_params["no_callback_list"].callback is not None
+
+    with pytest.raises(click.BadParameter):
+        callback_params["no_callback_list"].callback(
+            click.Context(click.Command(None)),
+            callback_params["no_callback_list"],
+            [123],
+        )
+
+
+def test_custom_callback(
+    callback_params: Mapping[str, click.Parameter],
+) -> None:
+    assert callback_params["custom_callback"].callback is not None
+    assert (
+        callback_params["custom_callback"].callback(
+            click.Context(click.Command(None)),
+            callback_params["custom_callback"],
+            "bazqux",
+        )
+        == "foobar"
+    )
+
+
+def test_custom_callback_with_invalid_value(
+    callback_params: Mapping[str, click.Parameter],
+) -> None:
+    assert callback_params["custom_callback"].callback is not None
+
+    with pytest.raises(click.BadParameter):
+        callback_params["custom_callback"].callback(
+            click.Context(click.Command(None)),
+            callback_params["custom_callback"],
+            ["foobar"],
+        )
 
 
 class _TestModel(pydantic.BaseModel):

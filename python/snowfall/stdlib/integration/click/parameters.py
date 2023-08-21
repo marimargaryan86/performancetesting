@@ -75,7 +75,9 @@ def _create_from_pydantic_field(
     if arg.field_info.extra.get("argument", False):
         return click.Argument(
             [arg.name.replace("_", "-")],
-            callback=callback if callback else _validate_option(arg),
+            callback=(
+                _custom_callback(arg, callback) if callback else _validate_option(arg)
+            ),
             default=_get_parameter_default(arg),
             envvar=arg.name.upper(),
             nargs=-1 if is_multi else 1,
@@ -85,7 +87,7 @@ def _create_from_pydantic_field(
 
     return click.Option(
         ["--{0}".format(arg.name.replace("_", "-"))],
-        callback=callback if callback else _validate_option(arg),
+        callback=_custom_callback(arg, callback) if callback else _validate_option(arg),
         default=_get_parameter_default(arg),
         envvar=arg.name.upper(),
         help=arg.field_info.description,
