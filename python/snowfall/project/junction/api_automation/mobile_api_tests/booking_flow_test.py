@@ -201,11 +201,20 @@ async def create_order(  # noqa: WPS210
     return order["data"]
 
 
-iata_codes = [("latvia", "lithuania"), ("funchal", "lisbon")]
+iata_codes = [
+    ("latvia", "lithuania"),
+    ("funchal", "lisbon"),
+    ("chicago", "groningen"),
+]
+ids = [
+    "Ask2Go",
+    "Duffel",
+    "Multi-modal",
+]
 
 
 @pytest.mark.integration()
-@pytest.mark.parametrize("iata_codes", iata_codes, ids=["Ask2Go", "DUFFEL"])
+@pytest.mark.parametrize("iata_codes", iata_codes, ids=ids)
 async def test_booking_flow(  # noqa: WPS217, WPS210
     mobile_client: MobileApiClient,
     departure_after: datetime.datetime,
@@ -238,7 +247,7 @@ async def test_booking_flow(  # noqa: WPS217, WPS210
 
 
 @pytest.mark.smoke()
-@pytest.mark.parametrize("iata_codes", iata_codes, ids=["Ask2Go", "DUFFEL"])
+@pytest.mark.parametrize("iata_codes", iata_codes, ids=ids)
 async def test_booking_flow_smoke(  # noqa: WPS217, WPS210
     mobile_client: MobileApiClient,
     departure_after: datetime.datetime,
