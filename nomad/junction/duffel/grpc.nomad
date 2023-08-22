@@ -51,8 +51,8 @@ job "duffel-grpc" {
     auto_revert       = true
     auto_promote      = true
     canary            = 1
-    healthy_deadline  = "60s"
-    progress_deadline = "2m"
+    healthy_deadline  = "2m"
+    progress_deadline = "4m"
   }
 
   group "grpc" {
