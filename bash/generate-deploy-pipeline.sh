@@ -61,7 +61,6 @@ for DIR in templates/*; do
 	fi
 
 	image_file="${DIR}/image.txt"
-	skip_deploy="${DIR}/.skip_deploy"
 
 	if ! [ -f "${image_file}" ] && grep -q 'variable "docker_image" {' "${DIR}"/*.nomad; then
 		echo >&2 "skip: \"${image_file}\" is missing"
@@ -94,7 +93,10 @@ for DIR in templates/*; do
 	templates=()
 
 	for TEMPLATE in "${DIR}"/*.nomad; do
-		templates+=("${TEMPLATE}")
+		skip_file="${TEMPLATE%.*}_skip_deploy"
+		if ! [ -f "${skip_file}" ]; then
+			templates+=("${TEMPLATE}")
+		fi
 	done
 
 	if [ -z "${templates+x}" ]; then
@@ -105,22 +107,8 @@ for DIR in templates/*; do
 	echo >&2 "generate: ${service_name}@${service_version}"
 	services+=("${service_name}")
 
-	if [ -f "${skip_deploy}" ]; then
-		# editorconfig-checker-disable
-		cat <<EOF
-
-${service_name}:
-  stage: deploy
-  script:
-    - echo "Skipped due to ${skip_deploy}."
-  needs: []
-  tags:
-    - shell
-EOF
-		# editorconfig-checker-enable
-	else
-		# editorconfig-checker-disable
-		cat <<EOF
+	# editorconfig-checker-disable
+	cat <<EOF
 
 ${service_name}:
   extends: .deploy
@@ -133,8 +121,7 @@ ${service_name}:
     templates: ${templates[@]}
     version: ${service_version}
 EOF
-		# editorconfig-checker-enable
-	fi
+	# editorconfig-checker-enable
 done
 
 if [ ${#services[@]} -eq 0 ]; then

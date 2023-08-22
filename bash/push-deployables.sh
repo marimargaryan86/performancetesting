@@ -51,7 +51,7 @@ for e in "${ENVIRONMENTS[@]}"; do
 		done
 	fi
 
-	for i in repo/templates/**/{.skip_deploy,*.vars}; do
+	for i in repo/templates/**/{.skip_deploy,*_skip_deploy,*.vars}; do
 		rm "${i}"
 	done
 
@@ -69,7 +69,7 @@ for e in "${ENVIRONMENTS[@]}"; do
 
 		if [[ -f "${config}" ]]; then
 			if [[ "$(jq -r ".${e}.deploy" "${config}")" == "false" ]]; then
-				touch "${template_path}/.skip_deploy"
+				touch "${template_path}/${filename%.*}_skip_deploy"
 			else
 				jq -r ".${e}.variables" "${config}" >"${template_path}/${filename%.*}.vars"
 			fi
