@@ -5,6 +5,7 @@ import dataclasses
 import datetime
 from collections.abc import AsyncIterator, Mapping, Sequence
 
+import asyncstdlib
 import more_itertools
 
 from snowfall.project.junction.go.service.offers.v1 import (
@@ -40,23 +41,6 @@ class BenerailError(Exception):
 
 _NON_BOOKABLE_STATES = frozenset(("NOT_BOOKABLE_NO_SERVICE", "NOT_BOOKABLE_NO_PAST"))
 _DATE_FMT = "%Y%m%d"
-_FIRST_CLASS_COMFORT_TYPES = frozenset(
-    (
-        "urn:bdws:class:1",
-        "urn:rtb:class:1",
-        "urn:itti:class:1",
-        "urn:csta:class:1",
-        "urn:ama:class:001",
-        "urn:bnds:class:1",
-        "urn:awdi:class:001",
-        "urn:epa:class:1",
-        "urn:htrl:class:1",
-        "urn:uic:class:1",
-        "urn:taco:class:1",
-        "urn:trl:class:first",
-        "urn:pao:class:1",
-    ),
-)
 
 
 @dataclasses.dataclass(frozen=True)
@@ -407,7 +391,6 @@ class BenerailAdapter(object):  # noqa: WPS214
         passenger_etags: Mapping[str, str],
         session_token: str | None = None,
     ) -> offer_models_pb2.Offer:
-        cabin_class_type = models_pb2.CabinClass.TYPE_ECONOMY
         comfort_class_value = (
             str(
                 offer_res.response_result.comfort_class.comfort_class_value,
@@ -415,9 +398,6 @@ class BenerailAdapter(object):  # noqa: WPS214
             if offer_res.response_result.comfort_class
             else ""
         )
-
-        if comfort_class_value in _FIRST_CLASS_COMFORT_TYPES:
-            cabin_class_type = models_pb2.CabinClass.TYPE_FIRST
 
         price_proto = money.from_string(
             string_amount=str(offer_res.response_result.price.amount),
@@ -446,12 +426,13 @@ class BenerailAdapter(object):  # noqa: WPS214
                     id=string.uuid(),
                     offer_segment_id=offer_segment_id,
                     cabin_class=models_pb2.CabinClass(
-                        type=cabin_class_type,
+                        type=await self._cabin_mapping.resolve_cabin_class(
+                            comfort_class_value,
+                            "benerail",
+                        ),
                         marketing_name=(
-                            str(
-                                offer_res.response_result.comfort_class.comfort_class_value,
-                            )
-                            if offer_res.response_result.comfort_class is not None
+                            await self._resolve_marketing_name(comfort_class_value)
+                            if comfort_class_value
                             else ""
                         ),
                     ),
@@ -472,6 +453,25 @@ class BenerailAdapter(object):  # noqa: WPS214
                 else ""
             ),
         )
+
+    @asyncstdlib.lru_cache()
+    async def _resolve_marketing_name(self, comfort_class_value: str) -> str:
+        try:
+            urn_val = await self._client.rcode_client.get_urn_value(comfort_class_value)
+        except errors.HttpError:
+            return comfort_class_value
+
+        try:
+            rcode = urn_val.response_result.rcodes[0]
+        except (IndexError, ValueError):
+            return comfort_class_value
+
+        try:
+            en_label = rcode.labels["en"]
+        except KeyError:
+            return comfort_class_value
+
+        return en_label.code_long or comfort_class_value
 
     async def _get_offer_info_responses(
         self,

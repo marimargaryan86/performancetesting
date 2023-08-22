@@ -51,8 +51,8 @@ class RcodeResult(BenerailBaseModel):
     type_id: str | None = Field(None, example="TSTATN_ID")
     sorting_tag: int | None = None
     metadata: RcodeMetaData | None = None
-    labels: dict[str, RcoderesultLabels] | None = Field(
-        None,
+    labels: dict[str, RcoderesultLabels] = Field(
+        ...,
         example={
             "nl/nl": {
                 "codeShort": "NLASC",
@@ -88,7 +88,7 @@ class RcodeResult(BenerailBaseModel):
 
 
 class RcodesResult(BenerailBaseModel):
-    rcodes: list[RcodeResult] | None = None
+    rcodes: list[RcodeResult]
     field_links: LinksUnderscoreType | None = Field(None, alias="_links")
 
 

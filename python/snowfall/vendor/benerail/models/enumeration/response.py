@@ -20,7 +20,7 @@ class PlacesResponse(BenerailBaseModel):
 
 class RcodesResponse(BenerailBaseModel):
     metadata: Metadata | None = None
-    response_result: RcodesResult | None = Field(None, alias="result")
+    response_result: RcodesResult = Field(..., alias="result")
 
 
 class TypesResponse(BenerailBaseModel):
