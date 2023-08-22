@@ -2,9 +2,6 @@ from collections.abc import Sequence
 
 import httpx
 
-from snowfall.project.junction.api_automation.test_functions.helpers_api import (
-    is_valid_uuid,
-)
 from snowfall.project.pay.adapter import beneficiaries
 from snowfall.project.pay.service.companies.v1alpha.models_pb2 import Account, Company
 from snowfall.stdlib import money
@@ -84,4 +81,3 @@ class TestBeneficiary(object):
         beneficiary = await beneficiaries_client.get(payload["id"])
 
         assert beneficiary is not None
-        assert is_valid_uuid(beneficiary.created_by)

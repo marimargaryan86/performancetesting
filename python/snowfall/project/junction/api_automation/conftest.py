@@ -12,16 +12,7 @@ import pytest
 from snowfall.project.junction.api_automation.test_functions.mobile_client import (
     MobileApiClient,
 )
-from snowfall.project.junction.api_automation.test_functions.pay_admin_client import (
-    PayAdminClient,
-)
-from snowfall.project.junction.api_automation.test_functions.pay_webhook_client import (
-    PayWebhookClient,
-)
 from snowfall.stdlib.transport.http import auth
-from snowfall.vendor.junction.auth import UserAuth
-from snowfall.vendor.junction.go.client import Client as GoClient
-from snowfall.vendor.junction.pay.client import Client as PayClient
 
 ALLURE_ENVIRONMENT_PROPERTIES_FILE = "environment.properties"
 ALLUREDIR_OPTION = "--alluredir"
@@ -34,8 +25,6 @@ logger = logging.getLogger()
 
 def pytest_addoption(parser: pytest.Parser) -> None:
     parser.addoption("--API-TOKEN", action="store", help="api token to execute calls")
-    parser.addoption("--ORIGIN", action="store", help="origin id")
-    parser.addoption("--DESTINATION", action="store", help="destination id")
     parser.addoption("--DEPARTURE_AFTER", action="store", help="departure after")
     parser.addoption("--HOST", action="store", help="prod dev or any other host")
 
@@ -96,44 +85,6 @@ def departures_after(request: pytest.FixtureRequest) -> Sequence[str]:
     return departures.split(",")
 
 
-@pytest.fixture(scope="package", autouse=True)
-def origin(
-    origins: Sequence[str],
-) -> str:
-    return origins[0]
-
-
-@pytest.fixture(scope="package", autouse=True)
-def origins(
-    local_config: Mapping[str, str],
-    request: pytest.FixtureRequest,
-) -> Sequence[str]:
-    origins = request.config.getoption("ORIGIN") or local_config.get("ORIGIN") or ""
-    return origins.split(",")
-
-
-@pytest.fixture(scope="package", autouse=True)
-def destination(
-    destinations: Sequence[str],
-) -> str:
-    return destinations[0]
-
-
-@pytest.fixture(scope="package", autouse=True)
-def destinations(
-    local_config: Mapping[str, str],
-    request: pytest.FixtureRequest,
-) -> Sequence[str]:
-    destinations = (
-        request.config.getoption("DESTINATION")
-        or local_config.get(
-            "DESTINATION",
-        )
-        or ""
-    )
-    return destinations.split(",")
-
-
 @pytest.fixture(scope="package")
 def protocol(
     request: pytest.FixtureRequest,
@@ -148,14 +99,6 @@ def host(
     local_config: Mapping[str, str],
 ) -> str:
     return request.config.getoption("HOST") or local_config.get("HOST") or ""
-
-
-@pytest.fixture(scope="package")
-def headers(api_token: str) -> dict[str, str]:
-    return {
-        "Content-Type": "application/vnd.api+json",
-        "Authorization": "Bearer {0}".format(api_token),
-    }
 
 
 def pytest_collection_modifyitems(
@@ -176,24 +119,6 @@ def pytest_collection_modifyitems(
 
 
 @pytest.fixture()
-def junction_client(
-    api_token: str,
-    host: str,
-) -> GoClient:
-    api_url = "{0}{1}".format(
-        HTTPS_PREFIX,
-        get_variable_value(host, api_token, "junction_api_host"),
-    )
-    junction_api_token = get_variable_value(host, api_token, "junction_api_token")
-    client_timeout = 20
-    return GoClient(
-        base_url=api_url,
-        auth=auth.TokenAuth(junction_api_token),
-        client=httpx.AsyncClient(timeout=client_timeout),
-    )
-
-
-@pytest.fixture()
 def mobile_client(
     api_token: str,
     host: str,
@@ -210,24 +135,6 @@ def mobile_client(
         auth=auth.TokenAuth(mobile_token),
         client=httpx.AsyncClient(timeout=client_timeout),
     )
-
-
-@pytest.fixture()
-def get_mongo_config(
-    api_token: str,
-    host: str,
-) -> dict[str, Any]:
-    mdb_user = get_variable_value(host, api_token, "mongodb_dev_user")
-    mdb_password = get_variable_value(host, api_token, "mongodb_dev_password")
-    mdb_server = get_variable_value(host, api_token, "mongodb_dev_server")
-    mdb_port = get_variable_value(host, api_token, "mongodb_dev_port")
-
-    return {
-        "mongodb_dev_user": mdb_user,
-        "mongodb_dev_password": mdb_password,
-        "mongodb_dev_server": mdb_server,
-        "mongodb_dev_port": mdb_port,
-    }
 
 
 def get_variable_value(
@@ -293,148 +200,13 @@ def add_allure_environment_property(  # noqa: WPS210
 @pytest.fixture(autouse=True)
 def _save_properties_to_allure_file(
     add_allure_environment_property: Callable[[str, Any], None],
-    origins: Sequence[str],
-    destinations: Sequence[str],
     departures_after: Sequence[str],
 ) -> None:
-    add_allure_environment_property(
-        "origin",
-        origins[0],
-    )
-    add_allure_environment_property(
-        "destination",
-        destinations[0],
-    )
     add_allure_environment_property(
         "departure_after",
         departures_after[0],
     )
     add_allure_environment_property(
-        "origins",
-        origins,
-    )
-    add_allure_environment_property(
-        "destinations",
-        destinations,
-    )
-    add_allure_environment_property(
         "departures_after",
         departures_after,
     )
-
-
-@pytest.fixture()
-def pay_client(
-    api_token: str,
-    host: str,
-) -> PayClient:
-    email = get_variable_value(host, api_token, "pay_api_test_email")
-    password = get_variable_value(host, api_token, "pay_api_test_password")
-    base_url_admin_api = "{0}{1}".format(
-        HTTPS_PREFIX,
-        get_variable_value(host, api_token, "pay_admin_api_host"),
-    )
-    base_url = "{0}{1}".format(
-        HTTPS_PREFIX,
-        get_variable_value(host, api_token, "pay_api_host"),
-    )
-
-    auth = UserAuth(
-        base_url=base_url_admin_api,
-        email=email,
-        password=password,
-    )
-
-    return PayClient(
-        base_url=base_url,
-        auth=auth,
-    )
-
-
-@pytest.fixture()
-def pay_admin_client(
-    api_token: str,
-    host: str,
-) -> PayAdminClient:
-    email = get_variable_value(host, api_token, "pay_api_test_email")
-    password = get_variable_value(host, api_token, "pay_api_test_password")
-
-    base_url_admin_api = "{0}{1}".format(
-        HTTPS_PREFIX,
-        get_variable_value(host, api_token, "pay_admin_api_host"),
-    )
-
-    auth = UserAuth(
-        base_url=base_url_admin_api,
-        email=email,
-        password=password,
-    )
-
-    return PayAdminClient(
-        base_url=base_url_admin_api,
-        auth=auth,
-    )
-
-
-@pytest.fixture()
-def pay_webhook_client(
-    api_token: str,
-    host: str,
-) -> PayWebhookClient:
-    base_url_webhook_api = "{0}{1}".format(
-        HTTPS_PREFIX,
-        get_variable_value(host, api_token, "pay_webhook_host"),
-    )
-    return PayWebhookClient(
-        base_url=base_url_webhook_api,
-    )
-
-
-@pytest.fixture()
-async def pay_create_beneficiary(
-    pay_admin_client: PayAdminClient,
-) -> dict[str, Any]:
-    try:
-        response_create_beneficiary = await pay_admin_client.create_beneficiary(
-            bank_account_holder_name="EUR test Account Holder",
-            email="example@example.com",
-            beneficiary_address_lines=[
-                "Radhuset",
-                "Våksalagatan 2",
-                "United Spaces",
-                "Sweden",
-            ],
-            beneficiary_country_code="DE",
-            bank_name="mBank S.A.",
-            account_type="checking",
-            payment_types="priority",
-            bank_address_lines=[
-                "mBank S.A.",
-                "Bankowość detaliczna",
-                "Skrytka Pocztowa 2108",
-                "90-959",
-                "Łódź 2",
-            ],
-            bank_country_code="DE",
-            currency_id="EUR",
-            account_id=PAY_TEST_ACCOUNT01,
-            beneficiary_postal_code="12345",
-            beneficiary_city="Uppsala",
-            bic_swift="BREXPLPWMBK",
-            iban="DE89370400440532013000",
-        )
-    except httpx.HTTPStatusError as err:
-        logger.info("response_create_beneficiary err: %s", err.response.headers)
-        logger.info("response_create_beneficiary body: %s", err.response.json())
-        err_msg = json.dumps(err.response.json(), indent=4)
-        pytest.fail(err_msg, pytrace=False)
-
-    logger.info(
-        "create_beneficiary: %s",
-        json.dumps(response_create_beneficiary, indent=4),
-    )
-    return response_create_beneficiary
-
-
-PAY_TEST_ACCOUNT01 = "7e249624-535d-418a-8009-0908675136e1"
-PAY_TEST_ACCOUNT02 = "026b616f-8e6b-42e4-abc7-559ef58a4d69"
