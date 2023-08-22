@@ -1,7 +1,7 @@
 from types import MappingProxyType
 
 import lagom
-from starlette import endpoints, requests, responses
+from starlette import endpoints, requests, responses, status
 
 from snowfall.project.junction.go.adapter import orders
 from snowfall.project.junction.hub.service.hub_api import resources
@@ -9,6 +9,7 @@ from snowfall.stdlib.integration.starlette import (
     messages,
     models,
     pagination_helpers,
+    request_helpers,
     sorting,
 )
 
@@ -228,4 +229,48 @@ class Order(endpoints.HTTPEndpoint):
                 ),
             ),
             request=request,
+        )
+
+
+class BookingsCancellation(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        client: orders.Client = lagom.injectable,
+    ) -> responses.Response:
+        cancellation = await client.get_bookings_cancellation(
+            identifier=request.path_params["bookingsCancellationId"],
+            reseller_id=request.user.username,
+        )
+
+        return await messages.create_response(
+            body=models.Body(
+                data=resources.BookingsCancellationResource.from_proto(
+                    cancellation=cancellation,
+                    request=request,
+                ),
+            ),
+            request=request,
+        )
+
+    async def post(
+        self,
+        request: requests.Request,
+        client: orders.Client = lagom.injectable,
+    ) -> responses.Response:
+        body = await request_helpers.flatten_request(request)
+        cancellation = await client.create_bookings_cancellation(
+            booking_ids=body["bookings"],
+            reseller_id=request.user.username,
+        )
+
+        return await messages.create_response(
+            body=models.Body(
+                data=resources.BookingsCancellationResource.from_proto(
+                    cancellation=cancellation,
+                    request=request,
+                ),
+            ),
+            request=request,
+            status_code=status.HTTP_201_CREATED,
         )

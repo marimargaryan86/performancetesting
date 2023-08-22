@@ -815,6 +815,110 @@
         "operationId": "get-bookings-details-id",
         "description": "Used to lookup data for a Booking Identifier."
       }
+    },
+    "/bookings/cancellations": {
+      "post": {
+        "summary": "Create Bookings Cancellation",
+        "operationId": "post-bookings-cancellations",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/BookingsCancellation"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "description": "Create a cancellation for multiple Bookings.",
+        "tags": [
+          "journeys"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/BookingsCancellation"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/bookings/cancellations/{bookingsCancellationId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/bookingsCancellationId"
+        },
+        {
+          "$ref": "#/components/parameters/bookingsCancellationInclude"
+        }
+      ],
+      "get": {
+        "summary": "Get Bookings Cancellation",
+        "tags": [
+          "journeys"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/BookingsCancellation"
+                    },
+                    "included": {
+                      "$ref": "#/components/schemas/BookingsCancellationIncluded"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-bookings-cancellations-id",
+        "description": "Used to lookup data for a Bookings Cancellation Identifier."
+      }
     }
   },
   "components": {
@@ -1077,6 +1181,42 @@
         "description": "Customize which field(s) to sort users by.",
         "style": "form",
         "explode": false
+      },
+      "bookingsCancellationId": {
+        "name": "bookingsCancellationId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+          "format": "uuid"
+        },
+        "description": "Bookings Cancellation identifier"
+      },
+      "bookingsCancellationInclude": {
+        "name": "include",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "bookings",
+              "bookings.order",
+              "bookings.order.journey",
+              "bookings.details",
+              "bookings.details.cabinClass",
+              "bookings.details.legType"
+            ]
+          },
+          "example": [
+            "bookings"
+          ]
+        },
+        "description": "Customize which related resources to return.",
+        "style": "form",
+        "explode": false
       }
     },
     "responses": {
@@ -1145,6 +1285,24 @@
               "required": [
                 "errors"
               ]
+            }
+          }
+        }
+      },
+      "UnprocessableEntity": {
+        "description": "Unprocessable Entity",
+        "content": {
+          "application/vnd.api+json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "errors": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
             }
           }
         }
@@ -2136,6 +2294,121 @@
           "city": {
             "type": "string",
             "example": "London"
+          }
+        }
+      },
+      "BookingsCancellation": {
+        "title": "Bookings Cancellation",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "d6cfe9e8-bbc9-485f-912f-7ba97ab2cf34",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "bookings-cancellations"
+                ],
+                "example": "bookings-cancellations"
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "status"
+                ],
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "unspecified",
+                      "pending",
+                      "processing",
+                      "completed"
+                    ],
+                    "example": "pending"
+                  }
+                },
+                "readOnly": true
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "bookings"
+                ],
+                "properties": {
+                  "bookings": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "items": {
+                          "oneOf": [
+                            {
+                              "$ref": "#/components/schemas/TripBookingIdentifier"
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes",
+              "relationships"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ],
+        "description": "Cancellation for multiple Bookings."
+      },
+      "BookingsCancellationIncluded": {
+        "title": "BookingsCancellationIncluded",
+        "type": "array",
+        "items": {
+          "oneOf": [
+            {
+              "$ref": "#/components/schemas/Order"
+            },
+            {
+              "$ref": "#/components/schemas/Journey"
+            },
+            {
+              "$ref": "#/components/schemas/TripBooking"
+            },
+            {
+              "$ref": "#/components/schemas/TripBookingDetails"
+            },
+            {
+              "$ref": "#/components/schemas/CabinClass"
+            },
+            {
+              "$ref": "#/components/schemas/LegType"
+            }
+          ],
+          "discriminator": {
+            "propertyName": "type",
+            "mapping": {
+              "orders": "#/components/schemas/Order",
+              "journeys": "#/components/schemas/Journey",
+              "trip-bookings": "#/components/schemas/TripBooking",
+              "trip-booking-details": "#/components/schemas/TripBookingDetails",
+              "cabin-classes": "#/components/schemas/CabinClass",
+              "leg-types": "#/components/schemas/LegType"
+            }
           }
         }
       },
