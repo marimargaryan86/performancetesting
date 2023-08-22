@@ -3355,6 +3355,47 @@
         "description": "Used to lookup data for a Booking Identifier."
       }
     },
+    "/bookings/{bookingId}/cancellation": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/bookingId"
+        }
+      ],
+      "get": {
+        "summary": "Get Bookings Cancellation By Booking",
+        "tags": [
+          "journeys"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/BookingsCancellation"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-bookings-id-cancellation",
+        "description": "Used to lookup a Bookings Cancellation for a Booking Identifier."
+      }
+    },
     "/bookings/{bookingId}/details": {
       "parameters": [
         {

@@ -202,6 +202,31 @@ class TestBookingsCancellations(object):
         assert retrieved.status == bookings_cancellation.status
         assert retrieved.created_at.seconds == bookings_cancellation.created_at.seconds
 
+    async def test_cancellation_is_retrievable_by_booking_id(
+        self,
+        bookings_cancellation_repository: orders.BookingsCancellationsRepository,
+        bookings_cancellation: models_pb2.BookingsCancellation,
+    ) -> None:
+        booking_id = more_itertools.first(
+            bookings_cancellation.booking_cancellations,
+        ).booking_id
+
+        retrieved = await bookings_cancellation_repository.find_by_booking_id(
+            booking_id,
+        )
+
+        assert retrieved
+        assert retrieved.id == bookings_cancellation.id
+        assert retrieved.status == bookings_cancellation.status
+        for retrieved_bc, expected_bc in list(  # noqa: WPS352
+            zip(
+                retrieved.booking_cancellations,
+                bookings_cancellation.booking_cancellations,
+                strict=True,
+            ),
+        ):
+            assert retrieved_bc == expected_bc
+
     async def test_cancellation_is_retrievable_by_ticket_id(
         self,
         bookings_cancellation_repository: orders.BookingsCancellationsRepository,

@@ -293,9 +293,14 @@ class OrderService(  # noqa: WPS214
         request: orders_pb2.GetBookingsCancellationRequest,
         context: aio.ServicerContext,
     ) -> orders_pb2.GetBookingsCancellationResponse:
-        cancellation = await self._cancellations.find_by_id(
-            document_id=request.id,
-        )
+        if request.booking_id:
+            cancellation = await self._cancellations.find_by_booking_id(
+                booking_id=request.booking_id,
+            )
+        else:
+            cancellation = await self._cancellations.find_by_id(
+                document_id=request.id,
+            )
 
         if cancellation is None or cancellation.reseller_id != request.reseller_id:
             await context.abort(StatusCode.NOT_FOUND)

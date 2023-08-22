@@ -138,7 +138,7 @@ class CreateBookingsCancellationHandler(object):  # noqa: WPS214
             )
 
     async def _validate_not_duplication(self, booking_ids: Sequence[str]) -> None:
-        cancellations = await self._cancellations.find_by_booking_id(
+        cancellations = await self._cancellations.find_by_booking_ids(
             list(booking_ids),
         )
         if [cancellation async for cancellation in cancellations]:

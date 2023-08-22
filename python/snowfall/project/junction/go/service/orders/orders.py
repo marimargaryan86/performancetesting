@@ -424,7 +424,7 @@ class BookingsCancellationsRepository(
 ):
     _proto = models_pb2.BookingsCancellation
 
-    async def find_by_booking_id(
+    async def find_by_booking_ids(
         self,
         ids: Sequence[str],
     ) -> resultset.ResultSet[models_pb2.BookingsCancellation]:
@@ -442,6 +442,30 @@ class BookingsCancellationsRepository(
             cur="",
             filter_=filter_,
         )
+
+    async def find_by_booking_id(
+        self,
+        booking_id: str,
+    ) -> models_pb2.BookingsCancellation | None:
+        filter_ = (
+            {
+                "booking_cancellations.booking_id": {
+                    "$eq": booking_id,
+                },
+            }
+            if booking_id
+            else {}
+        )
+
+        cancellation = await self._find_with_cursor(
+            cur="",
+            filter_=filter_,
+        )
+
+        try:
+            return await cancellation.take()
+        except StopAsyncIteration:
+            return None
 
     async def find_by_ticket_id(
         self,

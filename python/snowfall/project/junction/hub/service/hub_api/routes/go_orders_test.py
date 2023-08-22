@@ -64,3 +64,13 @@ class TestBookingsCancellation(object):
         )
 
         assert response.status_code == status.HTTP_200_OK
+
+    async def test_bookings_cancellation_are_found_by_booking(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        response = await client.get(
+            "/bookings/{id}/cancellation".format(id=fixtures.BOOKINGS[0]),
+        )
+
+        assert response.status_code == status.HTTP_200_OK

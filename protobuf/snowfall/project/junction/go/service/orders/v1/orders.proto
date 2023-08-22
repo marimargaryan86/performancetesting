@@ -156,8 +156,11 @@ message CreateBookingsCancellationResponse {
 }
 
 message GetBookingsCancellationRequest {
-  string id = 1;
-  string reseller_id = 2;
+  oneof payload {
+    string id = 1;
+    string booking_id = 2;
+  }
+  string reseller_id = 3;
 }
 
 message GetBookingsCancellationResponse {
