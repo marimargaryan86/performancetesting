@@ -148,7 +148,7 @@ verify:
   stage: verify
   interruptible: false
   script:
-    - docker run --rm -it --pull=always git.snowfall.se:4567/junction/junction/service/deploy:latest --env-name "${DEPLOYMENT_ENVIRONMENT}" verify --nomad-address "\${NOMAD_${DEPLOYMENT_ENVIRONMENT^^}_ADDR}" --nomad-templates-path "templates/" ${services[@]}
+    - docker run --rm --pull=always git.snowfall.se:4567/junction/junction/service/deploy:latest --env-name "${DEPLOYMENT_ENVIRONMENT}" verify --nomad-address "\${NOMAD_${DEPLOYMENT_ENVIRONMENT^^}_ADDR}" --nomad-templates-path "templates/" ${services[@]}
   tags:
     - shell
   needs:
