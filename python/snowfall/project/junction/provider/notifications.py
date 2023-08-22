@@ -1,4 +1,5 @@
 import abc
+import asyncio
 from email import message
 
 import aiosmtplib
@@ -52,6 +53,7 @@ class SmtpNotifier(Notifier):
         self._client = smtp_client
         self._sender = sender
         self._recipient = recipient
+        self._lock = asyncio.Lock()
 
     async def send(self, notification: Notification) -> None:
         email = message.EmailMessage()
@@ -60,7 +62,7 @@ class SmtpNotifier(Notifier):
         email["Subject"] = notification.subject
         email.set_content(notification.body)
 
-        async with self._client:
+        async with self._lock, self._client:
             try:
                 await self._client.send_message(email)
             except (
