@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package snowfall.project.junction.service.providers.benerail.v1alpha;
 
+import "google/protobuf/timestamp.proto";
 import "snowfall/project/junction/go/v1/models.proto";
 import "snowfall/stdlib/v1/date.proto";
 import "snowfall/stdlib/v1/datetime.proto";
@@ -32,4 +33,5 @@ message BookingNotificationTask {
   string passenger_name_record = 7;
   string departure_at = 8;
   string ticket_url = 9;
+  google.protobuf.Timestamp created_at = 10;
 }

@@ -26,6 +26,7 @@ from snowfall.vendor.benerail import client
 from snowfall.vendor.benerail.models import etag
 
 _PROVIDER_NAME = "Benerail"
+_RETRY_TTL = datetime.timedelta(hours=2)
 
 
 class NotificationsConsumer(object):
@@ -58,14 +59,12 @@ class NotificationsConsumer(object):
         except errors.HttpError:
             self._logger.exception("Failed to fetch the booking")
 
-            await message.nack()
-            return
+            return await self._handle_no_fulfillment(message)
 
         booking_res.set_etags(etag_data)
 
         if not booking_res.response_result.fulfillments:
-            await message.nack()
-            return
+            return await self._handle_no_fulfillment(message)
 
         fulfillment_res = await self._client.bookings_client.get_fulfillment(
             booking_id=booking_res.response_result.identifier,
@@ -83,8 +82,7 @@ class NotificationsConsumer(object):
         ]
 
         if not ticket_urls:
-            await message.nack()
-            return
+            return await self._handle_no_fulfillment(message)
 
         body.MergeFrom(
             br_amqp_pb2.BookingNotificationTask(
@@ -95,6 +93,25 @@ class NotificationsConsumer(object):
         await self._notifier.send(
             notifications.BookingNotification(body),
         )
+        return None
+
+    async def _handle_no_fulfillment(
+        self,
+        message: types.Message[br_amqp_pb2.BookingNotificationTask],
+    ) -> None:
+        created_at = protobuf.protobuf_to_datetime(
+            message.body.created_at,
+        )
+        time_passed = datetime.datetime.now(datetime.UTC) - created_at
+
+        if time_passed > _RETRY_TTL:
+            self._logger.error(
+                "Ticket retrieval limit reached",
+                booking_id=message.body.booking_id,
+            )
+            await message.nack()
+        else:
+            await message.requeue()
 
 
 class PriceQuoteConsumer(object):

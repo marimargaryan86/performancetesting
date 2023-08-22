@@ -157,6 +157,9 @@ class BookingHandler(object):
                 br_booking_id=booking_res.response_result.identifier,
                 br_dnr=booking_res.response_result.dnr,
                 br_session_token=offer_details.session_token,
+                created_at=protobuf.datetime_to_protobuf(
+                    datetime.datetime.now(datetime.UTC),
+                ),
             ),
             routing_key="benerail.notifications",
         )
