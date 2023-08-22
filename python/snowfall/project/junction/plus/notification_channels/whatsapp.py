@@ -1,5 +1,6 @@
 import pathlib
 from collections.abc import Sequence
+from gettext import gettext as _
 
 from twilio.rest import Client as twilioClient
 
@@ -90,7 +91,7 @@ class ProviderChannel(Channel):
         return self.send_message(
             receiver=receiver.phone_number.e164_number,
             sender_number=sender_configuration.mobile_phone.e164_number,
-            body=(
+            body=_(
                 "Hi {0},".format(receiver.first_name)
                 + "\nWe are pleased to confirm that your {0}trip is booked:".format(
                     trip_type,
@@ -98,7 +99,7 @@ class ProviderChannel(Channel):
                 + "\n\n*Booking Reference:* {0}".format(event.body.booking_reference)
                 + journey_details
                 + message_ending
-                + "\n\nTo check your *Trip Details*, please tap the button below"
+                + "\n\nTo check your *Trip Details*, please tap the button below",
             ),
         )
 
@@ -169,7 +170,7 @@ class MockChannel(Channel):
 
 
 def transform_trip_details(order: models_pb2.PersistedOrder) -> str:
-    return (
+    return _(
         "Here are the details of your upcoming trip:\n"
         + "*Booking Reference:* {0}\n".format(order.booking_reference)
         + "*Duration:* {0}\n".format(
@@ -197,7 +198,7 @@ def transform_trip_details(order: models_pb2.PersistedOrder) -> str:
                 )
                 for idx, booking in enumerate(order.bookings)
             ],
-        )
+        ),
     )
 
 

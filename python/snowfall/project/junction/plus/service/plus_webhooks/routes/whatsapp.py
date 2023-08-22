@@ -1,3 +1,5 @@
+from gettext import gettext as _
+
 import lagom
 from starlette import endpoints, requests, responses, status
 from twilio.twiml.messaging_response import MessagingResponse
@@ -41,28 +43,22 @@ class IncomingMessages(endpoints.HTTPEndpoint):
             and str(msg["Body"]).lower() != "subscribe"
         ):
             twiml_response.message(
-                "You are currently unsubscribed from WhatsApp."
-                " If you wish to receive notifications regarding travel information"
-                " please click the Subscribe option below.",
-            )
-        else:
-            twiml_response.message(
-                await message_handler.handle_message(
-                    str(msg["Body"]),
-                    str(msg.get("OriginalRepliedMessageSid", "")),
-                    subscriber,
-                    subscribers_client,
-                    orders_client,
+                _(
+                    "You are currently unsubscribed from WhatsApp."
+                    " If you wish to receive notifications regarding travel information"
+                    " please click the Subscribe option below.",
                 ),
             )
-            subscriber = await subscribers_client.get(subscriber_id=subscriber.id)
-            if (  # noqa: WPS337
-                subscriber.phone_subscription_status
-                is not notifications_pb2.Subscriber.SubscribedStatus.SUBSCRIBED_STATUS_UNSUBSCRIBED
-            ):
-                twiml_response.message(
-                    "Please select one of the following options",
-                )
+        else:
+            messages = await message_handler.handle_message(
+                str(msg["Body"]),
+                str(msg.get("OriginalRepliedMessageSid", "")),
+                subscriber,
+                subscribers_client,
+                orders_client,
+            )
+            for message in messages:
+                twiml_response.message(message)
         return responses.Response(
             content=twiml_response.to_xml(),
             status_code=status.HTTP_200_OK,
