@@ -1,4 +1,5 @@
 from pymongo import IndexModel
+from unidecode import unidecode
 
 from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.stdlib.logging import stdout
@@ -22,6 +23,9 @@ class CabinMappingRepository(
         operator: str | None,
     ) -> models_pb2.CabinClass.Type.ValueType:
         if fare_brand and operator:
+            fare_brand = unidecode(fare_brand)
+            operator = unidecode(operator)
+
             provider_mapping = await self._find_by_operator_mapping(
                 fare_brand=fare_brand,
                 operator=operator,
