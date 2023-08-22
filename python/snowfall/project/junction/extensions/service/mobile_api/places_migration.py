@@ -24,8 +24,8 @@ from snowfall.stdlib.v1 import latlng_pb2
 _SERVICE_NAME = "mobile-api"
 _ATTRIBUTES_KEY = "attributes"
 
-_CITY_RADIUS_DEGREES = float(
-    os.getenv("_CITY_RADIUS_DEGREES", "0.6"),  # noqa: WPS432
+_CITY_RADIUS_M = int(
+    os.getenv("_CITY_RADIUS_M", "50000"),  # noqa: WPS432
 )
 
 
@@ -123,7 +123,7 @@ async def _main_cities(
         place_main_city = await repo.find_main_city(
             latitude=place.coordinates.latitude,
             longitude=place.coordinates.longitude,
-            max_distance_degrees=_CITY_RADIUS_DEGREES,
+            max_distance_meters=_CITY_RADIUS_M,
             types=models_pb2.Place.TYPE_CITY,
         )
 

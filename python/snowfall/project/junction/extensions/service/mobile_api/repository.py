@@ -159,7 +159,7 @@ class PlacesRepository(
         self,
         longitude: float,
         latitude: float,
-        max_distance_degrees: float,
+        max_distance_meters: int,
         types: int,
     ) -> models_pb2.Place | None:
         main_cities = await self._execute(
@@ -167,8 +167,12 @@ class PlacesRepository(
             filter={
                 "types": [types],
                 "coordinates": {
-                    "$geoWithin": {
-                        "$center": [[longitude, latitude], max_distance_degrees],
+                    "$nearSphere": {
+                        "$geometry": {
+                            "type": "Point",
+                            "coordinates": [longitude, latitude],
+                        },
+                        "$maxDistance": max_distance_meters,
                     },
                 },
             },
