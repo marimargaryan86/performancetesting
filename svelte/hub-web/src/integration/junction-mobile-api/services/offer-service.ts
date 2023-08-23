@@ -1,5 +1,5 @@
 import type { OfferPriceQuoteModel } from "models/booking/offer";
-import { parsePriceQuoteSchema } from "../parsers/offer";
+import { parseGetPriceQuoteSchema, parsePriceQuoteSchema } from "../parsers/offer";
 import type {
   CreateOfferPriceQuoteResponseSchema,
   CreateOfferPriceQuoteRequestSchema,
@@ -9,6 +9,7 @@ import JunctionMobileApiService from "./junction-mobile-api-service";
 
 export class OfferService extends JunctionMobileApiService {
   async createPriceQuote(data: {
+    sessionToken: string;
     offerId: string;
     optionIds: string[];
   }): Promise<OfferPriceQuoteModel> {
@@ -28,6 +29,7 @@ export class OfferService extends JunctionMobileApiService {
           },
         },
       },
+      headers: { "Session-Token": data.sessionToken },
     });
 
     const respData = await resp.json();
@@ -36,14 +38,24 @@ export class OfferService extends JunctionMobileApiService {
   }
 
   async getPriceQuote(id: string): Promise<OfferPriceQuoteModel> {
-    const resp = await this.makeRequest<GetOfferPriceQuoteResponseSchema>(`/offers/quotes/${id}`);
+    const resp = await this.makeRequest<GetOfferPriceQuoteResponseSchema>(`/offers/quotes/${id}`, {
+      queryParams: {
+        include: [
+          "groups",
+          "groups.details",
+          "groups.details.legType",
+          "groups.options",
+          "groups.options.details",
+          "groups.options.details.cabinClass",
+          "groups.options.details.details",
+        ].join(","),
+      },
+    });
 
     if (resp.status === 404) {
       throw new Error("Quote not found");
     }
 
-    const respData = await resp.json();
-
-    return parsePriceQuoteSchema(respData.data);
+    return parseGetPriceQuoteSchema(await resp.json());
   }
 }

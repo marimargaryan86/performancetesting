@@ -1,6 +1,5 @@
 <script lang="ts">
   import TripSearch, { type PartialTripSearchData } from "../trip-search.svelte";
-  import { page } from "$app/stores";
   import SearchOptions, { type SearchOptionsData } from "./search-options.svelte";
   import type { OfferModel } from "models/booking/offer";
   import Offer from "./offer/offer.svelte";
@@ -15,12 +14,13 @@
   import Countdown from "../countdown.svelte";
   import LoadingSkelton from "./loading-skelton.svelte";
   import type { TripCandidatesSearchStatus } from "integration/junction-mobile-api/schemas/trip";
+  import type { ResolvedSearchData } from "../common";
 
   export let data;
 
   let countdown: Countdown | undefined;
   let getOffersTask: MaybePromise<OfferModel[]> = [];
-  let searchData = getSearchData($page.url);
+  let searchData = getSearchData(data.searchData);
   let searchOptions: SearchOptionsData = {
     sortBy: "price",
     stops: [],
@@ -32,7 +32,7 @@
   let searchRetries = 0;
   let selected = data.selectedOffer;
 
-  $: tripCandidatesSearchId = data.tripCandidatesSearch?.id;
+  $: tripCandidatesSearchId = data.searchData.tripCandidatesSearch?.id;
   $: if (browser && tripCandidatesSearchId) {
     beginPoll(tripCandidatesSearchId);
   }
@@ -43,18 +43,12 @@
     getOffersTask = pollOffers(id);
   }
 
-  function getSearchData(url: URL): PartialTripSearchData {
-    const outboundStr = url.searchParams.get("outbound") ?? undefined;
-
+  function getSearchData(nextSearchData: ResolvedSearchData): PartialTripSearchData {
     return {
-      destination: data.destination,
-      origin: data.origin,
-      outbound: outboundStr ? new Date(outboundStr) : undefined,
-      passengers: {
-        adults: Number(url.searchParams.get("adults") ?? 1),
-        children: Number(url.searchParams.get("children") ?? 0),
-        infants: Number(url.searchParams.get("infants") ?? 0),
-      },
+      destination: nextSearchData.destination,
+      origin: nextSearchData.origin,
+      outbound: nextSearchData.departureAfter,
+      passengers: nextSearchData.passengers,
     };
   }
 
@@ -123,8 +117,8 @@
 </div>
 
 <div class="content">
-  {#if data.tripCandidatesSearch}
-    <Countdown expiresAt={data.tripCandidatesSearch.expiresAt} bind:this={countdown} />
+  {#if data.searchData.tripCandidatesSearch}
+    <Countdown expiresAt={data.searchData.tripCandidatesSearch.expiresAt} bind:this={countdown} />
   {/if}
 
   <div class="scroll">

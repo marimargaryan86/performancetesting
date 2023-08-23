@@ -2,6 +2,7 @@ import type { CoordinatesModel } from "models/booking/location";
 import type { PassengerGender, PassengerTitle } from "./schemas/order";
 
 export interface CreateTripCandidatesModel {
+  sessionToken: string;
   criteria: {
     origin: CoordinatesModel;
     destination: CoordinatesModel;

@@ -42,7 +42,9 @@ export interface TripCandidatesSearchSchema {
 
 export interface CreateTripCandidatesSearchRequestSchema {
   data: Omit<TripCandidatesSearchSchema, "id" | "attributes" | "links"> & {
-    attributes: Omit<TripCandidatesSearchSchema["attributes"], "expiresAt" | "status">;
+    attributes: Omit<TripCandidatesSearchSchema["attributes"], "expiresAt" | "status"> & {
+      sessionToken: string;
+    };
   };
 }
 

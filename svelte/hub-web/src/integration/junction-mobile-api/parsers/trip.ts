@@ -1,5 +1,5 @@
 import type { TripCandidatesModel } from "models/booking/trip";
-import type { CreateTripCandidatesModel } from "../models/trip";
+import type { CreateTripCandidatesModel } from "../models";
 import type {
   CreateTripCandidatesSearchRequestSchema,
   CreateTripCandidatesSearchResponseSchema,
@@ -33,6 +33,7 @@ export function parseCreateTripCandidatesSearchModel(
     data: {
       type: "trip-candidate-searches",
       attributes: {
+        sessionToken: data.sessionToken,
         criteria: data.criteria.map((item) => ({
           departureAfter: item.departureAfter.toISOString(),
           destination: parseCoordinatesModel(item.destination),
@@ -99,7 +100,7 @@ export function parseGetTripCandidatesOffersResponse(
       offerOptionDetails.push(item);
     } else if (item.type === "offer-options") {
       offerOptions.push(item);
-    } else if (item.type === "offer-groups") {
+    } else {
       offerGroups.push(item);
     }
   });

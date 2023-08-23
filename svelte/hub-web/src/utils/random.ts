@@ -11,5 +11,5 @@ export function getRandomAlphaNumericString(length: number): string {
   return Array<string>(length)
     .fill("")
     .map(() => alphaNum[Math.floor(Math.random() * alphaNum.length)])
-    .join();
+    .join("");
 }

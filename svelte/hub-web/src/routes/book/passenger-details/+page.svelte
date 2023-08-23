@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-  function getDefaultPassengers(passengers: PassengerCountModel): PassengerData[] {
+  function getDefaultPassengers(passengers: PassengerCountData): PassengerData[] {
     return [
       ...Array<PassengerData>(passengers.adults).fill({ document: {}, type: "adult" }),
       ...Array<PassengerData>(passengers.children).fill({ document: {}, type: "child" }),
@@ -21,8 +21,8 @@
   import Summary from "./summary.svelte";
   import Passengers, { type PassengerData } from "./passengers.svelte";
   import ContactInformation, { type ContactInformationData } from "./contact-information.svelte";
-  import type { PassengerCountModel } from "../common";
   import { goto } from "$app/navigation";
+  import type { PassengerCountData } from "../common";
 
   export let data;
 
@@ -58,6 +58,10 @@
   async function pollPriceQuote(id: string): Promise<OfferPriceQuoteModel | undefined> {
     if (priceQuoteId !== id) {
       return undefined;
+    }
+
+    if (data.priceQuote.status === "completed") {
+      return data.priceQuote;
     }
 
     const result = await callAction<{ priceQuote: OfferPriceQuoteModel }>({
@@ -99,13 +103,11 @@
 </svelte:head>
 
 <div class="content">
-  <Countdown expiresAt={data.priceQuote.expiresAt} show />
+  {#await getPriceQuoteTask then}
+    <Countdown expiresAt={data.priceQuote.expiresAt} show />
+  {/await}
 
   <div class="scroll">
-    {#await getPriceQuoteTask then priceQuote}
-      {JSON.stringify(priceQuote)}
-    {/await}
-
     <div class="details">
       <Passengers bind:passengers={bookingDetails.passengers} />
 

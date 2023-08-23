@@ -210,4 +210,12 @@ export interface CreateOfferPriceQuoteResponseSchema {
 
 export interface GetOfferPriceQuoteResponseSchema {
   data: TripOfferPriceQuoteSchema;
+  included?: (
+    | CabinClassSchema
+    | TripOfferOptionDetailsSchema
+    | OfferOptionSchema
+    | LegTypeSchema
+    | TripOfferGroupDetailsSchema
+    | OfferGroupSchema
+  )[];
 }

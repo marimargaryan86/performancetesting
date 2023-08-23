@@ -1,32 +1,15 @@
-import { error, type RequestEvent } from "@sveltejs/kit";
-import { SEARCH_TOKEN, type PassengerCountModel, type SearchData } from "../common";
-import jwt from "jsonwebtoken";
+import { ActionFailure, error, fail } from "@sveltejs/kit";
 import type { OfferPriceQuoteModel } from "models/booking/offer";
 import integrationInstancesServer from "integration-instances-server";
-import type { PlaceModel } from "models/booking/location";
-
-function getSearchData(event: RequestEvent): SearchData {
-  const token = event.cookies.get(SEARCH_TOKEN);
-
-  if (!token) {
-    throw error(400, { message: "Booking session not found" });
-  }
-
-  return jwt.decode(token) as SearchData;
-}
+import { getSearchData, type ResolvedSearchData } from "../common";
 
 export async function load(event): Promise<{
-  searchData: {
-    origin: PlaceModel;
-    destination: PlaceModel;
-    departureAfter: Date;
-    passengers: PassengerCountModel;
-  };
+  searchData: ResolvedSearchData;
   priceQuote: OfferPriceQuoteModel;
 }> {
   const searchData = getSearchData(event);
 
-  if (!searchData.quoteId) {
+  if (!searchData?.priceQuoteId) {
     throw error(400, { message: "No quote ID found" });
   }
 
@@ -34,11 +17,12 @@ export async function load(event): Promise<{
     const [origin, destination, priceQuote] = await Promise.all([
       integrationInstancesServer.junctionMobileApi.places.getPlace(searchData.originId),
       integrationInstancesServer.junctionMobileApi.places.getPlace(searchData.destinationId),
-      integrationInstancesServer.junctionMobileApi.offers.getPriceQuote(searchData.quoteId),
+      integrationInstancesServer.junctionMobileApi.offers.getPriceQuote(searchData.priceQuoteId),
     ]);
 
     return {
       searchData: {
+        sessionToken: searchData.sessionToken,
         origin,
         destination,
         departureAfter: new Date(searchData.departureAfter),
@@ -52,21 +36,23 @@ export async function load(event): Promise<{
 }
 
 export const actions = {
-  async poll(event): Promise<{ priceQuote: OfferPriceQuoteModel }> {
+  async poll(
+    event,
+  ): Promise<{ priceQuote: OfferPriceQuoteModel } | ActionFailure<{ error: string }>> {
     const searchData = getSearchData(event);
 
-    if (!searchData.quoteId) {
+    if (!searchData?.priceQuoteId) {
       throw error(400, { message: "No quote ID found" });
     }
 
     try {
       return {
         priceQuote: await integrationInstancesServer.junctionMobileApi.offers.getPriceQuote(
-          searchData.quoteId,
+          searchData.priceQuoteId,
         ),
       };
     } catch {
-      throw error(404, { message: "Quote not found " });
+      return fail(404, { error: "Quote not found" });
     }
   },
 };

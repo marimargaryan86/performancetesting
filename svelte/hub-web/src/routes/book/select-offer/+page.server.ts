@@ -1,119 +1,57 @@
+import { error } from "@sveltejs/kit";
+import { getSearchData, parsePassengers, setSearchData, type ResolvedSearchData } from "../common";
 import integrationInstancesServer from "integration-instances-server";
-import type { PlaceModel } from "models/booking/location";
-import type { TripCandidatesModel } from "models/booking/trip";
-import type { RequestEvent } from "./$types";
-import type { OfferModel } from "models/booking/offer";
-import jwt from "jsonwebtoken";
-import {
-  SEARCH_TOKEN,
-  type SearchData,
-  getPassengers,
-  parsePassengers,
-  JWT_SIGNATURE,
-  getOrigDest,
-} from "../common";
 import type { TripCandidatesSearchStatus } from "integration/junction-mobile-api/schemas/trip";
+import type { OfferModel } from "models/booking/offer";
 
-function isNewSearch(nextSearch: SearchData, existingSearch?: SearchData): boolean {
-  return (
-    !existingSearch ||
-    existingSearch.departureAfter !== nextSearch.departureAfter ||
-    existingSearch.destinationId !== nextSearch.destinationId ||
-    existingSearch.originId !== nextSearch.originId ||
-    existingSearch.passengers.adults !== nextSearch.passengers.adults ||
-    existingSearch.passengers.children !== nextSearch.passengers.children ||
-    existingSearch.passengers.infants !== nextSearch.passengers.infants
-  );
-}
-
-function getSearchData(event: RequestEvent): SearchData | undefined {
-  const token = event.cookies.get(SEARCH_TOKEN);
-  const existingSearch = token ? (jwt.decode(token) as SearchData) : undefined;
-  const originId = event.url.searchParams.get("origin");
-  const destinationId = event.url.searchParams.get("destination");
-  const departureAfter = new Date(event.url.searchParams.get("outbound") ?? "");
-  const passengers = getPassengers(event);
-
-  if (!(originId && destinationId && !isNaN(departureAfter.getTime()))) {
-    return undefined;
-  }
-
-  const nextSearch: SearchData = {
-    originId,
-    destinationId,
-    departureAfter: departureAfter.toISOString(),
-    passengers,
-  };
-
-  if (isNewSearch(nextSearch, existingSearch)) {
-    return nextSearch;
-  }
-
-  return existingSearch;
-}
-
-type LoadReturnType = {
-  origin?: PlaceModel;
-  destination?: PlaceModel;
-  tripCandidatesSearch?: TripCandidatesModel;
+export async function load(event): Promise<{
+  searchData: ResolvedSearchData;
   selectedOffer?: { offerId: string; optionIds: string[] };
-};
-
-export async function load(event): Promise<LoadReturnType> {
-  const searchData = getSearchData(event);
+}> {
+  const searchData = getSearchData(event, "query");
 
   if (!searchData) {
-    return {};
+    throw error(400, "Invalid search data");
   }
 
-  const { origin, destination } = await getOrigDest(searchData.originId, searchData.destinationId);
+  const [origin, destination] = await Promise.all([
+    integrationInstancesServer.junctionMobileApi.places.getPlace(searchData.originId),
+    integrationInstancesServer.junctionMobileApi.places.getPlace(searchData.destinationId),
+  ]);
 
-  if (!(origin && destination)) {
-    return {};
-  }
+  // prettier-ignore
+  const tripCandidatesSearch = await (searchData.tripCandidatesSearchId
+    ? integrationInstancesServer.junctionMobileApi.trips.getTripCandidatesSearch(
+      searchData.tripCandidatesSearchId,
+    )
+    : integrationInstancesServer.junctionMobileApi.trips.createTripCandidatesSearch({
+      sessionToken: searchData.sessionToken,
+      criteria: [
+        {
+          departureAfter: searchData.departureAfter,
+          origin: origin.coordinates,
+          destination: destination.coordinates,
+        },
+      ],
+      passengers: parsePassengers(searchData.passengers),
+    }));
 
-  try {
-    // prettier-ignore
-    const tripCandidatesSearch = searchData.tripCandidatesSearchId
-      ?
-      await integrationInstancesServer.junctionMobileApi.trips.getTripCandidatesSearch(
-        searchData.tripCandidatesSearchId,
-      )
-      : await integrationInstancesServer.junctionMobileApi.trips.createTripCandidatesSearch({
-        passengers: parsePassengers(searchData.passengers),
-        criteria: [
-          {
-            departureAfter: new Date(searchData.departureAfter),
-            destination: destination.coordinates,
-            origin: origin.coordinates,
-          },
-        ],
-      });
+  setSearchData({ ...searchData, tripCandidatesSearchId: tripCandidatesSearch.id }, event);
 
-    searchData.tripCandidatesSearchId = tripCandidatesSearch.id;
-    event.cookies.set(SEARCH_TOKEN, jwt.sign(JSON.stringify(searchData), JWT_SIGNATURE), {
-      path: "/",
-      httpOnly: true,
-      sameSite: "strict",
-    });
-
-    return {
+  return {
+    searchData: {
+      sessionToken: searchData.sessionToken,
       origin,
       destination,
+      departureAfter: searchData.departureAfter,
+      passengers: searchData.passengers,
       tripCandidatesSearch,
-      selectedOffer:
-        searchData.offerId && searchData.optionIds
-          ? {
-              offerId: searchData.offerId,
-              optionIds: searchData.optionIds,
-            }
-          : undefined,
-    };
-  } catch (err) {
-    event.cookies.delete(SEARCH_TOKEN, { path: "/", httpOnly: true, sameSite: "strict" });
-
-    return { origin, destination };
-  }
+    },
+    selectedOffer:
+      searchData.offerId && searchData.optionIds
+        ? { offerId: searchData.offerId, optionIds: searchData.optionIds }
+        : undefined,
+  };
 }
 
 export const actions = {
@@ -123,8 +61,8 @@ export const actions = {
     | { status: Exclude<TripCandidatesSearchStatus, "completed"> }
     | { status: "completed"; offers: OfferModel[] }
   > {
-    const formData = await event.request.formData();
-    const tripCandidatesSearchId = formData.get("tripCandidatesSearchId")?.toString();
+    const searchdata = getSearchData(event);
+    const tripCandidatesSearchId = searchdata?.tripCandidatesSearchId;
 
     if (!tripCandidatesSearchId) {
       return { status: "failed" };
@@ -147,29 +85,25 @@ export const actions = {
     return { status: tripCandidatesSearch.status };
   },
   async select(event): Promise<void> {
-    const token = event.cookies.get(SEARCH_TOKEN);
     const formData = await event.request.formData();
+    const searchData = getSearchData(event);
     const offerId = formData.get("offerId")?.toString();
     const optionIds = formData.get("optionIds")?.toString().split(",");
 
-    if (!(token && offerId && optionIds)) {
+    if (!searchData || !offerId || !optionIds) {
+      return;
+    }
+
+    if (searchData.offerId === offerId && searchData.optionIds?.join(",") === optionIds.join(",")) {
       return;
     }
 
     const priceQuote = await integrationInstancesServer.junctionMobileApi.offers.createPriceQuote({
+      sessionToken: searchData.sessionToken,
       offerId,
       optionIds,
     });
 
-    const existingSearch = jwt.decode(token) as SearchData;
-    existingSearch.offerId = offerId;
-    existingSearch.optionIds = optionIds;
-    existingSearch.quoteId = priceQuote.id;
-
-    event.cookies.set(SEARCH_TOKEN, jwt.sign(existingSearch, JWT_SIGNATURE), {
-      path: "/",
-      httpOnly: true,
-      sameSite: "strict",
-    });
+    setSearchData({ ...searchData, offerId, optionIds, priceQuoteId: priceQuote.id }, event);
   },
 };

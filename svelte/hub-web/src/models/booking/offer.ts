@@ -114,4 +114,6 @@ export interface OfferPriceQuoteModel {
   status: TripOfferPriceQuoteStatus;
   offerId: string;
   optionIds: string[];
+  options?: OfferGroupOptionModel[];
+  groupDetails?: OfferGroupDetailsModel;
 }

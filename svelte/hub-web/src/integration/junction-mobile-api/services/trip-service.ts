@@ -1,5 +1,5 @@
 import type { TripCandidatesModel } from "models/booking/trip";
-import type { CreateTripCandidatesModel } from "../models/trip";
+import type { CreateTripCandidatesModel } from "../models";
 import {
   parseCreateTripCandidatesSearchModel,
   parseCreateTripCandidatesSearchResponseSchema,

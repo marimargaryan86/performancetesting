@@ -21,6 +21,7 @@ import type {
   TripOfferPriceQuoteSchema,
   LegTypeSchema,
   CabinClassSchema,
+  GetOfferPriceQuoteResponseSchema,
 } from "../schemas/offer";
 import { parsePriceBreakdownSchema, parsePriceSchema } from "./money";
 import { parsePointSchema } from "./common";
@@ -150,7 +151,13 @@ export function parseOfferSchema(
   };
 }
 
-export function parsePriceQuoteSchema(data: TripOfferPriceQuoteSchema): OfferPriceQuoteModel {
+export function parsePriceQuoteSchema(
+  data: TripOfferPriceQuoteSchema,
+  offerGroups?: OfferGroupModel[],
+): OfferPriceQuoteModel {
+  // eslint-disable-next-line no-console
+  console.log(offerGroups);
+
   return {
     id: data.id,
     expiresAt: new Date(data.attributes.expiresAt),
@@ -163,4 +170,48 @@ export function parsePriceQuoteSchema(data: TripOfferPriceQuoteSchema): OfferPri
     status: data.attributes.status,
     price: data.attributes.price ? parsePriceSchema(data.attributes.price) : undefined,
   };
+}
+
+export function parseGetPriceQuoteSchema(
+  data: GetOfferPriceQuoteResponseSchema,
+): OfferPriceQuoteModel {
+  const cabinClasses: CabinClassSchema[] = [];
+  const offerOptionDetails: TripOfferOptionDetailsSchema[] = [];
+  const offerOptions: OfferOptionSchema[] = [];
+  const legTypes: LegTypeSchema[] = [];
+  const offerGroupDetails: TripOfferGroupDetailsSchema[] = [];
+  const offerGroups: OfferGroupSchema[] = [];
+
+  data.included?.forEach((item) => {
+    if (item.type === "cabin-classes") {
+      cabinClasses.push(item);
+    } else if (item.type === "trip-offer-option-details") {
+      offerOptionDetails.push(item);
+    } else if (item.type === "offer-options") {
+      offerOptions.push(item);
+    } else if (item.type === "leg-types") {
+      legTypes.push(item);
+    } else if (item.type === "trip-offer-group-details") {
+      offerGroupDetails.push(item);
+    } else {
+      offerGroups.push(item);
+    }
+  });
+
+  const cabinClasses_ = cabinClasses.map(parseCabinClassSchema);
+  const offerOptionDetails_ = offerOptionDetails.map((item) =>
+    parseOfferOptionDetailsSchema(item, cabinClasses_),
+  );
+  const offerOptions_ = offerOptions.map((item) =>
+    parseOfferOptionSchema(item, offerOptionDetails_),
+  );
+  const legTypes_ = legTypes.map(parseLegTypeSchema);
+  const offerGroupDetails_ = offerGroupDetails.map((item) =>
+    parseOfferGroupDetailsSchema(item, legTypes_),
+  );
+  const offerGroups_ = offerGroups.map((item) =>
+    parseOfferGroupSchema(item, offerOptions_, offerGroupDetails_),
+  );
+
+  return parsePriceQuoteSchema(data.data, offerGroups_);
 }
