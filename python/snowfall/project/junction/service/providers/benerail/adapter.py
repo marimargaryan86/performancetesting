@@ -405,6 +405,11 @@ class BenerailAdapter(object):  # noqa: WPS214
                 offer_res.response_result.price.currency.upper(),
             ),
         ).protobuf()
+        comfort_class_name = (
+            await self._resolve_marketing_name(comfort_class_value)
+            if comfort_class_value
+            else ""
+        )
 
         return offer_models_pb2.Offer(
             id=await self._offers_cache.store(
@@ -430,11 +435,7 @@ class BenerailAdapter(object):  # noqa: WPS214
                             comfort_class_value,
                             "benerail",
                         ),
-                        marketing_name=(
-                            await self._resolve_marketing_name(comfort_class_value)
-                            if comfort_class_value
-                            else ""
-                        ),
+                        marketing_name=comfort_class_name,
                     ),
                 ),
             ],
@@ -445,13 +446,7 @@ class BenerailAdapter(object):  # noqa: WPS214
                     breakdown_type=offer_models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_BASE_FARE,
                 ),
             ],
-            brand_name=(
-                str(
-                    offer_res.response_result.comfort_class.comfort_class_value,
-                )
-                if offer_res.response_result.comfort_class is not None
-                else ""
-            ),
+            brand_name=comfort_class_name,
         )
 
     @asyncstdlib.lru_cache()

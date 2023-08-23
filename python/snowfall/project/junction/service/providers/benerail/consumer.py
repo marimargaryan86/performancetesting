@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 
 from snowfall.project.junction.go.service.offers.v1 import (
@@ -26,7 +27,8 @@ from snowfall.vendor.benerail import client
 from snowfall.vendor.benerail.models import etag
 
 _PROVIDER_NAME = "Benerail"
-_RETRY_TTL = datetime.timedelta(hours=2)
+_RETRY_TTL = datetime.timedelta(hours=1)
+_RETRY_AFTER_SECONDS = 120
 
 
 class NotificationsConsumer(object):
@@ -103,6 +105,8 @@ class NotificationsConsumer(object):
             message.body.created_at,
         )
         time_passed = datetime.datetime.now(datetime.UTC) - created_at
+
+        await asyncio.sleep(_RETRY_AFTER_SECONDS)
 
         if time_passed > _RETRY_TTL:
             self._logger.error(
