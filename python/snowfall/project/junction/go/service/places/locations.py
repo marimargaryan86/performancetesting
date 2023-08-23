@@ -49,11 +49,10 @@ def resolve_osm_properties(  # noqa: WPS231, WPS210
     if properties.get("railway") == "station":
         useful_properties["type"] = models_pb2.Location.Type.TYPE_RAILWAY_STATION
         useful_properties["distance"] = _MAX_DISTANCE_GENERAL_TRANSPORT_M
-    elif properties.get("aeroway") == "aerodrome":
-        if iata:
-            useful_properties["iata"] = iata
-            useful_properties["type"] = models_pb2.Location.Type.TYPE_AIRPORT
-            useful_properties["distance"] = _MAX_DISTANCE_AIRPORT_M
+    elif properties.get("aeroway") == "aerodrome" and iata and len(iata) == 3:
+        useful_properties["iata"] = iata
+        useful_properties["type"] = models_pb2.Location.Type.TYPE_AIRPORT
+        useful_properties["distance"] = _MAX_DISTANCE_AIRPORT_M
     elif properties.get("amenity") == "bus_station":
         useful_properties["type"] = models_pb2.Location.Type.TYPE_BUS_STATION
         useful_properties["distance"] = _MAX_DISTANCE_BUS_STATION_M
