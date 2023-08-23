@@ -49,7 +49,7 @@ CREATE_TRANSACTION_RESPONSE = MappingProxyType(
                         "currency": "SEK",
                         "amount": 0,
                     },
-                    "fxProviderMargin": {
+                    "processingMargin": {
                         "currency": "SEK",
                         "amount": 0,
                     },
@@ -59,6 +59,7 @@ CREATE_TRANSACTION_RESPONSE = MappingProxyType(
                     "fxBuffer": 0,
                     "salesMarkup": 0,
                     "fxMarkup": 0,
+                    "processingMarkup": 0,
                 },
             },
             "relationships": {

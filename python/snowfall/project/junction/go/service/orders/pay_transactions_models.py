@@ -20,7 +20,7 @@ class PayTransactionAmounts(PayBaseModel):
     base_converted: PayTransactionMoney = Field(alias="baseConverted")
     sales_margin: PayTransactionMoney = Field(alias="salesMargin")
     fx_margin: PayTransactionMoney = Field(alias="fxMargin")
-    fx_provider_margin: PayTransactionMoney = Field(alias="fxProviderMargin")
+    processing_margin: PayTransactionMoney = Field(alias="processingMargin")
 
 
 class PayTransactionRates(PayBaseModel):
@@ -28,6 +28,7 @@ class PayTransactionRates(PayBaseModel):
     fx_buffer: float = Field(alias="fxBuffer")
     sales_markup: float = Field(alias="salesMarkup")
     fx_markup: float = Field(alias="fxMarkup")
+    processing_markup: float = Field(alias="processingMarkup")
 
 
 class PayTransactionAttributes(PayBaseModel):
