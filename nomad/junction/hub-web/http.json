@@ -6,17 +6,20 @@
       "traefik_host_URL": "hub.junction.dev",
       "api_pay_base_url": "https://api.pay.junction.dev",
       "pay_admin_api_base_url": "https://adminapi.pay.junction.dev",
-      "client_api_base_url": "https://api.junction.dev"
+      "client_api_base_url": "https://api.junction.dev",
+      "booking_hub_api_base_url": "https://booking-hub-mobile-api.junction.dev"
     }
   },
   "production": {
+    "deploy": false,
     "variables": {
       "count": 2,
       "traefik_entrypoints": "web",
       "traefik_host_URL": "hub.junction.travel",
       "api_pay_base_url": "https://api.pay.junction.travel",
       "pay_admin_api_base_url": "https://adminapi.pay.junction.travel",
-      "client_api_base_url": "https://api.junction.travel"
+      "client_api_base_url": "https://api.junction.travel",
+      "booking_hub_api_base_url": "https://booking-hub-mobile-api.junction.travel"
     }
   },
   "sandbox": {
@@ -26,7 +29,8 @@
       "traefik_host_URL": "hub.sandbox.junction.dev",
       "api_pay_base_url": "https://api.pay.sandbox.junction.dev",
       "pay_admin_api_base_url": "https://adminapi.pay.sandbox.junction.dev",
-      "client_api_base_url": "https://api.sandbox.junction.dev"
+      "client_api_base_url": "https://api.sandbox.junction.dev",
+      "booking_hub_api_base_url": "https://booking-hub-mobile-api.sandbox.junction.dev"
     }
   }
 }

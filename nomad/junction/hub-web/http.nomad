@@ -46,6 +46,10 @@ variable "client_api_base_url" {
   type = string
 }
 
+variable "booking_hub_api_base_url" {
+  type = string
+}
+
 job "hub-web-http" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -117,6 +121,7 @@ job "hub-web-http" {
 {{ with secret "kv/data/${var.environment}/hub-web" }}
 CLIENT_API_KEY={{ .Data.data.client_api_key }}
 PUBLIC_STRIPE_KEY={{ .Data.data.public_stripe_key }}
+BOOKING_HUB_API_KEY={{ .Data.data.booking_hub_api_key }}
 {{ end }}
 EOH
       }
@@ -138,6 +143,7 @@ EOH
         PUBLIC_PAY_ADMIN_API_BASE_URL = "${var.pay_admin_api_base_url}"
         PUBLIC_PAY_API_BASE_URL       = "${var.api_pay_base_url}"
         CLIENT_API_BASE_URL           = "${var.client_api_base_url}"
+        BOOKING_HUB_API_BASE_URL      = "${var.booking_hub_api_base_url}"
       }
     }
   }
