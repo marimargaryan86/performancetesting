@@ -96,6 +96,6 @@
     flex-grow: 1;
     padding: 24px;
     overflow: auto;
-    background-image: var(--color-gradient-booking-flow);
+    background-image: var(--color-gradient-extensions-horizontal);
   }
 </style>

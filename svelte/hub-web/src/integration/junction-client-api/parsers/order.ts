@@ -39,7 +39,7 @@ export function parseOrder(order: OrderSchema, journeys: JourneySchema[]): Order
           postalCode: item.attributes.contactDetails.address.postalCode,
         },
         email: item.attributes.contactDetails.email,
-        poneNumber: item.attributes.contactDetails.phoneNumber,
+        phoneNumber: item.attributes.contactDetails.phoneNumber,
       },
     })),
   };

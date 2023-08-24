@@ -20,7 +20,7 @@
   import AccountsIcon from "components/icons/accounts-icon.svelte";
   import ActivityIcon from "components/icons/activity-icon.svelte";
   import DashboardIcon from "components/icons/dashboard-icon.svelte";
-  import BookIcon from "components/icons/book-icon.svelte";
+  import TicketIcon from "components/icons/ticket-icon.svelte";
   import { page } from "$app/stores";
   import { slide } from "svelte/transition";
   import ChevronIcon from "components/icons/chevron-icon.svelte";
@@ -42,7 +42,7 @@
       type: "menu-item",
       url: routeConfig.book.root,
       label: "Book",
-      icon: BookIcon,
+      icon: TicketIcon,
     },
     {
       type: "sub-menu",

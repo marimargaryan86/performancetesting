@@ -8,6 +8,7 @@
   import { browser } from "$app/environment";
   import routeConfig from "routeConfig";
   import { callAction } from "utils/common";
+  import { getTimeDeltaMs } from "utils/date-time.js";
 
   export let data;
 
@@ -20,7 +21,7 @@
   function setLogoutTimer(timeoutAt: Date): void {
     window.clearTimeout(logoutTimer);
 
-    logoutTimer = window.setTimeout(callAction, timeoutAt.getTime() - new Date().getTime(), {
+    logoutTimer = window.setTimeout(callAction, getTimeDeltaMs(timeoutAt, new Date()), {
       action: `${routeConfig.login}?/logout`,
     });
   }

@@ -3,13 +3,14 @@
   import EntityAvatar from "components/ui/entity-avatar.svelte";
   import { formatDuration } from "formatting/date-time";
   import type { LegModel } from "models/booking";
+  import { getTimeDeltaS } from "utils/date-time";
 
   export let leg: LegModel;
   export let operator: string | undefined;
   export let cabinClass: string | undefined;
   export let direction: string;
 
-  $: duration = (leg.arrivalAt.getTime() - leg.departureAt.getTime()) / 1000;
+  $: duration = getTimeDeltaS(leg.arrivalAt, leg.departureAt);
 </script>
 
 <div class="trip">

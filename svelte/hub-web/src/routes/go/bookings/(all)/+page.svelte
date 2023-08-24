@@ -1,6 +1,5 @@
 <script lang="ts">
   import Header from "components/ui/table/header.svelte";
-  import TActionsCol from "components/ui/table/t-actions-col.svelte";
   import TBody from "components/ui/table/t-body.svelte";
   import TCol from "components/ui/table/t-col.svelte";
   import TCompanyCol from "components/ui/table/t-company-col.svelte";
@@ -9,31 +8,19 @@
   import TRow from "components/ui/table/t-row.svelte";
   import Table from "components/ui/table/table.svelte";
   import TransactionStatusBadge from "components/ui/transaction-status-badge.svelte";
-  import Alert from "components/ui/alert.svelte";
-  import TripletIcon from "components/icons/triplet-icon.svelte";
   import type { FlattenedObject } from "utils/common";
   import type { TransactionModel } from "models/transaction";
   import type { DirectionY } from "models/spatial";
-  import { onMount } from "svelte";
 
   const bookings: string[] = ["a", "b", "c", "d", "e"];
 
   let sortGroup: FlattenedObject<TransactionModel> = "createdAt";
   let sortDirection: DirectionY = "down";
-  let alert: { type: "success" | "failed"; message: string } | undefined = undefined;
-
-  onMount(() => {
-    alert = history.state?.alert;
-  });
 </script>
 
 <svelte:head>
   <title>All · Bookings · Go · Junction Hub</title>
 </svelte:head>
-
-{#if alert}
-  <Alert type={alert.type}>{alert.message}</Alert>
-{/if}
 
 <div class="content">
   <Table class="bookings-table">
@@ -48,7 +35,6 @@
       <Header>Total Price</Header>
       <Header bind:sortGroup bind:sortDirection sortValue="status">Booking Status</Header>
       <Header bind:sortGroup bind:sortDirection>Refund Status</Header>
-      <Header />
     </THead>
 
     <TBody>
@@ -66,9 +52,6 @@
             <TransactionStatusBadge value="pending" />
           </TCol>
           <TCol maxWidth="96px" class="green">View</TCol>
-          <TActionsCol>
-            <TripletIcon />
-          </TActionsCol>
         </TRow>
       {/each}
     </TBody>

@@ -18,10 +18,12 @@
   function getActiveStep(route: string | null): number {
     if (route?.endsWith("select-offer")) {
       return 2;
-    } else if (route?.endsWith("passenger-details")) {
-      return 4;
     } else if (route?.endsWith("payment")) {
       return 3;
+    } else if (route?.endsWith("passenger-details")) {
+      return 4;
+    } else if (route?.endsWith("confirmation")) {
+      return 5;
     }
 
     return 1;
@@ -29,7 +31,7 @@
 </script>
 
 <div class="header">
-  <h1 class="typography headline-medium bold">{title ?? ""}</h1>
+  <h1 class="typography headline-medium bold">{title}</h1>
 </div>
 
 <StepView {steps} {activeStep} />

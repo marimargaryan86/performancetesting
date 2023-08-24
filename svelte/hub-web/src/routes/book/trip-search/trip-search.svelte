@@ -30,7 +30,6 @@
 </script>
 
 <script lang="ts">
-  import SearchIcon from "components/icons/book-search-icon.svelte";
   import DatePicker from "components/ui/date-picker/date-picker.svelte";
   import PassengerPicker, { passengerPickerData } from "./passenger-picker/passenger-picker.svelte";
   import routeConfig from "routeConfig";
@@ -43,6 +42,7 @@
   import { createEventDispatcher } from "svelte";
   import { z } from "zod";
   import { URLExtended } from "utils/url";
+  import SearchIcon from "components/icons/search-icon.svelte";
 
   export let data: PartialTripSearchData = {
     passengers: {

@@ -24,6 +24,7 @@
   import type { OfferGroupOptionModel, OfferModel } from "models/booking/offer";
   import AlternativeFares from "./alternative-fares.svelte";
   import { createEventDispatcher } from "svelte";
+  import { getTimeDeltaS } from "utils/date-time";
 
   export let offer: OfferModel;
   export let selectedOptionIds: string[] | undefined;
@@ -73,7 +74,7 @@
 
 <div class="offer" class:selected>
   {#each offer.groups as group, groupIdx}
-    {@const operator = group.details[0]?.vendor ?? "Unknown"}
+    {@const operator = group.details[0]?.operator ?? "Unknown"}
     {@const stopCount = group.details[0]?.legs.length ?? 1}
 
     <div class="group">
@@ -99,7 +100,7 @@
 
                 <span class="line" />
                 <span class="duration typography body-small">
-                  {formatDuration((leg.arrivalAt.getTime() - leg.departureAt.getTime()) / 1000)}
+                  {formatDuration(getTimeDeltaS(leg.arrivalAt, leg.departureAt))}
                 </span>
                 <span />
 

@@ -1,27 +1,32 @@
 <script lang="ts">
-  import RoundCheckIcon from "components/icons/round-check-icon.svelte";
-  import CloseIcon from "components/icons/croses-close-icon.svelte";
-  import { createEventDispatcher } from "svelte";
+  import CloseIcon from "components/icons/close-icon.svelte";
+  import { slideFade } from "transitions/slide-fade";
 
-  const dispatch = createEventDispatcher<{ close: void }>();
-  export let type: "success" | "failed" = "success";
+  export let type: "success" | "error" | "warning" = "success";
+  export let show = true;
+  let className: string | undefined = undefined;
+  export { className as class };
 
-  let expanded = true;
   function close(): void {
-    expanded = false;
-    dispatch("close");
+    show = false;
   }
 </script>
 
-{#if expanded}
-  <div class="alert typography body-medium" class:success={type === "success"}>
-    <RoundCheckIcon color="var(--color-main-primary-500)" />
-    {#if type === "success"}
-      <span class="typography bold">Success!</span>
-    {/if}
-    <slot />
+{#if show}
+  <div
+    class={className}
+    class:alert={true}
+    class:success={type === "success"}
+    class:warning={type === "warning"}
+    class:error={type === "error"}
+    transition:slideFade={{ duration: 300 }}
+  >
+    <div class="content">
+      <slot />
+    </div>
+
     <button on:click={close}>
-      <CloseIcon />
+      <CloseIcon variant="cross" />
     </button>
   </div>
 {/if}
@@ -29,25 +34,48 @@
 <style>
   .alert {
     display: flex;
-    flex-direction: row;
     gap: 8px;
     align-items: center;
-    max-height: 62px;
-    margin-bottom: 16px;
-    padding: 18px;
-    background-color: var(--color-semantic-success-100);
-    border: 1px solid var(--color-semantic-success-600);
+    justify-content: space-between;
+    padding: 16px;
+    border: 1px solid transparent;
     border-radius: 16px;
+    transition: border-color 200ms ease, background-color 200ms ease;
   }
 
-  .alert :last-child {
+  .alert.success {
+    background-color: var(--color-semantic-success-100);
+    border-color: var(--color-semantic-success-600);
+  }
+
+  .alert.error {
+    background-color: var(--color-semantic-error-100);
+    border-color: var(--color-semantic-error-600);
+  }
+
+  .alert.warning {
+    background-color: var(--color-semantic-warning-100);
+    border-color: var(--color-semantic-warning-600);
+  }
+
+  .content {
     display: flex;
-    margin-left: auto;
-    cursor: pointer;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .content > :global(*) {
+    flex-shrink: 0;
   }
 
   button {
+    padding: 0;
     background-color: transparent;
     border: 0;
+    cursor: pointer;
+  }
+
+  button > :global(svg) {
+    vertical-align: top;
   }
 </style>

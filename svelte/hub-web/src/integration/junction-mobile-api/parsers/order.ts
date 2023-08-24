@@ -1,6 +1,14 @@
-import type { OrderModel, OrderPassengerModel, TravelerDocumentModel } from "models/booking/order";
+import type {
+  BookingModel,
+  JourneyModel,
+  OrderModel,
+  OrderPassengerModel,
+  TravelerDocumentModel,
+} from "models/booking/order";
 import type { CreateOrderModel } from "../models";
 import type {
+  BookingDetailsSchema,
+  BookingSchema,
   CreateOrderRequestSchema,
   CreateOrderResponseSchema,
   GetOrderResponseSchema,
@@ -11,9 +19,8 @@ import type {
 import { parseJourneySchema } from "./journey";
 import { parseCabinClassSchema, parseLegTypeSchema } from "./offer";
 import { parseBookingDetailsSchema, parseBookingSchema } from "./booking";
-import type { JourneyModel } from "models/order";
-import type { CabinClassModel, LegTypeModel } from "models/booking/offer";
-import type { BookingDetailsModel } from "models/booking";
+import type { JourneySchema } from "../schemas/journey";
+import type { CabinClassSchema, LegTypeSchema } from "../schemas/offer";
 
 export function parseTravelerDocumentModel(
   data: NonNullable<CreateOrderModel["passengers"][number]["travelerDocument"]>,
@@ -86,40 +93,60 @@ export function parseOrderPassengerSchema(data: OrderPassengerSchema): OrderPass
   };
 }
 
-export function parseOrderSchema(data: OrderSchema): OrderModel {
+export function parseOrderSchema(
+  data: OrderSchema,
+  journeys: JourneyModel[],
+  bookings: BookingModel[],
+): OrderModel {
+  const bookingIds = data.relationships.bookings.data.map((item) => item.id);
+
   return {
     id: data.id,
     passengers: data.attributes.passengers.map((item) => parseOrderPassengerSchema(item)),
-    bookingIds: data.relationships.bookings.data.map((item) => item.id),
+    bookingIds,
+    bookings: bookings.filter((item) => bookingIds.includes(item.id)),
     journeyId: data.relationships.journey.data.id,
+    journey: journeys.find((item) => item.id === data.relationships.journey.data.id),
     paymentId: data.relationships.payment.data.id,
   };
 }
 
 export function parseCreateOrderResponseSchema(data: CreateOrderResponseSchema): OrderModel {
-  return parseOrderSchema(data.data);
+  return parseOrderSchema(data.data, [], []);
 }
 
 export function parseGetOrderResponseSchema(data: GetOrderResponseSchema): OrderModel {
-  const journeys: JourneyModel[] = [];
-  const cabinClasses: CabinClassModel[] = [];
-  const legTypes: LegTypeModel[] = [];
-  const bookingDetails: BookingDetailsModel[] = [];
-  const bookings: unknown[] = [];
+  const journeys: JourneySchema[] = [];
+  const cabinClasses: CabinClassSchema[] = [];
+  const legTypes: LegTypeSchema[] = [];
+  const bookingDetails: BookingDetailsSchema[] = [];
+  const bookings: BookingSchema[] = [];
 
   data.included?.forEach((item) => {
     if (item.type === "journeys") {
-      journeys.push(parseJourneySchema(item));
+      journeys.push(item);
     } else if (item.type === "cabin-classes") {
-      cabinClasses.push(parseCabinClassSchema(item));
+      cabinClasses.push(item);
     } else if (item.type === "leg-types") {
-      legTypes.push(parseLegTypeSchema(item));
+      legTypes.push(item);
     } else if (item.type === "trip-booking-details") {
-      bookingDetails.push(parseBookingDetailsSchema(item));
+      bookingDetails.push(item);
     } else if (item.type === "trip-bookings") {
-      bookings.push(parseBookingSchema(item));
+      bookings.push(item);
     }
   });
 
-  return parseOrderSchema(data.data);
+  const journeys_ = journeys.map((item) => parseJourneySchema(item, []));
+  const cabinClasses_ = cabinClasses.map(parseCabinClassSchema);
+  const legTypes_ = legTypes.map(parseLegTypeSchema);
+  const bookingDetails_ = bookingDetails.map((item) =>
+    parseBookingDetailsSchema(item, {
+      bookings: [],
+      cabinClasses: cabinClasses_,
+      legTypes: legTypes_,
+    }),
+  );
+  const bookings_ = bookings.map((item) => parseBookingSchema(item, bookingDetails_, []));
+
+  return parseOrderSchema(data.data, journeys_, bookings_);
 }

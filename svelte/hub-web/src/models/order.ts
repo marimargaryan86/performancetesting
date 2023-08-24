@@ -25,7 +25,7 @@ export interface JourneyModel {
       postalCode: string;
       city: string;
     };
-    poneNumber: string;
+    phoneNumber: string;
   };
 }
 

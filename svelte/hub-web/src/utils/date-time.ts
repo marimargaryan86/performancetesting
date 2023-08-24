@@ -50,3 +50,11 @@ export function getMonthLength(date: Date): number {
 export function datesEq(date1: Date, date2: Date): boolean {
   return date1.getTime() === date2.getTime();
 }
+
+export function getTimeDeltaMs(date1: Date, date2: Date): number {
+  return Math.abs(date1.getTime() - date2.getTime());
+}
+
+export function getTimeDeltaS(date1: Date, date2: Date): number {
+  return Math.floor(getTimeDeltaMs(date1, date2) / 1000);
+}

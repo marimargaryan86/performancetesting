@@ -1,7 +1,4 @@
 <script lang="ts">
-  import MinusPassengerIcon from "components/icons/minus-passenger-icon.svelte";
-  import PlusPassengerIcon from "components/icons/plus-passenger-icon.svelte";
-
   export let label: string;
   export let amount: number;
 
@@ -18,15 +15,11 @@
   <strong class="typography label-large">{label}</strong>
 
   <div class="counter">
-    <button class="counter-btn" on:click={decrement} type="button">
-      <MinusPassengerIcon color="var(--color-common-dark-strong)" />
-    </button>
+    <button class="counter-btn" on:click={decrement} type="button"> - </button>
 
     <span class="typography body-medium">{amount}</span>
 
-    <button on:click={increment} type="button">
-      <PlusPassengerIcon color="var(--color-common-dark-strong)" />
-    </button>
+    <button on:click={increment} type="button"> + </button>
   </div>
 </div>
 
@@ -55,6 +48,7 @@
     justify-content: center;
     width: 30px;
     height: 30px;
+    color: var(--color-common-dark-strong);
     background-color: var(--color-main-primary-500);
     border: 0;
     border-radius: 8px;
