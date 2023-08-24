@@ -40,7 +40,7 @@ export class OrderService extends JunctionMobileApiService {
           "bookings.details",
           "bookings.details.cabinClass",
           "bookings.details.legType",
-        ],
+        ].join(","),
       },
     });
 

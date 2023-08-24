@@ -46,6 +46,7 @@
   import BankAccountDetails from "./bank-account-details.svelte";
   import Summary from "./summary.svelte";
   import { slide } from "svelte/transition";
+  import { URLExtended } from "utils/url";
 
   export let data;
 
@@ -66,26 +67,12 @@
   ];
 
   async function goToPrevious(): Promise<void> {
-    const url = new URL($page.url);
-    const { prev } = steps[step];
-
-    if (prev) {
-      url.searchParams.set("step", prev);
-    }
-
-    await goto(url);
+    await goto(new URLExtended($page.url, { query: { step: steps[step].prev } }));
   }
 
   async function goToNext(): Promise<void> {
-    const url = new URL($page.url);
-    const { next } = steps[step];
-
-    if (next) {
-      url.searchParams.set("step", next);
-    }
-
     if ((await stepComponent?.validate()) ?? true) {
-      await goto(url);
+      await goto(new URLExtended($page.url, { query: { step: steps[step].next } }));
     }
   }
 

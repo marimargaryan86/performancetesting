@@ -28,7 +28,8 @@
   import Passengers, { type PassengerData } from "./passengers.svelte";
   import ContactInformation, { type ContactInformationData } from "./contact-information.svelte";
   import { goto } from "$app/navigation";
-  import type { PassengerCountData } from "../common";
+  import type { PassengerCountData, ResolvedSearchData } from "../common";
+  import { URLExtended } from "utils/url";
 
   export let data;
 
@@ -49,16 +50,18 @@
     getPriceQuoteTask = pollPriceQuote(priceQuoteId);
   }
 
-  function getBackUrl(searchData: typeof data.searchData): URL {
-    const url = new URL(routeConfig.book.select.root, $page.url.origin);
-    url.searchParams.set("origin", searchData.origin.id);
-    url.searchParams.set("destination", searchData.destination.id);
-    url.searchParams.set("adults", searchData.passengers.adults.toString());
-    url.searchParams.set("children", searchData.passengers.children.toString());
-    url.searchParams.set("infants", searchData.passengers.infants.toString());
-    url.searchParams.set("outbound", searchData.departureAfter.toLocaleDateString("sv-SE"));
-
-    return url;
+  function getBackUrl(searchData: ResolvedSearchData): URL {
+    return new URLExtended(routeConfig.book.select.root, {
+      base: $page.url.origin,
+      query: {
+        origin: searchData.origin.id,
+        destination: searchData.destination.id,
+        adults: searchData.passengers.adults,
+        children: searchData.passengers.children,
+        infants: searchData.passengers.infants,
+        outbound: searchData.departureAfter.toLocaleDateString("sv-SE"),
+      },
+    });
   }
 
   async function pollPriceQuote(id: string): Promise<OfferPriceQuoteModel | undefined> {

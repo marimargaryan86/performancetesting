@@ -1,4 +1,14 @@
 <script lang="ts" context="module">
+  export const tripSearchQueryData = z.object({
+    origin: z.string().uuid(),
+    destination: z.string().uuid(),
+    outbound: z.date({ coerce: true }),
+    inbound: z.date({ coerce: true }).optional(),
+    adults: z.number({ coerce: true }).min(1),
+    children: z.number({ coerce: true }).min(0),
+    infants: z.number({ coerce: true }).min(0),
+  });
+
   export const tripSearchData = z.object({
     passengers: passengerPickerData,
     originId: z.string({ required_error: "Origin is mandatory" }).uuid(),
@@ -88,12 +98,16 @@
 
     dispatch(
       "search",
-      new URLExtended(routeConfig.book.select.root, $page.url.origin, {
-        outbound: parsedData.outbound.toLocaleDateString("sv-SE"),
-        inbound: parsedData.inbound?.toLocaleDateString("sv-SE"),
-        origin: parsedData.originId,
-        destination: parsedData.destinationId,
-        ...parsedData.passengers,
+      new URLExtended(routeConfig.book.select.root, {
+        base: $page.url.origin,
+        query: {
+          outbound: parsedData.outbound.toLocaleDateString("sv-SE"),
+          inbound: parsedData.inbound?.toLocaleDateString("sv-SE"),
+          origin: parsedData.originId,
+          destination: parsedData.destinationId,
+          ...parsedData.passengers,
+        },
+        querySchema: tripSearchQueryData,
       }),
     );
   }

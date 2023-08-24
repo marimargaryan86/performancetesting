@@ -1,3 +1,5 @@
+import { URLExtended } from "utils/url";
+
 export default abstract class JunctionService {
   private readonly baseUrl: string;
 
@@ -20,24 +22,14 @@ export default abstract class JunctionService {
     resource: string,
     options: {
       method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
-      queryParams?: Record<string, unknown>;
+      queryParams?: Record<string, string | number | undefined>;
       headers?: Record<string, string>;
       data?: unknown;
       token?: string;
     } = {},
   ): Promise<Omit<Response, "json"> & { json: () => Promise<TResp> }> {
-    const url = new URL(resource, this.baseUrl);
-
-    if (options.queryParams) {
-      Object.entries(options.queryParams).forEach(([key, val]) => {
-        if (val !== undefined) {
-          url.searchParams.set(key, `${val}`);
-        }
-      });
-    }
-
     return fetch(
-      new Request(url, {
+      new Request(new URLExtended(resource, { base: this.baseUrl, query: options.queryParams }), {
         headers: {
           "Content-Type": "application/vnd.api+json",
           ...(options.token ? { Authorization: `Bearer ${options.token}` } : undefined),

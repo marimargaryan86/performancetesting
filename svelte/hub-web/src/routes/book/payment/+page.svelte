@@ -47,6 +47,7 @@
   import { env } from "$env/dynamic/public";
   import { goto } from "$app/navigation";
   import type { ActionPollReturnType } from "./+page.server";
+  import { URLExtended } from "utils/url";
 
   export let data;
 
@@ -78,15 +79,17 @@
   }
 
   function getBackUrl(searchData: typeof data.searchData): URL {
-    const url = new URL(routeConfig.book.select.root, $page.url.origin);
-    url.searchParams.set("origin", searchData.origin.id);
-    url.searchParams.set("destination", searchData.destination.id);
-    url.searchParams.set("adults", searchData.passengers.adults.toString());
-    url.searchParams.set("children", searchData.passengers.children.toString());
-    url.searchParams.set("infants", searchData.passengers.infants.toString());
-    url.searchParams.set("outbound", searchData.departureAfter.toLocaleDateString("sv-SE"));
-
-    return url;
+    return new URLExtended(routeConfig.book.select.root, {
+      base: $page.url.origin,
+      query: {
+        origin: searchData.origin.id,
+        destination: searchData.destination.id,
+        adults: searchData.passengers.adults.toString(),
+        children: searchData.passengers.children.toString(),
+        infants: searchData.passengers.infants.toString(),
+        outbound: searchData.departureAfter.toLocaleDateString("sv-SE"),
+      },
+    });
   }
 
   async function pollPriceQuote(id: string): Promise<void> {

@@ -4,6 +4,8 @@ import jwt from "jsonwebtoken";
 import { getRandomAlphaNumericString } from "utils/random";
 import type { TripCandidatesModel } from "models/booking/trip";
 import type { PaymentIntentModel } from "models/booking/payment";
+import { URLExtended } from "utils/url";
+import { tripSearchQueryData } from "./trip-search/trip-search.svelte";
 
 export const SEARCH_TOKEN = "search-token";
 export const JWT_SIGNATURE = "search-token";
@@ -52,37 +54,24 @@ function getTokenSearchData(event: RequestEvent): SearchData | undefined {
   return { ...searchData, departureAfter: new Date(searchData.departureAfter) };
 }
 
-// eslint-disable-next-line complexity
 function getQuerySearchData(event: RequestEvent): SearchData | undefined {
-  const originId = event.url.searchParams.get("origin")?.toString();
-  const destinationId = event.url.searchParams.get("destination")?.toString();
-  const departureAfter = new Date(event.url.searchParams.get("outbound")?.toString() ?? "");
-  const adults = Number(event.url.searchParams.get("adults")?.toString() ?? 0);
-  const children = Number(event.url.searchParams.get("children")?.toString() ?? 0);
-  const infants = Number(event.url.searchParams.get("infants")?.toString() ?? 0);
+  try {
+    const url = new URLExtended(event.url, { querySchema: tripSearchQueryData });
 
-  if (
-    !originId ||
-    !destinationId ||
-    isNaN(departureAfter.getTime()) ||
-    isNaN(adults) ||
-    isNaN(children) ||
-    isNaN(infants)
-  ) {
+    return {
+      sessionToken: getRandomAlphaNumericString(32),
+      originId: url.query.origin,
+      destinationId: url.query.destination,
+      departureAfter: url.query.outbound,
+      passengers: {
+        adults: url.query.adults,
+        children: url.query.children,
+        infants: url.query.infants,
+      },
+    };
+  } catch (err) {
     return undefined;
   }
-
-  return {
-    sessionToken: getRandomAlphaNumericString(32),
-    originId,
-    destinationId,
-    departureAfter,
-    passengers: {
-      adults,
-      children,
-      infants,
-    },
-  };
 }
 
 function searchDataEqual(searchData1: SearchData, searchData2: SearchData): boolean {

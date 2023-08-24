@@ -13,7 +13,7 @@ export default abstract class JunctionClientApiService extends JunctionService {
     resource: string,
     options: {
       method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
-      queryParams?: Record<string, unknown>;
+      queryParams?: Record<string, string | number | undefined>;
       headers?: Record<string, string>;
       data?: unknown;
     } = {},
