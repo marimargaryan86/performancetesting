@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 from collections.abc import Mapping, Sequence
 from typing import Any
 
@@ -44,7 +45,7 @@ class MockRepository(
     mixins.InsertMixin[dict[str, Any]],
     repository.DefaultRepository,
 ):
-    _indexes = (pymongo.IndexModel("field"),)
+    _indexes = (pymongo.IndexModel("field"), pymongo.IndexModel("created"))
 
     async def find_subset(
         self,
@@ -69,6 +70,7 @@ class NestedMockRepository(
     _indexes = (
         pymongo.IndexModel("nested._id"),
         pymongo.IndexModel("nested.field"),
+        pymongo.IndexModel("nested.created"),
     )
 
 
@@ -94,14 +96,24 @@ def nested_mock_repository(
 
 
 @pytest.fixture()
+def mock_db_values() -> list[dict[str, Any]]:
+    now = datetime.datetime.now(tz=datetime.UTC)
+
+    return [
+        {"_id": "2", "field": "A", "created": now - datetime.timedelta(hours=3)},
+        {"_id": "1", "field": "B", "created": now - datetime.timedelta(hours=4)},
+        {"_id": "3", "field": "C", "created": now - datetime.timedelta(hours=2)},
+        {"_id": "4", "field": "A", "created": now - datetime.timedelta(hours=1)},
+    ]
+
+
+@pytest.fixture()
 async def sorting_repository(
     mock_repository: MockRepository,
+    mock_db_values: Sequence[Mapping[str, Any]],
 ) -> MockRepository:
     await asyncio.gather(
-        mock_repository.insert({"_id": "2", "field": "A"}),
-        mock_repository.insert({"_id": "1", "field": "B"}),
-        mock_repository.insert({"_id": "3", "field": "C"}),
-        mock_repository.insert({"_id": "4", "field": "A"}),
+        *[mock_repository.insert(dict(db_value)) for db_value in mock_db_values],
     )
 
     return mock_repository
@@ -110,21 +122,22 @@ async def sorting_repository(
 @pytest.fixture()
 async def nested_sorting_repository(
     nested_mock_repository: NestedMockRepository,
+    mock_db_values: Sequence[Mapping[str, Any]],
 ) -> NestedMockRepository:
     await asyncio.gather(
         nested_mock_repository.insert(
             {
                 "nested": [
-                    {"_id": "2", "field": "A"},
-                    {"_id": "1", "field": "B"},
+                    mock_db_values[0],
+                    mock_db_values[1],
                 ],
             },
         ),
         nested_mock_repository.insert(
             {
                 "nested": [
-                    {"_id": "3", "field": "C"},
-                    {"_id": "4", "field": "A"},
+                    mock_db_values[2],
+                    mock_db_values[3],
                 ],
             },
         ),

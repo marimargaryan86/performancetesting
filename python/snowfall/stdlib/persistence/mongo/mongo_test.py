@@ -68,6 +68,8 @@ _TEST_DATA = (
     (("_id", pymongo.DESCENDING), ["4", "3", "2", "1"]),
     (("field", pymongo.ASCENDING), ["2", "4", "1", "3"]),
     (("field", pymongo.DESCENDING), ["3", "1", "2", "4"]),
+    (("created", pymongo.ASCENDING), ["1", "2", "3", "4"]),
+    (("created", pymongo.DESCENDING), ["4", "3", "2", "1"]),
 )
 
 

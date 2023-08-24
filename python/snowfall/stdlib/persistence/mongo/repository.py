@@ -6,6 +6,7 @@ from collections.abc import Callable, Mapping
 from typing import Any, Generic, Protocol, TypeVar
 
 import pymongo
+from bson import json_util
 from google.protobuf.message import Message
 from motor import core, motor_asyncio
 from pydantic import BaseModel
@@ -66,15 +67,17 @@ def with_cursor_filters(
         if "$or" not in cursor_filter:
             cursor_filter["$or"] = []
 
+        sort_value = json_util.loads(cursor_obj.sort_value)
+
         cursor_filter["$or"].append(
             {
-                sort[0]: {_DIRECTIONS[sort[1]]: cursor_obj.sort_value},
+                sort[0]: {_DIRECTIONS[sort[1]]: sort_value},
             },
         )
 
         cursor_filter["$or"].append(
             {
-                sort[0]: cursor_obj.sort_value,
+                sort[0]: sort_value,
                 prefixed_id: {_DIRECTIONS[pymongo.ASCENDING]: cursor_obj.id},
             },
         )

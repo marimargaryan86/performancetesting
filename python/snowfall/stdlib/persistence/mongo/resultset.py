@@ -3,6 +3,7 @@ from collections.abc import AsyncIterator, Mapping
 from typing import Any, Generic, Self, TypeVar, cast
 
 import pymongo
+from bson import json_util
 from motor import core, motor_asyncio
 
 from snowfall.stdlib.persistence import cursor
@@ -58,7 +59,7 @@ class ResultSet(abc.ABC, Generic[_Record], AsyncIterator[_Record]):
                 identifier=self._last or "",
                 filter_=self._filter,
                 sort=self._sort,
-                sort_value=self._last_sort_value,
+                sort_value=json_util.dumps(self._last_sort_value),
             ),
         )
 
