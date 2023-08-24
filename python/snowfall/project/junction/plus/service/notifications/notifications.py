@@ -5,7 +5,7 @@ import pymongo
 from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.persistence.mongo import mixins, repository
+from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 
 
 class OrderRepository(
@@ -46,6 +46,16 @@ class OrderRepository(
             raise RuntimeError()
 
         return persisted_order
+
+    async def find(
+        self,
+        identifier: str,
+        selector: str,
+    ) -> resultset.ResultSet[models_pb2.PersistedOrder]:
+        return await self._execute(
+            self._collection.find,
+            {selector: identifier},
+        )
 
 
 class SubscriberRepository(

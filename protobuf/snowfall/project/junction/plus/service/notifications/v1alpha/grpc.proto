@@ -9,6 +9,7 @@ option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/
 service OrderService {
   rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse) {}
   rpc GetOrder(GetOrderRequest) returns (GetOrderResponse) {}
+  rpc FindOrders(FindOrdersRequest) returns (FindOrdersResponse) {}
 }
 
 service SubscriberService {
@@ -52,6 +53,15 @@ message GetOrderRequest {
 
 message GetOrderResponse {
   snowfall.project.junction.plus.service.notifications.v1alpha.PersistedOrder order = 1;
+}
+
+message FindOrdersRequest {
+  string identifier = 1;
+  string selector = 2;
+}
+
+message FindOrdersResponse {
+  repeated snowfall.project.junction.plus.service.notifications.v1alpha.PersistedOrder orders = 1;
 }
 
 message GetSubscriberRequest {

@@ -1,18 +1,31 @@
 import datetime
 import json
+import time
 from collections.abc import Awaitable, Callable, Mapping, Sequence
 from gettext import gettext as _
 from typing import Any
 
 from snowfall.project.junction.plus.adapter import orders, subscribers
+from snowfall.project.junction.plus.notification_channels.order_utils import (
+    compress_flights,
+)
 from snowfall.project.junction.plus.notification_channels.whatsapp import (
     transform_trip_details,
 )
 from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
+from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.redis import types as redis
 
 _MessageHandlerFunctionType = Callable[..., Awaitable[Sequence[str]]]
+
+action_menu = _("Please select one of the following options")
+
+trip_details_menu = _(
+    "To enable auto check-in and save time at the airport please click the"
+    " *Check-in* button below. For further options please click on the *Main Menu*"
+    " button.",
+)
 
 
 class MessageHandler(object):
@@ -73,6 +86,8 @@ def message_handlers(fun: str) -> _MessageHandlerFunctionType:
         "unsubscribe": unsubscribe,
         "trip details": trip_details,
         "upcoming trips": upcoming_trips,
+        "main menu": main_menu,
+        "check-in": check_in,
     }.get(fun, handle_unknown)
 
 
@@ -109,7 +124,7 @@ async def subscribe(
                 "You have successfully subscribed on WhatsApp!"
                 " You can now receive notifications regarding travel information.",
             ),
-            await action_menu(),
+            action_menu,
         ]
     raise RuntimeError("error while subscribing with id: {0}".format(subscriber.id))
 
@@ -129,24 +144,79 @@ async def trip_details(
     if order is None:
         return [
             _("Sorry there are no details available for this trip."),
-            await action_menu(),
+            action_menu,
         ]
     return [
         transform_trip_details(order),
-        await action_menu(),
+        trip_details_menu,
     ]
 
 
-async def upcoming_trips(
+async def upcoming_trips(  # noqa: WPS210
     subscriber: models_pb2.Subscriber,
     subscribers_client: subscribers.Client,
     orders_client: orders.Client,
     message_sid: str,
     redis_client: redis.Client[str],
 ) -> Sequence[str]:  # noqa: WPS473
+    await redis_client.delete("upcoming_trips_{0}".format(subscriber.id))
+    session = redis_client.hash_("upcoming_trips_{0}".format(subscriber.id))
+
+    subscriber_orders = await orders_client.find(subscriber.id)
+    processed_bookings_message = ""
+    counter = 1
+    if subscriber_orders:
+        for order in subscriber_orders:
+            processed_bookings = compress_flights(
+                [
+                    booking.value
+                    for booking in order.bookings
+                    if booking.value.DESCRIPTOR.name == "AirBooking"
+                    and booking.value.departure_at.seconds > int(time.time())
+                ],
+            )
+            if processed_bookings:
+                await session.put(str(counter), order.id)
+                processed_bookings_message += _(
+                    "\n\n{0}. ".format(counter)
+                    + "\n    ".join(
+                        [
+                            "*{0} > {1} ({2})*".format(
+                                booking.origin,
+                                booking.destination,
+                                protobuf.protobuf_to_datetime(
+                                    booking.departure_at,
+                                ).strftime("%d/%m/%Y"),
+                            )
+                            for booking in processed_bookings
+                        ],
+                    ),
+                )
+                counter += 1
+        if processed_bookings_message:
+            return [
+                _(
+                    "*Upcoming trips*\nUse one of the menu options below by typing the"
+                    " corresponding number for more information"
+                    + processed_bookings_message,
+                ),
+            ]
     return [
-        _("Upcoming trips"),
-        await action_menu(),
+        _("*It looks like you have no upcoming trips at the moment.*"),
+        action_menu,
+    ]
+
+
+async def check_in(
+    subscriber: models_pb2.Subscriber,
+    subscribers_client: subscribers.Client,
+    orders_client: orders.Client,
+    message_sid: str,
+    redis_client: redis.Client[str],
+) -> Sequence[str]:
+    return [
+        _("Check-in feature is not implemented yet."),
+        action_menu,
     ]
 
 
@@ -159,8 +229,18 @@ async def handle_unknown(
 ) -> Sequence[str]:
     return [
         _("Sorry I didn't understand your message."),
-        await action_menu(),
+        action_menu,
     ]
+
+
+async def main_menu(
+    subscriber: models_pb2.Subscriber,
+    subscribers_client: subscribers.Client,
+    orders_client: orders.Client,
+    message_sid: str,
+    redis_client: redis.Client[str],
+) -> Sequence[str]:
+    return [action_menu]
 
 
 async def get_order_id_by_message_id(
@@ -170,7 +250,3 @@ async def get_order_id_by_message_id(
     session = redis_client.hash_("message_id_order_id")
     order_id = await session.get(sid)
     return order_id or ""
-
-
-async def action_menu() -> str:
-    return _("Please select one of the following options")

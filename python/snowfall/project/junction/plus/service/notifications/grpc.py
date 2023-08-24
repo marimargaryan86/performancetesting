@@ -69,6 +69,23 @@ class OrderService(
             order=order,
         )
 
+    async def FindOrders(  # type: ignore[override] # noqa: N802
+        self,
+        request: notifications_pb2.FindOrdersRequest,
+        context: aio.ServicerContext,
+    ) -> notifications_pb2.FindOrdersResponse:
+        orders = [
+            order
+            async for order in await self._orders.find(
+                request.identifier,
+                request.selector,
+            )
+        ]
+
+        return notifications_pb2.FindOrdersResponse(
+            orders=orders,
+        )
+
 
 class SubscriberService(
     service.Service,

@@ -29,6 +29,14 @@ class Client(abc.ABC):
     ) -> notifications_models_pb2.PersistedOrder:
         """Get Order."""
 
+    @abc.abstractmethod
+    async def find(
+        self,
+        identifier: str,
+        selector: str = "subscriber_id",
+    ) -> Sequence[notifications_models_pb2.PersistedOrder]:
+        """Find Orders."""
+
 
 class DictClient(Client):
     def __init__(self, orders: Sequence[notifications_models_pb2.PersistedOrder]):
@@ -62,6 +70,13 @@ class DictClient(Client):
             raise errors.NotFoundError()
 
         return order
+
+    async def find(
+        self,
+        identifier: str,
+        selector: str = "subscriber_id",
+    ) -> Sequence[notifications_models_pb2.PersistedOrder]:
+        return [self._orders[order_id] for order_id in self._orders]
 
 
 class GrpcClient(Client):
@@ -99,3 +114,21 @@ class GrpcClient(Client):
         )
 
         return response.order
+
+    async def find(
+        self,
+        identifier: str,
+        selector: str = "subscriber_id",
+    ) -> Sequence[notifications_models_pb2.PersistedOrder]:
+        request = notifications_grpc_pb2.FindOrdersRequest(
+            identifier=identifier,
+            selector=selector,
+        )
+        response = await errors.handle_grpc_errors(
+            self._orders.FindOrders(
+                request,
+                timeout=self._timeout,
+            ),
+        )
+
+        return response.orders
