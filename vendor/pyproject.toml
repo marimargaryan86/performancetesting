@@ -63,11 +63,8 @@ ignore_errors = true
 [[tool.mypy.overrides]]
 module = [
     "aiostream.*", # https://github.com/vxgmichel/aiostream/issues/36
-    "alchemy_mock.*", # https://github.com/rajivsarvepalli/mock-alchemy/issues/14
     "allure.*", # https://github.com/allure-framework/allure-python/issues/731
-    "async_factory_boy.*",
     "authlib.*", # https://github.com/lepture/authlib/issues/460
-    "factory.*", # https://github.com/FactoryBoy/factory_boy/issues/468
     "fsspec.*", # https://github.com/fsspec/filesystem_spec/issues/625
     "furl.*", # https://github.com/gruns/furl/issues/148
     "geopy.*",
@@ -230,9 +227,6 @@ known-first-party = ["snowfall"]
 [tool.ruff.per-file-ignores]
 "*/conftest.py" = ["S101", "S105", "S106"]
 "*_test.py" = ["S101", "S105", "S106"]
-"python/snowfall/project/pss/service/pss_api_v2/**/*.py" = ["B008"]
-"python/snowfall/project/pss/service/pss_api_v2/db/models/**/*.py" = ["A003"]
-"python/snowfall/project/pss/service/pss_api_v2/validators/transaction_test.py" = ["SLF001"]
 "python/snowfall/stdlib/integration/starlette/testing.py" = ["S101", "S105", "S106"]
 "python/snowfall/stdlib/testing/asserts.py" = ["S101", "S105", "S106"]
 "python/snowfall/vendor/carnect/models/**/*.py" = ["A003"]

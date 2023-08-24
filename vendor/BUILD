@@ -44,7 +44,6 @@ python_requirements(
         "protobuf": {"dependencies": ["#types-protobuf"]},
         "pyjwt": {"dependencies": ["#cryptography"]},
         "qrcode": {"dependencies": ["#Pillow"]},
-        "SQLAlchemy": {"dependencies": ["#aiomysql", "#aiosqlite"]},
         "starlette": {"dependencies": ["#python-multipart"]},
     },
 )

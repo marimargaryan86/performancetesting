@@ -2,8 +2,6 @@ commits:
   scopes:
     golang/stdlib:
       - "golang/stdlib"
-    junction/base:
-      - "python/snowfall/project/pss"
     junction/extensions:
       - "openapi/junction/mobile_api"
       - "protobuf/snowfall/project/junction/extensions"

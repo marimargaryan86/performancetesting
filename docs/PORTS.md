@@ -25,7 +25,6 @@ The following ports are configured in local environments by default:
 | 8002  | admin-api              | HTTP Server       |
 | 8003  | pay-api                | HTTP Server       |
 | 8004  | dogfood-ui             | HTTP Server       |
-| 8005  | pss/api                | HTTP Server       |
 | 8006  | pay-admin-api          | HTTP Server       |
 | 8007  | data-api               | HTTP Server       |
 | 8008  | webhooks               | HTTP Server       |
