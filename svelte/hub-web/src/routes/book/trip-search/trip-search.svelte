@@ -1,15 +1,20 @@
 <script lang="ts" context="module">
-  export type TripSearchData = {
-    passengers: PassengerPickerData;
+  export const tripSearchData = z.object({
+    passengers: passengerPickerData,
+    originId: z.string({ required_error: "Origin is mandatory" }).uuid(),
+    destinationId: z.string({ required_error: "Destination is mandatory" }).uuid(),
+    outbound: z.date({ required_error: "Departure date is mandatory" }),
+    inbound: z.date().optional(),
+  });
+
+  type TripSearchDataInternal = z.infer<typeof tripSearchData>;
+
+  export type TripSearchData = Omit<TripSearchDataInternal, "originId" | "destinationId"> & {
     origin: PlaceModel;
     destination: PlaceModel;
-    outbound: Date;
-    inbound?: Date;
   };
 
-  export type PartialTripSearchData = Omit<Partial<TripSearchData>, "passengers"> & {
-    passengers: PassengerPickerData;
-  };
+  export type PartialTripSearchData = PartiallyPartial<TripSearchData, "passengers">;
 
   export function formatPlace(place?: PlaceModel): string {
     if (!place) {
@@ -27,17 +32,17 @@
 <script lang="ts">
   import SearchIcon from "components/icons/book-search-icon.svelte";
   import DatePicker from "components/ui/date-picker/date-picker.svelte";
-  import PassengerPicker, {
-    type PassengerPickerData,
-  } from "./passenger-picker/passenger-picker.svelte";
+  import PassengerPicker, { passengerPickerData } from "./passenger-picker/passenger-picker.svelte";
   import routeConfig from "routeConfig";
   import Button from "components/ui/button.svelte";
   import { page } from "$app/stores";
   import AutocompleteField from "components/ui/autocomplete-field.svelte";
   import type { PlaceModel } from "models/booking/location";
-  import { callAction } from "utils/common";
+  import { callAction, type PartiallyPartial } from "utils/common";
   import { browser } from "$app/environment";
   import { createEventDispatcher } from "svelte";
+  import { z } from "zod";
+  import { URLExtended } from "utils/url";
 
   export let data: PartialTripSearchData = {
     passengers: {
@@ -47,36 +52,9 @@
     },
   };
 
+  let errors: z.ZodFormattedError<TripSearchDataInternal> | undefined = undefined;
+
   const dispatch = createEventDispatcher<{ search: URL }>();
-
-  function getSearchQuery(nextData: PartialTripSearchData): URL {
-    if (!formValid(nextData)) {
-      throw new Error("Invalid search data");
-    }
-
-    const url = new URL(routeConfig.book.select.root, $page.url.origin);
-
-    url.searchParams.set("origin", nextData.origin.id);
-    url.searchParams.set("destination", nextData.destination.id);
-
-    if (nextData.passengers.adults) {
-      url.searchParams.set("adults", nextData.passengers.adults.toString());
-    }
-
-    if (nextData.passengers.children) {
-      url.searchParams.set("children", nextData.passengers.children.toString());
-    }
-
-    if (nextData.passengers.infants) {
-      url.searchParams.set("infants", nextData.passengers.infants.toString());
-    }
-
-    if (nextData.outbound) {
-      url.searchParams.set("outbound", nextData.outbound.toLocaleDateString("sv-SE"));
-    }
-
-    return url;
-  }
 
   async function listPlaces(query: string): Promise<PlaceModel[]> {
     if (!browser) {
@@ -93,19 +71,30 @@
   }
 
   function search(): void {
-    try {
-      dispatch("search", getSearchQuery(data));
-    } catch {
-      //
-    }
-  }
+    const parseResult = tripSearchData.safeParse({
+      ...data,
+      originId: data.origin?.id,
+      destinationId: data.destination?.id,
+    });
 
-  function formValid(nextData: PartialTripSearchData): nextData is TripSearchData {
-    return Boolean(
-      nextData.origin &&
-        nextData.destination &&
-        nextData.outbound &&
-        (nextData.passengers.adults ?? 0) > 0,
+    if (!parseResult.success) {
+      errors = parseResult.error.format();
+
+      return;
+    }
+
+    errors = undefined;
+    const parsedData = parseResult.data;
+
+    dispatch(
+      "search",
+      new URLExtended(routeConfig.book.select.root, $page.url.origin, {
+        outbound: parsedData.outbound.toLocaleDateString("sv-SE"),
+        inbound: parsedData.inbound?.toLocaleDateString("sv-SE"),
+        origin: parsedData.originId,
+        destination: parsedData.destinationId,
+        ...parsedData.passengers,
+      }),
     );
   }
 </script>
@@ -118,6 +107,7 @@
     bind:value={data.origin}
     autocomplete={listPlaces}
     formatter={formatPlace}
+    error={errors?.originId?._errors}
     clearable
   />
   <AutocompleteField
@@ -127,6 +117,7 @@
     bind:value={data.destination}
     autocomplete={listPlaces}
     formatter={formatPlace}
+    error={errors?.destinationId?._errors}
     clearable
   />
 
@@ -136,6 +127,7 @@
     bind:value={data.outbound}
     id="depart-date"
     placeholder="Add date"
+    error={errors?.outbound?._errors}
     required
   />
 
@@ -143,7 +135,12 @@
     <SearchIcon color="var(--color-common-dark-strong)" />
   </Button>
 
-  <PassengerPicker bind:passengers={data.passengers} />
+  <PassengerPicker
+    bind:passengers={data.passengers}
+    error={errors?.passengers?.adults?._errors ??
+      errors?.passengers?.children?._errors ??
+      errors?.passengers?.infants?._errors}
+  />
 </form>
 
 <style>
@@ -151,7 +148,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr 1fr min-content;
     gap: 8px;
-    align-items: flex-end;
+    align-items: flex-start;
     max-width: 1154px;
     padding: 24px 24px 16px;
     background: var(--color-common-background-light-main);
@@ -163,5 +160,9 @@
     --label-font-size: 14px;
     --label-font-weight: 600;
     --label-font-family: "Inter";
+  }
+
+  .trip-search > :global(button) {
+    margin-top: 22px;
   }
 </style>

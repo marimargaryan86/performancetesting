@@ -1,5 +1,6 @@
 <script lang="ts" generics="TRange extends boolean">
   /* global TRange */
+  import { slideFade } from "transitions/slide-fade";
   import { getRandomId } from "utils/random";
   import ChevronIcon from "components/icons/chevron-icon.svelte";
   import RemoveIcon from "components/icons/remove-icon.svelte";
@@ -16,12 +17,15 @@
   export let id: string = getRandomId("date-picker");
   export let label: string | undefined = undefined;
   export let required = false;
+  export let error: string | string[] | boolean = false;
 
   let expanded = false;
   let displayValue = getFormattedValue();
 
   $: value, (displayValue = getFormattedValue());
   $: placeholderShowing = placeholder && !value;
+  $: displayError = error instanceof Array ? error.join(", ") : error;
+  $: value, (error = false);
 
   function getFormattedValue(): string | undefined {
     if (!value) {
@@ -71,7 +75,7 @@
   {/if}
 
   <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-  <label class="header" on:click={toggle} on:keypress {id}>
+  <label class="header" on:click={toggle} on:keypress {id} class:error>
     <span class:placeholder={placeholderShowing} class="typography body-medium">
       {displayValue ?? placeholder ?? ""}
     </span>
@@ -84,6 +88,10 @@
       <ChevronIcon direction={expanded ? "up" : "down"} color="var(--color-common-light-strong)" />
     {/if}
   </label>
+
+  {#if typeof displayError === "string"}
+    <span class="error-message" transition:slideFade={{ duration: 300 }}>{displayError}</span>
+  {/if}
 
   {#if expanded}
     <Dialogue {range} bind:value />
@@ -131,6 +139,11 @@
     border: 1px solid var(--color-common-line-medium);
     border-radius: 8px;
     cursor: pointer;
+    transition: border 150ms ease;
+  }
+
+  .header.error {
+    border-color: #fe4e4e;
   }
 
   .header > button,
@@ -151,5 +164,15 @@
 
   .clear > :global(svg) {
     vertical-align: middle;
+  }
+
+  .error-message {
+    margin-top: 8px;
+    color: #fe4e4e;
+    font-weight: 400;
+    font-size: 10px;
+    font-family: Poppins, Arial, Helvetica, sans-serif;
+    font-style: normal;
+    line-height: 16px;
   }
 </style>

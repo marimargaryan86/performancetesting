@@ -14,6 +14,7 @@
   export let placeholder: string | undefined = undefined;
   export let formatter: (v?: TValue) => string = (nextValue) => `${nextValue ?? ""}`;
   export let autocomplete: (q: string) => MaybePromise<TValue[]> = () => [];
+  export let error: string | string[] | undefined = undefined;
 
   let items: TValue[] = [];
   let query = formatter(value);
@@ -47,6 +48,7 @@
     {placeholder}
     bind:value={query}
     {clearable}
+    {error}
     on:clear={clear}
     on:input={search}
   />

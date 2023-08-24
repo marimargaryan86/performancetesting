@@ -67,6 +67,10 @@ export type RecursivePartial<T> = {
     : T[P];
 };
 
+export type PartiallyPartial<TObject extends object, TRequired extends keyof TObject> = {
+  [key in TRequired]: TObject[key];
+} & { [key in Exclude<keyof TObject, TRequired>]?: TObject[key] };
+
 function getActionRequestData(data?: Record<string, unknown>): FormData | undefined {
   const formData = new FormData();
 

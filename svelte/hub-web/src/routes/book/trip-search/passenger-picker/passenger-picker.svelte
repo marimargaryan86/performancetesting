@@ -1,9 +1,11 @@
 <script lang="ts" context="module">
-  export type PassengerPickerData = {
-    adults: number;
-    children: number;
-    infants: number;
-  };
+  export const passengerPickerData = z.object({
+    adults: z.number().min(1, "At least one adult is mandatory"),
+    children: z.number().min(0),
+    infants: z.number().min(0),
+  });
+
+  export type PassengerPickerData = z.infer<typeof passengerPickerData>;
 </script>
 
 <script lang="ts">
@@ -11,8 +13,11 @@
   import { clickOutside } from "directives/click-outside";
   import PassengerCounter from "./passenger-counter.svelte";
   import { scale } from "svelte/transition";
+  import { z } from "zod";
+  import { slideFade } from "transitions/slide-fade";
 
   export let passengers: PassengerPickerData;
+  export let error: string | string[] | boolean = false;
 
   let expanded = false;
 
@@ -30,6 +35,8 @@
     .filter((passenger): passenger is string => Boolean(passenger))
     .join(", ");
   $: totalPassengerCount = Object.values(passengers).reduce((prev, curr) => prev + curr, 0);
+  $: displayError = error instanceof Array ? error.join(", ") : error;
+  $: passengers, (error = false);
 
   function open(): void {
     expanded = true;
@@ -61,6 +68,10 @@
     <ChevronIcon direction={expanded ? "up" : "down"} color="var(--color-main-primary-500)" />
   </button>
 
+  {#if typeof displayError === "string"}
+    <span class="error-message" transition:slideFade={{ duration: 300 }}>{displayError}</span>
+  {/if}
+
   {#if expanded}
     <div class="dialogue" transition:scale={{ duration: 150, start: 0.8 }}>
       <div class="header typography title-medium bold title-medium bold">Passengers</div>
@@ -76,6 +87,8 @@
 
 <style>
   .passenger-picker {
+    --x-height: 22px;
+
     position: relative;
     display: inline-block;
   }
@@ -84,6 +97,7 @@
     display: flex;
     gap: 8px;
     align-items: center;
+    height: var(--x-height);
     color: var(--color-main-primary-500);
     background-color: transparent;
     border: 0;
@@ -92,7 +106,7 @@
 
   .dialogue {
     position: absolute;
-    top: 100%;
+    top: var(--x-height);
     left: 0;
     z-index: 100;
     width: 300px;
@@ -119,5 +133,16 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+  }
+
+  .error-message {
+    display: block;
+    margin-top: 8px;
+    color: #fe4e4e;
+    font-weight: 400;
+    font-size: 10px;
+    font-family: Poppins, Arial, Helvetica, sans-serif;
+    font-style: normal;
+    line-height: 16px;
   }
 </style>

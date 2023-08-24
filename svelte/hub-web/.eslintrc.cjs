@@ -43,7 +43,7 @@ module.exports = {
     "no-unreachable-loop": "error",
     "no-unused-private-class-members": "error",
     "block-scoped-var": "error",
-    camelcase: "error",
+    camelcase: ["error", { allow: ["_errors", "required_error"] }],
     "class-methods-use-this": "error",
     complexity: ["error", 10],
     curly: "error",

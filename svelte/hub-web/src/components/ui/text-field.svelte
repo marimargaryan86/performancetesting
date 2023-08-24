@@ -2,11 +2,13 @@
   lang="ts"
   generics="TType extends 'text' | 'tel' | 'password' | 'email' | 'number' | 'date'"
 >
+  import { slideFade } from "transitions/slide-fade";
+
   /* global TType */
   import RemoveIcon from "components/icons/remove-icon.svelte";
 
   import { createEventDispatcher } from "svelte";
-  import { fade, slide } from "svelte/transition";
+  import { fade } from "svelte/transition";
   import { getRandomId } from "utils/random";
 
   type InputEvent = Event & { currentTarget: EventTarget & HTMLInputElement };
@@ -20,7 +22,7 @@
   export let placeholder: string | undefined = undefined;
   export let type: TType = "text" as TType;
   export let value: TValue | undefined = undefined;
-  export let error: string | boolean = false;
+  export let error: string | string[] | boolean = false;
   export let name: string | undefined = undefined;
   export let readonly = false;
   export let required = false;
@@ -56,9 +58,11 @@
   }
 
   $: displayValue = value instanceof Date ? value.toLocaleDateString("sv-SE") : value ?? "";
+  $: displayError = error instanceof Array ? error.join(", ") : error;
+  $: value, (error = false);
 </script>
 
-<div class="text-field {className ? className : ''}" class:error>
+<div class:text-field={true} class={className} class:error>
   {#if label}
     <label for={id}>
       {label}
@@ -100,12 +104,12 @@
     <slot name="icon-after" />
   </div>
 
-  {#if !error && helpText}
-    <span class="help-text" transition:slide={{ duration: 300 }}>{helpText}</span>
+  {#if !displayError && helpText}
+    <span class="help-text" transition:slideFade={{ duration: 300 }}>{helpText}</span>
   {/if}
 
-  {#if typeof error === "string"}
-    <span class="error-message" transition:slide={{ duration: 300 }}>{error}</span>
+  {#if typeof displayError === "string"}
+    <span class="error-message" transition:slideFade={{ duration: 300 }}>{displayError}</span>
   {/if}
 </div>
 

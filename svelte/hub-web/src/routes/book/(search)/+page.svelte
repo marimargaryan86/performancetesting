@@ -1,6 +1,6 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import TripSearch from "../trip-search.svelte";
+  import TripSearch from "../trip-search/trip-search.svelte";
 
   function search(event: CustomEvent<URL>): void {
     goto(event.detail);

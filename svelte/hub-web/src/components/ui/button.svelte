@@ -126,6 +126,7 @@
   .large {
     --icon-size: 24px;
 
+    height: 52px;
     padding: 15px 24px;
   }
 

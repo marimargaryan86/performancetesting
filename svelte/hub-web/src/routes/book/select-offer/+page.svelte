@@ -1,5 +1,5 @@
 <script lang="ts">
-  import TripSearch, { type PartialTripSearchData } from "../trip-search.svelte";
+  import TripSearch, { type PartialTripSearchData } from "../trip-search/trip-search.svelte";
   import SearchOptions, { type SearchOptionsData } from "./search-options.svelte";
   import type { OfferModel } from "models/booking/offer";
   import Offer from "./offer/offer.svelte";
