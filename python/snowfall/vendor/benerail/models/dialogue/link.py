@@ -1,4 +1,4 @@
-from pydantic import AnyUrl
+from pydantic.v1 import AnyUrl
 
 from snowfall.vendor.benerail.models.base import BenerailBaseModel
 from snowfall.vendor.benerail.models.dialogue.summary import (

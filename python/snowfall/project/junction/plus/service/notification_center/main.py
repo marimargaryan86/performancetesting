@@ -3,7 +3,7 @@ import random
 from collections.abc import Sequence
 
 import httpx
-import pydantic
+from pydantic import v1 as pydantic
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.plus.adapter import configuration_vectors, subscribers

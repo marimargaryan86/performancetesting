@@ -9,8 +9,8 @@ from typing import Any, Generic, Protocol, TypeVar, cast
 
 import click
 import orjson
-import pydantic
 from prometheus_async.aio import web
+from pydantic import v1 as pydantic
 
 from snowfall.stdlib.integration.click import parameters
 from snowfall.stdlib.logging import sentry, stdout

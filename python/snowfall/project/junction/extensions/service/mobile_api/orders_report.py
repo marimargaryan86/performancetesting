@@ -10,7 +10,7 @@ import json_api_doc
 from authlib.integrations import httpx_client
 from dateutil import relativedelta
 from motor import motor_asyncio
-from pydantic import AnyUrl, HttpUrl
+from pydantic.v1 import AnyUrl, HttpUrl
 
 from snowfall.project.junction.extensions.service.mobile_api import smtp
 from snowfall.project.junction.extensions.service.mobile_api.tasks import orders

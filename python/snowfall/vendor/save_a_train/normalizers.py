@@ -3,7 +3,7 @@ from collections.abc import Callable, Sequence
 from typing import Any, TypeVar
 
 from dateutil.parser import parse as date_parser
-from pydantic import typing, validator
+from pydantic.v1 import typing, validator
 
 
 def normalize_time(

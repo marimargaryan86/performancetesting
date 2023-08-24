@@ -1,7 +1,7 @@
 """Contains offer search request schemas."""
 import datetime
 
-import pydantic
+from pydantic import v1 as pydantic
 
 from snowfall.vendor.ba_ndc.models.base_schema import BaseSchema
 from snowfall.vendor.ba_ndc.models.util import offer_enums, passenger_enums

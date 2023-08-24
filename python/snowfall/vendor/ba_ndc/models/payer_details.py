@@ -1,6 +1,6 @@
 from typing import Literal
 
-import pydantic
+from pydantic import v1 as pydantic
 
 from snowfall.vendor.ba_ndc.models.base_schema import BaseSchema
 from snowfall.vendor.ba_ndc.models.response_common_passenger_schemas import Contact

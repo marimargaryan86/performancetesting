@@ -2,7 +2,7 @@ import enum
 from collections.abc import Mapping, Sequence
 from typing import Any
 
-import pydantic
+from pydantic import v1 as pydantic
 from starlette import exceptions, status
 
 from snowfall.stdlib import string

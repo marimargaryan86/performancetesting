@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 from datetime import date, datetime
 
-from pydantic import BaseModel
+from pydantic.v1 import BaseModel
 
 from snowfall.vendor.save_a_train.enums import TripType
 from snowfall.vendor.save_a_train.models.booking import Passenger

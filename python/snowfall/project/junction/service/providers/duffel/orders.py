@@ -3,7 +3,7 @@ from collections.abc import Sequence
 
 import aiosmtplib
 import httpx
-import pydantic
+from pydantic import v1 as pydantic
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.go.service.orders.v1 import amqp_pb2

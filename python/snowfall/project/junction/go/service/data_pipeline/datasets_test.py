@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from pydantic import parse_obj_as
+from pydantic.v1 import parse_obj_as
 
 from snowfall.project.junction.go.service.data_pipeline.types import Dataset
 

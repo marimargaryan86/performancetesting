@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from uuid import UUID
 
-import pydantic
+from pydantic import v1 as pydantic
 
 from snowfall.vendor.ask2go import normalizers
 from snowfall.vendor.ask2go.models.base import CamelCaseBaseModel

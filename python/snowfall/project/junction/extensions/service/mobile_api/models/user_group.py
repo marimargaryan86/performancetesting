@@ -1,4 +1,4 @@
-import pydantic
+from pydantic import v1 as pydantic
 
 from snowfall.stdlib import string
 

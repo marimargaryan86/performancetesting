@@ -6,8 +6,8 @@ import ipaddress
 from collections.abc import Awaitable, Callable
 from typing import TYPE_CHECKING, Generic, TypeVar
 
-import pydantic
 from google.protobuf import message
+from pydantic import v1 as pydantic
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.provider import bookings, meta, offers

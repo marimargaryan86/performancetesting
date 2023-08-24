@@ -1,7 +1,7 @@
 import ipaddress
 
 from grpc import aio
-from pydantic import AnyUrl
+from pydantic.v1 import AnyUrl
 
 from snowfall.service.echo.v1 import echo_pb2, echo_pb2_grpc
 from snowfall.stdlib import service

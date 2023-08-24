@@ -2,7 +2,7 @@ import datetime
 import functools
 from types import MappingProxyType
 
-import pydantic
+from pydantic import v1 as pydantic
 
 from snowfall.stdlib import string
 

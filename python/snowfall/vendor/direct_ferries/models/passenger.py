@@ -1,7 +1,7 @@
 import datetime
 from types import MappingProxyType
 
-import pydantic
+from pydantic import v1 as pydantic
 
 from snowfall.vendor.direct_ferries import enums, normalizers
 from snowfall.vendor.direct_ferries.models import base

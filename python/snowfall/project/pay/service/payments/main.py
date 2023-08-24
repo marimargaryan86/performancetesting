@@ -1,7 +1,7 @@
 import ipaddress
 
 from motor import motor_asyncio
-from pydantic import AnyUrl
+from pydantic.v1 import AnyUrl
 
 from snowfall.project.pay.service.payments.grpc import PaymentsService
 from snowfall.project.pay.service.payments.repositories import PaymentsRepository

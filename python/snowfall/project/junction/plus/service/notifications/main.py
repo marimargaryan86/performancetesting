@@ -2,8 +2,8 @@ import ipaddress
 import random
 from collections.abc import Sequence
 
-import pydantic
 from motor import motor_asyncio
+from pydantic import v1 as pydantic
 
 from snowfall.project.junction.plus.service.notifications.grpc import (
     ConfigurationVectorService,

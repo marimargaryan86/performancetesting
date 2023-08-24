@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 from collections.abc import Mapping, Sequence
 
-import pydantic
+from pydantic import v1 as pydantic
 
 from snowfall.vendor.duffel.builders.base import DuffelRequestBaseModel
 from snowfall.vendor.duffel.models.offer import Offer, PrivateFare

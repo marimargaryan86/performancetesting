@@ -1,7 +1,7 @@
 import datetime
 from types import MappingProxyType
 
-from pydantic import Field
+from pydantic.v1 import Field
 
 from snowfall.vendor.benerail.models.base import BenerailBaseModel
 from snowfall.vendor.benerail.models.bookings.train import TrainType1

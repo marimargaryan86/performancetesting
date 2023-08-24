@@ -1,4 +1,4 @@
-from pydantic import AnyUrl, ConstrainedStr, Field
+from pydantic.v1 import AnyUrl, ConstrainedStr, Field
 
 from snowfall.vendor.benerail.models.base import BenerailBaseModel
 from snowfall.vendor.benerail.models.bookings.enums import Optionality

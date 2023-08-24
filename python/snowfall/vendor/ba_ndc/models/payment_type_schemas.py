@@ -2,7 +2,7 @@ from abc import ABC
 from decimal import Decimal
 from typing import Literal
 
-import pydantic
+from pydantic import v1 as pydantic
 
 from snowfall.vendor.ba_ndc.models.base_schema import BaseSchema
 from snowfall.vendor.ba_ndc.models.payer_details import (

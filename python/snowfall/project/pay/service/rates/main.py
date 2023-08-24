@@ -3,7 +3,7 @@ import random
 from collections.abc import Sequence
 
 from motor import motor_asyncio
-from pydantic import AnyUrl
+from pydantic.v1 import AnyUrl
 from redis import asyncio as aioredis
 
 from snowfall.project.pay.service.rates import cache

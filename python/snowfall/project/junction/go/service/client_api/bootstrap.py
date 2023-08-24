@@ -1,7 +1,7 @@
 import datetime
 
 import lagom
-import pydantic
+from pydantic import v1 as pydantic
 
 from snowfall.adapter import authentication
 from snowfall.project.junction.go.adapter import (  # noqa: WPS235

@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 
-import pydantic
+from pydantic import v1 as pydantic
 
 from snowfall.vendor.direct_ferries.models import base
 

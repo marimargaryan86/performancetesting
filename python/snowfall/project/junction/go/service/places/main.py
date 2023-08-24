@@ -11,7 +11,7 @@ from typing import Any
 import aiofiles
 import bson
 from motor import motor_asyncio
-from pydantic import AnyUrl
+from pydantic.v1 import AnyUrl
 
 from snowfall.project.junction.go.service.places import cities, locations, places
 from snowfall.project.junction.go.service.places.grpc import (

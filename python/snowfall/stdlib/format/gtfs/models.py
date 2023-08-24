@@ -3,7 +3,7 @@ import datetime
 from types import MappingProxyType
 from typing import Annotated
 
-import pydantic
+from pydantic import v1 as pydantic
 
 from snowfall.stdlib.format.gtfs import constants, enums, normalizers
 

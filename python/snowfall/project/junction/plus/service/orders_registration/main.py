@@ -1,5 +1,5 @@
 import httpx
-import pydantic
+from pydantic import v1 as pydantic
 
 from snowfall.project.junction.plus.adapter import (
     monitoring_rules,

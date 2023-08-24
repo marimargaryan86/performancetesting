@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 
-from pydantic import BaseModel
+from pydantic.v1 import BaseModel
 
 
 class VendorStation(BaseModel):

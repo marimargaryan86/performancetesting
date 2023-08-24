@@ -4,7 +4,7 @@ from collections.abc import Sequence
 
 import boto3
 import shapefile
-from pydantic import AnyUrl
+from pydantic.v1 import AnyUrl
 from redis import asyncio as aioredis
 
 from snowfall.service.geodata import geocoding, reverse_geocoding

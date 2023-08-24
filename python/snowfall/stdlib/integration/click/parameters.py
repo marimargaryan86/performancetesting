@@ -6,7 +6,7 @@ from typing import Any, TypeGuard, cast, get_args, get_origin, get_type_hints
 
 import click
 import orjson
-import pydantic
+from pydantic import v1 as pydantic
 
 from snowfall.stdlib import sequence, types
 

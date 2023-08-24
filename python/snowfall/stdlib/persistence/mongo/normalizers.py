@@ -6,9 +6,9 @@ from collections.abc import Mapping
 from enum import IntEnum
 from typing import Any, TypeVar, cast
 
-import pydantic
 from dateutil import parser
 from google.protobuf import descriptor, timestamp_pb2
+from pydantic import v1 as pydantic
 
 from snowfall.stdlib.v1 import latlng_pb2
 

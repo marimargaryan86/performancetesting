@@ -2,8 +2,8 @@ import datetime
 import ipaddress
 from collections.abc import Sequence
 
-import pydantic
 from motor import motor_asyncio
+from pydantic import v1 as pydantic
 
 from snowfall.adapter import authentication
 from snowfall.service.authentication import grpc, repository

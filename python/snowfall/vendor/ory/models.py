@@ -1,6 +1,6 @@
 import datetime
 
-import pydantic
+from pydantic import v1 as pydantic
 
 
 class OAuth2Client(pydantic.BaseModel):

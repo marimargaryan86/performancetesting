@@ -3,7 +3,7 @@ import pathlib
 import sys
 from collections.abc import Mapping, Sequence
 
-import pydantic
+from pydantic import v1 as pydantic
 
 from snowfall.stdlib.format import hcl2
 

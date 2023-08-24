@@ -1,5 +1,5 @@
 import lagom
-import pydantic
+from pydantic import v1 as pydantic
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.project.pay.adapter.payments import GrpcClient

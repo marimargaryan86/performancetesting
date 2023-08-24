@@ -2,7 +2,7 @@ import datetime
 from collections.abc import Sequence
 
 import lagom
-from pydantic import AnyUrl
+from pydantic.v1 import AnyUrl
 
 from snowfall.adapter import authentication
 from snowfall.project.pay.adapter import (  # noqa: WPS235

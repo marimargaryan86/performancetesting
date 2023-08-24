@@ -6,7 +6,7 @@ from typing import Any
 
 import phonenumbers
 import pycountry
-from pydantic import typing, validator
+from pydantic.v1 import typing, validator
 
 from snowfall.stdlib.format.gtfs import constants
 

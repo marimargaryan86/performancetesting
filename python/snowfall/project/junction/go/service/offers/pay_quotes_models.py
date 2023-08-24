@@ -1,7 +1,7 @@
 from typing import Literal
 
-from pydantic.fields import Field
-from pydantic.main import BaseModel
+from pydantic.v1.fields import Field
+from pydantic.v1.main import BaseModel
 
 
 class PayBaseModel(BaseModel):

@@ -1,4 +1,4 @@
-from pydantic import ConstrainedStr
+from pydantic.v1 import ConstrainedStr
 
 
 class UrlRegex(ConstrainedStr):

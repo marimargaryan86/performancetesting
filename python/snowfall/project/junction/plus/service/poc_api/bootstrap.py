@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 
 import lagom
-from pydantic import AnyUrl
+from pydantic.v1 import AnyUrl
 
 from snowfall.project.junction.plus.service.poc_api import (
     ai_utils,

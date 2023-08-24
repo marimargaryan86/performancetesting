@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import pydantic
+from pydantic import v1 as pydantic
 
 from snowfall.vendor.duffel.models.base import DuffelBaseModel
 

@@ -2,8 +2,8 @@ import uuid
 from collections.abc import Mapping, Sequence
 
 import click
-import pydantic
 import pytest
+from pydantic import v1 as pydantic
 
 from snowfall.stdlib.integration.click import parameters
 
@@ -105,13 +105,19 @@ def test_custom_callback_with_invalid_value(
 
 class _TestModel(pydantic.BaseModel):
     bool_option: bool
-    dict_string_string_option_default: dict[str, str] = {"foo": "bar"}
+    dict_string_string_option_default: dict[str, str] = pydantic.Field(
+        default_factory=lambda: {"foo": "bar"},
+    )
     dict_option_default_factory: dict[str, str] = pydantic.Field(default_factory=dict)
     float_option: float
     integer_option: int
-    list_string_option_default: list[str] = ["foobar"]
+    list_string_option_default: list[str] = pydantic.Field(
+        default_factory=lambda: ["foobar"],
+    )
     sequence_string_option_default: Sequence[str] = ["foobar"]
-    set_string_option_default: set[str] = {"foobar"}
+    set_string_option_default: set[str] = pydantic.Field(
+        default_factory=lambda: {"foobar"},
+    )
     string_argument: str = pydantic.Field(argument=True)
     string_option: str
     string_option_default: str = "foobar"

@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 
-import pydantic
 from hcl2 import api
+from pydantic import v1 as pydantic
 
 
 class Template(pydantic.BaseModel):

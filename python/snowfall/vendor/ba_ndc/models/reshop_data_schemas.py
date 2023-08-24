@@ -1,7 +1,7 @@
 """Contains offer ref data schemas."""
 import uuid
 
-import pydantic
+from pydantic import v1 as pydantic
 
 from snowfall.vendor.ba_ndc.models.base_schema import BaseSchema
 

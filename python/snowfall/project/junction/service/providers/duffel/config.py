@@ -2,7 +2,7 @@ import datetime
 from collections.abc import Sequence
 from typing import Any
 
-import pydantic
+from pydantic import v1 as pydantic
 
 from snowfall.project.junction.provider import service
 from snowfall.vendor.rate_limiter.config import RateLimitConfig
@@ -17,7 +17,7 @@ class DuffelConfig(pydantic.BaseModel):
     http_timeout: int = 30
     rate_limiter_grpc_host: str
     rate_limiter_service_configs: dict[str, RateLimitConfig]
-    resellers_map: dict[str, dict[str, Any]] = {}
+    resellers_map: dict[str, dict[str, Any]] = pydantic.Field(default_factory=dict)
 
 
 class Settings(DuffelConfig, service.ProviderSettings):

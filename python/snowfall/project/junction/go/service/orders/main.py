@@ -3,8 +3,8 @@ import random
 from collections.abc import Sequence
 
 import httpx
-import pydantic
 from motor import motor_asyncio
+from pydantic import v1 as pydantic
 
 from snowfall.project.junction.go import pay_integration
 from snowfall.project.junction.go.adapter import passenger_name_records

@@ -3,7 +3,7 @@ import datetime
 import uuid
 from abc import ABC
 
-import pydantic
+from pydantic import v1 as pydantic
 
 from snowfall.vendor.ba_ndc.models import (
     response_common_offer_schemas,

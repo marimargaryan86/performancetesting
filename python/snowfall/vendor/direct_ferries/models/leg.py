@@ -2,7 +2,7 @@ import datetime
 from collections.abc import Sequence
 from typing import Any
 
-import pydantic
+from pydantic import v1 as pydantic
 
 from snowfall.vendor.direct_ferries import enums
 from snowfall.vendor.direct_ferries.models import (

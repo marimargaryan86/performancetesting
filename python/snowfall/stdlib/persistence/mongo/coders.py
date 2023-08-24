@@ -4,8 +4,8 @@ from collections.abc import Mapping
 from typing import Any, Generic, TypeVar, cast
 
 import orjson
-import pydantic
 from google.protobuf import json_format, message
+from pydantic import v1 as pydantic
 
 from snowfall.stdlib.persistence.mongo import normalizers
 

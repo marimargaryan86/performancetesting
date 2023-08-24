@@ -3,8 +3,8 @@ import ipaddress
 import random
 from collections.abc import Sequence
 
-import pydantic
 from motor import motor_asyncio
+from pydantic import v1 as pydantic
 from redis import asyncio as aioredis
 
 from snowfall.project.pay.adapter import companies, currencies, lead_companies

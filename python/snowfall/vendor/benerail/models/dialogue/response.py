@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 
-from pydantic import Field
+from pydantic.v1 import Field
 
 from snowfall.vendor.benerail.models import etag as etag_models
 from snowfall.vendor.benerail.models.base import BenerailBaseModel

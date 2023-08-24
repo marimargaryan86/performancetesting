@@ -4,7 +4,7 @@ import random
 from collections.abc import Sequence
 
 from motor import motor_asyncio
-from pydantic import AnyUrl
+from pydantic.v1 import AnyUrl
 
 from snowfall.project.junction.go.adapter import legs, offer_searches, offers
 from snowfall.project.junction.go.service.offers.v1 import (

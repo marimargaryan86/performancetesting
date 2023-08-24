@@ -1,6 +1,6 @@
 from datetime import date, datetime, timedelta
 
-from pydantic import BaseModel
+from pydantic.v1 import BaseModel
 
 from snowfall.vendor.save_a_train import enums
 from snowfall.vendor.save_a_train import normalizers as save_a_train_normalizers

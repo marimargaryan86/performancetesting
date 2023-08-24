@@ -3,7 +3,7 @@ import random
 from collections.abc import Sequence
 
 from motor import motor_asyncio
-from pydantic import AnyUrl
+from pydantic.v1 import AnyUrl
 
 from snowfall.project.pay.adapter import transactions as transactions_adapter
 from snowfall.project.pay.service.refunds import grpc, repositories

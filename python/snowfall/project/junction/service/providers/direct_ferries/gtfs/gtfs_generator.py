@@ -5,7 +5,7 @@ import zipfile
 from collections.abc import Generator, Sequence
 
 import orjson
-import pydantic
+from pydantic import v1 as pydantic
 
 from snowfall.project.junction.service.providers.direct_ferries.gtfs import (
     converter as gtfs_converter,

@@ -1,4 +1,4 @@
-from pydantic import AnyUrl, Field
+from pydantic.v1 import AnyUrl, Field
 
 from snowfall.vendor.benerail.models import types
 from snowfall.vendor.benerail.models.base import BenerailBaseModel

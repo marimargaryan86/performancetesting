@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic.v1 import BaseModel
 
 from snowfall.vendor.save_a_train.models.search import SearchResult
 

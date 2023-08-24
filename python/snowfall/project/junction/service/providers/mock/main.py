@@ -4,7 +4,7 @@ import contextlib
 import datetime
 import uuid
 
-import pydantic
+from pydantic import v1 as pydantic
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.provider import bookings as provider_bookings

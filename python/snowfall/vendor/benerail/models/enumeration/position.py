@@ -1,6 +1,6 @@
 from typing import Literal
 
-from pydantic import Field
+from pydantic.v1 import Field
 
 from snowfall.vendor.benerail.models.base import BenerailBaseModel
 from snowfall.vendor.benerail.models.enumeration.rcode import RcoderesultLabels

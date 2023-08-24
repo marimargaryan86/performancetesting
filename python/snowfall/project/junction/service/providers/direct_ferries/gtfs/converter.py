@@ -2,7 +2,7 @@ import datetime
 import zoneinfo
 from collections.abc import Generator, Sequence
 
-import pydantic
+from pydantic import v1 as pydantic
 
 from snowfall.stdlib.format.gtfs import enums as gtfs_enums
 from snowfall.stdlib.format.gtfs import models as gtfs_models

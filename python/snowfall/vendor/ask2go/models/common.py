@@ -1,6 +1,6 @@
 import datetime
 
-import pydantic
+from pydantic import v1 as pydantic
 
 from snowfall.vendor.ask2go.enums import DocumentType, Gender, PassengerType
 from snowfall.vendor.ask2go.models.base import CamelCaseBaseModel

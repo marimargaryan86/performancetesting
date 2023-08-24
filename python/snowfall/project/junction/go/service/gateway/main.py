@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import ipaddress
 
-import pydantic
+from pydantic import v1 as pydantic
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.go.service.gateway import (

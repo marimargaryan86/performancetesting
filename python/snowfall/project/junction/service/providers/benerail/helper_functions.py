@@ -1,4 +1,4 @@
-import pydantic
+from pydantic import v1 as pydantic
 
 
 class UrlHasNoIdError(ValueError):

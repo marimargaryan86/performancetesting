@@ -1,6 +1,6 @@
 import datetime
 
-from pydantic import Field
+from pydantic.v1 import Field
 
 from snowfall.vendor.benerail.models import types
 from snowfall.vendor.benerail.models.base import BenerailBaseModel

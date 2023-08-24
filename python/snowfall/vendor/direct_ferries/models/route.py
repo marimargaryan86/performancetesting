@@ -1,8 +1,8 @@
 import functools
 from collections.abc import Sequence
 
-import pydantic
 import timezonefinder
+from pydantic import v1 as pydantic
 
 from snowfall.vendor.direct_ferries import enums
 from snowfall.vendor.direct_ferries.models import base, operator

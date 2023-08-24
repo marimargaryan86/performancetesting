@@ -4,7 +4,7 @@ from collections.abc import Mapping
 from typing import Any
 
 import httpx
-from pydantic import ValidationError
+from pydantic.v1 import ValidationError
 
 from snowfall.vendor.duffel import errors
 from snowfall.vendor.duffel.builders.offer_request import OfferRequestData

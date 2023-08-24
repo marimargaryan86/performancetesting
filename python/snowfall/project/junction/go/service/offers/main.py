@@ -4,8 +4,8 @@ import random
 from collections.abc import Sequence
 
 import httpx
-import pydantic
 from motor import motor_asyncio
+from pydantic import v1 as pydantic
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.go import pay_integration

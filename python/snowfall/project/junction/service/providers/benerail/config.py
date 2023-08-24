@@ -2,7 +2,7 @@ import base64
 import datetime
 import tempfile
 
-import pydantic
+from pydantic import v1 as pydantic
 
 from snowfall.project.junction.provider import service
 

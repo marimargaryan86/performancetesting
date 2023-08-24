@@ -1,4 +1,4 @@
-from pydantic import Field
+from pydantic.v1 import Field
 
 from snowfall.vendor.benerail.models import etag
 from snowfall.vendor.benerail.models import etag as etag_models

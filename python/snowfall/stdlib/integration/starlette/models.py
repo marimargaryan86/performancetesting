@@ -5,7 +5,7 @@ from collections.abc import Mapping, Sequence
 from types import MappingProxyType
 from typing import Any, ClassVar, cast
 
-import pydantic
+from pydantic import v1 as pydantic
 from starlette import background as starlette_background
 from starlette import responses, status
 

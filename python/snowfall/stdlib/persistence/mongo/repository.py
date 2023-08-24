@@ -9,7 +9,7 @@ import pymongo
 from bson import json_util
 from google.protobuf.message import Message
 from motor import core, motor_asyncio
-from pydantic import BaseModel
+from pydantic.v1 import BaseModel
 
 from snowfall.stdlib.persistence import cursor
 from snowfall.stdlib.persistence.mongo import coders, resultset

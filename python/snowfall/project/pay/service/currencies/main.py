@@ -1,7 +1,7 @@
 import ipaddress
 from collections.abc import Sequence
 
-from pydantic import AnyUrl
+from pydantic.v1 import AnyUrl
 
 from snowfall.project.pay.adapter import rates
 from snowfall.project.pay.service.currencies.grpc import CurrencyService

@@ -4,7 +4,7 @@ import abc
 import datetime
 from typing import Generic, TypeVar
 
-import pydantic
+from pydantic import v1 as pydantic
 
 from snowfall.stdlib import string
 from snowfall.stdlib.persistence.redis import types as redis

@@ -7,7 +7,7 @@ from collections.abc import Mapping, Sequence
 
 import aiofiles
 import httpx
-import pydantic
+from pydantic import v1 as pydantic
 
 from snowfall.project.junction.service.providers.distribusion.config import (
     DistribusionConfig,

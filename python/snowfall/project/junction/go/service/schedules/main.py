@@ -2,7 +2,7 @@ import ipaddress
 import random
 
 from motor import motor_asyncio
-from pydantic import AnyUrl
+from pydantic.v1 import AnyUrl
 
 from snowfall.project.junction.go.service.schedules import grpc, schedules
 from snowfall.stdlib import service

@@ -1,6 +1,6 @@
 import re
 
-import pydantic
+from pydantic import v1 as pydantic
 
 from snowfall.vendor.currency_cloud.models.base import CamelCaseBaseModel
 

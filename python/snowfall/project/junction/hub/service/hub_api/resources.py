@@ -5,7 +5,7 @@ import zoneinfo
 from collections.abc import Iterable
 from typing import ClassVar
 
-import pydantic
+from pydantic import v1 as pydantic
 from starlette import datastructures, requests
 
 from snowfall.project.junction.go.service.offers.v1 import (

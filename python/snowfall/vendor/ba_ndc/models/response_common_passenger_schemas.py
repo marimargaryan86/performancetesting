@@ -1,6 +1,6 @@
 """Contains common response schemas."""
 
-import pydantic
+from pydantic import v1 as pydantic
 
 from snowfall.vendor.ba_ndc.models.base_schema import BaseSchema
 from snowfall.vendor.ba_ndc.models.util import passenger_enums

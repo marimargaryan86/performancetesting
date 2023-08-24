@@ -4,7 +4,7 @@ import datetime
 from collections.abc import Mapping
 from typing import Any
 
-import pydantic
+from pydantic import v1 as pydantic
 
 from snowfall.vendor.duffel.builders.base import DuffelRequestBaseModel
 

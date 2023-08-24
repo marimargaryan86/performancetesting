@@ -3,7 +3,7 @@ from typing import Any
 
 import jwt
 from cryptography.hazmat.primitives import serialization
-from pydantic import BaseSettings
+from pydantic.v1 import BaseSettings
 
 
 class Settings(BaseSettings):
