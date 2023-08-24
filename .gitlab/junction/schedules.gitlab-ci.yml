@@ -183,8 +183,8 @@ directferries:
         sleep 60
     done
   - nomad job run -json job.json
-  - docker run -u "${UID}" --rm -v "$(pwd)/:/data" git.snowfall.se:4567/junction/junction/service/mobile_api:latest migrate --mongo-db='mobile-api' --mongo-dsn="${MONGODSN}"
-  - docker run -u "${UID}" --rm -v "$(pwd)/:/data" git.snowfall.se:4567/junction/junction/service/mobile_api:latest migrate --mongo-db='res-se-mobile-api' --mongo-dsn="${MONGODSN}"
+  - docker run -u "${UID}" --rm -v "$(pwd)/:/data" git.snowfall.se:4567/junction/junction/service/mobile_api:latest migrate --mongo-db='mobile-api' --mongo-dsn="${MONGODSN}/?retryWrites=false"
+  - docker run -u "${UID}" --rm -v "$(pwd)/:/data" git.snowfall.se:4567/junction/junction/service/mobile_api:latest migrate --mongo-db='res-se-mobile-api' --mongo-dsn="${MONGODSN}/?retryWrites=false"
   tags:
     - docker
 
