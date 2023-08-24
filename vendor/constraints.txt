@@ -34,6 +34,7 @@
 //     "boto3-stubs[location]==1.26.76",
 //     "boto3==1.26.76",
 //     "click==8.1.7",
+//     "coverage[toml]==7.3.0",
 //     "cryptography==41.0.3",
 //     "dnspython==2.4.2",
 //     "docformatter==1.5.1",
@@ -1762,13 +1763,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "108750e970cfc92fd593ab1be9ddaa2e89ce0b1ec908d5c3ad55405e1c3713a1",
-              "url": "https://files.pythonhosted.org/packages/42/b1/832727ed5a59841a487c67841869d0b691f145ef73777ef0077de436e49f/botocore_stubs-1.31.29-py3-none-any.whl"
+              "hash": "f26256b94309c2060844fb903d7522ed99311590c376cbe2ee641787f32fc46f",
+              "url": "https://files.pythonhosted.org/packages/f3/47/5e034c4d44930c06a3f52ba7a28ebf2ca03dbddd49c8e4c3b5f40fbaafa1/botocore_stubs-1.31.33-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "f961e1695c0caed71baee347413e0fc06ac28b0d3bb33253f163f7555b145702",
-              "url": "https://files.pythonhosted.org/packages/6a/25/9e5eaa148f23837594a8ebb5d692a93bd9703b3cf3800ea617b983dd7ff0/botocore_stubs-1.31.29.tar.gz"
+              "hash": "a41d50ee8a05e810d2bfd864d15cdd2f90974ae6ab50403f4ce3d1e6682ef851",
+              "url": "https://files.pythonhosted.org/packages/57/dd/615567608322eef72a0c2dc16ce78e4faf59b18d4b9e78f16a590cac3f14/botocore_stubs-1.31.33.tar.gz"
             }
           ],
           "project_name": "botocore-stubs",
@@ -1777,7 +1778,7 @@
             "typing-extensions>=4.1.0; python_version < \"3.9\""
           ],
           "requires_python": "<4.0,>=3.7",
-          "version": "1.31.29"
+          "version": "1.31.33"
         },
         {
           "artifacts": [
@@ -2761,19 +2762,19 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "77fd4e1249d8c9923de34907236b747ced06e5467ecac1a7bb7115ae0e9670b0",
-              "url": "https://files.pythonhosted.org/packages/fa/1a/f191d32818e5cd985bdd3f47a6e4f525e2db1ce5e8150045ca0c31813686/Flask-2.3.2-py3-none-any.whl"
+              "hash": "f69fcd559dc907ed196ab9df0e48471709175e696d6e698dd4dbe940f96ce66b",
+              "url": "https://files.pythonhosted.org/packages/fd/56/26f0be8adc2b4257df20c1c4260ddd0aa396cf8e75d90ab2f7ff99bc34f9/flask-2.3.3-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "8c2f9abd47a9e8df7f0c3f091ce9497d011dc3b31effcf4c85a6e2b50f4114ef",
-              "url": "https://files.pythonhosted.org/packages/4d/00/ef81c18da32fdfcde6381c315f4b11597fb6691180a330418848efee0ae7/Flask-2.3.2.tar.gz"
+              "hash": "09c347a92aa7ff4a8e7f3206795f30d826654baf38b873d0744cd571ca609efc",
+              "url": "https://files.pythonhosted.org/packages/46/b7/4ace17e37abd9c21715dea5ee11774a25e404c486a7893fa18e764326ead/flask-2.3.3.tar.gz"
             }
           ],
           "project_name": "flask",
           "requires_dists": [
             "Jinja2>=3.1.2",
-            "Werkzeug>=2.3.3",
+            "Werkzeug>=2.3.7",
             "asgiref>=3.2; extra == \"async\"",
             "blinker>=1.6.2",
             "click>=8.1.3",
@@ -2782,7 +2783,7 @@
             "python-dotenv; extra == \"dotenv\""
           ],
           "requires_python": ">=3.8",
-          "version": "2.3.2"
+          "version": "2.3.3"
         },
         {
           "artifacts": [
@@ -3762,14 +3763,19 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "a2673b335d671e64fc73c44e1eaa0aa01fd0e68354e58ee17e863ab29912a79a",
-              "url": "https://files.pythonhosted.org/packages/b6/11/542ff30f2c399d71126e55b64d41cb5caa78ddf7ce557fddf45607a41fe8/icdiff-2.0.6.tar.gz"
+              "hash": "f05d1b3623223dd1c70f7848da7d699de3d9a2550b902a8234d9026292fb5762",
+              "url": "https://files.pythonhosted.org/packages/7c/2a/b3178baa75a3ec75a33588252296c82a1332d2b83cd01061539b74bde9dd/icdiff-2.0.7-py3-none-any.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "f79a318891adbf59a45e3a7694f5e1f18c5407065264637072ac8363b759866f",
+              "url": "https://files.pythonhosted.org/packages/fa/e4/43341832be5f2bcae71eb3ef08a07aaef9b74f74fe0b3675f62bd12057fe/icdiff-2.0.7.tar.gz"
             }
           ],
           "project_name": "icdiff",
           "requires_dists": [],
           "requires_python": null,
-          "version": "2.0.6"
+          "version": "2.0.7"
         },
         {
           "artifacts": [
@@ -8052,6 +8058,7 @@
     "boto3-stubs[location]==1.26.76",
     "boto3==1.26.76",
     "click==8.1.7",
+    "coverage[toml]==7.3.0",
     "cryptography==41.0.3",
     "dnspython==2.4.2",
     "docformatter==1.5.1",

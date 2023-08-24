@@ -19,6 +19,7 @@ black==23.7.0
 boto3-stubs[location]==1.26.76  # freeze (fsspec compatibility)
 boto3==1.26.76  # freeze (fsspec compatibility)
 click==8.1.7
+coverage[toml]==7.3.0
 cryptography==41.0.3
 dnspython==2.4.2
 docformatter==1.5.1  # freeze (no Pants support)
