@@ -23,7 +23,7 @@
         }
     },
     "sandbox": {
-        "deploy": false,
+        "deploy": true,
         "variables": {
             "count": 1,
             "traefik_entrypoints": "websecure",
@@ -31,7 +31,7 @@
             "plus_api_address": "https://plus.api.sandbox.junction.dev",
             "plus_activated": false,
             "ory_client_token_endpoint": "https://optimistic-tereshkova-36hc6vayw4.projects.oryapis.com/oauth2/token",
-            "ory_client_id": ""
+            "ory_client_id": "04d95316-bb1e-4ac1-a03d-c96c8ad09213"
         }
     }
 }
