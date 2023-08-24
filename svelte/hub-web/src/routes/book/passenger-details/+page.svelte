@@ -1,9 +1,15 @@
 <script lang="ts" context="module">
   function getDefaultPassengers(passengers: PassengerCountData): PassengerData[] {
     return [
-      ...Array<PassengerData>(passengers.adults).fill({ document: {}, type: "adult" }),
-      ...Array<PassengerData>(passengers.children).fill({ document: {}, type: "child" }),
-      ...Array<PassengerData>(passengers.infants).fill({ document: {}, type: "infant" }),
+      ...Array(passengers.adults)
+        .fill(undefined)
+        .map<PassengerData>(() => ({ document: {}, type: "adult" })),
+      ...Array(passengers.children)
+        .fill(undefined)
+        .map<PassengerData>(() => ({ document: {}, type: "child" })),
+      ...Array(passengers.infants)
+        .fill(undefined)
+        .map<PassengerData>(() => ({ document: {}, type: "infant" })),
     ];
   }
 </script>
