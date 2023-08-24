@@ -14,7 +14,7 @@
   "sandbox": {
     "variables": {
       "count": 1,
-      "use_gateway": false
+      "use_gateway": true
     }
   }
 }
