@@ -16,7 +16,7 @@
 
 <script lang="ts">
   import ChevronIcon from "components/icons/chevron-icon.svelte";
-  import type { PassengerData } from "./passengers.svelte";
+  import type { PassengerData } from "./passenger-details/passengers.svelte";
 
   export let passengers: PassengerData[];
 </script>

@@ -14,6 +14,7 @@
   import { z } from "zod";
   import { formatError, type FormattedError } from "utils/zod";
   import { updateBeneficiaryData } from "./helpers";
+  import { formatCountryOption } from "formatting/location";
 
   export let data: CreateBeneficiaryModel;
   export let currencies: Map<string, CurrencyModel>;
@@ -23,8 +24,13 @@
   let bankDetails = data.bankDetails ?? {};
   let address = bankDetails.address ?? {};
   let addressLine = address.addressLines?.[0];
+  let country = countries.get(data.address?.countryCode ?? "");
 
-  $: address = { ...address, addressLines: addressLine ? [addressLine] : [] };
+  $: address = {
+    ...address,
+    addressLines: addressLine ? [addressLine] : [],
+    countryCode: country?.code,
+  };
   $: bankDetails = {
     ...bankDetails,
     address,
@@ -33,10 +39,6 @@
     accountType: "checking",
   };
   $: data = { ...data, bankDetails };
-
-  function formatCountryOption(code?: string): string {
-    return countries.get(code ?? "")?.name ?? "";
-  }
 
   function formatCurrencyOption(code?: string): string {
     const currency = currencies.get(code ?? "");
@@ -84,11 +86,11 @@
     <SelectField
       label="Country"
       placeholder="Select country"
-      options={Array.from(countries.values()).map((c) => c.code)}
+      options={Array.from(countries.values())}
       formatter={formatCountryOption}
       required
       error={errors?.bankDetails?.address?.countryCode}
-      bind:value={address.countryCode}
+      bind:value={country}
     />
     <SelectField
       label="Currency"

@@ -55,7 +55,7 @@ export function parseCreateOrderModel(data: CreateOrderModel): CreateOrderReques
         },
       },
       relationships: {
-        quote: { data: { id: data.quoteId, type: "trip-offer-price-quotes" } },
+        quote: { data: { id: data.priceQuoteId, type: "trip-offer-price-quotes" } },
         payment: { data: { id: data.paymentId, type: "payments" } },
       },
     },

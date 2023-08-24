@@ -12,11 +12,14 @@ export default {
     passengerDetails: {
       root: "/book/passenger-details",
       actions: {
-        poll: "/book/passenger-details?/poll",
+        createOrder: "/book/passenger-details?/createOrder",
       },
     },
     payment: {
       root: "/book/payment",
+      actions: {
+        poll: "/book/payment?/poll",
+      },
     },
     confirmation: {
       root: "/book/confirmation",

@@ -13,21 +13,18 @@
     countryCode?: string;
     postcode?: string;
   };
-
-  function formatCountryOption(country?: CountryModel): string {
-    return country?.name ?? "None";
-  }
 </script>
 
 <script lang="ts">
   import SelectField from "components/ui/select-field.svelte";
   import TextField from "components/ui/text-field.svelte";
+  import { formatCountryOption } from "formatting/location";
   import type { CountryModel } from "models/location";
 
   export let countries: Map<string, CountryModel>;
   export let contactInformation: ContactInformationData;
 
-  let country: CountryModel | undefined = undefined;
+  let country: CountryModel | undefined = countries.get(contactInformation.countryCode ?? "");
 
   $: contactInformation = {
     ...contactInformation,

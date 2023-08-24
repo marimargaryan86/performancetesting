@@ -104,6 +104,9 @@ export const actions = {
       optionIds,
     });
 
-    setSearchData({ ...searchData, offerId, optionIds, priceQuoteId: priceQuote.id }, event);
+    setSearchData(
+      { ...searchData, offerId, optionIds, priceQuoteId: priceQuote.id, paymentIntent: undefined },
+      event,
+    );
   },
 };

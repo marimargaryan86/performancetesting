@@ -67,8 +67,11 @@
   {#if expanded}
     <ul class="typography body-medium options" transition:scale={{ duration: 150, start: 0.8 }}>
       {#each options as option}
+        {@const displayValue = formatter(option)}
         <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
-        <li class="option" on:click={select.bind(select, option)}>{formatter(option)}</li>
+        <li class="option" on:click={select.bind(select, option)} title={displayValue}>
+          {displayValue}
+        </li>
       {/each}
     </ul>
   {/if}
@@ -113,6 +116,9 @@
 
   .option {
     padding: 16px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
     cursor: pointer;
     user-select: none;
   }

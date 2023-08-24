@@ -2,8 +2,8 @@
   const steps: { label: string; number: number; title: string }[] = [
     { label: "Search", number: 1, title: "Search for offers" },
     { label: "Select", number: 2, title: "Select an offer" },
-    { label: "Passenger Details", number: 3, title: "Passenger Details" },
-    { label: "Payment", number: 4, title: "Payment" },
+    { label: "Payment", number: 3, title: "Payment" },
+    { label: "Passenger Details", number: 4, title: "Passenger Details" },
     { label: "Confirmation", number: 5, title: "Confirmation" },
   ];
 </script>
@@ -19,6 +19,8 @@
     if (route?.endsWith("select-offer")) {
       return 2;
     } else if (route?.endsWith("passenger-details")) {
+      return 4;
+    } else if (route?.endsWith("payment")) {
       return 3;
     }
 

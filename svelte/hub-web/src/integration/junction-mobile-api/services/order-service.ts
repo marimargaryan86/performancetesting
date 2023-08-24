@@ -24,6 +24,10 @@ export class OrderService extends JunctionMobileApiService {
       },
     );
 
+    if (resp.status !== 201) {
+      throw new Error("Order creation failed");
+    }
+
     return parseCreateOrderResponseSchema(await resp.json());
   }
 

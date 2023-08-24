@@ -13,7 +13,7 @@ export interface CreateTripCandidatesModel {
 }
 
 export interface CreateOrderModel {
-  quoteId: string;
+  priceQuoteId: string;
   paymentId: string;
   passengers: {
     firstName: string;

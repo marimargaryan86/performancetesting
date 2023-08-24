@@ -71,18 +71,25 @@ export type PartiallyPartial<TObject extends object, TRequired extends keyof TOb
   [key in TRequired]: TObject[key];
 } & { [key in Exclude<keyof TObject, TRequired>]?: TObject[key] };
 
-function getActionRequestData(data?: Record<string, unknown>): FormData | undefined {
+function getActionRequestData(
+  dataType: "form" | "json",
+  data?: Record<string, unknown>,
+): FormData | undefined {
   const formData = new FormData();
 
   if (!data) {
     return formData;
   }
 
-  Object.entries(data).forEach(([key, val]) => {
-    if (val !== undefined) {
-      formData.set(key, String(val));
-    }
-  });
+  if (dataType === "form") {
+    Object.entries(data).forEach(([key, val]) => {
+      if (val !== undefined) {
+        formData.set(key, String(val));
+      }
+    });
+  } else {
+    formData.set("json", JSON.stringify(data));
+  }
 
   return formData;
 }
@@ -94,12 +101,14 @@ export async function callAction<
   action,
   data,
   apply = true,
+  dataType = "form",
 }: {
   action: string;
   data?: Record<string, unknown>;
   apply?: boolean;
+  dataType?: "form" | "json";
 }): Promise<ActionResult<TResult, TFailure>> {
-  const body = getActionRequestData(data);
+  const body = getActionRequestData(dataType, data);
   const resp = await fetch(action, { method: "POST", body });
   const result = deserialize<TResult, TFailure>(await resp.text());
 

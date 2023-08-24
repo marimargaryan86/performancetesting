@@ -18,7 +18,7 @@
   import { onDestroy } from "svelte";
   import { callAction, sleep } from "utils/common";
   import Countdown from "../countdown.svelte";
-  import Summary from "./summary.svelte";
+  import Summary from "../summary.svelte";
   import Passengers, { type PassengerData } from "./passengers.svelte";
   import ContactInformation, { type ContactInformationData } from "./contact-information.svelte";
   import { goto } from "$app/navigation";
@@ -65,7 +65,7 @@
     }
 
     const result = await callAction<{ priceQuote: OfferPriceQuoteModel }>({
-      action: routeConfig.book.passengerDetails.actions.poll,
+      action: routeConfig.book.payment.actions.poll,
       apply: false,
     });
 
@@ -89,8 +89,28 @@
     return pollPriceQuote(id);
   }
 
-  function goToNext(): void {
-    goto(routeConfig.book.payment.root);
+  async function goToNext(): Promise<void> {
+    if (!data.priceQuote.price) {
+      return;
+    }
+
+    const result = await callAction({
+      action: routeConfig.book.passengerDetails.actions.createOrder,
+      data: {
+        priceQuoteId: data.priceQuote.id,
+        passengers: bookingDetails.passengers,
+        contact: bookingDetails.contactInformation,
+        price: data.priceQuote.price,
+      },
+      dataType: "json",
+      apply: false,
+    });
+
+    if (result.type !== "success") {
+      return;
+    }
+
+    goto(routeConfig.book.confirmation.root);
   }
 
   onDestroy(() => {
@@ -99,7 +119,7 @@
 </script>
 
 <svelte:head>
-  <title>Summary · Book · Junction Hub</title>
+  <title>Passenger details · Book · Junction Hub</title>
 </svelte:head>
 
 <div class="content">
@@ -122,8 +142,10 @@
 </div>
 
 <div class="actions">
-  <Button size="small" variant="outline" href={backUrl.toString()}>Previous</Button>
-  <Button size="small" on:click={goToNext}><span class="next-btn">Next</span></Button>
+  <div class="wrapper">
+    <Button size="small" variant="text" href={backUrl.toString()}>Previous</Button>
+    <Button size="small" on:click={goToNext}><span class="next-btn">Next</span></Button>
+  </div>
 </div>
 
 <style>
@@ -172,11 +194,16 @@
 
   .actions {
     position: relative;
+    padding: 16px 24px;
+    background-color: var(--color-common-background-light-main);
+  }
+
+  .actions > .wrapper {
     display: flex;
     gap: 16px;
     justify-content: space-between;
-    padding: 16px 24px;
-    background-color: var(--color-common-background-light-main);
+    width: 100%;
+    max-width: 1104px;
   }
 
   .actions::after {
@@ -191,7 +218,7 @@
     pointer-events: none;
   }
 
-  .actions > :global(button) {
+  .actions > .wrapper > :global(button) {
     width: 140px;
   }
 </style>

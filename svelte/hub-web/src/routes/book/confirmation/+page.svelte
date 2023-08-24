@@ -8,7 +8,7 @@
   import { goto } from "$app/navigation";
   import routeConfig from "routeConfig";
   import Alert from "components/ui/alert.svelte";
-  import PaymentModal from "../payment/payment-modal.svelte";
+  import PaymentModal from "./payment-modal.svelte";
   import { onMount } from "svelte";
 
   let alert: { type: "success" | "failed"; message: string } | undefined = {

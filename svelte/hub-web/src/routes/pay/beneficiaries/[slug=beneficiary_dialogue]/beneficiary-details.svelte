@@ -17,6 +17,7 @@
   import { formatError, type FormattedError } from "utils/zod";
   import { updateBeneficiaryData } from "./helpers";
   import type { AccountModel } from "models/account";
+  import { formatCountryOption } from "formatting/location";
 
   export let data: CreateBeneficiaryModel;
   export let countries: Map<string, CountryModel>;
@@ -25,14 +26,15 @@
   let errors: FormattedError<z.infer<typeof schema>> | undefined = undefined;
   let address = data.address ?? {};
   let addressLine = address.addressLines?.[0];
+  let country = countries.get(data.address?.countryCode ?? "");
 
   $: accountIds = accounts.map((a) => a.id);
-  $: address = { ...address, addressLines: addressLine ? [addressLine] : [] };
+  $: address = {
+    ...address,
+    addressLines: addressLine ? [addressLine] : [],
+    countryCode: country?.code,
+  };
   $: data = { ...data, address };
-
-  function formatCountryOption(code?: string): string {
-    return countries.get(code ?? "")?.name ?? "";
-  }
 
   function formatAccountOption(id?: string): string {
     return accounts.find((a) => a.id === id)?.name ?? "";
@@ -116,10 +118,10 @@
         required
         label="Country"
         placeholder="Select country"
-        options={Array.from(countries.values()).map((c) => c.code)}
+        options={Array.from(countries.values())}
         formatter={formatCountryOption}
         error={errors?.address?.countryCode}
-        bind:value={address.countryCode}
+        bind:value={country}
       />
     </div>
   </form>

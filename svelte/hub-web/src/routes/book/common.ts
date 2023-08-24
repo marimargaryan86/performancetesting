@@ -3,6 +3,7 @@ import type { PlaceModel } from "models/booking/location";
 import jwt from "jsonwebtoken";
 import { getRandomAlphaNumericString } from "utils/random";
 import type { TripCandidatesModel } from "models/booking/trip";
+import type { PaymentIntentModel } from "models/booking/payment";
 
 export const SEARCH_TOKEN = "search-token";
 export const JWT_SIGNATURE = "search-token";
@@ -23,6 +24,8 @@ export type SearchData = {
   offerId?: string;
   optionIds?: string[];
   priceQuoteId?: string;
+  paymentIntent?: PaymentIntentModel;
+  orderId?: string;
 };
 
 export type ResolvedSearchData = {
@@ -32,6 +35,7 @@ export type ResolvedSearchData = {
   departureAfter: Date;
   passengers: PassengerCountData;
   tripCandidatesSearch?: TripCandidatesModel;
+  paymentIntent?: PaymentIntentModel;
 };
 
 function getTokenSearchData(event: RequestEvent): SearchData | undefined {

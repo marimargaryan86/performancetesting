@@ -16,5 +16,13 @@ export default {
       env.BOOKING_HUB_API_BASE_URL,
       env.BOOKING_HUB_API_KEY,
     ),
+    orders: new junctionMobileApi.OrderService(
+      env.BOOKING_HUB_API_BASE_URL,
+      env.BOOKING_HUB_API_KEY,
+    ),
+    payments: new junctionMobileApi.PaymentService(
+      env.BOOKING_HUB_API_BASE_URL,
+      env.BOOKING_HUB_API_KEY,
+    ),
   },
 };

@@ -107,7 +107,7 @@ export interface OfferPriceQuoteModel {
   id: string;
   expiresAt: Date;
   price?: PriceModel;
-  priceBreakdown: PriceBreakdownModel[];
+  priceBreakdown?: PriceBreakdownModel[];
   penalties: PenaltyModel[];
   required: PriceQuoteRequiredPassengerInfoType[];
   rules: RuleModel[];

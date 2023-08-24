@@ -102,7 +102,7 @@
       data: selected,
     });
 
-    goto(routeConfig.book.passengerDetails.root);
+    goto(routeConfig.book.payment.root);
   }
 
   onDestroy(() => (tripCandidatesSearchId = undefined));
@@ -151,7 +151,9 @@
 
 {#if selected}
   <div class="actions" transition:fade={{ duration: 200 }}>
-    <Button on:click={goToNext} size="small">Next</Button>
+    <div class="wrapper">
+      <Button on:click={goToNext} size="small">Next</Button>
+    </div>
   </div>
 {/if}
 
@@ -231,10 +233,15 @@
 
   .actions {
     position: relative;
-    display: flex;
-    justify-content: flex-end;
     padding: 16px 24px;
     background-color: var(--color-common-background-light-main);
+  }
+
+  .actions > .wrapper {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    max-width: 1104px;
   }
 
   .actions::after {
@@ -249,7 +256,7 @@
     pointer-events: none;
   }
 
-  .actions > :global(button) {
+  .actions > .wrapper > :global(button) {
     width: 140px;
   }
 </style>

@@ -4,7 +4,7 @@
   export let group: TValue[] = [];
   export let id: string | undefined = undefined;
 
-  let checked = value !== undefined && group.includes(value);
+  export let checked = value !== undefined && group.includes(value);
 
   $: updateCheckedByGroup(group);
   $: updateCheckedByChecked(checked);

@@ -9,6 +9,8 @@ import type {
   LegTypeModel,
   OfferSegmentLegModel,
   OfferPriceQuoteModel,
+  PenaltyModel,
+  RuleModel,
 } from "models/booking/offer";
 import type {
   BaggageAllowancesSchema,
@@ -22,6 +24,8 @@ import type {
   LegTypeSchema,
   CabinClassSchema,
   GetOfferPriceQuoteResponseSchema,
+  TripOfferOptionPenaltySchema,
+  OfferSegmentDetailRuleSchema,
 } from "../schemas/offer";
 import { parsePriceBreakdownSchema, parsePriceSchema } from "./money";
 import { parsePointSchema } from "./common";
@@ -151,6 +155,28 @@ export function parseOfferSchema(
   };
 }
 
+export function parseOfferOptionPenaltySchema(data: TripOfferOptionPenaltySchema): PenaltyModel {
+  return {
+    applicability: data.applicability,
+    applicableTo: {
+      dateOfBirthAfter: new Date(data.applicableTo.dateOfBirthAfter),
+      dateOfBirthBefore: new Date(data.applicableTo.dateOfBirthBefore),
+    },
+    refundable: data.refundable,
+    type: data.penaltyType,
+    changeable: data.changeable,
+    conditionsApply: data.conditionsApply,
+    price: data.price ? parsePriceSchema(data.price) : undefined,
+  };
+}
+
+export function parseOfferSegmentDetailRuleSchema(data: OfferSegmentDetailRuleSchema): RuleModel {
+  return {
+    body: data.body,
+    title: data.title,
+  };
+}
+
 export function parsePriceQuoteSchema(
   data: TripOfferPriceQuoteSchema,
   offerGroups?: OfferGroupModel[],
@@ -163,10 +189,10 @@ export function parsePriceQuoteSchema(
     expiresAt: new Date(data.attributes.expiresAt),
     offerId: data.relationships.offer.data.id,
     optionIds: data.relationships.options.data.map((item) => item.id),
-    penalties: [],
-    priceBreakdown: [],
+    penalties: data.attributes.penalties.map(parseOfferOptionPenaltySchema),
+    priceBreakdown: data.attributes.priceBreakdown?.map(parsePriceBreakdownSchema),
     required: data.attributes.required,
-    rules: [],
+    rules: data.attributes.rules.map(parseOfferSegmentDetailRuleSchema),
     status: data.attributes.status,
     price: data.attributes.price ? parsePriceSchema(data.attributes.price) : undefined,
   };
