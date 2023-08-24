@@ -187,11 +187,12 @@ def _factory(
             ),
             validate_response=app.settings.validate_responses_against_spec,
         )
+
         asgi_app.add_exception_handler(
             httpx.HTTPStatusError,
             partial(
                 mobile_handlers.go_status_error_handler,
-                go_urls=app.settings.junction_api_address,
+                go_urls=[app.settings.junction_api_address],
             ),
         )
         return asgi_app

@@ -102,7 +102,7 @@ def _factory(
             httpx.HTTPStatusError,
             partial(
                 handlers.go_status_error_handler,
-                go_urls=app.settings.junction_api_address,
+                go_urls=[app.settings.junction_api_address],
             ),
         )
         return asgi_app
