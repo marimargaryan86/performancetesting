@@ -1,4 +1,4 @@
-import { ActionFailure, HttpError_1 as HttpError, error, fail } from "@sveltejs/kit";
+import { ActionFailure, error, fail } from "@sveltejs/kit";
 import type { OfferPriceQuoteModel } from "models/booking/offer";
 import integrationInstancesServer from "integration-instances-server";
 import { getSearchData, setSearchData, type ResolvedSearchData, type SearchData } from "../common";
@@ -92,11 +92,9 @@ export const actions = {
 
       return { priceQuote, paymentIntent };
     } catch (err) {
-      if (err instanceof HttpError) {
-        return fail(err.status, { error: err.body.message });
-      }
-    }
+      const castErr = err as { status: number; body: { message: string } };
 
-    return fail(500, { error: "An unexpected error occurred" });
+      return fail(castErr.status, { error: castErr.body.message });
+    }
   },
 };
