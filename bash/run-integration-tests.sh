@@ -40,7 +40,5 @@ pants test --force --output=none python/snowfall/project/junction/api_automation
 	-- \
 	--API-TOKEN="${TEST_E2E_TOKEN}" \
 	--DEPARTURE_AFTER="${TEST_E2E_DEPARTURE_AFTER}" \
-	--ORIGIN="${TEST_E2E_ORIGIN}" \
-	--DESTINATION="${TEST_E2E_DESTINATION}" \
 	--HOST="${TEST_E2E_HOST}" \
 	--alluredir="${TEST_E2E_ALLURE_DIR}"
