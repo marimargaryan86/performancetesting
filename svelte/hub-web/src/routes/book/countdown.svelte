@@ -1,6 +1,6 @@
 <script lang="ts" context="module">
   function getTimeLeft(date: Date): string {
-    const secondsTotal = Math.max(0, getTimeDeltaS(date, new Date()));
+    const secondsTotal = Math.max(0, getTimeDeltaS(date, new Date(), false));
     const minutes = Math.floor(secondsTotal / 60);
     const seconds = secondsTotal % 60;
 

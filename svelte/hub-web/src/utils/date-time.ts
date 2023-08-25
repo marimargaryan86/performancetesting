@@ -51,10 +51,12 @@ export function datesEq(date1: Date, date2: Date): boolean {
   return date1.getTime() === date2.getTime();
 }
 
-export function getTimeDeltaMs(date1: Date, date2: Date): number {
-  return Math.abs(date1.getTime() - date2.getTime());
+export function getTimeDeltaMs(date1: Date, date2: Date, absolute = true): number {
+  const delta = date1.getTime() - date2.getTime();
+
+  return absolute ? Math.abs(delta) : delta;
 }
 
-export function getTimeDeltaS(date1: Date, date2: Date): number {
-  return Math.floor(getTimeDeltaMs(date1, date2) / 1000);
+export function getTimeDeltaS(date1: Date, date2: Date, absolute = true): number {
+  return Math.floor(getTimeDeltaMs(date1, date2, absolute) / 1000);
 }
