@@ -43,18 +43,25 @@ class MessageHandler(object):
     async def handle_message(  # noqa: WPS211
         self,
         message: str,
-        message_sid: str,
+        message_key: str,
         subscriber: models_pb2.Subscriber,
         subscribers_client: subscribers.Client,
         orders_client: orders.Client,
     ) -> Sequence[str]:
         subscriber_state = await self.get_state(subscriber)
+        if (  # noqa: WPS337
+            subscriber_state.get("last_handler")
+            in {"upcoming_trips", "upcoming_trip_details"}
+            and message.isdigit()
+        ):
+            message_key = message
+            message = "upcoming trip details"
         message_handler = message_handlers(message.lower())
         response = await message_handler(
             subscriber,
             subscribers_client,
             orders_client,
-            message_sid,
+            message_key,
             self._redis,
         )
         subscriber_state["last_message"] = message
@@ -88,6 +95,7 @@ def message_handlers(fun: str) -> _MessageHandlerFunctionType:
         "upcoming trips": upcoming_trips,
         "main menu": main_menu,
         "check-in": check_in,
+        "upcoming trip details": upcoming_trip_details,
     }.get(fun, handle_unknown)
 
 
@@ -95,7 +103,7 @@ async def unsubscribe(
     subscriber: models_pb2.Subscriber,
     subscribers_client: subscribers.Client,
     orders_client: orders.Client,
-    message_sid: str,
+    message_key: str,
     redis_client: redis.Client[str],
 ) -> Sequence[str]:  # noqa: WPS473
     unsubscribe_status = await subscribers_client.unsubscribe(subscriber.id)
@@ -114,7 +122,7 @@ async def subscribe(
     subscriber: models_pb2.Subscriber,
     subscribers_client: subscribers.Client,
     orders_client: orders.Client,
-    message_sid: str,
+    message_key: str,
     redis_client: redis.Client[str],
 ) -> Sequence[str]:  # noqa: WPS473
     subscribe_status = await subscribers_client.subscribe(subscriber.id)
@@ -133,12 +141,12 @@ async def trip_details(
     subscriber: models_pb2.Subscriber,
     subscribers_client: subscribers.Client,
     orders_client: orders.Client,
-    message_sid: str,
+    message_key: str,
     redis_client: redis.Client[str],
 ) -> Sequence[str]:  # noqa: WPS473
     order = None
-    if message_sid:
-        order_id = await get_order_id_by_message_id(redis_client, message_sid)
+    if message_key:
+        order_id = await get_order_id_by_message_id(redis_client, message_key)
         if order_id:
             order = await orders_client.get(order_id)
     if order is None:
@@ -156,7 +164,7 @@ async def upcoming_trips(  # noqa: WPS210
     subscriber: models_pb2.Subscriber,
     subscribers_client: subscribers.Client,
     orders_client: orders.Client,
-    message_sid: str,
+    message_key: str,
     redis_client: redis.Client[str],
 ) -> Sequence[str]:  # noqa: WPS473
     await redis_client.delete("upcoming_trips_{0}".format(subscriber.id))
@@ -207,11 +215,28 @@ async def upcoming_trips(  # noqa: WPS210
     ]
 
 
+async def upcoming_trip_details(
+    subscriber: models_pb2.Subscriber,
+    subscribers_client: subscribers.Client,
+    orders_client: orders.Client,
+    message_key: str,
+    redis_client: redis.Client[str],
+) -> Sequence[str]:  # noqa: WPS473
+    session = redis_client.hash_("upcoming_trips_{0}".format(subscriber.id))
+    order_id = await session.get(message_key)
+    if not order_id:
+        return [_("Invalid option. Please try again")]
+    return [
+        transform_trip_details(await orders_client.get(order_id)),
+        trip_details_menu,
+    ]
+
+
 async def check_in(
     subscriber: models_pb2.Subscriber,
     subscribers_client: subscribers.Client,
     orders_client: orders.Client,
-    message_sid: str,
+    message_key: str,
     redis_client: redis.Client[str],
 ) -> Sequence[str]:
     return [
@@ -224,7 +249,7 @@ async def handle_unknown(
     subscriber: models_pb2.Subscriber,
     subscribers_client: subscribers.Client,
     orders_client: orders.Client,
-    message_sid: str,
+    message_key: str,
     redis_client: redis.Client[str],
 ) -> Sequence[str]:
     return [
@@ -237,7 +262,7 @@ async def main_menu(
     subscriber: models_pb2.Subscriber,
     subscribers_client: subscribers.Client,
     orders_client: orders.Client,
-    message_sid: str,
+    message_key: str,
     redis_client: redis.Client[str],
 ) -> Sequence[str]:
     return [action_menu]
