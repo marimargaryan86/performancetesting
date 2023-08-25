@@ -74,6 +74,8 @@ EOH
           , "-F"
           , "variables[PROJECT_DIR]=mobile_api_tests/"
           , "-F"
+          , "variables[TESTING_SUIT]=${var.testing_suite}"
+          , "-F"
           , "variables[CI_PIPELINE_SOURCE]=schedule"
           , "https://git.snowfall.se/api/v4/projects/406/trigger/pipeline"
         ]
