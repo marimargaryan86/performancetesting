@@ -34,7 +34,7 @@ export class OfferService extends JunctionMobileApiService {
 
     const respData = await resp.json();
 
-    return parsePriceQuoteSchema(respData.data);
+    return parsePriceQuoteSchema(respData.data, []);
   }
 
   async getPriceQuote(id: string): Promise<OfferPriceQuoteModel> {

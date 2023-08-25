@@ -36,7 +36,7 @@
 <script lang="ts">
   import Button from "components/ui/button.svelte";
   import Countdown from "../countdown.svelte";
-  import Summary from "../summary.svelte";
+  import Summary from "../summary/summary.svelte";
   import routeConfig from "routeConfig";
   import Checkbox from "components/ui/checkbox.svelte";
   import { browser } from "$app/environment";
@@ -176,7 +176,11 @@
       </label>
     </div>
 
-    <Summary passengers={[]} />
+    <Summary
+      passengers={data.searchData.passengers}
+      offer={data.priceQuote.offer}
+      options={data.priceQuote.options}
+    />
   </div>
 </div>
 

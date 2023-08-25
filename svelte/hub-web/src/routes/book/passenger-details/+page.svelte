@@ -24,7 +24,7 @@
   import { onDestroy } from "svelte";
   import { callAction, sleep } from "utils/common";
   import Countdown from "../countdown.svelte";
-  import Summary from "../summary.svelte";
+  import Summary from "../summary/summary.svelte";
   import Passengers, { type PassengerData } from "./passengers.svelte";
   import ContactInformation, { type ContactInformationData } from "./contact-information.svelte";
   import { goto } from "$app/navigation";
@@ -146,7 +146,11 @@
       />
     </div>
 
-    <Summary passengers={bookingDetails.passengers} />
+    <Summary
+      passengers={data.searchData.passengers}
+      offer={data.priceQuote.offer}
+      options={data.priceQuote.options}
+    />
   </div>
 </div>
 

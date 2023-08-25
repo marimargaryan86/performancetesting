@@ -1,3 +1,4 @@
+import type { PriceBreakdownType } from "integration/junction-mobile-api/schemas/price";
 import type { CurrencyModel, MoneyModel } from "models/money";
 
 export function formatAmountAndCode(
@@ -24,4 +25,20 @@ export function formatAmount(
     style: sign ? "currency" : undefined,
     currency: sign ? money.currency : undefined,
   });
+}
+
+export function formatPriceBreakdownType(type: PriceBreakdownType): string {
+  if (type === "base-fare") {
+    return "Base fare";
+  } else if (type === "company-mark-up") {
+    return "Company mark-up";
+  } else if (type === "reseller-mark-up") {
+    return "Reseller mark-up";
+  } else if (type === "service-mark-up") {
+    return "Service mark-up";
+  } else if (type === "tax") {
+    return "Taxes";
+  }
+
+  throw new Error(`Unknown price breakdown type ${type}`);
 }

@@ -113,7 +113,7 @@ export interface OfferPriceQuoteModel {
   rules: RuleModel[];
   status: TripOfferPriceQuoteStatus;
   offerId: string;
+  offer?: OfferModel;
   optionIds: string[];
-  options?: OfferGroupOptionModel[];
-  groupDetails?: OfferGroupDetailsModel;
+  options: OfferGroupOptionModel[];
 }

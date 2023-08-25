@@ -4,13 +4,13 @@ import type {
   OfferGroupModel,
   OfferModel,
   OfferOptionDetailsModel,
-  OfferGroupOptionModel as OfferOptionModel,
   OfferGroupDetailsModel,
   LegTypeModel,
   OfferSegmentLegModel,
   OfferPriceQuoteModel,
   PenaltyModel,
   RuleModel,
+  OfferGroupOptionModel,
 } from "models/booking/offer";
 import type {
   BaggageAllowancesSchema,
@@ -111,7 +111,7 @@ export function parseBaggageAllowanceSchema(data: BaggageAllowancesSchema): Bagg
 export function parseOfferOptionSchema(
   data: OfferOptionSchema,
   offerOptionDetails: OfferOptionDetailsModel[],
-): OfferOptionModel {
+): OfferGroupOptionModel {
   return {
     id: data.id,
     price: parsePriceSchema(data.attributes.price),
@@ -128,14 +128,14 @@ export function parseOfferOptionSchema(
 
 export function parseOfferGroupSchema(
   data: OfferGroupSchema,
-  offerOptions: OfferOptionModel[],
+  offerOptions: OfferGroupOptionModel[],
   offerGroupDetails: OfferGroupDetailsModel[],
 ): OfferGroupModel {
   return {
     id: data.id,
     options: data.relationships.options.data
       .map((item) => offerOptions.find((item2) => item.id === item2.id))
-      .filter((item): item is OfferOptionModel => Boolean(item)),
+      .filter((item): item is OfferGroupOptionModel => Boolean(item)),
     details: data.relationships.details.data
       .map((item) => offerGroupDetails.find((item2) => item.id === item2.id))
       .filter((item): item is OfferGroupDetailsModel => Boolean(item)),
@@ -179,16 +179,26 @@ export function parseOfferSegmentDetailRuleSchema(data: OfferSegmentDetailRuleSc
 
 export function parsePriceQuoteSchema(
   data: TripOfferPriceQuoteSchema,
-  offerGroups?: OfferGroupModel[],
+  offers: OfferModel[],
 ): OfferPriceQuoteModel {
-  // eslint-disable-next-line no-console
-  console.log(offerGroups);
+  const offer = offers.find((item) => item.id === data.relationships.offer.data.id);
+  const optionIds = data.relationships.options.data.map((item) => item.id);
+
+  const options =
+    offer?.groups.reduce<OfferGroupOptionModel[]>((prev, curr) => {
+      return [
+        ...prev,
+        ...curr.options.filter((item) => !prev.includes(item) && optionIds.includes(item.id)),
+      ];
+    }, []) ?? [];
 
   return {
     id: data.id,
     expiresAt: new Date(data.attributes.expiresAt),
     offerId: data.relationships.offer.data.id,
-    optionIds: data.relationships.options.data.map((item) => item.id),
+    offer,
+    optionIds,
+    options,
     penalties: data.attributes.penalties.map(parseOfferOptionPenaltySchema),
     priceBreakdown: data.attributes.priceBreakdown?.map(parsePriceBreakdownSchema),
     required: data.attributes.required,
@@ -207,6 +217,7 @@ export function parseGetPriceQuoteSchema(
   const legTypes: LegTypeSchema[] = [];
   const offerGroupDetails: TripOfferGroupDetailsSchema[] = [];
   const offerGroups: OfferGroupSchema[] = [];
+  const offers: TripOfferSchema[] = [];
 
   data.included?.forEach((item) => {
     if (item.type === "cabin-classes") {
@@ -219,6 +230,8 @@ export function parseGetPriceQuoteSchema(
       legTypes.push(item);
     } else if (item.type === "trip-offer-group-details") {
       offerGroupDetails.push(item);
+    } else if (item.type === "offers") {
+      offers.push(item);
     } else {
       offerGroups.push(item);
     }
@@ -238,6 +251,7 @@ export function parseGetPriceQuoteSchema(
   const offerGroups_ = offerGroups.map((item) =>
     parseOfferGroupSchema(item, offerOptions_, offerGroupDetails_),
   );
+  const offers_ = offers.map((item) => parseOfferSchema(item, offerGroups_));
 
-  return parsePriceQuoteSchema(data.data, offerGroups_);
+  return parsePriceQuoteSchema(data.data, offers_);
 }
