@@ -17,14 +17,25 @@ class TransactionsRepository(
 ):
     _proto = models_pb2.Transaction
     _indexes = (
+        pymongo.IndexModel("created_at", background=True),
         pymongo.IndexModel("external_reference_id", background=True, unique=True),
     )
 
     async def list_transactions(
         self,
         cursor: str,
+        filter_by_ids: Sequence[str],
+        sort: tuple[str, int] | None = None,
     ) -> resultset.ResultSet[models_pb2.Transaction]:
-        return await self._find_with_cursor(cur=cursor)
+        filter_ = None
+        if filter_by_ids:
+            filter_ = {
+                "_id": {
+                    "$in": list(filter_by_ids),
+                },
+            }
+
+        return await self._find_with_cursor(cur=cursor, sort=sort, filter_=filter_)
 
     async def find_by_ids(
         self,

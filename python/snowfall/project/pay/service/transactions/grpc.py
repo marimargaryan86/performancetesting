@@ -17,7 +17,7 @@ from snowfall.project.pay.service.transactions.v1alpha import (
     models_pb2,
 )
 from snowfall.stdlib import money, string
-from snowfall.stdlib.transport.grpc import service
+from snowfall.stdlib.transport.grpc import service, sorting
 from snowfall.vendor.currency_cloud.client import PaymentClient
 from snowfall.vendor.currency_cloud.errors import CurrencyCloudError
 from snowfall.vendor.currency_cloud.models import conversion
@@ -38,6 +38,7 @@ class TransactionsService(
         self._conversions = conversions
         self._payment_client = payment_client
         self._companies = companies_client
+        self._sort = {"created_at": "created_at"}
         self._default_page_size = 20
 
     def get_name(self) -> str:
@@ -56,6 +57,8 @@ class TransactionsService(
     ) -> grpc_pb2.ListTransactionsResponse:
         transactions = await self._transactions.list_transactions(
             cursor=request.page_token,
+            sort=sorting.get_sort(request.sort_by, self._sort),
+            filter_by_ids=request.filter_by,
         )
         transactions.limit(
             request.page_size if request.page_size else self._default_page_size,

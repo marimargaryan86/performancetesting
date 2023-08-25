@@ -5,6 +5,7 @@ package snowfall.project.pay.service.transactions.v1alpha;
 import "snowfall/project/pay/service/companies/v1alpha/models.proto";
 import "snowfall/project/pay/service/transactions/v1alpha/models.proto";
 import "snowfall/stdlib/v1/money.proto";
+import "snowfall/stdlib/v1/sort.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/transactions/v1alpha";
 
@@ -29,6 +30,8 @@ service ConversionsService {
 message ListTransactionsRequest {
   int32 page_size = 1;
   string page_token = 2;
+  snowfall.stdlib.v1.Sort sort_by = 3;
+  repeated string filter_by = 4;
 }
 
 message ListTransactionsResponse {

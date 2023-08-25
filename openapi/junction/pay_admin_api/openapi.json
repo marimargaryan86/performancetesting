@@ -2078,6 +2078,12 @@
           },
           {
             "$ref": "#/components/parameters/page-limit"
+          },
+          {
+            "$ref": "#/components/parameters/sortTransaction"
+          },
+          {
+            "$ref": "#/components/parameters/filterIds"
           }
         ],
         "responses": {
@@ -2268,6 +2274,24 @@
         "style": "form",
         "explode": false
       },
+      "filterIds": {
+        "name": "filter[ids][eq]",
+        "in": "query",
+        "required": false,
+        "description": "Filters transactions based on the ids",
+        "style": "form",
+        "explode": false,
+        "schema": {
+          "type": "array",
+          "example": [
+            "271f6d54-9e59-407e-a860-b0771d9e3d26"
+          ],
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
       "filterCompaniesType": {
         "name": "filter[type][eq]",
         "in": "query",
@@ -2327,6 +2351,23 @@
           ],
           "example": "id",
           "default": "id"
+        },
+        "description": "Sorting based on field"
+      },
+      "sortTransaction": {
+        "name": "sort",
+        "in": "query",
+        "style": "form",
+        "explode": false,
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "createdAt",
+            "-createdAt"
+          ],
+          "example": "createdAt",
+          "default": "createdAt"
         },
         "description": "Sorting based on field"
       }

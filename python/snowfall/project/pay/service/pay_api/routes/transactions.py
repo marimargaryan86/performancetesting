@@ -10,10 +10,16 @@ from snowfall.stdlib.integration.starlette import (
     models,
     pagination_helpers,
     request_helpers,
+    sorting,
 )
+from snowfall.stdlib.logging import stdout
+
+_logger = stdout.get_logger()
 
 
 class Transactions(endpoints.HTTPEndpoint):
+    _default_page_size = 20
+
     async def post(
         self,
         request: requests.Request,
@@ -58,6 +64,52 @@ class Transactions(endpoints.HTTPEndpoint):
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
+    async def get(  # noqa: WPS210
+        self,
+        request: requests.Request,
+        client: transactions_adapter.Client = lagom.injectable,
+    ) -> models.JsonApiResponse:
+        pagination = pagination_helpers.get_pagination(request)
+
+        sort = sorting.get_sort(request, {"createdAt": "created_at"})
+        filter_by = [
+            str(uuid)
+            for uuid in request.scope["parsed_query_string"].get("filter[ids][eq]", [])
+        ]
+
+        response = await client.find(
+            limit=pagination.limit or self._default_page_size,
+            cursor=pagination.cursor,
+            sort=sort,
+            filter_by=filter_by,
+        )
+
+        data_resources = []
+        for transaction in response.transactions:
+            try:
+                data_resources.append(
+                    resources.Transaction.from_proto(transaction, request),
+                )
+            except Exception:  # noqa: BLE001
+                _logger.error(  # noqa: TRY400
+                    "data-model is not valid",
+                    data=transaction,
+                )
+
+        return await messages.create_response(
+            body=models.Body(
+                data=data_resources,
+                links=pagination_helpers.get_next_url(
+                    request.url_for("Transactions"),
+                    response.next_page_token,
+                    pagination,
+                ),
+            ),
+            request=request,
+        )
+
+
+class Transaction(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
@@ -67,37 +119,6 @@ class Transactions(endpoints.HTTPEndpoint):
         return await messages.create_response(
             body=models.Body(
                 data=resources.Transaction.from_proto(transaction, request),
-            ),
-            request=request,
-        )
-
-
-class ListTransactions(endpoints.HTTPEndpoint):
-    _default_page_size = 20
-
-    async def get(
-        self,
-        request: requests.Request,
-        client: transactions_adapter.Client = lagom.injectable,
-    ) -> models.JsonApiResponse:
-        pagination = pagination_helpers.get_pagination(request)
-
-        response = await client.find(
-            limit=pagination.limit or self._default_page_size,
-            cursor=pagination.cursor,
-        )
-
-        return await messages.create_response(
-            body=models.Body(
-                data=[
-                    resources.Transaction.from_proto(transaction, request)
-                    for transaction in response.transactions
-                ],
-                links=pagination_helpers.get_next_url(
-                    request.url_for("ListTransactions"),
-                    response.next_page_token,
-                    pagination,
-                ),
             ),
             request=request,
         )

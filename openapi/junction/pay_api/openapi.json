@@ -390,6 +390,12 @@
           },
           {
             "$ref": "#/components/parameters/page-limit"
+          },
+          {
+            "$ref": "#/components/parameters/sortTransaction"
+          },
+          {
+            "$ref": "#/components/parameters/filterIds"
           }
         ],
         "responses": {
@@ -530,6 +536,41 @@
           "default": "id"
         },
         "description": "Field name what should be used to sort"
+      },
+      "sortTransaction": {
+        "name": "sort",
+        "in": "query",
+        "style": "form",
+        "explode": false,
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "createdAt",
+            "-createdAt"
+          ],
+          "example": "createdAt",
+          "default": "createdAt"
+        },
+        "description": "Sorting based on field"
+      },
+      "filterIds": {
+        "name": "filter[ids][eq]",
+        "in": "query",
+        "required": false,
+        "description": "Filters transactions based on the ids",
+        "style": "form",
+        "explode": false,
+        "schema": {
+          "type": "array",
+          "example": [
+            "271f6d54-9e59-407e-a860-b0771d9e3d26"
+          ],
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
       },
       "currencyId": {
         "name": "currencyId",

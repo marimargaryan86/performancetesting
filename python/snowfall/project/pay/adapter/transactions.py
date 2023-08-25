@@ -16,6 +16,7 @@ from snowfall.project.pay.service.transactions.v1alpha import (
 )
 from snowfall.stdlib import sequence, string
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.v1 import sort_pb2
 
 
 class Client(abc.ABC):
@@ -39,8 +40,10 @@ class Client(abc.ABC):
     @abc.abstractmethod
     async def find(
         self,
+        filter_by: Sequence[str],
         limit: int | None = None,
         cursor: str | None = None,
+        sort: sort_pb2.Sort | None = None,
     ) -> grpc_pb2.ListTransactionsResponse:
         """Fetch all transaction resources."""
 
@@ -109,8 +112,10 @@ class DictClient(Client):
 
     async def find(
         self,
+        filter_by: Sequence[str],
         limit: int | None = None,
         cursor: str | None = None,
+        sort: sort_pb2.Sort | None = None,
     ) -> grpc_pb2.ListTransactionsResponse:
         page = sequence.paginate(
             sequence=list(self._transactions.values()),
@@ -181,17 +186,24 @@ class GrpcClient(Client):
 
     async def find(
         self,
+        filter_by: Sequence[str],
         limit: int | None = None,
         cursor: str | None = None,
+        sort: sort_pb2.Sort | None = None,
     ) -> grpc_pb2.ListTransactionsResponse:
         request = grpc_pb2.ListTransactionsRequest(
             page_token=cursor or "",
+            sort_by=sort,
+            filter_by=filter_by,
         )
         if limit is not None:
             request.page_size = limit
 
         return await errors.handle_grpc_errors(
-            self._transactions.ListTransactions(request, timeout=self._timeout),
+            self._transactions.ListTransactions(
+                request,
+                timeout=self._timeout,
+            ),
         )
 
     async def find_by_ids(
