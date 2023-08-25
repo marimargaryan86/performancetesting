@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     unzip \
     wget \
     xz-utils \
-&& curl -fsSL https://static.pantsbuild.org/setup/pantsup.sh | bash /dev/stdin --bin-dir /usr/local/bin --version 0.8.2 \
+&& curl -fsSL https://static.pantsbuild.org/setup/pantsup.sh | bash /dev/stdin --bin-dir /usr/local/bin --version 0.9.3 \
 && curl -fsSL https://github.com/Tufin/oasdiff/releases/download/v1.7.4/oasdiff_1.7.4_linux_amd64.deb > /tmp/oasdiff.deb \
 && curl -fsSL https://sentry.io/get-cli/ | SENTRY_CLI_VERSION=2.20.4 bash \
 && curl -fsSL https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg \

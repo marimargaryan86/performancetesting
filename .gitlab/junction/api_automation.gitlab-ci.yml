@@ -21,7 +21,6 @@ integration:api_automation-tests:
   script:
     - ./bash/run-integration-tests.sh $PROJECT_DIR $TEST_E2E_HOSTNAME $API_TOKEN $ALLURE_PROJECT_ID $TESTING_SUITE
   after_script:
-    - !reference [.pants, after_script]
     - SLACK_THREAD_NUMBER=$(cat slack.txt)
     - JOB_LINK=$(./bash/send-allure-reports.sh $ALLURE_PROJECT_ID)
     - ./bash/slack-end-notification.sh $SLACK_THREAD_NUMBER $JOB_LINK

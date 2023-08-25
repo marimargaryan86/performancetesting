@@ -23,8 +23,6 @@ pants:setup:
   interruptible: true
   before_script:
     - pants --version
-  after_script:
-    - ./bash/nuke-if-too-big.sh "${SCIE_BASE}" 512
   artifacts:
     paths:
       - .pants.d/pants.log
@@ -35,9 +33,10 @@ pants:setup:
     PANTS_CONFIG_FILES: "+['pants.ci.toml','pants.go.toml']"
     PANTS_DOCKER_DEFAULT_REPOSITORY: "${CI_PROJECT_PATH}/service/{directory}"
     PANTS_DOCKER_REGISTRIES: "{'${CI_REGISTRY}': {'address': '${CI_REGISTRY}', 'default': True}}"
-    SCIE_BASE: "${CI_PROJECT_DIR}/.cache/scie"
+    SCIE_BASE: "${CI_PROJECT_DIR}/.cache/nce"
+    PANTS_NAMED_CACHES_DIR: "${CI_PROJECT_DIR}/.cache/named_caches"
   services:
-    - name: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/buchgr/bazel-remote-cache:v2.4.1"
+    - name: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/buchgr/bazel-remote-cache:v2.4.2"
       alias: bazel-remote
       variables:
         BAZEL_REMOTE_MAX_SIZE: 30
@@ -45,11 +44,18 @@ pants:setup:
         BAZEL_REMOTE_S3_BUCKET: snowfall-gitlab-bazel-remote-cache
         BAZEL_REMOTE_S3_ENDPOINT: s3.eu-west-2.amazonaws.com
   cache:
-    key: "python-3.11.4-go-1.19.10-scie-0.8.2-pants-2.16.0-0"
-    when: always
-    policy: pull
-    paths:
-      - "${SCIE_BASE}"
+    - key: "${CI_JOB_NAME}-scie_pants_version=0.9.3-pants_version=2.16.0"
+      when: always
+      paths:
+        - "${SCIE_BASE}"
+    - key:
+        prefix: "${CI_JOB_NAME}"
+        files:
+          - golang/go.sum
+          - vendor/constraints.txt
+      when: always
+      paths:
+        - "${PANTS_NAMED_CACHES_DIR}"
   needs:
     - "pants:setup"
   tags:
@@ -91,8 +97,6 @@ pants:tailor-update-build-files:
   interruptible: true
   script:
     - "pants tailor --check update-build-files --check ::"
-  cache:
-    policy: pull-push
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: never
