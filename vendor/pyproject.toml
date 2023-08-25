@@ -14,6 +14,7 @@ relative_files = true
 
 [tool.mypy]
 plugins = [
+    "pydantic.mypy",
     "pydantic.v1.mypy",
 ]
 check_untyped_defs = true

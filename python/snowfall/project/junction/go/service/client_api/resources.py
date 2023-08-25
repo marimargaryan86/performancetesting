@@ -6,7 +6,7 @@ from collections import defaultdict
 from collections.abc import Iterable, Sequence
 from typing import Any, ClassVar
 
-from pydantic import v1 as pydantic
+import pydantic
 from starlette import datastructures, requests
 
 from snowfall.project.junction.go.service.offers.v1 import (

@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 
+import pydantic
 from hcl2 import api
-from pydantic import v1 as pydantic
 
 
 class Template(pydantic.BaseModel):
@@ -39,7 +39,7 @@ class Service(pydantic.BaseModel):
     check: Sequence[Check] = pydantic.Field(default_factory=list)
     connect: Sequence[Connect] = pydantic.Field(default_factory=list)
     name: str = ""
-    port: str | None
+    port: str | None = None
     tags: Sequence[str] = pydantic.Field(default_factory=list)
 
 

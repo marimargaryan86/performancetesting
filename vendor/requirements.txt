@@ -66,7 +66,7 @@ prometheus-async[aiohttp]==22.2.0
 prometheus-client==0.17.1
 protobuf==4.24.0
 pycountry==22.3.5
-pydantic[email]==2.2.1
+pydantic[email]==2.3.0
 pyjwt==2.8.0
 pymongo==4.4.1
 pyshp==2.3.1

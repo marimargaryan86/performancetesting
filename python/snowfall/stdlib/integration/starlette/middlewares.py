@@ -183,7 +183,7 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
         self._logger.error(
             "Response body does not validate against schema",
             errors=[
-                error.dict()
+                error.model_dump()
                 for error in validation.invalid_schema_value_to_errors(
                     exc=exc,
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

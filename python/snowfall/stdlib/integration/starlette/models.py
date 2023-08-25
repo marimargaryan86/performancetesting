@@ -2,10 +2,9 @@ from __future__ import annotations
 
 import datetime
 from collections.abc import Mapping, Sequence
-from types import MappingProxyType
 from typing import Any, ClassVar, cast
 
-from pydantic import v1 as pydantic
+import pydantic
 from starlette import background as starlette_background
 from starlette import responses, status
 
@@ -13,15 +12,14 @@ AnyMapping = Mapping[str, Any]
 
 
 class BaseModel(pydantic.BaseModel):
-    class Config(object):
-        extra = pydantic.Extra.forbid
-        json_encoders = MappingProxyType(
-            {
-                datetime.datetime: lambda datetime_object: datetime_object.isoformat(
-                    timespec="seconds",
-                ),
-            },
-        )
+    model_config = pydantic.ConfigDict(
+        extra="forbid",
+        json_encoders={
+            datetime.datetime: lambda datetime_object: datetime_object.isoformat(
+                timespec="seconds",
+            ),
+        },
+    )
 
 
 class ResourceIdentifier(BaseModel):
@@ -58,11 +56,11 @@ ErrorSource = ErrorSourceHeader | ErrorSourceParameter | ErrorSourcePointer
 
 
 class Error(BaseModel, frozen=True):
-    status: str | None
-    code: str | None
-    title: str | None
-    detail: str | None
-    source: ErrorSource | None
+    status: str | None = None
+    code: str | None = None
+    title: str | None = None
+    detail: str | None = None
+    source: ErrorSource | None = None
 
 
 class Body(BaseModel):
@@ -114,11 +112,8 @@ class JsonApiResponse(responses.Response):
         )
 
     def render(self, body: Body) -> bytes:
-        return body.json(
+        return body.model_dump_json(
             exclude_unset=True,
             by_alias=True,
-            ensure_ascii=False,
-            allow_nan=False,
             indent=None,
-            separators=(",", ":"),
         ).encode("utf-8")
