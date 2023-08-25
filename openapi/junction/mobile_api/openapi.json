@@ -1375,7 +1375,7 @@
                       "items": {
                         "anyOf": [
                           {
-                            "$ref": "./../client_api/openapi.json#/components/schemas/Offer"
+                            "$ref": "#/components/schemas/Offer"
                           },
                           {
                             "$ref": "./../client_api/openapi.json#/components/schemas/OfferGroup"
@@ -1421,13 +1421,126 @@
       "$ref": "./../client_api/openapi.json#/paths/~1offers~1searches~1{offerSearchId}~1offers"
     },
     "/offers/{offerId}": {
-      "$ref": "./../client_api/openapi.json#/paths/~1offers~1{offerId}"
+      "parameters": [
+        {
+          "$ref": "./../client_api/openapi.json#/components/parameters/offerId"
+        },
+        {
+          "$ref": "./../client_api/openapi.json#/components/parameters/offerInclude"
+        }
+      ],
+      "get": {
+        "summary": "Get Offer",
+        "tags": [
+          "offers"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Offer"
+                    },
+                    "included": {
+                      "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/Offer"
+                          },
+                          {
+                            "$ref": "./../client_api/openapi.json#/components/schemas/OfferGroup"
+                          },
+                          {
+                            "$ref": "./../client_api/openapi.json#/components/schemas/TripOfferGroupDetails"
+                          },
+                          {
+                            "$ref": "./../client_api/openapi.json#/components/schemas/LegType"
+                          },
+                          {
+                            "$ref": "./../client_api/openapi.json#/components/schemas/OfferOption"
+                          },
+                          {
+                            "$ref": "./../client_api/openapi.json#/components/schemas/TripOfferOptionDetails"
+                          },
+                          {
+                            "$ref": "./../client_api/openapi.json#/components/schemas/CabinClass"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-offers-id",
+        "description": "Used to lookup data for an Offer Identifier."
+      }
     },
     "/offers/quotes": {
       "$ref": "./../client_api/openapi.json#/paths/~1offers~1quotes"
     },
     "/offers/quotes/{offerPriceQuoteId}": {
-      "$ref": "./../client_api/openapi.json#/paths/~1offers~1quotes~1{offerPriceQuoteId}"
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/offerPriceQuoteId"
+        },
+        {
+          "$ref": "#/components/parameters/offerPriceQuoteInclude"
+        }
+      ],
+    "get": {
+        "summary": "Get Offer Price Quote",
+        "operationId": "get-offers-quotes-id",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/TripOfferPriceQuote"
+                    },
+                    "included": {
+                      "$ref": "#/components/schemas/OfferPriceQuoteIncluded"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "description": "Get a Price Quote for an Offer.",
+        "tags": [
+          "offers"
+        ]
+      }
     },
     "/payments": {
       "post": {
@@ -2257,9 +2370,63 @@
         "description": "Customize which related resources to return.",
         "style": "form",
         "explode": false
+      },
+      "offerPriceQuoteInclude": {
+        "name": "include",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "offers",
+              "options"
+            ]
+          },
+          "example": [
+            "options"
+          ]
+        },
+        "description": "Customize which related resources to return.",
+        "style": "form",
+        "explode": false
+      },
+      "offerPriceQuoteId": {
+        "name": "offerPriceQuoteId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+        },
+        "description": "Offer Price Quote Identifier"
       }
     },
     "schemas": {
+      "ApplicableTo": {
+        "title": "Applicable To",
+        "type": "object",
+        "properties": {
+          "dateOfBirthAfter": {
+            "nullable": true,
+            "type": "string",
+            "format": "date",
+            "example": "1980-02-03"
+          },
+          "dateOfBirthBefore": {
+            "nullable": true,
+            "type": "string",
+            "format": "date",
+            "example": "1980-02-03"
+          }
+        },
+        "required": [
+          "dateOfBirthAfter",
+          "dateOfBirthBefore"
+        ]
+      },
       "ChangePasswordBody": {
         "title": "Change Password Body",
         "type": "object",
@@ -2862,6 +3029,27 @@
         ],
         "description": "Collection of multiple booked Offers Options."
       },
+      "OfferPriceQuoteIncluded": {
+        "title": "OfferPriceQuoteIncluded",
+        "type": "array",
+        "items": {
+          "oneOf": [
+            {
+              "$ref": "#/components/schemas/OfferIdentifier"
+            },
+            {
+              "$ref": "#/components/schemas/OfferOption"
+            }
+          ],
+          "discriminator": {
+            "propertyName": "type",
+            "mapping": {
+              "offers": "#/components/schemas/Offer",
+              "offer-options": "#/components/schemas/OfferOption"
+            }
+          }
+        }
+      },
       "TripOfferSearch": {
         "title": "Trip Offer Search",
         "allOf": [
@@ -2984,6 +3172,165 @@
           }
         ],
         "description": "Context for which Trip-related Offers can be found."
+      },
+      "TripOfferPriceQuote": {
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "example": "trip-offer-price-quotes",
+                "enum": [
+                  "trip-offer-price-quotes"
+                ]
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "sessionToken": {
+                    "type": "string",
+                    "example": "FMSXrOAhIOdvIbxAmfSt7vJtRBkurNbn",
+                    "minLength": 32,
+                    "maxLength": 32,
+                    "pattern": "^[A-Za-z\\d]{32}$",
+                    "writeOnly": true
+                  },
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z",
+                    "readOnly": true
+                  },
+                  "price": {
+                    "readOnly": true,
+                    "nullable": true,
+                    "anyOf": [
+                      {
+                        "$ref": "#/components/schemas/Price"
+                      },
+                      {
+                        "nullable": true
+                      }
+                    ]
+                  },
+                  "priceBreakdown": {
+                    "readOnly": true,
+                    "nullable": true,
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/PriceBreakdown"
+                    }
+                  },
+                  "penalties": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/TripOfferOptionPenalty"
+                    },
+                    "readOnly": true
+                  },
+                  "required": {
+                    "type": "array",
+                    "example": [
+                      "passport-number"
+                    ],
+                    "items": {
+                      "type": "string",
+                      "example": "passport-number",
+                      "enum": [
+                        "date-of-birth",
+                        "nationality",
+                        "expiration-date",
+                        "issuing-country",
+                        "passport-number",
+                        "residence-country-code",
+                        "residence-address",
+                        "issue-date"
+                      ]
+                    },
+                    "readOnly": true
+                  },
+                  "rules": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/OfferSegmentDetailRule"
+                    },
+                    "readOnly": true
+                  },
+                  "status": {
+                    "type": "string",
+                    "readOnly": true,
+                    "enum": [
+                      "unspecified",
+                      "pending",
+                      "processing",
+                      "completed",
+                      "failed"
+                    ],
+                    "example": "completed"
+                  }
+                },
+                "required": [
+                  "expiresAt",
+                  "price",
+                  "penalties",
+                  "required",
+                  "rules",
+                  "status"
+                ]
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "offer",
+                  "options"
+                ],
+                "properties": {
+                  "offer": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/OfferIdentifier"
+                      }
+                    }
+                  },
+                  "options": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/OfferOptionIdentifier"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "relationships"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ],
+        "title": "Trip Offer Price Quote"
       },
       "PaymentIdentifier": {
         "title": "Payment Identifier",
@@ -3337,6 +3684,101 @@
           }
         ],
         "description": "Details for a Trip Booking."
+      },
+      "TripOfferOptionPenalty": {
+        "title": "Trip Offer Option Penalty",
+        "type": "object",
+        "properties": {
+          "applicableTo": {
+            "$ref": "#/components/schemas/ApplicableTo"
+          },
+          "penaltyType": {
+            "type": "string",
+            "example": "exchange",
+            "enum": [
+              "exchange",
+              "refund"
+            ]
+          },
+          "changeable": {
+            "type": "boolean",
+            "example": true
+          },
+          "refundable": {
+            "type": "boolean",
+            "example": false
+          },
+          "conditionsApply": {
+            "type": "boolean",
+            "example": false,
+            "description": "If True there are some restrictions to this penalty rule. Check the fare rules for conditions"
+          },
+          "applicability": {
+            "type": "string",
+            "example": "before",
+            "enum": [
+              "before",
+              "after"
+            ]
+          },
+          "price": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Price"
+              },
+              {
+                "nullable": true
+              }
+            ],
+            "nullable": true
+          }
+        },
+        "required": [
+          "applicableTo",
+          "penaltyType",
+          "refundable",
+          "applicability",
+          "price"
+        ]
+      },
+      "TripOfferOptionDetailsIdentifier": {
+        "title": "Trip Offer Option Details Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "trip-offer-option-details"
+            ],
+            "example": "trip-offer-option-details"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "TripOfferOptionPenaltyBaggageAllowance": {
+        "title": "Trip Offer Option Penalty Baggage Allowance",
+        "type": "object",
+        "properties": {
+          "isIncluded": {
+            "type": "boolean",
+            "example": true
+          },
+          "applicableTo": {
+            "$ref": "#/components/schemas/ApplicableTo"
+          }
+        },
+        "required": [
+          "isIncluded",
+          "applicableTo"
+        ]
       },
       "Guest": {
         "type": "object",
@@ -3833,6 +4275,31 @@
           "amount"
         ]
       },
+      "PriceBreakdown": {
+        "title": "Price Breakdown",
+        "description": "Breakdown of price into its individual components (base fare, tax, etc)",
+        "type": "object",
+        "properties": {
+          "price": {
+            "$ref": "#/components/schemas/Price"
+          },
+          "breakdownType": {
+            "type": "string",
+            "example": "tax",
+            "enum": [
+              "base-fare",
+              "tax",
+              "reseller-mark-up",
+              "company-mark-up",
+              "service-mark-up"
+            ]
+          }
+        },
+        "required": [
+          "price",
+          "breakdownType"
+        ]
+      },
       "RouteIdentifiers": {
         "title": "Route Identifiers",
         "description": "Route identifiers that the operator (operating) and vendor (marketing) uses, i.e. operating flight number and marketing flight number or vice versa for train or buss line numbers.",
@@ -3939,6 +4406,230 @@
         ],
         "description": "Indicates the type of the leg, such as \"air\" or \"rail\"."
       },
+      "Offer": {
+        "title": "Offer",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "offers"
+                ],
+                "example": "offers"
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "expiresAt"
+                ],
+                "properties": {
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z"
+                  }
+                }
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "groups"
+                ],
+                "properties": {
+                  "groups": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/OfferGroupIdentifier"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes",
+              "relationships"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ],
+        "description": "Result of searching for offers. Used for creating an Order. Chose one Offer Option from each Trip Offer Group when creating an order."
+      },
+      "OfferIdentifier": {
+        "title": "Trip Offer Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "offers"
+            ],
+            "example": "offers"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "OfferGroupIdentifier": {
+        "title": "Offer Group Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "offer-groups"
+            ],
+            "example": "offer-groups"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "OfferOption": {
+        "title": "OfferOption",
+        "description": "Offer Option for one or more segments. Used for creating an Order.",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "offer-options"
+                ],
+                "example": "offer-options"
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "price",
+                  "brandName",
+                  "baggageAllowances"
+                ],
+                "properties": {
+                  "price": {
+                    "$ref": "#/components/schemas/Price"
+                  },
+                  "priceBreakdown": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/PriceBreakdown"
+                    }
+                  },
+                  "brandName": {
+                    "type": "string",
+                    "example": "PLUS",
+                    "readOnly": true
+                  },
+                  "baggageAllowances": {
+                    "type": "array",
+                    "minItems": 0,
+                    "items": {
+                      "$ref": "#/components/schemas/TripOfferOptionPenaltyBaggageAllowance"
+                    }
+                  }
+                }
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "details"
+                ],
+                "properties": {
+                  "details": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "oneOf": [
+                          {
+                            "type": "array",
+                            "items": {
+                              "$ref": "#/components/schemas/TripOfferOptionDetailsIdentifier"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes",
+              "relationships"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ]
+      },
+      "OfferOptionIdentifier": {
+        "title": "Offer Option Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "offer-options"
+            ],
+            "example": "offer-options"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
       "OfferSegmentLeg": {
         "title": "Offer Segment Leg",
         "description": "Leg related to a grouped offers segments.",
@@ -3966,6 +4657,24 @@
           "destination",
           "departureAt",
           "arrivalAt"
+        ]
+      },
+      "OfferSegmentDetailRule": {
+        "title": "Offer Segment Detail Rule",
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Cancellation policy"
+          },
+          "body": {
+            "type": "string",
+            "example": "Tickets can be cancelled until the day of departure without any charges. After that, no refund is possible anymore.  NOTE: the refund delay for Homeprint and Mobile tickets is 2 days. Except for agency fee of 20euro for handling."
+          }
+        },
+        "required": [
+          "title",
+          "body"
         ]
       },
       "Point": {

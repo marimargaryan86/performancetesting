@@ -2742,7 +2742,7 @@
           "$ref": "#/components/parameters/offerPriceQuoteId"
         },
         {
-          "$ref": "#/components/parameters/offerInclude"
+          "$ref": "#/components/parameters/offerPriceQuoteInclude"
         }
       ],
       "get": {
@@ -2760,7 +2760,7 @@
                       "$ref": "#/components/schemas/TripOfferPriceQuote"
                     },
                     "included": {
-                      "$ref": "#/components/schemas/OfferIncluded"
+                      "$ref": "#/components/schemas/OfferPriceQuoteIncluded"
                     }
                   },
                   "required": [
@@ -6889,6 +6889,27 @@
           }
         }
       },
+      "OfferPriceQuoteIncluded": {
+        "title": "OfferPriceQuoteIncluded",
+        "type": "array",
+        "items": {
+          "oneOf": [
+            {
+              "$ref": "#/components/schemas/OfferIdentifier"
+            },
+            {
+              "$ref": "#/components/schemas/OfferOption"
+            }
+          ],
+          "discriminator": {
+            "propertyName": "type",
+            "mapping": {
+              "offers": "#/components/schemas/Offer",
+              "offer-options": "#/components/schemas/OfferOption"
+            }
+          }
+        }
+      },
       "TripIncluded": {
         "title": "TripIncluded",
         "type": "array",
@@ -7005,6 +7026,7 @@
           }
         }
       },
+
       "OfferOptionIncluded": {
         "title": "OfferOptionIncluded",
         "type": "array",
@@ -7924,6 +7946,27 @@
           "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
         },
         "description": "Offer Option Details Identifier"
+      },
+      "offerPriceQuoteInclude": {
+        "name": "include",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "offers",
+              "options"
+            ]
+          },
+          "example": [
+            "options"
+          ]
+        },
+        "description": "Customize which related resources to return.",
+        "style": "form",
+        "explode": false
       },
       "offerOptionDetailsInclude": {
         "name": "include",

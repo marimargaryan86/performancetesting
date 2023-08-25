@@ -41,8 +41,8 @@ class OfferQuote(endpoints.HTTPEndpoint):
             request.path_params["offerPriceQuoteId"],
             include=request.scope["parsed_query_string"].get("include", []),
         )
-        response_body = models.Body(data=offer_quote_response["data"])
 
+        response_body = models.Body(data=offer_quote_response["data"])
         response_body.included = offer_quote_response.get("included", [])
 
         return models.JsonApiResponse(response_body)

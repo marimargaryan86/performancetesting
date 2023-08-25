@@ -22,6 +22,10 @@ _OfferIncludes: TypeAlias = Literal[
     "groups.options.details.cabinClass",
     "groups.options.details.details",
 ]
+_OfferPriceQuoteIncludes: TypeAlias = Literal[
+    "offers",
+    "options",
+]
 _OfferSearchIncludes: TypeAlias = Literal[
     "offers.groups",
     "offers.groups.details",
@@ -444,10 +448,15 @@ class Client(base_client.BaseClient):  # noqa: WPS214
     async def get_offer(
         self,
         offer_id: str,
+        include: Sequence[_OfferIncludes] | None = None,
     ) -> dict[str, Any]:
+        query_parameters: dict[str, str] = {}
+        if include:
+            query_parameters["include"] = ",".join(include)
         return await self._make_request(
             method=_METHOD_GET,
             url="/offers/{0}".format(offer_id),
+            query_parameters=query_parameters,
         )
 
     async def get_offer_groups_by_offer_group_id(
@@ -575,7 +584,7 @@ class Client(base_client.BaseClient):  # noqa: WPS214
     async def get_offer_quote_by_id(
         self,
         identifier: str,
-        include: Sequence[_OfferIncludes] | None = None,
+        include: Sequence[_OfferPriceQuoteIncludes] | None = None,
     ) -> dict[str, Any]:
         query_parameters: dict[str, str] = {}
         if include:

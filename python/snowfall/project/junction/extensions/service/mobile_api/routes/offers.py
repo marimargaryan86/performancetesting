@@ -26,8 +26,16 @@ class Offer(endpoints.HTTPEndpoint):
     ) -> responses.Response:
         offer_response = await junction_client.get_offer(
             request.path_params["offerId"],
+            include=request.scope["parsed_query_string"].get(
+                "include",
+                [],
+            ),
         )
-        return models.JsonApiResponse(models.Body(data=offer_response["data"]))
+
+        response_body = models.Body(data=offer_response["data"])
+        response_body.included = offer_response.get("included", [])
+
+        return models.JsonApiResponse(response_body)
 
 
 class OfferSearches(endpoints.HTTPEndpoint):

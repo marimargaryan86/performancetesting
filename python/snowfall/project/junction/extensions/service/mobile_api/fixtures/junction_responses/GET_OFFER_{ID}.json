@@ -4,54 +4,23 @@
   "status_code":200,
   "json":{
     "data":{
-      "id":"04f83af9-90bb-4a0f-9881-03e1e690f7f5",
-      "type":"offers",
-      "attributes":{
-        "expiresAt":"2019-08-24T14:15:22Z"
-      },
-      "relationships":{
-        "groups":{
-          "data":[
-            {
-              "id":"04f83af9-90bb-4a0f-9881-03e1e690f7f5",
-              "type":"offer-groups"
-            }
-          ]
-        }
-      },
-      "links":{
-        "self":"https://example.com/resource/04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+    "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+    "type": "offers",
+    "attributes": {
+      "expiresAt": "2019-08-24T14:15:22Z"
+    },
+    "relationships": {
+      "groups": {
+        "data": [
+          {
+            "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+            "type": "offer-groups"
+          }
+        ]
       }
     },
-    "included":[
-      {
-        "id":"04f83af9-90bb-4a0f-9881-03e1e690f7f5",
-        "type":"offer-groups",
-        "attributes":{
-
-        },
-        "relationships":{
-          "options":{
-            "data":[
-              {
-                "id":"04f83af9-90bb-4a0f-9881-03e1e690f7f5",
-                "type":"offer-options"
-              }
-            ]
-          },
-          "details":{
-            "data":[
-              {
-                "id":"04f83af9-90bb-4a0f-9881-03e1e690f7f5",
-                "type":"trip-offer-group-details"
-              }
-            ]
-          }
-        },
-        "links":{
-          "self":"https://example.com/resource/04f83af9-90bb-4a0f-9881-03e1e690f7f5"
-        }
-      }
-    ]
-  }
+    "links": {
+      "self": "https://example.com/resource/04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+    }
+  }}
 }
