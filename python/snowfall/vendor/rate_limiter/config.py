@@ -1,6 +1,6 @@
 from typing import Literal, TypedDict
 
-from pydantic.v1 import BaseModel
+from pydantic import BaseModel
 
 from snowfall.vendor.rate_limiter.gubernator_pb2 import Algorithm, Behavior
 
