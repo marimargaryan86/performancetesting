@@ -1,6 +1,6 @@
 import { ActionFailure, error, fail } from "@sveltejs/kit";
 import type { OfferPriceQuoteModel } from "models/booking/offer";
-import integrationInstancesServer from "integration-instances-server";
+import integrationInstances from "integration-instances";
 import { getSearchData, setSearchData, type ResolvedSearchData, type SearchData } from "../common";
 import type { PaymentIntentModel } from "models/booking/payment";
 
@@ -20,7 +20,7 @@ async function getPriceQuoteAndPaymentIntent(searchData: SearchData): Promise<{
   let priceQuote: OfferPriceQuoteModel | undefined;
 
   try {
-    priceQuote = await integrationInstancesServer.junctionMobileApi.offers.getPriceQuote(
+    priceQuote = await integrationInstances.junctionMobileApi.offers.getPriceQuote(
       searchData.priceQuoteId,
     );
   } catch {
@@ -35,7 +35,7 @@ async function getPriceQuoteAndPaymentIntent(searchData: SearchData): Promise<{
 
   if (!paymentIntent && priceQuote.price) {
     try {
-      paymentIntent = await integrationInstancesServer.junctionMobileApi.payments.createPayment(
+      paymentIntent = await integrationInstances.junctionMobileApi.payments.createPayment(
         priceQuote.price,
       );
     } catch {
@@ -57,8 +57,8 @@ export async function load(event): Promise<{
   }
 
   const [origin, destination, { priceQuote, paymentIntent }] = await Promise.all([
-    integrationInstancesServer.junctionMobileApi.places.getPlace(searchData.originId),
-    integrationInstancesServer.junctionMobileApi.places.getPlace(searchData.destinationId),
+    integrationInstances.junctionMobileApi.places.getPlace(searchData.originId),
+    integrationInstances.junctionMobileApi.places.getPlace(searchData.destinationId),
     getPriceQuoteAndPaymentIntent(searchData),
   ]);
 

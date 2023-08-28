@@ -23,7 +23,7 @@ export async function load(event): Promise<{
   try {
     return {
       user,
-      currencies: await integrationInstances.junctionPay.currencies.listCurrencies(user.token),
+      currencies: await integrationInstances.junctionPayApi.currencies.listCurrencies(user.token),
       countries: integrationInstances.common.countries.findCountries(),
     };
   } catch {

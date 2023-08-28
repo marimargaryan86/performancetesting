@@ -1,4 +1,4 @@
-import integrationInstancesServer from "integration-instances-server";
+import integrationInstances from "integration-instances";
 import type { PlaceModel } from "models/booking/location";
 
 export const actions = {
@@ -11,7 +11,7 @@ export const actions = {
     }
 
     return {
-      places: await integrationInstancesServer.junctionMobileApi.places.listPlaces(query),
+      places: await integrationInstances.junctionMobileApi.places.listPlaces(query),
     };
   },
 };

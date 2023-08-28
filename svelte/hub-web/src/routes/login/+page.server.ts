@@ -22,7 +22,10 @@ export const actions = {
     }
 
     try {
-      const token = await integrationInstances.junctionPay.auth.createToken({ email, password });
+      const token = await integrationInstances.junctionPayApi.auth.createToken({
+        email,
+        password,
+      });
 
       event.cookies.set("session-token", token, { path: "/" });
     } catch {

@@ -5,12 +5,12 @@
   import Button from "components/ui/button.svelte";
   import TextField from "components/ui/text-field.svelte";
   import { portal } from "directives/portal";
-  import integrationInstances from "integration-instances";
   import type { CurrencyModel, MoneyModel } from "models/money";
+  import routeConfig from "routeConfig";
   import { createEventDispatcher } from "svelte";
   import { fade, fly } from "svelte/transition";
+  import { callAction } from "utils/common";
 
-  export let token: string | undefined;
   export let accountId: string;
   export let exclude: MoneyModel[];
   export let currencies: Map<string, CurrencyModel>;
@@ -48,23 +48,20 @@
       return;
     }
 
-    if (!token) {
-      close();
-
-      return;
-    }
-
     pending = true;
 
-    const nextBalances = await Promise.all(
-      value.map((item) =>
-        integrationInstances.junctionPay.balances.addBalance(token as string, accountId, item.code),
-      ),
-    );
+    const result = await callAction<{ balances: MoneyModel[] }>({
+      action: routeConfig.pay.accounts.actions.addBalances(accountId),
+      data: { currencyCodes: value.map((item) => item.code) },
+      dataType: "json",
+      apply: false,
+    });
+
+    if (result.type === "success") {
+      dispatch("addbalances", result.data?.balances ?? []);
+    }
 
     pending = false;
-
-    dispatch("addbalances", nextBalances);
     close();
   }
 </script>

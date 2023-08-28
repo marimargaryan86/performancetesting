@@ -50,6 +50,7 @@ export default {
       account: (id: string): string => `/pay/accounts/${id}`,
       actions: {
         listAccounts: "/pay/accounts?/listAccounts",
+        addBalances: (id: string): string => `/pay/accounts/${id}?/addBalances`,
       },
     },
     beneficiaries: {

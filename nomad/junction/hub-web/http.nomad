@@ -138,12 +138,12 @@ EOH
       }
 
       env {
-        ENV_NAME                      = "${var.environment}"
-        PORT                          = "${NOMAD_PORT_http}"
-        PUBLIC_PAY_ADMIN_API_BASE_URL = "${var.pay_admin_api_base_url}"
-        PUBLIC_PAY_API_BASE_URL       = "${var.api_pay_base_url}"
-        CLIENT_API_BASE_URL           = "${var.client_api_base_url}"
-        BOOKING_HUB_API_BASE_URL      = "${var.booking_hub_api_base_url}"
+        ENV_NAME                 = "${var.environment}"
+        PORT                     = "${NOMAD_PORT_http}"
+        PAY_ADMIN_API_BASE_URL   = "${var.pay_admin_api_base_url}"
+        PAY_API_BASE_URL         = "${var.api_pay_base_url}"
+        CLIENT_API_BASE_URL      = "${var.client_api_base_url}"
+        BOOKING_HUB_API_BASE_URL = "${var.booking_hub_api_base_url}"
       }
     }
   }

@@ -1,6 +1,6 @@
 import { ActionFailure, error, fail } from "@sveltejs/kit";
 import type { OfferPriceQuoteModel } from "models/booking/offer";
-import integrationInstancesServer from "integration-instances-server";
+import integrationInstances from "integration-instances";
 import { getSearchData, setSearchData, type ResolvedSearchData } from "../common";
 import type { OrderModel } from "models/booking/order";
 import type { ContactInformationData } from "./contact-information.svelte";
@@ -30,7 +30,7 @@ function getBookingData(formData: FormData): BookingData {
 }
 
 function createOrder(data: BookingData, paymentId: string): Promise<OrderModel> {
-  return integrationInstancesServer.junctionMobileApi.orders.createOrder({
+  return integrationInstances.junctionMobileApi.orders.createOrder({
     contactDetails: {
       address: {
         addressLines: [data.contact.address.line1, data.contact.address.line2].filter(
@@ -77,9 +77,9 @@ export async function load(event): Promise<{
 
   try {
     const [origin, destination, priceQuote] = await Promise.all([
-      integrationInstancesServer.junctionMobileApi.places.getPlace(searchData.originId),
-      integrationInstancesServer.junctionMobileApi.places.getPlace(searchData.destinationId),
-      integrationInstancesServer.junctionMobileApi.offers.getPriceQuote(searchData.priceQuoteId),
+      integrationInstances.junctionMobileApi.places.getPlace(searchData.originId),
+      integrationInstances.junctionMobileApi.places.getPlace(searchData.destinationId),
+      integrationInstances.junctionMobileApi.offers.getPriceQuote(searchData.priceQuoteId),
     ]);
 
     return {
@@ -109,7 +109,7 @@ export const actions = {
 
     try {
       return {
-        priceQuote: await integrationInstancesServer.junctionMobileApi.offers.getPriceQuote(
+        priceQuote: await integrationInstances.junctionMobileApi.offers.getPriceQuote(
           searchData.priceQuoteId,
         ),
       };

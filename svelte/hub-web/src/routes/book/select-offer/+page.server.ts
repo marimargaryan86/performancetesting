@@ -1,6 +1,6 @@
 import { error } from "@sveltejs/kit";
 import { getSearchData, parsePassengers, setSearchData, type ResolvedSearchData } from "../common";
-import integrationInstancesServer from "integration-instances-server";
+import integrationInstances from "integration-instances";
 import type { TripCandidatesSearchStatus } from "integration/junction-mobile-api/schemas/trip";
 import type { OfferModel } from "models/booking/offer";
 
@@ -15,16 +15,16 @@ export async function load(event): Promise<{
   }
 
   const [origin, destination] = await Promise.all([
-    integrationInstancesServer.junctionMobileApi.places.getPlace(searchData.originId),
-    integrationInstancesServer.junctionMobileApi.places.getPlace(searchData.destinationId),
+    integrationInstances.junctionMobileApi.places.getPlace(searchData.originId),
+    integrationInstances.junctionMobileApi.places.getPlace(searchData.destinationId),
   ]);
 
   // prettier-ignore
   const tripCandidatesSearch = await (searchData.tripCandidatesSearchId
-    ? integrationInstancesServer.junctionMobileApi.trips.getTripCandidatesSearch(
+    ? integrationInstances.junctionMobileApi.trips.getTripCandidatesSearch(
       searchData.tripCandidatesSearchId,
     )
-    : integrationInstancesServer.junctionMobileApi.trips.createTripCandidatesSearch({
+    : integrationInstances.junctionMobileApi.trips.createTripCandidatesSearch({
       sessionToken: searchData.sessionToken,
       criteria: [
         {
@@ -69,14 +69,14 @@ export const actions = {
     }
 
     const tripCandidatesSearch =
-      await integrationInstancesServer.junctionMobileApi.trips.getTripCandidatesSearch(
+      await integrationInstances.junctionMobileApi.trips.getTripCandidatesSearch(
         tripCandidatesSearchId,
       );
 
     if (tripCandidatesSearch.status === "completed") {
       return {
         status: "completed",
-        offers: await integrationInstancesServer.junctionMobileApi.trips.getTripCandidatesOffers(
+        offers: await integrationInstances.junctionMobileApi.trips.getTripCandidatesOffers(
           tripCandidatesSearchId,
         ),
       };
@@ -98,7 +98,7 @@ export const actions = {
       return;
     }
 
-    const priceQuote = await integrationInstancesServer.junctionMobileApi.offers.createPriceQuote({
+    const priceQuote = await integrationInstances.junctionMobileApi.offers.createPriceQuote({
       sessionToken: searchData.sessionToken,
       offerId,
       optionIds,

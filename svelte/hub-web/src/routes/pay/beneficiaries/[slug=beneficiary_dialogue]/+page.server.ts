@@ -1,4 +1,3 @@
-import integrationInstances from "integration-instances";
 import {
   beneficiaryModel,
   type BeneficiaryModel,
@@ -11,6 +10,7 @@ import { ActionFailure, fail } from "@sveltejs/kit";
 import { z } from "zod";
 import { formatError, type FormattedError } from "utils/zod";
 import type { AccountModel } from "models/account";
+import integrationInstances from "integration-instances";
 
 function getBeneficiaryData(event: RequestEvent): CreateBeneficiaryModel | undefined {
   const cookieData = event.cookies.get("beneficiary-data");
@@ -25,7 +25,7 @@ export async function load(event): Promise<{
   accounts: Promise<AccountModel[]>;
 }> {
   const token = getToken(event);
-  const accounts = integrationInstances.junctionPay.accounts
+  const accounts = integrationInstances.junctionPayApi.accounts
     .listAccounts(token)
     .then((data) => data.data);
 
@@ -37,7 +37,7 @@ export async function load(event): Promise<{
       event.cookies.delete("beneficiary-data", { path: "/", httpOnly: false, secure: false });
     }
   } else if (beneficiary?.id !== event.params.slug) {
-    beneficiary = await integrationInstances.junctionPay.beneficiaries.getBeneficiary(
+    beneficiary = await integrationInstances.junctionPayApi.beneficiaries.getBeneficiary(
       token,
       event.params.slug,
     );
@@ -68,7 +68,7 @@ export const actions = {
     try {
       if (beneficiary.id) {
         return {
-          beneficiary: await integrationInstances.junctionPay.beneficiaries.updateBeneficiary(
+          beneficiary: await integrationInstances.junctionPayApi.beneficiaries.updateBeneficiary(
             getToken(event),
             beneficiary.id,
             beneficiaryModel.parse(beneficiary),
@@ -77,7 +77,7 @@ export const actions = {
       }
 
       return {
-        beneficiary: await integrationInstances.junctionPay.beneficiaries.createBeneficiary(
+        beneficiary: await integrationInstances.junctionPayApi.beneficiaries.createBeneficiary(
           getToken(event),
           beneficiaryModel.omit({ id: true }).parse(beneficiary),
         ),

@@ -34,7 +34,6 @@
   currencies={data.currencies}
   exclude={balances}
   accountId={data.account.id}
-  token={data.user?.token}
   on:addbalances={addBalances}
   bind:this={dialogue}
 />

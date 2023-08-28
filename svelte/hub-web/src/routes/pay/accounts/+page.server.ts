@@ -5,7 +5,7 @@ import { getToken } from "utils/auth";
 
 export function load(event): { accounts: Promise<PaginatedData<AccountModel>> } {
   return {
-    accounts: integrationInstances.junctionPay.accounts.listAccounts(getToken(event)),
+    accounts: integrationInstances.junctionPayApi.accounts.listAccounts(getToken(event)),
   };
 }
 
@@ -19,7 +19,7 @@ export const actions = {
     }
 
     return {
-      accounts: await integrationInstances.junctionPay.accounts.listAccounts(
+      accounts: await integrationInstances.junctionPayApi.accounts.listAccounts(
         getToken(event),
         cursor,
       ),

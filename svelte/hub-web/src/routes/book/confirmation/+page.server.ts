@@ -1,6 +1,6 @@
 import { error } from "@sveltejs/kit";
 import { getSearchData } from "../common";
-import integrationInstancesServer from "integration-instances-server";
+import integrationInstances from "integration-instances";
 import type { OrderModel } from "models/booking/order";
 
 export function load(event): { order: Promise<OrderModel> } {
@@ -15,6 +15,6 @@ export function load(event): { order: Promise<OrderModel> } {
   }
 
   return {
-    order: integrationInstancesServer.junctionMobileApi.orders.getOrder(searchData.orderId),
+    order: integrationInstances.junctionMobileApi.orders.getOrder(searchData.orderId),
   };
 }
