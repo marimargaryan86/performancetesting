@@ -41,13 +41,13 @@ async def _notifications(  # noqa: WPS217
     logging.register(http_client)
     metrics.register(http_client)
     amqp_connection = await app.stack.enter_async_context(
-        types.Connection(app.settings.amqp_dsn),
+        types.Connection(str(app.settings.amqp_dsn)),
     )
     notifier = notifications.SmtpNotifier(
         smtp_client=aiosmtplib.SMTP(
             hostname=app.settings.smtp_dsn.host,
             port=int(app.settings.smtp_dsn.port or 0) or None,
-            username=app.settings.smtp_dsn.user,
+            username=app.settings.smtp_dsn.username,
             password=app.settings.smtp_dsn.password,
             start_tls=True,
         ),
@@ -56,7 +56,7 @@ async def _notifications(  # noqa: WPS217
     )
     benerail_client = client.BenerailClient(
         subscription_key=app.settings.subscription_key,
-        base_url=app.settings.api_base_url,
+        base_url=str(app.settings.api_base_url),
         http_client=http_client,
     )
     await _consume_notifications(app, amqp_connection, benerail_client, notifier)

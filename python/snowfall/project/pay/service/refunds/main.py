@@ -3,7 +3,7 @@ import random
 from collections.abc import Sequence
 
 from motor import motor_asyncio
-from pydantic.v1 import AnyUrl
+from pydantic import AnyUrl
 
 from snowfall.project.pay.adapter import transactions as transactions_adapter
 from snowfall.project.pay.service.refunds import grpc, repositories
@@ -28,7 +28,7 @@ class _GrpcSettings(service.Settings):
 
 async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # noqa: S311
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
     transactions_channel = create_channel(
         app.settings.transactions_address,

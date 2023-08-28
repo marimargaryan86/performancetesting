@@ -15,7 +15,7 @@ async def price_quotes(app: service.Application[config.PriceQuoteSettings]) -> N
     async with contextlib.AsyncExitStack() as stack:
         redis_connection: aioredis.Redis[bytes] = await stack.enter_async_context(
             aioredis.from_url(
-                app.settings.redis_dsn,  # nosec
+                str(app.settings.redis_dsn),
                 decode_responses=False,
             ).client(),
         )
@@ -23,7 +23,7 @@ async def price_quotes(app: service.Application[config.PriceQuoteSettings]) -> N
             client=redis_types.Client[bytes](redis_connection, prefix=app.name),
         )
         amqp_connection = await stack.enter_async_context(
-            types.Connection(app.settings.amqp_dsn),
+            types.Connection(str(app.settings.amqp_dsn)),
         )
         http_client = await stack.enter_async_context(
             httpx.AsyncClient(
@@ -46,7 +46,7 @@ async def price_quotes(app: service.Application[config.PriceQuoteSettings]) -> N
             offer_cache=offer_cache,
             benerail_client=client.BenerailClient(
                 subscription_key=app.settings.subscription_key,
-                base_url=app.settings.api_base_url,
+                base_url=str(app.settings.api_base_url),
                 http_client=http_client,
             ),
             price_ttl=app.settings.ttl,

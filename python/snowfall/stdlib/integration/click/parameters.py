@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import pathlib
 from collections.abc import Callable, Mapping, Sequence
-from typing import Any, TypeGuard, cast, get_args, get_origin, get_type_hints
+from typing import Any, TypeGuard, TypeVar, cast, get_args, get_origin, get_type_hints
 
 import click
 import orjson
-from pydantic import v1 as pydantic
+import pydantic
+import pydantic_core
 
 from snowfall.stdlib import sequence, types
 
@@ -40,14 +41,18 @@ class JSONParameterType(click.ParamType):
 def create_from_pydantic_model(
     model: type[pydantic.BaseModel],
 ) -> list[click.Parameter]:
-    fields: list[pydantic.fields.ModelField] = list(model.__fields__.values())
+    fields: list[tuple[str, pydantic.fields.FieldInfo]] = list(
+        model.model_fields.items(),
+    )
     field_types = get_type_hints(model)
 
-    return [_create_from_pydantic_field(field, field_types) for field in fields]
+    return [
+        _create_from_pydantic_field(name, field, field_types) for name, field in fields
+    ]
 
 
 def _custom_callback(
-    field: pydantic.fields.ModelField,
+    field: pydantic.fields.FieldInfo,
     callback: _Callback,
 ) -> _Callback:
     validator = _validate_option(field)
@@ -65,39 +70,41 @@ def _custom_callback(
 
 
 def _create_from_pydantic_field(
-    arg: pydantic.fields.ModelField,
+    name: str,
+    arg: pydantic.fields.FieldInfo,
     arg_types: Mapping[str, type],
 ) -> click.Parameter:
-    arg_type = get_origin(arg_types[arg.name]) or arg_types[arg.name]
+    arg_type = get_origin(arg_types[name]) or arg_types[name]
     is_multi = arg_type in {Sequence, list, set, tuple}
-    callback = arg.field_info.extra.get("callback")
+    extra = arg.json_schema_extra if isinstance(arg.json_schema_extra, dict) else {}
+    callback = extra.get("callback")
 
-    if arg.field_info.extra.get("argument", False):
+    if extra.get("argument", False):
         return click.Argument(
-            [arg.name.replace("_", "-")],
+            [name.replace("_", "-")],
             callback=(
                 _custom_callback(arg, callback) if callback else _validate_option(arg)
             ),
             default=_get_parameter_default(arg),
-            envvar=arg.name.upper(),
+            envvar=name.upper(),
             nargs=-1 if is_multi else 1,
-            required=bool(arg.required),
-            type=_get_type(arg_types, arg.name, arg_type),
+            required=arg.is_required(),
+            type=_get_type(arg_types, name, arg_type),
         )
 
     return click.Option(
-        ["--{0}".format(arg.name.replace("_", "-"))],
+        ["--{0}".format(name.replace("_", "-"))],
         callback=_custom_callback(arg, callback) if callback else _validate_option(arg),
         default=_get_parameter_default(arg),
-        envvar=arg.name.upper(),
-        help=arg.field_info.description,
-        hidden=bool(arg.field_info.extra.get("hidden", False)),
+        envvar=name.upper(),
+        help=arg.description,
+        hidden=bool(extra.get("hidden", False)),
         is_flag=arg_type == bool,
         multiple=is_multi,
-        required=arg.required,
+        required=arg.is_required(),
         show_default=True,
         show_envvar=True,
-        type=_get_type(arg_types, arg.name, arg_type),
+        type=_get_type(arg_types, name, arg_type),
     )
 
 
@@ -123,44 +130,32 @@ def _get_type(
     return str
 
 
-def _parse_pydantic_result(
-    ctx: click.Context,
-    param_def: click.Parameter,
-    response: tuple[Any | None, Sequence[Any] | Any | None],
-) -> Any:
-    if response[1]:
-        if isinstance(response[1], list):
-            raise click.BadParameter(
-                message=str(
-                    cast(pydantic.error_wrappers.ErrorWrapper, response[1][0][0]).exc,
-                ),
-                ctx=ctx,
-                param=param_def,
-            )
-
-        raise click.BadParameter(
-            message=str(cast(pydantic.error_wrappers.ErrorWrapper, response[1]).exc),
-            ctx=ctx,
-            param=param_def,
-        )
-
-    if isinstance(response[0], pathlib.Path):
-        return response[0].expanduser()
-
-    return response[0]
+_ValueType = TypeVar("_ValueType")
 
 
 def _validate_option(
-    field: pydantic.fields.ModelField,
+    field: pydantic.fields.FieldInfo,
 ) -> _Callback:
+    validator = pydantic.TypeAdapter(field.annotation)
+
     def decorator(
         ctx: click.Context,
         param_def: click.Parameter,
-        param_value: Any,
-    ) -> Any:
-        response = field.validate(param_value, {}, loc="")
+        param_value: _ValueType,
+    ) -> _ValueType | pathlib.Path:
+        try:
+            response = cast(_ValueType, validator.validate_python(param_value))
+        except pydantic.ValidationError as err:
+            raise click.BadParameter(
+                message=str(err),
+                ctx=ctx,
+                param=param_def,
+            ) from err
 
-        return _parse_pydantic_result(ctx, param_def, response)
+        if isinstance(response, pathlib.Path):
+            return response.expanduser()
+
+        return response
 
     return decorator
 
@@ -173,23 +168,23 @@ def _is_primitive(maybe_primitive: Any) -> TypeGuard[bool | float | int | str]:
 
 
 def _get_parameter_default(
-    arg: pydantic.fields.ModelField,
+    arg: pydantic.fields.FieldInfo,
 ) -> types.Primitive | list[types.Primitive] | None:
-    resolved_default = arg.get_default()
+    resolved = arg.get_default(call_default_factory=True)
 
-    if resolved_default == pydantic.fields.UndefinedType or resolved_default is None:
+    if resolved is None or resolved == pydantic_core.PydanticUndefined:
         return None
 
-    if isinstance(resolved_default, dict):
-        return orjson.dumps(resolved_default).decode()
+    if isinstance(resolved, dict):
+        return orjson.dumps(resolved).decode()
 
-    if isinstance(resolved_default, _iterables) or sequence.is_a(resolved_default):
+    if isinstance(resolved, _iterables) or sequence.is_a(resolved):
         return [
             (default if _is_primitive(default) else str(default))
-            for default in resolved_default
+            for default in resolved
         ]
 
-    if _is_primitive(resolved_default):
-        return resolved_default
+    if _is_primitive(resolved):
+        return resolved
 
-    return str(resolved_default)
+    return str(resolved)

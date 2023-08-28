@@ -3,7 +3,7 @@ import random
 from collections.abc import Sequence
 
 import httpx
-from pydantic import v1 as pydantic
+import pydantic
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.plus.adapter import configuration_vectors, subscribers
@@ -34,7 +34,7 @@ async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
     http_client = await app.stack.enter_async_context(httpx.AsyncClient())
     connection = await app.stack.enter_async_context(
         types.Connection(
-            app.settings.amqp_dsn,
+            str(app.settings.amqp_dsn),
         ),
     )
 
@@ -66,7 +66,7 @@ async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
         ),
         redis_client=redis.Client[str](
             aioredis.from_url(
-                random.choice(app.settings.redis_dsn),  # noqa: S311
+                str(random.choice(app.settings.redis_dsn)),  # noqa: S311
                 decode_responses=True,
             ).client(),
             prefix=app.settings.redis_prefix,

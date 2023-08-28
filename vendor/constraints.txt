@@ -78,6 +78,7 @@
 //     "prometheus-client==0.17.1",
 //     "protobuf==4.24.0",
 //     "pycountry==22.3.5",
+//     "pydantic-core==2.6.3",
 //     "pydantic[email]==2.3.0",
 //     "pyjwt==2.8.0",
 //     "pymongo==4.4.1",
@@ -1672,13 +1673,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "1e90061fc3abcc19f56464a8a65a1eb8289a521b7d322beff05079ca78d7baf5",
-              "url": "https://files.pythonhosted.org/packages/24/f4/5966317b6e1bd75b396c3870b48c78a4d83d86c9e7026785fcc3d0c078f0/botocore_stubs-1.31.34-py3-none-any.whl"
+              "hash": "19cf4813f717ebf112eeb8908c61385bce44163d5e827cc3debe5a6b63f4ef04",
+              "url": "https://files.pythonhosted.org/packages/92/2a/d27ecba6a3106d80b3afb72184122c52d5f7dd714c3ceeb2bc10bf5270cf/botocore_stubs-1.31.35-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "ec742f86636acf27872200987fe2068ba5fb9266ce04170a90ea26b698e15654",
-              "url": "https://files.pythonhosted.org/packages/6e/a0/376ae24c787fe263d07a3a413e96fd81bea4a18666aad47f4dad969e98c9/botocore_stubs-1.31.34.tar.gz"
+              "hash": "96858fb8bcf1f4413629b1f9484588e5d6bf3f9c20a37b2e760edf94f4b64c00",
+              "url": "https://files.pythonhosted.org/packages/7e/ed/292fdbcf0401972234717ffd79c110538e0d01cdfe71577ad07d1c8d923f/botocore_stubs-1.31.35.tar.gz"
             }
           ],
           "project_name": "botocore-stubs",
@@ -1687,7 +1688,7 @@
             "typing-extensions>=4.1.0; python_version < \"3.9\""
           ],
           "requires_python": "<4.0,>=3.7",
-          "version": "1.31.34"
+          "version": "1.31.35"
         },
         {
           "artifacts": [
@@ -7879,6 +7880,7 @@
     "prometheus-client==0.17.1",
     "protobuf==4.24.0",
     "pycountry==22.3.5",
+    "pydantic-core==2.6.3",
     "pydantic[email]==2.3.0",
     "pyjwt==2.8.0",
     "pymongo==4.4.1",

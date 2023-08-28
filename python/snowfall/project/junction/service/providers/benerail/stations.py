@@ -28,7 +28,7 @@ async def dump_stations(
         metrics.register(http_client)
         benerail_client = client.BenerailClient(
             subscription_key=settings.subscription_key,
-            base_url=settings.api_base_url,
+            base_url=str(settings.api_base_url),
             http_client=http_client,
         )
 

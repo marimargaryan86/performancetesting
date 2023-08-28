@@ -9,8 +9,8 @@ from typing import Any, cast
 
 import aiosmtplib
 import httpx
+import pydantic
 from motor import motor_asyncio
-from pydantic import v1 as pydantic
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.provider import (
@@ -128,8 +128,8 @@ async def _offers(
     )
 
     ask2go_client = client.Ask2GoClient(
-        api_base_url=app.settings.api_base_url,
-        api_booking_base_url=app.settings.api_booking_base_url,
+        api_base_url=str(app.settings.api_base_url),
+        api_booking_base_url=str(app.settings.api_booking_base_url),
         http_client=http_client,
         rate_limit_client=rate_limit_client,
     )
@@ -142,7 +142,7 @@ async def _offers(
         ),
     )
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # noqa: S311
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
 
     return offers.OfferSearchImplementation(
@@ -194,20 +194,20 @@ async def _orders(app: service.AsyncApplication[_OrdersSettings]) -> None:
     metrics.register(http_client)
     redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
         aioredis.from_url(
-            random.choice(app.settings.redis_dsn),  # noqa: S311
+            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
             decode_responses=False,
         ).client(),
     )
     amqp_connection = await app.stack.enter_async_context(
-        types.Connection(app.settings.amqp_dsn),
+        types.Connection(str(app.settings.amqp_dsn)),
     )
     ask2go_client = client.Ask2GoClient(
-        api_base_url=app.settings.api_base_url,
-        api_booking_base_url=app.settings.api_booking_base_url,
+        api_base_url=str(app.settings.api_base_url),
+        api_booking_base_url=str(app.settings.api_booking_base_url),
         http_client=http_client,
     )
     storage = await app.stack.enter_async_context(
-        filesystem.Storage.from_dsn(app.settings.storage_dsn),
+        filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
     )
 
     await consumer.OrderConsumer(
@@ -226,7 +226,7 @@ async def _orders(app: service.AsyncApplication[_OrdersSettings]) -> None:
                 smtp_client=aiosmtplib.SMTP(
                     hostname=app.settings.smtp_dsn.host,
                     port=int(app.settings.smtp_dsn.port or 0) or None,
-                    username=app.settings.smtp_dsn.user,
+                    username=app.settings.smtp_dsn.username,
                     password=app.settings.smtp_dsn.password,
                     start_tls=True,
                 ),
@@ -246,7 +246,7 @@ async def _orders(app: service.AsyncApplication[_OrdersSettings]) -> None:
 
 async def _price_quotes(app: service.AsyncApplication[_PriceQuotesSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # noqa: S311
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
     http_client = await app.stack.enter_async_context(
         httpx.AsyncClient(
@@ -264,16 +264,16 @@ async def _price_quotes(app: service.AsyncApplication[_PriceQuotesSettings]) -> 
 
     redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
         aioredis.from_url(
-            random.choice(app.settings.redis_dsn),  # noqa: S311
+            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
             decode_responses=False,
         ).client(),
     )
     amqp_connection = await app.stack.enter_async_context(
-        types.Connection(app.settings.amqp_dsn),
+        types.Connection(str(app.settings.amqp_dsn)),
     )
     ask2go_client = client.Ask2GoClient(
-        api_base_url=app.settings.api_base_url,
-        api_booking_base_url=app.settings.api_booking_base_url,
+        api_base_url=str(app.settings.api_base_url),
+        api_booking_base_url=str(app.settings.api_booking_base_url),
         http_client=http_client,
         rate_limit_client=rate_limit_client,
     )
@@ -323,7 +323,7 @@ async def _price_quotes(app: service.AsyncApplication[_PriceQuotesSettings]) -> 
 async def _seat_maps(app: service.AsyncApplication[_SeatMapsSettings]) -> None:
     redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
         aioredis.from_url(
-            random.choice(app.settings.redis_dsn),  # noqa: S311
+            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
             decode_responses=False,
         ).client(),
     )
@@ -335,12 +335,12 @@ async def _seat_maps(app: service.AsyncApplication[_SeatMapsSettings]) -> None:
     logging.register(http_client)
     metrics.register(http_client)
     ask2go_client = client.Ask2GoClient(
-        api_base_url=app.settings.api_base_url,
-        api_booking_base_url=app.settings.api_booking_base_url,
+        api_base_url=str(app.settings.api_base_url),
+        api_booking_base_url=str(app.settings.api_booking_base_url),
         http_client=http_client,
     )
     await consumer.SeatMapRpcServer(
-        address=app.settings.amqp_dsn,
+        address=str(app.settings.amqp_dsn),
         exchange=types.Exchange("seat_maps"),
         queue_name="{0}_seat_maps".format(app.name),
         routing_key="seat.maps",
@@ -355,7 +355,7 @@ async def _bookings_factory(
     app: service.AsyncApplication[_Settings],
 ) -> bookings.Implementation:
     storage = await app.stack.enter_async_context(
-        filesystem.Storage.from_dsn(app.settings.storage_dsn),
+        filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
     )
 
     return bookings.Implementation(

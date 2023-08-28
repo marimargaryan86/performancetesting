@@ -1,5 +1,5 @@
 import httpx
-from pydantic import v1 as pydantic
+import pydantic
 
 from snowfall.project.junction.plus.adapter import (
     monitoring_rules,
@@ -31,7 +31,7 @@ async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
     http_client = await app.stack.enter_async_context(httpx.AsyncClient())
     connection = await app.stack.enter_async_context(
         types.Connection(
-            app.settings.amqp_dsn,
+            str(app.settings.amqp_dsn),
         ),
     )
 

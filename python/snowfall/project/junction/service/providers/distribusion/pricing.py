@@ -39,19 +39,19 @@ async def price_quotes(  # noqa: WPS210
     )
     redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
         aioredis.from_url(
-            app.settings.redis_dsn[0],
+            str(app.settings.redis_dsn[0]),
             decode_responses=False,
         ).client(),
     )
     distribusion_client = client.DistribusionClient(
-        api_base_url=app.settings.api_base_url,
+        api_base_url=str(app.settings.api_base_url),
         api_key=app.settings.api_key,
         retailer_partner_number=app.settings.retailer_partner_number,
         http_client=http_client,
         rate_limit_client=rate_limit_client,
     )
     amqp_connection = await app.stack.enter_async_context(
-        types.Connection(app.settings.amqp_dsn),
+        types.Connection(str(app.settings.amqp_dsn)),
     )
     offer_cache = cache.OffersCache(
         client=redis.Client[bytes](redis_connection, prefix=app.name),

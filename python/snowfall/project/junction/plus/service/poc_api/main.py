@@ -60,7 +60,7 @@ def _factory(
         )[app.settings.mongo_db]
         redis_client = redis.Client[str](
             aioredis.from_url(
-                random.choice(app.settings.redis_dsn),  # noqa: S311
+                str(random.choice(app.settings.redis_dsn)),  # noqa: S311
                 decode_responses=True,
             ).client(),
             prefix=app.name,

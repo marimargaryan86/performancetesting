@@ -4,7 +4,7 @@ import contextlib
 import datetime
 import uuid
 
-from pydantic import v1 as pydantic
+import pydantic
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.provider import bookings as provider_bookings
@@ -45,12 +45,12 @@ class _BookingsSettings(service.Settings):
 async def _price_quotes(app: service.AsyncApplication[_PriceQuotesSettings]) -> None:
     redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
         aioredis.from_url(
-            app.settings.redis_dsn,
+            str(app.settings.redis_dsn),
             decode_responses=False,
         ).client(),
     )
     amqp_connection = await app.stack.enter_async_context(
-        types.Connection(app.settings.amqp_dsn),
+        types.Connection(str(app.settings.amqp_dsn)),
     )
 
     await pricing.Consumer(
@@ -79,15 +79,15 @@ async def _price_quotes(app: service.AsyncApplication[_PriceQuotesSettings]) -> 
 async def _bookings(app: service.AsyncApplication[_BookingsSettings]) -> None:
     redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
         aioredis.from_url(
-            app.settings.redis_dsn,
+            str(app.settings.redis_dsn),
             decode_responses=False,
         ).client(),
     )
     amqp_connection = await app.stack.enter_async_context(
-        types.Connection(app.settings.amqp_dsn),
+        types.Connection(str(app.settings.amqp_dsn)),
     )
     storage = await app.stack.enter_async_context(
-        filesystem.Storage.from_dsn(app.settings.storage_dsn),
+        filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
     )
 
     await bookings.Consumer(
@@ -140,7 +140,7 @@ async def _bookings_factory(
     app: service.AsyncApplication[_Settings],
 ) -> provider_bookings.Implementation:
     storage = await app.stack.enter_async_context(
-        filesystem.Storage.from_dsn(app.settings.storage_dsn),
+        filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
     )
 
     return provider_bookings.Implementation(

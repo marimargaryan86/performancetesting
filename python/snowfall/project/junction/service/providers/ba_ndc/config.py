@@ -1,7 +1,7 @@
 import datetime
 from collections.abc import Sequence
 
-from pydantic import v1 as pydantic
+import pydantic
 
 from snowfall.project.junction.provider import service
 from snowfall.vendor.rate_limiter.config import RateLimitConfig

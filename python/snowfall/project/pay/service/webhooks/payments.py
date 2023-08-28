@@ -1,6 +1,8 @@
+from typing import Never
+
 import lagom
-from pydantic import v1 as pydantic
-from starlette import endpoints, exceptions, requests, responses, status
+import pydantic
+from starlette import endpoints, exceptions, requests, status
 
 from snowfall.project.pay.adapter.payments import GrpcClient
 from snowfall.project.pay.service.webhooks.models import payment
@@ -12,7 +14,7 @@ class Payment(endpoints.HTTPEndpoint):
         self,
         request: requests.Request,
         payment_client: GrpcClient = lagom.injectable,
-    ) -> responses.Response:
+    ) -> Never:
         json_data = await request.json()
         if json_data["header"]["message_type"] == "payment":
             try:
@@ -20,7 +22,7 @@ class Payment(endpoints.HTTPEndpoint):
                     payment_client,
                     payment.Payment(**json_data["body"]),
                 )
-            except pydantic.error_wrappers.ValidationError as exc:
+            except pydantic.ValidationError as exc:
                 raise exceptions.HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                 ) from exc

@@ -2,8 +2,8 @@ import uuid
 from collections.abc import Mapping, Sequence
 
 import click
+import pydantic
 import pytest
-from pydantic import v1 as pydantic
 
 from snowfall.stdlib.integration.click import parameters
 

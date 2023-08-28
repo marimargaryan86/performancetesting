@@ -46,7 +46,7 @@ async def offers_factory(
         ),
     )
     offer_client_factory = DuffelClientFactory(
-        api_base_url=app.settings.api_base_url,
+        api_base_url=str(app.settings.api_base_url),
         api_key=app.settings.api_key,
         version=app.settings.api_version,
         http_client=http_client,

@@ -29,11 +29,11 @@ async def orders(app: service.Application[config.OrdersSettings]) -> None:
         logging.register(http_client)
         metrics.register(http_client)
         amqp_conn = await stack.enter_async_context(
-            types.Connection(app.settings.amqp_dsn),  # nosec
+            types.Connection(str(app.settings.amqp_dsn)),  # nosec
         )
         redis_conn = await stack.enter_async_context(
             aioredis.from_url(
-                app.settings.redis_dsn,
+                str(app.settings.redis_dsn),
                 decode_responses=True,
             ).client(),
         )
@@ -51,7 +51,7 @@ async def orders(app: service.Application[config.OrdersSettings]) -> None:
             bookings=booking.BookingHandler(
                 benerail_client=client.BenerailClient(
                     subscription_key=app.settings.subscription_key,
-                    base_url=app.settings.api_base_url,
+                    base_url=str(app.settings.api_base_url),
                     http_client=http_client,
                 ),
                 notifications_producer=producer.Producer(

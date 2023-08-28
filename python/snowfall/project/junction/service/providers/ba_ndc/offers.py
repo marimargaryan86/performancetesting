@@ -59,7 +59,7 @@ async def offers_factory(  # noqa: WPS210
     logging.register(http_client)
     metrics.register(http_client)
     ba_ndc_client = client.BaNdcClient(
-        api_base_url=app.settings.api_base_url,
+        api_base_url=str(app.settings.api_base_url),
         api_key=app.settings.api_key,
         http_client=http_client,
         rate_limit_clients=(rate_limit_client, rate_limit_client_daily),

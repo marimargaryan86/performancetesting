@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 
 import lagom
-from pydantic import v1 as pydantic
+import pydantic
 
 from snowfall.project.junction.plus.adapter import (
     configuration_vectors,

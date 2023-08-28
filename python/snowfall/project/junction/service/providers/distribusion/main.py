@@ -23,7 +23,7 @@ async def _bookings_factory(
     app: service.AsyncApplication[config.Settings],
 ) -> bookings.Implementation:
     storage = await app.stack.enter_async_context(
-        filesystem.Storage.from_dsn(app.settings.storage_dsn),
+        filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
     )
 
     return bookings.Implementation(

@@ -3,8 +3,8 @@ import ipaddress
 import random
 from collections.abc import Sequence
 
+import pydantic
 from motor import motor_asyncio
-from pydantic import v1 as pydantic
 from redis import asyncio as aioredis
 
 from snowfall.project.pay.adapter import companies, currencies, lead_companies
@@ -39,11 +39,11 @@ class _GrpcSettings(service.Settings):
 
 async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # noqa: S311
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
     redis_conn = await app.stack.enter_async_context(
         aioredis.from_url(
-            random.choice(app.settings.redis_dsn),  # noqa: S311
+            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
             decode_responses=True,
         ).client(),
     )

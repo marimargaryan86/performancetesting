@@ -4,8 +4,8 @@ import random
 from collections.abc import Sequence
 
 import httpx
+import pydantic
 from motor import motor_asyncio
-from pydantic import v1 as pydantic
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.go import pay_integration
@@ -78,9 +78,9 @@ class _GatherPriceQuoteSettings(
 
 async def _serve(app: service.Application[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # noqa: S311
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
-    async with types.Connection(app.settings.amqp_dsn) as connection:
+    async with types.Connection(str(app.settings.amqp_dsn)) as connection:
         amqp_producer = producer.Producer(
             connection=connection,
             exchange=types.Exchange("offers"),
@@ -154,19 +154,19 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
 
 async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # noqa: S311
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
 
     gateway_channel = client.create_channel(app.settings.gateway_address)
     http_client = await app.stack.enter_async_context(httpx.AsyncClient())
     connection = await app.stack.enter_async_context(
         types.Connection(
-            app.settings.amqp_dsn,
+            str(app.settings.amqp_dsn),
         ),
     )
     redis_conn = await app.stack.enter_async_context(
         aioredis.from_url(
-            random.choice(app.settings.redis_dsn),  # noqa: S311
+            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
             decode_responses=True,
         ).client(),
     )
@@ -231,9 +231,9 @@ async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
             ),
             pay_quotes=pay_quotes.PayQuotes(
                 pay_client=PayClient(
-                    base_url=app.settings.public_pay_api_dsn,
+                    base_url=str(app.settings.public_pay_api_dsn),
                     auth=UserAuth(
-                        app.settings.public_pay_admin_api_dsn,
+                        str(app.settings.public_pay_admin_api_dsn),
                         app.settings.pay_admin_username,
                         app.settings.pay_admin_password,
                     ),
@@ -257,13 +257,13 @@ async def _gather_price_quotes(
     app: service.AsyncApplication[_GatherPriceQuoteSettings],
 ) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # noqa: S311
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
 
     http_client = await app.stack.enter_async_context(httpx.AsyncClient())
     connection = await app.stack.enter_async_context(
         types.Connection(
-            app.settings.amqp_dsn,
+            str(app.settings.amqp_dsn),
         ),
     )
 
@@ -289,9 +289,9 @@ async def _gather_price_quotes(
             ),
             pay_quotes=pay_quotes.PayQuotes(
                 pay_client=PayClient(
-                    base_url=app.settings.public_pay_api_dsn,
+                    base_url=str(app.settings.public_pay_api_dsn),
                     auth=UserAuth(
-                        app.settings.public_pay_admin_api_dsn,
+                        str(app.settings.public_pay_admin_api_dsn),
                         app.settings.pay_admin_username,
                         app.settings.pay_admin_password,
                     ),

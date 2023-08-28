@@ -3,7 +3,7 @@ import random
 from collections.abc import Sequence
 
 from motor import motor_asyncio
-from pydantic.v1 import AnyUrl
+from pydantic import AnyUrl
 from redis import asyncio as aioredis
 
 from snowfall.project.pay.service.rates import cache
@@ -34,11 +34,11 @@ class _BackUpCronJobSettings(service.Settings):
 
 async def _serve(app: service.Application[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # noqa: S311
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
     redis_client = redis.Client[str](
         aioredis.from_url(
-            random.choice(app.settings.redis_dsn),  # noqa: S311
+            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
             decode_responses=True,
         ).client(),
         prefix=app.name,
@@ -62,11 +62,11 @@ async def _backup_rates_cron_run(
     app: service.Application[_BackUpCronJobSettings],
 ) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # noqa: S311
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
     redis_client = redis.Client[str](
         aioredis.from_url(
-            random.choice(app.settings.redis_dsn),  # noqa: S311
+            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
             decode_responses=True,
         ).client(),
         prefix=app.name,

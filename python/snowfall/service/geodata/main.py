@@ -4,7 +4,7 @@ from collections.abc import Sequence
 
 import boto3
 import shapefile
-from pydantic.v1 import AnyUrl
+from pydantic import AnyUrl
 from redis import asyncio as aioredis
 
 from snowfall.service.geodata import geocoding, reverse_geocoding
@@ -32,7 +32,7 @@ async def _main(app: service.Application[_Settings]) -> None:
     shp_file = shapefile.Reader(shp_path)
 
     async with aioredis.from_url(
-        random.choice(app.settings.redis_dsn),  # noqa: S311
+        str(random.choice(app.settings.redis_dsn)),  # noqa: S311
         decode_responses=True,
     ).client() as redis_conn:
         grpc_server = server.create_server(

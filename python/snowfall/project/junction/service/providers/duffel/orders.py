@@ -3,7 +3,7 @@ from collections.abc import Sequence
 
 import aiosmtplib
 import httpx
-from pydantic import v1 as pydantic
+import pydantic
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.go.service.orders.v1 import amqp_pb2
@@ -53,15 +53,15 @@ async def orders(app: service.AsyncApplication[OrdersSettings]) -> None:  # noqa
     )
     redis_connection = await app.stack.enter_async_context(
         aioredis.from_url(
-            random.choice(app.settings.redis_dsn),  # noqa: S311
+            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
             decode_responses=False,
         ).client(),
     )
     amqp_connection = await app.stack.enter_async_context(
-        types.Connection(app.settings.amqp_dsn),
+        types.Connection(str(app.settings.amqp_dsn)),
     )
     duffel_client_factory = DuffelClientFactory(
-        api_base_url=app.settings.api_base_url,
+        api_base_url=str(app.settings.api_base_url),
         api_key=app.settings.api_key,
         version=app.settings.api_version,
         http_client=http_client,
@@ -85,7 +85,7 @@ async def orders(app: service.AsyncApplication[OrdersSettings]) -> None:  # noqa
                 smtp_client=aiosmtplib.SMTP(
                     hostname=app.settings.smtp_dsn.host,
                     port=int(app.settings.smtp_dsn.port or 0) or None,
-                    username=app.settings.smtp_dsn.user,
+                    username=app.settings.smtp_dsn.username,
                     password=app.settings.smtp_dsn.password,
                     start_tls=True,
                 ),
@@ -94,7 +94,7 @@ async def orders(app: service.AsyncApplication[OrdersSettings]) -> None:  # noqa
             ),
             price_change_tolerance_percent=app.settings.price_change_tolerance_percent,
             booking_storage=await app.stack.enter_async_context(
-                filesystem.Storage.from_dsn(app.settings.storage_dsn),
+                filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
             ),
         ),
         offer_cache=cache.OfferCache(

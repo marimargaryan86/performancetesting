@@ -52,7 +52,7 @@ async def offers_factory(
     )
 
     distribusion_client = client.DistribusionClient(
-        api_base_url=app.settings.api_base_url,
+        api_base_url=str(app.settings.api_base_url),
         api_key=app.settings.api_key,
         retailer_partner_number=app.settings.retailer_partner_number,
         http_client=http_client,

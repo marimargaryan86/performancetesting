@@ -3,8 +3,8 @@ import random
 from collections.abc import Sequence
 
 import httpx
+import pydantic
 from motor import motor_asyncio
-from pydantic import v1 as pydantic
 
 from snowfall.project.junction.go import pay_integration
 from snowfall.project.junction.go.adapter import passenger_name_records
@@ -48,7 +48,7 @@ class _ImportSettings(pay_integration.Settings, service.Settings):
 
 async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # noqa: S311
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
 
     passenger_name_records_client = passenger_name_records.GrpcClient(
@@ -62,14 +62,14 @@ async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
     metrics.register(http_client)
 
     zendesk_client = ZendeskClient(
-        base_url=app.settings.zendesk_base_url,
+        base_url=str(app.settings.zendesk_base_url),
         api_key=app.settings.zendesk_api_key,
         http_client=http_client,
         env=app.environment,
     )
 
     amqp_connection = await app.stack.enter_async_context(
-        types.Connection(app.settings.amqp_dsn),
+        types.Connection(str(app.settings.amqp_dsn)),
     )
     booking_repository = orders.BookingRepository(
         collection=mongo.orders.journeys,
@@ -118,13 +118,13 @@ async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
 
 async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # noqa: S311
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
 
     http_client = await app.stack.enter_async_context(httpx.AsyncClient())
     connection = await app.stack.enter_async_context(
         types.Connection(
-            app.settings.amqp_dsn,
+            str(app.settings.amqp_dsn),
         ),
     )
 
@@ -143,9 +143,9 @@ async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
         pay_transaction_creator=PayTransactionCreator(
             use_pay_to_create_transaction=app.settings.use_pay_to_create_transaction,
             pay_client=PayClient(
-                base_url=app.settings.public_pay_api_dsn,
+                base_url=str(app.settings.public_pay_api_dsn),
                 auth=UserAuth(
-                    app.settings.public_pay_admin_api_dsn,
+                    str(app.settings.public_pay_admin_api_dsn),
                     app.settings.pay_admin_username,
                     app.settings.pay_admin_password,
                 ),

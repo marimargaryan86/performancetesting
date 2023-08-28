@@ -83,7 +83,7 @@ def _factory(
                     client_id=app.settings.ory_client_id,
                     client_secret=app.settings.ory_client_secret,
                 ),
-                token_endpoint=app.settings.ory_client_token_endpoint,
+                token_endpoint=str(app.settings.ory_client_token_endpoint),
             ),
         )
         junction_client = client.Client(
@@ -96,7 +96,7 @@ def _factory(
         )
         redis_client = redis.Client[str](
             aioredis.from_url(
-                random.choice(app.settings.redis_dsn),  # noqa: S311
+                str(random.choice(app.settings.redis_dsn)),  # noqa: S311
                 decode_responses=True,
             ).client(),
             prefix=app.name,
@@ -108,7 +108,7 @@ def _factory(
             aiosmtplib.SMTP(
                 hostname=app.settings.smtp_dsn.host,
                 port=int(app.settings.smtp_dsn.port or 0) or None,
-                username=app.settings.smtp_dsn.user,
+                username=app.settings.smtp_dsn.username,
                 password=app.settings.smtp_dsn.password,
                 start_tls=True,
             ),

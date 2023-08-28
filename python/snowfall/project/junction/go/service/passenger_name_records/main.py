@@ -2,8 +2,8 @@ import ipaddress
 import random
 from collections.abc import Sequence
 
+import pydantic
 from motor import motor_asyncio
-from pydantic import v1 as pydantic
 
 from snowfall.project.junction.go.service.passenger_name_records import (
     passenger_name_records,
@@ -23,7 +23,7 @@ class _GrpcSettings(service.Settings):
 
 async def _serve(app: service.Application[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # noqa: S311
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
     grpc_server = server.create_server(
         app.settings.grpc_address,

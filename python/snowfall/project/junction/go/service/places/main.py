@@ -11,7 +11,7 @@ from typing import Any
 import aiofiles
 import bson
 from motor import motor_asyncio
-from pydantic.v1 import AnyUrl
+from pydantic import AnyUrl
 
 from snowfall.project.junction.go.service.places import cities, locations, places
 from snowfall.project.junction.go.service.places.grpc import (
@@ -41,7 +41,7 @@ class _GrpcSettings(service.Settings):
 
 async def _generate_cities(app: service.Application[_CitiesSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # noqa: S311
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
     geocoding_service = geocoding_pb2_grpc.GeocodingServiceStub(
         create_channel(app.settings.geodata_address),
@@ -113,7 +113,7 @@ async def _generate_cities(app: service.Application[_CitiesSettings]) -> None:
 
 async def _serve(app: service.Application[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # noqa: S311
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
     geocoding_service = geocoding_pb2_grpc.GeocodingServiceStub(
         create_channel(app.settings.geodata_address),

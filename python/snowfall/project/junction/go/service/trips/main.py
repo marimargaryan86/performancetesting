@@ -4,7 +4,7 @@ import random
 from collections.abc import Sequence
 
 from motor import motor_asyncio
-from pydantic.v1 import AnyUrl
+from pydantic import AnyUrl
 
 from snowfall.project.junction.go.adapter import legs, offer_searches, offers
 from snowfall.project.junction.go.service.offers.v1 import (
@@ -61,10 +61,10 @@ class _GrpcSettings(service.Settings):
 
 async def _consume(app: service.Application[_ConsumeSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # noqa: S311
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
 
-    async with types.Connection(app.settings.amqp_dsn) as connection:
+    async with types.Connection(str(app.settings.amqp_dsn)) as connection:
         trip_search_consumer_obj = TripSearchConsumer(
             consumer_obj=consumer.Consumer(
                 connection=connection,
@@ -88,7 +88,7 @@ async def _consume_trip_candidate_search_tasks(
     app: service.Application[_ConsumeTripCandidateSearchSettings],
 ) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # noqa: S311
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
     offers_channel = create_channel(app.settings.offers_address)
     schedules_channel = create_channel(app.settings.schedules_address)
@@ -98,7 +98,7 @@ async def _consume_trip_candidate_search_tasks(
     trips_db = mongo[_TRIPS]
     trip_repository = trips.TripRepository(trips_db[_TRIPS])
 
-    async with types.Connection(app.settings.amqp_dsn) as connection:
+    async with types.Connection(str(app.settings.amqp_dsn)) as connection:
         consumer_obj = TripCandidateSearchConsumer(
             consumer_obj=consumer.Consumer(
                 connection=connection,
@@ -130,14 +130,14 @@ async def _consume_trip_candidate_search_tasks(
 
 async def _serve(app: service.Application[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # noqa: S311
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
 
     offers_channel = create_channel(app.settings.offers_address)
 
     trips_db = mongo[_TRIPS]
 
-    async with types.Connection(app.settings.amqp_dsn) as connection:
+    async with types.Connection(str(app.settings.amqp_dsn)) as connection:
         producer_obj = producer.Producer(
             connection=connection,
             exchange=types.Exchange(_TRIPS),

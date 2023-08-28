@@ -3,7 +3,7 @@ from collections.abc import Sequence
 
 import aiosmtplib
 import httpx
-from pydantic import v1 as pydantic
+import pydantic
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.go.service.orders.v1 import amqp_pb2
@@ -47,12 +47,12 @@ async def orders(  # noqa: WPS210, WPS217
     metrics.register(http_client)
     redis_connection = await app.stack.enter_async_context(
         aioredis.from_url(
-            random.choice(app.settings.redis_dsn),  # noqa: S311
+            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
             decode_responses=False,
         ).client(),
     )
     amqp_connection = await app.stack.enter_async_context(
-        types.Connection(app.settings.amqp_dsn),
+        types.Connection(str(app.settings.amqp_dsn)),
     )
     rate_limit_client = await app.stack.enter_async_context(
         RateLimitClient(
@@ -67,13 +67,13 @@ async def orders(  # noqa: WPS210, WPS217
         ),
     )
     ba_ndc_client = client.BaNdcClient(
-        api_base_url=app.settings.api_base_url,
+        api_base_url=str(app.settings.api_base_url),
         api_key=app.settings.api_key,
         http_client=http_client,
         rate_limit_clients=(rate_limit_client, rate_limit_client_daily),
     )
     storage = await app.stack.enter_async_context(
-        filesystem.Storage.from_dsn(app.settings.storage_dsn),
+        filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
     )
 
     await OrderConsumer(
@@ -92,7 +92,7 @@ async def orders(  # noqa: WPS210, WPS217
                 smtp_client=aiosmtplib.SMTP(
                     hostname=app.settings.smtp_dsn.host,
                     port=int(app.settings.smtp_dsn.port or 0) or None,
-                    username=app.settings.smtp_dsn.user,
+                    username=app.settings.smtp_dsn.username,
                     password=app.settings.smtp_dsn.password,
                     start_tls=True,
                 ),

@@ -13,9 +13,9 @@ from typing import cast
 
 import aiosmtplib
 import httpx
+import pydantic
 from aio_pika import abc
 from motor import motor_asyncio
-from pydantic import v1 as pydantic
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.provider import (
@@ -123,7 +123,7 @@ async def _offers_factory(
 ) -> _Impl:
     stations = await _load_train_stations()
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # noqa: S311
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
     http_client = await stack.enter_async_context(
         httpx.AsyncClient(
@@ -137,17 +137,17 @@ async def _offers_factory(
         password=app.settings.api_password,
         password_search=app.settings.api_search_password,
         token=app.settings.api_booking_token,
-        api_url=app.settings.api_base_url,
-        api_search_url=app.settings.api_search_base_url,
+        api_url=str(app.settings.api_base_url),
+        api_search_url=str(app.settings.api_search_base_url),
         api_search_timeout=app.settings.api_search_timeout,
         api_search_requests_limit=app.settings.api_search_requests_limit,
         client=http_client,
     )
     booking_storage = await stack.enter_async_context(
-        filesystem.Storage.from_dsn(app.settings.storage_dsn),
+        filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
     )
     ticket_storage = await stack.enter_async_context(
-        filesystem.Storage.from_dsn(app.settings.ticket_storage_dsn),
+        filesystem.Storage.from_dsn(str(app.settings.ticket_storage_dsn)),
     )
     # TODO: do we need to call get_token on the save_a_train_client?
     sat_adapter = adapter.SaveATrainAdapter(
@@ -190,7 +190,7 @@ async def _bookings_factory(
     app: service.AsyncApplication[_Settings],
 ) -> bookings.Implementation:
     storage = await app.stack.enter_async_context(
-        filesystem.Storage.from_dsn(app.settings.storage_dsn),
+        filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
     )
 
     return bookings.Implementation(
@@ -206,7 +206,7 @@ async def _orders(  # noqa: WPS217
     app: service.AsyncApplication[_OrdersSettings],
 ) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # noqa: S311
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
     http_client = await app.stack.enter_async_context(
         httpx.AsyncClient(
@@ -216,11 +216,11 @@ async def _orders(  # noqa: WPS217
     logging.register(http_client)
     metrics.register(http_client)
     amqp_connection = await app.stack.enter_async_context(
-        types.Connection(app.settings.amqp_dsn),
+        types.Connection(str(app.settings.amqp_dsn)),
     )
     redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
         aioredis.from_url(
-            random.choice(app.settings.redis_dsn),  # noqa: S311
+            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
             decode_responses=False,
         ).client(),
     )
@@ -230,8 +230,8 @@ async def _orders(  # noqa: WPS217
         password=app.settings.api_password,
         password_search=app.settings.api_search_password,
         token=app.settings.api_booking_token,
-        api_url=app.settings.api_base_url,
-        api_search_url=app.settings.api_search_base_url,
+        api_url=str(app.settings.api_base_url),
+        api_search_url=str(app.settings.api_search_base_url),
         api_search_timeout=app.settings.api_search_timeout,
         api_search_requests_limit=app.settings.api_search_requests_limit,
         client=http_client,
@@ -241,10 +241,10 @@ async def _orders(  # noqa: WPS217
         client=redis.Client(redis_connection, prefix=app.name),
     )
     booking_storage = await app.stack.enter_async_context(
-        filesystem.Storage.from_dsn(app.settings.storage_dsn),
+        filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
     )
     ticket_storage = await app.stack.enter_async_context(
-        filesystem.Storage.from_dsn(app.settings.ticket_storage_dsn),
+        filesystem.Storage.from_dsn(str(app.settings.ticket_storage_dsn)),
     )
     orders_consumer = consumer.OrdersConsumer(
         consumer_obj=amqp_consumer.Consumer(
@@ -270,7 +270,7 @@ async def _orders(  # noqa: WPS217
                 smtp_client=aiosmtplib.SMTP(
                     hostname=app.settings.smtp_dsn.host,
                     port=int(app.settings.smtp_dsn.port or 0) or None,
-                    username=app.settings.smtp_dsn.user,
+                    username=app.settings.smtp_dsn.username,
                     password=app.settings.smtp_dsn.password,
                     start_tls=True,
                 ),
@@ -293,12 +293,12 @@ async def _orders(  # noqa: WPS217
 async def _price_quotes(app: service.AsyncApplication[_PriceQuoteSettings]) -> None:
     redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
         aioredis.from_url(
-            random.choice(app.settings.redis_dsn),  # noqa: S311
+            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
             decode_responses=False,
         ).client(),
     )
     amqp_connection = await app.stack.enter_async_context(
-        types.Connection(app.settings.amqp_dsn),
+        types.Connection(str(app.settings.amqp_dsn)),
     )
 
     await consumer.PriceQuoteConsumer(
@@ -326,7 +326,7 @@ async def _notifications(  # noqa: WPS217
     app: service.AsyncApplication[_NotificationsSettings],
 ) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # noqa: S311
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
     http_client = await app.stack.enter_async_context(
         httpx.AsyncClient(
@@ -336,11 +336,11 @@ async def _notifications(  # noqa: WPS217
     logging.register(http_client)
     metrics.register(http_client)
     amqp_connection = await app.stack.enter_async_context(
-        types.Connection(app.settings.amqp_dsn),
+        types.Connection(str(app.settings.amqp_dsn)),
     )
     redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
         aioredis.from_url(
-            random.choice(app.settings.redis_dsn),  # noqa: S311
+            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
             decode_responses=False,
         ).client(),
     )
@@ -348,7 +348,7 @@ async def _notifications(  # noqa: WPS217
         smtp_client=aiosmtplib.SMTP(
             hostname=app.settings.smtp_dsn.host,
             port=int(app.settings.smtp_dsn.port or 0) or None,
-            username=app.settings.smtp_dsn.user,
+            username=app.settings.smtp_dsn.username,
             password=app.settings.smtp_dsn.password,
             start_tls=True,
         ),
@@ -356,10 +356,10 @@ async def _notifications(  # noqa: WPS217
         recipient=app.settings.smtp_recipient,
     )
     booking_storage = await app.stack.enter_async_context(
-        filesystem.Storage.from_dsn(app.settings.storage_dsn),
+        filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
     )
     ticket_storage = await app.stack.enter_async_context(
-        filesystem.Storage.from_dsn(app.settings.ticket_storage_dsn),
+        filesystem.Storage.from_dsn(str(app.settings.ticket_storage_dsn)),
     )
     sat_adapter = adapter.SaveATrainAdapter(
         save_a_train_client=client.SATClient(
@@ -367,8 +367,8 @@ async def _notifications(  # noqa: WPS217
             password=app.settings.api_password,
             password_search=app.settings.api_search_password,
             token=app.settings.api_booking_token,
-            api_url=app.settings.api_base_url,
-            api_search_url=app.settings.api_search_base_url,
+            api_url=str(app.settings.api_base_url),
+            api_search_url=str(app.settings.api_search_base_url),
             api_search_timeout=app.settings.api_search_timeout,
             api_search_requests_limit=app.settings.api_search_requests_limit,
             client=http_client,
@@ -461,8 +461,8 @@ async def _dump_stations(app: service.AsyncApplication[_DumpStationsSettings]) -
         password=app.settings.api_password,
         password_search=app.settings.api_search_password,
         token=app.settings.api_booking_token,
-        api_url=app.settings.api_base_url,
-        api_search_url=app.settings.api_search_base_url,
+        api_url=str(app.settings.api_base_url),
+        api_search_url=str(app.settings.api_search_base_url),
         api_search_timeout=app.settings.api_search_timeout,
         api_search_requests_limit=app.settings.api_search_requests_limit,
         client=http_client,

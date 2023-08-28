@@ -22,12 +22,12 @@ async def price_quotes(
 ) -> None:
     redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
         aioredis.from_url(
-            random.choice(app.settings.redis_dsn),  # noqa: S311
+            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
             decode_responses=False,
         ).client(),
     )
     amqp_connection = await app.stack.enter_async_context(
-        amqp_types.Connection(app.settings.amqp_dsn),
+        amqp_types.Connection(str(app.settings.amqp_dsn)),
     )
     offer_cache = cache.OfferCache(
         client=redis.Client[bytes](redis_connection, prefix=app.name),

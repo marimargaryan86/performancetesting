@@ -2,8 +2,8 @@ import ipaddress
 import random
 from collections.abc import Sequence
 
+import pydantic
 from motor import motor_asyncio
-from pydantic import v1 as pydantic
 
 from snowfall.project.junction.plus.service.notifications.grpc import (
     ConfigurationVectorService,
@@ -32,9 +32,9 @@ class _GrpcSettings(service.Settings):
 
 async def _serve(app: service.Application[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # noqa: S311
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
-    async with types.Connection(app.settings.amqp_dsn) as connection:
+    async with types.Connection(str(app.settings.amqp_dsn)) as connection:
         grpc_server = server.create_server(
             app.settings.grpc_address,
             app.settings.grpc_port,

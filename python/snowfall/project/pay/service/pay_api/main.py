@@ -76,11 +76,11 @@ def _factory(
 ) -> Callable[[], applications.Starlette]:
     def decorator() -> applications.Starlette:
         mongo = motor_asyncio.AsyncIOMotorClient(
-            random.choice(app.settings.mongo_dsn),  # noqa: S311
+            str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
         )
         redis_client = redis.Client[str](
             aioredis.from_url(
-                random.choice(app.settings.redis_dsn),  # noqa: S311
+                str(random.choice(app.settings.redis_dsn)),  # noqa: S311
                 decode_responses=True,
             ).client(),
             prefix=app.name,
@@ -191,7 +191,7 @@ def _admin_factory(
 ) -> Callable[[], applications.Starlette]:
     def decorator() -> applications.Starlette:
         mongo = motor_asyncio.AsyncIOMotorClient(
-            random.choice(app.settings.mongo_dsn),  # noqa: S311
+            str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
         )
         authentication_channel = create_channel(
             app.settings.authentication_address,
@@ -221,7 +221,7 @@ def _admin_factory(
         )
         redis_client = redis.Client[str](
             aioredis.from_url(
-                random.choice(app.settings.redis_dsn),  # noqa: S311
+                str(random.choice(app.settings.redis_dsn)),  # noqa: S311
                 decode_responses=True,
             ).client(),
             prefix=app.name,

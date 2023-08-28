@@ -10,7 +10,7 @@ import json_api_doc
 from authlib.integrations import httpx_client
 from dateutil import relativedelta
 from motor import motor_asyncio
-from pydantic.v1 import AnyUrl, HttpUrl
+from pydantic import AnyUrl, HttpUrl
 
 from snowfall.project.junction.extensions.service.mobile_api import smtp
 from snowfall.project.junction.extensions.service.mobile_api.tasks import orders
@@ -41,14 +41,14 @@ async def orders_report(app: service.Application[Settings]) -> None:
                 client_id=app.settings.ory_client_id,
                 client_secret=app.settings.ory_client_secret,
             ),
-            token_endpoint=app.settings.ory_client_token_endpoint,
+            token_endpoint=str(app.settings.ory_client_token_endpoint),
         ),
     )
     smtp_cl = smtp.EmailClient(
         aiosmtplib.SMTP(
             hostname=app.settings.smtp_dsn.host,
             port=int(app.settings.smtp_dsn.port or 0) or None,
-            username=app.settings.smtp_dsn.user,
+            username=app.settings.smtp_dsn.username,
             password=app.settings.smtp_dsn.password,
             start_tls=False,
         ),

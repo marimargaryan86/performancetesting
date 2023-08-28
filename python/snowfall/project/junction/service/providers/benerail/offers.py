@@ -35,7 +35,7 @@ async def offers_app(
 ) -> _Impl:
     stations = await train_stations.load_train_stations()
     mongo = motor_asyncio.AsyncIOMotorClient(
-        random.choice(app.settings.mongo_dsn),  # noqa: S311
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
 
     http_client = await stack.enter_async_context(
@@ -47,7 +47,7 @@ async def offers_app(
     )
     benerail_client = client.BenerailClient(
         subscription_key=app.settings.subscription_key,
-        base_url=app.settings.api_base_url,
+        base_url=str(app.settings.api_base_url),
         http_client=http_client,
     )
 

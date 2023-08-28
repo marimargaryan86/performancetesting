@@ -5,20 +5,23 @@ import contextlib
 import dataclasses
 import inspect
 from collections.abc import AsyncIterator, Awaitable, Callable
-from typing import Any, Generic, Protocol, TypeVar, cast
+from typing import Annotated, Any, Generic, Protocol, TypeVar, cast
 
 import click
 import orjson
+import pydantic
+import pydantic_core
 from prometheus_async.aio import web
-from pydantic import v1 as pydantic
 
 from snowfall.stdlib.integration.click import parameters
 from snowfall.stdlib.logging import sentry, stdout
 
 
 class Settings(pydantic.BaseModel):
-    class Config(object):
-        allow_mutation = False
+    model_config = pydantic.ConfigDict(
+        extra="forbid",
+        frozen=True,
+    )
 
 
 _Settings = TypeVar("_Settings", bound=Settings)
@@ -40,8 +43,7 @@ def _print_debug_info(
         ctx.exit()
 
 
-class AnyDsn(pydantic.AnyUrl):
-    host_required = False
+AnyDsn = Annotated[pydantic_core.Url, pydantic.UrlConstraints(host_required=False)]
 
 
 @dataclasses.dataclass(frozen=True)

@@ -1,7 +1,6 @@
 import asyncio
-from urllib import parse as urllib_parse
 
-from pydantic import v1 as pydantic
+import pydantic
 
 from snowfall.service.deploy import consul, dependencies, verify
 from snowfall.service.deploy.verifiers import junction_go, protocols
@@ -17,7 +16,7 @@ class _VerifySettings(service.Settings):
 
 
 async def _verify(app: service.AsyncApplication[_VerifySettings]) -> None:
-    dns_address = str(urllib_parse.urlparse(app.settings.nomad_address).hostname)
+    dns_address = str(app.settings.nomad_address.host)
     dns_resolver = consul.Resolver((dns_address, 8600), app.environment)
     deps_resolver = await dependencies.resolver_from_nomad_templates(
         app.settings.nomad_templates_path,

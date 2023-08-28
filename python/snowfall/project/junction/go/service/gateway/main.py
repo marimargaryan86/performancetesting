@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import ipaddress
 
-from pydantic import v1 as pydantic
+import pydantic
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.go.service.gateway import (
@@ -36,10 +36,10 @@ class _ServeSettings(service.Settings):
 
 async def _consume(app: service.AsyncApplication[_ConsumeSettings]) -> None:
     connection = await app.stack.enter_async_context(
-        types.Connection(app.settings.amqp_dsn),
+        types.Connection(str(app.settings.amqp_dsn)),
     )
     redis_conn = await app.stack.enter_async_context(
-        aioredis.from_url(app.settings.redis_dsn).client(),
+        aioredis.from_url(str(app.settings.redis_dsn)).client(),
     )
     all_providers = await providers.Collection.from_identifier_address_tuples(
         [
@@ -70,10 +70,10 @@ async def _consume(app: service.AsyncApplication[_ConsumeSettings]) -> None:
 
 async def _serve(app: service.AsyncApplication[_ServeSettings]) -> None:
     connection = await app.stack.enter_async_context(
-        types.Connection(app.settings.amqp_dsn),
+        types.Connection(str(app.settings.amqp_dsn)),
     )
     redis_conn = await app.stack.enter_async_context(
-        aioredis.from_url(app.settings.redis_dsn).client(),
+        aioredis.from_url(str(app.settings.redis_dsn)).client(),
     )
     all_providers = await providers.Collection.from_identifier_address_tuples(
         [

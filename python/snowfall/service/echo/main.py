@@ -1,7 +1,7 @@
 import ipaddress
 
 from grpc import aio
-from pydantic.v1 import AnyUrl
+from pydantic import AnyUrl
 
 from snowfall.service.echo.v1 import echo_pb2, echo_pb2_grpc
 from snowfall.stdlib import service
@@ -49,7 +49,7 @@ async def _grpc(app: service.Application[_GrpcSettings]) -> None:
 
 
 async def _produce(app: service.Application[_AmqpSettings]) -> None:
-    async with types.Connection(app.settings.amqp_dsn) as connection:
+    async with types.Connection(str(app.settings.amqp_dsn)) as connection:
         echo_producer = producer.Producer(
             connection=connection,
             exchange=types.Exchange(app.name),
@@ -66,7 +66,7 @@ async def _echo_message(message: types.Message[echo_pb2.EchoRequest]) -> None:
 
 
 async def _consume(app: service.Application[_AmqpSettings]) -> None:
-    async with types.Connection(app.settings.amqp_dsn) as connection:
+    async with types.Connection(str(app.settings.amqp_dsn)) as connection:
         await consumer.Consumer[echo_pb2.EchoRequest](
             connection=connection,
             queue_name="{0}_consumer".format(app.name),

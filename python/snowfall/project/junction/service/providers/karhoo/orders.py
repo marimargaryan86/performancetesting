@@ -30,18 +30,18 @@ async def orders(
     logging.register(http_client)
     metrics.register(http_client)
     amqp_connection = await app.stack.enter_async_context(
-        types.Connection(app.settings.amqp_dsn),
+        types.Connection(str(app.settings.amqp_dsn)),
     )
 
     redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
         aioredis.from_url(
-            random.choice(app.settings.redis_dsn),  # noqa: S311
+            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
             decode_responses=False,
         ).client(),
     )
 
     karhoo_client = client.KarhooClient(
-        base_url=app.settings.api_base_url,
+        base_url=str(app.settings.api_base_url),
         api_key=app.settings.api_key,
         http_client=http_client,
     )
@@ -62,7 +62,7 @@ async def orders(
                 smtp_client=aiosmtplib.SMTP(
                     hostname=app.settings.smtp_dsn.host,
                     port=int(app.settings.smtp_dsn.port or 0) or None,
-                    username=app.settings.smtp_dsn.user,
+                    username=app.settings.smtp_dsn.username,
                     password=app.settings.smtp_dsn.password,
                     start_tls=True,
                 ),

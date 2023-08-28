@@ -6,8 +6,8 @@ import ipaddress
 from collections.abc import Awaitable, Callable
 from typing import TYPE_CHECKING, Generic, TypeVar
 
+import pydantic
 from google.protobuf import message
-from pydantic import v1 as pydantic
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.provider import bookings, meta, offers
@@ -81,12 +81,12 @@ def _grpc_command(  # noqa: WPS210, WPS217
         ]
         redis_conn: aioredis.Redis[bytes] = await app.stack.enter_async_context(
             aioredis.from_url(
-                app.settings.redis_dsn,
+                str(app.settings.redis_dsn),
                 decode_responses=False,
             ).client(),
         )
         connection = await app.stack.enter_async_context(
-            types.Connection(app.settings.amqp_dsn),
+            types.Connection(str(app.settings.amqp_dsn)),
         )
 
         if offers_factory:
@@ -138,12 +138,12 @@ def _offers_command(
         meta_implementation = await meta_factory()
         redis_conn: aioredis.Redis[bytes] = await app.stack.enter_async_context(
             aioredis.from_url(
-                app.settings.redis_dsn,
+                str(app.settings.redis_dsn),
                 decode_responses=False,
             ).client(),
         )
         connection = await app.stack.enter_async_context(
-            types.Connection(app.settings.amqp_dsn),
+            types.Connection(str(app.settings.amqp_dsn)),
         )
 
         trip_search_consumer = offers.create_trip_offer_search_consumer(

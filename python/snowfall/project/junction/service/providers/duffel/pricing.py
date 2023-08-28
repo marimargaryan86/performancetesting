@@ -46,15 +46,15 @@ async def price_quotes(  # noqa: WPS210
     )
     redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
         aioredis.from_url(
-            random.choice(app.settings.redis_dsn),  # noqa: S311
+            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
             decode_responses=False,
         ).client(),
     )
     amqp_connection = await app.stack.enter_async_context(
-        amqp_types.Connection(app.settings.amqp_dsn),
+        amqp_types.Connection(str(app.settings.amqp_dsn)),
     )
     duffel_client_factory = DuffelClientFactory(
-        api_base_url=app.settings.api_base_url,
+        api_base_url=str(app.settings.api_base_url),
         api_key=app.settings.api_key,
         version=app.settings.api_version,
         http_client=http_client,

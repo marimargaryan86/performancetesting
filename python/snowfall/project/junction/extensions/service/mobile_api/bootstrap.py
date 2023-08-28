@@ -3,7 +3,7 @@ from collections.abc import Sequence
 
 import httpx
 import lagom
-from pydantic.v1 import AnyUrl, HttpUrl
+from pydantic import AnyUrl, HttpUrl
 
 from snowfall.project.junction.extensions.service.mobile_api import (
     jwt_generator,

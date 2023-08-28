@@ -2,7 +2,7 @@ import datetime
 from collections.abc import Sequence
 from pathlib import Path
 
-from pydantic import v1 as pydantic
+import pydantic
 
 from snowfall.project.junction.provider import service
 

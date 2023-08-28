@@ -55,14 +55,14 @@ def _create_client(
 ) -> client.DfHttpClient:
     return client.DfHttpClient(
         auth_client=auth.AuthClient(
-            api_url=setting.affiliate_api_url,
+            api_url=str(setting.affiliate_api_url),
             client_secret=setting.client_secret,
             client_id=setting.client_id,
             http_client=http_client,
         ),
         http_client=http_client,
         config=base.ClientConfig(
-            api_url=setting.api_url,
+            api_url=str(setting.api_url),
             partner_code=setting.partner_code,
             client_id=setting.client_id,
             client_secret=setting.client_secret,
@@ -122,11 +122,11 @@ async def _orders(app: service.AsyncApplication[config.OrdersSettings]) -> None:
     logging.register(http_client)
     metrics.register(http_client)
     amqp_conn = await app.stack.enter_async_context(
-        types.Connection(app.settings.amqp_dsn),
+        types.Connection(str(app.settings.amqp_dsn)),
     )
     redis_conn = await app.stack.enter_async_context(
         aioredis.from_url(
-            random.choice(app.settings.redis_dsn),  # noqa: S311
+            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
             decode_responses=True,
         ).client(),
     )
@@ -162,12 +162,12 @@ async def _price_quotes(
 ) -> None:
     redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
         aioredis.from_url(
-            app.settings.redis_dsn,
+            str(app.settings.redis_dsn),
             decode_responses=False,
         ).client(),
     )
     amqp_connection = await app.stack.enter_async_context(
-        types.Connection(app.settings.amqp_dsn),
+        types.Connection(str(app.settings.amqp_dsn)),
     )
 
     await df_consumer.PriceQuoteConsumer(
