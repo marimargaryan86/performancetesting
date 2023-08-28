@@ -44,6 +44,12 @@ let ensureRequiredFields = (input, options, context) => {
         }
 
         return errors
+    } else if (input.hasOwnProperty("anyOf")) {
+        for (const anyOf of input.anyOf) {
+            errors.concat(ensureRequiredFields(anyOf, options, context))
+        }
+
+        return errors
     } else if (input.hasOwnProperty("items") && input.items.hasOwnProperty("oneOf")) {
         for (const oneOf of input.items.oneOf) {
             errors.concat(ensureRequiredFields(oneOf, options, context))
