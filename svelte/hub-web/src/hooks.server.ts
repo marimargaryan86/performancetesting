@@ -18,13 +18,13 @@ export function handle({ event, resolve }): MaybePromise<Response> {
     };
 
     if (
-      event.url.pathname === routeConfig.login &&
+      event.url.pathname === routeConfig.login.root &&
       !Array.from(event.url.searchParams.keys()).length
     ) {
       throw redirect(303, routeConfig.home);
     }
-  } else if (event.url.pathname !== routeConfig.login) {
-    throw redirect(303, routeConfig.login);
+  } else if (event.url.pathname !== routeConfig.login.root) {
+    throw redirect(303, routeConfig.login.root);
   }
 
   return resolve(event);

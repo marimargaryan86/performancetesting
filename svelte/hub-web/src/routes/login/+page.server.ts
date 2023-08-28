@@ -41,6 +41,6 @@ export const actions = {
   logout(event): void {
     event.cookies.delete("session-token", { path: "/" });
 
-    throw redirect(303, routeConfig.login);
+    throw redirect(303, routeConfig.login.root);
   },
 };

@@ -62,7 +62,7 @@
   <div class="actions">
     <SearchField bind:value={searchQuery} />
 
-    <Button size="small" href={routeConfig.pay.beneficiaries.addBeneficiary} preload={false}>
+    <Button size="small" href={routeConfig.pay.beneficiaries.beneficiary()} preload={false}>
       Add Beneficiary
       <PlusIcon />
     </Button>

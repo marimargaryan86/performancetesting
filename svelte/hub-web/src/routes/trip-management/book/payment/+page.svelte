@@ -79,7 +79,7 @@
   }
 
   function getBackUrl(searchData: typeof data.searchData): URL {
-    return new URLExtended(routeConfig.book.select.root, {
+    return new URLExtended(routeConfig.tripManagement.book.select.root, {
       base: $page.url.origin,
       query: {
         origin: searchData.origin.id,
@@ -102,7 +102,7 @@
     }
 
     const result = await callAction<ActionPollReturnType>({
-      action: routeConfig.book.payment.actions.poll,
+      action: routeConfig.tripManagement.book.payment.actions.poll,
       apply: false,
     });
 
@@ -146,7 +146,7 @@
       redirect: "if_required",
     });
 
-    goto(routeConfig.book.passengerDetails.root);
+    goto(routeConfig.tripManagement.book.passengerDetails.root);
   }
 
   onDestroy(() => {

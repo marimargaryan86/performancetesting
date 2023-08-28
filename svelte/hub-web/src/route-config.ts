@@ -1,71 +1,122 @@
+// Trip management
+const tripManagementRoot = "/trip-management" as const;
+// Trip management - book
+const tripManagementBookRoot = `${tripManagementRoot}/book` as const;
+const tripManagementBookSelectRoot = `${tripManagementBookRoot}/select-offer` as const;
+const tripManagementBookPassengersRoot = `${tripManagementBookRoot}/passenger-details` as const;
+const tripManagementBookPaymentRoot = `${tripManagementBookRoot}/payment` as const;
+const tripManagementBookConfirmationRoot = `${tripManagementBookRoot}/confirmation` as const;
+// Trip management - Orders
+const tripManagementOrdersRoot = `${tripManagementRoot}/orders` as const;
+// Login
+const loginRoot = "/login" as const;
+// Settings
+const settingsRoot = "/settings" as const;
+// Pay
+const payRoot = "/pay" as const;
+// Pay - activity
+const payActivityRoot = `${payRoot}/activity` as const;
+const payActivityConversion = `${payActivityRoot}/fx` as const;
+// Pay - accounts
+const payAccountsRoot = `${payRoot}/accounts` as const;
+function payAccountsAccount<TID extends string>(id: TID): `${typeof payAccountsRoot}/${TID}` {
+  return `${payAccountsRoot}/${id}`;
+}
+// Pay - Beneficiaries
+const payBeneficiaries = `${payRoot}/beneficiaries` as const;
+function payBeneficiariesBeneficiary<
+  TID extends string | undefined = undefined,
+  TOut = `${typeof payBeneficiaries}/${TID extends undefined ? "add" : TID}`,
+>(id?: TID): TOut {
+  return `${payBeneficiaries}/${id ?? "add"}` as TOut;
+}
+// Go
+const goRoot = "/go" as const;
+// Go - Bookings
+const goBookings = `${goRoot}/bookings` as const;
+
 export default {
-  home: "/",
-  book: {
-    root: "/book",
-    select: {
-      root: "/book/select-offer",
+  home: "/" as const,
+  tripManagement: {
+    root: tripManagementRoot,
+    book: {
+      root: tripManagementBookRoot,
+      select: {
+        root: tripManagementBookSelectRoot,
+        actions: {
+          poll: `${tripManagementBookSelectRoot}?/poll` as const,
+          select: `${tripManagementBookSelectRoot}?/select` as const,
+        },
+      },
+      passengerDetails: {
+        root: tripManagementBookPassengersRoot,
+        actions: {
+          createOrder: `${tripManagementBookPassengersRoot}?/createOrder` as const,
+        },
+      },
+      payment: {
+        root: tripManagementBookPaymentRoot,
+        actions: {
+          poll: `${tripManagementBookPaymentRoot}?/poll` as const,
+        },
+      },
+      confirmation: {
+        root: tripManagementBookConfirmationRoot,
+      },
       actions: {
-        poll: "/book/select-offer?/poll",
-        select: "/book/select-offer?/select",
+        listPlaces: `${tripManagementBookRoot}?/listPlaces` as const,
       },
     },
-    passengerDetails: {
-      root: "/book/passenger-details",
-      actions: {
-        createOrder: "/book/passenger-details?/createOrder",
-      },
-    },
-    payment: {
-      root: "/book/payment",
-      actions: {
-        poll: "/book/payment?/poll",
-      },
-    },
-    confirmation: {
-      root: "/book/confirmation",
-    },
-    actions: {
-      listPlaces: "/book?/listPlaces",
+    orders: {
+      root: tripManagementOrdersRoot,
     },
   },
-  login: "/login",
-  settings: "/settings",
+  login: {
+    root: loginRoot,
+    actions: {
+      login: `${loginRoot}?/login` as const,
+      logout: `${loginRoot}?/logout` as const,
+    },
+  },
+  settings: settingsRoot,
   pay: {
-    root: "/pay",
+    root: payRoot,
     activity: {
-      root: "/pay/activity",
+      root: payActivityRoot,
       conversions: {
-        root: "/pay/activity/fx",
+        root: payActivityConversion,
         actions: {
-          listConversions: "/pay/activity/fx?/listConversions",
+          listConversions: `${payActivityConversion}?/listConversions` as const,
         },
       },
       actions: {
-        getBooking: "/pay/activity?/getBooking",
-        listTransactions: "/pay/activity?/listTransactions",
+        getBooking: `${payActivityRoot}?/getBooking` as const,
+        listTransactions: `${payActivityRoot}?/listTransactions` as const,
       },
     },
     accounts: {
-      root: "/pay/accounts",
-      account: (id: string): string => `/pay/accounts/${id}`,
+      root: payAccountsRoot,
+      account: payAccountsAccount,
       actions: {
-        listAccounts: "/pay/accounts?/listAccounts",
-        addBalances: (id: string): string => `/pay/accounts/${id}?/addBalances`,
+        listAccounts: `${payAccountsRoot}?/listAccounts` as const,
+        addBalances: <TID extends string>(
+          id: TID,
+        ): `${ReturnType<typeof payAccountsAccount<TID>>}?/addBalances` =>
+          `${payAccountsAccount(id)}?/addBalances`,
       },
     },
     beneficiaries: {
-      root: "/pay/beneficiaries",
-      beneficiary: (id?: string): string => `/pay/beneficiaries/${id ?? "add"}`,
-      addBeneficiary: "/pay/beneficiaries/add",
+      root: payBeneficiaries,
+      beneficiary: payBeneficiariesBeneficiary,
       actions: {
-        listBeneficiaries: "/pay/beneficiaries?/listBeneficiaries",
+        listBeneficiaries: `${payBeneficiaries}?/listBeneficiaries` as const,
       },
     },
   },
   go: {
-    root: "/go",
+    root: goRoot,
     bookings: {
-      root: "/go/bookings",
+      root: goBookings,
     },
   },
 };

@@ -22,7 +22,7 @@
     window.clearTimeout(logoutTimer);
 
     logoutTimer = window.setTimeout(callAction, getTimeDeltaMs(timeoutAt, new Date()), {
-      action: `${routeConfig.login}?/logout`,
+      action: routeConfig.login.actions.logout,
     });
   }
 </script>

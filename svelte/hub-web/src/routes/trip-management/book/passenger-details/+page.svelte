@@ -51,7 +51,7 @@
   }
 
   function getBackUrl(searchData: ResolvedSearchData): URL {
-    return new URLExtended(routeConfig.book.select.root, {
+    return new URLExtended(routeConfig.tripManagement.book.select.root, {
       base: $page.url.origin,
       query: {
         origin: searchData.origin.id,
@@ -74,7 +74,7 @@
     }
 
     const result = await callAction<{ priceQuote: OfferPriceQuoteModel }>({
-      action: routeConfig.book.payment.actions.poll,
+      action: routeConfig.tripManagement.book.payment.actions.poll,
       apply: false,
     });
 
@@ -104,7 +104,7 @@
     }
 
     const result = await callAction({
-      action: routeConfig.book.passengerDetails.actions.createOrder,
+      action: routeConfig.tripManagement.book.passengerDetails.actions.createOrder,
       data: {
         priceQuoteId: data.priceQuote.id,
         passengers: bookingDetails.passengers,
@@ -119,7 +119,7 @@
       return;
     }
 
-    goto(routeConfig.book.confirmation.root);
+    goto(routeConfig.tripManagement.book.confirmation.root);
   }
 
   onDestroy(() => {

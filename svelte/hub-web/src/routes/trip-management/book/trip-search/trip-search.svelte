@@ -72,7 +72,7 @@
     }
 
     const result = await callAction<{ places: PlaceModel[] }>({
-      action: routeConfig.book.actions.listPlaces,
+      action: routeConfig.tripManagement.book.actions.listPlaces,
       data: { query },
       apply: false,
     });
@@ -98,7 +98,7 @@
 
     dispatch(
       "search",
-      new URLExtended(routeConfig.book.select.root, {
+      new URLExtended(routeConfig.tripManagement.book.select.root, {
         base: $page.url.origin,
         query: {
           outbound: parsedData.outbound.toLocaleDateString("sv-SE"),

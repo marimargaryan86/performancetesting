@@ -1,11 +1,11 @@
 <script lang="ts" context="module">
-  import type { ComponentType } from "svelte";
+  import type { ComponentType, SvelteComponent } from "svelte";
 
   interface MenuItem {
     type: "menu-item";
     url: string;
     label: string;
-    icon: ComponentType;
+    icon: ComponentType<SvelteComponent<{ color?: string }>>;
   }
 
   interface SubMenu {
@@ -39,10 +39,23 @@
       icon: DashboardIcon,
     },
     {
-      type: "menu-item",
-      url: routeConfig.book.root,
-      label: "Book",
-      icon: TicketIcon,
+      type: "sub-menu",
+      label: "Trip Management",
+      expanded: $page.url.pathname.startsWith(routeConfig.tripManagement.root),
+      items: [
+        {
+          type: "menu-item",
+          url: routeConfig.tripManagement.book.root,
+          label: "Book",
+          icon: TicketIcon,
+        },
+        {
+          type: "menu-item",
+          url: routeConfig.tripManagement.orders.root,
+          label: "View orders",
+          icon: BookingsIcon,
+        },
+      ],
     },
     {
       type: "sub-menu",

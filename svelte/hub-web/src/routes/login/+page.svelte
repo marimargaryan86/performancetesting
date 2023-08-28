@@ -7,6 +7,7 @@
   import TextField from "components/ui/text-field.svelte";
   import { callAction } from "utils/common";
   import type { ActionData } from "./$types";
+  import routeConfig from "routeConfig";
 
   export let form;
 
@@ -30,7 +31,7 @@
 
   async function submit(): Promise<void> {
     pending = true;
-    await callAction({ action: "?/login", data });
+    await callAction({ action: routeConfig.login.actions.login, data });
     pending = false;
   }
 </script>

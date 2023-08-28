@@ -58,7 +58,7 @@
     }
 
     const result = await callAction<{ status: TripCandidatesSearchStatus; offers: OfferModel[] }>({
-      action: routeConfig.book.select.actions.poll,
+      action: routeConfig.tripManagement.book.select.actions.poll,
       data: { tripCandidatesSearchId: id },
       apply: false,
     });
@@ -98,11 +98,11 @@
 
   async function goToNext(): Promise<void> {
     await callAction({
-      action: routeConfig.book.select.actions.select,
+      action: routeConfig.tripManagement.book.select.actions.select,
       data: selected,
     });
 
-    goto(routeConfig.book.payment.root);
+    goto(routeConfig.tripManagement.book.payment.root);
   }
 
   onDestroy(() => (tripCandidatesSearchId = undefined));
