@@ -10,7 +10,6 @@ from typing import Annotated, Any, Generic, Protocol, TypeVar, cast
 import click
 import orjson
 import pydantic
-import pydantic_core
 from prometheus_async.aio import web
 
 from snowfall.stdlib.integration.click import parameters
@@ -43,7 +42,7 @@ def _print_debug_info(
         ctx.exit()
 
 
-AnyDsn = Annotated[pydantic_core.Url, pydantic.UrlConstraints(host_required=False)]
+AnyDsn = Annotated[str, pydantic.StringConstraints(pattern="^(memory|s3)://")]
 
 
 @dataclasses.dataclass(frozen=True)
