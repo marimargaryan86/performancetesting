@@ -8,6 +8,8 @@ const tripManagementBookPaymentRoot = `${tripManagementBookRoot}/payment` as con
 const tripManagementBookConfirmationRoot = `${tripManagementBookRoot}/confirmation` as const;
 // Trip management - Orders
 const tripManagementOrdersRoot = `${tripManagementRoot}/orders` as const;
+const tripManagementOrdersCancallations = `${tripManagementOrdersRoot}/cancellations` as const;
+const tripManagementOrdersRefunds = `${tripManagementOrdersRoot}/refunds` as const;
 // Login
 const loginRoot = "/login" as const;
 // Settings
@@ -69,6 +71,12 @@ export default {
     },
     orders: {
       root: tripManagementOrdersRoot,
+      cancellations: {
+        root: tripManagementOrdersCancallations,
+      },
+      refunds: {
+        root: tripManagementOrdersRefunds,
+      },
     },
   },
   login: {

@@ -144,13 +144,21 @@ export interface CreateOrderResponseSchema {
   data: OrderSchema;
 }
 
+export type OrderIncludesSchema = (
+  | JourneySchema
+  | BookingSchema
+  | BookingDetailsSchema
+  | CabinClassSchema
+  | LegTypeSchema
+)[];
+
 export interface GetOrderResponseSchema {
   data: OrderSchema;
-  included?: (
-    | JourneySchema
-    | BookingSchema
-    | BookingDetailsSchema
-    | CabinClassSchema
-    | LegTypeSchema
-  )[];
+  included?: OrderIncludesSchema;
+}
+
+export interface ListOrdersResponseSchema {
+  data: OrderSchema[];
+  included?: OrderIncludesSchema;
+  links: { next: string };
 }

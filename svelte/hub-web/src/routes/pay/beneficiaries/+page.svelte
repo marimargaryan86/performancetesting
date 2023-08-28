@@ -153,9 +153,9 @@
     color: var(--color-common-light-soft);
   }
 
-  .content :global(tr:hover .actions) {
-    opacity: 1;
-    pointer-events: all;
+  .content :global(tr:not(:hover) .actions) {
+    opacity: 0;
+    pointer-events: none;
   }
 
   .content :global(tr:hover .company-name) {

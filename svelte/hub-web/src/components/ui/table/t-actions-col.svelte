@@ -14,7 +14,5 @@
     gap: 8px;
     align-items: center;
     justify-content: flex-end;
-    opacity: 0;
-    pointer-events: 0;
   }
 </style>

@@ -1,4 +1,5 @@
 import type {
+  BookingDetailsModel,
   BookingModel,
   JourneyModel,
   OrderModel,
@@ -12,6 +13,8 @@ import type {
   CreateOrderRequestSchema,
   CreateOrderResponseSchema,
   GetOrderResponseSchema,
+  ListOrdersResponseSchema,
+  OrderIncludesSchema,
   OrderPassengerSchema,
   OrderSchema,
   TravelerDocumentSchema,
@@ -21,6 +24,7 @@ import { parseCabinClassSchema, parseLegTypeSchema } from "./offer";
 import { parseBookingDetailsSchema, parseBookingSchema } from "./booking";
 import type { JourneySchema } from "../schemas/journey";
 import type { CabinClassSchema, LegTypeSchema } from "../schemas/offer";
+import type { CabinClassModel, LegTypeModel } from "models/booking/offer";
 
 export function parseTravelerDocumentModel(
   data: NonNullable<CreateOrderModel["passengers"][number]["travelerDocument"]>,
@@ -115,38 +119,62 @@ export function parseCreateOrderResponseSchema(data: CreateOrderResponseSchema):
   return parseOrderSchema(data.data, [], []);
 }
 
-export function parseGetOrderResponseSchema(data: GetOrderResponseSchema): OrderModel {
-  const journeys: JourneySchema[] = [];
-  const cabinClasses: CabinClassSchema[] = [];
-  const legTypes: LegTypeSchema[] = [];
-  const bookingDetails: BookingDetailsSchema[] = [];
-  const bookings: BookingSchema[] = [];
+function parseOrderIncludeSchemas(data?: OrderIncludesSchema): {
+  journeys: JourneyModel[];
+  cabinClasses: CabinClassModel[];
+  legTypes: LegTypeModel[];
+  bookingDetails: BookingDetailsModel[];
+  bookings: BookingModel[];
+} {
+  const journeys_: JourneySchema[] = [];
+  const cabinClasses_: CabinClassSchema[] = [];
+  const legTypes_: LegTypeSchema[] = [];
+  const bookingDetails_: BookingDetailsSchema[] = [];
+  const bookings_: BookingSchema[] = [];
 
-  data.included?.forEach((item) => {
+  data?.forEach((item) => {
     if (item.type === "journeys") {
-      journeys.push(item);
+      journeys_.push(item);
     } else if (item.type === "cabin-classes") {
-      cabinClasses.push(item);
+      cabinClasses_.push(item);
     } else if (item.type === "leg-types") {
-      legTypes.push(item);
+      legTypes_.push(item);
     } else if (item.type === "trip-booking-details") {
-      bookingDetails.push(item);
+      bookingDetails_.push(item);
     } else if (item.type === "trip-bookings") {
-      bookings.push(item);
+      bookings_.push(item);
     }
   });
 
-  const journeys_ = journeys.map((item) => parseJourneySchema(item, []));
-  const cabinClasses_ = cabinClasses.map(parseCabinClassSchema);
-  const legTypes_ = legTypes.map(parseLegTypeSchema);
-  const bookingDetails_ = bookingDetails.map((item) =>
+  const journeys = journeys_.map((item) => parseJourneySchema(item, []));
+  const cabinClasses = cabinClasses_.map(parseCabinClassSchema);
+  const legTypes = legTypes_.map(parseLegTypeSchema);
+  const bookingDetails = bookingDetails_.map((item) =>
     parseBookingDetailsSchema(item, {
       bookings: [],
-      cabinClasses: cabinClasses_,
-      legTypes: legTypes_,
+      cabinClasses,
+      legTypes,
     }),
   );
-  const bookings_ = bookings.map((item) => parseBookingSchema(item, bookingDetails_, []));
+  const bookings = bookings_.map((item) => parseBookingSchema(item, bookingDetails, []));
 
-  return parseOrderSchema(data.data, journeys_, bookings_);
+  return {
+    journeys,
+    cabinClasses,
+    legTypes,
+    bookingDetails,
+    bookings,
+  };
+}
+
+export function parseGetOrderResponseSchema(data: GetOrderResponseSchema): OrderModel {
+  const included = parseOrderIncludeSchemas(data.included);
+
+  return parseOrderSchema(data.data, included.journeys, included.bookings);
+}
+
+export function parseListOrdersResponseSchema(data: ListOrdersResponseSchema): OrderModel[] {
+  const included = parseOrderIncludeSchemas(data.included);
+
+  return data.data.map((item) => parseOrderSchema(item, included.journeys, included.bookings));
 }

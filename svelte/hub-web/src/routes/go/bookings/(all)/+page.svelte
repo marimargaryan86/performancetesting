@@ -73,11 +73,6 @@
     cursor: pointer;
   }
 
-  .content :global(tr:hover .actions) {
-    opacity: 1;
-    pointer-events: all;
-  }
-
   .content :global(.green) {
     color: var(--color-main-primary-500);
   }

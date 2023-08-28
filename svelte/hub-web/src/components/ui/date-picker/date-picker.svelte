@@ -105,7 +105,7 @@
     --x-icon-padding: var(--icon-padding, 16px);
     --x-label-font-size: var(--label-font-size, 12px);
     --x-label-font-weight: var(--label-font-weight, 400);
-    --x-label-font-family: var(--label-font-family, "Poppins, Arial, Helvetica, sans-serif");
+    --x-label-font-family: var(--label-font-family, "Poppins");
 
     position: relative;
     display: inline-flex;

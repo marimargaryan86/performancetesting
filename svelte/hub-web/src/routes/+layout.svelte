@@ -8,7 +8,7 @@
   import { browser } from "$app/environment";
   import routeConfig from "routeConfig";
   import { callAction } from "utils/common";
-  import { getTimeDeltaMs } from "utils/date-time.js";
+  import { getTimeDeltaMs } from "utils/date-time";
 
   export let data;
 
