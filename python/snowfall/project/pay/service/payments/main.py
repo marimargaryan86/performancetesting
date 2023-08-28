@@ -21,7 +21,7 @@ class _GrpcSettings(service.Settings):
 
 async def _serve(app: service.Application[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        app.settings.mongo_dsn,
+        str(app.settings.mongo_dsn),
     )
     payment_client = PaymentClient(
         base_url=app.settings.cc_address,

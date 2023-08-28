@@ -104,7 +104,7 @@ async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
 async def _sync_accounts_cron_run(
     app: service.Application[_AccountSyncSettings],
 ) -> None:
-    mongo = motor_asyncio.AsyncIOMotorClient(app.settings.mongo_dsn)
+    mongo = motor_asyncio.AsyncIOMotorClient(str(app.settings.mongo_dsn))
     payment_client = PaymentClient(
         base_url=app.settings.cc_address,
         auth=CurrencyCloudAuth(
