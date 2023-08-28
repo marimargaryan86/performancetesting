@@ -53,13 +53,16 @@ class SentrySettings(object):
 
 
 class _GlobalSettings(Settings):
-    debug_info: bool = pydantic.Field(default=False, callback=_print_debug_info)
-    env_name: str = pydantic.Field(default="local", hidden=True)
+    debug_info: bool = pydantic.Field(
+        default=False,
+        json_schema_extra={"callback": _print_debug_info},
+    )
+    env_name: str = pydantic.Field(default="local", json_schema_extra={"hidden": True})
     json_output: bool = True
     log_level: str = "INFO"
     prometheus_port: int | None = None
     sentry_dsn: str = ""
-    version: str = pydantic.Field(default="dev", hidden=True)
+    version: str = pydantic.Field(default="dev", json_schema_extra={"hidden": True})
 
 
 @dataclasses.dataclass(frozen=True)

@@ -19,7 +19,9 @@ from snowfall.vendor.distribusion.models.stations import Station as VendorStatio
 
 
 class DumpStationsSettings(DistribusionConfig, service.Settings):
-    output_file: str = pydantic.Field(hidden=True, argument=True)
+    output_file: str = pydantic.Field(
+        json_schema_extra={"hidden": True, "argument": True},
+    )
 
 
 @dataclasses.dataclass(frozen=True)

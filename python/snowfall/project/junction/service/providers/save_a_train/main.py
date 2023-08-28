@@ -63,7 +63,9 @@ class _SatConfig(pydantic.BaseModel):
 
 class _DumpStationsSettings(_SatConfig, service.Settings):
     geodata_address: str
-    output_file: str = pydantic.Field(hidden=True, argument=True)
+    output_file: str = pydantic.Field(
+        json_schema_extra={"hidden": True, "argument": True},
+    )
 
 
 class _Settings(_SatConfig, service.ProviderSettings):

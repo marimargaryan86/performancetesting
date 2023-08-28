@@ -12,7 +12,7 @@ _verifiers: tuple[protocols.Verifier, ...] = (junction_go.OfferSearchFlow(),)
 class _VerifySettings(service.Settings):
     nomad_address: pydantic.HttpUrl
     nomad_templates_path: pydantic.DirectoryPath
-    changed_services: list[str] = pydantic.Field(argument=True)
+    changed_services: list[str] = pydantic.Field(json_schema_extra={"argument": True})
 
 
 async def _verify(app: service.AsyncApplication[_VerifySettings]) -> None:

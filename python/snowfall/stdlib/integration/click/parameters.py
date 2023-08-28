@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import datetime
 import pathlib
 from collections.abc import Callable, Mapping, Sequence
 from typing import Any, TypeGuard, TypeVar, cast, get_args, get_origin, get_type_hints
 
 import click
+import isodate
 import orjson
 import pydantic
 import pydantic_core
@@ -184,7 +186,7 @@ def _get_parameter_default(
             for default in resolved
         ]
 
-    if _is_primitive(resolved):
-        return resolved
+    if isinstance(resolved, datetime.timedelta):
+        return isodate.duration_isoformat(resolved)
 
-    return str(resolved)
+    return resolved if _is_primitive(resolved) else str(resolved)

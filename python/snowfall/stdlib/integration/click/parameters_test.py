@@ -1,3 +1,4 @@
+import datetime
 import uuid
 from collections.abc import Mapping, Sequence
 
@@ -25,7 +26,9 @@ def test_json_parameter_type_invalid() -> None:
 class _TestCallbackModel(pydantic.BaseModel):
     no_callback: int
     no_callback_list: list[bool]
-    custom_callback: str = pydantic.Field(callback=lambda *args: "foobar")
+    custom_callback: str = pydantic.Field(
+        json_schema_extra={"callback": lambda *args: "foobar"},
+    )
 
 
 @pytest.fixture()
@@ -118,11 +121,12 @@ class _TestModel(pydantic.BaseModel):
     set_string_option_default: set[str] = pydantic.Field(
         default_factory=lambda: {"foobar"},
     )
-    string_argument: str = pydantic.Field(argument=True)
+    string_argument: str = pydantic.Field(json_schema_extra={"argument": True})
     string_option: str
     string_option_default: str = "foobar"
     string_option_with_help_text: str = pydantic.Field(description="foobar")
-    string_option_hidden: str = pydantic.Field(hidden=True)
+    string_option_hidden: str = pydantic.Field(json_schema_extra={"hidden": True})
+    timedelta_option_default: datetime.timedelta = datetime.timedelta(seconds=45)
     tuple_string_option_default: tuple[str] = ("foobar",)
     uuid_option_default: uuid.UUID = uuid.UUID("12345678123456781234567812345678")
 
@@ -216,6 +220,12 @@ def test_create_from_pydantic_model() -> None:
                     envvar="STRING_OPTION_HIDDEN",
                     hidden=True,
                     required=True,
+                ),
+                click.Option(
+                    ["--timedelta-option-default"],
+                    default="PT45S",
+                    envvar="TIMEDELTA_OPTION_DEFAULT",
+                    required=False,
                 ),
                 click.Option(
                     ["--tuple-string-option-default"],
