@@ -102,7 +102,7 @@ def _factory(
             prefix=app.name,
         )
         mongo = motor_asyncio.AsyncIOMotorClient(
-            str(app.settings.mongo_dsn),
+            str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
         )[app.settings.mongo_db]
         smtp_cl = smtp.EmailClient(
             aiosmtplib.SMTP(

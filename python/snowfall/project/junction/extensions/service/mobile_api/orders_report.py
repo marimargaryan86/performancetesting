@@ -2,6 +2,7 @@ import contextlib
 import csv
 import datetime
 import io
+import random
 from collections.abc import Mapping, Sequence
 
 import aiosmtplib
@@ -15,12 +16,11 @@ from pydantic import AnyUrl, HttpUrl
 from snowfall.project.junction.extensions.service.mobile_api import smtp
 from snowfall.project.junction.extensions.service.mobile_api.tasks import orders
 from snowfall.stdlib import service
-from snowfall.stdlib.integration.starlette import application
 from snowfall.stdlib.transport.http import auth
 from snowfall.vendor.junction.go import client
 
 
-class Settings(application.Settings):
+class Settings(service.Settings):
     smtp_dsn: AnyUrl
     mongo_dsn: Sequence[AnyUrl]
     orders_report_email: str
@@ -32,7 +32,7 @@ class Settings(application.Settings):
 
 async def orders_report(app: service.Application[Settings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
-        str(app.settings.mongo_dsn),
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )[app.name]
     junction_client = client.Client(
         base_url=app.settings.junction_api_address,

@@ -56,7 +56,7 @@ def _factory(
             client_key=app.settings.tf_client_key,
         )
         mongo = motor_asyncio.AsyncIOMotorClient(
-            str(app.settings.mongo_dsn),
+            str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
         )[app.settings.mongo_db]
         redis_client = redis.Client[str](
             aioredis.from_url(

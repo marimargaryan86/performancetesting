@@ -1,5 +1,6 @@
 import datetime
 import ipaddress
+import random
 from collections.abc import Sequence
 
 import pydantic
@@ -27,7 +28,9 @@ class _GrpcSettings(service.Settings):
 
 
 async def _serve(app: service.Application[_GrpcSettings]) -> None:
-    mongo = motor_asyncio.AsyncIOMotorClient(str(app.settings.mongo_dsn))
+    mongo = motor_asyncio.AsyncIOMotorClient(
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
+    )
     ory_client = client.OryClient(
         base_url=str(app.settings.ory_application_url),
         auth=stdlib_auth.TokenAuth(token=app.settings.ory_api_key),
