@@ -15,6 +15,9 @@ from snowfall.project.junction.go.service.orders.v1 import (
     models_pb2 as order_models_pb2,
 )
 from snowfall.project.junction.go.v1 import models_pb2
+from snowfall.project.pay.service.companies.v1alpha import (
+    models_pb2 as companies_models_pb2,
+)
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import models
@@ -22,6 +25,20 @@ from snowfall.stdlib.v1 import money_pb2
 
 _SELF_HREF = "self"
 _RELATIONSHIPS_FIELD = "data"
+
+
+class Money(models.BaseModel):
+    currency: str
+    amount: int
+
+    @classmethod
+    def from_proto(cls, price: money_pb2.Money) -> Money:
+        money_price = money.from_protobuf(price)
+
+        return cls(
+            currency=money_price.currency.code,
+            amount=money_price.amount,
+        )
 
 
 class Point(models.BaseModel):
@@ -406,6 +423,104 @@ class BookingsCancellationResource(models.Resource):
                     request.url_for(
                         "ViewBookingsCancellation",
                         bookingsCancellationId=cancellation.id,
+                    ),
+                ),
+            },
+        )
+
+
+class ContactResource(models.Resource):
+    api_type: ClassVar[str] = "contacts"
+
+    @classmethod
+    def from_proto(
+        cls,
+        contact: companies_models_pb2.Contact,
+    ) -> ContactResource:
+        return cls(
+            id=contact.id,
+            type=ContactResource.api_type,
+            attributes={
+                "firstName": contact.first_name,
+                "lastName": contact.last_name,
+                "emailAddress": contact.email,
+                "phoneNumber": contact.phone_number.e164_number,
+            },
+            relationships={
+                "company": {
+                    "data": {
+                        "id": contact.company_id,
+                        "type": "companies",
+                    },
+                },
+            },
+        )
+
+
+class Company(models.Resource):
+    api_type: ClassVar[str] = "companies"
+
+    @classmethod
+    def from_proto(
+        cls,
+        company: companies_models_pb2.Company,
+        request: requests.Request,
+    ) -> Company:
+        relationships = {}
+        if company.account_id:
+            relationships["account"] = {
+                "data": {
+                    "id": company.account_id,
+                    "type": "accounts",
+                },
+            }
+        if company.lead_company_id:
+            relationships["leadCompany"] = {
+                "data": {
+                    "id": company.lead_company_id,
+                    "type": "lead-companies",
+                },
+            }
+
+        return cls(
+            id=company.id,
+            type=Company.api_type,
+            attributes={
+                "name": company.name,
+                "address": {
+                    "addressLines": list(company.address.address_lines),
+                    "countryCode": company.address.region_code,
+                    "postalCode": company.address.postal_code,
+                    "city": company.address.locality,
+                },
+                "fxMarkup": round(company.fx_markup, 3),
+                "processingMarkup": round(company.processing_markup, 3),
+                "salesMarkup": round(company.sales_markup, 3),
+                "resellerMarkups": [
+                    Money.from_proto(reseller_markup)
+                    for reseller_markup in company.reseller_markups
+                ],
+                "paymentType": protobuf.enum_value_to_slug(
+                    companies_models_pb2.PaymentType.DESCRIPTOR,
+                    company.payment_type,
+                ),
+                "paymentMethod": protobuf.enum_value_to_slug(
+                    companies_models_pb2.PaymentMethod.DESCRIPTOR,
+                    company.payment_method,
+                ),
+                "resellerProviders": list(company.reseller_providers),
+                "companyType": protobuf.enum_value_to_slug(
+                    enum_descriptor=companies_models_pb2.Company.Type.DESCRIPTOR,
+                    enum_value=company.company_type,
+                ),
+                "defaultCurrency": company.default_currency,
+            },
+            relationships=relationships,
+            links={
+                _SELF_HREF: str(
+                    request.url_for(
+                        "Company",
+                        companyId=company.id,
                     ),
                 ),
             },

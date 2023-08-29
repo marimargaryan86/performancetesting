@@ -7,6 +7,10 @@ from snowfall.adapter import authentication as auth_adapter
 from snowfall.project.junction.go.adapter import errors, orders
 from snowfall.project.junction.go.service.orders.v1 import orders_pb2_grpc
 from snowfall.project.junction.hub.service.hub_api import bootstrap, router
+from snowfall.project.pay.adapter import companies
+from snowfall.project.pay.service.companies.v1alpha.grpc_pb2_grpc import (
+    CompaniesServiceStub,
+)
 from snowfall.service.authentication.v1 import sessions_pb2_grpc
 from snowfall.stdlib.integration.starlette import application as starlette
 from snowfall.stdlib.integration.starlette import authentication, handlers
@@ -18,6 +22,7 @@ from snowfall.stdlib.transport.grpc import client
 class Settings(starlette.Settings):
     authentication_address: str
     orders_address: str
+    companies_address: str
     validate_responses_against_spec: bool = True
 
 
@@ -30,6 +35,7 @@ def _factory(
         )
         session_client = sessions_pb2_grpc.SessionServiceStub(authentication_channel)
         orders_channel = client.create_channel(app.settings.orders_address)
+        companies_channel = client.create_channel(app.settings.companies_address)
 
         asgi_app = starlette.create_starlette_app(
             routes=router.get_routes(
@@ -37,6 +43,11 @@ def _factory(
                     orders_client=orders.GrpcClient(
                         orders_pb2_grpc.OrderServiceStub(
                             orders_channel,
+                        ),
+                    ),
+                    companies_client=companies.GrpcClient(
+                        CompaniesServiceStub(
+                            companies_channel,
                         ),
                     ),
                 ),

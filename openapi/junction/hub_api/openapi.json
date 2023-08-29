@@ -17,6 +17,18 @@
   "x-internal": true,
   "x-tagGroups": [
     {
+      "name": "Companies",
+      "tags": [
+        "companies"
+      ]
+    },
+    {
+      "name": "Contacts",
+      "tags": [
+        "contacts"
+      ]
+    },
+    {
       "name": "Internal",
       "tags": [
         "internal"
@@ -36,6 +48,16 @@
     }
   ],
   "tags": [
+    {
+      "name": "companies",
+      "description": "Company related actions.",
+      "x-displayName": "Companies"
+    },
+    {
+      "name": "contacts",
+      "description": "Contact related actions.",
+      "x-displayName": "Contacts"
+    },
     {
       "name": "internal",
       "description": "Endpoints not for public use.",
@@ -960,6 +982,385 @@
         "operationId": "get-bookings-cancellations-id",
         "description": "Used to lookup data for a Bookings Cancellation Identifier."
       }
+    },
+    "/companies": {
+      "post": {
+        "summary": "Create company",
+        "description": "Create company for resellers and providers",
+        "tags": [
+          "companies"
+        ],
+        "operationId": "post-companies",
+        "responses": {
+          "201": {
+            "description": "Company is created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CompanyCreatable"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/CompanyCreatable"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "List Companies",
+        "tags": [
+          "companies"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          },
+          {
+            "$ref": "#/components/parameters/filterCompaniesType"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "minItems": 0,
+                          "items": {
+                            "$ref": "#/components/schemas/CompanyCreatable"
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "operationId": "get-companies",
+        "description": "Get companies"
+      }
+    },
+    "/companies/{companyId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/companyId"
+        }
+      ],
+      "patch": {
+        "summary": "Update Company",
+        "description": "Update company for resellers and providers",
+        "tags": [
+          "companies"
+        ],
+        "operationId": "patch-companies-id",
+        "responses": {
+          "200": {
+            "description": "Company is updated",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Company"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/Company"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Get Company details",
+        "description": "Get Company details",
+        "tags": [
+          "companies"
+        ],
+        "operationId": "get-companies-id",
+        "responses": {
+          "200": {
+            "description": "Company details are fetched",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Company"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/companies/accountless": {
+      "get": {
+        "summary": "List Accountless Companies",
+        "tags": [
+          "companies"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "minItems": 0,
+                          "items": {
+                            "$ref": "#/components/schemas/CompanyCreatable"
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "operationId": "get-companies-accountless",
+        "description": "Get accountless companies"
+      }
+    },
+    "/companies/{companyId}/contacts": {
+      "get": {
+        "summary": "List Companies Contacts",
+        "tags": [
+          "contacts"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          },
+          {
+            "$ref": "#/components/parameters/companyId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "minItems": 0,
+                          "items": {
+                            "$ref": "#/components/schemas/Contact"
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "operationId": "get-companies-id-contacts",
+        "description": "Get contacts"
+      },
+      "post": {
+        "summary": "Create Contact",
+        "tags": [
+          "contacts"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/companyId"
+          }
+        ],
+        "operationId": "post-companies-id-contacts",
+        "responses": {
+          "201": {
+            "description": "Contact created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Contact"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "description": "Used to create contact",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/Contact"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1256,6 +1657,42 @@
           ]
         },
         "description": "Customize which related resources to return.",
+        "style": "form",
+        "explode": false
+      },
+      "companyId": {
+        "name": "companyId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "271f6d54-9e59-407e-a860-b0771d9e3d26"
+        },
+        "description": "Company id"
+      },
+      "filterCompaniesType": {
+        "name": "filter[type][eq]",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "example": [
+            "reseller"
+          ],
+          "default": [
+            "reseller",
+            "provider"
+          ],
+          "items": {
+            "type": "string",
+            "enum": [
+              "reseller",
+              "provider"
+            ]
+          }
+        },
+        "description": "Filters companies based on the type",
         "style": "form",
         "explode": false
       }
@@ -2452,6 +2889,382 @@
             }
           }
         }
+      },
+      "Company": {
+        "title": "Company Details",
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "attributes"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "04f83af5-10bb-4a0f-1881-03e1e690f0f5",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "companies"
+            ],
+            "example": "companies"
+          },
+          "attributes": {
+            "properties": {
+              "name": {
+                "type": "string",
+                "example": "Company"
+              },
+              "address": {
+                "$ref": "#/components/schemas/EnhancedAddressDetails"
+              },
+              "fxMarkup": {
+                "type": "number",
+                "format": "float",
+                "example": 5.6
+              },
+              "processingMarkup": {
+                "type": "number",
+                "format": "float",
+                "example": 5.6
+              },
+              "salesMarkup": {
+                "type": "number",
+                "format": "float",
+                "example": 5.6
+              },
+              "resellerMarkups": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "$ref": "#/components/schemas/Money"
+                }
+              },
+              "paymentType": {
+                "type": "string",
+                "enum": [
+                  "unspecified",
+                  "card",
+                  "bank-transfer"
+                ],
+                "example": "card"
+              },
+              "paymentMethod": {
+                "type": "string",
+                "enum": [
+                  "unspecified",
+                  "transactional",
+                  "invoice"
+                ],
+                "example": "transactional"
+              },
+              "resellerProviders": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "example": [
+                  "04f83af5-10bb-4a0f-1881-03e1e690f0f5"
+                ],
+                "description": "The references (providers) to a reseller type company. Not required for providers."
+              },
+              "companyType": {
+                "type": "string",
+                "enum": [
+                  "unspecified",
+                  "provider",
+                  "reseller"
+                ],
+                "example": "unspecified"
+              },
+              "defaultCurrency": {
+                "type": "string",
+                "example": "SEK"
+              }
+            }
+          },
+          "relationships": {
+            "type": "object",
+            "readOnly": true,
+            "properties": {
+              "account": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/AccountIdentifier"
+                  }
+                }
+              },
+              "leadCompany": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/LeadCompanyIdentifier"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "CompanyCreatable": {
+        "title": "Company (Creatable)",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Company"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "attributes": {
+                "required": [
+                  "name",
+                  "address",
+                  "fxMarkup",
+                  "paymentType",
+                  "paymentMethod",
+                  "processingMarkup",
+                  "salesMarkup"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "CompanyIdentifier": {
+        "title": "Company Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "04f83af5-10bb-4a0f-1881-03e1e690f0f5",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "companies"
+            ],
+            "example": "companies"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "Money": {
+        "title": "Money",
+        "description": "Amount and currency.",
+        "type": "object",
+        "properties": {
+          "currency": {
+            "type": "string",
+            "format": "currency",
+            "example": "EUR"
+          },
+          "amount": {
+            "$ref": "#/components/schemas/MoneyAmount"
+          }
+        },
+        "required": [
+          "currency",
+          "amount"
+        ]
+      },
+      "AccountIdentifier": {
+        "title": "Account Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "04f83af5-10bb-4a0f-1881-03e1e690f0f5",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "accounts"
+            ],
+            "example": "accounts"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "LeadCompanyIdentifier": {
+        "title": "Lead Company Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "04f83af5-10bb-4a0f-1881-03e1e690f0f5",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "lead-companies"
+            ],
+            "example": "lead-companies"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "EnhancedAddressDetails": {
+        "title": "Enhanced Address Details",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AddressDetails"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "postalCode": {
+                "type": "string",
+                "example": "12345"
+              },
+              "city": {
+                "type": "string",
+                "example": "London",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "state": {
+                "type": "string",
+                "example": "California",
+                "nullable": true
+              }
+            }
+          }
+        ]
+      },
+      "MoneyAmount": {
+        "title": "Money amount",
+        "type": "integer",
+        "example": 1337,
+        "description": "A positive integer representing an amount of currency defined in the currency's smallest unit. This means that for currencies that have minor units, like EUR, 1 euro would be represented as 100, indicating 100 cents."
+      },
+      "AddressDetails": {
+        "title": "Address Details",
+        "type": "object",
+        "properties": {
+          "addressLines": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "Street name 7",
+              "minLength": 1,
+              "maxLength": 255
+            },
+            "example": [
+              "Street name 7"
+            ]
+          },
+          "countryCode": {
+            "type": "string",
+            "format": "country",
+            "example": "GB"
+          }
+        }
+      },
+      "Contact": {
+        "title": "Contact",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "271f6d54-9e59-407e-a860-b0771d9e3d26",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "example": "contacts",
+            "enum": [
+              "contacts"
+            ]
+          },
+          "attributes": {
+            "type": "object",
+            "properties": {
+              "firstName": {
+                "type": "string",
+                "example": "John",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "lastName": {
+                "type": "string",
+                "example": "Doe",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "emailAddress": {
+                "type": "string",
+                "example": "example@email.com",
+                "format": "email",
+                "maxLength": 255
+              },
+              "phoneNumber": {
+                "type": "string",
+                "example": "+123456789",
+                "format": "phone",
+                "minLength": 1,
+                "maxLength": 100
+              }
+            },
+            "required": [
+              "firstName",
+              "lastName",
+              "emailAddress",
+              "phoneNumber"
+            ]
+          },
+          "relationships": {
+            "type": "object",
+            "readOnly": true,
+            "required": [
+              "company"
+            ],
+            "properties": {
+              "company": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/CompanyIdentifier"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "attributes",
+          "relationships"
+        ],
+        "description": "Contact schema."
       },
       "SelfLink": {
         "title": "Self Link",

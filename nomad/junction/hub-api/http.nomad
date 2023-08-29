@@ -98,6 +98,10 @@ job "hub-api-http" {
               local_bind_port  = 8060
               destination_name = "orders-${var.environment}"
             }
+            upstreams {
+              local_bind_port  = 8040
+              destination_name = "companies-${var.environment}"
+            }
           }
         }
       }
@@ -133,6 +137,7 @@ job "hub-api-http" {
         data        = <<EOH
 AUTHENTICATION_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_authentication-${var.environment}"))}}
 ORDERS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_orders-${var.environment}"))}}
+COMPANIES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_companies-${var.environment}"))}}
 EOH
       }
 

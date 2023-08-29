@@ -8,6 +8,8 @@ from starlette.middleware import authentication as auth_middleware
 from snowfall.project.junction.go import fixtures
 from snowfall.project.junction.go.adapter import errors, orders
 from snowfall.project.junction.hub.service.hub_api import bootstrap, router
+from snowfall.project.pay import fixtures as pay_fixtures
+from snowfall.project.pay.adapter import companies
 from snowfall.stdlib import authentication as stdlib_auth
 from snowfall.stdlib.integration.starlette import application, authentication, handlers
 from snowfall.stdlib.persistence import filesystem
@@ -33,11 +35,22 @@ def orders_client() -> orders.Client:
     )
 
 
-def _create_app(orders_client: orders.Client) -> applications.Starlette:
+@pytest.fixture()
+def companies_client() -> companies.Client:
+    return companies.DictClient(
+        pay_fixtures.get_companies(),
+    )
+
+
+def _create_app(
+    orders_client: orders.Client,
+    companies_client: companies.Client,
+) -> applications.Starlette:
     asgi_app = application.create_starlette_app(
         routes=router.get_routes(
             bootstrap.create_dependencies(
                 orders_client=orders_client,
+                companies_client=companies_client,
             ),
         ),
         openapi_path=filesystem.resource_path("junction.hub_api", "openapi.json"),
@@ -77,5 +90,8 @@ async def client(
 
 
 @pytest.fixture()
-def app(orders_client: orders.Client) -> applications.Starlette:
-    return _create_app(orders_client=orders_client)
+def app(
+    orders_client: orders.Client,
+    companies_client: companies.Client,
+) -> applications.Starlette:
+    return _create_app(orders_client=orders_client, companies_client=companies_client)
