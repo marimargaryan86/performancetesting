@@ -15,6 +15,9 @@ from snowfall.project.junction.plus.service.notifications.v1alpha import (
 )
 from snowfall.project.junction.plus.service.plus_webhooks import chatbot_handlers
 
+message_maximum_length = 1600
+message_split_point = 1300
+
 
 class IncomingMessages(endpoints.HTTPEndpoint):
     async def post(  # noqa: WPS210, WPS211
@@ -58,7 +61,14 @@ class IncomingMessages(endpoints.HTTPEndpoint):
                 orders_client,
             )
             for message in messages:
-                twiml_response.message(message)
+                response_message = message
+                while len(response_message) >= message_maximum_length:
+                    split_point = message_split_point + response_message[
+                        message_split_point:
+                    ].index("\n\n")
+                    twiml_response.message(response_message[:split_point])
+                    response_message = response_message[split_point + 1 :]
+                twiml_response.message(response_message)
         return responses.Response(
             content=twiml_response.to_xml(),
             status_code=status.HTTP_200_OK,
