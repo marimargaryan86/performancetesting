@@ -61,6 +61,7 @@ directferries:
   - docker login git.snowfall.se:4567 -u "${REGISTRY_USERNAME}" -p "${REGISTRY_PASSWORD}"
   - if [ "$DOCKERPULL" ]; then docker pull git.snowfall.se:4567/junction/junction/service/gtfs-import:latest; fi
   - docker run -u "${UID}" --rm -v "$(pwd)/:/data" git.snowfall.se:4567/junction/junction/service/gtfs-import:latest /data/data-input/ /data/data-import/ $IMPORTDAYS
+  - echo "${CI_PIPELINE_ID}" > data-import/pipeline-id
   - tar -czf data-import.tar.gz data-import/*
   - docker run -u "${UID}" --rm -v "$(pwd)/:/data" -e AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" -e AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" amazon/aws-cli s3 cp /data/data-import.tar.gz  "s3://junction-schedules-export/PipelineData/$PREFIX-data-import.tar.gz" --no-progress
   tags:
@@ -104,6 +105,7 @@ directferries:
   script:
   - docker run -u "${UID}" --rm -v "$(pwd)/:/data" -e AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" -e AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" amazon/aws-cli s3 cp "s3://junction-schedules-export/PipelineData/$PREFIX-data-import.tar.gz" /data/data-import.tar.gz --no-progress
   - tar -xzf data-import.tar.gz
+  - if [ "$(cat data-import/pipeline-id)" != "${CI_PIPELINE_ID}" ]; then exit 1; fi
   - curl https://fastdl.mongodb.org/tools/db/mongodb-database-tools-debian11-x86_64-100.6.1.deb --output mongodb.deb
   - curl https://pgp.mongodb.com/server-6.0.asc | apt-key add -
   - echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-6.0.list
@@ -130,6 +132,7 @@ directferries:
       db.createCollection("schedules_import");
       db.schedules_import.createIndex({"legs._id": 1}, {unique: true});
       db.schedules_import.createIndex({"updated_at": 1});'
+  - docker run -u "${UID}" --rm -v "$(pwd)/:/data" -e AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" -e AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" amazon/aws-cli s3 cp /data/data-import/pipeline-id "s3://junction-schedules-export/PipelineData/$PREFIX-last-pipeline-id" --no-progress
   - mongorestore --db=places --collection=places_import --stopOnError --numInsertionWorkersPerCollection=10 "${MONGODSN}" data-import/places.bson
   - mongorestore --db=places --collection=locations_import --numInsertionWorkersPerCollection=10 "${MONGODSN}" data-import/locations.bson
   - mongorestore --db=schedules --collection=schedules_import --stopOnError --numInsertionWorkersPerCollection=10 "${MONGODSN}" data-import/schedules.bson
@@ -148,6 +151,8 @@ directferries:
     MONGODSN: $MONGODSN_DEPLOY
     NOMAD_NAMESPACE: $PREFIX
   script:
+  - docker run -u "${UID}" --rm -v "$(pwd)/:/data" -e AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" -e AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" amazon/aws-cli s3 cp "s3://junction-schedules-export/PipelineData/$PREFIX-last-pipeline-id" /data/pipeline-id --no-progress
+  - if [ "$(cat pipeline-id)" != "${CI_PIPELINE_ID}" ]; then exit 1; fi
   - curl https://pgp.mongodb.com/server-6.0.asc | apt-key add -
   - echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-6.0.list
   - apt update && apt install nfs-common mongodb-mongosh -y
