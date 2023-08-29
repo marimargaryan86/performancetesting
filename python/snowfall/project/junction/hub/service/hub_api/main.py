@@ -7,9 +7,19 @@ from snowfall.adapter import authentication as auth_adapter
 from snowfall.project.junction.go.adapter import errors, orders
 from snowfall.project.junction.go.service.orders.v1 import orders_pb2_grpc
 from snowfall.project.junction.hub.service.hub_api import bootstrap, router
-from snowfall.project.pay.adapter import companies
+from snowfall.project.pay.adapter import (
+    accounts as accounts_adapter,
+)
+from snowfall.project.pay.adapter import (
+    companies as companies_adapter,
+)
+from snowfall.project.pay.adapter import (
+    contacts,
+)
 from snowfall.project.pay.service.companies.v1alpha.grpc_pb2_grpc import (
+    AccountsServiceStub,
     CompaniesServiceStub,
+    ContactsServiceStub,
 )
 from snowfall.service.authentication.v1 import sessions_pb2_grpc
 from snowfall.stdlib.integration.starlette import application as starlette
@@ -17,9 +27,13 @@ from snowfall.stdlib.integration.starlette import authentication, handlers
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.grpc import client
+from snowfall.vendor.currency_cloud.client import CurrencyCloudAuth, PaymentClient
 
 
 class Settings(starlette.Settings):
+    cc_login: str
+    cc_api_key: str
+    cc_address: str
     authentication_address: str
     orders_address: str
     companies_address: str
@@ -36,6 +50,14 @@ def _factory(
         session_client = sessions_pb2_grpc.SessionServiceStub(authentication_channel)
         orders_channel = client.create_channel(app.settings.orders_address)
         companies_channel = client.create_channel(app.settings.companies_address)
+        cc_payment_client = PaymentClient(
+            base_url=app.settings.cc_address,
+            auth=CurrencyCloudAuth(
+                base_url=app.settings.cc_address,
+                login_id=app.settings.cc_login,
+                api_key=app.settings.cc_api_key,
+            ),
+        )
 
         asgi_app = starlette.create_starlette_app(
             routes=router.get_routes(
@@ -45,11 +67,22 @@ def _factory(
                             orders_channel,
                         ),
                     ),
-                    companies_client=companies.GrpcClient(
+                    accounts_client=accounts_adapter.GrpcClient(
+                        AccountsServiceStub(
+                            companies_channel,
+                        ),
+                    ),
+                    companies_client=companies_adapter.GrpcClient(
                         CompaniesServiceStub(
                             companies_channel,
                         ),
                     ),
+                    contacts_client=contacts.GrpcClient(
+                        ContactsServiceStub(
+                            companies_channel,
+                        ),
+                    ),
+                    cc_payment_client=cc_payment_client,
                 ),
             ),
             openapi_path=filesystem.resource_path("junction.hub_api", "openapi.json"),

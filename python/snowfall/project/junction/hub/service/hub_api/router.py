@@ -3,6 +3,7 @@ from lagom.integrations import starlette
 from starlette import routing
 
 from snowfall.project.junction.hub.service.hub_api.routes import (
+    accounts,
     companies,
     contacts,
     go_orders,
@@ -80,6 +81,18 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             "/orders/{orderId}",
             go_orders.Order,
             name="ViewOrder",
+        ),
+        integration.route(
+            "/accounts",
+            accounts.Accounts,
+            name="Accounts",
+            methods=["GET", "POST"],
+        ),
+        integration.route(
+            "/accounts/{accountId}",
+            accounts.Account,
+            name="Account",
+            methods=["GET", "PATCH"],
         ),
         integration.route(
             "/companies",

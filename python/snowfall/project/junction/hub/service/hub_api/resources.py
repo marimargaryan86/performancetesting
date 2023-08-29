@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import zoneinfo
 from collections.abc import Iterable
-from typing import ClassVar, Literal
+from typing import Any, ClassVar, Literal
 
 import pydantic
 from starlette import datastructures, requests
@@ -521,6 +521,55 @@ class Company(models.Resource):
                     request.url_for(
                         "Company",
                         companyId=company.id,
+                    ),
+                ),
+            },
+        )
+
+
+class AccountResource(models.Resource):
+    api_type: ClassVar[str] = "accounts"
+
+    @classmethod
+    def from_proto(
+        cls,
+        account: companies_models_pb2.Account,
+        request: requests.Request,
+    ) -> AccountResource:
+        relationships: dict[str, Any] = {
+            "company": None,
+            "contact": None,
+        }
+        if account.company_id:
+            relationships["company"] = {
+                "data": {
+                    "id": account.company_id,
+                    "type": "companies",
+                },
+            }
+        if account.contact_id:
+            relationships["contact"] = {
+                "data": {
+                    "id": account.contact_id,
+                    "type": "contacts",
+                },
+            }
+        return cls(
+            id=account.id,
+            type=AccountResource.api_type,
+            attributes={
+                "name": account.name,
+                "status": protobuf.enum_value_to_slug(
+                    companies_models_pb2.Status.DESCRIPTOR,
+                    account.status,
+                ),
+            },
+            relationships=relationships,
+            links={
+                _SELF_HREF: str(
+                    request.url_for(
+                        "Account",
+                        accountId=account.id,
                     ),
                 ),
             },

@@ -17,6 +17,12 @@
   "x-internal": true,
   "x-tagGroups": [
     {
+      "name": "Accounts",
+      "tags": [
+        "accounts"
+      ]
+    },
+    {
       "name": "Companies",
       "tags": [
         "companies"
@@ -48,6 +54,11 @@
     }
   ],
   "tags": [
+    {
+      "name": "accounts",
+      "description": "Accounts",
+      "x-displayName": "Accounts"
+    },
     {
       "name": "companies",
       "description": "Company related actions.",
@@ -223,6 +234,225 @@
         },
         "operationId": "get-users-id",
         "description": "Used to lookup data for a User Identifier."
+      }
+    },
+    "/accounts/{accountId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/accountId"
+        }
+      ],
+      "get": {
+        "summary": "Get account",
+        "description": "Get account",
+        "tags": [
+          "accounts"
+        ],
+        "operationId": "get-accounts-id",
+        "responses": {
+          "200": {
+            "description": "Account is found",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Account"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update account",
+        "description": "Update account status",
+        "tags": [
+          "accounts"
+        ],
+        "operationId": "patch-accounts-id",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/UpdateAccount"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Account is disabled",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Account"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/accounts": {
+      "get": {
+        "summary": "List accounts",
+        "description": "Get all accounts",
+        "tags": [
+          "accounts"
+        ],
+        "operationId": "get-accounts",
+        "responses": {
+          "200": {
+            "description": "List accounts",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "required": [
+                        "data"
+                      ],
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "minItems": 0,
+                          "uniqueItems": true,
+                          "items": {
+                            "$ref": "#/components/schemas/Account"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/sortAccount"
+          },
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          },
+          {
+            "$ref": "#/components/parameters/filterAccountsStatus"
+          }
+        ]
+      },
+      "post": {
+        "summary": "Create account",
+        "tags": [
+          "accounts"
+        ],
+        "operationId": "post-accounts",
+        "responses": {
+          "201": {
+            "description": "Account created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Account"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "description": "Used to create account",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/Account"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        }
       }
     },
     "/bookings/{bookingId}": {
@@ -1439,6 +1669,54 @@
           "example": 20
         },
         "description": "A limit on the number of objects to be returned, between 1 and 100."
+      },
+      "accountId": {
+        "name": "accountId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "271f6d54-9e59-407e-a860-b0771d9e3d26"
+        },
+        "description": "Account id"
+      },
+      "filterAccountsStatus": {
+        "name": "filter[status][eq]",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "example": [
+            "enabled"
+          ],
+          "items": {
+            "type": "string",
+            "enum": [
+              "enabled",
+              "disabled"
+            ]
+          }
+        },
+        "description": "Filters accounts based on the status",
+        "style": "form",
+        "explode": false
+      },
+      "sortAccount": {
+        "name": "sort",
+        "in": "query",
+        "style": "form",
+        "explode": false,
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "id"
+          ],
+          "example": "id",
+          "default": "id"
+        },
+        "description": "Sorting based on field"
       },
       "journeyId": {
         "name": "journeyId",
@@ -2775,6 +3053,178 @@
           }
         }
       },
+      "Account": {
+        "title": "Account",
+        "description": "Account schema",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "271f6d54-9e59-407e-a860-b0771d9e3d26",
+                "format": "uuid",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "example": "accounts",
+                "enum": [
+                  "accounts"
+                ]
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "account",
+                    "minLength": 1,
+                    "maxLength": 150
+                  },
+                  "status": {
+                    "type": "string",
+                    "example": "status",
+                    "readOnly": true
+                  }
+                },
+                "required": [
+                  "name",
+                  "status"
+                ]
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "company",
+                  "contact"
+                ],
+                "properties": {
+                  "company": {
+                    "type": "object",
+                    "readOnly": true,
+                    "nullable": true,
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/CompanyIdentifier"
+                      }
+                    }
+                  },
+                  "contact": {
+                    "type": "object",
+                    "nullable": true,
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/ContactIdentifier"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes",
+              "relationships"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ]
+      },
+      "UpdateAccount": {
+        "title": "Update Account",
+        "description": "Update Account",
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "attributes"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "271f6d54-9e59-407e-a860-b0771d9e3d26",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "example": "accounts",
+            "enum": [
+              "accounts"
+            ]
+          },
+          "attributes": {
+            "type": "object",
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "type": "string",
+                "example": "enabled",
+                "enum": [
+                  "enabled",
+                  "disabled"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "CompanyIdentifier": {
+        "title": "Company Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "04f83af5-10bb-4a0f-1881-03e1e690f0f5",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "companies"
+            ],
+            "example": "companies"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "ContactIdentifier": {
+        "title": "Contact Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "04f83af5-10bb-4a0f-1881-03e1e690f0f5",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "contacts"
+            ],
+            "example": "contacts"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
       "BookingsCancellation": {
         "title": "Bookings Cancellation",
         "allOf": [
@@ -3109,28 +3559,6 @@
               }
             }
           }
-        ]
-      },
-      "CompanyIdentifier": {
-        "title": "Company Identifier",
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "example": "04f83af5-10bb-4a0f-1881-03e1e690f0f5",
-            "format": "uuid"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "companies"
-            ],
-            "example": "companies"
-          }
-        },
-        "required": [
-          "id",
-          "type"
         ]
       },
       "Money": {

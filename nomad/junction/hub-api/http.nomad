@@ -38,6 +38,10 @@ variable "validate_responses_against_spec" {
   type = bool
 }
 
+variable "cc_address" {
+  type = string
+}
+
 job "hub-api-http" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -138,6 +142,10 @@ job "hub-api-http" {
 AUTHENTICATION_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_authentication-${var.environment}"))}}
 ORDERS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_orders-${var.environment}"))}}
 COMPANIES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_companies-${var.environment}"))}}
+{{ with secret "kv/data/${var.environment}/currencycloud" }}
+CC_LOGIN={{ .Data.data.cc_login }}
+CC_API_KEY={{ .Data.data.cc_api_key }}
+{{ end }}
 EOH
       }
 
@@ -164,6 +172,7 @@ EOH
         SENTRY_DSN                      = "https://7a9e03aa0fa24aed8155a1475b8be273@sentry.snowfall.se/147"
         PROMETHEUS_PORT                 = "${NOMAD_PORT_prometheus}"
         VALIDATE_RESPONSES_AGAINST_SPEC = "${var.validate_responses_against_spec}"
+        CC_ADDRESS                      = "${var.cc_address}"
       }
     }
   }

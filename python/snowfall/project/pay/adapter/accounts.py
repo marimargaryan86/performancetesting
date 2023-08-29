@@ -31,7 +31,7 @@ class Client(abc.ABC):
     @abc.abstractmethod
     async def find(
         self,
-        filter_by: str,
+        filter_by: Sequence[str],
         limit: int | None = None,
         cursor: str | None = None,
     ) -> grpc_pb2.ListAccountsResponse:
@@ -64,7 +64,7 @@ class DictClient(Client):
 
     async def find(
         self,
-        filter_by: str,
+        filter_by: Sequence[str],
         limit: int | None = None,
         cursor: str | None = None,
     ) -> grpc_pb2.ListAccountsResponse:
