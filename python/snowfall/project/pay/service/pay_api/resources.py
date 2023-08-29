@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, ClassVar
+from typing import Any, ClassVar, Literal
 
 from starlette import requests
 
@@ -21,7 +21,7 @@ from snowfall.stdlib.integration.starlette import models
 from snowfall.stdlib.v1 import money_pb2
 from snowfall.vendor.currency_cloud.models import balance as balance_models
 
-_SELF_HREF = "self"
+_SELF_HREF: Literal["self"] = "self"
 
 
 class QuoteResource(models.Resource):
@@ -57,28 +57,28 @@ class QuoteResource(models.Resource):
             },
             relationships={
                 "fromCurrency": {
-                    "data": {
-                        "id": quotation.amounts.beneficiary.currency_code,
-                        "type": "currencies",
-                    },
+                    "data": models.ResourceIdentifier(
+                        id=quotation.amounts.beneficiary.currency_code,
+                        type="currencies",
+                    ),
                 },
                 "toCurrency": {
-                    "data": {
-                        "id": quotation.amounts.quotation.currency_code,
-                        "type": "currencies",
-                    },
+                    "data": models.ResourceIdentifier(
+                        id=quotation.amounts.quotation.currency_code,
+                        type="currencies",
+                    ),
                 },
                 "payer": {
-                    "data": {
-                        "id": quotation.payer_id,
-                        "type": "companies",
-                    },
+                    "data": models.ResourceIdentifier(
+                        id=quotation.payer_id,
+                        type="companies",
+                    ),
                 },
                 "beneficiary": {
-                    "data": {
-                        "id": quotation.beneficiary_id,
-                        "type": "companies",
-                    },
+                    "data": models.ResourceIdentifier(
+                        id=quotation.beneficiary_id,
+                        type="companies",
+                    ),
                 },
             },
         )
@@ -93,20 +93,20 @@ class Company(models.Resource):
         company: models_pb2.Company,
         request: requests.Request,
     ) -> Company:
-        relationships = {}
+        relationships: dict[str, models.Relationship] = {}
         if company.account_id:
             relationships["account"] = {
-                "data": {
-                    "id": company.account_id,
-                    "type": "accounts",
-                },
+                "data": models.ResourceIdentifier(
+                    id=company.account_id,
+                    type="accounts",
+                ),
             }
         if company.lead_company_id:
             relationships["leadCompany"] = {
-                "data": {
-                    "id": company.lead_company_id,
-                    "type": "lead-companies",
-                },
+                "data": models.ResourceIdentifier(
+                    id=company.lead_company_id,
+                    type="lead-companies",
+                ),
             }
 
         return cls(
@@ -247,27 +247,27 @@ class Transaction(models.Resource):
                 ),
             },
             relationships={
-                "conversion": (
-                    {
-                        "data": {
-                            "id": transaction.conversion_id,
-                            "type": "conversions",
-                        },
-                    }
-                    if transaction.conversion_id
-                    else None
-                ),
+                "conversion": {
+                    "data": (
+                        models.ResourceIdentifier(
+                            id=transaction.conversion_id,
+                            type="conversions",
+                        )
+                        if transaction.conversion_id
+                        else None
+                    ),
+                },
                 "payer": {
-                    "data": {
-                        "id": transaction.payer_id,
-                        "type": "companies",
-                    },
+                    "data": models.ResourceIdentifier(
+                        id=transaction.payer_id,
+                        type="companies",
+                    ),
                 },
                 "beneficiary": {
-                    "data": {
-                        "id": transaction.beneficiary_id,
-                        "type": "companies",
-                    },
+                    "data": models.ResourceIdentifier(
+                        id=transaction.beneficiary_id,
+                        type="companies",
+                    ),
                 },
             },
             links={
@@ -300,10 +300,10 @@ class ContactResource(models.Resource):
             },
             relationships={
                 "company": {
-                    "data": {
-                        "id": contact.company_id,
-                        "type": "companies",
-                    },
+                    "data": models.ResourceIdentifier(
+                        id=contact.company_id,
+                        type="companies",
+                    ),
                 },
             },
         )
@@ -328,16 +328,16 @@ class BalanceResource(models.Resource):
             },
             relationships={
                 "account": {
-                    "data": {
-                        "id": balance.account_id,
-                        "type": "accounts",
-                    },
+                    "data": models.ResourceIdentifier(
+                        id=balance.account_id,
+                        type="accounts",
+                    ),
                 },
                 "currency": {
-                    "data": {
-                        "id": balance.currency,
-                        "type": "currencies",
-                    },
+                    "data": models.ResourceIdentifier(
+                        id=balance.currency,
+                        type="currencies",
+                    ),
                 },
             },
         )
@@ -532,16 +532,16 @@ class BeneficiariesResource(models.Resource):
             },
             relationships={
                 "account": {
-                    "data": {
-                        "id": beneficiary.account_id,
-                        "type": "accounts",
-                    },
+                    "data": models.ResourceIdentifier(
+                        id=beneficiary.account_id,
+                        type="accounts",
+                    ),
                 },
                 "currency": {
-                    "data": {
-                        "id": beneficiary.currency,
-                        "type": "currencies",
-                    },
+                    "data": models.ResourceIdentifier(
+                        id=beneficiary.currency,
+                        type="currencies",
+                    ),
                 },
             },
             links={
@@ -581,14 +581,17 @@ class PaymentsResource(models.Resource):
             },
             relationships={
                 "beneficiary": {
-                    "data": {
-                        "id": payment.beneficiary_id,
-                        "type": "beneficiaries",
-                    },
+                    "data": models.ResourceIdentifier(
+                        id=payment.beneficiary_id,
+                        type="beneficiaries",
+                    ),
                 },
                 "transaction": {
                     "data": [
-                        {"id": transaction_id, "type": "transactions"}
+                        models.ResourceIdentifier(
+                            id=transaction_id,
+                            type="transactions",
+                        )
                         for transaction_id in payment.transactions
                     ],
                 },
@@ -645,21 +648,21 @@ class RefundsResource(models.Resource):
             },
             relationships={
                 "transaction": {
-                    "data": {
-                        "id": refund.transaction_id,
-                        "type": "transactions",
-                    },
+                    "data": models.ResourceIdentifier(
+                        id=refund.transaction_id,
+                        type="transactions",
+                    ),
                 },
-                "conversion": (
-                    {
-                        "data": {
-                            "id": refund.conversion_id,
-                            "type": "conversions",
-                        },
-                    }
-                    if refund.conversion_id
-                    else None
-                ),
+                "conversion": {
+                    "data": (
+                        models.ResourceIdentifier(
+                            id=refund.conversion_id,
+                            type="conversions",
+                        )
+                        if refund.conversion_id
+                        else None
+                    ),
+                },
             },
             links={
                 _SELF_HREF: str(

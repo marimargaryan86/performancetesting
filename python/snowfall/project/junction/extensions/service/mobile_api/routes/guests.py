@@ -53,10 +53,10 @@ class Session(endpoints.HTTPEndpoint):
                     attributes={},
                     relationships={
                         "guest": {
-                            "data": {
-                                "id": body["guest"],
-                                "type": "guests",
-                            },
+                            "data": models.ResourceIdentifier(
+                                id=body["guest"],
+                                type="guests",
+                            ),
                         },
                     },
                 ),

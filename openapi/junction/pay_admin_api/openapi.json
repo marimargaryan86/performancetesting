@@ -3579,10 +3579,17 @@
                     "required": [
                       "data"
                     ],
-                    "nullable": true,
                     "properties": {
                       "data": {
-                        "$ref": "#/components/schemas/ConversionIdentifier"
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/ConversionIdentifier"
+                          },
+                          {
+                            "nullable": true
+                          }
+                        ],
+                        "nullable": true
                       }
                     },
                     "readOnly": true,
@@ -4035,11 +4042,18 @@
                   },
                   "conversion": {
                     "type": "object",
-                    "nullable": true,
                     "readOnly": true,
                     "properties": {
                       "data": {
-                        "$ref": "#/components/schemas/ConversionIdentifier"
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/ConversionIdentifier"
+                          },
+                          {
+                            "nullable": true
+                          }
+                        ],
+                        "nullable": true
                       }
                     }
                   },

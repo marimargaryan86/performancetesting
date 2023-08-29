@@ -4,7 +4,7 @@ import datetime
 import zoneinfo
 from collections import defaultdict
 from collections.abc import Iterable, Sequence
-from typing import Any, ClassVar
+from typing import Any, ClassVar, Literal
 
 import pydantic
 from starlette import datastructures, requests
@@ -25,8 +25,8 @@ from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import models
 from snowfall.stdlib.v1 import amqp_pb2, money_pb2
 
-_SELF_HREF = "self"
-_RELATIONSHIPS_FIELD = "data"
+_SELF_HREF: Literal["self"] = "self"
+_RELATIONSHIPS_FIELD: Literal["data"] = "data"
 
 
 class Point(models.BaseModel):

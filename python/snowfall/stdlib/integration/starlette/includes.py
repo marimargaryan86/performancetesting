@@ -108,10 +108,7 @@ class _IncludesResolver(object):
 
         for path, resource in resources:
             for rel_name, rel_data in (resource.relationships or {}).items():
-                relationship_path = "{0}.{1}".format(
-                    path,
-                    rel_name,
-                ).lstrip(".")
+                relationship_path = "{0}.{1}".format(path, rel_name).lstrip(".")
 
                 if not self._is_wanted_include(relationship_path):
                     continue
@@ -119,7 +116,7 @@ class _IncludesResolver(object):
                 relationships = relationships.union(
                     self._to_composite_keys(
                         relationship_path,
-                        sequence.ensure(rel_data["data"]),
+                        rel_data,
                     ),
                 )
 
@@ -135,14 +132,15 @@ class _IncludesResolver(object):
     def _to_composite_keys(
         self,
         relationship_path: str,
-        relationship_identifiers: Sequence[models.ResourceIdentifier],
+        relationship: models.Relationship,
     ) -> set[tuple[str, str, str]]:
+        identifiers = sequence.ensure(relationship["data"] or [])
         relationships = set()
 
-        for relationship_identifier in relationship_identifiers:
+        for identifier in identifiers:
             composite_key = (
-                relationship_identifier.data_type,
-                relationship_identifier.identifier,
+                identifier.data_type,
+                identifier.identifier,
             )
 
             if composite_key in self._known_resources:
@@ -151,8 +149,8 @@ class _IncludesResolver(object):
             relationships.add(
                 (
                     relationship_path,
-                    relationship_identifier.data_type,
-                    relationship_identifier.identifier,
+                    identifier.data_type,
+                    identifier.identifier,
                 ),
             )
 

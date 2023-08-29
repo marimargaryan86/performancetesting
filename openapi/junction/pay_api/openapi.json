@@ -1111,10 +1111,17 @@
                     "required": [
                       "data"
                     ],
-                    "nullable": true,
                     "properties": {
                       "data": {
-                        "$ref": "#/components/schemas/ConversionIdentifier"
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/ConversionIdentifier"
+                          },
+                          {
+                            "nullable": true
+                          }
+                        ],
+                        "nullable": true
                       }
                     },
                     "readOnly": true,

@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import datetime
 from collections.abc import Mapping, Sequence
-from typing import Any, ClassVar, cast
+from typing import Any, ClassVar, NotRequired, cast
 
 import pydantic
 from starlette import background as starlette_background
 from starlette import responses, status
+from typing_extensions import TypedDict
 
 AnyMapping = Mapping[str, Any]
 
@@ -28,10 +29,26 @@ class ResourceIdentifier(BaseModel):
     data_type: str = pydantic.Field(alias="type")
 
 
+class Links(TypedDict):
+    next: NotRequired[str]
+    related: NotRequired[str]
+    self: NotRequired[str]  # noqa: WPS117
+
+
+class Relationship(TypedDict):
+    links: NotRequired[Links]
+    data: NotRequired[  # noqa: WPS110
+        Sequence[ResourceIdentifier] | ResourceIdentifier | None
+    ]
+
+
+Relationships = Mapping[str, Relationship]
+
+
 class Resource(ResourceIdentifier):
     attributes: AnyMapping | None = None
-    relationships: AnyMapping | None = None
-    links: Mapping[str, str] | None = None
+    relationships: Relationships | None = None
+    links: Links | None = None
     meta: AnyMapping | None = None
 
 

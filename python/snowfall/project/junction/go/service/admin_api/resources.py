@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import ClassVar
+from typing import ClassVar, Literal
 
 from starlette import requests
 
@@ -8,8 +8,8 @@ from snowfall.project.junction.go.service.places.v1 import models_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import models
 
-_SELF_HREF = "self"
-_DATA_KEY = "data"
+_SELF_HREF: Literal["self"] = "self"
+_DATA_KEY: Literal["data"] = "data"
 
 
 class PlaceTypeResource(models.Resource):

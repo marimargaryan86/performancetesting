@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import zoneinfo
 from collections.abc import Iterable
-from typing import ClassVar
+from typing import ClassVar, Literal
 
 import pydantic
 from starlette import datastructures, requests
@@ -23,8 +23,8 @@ from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import models
 from snowfall.stdlib.v1 import money_pb2
 
-_SELF_HREF = "self"
-_RELATIONSHIPS_FIELD = "data"
+_SELF_HREF: Literal["self"] = "self"
+_RELATIONSHIPS_FIELD: Literal["data"] = "data"
 
 
 class Money(models.BaseModel):
@@ -448,10 +448,10 @@ class ContactResource(models.Resource):
             },
             relationships={
                 "company": {
-                    "data": {
-                        "id": contact.company_id,
-                        "type": "companies",
-                    },
+                    "data": models.ResourceIdentifier(
+                        id=contact.company_id,
+                        type="companies",
+                    ),
                 },
             },
         )
@@ -466,20 +466,20 @@ class Company(models.Resource):
         company: companies_models_pb2.Company,
         request: requests.Request,
     ) -> Company:
-        relationships = {}
+        relationships: dict[str, models.Relationship] = {}
         if company.account_id:
             relationships["account"] = {
-                "data": {
-                    "id": company.account_id,
-                    "type": "accounts",
-                },
+                "data": models.ResourceIdentifier(
+                    id=company.account_id,
+                    type="accounts",
+                ),
             }
         if company.lead_company_id:
             relationships["leadCompany"] = {
-                "data": {
-                    "id": company.lead_company_id,
-                    "type": "lead-companies",
-                },
+                "data": models.ResourceIdentifier(
+                    id=company.lead_company_id,
+                    type="lead-companies",
+                ),
             }
 
         return cls(

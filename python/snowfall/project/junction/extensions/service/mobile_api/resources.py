@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import enum
 from collections.abc import Mapping
-from typing import Any
+from typing import Any, Literal
 
 from google.protobuf.json_format import MessageToDict
 
@@ -13,7 +13,7 @@ from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import models
 from snowfall.stdlib.v1 import money_pb2
 
-_RELATIONSHIPS_FIELD = "data"
+_RELATIONSHIPS_FIELD: Literal["data"] = "data"
 
 
 class OrderResource(models.Resource):
