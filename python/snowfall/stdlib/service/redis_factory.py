@@ -1,0 +1,41 @@
+from typing import AnyStr, Literal, overload
+
+import pydantic
+from redis import asyncio as aioredis
+
+from snowfall.stdlib.service import application
+
+
+@overload
+async def make_connection(
+    app: application.AsyncApplication[application.Settings],
+    dsn: pydantic.RedisDsn,
+    *,
+    decode_responses: Literal[False],
+) -> aioredis.Redis[bytes]:
+    """Clients with decode_responses=False deals with bytes."""
+
+
+@overload
+async def make_connection(
+    app: application.AsyncApplication[application.Settings],
+    dsn: pydantic.RedisDsn,
+    *,
+    decode_responses: Literal[True],
+) -> aioredis.Redis[str]:
+    """Clients with decode_responses=True deals with strings."""
+
+
+async def make_connection(
+    app: application.AsyncApplication[application.Settings],
+    dsn: pydantic.RedisDsn,
+    *,
+    decode_responses: Literal[True, False],
+) -> aioredis.Redis[AnyStr]:
+    return await app.stack.enter_async_context(
+        aioredis.from_url(
+            url=str(dsn),
+            decode_responses=decode_responses,
+            retry_on_error=[aioredis.ConnectionError],
+        ).client(),
+    )
