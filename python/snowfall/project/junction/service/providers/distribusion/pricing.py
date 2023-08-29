@@ -42,6 +42,7 @@ async def price_quotes(  # noqa: WPS210
         aioredis.from_url(
             str(app.settings.redis_dsn[0]),
             decode_responses=False,
+            retry_on_error=[aioredis.ConnectionError],
         ).client(),
     )
     distribusion_client = client.DistribusionClient(

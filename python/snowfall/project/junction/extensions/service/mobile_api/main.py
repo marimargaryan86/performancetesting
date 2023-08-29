@@ -99,6 +99,7 @@ def _factory(
             aioredis.from_url(
                 str(random.choice(app.settings.redis_dsn)),  # noqa: S311
                 decode_responses=True,
+                retry_on_error=[aioredis.ConnectionError],
             ).client(),
             prefix=app.name,
         )

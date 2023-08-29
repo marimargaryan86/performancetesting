@@ -39,7 +39,10 @@ async def _consume(app: application.AsyncApplication[_ConsumeSettings]) -> None:
         types.Connection(str(app.settings.amqp_dsn)),
     )
     redis_conn = await app.stack.enter_async_context(
-        aioredis.from_url(str(app.settings.redis_dsn)).client(),
+        aioredis.from_url(
+            str(app.settings.redis_dsn),
+            retry_on_error=[aioredis.ConnectionError],
+        ).client(),
     )
     all_providers = await providers.Collection.from_identifier_address_tuples(
         [
@@ -73,7 +76,10 @@ async def _serve(app: application.AsyncApplication[_ServeSettings]) -> None:
         types.Connection(str(app.settings.amqp_dsn)),
     )
     redis_conn = await app.stack.enter_async_context(
-        aioredis.from_url(str(app.settings.redis_dsn)).client(),
+        aioredis.from_url(
+            str(app.settings.redis_dsn),
+            retry_on_error=[aioredis.ConnectionError],
+        ).client(),
     )
     all_providers = await providers.Collection.from_identifier_address_tuples(
         [

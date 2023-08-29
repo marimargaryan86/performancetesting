@@ -40,6 +40,7 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
         aioredis.from_url(
             str(random.choice(app.settings.redis_dsn)),  # noqa: S311
             decode_responses=True,
+            retry_on_error=[aioredis.ConnectionError],
         ).client(),
         prefix=app.name,
     )
@@ -68,6 +69,7 @@ async def _backup_rates_cron_run(
         aioredis.from_url(
             str(random.choice(app.settings.redis_dsn)),  # noqa: S311
             decode_responses=True,
+            retry_on_error=[aioredis.ConnectionError],
         ).client(),
         prefix=app.name,
     )

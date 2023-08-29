@@ -196,6 +196,7 @@ async def _orders(app: service.AsyncApplication[_OrdersSettings]) -> None:
         aioredis.from_url(
             str(random.choice(app.settings.redis_dsn)),  # noqa: S311
             decode_responses=False,
+            retry_on_error=[aioredis.ConnectionError],
         ).client(),
     )
     amqp_connection = await app.stack.enter_async_context(
@@ -266,6 +267,7 @@ async def _price_quotes(app: service.AsyncApplication[_PriceQuotesSettings]) -> 
         aioredis.from_url(
             str(random.choice(app.settings.redis_dsn)),  # noqa: S311
             decode_responses=False,
+            retry_on_error=[aioredis.ConnectionError],
         ).client(),
     )
     amqp_connection = await app.stack.enter_async_context(
@@ -325,6 +327,7 @@ async def _seat_maps(app: service.AsyncApplication[_SeatMapsSettings]) -> None:
         aioredis.from_url(
             str(random.choice(app.settings.redis_dsn)),  # noqa: S311
             decode_responses=False,
+            retry_on_error=[aioredis.ConnectionError],
         ).client(),
     )
     http_client = await app.stack.enter_async_context(

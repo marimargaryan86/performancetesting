@@ -83,6 +83,7 @@ def _grpc_command(  # noqa: WPS210, WPS217
             aioredis.from_url(
                 str(app.settings.redis_dsn),
                 decode_responses=False,
+                retry_on_error=[aioredis.ConnectionError],
             ).client(),
         )
         connection = await app.stack.enter_async_context(
@@ -140,6 +141,7 @@ def _offers_command(
             aioredis.from_url(
                 str(app.settings.redis_dsn),
                 decode_responses=False,
+                retry_on_error=[aioredis.ConnectionError],
             ).client(),
         )
         connection = await app.stack.enter_async_context(

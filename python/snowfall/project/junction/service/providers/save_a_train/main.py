@@ -224,6 +224,7 @@ async def _orders(  # noqa: WPS217
         aioredis.from_url(
             str(random.choice(app.settings.redis_dsn)),  # noqa: S311
             decode_responses=False,
+            retry_on_error=[aioredis.ConnectionError],
         ).client(),
     )
 
@@ -297,6 +298,7 @@ async def _price_quotes(app: service.AsyncApplication[_PriceQuoteSettings]) -> N
         aioredis.from_url(
             str(random.choice(app.settings.redis_dsn)),  # noqa: S311
             decode_responses=False,
+            retry_on_error=[aioredis.ConnectionError],
         ).client(),
     )
     amqp_connection = await app.stack.enter_async_context(
@@ -344,6 +346,7 @@ async def _notifications(  # noqa: WPS217
         aioredis.from_url(
             str(random.choice(app.settings.redis_dsn)),  # noqa: S311
             decode_responses=False,
+            retry_on_error=[aioredis.ConnectionError],
         ).client(),
     )
     notifier = notifications.SmtpNotifier(

@@ -128,6 +128,7 @@ async def _orders(app: service.AsyncApplication[config.OrdersSettings]) -> None:
         aioredis.from_url(
             str(random.choice(app.settings.redis_dsn)),  # noqa: S311
             decode_responses=True,
+            retry_on_error=[aioredis.ConnectionError],
         ).client(),
     )
 
@@ -164,6 +165,7 @@ async def _price_quotes(
         aioredis.from_url(
             str(app.settings.redis_dsn),
             decode_responses=False,
+            retry_on_error=[aioredis.ConnectionError],
         ).client(),
     )
     amqp_connection = await app.stack.enter_async_context(

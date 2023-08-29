@@ -34,6 +34,7 @@ async def _main(app: application.Application[_Settings]) -> None:
     async with aioredis.from_url(
         str(random.choice(app.settings.redis_dsn)),  # noqa: S311
         decode_responses=True,
+        retry_on_error=[aioredis.ConnectionError],
     ).client() as redis_conn:
         grpc_server = server.create_server(
             app.settings.grpc_address,

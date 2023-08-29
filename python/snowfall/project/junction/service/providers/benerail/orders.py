@@ -35,6 +35,7 @@ async def orders(app: application.Application[config.OrdersSettings]) -> None:
             aioredis.from_url(
                 str(app.settings.redis_dsn),
                 decode_responses=True,
+                retry_on_error=[aioredis.ConnectionError],
             ).client(),
         )
 

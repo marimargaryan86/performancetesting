@@ -17,6 +17,7 @@ async def price_quotes(app: application.Application[config.PriceQuoteSettings]) 
             aioredis.from_url(
                 str(app.settings.redis_dsn),
                 decode_responses=False,
+                retry_on_error=[aioredis.ConnectionError],
             ).client(),
         )
         offer_cache = cache.OffersCache(

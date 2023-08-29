@@ -2,7 +2,7 @@ import asyncio
 import datetime
 import types as std_types
 from collections.abc import AsyncIterable, AsyncIterator, Callable
-from typing import Generic, TypeVar
+from typing import Generic, Self, TypeVar
 
 import prometheus_client
 from google.protobuf import message
@@ -32,10 +32,6 @@ class NoCacheExistsError(Exception):
     """Thrown when the cache for an offer search hasn't been created yet."""
 
 
-class OfferCacheLockError(Exception):
-    """Thrown when the offer cache lock is not acquired."""
-
-
 class OfferGroupCache(object):
     def __init__(
         self,
@@ -52,8 +48,9 @@ class OfferGroupCache(object):
         self._offers = redis.set_("criteria_cache.offers:{0}".format(cache_key))
         self._redis = redis
 
-    async def __aenter__(self) -> bool:
-        return await self._lock.acquire()
+    async def __aenter__(self) -> Self:
+        await self._lock.__aenter__()
+        return self
 
     async def __aexit__(
         self,
@@ -76,8 +73,7 @@ class OfferGroupCache(object):
                 await self._redis.get_expires_at(self._offers) or fallback_expiry,
             )
 
-        if await self._lock.owned():
-            await self._lock.release()
+        await self._lock.__aexit__(exc_type, exc_value, traceback)
 
         return False
 
@@ -126,13 +122,10 @@ class OfferGroupRepository(Generic[_CriteriaType]):
             self._redis,
         )
 
-        async with offer_cache as has_lock:
-            if has_lock:
-                search_offers = self._search_offers(search_criteria, offer_cache)
-                async for cached_offer_group in search_offers:
-                    yield cached_offer_group
-            else:
-                raise OfferCacheLockError
+        async with offer_cache:
+            search_offers = self._search_offers(search_criteria, offer_cache)
+            async for cached_offer_group in search_offers:
+                yield cached_offer_group
 
     async def _search_offers(
         self,

@@ -168,6 +168,7 @@ async def _import(app: application.AsyncApplication[_ImportSettings]) -> None:
         aioredis.from_url(
             str(random.choice(app.settings.redis_dsn)),  # noqa: S311
             decode_responses=True,
+            retry_on_error=[aioredis.ConnectionError],
         ).client(),
     )
 

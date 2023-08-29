@@ -47,6 +47,7 @@ async def _price_quotes(app: service.AsyncApplication[_PriceQuotesSettings]) -> 
         aioredis.from_url(
             str(app.settings.redis_dsn),
             decode_responses=False,
+            retry_on_error=[aioredis.ConnectionError],
         ).client(),
     )
     amqp_connection = await app.stack.enter_async_context(
@@ -81,6 +82,7 @@ async def _bookings(app: service.AsyncApplication[_BookingsSettings]) -> None:
         aioredis.from_url(
             str(app.settings.redis_dsn),
             decode_responses=False,
+            retry_on_error=[aioredis.ConnectionError],
         ).client(),
     )
     amqp_connection = await app.stack.enter_async_context(

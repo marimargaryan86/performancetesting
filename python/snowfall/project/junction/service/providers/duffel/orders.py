@@ -57,6 +57,7 @@ async def orders(  # noqa: WPS217
         aioredis.from_url(
             str(random.choice(app.settings.redis_dsn)),  # noqa: S311
             decode_responses=False,
+            retry_on_error=[aioredis.ConnectionError],
         ).client(),
     )
     amqp_connection = await app.stack.enter_async_context(

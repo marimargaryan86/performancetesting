@@ -37,6 +37,7 @@ async def orders(
         aioredis.from_url(
             str(random.choice(app.settings.redis_dsn)),  # noqa: S311
             decode_responses=False,
+            retry_on_error=[aioredis.ConnectionError],
         ).client(),
     )
 

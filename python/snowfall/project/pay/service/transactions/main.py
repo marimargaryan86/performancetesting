@@ -45,6 +45,7 @@ async def _serve(app: application.AsyncApplication[_GrpcSettings]) -> None:
         aioredis.from_url(
             str(random.choice(app.settings.redis_dsn)),  # noqa: S311
             decode_responses=True,
+            retry_on_error=[aioredis.ConnectionError],
         ).client(),
     )
     redis_client = redis.Client[str](

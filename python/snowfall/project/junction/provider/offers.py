@@ -212,10 +212,7 @@ class TripOfferSearchConsumer(Generic[_SearchCriteriaTask, _SearchCriteria]):
         if self._provider_blocked_for_reseller(amqp_message.body.reseller_id):
             return
 
-        try:
-            await self._publish_trip_offer_search_results(amqp_message)
-        except repository.OfferCacheLockError:
-            await amqp_message.requeue()
+        await self._publish_trip_offer_search_results(amqp_message)
 
     def _provider_blocked_for_reseller(self, reseller_id: str) -> bool:
         return self._provider_id not in self._reseller_providers.get(reseller_id, [])
