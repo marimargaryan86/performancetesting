@@ -42,7 +42,11 @@ def _print_debug_info(
         ctx.exit()
 
 
+_MIN_PORT = 1
+_MAX_PORT = 65535
+
 AnyDsn = Annotated[str, pydantic.StringConstraints(pattern="^(memory|s3)://")]
+NetworkPort = Annotated[int, pydantic.conint(ge=_MIN_PORT, le=_MAX_PORT)]
 
 
 @dataclasses.dataclass(frozen=True)

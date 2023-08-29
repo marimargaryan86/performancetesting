@@ -1,14 +1,16 @@
-from typing import AnyStr, Literal, overload
+from typing import AnyStr, Literal, TypeVar, overload
 
 import pydantic
 from redis import asyncio as aioredis
 
 from snowfall.stdlib.service import application
 
+_Settings = TypeVar("_Settings", bound=application.Settings)
+
 
 @overload
 async def make_connection(
-    app: application.AsyncApplication[application.Settings],
+    app: application.AsyncApplication[_Settings],
     dsn: pydantic.RedisDsn,
     *,
     decode_responses: Literal[False],
@@ -18,7 +20,7 @@ async def make_connection(
 
 @overload
 async def make_connection(
-    app: application.AsyncApplication[application.Settings],
+    app: application.AsyncApplication[_Settings],
     dsn: pydantic.RedisDsn,
     *,
     decode_responses: Literal[True],
@@ -27,7 +29,7 @@ async def make_connection(
 
 
 async def make_connection(
-    app: application.AsyncApplication[application.Settings],
+    app: application.AsyncApplication[_Settings],
     dsn: pydantic.RedisDsn,
     *,
     decode_responses: Literal[True, False],
