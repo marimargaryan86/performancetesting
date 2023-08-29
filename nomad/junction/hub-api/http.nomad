@@ -134,6 +134,10 @@ job "hub-api-http" {
     task "http" {
       driver = "docker"
 
+      vault {
+        policies = ["currencycloud-${var.environment}"]
+      }
+
       template {
         destination = "services.env"
         env         = true
