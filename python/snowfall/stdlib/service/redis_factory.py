@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import AnyStr, Literal, TypeVar, overload
 
 import pydantic
