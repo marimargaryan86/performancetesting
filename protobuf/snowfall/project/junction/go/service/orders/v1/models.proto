@@ -127,14 +127,15 @@ message TripOptionDetails {
 }
 
 message BookingCancellation {
-  string booking_id = 1;
-  string ticket_id = 2 [(snowfall.stdlib.v1.read_only) = true];
+  string id = 1;
+  string booking_id = 2;
+  string ticket_id = 3 [(snowfall.stdlib.v1.read_only) = true];
   enum Status {
     STATUS_UNSPECIFIED = 0;
     STATUS_PENDING = 1;
     STATUS_COMPLETED = 2;
   }
-  Status status = 3 [(snowfall.stdlib.v1.read_only) = true];
+  Status status = 4 [(snowfall.stdlib.v1.read_only) = true];
 }
 
 message BookingsCancellation {
@@ -143,7 +144,6 @@ message BookingsCancellation {
   enum Status {
     STATUS_UNSPECIFIED = 0;
     STATUS_PENDING = 1;
-    STATUS_PROCESSING = 2;
     STATUS_COMPLETED = 3;
   }
   Status status = 3 [(snowfall.stdlib.v1.read_only) = true];

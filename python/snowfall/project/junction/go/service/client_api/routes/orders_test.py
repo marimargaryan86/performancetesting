@@ -151,7 +151,7 @@ class TestBookingsCancellation(object):
         )
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    async def test_bookings_cancellation_are_found_by_booking(
+    async def test_booking_cancellation_is_found_by_booking(
         self,
         client: httpx.AsyncClient,
     ) -> None:
@@ -161,7 +161,7 @@ class TestBookingsCancellation(object):
 
         assert response.status_code == status.HTTP_200_OK
 
-    async def test_bookings_cancellation_by_booking_not_found(
+    async def test_booking_cancellation_by_booking_not_found(
         self,
         client: httpx.AsyncClient,
     ) -> None:

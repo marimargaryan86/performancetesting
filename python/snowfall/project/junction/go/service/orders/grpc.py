@@ -293,20 +293,37 @@ class OrderService(  # noqa: WPS214
         request: orders_pb2.GetBookingsCancellationRequest,
         context: aio.ServicerContext,
     ) -> orders_pb2.GetBookingsCancellationResponse:
-        if request.booking_id:
-            cancellation = await self._cancellations.find_by_booking_id(
-                booking_id=request.booking_id,
-            )
-        else:
-            cancellation = await self._cancellations.find_by_id(
-                document_id=request.id,
-            )
+        cancellation = await self._cancellations.find_by_id(
+            document_id=request.id,
+        )
 
         if cancellation is None or cancellation.reseller_id != request.reseller_id:
             await context.abort(StatusCode.NOT_FOUND)
 
         return orders_pb2.GetBookingsCancellationResponse(
             cancellation=cancellation,
+        )
+
+    async def GetBookingCancellation(  # type: ignore[override] # noqa: N802
+        self,
+        request: orders_pb2.GetBookingCancellationRequest,
+        context: aio.ServicerContext,
+    ) -> orders_pb2.GetBookingCancellationResponse:
+        cancellation = await self._cancellations.find_by_booking_id(
+            booking_id=request.booking_id,
+        )
+
+        if cancellation is None or cancellation.reseller_id != request.reseller_id:
+            await context.abort(StatusCode.NOT_FOUND)
+
+        booking_cancellation_result = next(
+            booking_cancellation
+            for booking_cancellation in cancellation.booking_cancellations  # type: ignore[union-attr]
+            if booking_cancellation.booking_id == request.booking_id
+        )
+
+        return orders_pb2.GetBookingCancellationResponse(
+            cancellation=booking_cancellation_result,
         )
 
     async def HandleCancellationTicketCompleted(  # type: ignore[override] # noqa: N802

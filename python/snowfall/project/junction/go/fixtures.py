@@ -432,7 +432,10 @@ def get_bookings_cancellations() -> list[order_models_pb2.BookingsCancellation]:
         order_models_pb2.BookingsCancellation(
             id=BOOKINGS_CANCELLATION_REQUESTS[0],
             booking_cancellations=[
-                order_models_pb2.BookingCancellation(booking_id=booking_id)
+                order_models_pb2.BookingCancellation(
+                    id=string.uuid(),
+                    booking_id=booking_id,
+                )
                 for booking_id in BOOKINGS
             ],
             status=order_models_pb2.BookingsCancellation.STATUS_PENDING,

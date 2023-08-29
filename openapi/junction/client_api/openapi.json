@@ -3362,7 +3362,7 @@
         }
       ],
       "get": {
-        "summary": "Get Bookings Cancellation By Booking",
+        "summary": "Get Booking Cancellation By Booking",
         "tags": [
           "journeys"
         ],
@@ -3375,7 +3375,7 @@
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/components/schemas/BookingsCancellation"
+                      "$ref": "#/components/schemas/BookingCancellation"
                     }
                   },
                   "required": [
@@ -3393,7 +3393,7 @@
           }
         },
         "operationId": "get-bookings-id-cancellation",
-        "description": "Used to lookup a Bookings Cancellation for a Booking Identifier."
+        "description": "Used to lookup a Booking Cancellation for a Booking Identifier."
       }
     },
     "/bookings/{bookingId}/details": {
@@ -6428,7 +6428,6 @@
                     "enum": [
                       "unspecified",
                       "pending",
-                      "processing",
                       "completed"
                     ],
                     "example": "pending"
@@ -6475,6 +6474,76 @@
           }
         ],
         "description": "Cancellation for multiple Bookings."
+      },
+      "BookingCancellation": {
+        "title": "Booking Cancellation",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "d6cfe9e8-bbc9-485f-912f-7ba97ab2cf34",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "booking-cancellation"
+                ],
+                "example": "booking-cancellation"
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "status"
+                ],
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "unspecified",
+                      "pending",
+                      "completed"
+                    ],
+                    "example": "pending"
+                  }
+                },
+                "readOnly": true
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "booking"
+                ],
+                "properties": {
+                  "booking": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/TripBookingIdentifier"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes",
+              "relationships"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ],
+        "description": "Cancellation for a single Booking."
       },
       "BookingStatusIdentifier": {
         "title": "Booking Status Identifier",

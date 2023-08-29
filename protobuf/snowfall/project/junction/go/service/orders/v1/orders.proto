@@ -21,6 +21,7 @@ service OrderService {
   rpc ListBookingDetails(ListBookingDetailsRequest) returns (ListBookingDetailsResponse) {}
   rpc CreateBookingsCancellation(CreateBookingsCancellationRequest) returns (CreateBookingsCancellationResponse) {}
   rpc GetBookingsCancellation(GetBookingsCancellationRequest) returns (GetBookingsCancellationResponse) {}
+  rpc GetBookingCancellation(GetBookingCancellationRequest) returns (GetBookingCancellationResponse) {}
   rpc HandleCancellationTicketCompleted(HandleCancellationTicketCompletedRequest) returns (HandleCancellationTicketCompletedResponse) {}
 }
 
@@ -156,15 +157,21 @@ message CreateBookingsCancellationResponse {
 }
 
 message GetBookingsCancellationRequest {
-  oneof payload {
-    string id = 1;
-    string booking_id = 2;
-  }
-  string reseller_id = 3;
+  string id = 1;
+  string reseller_id = 2;
 }
 
 message GetBookingsCancellationResponse {
   BookingsCancellation cancellation = 1;
+}
+
+message GetBookingCancellationRequest {
+  string booking_id = 1;
+  string reseller_id = 2;
+}
+
+message GetBookingCancellationResponse {
+  BookingCancellation cancellation = 1;
 }
 
 message HandleCancellationTicketCompletedRequest {

@@ -275,8 +275,8 @@ def get_routes(  # noqa: WPS210
         ),
         integration.route(
             "/bookings/{bookingId}/cancellation",
-            orders.BookingsCancellationByBooking,
-            name="ViewBookingsCancellationByBooking",
+            orders.BookingCancellationByBooking,
+            name="ViewBookingCancellationByBooking",
         ),
         integration.route(
             "/bookings/{bookingId}/details",

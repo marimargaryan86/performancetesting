@@ -525,3 +525,42 @@ class Company(models.Resource):
                 ),
             },
         )
+
+
+class BookingCancellationResource(models.Resource):
+    api_type: ClassVar[str] = "booking-cancellation"
+
+    @classmethod
+    def from_proto(
+        cls,
+        booking_cancellation: order_models_pb2.BookingCancellation,
+        request: requests.Request,
+    ) -> BookingCancellationResource:
+        request_model = order_models_pb2.BookingCancellation
+        status = protobuf.enum_value_to_slug(
+            enum_descriptor=request_model.Status.DESCRIPTOR,
+            enum_value=booking_cancellation.status,
+        )
+        return cls(
+            id=booking_cancellation.id,
+            type=cls.api_type,
+            attributes={
+                "status": status,
+            },
+            relationships={
+                "booking": {
+                    _RELATIONSHIPS_FIELD: models.ResourceIdentifier(
+                        id=booking_cancellation.booking_id,
+                        type=TripBookingResource.api_type,
+                    ),
+                },
+            },
+            links={
+                _SELF_HREF: str(
+                    request.url_for(
+                        "ViewBookingCancellationByBooking",
+                        bookingId=booking_cancellation.booking_id,
+                    ),
+                ),
+            },
+        )

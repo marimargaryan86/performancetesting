@@ -496,21 +496,21 @@ class BookingsCancellation(endpoints.HTTPEndpoint):
         )
 
 
-class BookingsCancellationByBooking(endpoints.HTTPEndpoint):
+class BookingCancellationByBooking(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
         client: orders.Client = lagom.injectable,
     ) -> responses.Response:
-        cancellation = await client.get_bookings_cancellation_by_booking_id(
+        cancellation = await client.get_booking_cancellation_by_booking_id(
             booking_id=request.path_params["bookingId"],
             reseller_id=request.user.username,
         )
 
         return await messages.create_response(
             body=models.Body(
-                data=resources.BookingsCancellationResource.from_proto(
-                    cancellation=cancellation,
+                data=resources.BookingCancellationResource.from_proto(
+                    booking_cancellation=cancellation,
                     request=request,
                 ),
             ),
