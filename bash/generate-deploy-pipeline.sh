@@ -124,12 +124,9 @@ EOF
 	# editorconfig-checker-enable
 done
 
-if [ ${#services[@]} -eq 0 ]; then
-	exit 0
-fi
-
-# editorconfig-checker-disable
-cat <<EOF
+if [ ${#services[@]} -ne 0 ]; then
+	# editorconfig-checker-disable
+	cat <<EOF
 
 verify:
   stage: verify
@@ -141,11 +138,12 @@ verify:
     - shell
   needs:
 EOF
-# editorconfig-checker-enable
+	for service in "${services[@]}"; do
+		echo "    - ${service}"
+	done
+fi
 
-for service in "${services[@]}"; do
-	echo "    - ${service}"
-done
+# editorconfig-checker-enable
 
 if [ "${DEPLOYMENT_ENVIRONMENT}" == "development" ]; then
 	# editorconfig-checker-disable
@@ -165,8 +163,18 @@ if [ "${DEPLOYMENT_ENVIRONMENT}" == "development" ]; then
     - git config --global user.name "\${NOMAD_GIT_NAME}"
   tags:
     - shell
+EOF
+
+	if [ ${#services[@]} -ne 0 ]; then
+		# editorconfig-checker-disable
+		cat <<EOF
   needs:
     - verify
+EOF
+	fi
+
+	# editorconfig-checker-disable
+	cat <<EOF
 
 promote-to-production:
   extends: .promote
