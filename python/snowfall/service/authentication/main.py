@@ -8,14 +8,14 @@ from motor import motor_asyncio
 
 from snowfall.adapter import authentication
 from snowfall.service.authentication import grpc, repository
-from snowfall.stdlib import service
 from snowfall.stdlib.format import jwt
+from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.grpc import server
 from snowfall.stdlib.transport.http import auth as stdlib_auth
 from snowfall.vendor.ory import client
 
 
-class _GrpcSettings(service.Settings):
+class _GrpcSettings(application.Settings):
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
     default_page_size: int = 100
@@ -27,7 +27,7 @@ class _GrpcSettings(service.Settings):
     ory_api_key: str
 
 
-async def _serve(app: service.Application[_GrpcSettings]) -> None:
+async def _serve(app: application.Application[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
@@ -62,10 +62,10 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name="authentication")
+    entrypoint = application.Entrypoint(name="authentication")
 
     entrypoint.enter_with_commands(
-        service.Command(
+        application.Command(
             name="grpc",
             callback=_serve,
             settings_class=_GrpcSettings,

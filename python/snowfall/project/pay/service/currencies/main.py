@@ -7,12 +7,13 @@ from snowfall.project.pay.adapter import rates
 from snowfall.project.pay.service.currencies.grpc import CurrencyService
 from snowfall.project.pay.service.currencies.repositories import CurrencyRepository
 from snowfall.project.pay.service.rates.v1alpha import rates_pb2_grpc
-from snowfall.stdlib import money, service
+from snowfall.stdlib import money
+from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.grpc import server
 from snowfall.stdlib.transport.grpc.client import create_channel
 
 
-class _Settings(service.Settings):
+class _Settings(application.Settings):
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
     mongo_dsn: Sequence[AnyUrl]
@@ -20,7 +21,7 @@ class _Settings(service.Settings):
     currencies: Sequence[money.Currency]
 
 
-async def _main(app: service.Application[_Settings]) -> None:
+async def _main(app: application.Application[_Settings]) -> None:
     rates_channel = create_channel(app.settings.rates_address)
 
     grpc_server = server.create_server(
@@ -43,10 +44,10 @@ async def _main(app: service.Application[_Settings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name="currencies")
+    entrypoint = application.Entrypoint(name="currencies")
 
     entrypoint.enter_with_commands(
-        service.Command(
+        application.Command(
             name="grpc",
             callback=_main,
             settings_class=_Settings,

@@ -4,18 +4,18 @@ from grpc import aio
 from pydantic import AnyUrl
 
 from snowfall.service.echo.v1 import echo_pb2, echo_pb2_grpc
-from snowfall.stdlib import service
 from snowfall.stdlib.logging import stdout
+from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.stdlib.transport.grpc import server as grpc_server
 from snowfall.stdlib.transport.grpc import service as grpc_service
 
 
-class _AmqpSettings(service.Settings):
+class _AmqpSettings(application.Settings):
     amqp_dsn: AnyUrl
 
 
-class _GrpcSettings(service.Settings):
+class _GrpcSettings(application.Settings):
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
 
@@ -37,7 +37,7 @@ class _EchoService(grpc_service.Service, echo_pb2_grpc.EchoServiceServicer):
         )
 
 
-async def _grpc(app: service.Application[_GrpcSettings]) -> None:
+async def _grpc(app: application.Application[_GrpcSettings]) -> None:
     server = grpc_server.create_server(
         app.settings.grpc_address,
         app.settings.grpc_port,
@@ -48,7 +48,7 @@ async def _grpc(app: service.Application[_GrpcSettings]) -> None:
         await running.wait_for_termination()
 
 
-async def _produce(app: service.Application[_AmqpSettings]) -> None:
+async def _produce(app: application.Application[_AmqpSettings]) -> None:
     async with types.Connection(str(app.settings.amqp_dsn)) as connection:
         echo_producer = producer.Producer(
             connection=connection,
@@ -65,7 +65,7 @@ async def _echo_message(message: types.Message[echo_pb2.EchoRequest]) -> None:
     stdout.get_logger().info(message.body.echo)
 
 
-async def _consume(app: service.Application[_AmqpSettings]) -> None:
+async def _consume(app: application.Application[_AmqpSettings]) -> None:
     async with types.Connection(str(app.settings.amqp_dsn)) as connection:
         await consumer.Consumer[echo_pb2.EchoRequest](
             connection=connection,
@@ -75,16 +75,16 @@ async def _consume(app: service.Application[_AmqpSettings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name="echo")
+    entrypoint = application.Entrypoint(name="echo")
 
     entrypoint.enter_with_commands(
-        service.Command(
+        application.Command(
             name="consume",
             callback=_consume,
             settings_class=_AmqpSettings,
         ),
-        service.Command(name="grpc", callback=_grpc, settings_class=_GrpcSettings),
-        service.Command(
+        application.Command(name="grpc", callback=_grpc, settings_class=_GrpcSettings),
+        application.Command(
             name="produce",
             callback=_produce,
             settings_class=_AmqpSettings,

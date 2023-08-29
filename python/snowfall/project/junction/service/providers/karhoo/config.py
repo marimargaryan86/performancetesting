@@ -3,7 +3,7 @@ from collections.abc import Sequence
 
 import pydantic
 
-from snowfall.stdlib import service
+from snowfall.stdlib.service import application
 
 _DEFAULT_TTL_IN_MINUTES = 45
 _DEFAULT_API_TIMEOUT_IN_SECONDS = 30
@@ -17,7 +17,7 @@ class KarhooConfig(pydantic.BaseModel):
     )
 
 
-class OfferSettings(service.Settings, KarhooConfig):
+class OfferSettings(application.Settings, KarhooConfig):
     amqp_dsn: pydantic.AnyUrl
     redis_dsn: Sequence[pydantic.AnyUrl]
     ttl: datetime.timedelta = datetime.timedelta(minutes=_DEFAULT_TTL_IN_MINUTES)
@@ -27,7 +27,7 @@ class OfferSettings(service.Settings, KarhooConfig):
     reseller_providers: dict[str, list[str]] = pydantic.Field(default_factory=dict)
 
 
-class OrderSettings(service.Settings, KarhooConfig):
+class OrderSettings(application.Settings, KarhooConfig):
     amqp_dsn: pydantic.AnyUrl
     redis_dsn: Sequence[pydantic.AnyUrl]
     ttl: datetime.timedelta = datetime.timedelta(minutes=_DEFAULT_TTL_IN_MINUTES)

@@ -13,11 +13,11 @@ from snowfall.project.junction.service.providers.distribusion import (
 from snowfall.project.junction.service.providers.distribusion.booking import (
     BookingHandler,
 )
-from snowfall.stdlib import service
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer, types
 from snowfall.vendor.distribusion import client
@@ -27,7 +27,7 @@ _PROVIDER_NAME = "Distribusion"
 
 
 async def orders(  # noqa: WPS217, WPS210
-    app: service.AsyncApplication[config.OrdersSettings],
+    app: application.AsyncApplication[config.OrdersSettings],
 ) -> None:
     http_client = await app.stack.enter_async_context(
         httpx.AsyncClient(

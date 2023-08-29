@@ -13,20 +13,20 @@ from snowfall.project.junction.go.service.gateway import (
     providers,
 )
 from snowfall.project.junction.go.service.offers.v1 import amqp_pb2
-from snowfall.stdlib import service
 from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.stdlib.transport.grpc import server as grpc_server
 
 
-class _ConsumeSettings(service.Settings):
+class _ConsumeSettings(application.Settings):
     amqp_dsn: pydantic.AnyUrl
     providers: dict[str, str] = pydantic.Field(default_factory=dict)
     redis_dsn: pydantic.AnyUrl
     search_timeout: datetime.timedelta = datetime.timedelta(seconds=30)
 
 
-class _ServeSettings(service.Settings):
+class _ServeSettings(application.Settings):
     amqp_dsn: pydantic.AnyUrl
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
@@ -34,7 +34,7 @@ class _ServeSettings(service.Settings):
     redis_dsn: pydantic.AnyUrl
 
 
-async def _consume(app: service.AsyncApplication[_ConsumeSettings]) -> None:
+async def _consume(app: application.AsyncApplication[_ConsumeSettings]) -> None:
     connection = await app.stack.enter_async_context(
         types.Connection(str(app.settings.amqp_dsn)),
     )
@@ -68,7 +68,7 @@ async def _consume(app: service.AsyncApplication[_ConsumeSettings]) -> None:
     await amqp_consumer.consume(offers_consumer.consume)
 
 
-async def _serve(app: service.AsyncApplication[_ServeSettings]) -> None:
+async def _serve(app: application.AsyncApplication[_ServeSettings]) -> None:
     connection = await app.stack.enter_async_context(
         types.Connection(str(app.settings.amqp_dsn)),
     )
@@ -109,13 +109,17 @@ async def _serve(app: service.AsyncApplication[_ServeSettings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name="gateway")
+    entrypoint = application.Entrypoint(name="gateway")
 
     entrypoint.enter_with_commands(
-        service.Command(
+        application.Command(
             name="consume",
             callback=_consume,
             settings_class=_ConsumeSettings,
         ),
-        service.Command(name="serve", callback=_serve, settings_class=_ServeSettings),
+        application.Command(
+            name="serve",
+            callback=_serve,
+            settings_class=_ServeSettings,
+        ),
     )

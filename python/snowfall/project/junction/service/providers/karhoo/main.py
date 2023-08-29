@@ -4,22 +4,22 @@ from snowfall.project.junction.service.providers.karhoo import (
     orders,
     pricing,
 )
-from snowfall.stdlib import service
+from snowfall.stdlib.service import application
 
 if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name="karhoo")
+    entrypoint = application.Entrypoint(name="karhoo")
     entrypoint.enter_with_commands(
-        service.Command(
+        application.Command(
             name="offers",
             callback=offers.offers,
             settings_class=config.OfferSettings,
         ),
-        service.Command(
+        application.Command(
             name="pricing",
             callback=pricing.price_quotes,
             settings_class=config.OfferSettings,
         ),
-        service.Command(
+        application.Command(
             name="orders",
             callback=orders.orders,
             settings_class=config.OrderSettings,

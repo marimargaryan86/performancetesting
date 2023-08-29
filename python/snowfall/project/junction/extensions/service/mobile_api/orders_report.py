@@ -15,12 +15,12 @@ from pydantic import AnyUrl, HttpUrl
 
 from snowfall.project.junction.extensions.service.mobile_api import smtp
 from snowfall.project.junction.extensions.service.mobile_api.tasks import orders
-from snowfall.stdlib import service
+from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.http import auth
 from snowfall.vendor.junction.go import client
 
 
-class Settings(service.Settings):
+class Settings(application.Settings):
     smtp_dsn: AnyUrl
     mongo_dsn: Sequence[AnyUrl]
     orders_report_email: str
@@ -30,7 +30,7 @@ class Settings(service.Settings):
     ory_client_secret: str
 
 
-async def orders_report(app: service.Application[Settings]) -> None:
+async def orders_report(app: application.Application[Settings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )[app.name]

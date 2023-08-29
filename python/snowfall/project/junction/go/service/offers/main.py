@@ -26,9 +26,9 @@ from snowfall.project.junction.go.service.offers.grpc import (
     OfferService,
     PriceQuoteService,
 )
-from snowfall.stdlib import service
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.amqp import consumer, producer, trackable, types
 from snowfall.stdlib.transport.grpc import client, server
 from snowfall.vendor.junction.auth import UserAuth
@@ -38,7 +38,7 @@ _TRIP_OFFER_SEARCH_ROUTING_KEY = "offers.search.trip"
 _TRIP_OFFER_SEARCH_GATEWAY_KEY = "offer_searches.trip"
 
 
-class _GrpcSettings(service.Settings):
+class _GrpcSettings(application.Settings):
     amqp_dsn: pydantic.AnyUrl
     default_page_size: int = 100
     default_ttl: datetime.timedelta = datetime.timedelta(minutes=15)
@@ -48,13 +48,13 @@ class _GrpcSettings(service.Settings):
     use_gateway: bool = False
 
 
-class _PaySettings(service.Settings):
+class _PaySettings(application.Settings):
     payer_company_id: str
     payer_currency_code: str
     use_pay_for_currency_conversions: bool = False
 
 
-class _ImportSettings(pay_integration.Settings, _PaySettings, service.Settings):
+class _ImportSettings(pay_integration.Settings, _PaySettings, application.Settings):
     amqp_dsn: pydantic.AnyUrl
     default_ttl: datetime.timedelta = datetime.timedelta(minutes=15)
     mongo_dsn: Sequence[pydantic.AnyUrl]
@@ -69,14 +69,14 @@ class _ImportSettings(pay_integration.Settings, _PaySettings, service.Settings):
 class _GatherPriceQuoteSettings(
     pay_integration.Settings,
     _PaySettings,
-    service.Settings,
+    application.Settings,
 ):
     amqp_dsn: pydantic.AnyUrl
     default_ttl: datetime.timedelta = datetime.timedelta(minutes=15)
     mongo_dsn: Sequence[pydantic.AnyUrl]
 
 
-async def _serve(app: service.Application[_GrpcSettings]) -> None:
+async def _serve(app: application.Application[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
@@ -152,7 +152,7 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
             await running.wait_for_termination()
 
 
-async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
+async def _import(app: application.AsyncApplication[_ImportSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
@@ -254,7 +254,7 @@ async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
 
 
 async def _gather_price_quotes(
-    app: service.AsyncApplication[_GatherPriceQuoteSettings],
+    app: application.AsyncApplication[_GatherPriceQuoteSettings],
 ) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
@@ -309,16 +309,16 @@ async def _gather_price_quotes(
 
 
 if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name="offers")
+    entrypoint = application.Entrypoint(name="offers")
 
     entrypoint.enter_with_commands(
-        service.Command(name="grpc", callback=_serve, settings_class=_GrpcSettings),
-        service.Command(
+        application.Command(name="grpc", callback=_serve, settings_class=_GrpcSettings),
+        application.Command(
             name="import",
             callback=_import,
             settings_class=_ImportSettings,
         ),
-        service.Command(
+        application.Command(
             name="pricing",
             callback=_gather_price_quotes,
             settings_class=_GatherPriceQuoteSettings,

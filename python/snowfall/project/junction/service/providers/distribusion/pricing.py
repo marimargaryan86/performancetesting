@@ -6,11 +6,12 @@ from redis import asyncio as aioredis
 from snowfall.project.junction.go.service.offers.v1 import amqp_pb2 as offers_amqp_pb2
 from snowfall.project.junction.go.service.offers.v1 import models_pb2 as offers_pb2
 from snowfall.project.junction.service.providers.distribusion import cache, config
-from snowfall.stdlib import money, service
+from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.vendor.distribusion import client
 from snowfall.vendor.distribusion.models import connections, criterias
@@ -22,7 +23,7 @@ class NoPricingError(Exception):
 
 
 async def price_quotes(  # noqa: WPS210
-    app: service.AsyncApplication[config.PricingSettings],
+    app: application.AsyncApplication[config.PricingSettings],
 ) -> None:
     http_client = await app.stack.enter_async_context(
         httpx.AsyncClient(

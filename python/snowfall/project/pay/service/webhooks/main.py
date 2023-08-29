@@ -7,13 +7,13 @@ from snowfall.project.pay.adapter.payments import GrpcClient
 from snowfall.project.pay.service.payments.v1alpha import payments_pb2_grpc
 from snowfall.project.pay.service.webhooks import bootstrap, routers
 from snowfall.project.pay.service.webhooks.middlewares import HmacHeaderMiddleware
-from snowfall.stdlib import service
-from snowfall.stdlib.integration.starlette import application
+from snowfall.stdlib.integration.starlette import application as starlette
+from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.grpc.client import create_channel
 
 
 def _factory(
-    app: service.Application[bootstrap.Settings],
+    app: application.Application[bootstrap.Settings],
 ) -> Callable[[], Starlette]:
     def decorator() -> Starlette:
         payments_channel = create_channel(
@@ -22,7 +22,7 @@ def _factory(
         grpc_payment_client = GrpcClient(
             payments_pb2_grpc.PaymentsServiceStub(payments_channel),
         )
-        return application.create_starlette_app(
+        return starlette.create_starlette_app(
             routers.get_routes(
                 bootstrap.create_dependencies(
                     payment_client=grpc_payment_client,
@@ -37,8 +37,8 @@ def _factory(
     return decorator
 
 
-def _serve(app: service.Application[bootstrap.Settings]) -> None:
-    application.serve(
+def _serve(app: application.Application[bootstrap.Settings]) -> None:
+    starlette.serve(
         factory=_factory(app),
         host=str(app.settings.http_address),
         port=app.settings.http_port,
@@ -47,10 +47,10 @@ def _serve(app: service.Application[bootstrap.Settings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name="webhook")
+    entrypoint = application.Entrypoint(name="webhook")
 
     entrypoint.enter_with_commands(
-        service.Command(
+        application.Command(
             name="http",
             callback=_serve,
             settings_class=bootstrap.Settings,

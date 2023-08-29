@@ -14,17 +14,17 @@ from snowfall.project.junction.service.providers.ba_ndc import (
     notifications,
 )
 from snowfall.project.junction.service.providers.ba_ndc.booking import BookingHandler
-from snowfall.stdlib import service
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.vendor.ba_ndc import client
 from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 from snowfall.vendor.rate_limiter.config import RateLimitConfig
 
 
-class OrdersSettings(config.BaNdcConfig, service.Settings):
+class OrdersSettings(config.BaNdcConfig, application.Settings):
     amqp_dsn: pydantic.AnyUrl
     redis_dsn: Sequence[pydantic.AnyUrl]
     smtp_dsn: pydantic.AnyUrl
@@ -32,11 +32,11 @@ class OrdersSettings(config.BaNdcConfig, service.Settings):
     smtp_recipient: pydantic.EmailStr
     rate_limiter_grpc_host: str
     rate_limiter_service_configs: dict[str, RateLimitConfig]
-    storage_dsn: service.AnyDsn
+    storage_dsn: application.AnyDsn
 
 
 async def orders(  # noqa: WPS210, WPS217
-    app: service.AsyncApplication[OrdersSettings],
+    app: application.AsyncApplication[OrdersSettings],
 ) -> None:
     http_client = await app.stack.enter_async_context(
         httpx.AsyncClient(

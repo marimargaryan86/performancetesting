@@ -12,13 +12,13 @@ from snowfall.project.junction.plus.service.orders_registration import (
     flight_stats,
     importer,
 )
-from snowfall.stdlib import service
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
+from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.stdlib.transport.grpc.client import create_channel
 
 
-class _ImportSettings(service.Settings):
+class _ImportSettings(application.Settings):
     amqp_dsn: pydantic.AnyUrl
     notifications_address: str
     flight_stats_api_url: str
@@ -27,7 +27,7 @@ class _ImportSettings(service.Settings):
     flight_stats_webhook_url: str
 
 
-async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
+async def _import(app: application.AsyncApplication[_ImportSettings]) -> None:
     http_client = await app.stack.enter_async_context(httpx.AsyncClient())
     connection = await app.stack.enter_async_context(
         types.Connection(
@@ -67,10 +67,10 @@ async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name="orders_registration")
+    entrypoint = application.Entrypoint(name="orders_registration")
 
     entrypoint.enter_with_commands(
-        service.Command(
+        application.Command(
             name="import",
             callback=_import,
             settings_class=_ImportSettings,

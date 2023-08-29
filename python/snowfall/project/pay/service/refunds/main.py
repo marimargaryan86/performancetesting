@@ -10,13 +10,13 @@ from snowfall.project.pay.service.refunds import grpc, repositories
 from snowfall.project.pay.service.transactions.v1alpha import (
     grpc_pb2_grpc as transactions_pb2_grpc,
 )
-from snowfall.stdlib import service
+from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.grpc import server
 from snowfall.stdlib.transport.grpc.client import create_channel
 from snowfall.vendor.currency_cloud.client import CurrencyCloudAuth, PaymentClient
 
 
-class _GrpcSettings(service.Settings):
+class _GrpcSettings(application.Settings):
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
     mongo_dsn: Sequence[AnyUrl]
@@ -26,7 +26,7 @@ class _GrpcSettings(service.Settings):
     cc_address: str
 
 
-async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
+async def _serve(app: application.AsyncApplication[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
@@ -63,8 +63,8 @@ async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name="refunds")
+    entrypoint = application.Entrypoint(name="refunds")
 
     entrypoint.enter_with_commands(
-        service.Command(name="grpc", callback=_serve, settings_class=_GrpcSettings),
+        application.Command(name="grpc", callback=_serve, settings_class=_GrpcSettings),
     )

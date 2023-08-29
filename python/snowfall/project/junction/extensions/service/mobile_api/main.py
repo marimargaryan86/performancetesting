@@ -28,10 +28,11 @@ from snowfall.project.junction.extensions.service.mobile_api import (
     handlers as mobile_handlers,
 )
 from snowfall.project.junction.extensions.service.mobile_api.routes import router
-from snowfall.stdlib import service
-from snowfall.stdlib.integration.starlette import application, handlers
+from snowfall.stdlib.integration.starlette import application as starlette
+from snowfall.stdlib.integration.starlette import handlers
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.http import auth
 from snowfall.vendor.junction import client as base_client
 from snowfall.vendor.junction.go import client
@@ -72,7 +73,7 @@ async def lifespan(app: types.ASGIApp) -> AsyncGenerator[None, None]:
 
 
 def _factory(
-    app: service.Application[bootstrap.Settings],
+    app: application.Application[bootstrap.Settings],
 ) -> Callable[[], applications.Starlette]:
     def decorator() -> applications.Starlette:
         stripe.api_key = app.settings.stripe_api_key
@@ -120,7 +121,7 @@ def _factory(
             jwt_token_version=app.settings.jwt_token_version,
         )
 
-        asgi_app = application.create_starlette_app(
+        asgi_app = starlette.create_starlette_app(
             lifespan=lifespan,
             routes=router.get_routes(
                 bootstrap.create_dependencies(
@@ -200,8 +201,8 @@ def _factory(
     return decorator
 
 
-def _serve(app: service.Application[bootstrap.Settings]) -> None:
-    application.serve(
+def _serve(app: application.Application[bootstrap.Settings]) -> None:
+    starlette.serve(
         factory=_factory(app),
         host=str(app.settings.http_address),
         port=app.settings.http_port,
@@ -209,29 +210,29 @@ def _serve(app: service.Application[bootstrap.Settings]) -> None:
     )
 
 
-async def _migrate(app: service.Application[bootstrap.MigrateSettings]) -> None:
+async def _migrate(app: application.Application[bootstrap.MigrateSettings]) -> None:
     await places_migration.migrate(app.settings)
 
 
-async def _orders_report(app: service.Application[orders_report.Settings]) -> None:
+async def _orders_report(app: application.Application[orders_report.Settings]) -> None:
     await orders_report.orders_report(app)
 
 
 if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name="mobile-api")
+    entrypoint = application.Entrypoint(name="mobile-api")
 
     entrypoint.enter_with_commands(
-        service.Command(
+        application.Command(
             name="http",
             callback=_serve,
             settings_class=bootstrap.Settings,
         ),
-        service.Command(
+        application.Command(
             name="migrate",
             callback=_migrate,
             settings_class=bootstrap.MigrateSettings,
         ),
-        service.Command(
+        application.Command(
             name="orders_report",
             callback=_orders_report,
             settings_class=orders_report.Settings,

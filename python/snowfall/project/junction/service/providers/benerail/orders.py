@@ -11,14 +11,14 @@ from snowfall.project.junction.service.providers.benerail import (
 from snowfall.project.junction.service.providers.benerail import (
     consumer as benerail_consumer,
 )
-from snowfall.stdlib import service
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.vendor.benerail import client
 
 
-async def orders(app: service.Application[config.OrdersSettings]) -> None:
+async def orders(app: application.Application[config.OrdersSettings]) -> None:
     async with contextlib.AsyncExitStack() as stack:
         http_client = await stack.enter_async_context(
             httpx.AsyncClient(

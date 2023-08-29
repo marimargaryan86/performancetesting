@@ -18,14 +18,14 @@ from snowfall.project.pay.service.transactions.grpc import (
     QuotationsService,
     TransactionsService,
 )
-from snowfall.stdlib import service
 from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.grpc import server
 from snowfall.stdlib.transport.grpc.client import create_channel
 from snowfall.vendor.currency_cloud.client import CurrencyCloudAuth, PaymentClient
 
 
-class _GrpcSettings(service.Settings):
+class _GrpcSettings(application.Settings):
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
     mongo_dsn: Sequence[pydantic.AnyUrl]
@@ -37,7 +37,7 @@ class _GrpcSettings(service.Settings):
     cc_address: str
 
 
-async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
+async def _serve(app: application.AsyncApplication[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
@@ -109,8 +109,8 @@ async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name="transactions")
+    entrypoint = application.Entrypoint(name="transactions")
 
     entrypoint.enter_with_commands(
-        service.Command(name="grpc", callback=_serve, settings_class=_GrpcSettings),
+        application.Command(name="grpc", callback=_serve, settings_class=_GrpcSettings),
     )

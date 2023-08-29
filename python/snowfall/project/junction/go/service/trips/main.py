@@ -23,7 +23,7 @@ from snowfall.project.junction.go.service.trips.grpc import (
     TripSearchService,
     TripService,
 )
-from snowfall.stdlib import service
+from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.stdlib.transport.grpc import server
 from snowfall.stdlib.transport.grpc.client import create_channel
@@ -32,14 +32,14 @@ _TRIPS = "trips"
 _DEFAULT_TTL = datetime.timedelta(minutes=15)
 
 
-class _ConsumeSettings(service.Settings):
+class _ConsumeSettings(application.Settings):
     amqp_dsn: AnyUrl
     planner_address: str
     mongo_dsn: Sequence[AnyUrl]
     trip_search_ttl: datetime.timedelta = _DEFAULT_TTL
 
 
-class _ConsumeTripCandidateSearchSettings(service.Settings):
+class _ConsumeTripCandidateSearchSettings(application.Settings):
     amqp_dsn: AnyUrl
     planner_address: str
     offers_address: str
@@ -49,7 +49,7 @@ class _ConsumeTripCandidateSearchSettings(service.Settings):
     trip_candidate_search_ttl: datetime.timedelta = _DEFAULT_TTL
 
 
-class _GrpcSettings(service.Settings):
+class _GrpcSettings(application.Settings):
     amqp_dsn: AnyUrl
     offers_address: str
     default_page_size: int = 100
@@ -59,7 +59,7 @@ class _GrpcSettings(service.Settings):
     trip_search_ttl: datetime.timedelta = _DEFAULT_TTL
 
 
-async def _consume(app: service.Application[_ConsumeSettings]) -> None:
+async def _consume(app: application.Application[_ConsumeSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
@@ -85,7 +85,7 @@ async def _consume(app: service.Application[_ConsumeSettings]) -> None:
 
 
 async def _consume_trip_candidate_search_tasks(
-    app: service.Application[_ConsumeTripCandidateSearchSettings],
+    app: application.Application[_ConsumeTripCandidateSearchSettings],
 ) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
@@ -128,7 +128,7 @@ async def _consume_trip_candidate_search_tasks(
         await consumer_obj.consume()
 
 
-async def _serve(app: service.Application[_GrpcSettings]) -> None:
+async def _serve(app: application.Application[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
@@ -188,20 +188,20 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name=_TRIPS)
+    entrypoint = application.Entrypoint(name=_TRIPS)
 
     entrypoint.enter_with_commands(
-        service.Command(
+        application.Command(
             name="consume",
             callback=_consume,
             settings_class=_ConsumeSettings,
         ),
-        service.Command(
+        application.Command(
             name="consume-trip-candidate-searches",
             callback=_consume_trip_candidate_search_tasks,
             settings_class=_ConsumeTripCandidateSearchSettings,
         ),
-        service.Command(
+        application.Command(
             name="grpc",
             callback=_serve,
             settings_class=_GrpcSettings,

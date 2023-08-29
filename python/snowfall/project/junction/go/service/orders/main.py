@@ -19,15 +19,15 @@ from snowfall.project.junction.go.service.orders.zendesk.client import ZendeskCl
 from snowfall.project.junction.go.service.passenger_name_records.v1 import (
     passenger_name_records_pb2_grpc,
 )
-from snowfall.stdlib import service
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
+from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.stdlib.transport.grpc import client, server
 from snowfall.vendor.junction.auth import UserAuth
 from snowfall.vendor.junction.pay.client import Client as PayClient
 
 
-class _GrpcSettings(service.Settings):
+class _GrpcSettings(application.Settings):
     amqp_dsn: pydantic.AnyUrl
     default_page_size: int = 100
     gateway_address: str
@@ -39,14 +39,14 @@ class _GrpcSettings(service.Settings):
     zendesk_api_key: str
 
 
-class _ImportSettings(pay_integration.Settings, service.Settings):
+class _ImportSettings(pay_integration.Settings, application.Settings):
     amqp_dsn: pydantic.AnyUrl
     mongo_dsn: Sequence[pydantic.AnyUrl]
     passenger_name_records_address: str
     use_pay_to_create_transaction: bool = False
 
 
-async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
+async def _serve(app: application.AsyncApplication[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
@@ -116,7 +116,7 @@ async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
         await running.wait_for_termination()
 
 
-async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
+async def _import(app: application.AsyncApplication[_ImportSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
@@ -157,15 +157,15 @@ async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name="orders")
+    entrypoint = application.Entrypoint(name="orders")
 
     entrypoint.enter_with_commands(
-        service.Command(
+        application.Command(
             name="grpc",
             callback=_serve,
             settings_class=_GrpcSettings,
         ),
-        service.Command(
+        application.Command(
             name="import",
             callback=_import,
             settings_class=_ImportSettings,

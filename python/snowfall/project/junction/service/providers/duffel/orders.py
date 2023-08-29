@@ -16,28 +16,30 @@ from snowfall.project.junction.service.providers.duffel.booking import BookingHa
 from snowfall.project.junction.service.providers.duffel.client_factory import (
     DuffelClientFactory,
 )
-from snowfall.stdlib import service
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
 _PROVIDER_NAME = "Duffel"
 
 
-class OrdersSettings(config.DuffelConfig, service.Settings):
+class OrdersSettings(config.DuffelConfig, application.Settings):
     amqp_dsn: pydantic.AnyUrl
     redis_dsn: Sequence[pydantic.AnyUrl]
     smtp_dsn: pydantic.AnyUrl
     smtp_sender: pydantic.EmailStr
     smtp_recipient: pydantic.EmailStr
     price_change_tolerance_percent: float = 1.0
-    storage_dsn: service.AnyDsn
+    storage_dsn: application.AnyDsn
 
 
-async def orders(app: service.AsyncApplication[OrdersSettings]) -> None:  # noqa: WPS217
+async def orders(  # noqa: WPS217
+    app: application.AsyncApplication[OrdersSettings],
+) -> None:
     http_client = await app.stack.enter_async_context(
         httpx.AsyncClient(
             timeout=app.settings.http_timeout,

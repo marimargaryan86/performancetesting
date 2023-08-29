@@ -19,17 +19,17 @@ from snowfall.project.junction.service.providers.duffel.config import PricingSet
 from snowfall.project.junction.service.providers.duffel.search.parser import (
     dict_to_private_fares,
 )
-from snowfall.stdlib import service
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.amqp import consumer, producer
 from snowfall.stdlib.transport.amqp import types as amqp_types
 from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
 
 async def price_quotes(  # noqa: WPS210
-    app: service.AsyncApplication[PricingSettings],
+    app: application.AsyncApplication[PricingSettings],
 ) -> None:
     http_client = await app.stack.enter_async_context(
         httpx.AsyncClient(

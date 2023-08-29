@@ -8,20 +8,21 @@ from snowfall.project.junction.go.adapter import errors, orders
 from snowfall.project.junction.go.service.orders.v1 import orders_pb2_grpc
 from snowfall.project.junction.hub.service.hub_api import bootstrap, router
 from snowfall.service.authentication.v1 import sessions_pb2_grpc
-from snowfall.stdlib import service
-from snowfall.stdlib.integration.starlette import application, authentication, handlers
+from snowfall.stdlib.integration.starlette import application as starlette
+from snowfall.stdlib.integration.starlette import authentication, handlers
 from snowfall.stdlib.persistence import filesystem
+from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.grpc import client
 
 
-class Settings(application.Settings):
+class Settings(starlette.Settings):
     authentication_address: str
     orders_address: str
     validate_responses_against_spec: bool = True
 
 
 def _factory(
-    app: service.Application[Settings],
+    app: application.Application[Settings],
 ) -> Callable[[], applications.Starlette]:
     def decorator() -> applications.Starlette:
         authentication_channel = client.create_channel(
@@ -30,7 +31,7 @@ def _factory(
         session_client = sessions_pb2_grpc.SessionServiceStub(authentication_channel)
         orders_channel = client.create_channel(app.settings.orders_address)
 
-        asgi_app = application.create_starlette_app(
+        asgi_app = starlette.create_starlette_app(
             routes=router.get_routes(
                 bootstrap.create_dependencies(
                     orders_client=orders.GrpcClient(
@@ -72,8 +73,8 @@ def _factory(
     return decorator
 
 
-def _serve(app: service.Application[Settings]) -> None:
-    application.serve(
+def _serve(app: application.Application[Settings]) -> None:
+    starlette.serve(
         factory=_factory(app),
         host=str(app.settings.http_address),
         port=app.settings.http_port,
@@ -82,10 +83,10 @@ def _serve(app: service.Application[Settings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name="hub-api")
+    entrypoint = application.Entrypoint(name="hub-api")
 
     entrypoint.enter_with_commands(
-        service.Command(
+        application.Command(
             name="http",
             callback=_serve,
             settings_class=Settings,

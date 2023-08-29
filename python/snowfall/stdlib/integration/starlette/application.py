@@ -9,16 +9,16 @@ from asgiref.typing import ASGIApplication
 from starlette import applications, exceptions, requests, responses, routing, status
 from starlette.middleware import Middleware, errors
 
-from snowfall.stdlib import service
 from snowfall.stdlib.integration.starlette import handlers, middlewares, validation
 from snowfall.stdlib.integration.starlette import routes as common_routes
+from snowfall.stdlib.service import application
 
 ExceptionHandlerResponse = responses.Response | Awaitable[responses.Response]
 ExceptionHandler = Callable[[requests.Request, Exception], ExceptionHandlerResponse]
 ExceptionHandlerMapping = Mapping[Any, ExceptionHandler]
 
 
-class Settings(service.Settings):
+class Settings(application.Settings):
     forwarded_allowed_ips: Sequence[ipaddress.IPv4Address] = [
         ipaddress.IPv4Address("127.0.0.1"),
     ]

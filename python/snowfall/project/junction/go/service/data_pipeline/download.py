@@ -23,7 +23,7 @@ from snowfall.project.junction.go.service.data_pipeline.distribusion_plugin impo
 from snowfall.project.junction.go.service.data_pipeline.obb_plugin import obb_plugin
 from snowfall.project.junction.go.service.data_pipeline.sbb_plugin import sbb_plugin
 from snowfall.project.junction.go.service.data_pipeline.types import Dataset
-from snowfall.stdlib import service
+from snowfall.stdlib.service import application
 
 _PluginResult = Iterable[dict[str, Any]]
 _Plugin = Callable[[httpx.AsyncClient, Dataset], Awaitable[_PluginResult]]
@@ -32,11 +32,11 @@ PLUGINS: MappingProxyType[str, _Plugin] = MappingProxyType(
 )
 
 
-class DownloadSettings(service.Settings):
+class DownloadSettings(application.Settings):
     path: Path
 
 
-_DownloadApp: TypeAlias = service.Application[DownloadSettings]
+_DownloadApp: TypeAlias = application.Application[DownloadSettings]
 
 
 def _auth(name: str) -> tuple[str, str] | None:
@@ -119,9 +119,9 @@ async def run_download(app: _DownloadApp) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name="download")
+    entrypoint = application.Entrypoint(name="download")
     entrypoint.enter_with_commands(
-        service.Command(
+        application.Command(
             name="download",
             callback=run_download,
             settings_class=DownloadSettings,

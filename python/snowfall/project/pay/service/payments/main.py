@@ -5,12 +5,12 @@ from pydantic import AnyUrl
 
 from snowfall.project.pay.service.payments.grpc import PaymentsService
 from snowfall.project.pay.service.payments.repositories import PaymentsRepository
-from snowfall.stdlib import service
+from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.grpc import server
 from snowfall.vendor.currency_cloud.client import CurrencyCloudAuth, PaymentClient
 
 
-class _GrpcSettings(service.Settings):
+class _GrpcSettings(application.Settings):
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50065
     mongo_dsn: AnyUrl
@@ -19,7 +19,7 @@ class _GrpcSettings(service.Settings):
     cc_address: str
 
 
-async def _serve(app: service.Application[_GrpcSettings]) -> None:
+async def _serve(app: application.Application[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(app.settings.mongo_dsn),
     )
@@ -48,10 +48,10 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name="payments")
+    entrypoint = application.Entrypoint(name="payments")
 
     entrypoint.enter_with_commands(
-        service.Command(
+        application.Command(
             name="grpc",
             callback=_serve,
             settings_class=_GrpcSettings,

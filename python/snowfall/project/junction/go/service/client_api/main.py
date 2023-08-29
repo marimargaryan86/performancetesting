@@ -30,16 +30,17 @@ from snowfall.project.junction.go.service.places.v1 import places_pb2_grpc
 from snowfall.project.junction.go.service.schedules.v1alpha import schedules_pb2_grpc
 from snowfall.project.junction.go.service.trips.v1alpha import trips_pb2_grpc
 from snowfall.service.authentication.v1 import authentication_pb2_grpc, oauth_pb2_grpc
-from snowfall.stdlib import service
 from snowfall.stdlib.format import jwt
-from snowfall.stdlib.integration.starlette import application, handlers
+from snowfall.stdlib.integration.starlette import application as starlette
 from snowfall.stdlib.integration.starlette import authentication as stdlib_auth
+from snowfall.stdlib.integration.starlette import handlers
 from snowfall.stdlib.persistence import cursor, filesystem
+from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.grpc.client import create_channel
 
 
 def _factory(
-    app: service.Application[bootstrap.Settings],
+    app: application.Application[bootstrap.Settings],
 ) -> Callable[[], applications.Starlette]:
     def decorator() -> applications.Starlette:
         places_channel = create_channel(app.settings.places_address)
@@ -52,7 +53,7 @@ def _factory(
             authentication_channel,
         )
 
-        asgi_app = application.create_starlette_app(
+        asgi_app = starlette.create_starlette_app(
             routes=router.get_routes(
                 bootstrap.create_dependencies(
                     authentication_client=auth_adapter.GrpcClient(
@@ -176,8 +177,8 @@ def _factory(
     return decorator
 
 
-def _serve(app: service.Application[bootstrap.Settings]) -> None:
-    application.serve(
+def _serve(app: application.Application[bootstrap.Settings]) -> None:
+    starlette.serve(
         factory=_factory(app),
         host=str(app.settings.http_address),
         port=app.settings.http_port,
@@ -186,10 +187,10 @@ def _serve(app: service.Application[bootstrap.Settings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name="client-api")
+    entrypoint = application.Entrypoint(name="client-api")
 
     entrypoint.enter_with_commands(
-        service.Command(
+        application.Command(
             name="http",
             callback=_serve,
             settings_class=bootstrap.Settings,

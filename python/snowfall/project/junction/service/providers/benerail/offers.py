@@ -16,8 +16,9 @@ from snowfall.project.junction.service.providers.benerail import (
     train_stations,
 )
 from snowfall.project.junction.service.providers.benerail.v1alpha import amqp_pb2
-from snowfall.stdlib import h3, service
+from snowfall.stdlib import h3
 from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.amqp import producer, types
 from snowfall.vendor.benerail import client
 
@@ -28,7 +29,7 @@ _Impl = offers.OfferSearchImplementation[
 
 
 async def offers_app(
-    app: service.Application[config.Settings],
+    app: application.Application[config.Settings],
     amqp_conn: types.Connection,
     redis_conn: aioredis.Redis[bytes],
     stack: contextlib.AsyncExitStack,

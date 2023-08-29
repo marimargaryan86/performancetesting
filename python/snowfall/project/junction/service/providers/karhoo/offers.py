@@ -4,9 +4,9 @@ import httpx
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.service.providers.karhoo import cache, config, consumer
-from snowfall.stdlib import service
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer as amqp_producer
 from snowfall.stdlib.transport.amqp import trackable, types
@@ -14,7 +14,7 @@ from snowfall.vendor.karhoo import client
 
 
 async def offers(
-    app: service.AsyncApplication[config.OfferSettings],
+    app: application.AsyncApplication[config.OfferSettings],
 ) -> None:
     http_client = await app.stack.enter_async_context(
         httpx.AsyncClient(

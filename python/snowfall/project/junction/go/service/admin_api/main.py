@@ -5,19 +5,20 @@ from starlette import applications
 from snowfall.project.junction.go.adapter import errors, locations, places
 from snowfall.project.junction.go.service.admin_api import bootstrap, router
 from snowfall.project.junction.go.service.places.v1 import places_pb2_grpc
-from snowfall.stdlib import service
-from snowfall.stdlib.integration.starlette import application, handlers
+from snowfall.stdlib.integration.starlette import application as starlette
+from snowfall.stdlib.integration.starlette import handlers
 from snowfall.stdlib.persistence import cursor, filesystem
+from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.grpc.client import create_channel
 
 
 def _factory(
-    app: service.Application[bootstrap.Settings],
+    app: application.Application[bootstrap.Settings],
 ) -> Callable[[], applications.Starlette]:
     def decorator() -> applications.Starlette:
         places_channel = create_channel(app.settings.places_address)
 
-        asgi_app = application.create_starlette_app(
+        asgi_app = starlette.create_starlette_app(
             routes=router.get_routes(
                 bootstrap.create_dependencies(
                     locations_client=locations.GrpcClient(
@@ -53,8 +54,8 @@ def _factory(
     return decorator
 
 
-def _serve(app: service.Application[bootstrap.Settings]) -> None:
-    application.serve(
+def _serve(app: application.Application[bootstrap.Settings]) -> None:
+    starlette.serve(
         factory=_factory(app),
         host=str(app.settings.http_address),
         port=app.settings.http_port,
@@ -63,10 +64,10 @@ def _serve(app: service.Application[bootstrap.Settings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name="admin-api")
+    entrypoint = application.Entrypoint(name="admin-api")
 
     entrypoint.enter_with_commands(
-        service.Command(
+        application.Command(
             name="http",
             callback=_serve,
             settings_class=bootstrap.Settings,

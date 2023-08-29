@@ -9,13 +9,13 @@ from redis import asyncio as aioredis
 
 from snowfall.service.geodata import geocoding, reverse_geocoding
 from snowfall.service.geodata.grpc import GeocodingService
-from snowfall.stdlib import service
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.grpc import server
 
 
-class _Settings(service.Settings):
+class _Settings(application.Settings):
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
     redis_dsn: Sequence[AnyUrl]
@@ -24,7 +24,7 @@ class _Settings(service.Settings):
     aws_secret_access_key: str
 
 
-async def _main(app: service.Application[_Settings]) -> None:
+async def _main(app: application.Application[_Settings]) -> None:
     shp_path = filesystem.resource_path(
         "snowfall.service.geodata.main",
         "EEZ_land_union_v3_202003.zip",
@@ -57,10 +57,10 @@ async def _main(app: service.Application[_Settings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name="geodata")
+    entrypoint = application.Entrypoint(name="geodata")
 
     entrypoint.enter_with_commands(
-        service.Command(
+        application.Command(
             name="grpc",
             callback=_main,
             settings_class=_Settings,

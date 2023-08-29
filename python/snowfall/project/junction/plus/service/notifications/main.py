@@ -18,19 +18,19 @@ from snowfall.project.junction.plus.service.notifications.notifications import (
     OrderRepository,
     SubscriberRepository,
 )
-from snowfall.stdlib import service
+from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.amqp import producer, types
 from snowfall.stdlib.transport.grpc import server
 
 
-class _GrpcSettings(service.Settings):
+class _GrpcSettings(application.Settings):
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
     mongo_dsn: Sequence[pydantic.AnyUrl]
     amqp_dsn: pydantic.AnyUrl
 
 
-async def _serve(app: service.Application[_GrpcSettings]) -> None:
+async def _serve(app: application.Application[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
@@ -70,10 +70,10 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name="notifications")
+    entrypoint = application.Entrypoint(name="notifications")
 
     entrypoint.enter_with_commands(
-        service.Command(
+        application.Command(
             name="grpc",
             callback=_serve,
             settings_class=_GrpcSettings,

@@ -8,13 +8,14 @@ from pydantic import AnyUrl
 from snowfall.project.pay.adapter import currencies
 from snowfall.project.pay.service.companies import cron_jobs, grpc, repositories
 from snowfall.project.pay.service.currencies.v1alpha import currencies_pb2_grpc
-from snowfall.stdlib import money, service
+from snowfall.stdlib import money
+from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.grpc import server
 from snowfall.stdlib.transport.grpc.client import create_channel
 from snowfall.vendor.currency_cloud.client import CurrencyCloudAuth, PaymentClient
 
 
-class _GrpcSettings(service.Settings):
+class _GrpcSettings(application.Settings):
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
     mongo_dsn: Sequence[AnyUrl]
@@ -25,14 +26,14 @@ class _GrpcSettings(service.Settings):
     currencies: Sequence[money.Currency]
 
 
-class _AccountSyncSettings(service.Settings):
+class _AccountSyncSettings(application.Settings):
     mongo_dsn: AnyUrl
     cc_login: str
     cc_api_key: str
     cc_address: str
 
 
-async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
+async def _serve(app: application.AsyncApplication[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
@@ -102,7 +103,7 @@ async def _serve(app: service.AsyncApplication[_GrpcSettings]) -> None:
 
 
 async def _sync_accounts_cron_run(
-    app: service.Application[_AccountSyncSettings],
+    app: application.Application[_AccountSyncSettings],
 ) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(str(app.settings.mongo_dsn))
     payment_client = PaymentClient(
@@ -121,11 +122,11 @@ async def _sync_accounts_cron_run(
 
 
 if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name="companies")
+    entrypoint = application.Entrypoint(name="companies")
 
     entrypoint.enter_with_commands(
-        service.Command(name="grpc", callback=_serve, settings_class=_GrpcSettings),
-        service.Command(
+        application.Command(name="grpc", callback=_serve, settings_class=_GrpcSettings),
+        application.Command(
             name="sync_accounts",
             callback=_sync_accounts_cron_run,
             settings_class=_AccountSyncSettings,

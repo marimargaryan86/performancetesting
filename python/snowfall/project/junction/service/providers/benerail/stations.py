@@ -7,8 +7,8 @@ import httpx
 
 from snowfall.project.junction.service.providers.benerail import config
 from snowfall.service.geodata.v1 import geocoding_pb2, geocoding_pb2_grpc
-from snowfall.stdlib import service
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
+from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.grpc import client as grpc_client
 from snowfall.stdlib.v1 import latlng_pb2
 from snowfall.vendor.benerail import client
@@ -16,7 +16,7 @@ from snowfall.vendor.benerail.models.enumeration import position, response
 
 
 async def dump_stations(
-    app: service.Application[config.DumpStationsSettings],
+    app: application.Application[config.DumpStationsSettings],
 ) -> None:
     settings = app.settings
 

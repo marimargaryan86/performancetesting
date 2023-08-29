@@ -1,9 +1,9 @@
 import pydantic
 
-from snowfall.stdlib import service
+from snowfall.stdlib.service import application
 
 
-class Settings(service.Settings):
+class Settings(application.Settings):
     pay_admin_username: str
     pay_admin_password: str
     public_pay_api_dsn: pydantic.AnyUrl

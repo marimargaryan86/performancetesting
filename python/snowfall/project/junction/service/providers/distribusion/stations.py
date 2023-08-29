@@ -12,13 +12,14 @@ import pydantic
 from snowfall.project.junction.service.providers.distribusion.config import (
     DistribusionConfig,
 )
-from snowfall.stdlib import h3, service
+from snowfall.stdlib import h3
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
+from snowfall.stdlib.service import application
 from snowfall.vendor.distribusion import client
 from snowfall.vendor.distribusion.models.stations import Station as VendorStation
 
 
-class DumpStationsSettings(DistribusionConfig, service.Settings):
+class DumpStationsSettings(DistribusionConfig, application.Settings):
     output_file: str = pydantic.Field(
         json_schema_extra={"hidden": True, "argument": True},
     )
@@ -40,7 +41,9 @@ class StationRepository(object):
         return self._stations[station_id]
 
 
-async def dump_stations(app: service.AsyncApplication[DumpStationsSettings]) -> None:
+async def dump_stations(
+    app: application.AsyncApplication[DumpStationsSettings],
+) -> None:
     http_client = await app.stack.enter_async_context(
         httpx.AsyncClient(
             timeout=app.settings.api_timeout,

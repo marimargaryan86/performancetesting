@@ -10,15 +10,15 @@ from snowfall.project.junction.service.providers.ba_ndc import (
     config,
     pricing_transformer,
 )
-from snowfall.stdlib import service
 from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer
 from snowfall.stdlib.transport.amqp import types as amqp_types
 
 
 async def price_quotes(
-    app: service.AsyncApplication[config.PricingSettings],
+    app: application.AsyncApplication[config.PricingSettings],
 ) -> None:
     redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
         aioredis.from_url(

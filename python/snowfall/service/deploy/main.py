@@ -4,18 +4,18 @@ import pydantic
 
 from snowfall.service.deploy import consul, dependencies, verify
 from snowfall.service.deploy.verifiers import junction_go, protocols
-from snowfall.stdlib import service
+from snowfall.stdlib.service import application
 
 _verifiers: tuple[protocols.Verifier, ...] = (junction_go.OfferSearchFlow(),)
 
 
-class _VerifySettings(service.Settings):
+class _VerifySettings(application.Settings):
     nomad_address: pydantic.HttpUrl
     nomad_templates_path: pydantic.DirectoryPath
     changed_services: list[str] = pydantic.Field(json_schema_extra={"argument": True})
 
 
-async def _verify(app: service.AsyncApplication[_VerifySettings]) -> None:
+async def _verify(app: application.AsyncApplication[_VerifySettings]) -> None:
     dns_address = str(app.settings.nomad_address.host)
     dns_resolver = consul.Resolver((dns_address, 8600), app.environment)
     deps_resolver = await dependencies.resolver_from_nomad_templates(
@@ -41,10 +41,10 @@ async def _verify(app: service.AsyncApplication[_VerifySettings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name="deploy", cli_tool=True)
+    entrypoint = application.Entrypoint(name="deploy", cli_tool=True)
 
     entrypoint.enter_with_commands(
-        service.Command(
+        application.Command(
             name="verify",
             callback=_verify,
             settings_class=_VerifySettings,

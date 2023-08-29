@@ -11,21 +11,21 @@ from google.protobuf import message
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.provider import bookings, meta, offers
-from snowfall.stdlib import service
 from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.amqp import types
 from snowfall.stdlib.transport.grpc import server as grpc_server
 from snowfall.stdlib.transport.grpc import service as grpc_service
 
 # Re-export some service types
-AnyDsn = service.AnyDsn
-Application = service.Application
-AsyncApplication = service.AsyncApplication
-Command = service.Command
-Settings = service.Settings
+AnyDsn = application.AnyDsn
+Application = application.Application
+AsyncApplication = application.AsyncApplication
+Command = application.Command
+Settings = application.Settings
 
 
-class ProviderSettings(service.Settings):
+class ProviderSettings(application.Settings):
     amqp_dsn: pydantic.AnyUrl
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
@@ -34,7 +34,7 @@ class ProviderSettings(service.Settings):
     reseller_providers: dict[str, list[str]]
 
 
-class PriceQuoteSettings(service.Settings):
+class PriceQuoteSettings(application.Settings):
     provider_company_id: str
 
 
@@ -47,7 +47,7 @@ if TYPE_CHECKING:
     MetaFactory = Callable[[], Awaitable[meta.MetaImplementation]]
     OffersFactory = Callable[
         [
-            service.Application[_Settings],
+            application.Application[_Settings],
             types.Connection,
             aioredis.Redis[bytes],
             contextlib.AsyncExitStack,
@@ -59,7 +59,7 @@ if TYPE_CHECKING:
 
     OF = OffersFactory[_Settings, _SearchCriteriaTask, _SearchCriteria]
     BookingFactory = Callable[
-        [service.AsyncApplication[_Settings]],
+        [application.AsyncApplication[_Settings]],
         Awaitable[bookings.Implementation],
     ]
 
@@ -68,9 +68,9 @@ def _grpc_command(  # noqa: WPS210, WPS217
     meta_factory: MetaFactory,
     offers_factory: OF[_Settings, _SearchCriteriaTask, _SearchCriteria] | None = None,
     bookings_factory: BookingFactory[_Settings] | None = None,
-) -> service.Callback[_Settings]:
+) -> application.Callback[_Settings]:
     async def wrapper(  # noqa: WPS210, WPS217
-        app: service.AsyncApplication[_Settings],
+        app: application.AsyncApplication[_Settings],
     ) -> None:
         meta_implementation = await meta_factory()
         services: list[grpc_service.Service] = [
@@ -133,8 +133,8 @@ def _grpc_command(  # noqa: WPS210, WPS217
 def _offers_command(
     meta_factory: MetaFactory,
     offers_factory: OffersFactory[_Settings, _SearchCriteriaTask, _SearchCriteria],
-) -> service.Callback[_Settings]:
-    async def wrapper(app: service.AsyncApplication[_Settings]) -> None:
+) -> application.Callback[_Settings]:
+    async def wrapper(app: application.AsyncApplication[_Settings]) -> None:
         meta_implementation = await meta_factory()
         redis_conn: aioredis.Redis[bytes] = await app.stack.enter_async_context(
             aioredis.from_url(
@@ -165,7 +165,7 @@ def _offers_command(
 @dataclasses.dataclass(frozen=True, kw_only=True)
 class Entrypoint(
     Generic[_Settings, _SearchCriteriaTask, _SearchCriteria],
-    service.Entrypoint,
+    application.Entrypoint,
 ):
     settings_class: type[_Settings]
     meta_factory: MetaFactory
@@ -179,7 +179,7 @@ class Entrypoint(
     def __post_init__(self) -> None:
         super().__post_init__()
         self.add_command(
-            service.Command(
+            application.Command(
                 name="grpc",
                 callback=_grpc_command(
                     self.meta_factory,
@@ -193,7 +193,7 @@ class Entrypoint(
         # backwards compatibility
         if self.offers_factory:
             self.add_command(
-                service.Command(
+                application.Command(
                     name="offers",
                     callback=_offers_command(self.meta_factory, self.offers_factory),
                     settings_class=self.settings_class,

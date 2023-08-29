@@ -19,19 +19,19 @@ from snowfall.project.junction.go.service.places.grpc import (
     PlacesService,
 )
 from snowfall.service.geodata.v1 import geocoding_pb2_grpc
-from snowfall.stdlib import service
 from snowfall.stdlib.persistence import filesystem
+from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.grpc import server
 from snowfall.stdlib.transport.grpc.client import create_channel
 
 
-class _CitiesSettings(service.Settings):
+class _CitiesSettings(application.Settings):
     geodata_address: str
     mongo_dsn: Sequence[AnyUrl]
     places_dump: pathlib.Path
 
 
-class _GrpcSettings(service.Settings):
+class _GrpcSettings(application.Settings):
     default_page_size: int = 100
     geodata_address: str
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
@@ -39,7 +39,7 @@ class _GrpcSettings(service.Settings):
     mongo_dsn: Sequence[AnyUrl]
 
 
-async def _generate_cities(app: service.Application[_CitiesSettings]) -> None:
+async def _generate_cities(app: application.Application[_CitiesSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
@@ -111,7 +111,7 @@ async def _generate_cities(app: service.Application[_CitiesSettings]) -> None:
         )
 
 
-async def _serve(app: service.Application[_GrpcSettings]) -> None:
+async def _serve(app: application.Application[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
@@ -141,15 +141,15 @@ async def _serve(app: service.Application[_GrpcSettings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name="places")
+    entrypoint = application.Entrypoint(name="places")
 
     entrypoint.enter_with_commands(
-        service.Command(
+        application.Command(
             name="generate-cities",
             callback=_generate_cities,
             settings_class=_CitiesSettings,
         ),
-        service.Command(
+        application.Command(
             name="grpc",
             callback=_serve,
             settings_class=_GrpcSettings,

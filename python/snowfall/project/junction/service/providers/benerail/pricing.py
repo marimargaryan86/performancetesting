@@ -4,14 +4,14 @@ import httpx
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.service.providers.benerail import cache, config, consumer
-from snowfall.stdlib import service
 from snowfall.stdlib.persistence.redis import types as redis_types
+from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.amqp import consumer as std_consumer
 from snowfall.stdlib.transport.amqp import producer, types
 from snowfall.vendor.benerail import client
 
 
-async def price_quotes(app: service.Application[config.PriceQuoteSettings]) -> None:
+async def price_quotes(app: application.Application[config.PriceQuoteSettings]) -> None:
     async with contextlib.AsyncExitStack() as stack:
         redis_connection: aioredis.Redis[bytes] = await stack.enter_async_context(
             aioredis.from_url(

@@ -14,14 +14,14 @@ from snowfall.project.junction.plus.service.notification_center import importer,
 from snowfall.project.junction.plus.service.notifications.v1alpha import (
     grpc_pb2_grpc as notifications_pb2_grpc,
 )
-from snowfall.stdlib import service
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.amqp import consumer, types
 from snowfall.stdlib.transport.grpc.client import create_channel
 
 
-class _ImportSettings(service.Settings):
+class _ImportSettings(application.Settings):
     amqp_dsn: pydantic.AnyUrl
     notifications_address: str
     twilio_sid: str
@@ -30,7 +30,7 @@ class _ImportSettings(service.Settings):
     redis_prefix: str
 
 
-async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
+async def _import(app: application.AsyncApplication[_ImportSettings]) -> None:
     http_client = await app.stack.enter_async_context(httpx.AsyncClient())
     connection = await app.stack.enter_async_context(
         types.Connection(
@@ -76,10 +76,10 @@ async def _import(app: service.AsyncApplication[_ImportSettings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = service.Entrypoint(name="notification_center")
+    entrypoint = application.Entrypoint(name="notification_center")
 
     entrypoint.enter_with_commands(
-        service.Command(
+        application.Command(
             name="import",
             callback=_import,
             settings_class=_ImportSettings,

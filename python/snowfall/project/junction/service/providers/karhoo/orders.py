@@ -7,10 +7,10 @@ from redis import asyncio as aioredis
 from snowfall.project.junction.go.service.orders.v1 import amqp_pb2
 from snowfall.project.junction.provider import notifications
 from snowfall.project.junction.service.providers.karhoo import booking, cache, config
-from snowfall.stdlib import service
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer as amqp_producer
 from snowfall.stdlib.transport.amqp import types
@@ -20,7 +20,7 @@ _PROVIDER_NAME = "Karhoo"
 
 
 async def orders(
-    app: service.AsyncApplication[config.OrderSettings],
+    app: application.AsyncApplication[config.OrderSettings],
 ) -> None:
     http_client = await app.stack.enter_async_context(
         httpx.AsyncClient(
