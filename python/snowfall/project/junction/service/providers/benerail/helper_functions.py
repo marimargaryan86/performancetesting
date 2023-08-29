@@ -9,4 +9,4 @@ def last_id_of_url(url: pydantic.AnyUrl) -> str:
     if not url.path:
         raise UrlHasNoIdError
 
-    return url.path.split("/")[-1]
+    return url.path.rsplit("/", 1)[-1]

@@ -1,6 +1,6 @@
-from collections.abc import Mapping
+from collections.abc import Sequence
 
-from snowfall.project.junction.service.providers.benerail import criteria
+from snowfall.project.junction.service.providers.benerail import criteria, helper_models
 from snowfall.stdlib import money, string
 from snowfall.stdlib.persistence.redis.repository import (
     PydanticRepository as RedisRepository,
@@ -12,9 +12,9 @@ class OfferDetails(RedisRecord):
     offer_id: str
     price: str
     currency: money.Currency
-    dialogue_id: str
+    dialogue_info: helper_models.DialogueInfo
+    passengers_info: Sequence[helper_models.PassengerInfo]
     session_token: str | None = None
-    passenger_etags: Mapping[str, str]
     departure_at: str
 
 
@@ -33,7 +33,7 @@ def generate_cache_key(
                 str(search_criteria.origin),
                 str(search_criteria.destination),
                 str(search_criteria.outbound_departure_datetime),
-                *[str(dob) for dob in search_criteria.passenger_dobs],
+                *[str(dob) for dob in sorted(search_criteria.passenger_dobs)],
             ),
         ),
     )

@@ -13,18 +13,19 @@ from snowfall.project.junction.go.service.orders.v1 import models_pb2
 from snowfall.project.junction.go.service.orders.v1 import (
     models_pb2 as order_models_pb2,
 )
-from snowfall.project.junction.service.providers.benerail import cache, helper_functions
+from snowfall.project.junction.service.providers.benerail import cache, helper_models
 from snowfall.project.junction.service.providers.benerail.v1alpha import amqp_pb2
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.transport.amqp import producer
 from snowfall.stdlib.transport.http import errors
 from snowfall.vendor.benerail import client
 from snowfall.vendor.benerail.models import etag
 from snowfall.vendor.benerail.models.bookings import offer, order, payment
 from snowfall.vendor.benerail.models.bookings import response as bookings_response
-from snowfall.vendor.benerail.models.dialogue import dialogue, passenger, response
 from snowfall.vendor.benerail.models.dialogue import enums as dialogue_enums
+from snowfall.vendor.benerail.models.dialogue import passenger
 from snowfall.vendor.benerail.models.products import enums as product_enums
 
 _GENDER_MAP = python_types.MappingProxyType(
@@ -34,6 +35,7 @@ _GENDER_MAP = python_types.MappingProxyType(
         models_pb2.Passenger.Gender.GENDER_UNSPECIFIED: dialogue_enums.Gender.other,
     },
 )
+_WAIT_AFTER_PAYMENT_SECONDS = 15
 
 
 class BookingHandler(object):
@@ -44,6 +46,7 @@ class BookingHandler(object):
     ) -> None:
         self._client = benerail_client
         self._notifications_producer = notifications_producer
+        self._logger = stdout.get_logger()
 
     async def create_booking(  # noqa: WPS210, WPS213, WPS217
         self,
@@ -52,24 +55,23 @@ class BookingHandler(object):
     ) -> order_models_pb2.Booking:
         new_booking = task.booking
         etag_data = etag.EtagData(
-            passenger_etags=dict(offer_details.passenger_etags),
+            passenger_etags={
+                pax_info.identifier: pax_info.etag
+                for pax_info in offer_details.passengers_info
+            },
+            dialogue_etag=offer_details.dialogue_info.etag,
         )
-
-        dialogue_res = await self._client.dialogue.get_dialogue(
-            dialogue_id=offer_details.dialogue_id,
-            session_token=offer_details.session_token,
-        )
-        dialogue_res.set_etags(etag_data)
 
         await self._update_passengers(
-            dialogue_obj=dialogue_res.response_result,
+            dialogue_id=offer_details.dialogue_info.identifier,
             passengers=task.passengers,
             contact_details=task.contact_details,
             etag_data=etag_data,
+            br_passengers_info=offer_details.passengers_info,
         )
 
         booking_res = await self._client.bookings_client.create_booking(
-            dialogue_id=offer_details.dialogue_id,
+            dialogue_id=offer_details.dialogue_info.identifier,
             etag=etag_data.dialogue_etag,
             session_token=offer_details.session_token,
         )
@@ -136,6 +138,7 @@ class BookingHandler(object):
             session_token=offer_details.session_token,
         )
         payment_res.set_etags(etag_data)
+        await asyncio.sleep(_WAIT_AFTER_PAYMENT_SECONDS)
 
         booking_res = await self._get_booking(
             booking_id=booking_res.response_result.identifier,
@@ -143,8 +146,8 @@ class BookingHandler(object):
         )
         booking_res.set_etags(etag_data)
 
-        await self._notifications_producer.publish(
-            msg=amqp_pb2.BookingNotificationTask(
+        await self._notify(
+            amqp_pb2.BookingNotificationTask(
                 journey_id=task.metadata.journey_id,
                 order_id=task.metadata.order_id,
                 booking_id=task.metadata.booking_id,
@@ -161,7 +164,6 @@ class BookingHandler(object):
                     datetime.datetime.now(datetime.UTC),
                 ),
             ),
-            routing_key="benerail.notifications",
         )
 
         new_booking.MergeFrom(
@@ -200,12 +202,6 @@ class BookingHandler(object):
             session_token=session_token,
         )
 
-    @tenacity.retry(
-        stop=tenacity.stop_after_attempt(2),
-        retry=tenacity.retry_if_exception_type(errors.HttpStatusError),
-        wait=tenacity.wait_fixed(5),
-        reraise=True,
-    )
     async def _update_order_state(  # noqa: WPS211
         self,
         booking_id: str,
@@ -214,52 +210,56 @@ class BookingHandler(object):
         body: order.OrderIdBody,
         session_token: str | None = None,
     ) -> bookings_response.GetOrderResponse:
+        try:
+            return await self._client.orders_client.update_order_state(
+                booking_id=booking_id,
+                order_id=order_id,
+                etag=order_etag,
+                body=body,
+                session_token=session_token,
+            )
+        except errors.HttpStatusError as err:
+            self._logger.info("Failed to update order state", error=str(err))
+
+        await asyncio.sleep(5)
+
+        order_res = await self._client.orders_client.get_order(booking_id, order_id)
+
         return await self._client.orders_client.update_order_state(
             booking_id=booking_id,
             order_id=order_id,
-            etag=order_etag,
+            etag=order_res.order_etag,
             body=body,
             session_token=session_token,
         )
 
-    async def _update_passengers(  # noqa: WPS210
+    async def _update_passengers(  # noqa: WPS210,WPS211
         self,
-        dialogue_obj: dialogue.Dialogue,
+        dialogue_id: str,
         passengers: Sequence[models_pb2.Passenger],
+        br_passengers_info: Sequence[helper_models.PassengerInfo],
         contact_details: models_pb2.ContactDetails,
         etag_data: etag.EtagData,
     ) -> None:
-        passenger_ids = (
-            helper_functions.last_id_of_url(pax_link.href)
-            for pax_link in dialogue_obj.passengers or []
-        )
-        br_pax_responses: Sequence[response.GetPassengerResponse] = (
-            await asyncio.gather(
-                *(
-                    self._client.passengers_client.get_passenger(
-                        dialogue_id=dialogue_obj.identifier,
-                        passenger_id=passenger_id,
-                    )
-                    for passenger_id in passenger_ids
-                ),
+        br_pax_ids_sorted = (
+            pax_info.identifier
+            for pax_info in sorted(
+                br_passengers_info,
+                key=lambda pax_info: pax_info.date_of_birth,
             )
-        )
-        br_passengers_sorted: Sequence[passenger.Passenger] = sorted(
-            (br_pax_response.response_result for br_pax_response in br_pax_responses),
-            key=lambda pax: pax.date_of_birth,  # type: ignore[return-value, arg-type]
         )
         passengers_sorted: Sequence[models_pb2.Passenger] = sorted(
             passengers,
             key=lambda pax: protobuf.protobuf_to_date(pax.date_of_birth),
         )
         number = phonenumbers.parse(contact_details.phone.e164_number)
-        passengers_zip = zip(br_passengers_sorted, passengers_sorted, strict=True)
+        passengers_zip = zip(br_pax_ids_sorted, passengers_sorted, strict=True)
 
-        for br_pax, order_pax in passengers_zip:
+        for br_pax_id, order_pax in passengers_zip:
             res = await self._client.passengers_client.update_passenger(
-                dialogue_id=dialogue_obj.identifier,
-                passenger_id=br_pax.identifier,
-                etag=etag_data.passenger_etags[br_pax.identifier],
+                dialogue_id=dialogue_id,
+                passenger_id=br_pax_id,
+                etag=etag_data.passenger_etags[br_pax_id],
                 body=passenger.PassengerRequest(
                     gender=_GENDER_MAP[order_pax.gender],
                     details=passenger.PassengerDetail(
@@ -275,6 +275,12 @@ class BookingHandler(object):
                 ),
             )
             res.set_etags(etag_data)
+
+    async def _notify(self, msg: amqp_pb2.BookingNotificationTask) -> None:
+        await self._notifications_producer.publish(
+            msg=msg,
+            routing_key="benerail.notifications",
+        )
 
 
 def _get_title(title_enum_value: models_pb2.Passenger.Title.ValueType) -> str | None:

@@ -23,7 +23,7 @@ class TripsClient(base.BenerailBaseClient):
 
         return trip_response.GetTripCollectionResponse(**response.json())
 
-    async def get_trip_info(
+    async def get_trip(
         self,
         trip_id: str,
         session_token: str | None = None,

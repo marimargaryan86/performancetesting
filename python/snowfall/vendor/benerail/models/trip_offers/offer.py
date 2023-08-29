@@ -18,7 +18,7 @@ class Offer(BenerailBaseModel):
     identifier: str = Field(..., alias="id")
     offer_parts: list[OfferPartResourceLink]
     price: Price
-    flexibility: Flexibility | None = None
+    flexibility: Flexibility
     comfort_class: ComfortClass | None = None
     trip: TripResourceLink
     passengers: list[PassengerResourceLink]

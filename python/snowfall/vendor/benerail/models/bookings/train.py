@@ -54,8 +54,8 @@ class Flexibility(BenerailBaseModel):
         None,
         example="https://api.example.com/places/urn:bnds:railteam_flexibility:FF",
     )
-    flexibility_value: ConstrainedStr | None = Field(
-        None,
+    flexibility_value: ConstrainedStr = Field(
+        ...,
         example="urn:bnds:railteam_flexibility:FF",
         alias="value",
         regex="^urn:[a-z]*:railteam_flexibility:[A-Z]*$",
