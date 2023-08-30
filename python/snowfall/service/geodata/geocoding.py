@@ -18,6 +18,13 @@ class Geocoder(object):
         user_agent: str,
     ):
         self._records = shp_file.shapeRecords()
+        self._shapes = [
+            {
+                "shape": geometry.shape(shape_record.shape),
+                "alpha_3": shape_record.record["ISO_SOV1"],
+            }
+            for shape_record in self._records
+        ]
         self._tz_finder = timezonefinder.TimezoneFinder()
         self._user_agent = user_agent
         self._country_lookup_funcs: list[_LookupFunc] = [
@@ -67,12 +74,10 @@ class Geocoder(object):
         longitude: float,
     ) -> str | None:
         # Iterate over copy of list, as we modify on found country.
-        for ind, shape_record in enumerate(self._records[:]):
-            shape = geometry.shape(shape_record.shape)
-
-            if geometry.Point(longitude, latitude).within(shape):
+        for ind, shape_record in enumerate(self._shapes[:]):
+            if geometry.Point(longitude, latitude).within(shape_record["shape"]):
                 country = countries.get(
-                    alpha_3=shape_record.record["ISO_SOV1"],
+                    alpha_3=shape_record["alpha_3"],
                 )
 
                 if not country:
@@ -82,8 +87,7 @@ class Geocoder(object):
                 # for several requests in a row. Therefore, move the found record to
                 # the front so it is checked first in subsequent requests.
                 if ind > 0:
-                    self._records.remove(shape_record)
-                    self._records.insert(0, shape_record)
+                    self._records.insert(0, self._records.pop(ind))
 
                 return country.alpha_2
 
