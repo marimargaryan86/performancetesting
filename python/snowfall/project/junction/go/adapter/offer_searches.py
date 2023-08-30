@@ -23,6 +23,13 @@ class Client(abc.ABC):
         """Create an offer search."""
 
     @abc.abstractmethod
+    async def create_get_id(
+        self,
+        request: models_pb2.OfferSearch,
+    ) -> str:
+        """Create an offer search, return only ID."""
+
+    @abc.abstractmethod
     async def get(self, identifier: str) -> models_pb2.OfferSearch:
         """Get an offer search."""
 
@@ -52,6 +59,12 @@ class DictClient(Client):
         self._searches[offer_search.id] = offer_search
 
         return offer_search
+
+    async def create_get_id(
+        self,
+        request: models_pb2.OfferSearch,
+    ) -> str:
+        return (await self.create(request)).id
 
     async def get(self, identifier: str) -> models_pb2.OfferSearch:
         try:
@@ -90,6 +103,21 @@ class GrpcClient(Client):
         )
 
         return response.search
+
+    async def create_get_id(
+        self,
+        request: models_pb2.OfferSearch,
+    ) -> str:
+        response = await errors.handle_grpc_errors(
+            self._offer_searches.EnqueueOfferSearchGetId(
+                grpc_pb2.EnqueueOfferSearchRequest(
+                    search=request,
+                ),
+                timeout=self._timeout,
+            ),
+        )
+
+        return response.offer_search_id
 
     async def get(self, offer_search_id: str) -> models_pb2.OfferSearch:
         response = await errors.handle_grpc_errors(

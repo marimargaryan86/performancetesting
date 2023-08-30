@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 from collections.abc import Sequence
-from typing import Generic, TypeVar
+from typing import Any, Generic, TypeVar
 
 import pymongo
 
@@ -75,10 +75,12 @@ class InsertManyMixin(Generic[Record]):
     async def insert_many(
         self: repository.RepositoryProtocol[Record],
         documents: Sequence[Record],
+        **kwargs: Any,
     ) -> Sequence[Record]:
         inserts = await self._execute(
             self._collection.insert_many,
             [self._coder.encode(document) for document in documents],
+            **kwargs,
         )
 
         if not inserts.acknowledged:

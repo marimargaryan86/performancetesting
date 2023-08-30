@@ -38,6 +38,20 @@ class OfferSearchService(service.Service, grpc_pb2_grpc.OfferSearchServiceServic
 
         return grpc_pb2.EnqueueOfferSearchResponse(search=offer_search)
 
+    async def EnqueueOfferSearchGetId(  # type: ignore[override] # noqa: N802
+        self,
+        request: grpc_pb2.EnqueueOfferSearchGetIdRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.EnqueueOfferSearchGetIdResponse:
+        return grpc_pb2.EnqueueOfferSearchGetIdResponse(
+            offer_search_id=(
+                await self.EnqueueOfferSearch(
+                    request=grpc_pb2.EnqueueOfferSearchRequest(search=request.search),
+                    context=context,
+                )
+            ).search.id,
+        )
+
     async def GetOfferSearch(  # type: ignore[override] # noqa: N802
         self,
         request: grpc_pb2.GetOfferSearchRequest,

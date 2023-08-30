@@ -1,5 +1,6 @@
 import datetime
 from collections.abc import Sequence
+from typing import Any
 
 import pymongo
 
@@ -21,11 +22,12 @@ class RatesRepository(  # noqa: WPS215
     async def insert_many(
         self,
         documents: Sequence[models_pb2.Rate],
+        **kwargs: Any,
     ) -> Sequence[models_pb2.Rate]:
         for document in documents:
             document.id = string.uuid()
 
-        return await super().insert_many(documents)
+        return await super().insert_many(documents, **kwargs)
 
     async def find_outdated_rates(self) -> resultset.ResultSet[models_pb2.Rate]:
         date_threshold = datetime.datetime.now(tz=datetime.UTC) - datetime.timedelta(
@@ -62,11 +64,12 @@ class BackUpRatesRepository(
     async def insert_many(
         self,
         documents: Sequence[models_pb2.BackUpRate],
+        **kwargs: Any,
     ) -> Sequence[models_pb2.BackUpRate]:
         for document in documents:
             document.id = string.uuid()
 
-        return await super().insert_many(documents)
+        return await super().insert_many(documents, **kwargs)
 
     async def find_by_currency_pair(
         self,

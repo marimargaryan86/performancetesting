@@ -9,6 +9,7 @@ option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/
 
 service OfferSearchService {
   rpc EnqueueOfferSearch(EnqueueOfferSearchRequest) returns (EnqueueOfferSearchResponse) {}
+  rpc EnqueueOfferSearchGetId(EnqueueOfferSearchGetIdRequest) returns (EnqueueOfferSearchGetIdResponse) {} // @todo: remove once FieldMasks are implemented
   rpc GetOfferSearch(GetOfferSearchRequest) returns (GetOfferSearchResponse) {}
   rpc ListOfferSearches(ListOfferSearchesRequest) returns (ListOfferSearchesResponse) {}
 }
@@ -35,8 +36,16 @@ message EnqueueOfferSearchRequest {
   OfferSearch search = 1;
 }
 
+message EnqueueOfferSearchGetIdRequest {
+  OfferSearch search = 1;
+}
+
 message EnqueueOfferSearchResponse {
   OfferSearch search = 1;
+}
+
+message EnqueueOfferSearchGetIdResponse {
+  string offer_search_id = 1;
 }
 
 message GetOfferSearchRequest {

@@ -9,11 +9,17 @@ from typing import Self
 
 import more_itertools
 
+from snowfall.project.junction.go.adapter import legs as legs_adapter
 from snowfall.project.junction.go.service.planner.v1 import (
     planner_pb2,
     planner_pb2_grpc,
 )
-from snowfall.project.junction.go.service.trips import filters, orchestrator, trips
+from snowfall.project.junction.go.service.trips import (
+    cache,
+    filters,
+    orchestrator,
+    trips,
+)
 from snowfall.project.junction.go.service.trips.v1alpha import amqp_pb2, trips_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
@@ -128,23 +134,29 @@ class TripCandidateSearchConsumer(object):
         self,
         consumer_obj: consumer.Consumer[amqp_pb2.TripCandidateSearchTask],
         trip_repository: trips.TripRepository,
+        leg_cache_repository: cache.LegCacheRepository,
+        trip_metadata_repository: cache.TripMetadataRepository,
         trip_candidate_search_repository: trips.TripCandidateSearchRepository,
         trip_orchestrator: orchestrator.TripOrchestrator,
         offer_orchestrator: orchestrator.OfferOrchestrator,
+        leg_adapter: legs_adapter.GrpcClient,
         max_trip_length_factor: float | None = None,
     ):
         self._consumer = consumer_obj
         self._trip_repository = trip_repository
+        self._leg_cache_repository = leg_cache_repository
+        self._trip_metadata_repository = trip_metadata_repository
         self._trip_candidate_search_repository = trip_candidate_search_repository
         self._trip_orchestrator = trip_orchestrator
         self._offer_orchestrator = offer_orchestrator
         self._max_trip_length_factor = max_trip_length_factor
+        self._leg_adapter = leg_adapter
         self._logger = stdout.get_logger()
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
 
-    async def _process_message(
+    async def _process_message(  # noqa: WPS217
         self,
         message: types.Message[amqp_pb2.TripCandidateSearchTask],
     ) -> None:
@@ -168,34 +180,43 @@ class TripCandidateSearchConsumer(object):
             list(itertools.chain(*reference_groups)),
         )
 
-        journey_candidates = (
-            await self._trip_orchestrator.get_journeys_from_reference_groups(
-                trip_reference_groups=reference_groups,
-            )
+        await self._leg_cache_repository.fetch_many(
+            ids=[  # noqa: WPS224
+                leg_id
+                for reference_group in reference_groups
+                for reference in reference_group
+                for segment in reference.segments
+                for leg_id in segment.leg_ids
+            ],
+            legs_adapter=self._leg_adapter,
         )
 
         if self._max_trip_length_factor:
-            journey_candidates = filters.filter_include_multimodal(
-                journey_candidates=journey_candidates,
-                max_trip_length_factor=self._max_trip_length_factor,
-            )
+            for idx, _group in enumerate(reference_groups[:]):
+                reference_groups[idx] = await filters.filter_trip_references(
+                    trip_references=reference_groups[idx],
+                    trip_metadata_repository=self._trip_metadata_repository,
+                    max_trip_length_factor=self._max_trip_length_factor,
+                )
 
         await self._create_and_save_offer_searches(
             trip_candidate_search=body.trip_candidate_search,
-            trip_groups=journey_candidates.trip_groups,
+            trip_reference_groups=reference_groups,
         )
 
     async def _create_and_save_offer_searches(
         self,
         trip_candidate_search: trips_pb2.TripCandidateSearch,
-        trip_groups: Sequence[orchestrator.TripGroup],
+        trip_reference_groups: Sequence[orchestrator.TripReferenceGroup],
     ) -> None:
-        offer_searches = await self._offer_orchestrator.offer_searches_from_trip_groups(
-            trip_groups=trip_groups,
-            trip_candidate_search=trip_candidate_search,
+        offer_search_ids = (
+            await self._offer_orchestrator.offer_search_ids_from_trip_groups(
+                trip_reference_groups=trip_reference_groups,
+                trip_candidate_search=trip_candidate_search,
+            )
         )
 
         await self._trip_candidate_search_repository.add_offer_search_ids(
             trip_candidate_search_id=trip_candidate_search.id,
-            offer_search_ids=[search.id for search in offer_searches],
+            offer_search_ids=offer_search_ids,
         )

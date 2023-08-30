@@ -153,3 +153,9 @@ message ListTripCandidatesResponse {
   string next_page_token = 1;
   repeated snowfall.project.junction.go.service.offers.v1.OfferAggregate offers = 2;
 }
+
+message LegCache {
+  string id = 1;
+  snowfall.project.junction.go.v1.Leg leg = 2;
+  google.protobuf.Timestamp expires_at = 3 [(snowfall.stdlib.v1.read_only) = true];
+}

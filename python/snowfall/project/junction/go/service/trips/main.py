@@ -5,6 +5,7 @@ from collections.abc import Sequence
 
 from motor import motor_asyncio
 from pydantic import AnyUrl
+from redis import asyncio as aioredis
 
 from snowfall.project.junction.go.adapter import legs, offer_searches, offers
 from snowfall.project.junction.go.service.offers.v1 import (
@@ -12,7 +13,7 @@ from snowfall.project.junction.go.service.offers.v1 import (
 )
 from snowfall.project.junction.go.service.planner.v1 import planner_pb2_grpc
 from snowfall.project.junction.go.service.schedules.v1alpha import schedules_pb2_grpc
-from snowfall.project.junction.go.service.trips import orchestrator, trips
+from snowfall.project.junction.go.service.trips import cache, orchestrator, trips
 from snowfall.project.junction.go.service.trips.consumer import (
     TripCandidateSearchConsumer,
     TripSearchConsumer,
@@ -23,6 +24,7 @@ from snowfall.project.junction.go.service.trips.grpc import (
     TripSearchService,
     TripService,
 )
+from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.stdlib.transport.grpc import server
@@ -41,11 +43,12 @@ class _ConsumeSettings(application.Settings):
 
 class _ConsumeTripCandidateSearchSettings(application.Settings):
     amqp_dsn: AnyUrl
+    redis_dsn: AnyUrl
     planner_address: str
     offers_address: str
     schedules_address: str
     mongo_dsn: Sequence[AnyUrl]
-    max_trip_length_factor: int | float | None = None
+    max_trip_length_factor: float | int | None = None
     trip_candidate_search_ttl: datetime.timedelta = _DEFAULT_TTL
 
 
@@ -85,10 +88,20 @@ async def _consume(app: application.Application[_ConsumeSettings]) -> None:
 
 
 async def _consume_trip_candidate_search_tasks(
-    app: application.Application[_ConsumeTripCandidateSearchSettings],
+    app: application.AsyncApplication[_ConsumeTripCandidateSearchSettings],
 ) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
+    )
+    redis_connection = await app.stack.enter_async_context(
+        aioredis.from_url(
+            str(app.settings.redis_dsn),
+            decode_responses=False,
+        ).client(),
+    )
+    client = redis.Client[bytes](
+        redis_connection,
+        prefix=app.name,
     )
     offers_channel = create_channel(app.settings.offers_address)
     schedules_channel = create_channel(app.settings.schedules_address)
@@ -97,6 +110,9 @@ async def _consume_trip_candidate_search_tasks(
     )
     trips_db = mongo[_TRIPS]
     trip_repository = trips.TripRepository(trips_db[_TRIPS])
+    leg_cache_repo = cache.LegCacheRepository(
+        trips_db["leg_cache"],
+    )
 
     async with types.Connection(str(app.settings.amqp_dsn)) as connection:
         consumer_obj = TripCandidateSearchConsumer(
@@ -110,19 +126,24 @@ async def _consume_trip_candidate_search_tasks(
                 app.settings.trip_candidate_search_ttl,
             ),
             trip_repository=trip_repository,
+            leg_cache_repository=leg_cache_repo,
             trip_orchestrator=orchestrator.TripOrchestrator(
                 planner=planner,
-                trip_repository=trip_repository,
-                legs_adapter=legs.GrpcClient(
-                    schedules_pb2_grpc.ScheduleServiceStub(schedules_channel),
-                ),
+            ),
+            leg_adapter=legs.GrpcClient(
+                schedules_pb2_grpc.ScheduleServiceStub(schedules_channel),
             ),
             offer_orchestrator=orchestrator.OfferOrchestrator(
                 offer_search_adapter=offer_searches.GrpcClient(
                     offers_grpc_pb2_grpc.OfferSearchServiceStub(offers_channel),
                 ),
+                leg_cache_repository=leg_cache_repo,
             ),
             max_trip_length_factor=app.settings.max_trip_length_factor,
+            trip_metadata_repository=cache.TripMetadataRepository(
+                client=client,
+                leg_cache_repository=leg_cache_repo,
+            ),
         )
 
         await consumer_obj.consume()

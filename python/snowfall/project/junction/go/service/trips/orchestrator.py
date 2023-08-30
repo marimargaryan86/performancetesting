@@ -2,12 +2,12 @@ import asyncio
 import datetime
 import itertools
 import zoneinfo
-from collections.abc import Mapping, Sequence
+from collections.abc import Sequence
 from typing import NamedTuple
 
 import timezonefinder
 
-from snowfall.project.junction.go.adapter import legs, offer_searches
+from snowfall.project.junction.go.adapter import offer_searches
 from snowfall.project.junction.go.service.offers.v1 import (
     models_pb2 as offer_models_pb2,
 )
@@ -15,7 +15,7 @@ from snowfall.project.junction.go.service.planner.v1 import (
     planner_pb2,
     planner_pb2_grpc,
 )
-from snowfall.project.junction.go.service.trips import trips
+from snowfall.project.junction.go.service.trips import cache
 from snowfall.project.junction.go.service.trips.v1alpha import trips_pb2
 from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.stdlib import string
@@ -30,14 +30,7 @@ TripGroup = list[models_pb2.Trip]
 
 
 class JourneyCandidates(NamedTuple):
-    trip_groups: list[TripGroup]
-
-
-def _sort_keys(segment: models_pb2.Segment) -> tuple[int, int]:
-    return (
-        segment.legs[0].departure_at.seconds,
-        segment.legs[0].departure_at.nanos,
-    )
+    trip_groups: list[TripReferenceGroup]
 
 
 class CantFulfillFullTripError(Exception):
@@ -48,12 +41,8 @@ class TripOrchestrator(object):
     def __init__(
         self,
         planner: planner_pb2_grpc.PlannerServiceStub,
-        trip_repository: trips.TripRepository,
-        legs_adapter: legs.GrpcClient,
     ):
         self._planner = planner
-        self._trip_repository = trip_repository
-        self._legs_adapter = legs_adapter
         self._logger = stdout.get_logger()
 
     async def get_trip_reference_groups(
@@ -65,72 +54,15 @@ class TripOrchestrator(object):
             criteria=criteria,
             allowed_segment_types=allowed_segment_types,
         )
-        trip_groups = []
+        trip_reference_groups = []
 
         for response in journey_search_responses:
             if isinstance(response, Exception) or not response.trips:
                 raise CantFulfillFullTripError()
 
-            trip_groups.append(list(response.trips))
+            trip_reference_groups.append(list(response.trips))
 
-        return trip_groups
-
-    async def get_journeys_from_reference_groups(
-        self,
-        trip_reference_groups: Sequence[TripReferenceGroup],
-    ) -> JourneyCandidates:
-        trip_reference_map = {
-            trip.id: trip
-            async for trip in await self._trip_repository.find(
-                ids=[
-                    reference.id
-                    for reference in itertools.chain(*trip_reference_groups)
-                ],
-                cursor="",
-            )
-        }
-        legs_map = await self._make_legs_map(trip_reference_map)
-
-        return JourneyCandidates(
-            trip_groups=[
-                [
-                    models_pb2.Trip(
-                        id=reference.id,
-                        segments=sorted(
-                            [
-                                models_pb2.Segment(
-                                    id=segment.id,
-                                    legs=[
-                                        legs_map[leg_id] for leg_id in segment.leg_ids
-                                    ],
-                                )
-                                for segment in trip_reference_map[reference.id].segments
-                            ],
-                            key=_sort_keys,
-                        ),
-                    )
-                    for reference in reference_group
-                ]
-                for reference_group in trip_reference_groups
-            ],
-        )
-
-    async def _make_legs_map(
-        self,
-        trips_map: Mapping[str, models_pb2.TripReference],
-    ) -> dict[str, models_pb2.Leg]:
-        segments = [segment for trip in trips_map.values() for segment in trip.segments]
-        leg_ids = {leg_id for segment in segments for leg_id in segment.leg_ids}
-
-        return {
-            leg.id: leg
-            for leg in (
-                await self._legs_adapter.find_by_ids(
-                    list(leg_ids),
-                    limit=len(leg_ids),
-                )
-            ).legs
-        }
+        return trip_reference_groups
 
     async def _get_journey_search_responses(
         self,
@@ -186,45 +118,50 @@ _OFFER_SEARCH_LIMIT = 50
 
 
 class OfferOrchestrator(object):
-    def __init__(self, offer_search_adapter: offer_searches.Client) -> None:
+    def __init__(
+        self,
+        offer_search_adapter: offer_searches.Client,
+        leg_cache_repository: cache.LegCacheRepository,
+    ) -> None:
         self._offer_search_adapter = offer_search_adapter
+        self._leg_cache_repo = leg_cache_repository
         self._logger = stdout.get_logger()
         self._semaphore = asyncio.Semaphore(_OFFER_SEARCH_LIMIT)
 
-    async def offer_searches_from_trip_groups(
+    async def offer_search_ids_from_trip_groups(
         self,
-        trip_groups: Sequence[TripGroup],
+        trip_reference_groups: Sequence[TripReferenceGroup],
         trip_candidate_search: trips_pb2.TripCandidateSearch,
-    ) -> list[offer_models_pb2.OfferSearch]:
+    ) -> list[str]:
         coros = (
-            self._create_offer_search(trip_combination, trip_candidate_search)
-            for trip_combination in itertools.product(*trip_groups)
+            self._create_offer_search(trip_reference_combination, trip_candidate_search)
+            for trip_reference_combination in itertools.product(*trip_reference_groups)
         )
 
-        searches = await asyncio.gather(*coros, return_exceptions=True)
+        search_ids = await asyncio.gather(*coros, return_exceptions=True)
 
-        offer_search_objects = []
+        offer_search_ids = []
 
-        for search in searches:
-            if isinstance(search, Exception):
+        for search_id in search_ids:
+            if isinstance(search_id, Exception):
                 self._logger.exception(
                     "Failed to create an offer search",
-                    exception=search,
+                    exception=search_id,
                 )
 
                 continue
 
-            offer_search_objects.append(search)
+            offer_search_ids.append(search_id)
 
-        return offer_search_objects
+        return offer_search_ids
 
     async def _create_offer_search(
         self,
-        trip_combination: Sequence[models_pb2.Trip],
+        trip_reference_combination: Sequence[models_pb2.TripReference],
         trip_candidate_search: trips_pb2.TripCandidateSearch,
-    ) -> offer_models_pb2.OfferSearch:
+    ) -> str:
         async with self._semaphore:
-            return await self._offer_search_adapter.create(
+            return await self._offer_search_adapter.create_get_id(
                 request=offer_models_pb2.OfferSearch(
                     id=string.uuid(),
                     reseller_id=trip_candidate_search.reseller_id,
@@ -236,9 +173,40 @@ class OfferOrchestrator(object):
                     ),
                     trip=offer_models_pb2.TripOfferSearch(
                         passengers=trip_candidate_search.passengers,
-                        trips=trip_combination,
+                        trips=await self._trips_from_trip_references(
+                            trip_reference_combination,
+                        ),
                         reseller_id=trip_candidate_search.reseller_id,
                     ),
                     session_token=trip_candidate_search.session_token,
                 ),
             )
+
+    async def _trips_from_trip_references(
+        self,
+        trip_references: Sequence[models_pb2.TripReference],
+    ) -> list[models_pb2.Trip]:
+        leg_ids = [  # noqa: WPS224
+            leg_id
+            for trip_reference in trip_references
+            for segment in trip_reference.segments
+            for leg_id in segment.leg_ids
+        ]
+        leg_map = {
+            leg_cache_obj.id: leg_cache_obj.leg
+            async for leg_cache_obj in await self._leg_cache_repo.find(leg_ids)
+        }
+
+        return [
+            models_pb2.Trip(
+                id=trip_reference.id,
+                segments=[
+                    models_pb2.Segment(
+                        id=segment_ref.id,
+                        legs=[leg_map[leg_id] for leg_id in segment_ref.leg_ids],
+                    )
+                    for segment_ref in trip_reference.segments
+                ],
+            )
+            for trip_reference in trip_references
+        ]
