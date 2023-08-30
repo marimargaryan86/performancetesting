@@ -99,7 +99,11 @@ class JsonApiResponse(responses.Response):
         background: starlette_background.BackgroundTask | None = None,
     ) -> None:
         super().__init__(
-            content=body,
+            content=body.model_dump_json(
+                exclude_unset=True,
+                by_alias=True,
+                indent=None,
+            ),
             status_code=int(status_code),
             headers=dict(headers or {}),
             background=background,
@@ -127,10 +131,3 @@ class JsonApiResponse(responses.Response):
             body=Body(errors=errors),
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
-
-    def render(self, body: Body) -> bytes:
-        return body.model_dump_json(
-            exclude_unset=True,
-            by_alias=True,
-            indent=None,
-        ).encode("utf-8")
