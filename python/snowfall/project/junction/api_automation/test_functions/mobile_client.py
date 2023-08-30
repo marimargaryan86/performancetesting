@@ -121,9 +121,13 @@ class MobileApiClient(Client):  # noqa: WPS214
 
     async def create_offer_price_quote(
         self,
-        option_id: str,
         offer_id: str,
+        option_ids: Sequence[str],
     ) -> dict[str, Any]:
+        options_data = [
+            {"id": option_id, "type": "offer-options"} for option_id in option_ids
+        ]
+
         body = {
             _DATA_KEY: {
                 _TYPE_KEY: "trip-offer-price-quotes",
@@ -136,12 +140,7 @@ class MobileApiClient(Client):  # noqa: WPS214
                         },
                     },
                     "options": {
-                        _DATA_KEY: [
-                            {
-                                _ID_KEY: option_id,
-                                _TYPE_KEY: "offer-options",
-                            },
-                        ],
+                        _DATA_KEY: options_data,
                     },
                 },
             },

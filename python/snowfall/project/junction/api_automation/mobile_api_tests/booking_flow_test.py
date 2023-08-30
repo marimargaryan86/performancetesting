@@ -107,39 +107,41 @@ async def create_offer_lists(  # noqa: WPS210
         response = await mobile_client.list_offers_by_offer_search(
             trip_offer_searches,
         )
-
+        option_ids = []
         if response["data"]:
             offer = response["data"][0]
-            group = offer["relationships"]["groups"]["data"][0]
-            included_data = response["included"]
-            group_index = next(
-                (
-                    index
-                    for index, opt_data in enumerate(included_data)
-                    if "id" in opt_data and opt_data["id"] == group["id"]
-                ),
-                None,
-            )
-            options = response["included"][group_index]["relationships"]["options"]
-            options_data = options["data"][0]
-            offer_list.append(
-                {
-                    "offer_id": offer["id"],
-                    "groups_id": group["id"],
-                    "options_id": options_data["id"],
-                },
-            )
+            groups = offer["relationships"]["groups"]["data"]
+            for group in groups:
+                included_data = response["included"]
+                group_index = next(
+                    (
+                        index
+                        for index, opt_data in enumerate(included_data)
+                        if "id" in opt_data and opt_data["id"] == group["id"]
+                    ),
+                    None,
+                )
+                options = response["included"][group_index]["relationships"]["options"]
+                option_id = options["data"][0]["id"]
+                option_ids.append(option_id)
+                offer_list.append(
+                    {
+                        "offer_id": offer["id"],
+                        "groups_id": group["id"],
+                        "options_id": option_ids,
+                    },
+                )
     return offer_list
 
 
 async def create_quote(  # noqa: WPS210
     mobile_client: MobileApiClient,
     offer_id: str,
-    option_id: str,
+    option_ids: Sequence[str],
 ) -> str:
     quote = await mobile_client.create_offer_price_quote(
         offer_id=offer_id,
-        option_id=option_id,
+        option_ids=option_ids,
     )
     return quote["data"]["id"]
 
@@ -206,6 +208,11 @@ iata_codes = [
     ("funchal", "lisbon"),
     ("chicago", "groningen"),
 ]
+wait_times = {
+    "Ask2Go": 5,
+    "Duffel": 5,
+    "Multi-modal": 20,
+}
 ids = [
     "Ask2Go",
     "Duffel",
@@ -214,11 +221,19 @@ ids = [
 
 
 @pytest.mark.integration()
-@pytest.mark.parametrize("iata_codes", iata_codes, ids=ids)
+@pytest.mark.parametrize(
+    ("iata_codes", "wait_times"),
+    [
+        (iata_code, wait_times[id_value])
+        for iata_code, id_value in zip(iata_codes, ids, strict=False)
+    ],
+    ids=ids,
+)
 async def test_booking_flow(  # noqa: WPS217, WPS210
     mobile_client: MobileApiClient,
     departure_after: datetime.datetime,
     iata_codes: str,
+    wait_times: int,
 ) -> None:
     origin, destination = await get_place_id(mobile_client, iata_codes)
 
@@ -228,9 +243,10 @@ async def test_booking_flow(  # noqa: WPS217, WPS210
         origin,
         destination,
     )
-    await asyncio.sleep(5)
+    await asyncio.sleep(wait_times)
     trips_list = await get_trips_list(mobile_client, create_trip_search_id)
     assert trips_list, "no trips found"
+    await asyncio.sleep(wait_times)
     offer_list = await create_offer_lists(mobile_client, trips_list)
     assert offer_list, "no offers"
     keys_to_check = ["offer_id", "groups_id", "options_id"]
@@ -239,19 +255,28 @@ async def test_booking_flow(  # noqa: WPS217, WPS210
     ), "no offers found"
     offer_id = offer_list[0]["offer_id"]
     option_id = offer_list[0]["options_id"]
-    await asyncio.sleep(5)
+    await asyncio.sleep(wait_times)
     quotes = await create_quote(mobile_client, offer_id, option_id)
     assert quotes, "no quotes for offer"
+    await asyncio.sleep(wait_times)
     get_quote_id = await get_quote(mobile_client, quotes)
     assert get_quote_id
 
 
 @pytest.mark.smoke()
-@pytest.mark.parametrize("iata_codes", iata_codes, ids=ids)
+@pytest.mark.parametrize(
+    ("iata_codes", "wait_times"),
+    [
+        (iata_code, wait_times[id_value])
+        for iata_code, id_value in zip(iata_codes, ids, strict=False)
+    ],
+    ids=ids,
+)
 async def test_booking_flow_smoke(  # noqa: WPS217, WPS210
     mobile_client: MobileApiClient,
     departure_after: datetime.datetime,
     iata_codes: str,
+    wait_times: int,
 ) -> None:
     origin, destination = await get_place_id(mobile_client, iata_codes)
     create_trip_search_id = await create_trip_search(
@@ -260,7 +285,7 @@ async def test_booking_flow_smoke(  # noqa: WPS217, WPS210
         origin,
         destination,
     )
-    await asyncio.sleep(5)
+    await asyncio.sleep(wait_times)
     trips_list = await get_trips_list(mobile_client, create_trip_search_id)
     assert trips_list, "no trips found"
     offer_list = await create_offer_lists(mobile_client, trips_list)

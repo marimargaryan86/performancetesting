@@ -181,13 +181,14 @@ def add_allure_environment_property(  # noqa: WPS210
     yield maker
 
     allure_dir = request.config.getoption(ALLUREDIR_OPTION)
-    if not allure_dir or not allure_dir.is_dir():
+    allure_dir_path = Path(allure_dir)
+    if not allure_dir_path.is_dir():
         return
 
     if not environment_properties:
         return
 
-    allure_env_file = allure_dir / ALLURE_ENVIRONMENT_PROPERTIES_FILE
+    allure_env_file = allure_dir_path / ALLURE_ENVIRONMENT_PROPERTIES_FILE
     file_data = "\n".join(
         [
             "{0}={1}".format(env_variable, env_value)
