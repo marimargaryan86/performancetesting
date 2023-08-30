@@ -28,7 +28,7 @@ async def _serve(app: application.AsyncApplication[_GrpcSettings]) -> None:
     mongo_db = await mongo_factory.make_database(app, app.settings.mongo_dsn)
     ory_client = client.OryClient(
         base_url=str(app.settings.ory_application_url),
-        auth=stdlib_auth.TokenAuth(token=str(app.settings.ory_api_key)),
+        auth=stdlib_auth.TokenAuth(token=app.settings.ory_api_key.get_secret_value()),
     )
 
     grpc_server = server.create_server(
@@ -43,7 +43,7 @@ async def _serve(app: application.AsyncApplication[_GrpcSettings]) -> None:
                     ttl=app.settings.jwt_ttl,
                 ),
                 jwt_encoder=jwt.Encoder(
-                    private_key=str(app.settings.jwt_private_key),
+                    private_key=app.settings.jwt_private_key.get_secret_value(),
                     algorithm="RS256",
                 ),
             ),
