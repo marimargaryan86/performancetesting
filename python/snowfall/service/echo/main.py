@@ -1,23 +1,23 @@
 import ipaddress
 
+import pydantic
 from grpc import aio
-from pydantic import AnyUrl
 
 from snowfall.service.echo.v1 import echo_pb2, echo_pb2_grpc
 from snowfall.stdlib.logging import stdout
-from snowfall.stdlib.service import application
+from snowfall.stdlib.service import amqp_factory, application
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.stdlib.transport.grpc import server as grpc_server
 from snowfall.stdlib.transport.grpc import service as grpc_service
 
 
 class _AmqpSettings(application.Settings):
-    amqp_dsn: AnyUrl
+    amqp_dsn: pydantic.AmqpDsn
 
 
 class _GrpcSettings(application.Settings):
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
-    grpc_port: int = 50051
+    grpc_port: application.NetworkPort = 50051
 
 
 class _EchoService(grpc_service.Service, echo_pb2_grpc.EchoServiceServicer):
@@ -48,30 +48,31 @@ async def _grpc(app: application.Application[_GrpcSettings]) -> None:
         await running.wait_for_termination()
 
 
-async def _produce(app: application.Application[_AmqpSettings]) -> None:
-    async with types.Connection(str(app.settings.amqp_dsn)) as connection:
-        echo_producer = producer.Producer(
-            connection=connection,
-            exchange=types.Exchange(app.name),
-        )
+async def _produce(app: application.AsyncApplication[_AmqpSettings]) -> None:
+    connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
+    echo_producer = producer.Producer(
+        connection=connection,
+        exchange=types.Exchange(app.name),
+    )
 
-        await echo_producer.publish(
-            echo_pb2.EchoRequest(echo="foobar"),
-            "echo.foobar",
-        )
+    await echo_producer.publish(
+        echo_pb2.EchoRequest(echo="foobar"),
+        "echo.foobar",
+    )
 
 
 async def _echo_message(message: types.Message[echo_pb2.EchoRequest]) -> None:
     stdout.get_logger().info(message.body.echo)
 
 
-async def _consume(app: application.Application[_AmqpSettings]) -> None:
-    async with types.Connection(str(app.settings.amqp_dsn)) as connection:
-        await consumer.Consumer[echo_pb2.EchoRequest](
-            connection=connection,
-            queue_name="{0}_consumer".format(app.name),
-            binds=[(types.Exchange(app.name), "echo.foobar")],
-        ).consume(_echo_message)
+async def _consume(app: application.AsyncApplication[_AmqpSettings]) -> None:
+    connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
+
+    await consumer.Consumer[echo_pb2.EchoRequest](
+        connection=connection,
+        queue_name="{0}_consumer".format(app.name),
+        binds=[(types.Exchange(app.name), "echo.foobar")],
+    ).consume(_echo_message)
 
 
 if __name__ == "__main__":
