@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     unzip \
     wget \
     xz-utils \
+    expect \
 && curl -fsSL https://static.pantsbuild.org/setup/pantsup.sh | bash /dev/stdin --bin-dir /usr/local/bin --version 0.9.3 \
 && curl -fsSL https://github.com/Tufin/oasdiff/releases/download/v1.7.4/oasdiff_1.7.4_linux_amd64.deb > /tmp/oasdiff.deb \
 && curl -fsSL https://sentry.io/get-cli/ | SENTRY_CLI_VERSION=2.20.4 bash \
@@ -32,4 +33,5 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     nomad=1.6.1-1 \
     /tmp/oasdiff.deb \
 && rm -rf /var/lib/apt/lists/* /tmp/oasdiff.deb
+RUN curl -sSfL https://raw.githubusercontent.com/ory/meta/master/install.sh -o install.sh && bash install.sh -b ./usr/local/bin ory
 COPY --from=golang:1.19.12-bullseye /usr/local/go/ /usr/local/go/

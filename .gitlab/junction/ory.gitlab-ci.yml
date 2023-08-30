@@ -1,0 +1,16 @@
+ory-update:
+  image: git.snowfall.se:4567/junction/junction/pants:main
+  stage: deploy
+  script:
+    - ./ory/junction/ory_auth.sh
+    - ory update opl --project ${ORY_PROJECT_ID} --file ./ory/junction/permissions.ts
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      changes:
+        - ory/junction/permissions.ts
+  needs:
+    - "pants:setup"
+  tags:
+    - docker
