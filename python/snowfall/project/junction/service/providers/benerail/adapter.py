@@ -47,8 +47,10 @@ _FLEXIBILITY_NAMES = std_types.MappingProxyType(
     {
         "FF": _("Full flex"),
         "MF": _("Mid flex"),
+        "NF": _("Non flex"),
     },
 )
+_FLEX_NA = _("Flex info N/A")
 
 
 @dataclasses.dataclass(frozen=True)
@@ -78,7 +80,7 @@ def _next_page_id(links: Sequence[models_link.Link]) -> str:
 def _get_brand_name(comfort_class_name: str, flexibility_value: str) -> str:
     return "{0} / {1}".format(
         comfort_class_name,
-        _FLEXIBILITY_NAMES[flexibility_value[-2:]],
+        _FLEXIBILITY_NAMES.get(flexibility_value[-2:], _FLEX_NA),
     ).strip(" /")
 
 
