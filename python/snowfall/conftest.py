@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import mongomock_motor
 import pytest
+from fakeredis import FakeServer
 from fakeredis import aioredis as fakeredis
 from motor import motor_asyncio
 from redis import asyncio as aioredis
@@ -17,9 +18,9 @@ def mongo_client() -> motor_asyncio.AsyncIOMotorClient:
 
 @pytest.fixture()
 def redis_client() -> aioredis.Redis[bytes]:
-    return fakeredis.FakeRedis()
+    return fakeredis.FakeRedis(server=FakeServer())
 
 
 @pytest.fixture()
 def decoding_redis_client() -> aioredis.Redis[str]:
-    return fakeredis.FakeRedis(decode_responses=True)
+    return fakeredis.FakeRedis(server=FakeServer(), decode_responses=True)

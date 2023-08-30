@@ -34,7 +34,7 @@
 //     "dnspython==2.4.2",
 //     "docformatter==1.5.1",
 //     "email-validator==2.0.0.post2",
-//     "fakeredis[lua]==2.10.3",
+//     "fakeredis[lua]==2.18.0",
 //     "flake8-deprecated==2.0.1",
 //     "flake8-if-expr==1.0.4",
 //     "flake8-noqa==1.3.2",
@@ -59,7 +59,7 @@
 //     "jsonschema==4.19.0",
 //     "lagom==2.4.1",
 //     "locust==2.16.1",
-//     "lupa==1.14.1",
+//     "lupa==2.0",
 //     "mongomock-motor==0.0.21",
 //     "more-itertools==10.1.0",
 //     "motor==3.2.0",
@@ -2183,24 +2183,24 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "078ad729fe7cbcc84c9ff6f25c0e503fd4e19db6956f78049f9991b10c5271ba",
-              "url": "https://files.pythonhosted.org/packages/7a/7f/e4fdf244f46f08f2846334867dc2304ace61c768863283a503721bae3f67/fakeredis-2.10.3-py3-none-any.whl"
+              "hash": "bc7a82e9caec80096659fd9a810b72d21f833574be26ff7b97955db626d60bac",
+              "url": "https://files.pythonhosted.org/packages/ef/8e/8e454a26a7c651f0bb4ab0dc9372c44e2b53426a49611d1e8ca2207168e7/fakeredis-2.18.0-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "c5dcb070ef3219226e1d6db8836ddad47da1fc821270f6e89cfeb5da1f7f2e38",
-              "url": "https://files.pythonhosted.org/packages/4e/16/981975de0d325255f9b05b6244a53e7a95b19c5104f09315068039263efc/fakeredis-2.10.3.tar.gz"
+              "hash": "f9c18d3dba81a470953cc042868b411e334109e065cde53a7a82beef6702a1de",
+              "url": "https://files.pythonhosted.org/packages/70/64/3dc26499dbe656525e65d0c9035c3715906816d29bcb08fd1e833beeb007/fakeredis-2.18.0.tar.gz"
             }
           ],
           "project_name": "fakeredis",
           "requires_dists": [
             "jsonpath-ng<2.0,>=1.5; extra == \"json\"",
-            "lupa<2.0,>=1.14; extra == \"lua\"",
+            "lupa<3.0,>=1.14; extra == \"lua\"",
             "redis>=4",
-            "sortedcontainers<3.0,>=2.4"
+            "sortedcontainers<3,>=2"
           ],
           "requires_python": "<4.0,>=3.7",
-          "version": "2.10.3"
+          "version": "2.18.0"
         },
         {
           "artifacts": [
@@ -4008,44 +4008,54 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "40cf2eb90087dfe8ee002740469f2c4c5230d5e7d10ffb676602066d2f9b1ac9",
-              "url": "https://files.pythonhosted.org/packages/84/73/aeb964b8c0a6d9f54cb5e252e6f22a779f7bf1454abb287fc08a7f152033/lupa-1.14.1-cp311-cp311-musllinux_1_1_x86_64.whl"
+              "hash": "f3f962a499f95b3a5e90de36ac396cdb59c0c46b8003fbfcc1e2d78d7edc14f8",
+              "url": "https://files.pythonhosted.org/packages/3f/59/b707d4d7cef1404526fd5aea4d2edd6d24bb0bed261a19c35f28c26a1352/lupa-2.0-cp311-cp311-musllinux_1_1_x86_64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "a17ebf91b3aa1c5c36661e34c9cf10e04bb4cc00076e8b966f86749647162050",
-              "url": "https://files.pythonhosted.org/packages/01/9f/4b1a4111720af378cb0c82f4990fe36ef87967c85d22a5989bb408be48d7/lupa-1.14.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_24_x86_64.whl"
+              "hash": "50c529e5ecf3ec5b3e57efbb9a5def5125ceb7b95f12e2c89c34535856abb1ac",
+              "url": "https://files.pythonhosted.org/packages/0c/d9/29bba9c9d35423f01d560c26cfb93bb4e9142cb76ffa88cf5271cf178cb6/lupa-2.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "d0fd4e60ad149fe25c90530e2a0e032a42a6f0455f29ca0edb8170d6ec751c6e",
-              "url": "https://files.pythonhosted.org/packages/14/c5/a281abc9c349a48c535be62da6e6b1b0fb5c75d5308d752fe5f843ed4f02/lupa-1.14.1.tar.gz"
+              "hash": "e051969dc712d7050d0f3d6c6c8ed063941a004381e84f072815350476118f81",
+              "url": "https://files.pythonhosted.org/packages/37/09/2b79f5cfb2c880387baf0fc46ae6ac98117ec40911cff2c7cbd833238e7f/lupa-2.0-cp311-cp311-macosx_11_0_universal2.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "bc4f5e84aee0d567aa2e116ff6844d06086ef7404d5102807e59af5ce9daf3c0",
-              "url": "https://files.pythonhosted.org/packages/29/e2/5c6cbd98f0759d1f649ee12ffa5c786d1a7db56dd1f4b4ea303fcc0c6b0e/lupa-1.14.1-cp311-cp311-musllinux_1_1_aarch64.whl"
+              "hash": "4649a5501f0d8e5c96c297896377e9f73d0167df139109536187c57c60be1e90",
+              "url": "https://files.pythonhosted.org/packages/3f/5c/a213776c94015c0c6cdc61f334c05eb11421a4947350b0110dcc3c54ff57/lupa-2.0-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.manylinux_2_28_aarch64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "aa1449aa1ab46c557344867496dee324b47ede0c41643df8f392b00262d21b12",
-              "url": "https://files.pythonhosted.org/packages/45/b8/c69680565dbfe0edb61cc3cb7c54ab86e53b89afa7eb0dc1c91bdb4d5e55/lupa-1.14.1-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.manylinux_2_28_aarch64.whl"
+              "hash": "5e980571081c93152bb04de07bbde6852462e1674349eb3eafe703f5fa81a836",
+              "url": "https://files.pythonhosted.org/packages/59/ab/4befbc320dea2f59641b205d1ada1f6b41701df19fd6a9f2ca6a97e69701/lupa-2.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_28_x86_64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "1b8bda50c61c98ff9bb41d1f4934640c323e9f1539021810016a2eae25a66c3d",
-              "url": "https://files.pythonhosted.org/packages/69/74/d4e3b4bd3efa0d3549786abb8936cf71f0b2575c28a79dc03672bb672a6c/lupa-1.14.1-cp311-cp311-macosx_10_15_universal2.whl"
+              "hash": "ad3fef486be7adddd349fe9a9c393789061312cf98ebc533b489be34f484cb79",
+              "url": "https://files.pythonhosted.org/packages/5a/c2/34a30377e96ed0e1042067604b9c9cbb14eb8833583e2668c724c6eafe49/lupa-2.0.tar.gz"
             },
             {
               "algorithm": "sha256",
-              "hash": "b1d9cfa469e7a2ad7e9a00fea7196b0022aa52f43a2043c2e0be92122e7bcfe8",
-              "url": "https://files.pythonhosted.org/packages/71/d0/7f4c7bad49735e2e97f251996a958efb442030c7358b01d5e2110ea9c636/lupa-1.14.1-cp311-cp311-manylinux_2_5_i686.manylinux1_i686.manylinux_2_24_i686.whl"
+              "hash": "f7c1cfa9dac4f1363d9620384f9881a1ec968ff825be1e9b2ecdb4cb5375fbf2",
+              "url": "https://files.pythonhosted.org/packages/63/a1/fcc556e1b2a62a8e2d613ede88608126543ec20a7afa2f165dbf60d89cf6/lupa-2.0-cp311-cp311-manylinux_2_12_i686.manylinux2010_i686.manylinux_2_24_i686.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "02a0e45ada08e5694ab3f3c06523ec16322dfb875668ce9ff3e04a01d3e18e81",
+              "url": "https://files.pythonhosted.org/packages/ea/9a/b5193f56973861bafab8344bf692bab4d4d73d15f20e2a5d3b56fe38e5f3/lupa-2.0-cp311-cp311-manylinux_2_12_i686.manylinux2010_i686.manylinux_2_17_i686.manylinux2014_i686.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "a6847c2541f9cbdd596df821a575222f471175cd710fb967ffc51801dae58d68",
+              "url": "https://files.pythonhosted.org/packages/f8/73/882fc0893c5bba569a951372d2236223806ebe95a6d80594173296688944/lupa-2.0-cp311-cp311-musllinux_1_1_aarch64.whl"
             }
           ],
           "project_name": "lupa",
           "requires_dists": [],
           "requires_python": null,
-          "version": "1.14.1"
+          "version": "2.0"
         },
         {
           "artifacts": [
@@ -7854,7 +7864,7 @@
     "dnspython==2.4.2",
     "docformatter==1.5.1",
     "email-validator==2.0.0.post2",
-    "fakeredis[lua]==2.10.3",
+    "fakeredis[lua]==2.18.0",
     "flake8-deprecated==2.0.1",
     "flake8-if-expr==1.0.4",
     "flake8-noqa==1.3.2",
@@ -7879,7 +7889,7 @@
     "jsonschema==4.19.0",
     "lagom==2.4.1",
     "locust==2.16.1",
-    "lupa==1.14.1",
+    "lupa==2.0",
     "mongomock-motor==0.0.21",
     "more-itertools==10.1.0",
     "motor==3.2.0",

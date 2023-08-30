@@ -21,7 +21,7 @@ dnspython==2.4.2
 docformatter==1.5.1  # freeze (no Pants support)
 email-validator==2.0.0.post2
 Faker==19.3.1
-fakeredis[lua]==2.10.3  # freeze (regression)
+fakeredis[lua]==2.18.0
 flake8==6.1.0
 flake8-deprecated==2.0.1
 flake8-if-expr==1.0.4
@@ -46,7 +46,7 @@ json_api_doc==0.15.0
 jsonschema==4.19.0
 lagom==2.4.1
 locust==2.16.1
-lupa==1.14.1
+lupa==2.0
 mongomock-motor==0.0.21
 more-itertools==10.1.0
 motor==3.2.0
