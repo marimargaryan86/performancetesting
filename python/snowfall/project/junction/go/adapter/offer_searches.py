@@ -130,6 +130,9 @@ class GrpcClient(Client):
         return response.search
 
     async def find_by_ids(self, ids: Sequence[str]) -> Sequence[models_pb2.OfferSearch]:
+        if not ids:
+            return []
+
         response = await errors.handle_grpc_errors(
             self._offer_searches.ListOfferSearches(
                 grpc_pb2.ListOfferSearchesRequest(ids=ids),
