@@ -29,6 +29,13 @@ function transform_trip_candidates(response) {
   legs = [];
   included = {};
 
+  if (response.data.length == 0) {
+    return {
+      "data": [],
+      "included": [],
+    }
+  }
+
   for (const resource of response.included) {
     included[resource.type + resource.id] = resource;
   }
