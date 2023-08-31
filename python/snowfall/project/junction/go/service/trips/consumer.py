@@ -176,6 +176,13 @@ class TripCandidateSearchConsumer(object):
 
             return
 
+        if any(not reference_group for reference_group in reference_groups):
+            await self._trip_candidate_search_repository.mark_as_completed(
+                body.trip_candidate_search.id,
+            )
+
+            return
+
         await self._trip_repository.add_multiple_if_missing(
             list(itertools.chain(*reference_groups)),
         )
