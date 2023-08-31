@@ -53,7 +53,8 @@ make-uninterruptible:
 EOF
 # editorconfig-checker-enable
 
-services=()
+changed_services=()
+deployed_services=()
 
 for DIR in templates/*; do
 	if ! [ -d "${DIR}" ]; then
@@ -90,6 +91,7 @@ for DIR in templates/*; do
 		fi
 	fi
 
+	changed_services+=("${service_name}")
 	templates=()
 
 	for TEMPLATE in "${DIR}"/*.nomad; do
@@ -100,12 +102,12 @@ for DIR in templates/*; do
 	done
 
 	if [ -z "${templates+x}" ]; then
-		echo >&2 "skip: \"${DIR}\" has no Nomad template(s)"
+		echo >&2 "skip: \"${DIR}\" has no Nomad template(s) for this environment"
 		continue
 	fi
 
 	echo >&2 "generate: ${service_name}@${service_version}"
-	services+=("${service_name}")
+	deployed_services+=("${service_name}")
 
 	# editorconfig-checker-disable
 	cat <<EOF
@@ -124,7 +126,7 @@ EOF
 	# editorconfig-checker-enable
 done
 
-if [ ${#services[@]} -ne 0 ]; then
+if [ ${#deployed_services[@]} -ne 0 ]; then
 	# editorconfig-checker-disable
 	cat <<EOF
 
@@ -133,19 +135,18 @@ verify:
   interruptible: false
   script:
     - docker login -u "\${CI_REGISTRY_USER}" -p "\${CI_REGISTRY_PASSWORD}" "\${CI_REGISTRY}"
-    - docker run --rm -v "\$(pwd)/templates:/templates" --pull=always git.snowfall.se:4567/junction/junction/service/deploy:latest --env-name "${DEPLOYMENT_ENVIRONMENT}" verify --nomad-address "\${NOMAD_${DEPLOYMENT_ENVIRONMENT^^}_ADDR}" --nomad-templates-path "templates/" ${services[@]}
+    - docker run --rm -v "\$(pwd)/templates:/templates" --pull=always git.snowfall.se:4567/junction/junction/service/deploy:latest --env-name "${DEPLOYMENT_ENVIRONMENT}" verify --nomad-address "\${NOMAD_${DEPLOYMENT_ENVIRONMENT^^}_ADDR}" --nomad-templates-path "templates/" ${deployed_services[@]}
   tags:
     - shell
   needs:
 EOF
-	for service in "${services[@]}"; do
+	# editorconfig-checker-enable
+	for service in "${deployed_services[@]}"; do
 		echo "    - ${service}"
 	done
 fi
 
-# editorconfig-checker-enable
-
-if [ "${DEPLOYMENT_ENVIRONMENT}" == "development" ]; then
+if [ "${DEPLOYMENT_ENVIRONMENT}" == "development" ] && [ ${#changed_services[@]} -ne 0 ]; then
 	# editorconfig-checker-disable
 	cat <<EOF
 
@@ -165,12 +166,13 @@ if [ "${DEPLOYMENT_ENVIRONMENT}" == "development" ]; then
     - shell
 EOF
 
-	if [ ${#services[@]} -ne 0 ]; then
+	if [ ${#deployed_services[@]} -ne 0 ]; then
 		# editorconfig-checker-disable
 		cat <<EOF
   needs:
     - verify
 EOF
+		# editorconfig-checker-enable
 	fi
 
 	# editorconfig-checker-disable
@@ -179,12 +181,12 @@ EOF
 promote-to-production:
   extends: .promote
   script:
-    - ./promote-environment.sh production ${services[@]}
+    - ./promote-environment.sh production ${changed_services[@]}
 
 promote-to-sandbox:
   extends: .promote
   script:
-    - ./promote-environment.sh sandbox ${services[@]}
+    - ./promote-environment.sh sandbox ${changed_services[@]}
 
 EOF
 # editorconfig-checker-enable
