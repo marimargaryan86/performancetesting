@@ -75,39 +75,43 @@ class TripOrchestrator(object):
             if not criteria_obj.origins or not criteria_obj.destinations:
                 continue
 
+            request = planner_pb2.SearchJourneyRequest(
+                origins=[
+                    latlng_pb2.LatLng(
+                        latitude=origin.latitude,
+                        longitude=origin.longitude,
+                    )
+                    for origin in criteria_obj.origins
+                ],
+                destinations=[
+                    latlng_pb2.LatLng(
+                        latitude=destination.latitude,
+                        longitude=destination.longitude,
+                    )
+                    for destination in criteria_obj.destinations
+                ],
+                departure_after=protobuf.datetime_to_protobuf_datetime(
+                    protobuf.protobuf_to_datetime(
+                        criteria_obj.departure_after,
+                    ).astimezone(
+                        zoneinfo.ZoneInfo(
+                            _tz_finder.timezone_at(
+                                lat=criteria_obj.origins[0].latitude,
+                                lng=criteria_obj.origins[0].longitude,
+                            )
+                            or "",
+                        ),
+                    ),
+                ),
+                allowed_segment_types=allowed_segment_types,
+            )
+
+            if criteria_obj.HasField("maximum_connections"):
+                request.maximum_connections = criteria_obj.maximum_connections
+
             tasks.append(
                 self._planner.SearchJourney(
-                    request=planner_pb2.SearchJourneyRequest(
-                        origins=[
-                            latlng_pb2.LatLng(
-                                latitude=origin.latitude,
-                                longitude=origin.longitude,
-                            )
-                            for origin in criteria_obj.origins
-                        ],
-                        destinations=[
-                            latlng_pb2.LatLng(
-                                latitude=destination.latitude,
-                                longitude=destination.longitude,
-                            )
-                            for destination in criteria_obj.destinations
-                        ],
-                        departure_after=protobuf.datetime_to_protobuf_datetime(
-                            protobuf.protobuf_to_datetime(
-                                criteria_obj.departure_after,
-                            ).astimezone(
-                                zoneinfo.ZoneInfo(
-                                    _tz_finder.timezone_at(
-                                        lat=criteria_obj.origins[0].latitude,
-                                        lng=criteria_obj.origins[0].longitude,
-                                    )
-                                    or "",
-                                ),
-                            ),
-                        ),
-                        allowed_segment_types=allowed_segment_types,
-                        maximum_connections=criteria_obj.maximum_connections,
-                    ),
+                    request=request,
                 ),
             )
 

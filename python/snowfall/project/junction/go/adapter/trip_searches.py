@@ -67,9 +67,12 @@ class DictClient(Client):
             departure_after=protobuf.datetime_to_protobuf_datetime(
                 trip_search_request.departure_after,
             ),
-            maximum_connections=trip_search_request.maximum_connections,
             allowed_segment_types=trip_search_request.allowed_segment_types,
         )
+
+        if trip_search_request.maximum_connections is not None:
+            trip_search.maximum_connections = trip_search_request.maximum_connections
+
         self._searches[trip_search.id] = trip_search
         await self._generate_trips(trip_search)
 
@@ -133,10 +136,14 @@ class GrpcClient(Client):
                 departure_after=protobuf.datetime_to_protobuf_datetime(
                     trip_search_request.departure_after,
                 ),
-                maximum_connections=trip_search_request.maximum_connections,
                 allowed_segment_types=trip_search_request.allowed_segment_types,
             ),
         )
+
+        if trip_search_request.maximum_connections is not None:
+            request.trip_search.maximum_connections = (
+                trip_search_request.maximum_connections
+            )
 
         response = await errors.handle_grpc_errors(
             self._trip_searches.EnqueueTripSearch(

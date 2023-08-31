@@ -89,35 +89,42 @@ class TripSearchConsumer(object):
             return
 
         async with _TripSearchContext(self._trip_search_repository, message.body):
-            response = await self._planner.SearchJourney(
-                request=planner_pb2.SearchJourneyRequest(
-                    origins=[
-                        latlng_pb2.LatLng(
-                            latitude=origin[0],
-                            longitude=origin[1],
-                        )
-                        for origin in origins
-                    ],
-                    destinations=[
-                        latlng_pb2.LatLng(
-                            latitude=destination[0],
-                            longitude=destination[1],
-                        )
-                        for destination in destinations
-                    ],
-                    departure_after=protobuf.datetime_to_protobuf_datetime(
-                        protobuf.protobuf_to_datetime(
-                            message.body.trip_search.departure_after,
-                        ).astimezone(
-                            zoneinfo.ZoneInfo(
-                                more_itertools.first(
-                                    message.body.trip_search.origins,
-                                ).time_zone,
-                            ),
+            request = planner_pb2.SearchJourneyRequest(
+                origins=[
+                    latlng_pb2.LatLng(
+                        latitude=origin[0],
+                        longitude=origin[1],
+                    )
+                    for origin in origins
+                ],
+                destinations=[
+                    latlng_pb2.LatLng(
+                        latitude=destination[0],
+                        longitude=destination[1],
+                    )
+                    for destination in destinations
+                ],
+                departure_after=protobuf.datetime_to_protobuf_datetime(
+                    protobuf.protobuf_to_datetime(
+                        message.body.trip_search.departure_after,
+                    ).astimezone(
+                        zoneinfo.ZoneInfo(
+                            more_itertools.first(
+                                message.body.trip_search.origins,
+                            ).time_zone,
                         ),
                     ),
-                    allowed_segment_types=message.body.trip_search.allowed_segment_types,
                 ),
+                allowed_segment_types=message.body.trip_search.allowed_segment_types,
+            )
+
+            if message.body.trip_search.HasField("maximum_connections"):
+                request.maximum_connections = (
+                    message.body.trip_search.maximum_connections
+                )
+
+            response = await self._planner.SearchJourney(
+                request=request,
             )
 
             await asyncio.gather(

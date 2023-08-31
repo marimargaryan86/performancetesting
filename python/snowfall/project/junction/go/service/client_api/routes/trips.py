@@ -300,7 +300,6 @@ class TripCandidateSearches(object):
             list[dict[str, Any]],
             request.body["criteria"],
         )
-        locations_per_search = await self._get_nearby_locations(criteria)
 
         return trip_candidate_searches.TripCandidateSearchRequest(
             passengers=[
@@ -311,33 +310,7 @@ class TripCandidateSearches(object):
                 )
                 for pax in cast(_Passengers, request.body["passengers"])
             ],
-            criteria=[
-                trips_pb2.TripCandidateSearchCriteria(
-                    origin=latlng_pb2.LatLng(
-                        **criteria["origin"],
-                    ),
-                    destination=latlng_pb2.LatLng(
-                        **criteria["destination"],
-                    ),
-                    origins=locations_per_search[
-                        (
-                            criteria["origin"]["latitude"],
-                            criteria["origin"]["longitude"],
-                        )
-                    ],
-                    destinations=locations_per_search[
-                        (
-                            criteria["destination"]["latitude"],
-                            criteria["destination"]["longitude"],
-                        )
-                    ],
-                    departure_after=protobuf.datetime_to_protobuf_datetime(
-                        parser.isoparse(criteria["departureAfter"]),
-                    ),
-                    maximum_connections=criteria.get("maximumConnections"),
-                )
-                for criteria in criteria
-            ],
+            criteria=await self._create_criteria(criteria),
             allowed_segment_types=list(allowed_segment_types),
             reseller_id=reseller_id,
             currency_code=self._reseller_currencies.get(reseller_id),
@@ -350,6 +323,46 @@ class TripCandidateSearches(object):
                 ),
             ),
         )
+
+    async def _create_criteria(
+        self,
+        criteria: Sequence[Mapping[str, Any]],
+    ) -> list[trips_pb2.TripCandidateSearchCriteria]:
+        locations_per_search = await self._get_nearby_locations(criteria)
+        criteria_protos = []
+
+        for criterion in criteria:
+            maximum_connections = criterion.get("maximumConnections")
+            criterion_proto = trips_pb2.TripCandidateSearchCriteria(
+                origin=latlng_pb2.LatLng(
+                    **criterion["origin"],
+                ),
+                destination=latlng_pb2.LatLng(
+                    **criterion["destination"],
+                ),
+                origins=locations_per_search[
+                    (
+                        criterion["origin"]["latitude"],
+                        criterion["origin"]["longitude"],
+                    )
+                ],
+                destinations=locations_per_search[
+                    (
+                        criterion["destination"]["latitude"],
+                        criterion["destination"]["longitude"],
+                    )
+                ],
+                departure_after=protobuf.datetime_to_protobuf_datetime(
+                    parser.isoparse(criterion["departureAfter"]),
+                ),
+            )
+
+            if maximum_connections is not None:
+                criterion_proto.maximum_connections = maximum_connections
+
+            criteria_protos.append(criterion_proto)
+
+        return criteria_protos
 
     async def _get_nearby_locations(
         self,
