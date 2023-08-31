@@ -167,6 +167,8 @@ func (p *Planner) Search(froms []*planner.Stop, tos []*planner.Stop, departureAt
 		"origins", fromIds,
 		"destinations", toIds,
 		"departure", departureAt.Format(time.RFC3339),
+		"segment_types", kindList,
+		"max_connections", maxConnections,
 		"iterations", iterations,
 		"results", len(trips),
 		"workers", workerCount,

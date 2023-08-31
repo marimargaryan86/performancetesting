@@ -79,7 +79,7 @@ func load[T any, U protoMessage[T]](path string, logger *zap.SugaredLogger) (mes
 		messages = append(messages, message)
 	}
 
-	logger.Infow("file loaded", "file", filepath.Base(path))
+	logger.Infow("file loaded", "file", filepath.Base(path), "count", len(messages))
 
 	return messages, nil
 }
