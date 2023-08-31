@@ -54,8 +54,16 @@
                         <label class="form-check-label" for="show-maps">Show Maps</label>
                     </div>
                     <div class="mb-3 form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch" id="search-offers">
-                        <label class="form-check-label" for="search-offers">Search Offers</label>
+                        <input class="form-check-input" type="radio" name="search-mode" role="switch" id="search-trips" checked>
+                        <label class="form-check-label" for="search-trips">Search Trips</label>
+                    </div>
+                    <div class="mb-3 form-check form-switch">
+                        <input class="form-check-input" type="radio" name="search-mode" role="switch" id="search-offers">
+                        <label class="form-check-label" for="search-offers">Search Trips + Offers</label>
+                    </div>
+                    <div class="mb-3 form-check form-switch">
+                        <input class="form-check-input" type="radio" name="search-mode" role="switch" id="use-trip-candidates">
+                        <label class="form-check-label" for="use-trip-candidates">Search Trip Candidates</label>
                     </div>
                     <div class="mb-3">
                         <button type="submit" class="btn btn-primary mb-3">Search</button>
@@ -73,6 +81,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.6/plugin/utc.min.js" integrity="sha512-z84O912dDT9nKqvpBnl1tri5IN0j/OEgMzLN1GlkpKLMscs5ZHVu+G2CYtA6dkS0YnOGi3cODt3BOPnYc8Agjg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.6/plugin/timezone.min.js" integrity="sha512-fG1tT/Wn/ZOyH6/Djm8HQBuqvztPQdK/vBgNFLx6DQVt3yYYDPN3bXnGZT4z4kAnURzGQwAnM3CspmhLJAD/5Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="static/dogfood.js"></script>
+<script src="static/trip-candidates.js"></script>
 <script>const sessionToken = "{{ session_token }}";</script>
 </body>
 </html>

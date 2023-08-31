@@ -253,11 +253,10 @@ function haversine_distance(coords1, coords2) {
   return d;
 }
 
-function inject_trips(tripSearchId, response) {
+function inject_trips(tripSearchId, response, searchOffers) {
   hide_loader();
 
   const showMaps = document.getElementById("show-maps").checked;
-  const searchOffers = document.getElementById("search-offers").checked;
   const container = document.getElementById("result");
 
   if (response.data.length == 0) {
@@ -768,7 +767,7 @@ function load_trips(id) {
         )
           .then((res) => res.json())
           .then((response) => {
-            inject_trips(id, response);
+            inject_trips(id, response, document.getElementById("search-offers").checked);
           });
       } else {
         setTimeout(() => {
@@ -858,7 +857,9 @@ window.onload = () => {
     const transaction = db.transaction("places", "readwrite");
     const objectStore = transaction.objectStore("places");
     const originRequest = objectStore.get(origin);
+    const destinationRequest = objectStore.get(destination);
     const legTypes = document.querySelectorAll("input[name=leg-types]:checked")
+    const useTripCandidates = document.getElementById("use-trip-candidates").checked;
 
     let allowedSegmentTypes = []
 
@@ -871,41 +872,85 @@ window.onload = () => {
 
     originRequest.onsuccess = (event) => {
       const originTimeZone = originRequest.result.attributes.timeZone;
-      fetch("/trips/searches", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/vnd.api+json",
-        },
-        body: JSON.stringify({
-          data: {
-            type: "trip-searches",
-            attributes: {
-              departureAfter: dayjs.tz(departureAt, originTimeZone).format(),
+      if (useTripCandidates) {
+        destinationRequest.onsuccess = (event) => {
+          fetch("/trip-candidates/searches", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/vnd.api+json",
             },
-            relationships: {
-              origin: {
-                data: {
-                  id: origin,
-                  type: "places",
+            body: JSON.stringify({
+              data: {
+                type: "trip-candidate-searches",
+                attributes: {
+                  sessionToken: sessionToken,
+                  criteria: [{
+                    origin: {
+                      latitude: originRequest.result.attributes.latitude,
+                      longitude: originRequest.result.attributes.longitude,
+                    },
+                    destination: {
+                      latitude: destinationRequest.result.attributes.latitude,
+                      longitude: destinationRequest.result.attributes.longitude,
+                    },
+                    departureAfter: dayjs.tz(departureAt, originTimeZone).format(),
+                  }],
+                  passengers: [{
+                    dateOfBirth: "1990-10-25"
+                  }],
+                },
+
+                relationships: {
+                  allowedSegmentTypes: {
+                    data: allowedSegmentTypes,
+                  },
                 },
               },
-              destination: {
-                data: {
-                  id: destination,
-                  type: "places",
-                },
-              },
-              allowedSegmentTypes: {
-                data: allowedSegmentTypes,
-              },
-            },
+            }),
+          })
+          .then((response) => response.json())
+          .then((data) => {
+            load_trip_candidates(data.data.id);
+          });
+        }
+      } else {
+        fetch("/trips/searches", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/vnd.api+json",
           },
-        }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          load_trips(data.data.id);
-        });
+          body: JSON.stringify({
+            data: {
+              type: "trip-searches",
+              attributes: {
+                departureAfter: dayjs.tz(departureAt, originTimeZone).format(),
+              },
+              relationships: {
+                origin: {
+                  data: {
+                    id: origin,
+                    type: "places",
+                  },
+                },
+                destination: {
+                  data: {
+                    id: destination,
+                    type: "places",
+                  },
+                },
+                allowedSegmentTypes: {
+                  data: allowedSegmentTypes,
+                },
+              },
+            },
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            load_trips(data.data.id);
+          });
+      }
+
     };
   }
 
