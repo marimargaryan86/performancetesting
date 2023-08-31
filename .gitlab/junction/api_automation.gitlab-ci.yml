@@ -4,8 +4,6 @@ integration:api_automation-tests:
   allow_failure: true
   variables:
     TEST_E2E_DEPARTURE_AFTER: "${DEPARTURE_AFTER}"
-    TEST_E2E_ORIGIN: "${ORIGIN}"
-    TEST_E2E_DESTINATION: "${DESTINATION}"
     TEST_E2E_HOSTNAME: "${HOSTNAME}"
     API_TOKEN: "${API_TOKEN}"
     ALLURE_PROJECT_ID: "${ALLURE_PROJECT_ID}"
