@@ -467,17 +467,17 @@ class BookingsCancellationsRepository(
         except StopAsyncIteration:
             return None
 
-    async def find_by_ticket_id(
+    async def find_by_booking_cancellation_id(
         self,
-        ticket_id: str,
+        booking_cancellation_id: str,
     ) -> models_pb2.BookingsCancellation | None:
         filter_ = (
             {
-                "booking_cancellations.ticket_id": {
-                    "$eq": ticket_id,
+                "booking_cancellations._id": {
+                    "$eq": booking_cancellation_id,
                 },
             }
-            if ticket_id
+            if booking_cancellation_id
             else {}
         )
 

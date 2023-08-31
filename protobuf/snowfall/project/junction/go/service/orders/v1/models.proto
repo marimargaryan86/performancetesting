@@ -144,7 +144,7 @@ message BookingsCancellation {
   enum Status {
     STATUS_UNSPECIFIED = 0;
     STATUS_PENDING = 1;
-    STATUS_COMPLETED = 3;
+    STATUS_COMPLETED = 2;
   }
   Status status = 3 [(snowfall.stdlib.v1.read_only) = true];
   google.protobuf.Timestamp created_at = 4 [(snowfall.stdlib.v1.read_only) = true];

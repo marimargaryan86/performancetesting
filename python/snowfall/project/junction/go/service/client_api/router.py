@@ -269,6 +269,11 @@ def get_routes(  # noqa: WPS210
             name="ViewBookingsCancellation",
         ),
         integration.route(
+            "/bookings/cancellation/{bookingCancellationId}",
+            orders.BookingCancellation,
+            name="UpdateBookingCancellationStatus",
+        ),
+        integration.route(
             "/bookings/{bookingId}",
             orders.Booking,
             name="ViewBooking",

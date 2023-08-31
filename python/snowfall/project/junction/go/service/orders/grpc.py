@@ -13,8 +13,8 @@ from snowfall.project.junction.go.service.orders.orders import (
     OrderRepository,
 )
 from snowfall.project.junction.go.service.orders.orders_handlers import (
-    CancellationTicketCompletedHandler,
     CreateBookingsCancellationHandler,
+    UpdateBookingCancellationHandler,
 )
 from snowfall.project.junction.go.service.orders.v1 import orders_pb2, orders_pb2_grpc
 from snowfall.project.junction.go.service.orders.zendesk.client import ZendeskClient
@@ -326,16 +326,16 @@ class OrderService(  # noqa: WPS214
             cancellation=booking_cancellation_result,
         )
 
-    async def HandleCancellationTicketCompleted(  # type: ignore[override] # noqa: N802
+    async def UpdateBookingCancellation(  # type: ignore[override] # noqa: N802
         self,
-        request: orders_pb2.HandleCancellationTicketCompletedRequest,
+        request: orders_pb2.UpdateBookingCancellationRequest,
         context: aio.ServicerContext,
-    ) -> orders_pb2.HandleCancellationTicketCompletedResponse:
-        ticket_completed_handler = CancellationTicketCompletedHandler(
+    ) -> orders_pb2.UpdateBookingCancellationResponse:
+        update_booking_cancellation_handler = UpdateBookingCancellationHandler(
             request,
             context,
             self._bookings,
             self._cancellations,
         )
 
-        return await ticket_completed_handler.execute()
+        return await update_booking_cancellation_handler.execute()

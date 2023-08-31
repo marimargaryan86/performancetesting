@@ -10,6 +10,7 @@ from snowfall.project.junction.go.service.orders.v1 import (
     orders_pb2_grpc,
 )
 from snowfall.stdlib import sequence, string
+from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1 import postal_address_pb2, sort_pb2
 
 _MOCK_PRICE_UNITS = 13
@@ -58,6 +59,15 @@ class Client(abc.ABC):  # noqa: WPS214
         reseller_id: str,
     ) -> models_pb2.BookingsCancellation:
         """Create a new bookings cancellation resource."""
+
+    @abc.abstractmethod
+    async def update_booking_cancellation_status(
+        self,
+        identifier: str,
+        status: str,
+        reseller_id: str,
+    ) -> models_pb2.BookingCancellation:
+        """Update the status of a booking cancellation resource."""
 
     @abc.abstractmethod
     async def get_journey(
@@ -263,6 +273,19 @@ class DictClient(Client):  # noqa: WPS214
         self._cancellations[request.id] = request
 
         return request
+
+    async def update_booking_cancellation_status(
+        self,
+        identifier: str,
+        status: str,
+        reseller_id: str,
+    ) -> models_pb2.BookingCancellation:
+        for cancellations in self._cancellations.values():
+            for booking_cancellation in cancellations.booking_cancellations:
+                if booking_cancellation.id == identifier:
+                    return booking_cancellation
+
+        raise errors.NotFoundError()
 
     async def get_order(
         self,
@@ -634,6 +657,28 @@ class GrpcClient(Client):  # noqa: WPS214
                         ],
                         reseller_id=reseller_id,
                     ),
+                ),
+                timeout=self._timeout,
+            ),
+        )
+
+        return response.cancellation
+
+    async def update_booking_cancellation_status(
+        self,
+        identifier: str,
+        status: str,
+        reseller_id: str,
+    ) -> models_pb2.BookingCancellation:
+        response = await errors.handle_grpc_errors(
+            self._orders.UpdateBookingCancellation(
+                orders_pb2.UpdateBookingCancellationRequest(
+                    id=identifier,
+                    status=protobuf.slug_to_enum_value(
+                        orders_pb2.UpdateBookingCancellationRequest.Status,
+                        status,
+                    ),
+                    reseller_id=reseller_id,
                 ),
                 timeout=self._timeout,
             ),

@@ -25,6 +25,17 @@ def _get_bookings_cancellation_request() -> dict[str, Any]:
     }
 
 
+def _update_booking_cancellation_status_request() -> dict[str, Any]:
+    return {
+        "data": {
+            "type": "booking-cancellation",
+            "attributes": {
+                "status": "completed",
+            },
+        },
+    }
+
+
 class TestBookingsByOrder(object):
     async def test_bookings_are_found(self, client: httpx.AsyncClient) -> None:
         await testing.test_list_and_view_endpoints(
@@ -71,6 +82,18 @@ class TestBookingsCancellation(object):
     ) -> None:
         response = await client.get(
             "/bookings/{id}/cancellation".format(id=fixtures.BOOKINGS[0]),
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+    async def test_booking_cancellation_status_can_be_updated(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        response = await client.patch(
+            "/bookings/cancellation/{id}".format(id=fixtures.BOOKING_CANCELLATIONS[0]),
+            json=_update_booking_cancellation_status_request(),
+            headers={"Content-Type": "application/vnd.api+json"},
         )
 
         assert response.status_code == status.HTTP_200_OK
