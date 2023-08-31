@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package snowfall.project.junction.v1;
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/v1";
+
+enum StopType {
+  STOP_TYPE_UNSPECIFIED = 0;
+  STOP_TYPE_RAILWAY_STATION = 1;
+  STOP_TYPE_AIRPORT = 2;
+  STOP_TYPE_BUS_STATION = 3;
+  STOP_TYPE_FERRY_PORT = 4;
+}

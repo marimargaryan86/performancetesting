@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package snowfall.project.junction.service.routes.v1;
+
+import "google/protobuf/timestamp.proto";
+import "snowfall/project/junction/v1/stop_type.proto";
+import "snowfall/stdlib/v1/datetime.proto";
+import "snowfall/stdlib/v1/latlng.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/routes/v1";
+
+message Node {
+  string id = 1;
+  string osm_ref = 2;
+  string name = 3;
+  snowfall.stdlib.v1.LatLng coordinates = 4;
+  snowfall.stdlib.v1.TimeZone time_zone = 5;
+  string country_code = 6;
+  snowfall.project.junction.v1.StopType type = 7;
+  message StopRef {
+    repeated string ref = 1;
+  }
+  map<string, StopRef> stops = 8;
+  message Metadata {
+    string iata = 1;
+    string icao = 2;
+  }
+  Metadata metadata = 9;
+  google.protobuf.Timestamp created_at = 10;
+  google.protobuf.Timestamp updated_at = 11;
+}
