@@ -216,14 +216,17 @@ class TripCandidateSearchService(
         if not trip_candidate_search:
             await context.abort(StatusCode.NOT_FOUND)
 
-        offer_search_objectes = await self._offer_search_adapter.find_by_ids(
-            ids=trip_candidate_search.offer_search_ids,  # type: ignore[union-attr]
-        )
+        offer_search_objects = []
+
+        if trip_candidate_search.offer_search_ids:  # type: ignore[union-attr]
+            offer_search_objects = await self._offer_search_adapter.find_by_ids(
+                ids=trip_candidate_search.offer_search_ids,  # type: ignore[union-attr]
+            )
 
         trip_candidate_search.status = status_from_statuses(  # type: ignore[union-attr]
             statuses=[
                 offer_search_object.status
-                for offer_search_object in offer_search_objectes
+                for offer_search_object in offer_search_objects
             ],
         )
 
