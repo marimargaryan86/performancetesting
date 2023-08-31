@@ -1,9 +1,9 @@
 ---
-title: Python example
+title: Python Example
 sidebar_position: 5
 ---
 
-# Python example usage of Reseller API
+# Python Example Usage of Reseller API
 
 First we import some helpful modules, we use `json-api-doc` to flatten [json-api](https://jsonapi.org/) responses.
 The `Content-Type` also has to be set to `application/vnd.api+json` for json-api compatibility.
