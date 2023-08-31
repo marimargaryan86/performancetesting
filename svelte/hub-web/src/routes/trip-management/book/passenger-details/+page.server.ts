@@ -4,14 +4,14 @@ import integrationInstances from "integration-instances";
 import { getSearchData, setSearchData, type ResolvedSearchData } from "../common";
 import type { OrderModel } from "models/booking/order";
 import type { ContactInformationData } from "./contact-information.svelte";
-import type { PassengerData } from "./passengers.svelte";
+import type { PartialPassengerData } from "./passenger-entry.svelte";
 import type { PriceModel } from "models/booking/money";
 import type { CreateOrderModel } from "integration/junction-mobile-api/models";
 
 type BookingData = {
   priceQuoteId: string;
   contact: ContactInformationData;
-  passengers: PassengerData[];
+  passengers: PartialPassengerData[];
   price: PriceModel;
 };
 
@@ -21,10 +21,12 @@ function getBookingData(formData: FormData): BookingData {
   return {
     priceQuoteId: jsonData.priceQuoteId,
     contact: jsonData.contact,
-    passengers: (jsonData.passengers as PassengerData[]).map<PassengerData>((item) => ({
-      ...item,
-      dateOfBirth: item.dateOfBirth ? new Date(item.dateOfBirth) : undefined,
-    })),
+    passengers: (jsonData.passengers as PartialPassengerData[]).map<PartialPassengerData>(
+      (item) => ({
+        ...item,
+        dateOfBirth: item.dateOfBirth ? new Date(item.dateOfBirth) : undefined,
+      }),
+    ),
     price: jsonData.price,
   };
 }

@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-  export type ContactInformationData = {
+  export type PartialContactInformationData = {
     phone: {
       code?: string;
       number?: string;
@@ -13,16 +13,35 @@
     countryCode?: string;
     postcode?: string;
   };
+
+  export const contactInformationData = z.object({
+    phone: z.object({
+      code: z.string({ required_error: "Country code required" }),
+      number: string({ required_error: "Phone number required" }).min(10),
+    }),
+    email: z.string().email({ message: "Invalid email address" }).min(3),
+    address: z.object({
+      line1: z.string({ required_error: "Street address required" }),
+      line2: string().optional(),
+    }),
+    city: z.string({ required_error: "City required" }),
+    countryCode: z.string({ required_error: "Country redquired" }),
+    postcode: z.string({ required_error: "Post code required" }),
+  });
+
+  export type ContactInformationData = z.infer<typeof contactInformationData>;
 </script>
 
 <script lang="ts">
+  import { string, z } from "zod";
   import SelectField from "components/ui/select-field.svelte";
   import TextField from "components/ui/text-field.svelte";
   import { formatCountryOption } from "formatting/location";
   import type { CountryModel } from "models/location";
 
   export let countries: Map<string, CountryModel>;
-  export let contactInformation: ContactInformationData;
+  export let contactInformation: PartialContactInformationData;
+  export let errors: z.ZodFormattedError<ContactInformationData> | undefined = undefined;
 
   let country: CountryModel | undefined = countries.get(contactInformation.countryCode ?? "");
 
@@ -43,6 +62,7 @@
         placeholder="Select"
         required
         bind:value={contactInformation.phone.code}
+        error={errors?.phone?.code?._errors}
       />
       <TextField
         label="Phone number"
@@ -50,6 +70,7 @@
         placeholder="Enter phone number"
         required
         bind:value={contactInformation.phone.number}
+        error={errors?.phone?.number?._errors}
       />
     </div>
 
@@ -59,12 +80,14 @@
       placeholder="Enter email"
       required
       bind:value={contactInformation.email}
+      error={errors?.email?._errors}
     />
     <TextField
       label="Address line 1"
       placeholder="Enter address line 1"
       required
       bind:value={contactInformation.address.line1}
+      error={errors?.address?.line1?._errors}
     />
     <TextField
       label="Address line 2"
@@ -78,6 +101,7 @@
         placeholder="Enter city"
         required
         bind:value={contactInformation.city}
+        error={errors?.city?._errors}
       />
       <SelectField
         direction="up"
@@ -87,12 +111,14 @@
         formatter={formatCountryOption}
         required
         bind:value={country}
+        error={errors?.countryCode?._errors}
       />
       <TextField
         label="Postcode"
         placeholder="Postcode"
         required
         bind:value={contactInformation.postcode}
+        error={errors?.postcode?._errors}
       />
     </div>
   </div>

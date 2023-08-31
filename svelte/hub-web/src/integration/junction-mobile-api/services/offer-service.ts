@@ -39,17 +39,17 @@ export class OfferService extends JunctionMobileApiService {
 
   async getPriceQuote(id: string): Promise<OfferPriceQuoteModel> {
     const resp = await this.makeRequest<GetOfferPriceQuoteResponseSchema>(`/offers/quotes/${id}`, {
-      queryParams: {
-        include: [
-          "groups",
-          "groups.details",
-          "groups.details.legType",
-          "groups.options",
-          "groups.options.details",
-          "groups.options.details.cabinClass",
-          "groups.options.details.details",
-        ].join(","),
-      },
+      // queryParams: {
+      //   include: [
+      //     "groups",
+      //     "groups.details",
+      //     "groups.details.legType",
+      //     "groups.options",
+      //     "groups.options.details",
+      //     "groups.options.details.cabinClass",
+      //     "groups.options.details.details",
+      //   ].join(","),
+      // },
     });
 
     if (resp.status === 404) {

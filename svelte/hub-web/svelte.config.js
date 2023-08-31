@@ -6,7 +6,11 @@ const config = {
   // Consult https://kit.svelte.dev/docs/integrations#preprocessors
   // for more information about preprocessors
   preprocess: vitePreprocess(),
-
+  vitePlugin: {
+    inspector: {
+      toggleKeyCombo: "control-shift",
+    },
+  },
   kit: {
     adapter: adapter(),
     alias: {

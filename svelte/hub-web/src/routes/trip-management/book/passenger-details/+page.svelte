@@ -1,20 +1,21 @@
 <script lang="ts" context="module">
-  function getDefaultPassengers(passengers: PassengerCountData): PassengerData[] {
+  function getDefaultPassengers(passengers: PassengerCountData): PartialPassengerData[] {
     return [
       ...Array(passengers.adults)
         .fill(undefined)
-        .map<PassengerData>(() => ({ document: {}, type: "adult" })),
+        .map<PartialPassengerData>(() => ({ document: {}, type: "adult" })),
       ...Array(passengers.children)
         .fill(undefined)
-        .map<PassengerData>(() => ({ document: {}, type: "child" })),
+        .map<PartialPassengerData>(() => ({ document: {}, type: "child" })),
       ...Array(passengers.infants)
         .fill(undefined)
-        .map<PassengerData>(() => ({ document: {}, type: "infant" })),
+        .map<PartialPassengerData>(() => ({ document: {}, type: "infant" })),
     ];
   }
 </script>
 
 <script lang="ts">
+  import type { z } from "zod";
   import { browser } from "$app/environment";
   import { page } from "$app/stores";
   import type { MaybePromise } from "@sveltejs/kit";
@@ -25,8 +26,16 @@
   import { callAction, sleep } from "utils/common";
   import Countdown from "../countdown.svelte";
   import Summary from "../summary/summary.svelte";
-  import Passengers, { type PassengerData } from "./passengers.svelte";
-  import ContactInformation, { type ContactInformationData } from "./contact-information.svelte";
+  import PassengerEntry, {
+    passengerListData,
+    type PassengerListData,
+    type PartialPassengerData,
+  } from "./passenger-entry.svelte";
+  import ContactInformation, {
+    type PartialContactInformationData,
+    type ContactInformationData,
+    contactInformationData,
+  } from "./contact-information.svelte";
   import { goto } from "$app/navigation";
   import type { PassengerCountData, ResolvedSearchData } from "../common";
   import { URLExtended } from "utils/url";
@@ -35,14 +44,16 @@
 
   let getPriceQuoteTask: MaybePromise<OfferPriceQuoteModel | undefined> = data.priceQuote;
   let priceQuoteId: string | undefined = data.priceQuote.id;
-  let bookingDetails: { passengers: PassengerData[]; contactInformation: ContactInformationData } =
-    {
-      passengers: getDefaultPassengers(data.searchData.passengers),
-      contactInformation: {
-        phone: {},
-        address: {},
-      },
-    };
+  let bookingDetails: {
+    passengers: PartialPassengerData[];
+    contactInformation: PartialContactInformationData;
+  } = {
+    passengers: getDefaultPassengers(data.searchData.passengers),
+    contactInformation: {
+      phone: {},
+      address: {},
+    },
+  };
 
   $: backUrl = getBackUrl(data.searchData);
   $: priceQuoteId = data.priceQuote.id;
@@ -98,7 +109,31 @@
     return pollPriceQuote(id);
   }
 
+  let passengerErrors: z.ZodFormattedError<PassengerListData> | undefined = undefined;
+  let contactInformationErrors: z.ZodFormattedError<ContactInformationData> | undefined = undefined;
+
   async function goToNext(): Promise<void> {
+    const validatePassengers = passengerListData.safeParse(bookingDetails.passengers);
+    const validateContactDetails = contactInformationData.safeParse(
+      bookingDetails.contactInformation,
+    );
+
+    if (validatePassengers.success === false) {
+      passengerErrors = validatePassengers.error.format();
+    } else {
+      passengerErrors = undefined;
+    }
+
+    if (validateContactDetails.success === false) {
+      contactInformationErrors = validateContactDetails.error.format();
+    } else {
+      contactInformationErrors = undefined;
+    }
+
+    if (passengerErrors || contactInformationErrors) {
+      return;
+    }
+
     if (!data.priceQuote.price) {
       return;
     }
@@ -138,9 +173,10 @@
 
   <div class="scroll">
     <div class="details">
-      <Passengers bind:passengers={bookingDetails.passengers} />
+      <PassengerEntry errors={passengerErrors} bind:passengers={bookingDetails.passengers} />
 
       <ContactInformation
+        errors={contactInformationErrors}
         countries={data.countries}
         bind:contactInformation={bookingDetails.contactInformation}
       />

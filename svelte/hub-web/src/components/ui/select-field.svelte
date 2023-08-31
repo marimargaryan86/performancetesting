@@ -20,7 +20,7 @@
   export let label: string | undefined = undefined;
   export let placeholder: string | undefined = undefined;
   export let required = false;
-  export let error: string | boolean = false;
+  export let error: string | string[] | boolean = false;
 
   let expanded = false;
 
