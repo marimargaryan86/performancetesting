@@ -11,9 +11,21 @@ from snowfall.project.junction.go import fixtures
 from snowfall.project.junction.go.adapter import errors, orders
 from snowfall.project.junction.hub.service.hub_api import bootstrap, router
 from snowfall.project.pay import fixtures as pay_fixtures
-from snowfall.project.pay.adapter import accounts, companies, contacts
+from snowfall.project.pay.adapter import (
+    accounts,
+    beneficiaries,
+    companies,
+    contacts,
+    conversions,
+    transactions,
+)
+from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import (
+    QuotationAmounts,
+    QuotationRates,
+    Transaction,
+)
 from snowfall.stdlib import authentication as stdlib_auth
-from snowfall.stdlib import string
+from snowfall.stdlib import money, string
 from snowfall.stdlib.integration.starlette import application, authentication, handlers
 from snowfall.stdlib.persistence import filesystem
 from snowfall.vendor.currency_cloud.client import PaymentClient
@@ -47,6 +59,80 @@ def orders_client() -> orders.Client:
 def companies_client() -> companies.Client:
     return companies.DictClient(
         pay_fixtures.get_companies(),
+    )
+
+
+@pytest.fixture()
+def beneficiaries_client() -> beneficiaries.DictClient:
+    return beneficiaries.DictClient(
+        (
+            beneficiaries.models_pb2.Beneficiary(  # type: ignore[attr-defined]
+                id=string.uuid(),
+                external_reference=string.uuid(),
+                account_id=string.uuid(),
+                created_by="ByMe",
+                updated_by="ByMe",
+                payment_type="priority",
+                currency="USD",
+            ),
+        ),
+    )
+
+
+@pytest.fixture()
+def conversions_client(
+    transaction_ids: Sequence[str],
+) -> conversions.DictClient:
+    return conversions.DictClient(
+        [
+            pay_fixtures.generate_conversion(conversion_id)
+            for conversion_id in pay_fixtures.CONVERSIONS
+        ],
+    )
+
+
+@pytest.fixture()
+def transaction_ids() -> Sequence[str]:
+    return [
+        "e719b289-982c-42f0-99a2-63fa70f8f8c0",
+        "c36649e6-71f1-4dfa-aa5a-01c0ede6e538",
+    ]
+
+
+def get_transaction(transaction_id: str) -> Transaction:
+    money_usd = money.from_string("1000", money.Currency("USD")).protobuf()
+
+    return Transaction(
+        id=transaction_id,
+        external_reference_id=string.uuid(),
+        invoice_reference_id=string.uuid(),
+        conversion_id=string.uuid(),
+        amounts=QuotationAmounts(
+            beneficiary=money_usd,
+            base_converted=money_usd,
+            fx_margin=money_usd,
+            processing_margin=money_usd,
+            sales_margin=money_usd,
+            quotation=money_usd,
+        ),
+        rates=QuotationRates(
+            fx_quote=float(1),
+            fx_buffer=float(1),
+            fx_markup=float(1),
+            sales_markup=float(1),
+            processing_markup=float(2),
+        ),
+        payer_id=string.uuid(),
+        beneficiary_id=string.uuid(),
+    )
+
+
+@pytest.fixture()
+def transactions_client(
+    transaction_ids: Sequence[str],
+) -> transactions.Client:
+    return transactions.DictClient(
+        [get_transaction(transaction_id) for transaction_id in transaction_ids],
     )
 
 
@@ -178,11 +264,14 @@ def contacts_client() -> contacts.DictClient:
     )
 
 
-def _create_app(
+def _create_app(  # noqa: WPS211
     orders_client: orders.Client,
     companies_client: companies.Client,
     contacts_client: contacts.Client,
     accounts_client: accounts.Client,
+    conversions_client: conversions.Client,
+    beneficiaries_client: beneficiaries.Client,
+    transactions_client: transactions.Client,
     cc_payment_client: PaymentClient,
 ) -> applications.Starlette:
     asgi_app = application.create_starlette_app(
@@ -192,6 +281,9 @@ def _create_app(
                 companies_client=companies_client,
                 accounts_client=accounts_client,
                 contacts_client=contacts_client,
+                beneficiaries_client=beneficiaries_client,
+                conversions_client=conversions_client,
+                transactions_client=transactions_client,
                 cc_payment_client=cc_payment_client,
             ),
         ),
@@ -232,11 +324,14 @@ async def client(
 
 
 @pytest.fixture()
-def app(
+def app(  # noqa: WPS211
     orders_client: orders.Client,
     companies_client: companies.Client,
     contacts_client: contacts.Client,
     accounts_client: accounts.Client,
+    beneficiaries_client: beneficiaries.Client,
+    conversions_client: conversions.Client,
+    transactions_client: transactions.Client,
     cc_payment_client: PaymentClient,
 ) -> applications.Starlette:
     return _create_app(
@@ -244,5 +339,8 @@ def app(
         companies_client=companies_client,
         accounts_client=accounts_client,
         contacts_client=contacts_client,
+        beneficiaries_client=beneficiaries_client,
+        conversions_client=conversions_client,
+        transactions_client=transactions_client,
         cc_payment_client=cc_payment_client,
     )

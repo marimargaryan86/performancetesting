@@ -99,12 +99,16 @@ job "hub-api-http" {
               destination_name = "authentication-${var.environment}"
             }
             upstreams {
-              local_bind_port  = 8060
-              destination_name = "orders-${var.environment}"
+              local_bind_port  = 8020
+              destination_name = "transactions-${var.environment}"
             }
             upstreams {
               local_bind_port  = 8040
               destination_name = "companies-${var.environment}"
+            }
+            upstreams {
+              local_bind_port  = 8060
+              destination_name = "orders-${var.environment}"
             }
           }
         }
@@ -146,6 +150,7 @@ job "hub-api-http" {
 AUTHENTICATION_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_authentication-${var.environment}"))}}
 ORDERS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_orders-${var.environment}"))}}
 COMPANIES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_companies-${var.environment}"))}}
+TRANSACTIONS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_transactions-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/currencycloud" }}
 CC_LOGIN={{ .Data.data.cc_login }}
 CC_API_KEY={{ .Data.data.cc_api_key }}

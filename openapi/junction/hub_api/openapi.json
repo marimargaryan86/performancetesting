@@ -23,6 +23,12 @@
       ]
     },
     {
+      "name": "Beneficiaries",
+      "tags": [
+        "beneficiaries"
+      ]
+    },
+    {
       "name": "Companies",
       "tags": [
         "companies"
@@ -32,6 +38,12 @@
       "name": "Contacts",
       "tags": [
         "contacts"
+      ]
+    },
+    {
+      "name": "Conversions",
+      "tags": [
+        "conversions"
       ]
     },
     {
@@ -60,6 +72,11 @@
       "x-displayName": "Accounts"
     },
     {
+      "name": "beneficiaries",
+      "description": "Beneficiaries",
+      "x-displayName": "Beneficiaries"
+    },
+    {
       "name": "companies",
       "description": "Company related actions.",
       "x-displayName": "Companies"
@@ -68,6 +85,11 @@
       "name": "contacts",
       "description": "Contact related actions.",
       "x-displayName": "Contacts"
+    },
+    {
+      "name": "conversions",
+      "description": "Conversions",
+      "x-displayName": "Conversions"
     },
     {
       "name": "internal",
@@ -455,6 +477,221 @@
         }
       }
     },
+    "/beneficiaries/{beneficiaryId}": {
+      "get": {
+        "summary": "Get Beneficiary",
+        "tags": [
+          "beneficiaries"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/beneficiaryId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Beneficiary"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-beneficiaries-id",
+        "description": "Get beneficiary"
+      },
+      "patch": {
+        "summary": "Update Beneficiary",
+        "tags": [
+          "beneficiaries"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/beneficiaryId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/Beneficiary"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Beneficiary"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "patch-beneficiaries-id",
+        "description": "Update beneficiary"
+      }
+    },
+    "/beneficiaries": {
+      "post": {
+        "summary": "Create beneficiary",
+        "tags": [
+          "beneficiaries"
+        ],
+        "operationId": "post-beneficiaries",
+        "description": "Create beneficiary",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/Beneficiary"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Beneficiary created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Beneficiary"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "get": {
+        "summary": "List Beneficiaries",
+        "tags": [
+          "beneficiaries"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "minItems": 0,
+                          "items": {
+                            "$ref": "#/components/schemas/Beneficiary"
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "operationId": "get-beneficiaries",
+        "description": "Get beneficiaries"
+      }
+    },
     "/bookings/{bookingId}": {
       "parameters": [
         {
@@ -523,6 +760,108 @@
         },
         "operationId": "get-bookings-id",
         "description": "Used to lookup data for a Booking Identifier."
+      }
+    },
+    "/conversions": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ConversionInclude"
+        }
+      ],
+      "get": {
+        "summary": "List conversions details",
+        "description": "List FX conversions details",
+        "tags": [
+          "conversions"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ],
+        "operationId": "get-conversions",
+        "responses": {
+          "200": {
+            "description": "List Conversions ",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Conversion"
+                      }
+                    },
+                    "included": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Transaction"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/conversions/{conversionId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/conversionId"
+        },
+        {
+          "$ref": "#/components/parameters/ConversionInclude"
+        }
+      ],
+      "get": {
+        "summary": "Get conversion details",
+        "description": "Get conversion details",
+        "tags": [
+          "conversions"
+        ],
+        "operationId": "get-conversions-id",
+        "responses": {
+          "200": {
+            "description": "Conversion is fetched",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Conversion"
+                    },
+                    "included": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Transaction"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
       }
     },
     "/journeys": {
@@ -1681,6 +2020,37 @@
         },
         "description": "Account id"
       },
+      "beneficiaryId": {
+        "name": "beneficiaryId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "271f6d54-9e59-407e-a860-b0771d9e3d26"
+        },
+        "description": "Beneficiary id"
+      },
+      "ConversionInclude": {
+        "name": "include",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "transactions"
+            ]
+          },
+          "example": [
+            "transactions"
+          ]
+        },
+        "description": "Customize which related resources to return",
+        "style": "form",
+        "explode": false
+      },
       "filterAccountsStatus": {
         "name": "filter[status][eq]",
         "in": "query",
@@ -1948,6 +2318,17 @@
           "example": "271f6d54-9e59-407e-a860-b0771d9e3d26"
         },
         "description": "Company id"
+      },
+      "conversionId": {
+        "name": "conversionId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "271f6d54-9e59-407e-a860-b0771d9e3d26"
+        },
+        "description": "Conversion id"
       },
       "filterCompaniesType": {
         "name": "filter[type][eq]",
@@ -3181,6 +3562,486 @@
           }
         }
       },
+      "BankDetails": {
+        "title": "Bank Details",
+        "type": "object",
+        "required": [
+          "name",
+          "address",
+          "accountType",
+          "paymentTypes"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "BankName",
+            "minLength": 1,
+            "maxLength": 150
+          },
+          "bicSwift": {
+            "type": "string",
+            "pattern": "^[0-9A-Z]{8}$|^[0-9A-Z]{11}$",
+            "description": "BIC/SWIFT code",
+            "example": "AAAABBCC123",
+            "nullable": true
+          },
+          "accountType": {
+            "type": "string",
+            "enum": [
+              "checking",
+              "savings"
+            ],
+            "example": "savings"
+          },
+          "paymentTypes": {
+            "type": "string",
+            "example": "regular",
+            "enum": [
+              "priority",
+              "regular"
+            ],
+            "description": "'priority' (SWIFT) or 'regular' (local)"
+          },
+          "address": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AddressDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "addressLines",
+                  "countryCode"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "BankDetailsAba": {
+        "title": "Bank Details Aba",
+        "type": "object",
+        "required": [
+          "accountNumber",
+          "aba"
+        ],
+        "properties": {
+          "accountNumber": {
+            "type": "string",
+            "description": "Bank account number",
+            "example": "00997950423807",
+            "nullable": true
+          },
+          "aba": {
+            "type": "string",
+            "description": "AN ABA (American Bankers Association)",
+            "example": "123456789",
+            "nullable": true
+          }
+        }
+      },
+      "BankDetailsIban": {
+        "title": "Bank Details Iban",
+        "type": "object",
+        "required": [
+          "iban"
+        ],
+        "properties": {
+          "iban": {
+            "type": "string",
+            "description": "IBAN code",
+            "example": "GB06 BARC 1231 4512 7782 32",
+            "nullable": true
+          }
+        }
+      },
+      "Conversion": {
+        "title": "Conversion Details",
+        "allOf": [
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "type",
+              "attributes"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "04f83af5-10bb-4a0f-1881-03e1e690f0f5",
+                "format": "uuid",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "conversions"
+                ],
+                "example": "conversions"
+              },
+              "attributes": {
+                "properties": {
+                  "createdAt": {
+                    "type": "string",
+                    "example": "2023-03-06T14:30:00+00:00",
+                    "format": "date-time"
+                  },
+                  "settledAt": {
+                    "type": "string",
+                    "example": "2023-03-06T14:30:00+00:00",
+                    "format": "date-time"
+                  },
+                  "sellAmount": {
+                    "$ref": "#/components/schemas/Money"
+                  },
+                  "buyAmount": {
+                    "$ref": "#/components/schemas/Money"
+                  },
+                  "executedRate": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 1.02
+                  },
+                  "fxDelta": {
+                    "type": "number",
+                    "format": "float",
+                    "nullable": true,
+                    "description": "difference execution and quotation rates",
+                    "example": 1.02
+                  },
+                  "fxStatus": {
+                    "type": "string",
+                    "enum": [
+                      "unspecified",
+                      "executed",
+                      "failed"
+                    ],
+                    "example": "executed"
+                  }
+                }
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "transactions"
+                ],
+                "properties": {
+                  "transactions": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/TransactionIdentifier"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ]
+      },
+      "ConversionIdentifier": {
+        "title": "Conversion Identifier",
+        "type": "object",
+        "required": [
+          "id",
+          "type"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "conversions"
+            ],
+            "example": "conversions"
+          }
+        }
+      },
+      "Transaction": {
+        "title": "Transaction",
+        "description": "Transaction schema",
+        "allOf": [
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "type",
+              "attributes"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "format": "uuid",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "transactions"
+                ],
+                "example": "transactions"
+              },
+              "attributes": {
+                "required": [
+                  "externalReference",
+                  "createdAt",
+                  "amounts",
+                  "rates",
+                  "paymentType",
+                  "paymentMethod"
+                ],
+                "properties": {
+                  "externalReference": {
+                    "type": "string",
+                    "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                    "format": "uuid",
+                    "description": "The UUID related to a specific transaction in our integrating partners DB"
+                  },
+                  "invoiceReference": {
+                    "type": "string",
+                    "example": "k1234567890123"
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "example": "2023-01-20T17:04:14+00:00",
+                    "format": "date-time",
+                    "readOnly": true
+                  },
+                  "amounts": {
+                    "type": "object",
+                    "required": [
+                      "beneficiary",
+                      "quotation",
+                      "baseConverted",
+                      "salesMargin",
+                      "fxMargin",
+                      "processingMargin"
+                    ],
+                    "properties": {
+                      "beneficiary": {
+                        "allOf": [
+                          {
+                            "$ref": "#/components/schemas/Money"
+                          }
+                        ],
+                        "readOnly": true,
+                        "description": "This is how much Junction PAY will need to pay out"
+                      },
+                      "quotation": {
+                        "allOf": [
+                          {
+                            "$ref": "#/components/schemas/Money"
+                          }
+                        ],
+                        "readOnly": true,
+                        "description": "The amount that Junction PAY will be owed."
+                      },
+                      "baseConverted": {
+                        "allOf": [
+                          {
+                            "$ref": "#/components/schemas/Money"
+                          }
+                        ],
+                        "readOnly": true,
+                        "description": "The amount Junction PAY will need to collect in the payers currency to cover what Junction PAY owes to a beneficiary"
+                      },
+                      "salesMargin": {
+                        "allOf": [
+                          {
+                            "$ref": "#/components/schemas/Money"
+                          }
+                        ],
+                        "readOnly": true,
+                        "description": "The monetary value of the sales markup for a specific transaction"
+                      },
+                      "fxMargin": {
+                        "allOf": [
+                          {
+                            "$ref": "#/components/schemas/Money"
+                          }
+                        ],
+                        "readOnly": true,
+                        "description": "The monetary value of the fx markup for a specific transaction for Junction PAY"
+                      },
+                      "processingMargin": {
+                        "allOf": [
+                          {
+                            "$ref": "#/components/schemas/Money"
+                          }
+                        ],
+                        "readOnly": true,
+                        "description": "The monetary value of the provider markup for a specific transaction"
+                      }
+                    },
+                    "readOnly": true
+                  },
+                  "rates": {
+                    "type": "object",
+                    "required": [
+                      "fxQuote",
+                      "fxBuffer",
+                      "salesMarkup",
+                      "fxMarkup"
+                    ],
+                    "properties": {
+                      "fxQuote": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 1.02,
+                        "readOnly": true,
+                        "description": "The FX rate Junction PAY provided during the quotation call"
+                      },
+                      "fxBuffer": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 1.02,
+                        "readOnly": true,
+                        "description": "The amount  the exchange rate can move between quotation and transaction before Junction PAY loose money on the trade"
+                      },
+                      "salesMarkup": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 1.02,
+                        "readOnly": true,
+                        "description": "The percentage Junction PAY adds as a sales fee"
+                      },
+                      "fxMarkup": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 1.02,
+                        "readOnly": true,
+                        "description": "The percentage Junction PAY adds to foreign exchange"
+                      }
+                    },
+                    "readOnly": true
+                  },
+                  "paymentType": {
+                    "type": "string",
+                    "enum": [
+                      "unspecified",
+                      "card",
+                      "bank-transfer"
+                    ],
+                    "example": "card"
+                  },
+                  "paymentMethod": {
+                    "type": "string",
+                    "enum": [
+                      "unspecified",
+                      "transactional",
+                      "invoice"
+                    ],
+                    "example": "transactional"
+                  }
+                }
+              },
+              "relationships": {
+                "required": [
+                  "quotation"
+                ],
+                "properties": {
+                  "quotation": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/QuotationIdentifier"
+                      }
+                    },
+                    "writeOnly": true
+                  },
+                  "conversion": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/ConversionIdentifier"
+                          },
+                          {
+                            "nullable": true
+                          }
+                        ],
+                        "nullable": true
+                      }
+                    },
+                    "readOnly": true,
+                    "description": "The ID that links and FX transaction in the provider system to Junction PAYs transcation history"
+                  },
+                  "payer": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/CompanyIdentifier"
+                      }
+                    },
+                    "readOnly": true,
+                    "description": "The ID used to determine who will owe Junction PAY a monetary value"
+                  },
+                  "beneficiary": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/CompanyIdentifier"
+                      }
+                    },
+                    "readOnly": true,
+                    "description": "The ID used to determine who Junction PAY owes a monetary value to"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ]
+      },
+      "TransactionIdentifier": {
+        "title": "Transaction Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "04f83af5-10bb-4a0f-1881-03e1e690f0f5",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "transactions"
+            ],
+            "example": "transactions"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
       "CompanyIdentifier": {
         "title": "Company Identifier",
         "type": "object",
@@ -3223,6 +4084,167 @@
         "required": [
           "id",
           "type"
+        ]
+      },
+      "CurrencyIdentifier": {
+        "title": "Currency Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "USD"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "currencies"
+            ],
+            "example": "currencies"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "QuotationIdentifier": {
+        "title": "Quotation Identifier",
+        "type": "object",
+        "required": [
+          "id",
+          "type"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "quotations"
+            ],
+            "example": "quotations"
+          }
+        }
+      },
+      "Beneficiary": {
+        "title": "Beneficiary",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "271f6d54-9e59-407e-a860-b0771d9e3d26",
+                "format": "uuid",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "example": "beneficiaries",
+                "enum": [
+                  "beneficiaries"
+                ]
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "bankAccountHolderName": {
+                    "type": "string",
+                    "example": "bankAccountHolderName",
+                    "minLength": 1,
+                    "maxLength": 150
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "example@email.com",
+                    "format": "email",
+                    "maxLength": 255
+                  },
+                  "beneficiaryAddress": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/EnhancedAddressDetails"
+                      },
+                      {
+                        "type": "object",
+                        "required": [
+                          "addressLines",
+                          "countryCode"
+                        ]
+                      }
+                    ]
+                  },
+                  "bankDetails": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/BankDetails"
+                      },
+                      {
+                        "oneOf": [
+                          {
+                            "$ref": "#/components/schemas/BankDetailsAba"
+                          },
+                          {
+                            "$ref": "#/components/schemas/BankDetailsIban"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "bankAccountHolderName",
+                  "email",
+                  "beneficiaryAddress",
+                  "bankDetails"
+                ]
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "currency",
+                  "account"
+                ],
+                "properties": {
+                  "currency": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/CurrencyIdentifier"
+                      }
+                    }
+                  },
+                  "account": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/AccountIdentifier"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes",
+              "relationships"
+            ],
+            "description": "Beneficiary schema."
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
         ]
       },
       "BookingsCancellation": {

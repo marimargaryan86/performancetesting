@@ -1,0 +1,83 @@
+from collections.abc import Sequence
+
+import httpx
+
+from snowfall.project.pay.adapter import beneficiaries
+from snowfall.project.pay.service.companies.v1alpha.models_pb2 import Account, Company
+from snowfall.stdlib import money
+from snowfall.stdlib.format import jsonapi
+
+
+class TestBeneficiary(object):
+    async def test_post_beneficiary(  # noqa: WPS210
+        self,
+        client: httpx.AsyncClient,
+        account: Account,
+        company: Company,
+        available_currencies: Sequence[money.Currency],
+        beneficiaries_client: beneficiaries.Client,
+    ) -> None:
+        request = {
+            "data": {
+                "type": "beneficiaries",
+                "attributes": {
+                    "bankAccountHolderName": "bankAccountHolderName",
+                    "email": "example@email.com",
+                    "beneficiaryAddress": {
+                        "addressLines": [
+                            "Street name 7",
+                        ],
+                        "countryCode": "GB",
+                        "postalCode": "12345",
+                        "city": "London",
+                        "state": "California",
+                    },
+                    "bankDetails": {
+                        "accountNumber": "32847346",
+                        "name": "BankName",
+                        "bicSwift": "AAAABBCC123",
+                        "iban": "GB06 BARC 1231 4512 7782 32",
+                        "accountType": "savings",
+                        "paymentTypes": "regular",
+                        "address": {
+                            "addressLines": [
+                                "Street name 7",
+                            ],
+                            "countryCode": "GB",
+                            "postalCode": "12345",
+                            "city": "London",
+                            "state": "California",
+                        },
+                    },
+                },
+                "relationships": {
+                    "currency": {
+                        "data": {
+                            "id": available_currencies[-1].code,
+                            "type": "currencies",
+                        },
+                    },
+                    "account": {
+                        "data": {
+                            "id": account.id,
+                            "type": "accounts",
+                        },
+                    },
+                },
+            },
+        }
+
+        response = await client.post(
+            "/beneficiaries",
+            json=request,
+        )
+        payload = response.json()["data"]
+        flatten_payload = jsonapi.flatten_resource(payload)
+        flatten_request = jsonapi.flatten_resource(request["data"])
+        assert payload["id"]
+        assert flatten_payload["currency"] == flatten_request["currency"]
+        assert flatten_payload["account"] == flatten_request["account"]
+
+        beneficiary = await beneficiaries_client.get(payload["id"])
+
+        assert beneficiary is not None

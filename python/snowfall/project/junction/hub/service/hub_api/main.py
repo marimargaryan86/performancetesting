@@ -11,15 +11,22 @@ from snowfall.project.pay.adapter import (
     accounts as accounts_adapter,
 )
 from snowfall.project.pay.adapter import (
-    companies as companies_adapter,
+    beneficiaries,
+    contacts,
+    conversions,
+    transactions,
 )
 from snowfall.project.pay.adapter import (
-    contacts,
+    companies as companies_adapter,
 )
 from snowfall.project.pay.service.companies.v1alpha.grpc_pb2_grpc import (
     AccountsServiceStub,
+    BeneficiariesServiceStub,
     CompaniesServiceStub,
     ContactsServiceStub,
+)
+from snowfall.project.pay.service.transactions.v1alpha import (
+    grpc_pb2_grpc as transactions_pb2_grpc,
 )
 from snowfall.service.authentication.v1 import sessions_pb2_grpc
 from snowfall.stdlib.integration.starlette import application as starlette
@@ -37,6 +44,7 @@ class Settings(starlette.Settings):
     authentication_address: str
     orders_address: str
     companies_address: str
+    transactions_address: str
     validate_responses_against_spec: bool = True
 
 
@@ -50,6 +58,9 @@ def _factory(
         session_client = sessions_pb2_grpc.SessionServiceStub(authentication_channel)
         orders_channel = client.create_channel(app.settings.orders_address)
         companies_channel = client.create_channel(app.settings.companies_address)
+        transactions_channel = client.create_channel(
+            app.settings.transactions_address,
+        )
         cc_payment_client = PaymentClient(
             base_url=app.settings.cc_address,
             auth=CurrencyCloudAuth(
@@ -80,6 +91,21 @@ def _factory(
                     contacts_client=contacts.GrpcClient(
                         ContactsServiceStub(
                             companies_channel,
+                        ),
+                    ),
+                    beneficiaries_client=beneficiaries.GrpcClient(
+                        BeneficiariesServiceStub(
+                            companies_channel,
+                        ),
+                    ),
+                    conversions_client=conversions.GrpcClient(
+                        transactions_pb2_grpc.ConversionsServiceStub(
+                            transactions_channel,
+                        ),
+                    ),
+                    transactions_client=transactions.GrpcClient(
+                        transactions_pb2_grpc.TransactionsServiceStub(
+                            transactions_channel,
                         ),
                     ),
                     cc_payment_client=cc_payment_client,
