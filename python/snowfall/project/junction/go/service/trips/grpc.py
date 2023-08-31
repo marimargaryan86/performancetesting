@@ -269,8 +269,15 @@ class TripCandidateService(
         if not trip_candidate_search:
             await context.abort(StatusCode.NOT_FOUND)
 
+        offer_search_ids = trip_candidate_search.offer_search_ids  # type: ignore[union-attr]
+
+        if not offer_search_ids:
+            return trips_pb2.ListTripCandidatesResponse(
+                next_page_token="",
+            )
+
         offer_aggregates = await self._offers_adapter.find_offers_by_offer_searches(
-            identifiers=trip_candidate_search.offer_search_ids,  # type: ignore[union-attr]
+            identifiers=offer_search_ids,
             limit=request.page_size,
             cursor=request.page_token,
             cabin_classes=request.cabin_class_types,
