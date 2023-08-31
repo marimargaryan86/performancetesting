@@ -1,17 +1,20 @@
 {
   "development": {
     "variables": {
-      "count": 1
+      "count": 1,
+      "search_timeout": "PT50S"
     }
   },
   "production": {
     "variables": {
-      "count": 1
+      "count": 1,
+      "search_timeout": "PT30S"
     }
   },
   "sandbox": {
     "variables": {
-      "count": 1
+      "count": 1,
+      "search_timeout": "PT30S"
     }
   }
 }

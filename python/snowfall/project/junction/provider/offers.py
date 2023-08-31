@@ -55,7 +55,7 @@ class OfferSearchImplementation(Generic[_SearchCriteriaTask, _SearchCriteria]):
 
 
 class TripOfferSearcher(Generic[_SearchCriteriaTask, _SearchCriteria]):
-    _search_timeout_s = 30  # noqa: WPS432
+    _search_timeout_s = 50  # noqa: WPS432
 
     def __init__(
         self,

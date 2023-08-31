@@ -26,6 +26,10 @@ variable "count" {
   type = number
 }
 
+variable "search_timeout" {
+  type = string
+}
+
 job "gateway-consume" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -153,6 +157,7 @@ EOH
         ENV_NAME        = "${var.environment}"
         SENTRY_DSN      = "https://a7dc859d8f87421293496a948693c9c5@sentry.snowfall.se/128"
         PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
+        SEARCH_TIMEOUT  = var.search_timeout
       }
     }
   }
