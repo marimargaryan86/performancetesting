@@ -6,6 +6,7 @@ import (
 	models "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/v1"
 	v1Stdlib "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1"
 	"git.snowfall.se/junction/junction/golang/raptor"
+	"git.snowfall.se/junction/junction/golang/stdlib/sliceutil"
 	"github.com/google/uuid"
 	"github.com/uber/h3-go/v4"
 	"google.golang.org/grpc/codes"
@@ -121,7 +122,7 @@ func (ps *PlannerServiceServer) SearchJourney(context context.Context, req *plan
 		maxConnections = int(*req.MaximumConnections)
 	}
 
-	results, err := ps.Planner.Search(origins, destinations, departureTime, allowedSegmentTypes, maxConnections)
+	results, err := ps.Planner.Search(sliceutil.Unique(origins), sliceutil.Unique(destinations), departureTime, allowedSegmentTypes, maxConnections)
 
 	if err != nil {
 		return &planner.SearchJourneyResponse{}, status.Errorf(codes.Unknown, "raptor returned an error")
