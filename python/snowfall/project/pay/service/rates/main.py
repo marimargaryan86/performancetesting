@@ -3,7 +3,7 @@ import random
 from collections.abc import Sequence
 
 from motor import motor_asyncio
-from pydantic import AnyUrl
+from pydantic import AnyUrl, RedisDsn
 from redis import asyncio as aioredis
 
 from snowfall.project.pay.service.rates import cache
@@ -12,6 +12,7 @@ from snowfall.project.pay.service.rates.grpc import RatesService
 from snowfall.project.pay.service.rates.rates import BackUpRatesRepository
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.service import application
+from snowfall.stdlib.service.redis_factory import make_connection
 from snowfall.stdlib.transport.grpc import server
 from snowfall.vendor.currency_cloud.client import CurrencyCloudAuth, PaymentClient
 
@@ -25,7 +26,7 @@ class _GrpcSettings(application.Settings):
 
 class _BackUpCronJobSettings(application.Settings):
     mongo_dsn: Sequence[AnyUrl]
-    redis_dsn: Sequence[AnyUrl]
+    redis_dsn: RedisDsn
     cc_login: str
     cc_api_key: str
     cc_address: str
@@ -60,17 +61,18 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
 
 
 async def _backup_rates_cron_run(
-    app: application.Application[_BackUpCronJobSettings],
+    app: application.AsyncApplication[_BackUpCronJobSettings],
 ) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
+    redis_conn = await make_connection(
+        app,
+        app.settings.redis_dsn,
+        decode_responses=True,
+    )
     redis_client = redis.Client[str](
-        aioredis.from_url(
-            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
-            decode_responses=True,
-            retry_on_error=[aioredis.ConnectionError],
-        ).client(),
+        redis_conn,
         prefix=app.name,
     )
 
