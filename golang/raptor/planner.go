@@ -1,6 +1,7 @@
 package raptor
 
 import (
+	"errors"
 	"git.snowfall.se/junction/junction/golang/legacy"
 	planner "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/planner/v1"
 	models "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/v1"
@@ -61,6 +62,12 @@ func NewPlanner(
 }
 
 func (p *Planner) Search(froms []*planner.Stop, tos []*planner.Stop, departureAt time.Time, kindList []models.Schedule_Type, maxConnections int) ([]*Trip, error) {
+	eTime := departureAt.AddDate(0, 0, 1)
+	departureBefore := time.Date(eTime.Year(), eTime.Month(), eTime.Day(), 4, 0, 0, 0, eTime.Location())
+	return p.SearchRange(froms, tos, departureAt, departureBefore, kindList, maxConnections)
+}
+
+func (p *Planner) SearchRange(froms []*planner.Stop, tos []*planner.Stop, departureAfter time.Time, departureBefore time.Time, kindList []models.Schedule_Type, maxConnections int) ([]*Trip, error) {
 	if len(kindList) == 0 {
 		kindList = []models.Schedule_Type{
 			models.Schedule_TYPE_UNSPECIFIED,
@@ -74,9 +81,13 @@ func (p *Planner) Search(froms []*planner.Stop, tos []*planner.Stop, departureAt
 	trips := make([]*Trip, 0)
 	iterations := 0
 	start := time.Now()
-	sTime := departureAt
-	eTime := sTime.AddDate(0, 0, 1)
-	eTime = time.Date(eTime.Year(), eTime.Month(), eTime.Day(), 4, 0, 0, 0, eTime.Location())
+	sTime := departureAfter
+	eTime := departureBefore
+
+	difference := eTime.Sub(sTime).Hours()
+	if difference <= 0 || difference > 30 {
+		return trips, errors.New("Invalid date range (must be a duration of <30 hours).")
+	}
 
 	for sTime.Before(eTime) {
 		iterations++
@@ -166,7 +177,8 @@ func (p *Planner) Search(froms []*planner.Stop, tos []*planner.Stop, departureAt
 		"search performed",
 		"origins", fromIds,
 		"destinations", toIds,
-		"departure", departureAt.Format(time.RFC3339),
+		"departureAfter", departureAfter.Format(time.RFC3339),
+		"departureBefore", departureBefore.Format(time.RFC3339),
 		"segment_types", kindList,
 		"max_connections", maxConnections,
 		"iterations", iterations,
