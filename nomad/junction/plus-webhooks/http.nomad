@@ -115,7 +115,7 @@ job "plus-webhooks-http" {
     task "http" {
       driver = "docker"
       vault {
-        policies = ["plus-webhooks-${var.environment}", "notification-center-${var.environment}"]
+        policies = ["plus-webhooks-${var.environment}", "notification-center-${var.environment}", "poc-api-${var.environment}"]
       }
 
       template {
