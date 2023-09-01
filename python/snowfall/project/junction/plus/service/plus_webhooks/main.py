@@ -2,6 +2,7 @@ import datetime
 import random
 from collections.abc import Callable
 
+import openai
 from redis import asyncio as aioredis
 from starlette.applications import Starlette
 from starlette.middleware import Middleware
@@ -33,6 +34,7 @@ def _factory(
     app: application.Application[bootstrap.Settings],
 ) -> Callable[[], Starlette]:
     def decorator() -> Starlette:
+        openai.api_key = app.settings.openai_api_key
         notifications_channel = create_channel(app.settings.notifications_address)
         return starlette.create_starlette_app(
             router.get_routes(
