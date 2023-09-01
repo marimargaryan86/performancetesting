@@ -17,7 +17,7 @@ from snowfall.project.junction.go.service.orders.v1 import models_pb2
 from snowfall.project.junction.provider.v1alpha import (
     bookings_pb2 as provider_bookings_pb2,
 )
-from snowfall.stdlib import money
+from snowfall.stdlib import money, sequence
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.testing import asserts
 
@@ -96,11 +96,18 @@ class TestRepository(object):
             ),
         )
         stub = mock.create_autospec(bookings_pb2_grpc.BookingServiceStub)
+        booking.provider_id = "prov1"
+        booking.trip_result.provider_booking_reference = "ref1"
         stub.GetBookings = mock.AsyncMock(
             return_value=bookings_pb2.GetBookingsResponse(
                 bookings=[
                     bookings_pb2.Booking(
-                        id=booking.id,
+                        id=sequence.to_composite_id(
+                            [
+                                booking.provider_id,
+                                booking.trip_result.provider_booking_reference,
+                            ],
+                        ),
                         booking=provider_booking,
                     ),
                 ],

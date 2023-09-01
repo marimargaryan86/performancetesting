@@ -392,6 +392,10 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         combined_data = {
             "booking_information": base64.b64encode(raw_information).decode(),
             "ticket_information": base64.b64encode(raw_ticket).decode(),
+            "external_information": {
+                "order_id": task.booking.order_id,
+                "booking_id": task.booking.id,
+            },
         }
         await self._storage.put(
             pathlib.Path(booking_result.search_identifier),
@@ -402,18 +406,14 @@ class SaveATrainAdapter(object):  # noqa: WPS214
             ticket_body = await self._client.api_client.get_ticket_pdf(
                 get_ticket_result.url,
             )
-
+            # TODO: check if provider_id is required field(is always present)
             ticket_path = pathlib.Path(
-                task.reseller_id,
-                task.booking.provider_name,
+                task.booking.provider_id,
                 task.booking.order_id,
-                booking_result.search_identifier,
+                task.booking.id,
             ).with_suffix(".pdf")
 
-            await self._ticket_storage.put(
-                ticket_path,
-                ticket_body,
-            )
+            await self._ticket_storage.put(ticket_path, ticket_body)
 
         confirm_booking_result = await self._confirm_booking(search_id=search_id)
         return models.CombinedBookingResults(
@@ -545,11 +545,19 @@ def raise_http_error_with_text(http_error: errors.HttpStatusError) -> None:
 
 
 class Transformer(object):
-    def __init__(self, provider_identifier: uuid.UUID, provider_name: str):
+    def __init__(
+        self,
+        provider_identifier: uuid.UUID,
+        provider_name: str,
+        ticket_storage: filesystem.Storage,
+        url_timeout: int,
+    ):
         self._provider_id = str(provider_identifier)
         self._provider_name = provider_name
+        self._ticket_storage = ticket_storage
+        self._url_timeout = url_timeout
 
-    async def raw_to_booking(self, raw: bytes) -> bookings_pb2.Booking:
+    async def raw_to_booking(self, raw: bytes) -> bookings_pb2.Booking:  # noqa: WPS210
         combined = json.loads(raw.decode())
         booking_info = booking.BookingResult(
             **orjson.loads(base64.b64decode(combined["booking_information"])),
@@ -557,10 +565,20 @@ class Transformer(object):
         ticket_info = booking.TicketInfo(
             **orjson.loads(base64.b64decode(combined["ticket_information"])),
         )
+        external_info = combined.get("external_information")
 
         # TODO: How to figure out real status?
         booking_status = bookings_pb2.Booking.STATUS_CONFIRMED
-
+        ticket_url = None
+        if external_info:
+            path = pathlib.Path(
+                self._provider_id,
+                external_info["order_id"],
+                external_info["booking_id"],
+            ).with_suffix(".pdf")
+            ticket_url = await self._ticket_storage.url(path, timeout=self._url_timeout)
+        if ticket_url is None:
+            ticket_url = ""
         return bookings_pb2.Booking(
             id=booking_info.search_identifier,
             status=booking_status,
@@ -572,5 +590,6 @@ class Transformer(object):
                 record_locator=ticket_info.confirmation_code,
                 operator_booking_references=[booking_info.search_identifier],
             ),
+            ticket_url=ticket_url,
             # TODO: No idea how to get created_at or updated_at from the booking model.
         )

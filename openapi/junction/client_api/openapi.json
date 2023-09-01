@@ -6235,6 +6235,10 @@
                   "externalReference": {
                     "type": "string",
                     "example": "HDZEMS"
+                  },
+                  "ticketUrl": {
+                    "type": "string",
+                    "example": "http://example.com/ticket.pdf"
                   }
                 }
               },

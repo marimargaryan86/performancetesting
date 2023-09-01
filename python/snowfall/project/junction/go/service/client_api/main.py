@@ -23,7 +23,10 @@ from snowfall.project.junction.go.adapter import (
 from snowfall.project.junction.go.service.client_api import (
     authentication as authentication_backends,
 )
-from snowfall.project.junction.go.service.client_api import bootstrap, router
+from snowfall.project.junction.go.service.client_api import (
+    bootstrap,
+    router,
+)
 from snowfall.project.junction.go.service.offers.v1 import grpc_pb2_grpc
 from snowfall.project.junction.go.service.orders.v1 import orders_pb2_grpc
 from snowfall.project.junction.go.service.places.v1 import places_pb2_grpc

@@ -60,6 +60,7 @@ message Booking {
   google.protobuf.Timestamp updated_at = 10;
   string transaction_id = 11;
   snowfall.stdlib.v1.Money provider_total_price = 12;
+  string ticket_url = 14;
 }
 
 message TripBooking {

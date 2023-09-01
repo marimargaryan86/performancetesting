@@ -75,6 +75,7 @@ class _Settings(_SatConfig, service.ProviderSettings):
     storage_dsn: service.AnyDsn
     search_api_enabled: bool = False
     ticket_storage_dsn: service.AnyDsn
+    ticket_link_timeout: datetime.timedelta = datetime.timedelta(hours=6)
 
 
 class _PriceQuoteSettings(service.PriceQuoteSettings):
@@ -93,6 +94,7 @@ class _OrdersSettings(_SatConfig, service.Settings):
     mongo_dsn: tuple[pydantic.AnyUrl]
     storage_dsn: service.AnyDsn
     ticket_storage_dsn: service.AnyDsn
+    ticket_link_timeout: datetime.timedelta = datetime.timedelta(hours=6)
 
 
 class _NotificationsSettings(_SatConfig, service.Settings):
@@ -105,6 +107,7 @@ class _NotificationsSettings(_SatConfig, service.Settings):
     mongo_dsn: tuple[pydantic.AnyUrl]
     storage_dsn: service.AnyDsn
     ticket_storage_dsn: service.AnyDsn
+    ticket_link_timeout: datetime.timedelta = datetime.timedelta(hours=6)
 
 
 _Impl = offers.OfferSearchImplementation[
@@ -173,7 +176,6 @@ async def _offers_factory(
         ticket_storage=ticket_storage,
         search_api_enabled=app.settings.search_api_enabled,
     )
-
     return offers.OfferSearchImplementation(
         search_criteria_task_generator=criteria.CriteriaGenerator(
             h3_mapping=h3.H3MappingRepository[train_stations.TrainStation](
@@ -194,12 +196,17 @@ async def _bookings_factory(
     storage = await app.stack.enter_async_context(
         filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
     )
+    ticket_storage = await app.stack.enter_async_context(
+        filesystem.Storage.from_dsn(str(app.settings.ticket_storage_dsn)),
+    )
 
     return bookings.Implementation(
         storage=storage,
         transformer=adapter.Transformer(
             provider_identifier=_PROVIDER_ID,
             provider_name=_PROVIDER_NAME,
+            ticket_storage=ticket_storage,
+            url_timeout=app.settings.ticket_link_timeout.seconds,
         ).raw_to_booking,
     )
 

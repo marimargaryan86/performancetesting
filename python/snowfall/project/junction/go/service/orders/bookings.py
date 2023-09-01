@@ -42,12 +42,16 @@ class BookingHandler(object):
         self._logger = stdout.get_logger()
         self._timeout = timeout.total_seconds() if timeout else 10
 
-    async def get_latest(
+    async def get_latest(  # noqa: WPS210
         self,
         bookings: Sequence[models_pb2.Booking],
     ) -> list[models_pb2.Booking]:
         booking_mapping = {booking.id: booking for booking in bookings}
-
+        provider_booking_map = {
+            booking.trip_result.provider_booking_reference: booking
+            for booking in bookings
+            if (booking.provider_id and booking.trip_result.provider_booking_reference)
+        }
         try:
             response = await self._gateway.GetBookings(
                 request=gateway_bookings_pb2.GetBookingsRequest(
@@ -58,11 +62,7 @@ class BookingHandler(object):
                                 booking.trip_result.provider_booking_reference,
                             ],
                         )
-                        for booking in bookings
-                        if (
-                            booking.provider_id
-                            and booking.trip_result.provider_booking_reference
-                        )
+                        for booking in provider_booking_map.values()
                     ],
                 ),
                 timeout=self._timeout,
@@ -70,13 +70,14 @@ class BookingHandler(object):
         except grpc.aio.AioRpcError:
             self._logger.warning("Gateway service not available.")
             return list(bookings)
-
         for booking in response.bookings:
-            if booking.id not in booking_mapping:
-                continue
+            _, provider_reference = sequence.from_composite_id(booking.id)
 
-            booking_mapping[booking.id] = await self.update_local_with_provider(
-                local_booking=booking_mapping[booking.id],
+            if provider_reference not in provider_booking_map:
+                continue
+            local_booking = provider_booking_map[provider_reference]
+            booking_mapping[local_booking.id] = await self.update_local_with_provider(
+                local_booking=local_booking,
                 provider_booking=booking.booking,
             )
 
@@ -87,6 +88,7 @@ class BookingHandler(object):
         local_booking: models_pb2.Booking,
         provider_booking: bookings_pb2.Booking,
     ) -> models_pb2.Booking:
+        local_booking.ticket_url = provider_booking.ticket_url
         if not _provider_booking_is_newer(local_booking, provider_booking):
             return local_booking
 

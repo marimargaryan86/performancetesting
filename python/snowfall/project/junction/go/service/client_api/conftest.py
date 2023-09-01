@@ -27,7 +27,10 @@ from snowfall.project.junction.go.adapter import (
 from snowfall.project.junction.go.service.client_api import (
     authentication as authentication_backends,
 )
-from snowfall.project.junction.go.service.client_api import bootstrap, router
+from snowfall.project.junction.go.service.client_api import (
+    bootstrap,
+    router,
+)
 from snowfall.service.authentication.v1 import models_pb2 as auth_models_pb2
 from snowfall.stdlib.format import jwt
 from snowfall.stdlib.integration.starlette import application, handlers

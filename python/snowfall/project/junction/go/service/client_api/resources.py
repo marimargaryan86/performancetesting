@@ -726,6 +726,7 @@ class TripBookingResource(models.Resource):
                     booking.trip_result.operator_booking_references,
                 ),
                 "externalReference": booking.trip_result.record_locator,
+                "ticketUrl": booking.ticket_url,
             },
             relationships={
                 "order": {
