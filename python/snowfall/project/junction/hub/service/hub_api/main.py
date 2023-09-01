@@ -14,6 +14,7 @@ from snowfall.project.pay.adapter import (
     beneficiaries,
     contacts,
     conversions,
+    currencies,
     transactions,
 )
 from snowfall.project.pay.adapter import (
@@ -25,6 +26,7 @@ from snowfall.project.pay.service.companies.v1alpha.grpc_pb2_grpc import (
     CompaniesServiceStub,
     ContactsServiceStub,
 )
+from snowfall.project.pay.service.currencies.v1alpha import currencies_pb2_grpc
 from snowfall.project.pay.service.transactions.v1alpha import (
     grpc_pb2_grpc as transactions_pb2_grpc,
 )
@@ -45,6 +47,7 @@ class Settings(starlette.Settings):
     orders_address: str
     companies_address: str
     transactions_address: str
+    currencies_address: str
     validate_responses_against_spec: bool = True
 
 
@@ -60,6 +63,9 @@ def _factory(
         companies_channel = client.create_channel(app.settings.companies_address)
         transactions_channel = client.create_channel(
             app.settings.transactions_address,
+        )
+        currencies_channel = client.create_channel(
+            app.settings.currencies_address,
         )
         cc_payment_client = PaymentClient(
             base_url=app.settings.cc_address,
@@ -106,6 +112,11 @@ def _factory(
                     transactions_client=transactions.GrpcClient(
                         transactions_pb2_grpc.TransactionsServiceStub(
                             transactions_channel,
+                        ),
+                    ),
+                    currencies_client=currencies.GrpcClient(
+                        currencies_pb2_grpc.CurrencyServiceStub(
+                            currencies_channel,
                         ),
                     ),
                     cc_payment_client=cc_payment_client,

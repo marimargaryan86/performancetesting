@@ -23,6 +23,12 @@
       ]
     },
     {
+      "name": "Balances",
+      "tags": [
+        "balances"
+      ]
+    },
+    {
       "name": "Beneficiaries",
       "tags": [
         "beneficiaries"
@@ -70,6 +76,11 @@
       "name": "accounts",
       "description": "Accounts",
       "x-displayName": "Accounts"
+    },
+    {
+      "name": "balances",
+      "description": "Account balances in different currencies",
+      "x-displayName": "Balances"
     },
     {
       "name": "beneficiaries",
@@ -473,6 +484,120 @@
                 ]
               }
             }
+          }
+        }
+      }
+    },
+    "/accounts/{accountId}/balances": {
+      "get": {
+        "summary": "List Balances",
+        "tags": [
+          "balances"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accountId"
+          },
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "uniqueItems": true,
+                      "minItems": 0,
+                      "items": {
+                        "$ref": "#/components/schemas/Balance"
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-accounts-id-balances",
+        "description": "Get account balances"
+      }
+    },
+    "/accounts/{accountId}/relationships/currencies": {
+      "post": {
+        "summary": "Add currency in account",
+        "description": "Activate zero balance in account for given currency",
+        "tags": [
+          "accounts"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accountId"
+          }
+        ],
+        "operationId": "post-accounts-id-relationships-currencies",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/Balance"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Balance"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         }
       }
@@ -3631,6 +3756,76 @@
             }
           }
         }
+      },
+      "Balance": {
+        "title": "Balance",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "example": "balances",
+            "enum": [
+              "balances"
+            ]
+          },
+          "attributes": {
+            "type": "object",
+            "readOnly": true,
+            "properties": {
+              "amount": {
+                "$ref": "#/components/schemas/MoneyAmount"
+              }
+            },
+            "required": [
+              "amount"
+            ]
+          },
+          "relationships": {
+            "type": "object",
+            "required": [
+              "currency",
+              "account"
+            ],
+            "properties": {
+              "account": {
+                "type": "object",
+                "readOnly": true,
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/AccountIdentifier"
+                  }
+                }
+              },
+              "currency": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/CurrencyIdentifier"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "attributes",
+          "relationships"
+        ],
+        "description": "Account Balances."
       },
       "BankDetails": {
         "title": "Bank Details",

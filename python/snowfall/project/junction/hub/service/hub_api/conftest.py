@@ -17,6 +17,7 @@ from snowfall.project.pay.adapter import (
     companies,
     contacts,
     conversions,
+    currencies,
     transactions,
 )
 from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import (
@@ -88,6 +89,19 @@ def conversions_client(
             pay_fixtures.generate_conversion(conversion_id)
             for conversion_id in pay_fixtures.CONVERSIONS
         ],
+    )
+
+
+@pytest.fixture()
+def currencies_client(
+    available_currencies: Sequence[money.Currency],
+) -> currencies.DictClient:
+    return currencies.DictClient(
+        {
+            ("USD", "EUR"): 0.95,
+            ("EUR", "USD"): 1.05,
+        },
+        available_currencies,
     )
 
 
@@ -272,6 +286,7 @@ def _create_app(  # noqa: WPS211
     conversions_client: conversions.Client,
     beneficiaries_client: beneficiaries.Client,
     transactions_client: transactions.Client,
+    currencies_client: currencies.Client,
     cc_payment_client: PaymentClient,
 ) -> applications.Starlette:
     asgi_app = application.create_starlette_app(
@@ -284,6 +299,7 @@ def _create_app(  # noqa: WPS211
                 beneficiaries_client=beneficiaries_client,
                 conversions_client=conversions_client,
                 transactions_client=transactions_client,
+                currencies_client=currencies_client,
                 cc_payment_client=cc_payment_client,
             ),
         ),
@@ -332,6 +348,7 @@ def app(  # noqa: WPS211
     beneficiaries_client: beneficiaries.Client,
     conversions_client: conversions.Client,
     transactions_client: transactions.Client,
+    currencies_client: currencies.Client,
     cc_payment_client: PaymentClient,
 ) -> applications.Starlette:
     return _create_app(
@@ -342,5 +359,6 @@ def app(  # noqa: WPS211
         beneficiaries_client=beneficiaries_client,
         conversions_client=conversions_client,
         transactions_client=transactions_client,
+        currencies_client=currencies_client,
         cc_payment_client=cc_payment_client,
     )

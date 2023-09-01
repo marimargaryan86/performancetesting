@@ -4,6 +4,7 @@ from starlette import routing
 
 from snowfall.project.junction.hub.service.hub_api.routes import (
     accounts,
+    balances,
     beneficiaries,
     companies,
     contacts,
@@ -143,5 +144,17 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             beneficiaries.Beneficiary,
             name="Beneficiary",
             methods=["GET", "PATCH"],
+        ),
+        integration.route(
+            "/accounts/{accountId}/balances",
+            balances.Balances,
+            name="Balances",
+            methods=["GET"],
+        ),
+        integration.route(
+            "/accounts/{accountId}/relationships/currencies",
+            balances.Balances,
+            name="Balances",
+            methods=["POST"],
         ),
     ]

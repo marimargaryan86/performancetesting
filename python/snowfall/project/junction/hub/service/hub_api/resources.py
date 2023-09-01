@@ -26,6 +26,7 @@ from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import models
 from snowfall.stdlib.v1 import money_pb2
+from snowfall.vendor.currency_cloud.models import balance as balance_models
 
 _SELF_HREF: Literal["self"] = "self"
 _RELATIONSHIPS_FIELD: Literal["data"] = "data"
@@ -834,5 +835,39 @@ class BookingCancellationResource(models.Resource):
                         bookingId=booking_cancellation.booking_id,
                     ),
                 ),
+            },
+        )
+
+
+class BalanceResource(models.Resource):
+    api_type: ClassVar[str] = "balances"
+
+    @classmethod
+    def from_model(
+        cls,
+        balance: balance_models.BalanceResponse,
+    ) -> BalanceResource:
+        return cls(
+            id=balance.identifier,
+            type=BalanceResource.api_type,
+            attributes={
+                "amount": money.from_string(
+                    balance.amount,
+                    money.Currency(balance.currency),
+                ).amount,
+            },
+            relationships={
+                "account": {
+                    "data": models.ResourceIdentifier(
+                        id=balance.account_id,
+                        type="accounts",
+                    ),
+                },
+                "currency": {
+                    "data": models.ResourceIdentifier(
+                        id=balance.currency,
+                        type="currencies",
+                    ),
+                },
             },
         )
