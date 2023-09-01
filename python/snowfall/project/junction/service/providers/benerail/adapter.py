@@ -380,6 +380,7 @@ class BenerailAdapter(object):  # noqa: WPS214
             origin = self._train_stations.resolve_place_with_urn(
                 leg_info.origin.place_value,
             )
+
             destination = self._train_stations.resolve_place_with_urn(
                 leg_info.destination.place_value,
             )
@@ -389,7 +390,7 @@ class BenerailAdapter(object):  # noqa: WPS214
                     id=string.uuid(),
                     origin=models_pb2.Point(
                         ref=origin.identifier,
-                        name=origin.name or "",
+                        name=origin.name.title() if origin.name else "",
                         coordinates=latlng_pb2.LatLng(
                             latitude=origin.latitude,
                             longitude=origin.longitude,
@@ -398,7 +399,7 @@ class BenerailAdapter(object):  # noqa: WPS214
                     ),
                     destination=models_pb2.Point(
                         ref=destination.identifier,
-                        name=destination.name or "",
+                        name=destination.name.title() if destination.name else "",
                         coordinates=latlng_pb2.LatLng(
                             latitude=destination.latitude,
                             longitude=destination.longitude,
