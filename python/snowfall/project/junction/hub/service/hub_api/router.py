@@ -2,7 +2,7 @@ import lagom
 from lagom.integrations import starlette
 from starlette import routing
 
-from snowfall.project.junction.hub.service.hub_api.routes import (
+from snowfall.project.junction.hub.service.hub_api.routes import (  # noqa: WPS235
     accounts,
     balances,
     beneficiaries,
@@ -10,6 +10,7 @@ from snowfall.project.junction.hub.service.hub_api.routes import (
     contacts,
     conversions,
     go_orders,
+    transactions,
     users,
 )
 from snowfall.stdlib.integration.starlette import routes
@@ -156,5 +157,17 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             balances.Balances,
             name="Balances",
             methods=["POST"],
+        ),
+        integration.route(
+            "/transactions",
+            transactions.Transactions,
+            name="Transactions",
+            methods=["POST", "GET"],
+        ),
+        integration.route(
+            "/transactions/{transactionId}",
+            transactions.Transaction,
+            name="Transactions",
+            methods=["GET"],
         ),
     ]

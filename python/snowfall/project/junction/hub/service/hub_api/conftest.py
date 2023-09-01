@@ -18,9 +18,11 @@ from snowfall.project.pay.adapter import (
     contacts,
     conversions,
     currencies,
+    quotations,
     transactions,
 )
 from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import (
+    Quotation,
     QuotationAmounts,
     QuotationRates,
     Transaction,
@@ -110,6 +112,13 @@ def transaction_ids() -> Sequence[str]:
     return [
         "e719b289-982c-42f0-99a2-63fa70f8f8c0",
         "c36649e6-71f1-4dfa-aa5a-01c0ede6e538",
+    ]
+
+
+@pytest.fixture()
+def quotations_ids() -> list[str]:
+    return [
+        "766f0893-727e-430c-9531-ebb01d579b2d",
     ]
 
 
@@ -224,6 +233,31 @@ def beneficiary_response() -> BeneficiaryResponse:
     )
 
 
+def get_quotation(quotation_id: str) -> Quotation:
+    money_usd = money.from_string("1000", money.Currency("USD")).protobuf()
+    basic_rate = float(1)
+    return Quotation(
+        id=quotation_id,
+        amounts=QuotationAmounts(
+            beneficiary=money_usd,
+            base_converted=money_usd,
+            fx_margin=money_usd,
+            processing_margin=money_usd,
+            sales_margin=money_usd,
+            quotation=money_usd,
+        ),
+        rates=QuotationRates(
+            fx_quote=basic_rate,
+            fx_buffer=basic_rate,
+            fx_markup=basic_rate,
+            sales_markup=basic_rate,
+            processing_markup=basic_rate,
+        ),
+        payer_id=string.uuid(),
+        beneficiary_id=string.uuid(),
+    )
+
+
 @pytest.fixture()
 def cc_payment_client(
     accounts_list_from_cc: Sequence[mock.Mock],
@@ -278,16 +312,26 @@ def contacts_client() -> contacts.DictClient:
     )
 
 
+@pytest.fixture()
+def quotations_client(
+    quotations_ids: Sequence[str],
+) -> quotations.Client:
+    return quotations.DictClient(
+        [get_quotation(quotations_id) for quotations_id in quotations_ids],
+    )
+
+
 def _create_app(  # noqa: WPS211
     orders_client: orders.Client,
     companies_client: companies.Client,
-    contacts_client: contacts.Client,
     accounts_client: accounts.Client,
-    conversions_client: conversions.Client,
+    contacts_client: contacts.Client,
     beneficiaries_client: beneficiaries.Client,
+    conversions_client: conversions.Client,
     transactions_client: transactions.Client,
     currencies_client: currencies.Client,
     cc_payment_client: PaymentClient,
+    quotations_client: quotations.Client,
 ) -> applications.Starlette:
     asgi_app = application.create_starlette_app(
         routes=router.get_routes(
@@ -301,6 +345,7 @@ def _create_app(  # noqa: WPS211
                 transactions_client=transactions_client,
                 currencies_client=currencies_client,
                 cc_payment_client=cc_payment_client,
+                quotations_client=quotations_client,
             ),
         ),
         openapi_path=filesystem.resource_path("junction.hub_api", "openapi.json"),
@@ -345,20 +390,22 @@ def app(  # noqa: WPS211
     companies_client: companies.Client,
     contacts_client: contacts.Client,
     accounts_client: accounts.Client,
-    beneficiaries_client: beneficiaries.Client,
     conversions_client: conversions.Client,
+    beneficiaries_client: beneficiaries.Client,
     transactions_client: transactions.Client,
     currencies_client: currencies.Client,
     cc_payment_client: PaymentClient,
+    quotations_client: quotations.Client,
 ) -> applications.Starlette:
     return _create_app(
         orders_client=orders_client,
         companies_client=companies_client,
-        accounts_client=accounts_client,
         contacts_client=contacts_client,
-        beneficiaries_client=beneficiaries_client,
+        accounts_client=accounts_client,
         conversions_client=conversions_client,
+        beneficiaries_client=beneficiaries_client,
         transactions_client=transactions_client,
         currencies_client=currencies_client,
         cc_payment_client=cc_payment_client,
+        quotations_client=quotations_client,
     )

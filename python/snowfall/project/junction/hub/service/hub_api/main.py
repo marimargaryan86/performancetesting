@@ -12,13 +12,12 @@ from snowfall.project.pay.adapter import (
 )
 from snowfall.project.pay.adapter import (
     beneficiaries,
+    companies,
     contacts,
     conversions,
     currencies,
+    quotations,
     transactions,
-)
-from snowfall.project.pay.adapter import (
-    companies as companies_adapter,
 )
 from snowfall.project.pay.service.companies.v1alpha.grpc_pb2_grpc import (
     AccountsServiceStub,
@@ -29,6 +28,9 @@ from snowfall.project.pay.service.companies.v1alpha.grpc_pb2_grpc import (
 from snowfall.project.pay.service.currencies.v1alpha import currencies_pb2_grpc
 from snowfall.project.pay.service.transactions.v1alpha import (
     grpc_pb2_grpc as transactions_pb2_grpc,
+)
+from snowfall.project.pay.service.transactions.v1alpha.grpc_pb2_grpc import (
+    QuotationsServiceStub,
 )
 from snowfall.service.authentication.v1 import sessions_pb2_grpc
 from snowfall.stdlib.integration.starlette import application as starlette
@@ -61,12 +63,8 @@ def _factory(
         session_client = sessions_pb2_grpc.SessionServiceStub(authentication_channel)
         orders_channel = client.create_channel(app.settings.orders_address)
         companies_channel = client.create_channel(app.settings.companies_address)
-        transactions_channel = client.create_channel(
-            app.settings.transactions_address,
-        )
-        currencies_channel = client.create_channel(
-            app.settings.currencies_address,
-        )
+        transactions_channel = client.create_channel(app.settings.transactions_address)
+        currencies_channel = client.create_channel(app.settings.currencies_address)
         cc_payment_client = PaymentClient(
             base_url=app.settings.cc_address,
             auth=CurrencyCloudAuth(
@@ -89,7 +87,7 @@ def _factory(
                             companies_channel,
                         ),
                     ),
-                    companies_client=companies_adapter.GrpcClient(
+                    companies_client=companies.GrpcClient(
                         CompaniesServiceStub(
                             companies_channel,
                         ),
@@ -120,6 +118,11 @@ def _factory(
                         ),
                     ),
                     cc_payment_client=cc_payment_client,
+                    quotations_client=quotations.GrpcClient(
+                        QuotationsServiceStub(
+                            transactions_channel,
+                        ),
+                    ),
                 ),
             ),
             openapi_path=filesystem.resource_path("junction.hub_api", "openapi.json"),

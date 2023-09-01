@@ -8,6 +8,7 @@ from snowfall.project.pay.adapter import (
     contacts,
     conversions,
     currencies,
+    quotations,
     transactions,
 )
 from snowfall.vendor.currency_cloud import client
@@ -23,6 +24,7 @@ def create_dependencies(  # noqa: WPS211
     transactions_client: transactions.Client,
     currencies_client: currencies.Client,
     cc_payment_client: client.PaymentClient,
+    quotations_client: quotations.Client,
 ) -> lagom.Container:
     container = lagom.Container()
     container[orders.Client] = orders_client  # type: ignore[type-abstract]
@@ -34,5 +36,6 @@ def create_dependencies(  # noqa: WPS211
     container[transactions.Client] = transactions_client  # type: ignore[type-abstract]
     container[currencies.Client] = currencies_client  # type: ignore[type-abstract]
     container[client.PaymentClient] = cc_payment_client
+    container[quotations.Client] = quotations_client  # type: ignore[type-abstract]
 
     return container

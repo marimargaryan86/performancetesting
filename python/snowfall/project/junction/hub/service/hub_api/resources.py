@@ -19,9 +19,8 @@ from snowfall.project.pay.service.companies.v1alpha import (
     models_pb2 as companies_models_pb2,
 )
 from snowfall.project.pay.service.transactions.v1alpha import (
-    models_pb2 as transaction_models,
+    models_pb2 as transaction_models_pb2,
 )
-from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import Conversion
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import models
@@ -658,7 +657,7 @@ class Transaction(models.Resource):
     @classmethod
     def from_proto(
         cls,
-        transaction: transaction_models.Transaction,
+        transaction: transaction_models_pb2.Transaction,
         request: requests.Request,
     ) -> Transaction:
         return cls(
@@ -741,7 +740,7 @@ class ConversionResource(models.Resource):
     @classmethod
     def from_proto(
         cls,
-        conversion: Conversion,
+        conversion: transaction_models_pb2.Conversion,
         fx_delta: float | None,
         transaction_id: str | None,
         request: requests.Request,
