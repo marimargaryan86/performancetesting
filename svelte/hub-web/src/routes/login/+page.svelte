@@ -46,7 +46,7 @@
   <section class="intro">
     <JunctionLogo size={0.5} />
 
-    <span>Travel payment made</span>
+    <span>Travel Made</span>
     <strong>Simple</strong>
   </section>
 
