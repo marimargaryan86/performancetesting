@@ -24,12 +24,12 @@ class CriteriaGenerator(object):
         self,
         search: offer_models_pb2.TripOfferSearch,
     ) -> list[amqp_pb2.SearchCriteriaTask]:
+        segments = itertools.chain(*[tr.segments for tr in search.trips])
         tasks: list[amqp_pb2.SearchCriteriaTask] = []
 
-        for trip in search.trips:
-            segments = trip.segments
-            first_leg = more_itertools.first(more_itertools.first(segments).legs)
-            last_leg = more_itertools.last(more_itertools.last(segments).legs)
+        for segment in segments:
+            first_leg = more_itertools.first(segment.legs)
+            last_leg = more_itertools.last(segment.legs)
 
             if first_leg.type != models_pb2.Schedule.TYPE_BUS:
                 continue
@@ -48,7 +48,7 @@ class CriteriaGenerator(object):
 
             tasks.extend(
                 amqp_pb2.SearchCriteriaTask(
-                    segments=segments,
+                    segments=[segment],
                     criteria=amqp_pb2.Criteria(
                         origin_ids=[start],
                         destination_ids=[end],
