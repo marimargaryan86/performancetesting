@@ -65,7 +65,7 @@ for TEMPLATE_FILE in "$@"; do
 		mapfile -t JOBS < <(nomad alloc status -json "${ALLOC_ID}" | jq -e -r ".TaskStates | keys[]")
 		for JOB in "${JOBS[@]}"; do
 			echo "events for '${JOB}':"
-			nomad alloc status -json "${ALLOC_ID}" | jq -e -r ".TaskStates.${JOB}.Events[].DisplayMessage"
+			nomad alloc status -json "${ALLOC_ID}" | jq -e -r ".TaskStates.\"${JOB}\".Events[].DisplayMessage"
 			echo "stdout for '${JOB}':"
 			nomad alloc logs -tail "${ALLOC_ID}" "${JOB}"
 			echo "stderr for '${JOB}':"
