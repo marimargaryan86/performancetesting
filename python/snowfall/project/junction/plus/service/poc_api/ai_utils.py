@@ -285,7 +285,7 @@ async def shorten_link(
     date: str,
     num_of_passengers: int,
 ) -> str:
-    original_link = "https://phoenix.junction.dev/book?type=oneway&adults={0}&children=0&infants=0&originId={1}&destinationId={2}&departureDate={3}".format(
+    original_link = "https://phoenix.sandbox.junction.dev/book?type=oneway&adults={0}&children=0&infants=0&originId={1}&destinationId={2}&departureDate={3}".format(
         num_of_passengers,
         origin,
         destination,
