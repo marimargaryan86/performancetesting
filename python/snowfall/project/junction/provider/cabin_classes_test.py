@@ -1,5 +1,5 @@
 import pytest
-from motor import motor_asyncio
+from motor import core
 
 from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.project.junction.provider import cabin_classes
@@ -7,7 +7,7 @@ from snowfall.project.junction.provider import cabin_classes
 
 @pytest.fixture()
 def cabin_class_repo(
-    mongo_client: motor_asyncio.AsyncIOMotorClient,
+    mongo_client: core.AgnosticClient,
 ) -> cabin_classes.CabinMappingRepository:
     return cabin_classes.CabinMappingRepository(
         collection=mongo_client.test.provider_cabin_mapping,

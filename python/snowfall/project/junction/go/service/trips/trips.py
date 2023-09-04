@@ -4,7 +4,7 @@ from collections.abc import Sequence
 
 import pymongo
 from google.protobuf import timestamp_pb2
-from motor import motor_asyncio
+from motor import core
 from pymongo import errors as pymongo_errors
 
 from snowfall.project.junction.go.service.planner.v1 import planner_pb2
@@ -131,7 +131,7 @@ class TripSearchRepository(  # noqa: WPS215
 
     def __init__(
         self,
-        collection: motor_asyncio.AsyncIOMotorCollection,
+        collection: core.AgnosticCollection,
         ttl: datetime.timedelta,
     ) -> None:
         super().__init__(collection)
@@ -197,7 +197,7 @@ class TripCandidateSearchRepository(  # noqa: WPS215
 
     def __init__(
         self,
-        collection: motor_asyncio.AsyncIOMotorCollection,
+        collection: core.AgnosticCollection,
         ttl: datetime.timedelta,
     ) -> None:
         super().__init__(collection)

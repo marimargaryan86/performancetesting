@@ -7,7 +7,7 @@ from unittest import mock
 import httpx
 import pytest
 from fakeredis import aioredis as fakeredis
-from motor import motor_asyncio
+from motor import core
 from starlette import applications
 from starlette.middleware import Middleware, authentication
 
@@ -317,7 +317,7 @@ def get_quotation(quotation_id: str) -> Quotation:
 
 @pytest.fixture()
 def conversions_repository(
-    mongo_client: motor_asyncio.AsyncIOMotorClient,
+    mongo_client: core.AgnosticClient,
 ) -> pay_repos.ConversionRepository:
     return pay_repos.ConversionRepository(
         collection=mongo_client.test.conversions,

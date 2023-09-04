@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 
 import pytest
-from motor import motor_asyncio
+from motor import core
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.go.service.offers import aggregator, offers
@@ -24,21 +24,21 @@ def offer_bucket_repository(
 
 @pytest.fixture()
 def trip_offer_repository(
-    mongo_client: motor_asyncio.AsyncIOMotorClient,
+    mongo_client: core.AgnosticClient,
 ) -> offers.TripOfferRepository:
     return offers.TripOfferRepository(collection=mongo_client.test.trip_offers)
 
 
 @pytest.fixture()
 def offer_options_repository(
-    mongo_client: motor_asyncio.AsyncIOMotorClient,
+    mongo_client: core.AgnosticClient,
 ) -> offers.OfferOptionsRepository:
     return offers.OfferOptionsRepository(collection=mongo_client.test.trip_offers)
 
 
 @pytest.fixture()
 def offer_searches_repository(
-    mongo_client: motor_asyncio.AsyncIOMotorClient,
+    mongo_client: core.AgnosticClient,
 ) -> offers.OfferSearchRepository:
     return offers.OfferSearchRepository(
         collection=mongo_client.test.offer_searches,
@@ -48,14 +48,14 @@ def offer_searches_repository(
 
 @pytest.fixture()
 def offer_aggregate_collection(
-    mongo_client: motor_asyncio.AsyncIOMotorClient,
-) -> motor_asyncio.AsyncIOMotorCollection:
+    mongo_client: core.AgnosticClient,
+) -> core.AgnosticCollection:
     return mongo_client.test.offer_aggregates
 
 
 @pytest.fixture()
 def offer_aggregate_repository(
-    offer_aggregate_collection: motor_asyncio.AsyncIOMotorCollection,
+    offer_aggregate_collection: core.AgnosticCollection,
 ) -> offers.OfferAggregateMappingRepository:
     return offers.OfferAggregateMappingRepository(collection=offer_aggregate_collection)
 

@@ -4,7 +4,7 @@ from typing import Any, Generic, Self, TypeVar, cast
 
 import pymongo
 from bson import json_util
-from motor import core, motor_asyncio
+from motor import core
 
 from snowfall.stdlib.persistence import cursor
 from snowfall.stdlib.persistence.mongo import coders
@@ -78,7 +78,7 @@ class ResultSet(abc.ABC, Generic[_Record], AsyncIterator[_Record]):
 class DocumentResultSet(ResultSet[_Record]):
     def __init__(
         self,
-        cur: motor_asyncio.AsyncIOMotorCursor,
+        cur: core.AgnosticCursor,
         coder: coders.BaseCoder[_Record],
         filter_: Mapping[str, Any],
         sort: tuple[str, int] | None,

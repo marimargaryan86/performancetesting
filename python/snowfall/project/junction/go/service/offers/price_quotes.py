@@ -2,7 +2,7 @@ import datetime
 from collections.abc import Sequence
 
 import pymongo
-from motor import motor_asyncio
+from motor import core
 
 from snowfall.project.junction.go.service.offers.v1 import models_pb2
 from snowfall.stdlib import string
@@ -22,7 +22,7 @@ class PriceQuoteContainerRepository(
 
     def __init__(
         self,
-        collection: motor_asyncio.AsyncIOMotorCollection,
+        collection: core.AgnosticCollection,
         ttl: datetime.timedelta,
     ):
         super().__init__(collection)

@@ -3,7 +3,7 @@ from collections.abc import AsyncIterator
 
 import httpx
 import pytest
-from motor import motor_asyncio
+from motor import core
 
 from snowfall.project.junction.go.adapter import passenger_name_records
 from snowfall.project.junction.go.service.orders import orders
@@ -20,7 +20,7 @@ def pnr_client() -> passenger_name_records.Client:
 
 @pytest.fixture()
 def journey_repository(
-    mongo_client: motor_asyncio.AsyncIOMotorClient,
+    mongo_client: core.AgnosticClient,
     pnr_client: passenger_name_records.Client,
 ) -> orders.JourneyRepository:
     return orders.JourneyRepository(
@@ -31,7 +31,7 @@ def journey_repository(
 
 @pytest.fixture()
 def order_repository(
-    mongo_client: motor_asyncio.AsyncIOMotorClient,
+    mongo_client: core.AgnosticClient,
 ) -> orders.OrderRepository:
     return orders.OrderRepository(
         collection=mongo_client.test.journeys,
@@ -40,7 +40,7 @@ def order_repository(
 
 @pytest.fixture()
 def booking_repository(
-    mongo_client: motor_asyncio.AsyncIOMotorClient,
+    mongo_client: core.AgnosticClient,
 ) -> orders.BookingRepository:
     return orders.BookingRepository(
         collection=mongo_client.test.journeys,
@@ -49,7 +49,7 @@ def booking_repository(
 
 @pytest.fixture()
 def booking_details_repository(
-    mongo_client: motor_asyncio.AsyncIOMotorClient,
+    mongo_client: core.AgnosticClient,
 ) -> orders.BookingDetailsRepository:
     return orders.BookingDetailsRepository(
         collection=mongo_client.test.journeys,
@@ -58,7 +58,7 @@ def booking_details_repository(
 
 @pytest.fixture()
 def cancellation_requests_repository(
-    mongo_client: motor_asyncio.AsyncIOMotorClient,
+    mongo_client: core.AgnosticClient,
 ) -> orders.CancellationRequestsRepository:
     return orders.CancellationRequestsRepository(
         collection=mongo_client.test.order_cancellations,
