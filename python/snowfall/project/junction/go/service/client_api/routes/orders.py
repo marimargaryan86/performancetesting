@@ -452,21 +452,21 @@ def _create_trip_option(
     )
 
 
-class BookingsCancellation(endpoints.HTTPEndpoint):
+class CancellationRequest(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
         client: orders.Client = lagom.injectable,
     ) -> responses.Response:
-        cancellation = await client.get_bookings_cancellation(
-            identifier=request.path_params["bookingsCancellationId"],
+        cancellation_request = await client.get_cancellation_request(
+            identifier=request.path_params["cancellationRequestId"],
             reseller_id=request.user.username,
         )
 
         return await messages.create_response(
             body=models.Body(
-                data=resources.BookingsCancellationResource.from_proto(
-                    cancellation=cancellation,
+                data=resources.CancellationRequestResource.from_proto(
+                    cancellation_request=cancellation_request,
                     request=request,
                 ),
             ),
@@ -479,15 +479,15 @@ class BookingsCancellation(endpoints.HTTPEndpoint):
         client: orders.Client = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
-        cancellation = await client.create_bookings_cancellation(
+        cancellation_request = await client.create_cancellation_request(
             booking_ids=body["bookings"],
             reseller_id=request.user.username,
         )
 
         return await messages.create_response(
             body=models.Body(
-                data=resources.BookingsCancellationResource.from_proto(
-                    cancellation=cancellation,
+                data=resources.CancellationRequestResource.from_proto(
+                    cancellation_request=cancellation_request,
                     request=request,
                 ),
             ),

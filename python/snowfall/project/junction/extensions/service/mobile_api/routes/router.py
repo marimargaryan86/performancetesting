@@ -48,14 +48,14 @@ def get_routes(
             name="MessageOrder",
         ),
         integration.route(
-            "/bookings/cancellations",
-            orders.BookingsCancellation,
-            name="CreateBookingsCancellation",
+            "/cancellation/request",
+            orders.CancellationRequest,
+            name="CreateCancellationRequest",
         ),
         integration.route(
-            "/bookings/cancellations/{bookingsCancellationId}",
-            orders.BookingsCancellation,
-            name="ViewBookingsCancellation",
+            "/cancellation/request/{cancellationRequestId}",
+            orders.CancellationRequest,
+            name="ViewCancellationRequest",
         ),
         integration.route("/offers/searches", offers.OfferSearches),
         integration.route(

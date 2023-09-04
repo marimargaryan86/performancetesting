@@ -4,7 +4,7 @@ from grpc import StatusCode, aio
 
 from snowfall.project.junction.go.service.orders.orders import (
     BookingRepository,
-    BookingsCancellationsRepository,
+    CancellationRequestsRepository,
     JourneyRepository,
 )
 from snowfall.project.junction.go.service.orders.v1 import models_pb2, orders_pb2
@@ -13,13 +13,13 @@ from snowfall.stdlib.transport.grpc import rich_status
 from snowfall.stdlib.transport.http.errors import HttpStatusError
 
 
-class CreateBookingsCancellationHandler(object):  # noqa: WPS214
+class CreateCancellationRequestHandler(object):  # noqa: WPS214
     def __init__(  # noqa: WPS211
         self,
-        request: orders_pb2.CreateBookingsCancellationRequest,
+        request: orders_pb2.CreateCancellationRequestRequest,
         context: aio.ServicerContext,
         journeys: JourneyRepository,
-        cancellations: BookingsCancellationsRepository,
+        cancellations: CancellationRequestsRepository,
         zendesk_client: ZendeskClient,
     ):
         self._request = request
@@ -30,8 +30,8 @@ class CreateBookingsCancellationHandler(object):  # noqa: WPS214
 
     async def execute(  # noqa: WPS210
         self,
-    ) -> orders_pb2.CreateBookingsCancellationResponse:
-        document = self._request.cancellation
+    ) -> orders_pb2.CreateCancellationRequestResponse:
+        document = self._request.cancellation_request
 
         booking_ids = [
             cancellation.booking_id for cancellation in document.booking_cancellations
@@ -57,13 +57,13 @@ class CreateBookingsCancellationHandler(object):  # noqa: WPS214
             booking_cancellation.ticket_id = ticket_id
             booking_cancellation.status = models_pb2.BookingCancellation.STATUS_PENDING
 
-        document.status = models_pb2.BookingsCancellation.STATUS_PENDING
-        cancellation = await self._cancellations.insert(
+        document.status = models_pb2.CancellationRequest.STATUS_PENDING
+        cancellation_request = await self._cancellations.insert(
             document,
         )
 
-        return orders_pb2.CreateBookingsCancellationResponse(
-            cancellation=cancellation,
+        return orders_pb2.CreateCancellationRequestResponse(
+            cancellation_request=cancellation_request,
         )
 
     async def _validate(
@@ -92,7 +92,7 @@ class CreateBookingsCancellationHandler(object):  # noqa: WPS214
         self,
         journeys: Sequence[models_pb2.Journey],
     ) -> None:
-        reseller_id = self._request.cancellation.reseller_id
+        reseller_id = self._request.cancellation_request.reseller_id
         bookings_belong_to_reseller = all(
             reseller_id == journey.reseller_id for journey in journeys
         )
@@ -210,7 +210,7 @@ class UpdateBookingCancellationHandler(object):
         request: orders_pb2.UpdateBookingCancellationRequest,
         context: aio.ServicerContext,
         bookings: BookingRepository,
-        cancellations: BookingsCancellationsRepository,
+        cancellations: CancellationRequestsRepository,
     ):
         self._request = request
         self._context = context
@@ -246,7 +246,7 @@ class UpdateBookingCancellationHandler(object):
         await self._cancellations.update(document=cancellation)  # type: ignore[arg-type]
 
         return orders_pb2.UpdateBookingCancellationResponse(
-            cancellation=booking_cancellation,
+            booking_cancellation=booking_cancellation,
         )
 
     async def _update_booking_status(
@@ -265,7 +265,7 @@ class UpdateBookingCancellationHandler(object):
 
     def _update_overall_cancellation_status(
         self,
-        cancellation: models_pb2.BookingsCancellation,
+        cancellation: models_pb2.CancellationRequest,
     ) -> None:
         all_bookings_cancelled = all(
             booking_cancellation.status
@@ -274,4 +274,4 @@ class UpdateBookingCancellationHandler(object):
         )
 
         if all_bookings_cancelled:
-            cancellation.status = models_pb2.BookingsCancellation.STATUS_COMPLETED
+            cancellation.status = models_pb2.CancellationRequest.STATUS_COMPLETED

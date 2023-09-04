@@ -8,12 +8,12 @@ from snowfall.project.junction.go.service.orders.amqp import OrderProducer
 from snowfall.project.junction.go.service.orders.orders import (
     BookingDetailsRepository,
     BookingRepository,
-    BookingsCancellationsRepository,
+    CancellationRequestsRepository,
     JourneyRepository,
     OrderRepository,
 )
 from snowfall.project.junction.go.service.orders.orders_handlers import (
-    CreateBookingsCancellationHandler,
+    CreateCancellationRequestHandler,
     UpdateBookingCancellationHandler,
 )
 from snowfall.project.junction.go.service.orders.v1 import orders_pb2, orders_pb2_grpc
@@ -39,7 +39,7 @@ class OrderService(  # noqa: WPS214
         booking_handler: bookings.BookingHandler,
         booking_repository: BookingRepository,
         booking_details: BookingDetailsRepository,
-        cancellations: BookingsCancellationsRepository,
+        cancellation_requests: CancellationRequestsRepository,
         publisher: OrderProducer,
         default_page_size: int,
         zendesk_client: ZendeskClient,
@@ -50,7 +50,7 @@ class OrderService(  # noqa: WPS214
         self._booking_handler = booking_handler
         self._bookings = booking_repository
         self._booking_details = booking_details
-        self._cancellations = cancellations
+        self._cancellation_requests = cancellation_requests
         self._publisher = publisher
         self._zendesk_client = zendesk_client
 
@@ -274,34 +274,34 @@ class OrderService(  # noqa: WPS214
             next_page_token=await details_result.cursor(),
         )
 
-    async def CreateBookingsCancellation(  # type: ignore[override] # noqa: N802
+    async def CreateCancellationRequest(  # type: ignore[override] # noqa: N802
         self,
-        request: orders_pb2.CreateBookingsCancellationRequest,
+        request: orders_pb2.CreateCancellationRequestRequest,
         context: aio.ServicerContext,
-    ) -> orders_pb2.CreateBookingsCancellationResponse:
-        create_cancellation_handler = CreateBookingsCancellationHandler(
+    ) -> orders_pb2.CreateCancellationRequestResponse:
+        create_cancellation_handler = CreateCancellationRequestHandler(
             request,
             context,
             self._journeys,
-            self._cancellations,
+            self._cancellation_requests,
             self._zendesk_client,
         )
         return await create_cancellation_handler.execute()
 
-    async def GetBookingsCancellation(  # type: ignore[override] # noqa: N802
+    async def GetCancellationRequest(  # type: ignore[override] # noqa: N802
         self,
-        request: orders_pb2.GetBookingsCancellationRequest,
+        request: orders_pb2.GetCancellationRequestRequest,
         context: aio.ServicerContext,
-    ) -> orders_pb2.GetBookingsCancellationResponse:
-        cancellation = await self._cancellations.find_by_id(
+    ) -> orders_pb2.GetCancellationRequestResponse:
+        cancellation = await self._cancellation_requests.find_by_id(
             document_id=request.id,
         )
 
         if cancellation is None or cancellation.reseller_id != request.reseller_id:
             await context.abort(StatusCode.NOT_FOUND)
 
-        return orders_pb2.GetBookingsCancellationResponse(
-            cancellation=cancellation,
+        return orders_pb2.GetCancellationRequestResponse(
+            cancellation_request=cancellation,
         )
 
     async def GetBookingCancellation(  # type: ignore[override] # noqa: N802
@@ -309,7 +309,7 @@ class OrderService(  # noqa: WPS214
         request: orders_pb2.GetBookingCancellationRequest,
         context: aio.ServicerContext,
     ) -> orders_pb2.GetBookingCancellationResponse:
-        cancellation = await self._cancellations.find_by_booking_id(
+        cancellation = await self._cancellation_requests.find_by_booking_id(
             booking_id=request.booking_id,
         )
 
@@ -323,7 +323,7 @@ class OrderService(  # noqa: WPS214
         )
 
         return orders_pb2.GetBookingCancellationResponse(
-            cancellation=booking_cancellation_result,
+            booking_cancellation=booking_cancellation_result,
         )
 
     async def UpdateBookingCancellation(  # type: ignore[override] # noqa: N802
@@ -335,7 +335,7 @@ class OrderService(  # noqa: WPS214
             request,
             context,
             self._bookings,
-            self._cancellations,
+            self._cancellation_requests,
         )
 
         return await update_booking_cancellation_handler.execute()

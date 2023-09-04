@@ -19,8 +19,8 @@ service OrderService {
   rpc ListBookings(ListBookingsRequest) returns (ListBookingsResponse) {}
   rpc GetBookingDetails(GetBookingDetailsRequest) returns (GetBookingDetailsResponse) {}
   rpc ListBookingDetails(ListBookingDetailsRequest) returns (ListBookingDetailsResponse) {}
-  rpc CreateBookingsCancellation(CreateBookingsCancellationRequest) returns (CreateBookingsCancellationResponse) {}
-  rpc GetBookingsCancellation(GetBookingsCancellationRequest) returns (GetBookingsCancellationResponse) {}
+  rpc CreateCancellationRequest(CreateCancellationRequestRequest) returns (CreateCancellationRequestResponse) {}
+  rpc GetCancellationRequest(GetCancellationRequestRequest) returns (GetCancellationRequestResponse) {}
   rpc GetBookingCancellation(GetBookingCancellationRequest) returns (GetBookingCancellationResponse) {}
   rpc UpdateBookingCancellation(UpdateBookingCancellationRequest) returns (UpdateBookingCancellationResponse) {}
 }
@@ -148,21 +148,21 @@ message ListOfIds {
   repeated string ids = 1;
 }
 
-message CreateBookingsCancellationRequest {
-  BookingsCancellation cancellation = 1;
+message CreateCancellationRequestRequest {
+  CancellationRequest cancellation_request = 1;
 }
 
-message CreateBookingsCancellationResponse {
-  BookingsCancellation cancellation = 1;
+message CreateCancellationRequestResponse {
+  CancellationRequest cancellation_request = 1;
 }
 
-message GetBookingsCancellationRequest {
+message GetCancellationRequestRequest {
   string id = 1;
   string reseller_id = 2;
 }
 
-message GetBookingsCancellationResponse {
-  BookingsCancellation cancellation = 1;
+message GetCancellationRequestResponse {
+  CancellationRequest cancellation_request = 1;
 }
 
 message GetBookingCancellationRequest {
@@ -171,7 +171,7 @@ message GetBookingCancellationRequest {
 }
 
 message GetBookingCancellationResponse {
-  BookingCancellation cancellation = 1;
+  BookingCancellation booking_cancellation = 1;
 }
 
 message UpdateBookingCancellationRequest {
@@ -186,5 +186,5 @@ message UpdateBookingCancellationRequest {
 }
 
 message UpdateBookingCancellationResponse {
-  BookingCancellation cancellation = 1;
+  BookingCancellation booking_cancellation = 1;
 }

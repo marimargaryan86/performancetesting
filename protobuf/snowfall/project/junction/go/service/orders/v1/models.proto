@@ -139,7 +139,7 @@ message BookingCancellation {
   Status status = 4 [(snowfall.stdlib.v1.read_only) = true];
 }
 
-message BookingsCancellation {
+message CancellationRequest {
   string id = 1;
   repeated BookingCancellation booking_cancellations = 2;
   enum Status {

@@ -97,8 +97,8 @@ async def _serve(app: application.AsyncApplication[_GrpcSettings]) -> None:
                 booking_details=orders.BookingDetailsRepository(
                     collection=mongo.orders.journeys,
                 ),
-                cancellations=orders.BookingsCancellationsRepository(
-                    collection=mongo.orders.bookings_cancellations,
+                cancellation_requests=orders.CancellationRequestsRepository(
+                    collection=mongo.orders.cancellation_requests,
                 ),
                 publisher=OrderProducer(
                     producer_obj=producer.Producer(

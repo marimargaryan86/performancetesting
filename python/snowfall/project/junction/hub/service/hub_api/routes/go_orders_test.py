@@ -7,10 +7,10 @@ from snowfall.project.junction.go import fixtures
 from snowfall.stdlib.integration.starlette import testing
 
 
-def _get_bookings_cancellation_request() -> dict[str, Any]:
+def _get_cancellation_request_request() -> dict[str, Any]:
     return {
         "data": {
-            "type": "bookings-cancellations",
+            "type": "cancellation-request",
             "relationships": {
                 "bookings": {
                     "data": [
@@ -55,28 +55,31 @@ class TestBookingsDetailsByBooking(object):
 
 
 class TestBookingsCancellation(object):
-    async def test_bookings_can_be_cancelled(self, client: httpx.AsyncClient) -> None:
+    async def test_cancellation_request_creation(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
         response = await client.post(
-            "/bookings/cancellations",
-            json=_get_bookings_cancellation_request(),
+            "/cancellation/request",
+            json=_get_cancellation_request_request(),
             headers={"Content-Type": "application/vnd.api+json"},
         )
 
         assert response.status_code == status.HTTP_201_CREATED
 
-    async def test_bookings_cancellation_retrieval(
+    async def test_cancellation_request_retrieval(
         self,
         client: httpx.AsyncClient,
     ) -> None:
         response = await client.get(
-            "/bookings/cancellations/{id}".format(
-                id=fixtures.BOOKINGS_CANCELLATION_REQUESTS[0],
+            "/cancellation/request/{id}".format(
+                id=fixtures.CANCELLATION_REQUESTS[0],
             ),
         )
 
         assert response.status_code == status.HTTP_200_OK
 
-    async def test_bookings_cancellation_are_found_by_booking(
+    async def test_booking_cancellation_are_found_by_booking(
         self,
         client: httpx.AsyncClient,
     ) -> None:

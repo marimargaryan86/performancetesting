@@ -258,7 +258,7 @@ class Orders(endpoints.HTTPEndpoint):
         )
 
 
-class BookingsCancellation(endpoints.HTTPEndpoint):
+class CancellationRequest(endpoints.HTTPEndpoint):
     async def post(  # noqa: WPS210
         self,
         request: requests.Request,
@@ -279,7 +279,7 @@ class BookingsCancellation(endpoints.HTTPEndpoint):
             if mobile_order.user_id != request.user.username:
                 raise exceptions.HTTPException(status.HTTP_401_UNAUTHORIZED)
 
-        cancellation_response = await junction_client.create_bookings_cancellation(
+        cancellation_response = await junction_client.create_cancellation_request(
             booking_ids,
         )
 
@@ -293,8 +293,8 @@ class BookingsCancellation(endpoints.HTTPEndpoint):
         request: requests.Request,
         junction_client: client.Client = lagom.injectable,
     ) -> responses.Response:
-        cancellation_response = await junction_client.get_bookings_cancellation_by_id(
-            request.path_params["bookingsCancellationId"],
+        cancellation_response = await junction_client.get_cancellation_request_by_id(
+            request.path_params["cancellationRequestId"],
         )
 
         return stdlib_models.JsonApiResponse(

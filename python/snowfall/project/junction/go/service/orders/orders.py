@@ -417,17 +417,17 @@ class BookingDetailsRepository(
         )
 
 
-class BookingsCancellationsRepository(
-    mixins.FindByIdMixin[models_pb2.BookingsCancellation],
-    mixins.InsertMixin[models_pb2.BookingsCancellation],
-    repository.ProtoRepository[models_pb2.BookingsCancellation],
+class CancellationRequestsRepository(
+    mixins.FindByIdMixin[models_pb2.CancellationRequest],
+    mixins.InsertMixin[models_pb2.CancellationRequest],
+    repository.ProtoRepository[models_pb2.CancellationRequest],
 ):
-    _proto = models_pb2.BookingsCancellation
+    _proto = models_pb2.CancellationRequest
 
     async def find_by_booking_ids(
         self,
         ids: Sequence[str],
-    ) -> resultset.ResultSet[models_pb2.BookingsCancellation]:
+    ) -> resultset.ResultSet[models_pb2.CancellationRequest]:
         filter_ = (
             {
                 "booking_cancellations.booking_id": {
@@ -446,7 +446,7 @@ class BookingsCancellationsRepository(
     async def find_by_booking_id(
         self,
         booking_id: str,
-    ) -> models_pb2.BookingsCancellation | None:
+    ) -> models_pb2.CancellationRequest | None:
         filter_ = (
             {
                 "booking_cancellations.booking_id": {
@@ -470,7 +470,7 @@ class BookingsCancellationsRepository(
     async def find_by_booking_cancellation_id(
         self,
         booking_cancellation_id: str,
-    ) -> models_pb2.BookingsCancellation | None:
+    ) -> models_pb2.CancellationRequest | None:
         filter_ = (
             {
                 "booking_cancellations._id": {
@@ -493,7 +493,7 @@ class BookingsCancellationsRepository(
 
     async def update(
         self,
-        document: models_pb2.BookingsCancellation,
+        document: models_pb2.CancellationRequest,
     ) -> bool:
         replacement = self._coder.encode(document)
 

@@ -1286,22 +1286,22 @@ class TripCandidateSearchResource(models.Resource):
         )
 
 
-class BookingsCancellationResource(models.Resource):
-    api_type: ClassVar[str] = "bookings-cancellations"
+class CancellationRequestResource(models.Resource):
+    api_type: ClassVar[str] = "cancellation-request"
 
     @classmethod
     def from_proto(
         cls,
-        cancellation: order_models_pb2.BookingsCancellation,
+        cancellation_request: order_models_pb2.CancellationRequest,
         request: requests.Request,
-    ) -> BookingsCancellationResource:
-        request_model = order_models_pb2.BookingsCancellation
+    ) -> CancellationRequestResource:
+        request_model = order_models_pb2.CancellationRequest
         status = protobuf.enum_value_to_slug(
             enum_descriptor=request_model.Status.DESCRIPTOR,
-            enum_value=cancellation.status,
+            enum_value=cancellation_request.status,
         )
         return cls(
-            id=cancellation.id,
+            id=cancellation_request.id,
             type=cls.api_type,
             attributes={
                 "status": status,
@@ -1313,15 +1313,15 @@ class BookingsCancellationResource(models.Resource):
                             id=booking_cancellation.booking_id,
                             type=TripBookingResource.api_type,
                         )
-                        for booking_cancellation in cancellation.booking_cancellations
+                        for booking_cancellation in cancellation_request.booking_cancellations
                     ],
                 },
             },
             links={
                 _SELF_HREF: str(
                     request.url_for(
-                        "ViewBookingsCancellation",
-                        bookingsCancellationId=cancellation.id,
+                        "ViewCancellationRequest",
+                        cancellationRequestId=cancellation_request.id,
                     ),
                 ),
             },

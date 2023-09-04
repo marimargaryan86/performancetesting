@@ -50,10 +50,10 @@ def _get_journey_request() -> dict[str, Any]:
     return journey_request
 
 
-def _get_bookings_cancellation_request() -> dict[str, Any]:
+def _get_cancellation_request_request() -> dict[str, Any]:
     return {
         "data": {
-            "type": "bookings-cancellations",
+            "type": "cancellation-request",
             "relationships": {
                 "bookings": {
                     "data": [
@@ -133,32 +133,35 @@ class TestOrders(object):
 
 
 class TestBookingsCancellation(object):
-    async def test_bookings_can_be_cancelled(self, client: httpx.AsyncClient) -> None:
+    async def test_cancellation_request_creation(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
         response = await client.post(
-            "/bookings/cancellations",
-            json=_get_bookings_cancellation_request(),
+            "/cancellation/request",
+            json=_get_cancellation_request_request(),
             headers={"Content-Type": "application/vnd.api+json"},
         )
 
         assert response.status_code == status.HTTP_201_CREATED
 
-    async def test_bookings_cancellation_retrieval(
+    async def test_cancellation_request_retrieval(
         self,
         client: httpx.AsyncClient,
     ) -> None:
-        cancellation_id = fixtures.BOOKINGS_CANCELLATION_REQUESTS[0]
+        cancellation_id = fixtures.CANCELLATION_REQUESTS[0]
         response = await client.get(
-            "/bookings/cancellations/{id}".format(id=cancellation_id),
+            "/cancellation/request/{id}".format(id=cancellation_id),
             headers={"Content-Type": "application/vnd.api+json"},
         )
         assert response.status_code == status.HTTP_200_OK
 
-    async def test_bookings_cancellation_not_found(
+    async def test_cancellation_request_not_found(
         self,
         client: httpx.AsyncClient,
     ) -> None:
         response = await client.get(
-            "/bookings/cancellations/{id}".format(id=fixtures.NOT_FOUND),
+            "/cancellation/request/{id}".format(id=fixtures.NOT_FOUND),
         )
         assert response.status_code == status.HTTP_404_NOT_FOUND
 

@@ -54,7 +54,7 @@ def headers() -> dict[str, str]:
 def orders_client() -> orders.Client:
     return orders.DictClient(
         fixtures.get_journeys(),
-        fixtures.get_bookings_cancellations(),
+        fixtures.get_cancellation_requests(),
     )
 
 

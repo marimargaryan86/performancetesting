@@ -797,13 +797,13 @@ class Client(base_client.BaseClient):  # noqa: WPS214
             url="/orders/{0}".format(orders_id),
         )
 
-    async def create_bookings_cancellation(
+    async def create_cancellation_request(
         self,
         booking_ids: Sequence[str],
     ) -> dict[str, Any]:
         body: dict[str, Any] = {
             "data": {
-                "type": "bookings-cancellations",
+                "type": "cancellation-request",
                 "relationships": {
                     "bookings": {
                         "data": [
@@ -819,15 +819,15 @@ class Client(base_client.BaseClient):  # noqa: WPS214
         }
         return await self._make_request(
             method=_METHOD_POST,
-            url="/bookings/cancellations",
+            url="/cancellation/request",
             payload=body,
         )
 
-    async def get_bookings_cancellation_by_id(
+    async def get_cancellation_request_by_id(
         self,
-        bookings_cancellation_id: str,
+        cancellation_request_id: str,
     ) -> dict[str, Any]:
         return await self._make_request(
             method=_METHOD_GET,
-            url="/bookings/cancellations/{0}".format(bookings_cancellation_id),
+            url="/cancellation/request/{0}".format(cancellation_request_id),
         )

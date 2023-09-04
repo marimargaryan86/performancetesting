@@ -37,12 +37,12 @@ class Client(abc.ABC):  # noqa: WPS214
         """Create a new order resource."""
 
     @abc.abstractmethod
-    async def get_bookings_cancellation(
+    async def get_cancellation_request(
         self,
         identifier: str,
         reseller_id: str,
-    ) -> models_pb2.BookingsCancellation:
-        """Fetch bookings cancellation resource."""
+    ) -> models_pb2.CancellationRequest:
+        """Fetch cancellation request resource."""
 
     @abc.abstractmethod
     async def get_booking_cancellation_by_booking_id(
@@ -53,12 +53,12 @@ class Client(abc.ABC):  # noqa: WPS214
         """Fetch booking cancellation resource related to a booking."""
 
     @abc.abstractmethod
-    async def create_bookings_cancellation(
+    async def create_cancellation_request(
         self,
         booking_ids: Sequence[str],
         reseller_id: str,
-    ) -> models_pb2.BookingsCancellation:
-        """Create a new bookings cancellation resource."""
+    ) -> models_pb2.CancellationRequest:
+        """Create a new cancellation request resource."""
 
     @abc.abstractmethod
     async def update_booking_cancellation_status(
@@ -177,12 +177,12 @@ class DictClient(Client):  # noqa: WPS214
     def __init__(
         self,
         journeys: Sequence[models_pb2.Journey],
-        booking_cancellations: Sequence[models_pb2.BookingsCancellation],
+        booking_cancellations: Sequence[models_pb2.CancellationRequest],
     ) -> None:
         self._journeys: dict[str, models_pb2.Journey] = {
             journey.id: journey for journey in journeys
         }
-        self._cancellations: dict[str, models_pb2.BookingsCancellation] = {
+        self._cancellations: dict[str, models_pb2.CancellationRequest] = {
             cancellation.id: cancellation for cancellation in booking_cancellations
         }
 
@@ -231,11 +231,11 @@ class DictClient(Client):  # noqa: WPS214
             raise errors.NotFoundError()
         return self._journeys[identifier]
 
-    async def get_bookings_cancellation(
+    async def get_cancellation_request(
         self,
         identifier: str,
         reseller_id: str,
-    ) -> models_pb2.BookingsCancellation:
+    ) -> models_pb2.CancellationRequest:
         if identifier not in self._cancellations:
             raise errors.NotFoundError()
 
@@ -253,12 +253,12 @@ class DictClient(Client):  # noqa: WPS214
 
         raise errors.NotFoundError()
 
-    async def create_bookings_cancellation(
+    async def create_cancellation_request(
         self,
         booking_ids: Sequence[str],
         reseller_id: str,
-    ) -> models_pb2.BookingsCancellation:
-        request = models_pb2.BookingsCancellation(
+    ) -> models_pb2.CancellationRequest:
+        request = models_pb2.CancellationRequest(
             id=string.uuid(),
             booking_cancellations=[
                 models_pb2.BookingCancellation(
@@ -268,7 +268,7 @@ class DictClient(Client):  # noqa: WPS214
                 for booking_id in booking_ids
             ],
             reseller_id=reseller_id,
-            status=models_pb2.BookingsCancellation.STATUS_PENDING,
+            status=models_pb2.CancellationRequest.STATUS_PENDING,
         )
         self._cancellations[request.id] = request
 
@@ -604,14 +604,14 @@ class GrpcClient(Client):  # noqa: WPS214
 
         return response.journey
 
-    async def get_bookings_cancellation(
+    async def get_cancellation_request(
         self,
         identifier: str,
         reseller_id: str,
-    ) -> models_pb2.BookingsCancellation:
+    ) -> models_pb2.CancellationRequest:
         response = await errors.handle_grpc_errors(
-            self._orders.GetBookingsCancellation(
-                orders_pb2.GetBookingsCancellationRequest(
+            self._orders.GetCancellationRequest(
+                orders_pb2.GetCancellationRequestRequest(
                     id=identifier,
                     reseller_id=reseller_id,
                 ),
@@ -619,7 +619,7 @@ class GrpcClient(Client):  # noqa: WPS214
             ),
         )
 
-        return response.cancellation
+        return response.cancellation_request
 
     async def get_booking_cancellation_by_booking_id(
         self,
@@ -636,17 +636,17 @@ class GrpcClient(Client):  # noqa: WPS214
             ),
         )
 
-        return response.cancellation
+        return response.booking_cancellation
 
-    async def create_bookings_cancellation(
+    async def create_cancellation_request(
         self,
         booking_ids: Sequence[str],
         reseller_id: str,
-    ) -> models_pb2.BookingsCancellation:
+    ) -> models_pb2.CancellationRequest:
         response = await errors.handle_grpc_errors(
-            self._orders.CreateBookingsCancellation(
-                orders_pb2.CreateBookingsCancellationRequest(
-                    cancellation=models_pb2.BookingsCancellation(
+            self._orders.CreateCancellationRequest(
+                orders_pb2.CreateCancellationRequestRequest(
+                    cancellation_request=models_pb2.CancellationRequest(
                         id=string.uuid(),
                         booking_cancellations=[
                             models_pb2.BookingCancellation(
@@ -662,7 +662,7 @@ class GrpcClient(Client):  # noqa: WPS214
             ),
         )
 
-        return response.cancellation
+        return response.cancellation_request
 
     async def update_booking_cancellation_status(
         self,
@@ -684,7 +684,7 @@ class GrpcClient(Client):  # noqa: WPS214
             ),
         )
 
-        return response.cancellation
+        return response.booking_cancellation
 
     async def get_order(
         self,

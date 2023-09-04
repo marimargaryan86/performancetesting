@@ -9,13 +9,13 @@ from snowfall.project.junction.go.service.orders.v1 import models_pb2
 
 
 @pytest.fixture()
-async def bookings_cancellation(
-    bookings_cancellation_repository: orders.BookingsCancellationsRepository,
+async def cancellation_request(
+    cancellation_requests_repository: orders.CancellationRequestsRepository,
     order: models_pb2.Order,
-) -> models_pb2.BookingsCancellation:
+) -> models_pb2.CancellationRequest:
     ticket_ids = iter(["12345", "56789"])
-    return await bookings_cancellation_repository.insert(
-        models_pb2.BookingsCancellation(
+    return await cancellation_requests_repository.insert(
+        models_pb2.CancellationRequest(
             booking_cancellations=[
                 models_pb2.BookingCancellation(
                     booking_id=booking.id,
@@ -24,7 +24,7 @@ async def bookings_cancellation(
                 )
                 for booking in order.bookings
             ],
-            status=models_pb2.BookingsCancellation.STATUS_PENDING,
+            status=models_pb2.CancellationRequest.STATUS_PENDING,
         ),
     )
 
@@ -188,67 +188,67 @@ class TestBookingDetails(object):
         assert len([detail async for detail in details]) == 2
 
 
-class TestBookingsCancellations(object):
-    async def test_cancellation_is_retrievable_by_id(
+class TestCancellationRequests(object):
+    async def test_cancellation_request_is_retrievable_by_id(
         self,
-        bookings_cancellation_repository: orders.BookingsCancellationsRepository,
-        bookings_cancellation: models_pb2.BookingsCancellation,
+        cancellation_requests_repository: orders.CancellationRequestsRepository,
+        cancellation_request: models_pb2.CancellationRequest,
     ) -> None:
-        retrieved = await bookings_cancellation_repository.find_by_id(
-            bookings_cancellation.id,
+        retrieved = await cancellation_requests_repository.find_by_id(
+            cancellation_request.id,
         )
         assert retrieved
-        assert retrieved.id == bookings_cancellation.id
-        assert retrieved.status == bookings_cancellation.status
-        assert retrieved.created_at.seconds == bookings_cancellation.created_at.seconds
+        assert retrieved.id == cancellation_request.id
+        assert retrieved.status == cancellation_request.status
+        assert retrieved.created_at.seconds == cancellation_request.created_at.seconds
 
-    async def test_cancellation_is_retrievable_by_booking_id(
+    async def test_cancellation_request_is_retrievable_by_booking_id(
         self,
-        bookings_cancellation_repository: orders.BookingsCancellationsRepository,
-        bookings_cancellation: models_pb2.BookingsCancellation,
+        cancellation_requests_repository: orders.CancellationRequestsRepository,
+        cancellation_request: models_pb2.CancellationRequest,
     ) -> None:
         booking_id = more_itertools.first(
-            bookings_cancellation.booking_cancellations,
+            cancellation_request.booking_cancellations,
         ).booking_id
 
-        retrieved = await bookings_cancellation_repository.find_by_booking_id(
+        retrieved = await cancellation_requests_repository.find_by_booking_id(
             booking_id,
         )
 
         assert retrieved
-        assert retrieved.id == bookings_cancellation.id
-        assert retrieved.status == bookings_cancellation.status
+        assert retrieved.id == cancellation_request.id
+        assert retrieved.status == cancellation_request.status
         for retrieved_bc, expected_bc in list(  # noqa: WPS352
             zip(
                 retrieved.booking_cancellations,
-                bookings_cancellation.booking_cancellations,
+                cancellation_request.booking_cancellations,
                 strict=True,
             ),
         ):
             assert retrieved_bc == expected_bc
 
-    async def test_cancellation_is_retrievable_by_booking_cancellation_id(
+    async def test_cancellation_request_is_retrievable_by_booking_cancellation_id(
         self,
-        bookings_cancellation_repository: orders.BookingsCancellationsRepository,
-        bookings_cancellation: models_pb2.BookingsCancellation,
+        cancellation_requests_repository: orders.CancellationRequestsRepository,
+        cancellation_request: models_pb2.CancellationRequest,
     ) -> None:
         booking_cancellation_id = more_itertools.first(
-            bookings_cancellation.booking_cancellations,
+            cancellation_request.booking_cancellations,
         ).id
 
         retrieved = (
-            await bookings_cancellation_repository.find_by_booking_cancellation_id(
+            await cancellation_requests_repository.find_by_booking_cancellation_id(
                 booking_cancellation_id,
             )
         )
 
         assert retrieved
-        assert retrieved.id == bookings_cancellation.id
-        assert retrieved.status == bookings_cancellation.status
+        assert retrieved.id == cancellation_request.id
+        assert retrieved.status == cancellation_request.status
         for retrieved_bc, expected_bc in list(  # noqa: WPS352
             zip(
                 retrieved.booking_cancellations,
-                bookings_cancellation.booking_cancellations,
+                cancellation_request.booking_cancellations,
                 strict=True,
             ),
         ):
@@ -256,20 +256,20 @@ class TestBookingsCancellations(object):
 
     async def test_can_update_cancellation_status(
         self,
-        bookings_cancellation_repository: orders.BookingsCancellationsRepository,
-        bookings_cancellation: models_pb2.BookingsCancellation,
+        cancellation_requests_repository: orders.CancellationRequestsRepository,
+        cancellation_request: models_pb2.CancellationRequest,
     ) -> None:
-        bookings_cancellation.status = models_pb2.BookingsCancellation.STATUS_COMPLETED
+        cancellation_request.status = models_pb2.CancellationRequest.STATUS_COMPLETED
 
-        update_success = await bookings_cancellation_repository.update(
-            bookings_cancellation,
+        update_success = await cancellation_requests_repository.update(
+            cancellation_request,
         )
 
-        updated = await bookings_cancellation_repository.find_by_id(
-            bookings_cancellation.id,
+        updated = await cancellation_requests_repository.find_by_id(
+            cancellation_request.id,
         )
 
         assert update_success
         assert updated
-        assert updated.id == bookings_cancellation.id
-        assert updated.status == bookings_cancellation.status
+        assert updated.id == cancellation_request.id
+        assert updated.status == cancellation_request.status

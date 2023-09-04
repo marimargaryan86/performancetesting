@@ -3200,10 +3200,10 @@
         ]
       }
     },
-    "/bookings/cancellations": {
+    "/cancellation/request": {
       "post": {
-        "summary": "Create Bookings Cancellation",
-        "operationId": "post-bookings-cancellations",
+        "summary": "Create Cancellation Request",
+        "operationId": "post-cancellation-request",
         "responses": {
           "201": {
             "description": "Created",
@@ -3213,7 +3213,7 @@
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/components/schemas/BookingsCancellation"
+                      "$ref": "#/components/schemas/CancellationRequest"
                     }
                   },
                   "required": [
@@ -3233,7 +3233,7 @@
             "$ref": "#/components/responses/UnprocessableEntity"
           }
         },
-        "description": "Create a cancellation for multiple Bookings.",
+        "description": "Create a Cancellation Request for bookings.  A Cancellation Request will consist of one or more Booking Cancellations.",
         "tags": [
           "journeys"
         ],
@@ -3245,7 +3245,7 @@
                 "type": "object",
                 "properties": {
                   "data": {
-                    "$ref": "#/components/schemas/BookingsCancellation"
+                    "$ref": "#/components/schemas/CancellationRequest"
                   }
                 },
                 "required": [
@@ -3257,17 +3257,17 @@
         }
       }
     },
-    "/bookings/cancellations/{bookingsCancellationId}": {
+    "/cancellation/request/{cancellationRequestId}": {
       "parameters": [
         {
-          "$ref": "#/components/parameters/bookingsCancellationId"
+          "$ref": "#/components/parameters/cancellationRequestId"
         },
         {
-          "$ref": "#/components/parameters/bookingsCancellationInclude"
+          "$ref": "#/components/parameters/cancellationRequestInclude"
         }
       ],
       "get": {
-        "summary": "Get Bookings Cancellation",
+        "summary": "Get Cancellation Request",
         "tags": [
           "journeys"
         ],
@@ -3280,10 +3280,10 @@
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/components/schemas/BookingsCancellation"
+                      "$ref": "#/components/schemas/CancellationRequest"
                     },
                     "included": {
-                      "$ref": "#/components/schemas/BookingsCancellationIncluded"
+                      "$ref": "#/components/schemas/CancellationRequestIncluded"
                     }
                   },
                   "required": [
@@ -3300,8 +3300,8 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "get-bookings-cancellations-id",
-        "description": "Used to lookup data for a Bookings Cancellation Identifier."
+        "operationId": "get-cancellation-request-id",
+        "description": "Used to lookup data for a Cancellation Request Identifier."
       }
     },
     "/bookings/cancellation/{bookingCancellationId}": {
@@ -6461,8 +6461,8 @@
           "type"
         ]
       },
-      "BookingsCancellation": {
-        "title": "Bookings Cancellation",
+      "CancellationRequest": {
+        "title": "Cancellation Request",
         "allOf": [
           {
             "type": "object",
@@ -6476,9 +6476,9 @@
               "type": {
                 "type": "string",
                 "enum": [
-                  "bookings-cancellations"
+                  "cancellation-request"
                 ],
-                "example": "bookings-cancellations"
+                "example": "cancellation-request"
               },
               "attributes": {
                 "type": "object",
@@ -6536,7 +6536,7 @@
             "$ref": "#/components/schemas/SelfLink"
           }
         ],
-        "description": "Cancellation for multiple Bookings."
+        "description": "Cancellation Request for one or more Bookings."
       },
       "BookingCancellation": {
         "title": "Booking Cancellation",
@@ -7346,8 +7346,8 @@
           }
         }
       },
-      "BookingsCancellationIncluded": {
-        "title": "BookingsCancellationIncluded",
+      "CancellationRequestIncluded": {
+        "title": "CancellationRequestIncluded",
         "type": "array",
         "items": {
           "oneOf": [
@@ -8417,8 +8417,8 @@
         "style": "form",
         "explode": false
       },
-      "bookingsCancellationId": {
-        "name": "bookingsCancellationId",
+      "cancellationRequestId": {
+        "name": "cancellationRequestId",
         "in": "path",
         "required": true,
         "schema": {
@@ -8426,9 +8426,9 @@
           "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
           "format": "uuid"
         },
-        "description": "Bookings Cancellation identifier"
+        "description": "Cancellation Request identifier"
       },
-      "bookingsCancellationInclude": {
+      "cancellationRequestInclude": {
         "name": "include",
         "in": "query",
         "required": false,

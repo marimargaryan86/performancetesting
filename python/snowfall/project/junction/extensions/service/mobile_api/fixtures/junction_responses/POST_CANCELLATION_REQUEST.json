@@ -1,11 +1,11 @@
 {
-  "url": "\/bookings\/cancellations",
+  "url": "\/cancellation\/request",
   "method": "POST",
   "status_code": 201,
   "json": {
     "data": {
       "id": "d6cfe9e8-bbc9-485f-912f-7ba97ab2cf34",
-      "type": "bookings-cancellations",
+      "type": "cancellation-request",
       "attributes": {
         "status": "pending"
       },
