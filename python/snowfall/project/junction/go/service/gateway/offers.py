@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import asyncio
 import datetime
+import time
 
+import prometheus_client
 from grpc import StatusCode, aio
 
 from snowfall.project.junction.go.service.gateway import providers
@@ -13,10 +15,32 @@ from snowfall.project.junction.go.service.gateway.v1 import (
 from snowfall.project.junction.go.service.offers.v1 import amqp_pb2
 from snowfall.project.junction.provider.v1alpha import offers_pb2 as providers_pb2
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.instrumentation import prometheus
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.redis import types
 from snowfall.stdlib.transport.amqp import protocol
 from snowfall.stdlib.transport.amqp import types as amqp
 from snowfall.stdlib.transport.grpc import service
+
+_logger = stdout.get_logger()
+_failed = prometheus_client.Counter(
+    "gateway_failed_trip_searches_total",
+    "Total number of failed trip searches",
+    ["provider_id"],
+)
+
+_histogram = prometheus_client.Histogram(
+    "gateway_trip_search_duration_seconds",
+    "Duration of performed trip searches in seconds",
+    ["provider_id", "status"],
+    buckets=prometheus.BUCKETS,
+)
+
+_total = prometheus_client.Counter(
+    "gateway_trip_searches_total",
+    "Total number of performed trip searches",
+    ["provider_id", "status"],
+)
 
 
 class Service(service.Service, offers_pb2_grpc.OfferServiceServicer):
@@ -103,13 +127,32 @@ async def _do_trip_offer_search(
     msg: amqp_pb2.TripOfferSearchTask,
     timeout: datetime.timedelta,
 ) -> providers_pb2.SearchOffersResponse:
+    start = time.perf_counter()
+    status = "ok"
+
     try:
-        return await provider.connection.offers.SearchOffers(
+        response = await provider.connection.offers.SearchOffers(
             providers_pb2.SearchOffersRequest(trip_offer_search_task=msg),
             timeout=timeout.total_seconds(),
         )
     except aio.AioRpcError:
-        return providers_pb2.SearchOffersResponse()
+        _failed.labels(provider_id=provider.identifier).inc()
+        response = providers_pb2.SearchOffersResponse()
+        status = "nok"
+    finally:
+        exec_time = time.perf_counter() - start
+
+    _histogram.labels(provider_id=provider.identifier, status=status).observe(exec_time)
+    _total.labels(provider_id=provider.identifier, status=status).inc()
+    _logger.info(
+        "trip search performed",
+        provider_id=provider.identifier,
+        failed=status == "nok",
+        results=len(response.trip_offer_search_results.results),
+        execution_time=exec_time,
+    )
+
+    return response
 
 
 class Repository(object):
