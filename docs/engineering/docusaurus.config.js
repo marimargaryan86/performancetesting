@@ -60,6 +60,10 @@ const config = {
             id: 'junction-plus-poc-api',
             spec: 'openapi/junction/plus_poc_api/openapi.json',
           },
+          {
+            id: 'junction-hub-api',
+            spec: 'openapi/junction/hub_api/openapi.json',
+          },
         ],
       },
     ],

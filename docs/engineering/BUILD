@@ -11,6 +11,7 @@ docker_image(
         "//openapi/junction/pay_admin_api:pay_admin_api",
         "//openapi/junction/pay_api:pay_api",
         "//openapi/junction/plus_poc_api:plus_poc_api",
+        "//openapi/junction/hub_api:hub_api",
         ":source_files",
     ],
     image_tags=["{build_args.VERSION}"],
