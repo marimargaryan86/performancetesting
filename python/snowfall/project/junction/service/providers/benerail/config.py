@@ -46,6 +46,7 @@ class PriceQuoteSettings(BenerailSettings, service.Settings):
 class OrdersSettings(BenerailSettings, service.Settings):
     redis_dsn: pydantic.AnyUrl
     amqp_dsn: pydantic.AnyUrl
+    storage_dsn: service.AnyDsn
 
 
 class NotificationsSettings(BenerailSettings, service.Settings):

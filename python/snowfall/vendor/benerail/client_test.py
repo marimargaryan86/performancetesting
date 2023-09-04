@@ -26,7 +26,7 @@ async def test_get_booking(
         headers={"etag": "testetag"},
     )
 
-    booking = await benerail_client.bookings_client.get_booking(
+    booking, _ = await benerail_client.bookings_client.get_booking(
         booking_id="00000000-0000-0000-0000-000000000000",
     )
 

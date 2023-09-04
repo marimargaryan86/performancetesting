@@ -12,6 +12,7 @@ from snowfall.project.junction.service.providers.benerail import (
     consumer as benerail_consumer,
 )
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
+from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.amqp import consumer, producer, types
@@ -58,6 +59,9 @@ async def orders(app: application.Application[config.OrdersSettings]) -> None:
                 notifications_producer=producer.Producer(
                     amqp_conn,
                     types.Exchange("notifications"),
+                ),
+                booking_storage=await stack.enter_async_context(
+                    filesystem.Storage.from_dsn(app.settings.storage_dsn),
                 ),
             ),
             offers_cache=cache.OffersCache(

@@ -54,7 +54,7 @@ class NotificationsConsumer(object):
         etag_data = etag.EtagData()
 
         try:
-            booking_res = await self._client.bookings_client.get_booking(
+            booking_res, _ = await self._client.bookings_client.get_booking(
                 booking_id=body.br_booking_id,
                 session_token=body.br_session_token,
             )

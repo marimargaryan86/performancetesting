@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import pathlib
 import types as python_types
 from collections.abc import Sequence
 
@@ -18,6 +19,7 @@ from snowfall.project.junction.service.providers.benerail.v1alpha import amqp_pb
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
+from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.transport.amqp import producer
 from snowfall.stdlib.transport.http import errors
 from snowfall.vendor.benerail import client
@@ -43,10 +45,12 @@ class BookingHandler(object):
         self,
         benerail_client: client.BenerailClient,
         notifications_producer: producer.Producer,
+        booking_storage: filesystem.Storage,
     ) -> None:
         self._client = benerail_client
         self._notifications_producer = notifications_producer
         self._logger = stdout.get_logger()
+        self._storage = booking_storage
 
     async def create_booking(  # noqa: WPS210, WPS213, WPS217
         self,
@@ -140,11 +144,17 @@ class BookingHandler(object):
         payment_res.set_etags(etag_data)
         await asyncio.sleep(_WAIT_AFTER_PAYMENT_SECONDS)
 
-        booking_res = await self._get_booking(
+        booking_res, raw_response = await self._get_booking(
             booking_id=booking_res.response_result.identifier,
             session_token=offer_details.session_token,
         )
         booking_res.set_etags(etag_data)
+        await self._storage.put(
+            pathlib.Path(
+                booking_res.response_result.identifier,
+            ),
+            raw_response,
+        )
 
         await self._notify(
             amqp_pb2.BookingNotificationTask(
@@ -196,7 +206,7 @@ class BookingHandler(object):
         self,
         booking_id: str,
         session_token: str | None,
-    ) -> bookings_response.GetBookingResponse:
+    ) -> tuple[bookings_response.GetBookingResponse, bytes]:
         return await self._client.bookings_client.get_booking(
             booking_id=booking_id,
             session_token=session_token,

@@ -35,7 +35,7 @@ class BookingsClient(base.BenerailBaseClient):  # noqa: WPS214
         self,
         booking_id: str,
         session_token: str | None = None,
-    ) -> booking_response.GetBookingResponse:
+    ) -> tuple[booking_response.GetBookingResponse, bytes]:
         response = await self._make_request(
             client.RequestOptions(
                 method="GET",
@@ -47,9 +47,12 @@ class BookingsClient(base.BenerailBaseClient):  # noqa: WPS214
             ),
         )
 
-        return booking_response.GetBookingResponse(
-            **response.json(),
-            dialogue_etag=response.headers.get("etag"),
+        return (
+            booking_response.GetBookingResponse(
+                **response.json(),
+                dialogue_etag=response.headers.get("etag"),
+            ),
+            response.content,
         )
 
     async def create_order(
