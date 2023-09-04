@@ -1,4 +1,5 @@
 import abc
+from collections.abc import Sequence
 
 from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
 
@@ -10,7 +11,7 @@ class AbstractChannel(abc.ABC):
         event: models_pb2.NotificationEvent,
         receiver: models_pb2.Subscriber,
         sender_configuration: models_pb2.ConfigurationVector,
-    ) -> str:
+    ) -> Sequence[str]:
         """Send notification for order confirmation."""
 
     @abc.abstractmethod
@@ -19,5 +20,5 @@ class AbstractChannel(abc.ABC):
         event: models_pb2.NotificationEvent,
         receiver: models_pb2.Subscriber,
         sender_configuration: models_pb2.ConfigurationVector,
-    ) -> str:
+    ) -> Sequence[str]:
         """Send alerts from flight stats."""

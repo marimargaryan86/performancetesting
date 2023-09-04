@@ -62,6 +62,15 @@ class TestCustomHeaderMiddleware(object):
                                             },
                                         ],
                                     },
+                                    "updatedTextFields": {
+                                        "updatedTextField": [
+                                            {
+                                                "field": "DGT",
+                                                "originalText": "B3",
+                                                "newText": "A4",
+                                            },
+                                        ],
+                                    },
                                 },
                             ],
                         },

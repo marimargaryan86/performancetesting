@@ -116,9 +116,15 @@ message MonitoringRule {
 message FlightStatsAlert {
   string monitoring_rule_id = 1;
   string type = 2;
-  string value = 3;
-  Booking booking = 4;
-  repeated UpdatedDateField updates = 5;
+  Booking booking = 3;
+  repeated UpdatedFields updates = 4;
+}
+
+message UpdatedFields {
+  oneof updated_field {
+    UpdatedDateField date_field = 1;
+    UpdatedTextField text_field = 2;
+  }
 }
 
 message UpdatedDateField {
@@ -131,6 +137,18 @@ message UpdatedDateField {
   Field field = 1;
   google.protobuf.Timestamp original_date_local = 2;
   google.protobuf.Timestamp new_date_local = 3;
+}
+
+message UpdatedTextField {
+  enum Field {
+    FIELD_UNSPECIFIED = 0;
+    FIELD_STS = 1;
+    FIELD_DGT = 2;
+    FIELD_DTM = 3;
+  }
+  Field field = 1;
+  string original_text = 2;
+  string new_text = 3;
 }
 
 message NotificationEvent {

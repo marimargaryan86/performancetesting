@@ -19,7 +19,7 @@ class Channels(object):
         configuration_vector: models_pb2.ConfigurationVector,
         subscriber: models_pb2.Subscriber,
         event: models_pb2.NotificationEvent,
-    ) -> str:
+    ) -> str | None:
         chan = self._get_channel(channel_type)
         if hasattr(chan, fun):  # noqa: WPS421
             self._logger.warning(str(event))

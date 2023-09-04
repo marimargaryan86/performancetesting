@@ -41,6 +41,14 @@ async def _import(app: application.AsyncApplication[_ImportSettings]) -> None:
     logging.register(http_client)
     metrics.register(http_client)
     notifications_channel = create_channel(app.settings.notifications_address)
+    redis_client = redis.Client[str](
+        aioredis.from_url(
+            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
+            decode_responses=True,
+            retry_on_error=[aioredis.ConnectionError],
+        ).client(),
+        prefix=app.settings.redis_prefix,
+    )
     notification_event_importer = importer.NotificationEventImporter(
         consumer_obj=consumer.Consumer(
             connection=connection,
@@ -61,16 +69,9 @@ async def _import(app: application.AsyncApplication[_ImportSettings]) -> None:
             whatsapp_channel=ProviderChannel(
                 sid=app.settings.twilio_sid,
                 token=app.settings.twilio_token,
+                redis_client=redis_client,
                 templates_root_path=pathlib.Path(),
             ),
-        ),
-        redis_client=redis.Client[str](
-            aioredis.from_url(
-                str(random.choice(app.settings.redis_dsn)),  # noqa: S311
-                decode_responses=True,
-                retry_on_error=[aioredis.ConnectionError],
-            ).client(),
-            prefix=app.settings.redis_prefix,
         ),
     )
     await notification_event_importer.consume()

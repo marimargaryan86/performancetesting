@@ -4,8 +4,10 @@ from gettext import gettext as _
 
 from twilio.rest import Client as twilioClient
 
-from snowfall.project.junction.plus.adapter import format
 from snowfall.project.junction.plus.notification_channels.channel import AbstractChannel
+from snowfall.project.junction.plus.notification_channels.flight_stats_messages import (
+    get_message_from_code,
+)
 from snowfall.project.junction.plus.notification_channels.order_utils import (
     compress_flights,
     proto_to_format_dt,
@@ -13,6 +15,7 @@ from snowfall.project.junction.plus.notification_channels.order_utils import (
 )
 from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.persistence.redis import types as redis
 
 
 class Channel(AbstractChannel):
@@ -23,7 +26,7 @@ class Channel(AbstractChannel):
         event: models_pb2.NotificationEvent,
         receiver: models_pb2.Subscriber,
         sender_configuration: models_pb2.ConfigurationVector,
-    ) -> str:
+    ) -> Sequence[str]:
         raise NotImplementedError()
 
     async def flight_stats_alert(
@@ -31,7 +34,7 @@ class Channel(AbstractChannel):
         event: models_pb2.NotificationEvent,
         receiver: models_pb2.Subscriber,
         sender_configuration: models_pb2.ConfigurationVector,
-    ) -> str:
+    ) -> Sequence[str]:
         raise NotImplementedError()
 
 
@@ -40,9 +43,11 @@ class ProviderChannel(Channel):
         self,
         sid: str,
         token: str,
+        redis_client: redis.Client[str],
         templates_root_path: pathlib.Path,
     ):
         self._client = twilioClient(sid, token)
+        self._redis = redis_client
         self._templates_root_path = templates_root_path
 
     async def order_confirmation(  # noqa: WPS210
@@ -50,7 +55,7 @@ class ProviderChannel(Channel):
         event: models_pb2.NotificationEvent,
         receiver: models_pb2.Subscriber,
         sender_configuration: models_pb2.ConfigurationVector,
-    ) -> str:
+    ) -> Sequence[str]:
         trip_type = ""
         counter = 0
         journey_details = ""
@@ -88,7 +93,7 @@ class ProviderChannel(Channel):
             )
             counter += 1
 
-        return self.send_message(
+        sid = self.send_message(
             receiver=receiver.phone_number.e164_number,
             sender_number=sender_configuration.mobile_phone.e164_number,
             body=_(
@@ -102,22 +107,65 @@ class ProviderChannel(Channel):
                 + "\n\nTo check your *Trip Details*, please tap the button below",
             ),
         )
+        session = self._redis.hash_("message_id_order_id")
+        await session.put(sid, event.body.id)
+        return [sid]
 
-    async def flight_stats_alert(
+    async def flight_stats_alert(  # noqa: WPS231
         self,
         event: models_pb2.NotificationEvent,
         receiver: models_pb2.Subscriber,
         sender_configuration: models_pb2.ConfigurationVector,
-    ) -> str:
-        return self.send_message(
-            receiver=receiver.phone_number.e164_number,
-            sender_number=sender_configuration.mobile_phone.e164_number,
-            body="Gate number 7 for your flight {0} it's now open".format(
-                format.proto_to_route_identifier(
-                    event.alert.booking.value.route_identifier,
-                ),
-            ),
-        )
+    ) -> Sequence[str]:
+        message_ids = []
+        for update in event.alert.updates:
+            if update.HasField("date_field"):
+                try:
+                    message = get_message_from_code(
+                        protobuf.enum_value_to_slug(
+                            models_pb2.UpdatedDateField.Field.DESCRIPTOR,
+                            enum_value=update.date_field.field,
+                        ),
+                    )
+                except KeyError:
+                    continue
+                message_ids.append(
+                    self.send_message(
+                        receiver=receiver.phone_number.e164_number,
+                        sender_number=sender_configuration.mobile_phone.e164_number,
+                        body=message.format(
+                            event.alert.booking.value.origin,
+                            event.alert.booking.value.destination,
+                            proto_to_format_dt(
+                                update.date_field.original_date_local,
+                            ),
+                            proto_to_format_dt(update.date_field.new_date_local),
+                        ),
+                    ),
+                )
+            else:
+                try:
+                    message = get_message_from_code(
+                        protobuf.enum_value_to_slug(
+                            models_pb2.UpdatedTextField.Field.DESCRIPTOR,
+                            enum_value=update.text_field.field,
+                        ),
+                    )
+                except KeyError:
+                    continue
+                message_ids.append(
+                    self.send_message(
+                        receiver=receiver.phone_number.e164_number,
+                        sender_number=sender_configuration.mobile_phone.e164_number,
+                        body=message.format(
+                            event.alert.booking.value.origin,
+                            event.alert.booking.value.destination,
+                            update.text_field.original_text,
+                            update.text_field.new_text,
+                        ),
+                    ),
+                )
+        return message_ids
 
     def send_message(
         self,
@@ -144,7 +192,7 @@ class MockChannel(Channel):
         event: models_pb2.NotificationEvent,
         receiver: models_pb2.Subscriber,
         sender_configuration: models_pb2.ConfigurationVector,
-    ) -> str:
+    ) -> Sequence[str]:
         self._sent_messages.append(
             "order: {0} from {1} to {2}".format(
                 event.body.id,
@@ -152,21 +200,21 @@ class MockChannel(Channel):
                 receiver.id,
             ),
         )
-        return str(event.body.id)
+        return [str(event.body.id)]
 
     async def flight_stats_alert(
         self,
         event: models_pb2.NotificationEvent,
         receiver: models_pb2.Subscriber,
         sender_configuration: models_pb2.ConfigurationVector,
-    ) -> str:
+    ) -> Sequence[str]:
         self._sent_messages.append(
             "flight stats alert: {0} to {1}".format(
                 event.alert.monitoring_rule_id,
                 receiver.id,
             ),
         )
-        return str(event.body.id)
+        return [str(event.alert.monitoring_rule_id)]
 
 
 def transform_trip_details(order: models_pb2.PersistedOrder) -> str:

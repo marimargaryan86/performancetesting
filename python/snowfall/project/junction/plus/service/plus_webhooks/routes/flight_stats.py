@@ -43,27 +43,50 @@ class Alerts(endpoints.HTTPEndpoint):
             "flightStatusUpdate"
         ]
         updates = [
-            notifications_models_pb2.UpdatedDateField(
-                field=slug_to_enum_value(
-                    notifications_models_pb2.UpdatedDateField.Field,
-                    date_update["field"],
-                ),
-                original_date_local=datetime_to_protobuf(
-                    datetime.datetime.strptime(
-                        date_update["originalDateLocal"],
-                        "%Y-%m-%dT%H:%M:%S.%f",
-                    ).replace(tzinfo=datetime.UTC),
-                ),
-                new_date_local=datetime_to_protobuf(
-                    datetime.datetime.strptime(
-                        date_update["newDateLocal"],
-                        "%Y-%m-%dT%H:%M:%S.%f",
-                    ).replace(tzinfo=datetime.UTC),
+            notifications_models_pb2.UpdatedFields(
+                date_field=notifications_models_pb2.UpdatedDateField(
+                    field=slug_to_enum_value(
+                        notifications_models_pb2.UpdatedDateField.Field,
+                        date_update["field"],
+                    ),
+                    original_date_local=datetime_to_protobuf(
+                        datetime.datetime.strptime(
+                            date_update["originalDateLocal"],
+                            "%Y-%m-%dT%H:%M:%S.%f",
+                        ).replace(tzinfo=datetime.UTC),
+                    ),
+                    new_date_local=datetime_to_protobuf(
+                        datetime.datetime.strptime(
+                            date_update["newDateLocal"],
+                            "%Y-%m-%dT%H:%M:%S.%f",
+                        ).replace(tzinfo=datetime.UTC),
+                    ),
                 ),
             )
             for status_update in flight_status_list
+            if "updatedDateFields" in status_update
             for date_update in status_update["updatedDateFields"]["updatedDateField"]
         ]
+
+        updates.extend(
+            [
+                notifications_models_pb2.UpdatedFields(
+                    text_field=notifications_models_pb2.UpdatedTextField(
+                        field=slug_to_enum_value(
+                            notifications_models_pb2.UpdatedTextField.Field,
+                            text_update["field"],
+                        ),
+                        original_text=text_update.get("originalText", "undefined"),
+                        new_text=text_update["newText"],
+                    ),
+                )
+                for status_update in flight_status_list
+                if "updatedTextFields" in status_update
+                for text_update in status_update["updatedTextFields"][
+                    "updatedTextField"
+                ]
+            ],
+        )
 
         for subscriber_id in monitoring_rule.subscriber_ids:
             try:
@@ -76,7 +99,6 @@ class Alerts(endpoints.HTTPEndpoint):
                 alert=notifications_models_pb2.FlightStatsAlert(
                     monitoring_rule_id=monitoring_rule_id,
                     type=alert_body["alert"]["event"].get("type", ""),
-                    value=alert_body["alert"]["event"].get("value", ""),
                     booking=monitoring_rule.booking,
                     updates=updates,
                 ),
