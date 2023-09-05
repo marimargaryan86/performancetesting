@@ -124,14 +124,14 @@ job "gateway-consume" {
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 PROVIDERS="{
-{{- ""}}\"4b7d12db-7735-4c67-9645-5fc82f7c4fe8\":\"{{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_ask2go-${var.environment}"))}}\",
-{{- ""}}\"f9ce75d1-2025-4ab5-b5d7-69e4c14c053e\":\"{{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_mock-${var.environment}"))}}\",
-{{- ""}}\"a5547dae-9c65-4746-8637-d0601865508e\":\"{{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_save-a-train-${var.environment}"))}}\",
-{{- ""}}\"f1f884bf-0be6-4ce2-8414-296a775a508d\":\"{{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_ba-ndc-${var.environment}"))}}\",
-{{- ""}}\"92ada881-f31c-471e-a8b0-01ed48a181d5\":\"{{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_direct-ferries-${var.environment}"))}}\",
-{{- ""}}\"30bfba87-7077-4d96-beed-c5769cdc99c7\":\"{{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_distribusion-${var.environment}"))}}\",
-{{- ""}}\"5d18e8e1-48e3-4b7c-82b9-62bd97a92f91\":\"{{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_duffel-${var.environment}"))}}\",
-{{- ""}}\"caefde65-c15c-4b60-b8d9-27638b50b08f\":\"{{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_benerail-${var.environment}"))}}\"
+{{- ""}}\"4b7d12db-7735-4c67-9645-5fc82f7c4fe8\":\"{{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_ask2go-grpc-${var.environment}"))}}\",
+{{- ""}}\"f9ce75d1-2025-4ab5-b5d7-69e4c14c053e\":\"{{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_mock-grpc-${var.environment}"))}}\",
+{{- ""}}\"a5547dae-9c65-4746-8637-d0601865508e\":\"{{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_save-a-train-grpc-${var.environment}"))}}\",
+{{- ""}}\"f1f884bf-0be6-4ce2-8414-296a775a508d\":\"{{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_ba-ndc-grpc-${var.environment}"))}}\",
+{{- ""}}\"92ada881-f31c-471e-a8b0-01ed48a181d5\":\"{{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_direct-ferries-grpc-${var.environment}"))}}\",
+{{- ""}}\"30bfba87-7077-4d96-beed-c5769cdc99c7\":\"{{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_distribusion-grpc-${var.environment}"))}}\",
+{{- ""}}\"5d18e8e1-48e3-4b7c-82b9-62bd97a92f91\":\"{{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_duffel-grpc-${var.environment}"))}}\",
+{{- ""}}\"caefde65-c15c-4b60-b8d9-27638b50b08f\":\"{{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_benerail-grpc-${var.environment}"))}}\"
 {{- ""}}}"
 EOH
         destination = "services.env"
