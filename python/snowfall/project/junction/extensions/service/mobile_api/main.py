@@ -28,6 +28,7 @@ from snowfall.project.junction.extensions.service.mobile_api import (
     handlers as mobile_handlers,
 )
 from snowfall.project.junction.extensions.service.mobile_api.routes import router
+from snowfall.stdlib.instrumentation.httpx import metrics
 from snowfall.stdlib.integration.starlette import application as starlette
 from snowfall.stdlib.integration.starlette import handlers
 from snowfall.stdlib.persistence import filesystem
@@ -87,6 +88,7 @@ def _factory(
                 token_endpoint=str(app.settings.ory_client_token_endpoint),
             ),
         )
+        metrics.register(junction_httpx_client)
         junction_client = client.Client(
             base_url=app.settings.junction_api_address,
             client=junction_httpx_client,
@@ -94,6 +96,7 @@ def _factory(
         plus_http_client = plus_client.PlusClient(
             api_url=app.settings.plus_api_address,
             activated=app.settings.plus_activated,
+            client=metrics.register(httpx.AsyncClient()),
         )
         redis_client = redis.Client[str](
             aioredis.from_url(
