@@ -21,8 +21,20 @@ pants:setup:
 .pants:
   image: "${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG}"
   interruptible: true
-  before_script:
-    - pants --version
+  after_script:
+    - >
+      function nuke_if_too_big() {
+        path=$1
+        limit_mb=$2
+        size_mb=$(du -m -d0 "${path}" | cut -f 1)
+        if (( size_mb > limit_mb )); then
+          echo "${path} is too large (${size_mb}mb), nuking it."
+          rm -rf "${path}"
+        fi
+        mkdir -p "${path}"
+      }
+
+      nuke_if_too_big "${PANTS_NAMED_CACHES_DIR}" 1024
   artifacts:
     paths:
       - .pants.d/pants.log
@@ -33,7 +45,6 @@ pants:setup:
     PANTS_CONFIG_FILES: "+['pants.ci.toml','pants.go.toml']"
     PANTS_DOCKER_DEFAULT_REPOSITORY: "${CI_PROJECT_PATH}/service/{directory}"
     PANTS_DOCKER_REGISTRIES: "{'${CI_REGISTRY}': {'address': '${CI_REGISTRY}', 'default': True}}"
-    SCIE_BASE: "${CI_PROJECT_DIR}/.cache/nce"
     PANTS_NAMED_CACHES_DIR: "${CI_PROJECT_DIR}/.cache/named_caches"
   services:
     - name: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/buchgr/bazel-remote-cache:v2.4.2"
@@ -44,10 +55,6 @@ pants:setup:
         BAZEL_REMOTE_S3_BUCKET: snowfall-gitlab-bazel-remote-cache
         BAZEL_REMOTE_S3_ENDPOINT: s3.eu-west-2.amazonaws.com
   cache:
-    - key: "${CI_JOB_NAME}-scie_pants_version=0.9.3-pants_version=2.16.0"
-      when: always
-      paths:
-        - "${SCIE_BASE}"
     - key:
         prefix: "${CI_JOB_NAME}"
         files:

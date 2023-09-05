@@ -13,7 +13,6 @@ integration:api_automation-tests:
     SLACK_NOTIFICATION_TOKEN: "${SLACK_NOTIFICATION_TOKEN}"
     TESTING_SUITE: "${TESTING_SUITE}"
   before_script:
-    - !reference [.pants, before_script]
     - SLACK_THREAD_NUMBER=$(./bash/slack-start-notification.sh $SLACK_NOTIFICATION_TOKEN $SLACK_NOTIFICATION_CHANNEL $ALLURE_PROJECT_ID)
     - echo $SLACK_THREAD_NUMBER > slack.txt
   script:
