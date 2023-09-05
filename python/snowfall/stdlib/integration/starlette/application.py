@@ -63,8 +63,8 @@ def create_starlette_app(  # noqa: WPS211
 
     return applications.Starlette(
         routes=[
-            *routes,
             routing.Route("/health", common_routes.Health, name="Health"),
+            *routes,
         ],
         middleware=[
             *stack,
