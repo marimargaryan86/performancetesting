@@ -3,6 +3,7 @@ import random
 from collections.abc import AsyncGenerator, Callable
 from typing import Any
 
+import httpx
 from motor import motor_asyncio
 from redis import asyncio as aioredis
 from starlette import applications
@@ -23,12 +24,8 @@ from snowfall.project.pay.adapter import (
 )
 from snowfall.project.pay.adapter import companies as companies_adapter
 from snowfall.project.pay.adapter import lead_companies as lead_companies_adapter
-from snowfall.project.pay.service.companies.v1alpha.grpc_pb2_grpc import (
-    AccountsServiceStub,
-    BeneficiariesServiceStub,
-    CompaniesServiceStub,
-    ContactsServiceStub,
-    LeadCompaniesServiceStub,
+from snowfall.project.pay.service.companies.v1alpha import (
+    grpc_pb2_grpc as companies_grpc_pb2,
 )
 from snowfall.project.pay.service.currencies.v1alpha import currencies_pb2_grpc
 from snowfall.project.pay.service.pay_api import authenticator, bootstrap
@@ -48,6 +45,7 @@ from snowfall.project.pay.service.transactions.v1alpha import (
 )
 from snowfall.service.authentication.v1 import authentication_pb2_grpc, oauth_pb2_grpc
 from snowfall.stdlib.format import jwt
+from snowfall.stdlib.instrumentation.httpx import metrics
 from snowfall.stdlib.integration.starlette import application as starlette
 from snowfall.stdlib.integration.starlette import authentication as stdlib_auth
 from snowfall.stdlib.integration.starlette import handlers
@@ -55,11 +53,11 @@ from snowfall.stdlib.persistence import cursor, filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.grpc.client import create_channel
-from snowfall.vendor.currency_cloud.client import CurrencyCloudAuth, PaymentClient
+from snowfall.vendor.currency_cloud import client
 
 
 def _lifespan(
-    payment_client: PaymentClient,
+    payment_client: client.PaymentClient,
     redis_client: redis.Client[str],
 ) -> Callable[[applications.Starlette], AsyncGenerator[Any, Any]]:
     async def decorator(app: applications.Starlette) -> AsyncGenerator[Any, Any]:
@@ -130,13 +128,14 @@ def _factory(
             ],
             routes=router.get_routes(
                 bootstrap.create_dependencies(
-                    payment_client=PaymentClient(
+                    payment_client=client.PaymentClient(
                         base_url=app.settings.cc_address,
-                        auth=CurrencyCloudAuth(
+                        auth=client.CurrencyCloudAuth(
                             base_url=app.settings.cc_address,
                             login_id=app.settings.cc_login,
                             api_key=app.settings.cc_api_key,
                         ),
+                        client=metrics.register(httpx.AsyncClient()),
                     ),
                     currencies_client=currencies.GrpcClient(
                         currencies_pb2_grpc.CurrencyServiceStub(
@@ -161,7 +160,7 @@ def _factory(
                         ),
                     ),
                     companies_client=companies_adapter.GrpcClient(
-                        CompaniesServiceStub(
+                        companies_grpc_pb2.CompaniesServiceStub(
                             companies_channel,
                         ),
                     ),
@@ -213,13 +212,14 @@ def _admin_factory(
         refunds_channel = create_channel(
             app.settings.refunds_address,
         )
-        cc_payment_client = PaymentClient(
+        cc_payment_client = client.PaymentClient(
             base_url=app.settings.cc_address,
-            auth=CurrencyCloudAuth(
+            auth=client.CurrencyCloudAuth(
                 base_url=app.settings.cc_address,
                 login_id=app.settings.cc_login,
                 api_key=app.settings.cc_api_key,
             ),
+            client=metrics.register(httpx.AsyncClient()),
         )
         redis_client = redis.Client[str](
             aioredis.from_url(
@@ -269,27 +269,27 @@ def _admin_factory(
                         mongo.conversions.conversions,
                     ),
                     beneficiaries_client=beneficiaries.GrpcClient(
-                        BeneficiariesServiceStub(
+                        companies_grpc_pb2.BeneficiariesServiceStub(
                             companies_channel,
                         ),
                     ),
                     accounts_client=accounts_adapter.GrpcClient(
-                        AccountsServiceStub(
+                        companies_grpc_pb2.AccountsServiceStub(
                             companies_channel,
                         ),
                     ),
                     companies_client=companies_adapter.GrpcClient(
-                        CompaniesServiceStub(
+                        companies_grpc_pb2.CompaniesServiceStub(
                             companies_channel,
                         ),
                     ),
                     lead_companies_client=lead_companies_adapter.GrpcClient(
-                        LeadCompaniesServiceStub(
+                        companies_grpc_pb2.LeadCompaniesServiceStub(
                             companies_channel,
                         ),
                     ),
                     contacts_client=contacts.GrpcClient(
-                        ContactsServiceStub(
+                        companies_grpc_pb2.ContactsServiceStub(
                             companies_channel,
                         ),
                     ),

@@ -1,5 +1,6 @@
 from collections.abc import Callable
 
+import httpx
 from starlette import applications, middleware
 from starlette.middleware import authentication as auth_middleware
 
@@ -33,6 +34,7 @@ from snowfall.project.pay.service.transactions.v1alpha.grpc_pb2_grpc import (
     QuotationsServiceStub,
 )
 from snowfall.service.authentication.v1 import sessions_pb2_grpc
+from snowfall.stdlib.instrumentation.httpx import metrics
 from snowfall.stdlib.integration.starlette import application as starlette
 from snowfall.stdlib.integration.starlette import authentication, handlers
 from snowfall.stdlib.persistence import filesystem
@@ -72,6 +74,7 @@ def _factory(
                 login_id=app.settings.cc_login,
                 api_key=app.settings.cc_api_key,
             ),
+            client=metrics.register(httpx.AsyncClient()),
         )
 
         asgi_app = starlette.create_starlette_app(

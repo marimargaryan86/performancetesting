@@ -145,12 +145,11 @@ class PaymentClient(object):  # noqa: WPS214
         self,
         base_url: str,
         auth: CurrencyCloudAuth,
+        client: httpx.AsyncClient | None = None,
     ):
-        self._base_url = httpx.URL(base_url)
-        self._client = httpx.AsyncClient(
-            base_url=self._base_url,
-            auth=auth,
-        )
+        self._client = client or httpx.AsyncClient()
+        self._client.base_url = httpx.URL(base_url)
+        self._client.auth = auth
         self._logger = stdout.get_logger()
 
     async def create_conversion(

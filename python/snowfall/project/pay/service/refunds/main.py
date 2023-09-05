@@ -2,6 +2,7 @@ import ipaddress
 import random
 from collections.abc import Sequence
 
+import httpx
 from motor import motor_asyncio
 from pydantic import AnyUrl
 
@@ -10,6 +11,7 @@ from snowfall.project.pay.service.refunds import grpc, repositories
 from snowfall.project.pay.service.transactions.v1alpha import (
     grpc_pb2_grpc as transactions_pb2_grpc,
 )
+from snowfall.stdlib.instrumentation.httpx import metrics
 from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.grpc import server
 from snowfall.stdlib.transport.grpc.client import create_channel
@@ -53,6 +55,7 @@ async def _serve(app: application.AsyncApplication[_GrpcSettings]) -> None:
                         login_id=app.settings.cc_login,
                         api_key=app.settings.cc_api_key,
                     ),
+                    client=metrics.register(httpx.AsyncClient()),
                 ),
             ),
         ],

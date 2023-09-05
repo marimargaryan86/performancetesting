@@ -1,10 +1,12 @@
 import ipaddress
 
+import httpx
 from motor import motor_asyncio
 from pydantic import AnyUrl
 
 from snowfall.project.pay.service.payments.grpc import PaymentsService
 from snowfall.project.pay.service.payments.repositories import PaymentsRepository
+from snowfall.stdlib.instrumentation.httpx import metrics
 from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.grpc import server
 from snowfall.vendor.currency_cloud.client import CurrencyCloudAuth, PaymentClient
@@ -30,6 +32,7 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
             login_id=app.settings.cc_login,
             api_key=app.settings.cc_api_key,
         ),
+        client=metrics.register(httpx.AsyncClient()),
     )
 
     grpc_server = server.create_server(

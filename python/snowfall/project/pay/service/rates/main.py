@@ -2,6 +2,7 @@ import ipaddress
 import random
 from collections.abc import Sequence
 
+import httpx
 from motor import motor_asyncio
 from pydantic import AnyUrl, RedisDsn
 from redis import asyncio as aioredis
@@ -10,6 +11,7 @@ from snowfall.project.pay.service.rates import cache
 from snowfall.project.pay.service.rates.backup_rates_cron import UpdateBackUpRatesJob
 from snowfall.project.pay.service.rates.grpc import RatesService
 from snowfall.project.pay.service.rates.rates import BackUpRatesRepository
+from snowfall.stdlib.instrumentation.httpx import metrics
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.service import application
 from snowfall.stdlib.service.redis_factory import make_connection
@@ -85,6 +87,7 @@ async def _backup_rates_cron_run(
                 login_id=app.settings.cc_login,
                 api_key=app.settings.cc_api_key,
             ),
+            client=metrics.register(httpx.AsyncClient()),
         ),
         app.settings.currencies,
         cache.RateRepository(redis_client, 1),
