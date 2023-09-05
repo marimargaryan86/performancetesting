@@ -150,6 +150,12 @@ class BookingHandler(object):
                     raw_data=booking_adapter.get_booking_result().json(),
                 ),
             )
+            try:
+                await self._notifier.send(
+                    notifications.BookingNotification(task.metadata, booking_adapter),
+                )
+            except notifications.NotificationError:
+                self._logger.exception()
 
         return new_booking
 
@@ -219,14 +225,6 @@ class BookingHandler(object):
             pathlib.Path(str(order_response.identifier)),
             raw_response,
         )
-
-        try:
-            # TODO: this should be handled in a separate service
-            await self._notifier.send(
-                notifications.BookingNotification(task.metadata, adapter),
-            )
-        except notifications.NotificationError:
-            self._logger.exception()
 
         return adapter
 

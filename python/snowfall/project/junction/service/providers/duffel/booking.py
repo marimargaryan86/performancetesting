@@ -150,6 +150,14 @@ class BookingHandler(object):  # noqa: WPS214
             new_booking.raw_data = repr(booking_error)
             return new_booking
 
+        try:
+            # TODO: this should be handled in a separate service
+            await self._notifier.send(
+                notifications.BookingNotification(task.metadata, booking_result),
+            )
+        except notifications.NotificationError:
+            self._logger.exception()
+
         await self._storage.put(pathlib.Path(booking_result.identifier), raw_response)
 
         if booking_result is not None:
@@ -261,19 +269,9 @@ class BookingHandler(object):  # noqa: WPS214
 
             order_request.add_passenger(order_passenger)
 
-        order_response, raw_response = await duffel_client.order_request(
+        return await duffel_client.order_request(
             order_data=order_request.build(),
         )
-
-        try:
-            # TODO: this should be handled in a separate service
-            await self._notifier.send(
-                notifications.BookingNotification(task.metadata, order_response),
-            )
-        except notifications.NotificationError:
-            self._logger.exception()
-
-        return order_response, raw_response
 
     def _is_infant(
         self,
