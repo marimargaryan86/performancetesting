@@ -4,3 +4,4 @@ go_package(dependencies=[":airlines", ":airports"])
 go_image(
     name="bin",
 )
+python_sources(name="ssim-convert-python")
