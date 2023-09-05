@@ -9,7 +9,12 @@ from asgiref.typing import ASGIApplication
 from starlette import applications, exceptions, requests, responses, routing, status
 from starlette.middleware import Middleware, errors
 
-from snowfall.stdlib.integration.starlette import handlers, middlewares, validation
+from snowfall.stdlib.integration.starlette import (
+    handlers,
+    middlewares,
+    prometheus,
+    validation,
+)
 from snowfall.stdlib.integration.starlette import routes as common_routes
 from snowfall.stdlib.service import application
 
@@ -35,7 +40,10 @@ def create_starlette_app(  # noqa: WPS211
     security_headers: bool = True,
     lifespan: Any = None,
 ) -> applications.Starlette:
-    stack = [Middleware(middlewares.RequestIdMiddleware)]
+    stack = [
+        Middleware(prometheus.Middleware),
+        Middleware(middlewares.RequestIdMiddleware),
+    ]
 
     if security_headers:
         stack.append(Middleware(middlewares.SecurityHeadersMiddleware))
