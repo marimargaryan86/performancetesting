@@ -69,7 +69,7 @@ job "karhoo-offers" {
     }
 
     service {
-      name = "karhoo-offers-${var.environment}"
+      name = "${JOB}-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
 

@@ -69,7 +69,7 @@ job "ba-ndc-pricing" {
     }
 
     service {
-      name = "ba-ndc-pricing-${var.environment}"
+      name = "${JOB}-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
 

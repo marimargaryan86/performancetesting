@@ -78,7 +78,7 @@ job "ask2go-grpc" {
     }
 
     service {
-      name = "ask2go-${var.environment}"
+      name = "${JOB}-${var.environment}"
       port = "grpc"
       tags = ["grpc"]
 
@@ -101,7 +101,7 @@ job "ask2go-grpc" {
     }
 
     service {
-      name = "ask2go-grpc-${var.environment}"
+      name = "${JOB}-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
 

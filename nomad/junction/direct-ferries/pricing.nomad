@@ -81,7 +81,7 @@ job "direct-ferries-pricing" {
     }
 
     service {
-      name = "direct-ferries-pricing-${var.environment}"
+      name = "${JOB}-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
 

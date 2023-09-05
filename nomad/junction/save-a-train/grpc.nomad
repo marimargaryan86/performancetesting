@@ -82,7 +82,7 @@ job "save-a-train-grpc" {
     }
 
     service {
-      name = "save-a-train-${var.environment}"
+      name = "${JOB}-${var.environment}"
       port = "grpc"
       tags = ["grpc"]
 

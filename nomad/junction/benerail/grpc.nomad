@@ -70,7 +70,7 @@ job "benerail-grpc" {
     }
 
     service {
-      name = "benerail-${var.environment}"
+      name = "${JOB}-${var.environment}"
       port = "grpc"
       tags = ["grpc"]
 
@@ -86,7 +86,7 @@ job "benerail-grpc" {
     }
 
     service {
-      name = "benerail-${var.environment}"
+      name = "${JOB}-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
 

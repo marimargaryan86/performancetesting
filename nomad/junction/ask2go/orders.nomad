@@ -77,7 +77,7 @@ job "ask2go-orders" {
     }
 
     service {
-      name = "ask2go-orders-${var.environment}"
+      name = "${JOB}-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
 

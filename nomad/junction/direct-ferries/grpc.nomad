@@ -82,7 +82,7 @@ job "direct-ferries-grpc" {
     }
 
     service {
-      name = "direct-ferries-${var.environment}"
+      name = "${JOB}-${var.environment}"
       port = "grpc"
       tags = ["grpc"]
 
@@ -97,7 +97,7 @@ job "direct-ferries-grpc" {
       }
     }
     service {
-      name = "direct-ferries-${var.environment}"
+      name = "${JOB}-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
 

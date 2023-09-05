@@ -65,7 +65,7 @@ job "mock-pricing" {
     }
 
     service {
-      name = "mock-pricing-${var.environment}"
+      name = "${JOB}-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
 

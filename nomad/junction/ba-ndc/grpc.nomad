@@ -74,7 +74,7 @@ job "ba-ndc-grpc" {
     }
 
     service {
-      name = "ba-ndc-${var.environment}"
+      name = "${JOB}-${var.environment}"
       port = "grpc"
       tags = ["grpc"]
 
@@ -96,7 +96,7 @@ job "ba-ndc-grpc" {
       }
     }
     service {
-      name = "ba-ndc-${var.environment}"
+      name = "${JOB}-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
 

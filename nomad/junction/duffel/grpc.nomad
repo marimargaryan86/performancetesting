@@ -78,7 +78,7 @@ job "duffel-grpc" {
     }
 
     service {
-      name = "duffel-${var.environment}"
+      name = "${JOB}-${var.environment}"
       port = "grpc"
       tags = ["grpc"]
 
@@ -100,7 +100,7 @@ job "duffel-grpc" {
       }
     }
     service {
-      name = "duffel-${var.environment}"
+      name = "${JOB}-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
 

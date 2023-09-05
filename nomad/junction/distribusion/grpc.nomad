@@ -78,7 +78,7 @@ job "distribusion-grpc" {
     }
 
     service {
-      name = "distribusion-${var.environment}"
+      name = "${JOB}-${var.environment}"
       port = "grpc"
       tags = ["grpc"]
 

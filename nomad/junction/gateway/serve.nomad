@@ -71,35 +71,35 @@ job "gateway-serve" {
           proxy {
             upstreams {
               local_bind_port  = 8010
-              destination_name = "mock-${var.environment}"
+              destination_name = "mock-grpc-${var.environment}"
             }
             upstreams {
               local_bind_port  = 8020
-              destination_name = "ask2go-${var.environment}"
+              destination_name = "ask2go-grpc-${var.environment}"
             }
             upstreams {
               local_bind_port  = 8030
-              destination_name = "save-a-train-${var.environment}"
+              destination_name = "save-a-train-grpc-${var.environment}"
             }
             upstreams {
               local_bind_port  = 8040
-              destination_name = "ba-ndc-${var.environment}"
+              destination_name = "ba-ndc-grpc-${var.environment}"
             }
             upstreams {
               local_bind_port  = 8050
-              destination_name = "direct-ferries-${var.environment}"
+              destination_name = "direct-ferries-grpc-${var.environment}"
             }
             upstreams {
               local_bind_port  = 8060
-              destination_name = "distribusion-${var.environment}"
+              destination_name = "distribusion-grpc-${var.environment}"
             }
             upstreams {
               local_bind_port  = 8070
-              destination_name = "duffel-${var.environment}"
+              destination_name = "duffel-grpc-${var.environment}"
             }
             upstreams {
               local_bind_port  = 8080
-              destination_name = "benerail-${var.environment}"
+              destination_name = "benerail-grpc-${var.environment}"
             }
           }
         }

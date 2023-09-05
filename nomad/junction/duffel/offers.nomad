@@ -73,7 +73,7 @@ job "duffel-offers" {
     }
 
     service {
-      name = "duffel-offers-${var.environment}"
+      name = "${JOB}-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
 

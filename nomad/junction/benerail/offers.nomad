@@ -69,7 +69,7 @@ job "benerail-offers" {
     }
 
     service {
-      name = "benerail-offers-${var.environment}"
+      name = "${JOB}-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
 

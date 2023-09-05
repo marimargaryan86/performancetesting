@@ -77,7 +77,7 @@ job "save-a-train-offers" {
     }
 
     service {
-      name = "save-a-train-offers-${var.environment}"
+      name = "${JOB}-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
 
