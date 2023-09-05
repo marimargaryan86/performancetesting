@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+package snowfall.project.junction.provider.v2alpha;
+
+import "google/protobuf/duration.proto";
+import "snowfall/project/junction/v1/segment_type.proto";
+import "snowfall/stdlib/v1/date.proto";
+import "snowfall/stdlib/v1/datetime.proto";
+import "snowfall/stdlib/v1/latlng.proto";
+import "snowfall/stdlib/v1/money.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/provider/v2alpha";
+
+service TripService {
+  rpc SearchTrips(SearchTripsRequest) returns (SearchTripsResponse) {}
+}
+
+message Criterion {
+  oneof origin {
+    string origin_identifier = 1;
+    snowfall.stdlib.v1.LatLng origin_coordinates = 2;
+  }
+  oneof destination {
+    string destination_identifier = 3;
+    snowfall.stdlib.v1.LatLng destination_coordinates = 4;
+  }
+  snowfall.stdlib.v1.Date departure_date = 5;
+}
+
+message Passenger {
+  snowfall.stdlib.v1.Date date_of_birth = 1;
+}
+
+message Location {
+  string ref = 1;
+  string name = 2;
+  snowfall.stdlib.v1.LatLng coordinates = 3;
+  // @todo: add timezone? It's easy for us to retrieve from coordinates while
+  // the provider might not have this information, complicating the API.
+}
+
+message Leg {
+  Location origin = 1;
+  Location destination = 2;
+  snowfall.stdlib.v1.DateTime departure_at = 3;
+  snowfall.stdlib.v1.DateTime arrival_at = 4;
+}
+
+message Segment {
+  repeated Leg legs = 1;
+  snowfall.project.junction.v1.SegmentType type = 2;
+  // @todo: add vendor and operator information
+}
+
+message Trip {
+  repeated Segment segments = 2;
+  repeated Fare fares = 3;
+}
+
+message Fare {
+  string reference = 1;
+  snowfall.stdlib.v1.Money price = 2;
+  string brand_name = 3;
+}
+
+message SearchTripsRequest {
+  repeated Criterion criterion = 1;
+  repeated Passenger passengers = 2;
+  // @todo: add custom config data for the provider
+}
+
+message SearchTripsResponse {
+  repeated Trip trips = 1;
+
+  // The duration Junction is allowed to cache these results for. If Junction
+  // has results for a specific trip search cached, it will reuse the cached
+  // results instead of performing a new trip search towards the provider.
+  google.protobuf.Duration ttl = 2;
+}

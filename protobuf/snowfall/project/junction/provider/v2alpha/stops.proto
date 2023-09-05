@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package snowfall.project.junction.provider.v2alpha;
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/provider/v2alpha";
+
+service StopService {
+  rpc GetStops(GetStopsRequest) returns (GetStopsResponse) {}
+}
+
+message GetStopsRequest {}
+message GetStopsResponse {}

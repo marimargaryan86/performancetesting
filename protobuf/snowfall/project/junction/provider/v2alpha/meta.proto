@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package snowfall.project.junction.provider.v2alpha;
+
+import "snowfall/project/junction/v1/segment_type.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/provider/v2alpha";
+
+service MetaService {
+  rpc GetCapabilities(GetCapabilitiesRequest) returns (GetCapabilitiesResponse) {}
+  rpc GetIdentity(GetIdentityRequest) returns (GetIdentityResponse) {}
+}
+
+message GetIdentityRequest {}
+
+message GetIdentityResponse {
+  string id = 1;
+  string name = 2;
+}
+
+message GetCapabilitiesRequest {}
+
+message GetCapabilitiesResponse {
+  TripSearchCapabilities trip_search_capabilities = 1;
+}
+
+message TripSearchCapabilities {
+  // Whether or not trip searches are supported by the provider.
+  bool is_supported = 1;
+
+  enum StopIdentificationMethod {
+    // No value specified.
+    STOP_IDENTIFICATION_METHOD_UNSPECIFIED = 0;
+
+    // Junction will perform trip searches using the provider's own IDs for the
+    // origin and destination. In cases Junction can't map the origin or
+    // destination to the provider's own IDs, the provider will be skipped.
+    // `snowfall.project.junction.provider.v1alpha.StopService` needs to be
+    // implemented in order for Junction to have knowledge about the provider's
+    // IDs.
+    STOP_IDENTIFICATION_METHOD_PROVIDER_IDS = 1;
+
+    // Junction will perform trip searches using coordinates of the origin and
+    // destination. It's up to the provider itself to map these coordinates into
+    // stops that return relevant trip results.
+    STOP_IDENTIFICATION_METHOD_COORDINATES = 2;
+
+    // Junction will perform trip searches using the IATA codes of the origin
+    // and destination. In cases where IATA codes are not assigned or are
+    // missing, the provider will be skipped.
+    STOP_IDENTIFICATION_METHOD_IATA_CODES = 3;
+  }
+
+  // The stop identification method determines how the origin and destination
+  // will be represented in trip searches coming from Junction.
+  StopIdentificationMethod stop_identification_method = 2;
+
+  // All segment types supported by the provider. Junction won't ever perform
+  // trip searches towards a provider not supporting the search's segment type.
+  repeated snowfall.project.junction.v1.SegmentType supported_segment_types = 3;
+}
