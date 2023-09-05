@@ -42,7 +42,7 @@ async def _parse_request_body(
         return {}
 
     if "data" not in body:
-        return {}
+        return body
 
     return request_helpers.flatten_request_body(body)
 
@@ -60,7 +60,10 @@ def to_route(
                 body=await _parse_request_body(request),
                 pagination=pagination_helpers.get_pagination(request),
                 path_params=request.path_params,
-                query_params=request.scope["parsed_query_string"],
+                query_params=request.scope.get(
+                    "parsed_query_string",
+                    request.query_params,
+                ),
                 starlette_request=request,
             ),
         )

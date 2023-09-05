@@ -13,15 +13,21 @@ class Pagination(object):
 
 
 def get_pagination(request: requests.Request) -> Pagination:
-    limit_str = request.scope["parsed_query_string"].get(PAGE_LIMIT_KEY)
     limit: int | None = None
+    limit_str = request.scope.get(
+        "parsed_query_string",
+        request.query_params,
+    ).get(PAGE_LIMIT_KEY)
 
     if limit_str is not None:
         limit = int(limit_str)
 
     return Pagination(
-        cursor=request.scope["parsed_query_string"].get(PAGE_CURSOR_KEY),
         limit=limit,
+        cursor=request.scope.get(
+            "parsed_query_string",
+            request.query_params,
+        ).get(PAGE_CURSOR_KEY),
     )
 
 
