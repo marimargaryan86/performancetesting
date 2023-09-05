@@ -211,6 +211,7 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
         self,
         query: Callable[..., Any],
         *args: Any,
+        unmarshalled_cursor: cursor_pb2.Cursor | None = None,
         **kwargs: Any,
     ) -> Any:
         # TODO: can't run this in __init__, but this isn't pretty...
@@ -241,6 +242,7 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
             possible_cursor=query(*args, **kwargs),
             filter_=filter_pre_cursor,
             sort=sort,
+            unmarshalled_cursor=unmarshalled_cursor,
         )
 
     async def _parse_result(
@@ -248,6 +250,7 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
         possible_cursor: Any,
         filter_: Mapping[str, Any],
         sort: tuple[str, int] | None,
+        unmarshalled_cursor: cursor_pb2.Cursor | None = None,
     ) -> Any:
         if isinstance(possible_cursor, motor_asyncio.AsyncIOMotorCursor):
             return resultset.DocumentResultSet[Record](
@@ -255,6 +258,7 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
                 coder=self._coder,
                 filter_=filter_,
                 sort=sort,
+                previous_cursor=unmarshalled_cursor,
             )
 
         if isinstance(possible_cursor, _AGGREGATE_CURSOR_CLASS):
@@ -263,6 +267,7 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
                 coder=self._coder,
                 filter_=filter_,
                 sort=sort,
+                previous_cursor=unmarshalled_cursor,
             )
 
         possible_document = await possible_cursor
@@ -287,10 +292,12 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
 
         filter_pre_cursor = dict(filter_ or {})
         cursor_filter = filter_pre_cursor.copy()
+        unmarshalled_cursor = None
 
         if cur:
+            unmarshalled_cursor = cursor.unmarshal(cur, filter_pre_cursor, sort)
             cursor_filter = with_cursor_filters(
-                cursor.unmarshal(cur, filter_pre_cursor, sort),
+                unmarshalled_cursor,
                 filter_pre_cursor,
                 sort,
             )
@@ -300,9 +307,10 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
             filter=cursor_filter,
             filter_pre_cursor=filter_pre_cursor,
             sort=sort,
+            unmarshalled_cursor=unmarshalled_cursor,
         )
 
-    async def _find_nested(
+    async def _find_nested(  # noqa: WPS210
         self,
         filter_: Mapping[str, Any] | None = None,
         cur: str | None = None,
@@ -311,10 +319,12 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
         aggregate = []
         filter_pre_cursor = dict(filter_ or {})
         cursor_filter = filter_pre_cursor.copy()
+        unmarshalled_cursor = None
 
         if cur:
+            unmarshalled_cursor = cursor.unmarshal(cur, filter_pre_cursor, sort)
             cursor_filter = with_cursor_filters(
-                cursor_obj=cursor.unmarshal(cur, cursor_filter, sort),
+                cursor_obj=unmarshalled_cursor,
                 filter_=cursor_filter,
                 sort=sort,
                 path=self._clean_path,
@@ -379,6 +389,7 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
             pipeline=aggregate,
             filter_pre_cursor=filter_pre_cursor,
             sort=sort,
+            unmarshalled_cursor=unmarshalled_cursor,
         )
 
 

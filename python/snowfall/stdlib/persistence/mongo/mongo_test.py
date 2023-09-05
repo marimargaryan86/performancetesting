@@ -37,6 +37,42 @@ async def test_result_set(mock_repository: conftest.MockRepository) -> None:
     assert await documents.cursor() != ""
 
 
+async def test_documents_are_not_duplicated_during_pagination(
+    mock_repository: conftest.MockRepository,
+) -> None:
+    await mock_repository.insert({"_id": "aaaaa"})
+
+    documents = await mock_repository.all_()
+
+    assert len([doc async for doc in documents]) == 1
+
+    for _ in range(2):
+        documents = await mock_repository.all_(cursor=await documents.cursor())
+        assert not len([doc async for doc in documents])
+
+
+async def test_pagination_is_not_reset_on_no_documents(  # noqa: WPS217
+    mock_repository: conftest.MockRepository,
+) -> None:
+    await mock_repository.insert({"_id": "aaaaa"})
+
+    documents = await mock_repository.all_()
+    assert len([doc async for doc in documents]) == 1
+
+    for _ in range(2):
+        documents = await mock_repository.all_(await documents.cursor())
+        assert not len([doc async for doc in documents])
+
+    await mock_repository.insert({"_id": "bbbbb"})
+
+    assert (
+        len(
+            [doc async for doc in await mock_repository.all_(await documents.cursor())],
+        )
+        == 1
+    )
+
+
 async def test_cursor_filters(mock_repository: conftest.MockRepository) -> None:
     await asyncio.gather(
         mock_repository.insert({"_id": "foobar_foobar"}),

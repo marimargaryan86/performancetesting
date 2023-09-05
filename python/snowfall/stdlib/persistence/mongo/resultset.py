@@ -8,6 +8,7 @@ from motor import core
 
 from snowfall.stdlib.persistence import cursor
 from snowfall.stdlib.persistence.mongo import coders
+from snowfall.stdlib.v1 import cursor_pb2
 
 _mongo_id_key = "_id"
 _proto_id_key = "id"
@@ -15,12 +16,13 @@ _Record = TypeVar("_Record")
 
 
 class ResultSet(abc.ABC, Generic[_Record], AsyncIterator[_Record]):
-    def __init__(
+    def __init__(  # noqa: WPS211
         self,
         cur: core.AgnosticBaseCursor,
         coder: coders.BaseCoder[_Record],
         filter_: Mapping[str, Any],
         sort: tuple[str, int] | None = None,
+        previous_cursor: cursor_pb2.Cursor | None = None,
     ):
         self._coder = coder
         self._cursor = cur
@@ -30,11 +32,14 @@ class ResultSet(abc.ABC, Generic[_Record], AsyncIterator[_Record]):
         self._sort = sort
         self._custom_sort_field = None
         self._last_sort_value = None
-        self._last: str | None = None
+        self._last: str | None = previous_cursor.id if previous_cursor else None
         self._limit = 0
 
         if sort and sort[0] != _mongo_id_key:
             self._custom_sort_field = sort[0]
+            self._last_sort_value = (
+                json_util.loads(previous_cursor.sort_value) if previous_cursor else None
+            )
 
     def __aiter__(self) -> Self:
         return self
@@ -76,14 +81,15 @@ class ResultSet(abc.ABC, Generic[_Record], AsyncIterator[_Record]):
 
 
 class DocumentResultSet(ResultSet[_Record]):
-    def __init__(
+    def __init__(  # noqa: WPS211
         self,
         cur: core.AgnosticCursor,
         coder: coders.BaseCoder[_Record],
         filter_: Mapping[str, Any],
         sort: tuple[str, int] | None,
+        previous_cursor: cursor_pb2.Cursor | None = None,
     ) -> None:
-        super().__init__(cur, coder, filter_, sort)
+        super().__init__(cur, coder, filter_, sort, previous_cursor)
 
         self._cur = cur
         sort_fields = []
