@@ -87,6 +87,7 @@ def _factory(
                 ),
                 token_endpoint=str(app.settings.ory_client_token_endpoint),
             ),
+            client=httpx.AsyncClient(timeout=10),
         )
         metrics.register(junction_httpx_client)
         junction_client = client.Client(
