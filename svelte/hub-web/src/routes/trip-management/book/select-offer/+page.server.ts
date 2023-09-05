@@ -36,6 +36,7 @@ export async function load(event): Promise<{
         },
       ],
       passengers: parsePassengers(searchData.passengers),
+      allowedLegTypeIds: ["rail"],
     }));
 
   setSearchData({ ...searchData, tripCandidatesSearchId: tripCandidatesSearch.id }, event);
