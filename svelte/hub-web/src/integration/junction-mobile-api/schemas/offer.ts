@@ -1,222 +1,381 @@
-import type { RelationshipSchema } from "integration/common/schemas";
-import type { PriceBreakdownSchema, PriceSchema } from "./price";
-import type { PointSchema } from "./common";
+import { priceModel, priceBreakdownModel } from "./price";
+import { pointModel, resourceStatus } from "./common";
+import { getSchemaModel, links, relationship, type Infer } from "../schema-model.server";
+import { z } from "zod";
 
-export type Availability = "unspecified" | "unavailable" | "available" | "included";
+export const offerSegmentLegModel = getSchemaModel(
+  z.object({
+    origin: pointModel.schema,
+    destination: pointModel.schema,
+    departureAt: z.date({ coerce: true }),
+    arrivalAt: z.date({ coerce: true }),
+  }),
+  z.object({
+    origin: pointModel.model,
+    destination: pointModel.model,
+    departureAt: z.date({ coerce: true }),
+    arrivalAt: z.date({ coerce: true }),
+  }),
+  {
+    toModel: (data) => ({
+      ...data,
+      origin: pointModel.toModel(data.origin),
+      destination: pointModel.toModel(data.destination),
+    }),
+    toSchema: (data) => ({
+      ...data,
+      origin: pointModel.toSchema(data.origin),
+      destination: pointModel.toSchema(data.destination),
+    }),
+  },
+);
 
-export interface OfferSegmentDetailAmenitiesSchema {
-  beverage: { availability: Availability };
-  entertainment: { availability: Availability };
-  food: { availability: Availability };
-  power: { availability: Availability };
-  wifi: { availability: Availability };
-}
+export const legTypeModel = getSchemaModel(
+  z.object({
+    id: z.string(),
+    type: z.enum(["leg-types"]),
+    attributes: z.object({ name: z.string() }),
+    links: links(["self"]),
+  }),
+  z.object({ id: z.string(), name: z.string() }),
+  { toModel: (data) => ({ id: data.id, name: data.attributes.name }) },
+);
 
-export interface TripOfferOptionDetailsIdentifierSchema {
-  id: string;
-  type: "trip-offer-option-details";
-}
+export const routeIdentifierModel = getSchemaModel(
+  z.object({ vendor: z.string(), operator: z.string().nullable() }),
+  z.object({ vendor: z.string(), operator: z.string().optional() }),
+  {
+    toModel: (data) => ({ ...data, operator: data.operator ?? undefined }),
+    toSchema: (data) => ({ ...data, operator: data.operator ?? null }),
+  },
+);
 
-export interface TripOfferOptionDetailsSchema extends TripOfferOptionDetailsIdentifierSchema {
-  attributes: {
-    cabinClassName: string;
-    amenities: OfferSegmentDetailAmenitiesSchema;
-  };
-  relationships: {
-    details: RelationshipSchema<TripOfferGroupDetailsIdentifierSchema>;
-    cabinClass: RelationshipSchema<CabinClassIdentifierSchema>;
-  };
-  links: { self: string };
-}
+export const cabinClassModel = getSchemaModel(
+  z.object({
+    id: z.string(),
+    type: z.enum(["cabin-classes"]),
+    attributes: z.object({ name: z.string() }),
+    links: links(["self"]),
+  }),
+  z.object({ id: z.string(), name: z.string() }),
+  {
+    toModel: (data) => ({ id: data.id, name: data.attributes.name }),
+  },
+);
 
-export interface OfferOptionIdentifierSchema {
-  id: string;
-  type: "offer-options";
-}
+export const tripOfferGroupDetailsModel = getSchemaModel(
+  z.object({
+    id: z.string().uuid(),
+    type: z.enum(["trip-offer-group-details"]),
+    attributes: z.object({
+      legs: z.array(offerSegmentLegModel.schema),
+      vendor: z.string(),
+      operator: z.string().nullable(),
+      routeIdentifiers: routeIdentifierModel.schema,
+      sequences: z.object({ trip: z.number(), segment: z.number() }),
+    }),
+    relationships: relationship({ legType: legTypeModel.schema.pick({ id: true, type: true }) }),
+    links: links(["self"]),
+  }),
+  z.object({
+    id: z.string(),
+    legType: legTypeModel.model.optional(),
+    legs: z.array(offerSegmentLegModel.model),
+    vendor: z.string(),
+    operator: z.string().optional(),
+    routeIdentifiers: routeIdentifierModel.model,
+    sequences: z.object({
+      trip: z.number(),
+      segment: z.number(),
+    }),
+  }),
+  {
+    toModel: (data) => ({
+      id: data.id,
+      legType: undefined,
+      legs: data.attributes.legs.map(offerSegmentLegModel.toModel),
+      operator: data.attributes.operator ?? undefined,
+      vendor: data.attributes.vendor,
+      sequences: {
+        segment: data.attributes.sequences.segment,
+        trip: data.attributes.sequences.trip,
+      },
+      routeIdentifiers: routeIdentifierModel.toModel(data.attributes.routeIdentifiers),
+    }),
+  },
+);
 
-export interface BaggageAllowancesSchema {
-  isIncluded: boolean;
-  applicableTo: {
-    dateOfBirthAfter: string;
-    dateOfBirthBefore: string;
-  };
-}
+export const availability = z.enum(["unspecified", "unavailable", "available", "included"]);
 
-export interface CabinClassIdentifierSchema {
-  id: string;
-  type: "cabin-classes";
-}
+export const offerSegmentDetailAmenitiesModel = z.object({
+  beverage: z.object({ availability }),
+  entertainment: z.object({ availability }),
+  food: z.object({ availability }),
+  power: z.object({ availability }),
+  wifi: z.object({ availability }),
+});
 
-export interface CabinClassSchema extends CabinClassIdentifierSchema {
-  attributes: {
-    name: string;
-  };
-  links: { self: string };
-}
+export const tripOfferOptionDetailsModel = getSchemaModel(
+  z.object({
+    id: z.string().uuid(),
+    type: z.enum(["trip-offer-option-details"]),
+    attributes: z.object({
+      cabinClassName: z.string(),
+      amenities: offerSegmentDetailAmenitiesModel,
+    }),
+    relationships: relationship({
+      details: tripOfferGroupDetailsModel.schema.pick({ id: true, type: true }),
+      cabinClass: cabinClassModel.schema.pick({ id: true, type: true }),
+    }),
+    links: links(["self"]),
+  }),
+  z.object({
+    id: z.string(),
+    cabinClass: cabinClassModel.model.optional(),
+    cabinClassName: z.string(),
+    amenities: offerSegmentDetailAmenitiesModel,
+  }),
+  {
+    toModel: (data) => ({
+      id: data.id,
+      cabinClassName: data.attributes.cabinClassName,
+      cabinClass: undefined,
+      amenities: data.attributes.amenities,
+    }),
+  },
+);
 
-export interface LegTypeIdentifierSchema {
-  id: string;
-  type: "leg-types";
-}
+export const baggageAllowanceModel = getSchemaModel(
+  z.object({
+    isIncluded: z.boolean(),
+    applicableTo: z.object({
+      dateOfBirthAfter: z.date({ coerce: true }),
+      dateOfBirthBefore: z.date({ coerce: true }),
+    }),
+  }),
+  z.object({
+    isIncluded: z.boolean(),
+    applicableTo: z.object({
+      dateOfBirthAfter: z.date({ coerce: true }),
+      dateOfBirthBefore: z.date({ coerce: true }),
+    }),
+  }),
+);
 
-export interface LegTypeSchema extends LegTypeIdentifierSchema {
-  attributes: {
-    name: string;
-  };
-  links: { self: string };
-}
+export const offerOptionModel = getSchemaModel(
+  z.object({
+    id: z.string().uuid(),
+    type: z.enum(["offer-options"]),
+    attributes: z.object({
+      price: priceModel.schema,
+      priceBreakdown: z.array(priceBreakdownModel.schema).optional(),
+      brandName: z.string(),
+      baggageAllowances: z.array(baggageAllowanceModel.schema),
+    }),
+    relationships: relationship({
+      details: z.array(tripOfferOptionDetailsModel.schema.pick({ id: true, type: true })),
+    }),
+    links: links(["self"]),
+  }),
+  z.object({
+    id: z.string(),
+    price: priceModel.model,
+    priceBreakdown: z.array(priceBreakdownModel.model).optional(),
+    brandName: z.string(),
+    details: z.array(tripOfferOptionDetailsModel.model),
+    baggageAllowance: z.array(baggageAllowanceModel.model),
+  }),
+  {
+    toModel: (data) => ({
+      id: data.id,
+      price: priceModel.toModel(data.attributes.price),
+      priceBreakdown: data.attributes.priceBreakdown?.map(priceBreakdownModel.toModel),
+      brandName: data.attributes.brandName,
+      details: [],
+      baggageAllowance: data.attributes.baggageAllowances.map(baggageAllowanceModel.toModel),
+    }),
+  },
+);
 
-export interface OfferOptionSchema extends OfferOptionIdentifierSchema {
-  attributes: {
-    price: PriceSchema;
-    priceBreakdown?: PriceBreakdownSchema[];
-    brandName: string;
-    baggageAllowances: BaggageAllowancesSchema[];
-  };
-  relationships: {
-    details: RelationshipSchema<TripOfferOptionDetailsIdentifierSchema[]>;
-  };
-  links: { self: string };
-}
+export const offerGroupModel = getSchemaModel(
+  z.object({
+    id: z.string().uuid(),
+    type: z.enum(["offer-groups"]),
+    attributes: z.record(z.any()),
+    relationships: relationship({
+      options: z.array(offerOptionModel.schema.pick({ id: true, type: true })),
+      details: z.array(tripOfferGroupDetailsModel.schema.pick({ id: true, type: true })),
+    }),
+    links: links(["self"]),
+  }),
+  z.object({
+    id: z.string().uuid(),
+    options: z.array(offerOptionModel.model),
+    details: z.array(tripOfferGroupDetailsModel.model),
+  }),
+  { toModel: (data) => ({ id: data.id, options: [], details: [] }) },
+);
 
-export interface TripOfferGroupDetailsIdentifierSchema {
-  id: string;
-  type: "trip-offer-group-details";
-}
+export const offerModel = getSchemaModel(
+  z.object({
+    id: z.string().uuid(),
+    type: z.enum(["offers"]),
+    attributes: z.object({ expiresAt: z.date({ coerce: true }) }),
+    relationships: relationship({
+      groups: z.array(offerGroupModel.schema.pick({ id: true, type: true })),
+    }),
+    links: links(["self"]),
+  }),
+  z.object({
+    id: z.string().uuid(),
+    expiresAt: z.date({ coerce: true }),
+    groups: z.array(offerGroupModel.model),
+  }),
+  { toModel: (data) => ({ id: data.id, expiresAt: data.attributes.expiresAt, groups: [] }) },
+);
 
-export interface OfferSegmentLegSchema {
-  origin: PointSchema;
-  destination: PointSchema;
-  departureAt: string;
-  arrivalAt: string;
-}
+export const tripOfferOptionPenaltyModel = getSchemaModel(
+  z.object({
+    applicableTo: z.object({
+      dateOfBirthAfter: z.date({ coerce: true }),
+      dateOfBirthBefore: z.date({ coerce: true }),
+    }),
+    penaltyType: z.enum(["exchange", "refund"]),
+    changeable: z.boolean().optional(),
+    refundable: z.boolean(),
+    conditionsApply: z.boolean().optional(),
+    applicability: z.enum(["before", "after"]),
+    price: priceModel.schema.nullable(),
+  }),
+  z.object({
+    applicableTo: z.object({
+      dateOfBirthAfter: z.date({ coerce: true }),
+      dateOfBirthBefore: z.date({ coerce: true }),
+    }),
+    type: z.enum(["exchange", "refund"]),
+    changeable: z.boolean().optional(),
+    refundable: z.boolean(),
+    conditionsApply: z.boolean().optional(),
+    applicability: z.enum(["before", "after"]),
+    price: priceModel.model.optional(),
+  }),
+  {
+    toModel: (data) => ({
+      ...data,
+      type: data.penaltyType,
+      price: data.price ? priceModel.toModel(data.price) : undefined,
+    }),
+  },
+);
 
-export interface RouteIdentifiersSchema {
-  vendor: string;
-  operator: string | null;
-}
+export const offerSegmentDetailRuleModel = z.object({
+  title: z.string(),
+  body: z.string(),
+});
 
-export interface TripOfferGroupDetailsSchema extends TripOfferGroupDetailsIdentifierSchema {
-  attributes: {
-    legs: OfferSegmentLegSchema[];
-    vendor: string;
-    operator: string | null;
-    routeIdentifiers: RouteIdentifiersSchema;
-    sequences: {
-      trip: number;
-      segment: number;
-    };
-  };
-  relationships: {
-    legType: RelationshipSchema<LegTypeIdentifierSchema>;
-  };
-  links: { self: string };
-}
+export const priceQuoteRequiredPassengerInfoType = z.enum([
+  "date-of-birth",
+  "nationality",
+  "expiration-date",
+  "issuing-country",
+  "passport-number",
+  "residence-country-code",
+  "residence-address",
+  "issue-date",
+]);
 
-export interface OfferGroupIdentifierSchema {
-  id: string;
-  type: "offer-groups";
-}
+export const tripOfferPriceQuoteModel = getSchemaModel(
+  z.object({
+    id: z.string().uuid(),
+    type: z.enum(["trip-offer-price-quotes"]),
+    attributes: z.object({
+      expiresAt: z.date({ coerce: true }),
+      price: priceModel.schema.nullable(),
+      priceBreakdown: z.array(priceBreakdownModel.schema.nullable().optional()),
+      penalties: z.array(tripOfferOptionPenaltyModel.schema),
+      required: z.array(priceQuoteRequiredPassengerInfoType),
+      rules: z.array(offerSegmentDetailRuleModel),
+      status: resourceStatus,
+    }),
+    relationships: relationship({
+      offer: offerModel.schema.pick({ id: true, type: true }),
+      options: z.array(offerOptionModel.schema.pick({ id: true, type: true })),
+    }),
+  }),
+  z.object({
+    id: z.string(),
+    expiresAt: z.date({ coerce: true }),
+    price: priceModel.model.optional(),
+    priceBreakdown: z.array(priceBreakdownModel.model).optional(),
+    penalties: z.array(tripOfferOptionPenaltyModel.model),
+    required: z.array(priceQuoteRequiredPassengerInfoType),
+    rules: z.array(offerSegmentDetailRuleModel),
+    status: resourceStatus,
+    offerId: z.string(),
+    offer: offerModel.model.optional(),
+    optionIds: z.array(z.string()),
+    options: z.array(offerOptionModel.model),
+  }),
+  {
+    toModel: (data) => ({
+      id: data.id,
+      expiresAt: data.attributes.expiresAt,
+      offerId: data.relationships.offer.data.id,
+      offer: undefined,
+      optionIds: data.relationships.options.data.map((item) => item.id),
+      options: [],
+      penalties: data.attributes.penalties.map(tripOfferOptionPenaltyModel.toModel),
+      priceBreakdown: data.attributes.priceBreakdown?.map(priceBreakdownModel.toModel),
+      required: data.attributes.required,
+      rules: data.attributes.rules,
+      status: data.attributes.status,
+      price: data.attributes.price ? priceModel.toModel(data.attributes.price) : undefined,
+    }),
+  },
+);
 
-export interface OfferGroupSchema extends OfferGroupIdentifierSchema {
-  attributes: object;
-  relationships: {
-    options: RelationshipSchema<OfferOptionIdentifierSchema[]>;
-    details: RelationshipSchema<TripOfferGroupDetailsIdentifierSchema[]>;
-  };
-  links: { self: string };
-}
+export const createTripOfferPriceQuoteModel = getSchemaModel(
+  z.object({
+    type: z.enum(["trip-offer-price-quotes"]),
+    attributes: z.object({ sessionToken: z.string() }).optional(),
+    relationships: relationship({
+      offer: offerModel.schema.pick({ id: true, type: true }),
+      options: z.array(offerOptionModel.schema.pick({ id: true, type: true })),
+    }),
+  }),
+  z.object({
+    sessionToken: z.string(),
+    offerId: z.string(),
+    optionIds: z.array(z.string()),
+  }),
+  {
+    toSchema: (data) => ({
+      type: "trip-offer-price-quotes" as const,
+      relationships: {
+        offer: { data: { id: data.offerId, type: "offers" as const } },
+        options: {
+          data: data.optionIds.map((id) => ({ id, type: "offer-options" as const })),
+        },
+      },
+    }),
+  },
+);
 
-export interface TripOfferIdentifierSchema {
-  id: string;
-  type: "offers";
-}
+export type TripOfferPriceQuoteIncludes = (
+  | Infer<typeof offerModel, "schema">
+  | Infer<typeof cabinClassModel, "schema">
+  | Infer<typeof tripOfferOptionDetailsModel, "schema">
+  | Infer<typeof offerOptionModel, "schema">
+  | Infer<typeof legTypeModel, "schema">
+  | Infer<typeof tripOfferGroupDetailsModel, "schema">
+  | Infer<typeof offerGroupModel, "schema">
+)[];
 
-export interface TripOfferSchema extends TripOfferIdentifierSchema {
-  attributes: {
-    expiresAt: string;
-  };
-  relationships: {
-    groups: RelationshipSchema<OfferGroupIdentifierSchema[]>;
-  };
-  links: { self: string };
-}
-
-export interface TripOfferOptionPenaltySchema {
-  applicableTo: {
-    dateOfBirthAfter: string;
-    dateOfBirthBefore: string;
-  };
-  penaltyType: "exchange" | "refund";
-  changeable?: boolean;
-  refundable: boolean;
-  conditionsApply?: boolean;
-  applicability: "before" | "after";
-  price: PriceSchema | null;
-}
-
-export interface OfferSegmentDetailRuleSchema {
-  title: string;
-  body: string;
-}
-
-export type TripOfferPriceQuoteStatus =
-  | "unspecified"
-  | "pending"
-  | "processing"
-  | "completed"
-  | "failed";
-
-export type PriceQuoteRequiredPassengerInfoType =
-  | "date-of-birth"
-  | "nationality"
-  | "expiration-date"
-  | "issuing-country"
-  | "passport-number"
-  | "residence-country-code"
-  | "residence-address"
-  | "issue-date";
-
-export interface TripOfferPriceQuoteIdentifierSchema {
-  id: string;
-  type: "trip-offer-price-quotes";
-}
-
-export interface TripOfferPriceQuoteSchema extends TripOfferPriceQuoteIdentifierSchema {
-  attributes: {
-    expiresAt: string;
-    price: PriceSchema | null;
-    priceBreakdown?: PriceBreakdownSchema[] | null;
-    penalties: TripOfferOptionPenaltySchema[];
-    required: PriceQuoteRequiredPassengerInfoType[];
-    rules: OfferSegmentDetailRuleSchema[];
-    status: TripOfferPriceQuoteStatus;
-  };
-  relationships: {
-    offer: RelationshipSchema<TripOfferIdentifierSchema>;
-    options: RelationshipSchema<OfferOptionIdentifierSchema[]>;
-  };
-}
-
-export interface CreateOfferPriceQuoteRequestSchema {
-  data: Omit<TripOfferPriceQuoteSchema, "id" | "attributes"> & {
-    attributes?: { sessionToken?: string };
-  };
-}
-
-export interface CreateOfferPriceQuoteResponseSchema {
-  data: TripOfferPriceQuoteSchema;
-}
-
-export interface GetOfferPriceQuoteResponseSchema {
-  data: TripOfferPriceQuoteSchema;
-  included?: (
-    | TripOfferSchema
-    | CabinClassSchema
-    | TripOfferOptionDetailsSchema
-    | OfferOptionSchema
-    | LegTypeSchema
-    | TripOfferGroupDetailsSchema
-    | OfferGroupSchema
-  )[];
-}
+export type OfferIncludes = (
+  | Infer<typeof offerGroupModel, "schema">
+  | Infer<typeof tripOfferGroupDetailsModel, "schema">
+  | Infer<typeof legTypeModel, "schema">
+  | Infer<typeof offerOptionModel, "schema">
+  | Infer<typeof tripOfferOptionDetailsModel, "schema">
+  | Infer<typeof cabinClassModel, "schema">
+)[];

@@ -1,25 +1,16 @@
 import JunctionMobileApiService from "./junction-mobile-api-service";
-import type { CreateOrderModel } from "../models";
-import type {
-  CreateOrderRequestSchema,
-  CreateOrderResponseSchema,
-  GetOrderResponseSchema,
-  OrderSchema,
-} from "../schemas/order";
+import { createOrderModel, type OrderIncludes, type orderModel } from "../schemas/order";
 import { getRandomAlphaNumericString } from "utils/random";
-import {
-  parseCreateOrderModel,
-  parseCreateOrderResponseSchema,
-  parseGetOrderResponseSchema,
-  parseListOrdersResponseSchema,
-} from "../parsers/order";
-import type { OrderModel } from "models/booking/order";
+import { parseOrderSchema } from "../parsers/order";
 import type { PaginatedData } from "models/common";
+import type { Infer } from "../schema-model.server";
+import { parseIncluded } from "../parsers/included";
 
 export class OrderService extends JunctionMobileApiService {
-  async listOrders(cursor?: string, limit = 100): Promise<PaginatedData<OrderModel>> {
+  async listOrders(cursor?: string, limit = 100): Promise<PaginatedData<Infer<typeof orderModel>>> {
     const resp = await this.makeRequest<{
-      data: OrderSchema[];
+      data: Infer<typeof orderModel, "schema">[];
+      included?: OrderIncludes;
       links: { next: string };
     }>("/orders", {
       queryParams: {
@@ -40,34 +31,37 @@ export class OrderService extends JunctionMobileApiService {
     }
 
     const data = await resp.json();
+    const included = parseIncluded(data.included);
 
     return {
-      data: parseListOrdersResponseSchema(data),
-      // TODO: Fix
+      data: data.data.map((item) => parseOrderSchema(item, included)),
       // cursor: OrderService.getCursor(data),
       cursor: undefined,
     };
   }
 
-  async createOrder(data: CreateOrderModel): Promise<OrderModel> {
-    const resp = await this.makeRequest<CreateOrderResponseSchema, CreateOrderRequestSchema>(
-      "/orders",
-      {
-        method: "POST",
-        data: parseCreateOrderModel(data),
-        headers: { "Session-Token": getRandomAlphaNumericString(32) },
-      },
-    );
+  async createOrder(data: Infer<typeof createOrderModel>): Promise<Infer<typeof orderModel>> {
+    const resp = await this.makeRequest<
+      { data: Infer<typeof orderModel, "schema"> },
+      { data: Infer<typeof createOrderModel, "schema"> }
+    >("/orders", {
+      method: "POST",
+      data: { data: createOrderModel.toSchema(data) },
+      headers: { "Session-Token": getRandomAlphaNumericString(32) },
+    });
 
     if (resp.status !== 201) {
       throw new Error("Order creation failed");
     }
 
-    return parseCreateOrderResponseSchema(await resp.json());
+    return parseOrderSchema((await resp.json()).data, { bookings: [], journeys: [] });
   }
 
-  async getOrder(id: string): Promise<OrderModel> {
-    const resp = await this.makeRequest<GetOrderResponseSchema>(`/orders/${id}`, {
+  async getOrder(id: string): Promise<Infer<typeof orderModel>> {
+    const resp = await this.makeRequest<{
+      data: Infer<typeof orderModel, "schema">;
+      included?: OrderIncludes;
+    }>(`/orders/${id}`, {
       queryParams: {
         include: [
           "journey",
@@ -83,6 +77,9 @@ export class OrderService extends JunctionMobileApiService {
       throw new Error("Booking not found");
     }
 
-    return parseGetOrderResponseSchema(await resp.json());
+    const data = await resp.json();
+    const included = parseIncluded(data.included);
+
+    return parseOrderSchema(data.data, included);
   }
 }

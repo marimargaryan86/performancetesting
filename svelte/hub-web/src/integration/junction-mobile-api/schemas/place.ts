@@ -1,41 +1,57 @@
-import type { RelationshipSchema } from "integration/common/schemas";
+import { getSchemaModel, relationship } from "../schema-model.server";
+import { z } from "zod";
 
-export interface CoordinatesSchema {
-  latitude: number;
-  longitude: number;
-}
+export const coordinatesModel = getSchemaModel(
+  z.object({ latitude: z.number(), longitude: z.number() }),
+  z.object({ lat: z.number(), lon: z.number() }),
+  {
+    toModel: (data) => ({ lat: data.latitude, lon: data.longitude }),
+    toSchema: (data) => ({ latitude: data.lat, longitude: data.lon }),
+  },
+);
 
-export interface PlaceIdentifierSchema {
-  id: string;
-  type: "places";
-}
-
-export interface PlaceTypeIdentifier {
-  id: string;
-  type: "place-types";
-}
-
-export interface PlaceSchema extends PlaceIdentifierSchema {
-  attributes: {
-    name: string;
-    latitude: number;
-    longitude: number;
-    countryCode: string;
-    countryName?: string | null;
-    timeZone: string;
-    iataCode?: string | null;
-    population?: number;
-    minCity?: string;
-  };
-  relationships?: {
-    types: RelationshipSchema<PlaceTypeIdentifier[]>;
-  };
-}
-
-export interface ListPlacesResponseSchema {
-  data: PlaceSchema[];
-}
-
-export interface GetPlaceResponseSchema {
-  data: PlaceSchema;
-}
+export const placeModel = getSchemaModel(
+  z.object({
+    id: z.string().uuid(),
+    type: z.enum(["places"]),
+    attributes: z.object({
+      name: z.string(),
+      latitude: z.number(),
+      longitude: z.number(),
+      countryCode: z.string(),
+      countryName: z.string().nullable().optional(),
+      timeZone: z.string(),
+      iataCode: z.string().nullable().optional(),
+      population: z.number().optional(),
+      minCity: z.string().optional(),
+    }),
+    relationships: relationship({
+      types: z.array(z.object({ id: z.string(), type: z.enum(["place-types"]) })),
+    }).optional(),
+  }),
+  z.object({
+    id: z.string(),
+    types: z.array(z.string()),
+    name: z.string(),
+    coordinates: coordinatesModel.model,
+    timeZone: z.string(),
+    iataCode: z.string().optional(),
+    country: z.object({
+      code: z.string(),
+      name: z.string().optional(),
+    }),
+  }),
+  {
+    toModel: (data) => ({
+      ...data,
+      ...data.attributes,
+      iataCode: data.attributes.iataCode ?? undefined,
+      coordinates: coordinatesModel.toModel(data.attributes),
+      types: data.relationships?.types.data.map((item) => item.id) ?? [],
+      country: {
+        code: data.attributes.countryCode,
+        name: data.attributes.countryName ?? undefined,
+      },
+    }),
+  },
+);

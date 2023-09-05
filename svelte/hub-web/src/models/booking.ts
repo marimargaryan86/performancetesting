@@ -1,13 +1,7 @@
-import type { MoneyModel } from "./money";
+import type { Infer } from "integration/junction-mobile-api/schema-model.server";
 import type { OrderModel } from "./order";
-import type { PointModel } from "./spatial";
-
-export interface LegModel {
-  origin: PointModel;
-  destination: PointModel;
-  departureAt: Date;
-  arrivalAt: Date;
-}
+import type { offerSegmentLegModel } from "integration/junction-mobile-api/schemas/offer";
+import type { priceModel } from "integration/junction-mobile-api/schemas/price";
 
 export interface BookingDetailsModel {
   cabinClass: string;
@@ -17,13 +11,13 @@ export interface BookingDetailsModel {
     vendor: string;
     operator?: string;
   };
-  legs: LegModel[];
+  legs: Infer<typeof offerSegmentLegModel>[];
   legType?: string;
 }
 
 export interface BookingModel {
   id: string;
-  price: MoneyModel;
+  price: Infer<typeof priceModel>;
   operatorReferences: string[];
   externalReference?: string;
   order?: OrderModel;

@@ -8,8 +8,8 @@ import type { JourneySchema } from "../schemas/journey";
 import type { CabinClassSchema, LegTypeSchema } from "../schemas/offer";
 import type { OrderSchema } from "../schemas/order";
 import { parseOrder } from "./order";
-import { parsePriceSchema } from "./money";
-import { parsePointSchema } from "./common";
+import { priceModel } from "integration/junction-mobile-api/schemas/price";
+import { pointModel } from "integration/junction-mobile-api/schemas/common";
 
 export function parseBookingDetails(
   bookingDetails: BookingDetailsSchema,
@@ -20,8 +20,8 @@ export function parseBookingDetails(
     legs: bookingDetails.attributes.legs.map((item) => ({
       arrivalAt: new Date(item.arrivalAt),
       departureAt: new Date(item.departureAt),
-      destination: parsePointSchema(item.destination),
-      origin: parsePointSchema(item.origin),
+      destination: pointModel.toModel(item.departureAt),
+      origin: pointModel.toModel(item.origin),
     })),
     operator: bookingDetails.attributes.operator ?? undefined,
     routeIdentifiers: {
@@ -56,7 +56,7 @@ export function parseBooking(
     id: booking.id,
     externalReference: externalReference.length ? externalReference : undefined,
     operatorReferences: booking.attributes.operatorBookingReferences,
-    price: parsePriceSchema(booking.attributes.totalPrice),
+    price: priceModel.toModel(booking.attributes.totalPrice),
     status: booking.relationships.status.data.id,
     details: details ? parseBookingDetails(details, cabinClasses, legTypes) : undefined,
     order: order ? parseOrder(order, journeys) : undefined,

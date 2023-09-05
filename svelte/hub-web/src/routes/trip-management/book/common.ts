@@ -1,11 +1,12 @@
 import type { RequestEvent } from "@sveltejs/kit";
-import type { PlaceModel } from "models/booking/location";
 import jwt from "jsonwebtoken";
 import { getRandomAlphaNumericString } from "utils/random";
-import type { TripCandidatesModel } from "models/booking/trip";
-import type { PaymentIntentModel } from "models/booking/payment";
 import { URLExtended } from "utils/url";
 import { tripSearchQueryData } from "./trip-search/trip-search.svelte";
+import type { Infer } from "integration/junction-mobile-api/schema-model.server";
+import type { tripCandidatesSearchModel } from "integration/junction-mobile-api/schemas/trip";
+import type { paymentIntentModel } from "integration/junction-mobile-api/schemas/payment";
+import type { placeModel } from "integration/junction-mobile-api/schemas/place";
 
 export const SEARCH_TOKEN = "search-token";
 export const JWT_SIGNATURE = "search-token";
@@ -26,18 +27,18 @@ export type SearchData = {
   offerId?: string;
   optionIds?: string[];
   priceQuoteId?: string;
-  paymentIntent?: PaymentIntentModel;
+  paymentIntent?: Infer<typeof paymentIntentModel>;
   orderId?: string;
 };
 
 export type ResolvedSearchData = {
   sessionToken: string;
-  origin: PlaceModel;
-  destination: PlaceModel;
+  origin: Infer<typeof placeModel>;
+  destination: Infer<typeof placeModel>;
   departureAfter: Date;
   passengers: PassengerCountData;
-  tripCandidatesSearch?: TripCandidatesModel;
-  paymentIntent?: PaymentIntentModel;
+  tripCandidatesSearch?: Infer<typeof tripCandidatesSearchModel>;
+  paymentIntent?: Infer<typeof paymentIntentModel>;
 };
 
 function getTokenSearchData(event: RequestEvent): SearchData | undefined {
@@ -117,7 +118,9 @@ export function setSearchData(data: SearchData, event: RequestEvent): void {
   });
 }
 
-export function parsePassengers(passengers: PassengerCountData): TripCandidatesModel["passengers"] {
+type Passenger = Infer<typeof tripCandidatesSearchModel>["passengers"][number];
+
+export function parsePassengers(passengers: PassengerCountData): Passenger[] {
   const adult = new Date();
   adult.setFullYear(adult.getFullYear() - 25);
   const child = new Date();
@@ -126,14 +129,14 @@ export function parsePassengers(passengers: PassengerCountData): TripCandidatesM
   infant.setFullYear(infant.getFullYear() - 1);
 
   return [
-    ...Array<TripCandidatesModel["passengers"][number]>(passengers.adults).fill({
-      dateOfBirth: adult,
-    }),
-    ...Array<TripCandidatesModel["passengers"][number]>(passengers.children).fill({
-      dateOfBirth: child,
-    }),
-    ...Array<TripCandidatesModel["passengers"][number]>(passengers.infants).fill({
-      dateOfBirth: infant,
-    }),
+    ...Array(passengers.adults)
+      .fill(undefined)
+      .map<Passenger>(() => ({ dateOfBirth: adult })),
+    ...Array(passengers.children)
+      .fill(undefined)
+      .map<Passenger>(() => ({ dateOfBirth: child })),
+    ...Array(passengers.infants)
+      .fill(undefined)
+      .map<Passenger>(() => ({ dateOfBirth: infant })),
   ];
 }

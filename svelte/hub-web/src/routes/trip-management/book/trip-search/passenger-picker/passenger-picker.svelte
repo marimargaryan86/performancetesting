@@ -15,6 +15,7 @@
   import { scale } from "svelte/transition";
   import { z } from "zod";
   import { slideFade } from "transitions/slide-fade";
+  import { ensureDefined } from "utils/array";
 
   export let passengers: PassengerPickerData;
   export let error: string | string[] | boolean = false;
@@ -32,7 +33,7 @@
       ? `${passengers.infants} Infant${passengers.infants === 1 ? "" : "s"}`
       : undefined,
   ]
-    .filter((passenger): passenger is string => Boolean(passenger))
+    .filter(ensureDefined)
     .join(", ");
   $: totalPassengerCount = Object.values(passengers).reduce((prev, curr) => prev + curr, 0);
   $: displayError = error instanceof Array ? error.join(", ") : error;

@@ -20,13 +20,13 @@
   type TripSearchDataInternal = z.infer<typeof tripSearchData>;
 
   export type TripSearchData = Omit<TripSearchDataInternal, "originId" | "destinationId"> & {
-    origin: PlaceModel;
-    destination: PlaceModel;
+    origin: Infer<typeof placeModel>;
+    destination: Infer<typeof placeModel>;
   };
 
   export type PartialTripSearchData = PartiallyPartial<TripSearchData, "passengers">;
 
-  export function formatPlace(place?: PlaceModel): string {
+  export function formatPlace(place?: Infer<typeof placeModel>): string {
     if (!place) {
       return "";
     }
@@ -46,13 +46,14 @@
   import Button from "components/ui/button.svelte";
   import { page } from "$app/stores";
   import AutocompleteField from "components/ui/autocomplete-field.svelte";
-  import type { PlaceModel } from "models/booking/location";
   import { callAction, type PartiallyPartial } from "utils/common";
   import { browser } from "$app/environment";
   import { createEventDispatcher } from "svelte";
   import { z } from "zod";
   import { URLExtended } from "utils/url";
   import SearchIcon from "components/icons/search-icon.svelte";
+  import type { Infer } from "integration/junction-mobile-api/schema-model.server";
+  import type { placeModel } from "integration/junction-mobile-api/schemas/place";
 
   export let data: PartialTripSearchData = {
     passengers: {
@@ -66,12 +67,12 @@
 
   const dispatch = createEventDispatcher<{ search: URL }>();
 
-  async function listPlaces(query: string): Promise<PlaceModel[]> {
+  async function listPlaces(query: string): Promise<Infer<typeof placeModel>[]> {
     if (!browser) {
       return [];
     }
 
-    const result = await callAction<{ places: PlaceModel[] }>({
+    const result = await callAction<{ places: Infer<typeof placeModel>[] }>({
       action: routeConfig.tripManagement.book.actions.listPlaces,
       data: { query },
       apply: false,

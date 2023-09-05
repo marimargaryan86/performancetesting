@@ -1,7 +1,6 @@
 <script lang="ts">
   import TripSearch, { type PartialTripSearchData } from "../trip-search/trip-search.svelte";
   import SearchOptions, { type SearchOptionsData } from "./search-options.svelte";
-  import type { OfferModel } from "models/booking/offer";
   import Offer from "./offer/offer.svelte";
   import { callAction, sleep } from "utils/common";
   import routeConfig from "routeConfig";
@@ -13,13 +12,16 @@
   import type { MaybePromise } from "@sveltejs/kit";
   import Countdown from "../countdown.svelte";
   import LoadingSkelton from "./loading-skelton.svelte";
-  import type { TripCandidatesSearchStatus } from "integration/junction-mobile-api/schemas/trip";
   import type { ResolvedSearchData } from "../common";
+  import type { resourceStatus } from "integration/junction-mobile-api/schemas/common";
+  import type { z } from "zod";
+  import type { offerModel } from "integration/junction-mobile-api/schemas/offer";
+  import type { Infer } from "integration/junction-mobile-api/schema-model.server";
 
   export let data;
 
   let countdown: Countdown | undefined;
-  let getOffersTask: MaybePromise<OfferModel[]> = [];
+  let getOffersTask: MaybePromise<Infer<typeof offerModel>[]> = [];
   let searchData = getSearchData(data.searchData);
   let searchOptions: SearchOptionsData = {
     sortBy: "price",
@@ -52,12 +54,15 @@
     };
   }
 
-  async function pollOffers(id: string): Promise<OfferModel[]> {
+  async function pollOffers(id: string): Promise<Infer<typeof offerModel>[]> {
     if (tripCandidatesSearchId !== id) {
       return [];
     }
 
-    const result = await callAction<{ status: TripCandidatesSearchStatus; offers: OfferModel[] }>({
+    const result = await callAction<{
+      status: z.infer<typeof resourceStatus>;
+      offers: Infer<typeof offerModel>[];
+    }>({
       action: routeConfig.tripManagement.book.select.actions.poll,
       data: { tripCandidatesSearchId: id },
       apply: false,

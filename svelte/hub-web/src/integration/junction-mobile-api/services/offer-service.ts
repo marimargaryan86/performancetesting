@@ -1,61 +1,50 @@
-import type { OfferPriceQuoteModel } from "models/booking/offer";
-import { parseGetPriceQuoteSchema, parsePriceQuoteSchema } from "../parsers/offer";
-import type {
-  CreateOfferPriceQuoteResponseSchema,
-  CreateOfferPriceQuoteRequestSchema,
-  GetOfferPriceQuoteResponseSchema,
+import { parsePriceQuoteSchema } from "../parsers/offer";
+import {
+  createTripOfferPriceQuoteModel,
+  tripOfferPriceQuoteModel,
+  type TripOfferPriceQuoteIncludes,
 } from "../schemas/offer";
 import JunctionMobileApiService from "./junction-mobile-api-service";
+import type { Infer } from "../schema-model.server";
+import { parseIncluded } from "../parsers/included";
 
 export class OfferService extends JunctionMobileApiService {
-  async createPriceQuote(data: {
-    sessionToken: string;
-    offerId: string;
-    optionIds: string[];
-  }): Promise<OfferPriceQuoteModel> {
+  async createPriceQuote(
+    data: Infer<typeof createTripOfferPriceQuoteModel>,
+  ): Promise<Infer<typeof tripOfferPriceQuoteModel>> {
     const resp = await this.makeRequest<
-      CreateOfferPriceQuoteResponseSchema,
-      CreateOfferPriceQuoteRequestSchema
+      { data: Infer<typeof tripOfferPriceQuoteModel, "schema"> },
+      { data: Infer<typeof createTripOfferPriceQuoteModel, "schema"> }
     >("/offers/quotes", {
       method: "POST",
       data: {
-        data: {
-          type: "trip-offer-price-quotes",
-          relationships: {
-            offer: { data: { id: data.offerId, type: "offers" } },
-            options: {
-              data: data.optionIds.map((id) => ({ id, type: "offer-options" })),
-            },
-          },
-        },
+        data: createTripOfferPriceQuoteModel.toSchema(data),
       },
       headers: { "Session-Token": data.sessionToken },
     });
 
     const respData = await resp.json();
 
-    return parsePriceQuoteSchema(respData.data, []);
+    return parsePriceQuoteSchema(respData.data, { offers: [] });
   }
 
-  async getPriceQuote(id: string): Promise<OfferPriceQuoteModel> {
-    const resp = await this.makeRequest<GetOfferPriceQuoteResponseSchema>(`/offers/quotes/${id}`, {
-      // queryParams: {
-      //   include: [
-      //     "groups",
-      //     "groups.details",
-      //     "groups.details.legType",
-      //     "groups.options",
-      //     "groups.options.details",
-      //     "groups.options.details.cabinClass",
-      //     "groups.options.details.details",
-      //   ].join(","),
-      // },
+  async getPriceQuote(id: string): Promise<Infer<typeof tripOfferPriceQuoteModel>> {
+    const resp = await this.makeRequest<{
+      data: Infer<typeof tripOfferPriceQuoteModel, "schema">;
+      included?: TripOfferPriceQuoteIncludes;
+    }>(`/offers/quotes/${id}`, {
+      queryParams: {
+        include: ["offers", "options"].join(","),
+      },
     });
 
     if (resp.status === 404) {
       throw new Error("Quote not found");
     }
 
-    return parseGetPriceQuoteSchema(await resp.json());
+    const data = await resp.json();
+    const included = parseIncluded(data.included);
+
+    return parsePriceQuoteSchema(data.data, included);
   }
 }

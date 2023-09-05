@@ -1,9 +1,10 @@
-import type { MoneyModel } from "models/money";
 import type { AddBalanceResponseSchema, ListBalancesResponseSchema } from "../schemas/balance";
 import JunctionPayService from "./junction-pay-service";
+import type { priceModel } from "integration/junction-mobile-api/schemas/price";
+import type { Infer } from "integration/junction-mobile-api/schema-model.server";
 
 export default class BalanceService extends JunctionPayService {
-  async listBalances(token: string, accountId: string): Promise<MoneyModel[]> {
+  async listBalances(token: string, accountId: string): Promise<Infer<typeof priceModel>[]> {
     const resp = await this.makeRequest<ListBalancesResponseSchema>(
       `/accounts/${accountId}/balances`,
       { token },
@@ -23,7 +24,11 @@ export default class BalanceService extends JunctionPayService {
     }));
   }
 
-  async addBalance(token: string, accountId: string, currencyCode: string): Promise<MoneyModel> {
+  async addBalance(
+    token: string,
+    accountId: string,
+    currencyCode: string,
+  ): Promise<Infer<typeof priceModel>> {
     const resp = await this.makeRequest<AddBalanceResponseSchema>(
       `/accounts/${accountId}/relationships/currencies`,
       {

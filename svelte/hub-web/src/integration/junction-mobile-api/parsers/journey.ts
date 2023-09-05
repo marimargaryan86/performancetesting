@@ -1,25 +1,15 @@
-import type { JourneyModel, OrderModel } from "models/booking/order";
-import type { JourneySchema } from "../schemas/journey";
+import { journeyModel } from "../schemas/journey";
+import type { Infer } from "../schema-model.server";
+import type { orderModel } from "../schemas/order";
 
-export function parseJourneySchema(data: JourneySchema, orders: OrderModel[]): JourneyModel {
-  const contactDetails = data.attributes.contactDetails;
-  const address = contactDetails.address;
+export function parseJourneySchema(
+  data: Infer<typeof journeyModel, "schema">,
+  included: { orders: Infer<typeof orderModel>[] },
+): Infer<typeof journeyModel> {
   const orderIds = data.relationships.orders.data.map((item) => item.id);
-  const nextOrders = orders.filter((item) => orderIds.includes(item.id));
 
   return {
-    id: data.id,
-    reference: data.attributes.reference,
-    contact: {
-      address: {
-        addressLines: address.addressLines,
-        city: address.city,
-        countryCode: address.countryCode,
-        postalCode: address.postalCode,
-      },
-      email: contactDetails.email,
-      phoneNumber: contactDetails.phoneNumber,
-    },
-    orders: nextOrders,
+    ...journeyModel.toModel(data),
+    orders: included.orders.filter((item) => orderIds.includes(item.id)),
   };
 }

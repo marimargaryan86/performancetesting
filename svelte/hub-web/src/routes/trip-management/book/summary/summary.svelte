@@ -7,16 +7,16 @@
       children ? `${children} Child${children === 1 ? "" : "ren"}` : undefined,
       infants ? `${infants} Infant${infants === 1 ? "" : "s"}` : undefined,
     ]
-      .filter((item): item is string => Boolean(item))
+      .filter(ensureDefined)
       .join(", ");
   }
 
   export type OrigDestLegs = {
-    originLeg: OfferSegmentLegModel;
-    destinationLeg: OfferSegmentLegModel;
+    originLeg: Infer<typeof offerSegmentLegModel>;
+    destinationLeg: Infer<typeof offerSegmentLegModel>;
   };
 
-  function getOrigDestLegs(group: OfferGroupModel): OrigDestLegs | undefined {
+  function getOrigDestLegs(group: Infer<typeof offerGroupModel>): OrigDestLegs | undefined {
     const segments = [...group.details].sort((a, b) => a.sequences.segment - b.sequences.segment);
     const startSegment = segments[0];
     const endSegment = segments[segments.length - 1];
@@ -35,8 +35,10 @@
     return { originLeg, destinationLeg };
   }
 
-  function getPriceBreakdown(options: OfferGroupOptionModel[]): PriceBreakdownModel[] {
-    const priceBreakdown: PriceBreakdownModel[] = [];
+  function getPriceBreakdown(
+    options: Infer<typeof offerOptionModel>[],
+  ): Infer<typeof priceBreakdownModel>[] {
+    const priceBreakdown: Infer<typeof priceBreakdownModel>[] = [];
 
     options.forEach((option) => {
       option.priceBreakdown?.forEach((item) => {
@@ -53,8 +55,8 @@
     return priceBreakdown;
   }
 
-  function getTotalPrice(options: OfferGroupOptionModel[]): PriceModel {
-    return options.reduce<PriceModel>(
+  function getTotalPrice(options: Infer<typeof offerOptionModel>[]): Infer<typeof priceModel> {
+    return options.reduce<Infer<typeof priceModel>>(
       (prev, curr) => ({
         amount: prev.amount + curr.price.amount,
         currency: curr.price.currency,
@@ -66,24 +68,27 @@
 
 <script lang="ts">
   import type { PassengerCountData } from "../common";
-  import type {
-    OfferGroupModel,
-    OfferGroupOptionModel,
-    OfferModel,
-    OfferSegmentLegModel,
-  } from "models/booking/offer";
-  import type { PriceBreakdownModel, PriceModel } from "models/booking/money";
   import { formatAmount, formatPriceBreakdownType } from "formatting/currency";
   import Itinerary from "./itinerary.svelte";
+  import type {
+    offerGroupModel,
+    offerModel,
+    offerOptionModel,
+    offerSegmentLegModel,
+  } from "integration/junction-mobile-api/schemas/offer";
+  import type { Infer } from "integration/junction-mobile-api/schema-model.server";
+  import type {
+    priceBreakdownModel,
+    priceModel,
+  } from "integration/junction-mobile-api/schemas/price";
+  import { ensureDefined } from "utils/array";
 
   export let passengers: PassengerCountData;
-  export let options: OfferGroupOptionModel[] = [];
-  export let offer: OfferModel | undefined = undefined;
+  export let options: Infer<typeof offerOptionModel>[] = [];
+  export let offer: Infer<typeof offerModel> | undefined = undefined;
 
   $: offerGroups = offer?.groups ?? [];
-  $: origDestLegsList = offerGroups
-    .map((item) => getOrigDestLegs(item))
-    .filter((item): item is OrigDestLegs => Boolean(item));
+  $: origDestLegsList = offerGroups.map((item) => getOrigDestLegs(item)).filter(ensureDefined);
   $: priceBreakdown = getPriceBreakdown(options);
   $: totalPrice = getTotalPrice(options);
   $: fareBrands = options.map((item) => item.brandName);

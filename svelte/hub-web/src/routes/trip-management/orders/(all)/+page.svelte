@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-  function getDepartureDate(order: OrderModel): Date {
+  function getDepartureDate(order: Infer<typeof orderModel>): Date {
     const departureDate = order.bookings
       .flatMap((booking) =>
         booking.details.flatMap((details) => details.legs.flatMap((leg) => leg.departureAt)),
@@ -13,11 +13,11 @@
     return departureDate;
   }
 
-  function getPassengerNames(order: OrderModel): string[] {
+  function getPassengerNames(order: Infer<typeof orderModel>): string[] {
     return order.passengers.map((passenger) => `${passenger.firstName} ${passenger.lastName}`);
   }
 
-  function getTotalPrice(order: OrderModel): PriceModel {
+  function getTotalPrice(order: Infer<typeof orderModel>): Infer<typeof priceModel> {
     const prices = order.bookings.flatMap((booking) => booking.price);
 
     return prices.reduce((prev, curr) => ({
@@ -36,62 +36,66 @@
   import TRow from "components/ui/table/t-row.svelte";
   import Table from "components/ui/table/table.svelte";
   import { formatAmount } from "formatting/currency";
-  import type { PriceModel } from "models/booking/money.js";
-  import type { OrderModel } from "models/booking/order";
+  import type { Infer } from "integration/junction-mobile-api/schema-model.server";
+  import type { orderModel } from "integration/junction-mobile-api/schemas/order";
+  import type { priceModel } from "integration/junction-mobile-api/schemas/price";
 
   export let data;
 </script>
 
-<div class="content">
-  <Table>
-    <THead>
-      <Header>Order Reference</Header>
-      <Header>Ticket(s)</Header>
-      <Header>Departure Date</Header>
-      <Header>Passengers</Header>
-      <Header>Total Price</Header>
-      <Header />
-    </THead>
+<Table class="orders">
+  <THead>
+    <Header>Order Reference</Header>
+    <Header>Ticket(s)</Header>
+    <Header>Departure Date</Header>
+    <Header>Passengers</Header>
+    <Header>Total Price</Header>
+    <Header />
+  </THead>
 
-    <TBody>
-      {#each data.orders.data as order (order.id)}
-        {@const totalPrice = getTotalPrice(order)}
+  <TBody>
+    {#each data.orders.data as order (order.id)}
+      {@const totalPrice = getTotalPrice(order)}
 
-        <TRow alternatingBackground={false}>
-          <TCol class="typography body-small">
-            <span class="highlight">
-              {order.journey?.reference ?? "Unknown"}
-            </span>
-          </TCol>
-          <TCol class="typography body-small">
-            <a href="/">Download</a>
-          </TCol>
-          <TCol class="typography body-small">
-            {getDepartureDate(order).toLocaleDateString("sv-SE")}
-          </TCol>
-          <TCol class="typography body-small">
-            <span class="ellipsis typography bold">{getPassengerNames(order).join(", ")}</span>
-          </TCol>
-          <TCol class="typography body-small">
-            <strong>
-              {formatAmount(totalPrice)}
-            </strong>
-            <em class="typography body-xsmall">
-              {totalPrice.currency}
-            </em>
-          </TCol>
-          <TActionsCol>
-            <button class="action">
-              <span>...</span>
-            </button>
-          </TActionsCol>
-        </TRow>
-      {/each}
-    </TBody>
-  </Table>
-</div>
+      <TRow alternatingBackground={false}>
+        <TCol class="typography body-small">
+          <span class="highlight">
+            {order.journey?.reference ?? "Unknown"}
+          </span>
+        </TCol>
+        <TCol class="typography body-small">
+          <a href="/">Download</a>
+        </TCol>
+        <TCol class="typography body-small">
+          {getDepartureDate(order).toLocaleDateString("sv-SE")}
+        </TCol>
+        <TCol class="typography body-small">
+          <span class="ellipsis typography bold">{getPassengerNames(order).join(", ")}</span>
+        </TCol>
+        <TCol class="typography body-small">
+          <strong>
+            {formatAmount(totalPrice)}
+          </strong>
+          <em class="typography body-xsmall">
+            {totalPrice.currency}
+          </em>
+        </TCol>
+        <TActionsCol>
+          <button class="action">
+            <span>...</span>
+          </button>
+        </TActionsCol>
+      </TRow>
+    {/each}
+  </TBody>
+</Table>
 
 <style>
+  :global(.table.orders) {
+    width: 100%;
+    height: 100%;
+  }
+
   em.body-xsmall {
     color: var(--color-common-light-soft);
   }

@@ -1,8 +1,9 @@
-import type { MoneyModel } from "models/money";
 import { getToken } from "utils/auth";
 import integrationInstances from "integration-instances";
+import type { priceModel } from "integration/junction-mobile-api/schemas/price";
+import type { Infer } from "integration/junction-mobile-api/schema-model.server";
 
-export function load(event): { balances: Promise<MoneyModel[]> } {
+export function load(event): { balances: Promise<Infer<typeof priceModel>[]> } {
   const { accountId } = event.params;
 
   return {
@@ -11,7 +12,7 @@ export function load(event): { balances: Promise<MoneyModel[]> } {
 }
 
 export const actions = {
-  async addBalances(event): Promise<{ balances: MoneyModel[] }> {
+  async addBalances(event): Promise<{ balances: Infer<typeof priceModel>[] }> {
     const { accountId } = event.params;
     const formData = await event.request.formData();
     const jsonData = JSON.parse(formData.get("json")?.toString() ?? "{}") as {

@@ -1,10 +1,8 @@
 <script lang="ts" context="module">
-  import type { OfferSegmentLegModel } from "models/booking/offer";
-
-  function getOrigDestLegs(booking: BookingModel):
+  function getOrigDestLegs(booking: Infer<typeof bookingModel>):
     | {
-        originLeg: OfferSegmentLegModel;
-        destinationLeg: OfferSegmentLegModel;
+        originLeg: Infer<typeof offerSegmentLegModel>;
+        destinationLeg: Infer<typeof offerSegmentLegModel>;
       }
     | undefined {
     const originLegs = booking.details[0]?.legs;
@@ -22,13 +20,15 @@
 
 <script lang="ts">
   import ClockIcon from "components/icons/clock-icon.svelte";
-  import type { BookingModel } from "models/booking/order";
   import { formatDuration } from "formatting/date-time";
   import { getTimeDeltaS } from "utils/date-time";
   import SeatIcon from "components/icons/seat-icon.svelte";
   import EntityAvatar from "components/ui/entity-avatar.svelte";
+  import type { Infer } from "integration/junction-mobile-api/schema-model.server";
+  import type { offerSegmentLegModel } from "integration/junction-mobile-api/schemas/offer";
+  import type { bookingModel } from "integration/junction-mobile-api/schemas/booking";
 
-  export let bookings: BookingModel[];
+  export let bookings: Infer<typeof bookingModel>[];
 </script>
 
 <div class="itinerary">

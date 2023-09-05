@@ -1,8 +1,10 @@
 import { error } from "@sveltejs/kit";
 import { getSearchData, parsePassengers, setSearchData, type ResolvedSearchData } from "../common";
 import integrationInstances from "integration-instances";
-import type { TripCandidatesSearchStatus } from "integration/junction-mobile-api/schemas/trip";
-import type { OfferModel } from "models/booking/offer";
+import type { resourceStatus } from "integration/junction-mobile-api/schemas/common";
+import type { z } from "zod";
+import type { offerModel } from "integration/junction-mobile-api/schemas/offer";
+import type { Infer } from "integration/junction-mobile-api/schema-model.server";
 
 export async function load(event): Promise<{
   searchData: ResolvedSearchData;
@@ -58,8 +60,8 @@ export const actions = {
   async poll(
     event,
   ): Promise<
-    | { status: Exclude<TripCandidatesSearchStatus, "completed"> }
-    | { status: "completed"; offers: OfferModel[] }
+    | { status: Exclude<z.infer<typeof resourceStatus>, "completed"> }
+    | { status: "completed"; offers: Infer<typeof offerModel>[] }
   > {
     const searchdata = getSearchData(event);
     const tripCandidatesSearchId = searchdata?.tripCandidatesSearchId;

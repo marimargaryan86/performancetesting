@@ -1,9 +1,10 @@
 import { error } from "@sveltejs/kit";
 import { getSearchData } from "../common";
 import integrationInstances from "integration-instances";
-import type { OrderModel } from "models/booking/order";
+import type { orderModel } from "integration/junction-mobile-api/schemas/order";
+import type { Infer } from "integration/junction-mobile-api/schema-model.server";
 
-export function load(event): { order: Promise<OrderModel> } {
+export function load(event): { order: Promise<Infer<typeof orderModel>> } {
   const searchData = getSearchData(event);
 
   if (!searchData) {

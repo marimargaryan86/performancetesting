@@ -1,22 +1,38 @@
-import type { PriceSchema } from "./price";
+import { z } from "zod";
+import { getSchemaModel } from "../schema-model.server";
+import { priceModel } from "./price";
 
-export interface PaymentIntentSchema {
-  id: string;
-  type: "payments";
-  attributes: {
-    clientSecret: string;
-    ephemeralKey?: string;
-    customerId?: string;
-  };
-}
+export const paymentIntentModel = getSchemaModel(
+  z.object({
+    id: z.string(),
+    type: z.enum(["payments"]),
+    attributes: z.object({
+      clientSecret: z.string(),
+      ephemeralKey: z.string().optional(),
+      customerId: z.string().optional(),
+    }),
+  }),
+  z.object({
+    id: z.string(),
+    clientSecret: z.string(),
+    ephemeralKey: z.string().optional(),
+    customerId: z.string().optional(),
+  }),
+  {
+    toModel: (data) => ({ ...data, ...data.attributes }),
+  },
+);
 
-export interface CreatePaymentRequestSchema {
-  data: {
-    type: "payments";
-    attributes: PriceSchema;
-  };
-}
-
-export interface CreatePaymentResponseSchema {
-  data: PaymentIntentSchema;
-}
+export const createPaymentIntentModel = getSchemaModel(
+  z.object({
+    type: z.enum(["payments"]),
+    attributes: priceModel.schema,
+  }),
+  priceModel.model,
+  {
+    toSchema: (data) => ({
+      type: "payments" as const,
+      attributes: priceModel.toSchema(data),
+    }),
+  },
+);

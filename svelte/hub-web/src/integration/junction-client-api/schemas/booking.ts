@@ -1,5 +1,4 @@
 import type { RelationshipSchema } from "integration/common/schemas";
-import type { PointSchema } from "./common";
 import type { JourneySchema } from "./journey";
 import type {
   CabinClassIdentifierSchema,
@@ -8,7 +7,9 @@ import type {
   LegTypeSchema,
 } from "./offer";
 import type { OrderIdentifierSchema, OrderSchema } from "./order";
-import type { PriceSchema } from "./price";
+import type { Infer } from "integration/junction-mobile-api/schema-model.server";
+import type { pointModel } from "integration/junction-mobile-api/schemas/common";
+import type { priceModel } from "integration/junction-mobile-api/schemas/price";
 
 export interface BookingStatusIdentifierSchema {
   id: string;
@@ -21,8 +22,8 @@ export interface BookingDetailsIdentifierSchema {
 }
 
 export interface OfferSegmentLegSchema {
-  origin: PointSchema;
-  destination: PointSchema;
+  origin: Infer<typeof pointModel>;
+  destination: Infer<typeof pointModel>;
   departureAt: string;
   arrivalAt: string;
 }
@@ -55,7 +56,7 @@ export interface BookingIdentifierSchema {
 
 export interface BookingSchema extends BookingIdentifierSchema {
   attributes: {
-    totalPrice: PriceSchema;
+    totalPrice: Infer<typeof priceModel>;
     operatorBookingReferences: string[];
     externalReference: string;
   };

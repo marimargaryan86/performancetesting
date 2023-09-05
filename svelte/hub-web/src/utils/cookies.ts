@@ -1,3 +1,5 @@
+import { ensureDefined } from "./array";
+
 export function getCookie(name: string): string | undefined {
   if (typeof window === "undefined") {
     return undefined;
@@ -16,7 +18,7 @@ export function getCookie(name: string): string | undefined {
 
       return undefined;
     })
-    .filter((item): item is [string, string] => Boolean(item));
+    .filter(ensureDefined);
 
   return cookies.find(([key]) => key === name)?.[1];
 }

@@ -1,24 +1,25 @@
-import type { PlaceModel } from "models/booking/location";
-import type { GetPlaceResponseSchema, ListPlacesResponseSchema } from "../schemas/place";
+import { placeModel } from "../schemas/place";
 import JunctionMobileApiService from "./junction-mobile-api-service";
-import { parsePlaceSchema } from "../parsers/place";
+import type { Infer } from "../schema-model.server";
 
 export class PlaceService extends JunctionMobileApiService {
-  async listPlaces(query: string): Promise<PlaceModel[]> {
-    const resp = await this.makeRequest<ListPlacesResponseSchema>("/places", {
+  async listPlaces(query: string): Promise<Infer<typeof placeModel>[]> {
+    const resp = await this.makeRequest<{ data: Infer<typeof placeModel, "schema">[] }>("/places", {
       queryParams: { "query[name]": query },
     });
 
-    return (await resp.json()).data.map(parsePlaceSchema);
+    return (await resp.json()).data.map((item) => placeModel.toModel(item));
   }
 
-  async getPlace(id: string): Promise<PlaceModel> {
-    const resp = await this.makeRequest<GetPlaceResponseSchema>(`/places/${id}`);
+  async getPlace(id: string): Promise<Infer<typeof placeModel>> {
+    const resp = await this.makeRequest<{ data: Infer<typeof placeModel, "schema"> }>(
+      `/places/${id}`,
+    );
 
     if (resp.status === 404) {
       throw new Error("Place not found");
     }
 
-    return parsePlaceSchema((await resp.json()).data);
+    return placeModel.toModel((await resp.json()).data);
   }
 }

@@ -3,10 +3,11 @@
   import CurrencyFlag from "components/icons/currency-flag.svelte";
   import PlusIcon from "components/icons/plus-icon.svelte";
   import { formatAmount } from "formatting/currency";
-  import type { MoneyModel } from "models/money";
   import AddBalanceDialogue from "./add-balance-dialogue.svelte";
   import SearchField from "components/ui/search-field.svelte";
   import Button from "components/ui/button.svelte";
+  import type { priceModel } from "integration/junction-mobile-api/schemas/price";
+  import type { Infer } from "integration/junction-mobile-api/schema-model.server";
 
   export let data;
 
@@ -21,7 +22,7 @@
     dialogue.open();
   }
 
-  function addBalances(event: CustomEvent<MoneyModel[]>): void {
+  function addBalances(event: CustomEvent<Infer<typeof priceModel>[]>): void {
     data.balances = [...event.detail, ...data.balances];
   }
 </script>

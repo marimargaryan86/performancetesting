@@ -1,9 +1,10 @@
 <script lang="ts">
   import CheckedIcon from "components/icons/checked-icon.svelte";
   import TicketIcon from "components/icons/ticket-icon.svelte";
-  import type { OrderModel } from "models/booking/order";
+  import type { Infer } from "integration/junction-mobile-api/schema-model.server";
+  import type { orderModel } from "integration/junction-mobile-api/schemas/order";
 
-  export let order: OrderModel;
+  export let order: Infer<typeof orderModel>;
 </script>
 
 <div class="overview">

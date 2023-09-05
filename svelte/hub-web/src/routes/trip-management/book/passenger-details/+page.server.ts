@@ -1,18 +1,19 @@
 import { ActionFailure, error, fail } from "@sveltejs/kit";
-import type { OfferPriceQuoteModel } from "models/booking/offer";
 import integrationInstances from "integration-instances";
 import { getSearchData, setSearchData, type ResolvedSearchData } from "../common";
-import type { OrderModel } from "models/booking/order";
 import type { ContactInformationData } from "./contact-information.svelte";
 import type { PartialPassengerData } from "./passenger-entry.svelte";
-import type { PriceModel } from "models/booking/money";
-import type { CreateOrderModel } from "integration/junction-mobile-api/models";
+import type { tripOfferPriceQuoteModel } from "integration/junction-mobile-api/schemas/offer";
+import type { Infer } from "integration/junction-mobile-api/schema-model.server";
+import type { createOrderModel, orderModel } from "integration/junction-mobile-api/schemas/order";
+import type { priceModel } from "integration/junction-mobile-api/schemas/price";
+import { ensureDefined } from "utils/array";
 
 type BookingData = {
   priceQuoteId: string;
   contact: ContactInformationData;
   passengers: PartialPassengerData[];
-  price: PriceModel;
+  price: Infer<typeof priceModel>;
 };
 
 function getBookingData(formData: FormData): BookingData {
@@ -31,12 +32,12 @@ function getBookingData(formData: FormData): BookingData {
   };
 }
 
-function createOrder(data: BookingData, paymentId: string): Promise<OrderModel> {
+function createOrder(data: BookingData, paymentId: string): Promise<Infer<typeof orderModel>> {
   return integrationInstances.junctionMobileApi.orders.createOrder({
     contactDetails: {
       address: {
         addressLines: [data.contact.address.line1, data.contact.address.line2].filter(
-          (item): item is string => Boolean(item),
+          ensureDefined,
         ),
         city: data.contact.city ?? "",
         countryCode: data.contact.countryCode ?? "",
@@ -48,20 +49,22 @@ function createOrder(data: BookingData, paymentId: string): Promise<OrderModel> 
         number: data.contact.phone.number ?? "",
       },
     },
-    passengers: data.passengers.map<CreateOrderModel["passengers"][number]>((item) => ({
-      dateOfBirth: item.dateOfBirth ?? new Date(),
-      firstName: item.firstName ?? "",
-      lastName: item.lastName ?? "",
-      travelerDocument:
-        item.document.type === "passport"
-          ? {
-              type: item.document.type,
-              number: item.document.number,
-            }
-          : undefined,
-      title: item.title ?? "unspecified",
-      gender: item.gender ?? "unspecified",
-    })),
+    passengers: data.passengers.map<Infer<typeof createOrderModel>["passengers"][number]>(
+      (item) => ({
+        dateOfBirth: item.dateOfBirth ?? new Date(),
+        firstName: item.firstName ?? "",
+        lastName: item.lastName ?? "",
+        travelerDocument:
+          item.document.type === "passport"
+            ? {
+                type: item.document.type,
+                number: item.document.number,
+              }
+            : undefined,
+        title: item.title ?? "unspecified",
+        gender: item.gender ?? "unspecified",
+      }),
+    ),
     paymentId,
     priceQuoteId: data.priceQuoteId,
   });
@@ -69,7 +72,7 @@ function createOrder(data: BookingData, paymentId: string): Promise<OrderModel> 
 
 export async function load(event): Promise<{
   searchData: ResolvedSearchData;
-  priceQuote: OfferPriceQuoteModel;
+  priceQuote: Infer<typeof tripOfferPriceQuoteModel>;
 }> {
   const searchData = getSearchData(event);
 
@@ -89,7 +92,7 @@ export async function load(event): Promise<{
         sessionToken: searchData.sessionToken,
         origin,
         destination,
-        departureAfter: new Date(searchData.departureAfter),
+        departureAfter: searchData.departureAfter,
         passengers: searchData.passengers,
       },
       priceQuote,
@@ -102,7 +105,9 @@ export async function load(event): Promise<{
 export const actions = {
   async poll(
     event,
-  ): Promise<{ priceQuote: OfferPriceQuoteModel } | ActionFailure<{ error: string }>> {
+  ): Promise<
+    { priceQuote: Infer<typeof tripOfferPriceQuoteModel> } | ActionFailure<{ error: string }>
+  > {
     const searchData = getSearchData(event);
 
     if (!searchData?.priceQuoteId) {

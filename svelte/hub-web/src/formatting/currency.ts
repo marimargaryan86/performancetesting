@@ -1,15 +1,17 @@
-import type { PriceBreakdownType } from "integration/junction-mobile-api/schemas/price";
-import type { CurrencyModel, MoneyModel } from "models/money";
+import type { Infer } from "integration/junction-mobile-api/schema-model.server";
+import type { priceBreakdownType, priceModel } from "integration/junction-mobile-api/schemas/price";
+import type { CurrencyModel } from "models/money";
+import type { z } from "zod";
 
 export function formatAmountAndCode(
-  amount: MoneyModel,
+  amount: Infer<typeof priceModel>,
   currencies: Map<string, CurrencyModel> = new Map(),
 ): string {
   return `${formatAmount(amount, currencies)} ${amount.currency.toUpperCase()}`;
 }
 
 export function formatAmount(
-  money: MoneyModel,
+  money: Infer<typeof priceModel>,
   currencies: Map<string, CurrencyModel> = new Map(),
   sign = false,
 ): string {
@@ -27,7 +29,7 @@ export function formatAmount(
   });
 }
 
-export function formatPriceBreakdownType(type: PriceBreakdownType): string {
+export function formatPriceBreakdownType(type: z.infer<typeof priceBreakdownType>): string {
   if (type === "base-fare") {
     return "Base fare";
   } else if (type === "company-mark-up") {

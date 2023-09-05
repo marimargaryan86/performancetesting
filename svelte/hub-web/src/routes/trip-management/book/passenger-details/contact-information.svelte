@@ -17,9 +17,9 @@
   export const contactInformationData = z.object({
     phone: z.object({
       code: z.string({ required_error: "Country code required" }),
-      number: string({ required_error: "Phone number required" }).min(10),
+      number: string({ required_error: "Phone number required" }),
     }),
-    email: z.string().email({ message: "Invalid email address" }).min(3),
+    email: z.string().email({ message: "Invalid email address" }),
     address: z.object({
       line1: z.string({ required_error: "Street address required" }),
       line2: string().optional(),

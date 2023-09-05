@@ -1,5 +1,6 @@
+import type { priceModel } from "integration/junction-mobile-api/schemas/price";
 import type { CompanyModel } from "./company";
-import type { MoneyModel } from "./money";
+import type { Infer } from "integration/junction-mobile-api/schema-model.server";
 
 export const transactionStatus = ["paid", "pending", "cancelled"] as const;
 
@@ -27,9 +28,9 @@ export type TransactionModel = {
   createdAt: Date;
   payer?: CompanyModel;
   amounts: {
-    beneficiary: MoneyModel;
-    quotation: MoneyModel;
-    salesMargin: MoneyModel;
+    beneficiary: Infer<typeof priceModel>;
+    quotation: Infer<typeof priceModel>;
+    salesMargin: Infer<typeof priceModel>;
   };
   rates: {
     fxQuote: number;
@@ -46,8 +47,8 @@ export type BalanceTransactionModel = {
   createdAt: Date;
   action: string;
   reason: string;
-  debit: MoneyModel;
-  credit: MoneyModel;
-  balance: MoneyModel;
+  debit: Infer<typeof priceModel>;
+  credit: Infer<typeof priceModel>;
+  balance: Infer<typeof priceModel>;
   status: BalanceTransactionStatus;
 };

@@ -1,28 +1,18 @@
-import type { BookingDetailsSchema, BookingSchema } from "../schemas/order";
-import { parseOfferSegmentLegSchema } from "./offer";
-import { parsePriceSchema } from "./money";
-import type { BookingDetailsModel, BookingModel, OrderModel } from "models/booking/order";
-import type { CabinClassModel, LegTypeModel } from "models/booking/offer";
+import type { orderModel } from "../schemas/order";
+import type { cabinClassModel, legTypeModel } from "../schemas/offer";
+import type { Infer } from "../schema-model.server";
+import { bookingDetailsModel, bookingModel } from "../schemas/booking";
 
 export function parseBookingDetailsSchema(
-  data: BookingDetailsSchema,
+  data: Infer<typeof bookingDetailsModel, "schema">,
   included: {
-    bookings: BookingModel[];
-    cabinClasses: CabinClassModel[];
-    legTypes: LegTypeModel[];
+    bookings: Infer<typeof bookingModel>[];
+    cabinClasses: Infer<typeof cabinClassModel>[];
+    legTypes: Infer<typeof legTypeModel>[];
   },
-): BookingDetailsModel {
+): Infer<typeof bookingDetailsModel> {
   return {
-    id: data.id,
-    cabinClassName: data.attributes.cabinClassName,
-    legs: data.attributes.legs.map(parseOfferSegmentLegSchema),
-    operator: data.attributes.operator,
-    routeIdentifiers: {
-      vendor: data.attributes.routeIdentifiers.vendor,
-      operator: data.attributes.routeIdentifiers.operator ?? undefined,
-    },
-    vendor: data.attributes.vendor,
-    bookingId: data.relationships.booking.data.id,
+    ...bookingDetailsModel.toModel(data),
     booking: included.bookings.find((item) => item.id === data.relationships.booking.data.id),
     cabinClass: included.cabinClasses.find(
       (item) => item.id === data.relationships.cabinClass.data.id,
@@ -32,20 +22,17 @@ export function parseBookingDetailsSchema(
 }
 
 export function parseBookingSchema(
-  data: BookingSchema,
-  bookingDetails: BookingDetailsModel[],
-  orders: OrderModel[],
-): BookingModel {
+  data: Infer<typeof bookingModel, "schema">,
+  included: {
+    bookingDetails: Infer<typeof bookingDetailsModel>[];
+    orders: Infer<typeof orderModel>[];
+  },
+): Infer<typeof bookingModel> {
   const bookingDetailsIds = data.relationships.details.data.map((item) => item.id);
-  const details = bookingDetails.filter((item) => bookingDetailsIds.includes(item.id));
 
   return {
-    id: data.id,
-    details,
-    externalReference: data.attributes.externalReference,
-    operatorBookingReferences: data.attributes.operatorBookingReferences,
-    price: parsePriceSchema(data.attributes.totalPrice),
-    status: data.relationships.status.data.id,
-    order: orders.find((item) => item.id === data.relationships.order.data.id),
+    ...bookingModel.toModel(data),
+    details: included.bookingDetails.filter((item) => bookingDetailsIds.includes(item.id)),
+    order: included.orders.find((item) => item.id === data.relationships.order.data.id),
   };
 }
