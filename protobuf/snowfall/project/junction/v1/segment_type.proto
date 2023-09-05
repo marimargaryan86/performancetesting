@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package snowfall.project.junction.v1;
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/v1";
+
+enum SegmentType {
+  SEGMENT_TYPE_UNSPECIFIED = 0;
+  SEGMENT_TYPE_FLIGHT = 1;
+  SEGMENT_TYPE_TRAIN = 2;
+  SEGMENT_TYPE_FERRY = 3;
+  SEGMENT_TYPE_BUS = 4;
+  SEGMENT_TYPE_TAXI = 5;
+}
