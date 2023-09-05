@@ -29,6 +29,11 @@ class LoggingServerInterceptor(interceptor.ServerInterceptor):
     ) -> Iterator[None]:
         try:
             yield
+        except Exception:
+            self._logger.exception(
+                "An unhandled exception was raised in the gRPC server",
+            )
+            raise
         finally:
             status = (
                 rpc_status.code_to_grpc_status_code(context.code())
