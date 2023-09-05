@@ -1,5 +1,5 @@
 import contextlib
-from collections.abc import Iterator
+from collections.abc import AsyncIterator
 
 from google.protobuf.message import Message
 from grpc import StatusCode, aio
@@ -18,22 +18,26 @@ class LoggingServerInterceptor(interceptor.ServerInterceptor):
         request: Message,
         context: aio.ServicerContext,
     ) -> Message:
-        with self._log(continuation.__name__, context):
+        async with self._log(continuation.__name__, context):
             return await continuation(request, context)
 
-    @contextlib.contextmanager
-    def _log(
+    @contextlib.asynccontextmanager
+    async def _log(
         self,
         name: str,
         context: aio.ServicerContext,
-    ) -> Iterator[None]:
+    ) -> AsyncIterator[None]:
         try:
             yield
-        except Exception:
+        except Exception as err:
+            if isinstance(err, aio.BaseError):
+                raise
+
             self._logger.exception(
                 "An unhandled exception was raised in the gRPC server",
             )
-            raise
+
+            await context.abort(StatusCode.INTERNAL)
         finally:
             status = (
                 rpc_status.code_to_grpc_status_code(context.code())
