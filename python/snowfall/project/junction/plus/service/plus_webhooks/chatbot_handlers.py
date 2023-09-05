@@ -1,7 +1,7 @@
 import datetime
 import json
 import time
-from collections.abc import Awaitable, Callable, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 from gettext import gettext as _
 from typing import Any
 
@@ -13,11 +13,10 @@ from snowfall.project.junction.plus.notification_channels.whatsapp import (
     transform_trip_details,
 )
 from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
+from snowfall.project.junction.plus.service.plus_webhooks import open_ai
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.redis import types as redis
-
-_MessageHandlerFunctionType = Callable[..., Awaitable[Sequence[str]]]
 
 action_menu = _("Please select one of the following options")
 
@@ -33,11 +32,13 @@ class MessageHandler(object):
         self,
         redis_client: redis.Client[str],
         cache_ttl: datetime.timedelta,
+        ai_bot: open_ai.AIBot,
     ) -> None:
         self._redis = redis_client
         # Not going to use it now but in the future we can decide to
         # reset the state of whatsapp conversation after some time
         self._default_ttl = cache_ttl
+        self._ai_bot = ai_bot
         self._logger = stdout.get_logger()
 
     async def handle_message(  # noqa: WPS211
@@ -58,11 +59,13 @@ class MessageHandler(object):
             message = "upcoming trip details"
         message_handler = message_handlers(message.lower())
         response = await message_handler(
-            subscriber,
-            subscribers_client,
-            orders_client,
-            message_key,
-            self._redis,
+            subscriber=subscriber,
+            subscribers_client=subscribers_client,
+            orders_client=orders_client,
+            message=message,
+            message_key=message_key,
+            ai_bot=self._ai_bot,
+            redis_client=self._redis,
         )
         subscriber_state["last_message"] = message
         subscriber_state["last_response"] = response[0]
@@ -87,7 +90,7 @@ class MessageHandler(object):
 
 
 # TODO: Change this to class method and use it as decorator to register handlers
-def message_handlers(fun: str) -> _MessageHandlerFunctionType:
+def message_handlers(fun: str) -> Any:
     return {
         "subscribe": subscribe,
         "unsubscribe": unsubscribe,
@@ -102,9 +105,7 @@ def message_handlers(fun: str) -> _MessageHandlerFunctionType:
 async def unsubscribe(
     subscriber: models_pb2.Subscriber,
     subscribers_client: subscribers.Client,
-    orders_client: orders.Client,
-    message_key: str,
-    redis_client: redis.Client[str],
+    **kwargs: Any,
 ) -> Sequence[str]:  # noqa: WPS473
     unsubscribe_status = await subscribers_client.unsubscribe(subscriber.id)
     if unsubscribe_status:
@@ -121,9 +122,7 @@ async def unsubscribe(
 async def subscribe(
     subscriber: models_pb2.Subscriber,
     subscribers_client: subscribers.Client,
-    orders_client: orders.Client,
-    message_key: str,
-    redis_client: redis.Client[str],
+    **kwargs: Any,
 ) -> Sequence[str]:  # noqa: WPS473
     subscribe_status = await subscribers_client.subscribe(subscriber.id)
     if subscribe_status:
@@ -138,11 +137,10 @@ async def subscribe(
 
 
 async def trip_details(
-    subscriber: models_pb2.Subscriber,
-    subscribers_client: subscribers.Client,
     orders_client: orders.Client,
     message_key: str,
     redis_client: redis.Client[str],
+    **kwargs: Any,
 ) -> Sequence[str]:  # noqa: WPS473
     order = None
     if message_key:
@@ -162,10 +160,9 @@ async def trip_details(
 
 async def upcoming_trips(  # noqa: WPS210
     subscriber: models_pb2.Subscriber,
-    subscribers_client: subscribers.Client,
     orders_client: orders.Client,
-    message_key: str,
     redis_client: redis.Client[str],
+    **kwargs: Any,
 ) -> Sequence[str]:  # noqa: WPS473
     await redis_client.delete("upcoming_trips_{0}".format(subscriber.id))
     session = redis_client.hash_("upcoming_trips_{0}".format(subscriber.id))
@@ -217,10 +214,10 @@ async def upcoming_trips(  # noqa: WPS210
 
 async def upcoming_trip_details(
     subscriber: models_pb2.Subscriber,
-    subscribers_client: subscribers.Client,
     orders_client: orders.Client,
     message_key: str,
     redis_client: redis.Client[str],
+    **kwargs: Any,
 ) -> Sequence[str]:  # noqa: WPS473
     session = redis_client.hash_("upcoming_trips_{0}".format(subscriber.id))
     order_id = await session.get(message_key)
@@ -232,12 +229,27 @@ async def upcoming_trip_details(
     ]
 
 
-async def check_in(
+async def travel_assistant(
     subscriber: models_pb2.Subscriber,
-    subscribers_client: subscribers.Client,
-    orders_client: orders.Client,
-    message_key: str,
+    ai_bot: open_ai.AIBot,
     redis_client: redis.Client[str],
+    **kwargs: Any,
+) -> Sequence[str]:
+    session = redis_client.hash_("ai_assistant_state")
+    ai_chat_history = [
+        {"role": "system", "content": ai_bot.system_setup},
+        {"role": "assistant", "content": ai_bot.initial_message},
+    ]
+    state = {
+        "ai_chat_history": ai_chat_history,
+        "ai_enabled": True,
+    }
+    await session.put(subscriber.phone_number.e164_number, json.dumps(state))
+    return [_(ai_bot.initial_message)]
+
+
+async def check_in(
+    **kwargs: Any,
 ) -> Sequence[str]:
     return [
         _("Check-in feature is not implemented yet."),
@@ -247,11 +259,22 @@ async def check_in(
 
 async def handle_unknown(
     subscriber: models_pb2.Subscriber,
-    subscribers_client: subscribers.Client,
-    orders_client: orders.Client,
-    message_key: str,
+    message: str,
+    ai_bot: open_ai.AIBot,
     redis_client: redis.Client[str],
+    **kwargs: Any,
 ) -> Sequence[str]:
+    session = redis_client.hash_("ai_assistant_state")
+    state_str = await session.get(subscriber.phone_number.e164_number)
+    if state_str:
+        state: Mapping[str, Any] = json.loads(state_str) or {}
+        if state.get("ai_enabled"):
+            ai_chat_history = state.get("ai_chat_history", [])
+            ai_chat_history.append({"role": "user", "content": message})
+            assistant_message = await ai_bot.handle_prompt(ai_chat_history)
+            ai_chat_history.append(assistant_message)
+            await session.put(subscriber.phone_number.e164_number, json.dumps(state))
+            return [_(assistant_message["content"])]
     return [
         _("Sorry I didn't understand your message."),
         action_menu,
@@ -259,11 +282,8 @@ async def handle_unknown(
 
 
 async def main_menu(
-    subscriber: models_pb2.Subscriber,
-    subscribers_client: subscribers.Client,
-    orders_client: orders.Client,
-    message_key: str,
-    redis_client: redis.Client[str],
+    *args: Any,
+    **kwargs: Any,
 ) -> Sequence[str]:
     return [action_menu]
 

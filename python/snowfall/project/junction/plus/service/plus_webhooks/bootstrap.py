@@ -21,6 +21,7 @@ class Settings(application.Settings):
     redis_dsn: Sequence[pydantic.AnyUrl]
     redis_prefix: str
     openai_api_key: str
+    openai_org: str
 
 
 def create_dependencies(  # noqa: WPS211

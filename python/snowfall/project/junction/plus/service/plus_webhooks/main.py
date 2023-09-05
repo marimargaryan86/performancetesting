@@ -22,6 +22,7 @@ from snowfall.project.junction.plus.service.plus_webhooks import (
     bootstrap,
     chatbot_handlers,
     middlewares,
+    open_ai,
 )
 from snowfall.project.junction.plus.service.plus_webhooks.routes import router
 from snowfall.stdlib.integration.starlette import application as starlette
@@ -35,6 +36,7 @@ def _factory(
 ) -> Callable[[], Starlette]:
     def decorator() -> Starlette:
         openai.api_key = app.settings.openai_api_key
+        openai.organization = app.settings.openai_org
         notifications_channel = create_channel(app.settings.notifications_address)
         return starlette.create_starlette_app(
             router.get_routes(
@@ -76,6 +78,7 @@ def _factory(
                             prefix=app.settings.redis_prefix,
                         ),
                         cache_ttl=datetime.timedelta(minutes=15),
+                        ai_bot=open_ai.AIBot(),
                     ),
                 ),
             ),

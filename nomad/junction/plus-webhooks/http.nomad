@@ -133,6 +133,7 @@ TWILIO_TOKEN={{ .Data.data.twilio_token }}
 {{ end }}
 {{ with secret "kv/data/${var.environment}/poc-api" }}
 OPENAI_API_KEY={{ .Data.data.openai_api_key }}
+OPENAI_ORG={{ .Data.data.openai_org }}
 {{ end }}
 EOH
       }

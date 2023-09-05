@@ -28,6 +28,7 @@ from snowfall.project.junction.plus.service.plus_webhooks import (
     bootstrap,
     chatbot_handlers,
     middlewares,
+    open_ai,
 )
 from snowfall.project.junction.plus.service.plus_webhooks.routes import router
 from snowfall.stdlib.integration.starlette import application
@@ -172,6 +173,11 @@ def redis_client(redis_client: fakeredis.FakeRedis) -> redis.Client[str]:
 
 
 @pytest.fixture()
+def ai_bot() -> open_ai.AIBot:
+    return open_ai.AIBot()
+
+
+@pytest.fixture()
 def app(  # noqa: WPS211
     secret_key: str,
     monitoring_rules_client: monitoring_rules_adapter.Client,
@@ -180,6 +186,7 @@ def app(  # noqa: WPS211
     configuration_vectors_client: configuration_vectors.Client,
     notification_event_publisher_client: notification_event_publisher_adapter.Client,
     twilio_validator: RequestValidator,
+    ai_bot: open_ai.AIBot,
     redis_client: redis.Client[str],
 ) -> applications.Starlette:
     return application.create_starlette_app(
@@ -200,6 +207,7 @@ def app(  # noqa: WPS211
                 message_handler=chatbot_handlers.MessageHandler(
                     redis_client=redis_client,
                     cache_ttl=datetime.timedelta(minutes=10),
+                    ai_bot=ai_bot,
                 ),
             ),
         ),
