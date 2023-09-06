@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import datetime
 import ipaddress
+from typing import TypeVar
 
 import pydantic
-from redis import asyncio as aioredis
+from aio_pika import robust_connection
 
 from snowfall.project.junction.go.service.gateway import (
     bookings,
@@ -14,36 +15,46 @@ from snowfall.project.junction.go.service.gateway import (
 )
 from snowfall.project.junction.go.service.offers.v1 import amqp_pb2
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import application
+from snowfall.stdlib.service import amqp_factory, application, redis_factory
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.stdlib.transport.grpc import server as grpc_server
 
 
-class _ConsumeSettings(application.Settings):
-    amqp_dsn: pydantic.AnyUrl
+class _SharedSettings(application.Settings):
+    amqp_dsn: pydantic.AmqpDsn
     providers: dict[str, str] = pydantic.Field(default_factory=dict)
-    redis_dsn: pydantic.AnyUrl
+    redis_dsn: pydantic.RedisDsn
+
+
+class _ConsumeSettings(_SharedSettings):
     search_timeout: datetime.timedelta = datetime.timedelta(seconds=30)
 
 
-class _ServeSettings(application.Settings):
-    amqp_dsn: pydantic.AnyUrl
+class _ServeSettings(_SharedSettings):
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
-    providers: dict[str, str] = pydantic.Field(default_factory=dict)
-    redis_dsn: pydantic.AnyUrl
 
 
-async def _consume(app: application.AsyncApplication[_ConsumeSettings]) -> None:
-    connection = await app.stack.enter_async_context(
-        types.Connection(str(app.settings.amqp_dsn)),
+_BootstrapReturn = tuple[
+    robust_connection.RobustConnection,
+    redis.Client[bytes],
+    providers.Collection,
+]
+
+
+_SharedSettingsGeneric = TypeVar("_SharedSettingsGeneric", bound=_SharedSettings)
+
+
+async def _bootstrap(
+    app: application.AsyncApplication[_SharedSettingsGeneric],
+) -> _BootstrapReturn:
+    amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
+    redis_client = await redis_factory.make_client(
+        app,
+        app.settings.redis_dsn,
+        decode_responses=False,
     )
-    redis_conn = await app.stack.enter_async_context(
-        aioredis.from_url(
-            str(app.settings.redis_dsn),
-            retry_on_error=[aioredis.ConnectionError],
-        ).client(),
-    )
+
     all_providers = await providers.Collection.from_identifier_address_tuples(
         [
             providers.IdentifierAddressTuple(*provider_tuple)
@@ -51,19 +62,25 @@ async def _consume(app: application.AsyncApplication[_ConsumeSettings]) -> None:
         ],
     )
 
+    return amqp_connection, redis_client, all_providers
+
+
+async def _consume(app: application.AsyncApplication[_ConsumeSettings]) -> None:
+    amqp_connection, redis_client, all_providers = await _bootstrap(app)
+
     offers_consumer = offers.Consumer(
         providers_list=all_providers,
         repository=offers.Repository(
             producer=producer.Producer(
-                connection=connection,
+                connection=amqp_connection,
                 exchange=types.Exchange(name=app.name),
             ),
-            client=redis.Client(redis_conn),
+            client=redis_client,
         ),
         timeout=app.settings.search_timeout,
     )
     amqp_consumer = consumer.Consumer[amqp_pb2.TripOfferSearchTask](
-        connection=connection,
+        connection=amqp_connection,
         queue_name="{0}_offer_searches".format(app.name),
         binds=[(types.Exchange(app.name), "offers.search.*")],
     )
@@ -72,21 +89,7 @@ async def _consume(app: application.AsyncApplication[_ConsumeSettings]) -> None:
 
 
 async def _serve(app: application.AsyncApplication[_ServeSettings]) -> None:
-    connection = await app.stack.enter_async_context(
-        types.Connection(str(app.settings.amqp_dsn)),
-    )
-    redis_conn = await app.stack.enter_async_context(
-        aioredis.from_url(
-            str(app.settings.redis_dsn),
-            retry_on_error=[aioredis.ConnectionError],
-        ).client(),
-    )
-    all_providers = await providers.Collection.from_identifier_address_tuples(
-        [
-            providers.IdentifierAddressTuple(*provider_tuple)
-            for provider_tuple in app.settings.providers.items()
-        ],
-    )
+    amqp_connection, redis_client, all_providers = await _bootstrap(app)
 
     server = grpc_server.create_server(
         app.settings.grpc_address,
@@ -101,10 +104,10 @@ async def _serve(app: application.AsyncApplication[_ServeSettings]) -> None:
             offers.Service(
                 repository=offers.Repository(
                     producer=producer.Producer(
-                        connection=connection,
+                        connection=amqp_connection,
                         exchange=types.Exchange(name=app.name),
                     ),
-                    client=redis.Client(redis_conn),
+                    client=redis_client,
                 ),
             ),
         ],
