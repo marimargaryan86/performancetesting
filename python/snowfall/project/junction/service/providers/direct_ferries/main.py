@@ -62,7 +62,7 @@ def _create_client(
         ),
         http_client=http_client,
         config=base.ClientConfig(
-            api_url=str(setting.api_url),
+            api_url=str(setting.api_url).rstrip("/"),
             partner_code=setting.partner_code,
             client_id=setting.client_id,
             client_secret=setting.client_secret,

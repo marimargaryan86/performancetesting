@@ -19,7 +19,7 @@ class AuthClient(object):
         client_secret: str,
     ):
         self._http_client = http_client
-        self._api_url = api_url.lstrip("/")
+        self._api_url = api_url.rstrip("/")
         self._client_id = client_id
         self._client_secret = client_secret
 
