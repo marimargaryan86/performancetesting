@@ -259,17 +259,17 @@ def get_routes(  # noqa: WPS210
             name="ListBookingsByOrder",
         ),
         integration.route(
-            "/cancellation/request",
+            "/cancellations/requests",
             orders.CancellationRequest,
             name="CreateCancellationRequest",
         ),
         integration.route(
-            "/cancellation/request/{cancellationRequestId}",
+            "/cancellations/requests/{cancellationRequestId}",
             orders.CancellationRequest,
             name="ViewCancellationRequest",
         ),
         integration.route(
-            "/bookings/cancellation/{bookingCancellationId}",
+            "/bookings/cancellations/{bookingCancellationId}",
             orders.BookingCancellation,
             name="UpdateBookingCancellationStatus",
         ),

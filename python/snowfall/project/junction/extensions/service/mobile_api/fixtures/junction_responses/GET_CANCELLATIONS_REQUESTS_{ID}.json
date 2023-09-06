@@ -1,5 +1,5 @@
 {
-  "url": "\/cancellation\/request\/.*",
+  "url": "\/cancellations\/requests\/.*",
   "method": "GET",
   "status_code": 200,
   "json": {

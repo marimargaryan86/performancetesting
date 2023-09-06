@@ -819,7 +819,7 @@ class Client(base_client.BaseClient):  # noqa: WPS214
         }
         return await self._make_request(
             method=_METHOD_POST,
-            url="/cancellation/request",
+            url="/cancellations/requests",
             payload=body,
         )
 
@@ -829,5 +829,5 @@ class Client(base_client.BaseClient):  # noqa: WPS214
     ) -> dict[str, Any]:
         return await self._make_request(
             method=_METHOD_GET,
-            url="/cancellation/request/{0}".format(cancellation_request_id),
+            url="/cancellations/requests/{0}".format(cancellation_request_id),
         )

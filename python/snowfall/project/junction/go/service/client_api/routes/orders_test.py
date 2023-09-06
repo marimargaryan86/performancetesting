@@ -138,7 +138,7 @@ class TestBookingsCancellation(object):
         client: httpx.AsyncClient,
     ) -> None:
         response = await client.post(
-            "/cancellation/request",
+            "/cancellations/requests",
             json=_get_cancellation_request_request(),
             headers={"Content-Type": "application/vnd.api+json"},
         )
@@ -151,7 +151,7 @@ class TestBookingsCancellation(object):
     ) -> None:
         cancellation_id = fixtures.CANCELLATION_REQUESTS[0]
         response = await client.get(
-            "/cancellation/request/{id}".format(id=cancellation_id),
+            "/cancellations/requests/{id}".format(id=cancellation_id),
             headers={"Content-Type": "application/vnd.api+json"},
         )
         assert response.status_code == status.HTTP_200_OK
@@ -161,7 +161,7 @@ class TestBookingsCancellation(object):
         client: httpx.AsyncClient,
     ) -> None:
         response = await client.get(
-            "/cancellation/request/{id}".format(id=fixtures.NOT_FOUND),
+            "/cancellations/requests/{id}".format(id=fixtures.NOT_FOUND),
         )
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -190,7 +190,7 @@ class TestBookingsCancellation(object):
         client: httpx.AsyncClient,
     ) -> None:
         response = await client.patch(
-            "/bookings/cancellation/{id}".format(id=fixtures.BOOKING_CANCELLATIONS[0]),
+            "/bookings/cancellations/{id}".format(id=fixtures.BOOKING_CANCELLATIONS[0]),
             json=_update_booking_cancellation_status_request(),
             headers={"Content-Type": "application/vnd.api+json"},
         )
@@ -202,7 +202,7 @@ class TestBookingsCancellation(object):
         client: httpx.AsyncClient,
     ) -> None:
         response = await client.patch(
-            "/bookings/cancellation/{id}".format(id=fixtures.NOT_FOUND),
+            "/bookings/cancellations/{id}".format(id=fixtures.NOT_FOUND),
             json=_update_booking_cancellation_status_request(),
             headers={"Content-Type": "application/vnd.api+json"},
         )

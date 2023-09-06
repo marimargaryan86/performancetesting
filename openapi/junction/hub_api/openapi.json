@@ -1584,10 +1584,10 @@
         "description": "Used to lookup data for a Booking Identifier."
       }
     },
-    "/cancellation/request": {
+    "/cancellations/requests": {
       "post": {
         "summary": "Create Cancellation Request",
-        "operationId": "post-cancellation-request",
+        "operationId": "post-cancellations-requests",
         "responses": {
           "201": {
             "description": "Created",
@@ -1641,7 +1641,7 @@
         }
       }
     },
-    "/cancellation/request/{cancellationRequestId}": {
+    "/cancellations/requests/{cancellationRequestId}": {
       "parameters": [
         {
           "$ref": "#/components/parameters/cancellationRequestId"
@@ -1684,11 +1684,11 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "get-cancellation-request-id",
+        "operationId": "get-cancellations-requests-id",
         "description": "Used to lookup data for a Cancellation Request Identifier."
       }
     },
-    "/bookings/cancellation/{bookingCancellationId}": {
+    "/bookings/cancellations/{bookingCancellationId}": {
       "parameters": [
         {
           "$ref": "#/components/parameters/bookingCancellationId"
@@ -1743,7 +1743,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "operationId": "patch-bookings-cancellation-id",
+        "operationId": "patch-bookings-cancellations-id",
         "description": "Used to update a Booking Cancellation by identifier"
       }
     },

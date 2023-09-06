@@ -37,17 +37,17 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             name="ListBookingsByOrder",
         ),
         integration.route(
-            "/cancellation/request",
+            "/cancellations/requests",
             go_orders.CancellationRequest,
             name="CreateCancellationRequest",
         ),
         integration.route(
-            "/cancellation/request/{cancellationRequestId}",
+            "/cancellations/requests/{cancellationRequestId}",
             go_orders.CancellationRequest,
             name="ViewCancellationRequest",
         ),
         integration.route(
-            "/bookings/cancellation/{bookingCancellationId}",
+            "/bookings/cancellations/{bookingCancellationId}",
             go_orders.BookingCancellation,
             name="UpdateBookingCancellationStatus",
         ),

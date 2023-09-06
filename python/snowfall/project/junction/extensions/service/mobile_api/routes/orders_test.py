@@ -167,12 +167,12 @@ class TestOrders(object):
             **await conftest.load_response_fixture("GET_BOOKINGS_{ID}.json"),
         )
         httpx_mock.add_response(
-            **await conftest.load_response_fixture("POST_CANCELLATION_REQUEST.json"),
+            **await conftest.load_response_fixture("POST_CANCELLATIONS_REQUESTS.json"),
         )
         await self.create_order(authenticated_http_client, httpx_mock, monkeypatch)
 
         response = await authenticated_http_client.post(
-            "/cancellation/request",
+            "/cancellations/requests",
             json={
                 "data": {
                     "type": "cancellation-request",
@@ -203,7 +203,7 @@ class TestOrders(object):
         )
 
         response = await authenticated_http_client.post(
-            "/cancellation/request",
+            "/cancellations/requests",
             json={
                 "data": {
                     "type": "cancellation-request",
@@ -230,12 +230,12 @@ class TestOrders(object):
     ) -> None:
         httpx_mock.add_response(
             **await conftest.load_response_fixture(
-                "GET_CANCELLATION_REQUEST_{ID}.json",
+                "GET_CANCELLATIONS_REQUESTS_{ID}.json",
             ),
         )
 
         response = await authenticated_http_client.get(
-            "/cancellation/request/d6cfe9e8-bbc9-485f-912f-7ba97ab2cf34",
+            "/cancellations/requests/d6cfe9e8-bbc9-485f-912f-7ba97ab2cf34",
         )
 
         assert response.json()["data"]
