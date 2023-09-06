@@ -10,6 +10,12 @@ variable "vault_api_URL" {
 variable "testing_suite" {
   type = string
 }
+variable "execution_cron" {
+  type = string
+}
+variable "allure_project_id" {
+  type = string
+}
 job "test-automation-mobile-api" {
 
   datacenters = ["${var.datacenter}"]
@@ -17,7 +23,7 @@ job "test-automation-mobile-api" {
   type        = "batch"
 
   periodic {
-    cron             = "0 8 * * 1-5"
+    cron             = "${var.execution_cron}"
     prohibit_overlap = true
     time_zone        = "Europe/Warsaw"
   }
@@ -62,7 +68,7 @@ EOH
           , "-F"
           , "variables[HOSTNAME]=${var.vault_api_URL}"
           , "-F"
-          , "variables[ALLURE_PROJECT_ID]=junction-mobile-api-smoke"
+          , "variables[ALLURE_PROJECT_ID]=${var.allure_project_id}"
           , "-F"
           , "variables[SLACK_NOTIFICATION_CHANNEL]=junction-mobile-tests"
           , "-F"
@@ -74,7 +80,7 @@ EOH
           , "-F"
           , "variables[PROJECT_DIR]=mobile_api_tests/"
           , "-F"
-          , "variables[TESTING_SUIT]=${var.testing_suite}"
+          , "variables[TESTING_SUITE]=${var.testing_suite}"
           , "-F"
           , "variables[CI_PIPELINE_SOURCE]=schedule"
           , "https://git.snowfall.se/api/v4/projects/406/trigger/pipeline"
