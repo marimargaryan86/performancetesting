@@ -4697,6 +4697,11 @@
                   "expiresAt"
                 ],
                 "properties": {
+                  "createdAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z"
+                  },
                   "expiresAt": {
                     "type": "string",
                     "format": "date-time",
@@ -7980,7 +7985,8 @@
         "schema": {
           "type": "string",
           "enum": [
-            "id"
+            "id",
+            "createdAt"
           ],
           "example": "id",
           "default": "id"

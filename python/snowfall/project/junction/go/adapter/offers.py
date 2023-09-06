@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import abc
+import dataclasses
 from collections.abc import Iterator, Sequence
 
 from snowfall.project.junction.go.adapter import errors
@@ -11,6 +12,25 @@ from snowfall.project.junction.go.service.offers.v1 import (
 )
 from snowfall.project.junction.go.v1 import models_pb2 as common_pb2
 from snowfall.stdlib import sequence
+from snowfall.stdlib.v1 import sort_pb2
+
+
+@dataclasses.dataclass(frozen=True)
+class FindOffersByOfferSearchFilter(object):
+    identifier: str
+    limit: int | None = None
+    cursor: str | None = None
+    sort_by: sort_pb2.Sort | None = None
+    cabin_classes: Sequence[common_pb2.CabinClass.Type.ValueType] | None = None
+
+
+@dataclasses.dataclass(frozen=True)
+class FindOffersByOfferSearchesFilter(object):
+    identifiers: Sequence[str]
+    limit: int | None = None
+    cursor: str | None = None
+    sort_by: sort_pb2.Sort | None = None
+    cabin_classes: Sequence[common_pb2.CabinClass.Type.ValueType] | None = None
 
 
 class Client(abc.ABC):  # noqa: WPS214
@@ -21,10 +41,7 @@ class Client(abc.ABC):  # noqa: WPS214
     @abc.abstractmethod
     async def find_offers_by_offer_search(
         self,
-        identifier: str,
-        limit: int | None = None,
-        cursor: str | None = None,
-        cabin_classes: Sequence[common_pb2.CabinClass.Type.ValueType] | None = None,
+        filter_: FindOffersByOfferSearchFilter,
     ) -> grpc_pb2.ListOffersResponse:
         """Get offer results for an offer search."""
 
@@ -112,28 +129,25 @@ class DictClient(Client):  # noqa: WPS214
 
     async def find_offers_by_offer_search(
         self,
-        identifier: str,
-        limit: int | None = None,
-        cursor: str | None = None,
-        cabin_classes: Sequence[common_pb2.CabinClass.Type.ValueType] | None = None,
+        filter_: FindOffersByOfferSearchFilter,
     ) -> grpc_pb2.ListOffersResponse:
         offers = [
             offer
             for offer in self._offers.values()
-            if identifier == self._offer_search_id
+            if filter_.identifier == self._offer_search_id
         ]
 
-        if cabin_classes:
+        if filter_.cabin_classes:
             offers = [
                 offer
                 for offer in offers
-                if self._offer_has_cabin_classes(offer, cabin_classes)
+                if self._offer_has_cabin_classes(offer, filter_.cabin_classes)
             ]
 
         page = sequence.paginate(
             sequence=offers,
-            cursor=cursor,
-            limit=limit,
+            cursor=filter_.cursor,
+            limit=filter_.limit,
         )
 
         return grpc_pb2.ListOffersResponse(
@@ -308,34 +322,32 @@ class GrpcClient(Client):  # noqa: WPS214
 
     async def find_offers_by_offer_search(
         self,
-        identifier: str,
-        limit: int | None = None,
-        cursor: str | None = None,
-        cabin_classes: Sequence[common_pb2.CabinClass.Type.ValueType] | None = None,
+        filter_: FindOffersByOfferSearchFilter,
     ) -> grpc_pb2.ListOffersResponse:
         return await self.find_offers_by_offer_searches(
-            identifiers=[identifier],
-            limit=limit,
-            cursor=cursor,
-            cabin_classes=cabin_classes,
+            FindOffersByOfferSearchesFilter(
+                identifiers=[filter_.identifier],
+                limit=filter_.limit,
+                cursor=filter_.cursor,
+                sort_by=filter_.sort_by,
+                cabin_classes=filter_.cabin_classes,
+            ),
         )
 
     async def find_offers_by_offer_searches(
         self,
-        identifiers: Sequence[str],
-        limit: int | None = None,
-        cursor: str | None = None,
-        cabin_classes: Sequence[common_pb2.CabinClass.Type.ValueType] | None = None,
+        filter_: FindOffersByOfferSearchesFilter,
     ) -> grpc_pb2.ListOffersResponse:
         request = grpc_pb2.ListOffersRequest(
-            page_token=cursor or "",
+            page_token=filter_.cursor or "",
             offer_search_ids=grpc_pb2.ListOfIds(
-                ids=list(identifiers),
+                ids=list(filter_.identifiers),
             ),
-            cabin_class_types=cabin_classes,
+            cabin_class_types=filter_.cabin_classes,
+            sort_by=filter_.sort_by,
         )
-        if limit is not None:
-            request.page_size = limit
+        if filter_.limit is not None:
+            request.page_size = filter_.limit
 
         return await errors.handle_grpc_errors(
             self._offers.ListOffers(request, timeout=self._timeout),

@@ -4,8 +4,8 @@ import asyncio
 import itertools
 import types as std_types
 import zoneinfo
-from collections.abc import Sequence
-from typing import Self
+from collections.abc import Coroutine, Sequence
+from typing import Any, Self
 
 import more_itertools
 
@@ -127,13 +127,21 @@ class TripSearchConsumer(object):
                 request=request,
             )
 
-            await asyncio.gather(
-                self._trip_repository.add_multiple_if_missing(response.trips),
+            coros: list[
+                Coroutine[Any, Any, trips_pb2.TripSearch] | Coroutine[Any, Any, None]
+            ] = [
                 self._trip_search_repository.add_results_from_journey_search(
                     message.body.trip_search,
                     response,
                 ),
-            )
+            ]
+
+            if response.trips:
+                coros.append(
+                    self._trip_repository.add_multiple_if_missing(response.trips),
+                )
+
+            await asyncio.gather(*coros)
 
 
 class TripCandidateSearchConsumer(object):

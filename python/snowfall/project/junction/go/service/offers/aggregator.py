@@ -38,6 +38,9 @@ def generate_offer_aggregates(
     return [
         models_pb2.OfferAggregateMapping(
             id=string.uuid(),
+            created_at=protobuf.datetime_to_protobuf(
+                datetime.datetime.now(datetime.UTC),
+            ),
             expires_at=protobuf.datetime_to_protobuf(expires_at),
             offer_result_ids=offer_result_ids,
         )

@@ -9,6 +9,7 @@ import "snowfall/stdlib/v1/amqp.proto";
 import "snowfall/stdlib/v1/datetime.proto";
 import "snowfall/stdlib/v1/latlng.proto";
 import "snowfall/stdlib/v1/options.proto";
+import "snowfall/stdlib/v1/sort.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/trips/v1alpha";
 
@@ -147,6 +148,7 @@ message ListTripCandidatesRequest {
     string trip_candidate_search_id = 3;
   }
   repeated snowfall.project.junction.go.v1.CabinClass.Type cabin_class_types = 4;
+  snowfall.stdlib.v1.Sort sort_by = 5;
 }
 
 message ListTripCandidatesResponse {

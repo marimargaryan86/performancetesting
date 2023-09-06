@@ -189,6 +189,7 @@ class OfferAggregateMappingRepository(
     _indexes = (
         pymongo.IndexModel(_OFFER_SEARCH_ID, background=True),
         pymongo.IndexModel("offer_result_ids", background=True),
+        pymongo.IndexModel("created_at", background=True),
         pymongo.IndexModel("expires_at", expireAfterSeconds=1, background=True),
     )
 
@@ -197,11 +198,13 @@ class OfferAggregateMappingRepository(
         offer_search_ids: Sequence[str],
         cursor: str,
         cabin_classes: Sequence[common_pb2.CabinClass.Type.ValueType],
+        sort: tuple[str, int] | None = None,
     ) -> resultset.ResultSet[models_pb2.OfferAggregateMapping]:
         if not cabin_classes:
             return await self._find_with_cursor(
                 cur=cursor,
                 filter_={_OFFER_SEARCH_ID: {"$in": offer_search_ids}},
+                sort=sort,
             )
 
         filter_pre_cursor = {_OFFER_SEARCH_ID: {"$in": offer_search_ids}}
@@ -232,7 +235,7 @@ class OfferAggregateMappingRepository(
                     },
                 },
             },
-            {"$sort": {"_id": 1}},
+            {"$sort": {sort[0]: sort[1]} if sort else {"_id": 1}},
         ]
 
         return await self._execute(
@@ -245,6 +248,7 @@ class OfferAggregateMappingRepository(
         self,
         ids: Sequence[str],
         cursor: str,
+        sort: tuple[str, int] | None = None,
     ) -> resultset.ResultSet[models_pb2.OfferAggregateMapping]:
         filter_ = (
             {
@@ -259,6 +263,7 @@ class OfferAggregateMappingRepository(
         return await self._find_with_cursor(
             cur=cursor,
             filter_=filter_,
+            sort=sort,
         )
 
 

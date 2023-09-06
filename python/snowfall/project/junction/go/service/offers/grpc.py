@@ -1,3 +1,5 @@
+import typing
+
 import grpc
 
 from snowfall.project.junction.go.service.offers import amqp, offers, price_quotes
@@ -6,7 +8,8 @@ from snowfall.project.junction.go.service.offers.v1 import (
     grpc_pb2_grpc,
     models_pb2,
 )
-from snowfall.stdlib.transport.grpc import service
+from snowfall.stdlib.persistence.mongo import resultset
+from snowfall.stdlib.transport.grpc import service, sorting
 
 
 class OfferSearchService(service.Service, grpc_pb2_grpc.OfferSearchServiceServicer):
@@ -80,6 +83,11 @@ class OfferSearchService(service.Service, grpc_pb2_grpc.OfferSearchServiceServic
 
 
 class OfferService(service.Service, grpc_pb2_grpc.OfferServiceServicer):  # noqa: WPS214
+    _sort_mapping: typing.ClassVar = {
+        "id": "_id",
+        "created_at": "created_at",
+    }
+
     def __init__(  # noqa: WPS211
         self,
         offer_aggregates: offers.OfferAggregateMappingRepository,
@@ -120,6 +128,7 @@ class OfferService(service.Service, grpc_pb2_grpc.OfferServiceServicer):  # noqa
         return grpc_pb2.GetOfferResponse(
             offer=models_pb2.OfferAggregate(
                 id=offer_aggregate.id,  # type: ignore[union-attr]
+                created_at=offer_aggregate.created_at,  # type: ignore[union-attr]
                 expires_at=offer_aggregate.expires_at,  # type: ignore[union-attr]
                 groups=[offer_result async for offer_result in offer_results],
             ),
@@ -130,24 +139,7 @@ class OfferService(service.Service, grpc_pb2_grpc.OfferServiceServicer):  # noqa
         request: grpc_pb2.ListOffersRequest,
         context: grpc.aio.ServicerContext,
     ) -> grpc_pb2.ListOffersResponse:
-        payload_attr_name = request.WhichOneof("payload")
-        if payload_attr_name == "offer_search_id":
-            offer_aggregates = await self._aggregates.find_by_offer_search_ids(
-                [request.offer_search_id],
-                cursor=request.page_token,
-                cabin_classes=list(request.cabin_class_types),
-            )
-        elif payload_attr_name == "offer_ids":
-            offer_aggregates = await self._aggregates.find(
-                list(request.offer_ids.ids),
-                cursor=request.page_token,
-            )
-        else:
-            offer_aggregates = await self._aggregates.find_by_offer_search_ids(
-                list(request.offer_search_ids.ids),
-                cursor=request.page_token,
-                cabin_classes=list(request.cabin_class_types),
-            )
+        offer_aggregates = await self._offer_aggregates_result_set(request)
 
         offer_aggregates.limit(
             request.page_size if request.page_size else self._default_page_size,
@@ -163,6 +155,7 @@ class OfferService(service.Service, grpc_pb2_grpc.OfferServiceServicer):  # noqa
             offer_list.append(
                 models_pb2.OfferAggregate(
                     id=aggregate.id,
+                    created_at=aggregate.created_at,
                     expires_at=aggregate.expires_at,
                     groups=[offer_result async for offer_result in offer_results],
                 ),
@@ -279,6 +272,35 @@ class OfferService(service.Service, grpc_pb2_grpc.OfferServiceServicer):  # noqa
         return grpc_pb2.ListOfferOptionDetailsResponse(
             details=[detail async for detail in details],
             next_page_token=await details.cursor(),
+        )
+
+    async def _offer_aggregates_result_set(
+        self,
+        request: grpc_pb2.ListOffersRequest,
+    ) -> resultset.ResultSet[models_pb2.OfferAggregateMapping]:
+        payload_attr_name = request.WhichOneof("payload")
+        sort = sorting.get_sort(request.sort_by, self._sort_mapping)
+
+        if payload_attr_name == "offer_search_id":
+            return await self._aggregates.find_by_offer_search_ids(
+                [request.offer_search_id],
+                cursor=request.page_token,
+                cabin_classes=list(request.cabin_class_types),
+                sort=sort,
+            )
+
+        if payload_attr_name == "offer_ids":
+            return await self._aggregates.find(
+                list(request.offer_ids.ids),
+                cursor=request.page_token,
+                sort=sort,
+            )
+
+        return await self._aggregates.find_by_offer_search_ids(
+            list(request.offer_search_ids.ids),
+            cursor=request.page_token,
+            cabin_classes=list(request.cabin_class_types),
+            sort=sort,
         )
 
 

@@ -2,7 +2,7 @@ import asyncio
 import dataclasses
 import datetime
 from collections.abc import Mapping, Sequence
-from typing import Any, cast
+from typing import Any, ClassVar, cast
 
 import lagom
 from dateutil import parser
@@ -18,7 +18,7 @@ from snowfall.project.junction.go.adapter import (
     trip_searches,
     trips,
 )
-from snowfall.project.junction.go.service.client_api import resources
+from snowfall.project.junction.go.service.client_api import filters, resources
 from snowfall.project.junction.go.service.offers.v1 import (
     models_pb2 as offer_models_pb2,
 )
@@ -31,6 +31,7 @@ from snowfall.stdlib.integration.starlette import (
     models,
     pagination_helpers,
     request_helpers,
+    sorting,
 )
 from snowfall.stdlib.v1 import latlng_pb2
 
@@ -430,6 +431,11 @@ class TripCandidateSearch(endpoints.HTTPEndpoint):
 
 
 class TripCandidatesByTripCandidateSearch(endpoints.HTTPEndpoint):
+    _sort_mapping: ClassVar = {
+        "id": "id",
+        "createdAt": "created_at",
+    }
+
     async def get(
         self,
         request: requests.Request,
@@ -437,9 +443,13 @@ class TripCandidatesByTripCandidateSearch(endpoints.HTTPEndpoint):
     ) -> responses.Response:
         pagination = pagination_helpers.get_pagination(request)
         response = await client.list_trip_candidates_by_trip_candidate_search(
-            request.path_params["tripCandidateSearchId"],
-            cursor=pagination.cursor,
-            limit=pagination.limit,
+            trip_candidates.ListTripCandidatesFilter(
+                identifier=request.path_params["tripCandidateSearchId"],
+                cursor=pagination.cursor,
+                limit=pagination.limit,
+                sort_by=sorting.get_sort(request, self._sort_mapping),
+                cabin_classes=filters.get_cabin_class_filter(request),
+            ),
         )
 
         return await messages.create_response(

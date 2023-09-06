@@ -60,6 +60,7 @@ class OfferResource(models.Resource):
             id=offer.id,
             type=OfferResource.api_type,
             attributes={
+                "createdAt": protobuf.protobuf_to_datetime(offer.created_at),
                 "expiresAt": protobuf.protobuf_to_datetime(offer.expires_at),
             },
             relationships={

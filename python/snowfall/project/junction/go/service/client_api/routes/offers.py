@@ -4,7 +4,7 @@ import dataclasses
 import datetime
 import itertools
 from collections.abc import Mapping, Sequence
-from typing import Any, cast
+from typing import Any, ClassVar, cast
 
 import lagom
 from starlette import endpoints, requests, responses, status
@@ -17,12 +17,17 @@ from snowfall.project.junction.go.adapter import (
     price_quotes,
     trips,
 )
-from snowfall.project.junction.go.service.client_api import resources
+from snowfall.project.junction.go.service.client_api import filters, resources
 from snowfall.project.junction.go.service.offers.v1 import models_pb2
 from snowfall.project.junction.go.v1 import models_pb2 as common_pb2
 from snowfall.stdlib import sequence, string
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.integration.starlette import messages, models, pagination_helpers
+from snowfall.stdlib.integration.starlette import (
+    messages,
+    models,
+    pagination_helpers,
+    sorting,
+)
 
 _SESSION_TOKEN_LENGTH = 32
 _Passengers = list[dict[str, str]]
@@ -412,6 +417,11 @@ class OfferSearch(endpoints.HTTPEndpoint):
 
 
 class OffersByOfferSearch(endpoints.HTTPEndpoint):
+    _sort_mapping: ClassVar = {
+        "id": "id",
+        "createdAt": "created_at",
+    }
+
     async def get(
         self,
         request: requests.Request,
@@ -419,17 +429,20 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
         client: offers.Client = lagom.injectable,
     ) -> responses.Response:
         offer_search_id = request.path_params["offerSearchId"]
-        cabin_classes = _get_cabin_class_filter(request)
+        cabin_classes = filters.get_cabin_class_filter(request)
 
         # TODO: Check should probably be done in the RPC, but that requires refactoring.
         await search_client.get(offer_search_id)
 
         pagination = pagination_helpers.get_pagination(request)
         offers_page = await client.find_offers_by_offer_search(
-            identifier=offer_search_id,
-            cursor=pagination.cursor,
-            limit=pagination.limit,
-            cabin_classes=cabin_classes,
+            offers.FindOffersByOfferSearchFilter(
+                identifier=offer_search_id,
+                cursor=pagination.cursor,
+                limit=pagination.limit,
+                cabin_classes=cabin_classes,
+                sort_by=sorting.get_sort(request, self._sort_mapping),
+            ),
         )
 
         return await messages.create_response(
@@ -602,30 +615,6 @@ class PriceQuotes(object):
         )
 
         return validation_errors
-
-
-def _get_cabin_class_filter(
-    request: requests.Request,
-) -> list[common_pb2.CabinClass.Type.ValueType]:
-    cabin_classes_raw = request.scope["parsed_query_string"].get(
-        "filter[groups.options.details.cabinClass][eq]",
-        [],
-    )
-
-    cabin_class_enums: list[common_pb2.CabinClass.Type.ValueType] = []
-
-    for cabin_class_id in cabin_classes_raw:
-        try:
-            cabin_class_enums.append(
-                protobuf.slug_to_enum_value(
-                    common_pb2.CabinClass.Type,
-                    cabin_class_id,
-                ),
-            )
-        except ValueError:
-            cabin_class_enums.append(common_pb2.CabinClass.TYPE_UNSPECIFIED)
-
-    return cabin_class_enums
 
 
 def _sort_keys(segment: common_pb2.Segment) -> tuple[int, int]:

@@ -73,8 +73,10 @@ class TestDictClient(object):
         expected: int,
     ) -> None:
         offers_page = await offers_client.find_offers_by_offer_search(
-            identifier=fixtures.OFFER_SEARCHES[0],
-            cabin_classes=types,
+            offers.FindOffersByOfferSearchFilter(
+                identifier=fixtures.OFFER_SEARCHES[0],
+                cabin_classes=types,
+            ),
         )
         assert len(offers_page.offers) == expected
 

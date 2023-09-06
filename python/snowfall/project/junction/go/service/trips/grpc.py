@@ -277,10 +277,13 @@ class TripCandidateService(
             )
 
         offer_aggregates = await self._offers_adapter.find_offers_by_offer_searches(
-            identifiers=offer_search_ids,
-            limit=request.page_size,
-            cursor=request.page_token,
-            cabin_classes=request.cabin_class_types,
+            offers.FindOffersByOfferSearchesFilter(
+                identifiers=offer_search_ids,
+                limit=request.page_size,
+                cursor=request.page_token,
+                sort_by=request.sort_by,
+                cabin_classes=request.cabin_class_types,
+            ),
         )
 
         return trips_pb2.ListTripCandidatesResponse(

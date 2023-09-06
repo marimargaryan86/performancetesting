@@ -46,12 +46,14 @@ message LoyaltyCard {
 message OfferAggregateMapping {
   string id = 1;
   string offer_search_id = 2;
+  google.protobuf.Timestamp created_at = 5;
   google.protobuf.Timestamp expires_at = 4;
   repeated string offer_result_ids = 3;
 }
 
 message OfferAggregate {
   string id = 1;
+  google.protobuf.Timestamp created_at = 4;
   google.protobuf.Timestamp expires_at = 3;
   repeated OfferGroup groups = 2;
 }

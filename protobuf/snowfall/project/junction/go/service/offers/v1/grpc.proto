@@ -4,6 +4,7 @@ package snowfall.project.junction.go.service.offers.v1;
 
 import "snowfall/project/junction/go/service/offers/v1/models.proto";
 import "snowfall/project/junction/go/v1/models.proto";
+import "snowfall/stdlib/v1/sort.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/offers/v1";
 
@@ -81,6 +82,7 @@ message ListOffersRequest {
     ListOfIds offer_search_ids = 6;
   }
   repeated snowfall.project.junction.go.v1.CabinClass.Type cabin_class_types = 5;
+  snowfall.stdlib.v1.Sort sort_by = 7;
 }
 
 message ListOfIds {
