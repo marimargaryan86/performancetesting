@@ -7989,7 +7989,7 @@
             "createdAt"
           ],
           "example": "id",
-          "default": "id"
+          "default": "createdAt"
         },
         "description": "Customize which field(s) to sort the offers by.",
         "style": "form",
