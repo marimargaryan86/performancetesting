@@ -1,9 +1,12 @@
-import { redirect, type MaybePromise } from "@sveltejs/kit";
+import { redirect, type MaybePromise, type Handle } from "@sveltejs/kit";
 import type { UserJwtSchema } from "integration/junction-pay/schemas/user";
 import jwt from "jsonwebtoken";
 import routeConfig from "routeConfig";
+import * as Sentry from "@sentry/sveltekit";
+import { sequence } from "@sveltejs/kit/hooks";
+import { env } from "$env/dynamic/public";
 
-export function handle({ event, resolve }): MaybePromise<Response> {
+export function authHandle({ event, resolve }: Parameters<Handle>[0]): MaybePromise<Response> {
   const token = event.cookies.get("session-token");
   const user = token ? (jwt.decode(token) as UserJwtSchema) : undefined;
 
@@ -29,3 +32,12 @@ export function handle({ event, resolve }): MaybePromise<Response> {
 
   return resolve(event);
 }
+
+Sentry.init({
+  dsn: env.PUBLIC_SENTRY_DSN,
+  tracesSampleRate: 0.1,
+});
+
+export const handleError = Sentry.handleErrorWithSentry();
+
+export const handle = sequence(Sentry.sentryHandle(), authHandle);

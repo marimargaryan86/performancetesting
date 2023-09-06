@@ -9,6 +9,7 @@
   import routeConfig from "routeConfig";
   import { callAction } from "utils/common";
   import { getTimeDeltaMs } from "utils/date-time";
+  import * as Sentry from "@sentry/sveltekit";
 
   export let data;
 
@@ -16,6 +17,11 @@
 
   $: if (browser && data.user) {
     setLogoutTimer(data.user.sessionExpiresAt);
+  }
+  $: if (data.user) {
+    Sentry.setUser({ email: data.user.data.email, id: data.user.data.id });
+  } else {
+    Sentry.setUser(null);
   }
 
   function setLogoutTimer(timeoutAt: Date): void {

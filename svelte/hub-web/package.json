@@ -46,5 +46,8 @@
     "vitest": "^0.25.3",
     "zod": "^3.21.4"
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "@sentry/sveltekit": "^7.67.0"
+  }
 }
