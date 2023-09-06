@@ -142,6 +142,7 @@ external = [
     "WPS450", # Forbid importing protected objects from modules
     "WPS465", # Forbid comparisons between bitwise and boolean expressions
     "WPS473", # Limit empty lines in functions or methods body
+    "WPS505", # Forbid nested try blocks
     "WPS601", # Forbid shadowing class level attributes with instance level attributes
     "WPS609", # Forbid directly calling certain magic attributes and methods
 ]

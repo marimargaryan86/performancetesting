@@ -2,16 +2,117 @@
 
 import asyncio
 import json
+import logging
+import re
+import string
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import httpx
+from lxml.html import Element  # pants: no-infer-dep
+from lxml.html import fromstring as html_fromstring
 
 _Airports = dict[str, dict[str, Any]]
 
-DUFFEL_TOKEN = sys.argv[1]
 AIRPORTS_PATH = Path(__file__).with_name("airports.json")
+DUFFEL_TOKEN = sys.argv[1]
+GOOGLE_API_KEY = "AIzaSyAnIu066pbPDKN3Kto0xtKJtjIyOCmZZJI"
+
+
+class NoAirportError(ValueError):
+    """Failed to get details for new airport."""
+
+
+def dms_to_dec(coord: str) -> float:  # noqa: WPS210
+    """Convert coordinate formats."""
+    deg, *parts, direction = re.split("[°′″]", coord)  # noqa: RUF001
+    minutes = parts[0] if parts else 0
+    seconds = parts[1] if len(parts) > 1 else 0
+    di = -1 if direction in {"W", "S"} else 1
+    return (
+        float(deg) + float(minutes) / 60 + float(seconds) / (60 * 60)  # noqa: WPS221
+    ) * di
+
+
+async def _wiki_new_airport(  # noqa: WPS210
+    client: httpx.AsyncClient,
+    name: Element,
+) -> tuple[float, float, str]:
+    xpath_geo = (
+        "//table[contains(@class, 'infobox')]//span[contains(@class, 'geo-dms')]/span"
+    )
+    xpath_valid_link = "a[not(contains(@class, 'new'))]"
+    timezone_url = "https://maps.googleapis.com/maps/api/timezone/json"
+    try:
+        path = name.xpath(xpath_valid_link)[0].get("href")
+    except IndexError as ex:
+        raise NoAirportError() from ex
+    resp = await client.get("https://en.wikipedia.org{0}".format(path))
+    html = html_fromstring(resp.content)
+    try:
+        lat, lon = cast(list[Element], html.xpath(xpath_geo))
+    except ValueError as ec:
+        raise NoAirportError() from ec
+    assert "latitude" in lat.classes  # noqa: S101
+    assert "longitude" in lon.classes  # noqa: S101
+    lat = dms_to_dec(lat.text_content())
+    lon = dms_to_dec(lon.text_content())
+    req_params: dict[str, int | str] = {
+        "location": "{0},{1}".format(lat, lon),
+        "timestamp": 0,
+        "key": GOOGLE_API_KEY,
+    }
+    resp = await client.get(timezone_url, params=req_params)
+    return lat, lon, resp.json()["timeZoneId"]
+
+
+async def _wiki_process_page(  # noqa: WPS210
+    client: httpx.AsyncClient,
+    url: str,
+    airports: _Airports,
+) -> None:
+    xpath_row = "//table[contains(@class, 'wikitable')]/tbody/tr[not(descendant::th)]"
+
+    resp = await client.get(url)
+    html = html_fromstring(resp.content)
+    for row in cast(list[Element], html.xpath(xpath_row)):
+        children = row.getchildren()
+        iata = children[0].text_content().strip()
+        name = children[2]
+        try:
+            airport = airports[iata]
+        except KeyError:
+            # Get details for new airport.
+            try:  # noqa: WPS505
+                lat, lon, tz = await _wiki_new_airport(client, name)
+            except NoAirportError:
+                tc = name.text_content()
+                logging.warning("Skipped: %s - %s", iata, tc)
+                continue
+
+            airport = {
+                "iata_code": iata,
+                "latitude": lat,
+                "longitude": lon,
+                "time_zone": tz,
+            }
+            airports[iata] = airport
+
+        try:
+            node = name.xpath(".//a")[0]
+        except IndexError:
+            node = name
+        airport["name"] = node.text_content().strip()
+
+
+async def wikipedia_update(airports: _Airports) -> None:  # noqa: WPS210,WPS231
+    """Update the airports from Wikipedia in-place."""
+    url = "https://en.wikipedia.org/wiki/List_of_airports_by_IATA_airport_code:_{0}"
+    urls = (url.format(pg) for pg in string.ascii_uppercase)
+
+    async with httpx.AsyncClient() as client:
+        await asyncio.gather(*(_wiki_process_page(client, ur, airports) for ur in urls))
 
 
 async def duffel_update(airports: _Airports) -> None:  # noqa: WPS210
@@ -39,8 +140,11 @@ async def duffel_update(airports: _Airports) -> None:  # noqa: WPS210
 
 if __name__ == "__main__":
     with AIRPORTS_PATH.open() as fi:
-        airports = {ap["iata_code"]: ap for ap in json.load(fi)}
+        airports: _Airports = {ap["iata_code"]: ap for ap in json.load(fi)}
 
+    # Note: Order matters. Names differ between the sources, so whichever is run last
+    # will be used for any conflicting names (because each update overwrites the names).
+    asyncio.run(wikipedia_update(airports))
     asyncio.run(duffel_update(airports))
 
     sorted_airports = sorted(airports.values(), key=lambda ap: ap["iata_code"])

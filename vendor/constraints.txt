@@ -60,6 +60,7 @@
 //     "lagom==2.4.1",
 //     "locust==2.16.1",
 //     "lupa==2.0",
+//     "lxml-stubs==0.4.0",
 //     "mongomock-motor==0.0.21",
 //     "more-itertools==10.1.0",
 //     "motor==3.3.1",
@@ -4088,6 +4089,28 @@
           "artifacts": [
             {
               "algorithm": "sha256",
+              "hash": "3b381e9e82397c64ea3cc4d6f79d1255d015f7b114806d4826218805c10ec003",
+              "url": "https://files.pythonhosted.org/packages/1d/47/677fb6c4b81a5663cbce324201fa86f2276424e2d6ce05b7fc51f4ac4e77/lxml_stubs-0.4.0-py3-none-any.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "184877b42127256abc2b932ba8bd0ab5ea80bd0b0fee618d16daa40e0b71abee",
+              "url": "https://files.pythonhosted.org/packages/0d/2f/9e1ce676e94fe929c668b20cc1a761fb26cb4654b7e7fb965da50a105212/lxml-stubs-0.4.0.tar.gz"
+            }
+          ],
+          "project_name": "lxml-stubs",
+          "requires_dists": [
+            "coverage[toml]==5.2; extra == \"test\"",
+            "pytest-mypy-plugins==1.9.3; extra == \"test\"",
+            "pytest>=6.0.0; extra == \"test\""
+          ],
+          "requires_python": null,
+          "version": "0.4.0"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
               "hash": "355216845c60bd96232cd8d8c40e8f9765cc86f46880e43a8fd22dc1a1a8cab1",
               "url": "https://files.pythonhosted.org/packages/42/d7/1ec15b46af6af88f19b8e5ffea08fa375d433c998b8a7639e76935c14f1f/markdown_it_py-3.0.0-py3-none-any.whl"
             },
@@ -7929,6 +7952,7 @@
     "lagom==2.4.1",
     "locust==2.16.1",
     "lupa==2.0",
+    "lxml-stubs==0.4.0",
     "mongomock-motor==0.0.21",
     "more-itertools==10.1.0",
     "motor==3.3.1",

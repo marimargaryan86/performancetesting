@@ -3598,6 +3598,13 @@
         "time_zone": "Asia/Jayapura"
     },
     {
+        "iata_code": "AYX",
+        "latitude": -10.729166666666666,
+        "longitude": -73.76666666666667,
+        "name": "Tnte. Gral. Gerardo Pérez Pinedo Airport",
+        "time_zone": "America/Lima"
+    },
+    {
         "iata_code": "AYY",
         "latitude": 7.336921,
         "longitude": 81.625045,
@@ -3664,7 +3671,7 @@
         "iata_code": "AZP",
         "latitude": 19.573377,
         "longitude": -99.290733,
-        "name": "Atizapan De Zaragoza Airport",
+        "name": "Jorge Jiménez Cantú National Airport",
         "time_zone": "America/Mexico_City"
     },
     {
@@ -7504,6 +7511,13 @@
         "time_zone": "Asia/Jakarta"
     },
     {
+        "iata_code": "BWY",
+        "latitude": 52.128055555555555,
+        "longitude": 1.4352777777777779,
+        "name": "RAF Bentwaters",
+        "time_zone": "Europe/London"
+    },
+    {
         "iata_code": "BXA",
         "latitude": 30.81369,
         "longitude": -89.864977,
@@ -8727,6 +8741,13 @@
         "longitude": 61.505466,
         "name": "Chelyabinsk Airport",
         "time_zone": "Asia/Yekaterinburg"
+    },
+    {
+        "iata_code": "CEL",
+        "latitude": -29.370555555555555,
+        "longitude": -50.83222222222223,
+        "name": "Canela Airport",
+        "time_zone": "America/Sao_Paulo"
     },
     {
         "iata_code": "CEM",
@@ -10563,6 +10584,13 @@
         "time_zone": "America/Bogota"
     },
     {
+        "iata_code": "CQW",
+        "latitude": 29.465833333333332,
+        "longitude": 107.69222222222223,
+        "name": "Wulong Xiannüshan Airport",
+        "time_zone": "Asia/Shanghai"
+    },
+    {
         "iata_code": "CRA",
         "latitude": 44.31532,
         "longitude": 23.883494,
@@ -12012,6 +12040,13 @@
         "time_zone": "America/Chicago"
     },
     {
+        "iata_code": "DBR",
+        "latitude": 26.19472222222222,
+        "longitude": 85.9175,
+        "name": "Darbhanga Airport",
+        "time_zone": "Asia/Calcutta"
+    },
+    {
         "iata_code": "DBS",
         "latitude": 43.548372,
         "longitude": -109.68783,
@@ -12341,6 +12376,13 @@
         "time_zone": "America/Vancouver"
     },
     {
+        "iata_code": "DGH",
+        "latitude": 24.44472222222222,
+        "longitude": 86.7025,
+        "name": "Deoghar Airport",
+        "time_zone": "Asia/Calcutta"
+    },
+    {
         "iata_code": "DGK",
         "latitude": 29.960734,
         "longitude": 70.490607,
@@ -12549,6 +12591,13 @@
         "longitude": 103.006899,
         "name": "Dien Bien Phu Airport",
         "time_zone": "Asia/Bangkok"
+    },
+    {
+        "iata_code": "DIO",
+        "latitude": 65.75833333333334,
+        "longitude": -168.95166666666665,
+        "name": "Diomede Heliport",
+        "time_zone": "America/Anchorage"
     },
     {
         "iata_code": "DIP",
@@ -13370,6 +13419,13 @@
         "time_zone": "America/Denver"
     },
     {
+        "iata_code": "DRP",
+        "latitude": 13.112222222222222,
+        "longitude": 123.67722222222223,
+        "name": "Bicol International Airport",
+        "time_zone": "Asia/Manila"
+    },
+    {
         "iata_code": "DRR",
         "latitude": -25.68601,
         "longitude": 140.227185,
@@ -13895,6 +13951,13 @@
         "time_zone": "Indian/Mayotte"
     },
     {
+        "iata_code": "DZH",
+        "latitude": 31.033333333333335,
+        "longitude": 107.43333333333334,
+        "name": "Dazhou Jinya Airport",
+        "time_zone": "Asia/Shanghai"
+    },
+    {
         "iata_code": "DZI",
         "latitude": 9.582936,
         "longitude": -73.451738,
@@ -14245,6 +14308,13 @@
         "time_zone": "America/Los_Angeles"
     },
     {
+        "iata_code": "EEA",
+        "latitude": -27.634166666666665,
+        "longitude": -50.358333333333334,
+        "name": "Planalto Serrano Regional Airport",
+        "time_zone": "America/Sao_Paulo"
+    },
+    {
         "iata_code": "EED",
         "latitude": 34.766796,
         "longitude": -114.621986,
@@ -14397,6 +14467,13 @@
         "longitude": -162.062927,
         "name": "Cape Newenham LRRS Airport",
         "time_zone": "America/Anchorage"
+    },
+    {
+        "iata_code": "EHU",
+        "latitude": 30.342855555555555,
+        "longitude": 115.02961111111111,
+        "name": "Ezhou Huahu Airport",
+        "time_zone": "Asia/Shanghai"
     },
     {
         "iata_code": "EIA",
@@ -16527,6 +16604,13 @@
         "time_zone": "Atlantic/Madeira"
     },
     {
+        "iata_code": "FND",
+        "latitude": 6.161111111111111,
+        "longitude": 73.28722222222223,
+        "name": "Funadhoo Airport",
+        "time_zone": "Indian/Maldives"
+    },
+    {
         "iata_code": "FNE",
         "latitude": -8.550961,
         "longitude": 147.085359,
@@ -17171,6 +17255,13 @@
         "time_zone": "America/Chicago"
     },
     {
+        "iata_code": "FZL",
+        "latitude": 39.59444444444445,
+        "longitude": 47.196666666666665,
+        "name": "Fuzuli International Airport",
+        "time_zone": "Asia/Baku"
+    },
+    {
         "iata_code": "FZO",
         "latitude": 51.519605,
         "longitude": -2.588356,
@@ -17407,6 +17498,13 @@
         "longitude": -149.489271,
         "name": "Galbraith Lake Airport",
         "time_zone": "America/Anchorage"
+    },
+    {
+        "iata_code": "GBI",
+        "latitude": 17.30777777777778,
+        "longitude": 76.95805555555556,
+        "name": "Kalaburagi Airport",
+        "time_zone": "Asia/Calcutta"
     },
     {
         "iata_code": "GBJ",
@@ -17885,6 +17983,13 @@
         "time_zone": "Africa/Windhoek"
     },
     {
+        "iata_code": "GGB",
+        "latitude": -14.019444444444446,
+        "longitude": -52.15222222222222,
+        "name": "Água Boa Airport",
+        "time_zone": "America/Campo_Grande"
+    },
+    {
         "iata_code": "GGC",
         "latitude": -14.105204,
         "longitude": 21.441749,
@@ -17906,11 +18011,32 @@
         "time_zone": "America/New_York"
     },
     {
+        "iata_code": "GGF",
+        "latitude": -1.4791666666666667,
+        "longitude": -52.57805555555556,
+        "name": "Almeirim Airport",
+        "time_zone": "America/Belem"
+    },
+    {
         "iata_code": "GGG",
         "latitude": 32.385817,
         "longitude": -94.715305,
         "name": "East Texas Regional Airport",
         "time_zone": "America/Chicago"
+    },
+    {
+        "iata_code": "GGH",
+        "latitude": -23.691666666666666,
+        "longitude": -52.64222222222222,
+        "name": "Gastão Mesquita Airport",
+        "time_zone": "America/Sao_Paulo"
+    },
+    {
+        "iata_code": "GGJ",
+        "latitude": -24.079722222222223,
+        "longitude": -54.18805555555555,
+        "name": "Guaíra Airport",
+        "time_zone": "America/Sao_Paulo"
     },
     {
         "iata_code": "GGL",
@@ -18044,6 +18170,13 @@
         "longitude": -58.612996,
         "name": "Gualeguaychu Airport",
         "time_zone": "America/Cordoba"
+    },
+    {
+        "iata_code": "GHV",
+        "latitude": 45.70166666666667,
+        "longitude": 25.52,
+        "name": "Brașov-Ghimbav International Airport",
+        "time_zone": "Europe/Bucharest"
     },
     {
         "iata_code": "GIB",
@@ -18571,6 +18704,13 @@
         "time_zone": "Asia/Taipei"
     },
     {
+        "iata_code": "GNJ",
+        "latitude": 40.73777777777778,
+        "longitude": 46.3175,
+        "name": "Ganja International Airport",
+        "time_zone": "Asia/Baku"
+    },
+    {
         "iata_code": "GNM",
         "latitude": -14.208587,
         "longitude": -42.747596,
@@ -18772,6 +18912,13 @@
         "longitude": 136.820218,
         "name": "Gove Airport",
         "time_zone": "Australia/Darwin"
+    },
+    {
+        "iata_code": "GOX",
+        "latitude": 15.730277777777777,
+        "longitude": 73.86305555555555,
+        "name": "Manohar International Airport",
+        "time_zone": "Asia/Calcutta"
     },
     {
         "iata_code": "GOZ",
@@ -19894,6 +20041,13 @@
         "time_zone": "Europe/London"
     },
     {
+        "iata_code": "HAY",
+        "latitude": 8.247222222222222,
+        "longitude": -73.58194444444445,
+        "name": "Hacaritama Airport",
+        "time_zone": "America/Bogota"
+    },
+    {
         "iata_code": "HAZ",
         "latitude": -4.406977,
         "longitude": 145.216212,
@@ -20041,6 +20195,13 @@
         "time_zone": "America/New_York"
     },
     {
+        "iata_code": "HCZ",
+        "latitude": 25.750555555555554,
+        "longitude": 112.84583333333333,
+        "name": "Chenzhou Beihu Airport",
+        "time_zone": "Asia/Shanghai"
+    },
+    {
         "iata_code": "HDB",
         "latitude": 49.393333,
         "longitude": 8.6525,
@@ -20081,6 +20242,13 @@
         "longitude": -158.208801,
         "name": "Dillingham Airfield",
         "time_zone": "America/Denver"
+    },
+    {
+        "iata_code": "HDK",
+        "latitude": 6.631111111111111,
+        "longitude": 73.06666666666666,
+        "name": "Kulhudhuffushi Airport",
+        "time_zone": "Indian/Maldives"
     },
     {
         "iata_code": "HDM",
@@ -21231,6 +21399,13 @@
         "time_zone": "America/Sao_Paulo"
     },
     {
+        "iata_code": "HSA",
+        "latitude": 43.31111111111111,
+        "longitude": 68.55027777777778,
+        "name": "Hazret Sultan International Airport",
+        "time_zone": "Asia/Almaty"
+    },
+    {
         "iata_code": "HSB",
         "latitude": 37.81155,
         "longitude": -88.549186,
@@ -21803,6 +21978,13 @@
         "longitude": 24.88101,
         "name": "Hyvinkää Airfield",
         "time_zone": "Europe/Helsinki"
+    },
+    {
+        "iata_code": "HZA",
+        "latitude": 35.21333333333334,
+        "longitude": 115.73666666666666,
+        "name": "Heze Mudan Airport",
+        "time_zone": "Asia/Shanghai"
     },
     {
         "iata_code": "HZB",
@@ -22946,6 +23128,13 @@
         "time_zone": "America/Bahia"
     },
     {
+        "iata_code": "IOT",
+        "latitude": 71.23972222222223,
+        "longitude": -53.55555555555555,
+        "name": "Illorsuit Heliport",
+        "time_zone": "America/Godthab"
+    },
+    {
         "iata_code": "IOW",
         "latitude": 41.639215,
         "longitude": -91.544855,
@@ -23667,6 +23856,13 @@
         "time_zone": "Asia/Calcutta"
     },
     {
+        "iata_code": "IXX",
+        "latitude": 17.9,
+        "longitude": 77.46666666666667,
+        "name": "Bidar Airport",
+        "time_zone": "Asia/Calcutta"
+    },
+    {
         "iata_code": "IXY",
         "latitude": 23.112135,
         "longitude": 70.102158,
@@ -23868,6 +24064,13 @@
         "longitude": -90.644731,
         "name": "Jonesboro Municipal Airport",
         "time_zone": "America/Chicago"
+    },
+    {
+        "iata_code": "JBS",
+        "latitude": -28.654722222222222,
+        "longitude": -56.03472222222222,
+        "name": "São Borja Airport",
+        "time_zone": "America/Sao_Paulo"
     },
     {
         "iata_code": "JBT",
@@ -25522,6 +25725,13 @@
         "time_zone": "Asia/Colombo"
     },
     {
+        "iata_code": "KEA",
+        "latitude": 37.80888888888889,
+        "longitude": 65.2125,
+        "name": "Kerki Airport",
+        "time_zone": "Asia/Ashgabat"
+    },
+    {
         "iata_code": "KEB",
         "latitude": 59.352793,
         "longitude": -151.924316,
@@ -25718,6 +25928,13 @@
         "time_zone": "Australia/Darwin"
     },
     {
+        "iata_code": "KFM",
+        "latitude": 55.355555555555554,
+        "longitude": -110.6375,
+        "name": "Kirby Lake Airport",
+        "time_zone": "America/Edmonton"
+    },
+    {
         "iata_code": "KFP",
         "latitude": 54.848501,
         "longitude": -163.409148,
@@ -25730,6 +25947,13 @@
         "longitude": 33.796565,
         "name": "Kastamonu Airport",
         "time_zone": "Europe/Istanbul"
+    },
+    {
+        "iata_code": "KFZ",
+        "latitude": 42.03283333333333,
+        "longitude": 20.414944444444444,
+        "name": "Kukës International Airport",
+        "time_zone": "Europe/Tirane"
     },
     {
         "iata_code": "KGA",
@@ -26234,6 +26458,13 @@
         "longitude": 92.487349,
         "name": "Krasnoyarsk International Airport",
         "time_zone": "Asia/Krasnoyarsk"
+    },
+    {
+        "iata_code": "KJB",
+        "latitude": 15.70611111111111,
+        "longitude": 78.16083333333334,
+        "name": "Kurnool Airport",
+        "time_zone": "Asia/Calcutta"
     },
     {
         "iata_code": "KJH",
@@ -28028,6 +28259,13 @@
         "time_zone": "Asia/Anadyr"
     },
     {
+        "iata_code": "KVO",
+        "latitude": 43.81861111111112,
+        "longitude": 20.585277777777776,
+        "name": "Morava Airport",
+        "time_zone": "Europe/Belgrade"
+    },
+    {
         "iata_code": "KVR",
         "latitude": 44.2726,
         "longitude": 135.029,
@@ -28208,6 +28446,13 @@
         "longitude": -132.397754,
         "name": "Kasaan Seaplane Base",
         "time_zone": "America/Sitka"
+    },
+    {
+        "iata_code": "KXB",
+        "latitude": -4.341111111111111,
+        "longitude": 121.52388888888889,
+        "name": "Sangia Nibandera Airport",
+        "time_zone": "Asia/Makassar"
     },
     {
         "iata_code": "KXD",
@@ -28880,6 +29125,13 @@
         "longitude": -72.802555,
         "name": "La Chorrera Airport",
         "time_zone": "America/Bogota"
+    },
+    {
+        "iata_code": "LCT",
+        "latitude": 37.91305555555555,
+        "longitude": 114.59166666666667,
+        "name": "Shijiazhuang Luancheng Airport",
+        "time_zone": "Asia/Shanghai"
     },
     {
         "iata_code": "LCV",
@@ -30126,6 +30378,13 @@
         "longitude": 105.754591,
         "name": "Letung Airport",
         "time_zone": "Asia/Jakarta"
+    },
+    {
+        "iata_code": "LMV",
+        "latitude": 5.4575000000000005,
+        "longitude": 73.36999999999999,
+        "name": "Madivaru Airport",
+        "time_zone": "Indian/Maldives"
     },
     {
         "iata_code": "LMX",
@@ -34167,6 +34426,13 @@
         "time_zone": "America/Paramaribo"
     },
     {
+        "iata_code": "MOK",
+        "latitude": 43.755,
+        "longitude": 59.030833333333334,
+        "name": "Muynak Airport",
+        "time_zone": "Asia/Samarkand"
+    },
+    {
         "iata_code": "MOL",
         "latitude": 62.745551,
         "longitude": 7.261549,
@@ -37322,6 +37588,13 @@
         "longitude": -164.700922,
         "name": "Nightmute Airport",
         "time_zone": "America/Nome"
+    },
+    {
+        "iata_code": "NMF",
+        "latitude": 5.822222222222222,
+        "longitude": 73.47472222222223,
+        "name": "Maafaru International Airport",
+        "time_zone": "Indian/Maldives"
     },
     {
         "iata_code": "NMG",
@@ -43960,6 +44233,13 @@
         "time_zone": "Europe/Bratislava"
     },
     {
+        "iata_code": "QAH",
+        "latitude": 28.70583333333333,
+        "longitude": 77.34222222222222,
+        "name": "Hindon Airport",
+        "time_zone": "Asia/Calcutta"
+    },
+    {
         "iata_code": "QAQ",
         "latitude": 42.378791,
         "longitude": 13.309257,
@@ -44014,6 +44294,13 @@
         "longitude": 28.151623,
         "name": "Rand Airport",
         "time_zone": "Africa/Johannesburg"
+    },
+    {
+        "iata_code": "QRC",
+        "latitude": -34.17361111111111,
+        "longitude": -70.77638888888889,
+        "name": "Rancagua de la Independencia Airport",
+        "time_zone": "America/Santiago"
     },
     {
         "iata_code": "QRO",
@@ -44091,6 +44378,13 @@
         "longitude": -80.669294,
         "name": "Wilgrove Air Park",
         "time_zone": "America/New_York"
+    },
+    {
+        "iata_code": "QXB",
+        "latitude": 43.50527777777778,
+        "longitude": 5.367222222222222,
+        "name": "Aix-en-Provence Aerodrome",
+        "time_zone": "Europe/Paris"
     },
     {
         "iata_code": "RAA",
@@ -45745,6 +46039,13 @@
         "time_zone": "Australia/Darwin"
     },
     {
+        "iata_code": "RPI",
+        "latitude": -2.1275,
+        "longitude": 120.29944444444445,
+        "name": "Rampi Airport",
+        "time_zone": "Asia/Makassar"
+    },
+    {
         "iata_code": "RPM",
         "latitude": -14.722803,
         "longitude": 134.747158,
@@ -45813,6 +46114,13 @@
         "longitude": 158.4,
         "name": "Barora Airport",
         "time_zone": "Pacific/Guadalcanal"
+    },
+    {
+        "iata_code": "RRJ",
+        "latitude": -22.9875,
+        "longitude": -43.37,
+        "name": "Jacarepaguá Airport",
+        "time_zone": "America/Sao_Paulo"
     },
     {
         "iata_code": "RRK",
@@ -45897,6 +46205,13 @@
         "longitude": -161.325066,
         "name": "Russian Mission Airport",
         "time_zone": "America/Anchorage"
+    },
+    {
+        "iata_code": "RSI",
+        "latitude": 25.630277777777778,
+        "longitude": 37.07833333333333,
+        "name": "Red Sea International Airport",
+        "time_zone": "Asia/Riyadh"
     },
     {
         "iata_code": "RSJ",
@@ -46102,6 +46417,13 @@
         "time_zone": "Asia/Katmandu"
     },
     {
+        "iata_code": "RUL",
+        "latitude": 0.33666666666666667,
+        "longitude": 73.51138888888889,
+        "name": "Maavarulu Airport",
+        "time_zone": "Indian/Maldives"
+    },
+    {
         "iata_code": "RUM",
         "latitude": 27.302984,
         "longitude": 86.550477,
@@ -46197,6 +46519,13 @@
         "latitude": 59.98029,
         "longitude": 30.585339,
         "name": "Rzhevka Airport",
+        "time_zone": "Europe/Moscow"
+    },
+    {
+        "iata_code": "RVI",
+        "latitude": 47.25833333333333,
+        "longitude": 39.818333333333335,
+        "name": "Rostov-on-Don Airport",
         "time_zone": "Europe/Moscow"
     },
     {
@@ -46394,6 +46723,13 @@
         "longitude": 68.878646,
         "name": "Sawan Airport",
         "time_zone": "Asia/Karachi"
+    },
+    {
+        "iata_code": "RZV",
+        "latitude": 41.16916666666666,
+        "longitude": 40.82888888888889,
+        "name": "Rize–Artvin Airport",
+        "time_zone": "Europe/Istanbul"
     },
     {
         "iata_code": "RZZ",
@@ -47962,6 +48298,13 @@
         "longitude": -66.988125,
         "name": "São Gabriel da Cachoeira Airport",
         "time_zone": "America/Boa_Vista"
+    },
+    {
+        "iata_code": "SJM",
+        "latitude": 18.833333333333332,
+        "longitude": -71.23333333333333,
+        "name": "San Juan de la Maguana Airport",
+        "time_zone": "America/Santo_Domingo"
     },
     {
         "iata_code": "SJN",
@@ -54621,6 +54964,13 @@
         "time_zone": "America/Anchorage"
     },
     {
+        "iata_code": "UGL",
+        "latitude": -79.77777777777777,
+        "longitude": -83.32083333333333,
+        "name": "Union Glacier Blue-Ice Runway",
+        "time_zone": "Antarctica/South_Pole"
+    },
+    {
         "iata_code": "UGN",
         "latitude": 42.420419,
         "longitude": -87.867748,
@@ -54773,6 +55123,13 @@
         "longitude": 135.224459,
         "name": "Kobe Airport",
         "time_zone": "Asia/Tokyo"
+    },
+    {
+        "iata_code": "UKE",
+        "latitude": 20.097777777777775,
+        "longitude": 83.18333333333334,
+        "name": "Utkela Airport",
+        "time_zone": "Asia/Calcutta"
     },
     {
         "iata_code": "UKG",
@@ -55613,6 +55970,13 @@
         "longitude": -60.95202,
         "name": "Hewanorra International Airport",
         "time_zone": "America/St_Lucia"
+    },
+    {
+        "iata_code": "UVI",
+        "latitude": -26.231666666666666,
+        "longitude": -51.06888888888889,
+        "name": "União da Vitória Airport",
+        "time_zone": "America/Sao_Paulo"
     },
     {
         "iata_code": "UVL",
@@ -57463,6 +57827,13 @@
         "time_zone": "Africa/Libreville"
     },
     {
+        "iata_code": "WHA",
+        "latitude": 31.104444444444447,
+        "longitude": 118.66722222222222,
+        "name": "Wuhu Xuanzhou Airport",
+        "time_zone": "Asia/Shanghai"
+    },
+    {
         "iata_code": "WHD",
         "latitude": 55.903322,
         "longitude": -130.008339,
@@ -58219,6 +58590,13 @@
         "time_zone": "America/New_York"
     },
     {
+        "iata_code": "WSI",
+        "latitude": -33.88805555555555,
+        "longitude": 150.7147222222222,
+        "name": "Western Sydney Airport",
+        "time_zone": "Australia/Sydney"
+    },
+    {
         "iata_code": "WSK",
         "latitude": 31.62,
         "longitude": 110.338915,
@@ -58609,6 +58987,13 @@
         "longitude": -111.116659,
         "name": "Yellowstone Airport",
         "time_zone": "America/Denver"
+    },
+    {
+        "iata_code": "WZA",
+        "latitude": 10.0825,
+        "longitude": -2.5075,
+        "name": "Wa Airport",
+        "time_zone": "Africa/Accra"
     },
     {
         "iata_code": "WZQ",
@@ -59190,6 +59575,13 @@
         "longitude": 103.86819,
         "name": "Seletar Airport",
         "time_zone": "Asia/Singapore"
+    },
+    {
+        "iata_code": "XTA",
+        "latitude": 37.233333333333334,
+        "longitude": -115.80833333333334,
+        "name": "Homey Airport",
+        "time_zone": "America/Los_Angeles"
     },
     {
         "iata_code": "XTG",
@@ -60725,6 +61117,13 @@
         "time_zone": "America/Vancouver"
     },
     {
+        "iata_code": "YLX",
+        "latitude": 22.438055555555557,
+        "longitude": 110.12083333333332,
+        "name": "Yulin Fumian Airport",
+        "time_zone": "Asia/Shanghai"
+    },
+    {
         "iata_code": "YLY",
         "latitude": 49.10127,
         "longitude": -122.629903,
@@ -61775,6 +62174,13 @@
         "time_zone": "America/Vancouver"
     },
     {
+        "iata_code": "YTW",
+        "latitude": 36.81083333333333,
+        "longitude": 81.78083333333333,
+        "name": "Yutian Wanfang Airport",
+        "time_zone": "Asia/Shanghai"
+    },
+    {
         "iata_code": "YTX",
         "latitude": 57.915567,
         "longitude": -131.11978,
@@ -62734,6 +63140,13 @@
         "time_zone": "America/Edmonton"
     },
     {
+        "iata_code": "ZHT",
+        "latitude": 46.21021694444445,
+        "longitude": 6.142446944444445,
+        "name": "Geneva Railway Station",
+        "time_zone": "Europe/Zurich"
+    },
+    {
         "iata_code": "ZHY",
         "latitude": 37.572307,
         "longitude": 105.154835,
@@ -63236,6 +63649,13 @@
         "longitude": 91.868926,
         "name": "Osmani International Airport",
         "time_zone": "Asia/Dhaka"
+    },
+    {
+        "iata_code": "ZZE",
+        "latitude": 39.09444444444445,
+        "longitude": 46.73416666666667,
+        "name": "Zangilan International Airport",
+        "time_zone": "Asia/Baku"
     },
     {
         "iata_code": "ZZO",
