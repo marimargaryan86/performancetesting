@@ -4,16 +4,21 @@
   import PlusIcon from "components/icons/plus-icon.svelte";
   import { formatAmount } from "formatting/currency";
   import AddBalanceDialogue from "./add-balance-dialogue.svelte";
-  import SearchField from "components/ui/search-field.svelte";
   import Button from "components/ui/button.svelte";
   import type { priceModel } from "integration/junction-mobile-api/schemas/price";
   import type { Infer } from "integration/junction-mobile-api/schema-model.server";
+  import StandardLayout from "components/page/standard-layout.svelte";
+  import routeConfig from "routeConfig";
 
   export let data;
 
   let searchQuery = "";
   let dialogue: AddBalanceDialogue;
 
+  $: breadCrumbs = [
+    { url: routeConfig.pay.accounts.root, label: "Accounts" },
+    { url: routeConfig.pay.accounts.account(data.account.id), label: data.account.name },
+  ];
   $: balances = data.balances
     .filter((item) => item.currency.toLowerCase().includes(searchQuery.toLowerCase()))
     .sort((a, b) => 0 - (a.currency < b.currency ? 1 : -1));
@@ -39,20 +44,12 @@
   bind:this={dialogue}
 />
 
-<div class="header">
-  <h1 class="typography headline-medium bold">Balances</h1>
+<StandardLayout pageTitle="Balances" {breadCrumbs} bind:searchQuery>
+  <Button size="small" on:click={openDialogue} slot="actions">
+    Add Balance
+    <PlusIcon />
+  </Button>
 
-  <div class="actions">
-    <SearchField bind:value={searchQuery} />
-
-    <Button size="small" on:click={openDialogue}>
-      Add Balance
-      <PlusIcon />
-    </Button>
-  </div>
-</div>
-
-<div class="content">
   <ul class="balances">
     {#each balances as balance}
       <li>
@@ -73,28 +70,9 @@
       <li class="typography body-large empty">No balances found</li>
     {/each}
   </ul>
-</div>
+</StandardLayout>
 
 <style>
-  .header {
-    display: flex;
-    justify-content: space-between;
-    padding: 8px 24px 24px;
-  }
-
-  .actions {
-    display: flex;
-    gap: 16px;
-    align-items: center;
-  }
-
-  .content {
-    flex-grow: 1;
-    padding: 24px;
-    overflow: auto;
-    background-image: var(--color-gradient-extensions-horizontal);
-  }
-
   .balances {
     display: flex;
     flex-flow: column;

@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-  import Tabs, { type Tab } from "components/ui/tabs.svelte";
+  import type { Tab } from "components/ui/tabs.svelte";
 
   const tabs: Tab[] = [
     { url: routeConfig.pay.activity.root, label: "Transactions", exact: true },
@@ -8,9 +8,6 @@
 </script>
 
 <script lang="ts">
-  import BreadCrumbs from "components/page/bread-crumbs.svelte";
-  import FilterIcon from "components/icons/filter-icon.svelte";
-  import { slide } from "svelte/transition";
   import DatePicker from "components/ui/date-picker/date-picker.svelte";
   import StatusPicker from "components/ui/status-picker.svelte";
   import { transactionStatus } from "models/transaction";
@@ -20,10 +17,8 @@
   import { page } from "$app/stores";
   import { conversionStatus } from "models/conversion";
   import { formatConversionStatus } from "formatting/conversion";
-  import SearchField from "components/ui/search-field.svelte";
   import routeConfig from "routeConfig";
-
-  let showFilters = false;
+  import StandardLayout from "components/page/standard-layout.svelte";
 
   $: view =
     $page.url.pathname === routeConfig.pay.activity.root
@@ -51,108 +46,34 @@
     },
     viewBreadCrumbs,
   ];
-
-  function toggleFilters(): void {
-    showFilters = !showFilters;
-  }
 </script>
 
-<BreadCrumbs items={breadCrumbs} />
+<StandardLayout
+  {breadCrumbs}
+  pageTitle="Activity"
+  {tabs}
+  {filtersActive}
+  bind:searchQuery={$searchQuery}
+>
+  <svelte:fragment slot="filters">
+    <DatePicker bind:value={$dateRange} range placeholder="Date Range" />
 
-<div class="header">
-  <h1 class="typography headline-medium bold">Activity</h1>
+    {#if view === "transactions"}
+      <StatusPicker
+        statuses={transactionStatus}
+        bind:value={$currTransactionStatus}
+        format={formatTransactionStatus}
+        placeholder="Status"
+      />
+    {:else}
+      <StatusPicker
+        statuses={conversionStatus}
+        bind:value={$currConversionStatus}
+        format={formatConversionStatus}
+        placeholder="Status"
+      />
+    {/if}
+  </svelte:fragment>
 
-  <div class="actions">
-    <SearchField bind:value={$searchQuery} />
-
-    <button on:click={toggleFilters}>
-      <FilterIcon color="var(--color-main-primary-500)" active={filtersActive} />
-    </button>
-  </div>
-</div>
-
-<div class="tabs">
-  {#if showFilters}
-    <ul class="filters" transition:slide={{ duration: 250 }}>
-      <li>
-        <DatePicker bind:value={$dateRange} range placeholder="Date Range" />
-      </li>
-      <li>
-        {#if view === "transactions"}
-          <StatusPicker
-            statuses={transactionStatus}
-            bind:value={$currTransactionStatus}
-            format={formatTransactionStatus}
-            placeholder="Status"
-          />
-        {:else}
-          <StatusPicker
-            statuses={conversionStatus}
-            bind:value={$currConversionStatus}
-            format={formatConversionStatus}
-            placeholder="Status"
-          />
-        {/if}
-      </li>
-    </ul>
-  {/if}
-
-  <Tabs items={tabs} />
-</div>
-
-<div class="content">
   <slot />
-</div>
-
-<style>
-  .header {
-    display: flex;
-    justify-content: space-between;
-    padding: 8px 24px 24px;
-    color: var(--color-main-neutral-800);
-  }
-
-  .actions {
-    display: flex;
-    gap: 16px;
-    align-items: center;
-  }
-
-  .actions > button {
-    height: 40px;
-    padding: 0;
-    background-color: transparent;
-    border: 0;
-    cursor: pointer;
-  }
-
-  .tabs {
-    padding: 16px 24px 0;
-    background-color: var(--color-main-primary-50);
-  }
-
-  .filters {
-    display: flex;
-    gap: 16px;
-    padding-bottom: 16px;
-  }
-
-  .filters > li {
-    width: 100%;
-    max-width: 276px;
-  }
-
-  .filters :global(.date-picker),
-  .filters :global(.status-picker) {
-    --height: 40px;
-
-    width: 100%;
-  }
-
-  .content {
-    flex-grow: 1;
-    padding: 24px;
-    overflow: auto;
-    background-image: var(--color-gradient-extensions-horizontal);
-  }
-</style>
+</StandardLayout>

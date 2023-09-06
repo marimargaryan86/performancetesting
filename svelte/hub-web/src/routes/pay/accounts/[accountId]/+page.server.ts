@@ -2,12 +2,18 @@ import { getToken } from "utils/auth";
 import integrationInstances from "integration-instances";
 import type { priceModel } from "integration/junction-mobile-api/schemas/price";
 import type { Infer } from "integration/junction-mobile-api/schema-model.server";
+import type { AccountModel } from "models/account";
 
-export function load(event): { balances: Promise<Infer<typeof priceModel>[]> } {
+export function load(event): {
+  balances: Promise<Infer<typeof priceModel>[]>;
+  account: Promise<AccountModel>;
+} {
   const { accountId } = event.params;
+  const token = getToken(event);
 
   return {
-    balances: integrationInstances.junctionPayApi.balances.listBalances(getToken(event), accountId),
+    account: integrationInstances.junctionPayApi.accounts.getAccount(token, accountId),
+    balances: integrationInstances.junctionPayApi.balances.listBalances(token, accountId),
   };
 }
 

@@ -22,62 +22,55 @@
   <title>All · Bookings · Go · Junction Hub</title>
 </svelte:head>
 
-<div class="content">
-  <Table class="bookings-table">
-    <THead>
-      <Header>Booking Reference</Header>
-      <Header>Passenger Name</Header>
-      <Header>Ticket</Header>
-      <Header bind:sortGroup bind:sortDirection>Departure Date</Header>
-      <Header>Provider</Header>
-      <Header>Reseller</Header>
-      <Header bind:sortGroup bind:sortDirection sortValue="createdAt">Created Date</Header>
-      <Header>Total Price</Header>
-      <Header bind:sortGroup bind:sortDirection sortValue="status">Booking Status</Header>
-      <Header bind:sortGroup bind:sortDirection>Refund Status</Header>
-    </THead>
+<Table class="bookings-table">
+  <THead>
+    <Header>Booking Reference</Header>
+    <Header>Passenger Name</Header>
+    <Header>Ticket</Header>
+    <Header bind:sortGroup bind:sortDirection>Departure Date</Header>
+    <Header>Provider</Header>
+    <Header>Reseller</Header>
+    <Header bind:sortGroup bind:sortDirection sortValue="createdAt">Created Date</Header>
+    <Header>Total Price</Header>
+    <Header bind:sortGroup bind:sortDirection sortValue="status">Booking Status</Header>
+    <Header bind:sortGroup bind:sortDirection>Refund Status</Header>
+  </THead>
 
-    <TBody>
-      {#each bookings as booking}
-        <TRow alternatingBackground={false}>
-          <TCol maxWidth="96px" copyable class="green">123ABC456{booking}</TCol>
-          <TCol>Jerry Smith</TCol>
-          <TCol class="green">Download</TCol>
-          <TCol>02/11/23</TCol>
-          <TCompanyCol maxWidth="160px" companyName="Renfe" img="/images/renfe-logo.png" />
-          <TCompanyCol maxWidth="160px" companyName="Malaga TA" />
-          <TCol>02/11/23</TCol>
-          <TMoneyCol money={{ amount: 2952.9, currency: "USD" }} />
-          <TCol width="80px">
-            <TransactionStatusBadge value="pending" />
-          </TCol>
-          <TCol maxWidth="96px" class="green">View</TCol>
-        </TRow>
-      {/each}
-    </TBody>
-  </Table>
-</div>
+  <TBody>
+    {#each bookings as booking}
+      <TRow alternatingBackground={false}>
+        <TCol maxWidth="96px" copyable class="green">123ABC456{booking}</TCol>
+        <TCol>Jerry Smith</TCol>
+        <TCol class="green">Download</TCol>
+        <TCol>02/11/23</TCol>
+        <TCompanyCol maxWidth="160px" companyName="Renfe" img="/images/renfe-logo.png" />
+        <TCompanyCol maxWidth="160px" companyName="Malaga TA" />
+        <TCol>02/11/23</TCol>
+        <TMoneyCol money={{ amount: 2952.9, currency: "USD" }} />
+        <TCol width="80px">
+          <TransactionStatusBadge value="pending" />
+        </TCol>
+        <TCol maxWidth="96px" class="green">View</TCol>
+      </TRow>
+    {/each}
+  </TBody>
+</Table>
 
 <style>
-  .content > :global(.table.booking-table) {
+  :global(.table.bookings-table) {
     width: 100%;
     height: 100%;
-    color: var(--color-common-light-strong);
   }
 
-  .content > :global(.table.bookings-table .status-badge) {
+  :global(.table.bookings-table .status-badge) {
     width: 100%;
   }
 
-  .content > :global(.table.bookings-table tbody tr) {
+  :global(.table.bookings-table tbody tr) {
     cursor: pointer;
   }
 
-  .content :global(.green) {
+  :global(.green) {
     color: var(--color-main-primary-500);
-  }
-
-  .content :global(td:hover .green) {
-    color: var(--color-common-dark-strong);
   }
 </style>

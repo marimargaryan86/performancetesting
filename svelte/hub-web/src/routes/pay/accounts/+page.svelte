@@ -1,7 +1,7 @@
 <script lang="ts">
   import ChevronIcon from "components/icons/chevron-icon.svelte";
+  import StandardLayout from "components/page/standard-layout.svelte";
   import EntityAvatar from "components/ui/entity-avatar.svelte";
-  import SearchField from "components/ui/search-field.svelte";
   import { scrollLoad } from "directives/scroll-load";
   import routeConfig from "routeConfig";
   import { callAction } from "utils/common";
@@ -40,13 +40,7 @@
   <title>Accounts · Pay · Junction Hub</title>
 </svelte:head>
 
-<div class="header">
-  <h1 class="typography headline-medium bold">Accounts</h1>
-
-  <SearchField bind:value={searchQuery} />
-</div>
-
-<div class="content">
+<StandardLayout pageTitle="Accounts" bind:searchQuery>
   <div class="wrapper">
     <h2 class="typography title-medium bold">Sub accounts</h2>
 
@@ -62,24 +56,9 @@
       {/each}
     </ul>
   </div>
-</div>
+</StandardLayout>
 
 <style>
-  .header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 32px 24px;
-    color: var(--color-main-neutral-800);
-  }
-
-  .content {
-    flex-grow: 1;
-    padding: 24px;
-    overflow: auto;
-    background-image: var(--color-gradient-extensions-horizontal);
-  }
-
   .wrapper {
     display: flex;
     flex-flow: column;

@@ -34,7 +34,6 @@
 </script>
 
 <script lang="ts">
-  import BreadCrumbs from "components/page/bread-crumbs.svelte";
   import Button from "components/ui/button.svelte";
   import { page } from "$app/stores";
   import { goto } from "$app/navigation";
@@ -45,8 +44,9 @@
   import BeneficiaryDetails from "./beneficiary-details.svelte";
   import BankAccountDetails from "./bank-account-details.svelte";
   import Summary from "./summary.svelte";
-  import { slide } from "svelte/transition";
   import { URLExtended } from "utils/url";
+  import StandardLayout from "components/page/standard-layout.svelte";
+  import Alert from "components/ui/alert.svelte";
 
   export let data;
 
@@ -93,18 +93,14 @@
   </title>
 </svelte:head>
 
-<BreadCrumbs items={breadCrumbs} />
+<StandardLayout {breadCrumbs} pageTitle={title}>
+  <StepView steps={Object.values(steps)} activeStep={steps[step].number} slot="steps" />
 
-<h1 class="typography headline-medium bold">{title}</h1>
-
-<StepView steps={Object.values(steps)} activeStep={steps[step].number} />
-
-<div class="content">
-  {#if error}
-    <div class="error typography body-medium" transition:slide={{ duration: 150 }}>
-      <strong>Error</strong> <span>{error}</span>
-    </div>
-  {/if}
+  <Alert class="error-message" type="error" show={Boolean(error)}>
+    <span class="typography body-medium">
+      <strong class="typography bold">Error</strong> <span>{error}</span>
+    </span>
+  </Alert>
 
   <div class="wrapper">
     {#if step === "beneficiary"}
@@ -131,46 +127,32 @@
       />
     {/if}
   </div>
-</div>
 
-<div class="navigation">
-  <Button variant="text" size="medium" disabled={step === "beneficiary"} on:click={goToPrevious}>
+  <Button
+    variant="text"
+    size="medium"
+    disabled={step === "beneficiary"}
+    on:click={goToPrevious}
+    slot="navigation-left"
+  >
     Previous
   </Button>
-  <span />
-  <Button variant="outline" size="medium" on:click={cancel}>Cancel</Button>
-  <Button variant="primary" size="medium" on:click={goToNext}>
-    {steps[step].buttonLabel}
-  </Button>
-</div>
+
+  <svelte:fragment slot="navigation-right">
+    <Button variant="outline" size="medium" on:click={cancel}>Cancel</Button>
+    <Button variant="primary" size="medium" on:click={goToNext}>
+      {steps[step].buttonLabel}
+    </Button>
+  </svelte:fragment>
+</StandardLayout>
 
 <style>
-  .headline-medium {
-    padding: 8px 24px 24px;
-  }
-
-  .error {
-    display: flex;
-    gap: 8px;
+  :global(.alert.error-message) {
     margin-bottom: 24px;
-    padding: 18px;
-    color: var(--color-common-light-strong);
-    background-color: var(--color-semantic-error-100);
-    border: var(--color-semantic-error-600) 1px solid;
-    border-radius: 8px;
   }
 
-  .error > strong {
+  :global(.alert.error-message) strong {
     font-weight: 600;
-  }
-
-  .content {
-    display: flex;
-    flex-flow: column;
-    flex-grow: 1;
-    padding: 24px;
-    overflow: hidden;
-    background-image: var(--color-gradient-extensions-horizontal);
   }
 
   .wrapper {
@@ -182,19 +164,5 @@
     overflow: auto;
     background-color: var(--color-common-background-light-main);
     border-radius: 16px;
-  }
-
-  .navigation {
-    display: flex;
-    gap: 16px;
-    padding: 16px 24px;
-  }
-
-  .navigation > span {
-    flex-grow: 1;
-  }
-
-  .navigation > :global(:last-child) {
-    min-width: 140px;
   }
 </style>

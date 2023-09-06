@@ -3,5 +3,5 @@
 </svelte:head>
 
 <div>
-  <span>TODO: Refundsl</span>
+  <span>TODO: Refunds</span>
 </div>

@@ -1,0 +1,151 @@
+<script lang="ts">
+  import Tabs, { type Tab } from "components/ui/tabs.svelte";
+  import BreadCrumbs from "./bread-crumbs.svelte";
+  import FilterIcon from "components/icons/filter-icon.svelte";
+  import { slideFade } from "transitions/slide-fade";
+  import SearchField from "components/ui/search-field.svelte";
+
+  export let breadCrumbs: { label: string; url: string }[] | undefined = undefined;
+  export let pageTitle: string;
+  export let tabs: Tab[] | undefined = undefined;
+  export let filtersActive = false;
+  export let searchQuery: string | undefined = undefined;
+
+  let showFilters = false;
+
+  $: hasNavigation = $$slots["navigation-left"] || $$slots["navigation-right"];
+  $: hasFiltersOrTabs = Boolean($$slots.filters || tabs);
+  $: hasActions = $$slots.filters || searchQuery !== undefined || $$slots.actions;
+
+  function toggleFilters(): void {
+    showFilters = !showFilters;
+  }
+</script>
+
+{#if breadCrumbs}
+  <BreadCrumbs items={breadCrumbs} />
+{/if}
+
+<div class="header" class:after-breadcrumbs={breadCrumbs}>
+  <h1 class="typography headline-medium bold">{pageTitle}</h1>
+
+  {#if hasActions}
+    <div class="actions">
+      {#if searchQuery !== undefined}
+        <SearchField bind:value={searchQuery} />
+      {/if}
+
+      {#if $$slots.filters}
+        <button on:click={toggleFilters}>
+          <FilterIcon color="var(--color-main-primary-500)" active={filtersActive} />
+        </button>
+      {/if}
+
+      <slot name="actions" />
+    </div>
+  {/if}
+</div>
+
+<slot name="steps" />
+
+{#if hasFiltersOrTabs}
+  <div class="filters-and-tabs">
+    {#if showFilters}
+      <div class="filters" transition:slideFade={{ duration: 250 }} class:tabs-after={tabs}>
+        <slot name="filters" />
+      </div>
+    {/if}
+
+    {#if tabs}
+      <div class="tabs">
+        <Tabs items={tabs} />
+      </div>
+    {/if}
+  </div>
+{/if}
+
+{#if $$slots["content-before"]}
+  <slot name="content-before" />
+{/if}
+
+<div class="content">
+  <slot />
+</div>
+
+{#if hasNavigation}
+  <div class="navigation">
+    <slot name="navigation-left" />
+    <span />
+    <slot name="navigation-right" />
+  </div>
+{/if}
+
+<style>
+  .header {
+    display: flex;
+    justify-content: space-between;
+    padding: 32px 24px;
+    color: var(--color-main-neutral-800);
+  }
+
+  .header.after-breadcrumbs {
+    padding: 8px 24px 24px;
+  }
+
+  .actions {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .actions > button {
+    height: 40px;
+    padding: 0;
+    background-color: transparent;
+    border: 0;
+    cursor: pointer;
+  }
+
+  .filters-and-tabs {
+    padding: 0 24px;
+    background-color: var(--color-main-primary-50);
+  }
+
+  .filters {
+    --height: 40px;
+
+    display: flex;
+    gap: 16px;
+  }
+
+  .filters > :global(*) {
+    width: 100%;
+    max-width: 276px;
+    margin: 16px 0;
+  }
+
+  .filters.tabs-after > :global(*) {
+    margin-bottom: 0;
+  }
+
+  .tabs {
+    padding-top: 16px;
+  }
+
+  .content {
+    flex-grow: 1;
+    padding: 24px;
+    overflow: auto;
+    background-image: var(--color-gradient-extensions-horizontal);
+  }
+
+  .navigation {
+    display: flex;
+    gap: 16px;
+    padding: 16px 24px;
+  }
+
+  .navigation > span {
+    flex-grow: 1;
+  }
+</style>

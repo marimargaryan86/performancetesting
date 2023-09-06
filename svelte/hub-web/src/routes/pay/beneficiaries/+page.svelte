@@ -7,7 +7,6 @@
   import Table from "components/ui/table/table.svelte";
   import { callAction, capitalize, type FlattenedObject } from "utils/common";
   import type { DirectionY } from "models/spatial";
-  import SearchField from "components/ui/search-field.svelte";
   import Button from "components/ui/button.svelte";
   import PlusIcon from "components/icons/plus-icon.svelte";
   import type { BeneficiaryModel } from "models/beneficiary";
@@ -15,6 +14,7 @@
   import RemoveIcon from "components/icons/remove-icon.svelte";
   import routeConfig from "routeConfig";
   import TActionsCol from "components/ui/table/t-actions-col.svelte";
+  import StandardLayout from "components/page/standard-layout.svelte";
 
   export let data;
   export let form;
@@ -56,20 +56,17 @@
   <title>Beneficiaries · Pay · Junction Hub</title>
 </svelte:head>
 
-<div class="header">
-  <h1 class="typography headline-medium bold">Beneficiaries</h1>
+<StandardLayout pageTitle="Beneficiaries" bind:searchQuery>
+  <Button
+    size="small"
+    href={routeConfig.pay.beneficiaries.beneficiary()}
+    preload={false}
+    slot="actions"
+  >
+    Add Beneficiary
+    <PlusIcon />
+  </Button>
 
-  <div class="actions">
-    <SearchField bind:value={searchQuery} />
-
-    <Button size="small" href={routeConfig.pay.beneficiaries.beneficiary()} preload={false}>
-      Add Beneficiary
-      <PlusIcon />
-    </Button>
-  </div>
-</div>
-
-<div class="content">
   <Table class="beneficiaries-table" {loadMore}>
     <THead>
       <Header bind:sortGroup bind:sortDirection sortValue="companyName">Company</Header>
@@ -114,34 +111,13 @@
       {/each}
     </TBody>
   </Table>
-</div>
+</StandardLayout>
 
 <style>
-  .content > :global(.table.beneficiaries-table) {
+  :global(.table.beneficiaries-table) {
     width: 100%;
     height: 100%;
     color: var(--color-common-light-strong);
-  }
-
-  .header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 32px 24px;
-    color: var(--color-main-neutral-800);
-  }
-
-  .actions {
-    display: flex;
-    gap: 16px;
-    align-items: center;
-  }
-
-  .content {
-    flex-grow: 1;
-    padding: 24px;
-    overflow: auto;
-    background-image: var(--color-gradient-extensions-horizontal);
   }
 
   .currency {
@@ -153,12 +129,12 @@
     color: var(--color-common-light-soft);
   }
 
-  .content :global(tr:not(:hover) .actions) {
+  :global(tr:not(:hover) .actions) {
     opacity: 0;
     pointer-events: none;
   }
 
-  .content :global(tr:hover .company-name) {
+  :global(tr:hover .company-name) {
     color: var(--color-common-light-text-link);
   }
 

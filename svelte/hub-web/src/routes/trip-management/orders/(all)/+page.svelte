@@ -43,7 +43,7 @@
   export let data;
 </script>
 
-<Table class="orders">
+<Table class="orders-table">
   <THead>
     <Header>Order Reference</Header>
     <Header>Ticket(s)</Header>
@@ -91,7 +91,7 @@
 </Table>
 
 <style>
-  :global(.table.orders) {
+  :global(.table.orders-table) {
     width: 100%;
     height: 100%;
   }
