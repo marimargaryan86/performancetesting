@@ -234,13 +234,19 @@ class PlaceClient(base.BenerailBaseClient):
     async def get_places(
         self,
         page: int | str = 0,
+        attribute: str | None = None,
     ) -> rcodes_response.PlacesResponse:
+        query = {"page": str(page)}
+
+        if attribute:
+            query["attribute"] = attribute
+
         response = await self._make_request(
             client.RequestOptions(
                 method="GET",
                 path=_BASE_PLACE_PATH,
                 headers=self._get_headers(),
-                query={"page": str(page)},
+                query=query,
             ),
         )
         response_data = response.json()
@@ -259,9 +265,12 @@ class PlaceClient(base.BenerailBaseClient):
             ),
         )
 
-    async def get_all_places(self) -> Sequence[rcodes_response.PlacesResponse]:
+    async def get_all_places(
+        self,
+        attribute: str | None = None,
+    ) -> Sequence[rcodes_response.PlacesResponse]:
         page = 0
-        response = await self.get_places(page)
+        response = await self.get_places(page, attribute)
         responses = [response]
 
         while response.response_result.field_links.next_page:  # type: ignore[union-attr]
@@ -271,7 +280,7 @@ class PlaceClient(base.BenerailBaseClient):
                 ).query,
             ).get("page")[0]
 
-            response = await self.get_places(next_page)
+            response = await self.get_places(next_page, attribute)
             responses.append(response)
 
         return responses

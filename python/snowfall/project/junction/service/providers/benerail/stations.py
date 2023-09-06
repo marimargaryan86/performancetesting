@@ -32,7 +32,7 @@ async def dump_stations(
             http_client=http_client,
         )
 
-        place_responses = await benerail_client.place.get_all_places()
+        place_responses = await benerail_client.place.get_all_places("SEARCHABLE_BS:Y")
         geocoder = geocoding_pb2_grpc.GeocodingServiceStub(
             grpc_client.create_channel(app.settings.geodata_address),
         )
