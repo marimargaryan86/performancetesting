@@ -181,12 +181,14 @@ async def get_flight_status(
         )
     except httpx.HTTPStatusError:
         return ""
-    if "flightStatuses" not in status:
-        return ""
-    return "\nAirport Resources\n" + "\n".join(  # noqa: WPS336
-        "{0}: {1}".format(_key, resource)
-        for _key, resource in status["flightStatuses"][0]["airportResources"].items()
-    )
+    if status.get("flightStatuses"):
+        return "\nAirport Resources\n" + "\n".join(  # noqa: WPS336
+            "{0}: {1}".format(_key, resource)
+            for _key, resource in status["flightStatuses"][0][
+                "airportResources"
+            ].items()
+        )
+    return ""
 
 
 def home_message() -> str:  # noqa: WPS473
