@@ -1,6 +1,5 @@
-import type { priceModel } from "integration/junction-mobile-api/schemas/price";
+import type { PriceModel } from "integration/junction-mobile-api/schemas/price";
 import type { TransactionModel } from "./transaction";
-import type { Infer } from "integration/junction-mobile-api/schema-model.server";
 
 export const conversionStatus = ["executed", "unspecified", "failed"] as const;
 
@@ -16,8 +15,8 @@ export type ConversionModel = {
   id: string;
   createdAt?: Date;
   settledAt?: Date;
-  sellAmount?: Infer<typeof priceModel>;
-  buyAmount: Infer<typeof priceModel>;
+  sellAmount?: PriceModel;
+  buyAmount: PriceModel;
   executedRate: number;
   fxDelta?: number;
   fxStatus: ConversionStatus;

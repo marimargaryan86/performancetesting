@@ -1,15 +1,14 @@
-import { orderModel } from "../schemas/order";
-import type { journeyModel } from "../schemas/journey";
-import type { Infer } from "../schema-model.server";
-import type { bookingModel } from "../schemas/booking";
+import { orderModel, type OrderModel, type OrderSchema } from "../schemas/order";
+import type { JourneyModel } from "../schemas/journey";
+import type { BookingModel } from "../schemas/booking";
 
 export function parseOrderSchema(
-  data: Infer<typeof orderModel, "schema">,
+  data: OrderSchema,
   included: {
-    journeys: Infer<typeof journeyModel>[];
-    bookings: Infer<typeof bookingModel>[];
+    journeys: JourneyModel[];
+    bookings: BookingModel[];
   },
-): Infer<typeof orderModel> {
+): OrderModel {
   const parsed = orderModel.toModel(data);
 
   return {

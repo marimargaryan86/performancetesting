@@ -1,12 +1,11 @@
 <script lang="ts">
   import { formatAmount } from "formatting/currency";
-  import type { Infer } from "integration/junction-mobile-api/schema-model.server";
-  import type { priceModel } from "integration/junction-mobile-api/schemas/price";
-  import type { bookingModel } from "integration/junction-mobile-api/schemas/booking";
+  import type { PriceModel } from "integration/junction-mobile-api/schemas/price";
+  import type { BookingModel } from "integration/junction-mobile-api/schemas/booking";
 
-  export let bookings: Infer<typeof bookingModel>[];
+  export let bookings: BookingModel[];
 
-  $: totalPrice = bookings.reduce<Infer<typeof priceModel>>(
+  $: totalPrice = bookings.reduce<PriceModel>(
     (prev, curr) => ({ currency: curr.price.currency, amount: prev.amount + curr.price.amount }),
     { amount: 0, currency: "EUR" },
   );

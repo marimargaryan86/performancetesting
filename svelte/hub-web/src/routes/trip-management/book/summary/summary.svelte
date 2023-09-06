@@ -12,11 +12,11 @@
   }
 
   export type OrigDestLegs = {
-    originLeg: Infer<typeof offerSegmentLegModel>;
-    destinationLeg: Infer<typeof offerSegmentLegModel>;
+    originLeg: OfferSegmentLegModel;
+    destinationLeg: OfferSegmentLegModel;
   };
 
-  function getOrigDestLegs(group: Infer<typeof offerGroupModel>): OrigDestLegs | undefined {
+  function getOrigDestLegs(group: OfferGroupModel): OrigDestLegs | undefined {
     const segments = [...group.details].sort((a, b) => a.sequences.segment - b.sequences.segment);
     const startSegment = segments[0];
     const endSegment = segments[segments.length - 1];
@@ -35,10 +35,8 @@
     return { originLeg, destinationLeg };
   }
 
-  function getPriceBreakdown(
-    options: Infer<typeof offerOptionModel>[],
-  ): Infer<typeof priceBreakdownModel>[] {
-    const priceBreakdown: Infer<typeof priceBreakdownModel>[] = [];
+  function getPriceBreakdown(options: OfferOptionModel[]): PriceBreakdownModel[] {
+    const priceBreakdown: PriceBreakdownModel[] = [];
 
     options.forEach((option) => {
       option.priceBreakdown?.forEach((item) => {
@@ -55,8 +53,8 @@
     return priceBreakdown;
   }
 
-  function getTotalPrice(options: Infer<typeof offerOptionModel>[]): Infer<typeof priceModel> {
-    return options.reduce<Infer<typeof priceModel>>(
+  function getTotalPrice(options: OfferOptionModel[]): PriceModel {
+    return options.reduce<PriceModel>(
       (prev, curr) => ({
         amount: prev.amount + curr.price.amount,
         currency: curr.price.currency,
@@ -71,21 +69,20 @@
   import { formatAmount, formatPriceBreakdownType } from "formatting/currency";
   import Itinerary from "./itinerary.svelte";
   import type {
-    offerGroupModel,
-    offerModel,
-    offerOptionModel,
-    offerSegmentLegModel,
+    OfferGroupModel,
+    OfferModel,
+    OfferOptionModel,
+    OfferSegmentLegModel,
   } from "integration/junction-mobile-api/schemas/offer";
-  import type { Infer } from "integration/junction-mobile-api/schema-model.server";
   import type {
-    priceBreakdownModel,
-    priceModel,
+    PriceBreakdownModel,
+    PriceModel,
   } from "integration/junction-mobile-api/schemas/price";
   import { ensureDefined } from "utils/array";
 
   export let passengers: PassengerCountData;
-  export let options: Infer<typeof offerOptionModel>[] = [];
-  export let offer: Infer<typeof offerModel> | undefined = undefined;
+  export let options: OfferOptionModel[] = [];
+  export let offer: OfferModel | undefined = undefined;
 
   $: offerGroups = offer?.groups ?? [];
   $: origDestLegsList = offerGroups.map((item) => getOrigDestLegs(item)).filter(ensureDefined);

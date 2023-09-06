@@ -1,11 +1,10 @@
-import { journeyModel } from "../schemas/journey";
-import type { Infer } from "../schema-model.server";
-import type { orderModel } from "../schemas/order";
+import { journeyModel, type JourneyModel, type JourneySchema } from "../schemas/journey";
+import type { OrderModel } from "../schemas/order";
 
 export function parseJourneySchema(
-  data: Infer<typeof journeyModel, "schema">,
-  included: { orders: Infer<typeof orderModel>[] },
-): Infer<typeof journeyModel> {
+  data: JourneySchema,
+  included: { orders: OrderModel[] },
+): JourneyModel {
   const orderIds = data.relationships.orders.data.map((item) => item.id);
 
   return {

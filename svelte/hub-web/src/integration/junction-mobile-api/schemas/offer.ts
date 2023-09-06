@@ -29,6 +29,7 @@ export const offerSegmentLegModel = getSchemaModel(
     }),
   },
 );
+export type OfferSegmentLegModel = Infer<typeof offerSegmentLegModel>;
 
 export const legTypeModel = getSchemaModel(
   z.object({
@@ -40,6 +41,9 @@ export const legTypeModel = getSchemaModel(
   z.object({ id: z.string(), name: z.string() }),
   { toModel: (data) => ({ id: data.id, name: data.attributes.name }) },
 );
+export type LegTypeModel = Infer<typeof legTypeModel>;
+export type LegTypeSchema = Infer<typeof legTypeModel, "schema">;
+export type LegTypeIdentifier = Infer<typeof legTypeModel, "identifier">;
 
 export const routeIdentifierModel = getSchemaModel(
   z.object({ vendor: z.string(), operator: z.string().nullable() }),
@@ -62,6 +66,9 @@ export const cabinClassModel = getSchemaModel(
     toModel: (data) => ({ id: data.id, name: data.attributes.name }),
   },
 );
+export type CabinClassModel = Infer<typeof cabinClassModel>;
+export type CabinClassSchema = Infer<typeof cabinClassModel, "schema">;
+export type CabinClassIdentifier = Infer<typeof cabinClassModel, "identifier">;
 
 export const tripOfferGroupDetailsModel = getSchemaModel(
   z.object({
@@ -104,6 +111,8 @@ export const tripOfferGroupDetailsModel = getSchemaModel(
     }),
   },
 );
+export type TripOfferGroupDetailsModel = Infer<typeof tripOfferGroupDetailsModel>;
+export type TripOfferGroupDetailsSchema = Infer<typeof tripOfferGroupDetailsModel, "schema">;
 
 export const availability = z.enum(["unspecified", "unavailable", "available", "included"]);
 
@@ -144,6 +153,8 @@ export const tripOfferOptionDetailsModel = getSchemaModel(
     }),
   },
 );
+export type TripOfferOptionDetailsModel = Infer<typeof tripOfferOptionDetailsModel>;
+export type TripOfferOptionDetailsSchema = Infer<typeof tripOfferOptionDetailsModel, "schema">;
 
 export const baggageAllowanceModel = getSchemaModel(
   z.object({
@@ -196,6 +207,8 @@ export const offerOptionModel = getSchemaModel(
     }),
   },
 );
+export type OfferOptionModel = Infer<typeof offerOptionModel>;
+export type OfferOptionSchema = Infer<typeof offerOptionModel, "schema">;
 
 export const offerGroupModel = getSchemaModel(
   z.object({
@@ -215,6 +228,8 @@ export const offerGroupModel = getSchemaModel(
   }),
   { toModel: (data) => ({ id: data.id, options: [], details: [] }) },
 );
+export type OfferGroupModel = Infer<typeof offerGroupModel>;
+export type OfferGroupSchema = Infer<typeof offerGroupModel, "schema">;
 
 export const offerModel = getSchemaModel(
   z.object({
@@ -233,6 +248,8 @@ export const offerModel = getSchemaModel(
   }),
   { toModel: (data) => ({ id: data.id, expiresAt: data.attributes.expiresAt, groups: [] }) },
 );
+export type OfferModel = Infer<typeof offerModel>;
+export type OfferSchema = Infer<typeof offerModel, "schema">;
 
 export const tripOfferOptionPenaltyModel = getSchemaModel(
   z.object({
@@ -333,6 +350,8 @@ export const tripOfferPriceQuoteModel = getSchemaModel(
     }),
   },
 );
+export type TripOfferPriceQuoteModel = Infer<typeof tripOfferPriceQuoteModel>;
+export type TripOfferPriceQuoteSchema = Infer<typeof tripOfferPriceQuoteModel, "schema">;
 
 export const createTripOfferPriceQuoteModel = getSchemaModel(
   z.object({
@@ -360,22 +379,27 @@ export const createTripOfferPriceQuoteModel = getSchemaModel(
     }),
   },
 );
+export type CreateTripOfferPriceQuoteModel = Infer<typeof createTripOfferPriceQuoteModel>;
+export type CreateTripOfferPriceQuoteSchema = Infer<
+  typeof createTripOfferPriceQuoteModel,
+  "schema"
+>;
 
 export type TripOfferPriceQuoteIncludes = (
-  | Infer<typeof offerModel, "schema">
-  | Infer<typeof cabinClassModel, "schema">
-  | Infer<typeof tripOfferOptionDetailsModel, "schema">
-  | Infer<typeof offerOptionModel, "schema">
-  | Infer<typeof legTypeModel, "schema">
-  | Infer<typeof tripOfferGroupDetailsModel, "schema">
-  | Infer<typeof offerGroupModel, "schema">
+  | OfferSchema
+  | CabinClassSchema
+  | TripOfferOptionDetailsSchema
+  | OfferOptionSchema
+  | LegTypeSchema
+  | TripOfferGroupDetailsSchema
+  | OfferGroupSchema
 )[];
 
 export type OfferIncludes = (
-  | Infer<typeof offerGroupModel, "schema">
-  | Infer<typeof tripOfferGroupDetailsModel, "schema">
-  | Infer<typeof legTypeModel, "schema">
-  | Infer<typeof offerOptionModel, "schema">
-  | Infer<typeof tripOfferOptionDetailsModel, "schema">
-  | Infer<typeof cabinClassModel, "schema">
+  | OfferGroupSchema
+  | TripOfferGroupDetailsSchema
+  | LegTypeSchema
+  | OfferOptionSchema
+  | TripOfferOptionDetailsSchema
+  | CabinClassSchema
 )[];

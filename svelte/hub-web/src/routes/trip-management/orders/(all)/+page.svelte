@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-  function getDepartureDate(order: Infer<typeof orderModel>): Date {
+  function getDepartureDate(order: OrderModel): Date {
     const departureDate = order.bookings
       .flatMap((booking) =>
         booking.details.flatMap((details) => details.legs.flatMap((leg) => leg.departureAt)),
@@ -13,11 +13,11 @@
     return departureDate;
   }
 
-  function getPassengerNames(order: Infer<typeof orderModel>): string[] {
+  function getPassengerNames(order: OrderModel): string[] {
     return order.passengers.map((passenger) => `${passenger.firstName} ${passenger.lastName}`);
   }
 
-  function getTotalPrice(order: Infer<typeof orderModel>): Infer<typeof priceModel> {
+  function getTotalPrice(order: OrderModel): PriceModel {
     const prices = order.bookings.flatMap((booking) => booking.price);
 
     return prices.reduce((prev, curr) => ({
@@ -36,9 +36,8 @@
   import TRow from "components/ui/table/t-row.svelte";
   import Table from "components/ui/table/table.svelte";
   import { formatAmount } from "formatting/currency";
-  import type { Infer } from "integration/junction-mobile-api/schema-model.server";
-  import type { orderModel } from "integration/junction-mobile-api/schemas/order";
-  import type { priceModel } from "integration/junction-mobile-api/schemas/price";
+  import type { OrderModel } from "integration/junction-mobile-api/schemas/order";
+  import type { PriceModel } from "integration/junction-mobile-api/schemas/price";
 
   export let data;
 </script>

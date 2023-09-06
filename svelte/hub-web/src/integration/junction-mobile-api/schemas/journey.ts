@@ -1,9 +1,9 @@
-import { contactDetailsModel, orderModel } from "./order";
+import { contactDetailsModel, orderModel, type OrderIdentifier, type OrderModel } from "./order";
 import { getSchemaModel, links, relationship, type Infer } from "../schema-model.server";
 import { z } from "zod";
 
 const journeyRelationships: z.ZodType<{
-  orders: { data: Infer<typeof orderModel, "identifier">[] };
+  orders: { data: OrderIdentifier[] };
 }> = relationship({
   orders: z.array(z.lazy(() => orderModel.schema.pick({ id: true, type: true }))),
 });
@@ -14,11 +14,10 @@ const journeyModelBase = z.object({
   contact: z.lazy(() => contactDetailsModel.model),
 });
 
-const journeyModelExt: z.ZodType<
-  z.infer<typeof journeyModelBase> & { orders: Infer<typeof orderModel>[] }
-> = journeyModelBase.extend({
-  orders: z.array(z.lazy(() => orderModel.model)),
-});
+const journeyModelExt: z.ZodType<z.infer<typeof journeyModelBase> & { orders: OrderModel[] }> =
+  journeyModelBase.extend({
+    orders: z.array(z.lazy(() => orderModel.model)),
+  });
 
 export const journeyModel = getSchemaModel(
   z.object({
@@ -55,3 +54,5 @@ export const journeyModel = getSchemaModel(
     },
   },
 );
+export type JourneyModel = Infer<typeof journeyModel>;
+export type JourneySchema = Infer<typeof journeyModel, "schema">;

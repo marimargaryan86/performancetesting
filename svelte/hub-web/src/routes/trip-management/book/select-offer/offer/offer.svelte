@@ -7,8 +7,8 @@
     });
   }
 
-  function getTotalPrice(options: Infer<typeof offerOptionModel>[]): Infer<typeof priceModel> {
-    return options.reduce<Infer<typeof priceModel>>(
+  function getTotalPrice(options: OfferOptionModel[]): PriceModel {
+    return options.reduce<PriceModel>(
       (prev, curr) => (prev.amount < curr.price.amount ? prev : curr.price),
       options[0]?.price ?? { amount: 0, currency: "EUR" },
     );
@@ -23,12 +23,11 @@
   import AlternativeFares from "./alternative-fares.svelte";
   import { createEventDispatcher } from "svelte";
   import { getTimeDeltaS } from "utils/date-time";
-  import type { Infer } from "integration/junction-mobile-api/schema-model.server";
-  import type { offerModel, offerOptionModel } from "integration/junction-mobile-api/schemas/offer";
-  import type { priceModel } from "integration/junction-mobile-api/schemas/price";
+  import type { OfferModel, OfferOptionModel } from "integration/junction-mobile-api/schemas/offer";
+  import type { PriceModel } from "integration/junction-mobile-api/schemas/price";
   import { ensureDefined } from "utils/array";
 
-  export let offer: Infer<typeof offerModel>;
+  export let offer: OfferModel;
   export let selectedOptionIds: string[] | undefined;
   export let selected: boolean;
 
@@ -54,7 +53,7 @@
     dispatch("select", { offerId: offer.id, optionIds: selectedOptions.map((item) => item.id) });
   }
 
-  function selectOption(event: CustomEvent<Infer<typeof offerOptionModel>>): void {
+  function selectOption(event: CustomEvent<OfferOptionModel>): void {
     const nextSelectedOptions = offer.groups
       .map((group) => {
         if (group.options.find((option) => option.id === event.detail.id)) {

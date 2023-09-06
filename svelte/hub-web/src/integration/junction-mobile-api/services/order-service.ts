@@ -1,15 +1,21 @@
 import JunctionMobileApiService from "./junction-mobile-api-service";
-import { createOrderModel, type OrderIncludes, type orderModel } from "../schemas/order";
+import {
+  createOrderModel,
+  type CreateOrderModel,
+  type CreateOrderSchema,
+  type OrderIncludes,
+  type OrderModel,
+  type OrderSchema,
+} from "../schemas/order";
 import { getRandomAlphaNumericString } from "utils/random";
 import { parseOrderSchema } from "../parsers/order";
 import type { PaginatedData } from "models/common";
-import type { Infer } from "../schema-model.server";
 import { parseIncluded } from "../parsers/included";
 
 export class OrderService extends JunctionMobileApiService {
-  async listOrders(cursor?: string, limit = 100): Promise<PaginatedData<Infer<typeof orderModel>>> {
+  async listOrders(cursor?: string, limit = 100): Promise<PaginatedData<OrderModel>> {
     const resp = await this.makeRequest<{
-      data: Infer<typeof orderModel, "schema">[];
+      data: OrderSchema[];
       included?: OrderIncludes;
       links: { next: string };
     }>("/orders", {
@@ -40,15 +46,15 @@ export class OrderService extends JunctionMobileApiService {
     };
   }
 
-  async createOrder(data: Infer<typeof createOrderModel>): Promise<Infer<typeof orderModel>> {
-    const resp = await this.makeRequest<
-      { data: Infer<typeof orderModel, "schema"> },
-      { data: Infer<typeof createOrderModel, "schema"> }
-    >("/orders", {
-      method: "POST",
-      data: { data: createOrderModel.toSchema(data) },
-      headers: { "Session-Token": getRandomAlphaNumericString(32) },
-    });
+  async createOrder(data: CreateOrderModel): Promise<OrderModel> {
+    const resp = await this.makeRequest<{ data: OrderSchema }, { data: CreateOrderSchema }>(
+      "/orders",
+      {
+        method: "POST",
+        data: { data: createOrderModel.toSchema(data) },
+        headers: { "Session-Token": getRandomAlphaNumericString(32) },
+      },
+    );
 
     if (resp.status !== 201) {
       throw new Error("Order creation failed");
@@ -57,9 +63,9 @@ export class OrderService extends JunctionMobileApiService {
     return parseOrderSchema((await resp.json()).data, { bookings: [], journeys: [] });
   }
 
-  async getOrder(id: string): Promise<Infer<typeof orderModel>> {
+  async getOrder(id: string): Promise<OrderModel> {
     const resp = await this.makeRequest<{
-      data: Infer<typeof orderModel, "schema">;
+      data: OrderSchema;
       included?: OrderIncludes;
     }>(`/orders/${id}`, {
       queryParams: {

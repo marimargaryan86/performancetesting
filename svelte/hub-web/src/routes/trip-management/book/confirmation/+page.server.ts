@@ -1,11 +1,10 @@
 import { redirect } from "@sveltejs/kit";
 import { getSearchData, setSearchData } from "../common";
 import integrationInstances from "integration-instances";
-import type { orderModel } from "integration/junction-mobile-api/schemas/order";
-import type { Infer } from "integration/junction-mobile-api/schema-model.server";
+import type { OrderModel } from "integration/junction-mobile-api/schemas/order";
 import routeConfig from "routeConfig";
 
-export function load(event): { order: Promise<Infer<typeof orderModel>> } {
+export function load(event): { order: Promise<OrderModel> } {
   const searchData = getSearchData(event);
 
   if (!searchData?.orderId) {

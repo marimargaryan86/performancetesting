@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { getSchemaModel } from "../schema-model.server";
+import { getSchemaModel, type Infer } from "../schema-model.server";
 import { coordinatesModel } from "./place";
 
 export const pointModel = getSchemaModel(
@@ -27,6 +27,7 @@ export const pointModel = getSchemaModel(
     }),
   },
 );
+export type PointModel = Infer<typeof pointModel>;
 
 export const resourceStatuses = [
   "unspecified",

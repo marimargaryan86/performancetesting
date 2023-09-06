@@ -3,8 +3,7 @@ import { getSearchData, parsePassengers, setSearchData, type ResolvedSearchData 
 import integrationInstances from "integration-instances";
 import type { resourceStatus } from "integration/junction-mobile-api/schemas/common";
 import type { z } from "zod";
-import type { offerModel } from "integration/junction-mobile-api/schemas/offer";
-import type { Infer } from "integration/junction-mobile-api/schema-model.server";
+import type { OfferModel } from "integration/junction-mobile-api/schemas/offer";
 import routeConfig from "routeConfig";
 
 export async function load(event): Promise<{
@@ -65,7 +64,7 @@ export const actions = {
     event,
   ): Promise<
     | { status: Exclude<z.infer<typeof resourceStatus>, "completed"> }
-    | { status: "completed"; offers: Infer<typeof offerModel>[] }
+    | { status: "completed"; offers: OfferModel[] }
   > {
     const searchdata = getSearchData(event);
     const tripCandidatesSearchId = searchdata?.tripCandidatesSearchId;

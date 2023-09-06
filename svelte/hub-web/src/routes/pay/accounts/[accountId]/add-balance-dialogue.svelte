@@ -5,8 +5,7 @@
   import Button from "components/ui/button.svelte";
   import TextField from "components/ui/text-field.svelte";
   import { portal } from "directives/portal";
-  import type { Infer } from "integration/junction-mobile-api/schema-model.server";
-  import type { priceModel } from "integration/junction-mobile-api/schemas/price";
+  import type { PriceModel } from "integration/junction-mobile-api/schemas/price";
   import type { CurrencyModel } from "models/money";
   import routeConfig from "routeConfig";
   import { createEventDispatcher } from "svelte";
@@ -14,7 +13,7 @@
   import { callAction } from "utils/common";
 
   export let accountId: string;
-  export let exclude: Infer<typeof priceModel>[];
+  export let exclude: PriceModel[];
   export let currencies: Map<string, CurrencyModel>;
 
   export function close(): void {
@@ -37,7 +36,7 @@
   let inputRef: TextField<"text">;
   let pending = false;
 
-  const dispatch = createEventDispatcher<{ addbalances: Infer<typeof priceModel>[] }>();
+  const dispatch = createEventDispatcher<{ addbalances: PriceModel[] }>();
 
   $: filteredBalances = Array.from(currencies.values()).filter(
     (balance) =>
@@ -52,7 +51,7 @@
 
     pending = true;
 
-    const result = await callAction<{ balances: Infer<typeof priceModel>[] }>({
+    const result = await callAction<{ balances: PriceModel[] }>({
       action: routeConfig.pay.accounts.actions.addBalances(accountId),
       data: { currencyCodes: value.map((item) => item.code) },
       dataType: "json",

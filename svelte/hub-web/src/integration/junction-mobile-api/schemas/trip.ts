@@ -1,6 +1,6 @@
 import { coordinatesModel } from "./place";
 import { resourceStatus } from "./common";
-import { getSchemaModel, links, relationship } from "../schema-model.server";
+import { getSchemaModel, links, relationship, type Infer } from "../schema-model.server";
 import { z } from "zod";
 
 export const tripCandidatesSearchModel = getSchemaModel(
@@ -63,6 +63,8 @@ export const tripCandidatesSearchModel = getSchemaModel(
     }),
   },
 );
+export type TripCandidatesSearchModel = Infer<typeof tripCandidatesSearchModel>;
+export type TripCandidatesSearchSchema = Infer<typeof tripCandidatesSearchModel, "schema">;
 
 export const createTripCandidatesSearchModel = getSchemaModel(
   tripCandidatesSearchModel.schema.omit({ links: true, id: true }).extend({
@@ -114,3 +116,8 @@ export const createTripCandidatesSearchModel = getSchemaModel(
     }),
   },
 );
+export type CreateTripCandidatesSearchModel = Infer<typeof createTripCandidatesSearchModel>;
+export type CreateTripCandidatesSearchSchema = Infer<
+  typeof createTripCandidatesSearchModel,
+  "schema"
+>;

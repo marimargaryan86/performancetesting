@@ -1,17 +1,23 @@
-import { tripCandidatesSearchModel, createTripCandidatesSearchModel } from "../schemas/trip";
+import {
+  tripCandidatesSearchModel,
+  createTripCandidatesSearchModel,
+  type TripCandidatesSearchModel,
+  type TripCandidatesSearchSchema,
+  type CreateTripCandidatesSearchModel,
+  type CreateTripCandidatesSearchSchema,
+} from "../schemas/trip";
 import JunctionMobileApiService from "./junction-mobile-api-service";
-import type { Infer } from "../schema-model.server";
-import type { OfferIncludes, offerModel } from "../schemas/offer";
+import type { OfferIncludes, OfferModel, OfferSchema } from "../schemas/offer";
 import { parseOfferSchema } from "../parsers/offer";
 import { parseIncluded } from "../parsers/included";
 
 export class TripService extends JunctionMobileApiService {
   async createTripCandidatesSearch(
-    data: Infer<typeof createTripCandidatesSearchModel>,
-  ): Promise<Infer<typeof tripCandidatesSearchModel>> {
+    data: CreateTripCandidatesSearchModel,
+  ): Promise<TripCandidatesSearchModel> {
     const resp = await this.makeRequest<
-      { data: Infer<typeof tripCandidatesSearchModel, "schema"> },
-      { data: Infer<typeof createTripCandidatesSearchModel, "schema"> }
+      { data: TripCandidatesSearchSchema },
+      { data: CreateTripCandidatesSearchSchema }
     >("/trip-candidates/searches", {
       method: "POST",
       data: { data: createTripCandidatesSearchModel.toSchema(data) },
@@ -20,9 +26,9 @@ export class TripService extends JunctionMobileApiService {
     return tripCandidatesSearchModel.toModel((await resp.json()).data);
   }
 
-  async getTripCandidatesSearch(id: string): Promise<Infer<typeof tripCandidatesSearchModel>> {
+  async getTripCandidatesSearch(id: string): Promise<TripCandidatesSearchModel> {
     const resp = await this.makeRequest<{
-      data: Infer<typeof tripCandidatesSearchModel, "schema">;
+      data: TripCandidatesSearchSchema;
     }>(`/trip-candidates/searches/${id}`);
 
     if (resp.status === 404) {
@@ -32,9 +38,9 @@ export class TripService extends JunctionMobileApiService {
     return tripCandidatesSearchModel.toModel((await resp.json()).data);
   }
 
-  async getTripCandidatesOffers(id: string): Promise<Infer<typeof offerModel>[]> {
+  async getTripCandidatesOffers(id: string): Promise<OfferModel[]> {
     const resp = await this.makeRequest<{
-      data: Infer<typeof offerModel, "schema">[];
+      data: OfferSchema[];
       included?: OfferIncludes;
     }>(`/trip-candidates/searches/${id}/offers`, {
       queryParams: {

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { getSchemaModel } from "../schema-model.server";
+import { getSchemaModel, type Infer } from "../schema-model.server";
 
 export const priceModel = getSchemaModel(
   z.object({
@@ -21,6 +21,8 @@ export const priceModel = getSchemaModel(
     }),
   },
 );
+export type PriceModel = Infer<typeof priceModel>;
+export type PriceSchema = Infer<typeof priceModel, "schema">;
 
 export const priceBreakdownType = z.enum([
   "base-fare",
@@ -50,3 +52,4 @@ export const priceBreakdownModel = getSchemaModel(
     }),
   },
 );
+export type PriceBreakdownModel = Infer<typeof priceBreakdownModel>;

@@ -1,17 +1,16 @@
-import type { Infer } from "integration/junction-mobile-api/schema-model.server";
-import type { priceBreakdownType, priceModel } from "integration/junction-mobile-api/schemas/price";
+import type { PriceModel, priceBreakdownType } from "integration/junction-mobile-api/schemas/price";
 import type { CurrencyModel } from "models/money";
 import type { z } from "zod";
 
 export function formatAmountAndCode(
-  amount: Infer<typeof priceModel>,
+  amount: PriceModel,
   currencies: Map<string, CurrencyModel> = new Map(),
 ): string {
   return `${formatAmount(amount, currencies)} ${amount.currency.toUpperCase()}`;
 }
 
 export function formatAmount(
-  money: Infer<typeof priceModel>,
+  money: PriceModel,
   currencies: Map<string, CurrencyModel> = new Map(),
   sign = false,
 ): string {

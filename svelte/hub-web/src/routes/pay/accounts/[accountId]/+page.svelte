@@ -5,8 +5,7 @@
   import { formatAmount } from "formatting/currency";
   import AddBalanceDialogue from "./add-balance-dialogue.svelte";
   import Button from "components/ui/button.svelte";
-  import type { priceModel } from "integration/junction-mobile-api/schemas/price";
-  import type { Infer } from "integration/junction-mobile-api/schema-model.server";
+  import type { PriceModel } from "integration/junction-mobile-api/schemas/price";
   import StandardLayout from "components/page/standard-layout.svelte";
   import routeConfig from "routeConfig";
 
@@ -27,7 +26,7 @@
     dialogue.open();
   }
 
-  function addBalances(event: CustomEvent<Infer<typeof priceModel>[]>): void {
+  function addBalances(event: CustomEvent<PriceModel[]>): void {
     data.balances = [...event.detail, ...data.balances];
   }
 </script>

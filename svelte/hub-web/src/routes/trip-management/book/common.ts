@@ -3,10 +3,9 @@ import jwt from "jsonwebtoken";
 import { getRandomAlphaNumericString } from "utils/random";
 import { URLExtended } from "utils/url";
 import { tripSearchQueryData } from "./trip-search/trip-search.svelte";
-import type { Infer } from "integration/junction-mobile-api/schema-model.server";
-import type { tripCandidatesSearchModel } from "integration/junction-mobile-api/schemas/trip";
-import type { paymentIntentModel } from "integration/junction-mobile-api/schemas/payment";
-import type { placeModel } from "integration/junction-mobile-api/schemas/place";
+import type { TripCandidatesSearchModel } from "integration/junction-mobile-api/schemas/trip";
+import type { PaymentIntentModel } from "integration/junction-mobile-api/schemas/payment";
+import type { PlaceModel } from "integration/junction-mobile-api/schemas/place";
 
 export const SEARCH_TOKEN = "search-token";
 export const JWT_SIGNATURE = "search-token";
@@ -27,18 +26,18 @@ export type SearchData = {
   offerId?: string;
   optionIds?: string[];
   priceQuoteId?: string;
-  paymentIntent?: Infer<typeof paymentIntentModel>;
+  paymentIntent?: PaymentIntentModel;
   orderId?: string;
 };
 
 export type ResolvedSearchData = {
   sessionToken: string;
-  origin: Infer<typeof placeModel>;
-  destination: Infer<typeof placeModel>;
+  origin: PlaceModel;
+  destination: PlaceModel;
   departureAfter: Date;
   passengers: PassengerCountData;
-  tripCandidatesSearch?: Infer<typeof tripCandidatesSearchModel>;
-  paymentIntent?: Infer<typeof paymentIntentModel>;
+  tripCandidatesSearch?: TripCandidatesSearchModel;
+  paymentIntent?: PaymentIntentModel;
 };
 
 function getTokenSearchData(event: RequestEvent): SearchData | undefined {
@@ -124,7 +123,7 @@ export function setSearchData(data: SearchData | undefined, event: RequestEvent)
   });
 }
 
-type Passenger = Infer<typeof tripCandidatesSearchModel>["passengers"][number];
+type Passenger = TripCandidatesSearchModel["passengers"][number];
 
 export function parsePassengers(passengers: PassengerCountData): Passenger[] {
   const adult = new Date();

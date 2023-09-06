@@ -1,20 +1,20 @@
 import { parsePriceQuoteSchema } from "../parsers/offer";
 import {
   createTripOfferPriceQuoteModel,
-  tripOfferPriceQuoteModel,
+  type CreateTripOfferPriceQuoteModel,
+  type CreateTripOfferPriceQuoteSchema,
   type TripOfferPriceQuoteIncludes,
+  type TripOfferPriceQuoteModel,
+  type TripOfferPriceQuoteSchema,
 } from "../schemas/offer";
 import JunctionMobileApiService from "./junction-mobile-api-service";
-import type { Infer } from "../schema-model.server";
 import { parseIncluded } from "../parsers/included";
 
 export class OfferService extends JunctionMobileApiService {
-  async createPriceQuote(
-    data: Infer<typeof createTripOfferPriceQuoteModel>,
-  ): Promise<Infer<typeof tripOfferPriceQuoteModel>> {
+  async createPriceQuote(data: CreateTripOfferPriceQuoteModel): Promise<TripOfferPriceQuoteModel> {
     const resp = await this.makeRequest<
-      { data: Infer<typeof tripOfferPriceQuoteModel, "schema"> },
-      { data: Infer<typeof createTripOfferPriceQuoteModel, "schema"> }
+      { data: TripOfferPriceQuoteSchema },
+      { data: CreateTripOfferPriceQuoteSchema }
     >("/offers/quotes", {
       method: "POST",
       data: {
@@ -28,9 +28,9 @@ export class OfferService extends JunctionMobileApiService {
     return parsePriceQuoteSchema(respData.data, { offers: [] });
   }
 
-  async getPriceQuote(id: string): Promise<Infer<typeof tripOfferPriceQuoteModel>> {
+  async getPriceQuote(id: string): Promise<TripOfferPriceQuoteModel> {
     const resp = await this.makeRequest<{
-      data: Infer<typeof tripOfferPriceQuoteModel, "schema">;
+      data: TripOfferPriceQuoteSchema;
       included?: TripOfferPriceQuoteIncludes;
     }>(`/offers/quotes/${id}`, {
       queryParams: {

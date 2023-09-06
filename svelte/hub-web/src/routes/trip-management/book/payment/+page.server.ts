@@ -1,25 +1,24 @@
 import { ActionFailure, error, fail, redirect } from "@sveltejs/kit";
-import type { Infer } from "integration/junction-mobile-api/schema-model.server";
-import type { tripOfferPriceQuoteModel } from "integration/junction-mobile-api/schemas/offer";
-import type { paymentIntentModel } from "integration/junction-mobile-api/schemas/payment";
+import type { TripOfferPriceQuoteModel } from "integration/junction-mobile-api/schemas/offer";
+import type { PaymentIntentModel } from "integration/junction-mobile-api/schemas/payment";
 import integrationInstances from "integration-instances";
 import { getSearchData, setSearchData, type ResolvedSearchData, type SearchData } from "../common";
 import routeConfig from "routeConfig";
 
 export type ActionPollReturnType = {
-  priceQuote: Infer<typeof tripOfferPriceQuoteModel>;
-  paymentIntent?: Infer<typeof paymentIntentModel>;
+  priceQuote: TripOfferPriceQuoteModel;
+  paymentIntent?: PaymentIntentModel;
 };
 
 async function getPriceQuoteAndPaymentIntent(searchData: SearchData): Promise<{
-  priceQuote: Infer<typeof tripOfferPriceQuoteModel>;
-  paymentIntent?: Infer<typeof paymentIntentModel>;
+  priceQuote: TripOfferPriceQuoteModel;
+  paymentIntent?: PaymentIntentModel;
 }> {
   if (!searchData.priceQuoteId) {
     throw error(400, { message: "No quote ID found" });
   }
 
-  let priceQuote: Infer<typeof tripOfferPriceQuoteModel> | undefined;
+  let priceQuote: TripOfferPriceQuoteModel | undefined;
 
   try {
     priceQuote = await integrationInstances.junctionMobileApi.offers.getPriceQuote(
@@ -50,7 +49,7 @@ async function getPriceQuoteAndPaymentIntent(searchData: SearchData): Promise<{
 
 export async function load(event): Promise<{
   searchData: ResolvedSearchData;
-  priceQuote: Infer<typeof tripOfferPriceQuoteModel>;
+  priceQuote: TripOfferPriceQuoteModel;
 }> {
   const searchData = getSearchData(event);
 

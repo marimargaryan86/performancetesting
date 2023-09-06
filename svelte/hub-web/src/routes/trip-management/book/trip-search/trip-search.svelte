@@ -20,13 +20,13 @@
   type TripSearchDataInternal = z.infer<typeof tripSearchData>;
 
   export type TripSearchData = Omit<TripSearchDataInternal, "originId" | "destinationId"> & {
-    origin: Infer<typeof placeModel>;
-    destination: Infer<typeof placeModel>;
+    origin: PlaceModel;
+    destination: PlaceModel;
   };
 
   export type PartialTripSearchData = PartiallyPartial<TripSearchData, "passengers">;
 
-  export function formatPlace(place?: Infer<typeof placeModel>): string {
+  export function formatPlace(place?: PlaceModel): string {
     if (!place) {
       return "";
     }
@@ -52,8 +52,7 @@
   import { z } from "zod";
   import { URLExtended } from "utils/url";
   import SearchIcon from "components/icons/search-icon.svelte";
-  import type { Infer } from "integration/junction-mobile-api/schema-model.server";
-  import type { placeModel } from "integration/junction-mobile-api/schemas/place";
+  import type { PlaceModel } from "integration/junction-mobile-api/schemas/place";
 
   export let data: PartialTripSearchData = {
     passengers: {
@@ -67,12 +66,12 @@
 
   const dispatch = createEventDispatcher<{ search: URL }>();
 
-  async function listPlaces(query: string): Promise<Infer<typeof placeModel>[]> {
+  async function listPlaces(query: string): Promise<PlaceModel[]> {
     if (!browser) {
       return [];
     }
 
-    const result = await callAction<{ places: Infer<typeof placeModel>[] }>({
+    const result = await callAction<{ places: PlaceModel[] }>({
       action: routeConfig.tripManagement.book.actions.listPlaces,
       data: { query },
       apply: false,

@@ -1,9 +1,9 @@
-import { cabinClassModel, legTypeModel, tripOfferPriceQuoteModel } from "./offer";
+import { tripOfferPriceQuoteModel, type LegTypeSchema, type CabinClassSchema } from "./offer";
 import { getSchemaModel, relationship, type Infer, links } from "../schema-model.server";
 import { z } from "zod";
 import { paymentIntentModel } from "./payment";
-import { journeyModel } from "./journey";
-import { bookingModel, type bookingDetailsModel } from "./booking";
+import { journeyModel, type JourneySchema } from "./journey";
+import { bookingModel, type BookingDetailsSchema, type BookingSchema } from "./booking";
 
 export const passengerTitle = z.enum(["unspecified", "mr", "mrs", "ms", "miss"]);
 export const passengerGender = z.enum(["unspecified", "male", "female"]);
@@ -142,6 +142,9 @@ export const orderModel = getSchemaModel(
     }),
   },
 );
+export type OrderModel = Infer<typeof orderModel>;
+export type OrderSchema = Infer<typeof orderModel, "schema">;
+export type OrderIdentifier = Infer<typeof orderModel, "identifier">;
 
 export const createOrderModel = getSchemaModel(
   z.object({
@@ -185,11 +188,13 @@ export const createOrderModel = getSchemaModel(
     }),
   },
 );
+export type CreateOrderModel = Infer<typeof createOrderModel>;
+export type CreateOrderSchema = Infer<typeof createOrderModel, "schema">;
 
 export type OrderIncludes = (
-  | Infer<typeof journeyModel, "schema">
-  | Infer<typeof bookingModel, "schema">
-  | Infer<typeof bookingDetailsModel, "schema">
-  | Infer<typeof cabinClassModel, "schema">
-  | Infer<typeof legTypeModel, "schema">
+  | JourneySchema
+  | BookingSchema
+  | BookingDetailsSchema
+  | CabinClassSchema
+  | LegTypeSchema
 )[];

@@ -1,4 +1,4 @@
-import { getSchemaModel, relationship } from "../schema-model.server";
+import { getSchemaModel, relationship, type Infer } from "../schema-model.server";
 import { z } from "zod";
 
 export const coordinatesModel = getSchemaModel(
@@ -55,3 +55,5 @@ export const placeModel = getSchemaModel(
     }),
   },
 );
+export type PlaceModel = Infer<typeof placeModel>;
+export type PlaceSchema = Infer<typeof placeModel, "schema">;

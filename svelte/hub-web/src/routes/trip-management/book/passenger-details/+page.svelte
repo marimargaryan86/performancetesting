@@ -38,13 +38,11 @@
   import { goto } from "$app/navigation";
   import type { PassengerCountData, ResolvedSearchData } from "../common";
   import { URLExtended } from "utils/url";
-  import type { Infer } from "integration/junction-mobile-api/schema-model.server";
-  import type { tripOfferPriceQuoteModel } from "integration/junction-mobile-api/schemas/offer";
+  import type { TripOfferPriceQuoteModel } from "integration/junction-mobile-api/schemas/offer";
 
   export let data;
 
-  let getPriceQuoteTask: MaybePromise<Infer<typeof tripOfferPriceQuoteModel> | undefined> =
-    data.priceQuote;
+  let getPriceQuoteTask: MaybePromise<TripOfferPriceQuoteModel | undefined> = data.priceQuote;
   let priceQuoteId: string | undefined = data.priceQuote.id;
   let bookingDetails: {
     passengers: PartialPassengerData[];
@@ -77,9 +75,7 @@
     });
   }
 
-  async function pollPriceQuote(
-    id: string,
-  ): Promise<Infer<typeof tripOfferPriceQuoteModel> | undefined> {
+  async function pollPriceQuote(id: string): Promise<TripOfferPriceQuoteModel | undefined> {
     if (priceQuoteId !== id) {
       return undefined;
     }
@@ -88,7 +84,7 @@
       return data.priceQuote;
     }
 
-    const result = await callAction<{ priceQuote: Infer<typeof tripOfferPriceQuoteModel> }>({
+    const result = await callAction<{ priceQuote: TripOfferPriceQuoteModel }>({
       action: routeConfig.tripManagement.book.payment.actions.poll,
       apply: false,
     });

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { getSchemaModel } from "../schema-model.server";
+import { getSchemaModel, type Infer } from "../schema-model.server";
 import { priceModel } from "./price";
 
 export const paymentIntentModel = getSchemaModel(
@@ -22,6 +22,8 @@ export const paymentIntentModel = getSchemaModel(
     toModel: (data) => ({ ...data, ...data.attributes }),
   },
 );
+export type PaymentIntentModel = Infer<typeof paymentIntentModel>;
+export type PaymentIntentSchema = Infer<typeof paymentIntentModel, "schema">;
 
 export const createPaymentIntentModel = getSchemaModel(
   z.object({
@@ -36,3 +38,4 @@ export const createPaymentIntentModel = getSchemaModel(
     }),
   },
 );
+export type CreatePaymentIntentSchema = Infer<typeof createPaymentIntentModel, "schema">;

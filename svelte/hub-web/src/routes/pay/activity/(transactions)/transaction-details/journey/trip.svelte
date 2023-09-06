@@ -2,11 +2,10 @@
   import FlightIcon from "components/icons/flight-icon.svelte";
   import EntityAvatar from "components/ui/entity-avatar.svelte";
   import { formatDuration } from "formatting/date-time";
-  import type { Infer } from "integration/junction-mobile-api/schema-model.server";
-  import type { offerSegmentLegModel } from "integration/junction-mobile-api/schemas/offer";
+  import type { OfferSegmentLegModel } from "integration/junction-mobile-api/schemas/offer";
   import { getTimeDeltaS } from "utils/date-time";
 
-  export let leg: Infer<typeof offerSegmentLegModel>;
+  export let leg: OfferSegmentLegModel;
   export let operator: string | undefined;
   export let cabinClass: string | undefined;
   export let direction: string;

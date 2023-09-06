@@ -2,10 +2,9 @@
   import type { CurrencyModel } from "models/money";
   import TCol from "./t-col.svelte";
   import { formatAmount } from "formatting/currency";
-  import type { priceModel } from "integration/junction-mobile-api/schemas/price";
-  import type { Infer } from "integration/junction-mobile-api/schema-model.server";
+  import type { PriceModel } from "integration/junction-mobile-api/schemas/price";
 
-  export let money: Infer<typeof priceModel>;
+  export let money: PriceModel;
   export let currencies: Map<string, CurrencyModel> | undefined = undefined;
 </script>
 

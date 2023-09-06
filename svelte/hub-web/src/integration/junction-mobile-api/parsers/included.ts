@@ -1,16 +1,29 @@
-import type { Infer } from "../schema-model.server";
-import type { bookingDetailsModel, bookingModel } from "../schemas/booking";
-import type { journeyModel } from "../schemas/journey";
+import type {
+  BookingDetailsModel,
+  BookingDetailsSchema,
+  BookingModel,
+  BookingSchema,
+} from "../schemas/booking";
+import type { JourneyModel, JourneySchema } from "../schemas/journey";
 import {
   legTypeModel,
   type OfferIncludes,
   type TripOfferPriceQuoteIncludes,
   cabinClassModel,
-  type offerGroupModel,
-  type offerOptionModel,
-  type tripOfferGroupDetailsModel,
-  type tripOfferOptionDetailsModel,
-  offerModel,
+  type LegTypeModel,
+  type LegTypeSchema,
+  type CabinClassModel,
+  type CabinClassSchema,
+  type TripOfferGroupDetailsModel,
+  type TripOfferGroupDetailsSchema,
+  type TripOfferOptionDetailsModel,
+  type TripOfferOptionDetailsSchema,
+  type OfferOptionModel,
+  type OfferOptionSchema,
+  type OfferGroupModel,
+  type OfferGroupSchema,
+  type OfferModel,
+  type OfferSchema,
 } from "../schemas/offer";
 import type { OrderIncludes } from "../schemas/order";
 import { parseBookingDetailsSchema, parseBookingSchema } from "./booking";
@@ -27,27 +40,27 @@ import {
 export function parseIncluded(
   data?: (OrderIncludes[number] | TripOfferPriceQuoteIncludes[number] | OfferIncludes[number])[],
 ): {
-  legTypes: Infer<typeof legTypeModel>[];
-  offerGroupDetails: Infer<typeof tripOfferGroupDetailsModel>[];
-  cabinClasses: Infer<typeof cabinClassModel>[];
-  offerOptionDetails: Infer<typeof tripOfferOptionDetailsModel>[];
-  offerOptions: Infer<typeof offerOptionModel>[];
-  offerGroups: Infer<typeof offerGroupModel>[];
-  offers: Infer<typeof offerModel>[];
-  journeys: Infer<typeof journeyModel>[];
-  bookingDetails: Infer<typeof bookingDetailsModel>[];
-  bookings: Infer<typeof bookingModel>[];
+  legTypes: LegTypeModel[];
+  offerGroupDetails: TripOfferGroupDetailsModel[];
+  cabinClasses: CabinClassModel[];
+  offerOptionDetails: TripOfferOptionDetailsModel[];
+  offerOptions: OfferOptionModel[];
+  offerGroups: OfferGroupModel[];
+  offers: OfferModel[];
+  journeys: JourneyModel[];
+  bookingDetails: BookingDetailsModel[];
+  bookings: BookingModel[];
 } {
-  const legTypes_: Infer<typeof legTypeModel, "schema">[] = [];
-  const offerGroupDetails_: Infer<typeof tripOfferGroupDetailsModel, "schema">[] = [];
-  const cabinClasses_: Infer<typeof cabinClassModel, "schema">[] = [];
-  const offerOptionDetails_: Infer<typeof tripOfferOptionDetailsModel, "schema">[] = [];
-  const offerOptions_: Infer<typeof offerOptionModel, "schema">[] = [];
-  const offerGroups_: Infer<typeof offerGroupModel, "schema">[] = [];
-  const offers_: Infer<typeof offerModel, "schema">[] = [];
-  const journeys_: Infer<typeof journeyModel, "schema">[] = [];
-  const bookingDetails_: Infer<typeof bookingDetailsModel, "schema">[] = [];
-  const bookings_: Infer<typeof bookingModel, "schema">[] = [];
+  const legTypes_: LegTypeSchema[] = [];
+  const offerGroupDetails_: TripOfferGroupDetailsSchema[] = [];
+  const cabinClasses_: CabinClassSchema[] = [];
+  const offerOptionDetails_: TripOfferOptionDetailsSchema[] = [];
+  const offerOptions_: OfferOptionSchema[] = [];
+  const offerGroups_: OfferGroupSchema[] = [];
+  const offers_: OfferSchema[] = [];
+  const journeys_: JourneySchema[] = [];
+  const bookingDetails_: BookingDetailsSchema[] = [];
+  const bookings_: BookingSchema[] = [];
 
   // eslint-disable-next-line complexity
   data?.forEach((item) => {

@@ -1,20 +1,31 @@
 import {
   offerModel,
   offerGroupModel,
-  legTypeModel,
-  cabinClassModel,
   tripOfferOptionDetailsModel,
   offerOptionModel,
   tripOfferGroupDetailsModel,
   tripOfferPriceQuoteModel,
+  type LegTypeModel,
+  type CabinClassModel,
+  type TripOfferGroupDetailsSchema,
+  type TripOfferGroupDetailsModel,
+  type TripOfferOptionDetailsSchema,
+  type TripOfferOptionDetailsModel,
+  type OfferOptionSchema,
+  type OfferOptionModel,
+  type OfferGroupSchema,
+  type OfferGroupModel,
+  type OfferSchema,
+  type OfferModel,
+  type TripOfferPriceQuoteSchema,
+  type TripOfferPriceQuoteModel,
 } from "../schemas/offer";
-import type { Infer } from "../schema-model.server";
 import { ensureDefined } from "utils/array";
 
 export function parseOfferGroupDetailsSchema(
-  data: Infer<typeof tripOfferGroupDetailsModel, "schema">,
-  included: { legTypes: Infer<typeof legTypeModel>[] },
-): Infer<typeof tripOfferGroupDetailsModel> {
+  data: TripOfferGroupDetailsSchema,
+  included: { legTypes: LegTypeModel[] },
+): TripOfferGroupDetailsModel {
   return {
     ...tripOfferGroupDetailsModel.toModel(data),
     legType: included.legTypes.find((item) => item.id === data.relationships.legType.data.id),
@@ -22,9 +33,9 @@ export function parseOfferGroupDetailsSchema(
 }
 
 export function parseOfferOptionDetailsSchema(
-  data: Infer<typeof tripOfferOptionDetailsModel, "schema">,
-  included: { cabinClasses: Infer<typeof cabinClassModel>[] },
-): Infer<typeof tripOfferOptionDetailsModel> {
+  data: TripOfferOptionDetailsSchema,
+  included: { cabinClasses: CabinClassModel[] },
+): TripOfferOptionDetailsModel {
   return {
     ...tripOfferOptionDetailsModel.toModel(data),
     cabinClass: included.cabinClasses.find(
@@ -34,9 +45,9 @@ export function parseOfferOptionDetailsSchema(
 }
 
 export function parseOfferOptionSchema(
-  data: Infer<typeof offerOptionModel, "schema">,
-  included: { offerOptionDetails: Infer<typeof tripOfferOptionDetailsModel>[] },
-): Infer<typeof offerOptionModel> {
+  data: OfferOptionSchema,
+  included: { offerOptionDetails: TripOfferOptionDetailsModel[] },
+): OfferOptionModel {
   return {
     ...offerOptionModel.toModel(data),
     details: data.relationships.details.data
@@ -46,12 +57,12 @@ export function parseOfferOptionSchema(
 }
 
 export function parseOfferGroupSchema(
-  data: Infer<typeof offerGroupModel, "schema">,
+  data: OfferGroupSchema,
   included: {
-    offerOptions: Infer<typeof offerOptionModel>[];
-    offerGroupDetails: Infer<typeof tripOfferGroupDetailsModel>[];
+    offerOptions: OfferOptionModel[];
+    offerGroupDetails: TripOfferGroupDetailsModel[];
   },
-): Infer<typeof offerGroupModel> {
+): OfferGroupModel {
   return {
     ...offerGroupModel.toModel(data),
     options: data.relationships.options.data
@@ -64,9 +75,9 @@ export function parseOfferGroupSchema(
 }
 
 export function parseOfferSchema(
-  data: Infer<typeof offerModel, "schema">,
-  included: { offerGroups: Infer<typeof offerGroupModel>[] },
-): Infer<typeof offerModel> {
+  data: OfferSchema,
+  included: { offerGroups: OfferGroupModel[] },
+): OfferModel {
   return {
     ...offerModel.toModel(data),
     groups: data.relationships.groups.data
@@ -76,9 +87,9 @@ export function parseOfferSchema(
 }
 
 export function parsePriceQuoteSchema(
-  data: Infer<typeof tripOfferPriceQuoteModel, "schema">,
-  included: { offers: Infer<typeof offerModel>[] },
-): Infer<typeof tripOfferPriceQuoteModel> {
+  data: TripOfferPriceQuoteSchema,
+  included: { offers: OfferModel[] },
+): TripOfferPriceQuoteModel {
   const parsed = tripOfferPriceQuoteModel.toModel(data);
   const offer = included.offers.find((item) => item.id === data.relationships.offer.data.id);
   const options = Array.from(

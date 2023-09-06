@@ -15,13 +15,12 @@
   import type { ResolvedSearchData } from "../common";
   import type { resourceStatus } from "integration/junction-mobile-api/schemas/common";
   import type { z } from "zod";
-  import type { offerModel } from "integration/junction-mobile-api/schemas/offer";
-  import type { Infer } from "integration/junction-mobile-api/schema-model.server";
+  import type { OfferModel } from "integration/junction-mobile-api/schemas/offer";
 
   export let data;
 
   let countdown: Countdown | undefined;
-  let getOffersTask: MaybePromise<Infer<typeof offerModel>[]> = [];
+  let getOffersTask: MaybePromise<OfferModel[]> = [];
   let searchData = getSearchData(data.searchData);
   let searchOptions: SearchOptionsData = {
     sortBy: "price",
@@ -54,14 +53,14 @@
     };
   }
 
-  async function pollOffers(id: string): Promise<Infer<typeof offerModel>[]> {
+  async function pollOffers(id: string): Promise<OfferModel[]> {
     if (tripCandidatesSearchId !== id) {
       return [];
     }
 
     const result = await callAction<{
       status: z.infer<typeof resourceStatus>;
-      offers: Infer<typeof offerModel>[];
+      offers: OfferModel[];
     }>({
       action: routeConfig.tripManagement.book.select.actions.poll,
       data: { tripCandidatesSearchId: id },
