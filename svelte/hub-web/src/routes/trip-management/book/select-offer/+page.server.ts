@@ -1,10 +1,11 @@
-import { error } from "@sveltejs/kit";
+import { redirect } from "@sveltejs/kit";
 import { getSearchData, parsePassengers, setSearchData, type ResolvedSearchData } from "../common";
 import integrationInstances from "integration-instances";
 import type { resourceStatus } from "integration/junction-mobile-api/schemas/common";
 import type { z } from "zod";
 import type { offerModel } from "integration/junction-mobile-api/schemas/offer";
 import type { Infer } from "integration/junction-mobile-api/schema-model.server";
+import routeConfig from "routeConfig";
 
 export async function load(event): Promise<{
   searchData: ResolvedSearchData;
@@ -13,7 +14,9 @@ export async function load(event): Promise<{
   const searchData = getSearchData(event, "query");
 
   if (!searchData) {
-    throw error(400, "Invalid search data");
+    setSearchData(undefined, event);
+
+    throw redirect(303, routeConfig.tripManagement.book.root);
   }
 
   const [origin, destination] = await Promise.all([

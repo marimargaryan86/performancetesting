@@ -110,7 +110,13 @@ export function getSearchData(
   return searchDataEqual(tokenSearchData, querySearchData) ? tokenSearchData : querySearchData;
 }
 
-export function setSearchData(data: SearchData, event: RequestEvent): void {
+export function setSearchData(data: SearchData | undefined, event: RequestEvent): void {
+  if (data === undefined) {
+    event.cookies.delete(SEARCH_TOKEN, { path: "/", sameSite: "strict", httpOnly: true });
+
+    return;
+  }
+
   event.cookies.set(SEARCH_TOKEN, jwt.sign(data, JWT_SIGNATURE), {
     path: "/",
     sameSite: "strict",

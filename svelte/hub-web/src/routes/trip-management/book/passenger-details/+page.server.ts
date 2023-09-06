@@ -1,4 +1,4 @@
-import { ActionFailure, error, fail } from "@sveltejs/kit";
+import { ActionFailure, fail, redirect } from "@sveltejs/kit";
 import integrationInstances from "integration-instances";
 import { getSearchData, setSearchData, type ResolvedSearchData } from "../common";
 import type { ContactInformationData } from "./contact-information.svelte";
@@ -8,6 +8,7 @@ import type { Infer } from "integration/junction-mobile-api/schema-model.server"
 import type { createOrderModel, orderModel } from "integration/junction-mobile-api/schemas/order";
 import type { priceModel } from "integration/junction-mobile-api/schemas/price";
 import { ensureDefined } from "utils/array";
+import routeConfig from "routeConfig";
 
 type BookingData = {
   priceQuoteId: string;
@@ -77,7 +78,9 @@ export async function load(event): Promise<{
   const searchData = getSearchData(event);
 
   if (!searchData?.priceQuoteId) {
-    throw error(400, { message: "No quote ID found" });
+    setSearchData(undefined, event);
+
+    throw redirect(303, routeConfig.tripManagement.book.root);
   }
 
   try {
@@ -98,7 +101,7 @@ export async function load(event): Promise<{
       priceQuote,
     };
   } catch {
-    throw error(404, { message: "Quote not found" });
+    throw redirect(303, routeConfig.tripManagement.book.root);
   }
 }
 

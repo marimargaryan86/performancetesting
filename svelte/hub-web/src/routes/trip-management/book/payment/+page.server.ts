@@ -1,9 +1,10 @@
-import { ActionFailure, error, fail } from "@sveltejs/kit";
-import integrationInstances from "integration-instances";
-import { getSearchData, setSearchData, type ResolvedSearchData, type SearchData } from "../common";
+import { ActionFailure, error, fail, redirect } from "@sveltejs/kit";
 import type { Infer } from "integration/junction-mobile-api/schema-model.server";
 import type { tripOfferPriceQuoteModel } from "integration/junction-mobile-api/schemas/offer";
 import type { paymentIntentModel } from "integration/junction-mobile-api/schemas/payment";
+import integrationInstances from "integration-instances";
+import { getSearchData, setSearchData, type ResolvedSearchData, type SearchData } from "../common";
+import routeConfig from "routeConfig";
 
 export type ActionPollReturnType = {
   priceQuote: Infer<typeof tripOfferPriceQuoteModel>;
@@ -54,28 +55,36 @@ export async function load(event): Promise<{
   const searchData = getSearchData(event);
 
   if (!searchData) {
-    throw error(400, { message: "No search data found" });
+    setSearchData(undefined, event);
+
+    throw redirect(303, routeConfig.tripManagement.book.root);
   }
 
-  const [origin, destination, { priceQuote, paymentIntent }] = await Promise.all([
-    integrationInstances.junctionMobileApi.places.getPlace(searchData.originId),
-    integrationInstances.junctionMobileApi.places.getPlace(searchData.destinationId),
-    getPriceQuoteAndPaymentIntent(searchData),
-  ]);
+  try {
+    const [origin, destination, { priceQuote, paymentIntent }] = await Promise.all([
+      integrationInstances.junctionMobileApi.places.getPlace(searchData.originId),
+      integrationInstances.junctionMobileApi.places.getPlace(searchData.destinationId),
+      getPriceQuoteAndPaymentIntent(searchData),
+    ]);
 
-  setSearchData({ ...searchData, paymentIntent }, event);
+    setSearchData({ ...searchData, paymentIntent }, event);
 
-  return {
-    searchData: {
-      sessionToken: searchData.sessionToken,
-      origin,
-      destination,
-      departureAfter: new Date(searchData.departureAfter),
-      passengers: searchData.passengers,
-      paymentIntent,
-    },
-    priceQuote,
-  };
+    return {
+      searchData: {
+        sessionToken: searchData.sessionToken,
+        origin,
+        destination,
+        departureAfter: new Date(searchData.departureAfter),
+        passengers: searchData.passengers,
+        paymentIntent,
+      },
+      priceQuote,
+    };
+  } catch {
+    setSearchData(undefined, event);
+
+    throw redirect(303, routeConfig.tripManagement.book.root);
+  }
 }
 
 export const actions = {
