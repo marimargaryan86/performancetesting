@@ -4,6 +4,7 @@ import httpx
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.service.providers.benerail import cache, config, consumer
+from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis_types
 from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.amqp import consumer as std_consumer
@@ -33,6 +34,8 @@ async def price_quotes(app: application.Application[config.PriceQuoteSettings]) 
                 cert=config.cert_tmp_path(app.settings.cert_base64),
             ),
         )
+        logging.register(http_client)
+        metrics.register(http_client)
 
         await consumer.PriceQuoteConsumer(
             consumer_obj=std_consumer.Consumer(

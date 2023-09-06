@@ -17,6 +17,7 @@ from snowfall.project.junction.service.providers.benerail import (
 )
 from snowfall.project.junction.service.providers.benerail.v1alpha import amqp_pb2
 from snowfall.stdlib import h3
+from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.amqp import producer, types
@@ -46,6 +47,8 @@ async def offers_app(
             cert=config.cert_tmp_path(app.settings.cert_base64),
         ),
     )
+    logging.register(http_client)
+    metrics.register(http_client)
     benerail_client = client.BenerailClient(
         subscription_key=app.settings.subscription_key,
         base_url=str(app.settings.api_base_url),
