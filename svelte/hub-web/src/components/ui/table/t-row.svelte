@@ -17,7 +17,7 @@
     background-color: var(--color-main-primary-50);
   }
 
-  tr:not(:hover) :global(.actions) {
+  tr:not(:hover) > :global(.actions-col > .actions) {
     opacity: 0;
     pointer-events: none;
   }

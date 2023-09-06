@@ -32,6 +32,8 @@ function payBeneficiariesBeneficiary<
 >(id?: TID): TOut {
   return `${payBeneficiaries}/${id ?? "add"}` as TOut;
 }
+// Pay - Bills
+const payBills = `${payRoot}/bills` as const;
 // Go
 const goRoot = "/go" as const;
 // Go - Bookings
@@ -119,6 +121,9 @@ export default {
       actions: {
         listBeneficiaries: `${payBeneficiaries}?/listBeneficiaries` as const,
       },
+    },
+    bills: {
+      root: payBills,
     },
   },
   go: {

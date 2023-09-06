@@ -27,6 +27,7 @@
   import BeneficiaryIcon from "components/icons/beneficiary-icon.svelte";
   import routeConfig from "routeConfig";
   import BookingsIcon from "components/icons/bookings-icon.svelte";
+  import BillIcon from "components/icons/bill-icon.svelte";
 
   export let expanded: boolean;
   export let transitionTimeMs: number;
@@ -79,6 +80,12 @@
           url: routeConfig.pay.beneficiaries.root,
           label: "Beneficiaries",
           icon: BeneficiaryIcon,
+        },
+        {
+          type: "menu-item",
+          url: routeConfig.pay.bills.root,
+          label: "Bills",
+          icon: BillIcon,
         },
       ],
     },
