@@ -35,6 +35,12 @@
       ]
     },
     {
+      "name": "Bill",
+      "tags": [
+        "bill"
+      ]
+    },
+    {
       "name": "Companies",
       "tags": [
         "companies"
@@ -92,6 +98,11 @@
       "name": "beneficiaries",
       "description": "Beneficiaries",
       "x-displayName": "Beneficiaries"
+    },
+    {
+      "name": "bill",
+      "description": "Bill related actions.",
+      "x-displayName": "Bill"
     },
     {
       "name": "companies",
@@ -2231,6 +2242,158 @@
         "operationId": "get-transactions",
         "description": "Get transactions"
       }
+    },
+    "/bills": {
+      "get": {
+        "summary": "List bill details",
+        "tags": [
+          "bill"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ],
+        "operationId": "get-bills",
+        "description": "List bills details",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "minItems": 0,
+                          "items": {
+                            "$ref": "#/components/schemas/Bill"
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/bills/{billId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/billId"
+        }
+      ],
+      "get": {
+        "summary": "Get bill details",
+        "description": "Get bill details",
+        "tags": [
+          "bill"
+        ],
+        "operationId": "get-bills-id",
+        "responses": {
+          "200": {
+            "description": "Bill is fetched",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Bill"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update bill details",
+        "description": "Update bill details",
+        "tags": [
+          "bill"
+        ],
+        "operationId": "patch-bills-id",
+        "responses": {
+          "200": {
+            "description": "Bill details is updated",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Bill"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/Bill"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2355,6 +2518,17 @@
           "example": 20
         },
         "description": "A limit on the number of objects to be returned, between 1 and 100."
+      },
+      "billId": {
+        "name": "billId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "271f6d54-9e59-407e-a860-b0771d9e3d26"
+        },
+        "description": "Bill id"
       },
       "accountId": {
         "name": "accountId",
@@ -2989,6 +3163,73 @@
         "required": [
           "id",
           "type"
+        ]
+      },
+      "Bill": {
+        "title": "Bill entity",
+        "description": "Bill entity to show reconciliation status and association with order id",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "04f83af5-10bb-4a0f-1881-03e1e690f0f5",
+                "format": "uuid",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "bills"
+                ],
+                "example": "bills"
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "reconciled": {
+                    "type": "boolean",
+                    "example": false,
+                    "default": false
+                  },
+                  "amount": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Money"
+                      }
+                    ],
+                    "readOnly": true,
+                    "description": "The total amount of transactions."
+                  }
+                }
+              },
+              "relationships": {
+                "type": "object",
+                "properties": {
+                  "order": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/OrderIdentifier"
+                      }
+                    },
+                    "writeOnly": true
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
         ]
       },
       "Price": {
