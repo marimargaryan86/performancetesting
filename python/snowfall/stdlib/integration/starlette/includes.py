@@ -126,7 +126,7 @@ class _IncludesResolver(object):
         return any(
             wanted_include
             for wanted_include in self._wanted_includes
-            if wanted_include.startswith(path)
+            if wanted_include == path or wanted_include.startswith("{0}.".format(path))
         )
 
     def _to_composite_keys(

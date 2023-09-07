@@ -175,3 +175,13 @@ async def test_leaf_includes() -> None:
     }
 
     assert composite_ids == expected
+
+
+@pytest.mark.usefixtures("_setup")
+async def test_strict_path_matching() -> None:
+    included = await includes.resolve_includes(
+        models.Body(data=_test_data["foo"][0]),
+        _create_request(["foobar"]),
+    )
+
+    assert not len(included)
