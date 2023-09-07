@@ -1,0 +1,47 @@
+[
+  {
+    "ref": "ARN",
+    "lon": 17.92119,
+    "lat": 59.650831,
+    "tz": "Europe/Stockholm",
+    "name": "Stockholm-Arlanda Airport",
+    "country": "SE",
+    "type": "airport"
+  },
+  {
+    "ref": "LHR",
+    "lon": -0.458118,
+    "lat": 51.470311,
+    "tz": "Europe/London",
+    "name": "Heathrow Airport",
+    "country": "GB",
+    "type": "airport"
+  },
+  {
+    "ref": "LAX",
+    "lon": -118.408263,
+    "lat": 33.942045,
+    "tz": "America/Los_Angeles",
+    "name": "Los Angeles International Airport",
+    "country": "US",
+    "type": "airport"
+  },
+  {
+    "ref": "ORD",
+    "lon": -87.90606,
+    "lat": 41.976381,
+    "tz": "America/Chicago",
+    "name": "O'Hare International Airport",
+    "country": "US",
+    "type": "airport"
+  },
+  {
+    "ref": "AMS",
+    "lon": 4.765869,
+    "lat": 52.308856,
+    "tz": "Europe/Amsterdam",
+    "name": "Amsterdam Airport Schiphol",
+    "country": "NL",
+    "type": "airport"
+  }
+]

@@ -10,7 +10,7 @@ import pydantic
 from google.protobuf import message
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.provider import bookings, meta, offers
+from snowfall.project.junction.provider import bookings, meta, offers, trips
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.amqp import types
@@ -62,12 +62,17 @@ if TYPE_CHECKING:
         [application.AsyncApplication[_Settings]],
         Awaitable[bookings.Implementation],
     ]
+    TripsFactory = Callable[
+        [application.AsyncApplication[_Settings]],
+        Awaitable[trips.Implementation],
+    ]
 
 
 def _grpc_command(  # noqa: WPS210, WPS217
     meta_factory: MetaFactory,
     offers_factory: OF[_Settings, _SearchCriteriaTask, _SearchCriteria] | None = None,
     bookings_factory: BookingFactory[_Settings] | None = None,
+    trips_factory: TripsFactory[_Settings] | None = None,
 ) -> application.Callback[_Settings]:
     async def wrapper(  # noqa: WPS210, WPS217
         app: application.AsyncApplication[_Settings],
@@ -117,6 +122,12 @@ def _grpc_command(  # noqa: WPS210, WPS217
             bookings_implementation = await bookings_factory(app)
             services.append(
                 bookings.BookingService(implementation=bookings_implementation),
+            )
+
+        if trips_factory:
+            trips_implementation = await trips_factory(app)
+            services.append(
+                trips.TripService(implementation=trips_implementation),
             )
 
         server = grpc_server.create_server(
@@ -177,6 +188,7 @@ class Entrypoint(
         _SearchCriteria,
     ] | None = None
     bookings_factory: BookingFactory[_Settings] | None = None
+    trips_factory: TripsFactory[_Settings] | None = None
 
     def __post_init__(self) -> None:
         super().__post_init__()
@@ -187,6 +199,7 @@ class Entrypoint(
                     self.meta_factory,
                     self.offers_factory,
                     self.bookings_factory,
+                    self.trips_factory,
                 ),
                 settings_class=self.settings_class,
             ),
