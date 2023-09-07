@@ -1,4 +1,5 @@
 import pytest
+from grpc import aio
 
 from snowfall.project.junction.go.service.gateway import providers
 from snowfall.stdlib import sequence, string
@@ -11,7 +12,7 @@ def test_marshal_and_unmarshal_resource_id() -> None:
     provider_id = string.uuid()
     resource_id = string.uuid()
     provider = providers.Provider(
-        connection=providers.Connection(dsn="foobar"),
+        connection=providers.Connection(aio.insecure_channel("foobar")),
         identifier=provider_id,
     )
 
@@ -30,7 +31,7 @@ async def test_unmarshal_resource_ids() -> None:
 
     for provider_id in _IDENTIFIERS:
         provider = providers.Provider(
-            connection=providers.Connection(dsn="foobar"),
+            connection=providers.Connection(aio.insecure_channel("foobar")),
             identifier=provider_id,
         )
 

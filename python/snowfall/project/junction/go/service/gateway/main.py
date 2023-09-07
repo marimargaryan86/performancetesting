@@ -15,7 +15,12 @@ from snowfall.project.junction.go.service.gateway import (
 )
 from snowfall.project.junction.go.service.offers.v1 import amqp_pb2
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import amqp_factory, application, redis_factory
+from snowfall.stdlib.service import (
+    amqp_factory,
+    application,
+    grpc_factory,
+    redis_factory,
+)
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.stdlib.transport.grpc import server as grpc_server
 
@@ -55,10 +60,13 @@ async def _bootstrap(
         decode_responses=False,
     )
 
-    all_providers = await providers.Collection.from_identifier_address_tuples(
+    all_providers = await providers.Collection.from_identifier_channel_tuples(
         [
-            providers.IdentifierAddressTuple(*provider_tuple)
-            for provider_tuple in app.settings.providers.items()
+            providers.IdentifierChannelTuple(
+                identifier=identifier,
+                channel=await grpc_factory.make_insecure_channel(app, dsn),
+            )
+            for identifier, dsn in app.settings.providers.items()
         ],
     )
 

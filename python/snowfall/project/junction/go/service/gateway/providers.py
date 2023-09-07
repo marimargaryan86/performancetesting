@@ -17,14 +17,13 @@ from snowfall.project.junction.provider.v1alpha import (
 )
 from snowfall.stdlib import sequence
 from snowfall.stdlib.logging import stdout
-from snowfall.stdlib.transport.grpc import client
 
 _PROVIDER_REFRESH_RATE = datetime.timedelta(minutes=10)
 
 
-class IdentifierAddressTuple(NamedTuple):
+class IdentifierChannelTuple(NamedTuple):
     identifier: str
-    address: str
+    channel: aio.Channel
 
 
 class IdentifierMismatchError(Exception):
@@ -117,17 +116,17 @@ class Collection(object):
         return provider.provider
 
     @classmethod
-    async def from_identifier_address_tuples(
+    async def from_identifier_channel_tuples(
         cls,
-        tuples: Sequence[IdentifierAddressTuple],
+        tuples: Sequence[IdentifierChannelTuple],
     ) -> Collection:
         return cls(
             [
                 Provider(
-                    connection=Connection(address),
+                    connection=Connection(channel),
                     identifier=identifier,
                 )
-                for identifier, address in tuples
+                for identifier, channel in tuples
             ],
         )
 
@@ -167,8 +166,8 @@ class Provider(object):
 
 
 class Connection(object):
-    def __init__(self, dsn: str):
-        self._channel = client.create_channel(dsn)
+    def __init__(self, channel: aio.Channel):
+        self._channel = channel
         self._bookings = bookings_pb2_grpc.BookingServiceStub(self._channel)
         self._meta = meta_pb2_grpc.MetaServiceStub(self._channel)
         self._offers = offers_pb2_grpc.OfferServiceStub(self._channel)
