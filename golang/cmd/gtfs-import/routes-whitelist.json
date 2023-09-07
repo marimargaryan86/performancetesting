@@ -3,7 +3,7 @@
         "types": ["ferry"]
     },
     "distribusion":{
-        "types": ["bus"]
+        "types": ["bus", "rail"]
     },
     "gtfs.de":{
         "types": ["rail"]
