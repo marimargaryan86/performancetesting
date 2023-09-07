@@ -7074,17 +7074,34 @@
         "items": {
           "oneOf": [
             {
-              "$ref": "#/components/schemas/OfferIdentifier"
+              "$ref": "#/components/schemas/Offer"
+            },
+            {
+              "$ref": "#/components/schemas/OfferGroup"
+            },
+            {
+              "$ref": "#/components/schemas/TripOfferGroupDetails"
             },
             {
               "$ref": "#/components/schemas/OfferOption"
+            },
+            {
+              "$ref": "#/components/schemas/TripOfferOptionDetails"
+            },
+            {
+              "$ref": "#/components/schemas/CabinClass"
             }
           ],
           "discriminator": {
             "propertyName": "type",
             "mapping": {
               "offers": "#/components/schemas/Offer",
-              "offer-options": "#/components/schemas/OfferOption"
+              "offer-groups": "#/components/schemas/OfferGroup",
+              "trip-offer-group-details": "#/components/schemas/TripOfferGroupDetails",
+              "leg-types": "#/components/schemas/LegType",
+              "offer-options": "#/components/schemas/OfferOption",
+              "trip-offer-option-details": "#/components/schemas/TripOfferOptionDetails",
+              "cabin-classes": "#/components/schemas/CabinClass"
             }
           }
         }
@@ -8137,8 +8154,14 @@
           "items": {
             "type": "string",
             "enum": [
-              "offers",
-              "options"
+              "offer",
+              "offer.groups",
+              "offer.groups.details",
+              "offer.groups.details.legType",
+              "options",
+              "options.details",
+              "options.details.cabinClass",
+              "options.details.details"
             ]
           },
           "example": [

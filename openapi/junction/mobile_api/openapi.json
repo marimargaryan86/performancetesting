@@ -2380,8 +2380,14 @@
           "items": {
             "type": "string",
             "enum": [
-              "offers",
-              "options"
+              "offer",
+              "offer.groups",
+              "offer.groups.details",
+              "offer.groups.details.legType",
+              "options",
+              "options.details",
+              "options.details.cabinClass",
+              "options.details.details"
             ]
           },
           "example": [
@@ -3035,20 +3041,162 @@
         "items": {
           "oneOf": [
             {
-              "$ref": "#/components/schemas/OfferIdentifier"
+              "$ref": "#/components/schemas/Offer"
+            },
+            {
+              "$ref": "#/components/schemas/OfferGroup"
+            },
+            {
+              "$ref": "#/components/schemas/TripOfferGroupDetails"
             },
             {
               "$ref": "#/components/schemas/OfferOption"
+            },
+            {
+              "$ref": "#/components/schemas/TripOfferOptionDetails"
+            },
+            {
+              "$ref": "#/components/schemas/CabinClass"
             }
           ],
           "discriminator": {
             "propertyName": "type",
             "mapping": {
               "offers": "#/components/schemas/Offer",
-              "offer-options": "#/components/schemas/OfferOption"
+              "offer-groups": "#/components/schemas/OfferGroup",
+              "trip-offer-group-details": "#/components/schemas/TripOfferGroupDetails",
+              "leg-types": "#/components/schemas/LegType",
+              "offer-options": "#/components/schemas/OfferOption",
+              "trip-offer-option-details": "#/components/schemas/TripOfferOptionDetails",
+              "cabin-classes": "#/components/schemas/CabinClass"
             }
           }
         }
+      },
+      "OfferGroup": {
+        "title": "Offer Group",
+        "description": "Result of searching for offers. Used for creating an Order. Chose one Offer Option when creating an order.",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "offer-groups"
+                ],
+                "example": "offer-groups"
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {}
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "options",
+                  "details"
+                ],
+                "properties": {
+                  "options": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/OfferOptionIdentifier"
+                        }
+                      }
+                    }
+                  },
+                  "details": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "oneOf": [
+                          {
+                            "type": "array",
+                            "items": {
+                              "$ref": "#/components/schemas/TripOfferGroupDetailsIdentifier"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes",
+              "relationships"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ]
+      },
+      "OfferSegmentDetailAmenities": {
+        "title": "Offer Segment Detail Amenities",
+        "type": "object",
+        "properties": {
+          "beverage": {
+            "$ref": "#/components/schemas/OfferSegmentDetailAmenity"
+          },
+          "entertainment": {
+            "$ref": "#/components/schemas/OfferSegmentDetailAmenity"
+          },
+          "food": {
+            "$ref": "#/components/schemas/OfferSegmentDetailAmenity"
+          },
+          "power": {
+            "$ref": "#/components/schemas/OfferSegmentDetailAmenity"
+          },
+          "wifi": {
+            "$ref": "#/components/schemas/OfferSegmentDetailAmenity"
+          }
+        },
+        "required": [
+          "beverage",
+          "entertainment",
+          "food",
+          "power",
+          "wifi"
+        ]
+      },
+      "OfferSegmentDetailAmenity": {
+        "title": "Offer Segment Detail Amenity",
+        "type": "object",
+        "properties": {
+          "availability": {
+            "type": "string",
+            "enum": [
+              "unspecified",
+              "unavailable",
+              "available",
+              "included"
+            ],
+            "example": "included"
+          }
+        },
+        "required": [
+          "availability"
+        ]
       },
       "TripOfferSearch": {
         "title": "Trip Offer Search",
@@ -3331,6 +3479,131 @@
           }
         ],
         "title": "Trip Offer Price Quote"
+      },
+      "TripOfferGroupDetails": {
+        "title": "Trip Offer Group Details",
+        "description": "Segment details related to a Trip Offer Group.",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "trip-offer-group-details"
+                ],
+                "example": "trip-offer-group-details"
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "legs",
+                  "vendor",
+                  "operator",
+                  "routeIdentifiers",
+                  "sequences"
+                ],
+                "properties": {
+                  "legs": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "$ref": "#/components/schemas/OfferSegmentLeg"
+                    }
+                  },
+                  "vendor": {
+                    "type": "string",
+                    "example": "BA"
+                  },
+                  "operator": {
+                    "type": "string",
+                    "example": "BA",
+                    "nullable": true
+                  },
+                  "routeIdentifiers": {
+                    "$ref": "#/components/schemas/RouteIdentifiers"
+                  },
+                  "sequences": {
+                    "type": "object",
+                    "required": [
+                      "trip",
+                      "segment"
+                    ],
+                    "properties": {
+                      "trip": {
+                        "type": "integer",
+                        "example": 1,
+                        "minimum": 1
+                      },
+                      "segment": {
+                        "type": "integer",
+                        "example": 1,
+                        "minimum": 1
+                      }
+                    }
+                  }
+                }
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "legType"
+                ],
+                "properties": {
+                  "legType": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/LegTypeIdentifier"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes",
+              "relationships"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ]
+      },
+      "TripOfferGroupDetailsIdentifier": {
+        "title": "Trip Offer Group Details Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "trip-offer-group-details"
+            ],
+            "example": "trip-offer-group-details"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
       },
       "PaymentIdentifier": {
         "title": "Payment Identifier",
@@ -3743,6 +4016,95 @@
           "refundable",
           "applicability",
           "price"
+        ]
+      },
+      "TripOfferOptionDetails": {
+        "title": "Trip Offer Option Details",
+        "description": "Specific details for an offer on a specific segment.",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "trip-offer-option-details"
+                ],
+                "example": "trip-offer-option-details"
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "cabinClassName",
+                  "baggageAllowances",
+                  "amenities"
+                ],
+                "properties": {
+                  "cabinClassName": {
+                    "type": "string",
+                    "example": "Economy"
+                  },
+                  "baggageAllowances": {
+                    "deprecated": true,
+                    "type": "array",
+                    "minItems": 0,
+                    "items": {
+                      "$ref": "#/components/schemas/TripOfferOptionPenaltyBaggageAllowance"
+                    }
+                  },
+                  "amenities": {
+                    "$ref": "#/components/schemas/OfferSegmentDetailAmenities"
+                  }
+                }
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "details",
+                  "cabinClass"
+                ],
+                "properties": {
+                  "details": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/TripOfferGroupDetailsIdentifier"
+                      }
+                    }
+                  },
+                  "cabinClass": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/CabinClassIdentifier"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes",
+              "relationships"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
         ]
       },
       "TripOfferOptionDetailsIdentifier": {

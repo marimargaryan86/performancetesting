@@ -23,8 +23,14 @@ _OfferIncludes: TypeAlias = Literal[
     "groups.options.details.details",
 ]
 _OfferPriceQuoteIncludes: TypeAlias = Literal[
-    "offers",
+    "offer",
+    "offer.groups",
+    "offer.groups.details",
+    "offer.groups.details.legType",
     "options",
+    "options.details",
+    "options.details.cabinClass",
+    "options.details.details",
 ]
 _OfferSearchIncludes: TypeAlias = Literal[
     "offers.groups",
