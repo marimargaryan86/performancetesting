@@ -17,6 +17,7 @@ class _ResponseHandler(object):
             client_method=_discovery.get_calling_method(),
             method=response.request.method,
             status_code=response.status_code,
+            request_url=str(response.request.url),
             request=response.request.content,
             response=response.content,
             source="transport",
