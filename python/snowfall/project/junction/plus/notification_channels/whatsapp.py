@@ -165,6 +165,12 @@ class ProviderChannel(Channel):
                         ),
                     ),
                 )
+
+        self.send_message(
+            receiver=receiver.phone_number.e164_number,
+            sender_number=sender_configuration.mobile_phone.e164_number,
+            body=_("Please select one of the following options"),
+        )
         return message_ids
 
     def send_message(
