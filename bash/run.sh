@@ -21,7 +21,7 @@ if [ -n "${ENV_FILE+x}" ]; then
 		key="${line%%=*}"
 		value="${line#*=}"
 		ENV_STR="${ENV_STR} ${key@Q}=${value@Q}"
-	done <"${DIR}/.env.dist"
+	done <"${ENV_FILE}"
 fi
 
 env -S "${ENV_STR}" pants run "${1}:main" -- "${@:2}"
