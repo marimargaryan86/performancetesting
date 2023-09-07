@@ -30,7 +30,7 @@ _CITY_RADIUS_M = int(
 
 
 async def migrate(settings: bootstrap.MigrateSettings) -> None:  # noqa: WPS210, WPS217
-    mongo = motor_asyncio.AsyncIOMotorClient(settings.mongo_dsn)
+    mongo = motor_asyncio.AsyncIOMotorClient(str(settings.mongo_dsn))
     places_repository = repository.PlacesRepository(mongo[settings.mongo_db]["places"])
     osm_data = pd.read_csv(
         filesystem.resource_path(
