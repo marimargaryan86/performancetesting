@@ -36,7 +36,12 @@ def _generate_search_criteria(
                 destination_id=destination,
                 passenger_dob=passenger_dobs,
                 outbound_departure_datetime=protobuf.datetime_to_protobuf_datetime(
-                    trip_criteria.outbound.departure,
+                    trip_criteria.outbound.departure.replace(
+                        hour=0,
+                        minute=0,
+                        second=0,
+                        microsecond=0,
+                    ),
                 ),
                 br_session_token=br_session_token,
             ),
