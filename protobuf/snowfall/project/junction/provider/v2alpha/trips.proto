@@ -15,22 +15,6 @@ service TripService {
   rpc SearchTrips(SearchTripsRequest) returns (SearchTripsResponse) {}
 }
 
-message Criterion {
-  oneof origin {
-    string origin_identifier = 1;
-    snowfall.stdlib.v1.LatLng origin_coordinates = 2;
-  }
-  oneof destination {
-    string destination_identifier = 3;
-    snowfall.stdlib.v1.LatLng destination_coordinates = 4;
-  }
-  snowfall.stdlib.v1.Date departure_date = 5;
-}
-
-message Passenger {
-  snowfall.stdlib.v1.Date date_of_birth = 1;
-}
-
 message Location {
   string ref = 1;
   string name = 2;
@@ -64,8 +48,36 @@ message Fare {
 }
 
 message SearchTripsRequest {
-  repeated Criterion criterion = 1;
-  repeated Passenger passengers = 2;
+  message Criterion {
+    oneof origin {
+      string origin_identifier = 1;
+      snowfall.stdlib.v1.LatLng origin_coordinates = 2;
+    }
+    oneof destination {
+      string destination_identifier = 3;
+      snowfall.stdlib.v1.LatLng destination_coordinates = 4;
+    }
+    snowfall.stdlib.v1.Date departure_date = 5;
+  }
+  message Passenger {
+    snowfall.stdlib.v1.Date date_of_birth = 1;
+  }
+  message OneWay {
+    Criterion criterion = 1;
+  }
+  message RoundTrip {
+    Criterion criterion = 1;
+    snowfall.stdlib.v1.Date return_date = 2;
+  }
+  message MultiCity {
+    repeated Criterion criteria = 1;
+  }
+  oneof search_mode {
+    OneWay one_way = 1;
+    RoundTrip round_trip = 2;
+    MultiCity multi_city = 3;
+  }
+  repeated Passenger passengers = 4;
   // @todo: add custom config data for the provider
 }
 

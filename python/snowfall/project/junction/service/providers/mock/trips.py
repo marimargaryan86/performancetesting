@@ -123,7 +123,7 @@ class Trips(object):
         self,
         trip_request: trips_pb2.SearchTripsRequest,
     ) -> trips_pb2.SearchTripsResponse:
-        criterion = trip_request.criterion[0]
+        criterion = trip_request.one_way.criterion
         routes = self._routes.find_routes(
             origin=criterion.origin_identifier,
             destination=criterion.destination_identifier,

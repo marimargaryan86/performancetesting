@@ -30,13 +30,13 @@ class TripService(service.Service, trips_pb2_grpc.TripServiceServicer):
         request: trips_pb2.SearchTripsRequest,
         context: grpc.aio.ServicerContext,
     ) -> trips_pb2.SearchTripsResponse:
-        if not request.criterion:
+        if not request.WhichOneof("search_mode"):
             await rich_status.abort_with_rich_status(
                 context=context,
                 status=rich_status.build_bad_request(
-                    field_name="criterion",
-                    field_description="Field must not be empty",
-                    description="Searching requires at least one criterion",
+                    field_name="search_mode",
+                    field_description="Search mode must be chosen",
+                    description="Searching requires one search mode",
                 ),
             )
 

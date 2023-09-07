@@ -41,17 +41,17 @@ async def generic_response(
 ) -> trips_pb2.SearchTripsResponse:
     return await trip_searcher.find(
         trips_pb2.SearchTripsRequest(
-            criterion=[
-                trips_pb2.Criterion(
+            one_way=trips_pb2.SearchTripsRequest.OneWay(
+                criterion=trips_pb2.SearchTripsRequest.Criterion(
                     origin_identifier="ARN",
                     destination_identifier="LHR",
                     departure_date=protobuf.date_to_protobuf(
                         datetime.date(year=2023, month=9, day=6),
                     ),
                 ),
-            ],
+            ),
             passengers=[
-                trips_pb2.Passenger(
+                trips_pb2.SearchTripsRequest.Passenger(
                     date_of_birth=protobuf.date_to_protobuf(
                         datetime.date(year=1987, month=5, day=24),
                     ),
@@ -74,17 +74,17 @@ class TestTrips(object):
     ) -> None:
         response = await trip_searcher.find(
             trips_pb2.SearchTripsRequest(
-                criterion=[
-                    trips_pb2.Criterion(
+                one_way=trips_pb2.SearchTripsRequest.OneWay(
+                    criterion=trips_pb2.SearchTripsRequest.Criterion(
                         origin_identifier="XXX",
                         destination_identifier="YYY",
                         departure_date=protobuf.date_to_protobuf(
                             datetime.date(year=2023, month=9, day=6),
                         ),
                     ),
-                ],
+                ),
                 passengers=[
-                    trips_pb2.Passenger(
+                    trips_pb2.SearchTripsRequest.Passenger(
                         date_of_birth=protobuf.date_to_protobuf(
                             datetime.date(year=1987, month=5, day=24),
                         ),

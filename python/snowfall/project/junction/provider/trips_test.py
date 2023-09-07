@@ -54,7 +54,7 @@ def grpc_context() -> grpc.aio.ServicerContext:
 
 
 class TestService(object):
-    async def test_empty_criterion_is_aborted(
+    async def test_empty_search_mode_is_aborted(
         self,
         trip_service: provider_trips.TripService,
         grpc_context: grpc.aio.ServicerContext,
@@ -62,14 +62,14 @@ class TestService(object):
         with pytest.raises(_AbortError) as exc_info:
             await trip_service.SearchTrips(
                 request=trips_pb2.SearchTripsRequest(
-                    passengers=[trips_pb2.Passenger()],
+                    passengers=[trips_pb2.SearchTripsRequest.Passenger()],
                 ),
                 context=grpc_context,
             )
 
         error = _get_detail(exc_info.value)  # noqa: WPS441
         assert isinstance(error, error_details_pb2.BadRequest)
-        assert error.field_violations[0].field == "criterion"
+        assert error.field_violations[0].field == "search_mode"
 
     async def test_empty_passengers_is_aborted(
         self,
@@ -79,7 +79,9 @@ class TestService(object):
         with pytest.raises(_AbortError) as exc_info:
             await trip_service.SearchTrips(
                 request=trips_pb2.SearchTripsRequest(
-                    criterion=[trips_pb2.Criterion()],
+                    one_way=trips_pb2.SearchTripsRequest.OneWay(
+                        criterion=trips_pb2.SearchTripsRequest.Criterion(),
+                    ),
                 ),
                 context=grpc_context,
             )
