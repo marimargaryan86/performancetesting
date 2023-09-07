@@ -25,6 +25,7 @@ from snowfall.project.junction.service.providers.benerail import (
 )
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.transport.amqp import producer
 from snowfall.stdlib.transport.http import errors
 from snowfall.stdlib.v1 import latlng_pb2
@@ -35,11 +36,6 @@ from snowfall.vendor.benerail.models.dialogue import dialogue, passenger
 from snowfall.vendor.benerail.models.trip_offers import link, offer
 from snowfall.vendor.benerail.models.trip_offers import response as trip_offer_response
 from snowfall.vendor.benerail.models.trips import trips
-
-
-class BenerailError(Exception):
-    """Raised when there is an exception in the Benerail adapter."""
-
 
 _NON_BOOKABLE_STATES = frozenset(("NOT_BOOKABLE_NO_SERVICE", "NOT_BOOKABLE_NO_PAST"))
 _DATE_FMT = "%Y%m%d"
@@ -102,8 +98,32 @@ class BenerailAdapter(object):  # noqa: WPS214
         self._ttl = ttl
         self._notifier = notifier
         self._notifications_producer = notifications_producer
+        self._logger = stdout.get_logger()
 
     async def gather_search_results(  # noqa: WPS210
+        self,
+        search_task: criteria.SearchCriteria,
+    ) -> AsyncIterator[offer_models_pb2.OfferGroup]:
+        try:
+            offer_group_iterator = self._get_offer_groups_iterator(search_task)
+        except errors.HttpError:
+            self._logger.exception(
+                "Offer search failed",
+                br_session_token=search_task.br_session_token,
+            )
+
+            return
+
+        try:
+            async for offer_group in await offer_group_iterator:
+                yield offer_group
+        except errors.HttpError:
+            self._logger.exception(
+                "Offer search failed",
+                br_session_token=search_task.br_session_token,
+            )
+
+    async def _get_offer_groups_iterator(  # noqa: WPS210
         self,
         search_task: criteria.SearchCriteria,
     ) -> AsyncIterator[offer_models_pb2.OfferGroup]:
@@ -131,7 +151,7 @@ class BenerailAdapter(object):  # noqa: WPS214
             session_token=search_task.br_session_token,
         )
 
-        offer_group_iterator = self._get_offer_groups(
+        return self._get_offer_groups(
             dialogue_info=helper_models.DialogueInfo(
                 identifier=dialogue_id,
                 etag=create_trip_filter_res.dialogue_etag,
@@ -141,9 +161,6 @@ class BenerailAdapter(object):  # noqa: WPS214
             departure_after=search_task.outbound_departure_datetime,
             session_token=search_task.br_session_token,
         )
-
-        async for offer_group in offer_group_iterator:
-            yield offer_group
 
     async def _create_passengers(
         self,

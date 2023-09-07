@@ -1,6 +1,8 @@
 import asyncio
 import datetime
 
+import tenacity
+
 from snowfall.project.junction.go.service.offers.v1 import (
     amqp_pb2 as offers_amqp_pb2,
 )
@@ -25,6 +27,7 @@ from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.stdlib.transport.http import errors
 from snowfall.vendor.benerail import client
 from snowfall.vendor.benerail.models import etag
+from snowfall.vendor.benerail.models.trip_offers import response
 
 _PROVIDER_NAME = "Benerail"
 _RETRY_TTL = datetime.timedelta(hours=1)
@@ -101,12 +104,12 @@ class NotificationsConsumer(object):
         self,
         message: types.Message[br_amqp_pb2.BookingNotificationTask],
     ) -> None:
+        await asyncio.sleep(_RETRY_AFTER_SECONDS)
+
         created_at = protobuf.protobuf_to_datetime(
             message.body.created_at,
         )
         time_passed = datetime.datetime.now(datetime.UTC) - created_at
-
-        await asyncio.sleep(_RETRY_AFTER_SECONDS)
 
         if time_passed > _RETRY_TTL:
             self._logger.error(
@@ -134,9 +137,26 @@ class PriceQuoteConsumer(object):
         self._producer = producer_obj
         self._benerail_client = benerail_client
         self._provider_company_id = provider_company_id
+        self._logger = stdout.get_logger()
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
+
+    @tenacity.retry(
+        stop=tenacity.stop_after_attempt(3),
+        retry=tenacity.retry_if_exception_type(errors.HttpError),
+        wait=tenacity.wait_fixed(3),
+        reraise=True,
+    )
+    async def _get_offer_info(
+        self,
+        offer_id: str,
+        session_token: str | None = None,
+    ) -> response.GetOfferResponse:
+        return await self._benerail_client.offers_client.get_offer_info(
+            offer_id=offer_id,
+            session_token=session_token,
+        )
 
     async def _process_message(
         self,
@@ -150,10 +170,20 @@ class PriceQuoteConsumer(object):
         expires_at = datetime.datetime.now(tz=datetime.UTC) + self._ttl
         price_quote_id = await self._offer_cache.store(offer_details, expires_at)
 
-        offer_info = await self._benerail_client.offers_client.get_offer_info(
-            offer_id=offer_details.offer_id,
-            session_token=offer_details.session_token,
-        )
+        try:
+            offer_info = await self._get_offer_info(
+                offer_id=offer_details.offer_id,
+                session_token=offer_details.session_token,
+            )
+        except errors.HttpError:
+            self._logger.exception(
+                "Failed to get offer for quotation",
+                offer_id=offer_details.offer_id,
+                br_session_token=offer_details.session_token,
+            )
+
+            return
+
         price_quote_price_proto = money.from_string(
             str(offer_info.response_result.price.amount),
             money.Currency(
@@ -220,10 +250,20 @@ class OrdersConsumer(object):
 
             return
 
-        booking_result = await self._bookings.create_booking(
-            task=message.body,
-            offer_details=offer_details,
-        )
+        try:
+            booking_result = await self._bookings.create_booking(
+                task=message.body,
+                offer_details=offer_details,
+            )
+        except errors.HttpError:
+            self._logger.exception(
+                "Failed to create booking",
+                br_session_token=offer_details.session_token,
+                br_offer_id=offer_details.offer_id,
+                booking_id=message.body.booking.id,
+            )
+
+            return
 
         await self._producer.publish(
             booking_result,
