@@ -17,7 +17,7 @@ from httpx import AsyncClient
 
 from snowfall.project.junction.go.service.data_pipeline.types import Dataset
 
-CARRIER_CODES = ("BLAB", "MEGB")
+CARRIER_CODES = ("BLAB", "BRIG", "ESWI", "MEGB", "NEXP")
 
 
 async def distribusion_plugin(
