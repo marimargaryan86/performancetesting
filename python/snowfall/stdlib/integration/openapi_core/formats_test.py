@@ -5,14 +5,14 @@ from openapi_core.unmarshalling.schemas import (
     unmarshallers,
 )
 
-from snowfall.stdlib.integration.starlette import formatters
+from snowfall.stdlib.integration.openapi_core import formats
 
 
 @pytest.fixture()
 def formats_unmarshaller() -> unmarshallers.FormatsUnmarshaller:
     return unmarshallers.FormatsUnmarshaller(
         format_unmarshallers=oas30_format_unmarshallers,
-        extra_format_unmarshallers=formatters.format_unmarshallers(),
+        extra_format_unmarshallers=formats.format_unmarshallers(),
     )
 
 
