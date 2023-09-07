@@ -4,10 +4,11 @@ dayjs.extend(window.dayjs_plugin_timezone);
 let db;
 
 const icons = {
-  road: "car", // Unspecified
-  air: "plane", // Air
-  rail: "train", // Rail
-  foot: "walking", // Walk
+  air: "plane",
+  rail: "train",
+  bus: "bus",
+  ferry: "ship",
+  taxi: "taxi",
 };
 
 const greenIcon = new L.Icon({
@@ -71,6 +72,8 @@ function inject_places() {
   const transaction = db.transaction("places", "readonly");
   const objectStore = transaction.objectStore("places");
   const openCursorRequest = objectStore.openCursor();
+  let new_children = []
+
 
   openCursorRequest.onerror = (event) => {
     console.log(event);
@@ -80,6 +83,7 @@ function inject_places() {
     const cursor = event.target.result;
 
     if (!cursor) {
+      placesList.replaceChildren(...new_children)
       hide_loader();
       return;
     }
@@ -89,8 +93,9 @@ function inject_places() {
     option.innerText =
       cursor.value.attributes.name + ", " + cursor.value.attributes.countryCode;
 
-    placesList.append(option);
+    new_children.push(option);
     cursor.continue();
+
   };
 }
 
@@ -264,11 +269,11 @@ function inject_trips(tripSearchId, response, searchOffers) {
     return;
   }
 
-  container.innerText = "";
+  new_children = []
 
   let mega = document.createElement("h2");
   mega.innerText = "Search Results: " + response.data.length + " trips found";
-  container.append(mega);
+  new_children.push(mega);
   let searchInfo = document.createElement("dl");
   searchInfo.className = "row";
   searchInfo.innerHTML +=
@@ -279,7 +284,7 @@ function inject_trips(tripSearchId, response, searchOffers) {
     '<dt class="col-sm-2">Session Token</dt><dd class="col-sm-10">' +
     sessionToken +
     "</dd>";
-  container.append(searchInfo);
+  new_children.push(searchInfo);
 
   included = {};
 
@@ -485,9 +490,9 @@ function inject_trips(tripSearchId, response, searchOffers) {
       badges.append(badge);
     }
 
-    container.append(header);
-    container.append(badges);
-    container.append(infoList);
+    new_children.push(header);
+    new_children.push(badges);
+    new_children.push(infoList);
 
     let description = document.createElement("table");
     description.id = "description" + i;
@@ -661,7 +666,7 @@ function inject_trips(tripSearchId, response, searchOffers) {
       let map = document.createElement("div");
       map.id = "map" + i;
       map.className = "map col-sm";
-      container.append(map);
+      new_children.push(map);
 
       var mapItem = L.map("map" + i);
 
@@ -688,8 +693,10 @@ function inject_trips(tripSearchId, response, searchOffers) {
     }
 
     description.append(body);
-    container.append(description);
+    new_children.push(description);
   }
+
+  container.replaceChildren(...new_children)
 }
 
 function load_places(url = null) {
