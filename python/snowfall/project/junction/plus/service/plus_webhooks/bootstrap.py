@@ -10,6 +10,7 @@ from snowfall.project.junction.plus.adapter import (
     orders,
     subscribers,
 )
+from snowfall.project.junction.plus.notification_channels import whatsapp
 from snowfall.project.junction.plus.service.plus_webhooks import chatbot_handlers
 from snowfall.stdlib.integration.starlette import application
 
@@ -17,6 +18,7 @@ from snowfall.stdlib.integration.starlette import application
 class Settings(application.Settings):
     flight_stats_app_key: str
     notifications_address: str
+    twilio_sid: str
     twilio_token: str
     redis_dsn: Sequence[pydantic.AnyUrl]
     redis_prefix: str
@@ -31,6 +33,7 @@ def create_dependencies(  # noqa: WPS211
     notification_event_publisher_client: notification_event_publisher.Client,
     configuration_vectors_client: configuration_vectors.Client,
     message_handler: chatbot_handlers.MessageHandler,
+    whatsapp_channel: whatsapp.Channel,
 ) -> lagom.Container:
     container = lagom.Container()
     container[monitoring_rules.Client] = monitoring_rules_client  # type: ignore[type-abstract]
@@ -39,4 +42,5 @@ def create_dependencies(  # noqa: WPS211
     container[notification_event_publisher.Client] = notification_event_publisher_client  # type: ignore[type-abstract]
     container[configuration_vectors.Client] = configuration_vectors_client  # type: ignore[type-abstract]
     container[chatbot_handlers.MessageHandler] = message_handler
+    container[whatsapp.Channel] = whatsapp_channel
     return container

@@ -14,6 +14,7 @@ from snowfall.project.junction.plus.notification_channels.order_utils import (
     proto_to_route_identifier,
 )
 from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
+from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence.redis import types as redis
 
@@ -35,6 +36,15 @@ class Channel(AbstractChannel):
         receiver: models_pb2.Subscriber,
         sender_configuration: models_pb2.ConfigurationVector,
     ) -> Sequence[str]:
+        raise NotImplementedError()
+
+    def send_message(
+        self,
+        receiver: str,
+        sender_number: str,
+        body: str | None,
+        media_url: str | None = None,
+    ) -> str:
         raise NotImplementedError()
 
 
@@ -221,6 +231,15 @@ class MockChannel(Channel):
             ),
         )
         return [str(event.alert.monitoring_rule_id)]
+
+    def send_message(
+        self,
+        receiver: str,
+        sender_number: str,
+        body: str | None,
+        media_url: str | None = None,
+    ) -> str:
+        return string.uuid()
 
 
 def transform_trip_details(order: models_pb2.PersistedOrder) -> str:

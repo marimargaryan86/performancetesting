@@ -129,6 +129,7 @@ NOTIFICATIONS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_notifications-${v
 FLIGHT_STATS_APP_KEY={{ .Data.data.flight_stats_app_key }}
 {{ end }}
 {{ with secret "kv/data/${var.environment}/notification-center" }}
+TWILIO_SID={{ .Data.data.twilio_sid }}
 TWILIO_TOKEN={{ .Data.data.twilio_token }}
 {{ end }}
 {{ with secret "kv/data/${var.environment}/poc-api" }}

@@ -1,4 +1,5 @@
 import datetime
+import pathlib
 import random
 from collections.abc import Callable
 
@@ -14,6 +15,9 @@ from snowfall.project.junction.plus.adapter import (
     notification_event_publisher,
     orders,
     subscribers,
+)
+from snowfall.project.junction.plus.notification_channels.whatsapp import (
+    ProviderChannel,
 )
 from snowfall.project.junction.plus.service.notifications.v1alpha import (
     grpc_pb2_grpc as notifications_pb2_grpc,
@@ -38,6 +42,16 @@ def _factory(
         openai.api_key = app.settings.openai_api_key
         openai.organization = app.settings.openai_org
         notifications_channel = create_channel(app.settings.notifications_address)
+        redis_client = redis.Client[str](
+            aioredis.from_url(
+                str(
+                    random.choice(app.settings.redis_dsn),  # noqa: S311
+                ),
+                decode_responses=True,
+                retry_on_error=[aioredis.ConnectionError],
+            ).client(),
+            prefix=app.settings.redis_prefix,
+        )
         return starlette.create_starlette_app(
             router.get_routes(
                 bootstrap.create_dependencies(
@@ -67,18 +81,15 @@ def _factory(
                         ),
                     ),
                     message_handler=chatbot_handlers.MessageHandler(
-                        redis_client=redis.Client[str](
-                            aioredis.from_url(
-                                str(
-                                    random.choice(app.settings.redis_dsn),  # noqa: S311
-                                ),
-                                decode_responses=True,
-                                retry_on_error=[aioredis.ConnectionError],
-                            ).client(),
-                            prefix=app.settings.redis_prefix,
-                        ),
+                        redis_client=redis_client,
                         cache_ttl=datetime.timedelta(minutes=15),
                         ai_bot=open_ai.AIBot(),
+                    ),
+                    whatsapp_channel=ProviderChannel(
+                        sid=app.settings.twilio_sid,
+                        token=app.settings.twilio_token,
+                        redis_client=redis_client,
+                        templates_root_path=pathlib.Path(),
                     ),
                 ),
             ),

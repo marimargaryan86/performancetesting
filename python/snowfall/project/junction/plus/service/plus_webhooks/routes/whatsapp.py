@@ -10,6 +10,7 @@ from snowfall.project.junction.plus.adapter import (
     subscribers,
     validation,
 )
+from snowfall.project.junction.plus.notification_channels import whatsapp
 from snowfall.project.junction.plus.service.notifications.v1alpha import (
     models_pb2 as notifications_pb2,
 )
@@ -27,6 +28,7 @@ class IncomingMessages(endpoints.HTTPEndpoint):
         subscribers_client: subscribers.Client = lagom.injectable,
         configuration_vectors_client: configuration_vectors.Client = lagom.injectable,
         message_handler: chatbot_handlers.MessageHandler = lagom.injectable,
+        whatsapp_channel: whatsapp.Channel = lagom.injectable,
     ) -> responses.Response:
         msg = await request.form()
         message_from = validation.get_whatsapp_number(str(msg["From"]))
@@ -39,14 +41,15 @@ class IncomingMessages(endpoints.HTTPEndpoint):
             cv.reseller_id,
             message_from,
         )
-        twiml_response = MessagingResponse()
         if (  # noqa: WPS337
             subscriber.phone_subscription_status
             is notifications_pb2.Subscriber.SubscribedStatus.SUBSCRIBED_STATUS_UNSUBSCRIBED
             and str(msg["Body"]).lower() != "subscribe"
         ):
-            twiml_response.message(
-                _(
+            whatsapp_channel.send_message(
+                receiver=subscriber.phone_number.e164_number,
+                sender_number=cv.mobile_phone.e164_number,
+                body=_(
                     "You are currently unsubscribed from WhatsApp."
                     " If you wish to receive notifications regarding travel information"
                     " please click the Subscribe option below.",
@@ -66,11 +69,20 @@ class IncomingMessages(endpoints.HTTPEndpoint):
                     split_point = message_split_point + response_message[
                         message_split_point:
                     ].index("\n\n")
-                    twiml_response.message(response_message[:split_point])
+                    whatsapp_channel.send_message(
+                        receiver=subscriber.phone_number.e164_number,
+                        sender_number=cv.mobile_phone.e164_number,
+                        body=response_message[:split_point],
+                    )
                     response_message = response_message[split_point + 1 :]
-                twiml_response.message(response_message)
+                whatsapp_channel.send_message(
+                    receiver=subscriber.phone_number.e164_number,
+                    sender_number=cv.mobile_phone.e164_number,
+                    body=response_message,
+                )
+
         return responses.Response(
-            content=twiml_response.to_xml(),
+            content=MessagingResponse().to_xml(),
             status_code=status.HTTP_200_OK,
             media_type="application/xml",
         )

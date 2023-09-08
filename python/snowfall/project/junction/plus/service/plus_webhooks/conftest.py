@@ -21,6 +21,7 @@ from snowfall.project.junction.plus.adapter import (
 from snowfall.project.junction.plus.adapter import (
     subscribers as subscribers_adapter,
 )
+from snowfall.project.junction.plus.notification_channels import whatsapp
 from snowfall.project.junction.plus.service.notifications.v1alpha import (
     models_pb2 as notifications_models_pb2,
 )
@@ -173,6 +174,11 @@ def redis_client(redis_client: fakeredis.FakeRedis) -> redis.Client[str]:
 
 
 @pytest.fixture()
+def whatsapp_channel() -> whatsapp.Channel:
+    return whatsapp.MockChannel()
+
+
+@pytest.fixture()
 def ai_bot() -> open_ai.AIBot:
     return open_ai.AIBot()
 
@@ -188,6 +194,7 @@ def app(  # noqa: WPS211
     twilio_validator: RequestValidator,
     ai_bot: open_ai.AIBot,
     redis_client: redis.Client[str],
+    whatsapp_channel: whatsapp.Channel,
 ) -> applications.Starlette:
     return application.create_starlette_app(
         custom_middlewares=[
@@ -209,6 +216,7 @@ def app(  # noqa: WPS211
                     cache_ttl=datetime.timedelta(minutes=10),
                     ai_bot=ai_bot,
                 ),
+                whatsapp_channel=whatsapp_channel,
             ),
         ),
         openapi_path=None,

@@ -22,3 +22,13 @@ class AbstractChannel(abc.ABC):
         sender_configuration: models_pb2.ConfigurationVector,
     ) -> Sequence[str]:
         """Send alerts from flight stats."""
+
+    @abc.abstractmethod
+    def send_message(
+        self,
+        receiver: str,
+        sender_number: str,
+        body: str | None,
+        media_url: str | None = None,
+    ) -> str:
+        """Send message."""
