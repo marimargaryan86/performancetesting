@@ -126,15 +126,15 @@ class Trips(object):
         match trip_request.WhichOneof("search_mode"):
             case "one_way":
                 return trips_pb2.SearchTripsResponse(
-                    trips=self._find_one_ways(trip_request.one_way.criterion),
+                    results=self._find_one_ways(trip_request.one_way.criterion),
                 )
             case "round_trip":
                 return trips_pb2.SearchTripsResponse(
-                    trips=self._find_round_trips(trip_request.round_trip),
+                    results=self._find_round_trips(trip_request.round_trip),
                 )
             case "multi_city":
                 return trips_pb2.SearchTripsResponse(
-                    trips=self._find_multi_city(trip_request.multi_city),
+                    results=self._find_multi_city(trip_request.multi_city),
                 )
 
         return trips_pb2.SearchTripsResponse()
@@ -142,7 +142,7 @@ class Trips(object):
     def _find_one_ways(
         self,
         criterion: trips_pb2.SearchTripsRequest.Criterion,
-    ) -> list[trips_pb2.Trip]:
+    ) -> list[trips_pb2.Result]:
         routes = self._routes.find_routes(
             origin=criterion.origin_identifier,
             destination=criterion.destination_identifier,
@@ -154,8 +154,12 @@ class Trips(object):
         )
 
         return [
-            trips_pb2.Trip(
-                segments=self._make_segments(route, departure_at),
+            trips_pb2.Result(
+                trips=[
+                    trips_pb2.Trip(
+                        segments=self._make_segments(route, departure_at),
+                    ),
+                ],
             )
             for route in routes
         ]
@@ -163,7 +167,7 @@ class Trips(object):
     def _find_round_trips(
         self,
         round_trip: trips_pb2.SearchTripsRequest.RoundTrip,
-    ) -> list[trips_pb2.Trip]:
+    ) -> list[trips_pb2.Result]:
         routes = self._routes.find_routes(
             origin=round_trip.criterion.origin_identifier,
             destination=round_trip.criterion.destination_identifier,
@@ -180,10 +184,14 @@ class Trips(object):
         )
 
         return [
-            trips_pb2.Trip(
-                segments=[
-                    *self._make_segments(outbound_route, departure_at),
-                    *self._make_segments(inbound_route[::-1], return_at),
+            trips_pb2.Result(
+                trips=[
+                    trips_pb2.Trip(
+                        segments=self._make_segments(outbound_route, departure_at),
+                    ),
+                    trips_pb2.Trip(
+                        segments=self._make_segments(inbound_route[::-1], return_at),
+                    ),
                 ],
             )
             for outbound_route, inbound_route in itertools.product(routes, routes)
@@ -192,8 +200,8 @@ class Trips(object):
     def _find_multi_city(
         self,
         multi_city: trips_pb2.SearchTripsRequest.MultiCity,
-    ) -> list[trips_pb2.Trip]:
-        criteria_segments = []
+    ) -> list[trips_pb2.Result]:
+        criteria_trips = []
 
         for criterion in multi_city.criteria:
             routes = self._routes.find_routes(
@@ -205,15 +213,20 @@ class Trips(object):
                 datetime.time(hour=8),
                 tzinfo=datetime.UTC,
             )
-            criteria_segments.append(
-                [self._make_segments(route, departure_at) for route in routes],
+            criteria_trips.append(
+                [
+                    trips_pb2.Trip(
+                        segments=self._make_segments(route, departure_at),
+                    )
+                    for route in routes
+                ],
             )
 
         return [
-            trips_pb2.Trip(
-                segments=list(itertools.chain(*trip)),
+            trips_pb2.Result(
+                trips=trips,
             )
-            for trip in itertools.product(*criteria_segments)
+            for trips in itertools.product(*criteria_trips)
         ]
 
     def _make_segments(

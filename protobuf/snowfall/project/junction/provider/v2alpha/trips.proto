@@ -37,8 +37,12 @@ message Segment {
 }
 
 message Trip {
-  repeated Segment segments = 2;
-  repeated Fare fares = 3;
+  repeated Segment segments = 1;
+}
+
+message Result {
+  repeated Trip trips = 1;
+  repeated Fare fares = 2;
 }
 
 message Fare {
@@ -82,7 +86,7 @@ message SearchTripsRequest {
 }
 
 message SearchTripsResponse {
-  repeated Trip trips = 1;
+  repeated Result results = 1;
 
   // The duration Junction is allowed to cache these results for. If Junction
   // has results for a specific trip search cached, it will reuse the cached

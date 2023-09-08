@@ -118,53 +118,49 @@ async def multi_city_response(
 
 
 class TestTrips(object):
-    def test_one_way_result_contains_trips(
+    def test_one_way_response_contains_results(
         self,
         one_way_response: trips_pb2.SearchTripsResponse,
     ) -> None:
-        assert len(one_way_response.trips)
+        assert len(one_way_response.results)
 
-    def test_round_trip_result_contains_power_of_trips(
+    def test_round_trip_response_contains_power_of_results(
         self,
         round_trip_response: trips_pb2.SearchTripsResponse,
         one_way_response: trips_pb2.SearchTripsResponse,
     ) -> None:
-        assert len(round_trip_response.trips) == len(one_way_response.trips) ** 2
+        assert len(round_trip_response.results) == len(one_way_response.results) ** 2
 
-    def test_round_trip_result_contains_return_trip(
+    def test_round_trip_response_contains_return_trip(
         self,
         round_trip_response: trips_pb2.SearchTripsResponse,
     ) -> None:
-        for trip in round_trip_response.trips:
-            first_leg = trip.segments[0].legs[0]
-            last_leg = trip.segments[-1].legs[-1]
+        for trip_result in round_trip_response.results:
+            first_outbound_segment = trip_result.trips[0].segments[0]
+            last_inbound_segment = trip_result.trips[-1].segments[-1]
+            first_leg = first_outbound_segment.legs[0]
+            last_leg = last_inbound_segment.legs[-1]
             assert first_leg.origin.ref == last_leg.destination.ref
 
-    def test_multi_city_result_contains_trips(
+    def test_multi_city_response_contains_trips(
         self,
         multi_city_response: trips_pb2.SearchTripsResponse,
     ) -> None:
-        assert len(multi_city_response.trips)
+        assert len(multi_city_response.results)
 
-    def test_multi_city_result_contains_all_criteria(
+    def test_multi_city_response_contains_all_criteria(
         self,
         multi_city_response: trips_pb2.SearchTripsResponse,
         multi_city_criteria: Sequence[trips_pb2.SearchTripsRequest.Criterion],
     ) -> None:
-        for criterion in multi_city_criteria:
-            for trip in multi_city_response.trips:
-                origins = [
-                    leg.origin.ref for segment in trip.segments for leg in segment.legs
-                ]
-                destinations = [
-                    leg.destination.ref
-                    for segment in trip.segments
-                    for leg in segment.legs
-                ]
-                assert criterion.origin_identifier in origins
-                assert criterion.destination_identifier in destinations
+        for trip_result in multi_city_response.results:
+            for crit, trip in zip(multi_city_criteria, trip_result.trips, strict=True):
+                first_leg = trip.segments[0].legs[0]
+                last_leg = trip.segments[-1].legs[-1]
+                assert crit.origin_identifier == first_leg.origin.ref
+                assert crit.destination_identifier == last_leg.destination.ref
 
-    async def test_unknown_search_result_contains_no_trips(
+    async def test_unknown_search_response_contains_no_trips(
         self,
         trip_searcher: trips.Trips,
         passengers: Sequence[trips_pb2.SearchTripsRequest.Passenger],
@@ -184,7 +180,7 @@ class TestTrips(object):
             ),
         )
 
-        assert not len(response.trips)
+        assert not len(response.results)
 
 
 def _generate_criterion(
