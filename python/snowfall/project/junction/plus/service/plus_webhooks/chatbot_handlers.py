@@ -271,7 +271,7 @@ async def handle_unknown(
         state: Mapping[str, Any] = json.loads(state_str) or {}
         if state.get("ai_enabled"):
             # We should associate with message id to not bind those keywords, but we can do it after refactoring and async reply on chatbot.
-            if message in {"yes", "no"}:
+            if message.lower() in {"yes", "no"}:
                 await session.delete(subscriber.phone_number.e164_number)
                 if message == "yes":
                     return await travel_assistant(subscriber, ai_bot, redis_client)

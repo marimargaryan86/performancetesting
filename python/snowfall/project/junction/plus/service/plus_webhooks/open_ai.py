@@ -61,5 +61,8 @@ class AIBot(object):
         assistant_message = ai_response["choices"][0]["message"].to_dict()
         if assistant_message.get("function_call"):
             function_name = assistant_message["function_call"]["name"]
-            return {"content": self.available_functions[function_name]()}
+            return {
+                "content": self.available_functions[function_name](),
+                "role": "assistant",
+            }
         return assistant_message
