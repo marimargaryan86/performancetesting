@@ -7,6 +7,7 @@ from snowfall.project.pay.service.companies.v1alpha.models_pb2 import PaymentTyp
 from snowfall.project.pay.service.transactions.cache import UserSessionRepository
 from snowfall.project.pay.service.transactions.quote import Quote
 from snowfall.project.pay.service.transactions.transactions import (
+    BillsRepository,
     ConversionsRepository,
     QuotationsRepository,
     TransactionsRepository,
@@ -332,6 +333,119 @@ class ConversionsService(
             conversions=[conversion_result async for conversion_result in conversions],
             next_page_token=await conversions.cursor(),
         )
+
+
+class BillsService(  # noqa: WPS214
+    service.Service,
+    grpc_pb2_grpc.BillsServiceServicer,
+):
+    def __init__(
+        self,
+        bills: BillsRepository,
+    ):
+        self._bills = bills
+        self._default_page_size = 20
+
+    def get_name(self) -> str:
+        return grpc_pb2.DESCRIPTOR.services_by_name["BillsService"].full_name
+
+    def register(self, server: grpc.aio.Server) -> None:
+        grpc_pb2_grpc.add_BillsServiceServicer_to_server(
+            self,
+            server,
+        )
+
+    async def ListBills(  # type: ignore[override] # noqa: N802
+        self,
+        request: grpc_pb2.ListTransactionsRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.ListBillsResponse:
+        bills = await self._bills.find(
+            cursor=request.page_token,
+        )
+        bills.limit(
+            request.page_size if request.page_size else self._default_page_size,
+        )
+
+        return grpc_pb2.ListBillsResponse(
+            bills=[bill async for bill in bills],
+            next_page_token=await bills.cursor(),
+        )
+
+    async def GetBill(  # type: ignore[override] # noqa: N802
+        self,
+        request: grpc_pb2.GetTransactionRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.GetBillResponse:
+        bill = await self._get_bill(context, request.id)
+
+        return grpc_pb2.GetBillResponse(bill=bill)
+
+    async def CreateBill(  # type: ignore[override] # noqa: N802, WPS210
+        self,
+        request: grpc_pb2.CreateBillRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.CreateBillResponse:
+        request.bill.id = string.uuid()
+
+        inserted_bill = await self._bills.insert(request.bill)
+
+        return grpc_pb2.CreateBillResponse(bill=inserted_bill)
+
+    async def AddToBillAmount(  # type: ignore[override] # noqa: N802, WPS210
+        self,
+        request: grpc_pb2.AddToBillAmountRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.AddToBillAmountResponse:
+        bill = await self._get_bill(context, request.id)
+
+        total_amount = money.from_protobuf(bill.total_amount)
+        add_amount = money.from_protobuf(request.amount)
+
+        bill.MergeFrom(
+            models_pb2.Bill(
+                total_amount=total_amount.add(add_amount).protobuf(),
+                is_reconciled=False,
+            ),
+        )
+
+        return grpc_pb2.AddToBillAmountResponse(
+            bill=await self._bills.update(bill),
+        )
+
+    async def UpdateBillReconciliation(  # type: ignore[override] # noqa: N802, WPS210
+        self,
+        request: grpc_pb2.UpdateBillReconciliationRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.UpdateBillReconciliationResponse:
+        bill = await self._get_bill(context, request.id)
+
+        if request.is_reconciled:
+            bill.MergeFrom(
+                models_pb2.Bill(
+                    reconciled_amount=bill.total_amount,
+                    is_reconciled=request.is_reconciled,
+                ),
+            )
+        else:
+            bill.ClearField("reconciled_amount")
+            bill.is_reconciled = request.is_reconciled
+
+        return grpc_pb2.UpdateBillReconciliationResponse(
+            bill=await self._bills.update(bill),
+        )
+
+    async def _get_bill(
+        self,
+        context: grpc.aio.ServicerContext,
+        identifier: str,
+    ) -> models_pb2.Bill:
+        bill = await self._bills.find_by_id(identifier)
+
+        if bill is None:
+            await context.abort(grpc.StatusCode.NOT_FOUND)
+
+        return bill  # type: ignore[return-value]
 
 
 async def _create_conversion(

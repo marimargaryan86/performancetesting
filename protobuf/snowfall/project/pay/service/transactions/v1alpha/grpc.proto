@@ -27,6 +27,14 @@ service ConversionsService {
   rpc ListConversions(ListConversionsRequest) returns (ListConversionsResponse) {}
 }
 
+service BillsService {
+  rpc CreateBill(CreateBillRequest) returns (CreateBillResponse) {}
+  rpc GetBill(GetBillRequest) returns (GetBillResponse) {}
+  rpc AddToBillAmount(AddToBillAmountRequest) returns (AddToBillAmountResponse) {}
+  rpc UpdateBillReconciliation(UpdateBillReconciliationRequest) returns (UpdateBillReconciliationResponse) {}
+  rpc ListBills(ListBillsRequest) returns (ListBillsResponse) {}
+}
+
 message ListTransactionsRequest {
   int32 page_size = 1;
   string page_token = 2;
@@ -126,4 +134,46 @@ message ListConversionsRequest {
 message ListConversionsResponse {
   string next_page_token = 1;
   repeated Conversion conversions = 2;
+}
+
+message CreateBillRequest {
+  Bill bill = 1;
+}
+
+message CreateBillResponse {
+  Bill bill = 1;
+}
+
+message GetBillRequest {
+  string id = 1;
+}
+
+message GetBillResponse {
+  Bill bill = 1;
+}
+
+message AddToBillAmountRequest {
+  string id = 1;
+  snowfall.stdlib.v1.Money amount = 2;
+}
+
+message AddToBillAmountResponse {
+  Bill bill = 1;
+}
+message UpdateBillReconciliationRequest {
+  string id = 1;
+  bool is_reconciled = 2;
+}
+
+message UpdateBillReconciliationResponse {
+  Bill bill = 1;
+}
+message ListBillsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+}
+
+message ListBillsResponse {
+  string next_page_token = 1;
+  repeated Bill bills = 2;
 }

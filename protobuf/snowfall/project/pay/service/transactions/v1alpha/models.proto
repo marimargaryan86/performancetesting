@@ -82,3 +82,11 @@ message Conversion {
   }
   Status status = 8;
 }
+
+message Bill {
+  string id = 1;
+  string order_id = 2;
+  optional bool is_reconciled = 3;
+  snowfall.stdlib.v1.Money total_amount = 4;
+  snowfall.stdlib.v1.Money reconciled_amount = 5;
+}

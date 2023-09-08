@@ -15,6 +15,7 @@ from snowfall.project.pay.service.companies.v1alpha import (
 from snowfall.project.pay.service.currencies.v1alpha import currencies_pb2_grpc
 from snowfall.project.pay.service.transactions import cache, transactions
 from snowfall.project.pay.service.transactions.grpc import (
+    BillsService,
     ConversionsService,
     QuotationsService,
     TransactionsService,
@@ -103,6 +104,11 @@ async def _serve(app: application.AsyncApplication[_GrpcSettings]) -> None:
             ConversionsService(
                 conversions=transactions.ConversionsRepository(
                     mongo.transactions.conversions,
+                ),
+            ),
+            BillsService(
+                bills=transactions.BillsRepository(
+                    mongo.transactions.bills,
                 ),
             ),
         ],

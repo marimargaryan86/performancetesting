@@ -119,3 +119,34 @@ class ConversionsRepository(
             cur=cursor or "",
             filter_=filter_,
         )
+
+
+class BillsRepository(
+    mixins.FindByIdMixin[models_pb2.Bill],
+    mixins.InsertMixin[models_pb2.Bill],
+    repository.ProtoRepository[models_pb2.Bill],
+):
+    _proto = models_pb2.Bill
+
+    async def update(
+        self,
+        bill: models_pb2.Bill,
+    ) -> models_pb2.Bill:
+        replacement = self._coder.encode(bill)
+
+        await self._execute(
+            self._collection.replace_one,
+            filter={"_id": bill.id},
+            replacement=replacement,
+            upsert=False,
+        )
+
+        return bill
+
+    async def find(
+        self,
+        cursor: str | None,
+    ) -> resultset.ResultSet[models_pb2.Bill]:
+        return await self._find_with_cursor(
+            cur=cursor or "",
+        )
