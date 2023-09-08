@@ -29,6 +29,11 @@ def _generate_search_criteria(
     br_session_token: str,
 ) -> Iterator[amqp_pb2.SearchCriteriaTask]:
     for origin, destination in trip_criteria.get_combinations():
+        hour = trip_criteria.outbound.departure.hour
+
+        if hour % 2:
+            hour = hour - 1
+
         task = amqp_pb2.SearchCriteriaTask(
             segments=trip_criteria.outbound.segments,
             criteria=amqp_pb2.Criteria(
@@ -37,7 +42,7 @@ def _generate_search_criteria(
                 passenger_dob=passenger_dobs,
                 outbound_departure_datetime=protobuf.datetime_to_protobuf_datetime(
                     trip_criteria.outbound.departure.replace(
-                        hour=0,
+                        hour=hour,
                         minute=0,
                         second=0,
                         microsecond=0,
