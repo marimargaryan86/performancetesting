@@ -123,7 +123,26 @@ class Trips(object):
         self,
         trip_request: trips_pb2.SearchTripsRequest,
     ) -> trips_pb2.SearchTripsResponse:
-        criterion = trip_request.one_way.criterion
+        match trip_request.WhichOneof("search_mode"):
+            case "one_way":
+                return trips_pb2.SearchTripsResponse(
+                    trips=self._find_one_ways(trip_request.one_way.criterion),
+                )
+            case "round_trip":
+                return trips_pb2.SearchTripsResponse(
+                    trips=self._find_round_trips(trip_request.round_trip),
+                )
+            case "multi_city":
+                return trips_pb2.SearchTripsResponse(
+                    trips=self._find_multi_city(trip_request.multi_city),
+                )
+
+        return trips_pb2.SearchTripsResponse()
+
+    def _find_one_ways(
+        self,
+        criterion: trips_pb2.SearchTripsRequest.Criterion,
+    ) -> list[trips_pb2.Trip]:
         routes = self._routes.find_routes(
             origin=criterion.origin_identifier,
             destination=criterion.destination_identifier,
@@ -134,35 +153,87 @@ class Trips(object):
             tzinfo=datetime.UTC,
         )
 
-        return trips_pb2.SearchTripsResponse(
-            trips=[
-                self._make_trip(
-                    departure_at=departure_at,
-                    route=route,
-                )
-                for route in routes
-            ],
+        return [
+            trips_pb2.Trip(
+                segments=self._make_segments(route, departure_at),
+            )
+            for route in routes
+        ]
+
+    def _find_round_trips(
+        self,
+        round_trip: trips_pb2.SearchTripsRequest.RoundTrip,
+    ) -> list[trips_pb2.Trip]:
+        routes = self._routes.find_routes(
+            origin=round_trip.criterion.origin_identifier,
+            destination=round_trip.criterion.destination_identifier,
+        )
+        departure_at = datetime.datetime.combine(
+            protobuf.protobuf_to_date(round_trip.criterion.departure_date),
+            datetime.time(hour=8),
+            tzinfo=datetime.UTC,
+        )
+        return_at = datetime.datetime.combine(
+            protobuf.protobuf_to_date(round_trip.return_date),
+            datetime.time(hour=8),
+            tzinfo=datetime.UTC,
         )
 
-    def _make_trip(
+        return [
+            trips_pb2.Trip(
+                segments=[
+                    *self._make_segments(outbound_route, departure_at),
+                    *self._make_segments(inbound_route[::-1], return_at),
+                ],
+            )
+            for outbound_route, inbound_route in itertools.product(routes, routes)
+        ]
+
+    def _find_multi_city(
         self,
-        departure_at: datetime.datetime,
+        multi_city: trips_pb2.SearchTripsRequest.MultiCity,
+    ) -> list[trips_pb2.Trip]:
+        criteria_segments = []
+
+        for criterion in multi_city.criteria:
+            routes = self._routes.find_routes(
+                origin=criterion.origin_identifier,
+                destination=criterion.destination_identifier,
+            )
+            departure_at = datetime.datetime.combine(
+                protobuf.protobuf_to_date(criterion.departure_date),
+                datetime.time(hour=8),
+                tzinfo=datetime.UTC,
+            )
+            criteria_segments.append(
+                [self._make_segments(route, departure_at) for route in routes],
+            )
+
+        return [
+            trips_pb2.Trip(
+                segments=list(itertools.chain(*trip)),
+            )
+            for trip in itertools.product(*criteria_segments)
+        ]
+
+    def _make_segments(
+        self,
         route: Sequence[Stop],
-    ) -> trips_pb2.Trip:
+        departure_at: datetime.datetime,
+    ) -> list[trips_pb2.Segment]:
         travel_time = FakeTravelTime(
             departure_at=departure_at,
             start=route[0],
         )
-        return trips_pb2.Trip(
-            segments=[
-                self._make_segment(
-                    travel_time=travel_time,
-                    origin=origin,
-                    destination=destination,
-                )
-                for origin, destination in itertools.pairwise(route)
-            ],
-        )
+
+        return [
+            self._make_segment(
+                travel_time=travel_time,
+                origin=origin,
+                destination=destination,
+            )
+            for origin, destination in itertools.pairwise(route)
+        ]
 
     def _make_segment(
         self,
