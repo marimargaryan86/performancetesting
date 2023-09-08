@@ -1,6 +1,7 @@
 import asyncio
 import datetime
 import pathlib
+import types
 import uuid
 from collections.abc import Sequence
 
@@ -25,6 +26,36 @@ from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence import filesystem
 from snowfall.vendor.ask2go import client, errors
 from snowfall.vendor.ask2go.models import booking, common
+
+_PROVIDER_STATUS_MAPPING = types.MappingProxyType(
+    {
+        "BookingUpdated": bookings_pb2.Booking.STATUS_UNSPECIFIED,
+        "PricingSuccedded": bookings_pb2.Booking.STATUS_UNSPECIFIED,
+        "PricingPending": bookings_pb2.Booking.STATUS_UNSPECIFIED,
+        "ValidationPending": bookings_pb2.Booking.STATUS_UNSPECIFIED,
+        "ValidationDone": bookings_pb2.Booking.STATUS_UNSPECIFIED,
+        "ScheduleChange": bookings_pb2.Booking.STATUS_UNSPECIFIED,
+        "BookingPending": bookings_pb2.Booking.STATUS_PENDING,
+        "Completed": bookings_pb2.Booking.STATUS_CONFIRMED,
+        "BookingDone (if related to hotel)": bookings_pb2.Booking.STATUS_CONFIRMED,
+        "PNRCreated": bookings_pb2.Booking.STATUS_NOT_TICKETED,
+        "BookingDone (if related to air)": bookings_pb2.Booking.STATUS_NOT_TICKETED,
+        "Unknown": bookings_pb2.Booking.STATUS_ERROR,
+        "DBError": bookings_pb2.Booking.STATUS_ERROR,
+        "Expired": bookings_pb2.Booking.STATUS_ERROR,
+        "BookingFailed": bookings_pb2.Booking.STATUS_ERROR,
+        "PricingFailed": bookings_pb2.Booking.STATUS_ERROR,
+        "PriceDifference": bookings_pb2.Booking.STATUS_ERROR,
+        "Duplicate": bookings_pb2.Booking.STATUS_ERROR,
+        "Timeout": bookings_pb2.Booking.STATUS_ERROR,
+        "TicketingFailed": bookings_pb2.Booking.STATUS_ERROR,
+        "TicketingSkipped": bookings_pb2.Booking.STATUS_ERROR,
+        "Fraud": bookings_pb2.Booking.STATUS_ERROR,
+        "NotFound": bookings_pb2.Booking.STATUS_ERROR,
+        "GeneralException": bookings_pb2.Booking.STATUS_ERROR,
+        "Cancelled": bookings_pb2.Booking.STATUS_CANCELLED,
+    },
+)
 
 
 class BookingError(errors.Ask2GoError):
@@ -268,12 +299,12 @@ class Transformer(object):
     async def raw_to_booking(self, raw: bytes) -> bookings_pb2.Booking:
         booking_result = booking.Booking(**orjson.loads(raw))
 
-        # TODO: How to figure out real status?
-        booking_status = bookings_pb2.Booking.STATUS_NOT_TICKETED
-
         return bookings_pb2.Booking(
             id=str(booking_result.information.booking_id),
-            status=booking_status,
+            status=_PROVIDER_STATUS_MAPPING.get(
+                booking_result.information.status,
+                bookings_pb2.Booking.STATUS_UNSPECIFIED,
+            ),
             provider=bookings_pb2.Booking.Provider(
                 id=self._provider_id,
                 name=self._provider_name,

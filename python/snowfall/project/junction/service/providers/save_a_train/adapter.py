@@ -5,6 +5,7 @@ import datetime
 import http
 import json
 import pathlib
+import types
 import uuid
 from collections.abc import AsyncIterator, Sequence
 
@@ -41,6 +42,17 @@ from snowfall.vendor.save_a_train.models import (
     booking,
     request,
     search_result_selection,
+)
+
+_PROVIDER_STATUS_MAPPING = types.MappingProxyType(
+    {
+        "confirmed": bookings_pb2.Booking.STATUS_PENDING,
+        "pending": bookings_pb2.Booking.STATUS_PENDING,
+        "completed": bookings_pb2.Booking.STATUS_CONFIRMED,
+        "failed": bookings_pb2.Booking.STATUS_ERROR,
+        "expired": bookings_pb2.Booking.STATUS_ERROR,
+        "canceled": bookings_pb2.Booking.STATUS_CANCELLED,
+    },
 )
 
 logger = stdout.get_logger()
@@ -567,8 +579,6 @@ class Transformer(object):
         )
         external_info = combined.get("external_information")
 
-        # TODO: How to figure out real status?
-        booking_status = bookings_pb2.Booking.STATUS_CONFIRMED
         ticket_url = None
         if external_info:
             path = pathlib.Path(
@@ -581,7 +591,10 @@ class Transformer(object):
             ticket_url = ""
         return bookings_pb2.Booking(
             id=booking_info.search_identifier,
-            status=booking_status,
+            status=_PROVIDER_STATUS_MAPPING.get(
+                ticket_info.status,
+                bookings_pb2.Booking.STATUS_UNSPECIFIED,
+            ),
             provider=bookings_pb2.Booking.Provider(
                 id=self._provider_id,
                 name=self._provider_name,

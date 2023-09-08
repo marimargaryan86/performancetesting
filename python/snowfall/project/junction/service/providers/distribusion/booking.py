@@ -1,6 +1,7 @@
 import asyncio
 import datetime
 import pathlib
+import types
 import uuid
 import zoneinfo
 
@@ -20,7 +21,14 @@ from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence import filesystem
 from snowfall.vendor.distribusion import client, enums, errors, jsonapi_helpers
 from snowfall.vendor.distribusion.models import criterias, orders
-from snowfall.vendor.distribusion.models import orders as model_orders
+
+_PROVIDER_STATUS_MAPPING = types.MappingProxyType(
+    {
+        "created": bookings_pb2.Booking.STATUS_PENDING,
+        "executed": bookings_pb2.Booking.STATUS_CONFIRMED,
+        "failed": bookings_pb2.Booking.STATUS_ERROR,
+    },
+)
 
 
 class BookingHandler(object):
@@ -107,7 +115,7 @@ class BookingHandler(object):
         details: cache.OfferDetails,
         *,
         send_customer_email: bool = True,
-    ) -> model_orders.OrderResponse:
+    ) -> orders.OrderResponse:
         first_trip_details = task.booking.trip_option.details[0]
         last_trip_details = task.booking.trip_option.details[-1]
         booker = task.passengers[0]
@@ -204,8 +212,8 @@ class BookingHandler(object):
 
     async def _poll_booking(
         self,
-        model: model_orders.OrderCreateResponse,
-    ) -> tuple[model_orders.OrderResponse, bytes]:
+        model: orders.OrderCreateResponse,
+    ) -> tuple[orders.OrderResponse, bytes]:
         for _ in range(self._poll_retries_limit):
             order, raw_data = await self._client.get_order(model.identifier)
 
@@ -245,18 +253,11 @@ class Transformer(object):
             **jsonapi_helpers.flatten_object(orjson.loads(raw)),
         )
 
-        booking_status = bookings_pb2.Booking.STATUS_UNSPECIFIED
         record_locator = ""
         booking_references = []
         created_at = None
-        # TODO: How to figure out real status?
         if booking_result.booking:
             booking = booking_result.booking
-
-            booking_status = bookings_pb2.Booking.STATUS_NOT_TICKETED
-            if booking.marketing_carrier_booking_number:
-                booking_status = bookings_pb2.Booking.STATUS_CONFIRMED
-
             record_locator = booking.marketing_carrier_booking_number or ""
 
             if booking.distribusion_booking_number:
@@ -268,7 +269,10 @@ class Transformer(object):
 
         return bookings_pb2.Booking(
             id=booking_result.identifier,
-            status=booking_status,
+            status=_PROVIDER_STATUS_MAPPING.get(
+                booking_result.state,
+                bookings_pb2.Booking.STATUS_UNSPECIFIED,
+            ),
             provider=bookings_pb2.Booking.Provider(
                 id=self._provider_id,
                 name=self._provider_name,
