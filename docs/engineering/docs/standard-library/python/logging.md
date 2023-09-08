@@ -110,6 +110,19 @@ This will produce output similar to the first approach:
 {"event":"transaction failed","transaction_id":"f0e6b473-146f-4f92-aaa6-80dccff8201b","source":"application","logger":"__console__","level":"error","timestamp":"2023-04-27T12:38:22.666647Z"}
 ```
 
+You can also use the context manager to bind things later, producing the same
+output as in the previous example:
+
+```py
+from snowfall.stdlib.logging import stdout
+
+logger = stdout.get_logger()
+
+with stdout.context_binding() as context:
+    context.bind(transaction_id="f0e6b473-146f-4f92-aaa6-80dccff8201b")
+    logger.error("transaction failed")
+```
+
 :::caution
 Remember to never have variable data as part of the log message since that will
 make it much harder to search for the log event. Instead, bind your variables as
