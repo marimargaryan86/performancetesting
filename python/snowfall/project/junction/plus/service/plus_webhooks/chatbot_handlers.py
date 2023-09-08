@@ -99,6 +99,7 @@ def message_handlers(fun: str) -> Any:
         "main menu": main_menu,
         "check-in": check_in,
         "upcoming trip details": upcoming_trip_details,
+        "travel assistant": travel_assistant,
     }.get(fun, handle_unknown)
 
 
@@ -269,6 +270,12 @@ async def handle_unknown(
     if state_str:
         state: Mapping[str, Any] = json.loads(state_str) or {}
         if state.get("ai_enabled"):
+            # We should associate with message id to not bind those keywords, but we can do it after refactoring and async reply on chatbot.
+            if message in {"yes", "no"}:
+                await session.delete(subscriber.phone_number.e164_number)
+                if message == "yes":
+                    return await travel_assistant(subscriber, ai_bot, redis_client)
+                return [action_menu]
             ai_chat_history = state.get("ai_chat_history", [])
             ai_chat_history.append({"role": "user", "content": message})
             assistant_message = await ai_bot.handle_prompt(ai_chat_history)
