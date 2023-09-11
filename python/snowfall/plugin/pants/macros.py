@@ -74,14 +74,14 @@ def go_image(  # type: ignore[no-untyped-def]
     )
 
     # latest
-    tag_sha = "73deaaf6a207c1a33850257ba74e0f196bc418636cada9943a03d7abea980d6d"
+    tag_sha = "46c5b9bd3e3efff512e28350766b54355fce6337a0b44ba3f822ab918eca4520"
 
     docker_image(  # type: ignore[name-defined]  # noqa: F821
         name="{name}_docker".format(name=name),
         dependencies=[":{name}".format(name=name)],
         image_tags=["{build_args.VERSION}"],
         instructions=[
-            "FROM gcr.io/distroless/base@sha256:{hash} AS runtime".format(
+            "FROM gcr.io/distroless/base-debian11@sha256:{hash} AS runtime".format(
                 hash=tag_sha,
             ),
             "COPY {namespace}/{name} /bin/{name}".format(
@@ -153,11 +153,11 @@ def python_image(  # type: ignore[no-untyped-def]
         image_tags=["{build_args.VERSION}"],
         instructions=[
             "FROM cgr.dev/chainguard/wolfi-base:latest@sha256:{hash} AS runtime".format(
-                hash="46d848cfc02366b9f44e8e9323935ecb349286bf8a047a9e83186d91a105fc3a",
+                hash="f73a3360466ecc4d6df3f451d7d5c4c49663096e158848ddbc9603c52a47bffe",
             ),
             (
                 "RUN apk update && apk add --no-cache --update-cache"
-                " python-3.11~=3.11.4 tzdata~=2023c"
+                " python-3.11~=3.11.5 tzdata~=2023c"
             ),
             "ENV PYTHONUNBUFFERED 1",
             "COPY {namespace}/{name}.pex /bin/{name}".format(

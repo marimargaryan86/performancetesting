@@ -47,7 +47,7 @@ pants:setup:
     PANTS_DOCKER_REGISTRIES: "{'${CI_REGISTRY}': {'address': '${CI_REGISTRY}', 'default': True}}"
     PANTS_NAMED_CACHES_DIR: "${CI_PROJECT_DIR}/.cache/named_caches"
   services:
-    - name: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/buchgr/bazel-remote-cache:v2.4.2"
+    - name: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/buchgr/bazel-remote-cache:v2.4.3"
       alias: bazel-remote
       variables:
         BAZEL_REMOTE_MAX_SIZE: 30

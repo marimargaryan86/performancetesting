@@ -49,12 +49,12 @@ interpreter_constraints = ["CPython==3.11.*"]
 
 [buf]
 config = "protobuf/buf.yaml"
-version = "v1.25.1"
+version = "v1.26.1"
 known_versions = [
-    "v1.25.1|linux_arm64 |6940331d4b7c852da959513680b2249a0754484711a14ab9e8e3c1042f463749|15823775",
-    "v1.25.1|linux_x86_64|b9fe83630604dc1fecaf7d1cfdda12b581eb9601eac49308c976dcf8e71ebd6e|17393625",
-    "v1.25.1|macos_arm64 |324410e35186bc2a4b5c4ac984b5c1a599040fbb7e7c7e38b35427d55d14f66a|17734187",
-    "v1.25.1|macos_x86_64|18a23fd9fc5a1be2116957eca6ddddf8c15b0eb16e3b1156e43f3c9a516f5a74|18334627",
+    "v1.26.1|linux_arm64 |939ed1b101a4919d86176750c146807e0e3a5f4d15611b11d3e126322eac6d9a|15836568",
+    "v1.26.1|linux_x86_64|7286b1c6c84392f327991fd4c7b2e7f1bcff141cd1249e797a93d094c2f662ba|17406450",
+    "v1.26.1|macos_arm64 |de71605e1a3a9283b3c895accb33f405e050e4e88ded91131dedf9928188c1a6|17744956",
+    "v1.26.1|macos_x86_64|d7aa5bc29e7b4819dd138f1de170ff5180d7a6a5ea5f4005df5aad55e16f7143|18349781",
 ]
 
 [cli.alias]
@@ -106,14 +106,23 @@ requirements = ["mypy-protobuf", "protobuf"]
 install_from_resolve = "python-default"
 interpreter_constraints = ["CPython==3.11.*"]
 
+[pex-cli]
+version = "v2.1.145"
+known_versions = [
+    "v2.1.145|linux_arm64 |3940d85b6611cdf0496d223d7e65bff5aa6180cf7150d7fcd3527023c0348090|4195319",
+    "v2.1.145|linux_x86_64|3940d85b6611cdf0496d223d7e65bff5aa6180cf7150d7fcd3527023c0348090|4195319",
+    "v2.1.145|macos_arm64 |3940d85b6611cdf0496d223d7e65bff5aa6180cf7150d7fcd3527023c0348090|4195319",
+    "v2.1.145|macos_x86_64|3940d85b6611cdf0496d223d7e65bff5aa6180cf7150d7fcd3527023c0348090|4195319",
+]
+
 [protoc]
-version = "23.4"
+version = "24.3"
 url_platform_mapping = { linux_arm64 = "linux-aarch_64", linux_x86_64 = "linux-x86_64", macos_arm64 = "osx-aarch_64", macos_x86_64 = "osx-x86_64" }
 known_versions = [
-    "23.4|linux_arm64 |1c7750b6e038305b5a7fc3d0cda1ebefdf106a4f30a787bf826ed2fc47c3967d|2879347",
-    "23.4|linux_x86_64|0502f286ac9ed860b629a7965a14527b1f2dd131e4283fa23c2d7f184672aa9a|2916317",
-    "23.4|macos_arm64 |8c7afae8626b6811e7b5897d16d940c2dbf50b1e135ed958a01db6566bdda726|1974960",
-    "23.4|macos_x86_64|07e5fdcf1b0708d3367dc5e6eb8d135de7e407d75316c93155cfd8ab362eec80|2008727",
+    "24.3|linux_arm64 |77a5a41f3e9712af6a35de13143b9b2b77f075aa1ab18a63cca4483b30f6e3cd|2971115",
+    "24.3|linux_x86_64|fc793561283d9ea6813fb757ae54f1afea6770afcd930904bdf3e590910420aa|3005508",
+    "24.3|macos_arm64 |cca53adb73a6686dd60bb3b0da33961e6b9dab1f833c851b5e1bb7b5df02b36f|2089053",
+    "24.3|macos_x86_64|13b45cdcde9b2101e982de897d5490cfd81dfa181605749c23982379ba0e3288|2121387",
 ]
 
 [pytest]
@@ -136,6 +145,7 @@ interpreter_constraints = ["CPython==3.11.*"]
 enable_resolves = true
 tailor_pex_binary_targets = false
 resolves = {python-default = "vendor/constraints.txt"}
+pip_version = "23.0.1"
 
 [python-infer]
 unowned_dependency_behavior = "error"
@@ -148,6 +158,9 @@ config = "@vendor/regexes.json"
 
 [ruff]
 config = "vendor/pyproject.toml"
+install_from_resolve = "python-default"
+
+[setuptools]
 install_from_resolve = "python-default"
 
 [shellcheck]
