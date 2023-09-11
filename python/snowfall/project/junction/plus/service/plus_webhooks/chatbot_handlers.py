@@ -41,7 +41,7 @@ class MessageHandler(object):
         self._ai_bot = ai_bot
         self._logger = stdout.get_logger()
 
-    async def handle_message(  # noqa: WPS211
+    async def handle_message(  # noqa: WPS211,WPS210
         self,
         message: str,
         message_key: str,
@@ -49,7 +49,8 @@ class MessageHandler(object):
         subscribers_client: subscribers.Client,
         orders_client: orders.Client,
     ) -> Sequence[str]:
-        subscriber_state = await self.get_state(subscriber)
+        subscriber_state = await self.get_state("subscriber_state", subscriber)
+        ai_assistant_state = await self.get_state("ai_assistant_state", subscriber)
         if (  # noqa: WPS337
             subscriber_state.get("last_handler")
             in {"upcoming_trips", "upcoming_trip_details"}
@@ -58,6 +59,11 @@ class MessageHandler(object):
             message_key = message
             message = "upcoming trip details"
         message_handler = message_handlers(message.lower())
+        if (  # noqa: WPS337
+            ai_assistant_state.get("ai_enabled")
+            and message_handler is not handle_unknown
+        ):
+            await self.delete_state("ai_assistant_state", subscriber)
         response = await message_handler(
             subscriber=subscriber,
             subscribers_client=subscribers_client,
@@ -70,23 +76,36 @@ class MessageHandler(object):
         subscriber_state["last_message"] = message
         subscriber_state["last_response"] = response[0]
         subscriber_state["last_handler"] = message_handler.__name__
-        await self.store_state(subscriber, subscriber_state)
+        await self.store_state("subscriber_state", subscriber, subscriber_state)
         return response
 
     async def store_state(
         self,
+        hash_name: str,
         subscriber: models_pb2.Subscriber,
         hash_value: Mapping[str, str],
     ) -> None:
-        session = self._redis.hash_("subscriber_state")
+        session = self._redis.hash_(hash_name)
         await session.put(subscriber.phone_number.e164_number, json.dumps(hash_value))
 
-    async def get_state(self, subscriber: models_pb2.Subscriber) -> Any:
-        session = self._redis.hash_("subscriber_state")
+    async def get_state(
+        self,
+        hash_name: str,
+        subscriber: models_pb2.Subscriber,
+    ) -> Any:
+        session = self._redis.hash_(hash_name)
         state = await session.get(subscriber.phone_number.e164_number)
         if state:
             return json.loads(state)
         return {}
+
+    async def delete_state(
+        self,
+        hash_name: str,
+        subscriber: models_pb2.Subscriber,
+    ) -> None:
+        session = self._redis.hash_(hash_name)
+        await session.delete(subscriber.phone_number.e164_number)
 
 
 # TODO: Change this to class method and use it as decorator to register handlers
