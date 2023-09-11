@@ -36,18 +36,25 @@
   import { string, z } from "zod";
   import SelectField from "components/ui/select-field.svelte";
   import TextField from "components/ui/text-field.svelte";
-  import { formatCountryOption } from "formatting/location";
+  import { formatCountryOption, formatCountryPhoneOption } from "formatting/location";
   import type { CountryModel } from "models/location";
 
-  export let countries: Map<string, CountryModel>;
+  let countryMap: Map<string, CountryModel>;
+  export { countryMap as countries };
   export let contactInformation: PartialContactInformationData;
   export let errors: z.ZodFormattedError<ContactInformationData> | undefined = undefined;
 
-  let country: CountryModel | undefined = countries.get(contactInformation.countryCode ?? "");
+  let countries = Array.from(countryMap.values());
+  let country: CountryModel | undefined = countryMap.get(contactInformation.countryCode ?? "");
+  let phoneCountry: CountryModel | undefined = countryMap.get(contactInformation.phone.code ?? "");
 
   $: contactInformation = {
     ...contactInformation,
     countryCode: country?.code,
+    phone: {
+      ...contactInformation.phone,
+      code: phoneCountry?.phoneCode ? `+${phoneCountry.phoneCode}` : undefined,
+    },
   };
 </script>
 
@@ -57,11 +64,12 @@
   <div class="details">
     <div class="phone">
       <SelectField
-        options={["+34"]}
+        options={countries}
         label="Country code"
         placeholder="Select"
         required
-        bind:value={contactInformation.phone.code}
+        formatter={formatCountryPhoneOption}
+        bind:value={phoneCountry}
         error={errors?.phone?.code?._errors}
       />
       <TextField
@@ -105,7 +113,7 @@
       />
       <SelectField
         direction="up"
-        options={Array.from(countries.values())}
+        options={countries}
         label="Country"
         placeholder="Select country"
         formatter={formatCountryOption}

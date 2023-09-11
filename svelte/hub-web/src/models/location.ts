@@ -1,4 +1,5 @@
 export interface CountryModel {
   name: string;
   code: string;
+  phoneCode: string;
 }
