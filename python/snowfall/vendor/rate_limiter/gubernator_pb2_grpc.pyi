@@ -43,6 +43,7 @@ class V1Servicer(metaclass=abc.ABCMeta):
         context: grpc.ServicerContext,
     ) -> gubernator_pb2.GetRateLimitsResp:
         """Given a list of rate limit requests, return the rate limits of each."""
+
     @abc.abstractmethod
     def HealthCheck(
         self,
