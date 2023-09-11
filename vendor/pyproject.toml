@@ -147,14 +147,23 @@ external = [
     "WPS609", # Forbid directly calling certain magic attributes and methods
 ]
 ignore = [
+    "D100", # Missing docstring in public module
+    "D101", # Missing docstring in public class
+    "D102", # Missing docstring in public method
+    "D103", # Missing docstring in public function
+    "D104", # Missing docstring in public package
+    "D105", # Missing docstring in magic method
+    "D106", # Missing docstring in public nested class
+    "D107", # Missing docstring in `__init__
+    "D418", # Function decorated with `@overload` shouldn't contain a docstring
     "ANN101", # Missing type annotation for self in method
     "ANN102", # Missing type annotation for cls in classmethod
     "ANN401", # Dynamically typed expressions (typing.Any) are disallowed
     "E501", # Line too long
-    "PLR0912", # Too many branches # TODO: fix
     "PLR0913", # Too many arguments to function call # TODO: fix
-    "PLR0915", # Too many statements # TODO: fix
     "PLR2004", # Magic value used in comparison, consider replacing with a constant variable # TODO: fix
+    "TD002", # Missing author in TODO; try: `# TODO(<author_name>): ...` or `# TODO @<author_name>: ...`
+    "TD003", # Missing issue link on the line following this TODO
     "TRY003", # Avoid specifying long messages outside the exception class # TODO: fix
     "UP004", # Class inherits from `object`
     "UP030", # Use implicit references for positional format fields
@@ -162,7 +171,7 @@ ignore = [
 ]
 select = [
     "A", # flake8-builtins
-    #"AIR", # Airflow
+    "AIR", # Airflow
     "ANN", # flake8-annotations
     #"ARG", # flake8-unused-arguments
     "ASYNC", # flake8-async
@@ -172,8 +181,8 @@ select = [
     "C90", # mccabe
     "COM", # flake8-commas
     #"CPY", # Copyright-related rules
-    #"D", # pydocstyle
-    #"DJ", # flake8-django
+    "D", # pydocstyle
+    "DJ", # flake8-django
     "DTZ", # flake8-datetimez
     "E", # pycodestyle
     #"EM", # flake8-errmsg
@@ -183,7 +192,7 @@ select = [
     "FA", # flake8-future-annotations
     "FBT", # flake8-boolean-trap
     #"FIX", # flake8-fixme
-    #"FLY", # flynt
+    "FLY", # flynt
     "FURB", # refurb
     "G", # flake8-logging-format
     "I", # isort
@@ -212,7 +221,7 @@ select = [
     "T10", # flake8-debugger
     "T20", # flake8-print
     #"TCH", # flake8-type-checking
-    #"TD", # flake8-todos
+    "TD", # flake8-todos
     "TID", # flake8-tidy-imports
     "TRY", # tryceratops
     "UP", # pyupgrade
@@ -236,3 +245,6 @@ known-first-party = ["snowfall"]
 "python/snowfall/vendor/carnect/models/**/*.py" = ["A003"]
 "python/snowfall/vendor/gubernator/gubernator_pb2.py" = ["E402", "ERA001"]
 "python/snowfall/vendor/gubernator/gubernator_pb2_grpc.py" = ["ANN001", "ANN201", "ANN204", "ANN205", "N802"]
+
+[tool.ruff.pydocstyle]
+convention = "google"

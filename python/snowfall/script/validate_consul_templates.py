@@ -10,20 +10,9 @@ def _log_error(msg: str) -> None:
     print(msg, file=sys.stderr)  # noqa: T201,WPS421
 
 
-_CMD = " ".join(
-    [
-        "consul-template",
-        "-dry",
-        "-once",
-        "-parse-only",
-        "-template-error-fatal=true",
-        "-template",
-        "{0}",
-        "-default-left-delimiter",
-        "{1}",
-        "-default-right-delimiter",
-        "{2}",
-    ],
+_CMD = (
+    "consul-template -dry -once -parse-only -template-error-fatal=true -template {0}"
+    " -default-left-delimiter {1} -default-right-delimiter {2}"
 )
 
 

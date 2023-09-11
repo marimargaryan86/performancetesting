@@ -112,7 +112,7 @@ class SoapLogger(object):
         )
 
         if transaction_id:
-            file_name = "-".join([file_name, transaction_id])
+            file_name = "{0}-{1}".format(file_name, transaction_id)
 
         file_path = (self._export_dir / file_name).with_suffix(".xml")
         file_path.write_text(data_content)

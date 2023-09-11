@@ -80,7 +80,6 @@ requirements = [
     "flake8-deprecated",
     "flake8-if-expr",
     "flake8-noqa",
-    "flake8-todos",
     "setuptools",
     "wemake-python-styleguide",
 ]

@@ -213,7 +213,7 @@ def _transform(
 
 
 def _class_fqn(type_: type[object]) -> str:
-    return ".".join([type_.__module__, type_.__name__])
+    return "{0}.{1}".format(type_.__module__, type_.__name__)
 
 
 def _metadata_fqn(metadata: _Metadata) -> str:
