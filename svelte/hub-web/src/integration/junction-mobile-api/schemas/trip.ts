@@ -117,7 +117,3 @@ export const createTripCandidatesSearchModel = getSchemaModel(
   },
 );
 export type CreateTripCandidatesSearchModel = Infer<typeof createTripCandidatesSearchModel>;
-export type CreateTripCandidatesSearchSchema = Infer<
-  typeof createTripCandidatesSearchModel,
-  "schema"
->;

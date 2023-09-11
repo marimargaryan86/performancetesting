@@ -38,7 +38,7 @@ import {
 
 // eslint-disable-next-line max-lines-per-function
 export function parseIncluded(
-  data?: (OrderIncludes[number] | TripOfferPriceQuoteIncludes[number] | OfferIncludes[number])[],
+  data?: (OrderIncludes | TripOfferPriceQuoteIncludes | OfferIncludes)[],
 ): {
   legTypes: LegTypeModel[];
   offerGroupDetails: TripOfferGroupDetailsModel[];

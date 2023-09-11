@@ -2,7 +2,6 @@ import { parsePriceQuoteSchema } from "../parsers/offer";
 import {
   createTripOfferPriceQuoteModel,
   type CreateTripOfferPriceQuoteModel,
-  type CreateTripOfferPriceQuoteSchema,
   type TripOfferPriceQuoteIncludes,
   type TripOfferPriceQuoteModel,
   type TripOfferPriceQuoteSchema,
@@ -12,10 +11,7 @@ import { parseIncluded } from "../parsers/included";
 
 export class OfferService extends JunctionMobileApiService {
   async createPriceQuote(data: CreateTripOfferPriceQuoteModel): Promise<TripOfferPriceQuoteModel> {
-    const resp = await this.makeRequest<
-      { data: TripOfferPriceQuoteSchema },
-      { data: CreateTripOfferPriceQuoteSchema }
-    >("/offers/quotes", {
+    const resp = await this.makeRequest<{ data: TripOfferPriceQuoteSchema }>("/offers/quotes", {
       method: "POST",
       data: {
         data: createTripOfferPriceQuoteModel.toSchema(data),
@@ -31,10 +27,19 @@ export class OfferService extends JunctionMobileApiService {
   async getPriceQuote(id: string): Promise<TripOfferPriceQuoteModel> {
     const resp = await this.makeRequest<{
       data: TripOfferPriceQuoteSchema;
-      included?: TripOfferPriceQuoteIncludes;
+      included?: TripOfferPriceQuoteIncludes[];
     }>(`/offers/quotes/${id}`, {
       queryParams: {
-        include: ["offers", "options"].join(","),
+        include: [
+          "offer",
+          "offer.groups",
+          "offer.groups.details",
+          "offer.groups.details.legType",
+          "options",
+          "options.details",
+          "options.details.cabinClass",
+          "options.details.details",
+        ].join(","),
       },
     });
 

@@ -4,7 +4,6 @@ import {
   type TripCandidatesSearchModel,
   type TripCandidatesSearchSchema,
   type CreateTripCandidatesSearchModel,
-  type CreateTripCandidatesSearchSchema,
 } from "../schemas/trip";
 import JunctionMobileApiService from "./junction-mobile-api-service";
 import type { OfferIncludes, OfferModel, OfferSchema } from "../schemas/offer";
@@ -15,13 +14,13 @@ export class TripService extends JunctionMobileApiService {
   async createTripCandidatesSearch(
     data: CreateTripCandidatesSearchModel,
   ): Promise<TripCandidatesSearchModel> {
-    const resp = await this.makeRequest<
-      { data: TripCandidatesSearchSchema },
-      { data: CreateTripCandidatesSearchSchema }
-    >("/trip-candidates/searches", {
-      method: "POST",
-      data: { data: createTripCandidatesSearchModel.toSchema(data) },
-    });
+    const resp = await this.makeRequest<{ data: TripCandidatesSearchSchema }>(
+      "/trip-candidates/searches",
+      {
+        method: "POST",
+        data: { data: createTripCandidatesSearchModel.toSchema(data) },
+      },
+    );
 
     return tripCandidatesSearchModel.toModel((await resp.json()).data);
   }
@@ -41,7 +40,7 @@ export class TripService extends JunctionMobileApiService {
   async getTripCandidatesOffers(id: string): Promise<OfferModel[]> {
     const resp = await this.makeRequest<{
       data: OfferSchema[];
-      included?: OfferIncludes;
+      included?: OfferIncludes[];
     }>(`/trip-candidates/searches/${id}/offers`, {
       queryParams: {
         include: [

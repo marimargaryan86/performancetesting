@@ -380,26 +380,20 @@ export const createTripOfferPriceQuoteModel = getSchemaModel(
   },
 );
 export type CreateTripOfferPriceQuoteModel = Infer<typeof createTripOfferPriceQuoteModel>;
-export type CreateTripOfferPriceQuoteSchema = Infer<
-  typeof createTripOfferPriceQuoteModel,
-  "schema"
->;
 
-export type TripOfferPriceQuoteIncludes = (
+export type TripOfferPriceQuoteIncludes =
   | OfferSchema
   | CabinClassSchema
   | TripOfferOptionDetailsSchema
   | OfferOptionSchema
   | LegTypeSchema
   | TripOfferGroupDetailsSchema
-  | OfferGroupSchema
-)[];
+  | OfferGroupSchema;
 
-export type OfferIncludes = (
+export type OfferIncludes =
   | OfferGroupSchema
   | TripOfferGroupDetailsSchema
   | LegTypeSchema
   | OfferOptionSchema
   | TripOfferOptionDetailsSchema
-  | CabinClassSchema
-)[];
+  | CabinClassSchema;

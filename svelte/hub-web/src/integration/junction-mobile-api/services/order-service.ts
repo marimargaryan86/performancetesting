@@ -2,7 +2,6 @@ import JunctionMobileApiService from "./junction-mobile-api-service";
 import {
   createOrderModel,
   type CreateOrderModel,
-  type CreateOrderSchema,
   type OrderIncludes,
   type OrderModel,
   type OrderSchema,
@@ -16,7 +15,7 @@ export class OrderService extends JunctionMobileApiService {
   async listOrders(cursor?: string, limit = 100): Promise<PaginatedData<OrderModel>> {
     const resp = await this.makeRequest<{
       data: OrderSchema[];
-      included?: OrderIncludes;
+      included?: OrderIncludes[];
       links: { next: string };
     }>("/orders", {
       queryParams: {
@@ -47,14 +46,11 @@ export class OrderService extends JunctionMobileApiService {
   }
 
   async createOrder(data: CreateOrderModel): Promise<OrderModel> {
-    const resp = await this.makeRequest<{ data: OrderSchema }, { data: CreateOrderSchema }>(
-      "/orders",
-      {
-        method: "POST",
-        data: { data: createOrderModel.toSchema(data) },
-        headers: { "Session-Token": getRandomAlphaNumericString(32) },
-      },
-    );
+    const resp = await this.makeRequest<{ data: OrderSchema }>("/orders", {
+      method: "POST",
+      data: { data: createOrderModel.toSchema(data) },
+      headers: { "Session-Token": getRandomAlphaNumericString(32) },
+    });
 
     if (resp.status !== 201) {
       throw new Error("Order creation failed");
@@ -66,7 +62,7 @@ export class OrderService extends JunctionMobileApiService {
   async getOrder(id: string): Promise<OrderModel> {
     const resp = await this.makeRequest<{
       data: OrderSchema;
-      included?: OrderIncludes;
+      included?: OrderIncludes[];
     }>(`/orders/${id}`, {
       queryParams: {
         include: [

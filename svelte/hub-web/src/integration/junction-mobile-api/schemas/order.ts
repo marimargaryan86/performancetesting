@@ -189,12 +189,10 @@ export const createOrderModel = getSchemaModel(
   },
 );
 export type CreateOrderModel = Infer<typeof createOrderModel>;
-export type CreateOrderSchema = Infer<typeof createOrderModel, "schema">;
 
-export type OrderIncludes = (
+export type OrderIncludes =
   | JourneySchema
   | BookingSchema
   | BookingDetailsSchema
   | CabinClassSchema
-  | LegTypeSchema
-)[];
+  | LegTypeSchema;

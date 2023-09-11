@@ -38,4 +38,3 @@ export const createPaymentIntentModel = getSchemaModel(
     }),
   },
 );
-export type CreatePaymentIntentSchema = Infer<typeof createPaymentIntentModel, "schema">;
