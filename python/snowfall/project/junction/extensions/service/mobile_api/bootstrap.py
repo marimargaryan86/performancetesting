@@ -17,7 +17,7 @@ from snowfall.vendor.junction.go import client
 
 class MigrateSettings(application.Settings):
     mongo_db: str
-    mongo_dsn: Sequence[AnyUrl]
+    mongo_dsn: AnyUrl
 
 
 class Settings(application.Settings):
