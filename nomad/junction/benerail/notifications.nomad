@@ -30,6 +30,10 @@ variable "api_base_url" {
   type = string
 }
 
+variable "email_recipient" {
+  type = string
+}
+
 job "benerail-notifications" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -119,8 +123,8 @@ EOH
         SENTRY_DSN      = "https://e0876a2d75114c40a4c5256919067373@sentry.snowfall.se/81"
         PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
         API_BASE_URL    = "${var.api_base_url}"
-        SMTP_SENDER     = "noreply@junction.travel"
-        SMTP_RECIPIENT  = "BeneRailBooking@snowfalltravel.com"
+        SMTP_SENDER     = "sender@snowfalltravel.com"
+        SMTP_RECIPIENT  = "${var.email_recipient}"
       }
     }
   }

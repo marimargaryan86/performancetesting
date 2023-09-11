@@ -2,21 +2,24 @@
   "development": {
     "variables": {
       "count": 1,
-      "api_base_url": "https://rest.sandbox.karhoo.com/"
+      "api_base_url": "https://rest.sandbox.karhoo.com/",
+      "email_recipient": "go-dev@snowfalltravel.com"
     }
   },
   "production": {
     "deploy": false,
     "variables": {
       "count": 2,
-      "api_base_url": ""
+      "api_base_url": "",
+      "email_recipient": "recipient@snowfalltravel.com"
     }
   },
   "sandbox": {
     "deploy": true,
     "variables": {
       "count": 1,
-      "api_base_url": "https://rest.sandbox.karhoo.com/"
+      "api_base_url": "https://rest.sandbox.karhoo.com/",
+      "email_recipient": "go-dev@snowfalltravel.com"
     }
   }
 }

@@ -42,6 +42,10 @@ variable "bucket" {
   type = string
 }
 
+variable "email_recipient" {
+  type = string
+}
+
 job "ask2go-orders" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -131,8 +135,8 @@ EOH
       env {
         ENV_NAME                      = "${var.environment}"
         SENTRY_DSN                    = "https://c299617e39d446ccb1053a04d9ac12b8@sentry.snowfall.se/34"
-        SMTP_SENDER                   = "noreply@junction.travel"
-        SMTP_RECIPIENT                = "A2GBooking@snowfalltravel.com"
+        SMTP_SENDER                   = "sender@snowfalltravel.com"
+        SMTP_RECIPIENT                = "${var.email_recipient}"
         PROMETHEUS_PORT               = "${NOMAD_PORT_prometheus}"
         OVERRIDE_DOUBLE_BOOKING_CHECK = "${var.override_double_booking_check}"
         API_BASE_URL                  = "${var.api_base_url}"

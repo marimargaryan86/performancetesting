@@ -5,7 +5,8 @@
       "api_base_url": "https://apibook.saveatrain.com/api",
       "api_search_base_url": "https://apisearch.saveatrain.com/search",
       "bucket": "junction-provider-data-development",
-      "ticket_bucket": "junction-provider-tickets-development"
+      "ticket_bucket": "junction-provider-tickets-development",
+      "email_recipient": "go-dev@snowfalltravel.com"
     }
   },
   "production": {
@@ -14,7 +15,8 @@
       "api_base_url": "https://apibook.saveatrain.com/api",
       "api_search_base_url": "https://apisearch.saveatrain.com/search",
       "bucket": "junction-provider-data-production",
-      "ticket_bucket": "junction-provider-tickets-production"
+      "ticket_bucket": "junction-provider-tickets-production",
+      "email_recipient": "recipient@snowfalltravel.com"
     }
   },
   "sandbox": {
@@ -24,7 +26,8 @@
       "api_base_url": "https://apibook.saveatrain.com/api",
       "api_search_base_url": "https://apisearch.saveatrain.com/search",
       "bucket": "junction-provider-data-sandbox",
-      "ticket_bucket": "junction-provider-tickets-sandbox"
+      "ticket_bucket": "junction-provider-tickets-sandbox",
+      "email_recipient": "go-dev@snowfalltravel.com"
     }
   }
 }

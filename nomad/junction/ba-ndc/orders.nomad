@@ -34,6 +34,10 @@ variable "bucket" {
   type = string
 }
 
+variable "email_recipient" {
+  type = string
+}
+
 job "ba-ndc-orders" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -132,7 +136,7 @@ EOH
       env {
         ENV_NAME        = "${var.environment}"
         SMTP_SENDER     = "sender@snowfalltravel.com"
-        SMTP_RECIPIENT  = "recipient@snowfalltravel.com"
+        SMTP_RECIPIENT  = "${var.email_recipient}"
         PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
         API_BASE_URL    = "${var.api_base_url}"
         SENTRY_DSN      = "https://5e8ffcd08b434ebf955ecd889fe82947@sentry.snowfall.se/58"

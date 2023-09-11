@@ -30,6 +30,10 @@ variable "api_base_url" {
   type = string
 }
 
+variable "email_recipient" {
+  type = string
+}
+
 job "karhoo-orders" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -119,8 +123,8 @@ EOH
         ENV_NAME        = "${var.environment}"
         SENTRY_DSN      = "https://9678cf4943334528befbe1a14d653f3e@sentry.snowfall.se/63"
         PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
-        SMTP_SENDER     = "noreply@junction.travel"
-        SMTP_RECIPIENT  = "recipient@snowfalltravel.com"
+        SMTP_SENDER     = "sender@snowfalltravel.com"
+        SMTP_RECIPIENT  = "${var.email_recipient}"
         API_BASE_URL    = "${var.api_base_url}"
       }
     }

@@ -3,21 +3,24 @@
     "deploy": true,
     "variables": {
       "count": 2,
-      "api_base_url": "https://benerail-stg-apim.azure-api.net"
+      "api_base_url": "https://benerail-stg-apim.azure-api.net",
+      "email_recipient": "go-dev@snowfalltravel.com"
     }
   },
   "production": {
     "deploy": false,
     "variables": {
       "count": 2,
-      "api_base_url": ""
+      "api_base_url": "",
+      "email_recipient": "recipient@snowfalltravel.com"
     }
   },
   "sandbox": {
     "deploy": true,
     "variables": {
       "count": 1,
-      "api_base_url": "https://benerail-stg-apim.azure-api.net"
+      "api_base_url": "https://benerail-stg-apim.azure-api.net",
+      "email_recipient": "go-dev@snowfalltravel.com"
     }
   }
 }

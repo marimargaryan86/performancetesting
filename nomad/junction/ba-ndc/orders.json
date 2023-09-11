@@ -3,7 +3,8 @@
     "variables": {
       "count": 2,
       "api_base_url": "https://ndc.junction.dev",
-      "bucket": "junction-provider-data-development"
+      "bucket": "junction-provider-data-development",
+      "email_recipient": "go-dev@snowfalltravel.com"
     }
   },
   "production": {
@@ -11,7 +12,8 @@
     "variables": {
       "count": 5,
       "api_base_url": "https://ndc.junction.travel",
-      "bucket": "junction-provider-data-production"
+      "bucket": "junction-provider-data-production",
+      "email_recipient": "recipient@snowfalltravel.com"
     }
   },
   "sandbox": {
@@ -19,7 +21,8 @@
     "variables": {
       "count": 1,
       "api_base_url": "https://ndc.sandbox.junction.dev",
-      "bucket": "junction-provider-data-sandbox"
+      "bucket": "junction-provider-data-sandbox",
+      "email_recipient": "go-dev@snowfalltravel.com"
     }
   }
 }

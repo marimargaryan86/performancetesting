@@ -5,7 +5,8 @@
       "override_double_booking_check": "true",
       "api_base_url": "https://search.ask2go.com",
       "api_booking_base_url": "https://booking.ask2go.com",
-      "bucket": "junction-provider-data-development"
+      "bucket": "junction-provider-data-development",
+      "email_recipient": "go-dev@snowfalltravel.com"
     }
   },
   "production": {
@@ -14,7 +15,8 @@
       "override_double_booking_check": "false",
       "api_base_url": "https://search.production.ask2go.com/",
       "api_booking_base_url": "https://book.production.ask2go.com/",
-      "bucket": "junction-provider-data-production"
+      "bucket": "junction-provider-data-production",
+      "email_recipient": "recipient@snowfalltravel.com"
     }
   },
   "sandbox": {
@@ -24,7 +26,8 @@
       "override_double_booking_check": "true",
       "api_base_url": "https://search.ask2go.com",
       "api_booking_base_url": "https://booking.ask2go.com",
-      "bucket": "junction-provider-data-sandbox"
+      "bucket": "junction-provider-data-sandbox",
+      "email_recipient": "go-dev@snowfalltravel.com"
     }
   }
 }

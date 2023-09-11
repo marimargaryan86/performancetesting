@@ -42,6 +42,10 @@ variable "ticket_bucket" {
   type = string
 }
 
+variable "email_recipient" {
+  type = string
+}
+
 job "save-a-train-notifications" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -142,8 +146,8 @@ EOH
       env {
         ENV_NAME            = "${var.environment}"
         SENTRY_DSN          = "https://f01c7c8bf4d04a709a65b4be8b11ba69@sentry.snowfall.se/36"
-        SMTP_SENDER         = "noreply@junction.travel"
-        SMTP_RECIPIENT      = "SATBooking@snowfalltravel.com"
+        SMTP_SENDER         = "sender@snowfalltravel.com"
+        SMTP_RECIPIENT      = "${var.email_recipient}"
         PROMETHEUS_PORT     = "${NOMAD_PORT_prometheus}"
         API_BASE_URL        = "${var.api_base_url}"
         API_EMAIL           = "gb@snowfalltravel.com"

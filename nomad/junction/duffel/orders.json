@@ -4,7 +4,8 @@
       "count": 1,
       "api_base_url": "https://api.duffel.com",
       "http_timeout": 90,
-      "bucket": "junction-provider-data-development"
+      "bucket": "junction-provider-data-development",
+      "email_recipient": "go-dev@snowfalltravel.com"
     }
   },
   "production": {
@@ -13,7 +14,8 @@
       "count": 2,
       "api_base_url": "https://api.duffel.com",
       "http_timeout": 90,
-      "bucket": "junction-provider-data-production"
+      "bucket": "junction-provider-data-production",
+      "email_recipient": "recipient@snowfalltravel.com"
     }
   },
   "sandbox": {
@@ -22,7 +24,8 @@
       "count": 1,
       "api_base_url": "https://api.duffel.com",
       "http_timeout": 90,
-      "bucket": "junction-provider-data-sandbox"
+      "bucket": "junction-provider-data-sandbox",
+      "email_recipient": "go-dev@snowfalltravel.com"
     }
   }
 }
