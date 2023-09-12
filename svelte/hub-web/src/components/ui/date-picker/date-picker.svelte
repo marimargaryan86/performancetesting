@@ -62,6 +62,12 @@
   function clearValue(): void {
     value = undefined;
   }
+
+  function closeIfNotRange(): void {
+    if (!range) {
+      close();
+    }
+  }
 </script>
 
 <div class="date-picker" use:clickOutside={close}>
@@ -74,8 +80,8 @@
     </label>
   {/if}
 
-  <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-  <label class="header" on:click={toggle} on:keypress {id} class:error>
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <span class="header" on:click={toggle} on:keypress {id} class:error>
     <span class:placeholder={placeholderShowing} class="typography body-medium">
       {displayValue ?? placeholder ?? ""}
     </span>
@@ -87,14 +93,14 @@
     {:else}
       <ChevronIcon direction={expanded ? "up" : "down"} color="var(--color-common-light-strong)" />
     {/if}
-  </label>
+  </span>
 
   {#if typeof displayError === "string"}
     <span class="error-message" transition:slideFade={{ duration: 300 }}>{displayError}</span>
   {/if}
 
   {#if expanded}
-    <Dialogue {range} bind:value />
+    <Dialogue {range} bind:value on:select={closeIfNotRange} />
   {/if}
 </div>
 

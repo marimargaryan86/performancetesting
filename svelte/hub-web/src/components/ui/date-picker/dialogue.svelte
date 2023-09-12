@@ -69,7 +69,7 @@
     </div>
   </div>
 
-  <Calendar {viewingMonth} {range} bind:value />
+  <Calendar {viewingMonth} {range} bind:value on:select />
 </div>
 
 <style>

@@ -1,5 +1,6 @@
 <script lang="ts" generics="TRange extends boolean">
   /* global TRange */
+  import { createEventDispatcher } from "svelte";
   import type { DateRange } from "models/date-time";
   import { datesEq, getMonthLength, getWeekDays, getZeroTimeDate } from "utils/date-time";
 
@@ -14,6 +15,7 @@
 
   const today = getZeroTimeDate();
   const weekDays = getWeekDays(undefined, "short");
+  const dispatch = createEventDispatcher<{ select: void }>();
 
   $: year = viewingMonth.getFullYear();
   $: month = viewingMonth.getMonth();
@@ -21,9 +23,16 @@
   $: monthLength = getMonthLength(viewingMonth);
   $: paddingRight = (7 - new Date(year, month + 1, 1).getDay()) % 7;
   $: days = [
-    ...[...Array(paddingLeft)].map((_, idx) => new Date(year, month, -idx)).reverse(),
-    ...[...Array(monthLength)].map((_, idx) => new Date(year, month, idx + 1)),
-    ...[...Array(paddingRight)].map((_, idx) => new Date(year, month + 1, idx + 1)),
+    ...Array(paddingLeft)
+      .fill(undefined)
+      .map((_, idx) => new Date(year, month, -idx))
+      .reverse(),
+    ...Array(monthLength)
+      .fill(undefined)
+      .map((_, idx) => new Date(year, month, idx + 1)),
+    ...Array(paddingRight)
+      .fill(undefined)
+      .map((_, idx) => new Date(year, month + 1, idx + 1)),
   ];
 
   function select(date: Date): void {
@@ -32,6 +41,8 @@
 
       dirtyValue = nextValue as TDirtyValue;
       value = nextValue as TValue;
+
+      dispatch("select");
 
       return;
     }
@@ -50,6 +61,10 @@
 
     dirtyValue = nextValue as TDirtyValue;
     value = nextValue?.from && nextValue.to ? (nextValue as TValue) : undefined;
+
+    if (value) {
+      dispatch("select");
+    }
   }
 
   function isStart(date: Date, currValue: TDirtyValue | undefined): boolean {
@@ -96,7 +111,7 @@
 
   function isSelected(date: Date, currValue: TDirtyValue | undefined): boolean {
     if (!range && currValue instanceof Date) {
-      return datesEq(date, currValue);
+      return datesEq(date, currValue, false);
     }
 
     const nextValue = currValue as DateRange | undefined;

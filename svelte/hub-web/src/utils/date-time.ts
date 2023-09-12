@@ -47,7 +47,11 @@ export function getMonthLength(date: Date): number {
   return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
 }
 
-export function datesEq(date1: Date, date2: Date): boolean {
+export function datesEq(date1: Date, date2: Date, time = true): boolean {
+  if (!time) {
+    return getZeroTimeDate(date1).getTime() === getZeroTimeDate(date2).getTime();
+  }
+
   return date1.getTime() === date2.getTime();
 }
 
