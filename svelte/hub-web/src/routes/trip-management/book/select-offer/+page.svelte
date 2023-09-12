@@ -113,7 +113,7 @@
 </script>
 
 <svelte:head>
-  <title>Select an offer · Book · Junction Hub</title>
+  <title>Select an offer · Book · Trip Management · Junction Hub</title>
 </svelte:head>
 
 <div class="search-wrapper">

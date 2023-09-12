@@ -42,6 +42,10 @@
   export let data;
 </script>
 
+<svelte:head>
+  <title>All · Orders · Trip Management · Junction Hub</title>
+</svelte:head>
+
 <Table class="orders-table">
   <THead>
     <Header>Order Reference</Header>

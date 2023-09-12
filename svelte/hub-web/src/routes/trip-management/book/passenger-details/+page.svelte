@@ -147,7 +147,7 @@
 </script>
 
 <svelte:head>
-  <title>Passenger details · Book · Junction Hub</title>
+  <title>Passenger details · Book · Trip Management · Junction Hub</title>
 </svelte:head>
 
 <div class="content">

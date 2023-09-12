@@ -155,7 +155,7 @@
 </script>
 
 <svelte:head>
-  <title>Payment · Book · Junction Hub</title>
+  <title>Payment · Book · Trip Management · Junction Hub</title>
 </svelte:head>
 
 <div class="content">

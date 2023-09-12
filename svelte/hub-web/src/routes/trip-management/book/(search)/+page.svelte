@@ -8,7 +8,7 @@
 </script>
 
 <svelte:head>
-  <title>Search · Book · Junction Hub</title>
+  <title>Search · Book · Trip Management · Junction Hub</title>
 </svelte:head>
 
 <div class="search-wrapper">

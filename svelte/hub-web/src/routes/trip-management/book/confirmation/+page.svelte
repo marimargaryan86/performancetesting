@@ -12,7 +12,7 @@
 </script>
 
 <svelte:head>
-  <title>Confirmation · Junction Hub</title>
+  <title>Confirmation · Trip Management · Junction Hub</title>
 </svelte:head>
 
 <div style:display="none">
