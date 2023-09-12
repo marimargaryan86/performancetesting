@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package snowfall.project.junction.go.service.gateway.v1;
+
+import "snowfall/project/junction/provider/v2alpha/trips.proto";
+import "snowfall/project/junction/v1/segment_type.proto";
+import "snowfall/stdlib/v1/date.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/gateway/v1";
+
+service TripService {
+  rpc EnqueueTripSearch(EnqueueTripSearchRequest) returns (EnqueueTripSearchResponse) {}
+  rpc DrainTripSearchResults(DrainTripSearchResultsRequest) returns (DrainTripSearchResultsResponse) {}
+}
+
+message EnqueueTripSearchRequest {
+  oneof search_mode {
+    OneWay one_way = 1;
+    RoundTrip round_trip = 2;
+    MultiCity multi_city = 3;
+  }
+  repeated Passenger passengers = 4;
+}
+
+message Criterion {
+  string origin = 1;
+  string destination = 2;
+  snowfall.stdlib.v1.Date departure_date = 3;
+  repeated snowfall.project.junction.v1.SegmentType segment_types = 4;
+  uint32 max_connections = 5;
+}
+
+message Passenger {
+  snowfall.stdlib.v1.Date date_of_birth = 1;
+}
+
+message OneWay {
+  Criterion criterion = 1;
+}
+
+message RoundTrip {
+  Criterion criterion = 1;
+  snowfall.stdlib.v1.Date return_date = 2;
+}
+
+message MultiCity {
+  repeated Criterion criteria = 1;
+}
+
+message EnqueueTripSearchResponse {
+  string id = 1;
+}
+
+message DrainTripSearchResultsRequest {
+  string id = 1;
+}
+
+message DrainTripSearchResultsResponse {
+  bool is_in_progress = 1;
+  repeated TripSearchResult results = 2;
+}
+
+message TripSearchResult {
+  string id = 1;
+  snowfall.project.junction.provider.v2alpha.Result result = 2;
+}
+
+message TripSearchTask {
+  string id = 1;
+  oneof search_mode {
+    OneWay one_way = 2;
+    RoundTrip round_trip = 3;
+    MultiCity multi_city = 4;
+  }
+  repeated Passenger passengers = 5;
+}

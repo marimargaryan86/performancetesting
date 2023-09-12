@@ -3,7 +3,7 @@ import uuid
 
 from grpc import aio
 
-from snowfall.project.junction.provider.v1alpha import meta_pb2, meta_pb2_grpc
+from snowfall.project.junction.provider.v2alpha import meta_pb2, meta_pb2_grpc
 from snowfall.stdlib.transport.grpc import service
 
 
@@ -29,7 +29,11 @@ class MetaService(service.Service, meta_pb2_grpc.MetaServiceServicer):
         request: meta_pb2.GetCapabilitiesRequest,
         context: aio.ServicerContext,
     ) -> meta_pb2.GetCapabilitiesResponse:
-        return meta_pb2.GetCapabilitiesResponse()
+        return meta_pb2.GetCapabilitiesResponse(
+            trip_search_capabilities=meta_pb2.TripSearchCapabilities(
+                is_supported=True,
+            ),
+        )
 
     async def GetIdentity(  # type: ignore[override] # noqa: N802
         self,

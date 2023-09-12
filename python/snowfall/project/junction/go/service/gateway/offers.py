@@ -24,21 +24,21 @@ from snowfall.stdlib.transport.grpc import service
 
 _logger = stdout.get_logger()
 _failed = prometheus_client.Counter(
-    "gateway_failed_trip_searches_total",
-    "Total number of failed trip searches",
+    "gateway_failed_trip_offer_searches_total",
+    "Total number of failed trip offer searches",
     ["provider_id"],
 )
 
 _histogram = prometheus_client.Histogram(
-    "gateway_trip_search_duration_seconds",
-    "Duration of performed trip searches in seconds",
+    "gateway_trip_offer_search_duration_seconds",
+    "Duration of performed trip offer searches in seconds",
     ["provider_id", "status"],
     buckets=prometheus.BUCKETS,
 )
 
 _total = prometheus_client.Counter(
-    "gateway_trip_searches_total",
-    "Total number of performed trip searches",
+    "gateway_trip_offer_searches_total",
+    "Total number of performed trip offer searches",
     ["provider_id", "status"],
 )
 
@@ -105,6 +105,7 @@ class Consumer(object):
         tasks = [
             _do_trip_offer_search(provider, msg, self._timeout)
             async for provider in self._providers.all_healthy()
+            if provider.trip_search_capabilities.is_supported
         ]
 
         async with asyncio.TaskGroup() as tg:
@@ -145,7 +146,7 @@ async def _do_trip_offer_search(
     _histogram.labels(provider_id=provider.identifier, status=status).observe(exec_time)
     _total.labels(provider_id=provider.identifier, status=status).inc()
     _logger.info(
-        "trip search performed",
+        "trip offer search performed",
         provider_id=provider.identifier,
         failed=status == "nok",
         results=len(response.trip_offer_search_results.results),

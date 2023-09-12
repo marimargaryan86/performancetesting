@@ -12,6 +12,7 @@ from snowfall.project.junction.go.service.gateway import (
     meta,
     offers,
     providers,
+    trips,
 )
 from snowfall.project.junction.go.service.offers.v1 import amqp_pb2
 from snowfall.stdlib.persistence.redis import types as redis
@@ -93,6 +94,8 @@ async def _consume(app: application.AsyncApplication[_ConsumeSettings]) -> None:
         binds=[(types.Exchange(app.name), "offers.search.*")],
     )
 
+    # @todo: wire up trips consumer
+
     await amqp_consumer.consume(offers_consumer.consume)
 
 
@@ -111,6 +114,15 @@ async def _serve(app: application.AsyncApplication[_ServeSettings]) -> None:
             ),
             offers.Service(
                 repository=offers.Repository(
+                    producer=producer.Producer(
+                        connection=amqp_connection,
+                        exchange=types.Exchange(name=app.name),
+                    ),
+                    client=redis_client,
+                ),
+            ),
+            trips.Service(
+                repository=trips.Repository(
                     producer=producer.Producer(
                         connection=amqp_connection,
                         exchange=types.Exchange(name=app.name),

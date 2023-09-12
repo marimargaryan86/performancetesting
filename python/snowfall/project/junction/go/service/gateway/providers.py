@@ -11,9 +11,11 @@ from grpc import aio
 
 from snowfall.project.junction.provider.v1alpha import (
     bookings_pb2_grpc,
+    offers_pb2_grpc,
+)
+from snowfall.project.junction.provider.v2alpha import (
     meta_pb2,
     meta_pb2_grpc,
-    offers_pb2_grpc,
 )
 from snowfall.stdlib import sequence
 from snowfall.stdlib.logging import stdout

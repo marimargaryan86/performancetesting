@@ -58,4 +58,12 @@ message TripSearchCapabilities {
   // All segment types supported by the provider. Junction won't ever perform
   // trip searches towards a provider not supporting the search's segment type.
   repeated snowfall.project.junction.v1.SegmentType supported_segment_types = 3;
+
+  // Whether or not round trip trip searches are supported by the provider. If
+  // not, Junction will issue two one way trip searches instead.
+  bool supports_round_trip = 4;
+
+  // Whether or not multi city trip searches are supported by the provider. If
+  // not, Junction will issue multiple one way trip searches instead.
+  bool supports_multi_city = 5;
 }
