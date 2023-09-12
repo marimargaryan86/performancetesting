@@ -32,9 +32,10 @@ def _routes(app: application.Application[_Settings]) -> list[routing.BaseRoute]:
         routing.Mount(
             "/static",
             staticfiles.StaticFiles(
-                directory=filesystem.package_path(
-                    "snowfall.project.junction.go.service.dogfood_ui.static",
-                ),
+                html=False,
+                packages=[
+                    ("snowfall.project.junction.go.service.dogfood_ui.main", "static"),
+                ],
             ),
         ),
         stdlib_routes.Proxy(

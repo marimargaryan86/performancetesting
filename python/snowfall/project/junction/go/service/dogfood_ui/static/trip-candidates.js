@@ -9,7 +9,7 @@ function load_trip_candidates(id) {
         fetch(
           "/trip-candidates/searches/" +
             id +
-            "/offers?page[limit]=100&include=groups,groups.details,groups.details.legType,groups.options,groups.options.details,groups.options.details.cabinClass,groups.options.details.details"
+            "/offers?page[limit]=100&include=groups,groups.details,groups.details.legType"
         )
         .then((res) => res.json())
         .then((response) => {

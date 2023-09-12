@@ -62,6 +62,7 @@ function count_places() {
       inject_places();
     } else {
       console.log("No places in DB, indexing...");
+      show_loader("Indexing places, this could take several minutes...");
       load_places();
     }
   };
@@ -115,7 +116,7 @@ function hide_loader() {
 }
 
 function flatten(resource, included) {
-  if (!resource.hasOwnProperty("relationships")) {
+  if (!resource || !resource.hasOwnProperty("relationships")) {
     return resource;
   }
 
@@ -528,21 +529,6 @@ function inject_trips(tripSearchId, response, searchOffers) {
     description.append(head);
 
     let body = document.createElement("tbody");
-    let latlngs = [];
-    let markers = [];
-
-    let marker = L.marker(
-      [
-        trip.relationships.segments.data[0].relationships.legs.data[0]
-          .attributes.origin.latitude,
-        trip.relationships.segments.data[0].relationships.legs.data[0]
-          .attributes.origin.longitude,
-      ],
-      { icon: greenIcon }
-    );
-    markers.push(marker);
-    latlngs.push(marker.getLatLng());
-
     let prev_date = "";
 
     trip.relationships.segments.data.forEach(function (segment, k) {
@@ -622,44 +608,6 @@ function inject_trips(tripSearchId, response, searchOffers) {
       item.append(cell);
 
       body.append(item);
-
-      let marker;
-
-      if (k == trip.relationships.segments.data.length - 1) {
-        marker = L.marker(
-          [
-            segment.relationships.legs.data[
-              segment.relationships.legs.data.length - 1
-            ].attributes.destination.latitude,
-            segment.relationships.legs.data[
-              segment.relationships.legs.data.length - 1
-            ].attributes.destination.longitude,
-          ],
-          { icon: redIcon }
-        );
-      } else {
-        marker = L.marker([
-          segment.relationships.legs.data[
-            segment.relationships.legs.data.length - 1
-          ].attributes.destination.latitude,
-          segment.relationships.legs.data[
-            segment.relationships.legs.data.length - 1
-          ].attributes.destination.longitude,
-        ]);
-      }
-
-      markers.push(marker);
-
-      segment.relationships.legs.data.forEach(function (leg, k) {
-        if (k != segment.relationships.legs.data.length - 1) {
-          latlngs.push([
-            leg.attributes.destination.latitude,
-            leg.attributes.destination.longitude,
-          ]);
-        }
-      });
-
-      latlngs.push(marker.getLatLng());
     });
 
     if (showMaps) {
@@ -667,29 +615,6 @@ function inject_trips(tripSearchId, response, searchOffers) {
       map.id = "map" + i;
       map.className = "map col-sm";
       new_children.push(map);
-
-      var mapItem = L.map("map" + i);
-
-      L.tileLayer(
-        "https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}",
-        {
-          attribution:
-            'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-          maxZoom: 18,
-          id: "mapbox/streets-v11",
-          tileSize: 512,
-          zoomOffset: -1,
-          accessToken:
-            "pk.eyJ1IjoianlnZ2VuIiwiYSI6ImNrdDZmaGVsbDBodDMyd283dG9ucjdmejQifQ.4JXvYcrRq1FmBj3LqW5zDg",
-        }
-      ).addTo(mapItem);
-
-      for (const marker of markers) {
-        marker.addTo(mapItem);
-      }
-
-      let polyline = L.polyline(latlngs, { color: "blue" }).addTo(mapItem);
-      mapItem.fitBounds(polyline.getBounds());
     }
 
     description.append(body);
@@ -697,6 +622,12 @@ function inject_trips(tripSearchId, response, searchOffers) {
   }
 
   container.replaceChildren(...new_children)
+
+  if (showMaps) {
+    for (const [i, trip] of response.data.entries()) {
+      render_map("map" + i, trip)
+    }
+  }
 }
 
 function load_places(url = null) {
@@ -828,10 +759,132 @@ function search_offers(tripId) {
   }, Math.floor(Math.random() * 10000));
 }
 
+function clear_places_cache() {
+  if (!window.confirm("Do you really want to remove all cached places?")) {
+    return;
+  }
+
+  show_loader("Removing cached places, please wait...");
+
+  const transaction = db.transaction("places", "readwrite");
+  const objectStore = transaction.objectStore("places");
+  const objectStoreRequest = objectStore.clear();
+
+  transaction.oncomplete = (event) => {
+    location.reload();
+  };
+}
+
+function search_trips(event) {
+  event.preventDefault();
+  show_loader("Searching for trips, please wait...");
+
+  const origin = document.getElementById("origin").value;
+  const destination = document.getElementById("destination").value;
+  const departureAt = document.getElementById("departure-at").value;
+  const transaction = db.transaction("places", "readwrite");
+  const objectStore = transaction.objectStore("places");
+  const originRequest = objectStore.get(origin);
+  const destinationRequest = objectStore.get(destination);
+  const legTypes = document.querySelectorAll("input[name=leg-types]:checked")
+  const useTripCandidates = document.getElementById("use-trip-candidates").checked;
+
+  let allowedSegmentTypes = []
+
+  legTypes.forEach(function(legType) {
+    allowedSegmentTypes.push({
+      id: legType.value,
+      type: "leg-types",
+    })
+  })
+
+  originRequest.onsuccess = (event) => {
+    const originTimeZone = originRequest.result.attributes.timeZone;
+    if (useTripCandidates) {
+      destinationRequest.onsuccess = (event) => {
+        fetch("/trip-candidates/searches", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/vnd.api+json",
+          },
+          body: JSON.stringify({
+            data: {
+              type: "trip-candidate-searches",
+              attributes: {
+                sessionToken: sessionToken,
+                criteria: [{
+                  origin: {
+                    latitude: originRequest.result.attributes.latitude,
+                    longitude: originRequest.result.attributes.longitude,
+                  },
+                  destination: {
+                    latitude: destinationRequest.result.attributes.latitude,
+                    longitude: destinationRequest.result.attributes.longitude,
+                  },
+                  departureAfter: dayjs.tz(departureAt, originTimeZone).format(),
+                }],
+                passengers: [{
+                  dateOfBirth: "1990-10-25"
+                }],
+              },
+
+              relationships: {
+                allowedSegmentTypes: {
+                  data: allowedSegmentTypes,
+                },
+              },
+            },
+          }),
+        })
+        .then((response) => response.json())
+        .then((data) => {
+          load_trip_candidates(data.data.id);
+        });
+      }
+    } else {
+      fetch("/trips/searches", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/vnd.api+json",
+        },
+        body: JSON.stringify({
+          data: {
+            type: "trip-searches",
+            attributes: {
+              departureAfter: dayjs.tz(departureAt, originTimeZone).format(),
+            },
+            relationships: {
+              origin: {
+                data: {
+                  id: origin,
+                  type: "places",
+                },
+              },
+              destination: {
+                data: {
+                  id: destination,
+                  type: "places",
+                },
+              },
+              allowedSegmentTypes: {
+                data: allowedSegmentTypes,
+              },
+            },
+          },
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          load_trips(data.data.id);
+        });
+    }
+
+  };
+}
+
+
 window.onload = () => {
-  show_loader(
-    "Loading places, this might take a minute or two the first time..."
-  );
+  show_loader("Initializing UI, please wait...");
   const DBOpenRequest = window.indexedDB.open("places");
 
   DBOpenRequest.onupgradeneeded = (event) => {
@@ -854,112 +907,6 @@ window.onload = () => {
 
   const searchForm = document.getElementById("search-form");
 
-  function search_trips(event) {
-    event.preventDefault();
-    show_loader("Searching for trips, please wait...");
-
-    const origin = document.getElementById("origin").value;
-    const destination = document.getElementById("destination").value;
-    const departureAt = document.getElementById("departure-at").value;
-    const transaction = db.transaction("places", "readwrite");
-    const objectStore = transaction.objectStore("places");
-    const originRequest = objectStore.get(origin);
-    const destinationRequest = objectStore.get(destination);
-    const legTypes = document.querySelectorAll("input[name=leg-types]:checked")
-    const useTripCandidates = document.getElementById("use-trip-candidates").checked;
-
-    let allowedSegmentTypes = []
-
-    legTypes.forEach(function(legType) {
-      allowedSegmentTypes.push({
-        id: legType.value,
-        type: "leg-types",
-      })
-    })
-
-    originRequest.onsuccess = (event) => {
-      const originTimeZone = originRequest.result.attributes.timeZone;
-      if (useTripCandidates) {
-        destinationRequest.onsuccess = (event) => {
-          fetch("/trip-candidates/searches", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/vnd.api+json",
-            },
-            body: JSON.stringify({
-              data: {
-                type: "trip-candidate-searches",
-                attributes: {
-                  sessionToken: sessionToken,
-                  criteria: [{
-                    origin: {
-                      latitude: originRequest.result.attributes.latitude,
-                      longitude: originRequest.result.attributes.longitude,
-                    },
-                    destination: {
-                      latitude: destinationRequest.result.attributes.latitude,
-                      longitude: destinationRequest.result.attributes.longitude,
-                    },
-                    departureAfter: dayjs.tz(departureAt, originTimeZone).format(),
-                  }],
-                  passengers: [{
-                    dateOfBirth: "1990-10-25"
-                  }],
-                },
-
-                relationships: {
-                  allowedSegmentTypes: {
-                    data: allowedSegmentTypes,
-                  },
-                },
-              },
-            }),
-          })
-          .then((response) => response.json())
-          .then((data) => {
-            load_trip_candidates(data.data.id);
-          });
-        }
-      } else {
-        fetch("/trips/searches", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/vnd.api+json",
-          },
-          body: JSON.stringify({
-            data: {
-              type: "trip-searches",
-              attributes: {
-                departureAfter: dayjs.tz(departureAt, originTimeZone).format(),
-              },
-              relationships: {
-                origin: {
-                  data: {
-                    id: origin,
-                    type: "places",
-                  },
-                },
-                destination: {
-                  data: {
-                    id: destination,
-                    type: "places",
-                  },
-                },
-                allowedSegmentTypes: {
-                  data: allowedSegmentTypes,
-                },
-              },
-            },
-          }),
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            load_trips(data.data.id);
-          });
-      }
-
-    };
-  }
-
   searchForm.addEventListener("submit", search_trips);
+  document.getElementById("clear-places-cache").addEventListener("click", clear_places_cache);
 };
