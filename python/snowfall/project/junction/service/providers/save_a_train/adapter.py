@@ -610,16 +610,17 @@ class Transformer(object):
         )
         external_info = combined.get("external_information")
 
-        ticket_url = None
+        ticket_urls = []
         if external_info:
             path = pathlib.Path(
                 self._provider_id,
                 external_info["order_id"],
                 external_info["booking_id"],
             ).with_suffix(".pdf")
+
             ticket_url = await self._ticket_storage.url(path, timeout=self._url_timeout)
-        if ticket_url is None:
-            ticket_url = ""
+            if ticket_url:
+                ticket_urls.append(ticket_url)
         return bookings_pb2.Booking(
             id=booking_info.search_identifier,
             status=_PROVIDER_STATUS_MAPPING.get(
@@ -634,6 +635,6 @@ class Transformer(object):
                 record_locator=ticket_info.confirmation_code,
                 operator_booking_references=[booking_info.search_identifier],
             ),
-            ticket_url=ticket_url,
+            ticket_urls=ticket_urls,
             # TODO: No idea how to get created_at or updated_at from the booking model.
         )

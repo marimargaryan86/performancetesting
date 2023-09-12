@@ -88,7 +88,7 @@ class BookingHandler(object):
         local_booking: models_pb2.Booking,
         provider_booking: bookings_pb2.Booking,
     ) -> models_pb2.Booking:
-        local_booking.ticket_url = provider_booking.ticket_url
+        local_booking.ticket_urls.extend(provider_booking.ticket_urls)
         if not _provider_booking_is_newer(local_booking, provider_booking):
             return local_booking
 

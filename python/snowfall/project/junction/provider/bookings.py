@@ -9,6 +9,7 @@ from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.transport.grpc import service
 
 Transformer = Callable[[bytes], Awaitable[bookings_pb2.Booking]]
+Enricher = Callable[[bookings_pb2.Booking], Awaitable[bookings_pb2.Booking]]
 
 
 class NotFoundError(Exception):
@@ -20,9 +21,11 @@ class Implementation(object):
         self,
         storage: filesystem.Storage,
         transformer: Transformer,
+        enrich: Enricher | None = None,
     ):
         self._storage = storage
         self._transformer = transformer
+        self._enrich = enrich
 
     async def get(self, identifier: str) -> bookings_pb2.Booking:
         try:
@@ -30,7 +33,12 @@ class Implementation(object):
         except filesystem.NotFoundError as err:
             raise NotFoundError() from err
 
-        return await self._transformer(raw_booking)
+        booking_from_provider = await self._transformer(raw_booking)
+
+        if self._enrich:
+            return await self._enrich(booking_from_provider)
+
+        return booking_from_provider
 
 
 class BookingService(service.Service, bookings_pb2_grpc.BookingServiceServicer):

@@ -7,8 +7,9 @@ import aiosmtplib
 import httpx
 from aio_pika import abc
 
-from snowfall.project.junction.provider import meta, notifications, service
+from snowfall.project.junction.provider import bookings, meta, notifications, service
 from snowfall.project.junction.service.providers.benerail import (
+    booking,
     config,
     consumer,
     offers,
@@ -17,6 +18,7 @@ from snowfall.project.junction.service.providers.benerail import (
     stations,
 )
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
+from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import types
 from snowfall.vendor.benerail import client
@@ -27,6 +29,22 @@ _PROVIDER_NAME = "Benerail"
 
 async def _meta_factory() -> meta.MetaImplementation:
     return meta.MetaImplementation(identifier=_PROVIDER_ID, name=_PROVIDER_NAME)
+
+
+async def _bookings_factory(
+    app: service.AsyncApplication[config.Settings],
+) -> bookings.Implementation:
+    storage = await app.stack.enter_async_context(
+        filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
+    )
+
+    return bookings.Implementation(
+        storage=storage,
+        transformer=booking.Transformer(
+            provider_identifier=_PROVIDER_ID,
+            provider_name=_PROVIDER_NAME,
+        ).raw_to_booking,
+    )
 
 
 async def _notifications(  # noqa: WPS217
@@ -123,6 +141,7 @@ if __name__ == "__main__":
         name="benerail",
         offers_factory=offers.offers_app,
         meta_factory=_meta_factory,
+        bookings_factory=_bookings_factory,
         settings_class=config.Settings,
     )
     entrypoint.enter_with_commands(

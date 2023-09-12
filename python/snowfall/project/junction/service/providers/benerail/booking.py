@@ -2,8 +2,10 @@ import asyncio
 import datetime
 import pathlib
 import types as python_types
+import uuid
 from collections.abc import Sequence
 
+import orjson
 import phonenumbers
 import tenacity
 
@@ -14,6 +16,7 @@ from snowfall.project.junction.go.service.orders.v1 import models_pb2
 from snowfall.project.junction.go.service.orders.v1 import (
     models_pb2 as order_models_pb2,
 )
+from snowfall.project.junction.provider.v1alpha import bookings_pb2
 from snowfall.project.junction.service.providers.benerail import cache, helper_models
 from snowfall.project.junction.service.providers.benerail.v1alpha import amqp_pb2
 from snowfall.stdlib import money
@@ -25,6 +28,7 @@ from snowfall.stdlib.transport.http import errors
 from snowfall.vendor.benerail import client
 from snowfall.vendor.benerail.models import etag
 from snowfall.vendor.benerail.models.bookings import offer, order, payment
+from snowfall.vendor.benerail.models.bookings import response as booking_response
 from snowfall.vendor.benerail.models.bookings import response as bookings_response
 from snowfall.vendor.benerail.models.dialogue import enums as dialogue_enums
 from snowfall.vendor.benerail.models.dialogue import passenger
@@ -38,6 +42,40 @@ _GENDER_MAP = python_types.MappingProxyType(
     },
 )
 _WAIT_AFTER_PAYMENT_SECONDS = 15
+
+
+class Transformer(object):
+    def __init__(self, provider_identifier: uuid.UUID, provider_name: str):
+        self._provider_id = str(provider_identifier)
+        self._provider_name = provider_name
+
+    async def raw_to_booking(self, raw: bytes) -> bookings_pb2.Booking:
+        booking_result = booking_response.GetBookingResponse(
+            **orjson.loads(raw),
+            dialogue_etag="",
+        )
+
+        # TODO: How to figure out real status?
+        booking_status = bookings_pb2.Booking.STATUS_NOT_TICKETED
+
+        return bookings_pb2.Booking(
+            id=str(booking_result.response_result.identifier),
+            status=booking_status,
+            provider=bookings_pb2.Booking.Provider(
+                id=self._provider_id,
+                name=self._provider_name,
+            ),
+            trip=bookings_pb2.Booking.Trip(
+                record_locator=booking_result.response_result.dnr,
+                operator_booking_references=[booking_result.response_result.identifier],
+            ),
+            created_at=protobuf.datetime_to_protobuf(
+                datetime.datetime.fromisoformat(
+                    str(booking_result.metadata.responded_at),
+                ),
+            ),
+            # TODO: No idea how to get updated_at from the booking model.
+        )
 
 
 class BookingHandler(object):

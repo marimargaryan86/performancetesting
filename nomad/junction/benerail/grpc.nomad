@@ -34,6 +34,10 @@ variable "api_base_url" {
   type = string
 }
 
+variable "bucket" {
+  type = string
+}
+
 job "benerail-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -113,6 +117,7 @@ AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 {{ with secret "kv/data/${var.environment}/benerail" }}
+STORAGE_DSN=s3://{{ .Data.data.aws_access_key_id }}:{{ .Data.data.aws_secret_access_key | urlquery }}@/${var.bucket}/benerail
 SUBSCRIPTION_KEY={{ .Data.data.subscription_key }}
 CERT_BASE64={{ .Data.data.cert_base64 }}
 {{ end }}

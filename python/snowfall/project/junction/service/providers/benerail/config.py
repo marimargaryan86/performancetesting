@@ -34,6 +34,7 @@ class DumpStationsSettings(BenerailSettings, service.Settings):
 class Settings(BenerailSettings, service.ProviderSettings):
     mongo_dsn: tuple[pydantic.AnyUrl]
     ttl: datetime.timedelta = datetime.timedelta(minutes=_DEFAULT_TTL_IN_MINUTES)
+    storage_dsn: service.AnyDsn
 
 
 class PriceQuoteSettings(BenerailSettings, service.Settings):

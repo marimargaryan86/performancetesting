@@ -61,5 +61,5 @@ message Booking {
   string raw_data = 5;
   google.protobuf.Timestamp created_at = 6;
   google.protobuf.Timestamp updated_at = 7;
-  string ticket_url = 9;
+  repeated string ticket_urls = 9;
 }
