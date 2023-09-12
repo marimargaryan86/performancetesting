@@ -4,6 +4,7 @@ import itertools
 from collections import defaultdict
 from collections.abc import Awaitable, Callable, Sequence
 
+from sentry_sdk import tracing
 from starlette import requests
 
 from snowfall.stdlib import sequence
@@ -157,6 +158,7 @@ class _IncludesResolver(object):
         return relationships
 
 
+@tracing.trace
 async def resolve_includes(
     body: models.Body,
     request: requests.Request,

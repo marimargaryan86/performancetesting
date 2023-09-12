@@ -9,6 +9,7 @@ from openapi_core.unmarshalling.request import datatypes as request_datatypes
 from openapi_core.unmarshalling.response import datatypes as response_datatypes
 from openapi_core.validation.request.datatypes import RequestParameters
 from openapi_core.validation.schemas import exceptions as validation_exceptions
+from sentry_sdk import tracing
 from starlette import requests, responses
 from werkzeug.datastructures import Headers
 
@@ -110,6 +111,7 @@ class Validator(object):
             "application/vnd.api+json": orjson.loads,
         }
 
+    @tracing.trace
     async def validate_request(
         self,
         request: protocols.Request,
@@ -122,6 +124,7 @@ class Validator(object):
             extra_format_unmarshallers=self._format_unmarshallers,
         )
 
+    @tracing.trace
     async def validate_response(
         self,
         request: protocols.Request,
