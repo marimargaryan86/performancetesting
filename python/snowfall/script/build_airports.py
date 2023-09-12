@@ -15,7 +15,7 @@ from lxml.html import fromstring as html_fromstring
 
 _Airports = dict[str, dict[str, Any]]
 
-AIRPORTS_PATH = Path(__file__).with_name("airports.json")
+AIRPORTS_PATH = Path(__file__).parent.parent / "data" / "airports.json"
 DUFFEL_TOKEN = sys.argv[1]
 GOOGLE_API_KEY = "AIzaSyAnIu066pbPDKN3Kto0xtKJtjIyOCmZZJI"
 

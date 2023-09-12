@@ -5,7 +5,6 @@ import datetime
 import random
 import uuid
 from collections.abc import Sequence
-from typing import Any, cast
 
 import aiosmtplib
 import httpx
@@ -134,10 +133,7 @@ async def _offers(
         rate_limit_client=rate_limit_client,
     )
     airport_repo = airports.AirportRepository(
-        airports_data=cast(
-            list[dict[str, Any]],
-            filesystem.PkgLoader("snowfall.conftest").load("airports.json"),
-        ),
+        airports_data=filesystem.PkgLoader("snowfall.data").load("airports.json"),
     )
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
@@ -293,9 +289,8 @@ async def _price_quotes(app: service.AsyncApplication[_PriceQuotesSettings]) -> 
         ),
         offer_transformer=transformer.OfferTransformer(
             airport_repository=airports.AirportRepository(
-                airports_data=cast(
-                    list[dict[str, Any]],
-                    filesystem.PkgLoader("snowfall.conftest").load("airports.json"),
+                airports_data=filesystem.PkgLoader("snowfall.data").load(
+                    "airports.json",
                 ),
             ),
             cabin_mapping_repository=cabin_classes.CabinMappingRepository(

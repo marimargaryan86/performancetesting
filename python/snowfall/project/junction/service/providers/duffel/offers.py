@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import contextlib
-from typing import Any, cast
 
 import httpx
 from redis import asyncio as aioredis
@@ -64,10 +63,7 @@ async def offers_factory(
         disabled_airlines=frozenset(app.settings.disabled_airlines),
     )
     airport_mapping = airports.AirportRepository(
-        airports_data=cast(
-            list[dict[str, Any]],
-            filesystem.PkgLoader("snowfall.conftest").load("airports.json"),
-        ),
+        airports_data=filesystem.PkgLoader("snowfall.data").load("airports.json"),
     ).all_()
 
     return offers.OfferSearchImplementation(

@@ -1,6 +1,6 @@
-python_sources(dependencies=["python/snowfall:airports"])
+python_sources(dependencies=["python/snowfall/data:airports"])
 python_test_utils(
-    name="test_utils", dependencies=["python/snowfall:airports", ":fixtures"]
+    name="test_utils", dependencies=["python/snowfall/data:airports", ":fixtures"]
 )
 python_image(
     name="main",

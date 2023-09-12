@@ -96,7 +96,7 @@ def assert_all_responses_were_requested() -> bool:
 
 @pytest.fixture()
 async def airport_repository() -> airports.AirportRepository:
-    loader = filesystem.PkgLoader("snowfall.conftest")
+    loader = filesystem.PkgLoader("snowfall.data")
 
     airports_list: list[dict[str, Any]] = loader.load("airports.json")
     return airports.AirportRepository(airports_list)

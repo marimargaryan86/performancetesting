@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import contextlib
-from typing import Any, cast
 
 import httpx
 from redis import asyncio as aioredis
@@ -32,10 +31,7 @@ async def offers_factory(  # noqa: WPS210
     stack: contextlib.AsyncExitStack,
 ) -> _Impl:
     airport_repository = airports.AirportRepository(
-        airports_data=cast(
-            list[dict[str, Any]],
-            filesystem.PkgLoader("snowfall.conftest").load("airports.json"),
-        ),
+        airports_data=filesystem.PkgLoader("snowfall.data").load("airports.json"),
     )
     http_client = await stack.enter_async_context(
         httpx.AsyncClient(
