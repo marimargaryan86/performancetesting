@@ -38,7 +38,6 @@
   import { page } from "$app/stores";
   import { goto } from "$app/navigation";
   import { writableCookie } from "utils/persistent-store";
-  import type { CreateBeneficiaryModel } from "models/beneficiary";
   import StepView from "components/page/step-view.svelte";
   import routeConfig from "routeConfig";
   import BeneficiaryDetails from "./beneficiary-details.svelte";
@@ -47,6 +46,7 @@
   import { URLExtended } from "utils/url";
   import StandardLayout from "components/page/standard-layout.svelte";
   import Alert from "components/ui/alert.svelte";
+  import type { CreateBeneficiaryModel } from "integration/junction-pay/schemas/beneficiary.client";
 
   export let data;
 

@@ -1,6 +1,6 @@
 import { priceModel, priceBreakdownModel } from "./price";
 import { pointModel, resourceStatus } from "./common";
-import { getSchemaModel, links, relationship, type Infer } from "../schema-model.server";
+import { getSchemaModel, links, relationship, type Infer } from "../../common/schema-model.server";
 import { z } from "zod";
 
 export const offerSegmentLegModel = getSchemaModel(
@@ -81,7 +81,7 @@ export const tripOfferGroupDetailsModel = getSchemaModel(
       routeIdentifiers: routeIdentifierModel.schema,
       sequences: z.object({ trip: z.number(), segment: z.number() }),
     }),
-    relationships: relationship({ legType: legTypeModel.schema.pick({ id: true, type: true }) }),
+    relationships: relationship({ legType: legTypeModel.identifier }),
     links: links(["self"]),
   }),
   z.object({
@@ -133,8 +133,8 @@ export const tripOfferOptionDetailsModel = getSchemaModel(
       amenities: offerSegmentDetailAmenitiesModel,
     }),
     relationships: relationship({
-      details: tripOfferGroupDetailsModel.schema.pick({ id: true, type: true }),
-      cabinClass: cabinClassModel.schema.pick({ id: true, type: true }),
+      details: tripOfferGroupDetailsModel.identifier,
+      cabinClass: cabinClassModel.identifier,
     }),
     links: links(["self"]),
   }),
@@ -184,7 +184,7 @@ export const offerOptionModel = getSchemaModel(
       baggageAllowances: z.array(baggageAllowanceModel.schema),
     }),
     relationships: relationship({
-      details: z.array(tripOfferOptionDetailsModel.schema.pick({ id: true, type: true })),
+      details: z.array(tripOfferOptionDetailsModel.identifier),
     }),
     links: links(["self"]),
   }),
@@ -216,8 +216,8 @@ export const offerGroupModel = getSchemaModel(
     type: z.enum(["offer-groups"]),
     attributes: z.record(z.any()),
     relationships: relationship({
-      options: z.array(offerOptionModel.schema.pick({ id: true, type: true })),
-      details: z.array(tripOfferGroupDetailsModel.schema.pick({ id: true, type: true })),
+      options: z.array(offerOptionModel.identifier),
+      details: z.array(tripOfferGroupDetailsModel.identifier),
     }),
     links: links(["self"]),
   }),
@@ -237,7 +237,7 @@ export const offerModel = getSchemaModel(
     type: z.enum(["offers"]),
     attributes: z.object({ expiresAt: z.date({ coerce: true }) }),
     relationships: relationship({
-      groups: z.array(offerGroupModel.schema.pick({ id: true, type: true })),
+      groups: z.array(offerGroupModel.identifier),
     }),
     links: links(["self"]),
   }),
@@ -315,8 +315,8 @@ export const tripOfferPriceQuoteModel = getSchemaModel(
       status: resourceStatus,
     }),
     relationships: relationship({
-      offer: offerModel.schema.pick({ id: true, type: true }),
-      options: z.array(offerOptionModel.schema.pick({ id: true, type: true })),
+      offer: offerModel.identifier,
+      options: z.array(offerOptionModel.identifier),
     }),
   }),
   z.object({
@@ -358,8 +358,8 @@ export const createTripOfferPriceQuoteModel = getSchemaModel(
     type: z.enum(["trip-offer-price-quotes"]),
     attributes: z.object({ sessionToken: z.string() }).optional(),
     relationships: relationship({
-      offer: offerModel.schema.pick({ id: true, type: true }),
-      options: z.array(offerOptionModel.schema.pick({ id: true, type: true })),
+      offer: offerModel.identifier,
+      options: z.array(offerOptionModel.identifier),
     }),
   }),
   z.object({

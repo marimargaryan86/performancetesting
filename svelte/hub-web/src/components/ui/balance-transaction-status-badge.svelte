@@ -1,11 +1,10 @@
 <script lang="ts">
-  import { formatBalanceTransactionStatus } from "formatting/transaction";
-  import type { BalanceTransactionStatus } from "models/transaction";
   import StatusBadge, { type StatusBadgeVariant } from "./status-badge.svelte";
+  import { capitalize } from "utils/common";
 
-  export let value: BalanceTransactionStatus;
+  export let value: "completed" | "pending" | "deleted";
 
-  const variants: Record<BalanceTransactionStatus, StatusBadgeVariant> = {
+  const variants: Record<"completed" | "pending" | "deleted", StatusBadgeVariant> = {
     completed: "ok",
     pending: "warn",
     deleted: "error",
@@ -14,4 +13,4 @@
   $: variant = variants[value];
 </script>
 
-<StatusBadge {variant} value={formatBalanceTransactionStatus(value)} />
+<StatusBadge {variant} value={capitalize(value)} />

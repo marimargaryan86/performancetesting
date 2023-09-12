@@ -1,16 +1,16 @@
-import {
-  beneficiaryModel,
-  type BeneficiaryModel,
-  type CreateBeneficiaryModel,
-} from "models/beneficiary";
 import { getToken } from "utils/auth";
 import * as devalue from "devalue";
 import type { RequestEvent } from "./$types";
 import { ActionFailure, fail } from "@sveltejs/kit";
 import { z } from "zod";
 import { formatError, type FormattedError } from "utils/zod";
-import type { AccountModel } from "models/account";
 import integrationInstances from "integration-instances";
+import type { AccountModel } from "integration/junction-pay/schemas/account";
+import type { BeneficiaryModel } from "integration/junction-pay/schemas/beneficiary";
+import {
+  beneficiaryModel,
+  type CreateBeneficiaryModel,
+} from "integration/junction-pay/schemas/beneficiary.client";
 
 function getBeneficiaryData(event: RequestEvent): CreateBeneficiaryModel | undefined {
   const cookieData = event.cookies.get("beneficiary-data");

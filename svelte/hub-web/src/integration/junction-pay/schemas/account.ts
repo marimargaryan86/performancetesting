@@ -1,31 +1,44 @@
-import type { RelationshipSchema } from "integration/common/schemas";
-import type { CompanyIdentifierSchema } from "./company";
-import type { ContactPersonIdentifierSchema } from "./contact-person";
+import {
+  getSchemaModel,
+  links,
+  relationship,
+  type Infer,
+} from "integration/common/schema-model.server";
+import { z } from "zod";
+import { companyModel } from "./company";
 
-export interface AccountIdentifierSchema {
-  id: string;
-  type: "accounts";
-}
+export const contactPersonModel = z.object({ id: z.string(), type: z.enum(["contact-persons"]) });
 
-export interface AccountSchema extends AccountIdentifierSchema {
-  attributes: {
-    name: string;
-    status: string;
-  };
-  relationships: {
-    company?: RelationshipSchema<CompanyIdentifierSchema>;
-    contactPerson?: RelationshipSchema<ContactPersonIdentifierSchema>;
-  };
-  links: { self: string };
-}
-
-export interface ListAccountsResponseSchema {
-  data: AccountSchema[];
-  links: {
-    next: string;
-  };
-}
-
-export interface GetAccountResponseSchema {
-  data: AccountSchema;
-}
+export const accountModel = getSchemaModel(
+  z.object({
+    id: z.string(),
+    type: z.enum(["accounts"]),
+    attributes: z.object({
+      name: z.string(),
+      status: z.string(),
+    }),
+    relationships: relationship({
+      company: companyModel.identifier.optional(),
+      contactPerson: contactPersonModel.optional(),
+    }),
+    links: links(["self"]),
+  }),
+  z.object({
+    id: z.string(),
+    name: z.string(),
+    headAccount: z.boolean(),
+    companyId: z.string().optional(),
+    contactPersonId: z.string().optional(),
+  }),
+  {
+    toModel: (data) => ({
+      headAccount: false,
+      id: data.id,
+      name: data.attributes.name,
+      companyId: data.relationships.company?.data.id,
+      contactPersonId: data.relationships.contactPerson?.data.id,
+    }),
+  },
+);
+export type AccountModel = Infer<typeof accountModel>;
+export type AccountSchema = Infer<typeof accountModel, "schema">;

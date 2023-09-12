@@ -36,10 +36,20 @@ import {
   parseOfferSchema,
 } from "./offer";
 
-// eslint-disable-next-line max-lines-per-function
-export function parseIncluded(
-  data?: (OrderIncludes | TripOfferPriceQuoteIncludes | OfferIncludes)[],
-): {
+type IncludeSchemas = {
+  legTypes: LegTypeSchema[];
+  offerGroupDetails: TripOfferGroupDetailsSchema[];
+  cabinClasses: CabinClassSchema[];
+  offerOptionDetails: TripOfferOptionDetailsSchema[];
+  offerOptions: OfferOptionSchema[];
+  offerGroups: OfferGroupSchema[];
+  offers: OfferSchema[];
+  journeys: JourneySchema[];
+  bookingDetails: BookingDetailsSchema[];
+  bookings: BookingSchema[];
+};
+
+type IncludeModels = {
   legTypes: LegTypeModel[];
   offerGroupDetails: TripOfferGroupDetailsModel[];
   cabinClasses: CabinClassModel[];
@@ -50,67 +60,81 @@ export function parseIncluded(
   journeys: JourneyModel[];
   bookingDetails: BookingDetailsModel[];
   bookings: BookingModel[];
-} {
-  const legTypes_: LegTypeSchema[] = [];
-  const offerGroupDetails_: TripOfferGroupDetailsSchema[] = [];
-  const cabinClasses_: CabinClassSchema[] = [];
-  const offerOptionDetails_: TripOfferOptionDetailsSchema[] = [];
-  const offerOptions_: OfferOptionSchema[] = [];
-  const offerGroups_: OfferGroupSchema[] = [];
-  const offers_: OfferSchema[] = [];
-  const journeys_: JourneySchema[] = [];
-  const bookingDetails_: BookingDetailsSchema[] = [];
-  const bookings_: BookingSchema[] = [];
+};
+
+function separateIncluded(
+  data?: (OrderIncludes | TripOfferPriceQuoteIncludes | OfferIncludes)[],
+): IncludeSchemas {
+  const result: IncludeSchemas = {
+    legTypes: [],
+    offerGroupDetails: [],
+    cabinClasses: [],
+    offerOptionDetails: [],
+    offerOptions: [],
+    offerGroups: [],
+    offers: [],
+    journeys: [],
+    bookingDetails: [],
+    bookings: [],
+  };
 
   // eslint-disable-next-line complexity
   data?.forEach((item) => {
     if (item.type === "leg-types") {
-      legTypes_.push(item);
+      result.legTypes.push(item);
     } else if (item.type === "trip-offer-group-details") {
-      offerGroupDetails_.push(item);
+      result.offerGroupDetails.push(item);
     } else if (item.type === "cabin-classes") {
-      cabinClasses_.push(item);
+      result.cabinClasses.push(item);
     } else if (item.type === "trip-offer-option-details") {
-      offerOptionDetails_.push(item);
+      result.offerOptionDetails.push(item);
     } else if (item.type === "offer-options") {
-      offerOptions_.push(item);
+      result.offerOptions.push(item);
     } else if (item.type === "offer-groups") {
-      offerGroups_.push(item);
+      result.offerGroups.push(item);
     } else if (item.type === "offers") {
-      offers_.push(item);
+      result.offers.push(item);
     } else if (item.type === "journeys") {
-      journeys_.push(item);
+      result.journeys.push(item);
     } else if (item.type === "trip-booking-details") {
-      bookingDetails_.push(item);
+      result.bookingDetails.push(item);
     } else {
-      bookings_.push(item);
+      result.bookings.push(item);
     }
   });
 
-  const legTypes = legTypes_.map(legTypeModel.toModel);
-  const offerGroupDetails = offerGroupDetails_.map((item) =>
+  return result;
+}
+
+export function parseIncluded(
+  data?: (OrderIncludes | TripOfferPriceQuoteIncludes | OfferIncludes)[],
+): IncludeModels {
+  const mapping = separateIncluded(data);
+
+  const legTypes = mapping.legTypes.map(legTypeModel.toModel);
+  const offerGroupDetails = mapping.offerGroupDetails.map((item) =>
     parseOfferGroupDetailsSchema(item, { legTypes }),
   );
-  const cabinClasses = cabinClasses_.map(cabinClassModel.toModel);
-  const offerOptionDetails = offerOptionDetails_.map((item) =>
+  const cabinClasses = mapping.cabinClasses.map(cabinClassModel.toModel);
+  const offerOptionDetails = mapping.offerOptionDetails.map((item) =>
     parseOfferOptionDetailsSchema(item, { cabinClasses }),
   );
-  const offerOptions = offerOptions_.map((item) =>
+  const offerOptions = mapping.offerOptions.map((item) =>
     parseOfferOptionSchema(item, { offerOptionDetails }),
   );
-  const offerGroups = offerGroups_.map((item) =>
+  const offerGroups = mapping.offerGroups.map((item) =>
     parseOfferGroupSchema(item, { offerOptions, offerGroupDetails }),
   );
-  const offers = offers_.map((item) => parseOfferSchema(item, { offerGroups }));
-  const journeys = journeys_.map((item) => parseJourneySchema(item, { orders: [] }));
-  const bookingDetails = bookingDetails_.map((item) =>
+  const offers = mapping.offers.map((item) => parseOfferSchema(item, { offerGroups }));
+  const journeys = mapping.journeys.map((item) => parseJourneySchema(item, { orders: [] }));
+  const bookingDetails = mapping.bookingDetails.map((item) =>
     parseBookingDetailsSchema(item, {
       bookings: [],
       cabinClasses,
       legTypes,
     }),
   );
-  const bookings = bookings_.map((item) =>
+  const bookings = mapping.bookings.map((item) =>
     parseBookingSchema(item, { bookingDetails, orders: [] }),
   );
 

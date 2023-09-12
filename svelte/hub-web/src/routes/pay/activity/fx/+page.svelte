@@ -1,5 +1,4 @@
 <script lang="ts" context="module">
-  import type { ConversionStatus, ConversionModel } from "models/conversion";
   import type { DateRange } from "models/date-time";
   import { writable } from "svelte/store";
 
@@ -23,6 +22,10 @@
   import ConversionStatusBadge from "components/ui/conversion-status-badge.svelte";
   import { onMount } from "svelte";
   import routeConfig from "routeConfig";
+  import type {
+    ConversionModel,
+    ConversionStatus,
+  } from "integration/junction-pay/schemas/conversion.js";
 
   export let form;
   export let data;
@@ -106,7 +109,11 @@
         <TCol>{conversion.executedRate}</TCol>
         <TCol>{conversion.fxDelta ?? ""}</TCol>
         <TCol>{conversion.transaction?.rates.fxBuffer ?? ""}</TCol>
-        <TCol width="124px"><ConversionStatusBadge value={conversion.fxStatus} /></TCol>
+        <TCol width="124px">
+          {#if conversion.fxStatus}
+            <ConversionStatusBadge value={conversion.fxStatus} />
+          {/if}
+        </TCol>
       </TRow>
     {/each}
   </TBody>

@@ -1,7 +1,7 @@
 import { redirect } from "@sveltejs/kit";
 import integrationInstances from "integration-instances";
+import type { CurrencyModel } from "integration/junction-pay/schemas/money.js";
 import type { CountryModel } from "models/location";
-import type { CurrencyModel } from "models/money";
 import type { UserModel } from "models/user";
 import routeConfig from "routeConfig";
 

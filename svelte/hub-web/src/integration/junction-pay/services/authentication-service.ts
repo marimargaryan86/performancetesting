@@ -1,25 +1,22 @@
-import type { CreateAuthTokenResponseSchema } from "../schemas/auth";
+import {
+  createUserTokenModel,
+  userTokenModel,
+  type CreateUserTokenModel,
+  type UserTokenSchema,
+} from "../schemas/auth";
 import JunctionPayService from "./junction-pay-service";
 
 export default class AuthenticationService extends JunctionPayService {
-  async createToken(data: { email: string; password: string }): Promise<string> {
-    const resp = await this.makeRequest<CreateAuthTokenResponseSchema>("/users/tokens", {
+  async createToken(data: CreateUserTokenModel): Promise<string> {
+    const resp = await this.makeRequest<{ data: UserTokenSchema }>("/users/tokens", {
       method: "POST",
-      data: {
-        data: {
-          type: "user-tokens",
-          attributes: {
-            email: data.email,
-            password: data.password,
-          },
-        },
-      },
+      data: { data: createUserTokenModel.toSchema(data) },
     });
 
     if (resp.status !== 200) {
       throw new Error(`Junction Pay error: ${resp.status}`);
     }
 
-    return (await resp.json()).data.attributes.token;
+    return userTokenModel.toModel((await resp.json()).data).token;
   }
 }

@@ -1,7 +1,7 @@
 import { getToken } from "utils/auth";
 import integrationInstances from "integration-instances";
 import type { PriceModel } from "integration/junction-mobile-api/schemas/price";
-import type { AccountModel } from "models/account";
+import type { AccountModel } from "integration/junction-pay/schemas/account.js";
 
 export function load(event): {
   balances: Promise<PriceModel[]>;

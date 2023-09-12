@@ -2,7 +2,6 @@ import type { OrderModel } from "models/order";
 import type { JourneySchema } from "../schemas/journey";
 import type { OrderSchema } from "../schemas/order";
 
-/* eslint-disable max-lines-per-function */
 export function parseOrder(order: OrderSchema, journeys: JourneySchema[]): OrderModel {
   return {
     passengers: order.attributes.passengers.map((item) => ({
@@ -44,4 +43,3 @@ export function parseOrder(order: OrderSchema, journeys: JourneySchema[]): Order
     })),
   };
 }
-/* eslint-enable max-lines-per-function */

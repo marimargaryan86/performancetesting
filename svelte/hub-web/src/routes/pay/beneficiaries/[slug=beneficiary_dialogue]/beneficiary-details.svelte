@@ -10,14 +10,17 @@
 <script lang="ts">
   import SelectField from "components/ui/select-field.svelte";
   import TextField from "components/ui/text-field.svelte";
-  import { beneficiaryModel, type CreateBeneficiaryModel } from "models/beneficiary";
   import Section from "./section.svelte";
   import type { CountryModel } from "models/location";
   import { z } from "zod";
   import { formatError, type FormattedError } from "utils/zod";
   import { updateBeneficiaryData } from "./helpers";
-  import type { AccountModel } from "models/account";
   import { formatCountryOption } from "formatting/location";
+  import type { AccountModel } from "integration/junction-pay/schemas/account";
+  import {
+    beneficiaryModel,
+    type CreateBeneficiaryModel,
+  } from "integration/junction-pay/schemas/beneficiary.client";
 
   export let data: CreateBeneficiaryModel;
   export let countries: Map<string, CountryModel>;

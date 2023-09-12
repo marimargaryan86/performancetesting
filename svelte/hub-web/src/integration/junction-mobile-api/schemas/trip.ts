@@ -1,6 +1,6 @@
 import { coordinatesModel } from "./place";
 import { resourceStatus } from "./common";
-import { getSchemaModel, links, relationship, type Infer } from "../schema-model.server";
+import { getSchemaModel, links, relationship, type Infer } from "../../common/schema-model.server";
 import { z } from "zod";
 
 export const tripCandidatesSearchModel = getSchemaModel(

@@ -1,5 +1,5 @@
 import { tripOfferPriceQuoteModel, type LegTypeSchema, type CabinClassSchema } from "./offer";
-import { getSchemaModel, relationship, type Infer, links } from "../schema-model.server";
+import { getSchemaModel, relationship, type Infer, links } from "../../common/schema-model.server";
 import { z } from "zod";
 import { paymentIntentModel } from "./payment";
 import { journeyModel, type JourneySchema } from "./journey";
@@ -131,10 +131,10 @@ export const orderModel = getSchemaModel(
       residenceAddress: addressModel.optional(),
     }),
     relationships: relationship({
-      payment: paymentIntentModel.schema.pick({ id: true, type: true }),
-      voucher: voucherModel.schema.pick({ id: true, type: true }).optional(),
-      journey: journeyModel.schema.pick({ id: true, type: true }),
-      bookings: z.array(z.lazy(() => bookingModel.schema.pick({ id: true, type: true }))),
+      payment: paymentIntentModel.identifier,
+      voucher: voucherModel.identifier.optional(),
+      journey: journeyModel.identifier,
+      bookings: z.array(z.lazy(() => bookingModel.identifier)),
     }),
     links: links(["self"]),
   }),
@@ -171,9 +171,9 @@ export const createOrderModel = getSchemaModel(
       passengers: z.array(orderPassengerModel.schema),
     }),
     relationships: relationship({
-      payment: paymentIntentModel.schema.pick({ id: true, type: true }),
-      voucher: voucherModel.schema.pick({ id: true, type: true }).optional(),
-      quote: tripOfferPriceQuoteModel.schema.pick({ id: true, type: true }),
+      payment: paymentIntentModel.identifier,
+      voucher: voucherModel.identifier.optional(),
+      quote: tripOfferPriceQuoteModel.identifier,
     }),
   }),
   z.object({

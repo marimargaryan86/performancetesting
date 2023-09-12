@@ -1,46 +1,27 @@
-import type { AddBalanceResponseSchema, ListBalancesResponseSchema } from "../schemas/balance";
+import { balanceModel, createBalanceModel, type BalanceSchema } from "../schemas/balance";
 import JunctionPayService from "./junction-pay-service";
 import type { PriceModel } from "integration/junction-mobile-api/schemas/price";
 
 export default class BalanceService extends JunctionPayService {
   async listBalances(token: string, accountId: string): Promise<PriceModel[]> {
-    const resp = await this.makeRequest<ListBalancesResponseSchema>(
+    const resp = await this.makeRequest<{ data: BalanceSchema[] }>(
       `/accounts/${accountId}/balances`,
       { token },
     );
-
-    if (resp.status === 404) {
-      return [];
-    }
 
     if (resp.status !== 200) {
       throw new Error(`Junction Pay error: ${resp.status}`);
     }
 
-    return (await resp.json()).data.map((item) => ({
-      amount: item.attributes.amount,
-      currency: item.relationships.currency.data.id,
-    }));
+    return (await resp.json()).data.map(balanceModel.toModel);
   }
 
   async addBalance(token: string, accountId: string, currencyCode: string): Promise<PriceModel> {
-    const resp = await this.makeRequest<AddBalanceResponseSchema>(
+    const resp = await this.makeRequest<{ data: BalanceSchema }>(
       `/accounts/${accountId}/relationships/currencies`,
       {
         method: "POST",
-        data: {
-          data: {
-            type: "balances",
-            relationships: {
-              currency: {
-                data: {
-                  id: currencyCode,
-                  type: "currencies",
-                },
-              },
-            },
-          },
-        },
+        data: { data: createBalanceModel.toSchema({ currencyCode }) },
         token,
       },
     );
@@ -49,11 +30,6 @@ export default class BalanceService extends JunctionPayService {
       throw new Error(`Junction Pay error: ${resp.status}`);
     }
 
-    const data = await resp.json();
-
-    return {
-      amount: data.data.attributes.amount,
-      currency: data.data.relationships.currency.data.id,
-    };
+    return balanceModel.toModel((await resp.json()).data);
   }
 }

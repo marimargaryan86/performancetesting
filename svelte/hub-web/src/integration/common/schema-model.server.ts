@@ -3,9 +3,17 @@ import { z } from "zod";
 type SchemaParserReturnType<TSchema extends z.ZodType, TModel extends z.ZodType> = {
   schema: TSchema;
   model: TModel;
+  identifier: IdentifierSchema<TSchema>;
   toModel(data: unknown): z.infer<TModel>;
   toSchema(data: unknown): z.infer<TSchema>;
 };
+
+type IdentifierSchema<TSchema extends z.ZodType> = TSchema extends z.ZodObject<{
+  id: z.ZodType;
+  type: z.ZodType;
+}>
+  ? z.ZodObject<Pick<TSchema["shape"], "id" | "type">>
+  : unknown;
 
 export function getSchemaModel<TSchema extends z.ZodType, TModel extends z.ZodType>(
   schema: TSchema,
@@ -30,6 +38,9 @@ export function getSchemaModel<TSchema extends z.ZodType, TModel extends z.ZodTy
   return {
     schema,
     model,
+    identifier: (schema instanceof z.ZodObject
+      ? schema.pick({ id: true, type: true })
+      : undefined) as unknown as IdentifierSchema<TSchema>,
     toModel,
     toSchema,
   };
@@ -70,7 +81,6 @@ export function relationship<TMapping extends Record<string, z.ZodType>>(
   ) as z.ZodObject<Relationship<TMapping>>;
 }
 
-/* eslint-disable @typescript-eslint/ban-types */
 export function links<TItem extends "next" | "self">(
   items: TItem[],
 ): z.ZodObject<Record<TItem, z.ZodString>> {
@@ -79,7 +89,6 @@ export function links<TItem extends "next" | "self">(
     ...(items.includes("self" as TItem) ? { self: z.string().url() } : undefined),
   }) as z.ZodObject<Record<TItem, z.ZodString>>;
 }
-/* eslint-enable */
 
 export type Infer<
   TParser extends SchemaParserReturnType<z.ZodType, z.ZodType>,

@@ -9,12 +9,12 @@
   import type { DirectionY } from "models/spatial";
   import Button from "components/ui/button.svelte";
   import PlusIcon from "components/icons/plus-icon.svelte";
-  import type { BeneficiaryModel } from "models/beneficiary";
   import EditIcon from "components/icons/edit-icon.svelte";
   import RemoveIcon from "components/icons/remove-icon.svelte";
   import routeConfig from "routeConfig";
   import TActionsCol from "components/ui/table/t-actions-col.svelte";
   import StandardLayout from "components/page/standard-layout.svelte";
+  import type { BeneficiaryModel } from "integration/junction-pay/schemas/beneficiary.js";
 
   export let data;
   export let form;

@@ -1,8 +1,8 @@
 <script lang="ts">
-  import type { CurrencyModel } from "models/money";
   import TCol from "./t-col.svelte";
   import { formatAmount } from "formatting/currency";
   import type { PriceModel } from "integration/junction-mobile-api/schemas/price";
+  import type { CurrencyModel } from "integration/junction-pay/schemas/money";
 
   export let money: PriceModel;
   export let currencies: Map<string, CurrencyModel> | undefined = undefined;

@@ -1,5 +1,5 @@
 import integrationInstances from "integration-instances";
-import type { AccountModel } from "models/account";
+import type { AccountModel } from "integration/junction-pay/schemas/account.js";
 import type { PaginatedData } from "models/common";
 import { getToken } from "utils/auth";
 

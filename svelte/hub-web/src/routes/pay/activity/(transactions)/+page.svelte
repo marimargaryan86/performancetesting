@@ -1,6 +1,5 @@
 <script lang="ts" context="module">
   import type { DateRange } from "models/date-time";
-  import type { TransactionModel, TransactionStatus } from "models/transaction";
 
   export const dateRange = writable<DateRange | undefined>(undefined);
   export const status = writable<TransactionStatus[]>([]);
@@ -27,6 +26,10 @@
   import routeConfig from "routeConfig";
   import TCompanyCol from "components/ui/table/t-company-col.svelte";
   import TMoneyCol from "components/ui/table/t-money-col.svelte";
+  import type {
+    TransactionModel,
+    TransactionStatus,
+  } from "integration/junction-pay/schemas/transaction";
 
   export let data;
   export let form;

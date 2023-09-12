@@ -6,7 +6,7 @@
   import TextField from "components/ui/text-field.svelte";
   import { portal } from "directives/portal";
   import type { PriceModel } from "integration/junction-mobile-api/schemas/price";
-  import type { CurrencyModel } from "models/money";
+  import type { CurrencyModel } from "integration/junction-pay/schemas/money";
   import routeConfig from "routeConfig";
   import { createEventDispatcher } from "svelte";
   import { fade, fly } from "svelte/transition";

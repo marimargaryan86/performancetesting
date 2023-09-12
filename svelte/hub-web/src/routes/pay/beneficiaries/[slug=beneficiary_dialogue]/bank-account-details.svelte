@@ -4,9 +4,11 @@
 
 <script lang="ts">
   import SelectField from "components/ui/select-field.svelte";
-  import { beneficiaryModel, type CreateBeneficiaryModel } from "models/beneficiary";
+  import {
+    beneficiaryModel,
+    type CreateBeneficiaryModel,
+  } from "integration/junction-pay/schemas/beneficiary.client";
   import Section from "./section.svelte";
-  import type { CurrencyModel } from "models/money";
   import TextField from "components/ui/text-field.svelte";
   import RegularPaymentIcon from "components/icons/regular-payment-icon.svelte";
   import PriorityPaymentIcon from "components/icons/priority-payment-icon.svelte";
@@ -15,6 +17,7 @@
   import { formatError, type FormattedError } from "utils/zod";
   import { updateBeneficiaryData } from "./helpers";
   import { formatCountryOption } from "formatting/location";
+  import type { CurrencyModel } from "integration/junction-pay/schemas/money";
 
   export let data: CreateBeneficiaryModel;
   export let currencies: Map<string, CurrencyModel>;

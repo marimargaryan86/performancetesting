@@ -1,6 +1,9 @@
 import type { DateRange } from "models/date-time";
-import type { ConversionModel, ConversionStatus } from "models/conversion";
 import { getZeroTimeDate } from "utils/date-time";
+import type {
+  ConversionModel,
+  ConversionStatus,
+} from "integration/junction-pay/schemas/conversion";
 
 export function filterConversions(
   transactions: ConversionModel[],
@@ -18,7 +21,7 @@ export function filterConversions(
 
     return (
       (!dateRange || (dateRange.from <= createdAt && createdAt <= dateRange.to)) &&
-      (!status?.length || status.includes(item.fxStatus)) &&
+      (!status?.length || (item.fxStatus && status.includes(item.fxStatus))) &&
       (!item.transaction || item.transaction.reference.includes(lcQuery))
     );
   });

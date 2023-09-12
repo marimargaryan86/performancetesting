@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { getSchemaModel, type Infer } from "../schema-model.server";
+import { getSchemaModel, type Infer } from "../../common/schema-model.server";
 
 export const priceModel = getSchemaModel(
   z.object({

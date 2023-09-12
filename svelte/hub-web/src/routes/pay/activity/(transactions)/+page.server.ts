@@ -1,8 +1,8 @@
 import { ActionFailure, fail } from "@sveltejs/kit";
 import integrationInstances from "integration-instances";
+import type { TransactionModel } from "integration/junction-pay/schemas/transaction.js";
 import type { BookingModel } from "models/booking";
 import type { PaginatedData } from "models/common";
-import type { TransactionModel } from "models/transaction";
 import { getToken } from "utils/auth";
 
 export function load(event): {

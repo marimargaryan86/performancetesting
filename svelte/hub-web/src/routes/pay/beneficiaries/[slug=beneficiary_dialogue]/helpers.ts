@@ -1,4 +1,4 @@
-import type { CreateBeneficiaryModel } from "models/beneficiary";
+import type { CreateBeneficiaryModel } from "integration/junction-pay/schemas/beneficiary.client";
 
 function lengthOrUndefined(item?: string): string | undefined {
   const nextItem = item?.trim();

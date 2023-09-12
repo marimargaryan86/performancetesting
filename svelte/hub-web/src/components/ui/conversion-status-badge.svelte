@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { ConversionStatus } from "models/conversion";
+  import type { ConversionStatus } from "integration/junction-pay/schemas/conversion";
   import StatusBadge, { type StatusBadgeVariant } from "./status-badge.svelte";
-  import { formatConversionStatus } from "formatting/conversion";
+  import { capitalize } from "utils/common";
 
   export let value: ConversionStatus;
 
@@ -20,4 +20,4 @@
   $: variant = variants[value];
 </script>
 
-<StatusBadge {variant} value={formatConversionStatus(value)} />
+<StatusBadge {variant} value={capitalize(value)} />

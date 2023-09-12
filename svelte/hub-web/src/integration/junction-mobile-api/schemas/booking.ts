@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { getSchemaModel, links, relationship, type Infer } from "../schema-model.server";
+import { getSchemaModel, links, relationship, type Infer } from "../../common/schema-model.server";
 import {
   cabinClassModel,
   legTypeModel,
@@ -16,9 +16,9 @@ const bookingDetailsRelationships: z.ZodType<{
   legType: { data: LegTypeIdentifier };
   booking: { data: BookingIdentifier };
 }> = relationship({
-  cabinClass: cabinClassModel.schema.pick({ id: true, type: true }),
-  legType: legTypeModel.schema.pick({ id: true, type: true }),
-  booking: z.lazy(() => bookingModel.schema.pick({ id: true, type: true })),
+  cabinClass: cabinClassModel.identifier,
+  legType: legTypeModel.identifier,
+  booking: z.lazy(() => bookingModel.identifier),
 });
 
 const bookingDetailsModelBase = z.object({
@@ -79,8 +79,8 @@ const bookingRelationships: z.ZodType<{
   order: { data: OrderIdentifier };
 }> = relationship({
   status: z.object({ id: z.string(), type: z.enum(["booking-statuses"]) }),
-  details: z.array(bookingDetailsModel.schema.pick({ id: true, type: true })),
-  order: z.lazy(() => orderModel.schema.pick({ id: true, type: true })),
+  details: z.array(bookingDetailsModel.identifier),
+  order: z.lazy(() => orderModel.identifier),
 });
 
 export const bookingModelBase = z.object({

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { getSchemaModel, type Infer } from "../schema-model.server";
+import { getSchemaModel, type Infer } from "../../common/schema-model.server";
 import { priceModel } from "./price";
 
 export const paymentIntentModel = getSchemaModel(

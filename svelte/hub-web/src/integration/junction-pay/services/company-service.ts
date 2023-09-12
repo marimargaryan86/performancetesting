@@ -1,10 +1,9 @@
-import type { CompanyModel } from "models/company";
-import type { GetCompanyDetailsResponseSchema } from "../schemas/company";
+import { companyModel, type CompanyModel, type CompanySchema } from "../schemas/company";
 import JunctionPayService from "./junction-pay-service";
 
 export default class CompanyService extends JunctionPayService {
   async getCompanyDetails(token: string, id: string): Promise<CompanyModel> {
-    const resp = await this.makeRequest<GetCompanyDetailsResponseSchema>(`/companies/${id}`, {
+    const resp = await this.makeRequest<{ data: CompanySchema }>(`/companies/${id}`, {
       token,
     });
 
@@ -18,9 +17,6 @@ export default class CompanyService extends JunctionPayService {
 
     const data = await resp.json();
 
-    return {
-      id: data.data.id,
-      name: data.data.attributes.name,
-    };
+    return companyModel.toModel(data.data);
   }
 }

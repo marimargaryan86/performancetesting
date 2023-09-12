@@ -1,15 +1,14 @@
-import type { ConversionModel } from "models/conversion";
+import type { ConversionModel } from "integration/junction-pay/schemas/conversion";
 import type { DirectionY } from "models/spatial";
 import type { FlattenedObject } from "utils/common";
 
-/* eslint-disable max-lines-per-function */
 export function sortConversions(
   conversions: ConversionModel[],
   options: { by: FlattenedObject<ConversionModel>; direction: DirectionY },
 ): ConversionModel[] {
   const nextConversions = [...conversions];
 
-  /* eslint-disable complexity */
+  // eslint-disable-next-line complexity
   nextConversions.sort((a, b) => {
     switch (options.by) {
       case "transaction.reference":
@@ -23,13 +22,13 @@ export function sortConversions(
           ? 0 - ((a.sellAmount.currency ?? 0) < (b.sellAmount.currency ?? 0) ? 1 : -1)
           : 0;
       case "buyAmount.currency":
-        return 0 - ((a.buyAmount.currency ?? 0) < (b.buyAmount.currency ?? 0) ? 1 : -1);
+        return 0 - ((a.buyAmount?.currency ?? 0) < (b.buyAmount?.currency ?? 0) ? 1 : -1);
       case "transaction.rates.fxQuote":
         return (
           0 - ((a.transaction?.rates.fxQuote ?? 0) < (b.transaction?.rates.fxQuote ?? 0) ? 1 : -1)
         );
       case "executedRate":
-        return 0 - (a.executedRate < b.executedRate ? 1 : -1);
+        return 0 - ((a.executedRate ?? 0) < (b.executedRate ?? 0) ? 1 : -1);
       case "fxDelta":
         return 0 - ((a.fxDelta ?? 0) < (b.fxDelta ?? 0) ? 1 : -1);
       case "transaction.rates.fxBuffer":
@@ -42,7 +41,6 @@ export function sortConversions(
         return 0;
     }
   });
-  /* eslint-enable-complexity */
 
   if (options.direction === "up") {
     return nextConversions.reverse();
@@ -50,4 +48,3 @@ export function sortConversions(
 
   return nextConversions;
 }
-/* eslint-enable max-lines-per-function */

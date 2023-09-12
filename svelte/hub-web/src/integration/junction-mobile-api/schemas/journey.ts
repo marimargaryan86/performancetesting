@@ -1,11 +1,11 @@
 import { contactDetailsModel, orderModel, type OrderIdentifier, type OrderModel } from "./order";
-import { getSchemaModel, links, relationship, type Infer } from "../schema-model.server";
+import { getSchemaModel, links, relationship, type Infer } from "../../common/schema-model.server";
 import { z } from "zod";
 
 const journeyRelationships: z.ZodType<{
   orders: { data: OrderIdentifier[] };
 }> = relationship({
-  orders: z.array(z.lazy(() => orderModel.schema.pick({ id: true, type: true }))),
+  orders: z.array(z.lazy(() => orderModel.identifier)),
 });
 
 const journeyModelBase = z.object({

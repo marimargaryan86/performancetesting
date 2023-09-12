@@ -1,5 +1,5 @@
 import { redirect, type MaybePromise, type Handle } from "@sveltejs/kit";
-import type { UserJwtSchema } from "integration/junction-pay/schemas/user";
+import { userJwtModel } from "integration/junction-pay/schemas/user";
 import jwt from "jsonwebtoken";
 import routeConfig from "routeConfig";
 import * as Sentry from "@sentry/sveltekit";
@@ -8,14 +8,14 @@ import { env } from "$env/dynamic/public";
 
 export function authHandle({ event, resolve }: Parameters<Handle>[0]): MaybePromise<Response> {
   const token = event.cookies.get("session-token");
-  const user = token ? (jwt.decode(token) as UserJwtSchema) : undefined;
+  const user = token ? userJwtModel.toModel(jwt.decode(token)) : undefined;
 
   if (token && user) {
     event.locals = {
       ...event.locals,
       user: {
-        data: { email: user.user_info.email, id: user.user_info.id, name: "Unknown" },
-        sessionExpiresAt: new Date(user.exp * 1000),
+        data: { email: user.email, id: user.id, name: "Unknown" },
+        sessionExpiresAt: user.expiresAt,
         token,
       },
     };

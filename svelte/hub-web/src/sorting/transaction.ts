@@ -1,15 +1,14 @@
+import type { TransactionModel } from "integration/junction-pay/schemas/transaction";
 import type { DirectionY } from "models/spatial";
-import type { TransactionModel } from "models/transaction";
 import type { FlattenedObject } from "utils/common";
 
-/* eslint-disable max-lines-per-function */
 export function sortTransactions(
   transactions: TransactionModel[],
   options: { by: FlattenedObject<TransactionModel>; direction: DirectionY },
 ): TransactionModel[] {
   const nextTransactions = [...transactions];
 
-  /* eslint-disable complexity */
+  // eslint-disable-next-line complexity
   nextTransactions.sort((a, b) => {
     switch (options.by) {
       case "id":
@@ -34,7 +33,6 @@ export function sortTransactions(
         return 0;
     }
   });
-  /* eslint-enable complexity */
 
   if (options.direction === "up") {
     return nextTransactions.reverse();
@@ -42,4 +40,3 @@ export function sortTransactions(
 
   return nextTransactions;
 }
-/* eslint-enable max-lines-per-function */

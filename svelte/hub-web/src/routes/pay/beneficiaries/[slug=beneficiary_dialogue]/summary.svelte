@@ -1,11 +1,12 @@
 <script lang="ts">
-  import type { BeneficiaryModel, CreateBeneficiaryModel } from "models/beneficiary";
   import type { CountryModel } from "models/location";
-  import type { CurrencyModel } from "models/money";
   import { callAction, capitalize } from "utils/common";
   import { updateBeneficiaryData } from "./helpers";
   import { page } from "$app/stores";
   import type { FormattedError } from "utils/zod";
+  import type { CurrencyModel } from "integration/junction-pay/schemas/money";
+  import type { BeneficiaryModel } from "integration/junction-pay/schemas/beneficiary";
+  import type { CreateBeneficiaryModel } from "integration/junction-pay/schemas/beneficiary.client";
 
   export let data: CreateBeneficiaryModel;
   export let countries: Map<string, CountryModel>;

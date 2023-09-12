@@ -1,5 +1,8 @@
+import type {
+  TransactionModel,
+  TransactionStatus,
+} from "integration/junction-pay/schemas/transaction";
 import type { DateRange } from "models/date-time";
-import type { TransactionModel, TransactionStatus } from "models/transaction";
 import { getZeroTimeDate } from "utils/date-time";
 
 export function filterTransactions(
@@ -13,7 +16,7 @@ export function filterTransactions(
   const { query, status, dateRange } = filters;
   const lcQuery = query.toLowerCase();
 
-  /* eslint-disable complexity */
+  // eslint-disable-next-line complexity
   return transactions.filter((item) => {
     const createdAt = getZeroTimeDate(item.createdAt);
 
@@ -21,12 +24,11 @@ export function filterTransactions(
       (!dateRange || (dateRange.from <= createdAt && createdAt <= dateRange.to)) &&
       (!status?.length || status.includes(item.status)) &&
       (!item.beneficiary ||
-        item.beneficiary?.name.toLowerCase().includes(lcQuery) ||
+        item.beneficiary?.name?.toLowerCase().includes(lcQuery) ||
         !item.payer ||
-        item.payer.name.toLowerCase().includes(lcQuery) ||
+        item.payer.name?.toLowerCase().includes(lcQuery) ||
         item.bookingId.includes(lcQuery) ||
         item.reference.toLowerCase().includes(lcQuery))
     );
   });
-  /* eslint-enable complexity */
 }

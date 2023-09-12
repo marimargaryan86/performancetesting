@@ -10,15 +10,12 @@
 <script lang="ts">
   import DatePicker from "components/ui/date-picker/date-picker.svelte";
   import StatusPicker from "components/ui/status-picker.svelte";
-  import { transactionStatus } from "models/transaction";
-  import { formatTransactionStatus } from "formatting/transaction";
   import * as transactionFilters from "./(transactions)/+page.svelte";
   import * as conversionFilters from "./fx/+page.svelte";
   import { page } from "$app/stores";
-  import { conversionStatus } from "models/conversion";
-  import { formatConversionStatus } from "formatting/conversion";
   import routeConfig from "routeConfig";
   import StandardLayout from "components/page/standard-layout.svelte";
+  import { capitalize } from "utils/common";
 
   $: view =
     $page.url.pathname === routeConfig.pay.activity.root
@@ -60,16 +57,16 @@
 
     {#if view === "transactions"}
       <StatusPicker
-        statuses={transactionStatus}
+        statuses={["paid", "pending", "cancelled"]}
         bind:value={$currTransactionStatus}
-        format={formatTransactionStatus}
+        format={capitalize}
         placeholder="Status"
       />
     {:else}
       <StatusPicker
-        statuses={conversionStatus}
+        statuses={["executed", "unspecified", "failed"]}
         bind:value={$currConversionStatus}
-        format={formatConversionStatus}
+        format={capitalize}
         placeholder="Status"
       />
     {/if}

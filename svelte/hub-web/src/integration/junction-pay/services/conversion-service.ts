@@ -1,11 +1,9 @@
-import type { ConversionModel } from "models/conversion";
-import type {
-  GetConversionDetailsResponseSchema,
-  ListConversionDetailsResponseSchema,
-} from "../schemas/conversion";
+import type { ConversionModel, ConversionSchema } from "../schemas/conversion";
 import JunctionPayService from "./junction-pay-service";
 import { parseConversionSchema } from "../parsers/conversion";
 import type { PaginatedData } from "models/common";
+import type { TransactionSchema } from "../schemas/transaction";
+import { parseIncluded } from "../parsers/included";
 
 export default class ConversionService extends JunctionPayService {
   async listConversions(
@@ -13,7 +11,11 @@ export default class ConversionService extends JunctionPayService {
     cursor?: string,
     limit = 100,
   ): Promise<PaginatedData<ConversionModel>> {
-    const resp = await this.makeRequest<ListConversionDetailsResponseSchema>("/conversions", {
+    const resp = await this.makeRequest<{
+      data: ConversionSchema[];
+      included: TransactionSchema[];
+      links: { next: string };
+    }>("/conversions", {
       queryParams: {
         include: "transactions",
         "page[cursor]": cursor,
@@ -27,15 +29,16 @@ export default class ConversionService extends JunctionPayService {
     }
 
     const data = await resp.json();
+    const included = parseIncluded(data.included);
 
     return {
-      data: data.data.map((item) => parseConversionSchema(item, data.included)),
+      data: data.data.map((item) => parseConversionSchema(item, included)),
       cursor: ConversionService.getCursor(data),
     };
   }
 
   async getConversionDetails(token: string, conversionId: string): Promise<ConversionModel> {
-    const resp = await this.makeRequest<GetConversionDetailsResponseSchema>(
+    const resp = await this.makeRequest<{ data: ConversionSchema; included: TransactionSchema[] }>(
       `/conversions/${conversionId}`,
       { token },
     );
@@ -45,7 +48,8 @@ export default class ConversionService extends JunctionPayService {
     }
 
     const data = await resp.json();
+    const included = parseIncluded(data.included);
 
-    return parseConversionSchema(data.data, data.included);
+    return parseConversionSchema(data.data, included);
   }
 }

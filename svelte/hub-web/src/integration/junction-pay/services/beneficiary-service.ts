@@ -1,10 +1,9 @@
-import type { BeneficiaryModel } from "models/beneficiary";
-import { parseBeneficiaryModel, parseBeneficiarySchema } from "../parsers/beneficiary";
-import type {
-  CreateBeneficiaryResponseSchema,
-  GetBeneficiaryResponseSchema,
-  ListBeneficiariesResponseSchema,
-} from "../schemas/beneficiaty";
+import {
+  beneficiaryModel,
+  putBeneficiaryModel,
+  type BeneficiaryModel,
+  type BeneficiarySchema,
+} from "../schemas/beneficiary";
 import JunctionPayService from "./junction-pay-service";
 import type { PaginatedData } from "models/common";
 
@@ -13,7 +12,10 @@ export default class BeneficiaryService extends JunctionPayService {
     token: string,
     cursor?: string,
   ): Promise<PaginatedData<BeneficiaryModel>> {
-    const resp = await this.makeRequest<ListBeneficiariesResponseSchema>("/beneficiaries", {
+    const resp = await this.makeRequest<{
+      data: BeneficiarySchema[];
+      links: { next: string };
+    }>("/beneficiaries", {
       token,
       queryParams: { "page[cursor]": cursor },
     });
@@ -25,13 +27,13 @@ export default class BeneficiaryService extends JunctionPayService {
     const data = await resp.json();
 
     return {
-      data: data.data.map(parseBeneficiarySchema),
+      data: data.data.map(beneficiaryModel.toModel),
       cursor: BeneficiaryService.getCursor(data),
     };
   }
 
   async getBeneficiary(token: string, id: string): Promise<BeneficiaryModel> {
-    const resp = await this.makeRequest<GetBeneficiaryResponseSchema>(`/beneficiaries/${id}`, {
+    const resp = await this.makeRequest<{ data: BeneficiarySchema }>(`/beneficiaries/${id}`, {
       token,
     });
 
@@ -43,19 +45,17 @@ export default class BeneficiaryService extends JunctionPayService {
       throw new Error(await resp.text());
     }
 
-    return parseBeneficiarySchema((await resp.json()).data);
+    return beneficiaryModel.toModel((await resp.json()).data);
   }
 
   async createBeneficiary(
     token: string,
     beneficiary: Omit<BeneficiaryModel, "id">,
   ): Promise<BeneficiaryModel> {
-    const resp = await this.makeRequest<CreateBeneficiaryResponseSchema>("/beneficiaries", {
+    const resp = await this.makeRequest<{ data: BeneficiarySchema }>("/beneficiaries", {
       method: "POST",
       token,
-      data: {
-        data: parseBeneficiaryModel(beneficiary),
-      },
+      data: { data: putBeneficiaryModel.toSchema(beneficiary) },
     });
 
     if (resp.status !== 201) {
@@ -64,7 +64,7 @@ export default class BeneficiaryService extends JunctionPayService {
 
     const data = await resp.json();
 
-    return parseBeneficiarySchema(data.data);
+    return beneficiaryModel.toModel(data.data);
   }
 
   async updateBeneficiary(
@@ -72,12 +72,10 @@ export default class BeneficiaryService extends JunctionPayService {
     id: string,
     beneficiary: BeneficiaryModel,
   ): Promise<BeneficiaryModel> {
-    const resp = await this.makeRequest<GetBeneficiaryResponseSchema>(`/beneficiaries/${id}`, {
+    const resp = await this.makeRequest<{ data: BeneficiarySchema }>(`/beneficiaries/${id}`, {
       method: "PATCH",
       token,
-      data: {
-        data: parseBeneficiaryModel(beneficiary),
-      },
+      data: { data: putBeneficiaryModel.toSchema(beneficiary) },
     });
 
     if (resp.status !== 200) {
@@ -86,6 +84,6 @@ export default class BeneficiaryService extends JunctionPayService {
 
     const data = await resp.json();
 
-    return parseBeneficiarySchema(data.data);
+    return beneficiaryModel.toModel(data.data);
   }
 }

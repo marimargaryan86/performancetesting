@@ -1,6 +1,5 @@
 <script lang="ts">
   import { portal } from "directives/portal";
-  import type { TransactionModel } from "models/transaction";
   import { fade, fly } from "svelte/transition";
   import Summary from "./summary.svelte";
   import Billing from "./billing.svelte";
@@ -10,6 +9,7 @@
   import type { BookingModel } from "models/booking";
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import { createEventDispatcher } from "svelte";
+  import type { TransactionModel } from "integration/junction-pay/schemas/transaction";
 
   export let transaction: TransactionModel;
   export let bookingRequest: Promise<BookingModel | undefined> | undefined;

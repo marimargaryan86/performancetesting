@@ -1,6 +1,6 @@
 import integrationInstances from "integration-instances";
+import type { ConversionModel } from "integration/junction-pay/schemas/conversion.js";
 import type { PaginatedData } from "models/common";
-import type { ConversionModel } from "models/conversion";
 import { getToken } from "utils/auth";
 
 export function load(event): {
