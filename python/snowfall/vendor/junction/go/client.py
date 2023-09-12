@@ -555,6 +555,7 @@ class Client(base_client.BaseClient):  # noqa: WPS214
     ) -> dict[str, Any]:
         body = {
             "data": {
+                "attributes": {"sessionToken": session_token},
                 "relationships": {
                     "offer": {
                         "data": {
