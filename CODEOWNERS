@@ -32,7 +32,7 @@
 /CODEOWNERS
 /docker-compose.yml
 
-[Specification] @backend-team-leads
+[Specification][2] @backend-team-leads
 *.proto
 /openapi/**/*.json
 
