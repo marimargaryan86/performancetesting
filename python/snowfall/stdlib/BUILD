@@ -14,3 +14,12 @@ __dependencies_rules__(
         "!*",
     )
 )
+
+__defaults__(
+    {
+        (python_test, python_tests): dict(
+            batch_compatibility_tag="stdlib",
+        ),
+    },
+    extend=True,
+)

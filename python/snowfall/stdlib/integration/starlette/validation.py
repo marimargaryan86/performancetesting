@@ -101,7 +101,7 @@ class Validator(object):
         with spec_path.open() as spec_file:
             self._spec = spec.Spec.from_dict(
                 orjson.loads(spec_file.read()),
-                spec_url="file://{0}".format(spec_path),
+                base_uri="file://{0}".format(spec_path),
             )
 
         self._format_unmarshallers = formats.format_unmarshallers()

@@ -134,6 +134,15 @@ def python_image(  # type: ignore[no-untyped-def]
         ("*", "!*"),
     )
 
+    __defaults__(  # type: ignore[name-defined]  # noqa: F821
+        {
+            (python_test, python_tests): {  # type: ignore[name-defined]  # noqa: F821
+                "batch_compatibility_tag": str(build_file_dir()),  # type: ignore[name-defined]  # noqa: F821
+            },
+        },
+        extend=True,
+    )
+
     pex_binary(  # type: ignore[name-defined]  # noqa: F821
         **(
             {
