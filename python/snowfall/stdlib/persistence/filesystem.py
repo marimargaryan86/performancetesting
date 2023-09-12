@@ -19,8 +19,6 @@ from fsspec.implementations import memory
 
 from snowfall.stdlib import string
 
-_PkgLoaderReturn = list[dict[str, Any]] | dict[str, Any]  # noqa: WPS221
-
 
 class UnsupportedStorageSchemeError(Exception):
     """Raised when an unsupported storage scheme is used."""
@@ -126,7 +124,7 @@ class PkgLoader(object):
     def __init__(self, pkg: str):
         self._pkg = pkg
 
-    def load(self, ref: str) -> _PkgLoaderReturn:
+    def load(self, ref: str) -> Any:
         try:
             file_content = pkgutil.get_data(self._pkg, ref)
         except (AttributeError, OSError) as err:

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import uuid
-from typing import Any, cast
+from typing import Any
 from unittest import mock
 
 import aiofiles
@@ -52,11 +52,10 @@ def ba_ndc_client(http_client: httpx.AsyncClient) -> client.BaNdcClient:
 
 @pytest.fixture()
 async def airport_repository() -> airports.AirportRepository:
-    loader = filesystem.PkgLoader(__name__)
+    loader = filesystem.PkgLoader("snowfall.conftest")
 
-    return airports.AirportRepository(
-        cast(list[dict[str, Any]], loader.load("airports.json")),
-    )
+    airports_list: list[dict[str, Any]] = loader.load("airports.json")
+    return airports.AirportRepository(airports_list)
 
 
 @pytest.fixture()

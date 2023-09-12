@@ -4,7 +4,7 @@ import contextlib
 import datetime
 import hashlib
 from collections.abc import AsyncIterator, Iterator
-from typing import Any, cast
+from typing import Any
 from unittest import mock
 
 import aiofiles
@@ -96,11 +96,10 @@ def assert_all_responses_were_requested() -> bool:
 
 @pytest.fixture()
 async def airport_repository() -> airports.AirportRepository:
-    loader = filesystem.PkgLoader(__name__)
+    loader = filesystem.PkgLoader("snowfall.conftest")
 
-    return airports.AirportRepository(
-        cast(list[dict[str, Any]], loader.load("airports.json")),
-    )
+    airports_list: list[dict[str, Any]] = loader.load("airports.json")
+    return airports.AirportRepository(airports_list)
 
 
 @pytest.fixture()

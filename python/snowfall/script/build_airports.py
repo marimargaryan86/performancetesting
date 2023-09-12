@@ -73,6 +73,7 @@ async def _wiki_process_page(  # noqa: WPS210
     airports: _Airports,
 ) -> None:
     xpath_row = "//table[contains(@class, 'wikitable')]/tbody/tr[not(descendant::th)]"
+    geocode_url = "https://maps.googleapis.com/maps/api/geocode/json"
 
     resp = await client.get(url)
     html = html_fromstring(resp.content)
@@ -91,8 +92,18 @@ async def _wiki_process_page(  # noqa: WPS210
                 logging.warning("Skipped: %s - %s", iata, tc)
                 continue
 
+            # Get country code
+            req_params = {
+                "latlng": "{0},{1}".format(lat, lon),
+                "result_type": "country",
+                "key": GOOGLE_API_KEY,
+            }
+            geo_resp = await client.get(geocode_url, params=req_params)
+            addr = geo_resp.json()["results"][0]["address_components"]
+
             airport = {
                 "iata_code": iata,
+                "iata_country_code": addr[0]["short_name"],
                 "latitude": lat,
                 "longitude": lon,
                 "time_zone": tz,
@@ -117,7 +128,14 @@ async def wikipedia_update(airports: _Airports) -> None:  # noqa: WPS210,WPS231
 
 async def duffel_update(airports: _Airports) -> None:  # noqa: WPS210
     """Use Duffel API to update airports in-place."""
-    airport_keys = ("time_zone", "name", "longitude", "latitude", "iata_code")
+    airport_keys = (
+        "iata_code",
+        "iata_country_code",
+        "latitude",
+        "longitude",
+        "name",
+        "time_zone",
+    )
     headers = {
         "Accept-Encoding": "gzip",
         "Accept": "application/json",
