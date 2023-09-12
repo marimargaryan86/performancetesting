@@ -172,6 +172,7 @@ job "traefik-ingress" {
         args = [
           "--entrypoints.${var.traefik_entrypoints}.address=:${NOMAD_PORT_http}",
           "--entrypoints.${var.traefik_entrypoints}.forwardedheaders.trustedips=127.0.0.1/32,172.16.0.0/16",
+          "--entrypoints.${var.traefik_entrypoints}.http.middlewares=gzip@file",
           "--entrypoints.metrics.address=:${NOMAD_PORT_metrics}",
           "--api=true",
           "--metrics.prometheus.entrypoint=metrics",
@@ -210,6 +211,10 @@ http:
         passhostheader: true
         servers:
           - url: "http://vault.service.consul:8200/"
+
+  middlewares:
+    gzip:
+      compress: {}
 EOH
       }
     }
