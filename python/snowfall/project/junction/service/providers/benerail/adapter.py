@@ -30,7 +30,6 @@ from snowfall.stdlib.transport.amqp import producer
 from snowfall.stdlib.transport.http import errors
 from snowfall.stdlib.v1 import latlng_pb2
 from snowfall.vendor.benerail import client
-from snowfall.vendor.benerail.models import link as models_link
 from snowfall.vendor.benerail.models import types
 from snowfall.vendor.benerail.models.dialogue import dialogue, passenger
 from snowfall.vendor.benerail.models.trip_offers import link, offer
@@ -59,18 +58,6 @@ class _CreatePassengersResponse(object):
 class _CreateTripFilterResponse(object):
     trip_filter_id: str
     dialogue_etag: str
-
-
-class NextPageUrlNotFoundError(ValueError):
-    """Raised when a sequence of links doesn't contain the next page reference."""
-
-
-def _next_page_id(links: Sequence[models_link.Link]) -> str:
-    for link_obj in links:
-        if link_obj.title == "next":
-            return helper_functions.last_id_of_url(link_obj.href)
-
-    raise NextPageUrlNotFoundError
 
 
 def _get_brand_name(comfort_class_name: str, flexibility_value: str) -> str:
@@ -252,7 +239,6 @@ class BenerailAdapter(object):  # noqa: WPS214
 
         trip_offers_iterator = self._get_trips_of_offer_collection(
             collection_id=trip_offer_filter.response_result.identifier,
-            departure_after=departure_after,
             session_token=session_token,
         )
 
@@ -331,7 +317,6 @@ class BenerailAdapter(object):  # noqa: WPS214
     async def _get_trips_of_offer_collection(  # noqa: WPS231
         self,
         collection_id: str,
-        departure_after: datetime.datetime,
         session_token: str | None = None,
     ) -> AsyncIterator[link.TripOfferResourceLink]:
         get_coll = self._client.trip_offers_client.get_trip_offer_ids_in_collection
@@ -340,26 +325,17 @@ class BenerailAdapter(object):  # noqa: WPS214
             session_token=session_token,
         )
 
-        while collection.response_result.trip_offers:
-            for trip_offer in collection.response_result.trip_offers:
-                if departure_after.date().strftime(_DATE_FMT) not in trip_offer.title:
-                    return
+        if not collection.response_result.trip_offers:
+            return
 
-                summary = trip_offer.summary
+        for trip_offer in collection.response_result.trip_offers:
+            summary = trip_offer.summary
 
-                if summary is None:
-                    continue
+            if summary is None:
+                continue
 
-                if summary.bookable_status.status_value not in _NON_BOOKABLE_STATES:
-                    yield trip_offer
-
-            try:
-                collection = await get_coll(
-                    trip_offer_collection_id=_next_page_id(collection.links),
-                    session_token=session_token,
-                )
-            except (StopIteration, errors.HttpError):
-                return
+            if summary.bookable_status.status_value not in _NON_BOOKABLE_STATES:
+                yield trip_offer
 
     def _parse_segment_info(
         self,
