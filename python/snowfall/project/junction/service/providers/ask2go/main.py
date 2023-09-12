@@ -136,9 +136,7 @@ async def _offers(
     airport_repo = airports.AirportRepository(
         airports_data=cast(
             list[dict[str, Any]],
-            filesystem.PkgLoader(
-                "snowfall.project.junction.service.providers.ask2go.main",
-            ).load("airports.json"),
+            filesystem.PkgLoader("snowfall.conftest").load("airports.json"),
         ),
     )
     mongo = motor_asyncio.AsyncIOMotorClient(
@@ -297,9 +295,7 @@ async def _price_quotes(app: service.AsyncApplication[_PriceQuotesSettings]) -> 
             airport_repository=airports.AirportRepository(
                 airports_data=cast(
                     list[dict[str, Any]],
-                    filesystem.PkgLoader(
-                        "snowfall.project.junction.service.providers.ask2go.main",
-                    ).load("airports.json"),
+                    filesystem.PkgLoader("snowfall.conftest").load("airports.json"),
                 ),
             ),
             cabin_mapping_repository=cabin_classes.CabinMappingRepository(

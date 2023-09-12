@@ -66,9 +66,7 @@ async def offers_factory(
     airport_mapping = airports.AirportRepository(
         airports_data=cast(
             list[dict[str, Any]],
-            filesystem.PkgLoader(
-                "snowfall.project.junction.service.providers.duffel.main",
-            ).load("airports.json"),
+            filesystem.PkgLoader("snowfall.conftest").load("airports.json"),
         ),
     ).all_()
 

@@ -34,9 +34,7 @@ async def offers_factory(  # noqa: WPS210
     airport_repository = airports.AirportRepository(
         airports_data=cast(
             list[dict[str, Any]],
-            filesystem.PkgLoader(
-                "snowfall.project.junction.service.providers.ba_ndc.main",
-            ).load("airports.json"),
+            filesystem.PkgLoader("snowfall.conftest").load("airports.json"),
         ),
     )
     http_client = await stack.enter_async_context(
