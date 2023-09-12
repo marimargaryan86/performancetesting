@@ -48,18 +48,36 @@ export const passportDocumentModel = getSchemaModel(
   z.object({
     type: z.enum(["passport"]),
     number: z.string().optional(),
+    issueCountry: z.string().optional(),
+    expirationDate: z.date({ coerce: true }).optional(),
+    issueDate: z.date({ coerce: true }).optional(),
+    nationality: z.string().optional(),
+    residenceCountryCode: z.string().optional(),
   }),
   {
     toModel: (data) => ({
       type: data.documentType,
       number: data.documentNumber,
+      expirationDate: data.documentExpirationDate
+        ? new Date(data.documentExpirationDate)
+        : undefined,
+      issueCountry: data.documentIssueCountry,
+      issueDate: data.documentIssueDate ? new Date(data.documentIssueDate) : undefined,
+      nationality: data.nationality,
+      residenceCountryCode: data.residenceCountryCode,
     }),
     toSchema: (data) => ({
       documentType: data.type,
       documentNumber: data.number,
+      documentExpirationDate: data.expirationDate?.toLocaleDateString("sv-SE"),
+      documentIssueCountry: data.issueCountry,
+      documentIssueDate: data.issueDate?.toLocaleDateString("sv-SE"),
+      nationality: data.nationality,
+      residenceCountryCode: data.residenceCountryCode,
     }),
   },
 );
+export type PassportDocumentModel = Infer<typeof passportDocumentModel>;
 
 export const orderPassengerModel = getSchemaModel(
   z.object({
@@ -76,25 +94,24 @@ export const orderPassengerModel = getSchemaModel(
     dateOfBirth: z.date({ coerce: true }),
     gender: passengerGender,
     title: passengerTitle,
-    travelerDocument: passportDocumentModel.model.optional(),
+    document: passportDocumentModel.model.optional(),
   }),
   {
     toSchema: (data) => ({
       ...data,
       dateOfBirth: data.dateOfBirth.toLocaleDateString("sv-SE"),
-      travelerDocument: data.travelerDocument
-        ? passportDocumentModel.toSchema(data.travelerDocument)
-        : null,
+      travelerDocument: data.document ? passportDocumentModel.toSchema(data.document) : null,
     }),
     toModel: (data) => ({
       ...data,
       dateOfBirth: new Date(data.dateOfBirth),
-      travelerDocument: data.travelerDocument
+      document: data.travelerDocument
         ? passportDocumentModel.toModel(data.travelerDocument)
         : undefined,
     }),
   },
 );
+export type OrderPassengerModel = Infer<typeof orderPassengerModel>;
 
 export const voucherModel = getSchemaModel(
   z.object({
@@ -169,7 +186,7 @@ export const createOrderModel = getSchemaModel(
         title: passengerTitle,
         gender: passengerGender,
         dateOfBirth: z.date({ coerce: true }),
-        travelerDocument: passportDocumentModel.model.optional(),
+        document: passportDocumentModel.model.optional(),
       }),
     ),
     contactDetails: contactDetailsModel.model,

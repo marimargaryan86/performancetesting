@@ -1,4 +1,8 @@
 <script lang="ts" context="module">
+  const passengerTypes = ["adult", "child", "infant"] as const;
+  const passengerType = z.enum(passengerTypes);
+  type PassengerType = z.infer<typeof passengerType>;
+
   const passengerTitles = ["unspecified", "mr", "mrs", "ms", "miss"] as const;
   const passengerTitle = z.enum(passengerTitles, { required_error: "Title is required" });
   type PassengerTitle = z.infer<typeof passengerTitle>;
@@ -7,31 +11,69 @@
   const passengerGender = z.enum(passengerGenders, { required_error: "Gender is required" });
   type PassengerGender = z.infer<typeof passengerGender>;
 
-  const passportDocument = z.object({
-    type: z.literal("passport"),
-    number: z.string({ required_error: "Passport number required" }),
-  });
+  type DocumentValidator = z.ZodObject<{
+    [key in keyof PassportDocumentModel]-?: z.ZodType<PassportDocumentModel[key]>;
+  }>;
 
-  const passengerDocument = passportDocument.or(
-    z.object({ type: z.undefined().optional(), number: z.string().optional() }),
-  );
+  type PassengerValidator = z.ZodObject<
+    Omit<
+      { [key in keyof OrderPassengerModel]: z.ZodType<OrderPassengerModel[key]> },
+      "document"
+    > & {
+      type: typeof passengerType;
+      document: DocumentValidator | z.ZodUndefined;
+    }
+  >;
 
-  export const passengerData = z.object({
-    title: passengerTitle,
-    firstName: z.string({ required_error: "First name is required" }),
-    lastName: z.string({ required_error: "Last name is required" }),
-    dateOfBirth: z.date({ required_error: "Date of birth is required" }),
-    gender: passengerGender,
-    type: z.enum(["adult", "child", "infant"]),
-    document: passengerDocument,
-  });
+  export type PartialPassengerData = Omit<Partial<OrderPassengerModel>, "document"> & {
+    type: PassengerType;
+    document?: Partial<PassportDocumentModel>;
+  };
 
-  export type PassengerData = z.infer<typeof passengerData>;
+  export function getPassengerValidator(
+    required: TripOfferPriceQuoteModel["required"],
+  ): PassengerValidator {
+    const documentFields: {
+      [key in keyof PassportDocumentModel]: z.ZodType<PassportDocumentModel[key]>;
+    } = {
+      type: z.enum(["passport"]),
+    };
 
-  export type PartialPassengerData = PartiallyPartial<PassengerData, "type" | "document">;
+    required.forEach((field) => {
+      if (field === "expiration-date") {
+        documentFields.expirationDate = z.date({ coerce: true });
+      } else if (field === "issue-date") {
+        documentFields.issueDate = z.date({ coerce: true });
+      } else if (field === "issuing-country") {
+        documentFields.issueCountry = z.string().nonempty();
+      } else if (field === "nationality") {
+        documentFields.nationality = z.string().nonempty();
+      } else if (field === "passport-number") {
+        documentFields.number = z.string().nonempty();
+      } else if (field === "residence-country-code") {
+        documentFields.residenceCountryCode = z.string().nonempty();
+      } else if (field === "date-of-birth") {
+        // Date of birth will always be mandatory
+      } else {
+        throw new Error(`Unhandled field type ${field}`);
+      }
+    });
 
-  export const passengerListData = z.array(passengerData);
-  export type PassengerListData = z.infer<typeof passengerListData>;
+    const result = z.object({
+      type: passengerType,
+      title: passengerTitle,
+      firstName: z.string({ required_error: "First name is required" }),
+      lastName: z.string({ required_error: "Last name is required" }),
+      dateOfBirth: z.date({ coerce: true, required_error: "Date of birth is required" }),
+      gender: passengerGender,
+    });
+
+    return (Object.keys(documentFields).length > 1
+      ? result.extend({ document: z.object({ ...documentFields }) })
+      : result) as unknown as PassengerValidator;
+  }
+
+  export type PassengerData = z.infer<PassengerValidator>;
 
   const travelerDocumentTypes = ["passport"] as const;
   type TravelerDocumentType = (typeof travelerDocumentTypes)[number];
@@ -51,99 +93,152 @@
 
 <script lang="ts">
   import { z } from "zod";
-  import { capitalize, type PartiallyPartial } from "utils/common";
+  import { capitalize } from "utils/common";
   import SelectField from "components/ui/select-field.svelte";
   import TextField from "components/ui/text-field.svelte";
+  import type { TripOfferPriceQuoteModel } from "integration/junction-mobile-api/schemas/offer";
+  import type {
+    OrderPassengerModel,
+    PassportDocumentModel,
+  } from "integration/junction-mobile-api/schemas/order";
 
-  export let passengers: PartialPassengerData[];
-  export let errors: z.ZodFormattedError<PassengerListData> | undefined = undefined;
+  export let passengerNumber: number;
+  export let passenger: PartialPassengerData;
+  export let errors: z.ZodFormattedError<PassengerData> | undefined = undefined;
+  export let required: TripOfferPriceQuoteModel["required"];
+
+  let document = passenger.document ?? {};
+
+  $: passenger = { ...passenger, document };
 </script>
 
-<div class="passengers">
-  {#each passengers as passenger, idx}
-    <div class="passenger">
-      <h2>
-        <strong class="typography title-large bold">Passenger {idx + 1}</strong>
-        <span class="typography title-medium">{capitalize(passenger.type)}</span>
-      </h2>
+<div class="passenger">
+  <h2>
+    <strong class="typography title-large bold">Passenger {passengerNumber}</strong>
+    <span class="typography title-medium">{capitalize(passenger.type)}</span>
+  </h2>
 
-      <div class="details">
-        <SelectField
-          options={passengerTitles}
-          formatter={formatTitleOption}
-          bind:value={passenger.title}
-          placeholder="Select"
-          label="Title"
-          required
-          error={errors?.[idx]?.title?._errors}
-        />
+  <div class="details">
+    <SelectField
+      options={passengerTitles}
+      formatter={formatTitleOption}
+      bind:value={passenger.title}
+      placeholder="Select"
+      label="Title"
+      required
+      error={errors?.title?._errors}
+    />
 
-        <span />
+    <span />
 
+    <TextField
+      bind:value={passenger.firstName}
+      placeholder="Enter first name"
+      label="First name"
+      required
+      error={errors?.firstName?._errors}
+    />
+
+    <TextField
+      bind:value={passenger.lastName}
+      placeholder="Enter last name"
+      label="Last name"
+      required
+      error={errors?.lastName?._errors}
+    />
+
+    <TextField
+      type="date"
+      bind:value={passenger.dateOfBirth}
+      placeholder="dd/mm/yyyy"
+      label="Birthday"
+      required
+      error={errors?.dateOfBirth?._errors}
+    />
+
+    <SelectField
+      options={passengerGenders}
+      formatter={formatGenderOption}
+      bind:value={passenger.gender}
+      placeholder="Select"
+      label="Gender"
+      required
+      error={errors?.gender?._errors}
+    />
+
+    {#if required.length}
+      <SelectField
+        options={[undefined, ...travelerDocumentTypes]}
+        formatter={formatTravelerDocumentOption}
+        bind:value={document.type}
+        placeholder="Select"
+        label="Document type"
+        error={errors?.document?.type?._errors}
+      />
+    {/if}
+
+    {#if document.type === "passport"}
+      {#if required.includes("passport-number")}
         <TextField
-          bind:value={passenger.firstName}
-          placeholder="Enter first name"
-          label="First name"
+          bind:value={document.number}
+          placeholder="Enter document number"
+          label="Document number"
           required
-          error={errors?.[idx]?.firstName?._errors}
+          error={errors?.document?.number?._errors}
         />
-
-        <TextField
-          bind:value={passenger.lastName}
-          placeholder="Enter last name"
-          label="Last name"
-          required
-          error={errors?.[idx]?.lastName?._errors}
-        />
-
+      {/if}
+      {#if required.includes("expiration-date")}
         <TextField
           type="date"
-          bind:value={passenger.dateOfBirth}
+          bind:value={document.expirationDate}
           placeholder="dd/mm/yyyy"
-          label="Birthday"
+          label="Expiration date"
           required
-          error={errors?.[idx]?.dateOfBirth?._errors}
+          error={errors?.document?.expirationDate?._errors}
         />
-
-        <SelectField
-          options={passengerGenders}
-          formatter={formatGenderOption}
-          bind:value={passenger.gender}
-          placeholder="Select"
-          label="Gender"
+      {/if}
+      {#if required.includes("issue-date")}
+        <TextField
+          type="date"
+          bind:value={document.issueDate}
+          placeholder="dd/mm/yyyy"
+          label="Issue date"
           required
-          error={errors?.[idx]?.gender?._errors}
+          error={errors?.document?.issueDate?._errors}
         />
-
-        <SelectField
-          options={[undefined, ...travelerDocumentTypes]}
-          formatter={formatTravelerDocumentOption}
-          bind:value={passenger.document.type}
-          placeholder="Select"
-          label="Document type"
+      {/if}
+      {#if required.includes("issuing-country")}
+        <TextField
+          bind:value={document.issueCountry}
+          placeholder="Enter issuing country"
+          label="Issuing country"
+          required
+          error={errors?.document?.issueCountry?._errors}
         />
-
-        {#if passenger.document.type === "passport"}
-          <TextField
-            bind:value={passenger.document.number}
-            placeholder="Enter document number"
-            label="Document number"
-            required
-            error={errors?.[idx]?.document?.number?._errors}
-          />
-        {/if}
-      </div>
-    </div>
-  {/each}
+      {/if}
+      {#if required.includes("nationality")}
+        <TextField
+          bind:value={document.nationality}
+          placeholder="Enter nationality"
+          label="Nationality"
+          required
+          error={errors?.document?.nationality?._errors}
+        />
+      {/if}
+      {#if required.includes("residence-country-code")}
+        <TextField
+          bind:value={document.residenceCountryCode}
+          placeholder="Enter residence country code"
+          label="Residence country code"
+          required
+          error={errors?.document?.residenceCountryCode?._errors}
+        />
+      {/if}
+    {/if}
+  </div>
 </div>
 
 <style>
-  .passengers {
-    display: flex;
-    flex-flow: column;
-    gap: 24px;
-  }
-
   .passenger {
     display: flex;
     flex-flow: column;

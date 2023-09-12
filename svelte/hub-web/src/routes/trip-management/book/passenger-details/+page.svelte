@@ -15,7 +15,7 @@
 </script>
 
 <script lang="ts">
-  import type { z } from "zod";
+  import { z } from "zod";
   import { browser } from "$app/environment";
   import { page } from "$app/stores";
   import type { MaybePromise } from "@sveltejs/kit";
@@ -26,13 +26,11 @@
   import Countdown from "../countdown.svelte";
   import Summary from "../summary/summary.svelte";
   import PassengerEntry, {
-    passengerListData,
-    type PassengerListData,
+    getPassengerValidator,
     type PartialPassengerData,
   } from "./passenger-entry.svelte";
   import ContactInformation, {
     type PartialContactInformationData,
-    type ContactInformationData,
     contactInformationData,
   } from "./contact-information.svelte";
   import { goto } from "$app/navigation";
@@ -54,7 +52,12 @@
       address: {},
     },
   };
+  let errors: z.ZodFormattedError<z.infer<typeof bookingDetailsValidator>> | undefined = undefined;
 
+  $: bookingDetailsValidator = z.object({
+    passengers: z.array(getPassengerValidator(data.priceQuote.required)),
+    contactInformation: contactInformationData,
+  });
   $: backUrl = getBackUrl(data.searchData);
   $: priceQuoteId = data.priceQuote.id;
   $: if (browser && priceQuoteId) {
@@ -109,32 +112,13 @@
     return pollPriceQuote(id);
   }
 
-  let passengerErrors: z.ZodFormattedError<PassengerListData> | undefined = undefined;
-  let contactInformationErrors: z.ZodFormattedError<ContactInformationData> | undefined = undefined;
-
   async function goToNext(): Promise<void> {
-    const validatePassengers = passengerListData.safeParse(bookingDetails.passengers);
-    const validateContactDetails = contactInformationData.safeParse(
-      bookingDetails.contactInformation,
-    );
+    errors = undefined;
+    const validationResult = bookingDetailsValidator.safeParse(bookingDetails);
 
-    if (validatePassengers.success === false) {
-      passengerErrors = validatePassengers.error.format();
-    } else {
-      passengerErrors = undefined;
-    }
+    if (!validationResult.success) {
+      errors = validationResult.error.format();
 
-    if (validateContactDetails.success === false) {
-      contactInformationErrors = validateContactDetails.error.format();
-    } else {
-      contactInformationErrors = undefined;
-    }
-
-    if (passengerErrors || contactInformationErrors) {
-      return;
-    }
-
-    if (!data.priceQuote.price) {
       return;
     }
 
@@ -142,8 +126,8 @@
       action: routeConfig.tripManagement.book.passengerDetails.actions.createOrder,
       data: {
         priceQuoteId: data.priceQuote.id,
-        passengers: bookingDetails.passengers,
-        contact: bookingDetails.contactInformation,
+        passengers: validationResult.data.passengers,
+        contact: validationResult.data.contactInformation,
         price: data.priceQuote.price,
       },
       dataType: "json",
@@ -173,10 +157,19 @@
 
   <div class="scroll">
     <div class="details">
-      <PassengerEntry errors={passengerErrors} bind:passengers={bookingDetails.passengers} />
+      <div class="passengers">
+        {#each bookingDetails.passengers as passenger, idx}
+          <PassengerEntry
+            bind:passenger
+            errors={errors?.passengers?.[idx]}
+            required={data.priceQuote.required}
+            passengerNumber={idx + 1}
+          />
+        {/each}
+      </div>
 
       <ContactInformation
-        errors={contactInformationErrors}
+        errors={errors?.contactInformation}
         countries={data.countries}
         bind:contactInformation={bookingDetails.contactInformation}
       />
@@ -231,6 +224,12 @@
     align-self: flex-start;
     width: 100%;
     max-width: var(--passengers-width);
+  }
+
+  .passengers {
+    display: flex;
+    flex-flow: column;
+    gap: 24px;
   }
 
   .scroll > :global(.summary) {

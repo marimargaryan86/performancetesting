@@ -2,7 +2,7 @@ import { ActionFailure, fail, redirect } from "@sveltejs/kit";
 import integrationInstances from "integration-instances";
 import { getSearchData, setSearchData, type ResolvedSearchData } from "../common";
 import type { ContactInformationData } from "./contact-information.svelte";
-import type { PartialPassengerData } from "./passenger-entry.svelte";
+import type { PassengerData } from "./passenger-entry.svelte";
 import type { TripOfferPriceQuoteModel } from "integration/junction-mobile-api/schemas/offer";
 import type { CreateOrderModel, OrderModel } from "integration/junction-mobile-api/schemas/order";
 import type { PriceModel } from "integration/junction-mobile-api/schemas/price";
@@ -12,7 +12,7 @@ import routeConfig from "routeConfig";
 type BookingData = {
   priceQuoteId: string;
   contact: ContactInformationData;
-  passengers: PartialPassengerData[];
+  passengers: PassengerData[];
   price: PriceModel;
 };
 
@@ -22,12 +22,19 @@ function getBookingData(formData: FormData): BookingData {
   return {
     priceQuoteId: jsonData.priceQuoteId,
     contact: jsonData.contact,
-    passengers: (jsonData.passengers as PartialPassengerData[]).map<PartialPassengerData>(
-      (item) => ({
-        ...item,
-        dateOfBirth: item.dateOfBirth ? new Date(item.dateOfBirth) : undefined,
-      }),
-    ),
+    passengers: (jsonData.passengers as PassengerData[]).map<PassengerData>((item) => ({
+      ...item,
+      dateOfBirth: new Date(item.dateOfBirth),
+      document: item.document
+        ? {
+            ...item.document,
+            expirationDate: item.document.expirationDate
+              ? new Date(item.document.expirationDate)
+              : undefined,
+            issueDate: item.document.issueDate ? new Date(item.document.issueDate) : undefined,
+          }
+        : undefined,
+    })),
     price: jsonData.price,
   };
 }
@@ -39,27 +46,21 @@ function createOrder(data: BookingData, paymentId: string): Promise<OrderModel> 
         addressLines: [data.contact.address.line1, data.contact.address.line2].filter(
           ensureDefined,
         ),
-        city: data.contact.city ?? "",
-        countryCode: data.contact.countryCode ?? "",
-        postalCode: data.contact.postcode ?? "",
+        city: data.contact.city,
+        countryCode: data.contact.countryCode,
+        postalCode: data.contact.postcode,
       },
-      email: data.contact.email ?? "",
+      email: data.contact.email,
       phone: {
-        countryCode: data.contact.phone.code ?? "",
-        number: data.contact.phone.number ?? "",
+        countryCode: data.contact.phone.code,
+        number: data.contact.phone.number,
       },
     },
     passengers: data.passengers.map<CreateOrderModel["passengers"][number]>((item) => ({
-      dateOfBirth: item.dateOfBirth ?? new Date(),
-      firstName: item.firstName ?? "",
-      lastName: item.lastName ?? "",
-      travelerDocument:
-        item.document.type === "passport"
-          ? {
-              type: item.document.type,
-              number: item.document.number,
-            }
-          : undefined,
+      dateOfBirth: new Date(item.dateOfBirth),
+      firstName: item.firstName,
+      lastName: item.lastName,
+      document: item.document,
       title: item.title ?? "unspecified",
       gender: item.gender ?? "unspecified",
     })),
