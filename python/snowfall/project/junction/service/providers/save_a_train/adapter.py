@@ -74,6 +74,15 @@ class RouteNotAllowedError(SaveATrainAdapterError):
     """Raised when a route is not available for valid stations."""
 
 
+_CABIN_MAPPING = types.MappingProxyType(
+    {
+        "Second Class": models_pb2.CabinClass.TYPE_ECONOMY,
+        "Premium Class": models_pb2.CabinClass.TYPE_PREMIUM,
+        "First Class": models_pb2.CabinClass.TYPE_FIRST,
+    },
+)
+
+
 class SaveATrainAdapter(object):  # noqa: WPS214
     _poll_retries_limit = 10
     _wait_time_between_polling = 1
@@ -204,9 +213,8 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                                 id=string.uuid(),
                                 offer_segment_id=offer_segment_id,
                                 cabin_class=models_pb2.CabinClass(
-                                    type=await self._cabin_mapping.resolve_cabin_class(
-                                        fare_brand=transfer_fare.name,
-                                        operator=transfer.changes[0].train.category,
+                                    type=await self._get_cabin_type_value(
+                                        transfer_fare.name,
                                     ),
                                     marketing_name=transfer_fare.name.replace(
                                         "_",
@@ -385,6 +393,29 @@ class SaveATrainAdapter(object):  # noqa: WPS214
             if http_error.response.body:
                 raise_http_error_with_text(http_error)
             raise
+
+    async def _get_cabin_type_value(
+        self,
+        fare_brand: str,
+    ) -> models_pb2.CabinClass.Type.ValueType:
+        type_value = _CABIN_MAPPING.get(fare_brand)
+        if type_value is not None:
+            return type_value
+
+        new_fare_brand = await self._client.api_client.get_fare_class(fare_brand)
+
+        if new_fare_brand is not None:
+            type_value = _CABIN_MAPPING.get(new_fare_brand)
+            if type_value is not None:
+                return type_value
+
+            self._logger.warning(
+                "Provider fare brand type not mapped.",
+                fare_brand=new_fare_brand,
+                operator="SAT",
+            )
+
+        return models_pb2.CabinClass.TYPE_UNSPECIFIED
 
     async def _create_booking(  # noqa: WPS217, WPS210
         self,

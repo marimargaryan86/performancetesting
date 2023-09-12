@@ -5,6 +5,7 @@ import pytest
 import pytest_httpx
 
 from snowfall.project.junction.go.service.orders.v1 import amqp_pb2, models_pb2
+from snowfall.project.junction.go.v1.models_pb2 import CabinClass
 from snowfall.project.junction.service.providers.save_a_train import (
     adapter,
     cache,
@@ -13,7 +14,7 @@ from snowfall.project.junction.service.providers.save_a_train import (
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1 import phone_number_pb2, postal_address_pb2
-from snowfall.vendor.save_a_train import enums
+from snowfall.vendor.save_a_train import client, enums
 from snowfall.vendor.save_a_train.models import request
 
 _BASE_SEARCH_URL = "https://test_url/searches"
@@ -140,3 +141,44 @@ async def test_perform_general_search_route_not_allowed(
         )
 
     assert str(excinfo.value) == expected_error_message  # noqa: WPS441
+
+
+async def test_get_cabin_type(
+    save_a_train_adapter: adapter.SaveATrainAdapter,
+    save_a_train_client: client.SATClient,
+) -> None:
+    fare_brands = list(adapter._CABIN_MAPPING.keys())  # noqa: SLF001
+
+    for fare_brand in fare_brands:
+        assert (
+            await save_a_train_adapter._get_cabin_type_value(fare_brand)  # noqa: SLF001
+            == adapter._CABIN_MAPPING[fare_brand]  # noqa: SLF001
+        )
+
+    with mock.patch.object(
+        save_a_train_client.api_client,
+        "get_fare_class",
+    ) as mock_get_fare_class:
+        mock_get_fare_class.return_value = "First Class"
+        assert (
+            await save_a_train_adapter._get_cabin_type_value(  # noqa: SLF001
+                "Some other First Class value",
+            )
+            == CabinClass.TYPE_FIRST
+        )
+
+        mock_get_fare_class.return_value = ""
+        assert (
+            await save_a_train_adapter._get_cabin_type_value(  # noqa: SLF001
+                "brand not found",
+            )
+            == CabinClass.TYPE_UNSPECIFIED
+        )
+
+        mock_get_fare_class.return_value = "Some new class not mapped yet"
+        assert (
+            await save_a_train_adapter._get_cabin_type_value(  # noqa: SLF001
+                "Super Duper Elite Class",
+            )
+            == CabinClass.TYPE_UNSPECIFIED
+        )

@@ -778,6 +778,31 @@ class _SATApiClient(http_client.HttpClient):  # noqa: WPS214
 
         return response.content
 
+    async def get_fare_class(
+        self,
+        fare_name: str,
+    ) -> str:
+        try:
+            response = await self._make_request(
+                http_client.RequestOptions(
+                    method="GET",
+                    path="fare_class_mapper",
+                    query={"Fare": fare_name},
+                    headers=self._auth_headers,
+                ),
+            )
+        except http_errors.HttpStatusError as exc:
+            if exc.response.status_code == httpx.codes.NOT_FOUND:
+                self._logger.warning(
+                    "Provider found UNSPECIFIED fare brand type.",
+                    fare_brand=fare_name,
+                    operator="SAT",
+                )
+                return ""
+            raise
+
+        return response.json()["class"]
+
     @property
     def _auth_headers(self) -> dict[str, str]:
         """Generate auth header for API requests."""
