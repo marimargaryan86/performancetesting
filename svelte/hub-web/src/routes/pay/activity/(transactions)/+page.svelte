@@ -22,7 +22,6 @@
   import { writable } from "svelte/store";
   import { onMount } from "svelte";
   import TransactionDetails from "./transaction-details/transaction-details.svelte";
-  import type { BookingModel } from "models/booking";
   import routeConfig from "routeConfig";
   import TCompanyCol from "components/ui/table/t-company-col.svelte";
   import TMoneyCol from "components/ui/table/t-money-col.svelte";
@@ -30,6 +29,7 @@
     TransactionModel,
     TransactionStatus,
   } from "integration/junction-pay/schemas/transaction";
+  import type { BookingModel } from "integration/junction-client-api/schemas/booking";
 
   export let data;
   export let form;

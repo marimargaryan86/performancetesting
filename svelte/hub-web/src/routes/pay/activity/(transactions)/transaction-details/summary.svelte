@@ -2,8 +2,8 @@
   import EntityAvatar from "components/ui/entity-avatar.svelte";
   import StatusBadge, { type StatusBadgeVariant } from "components/ui/status-badge.svelte";
   import { yymmdd } from "formatting/date-time";
+  import type { BookingModel } from "integration/junction-client-api/schemas/booking";
   import type { TransactionModel } from "integration/junction-pay/schemas/transaction";
-  import type { BookingModel } from "models/booking";
   import { capitalize } from "utils/common";
 
   export let booking: BookingModel;

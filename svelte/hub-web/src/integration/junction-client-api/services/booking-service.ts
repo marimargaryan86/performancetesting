@@ -1,11 +1,13 @@
-import type { BookingModel } from "models/booking";
 import { parseBooking } from "../parsers/booking";
-import type { GetBookingResponseSchema } from "../schemas/booking";
+import type { BookingIncludes, BookingModel, BookingSchema } from "../schemas/booking";
 import JunctionClientApiService from "./junction-client-api-service";
 
 export default class BookingService extends JunctionClientApiService {
   async getBooking(id: string): Promise<BookingModel> {
-    const resp = await this.makeRequest(`/bookings/${id}`, {
+    const resp = await this.makeRequest<{
+      data: BookingSchema;
+      included: BookingIncludes[];
+    }>(`/bookings/${id}`, {
       queryParams: {
         include: [
           "order",
@@ -21,7 +23,7 @@ export default class BookingService extends JunctionClientApiService {
       throw new Error(`Junction Pay error: ${resp.status}`);
     }
 
-    const data = (await resp.json()) as GetBookingResponseSchema;
+    const data = await resp.json();
 
     return parseBooking(data.data, data.included);
   }

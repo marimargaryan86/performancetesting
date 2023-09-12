@@ -1,6 +1,6 @@
 <script lang="ts">
   import { yymmdd } from "formatting/date-time";
-  import type { OrderPassengerModel } from "models/order";
+  import type { OrderPassengerModel } from "integration/junction-client-api/schemas/order";
 
   export let passengers: OrderPassengerModel[];
 </script>
