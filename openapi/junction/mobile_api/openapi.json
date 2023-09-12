@@ -1504,7 +1504,7 @@
           "$ref": "#/components/parameters/offerPriceQuoteInclude"
         }
       ],
-    "get": {
+      "get": {
         "summary": "Get Offer Price Quote",
         "operationId": "get-offers-quotes-id",
         "responses": {
@@ -2249,7 +2249,7 @@
       "sessionToken": {
         "name": "Session-Token",
         "in": "header",
-        "required": true,
+        "required": false,
         "schema": {
           "type": "string",
           "example": "FMSXrOAhIOdvIbxAmfSt7vJtRBkurNbn",
@@ -2257,7 +2257,8 @@
           "maxLength": 32,
           "pattern": "^[A-Za-z\\d]{32}$"
         },
-        "description": "Unique session token that follows the flow until order creation. Used for rate and offer caching."
+        "description": "Unique session token that follows the flow until order creation. Used for rate and offer caching.",
+        "deprecated": true
       },
       "paymentIntentId": {
         "name": "paymentIntentId",
@@ -3220,6 +3221,15 @@
               "attributes": {
                 "type": "object",
                 "properties": {
+                  "sessionToken": {
+                    "type": "string",
+                    "example": "FMSXrOAhIOdvIbxAmfSt7vJtRBkurNbn",
+                    "minLength": 32,
+                    "maxLength": 32,
+                    "pattern": "^[A-Za-z\\d]{32}$",
+                    "writeOnly": true,
+                    "description": "Unique session token that follows the flow until order creation. Used for rate and offer caching."
+                  },
                   "expiresAt": {
                     "type": "string",
                     "format": "date-time",

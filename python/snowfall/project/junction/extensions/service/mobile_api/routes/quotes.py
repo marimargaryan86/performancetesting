@@ -1,5 +1,5 @@
 import lagom
-from starlette import endpoints, requests, responses, status
+from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.stdlib.integration.starlette import models, request_helpers
 from snowfall.vendor.junction.go import client
@@ -18,10 +18,17 @@ class OfferQuotes(endpoints.HTTPEndpoint):
         junction_client: client.Client = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
+        session_token = body.get("sessionToken") or request.headers.get("Session-Token")
+
+        if session_token is None:
+            raise exceptions.HTTPException(
+                status.HTTP_400_BAD_REQUEST,
+                "Session token is required",
+            )
         offer_quote = await junction_client.create_offer_quote(
             body["offer"],
             body["options"],
-            session_token=request.headers.get("Session-Token"),
+            session_token=session_token,
         )
         return models.JsonApiResponse(
             models.Body(

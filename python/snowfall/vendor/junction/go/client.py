@@ -382,16 +382,14 @@ class Client(base_client.BaseClient):  # noqa: WPS214
         self,
         trip_ids: Sequence[str],
         passengers_dates_of_birth: Sequence[datetime.date],
-        session_token: str | None = None,
+        session_token: str,
     ) -> dict[str, Any]:
         attributes: dict[str, Any] = {
             "passengers": [
                 {"dateOfBirth": dob.isoformat()} for dob in passengers_dates_of_birth
             ],
+            "sessionToken": session_token,
         }
-
-        if session_token:
-            attributes["sessionToken"] = session_token
 
         body = {
             "data": {
@@ -553,7 +551,7 @@ class Client(base_client.BaseClient):  # noqa: WPS214
         self,
         offer_id: str,
         option_ids: Sequence[str],
-        session_token: str | None = None,
+        session_token: str,
     ) -> dict[str, Any]:
         body = {
             "data": {
@@ -577,10 +575,7 @@ class Client(base_client.BaseClient):  # noqa: WPS214
                 "type": "trip-offer-price-quotes",
             },
         }
-        if session_token:
-            body["data"]["attributes"] = {"sessionToken": session_token}
-        else:
-            body["data"]["attributes"] = {}
+
         return await self._make_request(
             method=_METHOD_POST,
             url="/offers/quotes",

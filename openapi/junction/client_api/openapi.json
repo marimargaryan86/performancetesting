@@ -7222,7 +7222,6 @@
           }
         }
       },
-
       "OfferOptionIncluded": {
         "title": "OfferOptionIncluded",
         "type": "array",

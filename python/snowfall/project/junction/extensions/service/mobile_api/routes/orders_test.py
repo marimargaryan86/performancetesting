@@ -59,7 +59,6 @@ class TestOrders(object):
 
         return await authenticated_http_client.post(
             "/orders",
-            headers={"Session-Token": "FMSXrOAhIOdvIbxAmfSt7vJtRBkurNbn"},
             json={
                 "data": {
                     "type": "orders",
