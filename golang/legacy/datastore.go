@@ -2,6 +2,8 @@ package legacy
 
 import (
 	planner "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/planner/v1"
+	"github.com/uber/h3-go/v4"
+	"strconv"
 )
 
 type Repository struct {
@@ -21,6 +23,21 @@ func NewRepository(
 	schedules []*planner.Schedule,
 	scheduleStops []*planner.ScheduleStop,
 ) (*Repository, error) {
+	nullIsland := h3.LatLngToCell(h3.NewLatLng(0, 0), 9)
+
+	for _, stop := range stops {
+		intIndex, _ := strconv.Atoi(stop.Id)
+
+		if h3.Cell(intIndex) == nullIsland {
+			for _, seq := range stop.ScheduleStops {
+				scheduleStops[seq].AlightingAllowed = false
+				scheduleStops[seq].BoardingAllowed = false
+			}
+
+			break
+		}
+	}
+
 	return &Repository{
 		routes:        routes,
 		routeStops:    routeStops,
