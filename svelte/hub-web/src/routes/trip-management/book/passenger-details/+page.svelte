@@ -16,13 +16,10 @@
 
 <script lang="ts">
   import { z } from "zod";
-  import { browser } from "$app/environment";
   import { page } from "$app/stores";
-  import type { MaybePromise } from "@sveltejs/kit";
   import Button from "components/ui/button.svelte";
   import routeConfig from "routeConfig";
-  import { onDestroy } from "svelte";
-  import { callAction, sleep } from "utils/common";
+  import { callAction } from "utils/common";
   import Countdown from "../countdown.svelte";
   import Summary from "../summary/summary.svelte";
   import PassengerEntry, {
@@ -36,12 +33,11 @@
   import { goto } from "$app/navigation";
   import type { PassengerCountData, ResolvedSearchData } from "../common";
   import { URLExtended } from "utils/url";
-  import type { TripOfferPriceQuoteModel } from "integration/junction-mobile-api/schemas/offer";
+  import LoadingIcon from "components/icons/loading-icon.svelte";
+  import { pendableCall } from "utils/pendable-call";
 
   export let data;
 
-  let getPriceQuoteTask: MaybePromise<TripOfferPriceQuoteModel | undefined> = data.priceQuote;
-  let priceQuoteId: string | undefined = data.priceQuote.id;
   let bookingDetails: {
     passengers: PartialPassengerData[];
     contactInformation: PartialContactInformationData;
@@ -59,10 +55,6 @@
     contactInformation: contactInformationData,
   });
   $: backUrl = getBackUrl(data.searchData);
-  $: priceQuoteId = data.priceQuote.id;
-  $: if (browser && priceQuoteId) {
-    getPriceQuoteTask = pollPriceQuote(priceQuoteId);
-  }
 
   function getBackUrl(searchData: ResolvedSearchData): URL {
     return new URLExtended(routeConfig.tripManagement.book.select.root, {
@@ -78,41 +70,7 @@
     });
   }
 
-  async function pollPriceQuote(id: string): Promise<TripOfferPriceQuoteModel | undefined> {
-    if (priceQuoteId !== id) {
-      return undefined;
-    }
-
-    if (data.priceQuote.status === "completed") {
-      return data.priceQuote;
-    }
-
-    const result = await callAction<{ priceQuote: TripOfferPriceQuoteModel }>({
-      action: routeConfig.tripManagement.book.payment.actions.poll,
-      apply: false,
-    });
-
-    if (result.type !== "success") {
-      return undefined;
-    }
-
-    if (
-      result.data?.priceQuote.status === "unspecified" ||
-      result.data?.priceQuote.status === "failed"
-    ) {
-      return undefined;
-    }
-
-    if (result.data?.priceQuote.status === "completed") {
-      return result.data.priceQuote;
-    }
-
-    await sleep(2000);
-
-    return pollPriceQuote(id);
-  }
-
-  async function goToNext(): Promise<void> {
+  const { pending, func: createOrder } = pendableCall(async () => {
     errors = undefined;
     const validationResult = bookingDetailsValidator.safeParse(bookingDetails);
 
@@ -138,11 +96,7 @@
       return;
     }
 
-    goto(routeConfig.tripManagement.book.confirmation.root);
-  }
-
-  onDestroy(() => {
-    priceQuoteId = undefined;
+    await goto(routeConfig.tripManagement.book.confirmation.root);
   });
 </script>
 
@@ -151,9 +105,7 @@
 </svelte:head>
 
 <div class="content">
-  {#await getPriceQuoteTask then}
-    <Countdown expiresAt={data.priceQuote.expiresAt} show />
-  {/await}
+  <Countdown expiresAt={data.priceQuote.expiresAt} show />
 
   <div class="scroll">
     <div class="details">
@@ -186,7 +138,13 @@
 <div class="actions">
   <div class="wrapper">
     <Button size="small" variant="text" href={backUrl.toString()}>Previous</Button>
-    <Button size="small" on:click={goToNext}><span class="next-btn">Next</span></Button>
+    <Button size="small" on:click={createOrder}>
+      Next
+
+      {#if $pending}
+        <LoadingIcon />
+      {/if}
+    </Button>
   </div>
 </div>
 

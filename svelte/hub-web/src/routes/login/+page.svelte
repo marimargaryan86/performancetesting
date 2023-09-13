@@ -8,11 +8,11 @@
   import { callAction } from "utils/common";
   import type { ActionData } from "./$types";
   import routeConfig from "routeConfig";
+  import { pendableCall } from "utils/pendable-call";
 
   export let form;
 
   let data = { email: "", password: "" };
-  let pending = false;
   let disabled = false;
 
   $: disabled = data.email === "" || data.password === "";
@@ -29,11 +29,9 @@
     }
   }
 
-  async function submit(): Promise<void> {
-    pending = true;
-    await callAction({ action: routeConfig.login.actions.login, data });
-    pending = false;
-  }
+  const { pending, func: login } = pendableCall(() =>
+    callAction({ action: routeConfig.login.actions.login, data }),
+  );
 </script>
 
 <svelte:head>
@@ -53,7 +51,7 @@
   <section class="login">
     <JunctionLogo snowfallTechnology poweredBy />
 
-    <form on:submit|preventDefault={submit}>
+    <form on:submit|preventDefault={login}>
       <div class="login-tabs">
         <div class="login-tab">
           <p class="typography headline-small bold">Log in</p>
@@ -87,7 +85,7 @@
       <Button type="submit" {disabled}>
         Login
 
-        {#if pending}
+        {#if $pending}
           <LoadingIcon />
         {/if}
       </Button>

@@ -11,6 +11,7 @@
   import { createEventDispatcher } from "svelte";
   import { fade, fly } from "svelte/transition";
   import { callAction } from "utils/common";
+  import { pendableCall } from "utils/pendable-call";
 
   export let accountId: string;
   export let exclude: PriceModel[];
@@ -34,7 +35,6 @@
   let searchQuery = "";
   let visible = false;
   let inputRef: TextField<"text">;
-  let pending = false;
 
   const dispatch = createEventDispatcher<{ addbalances: PriceModel[] }>();
 
@@ -44,13 +44,7 @@
       !exclude.find((money) => money.currency === balance.code),
   );
 
-  async function addBalances(): Promise<void> {
-    if (pending) {
-      return;
-    }
-
-    pending = true;
-
+  const { pending, func: addBalances } = pendableCall(async () => {
     const result = await callAction<{ balances: PriceModel[] }>({
       action: routeConfig.pay.accounts.actions.addBalances(accountId),
       data: { currencyCodes: value.map((item) => item.code) },
@@ -62,9 +56,8 @@
       dispatch("addbalances", result.data?.balances ?? []);
     }
 
-    pending = false;
     close();
-  }
+  });
 </script>
 
 {#if visible}
@@ -107,7 +100,7 @@
         <Button on:click={addBalances} size="medium" disabled={!value.length}>
           Add
 
-          {#if pending}
+          {#if $pending}
             <LoadingIcon />
           {/if}
         </Button>

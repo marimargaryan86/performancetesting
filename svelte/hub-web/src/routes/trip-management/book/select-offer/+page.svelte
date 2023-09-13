@@ -16,6 +16,8 @@
   import type { resourceStatus } from "integration/junction-mobile-api/schemas/common";
   import type { z } from "zod";
   import type { OfferModel } from "integration/junction-mobile-api/schemas/offer";
+  import LoadingIcon from "components/icons/loading-icon.svelte";
+  import { pendableCall } from "utils/pendable-call";
 
   export let data;
 
@@ -100,14 +102,14 @@
     goto(event.detail);
   }
 
-  async function goToNext(): Promise<void> {
+  const { pending, func: selectOffer } = pendableCall(async () => {
     await callAction({
       action: routeConfig.tripManagement.book.select.actions.select,
       data: selected,
     });
 
-    goto(routeConfig.tripManagement.book.payment.root);
-  }
+    await goto(routeConfig.tripManagement.book.payment.root);
+  });
 
   onDestroy(() => (tripCandidatesSearchId = undefined));
 </script>
@@ -156,7 +158,13 @@
 {#if selected}
   <div class="actions" transition:fade={{ duration: 200 }}>
     <div class="wrapper">
-      <Button on:click={goToNext} size="small">Next</Button>
+      <Button on:click={selectOffer} size="small">
+        Next
+
+        {#if $pending}
+          <LoadingIcon />
+        {/if}
+      </Button>
     </div>
   </div>
 {/if}
@@ -173,8 +181,14 @@
   }
 
   .search-wrapper > :global(.trip-search > button) {
-    width: 52px;
     height: 40px;
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .search-wrapper > :global(.trip-search > button > svg) {
+    width: 20px;
+    height: 20px;
   }
 
   .search-wrapper::after {

@@ -48,6 +48,8 @@
   import { goto } from "$app/navigation";
   import type { ActionPollReturnType } from "./+page.server";
   import { URLExtended } from "utils/url";
+  import LoadingIcon from "components/icons/loading-icon.svelte";
+  import { pendableCall } from "utils/pendable-call";
 
   export let data;
 
@@ -93,11 +95,7 @@
   }
 
   async function pollPriceQuote(id: string): Promise<void> {
-    if (priceQuoteId !== id) {
-      return undefined;
-    }
-
-    if (data.priceQuote.status === "completed") {
+    if (priceQuoteId !== id || data.priceQuote.status === "completed") {
       return;
     }
 
@@ -106,30 +104,25 @@
       apply: false,
     });
 
-    if (result.type !== "success") {
-      return undefined;
-    }
-
     if (
+      result.type !== "success" ||
       result.data?.priceQuote.status === "unspecified" ||
       result.data?.priceQuote.status === "failed"
     ) {
-      return undefined;
-    }
-
-    if (result.data?.priceQuote.status === "completed") {
-      data.priceQuote = result.data.priceQuote;
-      data.searchData.paymentIntent = result.data.paymentIntent;
-
       return;
     }
 
-    await sleep(2000);
+    if (result.data?.priceQuote.status !== "completed") {
+      await sleep(2000);
 
-    return pollPriceQuote(id);
+      return pollPriceQuote(id);
+    }
+
+    data.priceQuote = result.data.priceQuote;
+    data.searchData.paymentIntent = result.data.paymentIntent;
   }
 
-  async function pay(): Promise<void> {
+  const { pending, func: pay } = pendableCall(async () => {
     if (!data.priceQuote.price || !stripe || !clientSecret || !stripeElements) {
       return;
     }
@@ -146,12 +139,10 @@
       redirect: "if_required",
     });
 
-    goto(routeConfig.tripManagement.book.passengerDetails.root);
-  }
-
-  onDestroy(() => {
-    priceQuoteId = undefined;
+    await goto(routeConfig.tripManagement.book.passengerDetails.root);
   });
+
+  onDestroy(() => (priceQuoteId = undefined));
 </script>
 
 <svelte:head>
@@ -163,7 +154,15 @@
 
   <div class="scroll">
     <div class="details">
-      <div bind:this={stripeContainer} class="stripe-container" />
+      <div
+        bind:this={stripeContainer}
+        class="stripe-container"
+        class:pending={data.priceQuote.status !== "completed"}
+      >
+        {#if data.priceQuote.status !== "completed"}
+          <LoadingIcon />
+        {/if}
+      </div>
 
       <label for="toc" class="toc typography body-small">
         <Checkbox id="toc" bind:checked={termsAccepted} />
@@ -187,7 +186,13 @@
 <div class="actions">
   <div class="wrapper">
     <Button size="small" variant="text" href={backUrl.toString()}>Previous</Button>
-    <Button size="small" on:click={pay} disabled={!termsAccepted}>Next</Button>
+    <Button size="small" on:click={pay} disabled={!termsAccepted}>
+      Next
+
+      {#if $pending}
+        <LoadingIcon />
+      {/if}
+    </Button>
   </div>
 </div>
 
@@ -232,6 +237,12 @@
     color: var(--color-text-light-strong);
     background-color: var(--color-common-background-light-main);
     border-radius: 16px;
+  }
+
+  .stripe-container.pending {
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .scroll > :global(.summary) {

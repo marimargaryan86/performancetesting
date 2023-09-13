@@ -104,25 +104,6 @@ export async function load(event): Promise<{
 }
 
 export const actions = {
-  async poll(
-    event,
-  ): Promise<{ priceQuote: TripOfferPriceQuoteModel } | ActionFailure<{ error: string }>> {
-    const searchData = getSearchData(event);
-
-    if (!searchData?.priceQuoteId) {
-      return fail(400, { error: "No quote ID found" });
-    }
-
-    try {
-      return {
-        priceQuote: await integrationInstances.junctionMobileApi.offers.getPriceQuote(
-          searchData.priceQuoteId,
-        ),
-      };
-    } catch {
-      return fail(404, { error: "Quote not found" });
-    }
-  },
   async createOrder(event): Promise<ActionFailure<{ error: string }> | undefined> {
     const formData = await event.request.formData();
     const searchData = getSearchData(event);

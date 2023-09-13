@@ -53,6 +53,7 @@
   import { URLExtended } from "utils/url";
   import SearchIcon from "components/icons/search-icon.svelte";
   import type { PlaceModel } from "integration/junction-mobile-api/schemas/place";
+  import LoadingIcon from "components/icons/loading-icon.svelte";
 
   export let data: PartialTripSearchData = {
     passengers: {
@@ -61,6 +62,7 @@
       infants: 0,
     },
   };
+  export let pending = false;
 
   let errors: z.ZodFormattedError<TripSearchDataInternal> | undefined = undefined;
 
@@ -146,7 +148,11 @@
   />
 
   <Button on:click={search}>
-    <SearchIcon color="var(--color-common-dark-strong)" />
+    {#if pending}
+      <LoadingIcon />
+    {:else}
+      <SearchIcon color="var(--color-common-dark-strong)" />
+    {/if}
   </Button>
 
   <PassengerPicker
@@ -160,7 +166,7 @@
 <style>
   .trip-search {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr min-content;
+    grid-template-columns: 1fr 1fr 1fr max-content;
     gap: 8px;
     align-items: flex-start;
     max-width: 1154px;
@@ -178,5 +184,7 @@
 
   .trip-search > :global(button) {
     margin-top: 22px;
+    padding-right: 16px;
+    padding-left: 16px;
   }
 </style>

@@ -1,10 +1,9 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
+  import { pendableCall } from "utils/pendable-call";
   import TripSearch from "../trip-search/trip-search.svelte";
 
-  function search(event: CustomEvent<URL>): void {
-    goto(event.detail);
-  }
+  const { pending, func: search } = pendableCall((event: CustomEvent<URL>) => goto(event.detail));
 </script>
 
 <svelte:head>
@@ -12,7 +11,7 @@
 </svelte:head>
 
 <div class="search-wrapper">
-  <TripSearch on:search={search} />
+  <TripSearch on:search={search} pending={$pending} />
 </div>
 
 <style>
