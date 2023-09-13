@@ -37,7 +37,7 @@ job "vector-vector-loki" {
     task "vector-loki" {
       driver = "docker"
       config {
-        image = "timberio/vector:0.26.0-alpine"
+        image = "timberio/vector:0.32.0-alpine"
         ports = ["api"]
 
         volumes = [
