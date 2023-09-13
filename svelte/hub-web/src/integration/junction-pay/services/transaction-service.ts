@@ -47,16 +47,11 @@ export default class TransactionService extends JunctionPayService {
       },
     );
 
-    if (resp.status !== 200) {
-      throw new Error(`Junction Pay error: ${resp.status}`);
-    }
-
-    const data = await resp.json();
-    const included = { companies: await this.getCompanies(data, token) };
+    const included = { companies: await this.getCompanies(resp.json, token) };
 
     return {
-      data: data.data.map((item) => parseTransactionSchema(item, included)),
-      cursor: TransactionService.getCursor(data),
+      data: resp.json.data.map((item) => parseTransactionSchema(item, included)),
+      cursor: TransactionService.getCursor(resp.json),
     };
   }
 }

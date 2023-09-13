@@ -19,9 +19,7 @@ export class OfferService extends JunctionMobileApiService {
       headers: { "Session-Token": data.sessionToken },
     });
 
-    const respData = await resp.json();
-
-    return parsePriceQuoteSchema(respData.data, { offers: [] });
+    return parsePriceQuoteSchema(resp.json.data);
   }
 
   async getPriceQuote(id: string): Promise<TripOfferPriceQuoteModel> {
@@ -43,13 +41,8 @@ export class OfferService extends JunctionMobileApiService {
       },
     });
 
-    if (resp.status === 404) {
-      throw new Error("Quote not found");
-    }
+    const included = parseIncluded(resp.json.included);
 
-    const data = await resp.json();
-    const included = parseIncluded(data.included);
-
-    return parsePriceQuoteSchema(data.data, included);
+    return parsePriceQuoteSchema(resp.json.data, included);
   }
 }

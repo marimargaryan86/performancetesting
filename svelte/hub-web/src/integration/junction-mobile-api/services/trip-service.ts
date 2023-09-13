@@ -22,7 +22,7 @@ export class TripService extends JunctionMobileApiService {
       },
     );
 
-    return tripCandidatesSearchModel.toModel((await resp.json()).data);
+    return tripCandidatesSearchModel.toModel(resp.json.data);
   }
 
   async getTripCandidatesSearch(id: string): Promise<TripCandidatesSearchModel> {
@@ -30,11 +30,7 @@ export class TripService extends JunctionMobileApiService {
       data: TripCandidatesSearchSchema;
     }>(`/trip-candidates/searches/${id}`);
 
-    if (resp.status === 404) {
-      throw new Error("Trip candidates search not found");
-    }
-
-    return tripCandidatesSearchModel.toModel((await resp.json()).data);
+    return tripCandidatesSearchModel.toModel(resp.json.data);
   }
 
   async getTripCandidatesOffers(id: string): Promise<OfferModel[]> {
@@ -55,9 +51,8 @@ export class TripService extends JunctionMobileApiService {
       },
     });
 
-    const data = await resp.json();
-    const included = parseIncluded(data.included);
+    const included = parseIncluded(resp.json.included);
 
-    return data.data.map((item) => parseOfferSchema(item, included));
+    return resp.json.data.map((item) => parseOfferSchema(item, included));
   }
 }

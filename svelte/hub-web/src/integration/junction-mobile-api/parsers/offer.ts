@@ -88,10 +88,10 @@ export function parseOfferSchema(
 
 export function parsePriceQuoteSchema(
   data: TripOfferPriceQuoteSchema,
-  included: { offers: OfferModel[] },
+  included: { offers?: OfferModel[] } = {},
 ): TripOfferPriceQuoteModel {
   const parsed = tripOfferPriceQuoteModel.toModel(data);
-  const offer = included.offers.find((item) => item.id === data.relationships.offer.data.id);
+  const offer = included.offers?.find((item) => item.id === data.relationships.offer.data.id);
   const options = Array.from(
     new Set(
       offer?.groups.flatMap((group) =>

@@ -17,7 +17,7 @@ export default abstract class JunctionClientApiService extends JunctionService {
       headers?: Record<string, string>;
       data?: unknown;
     } = {},
-  ): Promise<Omit<Response, "json"> & { json: () => Promise<TResp> }> {
+  ): Promise<Omit<Response, "json"> & { json: TResp }> {
     return super.makeRequest(resource, { ...options, token: this.apiKey });
   }
 }

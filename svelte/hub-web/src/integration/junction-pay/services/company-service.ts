@@ -7,16 +7,6 @@ export default class CompanyService extends JunctionPayService {
       token,
     });
 
-    if (resp.status === 404) {
-      throw new Error("Company does not exist");
-    }
-
-    if (resp.status !== 200) {
-      throw new Error(`Junction Pay error: ${resp.status}`);
-    }
-
-    const data = await resp.json();
-
-    return companyModel.toModel(data.data);
+    return companyModel.toModel(resp.json.data);
   }
 }

@@ -24,16 +24,11 @@ export default class ConversionService extends JunctionPayService {
       token,
     });
 
-    if (resp.status !== 200) {
-      throw new Error(`Junction Pay error: ${resp.status}`);
-    }
-
-    const data = await resp.json();
-    const included = parseIncluded(data.included);
+    const included = parseIncluded(resp.json.included);
 
     return {
-      data: data.data.map((item) => parseConversionSchema(item, included)),
-      cursor: ConversionService.getCursor(data),
+      data: resp.json.data.map((item) => parseConversionSchema(item, included)),
+      cursor: ConversionService.getCursor(resp.json),
     };
   }
 
@@ -43,13 +38,8 @@ export default class ConversionService extends JunctionPayService {
       { token },
     );
 
-    if (resp.status !== 200) {
-      throw new Error(`Junction Pay error: ${resp.status}`);
-    }
+    const included = parseIncluded(resp.json.included);
 
-    const data = await resp.json();
-    const included = parseIncluded(data.included);
-
-    return parseConversionSchema(data.data, included);
+    return parseConversionSchema(resp.json.data, included);
   }
 }

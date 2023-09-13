@@ -31,15 +31,10 @@ export class OrderService extends JunctionMobileApiService {
       },
     });
 
-    if (resp.status !== 200) {
-      throw new Error("Failed to fetch orders");
-    }
-
-    const data = await resp.json();
-    const included = parseIncluded(data.included);
+    const included = parseIncluded(resp.json.included);
 
     return {
-      data: data.data.map((item) => parseOrderSchema(item, included)),
+      data: resp.json.data.map((item) => parseOrderSchema(item, included)),
       // cursor: OrderService.getCursor(data),
       cursor: undefined,
     };
@@ -52,11 +47,7 @@ export class OrderService extends JunctionMobileApiService {
       headers: { "Session-Token": getRandomAlphaNumericString(32) },
     });
 
-    if (resp.status !== 201) {
-      throw new Error("Order creation failed");
-    }
-
-    return parseOrderSchema((await resp.json()).data, { bookings: [], journeys: [] });
+    return parseOrderSchema(resp.json.data);
   }
 
   async getOrder(id: string): Promise<OrderModel> {
@@ -75,13 +66,8 @@ export class OrderService extends JunctionMobileApiService {
       },
     });
 
-    if (resp.status === 404) {
-      throw new Error("Booking not found");
-    }
+    const included = parseIncluded(resp.json.included);
 
-    const data = await resp.json();
-    const included = parseIncluded(data.included);
-
-    return parseOrderSchema(data.data, included);
+    return parseOrderSchema(resp.json.data, included);
   }
 }

@@ -1,4 +1,5 @@
 import { URLExtended } from "utils/url";
+import { throwIfError } from "./junction-error";
 
 export default abstract class JunctionService {
   private readonly baseUrl: string;
@@ -18,7 +19,7 @@ export default abstract class JunctionService {
     return new URL(data.links.next).searchParams.get("page[cursor]") ?? undefined;
   }
 
-  protected makeRequest<TResp = unknown>(
+  protected async makeRequest<TResp = unknown>(
     resource: string,
     options: {
       method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
@@ -27,8 +28,8 @@ export default abstract class JunctionService {
       data?: unknown;
       token?: string;
     } = {},
-  ): Promise<Omit<Response, "json"> & { json: () => Promise<TResp> }> {
-    return fetch(
+  ): Promise<Omit<Response, "json"> & { json: TResp }> {
+    const resp = await fetch(
       new Request(new URLExtended(resource, { base: this.baseUrl, query: options.queryParams }), {
         headers: {
           "Content-Type": "application/vnd.api+json",
@@ -39,5 +40,17 @@ export default abstract class JunctionService {
         body: options.data ? JSON.stringify(options.data) : undefined,
       }),
     );
+
+    await throwIfError(resp);
+
+    let json: TResp | undefined = undefined;
+
+    try {
+      json = await resp.json();
+    } catch {
+      //
+    }
+
+    return { ...resp, json: json as TResp };
   }
 }

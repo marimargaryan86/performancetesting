@@ -13,10 +13,6 @@ export default class AuthenticationService extends JunctionPayService {
       data: { data: createUserTokenModel.toSchema(data) },
     });
 
-    if (resp.status !== 200) {
-      throw new Error(`Junction Pay error: ${resp.status}`);
-    }
-
-    return userTokenModel.toModel((await resp.json()).data).token;
+    return userTokenModel.toModel(resp.json.data).token;
   }
 }

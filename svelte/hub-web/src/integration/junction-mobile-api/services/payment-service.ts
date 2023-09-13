@@ -14,6 +14,6 @@ export class PaymentService extends JunctionMobileApiService {
       data: { data: createPaymentIntentModel.toSchema(data) },
     });
 
-    return paymentIntentModel.toModel((await resp.json()).data);
+    return paymentIntentModel.toModel(resp.json.data);
   }
 }

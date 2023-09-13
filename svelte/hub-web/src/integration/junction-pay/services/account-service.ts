@@ -12,15 +12,9 @@ export default class AccountService extends JunctionPayService {
       },
     );
 
-    if (resp.status !== 200) {
-      throw new Error(`Junction Pay error: ${resp.status}`);
-    }
-
-    const data = await resp.json();
-
     return {
-      data: data.data.map(accountModel.toModel),
-      cursor: AccountService.getCursor(data),
+      data: resp.json.data.map(accountModel.toModel),
+      cursor: AccountService.getCursor(resp.json),
     };
   }
 
@@ -29,10 +23,6 @@ export default class AccountService extends JunctionPayService {
       token,
     });
 
-    if (resp.status !== 200) {
-      throw new Error(`Junction Pay error: ${resp.status}`);
-    }
-
-    return accountModel.toModel((await resp.json()).data);
+    return accountModel.toModel(resp.json.data);
   }
 }

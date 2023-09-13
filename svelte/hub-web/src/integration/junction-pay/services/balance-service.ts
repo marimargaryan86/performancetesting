@@ -9,11 +9,7 @@ export default class BalanceService extends JunctionPayService {
       { token },
     );
 
-    if (resp.status !== 200) {
-      throw new Error(`Junction Pay error: ${resp.status}`);
-    }
-
-    return (await resp.json()).data.map(balanceModel.toModel);
+    return resp.json.data.map(balanceModel.toModel);
   }
 
   async addBalance(token: string, accountId: string, currencyCode: string): Promise<PriceModel> {
@@ -26,10 +22,6 @@ export default class BalanceService extends JunctionPayService {
       },
     );
 
-    if (resp.status !== 201) {
-      throw new Error(`Junction Pay error: ${resp.status}`);
-    }
-
-    return balanceModel.toModel((await resp.json()).data);
+    return balanceModel.toModel(resp.json.data);
   }
 }

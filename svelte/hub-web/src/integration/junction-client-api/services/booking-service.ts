@@ -19,12 +19,6 @@ export default class BookingService extends JunctionClientApiService {
       },
     });
 
-    if (resp.status !== 200) {
-      throw new Error(`Junction Pay error: ${resp.status}`);
-    }
-
-    const data = await resp.json();
-
-    return parseBooking(data.data, data.included);
+    return parseBooking(resp.json.data, resp.json.included);
   }
 }

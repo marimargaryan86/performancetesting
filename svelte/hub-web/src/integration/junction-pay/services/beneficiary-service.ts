@@ -20,15 +20,9 @@ export default class BeneficiaryService extends JunctionPayService {
       queryParams: { "page[cursor]": cursor },
     });
 
-    if (resp.status !== 200) {
-      throw new Error(await resp.text());
-    }
-
-    const data = await resp.json();
-
     return {
-      data: data.data.map(beneficiaryModel.toModel),
-      cursor: BeneficiaryService.getCursor(data),
+      data: resp.json.data.map(beneficiaryModel.toModel),
+      cursor: BeneficiaryService.getCursor(resp.json),
     };
   }
 
@@ -37,15 +31,7 @@ export default class BeneficiaryService extends JunctionPayService {
       token,
     });
 
-    if (resp.status === 404) {
-      throw new Error("Beneficiary not found");
-    }
-
-    if (resp.status !== 200) {
-      throw new Error(await resp.text());
-    }
-
-    return beneficiaryModel.toModel((await resp.json()).data);
+    return beneficiaryModel.toModel(resp.json.data);
   }
 
   async createBeneficiary(
@@ -58,13 +44,7 @@ export default class BeneficiaryService extends JunctionPayService {
       data: { data: putBeneficiaryModel.toSchema(beneficiary) },
     });
 
-    if (resp.status !== 201) {
-      throw new Error(await resp.text());
-    }
-
-    const data = await resp.json();
-
-    return beneficiaryModel.toModel(data.data);
+    return beneficiaryModel.toModel(resp.json.data);
   }
 
   async updateBeneficiary(
@@ -78,12 +58,6 @@ export default class BeneficiaryService extends JunctionPayService {
       data: { data: putBeneficiaryModel.toSchema(beneficiary) },
     });
 
-    if (resp.status !== 200) {
-      throw new Error(await resp.text());
-    }
-
-    const data = await resp.json();
-
-    return beneficiaryModel.toModel(data.data);
+    return beneficiaryModel.toModel(resp.json.data);
   }
 }

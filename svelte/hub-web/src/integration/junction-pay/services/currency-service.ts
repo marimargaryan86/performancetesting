@@ -1,4 +1,4 @@
-import type { CurrencyModel, CurrencySchema } from "../schemas/money";
+import { currencyModel, type CurrencyModel, type CurrencySchema } from "../schemas/money";
 import JunctionPayService from "./junction-pay-service";
 
 export default class CurrencyService extends JunctionPayService {
@@ -11,20 +11,8 @@ export default class CurrencyService extends JunctionPayService {
       token,
     });
 
-    if (resp.status !== 200) {
-      throw new Error(`Junction Pay error: ${resp.status}`);
-    }
-
-    const currencies = (await resp.json()).data.map((item) => ({
-      code: item.id,
-      minorUnits: item.attributes.minorUnits,
-      name: item.attributes.name,
-    }));
-
-    const currencyMap = new Map<string, CurrencyModel>();
-
-    currencies.forEach((currency) => currencyMap.set(currency.code, currency));
-
-    return currencyMap;
+    return new Map(
+      resp.json.data.map((currency) => [currency.id, currencyModel.toModel(currency)]),
+    );
   }
 }
