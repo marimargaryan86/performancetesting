@@ -13,6 +13,7 @@ from snowfall.project.pay.adapter import (
 )
 from snowfall.project.pay.adapter import (
     beneficiaries,
+    bills,
     companies,
     contacts,
     conversions,
@@ -122,6 +123,11 @@ def _factory(
                     cc_payment_client=cc_payment_client,
                     quotations_client=quotations.GrpcClient(
                         QuotationsServiceStub(
+                            transactions_channel,
+                        ),
+                    ),
+                    bills_client=bills.GrpcClient(
+                        transactions_pb2_grpc.BillsServiceStub(
                             transactions_channel,
                         ),
                     ),

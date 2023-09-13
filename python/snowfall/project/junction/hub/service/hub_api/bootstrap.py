@@ -1,9 +1,10 @@
 import lagom
 
 from snowfall.project.junction.go.adapter import orders
-from snowfall.project.pay.adapter import (
+from snowfall.project.pay.adapter import (  # noqa: WPS235
     accounts,
     beneficiaries,
+    bills,
     companies,
     contacts,
     conversions,
@@ -25,6 +26,7 @@ def create_dependencies(  # noqa: WPS211
     currencies_client: currencies.Client,
     cc_payment_client: client.PaymentClient,
     quotations_client: quotations.Client,
+    bills_client: bills.Client,
 ) -> lagom.Container:
     container = lagom.Container()
     container[orders.Client] = orders_client  # type: ignore[type-abstract]
@@ -37,5 +39,6 @@ def create_dependencies(  # noqa: WPS211
     container[currencies.Client] = currencies_client  # type: ignore[type-abstract]
     container[client.PaymentClient] = cc_payment_client
     container[quotations.Client] = quotations_client  # type: ignore[type-abstract]
+    container[bills.Client] = bills_client  # type: ignore[type-abstract]
 
     return container

@@ -35,9 +35,9 @@
       ]
     },
     {
-      "name": "Bill",
+      "name": "Bills",
       "tags": [
-        "bill"
+        "bills"
       ]
     },
     {
@@ -100,9 +100,9 @@
       "x-displayName": "Beneficiaries"
     },
     {
-      "name": "bill",
+      "name": "bills",
       "description": "Bill related actions.",
-      "x-displayName": "Bill"
+      "x-displayName": "Bills"
     },
     {
       "name": "companies",
@@ -2247,7 +2247,7 @@
       "get": {
         "summary": "List bill details",
         "tags": [
-          "bill"
+          "bills"
         ],
         "parameters": [
           {
@@ -2309,7 +2309,7 @@
         "summary": "Get bill details",
         "description": "Get bill details",
         "tags": [
-          "bill"
+          "bills"
         ],
         "operationId": "get-bills-id",
         "responses": {
@@ -2343,7 +2343,7 @@
         "summary": "Update bill details",
         "description": "Update bill details",
         "tags": [
-          "bill"
+          "bills"
         ],
         "operationId": "patch-bills-id",
         "responses": {
@@ -3188,12 +3188,12 @@
               "attributes": {
                 "type": "object",
                 "properties": {
-                  "reconciled": {
+                  "isReconciled": {
                     "type": "boolean",
                     "example": false,
                     "default": false
                   },
-                  "amount": {
+                  "totalAmount": {
                     "allOf": [
                       {
                         "$ref": "#/components/schemas/Money"
@@ -3201,6 +3201,19 @@
                     ],
                     "readOnly": true,
                     "description": "The total amount of transactions."
+                  },
+                  "reconciledAmount": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/components/schemas/Money"
+                      },
+                      {
+                        "nullable": true
+                      }
+                    ],
+                    "nullable": true,
+                    "readOnly": true,
+                    "description": "The reconciled amount of transactions."
                   }
                 }
               },

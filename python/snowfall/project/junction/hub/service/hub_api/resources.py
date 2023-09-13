@@ -870,3 +870,37 @@ class BalanceResource(models.Resource):
                 },
             },
         )
+
+
+class BillResource(models.Resource):
+    api_type: ClassVar[str] = "bills"
+
+    @classmethod
+    def from_proto(
+        cls,
+        bill: transaction_models_pb2.Bill,
+        request: requests.Request,
+    ) -> BillResource:
+        return cls(
+            id=bill.id,
+            type=BillResource.api_type,
+            attributes={
+                "id": bill.id,
+                "orderId": bill.order_id,
+                "isReconciled": bill.is_reconciled,
+                "totalAmount": money.from_protobuf(bill.total_amount),
+                "reconciledAmount": (
+                    money.from_protobuf(bill.reconciled_amount)
+                    if bill.HasField("reconciled_amount")
+                    else None
+                ),
+            },
+            links={
+                _SELF_HREF: str(
+                    request.url_for(
+                        "Bills",
+                        billId=bill.id,
+                    ),
+                ),
+            },
+        )

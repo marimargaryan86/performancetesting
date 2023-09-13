@@ -14,6 +14,7 @@ from snowfall.project.pay import fixtures as pay_fixtures
 from snowfall.project.pay.adapter import (
     accounts,
     beneficiaries,
+    bills,
     companies,
     contacts,
     conversions,
@@ -22,6 +23,7 @@ from snowfall.project.pay.adapter import (
     transactions,
 )
 from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import (
+    Bill,
     Quotation,
     QuotationAmounts,
     QuotationRates,
@@ -258,6 +260,16 @@ def get_quotation(quotation_id: str) -> Quotation:
     )
 
 
+def get_bill(bill_id: str) -> Bill:
+    money_usd = money.from_string("1000", money.Currency("USD")).protobuf()
+    return Bill(
+        id=bill_id,
+        order_id=string.uuid(),
+        is_reconciled=False,
+        total_amount=money_usd,
+    )
+
+
 @pytest.fixture()
 def cc_payment_client(
     accounts_list_from_cc: Sequence[mock.Mock],
@@ -321,6 +333,13 @@ def quotations_client(
     )
 
 
+@pytest.fixture()
+def bills_client() -> bills.Client:
+    return bills.DictClient(
+        [get_bill(bill_id) for bill_id in pay_fixtures.BILLS],
+    )
+
+
 def _create_app(  # noqa: WPS211
     orders_client: orders.Client,
     companies_client: companies.Client,
@@ -332,6 +351,7 @@ def _create_app(  # noqa: WPS211
     currencies_client: currencies.Client,
     cc_payment_client: PaymentClient,
     quotations_client: quotations.Client,
+    bills_client: bills.Client,
 ) -> applications.Starlette:
     asgi_app = application.create_starlette_app(
         routes=router.get_routes(
@@ -346,6 +366,7 @@ def _create_app(  # noqa: WPS211
                 currencies_client=currencies_client,
                 cc_payment_client=cc_payment_client,
                 quotations_client=quotations_client,
+                bills_client=bills_client,
             ),
         ),
         openapi_path=filesystem.resource_path("junction.hub_api", "openapi.json"),
@@ -396,6 +417,7 @@ def app(  # noqa: WPS211
     currencies_client: currencies.Client,
     cc_payment_client: PaymentClient,
     quotations_client: quotations.Client,
+    bills_client: bills.Client,
 ) -> applications.Starlette:
     return _create_app(
         orders_client=orders_client,
@@ -408,4 +430,5 @@ def app(  # noqa: WPS211
         currencies_client=currencies_client,
         cc_payment_client=cc_payment_client,
         quotations_client=quotations_client,
+        bills_client=bills_client,
     )

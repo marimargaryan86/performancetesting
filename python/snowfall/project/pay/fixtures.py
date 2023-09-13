@@ -52,6 +52,12 @@ REFUNDS = (
 )
 
 
+BILLS = (
+    "8304c0ff-7ba6-4431-9788-1d486be3a033",
+    "946a7e4b-519a-4f3d-8169-bcb4dbb3af94",
+)
+
+
 def get_payments() -> list[models_pb2.Payment]:
     return [generate_payment(identifier) for identifier in PAYMENTS]
 

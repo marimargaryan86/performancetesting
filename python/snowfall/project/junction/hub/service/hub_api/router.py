@@ -6,6 +6,7 @@ from snowfall.project.junction.hub.service.hub_api.routes import (  # noqa: WPS2
     accounts,
     balances,
     beneficiaries,
+    bills,
     companies,
     contacts,
     conversions,
@@ -169,5 +170,16 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             transactions.Transaction,
             name="Transactions",
             methods=["GET"],
+        ),
+        integration.route(
+            "/bills",
+            bills.Bills,
+            name="Bills",
+            methods=["GET"],
+        ),
+        integration.route(
+            "/bills/{billId}",
+            bills.Bill,
+            name="Bills",
         ),
     ]
