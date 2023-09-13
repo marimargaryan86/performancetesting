@@ -141,7 +141,6 @@ def _factory(
                 ),
             ],
             security_headers=False,
-            validate_response=app.settings.validate_responses_against_spec,
         )
         asgi_app.add_exception_handler(
             errors.NotFoundError,

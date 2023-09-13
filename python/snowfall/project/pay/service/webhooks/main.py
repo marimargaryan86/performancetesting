@@ -23,7 +23,7 @@ def _factory(
             payments_pb2_grpc.PaymentsServiceStub(payments_channel),
         )
         return starlette.create_starlette_app(
-            routers.get_routes(
+            routes=routers.get_routes(
                 bootstrap.create_dependencies(
                     payment_client=grpc_payment_client,
                 ),

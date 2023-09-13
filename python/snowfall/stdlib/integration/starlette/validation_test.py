@@ -140,18 +140,6 @@ class TestResponseValidation(object):
             assert error["title"] == status_code.phrase
             assert error["detail"] == status_code.description
 
-    async def test_no_response_validation(
-        self,
-        test_app_without_response_validation: applications.Starlette,
-        test_client_without_response_validation: httpx.AsyncClient,
-    ) -> None:
-        test_app_without_response_validation.add_route(
-            _VALIDATION_PATH,
-            _failed_validation,
-        )
-        response = await test_client_without_response_validation.get(_VALIDATION_PATH)
-        assert response.status_code == status.HTTP_200_OK
-
     async def test_response_validation_success_status_code(
         self,
         test_app: applications.Starlette,

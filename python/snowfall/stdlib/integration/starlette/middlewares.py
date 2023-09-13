@@ -1,3 +1,4 @@
+import enum
 from collections.abc import Awaitable, Callable, Container
 from typing import cast
 
@@ -7,10 +8,18 @@ from openapi_core.exceptions import OpenAPIError
 from openapi_core.templating.paths.exceptions import PathNotFound
 from openapi_core.templating.security import exceptions as security_exceptions
 from openapi_core.validation.schemas import exceptions as validation_exceptions
-from starlette import applications, exceptions, requests, responses, status, types
+from starlette import (
+    applications,
+    background,
+    exceptions,
+    requests,
+    responses,
+    status,
+    types,
+)
 from starlette.middleware import base
 
-from snowfall.stdlib.integration.starlette import handlers, validation
+from snowfall.stdlib.integration.starlette import handlers, messages, validation
 from snowfall.stdlib.logging import stdout
 
 
@@ -101,21 +110,27 @@ class SecurityHeadersMiddleware(base.BaseHTTPMiddleware):
         return response
 
 
+class ValidationMode(enum.StrEnum):
+    disabled = "disabled"
+    eager = "eager"
+    lazy = "lazy"
+
+
 class ValidationMiddleware(base.BaseHTTPMiddleware):
     def __init__(
         self,
         app: applications.Starlette,
         validator: validation.Validator,
-        excluded_status_codes: Container[int] | None = None,
         *,
-        validate_response: bool = True,
+        excluded_status_codes: Container[int] | None = None,
+        validation_mode: ValidationMode = ValidationMode.disabled,
     ):
         super().__init__(app)
         self._logger = stdout.get_logger()
         self._response_logger = stdout.get_logger()
         self._validator = validator
         self._excluded_status_codes = excluded_status_codes or []
-        self._validate_response = validate_response
+        self._validation_mode = validation_mode
 
     async def dispatch(
         self,
@@ -142,15 +157,39 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
         resolved_request: requests.Request,
     ) -> responses.Response:
         response = await call_next(resolved_request)
+        response = await resolve_response(response)
 
-        if not self._validate_response:
+        if response.status_code in self._excluded_status_codes:
             return response
 
-        resolved_response = await resolve_response(response)
+        match self._validation_mode:
+            case ValidationMode.disabled:
+                return response
+            case ValidationMode.eager:
+                return await self._validate_response(
+                    openapi_request=openapi_request,
+                    resolved_request=resolved_request,
+                    resolved_response=response,
+                )
+            case ValidationMode.lazy:
+                messages.add_background_task(
+                    response,
+                    background.BackgroundTask(
+                        self._validate_response,
+                        openapi_request=openapi_request,
+                        resolved_request=resolved_request,
+                        resolved_response=response,
+                    ),
+                )
 
-        if resolved_response.status_code in self._excluded_status_codes:
-            return resolved_response
+                return response
 
+    async def _validate_response(
+        self,
+        openapi_request: protocols.Request,
+        resolved_request: requests.Request,
+        resolved_response: responses.Response,
+    ) -> responses.Response:
         openapi_response = await validation.response_to_openapi(resolved_response)
 
         try:

@@ -53,7 +53,7 @@ def _factory(
             prefix=app.settings.redis_prefix,
         )
         return starlette.create_starlette_app(
-            router.get_routes(
+            routes=router.get_routes(
                 bootstrap.create_dependencies(
                     monitoring_rules_client=monitoring_rules.GrpcClient(
                         monitoring_rules=notifications_pb2_grpc.MonitoringRuleServiceStub(

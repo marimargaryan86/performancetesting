@@ -1,3 +1,4 @@
+import asyncio
 import dataclasses
 import pathlib
 from typing import cast
@@ -116,13 +117,18 @@ class Validator(object):
         self,
         request: protocols.Request,
     ) -> request_datatypes.RequestUnmarshalResult:
-        return shortcuts.unmarshal_request(
-            request=request,
-            spec=self._spec,
-            extra_media_type_deserializers=self._media_type_deserializers,
-            extra_format_validators=self._format_validators,
-            extra_format_unmarshallers=self._format_unmarshallers,
-        )
+        loop = asyncio.get_running_loop()
+
+        def wrapper() -> request_datatypes.RequestUnmarshalResult:
+            return shortcuts.unmarshal_request(
+                request=request,
+                spec=self._spec,
+                extra_media_type_deserializers=self._media_type_deserializers,
+                extra_format_validators=self._format_validators,
+                extra_format_unmarshallers=self._format_unmarshallers,
+            )
+
+        return await loop.run_in_executor(None, wrapper)
 
     @tracing.trace
     async def validate_response(
@@ -130,11 +136,16 @@ class Validator(object):
         request: protocols.Request,
         response: protocols.Response,
     ) -> response_datatypes.ResponseUnmarshalResult:
-        return shortcuts.unmarshal_response(
-            request=request,
-            response=response,
-            spec=self._spec,
-            extra_media_type_deserializers=self._media_type_deserializers,
-            extra_format_validators=self._format_validators,
-            extra_format_unmarshallers=self._format_unmarshallers,
-        )
+        loop = asyncio.get_running_loop()
+
+        def wrapper() -> response_datatypes.ResponseUnmarshalResult:
+            return shortcuts.unmarshal_response(
+                request=request,
+                response=response,
+                spec=self._spec,
+                extra_media_type_deserializers=self._media_type_deserializers,
+                extra_format_validators=self._format_validators,
+                extra_format_unmarshallers=self._format_unmarshallers,
+            )
+
+        return await loop.run_in_executor(None, wrapper)

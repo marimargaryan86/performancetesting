@@ -97,7 +97,6 @@ def _factory(
                 "junction.plus_poc_api",
                 "openapi.json",
             ),
-            validate_response=app.settings.validate_responses_against_spec,
         )
         asgi_app.add_exception_handler(
             httpx.HTTPStatusError,

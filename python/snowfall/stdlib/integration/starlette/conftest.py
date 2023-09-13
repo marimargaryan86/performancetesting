@@ -13,14 +13,11 @@ from snowfall.stdlib.integration.starlette import application
 def _create_app(
     openapi_path: pathlib.Path | None,
     custom_middlewares: Sequence[Middleware] | None = None,
-    *,
-    validate_response: bool = True,
 ) -> applications.Starlette:
     return application.create_starlette_app(
         custom_middlewares=custom_middlewares,
         routes=[],
         openapi_path=openapi_path,
-        validate_response=validate_response,
     )
 
 
@@ -52,7 +49,6 @@ def test_app_without_response_validation(
 ) -> applications.Starlette:
     return _create_app(
         openapi_path=pathlib.Path(request.param),
-        validate_response=False,
     )
 
 
