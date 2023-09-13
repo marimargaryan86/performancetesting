@@ -28,6 +28,10 @@ export default {
       env.BOOKING_HUB_API_BASE_URL,
       env.BOOKING_HUB_API_KEY,
     ),
+    cancellations: new junctionMobileApi.CancellationRequestService(
+      env.BOOKING_HUB_API_BASE_URL,
+      env.BOOKING_HUB_API_KEY,
+    ),
   },
   junctionPayApi: {
     auth: new junctionPayApi.AuthenticationService(env.PAY_ADMIN_API_BASE_URL),
