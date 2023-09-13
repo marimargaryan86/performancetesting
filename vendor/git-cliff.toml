@@ -11,6 +11,7 @@ body = """
             by {{ commit.author.name }} \
             {% for footer in commit.footers | filter(attribute="token", value="Closes") -%}
                 {%- set parts = footer.value | split(pat="#") -%}
+                {%- if parts | length != 2 %}{% continue %}{% endif -%}
                 (<https://git.snowfall.se/{{ parts[0] }}/-/issues/{{ parts[1] }}|{{ footer.value }}>)
             {%- endfor -%}
     {%- endfor -%}

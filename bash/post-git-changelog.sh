@@ -6,7 +6,7 @@ shopt -s nullglob
 
 TODAY=$(printf '%(%Y-%m-%d)T\n' -1)
 YESTERDAY=$(printf '%(%Y-%m-%d)T\n' $((EPOCHSECONDS - 86400)))
-ALL_COMMITS=$(git log --before "${TODAY}T04:00:00Z" --after "${YESTERDAY}T03:59:59Z" --pretty=format:"%h" --no-patch)
+ALL_COMMITS=$(git log --before "${TODAY}T04:00:00Z" --after "${YESTERDAY}T03:59:59Z" --pretty=format:"%H" --no-patch)
 
 if [[ "${ALL_COMMITS}" == "" ]]; then
 	exit 0
