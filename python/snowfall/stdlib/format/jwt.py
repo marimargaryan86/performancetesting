@@ -36,8 +36,12 @@ class AsyncJWKClient(object):
             options={"verify_signature": False},
         )
         header = unverified["header"]
+        kid = header.get("kid")
 
-        return await self._get_signing_key(header.get("kid")), header["alg"]
+        if not kid:
+            raise jwt.PyJWKError("JWT is missing 'kid' header")
+
+        return await self._get_signing_key(kid), header["alg"]
 
     async def _get_signing_key(self, kid: str) -> jwt.PyJWK:
         signing_keys = await self._get_signing_keys()
@@ -135,14 +139,15 @@ class Encoder(object):
         # Verify that the chosen algorithm works with the provided key.
         jwt.encode({}, self._key, algorithm=self._algorithm)
 
-    def encode(self, payload: Payload) -> str:
+    def encode(self, payload: Payload, headers: Mapping[str, Any] | None = None) -> str:
         return jwt.encode(
-            {
+            payload={
                 jwt_key: jwt_value
                 for jwt_key, jwt_value in dataclasses.asdict(payload).items()
                 if jwt_value is not None
             },
-            self._key,
+            key=self._key,
+            headers=dict(headers) if headers else None,
             algorithm=self._algorithm,
         )
 
