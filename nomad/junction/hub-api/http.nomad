@@ -34,10 +34,6 @@ variable "count" {
   type = number
 }
 
-variable "validate_responses_against_spec" {
-  type = bool
-}
-
 variable "cc_address" {
   type = string
 }
@@ -179,14 +175,13 @@ EOH
       }
 
       env {
-        ENV_NAME                        = "${var.environment}"
-        FORWARDED_ALLOWED_IPS           = "0.0.0.0"
-        HTTP_ADDRESS                    = "0.0.0.0"
-        HTTP_PORT                       = "${NOMAD_PORT_http}"
-        SENTRY_DSN                      = "https://7a9e03aa0fa24aed8155a1475b8be273@sentry.snowfall.se/147"
-        PROMETHEUS_PORT                 = "${NOMAD_PORT_prometheus}"
-        VALIDATE_RESPONSES_AGAINST_SPEC = "${var.validate_responses_against_spec}"
-        CC_ADDRESS                      = "${var.cc_address}"
+        ENV_NAME              = "${var.environment}"
+        FORWARDED_ALLOWED_IPS = "0.0.0.0"
+        HTTP_ADDRESS          = "0.0.0.0"
+        HTTP_PORT             = "${NOMAD_PORT_http}"
+        SENTRY_DSN            = "https://7a9e03aa0fa24aed8155a1475b8be273@sentry.snowfall.se/147"
+        PROMETHEUS_PORT       = "${NOMAD_PORT_prometheus}"
+        CC_ADDRESS            = "${var.cc_address}"
       }
     }
   }

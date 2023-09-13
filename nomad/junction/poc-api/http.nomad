@@ -164,21 +164,20 @@ EOH
       }
 
       env {
-        ENV_NAME                        = "${var.environment}"
-        FORWARDED_ALLOWED_IPS           = "0.0.0.0"
-        HTTP_ADDRESS                    = "0.0.0.0"
-        HTTP_PORT                       = "${NOMAD_PORT_http}"
-        PROMETHEUS_PORT                 = "${NOMAD_PORT_prometheus}"
-        VALIDATE_RESPONSES_AGAINST_SPEC = false
-        MONGO_DB                        = "plus-poc"
-        TWILIO_SENDER                   = "+15674831787"
-        FLIGHT_STATS_APP_ID             = "4fb1a656"
-        SENTRY_DSN                      = "https://edddac6f53a345bfa2b49ac386a69e9b@sentry.snowfall.se/80"
-        JUNCTION_API_ADDRESS            = "${var.junction_api_address}"
-        FLIGHT_STATS_API_ADDRESS        = "https://api.flightstats.com/flex/flightstatus/rest/v2/json/flight/status/"
-        ICOUPON_CLIENT_ID               = "Snowfall"
-        ICOUPON_API_ADDRESS             = "https://ppd.icoupon.global/api"
-        TF_API_ADDRESS                  = "https://api.travelfusion.com"
+        ENV_NAME                 = "${var.environment}"
+        FORWARDED_ALLOWED_IPS    = "0.0.0.0"
+        HTTP_ADDRESS             = "0.0.0.0"
+        HTTP_PORT                = "${NOMAD_PORT_http}"
+        PROMETHEUS_PORT          = "${NOMAD_PORT_prometheus}"
+        MONGO_DB                 = "plus-poc"
+        TWILIO_SENDER            = "+15674831787"
+        FLIGHT_STATS_APP_ID      = "4fb1a656"
+        SENTRY_DSN               = "https://edddac6f53a345bfa2b49ac386a69e9b@sentry.snowfall.se/80"
+        JUNCTION_API_ADDRESS     = "${var.junction_api_address}"
+        FLIGHT_STATS_API_ADDRESS = "https://api.flightstats.com/flex/flightstatus/rest/v2/json/flight/status/"
+        ICOUPON_CLIENT_ID        = "Snowfall"
+        ICOUPON_API_ADDRESS      = "https://ppd.icoupon.global/api"
+        TF_API_ADDRESS           = "https://api.travelfusion.com"
       }
     }
   }

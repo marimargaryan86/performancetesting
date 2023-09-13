@@ -34,10 +34,6 @@ variable "count" {
   type = number
 }
 
-variable "validate_responses_against_spec" {
-  type = bool
-}
-
 job "client-api-http" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -181,14 +177,13 @@ EOH
       }
 
       env {
-        ENV_NAME                        = "${var.environment}"
-        FORWARDED_ALLOWED_IPS           = "0.0.0.0"
-        HTTP_ADDRESS                    = "0.0.0.0"
-        HTTP_PORT                       = "${NOMAD_PORT_http}"
-        JWT_TOKEN_VERSION               = "1.0.0"
-        SENTRY_DSN                      = "https://c674550aaa124dd9b5f02bf6c49b1983@sentry.snowfall.se/19"
-        PROMETHEUS_PORT                 = "${NOMAD_PORT_prometheus}"
-        VALIDATE_RESPONSES_AGAINST_SPEC = "${var.validate_responses_against_spec}"
+        ENV_NAME              = "${var.environment}"
+        FORWARDED_ALLOWED_IPS = "0.0.0.0"
+        HTTP_ADDRESS          = "0.0.0.0"
+        HTTP_PORT             = "${NOMAD_PORT_http}"
+        JWT_TOKEN_VERSION     = "1.0.0"
+        SENTRY_DSN            = "https://c674550aaa124dd9b5f02bf6c49b1983@sentry.snowfall.se/19"
+        PROMETHEUS_PORT       = "${NOMAD_PORT_prometheus}"
       }
     }
   }

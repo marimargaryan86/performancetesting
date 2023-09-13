@@ -33,7 +33,6 @@ class Settings(application.Settings):
     schedules_address: str
     authentication_address: str
     ory_jwk_ttl: datetime.timedelta = datetime.timedelta(hours=1)
-    validate_responses_against_spec: bool = True
     reseller_currencies: dict[str, str] = pydantic.Field(default_factory=dict)
     reseller_pay_companies: dict[str, str] = pydantic.Field(default_factory=dict)
 

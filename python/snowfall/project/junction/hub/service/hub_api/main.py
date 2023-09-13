@@ -52,7 +52,6 @@ class Settings(starlette.Settings):
     companies_address: str
     transactions_address: str
     currencies_address: str
-    validate_responses_against_spec: bool = True
 
 
 def _factory(

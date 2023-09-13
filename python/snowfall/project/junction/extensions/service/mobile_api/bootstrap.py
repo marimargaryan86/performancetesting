@@ -40,7 +40,6 @@ class Settings(application.Settings):
     support_email: str
     create_stripe_customers: bool
     mongo_db: str
-    validate_responses_against_spec: bool = True
 
 
 def create_dependencies(  # noqa: WPS211

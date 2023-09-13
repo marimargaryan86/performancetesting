@@ -6,7 +6,6 @@ from snowfall.stdlib.integration.starlette import application
 
 class Settings(application.Settings):
     geodata_address: str
-    validate_responses_against_spec: bool = True
 
 
 def create_dependencies(

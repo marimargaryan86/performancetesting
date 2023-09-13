@@ -142,13 +142,12 @@ EOH
       }
 
       env {
-        ENV_NAME                        = "${var.environment}"
-        FORWARDED_ALLOWED_IPS           = "0.0.0.0"
-        HTTP_ADDRESS                    = "0.0.0.0"
-        HTTP_PORT                       = "${NOMAD_PORT_http}"
-        SENTRY_DSN                      = "https://07b6d5a555bc4b7d88c6b552488016ae@sentry.snowfall.se/70"
-        PROMETHEUS_PORT                 = "${NOMAD_PORT_prometheus}"
-        VALIDATE_RESPONSES_AGAINST_SPEC = false
+        ENV_NAME              = "${var.environment}"
+        FORWARDED_ALLOWED_IPS = "0.0.0.0"
+        HTTP_ADDRESS          = "0.0.0.0"
+        HTTP_PORT             = "${NOMAD_PORT_http}"
+        SENTRY_DSN            = "https://07b6d5a555bc4b7d88c6b552488016ae@sentry.snowfall.se/70"
+        PROMETHEUS_PORT       = "${NOMAD_PORT_prometheus}"
       }
     }
   }

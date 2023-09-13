@@ -5,7 +5,6 @@
       "count": 2,
       "traefik_entrypoints": "websecure",
       "traaefik_host_URL": "api.hub.junction.dev",
-      "validate_responses_against_spec": "true",
       "cc_address": "https://devapi.currencycloud.com/v2"
     }
   },
@@ -15,7 +14,6 @@
       "count": 2,
       "traefik_entrypoints": "web",
       "traaefik_host_URL": "api.hub.junction.travel",
-      "validate_responses_against_spec": "false",
       "cc_address": "https://api.currencycloud.com/v2"
     }
   },
@@ -25,7 +23,6 @@
       "count": 1,
       "traefik_entrypoints": "websecure",
       "traaefik_host_URL": "api.hub.sandbox.junction.dev",
-      "validate_responses_against_spec": "true",
       "cc_address": "https://devapi.currencycloud.com/v2"
     }
   }

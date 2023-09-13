@@ -37,7 +37,6 @@ class Settings(application.Settings):
     tf_api_address: str
     tf_client_key: str
     openai_api_key: str
-    validate_responses_against_spec: bool = True
 
 
 def create_dependencies(  # noqa: WPS211
