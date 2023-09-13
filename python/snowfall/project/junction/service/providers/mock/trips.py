@@ -8,7 +8,7 @@ from typing import Any
 
 from snowfall.project.junction.provider.v2alpha import trips_pb2
 from snowfall.project.junction.v1 import segment_type_pb2
-from snowfall.stdlib import h3
+from snowfall.stdlib import h3, money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1 import latlng_pb2
 
@@ -115,6 +115,83 @@ class FakeTravelTime(object):
         return self._earth_radius * curve
 
 
+class FakeFareGenerator(object):
+    _air_base_cost = 15
+    _air_travel_cost = 0.00075
+    _air_base_modifier = 2.1
+    _air_fare_modifier = 0.065
+    _round_trip_rebate = 0.7
+    _air_fare_classes = (
+        ("Basic", 1.0),
+        ("Premium", 1.4),
+        ("Business", 2.7),
+    )
+
+    def __init__(
+        self,
+        trips: Sequence[trips_pb2.Trip],
+    ):
+        self._trips = trips
+
+    def generate(self) -> list[trips_pb2.Fare]:
+        return [
+            trips_pb2.Fare(
+                reference="foo",
+                price=money.from_string(
+                    str(self._calculate_trips_price(markup)),
+                    currency=money.Currency("EUR"),
+                ).protobuf(),
+                brand_name=brand,
+            )
+            for brand, markup in self._air_fare_classes
+        ]
+
+    def _get_rebate(self) -> float:
+        if self._is_round_trip():
+            return self._round_trip_rebate
+
+        return 1
+
+    def _is_round_trip(self) -> bool:
+        if len(self._trips) < 2:
+            return False
+
+        first_segments = self._trips[0].segments
+        last_segments = self._trips[-1].segments
+        first_leg = first_segments[0].legs[0]
+        last_leg = last_segments[-1].legs[-1]
+
+        return first_leg.origin.ref == last_leg.destination.ref
+
+    def _calculate_trips_price(self, markup: float) -> int:
+        return round(
+            sum(
+                self._calculate_segment_price(segment, markup)
+                for trip in self._trips
+                for segment in trip.segments
+            )
+            * self._get_rebate(),
+        )
+
+    def _calculate_segment_price(
+        self,
+        segment: trips_pb2.Segment,
+        markup: float,
+    ) -> float:
+        travel_time = protobuf.protobuf_to_datetime(
+            segment.legs[-1].arrival_at,
+        ) - protobuf.protobuf_to_datetime(segment.legs[0].departure_at)
+        base_price = (
+            self._air_base_cost
+            + (travel_time.total_seconds() * self._air_travel_cost)
+            ** self._air_base_modifier
+        )
+
+        return (
+            base_price * travel_time.total_seconds() ** self._air_fare_modifier * markup
+        )
+
+
 class Trips(object):
     def __init__(self, route_repository: RouteRepository):
         self._routes = route_repository
@@ -154,12 +231,8 @@ class Trips(object):
         )
 
         return [
-            trips_pb2.Result(
-                trips=[
-                    trips_pb2.Trip(
-                        segments=self._make_segments(route, departure_at),
-                    ),
-                ],
+            _generate_result_for_trips(
+                [trips_pb2.Trip(segments=_make_segments(route, departure_at))],
             )
             for route in routes
         ]
@@ -184,13 +257,13 @@ class Trips(object):
         )
 
         return [
-            trips_pb2.Result(
-                trips=[
+            _generate_result_for_trips(
+                [
                     trips_pb2.Trip(
-                        segments=self._make_segments(outbound_route, departure_at),
+                        segments=_make_segments(outbound_route, departure_at),
                     ),
                     trips_pb2.Trip(
-                        segments=self._make_segments(inbound_route[::-1], return_at),
+                        segments=_make_segments(inbound_route[::-1], return_at),
                     ),
                 ],
             )
@@ -216,68 +289,75 @@ class Trips(object):
             criteria_trips.append(
                 [
                     trips_pb2.Trip(
-                        segments=self._make_segments(route, departure_at),
+                        segments=_make_segments(route, departure_at),
                     )
                     for route in routes
                 ],
             )
 
         return [
-            trips_pb2.Result(
-                trips=trips,
-            )
+            _generate_result_for_trips(trips)
             for trips in itertools.product(*criteria_trips)
         ]
 
-    def _make_segments(
-        self,
-        route: Sequence[Stop],
-        departure_at: datetime.datetime,
-    ) -> list[trips_pb2.Segment]:
-        travel_time = FakeTravelTime(
-            departure_at=departure_at,
-            start=route[0],
+
+def _make_segments(
+    route: Sequence[Stop],
+    departure_at: datetime.datetime,
+) -> list[trips_pb2.Segment]:
+    travel_time = FakeTravelTime(
+        departure_at=departure_at,
+        start=route[0],
+    )
+
+    return [
+        _make_segment(
+            travel_time=travel_time,
+            origin=origin,
+            destination=destination,
         )
+        for origin, destination in itertools.pairwise(route)
+    ]
 
-        return [
-            self._make_segment(
-                travel_time=travel_time,
-                origin=origin,
-                destination=destination,
-            )
-            for origin, destination in itertools.pairwise(route)
-        ]
 
-    def _make_segment(
-        self,
-        travel_time: FakeTravelTime,
-        origin: Stop,
-        destination: Stop,
-    ) -> trips_pb2.Segment:
-        departure_at, arrival_at = travel_time.make_time_tuple(destination)
+def _make_segment(
+    travel_time: FakeTravelTime,
+    origin: Stop,
+    destination: Stop,
+) -> trips_pb2.Segment:
+    departure_at, arrival_at = travel_time.make_time_tuple(destination)
 
-        return trips_pb2.Segment(
-            legs=[
-                trips_pb2.Leg(
-                    origin=trips_pb2.Location(
-                        ref=origin.identifier,
-                        name=origin.name,
-                        coordinates=latlng_pb2.LatLng(
-                            latitude=origin.latitude,
-                            longitude=origin.longitude,
-                        ),
+    return trips_pb2.Segment(
+        legs=[
+            trips_pb2.Leg(
+                origin=trips_pb2.Location(
+                    ref=origin.identifier,
+                    name=origin.name,
+                    coordinates=latlng_pb2.LatLng(
+                        latitude=origin.latitude,
+                        longitude=origin.longitude,
                     ),
-                    destination=trips_pb2.Location(
-                        ref=destination.identifier,
-                        name=destination.name,
-                        coordinates=latlng_pb2.LatLng(
-                            latitude=destination.latitude,
-                            longitude=destination.longitude,
-                        ),
-                    ),
-                    departure_at=protobuf.datetime_to_protobuf_datetime(departure_at),
-                    arrival_at=protobuf.datetime_to_protobuf_datetime(arrival_at),
                 ),
-            ],
-            type=segment_type_pb2.SEGMENT_TYPE_FLIGHT,
-        )
+                destination=trips_pb2.Location(
+                    ref=destination.identifier,
+                    name=destination.name,
+                    coordinates=latlng_pb2.LatLng(
+                        latitude=destination.latitude,
+                        longitude=destination.longitude,
+                    ),
+                ),
+                departure_at=protobuf.datetime_to_protobuf_datetime(departure_at),
+                arrival_at=protobuf.datetime_to_protobuf_datetime(arrival_at),
+            ),
+        ],
+        type=segment_type_pb2.SEGMENT_TYPE_FLIGHT,
+    )
+
+
+def _generate_result_for_trips(
+    trips: Sequence[trips_pb2.Trip],
+) -> trips_pb2.Result:
+    return trips_pb2.Result(
+        trips=trips,
+        fares=FakeFareGenerator(trips).generate(),
+    )

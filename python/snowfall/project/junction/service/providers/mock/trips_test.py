@@ -1,11 +1,13 @@
 import datetime
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from typing import Any, cast
 
 import pytest
 
 from snowfall.project.junction.provider.v2alpha import trips_pb2
 from snowfall.project.junction.service.providers.mock import trips
+from snowfall.project.junction.v1 import segment_type_pb2
+from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence import filesystem
 
@@ -118,20 +120,26 @@ async def multi_city_response(
 
 
 class TestTrips(object):
-    def test_one_way_response_contains_results(
+    def test_one_way_contains_results(
         self,
         one_way_response: trips_pb2.SearchTripsResponse,
     ) -> None:
         assert len(one_way_response.results)
 
-    def test_round_trip_response_contains_power_of_results(
+    def test_one_way_contains_fares(
+        self,
+        one_way_response: trips_pb2.SearchTripsResponse,
+    ) -> None:
+        _assert_result_fares(one_way_response)
+
+    def test_round_trip_contains_power_of_results(
         self,
         round_trip_response: trips_pb2.SearchTripsResponse,
         one_way_response: trips_pb2.SearchTripsResponse,
     ) -> None:
         assert len(round_trip_response.results) == len(one_way_response.results) ** 2
 
-    def test_round_trip_response_contains_return_trip(
+    def test_round_trip_contains_return_trip(
         self,
         round_trip_response: trips_pb2.SearchTripsResponse,
     ) -> None:
@@ -142,13 +150,19 @@ class TestTrips(object):
             last_leg = last_inbound_segment.legs[-1]
             assert first_leg.origin.ref == last_leg.destination.ref
 
-    def test_multi_city_response_contains_trips(
+    def test_round_trip_contains_fares(
+        self,
+        round_trip_response: trips_pb2.SearchTripsResponse,
+    ) -> None:
+        _assert_result_fares(round_trip_response)
+
+    def test_multi_city_contains_trips(
         self,
         multi_city_response: trips_pb2.SearchTripsResponse,
     ) -> None:
         assert len(multi_city_response.results)
 
-    def test_multi_city_response_contains_all_criteria(
+    def test_multi_city_contains_all_criteria(
         self,
         multi_city_response: trips_pb2.SearchTripsResponse,
         multi_city_criteria: Sequence[trips_pb2.SearchTripsRequest.Criterion],
@@ -160,7 +174,7 @@ class TestTrips(object):
                 assert crit.origin_identifier == first_leg.origin.ref
                 assert crit.destination_identifier == last_leg.destination.ref
 
-    async def test_unknown_search_response_contains_no_trips(
+    async def test_unknown_search_contains_no_trips(
         self,
         trip_searcher: trips.Trips,
         passengers: Sequence[trips_pb2.SearchTripsRequest.Passenger],
@@ -183,6 +197,17 @@ class TestTrips(object):
         assert not len(response.results)
 
 
+def _assert_result_fares(response: trips_pb2.SearchTripsResponse) -> None:
+    for trip_result in response.results:
+        assert len(trip_result.fares), "Results should have fares"
+
+        for fare in trip_result.fares:
+            assert fare.reference, "Fare should have a reference"
+            price = money.from_protobuf(fare.price)
+            assert price.amount, "Fare should have a price"
+            assert fare.brand_name, "Fare should have a brand name"
+
+
 def _generate_criterion(
     origin: str = "ARN",
     destination: str = "LAX",
@@ -195,3 +220,77 @@ def _generate_criterion(
             departure_date or datetime.date(year=2023, month=9, day=6),
         ),
     )
+
+
+def _generate_mock_trip(
+    duration: datetime.timedelta,
+) -> trips_pb2.Trip:
+    departure_at = datetime.datetime(
+        year=2023,
+        month=9,
+        day=13,
+        hour=8,
+        tzinfo=datetime.UTC,
+    )
+    arrival_at = departure_at + duration
+
+    return trips_pb2.Trip(
+        segments=[
+            trips_pb2.Segment(
+                legs=[
+                    trips_pb2.Leg(
+                        departure_at=protobuf.datetime_to_protobuf_datetime(
+                            departure_at,
+                        ),
+                        arrival_at=protobuf.datetime_to_protobuf_datetime(arrival_at),
+                    ),
+                ],
+                type=segment_type_pb2.SEGMENT_TYPE_FLIGHT,
+            ),
+        ],
+    )
+
+
+class TestFarePrices(object):
+    @pytest.mark.parametrize(
+        ("fake_trips", "expected"),
+        [
+            (
+                [_generate_mock_trip(duration=datetime.timedelta(hours=2, minutes=40))],
+                {
+                    "Basic": (140, 150),
+                    "Premium": (195, 210),
+                    "Business": (350, 400),
+                },
+            ),
+            (
+                [_generate_mock_trip(duration=datetime.timedelta(hours=9, minutes=5))],
+                {
+                    "Basic": (1500, 1700),
+                    "Premium": (2300, 2400),
+                    "Business": (4300, 4500),
+                },
+            ),
+        ],
+    )
+    def test_prices_in_expected_range(
+        self,
+        fake_trips: Sequence[trips_pb2.Trip],
+        expected: Mapping[str, tuple[int, int]],
+    ) -> None:
+        fares = {
+            fare.brand_name: money.from_protobuf(fare.price)
+            for fare in trips.FakeFareGenerator(fake_trips).generate()
+        }
+
+        for brand, price in fares.items():
+            lower_limit = expected[brand][0]
+            upper_limit = expected[brand][1]
+            assert (
+                lower_limit <= float(str(price)) <= upper_limit
+            ), "Brand {0} price {1} not within range {2}-{3}".format(
+                brand,
+                str(price),
+                lower_limit,
+                upper_limit,
+            )
