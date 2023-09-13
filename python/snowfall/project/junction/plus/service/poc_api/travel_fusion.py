@@ -67,12 +67,16 @@ def json2xml(
         return "\n".join([json2xml(sub_elem, line_padding) for sub_elem in json_obj])
 
     if isinstance(json_obj, dict):
-        result_list = []
+        result_list: list[str] = []
 
         for tag_name, sub_obj in json_obj.items():
-            result_list.append("{0}<{1}>".format(line_padding, tag_name))
-            result_list.append(json2xml(sub_obj, line_padding))
-            result_list.append("{0}</{1}>".format(line_padding, tag_name))
+            result_list.extend(
+                (
+                    "{0}<{1}>".format(line_padding, tag_name),
+                    json2xml(sub_obj, line_padding),
+                    "{0}</{1}>".format(line_padding, tag_name),
+                ),
+            )
 
         return "".join(result_list)
 

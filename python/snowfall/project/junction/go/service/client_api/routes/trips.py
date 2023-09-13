@@ -372,16 +372,16 @@ class TripCandidateSearches(object):
         coordinate_pairs: list[tuple[float, float]] = []
 
         for single_criteria in criteria:
-            coordinate_pairs.append(
+            coordinate_pairs.extend(
                 (
-                    single_criteria["origin"]["latitude"],
-                    single_criteria["origin"]["longitude"],
-                ),
-            )
-            coordinate_pairs.append(
-                (
-                    single_criteria["destination"]["latitude"],
-                    single_criteria["destination"]["longitude"],
+                    (
+                        single_criteria["origin"]["latitude"],
+                        single_criteria["origin"]["longitude"],
+                    ),
+                    (
+                        single_criteria["destination"]["latitude"],
+                        single_criteria["destination"]["longitude"],
+                    ),
                 ),
             )
 
