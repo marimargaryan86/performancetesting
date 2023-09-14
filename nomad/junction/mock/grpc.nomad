@@ -70,7 +70,7 @@ job "mock-grpc" {
     }
 
     service {
-      name = "mock-${var.environment}"
+      name = "${JOB}-${var.environment}"
       port = "grpc"
       tags = ["grpc"]
 
