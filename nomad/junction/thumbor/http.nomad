@@ -86,7 +86,7 @@ EOH
       }
 
       config {
-        image = "git.snowfall.se:4567/devops/thumbor:latest"
+        image = "git.snowfall.se:4567/devops/thumbor:3cf9d573c9ec321629163ab0ff90f4d92741162e"
         ports = ["http"]
 
         auth {
@@ -118,3 +118,4 @@ EOH
     }
   }
 }
+
