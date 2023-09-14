@@ -42,7 +42,7 @@
   import { browser } from "$app/environment";
   import { page } from "$app/stores";
   import { onDestroy } from "svelte";
-  import { callAction, sleep } from "utils/common";
+  import { callAction } from "utils/common";
   import { loadStripe, type Stripe, type Appearance, type StripeElements } from "@stripe/stripe-js";
   import { env } from "$env/dynamic/public";
   import { goto } from "$app/navigation";
@@ -50,23 +50,32 @@
   import { URLExtended } from "utils/url";
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import { pendableCall } from "utils/pendable-call";
+  import { pollableCall } from "utils/pollable-call";
 
   export let data;
 
-  let priceQuoteId: string | undefined = data.priceQuote.id;
   let stripe: Stripe | undefined = undefined;
   let stripeElements: StripeElements | undefined = undefined;
   let stripeContainer: HTMLDivElement | undefined = undefined;
   let termsAccepted = false;
 
+  $: priceQuoteId = data.priceQuote.id;
   $: clientSecret = data.searchData.paymentIntent?.clientSecret;
   $: backUrl = getBackUrl(data.searchData);
-  $: priceQuoteId = data.priceQuote.id;
-  $: if (browser && priceQuoteId) {
-    pollPriceQuote(priceQuoteId);
+  $: if (browser) {
+    pollPriceQuote(priceQuoteId).then(updateData);
   }
   $: if (browser && clientSecret) {
     createStripe(clientSecret);
+  }
+
+  function updateData(value?: ActionPollReturnType): void {
+    if (!value) {
+      return;
+    }
+
+    data.searchData.paymentIntent = value.paymentIntent;
+    data.priceQuote = value.priceQuote;
   }
 
   async function createStripe(nextClientSecret: string): Promise<void> {
@@ -94,33 +103,31 @@
     });
   }
 
-  async function pollPriceQuote(id: string): Promise<void> {
-    if (priceQuoteId !== id || data.priceQuote.status === "completed") {
-      return;
-    }
+  const { poll: pollPriceQuote, cancel: cancelPolling } = pollableCall({
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    func(_: string) {
+      return callAction<ActionPollReturnType>({
+        action: routeConfig.tripManagement.book.payment.actions.poll,
+        apply: false,
+      });
+    },
+    check(result) {
+      if (
+        result.type !== "success" ||
+        result.data?.priceQuote.status === "unspecified" ||
+        result.data?.priceQuote.status === "failed"
+      ) {
+        return { status: "done", data: undefined };
+      }
 
-    const result = await callAction<ActionPollReturnType>({
-      action: routeConfig.tripManagement.book.payment.actions.poll,
-      apply: false,
-    });
+      if (result.data?.priceQuote.status === "completed") {
+        return { status: "done", data: result.data };
+      }
 
-    if (
-      result.type !== "success" ||
-      result.data?.priceQuote.status === "unspecified" ||
-      result.data?.priceQuote.status === "failed"
-    ) {
-      return;
-    }
-
-    if (result.data?.priceQuote.status !== "completed") {
-      await sleep(2000);
-
-      return pollPriceQuote(id);
-    }
-
-    data.priceQuote = result.data.priceQuote;
-    data.searchData.paymentIntent = result.data.paymentIntent;
-  }
+      return { status: "pending" };
+    },
+    sleepMs: 2000,
+  });
 
   const { pending, func: pay } = pendableCall(async () => {
     if (!data.priceQuote.price || !stripe || !clientSecret || !stripeElements) {
@@ -142,7 +149,7 @@
     await goto(routeConfig.tripManagement.book.passengerDetails.root);
   });
 
-  onDestroy(() => (priceQuoteId = undefined));
+  onDestroy(cancelPolling);
 </script>
 
 <svelte:head>

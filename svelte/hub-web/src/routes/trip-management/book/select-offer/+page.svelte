@@ -2,14 +2,13 @@
   import TripSearch, { type PartialTripSearchData } from "../trip-search/trip-search.svelte";
   import SearchOptions, { type SearchOptionsData } from "./search-options.svelte";
   import Offer from "./offer/offer.svelte";
-  import { callAction, sleep } from "utils/common";
+  import { callAction } from "utils/common";
   import routeConfig from "routeConfig";
   import { goto } from "$app/navigation";
   import Button from "components/ui/button.svelte";
   import { fade } from "svelte/transition";
   import { browser } from "$app/environment";
   import { onDestroy } from "svelte";
-  import type { MaybePromise } from "@sveltejs/kit";
   import Countdown from "../countdown.svelte";
   import LoadingSkelton from "./loading-skelton.svelte";
   import type { ResolvedSearchData } from "../common";
@@ -18,11 +17,11 @@
   import type { OfferModel } from "integration/junction-mobile-api/schemas/offer";
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import { pendableCall } from "utils/pendable-call";
+  import { pollableCall } from "utils/pollable-call";
 
   export let data;
 
   let countdown: Countdown | undefined;
-  let getOffersTask: MaybePromise<OfferModel[]> = [];
   let searchData = getSearchData(data.searchData);
   let searchOptions: SearchOptionsData = {
     sortBy: "price",
@@ -32,19 +31,12 @@
     duration: 492,
     operators: [0, 1, 2],
   };
-  let searchRetries = 0;
   let selected = data.selectedOffer;
 
-  $: tripCandidatesSearchId = data.searchData.tripCandidatesSearch?.id;
-  $: if (browser && tripCandidatesSearchId) {
-    beginPoll(tripCandidatesSearchId);
-  }
-
-  function beginPoll(id: string): void {
-    searchRetries = 0;
-    countdown?.close();
-    getOffersTask = pollOffers(id);
-  }
+  $: offersTask =
+    browser && data.searchData.tripCandidatesSearch?.id
+      ? pollOffers(data.searchData.tripCandidatesSearch.id)
+      : undefined;
 
   function getSearchData(nextSearchData: ResolvedSearchData): PartialTripSearchData {
     return {
@@ -55,44 +47,39 @@
     };
   }
 
-  async function pollOffers(id: string): Promise<OfferModel[]> {
-    if (tripCandidatesSearchId !== id) {
-      return [];
-    }
-
-    const result = await callAction<{
-      status: z.infer<typeof resourceStatus>;
-      offers: OfferModel[];
-    }>({
-      action: routeConfig.tripManagement.book.select.actions.poll,
-      data: { tripCandidatesSearchId: id },
-      apply: false,
-    });
-
-    if (result.type !== "success") {
-      return [];
-    }
-
-    if (result.data?.status === "unspecified" || result.data?.status === "failed") {
-      return [];
-    }
-
-    if (result.data?.status === "completed") {
-      if (result.data.offers.length) {
-        countdown?.open();
+  const { poll: pollOffers, cancel: cancelPolling } = pollableCall({
+    func(id: string) {
+      return callAction<{
+        status: z.infer<typeof resourceStatus>;
+        offers: OfferModel[];
+      }>({
+        action: routeConfig.tripManagement.book.select.actions.poll,
+        data: { tripCandidatesSearchId: id },
+        apply: false,
+      });
+    },
+    check(result) {
+      if (
+        result.type !== "success" ||
+        result.data?.status === "unspecified" ||
+        result.data?.status === "failed"
+      ) {
+        return { status: "done", data: [] };
       }
 
-      if (result.data.offers.length || searchRetries >= 3) {
-        return result.data.offers;
+      if (result.data?.status === "completed") {
+        if (result.data.offers.length) {
+          countdown?.open();
+        }
+
+        return { status: result.data.offers.length ? "done" : "retry", data: result.data.offers };
       }
 
-      searchRetries++;
-    }
-
-    await sleep(2000);
-
-    return pollOffers(id);
-  }
+      return { status: "pending" };
+    },
+    sleepMs: 2000,
+    retries: 3,
+  });
 
   function select(event: CustomEvent<{ offerId: string; optionIds: string[] }>): void {
     selected = event.detail;
@@ -111,7 +98,7 @@
     await goto(routeConfig.tripManagement.book.payment.root);
   });
 
-  onDestroy(() => (tripCandidatesSearchId = undefined));
+  onDestroy(cancelPolling);
 </script>
 
 <svelte:head>
@@ -131,25 +118,31 @@
     <SearchOptions bind:data={searchOptions} />
 
     <ul class="offer-result">
-      {#await getOffersTask}
-        <li><LoadingSkelton /></li>
+      {#await offersTask}
         <li><LoadingSkelton /></li>
         <li><LoadingSkelton /></li>
         <li><LoadingSkelton /></li>
         <li><LoadingSkelton /></li>
       {:then offers}
-        {#each offers as offer}
-          <li>
-            <Offer
-              {offer}
-              selected={selected?.offerId === offer.id}
-              selectedOptionIds={selected?.offerId === offer.id ? selected.optionIds : undefined}
-              on:select={select}
-            />
-          </li>
+        {#if offers?.length}
+          {#each offers as offer}
+            <li>
+              <Offer
+                {offer}
+                selected={selected?.offerId === offer.id}
+                selectedOptionIds={selected?.offerId === offer.id ? selected.optionIds : undefined}
+                on:select={select}
+              />
+            </li>
+          {:else}
+            <li class="no-result">No trips found</li>
+          {/each}
         {:else}
-          <li class="no-result">No trips found</li>
-        {/each}
+          <li><LoadingSkelton /></li>
+          <li><LoadingSkelton /></li>
+          <li><LoadingSkelton /></li>
+          <li><LoadingSkelton /></li>
+        {/if}
       {/await}
     </ul>
   </div>

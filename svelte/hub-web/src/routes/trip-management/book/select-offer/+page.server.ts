@@ -1,10 +1,42 @@
 import { redirect } from "@sveltejs/kit";
-import { getSearchData, parsePassengers, setSearchData, type ResolvedSearchData } from "../common";
+import {
+  getSearchData,
+  parsePassengers,
+  setSearchData,
+  type ResolvedSearchData,
+  type SearchData,
+} from "../common";
 import integrationInstances from "integration-instances";
 import type { resourceStatus } from "integration/junction-mobile-api/schemas/common";
 import type { z } from "zod";
 import type { OfferModel } from "integration/junction-mobile-api/schemas/offer";
 import routeConfig from "routeConfig";
+import type { TripCandidatesSearchModel } from "integration/junction-mobile-api/schemas/trip";
+import type { PlaceModel } from "integration/junction-mobile-api/schemas/place";
+
+function getTripCandidatesSearch(
+  searchData: SearchData,
+  origin: PlaceModel,
+  destination: PlaceModel,
+): Promise<TripCandidatesSearchModel> {
+  // prettier-ignore
+  return searchData.tripCandidatesSearchId
+    ? integrationInstances.junctionMobileApi.trips.getTripCandidatesSearch(
+      searchData.tripCandidatesSearchId,
+    )
+    : integrationInstances.junctionMobileApi.trips.createTripCandidatesSearch({
+      sessionToken: searchData.sessionToken,
+      criteria: [
+        {
+          departureAfter: searchData.departureAfter,
+          origin: origin.coordinates,
+          destination: destination.coordinates,
+        },
+      ],
+      passengers: parsePassengers(searchData.passengers),
+      allowedLegTypeIds: ["rail"],
+    });
+}
 
 export async function load(event): Promise<{
   searchData: ResolvedSearchData;
@@ -23,40 +55,30 @@ export async function load(event): Promise<{
     integrationInstances.junctionMobileApi.places.getPlace(searchData.destinationId),
   ]);
 
-  // prettier-ignore
-  const tripCandidatesSearch = await (searchData.tripCandidatesSearchId
-    ? integrationInstances.junctionMobileApi.trips.getTripCandidatesSearch(
-      searchData.tripCandidatesSearchId,
-    )
-    : integrationInstances.junctionMobileApi.trips.createTripCandidatesSearch({
-      sessionToken: searchData.sessionToken,
-      criteria: [
-        {
-          departureAfter: searchData.departureAfter,
-          origin: origin.coordinates,
-          destination: destination.coordinates,
-        },
-      ],
-      passengers: parsePassengers(searchData.passengers),
-      allowedLegTypeIds: ["rail"],
-    }));
+  try {
+    const tripCandidatesSearch = await getTripCandidatesSearch(searchData, origin, destination);
 
-  setSearchData({ ...searchData, tripCandidatesSearchId: tripCandidatesSearch.id }, event);
+    setSearchData({ ...searchData, tripCandidatesSearchId: tripCandidatesSearch.id }, event);
 
-  return {
-    searchData: {
-      sessionToken: searchData.sessionToken,
-      origin,
-      destination,
-      departureAfter: searchData.departureAfter,
-      passengers: searchData.passengers,
-      tripCandidatesSearch,
-    },
-    selectedOffer:
-      searchData.offerId && searchData.optionIds
-        ? { offerId: searchData.offerId, optionIds: searchData.optionIds }
-        : undefined,
-  };
+    return {
+      searchData: {
+        sessionToken: searchData.sessionToken,
+        origin,
+        destination,
+        departureAfter: searchData.departureAfter,
+        passengers: searchData.passengers,
+        tripCandidatesSearch,
+      },
+      selectedOffer:
+        searchData.offerId && searchData.optionIds
+          ? { offerId: searchData.offerId, optionIds: searchData.optionIds }
+          : undefined,
+    };
+  } catch {
+    setSearchData(undefined, event);
+  }
+
+  throw redirect(303, routeConfig.tripManagement.book.root);
 }
 
 export const actions = {
