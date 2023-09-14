@@ -257,7 +257,7 @@ async def travel_assistant(
 ) -> Sequence[str]:
     session = redis_client.hash_("ai_assistant_state")
     ai_chat_history = [
-        {"role": "system", "content": ai_bot.system_setup},
+        {"role": "system", "content": ai_bot.generate_system_setup()},
         {"role": "assistant", "content": ai_bot.initial_message},
     ]
     state = {
