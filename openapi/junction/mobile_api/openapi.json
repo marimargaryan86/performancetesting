@@ -1001,7 +1001,78 @@
       }
     },
     "/trips/searches/{tripSearchId}/trips": {
-      "$ref": "./../client_api/openapi.json#/paths/~1trips~1searches~1{tripSearchId}~1trips"
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/tripSearchId"
+        },
+        {
+          "$ref": "#/components/parameters/tripInclude"
+        }
+      ],
+      "get": {
+        "x-sunset": "2023-09-01",
+        "summary": "List Trips by Trip Search",
+        "tags": [
+          "trips"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "minItems": 0,
+                          "items": {
+                            "$ref": "#/components/schemas/Trip"
+                          }
+                        },
+                        "included": {
+                          "$ref": "#/components/schemas/TripIncluded"
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-trips-searches-id-trips",
+        "description": "Used to retrieve all Trip results for a Trip Search.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/tripSort"
+          },
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ]
+      }
     },
     "/trip-candidates/searches": {
       "$ref": "./../client_api/openapi.json#/paths/~1trip-candidates~1searches"
@@ -2260,6 +2331,17 @@
         "description": "Unique session token that follows the flow until order creation. Used for rate and offer caching.",
         "deprecated": true
       },
+      "tripSearchId": {
+        "name": "tripSearchId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+        },
+        "description": "Trip Search identifier"
+      },
       "paymentIntentId": {
         "name": "paymentIntentId",
         "in": "path",
@@ -2369,6 +2451,45 @@
           ]
         },
         "description": "Customize which related resources to return.",
+        "style": "form",
+        "explode": false
+      },
+
+      "tripInclude": {
+        "name": "include",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "segments",
+              "segments.legs",
+              "segments.legs.legType"
+            ]
+          },
+          "example": [
+            "segments"
+          ]
+        },
+        "description": "Customize which related resources to return.",
+        "style": "form",
+        "explode": false
+      },
+      "tripSort": {
+        "name": "sort",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "id"
+          ],
+          "example": "id",
+          "default": "id"
+        },
+        "description": "Customize which field(s) to sort the trips by.",
         "style": "form",
         "explode": false
       },
@@ -4139,6 +4260,31 @@
           "type"
         ]
       },
+      "TripIncluded": {
+        "title": "TripIncluded",
+        "type": "array",
+        "items": {
+          "oneOf": [
+            {
+              "$ref": "#/components/schemas/Segment"
+            },
+            {
+              "$ref": "#/components/schemas/Leg"
+            },
+            {
+              "$ref": "#/components/schemas/LegType"
+            }
+          ],
+          "discriminator": {
+            "propertyName": "type",
+            "mapping": {
+              "segments": "#/components/schemas/Segment",
+              "legs": "#/components/schemas/Leg",
+              "leg-types": "#/components/schemas/LegType"
+            }
+          }
+        }
+      },
       "TripOfferOptionPenaltyBaggageAllowance": {
         "title": "Trip Offer Option Penalty Baggage Allowance",
         "type": "object",
@@ -4630,6 +4776,145 @@
           "type",
           "attributes"
         ]
+      },
+      "Trip": {
+        "title": "Trip",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "format": "uuid",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "trips"
+                ],
+                "example": "trips"
+              },
+              "attributes": {
+                "type": "object"
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "segments"
+                ],
+                "properties": {
+                  "segments": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/SegmentIdentifier"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes",
+              "relationships"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ],
+        "description": "Sequenced container of Segments."
+      },
+      "Leg": {
+        "title": "Leg",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "legs"
+                ],
+                "example": "legs"
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "departureAt",
+                  "arrivalAt",
+                  "origin",
+                  "destination"
+                ],
+                "properties": {
+                  "departureAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z",
+                    "readOnly": true
+                  },
+                  "arrivalAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z",
+                    "readOnly": true
+                  },
+                  "origin": {
+                    "$ref": "#/components/schemas/Point"
+                  },
+                  "destination": {
+                    "$ref": "#/components/schemas/Point"
+                  }
+                }
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "legType"
+                ],
+                "properties": {
+                  "legType": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/LegTypeIdentifier"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes",
+              "relationships"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ],
+        "description": "Smallest part of a Trip; A scheduled departure from A and a scheduled arrival to B."
       },
       "Price": {
         "title": "Price",
@@ -5315,6 +5600,122 @@
         },
         "required": [
           "links"
+        ]
+      },
+      "LegIdentifier": {
+        "title": "Leg Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "legs"
+            ],
+            "example": "legs"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "Segment": {
+        "title": "Segment",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "segments"
+                ],
+                "example": "segments"
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "operator"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "BA1"
+                  },
+                  "operator": {
+                    "type": "string",
+                    "example": "BA"
+                  }
+                }
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "legs"
+                ],
+                "properties": {
+                  "legs": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/LegIdentifier"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes",
+              "relationships"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ],
+        "description": "Sequenced collection of Legs with a common equipment."
+      },
+      "SegmentIdentifier": {
+        "title": "Segment Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "segments"
+            ],
+            "example": "segments"
+          }
+        },
+        "required": [
+          "id",
+          "type"
         ]
       },
       "LoyaltyProgramUserProfile": {
