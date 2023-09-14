@@ -22,13 +22,30 @@ class Client(abc.ABC):
     ) -> notifications_models_pb2.ConfigurationVector:
         """Get Reseller configuration vector."""
 
+    @abc.abstractmethod
+    async def create(
+        self,
+        configuration_vector: notifications_models_pb2.ConfigurationVector,
+    ) -> notifications_models_pb2.ConfigurationVector:
+        """Create Reseller configuration vector."""
+
+    @abc.abstractmethod
+    async def update(
+        self,
+        configuration_vector: notifications_models_pb2.ConfigurationVector,
+    ) -> None:
+        """Update Reseller configuration vector."""
+
 
 class DictClient(Client):
     def __init__(
         self,
         configuration_vectors: Sequence[notifications_models_pb2.ConfigurationVector],
     ) -> None:
-        self._configuration_vectors = configuration_vectors
+        self._configuration_vectors_id = {
+            configuration_vector.id: configuration_vector
+            for configuration_vector in configuration_vectors
+        }
 
     async def get(
         self,
@@ -39,7 +56,7 @@ class DictClient(Client):
             configuration_vector = next(
                 filter(
                     lambda cv: cv.reseller_id == identifier,
-                    self._configuration_vectors,
+                    self._configuration_vectors_id.values(),
                 ),
                 None,
             )
@@ -47,7 +64,7 @@ class DictClient(Client):
             configuration_vector = next(
                 filter(
                     lambda cv: cv.mobile_phone.e164_number == identifier,  # type: ignore[arg-type, union-attr]
-                    self._configuration_vectors,
+                    self._configuration_vectors_id.values(),
                 ),
                 None,
             )
@@ -56,6 +73,19 @@ class DictClient(Client):
             raise errors.NotFoundError()
 
         return configuration_vector
+
+    async def create(
+        self,
+        configuration_vector: notifications_models_pb2.ConfigurationVector,
+    ) -> notifications_models_pb2.ConfigurationVector:
+        self._configuration_vectors_id[configuration_vector.id] = configuration_vector
+        return configuration_vector
+
+    async def update(
+        self,
+        configuration_vector: notifications_models_pb2.ConfigurationVector,
+    ) -> None:
+        self._configuration_vectors_id[configuration_vector.id] = configuration_vector
 
 
 class GrpcClient(Client):
@@ -84,3 +114,36 @@ class GrpcClient(Client):
         )
 
         return response.configuration_vector
+
+    async def create(
+        self,
+        configuration_vector: notifications_models_pb2.ConfigurationVector,
+    ) -> notifications_models_pb2.ConfigurationVector:
+        request = notifications_grpc_pb2.CreateConfigurationVectorRequest(
+            configuration_vector=configuration_vector,
+        )
+        response = await errors.handle_grpc_errors(
+            self._configuration_vectors.CreateConfigurationVector(
+                request,
+                timeout=self._timeout,
+            ),
+        )
+
+        return response.configuration_vector
+
+    async def update(
+        self,
+        configuration_vector: notifications_models_pb2.ConfigurationVector,
+    ) -> None:
+        request = notifications_grpc_pb2.UpdateConfigurationVectorRequest(
+            configuration_vector=configuration_vector,
+        )
+        response = await errors.handle_grpc_errors(
+            self._configuration_vectors.UpdateConfigurationVector(
+                request,
+                timeout=self._timeout,
+            ),
+        )
+
+        if not response.is_success:
+            raise errors.UnprocessableEntityError()

@@ -195,6 +195,28 @@ class ConfigurationVectorService(
             configuration_vector=configuration_vector,
         )
 
+    async def CreateConfigurationVector(  # type: ignore[override] # noqa: N802
+        self,
+        request: notifications_pb2.CreateConfigurationVectorRequest,
+        context: aio.ServicerContext,
+    ) -> notifications_pb2.CreateConfigurationVectorResponse:
+        await self._configuration_vectors.insert(request.configuration_vector)
+        return notifications_pb2.CreateConfigurationVectorResponse(
+            configuration_vector=request.configuration_vector,
+        )
+
+    async def UpdateConfigurationVector(  # type: ignore[override] # noqa: N802
+        self,
+        request: notifications_pb2.UpdateConfigurationVectorRequest,
+        context: aio.ServicerContext,
+    ) -> notifications_pb2.UpdateConfigurationVectorResponse:
+        update_status = await self._configuration_vectors.update(
+            request.configuration_vector,
+        )
+        return notifications_pb2.UpdateConfigurationVectorResponse(
+            is_success=update_status,
+        )
+
 
 class MonitoringRuleService(
     service.Service,

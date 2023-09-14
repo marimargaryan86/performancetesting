@@ -152,12 +152,32 @@ class SubscriberRepository(
         return update.matched_count
 
 
-class ConfigurationVectorRepository(
+class ConfigurationVectorRepository(  # noqa: WPS215
     mixins.FindByIdMixin[models_pb2.ConfigurationVector],
+    mixins.InsertMixin[models_pb2.ConfigurationVector],
     repository.ProtoRepository[models_pb2.ConfigurationVector],
 ):
     _proto = models_pb2.ConfigurationVector
     _indexes = (pymongo.IndexModel("reseller_id", background=True),)
+
+    async def update(
+        self,
+        configuration_vector: models_pb2.ConfigurationVector,
+    ) -> bool:
+        replacement = self._coder.encode(configuration_vector)
+        replacement.pop("_id")
+
+        update: pymongo.results.UpdateResult = await self._execute(
+            self._collection.update_one,
+            {"_id": configuration_vector.id},
+            {"$set": replacement},
+            upsert=False,
+        )
+
+        if not update.acknowledged:
+            raise RuntimeError()
+
+        return update.acknowledged
 
 
 class MonitoringRuleRepository(  # noqa: WPS215

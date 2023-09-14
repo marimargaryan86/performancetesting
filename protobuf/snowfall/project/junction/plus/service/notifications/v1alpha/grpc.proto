@@ -21,6 +21,8 @@ service SubscriberService {
 
 service ConfigurationVectorService {
   rpc GetConfigurationVector(GetConfigurationVectorRequest) returns (GetConfigurationVectorResponse) {}
+  rpc CreateConfigurationVector(CreateConfigurationVectorRequest) returns (CreateConfigurationVectorResponse) {}
+  rpc UpdateConfigurationVector(UpdateConfigurationVectorRequest) returns (UpdateConfigurationVectorResponse) {}
 }
 
 service MonitoringRuleService {
@@ -104,6 +106,22 @@ message GetConfigurationVectorRequest {
 
 message GetConfigurationVectorResponse {
   snowfall.project.junction.plus.service.notifications.v1alpha.ConfigurationVector configuration_vector = 1;
+}
+
+message CreateConfigurationVectorRequest {
+  snowfall.project.junction.plus.service.notifications.v1alpha.ConfigurationVector configuration_vector = 1;
+}
+
+message CreateConfigurationVectorResponse {
+  snowfall.project.junction.plus.service.notifications.v1alpha.ConfigurationVector configuration_vector = 1;
+}
+
+message UpdateConfigurationVectorRequest {
+  snowfall.project.junction.plus.service.notifications.v1alpha.ConfigurationVector configuration_vector = 1;
+}
+
+message UpdateConfigurationVectorResponse {
+  bool is_success = 1;
 }
 
 message GetMonitoringRuleRequest {
