@@ -102,8 +102,9 @@ directferries:
   - name: mongo:latest
   variables:
     MONGODSN: $MONGODSN_IMPORT
+    IMPORT_PREFIX: $PREFIX
   script:
-  - docker run -u "${UID}" --rm -v "$(pwd)/:/data" -e AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" -e AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" amazon/aws-cli s3 cp "s3://junction-schedules-export/PipelineData/$PREFIX-data-import.tar.gz" /data/data-import.tar.gz --no-progress
+  - docker run -u "${UID}" --rm -v "$(pwd)/:/data" -e AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" -e AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" amazon/aws-cli s3 cp "s3://junction-schedules-export/PipelineData/$IMPORT_PREFIX-data-import.tar.gz" /data/data-import.tar.gz --no-progress
   - tar -xzf data-import.tar.gz
   - if [ "$(cat data-import/pipeline-id)" != "${CI_PIPELINE_ID}" ]; then exit 1; fi
   - curl https://fastdl.mongodb.org/tools/db/mongodb-database-tools-debian11-x86_64-100.6.1.deb --output mongodb.deb
@@ -240,7 +241,7 @@ import-to-sandbox:
   stage: dev-deploy
   needs: ["dev-import"]
   variables:
-    PREFIX: "development"  # Use import artifact from dev job.
+    IMPORT_PREFIX: "development"  # Use import artifact from dev job.
 
 deploy-in-sandbox:
   extends: [".deploy-in-server", ".sandbox"]
