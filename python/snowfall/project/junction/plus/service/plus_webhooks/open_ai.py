@@ -110,11 +110,11 @@ class AIBot(object):
             temperature=0.2,  # noqa: WPS432
         )
         assistant_message = ai_response["choices"][0]["message"].to_dict()
-        assistant_arguments = json.loads(
-            assistant_message["function_call"]["arguments"],
-        )
         if assistant_message.get("function_call"):
             function_name = assistant_message["function_call"]["name"]
+            assistant_arguments = json.loads(
+                assistant_message["function_call"]["arguments"],
+            )
             return {
                 "content": self.available_functions[function_name](
                     **assistant_arguments,
