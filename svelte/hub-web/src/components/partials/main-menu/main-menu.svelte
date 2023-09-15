@@ -6,6 +6,7 @@
   import Menu from "./menu.svelte";
   import HubLogo from "components/icons/hub-logo.svelte";
   import SettingsIcon from "components/icons/settings-icon.svelte";
+  import InformationIcon from "components/icons/information-icon.svelte";
   import { page } from "$app/stores";
   import routeConfig from "routeConfig";
   import { callAction } from "utils/common";
@@ -36,24 +37,44 @@
 
   <hr />
 
-  <a
-    class="settings typography body-medium"
-    title={expanded ? undefined : "Settings"}
-    href={routeConfig.settings}
-    class:active={$page.url.pathname === routeConfig.settings}
-  >
-    <SettingsIcon color="var(--color-common-light-strong)" variant="cog" />
-    <span>Settings</span>
-  </a>
-
-  <button
-    class="logout typography body-medium"
-    title={expanded ? undefined : "Logout"}
-    on:click={logout}
-  >
-    <LogoutIcon color="var(--color-common-light-strong)" />
-    <span>Logout</span>
-  </button>
+  <ul>
+    <li>
+      <a
+        class="link typography body-medium"
+        title={expanded ? undefined : "Settings"}
+        href={routeConfig.settings}
+        class:active={$page.url.pathname === routeConfig.settings}
+      >
+        <SettingsIcon color="var(--color-common-light-strong)" variant="cog" />
+        <span>Settings</span>
+      </a>
+    </li>
+    <li>
+      <a
+        class="link typography body-medium"
+        title={expanded ? undefined : "Help"}
+        href={routeConfig.help.privacyPolicy.root}
+        class:active={$page.url.pathname.includes("help")}
+      >
+        <InformationIcon
+          color="var({$page.url.pathname.includes('help')
+            ? '--color-main-primary-500'
+            : '--color-common-light-strong'})"
+        />
+        <span>Help</span>
+      </a>
+    </li>
+    <li>
+      <button
+        class="logout typography body-medium"
+        title={expanded ? undefined : "Logout"}
+        on:click={logout}
+      >
+        <LogoutIcon color="var(--color-common-light-strong)" />
+        <span>Logout</span>
+      </button>
+    </li>
+  </ul>
 
   <Account {user} {expanded} {transitionTimeMs} />
 </nav>
@@ -109,7 +130,8 @@
     opacity: 1;
   }
 
-  .logout > span {
+  .logout > span,
+  .link > span {
     transition: opacity var(--transition-time) ease;
   }
 
@@ -131,12 +153,8 @@
     border-bottom-width: 1px;
   }
 
-  .logout {
-    margin-top: -16px;
-  }
-
   .logout,
-  .settings {
+  .link {
     display: flex;
     gap: 8px;
     align-items: center;
@@ -154,12 +172,12 @@
   }
 
   .logout > :global(svg),
-  .settings > :global(svg) {
+  .link > :global(svg) {
     flex-shrink: 0;
   }
 
-  .main-menu:not(.expanded) > .logout > span,
-  .main-menu:not(.expanded) > .settings > span {
+  .main-menu:not(.expanded) .logout > span,
+  .main-menu:not(.expanded) .link > span {
     opacity: 0;
   }
 

@@ -175,9 +175,10 @@
         <Checkbox id="toc" bind:checked={termsAccepted} />
         <span>
           By booking your ticket you accept Snowfall’s
-          <a href="/">T&amp;Cs</a>, the <a href="/">carrier’s conditions of carriage</a>
+          <a href={routeConfig.help.termsAndConditions.root} target="_blank">T&amp;Cs</a>, the
+          <a href="/">carrier’s conditions of carriage</a>
           and
-          <a href="/">privacy policy</a>.
+          <a href={routeConfig.help.privacyPolicy.root} target="_blank">privacy policy</a>.
         </span>
       </label>
     </div>

@@ -23,6 +23,12 @@ function tripManagementOrdersOrder<TID extends string>(
 }
 // Login
 const loginRoot = "/login" as const;
+// Help
+const helpRoot = "/help" as const;
+const helpPrivacyPolcy = `${helpRoot}/privacy-policy` as const;
+const helpTermsAndConditions = `${helpRoot}/terms-and-conditions` as const;
+const helpCookies = `${helpRoot}/cookies` as const;
+const helpCustomerService = `${helpRoot}/customer-service` as const;
 // Settings
 const settingsRoot = "/settings" as const;
 // Pay
@@ -100,6 +106,21 @@ export default {
       logout: `${loginRoot}?/logout` as const,
     },
   },
+  help: {
+    privacyPolicy: {
+      root: helpPrivacyPolcy,
+    },
+    termsAndConditions: {
+      root: helpTermsAndConditions,
+    },
+    cookies: {
+      root: helpCookies,
+    },
+    customerService: {
+      root: helpCustomerService,
+    },
+  },
+
   settings: settingsRoot,
   pay: {
     root: payRoot,

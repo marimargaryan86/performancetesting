@@ -4,6 +4,7 @@
   export let variant: "primary" | "outline" | "text" = "primary";
   export let size: "large" | "medium" | "small" | "x-small" | "xl-small" = "large";
   export let href: string | undefined = undefined;
+  export let minWidth: string | undefined = undefined;
   export let preload = true;
 </script>
 
@@ -15,6 +16,7 @@
   on:click
   {type}
   {disabled}
+  style:min-width={minWidth}
   class="typography bold"
   class:body-large={size === "large" || size === "medium"}
   class:body-medium={size === "small" || size === "x-small"}
