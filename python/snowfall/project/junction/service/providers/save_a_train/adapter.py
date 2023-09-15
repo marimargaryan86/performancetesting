@@ -97,7 +97,6 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         provider_cabin_class_mapping: cabin_classes.CabinMappingRepository,
         notifications_producer: producer.Producer,
         booking_storage: filesystem.Storage,
-        ticket_storage: filesystem.Storage,
         search_api_enabled: bool = True,  # noqa: FBT001,FBT002
     ) -> None:
         self._train_stations = train_station_repository
@@ -110,7 +109,6 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         self._search_api_enabled = search_api_enabled
         self._logger = stdout.get_logger()
         self._storage = booking_storage
-        self._ticket_storage = ticket_storage
 
     def search_criteria_generator(
         self,
@@ -435,28 +433,11 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         combined_data = {
             "booking_information": base64.b64encode(raw_information).decode(),
             "ticket_information": base64.b64encode(raw_ticket).decode(),
-            "external_information": {
-                "order_id": task.booking.order_id,
-                "booking_id": task.booking.id,
-            },
         }
         await self._storage.put(
             pathlib.Path(booking_result.search_identifier),
             json.dumps(combined_data).encode(),
         )
-
-        if get_ticket_result.url:
-            ticket_body = await self._client.api_client.get_ticket_pdf(
-                get_ticket_result.url,
-            )
-            # TODO: check if provider_id is required field(is always present)
-            ticket_path = pathlib.Path(
-                task.booking.provider_id,
-                task.booking.order_id,
-                task.booking.id,
-            ).with_suffix(".pdf")
-
-            await self._ticket_storage.put(ticket_path, ticket_body)
 
         confirm_booking_result = await self._confirm_booking(search_id=search_id)
         return models.CombinedBookingResults(
@@ -592,12 +573,10 @@ class Transformer(object):
         self,
         provider_identifier: uuid.UUID,
         provider_name: str,
-        ticket_storage: filesystem.Storage,
         url_timeout: int,
     ):
         self._provider_id = str(provider_identifier)
         self._provider_name = provider_name
-        self._ticket_storage = ticket_storage
         self._url_timeout = url_timeout
 
     async def raw_to_booking(self, raw: bytes) -> bookings_pb2.Booking:  # noqa: WPS210
@@ -608,19 +587,7 @@ class Transformer(object):
         ticket_info = booking.TicketInfo(
             **orjson.loads(base64.b64decode(combined["ticket_information"])),
         )
-        external_info = combined.get("external_information")
 
-        ticket_urls = []
-        if external_info:
-            path = pathlib.Path(
-                self._provider_id,
-                external_info["order_id"],
-                external_info["booking_id"],
-            ).with_suffix(".pdf")
-
-            ticket_url = await self._ticket_storage.url(path, timeout=self._url_timeout)
-            if ticket_url:
-                ticket_urls.append(ticket_url)
         return bookings_pb2.Booking(
             id=booking_info.search_identifier,
             status=_PROVIDER_STATUS_MAPPING.get(
@@ -635,6 +602,26 @@ class Transformer(object):
                 record_locator=ticket_info.confirmation_code,
                 operator_booking_references=[booking_info.search_identifier],
             ),
-            ticket_urls=ticket_urls,
             # TODO: No idea how to get created_at or updated_at from the booking model.
         )
+
+
+class Enricher(object):
+    def __init__(
+        self,
+        sat_client: client.SATClient,
+    ):
+        self._client = sat_client
+
+    async def add_ticket_urls(
+        self,
+        sat_booking: bookings_pb2.Booking,
+    ) -> bookings_pb2.Booking:
+        get_ticket_result, _ = await self._client.api_client.get_ticket(
+            sat_booking.id,
+        )
+        ticket_url = get_ticket_result.url
+
+        if ticket_url:
+            sat_booking.ticket_urls.append(ticket_url)
+        return sat_booking

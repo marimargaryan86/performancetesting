@@ -100,5 +100,4 @@ def save_a_train_adapter(
             types.Exchange("notifications"),
         ),
         booking_storage=storage,
-        ticket_storage=storage,
     )

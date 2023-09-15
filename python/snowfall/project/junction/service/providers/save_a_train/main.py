@@ -74,7 +74,6 @@ class _Settings(_SatConfig, service.ProviderSettings):
     allowed_window_td: datetime.timedelta = datetime.timedelta(minutes=0)
     storage_dsn: service.AnyDsn
     search_api_enabled: bool = False
-    ticket_storage_dsn: service.AnyDsn
     ticket_link_timeout: datetime.timedelta = datetime.timedelta(hours=6)
 
 
@@ -93,7 +92,6 @@ class _OrdersSettings(_SatConfig, service.Settings):
     smtp_recipient: pydantic.EmailStr
     mongo_dsn: tuple[pydantic.AnyUrl]
     storage_dsn: service.AnyDsn
-    ticket_storage_dsn: service.AnyDsn
     ticket_link_timeout: datetime.timedelta = datetime.timedelta(hours=6)
 
 
@@ -106,7 +104,6 @@ class _NotificationsSettings(_SatConfig, service.Settings):
     smtp_recipient: pydantic.EmailStr
     mongo_dsn: tuple[pydantic.AnyUrl]
     storage_dsn: service.AnyDsn
-    ticket_storage_dsn: service.AnyDsn
     ticket_link_timeout: datetime.timedelta = datetime.timedelta(hours=6)
 
 
@@ -151,9 +148,6 @@ async def _offers_factory(
     booking_storage = await stack.enter_async_context(
         filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
     )
-    ticket_storage = await stack.enter_async_context(
-        filesystem.Storage.from_dsn(str(app.settings.ticket_storage_dsn)),
-    )
     # TODO: do we need to call get_token on the save_a_train_client?
     sat_adapter = adapter.SaveATrainAdapter(
         save_a_train_client=save_a_train_client,
@@ -173,7 +167,6 @@ async def _offers_factory(
             types.Exchange("notifications"),
         ),
         booking_storage=booking_storage,
-        ticket_storage=ticket_storage,
         search_api_enabled=app.settings.search_api_enabled,
     )
     return offers.OfferSearchImplementation(
@@ -196,8 +189,21 @@ async def _bookings_factory(
     storage = await app.stack.enter_async_context(
         filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
     )
-    ticket_storage = await app.stack.enter_async_context(
-        filesystem.Storage.from_dsn(str(app.settings.ticket_storage_dsn)),
+    http_client = await app.stack.enter_async_context(
+        httpx.AsyncClient(
+            timeout=app.settings.api_timeout,
+        ),
+    )
+    save_a_train_client = client.SATClient(
+        email=app.settings.api_email,
+        password=app.settings.api_password,
+        password_search=app.settings.api_search_password,
+        token=app.settings.api_booking_token,
+        api_url=str(app.settings.api_base_url),
+        api_search_url=str(app.settings.api_search_base_url),
+        api_search_timeout=app.settings.api_search_timeout,
+        api_search_requests_limit=app.settings.api_search_requests_limit,
+        client=http_client,
     )
 
     return bookings.Implementation(
@@ -205,9 +211,9 @@ async def _bookings_factory(
         transformer=adapter.Transformer(
             provider_identifier=_PROVIDER_ID,
             provider_name=_PROVIDER_NAME,
-            ticket_storage=ticket_storage,
             url_timeout=app.settings.ticket_link_timeout.seconds,
         ).raw_to_booking,
+        enrich=adapter.Enricher(save_a_train_client).add_ticket_urls,
     )
 
 
@@ -253,9 +259,6 @@ async def _orders(  # noqa: WPS217
     booking_storage = await app.stack.enter_async_context(
         filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
     )
-    ticket_storage = await app.stack.enter_async_context(
-        filesystem.Storage.from_dsn(str(app.settings.ticket_storage_dsn)),
-    )
     orders_consumer = consumer.OrdersConsumer(
         consumer_obj=amqp_consumer.Consumer(
             connection=amqp_connection,
@@ -292,7 +295,6 @@ async def _orders(  # noqa: WPS217
                 types.Exchange("notifications"),
             ),
             booking_storage=booking_storage,
-            ticket_storage=ticket_storage,
         ),
         offers_cache=offer_cache,
     )
@@ -370,9 +372,6 @@ async def _notifications(  # noqa: WPS217
     booking_storage = await app.stack.enter_async_context(
         filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
     )
-    ticket_storage = await app.stack.enter_async_context(
-        filesystem.Storage.from_dsn(str(app.settings.ticket_storage_dsn)),
-    )
     sat_adapter = adapter.SaveATrainAdapter(
         save_a_train_client=client.SATClient(
             email=app.settings.api_email,
@@ -401,7 +400,6 @@ async def _notifications(  # noqa: WPS217
             mongo.sat.provider_cabin_mapping,
         ),
         booking_storage=booking_storage,
-        ticket_storage=ticket_storage,
     )
     await _consume_notifications(app, amqp_connection, sat_adapter, notifier)
 
