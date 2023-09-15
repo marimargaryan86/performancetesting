@@ -55,7 +55,7 @@ def create_starlette_app(  # noqa: WPS211
         case "local":
             validation_mode = middlewares.ValidationMode.eager
         case "development":
-            validation_mode = middlewares.ValidationMode.lazy
+            validation_mode = middlewares.ValidationMode.disabled
 
     if openapi_path:
         stack.append(
