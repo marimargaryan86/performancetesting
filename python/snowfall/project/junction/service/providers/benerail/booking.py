@@ -17,7 +17,11 @@ from snowfall.project.junction.go.service.orders.v1 import (
     models_pb2 as order_models_pb2,
 )
 from snowfall.project.junction.provider.v1alpha import bookings_pb2
-from snowfall.project.junction.service.providers.benerail import cache, helper_models
+from snowfall.project.junction.service.providers.benerail import (
+    cache,
+    helper_functions,
+    helper_models,
+)
 from snowfall.project.junction.service.providers.benerail.v1alpha import amqp_pb2
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
@@ -42,6 +46,41 @@ _GENDER_MAP = python_types.MappingProxyType(
     },
 )
 _WAIT_AFTER_PAYMENT_SECONDS = 15
+
+
+class Enricher(object):
+    def __init__(self, benerail_client: client.BenerailClient):
+        self._client = benerail_client
+        self._logger = stdout.get_logger()
+
+    async def add_ticket_urls(
+        self,
+        booking: bookings_pb2.Booking,
+    ) -> bookings_pb2.Booking:
+        try:
+            booking_res, _ = await self._client.bookings_client.get_booking(
+                booking_id=booking.id,
+            )
+        except errors.HttpError:
+            self._logger.exception("Failed to fetch the booking")
+
+            return booking
+
+        if not booking_res.response_result.fulfillments:
+            return booking
+
+        ticket_urls = (
+            await self._client.bookings_client.get_ticket_urls_from_fulfillment(
+                booking_id=booking_res.response_result.identifier,
+                fulfillment_id=helper_functions.last_id_of_url(
+                    booking_res.response_result.fulfillments[0].href,
+                ),
+            )
+        )
+
+        booking.ticket_urls.extend(ticket_urls)
+
+        return booking
 
 
 class Transformer(object):

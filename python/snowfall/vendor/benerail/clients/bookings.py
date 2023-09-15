@@ -1,4 +1,5 @@
 import http
+from collections.abc import Collection
 
 from snowfall.stdlib.transport.http import client
 from snowfall.vendor.benerail.clients import base
@@ -191,6 +192,23 @@ class BookingsClient(base.BenerailBaseClient):  # noqa: WPS214
             ),
         )
         return booking_response.GetBookedTripResponse(**response.json())
+
+    async def get_ticket_urls_from_fulfillment(
+        self,
+        booking_id: str,
+        fulfillment_id: str,
+    ) -> Collection[str]:
+        fulfillment_res = await self.get_fulfillment(
+            booking_id=booking_id,
+            fulfillment_id=fulfillment_id,
+            etag="",
+        )
+
+        return [
+            str(document.download_link.href)
+            for document in fulfillment_res.response_result.documents or []
+            if document.download_link
+        ]
 
     async def get_fulfillment(
         self,

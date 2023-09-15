@@ -71,20 +71,14 @@ class NotificationsConsumer(object):
         if not booking_res.response_result.fulfillments:
             return await self._handle_no_fulfillment(message)
 
-        fulfillment_res = await self._client.bookings_client.get_fulfillment(
-            booking_id=booking_res.response_result.identifier,
-            fulfillment_id=helper_functions.last_id_of_url(
-                booking_res.response_result.fulfillments[0].href,
-            ),
-            etag=etag_data.booking_etag,
+        ticket_urls = (
+            await self._client.bookings_client.get_ticket_urls_from_fulfillment(
+                booking_id=booking_res.response_result.identifier,
+                fulfillment_id=helper_functions.last_id_of_url(
+                    booking_res.response_result.fulfillments[0].href,
+                ),
+            )
         )
-        fulfillment_res.set_etags(etag_data)
-
-        ticket_urls = [
-            str(document.download_link.href)
-            for document in fulfillment_res.response_result.documents or []
-            if document.download_link
-        ]
 
         if not ticket_urls:
             return await self._handle_no_fulfillment(message)

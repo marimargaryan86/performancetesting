@@ -37,6 +37,17 @@ async def _bookings_factory(
     storage = await app.stack.enter_async_context(
         filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
     )
+    http_client = await app.stack.enter_async_context(
+        httpx.AsyncClient(
+            timeout=app.settings.api_timeout.total_seconds(),
+            cert=config.cert_tmp_path(app.settings.cert_base64),
+        ),
+    )
+    benerail_client = client.BenerailClient(
+        subscription_key=app.settings.subscription_key,
+        base_url=str(app.settings.api_base_url),
+        http_client=http_client,
+    )
 
     return bookings.Implementation(
         storage=storage,
@@ -44,6 +55,9 @@ async def _bookings_factory(
             provider_identifier=_PROVIDER_ID,
             provider_name=_PROVIDER_NAME,
         ).raw_to_booking,
+        enrich=booking.Enricher(
+            benerail_client=benerail_client,
+        ).add_ticket_urls,
     )
 
 
