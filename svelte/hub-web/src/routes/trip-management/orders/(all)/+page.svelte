@@ -38,6 +38,7 @@
   import { formatAmount } from "formatting/currency";
   import type { OrderModel } from "integration/junction-mobile-api/schemas/order";
   import type { PriceModel } from "integration/junction-mobile-api/schemas/price";
+  import routeConfig from "routeConfig";
 
   export let data;
 </script>
@@ -62,9 +63,9 @@
 
       <TRow alternatingBackground={false}>
         <TCol class="typography body-small">
-          <span class="highlight">
+          <a href={routeConfig.tripManagement.orders.order(order.id).root}>
             {order.journey?.reference ?? "Unknown"}
-          </span>
+          </a>
         </TCol>
         <TCol class="typography body-small">
           <a href="/">Download</a>
@@ -103,7 +104,6 @@
     color: var(--color-common-light-soft);
   }
 
-  .highlight,
   a {
     color: var(--color-common-light-text-link);
     text-decoration: none;

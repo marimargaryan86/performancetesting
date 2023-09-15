@@ -1,26 +1,8 @@
-<script lang="ts" context="module">
-  function getPassengerType(passenger: OrderPassengerModel): "adult" | "child" | "infant" {
-    const deltaMs = getTimeDeltaMs(new Date(), passenger.dateOfBirth);
-    const deltaHours = Math.floor(deltaMs / 3600000);
-    const deltaYears = Math.floor(deltaHours / 8760);
-
-    if (deltaYears < 2) {
-      return "infant";
-    }
-
-    if (deltaYears < 12) {
-      return "child";
-    }
-
-    return "adult";
-  }
-</script>
-
 <script lang="ts">
   import PassengerIcon from "components/icons/passenger-icon.svelte";
   import type { OrderPassengerModel } from "integration/junction-client-api/schemas/order";
   import { capitalize } from "utils/common";
-  import { getTimeDeltaMs } from "utils/date-time";
+  import { getPassengerType } from "utils/passenger";
 
   export let passengers: OrderPassengerModel[];
 </script>

@@ -1,5 +1,5 @@
 import integrationInstances from "integration-instances";
-import type { ConversionModel } from "integration/junction-pay/schemas/conversion.js";
+import type { ConversionModel } from "integration/junction-pay/schemas/conversion";
 import type { PaginatedData } from "models/common";
 import { getToken } from "utils/auth";
 

@@ -2,7 +2,7 @@ import type { RequestEvent } from "@sveltejs/kit";
 import jwt from "jsonwebtoken";
 import { getRandomAlphaNumericString } from "utils/random";
 import { URLExtended } from "utils/url";
-import { tripSearchQueryData } from "./trip-search/trip-search.svelte";
+import { tripSearchQueryData } from "../components/trip-search/trip-search.svelte";
 import type { TripCandidatesSearchModel } from "integration/junction-mobile-api/schemas/trip";
 import type { PaymentIntentModel } from "integration/junction-mobile-api/schemas/payment";
 import type { PlaceModel } from "integration/junction-mobile-api/schemas/place";

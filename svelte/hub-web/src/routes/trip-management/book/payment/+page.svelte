@@ -36,7 +36,7 @@
 <script lang="ts">
   import Button from "components/ui/button.svelte";
   import Countdown from "../countdown.svelte";
-  import Summary from "../summary/summary.svelte";
+  import Summary from "../../components/summary/summary.svelte";
   import routeConfig from "routeConfig";
   import Checkbox from "components/ui/checkbox.svelte";
   import { browser } from "$app/environment";

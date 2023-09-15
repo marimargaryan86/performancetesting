@@ -1,5 +1,7 @@
 <script lang="ts">
-  import TripSearch, { type PartialTripSearchData } from "../trip-search/trip-search.svelte";
+  import TripSearch, {
+    type PartialTripSearchData,
+  } from "../../components/trip-search/trip-search.svelte";
   import SearchOptions, { type SearchOptionsData } from "./search-options.svelte";
   import Offer from "./offer/offer.svelte";
   import { callAction } from "utils/common";

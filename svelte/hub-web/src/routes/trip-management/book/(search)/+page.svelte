@@ -1,7 +1,7 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { pendableCall } from "utils/pendable-call";
-  import TripSearch from "../trip-search/trip-search.svelte";
+  import TripSearch from "../../components/trip-search/trip-search.svelte";
 
   const { pending, func: search } = pendableCall((event: CustomEvent<URL>) => goto(event.detail));
 </script>

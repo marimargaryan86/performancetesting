@@ -1,12 +1,13 @@
 <script lang="ts">
   import Tabs, { type Tab } from "components/ui/tabs.svelte";
-  import BreadCrumbs from "./bread-crumbs.svelte";
+  import BreadCrumbs, { type BreadCrumb } from "./bread-crumbs.svelte";
   import FilterIcon from "components/icons/filter-icon.svelte";
   import { slideFade } from "transitions/slide-fade";
   import SearchField from "components/ui/search-field.svelte";
 
-  export let breadCrumbs: { label: string; url: string }[] | undefined = undefined;
-  export let pageTitle: string;
+  export let breadCrumbs: BreadCrumb[] | undefined = undefined;
+  export let pageTitle = "";
+  export let pageSubTitle: string | undefined = undefined;
   export let tabs: Tab[] | undefined = undefined;
   export let filtersActive = false;
   export let searchQuery: string | undefined = undefined;
@@ -27,7 +28,21 @@
 {/if}
 
 <div class="header" class:after-breadcrumbs={breadCrumbs}>
-  <h1 class="typography headline-medium bold">{pageTitle}</h1>
+  <h1>
+    <span class="typography headline-small bold">
+      <slot name="page-title">
+        {pageTitle}
+      </slot>
+    </span>
+
+    {#if $$slots["page-sub-title"] || pageSubTitle !== undefined}
+      <em class="typography body-small">
+        <slot name="page-sub-title">
+          {pageSubTitle}
+        </slot>
+      </em>
+    {/if}
+  </h1>
 
   {#if hasActions}
     <div class="actions">
@@ -83,6 +98,7 @@
 <style>
   .header {
     display: flex;
+    align-items: flex-start;
     justify-content: space-between;
     padding: 32px 24px;
     color: var(--color-main-neutral-800);
@@ -90,6 +106,16 @@
 
   .header.after-breadcrumbs {
     padding: 8px 24px 24px;
+  }
+
+  h1 {
+    display: flex;
+    flex-flow: column;
+    gap: 8px;
+  }
+
+  h1 > em {
+    color: var(--color-main-neutral-700);
   }
 
   .actions {

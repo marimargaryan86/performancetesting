@@ -65,7 +65,7 @@
 </script>
 
 <script lang="ts">
-  import type { PassengerCountData } from "../common";
+  import type { PassengerCountData } from "../../book/common";
   import { formatAmount, formatPriceBreakdownType } from "formatting/currency";
   import Itinerary from "./itinerary.svelte";
   import type {

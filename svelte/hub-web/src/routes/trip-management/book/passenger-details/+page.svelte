@@ -21,7 +21,7 @@
   import routeConfig from "routeConfig";
   import { callAction } from "utils/common";
   import Countdown from "../countdown.svelte";
-  import Summary from "../summary/summary.svelte";
+  import Summary from "../../components/summary/summary.svelte";
   import PassengerEntry, {
     getPassengerValidator,
     type PartialPassengerData,

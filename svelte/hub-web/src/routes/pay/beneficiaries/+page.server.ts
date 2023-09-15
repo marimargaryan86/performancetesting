@@ -1,5 +1,5 @@
 import integrationInstances from "integration-instances";
-import type { BeneficiaryModel } from "integration/junction-pay/schemas/beneficiary.js";
+import type { BeneficiaryModel } from "integration/junction-pay/schemas/beneficiary";
 import type { PaginatedData } from "models/common";
 import { getToken } from "utils/auth";
 

@@ -3,7 +3,7 @@
   import routeConfig from "routeConfig";
   import Alert from "components/ui/alert.svelte";
   import CheckedIcon from "components/icons/checked-icon.svelte";
-  import Passengers from "./passengers.svelte";
+  import Passengers from "../../components/passengers.svelte";
   import Price from "./price.svelte";
   import Overview from "./overview.svelte";
   import Itinerary from "./itinerary.svelte";

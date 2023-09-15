@@ -25,7 +25,7 @@
   import type {
     ConversionModel,
     ConversionStatus,
-  } from "integration/junction-pay/schemas/conversion.js";
+  } from "integration/junction-pay/schemas/conversion";
 
   export let form;
   export let data;

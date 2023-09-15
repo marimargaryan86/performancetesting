@@ -10,6 +10,17 @@ const tripManagementBookConfirmationRoot = `${tripManagementBookRoot}/confirmati
 const tripManagementOrdersRoot = `${tripManagementRoot}/orders` as const;
 const tripManagementOrdersCancallations = `${tripManagementOrdersRoot}/cancellations` as const;
 const tripManagementOrdersRefunds = `${tripManagementOrdersRoot}/refunds` as const;
+function tripManagementOrdersOrder<TID extends string>(
+  id: TID,
+): {
+  root: `${typeof tripManagementOrdersRoot}/${TID}`;
+  details: `${typeof tripManagementOrdersRoot}/${TID}/details`;
+} {
+  return {
+    root: `${tripManagementOrdersRoot}/${id}`,
+    details: `${tripManagementOrdersRoot}/${id}/details`,
+  };
+}
 // Login
 const loginRoot = "/login" as const;
 // Settings
@@ -73,6 +84,7 @@ export default {
     },
     orders: {
       root: tripManagementOrdersRoot,
+      order: tripManagementOrdersOrder,
       cancellations: {
         root: tripManagementOrdersCancallations,
       },
