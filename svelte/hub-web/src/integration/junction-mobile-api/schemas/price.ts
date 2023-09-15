@@ -31,6 +31,7 @@ export const priceBreakdownType = z.enum([
   "company-mark-up",
   "service-mark-up",
 ]);
+export type PriceBreakdownType = z.infer<typeof priceBreakdownType>;
 
 export const priceBreakdownModel = getSchemaModel(
   z.object({

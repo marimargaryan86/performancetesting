@@ -14,7 +14,6 @@
   import PriorityPaymentIcon from "components/icons/priority-payment-icon.svelte";
   import type { CountryModel } from "models/location";
   import { z } from "zod";
-  import { formatError, type FormattedError } from "utils/zod";
   import { updateBeneficiaryData } from "./helpers";
   import { formatCountryOption } from "formatting/location";
   import type { CurrencyModel } from "integration/junction-pay/schemas/money";
@@ -23,7 +22,7 @@
   export let currencies: Map<string, CurrencyModel>;
   export let countries: Map<string, CountryModel>;
 
-  let errors: FormattedError<z.infer<typeof schema>> | undefined = undefined;
+  let errors: z.ZodFormattedError<z.infer<typeof schema>> | undefined = undefined;
   let bankDetails = data.bankDetails ?? {};
   let address = bankDetails.address ?? {};
   let addressLine = address.addressLines?.[0];
@@ -50,13 +49,15 @@
   }
 
   export function validate(): boolean {
+    errors = undefined;
+
     try {
       data = { ...data, ...schema.parse(updateBeneficiaryData(data)) };
 
       return true;
     } catch (err) {
       if (err instanceof z.ZodError) {
-        errors = formatError<z.infer<typeof schema>>(err);
+        errors = err.format();
       }
     }
 
@@ -74,7 +75,7 @@
       label="Bank name"
       required
       placeholder="Enter bank name"
-      error={errors?.bankDetails?.name}
+      error={errors?.bankDetails?.name?._errors}
       bind:value={bankDetails.name}
     />
 
@@ -82,7 +83,7 @@
       label="Bank address"
       required
       placeholder="Enter address"
-      error={errors?.bankDetails?.address?.addressLines}
+      error={errors?.bankDetails?.address?.addressLines?._errors}
       bind:value={addressLine}
     />
 
@@ -92,7 +93,7 @@
       options={Array.from(countries.values())}
       formatter={formatCountryOption}
       required
-      error={errors?.bankDetails?.address?.countryCode}
+      error={errors?.bankDetails?.address?.countryCode?._errors}
       bind:value={country}
     />
     <SelectField
@@ -101,7 +102,7 @@
       options={Array.from(currencies.values()).map((c) => c.code)}
       formatter={formatCurrencyOption}
       required
-      error={errors?.currencyCode}
+      error={errors?.currencyCode?._errors}
       bind:value={data.currencyCode}
     />
   </form>
@@ -168,7 +169,7 @@
       label="SWIFT/BIC Code"
       required
       placeholder="Enter SWIFT/BIC Code"
-      error={errors?.bankDetails?.bicSwift}
+      error={errors?.bankDetails?.bicSwift?._errors}
       bind:value={bankDetails.bicSwift}
     />
 
@@ -178,7 +179,7 @@
         required
         placeholder="Enter IBAN Code"
         error={errors?.bankDetails && "iban" in errors.bankDetails
-          ? errors.bankDetails.iban
+          ? errors.bankDetails.iban?._errors
           : undefined}
         bind:value={bankDetails.iban}
       />
@@ -188,7 +189,7 @@
         required
         placeholder="00-00-00"
         error={errors?.bankDetails && "aba" in errors.bankDetails
-          ? errors.bankDetails.aba
+          ? errors.bankDetails.aba?._errors
           : undefined}
         bind:value={bankDetails.aba}
       />
@@ -197,7 +198,7 @@
         required
         placeholder="00000000"
         error={errors?.bankDetails && "accountNumber" in errors.bankDetails
-          ? errors.bankDetails.accountNumber
+          ? errors.bankDetails.accountNumber?._errors
           : undefined}
         bind:value={bankDetails.accountNumber}
       />

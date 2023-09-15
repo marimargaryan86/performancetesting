@@ -37,3 +37,4 @@ export const resourceStatuses = [
   "failed",
 ] as const;
 export const resourceStatus = z.enum(resourceStatuses);
+export type ResourceStatus = z.infer<typeof resourceStatus>;

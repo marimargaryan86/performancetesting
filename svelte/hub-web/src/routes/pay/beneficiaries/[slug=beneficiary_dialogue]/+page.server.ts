@@ -3,7 +3,6 @@ import * as devalue from "devalue";
 import type { RequestEvent } from "./$types";
 import { ActionFailure, fail } from "@sveltejs/kit";
 import { z } from "zod";
-import { formatError, type FormattedError } from "utils/zod";
 import integrationInstances from "integration-instances";
 import type { AccountModel } from "integration/junction-pay/schemas/account";
 import type { BeneficiaryModel } from "integration/junction-pay/schemas/beneficiary";
@@ -57,7 +56,7 @@ export const actions = {
     event,
   ): Promise<
     | { beneficiary: BeneficiaryModel }
-    | ActionFailure<{ validation?: FormattedError<BeneficiaryModel>; service?: string }>
+    | ActionFailure<{ validation?: z.ZodFormattedError<BeneficiaryModel>; service?: string }>
   > {
     const beneficiary = getBeneficiaryData(event);
 
@@ -84,7 +83,7 @@ export const actions = {
       };
     } catch (err) {
       if (err instanceof z.ZodError) {
-        return fail(422, { validation: formatError<BeneficiaryModel>(err) });
+        return fail(422, { validation: err.format() });
       }
 
       if (err instanceof Error) {

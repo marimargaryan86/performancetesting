@@ -14,8 +14,7 @@
   import Countdown from "../countdown.svelte";
   import LoadingSkelton from "./loading-skelton.svelte";
   import type { ResolvedSearchData } from "../common";
-  import type { resourceStatus } from "integration/junction-mobile-api/schemas/common";
-  import type { z } from "zod";
+  import type { ResourceStatus } from "integration/junction-mobile-api/schemas/common";
   import type { OfferModel } from "integration/junction-mobile-api/schemas/offer";
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import { pendableCall } from "utils/pendable-call";
@@ -52,7 +51,7 @@
   const { poll: pollOffers, cancel: cancelPolling } = pollableCall({
     func(id: string) {
       return callAction<{
-        status: z.infer<typeof resourceStatus>;
+        status: ResourceStatus;
         offers: OfferModel[];
       }>({
         action: routeConfig.tripManagement.book.select.actions.poll,

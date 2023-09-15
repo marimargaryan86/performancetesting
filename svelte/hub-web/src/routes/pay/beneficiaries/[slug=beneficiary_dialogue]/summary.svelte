@@ -3,10 +3,10 @@
   import { callAction, capitalize } from "utils/common";
   import { updateBeneficiaryData } from "./helpers";
   import { page } from "$app/stores";
-  import type { FormattedError } from "utils/zod";
   import type { CurrencyModel } from "integration/junction-pay/schemas/money";
   import type { BeneficiaryModel } from "integration/junction-pay/schemas/beneficiary";
   import type { CreateBeneficiaryModel } from "integration/junction-pay/schemas/beneficiary.client";
+  import type { z } from "zod";
 
   export let data: CreateBeneficiaryModel;
   export let countries: Map<string, CountryModel>;
@@ -27,7 +27,7 @@
 
     const result = await callAction<
       { beneficiary: BeneficiaryModel },
-      { validation?: FormattedError<BeneficiaryModel>; service?: string }
+      { validation?: z.ZodFormattedError<BeneficiaryModel>; service?: string }
     >({ action: $page.url.toString() });
 
     if (result.type === "failure") {

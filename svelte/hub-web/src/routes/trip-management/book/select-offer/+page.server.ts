@@ -7,8 +7,7 @@ import {
   type SearchData,
 } from "../common";
 import integrationInstances from "integration-instances";
-import type { resourceStatus } from "integration/junction-mobile-api/schemas/common";
-import type { z } from "zod";
+import type { ResourceStatus } from "integration/junction-mobile-api/schemas/common";
 import type { OfferModel } from "integration/junction-mobile-api/schemas/offer";
 import routeConfig from "routeConfig";
 import type { TripCandidatesSearchModel } from "integration/junction-mobile-api/schemas/trip";
@@ -85,8 +84,7 @@ export const actions = {
   async poll(
     event,
   ): Promise<
-    | { status: Exclude<z.infer<typeof resourceStatus>, "completed"> }
-    | { status: "completed"; offers: OfferModel[] }
+    { status: Exclude<ResourceStatus, "completed"> } | { status: "completed"; offers: OfferModel[] }
   > {
     const searchdata = getSearchData(event);
     const tripCandidatesSearchId = searchdata?.tripCandidatesSearchId;

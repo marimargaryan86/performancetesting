@@ -13,7 +13,6 @@
   import Section from "./section.svelte";
   import type { CountryModel } from "models/location";
   import { z } from "zod";
-  import { formatError, type FormattedError } from "utils/zod";
   import { updateBeneficiaryData } from "./helpers";
   import { formatCountryOption } from "formatting/location";
   import type { AccountModel } from "integration/junction-pay/schemas/account";
@@ -26,7 +25,7 @@
   export let countries: Map<string, CountryModel>;
   export let accounts: AccountModel[];
 
-  let errors: FormattedError<z.infer<typeof schema>> | undefined = undefined;
+  let errors: z.ZodFormattedError<z.infer<typeof schema>> | undefined = undefined;
   let address = data.address ?? {};
   let addressLine = address.addressLines?.[0];
   let country = countries.get(data.address?.countryCode ?? "");
@@ -44,13 +43,15 @@
   }
 
   export function validate(): boolean {
+    errors = undefined;
+
     try {
       data = { ...data, ...schema.parse(updateBeneficiaryData(data)) };
 
       return true;
     } catch (err) {
       if (err instanceof z.ZodError) {
-        errors = formatError<z.infer<typeof schema>>(err);
+        errors = err.format();
       }
     }
 
@@ -70,14 +71,14 @@
       placeholder="Select account"
       options={accountIds}
       formatter={formatAccountOption}
-      error={errors?.accountId}
+      error={errors?.accountId?._errors}
       bind:value={data.accountId}
     />
     <TextField
       required
       label="Personalised name"
       placeholder="E.g. Air France"
-      error={errors?.companyName}
+      error={errors?.companyName?._errors}
       bind:value={data.companyName}
     />
     <TextField
@@ -85,14 +86,14 @@
       type="email"
       label="Email"
       placeholder="Enter email"
-      error={errors?.email}
+      error={errors?.email?._errors}
       bind:value={data.email}
     />
     <TextField
       required
       label="Address"
       placeholder="Enter address"
-      error={errors?.address?.addressLines}
+      error={errors?.address?.addressLines?._errors}
       bind:value={addressLine}
     />
 
@@ -101,20 +102,20 @@
         required
         label="City"
         placeholder="Enter city"
-        error={errors?.address?.city}
+        error={errors?.address?.city?._errors}
         bind:value={address.city}
       />
       <TextField
         required
         label="Postcode"
         placeholder="Enter postcode"
-        error={errors?.address?.postalCode}
+        error={errors?.address?.postalCode?._errors}
         bind:value={address.postalCode}
       />
       <TextField
         label="State"
         placeholder="Enter state"
-        error={errors?.address?.state}
+        error={errors?.address?.state?._errors}
         bind:value={address.state}
       />
       <SelectField
@@ -123,7 +124,7 @@
         placeholder="Select country"
         options={Array.from(countries.values())}
         formatter={formatCountryOption}
-        error={errors?.address?.countryCode}
+        error={errors?.address?.countryCode?._errors}
         bind:value={country}
       />
     </div>

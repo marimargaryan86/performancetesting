@@ -1,6 +1,5 @@
-import type { PriceModel, priceBreakdownType } from "integration/junction-mobile-api/schemas/price";
+import type { PriceBreakdownType, PriceModel } from "integration/junction-mobile-api/schemas/price";
 import type { CurrencyModel } from "integration/junction-pay/schemas/money";
-import type { z } from "zod";
 
 export function formatAmountAndCode(
   amount: PriceModel,
@@ -28,7 +27,7 @@ export function formatAmount(
   });
 }
 
-export function formatPriceBreakdownType(type: z.infer<typeof priceBreakdownType>): string {
+export function formatPriceBreakdownType(type: PriceBreakdownType): string {
   if (type === "base-fare") {
     return "Base fare";
   } else if (type === "company-mark-up") {
