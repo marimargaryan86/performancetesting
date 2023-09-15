@@ -60,6 +60,7 @@ class IncomingMessages(endpoints.HTTPEndpoint):
                 str(msg["Body"]),
                 str(msg.get("OriginalRepliedMessageSid", "")),
                 subscriber,
+                cv,
                 subscribers_client,
                 orders_client,
             )

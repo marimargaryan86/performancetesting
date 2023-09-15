@@ -46,6 +46,7 @@ class MessageHandler(object):
         message: str,
         message_key: str,
         subscriber: models_pb2.Subscriber,
+        configuration_vector: models_pb2.ConfigurationVector,
         subscribers_client: subscribers.Client,
         orders_client: orders.Client,
     ) -> Sequence[str]:
@@ -66,6 +67,7 @@ class MessageHandler(object):
             await self.delete_state("ai_assistant_state", subscriber)
         response = await message_handler(
             subscriber=subscriber,
+            configuration_vector=configuration_vector,
             subscribers_client=subscribers_client,
             orders_client=orders_client,
             message=message,
@@ -277,8 +279,9 @@ async def check_in(
     ]
 
 
-async def handle_unknown(
+async def handle_unknown(  # noqa: WPS211
     subscriber: models_pb2.Subscriber,
+    configuration_vector: models_pb2.ConfigurationVector,
     message: str,
     ai_bot: open_ai.AIBot,
     redis_client: redis.Client[str],
@@ -297,7 +300,10 @@ async def handle_unknown(
                 return [_("Great! We are here"), action_menu]
             ai_chat_history = state.get("ai_chat_history", [])
             ai_chat_history.append({"role": "user", "content": message})
-            assistant_message = await ai_bot.handle_prompt(ai_chat_history)
+            assistant_message = await ai_bot.handle_prompt(
+                messages=ai_chat_history,
+                search_url_template=configuration_vector.search_url_template,
+            )
             ai_chat_history.append(assistant_message)
             await session.put(subscriber.phone_number.e164_number, json.dumps(state))
             return [_(assistant_message["content"])]

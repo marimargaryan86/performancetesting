@@ -1,6 +1,7 @@
 import datetime
 import json
 from collections.abc import Mapping, Sequence
+from gettext import gettext as _
 from typing import Any, ClassVar
 
 import openai
@@ -12,17 +13,23 @@ def home_function(*args: Any, **kwargs: Any) -> str:
     return "Do you want to continue with new queries about trip destination?"
 
 
-def search_flight(
+def search_flight(  # noqa: WPS211
     origin: str,
     destination: str,
     date: str,
+    search_url_template: str,
     *args: Any,
     **kwargs: Any,
 ) -> str:
-    return "URL for Flight from {0} to {1} on date {2}".format(
-        origin,
-        destination,
-        date,
+    departure_date = datetime.datetime.strptime(date, "%d-%m-%Y").replace(
+        tzinfo=datetime.UTC,
+    )
+    return _("Please book your flights here: ") + search_url_template.format(
+        origin=origin,
+        destination=destination,
+        day=departure_date.day,
+        month=departure_date.month,
+        year=departure_date.year,
     )
 
 
@@ -100,6 +107,7 @@ class AIBot(object):
     async def handle_prompt(
         self,
         messages: Sequence[Mapping[str, str]],
+        search_url_template: str,
     ) -> Mapping[str, str]:
         """Get message history from state, append message and send to openai."""
         ai_response = await openai.ChatCompletion.acreate(
@@ -117,6 +125,7 @@ class AIBot(object):
             )
             return {
                 "content": self.available_functions[function_name](
+                    search_url_template=search_url_template,
                     **assistant_arguments,
                 ),
                 "role": "assistant",
