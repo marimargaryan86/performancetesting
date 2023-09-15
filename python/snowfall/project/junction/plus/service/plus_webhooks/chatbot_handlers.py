@@ -290,11 +290,11 @@ async def handle_unknown(
         state: Mapping[str, Any] = json.loads(state_str) or {}
         if state.get("ai_enabled"):
             # We should associate with message id to not bind those keywords, but we can do it after refactoring and async reply on chatbot.
-            if message.lower() in {"yes", "no"}:
+            if message.lower() in {"i need more help", "that's all for now"}:
                 await session.delete(subscriber.phone_number.e164_number)
-                if message == "yes":
+                if message.lower() == "i need more help":
                     return await travel_assistant(subscriber, ai_bot, redis_client)
-                return [action_menu]
+                return [_("Great! We are here"), action_menu]
             ai_chat_history = state.get("ai_chat_history", [])
             ai_chat_history.append({"role": "user", "content": message})
             assistant_message = await ai_bot.handle_prompt(ai_chat_history)
