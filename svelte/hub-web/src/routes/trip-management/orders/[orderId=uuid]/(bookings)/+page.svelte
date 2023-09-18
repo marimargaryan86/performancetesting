@@ -1,15 +1,3 @@
-<script lang="ts" context="module">
-  function getOrigin(booking: BookingModel): PointModel | undefined {
-    return booking.details[0]?.legs[0]?.origin;
-  }
-
-  function getDestination(booking: BookingModel): PointModel | undefined {
-    const details = booking.details[booking.details.length - 1];
-
-    return details?.legs[(details?.legs.length ?? 0) - 1]?.destination;
-  }
-</script>
-
 <script lang="ts">
   import Header from "components/ui/table/header.svelte";
   import TActionsCol from "components/ui/table/t-actions-col.svelte";
@@ -19,8 +7,8 @@
   import TMoneyCol from "components/ui/table/t-money-col.svelte";
   import TRow from "components/ui/table/t-row.svelte";
   import Table from "components/ui/table/table.svelte";
-  import type { BookingModel } from "integration/junction-mobile-api/schemas/booking";
-  import type { PointModel } from "integration/junction-mobile-api/schemas/common";
+  import routeConfig from "routeConfig";
+  import { getOrigin, getDestination } from "utils/booking";
 
   export let data;
 </script>
@@ -48,7 +36,11 @@
       {@const destination = getDestination(booking)}
       <TRow>
         <TCol width="0">{idx + 1}</TCol>
-        <TCol width="0"><a href="/">View</a></TCol>
+        <TCol width="0">
+          <a href={routeConfig.tripManagement.orders.order(data.order.id).booking(booking.id).root}>
+            View
+          </a>
+        </TCol>
         <TCol width="0"><a href="/">Download</a></TCol>
         <TCol>{booking.details[0]?.legs[0]?.departureAt.toLocaleDateString("en-GB")}</TCol>
         <TCol>{origin?.name ?? "Unknown"}</TCol>

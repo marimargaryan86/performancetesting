@@ -1,24 +1,15 @@
 <script lang="ts">
   import CheckedIcon from "components/icons/checked-icon.svelte";
-  import TicketIcon from "components/icons/ticket-icon.svelte";
   import type { OrderModel } from "integration/junction-mobile-api/schemas/order";
+  import Ticket from "../../components/ticket.svelte";
 
   export let order: OrderModel;
 </script>
 
 <div class="overview">
   <h2 class="typography headline-small bold">Your order has been confirmed</h2>
-  <div class="item">
-    <span class="circle">
-      <TicketIcon color="var(--color-main-primary-600)" />
-    </span>
-    <div>
-      <span class="typography body-xsmall"> Order reference </span>
-      <strong class="typography body-medium bold">
-        {order.journey?.reference ?? "-"}
-      </strong>
-    </div>
-  </div>
+  <Ticket reference={order.journey?.reference} />
+
   <div class="item">
     <span class="circle target">
       <CheckedIcon color="var(--color-common-dark-strong)" />

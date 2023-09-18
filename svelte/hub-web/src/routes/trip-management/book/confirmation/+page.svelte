@@ -6,7 +6,7 @@
   import Passengers from "../../components/passengers.svelte";
   import Price from "./price.svelte";
   import Overview from "./overview.svelte";
-  import Itinerary from "./itinerary.svelte";
+  import Itinerary from "../../components/itinerary.svelte";
 
   export let data;
 </script>

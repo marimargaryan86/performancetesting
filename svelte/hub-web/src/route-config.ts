@@ -10,15 +10,23 @@ const tripManagementBookConfirmationRoot = `${tripManagementBookRoot}/confirmati
 const tripManagementOrdersRoot = `${tripManagementRoot}/orders` as const;
 const tripManagementOrdersCancallations = `${tripManagementOrdersRoot}/cancellations` as const;
 const tripManagementOrdersRefunds = `${tripManagementOrdersRoot}/refunds` as const;
-function tripManagementOrdersOrder<TID extends string>(
-  id: TID,
+function tripManagementOrdersOrder<TId extends string>(
+  id: TId,
 ): {
-  root: `${typeof tripManagementOrdersRoot}/${TID}`;
-  details: `${typeof tripManagementOrdersRoot}/${TID}/details`;
+  root: `${typeof tripManagementOrdersRoot}/${TId}`;
+  details: `${typeof tripManagementOrdersRoot}/${TId}/details`;
+  booking: <TBookingId extends string>(
+    bookingId: TBookingId,
+  ) => {
+    root: `${typeof tripManagementOrdersRoot}/${TId}/${TBookingId}`;
+  };
 } {
   return {
     root: `${tripManagementOrdersRoot}/${id}`,
     details: `${tripManagementOrdersRoot}/${id}/details`,
+    booking: (bookingId) => ({
+      root: `${tripManagementOrdersRoot}/${id}/${bookingId}`,
+    }),
   };
 }
 // Login
