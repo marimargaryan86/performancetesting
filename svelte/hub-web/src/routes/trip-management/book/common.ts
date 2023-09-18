@@ -26,7 +26,7 @@ export type SearchData = {
   offerId?: string;
   optionIds?: string[];
   priceQuoteId?: string;
-  paymentIntent?: PaymentIntentModel;
+  paymentIntent?: PaymentIntentModel & { confirmed?: boolean };
   orderId?: string;
 };
 
@@ -37,7 +37,7 @@ export type ResolvedSearchData = {
   departureAfter: Date;
   passengers: PassengerCountData;
   tripCandidatesSearch?: TripCandidatesSearchModel;
-  paymentIntent?: PaymentIntentModel;
+  paymentIntent?: PaymentIntentModel & { confirmed?: boolean };
 };
 
 function getTokenSearchData(event: RequestEvent): SearchData | undefined {

@@ -1,93 +1,58 @@
 <script lang="ts" context="module">
-  const appearance: Appearance = {
-    theme: "stripe",
-    variables: {
-      colorPrimary: "#0570de",
-      colorBackground: "#ffffff",
-      colorText: "#17372f",
-      colorDanger: "#db3041",
-      fontFamily: "Inter, Open Sans, system-ui, sans-serif",
-      spacingUnit: "6px",
-      borderRadius: "4px",
-    },
-    rules: {
-      ".Error": {
-        fontSize: "12px",
-      },
-      ".Label": {
-        fontSize: "14px",
-        fontWeight: "600",
-      },
-      ".Input:focus": {
-        border: "1px solid #bcc2bd",
-        boxShadow: "none",
-      },
-      ".Input": {
-        border: "1px solid #d7dbd8",
-        fontSize: "14px",
-        borderRadius: "8px",
-        padding: "10px 16px",
-        boxShadow: "none",
-      },
-    },
-  };
+  function getDefaultPassengers(passengers: PassengerCountData): PartialPassengerData[] {
+    return [
+      ...Array(passengers.adults)
+        .fill(undefined)
+        .map<PartialPassengerData>(() => ({ document: {}, type: "adult" })),
+      ...Array(passengers.children)
+        .fill(undefined)
+        .map<PartialPassengerData>(() => ({ document: {}, type: "child" })),
+      ...Array(passengers.infants)
+        .fill(undefined)
+        .map<PartialPassengerData>(() => ({ document: {}, type: "infant" })),
+    ];
+  }
 </script>
 
 <script lang="ts">
-  import Button from "components/ui/button.svelte";
-  import Countdown from "../countdown.svelte";
-  import Summary from "../../components/summary/summary.svelte";
-  import routeConfig from "routeConfig";
-  import Checkbox from "components/ui/checkbox.svelte";
-  import { browser } from "$app/environment";
   import { page } from "$app/stores";
-  import { onDestroy } from "svelte";
-  import { callAction } from "utils/common";
-  import { loadStripe, type Stripe, type Appearance, type StripeElements } from "@stripe/stripe-js";
-  import { env } from "$env/dynamic/public";
-  import { goto } from "$app/navigation";
-  import type { ActionPollReturnType } from "./+page.server";
-  import { URLExtended } from "utils/url";
   import LoadingIcon from "components/icons/loading-icon.svelte";
+  import Button from "components/ui/button.svelte";
+  import routeConfig from "routeConfig";
+  import { URLExtended } from "utils/url.js";
+  import Payment from "./payment.svelte";
+  import PassengerEntry, {
+    getPassengerValidator,
+    type PartialPassengerData,
+  } from "./passenger-entry.svelte";
+  import ContactInformation, {
+    contactInformationData,
+    type PartialContactInformationData,
+  } from "./contact-information.svelte";
+  import Countdown from "../countdown.svelte";
+  import { z } from "zod";
+  import type { PassengerCountData } from "../common";
   import { pendableCall } from "utils/pendable-call";
-  import { pollableCall } from "utils/pollable-call";
+  import { callAction } from "utils/common";
+  import { goto } from "$app/navigation";
 
   export let data;
 
-  let stripe: Stripe | undefined = undefined;
-  let stripeElements: StripeElements | undefined = undefined;
-  let stripeContainer: HTMLDivElement | undefined = undefined;
-  let termsAccepted = false;
+  let payment: Payment | undefined;
+  let bookingData: {
+    passengers: PartialPassengerData[];
+    contactInformation: PartialContactInformationData;
+  } = {
+    passengers: getDefaultPassengers(data.searchData.passengers),
+    contactInformation: { phone: {}, address: {} },
+  };
+  let errors: z.ZodFormattedError<z.infer<typeof bookingDetailsValidator>> | undefined = undefined;
 
-  $: priceQuoteId = data.priceQuote.id;
-  $: clientSecret = data.searchData.paymentIntent?.clientSecret;
+  $: bookingDetailsValidator = z.object({
+    passengers: z.array(getPassengerValidator(data.priceQuote.required)),
+    contactInformation: contactInformationData,
+  });
   $: backUrl = getBackUrl(data.searchData);
-  $: if (browser) {
-    pollPriceQuote(priceQuoteId).then(updateData);
-  }
-  $: if (browser && clientSecret) {
-    createStripe(clientSecret);
-  }
-
-  function updateData(value?: ActionPollReturnType): void {
-    if (!value) {
-      return;
-    }
-
-    data.searchData.paymentIntent = value.paymentIntent;
-    data.priceQuote = value.priceQuote;
-  }
-
-  async function createStripe(nextClientSecret: string): Promise<void> {
-    stripe = (await loadStripe(env.PUBLIC_STRIPE_KEY ?? "", { locale: "en-GB" })) ?? undefined;
-
-    stripeElements = stripe?.elements({ appearance, clientSecret: nextClientSecret });
-    const paymentElement = stripeElements?.create("payment");
-
-    if (stripeContainer) {
-      paymentElement?.mount(stripeContainer);
-    }
-  }
 
   function getBackUrl(searchData: typeof data.searchData): URL {
     return new URLExtended(routeConfig.tripManagement.book.select.root, {
@@ -103,53 +68,54 @@
     });
   }
 
-  const { poll: pollPriceQuote, cancel: cancelPolling } = pollableCall({
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    func(_: string) {
-      return callAction<ActionPollReturnType>({
-        action: routeConfig.tripManagement.book.payment.actions.poll,
-        apply: false,
-      });
-    },
-    check(result) {
-      if (
-        result.type !== "success" ||
-        result.data?.priceQuote.status === "unspecified" ||
-        result.data?.priceQuote.status === "failed"
-      ) {
-        return { status: "done", data: undefined };
-      }
+  async function createOrder(): Promise<boolean> {
+    errors = undefined;
+    const validationResult = bookingDetailsValidator.safeParse(bookingData);
 
-      if (result.data?.priceQuote.status === "completed") {
-        return { status: "done", data: result.data };
-      }
+    if (!validationResult.success) {
+      errors = validationResult.error.format();
 
-      return { status: "pending" };
-    },
-    sleepMs: 2000,
-  });
-
-  const { pending, func: pay } = pendableCall(async () => {
-    if (!data.priceQuote.price || !stripe || !clientSecret || !stripeElements) {
-      return;
+      return false;
     }
 
-    const result = await stripeElements.submit();
-
-    if (result.error) {
-      return;
-    }
-
-    await stripe.confirmPayment({
-      elements: stripeElements,
-      clientSecret,
-      redirect: "if_required",
+    const result = await callAction({
+      action: routeConfig.tripManagement.book.payment.actions.createOrder,
+      data: {
+        priceQuoteId: data.priceQuote.id,
+        passengers: validationResult.data.passengers,
+        contact: validationResult.data.contactInformation,
+        price: data.priceQuote.price,
+      },
+      dataType: "json",
+      apply: false,
     });
 
-    await goto(routeConfig.tripManagement.book.passengerDetails.root);
-  });
+    if (result.type !== "success") {
+      return false;
+    }
 
-  onDestroy(cancelPolling);
+    return true;
+  }
+
+  const { pending, func: pay } = pendableCall(async () => {
+    if (!payment) {
+      return;
+    }
+
+    if (!(await payment.pay())) {
+      return;
+    }
+
+    if (data.searchData.paymentIntent) {
+      data.searchData.paymentIntent.confirmed = true;
+    }
+
+    if (!(await createOrder())) {
+      return;
+    }
+
+    await goto(routeConfig.tripManagement.book.confirmation.root);
+  });
 </script>
 
 <svelte:head>
@@ -159,42 +125,34 @@
 <div class="content">
   <Countdown expiresAt={data.priceQuote.expiresAt} show />
 
-  <div class="scroll">
-    <div class="details">
-      <div
-        bind:this={stripeContainer}
-        class="stripe-container"
-        class:pending={data.priceQuote.status !== "completed"}
-      >
-        {#if data.priceQuote.status !== "completed"}
-          <LoadingIcon />
-        {/if}
-      </div>
-
-      <label for="toc" class="toc typography body-small">
-        <Checkbox id="toc" bind:checked={termsAccepted} />
-        <span>
-          By booking your ticket you accept Snowfall’s
-          <a href={routeConfig.help.termsAndConditions.root} target="_blank">T&amp;Cs</a>, the
-          <a href="/">carrier’s conditions of carriage</a>
-          and
-          <a href={routeConfig.help.privacyPolicy.root} target="_blank">privacy policy</a>.
-        </span>
-      </label>
+  <div class="wrapper">
+    <div class="column passengers">
+      {#each bookingData.passengers as passenger, idx}
+        <PassengerEntry
+          bind:passenger
+          errors={errors?.passengers?.[idx]}
+          required={data.priceQuote.required}
+          passengerNumber={idx + 1}
+        />
+      {/each}
     </div>
 
-    <Summary
-      passengers={data.searchData.passengers}
-      offer={data.priceQuote.offer}
-      options={data.priceQuote.options}
-    />
+    <div class="column payment">
+      <ContactInformation
+        countries={data.countries}
+        bind:contactInformation={bookingData.contactInformation}
+        errors={errors?.contactInformation}
+      />
+
+      <Payment bind:this={payment} priceQuote={data.priceQuote} searchData={data.searchData} />
+    </div>
   </div>
 </div>
 
 <div class="actions">
   <div class="wrapper">
     <Button size="small" variant="text" href={backUrl.toString()}>Previous</Button>
-    <Button size="small" on:click={pay} disabled={!termsAccepted}>
+    <Button size="small" on:click={pay}>
       Next
 
       {#if $pending}
@@ -209,74 +167,41 @@
     display: flex;
     flex-flow: column;
     flex-grow: 1;
+    gap: 24px;
     width: 100%;
-    padding-top: 24px;
+    height: 100%;
+    padding: 24px;
     overflow: auto;
   }
 
   .content > :global(.countdown) {
     max-width: 1104px;
-    margin: 0 24px 24px;
   }
 
-  .scroll {
-    --summary-width: 320px;
-    --passengers-width: calc(1152px - var(--summary-width) - 72px);
-
-    display: flex;
-    flex-grow: 1;
+  .wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 24px;
-    width: 100%;
-    padding: 0 24px 24px;
+    max-width: 1104px;
+    height: 100%;
     overflow: auto;
   }
 
-  .scroll > .details {
+  .column {
     display: flex;
     flex-flow: column;
+    flex-grow: 1;
     gap: 24px;
-    align-self: flex-start;
     width: 100%;
-    max-width: var(--passengers-width);
+    overflow: auto;
   }
 
-  .stripe-container {
-    padding: 40px 80px;
-    color: var(--color-text-light-strong);
-    background-color: var(--color-common-background-light-main);
-    border-radius: 16px;
+  .column.passengers {
+    min-width: 648px;
   }
 
-  .stripe-container.pending {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .scroll > :global(.summary) {
-    position: sticky;
-    top: 0;
-    left: 0;
-    flex-shrink: 0;
-    width: var(--summary-width);
-  }
-
-  .toc {
-    display: flex;
-    gap: 12px;
-    padding: 40px 80px;
-    color: var(--color-text-light-strong);
-    background-color: var(--color-common-background-light-main);
-    border-radius: 16px;
-  }
-
-  .toc > :global(.checkbox) {
-    cursor: pointer;
-  }
-
-  .toc a {
-    color: var(--color-main-primary-600);
-    text-decoration: none;
+  .column.payment {
+    min-width: 432px;
   }
 
   .actions {

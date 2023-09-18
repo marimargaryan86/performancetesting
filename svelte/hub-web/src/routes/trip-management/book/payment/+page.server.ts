@@ -1,14 +1,79 @@
-import { ActionFailure, error, fail, redirect } from "@sveltejs/kit";
+import { error, fail, redirect, type ActionFailure } from "@sveltejs/kit";
+import { getSearchData, setSearchData, type SearchData, type ResolvedSearchData } from "../common";
+import integrationInstances from "integration-instances";
+import routeConfig from "routeConfig";
 import type { TripOfferPriceQuoteModel } from "integration/junction-mobile-api/schemas/offer";
 import type { PaymentIntentModel } from "integration/junction-mobile-api/schemas/payment";
-import integrationInstances from "integration-instances";
-import { getSearchData, setSearchData, type ResolvedSearchData, type SearchData } from "../common";
-import routeConfig from "routeConfig";
+import type { PassengerData } from "./passenger-entry.svelte";
+import type { ContactInformationData } from "./contact-information.svelte";
+import type { PriceModel } from "integration/junction-mobile-api/schemas/price";
+import { ensureDefined } from "utils/array";
+import type { CreateOrderModel, OrderModel } from "integration/junction-mobile-api/schemas/order";
 
 export type ActionPollReturnType = {
   priceQuote: TripOfferPriceQuoteModel;
   paymentIntent?: PaymentIntentModel;
 };
+
+type BookingData = {
+  priceQuoteId: string;
+  contact: ContactInformationData;
+  passengers: PassengerData[];
+  price: PriceModel;
+};
+
+function getBookingData(formData: FormData): BookingData {
+  const jsonData = JSON.parse(formData.get("json")?.toString() ?? "{}");
+
+  return {
+    priceQuoteId: jsonData.priceQuoteId,
+    contact: jsonData.contact,
+    passengers: (jsonData.passengers as PassengerData[]).map<PassengerData>((item) => ({
+      ...item,
+      dateOfBirth: new Date(item.dateOfBirth),
+      document: item.document
+        ? {
+            ...item.document,
+            expirationDate: item.document.expirationDate
+              ? new Date(item.document.expirationDate)
+              : undefined,
+            issueDate: item.document.issueDate ? new Date(item.document.issueDate) : undefined,
+          }
+        : undefined,
+    })),
+    price: jsonData.price,
+  };
+}
+
+function createOrder(data: BookingData, paymentId: string): Promise<OrderModel> {
+  return integrationInstances.junctionMobileApi.orders.createOrder({
+    contactDetails: {
+      address: {
+        addressLines: [data.contact.address.line1, data.contact.address.line2].filter(
+          ensureDefined,
+        ),
+        city: data.contact.city,
+        countryCode: data.contact.countryCode,
+        postalCode: data.contact.postcode,
+      },
+      email: data.contact.email,
+      phone: {
+        countryCode: data.contact.phone.code,
+        number: data.contact.phone.number,
+      },
+    },
+    passengers: data.passengers.map<CreateOrderModel["passengers"][number]>((item) => ({
+      dateOfBirth: new Date(item.dateOfBirth),
+      firstName: item.firstName,
+      lastName: item.lastName,
+      document: item.document,
+      title: item.title ?? "unspecified",
+      gender: item.gender ?? "unspecified",
+    })),
+    paymentId,
+    priceQuoteId: data.priceQuoteId,
+  });
+}
 
 async function getPriceQuoteAndPaymentIntent(searchData: SearchData): Promise<{
   priceQuote: TripOfferPriceQuoteModel;
@@ -105,5 +170,44 @@ export const actions = {
 
       return fail(castErr.status, { error: castErr.body.message });
     }
+  },
+  async createOrder(event): Promise<ActionFailure<{ error: string }> | undefined> {
+    const formData = await event.request.formData();
+    const searchData = getSearchData(event);
+    const bookingData = getBookingData(formData);
+
+    if (!searchData) {
+      return fail(400, { error: "No search data found" });
+    }
+
+    if (!searchData.priceQuoteId) {
+      return fail(400, { error: "No quote ID found" });
+    }
+
+    if (!searchData.paymentIntent) {
+      return fail(400, { error: "No payment intent found" });
+    }
+
+    try {
+      const order = await createOrder(bookingData, searchData.paymentIntent.id);
+
+      setSearchData({ ...searchData, orderId: order.id }, event);
+    } catch {
+      return fail(400, { error: "Failed to create booking" });
+    }
+
+    return undefined;
+  },
+  confirmPayment(event): void {
+    const searchData = getSearchData(event);
+
+    if (!searchData?.paymentIntent) {
+      return;
+    }
+
+    setSearchData(
+      { ...searchData, paymentIntent: { ...searchData.paymentIntent, confirmed: true } },
+      event,
+    );
   },
 };

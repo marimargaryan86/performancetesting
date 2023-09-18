@@ -3,7 +3,6 @@ const tripManagementRoot = "/trip-management" as const;
 // Trip management - book
 const tripManagementBookRoot = `${tripManagementRoot}/book` as const;
 const tripManagementBookSelectRoot = `${tripManagementBookRoot}/select-offer` as const;
-const tripManagementBookPassengersRoot = `${tripManagementBookRoot}/passenger-details` as const;
 const tripManagementBookPaymentRoot = `${tripManagementBookRoot}/payment` as const;
 const tripManagementBookConfirmationRoot = `${tripManagementBookRoot}/confirmation` as const;
 // Trip management - Orders
@@ -77,16 +76,12 @@ export default {
           select: `${tripManagementBookSelectRoot}?/select` as const,
         },
       },
-      passengerDetails: {
-        root: tripManagementBookPassengersRoot,
-        actions: {
-          createOrder: `${tripManagementBookPassengersRoot}?/createOrder` as const,
-        },
-      },
       payment: {
         root: tripManagementBookPaymentRoot,
         actions: {
           poll: `${tripManagementBookPaymentRoot}?/poll` as const,
+          createOrder: `${tripManagementBookPaymentRoot}?/createOrder` as const,
+          confirmPayment: `${tripManagementBookPaymentRoot}?/confirmPayment` as const,
         },
       },
       confirmation: {

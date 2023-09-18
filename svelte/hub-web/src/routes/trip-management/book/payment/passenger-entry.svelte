@@ -15,7 +15,7 @@
     [key in keyof PassportDocumentModel]-?: z.ZodType<PassportDocumentModel[key]>;
   }>;
 
-  type PassengerValidator = z.ZodObject<
+  export type PassengerValidator = z.ZodObject<
     Omit<
       { [key in keyof OrderPassengerModel]: z.ZodType<OrderPassengerModel[key]> },
       "document"
@@ -114,8 +114,8 @@
 
 <div class="passenger">
   <h2>
-    <strong class="typography title-large bold">Passenger {passengerNumber}</strong>
-    <span class="typography title-medium">{capitalize(passenger.type)}</span>
+    <strong class="typography title-medium bold">Passenger {passengerNumber}</strong>
+    <span class="typography title-small">{capitalize(passenger.type)}</span>
   </h2>
 
   <div class="details">
@@ -243,7 +243,7 @@
     display: flex;
     flex-flow: column;
     gap: 24px;
-    padding: 40px 80px;
+    padding: 24px 40px;
     color: var(--color-text-light-strong);
     background-color: var(--color-common-background-light-main);
     border-radius: 16px;
@@ -251,8 +251,8 @@
 
   h2 {
     display: flex;
-    flex-flow: column;
-    gap: 8px;
+    gap: 16px;
+    align-items: center;
   }
 
   .details {

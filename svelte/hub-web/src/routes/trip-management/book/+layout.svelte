@@ -3,8 +3,7 @@
     { label: "Search", number: 1, title: "Search for offers" },
     { label: "Select", number: 2, title: "Select an offer" },
     { label: "Payment", number: 3, title: "Payment" },
-    { label: "Passenger Details", number: 4, title: "Passenger Details" },
-    { label: "Confirmation", number: 5, title: "Confirmation" },
+    { label: "Confirmation", number: 4, title: "Confirmation" },
   ];
 </script>
 
@@ -20,10 +19,8 @@
       return 2;
     } else if (route?.endsWith("payment")) {
       return 3;
-    } else if (route?.endsWith("passenger-details")) {
-      return 4;
     } else if (route?.endsWith("confirmation")) {
-      return 5;
+      return 4;
     }
 
     return 1;

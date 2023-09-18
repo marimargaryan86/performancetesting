@@ -59,7 +59,7 @@
 </script>
 
 <div class="contact-information">
-  <h2 class="typography title-large bold">Agent's contact information</h2>
+  <h2 class="typography title-medium bold">Contact information</h2>
 
   <div class="details">
     <div class="phone">
@@ -137,7 +137,7 @@
     display: flex;
     flex-flow: column;
     gap: 24px;
-    padding: 40px 80px;
+    padding: 24px 40px;
     color: var(--color-text-light-strong);
     background-color: var(--color-common-background-light-main);
     border-radius: 16px;
@@ -146,7 +146,7 @@
   .details {
     display: flex;
     flex-flow: column;
-    gap: 24px;
+    gap: 16px 24px;
   }
 
   .details :global(.text-field),
@@ -165,7 +165,11 @@
 
   .location {
     display: grid;
-    grid-template-columns: 1fr 1fr 112px;
+    grid-template-columns: 1fr 1fr;
     gap: 24px;
+  }
+
+  .location > :global(.text-field:first-child) {
+    grid-column: 1 / -1;
   }
 </style>
