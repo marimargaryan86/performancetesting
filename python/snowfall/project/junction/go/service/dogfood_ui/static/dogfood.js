@@ -104,9 +104,9 @@ function show_loader(status_message = "") {
   const container = document.getElementById("loader");
   container.classList.add("overlay");
   container.innerHTML =
-    '<div><div class="lds-heart"><div></div></div><br>' +
+    '<div><div class="lds-heart"><div></div></div><br><center>' +
     status_message +
-    "</div>";
+    "</center></div>";
 }
 
 function hide_loader() {
@@ -909,4 +909,9 @@ window.onload = () => {
 
   searchForm.addEventListener("submit", search_trips);
   document.getElementById("clear-places-cache").addEventListener("click", clear_places_cache);
+};
+
+window.onerror = function(msg, url, line, col, error) {
+  show_loader("An unexpected error has occurred. Please reload the application.<br>" + error);
+  return true;
 };
