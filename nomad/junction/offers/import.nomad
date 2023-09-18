@@ -46,6 +46,10 @@ variable "api_pay_base_url" {
   type = string
 }
 
+variable "gateway_poll_sleep" {
+  type = number
+}
+
 job "offers-import" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -152,6 +156,7 @@ EOH
         USE_PAY_FOR_CURRENCY_CONVERSIONS = "${var.use_pay_for_currency_conversions}"
         PUBLIC_PAY_ADMIN_API_DSN         = "${var.pay_admin_api_base_url}"
         PUBLIC_PAY_API_DSN               = "${var.api_pay_base_url}"
+        GATEWAY_POLL_SLEEP               = "${var.gateway_poll_sleep}"
       }
     }
   }

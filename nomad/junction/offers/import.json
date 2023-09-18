@@ -6,7 +6,8 @@
       "payer_currency_code": "SEK",
       "api_pay_base_url": "https://api.pay.junction.dev",
       "pay_admin_api_base_url": "https://adminapi.pay.junction.dev",
-      "use_pay_for_currency_conversions": true
+      "use_pay_for_currency_conversions": true,
+      "gateway_poll_sleep": 5
     }
   },
   "production": {
@@ -16,7 +17,8 @@
       "payer_currency_code": "SEK",
       "api_pay_base_url": "https://api.pay.junction.travel",
       "pay_admin_api_base_url": "https://adminapi.pay.junction.travel",
-      "use_pay_for_currency_conversions": true
+      "use_pay_for_currency_conversions": true,
+      "gateway_poll_sleep": 1
     }
   },
   "sandbox": {
@@ -26,7 +28,8 @@
       "payer_currency_code": "SEK",
       "api_pay_base_url": "https://api.pay.sandbox.junction.dev",
       "pay_admin_api_base_url": "https://adminapi.pay.sandbox.junction.dev",
-      "use_pay_for_currency_conversions": true
+      "use_pay_for_currency_conversions": true,
+      "gateway_poll_sleep": 1
     }
   }
 }

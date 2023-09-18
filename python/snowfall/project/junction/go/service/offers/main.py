@@ -64,6 +64,7 @@ class _ImportSettings(pay_integration.Settings, _PaySettings, application.Settin
     )
     gateway_address: str
     gateway_timeout: datetime.timedelta = datetime.timedelta(seconds=45)
+    gateway_poll_sleep: int = 5
 
 
 class _GatherPriceQuoteSettings(
@@ -250,6 +251,7 @@ async def _import(app: application.AsyncApplication[_ImportSettings]) -> None:
         reseller_disabled_operators=app.settings.reseller_disabled_operators,
         gateway_stubs=offers_pb2_grpc.OfferServiceStub(gateway_channel),
         gateway_timeout=app.settings.gateway_timeout,
+        gateway_poll_sleep=app.settings.gateway_poll_sleep,
     )
     await offer_importer.consume()
 

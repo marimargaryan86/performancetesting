@@ -119,6 +119,7 @@ class OfferImporter(object):
         reseller_disabled_operators: RESELLERS_TO_PROVIDER_OPERATORS,
         gateway_stubs: offers_pb2_grpc.OfferServiceStub,
         gateway_timeout: datetime.timedelta,
+        gateway_poll_sleep: int,
     ):
         self._consumer = consumer_obj
         self._offers = trip_offers
@@ -131,6 +132,7 @@ class OfferImporter(object):
         self._reseller_disabled_operators = reseller_disabled_operators
         self._gateway_stubs = gateway_stubs
         self._gateway_timeout = gateway_timeout
+        self._gateway_poll_sleep = gateway_poll_sleep
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
@@ -182,6 +184,7 @@ class OfferImporter(object):
         cutoff = datetime.datetime.now(tz=datetime.UTC) + self._gateway_timeout
 
         while datetime.datetime.now(tz=datetime.UTC) < cutoff:
+            await asyncio.sleep(self._gateway_poll_sleep)
             response = await self._gateway_stubs.PopOfferSearchResults(
                 offers_pb2.PopOfferSearchResultsRequest(
                     id=gw_offer_search_id,
@@ -199,7 +202,7 @@ class OfferImporter(object):
             if not response.is_in_progress:
                 break
 
-            await asyncio.sleep(1)
+            await asyncio.sleep(self._gateway_poll_sleep)
 
         await self._searches.mark_as_completed(offer_search.id)
 
