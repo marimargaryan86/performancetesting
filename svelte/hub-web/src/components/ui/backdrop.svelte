@@ -5,10 +5,11 @@
 
   let show = false;
 
-  const dispatch = createEventDispatcher<{ close: void }>();
+  const dispatch = createEventDispatcher<{ close: void; open: void }>();
 
   export function open(): void {
     show = true;
+    dispatch("open");
   }
 
   export function close(): void {
@@ -17,7 +18,11 @@
   }
 
   export function toggle(): void {
-    show = !show;
+    if (show) {
+      close();
+    } else {
+      open();
+    }
   }
 </script>
 

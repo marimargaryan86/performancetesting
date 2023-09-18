@@ -30,7 +30,7 @@
   }
 </script>
 
-<Dialog bind:this={dialog} on:close>
+<Dialog bind:this={dialog} on:close on:open>
   <div class="content">
     <slot>
       <span>Are you sure?</span>
