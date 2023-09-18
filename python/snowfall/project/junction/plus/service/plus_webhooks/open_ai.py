@@ -4,33 +4,41 @@ from collections.abc import Mapping, Sequence
 from gettext import gettext as _
 from typing import Any, ClassVar
 
+import httpx
 import openai
 
+from snowfall.project.junction.plus.service.plus_webhooks import shortener
 from snowfall.stdlib.logging import stdout
 
 
-def home_function(*args: Any, **kwargs: Any) -> str:
+async def home_function(*args: Any, **kwargs: Any) -> str:
     return "Do you want to continue with new queries about trip destination?"
 
 
-def search_flight(  # noqa: WPS211
+async def search_flight(  # noqa: WPS211
     origin: str,
     destination: str,
     date: str,
     search_url_template: str,
+    shortener_client: shortener.Client,
     *args: Any,
     **kwargs: Any,
 ) -> str:
     departure_date = datetime.datetime.strptime(date, "%d-%m-%Y").replace(
         tzinfo=datetime.UTC,
     )
-    return _("Please book your flights here: ") + search_url_template.format(
+    original_link = search_url_template.format(
         origin=origin,
         destination=destination,
         day=departure_date.day,
         month=departure_date.month,
         year=departure_date.year,
     )
+    try:
+        short_link = await shortener_client.shorten_link(original_link)
+    except httpx.HTTPStatusError:
+        short_link = original_link
+    return _("Please book your flights here: ") + short_link
 
 
 class AIBot(object):
@@ -108,6 +116,7 @@ class AIBot(object):
         self,
         messages: Sequence[Mapping[str, str]],
         search_url_template: str,
+        shortener_client: shortener.Client,
     ) -> Mapping[str, str]:
         """Get message history from state, append message and send to openai."""
         ai_response = await openai.ChatCompletion.acreate(
@@ -124,8 +133,9 @@ class AIBot(object):
                 assistant_message["function_call"]["arguments"],
             )
             return {
-                "content": self.available_functions[function_name](
+                "content": await self.available_functions[function_name](
                     search_url_template=search_url_template,
+                    shortener_client=shortener_client,
                     **assistant_arguments,
                 ),
                 "role": "assistant",

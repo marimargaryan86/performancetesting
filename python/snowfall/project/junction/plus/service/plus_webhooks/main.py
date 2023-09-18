@@ -29,6 +29,9 @@ from snowfall.project.junction.plus.service.plus_webhooks import (
     open_ai,
 )
 from snowfall.project.junction.plus.service.plus_webhooks.routes import router
+from snowfall.project.junction.plus.service.plus_webhooks.shortener import (
+    ShortenerClient,
+)
 from snowfall.stdlib.integration.starlette import application as starlette
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.service import application
@@ -84,6 +87,11 @@ def _factory(
                         redis_client=redis_client,
                         cache_ttl=datetime.timedelta(minutes=15),
                         ai_bot=open_ai.AIBot(),
+                        shortener_client=ShortenerClient(
+                            shortener_url=app.settings.shortener_url,
+                            shortener_domain=app.settings.shortener_domain,
+                            shortener_key=app.settings.shortener_key,
+                        ),
                     ),
                     whatsapp_channel=ProviderChannel(
                         sid=app.settings.twilio_sid,

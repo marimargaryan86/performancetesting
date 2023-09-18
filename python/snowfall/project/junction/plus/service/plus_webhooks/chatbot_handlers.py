@@ -13,7 +13,7 @@ from snowfall.project.junction.plus.notification_channels.whatsapp import (
     transform_trip_details,
 )
 from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
-from snowfall.project.junction.plus.service.plus_webhooks import open_ai
+from snowfall.project.junction.plus.service.plus_webhooks import open_ai, shortener
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.redis import types as redis
@@ -33,12 +33,14 @@ class MessageHandler(object):
         redis_client: redis.Client[str],
         cache_ttl: datetime.timedelta,
         ai_bot: open_ai.AIBot,
+        shortener_client: shortener.Client,
     ) -> None:
         self._redis = redis_client
         # Not going to use it now but in the future we can decide to
         # reset the state of whatsapp conversation after some time
         self._default_ttl = cache_ttl
         self._ai_bot = ai_bot
+        self._shortener_client = shortener_client
         self._logger = stdout.get_logger()
 
     async def handle_message(  # noqa: WPS211,WPS210
@@ -74,6 +76,7 @@ class MessageHandler(object):
             message_key=message_key,
             ai_bot=self._ai_bot,
             redis_client=self._redis,
+            shortener_client=self._shortener_client,
         )
         subscriber_state["last_message"] = message
         subscriber_state["last_response"] = response[0]
@@ -285,6 +288,7 @@ async def handle_unknown(  # noqa: WPS211
     message: str,
     ai_bot: open_ai.AIBot,
     redis_client: redis.Client[str],
+    shortener_client: shortener.Client,
     **kwargs: Any,
 ) -> Sequence[str]:
     session = redis_client.hash_("ai_assistant_state")
@@ -303,6 +307,7 @@ async def handle_unknown(  # noqa: WPS211
             assistant_message = await ai_bot.handle_prompt(
                 messages=ai_chat_history,
                 search_url_template=configuration_vector.search_url_template,
+                shortener_client=shortener_client,
             )
             ai_chat_history.append(assistant_message)
             await session.put(subscriber.phone_number.e164_number, json.dumps(state))

@@ -30,6 +30,7 @@ from snowfall.project.junction.plus.service.plus_webhooks import (
     chatbot_handlers,
     middlewares,
     open_ai,
+    shortener,
 )
 from snowfall.project.junction.plus.service.plus_webhooks.routes import router
 from snowfall.stdlib.integration.starlette import application
@@ -184,6 +185,11 @@ def ai_bot() -> open_ai.AIBot:
 
 
 @pytest.fixture()
+def shortener_client() -> shortener.Client:
+    return shortener.DictClient()
+
+
+@pytest.fixture()
 def app(  # noqa: WPS211
     secret_key: str,
     monitoring_rules_client: monitoring_rules_adapter.Client,
@@ -193,6 +199,7 @@ def app(  # noqa: WPS211
     notification_event_publisher_client: notification_event_publisher_adapter.Client,
     twilio_validator: RequestValidator,
     ai_bot: open_ai.AIBot,
+    shortener_client: shortener.Client,
     redis_client: redis.Client[str],
     whatsapp_channel: whatsapp.Channel,
 ) -> applications.Starlette:
@@ -215,6 +222,7 @@ def app(  # noqa: WPS211
                     redis_client=redis_client,
                     cache_ttl=datetime.timedelta(minutes=10),
                     ai_bot=ai_bot,
+                    shortener_client=shortener_client,
                 ),
                 whatsapp_channel=whatsapp_channel,
             ),

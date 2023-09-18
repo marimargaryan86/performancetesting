@@ -24,6 +24,9 @@ class Settings(application.Settings):
     redis_prefix: str
     openai_api_key: str
     openai_org: str
+    shortener_key: str
+    shortener_url: str
+    shortener_domain: str
 
 
 def create_dependencies(  # noqa: WPS211

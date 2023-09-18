@@ -127,6 +127,7 @@ REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis:
 NOTIFICATIONS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_notifications-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/plus-webhooks" }}
 FLIGHT_STATS_APP_KEY={{ .Data.data.flight_stats_app_key }}
+SHORTENER_KEY={{ .Data.data.shortener_key }}
 {{ end }}
 {{ with secret "kv/data/${var.environment}/notification-center" }}
 TWILIO_SID={{ .Data.data.twilio_sid }}
@@ -161,6 +162,8 @@ EOH
         SENTRY_DSN            = "https://451b8cf11f0240d1884794af6d3d77f0@sentry.snowfall.se/165"
         PROMETHEUS_PORT       = "${NOMAD_PORT_prometheus}"
         REDIS_PREFIX          = "junction-plus"
+        SHORTENER_DOMAIN      = "bdvp.short.gy"
+        SHORTENER_URL         = "https://api.short.io/links"
       }
     }
   }
