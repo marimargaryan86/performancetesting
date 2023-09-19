@@ -99,12 +99,12 @@ class Queue(consumer.AbstractQueue[amqp_pb2.TripOfferSearchTask]):
     @property
     def binds(self) -> Sequence[tuple[amqp.Exchange, str]]:
         return [
-            (amqp.Exchange(self._name_prefix), "trips.search.*"),
+            (amqp.Exchange(self._name_prefix), "offers.search.*"),
         ]
 
     @property
     def name(self) -> str:
-        return "{0}_trip_searches".format(self._name_prefix)
+        return "{0}_offer_searches".format(self._name_prefix)
 
     async def on_message(self, msg: amqp.Message[amqp_pb2.TripOfferSearchTask]) -> None:
         match msg.body:

@@ -56,8 +56,12 @@ class QueueConsumer(Generic[_Proto]):
                         self._exchanges[exchange.name],
                         routing_key,
                     )
-
                 await declared_queue.consume(self._generate_consumer(queue))
+                self._logger.info(
+                    "Queue consumer started.",
+                    queue=queue.name,
+                    binds=queue.binds,
+                )
 
             await asyncio.Future()
 
