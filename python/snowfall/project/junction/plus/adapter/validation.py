@@ -72,3 +72,29 @@ def get_whatsapp_number(field: str) -> str:
     if len(field_array) == 2:
         return field_array[1]
     raise RuntimeError("Wrong format for whatsapp number: {0}".format(field))
+
+
+def validate_search_url_template(
+    search_url_template: str | None,
+) -> None:
+    dynamic_fields = ["{origin}", "{destination}", "{day}", "{month}", "{year}"]
+    if not search_url_template:
+        raise ValueError("Search URL template should not be empty")
+    if not any(  # noqa: WPS337
+        dynamic_field in search_url_template for dynamic_field in dynamic_fields
+    ):
+        raise ValueError(
+            "Missing field, must have dynamic fields: {0}".format(
+                ",".join(dynamic_fields),
+            ),
+        )
+    try:
+        search_url_template.format(
+            origin="origin",
+            destination="destination",
+            day="11",
+            month="11",
+            year="2011",
+        )
+    except LookupError as err:
+        raise ValueError("Template is not formattable") from err
