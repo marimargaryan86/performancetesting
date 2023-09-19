@@ -1,4 +1,5 @@
 import ipaddress
+from collections.abc import Sequence
 
 import pydantic
 from grpc import aio
@@ -61,18 +62,28 @@ async def _produce(app: application.AsyncApplication[_AmqpSettings]) -> None:
     )
 
 
-async def _echo_message(message: types.Message[echo_pb2.EchoRequest]) -> None:
-    stdout.get_logger().info(message.body.echo)
+class _Queue(consumer.AbstractQueue[echo_pb2.EchoRequest]):
+    def __init__(self, name: str):
+        self._logger = stdout.get_logger()
+        self._name = name
+
+    @property
+    def binds(self) -> Sequence[tuple[types.Exchange, str]]:
+        return [
+            (types.Exchange(self._name), "echo.foobar"),
+        ]
+
+    @property
+    def name(self) -> str:
+        return "{0}_consumer".format(self._name)
+
+    async def on_message(self, msg: types.Message[echo_pb2.EchoRequest]) -> None:
+        self._logger.info(msg.body.echo)
 
 
 async def _consume(app: application.AsyncApplication[_AmqpSettings]) -> None:
     connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
-
-    await consumer.Consumer[echo_pb2.EchoRequest](
-        connection=connection,
-        queue_name="{0}_consumer".format(app.name),
-        binds=[(types.Exchange(app.name), "echo.foobar")],
-    ).consume(_echo_message)
+    await consumer.QueueConsumer(connection, [_Queue(name=app.name)]).consume()
 
 
 if __name__ == "__main__":

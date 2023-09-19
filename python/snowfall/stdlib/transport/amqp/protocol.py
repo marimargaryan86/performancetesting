@@ -1,8 +1,9 @@
 import datetime
-from collections.abc import Awaitable, Callable, Mapping
+from collections.abc import Awaitable, Callable, Mapping, Sequence
 from typing import Protocol, TypeVar
 
 from google.protobuf import message
+from pamqp import common
 
 from snowfall.stdlib.transport.amqp import types
 
@@ -28,3 +29,24 @@ class Producer(Protocol):
         headers: Mapping[str, str] | None = None,
     ) -> None:
         """Publish a message on the exchange."""
+
+
+class Queue(Protocol[_Proto]):
+    @property
+    def arguments(self) -> common.Arguments:
+        """Additional arguments to send to RabbitMQ when declaring the queue."""
+
+    @property
+    def binds(self) -> Sequence[tuple[types.Exchange, str]]:
+        """A sequence of exchanges and routing keys to bind the queue to."""
+
+    @property
+    def middlewares(self) -> Sequence[ConsumerMiddleware[_Proto]]:
+        """A sequence of middlewares to wrap around the queue."""
+
+    @property
+    def name(self) -> str:
+        """The name of the queue."""
+
+    async def on_message(self, msg: types.Message[_Proto]) -> None:
+        """Called by the consumer whenever a new message is received on the queue."""
