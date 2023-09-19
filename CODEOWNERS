@@ -11,6 +11,11 @@
 /pants.ci.toml
 /pants.toml
 
+[CI/CD] @frontend-tech-leads
+/svelte/**/*.cjs
+/svelte/**/package.json
+/svelte/**/tsconfig.json
+
 [Documentation]
 /docs/engineering/ @platform-engineers
 /docs/engineering/docs/projects/ @architects
