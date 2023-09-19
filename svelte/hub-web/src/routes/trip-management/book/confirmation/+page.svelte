@@ -7,8 +7,14 @@
   import Price from "./price.svelte";
   import Overview from "./overview.svelte";
   import Itinerary from "../../components/itinerary.svelte";
+  import { ensureDefined } from "utils/array";
+  import { downloadTickets } from "utils/booking";
 
   export let data;
+
+  $: hasTickets = Boolean(
+    data.order.bookings.map((item) => item.ticketUrl).filter(ensureDefined).length,
+  );
 </script>
 
 <svelte:head>
@@ -33,7 +39,11 @@
       <div class="details">
         <Overview order={data.order} />
 
-        <Button>Download tickets</Button>
+        {#if hasTickets}
+          <Button on:click={downloadTickets.bind(downloadTickets, data.order.bookings)}>
+            Download tickets
+          </Button>
+        {/if}
 
         <Price bookings={data.order.bookings} />
 

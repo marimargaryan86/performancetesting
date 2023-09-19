@@ -8,7 +8,7 @@
   import TRow from "components/ui/table/t-row.svelte";
   import Table from "components/ui/table/table.svelte";
   import routeConfig from "routeConfig";
-  import { getOrigin, getDestination } from "utils/booking";
+  import { getOrigin, getDestination, downloadTickets } from "utils/booking";
 
   export let data;
 </script>
@@ -41,7 +41,18 @@
             View
           </a>
         </TCol>
-        <TCol width="0"><a href="/">Download</a></TCol>
+        <TCol width="0">
+          {#if booking.ticketUrl}
+            <button
+              class="typography body-medium"
+              on:click|preventDefault={downloadTickets.bind(downloadTickets, [booking])}
+            >
+              Download
+            </button>
+          {:else}
+            <span class="not-available">N/A</span>
+          {/if}
+        </TCol>
         <TCol>{booking.details[0]?.legs[0]?.departureAt.toLocaleDateString("en-GB")}</TCol>
         <TCol>{origin?.name ?? "Unknown"}</TCol>
         <TCol>{destination?.name ?? "Unknown"}</TCol>
@@ -70,8 +81,17 @@
     cursor: pointer;
   }
 
-  a {
+  a,
+  button {
+    padding: 0;
     color: var(--color-common-light-text-link);
     text-decoration: none;
+    background-color: transparent;
+    border: 0;
+    cursor: pointer;
+  }
+
+  .not-available {
+    color: var(--color-common-light-soft);
   }
 </style>

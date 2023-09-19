@@ -39,6 +39,8 @@
   import type { OrderModel } from "integration/junction-mobile-api/schemas/order";
   import type { PriceModel } from "integration/junction-mobile-api/schemas/price";
   import routeConfig from "routeConfig";
+  import { ensureDefined } from "utils/array";
+  import { downloadTickets } from "utils/booking";
 
   export let data;
 </script>
@@ -60,15 +62,27 @@
   <TBody>
     {#each data.orders.data as order (order.id)}
       {@const totalPrice = getTotalPrice(order)}
+      {@const hasTickets = Boolean(
+        order.bookings.map((item) => item.ticketUrl).filter(ensureDefined).length,
+      )}
 
       <TRow alternatingBackground={false}>
-        <TCol class="typography body-small">
+        <TCol class="typography body-small" width="0">
           <a href={routeConfig.tripManagement.orders.order(order.id).root}>
             {order.journey?.reference ?? "Unknown"}
           </a>
         </TCol>
-        <TCol class="typography body-small">
-          <a href="/">Download</a>
+        <TCol class="typography body-small" width="0">
+          {#if hasTickets}
+            <button
+              class="typography body-small"
+              on:click|preventDefault={downloadTickets.bind(downloadTickets, order.bookings)}
+            >
+              Download
+            </button>
+          {:else}
+            <span class="not-available">N/A</span>
+          {/if}
         </TCol>
         <TCol class="typography body-small">
           {getDepartureDate(order).toLocaleDateString("sv-SE")}
@@ -104,9 +118,18 @@
     color: var(--color-common-light-soft);
   }
 
-  a {
+  a,
+  button {
+    padding: 0;
     color: var(--color-common-light-text-link);
     text-decoration: none;
+    background-color: transparent;
+    border: 0;
+    cursor: pointer;
+  }
+
+  .not-available {
+    color: var(--color-common-light-soft);
   }
 
   .action {

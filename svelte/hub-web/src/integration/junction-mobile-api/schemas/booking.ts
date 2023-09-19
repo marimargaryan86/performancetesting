@@ -88,6 +88,7 @@ export const bookingModelBase = z.object({
   price: priceModel.model,
   operatorBookingReferences: z.array(z.string()),
   externalReference: z.string(),
+  ticketUrl: z.string().optional(),
   status: z.string(),
   details: z.array(bookingDetailsModel.model),
 });
@@ -103,6 +104,7 @@ export const bookingModel = getSchemaModel(
       totalPrice: priceModel.schema,
       operatorBookingReferences: z.array(z.string()),
       externalReference: z.string(),
+      ticketUrl: z.string().optional(),
     }),
     relationships: bookingRelationships,
     links: links(["self"]),
@@ -114,6 +116,7 @@ export const bookingModel = getSchemaModel(
       details: [],
       externalReference: data.attributes.externalReference,
       operatorBookingReferences: data.attributes.operatorBookingReferences,
+      ticketUrl: data.attributes.ticketUrl,
       price: priceModel.toModel(data.attributes.totalPrice),
       status: data.relationships.status.data.id,
       order: undefined,
