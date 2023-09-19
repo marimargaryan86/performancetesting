@@ -54,6 +54,13 @@ class AIBot(object):
         After that, call the home_function.
         If user wants to find ticket for flight, ask user to specify date,
         the origin valid city name, destination valid city name, then call the search_flight.
+        When the user wants activities provide the following options as example
+        "1) Hotels, 2) Restaurants, 3) Museums, 4) Concerts, 5) Nightlife (bars, clubs), 6) Hiking"
+        Then wait for user's input and answer to the question if it's from mentioned options.
+        If your answer includes suggestion about place or activity always include url to them
+        and add at the end of whole message
+        "This disclaimer serves to inform users about the limitations of the information provided and encourages
+        them to take responsible steps to verify the accuracy and legitimacy of links and information.
     """
     initial_message = """
         Welcome to your travel assistant. For which city are you interested about?
