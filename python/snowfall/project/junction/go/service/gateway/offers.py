@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import datetime
 import time
+from collections.abc import Sequence
 
 import prometheus_client
 from grpc import StatusCode, aio
@@ -18,7 +19,7 @@ from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.instrumentation import prometheus
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.redis import types
-from snowfall.stdlib.transport.amqp import protocol
+from snowfall.stdlib.transport.amqp import consumer, protocol
 from snowfall.stdlib.transport.amqp import types as amqp
 from snowfall.stdlib.transport.grpc import service
 
@@ -82,18 +83,30 @@ class Service(service.Service, offers_pb2_grpc.OfferServiceServicer):
         )
 
 
-class Consumer(object):
+class Queue(consumer.AbstractQueue[amqp_pb2.TripOfferSearchTask]):
     def __init__(
         self,
+        name_prefix: str,
         providers_list: providers.Collection,
         repository: Repository,
         timeout: datetime.timedelta,
     ):
+        self._name_prefix = name_prefix
         self._providers = providers_list
         self._repository = repository
         self._timeout = timeout
 
-    async def consume(self, msg: amqp.Message[amqp_pb2.TripOfferSearchTask]) -> None:
+    @property
+    def binds(self) -> Sequence[tuple[amqp.Exchange, str]]:
+        return [
+            (amqp.Exchange(self._name_prefix), "trips.search.*"),
+        ]
+
+    @property
+    def name(self) -> str:
+        return "{0}_trip_searches".format(self._name_prefix)
+
+    async def on_message(self, msg: amqp.Message[amqp_pb2.TripOfferSearchTask]) -> None:
         match msg.body:
             case amqp_pb2.TripOfferSearchTask():
                 await self._consume_trip_task(msg.body)

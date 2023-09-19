@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import datetime
 import ipaddress
-from typing import TypeVar
+from typing import TypeVar, cast
 
 import pydantic
 from aio_pika import robust_connection
+from google.protobuf import message
 
 from snowfall.project.junction.go.service.gateway import (
     bookings,
@@ -14,7 +15,6 @@ from snowfall.project.junction.go.service.gateway import (
     providers,
     trips,
 )
-from snowfall.project.junction.go.service.offers.v1 import amqp_pb2
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.service import (
     amqp_factory,
@@ -22,7 +22,7 @@ from snowfall.stdlib.service import (
     grpc_factory,
     redis_factory,
 )
-from snowfall.stdlib.transport.amqp import consumer, producer, types
+from snowfall.stdlib.transport.amqp import consumer, producer, protocol, types
 from snowfall.stdlib.transport.grpc import server as grpc_server
 
 
@@ -34,6 +34,7 @@ class _SharedSettings(application.Settings):
 
 class _ConsumeSettings(_SharedSettings):
     search_timeout: datetime.timedelta = datetime.timedelta(seconds=30)
+    trip_search_timeout: datetime.timedelta = datetime.timedelta(seconds=10)
 
 
 class _ServeSettings(_SharedSettings):
@@ -77,7 +78,8 @@ async def _bootstrap(
 async def _consume(app: application.AsyncApplication[_ConsumeSettings]) -> None:
     amqp_connection, redis_client, all_providers = await _bootstrap(app)
 
-    offers_consumer = offers.Consumer(
+    legacy_offers_queue = offers.Queue(
+        name_prefix=app.name,
         providers_list=all_providers,
         repository=offers.Repository(
             producer=producer.Producer(
@@ -88,15 +90,30 @@ async def _consume(app: application.AsyncApplication[_ConsumeSettings]) -> None:
         ),
         timeout=app.settings.search_timeout,
     )
-    amqp_consumer = consumer.Consumer[amqp_pb2.TripOfferSearchTask](
-        connection=amqp_connection,
-        queue_name="{0}_offer_searches".format(app.name),
-        binds=[(types.Exchange(app.name), "offers.search.*")],
+
+    trips_queue = trips.Queue(
+        name_prefix=app.name,
+        providers_list=all_providers,
+        repository=trips.Repository(
+            producer=producer.Producer(
+                connection=amqp_connection,
+                exchange=types.Exchange(name=app.name),
+            ),
+            client=redis_client,
+        ),
+        timeout=app.settings.trip_search_timeout,
     )
 
-    # @todo: wire up trips consumer
-
-    await amqp_consumer.consume(offers_consumer.consume)
+    await consumer.QueueConsumer(
+        connection=amqp_connection,
+        queues=cast(
+            list[protocol.Queue[message.Message]],
+            [
+                legacy_offers_queue,
+                trips_queue,
+            ],
+        ),
+    ).consume()
 
 
 async def _serve(app: application.AsyncApplication[_ServeSettings]) -> None:
