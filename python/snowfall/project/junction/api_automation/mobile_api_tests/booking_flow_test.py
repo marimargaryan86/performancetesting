@@ -204,14 +204,14 @@ async def create_order(  # noqa: WPS210
 
 
 iata_codes = [
-    ("latvia", "lithuania"),
-    ("funchal", "lisbon"),
+    [("stockholm", "london"), ("london", "athens")],
+    ("london", "vienna"),
     ("chicago", "groningen"),
 ]
 wait_times = {
-    "Ask2Go": 5,
-    "Duffel": 5,
-    "Multi-modal": 20,
+    "Ask2Go": 10,
+    "Duffel": 10,
+    "Multi-modal": 25,
 }
 ids = [
     "Ask2Go",

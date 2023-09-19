@@ -3,7 +3,7 @@
     "variables": {
       "vault_api_URL":"http://172.16.104.79:8200",
       "testing_suite": "integration",
-      "execution_cron": "0 8 * * 1-5",
+      "execution_cron": "0 10,14 * * 1-5",
       "allure_project_id": "junction-mobile-api-smoke-dev"
     }
   },
@@ -12,7 +12,7 @@
     "variables": {
       "vault_api_URL":"http://172.16.144.109:8200",
       "testing_suite": "smoke",
-      "execution_cron": "0 10 * * 1",
+      "execution_cron": "0 12 * * 1",
       "allure_project_id": "junction-mobile-api-smoke-prod"
     }
   },
@@ -20,7 +20,7 @@
     "variables": {
       "vault_api_URL":"http://10.255.73.157:8200",
       "testing_suite": "integration",
-      "execution_cron": "0 9 * * 1-5",
+      "execution_cron": "0 11,15 * * 1-5",
       "allure_project_id": "junction-mobile-api-smoke-sandbox"
     }
   }

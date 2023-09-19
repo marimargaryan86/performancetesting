@@ -13,6 +13,7 @@ variable "testing_suite" {
 variable "execution_cron" {
   type = string
 }
+
 variable "allure_project_id" {
   type = string
 }
@@ -25,7 +26,7 @@ job "test-automation-mobile-api" {
   periodic {
     cron             = "${var.execution_cron}"
     prohibit_overlap = true
-    time_zone        = "Europe/Warsaw"
+    time_zone        = "Asia/Yerevan"
   }
 
   group "mobile-api" {
