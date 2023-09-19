@@ -1,20 +1,19 @@
 import datetime
-from collections.abc import Mapping, Sequence
+from collections.abc import Sequence
 from typing import Any, cast
 
 import pytest
 
 from snowfall.project.junction.provider.v2alpha import trips_pb2
-from snowfall.project.junction.service.providers.mock import trips
-from snowfall.project.junction.v1 import segment_type_pb2
+from snowfall.project.junction.service.providers.mock import client, trips
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence import filesystem
 
 
 @pytest.fixture()
-def stop_repository() -> trips.StopRepository:
-    return trips.StopRepository(
+def stop_repository() -> client.StopRepository:
+    return client.StopRepository(
         stops=cast(
             list[dict[str, Any]],
             filesystem.PkgLoader(__name__).load("stops.json"),
@@ -23,8 +22,8 @@ def stop_repository() -> trips.StopRepository:
 
 
 @pytest.fixture()
-def route_repository(stop_repository: trips.StopRepository) -> trips.RouteRepository:
-    return trips.RouteRepository(
+def route_repository(stop_repository: client.StopRepository) -> client.RouteRepository:
+    return client.RouteRepository(
         stop_repository=stop_repository,
         routes=cast(
             list[list[str]],
@@ -34,8 +33,21 @@ def route_repository(stop_repository: trips.StopRepository) -> trips.RouteReposi
 
 
 @pytest.fixture()
-def trip_searcher(route_repository: trips.RouteRepository) -> trips.Trips:
-    return trips.Trips(route_repository=route_repository)
+def transformer() -> trips.Transformer:
+    return trips.Transformer()
+
+
+@pytest.fixture()
+def mock_client(route_repository: client.RouteRepository) -> client.MockClient:
+    return client.MockClient(route_repository=route_repository)
+
+
+@pytest.fixture()
+def trip_searcher(
+    mock_client: client.MockClient,
+    transformer: trips.Transformer,
+) -> trips.Trips:
+    return trips.Trips(search_client=mock_client, transformer=transformer)
 
 
 @pytest.fixture()
@@ -220,77 +232,3 @@ def _generate_criterion(
             departure_date or datetime.date(year=2023, month=9, day=6),
         ),
     )
-
-
-def _generate_mock_trip(
-    duration: datetime.timedelta,
-) -> trips_pb2.Trip:
-    departure_at = datetime.datetime(
-        year=2023,
-        month=9,
-        day=13,
-        hour=8,
-        tzinfo=datetime.UTC,
-    )
-    arrival_at = departure_at + duration
-
-    return trips_pb2.Trip(
-        segments=[
-            trips_pb2.Segment(
-                legs=[
-                    trips_pb2.Leg(
-                        departure_at=protobuf.datetime_to_protobuf_datetime(
-                            departure_at,
-                        ),
-                        arrival_at=protobuf.datetime_to_protobuf_datetime(arrival_at),
-                    ),
-                ],
-                type=segment_type_pb2.SEGMENT_TYPE_FLIGHT,
-            ),
-        ],
-    )
-
-
-class TestFarePrices(object):
-    @pytest.mark.parametrize(
-        ("fake_trips", "expected"),
-        [
-            (
-                [_generate_mock_trip(duration=datetime.timedelta(hours=2, minutes=40))],
-                {
-                    "Basic": (140, 150),
-                    "Premium": (195, 210),
-                    "Business": (350, 400),
-                },
-            ),
-            (
-                [_generate_mock_trip(duration=datetime.timedelta(hours=9, minutes=5))],
-                {
-                    "Basic": (1500, 1700),
-                    "Premium": (2300, 2400),
-                    "Business": (4300, 4500),
-                },
-            ),
-        ],
-    )
-    def test_prices_in_expected_range(
-        self,
-        fake_trips: Sequence[trips_pb2.Trip],
-        expected: Mapping[str, tuple[int, int]],
-    ) -> None:
-        fares = {
-            fare.brand_name: money.from_protobuf(fare.price)
-            for fare in trips.FakeFareGenerator(fake_trips).generate()
-        }
-
-        for brand, price in fares.items():
-            lower_limit = expected[brand][0]
-            upper_limit = expected[brand][1]
-            assert (
-                lower_limit <= float(str(price)) <= upper_limit
-            ), "Brand {0} price {1} not within range {2}-{3}".format(
-                brand,
-                str(price),
-                lower_limit,
-                upper_limit,
-            )

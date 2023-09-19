@@ -15,6 +15,7 @@ from snowfall.project.junction.provider import trips as provider_trips
 from snowfall.project.junction.service.providers.mock import (
     bookings,
     cache,
+    client,
     offers,
     pricing,
     trips,
@@ -157,20 +158,25 @@ async def _bookings_factory(
 async def _trips_factory(
     app: service.AsyncApplication[_Settings],
 ) -> provider_trips.Implementation:
-    stop_repository = trips.StopRepository(
+    stop_repository = client.StopRepository(
         stops=cast(
             list[dict[str, Any]],
             filesystem.PkgLoader(__name__).load("stops.json"),
         ),
     )
-    route_repository = trips.RouteRepository(
+    route_repository = client.RouteRepository(
         stop_repository=stop_repository,
         routes=cast(
             list[list[str]],
             filesystem.PkgLoader(__name__).load("routes.json"),
         ),
     )
-    return trips.Trips(route_repository=route_repository).find
+    return trips.Trips(
+        search_client=client.MockClient(
+            route_repository=route_repository,
+        ),
+        transformer=trips.Transformer(),
+    ).find
 
 
 if __name__ == "__main__":
