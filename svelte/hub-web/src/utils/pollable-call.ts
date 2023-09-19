@@ -24,7 +24,7 @@ export function pollableCall<TFunc extends (...args: any[]) => any, TData>({
   func: TFunc;
   check: (
     result: Awaited<ReturnType<TFunc>>,
-  ) => { status: "done" | "retry"; data: TData } | { status: "pending" };
+  ) => { status: "done" | "retry"; data?: TData } | { status: "pending" };
   sleepMs?: number;
   newArgs?: (prevArgs: Parameters<TFunc>, nextArgs: Parameters<TFunc>) => boolean;
   retries?: number;

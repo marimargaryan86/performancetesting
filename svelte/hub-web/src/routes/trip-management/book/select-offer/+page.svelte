@@ -1,7 +1,5 @@
 <script lang="ts">
-  import TripSearch, {
-    type PartialTripSearchData,
-  } from "../../components/trip-search/trip-search.svelte";
+  import TripSearch from "../../components/trip-search/trip-search.svelte";
   import SearchOptions, { type SearchOptionsData } from "./search-options.svelte";
   import Offer from "./offer/offer.svelte";
   import { callAction } from "utils/common";
@@ -13,7 +11,6 @@
   import { onDestroy } from "svelte";
   import Countdown from "../countdown.svelte";
   import LoadingSkelton from "./loading-skelton.svelte";
-  import type { ResolvedSearchData } from "../common";
   import type { ResourceStatus } from "integration/junction-mobile-api/schemas/common";
   import type { OfferModel } from "integration/junction-mobile-api/schemas/offer";
   import LoadingIcon from "components/icons/loading-icon.svelte";
@@ -22,8 +19,6 @@
 
   export let data;
 
-  let countdown: Countdown | undefined;
-  let searchData = getSearchData(data.searchData);
   let searchOptions: SearchOptionsData = {
     sortBy: "price",
     stops: [],
@@ -32,30 +27,24 @@
     duration: 492,
     operators: [0, 1, 2],
   };
-  let selected = data.selectedOffer;
+  let selected = {
+    offerId: data.searchData.offerId,
+    optionIds: data.searchData.optionIds,
+  };
 
-  $: offersTask =
-    browser && data.searchData.tripCandidatesSearch?.id
-      ? pollOffers(data.searchData.tripCandidatesSearch.id)
-      : undefined;
-
-  function getSearchData(nextSearchData: ResolvedSearchData): PartialTripSearchData {
-    return {
-      destination: nextSearchData.destination,
-      origin: nextSearchData.origin,
-      outbound: nextSearchData.departureAfter,
-      passengers: nextSearchData.passengers,
-    };
+  $: offers = data.tripCandidates.offers;
+  $: if (browser && data.tripCandidates.status !== "completed") {
+    pollOffers(data.tripCandidates.id);
   }
 
-  const { poll: pollOffers, cancel: cancelPolling } = pollableCall({
-    func(id: string) {
+  const { poll: pollOffersAux, cancel: cancelPolling } = pollableCall({
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    func(_: string) {
       return callAction<{
         status: ResourceStatus;
         offers: OfferModel[];
       }>({
         action: routeConfig.tripManagement.book.select.actions.poll,
-        data: { tripCandidatesSearchId: id },
         apply: false,
       });
     },
@@ -65,15 +54,15 @@
         result.data?.status === "unspecified" ||
         result.data?.status === "failed"
       ) {
-        return { status: "done", data: [] };
+        return { status: "done" };
+      }
+
+      if (result.data) {
+        offers = result.data.offers;
       }
 
       if (result.data?.status === "completed") {
-        if (result.data.offers.length) {
-          countdown?.open();
-        }
-
-        return { status: result.data.offers.length ? "done" : "retry", data: result.data.offers };
+        return { status: result.data.offers.length ? "done" : "retry" };
       }
 
       return { status: "pending" };
@@ -82,12 +71,10 @@
     retries: 3,
   });
 
+  const { pending: offersPending, func: pollOffers } = pendableCall(pollOffersAux);
+
   function select(event: CustomEvent<{ offerId: string; optionIds: string[] }>): void {
     selected = event.detail;
-  }
-
-  function search(event: CustomEvent<URL>): void {
-    goto(event.detail);
   }
 
   const { pending, func: selectOffer } = pendableCall(async () => {
@@ -107,49 +94,40 @@
 </svelte:head>
 
 <div class="search-wrapper">
-  <TripSearch bind:data={searchData} on:search={search} />
+  <TripSearch data={data.searchData} />
 </div>
 
 <div class="content">
-  {#if data.searchData.tripCandidatesSearch}
-    <Countdown expiresAt={data.searchData.tripCandidatesSearch.expiresAt} bind:this={countdown} />
-  {/if}
+  <Countdown expiresAt={data.tripCandidates.expiresAt} show={Boolean(offers.length)} />
 
   <div class="scroll">
     <SearchOptions bind:data={searchOptions} />
 
     <ul class="offer-result">
-      {#await offersTask}
+      {#each offers as offer}
+        <li>
+          <Offer
+            {offer}
+            selected={selected.offerId === offer.id}
+            selectedOptionIds={selected.offerId === offer.id ? selected.optionIds : undefined}
+            on:select={select}
+          />
+        </li>
+      {/each}
+
+      {#if $offersPending}
         <li><LoadingSkelton /></li>
         <li><LoadingSkelton /></li>
         <li><LoadingSkelton /></li>
         <li><LoadingSkelton /></li>
-      {:then offers}
-        {#if offers?.length}
-          {#each offers as offer}
-            <li>
-              <Offer
-                {offer}
-                selected={selected?.offerId === offer.id}
-                selectedOptionIds={selected?.offerId === offer.id ? selected.optionIds : undefined}
-                on:select={select}
-              />
-            </li>
-          {:else}
-            <li class="no-result">No trips found</li>
-          {/each}
-        {:else}
-          <li><LoadingSkelton /></li>
-          <li><LoadingSkelton /></li>
-          <li><LoadingSkelton /></li>
-          <li><LoadingSkelton /></li>
-        {/if}
-      {/await}
+      {:else if !offers.length}
+        <li class="no-result">No trips found</li>
+      {/if}
     </ul>
   </div>
 </div>
 
-{#if selected}
+{#if selected.offerId && selected.optionIds}
   <div class="actions" transition:fade={{ duration: 200 }}>
     <div class="wrapper">
       <Button on:click={selectOffer} size="small">

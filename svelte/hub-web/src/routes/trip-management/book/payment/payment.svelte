@@ -43,18 +43,18 @@
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import { pollableCall } from "utils/pollable-call";
   import type { TripOfferPriceQuoteModel } from "integration/junction-mobile-api/schemas/offer";
-  import type { ResolvedSearchData } from "../common";
   import type { ActionPollReturnType } from "./+page.server";
+  import type { SearchDataModel } from "../booking-manager.server";
 
   export let priceQuote: TripOfferPriceQuoteModel;
-  export let searchData: ResolvedSearchData;
+  export let paymentIntent: SearchDataModel["paymentIntent"];
 
   let stripe: Stripe | undefined = undefined;
   let stripeElements: StripeElements | undefined = undefined;
   let stripeContainer: HTMLDivElement | undefined = undefined;
 
   $: priceQuoteId = priceQuote.id;
-  $: clientSecret = searchData.paymentIntent?.clientSecret;
+  $: clientSecret = paymentIntent?.clientSecret;
   $: if (browser) {
     pollPriceQuote(priceQuoteId).then(updateData);
   }
@@ -67,7 +67,7 @@
       return;
     }
 
-    searchData.paymentIntent = value.paymentIntent;
+    paymentIntent = value.paymentIntent;
     priceQuote = value.priceQuote;
   }
 
@@ -96,7 +96,7 @@
         result.data?.priceQuote.status === "unspecified" ||
         result.data?.priceQuote.status === "failed"
       ) {
-        return { status: "done", data: undefined };
+        return { status: "done" };
       }
 
       if (result.data?.priceQuote.status === "completed") {
@@ -109,7 +109,7 @@
   });
 
   export async function pay(): Promise<boolean> {
-    if (searchData.paymentIntent?.confirmed) {
+    if (paymentIntent?.confirmed) {
       return true;
     }
 

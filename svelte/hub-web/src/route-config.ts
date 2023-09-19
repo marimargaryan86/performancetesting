@@ -88,6 +88,7 @@ export default {
         root: tripManagementBookConfirmationRoot,
       },
       actions: {
+        search: `${tripManagementBookRoot}?/search` as const,
         listPlaces: `${tripManagementBookRoot}?/listPlaces` as const,
       },
     },

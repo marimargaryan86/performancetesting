@@ -13,18 +13,18 @@
     passengers: passengerPickerData,
     originId: z.string({ required_error: "Origin is mandatory" }).uuid(),
     destinationId: z.string({ required_error: "Destination is mandatory" }).uuid(),
-    outbound: z.date({ required_error: "Departure date is mandatory" }),
-    inbound: z.date().optional(),
+    outbound: z.date({ coerce: true, required_error: "Departure date is mandatory" }),
+    inbound: z.date({ coerce: true }).optional(),
   });
 
-  type TripSearchDataInternal = z.infer<typeof tripSearchData>;
+  export type TripSearchData = z.infer<typeof tripSearchData>;
 
-  export type TripSearchData = Omit<TripSearchDataInternal, "originId" | "destinationId"> & {
+  export type TripSearchDataResolved = Omit<TripSearchData, "originId" | "destinationId"> & {
     origin: PlaceModel;
     destination: PlaceModel;
   };
 
-  export type PartialTripSearchData = PartiallyPartial<TripSearchData, "passengers">;
+  export type PartialTripSearchData = PartiallyPartial<TripSearchDataResolved, "passengers">;
 
   export function formatPlace(place?: PlaceModel): string {
     if (!place) {
@@ -44,16 +44,15 @@
   import PassengerPicker, { passengerPickerData } from "./passenger-picker/passenger-picker.svelte";
   import routeConfig from "routeConfig";
   import Button from "components/ui/button.svelte";
-  import { page } from "$app/stores";
   import AutocompleteField from "components/ui/autocomplete-field.svelte";
   import { callAction, type PartiallyPartial } from "utils/common";
   import { browser } from "$app/environment";
-  import { createEventDispatcher } from "svelte";
   import { z } from "zod";
-  import { URLExtended } from "utils/url";
   import SearchIcon from "components/icons/search-icon.svelte";
   import type { PlaceModel } from "integration/junction-mobile-api/schemas/place";
   import LoadingIcon from "components/icons/loading-icon.svelte";
+  import { goto } from "$app/navigation";
+  import { pendableCall } from "utils/pendable-call";
 
   export let data: PartialTripSearchData = {
     passengers: {
@@ -62,11 +61,8 @@
       infants: 0,
     },
   };
-  export let pending = false;
 
-  let errors: z.ZodFormattedError<TripSearchDataInternal> | undefined = undefined;
-
-  const dispatch = createEventDispatcher<{ search: URL }>();
+  let errors: z.ZodFormattedError<TripSearchData> | undefined = undefined;
 
   async function listPlaces(query: string): Promise<PlaceModel[]> {
     if (!browser) {
@@ -82,7 +78,7 @@
     return result.type === "success" ? result.data?.places ?? [] : [];
   }
 
-  function search(): void {
+  const { pending, func: search } = pendableCall(async () => {
     const parseResult = tripSearchData.safeParse({
       ...data,
       originId: data.origin?.id,
@@ -98,21 +94,15 @@
     errors = undefined;
     const parsedData = parseResult.data;
 
-    dispatch(
-      "search",
-      new URLExtended(routeConfig.tripManagement.book.select.root, {
-        base: $page.url.origin,
-        query: {
-          outbound: parsedData.outbound.toLocaleDateString("sv-SE"),
-          inbound: parsedData.inbound?.toLocaleDateString("sv-SE"),
-          origin: parsedData.originId,
-          destination: parsedData.destinationId,
-          ...parsedData.passengers,
-        },
-        querySchema: tripSearchQueryData,
-      }),
-    );
-  }
+    await callAction({
+      action: routeConfig.tripManagement.book.actions.search,
+      data: parsedData,
+      dataType: "json",
+      apply: false,
+    });
+
+    await goto(routeConfig.tripManagement.book.select.root, { invalidateAll: true });
+  });
 </script>
 
 <form class="trip-search" on:submit|preventDefault={search}>
@@ -148,7 +138,7 @@
   />
 
   <Button on:click={search}>
-    {#if pending}
+    {#if $pending}
       <LoadingIcon />
     {:else}
       <SearchIcon color="var(--color-common-dark-strong)" />

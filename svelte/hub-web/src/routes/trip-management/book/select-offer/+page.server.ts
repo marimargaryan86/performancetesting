@@ -1,136 +1,103 @@
-import { redirect } from "@sveltejs/kit";
-import {
-  getSearchData,
-  parsePassengers,
-  setSearchData,
-  type ResolvedSearchData,
-  type SearchData,
-} from "../common";
 import integrationInstances from "integration-instances";
 import type { ResourceStatus } from "integration/junction-mobile-api/schemas/common";
 import type { OfferModel } from "integration/junction-mobile-api/schemas/offer";
-import routeConfig from "routeConfig";
 import type { TripCandidatesSearchModel } from "integration/junction-mobile-api/schemas/trip";
 import type { PlaceModel } from "integration/junction-mobile-api/schemas/place";
+import bookingManager, { type SearchDataModel } from "../booking-manager.server";
 
-function getTripCandidatesSearch(
-  searchData: SearchData,
-  origin: PlaceModel,
-  destination: PlaceModel,
-): Promise<TripCandidatesSearchModel> {
-  // prettier-ignore
-  return searchData.tripCandidatesSearchId
-    ? integrationInstances.junctionMobileApi.trips.getTripCandidatesSearch(
-      searchData.tripCandidatesSearchId,
-    )
-    : integrationInstances.junctionMobileApi.trips.createTripCandidatesSearch({
-      sessionToken: searchData.sessionToken,
-      criteria: [
-        {
-          departureAfter: searchData.departureAfter,
-          origin: origin.coordinates,
-          destination: destination.coordinates,
-        },
-      ],
-      passengers: parsePassengers(searchData.passengers),
-      allowedLegTypeIds: ["rail"],
-    });
-}
+type LoadReturnType = {
+  searchData: {
+    passengers: SearchDataModel["passengers"];
+    origin: PlaceModel;
+    destination: PlaceModel;
+    outbound: Date;
+    offerId?: string;
+    optionIds?: string[];
+  };
+  tripCandidates: {
+    id: string;
+    expiresAt: Date;
+    offers: OfferModel[];
+    status: TripCandidatesSearchModel["status"];
+  };
+};
 
-export async function load(event): Promise<{
-  searchData: ResolvedSearchData;
-  selectedOffer?: { offerId: string; optionIds: string[] };
-}> {
-  const searchData = getSearchData(event, "query");
-
-  if (!searchData) {
-    setSearchData(undefined, event);
-
-    throw redirect(303, routeConfig.tripManagement.book.root);
-  }
-
-  const [origin, destination] = await Promise.all([
-    integrationInstances.junctionMobileApi.places.getPlace(searchData.originId),
-    integrationInstances.junctionMobileApi.places.getPlace(searchData.destinationId),
-  ]);
+export async function load(event): Promise<LoadReturnType> {
+  const searchData = bookingManager.getSearchData(event);
 
   try {
-    const tripCandidatesSearch = await getTripCandidatesSearch(searchData, origin, destination);
+    const [origin, destination, result] = await Promise.all([
+      integrationInstances.junctionMobileApi.places.getPlace(searchData.origin.id),
+      integrationInstances.junctionMobileApi.places.getPlace(searchData.destination.id),
+      bookingManager.getOffers(searchData, event),
+    ]);
 
-    setSearchData({ ...searchData, tripCandidatesSearchId: tripCandidatesSearch.id }, event);
+    bookingManager.setSearchData(
+      {
+        ...searchData,
+        sessionToken: result.sessionToken,
+        tripCandidatesId: result.tripCandidatesId,
+      },
+      event,
+    );
 
     return {
       searchData: {
-        sessionToken: searchData.sessionToken,
+        passengers: searchData.passengers,
         origin,
         destination,
-        departureAfter: searchData.departureAfter,
-        passengers: searchData.passengers,
-        tripCandidatesSearch,
+        outbound: searchData.outbound,
+        offerId: searchData.offerId,
+        optionIds: searchData.optionIds,
       },
-      selectedOffer:
-        searchData.offerId && searchData.optionIds
-          ? { offerId: searchData.offerId, optionIds: searchData.optionIds }
-          : undefined,
+      tripCandidates: {
+        id: result.tripCandidatesId,
+        expiresAt: result.expiresAt,
+        offers: result.offers,
+        status: result.status,
+      },
     };
-  } catch {
-    setSearchData(undefined, event);
+  } catch (err) {
+    throw bookingManager.rootRedirect(event);
   }
-
-  throw redirect(303, routeConfig.tripManagement.book.root);
 }
 
 export const actions = {
-  async poll(
-    event,
-  ): Promise<
-    { status: Exclude<ResourceStatus, "completed"> } | { status: "completed"; offers: OfferModel[] }
-  > {
-    const searchdata = getSearchData(event);
-    const tripCandidatesSearchId = searchdata?.tripCandidatesSearchId;
+  async poll(event): Promise<{ status: ResourceStatus; offers: OfferModel[] }> {
+    try {
+      const searchData = bookingManager.getSearchData(event);
+      const result = await bookingManager.getOffers(searchData, event);
 
-    if (!tripCandidatesSearchId) {
-      return { status: "failed" };
-    }
-
-    const tripCandidatesSearch =
-      await integrationInstances.junctionMobileApi.trips.getTripCandidatesSearch(
-        tripCandidatesSearchId,
-      );
-
-    if (tripCandidatesSearch.status === "completed") {
       return {
-        status: "completed",
-        offers: await integrationInstances.junctionMobileApi.trips.getTripCandidatesOffers(
-          tripCandidatesSearchId,
-        ),
+        status: result.status,
+        offers: result.offers,
       };
+    } catch {
+      return { status: "failed", offers: [] };
     }
-
-    return { status: tripCandidatesSearch.status };
   },
   async select(event): Promise<void> {
+    const searchData = bookingManager.getSearchData(event);
     const formData = await event.request.formData();
-    const searchData = getSearchData(event);
     const offerId = formData.get("offerId")?.toString();
     const optionIds = formData.get("optionIds")?.toString().split(",");
 
-    if (!searchData || !offerId || !optionIds) {
+    if (!(offerId && optionIds?.length)) {
       return;
     }
 
+    // Offer and options have been selected before, don't update session.
     if (searchData.offerId === offerId && searchData.optionIds?.join(",") === optionIds.join(",")) {
       return;
     }
 
-    const priceQuote = await integrationInstances.junctionMobileApi.offers.createPriceQuote({
-      sessionToken: searchData.sessionToken,
-      offerId,
-      optionIds,
-    });
-
-    setSearchData(
-      { ...searchData, offerId, optionIds, priceQuoteId: priceQuote.id, paymentIntent: undefined },
+    bookingManager.setSearchData(
+      {
+        ...searchData,
+        offerId,
+        optionIds,
+        paymentIntent: undefined,
+      },
       event,
     );
   },

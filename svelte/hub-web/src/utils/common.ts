@@ -1,5 +1,6 @@
 import { applyAction, deserialize } from "$app/forms";
-import type { ActionResult } from "@sveltejs/kit";
+import type { ActionResult, RequestEvent } from "@sveltejs/kit";
+import type { z } from "zod";
 
 export function sleep(timeMs: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, timeMs));
@@ -92,6 +93,32 @@ function getActionRequestData(
   }
 
   return formData;
+}
+
+export async function getActionRequestJsonData<TSchema extends z.AnyZodObject = z.AnyZodObject>(
+  event: RequestEvent,
+  schema?: TSchema,
+): Promise<z.infer<TSchema>> {
+  const formData = await event.request.formData();
+  const jsonStr = formData.get("json")?.toString();
+
+  if (!jsonStr) {
+    throw new Error("Missing JSON data");
+  }
+
+  const jsonObj = JSON.parse(jsonStr);
+
+  if (!schema) {
+    return jsonObj;
+  }
+
+  const parsedResult = schema.safeParse(jsonObj);
+
+  if (parsedResult.success) {
+    return parsedResult.data;
+  }
+
+  throw new Error("Failed to parse JSON data", { cause: parsedResult.error });
 }
 
 export async function callAction<

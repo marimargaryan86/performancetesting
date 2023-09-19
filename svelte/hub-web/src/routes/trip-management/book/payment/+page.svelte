@@ -15,11 +15,9 @@
 </script>
 
 <script lang="ts">
-  import { page } from "$app/stores";
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import Button from "components/ui/button.svelte";
   import routeConfig from "routeConfig";
-  import { URLExtended } from "utils/url.js";
   import Payment from "./payment.svelte";
   import PassengerEntry, {
     getPassengerValidator,
@@ -31,10 +29,14 @@
   } from "./contact-information.svelte";
   import Countdown from "../countdown.svelte";
   import { z } from "zod";
-  import type { PassengerCountData } from "../common";
+  import type { PassengerCountData } from "../booking-manager.server";
   import { pendableCall } from "utils/pendable-call";
   import { callAction } from "utils/common";
   import { goto } from "$app/navigation";
+  import { browser } from "$app/environment";
+  import { pollableCall } from "utils/pollable-call";
+  import type { ActionPollReturnType } from "./+page.server";
+  import { onDestroy } from "svelte";
 
   export let data;
 
@@ -48,24 +50,14 @@
   };
   let errors: z.ZodFormattedError<z.infer<typeof bookingDetailsValidator>> | undefined = undefined;
 
+  $: priceQuote = data.priceQuote;
+  $: paymentIntent = data.paymentIntent;
   $: bookingDetailsValidator = z.object({
-    passengers: z.array(getPassengerValidator(data.priceQuote.required)),
+    passengers: z.array(getPassengerValidator(priceQuote.required)),
     contactInformation: contactInformationData,
   });
-  $: backUrl = getBackUrl(data.searchData);
-
-  function getBackUrl(searchData: typeof data.searchData): URL {
-    return new URLExtended(routeConfig.tripManagement.book.select.root, {
-      base: $page.url.origin,
-      query: {
-        origin: searchData.origin.id,
-        destination: searchData.destination.id,
-        adults: searchData.passengers.adults.toString(),
-        children: searchData.passengers.children.toString(),
-        infants: searchData.passengers.infants.toString(),
-        outbound: searchData.departureAfter.toLocaleDateString("sv-SE"),
-      },
-    });
+  $: if (browser && !paymentIntent) {
+    pollPayment(priceQuote.id);
   }
 
   async function createOrder(): Promise<boolean> {
@@ -81,10 +73,10 @@
     const result = await callAction({
       action: routeConfig.tripManagement.book.payment.actions.createOrder,
       data: {
-        priceQuoteId: data.priceQuote.id,
+        priceQuoteId: priceQuote.id,
         passengers: validationResult.data.passengers,
         contact: validationResult.data.contactInformation,
-        price: data.priceQuote.price,
+        price: priceQuote.price,
       },
       dataType: "json",
       apply: false,
@@ -97,6 +89,30 @@
     return true;
   }
 
+  const { cancel: cancelPolling, poll: pollPayment } = pollableCall({
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    func(_: string) {
+      return callAction<ActionPollReturnType>({
+        action: routeConfig.tripManagement.book.payment.actions.poll,
+        apply: false,
+      });
+    },
+    check(result) {
+      if (result.type !== "success") {
+        return { status: "done" };
+      }
+
+      if (result.data?.priceQuote.price && result.data.paymentIntent) {
+        ({ priceQuote, paymentIntent } = result.data);
+
+        return { status: "done" };
+      }
+
+      return { status: "pending" };
+    },
+    sleepMs: 2000,
+  });
+
   const { pending, func: pay } = pendableCall(async () => {
     if (!payment) {
       return;
@@ -106,8 +122,8 @@
       return;
     }
 
-    if (data.searchData.paymentIntent) {
-      data.searchData.paymentIntent.confirmed = true;
+    if (paymentIntent) {
+      paymentIntent.confirmed = true;
     }
 
     if (!(await createOrder())) {
@@ -116,6 +132,8 @@
 
     await goto(routeConfig.tripManagement.book.confirmation.root);
   });
+
+  onDestroy(cancelPolling);
 </script>
 
 <svelte:head>
@@ -123,7 +141,7 @@
 </svelte:head>
 
 <div class="content">
-  <Countdown expiresAt={data.priceQuote.expiresAt} show />
+  <Countdown expiresAt={priceQuote.expiresAt} show />
 
   <div class="wrapper">
     <div class="column passengers">
@@ -131,7 +149,7 @@
         <PassengerEntry
           bind:passenger
           errors={errors?.passengers?.[idx]}
-          required={data.priceQuote.required}
+          required={priceQuote.required}
           passengerNumber={idx + 1}
         />
       {/each}
@@ -144,15 +162,17 @@
         errors={errors?.contactInformation}
       />
 
-      <Payment bind:this={payment} priceQuote={data.priceQuote} searchData={data.searchData} />
+      <Payment bind:this={payment} {priceQuote} {paymentIntent} />
     </div>
   </div>
 </div>
 
 <div class="actions">
   <div class="wrapper">
-    <Button size="small" variant="text" href={backUrl.toString()}>Previous</Button>
-    <Button size="small" on:click={pay}>
+    <Button size="small" variant="text" href={routeConfig.tripManagement.book.select.root}>
+      Previous
+    </Button>
+    <Button size="small" on:click={pay} disabled={!paymentIntent}>
       Next
 
       {#if $pending}
