@@ -158,12 +158,14 @@ message NotificationEvent {
   oneof event {
     PersistedOrder body = 3;
     FlightStatsAlert alert = 4;
+    string preformatted_message = 5;
   }
   enum Type {
     TYPE_UNSPECIFIED = 0;
     TYPE_ORDER_CONFIRMATION = 1;
     TYPE_FLIGHT_STATS_ALERT = 2;
+    TYPE_PREFORMATTED_MESSAGE = 3;
   }
-  Type event_type = 5;
-  Channel channel = 6;
+  Type event_type = 6;
+  Channel channel = 7;
 }
