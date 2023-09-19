@@ -244,25 +244,48 @@ class QuotationsService(  # noqa: WPS214
         if session_token:
             currency_pair = "{0}{1}".format(from_currency, to_currency)
             cache_key = "locks:{0}:{1}".format(session_token, currency_pair)
-            async with self._user_sessions.lock(cache_key):
-                rate = await self._user_sessions.get_rate(session_token, currency_pair)
-
-                if not rate:
-                    rate = await self._get_live_rate(
+            rate = await self._user_sessions.get_rate(session_token, currency_pair)
+            if not rate:
+                async with self._user_sessions.lock(cache_key):
+                    rate = await self._handle_lock(
+                        session_token,
+                        currency_pair,
                         from_currency,
                         to_currency,
                         amount,
                     )
-                    await self._user_sessions.store(
-                        session_token,
-                        currency_pair,
-                        rate,
-                    )
+
         else:
             rate = await self._get_live_rate(
                 from_currency,
                 to_currency,
                 amount,
+            )
+
+        return rate
+
+    async def _handle_lock(  # noqa: WPS211
+        self,
+        session_token: str,
+        currency_pair: str,
+        from_currency: str,
+        to_currency: str,
+        amount: int,
+    ) -> float:
+        rate = await self._user_sessions.get_rate(
+            session_token,
+            currency_pair,
+        )
+        if not rate:
+            rate = await self._get_live_rate(
+                from_currency,
+                to_currency,
+                amount,
+            )
+            await self._user_sessions.store(
+                session_token,
+                currency_pair,
+                rate,
             )
 
         return rate
