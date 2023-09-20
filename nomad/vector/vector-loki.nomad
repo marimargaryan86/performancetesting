@@ -71,7 +71,7 @@ job "vector-vector-loki" {
             source = """
             .message,err = parse_json(.message)
             .log_level = .message.level
-            .service_name = replace(.label."com.hashicorp.nomad.job_name",r'/periodic-(\d+)',"") ?? ""
+            .service_name = replace(.label."com.hashicorp.nomad.job_name",r'/periodic-(\\d+)',"") ?? ""
           """
           [sources.logs]
             type = "docker_logs"
@@ -93,6 +93,8 @@ job "vector-vector-loki" {
             labels.node = "{{ label.\"com.hashicorp.nomad.node_name\" }}"
             labels.job = "${var.datacenter}"
             labels.stream = "{{ stream }}"
+            labels.log_level = "{{ log_level }}"
+            labels.service_name = "{{ service_name}}"
             #remove fields that have been converted to labels to avoid having the field twice
             remove_label_fields = true
 
