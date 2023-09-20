@@ -14,6 +14,7 @@ _MAX_DISTANCE_AIRPORT = 50000
 _MAX_DISTANCE_RAIL_STATION = 10000
 _MAX_DISTANCE_BUS_STATION = 10000
 _MAX_DISTANCE_PORT = 10000
+_MAX_DISTANCE_PRECISE = 100
 
 
 class LocationsService(service.Service, places_pb2_grpc.LocationsServiceServicer):
@@ -74,6 +75,8 @@ class LocationsService(service.Service, places_pb2_grpc.LocationsServiceServicer
         request: places_pb2.ListNearbyLocationsRequest,
         context: aio.ServicerContext,
     ) -> places_pb2.ListNearbyLocationsResponse:
+        precise_mode = places_pb2.SearchPrecision.MODE_PRECISE
+
         return places_pb2.ListNearbyLocationsResponse(
             locations=await self._locations.find_within_area_per_type(
                 cursor="",
@@ -82,19 +85,35 @@ class LocationsService(service.Service, places_pb2_grpc.LocationsServiceServicer
                     longitude=float(request.coordinates.longitude),
                     type_distances=[
                         places.PlaceTypeDistancePair(
-                            max_distance_meters=_MAX_DISTANCE_AIRPORT,
+                            max_distance_meters=(
+                                _MAX_DISTANCE_PRECISE
+                                if request.precision.mode == precise_mode
+                                else _MAX_DISTANCE_AIRPORT
+                            ),
                             location_type=models_pb2.Location.Type.TYPE_AIRPORT,
                         ),
                         places.PlaceTypeDistancePair(
-                            max_distance_meters=_MAX_DISTANCE_RAIL_STATION,
+                            max_distance_meters=(
+                                _MAX_DISTANCE_PRECISE
+                                if request.precision.mode == precise_mode
+                                else _MAX_DISTANCE_RAIL_STATION
+                            ),
                             location_type=models_pb2.Location.Type.TYPE_RAILWAY_STATION,
                         ),
                         places.PlaceTypeDistancePair(
-                            max_distance_meters=_MAX_DISTANCE_PORT,
+                            max_distance_meters=(
+                                _MAX_DISTANCE_PRECISE
+                                if request.precision.mode == precise_mode
+                                else _MAX_DISTANCE_PORT
+                            ),
                             location_type=models_pb2.Location.Type.TYPE_FERRY_PORT,
                         ),
                         places.PlaceTypeDistancePair(
-                            max_distance_meters=_MAX_DISTANCE_BUS_STATION,
+                            max_distance_meters=(
+                                _MAX_DISTANCE_PRECISE
+                                if request.precision.mode == precise_mode
+                                else _MAX_DISTANCE_BUS_STATION
+                            ),
                             location_type=models_pb2.Location.Type.TYPE_BUS_STATION,
                         ),
                     ],

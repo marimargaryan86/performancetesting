@@ -4,6 +4,7 @@ package snowfall.project.junction.go.service.trips.v1alpha;
 
 import "google/protobuf/timestamp.proto";
 import "snowfall/project/junction/go/service/offers/v1/models.proto";
+import "snowfall/project/junction/go/service/places/v1/places.proto";
 import "snowfall/project/junction/go/v1/models.proto";
 import "snowfall/stdlib/v1/amqp.proto";
 import "snowfall/stdlib/v1/datetime.proto";
@@ -114,9 +115,14 @@ message GetTripCandidateSearchDetailsResponse {
   TripCandidateSearch trip_candidate_search = 1;
 }
 
+message CoordinatesSearchable {
+  snowfall.stdlib.v1.LatLng coordinates = 1;
+  snowfall.project.junction.go.service.places.v1.SearchPrecision precision = 2;
+}
+
 message TripCandidateSearchCriteria {
-  snowfall.stdlib.v1.LatLng origin = 1;
-  snowfall.stdlib.v1.LatLng destination = 2;
+  CoordinatesSearchable origin = 1;
+  CoordinatesSearchable destination = 2;
   repeated snowfall.stdlib.v1.LatLng origins = 3;
   repeated snowfall.stdlib.v1.LatLng destinations = 4;
   snowfall.stdlib.v1.DateTime departure_after = 5;

@@ -2,7 +2,7 @@ import asyncio
 import dataclasses
 import datetime
 from collections.abc import Mapping, Sequence
-from typing import Any, ClassVar, cast
+from typing import Any, ClassVar, NamedTuple, cast
 
 import lagom
 from dateutil import parser
@@ -22,6 +22,7 @@ from snowfall.project.junction.go.service.client_api import filters, resources
 from snowfall.project.junction.go.service.offers.v1 import (
     models_pb2 as offer_models_pb2,
 )
+from snowfall.project.junction.go.service.places.v1 import places_pb2
 from snowfall.project.junction.go.service.trips.v1alpha import trips_pb2
 from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.stdlib import sequence, string
@@ -35,9 +36,16 @@ from snowfall.stdlib.integration.starlette import (
 )
 from snowfall.stdlib.v1 import latlng_pb2
 
-_Coordinates = Mapping[str, float]
+_Coordinates = Mapping[str, float | str]
 _Passengers = list[dict[str, str]]
 _SESSION_TOKEN_LENGTH = 32
+_DEFAULT_PRECISION = "area"
+
+
+class CoordinatesSearchable(NamedTuple):
+    latitude: float
+    longitude: float
+    precision_mode: places_pb2.SearchPrecision.Mode.ValueType
 
 
 class Trip(endpoints.HTTPEndpoint):
@@ -253,6 +261,61 @@ class TripsByTripSearch(endpoints.HTTPEndpoint):
         )
 
 
+def _create_single_criteria(
+    search_criteria: Mapping[str, Any],
+    locations_per_search: Mapping[CoordinatesSearchable, Sequence[latlng_pb2.LatLng]],
+) -> trips_pb2.TripCandidateSearchCriteria:
+    origin = search_criteria["origin"]
+    destination = search_criteria["destination"]
+    origin_precision_enum = protobuf.slug_to_enum_value(
+        places_pb2.SearchPrecision.Mode,
+        origin.get("precision", _DEFAULT_PRECISION),
+    )
+    destination_precision_enum = protobuf.slug_to_enum_value(
+        places_pb2.SearchPrecision.Mode,
+        destination.get("precision", _DEFAULT_PRECISION),
+    )
+
+    return trips_pb2.TripCandidateSearchCriteria(
+        origin=trips_pb2.CoordinatesSearchable(
+            coordinates=latlng_pb2.LatLng(
+                latitude=origin["latitude"],
+                longitude=origin["longitude"],
+            ),
+            precision=places_pb2.SearchPrecision(
+                mode=origin_precision_enum,
+            ),
+        ),
+        destination=trips_pb2.CoordinatesSearchable(
+            coordinates=latlng_pb2.LatLng(
+                latitude=destination["latitude"],
+                longitude=destination["longitude"],
+            ),
+            precision=places_pb2.SearchPrecision(
+                mode=destination_precision_enum,
+            ),
+        ),
+        origins=locations_per_search[
+            CoordinatesSearchable(
+                latitude=origin["latitude"],
+                longitude=origin["longitude"],
+                precision_mode=origin_precision_enum,
+            )
+        ],
+        destinations=locations_per_search[
+            CoordinatesSearchable(
+                latitude=destination["latitude"],
+                longitude=destination["longitude"],
+                precision_mode=destination_precision_enum,
+            )
+        ],
+        departure_after=protobuf.datetime_to_protobuf_datetime(
+            parser.isoparse(search_criteria["departureAfter"]),
+        ),
+        maximum_connections=search_criteria.get("maximumConnections", 0),
+    )
+
+
 @dataclasses.dataclass(frozen=True)
 class TripCandidateSearches(object):
     _trip_candidate_searches_client: trip_candidate_searches.Client
@@ -330,57 +393,39 @@ class TripCandidateSearches(object):
         criteria: Sequence[Mapping[str, Any]],
     ) -> list[trips_pb2.TripCandidateSearchCriteria]:
         locations_per_search = await self._get_nearby_locations(criteria)
-        criteria_protos = []
 
-        for criterion in criteria:
-            maximum_connections = criterion.get("maximumConnections")
-            criterion_proto = trips_pb2.TripCandidateSearchCriteria(
-                origin=latlng_pb2.LatLng(
-                    **criterion["origin"],
-                ),
-                destination=latlng_pb2.LatLng(
-                    **criterion["destination"],
-                ),
-                origins=locations_per_search[
-                    (
-                        criterion["origin"]["latitude"],
-                        criterion["origin"]["longitude"],
-                    )
-                ],
-                destinations=locations_per_search[
-                    (
-                        criterion["destination"]["latitude"],
-                        criterion["destination"]["longitude"],
-                    )
-                ],
-                departure_after=protobuf.datetime_to_protobuf_datetime(
-                    parser.isoparse(criterion["departureAfter"]),
-                ),
-            )
-
-            if maximum_connections is not None:
-                criterion_proto.maximum_connections = maximum_connections
-
-            criteria_protos.append(criterion_proto)
-
-        return criteria_protos
+        return [
+            _create_single_criteria(criterion, locations_per_search)
+            for criterion in criteria
+        ]
 
     async def _get_nearby_locations(
         self,
         criteria: Sequence[Mapping[str, _Coordinates]],
-    ) -> Mapping[tuple[float, float], Sequence[latlng_pb2.LatLng]]:
-        coordinate_pairs: list[tuple[float, float]] = []
+    ) -> Mapping[CoordinatesSearchable, list[latlng_pb2.LatLng]]:
+        coordinate_pairs: list[CoordinatesSearchable] = []
 
         for single_criteria in criteria:
             coordinate_pairs.extend(
                 (
-                    (
-                        single_criteria["origin"]["latitude"],
-                        single_criteria["origin"]["longitude"],
+                    CoordinatesSearchable(
+                        latitude=float(single_criteria["origin"]["latitude"]),
+                        longitude=float(single_criteria["origin"]["longitude"]),
+                        precision_mode=(
+                            places_pb2.SearchPrecision.MODE_PRECISE
+                            if single_criteria["origin"].get("precision") == "precise"
+                            else places_pb2.SearchPrecision.MODE_AREA
+                        ),
                     ),
-                    (
-                        single_criteria["destination"]["latitude"],
-                        single_criteria["destination"]["longitude"],
+                    CoordinatesSearchable(
+                        latitude=float(single_criteria["destination"]["latitude"]),
+                        longitude=float(single_criteria["destination"]["longitude"]),
+                        precision_mode=(
+                            places_pb2.SearchPrecision.MODE_PRECISE
+                            if single_criteria["destination"].get("precision")
+                            == "precise"
+                            else places_pb2.SearchPrecision.MODE_AREA
+                        ),
                     ),
                 ),
             )
@@ -389,8 +434,11 @@ class TripCandidateSearches(object):
             *[
                 self._locations_client.get_nearby_locations(
                     coordinates=latlng_pb2.LatLng(
-                        latitude=pair[0],
-                        longitude=pair[1],
+                        latitude=pair.latitude,
+                        longitude=pair.longitude,
+                    ),
+                    precision=places_pb2.SearchPrecision(
+                        mode=pair.precision_mode,
                     ),
                 )
                 for pair in coordinate_pairs

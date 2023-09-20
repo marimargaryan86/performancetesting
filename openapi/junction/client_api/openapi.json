@@ -4624,10 +4624,10 @@
         "description": "Criteria to use in a Trip Candidates Search",
         "properties": {
           "origin": {
-            "$ref": "#/components/schemas/Coordinates"
+            "$ref": "#/components/schemas/CoordinatesSearchable"
           },
           "destination": {
-            "$ref": "#/components/schemas/Coordinates"
+            "$ref": "#/components/schemas/CoordinatesSearchable"
           },
           "departureAfter": {
             "type": "string",
@@ -4671,6 +4671,25 @@
           }
         ],
         "description": "A Coordinate represented via latitude and longitude"
+      },
+      "CoordinatesSearchable": {
+        "title": "CoordinatesSearchable",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "precision": {
+                "type": "string",
+                "enum": ["precise", "area"],
+                "example": "precise",
+                "default": "area"
+              }
+            }
+          },
+          {
+            "$ref": "#/components/schemas/Coordinates"
+          }
+        ]
       },
       "Offer": {
         "title": "Offer",

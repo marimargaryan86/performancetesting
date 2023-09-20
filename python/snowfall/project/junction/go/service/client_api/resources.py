@@ -18,6 +18,7 @@ from snowfall.project.junction.go.service.orders.v1 import (
 from snowfall.project.junction.go.service.places.v1 import (
     models_pb2 as place_models_pb2,
 )
+from snowfall.project.junction.go.service.places.v1 import places_pb2
 from snowfall.project.junction.go.service.trips.v1alpha import trips_pb2
 from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.stdlib import money
@@ -1254,12 +1255,20 @@ class TripCandidateSearchResource(models.Resource):
                 "criteria": [
                     {
                         "origin": {
-                            "latitude": criteria.origin.latitude,
-                            "longitude": criteria.origin.longitude,
+                            "latitude": criteria.origin.coordinates.latitude,
+                            "longitude": criteria.origin.coordinates.longitude,
+                            "precision": protobuf.enum_value_to_slug(
+                                places_pb2.SearchPrecision.Mode.DESCRIPTOR,
+                                criteria.origin.precision.mode,
+                            ),
                         },
                         "destination": {
-                            "latitude": criteria.destination.latitude,
-                            "longitude": criteria.destination.longitude,
+                            "latitude": criteria.destination.coordinates.latitude,
+                            "longitude": criteria.destination.coordinates.longitude,
+                            "precision": protobuf.enum_value_to_slug(
+                                places_pb2.SearchPrecision.Mode.DESCRIPTOR,
+                                criteria.destination.precision.mode,
+                            ),
                         },
                         "departureAfter": protobuf.protobuf_to_datetime(
                             criteria.departure_after,

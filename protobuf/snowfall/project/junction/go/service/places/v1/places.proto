@@ -34,8 +34,18 @@ message ListLocationsResponse {
   string next_page_token = 2;
 }
 
+message SearchPrecision {
+  enum Mode {
+    MODE_UNSPECIFIED = 0;
+    MODE_AREA = 1;
+    MODE_PRECISE = 2;
+  }
+  Mode mode = 1;
+}
+
 message ListNearbyLocationsRequest {
   snowfall.stdlib.v1.LatLng coordinates = 1;
+  SearchPrecision precision = 2;
 }
 
 message ListNearbyLocationsResponse {

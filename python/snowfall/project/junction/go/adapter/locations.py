@@ -31,6 +31,7 @@ class Client(abc.ABC):
     async def get_nearby_locations(
         self,
         coordinates: latlng_pb2.LatLng,
+        precision: places_pb2.SearchPrecision | None = None,
     ) -> models_pb2.Location:
         """Fetch all nearby locations."""
 
@@ -72,6 +73,7 @@ class DictClient(Client):
     async def get_nearby_locations(
         self,
         coordinates: latlng_pb2.LatLng,
+        precision: places_pb2.SearchPrecision | None = None,
     ) -> models_pb2.Location:
         return models_pb2.Location()
 
@@ -116,10 +118,14 @@ class GrpcClient(Client):
     async def get_nearby_locations(
         self,
         coordinates: latlng_pb2.LatLng,
+        precision: places_pb2.SearchPrecision | None = None,
     ) -> models_pb2.Location:
         response = await errors.handle_grpc_errors(
             self._locations.ListNearbyLocations(
-                request=places_pb2.ListNearbyLocationsRequest(coordinates=coordinates),
+                request=places_pb2.ListNearbyLocationsRequest(
+                    coordinates=coordinates,
+                    precision=precision,
+                ),
                 timeout=self._timeout,
             ),
         )
