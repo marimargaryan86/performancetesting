@@ -1,7 +1,7 @@
 import { error } from "@sveltejs/kit";
 import integrationInstances from "integration-instances";
-import type { BookingModel } from "integration/junction-mobile-api/schemas/booking.js";
-import type { OrderModel } from "integration/junction-mobile-api/schemas/order.js";
+import type { BookingModel } from "integration/junction-mobile-api/schemas/booking";
+import type { OrderModel } from "integration/junction-mobile-api/schemas/order";
 
 export async function load(
   event,

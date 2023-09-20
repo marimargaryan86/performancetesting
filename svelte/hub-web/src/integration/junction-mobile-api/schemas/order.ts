@@ -206,6 +206,7 @@ export const createOrderModel = getSchemaModel(
   },
 );
 export type CreateOrderModel = Infer<typeof createOrderModel>;
+export type CreateOrderSchema = Infer<typeof createOrderModel, "schema">;
 
 export type OrderIncludes =
   | JourneySchema

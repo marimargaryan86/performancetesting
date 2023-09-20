@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-type SchemaParserReturnType<TSchema extends z.ZodType, TModel extends z.ZodType> = {
+export type SchemaModel<TSchema extends z.ZodType, TModel extends z.ZodType> = {
   schema: TSchema;
   model: TModel;
   identifier: IdentifierSchema<TSchema>;
@@ -22,7 +22,7 @@ export function getSchemaModel<TSchema extends z.ZodType, TModel extends z.ZodTy
     toModel?: (data: z.infer<TSchema>) => TModel["_input"];
     toSchema?: (data: z.infer<TModel>) => TSchema["_input"];
   } = {},
-): SchemaParserReturnType<TSchema, TModel> {
+): SchemaModel<TSchema, TModel> {
   function toModel(data: unknown): z.infer<TModel> {
     const parsed = schema.parse(data);
 
@@ -91,12 +91,9 @@ export function links<TItem extends "next" | "self">(
 }
 
 export type Infer<
-  TParser extends SchemaParserReturnType<z.ZodType, z.ZodType>,
+  TParser extends SchemaModel<z.ZodType, z.ZodType>,
   TWhat extends "schema" | "model" | "identifier" = "model",
-> = TParser extends SchemaParserReturnType<
-  infer TSchema extends z.ZodType,
-  infer TModel extends z.ZodType
->
+> = TParser extends SchemaModel<infer TSchema extends z.ZodType, infer TModel extends z.ZodType>
   ? TWhat extends "identifier"
     ? TSchema extends z.AnyZodObject
       ? z.infer<z.ZodObject<{ id: TSchema["shape"]["id"]; type: TSchema["shape"]["type"] }>>

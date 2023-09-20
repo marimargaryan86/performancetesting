@@ -1,6 +1,6 @@
 import integrationInstances from "integration-instances";
 import type { PlaceModel } from "integration/junction-mobile-api/schemas/place";
-import { getActionRequestJsonData } from "utils/common.js";
+import { getActionRequestJsonData } from "utils/common";
 import { tripSearchData } from "../../components/trip-search/trip-search.svelte";
 import { ActionFailure, fail } from "@sveltejs/kit";
 import bookingManager from "../booking-manager.server";

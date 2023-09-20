@@ -5,7 +5,7 @@ import { getPassengerValidator } from "./passenger-entry.svelte";
 import { contactInformationData } from "./contact-information.svelte";
 import { priceModel } from "integration/junction-mobile-api/schemas/price";
 import { ensureDefined } from "utils/array";
-import type { OrderModel } from "integration/junction-mobile-api/schemas/order";
+import type { CreateOrderModel, OrderModel } from "integration/junction-mobile-api/schemas/order";
 import bookingManager, { type SearchDataModel } from "../booking-manager.server";
 import { z } from "zod";
 import { getActionRequestJsonData } from "utils/common";
@@ -98,7 +98,9 @@ export const actions = {
       return fail(400);
     }
   },
-  async createOrder(event): Promise<ActionFailure | void> {
+  async createOrder(
+    event,
+  ): Promise<ActionFailure<{ error: z.ZodFormattedError<CreateOrderModel> }> | void> {
     const searchData = bookingManager.getSearchData(event);
     const { priceQuote, paymentIntent } = await bookingManager.getPaymentIntent(searchData, event);
 
@@ -111,9 +113,18 @@ export const actions = {
         event,
         getBookingDataModel(priceQuote.required),
       );
-      const order = await createOrder(bookingData, paymentIntent.id);
 
-      bookingManager.setSearchData({ ...searchData, orderId: order.id }, event);
+      try {
+        const order = await createOrder(bookingData, paymentIntent.id);
+
+        bookingManager.setSearchData({ ...searchData, orderId: order.id }, event);
+      } catch (err) {
+        if (err instanceof z.ZodError) {
+          return fail(400, { error: err.format() });
+        }
+
+        throw err;
+      }
     } catch {
       return fail(400);
     }

@@ -1,7 +1,31 @@
 import { env } from "$env/dynamic/public";
 
-export class JunctionError extends Error {
-  readonly json: unknown;
+type Pointer<TSchema> = keyof TSchema extends string
+  ?
+      | `/${keyof TSchema}`
+      | {
+          [key in keyof TSchema]: TSchema[key] extends Record<string, unknown>
+            ? `/${key}${Pointer<TSchema[key]>}`
+            : `/${key}`;
+        }[keyof TSchema]
+  : never;
+
+export type ApiError<TSchema> = {
+  errors: {
+    status: string;
+    title?: string;
+    detail: string;
+    code?: string;
+    source?: {
+      pointer?: Pointer<TSchema>;
+      parameter?: string;
+      header?: string;
+    };
+  }[];
+};
+
+export class JunctionError<TSchema> extends Error {
+  readonly json?: ApiError<TSchema>;
   readonly status: number;
 
   get badRequest(): boolean {
@@ -37,7 +61,7 @@ export class JunctionError extends Error {
   }
 
   constructor(
-    response: { json: unknown; status: number; statusText: string },
+    response: { json?: ApiError<TSchema>; status: number; statusText: string },
     options: ErrorOptions = {},
   ) {
     super(
@@ -54,11 +78,11 @@ export class JunctionError extends Error {
   }
 }
 
-export async function createJunctionError(
+export async function createJunctionError<TSchema>(
   response: Response,
   options: ErrorOptions = {},
-): Promise<JunctionError> {
-  let json: unknown = undefined;
+): Promise<JunctionError<TSchema>> {
+  let json: ApiError<TSchema> | undefined = undefined;
 
   try {
     json = await response.json();
@@ -72,7 +96,7 @@ export async function createJunctionError(
   );
 }
 
-export function ensureJunctionError(error: unknown): error is JunctionError {
+export function ensureJunctionError<TSchema>(error: unknown): error is JunctionError<TSchema> {
   return error instanceof JunctionError;
 }
 

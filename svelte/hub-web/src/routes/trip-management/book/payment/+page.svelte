@@ -37,6 +37,7 @@
   import { pollableCall } from "utils/pollable-call";
   import type { ActionPollReturnType } from "./+page.server";
   import { onDestroy } from "svelte";
+  import type { CreateOrderModel } from "integration/junction-mobile-api/schemas/order";
 
   export let data;
 
@@ -69,7 +70,10 @@
       return false;
     }
 
-    const result = await callAction({
+    const result = await callAction<
+      Record<string, unknown>,
+      { error: z.ZodFormattedError<CreateOrderModel> }
+    >({
       action: routeConfig.routes.tripManagement.routes.book.routes.payment.actions.createOrder,
       data: {
         priceQuoteId: priceQuote.id,
@@ -80,6 +84,21 @@
       dataType: "json",
       apply: false,
     });
+
+    if (result.type === "failure" && result.data?.error) {
+      errors = {
+        _errors: [],
+        contactInformation: {
+          _errors: [],
+          phone: {
+            _errors: [],
+            number: result.data.error.contactDetails?.phone?.number,
+          },
+        },
+      };
+
+      return false;
+    }
 
     if (result.type !== "success") {
       return false;

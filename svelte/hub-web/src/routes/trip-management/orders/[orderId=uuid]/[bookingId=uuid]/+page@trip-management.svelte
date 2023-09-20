@@ -2,7 +2,7 @@
   import type { BreadCrumb } from "components/page/bread-crumbs.svelte";
   import StandardLayout from "components/page/standard-layout.svelte";
   import routeConfig from "routeConfig";
-  import { getDestination, getOrigin } from "utils/booking.js";
+  import { getDestination, getOrigin } from "utils/booking";
   import Passengers from "../../../components/passengers.svelte";
   import Ticket from "../../../components/ticket.svelte";
   import Itinerary from "../../../components/itinerary.svelte";
