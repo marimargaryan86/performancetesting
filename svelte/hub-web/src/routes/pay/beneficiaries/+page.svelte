@@ -31,7 +31,7 @@
     }
 
     await callAction({
-      action: routeConfig.pay.beneficiaries.actions.listBeneficiaries,
+      action: routeConfig.routes.pay.routes.beneficiaries.actions.listBeneficiaries,
       data: {
         cursor: data.beneficiaries.cursor,
       },
@@ -59,7 +59,7 @@
 <StandardLayout pageTitle="Beneficiaries" bind:searchQuery>
   <Button
     size="small"
-    href={routeConfig.pay.beneficiaries.beneficiary()}
+    href={routeConfig.routes.pay.routes.beneficiaries.routes.beneficiary().root}
     preload={false}
     slot="actions"
   >
@@ -94,7 +94,7 @@
           <TCol class="typography body-medium">{capitalize(item.bankDetails.paymentType)}</TCol>
           <TActionsCol>
             <a
-              href={routeConfig.pay.beneficiaries.beneficiary(item.id)}
+              href={routeConfig.routes.pay.routes.beneficiaries.routes.beneficiary(item.id).root}
               data-sveltekit-preload-data="off"
               class="action"
             >

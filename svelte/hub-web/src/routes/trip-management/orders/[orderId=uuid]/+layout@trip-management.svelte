@@ -9,14 +9,14 @@
   let breadCrumbs: BreadCrumb[] = [];
   let tabs: Tab[] = [];
 
-  $: selfLink = routeConfig.tripManagement.orders.order(data.order.id);
+  $: selfLink = routeConfig.routes.tripManagement.routes.orders.routes.order(data.order.id);
   $: breadCrumbs = [
-    { label: "Orders", url: routeConfig.tripManagement.orders.root },
+    { label: "Orders", url: routeConfig.routes.tripManagement.routes.orders.root },
     { label: data.order.journey?.reference ?? "Unknown", url: selfLink.root },
   ];
   $: tabs = [
     { label: "Bookings", url: selfLink.root, exact: true },
-    { label: "Details", url: selfLink.details },
+    { label: "Details", url: selfLink.routes.details.root },
   ];
 </script>
 

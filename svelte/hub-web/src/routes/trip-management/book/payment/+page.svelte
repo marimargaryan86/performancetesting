@@ -71,7 +71,7 @@
     }
 
     const result = await callAction({
-      action: routeConfig.tripManagement.book.payment.actions.createOrder,
+      action: routeConfig.routes.tripManagement.routes.book.routes.payment.actions.createOrder,
       data: {
         priceQuoteId: priceQuote.id,
         passengers: validationResult.data.passengers,
@@ -93,7 +93,7 @@
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     func(_: string) {
       return callAction<ActionPollReturnType>({
-        action: routeConfig.tripManagement.book.payment.actions.poll,
+        action: routeConfig.routes.tripManagement.routes.book.routes.payment.actions.poll,
         apply: false,
       });
     },
@@ -130,7 +130,7 @@
       return;
     }
 
-    await goto(routeConfig.tripManagement.book.confirmation.root);
+    await goto(routeConfig.routes.tripManagement.routes.book.routes.confirmation.root);
   });
 
   onDestroy(cancelPolling);
@@ -169,7 +169,11 @@
 
 <div class="actions">
   <div class="wrapper">
-    <Button size="small" variant="text" href={routeConfig.tripManagement.book.select.root}>
+    <Button
+      size="small"
+      variant="text"
+      href={routeConfig.routes.tripManagement.routes.book.routes.select.root}
+    >
       Previous
     </Button>
     <Button size="small" on:click={pay} disabled={!paymentIntent}>

@@ -68,7 +68,7 @@
 
       <TRow alternatingBackground={false}>
         <TCol class="typography body-small" width="0">
-          <a href={routeConfig.tripManagement.orders.order(order.id).root}>
+          <a href={routeConfig.routes.tripManagement.routes.orders.routes.order(order.id).root}>
             {order.journey?.reference ?? "Unknown"}
           </a>
         </TCol>

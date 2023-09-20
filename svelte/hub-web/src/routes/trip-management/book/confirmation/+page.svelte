@@ -57,7 +57,9 @@
 
 <div class="actions">
   <div class="wrapper">
-    <Button size="small" href={routeConfig.tripManagement.book.root}>New search</Button>
+    <Button size="small" href={routeConfig.routes.tripManagement.routes.book.root}
+      >New search</Button
+    >
   </div>
 </div>
 

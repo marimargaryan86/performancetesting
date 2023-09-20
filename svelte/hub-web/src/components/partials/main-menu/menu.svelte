@@ -35,24 +35,24 @@
   let menuItems: (MenuItem | SubMenu)[] = [
     {
       type: "menu-item",
-      url: routeConfig.home,
+      url: routeConfig.root,
       label: "Dashboard",
       icon: DashboardIcon,
     },
     {
       type: "sub-menu",
       label: "Trip Management",
-      expanded: $page.url.pathname.startsWith(routeConfig.tripManagement.root),
+      expanded: $page.url.pathname.startsWith(routeConfig.routes.tripManagement.root),
       items: [
         {
           type: "menu-item",
-          url: routeConfig.tripManagement.book.root,
+          url: routeConfig.routes.tripManagement.routes.book.root,
           label: "Book",
           icon: TicketIcon,
         },
         {
           type: "menu-item",
-          url: routeConfig.tripManagement.orders.root,
+          url: routeConfig.routes.tripManagement.routes.orders.root,
           label: "View orders",
           icon: BookingsIcon,
         },
@@ -61,29 +61,29 @@
     {
       type: "sub-menu",
       label: "Pay",
-      expanded: $page.url.pathname.startsWith(routeConfig.pay.root),
+      expanded: $page.url.pathname.startsWith(routeConfig.routes.pay.root),
       items: [
         {
           type: "menu-item",
-          url: routeConfig.pay.activity.root,
+          url: routeConfig.routes.pay.routes.activity.root,
           label: "Activity",
           icon: ActivityIcon,
         },
         {
           type: "menu-item",
-          url: routeConfig.pay.accounts.root,
+          url: routeConfig.routes.pay.routes.accounts.root,
           label: "Accounts",
           icon: AccountsIcon,
         },
         {
           type: "menu-item",
-          url: routeConfig.pay.beneficiaries.root,
+          url: routeConfig.routes.pay.routes.beneficiaries.root,
           label: "Beneficiaries",
           icon: BeneficiaryIcon,
         },
         {
           type: "menu-item",
-          url: routeConfig.pay.bills.root,
+          url: routeConfig.routes.pay.routes.bills.root,
           label: "Bills",
           icon: BillIcon,
         },
@@ -92,11 +92,11 @@
     {
       type: "sub-menu",
       label: "Go",
-      expanded: $page.url.pathname.startsWith(routeConfig.go.root),
+      expanded: $page.url.pathname.startsWith(routeConfig.routes.go.root),
       items: [
         {
           type: "menu-item",
-          url: routeConfig.go.bookings.root,
+          url: routeConfig.routes.go.routes.bookings.root,
           label: "Bookings",
           icon: BookingsIcon,
         },

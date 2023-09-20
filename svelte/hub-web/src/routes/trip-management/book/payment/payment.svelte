@@ -86,7 +86,7 @@
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     func(_: string) {
       return callAction<ActionPollReturnType>({
-        action: routeConfig.tripManagement.book.payment.actions.poll,
+        action: routeConfig.routes.tripManagement.routes.book.routes.payment.actions.poll,
         apply: false,
       });
     },
@@ -133,7 +133,9 @@
       return false;
     }
 
-    await callAction({ action: routeConfig.tripManagement.book.payment.actions.confirmPayment });
+    await callAction({
+      action: routeConfig.routes.tripManagement.routes.book.routes.payment.actions.confirmPayment,
+    });
 
     return true;
   }
@@ -156,10 +158,11 @@
 
   <span class="toc typography body-small">
     By booking your ticket you accept Snowfall’s
-    <a href={routeConfig.help.termsAndConditions.root} target="_blank">T&amp;Cs</a>, the
+    <a href={routeConfig.routes.help.routes.termsAndConditions.root} target="_blank">T&amp;Cs</a>,
+    the
     <a href="/">carrier’s conditions of carriage</a>
     and
-    <a href={routeConfig.help.privacyPolicy.root} target="_blank">privacy policy</a>.
+    <a href={routeConfig.routes.help.routes.privacyPolicy.root} target="_blank">privacy policy</a>.
   </span>
 </div>
 

@@ -52,7 +52,7 @@ export type SearchDataModel = z.infer<typeof searchDataModel>;
 function rootRedirect(event: RequestEvent): Redirect {
   deleteSearchData(event);
 
-  return redirect(303, routeConfig.tripManagement.book.root);
+  return redirect(303, routeConfig.routes.tripManagement.routes.book.root);
 }
 
 function parsePassengers(passengersCount: SearchDataModel["passengers"]): { dateOfBirth: Date }[] {

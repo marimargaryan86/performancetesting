@@ -21,7 +21,7 @@
     }
 
     await callAction({
-      action: routeConfig.pay.accounts.actions.listAccounts,
+      action: routeConfig.routes.pay.routes.accounts.actions.listAccounts,
       data: {
         cursor: data.accounts.cursor,
       },
@@ -47,7 +47,10 @@
     <ul class="accounts" data-sveltekit-preload-data="off" use:scrollLoad={{ func: loadMore }}>
       {#each accounts as account (account.id)}
         <li>
-          <a href={routeConfig.pay.accounts.account(account.id)} class="account">
+          <a
+            href={routeConfig.routes.pay.routes.accounts.routes.account(account.id).root}
+            class="account"
+          >
             <EntityAvatar name={account.name} size="72px" />
             <span class="account-name typography body-large">{account.name}</span>
             <ChevronIcon size="20px" color="var(--color-main-neutral-700)" />

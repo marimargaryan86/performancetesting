@@ -30,7 +30,7 @@
   }
 
   const { pending, func: login } = pendableCall(() =>
-    callAction({ action: routeConfig.login.actions.login, data }),
+    callAction({ action: routeConfig.routes.login.actions.login, data }),
   );
 </script>
 

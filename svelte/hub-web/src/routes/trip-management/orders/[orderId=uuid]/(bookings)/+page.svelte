@@ -37,7 +37,11 @@
       <TRow>
         <TCol width="0">{idx + 1}</TCol>
         <TCol width="0">
-          <a href={routeConfig.tripManagement.orders.order(data.order.id).booking(booking.id).root}>
+          <a
+            href={routeConfig.routes.tripManagement.routes.orders.routes
+              .order(data.order.id)
+              .routes.booking(booking.id).root}
+          >
             View
           </a>
         </TCol>

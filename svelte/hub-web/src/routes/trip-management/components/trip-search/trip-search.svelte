@@ -70,7 +70,7 @@
     }
 
     const result = await callAction<{ places: PlaceModel[] }>({
-      action: routeConfig.tripManagement.book.actions.listPlaces,
+      action: routeConfig.routes.tripManagement.routes.book.actions.listPlaces,
       data: { query },
       apply: false,
     });
@@ -95,13 +95,15 @@
     const parsedData = parseResult.data;
 
     await callAction({
-      action: routeConfig.tripManagement.book.actions.search,
+      action: routeConfig.routes.tripManagement.routes.book.actions.search,
       data: parsedData,
       dataType: "json",
       apply: false,
     });
 
-    await goto(routeConfig.tripManagement.book.select.root, { invalidateAll: true });
+    await goto(routeConfig.routes.tripManagement.routes.book.routes.select.root, {
+      invalidateAll: true,
+    });
   });
 </script>
 

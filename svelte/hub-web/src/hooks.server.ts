@@ -21,13 +21,13 @@ export function authHandle({ event, resolve }: Parameters<Handle>[0]): MaybeProm
     };
 
     if (
-      event.url.pathname === routeConfig.login.root &&
+      event.url.pathname === routeConfig.routes.login.root &&
       !Array.from(event.url.searchParams.keys()).length
     ) {
-      throw redirect(303, routeConfig.home);
+      throw redirect(303, routeConfig.root);
     }
-  } else if (event.url.pathname !== routeConfig.login.root) {
-    throw redirect(303, routeConfig.login.root);
+  } else if (event.url.pathname !== routeConfig.routes.login.root) {
+    throw redirect(303, routeConfig.routes.login.root);
   }
 
   return resolve(event);

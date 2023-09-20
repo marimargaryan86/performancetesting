@@ -48,7 +48,7 @@
     }
 
     await callAction({
-      action: routeConfig.pay.activity.conversions.actions.listConversions,
+      action: routeConfig.routes.pay.routes.activity.routes.conversions.actions.listConversions,
       data: {
         cursor: data.conversions.cursor,
       },

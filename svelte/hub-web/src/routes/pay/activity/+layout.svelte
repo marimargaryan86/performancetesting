@@ -2,8 +2,12 @@
   import type { Tab } from "components/ui/tabs.svelte";
 
   const tabs: Tab[] = [
-    { url: routeConfig.pay.activity.root, label: "Transactions", exact: true },
-    { url: routeConfig.pay.activity.conversions.root, label: "FX", exact: true },
+    { url: routeConfig.routes.pay.routes.activity.root, label: "Transactions", exact: true },
+    {
+      url: routeConfig.routes.pay.routes.activity.routes.conversions.root,
+      label: "FX",
+      exact: true,
+    },
   ];
 </script>
 
@@ -18,7 +22,7 @@
   import { capitalize } from "utils/common";
 
   $: view =
-    $page.url.pathname === routeConfig.pay.activity.root
+    $page.url.pathname === routeConfig.routes.pay.routes.activity.root
       ? ("transactions" as const)
       : ("conversions" as const);
   $: filters = view === "transactions" ? transactionFilters : conversionFilters;
@@ -28,17 +32,17 @@
   $: currConversionStatus = conversionFilters.status;
   $: viewBreadCrumbs = {
     transactions: {
-      url: routeConfig.pay.activity.root,
+      url: routeConfig.routes.pay.routes.activity.root,
       label: "Transactions",
     },
     conversions: {
-      url: routeConfig.pay.activity.conversions.root,
+      url: routeConfig.routes.pay.routes.activity.routes.conversions.root,
       label: "FX",
     },
   }[view];
   $: breadCrumbs = [
     {
-      url: routeConfig.pay.activity.root,
+      url: routeConfig.routes.pay.routes.activity.root,
       label: "Activity",
     },
     viewBreadCrumbs,

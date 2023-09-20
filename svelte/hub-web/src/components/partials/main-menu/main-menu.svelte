@@ -22,7 +22,7 @@
   }
 
   function logout(): void {
-    callAction({ action: routeConfig.login.actions.logout });
+    callAction({ action: routeConfig.routes.login.actions.logout });
   }
 </script>
 
@@ -42,8 +42,8 @@
       <a
         class="link typography body-medium"
         title={expanded ? undefined : "Settings"}
-        href={routeConfig.settings}
-        class:active={$page.url.pathname === routeConfig.settings}
+        href={routeConfig.routes.settings.root}
+        class:active={$page.url.pathname === routeConfig.routes.settings.root}
       >
         <SettingsIcon color="var(--color-common-light-strong)" variant="cog" />
         <span>Settings</span>
@@ -53,7 +53,7 @@
       <a
         class="link typography body-medium"
         title={expanded ? undefined : "Help"}
-        href={routeConfig.help.privacyPolicy.root}
+        href={routeConfig.routes.help.routes.privacyPolicy.root}
         class:active={$page.url.pathname.includes("help")}
       >
         <InformationIcon

@@ -1,33 +1,33 @@
 <script lang="ts" context="module">
   const tabs: (Tab & { icon?: ComponentType })[] = [
     {
-      url: routeConfig.help.privacyPolicy.root,
+      url: routeConfig.routes.help.routes.privacyPolicy.root,
       label: "Privacy Policy",
       exact: true,
     },
     {
-      url: routeConfig.help.termsAndConditions.root,
+      url: routeConfig.routes.help.routes.termsAndConditions.root,
       label: "Terms and Conditions",
       exact: true,
     },
     {
-      url: routeConfig.help.cookies.root,
+      url: routeConfig.routes.help.routes.cookies.root,
       label: "Cookies",
       exact: true,
     },
     {
       icon: HeadphonesIcon,
-      url: routeConfig.help.customerService.root,
+      url: routeConfig.routes.help.routes.customerService.root,
       label: "Customer Service",
       exact: true,
     },
   ];
 
   const routes: string[] = [
-    routeConfig.help.privacyPolicy.root,
-    routeConfig.help.termsAndConditions.root,
-    routeConfig.help.cookies.root,
-    routeConfig.help.customerService.root,
+    routeConfig.routes.help.routes.privacyPolicy.root,
+    routeConfig.routes.help.routes.termsAndConditions.root,
+    routeConfig.routes.help.routes.cookies.root,
+    routeConfig.routes.help.routes.customerService.root,
   ];
 </script>
 

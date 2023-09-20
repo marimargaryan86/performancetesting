@@ -15,8 +15,11 @@
   let dialogue: AddBalanceDialogue;
 
   $: breadCrumbs = [
-    { url: routeConfig.pay.accounts.root, label: "Accounts" },
-    { url: routeConfig.pay.accounts.account(data.account.id), label: data.account.name },
+    { url: routeConfig.routes.pay.routes.accounts.root, label: "Accounts" },
+    {
+      url: routeConfig.routes.pay.routes.accounts.routes.account(data.account.id).root,
+      label: data.account.name,
+    },
   ];
   $: balances = data.balances
     .filter((item) => item.currency.toLowerCase().includes(searchQuery.toLowerCase()))

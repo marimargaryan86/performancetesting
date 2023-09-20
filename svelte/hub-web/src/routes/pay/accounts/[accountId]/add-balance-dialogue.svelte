@@ -46,7 +46,7 @@
 
   const { pending, func: addBalances } = pendableCall(async () => {
     const result = await callAction<{ balances: PriceModel[] }>({
-      action: routeConfig.pay.accounts.actions.addBalances(accountId),
+      action: routeConfig.routes.pay.routes.accounts.routes.account(accountId).actions.addBalances,
       data: { currencyCodes: value.map((item) => item.code) },
       dataType: "json",
       apply: false,

@@ -62,8 +62,11 @@
   $: step = ($page.url.searchParams.get("step") ?? "beneficiary") as Step;
   $: title = `${data.beneficiary.id ? "Edit" : "Add"} Beneficiary`;
   $: breadCrumbs = [
-    { label: "Beneficiaries", url: routeConfig.pay.beneficiaries.root },
-    { label: title, url: routeConfig.pay.beneficiaries.beneficiary(data.beneficiary.id) },
+    { label: "Beneficiaries", url: routeConfig.routes.pay.routes.beneficiaries.root },
+    {
+      label: title,
+      url: routeConfig.routes.pay.routes.beneficiaries.routes.beneficiary(data.beneficiary.id).root,
+    },
   ];
 
   async function goToPrevious(): Promise<void> {
@@ -83,7 +86,7 @@
 
     beneficiary.remove();
 
-    await goto(routeConfig.pay.beneficiaries.root);
+    await goto(routeConfig.routes.pay.routes.beneficiaries.root);
   }
 </script>
 

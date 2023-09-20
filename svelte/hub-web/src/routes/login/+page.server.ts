@@ -36,11 +36,11 @@ export const actions = {
       });
     }
 
-    throw redirect(303, routeConfig.home);
+    throw redirect(303, routeConfig.root);
   },
   logout(event): void {
     event.cookies.delete("session-token", { path: "/" });
 
-    throw redirect(303, routeConfig.login.root);
+    throw redirect(303, routeConfig.routes.login.root);
   },
 };

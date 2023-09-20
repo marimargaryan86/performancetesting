@@ -11,10 +11,10 @@
 
   let breadCrumbs: BreadCrumb[] = [];
 
-  $: orderLink = routeConfig.tripManagement.orders.order(data.order.id);
-  $: selfLink = orderLink.booking(data.booking.id);
+  $: orderLink = routeConfig.routes.tripManagement.routes.orders.routes.order(data.order.id);
+  $: selfLink = orderLink.routes.booking(data.booking.id);
   $: breadCrumbs = [
-    { label: "Orders", url: routeConfig.tripManagement.orders.root },
+    { label: "Orders", url: routeConfig.routes.tripManagement.routes.orders.root },
     { label: data.order.journey?.reference ?? "Unknown", url: orderLink.root },
     { label: `Booking ${data.bookingNo}` ?? "Unknown", url: selfLink.root },
   ];

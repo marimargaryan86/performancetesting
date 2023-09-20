@@ -67,7 +67,7 @@
     }
 
     await callAction({
-      action: routeConfig.pay.activity.actions.listTransactions,
+      action: routeConfig.routes.pay.routes.activity.actions.listTransactions,
       data: {
         cursor: data.transactions.cursor,
       },
@@ -82,7 +82,10 @@
   }
 
   async function getBooking(bookingId: string): Promise<BookingModel | undefined> {
-    await callAction({ action: routeConfig.pay.activity.actions.getBooking, data: { bookingId } });
+    await callAction({
+      action: routeConfig.routes.pay.routes.activity.actions.getBooking,
+      data: { bookingId },
+    });
 
     return form?.booking;
   }

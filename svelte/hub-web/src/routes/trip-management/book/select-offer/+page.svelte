@@ -76,7 +76,7 @@
         status: ResourceStatus;
         offers: OfferModel[];
       }>({
-        action: routeConfig.tripManagement.book.select.actions.poll,
+        action: routeConfig.routes.tripManagement.routes.book.routes.select.actions.poll,
         apply: false,
       });
     },
@@ -121,11 +121,11 @@
 
   const { pending, func: selectOffer } = pendableCall(async () => {
     await callAction({
-      action: routeConfig.tripManagement.book.select.actions.select,
+      action: routeConfig.routes.tripManagement.routes.book.routes.select.actions.select,
       data: selected,
     });
 
-    await goto(routeConfig.tripManagement.book.payment.root);
+    await goto(routeConfig.routes.tripManagement.routes.book.routes.payment.root);
   });
 
   onDestroy(cancelPolling);

@@ -4,13 +4,17 @@
   type ViewId = "all" | "cancellations" | "refunds";
 
   const tabs: Record<ViewId, Tab> = {
-    all: { url: routeConfig.tripManagement.orders.root, label: "All", exact: true },
+    all: { url: routeConfig.routes.tripManagement.routes.orders.root, label: "All", exact: true },
     cancellations: {
-      url: routeConfig.tripManagement.orders.cancellations.root,
+      url: routeConfig.routes.tripManagement.routes.orders.routes.cancellations.root,
       label: "Cancellations",
       exact: true,
     },
-    refunds: { url: routeConfig.tripManagement.orders.refunds.root, label: "Refunds", exact: true },
+    refunds: {
+      url: routeConfig.routes.tripManagement.routes.orders.routes.refunds.root,
+      label: "Refunds",
+      exact: true,
+    },
   };
 
   export const departureAtDateRange = writable<DateRange | undefined>(undefined);
@@ -29,7 +33,7 @@
 </script>
 
 <StandardLayout pageTitle="Orders" tabs={Object.values(tabs)} bind:searchQuery={$searchQuery}>
-  <Button size="small" href={routeConfig.tripManagement.book.root} slot="actions">
+  <Button size="small" href={routeConfig.routes.tripManagement.routes.book.root} slot="actions">
     New Order
     <PlusIcon />
   </Button>

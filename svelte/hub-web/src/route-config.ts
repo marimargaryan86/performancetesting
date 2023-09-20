@@ -1,172 +1,201 @@
-// Trip management
-const tripManagementRoot = "/trip-management" as const;
-// Trip management - book
-const tripManagementBookRoot = `${tripManagementRoot}/book` as const;
-const tripManagementBookSelectRoot = `${tripManagementBookRoot}/select-offer` as const;
-const tripManagementBookPaymentRoot = `${tripManagementBookRoot}/payment` as const;
-const tripManagementBookConfirmationRoot = `${tripManagementBookRoot}/confirmation` as const;
-// Trip management - Orders
-const tripManagementOrdersRoot = `${tripManagementRoot}/orders` as const;
-const tripManagementOrdersCancallations = `${tripManagementOrdersRoot}/cancellations` as const;
-const tripManagementOrdersRefunds = `${tripManagementOrdersRoot}/refunds` as const;
-function tripManagementOrdersOrder<TId extends string>(
-  id: TId,
-): {
-  root: `${typeof tripManagementOrdersRoot}/${TId}`;
-  details: `${typeof tripManagementOrdersRoot}/${TId}/details`;
-  booking: <TBookingId extends string>(
-    bookingId: TBookingId,
-  ) => {
-    root: `${typeof tripManagementOrdersRoot}/${TId}/${TBookingId}`;
-  };
-} {
-  return {
-    root: `${tripManagementOrdersRoot}/${id}`,
-    details: `${tripManagementOrdersRoot}/${id}/details`,
-    booking: (bookingId) => ({
-      root: `${tripManagementOrdersRoot}/${id}/${bookingId}`,
-    }),
-  };
-}
-// Login
-const loginRoot = "/login" as const;
-// Help
-const helpRoot = "/help" as const;
-const helpPrivacyPolcy = `${helpRoot}/privacy-policy` as const;
-const helpTermsAndConditions = `${helpRoot}/terms-and-conditions` as const;
-const helpCookies = `${helpRoot}/cookies` as const;
-const helpCustomerService = `${helpRoot}/customer-service` as const;
-// Settings
-const settingsRoot = "/settings" as const;
-// Pay
-const payRoot = "/pay" as const;
-// Pay - activity
-const payActivityRoot = `${payRoot}/activity` as const;
-const payActivityConversion = `${payActivityRoot}/fx` as const;
-// Pay - accounts
-const payAccountsRoot = `${payRoot}/accounts` as const;
-function payAccountsAccount<TID extends string>(id: TID): `${typeof payAccountsRoot}/${TID}` {
-  return `${payAccountsRoot}/${id}`;
-}
-// Pay - Beneficiaries
-const payBeneficiaries = `${payRoot}/beneficiaries` as const;
-function payBeneficiariesBeneficiary<
-  TID extends string | undefined = undefined,
-  TOut = `${typeof payBeneficiaries}/${TID extends undefined ? "add" : TID}`,
->(id?: TID): TOut {
-  return `${payBeneficiaries}/${id ?? "add"}` as TOut;
-}
-// Pay - Bills
-const payBills = `${payRoot}/bills` as const;
-// Go
-const goRoot = "/go" as const;
-// Go - Bookings
-const goBookings = `${goRoot}/bookings` as const;
+type RouteConfig =
+  | { root?: string; actions?: Record<string, string>; routes?: Record<string, RouteConfig> }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  | ((...args: any[]) => RouteConfig);
 
-export default {
-  home: "/" as const,
-  tripManagement: {
-    root: tripManagementRoot,
-    book: {
-      root: tripManagementBookRoot,
-      select: {
-        root: tripManagementBookSelectRoot,
-        actions: {
-          poll: `${tripManagementBookSelectRoot}?/poll` as const,
-          select: `${tripManagementBookSelectRoot}?/select` as const,
-        },
-      },
-      payment: {
-        root: tripManagementBookPaymentRoot,
-        actions: {
-          poll: `${tripManagementBookPaymentRoot}?/poll` as const,
-          createOrder: `${tripManagementBookPaymentRoot}?/createOrder` as const,
-          confirmPayment: `${tripManagementBookPaymentRoot}?/confirmPayment` as const,
-        },
-      },
-      confirmation: {
-        root: tripManagementBookConfirmationRoot,
-      },
-      actions: {
-        search: `${tripManagementBookRoot}?/search` as const,
-        listPlaces: `${tripManagementBookRoot}?/listPlaces` as const,
-      },
-    },
-    orders: {
-      root: tripManagementOrdersRoot,
-      order: tripManagementOrdersOrder,
-      cancellations: {
-        root: tripManagementOrdersCancallations,
-      },
-      refunds: {
-        root: tripManagementOrdersRefunds,
-      },
-    },
-  },
-  login: {
-    root: loginRoot,
-    actions: {
-      login: `${loginRoot}?/login` as const,
-      logout: `${loginRoot}?/logout` as const,
-    },
-  },
-  help: {
-    privacyPolicy: {
-      root: helpPrivacyPolcy,
-    },
-    termsAndConditions: {
-      root: helpTermsAndConditions,
-    },
-    cookies: {
-      root: helpCookies,
-    },
-    customerService: {
-      root: helpCustomerService,
-    },
-  },
+function getRouteConfig<TConfig extends RouteConfig>(config: TConfig): TConfig {
+  return config;
+}
 
-  settings: settingsRoot,
-  pay: {
-    root: payRoot,
-    activity: {
-      root: payActivityRoot,
-      conversions: {
-        root: payActivityConversion,
-        actions: {
-          listConversions: `${payActivityConversion}?/listConversions` as const,
+/**
+ * A route configuration object containing URL paths for the SvelteKit router.
+ * URL paths are composed of current and parent key strings.
+ * Routes contain nested configurations that contain the following:
+ *
+ * @param root {string} The canonical URL path for the route.
+ * @param actions {object} [Key-value pairs of API actions and their URL paths.]
+ * @param routes {object} [Additional nested route configurations.]
+ */
+export default getRouteConfig({
+  root: "/",
+  routes: {
+    tripManagement: {
+      root: "/trip-management",
+      routes: {
+        book: {
+          root: "/trip-management/book",
+          actions: {
+            search: "/trip-management/book?/search",
+            listPlaces: "/trip-management/book?/listPlaces",
+          },
+          routes: {
+            select: {
+              root: "/trip-management/book/select-offer",
+              actions: {
+                poll: "/trip-management/book/select-offer?/poll",
+                select: "/trip-management/book/select-offer?/select",
+              },
+            },
+            payment: {
+              root: "/trip-management/book/payment",
+              actions: {
+                poll: "/trip-management/book/payment?/poll",
+                createOrder: "/trip-management/book/payment?/crateOrder",
+                confirmPayment: "/trip-management/book/payment?/confirmPayment",
+              },
+            },
+            confirmation: {
+              root: "/trip-management/book/confirmation",
+            },
+          },
+        },
+        orders: {
+          root: "/trip-management/orders",
+          routes: {
+            cancellations: {
+              root: "/trip-management/orders/cancellations",
+            },
+            refunds: {
+              root: "/trip-management/orders/refunds",
+            },
+            order<TId extends string>(
+              id: TId,
+            ): {
+              root: `/trip-management/orders/${TId}`;
+              routes: {
+                details: {
+                  root: `/trip-management/orders/${TId}/details`;
+                };
+                booking: <TBookingId extends string>(
+                  bookingId: TBookingId,
+                ) => {
+                  root: `/trip-management/orders/${TId}/${TBookingId}`;
+                };
+              };
+            } {
+              const root = `/trip-management/orders/${id}` as const;
+
+              return {
+                root,
+                routes: {
+                  details: {
+                    root: `${root}/details`,
+                  },
+                  booking<TBookingId extends string>(
+                    bookingId: TBookingId,
+                  ): {
+                    root: `/trip-management/orders/${TId}/${TBookingId}`;
+                  } {
+                    return {
+                      root: `${root}/${bookingId}`,
+                    };
+                  },
+                },
+              };
+            },
+          },
         },
       },
+    },
+    login: {
+      root: "/login",
       actions: {
-        getBooking: `${payActivityRoot}?/getBooking` as const,
-        listTransactions: `${payActivityRoot}?/listTransactions` as const,
+        login: "/login?/login",
+        logout: "/login?/logout",
       },
     },
-    accounts: {
-      root: payAccountsRoot,
-      account: payAccountsAccount,
-      actions: {
-        listAccounts: `${payAccountsRoot}?/listAccounts` as const,
-        addBalances: <TID extends string>(
-          id: TID,
-        ): `${ReturnType<typeof payAccountsAccount<TID>>}?/addBalances` =>
-          `${payAccountsAccount(id)}?/addBalances`,
+    help: {
+      routes: {
+        privacyPolicy: {
+          root: "/help/privacy-policy",
+        },
+        termsAndConditions: {
+          root: "/help/terms-and-conditions",
+        },
+        cookies: {
+          root: "/help/cookies",
+        },
+        customerService: {
+          root: "/help/customer-service",
+        },
       },
     },
-    beneficiaries: {
-      root: payBeneficiaries,
-      beneficiary: payBeneficiariesBeneficiary,
-      actions: {
-        listBeneficiaries: `${payBeneficiaries}?/listBeneficiaries` as const,
+    settings: {
+      root: "/settings",
+    },
+    pay: {
+      root: "/pay",
+      routes: {
+        activity: {
+          root: "/pay/activity",
+          actions: {
+            getBooking: "/pay/activity?/getBooking",
+            listTransactions: "/pay/activity?/listTransactions",
+          },
+          routes: {
+            conversions: {
+              root: "/pay/activity/fx",
+              actions: {
+                listConversions: "/pay/activity/fx?/listConversions",
+              },
+            },
+          },
+        },
+        accounts: {
+          root: "/pay/accounts",
+          actions: {
+            listAccounts: "/pay/accounts?/listAccounts",
+          },
+          routes: {
+            account<TId extends string>(
+              id: TId,
+            ): {
+              root: `/pay/accounts/${TId}`;
+              actions: {
+                addBalances: `/pay/accounts/${TId}?/addBalances`;
+              };
+            } {
+              const root = `/pay/accounts/${id}` as const;
+
+              return {
+                root,
+                actions: {
+                  addBalances: `${root}?/addBalances`,
+                },
+              };
+            },
+          },
+        },
+        beneficiaries: {
+          root: "/pay/beneficiaries",
+          actions: {
+            listBeneficiaries: "/pay/beneficiaries?/listBeneficiaries",
+          },
+          routes: {
+            beneficiary<
+              TId extends string | undefined = undefined,
+              TOut = `/pay/beneficiaries/${TId extends undefined ? "add" : TId}`,
+            >(
+              id?: TId,
+            ): {
+              root: TOut;
+            } {
+              return { root: `/pay/beneficiaries/${id ?? "add"}` as TOut };
+            },
+          },
+        },
+        bills: {
+          root: "/pay/bills",
+        },
       },
     },
-    bills: {
-      root: payBills,
+    go: {
+      root: "/go",
+      routes: {
+        bookings: {
+          root: "/go/bookings",
+        },
+      },
     },
   },
-  go: {
-    root: goRoot,
-    bookings: {
-      root: goBookings,
-    },
-  },
-};
+} as const);
