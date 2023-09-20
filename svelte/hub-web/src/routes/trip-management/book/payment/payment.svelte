@@ -36,39 +36,21 @@
 <script lang="ts">
   import routeConfig from "routeConfig";
   import { browser } from "$app/environment";
-  import { onDestroy } from "svelte";
   import { callAction } from "utils/common";
   import { loadStripe, type Stripe, type Appearance, type StripeElements } from "@stripe/stripe-js";
   import { env } from "$env/dynamic/public";
   import LoadingIcon from "components/icons/loading-icon.svelte";
-  import { pollableCall } from "utils/pollable-call";
-  import type { TripOfferPriceQuoteModel } from "integration/junction-mobile-api/schemas/offer";
-  import type { ActionPollReturnType } from "./+page.server";
   import type { SearchDataModel } from "../booking-manager.server";
 
-  export let priceQuote: TripOfferPriceQuoteModel;
   export let paymentIntent: SearchDataModel["paymentIntent"];
 
   let stripe: Stripe | undefined = undefined;
   let stripeElements: StripeElements | undefined = undefined;
   let stripeContainer: HTMLDivElement | undefined = undefined;
 
-  $: priceQuoteId = priceQuote.id;
   $: clientSecret = paymentIntent?.clientSecret;
-  $: if (browser) {
-    pollPriceQuote(priceQuoteId).then(updateData);
-  }
   $: if (browser && clientSecret) {
     createStripe(clientSecret);
-  }
-
-  function updateData(value?: ActionPollReturnType): void {
-    if (!value) {
-      return;
-    }
-
-    paymentIntent = value.paymentIntent;
-    priceQuote = value.priceQuote;
   }
 
   async function createStripe(nextClientSecret: string): Promise<void> {
@@ -82,38 +64,12 @@
     }
   }
 
-  const { poll: pollPriceQuote, cancel: cancelPolling } = pollableCall({
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    func(_: string) {
-      return callAction<ActionPollReturnType>({
-        action: routeConfig.routes.tripManagement.routes.book.routes.payment.actions.poll,
-        apply: false,
-      });
-    },
-    check(result) {
-      if (
-        result.type !== "success" ||
-        result.data?.priceQuote.status === "unspecified" ||
-        result.data?.priceQuote.status === "failed"
-      ) {
-        return { status: "done" };
-      }
-
-      if (result.data?.priceQuote.status === "completed") {
-        return { status: "done", data: result.data };
-      }
-
-      return { status: "pending" };
-    },
-    sleepMs: 2000,
-  });
-
   export async function pay(): Promise<boolean> {
     if (paymentIntent?.confirmed) {
       return true;
     }
 
-    if (!(priceQuote.price && stripe && clientSecret && stripeElements)) {
+    if (!(stripe && clientSecret && stripeElements)) {
       return false;
     }
 
@@ -139,19 +95,13 @@
 
     return true;
   }
-
-  onDestroy(cancelPolling);
 </script>
 
 <div class="payment">
   <h3 class="typography title-medium bold">Payment method</h3>
 
-  <div
-    bind:this={stripeContainer}
-    class="stripe-container"
-    class:pending={priceQuote.status !== "completed"}
-  >
-    {#if priceQuote.status !== "completed"}
+  <div bind:this={stripeContainer} class="stripe-container" class:pending={!paymentIntent}>
+    {#if !paymentIntent}
       <LoadingIcon />
     {/if}
   </div>

@@ -40,7 +40,7 @@ export default getRouteConfig({
               root: "/trip-management/book/payment",
               actions: {
                 poll: "/trip-management/book/payment?/poll",
-                createOrder: "/trip-management/book/payment?/crateOrder",
+                createOrder: "/trip-management/book/payment?/createOrder",
                 confirmPayment: "/trip-management/book/payment?/confirmPayment",
               },
             },
