@@ -37,19 +37,18 @@ class ShortenerClient(Client):
         self,
         original_link: str,
     ) -> str:
-        async with self._client as link_client:
-            response = await link_client.post(
-                self._shortener_url,
-                headers={
-                    "accept": "application/json",
-                    "content-type": "application/json",
-                    "Authorization": self._shortener_key,
-                },
-                json={
-                    "domain": self._shortener_domain,
-                    "originalURL": original_link,
-                },
-            )
-            response.raise_for_status()
+        response = await self._client.post(
+            self._shortener_url,
+            headers={
+                "accept": "application/json",
+                "content-type": "application/json",
+                "Authorization": self._shortener_key,
+            },
+            json={
+                "domain": self._shortener_domain,
+                "originalURL": original_link,
+            },
+        )
+        response.raise_for_status()
 
-            return response.json()["shortURL"]
+        return response.json()["shortURL"]
