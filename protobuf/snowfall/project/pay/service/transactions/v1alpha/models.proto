@@ -44,6 +44,7 @@ message Transaction {
   string beneficiary_id = 9;
   snowfall.project.pay.service.companies.v1alpha.PaymentMethod payment_method = 10;
   snowfall.project.pay.service.companies.v1alpha.PaymentType payment_type = 11;
+  string bill_id = 12;
 }
 
 enum QuotationStatus {

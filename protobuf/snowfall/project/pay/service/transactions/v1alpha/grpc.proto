@@ -30,7 +30,6 @@ service ConversionsService {
 service BillsService {
   rpc CreateBill(CreateBillRequest) returns (CreateBillResponse) {}
   rpc GetBill(GetBillRequest) returns (GetBillResponse) {}
-  rpc AddToBillAmount(AddToBillAmountRequest) returns (AddToBillAmountResponse) {}
   rpc UpdateBillReconciliation(UpdateBillReconciliationRequest) returns (UpdateBillReconciliationResponse) {}
   rpc ListBills(ListBillsRequest) returns (ListBillsResponse) {}
 }
@@ -40,6 +39,7 @@ message ListTransactionsRequest {
   string page_token = 2;
   snowfall.stdlib.v1.Sort sort_by = 3;
   repeated string filter_by = 4;
+  repeated string filter_by_bill_ids = 5;
 }
 
 message ListTransactionsResponse {
@@ -71,6 +71,7 @@ message CreateTransactionRequest {
   string invoice_reference = 4;
   snowfall.project.pay.service.companies.v1alpha.PaymentMethod payment_method = 5;
   snowfall.project.pay.service.companies.v1alpha.PaymentType payment_type = 6;
+  string order_id = 7;
 }
 
 message CreateTransactionResponse {
@@ -152,14 +153,6 @@ message GetBillResponse {
   Bill bill = 1;
 }
 
-message AddToBillAmountRequest {
-  string id = 1;
-  snowfall.stdlib.v1.Money amount = 2;
-}
-
-message AddToBillAmountResponse {
-  Bill bill = 1;
-}
 message UpdateBillReconciliationRequest {
   string id = 1;
   bool is_reconciled = 2;
@@ -168,6 +161,7 @@ message UpdateBillReconciliationRequest {
 message UpdateBillReconciliationResponse {
   Bill bill = 1;
 }
+
 message ListBillsRequest {
   int32 page_size = 1;
   string page_token = 2;

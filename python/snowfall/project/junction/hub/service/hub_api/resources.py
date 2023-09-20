@@ -722,6 +722,16 @@ class Transaction(models.Resource):
                         type="companies",
                     ),
                 },
+                "bill": {
+                    "data": (
+                        models.ResourceIdentifier(
+                            id=transaction.bill_id,
+                            type="bills",
+                        )
+                        if transaction.bill_id
+                        else None
+                    ),
+                },
             },
             links={
                 _SELF_HREF: str(

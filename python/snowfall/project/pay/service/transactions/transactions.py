@@ -25,16 +25,18 @@ class TransactionsRepository(
         self,
         cursor: str,
         filter_by_ids: Sequence[str],
+        filter_by_bill_ids: Sequence[str],
         sort: tuple[str, int] | None = None,
     ) -> resultset.ResultSet[models_pb2.Transaction]:
-        filter_ = None
+        filter_ = {}
         if filter_by_ids:
-            filter_ = {
-                "_id": {
-                    "$in": list(filter_by_ids),
-                },
+            filter_["_id"] = {
+                "$in": list(filter_by_ids),
             }
-
+        if filter_by_bill_ids:
+            filter_["bill_id"] = {
+                "$in": list(filter_by_bill_ids),
+            }
         return await self._find_with_cursor(cur=cursor, sort=sort, filter_=filter_)
 
     async def find_by_ids(

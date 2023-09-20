@@ -116,6 +116,7 @@ async def test_that_transaction_created_and_id_set_in_booking() -> None:
         external_reference=EXTERNAL_REFERENCE,
         invoice_reference=INVOICE_REFERENCE,
         quotation_id="a-pay-quotation-id",
+        order_id="an-id",
     )
 
 

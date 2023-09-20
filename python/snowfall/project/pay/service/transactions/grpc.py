@@ -19,24 +19,27 @@ from snowfall.project.pay.service.transactions.v1alpha import (
 )
 from snowfall.stdlib import money, string
 from snowfall.stdlib.transport.grpc import service, sorting
+from snowfall.stdlib.v1 import money_pb2
 from snowfall.vendor.currency_cloud.client import PaymentClient
 from snowfall.vendor.currency_cloud.errors import CurrencyCloudError
 from snowfall.vendor.currency_cloud.models import conversion
 
 
-class TransactionsService(
+class TransactionsService(  # noqa:WPS214
     service.Service,
     grpc_pb2_grpc.TransactionsServiceServicer,
 ):
-    def __init__(
+    def __init__(  # noqa: WPS211
         self,
         transactions: TransactionsRepository,
         conversions: ConversionsRepository,
+        bills: BillsRepository,
         payment_client: PaymentClient,
         companies_client: companies.Client,
     ):
         self._transactions = transactions
         self._conversions = conversions
+        self._bills = bills
         self._payment_client = payment_client
         self._companies = companies_client
         self._sort = {"created_at": "created_at"}
@@ -60,6 +63,7 @@ class TransactionsService(
             cursor=request.page_token,
             sort=sorting.get_sort(request.sort_by, self._sort),
             filter_by_ids=request.filter_by,
+            filter_by_bill_ids=request.filter_by_bill_ids,
         )
         transactions.limit(
             request.page_size if request.page_size else self._default_page_size,
@@ -99,11 +103,30 @@ class TransactionsService(
             transactions=[transaction async for transaction in transactions],
         )
 
-    async def CreateTransaction(  # type: ignore[override] # noqa: N802, WPS210
+    async def CreateTransaction(  # type: ignore[override] # noqa: N802, WPS210, WPS217
         self,
         request: grpc_pb2.CreateTransactionRequest,
         context: grpc.aio.ServicerContext,
     ) -> grpc_pb2.CreateTransactionResponse:
+        bill = await self._bills.find_by_id(
+            selector="order_id",
+            document_id=request.order_id,
+        )
+        if bill:
+            bill = self._add_amount_to_bill_amount(
+                bill,
+                request.quotation.amounts.total_amount,
+            )
+            await self._bills.update(bill)
+        else:
+            bill = await self._bills.insert(
+                models_pb2.Bill(
+                    id=string.uuid(),
+                    order_id=request.order_id,
+                    total_amount=request.quotation.amounts.total_amount,
+                ),
+            )
+
         transaction_id = string.uuid()
         are_currencies_same = (
             request.quotation.amounts.base_converted.currency_code
@@ -138,10 +161,22 @@ class TransactionsService(
                 beneficiary_id=request.quotation.beneficiary_id,
                 payment_type=payer.payment_type,
                 payment_method=payer.payment_method,
+                bill_id=bill.id,
             ),
         )
 
         return grpc_pb2.CreateTransactionResponse(transaction=inserted_transaction)
+
+    def _add_amount_to_bill_amount(
+        self,
+        bill: models_pb2.Bill,
+        amount: money_pb2.Money,
+    ) -> models_pb2.Bill:
+        bill_total_amount = money.from_protobuf(bill.total_amount)
+        added_amount = money.from_protobuf(amount)
+        bill.total_amount.MergeFrom(bill_total_amount.add(added_amount).protobuf())
+
+        return bill
 
 
 class QuotationsService(  # noqa: WPS214
@@ -380,7 +415,7 @@ class BillsService(  # noqa: WPS214
 
     async def ListBills(  # type: ignore[override] # noqa: N802
         self,
-        request: grpc_pb2.ListTransactionsRequest,
+        request: grpc_pb2.ListBillsRequest,
         context: grpc.aio.ServicerContext,
     ) -> grpc_pb2.ListBillsResponse:
         bills = await self._bills.find(
@@ -414,27 +449,6 @@ class BillsService(  # noqa: WPS214
         inserted_bill = await self._bills.insert(request.bill)
 
         return grpc_pb2.CreateBillResponse(bill=inserted_bill)
-
-    async def AddToBillAmount(  # type: ignore[override] # noqa: N802, WPS210
-        self,
-        request: grpc_pb2.AddToBillAmountRequest,
-        context: grpc.aio.ServicerContext,
-    ) -> grpc_pb2.AddToBillAmountResponse:
-        bill = await self._get_bill(context, request.id)
-
-        total_amount = money.from_protobuf(bill.total_amount)
-        add_amount = money.from_protobuf(request.amount)
-
-        bill.MergeFrom(
-            models_pb2.Bill(
-                total_amount=total_amount.add(add_amount).protobuf(),
-                is_reconciled=False,
-            ),
-        )
-
-        return grpc_pb2.AddToBillAmountResponse(
-            bill=await self._bills.update(bill),
-        )
 
     async def UpdateBillReconciliation(  # type: ignore[override] # noqa: N802, WPS210
         self,

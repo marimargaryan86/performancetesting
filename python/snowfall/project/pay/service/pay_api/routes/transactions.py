@@ -33,6 +33,7 @@ class Transactions(endpoints.HTTPEndpoint):
                 quotation=quote,
                 external_reference=body["externalReference"],
                 invoice_reference=body["invoiceReference"],
+                order_id=body["order"],
             )
             await quotations_client.update_status(
                 identifier=quote.id,
@@ -76,12 +77,20 @@ class Transactions(endpoints.HTTPEndpoint):
             str(uuid)
             for uuid in request.scope["parsed_query_string"].get("filter[ids][eq]", [])
         ]
+        filter_by_bill_ids = [
+            str(uuid)
+            for uuid in request.scope["parsed_query_string"].get(
+                "filter[bill.id][eq]",
+                [],
+            )
+        ]
 
         response = await client.find(
             limit=pagination.limit or self._default_page_size,
             cursor=pagination.cursor,
             sort=sort,
             filter_by=filter_by,
+            filter_by_bill_ids=filter_by_bill_ids,
         )
 
         data_resources = []

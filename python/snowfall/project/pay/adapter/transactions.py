@@ -26,6 +26,7 @@ class Client(abc.ABC):
         quotation: models_pb2.Quotation,
         external_reference: str,
         invoice_reference: str,
+        order_id: str,
     ) -> models_pb2.Transaction:
         """Create a transaction resource."""
 
@@ -38,9 +39,10 @@ class Client(abc.ABC):
         """Fetch a transaction resource."""
 
     @abc.abstractmethod
-    async def find(
+    async def find(  # noqa: WPS211
         self,
         filter_by: Sequence[str],
+        filter_by_bill_ids: Sequence[str],
         limit: int | None = None,
         cursor: str | None = None,
         sort: sort_pb2.Sort | None = None,
@@ -67,6 +69,7 @@ class DictClient(Client):
         quotation: models_pb2.Quotation,
         external_reference: str,
         invoice_reference: str,
+        order_id: str,
     ) -> models_pb2.Transaction:
         transaction = models_pb2.Transaction(
             id=string.uuid(),
@@ -110,9 +113,10 @@ class DictClient(Client):
             raise errors.NotFoundError()
         return transaction
 
-    async def find(
+    async def find(  # noqa: WPS211
         self,
         filter_by: Sequence[str],
+        filter_by_bill_ids: Sequence[str],
         limit: int | None = None,
         cursor: str | None = None,
         sort: sort_pb2.Sort | None = None,
@@ -157,6 +161,7 @@ class GrpcClient(Client):
         quotation: models_pb2.Quotation,
         external_reference: str,
         invoice_reference: str,
+        order_id: str,
     ) -> models_pb2.Transaction:
         response = await errors.handle_grpc_errors(
             self._transactions.CreateTransaction(
@@ -164,6 +169,7 @@ class GrpcClient(Client):
                     quotation=quotation,
                     external_reference=external_reference,
                     invoice_reference=invoice_reference,
+                    order_id=order_id,
                 ),
             ),
         )
@@ -184,9 +190,10 @@ class GrpcClient(Client):
 
         return response.transaction
 
-    async def find(
+    async def find(  # noqa: WPS211
         self,
         filter_by: Sequence[str],
+        filter_by_bill_ids: Sequence[str],
         limit: int | None = None,
         cursor: str | None = None,
         sort: sort_pb2.Sort | None = None,
@@ -195,6 +202,7 @@ class GrpcClient(Client):
             page_token=cursor or "",
             sort_by=sort,
             filter_by=filter_by,
+            filter_by_bill_ids=filter_by_bill_ids,
         )
         if limit is not None:
             request.page_size = limit

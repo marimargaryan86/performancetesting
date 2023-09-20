@@ -2199,6 +2199,9 @@
           },
           {
             "$ref": "#/components/parameters/filterIds"
+          },
+          {
+            "$ref": "#/components/parameters/filterByBillIds"
           }
         ],
         "responses": {
@@ -2420,6 +2423,24 @@
         "in": "query",
         "required": false,
         "description": "Filters transactions based on the ids",
+        "style": "form",
+        "explode": false,
+        "schema": {
+          "type": "array",
+          "example": [
+            "271f6d54-9e59-407e-a860-b0771d9e3d26"
+          ],
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "filterByBillIds": {
+        "name": "filter[bill.id][eq]",
+        "in": "query",
+        "required": false,
+        "description": "Filters transactions based on the bill ids",
         "style": "form",
         "explode": false,
         "schema": {
@@ -4450,6 +4471,28 @@
           }
         }
       },
+      "BillIdentifier": {
+        "title": "Bill Identifier",
+        "type": "object",
+        "required": [
+          "id",
+          "type"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "bills"
+            ],
+            "example": "bills"
+          }
+        }
+      },
       "Transaction": {
         "title": "Transaction",
         "description": "Transaction schema",
@@ -4666,6 +4709,27 @@
                     },
                     "readOnly": true,
                     "description": "The ID that links and FX transaction in the provider system to Junction PAYs transcation history"
+                  },
+                  "bill": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/BillIdentifier"
+                          },
+                          {
+                            "nullable": true
+                          }
+                        ],
+                        "nullable": true
+                      }
+                    },
+                    "readOnly": true,
+                    "description": "The ID that refers to the bill entity"
                   },
                   "payer": {
                     "type": "object",

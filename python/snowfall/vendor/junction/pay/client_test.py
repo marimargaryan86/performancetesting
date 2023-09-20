@@ -203,6 +203,7 @@ class TestPayClient(object):
             external_reference=_EXTERNAL_REFERENCE,
             invoice_reference="k1234567890123",
             quotation_id="04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+            order_id="04f83af9-90bb-4a0f-9881-03e1e690f7f5",
         )
 
         assert response == create_transaction_response

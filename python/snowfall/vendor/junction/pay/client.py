@@ -56,6 +56,7 @@ class Client(BaseClient):
         external_reference: str,
         invoice_reference: str,
         quotation_id: str,
+        order_id: str,
     ) -> dict[str, Any]:
         payload = {
             "data": {
@@ -69,6 +70,12 @@ class Client(BaseClient):
                         "data": {
                             "id": quotation_id,
                             "type": "quotations",
+                        },
+                    },
+                    "order": {
+                        "data": {
+                            "id": order_id,
+                            "type": "orders",
                         },
                     },
                 },

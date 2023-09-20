@@ -30,6 +30,7 @@ class PayTransactionCreator(object):
                 quotation_id=booking.trip_option.pay_quote_id,
                 external_reference=booking.id,
                 invoice_reference=booking.trip_result.provider_booking_reference,
+                order_id=booking.order_id,
             )
             booking.transaction_id = transaction.data.id
         return booking
@@ -39,12 +40,14 @@ class PayTransactionCreator(object):
         quotation_id: str,
         external_reference: str,
         invoice_reference: str,
+        order_id: str,
     ) -> PayTransactionResponse:
         try:  # noqa: WPS229
             resp = await self._pay_client.create_transactions(
                 external_reference=external_reference,
                 invoice_reference=invoice_reference,
                 quotation_id=quotation_id,
+                order_id=order_id,
             )
             return PayTransactionResponse(**resp)
         except httpx.HTTPError as ex:

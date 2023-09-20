@@ -114,6 +114,12 @@ class TestTransactions(object):
                             "type": "quotations",
                         },
                     },
+                    "order": {
+                        "data": {
+                            "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                            "type": "orders",
+                        },
+                    },
                 },
             },
         }

@@ -67,6 +67,9 @@ async def _serve(app: application.AsyncApplication[_GrpcSettings]) -> None:
                 conversions=transactions.ConversionsRepository(
                     mongo.transactions.conversions,
                 ),
+                bills=transactions.BillsRepository(
+                    mongo.transactions.bills,
+                ),
                 payment_client=PaymentClient(
                     base_url=app.settings.cc_address,
                     auth=CurrencyCloudAuth(
