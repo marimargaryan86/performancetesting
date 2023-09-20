@@ -16,11 +16,12 @@
   export let value: TValue | undefined = undefined;
   export let options: Readonly<(TValue | undefined)[]>;
   // prettier-ignore
-  export let formatter: (nextValue?: TValue) => string = (nextValue) => String(nextValue ?? "");
+  export let formatter: (nextValue?: TValue, selected?: boolean) => string = (nextValue) => String(nextValue ?? "");
   export let label: string | undefined = undefined;
   export let placeholder: string | undefined = undefined;
   export let required = false;
   export let error: string | string[] | boolean = false;
+  export let dialogMinWidth: string | undefined = undefined;
 
   let expanded = false;
 
@@ -58,14 +59,18 @@
     {placeholder}
     readonly
     on:click={toggleExpanded}
-    value={value ? formatter(value) : undefined}
+    value={value ? formatter(value, true) : undefined}
     {error}
   >
     <ChevronIcon slot="icon-after" direction={expanded ? "up" : "down"} />
   </TextField>
 
   {#if expanded}
-    <ul class="typography body-medium options" transition:scale={{ duration: 150, start: 0.8 }}>
+    <ul
+      class="typography body-medium options"
+      transition:scale={{ duration: 150, start: 0.8 }}
+      style:min-width={dialogMinWidth}
+    >
       {#each options as option}
         {@const displayValue = formatter(option)}
         <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->

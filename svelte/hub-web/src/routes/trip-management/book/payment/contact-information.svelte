@@ -71,6 +71,7 @@
         formatter={formatCountryPhoneOption}
         bind:value={phoneCountry}
         error={errors?.phone?.code?._errors}
+        dialogMinWidth="240px"
       />
       <TextField
         label="Phone number"
@@ -120,6 +121,7 @@
         required
         bind:value={country}
         error={errors?.countryCode?._errors}
+        dialogMinWidth="240px"
       />
       <TextField
         label="Postcode"
