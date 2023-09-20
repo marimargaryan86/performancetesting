@@ -49,16 +49,14 @@
     contactInformation: { phone: {}, address: {} },
   };
   let errors: z.ZodFormattedError<z.infer<typeof bookingDetailsValidator>> | undefined = undefined;
+  let { priceQuote, paymentIntent } = data;
 
-  $: priceQuote = data.priceQuote;
-  $: priceQuoteId = priceQuote.id;
-  $: paymentIntent = data.paymentIntent;
   $: bookingDetailsValidator = z.object({
     passengers: z.array(getPassengerValidator(priceQuote.required)),
     contactInformation: contactInformationData,
   });
   $: if (browser && !paymentIntent) {
-    pollPayment(priceQuoteId);
+    pollPayment(priceQuote.id);
   }
 
   async function createOrder(): Promise<boolean> {
@@ -74,7 +72,7 @@
     const result = await callAction({
       action: routeConfig.routes.tripManagement.routes.book.routes.payment.actions.createOrder,
       data: {
-        priceQuoteId,
+        priceQuoteId: priceQuote.id,
         passengers: validationResult.data.passengers,
         contact: validationResult.data.contactInformation,
         price: priceQuote.price,
