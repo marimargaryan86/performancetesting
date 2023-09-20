@@ -184,9 +184,12 @@ known_versions = [
 root_patterns = [
     "/bash",
     "/golang",
+    "/nomad",
     "/openapi",
+    "/ory",
     "/protobuf",
     "/python",
+    "/svelte",
 ]
 
 [test]
@@ -194,6 +197,7 @@ report_dir = "dist/test_results"
 
 [tailor]
 ignore_paths = [
+    "**/node_modules/**",
     "bash/tests/schedule_tests/**",
 ]
 
