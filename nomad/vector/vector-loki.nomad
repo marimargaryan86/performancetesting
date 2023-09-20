@@ -65,15 +65,22 @@ job "vector-vector-loki" {
             enabled = true
             address = "0.0.0.0:8686"
             playground = true
+          [transforms.relabel_docker_logs]
+            inputs = ["logs"]
+            type   = "remap"
+            source = """
+            .message,err = parse_json(.message)
+            .log_level = .message.level
+          """
           [sources.logs]
             type = "docker_logs"
           [sinks.out]
             type = "console"
-            inputs = [ "logs" ]
+            inputs = [ "relabel_docker_logs" ]
             encoding.codec = "json"
           [sinks.loki]
             type = "loki"
-            inputs = ["logs"]
+            inputs = ["relabel_docker_logs"]
             endpoint = "${var.loki_endpoint}"
             encoding.codec = "json"
             healthcheck.enabled = true
