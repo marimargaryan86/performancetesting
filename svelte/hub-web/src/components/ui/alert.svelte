@@ -6,13 +6,14 @@
   export let show = true;
   let className: string | undefined = undefined;
   export { className as class };
+  export let dismissable = true;
 
   function close(): void {
     show = false;
   }
 </script>
 
-{#if show}
+{#if show || !dismissable}
   <div
     class={className}
     class:alert={true}
@@ -25,9 +26,11 @@
       <slot />
     </div>
 
-    <button on:click={close}>
-      <CloseIcon variant="cross" />
-    </button>
+    {#if dismissable}
+      <button on:click={close}>
+        <CloseIcon variant="cross" />
+      </button>
+    {/if}
   </div>
 {/if}
 

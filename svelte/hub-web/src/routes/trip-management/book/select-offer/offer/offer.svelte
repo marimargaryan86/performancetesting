@@ -75,45 +75,57 @@
 
 <div class="offer" class:selected>
   {#each offer.groups as group, groupIdx}
-    {@const operator = group.details[0]?.operator ?? "Unknown"}
+    {@const vendor = group.details[0]?.vendor ?? "Unknown"}
     {@const stopCount = group.details[0]?.legs.length ?? 1}
 
     <div class="group">
       <div class="header typography label-medium">
-        <EntityAvatar name={operator} size="24px" />
+        <EntityAvatar name={vendor} size="24px" />
         <span>
-          {operator}
+          {vendor}
           •
           {stopCount === 1 ? "Direct" : `${stopCount} stops`}
         </span>
       </div>
 
       <div class="info">
-        <ul class="legs">
-          {#each group.details[0]?.legs ?? [] as leg}
-            <li class="leg">
-              <div class="route">
-                <span class="circle" />
-                <span class="time typography label-large bold">
-                  {formatTime(leg.departureAt, leg.origin.timeZone)}
-                </span>
-                <span class="location typography label-large bold">{leg.origin.name}</span>
+        <div class="segments">
+          {#each group.details as details}
+            <span class="typography body-small">
+              {details.legs[0]?.departureAt.toLocaleDateString("en-GB", {
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+              })}
+            </span>
 
-                <span class="line" />
-                <span class="duration typography body-small">
-                  {formatDuration(getTimeDeltaS(leg.arrivalAt, leg.departureAt))}
-                </span>
-                <span />
+            <ul class="legs">
+              {#each details.legs ?? [] as leg}
+                <li class="leg">
+                  <div class="route">
+                    <span class="circle" />
+                    <span class="time typography label-large bold">
+                      {formatTime(leg.departureAt, leg.origin.timeZone)}
+                    </span>
+                    <span class="location typography label-large bold">{leg.origin.name}</span>
 
-                <span class="circle" />
-                <span class="time typography label-large bold">
-                  {formatTime(leg.arrivalAt, leg.destination.timeZone)}
-                </span>
-                <span class="location typography label-large bold">{leg.destination.name}</span>
-              </div>
-            </li>
+                    <span class="line" />
+                    <span class="duration typography body-small">
+                      {formatDuration(getTimeDeltaS(leg.arrivalAt, leg.departureAt))}
+                    </span>
+                    <span />
+
+                    <span class="circle" />
+                    <span class="time typography label-large bold">
+                      {formatTime(leg.arrivalAt, leg.destination.timeZone)}
+                    </span>
+                    <span class="location typography label-large bold">{leg.destination.name}</span>
+                  </div>
+                </li>
+              {/each}
+            </ul>
           {/each}
-        </ul>
+        </div>
 
         {#if groupIdx === 0}
           <div class="price">
@@ -168,8 +180,11 @@
     gap: 24px;
   }
 
-  .legs {
+  .segments {
+    display: flex;
+    flex-flow: column;
     flex-grow: 1;
+    gap: 8px;
   }
 
   .route {

@@ -195,8 +195,8 @@
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    width: calc(var(--x-height) * 0.35);
-    height: calc(var(--x-height) * 0.35);
+    width: calc(var(--x-height) * 0.4);
+    height: calc(var(--x-height) * 0.4);
     margin-right: var(--x-icon-padding);
     padding: 8px 2px;
     background-color: var(--color-main-neutral-400);

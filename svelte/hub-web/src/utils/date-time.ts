@@ -64,3 +64,27 @@ export function getTimeDeltaMs(date1: Date, date2: Date, absolute = true): numbe
 export function getTimeDeltaS(date1: Date, date2: Date, absolute = true): number {
   return Math.floor(getTimeDeltaMs(date1, date2, absolute) / 1000);
 }
+
+export function getMinDate(...dates: Date[]): Date {
+  const asTime = dates.map((date) => date.getTime());
+
+  return dates[asTime.indexOf(Math.min(...asTime))] as Date;
+}
+
+export function getMaxDate(...dates: Date[]): Date {
+  const asTime = dates.map((date) => date.getTime());
+
+  return dates[asTime.indexOf(Math.max(...asTime))] as Date;
+}
+
+export function getTimeOfDayMs(date: Date): number {
+  return getTimeDeltaMs(date, getZeroTimeDate(date));
+}
+
+export function getTimeOfDayS(date: Date): number {
+  return Math.round(getTimeOfDayMs(date) / 1000);
+}
+
+export function getTimeOfDayM(date: Date): number {
+  return Math.fround(getTimeOfDayS(date) / 60);
+}

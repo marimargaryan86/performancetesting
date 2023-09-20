@@ -1,6 +1,32 @@
+<script lang="ts" context="module">
+  function getSortAndFilteringFunc(
+    options: SearchOptionsData,
+  ): (offers: OfferModel[]) => OfferModel[] {
+    return (offers): OfferModel[] =>
+      offers.filter(getFilterOffersFunc(options)).sort(getSortOffersFunc(options));
+  }
+
+  function getSearchOptionSettings(offers?: OfferModel[]): SearchOptionsSettings {
+    if (!offers?.length) {
+      return { durationSpanM: { start: 0, end: 0 }, vendors: [] };
+    }
+
+    const durations = offers.map((item) => getOfferDurationM(item));
+    const vendors = Array.from(new Set(offers.flatMap((item) => getVendors(item))));
+
+    return {
+      durationSpanM: { start: Math.min(...durations), end: Math.max(...durations) },
+      vendors,
+    };
+  }
+</script>
+
 <script lang="ts">
   import TripSearch from "../../components/trip-search/trip-search.svelte";
-  import SearchOptions, { type SearchOptionsData } from "./search-options.svelte";
+  import SearchOptions, {
+    type SearchOptionsData,
+    type SearchOptionsSettings,
+  } from "./search-options.svelte";
   import Offer from "./offer/offer.svelte";
   import { callAction } from "utils/common";
   import routeConfig from "routeConfig";
@@ -16,26 +42,32 @@
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import { pendableCall } from "utils/pendable-call";
   import { pollableCall } from "utils/pollable-call";
+  import Alert from "components/ui/alert.svelte";
+  import { getSortOffersFunc } from "sorting/offer";
+  import { getFilterOffersFunc } from "filters/offer";
+  import { getOfferDurationM, getVendors } from "utils/offer";
 
   export let data;
 
-  let searchOptions: SearchOptionsData = {
-    sortBy: "price",
-    stops: [],
-    arrivalSpan: { start: 0, end: 1440 },
-    departureSpan: { start: 0, end: 1440 },
-    duration: 492,
-    operators: [0, 1, 2],
-  };
   let selected = {
     offerId: data.searchData.offerId,
     optionIds: data.searchData.optionIds,
   };
+  let offers = data.tripCandidates.offers;
+  let searchOptionsSettings = getSearchOptionSettings(offers);
+  let searchOptions: SearchOptionsData = {
+    sortBy: "price",
+    stops: [],
+    arrivalSpanM: { start: 0, end: 1440 },
+    departureSpanM: { start: 0, end: 1440 },
+    durationM: searchOptionsSettings.durationSpanM.start,
+    vendors: [],
+  };
 
-  $: offers = data.tripCandidates.offers;
   $: if (browser && data.tripCandidates.status !== "completed") {
     pollOffers(data.tripCandidates.id);
   }
+  $: sortAndFilter = getSortAndFilteringFunc(searchOptions);
 
   const { poll: pollOffersAux, cancel: cancelPolling } = pollableCall({
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -61,8 +93,18 @@
         offers = result.data.offers;
       }
 
+      if (offers.length) {
+        searchOptionsSettings = getSearchOptionSettings(offers);
+        searchOptions = {
+          ...searchOptions,
+          durationM: searchOptionsSettings.durationSpanM.start,
+          vendors: [],
+        };
+      }
+
+      // Sometimes the result comes back as completed with an empty set, retry if so.
       if (result.data?.status === "completed") {
-        return { status: result.data.offers.length ? "done" : "retry" };
+        return { status: offers.length ? "done" : "retry" };
       }
 
       return { status: "pending" };
@@ -101,10 +143,10 @@
   <Countdown expiresAt={data.tripCandidates.expiresAt} show={Boolean(offers.length)} />
 
   <div class="scroll">
-    <SearchOptions bind:data={searchOptions} />
+    <SearchOptions bind:data={searchOptions} settings={searchOptionsSettings} />
 
     <ul class="offer-result">
-      {#each offers as offer}
+      {#each sortAndFilter(offers) as offer}
         <li>
           <Offer
             {offer}
@@ -113,6 +155,14 @@
             on:select={select}
           />
         </li>
+      {:else}
+        {#if offers.length}
+          <li>
+            <Alert type="warning" dismissable={false}>
+              <span class="typography body-medium">No trips matches the filter criteria</span>
+            </Alert>
+          </li>
+        {/if}
       {/each}
 
       {#if $offersPending}
@@ -121,7 +171,11 @@
         <li><LoadingSkelton /></li>
         <li><LoadingSkelton /></li>
       {:else if !offers.length}
-        <li class="no-result">No trips found</li>
+        <li>
+          <Alert type="warning" dismissable={false}>
+            <span class="typography body-medium">No trips found</span>
+          </Alert>
+        </li>
       {/if}
     </ul>
   </div>

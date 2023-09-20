@@ -88,7 +88,7 @@ export const tripOfferGroupDetailsModel = getSchemaModel(
     id: z.string(),
     legType: legTypeModel.model.optional(),
     legs: z.array(offerSegmentLegModel.model),
-    vendor: z.string(),
+    vendor: z.string().optional(),
     operator: z.string().optional(),
     routeIdentifiers: routeIdentifierModel.model,
     sequences: z.object({
@@ -102,7 +102,7 @@ export const tripOfferGroupDetailsModel = getSchemaModel(
       legType: undefined,
       legs: data.attributes.legs.map(offerSegmentLegModel.toModel),
       operator: data.attributes.operator ?? undefined,
-      vendor: data.attributes.vendor,
+      vendor: data.attributes.vendor.length ? data.attributes.vendor : undefined,
       sequences: {
         segment: data.attributes.sequences.segment,
         trip: data.attributes.sequences.trip,

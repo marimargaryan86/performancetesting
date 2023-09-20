@@ -7,16 +7,21 @@
     | "earliest-arrival"
     | "latest-arrival";
   type SortOption = { label: string; value: SortValue };
-  type StopValue = "direct" | "non-stop" | "indirect";
+  type StopValue = "direct";
   type TimeSpan = { start: number; end: number };
 
   export type SearchOptionsData = {
     sortBy: SortValue;
     stops: StopValue[];
-    departureSpan: TimeSpan;
-    arrivalSpan: TimeSpan;
-    duration: number;
-    operators: number[];
+    departureSpanM: TimeSpan;
+    arrivalSpanM: TimeSpan;
+    durationM: number;
+    vendors: string[];
+  };
+
+  export type SearchOptionsSettings = {
+    durationSpanM: { start: number; end: number };
+    vendors: string[];
   };
 
   const sortValues: SortOption[] = [
@@ -26,12 +31,6 @@
     { label: "Latest departure", value: "latest-departure" },
     { label: "Earliest arrival", value: "earliest-arrival" },
     { label: "Latest arrival", value: "latest-arrival" },
-  ];
-
-  const operators = [
-    { name: "Provider 1", id: 0 },
-    { name: "Provider 2", id: 1 },
-    { name: "Provider 3", id: 2 },
   ];
 
   function formatSortBy(value?: SortOption): string {
@@ -53,6 +52,7 @@
   import { formatDuration } from "formatting/date-time";
 
   export let data: SearchOptionsData;
+  export let settings: SearchOptionsSettings;
 
   let sortBy = sortValues[0] as SortOption;
 
@@ -60,9 +60,9 @@
 
   function selectOperators(all: boolean): void {
     if (all) {
-      data = { ...data, operators: operators.map((operator) => operator.id) };
+      data = { ...data, vendors: [...settings.vendors] };
     } else {
-      data = { ...data, operators: [] };
+      data = { ...data, vendors: [] };
     }
   }
 </script>
@@ -77,16 +77,9 @@
 
   <div class="stops">
     <h3 class="typography label-large">Stops</h3>
-
     <div class="options typography body-small">
       <label for="stop-direct">
         <Checkbox id="stop-direct" value="direct" bind:group={data.stops} /> Direct
-      </label>
-      <label for="non-stop">
-        <Checkbox id="non-stop" value="non-stop" bind:group={data.stops} /> Non-stop
-      </label>
-      <label for="indirect">
-        <Checkbox id="indirect" value="indirect" bind:group={data.stops} /> Indirect
       </label>
     </div>
   </div>
@@ -95,21 +88,20 @@
 
   <div class="departure-time">
     <h3 class="typography label-large">Departure time</h3>
-
     <div>
       <h4 class="typography label-medium bold">Departure</h4>
       <span class="typography body-small">
-        {formatTime(data.departureSpan.start)} - {formatTime(data.departureSpan.end)}
+        {formatTime(data.departureSpanM.start)} - {formatTime(data.departureSpanM.end)}
       </span>
-      <RangeField bind:value={data.departureSpan} min={0} max={1440} />
+      <RangeField bind:value={data.departureSpanM} min={0} max={1440} />
     </div>
 
     <div>
       <h4 class="typography label-medium bold">Arrival</h4>
       <span class="typography body-small">
-        {formatTime(data.arrivalSpan.start)} - {formatTime(data.arrivalSpan.end)}
+        {formatTime(data.arrivalSpanM.start)} - {formatTime(data.arrivalSpanM.end)}
       </span>
-      <RangeField bind:value={data.arrivalSpan} min={0} max={1440} />
+      <RangeField bind:value={data.arrivalSpanM} min={0} max={1440} />
     </div>
   </div>
 
@@ -117,44 +109,49 @@
 
   <div class="duration">
     <h3 class="typography label-large">Journey duration</h3>
-
     <span class="typography body-small">
-      {formatDuration(123 * 60)} - {formatDuration(data.duration * 60)}
+      {formatDuration(data.durationM * 60)} - {formatDuration(settings.durationSpanM.end * 60)}
     </span>
-    <RangeField bind:value={data.duration} min={123} max={492} />
+    <RangeField
+      bind:value={data.durationM}
+      min={settings.durationSpanM.start}
+      max={settings.durationSpanM.end}
+    />
   </div>
 
   <hr />
 
-  <div class="operators">
-    <h3 class="typography label-large">Railway operators</h3>
+  {#if settings.vendors.length}
+    <div class="operators">
+      <h3 class="typography label-large">Railway operators</h3>
 
-    <div class="actions">
-      <button
-        class="typography body-small bold"
-        on:click={selectOperators.bind(selectOperators, true)}
-      >
-        Select all
-      </button>
-      <button
-        class="typography body-small bold"
-        on:click={selectOperators.bind(selectOperators, false)}
-      >
-        Clear all
-      </button>
+      <div class="actions">
+        <button
+          class="typography body-small bold"
+          on:click={selectOperators.bind(selectOperators, true)}
+        >
+          Select all
+        </button>
+        <button
+          class="typography body-small bold"
+          on:click={selectOperators.bind(selectOperators, false)}
+        >
+          Clear all
+        </button>
+      </div>
+
+      <ul class="typography body-small">
+        {#each settings.vendors as vendor, idx}
+          <li class="vendor">
+            <label for="vendor-{idx}">
+              <Checkbox id="vendor-{idx}" value={vendor} bind:group={data.vendors} />
+              {vendor}
+            </label>
+          </li>
+        {/each}
+      </ul>
     </div>
-
-    <ul class="typography body-small">
-      {#each operators as operator}
-        <li class="operator">
-          <label for="operator-{operator.id}">
-            <Checkbox id="operator-{operator.id}" value={operator.id} bind:group={data.operators} />
-            {operator.name}
-          </label>
-        </li>
-      {/each}
-    </ul>
-  </div>
+  {/if}
 </div>
 
 <style>
@@ -183,7 +180,7 @@
     --height: 40px;
   }
 
-  .operator > label {
+  .vendor > label {
     display: flex;
     gap: 8px;
     align-items: center;
