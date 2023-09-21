@@ -17,27 +17,34 @@ class AuthenticationBackend(authentication.AuthenticationBackend):
         conn: requests.HTTPConnection,
     ) -> tuple[authentication.AuthCredentials, authentication.SimpleUser] | None:
         otp = conn.scope["security"].get("otp")
-        if otp:
+
+        if otp is not None:
             return self._otp_authenticate(otp)
+
         jwt_token = conn.scope["security"].get("jwt")
-        if jwt_token:
+
+        if jwt_token is not None:
             return self._jwt_authenticate(jwt_token)
+
         return None
 
     def _otp_authenticate(
         self,
-        otp: str,
-    ) -> tuple[authentication.AuthCredentials, authentication.SimpleUser] | None:
+        otp: str | None,
+    ) -> tuple[authentication.AuthCredentials, authentication.SimpleUser]:
+        if not otp:
+            raise authentication.AuthenticationError("Empty OTP found.")
+
         return authentication.AuthCredentials(
             ["otp_authenticated"],
         ), authentication.SimpleUser(otp)
 
     def _jwt_authenticate(
         self,
-        jwt_token: str,
-    ) -> tuple[authentication.AuthCredentials, authentication.SimpleUser] | None:
+        jwt_token: str | None,
+    ) -> tuple[authentication.AuthCredentials, authentication.SimpleUser]:
         if not jwt_token:
-            return None
+            raise authentication.AuthenticationError("Invalid JWT token.")
 
         client_id = self._get_client_id_from_jwt_token(jwt_token)
 
@@ -49,16 +56,16 @@ class AuthenticationBackend(authentication.AuthenticationBackend):
         try:
             payload = self._get_payload_from_jwt_token(jwt_token)
         except jwt.exceptions.PyJWTError as err:
-            raise authentication.AuthenticationError("Invalid jwt token.") from err
+            raise authentication.AuthenticationError("Invalid JWT token.") from err
 
         if payload.get("version") != self._token_version:
             raise authentication.AuthenticationError(
-                "Wrong version of jwt token. Refresh your token.",
+                "Wrong version of JWT token. Refresh your token.",
             )
 
         if "client_id" not in payload:
             raise authentication.AuthenticationError(
-                "Wrong version of jwt token. Refresh your token.",
+                "Wrong version of JWT token. Refresh your token.",
             )
 
         return payload["client_id"]
