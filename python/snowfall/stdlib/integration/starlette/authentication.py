@@ -27,7 +27,7 @@ class OryAuth(object):
             if self._legacy_fallback:
                 return self._legacy_fallback(token)
 
-            raise authentication.AuthenticationError("Invalid jwt token.") from ory_err
+            raise authentication.AuthenticationError("Invalid JWT token.") from ory_err
 
         try:
             payload = jwtlib.decode(
@@ -36,7 +36,7 @@ class OryAuth(object):
                 algorithms=[alg],
             )
         except jwtlib.PyJWTError as err:
-            raise authentication.AuthenticationError("Invalid jwt token.") from err
+            raise authentication.AuthenticationError("Invalid JWT token.") from err
 
         return await self._client_resolver(payload["client_id"])
 
@@ -51,8 +51,11 @@ class JWTAuthenticationBackend(authentication.AuthenticationBackend):
     ) -> tuple[authentication.AuthCredentials, authentication.SimpleUser] | None:
         jwt_token = conn.scope["security"].get("jwt")
 
-        if not jwt_token:
+        if jwt_token is None:
             return None
+
+        if not jwt_token:
+            raise authentication.AuthenticationError("Invalid JWT token.")
 
         return authentication.AuthCredentials(
             ["authenticated"],
@@ -91,8 +94,11 @@ class CookieAuthenticationBackend(authentication.AuthenticationBackend):
     ) -> tuple[authentication.AuthCredentials, AuthenticatedUser] | None:
         cookie_value = conn.scope["security"].get("cookie")
 
-        if not cookie_value:
+        if cookie_value is None:
             return None
+
+        if not cookie_value:
+            raise authentication.AuthenticationError("Empty cookie found.")
 
         try:
             ory_user = await self._cookie_to_user(cookie_value)
