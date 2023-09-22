@@ -2,6 +2,7 @@ import asyncio
 import datetime
 import json
 import logging
+import time
 from collections.abc import Mapping, Sequence
 from typing import Any
 
@@ -203,16 +204,32 @@ async def create_order(  # noqa: WPS210
     return order["data"]
 
 
+async def wait_for_response(
+    request_func: Any,
+    error_message: str,
+    max_wait_time_seconds: int = 60,
+    polling_interval: int = 5,
+) -> Any:
+    stopwatch = time.time()
+
+    while True:
+        response = await request_func()
+
+        if response:
+            return response
+
+        elapsed_time = time.time() - stopwatch
+        if elapsed_time <= max_wait_time_seconds:
+            await asyncio.sleep(polling_interval)
+        else:
+            raise AssertionError(error_message)
+
+
 iata_codes = [
     [("stockholm", "london"), ("london", "athens")],
     ("london", "vienna"),
     ("chicago", "groningen"),
 ]
-wait_times = {
-    "Ask2Go": 10,
-    "Duffel": 10,
-    "Multi-modal": 25,
-}
 ids = [
     "Ask2Go",
     "Duffel",
@@ -221,19 +238,11 @@ ids = [
 
 
 @pytest.mark.integration()
-@pytest.mark.parametrize(
-    ("iata_codes", "wait_times"),
-    [
-        (iata_code, wait_times[id_value])
-        for iata_code, id_value in zip(iata_codes, ids, strict=False)
-    ],
-    ids=ids,
-)
+@pytest.mark.parametrize("iata_codes", iata_codes, ids=ids)
 async def test_booking_flow(  # noqa: WPS217, WPS210
     mobile_client: MobileApiClient,
     departure_after: datetime.datetime,
     iata_codes: str,
-    wait_times: int,
 ) -> None:
     origin, destination = await get_place_id(mobile_client, iata_codes)
 
@@ -243,11 +252,15 @@ async def test_booking_flow(  # noqa: WPS217, WPS210
         origin,
         destination,
     )
-    await asyncio.sleep(wait_times)
-    trips_list = await get_trips_list(mobile_client, create_trip_search_id)
+    trips_list = await wait_for_response(
+        lambda: get_trips_list(mobile_client, create_trip_search_id),
+        "Timeout reached with no trips found.",
+    )
     assert trips_list, "no trips found"
-    await asyncio.sleep(wait_times)
-    offer_list = await create_offer_lists(mobile_client, trips_list)
+    offer_list = await wait_for_response(
+        lambda: create_offer_lists(mobile_client, trips_list),
+        "Timeout reached with no offers found.",
+    )
     assert offer_list, "no offers"
     keys_to_check = ["offer_id", "groups_id", "options_id"]
     assert all(
@@ -255,28 +268,24 @@ async def test_booking_flow(  # noqa: WPS217, WPS210
     ), "no offers found"
     offer_id = offer_list[0]["offer_id"]
     option_id = offer_list[0]["options_id"]
-    await asyncio.sleep(wait_times)
-    quotes = await create_quote(mobile_client, offer_id, option_id)
+    quotes = await wait_for_response(
+        lambda: create_quote(mobile_client, offer_id, option_id),
+        "Timeout reached with no quotes found.",
+    )
     assert quotes, "no quotes for offer"
-    await asyncio.sleep(wait_times)
-    get_quote_id = await get_quote(mobile_client, quotes)
+    get_quote_id = await wait_for_response(
+        lambda: get_quote(mobile_client, quotes),
+        "Timeout reached with no quotes Id found.",
+    )
     assert get_quote_id
 
 
 @pytest.mark.smoke()
-@pytest.mark.parametrize(
-    ("iata_codes", "wait_times"),
-    [
-        (iata_code, wait_times[id_value])
-        for iata_code, id_value in zip(iata_codes, ids, strict=False)
-    ],
-    ids=ids,
-)
+@pytest.mark.parametrize("iata_codes", iata_codes, ids=ids)
 async def test_booking_flow_smoke(  # noqa: WPS217, WPS210
     mobile_client: MobileApiClient,
     departure_after: datetime.datetime,
     iata_codes: str,
-    wait_times: int,
 ) -> None:
     origin, destination = await get_place_id(mobile_client, iata_codes)
     create_trip_search_id = await create_trip_search(
@@ -285,10 +294,15 @@ async def test_booking_flow_smoke(  # noqa: WPS217, WPS210
         origin,
         destination,
     )
-    await asyncio.sleep(wait_times)
-    trips_list = await get_trips_list(mobile_client, create_trip_search_id)
+    trips_list = await wait_for_response(
+        lambda: get_trips_list(mobile_client, create_trip_search_id),
+        "Timeout reached with no trips found.",
+    )
     assert trips_list, "no trips found"
-    offer_list = await create_offer_lists(mobile_client, trips_list)
+    offer_list = await wait_for_response(
+        lambda: create_offer_lists(mobile_client, trips_list),
+        "Timeout reached with no offers found.",
+    )
     keys_to_check = ["offer_id", "groups_id", "options_id"]
     assert all(
         offer.get(key) != "" for offer in offer_list for key in keys_to_check
