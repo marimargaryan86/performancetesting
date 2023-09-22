@@ -60,6 +60,7 @@ def create_dependencies(  # noqa: WPS211
     vouchers_repository: repository.VouchersRepository,
     notification_tokens_repository: repository.NotificationTokensRepository,
     user_groups_repository: repository.UserGroupsRepository,
+    markups_repository: repository.MarkupsRepository,
 ) -> lagom.Container:
     container = lagom.Container()
     container[repository.OrdersRepository] = orders_repository
@@ -79,4 +80,5 @@ def create_dependencies(  # noqa: WPS211
     container[repository.VouchersRepository] = vouchers_repository
     container[repository.NotificationTokensRepository] = notification_tokens_repository
     container[repository.UserGroupsRepository] = user_groups_repository
+    container[repository.MarkupsRepository] = markups_repository
     return container

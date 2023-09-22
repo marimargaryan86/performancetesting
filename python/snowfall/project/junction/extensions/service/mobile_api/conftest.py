@@ -338,6 +338,15 @@ async def places_repository(
 
 
 @pytest.fixture()
+async def markups_repository(
+    mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
+) -> repository.MarkupsRepository:
+    return repository.MarkupsRepository(
+        mongo_test_db["markups"],
+    )
+
+
+@pytest.fixture()
 def jwt_gen() -> jwt_generator.JwtGenerator:
     return jwt_generator.JwtGenerator(
         base64.b64encode(
@@ -395,6 +404,7 @@ def app(  # noqa: WPS211
     vouchers_repository: repository.VouchersRepository,
     notification_tokens_repository: repository.NotificationTokensRepository,
     user_groups_repository: repository.UserGroupsRepository,
+    markups_repository: repository.MarkupsRepository,
 ) -> applications.Starlette:
     return _create_app(
         dependencies=bootstrap.create_dependencies(
@@ -415,6 +425,7 @@ def app(  # noqa: WPS211
             vouchers_repository,
             notification_tokens_repository,
             user_groups_repository,
+            markups_repository,
         ),
         openapi_path=filesystem.resource_path("junction.mobile_api", "openapi.json"),
         custom_middlewares=[

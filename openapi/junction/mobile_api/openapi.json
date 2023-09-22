@@ -1349,6 +1349,63 @@
         }
       }
     },
+    "/orders/markups": {
+      "post": {
+        "summary": "Create Order Markups",
+        "operationId": "post-orders-markups",
+        "description": "Used to create markups for an order",
+        "tags": [
+          "orders"
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Markup"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/Markup"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
     "/offers/searches": {
       "post": {
         "parameters": [
@@ -2454,7 +2511,6 @@
         "style": "form",
         "explode": false
       },
-
       "tripInclude": {
         "name": "include",
         "in": "query",
@@ -6032,6 +6088,83 @@
           "id",
           "type",
           "attributes"
+        ]
+      },
+      "Markup": {
+        "title": "Markup",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "markups"
+            ],
+            "example": "markups"
+          },
+          "attributes": {
+            "type": "object",
+            "required": [
+              "serviceFee",
+              "agencyMarkup",
+              "totalToCollect",
+              "createdAt",
+              "updatedAt"
+            ],
+            "properties": {
+              "serviceFee": {
+                "$ref": "#/components/schemas/Price"
+              },
+              "agencyMarkup": {
+                "$ref": "#/components/schemas/Price"
+              },
+              "totalToCollect": {
+                "$ref": "#/components/schemas/Price"
+              },
+              "createdAt": {
+                "type": "string",
+                "example": "2019-08-24T14:15:22Z",
+                "format": "date-time",
+                "readOnly": true
+              },
+              "updatedAt": {
+                "type": "string",
+                "example": "2019-08-24T14:15:22Z",
+                "format": "date-time",
+                "readOnly": true
+              }
+            }
+          },
+          "relationships": {
+            "type": "object",
+            "required": [
+              "order"
+            ],
+            "properties": {
+              "order": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/OrderIdentifier"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "attributes",
+          "relationships"
         ]
       }
     },

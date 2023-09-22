@@ -169,6 +169,9 @@ def _factory(
                     user_groups_repository=repository.UserGroupsRepository(
                         mongo["user_groups"],
                     ),
+                    markups_repository=repository.MarkupsRepository(
+                        mongo["markups"],
+                    ),
                     junction_client=junction_client,
                     plus_http_client=plus_http_client,
                     jwt_gen=jwt_gen,

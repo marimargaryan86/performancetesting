@@ -632,3 +632,12 @@ class UserGroupsRepository(
             update={"$pull": {"members": {"_id": member_id}}},
         )
         return update_result.modified_count > 0
+
+
+class MarkupsRepository(
+    mixins.FindByIdMixin[models_pb2.Markup],
+    mixins.InsertMixin[models_pb2.Markup],
+    repository.ProtoRepository[models_pb2.Markup],
+):
+    _proto = models_pb2.Markup
+    _indexes = (pymongo.IndexModel("order_id", background=True, unique=True),)

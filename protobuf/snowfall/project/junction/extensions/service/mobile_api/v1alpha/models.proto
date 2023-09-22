@@ -124,3 +124,13 @@ message UserGroup {
   google.protobuf.Timestamp created_at = 5;
   google.protobuf.Timestamp updated_at = 6;
 }
+
+message Markup {
+  string id = 1;
+  string order_id = 2;
+  snowfall.stdlib.v1.Money service_fee = 3;
+  snowfall.stdlib.v1.Money agency_markup = 4;
+  snowfall.stdlib.v1.Money total_to_collect = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}

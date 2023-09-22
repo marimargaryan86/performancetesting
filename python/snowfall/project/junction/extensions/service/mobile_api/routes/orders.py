@@ -4,6 +4,7 @@ from typing import Any
 import httpx
 import lagom
 import stripe
+from pymongo import errors
 from starlette import endpoints, exceptions, requests, responses, status
 from starlette.background import BackgroundTask
 
@@ -11,12 +12,13 @@ from snowfall.project.junction.extensions.service.mobile_api import (
     payments,
     plus_client,
     repository,
+    resources,
     smtp,
     validators,
 )
 from snowfall.project.junction.extensions.service.mobile_api.tasks import orders
 from snowfall.project.junction.extensions.service.mobile_api.v1alpha import models_pb2
-from snowfall.stdlib import money
+from snowfall.stdlib import money, string
 from snowfall.stdlib.integration.starlette import models as stdlib_models
 from snowfall.stdlib.integration.starlette import request_helpers
 from snowfall.vendor.junction.go import client
@@ -299,6 +301,64 @@ class CancellationRequest(endpoints.HTTPEndpoint):
 
         return stdlib_models.JsonApiResponse(
             stdlib_models.Body(data=cancellation_response["data"]),
+        )
+
+
+class Markups(endpoints.HTTPEndpoint):
+    async def post(
+        self,
+        request: requests.Request,
+        orders_repository: repository.OrdersRepository = lagom.injectable,
+        markups_repository: repository.MarkupsRepository = lagom.injectable,
+    ) -> responses.Response:
+        body = await request_helpers.flatten_request(request)
+
+        mobile_order = await orders_repository.find_by_id(body["order"])
+        if not mobile_order:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+
+        if mobile_order.user_id != request.user.username:
+            raise exceptions.HTTPException(status.HTTP_401_UNAUTHORIZED)
+
+        markup = models_pb2.Markup(
+            id=string.uuid(),
+            order_id=body["order"],
+            service_fee=money.from_string(
+                body["serviceFee"]["amount"],
+                money.Currency(body["serviceFee"]["currency"]),
+            ).protobuf(),
+            agency_markup=money.from_string(
+                body["serviceFee"]["amount"],
+                money.Currency(body["serviceFee"]["currency"]),
+            ).protobuf(),
+            total_to_collect=money.from_string(
+                body["totalToCollect"]["amount"],
+                money.Currency(body["totalToCollect"]["currency"]),
+            ).protobuf(),
+        )
+
+        try:
+            await markups_repository.insert(markup)
+        except errors.DuplicateKeyError:
+            return stdlib_models.JsonApiResponse(
+                stdlib_models.Body(
+                    errors=[
+                        stdlib_models.Error(
+                            status=str(status.HTTP_400_BAD_REQUEST),
+                            code="duplicated_order",
+                            detail="Markups already exist for the order",
+                            source=stdlib_models.ErrorSourcePointer(
+                                pointer="/data/relationships/order",
+                            ),
+                        ),
+                    ],
+                ),
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
+
+        return stdlib_models.JsonApiResponse(
+            stdlib_models.Body(data=resources.MarkupResource.from_proto(markup)),
+            status.HTTP_201_CREATED,
         )
 
 

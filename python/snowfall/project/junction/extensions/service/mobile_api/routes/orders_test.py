@@ -14,6 +14,8 @@ from snowfall.project.junction.extensions.service.mobile_api import (
 )
 from snowfall.project.junction.extensions.service.mobile_api.tasks import orders
 
+_ORDER_ID = "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+
 
 class TestOrders(object):
     async def create_order(
@@ -131,7 +133,7 @@ class TestOrders(object):
     ) -> None:
         await self.create_order(authenticated_http_client, httpx_mock, monkeypatch)
         response = await authenticated_http_client.get(
-            "/orders/04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+            "/orders/{0}".format(_ORDER_ID),
         )
 
         assert response.json()["data"]["relationships"]["payment"][  # noqa: WPS219
@@ -239,3 +241,103 @@ class TestOrders(object):
 
         assert response.json()["data"]
         assert response.status_code == 200
+
+    async def test_create_markups(
+        self,
+        authenticated_http_client: httpx.AsyncClient,
+        httpx_mock: pytest_httpx.HTTPXMock,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        await self.create_order(authenticated_http_client, httpx_mock, monkeypatch)
+
+        response = await authenticated_http_client.post(
+            "/orders/markups",
+            json={
+                "data": {
+                    "type": "markups",
+                    "attributes": {
+                        "serviceFee": {"currency": "EUR", "amount": "13.37"},
+                        "agencyMarkup": {"currency": "EUR", "amount": "13.37"},
+                        "totalToCollect": {"currency": "EUR", "amount": "13.37"},
+                    },
+                    "relationships": {
+                        "order": {
+                            "data": {
+                                "id": _ORDER_ID,
+                                "type": "orders",
+                            },
+                        },
+                    },
+                },
+            },
+        )
+
+        assert response.json()["data"]
+        assert response.status_code == 201
+
+    async def test_create_markups_mobile_order_not_found_throws404(
+        self,
+        authenticated_http_client: httpx.AsyncClient,
+    ) -> None:
+        response = await authenticated_http_client.post(
+            "/orders/markups",
+            json={
+                "data": {
+                    "type": "markups",
+                    "attributes": {
+                        "serviceFee": {"currency": "EUR", "amount": "13.37"},
+                        "agencyMarkup": {"currency": "EUR", "amount": "13.37"},
+                        "totalToCollect": {"currency": "EUR", "amount": "13.37"},
+                    },
+                    "relationships": {
+                        "order": {
+                            "data": {
+                                "id": _ORDER_ID,
+                                "type": "orders",
+                            },
+                        },
+                    },
+                },
+            },
+        )
+
+        assert response.status_code == 404
+
+    async def test_create_markups_duplicate_order_throws400(
+        self,
+        authenticated_http_client: httpx.AsyncClient,
+        httpx_mock: pytest_httpx.HTTPXMock,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        await self.create_order(authenticated_http_client, httpx_mock, monkeypatch)
+
+        payload = {
+            "data": {
+                "type": "markups",
+                "attributes": {
+                    "serviceFee": {"currency": "EUR", "amount": "13.37"},
+                    "agencyMarkup": {"currency": "EUR", "amount": "13.37"},
+                    "totalToCollect": {"currency": "EUR", "amount": "13.37"},
+                },
+                "relationships": {
+                    "order": {
+                        "data": {
+                            "id": _ORDER_ID,
+                            "type": "orders",
+                        },
+                    },
+                },
+            },
+        }
+
+        await authenticated_http_client.post(
+            "/orders/markups",
+            json=payload,
+        )
+
+        response = await authenticated_http_client.post(
+            "/orders/markups",
+            json=payload,
+        )
+
+        assert response.status_code == 400

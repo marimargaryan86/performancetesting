@@ -295,3 +295,34 @@ class UserGroupResource(models.Resource):
                 },
             },
         )
+
+
+class MarkupResource(models.Resource):
+    @classmethod
+    def from_proto(
+        cls,
+        markup: models_pb2.Markup,
+    ) -> MarkupResource:
+        return cls(
+            id=markup.id,
+            type="markups",
+            attributes={
+                "serviceFee": Price.from_proto(markup.service_fee),
+                "agencyMarkup": Price.from_proto(markup.agency_markup),
+                "totalToCollect": Price.from_proto(markup.total_to_collect),
+                "createdAt": protobuf.protobuf_to_datetime(
+                    markup.created_at,
+                ),
+                "updatedAt": protobuf.protobuf_to_datetime(
+                    markup.updated_at,
+                ),
+            },
+            relationships={
+                "order": {
+                    _RELATIONSHIPS_FIELD: models.ResourceIdentifier(
+                        id=markup.order_id,
+                        type="orders",
+                    ),
+                },
+            },
+        )
