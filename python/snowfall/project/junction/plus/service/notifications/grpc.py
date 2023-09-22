@@ -218,7 +218,7 @@ class ConfigurationVectorService(
         )
 
 
-class MonitoringRuleService(
+class MonitoringRuleService(  # noqa: WPS214
     service.Service,
     notifications_pb2_grpc.MonitoringRuleServiceServicer,
 ):
@@ -283,6 +283,33 @@ class MonitoringRuleService(
     ) -> notifications_pb2.UpdateMonitoringRuleResponse:
         update_status = await self._monitoring_rules.upsert(request.monitoring_rule)
         return notifications_pb2.UpdateMonitoringRuleResponse(
+            is_success=update_status,
+        )
+
+    async def FindMonitoringRules(  # type: ignore[override] # noqa: N802
+        self,
+        request: notifications_pb2.FindMonitoringRulesRequest,
+        context: aio.ServicerContext,
+    ) -> notifications_pb2.FindMonitoringRulesResponse:
+        monitoring_rules = [
+            monitoring_rule
+            async for monitoring_rule in await self._monitoring_rules.find_checkin_candidates(
+                request.departure_after,
+            )
+        ]
+        return notifications_pb2.FindMonitoringRulesResponse(
+            monitoring_rules=monitoring_rules,
+        )
+
+    async def UpdateCheckinReminder(  # type: ignore[override] # noqa: N802
+        self,
+        request: notifications_pb2.UpdateCheckinReminderRequest,
+        context: aio.ServicerContext,
+    ) -> notifications_pb2.UpdateCheckinReminderResponse:
+        update_status = await self._monitoring_rules.update_checkin_reminder(
+            request.identifier,
+        )
+        return notifications_pb2.UpdateCheckinReminderResponse(
             is_success=update_status,
         )
 

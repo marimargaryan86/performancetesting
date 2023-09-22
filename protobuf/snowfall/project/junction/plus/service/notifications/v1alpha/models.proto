@@ -112,6 +112,7 @@ message MonitoringRule {
   string ext_rule_id = 2;
   Booking booking = 3;
   repeated string subscriber_ids = 4;
+  google.protobuf.Timestamp sent_checkin_reminder = 5;
 }
 
 message FlightStatsAlert {

@@ -1,3 +1,4 @@
+import datetime
 from collections.abc import Sequence
 
 import pymongo
@@ -6,6 +7,7 @@ from snowfall.project.junction.plus.service.notifications.v1alpha import models_
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
+from snowfall.stdlib.v1 import datetime_pb2
 
 
 class OrderRepository(
@@ -210,3 +212,25 @@ class MonitoringRuleRepository(  # noqa: WPS215
                 ),
             },
         )
+
+    async def find_checkin_candidates(
+        self,
+        departure_after: datetime_pb2.DateTime,
+    ) -> resultset.ResultSet[models_pb2.MonitoringRule]:
+        return await self._execute(
+            self._collection.find,
+            {
+                "booking.value.departure_at": {
+                    "$gt": protobuf.protobuf_to_datetime(departure_after),
+                },
+                "sent_checkin_reminder": {"$exists": False},
+            },
+        )
+
+    async def update_checkin_reminder(self, identifier: str) -> bool:
+        update_result = await self._execute(
+            self._collection.update_one,
+            {"_id": identifier},
+            {"$set": {"sent_checkin_reminder": datetime.datetime.now(tz=datetime.UTC)}},
+        )
+        return update_result.modified_count != 0

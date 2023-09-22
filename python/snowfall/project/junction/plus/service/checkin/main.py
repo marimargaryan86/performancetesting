@@ -1,14 +1,18 @@
 import ipaddress
-import random
-from collections.abc import Sequence
 
-from motor import motor_asyncio
-from pydantic import AnyUrl
-
+from snowfall.project.junction.plus.adapter import (
+    monitoring_rules,
+    notification_event_publisher,
+    subscribers,
+)
 from snowfall.project.junction.plus.service.checkin.cron import CheckinCronJob
 from snowfall.project.junction.plus.service.checkin.grpc import CheckinService
+from snowfall.project.junction.plus.service.notifications.v1alpha import (
+    grpc_pb2_grpc as notifications_pb2_grpc,
+)
 from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.grpc import server
+from snowfall.stdlib.transport.grpc.client import create_channel
 
 
 class _GrpcSettings(application.Settings):
@@ -17,7 +21,7 @@ class _GrpcSettings(application.Settings):
 
 
 class _CronSettings(application.Settings):
-    mongo_dsn: Sequence[AnyUrl]
+    notifications_address: str
 
 
 async def _serve(app: application.Application[_GrpcSettings]) -> None:
@@ -36,11 +40,25 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
 async def _cron_run(
     app: application.AsyncApplication[_CronSettings],
 ) -> None:
-    motor_asyncio.AsyncIOMotorClient(
-        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
-    )
+    notifications_channel = create_channel(app.settings.notifications_address)
 
-    job = CheckinCronJob()
+    job = CheckinCronJob(
+        monitoring_rules=monitoring_rules.GrpcClient(
+            monitoring_rules=notifications_pb2_grpc.MonitoringRuleServiceStub(
+                notifications_channel,
+            ),
+        ),
+        subscribers=subscribers.GrpcClient(
+            subscribers=notifications_pb2_grpc.SubscriberServiceStub(
+                notifications_channel,
+            ),
+        ),
+        publisher_client=notification_event_publisher.GrpcClient(
+            notification_event_publisher=notifications_pb2_grpc.NotificationEventPublisherServiceStub(
+                notifications_channel,
+            ),
+        ),
+    )
 
     await job.run()
 
