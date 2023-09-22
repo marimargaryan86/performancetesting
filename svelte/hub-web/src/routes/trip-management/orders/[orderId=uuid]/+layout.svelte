@@ -20,7 +20,7 @@
   ];
 </script>
 
-<StandardLayout {breadCrumbs} {tabs} searchQuery="">
+<StandardLayout {breadCrumbs} {tabs}>
   <svelte:fragment slot="page-title">
     Order reference:
     <span class="typography title-large bold">

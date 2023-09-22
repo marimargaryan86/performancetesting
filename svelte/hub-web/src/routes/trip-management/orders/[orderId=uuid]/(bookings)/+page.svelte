@@ -34,6 +34,7 @@
     {#each data.order.bookings as booking, idx}
       {@const origin = getOrigin(booking)}
       {@const destination = getDestination(booking)}
+
       <TRow>
         <TCol width="0">{idx + 1}</TCol>
         <TCol width="0">

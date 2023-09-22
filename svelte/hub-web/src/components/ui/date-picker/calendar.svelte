@@ -10,6 +10,7 @@
   export let range: TRange;
   export let value: TValue | undefined;
   export let viewingMonth: Date;
+  export let span: DateRange | undefined = undefined;
 
   let dirtyValue: TDirtyValue | undefined = value;
 
@@ -121,6 +122,14 @@
       Boolean(nextValue?.to && datesEq(nextValue.to, date))
     );
   }
+
+  function isInSpan(date: Date): boolean {
+    if (!span) {
+      return true;
+    }
+
+    return span.from <= date && date <= span.to;
+  }
 </script>
 
 <div class="calendar typography body-small">
@@ -129,6 +138,8 @@
   {/each}
 
   {#each days as day, idx}
+    {@const inSpan = isInSpan(day)}
+
     <button
       type="button"
       class="cell date"
@@ -139,7 +150,8 @@
       class:in-range={isInRange(day, dirtyValue)}
       class:start={isStart(day, dirtyValue)}
       class:end={isEnd(day, dirtyValue)}
-      on:click={select.bind(select, day)}
+      class:in-span={inSpan}
+      on:click={inSpan ? select.bind(select, day) : undefined}
     >
       <span>{day.getDate()}</span>
     </button>
@@ -166,7 +178,6 @@
     padding: 0;
     background-color: transparent;
     border: 0;
-    cursor: pointer;
   }
 
   .prev-month,
@@ -180,6 +191,14 @@
 
   .in-range {
     background-color: var(--color-main-primary-100);
+  }
+
+  .date.in-span {
+    cursor: pointer;
+  }
+
+  .date:not(.in-span) {
+    color: var(--color-main-neutral-500);
   }
 
   .date.start::after {
@@ -218,7 +237,7 @@
     background-color: var(--color-main-primary-500);
   }
 
-  .date:hover > span {
+  .date.in-span:hover > span {
     border-color: var(--color-main-neutral-200);
   }
 </style>

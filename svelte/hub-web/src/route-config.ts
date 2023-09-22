@@ -52,12 +52,6 @@ export default getRouteConfig({
         orders: {
           root: "/trip-management/orders",
           routes: {
-            cancellations: {
-              root: "/trip-management/orders/cancellations",
-            },
-            refunds: {
-              root: "/trip-management/orders/refunds",
-            },
             order<TId extends string>(
               id: TId,
             ): {

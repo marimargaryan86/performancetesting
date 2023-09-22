@@ -4,19 +4,22 @@
   import { monthName } from "formatting/date-time";
   import type { DateRange } from "models/date-time";
   import { scale } from "svelte/transition";
-  import { getZeroTimeDate } from "utils/date-time";
+  import { addToDate, getZeroTimeDate } from "utils/date-time";
   import Calendar from "./calendar.svelte";
 
   type TValue = TRange extends true ? DateRange : Date;
 
   export let range: TRange;
   export let value: TValue | undefined;
+  export let span: DateRange | undefined = undefined;
 
   let viewingMonth = getViewingMonth();
   let month = viewingMonth.getMonth();
   let year = viewingMonth.getFullYear();
 
   $: viewingMonth = new Date(year, month, 1);
+  $: canGoToPrev = !span || span.from <= viewingMonth;
+  $: canGoToNext = !span || addToDate(viewingMonth, { months: 1 }) <= span.to;
 
   function getViewingMonth(): Date {
     if (range) {
@@ -59,17 +62,23 @@
     </div>
 
     <div class="navigation">
-      <button class="navigate" type="button" on:click={goToPrev}>
-        <ChevronIcon direction="left" color="var(--color-main-neutral-900)" />
+      <button class="navigate" type="button" on:click={goToPrev} disabled={!canGoToPrev}>
+        <ChevronIcon
+          direction="left"
+          color="var({canGoToPrev ? '--color-main-neutral-900' : '--color-main-neutral-500'}"
+        />
       </button>
 
-      <button class="navigate" type="button" on:click={goToNext}>
-        <ChevronIcon direction="right" color="var(--color-main-neutral-900)" />
+      <button class="navigate" type="button" on:click={goToNext} disabled={!canGoToNext}>
+        <ChevronIcon
+          direction="right"
+          color="var({canGoToNext ? '--color-main-neutral-900' : '--color-main-neutral-500'}"
+        />
       </button>
     </div>
   </div>
 
-  <Calendar {viewingMonth} {range} bind:value on:select />
+  <Calendar {viewingMonth} {range} {span} bind:value on:select />
 </div>
 
 <style>

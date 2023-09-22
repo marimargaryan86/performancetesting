@@ -2,13 +2,10 @@
   lang="ts"
   generics="TType extends 'text' | 'tel' | 'password' | 'email' | 'number' | 'date'"
 >
-  import { slideFade } from "transitions/slide-fade";
-
   /* global TType */
+  import { slideFade } from "transitions/slide-fade";
   import RemoveIcon from "components/icons/remove-icon.svelte";
-
   import { createEventDispatcher } from "svelte";
-  import { fade } from "svelte/transition";
   import { getRandomId } from "utils/random";
 
   type InputEvent = Event & { currentTarget: EventTarget & HTMLInputElement };
@@ -22,6 +19,7 @@
   export let placeholder: string | undefined = undefined;
   export let type: TType = "text" as TType;
   export let value: TValue | undefined = undefined;
+  export let clearValue: TValue | undefined = undefined;
   export let error: string | string[] | boolean = false;
   export let name: string | undefined = undefined;
   export let readonly = false;
@@ -49,7 +47,7 @@
   }
 
   function clear(): void {
-    value = undefined;
+    value = clearValue;
     dispatch("clear");
   }
 
@@ -96,7 +94,7 @@
     />
 
     {#if clearable && value}
-      <button type="button" on:click={clear} class="clear" transition:fade={{ duration: 150 }}>
+      <button type="button" on:click={clear} class="clear">
         <RemoveIcon color="var(--color-common-dark-strong)" />
       </button>
     {/if}

@@ -47,7 +47,7 @@
   {#if hasActions}
     <div class="actions">
       {#if searchQuery !== undefined}
-        <SearchField bind:value={searchQuery} />
+        <SearchField bind:value={searchQuery} clearable />
       {/if}
 
       {#if $$slots.filters}

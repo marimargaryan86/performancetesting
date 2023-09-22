@@ -4,6 +4,8 @@
 
   export let value = "";
   export let placeholder = "Search";
+  export let clearable = false;
+  export let clearValue = "";
 
   let focused = false;
 
@@ -25,6 +27,8 @@
   on:focus={focus}
   on:blur={blur}
   name="search"
+  {clearable}
+  {clearValue}
 >
   <SearchIcon slot="icon-before" color="var(--color-main-primary-500)" />
 </TextField>

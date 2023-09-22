@@ -1,20 +1,9 @@
 <script lang="ts" context="module">
-  export const tripSearchQueryData = z.object({
-    origin: z.string().uuid(),
-    destination: z.string().uuid(),
-    outbound: z.date({ coerce: true }),
-    inbound: z.date({ coerce: true }).optional(),
-    adults: z.number({ coerce: true }).min(1),
-    children: z.number({ coerce: true }).min(0),
-    infants: z.number({ coerce: true }).min(0),
-  });
-
   export const tripSearchData = z.object({
     passengers: passengerPickerData,
     originId: z.string({ required_error: "Origin is mandatory" }).uuid(),
     destinationId: z.string({ required_error: "Destination is mandatory" }).uuid(),
     outbound: z.date({ coerce: true, required_error: "Departure date is mandatory" }),
-    inbound: z.date({ coerce: true }).optional(),
   });
 
   export type TripSearchData = z.infer<typeof tripSearchData>;
@@ -53,6 +42,8 @@
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import { goto } from "$app/navigation";
   import { pendableCall } from "utils/pendable-call";
+  import type { DateRange } from "models/date-time";
+  import { addToDate, getZeroTimeDate } from "utils/date-time";
 
   export let data: PartialTripSearchData = {
     passengers: {
@@ -63,6 +54,10 @@
   };
 
   let errors: z.ZodFormattedError<TripSearchData> | undefined = undefined;
+  let dateSpan: DateRange = {
+    from: getZeroTimeDate(new Date()),
+    to: getZeroTimeDate(addToDate(new Date(), { years: 1 })),
+  };
 
   async function listPlaces(query: string): Promise<PlaceModel[]> {
     if (!browser) {
@@ -96,7 +91,10 @@
 
     await callAction({
       action: routeConfig.routes.tripManagement.routes.book.actions.search,
-      data: parsedData,
+      data: {
+        ...parsedData,
+        outbound: parsedData.outbound.toUTCString(),
+      },
       dataType: "json",
       apply: false,
     });
@@ -136,6 +134,7 @@
     id="depart-date"
     placeholder="Add date"
     error={errors?.outbound?._errors}
+    span={dateSpan}
     required
   />
 

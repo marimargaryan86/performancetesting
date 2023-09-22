@@ -88,3 +88,28 @@ export function getTimeOfDayS(date: Date): number {
 export function getTimeOfDayM(date: Date): number {
   return Math.fround(getTimeOfDayS(date) / 60);
 }
+
+export function addToDate(
+  date: Date,
+  options: {
+    years?: number;
+    months?: number;
+    days?: number;
+  },
+): Date {
+  const nextDate = new Date(date);
+
+  if (options.years) {
+    nextDate.setFullYear(nextDate.getFullYear() + options.years);
+  }
+
+  if (options.months) {
+    nextDate.setMonth(nextDate.getMonth() + options.months);
+  }
+
+  if (options.days) {
+    nextDate.setDate(nextDate.getMonth() + options.days);
+  }
+
+  return nextDate;
+}
