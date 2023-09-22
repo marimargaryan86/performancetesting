@@ -38,6 +38,14 @@ class Channel(AbstractChannel):
     ) -> Sequence[str]:
         raise NotImplementedError()
 
+    async def preformatted_message(
+        self,
+        event: models_pb2.NotificationEvent,
+        receiver: models_pb2.Subscriber,
+        sender_configuration: models_pb2.ConfigurationVector,
+    ) -> Sequence[str]:
+        raise NotImplementedError()
+
     def send_message(
         self,
         receiver: str,
@@ -183,6 +191,19 @@ class ProviderChannel(Channel):
         )
         return message_ids
 
+    async def preformatted_message(
+        self,
+        event: models_pb2.NotificationEvent,
+        receiver: models_pb2.Subscriber,
+        sender_configuration: models_pb2.ConfigurationVector,
+    ) -> Sequence[str]:
+        sid = self.send_message(
+            receiver=receiver.phone_number.e164_number,
+            sender_number=sender_configuration.mobile_phone.e164_number,
+            body=event.preformatted_message,
+        )
+        return [sid]
+
     def send_message(
         self,
         receiver: str,
@@ -231,6 +252,17 @@ class MockChannel(Channel):
             ),
         )
         return [str(event.alert.monitoring_rule_id)]
+
+    async def preformatted_message(
+        self,
+        event: models_pb2.NotificationEvent,
+        receiver: models_pb2.Subscriber,
+        sender_configuration: models_pb2.ConfigurationVector,
+    ) -> Sequence[str]:
+        self._sent_messages.append(
+            event.preformatted_message,
+        )
+        return [str(event.receiver_id)]
 
     def send_message(
         self,

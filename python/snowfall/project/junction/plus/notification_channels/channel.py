@@ -24,6 +24,15 @@ class AbstractChannel(abc.ABC):
         """Send alerts from flight stats."""
 
     @abc.abstractmethod
+    async def preformatted_message(
+        self,
+        event: models_pb2.NotificationEvent,
+        receiver: models_pb2.Subscriber,
+        sender_configuration: models_pb2.ConfigurationVector,
+    ) -> Sequence[str]:
+        """Send preformatted message."""
+
+    @abc.abstractmethod
     def send_message(
         self,
         receiver: str,
