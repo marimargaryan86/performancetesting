@@ -68,11 +68,11 @@
   import { formatAmount } from "formatting/currency";
   import type { OrderModel } from "integration/junction-mobile-api/schemas/order";
   import type { PriceModel } from "integration/junction-mobile-api/schemas/price";
-  import type { DateRange } from "models/date-time.js";
+  import type { DateRange } from "models/date-time";
   import routeConfig from "routeConfig";
   import { ensureDefined } from "utils/array";
   import { downloadTickets } from "utils/booking";
-  import { getZeroTimeDate } from "utils/date-time.js";
+  import { getZeroTimeDate } from "utils/date-time";
 
   export let data;
 

@@ -10,6 +10,7 @@ import type {
 } from "integration/junction-mobile-api/schemas/offer";
 import { paymentIntentModel } from "integration/junction-mobile-api/schemas/payment";
 import routeConfig from "routeConfig";
+import { priceModel } from "integration/junction-mobile-api/schemas/price";
 
 const SEARCH_TOKEN = "search-token";
 const JWT_SECRET = "jwt-secret";
@@ -46,6 +47,7 @@ const searchDataModel = z.object({
   expiresAt: z.date({ coerce: true }).optional(),
   paymentIntent: paymentIntentModel.model.extend({ confirmed: z.boolean().optional() }).optional(),
   orderId: z.string().uuid().optional(),
+  originalPrice: priceModel.model.optional(),
 });
 export type SearchDataModel = z.infer<typeof searchDataModel>;
 

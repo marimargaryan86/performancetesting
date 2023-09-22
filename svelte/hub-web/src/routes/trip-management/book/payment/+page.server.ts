@@ -55,7 +55,7 @@ function createOrder(data: BookingData, paymentId: string): Promise<OrderModel> 
 }
 
 export async function load(event): Promise<{
-  searchData: Pick<SearchDataModel, "passengers">;
+  searchData: Pick<SearchDataModel, "passengers" | "originalPrice">;
   priceQuote: TripOfferPriceQuoteModel;
   paymentIntent?: SearchDataModel["paymentIntent"];
 }> {
@@ -66,6 +66,7 @@ export async function load(event): Promise<{
     return {
       searchData: {
         passengers: searchData.passengers,
+        originalPrice: searchData.originalPrice,
       },
       ...result,
     };

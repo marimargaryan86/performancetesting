@@ -1,6 +1,7 @@
 <script lang="ts">
   import { scale } from "svelte/transition";
   import Backdrop from "../backdrop.svelte";
+  import { onDestroy } from "svelte";
 
   let backdrop: Backdrop | undefined = undefined;
 
@@ -15,6 +16,8 @@
   export function toggle(): void {
     backdrop?.toggle();
   }
+
+  onDestroy(close);
 </script>
 
 <Backdrop on:close on:open bind:this={backdrop}>

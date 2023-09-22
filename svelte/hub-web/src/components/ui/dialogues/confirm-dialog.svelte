@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
+  import { createEventDispatcher, onDestroy } from "svelte";
   import Button from "../button.svelte";
   import Dialog from "./dialog.svelte";
 
@@ -28,6 +28,8 @@
   export function toggle(): void {
     dialog?.toggle();
   }
+
+  onDestroy(close);
 </script>
 
 <Dialog bind:this={dialog} on:close on:open>

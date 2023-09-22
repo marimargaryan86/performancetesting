@@ -19,6 +19,30 @@
       vendors,
     };
   }
+
+  function getOptions(
+    offers: OfferModel[],
+    offerId: string,
+    optionIds: string[],
+  ): OfferOptionModel[] {
+    const options =
+      offers
+        .find(({ id }) => offerId === id)
+        ?.groups.flatMap((group) => group.options.filter(({ id }) => optionIds?.includes(id))) ??
+      [];
+
+    return Array.from(new Set(options));
+  }
+
+  function getTotalPrice(options: OfferOptionModel[]): PriceModel {
+    return options.reduce<PriceModel>(
+      (prev, curr) => ({
+        currency: curr.price.currency,
+        amount: prev.amount + curr.price.amount,
+      }),
+      { currency: "EUR", amount: 0 },
+    );
+  }
 </script>
 
 <script lang="ts">
@@ -38,7 +62,7 @@
   import Countdown from "../countdown.svelte";
   import LoadingSkelton from "./loading-skelton.svelte";
   import type { ResourceStatus } from "integration/junction-mobile-api/schemas/common";
-  import type { OfferModel } from "integration/junction-mobile-api/schemas/offer";
+  import type { OfferModel, OfferOptionModel } from "integration/junction-mobile-api/schemas/offer";
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import { pendableCall } from "utils/pendable-call";
   import { pollableCall } from "utils/pollable-call";
@@ -46,6 +70,8 @@
   import { getSortOffersFunc } from "sorting/offer";
   import { getFilterOffersFunc } from "filters/offer";
   import { getOfferDurationM, getVendors } from "utils/offer";
+  import type { PriceModel } from "integration/junction-mobile-api/schemas/price";
+  import type { SelectActionData } from "./+page.server";
 
   export let data;
 
@@ -120,9 +146,21 @@
   }
 
   const { pending, func: selectOffer } = pendableCall(async () => {
+    if (!(selected.offerId && selected.optionIds)) {
+      return;
+    }
+
+    const originalPrice = getTotalPrice(getOptions(offers, selected.offerId, selected.optionIds));
+    const actionData: SelectActionData = {
+      offerId: selected.offerId,
+      optionIds: selected.optionIds,
+      originalPrice,
+    };
+
     await callAction({
       action: routeConfig.routes.tripManagement.routes.book.routes.select.actions.select,
-      data: selected,
+      data: actionData,
+      dataType: "json",
     });
 
     await goto(routeConfig.routes.tripManagement.routes.book.routes.payment.root);

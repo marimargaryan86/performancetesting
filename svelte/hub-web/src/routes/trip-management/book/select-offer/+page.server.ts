@@ -4,6 +4,9 @@ import type { OfferModel } from "integration/junction-mobile-api/schemas/offer";
 import type { TripCandidatesSearchModel } from "integration/junction-mobile-api/schemas/trip";
 import type { PlaceModel } from "integration/junction-mobile-api/schemas/place";
 import bookingManager, { type SearchDataModel } from "../booking-manager.server";
+import { getActionRequestJsonData } from "utils/common";
+import { z } from "zod";
+import { priceModel } from "integration/junction-mobile-api/schemas/price";
 
 type LoadReturnType = {
   searchData: {
@@ -62,6 +65,13 @@ export async function load(event): Promise<LoadReturnType> {
   }
 }
 
+const selectActionData = z.object({
+  offerId: z.string().uuid(),
+  optionIds: z.array(z.string().uuid()),
+  originalPrice: priceModel.model,
+});
+export type SelectActionData = z.infer<typeof selectActionData>;
+
 export const actions = {
   async poll(event): Promise<{ status: ResourceStatus; offers: OfferModel[] }> {
     try {
@@ -78,27 +88,31 @@ export const actions = {
   },
   async select(event): Promise<void> {
     const searchData = bookingManager.getSearchData(event);
-    const formData = await event.request.formData();
-    const offerId = formData.get("offerId")?.toString();
-    const optionIds = formData.get("optionIds")?.toString().split(",");
 
-    if (!(offerId && optionIds?.length)) {
+    try {
+      const data = await getActionRequestJsonData(event, selectActionData);
+
+      // Offer and options have been selected before, don't update session.
+      if (
+        searchData.offerId === data.offerId &&
+        searchData.optionIds?.join(",") === data.optionIds.join(",")
+      ) {
+        return;
+      }
+
+      bookingManager.setSearchData(
+        {
+          ...searchData,
+          offerId: data.offerId,
+          optionIds: data.optionIds,
+          paymentIntent: undefined,
+          originalPrice: data.originalPrice,
+          priceQuoteId: undefined,
+        },
+        event,
+      );
+    } catch {
       return;
     }
-
-    // Offer and options have been selected before, don't update session.
-    if (searchData.offerId === offerId && searchData.optionIds?.join(",") === optionIds.join(",")) {
-      return;
-    }
-
-    bookingManager.setSearchData(
-      {
-        ...searchData,
-        offerId,
-        optionIds,
-        paymentIntent: undefined,
-      },
-      event,
-    );
   },
 };

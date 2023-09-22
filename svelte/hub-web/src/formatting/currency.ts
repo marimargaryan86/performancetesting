@@ -20,7 +20,7 @@ export function formatAmount(
     finalAmount /= 10 ** currency.minorUnits;
   }
 
-  return finalAmount.toLocaleString("en-GB", {
+  return finalAmount.toLocaleString("en-US", {
     minimumFractionDigits: 2,
     style: sign ? "currency" : undefined,
     currency: sign ? money.currency : undefined,

@@ -1,7 +1,9 @@
 <script lang="ts">
   import { portal } from "directives/portal";
-  import { createEventDispatcher } from "svelte";
+  import { createEventDispatcher, onDestroy } from "svelte";
   import { fade } from "svelte/transition";
+
+  export let closeOnClickOutside = true;
 
   let show = false;
 
@@ -24,6 +26,8 @@
       open();
     }
   }
+
+  onDestroy(close);
 </script>
 
 {#if show}
@@ -32,7 +36,7 @@
     class="backdrop"
     use:portal={document.body}
     role="dialog"
-    on:click|self={close}
+    on:click|self={closeOnClickOutside ? close : undefined}
     transition:fade={{ duration: 150 }}
   >
     <slot />

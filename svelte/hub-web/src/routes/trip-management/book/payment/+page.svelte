@@ -38,6 +38,7 @@
   import type { ActionPollReturnType } from "./+page.server";
   import { onDestroy } from "svelte";
   import type { CreateOrderModel } from "integration/junction-mobile-api/schemas/order";
+  import PriceDialog from "components/ui/dialogues/price-dialog.svelte";
 
   export let data;
 
@@ -58,6 +59,10 @@
   });
   $: if (browser && !paymentIntent) {
     pollPayment(priceQuote.id);
+  }
+
+  function cancel(): void {
+    goto(routeConfig.routes.tripManagement.routes.book.routes.select.root);
   }
 
   async function createOrder(): Promise<boolean> {
@@ -157,6 +162,14 @@
 <svelte:head>
   <title>Payment · Book · Trip Management · Junction Hub</title>
 </svelte:head>
+
+{#if data.searchData.originalPrice && priceQuote.price}
+  <PriceDialog
+    originalPrice={data.searchData.originalPrice}
+    newPrice={priceQuote.price}
+    on:cancel={cancel}
+  />
+{/if}
 
 <div class="content">
   <Countdown expiresAt={priceQuote.expiresAt} show />
