@@ -15,20 +15,26 @@ export default class TransactionService extends JunctionPayService {
     this.companyService = companyService;
   }
 
-  private getCompanies(
+  private async getCompanies(
     data: { data: TransactionSchema[]; links: { next: string } },
     token: string,
   ): Promise<CompanyModel[]> {
     const companyIds = new Set(
       data.data
-        .flatMap((transaction) => transaction.relationships.beneficiary?.data.id)
+        .flatMap((transaction) => [
+          transaction.relationships.beneficiary?.data.id,
+          transaction.relationships.payer?.data.id,
+        ])
         .filter(ensureDefined),
     );
     const companyRequests = Array.from(companyIds).map((id) =>
-      this.companyService.getCompanyDetails(token, id),
+      this.companyService
+        .getCompanyDetails(token, id)
+        .then((item) => item)
+        .catch(() => undefined),
     );
 
-    return Promise.all(companyRequests);
+    return (await Promise.all(companyRequests)).filter(ensureDefined);
   }
 
   async listTransactions(

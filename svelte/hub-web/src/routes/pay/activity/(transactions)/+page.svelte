@@ -15,7 +15,7 @@
   import TCol from "components/ui/table/t-col.svelte";
   import { yymmdd } from "formatting/date-time";
   import TransactionStatusBadge from "components/ui/transaction-status-badge.svelte";
-  import { callAction, type FlattenedObject } from "utils/common";
+  import { callAction, capitalize, type FlattenedObject } from "utils/common";
   import type { DirectionY } from "models/spatial";
   import { sortTransactions } from "sorting/transaction";
   import { filterTransactions } from "filters/transaction";
@@ -113,6 +113,8 @@
   <THead>
     <Header>ID</Header>
     <Header bind:sortGroup bind:sortDirection sortValue="createdAt">Created</Header>
+    <Header>Transaction type</Header>
+    <Header>Payment type</Header>
     <Header bind:sortGroup bind:sortDirection sortValue="payer.name">Payer</Header>
     <Header bind:sortGroup bind:sortDirection sortValue="amounts.quotation.amount">
       Owed to us
@@ -133,12 +135,14 @@
       <TRow on:click={showDetails.bind(showDetails, item)}>
         <TCol maxWidth="96px" copyable>{item.bookingId}</TCol>
         <TCol>{yymmdd(item.createdAt)}</TCol>
+        <TCol width="0">{capitalize(item.payment.method)}</TCol>
+        <TCol width="0">{capitalize(item.payment.type)}</TCol>
         <TCompanyCol maxWidth="160px" companyName={item.payer?.name} />
         <TMoneyCol money={item.amounts.quotation} currencies={data.currencies} />
         <TCompanyCol maxWidth="160px" companyName={item.beneficiary?.name} />
         <TMoneyCol money={item.amounts.beneficiary} currencies={data.currencies} />
         <TMoneyCol money={item.amounts.salesMargin} currencies={data.currencies} />
-        <TCol maxWidth="96px" copyable copyAlign="right">{item.reference}</TCol>
+        <TCol maxWidth="96px" copyable copyAlign="right">{item.reference ?? "Unknown"}</TCol>
         <TCol width="80px"><TransactionStatusBadge value={item.status} /></TCol>
       </TRow>
     {/each}

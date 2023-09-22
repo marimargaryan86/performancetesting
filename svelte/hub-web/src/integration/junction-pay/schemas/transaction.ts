@@ -25,7 +25,7 @@ export const transactionModel = getSchemaModel(
     type: z.enum(["transactions"]),
     attributes: z.object({
       externalReference: z.string(),
-      invoiceReference: z.string(),
+      invoiceReference: z.string().optional(),
       createdAt: z.date({ coerce: true }),
       amounts: z.object({
         beneficiary: moneyModel.schema,
@@ -41,6 +41,8 @@ export const transactionModel = getSchemaModel(
         salesMarkup: z.number(),
         fxMarkup: z.number(),
       }),
+      paymentType: z.enum(["unspecified", "card", "bank-transfer"]),
+      paymentMethod: z.enum(["unspecified", "transactional", "invoice"]),
     }),
     relationships: transactionRelationships,
     links: links(["self"]),
@@ -62,7 +64,11 @@ export const transactionModel = getSchemaModel(
       fxMarkup: z.number(),
     }),
     beneficiary: companyModel.model.optional(),
-    reference: z.string(),
+    reference: z.string().optional(),
+    payment: z.object({
+      type: z.enum(["unspecified", "card", "bank-transfer"]),
+      method: z.enum(["unspecified", "transactional", "invoice"]),
+    }),
     status: z.enum(["paid", "pending", "cancelled"]),
   }),
   {
@@ -84,6 +90,10 @@ export const transactionModel = getSchemaModel(
         salesMarkup: data.attributes.rates.salesMarkup,
       },
       reference: data.attributes.invoiceReference,
+      payment: {
+        type: data.attributes.paymentType,
+        method: data.attributes.paymentMethod,
+      },
       // TODO: Use real status.
       status: "paid" as const,
     }),

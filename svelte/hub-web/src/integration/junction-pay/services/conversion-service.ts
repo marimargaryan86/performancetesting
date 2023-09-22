@@ -13,7 +13,7 @@ export default class ConversionService extends JunctionPayService {
   ): Promise<PaginatedData<ConversionModel>> {
     const resp = await this.makeRequest<{
       data: ConversionSchema[];
-      included: TransactionSchema[];
+      included?: TransactionSchema[];
       links: { next: string };
     }>("/conversions", {
       queryParams: {
@@ -24,7 +24,7 @@ export default class ConversionService extends JunctionPayService {
       token,
     });
 
-    const included = parseIncluded(resp.json.included);
+    const included = parseIncluded(resp.json.included ?? []);
 
     return {
       data: resp.json.data.map((item) => parseConversionSchema(item, included)),

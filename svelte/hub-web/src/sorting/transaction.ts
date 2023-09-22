@@ -26,7 +26,7 @@ export function sortTransactions(
       case "amounts.salesMargin.amount":
         return 0 - (a.amounts.salesMargin.amount < b.amounts.salesMargin.amount ? 1 : -1);
       case "reference":
-        return 0 - (a.reference < b.reference ? 1 : -1);
+        return 0 - ((a.reference ?? "") < (b.reference ?? "") ? 1 : -1);
       case "status":
         return 0 - (a.status < b.status ? 1 : -1);
       default:

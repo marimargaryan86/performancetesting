@@ -129,11 +129,6 @@
     color: var(--color-common-light-soft);
   }
 
-  :global(tr:not(:hover) .actions) {
-    opacity: 0;
-    pointer-events: none;
-  }
-
   :global(tr:hover .company-name) {
     color: var(--color-common-light-text-link);
   }

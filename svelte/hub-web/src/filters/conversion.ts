@@ -22,7 +22,7 @@ export function filterConversions(
     return (
       (!dateRange || (dateRange.from <= createdAt && createdAt <= dateRange.to)) &&
       (!status?.length || (item.fxStatus && status.includes(item.fxStatus))) &&
-      (!item.transaction || item.transaction.reference.includes(lcQuery))
+      (!item.transaction || item.transaction.reference?.includes(lcQuery))
     );
   });
 }
