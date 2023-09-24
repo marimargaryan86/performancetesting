@@ -94,6 +94,7 @@
 <script lang="ts">
   import { z } from "zod";
   import { capitalize } from "utils/common";
+  import BirthdateTextField from "components/ui/birthdate-text-field.svelte";
   import SelectField from "components/ui/select-field.svelte";
   import TextField from "components/ui/text-field.svelte";
   import type { TripOfferPriceQuoteModel } from "integration/junction-mobile-api/schemas/offer";
@@ -147,8 +148,7 @@
       error={errors?.lastName?._errors}
     />
 
-    <TextField
-      type="date"
+    <BirthdateTextField
       bind:value={passenger.dateOfBirth}
       placeholder="dd/mm/yyyy"
       label="Birthday"
