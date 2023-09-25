@@ -144,6 +144,15 @@ class TripSearchConsumer(object):
             await asyncio.gather(*coros)
 
 
+def _trip_search_can_be_fulfilled(
+    trip_reference_groups: Sequence[orchestrator.TripReferenceGroup],
+) -> bool:
+    if not trip_reference_groups:
+        return False
+
+    return all(bool(reference_group) for reference_group in trip_reference_groups)
+
+
 class TripCandidateSearchConsumer(object):
     def __init__(  # noqa: WPS211
         self,
@@ -191,7 +200,7 @@ class TripCandidateSearchConsumer(object):
 
             return
 
-        if any(not reference_group for reference_group in reference_groups):
+        if not _trip_search_can_be_fulfilled(reference_groups):
             await self._trip_candidate_search_repository.mark_as_completed(
                 body.trip_candidate_search.id,
             )
