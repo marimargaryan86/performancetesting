@@ -44,7 +44,6 @@ class TestPayClient(object):
                     "totalMarkups": 23,
                     "totalAmount": 1700,
                     "resellerMarkup": 100,
-                    "leadCompanyMarkup": 100,
                     "externalReference": _EXTERNAL_REFERENCE,
                 },
                 "relationships": {
@@ -99,7 +98,6 @@ class TestPayClient(object):
                     "totalMarkups": 23,
                     "totalAmount": 1700,
                     "resellerMarkup": 100,
-                    "leadCompanyMarkup": 100,
                     "externalReference": _EXTERNAL_REFERENCE,
                 },
                 "relationships": {

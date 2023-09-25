@@ -4,9 +4,6 @@ from starlette import endpoints, requests, status
 from snowfall.project.junction.hub.service.hub_api import resources
 from snowfall.project.pay.adapter import companies as companies_adapter
 from snowfall.project.pay.service.companies.v1alpha import models_pb2
-from snowfall.project.pay.service.companies.v1alpha import (
-    models_pb2 as company_models_pb2,
-)
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import (
     messages,
@@ -40,12 +37,6 @@ class AdminCompany(endpoints.HTTPEndpoint):
                 fx_markup=payload.get("fxMarkup"),  # type: ignore[arg-type]
                 processing_markup=payload.get("processingMarkup"),  # type: ignore[arg-type]
                 sales_markup=payload.get("salesMarkup"),  # type: ignore[arg-type]
-                reseller_providers=payload.get("resellerProviders"),
-                company_type=protobuf.slug_to_enum_value(
-                    company_models_pb2.Company.Type,
-                    payload.get("companyType", "unspecified"),
-                ),
-                default_currency=payload.get("defaultCurrency"),  # type: ignore[arg-type]
             ),
         )
 
@@ -109,12 +100,6 @@ class AdminCompanies(endpoints.HTTPEndpoint):
                     models_pb2.PaymentType,
                     body["paymentType"],
                 ),
-                reseller_providers=body.get("resellerProviders"),
-                company_type=protobuf.slug_to_enum_value(
-                    company_models_pb2.Company.Type,
-                    body.get("companyType", "unspecified"),
-                ),
-                default_currency=body.get("defaultCurrency"),  # type: ignore[arg-type]
             ),
         )
 
@@ -135,13 +120,8 @@ class AdminCompanies(endpoints.HTTPEndpoint):
         companies_client: companies_adapter.Client = lagom.injectable,
     ) -> models.JsonApiResponse:
         pagination = pagination_helpers.get_pagination(request)
-        filters = request.query_params.get(
-            "filter[type][eq]",
-            "reseller,provider",
-        ).split(",")
 
         response = await companies_client.find(
-            filters=filters,
             limit=pagination.limit or self._default_page_size,
             cursor=pagination.cursor,
         )

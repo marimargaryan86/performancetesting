@@ -53,12 +53,6 @@
       ]
     },
     {
-      "name": "LeadCompanies",
-      "tags": [
-        "leadCompanies"
-      ]
-    },
-    {
       "name": "Conversions",
       "tags": [
         "conversions"
@@ -129,11 +123,6 @@
       "name": "internal",
       "description": "Endpoints not for public use.",
       "x-displayName": "Internal"
-    },
-    {
-      "name": "leadCompanies",
-      "description": "Lead Companies",
-      "x-displayName": "LeadCompanies"
     },
     {
       "name": "payments",
@@ -634,210 +623,6 @@
         },
         "operationId": "get-companies-accountless",
         "description": "Get accountless companies"
-      }
-    },
-    "/lead-companies": {
-      "post": {
-        "summary": "Create lead company",
-        "description": "Create a lead company",
-        "tags": [
-          "leadCompanies"
-        ],
-        "operationId": "post-lead-companies",
-        "responses": {
-          "201": {
-            "description": "Lead Company is created",
-            "content": {
-              "application/vnd.api+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "$ref": "#/components/schemas/LeadCompany"
-                    }
-                  },
-                  "required": [
-                    "data"
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          }
-        },
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/vnd.api+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "data": {
-                    "$ref": "#/components/schemas/LeadCompany"
-                  }
-                },
-                "required": [
-                  "data"
-                ]
-              }
-            }
-          }
-        }
-      },
-      "get": {
-        "summary": "List Lead Companies",
-        "tags": [
-          "leadCompanies"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/page-cursor"
-          },
-          {
-            "$ref": "#/components/parameters/page-limit"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/vnd.api+json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "type": "array",
-                          "uniqueItems": true,
-                          "minItems": 0,
-                          "items": {
-                            "$ref": "#/components/schemas/LeadCompany"
-                          }
-                        }
-                      },
-                      "required": [
-                        "data"
-                      ]
-                    },
-                    {
-                      "$ref": "#/components/schemas/NextLink"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          }
-        },
-        "operationId": "get-lead-companies",
-        "description": "Get lead companies"
-      }
-    },
-    "/lead-companies/{leadCompanyId}": {
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/leadCompanyId"
-        }
-      ],
-      "patch": {
-        "summary": "Update Lead Company",
-        "description": "Update lead company",
-        "tags": [
-          "leadCompanies"
-        ],
-        "operationId": "patch-lead-companies-id",
-        "responses": {
-          "200": {
-            "description": "Lead Company is updated",
-            "content": {
-              "application/vnd.api+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "$ref": "#/components/schemas/LeadCompany"
-                    }
-                  },
-                  "required": [
-                    "data"
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          }
-        },
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/vnd.api+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "data": {
-                    "$ref": "#/components/schemas/LeadCompany"
-                  }
-                },
-                "required": [
-                  "data"
-                ]
-              }
-            }
-          }
-        }
-      },
-      "get": {
-        "summary": "Get Lead Company details",
-        "description": "Get Lead Company details",
-        "tags": [
-          "leadCompanies"
-        ],
-        "operationId": "get-lead-companies-id",
-        "responses": {
-          "200": {
-            "description": "Lead Company details are fetched",
-            "content": {
-              "application/vnd.api+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "$ref": "#/components/schemas/LeadCompany"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          }
-        }
       }
     },
     "/conversions": {
@@ -2166,17 +1951,6 @@
         },
         "description": "Company id"
       },
-      "leadCompanyId": {
-        "name": "leadCompanyId",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "format": "uuid",
-          "example": "271f6d54-9e59-407e-a860-b0771d9e3d26"
-        },
-        "description": "Lead Company id"
-      },
       "beneficiaryId": {
         "name": "beneficiaryId",
         "in": "path",
@@ -3141,31 +2915,6 @@
                   "invoice"
                 ],
                 "example": "transactional"
-              },
-              "resellerProviders": {
-                "type": "array",
-                "uniqueItems": true,
-                "items": {
-                  "type": "string",
-                  "format": "uuid"
-                },
-                "example": [
-                  "04f83af5-10bb-4a0f-1881-03e1e690f0f5"
-                ],
-                "description": "The references (providers) to a reseller type company. Not required for providers."
-              },
-              "companyType": {
-                "type": "string",
-                "enum": [
-                  "unspecified",
-                  "provider",
-                  "reseller"
-                ],
-                "example": "unspecified"
-              },
-              "defaultCurrency": {
-                "type": "string",
-                "example": "SEK"
               }
             }
           },
@@ -3182,56 +2931,6 @@
                   "data": {
                     "$ref": "#/components/schemas/AccountIdentifier"
                   }
-                }
-              },
-              "leadCompany": {
-                "type": "object",
-                "required": [
-                  "data"
-                ],
-                "properties": {
-                  "data": {
-                    "$ref": "#/components/schemas/LeadCompanyIdentifier"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "LeadCompany": {
-        "title": "Lead Company Details",
-        "type": "object",
-        "required": [
-          "id",
-          "type",
-          "attributes"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "example": "04f83af5-10bb-4a0f-1881-03e1e690f0f5",
-            "format": "uuid",
-            "readOnly": true
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "lead-companies"
-            ],
-            "example": "lead-companies"
-          },
-          "attributes": {
-            "properties": {
-              "name": {
-                "type": "string",
-                "example": "LeadCompany"
-              },
-              "salesMarkups": {
-                "type": "array",
-                "uniqueItems": true,
-                "items": {
-                  "$ref": "#/components/schemas/Money"
                 }
               }
             }
@@ -3645,28 +3344,6 @@
               "companies"
             ],
             "example": "companies"
-          }
-        },
-        "required": [
-          "id",
-          "type"
-        ]
-      },
-      "LeadCompanyIdentifier": {
-        "title": "Lead Company Identifier",
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "example": "04f83af5-10bb-4a0f-1881-03e1e690f0f5",
-            "format": "uuid"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "lead-companies"
-            ],
-            "example": "lead-companies"
           }
         },
         "required": [

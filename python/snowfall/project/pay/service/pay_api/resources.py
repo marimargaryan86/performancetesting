@@ -51,9 +51,6 @@ class QuoteResource(models.Resource):
                 "resellerMarkup": money.from_protobuf(
                     quotation.amounts.reseller_markup,
                 ).amount,
-                "leadCompanyMarkup": money.from_protobuf(
-                    quotation.amounts.lead_reseller_markup,
-                ).amount,
             },
             relationships={
                 "fromCurrency": {
@@ -101,13 +98,6 @@ class Company(models.Resource):
                     type="accounts",
                 ),
             }
-        if company.lead_company_id:
-            relationships["leadCompany"] = {
-                "data": models.ResourceIdentifier(
-                    id=company.lead_company_id,
-                    type="lead-companies",
-                ),
-            }
 
         return cls(
             id=company.id,
@@ -135,12 +125,6 @@ class Company(models.Resource):
                     models_pb2.PaymentMethod.DESCRIPTOR,
                     company.payment_method,
                 ),
-                "resellerProviders": list(company.reseller_providers),
-                "companyType": protobuf.enum_value_to_slug(
-                    enum_descriptor=models_pb2.Company.Type.DESCRIPTOR,
-                    enum_value=company.company_type,
-                ),
-                "defaultCurrency": company.default_currency,
             },
             relationships=relationships,
             links={
@@ -148,36 +132,6 @@ class Company(models.Resource):
                     request.url_for(
                         "Company",
                         companyId=company.id,
-                    ),
-                ),
-            },
-        )
-
-
-class LeadCompany(models.Resource):
-    api_type: ClassVar[str] = "lead-companies"
-
-    @classmethod
-    def from_proto(
-        cls,
-        lead_company: models_pb2.LeadCompany,
-        request: requests.Request,
-    ) -> LeadCompany:
-        return cls(
-            id=lead_company.id,
-            type=LeadCompany.api_type,
-            attributes={
-                "name": lead_company.name,
-                "salesMarkups": [
-                    Money.from_proto(reseller_markup)
-                    for reseller_markup in lead_company.sales_markups
-                ],
-            },
-            links={
-                _SELF_HREF: str(
-                    request.url_for(
-                        "LeadCompany",
-                        leadCompanyId=lead_company.id,
                     ),
                 ),
             },

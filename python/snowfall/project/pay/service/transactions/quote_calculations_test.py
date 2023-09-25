@@ -30,7 +30,6 @@ async def test_same_currencies(
         money.Currency("USD"),
         1,
         company,
-        None,
         "beneficiary_id",
         0,
     ).to_proto()
@@ -57,7 +56,6 @@ async def test_calculation(  # noqa: WPS218
         money.Currency("EUR"),
         1.16,
         company,
-        None,
         "beneficiary_id",
         0,
     ).to_proto()

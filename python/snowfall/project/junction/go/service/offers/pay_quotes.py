@@ -225,17 +225,6 @@ class PayQuotes(object):
                 ),
             )
 
-        if pay_quote_attributes.lead_company_markup:
-            price_breakdown.append(
-                models_pb2.PriceBreakdown(
-                    price=money.Money(
-                        amount=pay_quote_attributes.lead_company_markup,
-                        currency=converted_to_currency,
-                    ).protobuf(),
-                    breakdown_type=models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_COMPANY_MARK_UP,
-                ),
-            )
-
         return price_breakdown
 
 

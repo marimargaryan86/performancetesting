@@ -13,13 +13,6 @@ service CompaniesService {
   rpc ListCompanies(ListCompaniesRequest) returns (ListCompaniesResponse) {}
 }
 
-service LeadCompaniesService {
-  rpc CreateLeadCompany(CreateLeadCompanyRequest) returns (CreateLeadCompanyResponse) {}
-  rpc GetLeadCompany(GetLeadCompanyRequest) returns (GetLeadCompanyResponse) {}
-  rpc UpdateLeadCompany(UpdateLeadCompanyRequest) returns (UpdateLeadCompanyResponse) {}
-  rpc ListLeadCompanies(ListLeadCompaniesRequest) returns (ListLeadCompaniesResponse) {}
-}
-
 service AccountsService {
   rpc CreateAccount(CreateAccountRequest) returns (CreateAccountResponse) {}
   rpc GetAccount(GetAccountRequest) returns (GetAccountResponse) {}
@@ -104,43 +97,10 @@ message ListCompaniesRequest {
   int32 page_size = 1;
   string page_token = 2;
   bool is_accountless = 3;
-  repeated string filters = 4;
 }
 
 message ListCompaniesResponse {
   repeated Company companies = 1;
-  string next_page_token = 2;
-}
-
-message CreateLeadCompanyRequest {
-  LeadCompany lead_company = 1;
-}
-
-message CreateLeadCompanyResponse {
-  LeadCompany lead_company = 1;
-}
-message GetLeadCompanyRequest {
-  string id = 1;
-}
-
-message GetLeadCompanyResponse {
-  LeadCompany lead_company = 1;
-}
-
-message UpdateLeadCompanyRequest {
-  LeadCompany lead_company = 1;
-}
-
-message UpdateLeadCompanyResponse {
-  LeadCompany lead_company = 1;
-}
-message ListLeadCompaniesRequest {
-  int32 page_size = 1;
-  string page_token = 2;
-}
-
-message ListLeadCompaniesResponse {
-  repeated LeadCompany lead_companies = 1;
   string next_page_token = 2;
 }
 

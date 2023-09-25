@@ -19,7 +19,6 @@ class Quote(object):
         to_currency: money.Currency,
         rate: float,
         company: company_models.Company,
-        lead_company: company_models.LeadCompany | None,
         beneficiary_id: str,
         tax: int,
     ) -> None:
@@ -28,12 +27,8 @@ class Quote(object):
         self._to_currency = to_currency
         self._rate = rate
         self._company = company
-        self._lead_company = lead_company
         self._reseller_markup = self._get_markup(
             getattr(self._company, "reseller_markups", []),
-        )
-        self._lead_company_markup = self._get_markup(
-            getattr(self._lead_company, "sales_markups", []),
         )
         self._tax = money.Money(tax, currency=self._from_currency)
         self._quotation_amounts = self._calculate_margins()
@@ -59,7 +54,6 @@ class Quote(object):
                 service_markup=self._quotation_amounts["service_markup"].protobuf(),
                 total_amount=self._quotation_amounts["total_amount"].protobuf(),
                 reseller_markup=self._reseller_markup.protobuf(),
-                lead_reseller_markup=self._lead_company_markup.protobuf(),
                 tax=self._tax.protobuf(),
             ),
             rates=models_pb2.QuotationRates(
@@ -123,10 +117,6 @@ class Quote(object):
             [
                 service_markup,
                 self._reseller_markup.convert(self._to_currency, rate),
-                self._lead_company_markup.convert(
-                    self._to_currency,
-                    rate,
-                ),
             ],
         )
 
@@ -145,10 +135,6 @@ class Quote(object):
                     total_markups,
                     tax_converted,
                     self._reseller_markup.convert(
-                        self._to_currency,
-                        rate,
-                    ),
-                    self._lead_company_markup.convert(
                         self._to_currency,
                         rate,
                     ),

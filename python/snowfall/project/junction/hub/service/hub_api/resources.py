@@ -478,13 +478,6 @@ class Company(models.Resource):
                     type="accounts",
                 ),
             }
-        if company.lead_company_id:
-            relationships["leadCompany"] = {
-                "data": models.ResourceIdentifier(
-                    id=company.lead_company_id,
-                    type="lead-companies",
-                ),
-            }
 
         return cls(
             id=company.id,
@@ -512,12 +505,6 @@ class Company(models.Resource):
                     companies_models_pb2.PaymentMethod.DESCRIPTOR,
                     company.payment_method,
                 ),
-                "resellerProviders": list(company.reseller_providers),
-                "companyType": protobuf.enum_value_to_slug(
-                    enum_descriptor=companies_models_pb2.Company.Type.DESCRIPTOR,
-                    enum_value=company.company_type,
-                ),
-                "defaultCurrency": company.default_currency,
             },
             relationships=relationships,
             links={

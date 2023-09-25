@@ -19,9 +19,8 @@ message QuotationAmounts {
   snowfall.stdlib.v1.Money total_markups = 8;
   snowfall.stdlib.v1.Money total_amount = 9;
   snowfall.stdlib.v1.Money reseller_markup = 10;
-  snowfall.stdlib.v1.Money lead_reseller_markup = 11;
-  snowfall.stdlib.v1.Money tax = 12;
-  snowfall.stdlib.v1.Money service_markup = 13;
+  snowfall.stdlib.v1.Money tax = 11;
+  snowfall.stdlib.v1.Money service_markup = 12;
 }
 
 message QuotationRates {

@@ -1,5 +1,4 @@
 import datetime
-import random
 
 from snowfall.project.pay.service.companies.v1alpha import (
     models_pb2 as company_model_pb2,
@@ -36,10 +35,6 @@ ACCOUNTLESS_COMPANIES = (
     "b184081a-92bd-4ec8-af9a-1faaa8dfbbeb",
 )
 
-LEAD_COMPANIES = (
-    "9b4a1e83-a0e9-49b3-aa79-fccb6add617c",
-    "d184081a-92bd-4ec8-af9a-1faaa8dfbbeb",
-)
 
 CONTACTS = (
     "8304c0ff-7ba6-4431-9788-1d486be3a033",
@@ -72,10 +67,6 @@ def get_companies() -> list[company_model_pb2.Company]:
     )
 
     return companies
-
-
-def get_lead_companies() -> list[company_model_pb2.LeadCompany]:
-    return [generate_lead_company(identifier) for identifier in LEAD_COMPANIES]
 
 
 def generate_payment(identifier: str) -> models_pb2.Payment:
@@ -152,11 +143,6 @@ def generate_accountless_company(identifier: str) -> company_model_pb2.Company:
             company_model_pb2.PaymentType,
             "card",
         ),
-        reseller_providers=[string.uuid(), string.uuid()],
-        company_type=protobuf.slug_to_enum_value(
-            company_model_pb2.Company.Type,
-            random.choice(("reseller", "provider")),  # noqa: S311
-        ),
     )
 
 
@@ -165,16 +151,6 @@ def generate_company(identifier: str) -> company_model_pb2.Company:
     company.account_id = string.uuid()
 
     return company
-
-
-def generate_lead_company(identifier: str) -> company_model_pb2.LeadCompany:
-    return company_model_pb2.LeadCompany(
-        id=identifier,
-        name="Lead Company name",
-        sales_markups=[
-            money.Money(amount=100, currency=money.Currency("EUR")).protobuf(),
-        ],
-    )
 
 
 def generate_contact(identifier: str) -> company_model_pb2.Contact:

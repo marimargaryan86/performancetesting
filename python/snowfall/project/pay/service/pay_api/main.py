@@ -23,7 +23,6 @@ from snowfall.project.pay.adapter import (
     transactions,
 )
 from snowfall.project.pay.adapter import companies as companies_adapter
-from snowfall.project.pay.adapter import lead_companies as lead_companies_adapter
 from snowfall.project.pay.service.companies.v1alpha import (
     grpc_pb2_grpc as companies_grpc_pb2,
 )
@@ -280,11 +279,6 @@ def _admin_factory(
                     ),
                     companies_client=companies_adapter.GrpcClient(
                         companies_grpc_pb2.CompaniesServiceStub(
-                            companies_channel,
-                        ),
-                    ),
-                    lead_companies_client=lead_companies_adapter.GrpcClient(
-                        companies_grpc_pb2.LeadCompaniesServiceStub(
                             companies_channel,
                         ),
                     ),

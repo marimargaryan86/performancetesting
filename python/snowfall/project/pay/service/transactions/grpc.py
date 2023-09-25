@@ -1,8 +1,7 @@
 import grpc
 
-from snowfall.project.junction.go.adapter import errors
 from snowfall.project.junction.go.adapter import errors as adapter_errors
-from snowfall.project.pay.adapter import companies, currencies, lead_companies
+from snowfall.project.pay.adapter import companies, currencies
 from snowfall.project.pay.service.companies.v1alpha.models_pb2 import PaymentType
 from snowfall.project.pay.service.transactions.cache import UserSessionRepository
 from snowfall.project.pay.service.transactions.quote import Quote
@@ -188,12 +187,10 @@ class QuotationsService(  # noqa: WPS214
         quotations: QuotationsRepository,
         user_sessions: UserSessionRepository,
         currencies_client: currencies.Client,
-        lead_company_client: lead_companies.Client,
     ):
         self._quotations = quotations
         self._user_sessions = user_sessions
         self._currencies_client = currencies_client
-        self._lead_companies_client = lead_company_client
 
     def get_name(self) -> str:
         return grpc_pb2.DESCRIPTOR.services_by_name["QuotationsService"].full_name
@@ -224,20 +221,12 @@ class QuotationsService(  # noqa: WPS214
             )
             raise RuntimeError() from None  # TODO: Remove when grpcio types are available.
 
-        try:
-            lead_company = await self._lead_companies_client.get(
-                request.payer.lead_company_id,
-            )
-        except errors.NotFoundError:
-            lead_company = None
-
         quote = Quote(
             request.amount,
             money.Currency(request.from_currency),
             money.Currency(request.to_currency),
             rate,
             request.payer,
-            lead_company,
             request.beneficiary_company.id,
             request.tax,
         )

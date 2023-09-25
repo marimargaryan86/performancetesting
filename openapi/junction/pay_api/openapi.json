@@ -735,15 +735,6 @@
                     "description": "Company Markup",
                     "readOnly": true
                   },
-                  "leadCompanyMarkup": {
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/MoneyAmount"
-                      }
-                    ],
-                    "description": "Lead Company Markup",
-                    "readOnly": true
-                  },
                   "externalReference": {
                     "type": "string",
                     "example": "FMSXrOAhIOdvIbxAmfSt7vJtRBkurNbn",
@@ -755,8 +746,7 @@
                   "totalAmount",
                   "totalMarkups",
                   "serviceMarkup",
-                  "resellerMarkup",
-                  "leadCompanyMarkup"
+                  "resellerMarkup"
                 ]
               },
               "relationships": {
