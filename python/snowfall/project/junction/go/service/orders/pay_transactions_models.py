@@ -45,7 +45,7 @@ class PayTransactionConversionData(PayBaseModel):
 
 
 class PayTransactionConversion(PayBaseModel):
-    data: PayTransactionConversionData  # noqa: WPS110
+    data: PayTransactionConversionData | None  # noqa: WPS110
 
 
 class PayTransactionCompanyData(PayBaseModel):
