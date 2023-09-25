@@ -1,8 +1,7 @@
 import base64
-import contextlib
 import pathlib
 import random
-from collections.abc import AsyncGenerator, Callable
+from collections.abc import Callable
 from functools import partial
 
 import aiosmtplib
@@ -11,7 +10,7 @@ import stripe
 from authlib.integrations import httpx_client
 from motor import motor_asyncio
 from redis import asyncio as aioredis
-from starlette import applications, types
+from starlette import applications
 from starlette.middleware import Middleware, authentication
 
 from snowfall.project.junction.extensions.service.mobile_api import (
@@ -23,6 +22,7 @@ from snowfall.project.junction.extensions.service.mobile_api import (
     plus_client,
     repository,
     smtp,
+    spec,
 )
 from snowfall.project.junction.extensions.service.mobile_api import (
     handlers as mobile_handlers,
@@ -31,7 +31,6 @@ from snowfall.project.junction.extensions.service.mobile_api.routes import route
 from snowfall.stdlib.instrumentation.httpx import metrics
 from snowfall.stdlib.integration.starlette import application as starlette
 from snowfall.stdlib.integration.starlette import handlers
-from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.http import auth
@@ -39,42 +38,9 @@ from snowfall.vendor.junction import client as base_client
 from snowfall.vendor.junction.go import client
 
 
-def replace_in_file(path: str, find: str, replace: str) -> None:
-    path_obj = pathlib.Path(path)
-
-    with path_obj.open("r") as file_r:
-        file_content = file_r.read()
-    file_content = file_content.replace(
-        find,
-        replace,
-    )
-    with path_obj.open("w") as file_w:
-        file_w.write(file_content)
-
-
-@contextlib.asynccontextmanager
-async def lifespan(app: types.ASGIApp) -> AsyncGenerator[None, None]:
-    client_api_spec_path = str(
-        filesystem.resource_path(
-            "junction.client_api",
-            "openapi.json",
-        ),
-    )
-    replace_in_file(
-        client_api_spec_path,
-        '"$ref": "#/',
-        '"$ref": "./../client_api/openapi.json#/',
-    )
-    yield
-    replace_in_file(
-        client_api_spec_path,
-        '"$ref": "./../client_api/openapi.json#/',
-        '"$ref": "#/',
-    )
-
-
 def _factory(
     app: application.Application[bootstrap.Settings],
+    api_spec_path: pathlib.Path,
 ) -> Callable[[], applications.Starlette]:
     def decorator() -> applications.Starlette:
         stripe.api_key = app.settings.stripe_api_key
@@ -127,7 +93,6 @@ def _factory(
         )
 
         asgi_app = starlette.create_starlette_app(
-            lifespan=lifespan,
             routes=router.get_routes(
                 bootstrap.create_dependencies(
                     places_repository=repository.PlacesRepository(
@@ -190,10 +155,7 @@ def _factory(
                     on_error=handlers.auth_error_handler,
                 ),
             ],
-            openapi_path=filesystem.resource_path(
-                "junction.mobile_api",
-                "openapi.json",
-            ),
+            openapi_path=api_spec_path,
         )
 
         asgi_app.add_exception_handler(
@@ -209,12 +171,13 @@ def _factory(
 
 
 def _serve(app: application.Application[bootstrap.Settings]) -> None:
-    starlette.serve(
-        factory=_factory(app),
-        host=str(app.settings.http_address),
-        port=app.settings.http_port,
-        allowed_proxy_ips=app.settings.forwarded_allowed_ips,
-    )
+    with spec.get_api_spec() as temp_spec_path:
+        starlette.serve(
+            factory=_factory(app, temp_spec_path),
+            host=str(app.settings.http_address),
+            port=app.settings.http_port,
+            allowed_proxy_ips=app.settings.forwarded_allowed_ips,
+        )
 
 
 async def _migrate(app: application.Application[bootstrap.MigrateSettings]) -> None:

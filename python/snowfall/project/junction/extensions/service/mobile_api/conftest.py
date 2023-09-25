@@ -4,7 +4,7 @@ import dataclasses
 import datetime
 import pathlib
 import re
-from collections.abc import AsyncIterator, Mapping, Sequence
+from collections.abc import AsyncIterator, Iterator, Mapping, Sequence
 from functools import partial
 from typing import Any, TypedDict
 from unittest import mock
@@ -27,11 +27,11 @@ from starlette.middleware import Middleware, authentication
 from snowfall.project.junction.extensions.service.mobile_api import (
     bootstrap,
     jwt_generator,
-    main,
     middleware,
     plus_client,
     repository,
     smtp,
+    spec,
 )
 from snowfall.project.junction.extensions.service.mobile_api import (
     handlers as mobile_handlers,
@@ -40,7 +40,6 @@ from snowfall.project.junction.extensions.service.mobile_api.routes import route
 from snowfall.project.junction.extensions.service.mobile_api.v1alpha import models_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.integration.starlette import application, handlers
-from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.v1 import phone_number_pb2
 from snowfall.vendor.junction import client as base_client
@@ -167,17 +166,6 @@ def _create_app(
     openapi_path: pathlib.Path,
     custom_middlewares: Sequence[Middleware] | None = None,
 ) -> applications.Starlette:
-    client_api_spec_path = str(
-        filesystem.resource_path(
-            "junction.client_api",
-            "openapi.json",
-        ),
-    )
-    main.replace_in_file(
-        client_api_spec_path,
-        '"$ref": "#/',
-        '"$ref": "./../client_api/openapi.json#/',
-    )
     asgi_app = application.create_starlette_app(
         custom_middlewares=custom_middlewares,
         openapi_path=openapi_path,
@@ -405,42 +393,43 @@ def app(  # noqa: WPS211
     notification_tokens_repository: repository.NotificationTokensRepository,
     user_groups_repository: repository.UserGroupsRepository,
     markups_repository: repository.MarkupsRepository,
-) -> applications.Starlette:
-    return _create_app(
-        dependencies=bootstrap.create_dependencies(
-            orders_repository,
-            junction_client,
-            base_client.create_httpx_client(base_url=junction_api_address),
-            plus_http_client,
-            places_repository,
-            users_repository,
-            guests_repository,
-            otp_repository,
-            enums_values_repository,
-            smtp_client,
-            jwt_gen,
-            stripe_users_repository,
-            loyalty_programs_repository,
-            preferences_repository,
-            vouchers_repository,
-            notification_tokens_repository,
-            user_groups_repository,
-            markups_repository,
-        ),
-        openapi_path=filesystem.resource_path("junction.mobile_api", "openapi.json"),
-        custom_middlewares=[
-            Middleware(
-                authentication.AuthenticationMiddleware,
-                backend=middleware.AuthenticationBackend(
-                    token_version=jwt_token_version,
-                    public_key=base64.b64decode(
-                        jwt_public_key,
-                    ).decode(),
-                ),
-                on_error=handlers.auth_error_handler,
+) -> Iterator[applications.Starlette]:
+    with spec.get_api_spec() as temp_spec_path:
+        yield _create_app(
+            dependencies=bootstrap.create_dependencies(
+                orders_repository,
+                junction_client,
+                base_client.create_httpx_client(base_url=junction_api_address),
+                plus_http_client,
+                places_repository,
+                users_repository,
+                guests_repository,
+                otp_repository,
+                enums_values_repository,
+                smtp_client,
+                jwt_gen,
+                stripe_users_repository,
+                loyalty_programs_repository,
+                preferences_repository,
+                vouchers_repository,
+                notification_tokens_repository,
+                user_groups_repository,
+                markups_repository,
             ),
-        ],
-    )
+            openapi_path=temp_spec_path,
+            custom_middlewares=[
+                Middleware(
+                    authentication.AuthenticationMiddleware,
+                    backend=middleware.AuthenticationBackend(
+                        token_version=jwt_token_version,
+                        public_key=base64.b64decode(
+                            jwt_public_key,
+                        ).decode(),
+                    ),
+                    on_error=handlers.auth_error_handler,
+                ),
+            ],
+        )
 
 
 @pytest.fixture()
