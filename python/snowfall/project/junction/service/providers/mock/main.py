@@ -31,6 +31,7 @@ _PROVIDER_NAME = "Mock"
 class _Settings(service.ProviderSettings):
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
     storage_dsn: service.AnyDsn
+    reasonable_results: bool = False
 
 
 class _PriceQuotesSettings(service.Settings):
@@ -133,6 +134,7 @@ async def _offers_factory(
         offer_group_cache_key_generator=offers.cache_key,
         offer_group_generator=offers.offer_group_generator(
             generator=offers.Generator(
+                reasonable_results=app.settings.reasonable_results,
                 option_cache=cache.OptionCache(
                     client=redis.Client(redis_conn, prefix=app.name),
                 ),

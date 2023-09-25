@@ -125,9 +125,11 @@ def cache_key(search: Criteria) -> str:
 class Generator(object):
     def __init__(
         self,
+        reasonable_results: bool,  # noqa: FBT001
         option_cache: cache.OptionCache,
         ttl: datetime.timedelta,
     ):
+        self._reasonable_results = reasonable_results
         self._cache = option_cache
         self._ttl = ttl
 
@@ -137,11 +139,31 @@ class Generator(object):
     ) -> AsyncIterator[offers_pb2.OfferGroup]:
         fake = faker.Faker()
         expires_at = datetime.datetime.now(tz=datetime.UTC) + self._ttl
-        segments = search.segments
-        departure = segments[0].legs[0].departure_at
-        arrival = segments[-1].legs[-1].arrival_at
-        travel_type = segments[0].legs[0].type
-        reasonable_price = _calculate_reasonable_price(travel_type, departure, arrival)
+        operator = fake.lexify(text="??").upper()
+        vendor = fake.lexify(text="??").upper()
+        price = money.from_string(
+            string_amount=(fake.numerify(text="%#")),
+            currency=money.Currency("EUR"),
+        )
+        if self._reasonable_results:
+            segments = search.segments
+            departure = segments[0].legs[0].departure_at
+            arrival = segments[-1].legs[-1].arrival_at
+            travel_type = segments[0].legs[0].type
+            reasonable_price = _calculate_reasonable_price(
+                travel_type,
+                departure,
+                arrival,
+            )
+            operator = _get_name_from_type(travel_type, _SNOWFALL_OPERATORS)
+            vendor = _get_name_from_type(
+                travel_type,
+                _SNOWFALL_VENDORS,
+            )
+            price = money.from_string(
+                string_amount=(str(reasonable_price)),
+                currency=money.Currency("EUR"),
+            )
         offer_segments = [
             offers_pb2.OfferSegment(
                 id=string.uuid(),
@@ -155,20 +177,8 @@ class Generator(object):
                     )
                     for leg in segment.legs
                 ],
-                operator=_get_name_from_type(
-                    travel_type,
-                    _SNOWFALL_OPERATORS,
-                )
-                or fake.lexify(
-                    text="??",
-                ).upper(),
-                vendor=_get_name_from_type(
-                    travel_type,
-                    _SNOWFALL_VENDORS,
-                )
-                or fake.lexify(
-                    text="??",
-                ).upper(),
+                operator=operator,
+                vendor=vendor,
                 vehicle=offers_pb2.Vehicle(
                     number=fake.numerify(text="%##"),
                 ),
@@ -176,13 +186,6 @@ class Generator(object):
             )
             for segment in search.segments
         ]
-
-        price = money.from_string(
-            string_amount=(
-                str(reasonable_price) if reasonable_price else fake.numerify(text="%#")
-            ),
-            currency=money.Currency("EUR"),
-        )
 
         yield offers_pb2.OfferGroup(
             id=string.uuid(),
