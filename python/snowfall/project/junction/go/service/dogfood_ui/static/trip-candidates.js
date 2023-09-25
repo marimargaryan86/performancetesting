@@ -1,4 +1,4 @@
-function load_trip_candidates(id) {
+function load_trip_candidates(id, origin, destination) {
   fetch("/trip-candidates/searches/" + id)
     .then((res) => res.json())
     .then((response) => {
@@ -13,14 +13,14 @@ function load_trip_candidates(id) {
         )
         .then((res) => res.json())
         .then((response) => {
-          inject_trips(id, transform_trip_candidates(response), false);
-        });
+          inject_trips(id, transform_trip_candidates(response), origin, destination, false);
+        }).catch(error => show_loader("An unexpected error has occurred. Please reload the application.<br>" + error));
       } else {
         setTimeout(() => {
-          load_trip_candidates(id);
+          load_trip_candidates(id, origin, destination);
         }, "2000");
       }
-    });
+    }).catch(error => show_loader("An unexpected error has occurred. Please reload the application.<br>" + error));
 }
 
 function transform_trip_candidates(response) {

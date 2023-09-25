@@ -259,7 +259,7 @@ function haversine_distance(coords1, coords2) {
   return d;
 }
 
-function inject_trips(tripSearchId, response, searchOffers) {
+function inject_trips(tripSearchId, response, origin, destination, searchOffers) {
   hide_loader();
 
   const showMaps = document.getElementById("show-maps").checked;
@@ -285,7 +285,14 @@ function inject_trips(tripSearchId, response, searchOffers) {
     '<dt class="col-sm-2">Session Token</dt><dd class="col-sm-10">' +
     sessionToken +
     "</dd>";
+  searchInfo.innerHTML += '<dt class="col-sm-2">Provider Mapping</dt>';
+  let provider_mapping = document.createElement("dd");
+  provider_mapping.className = "col-sm-10"
+  searchInfo.append(provider_mapping);
   new_children.push(searchInfo);
+
+  inject_provider_mapping(origin, provider_mapping)
+  inject_provider_mapping(destination, provider_mapping)
 
   included = {};
 
@@ -649,7 +656,7 @@ function load_places(url = null) {
       } else {
         inject_places();
       }
-    });
+    }).catch(error => show_loader("An unexpected error has occurred. Please reload the application.<br>" + error));
 }
 
 function inject_offers(response, offerSearchId, tripId, searchStatus) {
@@ -687,10 +694,10 @@ function load_offers(id, tripId) {
           load_offers(id, tripId);
         }, "5000");
       }
-    });
+    }).catch(error => show_loader("An unexpected error has occurred. Please reload the application.<br>" + error));
 }
 
-function load_trips(id) {
+function load_trips(id, origin, destination) {
   fetch("/trips/searches/" + id)
     .then((res) => res.json())
     .then((response) => {
@@ -705,14 +712,14 @@ function load_trips(id) {
         )
           .then((res) => res.json())
           .then((response) => {
-            inject_trips(id, response, document.getElementById("search-offers").checked);
-          });
+            inject_trips(id, response, origin, destination, document.getElementById("search-offers").checked);
+          }).catch(error => show_loader("An unexpected error has occurred. Please reload the application.<br>" + error));
       } else {
         setTimeout(() => {
-          load_trips(id);
+          load_trips(id, origin, destination);
         }, "2000");
       }
-    });
+    }).catch(error => show_loader("An unexpected error has occurred. Please reload the application.<br>" + error));
 }
 
 function search_offers(tripId) {
@@ -755,7 +762,7 @@ function search_offers(tripId) {
         const search = document.getElementById("offer-search-" + tripId);
         search.innerHTML = data.data.id;
         load_offers(data.data.id, tripId);
-      });
+      }).catch(error => show_loader("An unexpected error has occurred. Please reload the application.<br>" + error));
   }, Math.floor(Math.random() * 10000));
 }
 
@@ -799,9 +806,26 @@ function search_trips(event) {
   })
 
   originRequest.onsuccess = (event) => {
-    const originTimeZone = originRequest.result.attributes.timeZone;
-    if (useTripCandidates) {
-      destinationRequest.onsuccess = (event) => {
+    destinationRequest.onsuccess = (event) => {
+      const originTimeZone = originRequest.result.attributes.timeZone;
+      if (useTripCandidates) {
+        let originCity = false
+        let destinationCity = false
+
+        for (const type of originRequest.result.relationships.types.data) {
+          if (type.id == "city") {
+            originCity = true
+            return
+          }
+        }
+
+        for (const type of destinationRequest.result.relationships.types.data) {
+          if (type.id == "city") {
+            destinationCity = true
+            return
+          }
+        }
+
         fetch("/trip-candidates/searches", {
           method: "POST",
           headers: {
@@ -816,10 +840,12 @@ function search_trips(event) {
                   origin: {
                     latitude: originRequest.result.attributes.latitude,
                     longitude: originRequest.result.attributes.longitude,
+                    precision: originCity ? "area" : "precise"
                   },
                   destination: {
                     latitude: destinationRequest.result.attributes.latitude,
                     longitude: destinationRequest.result.attributes.longitude,
+                    precision: destinationCity ? "area" : "precise"
                   },
                   departureAfter: dayjs.tz(departureAt, originTimeZone).format(),
                 }],
@@ -838,47 +864,46 @@ function search_trips(event) {
         })
         .then((response) => response.json())
         .then((data) => {
-          load_trip_candidates(data.data.id);
-        });
-      }
-    } else {
-      fetch("/trips/searches", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/vnd.api+json",
-        },
-        body: JSON.stringify({
-          data: {
-            type: "trip-searches",
-            attributes: {
-              departureAfter: dayjs.tz(departureAt, originTimeZone).format(),
-            },
-            relationships: {
-              origin: {
-                data: {
-                  id: origin,
-                  type: "places",
-                },
-              },
-              destination: {
-                data: {
-                  id: destination,
-                  type: "places",
-                },
-              },
-              allowedSegmentTypes: {
-                data: allowedSegmentTypes,
-              },
-            },
+          load_trip_candidates(data.data.id, originRequest.result, destinationRequest.result);
+        }).catch(error => show_loader("An unexpected error has occurred. Please reload the application.<br>" + error));
+      } else {
+        fetch("/trips/searches", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/vnd.api+json",
           },
-        }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          load_trips(data.data.id);
-        });
+          body: JSON.stringify({
+            data: {
+              type: "trip-searches",
+              attributes: {
+                departureAfter: dayjs.tz(departureAt, originTimeZone).format(),
+              },
+              relationships: {
+                origin: {
+                  data: {
+                    id: origin,
+                    type: "places",
+                  },
+                },
+                destination: {
+                  data: {
+                    id: destination,
+                    type: "places",
+                  },
+                },
+                allowedSegmentTypes: {
+                  data: allowedSegmentTypes,
+                },
+              },
+            },
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            load_trips(data.data.id, originRequest.result, destinationRequest.result);
+          }).catch(error => show_loader("An unexpected error has occurred. Please reload the application.<br>" + error));
+      }
     }
-
   };
 }
 

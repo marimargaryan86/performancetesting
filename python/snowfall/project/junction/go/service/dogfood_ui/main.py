@@ -24,11 +24,21 @@ def _routes(app: application.Application[_Settings]) -> list[routing.BaseRoute]:
             "snowfall.project.junction.go.service.dogfood_ui.templates",
         ),
     )
+    container[httpx.AsyncClient] = httpx.AsyncClient(
+        base_url=app.settings.base_url,
+        headers={
+            "Accept": "application/vnd.api+json",
+            "Authorization": "Bearer {0}".format(app.settings.auth_token),
+            "Content-Type": "application/vnd.api+json",
+            "User-Agent": app.user_agent,
+        },
+    )
 
     integration = starlette_integration.StarletteIntegration(container)
 
     return [
         integration.route("/", routes.UI),
+        integration.route("/locations", routes.Locations),
         routing.Mount(
             "/static",
             staticfiles.StaticFiles(
@@ -38,17 +48,7 @@ def _routes(app: application.Application[_Settings]) -> list[routing.BaseRoute]:
                 ],
             ),
         ),
-        stdlib_routes.Proxy(
-            httpx.AsyncClient(
-                base_url=app.settings.base_url,
-                headers={
-                    "Accept": "application/vnd.api+json",
-                    "Authorization": "Bearer {0}".format(app.settings.auth_token),
-                    "Content-Type": "application/vnd.api+json",
-                    "User-Agent": app.user_agent,
-                },
-            ),
-        ).to_route(),
+        stdlib_routes.Proxy(container[httpx.AsyncClient]).to_route(),
     ]
 
 
