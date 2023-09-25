@@ -1,4 +1,5 @@
 import datetime
+from gettext import gettext as _
 
 from snowfall.project.junction.plus.adapter import (
     errors as errors_adapter,
@@ -10,6 +11,10 @@ from snowfall.project.junction.plus.adapter import (
     notification_event_publisher as notification_event_publisher_adapter,
 )
 from snowfall.project.junction.plus.adapter import subscribers as subscribers_adapter
+from snowfall.project.junction.plus.service.checkin.checkin_urls import (
+    get_open_hours_from_iata,
+    get_url_from_iata,
+)
 from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
@@ -29,15 +34,15 @@ class CheckinCronJob(object):
         self._publisher_client = publisher_client
         self._logger = stdout.get_logger()
 
-    async def run(self) -> None:  # noqa: WPS231
+    async def run(self) -> None:  # noqa: WPS231,WPS210
         self._logger.info("Started check-in reminder as a cron job")
-        next_day = datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(
-            hours=24,
-        )
         for candidate in await self._monitoring_rules.get_checkin_candidates():
+            checkin_window = generate_checkin_window_start(
+                carrier=candidate.booking.value.route_identifier.carrier,
+            )
             if (  # noqa: WPS337
                 protobuf.protobuf_to_datetime(candidate.booking.value.departure_at)
-                < next_day
+                < checkin_window
             ):
                 for subscriber_id in candidate.subscriber_ids:
                     try:
@@ -46,13 +51,45 @@ class CheckinCronJob(object):
                         )
                     except errors_adapter.NotFoundError:
                         continue  # noqa: WPS220
+                    checkin_message = generate_checkin_message(
+                        carrier=candidate.booking.value.route_identifier.carrier,
+                        destination=candidate.booking.value.destination,
+                    )
                     notification_event = models_pb2.NotificationEvent(
                         sender_id=subscriber.reseller_id,
                         receiver_id=subscriber_id,
-                        preformatted_message="Checkin reminder!",
+                        preformatted_message=checkin_message,
                         event_type=models_pb2.NotificationEvent.TYPE_PREFORMATTED_MESSAGE,
                         channel=models_pb2.Channel.CHANNEL_WHATSAPP,
                     )
                     await self._publisher_client.publish(notification_event)
                 await self._monitoring_rules.sent_reminder(candidate.id)
         self._logger.info("Ended check-in reminder as a cron job")
+
+
+def generate_checkin_message(
+    carrier: str,
+    destination: str,
+) -> str:
+    try:
+        return _(
+            "Check-in for your flight to {0} is now available! "
+            "Please follow the link here to check-in: {1}",
+        ).format(
+            destination,
+            get_url_from_iata(carrier),
+        )
+    except KeyError:
+        return _(
+            "Check-in for your flight to {0} is now available!",
+        ).format(destination)
+
+
+def generate_checkin_window_start(carrier: str) -> datetime.datetime:
+    try:
+        hours = get_open_hours_from_iata(carrier)
+    except KeyError:
+        hours = 24
+    return datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(
+        hours=hours,
+    )
