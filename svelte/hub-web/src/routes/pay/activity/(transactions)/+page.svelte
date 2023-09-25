@@ -14,7 +14,6 @@
   import TRow from "components/ui/table/t-row.svelte";
   import TCol from "components/ui/table/t-col.svelte";
   import { yymmdd } from "formatting/date-time";
-  import TransactionStatusBadge from "components/ui/transaction-status-badge.svelte";
   import { callAction, capitalize, type FlattenedObject } from "utils/common";
   import type { DirectionY } from "models/spatial";
   import { sortTransactions } from "sorting/transaction";
@@ -30,6 +29,7 @@
     TransactionStatus,
   } from "integration/junction-pay/schemas/transaction";
   import type { BookingModel } from "integration/junction-client-api/schemas/booking";
+  import TStatusBadgeCol from "components/ui/table/t-status-badge-col.svelte";
 
   export let data;
   export let form;
@@ -143,7 +143,7 @@
         <TMoneyCol money={item.amounts.beneficiary} currencies={data.currencies} />
         <TMoneyCol money={item.amounts.salesMargin} currencies={data.currencies} />
         <TCol maxWidth="96px" copyable copyAlign="right">{item.reference ?? "Unknown"}</TCol>
-        <TCol width="80px"><TransactionStatusBadge value={item.status} /></TCol>
+        <TStatusBadgeCol value={item.status} />
       </TRow>
     {/each}
   </TBody>

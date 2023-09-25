@@ -35,7 +35,11 @@
 </script>
 
 <Backdrop bind:this={backdrop} closeOnClickOutside={false}>
-  <div class="content" transition:scale={{ duration: 150, start: 0.7, delay: 100 }}>
+  <div
+    class="content"
+    in:scale={{ duration: 150, start: 0.7, delay: 100 }}
+    out:scale={{ duration: 150, start: 0.7 }}
+  >
     <AlertIcon color="var(--color-semantic-error-500)" size="64px" variant="disc" />
 
     <h1 class="typography bold display-small title">Price change</h1>

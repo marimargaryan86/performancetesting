@@ -1,7 +1,8 @@
 <script lang="ts">
   import TicketIcon from "components/icons/ticket-icon.svelte";
 
-  export let reference: string | undefined = undefined;
+  export let title = "Order reference";
+  export let identifier: string | undefined = undefined;
 </script>
 
 <div class="ticket">
@@ -10,9 +11,9 @@
   </div>
 
   <span>
-    <em class="typography body-xsmall">Order reference</em>
+    <em class="typography body-xsmall">{title}</em>
     <strong class="typography body-medium bold">
-      {reference ?? "Unknown"}
+      {identifier ?? "N/A"}
     </strong>
   </span>
 </div>

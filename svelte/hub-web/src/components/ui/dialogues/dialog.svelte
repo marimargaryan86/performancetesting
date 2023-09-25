@@ -21,7 +21,11 @@
 </script>
 
 <Backdrop on:close on:open bind:this={backdrop}>
-  <div class="dialog" transition:scale={{ duration: 150, start: 0.7, delay: 100 }}>
+  <div
+    class="dialog"
+    in:scale={{ duration: 150, start: 0.7, delay: 100 }}
+    out:scale={{ duration: 150, start: 0.7 }}
+  >
     <slot />
   </div>
 </Backdrop>

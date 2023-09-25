@@ -12,7 +12,15 @@ import {
 import { z } from "zod";
 
 export const bookingStatusIdentifier = z.object({
-  id: z.string(),
+  id: z.enum([
+    "unspecified",
+    "pending",
+    "confirmed",
+    "rejected",
+    "not-ticketed",
+    "error",
+    "cancelled",
+  ]),
   type: z.enum(["booking-statuses"]),
 });
 
@@ -112,7 +120,7 @@ const bookingBase = z.object({
   price: priceModel.model,
   operatorReferences: z.array(z.string()),
   externalReference: z.string().optional(),
-  status: z.string(),
+  status: bookingStatusIdentifier.shape.id,
 });
 
 const bookingExt: z.ZodType<

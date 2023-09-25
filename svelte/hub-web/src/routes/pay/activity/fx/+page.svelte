@@ -19,13 +19,13 @@
   import TBody from "components/ui/table/t-body.svelte";
   import TRow from "components/ui/table/t-row.svelte";
   import TCol from "components/ui/table/t-col.svelte";
-  import ConversionStatusBadge from "components/ui/conversion-status-badge.svelte";
   import { onMount } from "svelte";
   import routeConfig from "routeConfig";
   import type {
     ConversionModel,
     ConversionStatus,
   } from "integration/junction-pay/schemas/conversion";
+  import TStatusBadgeCol from "components/ui/table/t-status-badge-col.svelte";
 
   export let form;
   export let data;
@@ -109,11 +109,7 @@
         <TCol>{conversion.executedRate}</TCol>
         <TCol>{conversion.fxDelta ?? ""}</TCol>
         <TCol>{conversion.transaction?.rates.fxBuffer ?? ""}</TCol>
-        <TCol width="124px">
-          {#if conversion.fxStatus}
-            <ConversionStatusBadge value={conversion.fxStatus} />
-          {/if}
-        </TCol>
+        <TStatusBadgeCol value={conversion.fxStatus ?? "unspecified"} />
       </TRow>
     {/each}
   </TBody>

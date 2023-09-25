@@ -73,12 +73,26 @@ export type BookingDetailsModel = Infer<typeof bookingDetailsModel>;
 export type BookingDetailsSchema = Infer<typeof bookingDetailsModel, "schema">;
 export type BookingDetailsIdentifier = Infer<typeof bookingDetailsModel, "identifier">;
 
+export const bookingStatusIdentifier = z.object({
+  id: z.enum([
+    "unspecified",
+    "pending",
+    "confirmed",
+    "rejected",
+    "not-ticketed",
+    "error",
+    "cancelled",
+  ]),
+  type: z.enum(["booking-statuses"]),
+});
+export type BookingStatus = z.infer<typeof bookingStatusIdentifier>["id"];
+
 const bookingRelationships: z.ZodType<{
-  status: { data: { id: string; type: "booking-statuses" } };
+  status: { data: z.infer<typeof bookingStatusIdentifier> };
   details: { data: BookingDetailsIdentifier[] };
   order: { data: OrderIdentifier };
 }> = relationship({
-  status: z.object({ id: z.string(), type: z.enum(["booking-statuses"]) }),
+  status: bookingStatusIdentifier,
   details: z.array(bookingDetailsModel.identifier),
   order: z.lazy(() => orderModel.identifier),
 });
@@ -89,7 +103,7 @@ export const bookingModelBase = z.object({
   operatorBookingReferences: z.array(z.string()),
   externalReference: z.string(),
   ticketUrl: z.string().optional(),
-  status: z.string(),
+  status: bookingStatusIdentifier.shape.id,
   details: z.array(bookingDetailsModel.model),
 });
 

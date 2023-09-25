@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Button from "components/ui/button.svelte";
   import Header from "components/ui/table/header.svelte";
   import TActionsCol from "components/ui/table/t-actions-col.svelte";
   import TBody from "components/ui/table/t-body.svelte";
@@ -7,10 +8,19 @@
   import TMoneyCol from "components/ui/table/t-money-col.svelte";
   import TRow from "components/ui/table/t-row.svelte";
   import Table from "components/ui/table/table.svelte";
+  import type { BookingModel } from "integration/junction-mobile-api/schemas/booking";
   import routeConfig from "routeConfig";
   import { getOrigin, getDestination, downloadTickets } from "utils/booking";
+  import CancellationDialog from "./cancellation-dialog.svelte";
+  import TStatusBadgeCol from "components/ui/table/t-status-badge-col.svelte";
 
   export let data;
+
+  let cancellationDialog: CancellationDialog | undefined;
+
+  function cancelBooking(booking: BookingModel): void {
+    cancellationDialog?.open(booking);
+  }
 </script>
 
 <svelte:head>
@@ -18,6 +28,12 @@
     Bookings · {data.order.journey?.reference ?? "Unknown"} · Orders · Trip Management · Junction Hub
   </title>
 </svelte:head>
+
+<CancellationDialog
+  bind:this={cancellationDialog}
+  orderId={data.order.id}
+  passengers={data.order.passengers}
+/>
 
 <Table class="bookings-table">
   <THead>
@@ -28,6 +44,7 @@
     <Header>Origin</Header>
     <Header>Destination</Header>
     <Header>Total Price</Header>
+    <Header>Booking status</Header>
     <Header />
   </THead>
   <TBody>
@@ -59,13 +76,20 @@
           {/if}
         </TCol>
         <TCol>{booking.details[0]?.legs[0]?.departureAt.toLocaleDateString("en-GB")}</TCol>
-        <TCol>{origin?.name ?? "Unknown"}</TCol>
-        <TCol>{destination?.name ?? "Unknown"}</TCol>
+        <TCol class="typography bold">{origin?.name ?? "Unknown"}</TCol>
+        <TCol class="typography bold">{destination?.name ?? "Unknown"}</TCol>
         <TMoneyCol money={booking.price} />
+        <TStatusBadgeCol value={booking.status} />
         <TActionsCol>
-          <button class="action">
-            <span>...</span>
-          </button>
+          {#if booking.status === "confirmed"}
+            <Button
+              size="xx-small"
+              variant="outline"
+              on:click={cancelBooking.bind(cancelBooking, booking)}
+            >
+              Cancel
+            </Button>
+          {/if}
         </TActionsCol>
       </TRow>
     {/each}
@@ -76,14 +100,6 @@
   :global(.table.bookings-table) {
     width: 100%;
     height: 100%;
-  }
-
-  .action {
-    padding: 4px;
-    background-color: transparent;
-    border: 0;
-    transform: rotateZ(90deg);
-    cursor: pointer;
   }
 
   a,

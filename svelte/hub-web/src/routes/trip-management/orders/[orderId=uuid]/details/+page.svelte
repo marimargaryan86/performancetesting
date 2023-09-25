@@ -14,7 +14,7 @@
 <div class="content">
   <h3 class="typography title-large bold">Order details</h3>
 
-  <Ticket reference={data.order.journey?.reference} />
+  <Ticket identifier={data.order.journey?.reference} />
 
   <Passengers passengers={data.order.passengers} />
 </div>

@@ -8,7 +8,7 @@
 
 <div class="overview">
   <h2 class="typography headline-small bold">Your order has been confirmed</h2>
-  <Ticket reference={order.journey?.reference} />
+  <Ticket identifier={order.journey?.reference} />
 
   <div class="item">
     <span class="circle target">

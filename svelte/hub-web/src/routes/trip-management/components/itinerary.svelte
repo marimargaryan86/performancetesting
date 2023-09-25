@@ -36,7 +36,7 @@
   {#each bookings as booking}
     {@const origDestLegs = getOrigDestLegs(booking)}
     {@const cabinClasses = booking.details.map((item) => item.cabinClassName)}
-    {@const operator = booking.details[0]?.operator ?? "Unknown"}
+    {@const vendor = booking.details[0]?.vendor}
     {@const segmentCount = booking.details.length}
 
     {#if origDestLegs}
@@ -59,10 +59,10 @@
           </span>
         </div>
 
-        <div class="operator">
-          <EntityAvatar name={operator} />
+        <div class="vendor">
+          <EntityAvatar name={vendor} />
           <span class="typography label-medium">
-            {operator}
+            {vendor?.length ? vendor : "Unknown"}
             •
             {segmentCount === 1 ? "Direct" : `${segmentCount} stops`}
           </span>
@@ -142,7 +142,12 @@
     gap: 8px;
   }
 
-  .operator {
+  .orig-dest > em {
+    display: inline-block;
+    padding: 0 8px;
+  }
+
+  .vendor {
     display: flex;
     gap: 8px;
     align-items: center;

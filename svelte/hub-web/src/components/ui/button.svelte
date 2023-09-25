@@ -2,7 +2,7 @@
   export let type: "button" | "reset" | "submit" = "button";
   export let disabled = false;
   export let variant: "primary" | "outline" | "text" = "primary";
-  export let size: "large" | "medium" | "small" | "x-small" | "xl-small" = "large";
+  export let size: "large" | "medium" | "small" | "x-small" | "xx-small" = "large";
   export let href: string | undefined = undefined;
   export let minWidth: string | undefined = undefined;
   export let preload = true;
@@ -27,7 +27,7 @@
   class:medium={size === "medium"}
   class:small={size === "small"}
   class:x-small={size === "x-small"}
-  class:xl-small={size === "xl-small"}
+  class:xx-small={size === "xx-small"}
 >
   <slot />
 </svelte:element>
@@ -148,7 +148,7 @@
     padding: 6px 16px;
   }
 
-  .xl-small {
+  .xx-small {
     --icon-size: 20px;
 
     padding: 6px 8px;

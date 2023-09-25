@@ -7,10 +7,10 @@
   import TMoneyCol from "components/ui/table/t-money-col.svelte";
   import TRow from "components/ui/table/t-row.svelte";
   import Table from "components/ui/table/table.svelte";
-  import TransactionStatusBadge from "components/ui/transaction-status-badge.svelte";
   import type { FlattenedObject } from "utils/common";
   import type { DirectionY } from "models/spatial";
   import type { TransactionModel } from "integration/junction-pay/schemas/transaction";
+  import TStatusBadgeCol from "components/ui/table/t-status-badge-col.svelte";
 
   const bookings: string[] = ["a", "b", "c", "d", "e"];
 
@@ -47,9 +47,7 @@
         <TCompanyCol maxWidth="160px" companyName="Malaga TA" />
         <TCol>02/11/23</TCol>
         <TMoneyCol money={{ amount: 2952.9, currency: "USD" }} />
-        <TCol width="80px">
-          <TransactionStatusBadge value="pending" />
-        </TCol>
+        <TStatusBadgeCol value="pending" />
         <TCol maxWidth="96px" class="green">View</TCol>
       </TRow>
     {/each}

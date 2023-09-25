@@ -1,10 +1,38 @@
 <script lang="ts" context="module">
+  import type { BookingStatus } from "integration/junction-mobile-api/schemas/booking";
+  import type { ConversionStatus } from "integration/junction-pay/schemas/conversion";
+  import type { TransactionStatus } from "integration/junction-pay/schemas/transaction";
+
   export type StatusBadgeVariant = "ok" | "warn" | "error";
+  export type StatusBadgeValue =
+    | BookingStatus
+    | ConversionStatus
+    | TransactionStatus
+    | "completed"
+    | "deleted";
+
+  const statusMapping: Record<StatusBadgeValue, StatusBadgeVariant> = {
+    confirmed: "ok",
+    completed: "ok",
+    executed: "ok",
+    paid: "ok",
+    error: "error",
+    rejected: "error",
+    deleted: "error",
+    failed: "error",
+    pending: "warn",
+    "not-ticketed": "warn",
+    cancelled: "warn",
+    unspecified: "warn",
+  };
 </script>
 
 <script lang="ts">
-  export let value: string;
-  export let variant: StatusBadgeVariant = "ok";
+  import { capitalize } from "utils/common";
+
+  export let value: StatusBadgeValue;
+
+  $: variant = statusMapping[value] ?? "ok";
 </script>
 
 <span
@@ -13,7 +41,7 @@
   class:warn={variant === "warn"}
   class:error={variant === "error"}
 >
-  {value}
+  {capitalize(value)}
 </span>
 
 <style>

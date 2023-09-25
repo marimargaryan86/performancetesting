@@ -6,11 +6,15 @@
   import Passengers from "../../../components/passengers.svelte";
   import Ticket from "../../../components/ticket.svelte";
   import Itinerary from "../../../components/itinerary.svelte";
+  import StatusBadge from "components/ui/status-badge.svelte";
 
   export let data;
 
   let breadCrumbs: BreadCrumb[] = [];
 
+  $: reservationNo = data.booking?.operatorBookingReferences.length
+    ? data.booking.operatorBookingReferences.join(", ")
+    : undefined;
   $: orderLink = routeConfig.routes.tripManagement.routes.orders.routes.order(data.order.id);
   $: selfLink = orderLink.routes.booking(data.booking.id);
   $: breadCrumbs = [
@@ -41,7 +45,12 @@
     <div class="itinerary">
       <h3 class="typography title-large bold">Itinerary</h3>
 
-      <Ticket reference={data.order.journey?.reference} />
+      <Ticket identifier={reservationNo} title="Reservation number" />
+
+      <div class="status typography body-small bold">
+        Booking status
+        <StatusBadge value={data.booking.status} />
+      </div>
     </div>
 
     <Passengers passengers={data.order.passengers} />
@@ -66,5 +75,12 @@
     display: flex;
     flex-flow: column;
     gap: 24px;
+  }
+
+  .status {
+    display: flex;
+    flex-flow: column;
+    gap: 8px;
+    align-items: flex-start;
   }
 </style>

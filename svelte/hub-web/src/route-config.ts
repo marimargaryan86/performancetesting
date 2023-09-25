@@ -56,6 +56,9 @@ export default getRouteConfig({
               id: TId,
             ): {
               root: `/trip-management/orders/${TId}`;
+              actions: {
+                cancelBookings: `/trip-management/orders/${TId}?/cancelBookings`;
+              };
               routes: {
                 details: {
                   root: `/trip-management/orders/${TId}/details`;
@@ -71,6 +74,9 @@ export default getRouteConfig({
 
               return {
                 root,
+                actions: {
+                  cancelBookings: `${root}?/cancelBookings`,
+                },
                 routes: {
                   details: {
                     root: `${root}/details`,
