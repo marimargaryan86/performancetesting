@@ -52,6 +52,7 @@
   font-size: 12px;
   font-family: Inter, Arial, Helvetica, sans-serif;
   font-style: normal;
+  line-height: 16px;
 }
 
 .typography.label-large {
@@ -59,6 +60,7 @@
   font-size: 14px;
   font-family: Inter, Arial, Helvetica, sans-serif;
   font-style: normal;
+  line-height: 20px;
 }
 
 .typography.headline-medium {

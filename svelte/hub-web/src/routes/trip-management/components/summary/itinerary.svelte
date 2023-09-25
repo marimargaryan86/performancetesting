@@ -1,6 +1,13 @@
+<script lang="ts" context="module">
+  export type OrigDestLegs = {
+    originLeg: OfferSegmentLegModel;
+    destinationLeg: OfferSegmentLegModel;
+  };
+</script>
+
 <script lang="ts">
   import ChevronIcon from "components/icons/chevron-icon.svelte";
-  import type { OrigDestLegs } from "./summary.svelte";
+  import type { OfferSegmentLegModel } from "integration/junction-mobile-api/schemas/offer";
   import { formatDuration } from "formatting/date-time";
   import { getTimeDeltaS } from "utils/date-time";
   import { slideFade } from "transitions/slide-fade";

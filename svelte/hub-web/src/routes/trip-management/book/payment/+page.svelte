@@ -19,6 +19,7 @@
   import Button from "components/ui/button.svelte";
   import routeConfig from "routeConfig";
   import Payment from "./payment.svelte";
+
   import PassengerEntry, {
     getPassengerValidator,
     type PartialPassengerData,
@@ -39,6 +40,7 @@
   import { onDestroy } from "svelte";
   import type { CreateOrderModel } from "integration/junction-mobile-api/schemas/order";
   import PriceDialog from "components/ui/dialogues/price-dialog.svelte";
+  import Summary from "../../components/summary/summary.svelte";
 
   export let data;
 
@@ -187,13 +189,13 @@
     </div>
 
     <div class="column payment">
+      <Summary {priceQuote} passengers={data.searchData.passengers} />
+      <Payment bind:this={payment} {paymentIntent} />
       <ContactInformation
         countries={data.countries}
         bind:contactInformation={bookingData.contactInformation}
         errors={errors?.contactInformation}
       />
-
-      <Payment bind:this={payment} {paymentIntent} />
     </div>
   </div>
 </div>

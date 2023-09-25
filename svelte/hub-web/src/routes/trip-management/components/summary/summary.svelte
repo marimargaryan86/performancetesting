@@ -10,186 +10,116 @@
       .filter(ensureDefined)
       .join(", ");
   }
-
-  export type OrigDestLegs = {
-    originLeg: OfferSegmentLegModel;
-    destinationLeg: OfferSegmentLegModel;
-  };
-
-  function getOrigDestLegs(group: OfferGroupModel): OrigDestLegs | undefined {
-    const segments = [...group.details].sort((a, b) => a.sequences.segment - b.sequences.segment);
-    const startSegment = segments[0];
-    const endSegment = segments[segments.length - 1];
-
-    if (!(startSegment && endSegment)) {
-      return undefined;
-    }
-
-    const originLeg = startSegment.legs[0];
-    const destinationLeg = endSegment.legs[endSegment.legs.length - 1];
-
-    if (!(originLeg && destinationLeg)) {
-      return undefined;
-    }
-
-    return { originLeg, destinationLeg };
-  }
-
-  function getPriceBreakdown(options: OfferOptionModel[]): PriceBreakdownModel[] {
-    const priceBreakdown: PriceBreakdownModel[] = [];
-
-    options.forEach((option) => {
-      option.priceBreakdown?.forEach((item) => {
-        const existing = priceBreakdown.find((pb) => pb.type === item.type);
-
-        if (existing) {
-          existing.price = { ...existing.price, amount: existing.price.amount + item.price.amount };
-        } else {
-          priceBreakdown.push({ ...item });
-        }
-      });
-    });
-
-    return priceBreakdown;
-  }
-
-  function getTotalPrice(options: OfferOptionModel[]): PriceModel {
-    return options.reduce<PriceModel>(
-      (prev, curr) => ({
-        amount: prev.amount + curr.price.amount,
-        currency: curr.price.currency,
-      }),
-      { amount: 0, currency: "EUR" },
-    );
-  }
 </script>
 
 <script lang="ts">
+  import type { TripOfferPriceQuoteModel } from "integration/junction-mobile-api/schemas/offer";
   import type { PassengerCountData } from "../../book/booking-manager.server";
-  import { formatAmount, formatPriceBreakdownType } from "formatting/currency";
-  import Itinerary from "./itinerary.svelte";
-  import type {
-    OfferGroupModel,
-    OfferModel,
-    OfferOptionModel,
-    OfferSegmentLegModel,
-  } from "integration/junction-mobile-api/schemas/offer";
-  import type {
-    PriceBreakdownModel,
-    PriceModel,
-  } from "integration/junction-mobile-api/schemas/price";
   import { ensureDefined } from "utils/array";
+  import { formatAmount, formatPriceBreakdownType } from "formatting/currency";
+  import ChevronIcon from "components/icons/chevron-icon.svelte";
+  import { slideFade } from "transitions/slide-fade";
+  import { getTotalPriceBreakdown } from "utils/offer";
 
+  export let priceQuote: TripOfferPriceQuoteModel | undefined = undefined;
   export let passengers: PassengerCountData;
-  export let options: OfferOptionModel[] = [];
-  export let offer: OfferModel | undefined = undefined;
 
-  $: offerGroups = offer?.groups ?? [];
-  $: origDestLegsList = offerGroups.map((item) => getOrigDestLegs(item)).filter(ensureDefined);
-  $: priceBreakdown = getPriceBreakdown(options);
-  $: totalPrice = getTotalPrice(options);
-  $: fareBrands = options.map((item) => item.brandName);
+  $: priceBreakdown = priceQuote ? getTotalPriceBreakdown(priceQuote) : undefined;
+  $: totalPrice = priceQuote?.price;
+  $: expanded = Boolean(totalPrice && priceBreakdown);
+
+  function toggle(): void {
+    expanded = !expanded;
+  }
 </script>
 
 <div class="summary">
-  <h2 class="typography title-large bold">Summary</h2>
+  <button class="summary-title" on:click={toggle}>
+    <span class="typography title-medium bold">Summary</span>
+    <ChevronIcon size="20px" direction={expanded ? "up" : "down"} />
+  </button>
 
-  {#each origDestLegsList as { originLeg, destinationLeg }}
-    <h3 class="orig-dest">
-      <strong class="typography title-medium bold">
-        {originLeg.origin.name}
-        <span class="typography title-small default">to</span>
-      </strong>
-      <strong class="typography title-medium bold">
-        {destinationLeg.destination.name}
-      </strong>
-    </h3>
-  {/each}
+  {#if totalPrice}
+    {#if expanded}
+      <div class="details" transition:slideFade={{ duration: 300 }}>
+        <p class="typography label-large">
+          Passengers <span class="typography bold">{getPassengersPresentation(passengers)}</span>
+        </p>
 
-  <div class="passengers">
-    <strong class="typography label-large">Passengers</strong>
-    <span class="typography label-large bold">{getPassengersPresentation(passengers)}</span>
-  </div>
+        <p class="typography label-large">
+          Fare Brand{priceQuote?.options.length === 1 ? "" : "s"}
 
-  <div class="fare-brand">
-    <strong class="typography label-large">Fare Brand{fareBrands.length === 1 ? "" : "s"}</strong>
-    <span class="typography label-large bold">{fareBrands.join(", ")}</span>
-    <button class="typography body-small">View fare rules</button>
-  </div>
+          <span class="typography bold">
+            {priceQuote?.options.map((item) => item.brandName).join(", ")}
+          </span>
+        </p>
 
-  <hr />
+        <button class="fare-rules typography body-small">View fare rules</button>
+      </div>
+    {/if}
 
-  <Itinerary {origDestLegsList} />
+    <div class="price">
+      {#if expanded}
+        <div transition:slideFade={{ duration: 300 }} class="price-breakdown">
+          <span class="typography body-small">This price is for all passengers</span>
 
-  <hr />
+          {#if priceBreakdown}
+            <ul>
+              {#each priceBreakdown as item}
+                <li>
+                  <span class="typography label-medium">{formatPriceBreakdownType(item.type)}</span>
+                  <span class="typography body-small bold">
+                    {formatAmount(item.price, undefined, true)}
+                  </span>
+                </li>
+              {/each}
+            </ul>
+          {/if}
+        </div>
+      {/if}
 
-  <div class="price typography body-small">
-    <span>The price is for all passengers</span>
-    <ul>
-      {#each priceBreakdown as item}
-        <li>
-          <span>{formatPriceBreakdownType(item.type)}</span>
-          <strong class="typography bold">{formatAmount(item.price, undefined, true)}</strong>
-        </li>
-      {/each}
-    </ul>
-
-    <strong class="total typography body-xlarge bold">
-      <span>Total to pay</span>
-      <em>{formatAmount(totalPrice, undefined, true)}</em>
-    </strong>
-  </div>
-
-  <div class="disclaimer typography body-xsmall">
-    Fares are not guaranteed until full payment is received and tickets are issued. See all the
-    applicable
-    <button class="typography body-xsmall">Fare Rules</button>
-    and
-    <button class="typography body-xsmall">Baggage Information</button>.
-  </div>
+      <div class="total">
+        <span class="typography body-large bold">Total to pay</span>
+        <em class="typography body-large bold">
+          {formatAmount(totalPrice, undefined, true)}
+        </em>
+      </div>
+    </div>
+  {/if}
 </div>
 
 <style>
   .summary {
     display: flex;
-    flex-flow: column;
-    gap: 24px;
-    padding: 24px;
-    overflow-y: auto;
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px 40px;
     color: var(--color-main-primary-900);
     background-color: var(--color-common-background-light-main);
     border-radius: 16px;
   }
 
-  .orig-dest,
-  .passengers,
-  .fare-brand,
-  .price,
-  .price > ul {
-    display: flex;
-    flex-flow: column;
-    gap: 8px;
-  }
-
-  .price {
-    gap: 16px;
-  }
-
-  .orig-dest,
-  .price > ul {
-    gap: 4px;
-  }
-
-  .price > ul > li,
-  .total {
+  .summary-title {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding: 0;
+    color: var(--color-main-primary-900);
+    background-color: transparent;
+    border: 0;
+    cursor: pointer;
   }
 
-  .fare-brand > button {
+  .details {
+    display: flex;
+    flex-flow: column;
+    gap: 4px;
+    padding: 0 0 16px;
+    border-bottom: var(--color-common-line-medium) 1px solid;
+  }
+
+  .fare-rules {
     align-self: flex-end;
-    padding: 0;
     color: var(--color-common-light-text-link);
     text-decoration: underline;
     background-color: transparent;
@@ -197,21 +127,37 @@
     cursor: pointer;
   }
 
-  hr {
-    margin: 0;
-    border: 0;
-    border-top: var(--color-common-line-medium) 1px solid;
+  .price {
+    margin: 0 -16px;
+    padding: 16px;
+    background-color: var(--color-main-primary-50);
+    border-radius: 16px;
+  }
+
+  .price-breakdown {
+    display: flex;
+    flex-flow: column;
+    gap: 8px;
+  }
+
+  .price-breakdown > ul {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 0 0 16px;
+  }
+
+  .price-breakdown > ul > li {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .total {
+    display: flex;
+    justify-content: space-between;
   }
 
   .total > em {
     color: var(--color-main-primary-500);
-  }
-
-  .disclaimer > button {
-    padding: 0;
-    color: var(--color-main-primary-500);
-    background-color: transparent;
-    border: 0;
-    cursor: pointer;
   }
 </style>

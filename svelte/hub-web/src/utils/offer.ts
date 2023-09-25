@@ -1,6 +1,11 @@
+import type { PriceBreakdownModel } from "integration/junction-mobile-api/schemas/price";
 import { ensureDefined } from "./array";
 import { getMaxDate, getMinDate, getTimeDeltaMs } from "./date-time";
-import type { OfferModel } from "integration/junction-mobile-api/schemas/offer";
+import type {
+  OfferModel,
+  TripOfferPriceQuoteModel,
+} from "integration/junction-mobile-api/schemas/offer";
+import { summarizePrices } from "./money";
 
 export function getLowestPrice(offer: OfferModel): number {
   return Math.min(
@@ -58,4 +63,24 @@ export function getVendors(offer: OfferModel): string[] {
   return Array.from(
     new Set(offer.groups.flatMap((group) => group.details.flatMap((details) => details.vendor))),
   ).filter(ensureDefined);
+}
+
+export function getTotalPriceBreakdown(
+  priceQuote: TripOfferPriceQuoteModel,
+): PriceBreakdownModel[] {
+  return priceQuote.options
+    .flatMap((option) => option.priceBreakdown)
+    .filter(ensureDefined)
+    .reduce<PriceBreakdownModel[]>((prev, curr) => {
+      const existing = prev.find((pb) => pb.type === curr.type);
+
+      if (existing) {
+        return prev.splice(prev.indexOf(existing), 1, {
+          ...existing,
+          price: summarizePrices(existing.price, curr.price),
+        });
+      }
+
+      return [...prev, curr];
+    }, []);
 }
