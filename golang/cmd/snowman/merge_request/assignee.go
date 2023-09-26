@@ -48,63 +48,35 @@ func (mr *mergeRequest) currentAssignees() []int {
 }
 
 func (mr *mergeRequest) expectedAssignees() ([]int, error) {
-	status := mr.status()
+	reviewers, _, err := mr.client.MergeRequests.GetMergeRequestReviewers(mr.object.ProjectID, mr.object.ID)
 
+	if err != nil {
+		return []int{}, err
+	}
+
+	return determineAssignee(mr.object.Author.ID, mr.status(), reviewers), nil
+}
+
+func determineAssignee(author int, status string, reviewers []*gitlab.MergeRequestReviewer) []int {
 	if status == statusAbandoned || status == statusAccepted {
-		return []int{}, nil
+		return []int{}
 	}
 
-	if status == statusReviewNeeded {
-		reviewers, err := mr.expectedReviewers()
+	if status == statusInProgress {
+		return []int{author}
+	}
 
-		if err != nil {
-			return []int{}, err
-		}
+	assignees := make([]int, 0)
 
-		state, err := mr.approvalState()
+	if status == statusRevisionNeeded || status == statusBlocked {
+		assignees = append(assignees, author)
+	}
 
-		if err != nil {
-			return []int{}, err
-		}
-
-		approvers := make([]int, 0)
-		owners := make([]int, 0)
-
-		for _, rule := range state.Rules {
-			for _, u := range rule.ApprovedBy {
-				approvers = append(approvers, u.ID)
-			}
-
-			if rule.RuleType == "code_owner" {
-				for _, u := range rule.EligibleApprovers {
-					owners = append(owners, u.ID)
-				}
-			}
-		}
-
-		missingApprovers := make([]int, 0)
-		missingOwners := make([]int, 0)
-
-		for _, reviewer := range reviewers {
-			if sliceutil.In(approvers, reviewer) {
-				continue
-			}
-
-			if sliceutil.In(owners, reviewer) {
-				missingOwners = append(missingOwners, reviewer)
-			} else {
-				missingApprovers = append(missingApprovers, reviewer)
-			}
-		}
-
-		if len(missingApprovers) > 0 {
-			return missingApprovers, nil
-		}
-
-		if len(missingOwners) > 0 {
-			return missingOwners, nil
+	for _, reviewer := range reviewers {
+		if reviewer.State == "unreviewed" {
+			assignees = append(assignees, reviewer.User.ID)
 		}
 	}
 
-	return []int{mr.object.Author.ID}, nil
+	return assignees
 }
