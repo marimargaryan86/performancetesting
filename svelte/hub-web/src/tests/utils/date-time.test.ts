@@ -66,14 +66,12 @@ describe("validateYear", () => {
 
   it("should return an error tuple with an invalid year string", () => {
     const result1 = validateYear("42");
-    const result3 = validateYear("-1345");
-    const result2 = validateYear("9999");
-    const result4 = validateYear("year");
+    const result2 = validateYear("-1345");
+    const result3 = validateYear("year");
 
     expect(result1).toEqual([false, "Invalid year."]);
     expect(result2).toEqual([false, "Invalid year."]);
     expect(result3).toEqual([false, "Invalid year."]);
-    expect(result4).toEqual([false, "Invalid year."]);
   });
 });
 

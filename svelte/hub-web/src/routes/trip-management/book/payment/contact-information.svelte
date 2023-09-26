@@ -1,39 +1,46 @@
 <script lang="ts" context="module">
-  export type PartialContactInformationData = {
-    phone: {
-      code?: string;
-      number?: string;
-    };
-    email?: string;
-    address: {
-      line1?: string;
-      line2?: string;
-    };
-    city?: string;
-    countryCode?: string;
-    postcode?: string;
-  };
-
   export const contactInformationData = z.object({
     phone: z.object({
-      code: z.string({ required_error: "Country code required" }),
-      number: string({ required_error: "Phone number required" }),
+      code: z.string({ required_error: "Country code is required" }),
+      number: z
+        .string({ required_error: "Phone number is required" })
+        .trim()
+        .min(1, "Phone number required"),
     }),
-    email: z.string().email({ message: "Invalid email address" }),
+    email: z
+      .string({ required_error: "Email address is required" })
+      .email({ message: "Invalid email address" }),
     address: z.object({
-      line1: z.string({ required_error: "Street address required" }),
-      line2: string().optional(),
+      line1: z
+        .string({ required_error: "Street address is required" })
+        .trim()
+        .min(1, "Street address is required"),
+      line2: z.string().trim().optional(),
     }),
-    city: z.string({ required_error: "City required" }),
-    countryCode: z.string({ required_error: "Country redquired" }),
-    postcode: z.string({ required_error: "Post code required" }),
+    city: z.string({ required_error: "City is required" }).trim().min(1, "City is required"),
+    countryCode: z
+      .string({ required_error: "Country is required" })
+      .regex(/^[A-z]{2}$/, "Invalid country code"),
+    postcode: z
+      .string({ required_error: "Post code is required" })
+      .trim()
+      .min(1, "Post code is required"),
   });
+
+  const partialContactInformationData = contactInformationData
+    .omit({ phone: true, address: true })
+    .deepPartial()
+    .extend({
+      phone: contactInformationData.shape.phone.partial(),
+      address: contactInformationData.shape.address.partial(),
+    });
+  export type PartialContactInformationData = z.infer<typeof partialContactInformationData>;
 
   export type ContactInformationData = z.infer<typeof contactInformationData>;
 </script>
 
 <script lang="ts">
-  import { string, z } from "zod";
+  import { z } from "zod";
   import SelectField from "components/ui/select-field.svelte";
   import TextField from "components/ui/text-field.svelte";
   import { formatCountryOption, formatCountryPhoneOption } from "formatting/location";

@@ -133,8 +133,8 @@ export function validateMonth(month: string): [isValid: boolean, error: string |
 
 /**
  * Matches a year string and validates that it is a four-digit number
- * (including zero-padding) that is at most the current year. Returns a tuple
- * with a boolean and error string, if any.
+ * (including zero-padding). Returns a tuple with a boolean and error string,
+ * if any.
  *
  */
 export function validateYear(year: string): [isValid: boolean, error: string | null] {
@@ -142,12 +142,7 @@ export function validateYear(year: string): [isValid: boolean, error: string | n
   let result: [boolean, string | null] = [false, "Invalid year."];
 
   if (regex.test(year)) {
-    const parsedYear = parseInt(year, 10);
-    const currentYear: number = new Date().getFullYear();
-
-    if (parsedYear <= currentYear) {
-      result = [true, null];
-    }
+    result = [true, null];
   }
 
   return result;
