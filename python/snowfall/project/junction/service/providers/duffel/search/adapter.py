@@ -2,6 +2,7 @@ import dataclasses
 import datetime
 from collections import defaultdict
 from collections.abc import AsyncIterator, Callable, Mapping, Sequence
+from itertools import starmap
 from typing import Any
 
 from snowfall.project.junction.go.service.offers.v1 import (
@@ -48,10 +49,7 @@ def _generate_private_fares_keys(  # noqa: WPS210
             b"\x00".decode().join(
                 [
                     b"\x00".decode().join(
-                        [
-                            "{0}-{1}".format(key, fare_value)
-                            for key, fare_value in fare.dict().items()
-                        ],
+                        list(starmap("{0}-{1}".format, fare.dict().items())),
                     )
                     for fare in sorted(fares, key=_fares_sort_key)
                 ],

@@ -31,7 +31,7 @@ async def test_trip_windows_planner_many_origins(
         len(origins) == len(destinations) == len(departures_after)
     ), "O&D&Departures list should be equal in size!"
 
-    for idx, _ in enumerate(origins):
+    for idx in range(len(origins)):
         trip_ids = await get_trip_ids_with_minimum_segments(
             junction_client,
             departures_after[idx],

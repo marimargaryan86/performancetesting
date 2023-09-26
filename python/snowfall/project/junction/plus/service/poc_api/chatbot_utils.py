@@ -2,6 +2,7 @@ import asyncio
 import datetime
 from collections.abc import Mapping, Sequence
 from io import BytesIO
+from itertools import starmap
 from typing import Any
 
 import httpx
@@ -183,10 +184,10 @@ async def get_flight_status(
         return ""
     if status.get("flightStatuses"):
         return "\nAirport Resources\n" + "\n".join(  # noqa: WPS336
-            "{0}: {1}".format(_key, resource)
-            for _key, resource in status["flightStatuses"][0][
-                "airportResources"
-            ].items()
+            starmap(
+                "{0}: {1}".format,
+                status["flightStatuses"][0]["airportResources"].items(),
+            ),
         )
     return ""
 

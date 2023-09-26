@@ -138,8 +138,8 @@ class TestStandardLogger(object):
         ("level", "below"),
         [
             (logging.INFO, logging.DEBUG),
-            (logging.WARN, logging.INFO),
-            (logging.ERROR, logging.WARN),
+            (logging.WARNING, logging.INFO),
+            (logging.ERROR, logging.WARNING),
             (logging.CRITICAL, logging.ERROR),
         ],
     )

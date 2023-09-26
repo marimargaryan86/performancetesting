@@ -2,6 +2,7 @@ import datetime
 import json
 import logging
 from collections.abc import Callable, Iterator, Mapping, Sequence
+from itertools import starmap
 from pathlib import Path
 from typing import Any
 
@@ -190,10 +191,7 @@ def add_allure_environment_property(  # noqa: WPS210
 
     allure_env_file = allure_dir_path / ALLURE_ENVIRONMENT_PROPERTIES_FILE
     file_data = "\n".join(
-        [
-            "{0}={1}".format(env_variable, env_value)
-            for env_variable, env_value in environment_properties.items()
-        ],
+        list(starmap("{0}={1}".format, environment_properties.items())),
     )
     allure_env_file.write_text(file_data)
 

@@ -255,5 +255,5 @@ def test_create_from_pydantic_model() -> None:
 
     assert len(expected) == len(actual)
 
-    for idx, _ in enumerate(expected):
+    for idx in range(len(expected)):
         assert expected[idx] == actual[idx]
