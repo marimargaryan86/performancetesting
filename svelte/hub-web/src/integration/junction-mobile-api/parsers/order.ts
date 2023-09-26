@@ -2,6 +2,16 @@ import { orderModel, type OrderModel, type OrderSchema } from "../schemas/order"
 import type { JourneyModel } from "../schemas/journey";
 import type { BookingModel } from "../schemas/booking";
 
+function getOrderStatus(bookings: BookingModel[]): OrderModel["status"] {
+  const statuses = Array.from(new Set(bookings.flatMap((booking) => booking.status)));
+
+  if (statuses.length === 1 && statuses[0]) {
+    return statuses[0];
+  }
+
+  return "unknown";
+}
+
 export function parseOrderSchema(
   data: OrderSchema,
   included: {
@@ -10,10 +20,12 @@ export function parseOrderSchema(
   } = {},
 ): OrderModel {
   const parsed = orderModel.toModel(data);
+  const bookings = included.bookings?.filter((item) => parsed.bookingIds.includes(item.id)) ?? [];
 
   return {
     ...parsed,
-    bookings: included.bookings?.filter((item) => parsed.bookingIds.includes(item.id)) ?? [],
+    status: getOrderStatus(bookings),
+    bookings,
     journey: included.journeys?.find((item) => item.id === data.relationships.journey.data.id),
   };
 }

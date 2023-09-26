@@ -2,12 +2,13 @@
   import CheckedIcon from "components/icons/checked-icon.svelte";
   import type { OrderModel } from "integration/junction-mobile-api/schemas/order";
   import Ticket from "../../components/ticket.svelte";
+  import StatusBadge from "components/ui/status-badge.svelte";
 
   export let order: OrderModel;
 </script>
 
 <div class="overview">
-  <h2 class="typography headline-small bold">Your order has been confirmed</h2>
+  <h2 class="typography headline-small bold">Your order has been created</h2>
   <Ticket identifier={order.journey?.reference} />
 
   <div class="item">
@@ -16,7 +17,7 @@
     </span>
     <div>
       <span class="typography body-xsmall">Status</span>
-      <strong class="typography body-medium bold">Confirmed</strong>
+      <StatusBadge value={order.status} />
     </div>
   </div>
 </div>

@@ -1,8 +1,12 @@
+<script lang="ts" context="module">
+  export type AlertType = "success" | "error" | "warning";
+</script>
+
 <script lang="ts">
   import CloseIcon from "components/icons/close-icon.svelte";
   import { slideFade } from "transitions/slide-fade";
 
-  export let type: "success" | "error" | "warning" = "success";
+  export let type: AlertType = "success";
   export let show = true;
   let className: string | undefined = undefined;
   export { className as class };

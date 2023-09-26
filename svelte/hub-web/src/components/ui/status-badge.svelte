@@ -9,7 +9,8 @@
     | ConversionStatus
     | TransactionStatus
     | "completed"
-    | "deleted";
+    | "deleted"
+    | "unknown";
 
   const statusMapping: Record<StatusBadgeValue, StatusBadgeVariant> = {
     confirmed: "ok",
@@ -24,6 +25,7 @@
     "not-ticketed": "warn",
     cancelled: "warn",
     unspecified: "warn",
+    unknown: "warn",
   };
 </script>
 
@@ -41,7 +43,7 @@
   class:warn={variant === "warn"}
   class:error={variant === "error"}
 >
-  {capitalize(value)}
+  {capitalize(value).replaceAll("-", " ")}
 </span>
 
 <style>

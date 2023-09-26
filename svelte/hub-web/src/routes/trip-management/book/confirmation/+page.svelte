@@ -1,7 +1,19 @@
+<script lang="ts" context="module">
+  function getAlertType(status: OrderModel["status"]): AlertType {
+    if (status === "confirmed") {
+      return "success";
+    } else if (status === "error" || status === "cancelled" || status === "rejected") {
+      return "error";
+    }
+
+    return "warning";
+  }
+</script>
+
 <script lang="ts">
   import Button from "components/ui/button.svelte";
   import routeConfig from "routeConfig";
-  import Alert from "components/ui/alert.svelte";
+  import Alert, { type AlertType } from "components/ui/alert.svelte";
   import CheckedIcon from "components/icons/checked-icon.svelte";
   import Passengers from "../../components/passengers.svelte";
   import Price from "./price.svelte";
@@ -9,12 +21,16 @@
   import Itinerary from "../../components/itinerary.svelte";
   import { ensureDefined } from "utils/array";
   import { downloadTickets } from "utils/booking";
+  import CloseIcon from "components/icons/close-icon.svelte";
+  import AlertIcon from "components/icons/alert-icon.svelte";
+  import type { OrderModel } from "integration/junction-mobile-api/schemas/order";
 
   export let data;
 
   $: hasTickets = Boolean(
     data.order.bookings.map((item) => item.ticketUrl).filter(ensureDefined).length,
   );
+  $: alertType = getAlertType(data.order.status);
 </script>
 
 <svelte:head>
@@ -26,12 +42,24 @@
 </div>
 
 <div class="content">
-  <Alert type="success">
-    <span class="checked-icon">
-      <CheckedIcon color="var(--color-common-dark-strong)" />
-    </span>
-    <span class="typography body-medium bold">Success!</span>
-    <span class="typography body-medium">We will send an email with a copy of your ticket.</span>
+  <Alert type={alertType}>
+    {#if alertType === "success"}
+      <span class="icon success">
+        <CheckedIcon color="var(--color-common-dark-strong)" />
+      </span>
+      <span class="typography body-medium bold">Success</span>
+      <span class="typography body-medium">The order was created successfully</span>
+    {:else if alertType === "error"}
+      <span class="icon error">
+        <CloseIcon color="var(--color-common-dark-strong)" variant="cross" />
+      </span>
+      <span class="typography body-medium bold">Error</span>
+      <span class="typography body-medium">The order was created with errors</span>
+    {:else}
+      <AlertIcon color="var(--color-semantic-warning-600)" />
+      <span class="typography body-medium bold">Warning</span>
+      <span class="typography body-medium">The order is in a pending state</span>
+    {/if}
   </Alert>
 
   <div class="scroll">
@@ -78,15 +106,22 @@
     margin: 0 24px 24px;
   }
 
-  .checked-icon {
+  .icon {
     display: flex;
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
     width: 20px;
     height: 20px;
-    background-color: var(--color-semantic-success-600);
     border-radius: 50%;
+  }
+
+  .icon.success {
+    background-color: var(--color-semantic-success-600);
+  }
+
+  .icon.error {
+    background-color: var(--color-semantic-error-600);
   }
 
   .scroll {

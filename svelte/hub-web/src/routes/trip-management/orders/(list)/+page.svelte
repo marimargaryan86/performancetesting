@@ -64,6 +64,7 @@
   import TCol from "components/ui/table/t-col.svelte";
   import THead from "components/ui/table/t-head.svelte";
   import TRow from "components/ui/table/t-row.svelte";
+  import TStatusBadgeCol from "components/ui/table/t-status-badge-col.svelte";
   import Table from "components/ui/table/table.svelte";
   import { formatAmount } from "formatting/currency";
   import type { OrderModel } from "integration/junction-mobile-api/schemas/order";
@@ -105,6 +106,7 @@
       <Header>Departure Date</Header>
       <Header>Passengers</Header>
       <Header>Total Price</Header>
+      <Header>Status</Header>
       <Header />
     </THead>
 
@@ -147,6 +149,7 @@
               {totalPrice.currency}
             </em>
           </TCol>
+          <TStatusBadgeCol value={order.status} />
           <TActionsCol>
             <button class="action">
               <span>...</span>
