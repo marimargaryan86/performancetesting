@@ -15,8 +15,8 @@
   export { className as class };
   export let value: TValue | undefined = undefined;
   export let options: Readonly<(TValue | undefined)[]>;
-  // prettier-ignore
-  export let formatter: (nextValue?: TValue, selected?: boolean) => string = (nextValue) => String(nextValue ?? "");
+  export let formatter: (nextValue?: TValue, selected?: boolean) => string = (nextValue) =>
+    String(nextValue ?? "");
   export let label: string | undefined = undefined;
   export let placeholder: string | undefined = undefined;
   export let required = false;
@@ -42,6 +42,7 @@
   }
 
   function select(option?: TValue): void {
+    error = false;
     value = option;
     dispatch("select", value);
     close();

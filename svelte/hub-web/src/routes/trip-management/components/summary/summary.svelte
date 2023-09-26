@@ -20,6 +20,7 @@
   import { slideFade } from "transitions/slide-fade";
   import { getTotalPriceBreakdown } from "utils/offer";
   import Collapsible from "../collapsible.svelte";
+  import LoadingIcon from "components/icons/loading-icon.svelte";
 
   export let priceQuote: TripOfferPriceQuoteModel | undefined = undefined;
   export let passengers: PassengerCountData;
@@ -71,14 +72,16 @@
       </div>
     {/if}
 
-    {#if totalPrice}
-      <div class="total">
-        <span class="typography body-large bold">Total paid</span>
-        <em class="typography body-large bold">
+    <div class="total">
+      <span class="typography body-large bold">Total paid</span>
+      <em class="typography body-large bold">
+        {#if totalPrice}
           {formatAmount(totalPrice, undefined, true)}
-        </em>
-      </div>
-    {/if}
+        {:else}
+          <LoadingIcon size="16px" />
+        {/if}
+      </em>
+    </div>
   </div>
 </Collapsible>
 

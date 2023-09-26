@@ -38,12 +38,14 @@
   import TextField from "components/ui/text-field.svelte";
   import { formatCountryOption, formatCountryPhoneOption } from "formatting/location";
   import type { CountryModel } from "models/location";
+  import Collapsible from "../../components/collapsible.svelte";
 
   let countryMap: Map<string, CountryModel>;
   export { countryMap as countries };
   export let contactInformation: PartialContactInformationData;
   export let errors: z.ZodFormattedError<ContactInformationData> | undefined = undefined;
 
+  let collapsible: Collapsible | undefined;
   let countries = Array.from(countryMap.values());
   let country: CountryModel | undefined = countryMap.get(contactInformation.countryCode ?? "");
   let phoneCountry: CountryModel | undefined = countryMap.get(contactInformation.phone.code ?? "");
@@ -56,11 +58,12 @@
       code: phoneCountry?.phoneCode ? `+${phoneCountry.phoneCode}` : undefined,
     },
   };
+  $: if (errors) {
+    collapsible?.open();
+  }
 </script>
 
-<div class="contact-information">
-  <h2 class="typography title-medium bold">Contact information</h2>
-
+<Collapsible bind:this={collapsible} title="Contact information" expandedOnMount>
   <div class="details">
     <div class="phone">
       <SelectField
@@ -132,19 +135,9 @@
       />
     </div>
   </div>
-</div>
+</Collapsible>
 
 <style>
-  .contact-information {
-    display: flex;
-    flex-flow: column;
-    gap: 24px;
-    padding: 24px 40px;
-    color: var(--color-text-light-strong);
-    background-color: var(--color-common-background-light-main);
-    border-radius: 16px;
-  }
-
   .details {
     display: flex;
     flex-flow: column;

@@ -33,6 +33,8 @@
   const dispatch = createEventDispatcher<{ input: HTMLInputElement; clear: void }>();
 
   function onInput(event: InputEvent): void {
+    error = false;
+
     if (type === "number") {
       value = Number(event.currentTarget.value) as TValue;
     } else if (type === "date") {
@@ -57,7 +59,6 @@
 
   $: displayValue = value instanceof Date ? value.toLocaleDateString("sv-SE") : value ?? "";
   $: displayError = error instanceof Array ? error.join(", ") : error;
-  $: value, (error = false);
 </script>
 
 <div class:text-field={true} class={className} class:error>

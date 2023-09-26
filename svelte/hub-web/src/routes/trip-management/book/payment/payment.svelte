@@ -39,7 +39,13 @@
   import routeConfig from "routeConfig";
   import { browser } from "$app/environment";
   import { callAction } from "utils/common";
-  import { loadStripe, type Stripe, type Appearance, type StripeElements } from "@stripe/stripe-js";
+  import {
+    loadStripe,
+    type Stripe,
+    type Appearance,
+    type StripeElements,
+    type StripePaymentElement,
+  } from "@stripe/stripe-js";
   import { env } from "$env/dynamic/public";
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import type { SearchDataModel } from "../booking-manager.server";
@@ -53,6 +59,7 @@
   let stripeElements: StripeElements | undefined = undefined;
   let stripeContainer: HTMLDivElement | undefined = undefined;
   let error: string | undefined = undefined;
+  let paymentElement: StripePaymentElement | undefined = undefined;
 
   $: if (error) {
     dialog?.open();
@@ -63,16 +70,14 @@
   $: if (browser && clientSecret) {
     createStripe(clientSecret);
   }
+  $: if (browser && paymentElement && stripeContainer) {
+    paymentElement.mount(stripeContainer);
+  }
 
   async function createStripe(nextClientSecret: string): Promise<void> {
     stripe = (await loadStripe(env.PUBLIC_STRIPE_KEY ?? "", { locale: "en-GB" })) ?? undefined;
-
     stripeElements = stripe?.elements({ appearance, clientSecret: nextClientSecret });
-    const paymentElement = stripeElements?.create("payment");
-
-    if (stripeContainer) {
-      paymentElement?.mount(stripeContainer);
-    }
+    paymentElement = stripeElements?.create("payment");
   }
 
   export async function pay(): Promise<boolean> {
@@ -127,7 +132,7 @@
 </Dialog>
 
 <div class="payment">
-  <h3 class="typography title-medium bold">Payment method</h3>
+  <span class="typography title-medium bold">Payment method</span>
 
   <div bind:this={stripeContainer} class="stripe-container" class:pending={!paymentIntent}>
     {#if !paymentIntent}
@@ -149,7 +154,7 @@
   .payment {
     display: flex;
     flex-flow: column;
-    gap: 24px;
+    gap: 16px;
     padding: 24px 40px;
     color: var(--color-text-light-strong);
     background-color: var(--color-common-background-light-main);

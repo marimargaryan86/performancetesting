@@ -102,19 +102,24 @@
     OrderPassengerModel,
     PassportDocumentModel,
   } from "integration/junction-mobile-api/schemas/order";
+  import Collapsible from "../../components/collapsible.svelte";
 
   export let passengerNumber: number;
   export let passenger: PartialPassengerData;
   export let errors: z.ZodFormattedError<PassengerData> | undefined = undefined;
   export let required: TripOfferPriceQuoteModel["required"];
 
+  let collapsible: Collapsible | undefined;
   let document = passenger.document ?? {};
 
   $: passenger = { ...passenger, document };
+  $: if (errors) {
+    collapsible?.open();
+  }
 </script>
 
-<div class="passenger">
-  <h2>
+<Collapsible expandedOnMount bind:this={collapsible}>
+  <h2 slot="title">
     <strong class="typography title-medium bold">Passenger {passengerNumber}</strong>
     <span class="typography title-small">{capitalize(passenger.type)}</span>
   </h2>
@@ -236,19 +241,9 @@
       {/if}
     {/if}
   </div>
-</div>
+</Collapsible>
 
 <style>
-  .passenger {
-    display: flex;
-    flex-flow: column;
-    gap: 24px;
-    padding: 24px 40px;
-    color: var(--color-text-light-strong);
-    background-color: var(--color-common-background-light-main);
-    border-radius: 16px;
-  }
-
   h2 {
     display: flex;
     gap: 16px;
