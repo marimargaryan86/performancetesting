@@ -22,7 +22,7 @@
     </li>
 
     <li class="typography body-xlarge bold">
-      <span>Total to pay</span>
+      <span>Total paid</span>
       <strong>
         {formatAmount(totalPrice, undefined, true)}
       </strong>

@@ -73,7 +73,7 @@
 
     {#if totalPrice}
       <div class="total">
-        <span class="typography body-large bold">Total to pay</span>
+        <span class="typography body-large bold">Total paid</span>
         <em class="typography body-large bold">
           {formatAmount(totalPrice, undefined, true)}
         </em>
