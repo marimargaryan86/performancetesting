@@ -6,6 +6,8 @@ preview = true
 [tool.coverage.report]
 omit = ["*_pb2.py", "*_pb2_grpc.py"]
 include_namespace_packages = true
+skip_empty = true
+exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:"]
 
 [tool.coverage.run]
 branch = true

@@ -61,7 +61,6 @@ known_versions = [
 all-changed = "--changed-since=main --changed-dependents=transitive"
 
 [coverage-py]
-global_report = true
 requirements = ["coverage"]
 install_from_resolve = "python-default"
 interpreter_constraints = ["CPython==3.11.*"]
