@@ -108,6 +108,44 @@ class Set(Generic[AnyStr]):
                 return
 
 
+class SortedSet(Generic[AnyStr]):
+    def __init__(self, redis: Redis[AnyStr], name: str):
+        self._name = name
+        self._redis: Redis[AnyStr] = redis
+
+    def __str__(self) -> str:
+        return self._name
+
+    async def add(self, set_value: bytes | str, score: float) -> None:
+        await self._redis.zadd(
+            self._name,
+            {
+                set_value: score,
+            },
+        )
+
+    async def has(self, set_value: bytes | float | str) -> bool:
+        return await self._redis.zscore(self._name, set_value) is not None
+
+    async def remove(self, set_value: bytes | float | str) -> None:
+        await self._redis.zrem(self._name, set_value)
+
+    async def remove_between_scores(self, min_: float, max_: float) -> None:
+        await self._redis.zremrangebyscore(self._name, min_, max_)
+
+    async def to_iterable(self) -> AsyncIterable[tuple[AnyStr, float]]:
+        cursor = 0
+
+        while True:
+            cursor, keys = await self._redis.zscan(name=self._name, cursor=cursor)
+
+            for key, score in keys:
+                yield key, score
+
+            if cursor == 0:
+                return
+
+
 class Client(Generic[AnyStr]):  # noqa: WPS214
     def __init__(self, redis: Redis[AnyStr], prefix: str | None = None):
         self._prefix = "{0}:".format(prefix) if prefix else ""
@@ -143,6 +181,9 @@ class Client(Generic[AnyStr]):  # noqa: WPS214
 
     def set_(self, name: str) -> Set[AnyStr]:
         return Set(self._redis, self._prefix + name)
+
+    def sorted_set(self, name: str) -> SortedSet[AnyStr]:
+        return SortedSet(self._redis, self._prefix + name)
 
     def lock(  # noqa: WPS211
         self,

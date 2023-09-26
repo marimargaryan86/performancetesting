@@ -169,6 +169,66 @@ class TestSet(object):
         await asserts.assert_iterable(set_.to_iterable(), [b"foo", b"bar"])
 
 
+class TestSortedSet(object):
+    @pytest.mark.parametrize(*_PREFIX_PARAMETERS)
+    async def test_add_has_remove(
+        self,
+        prefix: str | None,
+        redis_client: aioredis.Redis[bytes],
+    ) -> None:
+        sorted_set = redis.Client(redis_client, prefix=prefix).sorted_set("foobar")
+
+        await sorted_set.add("foo", 1)
+        assert await sorted_set.has("foo")
+        await sorted_set.remove("foo")
+        assert not await sorted_set.has("foo")
+
+    @pytest.mark.parametrize(*_PREFIX_PARAMETERS)
+    async def test_remove_between_scores(
+        self,
+        prefix: str | None,
+        redis_client: aioredis.Redis[bytes],
+    ) -> None:
+        sorted_set = redis.Client(redis_client, prefix=prefix).sorted_set("foobar")
+
+        await sorted_set.add("foo", 1)
+        await sorted_set.add("bar", 2)
+        await sorted_set.add("baz", 3)
+        await sorted_set.remove_between_scores(1, 2)
+        await asserts.assert_iterable(
+            sorted_set.to_iterable(),
+            [(b"baz", 3)],
+        )
+
+    @pytest.mark.parametrize(*_PREFIX_PARAMETERS)
+    async def test_expiration(
+        self,
+        prefix: str | None,
+        redis_client: aioredis.Redis[bytes],
+    ) -> None:
+        client = redis.Client(redis_client, prefix=prefix)
+        sorted_set = client.sorted_set("foobar")
+
+        await sorted_set.add("foo", 1)
+
+        await _test_expiration(client, sorted_set)
+
+    @pytest.mark.parametrize(*_PREFIX_PARAMETERS)
+    async def test_to_iterable(
+        self,
+        prefix: str | None,
+        redis_client: aioredis.Redis[bytes],
+    ) -> None:
+        sorted_set = redis.Client(redis_client, prefix=prefix).sorted_set("foobar")
+
+        await sorted_set.add("foo", 1)
+        await sorted_set.add("bar", 2)
+        await asserts.assert_iterable(
+            sorted_set.to_iterable(),
+            [(b"foo", 1), (b"bar", 2)],
+        )
+
+
 class TestClient(object):
     @pytest.mark.parametrize(*_PREFIX_PARAMETERS)
     async def test_delete_get_put(
