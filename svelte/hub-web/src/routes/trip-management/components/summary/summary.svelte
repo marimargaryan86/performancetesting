@@ -17,99 +17,72 @@
   import type { PassengerCountData } from "../../book/booking-manager.server";
   import { ensureDefined } from "utils/array";
   import { formatAmount, formatPriceBreakdownType } from "formatting/currency";
-  import ChevronIcon from "components/icons/chevron-icon.svelte";
   import { slideFade } from "transitions/slide-fade";
   import { getTotalPriceBreakdown } from "utils/offer";
+  import Collapsible from "../collapsible.svelte";
 
   export let priceQuote: TripOfferPriceQuoteModel | undefined = undefined;
   export let passengers: PassengerCountData;
 
+  let collapsible: Collapsible | undefined;
+
   $: priceBreakdown = priceQuote ? getTotalPriceBreakdown(priceQuote) : undefined;
   $: totalPrice = priceQuote?.price;
-  $: expanded = Boolean(totalPrice && priceBreakdown);
-
-  function toggle(): void {
-    expanded = !expanded;
+  $: priceSet = Boolean(totalPrice && priceBreakdown);
+  $: if (priceSet) {
+    collapsible?.open();
   }
 </script>
 
-<div class="summary">
-  <button class="summary-title" on:click={toggle}>
-    <span class="typography title-medium bold">Summary</span>
-    <ChevronIcon size="20px" direction={expanded ? "up" : "down"} />
-  </button>
+<Collapsible bind:this={collapsible} expandedOnMount={priceSet} title="Summary">
+  <div class="details">
+    <p class="typography label-large">
+      Passengers <span class="typography bold">{getPassengersPresentation(passengers)}</span>
+    </p>
 
-  {#if totalPrice}
+    <p class="typography label-large">
+      Fare Brand{priceQuote?.options.length === 1 ? "" : "s"}
+
+      <span class="typography bold">
+        {priceQuote?.options.map((item) => item.brandName).join(", ")}
+      </span>
+    </p>
+
+    <button class="fare-rules typography body-small">View fare rules</button>
+  </div>
+
+  <div class="price" slot="content-after" let:expanded let:transitionTimeMs>
     {#if expanded}
-      <div class="details" transition:slideFade={{ duration: 300 }}>
-        <p class="typography label-large">
-          Passengers <span class="typography bold">{getPassengersPresentation(passengers)}</span>
-        </p>
+      <div transition:slideFade={{ duration: transitionTimeMs }} class="price-breakdown">
+        <span class="typography body-small">This price is for all passengers</span>
 
-        <p class="typography label-large">
-          Fare Brand{priceQuote?.options.length === 1 ? "" : "s"}
-
-          <span class="typography bold">
-            {priceQuote?.options.map((item) => item.brandName).join(", ")}
-          </span>
-        </p>
-
-        <button class="fare-rules typography body-small">View fare rules</button>
+        {#if priceBreakdown}
+          <ul>
+            {#each priceBreakdown as item}
+              <li>
+                <span class="typography label-medium">{formatPriceBreakdownType(item.type)}</span>
+                <span class="typography body-small bold">
+                  {formatAmount(item.price, undefined, true)}
+                </span>
+              </li>
+            {/each}
+          </ul>
+        {/if}
       </div>
     {/if}
 
-    <div class="price">
-      {#if expanded}
-        <div transition:slideFade={{ duration: 300 }} class="price-breakdown">
-          <span class="typography body-small">This price is for all passengers</span>
-
-          {#if priceBreakdown}
-            <ul>
-              {#each priceBreakdown as item}
-                <li>
-                  <span class="typography label-medium">{formatPriceBreakdownType(item.type)}</span>
-                  <span class="typography body-small bold">
-                    {formatAmount(item.price, undefined, true)}
-                  </span>
-                </li>
-              {/each}
-            </ul>
-          {/if}
-        </div>
-      {/if}
-
+    {#if totalPrice}
       <div class="total">
         <span class="typography body-large bold">Total to pay</span>
         <em class="typography body-large bold">
           {formatAmount(totalPrice, undefined, true)}
         </em>
       </div>
-    </div>
-  {/if}
-</div>
+    {/if}
+  </div>
+</Collapsible>
 
 <style>
-  .summary {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    padding: 24px 40px;
-    color: var(--color-main-primary-900);
-    background-color: var(--color-common-background-light-main);
-    border-radius: 16px;
-  }
-
-  .summary-title {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0;
-    color: var(--color-main-primary-900);
-    background-color: transparent;
-    border: 0;
-    cursor: pointer;
-  }
-
   .details {
     display: flex;
     flex-flow: column;
