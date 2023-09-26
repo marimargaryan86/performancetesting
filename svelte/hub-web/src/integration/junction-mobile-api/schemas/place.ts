@@ -10,6 +10,25 @@ export const coordinatesModel = getSchemaModel(
   },
 );
 
+export const coordinatesSearchableModel = getSchemaModel(
+  coordinatesModel.schema.extend({
+    precision: z.enum(["area", "precise"]).optional(),
+  }),
+  coordinatesModel.model.extend({
+    precision: z.enum(["area", "precise"]).optional(),
+  }),
+  {
+    toModel: (data) => ({
+      ...coordinatesModel.toModel(data),
+      precision: data.precision,
+    }),
+    toSchema: (data) => ({
+      ...coordinatesModel.toSchema(data),
+      precision: data.precision,
+    }),
+  },
+);
+
 export const placeModel = getSchemaModel(
   z.object({
     id: z.string().uuid(),

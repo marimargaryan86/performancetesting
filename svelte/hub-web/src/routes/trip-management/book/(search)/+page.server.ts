@@ -5,6 +5,10 @@ import { tripSearchData } from "../../components/trip-search/trip-search.svelte"
 import { ActionFailure, fail } from "@sveltejs/kit";
 import bookingManager from "../booking-manager.server";
 
+function requiresPrecision(place: PlaceModel): boolean {
+  return !(place.types.includes("city") || place.types.includes("unspecified"));
+}
+
 export const actions = {
   async search(event): Promise<void | ActionFailure> {
     try {
@@ -18,8 +22,16 @@ export const actions = {
         {
           ...searchData,
           outbound: searchData.outbound,
-          origin: { id: origin.id, ...origin.coordinates },
-          destination: { id: destination.id, ...destination.coordinates },
+          origin: {
+            ...origin.coordinates,
+            id: origin.id,
+            precise: requiresPrecision(origin),
+          },
+          destination: {
+            ...destination.coordinates,
+            id: destination.id,
+            precise: requiresPrecision(destination),
+          },
           passengers: searchData.passengers,
         },
         event,

@@ -1,7 +1,8 @@
-import { coordinatesModel } from "./place";
+import { coordinatesSearchableModel } from "./place";
 import { resourceStatus } from "./common";
 import { getSchemaModel, links, relationship, type Infer } from "../../common/schema-model.server";
 import { z } from "zod";
+import { legTypeModel } from "./offer";
 
 export const tripCandidatesSearchModel = getSchemaModel(
   z.object({
@@ -12,8 +13,8 @@ export const tripCandidatesSearchModel = getSchemaModel(
       status: resourceStatus,
       criteria: z.array(
         z.object({
-          origin: coordinatesModel.schema,
-          destination: coordinatesModel.schema,
+          origin: coordinatesSearchableModel.schema,
+          destination: coordinatesSearchableModel.schema,
           departureAfter: z.date({ coerce: true }),
           maximumConnections: z.number().optional(),
         }),
@@ -21,14 +22,7 @@ export const tripCandidatesSearchModel = getSchemaModel(
       passengers: z.array(z.object({ dateOfBirth: z.date({ coerce: true }) })),
     }),
     relationships: relationship({
-      allowedSegmentTypes: z
-        .array(
-          z.object({
-            id: z.string(),
-            type: z.enum(["leg-types"]),
-          }),
-        )
-        .optional(),
+      allowedSegmentTypes: z.array(legTypeModel.identifier).optional(),
     }).optional(),
     links: links(["self"]),
   }),
@@ -38,8 +32,8 @@ export const tripCandidatesSearchModel = getSchemaModel(
     status: resourceStatus,
     criteria: z.array(
       z.object({
-        origin: coordinatesModel.model,
-        destination: coordinatesModel.model,
+        origin: coordinatesSearchableModel.model,
+        destination: coordinatesSearchableModel.model,
         departureAfter: z.date({ coerce: true }),
       }),
     ),
@@ -52,8 +46,8 @@ export const tripCandidatesSearchModel = getSchemaModel(
       status: data.attributes.status,
       expiresAt: data.attributes.expiresAt,
       criteria: data.attributes.criteria.map((item) => ({
-        origin: coordinatesModel.toModel(item.origin),
-        destination: coordinatesModel.toModel(item.destination),
+        origin: coordinatesSearchableModel.toModel(item.origin),
+        destination: coordinatesSearchableModel.toModel(item.destination),
         departureAfter: item.departureAfter,
       })),
       passengers: data.attributes.passengers.map((item) => ({
@@ -67,25 +61,30 @@ export type TripCandidatesSearchModel = Infer<typeof tripCandidatesSearchModel>;
 export type TripCandidatesSearchSchema = Infer<typeof tripCandidatesSearchModel, "schema">;
 
 export const createTripCandidatesSearchModel = getSchemaModel(
-  tripCandidatesSearchModel.schema.omit({ links: true, id: true }).extend({
-    attributes: tripCandidatesSearchModel.schema.shape.attributes
-      .omit({ expiresAt: true, status: true })
-      .extend({
-        sessionToken: z.string(),
-        criteria: z.array(
-          tripCandidatesSearchModel.schema.shape.attributes.shape.criteria.element.extend({
-            departureAfter: z.string(),
-          }),
-        ),
-        passengers: z.array(z.object({ dateOfBirth: z.string() })),
-      }),
+  z.object({
+    type: tripCandidatesSearchModel.identifier.shape.type,
+    attributes: z.object({
+      sessionToken: z.string(),
+      criteria: z.array(
+        z.object({
+          origin: coordinatesSearchableModel.schema,
+          destination: coordinatesSearchableModel.schema,
+          departureAfter: z.string().datetime(),
+          maximumConnections: z.number().optional(),
+        }),
+      ),
+      passengers: z.array(z.object({ dateOfBirth: z.string() })),
+    }),
+    relationships: relationship({
+      allowedSegmentTypes: z.array(legTypeModel.identifier).optional(),
+    }).optional(),
   }),
   z.object({
     sessionToken: z.string(),
     criteria: z.array(
       z.object({
-        origin: coordinatesModel.model,
-        destination: coordinatesModel.model,
+        origin: coordinatesSearchableModel.model,
+        destination: coordinatesSearchableModel.model,
         departureAfter: z.date({ coerce: true }),
       }),
     ),
@@ -99,8 +98,8 @@ export const createTripCandidatesSearchModel = getSchemaModel(
         sessionToken: data.sessionToken,
         criteria: data.criteria.map((item) => ({
           departureAfter: item.departureAfter.toISOString(),
-          destination: coordinatesModel.toSchema(item.destination),
-          origin: coordinatesModel.toSchema(item.origin),
+          destination: coordinatesSearchableModel.toSchema(item.destination),
+          origin: coordinatesSearchableModel.toSchema(item.origin),
         })),
         passengers: data.passengers.map((item) => ({
           dateOfBirth: item.dateOfBirth.toLocaleDateString("sv-SE"),

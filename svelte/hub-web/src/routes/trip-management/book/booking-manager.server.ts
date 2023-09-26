@@ -27,11 +27,13 @@ const searchDataModel = z.object({
     id: z.string().uuid(),
     lat: z.number(),
     lon: z.number(),
+    precise: z.boolean(),
   }),
   destination: z.object({
     id: z.string().uuid(),
     lat: z.number(),
     lon: z.number(),
+    precise: z.boolean(),
   }),
   outbound: z.date({ coerce: true }),
   passengers: z.object({
@@ -127,8 +129,11 @@ async function getTripCandidates(data: SearchDataModel): Promise<{
       criteria: [
         {
           departureAfter: data.outbound,
-          origin: data.origin,
-          destination: data.destination,
+          origin: { ...data.origin, precision: data.origin.precise ? "precise" : undefined },
+          destination: {
+            ...data.destination,
+            precision: data.destination.precise ? "precise" : undefined,
+          },
         },
       ],
       sessionToken,

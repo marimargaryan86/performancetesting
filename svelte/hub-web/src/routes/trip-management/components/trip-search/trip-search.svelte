@@ -93,6 +93,7 @@
       action: routeConfig.routes.tripManagement.routes.book.actions.search,
       data: {
         ...parsedData,
+        // Important, otherwise the machine's local timezone might get in the way.
         outbound: parsedData.outbound.toUTCString(),
       },
       dataType: "json",
