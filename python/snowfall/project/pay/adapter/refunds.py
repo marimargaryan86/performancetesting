@@ -12,7 +12,7 @@ from snowfall.project.pay.service.refunds.v1alpha import (
 from snowfall.project.pay.service.transactions.v1alpha import (
     models_pb2 as transaction_model,
 )
-from snowfall.stdlib import money, sequence
+from snowfall.stdlib import money, sequence, string
 from snowfall.stdlib.v1 import money_pb2
 from snowfall.vendor.currency_cloud.client import PaymentClient
 from snowfall.vendor.currency_cloud.models.rate import (
@@ -22,6 +22,19 @@ from snowfall.vendor.currency_cloud.models.rate import (
 
 
 class Client(abc.ABC):
+    @abc.abstractmethod
+    async def create(  # noqa: WPS211
+        self,
+        note: str,
+        refunded_by_provider: money_pb2.Money,
+        refunded_to_reseller: money_pb2.Money,
+        invoice_reference: str,
+        transaction_id: str,
+        *,
+        refund_received: bool,
+    ) -> models_pb2.Refund:
+        """Create a refund resource."""
+
     @abc.abstractmethod
     async def get(
         self,
@@ -70,6 +83,31 @@ class DictClient(Client):
             transaction.id: transaction for transaction in transactions
         }
         self._payment_client = payment_client
+
+    async def create(  # noqa: WPS211
+        self,
+        note: str,
+        refunded_by_provider: money_pb2.Money,
+        refunded_to_reseller: money_pb2.Money,
+        invoice_reference: str,
+        transaction_id: str,
+        *,
+        refund_received: bool,
+    ) -> models_pb2.Refund:
+        if transaction_id in self._transactions:
+            refund_id = string.uuid()
+            self._refunds[refund_id] = models_pb2.Refund(
+                id=refund_id,
+                refund_received=refund_received,
+                note=note,
+                refunded_us=refunded_by_provider,
+                refunded_reseller=refunded_to_reseller,
+                invoice_reference=invoice_reference,
+                transaction_id=transaction_id,
+                status=models_pb2.Refund.Status.STATUS_PENDING,
+            )
+            return self._refunds[refund_id]
+        raise errors.NotFoundError("transaction not found")
 
     async def get(
         self,
@@ -160,6 +198,30 @@ class GrpcClient(Client):
     ):
         self._refunds = refunds
         self._timeout = timeout
+
+    async def create(  # noqa: WPS211
+        self,
+        note: str,
+        refunded_by_provider: money_pb2.Money,
+        refunded_to_reseller: money_pb2.Money,
+        invoice_reference: str,
+        transaction_id: str,
+        *,
+        refund_received: bool,
+    ) -> models_pb2.Refund:
+        response = await self._refunds.CreateRefund(
+            grpc_pb2.CreateRefundRequest(
+                refund=models_pb2.Refund(
+                    transaction_id=transaction_id,
+                    refund_received=refund_received,
+                    note=note,
+                    refunded_us=refunded_by_provider,
+                    refunded_reseller=refunded_to_reseller,
+                    invoice_reference=invoice_reference,
+                ),
+            ),
+        )
+        return response.refund
 
     async def get(
         self,

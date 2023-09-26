@@ -11,6 +11,7 @@ from snowfall.project.junction.hub.service.hub_api.routes import (  # noqa: WPS2
     contacts,
     conversions,
     go_orders,
+    refunds,
     transactions,
     users,
 )
@@ -181,5 +182,26 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             "/bills/{billId}",
             bills.Bill,
             name="Bills",
+        ),
+        integration.route(
+            "/refunds",
+            refunds.Refunds,
+            name="Refunds",
+        ),
+        integration.route(
+            "/refunds/{refundId}",
+            refunds.Refund,
+            name="Refund",
+            methods=["PATCH", "GET"],
+        ),
+        integration.route(
+            "/refunds/{refundId}/refund-position",
+            refunds.RefundPosition,
+            name="RefundPosition",
+        ),
+        integration.route(
+            "/refunds/bookings/{bookingId}",
+            refunds.RefundByBooking,
+            name="RefundByBookingId",
         ),
     ]

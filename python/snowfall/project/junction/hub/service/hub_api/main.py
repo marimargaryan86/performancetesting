@@ -19,6 +19,7 @@ from snowfall.project.pay.adapter import (
     conversions,
     currencies,
     quotations,
+    refunds,
     transactions,
 )
 from snowfall.project.pay.service.companies.v1alpha.grpc_pb2_grpc import (
@@ -28,6 +29,9 @@ from snowfall.project.pay.service.companies.v1alpha.grpc_pb2_grpc import (
     ContactsServiceStub,
 )
 from snowfall.project.pay.service.currencies.v1alpha import currencies_pb2_grpc
+from snowfall.project.pay.service.refunds.v1alpha.grpc_pb2_grpc import (
+    RefundsServiceStub,
+)
 from snowfall.project.pay.service.transactions.v1alpha import (
     grpc_pb2_grpc as transactions_pb2_grpc,
 )
@@ -53,6 +57,7 @@ class Settings(starlette.Settings):
     companies_address: str
     transactions_address: str
     currencies_address: str
+    refunds_address: str
 
 
 def _factory(
@@ -67,6 +72,7 @@ def _factory(
         companies_channel = client.create_channel(app.settings.companies_address)
         transactions_channel = client.create_channel(app.settings.transactions_address)
         currencies_channel = client.create_channel(app.settings.currencies_address)
+        refunds_channel = client.create_channel(app.settings.refunds_address)
         cc_payment_client = PaymentClient(
             base_url=app.settings.cc_address,
             auth=CurrencyCloudAuth(
@@ -129,6 +135,11 @@ def _factory(
                     bills_client=bills.GrpcClient(
                         transactions_pb2_grpc.BillsServiceStub(
                             transactions_channel,
+                        ),
+                    ),
+                    refunds_client=refunds.GrpcClient(
+                        RefundsServiceStub(
+                            refunds_channel,
                         ),
                     ),
                 ),

@@ -18,6 +18,7 @@ from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.project.pay.service.companies.v1alpha import (
     models_pb2 as companies_models_pb2,
 )
+from snowfall.project.pay.service.refunds.v1alpha.models_pb2 import Refund
 from snowfall.project.pay.service.transactions.v1alpha import (
     models_pb2 as transaction_models_pb2,
 )
@@ -899,5 +900,92 @@ class BillResource(models.Resource):
                         billId=bill.id,
                     ),
                 ),
+            },
+        )
+
+
+class RefundsResource(models.Resource):
+    api_type: ClassVar[str] = "refunds"
+
+    @classmethod
+    def from_proto(
+        cls,
+        refund: Refund,
+        request: requests.Request,
+    ) -> RefundsResource:
+        return cls(
+            id=refund.id,
+            type=RefundsResource.api_type,
+            attributes={
+                "status": protobuf.enum_value_to_slug(
+                    Refund.Status.DESCRIPTOR,
+                    refund.status,
+                ),
+                "refundReceived": refund.refund_received,
+                "note": refund.note,
+                "refundedUs": Money.from_proto(refund.refunded_us),
+                "refundedReseller": Money.from_proto(
+                    refund.refunded_reseller,
+                ),
+                "refundedUsInPayerCurrency": (
+                    Money.from_proto(
+                        refund.refunded_us_in_payer_currency,
+                    )
+                    if refund.HasField("refunded_us_in_payer_currency")
+                    else None
+                ),
+                "refundPosition": (
+                    Money.from_proto(
+                        refund.refund_position,
+                    )
+                    if refund.HasField("refund_position")
+                    else None
+                ),
+                "invoiceReference": refund.invoice_reference,
+            },
+            relationships={
+                "transaction": {
+                    "data": models.ResourceIdentifier(
+                        id=refund.transaction_id,
+                        type="transactions",
+                    ),
+                },
+                "conversion": {
+                    "data": (
+                        models.ResourceIdentifier(
+                            id=refund.conversion_id,
+                            type="conversions",
+                        )
+                        if refund.conversion_id
+                        else None
+                    ),
+                },
+            },
+            links={
+                _SELF_HREF: str(
+                    request.url_for(
+                        "Refund",
+                        refundId=refund.id,
+                    ),
+                ),
+            },
+        )
+
+
+class RefundPosition(models.Resource):
+    api_type: ClassVar[str] = "refund-position"
+
+    @classmethod
+    def from_models(
+        cls,
+        refund_id: str,
+        refund_position: money.Money,
+    ) -> RefundPosition:
+        return cls(
+            id=refund_id,
+            type=RefundPosition.api_type,
+            attributes={
+                "currency": refund_position.currency.code,
+                "amount": refund_position.amount,
             },
         )

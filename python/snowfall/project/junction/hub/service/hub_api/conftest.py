@@ -20,6 +20,7 @@ from snowfall.project.pay.adapter import (
     conversions,
     currencies,
     quotations,
+    refunds,
     transactions,
 )
 from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import (
@@ -106,6 +107,18 @@ def currencies_client(
             ("EUR", "USD"): 1.05,
         },
         available_currencies,
+    )
+
+
+@pytest.fixture()
+def refunds_client(cc_payment_client: mock.Mock) -> refunds.DictClient:
+    refund_data = [
+        pay_fixtures.generate_refund(refund_id) for refund_id in pay_fixtures.REFUNDS
+    ]
+    return refunds.DictClient(
+        refund_data,
+        [get_transaction(refund.transaction_id) for refund in refund_data],
+        cc_payment_client,
     )
 
 
@@ -352,6 +365,7 @@ def _create_app(  # noqa: WPS211
     cc_payment_client: PaymentClient,
     quotations_client: quotations.Client,
     bills_client: bills.Client,
+    refunds_client: refunds.Client,
 ) -> applications.Starlette:
     asgi_app = application.create_starlette_app(
         routes=router.get_routes(
@@ -367,6 +381,7 @@ def _create_app(  # noqa: WPS211
                 cc_payment_client=cc_payment_client,
                 quotations_client=quotations_client,
                 bills_client=bills_client,
+                refunds_client=refunds_client,
             ),
         ),
         openapi_path=filesystem.resource_path("junction.hub_api", "openapi.json"),
@@ -418,6 +433,7 @@ def app(  # noqa: WPS211
     cc_payment_client: PaymentClient,
     quotations_client: quotations.Client,
     bills_client: bills.Client,
+    refunds_client: refunds.Client,
 ) -> applications.Starlette:
     return _create_app(
         orders_client=orders_client,
@@ -431,4 +447,5 @@ def app(  # noqa: WPS211
         cc_payment_client=cc_payment_client,
         quotations_client=quotations_client,
         bills_client=bills_client,
+        refunds_client=refunds_client,
     )

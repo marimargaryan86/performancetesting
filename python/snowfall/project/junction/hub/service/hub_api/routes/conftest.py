@@ -3,7 +3,7 @@ from unittest import mock
 
 import pytest
 
-from snowfall.project.pay.adapter import accounts
+from snowfall.project.pay.adapter import accounts, transactions
 from snowfall.project.pay.service.companies.v1alpha.models_pb2 import (
     Account,
     Company,
@@ -78,3 +78,19 @@ async def company(
         sales_markup=sales_markup,
         account_id=account.id,
     )
+
+
+@pytest.fixture()
+def transaction_ids() -> Sequence[str]:
+    return [
+        "e719b289-982c-42f0-99a2-63fa70f8f8c0",
+        "c36649e6-71f1-4dfa-aa5a-01c0ede6e538",
+    ]
+
+
+@pytest.fixture()
+async def booking_id(
+    transaction_ids: Sequence[str],
+    transactions_client: transactions.Client,
+) -> str:
+    return (await transactions_client.get(transaction_ids[0])).external_reference_id
