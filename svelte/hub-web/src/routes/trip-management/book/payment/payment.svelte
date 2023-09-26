@@ -1,4 +1,6 @@
 <script lang="ts" context="module">
+  import paymentIllustrationImg from "assets/images/payment-illustration.png";
+
   const appearance: Appearance = {
     theme: "stripe",
     variables: {
@@ -41,13 +43,22 @@
   import { env } from "$env/dynamic/public";
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import type { SearchDataModel } from "../booking-manager.server";
+  import Dialog from "components/ui/dialogues/dialog.svelte";
+  import Button from "components/ui/button.svelte";
 
   export let paymentIntent: SearchDataModel["paymentIntent"];
 
+  let dialog: Dialog | undefined = undefined;
   let stripe: Stripe | undefined = undefined;
   let stripeElements: StripeElements | undefined = undefined;
   let stripeContainer: HTMLDivElement | undefined = undefined;
+  let error: string | undefined = undefined;
 
+  $: if (error) {
+    dialog?.open();
+  } else {
+    dialog?.close();
+  }
   $: clientSecret = paymentIntent?.clientSecret;
   $: if (browser && clientSecret) {
     createStripe(clientSecret);
@@ -65,6 +76,8 @@
   }
 
   export async function pay(): Promise<boolean> {
+    error = undefined;
+
     if (paymentIntent?.confirmed) {
       return true;
     }
@@ -86,6 +99,7 @@
     });
 
     if (confirmationResult.error) {
+      error = confirmationResult.error.message;
       return false;
     }
 
@@ -95,7 +109,22 @@
 
     return true;
   }
+
+  function clearError(): void {
+    error = undefined;
+  }
 </script>
+
+<Dialog bind:this={dialog}>
+  <div class="dialog">
+    <img src={paymentIllustrationImg} alt="" />
+    <div>
+      <h3 class="typography display-small bold">Payment declined</h3>
+      <p class="typography body-medium">{error ?? "An unexpected error occured"}</p>
+    </div>
+    <Button size="small" on:click={clearError}>Try again</Button>
+  </div>
+</Dialog>
 
 <div class="payment">
   <h3 class="typography title-medium bold">Payment method</h3>
@@ -142,5 +171,26 @@
   .toc a {
     color: var(--color-main-primary-600);
     text-decoration: none;
+  }
+
+  .dialog {
+    display: flex;
+    flex-flow: column;
+    gap: 32px;
+    align-items: center;
+    width: 100%;
+    max-width: 482px;
+    padding: 32px;
+  }
+
+  .dialog > div {
+    display: flex;
+    flex-flow: column;
+    gap: 8px;
+    text-align: center;
+  }
+
+  .dialog > div > p {
+    color: var(--color-main-neutral-700);
   }
 </style>
