@@ -2,9 +2,6 @@ import abc
 from collections.abc import Sequence
 
 from snowfall.project.junction.plus.adapter import errors
-from snowfall.project.junction.plus.adapter.validation import (
-    validate_search_url_template,
-)
 from snowfall.project.junction.plus.service.notifications.v1alpha import (
     grpc_pb2 as notifications_grpc_pb2,
 )
@@ -122,10 +119,6 @@ class GrpcClient(Client):
         self,
         configuration_vector: notifications_models_pb2.ConfigurationVector,
     ) -> notifications_models_pb2.ConfigurationVector:
-        try:
-            validate_search_url_template(configuration_vector.search_url_template)
-        except ValueError as err:
-            raise errors.UnprocessableEntityError() from err
         request = notifications_grpc_pb2.CreateConfigurationVectorRequest(
             configuration_vector=configuration_vector,
         )
@@ -142,10 +135,6 @@ class GrpcClient(Client):
         self,
         configuration_vector: notifications_models_pb2.ConfigurationVector,
     ) -> None:
-        try:
-            validate_search_url_template(configuration_vector.search_url_template)
-        except ValueError as err:
-            raise errors.UnprocessableEntityError() from err
         request = notifications_grpc_pb2.UpdateConfigurationVectorRequest(
             configuration_vector=configuration_vector,
         )

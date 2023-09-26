@@ -1,6 +1,7 @@
 import datetime
 import json
 from collections.abc import Mapping, Sequence
+from contextlib import suppress
 from gettext import gettext as _
 from typing import Any, ClassVar
 
@@ -16,28 +17,18 @@ async def home_function(*args: Any, **kwargs: Any) -> str:
 
 
 async def search_flight(  # noqa: WPS211
-    origin: str,
-    destination: str,
-    date: str,
-    search_url_template: str,
+    search_url: str,
     shortener_client: shortener.Client,
     *args: Any,
     **kwargs: Any,
 ) -> str:
-    departure_date = datetime.datetime.strptime(date, "%d-%m-%Y").replace(
-        tzinfo=datetime.UTC,
-    )
-    original_link = search_url_template.format(
-        origin=origin,
-        destination=destination,
-        day=departure_date.day,
-        month=departure_date.month,
-        year=departure_date.year,
-    )
-    try:
-        short_link = await shortener_client.shorten_link(original_link)
-    except httpx.HTTPStatusError:
-        short_link = original_link
+    if not search_url:
+        return _("Travel assistant can't help you with ticket search")
+    short_link = search_url
+    if len(search_url) > 30:  # noqa: WPS432
+        with suppress(httpx.HTTPStatusError):
+            short_link = await shortener_client.shorten_link(search_url)
+
     return _("Please book your flights here: ") + short_link
 
 
@@ -52,8 +43,7 @@ class AIBot(object):
         a day here, 3) Give me a 3 day itinerary"
         Then wait for user's input and answer to the question if it's travel related.
         After that, call the home_function.
-        If user wants to find ticket for flight, ask user to specify date,
-        the origin valid city name, destination valid city name, then call the search_flight.
+        If user wants to find ticket for flight call the search_flight.
         When the user wants activities provide the following options as example
         "1) Hotels, 2) Restaurants, 3) Museums, 4) Concerts, 5) Nightlife (bars, clubs), 6) Hiking"
         Then wait for user's input and answer to the question if it's from mentioned options.
@@ -82,26 +72,13 @@ class AIBot(object):
         {
             "name": "search_flight",
             "description": (
-                "Needs to be called when user wants to book or buy a flight ticket when"
-                " date, origin and destination of flight are clear"
+                "Needs to be called when user wants to book or buy a flight ticket"
             ),
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "origin": {
-                        "type": "string",
-                        "description": "The origin city",
-                    },
-                    "destination": {
-                        "type": "string",
-                        "description": "The destination city",
-                    },
-                    "date": {
-                        "type": "string",
-                        "description": "Date for flight in format of dd-mm-yyyy",
-                    },
+                    "no_params": {"type": "null"},
                 },
-                "required": ["origin", "destination", "date"],
             },
         },
     ]
@@ -122,7 +99,7 @@ class AIBot(object):
     async def handle_prompt(
         self,
         messages: Sequence[Mapping[str, str]],
-        search_url_template: str,
+        search_url: str,
         shortener_client: shortener.Client,
     ) -> Mapping[str, str]:
         """Get message history from state, append message and send to openai."""
@@ -141,7 +118,7 @@ class AIBot(object):
             )
             return {
                 "content": await self.available_functions[function_name](
-                    search_url_template=search_url_template,
+                    search_url=search_url,
                     shortener_client=shortener_client,
                     **assistant_arguments,
                 ),

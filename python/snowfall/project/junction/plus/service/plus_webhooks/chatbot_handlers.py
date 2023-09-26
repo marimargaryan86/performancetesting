@@ -306,7 +306,7 @@ async def handle_unknown(  # noqa: WPS211
             ai_chat_history.append({"role": "user", "content": message})
             assistant_message = await ai_bot.handle_prompt(
                 messages=ai_chat_history,
-                search_url_template=configuration_vector.search_url_template,
+                search_url=configuration_vector.search_url,
                 shortener_client=shortener_client,
             )
             ai_chat_history.append(assistant_message)
