@@ -48,7 +48,7 @@ func (mr *mergeRequest) currentAssignees() []int {
 }
 
 func (mr *mergeRequest) expectedAssignees() ([]int, error) {
-	reviewers, _, err := mr.client.MergeRequests.GetMergeRequestReviewers(mr.object.ProjectID, mr.object.ID)
+	reviewers, _, err := mr.client.MergeRequests.GetMergeRequestReviewers(mr.object.ProjectID, mr.object.IID)
 
 	if err != nil {
 		return []int{}, err

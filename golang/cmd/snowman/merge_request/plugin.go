@@ -104,8 +104,8 @@ func (plugin *MergeRequestPlugin) onTimer(pid int, iid int) {
 		wrapper.validateTitle,
 		wrapper.validateScope,
 		wrapper.setReviewers,
-		wrapper.setAssignees,
 		wrapper.setStatus,
+		wrapper.setAssignees,
 		wrapper.informBreakingChanges,
 		wrapper.merge,
 	} {
