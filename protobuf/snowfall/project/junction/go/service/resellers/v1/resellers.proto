@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package snowfall.project.junction.go.service.resellers.v1;
+
+import "snowfall/project/junction/go/service/resellers/v1/models.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/resellers/v1";
+
+service ResellerService {
+  rpc CreateReseller(CreateResellerRequest) returns (CreateResellerResponse) {}
+  rpc GetReseller(GetResellerRequest) returns (GetResellerResponse) {}
+  rpc ListResellers(ListResellersRequest) returns (ListResellersResponse) {}
+  rpc UpdateReseller(UpdateResellerRequest) returns (UpdateResellerResponse) {}
+  rpc DeleteReseller(DeleteResellerRequest) returns (DeleteResellerResponse) {}
+}
+
+message CreateResellerRequest {
+  Reseller reseller = 1;
+}
+
+message CreateResellerResponse {
+  Reseller reseller = 1;
+}
+
+message GetResellerRequest {
+  string id = 1;
+}
+
+message GetResellerResponse {
+  Reseller reseller = 1;
+}
+
+message ListResellersRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+}
+
+message ListResellersResponse {
+  repeated Reseller resellers = 1;
+  string next_page_token = 2;
+}
+
+message UpdateResellerRequest {
+  string id = 1;
+  string name = 2;
+  string default_currency = 3;
+  repeated string providers = 4;
+}
+
+message UpdateResellerResponse {
+  Reseller reseller = 1;
+}
+
+message DeleteResellerRequest {
+  string id = 1;
+}
+
+message DeleteResellerResponse {}
