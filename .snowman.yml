@@ -75,3 +75,5 @@ commits:
       - "python/snowfall/vendor/rate_limiter"
     vendor/save-a-train:
       - "python/snowfall/vendor/save_a_train"
+    vendor/consul:
+      - "python/snowfall/vendor/consul"
