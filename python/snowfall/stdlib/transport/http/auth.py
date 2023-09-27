@@ -1,9 +1,17 @@
 import asyncio
+import contextlib
+import contextvars
 import datetime
-from collections.abc import AsyncGenerator
+from collections.abc import AsyncGenerator, Iterator
 
 import httpx
 from authlib.integrations import httpx_client
+
+_temporary_token: contextvars.ContextVar[str] = contextvars.ContextVar("token")
+
+
+class TemporaryTokenNotSetError(Exception):
+    """Raised when a temporary token has not been set."""
 
 
 class ClientCredentialsAuth(httpx.Auth):
@@ -67,10 +75,35 @@ class TokenAuth(httpx.Auth):
         request: httpx.Request,
     ) -> AsyncGenerator[httpx.Request, httpx.Response]:
         request.headers.update(
-            httpx.Headers(
-                {
-                    "Authorization": "Bearer {0}".format(self._token),
-                },
-            ),
+            _make_bearer_header(self._token),
         )
         yield request
+
+
+class TemporaryTokenAuth(httpx.Auth):
+    async def async_auth_flow(
+        self,
+        request: httpx.Request,
+    ) -> AsyncGenerator[httpx.Request, httpx.Response]:
+        try:
+            token = _temporary_token.get()
+        except LookupError as err:
+            raise TemporaryTokenNotSetError("Temporary token not set.") from err
+
+        request.headers.update(
+            _make_bearer_header(token),
+        )
+        yield request
+
+    @contextlib.contextmanager
+    def temporary(self, token: str) -> Iterator[None]:
+        context_token = _temporary_token.set(token)
+
+        try:
+            yield
+        finally:
+            _temporary_token.reset(context_token)
+
+
+def _make_bearer_header(token: str) -> httpx.Headers:
+    return httpx.Headers({"Authorization": "Bearer {0}".format(token)})
