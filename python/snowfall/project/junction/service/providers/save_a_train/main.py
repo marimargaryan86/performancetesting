@@ -297,6 +297,7 @@ async def _orders(  # noqa: WPS217
             booking_storage=booking_storage,
         ),
         offers_cache=offer_cache,
+        provider_id=str(_PROVIDER_ID),
     )
 
     await orders_consumer.consume()
