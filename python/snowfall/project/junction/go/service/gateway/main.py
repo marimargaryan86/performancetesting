@@ -13,9 +13,11 @@ from snowfall.project.junction.go.service.gateway import (
     meta,
     offers,
     providers,
+    tasks,
     trips,
 )
-from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.project.junction.go.service.gateway.v1 import trips_pb2
+from snowfall.project.junction.go.service.offers.v1 import amqp_pb2
 from snowfall.stdlib.service import (
     amqp_factory,
     application,
@@ -44,12 +46,15 @@ class _ServeSettings(_SharedSettings):
 
 _BootstrapReturn = tuple[
     robust_connection.RobustConnection,
-    redis.Client[bytes],
     providers.Collection,
+    tasks.Runner[amqp_pb2.TripOfferSearchResult],
+    tasks.Runner[trips_pb2.TripSearchResult],
 ]
 
 
 _SharedSettingsGeneric = TypeVar("_SharedSettingsGeneric", bound=_SharedSettings)
+_task_ttl = datetime.timedelta(minutes=5)
+_gc_probability = 0.01
 
 
 async def _bootstrap(
@@ -72,35 +77,42 @@ async def _bootstrap(
         ],
     )
 
-    return amqp_connection, redis_client, all_providers
+    trip_offer_search_runner = tasks.Runner[amqp_pb2.TripOfferSearchResult](
+        client=redis_client,
+        ttl=_task_ttl,
+        gc_probability=_gc_probability,
+    )
+
+    trip_search_runner = tasks.Runner[trips_pb2.TripSearchResult](
+        client=redis_client,
+        ttl=_task_ttl,
+        gc_probability=_gc_probability,
+    )
+
+    return (
+        amqp_connection,
+        all_providers,
+        trip_offer_search_runner,
+        trip_search_runner,
+    )
 
 
 async def _consume(app: application.AsyncApplication[_ConsumeSettings]) -> None:
-    amqp_connection, redis_client, all_providers = await _bootstrap(app)
+    amqp_connection, all_providers, trip_offer_search_runner, trip_search_runner = (
+        await _bootstrap(app)
+    )
 
     legacy_offers_queue = offers.Queue(
         name_prefix=app.name,
         providers_list=all_providers,
-        repository=offers.Repository(
-            producer=producer.Producer(
-                connection=amqp_connection,
-                exchange=types.Exchange(name=app.name),
-            ),
-            client=redis_client,
-        ),
+        runner=trip_offer_search_runner,
         timeout=app.settings.search_timeout,
     )
 
     trips_queue = trips.Queue(
         name_prefix=app.name,
         providers_list=all_providers,
-        repository=trips.Repository(
-            producer=producer.Producer(
-                connection=amqp_connection,
-                exchange=types.Exchange(name=app.name),
-            ),
-            client=redis_client,
-        ),
+        runner=trip_search_runner,
         timeout=app.settings.trip_search_timeout,
     )
 
@@ -117,7 +129,9 @@ async def _consume(app: application.AsyncApplication[_ConsumeSettings]) -> None:
 
 
 async def _serve(app: application.AsyncApplication[_ServeSettings]) -> None:
-    amqp_connection, redis_client, all_providers = await _bootstrap(app)
+    amqp_connection, all_providers, trip_offer_search_runner, trip_search_runner = (
+        await _bootstrap(app)
+    )
 
     server = grpc_server.create_server(
         app.settings.grpc_address,
@@ -130,22 +144,18 @@ async def _serve(app: application.AsyncApplication[_ServeSettings]) -> None:
                 providers_collection=all_providers,
             ),
             offers.Service(
-                repository=offers.Repository(
-                    producer=producer.Producer(
-                        connection=amqp_connection,
-                        exchange=types.Exchange(name=app.name),
-                    ),
-                    client=redis_client,
+                producer=producer.Producer(
+                    connection=amqp_connection,
+                    exchange=types.Exchange(name=app.name),
                 ),
+                runner=trip_offer_search_runner,
             ),
             trips.Service(
-                repository=trips.Repository(
-                    producer=producer.Producer(
-                        connection=amqp_connection,
-                        exchange=types.Exchange(name=app.name),
-                    ),
-                    client=redis_client,
+                producer=producer.Producer(
+                    connection=amqp_connection,
+                    exchange=types.Exchange(name=app.name),
                 ),
+                runner=trip_search_runner,
             ),
         ],
     )

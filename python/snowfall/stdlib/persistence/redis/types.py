@@ -124,10 +124,10 @@ class SortedSet(Generic[AnyStr]):
             },
         )
 
-    async def has(self, set_value: bytes | float | str) -> bool:
-        return await self._redis.zscore(self._name, set_value) is not None
+    async def get_score(self, set_value: bytes | str) -> float | None:
+        return await self._redis.zscore(self._name, set_value)
 
-    async def remove(self, set_value: bytes | float | str) -> None:
+    async def remove(self, set_value: bytes | str) -> None:
         await self._redis.zrem(self._name, set_value)
 
     async def remove_between_scores(self, min_: float, max_: float) -> None:

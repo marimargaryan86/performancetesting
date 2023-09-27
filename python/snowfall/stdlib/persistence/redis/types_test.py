@@ -179,9 +179,9 @@ class TestSortedSet(object):
         sorted_set = redis.Client(redis_client, prefix=prefix).sorted_set("foobar")
 
         await sorted_set.add("foo", 1)
-        assert await sorted_set.has("foo")
+        assert await sorted_set.get_score("foo")
         await sorted_set.remove("foo")
-        assert not await sorted_set.has("foo")
+        assert not await sorted_set.get_score("foo")
 
     @pytest.mark.parametrize(*_PREFIX_PARAMETERS)
     async def test_remove_between_scores(
