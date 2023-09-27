@@ -4009,9 +4009,15 @@
                     "type": "string",
                     "example": "HDZEMS"
                   },
-                  "ticketUrl": {
-                    "type": "string",
-                    "example": "http://example.com/ticket.pdf"
+                  "ticketUrls": {
+                    "type": "array",
+                    "example": [
+                      "http://example.com/ticket.pdf"
+                    ],
+                    "items": {
+                      "type": "string",
+                      "example": "http://example.com/ticket.pdf"
+                    }
                   }
                 }
               },
