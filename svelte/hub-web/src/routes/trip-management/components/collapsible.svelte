@@ -2,6 +2,8 @@
   import ChevronIcon from "components/icons/chevron-icon.svelte";
   import { slideFade } from "transitions/slide-fade";
 
+  let className: string | undefined = undefined;
+  export { className as class };
   export let expandedOnMount = false;
   export let transitionTimeMs = 300;
   export let title = "";
@@ -25,7 +27,7 @@
   }
 </script>
 
-<div class:collapsible={true}>
+<div class:collapsible={true} class={className}>
   <button class="toggle" on:click={toggle}>
     <slot name="title" {expanded} {transitionTimeMs}>
       <span class="typography title-medium bold">{title}</span>
@@ -45,13 +47,17 @@
 
 <style>
   .collapsible {
+    --x-padding: var(--padding, 24px 40px);
+    --x-border-radius: var(--border-radius, 16px);
+    --x-background-color: var(--background-color, var(--color-common-background-light-main));
+
     display: flex;
     flex-flow: column;
     gap: 16px;
-    padding: 24px 40px;
+    padding: var(--x-padding);
     color: var(--color-text-light-strong);
-    background-color: var(--color-common-background-light-main);
-    border-radius: 16px;
+    background-color: var(--x-background-color);
+    border-radius: var(--x-border-radius);
   }
 
   .toggle {

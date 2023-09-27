@@ -21,6 +21,7 @@
   import { getTotalPriceBreakdown } from "utils/offer";
   import Collapsible from "../collapsible.svelte";
   import LoadingIcon from "components/icons/loading-icon.svelte";
+  import Itinerary from "./itinerary.svelte";
 
   export let priceQuote: TripOfferPriceQuoteModel | undefined = undefined;
   export let passengers: PassengerCountData;
@@ -29,27 +30,27 @@
 
   $: priceBreakdown = priceQuote ? getTotalPriceBreakdown(priceQuote) : undefined;
   $: totalPrice = priceQuote?.price;
-  $: priceSet = Boolean(totalPrice && priceBreakdown);
-  $: if (priceSet) {
-    collapsible?.open();
-  }
 </script>
 
-<Collapsible bind:this={collapsible} expandedOnMount={priceSet} title="Summary">
+<Collapsible bind:this={collapsible} title="Summary">
   <div class="details">
-    <p class="typography label-large">
-      Passengers <span class="typography bold">{getPassengersPresentation(passengers)}</span>
-    </p>
+    {#if priceQuote}
+      <p class="typography label-large">
+        Passengers <span class="typography bold">{getPassengersPresentation(passengers)}</span>
+      </p>
 
-    <p class="typography label-large">
-      Fare Brand{priceQuote?.options.length === 1 ? "" : "s"}
+      <p class="typography label-large">
+        Fare Brand{priceQuote.options.length === 1 ? "" : "s"}
 
-      <span class="typography bold">
-        {priceQuote?.options.map((item) => item.brandName).join(", ")}
-      </span>
-    </p>
+        <span class="typography bold">
+          {priceQuote.options.map((item) => item.brandName).join(", ")}
+        </span>
+      </p>
 
-    <button class="fare-rules typography body-small">View fare rules</button>
+      <Itinerary {priceQuote} />
+    {:else}
+      <LoadingIcon size="24px" />
+    {/if}
   </div>
 
   <div class="price" slot="content-after" let:expanded let:transitionTimeMs>
@@ -73,7 +74,7 @@
     {/if}
 
     <div class="total">
-      <span class="typography body-large bold">Total paid</span>
+      <span class="typography body-large bold">Total to pay</span>
       <em class="typography body-large bold">
         {#if totalPrice}
           {formatAmount(totalPrice, undefined, true)}
@@ -94,13 +95,12 @@
     border-bottom: var(--color-common-line-medium) 1px solid;
   }
 
-  .fare-rules {
-    align-self: flex-end;
-    color: var(--color-common-light-text-link);
-    text-decoration: underline;
-    background-color: transparent;
-    border: 0;
-    cursor: pointer;
+  .details > :global(svg) {
+    align-self: center;
+  }
+
+  .details > :global(.itinerary) {
+    margin-top: 16px;
   }
 
   .price {

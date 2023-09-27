@@ -3,96 +3,75 @@
     originLeg: OfferSegmentLegModel;
     destinationLeg: OfferSegmentLegModel;
   };
+
+  function getLegs(priceQuote: TripOfferPriceQuoteModel): OfferSegmentLegModel[] {
+    return (
+      priceQuote.offer?.groups
+        .flatMap((group) => group.details.flatMap((details) => details.legs))
+        .filter(ensureDefined)
+        .sort((a, b) => a.departureAt.getTime() - b.departureAt.getTime()) ?? []
+    );
+  }
 </script>
 
 <script lang="ts">
-  import ChevronIcon from "components/icons/chevron-icon.svelte";
-  import type { OfferSegmentLegModel } from "integration/junction-mobile-api/schemas/offer";
+  import type {
+    OfferSegmentLegModel,
+    TripOfferPriceQuoteModel,
+  } from "integration/junction-mobile-api/schemas/offer";
   import { formatDuration } from "formatting/date-time";
   import { getTimeDeltaS } from "utils/date-time";
-  import { slideFade } from "transitions/slide-fade";
+  import Collapsible from "../collapsible.svelte";
+  import { ensureDefined } from "utils/array";
 
-  let expanded = false;
+  export let priceQuote: TripOfferPriceQuoteModel;
 
-  function expand(): void {
-    expanded = true;
-  }
-
-  function collapse(): void {
-    expanded = false;
-  }
-
-  function toggle(): void {
-    if (expanded) {
-      collapse();
-    } else {
-      expand();
-    }
-  }
-
-  export let origDestLegsList: OrigDestLegs[];
+  $: legs = getLegs(priceQuote);
 </script>
 
-<div class="itinerary">
-  <button class="typography title-small bold" on:click={toggle}>
-    Itinerary Details
-    <ChevronIcon direction={expanded ? "up" : "down"} />
-  </button>
+<Collapsible class="itinerary" title="Itinerary">
+  <ul class="segments">
+    {#each legs as leg}
+      <li class="segment typography label-large bold">
+        <span class="circle" />
+        <strong>
+          {leg.departureAt.toLocaleTimeString("sv-SE", {
+            hour: "2-digit",
+            minute: "2-digit",
+            timeZone: leg.origin.timeZone,
+          })}
+        </strong>
+        <strong>{leg.origin.name}</strong>
 
-  {#if expanded}
-    <ul class="segments" transition:slideFade={{ duration: 300 }}>
-      {#each origDestLegsList as { originLeg, destinationLeg }}
-        <li class="segment typography label-large bold">
-          <span class="circle" />
-          <strong>
-            {originLeg.departureAt.toLocaleTimeString("sv-SE", {
-              hour: "2-digit",
-              minute: "2-digit",
-              timeZone: originLeg.origin.timeZone,
-            })}
-          </strong>
-          <strong>{originLeg.origin.name}</strong>
+        <span class="line" />
+        <em class="typography body-small default">
+          {formatDuration(getTimeDeltaS(leg.departureAt, leg.arrivalAt))}
+        </em>
+        <em />
 
-          <span class="line" />
-          <em class="typography body-small default">
-            {formatDuration(getTimeDeltaS(originLeg.departureAt, destinationLeg.arrivalAt))}
-          </em>
-          <em />
+        <span class="circle" />
+        <strong>
+          {leg.arrivalAt.toLocaleTimeString("sv-SE", {
+            hour: "2-digit",
+            minute: "2-digit",
+            timeZone: leg.destination.timeZone,
+          })}
+        </strong>
+        <strong>{leg.destination.name}</strong>
+      </li>
+    {/each}
+  </ul>
 
-          <span class="circle" />
-          <strong>
-            {destinationLeg.arrivalAt.toLocaleTimeString("sv-SE", {
-              hour: "2-digit",
-              minute: "2-digit",
-              timeZone: destinationLeg.destination.timeZone,
-            })}
-          </strong>
-          <strong>{destinationLeg.destination.name}</strong>
-        </li>
-      {/each}
-    </ul>
-  {/if}
-</div>
+  <div class="fare-rules">
+    <button class="typography body-small">View fare rules</button>
+  </div>
+</Collapsible>
 
 <style>
-  .itinerary {
-    display: flex;
-    flex-flow: column;
-    gap: 0;
-  }
-
-  .itinerary > button {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0;
-    background-color: transparent;
-    border: 0;
-    cursor: pointer;
-  }
-
-  .itinerary > button > :global(svg) {
-    flex-shrink: 0;
+  :global(.collapsible.itinerary) {
+    --border-radius: 0;
+    --padding: 0;
+    --background-color: transparent;
   }
 
   .segments {
@@ -126,5 +105,19 @@
 
   em {
     color: var(--color-main-neutral-500);
+  }
+
+  .fare-rules {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+  }
+
+  .fare-rules > button {
+    color: var(--color-common-light-text-link);
+    text-decoration: underline;
+    background-color: transparent;
+    border: 0;
+    cursor: pointer;
   }
 </style>
