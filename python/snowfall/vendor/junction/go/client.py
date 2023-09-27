@@ -48,6 +48,14 @@ _OrderIncludes: TypeAlias = Literal[
     "bookings.details.cabinClass",
     "bookings.details.legType",
 ]
+_CancellationRequestIncludes: TypeAlias = Literal[
+    "bookings",
+    "bookings.order",
+    "bookings.order.journey",
+    "bookings.details",
+    "bookings.details.cabinClass",
+    "bookings.details.legType",
+]
 
 
 class LegType(enum.Enum):
@@ -233,7 +241,7 @@ class TripsClient(base_client.BaseClient):
             base_client.make_pagination_params(limit, cursor),
         )
         if include:
-            query_parameters["include"] = include
+            query_parameters["include"] = include  # noqa: WPS204
         return await self._make_request(
             method=_METHOD_GET,
             url="/trips/searches/{0}/trips".format(trips_search_id),
@@ -828,8 +836,13 @@ class Client(base_client.BaseClient):  # noqa: WPS214
     async def get_cancellation_request_by_id(
         self,
         cancellation_request_id: str,
+        include: Sequence[_CancellationRequestIncludes] | None = None,
     ) -> dict[str, Any]:
+        query_parameters: dict[str, str] = {}
+        if include:
+            query_parameters["include"] = ",".join(include)
         return await self._make_request(
             method=_METHOD_GET,
             url="/cancellations/requests/{0}".format(cancellation_request_id),
+            query_parameters=query_parameters,
         )

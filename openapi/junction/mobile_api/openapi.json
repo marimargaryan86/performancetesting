@@ -1473,9 +1473,6 @@
       "parameters": [
         {
           "$ref": "./../client_api/openapi.json#/components/parameters/offerSearchId"
-        },
-        {
-          "$ref": "./../client_api/openapi.json#/components/parameters/offerSearchInclude"
         }
       ],
       "get": {
@@ -2350,7 +2347,7 @@
                       "$ref": "./../client_api/openapi.json#/components/schemas/CancellationRequest"
                     },
                     "included": {
-                      "$ref": "./../client_api/openapi.json#/components/schemas/CancellationRequestIncluded"
+                      "$ref": "#/components/schemas/CancellationRequestIncluded"
                     }
                   },
                   "required": [
@@ -3247,6 +3244,43 @@
               "offer-options": "#/components/schemas/OfferOption",
               "trip-offer-option-details": "#/components/schemas/TripOfferOptionDetails",
               "cabin-classes": "#/components/schemas/CabinClass"
+            }
+          }
+        }
+      },
+      "CancellationRequestIncluded": {
+        "title": "CancellationRequestIncluded",
+        "type": "array",
+        "items": {
+          "oneOf": [
+            {
+              "$ref": "./../client_api/openapi.json#/components/schemas/Order"
+            },
+            {
+              "$ref": "./../client_api/openapi.json#/components/schemas/Journey"
+            },
+            {
+              "$ref": "./../client_api/openapi.json#/components/schemas/TripBooking"
+            },
+            {
+              "$ref": "./../client_api/openapi.json#/components/schemas/TripBookingDetails"
+            },
+            {
+              "$ref": "./../client_api/openapi.json#/components/schemas/CabinClass"
+            },
+            {
+              "$ref": "./../client_api/openapi.json#/components/schemas/LegType"
+            }
+          ],
+          "discriminator": {
+            "propertyName": "type",
+            "mapping": {
+              "orders": "./../client_api/openapi.json#/components/schemas/Order",
+              "journeys": "./../client_api/openapi.json#/components/schemas/Journey",
+              "trip-bookings": "./../client_api/openapi.json#/components/schemas/TripBooking",
+              "trip-booking-details": "./../client_api/openapi.json#/components/schemas/TripBookingDetails",
+              "cabin-classes": "./../client_api/openapi.json#/components/schemas/CabinClass",
+              "leg-types": "./../client_api/openapi.json#/components/schemas/LegType"
             }
           }
         }

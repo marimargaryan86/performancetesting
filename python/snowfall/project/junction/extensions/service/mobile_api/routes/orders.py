@@ -297,10 +297,17 @@ class CancellationRequest(endpoints.HTTPEndpoint):
     ) -> responses.Response:
         cancellation_response = await junction_client.get_cancellation_request_by_id(
             request.path_params["cancellationRequestId"],
+            include=request.scope["parsed_query_string"].get(
+                "include",
+                [],
+            ),
         )
+        response_body = stdlib_models.Body(data=cancellation_response["data"])
+        if cancellation_response.get("included"):
+            response_body.included = cancellation_response.get("included")
 
         return stdlib_models.JsonApiResponse(
-            stdlib_models.Body(data=cancellation_response["data"]),
+            response_body,
         )
 
 

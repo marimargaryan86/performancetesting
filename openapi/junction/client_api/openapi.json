@@ -1919,9 +1919,6 @@
                           "$ref": "#/components/schemas/RentalOfferSearch"
                         }
                       ]
-                    },
-                    "included": {
-                      "$ref": "#/components/schemas/OfferSearchIncluded"
                     }
                   },
                   "required": [
@@ -1976,20 +1973,12 @@
             }
           }
         }
-      },
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/offerSearchInclude"
-        }
-      ]
+      }
     },
     "/offers/searches/{offerSearchId}": {
       "parameters": [
         {
           "$ref": "#/components/parameters/offerSearchId"
-        },
-        {
-          "$ref": "#/components/parameters/offerSearchInclude"
         }
       ],
       "get": {
@@ -2017,9 +2006,6 @@
                           "$ref": "#/components/schemas/RentalOfferSearch"
                         }
                       ]
-                    },
-                    "included": {
-                      "$ref": "#/components/schemas/OfferSearchIncluded"
                     }
                   },
                   "required": [
@@ -7156,47 +7142,6 @@
           }
         }
       },
-      "OfferSearchIncluded": {
-        "title": "OfferSearchIncluded",
-        "type": "array",
-        "items": {
-          "oneOf": [
-            {
-              "$ref": "#/components/schemas/Offer"
-            },
-            {
-              "$ref": "#/components/schemas/OfferGroup"
-            },
-            {
-              "$ref": "#/components/schemas/TripOfferGroupDetails"
-            },
-            {
-              "$ref": "#/components/schemas/LegType"
-            },
-            {
-              "$ref": "#/components/schemas/OfferOption"
-            },
-            {
-              "$ref": "#/components/schemas/TripOfferOptionDetails"
-            },
-            {
-              "$ref": "#/components/schemas/CabinClass"
-            }
-          ],
-          "discriminator": {
-            "propertyName": "type",
-            "mapping": {
-              "offers": "#/components/schemas/Offer",
-              "offer-groups": "#/components/schemas/OfferGroup",
-              "trip-offer-group-details": "#/components/schemas/TripOfferGroupDetails",
-              "leg-types": "#/components/schemas/LegType",
-              "offer-options": "#/components/schemas/OfferOption",
-              "trip-offer-option-details": "#/components/schemas/TripOfferOptionDetails",
-              "cabin-classes": "#/components/schemas/CabinClass"
-            }
-          }
-        }
-      },
       "OfferGroupIncluded": {
         "title": "OfferGroupIncluded",
         "type": "array",
@@ -7757,33 +7702,6 @@
           "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
         },
         "description": "Offer Search identifier"
-      },
-      "offerSearchInclude": {
-        "name": "include",
-        "in": "query",
-        "required": false,
-        "schema": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": [
-              "offers",
-              "offers.groups",
-              "offers.groups.details",
-              "offers.groups.details.legType",
-              "offers.groups.options",
-              "offers.groups.options.details",
-              "offers.groups.options.details.cabinClass",
-              "offers.groups.options.details.details"
-            ]
-          },
-          "example": [
-            "offers"
-          ]
-        },
-        "description": "Customize which related resources to return.",
-        "style": "form",
-        "explode": false
       },
       "orderId": {
         "name": "orderId",
