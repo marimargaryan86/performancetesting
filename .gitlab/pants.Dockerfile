@@ -35,4 +35,4 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     nomad=1.6.1-1 \
     /tmp/oasdiff.deb \
 && rm -rf /var/lib/apt/lists/* /tmp/oasdiff.deb \
-&& printf "[GLOBAL]\npants_version = \"2.16.0\"" > /tmp/pants.toml && cd /tmp/ && pants --version && rm /tmp/pants.toml
+&& printf "[GLOBAL]\npants_version = \"2.17.1rc0\"" > /tmp/pants.toml && cd /tmp/ && pants --version && rm /tmp/pants.toml

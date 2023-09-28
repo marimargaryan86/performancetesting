@@ -22,7 +22,7 @@ pants:setup:
   image: "${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG}"
   interruptible: true
   after_script:
-    - >
+    - |
       function nuke_if_too_big() {
         path=$1
         limit_mb=$2
@@ -34,7 +34,7 @@ pants:setup:
         mkdir -p "${path}"
       }
 
-      nuke_if_too_big "${PANTS_NAMED_CACHES_DIR}" 1024
+      nuke_if_too_big "${PANTS_NAMED_CACHES_DIR}" 2048
   artifacts:
     paths:
       - .pants.d/pants.log
@@ -42,7 +42,7 @@ pants:setup:
   variables:
     GIT_DEPTH: 0
     GIT_STRATEGY: clone
-    PANTS_CONFIG_FILES: "+['pants.ci.toml','pants.go.toml']"
+    PANTS_CONFIG_FILES: "+['pants.ci.toml', 'pants.go.toml']"
     PANTS_DOCKER_DEFAULT_REPOSITORY: "${CI_PROJECT_PATH}/service/{directory}"
     PANTS_DOCKER_REGISTRIES: "{'${CI_REGISTRY}': {'address': '${CI_REGISTRY}', 'default': True}}"
     PANTS_NAMED_CACHES_DIR: "${CI_PROJECT_DIR}/.cache/named_caches"
@@ -66,7 +66,7 @@ pants:setup:
   needs:
     - "pants:setup"
   tags:
-    - docker
+    - docker-mr-pants
 
 pants:lint-check:
   extends: .pants
