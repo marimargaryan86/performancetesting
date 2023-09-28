@@ -8,8 +8,7 @@ declare global {
     interface Locals {
       user?: {
         data: UserModel;
-        sessionExpiresAt: Date;
-        token: string;
+        expiresAt: Date | undefined;
       };
     }
     // interface PageData {}

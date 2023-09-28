@@ -3,7 +3,7 @@ import { getZeroTimeDate } from "utils/date-time";
 import type {
   ConversionModel,
   ConversionStatus,
-} from "integration/junction-pay/schemas/conversion";
+} from "integration/junction-hub-api/schemas/conversion";
 
 export function filterConversions(
   transactions: ConversionModel[],

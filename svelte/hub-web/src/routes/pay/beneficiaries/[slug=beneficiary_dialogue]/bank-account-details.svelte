@@ -7,7 +7,7 @@
   import {
     beneficiaryModel,
     type CreateBeneficiaryModel,
-  } from "integration/junction-pay/schemas/beneficiary.client";
+  } from "integration/junction-hub-api/schemas/beneficiary.client";
   import Section from "./section.svelte";
   import TextField from "components/ui/text-field.svelte";
   import RegularPaymentIcon from "components/icons/regular-payment-icon.svelte";
@@ -16,7 +16,7 @@
   import { z } from "zod";
   import { updateBeneficiaryData } from "./helpers";
   import { formatCountryOption } from "formatting/location";
-  import type { CurrencyModel } from "integration/junction-pay/schemas/money";
+  import type { CurrencyModel } from "integration/junction-hub-api/schemas/money";
 
   export let data: CreateBeneficiaryModel;
   export let currencies: Map<string, CurrencyModel>;

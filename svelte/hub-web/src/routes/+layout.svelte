@@ -15,8 +15,8 @@
 
   let logoutTimer: number | undefined = undefined;
 
-  $: if (browser && data.user) {
-    setLogoutTimer(data.user.sessionExpiresAt);
+  $: if (browser && data.user?.expiresAt) {
+    setLogoutTimer(data.user.expiresAt);
   }
   $: if (data.user) {
     Sentry.setUser({ email: data.user.data.email, id: data.user.data.id });

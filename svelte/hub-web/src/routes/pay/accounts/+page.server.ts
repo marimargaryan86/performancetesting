@@ -1,11 +1,13 @@
 import integrationInstances from "integration-instances";
-import type { AccountModel } from "integration/junction-pay/schemas/account";
+import type { AccountModel } from "integration/junction-hub-api/schemas/account";
 import type { PaginatedData } from "models/common";
-import { getToken } from "utils/auth";
+import { getSession } from "utils/auth";
 
 export function load(event): { accounts: Promise<PaginatedData<AccountModel>> } {
   return {
-    accounts: integrationInstances.junctionPayApi.accounts.listAccounts(getToken(event)),
+    accounts: integrationInstances.junctionPayApi.accounts.listAccounts({
+      session: getSession(event),
+    }),
   };
 }
 
@@ -19,10 +21,10 @@ export const actions = {
     }
 
     return {
-      accounts: await integrationInstances.junctionPayApi.accounts.listAccounts(
-        getToken(event),
+      accounts: await integrationInstances.junctionPayApi.accounts.listAccounts({
+        session: getSession(event),
         cursor,
-      ),
+      }),
     };
   },
 };

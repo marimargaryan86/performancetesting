@@ -1,17 +1,17 @@
 import { ActionFailure, fail } from "@sveltejs/kit";
 import integrationInstances from "integration-instances";
 import type { BookingModel } from "integration/junction-client-api/schemas/booking";
-import type { TransactionModel } from "integration/junction-pay/schemas/transaction";
+import type { TransactionModel } from "integration/junction-hub-api/schemas/transaction";
 import type { PaginatedData } from "models/common";
-import { getToken } from "utils/auth";
+import { getSession } from "utils/auth";
 
 export function load(event): {
   transactions: Promise<PaginatedData<TransactionModel>>;
 } {
   return {
-    transactions: integrationInstances.junctionPayApi.transactions.listTransactions(
-      getToken(event),
-    ),
+    transactions: integrationInstances.junctionPayApi.transactions.listTransactions({
+      session: getSession(event),
+    }),
   };
 }
 
@@ -43,10 +43,10 @@ export const actions = {
     }
 
     return {
-      transactions: await integrationInstances.junctionPayApi.transactions.listTransactions(
-        getToken(event),
+      transactions: await integrationInstances.junctionPayApi.transactions.listTransactions({
+        session: getSession(event),
         cursor,
-      ),
+      }),
     };
   },
 };

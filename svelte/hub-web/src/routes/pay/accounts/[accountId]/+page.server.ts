@@ -1,18 +1,18 @@
-import { getToken } from "utils/auth";
+import { getSession } from "utils/auth";
 import integrationInstances from "integration-instances";
 import type { PriceModel } from "integration/junction-mobile-api/schemas/price";
-import type { AccountModel } from "integration/junction-pay/schemas/account";
+import type { AccountModel } from "integration/junction-hub-api/schemas/account";
 
 export function load(event): {
   balances: Promise<PriceModel[]>;
   account: Promise<AccountModel>;
 } {
   const { accountId } = event.params;
-  const token = getToken(event);
+  const session = getSession(event);
 
   return {
-    account: integrationInstances.junctionPayApi.accounts.getAccount(token, accountId),
-    balances: integrationInstances.junctionPayApi.balances.listBalances(token, accountId),
+    account: integrationInstances.junctionPayApi.accounts.getAccount({ session, id: accountId }),
+    balances: integrationInstances.junctionPayApi.balances.listBalances({ session, accountId }),
   };
 }
 
@@ -31,11 +31,11 @@ export const actions = {
     return {
       balances: await Promise.all(
         jsonData.currencyCodes.map((currencyCode) =>
-          integrationInstances.junctionPayApi.balances.addBalance(
-            getToken(event),
+          integrationInstances.junctionPayApi.balances.addBalance({
+            session: getSession(event),
             accountId,
             currencyCode,
-          ),
+          }),
         ),
       ),
     };

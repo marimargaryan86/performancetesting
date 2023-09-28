@@ -1,7 +1,7 @@
 import type {
   TransactionModel,
   TransactionStatus,
-} from "integration/junction-pay/schemas/transaction";
+} from "integration/junction-hub-api/schemas/transaction";
 import type { DateRange } from "models/date-time";
 import { getZeroTimeDate } from "utils/date-time";
 

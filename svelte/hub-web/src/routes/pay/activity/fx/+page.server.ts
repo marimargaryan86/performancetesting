@@ -1,13 +1,15 @@
 import integrationInstances from "integration-instances";
-import type { ConversionModel } from "integration/junction-pay/schemas/conversion";
+import type { ConversionModel } from "integration/junction-hub-api/schemas/conversion";
 import type { PaginatedData } from "models/common";
-import { getToken } from "utils/auth";
+import { getSession } from "utils/auth";
 
 export function load(event): {
   conversions: Promise<PaginatedData<ConversionModel>>;
 } {
   return {
-    conversions: integrationInstances.junctionPayApi.conversions.listConversions(getToken(event)),
+    conversions: integrationInstances.junctionPayApi.conversions.listConversions({
+      session: getSession(event),
+    }),
   };
 }
 
@@ -21,10 +23,10 @@ export const actions = {
     }
 
     return {
-      conversions: await integrationInstances.junctionPayApi.conversions.listConversions(
-        getToken(event),
+      conversions: await integrationInstances.junctionPayApi.conversions.listConversions({
+        session: getSession(event),
         cursor,
-      ),
+      }),
     };
   },
 };

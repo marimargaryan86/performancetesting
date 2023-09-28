@@ -1,37 +1,43 @@
 <script lang="ts">
-  import EmailIcon from "components/icons/email-icon.svelte";
   import JunctionLogo from "components/icons/junction-logo.svelte";
   import LoadingIcon from "components/icons/loading-icon.svelte";
-  import LockIcon from "components/icons/lock-icon.svelte";
   import Button from "components/ui/button.svelte";
   import TextField from "components/ui/text-field.svelte";
   import { callAction } from "utils/common";
-  import type { ActionData } from "./$types";
   import routeConfig from "routeConfig";
   import { pendableCall } from "utils/pendable-call";
+  import type { LoginActionData } from "./+page.server";
+  import { goto } from "$app/navigation";
 
-  export let form;
+  export let data;
 
-  let data = { email: "", password: "" };
-  let disabled = false;
+  let errors: string | undefined;
 
-  $: disabled = data.email === "" || data.password === "";
+  const { pending, func: submit } = pendableCall(async () => {
+    errors = undefined;
 
-  function clearError(key: keyof NonNullable<ActionData>): void {
-    if (!form) {
+    const actionData: LoginActionData = {
+      id: data.loginFlow.id,
+      data: Object.fromEntries(
+        data.loginFlow.elements.map((item) => [item.attributes.name, item.attributes.value]),
+      ),
+    };
+
+    const result = await callAction({
+      action: routeConfig.routes.login.actions.login,
+      data: actionData,
+      dataType: "json",
+      apply: false,
+    });
+
+    if (result.type === "success") {
+      await goto(routeConfig.root, { invalidateAll: true });
+
       return;
     }
 
-    if (form.unauthorized) {
-      form = {};
-    } else {
-      form[key] = undefined;
-    }
-  }
-
-  const { pending, func: login } = pendableCall(() =>
-    callAction({ action: routeConfig.routes.login.actions.login, data }),
-  );
+    errors = "Invalid credentials";
+  });
 </script>
 
 <svelte:head>
@@ -44,45 +50,32 @@
   <section class="intro">
     <JunctionLogo size={0.5} />
 
-    <span>Travel Made</span>
+    <span>Travel payment made</span>
     <strong>Simple</strong>
   </section>
 
   <section class="login">
     <JunctionLogo snowfallTechnology poweredBy />
 
-    <form on:submit|preventDefault={login}>
-      <div class="login-tabs">
-        <div class="login-tab">
-          <p class="typography headline-small bold">Log in</p>
-          <div class="underscore" />
-        </div>
-      </div>
+    <form on:submit|preventDefault={submit}>
+      {#each data.loginFlow.elements as element}
+        {#if element.type === "input"}
+          {#if element.attributes.type === "text" || element.attributes.type === "password"}
+            <TextField
+              label={element.attributes.label}
+              type={element.attributes.type}
+              name={element.attributes.name}
+              bind:value={element.attributes.value}
+              placeholder={element.attributes.label
+                ? `Enter ${element.attributes.label}`
+                : undefined}
+              error={element.attributes.type === "password" ? errors : undefined}
+            />
+          {/if}
+        {/if}
+      {/each}
 
-      <TextField
-        label="Email"
-        type="email"
-        name="email"
-        bind:value={data.email}
-        error={form?.email}
-        placeholder="Enter your email"
-        on:input={clearError.bind(clearError, "email")}
-      >
-        <EmailIcon slot="icon-before" color="var(--color-main-primary-500)" />
-      </TextField>
-
-      <TextField
-        label="Password"
-        type="password"
-        name="password"
-        bind:value={data.password}
-        error={form?.password}
-        placeholder="Enter your password"
-        on:input={clearError.bind(clearError, "password")}
-      >
-        <LockIcon slot="icon-before" color="var(--color-main-primary-500)" />
-      </TextField>
-      <Button type="submit" {disabled}>
+      <Button type="submit">
         Login
 
         {#if $pending}
@@ -187,27 +180,5 @@
     gap: 24px;
     width: 100%;
     max-width: 448px;
-  }
-
-  .login-tabs {
-    display: flex;
-    flex-direction: row;
-  }
-
-  .login-tab {
-    position: relative;
-  }
-
-  .login-tab p {
-    padding-bottom: 16px;
-  }
-
-  .underscore {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 45%;
-    height: 4px;
-    background-color: var(--color-main-primary-500);
   }
 </style>

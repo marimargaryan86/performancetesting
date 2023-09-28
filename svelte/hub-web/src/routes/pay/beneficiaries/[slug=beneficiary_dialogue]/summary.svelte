@@ -3,9 +3,9 @@
   import { callAction, capitalize } from "utils/common";
   import { updateBeneficiaryData } from "./helpers";
   import { page } from "$app/stores";
-  import type { CurrencyModel } from "integration/junction-pay/schemas/money";
-  import type { BeneficiaryModel } from "integration/junction-pay/schemas/beneficiary";
-  import type { CreateBeneficiaryModel } from "integration/junction-pay/schemas/beneficiary.client";
+  import type { CurrencyModel } from "integration/junction-hub-api/schemas/money";
+  import type { BeneficiaryModel } from "integration/junction-hub-api/schemas/beneficiary";
+  import type { CreateBeneficiaryModel } from "integration/junction-hub-api/schemas/beneficiary.client";
   import type { z } from "zod";
 
   export let data: CreateBeneficiaryModel;

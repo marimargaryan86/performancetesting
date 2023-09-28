@@ -1,12 +1,13 @@
 import { parseTransactionSchema } from "../parsers/transaction";
 import type { TransactionModel, TransactionSchema } from "../schemas/transaction";
 import type CompanyService from "./company-service";
-import JunctionPayService from "./junction-pay-service";
+import JunctionHubApiService from "./junction-hub-api-service";
 import type { PaginatedData } from "models/common";
 import type { CompanyModel } from "../schemas/company";
 import { ensureDefined } from "utils/array";
+import type { SessionModel } from "models/user";
 
-export default class TransactionService extends JunctionPayService {
+export default class TransactionService extends JunctionHubApiService {
   private readonly companyService: CompanyService;
 
   constructor(baseUrl: string | undefined, companyService: CompanyService) {
@@ -15,10 +16,10 @@ export default class TransactionService extends JunctionPayService {
     this.companyService = companyService;
   }
 
-  private async getCompanies(
-    data: { data: TransactionSchema[]; links: { next: string } },
-    token: string,
-  ): Promise<CompanyModel[]> {
+  private async getCompanies(data: {
+    data: TransactionSchema[];
+    session: SessionModel;
+  }): Promise<CompanyModel[]> {
     const companyIds = new Set(
       data.data
         .flatMap((transaction) => [
@@ -29,7 +30,7 @@ export default class TransactionService extends JunctionPayService {
     );
     const companyRequests = Array.from(companyIds).map((id) =>
       this.companyService
-        .getCompanyDetails(token, id)
+        .getCompanyDetails({ session: data.session, id })
         .then((item) => item)
         .catch(() => undefined),
     );
@@ -37,15 +38,19 @@ export default class TransactionService extends JunctionPayService {
     return (await Promise.all(companyRequests)).filter(ensureDefined);
   }
 
-  async listTransactions(
-    token: string,
-    cursor?: string,
+  async listTransactions({
+    session,
+    cursor,
     limit = 100,
-  ): Promise<PaginatedData<TransactionModel>> {
+  }: {
+    session: SessionModel;
+    cursor?: string;
+    limit?: number;
+  }): Promise<PaginatedData<TransactionModel>> {
     const resp = await this.makeRequest<{ data: TransactionSchema[]; links: { next: string } }>(
       "/transactions",
       {
-        token,
+        session,
         queryParams: {
           "page[cursor]": cursor,
           "page[limit]": limit,
@@ -53,7 +58,7 @@ export default class TransactionService extends JunctionPayService {
       },
     );
 
-    const included = { companies: await this.getCompanies(resp.json, token) };
+    const included = { companies: await this.getCompanies({ data: resp.json.data, session }) };
 
     return {
       data: resp.json.data.map((item) => parseTransactionSchema(item, included)),

@@ -1,15 +1,15 @@
 import integrationInstances from "integration-instances";
-import type { BeneficiaryModel } from "integration/junction-pay/schemas/beneficiary";
+import type { BeneficiaryModel } from "integration/junction-hub-api/schemas/beneficiary";
 import type { PaginatedData } from "models/common";
-import { getToken } from "utils/auth";
+import { getSession } from "utils/auth";
 
 export function load(event): {
   beneficiaries: Promise<PaginatedData<BeneficiaryModel>>;
 } {
   return {
-    beneficiaries: integrationInstances.junctionPayApi.beneficiaries.listBeneficiaries(
-      getToken(event),
-    ),
+    beneficiaries: integrationInstances.junctionPayApi.beneficiaries.listBeneficiaries({
+      session: getSession(event),
+    }),
   };
 }
 
@@ -25,10 +25,10 @@ export const actions = {
     }
 
     return {
-      beneficiaries: await integrationInstances.junctionPayApi.beneficiaries.listBeneficiaries(
-        getToken(event),
+      beneficiaries: await integrationInstances.junctionPayApi.beneficiaries.listBeneficiaries({
+        session: getSession(event),
         cursor,
-      ),
+      }),
     };
   },
 };

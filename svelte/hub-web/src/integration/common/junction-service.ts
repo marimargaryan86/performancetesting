@@ -1,5 +1,6 @@
 import { URLExtended } from "utils/url";
 import { throwIfError } from "./junction-error";
+import type { SessionModel } from "models/user";
 
 export default abstract class JunctionService {
   private readonly baseUrl: string;
@@ -26,6 +27,7 @@ export default abstract class JunctionService {
       queryParams?: Record<string, string | number | undefined>;
       headers?: Record<string, string>;
       data?: unknown;
+      session?: SessionModel;
       token?: string;
     } = {},
   ): Promise<Omit<Response, "json"> & { json: TResp }> {
@@ -33,8 +35,11 @@ export default abstract class JunctionService {
       new Request(new URLExtended(resource, { base: this.baseUrl, query: options.queryParams }), {
         headers: {
           "Content-Type": "application/vnd.api+json",
-          ...(options.token ? { Authorization: `Bearer ${options.token}` } : undefined),
           ...options.headers,
+          ...(options.token ? { Authorization: `Bearer ${options.token}` } : undefined),
+          ...(options.session
+            ? { cookie: `ory_kratos_session=${options.session.token}` }
+            : undefined),
         },
         method: options.method,
         body: options.data ? JSON.stringify(options.data) : undefined,

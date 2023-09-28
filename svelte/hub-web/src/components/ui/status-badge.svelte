@@ -1,7 +1,7 @@
 <script lang="ts" context="module">
   import type { BookingStatus } from "integration/junction-mobile-api/schemas/booking";
-  import type { ConversionStatus } from "integration/junction-pay/schemas/conversion";
-  import type { TransactionStatus } from "integration/junction-pay/schemas/transaction";
+  import type { ConversionStatus } from "integration/junction-hub-api/schemas/conversion";
+  import type { TransactionStatus } from "integration/junction-hub-api/schemas/transaction";
 
   export type StatusBadgeVariant = "ok" | "warn" | "error";
   export type StatusBadgeValue =

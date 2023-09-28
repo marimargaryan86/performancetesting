@@ -14,7 +14,7 @@
   import routeConfig from "routeConfig";
   import TActionsCol from "components/ui/table/t-actions-col.svelte";
   import StandardLayout from "components/page/standard-layout.svelte";
-  import type { BeneficiaryModel } from "integration/junction-pay/schemas/beneficiary";
+  import type { BeneficiaryModel } from "integration/junction-hub-api/schemas/beneficiary";
 
   export let data;
   export let form;

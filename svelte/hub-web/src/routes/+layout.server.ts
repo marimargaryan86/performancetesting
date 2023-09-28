@@ -1,19 +1,19 @@
 import { redirect } from "@sveltejs/kit";
 import integrationInstances from "integration-instances";
-import type { CurrencyModel } from "integration/junction-pay/schemas/money";
+import type { CurrencyModel } from "integration/junction-hub-api/schemas/money";
 import type { CountryModel } from "models/location";
 import type { UserModel } from "models/user";
 import routeConfig from "routeConfig";
+import { deleteSession } from "utils/auth";
 
-export async function load(event): Promise<{
+export function load(event): {
   user?: {
     data: UserModel;
-    token: string;
-    sessionExpiresAt: Date;
+    expiresAt: Date | undefined;
   };
   currencies: Map<string, CurrencyModel>;
   countries: Map<string, CountryModel>;
-}> {
+} {
   const user = event.locals.user;
 
   if (!user) {
@@ -23,11 +23,13 @@ export async function load(event): Promise<{
   try {
     return {
       user,
-      currencies: await integrationInstances.junctionPayApi.currencies.listCurrencies(user.token),
+      currencies: new Map(),
+      // TODO: Enable once the currencies endpoint is migrated to HUB API.
+      // currencies: await integrationInstances.junctionPayApi.currencies.listCurrencies(user.session),
       countries: integrationInstances.common.countries.findCountries(),
     };
   } catch {
-    event.cookies.delete("session-token", { path: "/" });
+    deleteSession(event);
 
     throw redirect(303, routeConfig.routes.login.root);
   }

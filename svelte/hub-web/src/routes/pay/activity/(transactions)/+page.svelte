@@ -27,7 +27,7 @@
   import type {
     TransactionModel,
     TransactionStatus,
-  } from "integration/junction-pay/schemas/transaction";
+  } from "integration/junction-hub-api/schemas/transaction";
   import type { BookingModel } from "integration/junction-client-api/schemas/booking";
   import TStatusBadgeCol from "components/ui/table/t-status-badge-col.svelte";
 

@@ -24,7 +24,7 @@
   import type {
     ConversionModel,
     ConversionStatus,
-  } from "integration/junction-pay/schemas/conversion";
+  } from "integration/junction-hub-api/schemas/conversion";
   import TStatusBadgeCol from "components/ui/table/t-status-badge-col.svelte";
 
   export let form;

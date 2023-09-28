@@ -1,10 +1,11 @@
 import { env } from "$env/dynamic/private";
 import junctionClientApi from "integration/junction-client-api/services";
 import junctionMobileApi from "integration/junction-mobile-api/services";
-import junctionPayApi from "integration/junction-pay/services";
+import junctionPayApi from "integration/junction-hub-api/services";
 import common from "integration/common/services";
+import ory from "integration/ory/services";
 
-const junctionPayCompanyService = new junctionPayApi.CompanyService(env.PAY_ADMIN_API_BASE_URL);
+const junctionPayCompanyService = new junctionPayApi.CompanyService(env.HUB_API_BASE_URL);
 
 export default {
   junctionClientApi: {
@@ -34,19 +35,19 @@ export default {
     ),
   },
   junctionPayApi: {
-    auth: new junctionPayApi.AuthenticationService(env.PAY_ADMIN_API_BASE_URL),
-    accounts: new junctionPayApi.AccountService(env.PAY_ADMIN_API_BASE_URL),
-    beneficiaries: new junctionPayApi.BeneficiaryService(env.PAY_ADMIN_API_BASE_URL),
-    currencies: new junctionPayApi.CurrencyService(env.PAY_API_BASE_URL),
-    conversions: new junctionPayApi.ConversionService(env.PAY_ADMIN_API_BASE_URL),
+    accounts: new junctionPayApi.AccountService(env.HUB_API_BASE_URL),
+    beneficiaries: new junctionPayApi.BeneficiaryService(env.HUB_API_BASE_URL),
+    currencies: new junctionPayApi.CurrencyService(env.HUB_API_BASE_URL),
+    conversions: new junctionPayApi.ConversionService(env.HUB_API_BASE_URL),
     companyService: junctionPayCompanyService,
     transactions: new junctionPayApi.TransactionService(
-      env.PAY_ADMIN_API_BASE_URL,
+      env.HUB_API_BASE_URL,
       junctionPayCompanyService,
     ),
-    balances: new junctionPayApi.BalanceService(env.PAY_ADMIN_API_BASE_URL),
+    balances: new junctionPayApi.BalanceService(env.HUB_API_BASE_URL),
   },
   common: {
     countries: new common.CountryService(),
   },
+  ory: new ory.OryService(env.ORY_BASE_URL),
 };

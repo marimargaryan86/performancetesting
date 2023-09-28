@@ -1,4 +1,4 @@
-import type { TransactionModel } from "integration/junction-pay/schemas/transaction";
+import type { TransactionModel } from "integration/junction-hub-api/schemas/transaction";
 import type { DirectionY } from "models/spatial";
 import type { FlattenedObject } from "utils/common";
 

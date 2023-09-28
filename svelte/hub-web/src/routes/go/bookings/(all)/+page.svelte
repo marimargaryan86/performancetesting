@@ -9,7 +9,7 @@
   import Table from "components/ui/table/table.svelte";
   import type { FlattenedObject } from "utils/common";
   import type { DirectionY } from "models/spatial";
-  import type { TransactionModel } from "integration/junction-pay/schemas/transaction";
+  import type { TransactionModel } from "integration/junction-hub-api/schemas/transaction";
   import TStatusBadgeCol from "components/ui/table/t-status-badge-col.svelte";
 
   const bookings: string[] = ["a", "b", "c", "d", "e"];

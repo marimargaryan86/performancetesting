@@ -46,7 +46,7 @@
   import { URLExtended } from "utils/url";
   import StandardLayout from "components/page/standard-layout.svelte";
   import Alert from "components/ui/alert.svelte";
-  import type { CreateBeneficiaryModel } from "integration/junction-pay/schemas/beneficiary.client";
+  import type { CreateBeneficiaryModel } from "integration/junction-hub-api/schemas/beneficiary.client";
 
   export let data;
 

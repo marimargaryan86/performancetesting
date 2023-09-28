@@ -1,4 +1,4 @@
-import type { ConversionModel } from "integration/junction-pay/schemas/conversion";
+import type { ConversionModel } from "integration/junction-hub-api/schemas/conversion";
 import type { DirectionY } from "models/spatial";
 import type { FlattenedObject } from "utils/common";
 

@@ -15,11 +15,11 @@
   import { z } from "zod";
   import { updateBeneficiaryData } from "./helpers";
   import { formatCountryOption } from "formatting/location";
-  import type { AccountModel } from "integration/junction-pay/schemas/account";
+  import type { AccountModel } from "integration/junction-hub-api/schemas/account";
   import {
     beneficiaryModel,
     type CreateBeneficiaryModel,
-  } from "integration/junction-pay/schemas/beneficiary.client";
+  } from "integration/junction-hub-api/schemas/beneficiary.client";
 
   export let data: CreateBeneficiaryModel;
   export let countries: Map<string, CountryModel>;

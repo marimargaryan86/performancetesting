@@ -1,15 +1,15 @@
-import { getToken } from "utils/auth";
+import { getSession } from "utils/auth";
 import * as devalue from "devalue";
 import type { RequestEvent } from "./$types";
 import { ActionFailure, fail } from "@sveltejs/kit";
 import { z } from "zod";
 import integrationInstances from "integration-instances";
-import type { AccountModel } from "integration/junction-pay/schemas/account";
-import type { BeneficiaryModel } from "integration/junction-pay/schemas/beneficiary";
+import type { AccountModel } from "integration/junction-hub-api/schemas/account";
+import type { BeneficiaryModel } from "integration/junction-hub-api/schemas/beneficiary";
 import {
   beneficiaryModel,
   type CreateBeneficiaryModel,
-} from "integration/junction-pay/schemas/beneficiary.client";
+} from "integration/junction-hub-api/schemas/beneficiary.client";
 
 function getBeneficiaryData(event: RequestEvent): CreateBeneficiaryModel | undefined {
   const cookieData = event.cookies.get("beneficiary-data");
@@ -23,9 +23,9 @@ export async function load(event): Promise<{
   beneficiary: CreateBeneficiaryModel;
   accounts: Promise<AccountModel[]>;
 }> {
-  const token = getToken(event);
+  const session = getSession(event);
   const accounts = integrationInstances.junctionPayApi.accounts
-    .listAccounts(token)
+    .listAccounts({ session })
     .then((data) => data.data);
 
   let beneficiary = getBeneficiaryData(event);
@@ -36,10 +36,10 @@ export async function load(event): Promise<{
       event.cookies.delete("beneficiary-data", { path: "/", httpOnly: false, secure: false });
     }
   } else if (beneficiary?.id !== event.params.slug) {
-    beneficiary = await integrationInstances.junctionPayApi.beneficiaries.getBeneficiary(
-      token,
-      event.params.slug,
-    );
+    beneficiary = await integrationInstances.junctionPayApi.beneficiaries.getBeneficiary({
+      session,
+      id: event.params.slug,
+    });
     event.cookies.delete("beneficiary-data", { path: "/", httpOnly: false, secure: false });
   }
 
@@ -67,19 +67,19 @@ export const actions = {
     try {
       if (beneficiary.id) {
         return {
-          beneficiary: await integrationInstances.junctionPayApi.beneficiaries.updateBeneficiary(
-            getToken(event),
-            beneficiary.id,
-            beneficiaryModel.parse(beneficiary),
-          ),
+          beneficiary: await integrationInstances.junctionPayApi.beneficiaries.updateBeneficiary({
+            session: getSession(event),
+            id: beneficiary.id,
+            beneficiary: beneficiaryModel.parse(beneficiary),
+          }),
         };
       }
 
       return {
-        beneficiary: await integrationInstances.junctionPayApi.beneficiaries.createBeneficiary(
-          getToken(event),
-          beneficiaryModel.omit({ id: true }).parse(beneficiary),
-        ),
+        beneficiary: await integrationInstances.junctionPayApi.beneficiaries.createBeneficiary({
+          session: getSession(event),
+          beneficiary: beneficiaryModel.omit({ id: true }).parse(beneficiary),
+        }),
       };
     } catch (err) {
       if (err instanceof z.ZodError) {

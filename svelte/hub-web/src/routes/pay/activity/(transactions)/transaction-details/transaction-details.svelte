@@ -8,7 +8,7 @@
   import Button from "components/ui/button.svelte";
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import { createEventDispatcher } from "svelte";
-  import type { TransactionModel } from "integration/junction-pay/schemas/transaction";
+  import type { TransactionModel } from "integration/junction-hub-api/schemas/transaction";
   import type { BookingModel } from "integration/junction-client-api/schemas/booking";
 
   export let transaction: TransactionModel;

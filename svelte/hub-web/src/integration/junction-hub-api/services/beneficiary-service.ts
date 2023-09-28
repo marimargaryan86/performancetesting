@@ -1,22 +1,26 @@
+import type { SessionModel } from "models/user";
 import {
   beneficiaryModel,
   putBeneficiaryModel,
   type BeneficiaryModel,
   type BeneficiarySchema,
 } from "../schemas/beneficiary";
-import JunctionPayService from "./junction-pay-service";
+import JunctionHubApiService from "./junction-hub-api-service";
 import type { PaginatedData } from "models/common";
 
-export default class BeneficiaryService extends JunctionPayService {
-  async listBeneficiaries(
-    token: string,
-    cursor?: string,
-  ): Promise<PaginatedData<BeneficiaryModel>> {
+export default class BeneficiaryService extends JunctionHubApiService {
+  async listBeneficiaries({
+    session,
+    cursor,
+  }: {
+    session: SessionModel;
+    cursor?: string;
+  }): Promise<PaginatedData<BeneficiaryModel>> {
     const resp = await this.makeRequest<{
       data: BeneficiarySchema[];
       links: { next: string };
     }>("/beneficiaries", {
-      token,
+      session,
       queryParams: { "page[cursor]": cursor },
     });
 
@@ -26,35 +30,48 @@ export default class BeneficiaryService extends JunctionPayService {
     };
   }
 
-  async getBeneficiary(token: string, id: string): Promise<BeneficiaryModel> {
+  async getBeneficiary({
+    session,
+    id,
+  }: {
+    session: SessionModel;
+    id: string;
+  }): Promise<BeneficiaryModel> {
     const resp = await this.makeRequest<{ data: BeneficiarySchema }>(`/beneficiaries/${id}`, {
-      token,
+      session,
     });
 
     return beneficiaryModel.toModel(resp.json.data);
   }
 
-  async createBeneficiary(
-    token: string,
-    beneficiary: Omit<BeneficiaryModel, "id">,
-  ): Promise<BeneficiaryModel> {
+  async createBeneficiary({
+    session,
+    beneficiary,
+  }: {
+    session: SessionModel;
+    beneficiary: Omit<BeneficiaryModel, "id">;
+  }): Promise<BeneficiaryModel> {
     const resp = await this.makeRequest<{ data: BeneficiarySchema }>("/beneficiaries", {
       method: "POST",
-      token,
+      session,
       data: { data: putBeneficiaryModel.toSchema(beneficiary) },
     });
 
     return beneficiaryModel.toModel(resp.json.data);
   }
 
-  async updateBeneficiary(
-    token: string,
-    id: string,
-    beneficiary: BeneficiaryModel,
-  ): Promise<BeneficiaryModel> {
+  async updateBeneficiary({
+    session,
+    id,
+    beneficiary,
+  }: {
+    session: SessionModel;
+    id: string;
+    beneficiary: BeneficiaryModel;
+  }): Promise<BeneficiaryModel> {
     const resp = await this.makeRequest<{ data: BeneficiarySchema }>(`/beneficiaries/${id}`, {
       method: "PATCH",
-      token,
+      session,
       data: { data: putBeneficiaryModel.toSchema(beneficiary) },
     });
 

@@ -1,4 +1,3 @@
-import AuthenticationService from "./authentication-service";
 import AccountService from "./account-service";
 import CompanyService from "./company-service";
 import TransactionService from "./transaction-service";
@@ -8,7 +7,6 @@ import CurrencyService from "./currency-service";
 import BeneficiaryService from "./beneficiary-service";
 
 export default {
-  AuthenticationService,
   AccountService,
   CompanyService,
   TransactionService,

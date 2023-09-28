@@ -1,24 +1,39 @@
+import type { SessionModel } from "models/user";
 import { balanceModel, createBalanceModel, type BalanceSchema } from "../schemas/balance";
-import JunctionPayService from "./junction-pay-service";
+import JunctionHubApiService from "./junction-hub-api-service";
 import type { PriceModel } from "integration/junction-mobile-api/schemas/price";
 
-export default class BalanceService extends JunctionPayService {
-  async listBalances(token: string, accountId: string): Promise<PriceModel[]> {
+export default class BalanceService extends JunctionHubApiService {
+  async listBalances({
+    session,
+    accountId,
+  }: {
+    session: SessionModel;
+    accountId: string;
+  }): Promise<PriceModel[]> {
     const resp = await this.makeRequest<{ data: BalanceSchema[] }>(
       `/accounts/${accountId}/balances`,
-      { token },
+      { session },
     );
 
     return resp.json.data.map(balanceModel.toModel);
   }
 
-  async addBalance(token: string, accountId: string, currencyCode: string): Promise<PriceModel> {
+  async addBalance({
+    session,
+    accountId,
+    currencyCode,
+  }: {
+    session: SessionModel;
+    accountId: string;
+    currencyCode: string;
+  }): Promise<PriceModel> {
     const resp = await this.makeRequest<{ data: BalanceSchema }>(
       `/accounts/${accountId}/relationships/currencies`,
       {
         method: "POST",
         data: { data: createBalanceModel.toSchema({ currencyCode }) },
-        token,
+        session,
       },
     );
 

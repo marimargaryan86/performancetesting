@@ -1,16 +1,21 @@
 import type { ConversionModel, ConversionSchema } from "../schemas/conversion";
-import JunctionPayService from "./junction-pay-service";
+import JunctionHubApiService from "./junction-hub-api-service";
 import { parseConversionSchema } from "../parsers/conversion";
 import type { PaginatedData } from "models/common";
 import type { TransactionSchema } from "../schemas/transaction";
 import { parseIncluded } from "../parsers/included";
+import type { SessionModel } from "models/user";
 
-export default class ConversionService extends JunctionPayService {
-  async listConversions(
-    token: string,
-    cursor?: string,
+export default class ConversionService extends JunctionHubApiService {
+  async listConversions({
+    session,
+    cursor,
     limit = 100,
-  ): Promise<PaginatedData<ConversionModel>> {
+  }: {
+    session: SessionModel;
+    cursor?: string;
+    limit?: number;
+  }): Promise<PaginatedData<ConversionModel>> {
     const resp = await this.makeRequest<{
       data: ConversionSchema[];
       included?: TransactionSchema[];
@@ -21,7 +26,7 @@ export default class ConversionService extends JunctionPayService {
         "page[cursor]": cursor,
         "page[limit]": limit,
       },
-      token,
+      session,
     });
 
     const included = parseIncluded(resp.json.included ?? []);
@@ -32,10 +37,16 @@ export default class ConversionService extends JunctionPayService {
     };
   }
 
-  async getConversionDetails(token: string, conversionId: string): Promise<ConversionModel> {
+  async getConversionDetails({
+    session,
+    id,
+  }: {
+    session: SessionModel;
+    id: string;
+  }): Promise<ConversionModel> {
     const resp = await this.makeRequest<{ data: ConversionSchema; included: TransactionSchema[] }>(
-      `/conversions/${conversionId}`,
-      { token },
+      `/conversions/${id}`,
+      { session },
     );
 
     const included = parseIncluded(resp.json.included);

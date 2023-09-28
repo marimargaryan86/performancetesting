@@ -1,5 +1,5 @@
 import type { PriceBreakdownType, PriceModel } from "integration/junction-mobile-api/schemas/price";
-import type { CurrencyModel } from "integration/junction-pay/schemas/money";
+import type { CurrencyModel } from "integration/junction-hub-api/schemas/money";
 
 export function formatAmountAndCode(
   amount: PriceModel,
