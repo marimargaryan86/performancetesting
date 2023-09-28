@@ -110,7 +110,7 @@ job "gateway-consume" {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
-PROVIDERS={{ "${local.providers_str}" | splitToMap ";" ":" | toJSON }}
+PROVIDERS={{ "${local.providers_str}" | splitToMap ";" ":" | toJSON | js }}
 EOH
         destination = "services.env"
         env         = true
