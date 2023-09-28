@@ -2,19 +2,49 @@
   "development": {
     "variables": {
       "count": 1,
-      "search_timeout": "PT50S"
+      "search_timeout": "PT50S",
+      "providers": [
+        {"uuid": "4b7d12db-7735-4c67-9645-5fc82f7c4fe8", "service_name": "ask2go-grpc"},
+        {"uuid": "f1f884bf-0be6-4ce2-8414-296a775a508d", "service_name": "ba-ndc-grpc"},
+        {"uuid": "caefde65-c15c-4b60-b8d9-27638b50b08f", "service_name": "benerail-grpc"},
+        {"uuid": "92ada881-f31c-471e-a8b0-01ed48a181d5", "service_name": "direct-ferries-grpc"},
+        {"uuid": "30bfba87-7077-4d96-beed-c5769cdc99c7", "service_name": "distribusion-grpc"},
+        {"uuid": "5d18e8e1-48e3-4b7c-82b9-62bd97a92f91", "service_name": "duffel-grpc"},
+        {"uuid": "f9ce75d1-2025-4ab5-b5d7-69e4c14c053e", "service_name": "mock-grpc"},
+        {"uuid": "a5547dae-9c65-4746-8637-d0601865508e", "service_name": "save-a-train-grpc"}
+      ]
     }
   },
   "production": {
     "variables": {
       "count": 1,
-      "search_timeout": "PT30S"
+      "search_timeout": "PT30S",
+      "providers": [
+        {"uuid": "4b7d12db-7735-4c67-9645-5fc82f7c4fe8", "service_name": "ask2go-grpc"},
+        {"uuid": "f1f884bf-0be6-4ce2-8414-296a775a508d", "service_name": "ba-ndc-grpc"},
+        {"uuid": "caefde65-c15c-4b60-b8d9-27638b50b08f", "service_name": "benerail-grpc"},
+        {"uuid": "92ada881-f31c-471e-a8b0-01ed48a181d5", "service_name": "direct-ferries-grpc"},
+        {"uuid": "30bfba87-7077-4d96-beed-c5769cdc99c7", "service_name": "distribusion-grpc"},
+        {"uuid": "5d18e8e1-48e3-4b7c-82b9-62bd97a92f91", "service_name": "duffel-grpc"},
+        {"uuid": "f9ce75d1-2025-4ab5-b5d7-69e4c14c053e", "service_name": "mock-grpc"},
+        {"uuid": "a5547dae-9c65-4746-8637-d0601865508e", "service_name": "save-a-train-grpc"}
+      ]
     }
   },
   "sandbox": {
     "variables": {
       "count": 1,
-      "search_timeout": "PT30S"
+      "search_timeout": "PT30S",
+      "providers": [
+        {"uuid": "4b7d12db-7735-4c67-9645-5fc82f7c4fe8", "service_name": "ask2go-grpc"},
+        {"uuid": "f1f884bf-0be6-4ce2-8414-296a775a508d", "service_name": "ba-ndc-grpc"},
+        {"uuid": "caefde65-c15c-4b60-b8d9-27638b50b08f", "service_name": "benerail-grpc"},
+        {"uuid": "92ada881-f31c-471e-a8b0-01ed48a181d5", "service_name": "direct-ferries-grpc"},
+        {"uuid": "30bfba87-7077-4d96-beed-c5769cdc99c7", "service_name": "distribusion-grpc"},
+        {"uuid": "5d18e8e1-48e3-4b7c-82b9-62bd97a92f91", "service_name": "duffel-grpc"},
+        {"uuid": "f9ce75d1-2025-4ab5-b5d7-69e4c14c053e", "service_name": "mock-grpc"},
+        {"uuid": "a5547dae-9c65-4746-8637-d0601865508e", "service_name": "save-a-train-grpc"}
+      ]
     }
   }
 }

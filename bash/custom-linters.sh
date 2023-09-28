@@ -143,11 +143,13 @@ for f in "${NOMAD_FILES[@]}"; do
 		if [[ -n ${VARIABLES} ]]; then
 			(nomad validate -var-file /dev/stdin "${f}" >/dev/null 2>&1) <<<"${VARIABLES}" || {
 				echo "${f}: file did not validate"
+				(nomad validate -var-file /dev/stdin "${f}") <<<"${VARIABLES}"
 				FAILURE=1
 			}
 		else
 			nomad validate "${f}" >/dev/null 2>&1 || {
 				echo "${f}: file did not validate"
+				nomad validate "${f}"
 				FAILURE=1
 			}
 		fi
