@@ -7,7 +7,7 @@ import {
 import { z } from "zod";
 import { companyModel } from "./company";
 
-export const contactPersonModel = z.object({ id: z.string(), type: z.enum(["contact-persons"]) });
+export const contactModel = z.object({ id: z.string(), type: z.enum(["contacts"]) });
 
 export const accountModel = getSchemaModel(
   z.object({
@@ -18,8 +18,8 @@ export const accountModel = getSchemaModel(
       status: z.string(),
     }),
     relationships: relationship({
-      company: companyModel.identifier.optional(),
-      contactPerson: contactPersonModel.optional(),
+      company: companyModel.identifier.nullable(),
+      contact: contactModel.nullable(),
     }),
     links: links(["self"]),
   }),
@@ -35,8 +35,8 @@ export const accountModel = getSchemaModel(
       headAccount: false,
       id: data.id,
       name: data.attributes.name,
-      companyId: data.relationships.company?.data.id,
-      contactPersonId: data.relationships.contactPerson?.data.id,
+      companyId: data.relationships.company?.data?.id,
+      contactPersonId: data.relationships.contact.data?.id,
     }),
   },
 );

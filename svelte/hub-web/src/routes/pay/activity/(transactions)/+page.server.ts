@@ -1,6 +1,6 @@
 import { ActionFailure, fail } from "@sveltejs/kit";
 import integrationInstances from "integration-instances";
-import type { BookingModel } from "integration/junction-client-api/schemas/booking";
+import type { BookingModel } from "integration/junction-hub-api/schemas/booking";
 import type { TransactionModel } from "integration/junction-hub-api/schemas/transaction";
 import type { PaginatedData } from "models/common";
 import { getSession } from "utils/auth";
@@ -27,7 +27,10 @@ export const actions = {
     let booking: BookingModel | undefined = undefined;
 
     try {
-      booking = await integrationInstances.junctionClientApi.bookings.getBooking(bookingId);
+      booking = await integrationInstances.junctionPayApi.bookings.getBooking({
+        session: getSession(event),
+        id: bookingId,
+      });
     } catch {
       //
     }

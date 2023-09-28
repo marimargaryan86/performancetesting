@@ -1,5 +1,4 @@
 import { env } from "$env/dynamic/private";
-import junctionClientApi from "integration/junction-client-api/services";
 import junctionMobileApi from "integration/junction-mobile-api/services";
 import junctionPayApi from "integration/junction-hub-api/services";
 import common from "integration/common/services";
@@ -8,9 +7,6 @@ import ory from "integration/ory/services";
 const junctionPayCompanyService = new junctionPayApi.CompanyService(env.HUB_API_BASE_URL);
 
 export default {
-  junctionClientApi: {
-    bookings: new junctionClientApi.BookingService(env.CLIENT_API_BASE_URL, env.CLIENT_API_KEY),
-  },
   junctionMobileApi: {
     places: new junctionMobileApi.PlaceService(
       env.BOOKING_HUB_API_BASE_URL,
@@ -44,6 +40,7 @@ export default {
       env.HUB_API_BASE_URL,
       junctionPayCompanyService,
     ),
+    bookings: new junctionPayApi.BookingService(env.HUB_API_BASE_URL),
     balances: new junctionPayApi.BalanceService(env.HUB_API_BASE_URL),
   },
   common: {

@@ -2,7 +2,7 @@
   import EntityAvatar from "components/ui/entity-avatar.svelte";
   import StatusBadge from "components/ui/status-badge.svelte";
   import { yymmdd } from "formatting/date-time";
-  import type { BookingModel } from "integration/junction-client-api/schemas/booking";
+  import type { BookingModel } from "integration/junction-hub-api/schemas/booking";
   import type { TransactionModel } from "integration/junction-hub-api/schemas/transaction";
 
   export let booking: BookingModel;

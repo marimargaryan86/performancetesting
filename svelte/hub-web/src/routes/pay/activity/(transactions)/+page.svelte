@@ -28,7 +28,7 @@
     TransactionModel,
     TransactionStatus,
   } from "integration/junction-hub-api/schemas/transaction";
-  import type { BookingModel } from "integration/junction-client-api/schemas/booking";
+  import type { BookingModel } from "integration/junction-hub-api/schemas/booking";
   import TStatusBadgeCol from "components/ui/table/t-status-badge-col.svelte";
 
   export let data;

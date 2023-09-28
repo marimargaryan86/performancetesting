@@ -1,6 +1,6 @@
 <script lang="ts">
   import { formatAmountAndCode } from "formatting/currency";
-  import type { BookingModel } from "integration/junction-client-api/schemas/booking";
+  import type { BookingModel } from "integration/junction-hub-api/schemas/booking";
 
   export let booking: BookingModel;
 </script>

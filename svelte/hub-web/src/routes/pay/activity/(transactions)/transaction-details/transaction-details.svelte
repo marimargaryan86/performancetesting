@@ -9,7 +9,7 @@
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import { createEventDispatcher } from "svelte";
   import type { TransactionModel } from "integration/junction-hub-api/schemas/transaction";
-  import type { BookingModel } from "integration/junction-client-api/schemas/booking";
+  import type { BookingModel } from "integration/junction-hub-api/schemas/booking";
 
   export let transaction: TransactionModel;
   export let bookingRequest: Promise<BookingModel | undefined> | undefined;

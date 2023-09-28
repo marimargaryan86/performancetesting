@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { BookingModel } from "integration/junction-client-api/schemas/booking";
+  import type { BookingModel } from "integration/junction-hub-api/schemas/booking";
   import Trip from "./trip.svelte";
 
   export let booking: BookingModel;
