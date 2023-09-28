@@ -121,5 +121,12 @@ module.exports = {
     "no-trailing-spaces": "error",
     "object-curly-newline": ["error", { consistent: true }],
     "wrap-iife": "error",
+    "svelte/require-event-dispatcher-types": "error",
+    "svelte/prefer-class-directive": "error",
+    "svelte/prefer-style-directive": "error",
+    "svelte/no-inner-declarations": "error",
+    "svelte/no-dom-manipulating": "error",
+    "svelte/valid-prop-names-in-kit-pages": "error",
+    "svelte/no-reactive-functions": "error",
   },
 };
