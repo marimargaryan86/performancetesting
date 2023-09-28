@@ -1406,6 +1406,51 @@
         }
       }
     },
+    "/orders/{orderId}/markup": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/orderId"
+        }
+      ],
+      "get": {
+        "summary": "Get Order Markup By Order",
+        "tags": [
+          "orders"
+        ],
+        "description": "Used to retrieve markup by order id",
+        "operationId": "get-orders-id-markup",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/Markup"
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
     "/offers/searches": {
       "post": {
         "parameters": [

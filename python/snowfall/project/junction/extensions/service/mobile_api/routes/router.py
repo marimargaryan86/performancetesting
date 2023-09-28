@@ -49,6 +49,11 @@ def get_routes(
             name="MessageOrder",
         ),
         integration.route(
+            "/orders/{orderId}/markup",
+            orders.MarkupByOrder,
+            name="ViewMarkupByOrder",
+        ),
+        integration.route(
             "/cancellations/requests",
             orders.CancellationRequest,
             name="CreateCancellationRequest",

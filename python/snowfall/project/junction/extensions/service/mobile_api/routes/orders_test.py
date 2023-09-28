@@ -250,27 +250,7 @@ class TestOrders(object):
     ) -> None:
         await self.create_order(authenticated_http_client, httpx_mock, monkeypatch)
 
-        response = await authenticated_http_client.post(
-            "/orders/markups",
-            json={
-                "data": {
-                    "type": "markups",
-                    "attributes": {
-                        "serviceFee": {"currency": "EUR", "amount": "13.37"},
-                        "agencyMarkup": {"currency": "EUR", "amount": "13.37"},
-                        "totalToCollect": {"currency": "EUR", "amount": "13.37"},
-                    },
-                    "relationships": {
-                        "order": {
-                            "data": {
-                                "id": _ORDER_ID,
-                                "type": "orders",
-                            },
-                        },
-                    },
-                },
-            },
-        )
+        response = await _create_markups(authenticated_http_client)
 
         assert response.json()["data"]
         assert response.status_code == 201
@@ -279,27 +259,7 @@ class TestOrders(object):
         self,
         authenticated_http_client: httpx.AsyncClient,
     ) -> None:
-        response = await authenticated_http_client.post(
-            "/orders/markups",
-            json={
-                "data": {
-                    "type": "markups",
-                    "attributes": {
-                        "serviceFee": {"currency": "EUR", "amount": "13.37"},
-                        "agencyMarkup": {"currency": "EUR", "amount": "13.37"},
-                        "totalToCollect": {"currency": "EUR", "amount": "13.37"},
-                    },
-                    "relationships": {
-                        "order": {
-                            "data": {
-                                "id": _ORDER_ID,
-                                "type": "orders",
-                            },
-                        },
-                    },
-                },
-            },
-        )
+        response = await _create_markups(authenticated_http_client)
 
         assert response.status_code == 404
 
@@ -311,7 +271,46 @@ class TestOrders(object):
     ) -> None:
         await self.create_order(authenticated_http_client, httpx_mock, monkeypatch)
 
-        payload = {
+        await _create_markups(authenticated_http_client)
+
+        response = await _create_markups(authenticated_http_client)
+
+        assert response.status_code == 400
+
+    async def test_get_markup_by_order(
+        self,
+        authenticated_http_client: httpx.AsyncClient,
+        httpx_mock: pytest_httpx.HTTPXMock,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        await self.create_order(authenticated_http_client, httpx_mock, monkeypatch)
+
+        await _create_markups(authenticated_http_client)
+
+        response = await authenticated_http_client.get(
+            "/orders/{0}/markup".format(_ORDER_ID),
+        )
+
+        assert response.json()["data"]
+        assert response.status_code == 200
+
+    async def test_get_markup_by_order_not_found_throws404(
+        self,
+        authenticated_http_client: httpx.AsyncClient,
+    ) -> None:
+        response = await authenticated_http_client.get(
+            "/orders/{0}/markup".format(_ORDER_ID),
+        )
+
+        assert response.status_code == 404
+
+
+async def _create_markups(
+    authenticated_http_client: httpx.AsyncClient,
+) -> httpx.Response:
+    return await authenticated_http_client.post(
+        "/orders/markups",
+        json={
             "data": {
                 "type": "markups",
                 "attributes": {
@@ -328,16 +327,5 @@ class TestOrders(object):
                     },
                 },
             },
-        }
-
-        await authenticated_http_client.post(
-            "/orders/markups",
-            json=payload,
-        )
-
-        response = await authenticated_http_client.post(
-            "/orders/markups",
-            json=payload,
-        )
-
-        assert response.status_code == 400
+        },
+    )

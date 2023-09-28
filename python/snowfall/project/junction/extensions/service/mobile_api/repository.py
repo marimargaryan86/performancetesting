@@ -641,3 +641,6 @@ class MarkupsRepository(
 ):
     _proto = models_pb2.Markup
     _indexes = (pymongo.IndexModel("order_id", background=True, unique=True),)
+
+    async def find_by_order_id(self, order_id: str) -> models_pb2.Markup | None:
+        return await self._execute(self._collection.find_one, {"order_id": order_id})

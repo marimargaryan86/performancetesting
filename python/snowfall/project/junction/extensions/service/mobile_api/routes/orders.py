@@ -369,6 +369,24 @@ class Markups(endpoints.HTTPEndpoint):
         )
 
 
+class MarkupByOrder(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        markups_repository: repository.MarkupsRepository = lagom.injectable,
+    ) -> responses.Response:
+        markup = await markups_repository.find_by_order_id(
+            request.path_params["orderId"],
+        )
+
+        if not markup:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+
+        return stdlib_models.JsonApiResponse(
+            stdlib_models.Body(data=resources.MarkupResource.from_proto(markup)),
+        )
+
+
 async def check_payment_amount_and_state(
     payment_intent_id: str,
     quote: str,
