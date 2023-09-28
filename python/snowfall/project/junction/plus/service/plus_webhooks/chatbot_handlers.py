@@ -21,8 +21,9 @@ from snowfall.stdlib.persistence.redis import types as redis
 action_menu = _("Please select one of the following options")
 
 trip_details_menu = _(
-    "To enable auto check-in and save time at the airport please click the"
-    " *Check-in* button below. For further options please click on the *Main Menu*"
+    "To enable auto check-in and save time at the airport please click on the"
+    " *Check-in* button below. If you would like to plan this trip please click on the"
+    " Plan this trip button. For further options please click on the *Main Menu*"
     " button.",
 )
 
