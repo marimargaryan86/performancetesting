@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package snowfall.service.authentication.v1;
 
+import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/service/authentication/v1";
@@ -25,6 +26,7 @@ message Session {
   message Identity {
     string id = 1;
     string email = 2;
+    google.protobuf.Struct metadata_public = 3;
   }
   Identity identity = 4;
 }

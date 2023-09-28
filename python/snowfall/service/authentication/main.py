@@ -4,7 +4,7 @@ import ipaddress
 import pydantic
 
 from snowfall.adapter import authentication
-from snowfall.service.authentication import grpc, repository
+from snowfall.service.authentication import grpc, repository, sessions
 from snowfall.stdlib.format import jwt
 from snowfall.stdlib.service import application, mongo_factory
 from snowfall.stdlib.transport.grpc import server
@@ -48,7 +48,9 @@ async def _serve(app: application.AsyncApplication[_GrpcSettings]) -> None:
                 ),
             ),
             grpc.OAuthService(ory_client=ory_client),
-            grpc.SessionService(ory_client=ory_client),
+            grpc.SessionService(
+                sessions_client=sessions.Sessions(ory_client=ory_client),
+            ),
         ],
     )
 

@@ -5,7 +5,7 @@ import httpx
 from google.rpc import error_details_pb2
 
 from snowfall.adapter import authentication
-from snowfall.service.authentication import repository
+from snowfall.service.authentication import repository, sessions
 from snowfall.service.authentication.v1 import (
     authentication_pb2 as auth_pb2,
 )
@@ -18,7 +18,7 @@ from snowfall.service.authentication.v1 import (
     sessions_pb2_grpc,
 )
 from snowfall.stdlib import string
-from snowfall.stdlib.format import jwt, protobuf
+from snowfall.stdlib.format import jwt
 from snowfall.stdlib.transport.grpc import rich_status, service
 from snowfall.vendor.ory import client
 
@@ -249,8 +249,8 @@ def _validate_email(email: str) -> str:
 
 
 class SessionService(service.Service, sessions_pb2_grpc.SessionServiceServicer):
-    def __init__(self, ory_client: client.OryClient):
-        self._client = ory_client
+    def __init__(self, sessions_client: sessions.Sessions):
+        self._sessions = sessions_client
 
     def get_name(self) -> str:
         return sessions_pb2.DESCRIPTOR.services_by_name["SessionService"].full_name
@@ -267,21 +267,12 @@ class SessionService(service.Service, sessions_pb2_grpc.SessionServiceServicer):
         context: grpc.aio.ServicerContext,
     ) -> sessions_pb2.GetSessionResponse:
         try:
-            session = await self._client.get_session(request.cookie)
-        except httpx.HTTPStatusError as err:
-            if err.response.status_code == httpx.codes.NOT_FOUND.value:
-                await context.abort(grpc.StatusCode.NOT_FOUND)
-
+            session = await self._sessions.get_session_for_cookie(request.cookie)
+        except sessions.NotFoundError:
+            return await context.abort(grpc.StatusCode.NOT_FOUND)
+        except sessions.UnknownError:
             return await context.abort(grpc.StatusCode.UNKNOWN)
 
         return sessions_pb2.GetSessionResponse(
-            session=sessions_pb2.Session(
-                id=session.identifier,
-                active=session.active,
-                expires_at=protobuf.datetime_to_protobuf(session.expires_at),
-                identity=sessions_pb2.Session.Identity(
-                    id=session.identity.identifier,
-                    email=session.identity.traits.email,
-                ),
-            ),
+            session=session,
         )
