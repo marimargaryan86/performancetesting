@@ -143,7 +143,7 @@ interpreter_constraints = ["CPython==3.11.*"]
 enable_resolves = true
 tailor_pex_binary_targets = false
 resolves = {python-default = "vendor/constraints.txt"}
-pip_version = "23.0.1"
+pip_version = "latest"
 
 [python-infer]
 unowned_dependency_behavior = "error"
