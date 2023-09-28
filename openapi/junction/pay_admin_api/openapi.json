@@ -2373,25 +2373,39 @@
                   "company": {
                     "type": "object",
                     "readOnly": true,
-                    "nullable": true,
                     "required": [
                       "data"
                     ],
                     "properties": {
                       "data": {
-                        "$ref": "#/components/schemas/CompanyIdentifier"
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/CompanyIdentifier"
+                          },
+                          {
+                            "nullable": true
+                          }
+                        ],
+                        "nullable": true
                       }
                     }
                   },
                   "contact": {
                     "type": "object",
-                    "nullable": true,
                     "required": [
                       "data"
                     ],
                     "properties": {
                       "data": {
-                        "$ref": "#/components/schemas/ContactIdentifier"
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/ContactIdentifier"
+                          },
+                          {
+                          "nullable": true
+                          }
+                        ],
+                        "nullable": true
                       }
                     }
                   }

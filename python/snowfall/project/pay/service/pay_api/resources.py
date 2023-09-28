@@ -307,8 +307,8 @@ class AccountResource(models.Resource):
         request: requests.Request,
     ) -> AccountResource:
         relationships: dict[str, Any] = {
-            "company": None,
-            "contact": None,
+            "company": {"data": None},
+            "contact": {"data": None},
         }
         if account.company_id:
             relationships["company"] = {
