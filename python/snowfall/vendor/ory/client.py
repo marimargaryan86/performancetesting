@@ -4,7 +4,7 @@ import more_itertools
 from snowfall.vendor.ory import models
 
 
-class OryClient(object):
+class OryClient(object):  # noqa: WPS214
     def __init__(
         self,
         base_url: str,
@@ -47,6 +47,23 @@ class OryClient(object):
     async def get_identity(self, identifier: str) -> models.Identity:
         response = await self._client.get(
             url="/admin/identities/{0}".format(identifier),
+        )
+        response.raise_for_status()
+
+        return models.Identity(**response.json())
+
+    async def update_identity(self, identity: models.Identity) -> models.Identity:
+        operations = [
+            {
+                "op": "replace",
+                "path": "/metadata_public/{0}".format(meta_key),
+                "value": meta_value,
+            }
+            for meta_key, meta_value in identity.metadata_public.items()
+        ]
+        response = await self._client.patch(
+            url="/admin/identities/{0}".format(identity.identifier),
+            json=operations,
         )
         response.raise_for_status()
 
