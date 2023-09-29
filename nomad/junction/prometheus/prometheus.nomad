@@ -49,8 +49,6 @@ scrape_configs:
         regex: (.*)metrics(.*)
         action: keep
       - source_labels: [__meta_consul_service]
-        action: drop
-        regex: (.+)-sidecar-proxy
         target_label: job
       - source_labels: [__meta_consul_node]
         target_label: instance
