@@ -7,6 +7,7 @@ import itertools
 from collections.abc import AsyncIterable, Sequence
 from typing import ClassVar, NamedTuple
 
+import prometheus_client
 from grpc import aio
 
 from snowfall.project.junction.provider.v1alpha import (
@@ -47,6 +48,12 @@ class _ProviderWrapper(object):
     )
 
     _logger: ClassVar[stdout.Logger] = stdout.get_logger()
+    _provider_status = prometheus_client.Enum(
+        "gateway_provider_status",
+        "The current status of a provider",
+        ["provider_id"],
+        states=["healthy", "unhealthy"],
+    )
 
     async def refresh(self) -> None:
         now = datetime.datetime.now(tz=datetime.UTC)
@@ -63,8 +70,14 @@ class _ProviderWrapper(object):
             try:
                 await self._do_refresh()
             except (aio.AioRpcError, IdentifierMismatchError):
+                self._provider_status.labels(
+                    provider_id=self.provider.identifier,
+                ).state("unhealthy")
                 self.is_healthy = False  # noqa: WPS601
             else:
+                self._provider_status.labels(
+                    provider_id=self.provider.identifier,
+                ).state("healthy")
                 self.is_healthy = True  # noqa: WPS601
 
             self._last_checked_at = datetime.datetime.now(  # noqa: WPS601

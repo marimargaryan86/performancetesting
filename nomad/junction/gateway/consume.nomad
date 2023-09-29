@@ -39,7 +39,7 @@ variable "providers" {
 }
 
 locals {
-  providers_str = join(";", [for provider in var.providers : format("%s:%s", provider.uuid, provider.service_name)])
+  providers_str = join(";", [for key, provider in var.providers : format("%s#127.0.0.1:%s", provider.uuid, format("80%02d", key))])
 }
 
 job "gateway-consume" {
@@ -110,7 +110,7 @@ job "gateway-consume" {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
-PROVIDERS='{{ "${local.providers_str}" | splitToMap ";" ":" | toJSON }}'
+PROVIDERS='{{ "${local.providers_str}" | splitToMap ";" "#" | toJSON }}'
 EOH
         destination = "services.env"
         env         = true
