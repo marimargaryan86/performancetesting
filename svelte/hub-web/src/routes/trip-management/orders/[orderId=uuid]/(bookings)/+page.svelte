@@ -10,7 +10,7 @@
   import Table from "components/ui/table/table.svelte";
   import type { BookingModel } from "integration/junction-mobile-api/schemas/booking";
   import routeConfig from "routeConfig";
-  import { getOrigin, getDestination, downloadTickets } from "utils/booking";
+  import { getOrigin, getDestination } from "utils/booking";
   import CancellationDialog from "./cancellation-dialog.svelte";
   import TStatusBadgeCol from "components/ui/table/t-status-badge-col.svelte";
 
@@ -21,6 +21,8 @@
   function cancelBooking(booking: BookingModel): void {
     cancellationDialog?.open(booking);
   }
+
+  const orderLink = routeConfig.routes.tripManagement.routes.orders.routes.order(data.order.id);
 </script>
 
 <svelte:head>
@@ -64,13 +66,14 @@
           </a>
         </TCol>
         <TCol width="0">
-          {#if booking.ticketUrl}
-            <button
+          {#if booking.ticketUrls?.length}
+            <a
               class="typography body-medium"
-              on:click|preventDefault={downloadTickets.bind(downloadTickets, [booking])}
+              href={orderLink.routes.booking(booking.id).routes.tickets.root}
+              download
             >
               Download
-            </button>
+            </a>
           {:else}
             <span class="not-available">N/A</span>
           {/if}
@@ -102,8 +105,7 @@
     height: 100%;
   }
 
-  a,
-  button {
+  a {
     padding: 0;
     color: var(--color-common-light-text-link);
     text-decoration: none;

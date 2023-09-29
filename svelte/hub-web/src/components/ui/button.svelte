@@ -6,6 +6,7 @@
   export let href: string | undefined = undefined;
   export let minWidth: string | undefined = undefined;
   export let preload = true;
+  export let download: string | boolean | undefined = undefined;
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -28,6 +29,7 @@
   class:small={size === "small"}
   class:x-small={size === "x-small"}
   class:xx-small={size === "xx-small"}
+  {download}
 >
   <slot />
 </svelte:element>

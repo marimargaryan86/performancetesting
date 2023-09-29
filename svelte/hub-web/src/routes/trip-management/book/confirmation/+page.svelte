@@ -20,7 +20,6 @@
   import Overview from "./overview.svelte";
   import Itinerary from "../../components/itinerary.svelte";
   import { ensureDefined } from "utils/array";
-  import { downloadTickets } from "utils/booking";
   import CloseIcon from "components/icons/close-icon.svelte";
   import AlertIcon from "components/icons/alert-icon.svelte";
   import type { OrderModel } from "integration/junction-mobile-api/schemas/order";
@@ -28,7 +27,7 @@
   export let data;
 
   $: hasTickets = Boolean(
-    data.order.bookings.map((item) => item.ticketUrl).filter(ensureDefined).length,
+    data.order.bookings.flatMap((item) => item.ticketUrls).filter(ensureDefined).length,
   );
   $: alertType = getAlertType(data.order.status);
 </script>
@@ -68,7 +67,11 @@
         <Overview order={data.order} />
 
         {#if hasTickets}
-          <Button on:click={downloadTickets.bind(downloadTickets, data.order.bookings)}>
+          <Button
+            href={routeConfig.routes.tripManagement.routes.orders.routes.order(data.order.id).routes
+              .tickets.root}
+            download
+          >
             Download tickets
           </Button>
         {/if}
@@ -85,9 +88,9 @@
 
 <div class="actions">
   <div class="wrapper">
-    <Button size="small" href={routeConfig.routes.tripManagement.routes.book.root}
-      >New search</Button
-    >
+    <Button size="small" href={routeConfig.routes.tripManagement.routes.book.root}>
+      New search
+    </Button>
   </div>
 </div>
 

@@ -1,0 +1,19 @@
+import { getTicketsZip } from "utils/ticket-manager.server";
+
+export async function GET(event): Promise<Response> {
+  const { orderId, bookingId } = event.params;
+
+  try {
+    const zip = await getTicketsZip(orderId, bookingId);
+
+    return new Response(zip.data, {
+      status: 200,
+      headers: {
+        "content-type": "application/zip",
+        "content-disposition": `attachment; filename=${zip.name}`,
+      },
+    });
+  } catch {
+    return new Response(undefined, { status: 404 });
+  }
+}

@@ -1,12 +1,3 @@
-type RouteConfig =
-  | { root?: string; actions?: Record<string, string>; routes?: Record<string, RouteConfig> }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  | ((...args: any[]) => RouteConfig);
-
-function getRouteConfig<TConfig extends RouteConfig>(config: TConfig): TConfig {
-  return config;
-}
-
 /**
  * A route configuration object containing URL paths for the SvelteKit router.
  * URL paths are composed of current and parent key strings.
@@ -16,7 +7,7 @@ function getRouteConfig<TConfig extends RouteConfig>(config: TConfig): TConfig {
  * @param actions {object} [Key-value pairs of API actions and their URL paths.]
  * @param routes {object} [Additional nested route configurations.]
  */
-export default getRouteConfig({
+export default {
   root: "/",
   routes: {
     tripManagement: {
@@ -52,47 +43,30 @@ export default getRouteConfig({
         orders: {
           root: "/trip-management/orders",
           routes: {
-            order<TId extends string>(
-              id: TId,
-            ): {
-              root: `/trip-management/orders/${TId}`;
-              actions: {
-                cancelBookings: `/trip-management/orders/${TId}?/cancelBookings`;
-              };
-              routes: {
-                details: {
-                  root: `/trip-management/orders/${TId}/details`;
-                };
-                booking: <TBookingId extends string>(
-                  bookingId: TBookingId,
-                ) => {
-                  root: `/trip-management/orders/${TId}/${TBookingId}`;
-                };
-              };
-            } {
-              const root = `/trip-management/orders/${id}` as const;
-
-              return {
-                root,
+            order: <TOrderId extends string>(orderId: TOrderId) =>
+              ({
+                root: `/trip-management/orders/${orderId}`,
                 actions: {
-                  cancelBookings: `${root}?/cancelBookings`,
+                  cancelBookings: `/trip-management/orders/${orderId}?/cancelBookings`,
                 },
                 routes: {
+                  tickets: {
+                    root: `/trip-management/orders/${orderId}/tickets`,
+                  },
                   details: {
-                    root: `${root}/details`,
+                    root: `/trip-management/orders/${orderId}/details`,
                   },
-                  booking<TBookingId extends string>(
-                    bookingId: TBookingId,
-                  ): {
-                    root: `/trip-management/orders/${TId}/${TBookingId}`;
-                  } {
-                    return {
-                      root: `${root}/${bookingId}`,
-                    };
-                  },
+                  booking: <TBookingId extends string>(bookingId: TBookingId) =>
+                    ({
+                      root: `/trip-management/orders/${orderId}/${bookingId}`,
+                      routes: {
+                        tickets: {
+                          root: `/trip-management/orders/${orderId}/${bookingId}/tickets`,
+                        },
+                      },
+                    } as const),
                 },
-              };
-            },
+              } as const),
           },
         },
       },
@@ -147,23 +121,13 @@ export default getRouteConfig({
             listAccounts: "/pay/accounts?/listAccounts",
           },
           routes: {
-            account<TId extends string>(
-              id: TId,
-            ): {
-              root: `/pay/accounts/${TId}`;
-              actions: {
-                addBalances: `/pay/accounts/${TId}?/addBalances`;
-              };
-            } {
-              const root = `/pay/accounts/${id}` as const;
-
-              return {
-                root,
+            account: <TAccountId extends string>(accountId: TAccountId) =>
+              ({
+                root: `/pay/accounts/${accountId}`,
                 actions: {
-                  addBalances: `${root}?/addBalances`,
+                  addBalances: `/pay/accounts/${accountId}?/addBalances`,
                 },
-              };
-            },
+              } as const),
           },
         },
         beneficiaries: {
@@ -172,16 +136,12 @@ export default getRouteConfig({
             listBeneficiaries: "/pay/beneficiaries?/listBeneficiaries",
           },
           routes: {
-            beneficiary<
-              TId extends string | undefined = undefined,
-              TOut = `/pay/beneficiaries/${TId extends undefined ? "add" : TId}`,
-            >(
-              id?: TId,
-            ): {
-              root: TOut;
-            } {
-              return { root: `/pay/beneficiaries/${id ?? "add"}` as TOut };
-            },
+            beneficiary: <TBeneficiaryId extends string | undefined = undefined>(
+              beneficiaryId?: TBeneficiaryId,
+            ) =>
+              ({
+                root: `/pay/beneficiaries/${beneficiaryId}/${beneficiaryId ?? "add"}`,
+              } as const),
           },
         },
         bills: {
@@ -198,4 +158,4 @@ export default getRouteConfig({
       },
     },
   },
-} as const);
+} as const;

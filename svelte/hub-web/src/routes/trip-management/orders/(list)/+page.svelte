@@ -72,7 +72,6 @@
   import type { DateRange } from "models/date-time";
   import routeConfig from "routeConfig";
   import { ensureDefined } from "utils/array";
-  import { downloadTickets } from "utils/booking";
   import { getZeroTimeDate } from "utils/date-time";
 
   export let data;
@@ -114,7 +113,7 @@
       {#each data.orders.data.filter(getFilterFunction(searchQuery, departureAtDateRange)) as order (order.id)}
         {@const totalPrice = getTotalPrice(order)}
         {@const hasTickets = Boolean(
-          order.bookings.map((item) => item.ticketUrl).filter(ensureDefined).length,
+          order.bookings.flatMap((item) => item.ticketUrls).filter(ensureDefined).length,
         )}
 
         <TRow alternatingBackground={false}>
@@ -125,12 +124,14 @@
           </TCol>
           <TCol class="typography body-small" width="0">
             {#if hasTickets}
-              <button
+              <a
                 class="typography body-small"
-                on:click|preventDefault={downloadTickets.bind(downloadTickets, order.bookings)}
+                href={routeConfig.routes.tripManagement.routes.orders.routes.order(order.id).routes
+                  .tickets.root}
+                download
               >
                 Download
-              </button>
+              </a>
             {:else}
               <span class="not-available">N/A</span>
             {/if}
