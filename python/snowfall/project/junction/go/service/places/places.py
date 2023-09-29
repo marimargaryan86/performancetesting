@@ -199,9 +199,11 @@ class PlaceRepository(  # noqa: WPS215
     async def find(
         self,
         cursor: str,
+        identifiers: Sequence[str] | None = None,
     ) -> resultset.ResultSet[models_pb2.Place]:
         return await self._find_with_cursor(
             cur=cursor,
+            filter_={_mongo_id_key: {"$in": identifiers}} if identifiers else None,
         )
 
     async def create(

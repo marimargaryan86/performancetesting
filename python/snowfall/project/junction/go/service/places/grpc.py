@@ -162,7 +162,10 @@ class PlacesService(  # noqa: WPS214
         request: places_pb2.ListPlacesRequest,
         context: aio.ServicerContext,
     ) -> places_pb2.ListPlacesResponse:
-        places_result = await self._places.find(request.page_token)
+        places_result = await self._places.find(
+            cursor=request.page_token,
+            identifiers=list(request.ids.ids) if request.HasField("ids") else None,
+        )
 
         places_result.limit(
             request.page_size if request.page_size else self._default_page_size,

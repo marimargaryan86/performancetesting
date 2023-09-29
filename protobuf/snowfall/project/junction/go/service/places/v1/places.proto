@@ -93,6 +93,9 @@ message GetPlaceResponse {
 message ListPlacesRequest {
   int32 page_size = 1;
   string page_token = 2;
+  oneof filter {
+    ListOfIds ids = 3;
+  }
 }
 
 message ListPlacesResponse {
