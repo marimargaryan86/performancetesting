@@ -61,13 +61,7 @@ func NewPlanner(
 	}
 }
 
-func (p *Planner) Search(froms []*planner.Stop, tos []*planner.Stop, departureAt time.Time, kindList []models.Schedule_Type, maxConnections int) ([]*Trip, error) {
-	eTime := departureAt.AddDate(0, 0, 1)
-	departureBefore := time.Date(eTime.Year(), eTime.Month(), eTime.Day(), 4, 0, 0, 0, eTime.Location())
-	return p.SearchRange(froms, tos, departureAt, departureBefore, kindList, maxConnections)
-}
-
-func (p *Planner) SearchRange(froms []*planner.Stop, tos []*planner.Stop, departureAfter time.Time, departureBefore time.Time, kindList []models.Schedule_Type, maxConnections int) ([]*Trip, error) {
+func (p *Planner) Search(froms []*planner.Stop, tos []*planner.Stop, departureAfter time.Time, departureBefore time.Time, kindList []models.Schedule_Type, maxConnections int) ([]*Trip, error) {
 	if len(kindList) == 0 {
 		kindList = []models.Schedule_Type{
 			models.Schedule_TYPE_UNSPECIFIED,

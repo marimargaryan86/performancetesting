@@ -104,6 +104,39 @@ func (ps *PlannerServiceServer) SearchJourney(context context.Context, req *plan
 		)
 	}
 
+	var departureBefore time.Time
+	if req.DepartureBefore == nil {
+		eTime := departureTime.AddDate(0, 0, 1)
+		departureBefore = time.Date(eTime.Year(), eTime.Month(), eTime.Day(), 4, 0, 0, 0, eTime.Location())
+	} else {
+		var err error
+		var originTz *time.Location
+
+		switch v := req.DepartureBefore.TimeOffset.(type) {
+		case *v1Stdlib.DateTime_TimeZone:
+			originTz, err = time.LoadLocation(v.TimeZone.Id)
+
+			if err != nil {
+				return &planner.SearchJourneyResponse{}, status.Errorf(codes.Internal, "unknown time zone")
+			}
+		case *v1Stdlib.DateTime_UtcOffset:
+			originTz = time.FixedZone("custom", int(v.UtcOffset.Seconds))
+		default:
+			return &planner.SearchJourneyResponse{}, status.Errorf(codes.Internal, "unknown time zone")
+		}
+
+		departureBefore = time.Date(
+			int(req.DepartureBefore.Year),
+			time.Month(req.DepartureBefore.Month),
+			int(req.DepartureBefore.Day),
+			int(req.DepartureBefore.Hours),
+			int(req.DepartureBefore.Minutes),
+			int(req.DepartureBefore.Seconds),
+			int(req.DepartureBefore.Nanos),
+			originTz,
+		)
+	}
+
 	allowedSegmentTypes := make([]models.Schedule_Type, len(req.AllowedSegmentTypes))
 
 	copy(allowedSegmentTypes, req.AllowedSegmentTypes)
@@ -122,7 +155,7 @@ func (ps *PlannerServiceServer) SearchJourney(context context.Context, req *plan
 		maxConnections = int(*req.MaximumConnections)
 	}
 
-	results, err := ps.Planner.Search(sliceutil.Unique(origins), sliceutil.Unique(destinations), departureTime, allowedSegmentTypes, maxConnections)
+	results, err := ps.Planner.Search(sliceutil.Unique(origins), sliceutil.Unique(destinations), departureTime, departureBefore, allowedSegmentTypes, maxConnections)
 
 	if err != nil {
 		return &planner.SearchJourneyResponse{}, status.Errorf(codes.Unknown, "raptor returned an error")

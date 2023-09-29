@@ -16,6 +16,7 @@ message SearchJourneyRequest {
   repeated snowfall.stdlib.v1.LatLng origins = 1;
   repeated snowfall.stdlib.v1.LatLng destinations = 2;
   snowfall.stdlib.v1.DateTime departure_after = 3;
+  optional snowfall.stdlib.v1.DateTime departure_before = 6;
   optional uint32 maximum_connections = 4;
   repeated snowfall.project.junction.go.v1.Schedule.Type allowed_segment_types = 5;
 }
