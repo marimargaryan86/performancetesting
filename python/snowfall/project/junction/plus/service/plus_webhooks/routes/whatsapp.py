@@ -56,7 +56,7 @@ class IncomingMessages(endpoints.HTTPEndpoint):
                 ),
             )
         else:
-            messages = await message_handler.handle_message(
+            replies = await message_handler.handle_message(
                 str(msg["Body"]),
                 str(msg.get("OriginalRepliedMessageSid", "")),
                 subscriber,
@@ -64,8 +64,8 @@ class IncomingMessages(endpoints.HTTPEndpoint):
                 subscribers_client,
                 orders_client,
             )
-            for message in messages:
-                response_message = message
+            for reply in replies:
+                response_message = reply["message"]
                 while len(response_message) >= message_maximum_length:
                     split_point = message_split_point + response_message[
                         message_split_point:
@@ -76,11 +76,18 @@ class IncomingMessages(endpoints.HTTPEndpoint):
                         body=response_message[:split_point],
                     )
                     response_message = response_message[split_point + 1 :]
-                whatsapp_channel.send_message(
+                message_id = whatsapp_channel.send_message(
                     receiver=subscriber.phone_number.e164_number,
                     sender_number=cv.mobile_phone.e164_number,
                     body=response_message,
                 )
+                reply_cache = reply.get("cache")
+                if reply_cache:
+                    await message_handler.store_cache(
+                        reply_cache["hash"],
+                        message_id,
+                        reply_cache["value"],
+                    )
 
         return responses.Response(
             content=MessagingResponse().to_xml(),

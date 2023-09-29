@@ -52,9 +52,15 @@ class MessageHandler(object):
         configuration_vector: models_pb2.ConfigurationVector,
         subscribers_client: subscribers.Client,
         orders_client: orders.Client,
-    ) -> Sequence[str]:
-        subscriber_state = await self.get_state("subscriber_state", subscriber)
-        ai_assistant_state = await self.get_state("ai_assistant_state", subscriber)
+    ) -> Sequence[Mapping[str, Any]]:
+        subscriber_state = await self.get_cache(
+            hash_name="subscriber_state",
+            hash_key=subscriber.phone_number.e164_number,
+        )
+        ai_assistant_state = await self.get_cache(
+            hash_name="ai_assistant_state",
+            hash_key=subscriber.phone_number.e164_number,
+        )
         if (  # noqa: WPS337
             subscriber_state.get("last_handler")
             in {"upcoming_trips", "upcoming_trip_details"}
@@ -67,7 +73,10 @@ class MessageHandler(object):
             ai_assistant_state.get("ai_enabled")
             and message_handler is not handle_unknown
         ):
-            await self.delete_state("ai_assistant_state", subscriber)
+            await self.delete_cache(
+                "ai_assistant_state",
+                subscriber.phone_number.e164_number,
+            )
         response = await message_handler(
             subscriber=subscriber,
             configuration_vector=configuration_vector,
@@ -80,38 +89,42 @@ class MessageHandler(object):
             shortener_client=self._shortener_client,
         )
         subscriber_state["last_message"] = message
-        subscriber_state["last_response"] = response[0]
+        subscriber_state["last_response"] = response[0]["message"]
         subscriber_state["last_handler"] = message_handler.__name__
-        await self.store_state("subscriber_state", subscriber, subscriber_state)
+        await self.store_cache(
+            "subscriber_state",
+            subscriber.phone_number.e164_number,
+            json.dumps(subscriber_state),
+        )
         return response
 
-    async def store_state(
+    async def store_cache(
         self,
         hash_name: str,
-        subscriber: models_pb2.Subscriber,
-        hash_value: Mapping[str, str],
+        hash_key: str,
+        hash_value: str,
     ) -> None:
         session = self._redis.hash_(hash_name)
-        await session.put(subscriber.phone_number.e164_number, json.dumps(hash_value))
+        await session.put(hash_key, hash_value)
 
-    async def get_state(
+    async def get_cache(
         self,
         hash_name: str,
-        subscriber: models_pb2.Subscriber,
+        hash_key: str,
     ) -> Any:
         session = self._redis.hash_(hash_name)
-        state = await session.get(subscriber.phone_number.e164_number)
-        if state:
-            return json.loads(state)
+        hash_value = await session.get(hash_key)
+        if hash_value:
+            return json.loads(hash_value)
         return {}
 
-    async def delete_state(
+    async def delete_cache(
         self,
         hash_name: str,
-        subscriber: models_pb2.Subscriber,
+        hash_key: str,
     ) -> None:
         session = self._redis.hash_(hash_name)
-        await session.delete(subscriber.phone_number.e164_number)
+        await session.delete(hash_key)
 
 
 # TODO: Change this to class method and use it as decorator to register handlers
@@ -132,15 +145,17 @@ async def unsubscribe(
     subscriber: models_pb2.Subscriber,
     subscribers_client: subscribers.Client,
     **kwargs: Any,
-) -> Sequence[str]:  # noqa: WPS473
+) -> Sequence[Mapping[str, Any]]:  # noqa: WPS473
     unsubscribe_status = await subscribers_client.unsubscribe(subscriber.id)
     if unsubscribe_status:
         return [
-            _(
-                "You have unsubscribed from WhatsApp and will no longer receive"
-                " notifications regarding travel information. If you wish to"
-                " resubscribe please click the Subscribe button below.",
-            ),
+            {
+                "message": _(
+                    "You have unsubscribed from WhatsApp and will no longer receive"
+                    " notifications regarding travel information. If you wish to"
+                    " resubscribe please click the Subscribe button below.",
+                ),
+            },
         ]
     raise RuntimeError("error while unsubscribing with id: {0}".format(subscriber.id))
 
@@ -149,15 +164,19 @@ async def subscribe(
     subscriber: models_pb2.Subscriber,
     subscribers_client: subscribers.Client,
     **kwargs: Any,
-) -> Sequence[str]:  # noqa: WPS473
+) -> Sequence[Mapping[str, Any]]:  # noqa: WPS473
     subscribe_status = await subscribers_client.subscribe(subscriber.id)
     if subscribe_status:
         return [
-            _(
-                "You have successfully subscribed on WhatsApp!"
-                " You can now receive notifications regarding travel information.",
-            ),
-            action_menu,
+            {
+                "message": _(
+                    "You have successfully subscribed on WhatsApp!"
+                    " You can now receive notifications regarding travel information.",
+                ),
+            },
+            {
+                "message": action_menu,
+            },
         ]
     raise RuntimeError("error while subscribing with id: {0}".format(subscriber.id))
 
@@ -167,7 +186,7 @@ async def trip_details(
     message_key: str,
     redis_client: redis.Client[str],
     **kwargs: Any,
-) -> Sequence[str]:  # noqa: WPS473
+) -> Sequence[Mapping[str, Any]]:  # noqa: WPS473
     order = None
     if message_key:
         order_id = await get_order_id_by_message_id(redis_client, message_key)
@@ -175,12 +194,24 @@ async def trip_details(
             order = await orders_client.get(order_id)
     if order is None:
         return [
-            _("Sorry there are no details available for this trip."),
-            action_menu,
+            {
+                "message": _("Sorry there are no details available for this trip."),
+            },
+            {
+                "message": action_menu,
+            },
         ]
     return [
-        transform_trip_details(order),
-        trip_details_menu,
+        {
+            "message": transform_trip_details(order),
+        },
+        {
+            "message": trip_details_menu,
+            "cache": {
+                "hash": "message_id_order_id",
+                "value": order.id,
+            },
+        },
     ]
 
 
@@ -189,7 +220,7 @@ async def upcoming_trips(  # noqa: WPS210
     orders_client: orders.Client,
     redis_client: redis.Client[str],
     **kwargs: Any,
-) -> Sequence[str]:  # noqa: WPS473
+) -> Sequence[Mapping[str, Any]]:  # noqa: WPS473
     await redis_client.delete("upcoming_trips_{0}".format(subscriber.id))
     session = redis_client.hash_("upcoming_trips_{0}".format(subscriber.id))
 
@@ -226,15 +257,21 @@ async def upcoming_trips(  # noqa: WPS210
                 counter += 1
         if processed_bookings_message:
             return [
-                _(
-                    "*Upcoming trips*\nUse one of the menu options below by typing the"
-                    " corresponding number for more information"
-                    + processed_bookings_message,
-                ),
+                {
+                    "message": _(
+                        "*Upcoming trips*\nUse one of the menu options below by typing"
+                        " the corresponding number for more information"
+                        + processed_bookings_message,
+                    ),
+                },
             ]
     return [
-        _("*It looks like you have no upcoming trips at the moment.*"),
-        action_menu,
+        {
+            "message": _("*It looks like you have no upcoming trips at the moment.*"),
+        },
+        {
+            "message": action_menu,
+        },
     ]
 
 
@@ -244,14 +281,26 @@ async def upcoming_trip_details(
     message_key: str,
     redis_client: redis.Client[str],
     **kwargs: Any,
-) -> Sequence[str]:  # noqa: WPS473
+) -> Sequence[Mapping[str, Any]]:  # noqa: WPS473
     session = redis_client.hash_("upcoming_trips_{0}".format(subscriber.id))
     order_id = await session.get(message_key)
     if not order_id:
-        return [_("Invalid option. Please try again")]
+        return [
+            {
+                "message": _("Invalid option. Please try again"),
+            },
+        ]
     return [
-        transform_trip_details(await orders_client.get(order_id)),
-        trip_details_menu,
+        {
+            "message": transform_trip_details(await orders_client.get(order_id)),
+        },
+        {
+            "message": trip_details_menu,
+            "cache": {
+                "hash": "message_id_order_id",
+                "value": order_id,
+            },
+        },
     ]
 
 
@@ -260,7 +309,7 @@ async def travel_assistant(
     ai_bot: open_ai.AIBot,
     redis_client: redis.Client[str],
     **kwargs: Any,
-) -> Sequence[str]:
+) -> Sequence[Mapping[str, Any]]:
     session = redis_client.hash_("ai_assistant_state")
     ai_chat_history = [
         {"role": "system", "content": ai_bot.generate_system_setup()},
@@ -271,15 +320,23 @@ async def travel_assistant(
         "ai_enabled": True,
     }
     await session.put(subscriber.phone_number.e164_number, json.dumps(state))
-    return [_(ai_bot.initial_message)]
+    return [
+        {
+            "message": _(ai_bot.initial_message),
+        },
+    ]
 
 
 async def check_in(
     **kwargs: Any,
-) -> Sequence[str]:
+) -> Sequence[Mapping[str, Any]]:
     return [
-        _("Check-in feature is not implemented yet."),
-        action_menu,
+        {
+            "message": _("Check-in feature is not implemented yet."),
+        },
+        {
+            "message": action_menu,
+        },
     ]
 
 
@@ -291,7 +348,7 @@ async def handle_unknown(  # noqa: WPS211
     redis_client: redis.Client[str],
     shortener_client: shortener.Client,
     **kwargs: Any,
-) -> Sequence[str]:
+) -> Sequence[Mapping[str, Any]]:
     session = redis_client.hash_("ai_assistant_state")
     state_str = await session.get(subscriber.phone_number.e164_number)
     if state_str:
@@ -302,7 +359,14 @@ async def handle_unknown(  # noqa: WPS211
                 await session.delete(subscriber.phone_number.e164_number)
                 if message.lower() == "i need more help":
                     return await travel_assistant(subscriber, ai_bot, redis_client)
-                return [_("Great! We are here"), action_menu]
+                return [
+                    {
+                        "message": _("Great! We are here"),
+                    },
+                    {
+                        "message": action_menu,
+                    },
+                ]
             ai_chat_history = state.get("ai_chat_history", [])
             ai_chat_history.append({"role": "user", "content": message})
             assistant_message = await ai_bot.handle_prompt(
@@ -312,18 +376,30 @@ async def handle_unknown(  # noqa: WPS211
             )
             ai_chat_history.append(assistant_message)
             await session.put(subscriber.phone_number.e164_number, json.dumps(state))
-            return [_(assistant_message["content"])]
+            return [
+                {
+                    "message": _(assistant_message["content"]),
+                },
+            ]
     return [
-        _("Sorry I didn't understand your message."),
-        action_menu,
+        {
+            "message": _("Sorry I didn't understand your message."),
+        },
+        {
+            "message": action_menu,
+        },
     ]
 
 
 async def main_menu(
     *args: Any,
     **kwargs: Any,
-) -> Sequence[str]:
-    return [action_menu]
+) -> Sequence[Mapping[str, Any]]:
+    return [
+        {
+            "message": action_menu,
+        },
+    ]
 
 
 async def get_order_id_by_message_id(
