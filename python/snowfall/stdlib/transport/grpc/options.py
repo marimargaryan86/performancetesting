@@ -1,7 +1,7 @@
 from collections.abc import Iterable
 from typing import cast
 
-from google.protobuf import descriptor, message
+from google.protobuf import descriptor, message, struct_pb2
 from grpc import aio
 
 from snowfall.stdlib.transport.grpc import interceptor
@@ -25,7 +25,7 @@ def _clear_nested_message_with_option(
 ) -> None:
     message_type: descriptor.Descriptor | None = field[0].message_type
 
-    if message_type:
+    if message_type and not isinstance(field[1], struct_pb2.Struct):
         if field[0].label == descriptor.FieldDescriptor.LABEL_REPEATED:
             for field_value in cast(Iterable[message.Message], field[1]):
                 clear_message_with_option(field_value, option_name)

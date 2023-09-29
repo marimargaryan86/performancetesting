@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package snowfall.stdlib.v1;
 
+import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 import "snowfall/stdlib/v1/options.proto";
 
@@ -13,6 +14,8 @@ message Foobar {
   string read_only = 3 [(snowfall.stdlib.v1.read_only) = true];
   string write_only = 4 [(snowfall.stdlib.v1.write_only) = true];
   Foobar nested_foobar = 5;
+  google.protobuf.Struct struct = 6;
+  google.protobuf.Struct read_only_struct = 7 [(snowfall.stdlib.v1.read_only) = true];
 }
 
 message RepeatedFoobar {
