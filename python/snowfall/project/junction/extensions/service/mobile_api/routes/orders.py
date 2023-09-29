@@ -1,3 +1,4 @@
+import asyncio
 from types import MappingProxyType
 from typing import Any
 
@@ -104,7 +105,7 @@ class Order(endpoints.HTTPEndpoint):
 
 
 class Orders(endpoints.HTTPEndpoint):
-    async def get(
+    async def get(  # noqa: WPS210
         self,
         request: requests.Request,
         orders_repository: repository.OrdersRepository = lagom.injectable,
@@ -114,28 +115,35 @@ class Orders(endpoints.HTTPEndpoint):
         user_mobile_orders = await orders_repository.get_user_orders(
             request.user.username,
         )
+        include = request.scope["parsed_query_string"].get("include", [])
         user_orders: dict[str, list[Any]] = {"data": [], "included": []}
-        async for mobile_order in user_mobile_orders:
+
+        async def get_order_response(  # noqa: WPS430
+            order: models_pb2.MobileOrder,
+        ) -> dict[str, Any]:
             order_response = await junction_client.get_order_by_id(
-                identifier=mobile_order.id,
-                include=request.scope["parsed_query_string"].get(
-                    "include",
-                    [],
-                ),
+                identifier=order.id,
+                include=include,
             )
             order_response["data"]["relationships"]["payment"] = {
                 "data": {
-                    "id": mobile_order.payment_intent_id,
+                    "id": order.payment_intent_id,
                     "type": "payments",
                 },
             }
+            return order_response
+
+        resps = await asyncio.gather(
+            *[get_order_response(mo) async for mo in user_mobile_orders],
+        )
+        for order_response in resps:
             user_orders["data"].append(order_response["data"])
-            if order_response.get("included"):
-                user_orders["included"].extend(order_response["included"])
+            included = order_response.get("included")
+            if included:
+                user_orders["included"].extend(included)
 
         response_body = stdlib_models.Body(data=user_orders["data"])
-        if user_orders.get("included"):
-            response_body.included = user_orders.get("included")
+        response_body.included = user_orders["included"] or None
         return stdlib_models.JsonApiResponse(response_body)
 
     @validators.voucher_validator
