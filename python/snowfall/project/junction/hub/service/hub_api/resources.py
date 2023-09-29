@@ -883,8 +883,6 @@ class BillResource(models.Resource):
             id=bill.id,
             type=BillResource.api_type,
             attributes={
-                "id": bill.id,
-                "orderId": bill.order_id,
                 "isReconciled": bill.is_reconciled,
                 "totalAmount": money.from_protobuf(bill.total_amount),
                 "reconciledAmount": (
@@ -892,6 +890,14 @@ class BillResource(models.Resource):
                     if bill.HasField("reconciled_amount")
                     else None
                 ),
+            },
+            relationships={
+                "order": {
+                    "data": models.ResourceIdentifier(
+                        id=bill.order_id,
+                        type="orders",
+                    ),
+                },
             },
             links={
                 _SELF_HREF: str(

@@ -3589,7 +3589,7 @@
                         "$ref": "#/components/schemas/OrderIdentifier"
                       }
                     },
-                    "writeOnly": true
+                    "readOnly": true
                   }
                 }
               }
