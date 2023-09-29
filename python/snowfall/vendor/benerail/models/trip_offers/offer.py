@@ -29,15 +29,15 @@ class OfferPartCommon(BenerailBaseModel):
     price: Price | None = None
     flexibility: Flexibility | None = None
     comfort_class: ComfortClass | None = None
-    product: ProductResourceLink | None = None
+    product: ProductResourceLink
     passengers: list[PassengerResourceLink] | None = None
-    trip_leg_sequence: int | None = None
+    trip_leg_sequence: list[int] | None = None
     is_required_in_offer: bool | None = None
 
 
 class OfferPart(BenerailBaseModel):
     identifier: str | None = Field(None, alias="id")
-    offer_part_common: OfferPartCommon | None = None
+    offer_part_common: OfferPartCommon
     offer_part_specific: Reservation | Admission | None = None
 
 

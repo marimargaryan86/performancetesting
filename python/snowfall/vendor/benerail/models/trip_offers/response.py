@@ -12,7 +12,7 @@ from snowfall.vendor.benerail.models.trip_offers.trip_offers import (
 
 class GetOfferPartResponse(BenerailBaseModel):
     metadata: Metadata | None = None
-    response_result: OfferPart | None = Field(None, alias="result")
+    response_result: OfferPart = Field(..., alias="result")
     links: list[Link] | None = None
 
 

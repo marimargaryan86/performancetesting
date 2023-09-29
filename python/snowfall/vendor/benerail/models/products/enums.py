@@ -25,10 +25,12 @@ class ServiceClassType(Enum):
 
 
 class SaleType(Enum):
-    sale = "SALE"
-    exchange = "EXCHANGE"
-    refund = "REFUND"
-    travel = "TRAVEL"
+    exchange_conditions = "EXCHANGE_CONDITIONS"
+    provider_information = "PROVIDER_INFORMATION"
+    refund_conditions = "REFUND_CONDITIONS"
+    ticket_information = "TICKET_INFORMATION"
+    travel_conditions = "TRAVEL_CONDITIONS"
+    special_information = "SPECIAL_INFORMATION"
 
 
 class ProductErrorCodes(Enum):

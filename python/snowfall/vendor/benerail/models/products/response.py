@@ -8,5 +8,5 @@ from snowfall.vendor.benerail.models.products.product import Product
 
 class GetProductResponse(BenerailBaseModel):
     metadata: Metadata | None = None
-    response_result: Product | None = Field(None, alias="result")
+    response_result: Product = Field(..., alias="result")
     links: list[Link] | None = None

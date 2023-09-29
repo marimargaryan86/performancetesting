@@ -14,6 +14,7 @@ from snowfall.project.junction.provider import notifications as base_notificatio
 from snowfall.project.junction.service.providers.benerail import (
     booking,
     cache,
+    fare_rules,
     helper_functions,
     notifications,
 )
@@ -201,7 +202,10 @@ class PriceQuoteConsumer(object):
                         ),
                     ],
                     required_documents=[],
-                    rules=[],
+                    rules=await fare_rules.get_fare_rules(
+                        benerail_client=self._benerail_client,
+                        offer_info=offer_info,
+                    ),
                 ),
                 provider_company_id=self._provider_company_id,
             ),

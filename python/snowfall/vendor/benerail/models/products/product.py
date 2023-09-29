@@ -3,7 +3,7 @@ from datetime import datetime
 from pydantic.v1 import AnyUrl, ConstrainedStr, Field
 
 from snowfall.vendor.benerail.models.base import BenerailBaseModel
-from snowfall.vendor.benerail.models.products.enums import SaleType, ServiceClassType
+from snowfall.vendor.benerail.models.products.enums import ServiceClassType
 
 
 class ConditionAfterSalesFee(BenerailBaseModel):
@@ -28,7 +28,7 @@ class ComfortClass(BenerailBaseModel):
 
 
 class Condition(BenerailBaseModel):
-    condition_type: SaleType = Field(..., alias="type")
+    condition_type: str = Field(..., alias="type")
     description: str
     valid_from: datetime | None = None
     valid_until: datetime | None = None
