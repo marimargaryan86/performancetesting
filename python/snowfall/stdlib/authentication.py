@@ -1,4 +1,5 @@
 import dataclasses
+from typing import Any
 
 
 class AuthenticationError(Exception):
@@ -9,3 +10,4 @@ class AuthenticationError(Exception):
 class User(object):
     identifier: str
     email: str
+    metadata: dict[str, Any] = dataclasses.field(default_factory=dict)

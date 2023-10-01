@@ -1,6 +1,6 @@
 import dataclasses
 from collections.abc import Awaitable, Callable
-from typing import Literal
+from typing import Any, Literal
 
 import jwt as jwtlib
 from starlette import authentication, requests
@@ -66,6 +66,7 @@ class JWTAuthenticationBackend(authentication.AuthenticationBackend):
 class AuthenticatedUser(authentication.BaseUser):
     identifier: str
     email: str
+    metadata: dict[str, Any] = dataclasses.field(default_factory=dict)
 
     @property
     def is_authenticated(self) -> Literal[True]:
@@ -107,4 +108,8 @@ class CookieAuthenticationBackend(authentication.AuthenticationBackend):
 
         return authentication.AuthCredentials(
             ["authenticated"],
-        ), AuthenticatedUser(identifier=ory_user.identifier, email=ory_user.email)
+        ), AuthenticatedUser(
+            identifier=ory_user.identifier,
+            email=ory_user.email,
+            metadata=ory_user.metadata,
+        )

@@ -285,6 +285,10 @@ def session_cookie_resolver(
 
         identity = response.session.identity
 
-        return authentication.User(identifier=identity.id, email=identity.email)
+        return authentication.User(
+            identifier=identity.id,
+            email=identity.email,
+            metadata=dict(identity.metadata_public.items()),
+        )
 
     return wrapper
