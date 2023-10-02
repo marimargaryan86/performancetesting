@@ -12,6 +12,7 @@ service ResellerService {
   rpc ListResellers(ListResellersRequest) returns (ListResellersResponse) {}
   rpc UpdateReseller(UpdateResellerRequest) returns (UpdateResellerResponse) {}
   rpc DeleteReseller(DeleteResellerRequest) returns (DeleteResellerResponse) {}
+  rpc PromoteResellerConfig(PromoteResellerConfigRequest) returns (PromoteResellerConfigResponse) {}
 }
 
 message CreateResellerRequest {
@@ -56,3 +57,7 @@ message DeleteResellerRequest {
 }
 
 message DeleteResellerResponse {}
+
+message PromoteResellerConfigRequest {}
+
+message PromoteResellerConfigResponse {}

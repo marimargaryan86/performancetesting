@@ -1,4 +1,6 @@
+import json
 import uuid
+from collections.abc import Sequence
 
 from grpc import StatusCode, aio
 
@@ -10,6 +12,10 @@ from snowfall.project.junction.go.service.resellers.v1 import (
 )
 from snowfall.stdlib import string
 from snowfall.stdlib.transport.grpc import service
+from snowfall.vendor.consul.client import ConsulClient
+
+_PROVIDERS_KEY = "{0}/providers/reseller-providers"
+_CURRENCIES_KEY = "{0}/client-api/reseller-currencies"
 
 
 class ResellerService(  # noqa: WPS214
@@ -20,9 +26,14 @@ class ResellerService(  # noqa: WPS214
         self,
         default_page_size: int,
         resellers_repo: resellers_repository.ResellerRepository,
+        consul_client: ConsulClient,
+        environment: str,
     ):
         self._default_page_size = default_page_size
         self._repository = resellers_repo
+        self._client = consul_client
+        self._reseller_providers_key = _PROVIDERS_KEY.format(environment)
+        self._reseller_currencies_key = _CURRENCIES_KEY.format(environment)
 
     def get_name(self) -> str:
         return models_pb2.DESCRIPTOR.services_by_name["ResellerService"].full_name
@@ -112,3 +123,50 @@ class ResellerService(  # noqa: WPS214
         await self._repository.delete(request.id)
 
         return resellers_pb2.DeleteResellerResponse()
+
+    async def PromoteResellerConfig(  # type: ignore[override] # noqa: N802
+        self,
+        request: resellers_pb2.PromoteResellerConfigRequest,
+        context: aio.ServicerContext,
+    ) -> resellers_pb2.PromoteResellerConfigResponse:
+        resellers = [reseller async for reseller in await self._repository.all_()]
+
+        reseller_config_updated = await self._update_resellers_config(resellers)
+        currencies_config_updated = await self._update_currencies_config(resellers)
+
+        if not currencies_config_updated or not reseller_config_updated:
+            await context.abort(StatusCode.FAILED_PRECONDITION)
+
+        return resellers_pb2.PromoteResellerConfigResponse()
+
+    async def _update_resellers_config(
+        self,
+        resellers: Sequence[models_pb2.Reseller],
+    ) -> bool:
+        reseller_providers_mapping = json.loads(
+            await self._client.get_key(self._reseller_providers_key),
+        )
+
+        for reseller in resellers:
+            reseller_providers_mapping[reseller.id] = list(reseller.providers)
+
+        return await self._client.put_key(
+            self._reseller_providers_key,
+            json.dumps(reseller_providers_mapping).encode(),
+        )
+
+    async def _update_currencies_config(
+        self,
+        resellers: Sequence[models_pb2.Reseller],
+    ) -> bool:
+        reseller_currencies_mapping = json.loads(
+            await self._client.get_key(self._reseller_currencies_key),
+        )
+
+        for reseller in resellers:
+            reseller_currencies_mapping[reseller.id] = reseller.default_currency
+
+        return await self._client.put_key(
+            self._reseller_currencies_key,
+            json.dumps(reseller_currencies_mapping).encode(),
+        )

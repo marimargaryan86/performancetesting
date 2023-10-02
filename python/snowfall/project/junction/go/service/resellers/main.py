@@ -2,6 +2,7 @@ import ipaddress
 import random
 from collections.abc import Sequence
 
+import httpx
 import pydantic
 from motor import motor_asyncio
 
@@ -9,6 +10,7 @@ from snowfall.project.junction.go.service.resellers import resellers_repository
 from snowfall.project.junction.go.service.resellers.grpc import ResellerService
 from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.grpc import server as grpc_server
+from snowfall.vendor.consul.client import ConsulClient
 
 
 class _ServeSettings(application.Settings):
@@ -16,11 +18,24 @@ class _ServeSettings(application.Settings):
     grpc_port: int = 50051
     default_page_size: int = 100
     mongo_dsn: Sequence[pydantic.AnyUrl]
+    consul_api_base_url: pydantic.AnyUrl
+    consul_api_token: str
+    consul_api_version: str = "v1"
+    env_name: str
 
 
 async def _serve(app: application.AsyncApplication[_ServeSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
+    )
+
+    http_client = await app.stack.enter_async_context(httpx.AsyncClient())
+
+    consul_client = ConsulClient(
+        api_base_url=str(app.settings.consul_api_base_url),
+        api_token=app.settings.consul_api_token,
+        version=app.settings.consul_api_version,
+        httpx_client=http_client,
     )
 
     server = grpc_server.create_server(
@@ -32,6 +47,8 @@ async def _serve(app: application.AsyncApplication[_ServeSettings]) -> None:
                     collection=mongo.resellers.resellers,
                 ),
                 default_page_size=app.settings.default_page_size,
+                consul_client=consul_client,
+                environment=app.settings.env_name,
             ),
         ],
     )

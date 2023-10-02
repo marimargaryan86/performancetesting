@@ -2,19 +2,22 @@
   "development": {
     "deploy": true,
     "variables": {
-      "count": 1
+      "count": 1,
+      "consul_api_base_url": "https://consul.junction.dev"
     }
   },
   "production": {
     "deploy": false,
     "variables": {
-      "count": 1
+      "count": 1,
+      "consul_api_base_url": "https://consul.junction.travel"
     }
   },
   "sandbox": {
     "deploy": false,
     "variables": {
-      "count": 1
+      "count": 1,
+      "consul_api_base_url": "https://consul.sandbox.junction.dev"
     }
   }
 }
