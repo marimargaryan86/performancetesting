@@ -86,9 +86,6 @@ export default {
         termsAndConditions: {
           root: "/help/terms-and-conditions",
         },
-        cookies: {
-          root: "/help/cookies",
-        },
         customerService: {
           root: "/help/customer-service",
         },

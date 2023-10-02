@@ -11,11 +11,6 @@
       exact: true,
     },
     {
-      url: routeConfig.routes.help.routes.cookies.root,
-      label: "Cookies",
-      exact: true,
-    },
-    {
       icon: HeadphonesIcon,
       url: routeConfig.routes.help.routes.customerService.root,
       label: "Customer Service",
@@ -26,7 +21,6 @@
   const routes: string[] = [
     routeConfig.routes.help.routes.privacyPolicy.root,
     routeConfig.routes.help.routes.termsAndConditions.root,
-    routeConfig.routes.help.routes.cookies.root,
     routeConfig.routes.help.routes.customerService.root,
   ];
 </script>
@@ -58,19 +52,21 @@
 </svelte:head>
 
 <StandardLayout pageTitle="Help" {tabs} searchQuery="">
-  <div class="container">
-    {#if activeTab?.icon}
-      <svelte:component this={activeTab.icon} />
-    {/if}
+  {#key $page.url.pathname}
+    <div class="container">
+      {#if activeTab?.icon}
+        <svelte:component this={activeTab.icon} />
+      {/if}
 
-    <h1 class="typography bold title-medium policy-title">
-      {activeTab?.label ?? undefined}
-    </h1>
+      <h1 class="typography bold title-medium">
+        {activeTab?.label ?? undefined}
+      </h1>
 
-    <div class="content typography body-medium">
-      <slot />
+      <div class="content typography body-medium">
+        <slot />
+      </div>
     </div>
-  </div>
+  {/key}
 
   <Button
     href={prevHref}
