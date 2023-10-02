@@ -144,7 +144,9 @@
     By booking your ticket you accept Snowfall’s
     <a href={routeConfig.routes.help.routes.termsAndConditions.root} target="_blank">T&amp;Cs</a>,
     the
-    <a href="/">carrier’s conditions of carriage</a>
+    <a href={routeConfig.routes.help.routes.conditionsOfCarriage.root} target="_blank"
+      >carrier’s conditions of carriage</a
+    >
     and
     <a href={routeConfig.routes.help.routes.privacyPolicy.root} target="_blank">privacy policy</a>.
   </span>
