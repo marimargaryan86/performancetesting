@@ -1,12 +1,19 @@
 <script lang="ts">
+  import { createEventDispatcher } from "svelte";
   import { getRandomId } from "utils/random";
 
   export let id = getRandomId("checkbox");
   export let active = false;
+
+  const dispatch = createEventDispatcher<{ toggle: boolean }>();
+
+  function toggle(): void {
+    dispatch("toggle", active);
+  }
 </script>
 
 <div class="switch">
-  <input type="checkbox" {id} bind:checked={active} />
+  <input type="checkbox" {id} bind:checked={active} on:change={toggle} />
   <label for={id} />
 </div>
 

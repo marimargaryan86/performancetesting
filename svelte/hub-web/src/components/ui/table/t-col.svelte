@@ -8,6 +8,7 @@
   export let width: string | undefined = undefined;
   export let copyable = false;
   export let copyAlign: "left" | "right" = "left";
+  export let textAlign: "left" | "right" = "left";
 
   let copyRef: HTMLButtonElement;
   let copied = false;
@@ -20,7 +21,12 @@
   }
 </script>
 
-<td class={className} style:--max-width={maxWidth} style:--width={width}>
+<td
+  class={className}
+  style:--max-width={maxWidth}
+  style:--width={width}
+  style:text-align={textAlign}
+>
   <div>
     <slot />
   </div>

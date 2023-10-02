@@ -2,59 +2,71 @@
   import StandardLayout from "components/page/standard-layout.svelte";
   import Switch from "components/ui/switch.svelte";
   import Header from "components/ui/table/header.svelte";
-  import TActionsCol from "components/ui/table/t-actions-col.svelte";
   import TBody from "components/ui/table/t-body.svelte";
   import TCol from "components/ui/table/t-col.svelte";
   import THead from "components/ui/table/t-head.svelte";
+  import TMoneyCol from "components/ui/table/t-money-col.svelte";
   import TRow from "components/ui/table/t-row.svelte";
   import Table from "components/ui/table/table.svelte";
-  import { formatAmount } from "formatting/currency";
+  import type { BillModel } from "integration/junction-hub-api/schemas/bill";
+  import type { PaginatedData } from "models/common";
+  import routeConfig from "routeConfig";
+  import { callAction } from "utils/common";
 
-  const bills = [
-    {
-      orderId: "abc123",
-      owedToUs: { amount: 123456, currency: "USD" },
-      reconciled: true,
-    },
-    {
-      orderId: "zxc936",
-      owedToUs: { amount: 84234, currency: "USD" },
-      reconciled: false,
-    },
-    {
-      orderId: "qwe12039",
-      owedToUs: { amount: 9812, currency: "USD" },
-      reconciled: true,
-    },
-  ];
+  export let data;
+
+  $: ({ data: bills } = data.bills);
+
+  async function loadMore(): Promise<void> {
+    if (!data.bills.cursor) {
+      return;
+    }
+
+    const result = await callAction<{ bills: PaginatedData<BillModel> }>({
+      action: routeConfig.routes.pay.routes.bills.actions.listBills,
+      data: { cursor: data.bills.cursor },
+      apply: false,
+    });
+
+    if (result.type === "success" && result.data?.bills) {
+      data.bills = {
+        cursor: result.data.bills.cursor,
+        data: [...data.bills.data, ...result.data.bills.data],
+      };
+    }
+  }
+
+  async function toggleReconciliation(bill: BillModel): Promise<void> {
+    await callAction({
+      action: routeConfig.routes.pay.routes.bills.actions.toggleReconciliation,
+      apply: false,
+      data: { billId: bill.id },
+    });
+  }
 </script>
 
+<svelte:head>
+  <title>Bills · Pay · Junction Hub</title>
+</svelte:head>
+
 <StandardLayout pageTitle="Bills" searchQuery="">
-  <Table>
+  <Table {loadMore} class="bills-table">
     <THead>
       <Header>Order ID</Header>
       <Header>Owed to us</Header>
       <Header>Reconciled?</Header>
-      <Header />
     </THead>
     <TBody>
       {#each bills as bill}
         <TRow>
           <TCol>{bill.orderId}</TCol>
-          <TCol>
-            <span class="money">
-              <span>{formatAmount(bill.owedToUs)}</span>
-              <em class="typography body-xsmall">{bill.owedToUs.currency}</em>
-            </span>
+          <TMoneyCol money={bill.amounts.total ?? { amount: 0, currency: "EUR" }} />
+          <TCol width="40px" textAlign="right">
+            <Switch
+              bind:active={bill.isReconciled}
+              on:toggle={toggleReconciliation.bind(toggleReconciliation, bill)}
+            />
           </TCol>
-          <TCol class="reconciled">
-            <Switch bind:active={bill.reconciled} />
-          </TCol>
-          <TActionsCol>
-            <button class="action">
-              <span>...</span>
-            </button>
-          </TActionsCol>
         </TRow>
       {/each}
     </TBody>
@@ -62,32 +74,7 @@
 </StandardLayout>
 
 <style>
-  .action {
-    padding: 4px;
-    background-color: transparent;
-    border: 0;
-    transform: rotateZ(90deg);
-    cursor: pointer;
-  }
-
-  .money {
-    display: inline-flex;
-    gap: 4px;
-    align-items: center;
-  }
-
-  .money > em {
-    color: var(--color-main-neutral-600);
-  }
-
-  :global(td.reconciled) {
-    --width: 0;
-
-    white-space: nowrap;
-    text-align: right;
-  }
-
-  :global(td.reconciled .switch) {
-    --width: 40px;
+  :global(.table.bills-table) {
+    height: 100%;
   }
 </style>

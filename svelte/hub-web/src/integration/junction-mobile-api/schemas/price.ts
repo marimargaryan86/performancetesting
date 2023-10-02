@@ -4,7 +4,7 @@ import { getSchemaModel, type Infer } from "../../common/schema-model.server";
 export const priceModel = getSchemaModel(
   z.object({
     currency: z.string(),
-    amount: z.string(),
+    amount: z.string({ coerce: true }),
   }),
   z.object({
     currency: z.string(),

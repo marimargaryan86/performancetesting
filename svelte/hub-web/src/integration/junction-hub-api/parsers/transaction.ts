@@ -12,9 +12,9 @@ export function parseTransactionSchema(
   } = {},
 ): TransactionModel {
   const beneficiary = included.companies?.find(
-    (item) => item.id === data.relationships.beneficiary?.data.id,
+    (item) => item.id === data.relationships?.beneficiary?.data.id,
   );
-  const payer = included.companies?.find((item) => item.id === data.relationships.payer?.data.id);
+  const payer = included.companies?.find((item) => item.id === data.relationships?.payer?.data.id);
 
   return {
     ...transactionModel.toModel(data),

@@ -42,6 +42,7 @@ export default {
     ),
     bookings: new junctionPayApi.BookingService(env.HUB_API_BASE_URL),
     balances: new junctionPayApi.BalanceService(env.HUB_API_BASE_URL),
+    bills: new junctionPayApi.BillService(env.HUB_API_BASE_URL),
   },
   common: {
     countries: new common.CountryService(),

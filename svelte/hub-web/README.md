@@ -42,3 +42,7 @@ You can preview the production build with `npm run preview`.
 ```
 ory tunnel --dev --project optimistic-tereshkova-36hc6vayw4 http://localhost:4000
 ```
+
+## Notes
+
+- In order to access and view finance-related pages in `dev`, such as the "Bills" tab, please use your Snowfall VPN.

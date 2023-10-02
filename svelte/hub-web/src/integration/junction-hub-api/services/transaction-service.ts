@@ -23,8 +23,8 @@ export default class TransactionService extends JunctionHubApiService {
     const companyIds = new Set(
       data.data
         .flatMap((transaction) => [
-          transaction.relationships.beneficiary?.data.id,
-          transaction.relationships.payer?.data.id,
+          transaction.relationships?.beneficiary?.data.id,
+          transaction.relationships?.payer?.data.id,
         ])
         .filter(ensureDefined),
     );

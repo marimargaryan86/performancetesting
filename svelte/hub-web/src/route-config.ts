@@ -146,6 +146,10 @@ export default {
         },
         bills: {
           root: "/pay/bills",
+          actions: {
+            listBills: "/pay/bills?/listBills",
+            toggleReconciliation: "/pay/bills?/toggleReconciliation",
+          },
         },
       },
     },

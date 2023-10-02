@@ -1,3 +1,4 @@
+import { billModel, type BillIdentifier } from "./bill";
 import { companyModel, type CompanyIdentifier } from "./company";
 import { conversionModel, type ConversionIdentifier } from "./conversion";
 import { moneyModel } from "./money";
@@ -11,10 +12,12 @@ import { z } from "zod";
 
 const transactionRelationships: z.ZodType<{
   conversion?: { data: ConversionIdentifier | null };
+  bill?: { data: BillIdentifier | null };
   payer?: { data: CompanyIdentifier };
   beneficiary?: { data: CompanyIdentifier };
 }> = relationship({
   conversion: z.lazy(() => conversionModel.identifier.nullable()).optional(),
+  bill: z.lazy(() => billModel.identifier.nullable()).optional(),
   payer: z.lazy(() => companyModel.identifier).optional(),
   beneficiary: z.lazy(() => companyModel.identifier).optional(),
 });
@@ -44,7 +47,7 @@ export const transactionModel = getSchemaModel(
       paymentType: z.enum(["unspecified", "card", "bank-transfer"]),
       paymentMethod: z.enum(["unspecified", "transactional", "invoice"]),
     }),
-    relationships: transactionRelationships,
+    relationships: transactionRelationships.optional(),
     links: links(["self"]),
   }),
   z.object({
@@ -63,6 +66,8 @@ export const transactionModel = getSchemaModel(
       salesMarkup: z.number(),
       fxMarkup: z.number(),
     }),
+    billId: z.string().uuid().optional(),
+    bill: billModel.model.optional(),
     beneficiary: companyModel.model.optional(),
     reference: z.string().optional(),
     payment: z.object({
@@ -89,6 +94,8 @@ export const transactionModel = getSchemaModel(
         fxQuote: data.attributes.rates.fxQuote,
         salesMarkup: data.attributes.rates.salesMarkup,
       },
+      billId: data.relationships?.bill?.data?.id,
+      bill: undefined,
       reference: data.attributes.invoiceReference,
       payment: {
         type: data.attributes.paymentType,
