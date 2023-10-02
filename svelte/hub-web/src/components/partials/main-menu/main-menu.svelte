@@ -1,7 +1,6 @@
 <script lang="ts">
   import ChevronIcon from "components/icons/chevron-icon.svelte";
   import LogoutIcon from "components/icons/logout-icon.svelte";
-  import type { UserModel } from "models/user";
   import Account from "./account.svelte";
   import Menu from "./menu.svelte";
   import HubLogo from "components/icons/hub-logo.svelte";
@@ -10,8 +9,6 @@
   import { page } from "$app/stores";
   import routeConfig from "routeConfig";
   import { callAction } from "utils/common";
-
-  export let user: UserModel;
 
   let expanded = true;
 
@@ -76,7 +73,7 @@
     </li>
   </ul>
 
-  <Account {user} {expanded} {transitionTimeMs} />
+  <Account {expanded} {transitionTimeMs} />
 </nav>
 
 <style>

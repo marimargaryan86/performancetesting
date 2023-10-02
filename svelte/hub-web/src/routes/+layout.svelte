@@ -24,7 +24,6 @@
     $userStore = data.user.data;
   } else {
     Sentry.setUser(null);
-    $userStore = undefined;
   }
 
   function setLogoutTimer(timeoutAt: Date): void {
@@ -38,7 +37,7 @@
 
 {#if data.user}
   <div class="workspace">
-    <MainMenu user={data.user.data} />
+    <MainMenu />
 
     <main>
       <slot />

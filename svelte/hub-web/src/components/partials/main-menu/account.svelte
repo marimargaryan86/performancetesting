@@ -1,20 +1,19 @@
 <script lang="ts">
   import md5 from "md5";
-  import type { UserModel } from "models/user";
+  import userStore from "stores/user-store";
 
-  export let user: UserModel;
   export let transitionTimeMs: number;
   export let expanded: boolean;
 
-  $: gravatarHash = md5(user.email.trim().toLowerCase());
+  $: gravatarHash = md5($userStore.email.trim().toLowerCase());
 </script>
 
 <div class="account" style:--transition-time="{transitionTimeMs}ms" class:expanded>
   <img src="https://www.gravatar.com/avatar/{gravatarHash}?s=40&d=retro" alt="" />
 
   <div class="info">
-    <strong class="typography body-small bold">{user.name}</strong>
-    <span class="typography body-small">{user.email}</span>
+    <strong class="typography body-small bold">{$userStore.name}</strong>
+    <span class="typography body-small">{$userStore.email}</span>
   </div>
 </div>
 
