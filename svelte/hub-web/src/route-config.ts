@@ -89,6 +89,9 @@ export default {
         customerService: {
           root: "/help/customer-service",
         },
+        conditionsOfCarriage: {
+          root: "/help/conditions-of-carriage",
+        },
       },
     },
     settings: {

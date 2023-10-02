@@ -16,13 +16,14 @@
       label: "Customer Service",
       exact: true,
     },
+    {
+      url: routeConfig.routes.help.routes.conditionsOfCarriage.root,
+      label: "Conditions of Carriage",
+      exact: true,
+    },
   ];
 
-  const routes: string[] = [
-    routeConfig.routes.help.routes.privacyPolicy.root,
-    routeConfig.routes.help.routes.termsAndConditions.root,
-    routeConfig.routes.help.routes.customerService.root,
-  ];
+  const routes = Object.values(tabs).map((item) => item.url);
 </script>
 
 <script lang="ts">
