@@ -35,7 +35,8 @@
         "msm@snowfalltravel.com:$2y$05$pP/BDRnXN2jv9NBJiZWlteceTMSF9/5ouDKQWk96JD1UBP9tES2Si",
         "hovhannes.d@snowfalltravel.com:$2y$05$VVy95Nj0wCewSNMg4M99N.TlFRCgHctD8nX2Z5HH6oWeIPNlXipnS",
         "aramh@snowfalltravel.com:$2y$05$Da0Ed8d0OxkV33TyQjI0keySB/xgOzhQbgchne26BOPJRxpaodb5S",
-        "ivannikolic:$2y$05$mHvhvpthFWPwprr5ybV.oeDGYop0wCROW2v0CWTRYfaOhKFT2HZIu"
+        "ivannikolic:$2y$05$mHvhvpthFWPwprr5ybV.oeDGYop0wCROW2v0CWTRYfaOhKFT2HZIu",
+        "mandersson@snowfalltravel.com:$2y$05$DoMEusoargMDkD5TkMrsRez.Nh7dUU1qPKeSMvFHY9umPPXjLf/BS"
       ],
       "traefik_consul_ui_users": [
         "ara@snowfalltravel.com:$2y$05$4YUMkM/Ka8xbPRN9pjJO0O/og964WHUf4NbjZBIMbd7hIYt6FWl/i",
