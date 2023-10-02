@@ -136,11 +136,11 @@ export default {
             listBeneficiaries: "/pay/beneficiaries?/listBeneficiaries",
           },
           routes: {
-            beneficiary: <TBeneficiaryId extends string | undefined = undefined>(
-              beneficiaryId?: TBeneficiaryId,
+            beneficiary: <TBeneficiaryId extends string = "add">(
+              beneficiaryId: TBeneficiaryId = "add" as TBeneficiaryId,
             ) =>
               ({
-                root: `/pay/beneficiaries/${beneficiaryId}/${beneficiaryId ?? "add"}`,
+                root: `/pay/beneficiaries/${beneficiaryId}`,
               } as const),
           },
         },

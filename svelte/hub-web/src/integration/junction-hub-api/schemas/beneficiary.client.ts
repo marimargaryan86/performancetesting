@@ -1,14 +1,14 @@
 import { z } from "zod";
 
 export const addressDetails = z.object({
-  addressLines: z.array(z.string().min(1).max(255).trim()).min(1),
+  addressLines: z.array(z.string().max(255).trim()).min(1),
   countryCode: z.string().regex(/^[A-Z]{2}$/),
 });
 
 export const enhancedAddressDetails = addressDetails.extend({
-  postalCode: z.string().min(1).trim(),
-  city: z.string().min(1).max(255).min(1).trim(),
-  state: z.string().min(1).trim().optional(),
+  postalCode: z.string().trim(),
+  city: z.string().max(255).trim(),
+  state: z.string().trim().optional(),
 });
 
 export const bankDetailsBase = z.object({
@@ -21,13 +21,13 @@ export const bankDetailsBase = z.object({
 
 export const bankDetailsIban = bankDetailsBase.extend({
   type: z.enum(["iban"]),
-  iban: z.string().min(1).trim(),
+  iban: z.string().trim(),
 });
 
 export const bankDetailsAba = bankDetailsBase.extend({
   type: z.enum(["aba"]),
-  accountNumber: z.string().min(1).trim(),
-  aba: z.string().min(1).trim(),
+  accountNumber: z.string().trim(),
+  aba: z.string().trim(),
 });
 
 export const bankDetails = z.discriminatedUnion("type", [bankDetailsIban, bankDetailsAba]);
@@ -39,11 +39,11 @@ export const partialBankDetailsModel = z.discriminatedUnion("type", [
 
 export const beneficiaryModel = z.object({
   id: z.string().uuid(),
-  companyName: z.string().min(1).max(150).trim(),
+  companyName: z.string().max(150).trim(),
   email: z.string().email().max(255).trim(),
   address: enhancedAddressDetails,
   bankDetails,
-  currencyCode: z.string().regex(/^[A-Z]{3}$/),
+  currencyCode: z.string(),
   accountId: z.string().uuid(),
 });
 
