@@ -84,17 +84,27 @@ class MessageHandler(object):
                 "ai_assistant_state",
                 subscriber.phone_number.e164_number,
             )
-        response = await message_handler(
-            subscriber=subscriber,
-            configuration_vector=configuration_vector,
-            subscribers_client=subscribers_client,
-            orders_client=orders_client,
-            message=message,
-            message_key=message_key,
-            ai_bot=self._ai_bot,
-            redis_client=self._redis,
-            shortener_client=self._shortener_client,
-        )
+        try:
+            response = await message_handler(
+                subscriber=subscriber,
+                configuration_vector=configuration_vector,
+                subscribers_client=subscribers_client,
+                orders_client=orders_client,
+                message=message,
+                message_key=message_key,
+                ai_bot=self._ai_bot,
+                redis_client=self._redis,
+                shortener_client=self._shortener_client,
+            )
+        except RuntimeError:
+            return [
+                {
+                    "message": _(
+                        "There is an issue retrieving the requested data at the moment."
+                        " Please try again later",
+                    ),
+                },
+            ]
         subscriber_state["last_message"] = message
         subscriber_state["last_response"] = response[0]["message"]
         subscriber_state["last_handler"] = message_handler.__name__

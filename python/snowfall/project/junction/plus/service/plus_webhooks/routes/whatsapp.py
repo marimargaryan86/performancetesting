@@ -6,6 +6,7 @@ from twilio.twiml.messaging_response import MessagingResponse
 
 from snowfall.project.junction.plus.adapter import (
     configuration_vectors,
+    errors,
     orders,
     subscribers,
     validation,
@@ -37,10 +38,21 @@ class IncomingMessages(endpoints.HTTPEndpoint):
             message_to,
             "mobile_phone.e164_number",
         )
-        subscriber = await subscribers_client.find_from_reseller(
-            cv.reseller_id,
-            message_from,
-        )
+        try:
+            subscriber = await subscribers_client.find_from_reseller(
+                cv.reseller_id,
+                message_from,
+            )
+        except errors.NotFoundError:
+            whatsapp_channel.send_message(
+                receiver=message_from,
+                sender_number=cv.mobile_phone.e164_number,
+                body=_(
+                    "We couldn't find a subscriber. Please book your flights here: ",
+                )
+                + cv.search_url,
+            )
+            raise
         if (  # noqa: WPS337
             subscriber.phone_subscription_status
             is notifications_pb2.Subscriber.SubscribedStatus.SUBSCRIBED_STATUS_UNSUBSCRIBED
