@@ -7,6 +7,7 @@
   import MainMenu from "components/partials/main-menu/main-menu.svelte";
   import { browser } from "$app/environment";
   import routeConfig from "routeConfig";
+  import userStore from "stores/user-store";
   import { callAction } from "utils/common";
   import { getTimeDeltaMs } from "utils/date-time";
   import * as Sentry from "@sentry/sveltekit";
@@ -20,8 +21,10 @@
   }
   $: if (data.user) {
     Sentry.setUser({ email: data.user.data.email, id: data.user.data.id });
+    $userStore = data.user.data;
   } else {
     Sentry.setUser(null);
+    $userStore = undefined;
   }
 
   function setLogoutTimer(timeoutAt: Date): void {

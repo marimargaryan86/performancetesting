@@ -27,6 +27,7 @@ const config = {
       sorting: "src/sorting",
       transitions: "src/transitions",
       routeConfig: "src/route-config.ts",
+      stores: "src/stores",
     },
   },
 };
