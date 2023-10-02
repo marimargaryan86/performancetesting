@@ -3,6 +3,7 @@ import json
 import logging
 from collections.abc import Mapping, Sequence
 from datetime import date, datetime
+from itertools import starmap
 from typing import Any, Literal, TypeAlias
 
 import httpx
@@ -57,6 +58,30 @@ class MobileApiClient(Client):  # noqa: WPS214
         super().__init__(base_url=base_url, auth=auth, client=client)
         self.logger = logging.getLogger()
         self.logger.setLevel(logging.DEBUG)
+
+    def generate_curl_command(  # noqa: WPS211
+        self,
+        method: str,
+        url: str,
+        query_parameters: Mapping[str, str] | None = None,
+        body: Mapping[str, Any] | None = None,
+        headers: Mapping[str, str] | None = None,
+    ) -> str:
+        full_url = str(self._base_url) + url
+        curl_command = 'curl -X "{0}" "{1}"'.format(method, full_url)
+
+        if query_parameters:
+            curl_command += ' -d "{0}"'.format(json.dumps(query_parameters))
+        if headers:
+            header_strings = list(starmap('-H "{0}: {1}"'.format, headers.items()))
+            curl_command += " ".join(header_strings)
+
+        if body:
+            curl_command += " -H \"Content-Type: application/json\" -d '{0}'".format(
+                json.dumps(body),
+            )
+
+        return "Curl command for the {0} request:\n{1}".format(method, curl_command)
 
     async def list_cabin_classes(self) -> dict[str, Any]:
         return await self._make_request(method=_METHOD_GET, url="/cabin-classes")
@@ -393,10 +418,20 @@ class MobileApiClient(Client):  # noqa: WPS214
         self,
         offer_search_id: str,
     ) -> dict[str, Any]:
+        url = "/offers/searches/{0}/offers".format(offer_search_id)
+        query_parameters = {"include": "groups.details"}
+
+        curl_command = self.generate_curl_command(
+            _METHOD_GET,
+            url,
+            query_parameters=query_parameters,
+        )
+        logger.info(curl_command)
+
         return await self._make_request(
             method=_METHOD_GET,
-            url="/offers/searches/{0}/offers".format(offer_search_id),
-            query_parameters={"include": "groups.details"},
+            url=url,
+            query_parameters=query_parameters,
         )
 
     async def delete_user_group(
@@ -652,9 +687,16 @@ class MobileApiClient(Client):  # noqa: WPS214
         query_parameters = {
             "query[name]": name,
         }
+        url = "/places"
+        curl_command = self.generate_curl_command(
+            _METHOD_GET,
+            "/places",
+            query_parameters,
+        )
+        logger.info(curl_command)
         return await self._make_request(
             method=_METHOD_GET,
-            url="/places",
+            url=url,
             query_parameters=query_parameters,
         )
 
@@ -664,6 +706,7 @@ class MobileApiClient(Client):  # noqa: WPS214
         destination_id: str,
         departure_after: datetime,
     ) -> dict[str, Any]:
+        url = "/trips/searches"
         body = {
             "data": {
                 "attributes": {
@@ -678,9 +721,16 @@ class MobileApiClient(Client):  # noqa: WPS214
                 "type": "trip-searches",
             },
         }
+
+        curl_command = self.generate_curl_command(
+            _METHOD_GET,
+            url,
+            body=body,
+        )
+        logger.info(curl_command)
         return await self._make_request(
             method=_METHOD_POST,
-            url="/trips/searches",
+            url=url,
             payload=body,
         )
 
@@ -688,17 +738,23 @@ class MobileApiClient(Client):  # noqa: WPS214
         self,
         trips_search_id: str,
     ) -> dict[str, Any]:
+        url = "/trips/searches/{0}/trips".format(trips_search_id)
+        curl_command = self.generate_curl_command(
+            _METHOD_GET,
+            url,
+        )
+        logger.info(curl_command)
         return await self._make_request(
             method=_METHOD_GET,
-            url="/trips/searches/{0}/trips".format(trips_search_id),
+            url=url,
         )
 
     async def create_offers_search(
         self,
         trip_id: str,
         passengers_dates_of_birth: Sequence[date],
-        session_token: str | None = None,
     ) -> dict[str, Any]:
+        url = "/offers/searches"
         attributes: dict[str, Any] = {
             "passengers": [
                 {"dateOfBirth": dob.isoformat()} for dob in passengers_dates_of_birth
@@ -721,9 +777,16 @@ class MobileApiClient(Client):  # noqa: WPS214
         headers = {
             "Session-Token": "YMSXrOAhIOdvIbxAmfSt7vJtRBkurNb6",
         }
+        curl_command = self.generate_curl_command(
+            _METHOD_GET,
+            url,
+            headers=headers,
+            body=body,
+        )
+        logger.info(curl_command)
         return await self._make_request(
             method=_METHOD_POST,
-            url="/offers/searches",
+            url=url,
             headers=headers,
             payload=body,
         )
