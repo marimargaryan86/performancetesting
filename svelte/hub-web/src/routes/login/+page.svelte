@@ -82,6 +82,12 @@
           <LoadingIcon />
         {/if}
       </Button>
+
+      <p class="typography body-small">
+        We store some strictly necessary cookies. These cookies are used for Authentication and
+        managing form data during a session. We currently do not use cookies for marketing,
+        analytics or any other use cases.
+      </p>
     </form>
   </section>
 </main>
