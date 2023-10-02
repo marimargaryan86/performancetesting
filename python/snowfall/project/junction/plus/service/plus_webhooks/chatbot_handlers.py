@@ -3,7 +3,7 @@ import json
 import time
 from collections.abc import Mapping, Sequence
 from gettext import gettext as _
-from typing import Any
+from typing import Any, TypeAlias
 
 from snowfall.project.junction.plus.adapter import orders, subscribers
 from snowfall.project.junction.plus.notification_channels.order_utils import (
@@ -18,14 +18,21 @@ from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.redis import types as redis
 
-action_menu = _("Please select one of the following options")
+action_menu = {
+    "message": _("Please select one of the following options"),
+}
 
-trip_details_menu = _(
-    "To enable auto check-in and save time at the airport please click on the"
-    " *Check-in* button below. If you would like to plan this trip please click on the"
-    " Plan this trip button. For further options please click on the *Main Menu*"
-    " button.",
-)
+
+trip_details_menu = {
+    "message": _(
+        "To enable auto check-in and save time at the airport please click on the"
+        " *Check-in* button below. If you would like to plan this trip please click on"
+        " the Plan this trip button. For further options please click on the *Main"
+        " Menu* button.",
+    ),
+}
+
+_HandlersResponse: TypeAlias = Sequence[Mapping[str, Any]]
 
 
 class MessageHandler(object):
@@ -52,7 +59,7 @@ class MessageHandler(object):
         configuration_vector: models_pb2.ConfigurationVector,
         subscribers_client: subscribers.Client,
         orders_client: orders.Client,
-    ) -> Sequence[Mapping[str, Any]]:
+    ) -> _HandlersResponse:
         subscriber_state = await self.get_cache(
             hash_name="subscriber_state",
             hash_key=subscriber.phone_number.e164_number,
@@ -138,6 +145,7 @@ def message_handlers(fun: str) -> Any:
         "check-in": check_in,
         "upcoming trip details": upcoming_trip_details,
         "travel assistant": travel_assistant,
+        "plan this trip": plan_selected_trip,
     }.get(fun, handle_unknown)
 
 
@@ -145,7 +153,7 @@ async def unsubscribe(
     subscriber: models_pb2.Subscriber,
     subscribers_client: subscribers.Client,
     **kwargs: Any,
-) -> Sequence[Mapping[str, Any]]:  # noqa: WPS473
+) -> _HandlersResponse:
     unsubscribe_status = await subscribers_client.unsubscribe(subscriber.id)
     if unsubscribe_status:
         return [
@@ -164,7 +172,7 @@ async def subscribe(
     subscriber: models_pb2.Subscriber,
     subscribers_client: subscribers.Client,
     **kwargs: Any,
-) -> Sequence[Mapping[str, Any]]:  # noqa: WPS473
+) -> _HandlersResponse:
     subscribe_status = await subscribers_client.subscribe(subscriber.id)
     if subscribe_status:
         return [
@@ -174,9 +182,7 @@ async def subscribe(
                     " You can now receive notifications regarding travel information.",
                 ),
             },
-            {
-                "message": action_menu,
-            },
+            action_menu,
         ]
     raise RuntimeError("error while subscribing with id: {0}".format(subscriber.id))
 
@@ -186,10 +192,11 @@ async def trip_details(
     message_key: str,
     redis_client: redis.Client[str],
     **kwargs: Any,
-) -> Sequence[Mapping[str, Any]]:  # noqa: WPS473
+) -> _HandlersResponse:
     order = None
     if message_key:
-        order_id = await get_order_id_by_message_id(redis_client, message_key)
+        session = redis_client.hash_("message_id_order_id")
+        order_id = await session.get(message_key) or ""
         if order_id:
             order = await orders_client.get(order_id)
     if order is None:
@@ -197,16 +204,14 @@ async def trip_details(
             {
                 "message": _("Sorry there are no details available for this trip."),
             },
-            {
-                "message": action_menu,
-            },
+            action_menu,
         ]
     return [
         {
             "message": transform_trip_details(order),
         },
         {
-            "message": trip_details_menu,
+            **trip_details_menu,
             "cache": {
                 "hash": "message_id_order_id",
                 "value": order.id,
@@ -220,7 +225,7 @@ async def upcoming_trips(  # noqa: WPS210
     orders_client: orders.Client,
     redis_client: redis.Client[str],
     **kwargs: Any,
-) -> Sequence[Mapping[str, Any]]:  # noqa: WPS473
+) -> _HandlersResponse:
     await redis_client.delete("upcoming_trips_{0}".format(subscriber.id))
     session = redis_client.hash_("upcoming_trips_{0}".format(subscriber.id))
 
@@ -269,9 +274,7 @@ async def upcoming_trips(  # noqa: WPS210
         {
             "message": _("*It looks like you have no upcoming trips at the moment.*"),
         },
-        {
-            "message": action_menu,
-        },
+        action_menu,
     ]
 
 
@@ -281,7 +284,7 @@ async def upcoming_trip_details(
     message_key: str,
     redis_client: redis.Client[str],
     **kwargs: Any,
-) -> Sequence[Mapping[str, Any]]:  # noqa: WPS473
+) -> _HandlersResponse:
     session = redis_client.hash_("upcoming_trips_{0}".format(subscriber.id))
     order_id = await session.get(message_key)
     if not order_id:
@@ -295,7 +298,7 @@ async def upcoming_trip_details(
             "message": transform_trip_details(await orders_client.get(order_id)),
         },
         {
-            "message": trip_details_menu,
+            **trip_details_menu,
             "cache": {
                 "hash": "message_id_order_id",
                 "value": order_id,
@@ -309,7 +312,7 @@ async def travel_assistant(
     ai_bot: open_ai.AIBot,
     redis_client: redis.Client[str],
     **kwargs: Any,
-) -> Sequence[Mapping[str, Any]]:
+) -> _HandlersResponse:
     session = redis_client.hash_("ai_assistant_state")
     ai_chat_history = [
         {"role": "system", "content": ai_bot.generate_system_setup()},
@@ -327,16 +330,75 @@ async def travel_assistant(
     ]
 
 
+async def plan_selected_trip(  # noqa: WPS211,WPS210
+    subscriber: models_pb2.Subscriber,
+    configuration_vector: models_pb2.ConfigurationVector,
+    orders_client: orders.Client,
+    ai_bot: open_ai.AIBot,
+    message_key: str,
+    redis_client: redis.Client[str],
+    shortener_client: shortener.Client,
+    **kwargs: Any,
+) -> _HandlersResponse:
+    if message_key:
+        session = redis_client.hash_("message_id_order_id")
+        order_id = await session.get(message_key) or ""
+        if order_id:
+            order = await orders_client.get(order_id)
+            processed_bookings = compress_flights(
+                [
+                    booking.value
+                    for booking in order.bookings
+                    if booking.value.DESCRIPTOR.name == "AirBooking"
+                    and booking.value.departure_at.seconds > int(time.time())
+                ],
+            )
+            if processed_bookings:
+                session = redis_client.hash_("ai_assistant_state")
+                ai_chat_history = [
+                    {"role": "system", "content": ai_bot.generate_system_setup()},
+                    {
+                        "role": "user",
+                        "content": "Airport - {0}".format(
+                            processed_bookings[0].destination,
+                        ),
+                    },
+                ]
+                assistant_message = await ai_bot.handle_prompt(
+                    messages=ai_chat_history,
+                    search_url=configuration_vector.search_url,
+                    shortener_client=shortener_client,
+                )
+                ai_chat_history.append(assistant_message)
+                state = {
+                    "ai_chat_history": ai_chat_history,
+                    "ai_enabled": True,
+                }
+                await session.put(
+                    subscriber.phone_number.e164_number,
+                    json.dumps(state),
+                )
+                return [
+                    {
+                        "message": _(assistant_message["content"]),
+                    },
+                ]
+    return [
+        {
+            "message": _("Sorry, this trip can't be planned"),
+        },
+        action_menu,
+    ]
+
+
 async def check_in(
     **kwargs: Any,
-) -> Sequence[Mapping[str, Any]]:
+) -> _HandlersResponse:
     return [
         {
             "message": _("Check-in feature is not implemented yet."),
         },
-        {
-            "message": action_menu,
-        },
+        action_menu,
     ]
 
 
@@ -348,7 +410,7 @@ async def handle_unknown(  # noqa: WPS211
     redis_client: redis.Client[str],
     shortener_client: shortener.Client,
     **kwargs: Any,
-) -> Sequence[Mapping[str, Any]]:
+) -> _HandlersResponse:
     session = redis_client.hash_("ai_assistant_state")
     state_str = await session.get(subscriber.phone_number.e164_number)
     if state_str:
@@ -363,9 +425,7 @@ async def handle_unknown(  # noqa: WPS211
                     {
                         "message": _("Great! We are here"),
                     },
-                    {
-                        "message": action_menu,
-                    },
+                    action_menu,
                 ]
             ai_chat_history = state.get("ai_chat_history", [])
             ai_chat_history.append({"role": "user", "content": message})
@@ -385,27 +445,12 @@ async def handle_unknown(  # noqa: WPS211
         {
             "message": _("Sorry I didn't understand your message."),
         },
-        {
-            "message": action_menu,
-        },
+        action_menu,
     ]
 
 
 async def main_menu(
     *args: Any,
     **kwargs: Any,
-) -> Sequence[Mapping[str, Any]]:
-    return [
-        {
-            "message": action_menu,
-        },
-    ]
-
-
-async def get_order_id_by_message_id(
-    redis_client: redis.Client[str],
-    sid: str,
-) -> str:
-    session = redis_client.hash_("message_id_order_id")
-    order_id = await session.get(sid)
-    return order_id or ""
+) -> _HandlersResponse:
+    return [action_menu]

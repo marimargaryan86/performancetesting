@@ -38,6 +38,7 @@ class AIBot(object):
         For anything else, you should respond with "unrelated question" message.
         Currently it is {0}.
         Use dd-mm-yyyy for date format.
+        When the user mentions airport, use city where that airport is located and offer 3 options as example.
         When the user gives you a valid city name, provide the following 3 options as examples
         "1) Top 5 restaurants, 2) I would like to spend
         a day here, 3) Give me a 3 day itinerary"
@@ -101,7 +102,7 @@ class AIBot(object):
         messages: Sequence[Mapping[str, str]],
         search_url: str,
         shortener_client: shortener.Client,
-    ) -> Mapping[str, str]:
+    ) -> dict[str, str]:
         """Get message history from state, append message and send to openai."""
         ai_response = await openai.ChatCompletion.acreate(
             # type: ignore[no-untyped-call]
