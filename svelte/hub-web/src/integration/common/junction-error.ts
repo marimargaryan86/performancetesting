@@ -1,4 +1,4 @@
-import { env } from "$env/dynamic/public";
+import { dev } from "$app/environment";
 
 type Pointer<TSchema> = keyof TSchema extends string
   ?
@@ -104,7 +104,7 @@ export async function throwIfError(response: Response): Promise<void> {
   if (response.status >= 400) {
     const error = await createJunctionError(response);
 
-    if (env.PUBLIC_DEV === "1") {
+    if (dev) {
       // eslint-disable-next-line no-console
       console.debug(error);
     }
