@@ -27,6 +27,7 @@ export async function load(event): Promise<{ loginFlow: LoginFormModel }> {
 const loginActionData = z.object({
   id: z.string().uuid(),
   data: z.record(z.string()),
+  rememberMe: z.boolean(),
 });
 export type LoginActionData = z.infer<typeof loginActionData>;
 
@@ -40,7 +41,7 @@ export const actions = {
         flowId: data.id,
       });
 
-      setSession(session.id, session.token, event);
+      setSession({ id: session.id, token: session.token, rememberMe: data.rememberMe, event });
     } catch {
       return fail(401, { unauthorized: true });
     }

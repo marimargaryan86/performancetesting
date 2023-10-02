@@ -9,6 +9,8 @@ const COOKIE_OPTIONS = {
   httpOnly: true,
   secure: !dev,
 };
+// Two weeks, as set by the Legal team. Do not modify.
+const EXPIRY_MAX_AGE = 1209600;
 
 export function getSession(event: RequestEvent): SessionModel {
   const id = event.cookies.get(SESSION_ID);
@@ -21,9 +23,25 @@ export function getSession(event: RequestEvent): SessionModel {
   throw error(401, "Unauthorized");
 }
 
-export function setSession(id: string, token: string, event: RequestEvent): void {
-  event.cookies.set(SESSION_ID, id, COOKIE_OPTIONS);
-  event.cookies.set(SESSION_TOKEN, token, COOKIE_OPTIONS);
+export function setSession({
+  id,
+  token,
+  rememberMe = false,
+  event,
+}: {
+  id: string;
+  token: string;
+  rememberMe?: boolean;
+  event: RequestEvent;
+}): void {
+  event.cookies.set(SESSION_ID, id, {
+    ...COOKIE_OPTIONS,
+    maxAge: rememberMe ? EXPIRY_MAX_AGE : undefined,
+  });
+  event.cookies.set(SESSION_TOKEN, token, {
+    ...COOKIE_OPTIONS,
+    maxAge: rememberMe ? EXPIRY_MAX_AGE : undefined,
+  });
 }
 
 export function deleteSession(event: RequestEvent): void {

@@ -8,10 +8,12 @@
   import { pendableCall } from "utils/pendable-call";
   import type { LoginActionData } from "./+page.server";
   import { goto } from "$app/navigation";
+  import Checkbox from "components/ui/checkbox.svelte";
 
   export let data;
 
   let errors: string | undefined;
+  let rememberMe = false;
 
   const { pending, func: submit } = pendableCall(async () => {
     errors = undefined;
@@ -21,6 +23,7 @@
       data: Object.fromEntries(
         data.loginFlow.elements.map((item) => [item.attributes.name, item.attributes.value]),
       ),
+      rememberMe,
     };
 
     const result = await callAction({
@@ -88,6 +91,11 @@
         managing form data during a session. We currently do not use cookies for marketing,
         analytics or any other use cases.
       </p>
+
+      <label for="remember-me" class="remember-me">
+        <Checkbox id="remember-me" bind:checked={rememberMe} />
+        <span class="typography body-small">Remember me for 14 days</span>
+      </label>
     </form>
   </section>
 </main>
@@ -186,5 +194,11 @@
     gap: 24px;
     width: 100%;
     max-width: 448px;
+  }
+
+  .remember-me {
+    display: flex;
+    gap: 12px;
+    align-items: center;
   }
 </style>
