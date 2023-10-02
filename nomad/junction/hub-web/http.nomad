@@ -50,6 +50,14 @@ variable "booking_hub_api_base_url" {
   type = string
 }
 
+variable "hub_api_base_url" {
+  type = string
+}
+
+variable "ory_base_url" {
+  type = string
+}
+
 job "hub-web-http" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -144,6 +152,8 @@ EOH
         PAY_API_BASE_URL         = "${var.api_pay_base_url}"
         CLIENT_API_BASE_URL      = "${var.client_api_base_url}"
         BOOKING_HUB_API_BASE_URL = "${var.booking_hub_api_base_url}"
+        ORY_BASE_URL             = "${var.ory_base_url}"
+        HUB_API_BASE_URL         = "${var.hub_api_base_url}"
       }
     }
   }
