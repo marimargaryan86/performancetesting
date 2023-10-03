@@ -92,6 +92,10 @@ job "resellers-grpc" {
     task "grpc" {
       driver = "docker"
 
+      vault {
+        policies = ["resellers-${var.environment}"]
+      }
+
       template {
         destination = "services.env"
         env         = true
