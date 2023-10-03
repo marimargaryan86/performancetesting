@@ -91,7 +91,7 @@ def _factory(
         transactions_channel = create_channel(
             app.settings.transactions_address,
         )
-        create_channel(
+        currencies_channel = create_channel(
             app.settings.currencies_address,
         )
         companies_channel = create_channel(
@@ -135,6 +135,11 @@ def _factory(
                             api_key=app.settings.cc_api_key,
                         ),
                         client=metrics.register(httpx.AsyncClient()),
+                    ),
+                    currencies_client=currencies.GrpcClient(
+                        currencies_pb2_grpc.CurrencyServiceStub(
+                            currencies_channel,
+                        ),
                     ),
                     redis_client=UserSessionRepository(
                         redis_client=redis_client,

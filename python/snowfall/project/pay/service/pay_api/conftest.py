@@ -92,6 +92,7 @@ def custom_middlewares() -> Sequence[Middleware]:
 
 def _create_app(  # noqa: WPS211
     payment_client: PaymentClient,
+    currencies_client: currencies.Client,
     quotations_client: quotations.Client,
     redis_repository: UserSessionRepository,
     conversion_repository: pay_repos.ConversionRepository,
@@ -105,6 +106,7 @@ def _create_app(  # noqa: WPS211
         openapi_path=openapi_path,
         routes=router.get_routes(
             bootstrap.create_dependencies(
+                currencies_client,
                 redis_repository,
                 transactions_client,
                 quotations_client,
@@ -425,6 +427,7 @@ def headers(jwt_token: str) -> dict[str, str]:
 
 @pytest.fixture()
 def app(  # noqa: WPS211
+    currencies_client: currencies.Client,
     quotations_client: quotations.Client,
     redis_repository: UserSessionRepository,
     transactions_client: transactions.Client,
@@ -434,6 +437,7 @@ def app(  # noqa: WPS211
 ) -> applications.Starlette:
     return _create_app(
         payment_client=cc_payment_client,
+        currencies_client=currencies_client,
         quotations_client=quotations_client,
         redis_repository=redis_repository,
         conversion_repository=conversions_repository,
