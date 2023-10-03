@@ -7,7 +7,7 @@ export function load(event): {
   conversions: Promise<PaginatedData<ConversionModel>>;
 } {
   return {
-    conversions: integrationInstances.junctionPayApi.conversions.listConversions({
+    conversions: integrationInstances.junctionHubApi.conversions.listConversions({
       session: getSession(event),
     }),
   };
@@ -23,7 +23,7 @@ export const actions = {
     }
 
     return {
-      conversions: await integrationInstances.junctionPayApi.conversions.listConversions({
+      conversions: await integrationInstances.junctionHubApi.conversions.listConversions({
         session: getSession(event),
         cursor,
       }),

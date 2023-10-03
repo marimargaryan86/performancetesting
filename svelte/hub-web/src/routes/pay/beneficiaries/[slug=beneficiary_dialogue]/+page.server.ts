@@ -24,7 +24,7 @@ export async function load(event): Promise<{
   accounts: Promise<AccountModel[]>;
 }> {
   const session = getSession(event);
-  const accounts = integrationInstances.junctionPayApi.accounts
+  const accounts = integrationInstances.junctionHubApi.accounts
     .listAccounts({ session })
     .then((data) => data.data);
 
@@ -36,7 +36,7 @@ export async function load(event): Promise<{
       event.cookies.delete("beneficiary-data", { path: "/", httpOnly: false, secure: false });
     }
   } else if (beneficiary?.id !== event.params.slug) {
-    beneficiary = await integrationInstances.junctionPayApi.beneficiaries.getBeneficiary({
+    beneficiary = await integrationInstances.junctionHubApi.beneficiaries.getBeneficiary({
       session,
       id: event.params.slug,
     });
@@ -67,7 +67,7 @@ export const actions = {
     try {
       if (beneficiary.id) {
         return {
-          beneficiary: await integrationInstances.junctionPayApi.beneficiaries.updateBeneficiary({
+          beneficiary: await integrationInstances.junctionHubApi.beneficiaries.updateBeneficiary({
             session: getSession(event),
             id: beneficiary.id,
             beneficiary: beneficiaryModel.parse(beneficiary),
@@ -76,7 +76,7 @@ export const actions = {
       }
 
       return {
-        beneficiary: await integrationInstances.junctionPayApi.beneficiaries.createBeneficiary({
+        beneficiary: await integrationInstances.junctionHubApi.beneficiaries.createBeneficiary({
           session: getSession(event),
           beneficiary: beneficiaryModel.omit({ id: true }).parse(beneficiary),
         }),

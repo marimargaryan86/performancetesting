@@ -1,10 +1,10 @@
 import { env } from "$env/dynamic/private";
 import junctionMobileApi from "integration/junction-mobile-api/services";
-import junctionPayApi from "integration/junction-hub-api/services";
+import junctionHubApi from "integration/junction-hub-api/services";
 import common from "integration/common/services";
 import ory from "integration/ory/services";
 
-const junctionPayCompanyService = new junctionPayApi.CompanyService(env.HUB_API_BASE_URL);
+const junctionHubCompanyService = new junctionHubApi.CompanyService(env.HUB_API_BASE_URL);
 
 export default {
   junctionMobileApi: {
@@ -30,19 +30,19 @@ export default {
       env.BOOKING_HUB_API_KEY,
     ),
   },
-  junctionPayApi: {
-    accounts: new junctionPayApi.AccountService(env.HUB_API_BASE_URL),
-    beneficiaries: new junctionPayApi.BeneficiaryService(env.HUB_API_BASE_URL),
-    currencies: new junctionPayApi.CurrencyService(env.HUB_API_BASE_URL),
-    conversions: new junctionPayApi.ConversionService(env.HUB_API_BASE_URL),
-    companyService: junctionPayCompanyService,
-    transactions: new junctionPayApi.TransactionService(
+  junctionHubApi: {
+    accounts: new junctionHubApi.AccountService(env.HUB_API_BASE_URL),
+    beneficiaries: new junctionHubApi.BeneficiaryService(env.HUB_API_BASE_URL),
+    currencies: new junctionHubApi.CurrencyService(env.HUB_API_BASE_URL),
+    conversions: new junctionHubApi.ConversionService(env.HUB_API_BASE_URL),
+    companyService: junctionHubCompanyService,
+    transactions: new junctionHubApi.TransactionService(
       env.HUB_API_BASE_URL,
-      junctionPayCompanyService,
+      junctionHubCompanyService,
     ),
-    bookings: new junctionPayApi.BookingService(env.HUB_API_BASE_URL),
-    balances: new junctionPayApi.BalanceService(env.HUB_API_BASE_URL),
-    bills: new junctionPayApi.BillService(env.HUB_API_BASE_URL),
+    bookings: new junctionHubApi.BookingService(env.HUB_API_BASE_URL),
+    balances: new junctionHubApi.BalanceService(env.HUB_API_BASE_URL),
+    bills: new junctionHubApi.BillService(env.HUB_API_BASE_URL),
   },
   common: {
     countries: new common.CountryService(),

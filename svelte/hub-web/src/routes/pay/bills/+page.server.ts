@@ -5,7 +5,7 @@ import { getSession } from "utils/auth";
 
 export function load(event): { bills: Promise<PaginatedData<BillModel>> } {
   return {
-    bills: integrationInstances.junctionPayApi.bills.listBills({
+    bills: integrationInstances.junctionHubApi.bills.listBills({
       session: getSession(event),
     }),
   };
@@ -23,7 +23,7 @@ export const actions = {
     }
 
     return {
-      bills: await integrationInstances.junctionPayApi.bills.listBills({
+      bills: await integrationInstances.junctionHubApi.bills.listBills({
         session: getSession(event),
         cursor,
       }),
@@ -39,9 +39,9 @@ export const actions = {
     }
 
     try {
-      await integrationInstances.junctionPayApi.bills.toggleReconciliation({
+      await integrationInstances.junctionHubApi.bills.toggleReconciliation({
         session,
-        bill: await integrationInstances.junctionPayApi.bills.getBill({
+        bill: await integrationInstances.junctionHubApi.bills.getBill({
           session,
           billId,
         }),

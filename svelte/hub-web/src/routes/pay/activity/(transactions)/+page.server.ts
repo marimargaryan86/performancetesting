@@ -9,7 +9,7 @@ export function load(event): {
   transactions: Promise<PaginatedData<TransactionModel>>;
 } {
   return {
-    transactions: integrationInstances.junctionPayApi.transactions.listTransactions({
+    transactions: integrationInstances.junctionHubApi.transactions.listTransactions({
       session: getSession(event),
     }),
   };
@@ -27,7 +27,7 @@ export const actions = {
     let booking: BookingModel | undefined = undefined;
 
     try {
-      booking = await integrationInstances.junctionPayApi.bookings.getBooking({
+      booking = await integrationInstances.junctionHubApi.bookings.getBooking({
         session: getSession(event),
         id: bookingId,
       });
@@ -46,7 +46,7 @@ export const actions = {
     }
 
     return {
-      transactions: await integrationInstances.junctionPayApi.transactions.listTransactions({
+      transactions: await integrationInstances.junctionHubApi.transactions.listTransactions({
         session: getSession(event),
         cursor,
       }),

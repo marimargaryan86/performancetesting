@@ -7,7 +7,7 @@ export function load(event): {
   beneficiaries: Promise<PaginatedData<BeneficiaryModel>>;
 } {
   return {
-    beneficiaries: integrationInstances.junctionPayApi.beneficiaries.listBeneficiaries({
+    beneficiaries: integrationInstances.junctionHubApi.beneficiaries.listBeneficiaries({
       session: getSession(event),
     }),
   };
@@ -25,7 +25,7 @@ export const actions = {
     }
 
     return {
-      beneficiaries: await integrationInstances.junctionPayApi.beneficiaries.listBeneficiaries({
+      beneficiaries: await integrationInstances.junctionHubApi.beneficiaries.listBeneficiaries({
         session: getSession(event),
         cursor,
       }),

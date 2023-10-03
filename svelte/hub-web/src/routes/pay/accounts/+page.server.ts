@@ -5,7 +5,7 @@ import { getSession } from "utils/auth";
 
 export function load(event): { accounts: Promise<PaginatedData<AccountModel>> } {
   return {
-    accounts: integrationInstances.junctionPayApi.accounts.listAccounts({
+    accounts: integrationInstances.junctionHubApi.accounts.listAccounts({
       session: getSession(event),
     }),
   };
@@ -21,7 +21,7 @@ export const actions = {
     }
 
     return {
-      accounts: await integrationInstances.junctionPayApi.accounts.listAccounts({
+      accounts: await integrationInstances.junctionHubApi.accounts.listAccounts({
         session: getSession(event),
         cursor,
       }),

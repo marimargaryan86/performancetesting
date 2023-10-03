@@ -11,8 +11,8 @@ export function load(event): {
   const session = getSession(event);
 
   return {
-    account: integrationInstances.junctionPayApi.accounts.getAccount({ session, id: accountId }),
-    balances: integrationInstances.junctionPayApi.balances.listBalances({ session, accountId }),
+    account: integrationInstances.junctionHubApi.accounts.getAccount({ session, id: accountId }),
+    balances: integrationInstances.junctionHubApi.balances.listBalances({ session, accountId }),
   };
 }
 
@@ -31,7 +31,7 @@ export const actions = {
     return {
       balances: await Promise.all(
         jsonData.currencyCodes.map((currencyCode) =>
-          integrationInstances.junctionPayApi.balances.addBalance({
+          integrationInstances.junctionHubApi.balances.addBalance({
             session: getSession(event),
             accountId,
             currencyCode,
