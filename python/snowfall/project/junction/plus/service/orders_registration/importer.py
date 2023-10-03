@@ -1,3 +1,5 @@
+import httpx
+
 from snowfall.project.junction.plus.adapter import (
     errors as errors_adapter,
 )
@@ -78,21 +80,34 @@ class OrderImporter(object):
             try:
                 existing_rule = await self._monitoring_rules.get_by_booking(booking)
             except errors_adapter.NotFoundError:
-                monitoring_rule_id = string.uuid()
-                rule = await self._flight_stats_client.create_monitoring_rule(
-                    booking,
-                    monitoring_rule_id,
-                )
-                await self._monitoring_rules.create(
-                    notifications_models_pb2.MonitoringRule(
-                        id=monitoring_rule_id,
-                        ext_rule_id=rule["rule"]["id"],
-                        booking=booking,
-                        subscriber_ids=[persisted_order.subscriber_id],
-                    ),
+                await self._process_new_monitoring_rule(
+                    booking=booking,
+                    subscriber_id=persisted_order.subscriber_id,
                 )
             else:
                 if persisted_order.subscriber_id not in existing_rule.subscriber_ids:
                     existing_rule.subscriber_ids.append(persisted_order.subscriber_id)
                 await self._monitoring_rules.update(monitoring_rule=existing_rule)
         self._logger.warning(str(persisted_order))
+
+    async def _process_new_monitoring_rule(
+        self,
+        booking: notifications_models_pb2.Booking,
+        subscriber_id: str,
+    ) -> None:
+        monitoring_rule_id = string.uuid()
+        try:
+            rule = await self._flight_stats_client.create_monitoring_rule(
+                booking,
+                monitoring_rule_id,
+            )
+        except httpx.HTTPStatusError:
+            rule = None
+        await self._monitoring_rules.create(
+            notifications_models_pb2.MonitoringRule(
+                id=monitoring_rule_id,
+                ext_rule_id=rule["rule"]["id"] if rule else "",
+                booking=booking,
+                subscriber_ids=[subscriber_id],
+            ),
+        )
