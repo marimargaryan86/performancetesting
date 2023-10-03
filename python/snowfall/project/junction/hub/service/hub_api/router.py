@@ -10,6 +10,7 @@ from snowfall.project.junction.hub.service.hub_api.routes import (  # noqa: WPS2
     companies,
     contacts,
     conversions,
+    currencies,
     go_orders,
     refunds,
     transactions,
@@ -203,5 +204,15 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             "/refunds/bookings/{bookingId}",
             refunds.RefundByBooking,
             name="RefundByBookingId",
+        ),
+        integration.route(
+            "/currencies",
+            currencies.ListCurrencies,
+            name="Currencies",
+        ),
+        integration.route(
+            "/currencies/{currencyId}",
+            currencies.Currencies,
+            name="Currencies",
         ),
     ]

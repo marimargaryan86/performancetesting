@@ -1,8 +1,8 @@
 import lagom
 from starlette import endpoints, requests, responses
 
+from snowfall.project.junction.hub.service.hub_api import resources
 from snowfall.project.pay.adapter.currencies import Client
-from snowfall.project.pay.service.pay_api import resources
 from snowfall.stdlib.integration.starlette import messages, models, pagination_helpers
 
 

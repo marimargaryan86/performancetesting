@@ -79,7 +79,6 @@ def create_admin_dependencies(  # noqa: WPS211
 
 
 def create_dependencies(  # noqa: WPS211
-    currencies_client: currencies.Client,
     redis_client: UserSessionRepository,
     transactions_client: transactions.Client,
     quotations_client: quotations.Client,
@@ -89,7 +88,6 @@ def create_dependencies(  # noqa: WPS211
 ) -> lagom.Container:
     container = lagom.Container()
     container[client.PaymentClient] = payment_client
-    container[currencies.Client] = currencies_client  # type: ignore[type-abstract]
     container[quotations.Client] = quotations_client  # type: ignore[type-abstract]
     container[companies.Client] = companies_client  # type: ignore[type-abstract]
     container[UserSessionRepository] = redis_client

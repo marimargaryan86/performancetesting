@@ -10,7 +10,6 @@ from snowfall.project.pay.service.pay_api.routes import (  # noqa: WPS235
     companies,
     contacts,
     conversions,
-    currencies,
     payments,
     quotations,
     rates,
@@ -23,16 +22,6 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
     integration = starlette.StarletteIntegration(dependencies)
 
     return [
-        integration.route(
-            "/currencies",
-            currencies.ListCurrencies,
-            name="Currencies",
-        ),
-        integration.route(
-            "/currencies/{currencyId}",
-            currencies.Currencies,
-            name="Currencies",
-        ),
         integration.route(
             "/transactions",
             transactions.Transactions,

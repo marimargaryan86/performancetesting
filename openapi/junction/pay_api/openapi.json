@@ -17,12 +17,6 @@
   "x-internal": true,
   "x-tagGroups": [
     {
-      "name": "Currencies",
-      "tags": [
-        "currencies"
-      ]
-    },
-    {
       "name": "Internal",
       "tags": [
         "internal"
@@ -48,11 +42,6 @@
     }
   ],
   "tags": [
-    {
-      "name": "currencies",
-      "description": "Available currencies",
-      "x-displayName": "Currencies"
-    },
     {
       "name": "internal",
       "description": "Endpoints not for public use.",
@@ -128,96 +117,6 @@
         "description": "Check the application health.",
         "x-internal": true,
         "security": []
-      }
-    },
-    "/currencies": {
-      "get": {
-        "summary": "List all currencies",
-        "operationId": "get-currencies",
-        "description": "Listing all available currencies",
-        "tags": [
-          "currencies"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/page-cursor"
-          },
-          {
-            "$ref": "#/components/parameters/page-limit"
-          },
-          {
-            "$ref": "#/components/parameters/sortCurrencies"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/vnd.api+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "array",
-                      "uniqueItems": true,
-                      "minItems": 0,
-                      "items": {
-                        "$ref": "#/components/schemas/Currency"
-                      }
-                    }
-                  },
-                  "required": [
-                    "data"
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          }
-        }
-      }
-    },
-    "/currencies/{currencyId}": {
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/currencyId"
-        }
-      ],
-      "get": {
-        "summary": "Get Currency details",
-        "tags": [
-          "currencies"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/vnd.api+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "$ref": "#/components/schemas/Currency"
-                    }
-                  },
-                  "required": [
-                    "data"
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          }
-        },
-        "operationId": "get-currencies-id",
-        "description": "Used to get currency details"
       }
     },
     "/rates": {
@@ -521,22 +420,6 @@
         },
         "description": "A limit on the number of objects to be returned, between 1 and 100."
       },
-      "sortCurrencies": {
-        "name": "sort",
-        "in": "query",
-        "style": "form",
-        "explode": false,
-        "required": false,
-        "schema": {
-          "type": "string",
-          "enum": [
-            "id"
-          ],
-          "example": "id",
-          "default": "id"
-        },
-        "description": "Field name what should be used to sort"
-      },
       "sortTransaction": {
         "name": "sort",
         "in": "query",
@@ -571,17 +454,6 @@
             "format": "uuid"
           }
         }
-      },
-      "currencyId": {
-        "name": "currencyId",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "format": "currency",
-          "example": "USD"
-        },
-        "description": "Currency id"
       },
       "transactionId": {
         "name": "transactionId",
@@ -813,56 +685,6 @@
           }
         ],
         "description": "Quote schema."
-      },
-      "Currency": {
-        "title": "Currency",
-        "allOf": [
-          {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string",
-                "example": "USD",
-                "readOnly": true
-              },
-              "type": {
-                "type": "string",
-                "example": "currencies",
-                "enum": [
-                  "currencies"
-                ]
-              },
-              "attributes": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "example": "US Dollar"
-                  },
-                  "minorUnits": {
-                    "type": "integer",
-                    "minimum": 0,
-                    "description": "The relationship between the minor unit and the currency itself.",
-                    "example": 2
-                  }
-                },
-                "required": [
-                  "name",
-                  "minorUnits"
-                ]
-              }
-            },
-            "required": [
-              "id",
-              "type",
-              "attributes"
-            ]
-          },
-          {
-            "$ref": "#/components/schemas/SelfLink"
-          }
-        ],
-        "description": "Currency details."
       },
       "MoneyAmount": {
         "title": "Money amount",

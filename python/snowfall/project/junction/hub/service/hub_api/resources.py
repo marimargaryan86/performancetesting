@@ -18,6 +18,9 @@ from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.project.pay.service.companies.v1alpha import (
     models_pb2 as companies_models_pb2,
 )
+from snowfall.project.pay.service.currencies.v1alpha import (
+    models_pb2 as currencies_models_pb2,
+)
 from snowfall.project.pay.service.refunds.v1alpha.models_pb2 import Refund
 from snowfall.project.pay.service.transactions.v1alpha import (
     models_pb2 as transaction_models_pb2,
@@ -993,5 +996,32 @@ class RefundPosition(models.Resource):
             attributes={
                 "currency": refund_position.currency.code,
                 "amount": refund_position.amount,
+            },
+        )
+
+
+class CurrenciesResource(models.Resource):
+    api_type: ClassVar[str] = "currencies"
+
+    @classmethod
+    def from_model(
+        cls,
+        currency: currencies_models_pb2.Currency,
+        request: requests.Request,
+    ) -> CurrenciesResource:
+        return cls(
+            id=currency.code,
+            type=CurrenciesResource.api_type,
+            attributes={
+                "name": currency.name,
+                "minorUnits": currency.exponent or 0,
+            },
+            links={
+                _SELF_HREF: str(
+                    request.url_for(
+                        "Currencies",
+                        currencyId=currency.code,
+                    ),
+                ),
             },
         )
