@@ -1,6 +1,6 @@
 <script
   lang="ts"
-  generics="TType extends 'text' | 'tel' | 'password' | 'email' | 'number' | 'date'"
+  generics="TType extends 'text' | 'tel' | 'password' | 'email' | 'number' | 'date' = 'text'"
 >
   /* global TType */
   import { slideFade } from "transitions/slide-fade";
