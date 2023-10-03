@@ -214,18 +214,20 @@ class PriceQuoteConsumer(object):
 
 
 class OrdersConsumer(object):
-    def __init__(
+    def __init__(  # noqa: WPS211
         self,
         consumer_obj: consumer.Consumer[orders_amqp_pb2.PlaceOrderTask],
         offers_cache: cache.OffersCache,
         producer_obj: producer.Producer,
         bookings: booking.BookingHandler,
+        provider_id: str,
     ):
         self._cache = offers_cache
         self._consumer = consumer_obj
         self._producer = producer_obj
         self._bookings = bookings
         self._logger = stdout.get_logger()
+        self._provider_id = provider_id
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
@@ -238,6 +240,7 @@ class OrdersConsumer(object):
             message.body.booking.trip_option.price_quote_id,
         )
         message.body.booking.provider_name = _PROVIDER_NAME
+        message.body.booking.provider_id = self._provider_id
 
         if not offer_details:
             self._logger.warning(

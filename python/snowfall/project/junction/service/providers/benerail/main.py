@@ -171,7 +171,7 @@ if __name__ == "__main__":
         ),
         service.Command(
             name="orders",
-            callback=orders.orders,
+            callback=orders.orders_factory(str(_PROVIDER_ID)),
             settings_class=config.OrdersSettings,
         ),
         service.Command(
