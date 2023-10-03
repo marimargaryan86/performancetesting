@@ -129,7 +129,6 @@
   />
 
   <DatePicker
-    range={false}
     label="Depart"
     bind:value={data.outbound}
     id="depart-date"

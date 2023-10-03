@@ -1,4 +1,4 @@
-<script lang="ts" generics="TRange extends boolean">
+<script lang="ts" generics="TRange extends boolean = false">
   /* global TRange */
   import { getRandomId } from "utils/random";
   import ChevronIcon from "components/icons/chevron-icon.svelte";
@@ -9,7 +9,7 @@
 
   type TValue = TRange extends true ? DateRange : Date;
 
-  export let range: TRange;
+  export let range: TRange = false as TRange;
   export let value: TValue | undefined = undefined;
   export let placeholder: string | undefined = undefined;
   export let id: string = getRandomId("date-picker");
