@@ -84,7 +84,7 @@ class FlightStatsClient(Client):
                 air_booking.destination_iata,
                 air_booking.origin_iata,
             ),
-            "events": "depGate,depDelay",
+            "events": "depGate,depDelay,bag,div",
             "deliverTo": self._webhook_url,
             "type": "JSON",
             "extendedOptions": "useHttpErrors",
