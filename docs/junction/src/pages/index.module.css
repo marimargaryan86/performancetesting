@@ -21,3 +21,13 @@
   align-items: center;
   justify-content: center;
 }
+
+.welcomeText {
+  padding: 4rem 0;
+  text-align: center;
+}
+
+ul {
+    text-align: center;
+    list-style-position: inside;
+}

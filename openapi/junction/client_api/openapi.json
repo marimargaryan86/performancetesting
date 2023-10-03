@@ -16,12 +16,6 @@
   },
   "x-tagGroups": [
     {
-      "name": "Authentication",
-      "tags": [
-        "authentication"
-      ]
-    },
-    {
       "name": "Cabins",
       "tags": [
         "cabins"
@@ -67,11 +61,6 @@
     }
   ],
   "tags": [
-    {
-      "name": "authentication",
-      "description": "Authentication token",
-      "x-displayName": "Authentication"
-    },
     {
       "name": "cabins",
       "description": "Cabin class information.",

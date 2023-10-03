@@ -125,6 +125,7 @@ offers = json_api_doc.deserialize(s.get(
 ).json())
 ```
 <details>
+<summary>Trip offer results</summary>
 
   ```python
     [
@@ -1389,6 +1390,7 @@ quotes = json_api_doc.deserialize(s.post(
 ).json())
 ```
 <details>
+<summary>Offer quote results</summary>
 
   ```
     {

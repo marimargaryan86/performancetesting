@@ -9,9 +9,8 @@ Here are the building blocks to set up your first request.
 
 ## Authentication
 
-You'll need to include an access token in every request you make to the API except the `/users/tokens` endpoint.
-
-To get an access token see the `/users/tokens` endpoint.
+We will provide you with OAuth2 Client Credentials during your onboarding, you
+may use this with instructions we'll provide to generate your access token.
 
 Send your access token in the Authorization request header using the "Bearer" authentication scheme:
 
