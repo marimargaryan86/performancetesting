@@ -71,12 +71,6 @@ const config = {
         items: [
           {
             type: 'docSidebar',
-            sidebarId: 'providers',
-            position: 'left',
-            label: 'Providers',
-          },
-          {
-            type: 'docSidebar',
             sidebarId: 'resellers',
             position: 'left',
             label: 'Resellers',

@@ -47,16 +47,16 @@ particular group.
 As an example; if you're searching for offers for a trip from **Uppsala C** to
 **London Heathrow Airport**, you could get an offer back with two
 offer groups; one group with offer options for the rail segment between _Uppsala C_ and
-_Arlanda C_ from SJ, and one group with offer options for the air segment between
-_Stockholm Arlanda Airport_ and _London Heathrow Airport_ with SAS.
+_Arlanda C_, and one group with offer options for the air segment between
+_Stockholm Arlanda Airport_ and _London Heathrow Airport_.
 
 Taking a look at each group, the first group could contain two offer options; one for
-First Class and one for Second Class; while the second group could contain two
-offer options; one for SAS Go and one for SAS Plus.
+Airline 1 Business and one for Airline 1 Economy; while the second group could contain two
+offer options; one for Airline 2 Business and one for Airline 2 Economy.
 
 One offer group can appear in multiple offers, see the following diagram:
 
-<img src="/img/terminology.jpg" width="600"/>
+<img src="/img/offer-aggregates.jpg" width="600"/>
 
 ## Quotes
 
