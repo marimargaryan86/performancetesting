@@ -29,7 +29,7 @@ class LegacyAuth(object):
                 "Wrong version of jwt token. Refresh your token.",
             )
 
-        metadata = payload["user_info"]["metadata"]
+        metadata = payload.get("user_info", {}).get("metadata", {})
         client_id = metadata.get("client_id")
 
         if not metadata.get("default_currency") and not client_id:
