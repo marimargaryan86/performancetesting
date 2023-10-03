@@ -154,6 +154,7 @@ EOH
         BOOKING_HUB_API_BASE_URL = "${var.booking_hub_api_base_url}"
         ORY_BASE_URL             = "${var.ory_base_url}"
         HUB_API_BASE_URL         = "${var.hub_api_base_url}"
+        PUBLIC_SENTRY_DSN        = "https://33b134d137c04fb8ba77aabdbd60304c@sentry.snowfall.se/68"
       }
     }
   }
