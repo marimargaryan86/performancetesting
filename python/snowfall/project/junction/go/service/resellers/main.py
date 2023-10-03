@@ -21,7 +21,6 @@ class _ServeSettings(application.Settings):
     consul_api_base_url: pydantic.AnyUrl
     consul_api_token: str
     consul_api_version: str = "v1"
-    env_name: str
 
 
 async def _serve(app: application.AsyncApplication[_ServeSettings]) -> None:
@@ -48,7 +47,7 @@ async def _serve(app: application.AsyncApplication[_ServeSettings]) -> None:
                 ),
                 default_page_size=app.settings.default_page_size,
                 consul_client=consul_client,
-                environment=app.settings.env_name,
+                environment=app.environment,
             ),
         ],
     )
