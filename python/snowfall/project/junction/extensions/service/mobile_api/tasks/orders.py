@@ -91,7 +91,7 @@ async def send_booking_confirmation(  # noqa: WPS210
     smtp_client: smtp.EmailClient,
     forward_email: str | None = None,
     *,
-    forward_to_support: bool = True,
+    forward_to_support: bool = False,
 ) -> None:
     details: Sequence[Mapping[str, Any]] = [
         detail for booking in order["bookings"] for detail in booking["details"]
