@@ -132,6 +132,21 @@ class TripSearch(endpoints.HTTPEndpoint):
         )
 
 
+def _get_departure_after(body: Mapping[str, Any]) -> datetime.datetime:
+    if body.get("departureAfter"):
+        departure_after = parser.isoparse(body["departureAfter"])
+        current_time = datetime.datetime.now(
+            datetime.UTC,
+        ) - datetime.timedelta(minutes=1)
+
+        if departure_after < current_time:
+            raise exceptions.HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY)
+    else:
+        departure_after = datetime.datetime.now(datetime.UTC)
+
+    return departure_after
+
+
 class TripSearches(endpoints.HTTPEndpoint):
     async def post(  # noqa: WPS210
         self,
@@ -165,16 +180,15 @@ class TripSearches(endpoints.HTTPEndpoint):
                 status.HTTP_422_UNPROCESSABLE_ENTITY,
             ) from key_err
 
-        if body.get("departureAfter"):
-            departure_after = parser.isoparse(body["departureAfter"])
-            current_time = datetime.datetime.now(
-                datetime.UTC,
-            ) - datetime.timedelta(minutes=1)
+        departure_after = _get_departure_after(body)
 
-            if departure_after < current_time:
-                raise exceptions.HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY)
-        else:
-            departure_after = datetime.datetime.now(datetime.UTC)
+        try:
+            departure_before = parser.isoparse(body["departureBefore"])
+        except KeyError:
+            departure_before = None
+
+        if departure_before and departure_before < departure_after:
+            raise exceptions.HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY)
 
         location_ids = {*origin.merged_ids, *destination.merged_ids}
         response = await locations_client.find(
@@ -214,6 +228,7 @@ class TripSearches(endpoints.HTTPEndpoint):
                                 if location.id in destination.merged_ids
                             ],
                             departure_after=departure_after,
+                            departure_before=departure_before,
                             maximum_connections=body.get("maximumConnections"),
                             allowed_segment_types=allowed_segment_types,
                         ),
@@ -311,6 +326,13 @@ def _create_single_criteria(
         ],
         departure_after=protobuf.datetime_to_protobuf_datetime(
             parser.isoparse(search_criteria["departureAfter"]),
+        ),
+        departure_before=(
+            protobuf.datetime_to_protobuf_datetime(
+                parser.isoparse(search_criteria["departureBefore"]),
+            )
+            if "departureBefore" in search_criteria
+            else None
         ),
         maximum_connections=search_criteria.get("maximumConnections", 0),
     )

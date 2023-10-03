@@ -51,6 +51,62 @@ class _TripSearchContext(object):
         return False
 
 
+def _search_journey_request(
+    trip_search_task: amqp_pb2.TripSearchTask,
+) -> planner_pb2.SearchJourneyRequest:
+    origins = {
+        (origin.coordinates.latitude, origin.coordinates.longitude)
+        for origin in trip_search_task.trip_search.origins
+    }
+    destinations = {
+        (destination.coordinates.latitude, destination.coordinates.longitude)
+        for destination in trip_search_task.trip_search.destinations
+    }
+
+    origin_tz = zoneinfo.ZoneInfo(
+        more_itertools.first(
+            trip_search_task.trip_search.origins,
+        ).time_zone,
+    )
+
+    request = planner_pb2.SearchJourneyRequest(
+        origins=[
+            latlng_pb2.LatLng(
+                latitude=origin[0],
+                longitude=origin[1],
+            )
+            for origin in origins
+        ],
+        destinations=[
+            latlng_pb2.LatLng(
+                latitude=destination[0],
+                longitude=destination[1],
+            )
+            for destination in destinations
+        ],
+        departure_after=protobuf.datetime_to_protobuf_datetime(
+            protobuf.protobuf_to_datetime(
+                trip_search_task.trip_search.departure_after,
+            ).astimezone(origin_tz),
+        ),
+        departure_before=(
+            protobuf.datetime_to_protobuf_datetime(
+                protobuf.protobuf_to_datetime(
+                    trip_search_task.trip_search.departure_before,
+                ).astimezone(origin_tz),
+            )
+            if trip_search_task.trip_search.HasField("departure_before")
+            else None
+        ),
+        allowed_segment_types=trip_search_task.trip_search.allowed_segment_types,
+    )
+
+    if trip_search_task.trip_search.HasField("maximum_connections"):
+        request.maximum_connections = trip_search_task.trip_search.maximum_connections
+
+    return request
+
+
 class TripSearchConsumer(object):
     def __init__(
         self,
@@ -76,55 +132,9 @@ class TripSearchConsumer(object):
             message.body.trip_search.id,
         )
 
-        origins = {
-            (origin.coordinates.latitude, origin.coordinates.longitude)
-            for origin in message.body.trip_search.origins
-        }
-        destinations = {
-            (destination.coordinates.latitude, destination.coordinates.longitude)
-            for destination in message.body.trip_search.destinations
-        }
-
-        if not origins or not destinations:
-            return
-
         async with _TripSearchContext(self._trip_search_repository, message.body):
-            request = planner_pb2.SearchJourneyRequest(
-                origins=[
-                    latlng_pb2.LatLng(
-                        latitude=origin[0],
-                        longitude=origin[1],
-                    )
-                    for origin in origins
-                ],
-                destinations=[
-                    latlng_pb2.LatLng(
-                        latitude=destination[0],
-                        longitude=destination[1],
-                    )
-                    for destination in destinations
-                ],
-                departure_after=protobuf.datetime_to_protobuf_datetime(
-                    protobuf.protobuf_to_datetime(
-                        message.body.trip_search.departure_after,
-                    ).astimezone(
-                        zoneinfo.ZoneInfo(
-                            more_itertools.first(
-                                message.body.trip_search.origins,
-                            ).time_zone,
-                        ),
-                    ),
-                ),
-                allowed_segment_types=message.body.trip_search.allowed_segment_types,
-            )
-
-            if message.body.trip_search.HasField("maximum_connections"):
-                request.maximum_connections = (
-                    message.body.trip_search.maximum_connections
-                )
-
             response = await self._planner.SearchJourney(
-                request=request,
+                request=_search_journey_request(message.body),
             )
 
             coros: list[
@@ -196,6 +206,10 @@ class TripCandidateSearchConsumer(object):
         except orchestrator.CantFulfillFullTripError:
             await self._trip_candidate_search_repository.mark_as_failed(
                 body.trip_candidate_search.id,
+            )
+            self._logger.exception(
+                "Failed to get trips from planner",
+                trip_candidate_search_id=body.trip_candidate_search.id,
             )
 
             return

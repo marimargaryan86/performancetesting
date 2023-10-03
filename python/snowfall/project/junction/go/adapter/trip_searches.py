@@ -19,6 +19,7 @@ class TripSearchRequest(object):
     departure_after: datetime.datetime
     maximum_connections: int | None
     allowed_segment_types: Sequence[models_pb2.Schedule.Type.ValueType]
+    departure_before: datetime.datetime | None = None
 
 
 class Client(abc.ABC):
@@ -59,6 +60,13 @@ class DictClient(Client):
         expires_at = datetime.datetime.now(datetime.UTC) + datetime.timedelta(
             days=1,
         )
+        departure_before = None
+
+        if trip_search_request.departure_before is not None:
+            departure_before = protobuf.datetime_to_protobuf_datetime(
+                trip_search_request.departure_before,
+            )
+
         trip_search = trips_pb2.TripSearch(
             id=string.uuid(),
             expires_at=protobuf.datetime_to_protobuf(expires_at),
@@ -67,6 +75,7 @@ class DictClient(Client):
             departure_after=protobuf.datetime_to_protobuf_datetime(
                 trip_search_request.departure_after,
             ),
+            departure_before=departure_before,
             allowed_segment_types=trip_search_request.allowed_segment_types,
         )
 
@@ -135,6 +144,13 @@ class GrpcClient(Client):
                 destinations=trip_search_request.destinations,
                 departure_after=protobuf.datetime_to_protobuf_datetime(
                     trip_search_request.departure_after,
+                ),
+                departure_before=(
+                    protobuf.datetime_to_protobuf_datetime(
+                        trip_search_request.departure_before,
+                    )
+                    if trip_search_request.departure_before
+                    else None
                 ),
                 allowed_segment_types=trip_search_request.allowed_segment_types,
             ),

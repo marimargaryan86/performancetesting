@@ -75,6 +75,14 @@ class TripOrchestrator(object):
             if not criteria_obj.origins or not criteria_obj.destinations:
                 continue
 
+            origin_tz = zoneinfo.ZoneInfo(
+                _tz_finder.timezone_at(
+                    lat=criteria_obj.origins[0].latitude,
+                    lng=criteria_obj.origins[0].longitude,
+                )
+                or "",
+            )
+
             request = planner_pb2.SearchJourneyRequest(
                 origins=[
                     latlng_pb2.LatLng(
@@ -93,15 +101,16 @@ class TripOrchestrator(object):
                 departure_after=protobuf.datetime_to_protobuf_datetime(
                     protobuf.protobuf_to_datetime(
                         criteria_obj.departure_after,
-                    ).astimezone(
-                        zoneinfo.ZoneInfo(
-                            _tz_finder.timezone_at(
-                                lat=criteria_obj.origins[0].latitude,
-                                lng=criteria_obj.origins[0].longitude,
-                            )
-                            or "",
-                        ),
-                    ),
+                    ).astimezone(origin_tz),
+                ),
+                departure_before=(
+                    protobuf.datetime_to_protobuf_datetime(
+                        protobuf.protobuf_to_datetime(
+                            criteria_obj.departure_before,
+                        ).astimezone(origin_tz),
+                    )
+                    if criteria_obj.HasField("departure_before")
+                    else None
                 ),
                 allowed_segment_types=allowed_segment_types,
             )

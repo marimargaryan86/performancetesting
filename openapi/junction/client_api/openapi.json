@@ -4402,6 +4402,11 @@
                     "format": "date-time",
                     "example": "2019-08-24T14:15:22Z"
                   },
+                  "departureBefore": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z"
+                  },
                   "arrivalBefore": {
                     "type": "string",
                     "format": "date-time",
@@ -4605,6 +4610,11 @@
             "$ref": "#/components/schemas/CoordinatesSearchable"
           },
           "departureAfter": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2019-08-24T14:15:22Z"
+          },
+          "departureBefore": {
             "type": "string",
             "format": "date-time",
             "example": "2019-08-24T14:15:22Z"
