@@ -19,6 +19,7 @@
   import Button from "components/ui/button.svelte";
   import routeConfig from "routeConfig";
   import Payment from "./payment.svelte";
+  import Fees from "./fees.svelte";
 
   import PassengerEntry, {
     getPassengerValidator,
@@ -190,6 +191,7 @@
 
     <div class="column payment">
       <Summary {priceQuote} passengers={data.searchData.passengers} />
+      <Fees />
       <Payment bind:this={payment} {paymentIntent} />
       <ContactInformation
         countries={data.countries}
