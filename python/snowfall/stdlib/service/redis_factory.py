@@ -13,7 +13,7 @@ _Settings = TypeVar("_Settings", bound=application.Settings)
 
 @overload
 async def make_client(
-    app: application.AsyncApplication[_Settings],
+    app: application.Application[_Settings],
     dsn: pydantic.RedisDsn,
     *,
     decode_responses: Literal[False],
@@ -23,7 +23,7 @@ async def make_client(
 
 @overload
 async def make_client(
-    app: application.AsyncApplication[_Settings],
+    app: application.Application[_Settings],
     dsn: pydantic.RedisDsn,
     *,
     decode_responses: Literal[True],
@@ -32,7 +32,7 @@ async def make_client(
 
 
 async def make_client(
-    app: application.AsyncApplication[_Settings],
+    app: application.Application[_Settings],
     dsn: pydantic.RedisDsn,
     *,
     decode_responses: Literal[True, False],
@@ -49,7 +49,7 @@ async def make_client(
 
 @overload
 async def make_connection(
-    app: application.AsyncApplication[_Settings],
+    app: application.Application[_Settings],
     dsn: pydantic.RedisDsn,
     *,
     decode_responses: Literal[False],
@@ -59,7 +59,7 @@ async def make_connection(
 
 @overload
 async def make_connection(
-    app: application.AsyncApplication[_Settings],
+    app: application.Application[_Settings],
     dsn: pydantic.RedisDsn,
     *,
     decode_responses: Literal[True],
@@ -69,7 +69,7 @@ async def make_connection(
 
 @overload
 async def make_connection(
-    app: application.AsyncApplication[_Settings],
+    app: application.Application[_Settings],
     dsn: pydantic.RedisDsn,
     *,
     decode_responses: Literal[True, False],
@@ -78,7 +78,7 @@ async def make_connection(
 
 
 async def make_connection(
-    app: application.AsyncApplication[_Settings],
+    app: application.Application[_Settings],
     dsn: pydantic.RedisDsn,
     *,
     decode_responses: bool,

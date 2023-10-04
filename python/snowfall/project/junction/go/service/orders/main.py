@@ -46,7 +46,7 @@ class _ImportSettings(pay_integration.Settings, application.Settings):
     use_pay_to_create_transaction: bool = False
 
 
-async def _serve(app: application.AsyncApplication[_GrpcSettings]) -> None:
+async def _serve(app: application.Application[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
@@ -116,7 +116,7 @@ async def _serve(app: application.AsyncApplication[_GrpcSettings]) -> None:
         await running.wait_for_termination()
 
 
-async def _import(app: application.AsyncApplication[_ImportSettings]) -> None:
+async def _import(app: application.Application[_ImportSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )

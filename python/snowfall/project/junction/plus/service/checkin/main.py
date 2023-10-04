@@ -38,7 +38,7 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
 
 
 async def _cron_run(
-    app: application.AsyncApplication[_CronSettings],
+    app: application.Application[_CronSettings],
 ) -> None:
     notifications_channel = create_channel(app.settings.notifications_address)
 

@@ -27,7 +27,7 @@ class _ImportSettings(application.Settings):
     flight_stats_webhook_url: str
 
 
-async def _import(app: application.AsyncApplication[_ImportSettings]) -> None:
+async def _import(app: application.Application[_ImportSettings]) -> None:
     http_client = await app.stack.enter_async_context(httpx.AsyncClient())
     connection = await app.stack.enter_async_context(
         types.Connection(

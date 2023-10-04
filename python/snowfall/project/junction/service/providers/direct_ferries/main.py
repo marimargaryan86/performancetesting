@@ -113,7 +113,7 @@ async def _offers(
     )
 
 
-async def _orders(app: service.AsyncApplication[config.OrdersSettings]) -> None:
+async def _orders(app: service.Application[config.OrdersSettings]) -> None:
     http_client = await app.stack.enter_async_context(
         httpx.AsyncClient(
             timeout=int(app.settings.api_timeout.total_seconds()),
@@ -159,7 +159,7 @@ async def _orders(app: service.AsyncApplication[config.OrdersSettings]) -> None:
 
 
 async def _price_quotes(
-    app: service.AsyncApplication[config.PriceQuotesSettings],
+    app: service.Application[config.PriceQuotesSettings],
 ) -> None:
     redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
         aioredis.from_url(
@@ -191,7 +191,7 @@ async def _price_quotes(
     ).consume()
 
 
-async def _create_gtfs(app: service.AsyncApplication[config.GtfsSetting]) -> None:
+async def _create_gtfs(app: service.Application[config.GtfsSetting]) -> None:
     output_path = pathlib.Path(app.settings.output_path)
     output_path.mkdir(parents=True, exist_ok=True)
 
@@ -228,7 +228,7 @@ async def _create_gtfs(app: service.AsyncApplication[config.GtfsSetting]) -> Non
     )
 
 
-async def _static(app: service.AsyncApplication[config.StaticSettings]) -> None:
+async def _static(app: service.Application[config.StaticSettings]) -> None:
     http_client = await app.stack.enter_async_context(
         httpx.AsyncClient(
             timeout=int(app.settings.api_timeout.total_seconds()),

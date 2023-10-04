@@ -184,7 +184,7 @@ async def _offers_factory(
 
 
 async def _bookings_factory(
-    app: service.AsyncApplication[_Settings],
+    app: service.Application[_Settings],
 ) -> bookings.Implementation:
     storage = await app.stack.enter_async_context(
         filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
@@ -218,7 +218,7 @@ async def _bookings_factory(
 
 
 async def _orders(  # noqa: WPS217
-    app: service.AsyncApplication[_OrdersSettings],
+    app: service.Application[_OrdersSettings],
 ) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
@@ -303,7 +303,7 @@ async def _orders(  # noqa: WPS217
     await orders_consumer.consume()
 
 
-async def _price_quotes(app: service.AsyncApplication[_PriceQuoteSettings]) -> None:
+async def _price_quotes(app: service.Application[_PriceQuoteSettings]) -> None:
     redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
         aioredis.from_url(
             str(random.choice(app.settings.redis_dsn)),  # noqa: S311
@@ -337,7 +337,7 @@ async def _price_quotes(app: service.AsyncApplication[_PriceQuoteSettings]) -> N
 
 
 async def _notifications(  # noqa: WPS217
-    app: service.AsyncApplication[_NotificationsSettings],
+    app: service.Application[_NotificationsSettings],
 ) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
@@ -406,7 +406,7 @@ async def _notifications(  # noqa: WPS217
 
 
 async def _consume_notifications(
-    app: service.AsyncApplication[_NotificationsSettings],
+    app: service.Application[_NotificationsSettings],
     amqp_connection: abc.AbstractConnection,
     sat_adapter: adapter.SaveATrainAdapter,
     notifier: notifications.SmtpNotifier,
@@ -429,7 +429,7 @@ async def _consume_notifications(
 
 
 async def _configure_queue(
-    app: service.AsyncApplication[_NotificationsSettings],
+    app: service.Application[_NotificationsSettings],
     amqp_connection: abc.AbstractConnection,
 ) -> None:
     channel = await app.stack.enter_async_context(
@@ -459,7 +459,7 @@ async def _configure_queue(
     await queue.bind(declared_exchange, "notifications.retry")
 
 
-async def _dump_stations(app: service.AsyncApplication[_DumpStationsSettings]) -> None:
+async def _dump_stations(app: service.Application[_DumpStationsSettings]) -> None:
     http_client = await app.stack.enter_async_context(
         httpx.AsyncClient(
             timeout=app.settings.api_timeout,

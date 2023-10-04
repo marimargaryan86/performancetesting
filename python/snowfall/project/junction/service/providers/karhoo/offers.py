@@ -14,7 +14,7 @@ from snowfall.vendor.karhoo import client
 
 
 async def offers(
-    app: application.AsyncApplication[config.OfferSettings],
+    app: application.Application[config.OfferSettings],
 ) -> None:
     http_client = await app.stack.enter_async_context(
         httpx.AsyncClient(

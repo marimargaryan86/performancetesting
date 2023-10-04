@@ -35,7 +35,7 @@ class _AccountSyncSettings(application.Settings):
     cc_address: str
 
 
-async def _serve(app: application.AsyncApplication[_GrpcSettings]) -> None:
+async def _serve(app: application.Application[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )

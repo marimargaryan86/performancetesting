@@ -8,7 +8,7 @@ from snowfall.stdlib.transport.grpc import client as grpc_client
 
 
 async def _http(
-    app: application.AsyncApplication[bootstrap.Settings],
+    app: application.Application[bootstrap.Settings],
 ) -> None:
     geocoder = geocoding_pb2_grpc.GeocodingServiceStub(
         grpc_client.create_channel(app.settings.geodata_address),

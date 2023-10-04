@@ -178,7 +178,7 @@ async def _offers(
     )
 
 
-async def _orders(app: service.AsyncApplication[_OrdersSettings]) -> None:
+async def _orders(app: service.Application[_OrdersSettings]) -> None:
     http_client = await app.stack.enter_async_context(
         httpx.AsyncClient(
             timeout=app.settings.http_timeout,
@@ -239,7 +239,7 @@ async def _orders(app: service.AsyncApplication[_OrdersSettings]) -> None:
     ).consume()
 
 
-async def _price_quotes(app: service.AsyncApplication[_PriceQuotesSettings]) -> None:
+async def _price_quotes(app: service.Application[_PriceQuotesSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
@@ -313,7 +313,7 @@ async def _price_quotes(app: service.AsyncApplication[_PriceQuotesSettings]) -> 
     ).consume()
 
 
-async def _seat_maps(app: service.AsyncApplication[_SeatMapsSettings]) -> None:
+async def _seat_maps(app: service.Application[_SeatMapsSettings]) -> None:
     redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
         aioredis.from_url(
             str(random.choice(app.settings.redis_dsn)),  # noqa: S311
@@ -346,7 +346,7 @@ async def _seat_maps(app: service.AsyncApplication[_SeatMapsSettings]) -> None:
 
 
 async def _bookings_factory(
-    app: service.AsyncApplication[_Settings],
+    app: service.Application[_Settings],
 ) -> bookings.Implementation:
     storage = await app.stack.enter_async_context(
         filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),

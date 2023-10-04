@@ -14,7 +14,7 @@ class ImportSettings(application.Settings):
     mongo_dsn: pydantic.MongoDsn
 
 
-async def import_nodes(app: application.AsyncApplication[ImportSettings]) -> None:
+async def import_nodes(app: application.Application[ImportSettings]) -> None:
     geocoding_service = geocoding_pb2_grpc.GeocodingServiceStub(
         client.create_channel(app.settings.geodata_address),
     )

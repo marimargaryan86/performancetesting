@@ -58,7 +58,7 @@ class Settings(starlette.Settings):
     refunds_address: str
 
 
-async def _http(app: application.AsyncApplication[Settings]) -> None:
+async def _http(app: application.Application[Settings]) -> None:
     authentication_channel = client.create_channel(
         app.settings.authentication_address,
     )

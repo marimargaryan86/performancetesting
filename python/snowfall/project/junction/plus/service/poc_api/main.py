@@ -26,7 +26,7 @@ from snowfall.stdlib.transport.http import auth
 from snowfall.vendor.junction.go import client
 
 
-async def _http(app: application.AsyncApplication[bootstrap.Settings]) -> None:
+async def _http(app: application.Application[bootstrap.Settings]) -> None:
     openai.api_key = app.settings.openai_api_key
     junction_client = client.Client(
         base_url=app.settings.junction_api_address,

@@ -58,7 +58,7 @@ _gc_probability = 0.01
 
 
 async def _bootstrap(
-    app: application.AsyncApplication[_SharedSettingsGeneric],
+    app: application.Application[_SharedSettingsGeneric],
 ) -> _BootstrapReturn:
     amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
     redis_client = await redis_factory.make_client(
@@ -97,7 +97,7 @@ async def _bootstrap(
     )
 
 
-async def _consume(app: application.AsyncApplication[_ConsumeSettings]) -> None:
+async def _consume(app: application.Application[_ConsumeSettings]) -> None:
     amqp_connection, all_providers, trip_offer_search_runner, trip_search_runner = (
         await _bootstrap(app)
     )
@@ -128,7 +128,7 @@ async def _consume(app: application.AsyncApplication[_ConsumeSettings]) -> None:
     ).consume()
 
 
-async def _serve(app: application.AsyncApplication[_ServeSettings]) -> None:
+async def _serve(app: application.Application[_ServeSettings]) -> None:
     amqp_connection, all_providers, trip_offer_search_runner, trip_search_runner = (
         await _bootstrap(app)
     )

@@ -3,8 +3,7 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import dataclasses
-import inspect
-from collections.abc import AsyncIterator, Awaitable, Callable
+from collections.abc import Awaitable, Callable
 from typing import Annotated, Any, Generic, Protocol, TypeVar, cast
 
 import click
@@ -71,36 +70,15 @@ class _GlobalSettings(Settings):
 @dataclasses.dataclass(frozen=True)
 class Application(Generic[_Settings]):
     environment: str
+    logger: stdout.Logger
     name: str
     settings: _Settings
+    stack: contextlib.AsyncExitStack
     user_agent: str
     version: str
 
 
-@dataclasses.dataclass(frozen=True)
-class AsyncApplication(Application[_Settings]):
-    stack: contextlib.AsyncExitStack
-
-    @classmethod
-    @contextlib.asynccontextmanager
-    async def from_application(
-        cls,
-        app: Application[_Settings],
-    ) -> AsyncIterator[AsyncApplication[_Settings]]:
-        async with contextlib.AsyncExitStack() as stack:
-            yield AsyncApplication(
-                stack=stack,
-                environment=app.environment,
-                name=app.name,
-                settings=app.settings,
-                user_agent=app.user_agent,
-                version=app.version,
-            )
-
-
-SyncCallback = Callable[[Application[_Settings]], None]
-AsyncCallback = Callable[[AsyncApplication[_Settings]], Awaitable[None]]
-Callback = SyncCallback[_Settings] | AsyncCallback[_Settings]
+Callback = Callable[[Application[_Settings]], Awaitable[None]]
 
 
 @dataclasses.dataclass(frozen=True)
@@ -180,7 +158,7 @@ def _group(ctx: click.Context, /, **kwargs: Any) -> None:
     ctx.obj["global_settings"] = _GlobalSettings.construct(**kwargs)
 
 
-def _configure(
+def _create_logger(
     entrypoint: Entrypoint,
     global_settings: _GlobalSettings,
 ) -> stdout.Logger:
@@ -198,38 +176,44 @@ def _configure(
             environment=global_settings.env_name,
         )
 
-    if global_settings.sentry_dsn:
-        sentry.configure_sentry(
-            dsn=global_settings.sentry_dsn,
-            environment=global_settings.env_name,
-            release="{name}@{version}".format(
-                name=entrypoint.name,
-                version=global_settings.version,
-            ),
-            additional_integrations=entrypoint.sentry_settings.additional_integrations,
-            tag_keys=entrypoint.sentry_settings.tag_keys,
-        )
-
-        if not entrypoint.cli_tool:
-            logger.info(
-                "Sentry configured.",
-                dsn=global_settings.sentry_dsn,
-            )
-
     return logger
 
 
-async def _async_wrapper(
+def _configure_sentry(
+    application: Application[_Settings],
     entrypoint: Entrypoint,
     global_settings: _GlobalSettings,
-    application: Application[_Settings],
-    callback: AsyncCallback[_Settings],
 ) -> None:
-    logger = _configure(entrypoint, global_settings)
+    sentry.configure_sentry(
+        dsn=global_settings.sentry_dsn,
+        environment=global_settings.env_name,
+        release="{name}@{version}".format(
+            name=entrypoint.name,
+            version=global_settings.version,
+        ),
+        additional_integrations=entrypoint.sentry_settings.additional_integrations,
+        tag_keys=entrypoint.sentry_settings.tag_keys,
+    )
 
-    async with AsyncApplication.from_application(application) as async_app:
+    if not entrypoint.cli_tool:
+        application.logger.info(
+            "Sentry configured.",
+            dsn=global_settings.sentry_dsn,
+        )
+
+
+async def _async_wrapper(
+    application: Application[_Settings],
+    entrypoint: Entrypoint,
+    global_settings: _GlobalSettings,
+    command: Command[_Settings],
+) -> None:
+    if global_settings.sentry_dsn:
+        _configure_sentry(application, entrypoint, global_settings)
+
+    async with application.stack:
         tasks: list[Awaitable[None | web.MetricsHTTPServer]] = [
-            callback(async_app),
+            command.callback(application),
         ]
 
         if global_settings.prometheus_port:
@@ -240,26 +224,8 @@ async def _async_wrapper(
         try:
             await asyncio.gather(*tasks)
         except Exception as err:
-            logger.exception()
+            application.logger.exception()
             raise SystemExit(1) from err
-
-
-def _sync_wrapper(
-    entrypoint: Entrypoint,
-    global_settings: _GlobalSettings,
-    application: Application[_Settings],
-    callback: SyncCallback[_Settings],
-) -> None:
-    logger = _configure(entrypoint, global_settings)
-
-    if global_settings.prometheus_port:
-        web.start_http_server_in_thread(port=global_settings.prometheus_port)
-
-    try:
-        callback(application)
-    except Exception as err:
-        logger.exception()
-        raise SystemExit(1) from err
 
 
 class _Command(Protocol):
@@ -278,8 +244,10 @@ def _command(
         global_settings: _GlobalSettings = ctx.obj["global_settings"]
         application = Application(
             environment=global_settings.env_name,
+            logger=_create_logger(entrypoint, global_settings),
             name=entrypoint.name,
             settings=command.settings_class.construct(**kwargs),
+            stack=contextlib.AsyncExitStack(),
             user_agent="{name}/{version} (+https://snowfalltravel.com/)".format(
                 name=entrypoint.name,
                 version=global_settings.version,
@@ -287,22 +255,7 @@ def _command(
             version=global_settings.version,
         )
 
-        if inspect.iscoroutinefunction(command.callback):
-            asyncio.run(
-                _async_wrapper(
-                    entrypoint,
-                    global_settings,
-                    application,
-                    command.callback,
-                ),
-            )
-        else:
-            _sync_wrapper(
-                entrypoint,
-                global_settings,
-                application,
-                cast(SyncCallback[_Settings], command.callback),
-            )
+        asyncio.run(_async_wrapper(application, entrypoint, global_settings, command))
 
     # need to cast because of dodgy type hinting in @click.pass_context
     return cast(_Command, decorator)

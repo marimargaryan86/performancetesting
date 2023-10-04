@@ -15,7 +15,7 @@ class _Settings(starlette.Settings):
     base_url: str
 
 
-def _routes(app: application.AsyncApplication[_Settings]) -> list[routing.BaseRoute]:
+def _routes(app: application.Application[_Settings]) -> list[routing.BaseRoute]:
     container = lagom.Container()
     container[templating.Jinja2Templates] = templating.Jinja2Templates(
         filesystem.package_path(
@@ -51,7 +51,7 @@ def _routes(app: application.AsyncApplication[_Settings]) -> list[routing.BaseRo
 
 
 async def _http(
-    app: application.AsyncApplication[_Settings],
+    app: application.Application[_Settings],
 ) -> None:
     asgi_app = starlette.create_starlette_app(
         routes=_routes(app),

@@ -88,7 +88,7 @@ async def _consume(app: application.Application[_ConsumeSettings]) -> None:
 
 
 async def _consume_trip_candidate_search_tasks(
-    app: application.AsyncApplication[_ConsumeTripCandidateSearchSettings],
+    app: application.Application[_ConsumeTripCandidateSearchSettings],
 ) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311

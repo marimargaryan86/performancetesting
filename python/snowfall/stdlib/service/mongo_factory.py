@@ -9,7 +9,7 @@ _Settings = TypeVar("_Settings", bound=application.Settings)
 
 
 async def make_database(
-    app: application.AsyncApplication[_Settings],
+    app: application.Application[_Settings],
     dsn: pydantic.MongoDsn,
 ) -> core.AgnosticDatabase:
     client = motor_asyncio.AsyncIOMotorClient(host=str(dsn))

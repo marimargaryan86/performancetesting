@@ -24,7 +24,7 @@ class _GrpcSettings(application.Settings):
     ory_api_key: pydantic.SecretStr
 
 
-async def _serve(app: application.AsyncApplication[_GrpcSettings]) -> None:
+async def _serve(app: application.Application[_GrpcSettings]) -> None:
     mongo_db = await mongo_factory.make_database(app, app.settings.mongo_dsn)
     ory_client = client.OryClient(
         base_url=str(app.settings.ory_application_url),

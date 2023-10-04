@@ -20,7 +20,7 @@ _PROVIDER_NAME = "Karhoo"
 
 
 async def orders(
-    app: application.AsyncApplication[config.OrderSettings],
+    app: application.Application[config.OrderSettings],
 ) -> None:
     http_client = await app.stack.enter_async_context(
         httpx.AsyncClient(

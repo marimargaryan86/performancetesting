@@ -21,7 +21,7 @@ class _Settings(application.Settings):
     aws_secret_access_key: pydantic.SecretStr
 
 
-async def _main(app: application.AsyncApplication[_Settings]) -> None:
+async def _main(app: application.Application[_Settings]) -> None:
     shp_path = filesystem.resource_path(
         "snowfall.service.geodata.main",
         "EEZ_land_union_v3_202003.zip",

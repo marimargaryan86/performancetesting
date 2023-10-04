@@ -98,7 +98,7 @@ def _get_httpx_auth_and_middlewares(
 
 
 async def _http(
-    app: application.AsyncApplication[bootstrap.Settings],
+    app: application.Application[bootstrap.Settings],
 ) -> None:
     stripe.api_key = app.settings.stripe_api_key
     httpx_auth, custom_middlewares = _get_httpx_auth_and_middlewares(app.settings)

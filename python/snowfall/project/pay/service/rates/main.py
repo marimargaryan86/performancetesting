@@ -63,7 +63,7 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
 
 
 async def _backup_rates_cron_run(
-    app: application.AsyncApplication[_BackUpCronJobSettings],
+    app: application.Application[_BackUpCronJobSettings],
 ) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311

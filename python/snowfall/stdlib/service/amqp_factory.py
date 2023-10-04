@@ -10,7 +10,7 @@ _Settings = TypeVar("_Settings", bound=application.Settings)
 
 
 async def make_connection(
-    app: application.AsyncApplication[_Settings],
+    app: application.Application[_Settings],
     dsn: pydantic.AmqpDsn,
 ) -> robust_connection.RobustConnection:
     return await app.stack.enter_async_context(

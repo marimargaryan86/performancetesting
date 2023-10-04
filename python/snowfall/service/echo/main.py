@@ -49,7 +49,7 @@ async def _grpc(app: application.Application[_GrpcSettings]) -> None:
         await running.wait_for_termination()
 
 
-async def _produce(app: application.AsyncApplication[_AmqpSettings]) -> None:
+async def _produce(app: application.Application[_AmqpSettings]) -> None:
     connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
     echo_producer = producer.Producer(
         connection=connection,
@@ -81,7 +81,7 @@ class _Queue(consumer.AbstractQueue[echo_pb2.EchoRequest]):
         self._logger.info(msg.body.echo)
 
 
-async def _consume(app: application.AsyncApplication[_AmqpSettings]) -> None:
+async def _consume(app: application.Application[_AmqpSettings]) -> None:
     connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
     await consumer.QueueConsumer(connection, [_Queue(name=app.name)]).consume()
 

@@ -47,7 +47,7 @@ class _BookingsSettings(service.Settings):
     storage_dsn: service.AnyDsn
 
 
-async def _price_quotes(app: service.AsyncApplication[_PriceQuotesSettings]) -> None:
+async def _price_quotes(app: service.Application[_PriceQuotesSettings]) -> None:
     redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
         aioredis.from_url(
             str(app.settings.redis_dsn),
@@ -82,7 +82,7 @@ async def _price_quotes(app: service.AsyncApplication[_PriceQuotesSettings]) -> 
     ).consume()
 
 
-async def _bookings(app: service.AsyncApplication[_BookingsSettings]) -> None:
+async def _bookings(app: service.Application[_BookingsSettings]) -> None:
     redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
         aioredis.from_url(
             str(app.settings.redis_dsn),
@@ -145,7 +145,7 @@ async def _offers_factory(
 
 
 async def _bookings_factory(
-    app: service.AsyncApplication[_Settings],
+    app: service.Application[_Settings],
 ) -> provider_bookings.Implementation:
     storage = await app.stack.enter_async_context(
         filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
@@ -158,7 +158,7 @@ async def _bookings_factory(
 
 
 async def _trips_factory(
-    app: service.AsyncApplication[_Settings],
+    app: service.Application[_Settings],
 ) -> provider_trips.Implementation:
     stop_repository = client.StopRepository(
         stops=cast(

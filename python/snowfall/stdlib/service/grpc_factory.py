@@ -9,7 +9,7 @@ _Settings = TypeVar("_Settings", bound=application.Settings)
 
 
 async def make_insecure_channel(
-    app: application.AsyncApplication[_Settings],
+    app: application.Application[_Settings],
     target: str,
 ) -> aio.Channel:
     channel = client.create_channel(target)

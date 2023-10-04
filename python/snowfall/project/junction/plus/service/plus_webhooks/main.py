@@ -37,7 +37,7 @@ from snowfall.stdlib.transport.grpc.client import create_channel
 
 
 async def _http(
-    app: application.AsyncApplication[bootstrap.Settings],
+    app: application.Application[bootstrap.Settings],
 ) -> None:
     openai.api_key = app.settings.openai_api_key
     openai.organization = app.settings.openai_org

@@ -23,7 +23,7 @@ class _ServeSettings(application.Settings):
     consul_api_version: str = "v1"
 
 
-async def _serve(app: application.AsyncApplication[_ServeSettings]) -> None:
+async def _serve(app: application.Application[_ServeSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )

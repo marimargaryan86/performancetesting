@@ -32,7 +32,7 @@ async def _meta_factory() -> meta.MetaImplementation:
 
 
 async def _bookings_factory(
-    app: service.AsyncApplication[config.Settings],
+    app: service.Application[config.Settings],
 ) -> bookings.Implementation:
     storage = await app.stack.enter_async_context(
         filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
@@ -62,7 +62,7 @@ async def _bookings_factory(
 
 
 async def _notifications(  # noqa: WPS217
-    app: service.AsyncApplication[config.NotificationsSettings],
+    app: service.Application[config.NotificationsSettings],
 ) -> None:
     http_client = await app.stack.enter_async_context(
         httpx.AsyncClient(
@@ -95,7 +95,7 @@ async def _notifications(  # noqa: WPS217
 
 
 async def _consume_notifications(
-    app: service.AsyncApplication[config.NotificationsSettings],
+    app: service.Application[config.NotificationsSettings],
     amqp_connection: abc.AbstractConnection,
     benerail_client: client.BenerailClient,
     notifier: notifications.SmtpNotifier,
@@ -120,7 +120,7 @@ async def _consume_notifications(
 
 
 async def _configure_queue(
-    app: service.AsyncApplication[config.NotificationsSettings],
+    app: service.Application[config.NotificationsSettings],
     amqp_connection: abc.AbstractConnection,
 ) -> None:
     channel = await app.stack.enter_async_context(

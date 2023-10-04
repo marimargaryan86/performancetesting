@@ -153,7 +153,7 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
             await running.wait_for_termination()
 
 
-async def _import(app: application.AsyncApplication[_ImportSettings]) -> None:
+async def _import(app: application.Application[_ImportSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
@@ -257,7 +257,7 @@ async def _import(app: application.AsyncApplication[_ImportSettings]) -> None:
 
 
 async def _gather_price_quotes(
-    app: application.AsyncApplication[_GatherPriceQuoteSettings],
+    app: application.Application[_GatherPriceQuoteSettings],
 ) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311

@@ -42,7 +42,7 @@ class StationRepository(object):
 
 
 async def dump_stations(
-    app: application.AsyncApplication[DumpStationsSettings],
+    app: application.Application[DumpStationsSettings],
 ) -> None:
     http_client = await app.stack.enter_async_context(
         httpx.AsyncClient(

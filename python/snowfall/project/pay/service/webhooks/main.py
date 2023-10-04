@@ -10,7 +10,7 @@ from snowfall.stdlib.transport.grpc.client import create_channel
 
 
 async def _http(
-    app: application.AsyncApplication[bootstrap.Settings],
+    app: application.Application[bootstrap.Settings],
 ) -> None:
     payments_channel = create_channel(
         app.settings.payments_address,

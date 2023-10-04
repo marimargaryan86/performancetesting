@@ -27,7 +27,7 @@ _PROVIDER_NAME = "Distribusion"
 
 
 async def orders(  # noqa: WPS217, WPS210
-    app: application.AsyncApplication[config.OrdersSettings],
+    app: application.Application[config.OrdersSettings],
 ) -> None:
     http_client = await app.stack.enter_async_context(
         httpx.AsyncClient(

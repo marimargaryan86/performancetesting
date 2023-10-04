@@ -15,7 +15,7 @@ class _VerifySettings(application.Settings):
     changed_services: list[str] = pydantic.Field(json_schema_extra={"argument": True})
 
 
-async def _verify(app: application.AsyncApplication[_VerifySettings]) -> None:
+async def _verify(app: application.Application[_VerifySettings]) -> None:
     dns_address = str(app.settings.nomad_address.host)
     dns_resolver = consul.Resolver((dns_address, 8600), app.environment)
     deps_resolver = await dependencies.resolver_from_nomad_templates(

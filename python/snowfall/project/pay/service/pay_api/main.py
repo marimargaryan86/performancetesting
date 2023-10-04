@@ -70,7 +70,7 @@ def _lifespan(
 
 
 async def _http(
-    app: application.AsyncApplication[bootstrap.Settings],
+    app: application.Application[bootstrap.Settings],
 ) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
@@ -187,7 +187,7 @@ async def _http(
 
 
 async def _admin_http(
-    app: application.AsyncApplication[bootstrap.AdminSettings],
+    app: application.Application[bootstrap.AdminSettings],
 ) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311

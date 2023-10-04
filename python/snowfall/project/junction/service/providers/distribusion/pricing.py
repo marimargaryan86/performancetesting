@@ -23,7 +23,7 @@ class NoPricingError(Exception):
 
 
 async def price_quotes(  # noqa: WPS210
-    app: application.AsyncApplication[config.PricingSettings],
+    app: application.Application[config.PricingSettings],
 ) -> None:
     http_client = await app.stack.enter_async_context(
         httpx.AsyncClient(

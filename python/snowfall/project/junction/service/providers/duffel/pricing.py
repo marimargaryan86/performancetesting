@@ -29,7 +29,7 @@ from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
 
 async def price_quotes(  # noqa: WPS210
-    app: application.AsyncApplication[PricingSettings],
+    app: application.Application[PricingSettings],
 ) -> None:
     http_client = await app.stack.enter_async_context(
         httpx.AsyncClient(

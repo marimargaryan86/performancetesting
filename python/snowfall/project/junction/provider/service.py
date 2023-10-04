@@ -20,7 +20,6 @@ from snowfall.stdlib.transport.grpc import service as grpc_service
 # Re-export some service types
 AnyDsn = application.AnyDsn
 Application = application.Application
-AsyncApplication = application.AsyncApplication
 Command = application.Command
 Settings = application.Settings
 
@@ -59,11 +58,11 @@ if TYPE_CHECKING:
 
     OF = OffersFactory[_Settings, _SearchCriteriaTask, _SearchCriteria]
     BookingFactory = Callable[
-        [application.AsyncApplication[_Settings]],
+        [application.Application[_Settings]],
         Awaitable[bookings.Implementation],
     ]
     TripsFactory = Callable[
-        [application.AsyncApplication[_Settings]],
+        [application.Application[_Settings]],
         Awaitable[trips.Implementation],
     ]
 
@@ -75,7 +74,7 @@ def _grpc_command(  # noqa: WPS210, WPS217
     trips_factory: TripsFactory[_Settings] | None = None,
 ) -> application.Callback[_Settings]:
     async def wrapper(  # noqa: WPS210, WPS217
-        app: application.AsyncApplication[_Settings],
+        app: application.Application[_Settings],
     ) -> None:
         meta_implementation = await meta_factory()
         services: list[grpc_service.Service] = [
@@ -146,7 +145,7 @@ def _offers_command(
     meta_factory: MetaFactory,
     offers_factory: OffersFactory[_Settings, _SearchCriteriaTask, _SearchCriteria],
 ) -> application.Callback[_Settings]:
-    async def wrapper(app: application.AsyncApplication[_Settings]) -> None:
+    async def wrapper(app: application.Application[_Settings]) -> None:
         meta_implementation = await meta_factory()
         redis_conn: aioredis.Redis[bytes] = await app.stack.enter_async_context(
             aioredis.from_url(

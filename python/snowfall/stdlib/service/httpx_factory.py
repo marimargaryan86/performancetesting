@@ -12,7 +12,7 @@ _Settings = TypeVar("_Settings", bound=application.Settings)
 
 
 async def make_client(
-    app: application.AsyncApplication[_Settings],
+    app: application.Application[_Settings],
     *,
     base_url: httpx.URL | None = None,
     follow_redirects: bool = False,

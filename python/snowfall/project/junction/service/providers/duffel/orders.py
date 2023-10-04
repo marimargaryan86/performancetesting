@@ -38,7 +38,7 @@ class OrdersSettings(config.DuffelConfig, application.Settings):
 
 
 async def orders(  # noqa: WPS217
-    app: application.AsyncApplication[OrdersSettings],
+    app: application.Application[OrdersSettings],
 ) -> None:
     http_client = await app.stack.enter_async_context(
         httpx.AsyncClient(
