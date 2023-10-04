@@ -48,10 +48,13 @@ scrape_configs:
       - source_labels: [__meta_consul_tags]
         regex: (.*)metrics(.*)
         action: keep
-      - source_labels: [__meta_consul_service]
-        target_label: job
       - source_labels: [__meta_consul_node]
         target_label: instance
+      - source_labels: [__meta_consul_service]
+        target_label: job
+      - source_labels: [__meta_consul_service]
+        regex: '.*sidecar-proxy.*'
+        action: drop
     scrape_interval: 5s
     params:
       format: ['prometheus']
@@ -84,3 +87,4 @@ EOH
     }
   }
 }
+
