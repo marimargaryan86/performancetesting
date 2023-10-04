@@ -34,14 +34,6 @@ variable "count" {
   type = number
 }
 
-variable "pay_admin_api_base_url" {
-  type = string
-}
-
-variable "api_pay_base_url" {
-  type = string
-}
-
 variable "client_api_base_url" {
   type = string
 }
@@ -148,8 +140,6 @@ EOH
       env {
         ENV_NAME                 = "${var.environment}"
         PORT                     = "${NOMAD_PORT_http}"
-        PAY_ADMIN_API_BASE_URL   = "${var.pay_admin_api_base_url}"
-        PAY_API_BASE_URL         = "${var.api_pay_base_url}"
         CLIENT_API_BASE_URL      = "${var.client_api_base_url}"
         BOOKING_HUB_API_BASE_URL = "${var.booking_hub_api_base_url}"
         ORY_BASE_URL             = "${var.ory_base_url}"
