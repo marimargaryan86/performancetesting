@@ -1,20 +1,18 @@
 from collections.abc import Mapping
 from typing import Any
 
-_DATA_KEY = "data"
-_IDENTIFIER = "id"
-
 
 def _flatten_relationships(relationships: Mapping[str, Any]) -> dict[str, Any]:
-    flattened = {}
+    flattened: dict[str, Any] = {}
 
     for key, relationship in relationships.items():
-        if isinstance(relationship[_DATA_KEY], dict):
-            flattened[key] = relationship[_DATA_KEY][_IDENTIFIER]
+        if relationship["data"] is None:
+            flattened[key] = None
+        elif isinstance(relationship["data"], dict):
+            flattened[key] = relationship["data"]["id"]
         else:
             flattened[key] = [
-                relationship_data[_IDENTIFIER]
-                for relationship_data in relationship[_DATA_KEY]
+                relationship_data["id"] for relationship_data in relationship["data"]
             ]
 
     return flattened

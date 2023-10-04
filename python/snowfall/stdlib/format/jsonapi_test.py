@@ -64,6 +64,34 @@ from snowfall.stdlib.format import jsonapi
                 ],
             },
         ),
+        (
+            {
+                "attributes": {},
+                "relationships": {
+                    "foo": {
+                        "data": None,
+                    },
+                },
+                "type": "foo",
+            },
+            {
+                "foo": None,
+            },
+        ),
+        (
+            {
+                "attributes": {},
+                "relationships": {
+                    "foo": {
+                        "data": [],
+                    },
+                },
+                "type": "foo",
+            },
+            {
+                "foo": [],
+            },
+        ),
     ],
 )
 def test_resource_is_flattened(
