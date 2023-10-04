@@ -60,9 +60,9 @@ class EnumsValuesRepository(RedisRepository):
 
 
 class PlacesRepository(
+    repository.ProtoRepository[models_pb2.Place],
     mixins.FindByIdMixin[models_pb2.Place],
     mixins.InsertMixin[models_pb2.Place],
-    repository.ProtoRepository[models_pb2.Place],
 ):
     _proto = models_pb2.Place
     _indexes = (
@@ -196,9 +196,9 @@ class PlacesRepository(
 
 
 class GuestsRepository(
+    repository.ProtoRepository[models_pb2.Guest],
     mixins.FindByIdMixin[models_pb2.Guest],
     mixins.InsertMixin[models_pb2.Guest],
-    repository.ProtoRepository[models_pb2.Guest],
 ):
     _proto = models_pb2.Guest
 
@@ -210,9 +210,9 @@ class GuestsRepository(
 
 
 class UsersRepository(
+    repository.ProtoRepository[models_pb2.User],
     mixins.FindByIdMixin[models_pb2.User],
     mixins.InsertMixin[models_pb2.User],
-    repository.ProtoRepository[models_pb2.User],
 ):
     _proto = models_pb2.User
     _indexes = (pymongo.IndexModel("email", background=True, unique=True),)
@@ -288,9 +288,9 @@ class UsersRepository(
 
 
 class StripeUsersRepository(
+    repository.ProtoRepository[models_pb2.StripeUser],
     mixins.FindByIdMixin[models_pb2.StripeUser],
     mixins.InsertMixin[models_pb2.StripeUser],
-    repository.ProtoRepository[models_pb2.StripeUser],
 ):
     _proto = models_pb2.StripeUser
 
@@ -339,13 +339,14 @@ class LoyaltyProgramsRepository(
 
 
 class PreferencesRepository(
-    mixins.FindByIdMixin[dict[str, Any]],
     repository.DefaultRepository,
+    mixins.FindByIdMixin[Mapping[str, Any]],
 ):
     async def update_preferences(self, user_id: str, preferences: Any) -> None:
         # TODO: check if I can do it in 1 aggregation pipeline
         saved_preferences = await self.find_by_id(user_id, "user_id")
         if saved_preferences:
+            saved_preferences = dict(saved_preferences)
             saved_preferences["preferences"] = [
                 *saved_preferences["preferences"],
                 *list(preferences),
@@ -373,17 +374,17 @@ class PreferencesRepository(
 
 
 class MockRepository(
-    mixins.AllMixin[dict[str, Any]],
-    mixins.InsertMixin[dict[str, Any]],
     repository.DefaultRepository,
+    mixins.AllMixin[Mapping[str, Any]],
+    mixins.InsertMixin[Mapping[str, Any]],
 ):
     """Used for tests with various mixins."""
 
 
 class OrdersRepository(
+    repository.ProtoRepository[models_pb2.MobileOrder],
     mixins.FindByIdMixin[models_pb2.MobileOrder],
     mixins.InsertMixin[models_pb2.MobileOrder],
-    repository.ProtoRepository[models_pb2.MobileOrder],
 ):
     _proto = models_pb2.MobileOrder
     _indexes = (
@@ -405,9 +406,9 @@ class OrdersRepository(
 
 
 class VouchersRepository(
+    repository.ProtoRepository[models_pb2.Voucher],
     mixins.FindByIdMixin[models_pb2.Voucher],
     mixins.InsertMixin[models_pb2.Voucher],
-    repository.ProtoRepository[models_pb2.Voucher],
 ):
     _proto = models_pb2.Voucher
     _indexes = (pymongo.IndexModel("code", background=True, unique=True),)
@@ -489,9 +490,9 @@ class VouchersRepository(
 
 
 class NotificationTokensRepository(
+    repository.ProtoRepository[models_pb2.NotificationToken],
     mixins.FindByIdMixin[models_pb2.NotificationToken],
     mixins.InsertMixin[models_pb2.NotificationToken],
-    repository.ProtoRepository[models_pb2.NotificationToken],
 ):
     _proto = models_pb2.NotificationToken
     _indexes = (
@@ -537,9 +538,9 @@ class NotificationTokensRepository(
 
 
 class UserGroupsRepository(
+    repository.ProtoRepository[models_pb2.UserGroup],
     mixins.FindByIdMixin[models_pb2.UserGroup],
     mixins.InsertMixin[models_pb2.UserGroup],
-    repository.ProtoRepository[models_pb2.UserGroup],
 ):
     _proto = models_pb2.UserGroup
     _indexes = (pymongo.IndexModel("user_id", background=True),)
@@ -635,9 +636,9 @@ class UserGroupsRepository(
 
 
 class MarkupsRepository(
+    repository.ProtoRepository[models_pb2.Markup],
     mixins.FindByIdMixin[models_pb2.Markup],
     mixins.InsertMixin[models_pb2.Markup],
-    repository.ProtoRepository[models_pb2.Markup],
 ):
     _proto = models_pb2.Markup
     _indexes = (pymongo.IndexModel("order_id", background=True, unique=True),)

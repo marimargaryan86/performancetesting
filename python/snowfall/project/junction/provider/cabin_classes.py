@@ -7,8 +7,8 @@ from snowfall.stdlib.persistence.mongo import mixins, repository
 
 
 class CabinMappingRepository(
-    mixins.InsertMixin[models_pb2.CabinClassMapping],
     repository.ProtoRepository[models_pb2.CabinClassMapping],
+    mixins.InsertMixin[models_pb2.CabinClassMapping],
 ):
     _proto = models_pb2.CabinClassMapping
     _logger = stdout.get_logger()

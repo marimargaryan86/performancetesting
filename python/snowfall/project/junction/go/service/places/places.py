@@ -45,8 +45,8 @@ def _unique(locations: Sequence[models_pb2.Location]) -> Sequence[models_pb2.Loc
 
 
 class LocationRepository(
-    mixins.FindByIdMixin[models_pb2.Location],
     repository.ProtoRepository[models_pb2.Location],
+    mixins.FindByIdMixin[models_pb2.Location],
 ):
     _indexes = (IndexModel([("coordinates", GEOSPHERE)], background=True),)
     _proto = models_pb2.Location
@@ -166,10 +166,10 @@ class _PlaceNormalizer(normalizers.Normalizer):
 
 
 class PlaceRepository(  # noqa: WPS215
+    repository.ProtoRepository[models_pb2.Place],
     mixins.FindByIdMixin[models_pb2.Place],
     mixins.InsertMixin[models_pb2.Place],
     mixins.UpsertMixin[models_pb2.Place],
-    repository.ProtoRepository[models_pb2.Place],
 ):
     _proto = models_pb2.Place
     _indexes = (IndexModel([("location.coordinates", GEOSPHERE)], background=True),)

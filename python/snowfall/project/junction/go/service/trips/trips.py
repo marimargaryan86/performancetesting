@@ -59,8 +59,8 @@ class SegmentRepository(repository.ProtoRepository[models_pb2.SegmentReference])
 
 
 class TripRepository(
-    mixins.FindByIdMixin[models_pb2.TripReference],
     repository.ProtoRepository[models_pb2.TripReference],
+    mixins.FindByIdMixin[models_pb2.TripReference],
 ):
     _proto = models_pb2.TripReference
 
@@ -119,10 +119,10 @@ class TripRepository(
 
 
 class TripSearchRepository(  # noqa: WPS215
+    repository.ProtoRepository[trips_pb2.TripSearch],
     mixins.FindByIdMixin[trips_pb2.TripSearch],
     mixins.InsertMixin[trips_pb2.TripSearch],
     mixins.StatusMixin[trips_pb2.TripSearch],
-    repository.ProtoRepository[trips_pb2.TripSearch],
 ):
     _proto = trips_pb2.TripSearch
     _indexes = (
@@ -185,10 +185,10 @@ class TripSearchRepository(  # noqa: WPS215
 
 
 class TripCandidateSearchRepository(  # noqa: WPS215
+    repository.ProtoRepository[trips_pb2.TripCandidateSearch],
     mixins.FindByIdMixin[trips_pb2.TripCandidateSearch],
     mixins.InsertMixin[trips_pb2.TripCandidateSearch],
     mixins.StatusMixin[trips_pb2.TripCandidateSearch],
-    repository.ProtoRepository[trips_pb2.TripCandidateSearch],
 ):
     _proto = trips_pb2.TripCandidateSearch
     _indexes = (

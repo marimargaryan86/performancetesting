@@ -11,9 +11,9 @@ from snowfall.vendor.currency_cloud.models.conversion import ConversionResponse
 
 
 class TransactionsRepository(
+    repository.ProtoRepository[models_pb2.Transaction],
     mixins.FindByIdMixin[models_pb2.Transaction],
     mixins.InsertMixin[models_pb2.Transaction],
-    repository.ProtoRepository[models_pb2.Transaction],
 ):
     _proto = models_pb2.Transaction
     _indexes = (
@@ -53,9 +53,9 @@ class TransactionsRepository(
 
 
 class QuotationsRepository(
+    repository.ProtoRepository[models_pb2.Quotation],
     mixins.InsertMixin[models_pb2.Quotation],
     mixins.FindByIdMixin[models_pb2.Quotation],
-    repository.ProtoRepository[models_pb2.Quotation],
 ):
     _proto = models_pb2.Quotation
 
@@ -82,9 +82,9 @@ class QuotationsRepository(
 
 
 class ConversionsRepository(
+    repository.ProtoRepository[models_pb2.Conversion],
     mixins.FindByIdMixin[models_pb2.Conversion],
     mixins.InsertMixin[models_pb2.Conversion],
-    repository.ProtoRepository[models_pb2.Conversion],
 ):
     _proto = models_pb2.Conversion
 
@@ -124,9 +124,9 @@ class ConversionsRepository(
 
 
 class BillsRepository(
+    repository.ProtoRepository[models_pb2.Bill],
     mixins.FindByIdMixin[models_pb2.Bill],
     mixins.InsertMixin[models_pb2.Bill],
-    repository.ProtoRepository[models_pb2.Bill],
 ):
     _proto = models_pb2.Bill
 

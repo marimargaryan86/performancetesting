@@ -9,9 +9,9 @@ _mongo_id_key = "_id"
 
 
 class PaymentsRepository(
+    repository.ProtoRepository[Payment],
     mixins.FindByIdMixin[Payment],
     mixins.InsertMixin[Payment],
-    repository.ProtoRepository[Payment],
 ):
     _proto = Payment
 

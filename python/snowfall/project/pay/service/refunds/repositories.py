@@ -3,9 +3,9 @@ from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 
 
 class RefundsRepository(
+    repository.ProtoRepository[models_pb2.Refund],
     mixins.FindByIdMixin[models_pb2.Refund],
     mixins.InsertMixin[models_pb2.Refund],
-    repository.ProtoRepository[models_pb2.Refund],
 ):
     _proto = models_pb2.Refund
 

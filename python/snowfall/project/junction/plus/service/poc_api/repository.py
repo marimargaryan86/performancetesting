@@ -9,9 +9,9 @@ from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 
 
 class OrdersRepository(
+    repository.ProtoRepository[mobile_models_pb2.MobileOrder],
     mixins.FindByIdMixin[mobile_models_pb2.MobileOrder],
     mixins.InsertMixin[mobile_models_pb2.MobileOrder],
-    repository.ProtoRepository[mobile_models_pb2.MobileOrder],
 ):
     _proto = mobile_models_pb2.MobileOrder
 
@@ -29,9 +29,9 @@ class OrdersRepository(
 
 
 class SubscriptionsRepository(
+    repository.DefaultRepository,
     mixins.FindByIdMixin[Mapping[str, Any]],
     mixins.InsertMixin[Mapping[str, Any]],
-    repository.DefaultRepository,
 ):
     async def subscribe(
         self,
@@ -65,8 +65,8 @@ class SubscriptionsRepository(
 
 
 class DelayWebhookRepository(
-    mixins.FindByIdMixin[Mapping[str, Any]],
     repository.DefaultRepository,
+    mixins.FindByIdMixin[Mapping[str, Any]],
 ):
     async def add_order(
         self,

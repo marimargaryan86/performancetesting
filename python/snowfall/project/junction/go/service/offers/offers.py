@@ -18,9 +18,9 @@ _OFFER_SEARCH_ID = "offer_search_id"
 
 
 class TripOfferRepository(
+    repository.ProtoRepository[models_pb2.OfferGroup],
     mixins.FindByIdMixin[models_pb2.OfferGroup],
     mixins.InsertMixin[models_pb2.OfferGroup],
-    repository.ProtoRepository[models_pb2.OfferGroup],
 ):
     _proto = models_pb2.OfferGroup
     _indexes = (
@@ -181,9 +181,9 @@ class OfferOptionDetailsRepository(
 
 
 class OfferAggregateMappingRepository(
+    repository.ProtoRepository[models_pb2.OfferAggregateMapping],
     mixins.FindByIdMixin[models_pb2.OfferAggregateMapping],
     mixins.InsertMixin[models_pb2.OfferAggregateMapping],
-    repository.ProtoRepository[models_pb2.OfferAggregateMapping],
 ):
     _proto = models_pb2.OfferAggregateMapping
     _indexes = (
@@ -268,11 +268,11 @@ class OfferAggregateMappingRepository(
 
 
 class OfferSearchRepository(  # noqa: WPS215
+    repository.ProtoRepository[models_pb2.OfferSearch],
     mixins.AllMixin[models_pb2.OfferSearch],
     mixins.FindByIdMixin[models_pb2.OfferSearch],
     mixins.InsertMixin[models_pb2.OfferSearch],
     mixins.StatusMixin[models_pb2.OfferSearch],
-    repository.ProtoRepository[models_pb2.OfferSearch],
 ):
     _proto = models_pb2.OfferSearch
     _indexes = (

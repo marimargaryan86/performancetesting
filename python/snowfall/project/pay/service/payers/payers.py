@@ -4,10 +4,10 @@ from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 
 
 class PayersRepository(  # noqa: WPS215
+    repository.ProtoRepository[models_pb2.Payer],
     mixins.AllMixin[models_pb2.Payer],
     mixins.FindByIdMixin[models_pb2.Payer],
     mixins.InsertMixin[models_pb2.Payer],
-    repository.ProtoRepository[models_pb2.Payer],
 ):
     _proto = models_pb2.Payer
 

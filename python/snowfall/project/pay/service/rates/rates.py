@@ -12,10 +12,10 @@ VALID_RATE_DAYS = 30
 
 
 class RatesRepository(  # noqa: WPS215
+    repository.ProtoRepository[models_pb2.Rate],
     mixins.AllMixin[models_pb2.Rate],
     mixins.FindByIdMixin[models_pb2.Rate],
     mixins.InsertManyMixin[models_pb2.Rate],
-    repository.ProtoRepository[models_pb2.Rate],
 ):
     _proto = models_pb2.Rate
 
@@ -51,9 +51,9 @@ class RatesRepository(  # noqa: WPS215
 
 
 class BackUpRatesRepository(
+    repository.ProtoRepository[models_pb2.BackUpRate],
     mixins.AllMixin[models_pb2.BackUpRate],
     mixins.InsertManyMixin[models_pb2.BackUpRate],
-    repository.ProtoRepository[models_pb2.BackUpRate],
 ):
     _proto = models_pb2.BackUpRate
     _indexes = (

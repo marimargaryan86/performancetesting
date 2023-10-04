@@ -11,8 +11,8 @@ from snowfall.stdlib.v1 import datetime_pb2
 
 
 class OrderRepository(
-    mixins.FindByIdMixin[models_pb2.PersistedOrder],
     repository.ProtoRepository[models_pb2.PersistedOrder],
+    mixins.FindByIdMixin[models_pb2.PersistedOrder],
 ):
     _proto = models_pb2.PersistedOrder
     _nested_path = "bookings"
@@ -61,8 +61,8 @@ class OrderRepository(
 
 
 class SubscriberRepository(
-    mixins.FindByIdMixin[models_pb2.Subscriber],
     repository.ProtoRepository[models_pb2.Subscriber],
+    mixins.FindByIdMixin[models_pb2.Subscriber],
 ):
     _proto = models_pb2.Subscriber
     _indexes = (
@@ -155,9 +155,9 @@ class SubscriberRepository(
 
 
 class ConfigurationVectorRepository(  # noqa: WPS215
+    repository.ProtoRepository[models_pb2.ConfigurationVector],
     mixins.FindByIdMixin[models_pb2.ConfigurationVector],
     mixins.InsertMixin[models_pb2.ConfigurationVector],
-    repository.ProtoRepository[models_pb2.ConfigurationVector],
 ):
     _proto = models_pb2.ConfigurationVector
     _indexes = (pymongo.IndexModel("reseller_id", background=True),)
@@ -183,10 +183,10 @@ class ConfigurationVectorRepository(  # noqa: WPS215
 
 
 class MonitoringRuleRepository(  # noqa: WPS215
+    repository.ProtoRepository[models_pb2.MonitoringRule],
     mixins.FindByIdMixin[models_pb2.MonitoringRule],
     mixins.InsertMixin[models_pb2.MonitoringRule],
     mixins.UpsertMixin[models_pb2.MonitoringRule],
-    repository.ProtoRepository[models_pb2.MonitoringRule],
 ):
     _proto = models_pb2.MonitoringRule
     _indexes = (

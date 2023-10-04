@@ -9,9 +9,9 @@ from snowfall.vendor.currency_cloud.models.conversion import ConversionResponse
 
 
 class ConversionRepository(
+    repository.ProtoRepository[Conversion],
     mixins.FindByIdMixin[Conversion],
     mixins.InsertMixin[Conversion],
-    repository.ProtoRepository[Conversion],
 ):
     _proto = Conversion
 

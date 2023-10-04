@@ -5,9 +5,9 @@ from snowfall.stdlib.persistence.mongo import mixins, repository
 
 
 class UsersRepository(
+    repository.ProtoRepository[models_pb2.User],
     mixins.FindByIdMixin[models_pb2.User],
     mixins.InsertMixin[models_pb2.User],
-    repository.ProtoRepository[models_pb2.User],
 ):
     """Repository for keeping users information."""
 

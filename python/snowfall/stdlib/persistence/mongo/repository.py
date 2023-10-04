@@ -128,13 +128,11 @@ def _configure_collection(
 
 
 class RepositoryProtocol(Protocol[Record]):
+    _collection: core.AgnosticCollection
+
     @property
     def _coder(self) -> coders.BaseCoder[Record]:
         """Use to convert protobufs to BSON and back."""
-
-    @property
-    def _collection(self) -> core.AgnosticCollection:
-        """Use to perform Mongo queries again."""
 
     async def _execute(
         self,

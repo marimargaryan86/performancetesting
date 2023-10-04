@@ -28,8 +28,8 @@ def _add_reseller_id_to_filter(
 
 
 class JourneyRepository(
-    orders_mixins.FindByIdMixin[models_pb2.Journey],
     repository.ProtoRepository[models_pb2.Journey],
+    orders_mixins.FindByIdMixin[models_pb2.Journey],
 ):
     _proto = models_pb2.Journey
     _indexes = (pymongo.IndexModel("passenger_name_record", background=True),)
@@ -418,9 +418,9 @@ class BookingDetailsRepository(
 
 
 class CancellationRequestsRepository(
+    repository.ProtoRepository[models_pb2.CancellationRequest],
     mixins.FindByIdMixin[models_pb2.CancellationRequest],
     mixins.InsertMixin[models_pb2.CancellationRequest],
-    repository.ProtoRepository[models_pb2.CancellationRequest],
 ):
     _proto = models_pb2.CancellationRequest
 

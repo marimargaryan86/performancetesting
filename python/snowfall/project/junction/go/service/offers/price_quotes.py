@@ -11,9 +11,9 @@ from snowfall.stdlib.persistence.mongo import mixins, repository
 
 
 class PriceQuoteContainerRepository(
+    repository.ProtoRepository[models_pb2.PriceQuoteContainer],
     mixins.FindByIdMixin[models_pb2.PriceQuoteContainer],
     mixins.InsertMixin[models_pb2.PriceQuoteContainer],
-    repository.ProtoRepository[models_pb2.PriceQuoteContainer],
 ):
     _proto = models_pb2.PriceQuoteContainer
     _indexes = (

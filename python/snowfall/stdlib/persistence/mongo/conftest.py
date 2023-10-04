@@ -12,9 +12,9 @@ from snowfall.stdlib.v1 import testing_pb2
 
 
 class FoobarRepository(
+    repository.ProtoRepository[testing_pb2.Foobar],
     mixins.AllMixin[testing_pb2.Foobar],
     mixins.InsertMixin[testing_pb2.Foobar],
-    repository.ProtoRepository[testing_pb2.Foobar],
 ):
     _nested_path = "foobars"
     _proto = testing_pb2.Foobar
@@ -41,9 +41,9 @@ class FoobarRepository(
 
 
 class MockRepository(
-    mixins.AllMixin[dict[str, Any]],
-    mixins.InsertMixin[dict[str, Any]],
     repository.DefaultRepository,
+    mixins.AllMixin[Mapping[str, Any]],
+    mixins.InsertMixin[Mapping[str, Any]],
 ):
     _indexes = (pymongo.IndexModel("field"), pymongo.IndexModel("created"))
 
@@ -62,9 +62,9 @@ class MockRepository(
 
 
 class NestedMockRepository(
-    mixins.AllMixin[dict[str, Any]],
-    mixins.InsertMixin[dict[str, Any]],
     repository.DefaultRepository,
+    mixins.AllMixin[Mapping[str, Any]],
+    mixins.InsertMixin[Mapping[str, Any]],
 ):
     _nested_path = "nested"
     _indexes = (

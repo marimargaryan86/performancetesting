@@ -9,9 +9,9 @@ from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 
 
 class CompaniesRepository(
+    repository.ProtoRepository[models_pb2.Company],
     mixins.FindByIdMixin[models_pb2.Company],
     mixins.InsertMixin[models_pb2.Company],
-    repository.ProtoRepository[models_pb2.Company],
 ):
     _proto = models_pb2.Company
     _indexes = (pymongo.IndexModel("name", background=True, unique=True),)
@@ -51,9 +51,9 @@ class CompaniesRepository(
 
 
 class AccountsRepository(
+    repository.ProtoRepository[models_pb2.Account],
     mixins.InsertMixin[models_pb2.Account],
     mixins.FindByIdMixin[models_pb2.Account],
-    repository.ProtoRepository[models_pb2.Account],
 ):
     _proto = models_pb2.Account
 
@@ -91,9 +91,9 @@ class AccountsRepository(
 
 
 class ContactsRepository(
+    repository.ProtoRepository[models_pb2.Contact],
     mixins.InsertMixin[models_pb2.Contact],
     mixins.FindByIdMixin[models_pb2.Contact],
-    repository.ProtoRepository[models_pb2.Contact],
 ):
     _proto = models_pb2.Contact
     _default_page_size = 20
@@ -139,9 +139,9 @@ class ContactsRepository(
 
 
 class BeneficiaryRepository(
+    repository.ProtoRepository[models_pb2.Beneficiary],
     mixins.FindByIdMixin[models_pb2.Beneficiary],
     mixins.InsertMixin[models_pb2.Beneficiary],
-    repository.ProtoRepository[models_pb2.Beneficiary],
 ):
     _proto = models_pb2.Beneficiary
     _default_page_size = 20

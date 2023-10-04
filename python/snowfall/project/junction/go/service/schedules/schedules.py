@@ -49,9 +49,9 @@ class LegRepository(repository.ProtoRepository[models_pb2.Leg]):
 
 
 class ScheduleRepository(
+    repository.ProtoRepository[models_pb2.Schedule],
     mixins.AllMixin[models_pb2.Schedule],
     mixins.FindByIdMixin[models_pb2.Schedule],
-    repository.ProtoRepository[models_pb2.Schedule],
 ):
     _proto = models_pb2.Schedule
     _indexes = (IndexModel("updated_at", background=True),)

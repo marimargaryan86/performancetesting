@@ -16,9 +16,9 @@ from snowfall.stdlib.persistence.redis import types as redis
 
 
 class LegCacheRepository(
+    mongo_repository.ProtoRepository[trips_pb2.LegCache],
     mixins.FindByIdMixin[trips_pb2.LegCache],
     mixins.InsertManyMixin[trips_pb2.LegCache],
-    mongo_repository.ProtoRepository[trips_pb2.LegCache],
 ):
     _proto = trips_pb2.LegCache
     _indexes = (
