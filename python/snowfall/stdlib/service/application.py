@@ -255,7 +255,10 @@ def _command(
             version=global_settings.version,
         )
 
-        asyncio.run(_async_wrapper(application, entrypoint, global_settings, command))
+        asyncio.run(
+            main=_async_wrapper(application, entrypoint, global_settings, command),
+            debug=global_settings.env_name in {"local", "development"},
+        )
 
     # need to cast because of dodgy type hinting in @click.pass_context
     return cast(_Command, decorator)
