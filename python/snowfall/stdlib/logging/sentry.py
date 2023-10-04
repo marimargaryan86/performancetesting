@@ -4,7 +4,6 @@ from typing import Any
 
 import sentry_sdk
 import structlog
-from sentry_sdk.integrations import asyncio as sentry_asyncio
 from sentry_sdk.integrations import logging as sentry_logging
 
 Integrations = Sequence[sentry_sdk.integrations.Integration]
@@ -31,7 +30,6 @@ def configure_sentry(
     **kwargs: Any,
 ) -> None:
     integrations: Integrations = [
-        sentry_asyncio.AsyncioIntegration(),
         sentry_logging.LoggingIntegration(event_level=None, level=None),
     ]
 
