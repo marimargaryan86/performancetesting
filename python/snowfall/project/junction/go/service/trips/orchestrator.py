@@ -210,6 +210,11 @@ class OfferOrchestrator(object):
             async for leg_cache_obj in await self._leg_cache_repo.find(leg_ids)
         }
 
+        not_found_legs = set(leg_ids) - set(leg_map.keys())
+
+        if not_found_legs:
+            self._logger.warning("Legs not found in cache", legs=not_found_legs)
+
         return [
             models_pb2.Trip(
                 id=trip_reference.id,
