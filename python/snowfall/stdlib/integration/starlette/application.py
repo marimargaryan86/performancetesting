@@ -3,10 +3,9 @@ import ipaddress
 import os
 import pathlib
 from collections.abc import Awaitable, Callable, Mapping, Sequence
-from typing import Any, cast
+from typing import Any
 
 import uvicorn
-from asgiref.typing import ASGIApplication
 from starlette import applications, exceptions, requests, responses, routing, status
 from starlette.middleware import Middleware, errors
 
@@ -91,27 +90,30 @@ def create_starlette_app(  # noqa: WPS211
     )
 
 
-def serve(
-    factory: Callable[[], applications.Starlette],
-    host: str,
-    port: int,
-    allowed_proxy_ips: Sequence[ipaddress.IPv4Address],
+async def serve(
+    starlette_app: applications.Starlette,
+    settings: Settings,
 ) -> None:
-    return uvicorn.run(
-        app=cast(ASGIApplication, factory),
-        factory=True,
-        host=host,
-        loop="asyncio",
-        port=port,
-        access_log=False,
-        log_config=None,
-        proxy_headers=True,
-        server_header=False,
-        ws="none",
-        forwarded_allow_ips=",".join(
-            [
-                "*" if str(address) == "0.0.0.0" else str(address)  # noqa: S104
-                for address in allowed_proxy_ips
-            ],
+    server = uvicorn.Server(
+        config=uvicorn.Config(
+            app=starlette_app,
+            host=str(settings.http_address),
+            loop="asyncio",
+            port=settings.http_port,
+            access_log=False,
+            log_config=None,
+            proxy_headers=True,
+            server_header=False,
+            ws="none",
+            forwarded_allow_ips=",".join(
+                [
+                    "*" if str(address) == "0.0.0.0" else str(address)  # noqa: S104
+                    for address in settings.forwarded_allowed_ips
+                ],
+            ),
         ),
     )
+
+    server.config.setup_event_loop()
+
+    await server.serve()

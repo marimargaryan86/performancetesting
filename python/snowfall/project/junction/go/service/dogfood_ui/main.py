@@ -1,9 +1,7 @@
-from collections.abc import Callable
-
 import httpx
 import lagom
 from lagom.integrations import starlette as starlette_integration
-from starlette import applications, routing, staticfiles, templating
+from starlette import routing, staticfiles, templating
 
 from snowfall.project.junction.go.service.dogfood_ui import routes
 from snowfall.stdlib.integration.starlette import application as starlette
@@ -17,7 +15,7 @@ class _Settings(starlette.Settings):
     base_url: str
 
 
-def _routes(app: application.Application[_Settings]) -> list[routing.BaseRoute]:
+def _routes(app: application.AsyncApplication[_Settings]) -> list[routing.BaseRoute]:
     container = lagom.Container()
     container[templating.Jinja2Templates] = templating.Jinja2Templates(
         filesystem.package_path(
@@ -52,25 +50,18 @@ def _routes(app: application.Application[_Settings]) -> list[routing.BaseRoute]:
     ]
 
 
-def _factory(
-    app: application.Application[_Settings],
-) -> Callable[[], applications.Starlette]:
-    def decorator() -> applications.Starlette:
-        return starlette.create_starlette_app(
-            routes=_routes(app),
-            openapi_path=None,
-            security_headers=False,
-        )
+async def _http(
+    app: application.AsyncApplication[_Settings],
+) -> None:
+    asgi_app = starlette.create_starlette_app(
+        routes=_routes(app),
+        openapi_path=None,
+        security_headers=False,
+    )
 
-    return decorator
-
-
-def _serve(app: application.Application[_Settings]) -> None:
-    starlette.serve(
-        factory=_factory(app),
-        host=str(app.settings.http_address),
-        port=app.settings.http_port,
-        allowed_proxy_ips=app.settings.forwarded_allowed_ips,
+    await starlette.serve(
+        starlette_app=asgi_app,
+        settings=app.settings,
     )
 
 
@@ -78,5 +69,5 @@ if __name__ == "__main__":
     entrypoint = application.Entrypoint(name="dogfood-ui")
 
     entrypoint.enter_with_commands(
-        application.Command(name="http", callback=_serve, settings_class=_Settings),
+        application.Command(name="http", callback=_http, settings_class=_Settings),
     )

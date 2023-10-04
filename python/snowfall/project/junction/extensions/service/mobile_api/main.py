@@ -1,7 +1,5 @@
 import base64
-import pathlib
 import random
-from collections.abc import Callable
 from functools import partial
 
 import aiosmtplib
@@ -10,7 +8,6 @@ import stripe
 from authlib.integrations import httpx_client
 from motor import motor_asyncio
 from redis import asyncio as aioredis
-from starlette import applications
 from starlette.middleware import Middleware, authentication
 
 from snowfall.adapter import authentication as auth_adapter
@@ -100,55 +97,54 @@ def _get_httpx_auth_and_middlewares(
     return httpx_auth_method, custom_middlewares
 
 
-def _factory(
-    app: application.Application[bootstrap.Settings],
-    api_spec_path: pathlib.Path,
-) -> Callable[[], applications.Starlette]:
-    def decorator() -> applications.Starlette:
-        stripe.api_key = app.settings.stripe_api_key
-        httpx_auth, custom_middlewares = _get_httpx_auth_and_middlewares(app.settings)
-        junction_httpx_client = base_client.create_httpx_client(
-            base_url=app.settings.junction_api_address,
-            auth=httpx_auth,
-            client=httpx.AsyncClient(timeout=10),
-        )
-        metrics.register(junction_httpx_client)
-        junction_client = client.Client(
-            base_url=app.settings.junction_api_address,
-            client=junction_httpx_client,
-        )
-        plus_http_client = plus_client.PlusClient(
-            api_url=app.settings.plus_api_address,
-            activated=app.settings.plus_activated,
-            client=metrics.register(httpx.AsyncClient()),
-        )
-        redis_client = redis.Client[str](
-            aioredis.from_url(
-                str(random.choice(app.settings.redis_dsn)),  # noqa: S311
-                decode_responses=True,
-                retry_on_error=[aioredis.ConnectionError],
-            ).client(),
-            prefix=app.name,
-        )
-        mongo = motor_asyncio.AsyncIOMotorClient(
-            str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
-        )[app.settings.mongo_db]
-        smtp_cl = smtp.EmailClient(
-            aiosmtplib.SMTP(
-                hostname=app.settings.smtp_dsn.host,
-                port=int(app.settings.smtp_dsn.port or 0) or None,
-                username=app.settings.smtp_dsn.username,
-                password=app.settings.smtp_dsn.password,
-                start_tls=True,
-            ),
-            client_name=app.settings.client_name,
-            support_email=app.settings.support_email,
-        )
-        jwt_gen = jwt_generator.JwtGenerator(
-            jwt_private_key=app.settings.jwt_private_key,
-            jwt_token_version=app.settings.jwt_token_version,
-        )
+async def _http(
+    app: application.AsyncApplication[bootstrap.Settings],
+) -> None:
+    stripe.api_key = app.settings.stripe_api_key
+    httpx_auth, custom_middlewares = _get_httpx_auth_and_middlewares(app.settings)
+    junction_httpx_client = base_client.create_httpx_client(
+        base_url=app.settings.junction_api_address,
+        auth=httpx_auth,
+        client=httpx.AsyncClient(timeout=10),
+    )
+    metrics.register(junction_httpx_client)
+    junction_client = client.Client(
+        base_url=app.settings.junction_api_address,
+        client=junction_httpx_client,
+    )
+    plus_http_client = plus_client.PlusClient(
+        api_url=app.settings.plus_api_address,
+        activated=app.settings.plus_activated,
+        client=metrics.register(httpx.AsyncClient()),
+    )
+    redis_client = redis.Client[str](
+        aioredis.from_url(
+            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
+            decode_responses=True,
+            retry_on_error=[aioredis.ConnectionError],
+        ).client(),
+        prefix=app.name,
+    )
+    mongo = motor_asyncio.AsyncIOMotorClient(
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
+    )[app.settings.mongo_db]
+    smtp_cl = smtp.EmailClient(
+        aiosmtplib.SMTP(
+            hostname=app.settings.smtp_dsn.host,
+            port=int(app.settings.smtp_dsn.port or 0) or None,
+            username=app.settings.smtp_dsn.username,
+            password=app.settings.smtp_dsn.password,
+            start_tls=True,
+        ),
+        client_name=app.settings.client_name,
+        support_email=app.settings.support_email,
+    )
+    jwt_gen = jwt_generator.JwtGenerator(
+        jwt_private_key=app.settings.jwt_private_key,
+        jwt_token_version=app.settings.jwt_token_version,
+    )
 
+    with spec.get_api_spec(cookie_auth=app.settings.cookie_auth_enabled) as spec_path:
         asgi_app = starlette.create_starlette_app(
             routes=router.get_routes(
                 bootstrap.create_dependencies(
@@ -201,7 +197,7 @@ def _factory(
                 ),
             ),
             custom_middlewares=custom_middlewares,
-            openapi_path=api_spec_path,
+            openapi_path=spec_path,
         )
 
         asgi_app.add_exception_handler(
@@ -211,18 +207,10 @@ def _factory(
                 go_urls=[app.settings.junction_api_address],
             ),
         )
-        return asgi_app
 
-    return decorator
-
-
-def _serve(app: application.Application[bootstrap.Settings]) -> None:
-    with spec.get_api_spec(cookie_auth=app.settings.cookie_auth_enabled) as spec_path:
-        starlette.serve(
-            factory=_factory(app, spec_path),
-            host=str(app.settings.http_address),
-            port=app.settings.http_port,
-            allowed_proxy_ips=app.settings.forwarded_allowed_ips,
+        await starlette.serve(
+            starlette_app=asgi_app,
+            settings=app.settings,
         )
 
 
@@ -240,7 +228,7 @@ if __name__ == "__main__":
     entrypoint.enter_with_commands(
         application.Command(
             name="http",
-            callback=_serve,
+            callback=_http,
             settings_class=bootstrap.Settings,
         ),
         application.Command(

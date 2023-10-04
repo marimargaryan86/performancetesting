@@ -1,11 +1,9 @@
 import datetime
 import pathlib
 import random
-from collections.abc import Callable
 
 import openai
 from redis import asyncio as aioredis
-from starlette.applications import Starlette
 from starlette.middleware import Middleware
 from twilio.request_validator import RequestValidator
 
@@ -38,88 +36,81 @@ from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.grpc.client import create_channel
 
 
-def _factory(
-    app: application.Application[bootstrap.Settings],
-) -> Callable[[], Starlette]:
-    def decorator() -> Starlette:
-        openai.api_key = app.settings.openai_api_key
-        openai.organization = app.settings.openai_org
-        notifications_channel = create_channel(app.settings.notifications_address)
-        redis_client = redis.Client[str](
-            aioredis.from_url(
-                str(
-                    random.choice(app.settings.redis_dsn),  # noqa: S311
+async def _http(
+    app: application.AsyncApplication[bootstrap.Settings],
+) -> None:
+    openai.api_key = app.settings.openai_api_key
+    openai.organization = app.settings.openai_org
+    notifications_channel = create_channel(app.settings.notifications_address)
+    redis_client = redis.Client[str](
+        aioredis.from_url(
+            str(
+                random.choice(app.settings.redis_dsn),  # noqa: S311
+            ),
+            decode_responses=True,
+            retry_on_error=[aioredis.ConnectionError],
+        ).client(),
+        prefix=app.settings.redis_prefix,
+    )
+    asgi_app = starlette.create_starlette_app(
+        routes=router.get_routes(
+            bootstrap.create_dependencies(
+                monitoring_rules_client=monitoring_rules.GrpcClient(
+                    monitoring_rules=notifications_pb2_grpc.MonitoringRuleServiceStub(
+                        notifications_channel,
+                    ),
                 ),
-                decode_responses=True,
-                retry_on_error=[aioredis.ConnectionError],
-            ).client(),
-            prefix=app.settings.redis_prefix,
-        )
-        return starlette.create_starlette_app(
-            routes=router.get_routes(
-                bootstrap.create_dependencies(
-                    monitoring_rules_client=monitoring_rules.GrpcClient(
-                        monitoring_rules=notifications_pb2_grpc.MonitoringRuleServiceStub(
-                            notifications_channel,
-                        ),
+                subscribers_client=subscribers.GrpcClient(
+                    subscribers=notifications_pb2_grpc.SubscriberServiceStub(
+                        notifications_channel,
                     ),
-                    subscribers_client=subscribers.GrpcClient(
-                        subscribers=notifications_pb2_grpc.SubscriberServiceStub(
-                            notifications_channel,
-                        ),
+                ),
+                orders_client=orders.GrpcClient(
+                    orders=notifications_pb2_grpc.OrderServiceStub(
+                        notifications_channel,
                     ),
-                    orders_client=orders.GrpcClient(
-                        orders=notifications_pb2_grpc.OrderServiceStub(
-                            notifications_channel,
-                        ),
+                ),
+                configuration_vectors_client=configuration_vectors.GrpcClient(
+                    configuration_vectors=notifications_pb2_grpc.ConfigurationVectorServiceStub(
+                        notifications_channel,
                     ),
-                    configuration_vectors_client=configuration_vectors.GrpcClient(
-                        configuration_vectors=notifications_pb2_grpc.ConfigurationVectorServiceStub(
-                            notifications_channel,
-                        ),
+                ),
+                notification_event_publisher_client=notification_event_publisher.GrpcClient(
+                    notification_event_publisher=notifications_pb2_grpc.NotificationEventPublisherServiceStub(
+                        notifications_channel,
                     ),
-                    notification_event_publisher_client=notification_event_publisher.GrpcClient(
-                        notification_event_publisher=notifications_pb2_grpc.NotificationEventPublisherServiceStub(
-                            notifications_channel,
-                        ),
+                ),
+                message_handler=chatbot_handlers.MessageHandler(
+                    redis_client=redis_client,
+                    cache_ttl=datetime.timedelta(minutes=15),
+                    ai_bot=open_ai.AIBot(),
+                    shortener_client=ShortenerClient(
+                        shortener_url=app.settings.shortener_url,
+                        shortener_domain=app.settings.shortener_domain,
+                        shortener_key=app.settings.shortener_key,
                     ),
-                    message_handler=chatbot_handlers.MessageHandler(
-                        redis_client=redis_client,
-                        cache_ttl=datetime.timedelta(minutes=15),
-                        ai_bot=open_ai.AIBot(),
-                        shortener_client=ShortenerClient(
-                            shortener_url=app.settings.shortener_url,
-                            shortener_domain=app.settings.shortener_domain,
-                            shortener_key=app.settings.shortener_key,
-                        ),
-                    ),
-                    whatsapp_channel=ProviderChannel(
-                        sid=app.settings.twilio_sid,
-                        token=app.settings.twilio_token,
-                        redis_client=redis_client,
-                        templates_root_path=pathlib.Path(),
-                    ),
+                ),
+                whatsapp_channel=ProviderChannel(
+                    sid=app.settings.twilio_sid,
+                    token=app.settings.twilio_token,
+                    redis_client=redis_client,
+                    templates_root_path=pathlib.Path(),
                 ),
             ),
-            custom_middlewares=[
-                Middleware(
-                    middlewares.HmacHeaderMiddleware,
-                    secret_key=app.settings.flight_stats_app_key,
-                    twilio_validator=RequestValidator(app.settings.twilio_token),
-                ),
-            ],
-            openapi_path=None,
-        )
+        ),
+        custom_middlewares=[
+            Middleware(
+                middlewares.HmacHeaderMiddleware,
+                secret_key=app.settings.flight_stats_app_key,
+                twilio_validator=RequestValidator(app.settings.twilio_token),
+            ),
+        ],
+        openapi_path=None,
+    )
 
-    return decorator
-
-
-def _serve(app: application.Application[bootstrap.Settings]) -> None:
-    starlette.serve(
-        factory=_factory(app),
-        host=str(app.settings.http_address),
-        port=app.settings.http_port,
-        allowed_proxy_ips=app.settings.forwarded_allowed_ips,
+    await starlette.serve(
+        starlette_app=asgi_app,
+        settings=app.settings,
     )
 
 
@@ -129,7 +120,7 @@ if __name__ == "__main__":
     entrypoint.enter_with_commands(
         application.Command(
             name="http",
-            callback=_serve,
+            callback=_http,
             settings_class=bootstrap.Settings,
         ),
     )

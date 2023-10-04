@@ -1,7 +1,3 @@
-from collections.abc import Callable
-
-from starlette import applications
-
 from snowfall.project.junction.go.service.data_api import bootstrap
 from snowfall.project.junction.go.service.data_api.routes import router
 from snowfall.service.geodata.v1 import geocoding_pb2_grpc
@@ -11,34 +7,27 @@ from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.grpc import client as grpc_client
 
 
-def _factory(
-    app: application.Application[bootstrap.Settings],
-) -> Callable[[], applications.Starlette]:
-    def decorator() -> applications.Starlette:
-        geocoder = geocoding_pb2_grpc.GeocodingServiceStub(
-            grpc_client.create_channel(app.settings.geodata_address),
-        )
-        return starlette.create_starlette_app(
-            routes=router.get_routes(
-                bootstrap.create_dependencies(
-                    geocoding=geocoder,
-                ),
+async def _http(
+    app: application.AsyncApplication[bootstrap.Settings],
+) -> None:
+    geocoder = geocoding_pb2_grpc.GeocodingServiceStub(
+        grpc_client.create_channel(app.settings.geodata_address),
+    )
+    asgi_app = starlette.create_starlette_app(
+        routes=router.get_routes(
+            bootstrap.create_dependencies(
+                geocoding=geocoder,
             ),
-            openapi_path=filesystem.resource_path(
-                "junction.data_api",
-                "openapi.json",
-            ),
-        )
+        ),
+        openapi_path=filesystem.resource_path(
+            "junction.data_api",
+            "openapi.json",
+        ),
+    )
 
-    return decorator
-
-
-def _serve(app: application.Application[bootstrap.Settings]) -> None:
-    starlette.serve(
-        factory=_factory(app),
-        host=str(app.settings.http_address),
-        port=app.settings.http_port,
-        allowed_proxy_ips=app.settings.forwarded_allowed_ips,
+    await starlette.serve(
+        starlette_app=asgi_app,
+        settings=app.settings,
     )
 
 
@@ -47,7 +36,7 @@ if __name__ == "__main__":
     entrypoint.enter_with_commands(
         application.Command(
             name="http",
-            callback=_serve,
+            callback=_http,
             settings_class=bootstrap.Settings,
         ),
     )

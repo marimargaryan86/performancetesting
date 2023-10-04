@@ -1,7 +1,5 @@
-from collections.abc import Callable
-
 import httpx
-from starlette import applications, middleware
+from starlette import middleware
 from starlette.middleware import authentication as auth_middleware
 
 from snowfall.adapter import authentication as auth_adapter
@@ -60,127 +58,117 @@ class Settings(starlette.Settings):
     refunds_address: str
 
 
-def _factory(
-    app: application.Application[Settings],
-) -> Callable[[], applications.Starlette]:
-    def decorator() -> applications.Starlette:
-        authentication_channel = client.create_channel(
-            app.settings.authentication_address,
-        )
-        session_client = sessions_pb2_grpc.SessionServiceStub(authentication_channel)
-        orders_channel = client.create_channel(app.settings.orders_address)
-        companies_channel = client.create_channel(app.settings.companies_address)
-        transactions_channel = client.create_channel(app.settings.transactions_address)
-        currencies_channel = client.create_channel(app.settings.currencies_address)
-        refunds_channel = client.create_channel(app.settings.refunds_address)
-        cc_payment_client = PaymentClient(
+async def _http(app: application.AsyncApplication[Settings]) -> None:
+    authentication_channel = client.create_channel(
+        app.settings.authentication_address,
+    )
+    session_client = sessions_pb2_grpc.SessionServiceStub(authentication_channel)
+    orders_channel = client.create_channel(app.settings.orders_address)
+    companies_channel = client.create_channel(app.settings.companies_address)
+    transactions_channel = client.create_channel(app.settings.transactions_address)
+    currencies_channel = client.create_channel(app.settings.currencies_address)
+    refunds_channel = client.create_channel(app.settings.refunds_address)
+    cc_payment_client = PaymentClient(
+        base_url=app.settings.cc_address,
+        auth=CurrencyCloudAuth(
             base_url=app.settings.cc_address,
-            auth=CurrencyCloudAuth(
-                base_url=app.settings.cc_address,
-                login_id=app.settings.cc_login,
-                api_key=app.settings.cc_api_key,
-            ),
-            client=metrics.register(httpx.AsyncClient()),
-        )
+            login_id=app.settings.cc_login,
+            api_key=app.settings.cc_api_key,
+        ),
+        client=metrics.register(httpx.AsyncClient()),
+    )
 
-        asgi_app = starlette.create_starlette_app(
-            routes=router.get_routes(
-                bootstrap.create_dependencies(
-                    orders_client=orders.GrpcClient(
-                        orders_pb2_grpc.OrderServiceStub(
-                            orders_channel,
-                        ),
+    asgi_app = starlette.create_starlette_app(
+        routes=router.get_routes(
+            bootstrap.create_dependencies(
+                orders_client=orders.GrpcClient(
+                    orders_pb2_grpc.OrderServiceStub(
+                        orders_channel,
                     ),
-                    accounts_client=accounts_adapter.GrpcClient(
-                        AccountsServiceStub(
-                            companies_channel,
-                        ),
+                ),
+                accounts_client=accounts_adapter.GrpcClient(
+                    AccountsServiceStub(
+                        companies_channel,
                     ),
-                    companies_client=companies.GrpcClient(
-                        CompaniesServiceStub(
-                            companies_channel,
-                        ),
+                ),
+                companies_client=companies.GrpcClient(
+                    CompaniesServiceStub(
+                        companies_channel,
                     ),
-                    contacts_client=contacts.GrpcClient(
-                        ContactsServiceStub(
-                            companies_channel,
-                        ),
+                ),
+                contacts_client=contacts.GrpcClient(
+                    ContactsServiceStub(
+                        companies_channel,
                     ),
-                    beneficiaries_client=beneficiaries.GrpcClient(
-                        BeneficiariesServiceStub(
-                            companies_channel,
-                        ),
+                ),
+                beneficiaries_client=beneficiaries.GrpcClient(
+                    BeneficiariesServiceStub(
+                        companies_channel,
                     ),
-                    conversions_client=conversions.GrpcClient(
-                        transactions_pb2_grpc.ConversionsServiceStub(
-                            transactions_channel,
-                        ),
+                ),
+                conversions_client=conversions.GrpcClient(
+                    transactions_pb2_grpc.ConversionsServiceStub(
+                        transactions_channel,
                     ),
-                    transactions_client=transactions.GrpcClient(
-                        transactions_pb2_grpc.TransactionsServiceStub(
-                            transactions_channel,
-                        ),
+                ),
+                transactions_client=transactions.GrpcClient(
+                    transactions_pb2_grpc.TransactionsServiceStub(
+                        transactions_channel,
                     ),
-                    currencies_client=currencies.GrpcClient(
-                        currencies_pb2_grpc.CurrencyServiceStub(
-                            currencies_channel,
-                        ),
+                ),
+                currencies_client=currencies.GrpcClient(
+                    currencies_pb2_grpc.CurrencyServiceStub(
+                        currencies_channel,
                     ),
-                    cc_payment_client=cc_payment_client,
-                    quotations_client=quotations.GrpcClient(
-                        QuotationsServiceStub(
-                            transactions_channel,
-                        ),
+                ),
+                cc_payment_client=cc_payment_client,
+                quotations_client=quotations.GrpcClient(
+                    QuotationsServiceStub(
+                        transactions_channel,
                     ),
-                    bills_client=bills.GrpcClient(
-                        transactions_pb2_grpc.BillsServiceStub(
-                            transactions_channel,
-                        ),
+                ),
+                bills_client=bills.GrpcClient(
+                    transactions_pb2_grpc.BillsServiceStub(
+                        transactions_channel,
                     ),
-                    refunds_client=refunds.GrpcClient(
-                        RefundsServiceStub(
-                            refunds_channel,
-                        ),
+                ),
+                refunds_client=refunds.GrpcClient(
+                    RefundsServiceStub(
+                        refunds_channel,
                     ),
                 ),
             ),
-            openapi_path=filesystem.resource_path("junction.hub_api", "openapi.json"),
-            custom_middlewares=[
-                middleware.Middleware(
-                    auth_middleware.AuthenticationMiddleware,
-                    backend=authentication.CookieAuthenticationBackend(
-                        cookie_to_user=auth_adapter.session_cookie_resolver(
-                            session_client=session_client,
-                        ),
+        ),
+        openapi_path=filesystem.resource_path("junction.hub_api", "openapi.json"),
+        custom_middlewares=[
+            middleware.Middleware(
+                auth_middleware.AuthenticationMiddleware,
+                backend=authentication.CookieAuthenticationBackend(
+                    cookie_to_user=auth_adapter.session_cookie_resolver(
+                        session_client=session_client,
                     ),
-                    on_error=handlers.auth_error_handler,
                 ),
-            ],
-            security_headers=False,
-        )
-        asgi_app.add_exception_handler(
-            errors.NotFoundError,
-            handlers.not_found_error_handler,
-        )
-        asgi_app.add_exception_handler(
-            errors.ServiceUnavailableError,
-            handlers.service_unavailable_error_handler,
-        )
-        asgi_app.add_exception_handler(
-            errors.UnprocessableEntityError,
-            handlers.unprocessable_entity_error_handler,
-        )
-        return asgi_app
+                on_error=handlers.auth_error_handler,
+            ),
+        ],
+        security_headers=False,
+    )
+    asgi_app.add_exception_handler(
+        errors.NotFoundError,
+        handlers.not_found_error_handler,
+    )
+    asgi_app.add_exception_handler(
+        errors.ServiceUnavailableError,
+        handlers.service_unavailable_error_handler,
+    )
+    asgi_app.add_exception_handler(
+        errors.UnprocessableEntityError,
+        handlers.unprocessable_entity_error_handler,
+    )
 
-    return decorator
-
-
-def _serve(app: application.Application[Settings]) -> None:
-    starlette.serve(
-        factory=_factory(app),
-        host=str(app.settings.http_address),
-        port=app.settings.http_port,
-        allowed_proxy_ips=app.settings.forwarded_allowed_ips,
+    await starlette.serve(
+        starlette_app=asgi_app,
+        settings=app.settings,
     )
 
 
@@ -190,7 +178,7 @@ if __name__ == "__main__":
     entrypoint.enter_with_commands(
         application.Command(
             name="http",
-            callback=_serve,
+            callback=_http,
             settings_class=Settings,
         ),
     )

@@ -69,291 +69,273 @@ def _lifespan(
     return decorator
 
 
-def _factory(
-    app: application.Application[bootstrap.Settings],
-) -> Callable[[], applications.Starlette]:
-    def decorator() -> applications.Starlette:
-        mongo = motor_asyncio.AsyncIOMotorClient(
-            str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
-        )
-        redis_client = redis.Client[str](
-            aioredis.from_url(
-                str(random.choice(app.settings.redis_dsn)),  # noqa: S311
-                decode_responses=True,
-                retry_on_error=[aioredis.ConnectionError],
-            ).client(),
-            prefix=app.name,
-        )
+async def _http(
+    app: application.AsyncApplication[bootstrap.Settings],
+) -> None:
+    mongo = motor_asyncio.AsyncIOMotorClient(
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
+    )
+    redis_client = redis.Client[str](
+        aioredis.from_url(
+            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
+            decode_responses=True,
+            retry_on_error=[aioredis.ConnectionError],
+        ).client(),
+        prefix=app.name,
+    )
 
-        authentication_channel = create_channel(
-            app.settings.authentication_address,
-        )
-        transactions_channel = create_channel(
-            app.settings.transactions_address,
-        )
-        currencies_channel = create_channel(
-            app.settings.currencies_address,
-        )
-        companies_channel = create_channel(
-            app.settings.companies_address,
-        )
-        asgi_app = starlette.create_starlette_app(
-            custom_middlewares=[
-                Middleware(
-                    authentication.AuthenticationMiddleware,
-                    backend=stdlib_auth.JWTAuthenticationBackend(
-                        stdlib_auth.OryAuth(
-                            jwk_client=jwt.AsyncJWKClient(
-                                jwk_url=auth_adapter.get_jwk_url(
-                                    app.settings.authentication_address,
-                                ),
-                                key_ttl=app.settings.ory_jwk_ttl,
+    authentication_channel = create_channel(
+        app.settings.authentication_address,
+    )
+    transactions_channel = create_channel(
+        app.settings.transactions_address,
+    )
+    currencies_channel = create_channel(
+        app.settings.currencies_address,
+    )
+    companies_channel = create_channel(
+        app.settings.companies_address,
+    )
+    asgi_app = starlette.create_starlette_app(
+        custom_middlewares=[
+            Middleware(
+                authentication.AuthenticationMiddleware,
+                backend=stdlib_auth.JWTAuthenticationBackend(
+                    stdlib_auth.OryAuth(
+                        jwk_client=jwt.AsyncJWKClient(
+                            jwk_url=auth_adapter.get_jwk_url(
+                                app.settings.authentication_address,
                             ),
-                            legacy_fallback=authenticator.LegacyAuth(
-                                decoder=jwt.Decoder(
-                                    public_key=app.settings.jwt_public_key,
-                                    algorithms=["RS256"],
-                                ),
-                            ).get_user_id_from_jwt,
-                            client_resolver=auth_adapter.oauth_client_resolver(
-                                oauth_client=oauth_pb2_grpc.OAuthServiceStub(
-                                    authentication_channel,
-                                ),
+                            key_ttl=app.settings.ory_jwk_ttl,
+                        ),
+                        legacy_fallback=authenticator.LegacyAuth(
+                            decoder=jwt.Decoder(
+                                public_key=app.settings.jwt_public_key,
+                                algorithms=["RS256"],
                             ),
-                        ).get_owner_from_jwt,
-                    ),
-                    on_error=handlers.auth_error_handler,
+                        ).get_user_id_from_jwt,
+                        client_resolver=auth_adapter.oauth_client_resolver(
+                            oauth_client=oauth_pb2_grpc.OAuthServiceStub(
+                                authentication_channel,
+                            ),
+                        ),
+                    ).get_owner_from_jwt,
                 ),
-            ],
-            routes=router.get_routes(
-                bootstrap.create_dependencies(
-                    payment_client=client.PaymentClient(
+                on_error=handlers.auth_error_handler,
+            ),
+        ],
+        routes=router.get_routes(
+            bootstrap.create_dependencies(
+                payment_client=client.PaymentClient(
+                    base_url=app.settings.cc_address,
+                    auth=client.CurrencyCloudAuth(
                         base_url=app.settings.cc_address,
-                        auth=client.CurrencyCloudAuth(
-                            base_url=app.settings.cc_address,
-                            login_id=app.settings.cc_login,
-                            api_key=app.settings.cc_api_key,
-                        ),
-                        client=metrics.register(httpx.AsyncClient()),
+                        login_id=app.settings.cc_login,
+                        api_key=app.settings.cc_api_key,
                     ),
-                    currencies_client=currencies.GrpcClient(
-                        currencies_pb2_grpc.CurrencyServiceStub(
-                            currencies_channel,
-                        ),
+                    client=metrics.register(httpx.AsyncClient()),
+                ),
+                currencies_client=currencies.GrpcClient(
+                    currencies_pb2_grpc.CurrencyServiceStub(
+                        currencies_channel,
                     ),
-                    redis_client=UserSessionRepository(
-                        redis_client=redis_client,
-                        cache_ttl=datetime.timedelta(minutes=15),
+                ),
+                redis_client=UserSessionRepository(
+                    redis_client=redis_client,
+                    cache_ttl=datetime.timedelta(minutes=15),
+                ),
+                conversions_repository=ConversionRepository(
+                    mongo.conversions.conversions,
+                ),
+                transactions_client=transactions.GrpcClient(
+                    transactions_pb2_grpc.TransactionsServiceStub(
+                        transactions_channel,
                     ),
-                    conversions_repository=ConversionRepository(
-                        mongo.conversions.conversions,
+                ),
+                quotations_client=quotations.GrpcClient(
+                    transactions_pb2_grpc.QuotationsServiceStub(
+                        transactions_channel,
                     ),
-                    transactions_client=transactions.GrpcClient(
-                        transactions_pb2_grpc.TransactionsServiceStub(
-                            transactions_channel,
-                        ),
-                    ),
-                    quotations_client=quotations.GrpcClient(
-                        transactions_pb2_grpc.QuotationsServiceStub(
-                            transactions_channel,
-                        ),
-                    ),
-                    companies_client=companies_adapter.GrpcClient(
-                        companies_grpc_pb2.CompaniesServiceStub(
-                            companies_channel,
-                        ),
+                ),
+                companies_client=companies_adapter.GrpcClient(
+                    companies_grpc_pb2.CompaniesServiceStub(
+                        companies_channel,
                     ),
                 ),
             ),
-            openapi_path=filesystem.resource_path("junction.pay_api", "openapi.json"),
-        )
+        ),
+        openapi_path=filesystem.resource_path("junction.pay_api", "openapi.json"),
+    )
 
-        asgi_app.add_exception_handler(
-            cursor.CursorError,
-            handlers.cursor_error_handler,
-        )
-        asgi_app.add_exception_handler(
-            errors.NotFoundError,
-            handlers.not_found_error_handler,
-        )
-        asgi_app.add_exception_handler(
-            errors.ServiceUnavailableError,
-            handlers.service_unavailable_error_handler,
-        )
+    asgi_app.add_exception_handler(
+        cursor.CursorError,
+        handlers.cursor_error_handler,
+    )
+    asgi_app.add_exception_handler(
+        errors.NotFoundError,
+        handlers.not_found_error_handler,
+    )
+    asgi_app.add_exception_handler(
+        errors.ServiceUnavailableError,
+        handlers.service_unavailable_error_handler,
+    )
 
-        return asgi_app
-
-    return decorator
-
-
-def _admin_factory(
-    app: application.Application[bootstrap.AdminSettings],
-) -> Callable[[], applications.Starlette]:
-    def decorator() -> applications.Starlette:
-        mongo = motor_asyncio.AsyncIOMotorClient(
-            str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
-        )
-        authentication_channel = create_channel(
-            app.settings.authentication_address,
-        )
-        companies_channel = create_channel(
-            app.settings.companies_address,
-        )
-        payments_channel = create_channel(
-            app.settings.payments_address,
-        )
-        transactions_channel = create_channel(
-            app.settings.transactions_address,
-        )
-        currencies_channel = create_channel(
-            app.settings.currencies_address,
-        )
-        refunds_channel = create_channel(
-            app.settings.refunds_address,
-        )
-        cc_payment_client = client.PaymentClient(
-            base_url=app.settings.cc_address,
-            auth=client.CurrencyCloudAuth(
-                base_url=app.settings.cc_address,
-                login_id=app.settings.cc_login,
-                api_key=app.settings.cc_api_key,
-            ),
-            client=metrics.register(httpx.AsyncClient()),
-        )
-        redis_client = redis.Client[str](
-            aioredis.from_url(
-                str(random.choice(app.settings.redis_dsn)),  # noqa: S311
-                decode_responses=True,
-                retry_on_error=[aioredis.ConnectionError],
-            ).client(),
-            prefix=app.name,
-        )
-        asgi_app = starlette.create_starlette_app(
-            custom_middlewares=[
-                Middleware(
-                    authentication.AuthenticationMiddleware,
-                    backend=stdlib_auth.JWTAuthenticationBackend(
-                        stdlib_auth.OryAuth(
-                            jwk_client=jwt.AsyncJWKClient(
-                                jwk_url=auth_adapter.get_jwk_url(
-                                    app.settings.authentication_address,
-                                ),
-                                key_ttl=app.settings.ory_jwk_ttl,
-                            ),
-                            legacy_fallback=authenticator.LegacyAuth(
-                                decoder=jwt.Decoder(
-                                    public_key=app.settings.jwt_public_key,
-                                    algorithms=["RS256"],
-                                ),
-                            ).get_user_id_from_jwt,
-                            client_resolver=auth_adapter.oauth_client_resolver(
-                                oauth_client=oauth_pb2_grpc.OAuthServiceStub(
-                                    authentication_channel,
-                                ),
-                            ),
-                        ).get_owner_from_jwt,
-                    ),
-                    on_error=handlers.auth_error_handler,
-                ),
-            ],
-            routes=router.get_admin_routes(
-                bootstrap.create_admin_dependencies(
-                    cc_payment_client=cc_payment_client,
-                    authentication_client=auth_adapter.GrpcClient(
-                        authentication_pb2_grpc.AuthenticationServiceStub(
-                            authentication_channel,
-                        ),
-                    ),
-                    conversions_repository=ConversionRepository(
-                        mongo.conversions.conversions,
-                    ),
-                    beneficiaries_client=beneficiaries.GrpcClient(
-                        companies_grpc_pb2.BeneficiariesServiceStub(
-                            companies_channel,
-                        ),
-                    ),
-                    accounts_client=accounts_adapter.GrpcClient(
-                        companies_grpc_pb2.AccountsServiceStub(
-                            companies_channel,
-                        ),
-                    ),
-                    companies_client=companies_adapter.GrpcClient(
-                        companies_grpc_pb2.CompaniesServiceStub(
-                            companies_channel,
-                        ),
-                    ),
-                    contacts_client=contacts.GrpcClient(
-                        companies_grpc_pb2.ContactsServiceStub(
-                            companies_channel,
-                        ),
-                    ),
-                    transactions_client=transactions.GrpcClient(
-                        transactions_pb2_grpc.TransactionsServiceStub(
-                            transactions_channel,
-                        ),
-                    ),
-                    conversions_client=conversions.GrpcClient(
-                        transactions_pb2_grpc.ConversionsServiceStub(
-                            transactions_channel,
-                        ),
-                    ),
-                    currencies_client=currencies.GrpcClient(
-                        currencies_pb2_grpc.CurrencyServiceStub(
-                            currencies_channel,
-                        ),
-                    ),
-                    payments_client=payments.GrpcClient(
-                        PaymentsServiceStub(
-                            payments_channel,
-                        ),
-                    ),
-                    refunds_client=refunds.GrpcClient(
-                        RefundsServiceStub(
-                            refunds_channel,
-                        ),
-                    ),
-                ),
-            ),
-            openapi_path=filesystem.resource_path(
-                "junction.pay_admin_api",
-                "openapi.json",
-            ),
-            lifespan=_lifespan(cc_payment_client, redis_client),
-        )
-
-        asgi_app.add_exception_handler(
-            cursor.CursorError,
-            handlers.cursor_error_handler,
-        )
-        asgi_app.add_exception_handler(
-            errors.NotFoundError,
-            handlers.not_found_error_handler,
-        )
-        asgi_app.add_exception_handler(
-            errors.ServiceUnavailableError,
-            handlers.service_unavailable_error_handler,
-        )
-
-        return asgi_app
-
-    return decorator
-
-
-def _serve(app: application.Application[bootstrap.Settings]) -> None:
-    starlette.serve(
-        factory=_factory(app),
-        host=str(app.settings.http_address),
-        port=app.settings.http_port,
-        allowed_proxy_ips=app.settings.forwarded_allowed_ips,
+    await starlette.serve(
+        starlette_app=asgi_app,
+        settings=app.settings,
     )
 
 
-def _admin_serve(app: application.Application[bootstrap.AdminSettings]) -> None:
-    starlette.serve(
-        factory=_admin_factory(app),
-        host=str(app.settings.http_address),
-        port=app.settings.http_port,
-        allowed_proxy_ips=app.settings.forwarded_allowed_ips,
+async def _admin_http(
+    app: application.AsyncApplication[bootstrap.AdminSettings],
+) -> None:
+    mongo = motor_asyncio.AsyncIOMotorClient(
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
+    )
+    authentication_channel = create_channel(
+        app.settings.authentication_address,
+    )
+    companies_channel = create_channel(
+        app.settings.companies_address,
+    )
+    payments_channel = create_channel(
+        app.settings.payments_address,
+    )
+    transactions_channel = create_channel(
+        app.settings.transactions_address,
+    )
+    currencies_channel = create_channel(
+        app.settings.currencies_address,
+    )
+    refunds_channel = create_channel(
+        app.settings.refunds_address,
+    )
+    cc_payment_client = client.PaymentClient(
+        base_url=app.settings.cc_address,
+        auth=client.CurrencyCloudAuth(
+            base_url=app.settings.cc_address,
+            login_id=app.settings.cc_login,
+            api_key=app.settings.cc_api_key,
+        ),
+        client=metrics.register(httpx.AsyncClient()),
+    )
+    redis_client = redis.Client[str](
+        aioredis.from_url(
+            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
+            decode_responses=True,
+            retry_on_error=[aioredis.ConnectionError],
+        ).client(),
+        prefix=app.name,
+    )
+    asgi_app = starlette.create_starlette_app(
+        custom_middlewares=[
+            Middleware(
+                authentication.AuthenticationMiddleware,
+                backend=stdlib_auth.JWTAuthenticationBackend(
+                    stdlib_auth.OryAuth(
+                        jwk_client=jwt.AsyncJWKClient(
+                            jwk_url=auth_adapter.get_jwk_url(
+                                app.settings.authentication_address,
+                            ),
+                            key_ttl=app.settings.ory_jwk_ttl,
+                        ),
+                        legacy_fallback=authenticator.LegacyAuth(
+                            decoder=jwt.Decoder(
+                                public_key=app.settings.jwt_public_key,
+                                algorithms=["RS256"],
+                            ),
+                        ).get_user_id_from_jwt,
+                        client_resolver=auth_adapter.oauth_client_resolver(
+                            oauth_client=oauth_pb2_grpc.OAuthServiceStub(
+                                authentication_channel,
+                            ),
+                        ),
+                    ).get_owner_from_jwt,
+                ),
+                on_error=handlers.auth_error_handler,
+            ),
+        ],
+        routes=router.get_admin_routes(
+            bootstrap.create_admin_dependencies(
+                cc_payment_client=cc_payment_client,
+                authentication_client=auth_adapter.GrpcClient(
+                    authentication_pb2_grpc.AuthenticationServiceStub(
+                        authentication_channel,
+                    ),
+                ),
+                conversions_repository=ConversionRepository(
+                    mongo.conversions.conversions,
+                ),
+                beneficiaries_client=beneficiaries.GrpcClient(
+                    companies_grpc_pb2.BeneficiariesServiceStub(
+                        companies_channel,
+                    ),
+                ),
+                accounts_client=accounts_adapter.GrpcClient(
+                    companies_grpc_pb2.AccountsServiceStub(
+                        companies_channel,
+                    ),
+                ),
+                companies_client=companies_adapter.GrpcClient(
+                    companies_grpc_pb2.CompaniesServiceStub(
+                        companies_channel,
+                    ),
+                ),
+                contacts_client=contacts.GrpcClient(
+                    companies_grpc_pb2.ContactsServiceStub(
+                        companies_channel,
+                    ),
+                ),
+                transactions_client=transactions.GrpcClient(
+                    transactions_pb2_grpc.TransactionsServiceStub(
+                        transactions_channel,
+                    ),
+                ),
+                conversions_client=conversions.GrpcClient(
+                    transactions_pb2_grpc.ConversionsServiceStub(
+                        transactions_channel,
+                    ),
+                ),
+                currencies_client=currencies.GrpcClient(
+                    currencies_pb2_grpc.CurrencyServiceStub(
+                        currencies_channel,
+                    ),
+                ),
+                payments_client=payments.GrpcClient(
+                    PaymentsServiceStub(
+                        payments_channel,
+                    ),
+                ),
+                refunds_client=refunds.GrpcClient(
+                    RefundsServiceStub(
+                        refunds_channel,
+                    ),
+                ),
+            ),
+        ),
+        openapi_path=filesystem.resource_path(
+            "junction.pay_admin_api",
+            "openapi.json",
+        ),
+        lifespan=_lifespan(cc_payment_client, redis_client),
+    )
+
+    asgi_app.add_exception_handler(
+        cursor.CursorError,
+        handlers.cursor_error_handler,
+    )
+    asgi_app.add_exception_handler(
+        errors.NotFoundError,
+        handlers.not_found_error_handler,
+    )
+    asgi_app.add_exception_handler(
+        errors.ServiceUnavailableError,
+        handlers.service_unavailable_error_handler,
+    )
+
+    await starlette.serve(
+        starlette_app=asgi_app,
+        settings=app.settings,
     )
 
 
@@ -363,12 +345,12 @@ if __name__ == "__main__":
     entrypoint.enter_with_commands(
         application.Command(
             name="http",
-            callback=_serve,
+            callback=_http,
             settings_class=bootstrap.Settings,
         ),
         application.Command(
             name="admin-http",
-            callback=_admin_serve,
+            callback=_admin_http,
             settings_class=bootstrap.AdminSettings,
         ),
     )
