@@ -5,9 +5,12 @@ package snowfall.project.junction.go.service.resellers.v1;
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/resellers/v1";
 
 message Reseller {
+  reserved 5;
+  reserved "providers";
   string id = 1;
   string name = 2;
   string company_id = 3;
   string default_currency = 4;
-  repeated string providers = 5;
+  repeated string provider_ids = 7;
+  repeated string parent_reseller_ids = 6;
 }

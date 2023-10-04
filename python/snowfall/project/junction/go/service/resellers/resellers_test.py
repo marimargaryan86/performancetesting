@@ -16,7 +16,7 @@ async def reseller(
             name="qa-integration-testing",
             company_id="0f9c58dc-35a9-4828-8505-a4f330d23408",
             default_currency="EUR",
-            providers=[
+            provider_ids=[
                 "0f9c58dc-35a9-4828-8505-a4f330d23411",
                 "0f9c58dc-35a9-4828-8505-a4f330d23422",
             ],

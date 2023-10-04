@@ -42,10 +42,9 @@ message ListResellersResponse {
 }
 
 message UpdateResellerRequest {
-  string id = 1;
-  string name = 2;
-  string default_currency = 3;
-  repeated string providers = 4;
+  reserved 1, 2, 3, 4;
+  reserved "id", "name", "default_currency", "providers";
+  Reseller reseller = 5;
 }
 
 message UpdateResellerResponse {

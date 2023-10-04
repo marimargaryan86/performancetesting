@@ -90,25 +90,12 @@ class ResellerService(  # noqa: WPS214
         request: resellers_pb2.UpdateResellerRequest,
         context: aio.ServicerContext,
     ) -> resellers_pb2.UpdateResellerResponse:
-        reseller = await self._repository.find_by_id(request.id)
-
-        if not reseller:
+        if not await self._repository.exists(request.reseller.id):
             await context.abort(StatusCode.NOT_FOUND)
 
-        if request.providers:
-            reseller.ClearField("providers")  # type: ignore[union-attr]
+        await self._repository.upsert(request.reseller)
 
-        reseller.MergeFrom(  # type: ignore[union-attr]
-            models_pb2.Reseller(
-                name=request.name,
-                default_currency=request.default_currency,
-                providers=request.providers,
-            ),
-        )
-
-        await self._repository.update(reseller)  # type: ignore[arg-type]
-
-        return resellers_pb2.UpdateResellerResponse(reseller=reseller)
+        return resellers_pb2.UpdateResellerResponse(reseller=request.reseller)
 
     async def DeleteReseller(  # type: ignore[override] # noqa: N802
         self,
@@ -148,7 +135,7 @@ class ResellerService(  # noqa: WPS214
         )
 
         for reseller in resellers:
-            reseller_providers_mapping[reseller.id] = list(reseller.providers)
+            reseller_providers_mapping[reseller.id] = list(reseller.provider_ids)
 
         return await self._client.put_key(
             self._reseller_providers_key,
