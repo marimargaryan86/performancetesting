@@ -107,6 +107,12 @@ const config = {
         items: [
           {
             type: 'docSidebar',
+            sidebarId: 'onboarding',
+            position: 'left',
+            label: 'Onboarding',
+          },
+          {
+            type: 'docSidebar',
             sidebarId: 'development',
             position: 'left',
             label: 'Development',
