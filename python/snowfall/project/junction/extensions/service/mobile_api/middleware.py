@@ -1,6 +1,14 @@
-import jwt
+import dataclasses
+from collections.abc import Awaitable, Callable
+
+import jwt as jwtlib
 from cryptography.hazmat.primitives import serialization
-from starlette import authentication, requests
+from starlette import applications, authentication, requests, responses
+from starlette.middleware import base
+
+from snowfall.stdlib.format import jwt
+from snowfall.stdlib.integration.starlette import authentication as stdlib_auth
+from snowfall.stdlib.transport.http import auth
 
 
 class AuthenticationBackend(authentication.AuthenticationBackend):
@@ -55,7 +63,7 @@ class AuthenticationBackend(authentication.AuthenticationBackend):
     def _get_client_id_from_jwt_token(self, jwt_token: str) -> str:
         try:
             payload = self._get_payload_from_jwt_token(jwt_token)
-        except jwt.exceptions.PyJWTError as err:
+        except jwtlib.exceptions.PyJWTError as err:
             raise authentication.AuthenticationError("Invalid JWT token.") from err
 
         if payload.get("version") != self._token_version:
@@ -73,8 +81,46 @@ class AuthenticationBackend(authentication.AuthenticationBackend):
     def _get_payload_from_jwt_token(self, jwt_token: str) -> dict[str, str]:
         key = serialization.load_pem_public_key(self._public_key.encode())
 
-        return jwt.decode(
+        return jwtlib.decode(
             jwt=jwt_token,
             key=key,  # type: ignore[arg-type]
             algorithms=["RS256"],
         )
+
+
+@dataclasses.dataclass(kw_only=True, frozen=True)
+class _Version1Payload(jwt.Payload):
+    client_id: str
+
+
+class HubHackBackend(base.BaseHTTPMiddleware):
+    def __init__(
+        self,
+        app: applications.Starlette,
+        jwt_auth: auth.TemporaryTokenAuth,
+        jwt_encoder: jwt.Encoder,
+    ):
+        super().__init__(app)
+        self._jwt = jwt_auth
+        self._encoder = jwt_encoder
+
+    async def dispatch(
+        self,
+        request: requests.Request,
+        call_next: Callable[[requests.Request], Awaitable[responses.Response]],
+    ) -> responses.Response:
+        if not isinstance(request.user, stdlib_auth.AuthenticatedUser):
+            return await call_next(request)
+
+        with self._jwt.temporary(self._generate_jwt(request.user)):
+            return await call_next(request)
+
+    def _generate_jwt(self, user: stdlib_auth.AuthenticatedUser) -> str:
+        reseller_id = user.metadata.get("reseller_id")
+
+        if not reseller_id:
+            raise authentication.AuthenticationError(
+                "No reseller associated with this account.",
+            )
+
+        return self._encoder.encode(_Version1Payload(client_id=reseller_id))

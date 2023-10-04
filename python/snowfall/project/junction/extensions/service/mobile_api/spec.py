@@ -42,7 +42,7 @@ def _create_temporary_spec_file(
 
 
 @contextlib.contextmanager
-def get_api_spec() -> Iterator[pathlib.Path]:
+def get_api_spec(*, cookie_auth: bool = False) -> Iterator[pathlib.Path]:
     with tempfile.TemporaryDirectory() as temp:
         temp_path = pathlib.Path(temp)
         client_api_spec_path = _create_temporary_spec_file(
@@ -59,6 +59,34 @@ def get_api_spec() -> Iterator[pathlib.Path]:
                 "openapi.json",
             ),
         )
+
+        if cookie_auth:
+            _replace_in_file(
+                mobile_api_spec_path,
+                [
+                    (
+                        re.compile(
+                            r'(?<="securitySchemes": {).*?^\s{4}(?=})',
+                            flags=re.DOTALL | re.MULTILINE,
+                        ),
+                        '"cookie":{"type":"apiKey","in":"cookie","name":"ory_kratos_session"}',
+                    ),
+                    (
+                        re.compile(
+                            r'^\s{2}"security":.*?^\s{2}]',
+                            flags=re.DOTALL | re.MULTILINE,
+                        ),
+                        '"security": [{"cookie": []}]',
+                    ),
+                    (
+                        re.compile(
+                            r'"security": \[\n.*?"otp": \[].*?],',
+                            flags=re.DOTALL | re.MULTILINE,
+                        ),
+                        "",
+                    ),
+                ],
+            )
 
         _replace_in_file(
             client_api_spec_path,

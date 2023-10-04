@@ -40,6 +40,9 @@ class Settings(application.Settings):
     support_email: str
     create_stripe_customers: bool
     mongo_db: str
+    cookie_auth_enabled: bool = False
+    authentication_address: str | None = None
+    junction_private_key: str | None = None
 
 
 def create_dependencies(  # noqa: WPS211

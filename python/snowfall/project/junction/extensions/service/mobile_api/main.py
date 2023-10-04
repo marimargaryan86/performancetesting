@@ -13,6 +13,7 @@ from redis import asyncio as aioredis
 from starlette import applications
 from starlette.middleware import Middleware, authentication
 
+from snowfall.adapter import authentication as auth_adapter
 from snowfall.project.junction.extensions.service.mobile_api import (
     bootstrap,
     jwt_generator,
@@ -28,14 +29,75 @@ from snowfall.project.junction.extensions.service.mobile_api import (
     handlers as mobile_handlers,
 )
 from snowfall.project.junction.extensions.service.mobile_api.routes import router
+from snowfall.service.authentication.v1 import sessions_pb2_grpc
+from snowfall.stdlib.format import jwt
 from snowfall.stdlib.instrumentation.httpx import metrics
 from snowfall.stdlib.integration.starlette import application as starlette
+from snowfall.stdlib.integration.starlette import authentication as starlette_auth
 from snowfall.stdlib.integration.starlette import handlers
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.service import application
+from snowfall.stdlib.transport.grpc import client as grpc_transport_client
 from snowfall.stdlib.transport.http import auth
 from snowfall.vendor.junction import client as base_client
 from snowfall.vendor.junction.go import client
+
+
+def _get_httpx_auth_and_middlewares(
+    settings: bootstrap.Settings,
+) -> tuple[httpx.Auth, list[Middleware]]:
+    httpx_auth_method: httpx.Auth
+
+    if settings.cookie_auth_enabled:
+        if not settings.authentication_address or settings.jwt_private_key:
+            raise RuntimeError("Missing required configuration.")
+
+        httpx_auth_method = auth.TemporaryTokenAuth()
+        custom_middlewares = [
+            Middleware(
+                authentication.AuthenticationMiddleware,
+                backend=starlette_auth.CookieAuthenticationBackend(
+                    cookie_to_user=auth_adapter.session_cookie_resolver(
+                        session_client=sessions_pb2_grpc.SessionServiceStub(
+                            grpc_transport_client.create_channel(
+                                settings.authentication_address,
+                            ),
+                        ),
+                    ),
+                ),
+                on_error=handlers.auth_error_handler,
+            ),
+            Middleware(
+                middleware.HubHackBackend,
+                jwt_auth=httpx_auth_method,
+                jwt_encoder=jwt.Encoder(
+                    private_key=settings.jwt_private_key,
+                    algorithm="RS256",
+                ),
+            ),
+        ]
+    else:
+        httpx_auth_method = auth.ClientCredentialsAuth(
+            client=httpx_client.AsyncOAuth2Client(
+                client_id=settings.ory_client_id,
+                client_secret=settings.ory_client_secret,
+            ),
+            token_endpoint=str(settings.ory_client_token_endpoint),
+        )
+        custom_middlewares = [
+            Middleware(
+                authentication.AuthenticationMiddleware,
+                backend=middleware.AuthenticationBackend(
+                    token_version=settings.jwt_token_version,
+                    public_key=base64.b64decode(
+                        settings.jwt_public_key.encode(),
+                    ).decode(),
+                ),
+                on_error=handlers.auth_error_handler,
+            ),
+        ]
+
+    return httpx_auth_method, custom_middlewares
 
 
 def _factory(
@@ -44,15 +106,10 @@ def _factory(
 ) -> Callable[[], applications.Starlette]:
     def decorator() -> applications.Starlette:
         stripe.api_key = app.settings.stripe_api_key
+        httpx_auth, custom_middlewares = _get_httpx_auth_and_middlewares(app.settings)
         junction_httpx_client = base_client.create_httpx_client(
             base_url=app.settings.junction_api_address,
-            auth=auth.ClientCredentialsAuth(
-                client=httpx_client.AsyncOAuth2Client(
-                    client_id=app.settings.ory_client_id,
-                    client_secret=app.settings.ory_client_secret,
-                ),
-                token_endpoint=str(app.settings.ory_client_token_endpoint),
-            ),
+            auth=httpx_auth,
             client=httpx.AsyncClient(timeout=10),
         )
         metrics.register(junction_httpx_client)
@@ -143,18 +200,7 @@ def _factory(
                     httpx_client=junction_httpx_client,
                 ),
             ),
-            custom_middlewares=[
-                Middleware(
-                    authentication.AuthenticationMiddleware,
-                    backend=middleware.AuthenticationBackend(
-                        token_version=app.settings.jwt_token_version,
-                        public_key=base64.b64decode(
-                            app.settings.jwt_public_key.encode(),
-                        ).decode(),
-                    ),
-                    on_error=handlers.auth_error_handler,
-                ),
-            ],
+            custom_middlewares=custom_middlewares,
             openapi_path=api_spec_path,
         )
 
@@ -171,9 +217,9 @@ def _factory(
 
 
 def _serve(app: application.Application[bootstrap.Settings]) -> None:
-    with spec.get_api_spec() as temp_spec_path:
+    with spec.get_api_spec(cookie_auth=app.settings.cookie_auth_enabled) as spec_path:
         starlette.serve(
-            factory=_factory(app, temp_spec_path),
+            factory=_factory(app, spec_path),
             host=str(app.settings.http_address),
             port=app.settings.http_port,
             allowed_proxy_ips=app.settings.forwarded_allowed_ips,
