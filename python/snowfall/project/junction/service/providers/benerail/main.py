@@ -1,6 +1,5 @@
 import contextlib
 import os
-import uuid
 from typing import cast
 
 import aiosmtplib
@@ -17,18 +16,18 @@ from snowfall.project.junction.service.providers.benerail import (
     pricing,
     stations,
 )
+from snowfall.project.junction.service.providers.benerail.constant import PROVIDER_ID
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import types
 from snowfall.vendor.benerail import client
 
-_PROVIDER_ID = uuid.UUID("caefde65-c15c-4b60-b8d9-27638b50b08f")
 _PROVIDER_NAME = "Benerail"
 
 
 async def _meta_factory() -> meta.MetaImplementation:
-    return meta.MetaImplementation(identifier=_PROVIDER_ID, name=_PROVIDER_NAME)
+    return meta.MetaImplementation(identifier=PROVIDER_ID, name=_PROVIDER_NAME)
 
 
 async def _bookings_factory(
@@ -52,7 +51,7 @@ async def _bookings_factory(
     return bookings.Implementation(
         storage=storage,
         transformer=booking.Transformer(
-            provider_identifier=_PROVIDER_ID,
+            provider_identifier=PROVIDER_ID,
             provider_name=_PROVIDER_NAME,
         ).raw_to_booking,
         enrich=booking.Enricher(
@@ -171,7 +170,7 @@ if __name__ == "__main__":
         ),
         service.Command(
             name="orders",
-            callback=orders.orders_factory(str(_PROVIDER_ID)),
+            callback=orders.orders_factory(str(PROVIDER_ID)),
             settings_class=config.OrdersSettings,
         ),
         service.Command(

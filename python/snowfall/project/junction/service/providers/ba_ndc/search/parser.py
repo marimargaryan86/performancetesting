@@ -9,6 +9,7 @@ from snowfall.project.junction.go.service.offers.v1 import (
 from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.project.junction.provider import airports, parsers
 from snowfall.project.junction.service.providers.ba_ndc import cache, enums
+from snowfall.project.junction.service.providers.ba_ndc.constant import PROVIDER_ID
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1 import latlng_pb2
@@ -197,6 +198,7 @@ class OfferParser(object):  # noqa: WPS214
                 offers_adapter,
             ),
             segments=offer_segm,
+            provider_id=str(PROVIDER_ID),
         )
 
     def check_if_international_flight(

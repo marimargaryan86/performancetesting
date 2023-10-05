@@ -3,7 +3,6 @@ from __future__ import annotations
 import contextlib
 import pathlib
 import random
-import uuid
 
 import httpx
 from redis import asyncio as aioredis
@@ -21,6 +20,9 @@ from snowfall.project.junction.service.providers.direct_ferries import (
 )
 from snowfall.project.junction.service.providers.direct_ferries import (
     consumer as df_consumer,
+)
+from snowfall.project.junction.service.providers.direct_ferries.constant import (
+    PROVIDER_ID,
 )
 from snowfall.project.junction.service.providers.direct_ferries.gtfs import (
     converter,
@@ -41,12 +43,11 @@ _Impl = offers.OfferSearchImplementation[
     request.QuoteRequest,
 ]
 
-_PROVIDER_ID = uuid.UUID("92ada881-f31c-471e-a8b0-01ed48a181d5")
 _PROVIDER_NAME = "Direct Ferries"
 
 
 async def _meta_factory() -> meta.MetaImplementation:
-    return meta.MetaImplementation(identifier=_PROVIDER_ID, name=_PROVIDER_NAME)
+    return meta.MetaImplementation(identifier=PROVIDER_ID, name=_PROVIDER_NAME)
 
 
 def _create_client(

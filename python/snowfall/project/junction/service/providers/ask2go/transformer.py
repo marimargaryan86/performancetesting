@@ -9,6 +9,7 @@ from snowfall.project.junction.go.service.offers.v1 import models_pb2 as offers_
 from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.project.junction.provider import airports, cabin_classes, parsers
 from snowfall.project.junction.service.providers.ask2go import cache, models
+from snowfall.project.junction.service.providers.ask2go.constant import PROVIDER_ID
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1 import latlng_pb2, money_pb2
@@ -141,6 +142,7 @@ class OfferTransformer(object):  # noqa: WPS214
                 grouped_offer_segments,
             ),
             segments=[grouped_segment[1] for grouped_segment in grouped_offer_segments],
+            provider_id=str(PROVIDER_ID),
         )
 
     def _get_offer_price_doc_requirements(

@@ -1,5 +1,3 @@
-import uuid
-
 from snowfall.project.junction.provider import bookings, meta, service
 from snowfall.project.junction.service.providers.ba_ndc import (
     booking,
@@ -8,14 +6,14 @@ from snowfall.project.junction.service.providers.ba_ndc import (
     orders,
     pricing,
 )
+from snowfall.project.junction.service.providers.ba_ndc.constant import PROVIDER_ID
 from snowfall.stdlib.persistence import filesystem
 
-_PROVIDER_ID = uuid.UUID("f1f884bf-0be6-4ce2-8414-296a775a508d")
 _PROVIDER_NAME = "British Airways NDC"
 
 
 async def _meta_factory() -> meta.MetaImplementation:
-    return meta.MetaImplementation(identifier=_PROVIDER_ID, name=_PROVIDER_NAME)
+    return meta.MetaImplementation(identifier=PROVIDER_ID, name=_PROVIDER_NAME)
 
 
 async def _bookings_factory(
@@ -28,7 +26,7 @@ async def _bookings_factory(
     return bookings.Implementation(
         storage=storage,
         transformer=booking.Transformer(
-            provider_identifier=_PROVIDER_ID,
+            provider_identifier=PROVIDER_ID,
             provider_name=_PROVIDER_NAME,
         ).raw_to_booking,
     )

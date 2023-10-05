@@ -3,7 +3,6 @@ from __future__ import annotations
 import contextlib
 import datetime
 import random
-import uuid
 from collections.abc import Sequence
 
 import aiosmtplib
@@ -31,6 +30,7 @@ from snowfall.project.junction.service.providers.ask2go import (
     transformer,
 )
 from snowfall.project.junction.service.providers.ask2go import offers as a2g_offers
+from snowfall.project.junction.service.providers.ask2go.constant import PROVIDER_ID
 from snowfall.project.junction.service.providers.ask2go.v1 import amqp_pb2
 from snowfall.stdlib import h3
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
@@ -98,12 +98,11 @@ _Impl = offers.OfferSearchImplementation[
     search_models.CreateSearchCriteria,
 ]
 
-_PROVIDER_ID = uuid.UUID("4b7d12db-7735-4c67-9645-5fc82f7c4fe8")
 _PROVIDER_NAME = "Ask2Go"
 
 
 async def _meta_factory() -> meta.MetaImplementation:
-    return meta.MetaImplementation(identifier=_PROVIDER_ID, name=_PROVIDER_NAME)
+    return meta.MetaImplementation(identifier=PROVIDER_ID, name=_PROVIDER_NAME)
 
 
 async def _offers(
@@ -234,7 +233,7 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
         price_quote_cache=cache.PriceQuoteCache(
             client=redis.Client(redis_connection, prefix=app.name),
         ),
-        provider_id=_PROVIDER_ID,
+        provider_id=PROVIDER_ID,
         provider_name=_PROVIDER_NAME,
     ).consume()
 
@@ -355,7 +354,7 @@ async def _bookings_factory(
     return bookings.Implementation(
         storage=storage,
         transformer=booking.Transformer(
-            provider_identifier=_PROVIDER_ID,
+            provider_identifier=PROVIDER_ID,
             provider_name=_PROVIDER_NAME,
         ).raw_to_booking,
     )

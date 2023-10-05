@@ -36,6 +36,10 @@ PLACES = (
     "28a2ee10-d0a7-4a70-89f3-6d587f4dba70",
     "f87c4a6d-fa48-4abb-927c-25447827f5a6",
 )
+PROVIDERS = (
+    "28a2ee10-d0a7-4a70-89f3-6d587f4dba33",
+    "f87c4a6d-fa48-4abb-927c-25447827f511",
+)
 TRIPS = (
     "9d672f0e-0934-4388-8568-03e40c0bf0e9",
     "51e3688b-057f-4553-95c7-53dc05559688",
@@ -298,6 +302,7 @@ def generate_offer(identifier: str) -> offers_pb2.OfferAggregate:
                 expires_at=protobuf.datetime_to_protobuf(
                     datetime.datetime.now(tz=datetime.UTC),
                 ),
+                provider_id=PROVIDERS[0],
             ),
             offers_pb2.OfferGroup(
                 id=OFFER_GROUPS[1],
@@ -371,6 +376,7 @@ def generate_offer(identifier: str) -> offers_pb2.OfferAggregate:
                 expires_at=protobuf.datetime_to_protobuf(
                     datetime.datetime.now(tz=datetime.UTC),
                 ),
+                provider_id=PROVIDERS[1],
             ),
         ],
     )

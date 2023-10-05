@@ -7,7 +7,6 @@ import os
 import pathlib
 import pkgutil
 import random
-import uuid
 from collections.abc import Sequence
 from typing import cast
 
@@ -33,6 +32,9 @@ from snowfall.project.junction.service.providers.save_a_train import (
     criteria,
     train_stations,
 )
+from snowfall.project.junction.service.providers.save_a_train.constant import (
+    PROVIDER_ID,
+)
 from snowfall.project.junction.service.providers.save_a_train.v1 import amqp_pb2
 from snowfall.service.geodata.v1 import geocoding_pb2_grpc
 from snowfall.stdlib import h3
@@ -45,7 +47,6 @@ from snowfall.stdlib.transport.grpc import client as grpc_client
 from snowfall.vendor.save_a_train import client
 from snowfall.vendor.save_a_train.models import request
 
-_PROVIDER_ID = uuid.UUID("a5547dae-9c65-4746-8637-d0601865508e")
 _PROVIDER_NAME = "Save A Train"
 
 
@@ -114,7 +115,7 @@ _Impl = offers.OfferSearchImplementation[
 
 
 async def _meta_factory() -> meta.MetaImplementation:
-    return meta.MetaImplementation(identifier=_PROVIDER_ID, name=_PROVIDER_NAME)
+    return meta.MetaImplementation(identifier=PROVIDER_ID, name=_PROVIDER_NAME)
 
 
 async def _offers_factory(
@@ -209,7 +210,7 @@ async def _bookings_factory(
     return bookings.Implementation(
         storage=storage,
         transformer=adapter.Transformer(
-            provider_identifier=_PROVIDER_ID,
+            provider_identifier=PROVIDER_ID,
             provider_name=_PROVIDER_NAME,
             url_timeout=app.settings.ticket_link_timeout.seconds,
         ).raw_to_booking,
@@ -297,7 +298,7 @@ async def _orders(  # noqa: WPS217
             booking_storage=booking_storage,
         ),
         offers_cache=offer_cache,
-        provider_id=str(_PROVIDER_ID),
+        provider_id=str(PROVIDER_ID),
     )
 
     await orders_consumer.consume()

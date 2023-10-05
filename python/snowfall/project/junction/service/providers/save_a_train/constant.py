@@ -1,0 +1,3 @@
+import uuid
+
+PROVIDER_ID = uuid.UUID("a5547dae-9c65-4746-8637-d0601865508e")

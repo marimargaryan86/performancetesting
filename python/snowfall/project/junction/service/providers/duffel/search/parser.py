@@ -12,6 +12,7 @@ from snowfall.project.junction.go.service.offers.v1 import (
 from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.project.junction.provider import parsers
 from snowfall.project.junction.service.providers.duffel import cache, enums
+from snowfall.project.junction.service.providers.duffel.constant import PROVIDER_ID
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1 import latlng_pb2
@@ -53,6 +54,7 @@ class OfferParser(object):  # noqa: WPS214
             expires_at=protobuf.datetime_to_protobuf(expires_at),
             offers=await self._get_group_offers(offers, offer_segments, expires_at),
             segments=offer_segments,
+            provider_id=str(PROVIDER_ID),
         )
 
     def _get_expires_at(self, offers: Sequence[Offer]) -> datetime.datetime:

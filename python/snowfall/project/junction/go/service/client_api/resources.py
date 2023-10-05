@@ -98,6 +98,9 @@ class OfferGroupResource(models.Resource):
         return cls(
             id=group.id,
             type=OfferGroupResource.api_type,
+            meta={
+                "providerId": group.provider_id,
+            },
             attributes={
                 "expiresAt": protobuf.protobuf_to_datetime(group.expires_at),
             },

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import contextlib
 import datetime
-import uuid
 from typing import Any, cast
 
 import pydantic
@@ -20,11 +19,11 @@ from snowfall.project.junction.service.providers.mock import (
     pricing,
     trips,
 )
+from snowfall.project.junction.service.providers.mock.constant import PROVIDER_ID
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 
-_PROVIDER_ID = uuid.UUID("f9ce75d1-2025-4ab5-b5d7-69e4c14c053e")
 _PROVIDER_NAME = "Mock"
 
 
@@ -112,14 +111,14 @@ async def _bookings(app: service.Application[_BookingsSettings]) -> None:
                 client=redis.Client(redis_connection, prefix=app.name),
             ),
             booking_storage=storage,
-            provider_id=_PROVIDER_ID,
+            provider_id=PROVIDER_ID,
             provider_name=_PROVIDER_NAME,
         ),
     ).consume()
 
 
 async def _meta_factory() -> meta.MetaImplementation:
-    return meta.MetaImplementation(identifier=_PROVIDER_ID, name=_PROVIDER_NAME)
+    return meta.MetaImplementation(identifier=PROVIDER_ID, name=_PROVIDER_NAME)
 
 
 async def _offers_factory(

@@ -7,6 +7,9 @@ from snowfall.project.junction.go.service.offers.v1 import (
 )
 from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.project.junction.service.providers.distribusion import cache
+from snowfall.project.junction.service.providers.distribusion.constant import (
+    PROVIDER_ID,
+)
 from snowfall.project.junction.service.providers.distribusion.search import amenities
 from snowfall.project.junction.service.providers.distribusion.v1 import amqp_pb2
 from snowfall.stdlib import money, string
@@ -376,6 +379,7 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
             expires_at=protobuf.datetime_to_protobuf(expires_at),
             offers=offers,
             segments=segments,
+            provider_id=str(PROVIDER_ID),
         )
 
     def _parse_segments(

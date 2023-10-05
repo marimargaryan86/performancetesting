@@ -90,6 +90,7 @@ message OfferGroup {
   // min/max prices?
   repeated Offer offers = 4;
   repeated OfferSegment segments = 5;
+  string provider_id = 6;
 }
 
 message Offer {

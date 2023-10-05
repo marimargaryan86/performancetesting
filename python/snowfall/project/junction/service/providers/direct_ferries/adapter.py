@@ -7,6 +7,9 @@ from snowfall.project.junction.go.service.offers.v1 import (
 )
 from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.project.junction.service.providers.direct_ferries import cache, port
+from snowfall.project.junction.service.providers.direct_ferries.constant import (
+    PROVIDER_ID,
+)
 from snowfall.project.junction.service.providers.direct_ferries.v1alpha import amqp_pb2
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
@@ -235,4 +238,5 @@ class DfAdapter(object):
                     ),
                 ],
                 segments=segments,
+                provider_id=str(PROVIDER_ID),
             )

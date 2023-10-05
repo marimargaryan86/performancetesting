@@ -12,6 +12,7 @@ from google.protobuf import message, timestamp_pb2
 from snowfall.project.junction.go.service.offers.v1 import models_pb2 as offers_pb2
 from snowfall.project.junction.go.v1 import models_pb2 as common_pb2
 from snowfall.project.junction.service.providers.mock import cache
+from snowfall.project.junction.service.providers.mock.constant import PROVIDER_ID
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 
@@ -215,6 +216,7 @@ class Generator(object):
                 ),
             ],
             segments=offer_segments,
+            provider_id=str(PROVIDER_ID),
         )
 
 

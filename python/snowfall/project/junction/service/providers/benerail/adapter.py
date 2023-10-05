@@ -23,6 +23,7 @@ from snowfall.project.junction.service.providers.benerail import (
     helper_models,
     train_stations,
 )
+from snowfall.project.junction.service.providers.benerail.constant import PROVIDER_ID
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
@@ -312,6 +313,7 @@ class BenerailAdapter(object):  # noqa: WPS214
                         segment_id=segment_id,
                     ),
                 ],
+                provider_id=str(PROVIDER_ID),
             )
 
     async def _get_trips_of_offer_collection(  # noqa: WPS231
