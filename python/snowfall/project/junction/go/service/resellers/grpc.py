@@ -1,5 +1,4 @@
 import json
-import uuid
 from collections.abc import Sequence
 
 from grpc import StatusCode, aio
@@ -96,20 +95,6 @@ class ResellerService(  # noqa: WPS214
         await self._repository.upsert(request.reseller)
 
         return resellers_pb2.UpdateResellerResponse(reseller=request.reseller)
-
-    async def DeleteReseller(  # type: ignore[override] # noqa: N802
-        self,
-        request: resellers_pb2.DeleteResellerRequest,
-        context: aio.ServicerContext,
-    ) -> resellers_pb2.DeleteResellerResponse:
-        try:
-            uuid.UUID(request.id)
-        except ValueError:
-            await context.abort(StatusCode.INVALID_ARGUMENT)
-
-        await self._repository.delete(request.id)
-
-        return resellers_pb2.DeleteResellerResponse()
 
     async def PromoteResellerConfig(  # type: ignore[override] # noqa: N802
         self,

@@ -23,9 +23,3 @@ class ResellerRepository(  # noqa: WPS215
             cur=cursor,
             filter_={"_id": {"$in": identifiers}} if identifiers else None,
         )
-
-    async def delete(self, identifier: str) -> None:
-        await self._execute(
-            self._collection.delete_one,
-            filter={"_id": identifier},
-        )

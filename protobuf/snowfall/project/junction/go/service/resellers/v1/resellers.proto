@@ -11,7 +11,6 @@ service ResellerService {
   rpc GetReseller(GetResellerRequest) returns (GetResellerResponse) {}
   rpc ListResellers(ListResellersRequest) returns (ListResellersResponse) {}
   rpc UpdateReseller(UpdateResellerRequest) returns (UpdateResellerResponse) {}
-  rpc DeleteReseller(DeleteResellerRequest) returns (DeleteResellerResponse) {}
   rpc PromoteResellerConfig(PromoteResellerConfigRequest) returns (PromoteResellerConfigResponse) {}
 }
 
@@ -50,12 +49,6 @@ message UpdateResellerRequest {
 message UpdateResellerResponse {
   Reseller reseller = 1;
 }
-
-message DeleteResellerRequest {
-  string id = 1;
-}
-
-message DeleteResellerResponse {}
 
 message PromoteResellerConfigRequest {}
 
