@@ -273,12 +273,15 @@ class PlaceClient(base.BenerailBaseClient):
         response = await self.get_places(page, attribute)
         responses = [response]
 
-        while response.response_result.field_links.next_page:  # type: ignore[union-attr]
-            next_page = parse_url.parse_qs(  # type: ignore[index]
+        if not response.response_result or not response.response_result.field_links:
+            return []
+
+        while response.response_result.field_links.next_page:
+            next_page = parse_url.parse_qs(
                 parse_url.urlparse(
-                    response.response_result.field_links.next_page,  # type: ignore[union-attr]
+                    response.response_result.field_links.next_page,
                 ).query,
-            ).get("page")[0]
+            )["page"][0]
 
             response = await self.get_places(next_page, attribute)
             responses.append(response)

@@ -51,8 +51,9 @@ class GetDialoguesResponse(BenerailBaseModel):
             return []
 
         return [
-            url.href.path.split("/")[-1]  # type: ignore[union-attr]
+            url.href.path.split("/")[-1]
             for url in self.response_result
+            if url.href.path
         ]
 
 

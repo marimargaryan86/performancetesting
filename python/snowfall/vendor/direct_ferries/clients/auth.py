@@ -26,10 +26,10 @@ class AuthClient(object):
         self._auth_response: AuthServiceResponse | None = None
 
     async def get_token(self) -> str:
-        if not self._is_token_valid():
+        if not self._auth_response or not self._is_token_valid():
             self._auth_response = await self._create_token()
 
-        return self._auth_response.token  # type: ignore[union-attr]
+        return self._auth_response.token
 
     def _is_token_valid(self) -> bool:
         return bool(
