@@ -156,15 +156,18 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         )
 
         if self._search_api_enabled:
-            await self.perform_general_search(
-                search_request=request.GeneralSearchResultsRequest(
-                    origin_id=origin.identifier,
-                    destination_id=destination.identifier,
-                    trip_type=enums.TripType.one_way,
-                    number_of_passengers=len(search_criteria.passengers_ages),
-                    departure_date=search_criteria.departure_datetime.date(),
-                ),
-            )
+            try:
+                await self.perform_general_search(
+                    search_request=request.GeneralSearchResultsRequest(
+                        origin_id=origin.identifier,
+                        destination_id=destination.identifier,
+                        trip_type=enums.TripType.one_way,
+                        number_of_passengers=len(search_criteria.passengers_ages),
+                        departure_date=search_criteria.departure_datetime.date(),
+                    ),
+                )
+            except RouteNotAllowedError:
+                self._logger.info("This route is not allowed", exc_info=True)
 
         try:
             search_response = await self._client.api_client.create_search(
@@ -305,8 +308,8 @@ class SaveATrainAdapter(object):  # noqa: WPS214
         except exceptions.SATValidationError as no_route_error:
             raise RouteNotAllowedError(no_route_error) from no_route_error
 
-        except errors.TimeOutError as timeout_error:
-            self._logger.info("SAT timeout error occurred.", error=timeout_error)
+        except errors.TimeOutError:
+            self._logger.info("SAT timeout error occurred.", exc_info=True)
 
         except errors.HttpStatusError as http_status_error:
             status_code = http_status_error.response.status_code
