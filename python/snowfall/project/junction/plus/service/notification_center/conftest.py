@@ -17,7 +17,10 @@ from snowfall.project.junction.plus.service.notifications.v1alpha import (
 )
 from snowfall.stdlib.transport.amqp import types
 from snowfall.stdlib.transport.amqp.consumer import Consumer
-from snowfall.stdlib.v1 import phone_number_pb2
+from snowfall.stdlib.v1 import latlng_pb2, phone_number_pb2
+
+_latitude = 37.9362
+_longitude = 23.948
 
 
 @pytest.fixture()
@@ -115,8 +118,20 @@ async def valid_message() -> (
                     notifications_models_pb2.Booking(
                         value=notifications_models_pb2.AirBooking(
                             id="id",
-                            origin="London",
-                            destination="Amsterdam",
+                            origin=notifications_models_pb2.Location(
+                                name="Zvartnots International Airport",
+                                coordinates=latlng_pb2.LatLng(
+                                    latitude=_latitude,
+                                    longitude=_longitude,
+                                ),
+                            ),
+                            destination=notifications_models_pb2.Location(
+                                name="Paris Charles de Gaulle Airport",
+                                coordinates=latlng_pb2.LatLng(
+                                    latitude=_latitude,
+                                    longitude=_longitude,
+                                ),
+                            ),
                             origin_iata="LND",
                             destination_iata="AMS",
                             route_identifier=notifications_models_pb2.RouteIdentifier(

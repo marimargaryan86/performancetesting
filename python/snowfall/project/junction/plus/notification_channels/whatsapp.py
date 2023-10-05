@@ -102,8 +102,8 @@ class ProviderChannel(Channel):
             journey_details += (
                 "\n\n*Journey{0}:*\n\n*From:* {1}\n*To:* {2}\n*On:* {3}".format(
                     " {0}".format(counter) if counter else "",
-                    journey.origin,
-                    journey.destination,
+                    journey.origin.name,
+                    journey.destination.name,
                     protobuf.protobuf_to_datetime(
                         journey.departure_at,
                     ).strftime("%A %d %b %Y %H:%M"),
@@ -136,6 +136,7 @@ class ProviderChannel(Channel):
         sender_configuration: models_pb2.ConfigurationVector,
     ) -> Sequence[str]:
         message_ids = []
+        booking_value = event.alert.booking.value
         for update in event.alert.updates:
             if update.HasField("date_field"):
                 try:
@@ -152,8 +153,8 @@ class ProviderChannel(Channel):
                         receiver=receiver.phone_number.e164_number,
                         sender_number=sender_configuration.mobile_phone.e164_number,
                         body=message.format(
-                            event.alert.booking.value.origin,
-                            event.alert.booking.value.destination,
+                            booking_value.origin.name,
+                            booking_value.destination.name,
                             proto_to_format_dt(
                                 update.date_field.original_date_local,
                             ),
@@ -176,8 +177,8 @@ class ProviderChannel(Channel):
                         receiver=receiver.phone_number.e164_number,
                         sender_number=sender_configuration.mobile_phone.e164_number,
                         body=message.format(
-                            event.alert.booking.value.origin,
-                            event.alert.booking.value.destination,
+                            booking_value.origin.name,
+                            booking_value.destination.name,
                             update.text_field.original_text,
                             update.text_field.new_text,
                         ),
@@ -288,11 +289,11 @@ def transform_trip_details(order: models_pb2.PersistedOrder) -> str:
         + "\n".join(
             [
                 (
-                    "*Departure from:* {0}\n".format(booking.value.origin)
+                    "*Departure from:* {0}\n".format(booking.value.origin.name)
                     + "*Departure at:* {0}\n".format(
                         proto_to_format_dt(booking.value.departure_at),
                     )
-                    + "*Arrival to:* {0}\n".format(booking.value.destination)
+                    + "*Arrival to:* {0}\n".format(booking.value.destination.name)
                     + "*Arrival at:* {0}\n".format(
                         proto_to_format_dt(booking.value.arrival_at),
                     )

@@ -35,7 +35,10 @@ from snowfall.project.junction.plus.service.plus_webhooks import (
 from snowfall.project.junction.plus.service.plus_webhooks.routes import router
 from snowfall.stdlib.integration.starlette import application
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.v1 import phone_number_pb2
+from snowfall.stdlib.v1 import latlng_pb2, phone_number_pb2
+
+_latitude = 37.9362
+_longitude = 23.948
 
 
 @pytest.fixture()
@@ -127,8 +130,20 @@ def orders_client() -> orders_adapter.Client:
                     notifications_models_pb2.Booking(
                         value=notifications_models_pb2.AirBooking(
                             id="id",
-                            origin="London",
-                            destination="Amsterdam",
+                            origin=notifications_models_pb2.Location(
+                                name="Zvartnoc",
+                                coordinates=latlng_pb2.LatLng(
+                                    latitude=_latitude,
+                                    longitude=_longitude,
+                                ),
+                            ),
+                            destination=notifications_models_pb2.Location(
+                                name="Zvartnoc",
+                                coordinates=latlng_pb2.LatLng(
+                                    latitude=_latitude,
+                                    longitude=_longitude,
+                                ),
+                            ),
                             origin_iata="LND",
                             destination_iata="AMS",
                             route_identifier=notifications_models_pb2.RouteIdentifier(

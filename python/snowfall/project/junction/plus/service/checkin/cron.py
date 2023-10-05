@@ -53,7 +53,7 @@ class CheckinCronJob(object):
                         continue  # noqa: WPS220
                     checkin_message = generate_checkin_message(
                         carrier=candidate.booking.value.route_identifier.carrier,
-                        destination=candidate.booking.value.destination,
+                        destination=candidate.booking.value.destination.name,
                     )
                     notification_event = models_pb2.NotificationEvent(
                         sender_id=subscriber.reseller_id,

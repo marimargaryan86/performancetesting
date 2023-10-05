@@ -19,7 +19,10 @@ from snowfall.stdlib import string
 from snowfall.stdlib.transport.amqp import types
 from snowfall.stdlib.transport.amqp.consumer import Consumer
 from snowfall.stdlib.transport.amqp.producer import Producer
-from snowfall.stdlib.v1 import phone_number_pb2
+from snowfall.stdlib.v1 import latlng_pb2, phone_number_pb2
+
+_latitude = 37.9362
+_longitude = 23.948
 
 
 @pytest.fixture()
@@ -100,8 +103,20 @@ async def valid_message() -> (
                 models_pb2.Booking(
                     value=models_pb2.AirBooking(
                         id=string.uuid(),
-                        origin="London",
-                        destination="Amsterdam",
+                        origin=models_pb2.Location(
+                            name="London",
+                            coordinates=latlng_pb2.LatLng(
+                                latitude=_latitude,
+                                longitude=_longitude,
+                            ),
+                        ),
+                        destination=models_pb2.Location(
+                            name="Amsterdam",
+                            coordinates=latlng_pb2.LatLng(
+                                latitude=_latitude,
+                                longitude=_longitude,
+                            ),
+                        ),
                         route_identifier=models_pb2.RouteIdentifier(
                             carrier="U2",
                             flight_number=flight_number,

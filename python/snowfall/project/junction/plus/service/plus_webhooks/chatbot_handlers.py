@@ -259,8 +259,8 @@ async def upcoming_trips(  # noqa: WPS210
                     + "\n    ".join(
                         [
                             "*{0} > {1} ({2})*".format(
-                                booking.origin,
-                                booking.destination,
+                                booking.origin.name,
+                                booking.destination.name,
                                 protobuf.protobuf_to_datetime(
                                     booking.departure_at,
                                 ).strftime("%d/%m/%Y"),
@@ -370,7 +370,7 @@ async def plan_selected_trip(  # noqa: WPS211,WPS210
                     {
                         "role": "user",
                         "content": "Airport - {0}".format(
-                            processed_bookings[0].destination,
+                            processed_bookings[0].destination.name,
                         ),
                     },
                 ]

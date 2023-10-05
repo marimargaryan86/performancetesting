@@ -4,6 +4,7 @@ package snowfall.project.junction.plus.service.notifications.v1alpha;
 
 import "google/protobuf/timestamp.proto";
 import "snowfall/stdlib/v1/date.proto";
+import "snowfall/stdlib/v1/latlng.proto";
 import "snowfall/stdlib/v1/phone_number.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/plus/service/notifications/v1alpha";
@@ -61,8 +62,8 @@ message AirBooking {
   string id = 1;
   google.protobuf.Timestamp departure_at = 2;
   google.protobuf.Timestamp arrival_at = 3;
-  string origin = 4;
-  string destination = 5;
+  Location origin = 4;
+  Location destination = 5;
   string origin_iata = 6;
   string destination_iata = 7;
   RouteIdentifier route_identifier = 8;
@@ -169,4 +170,9 @@ message NotificationEvent {
   }
   Type event_type = 6;
   Channel channel = 7;
+}
+
+message Location {
+  string name = 1;
+  snowfall.stdlib.v1.LatLng coordinates = 2;
 }
