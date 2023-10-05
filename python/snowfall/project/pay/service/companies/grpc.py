@@ -1,6 +1,5 @@
 import asyncio
 import datetime
-from typing import cast
 
 import grpc
 from pymongo.errors import DuplicateKeyError
@@ -70,7 +69,7 @@ class CompaniesService(
         company = await self._companies.find_by_id(request.id)
 
         if not company:
-            await context.abort(grpc.StatusCode.NOT_FOUND)  # noqa: WPS204
+            return await context.abort(grpc.StatusCode.NOT_FOUND)  # noqa: WPS204
 
         return grpc_pb2.GetCompanyResponse(company=company)
 
@@ -82,18 +81,17 @@ class CompaniesService(
         company = await self._companies.find_by_id(request.company.id)
 
         if not company:
-            await context.abort(grpc.StatusCode.NOT_FOUND)
+            return await context.abort(grpc.StatusCode.NOT_FOUND)
 
         if (  # noqa: WPS337
-            request.company.address.address_lines
-            and company.address.address_lines  # type: ignore[union-attr]
+            request.company.address.address_lines and company.address.address_lines
         ):
-            company.address.ClearField("address_lines")  # type: ignore[union-attr]
+            company.address.ClearField("address_lines")
 
-        company.MergeFrom(request.company)  # type: ignore[union-attr]
+        company.MergeFrom(request.company)
 
         try:
-            await self._companies.update(company)  # type: ignore[arg-type]
+            await self._companies.update(company)
         except DuplicateKeyError:
             await rich_status.abort_with_rich_status(
                 context=context,
@@ -163,7 +161,7 @@ class AccountsService(service.Service, grpc_pb2_grpc.AccountsServiceServicer):
         account = await self._accounts.find_by_id(request.id)
 
         if not account:
-            await context.abort(grpc.StatusCode.NOT_FOUND)
+            return await context.abort(grpc.StatusCode.NOT_FOUND)
 
         return grpc_pb2.GetAccountResponse(account=account)
 
@@ -189,9 +187,8 @@ class AccountsService(service.Service, grpc_pb2_grpc.AccountsServiceServicer):
     ) -> grpc_pb2.UpdateAccountStatusResponse:
         account = await self._accounts.find_by_id(request.id)
         if account is None:
-            await context.abort(grpc.StatusCode.NOT_FOUND)
+            return await context.abort(grpc.StatusCode.NOT_FOUND)
 
-        account = cast(models_pb2.Account, account)
         await self._payment_client.update_account(
             account.external_reference,
             cc_account_models.AccountUpdateRequest(
@@ -211,7 +208,7 @@ class AccountsService(service.Service, grpc_pb2_grpc.AccountsServiceServicer):
             },
         )
         if update_result.matched_count == 0:
-            await context.abort(grpc.StatusCode.NOT_FOUND)
+            return await context.abort(grpc.StatusCode.NOT_FOUND)
 
         account.status = request.status
 
@@ -266,7 +263,7 @@ class ContactsService(service.Service, grpc_pb2_grpc.ContactsServiceServicer):
         contact = await self._contacts.find_by_id(request.id)
 
         if not contact:
-            await context.abort(grpc.StatusCode.NOT_FOUND)
+            return await context.abort(grpc.StatusCode.NOT_FOUND)
 
         return grpc_pb2.GetContactResponse(contact=contact)
 
@@ -390,11 +387,10 @@ class BeneficiariesService(  # noqa: WPS214
                 beneficiary_request,
             )
         except errors.CurrencyCloudError as exc:
-            await context.abort(
+            return await context.abort(
                 grpc.StatusCode.ABORTED,
                 details=str(exc.messages),
             )
-            raise RuntimeError() from None  # TODO: Remove when grpcio types are available.
 
         payment_type = (
             ""
@@ -423,9 +419,7 @@ class BeneficiariesService(  # noqa: WPS214
     ) -> grpc_pb2.UpdateBeneficiaryResponse:
         beneficiary = await self._beneficiaries.find_by_id(request.beneficiary.id)
         if beneficiary is None:
-            await context.abort(grpc.StatusCode.NOT_FOUND)
-
-        beneficiary = cast(models_pb2.Beneficiary, beneficiary)
+            return await context.abort(grpc.StatusCode.NOT_FOUND)
 
         if (  # noqa: WPS337
             request.beneficiary.currency
@@ -507,20 +501,18 @@ class BeneficiariesService(  # noqa: WPS214
         beneficiary = await self._beneficiaries.find_by_id(request.id)
 
         if not beneficiary:
-            await context.abort(
-                grpc.StatusCode.NOT_FOUND,
-            )
+            return await context.abort(grpc.StatusCode.NOT_FOUND)
 
         cc_beneficiary = await self._payment_client.get_beneficiary(
-            beneficiary_id=beneficiary.external_reference,  # type: ignore[union-attr]
+            beneficiary_id=beneficiary.external_reference,
         )
 
         return grpc_pb2.GetBeneficiaryResponse(
             beneficiary=models_pb2.Beneficiary(
-                id=beneficiary.id,  # type: ignore[union-attr]
-                currency=beneficiary.currency,  # type: ignore[union-attr]
-                account_id=beneficiary.account_id,  # type: ignore[union-attr]
-                payment_type=beneficiary.payment_type,  # type: ignore[union-attr]
+                id=beneficiary.id,
+                currency=beneficiary.currency,
+                account_id=beneficiary.account_id,
+                payment_type=beneficiary.payment_type,
                 meta_data=self._build_meta_data_model(cc_beneficiary),
             ),
         )

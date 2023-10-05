@@ -43,8 +43,7 @@ class CurrencyService(service.Service, currencies_pb2_grpc.CurrencyServiceServic
                 Currency(request.to_currency),
             )
         except errors.NotFoundError:
-            await context.abort(grpc.StatusCode.NOT_FOUND)
-            raise RuntimeError() from None  # TODO: Remove when grpcio types are available.
+            return await context.abort(grpc.StatusCode.NOT_FOUND)
 
         base_amount = Money(request.amount, Currency(request.from_currency))
         conversion = base_amount.convert(
@@ -64,15 +63,15 @@ class CurrencyService(service.Service, currencies_pb2_grpc.CurrencyServiceServic
     ) -> currencies_pb2.GetResponse:
         currency = self._currencies.find_by_id(request.currency)
         if not currency:
-            await context.abort(
+            return await context.abort(
                 grpc.StatusCode.NOT_FOUND,
                 details="{0} currency not supported".format(request.currency),
             )
         return currencies_pb2.GetResponse(
             currency=models_pb2.Currency(
-                code=currency.code,  # type: ignore[union-attr]
-                name=currency.currency_name,  # type: ignore[union-attr]
-                exponent=currency.exponent or 0,  # type: ignore[union-attr]
+                code=currency.code,
+                name=currency.currency_name,
+                exponent=currency.exponent or 0,
             ),
         )
 

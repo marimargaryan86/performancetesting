@@ -60,7 +60,7 @@ class ResellerService(  # noqa: WPS214
     ) -> resellers_pb2.GetResellerResponse:
         reseller = await self._repository.find_by_id(request.id)
         if not reseller:
-            await context.abort(StatusCode.NOT_FOUND)
+            return await context.abort(StatusCode.NOT_FOUND)
 
         return resellers_pb2.GetResellerResponse(
             reseller=reseller,
@@ -90,7 +90,7 @@ class ResellerService(  # noqa: WPS214
         context: aio.ServicerContext,
     ) -> resellers_pb2.UpdateResellerResponse:
         if not await self._repository.exists(request.reseller.id):
-            await context.abort(StatusCode.NOT_FOUND)
+            return await context.abort(StatusCode.NOT_FOUND)
 
         await self._repository.upsert(request.reseller)
 
@@ -107,7 +107,7 @@ class ResellerService(  # noqa: WPS214
         currencies_config_updated = await self._update_currencies_config(resellers)
 
         if not currencies_config_updated or not reseller_config_updated:
-            await context.abort(StatusCode.FAILED_PRECONDITION)
+            return await context.abort(StatusCode.FAILED_PRECONDITION)
 
         return resellers_pb2.PromoteResellerConfigResponse()
 

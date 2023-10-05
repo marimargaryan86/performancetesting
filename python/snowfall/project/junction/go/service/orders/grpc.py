@@ -93,7 +93,7 @@ class OrderService(  # noqa: WPS214
         )
 
         if journey is None:
-            await context.abort(StatusCode.NOT_FOUND)
+            return await context.abort(StatusCode.NOT_FOUND)
 
         return orders_pb2.GetJourneyResponse(journey=journey)
 
@@ -126,7 +126,7 @@ class OrderService(  # noqa: WPS214
         journey = await self._journeys.find_by_id(request.journey_id)
 
         if journey is None:
-            await context.abort(StatusCode.NOT_FOUND)
+            return await context.abort(StatusCode.NOT_FOUND)
 
         order = await self._orders.create_from_options(
             journey_id=request.journey_id,
@@ -136,9 +136,9 @@ class OrderService(  # noqa: WPS214
         )
 
         await self._publisher.publish(
-            journey=journey,  # type: ignore[arg-type]
+            journey=journey,
             order=order,
-            reseller_id=journey.reseller_id,  # type: ignore[union-attr]
+            reseller_id=journey.reseller_id,
         )
 
         return orders_pb2.PlaceOrderResponse(order=order)
@@ -154,7 +154,7 @@ class OrderService(  # noqa: WPS214
         )
 
         if order is None:
-            await context.abort(StatusCode.NOT_FOUND)
+            return await context.abort(StatusCode.NOT_FOUND)
 
         return orders_pb2.GetOrderResponse(order=order)
 
@@ -193,13 +193,11 @@ class OrderService(  # noqa: WPS214
         booking = await self._bookings.find_by_id(request.id, request.reseller_id)
 
         if booking is None:
-            await context.abort(StatusCode.NOT_FOUND)
+            return await context.abort(StatusCode.NOT_FOUND)
 
         return orders_pb2.GetBookingResponse(
             booking=more_itertools.first(
-                await self._booking_handler.get_latest(
-                    [booking],  # type: ignore[list-item]
-                ),
+                await self._booking_handler.get_latest([booking]),
             ),
         )
 
@@ -243,7 +241,7 @@ class OrderService(  # noqa: WPS214
         )
 
         if details is None:
-            await context.abort(StatusCode.NOT_FOUND)
+            return await context.abort(StatusCode.NOT_FOUND)
 
         return orders_pb2.GetBookingDetailsResponse(details=details)
 
@@ -298,7 +296,7 @@ class OrderService(  # noqa: WPS214
         )
 
         if cancellation is None or cancellation.reseller_id != request.reseller_id:
-            await context.abort(StatusCode.NOT_FOUND)
+            return await context.abort(StatusCode.NOT_FOUND)
 
         return orders_pb2.GetCancellationRequestResponse(
             cancellation_request=cancellation,
@@ -314,11 +312,11 @@ class OrderService(  # noqa: WPS214
         )
 
         if cancellation is None or cancellation.reseller_id != request.reseller_id:
-            await context.abort(StatusCode.NOT_FOUND)
+            return await context.abort(StatusCode.NOT_FOUND)
 
         booking_cancellation_result = next(
             booking_cancellation
-            for booking_cancellation in cancellation.booking_cancellations  # type: ignore[union-attr]
+            for booking_cancellation in cancellation.booking_cancellations
             if booking_cancellation.booking_id == request.booking_id
         )
 

@@ -36,7 +36,7 @@ class ScheduleService(service.Service, schedules_pb2_grpc.ScheduleServiceService
         schedule = await self._schedules.find_by_id(request.id)
 
         if not schedule:
-            await context.abort(StatusCode.NOT_FOUND)
+            return await context.abort(StatusCode.NOT_FOUND)
 
         return schedules_pb2.GetScheduleResponse(schedule=schedule)
 
@@ -67,7 +67,7 @@ class ScheduleService(service.Service, schedules_pb2_grpc.ScheduleServiceService
         leg = await self._legs.find_by_id(request.id)
 
         if not leg:
-            await context.abort(StatusCode.NOT_FOUND)
+            return await context.abort(StatusCode.NOT_FOUND)
 
         return schedules_pb2.GetLegResponse(leg=leg)
 

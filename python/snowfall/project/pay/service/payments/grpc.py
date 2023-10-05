@@ -81,7 +81,7 @@ class PaymentsService(service.Service, payments_pb2_grpc.PaymentsServiceServicer
         payment = await self._payments_repository.find_by_id(request.id)
 
         if payment is None:
-            await context.abort(grpc.StatusCode.NOT_FOUND)
+            return await context.abort(grpc.StatusCode.NOT_FOUND)
 
         return payments_pb2.GetPaymentResponse(payment=payment)
 

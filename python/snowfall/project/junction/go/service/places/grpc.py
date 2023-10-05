@@ -1,5 +1,3 @@
-import uuid
-
 from grpc import StatusCode, aio
 
 from snowfall.project.junction.go.service.places import places
@@ -36,9 +34,9 @@ class LocationsService(service.Service, places_pb2_grpc.LocationsServiceServicer
         location = await self._locations.find_by_id(request.id)
 
         if not location:
-            await context.abort(StatusCode.NOT_FOUND)
+            return await context.abort(StatusCode.NOT_FOUND)
 
-        if location and not location.types:  # TODO: not needed with NoReturn above.
+        if not location.types:
             location.types.append(models_pb2.Location.TYPE_UNSPECIFIED)
 
         return places_pb2.GetLocationResponse(location=location)
@@ -145,15 +143,10 @@ class PlacesService(  # noqa: WPS214
         request: places_pb2.GetPlaceRequest,
         context: aio.ServicerContext,
     ) -> places_pb2.GetPlaceResponse:
-        try:
-            uuid.UUID(request.id)
-        except ValueError:
-            await context.abort(StatusCode.INVALID_ARGUMENT)
-
         place_result = await self._places.find_by_id(request.id)
 
         if not place_result:
-            await context.abort(StatusCode.NOT_FOUND)
+            return await context.abort(StatusCode.NOT_FOUND)
 
         return places_pb2.GetPlaceResponse(place=place_result)
 
@@ -192,11 +185,6 @@ class PlacesService(  # noqa: WPS214
         request: places_pb2.DeletePlaceRequest,
         context: aio.ServicerContext,
     ) -> places_pb2.DeletePlaceResponse:
-        try:
-            uuid.UUID(request.id)
-        except ValueError:
-            await context.abort(StatusCode.INVALID_ARGUMENT)
-
         await self._places.delete(request.id)
 
         return places_pb2.DeletePlaceResponse()

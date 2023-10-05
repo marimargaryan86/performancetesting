@@ -39,7 +39,7 @@ class TripService(service.Service, trips_pb2_grpc.TripServiceServicer):
         trip = await self._trips.find_by_id(request.id)
 
         if not trip:
-            await context.abort(StatusCode.NOT_FOUND)
+            return await context.abort(StatusCode.NOT_FOUND)
 
         return trips_pb2.GetTripResponse(trip=trip)
 
@@ -70,7 +70,7 @@ class TripService(service.Service, trips_pb2_grpc.TripServiceServicer):
         segment = await self._segments.find_by_id(request.id)
 
         if segment is None:
-            await context.abort(StatusCode.NOT_FOUND)
+            return await context.abort(StatusCode.NOT_FOUND)
 
         return trips_pb2.GetSegmentResponse(segment=segment)
 
@@ -134,7 +134,7 @@ class TripSearchService(service.Service, trips_pb2_grpc.TripSearchServiceService
         trip_search = await self._repository.find_by_id(request.id)
 
         if not trip_search:
-            await context.abort(StatusCode.NOT_FOUND)
+            return await context.abort(StatusCode.NOT_FOUND)
 
         return trips_pb2.GetTripSearchDetailsResponse(trip_search=trip_search)
 
@@ -214,18 +214,16 @@ class TripCandidateSearchService(
         trip_candidate_search = await self._repository.find_by_id(request.id)
 
         if not trip_candidate_search:
-            await context.abort(StatusCode.NOT_FOUND)
+            return await context.abort(StatusCode.NOT_FOUND)
 
-        offer_search_ids = (
-            trip_candidate_search.offer_search_ids  # type: ignore[union-attr]
-        )
+        offer_search_ids = trip_candidate_search.offer_search_ids
 
-        if trip_candidate_search.status not in _FINAL_STATUSES and offer_search_ids:  # type: ignore[union-attr]
+        if trip_candidate_search.status not in _FINAL_STATUSES and offer_search_ids:
             offer_search_objects = await self._offer_search_adapter.find_by_ids(
                 ids=offer_search_ids,
             )
 
-            trip_candidate_search.status = status_from_statuses(  # type: ignore[union-attr]
+            trip_candidate_search.status = status_from_statuses(
                 statuses=[
                     offer_search_object.status
                     for offer_search_object in offer_search_objects
@@ -267,9 +265,9 @@ class TripCandidateService(
         )
 
         if not trip_candidate_search:
-            await context.abort(StatusCode.NOT_FOUND)
+            return await context.abort(StatusCode.NOT_FOUND)
 
-        offer_search_ids = trip_candidate_search.offer_search_ids  # type: ignore[union-attr]
+        offer_search_ids = trip_candidate_search.offer_search_ids
 
         if not offer_search_ids:
             return trips_pb2.ListTripCandidatesResponse(

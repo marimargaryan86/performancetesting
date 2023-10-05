@@ -63,7 +63,7 @@ class OrderService(
         order = await self._orders.find_by_id(request.id)
 
         if order is None:
-            await context.abort(StatusCode.NOT_FOUND)
+            return await context.abort(StatusCode.NOT_FOUND)
 
         return notifications_pb2.GetOrderResponse(
             order=order,
@@ -113,7 +113,7 @@ class SubscriberService(
         subscriber = await self._subscribers.find_by_id(request.id)
 
         if subscriber is None:
-            await context.abort(StatusCode.NOT_FOUND)
+            return await context.abort(StatusCode.NOT_FOUND)
 
         return notifications_pb2.GetSubscriberResponse(
             subscriber=subscriber,
@@ -130,7 +130,7 @@ class SubscriberService(
         )
 
         if subscriber is None:
-            await context.abort(StatusCode.NOT_FOUND)
+            return await context.abort(StatusCode.NOT_FOUND)
 
         return notifications_pb2.GetSubscriberResponse(
             subscriber=subscriber,
@@ -189,7 +189,7 @@ class ConfigurationVectorService(
         )
 
         if configuration_vector is None:
-            await context.abort(StatusCode.NOT_FOUND)
+            return await context.abort(StatusCode.NOT_FOUND)
 
         return notifications_pb2.GetConfigurationVectorResponse(
             configuration_vector=configuration_vector,
@@ -248,7 +248,7 @@ class MonitoringRuleService(  # noqa: WPS214
             request.monitoring_rule_id,
         )
         if monitoring_rule is None:
-            await context.abort(StatusCode.NOT_FOUND)
+            return await context.abort(StatusCode.NOT_FOUND)
 
         return notifications_pb2.GetMonitoringRuleResponse(
             monitoring_rule=monitoring_rule,
@@ -261,7 +261,7 @@ class MonitoringRuleService(  # noqa: WPS214
     ) -> notifications_pb2.GetMonitoringRuleByBookingResponse:
         monitoring_rule = await self._monitoring_rules.find_by_booking(request.booking)
         if not monitoring_rule:
-            await context.abort(StatusCode.NOT_FOUND)
+            return await context.abort(StatusCode.NOT_FOUND)
         return notifications_pb2.GetMonitoringRuleByBookingResponse(
             monitoring_rule=monitoring_rule,
         )

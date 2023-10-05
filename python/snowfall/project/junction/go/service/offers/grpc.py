@@ -63,7 +63,7 @@ class OfferSearchService(service.Service, grpc_pb2_grpc.OfferSearchServiceServic
         offer_search = await self._offers_searches.find_by_id(request.id)
 
         if not offer_search:
-            await context.abort(grpc.StatusCode.NOT_FOUND)
+            return await context.abort(grpc.StatusCode.NOT_FOUND)
 
         return grpc_pb2.GetOfferSearchResponse(search=offer_search)
 
@@ -118,18 +118,18 @@ class OfferService(service.Service, grpc_pb2_grpc.OfferServiceServicer):  # noqa
         offer_aggregate = await self._aggregates.find_by_id(request.id)
 
         if not offer_aggregate:
-            await context.abort(grpc.StatusCode.NOT_FOUND)
+            return await context.abort(grpc.StatusCode.NOT_FOUND)
 
         offer_results = await self._offers_results.find(
-            ids=list(offer_aggregate.offer_result_ids),  # type: ignore[union-attr]
+            ids=list(offer_aggregate.offer_result_ids),
             cursor="",
         )
 
         return grpc_pb2.GetOfferResponse(
             offer=models_pb2.OfferAggregate(
-                id=offer_aggregate.id,  # type: ignore[union-attr]
-                created_at=offer_aggregate.created_at,  # type: ignore[union-attr]
-                expires_at=offer_aggregate.expires_at,  # type: ignore[union-attr]
+                id=offer_aggregate.id,
+                created_at=offer_aggregate.created_at,
+                expires_at=offer_aggregate.expires_at,
                 groups=[offer_result async for offer_result in offer_results],
             ),
         )
@@ -174,7 +174,7 @@ class OfferService(service.Service, grpc_pb2_grpc.OfferServiceServicer):  # noqa
         offer_group = await self._offers_results.find_by_id(request.id)
 
         if not offer_group:
-            await context.abort(grpc.StatusCode.NOT_FOUND)
+            return await context.abort(grpc.StatusCode.NOT_FOUND)
 
         return grpc_pb2.GetOfferGroupResponse(group=offer_group)
 
@@ -201,7 +201,7 @@ class OfferService(service.Service, grpc_pb2_grpc.OfferServiceServicer):  # noqa
         details = await self._group_details.find_by_id(request.id)
 
         if not details:
-            await context.abort(grpc.StatusCode.NOT_FOUND)
+            return await context.abort(grpc.StatusCode.NOT_FOUND)
 
         return grpc_pb2.GetOfferGroupDetailsResponse(details=details)
 
@@ -228,7 +228,7 @@ class OfferService(service.Service, grpc_pb2_grpc.OfferServiceServicer):  # noqa
         option = await self._options.find_by_id(request.id)
 
         if not option:
-            await context.abort(grpc.StatusCode.NOT_FOUND)
+            return await context.abort(grpc.StatusCode.NOT_FOUND)
 
         return grpc_pb2.GetOfferOptionResponse(option=option)
 
@@ -255,7 +255,7 @@ class OfferService(service.Service, grpc_pb2_grpc.OfferServiceServicer):  # noqa
         details = await self._option_details.find_by_id(request.id)
 
         if not details:
-            await context.abort(grpc.StatusCode.NOT_FOUND)
+            return await context.abort(grpc.StatusCode.NOT_FOUND)
 
         return grpc_pb2.GetOfferOptionDetailsResponse(details=details)
 
@@ -342,6 +342,6 @@ class PriceQuoteService(service.Service, grpc_pb2_grpc.PriceQuoteServiceServicer
         price_quote = await self._price_quotes.find_by_id(request.id)
 
         if not price_quote:
-            await context.abort(grpc.StatusCode.NOT_FOUND)
+            return await context.abort(grpc.StatusCode.NOT_FOUND)
 
         return grpc_pb2.GetPriceQuoteResponse(price_quote=price_quote)

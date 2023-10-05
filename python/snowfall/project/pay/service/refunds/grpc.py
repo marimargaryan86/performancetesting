@@ -78,7 +78,7 @@ class RefundsService(  # noqa: WPS214
         )
 
         if not refund:
-            await context.abort(grpc.StatusCode.NOT_FOUND)  # noqa: WPS204
+            return await context.abort(grpc.StatusCode.NOT_FOUND)
 
         return grpc_pb2.GetRefundResponse(refund=refund)
 
@@ -107,7 +107,7 @@ class RefundsService(  # noqa: WPS214
     ) -> grpc_pb2.UpdateRefundResponse:
         refund = await self._refunds.find_by_id(request.refund_id)
         if not refund:
-            await context.abort(grpc.StatusCode.NOT_FOUND)  # noqa: WPS204
+            return await context.abort(grpc.StatusCode.NOT_FOUND)
 
         if (  # noqa: WPS337
             request.refunded_by_provider.currency_code
@@ -124,7 +124,7 @@ class RefundsService(  # noqa: WPS214
             )
 
         try:
-            transaction = await self._transactions_client.get(refund.transaction_id)  # type: ignore[union-attr]
+            transaction = await self._transactions_client.get(refund.transaction_id)
         except NotFoundError:
             await rich_status.abort_with_rich_status(
                 context=context,
@@ -139,7 +139,7 @@ class RefundsService(  # noqa: WPS214
             request.refunded_to_reseller,
         )
 
-        refund.refund_position.CopyFrom(  # type: ignore[union-attr]
+        refund.refund_position.CopyFrom(
             await self._get_refund_position(
                 detailed_rate,
                 request.refunded_to_reseller,
@@ -162,17 +162,17 @@ class RefundsService(  # noqa: WPS214
             )
             conversion_id = cc_conversion.identifier
 
-        refund.status = models_pb2.Refund.Status.STATUS_EXECUTED  # type: ignore[union-attr]
-        refund.conversion_id = conversion_id  # type: ignore[union-attr]
-        refund.invoice_reference = request.invoice_reference  # type: ignore[union-attr]
-        refund.refunded_us_in_payer_currency.CopyFrom(  # type: ignore[union-attr]
+        refund.status = models_pb2.Refund.Status.STATUS_EXECUTED
+        refund.conversion_id = conversion_id
+        refund.invoice_reference = request.invoice_reference
+        refund.refunded_us_in_payer_currency.CopyFrom(
             money.from_string(
                 detailed_rate.client_buy_amount,
                 money.Currency(detailed_rate.client_buy_currency),
             ).protobuf(),
         )
 
-        await self._refunds.update(refund)  # type: ignore[arg-type]
+        await self._refunds.update(refund)
 
         return grpc_pb2.UpdateRefundResponse(refund=refund)
 
@@ -183,9 +183,9 @@ class RefundsService(  # noqa: WPS214
     ) -> grpc_pb2.CalculateRefundPositionResponse:
         refund = await self._refunds.find_by_id(request.refund_id)
         if not refund:
-            await context.abort(grpc.StatusCode.NOT_FOUND)  # noqa: WPS204
+            return await context.abort(grpc.StatusCode.NOT_FOUND)
         try:
-            transaction = await self._transactions_client.get(refund.transaction_id)  # type: ignore[union-attr]
+            transaction = await self._transactions_client.get(refund.transaction_id)
         except NotFoundError:
             await rich_status.abort_with_rich_status(
                 context=context,

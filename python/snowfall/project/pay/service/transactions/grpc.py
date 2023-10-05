@@ -84,7 +84,7 @@ class TransactionsService(  # noqa:WPS214
         )
 
         if transaction is None:
-            await context.abort(grpc.StatusCode.NOT_FOUND)
+            return await context.abort(grpc.StatusCode.NOT_FOUND)
 
         return grpc_pb2.GetTransactionResponse(transaction=transaction)
 
@@ -212,11 +212,10 @@ class QuotationsService(  # noqa: WPS214
                 request.session_token,
             )
         except adapter_errors.NotFoundError:
-            await context.abort(
+            return await context.abort(
                 grpc.StatusCode.INVALID_ARGUMENT,
                 details="Currencies pair not supported",
             )
-            raise RuntimeError() from None  # TODO: Remove when grpcio types are available.
 
         quote = Quote(
             request.amount,
@@ -239,7 +238,7 @@ class QuotationsService(  # noqa: WPS214
         quotation = await self._quotations.find_by_id(request.id)
 
         if not quotation:
-            await context.abort(grpc.StatusCode.NOT_FOUND)
+            return await context.abort(grpc.StatusCode.NOT_FOUND)
 
         return grpc_pb2.GetQuotationResponse(quotation=quotation)
 
@@ -357,7 +356,7 @@ class ConversionsService(
         conversion_result = await self._conversions.find_by_id(request.id)
 
         if not conversion_result:
-            await context.abort(grpc.StatusCode.NOT_FOUND)
+            return await context.abort(grpc.StatusCode.NOT_FOUND)
 
         return grpc_pb2.GetConversionResponse(conversion=conversion_result)
 
@@ -466,9 +465,9 @@ class BillsService(  # noqa: WPS214
         bill = await self._bills.find_by_id(identifier)
 
         if bill is None:
-            await context.abort(grpc.StatusCode.NOT_FOUND)
+            return await context.abort(grpc.StatusCode.NOT_FOUND)
 
-        return bill  # type: ignore[return-value]
+        return bill
 
 
 async def _create_conversion(

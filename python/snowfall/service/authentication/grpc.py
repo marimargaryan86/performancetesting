@@ -161,11 +161,10 @@ class AuthenticationService(
             user = await self._users.find_user_by_id(request.id)
 
         if not user:
-            await context.abort(
+            return await context.abort(
                 grpc.StatusCode.NOT_FOUND,
                 details="User is not found",
             )
-            raise RuntimeError() from None  # TODO: Remove when grpcio types are available.
 
         updated_result = await self._users.update(
             user,
@@ -206,7 +205,7 @@ class OAuthService(service.Service, oauth_pb2_grpc.OAuthServiceServicer):
             oauth2_client = await self._client.get_client_by_id(request.id)
         except httpx.HTTPStatusError as err:
             if err.response.status_code == httpx.codes.NOT_FOUND.value:
-                await context.abort(grpc.StatusCode.NOT_FOUND)
+                return await context.abort(grpc.StatusCode.NOT_FOUND)
 
             return await context.abort(grpc.StatusCode.UNKNOWN)
 

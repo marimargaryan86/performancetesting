@@ -40,8 +40,7 @@ class RatesService(service.Service, rates_pb2_grpc.RatesServiceServicer):
             )
 
             if not backup_rate:
-                await context.abort(grpc.StatusCode.NOT_FOUND)
-                raise RuntimeError() from None
+                return await context.abort(grpc.StatusCode.NOT_FOUND)
 
             rate = backup_rate.rate
 
