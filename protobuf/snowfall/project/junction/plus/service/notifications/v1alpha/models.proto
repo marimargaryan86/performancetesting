@@ -148,6 +148,8 @@ message UpdatedTextField {
     FIELD_STS = 1;
     FIELD_DGT = 2;
     FIELD_DTM = 3;
+    FIELD_DIV = 4;
+    FIELD_BGG = 5;
   }
   Field field = 1;
   string original_text = 2;

@@ -16,7 +16,7 @@ _CODE_TO_MESSAGE = MappingProxyType(
         ),
         "BGG": _(
             "Your bag pickup location for your flight from *{0}* > *{1}* has changed"
-            " from *{2}* to *{3}*'",
+            " from *{2}* to *{3}*",
         ),
     },
 )
