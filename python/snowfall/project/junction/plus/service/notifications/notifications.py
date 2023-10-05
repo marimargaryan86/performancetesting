@@ -162,6 +162,16 @@ class ConfigurationVectorRepository(  # noqa: WPS215
     _proto = models_pb2.ConfigurationVector
     _indexes = (pymongo.IndexModel("reseller_id", background=True),)
 
+    async def find_by_selector(
+        self,
+        selection_value: str,
+        selector: str,
+    ) -> models_pb2.ConfigurationVector | None:
+        return await self._execute(
+            self._collection.find_one,
+            {selector: selection_value},
+        )
+
     async def update(
         self,
         configuration_vector: models_pb2.ConfigurationVector,

@@ -78,9 +78,9 @@ class TransactionsService(  # noqa:WPS214
         request: grpc_pb2.GetTransactionRequest,
         context: grpc.aio.ServicerContext,
     ) -> grpc_pb2.GetTransactionResponse:
-        transaction = await self._transactions.find_by_id(
-            request.id,
-            request.selector if request.selector else "_id",
+        transaction = await self._transactions.find_by_selector(
+            selection_value=request.id,
+            selector=request.selector if request.selector else "_id",
         )
 
         if transaction is None:
@@ -107,10 +107,7 @@ class TransactionsService(  # noqa:WPS214
         request: grpc_pb2.CreateTransactionRequest,
         context: grpc.aio.ServicerContext,
     ) -> grpc_pb2.CreateTransactionResponse:
-        bill = await self._bills.find_by_id(
-            selector="order_id",
-            document_id=request.order_id,
-        )
+        bill = await self._bills.find_by_order_id(request.order_id)
         if bill:
             bill = self._add_amount_to_bill_amount(
                 bill,

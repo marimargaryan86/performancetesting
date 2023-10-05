@@ -28,9 +28,8 @@ class SyncAccounts(object):
         self._logger.info("Fetched accounts in CC", count=len(all_cc_accounts))
 
         for cc_account in all_cc_accounts:
-            account = await self._accounts_repository.find_by_id(
+            account = await self._accounts_repository.find_by_external_reference(
                 cc_account.identifier,
-                "external_reference",
             )
             if not account:
                 await self._accounts_repository.insert(

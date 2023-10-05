@@ -10,10 +10,12 @@ from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 
 class OrdersRepository(
     repository.ProtoRepository[mobile_models_pb2.MobileOrder],
-    mixins.FindByIdMixin[mobile_models_pb2.MobileOrder],
     mixins.InsertMixin[mobile_models_pb2.MobileOrder],
 ):
     _proto = mobile_models_pb2.MobileOrder
+
+    async def find_by_spnr(self, spnr: str) -> mobile_models_pb2.MobileOrder | None:
+        return await self._execute(self._collection.find_one, {"spnr": spnr})
 
     async def get_user_orders(
         self,

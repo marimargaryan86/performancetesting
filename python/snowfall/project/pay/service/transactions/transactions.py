@@ -12,7 +12,6 @@ from snowfall.vendor.currency_cloud.models.conversion import ConversionResponse
 
 class TransactionsRepository(
     repository.ProtoRepository[models_pb2.Transaction],
-    mixins.FindByIdMixin[models_pb2.Transaction],
     mixins.InsertMixin[models_pb2.Transaction],
 ):
     _proto = models_pb2.Transaction
@@ -20,6 +19,16 @@ class TransactionsRepository(
         pymongo.IndexModel("created_at", background=True),
         pymongo.IndexModel("external_reference_id", background=True, unique=True),
     )
+
+    async def find_by_selector(
+        self,
+        selection_value: str,
+        selector: str,
+    ) -> models_pb2.Transaction | None:
+        return await self._execute(
+            self._collection.find_one,
+            {selector: selection_value},
+        )
 
     async def list_transactions(
         self,
@@ -129,6 +138,15 @@ class BillsRepository(
     mixins.InsertMixin[models_pb2.Bill],
 ):
     _proto = models_pb2.Bill
+
+    async def find_by_order_id(
+        self,
+        order_id: str,
+    ) -> models_pb2.Bill | None:
+        return await self._execute(
+            self._collection.find_one,
+            {"order_id": order_id},
+        )
 
     async def update(
         self,

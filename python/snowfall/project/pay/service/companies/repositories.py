@@ -57,6 +57,15 @@ class AccountsRepository(
 ):
     _proto = models_pb2.Account
 
+    async def find_by_external_reference(
+        self,
+        external_reference: str,
+    ) -> models_pb2.Account | None:
+        return await self._execute(
+            self._collection.find_one,
+            {"external_reference": external_reference},
+        )
+
     async def find(
         self,
         limit: int,

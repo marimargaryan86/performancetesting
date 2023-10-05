@@ -79,9 +79,8 @@ class PushNotificationToken(endpoints.HTTPEndpoint):
         request: requests.Request,
         notification_tokens_repository: repository.NotificationTokensRepository = lagom.injectable,
     ) -> responses.Response:
-        token = await notification_tokens_repository.find_by_id(
+        token = await notification_tokens_repository.find_by_device_token(
             request.path_params["deviceToken"],
-            "device_token",
         )
         if not token or token.user_id != request.user.username:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
@@ -104,9 +103,8 @@ class PushNotificationToken(endpoints.HTTPEndpoint):
         )
         if not update_result.matched_count:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
-        token = await notification_tokens_repository.find_by_id(
+        token = await notification_tokens_repository.find_by_device_token(
             request.path_params["deviceToken"],
-            "device_token",
         )
         if not token or token.user_id != request.user.username:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)

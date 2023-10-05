@@ -183,9 +183,9 @@ class ConfigurationVectorService(
         request: notifications_pb2.GetConfigurationVectorRequest,
         context: aio.ServicerContext,
     ) -> notifications_pb2.GetConfigurationVectorResponse:
-        configuration_vector = await self._configuration_vectors.find_by_id(
-            request.identifier,
-            request.selector,
+        configuration_vector = await self._configuration_vectors.find_by_selector(
+            selection_value=request.identifier,
+            selector=request.selector,
         )
 
         if configuration_vector is None:

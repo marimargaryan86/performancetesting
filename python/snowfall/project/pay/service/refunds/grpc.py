@@ -72,7 +72,10 @@ class RefundsService(  # noqa: WPS214
         request: grpc_pb2.GetRefundRequest,
         context: grpc.aio.ServicerContext,
     ) -> grpc_pb2.GetRefundResponse:
-        refund = await self._refunds.find_by_id(request.id, request.selector)
+        refund = await self._refunds.find_by_selector(
+            selection_value=request.id,
+            selector=request.selector,
+        )
 
         if not refund:
             await context.abort(grpc.StatusCode.NOT_FOUND)  # noqa: WPS204

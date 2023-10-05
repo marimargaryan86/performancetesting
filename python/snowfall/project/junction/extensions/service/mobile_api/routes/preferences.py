@@ -23,7 +23,7 @@ class Preferences(endpoints.HTTPEndpoint):
         preferences_repository: repository.PreferencesRepository = lagom.injectable,
     ) -> responses.Response:
         user_id = request.user.username
-        stored_preferences = await preferences_repository.find_by_id(user_id, "user_id")
+        stored_preferences = await preferences_repository.find_by_user_id(user_id)
         updated_preferences = sync_template(
             preference_model.preference_defaults,
             stored_preferences,

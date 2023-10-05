@@ -9,6 +9,16 @@ class RefundsRepository(
 ):
     _proto = models_pb2.Refund
 
+    async def find_by_selector(
+        self,
+        selection_value: str,
+        selector: str,
+    ) -> models_pb2.Refund | None:
+        return await self._execute(
+            self._collection.find_one,
+            {selector: selection_value},
+        )
+
     async def update(
         self,
         refund: models_pb2.Refund,

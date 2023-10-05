@@ -42,15 +42,11 @@ class ExistsMixin(Generic[Record], repository.RepositoryProtocol[Record]):
 
 
 class FindByIdMixin(Generic[Record], repository.RepositoryProtocol[Record]):
-    async def find_by_id(
-        self,
-        document_id: str,
-        selector: str = "_id",
-    ) -> Record | None:
+    async def find_by_id(self, document_id: str) -> Record | None:
         return await self._execute(
             self._collection.find_one,
             {
-                selector: document_id,
+                repository.mongo_id_key: document_id,
             },
         )
 
@@ -96,7 +92,7 @@ class StatusMixin(Generic[Record], repository.RepositoryProtocol[Record]):
     ) -> Record:
         return await self._execute(
             self._collection.find_one_and_update,
-            {"_id": document_id},
+            {repository.mongo_id_key: document_id},
             {
                 "$set": {
                     "status": amqp_pb2.Trackable.STATUS_COMPLETED,
@@ -112,7 +108,7 @@ class StatusMixin(Generic[Record], repository.RepositoryProtocol[Record]):
     ) -> Record:
         return await self._execute(
             self._collection.find_one_and_update,
-            {"_id": document_id},
+            {repository.mongo_id_key: document_id},
             {
                 "$set": {
                     "status": amqp_pb2.Trackable.STATUS_FAILED,
@@ -128,7 +124,7 @@ class StatusMixin(Generic[Record], repository.RepositoryProtocol[Record]):
     ) -> Record:
         return await self._execute(
             self._collection.find_one_and_update,
-            {"_id": document_id},
+            {repository.mongo_id_key: document_id},
             {
                 "$set": {
                     "status": amqp_pb2.Trackable.STATUS_PROCESSING,
@@ -147,7 +143,7 @@ class UpsertMixin(Generic[Record], repository.RepositoryProtocol[Record]):
         encoded = self._coder.encode(document)
         upsert = await self._execute(
             self._collection.replace_one,
-            filter={"_id": encoded["_id"]},
+            filter={repository.mongo_id_key: encoded[repository.mongo_id_key]},
             replacement=encoded,
             upsert=True,
         )

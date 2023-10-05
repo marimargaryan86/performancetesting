@@ -46,7 +46,7 @@ class Whatsapp(endpoints.HTTPEndpoint):
                 if int(message_body) > len(session):
                     twiml_response.message("Invalid option. Please try again")
                 spnr = session[int(message_body) - 1]
-                mobile_order = await orders_repository.find_by_id(spnr, "spnr")
+                mobile_order = await orders_repository.find_by_spnr(spnr)
                 if mobile_order is None:
                     twiml_response.message("Invalid option. Please try again")
                 else:

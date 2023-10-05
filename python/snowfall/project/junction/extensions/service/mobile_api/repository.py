@@ -338,13 +338,13 @@ class LoyaltyProgramsRepository(
         return programs
 
 
-class PreferencesRepository(
-    repository.DefaultRepository,
-    mixins.FindByIdMixin[Mapping[str, Any]],
-):
+class PreferencesRepository(repository.DefaultRepository):
+    async def find_by_user_id(self, user_id: str) -> Mapping[str, Any] | None:
+        return await self._execute(self._collection.find_one, {"user_id": user_id})
+
     async def update_preferences(self, user_id: str, preferences: Any) -> None:
         # TODO: check if I can do it in 1 aggregation pipeline
-        saved_preferences = await self.find_by_id(user_id, "user_id")
+        saved_preferences = await self.find_by_user_id(user_id)
         if saved_preferences:
             saved_preferences = dict(saved_preferences)
             saved_preferences["preferences"] = [
@@ -491,7 +491,6 @@ class VouchersRepository(
 
 class NotificationTokensRepository(
     repository.ProtoRepository[models_pb2.NotificationToken],
-    mixins.FindByIdMixin[models_pb2.NotificationToken],
     mixins.InsertMixin[models_pb2.NotificationToken],
 ):
     _proto = models_pb2.NotificationToken
@@ -500,6 +499,15 @@ class NotificationTokensRepository(
         pymongo.IndexModel("device_token", background=True, unique=True),
         pymongo.IndexModel("notification_token", background=True, unique=True),
     )
+
+    async def find_by_device_token(
+        self,
+        device_token: str,
+    ) -> models_pb2.NotificationToken | None:
+        return await self._execute(
+            self._collection.find_one,
+            {"device_token": device_token},
+        )
 
     async def delete(self, document_id: str, user_id: str) -> int:
         delete = await self._execute(
