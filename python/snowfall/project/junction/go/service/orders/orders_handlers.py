@@ -1,3 +1,4 @@
+import types
 from collections.abc import Sequence
 
 from grpc import StatusCode, aio
@@ -11,6 +12,20 @@ from snowfall.project.junction.go.service.orders.v1 import models_pb2, orders_pb
 from snowfall.project.junction.go.service.orders.zendesk.client import ZendeskClient
 from snowfall.stdlib.transport.grpc import rich_status
 from snowfall.stdlib.transport.http.errors import HttpStatusError
+
+_STATUS_MAPPING = types.MappingProxyType(
+    {
+        orders_pb2.UpdateBookingCancellationRequest.STATUS_UNSPECIFIED: (
+            models_pb2.BookingCancellation.STATUS_UNSPECIFIED
+        ),
+        orders_pb2.UpdateBookingCancellationRequest.STATUS_PENDING: (
+            models_pb2.BookingCancellation.STATUS_PENDING
+        ),
+        orders_pb2.UpdateBookingCancellationRequest.STATUS_COMPLETED: (
+            models_pb2.BookingCancellation.STATUS_COMPLETED
+        ),
+    },
+)
 
 
 class CreateCancellationRequestHandler(object):  # noqa: WPS214
@@ -45,17 +60,15 @@ class CreateCancellationRequestHandler(object):  # noqa: WPS214
 
         await self._validate(booking_ids, journeys, bookings)
 
-        for booking_cancellation in document.booking_cancellations:
-            booking, order, journey = bookings_and_orders.get(  # type: ignore[misc]
-                booking_cancellation.booking_id,
-            )
+        for cancellation in document.booking_cancellations:
+            booking, order, journey = bookings_and_orders[cancellation.booking_id]
             ticket_id = await self._create_zendesk_support_ticket(
                 booking,
                 order,
                 journey,
             )
-            booking_cancellation.ticket_id = ticket_id
-            booking_cancellation.status = models_pb2.BookingCancellation.STATUS_PENDING
+            cancellation.ticket_id = ticket_id
+            cancellation.status = models_pb2.BookingCancellation.STATUS_PENDING
 
         document.status = models_pb2.CancellationRequest.STATUS_PENDING
         cancellation_request = await self._cancellations.insert(
@@ -222,28 +235,22 @@ class UpdateBookingCancellationHandler(object):
             booking_cancellation_id=self._request.id,
         )
 
-        if (  # noqa: WPS337
-            cancellation is None
-            or cancellation.reseller_id != self._request.reseller_id
-        ):
-            await self._context.abort(StatusCode.NOT_FOUND)
+        if not cancellation or cancellation.reseller_id != self._request.reseller_id:
+            return await self._context.abort(StatusCode.NOT_FOUND)
 
         booking_cancellation = next(
             booking_cancellation
-            for booking_cancellation in cancellation.booking_cancellations  # type: ignore[union-attr]
+            for booking_cancellation in cancellation.booking_cancellations
             if booking_cancellation.id == self._request.id
         )
 
-        if (  # noqa: WPS337
-            self._request.status
-            == orders_pb2.UpdateBookingCancellationRequest.Status.STATUS_COMPLETED
-        ):
+        if self._request_is_complete():
             await self._update_booking_status(booking_cancellation.booking_id)
 
-        booking_cancellation.status = self._request.status
-        self._update_overall_cancellation_status(cancellation)  # type: ignore[arg-type]
+        booking_cancellation.status = _STATUS_MAPPING[self._request.status]
+        self._update_overall_cancellation_status(cancellation)
 
-        await self._cancellations.update(document=cancellation)  # type: ignore[arg-type]
+        await self._cancellations.update(document=cancellation)
 
         return orders_pb2.UpdateBookingCancellationResponse(
             booking_cancellation=booking_cancellation,
@@ -253,15 +260,14 @@ class UpdateBookingCancellationHandler(object):
         self,
         booking_id: str,
     ) -> None:
-        booking = await self._bookings.find_by_id(
-            document_id=booking_id,
-        )
+        booking = await self._bookings.find_by_id(document_id=booking_id)
 
         if booking is None:
             await self._context.abort(StatusCode.NOT_FOUND)
+            return
 
-        booking.status = models_pb2.Booking.STATUS_CANCELLED  # type: ignore[union-attr]
-        await self._bookings.update(booking)  # type: ignore[arg-type]
+        booking.status = models_pb2.Booking.STATUS_CANCELLED
+        await self._bookings.update(booking)
 
     def _update_overall_cancellation_status(
         self,
@@ -275,3 +281,9 @@ class UpdateBookingCancellationHandler(object):
 
         if all_bookings_cancelled:
             cancellation.status = models_pb2.CancellationRequest.STATUS_COMPLETED
+
+    def _request_is_complete(self) -> bool:
+        return (
+            self._request.status
+            == orders_pb2.UpdateBookingCancellationRequest.STATUS_COMPLETED
+        )
