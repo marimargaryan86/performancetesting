@@ -603,44 +603,46 @@ class BeneficiariesService(  # noqa: WPS214
     ) -> models_pb2.MetaData:
         return models_pb2.MetaData(
             bank_account_holder_name=cc_beneficiary.bank_account_holder_name,
-            email=cc_beneficiary.email,  # type: ignore[arg-type]
+            email=cc_beneficiary.email or "",
             beneficiary_address=postal_address_pb2.PostalAddress(
                 address_lines=cc_beneficiary.beneficiary_address,
-                region_code=cc_beneficiary.beneficiary_country,  # type: ignore[arg-type]
+                region_code=cc_beneficiary.beneficiary_country or "",
                 postal_code=cc_beneficiary.beneficiary_postcode or "",
-                locality=cc_beneficiary.beneficiary_city,  # type: ignore[arg-type]
-                administrative_area=cc_beneficiary.beneficiary_state_or_province,  # type: ignore[arg-type]
+                locality=cc_beneficiary.beneficiary_city or "",
+                administrative_area=cc_beneficiary.beneficiary_state_or_province or "",
             ),
-            bank_details=models_pb2.BankDetails(
-                name=cc_beneficiary.bank_name,  # type: ignore[arg-type]
-                bic_swift=cc_beneficiary.bic_swift,  # type: ignore[arg-type]
-                account_type=cc_beneficiary.bank_account_type,  # type: ignore[arg-type]
-                payment_types=cc_beneficiary.payment_types  # type: ignore[arg-type]
-                and cc_beneficiary.payment_types[0],
-                address=postal_address_pb2.PostalAddress(
-                    address_lines=(
-                        cc_beneficiary.bank_address[0].split(
-                            r"\n",
-                        )
-                        if cc_beneficiary.bank_address
-                        else None
-                    ),
-                    region_code=cc_beneficiary.bank_country,
-                ),
-                account_number=(
-                    cc_beneficiary.account_number  # type: ignore[arg-type]
-                    if cc_beneficiary.account_number
+            bank_details=self._build_bank_details_model(cc_beneficiary),
+        )
+
+    def _build_bank_details_model(
+        self,
+        cc_beneficiary: beneficiary_models.BeneficiaryResponse,
+    ) -> models_pb2.BankDetails:
+        if cc_beneficiary.payment_types:
+            payment_type = cc_beneficiary.payment_types[0]
+        else:
+            payment_type = ""
+
+        return models_pb2.BankDetails(
+            name=cc_beneficiary.bank_name or "",
+            bic_swift=cc_beneficiary.bic_swift or "",
+            account_type=cc_beneficiary.bank_account_type or "",
+            payment_types=payment_type,
+            address=postal_address_pb2.PostalAddress(
+                address_lines=(
+                    cc_beneficiary.bank_address[0].split(
+                        r"\n",
+                    )
+                    if cc_beneficiary.bank_address
                     else None
                 ),
-                aba=(
-                    cc_beneficiary.routing_code_value_1  # type: ignore[arg-type]
-                    if cc_beneficiary.account_number
-                    else None
-                ),
-                iban=(
-                    None  # type: ignore[arg-type]
-                    if cc_beneficiary.account_number
-                    else cc_beneficiary.iban
-                ),
+                region_code=cc_beneficiary.bank_country,
             ),
+            account_number=cc_beneficiary.account_number or "",
+            aba=(
+                cc_beneficiary.routing_code_value_1 or ""
+                if cc_beneficiary.account_number
+                else ""
+            ),
+            iban=("" if cc_beneficiary.account_number else cc_beneficiary.iban or ""),
         )

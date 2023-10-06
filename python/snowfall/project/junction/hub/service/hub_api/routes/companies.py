@@ -27,16 +27,16 @@ class AdminCompany(endpoints.HTTPEndpoint):
         company = await companies_client.update(
             models_pb2.Company(
                 id=company_id,
-                name=payload.get("name"),  # type: ignore[arg-type]
+                name=payload.get("name", ""),
                 address=postal_address_pb2.PostalAddress(
                     address_lines=address.get("addressLines"),
                     region_code=address.get("countryCode"),
                     postal_code=address.get("postalCode"),
                     locality=address.get("city"),
                 ),
-                fx_markup=payload.get("fxMarkup"),  # type: ignore[arg-type]
-                processing_markup=payload.get("processingMarkup"),  # type: ignore[arg-type]
-                sales_markup=payload.get("salesMarkup"),  # type: ignore[arg-type]
+                fx_markup=payload.get("fxMarkup", 0),
+                processing_markup=payload.get("processingMarkup", 0),
+                sales_markup=payload.get("salesMarkup", 0),
             ),
         )
 

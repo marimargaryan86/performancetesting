@@ -21,7 +21,9 @@ class TestZendeskClient(object):
     ) -> None:
         booking_id = more_itertools.first(order.bookings).id
         booking = await booking_repository.find_by_id(booking_id)
+        assert booking
         journey = await journey_repository.find_by_id(order.journey_id)
+        assert journey
 
         httpx_mock.add_response(
             url="https://test.api.com/api/v2/tickets",
@@ -40,9 +42,9 @@ class TestZendeskClient(object):
             },
         )
         cancel_request_payload = zendesk_client.create_cancel_request_payload(
-            booking,  # type: ignore[arg-type]
+            booking,
             order,
-            journey,  # type: ignore[arg-type]
+            journey,
         )
         support_ticket_id = await zendesk_client.create_support_ticket(
             cancel_request_payload,

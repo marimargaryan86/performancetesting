@@ -2,7 +2,7 @@ import functools
 from collections.abc import Awaitable, Callable
 from typing import ParamSpec, TypeVar, cast
 
-from starlette import status
+from starlette import requests, status
 
 from snowfall.project.junction.extensions.service.mobile_api import repository
 from snowfall.stdlib.integration.starlette import models, request_helpers
@@ -19,7 +19,12 @@ def voucher_validator(
         *args: _In.args,
         **kwargs: _In.kwargs,
     ) -> _Out | models.JsonApiResponse:
-        body = await request_helpers.flatten_request(args[1])  # type: ignore[arg-type]
+        request = args[1]
+
+        if not isinstance(request, requests.Request):
+            raise TypeError
+
+        body = await request_helpers.flatten_request(request)
         voucher_code = body.get("voucher", "")
         voucher = None
         if voucher_code:

@@ -183,7 +183,7 @@ class GrpcClient(Client):
     ) -> models_pb2.Transaction:
         response = await errors.handle_grpc_errors(
             self._transactions.GetTransaction(
-                grpc_pb2.GetTransactionRequest(id=identifier, selector=selector),  # type: ignore[arg-type]
+                grpc_pb2.GetTransactionRequest(id=identifier, selector=selector or ""),
                 timeout=self._timeout,
             ),
         )

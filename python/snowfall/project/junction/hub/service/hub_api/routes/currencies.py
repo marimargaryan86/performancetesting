@@ -1,5 +1,5 @@
 import lagom
-from starlette import endpoints, requests, responses
+from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.project.junction.hub.service.hub_api import resources
 from snowfall.project.pay.adapter.currencies import Client
@@ -14,10 +14,14 @@ class Currencies(endpoints.HTTPEndpoint):
     ) -> responses.Response:
         currency_id = request.path_params["currencyId"]
         currency = await currencies_client.get(currency_id)
+
+        if not currency:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+
         return await messages.create_response(
             body=models.Body(
                 data=resources.CurrenciesResource.from_model(
-                    currency,  # type: ignore[arg-type]
+                    currency,
                     request,
                 ),
             ),
