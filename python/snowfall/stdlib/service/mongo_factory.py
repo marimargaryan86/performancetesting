@@ -12,6 +12,9 @@ async def make_database(
     app: application.Application[_Settings],
     dsn: pydantic.MongoDsn,
 ) -> core.AgnosticDatabase:
-    client = motor_asyncio.AsyncIOMotorClient(host=str(dsn))
+    client = motor_asyncio.AsyncIOMotorClient(
+        host=str(dsn),
+        tz_aware=True,
+    )
 
     return client[app.name]

@@ -5,7 +5,7 @@ import ipaddress
 from typing import TypeVar, cast
 
 import pydantic
-from aio_pika import robust_connection
+from aio_pika import abc
 from google.protobuf import message
 
 from snowfall.project.junction.go.service.gateway import (
@@ -49,7 +49,7 @@ class _ServeSettings(_SharedSettings):
 
 
 _BootstrapReturn = tuple[
-    robust_connection.RobustConnection,
+    abc.AbstractConnection,
     providers.Collection,
     tasks.Runner[amqp_pb2.TripOfferSearchResult],
     tasks.Runner[trips_pb2.TripSearchResult],
