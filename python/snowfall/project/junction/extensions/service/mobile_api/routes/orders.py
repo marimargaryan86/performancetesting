@@ -28,6 +28,8 @@ from snowfall.vendor.junction.go import models as vendor_models
 MIN_CHARGE = MappingProxyType(
     {
         "EUR": 50,
+        "USD": 50,
+        "GBP": 50,
         "SEK": 500,
     },
 )
