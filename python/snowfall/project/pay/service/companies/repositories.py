@@ -24,7 +24,7 @@ class CompaniesRepository(
 
         await self._execute(
             self._collection.replace_one,
-            filter={"_id": company.id},
+            filter={repository.mongo_id_key: company.id},
             replacement=replacement,
         )
 
@@ -94,7 +94,7 @@ class AccountsRepository(
     ) -> pymongo.results.UpdateResult:
         return await self._execute(
             self._collection.update_one,
-            filter={"_id": account_id},
+            filter={repository.mongo_id_key: account_id},
             update={"$set": new_values},
         )
 
@@ -121,7 +121,7 @@ class ContactsRepository(
     ) -> models_pb2.Contact:
         return await self._execute(
             self._collection.update_one,
-            filter={"_id": contact.id},
+            filter={repository.mongo_id_key: contact.id},
             update={
                 "$set": {
                     "external_reference": contact.external_reference,
@@ -169,10 +169,10 @@ class BeneficiaryRepository(
         beneficiary: models_pb2.Beneficiary,
     ) -> pymongo.results.UpdateResult:
         replacement = self._coder.encode(beneficiary)
-        replacement.pop("_id")
+        replacement.pop(repository.mongo_id_key)
 
         return await self._execute(
             self._collection.replace_one,
-            filter={"_id": document_id},
+            filter={repository.mongo_id_key: document_id},
             replacement=replacement,
         )

@@ -21,5 +21,7 @@ class ResellerRepository(  # noqa: WPS215
     ) -> resultset.ResultSet[models_pb2.Reseller]:
         return await self._find_with_cursor(
             cur=cursor,
-            filter_={"_id": {"$in": identifiers}} if identifiers else None,
+            filter_=(
+                {repository.mongo_id_key: {"$in": identifiers}} if identifiers else None
+            ),
         )

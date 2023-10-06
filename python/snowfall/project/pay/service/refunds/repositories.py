@@ -27,7 +27,7 @@ class RefundsRepository(
 
         await self._execute(
             self._collection.replace_one,
-            filter={"_id": refund.id},
+            filter={repository.mongo_id_key: refund.id},
             replacement=replacement,
         )
 

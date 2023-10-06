@@ -153,7 +153,7 @@ class TripSearchRepository(  # noqa: WPS215
 
         update = await self._execute(
             self._collection.update_one,
-            {"_id": new_trip_search.id},
+            {repository.mongo_id_key: new_trip_search.id},
             {
                 "$set": {
                     "trip_ids": list(new_trip_search.trip_ids),
@@ -228,7 +228,7 @@ class TripCandidateSearchRepository(  # noqa: WPS215
     ) -> bool:
         update = await self._execute(
             self._collection.update_one,
-            {"_id": trip_candidate_search_id},
+            {repository.mongo_id_key: trip_candidate_search_id},
             {
                 "$set": {
                     "offer_search_ids": list(offer_search_ids),

@@ -1,7 +1,6 @@
 import asyncio
 import dataclasses
 import logging
-import uuid
 from collections.abc import Iterable, Sequence
 from typing import Any
 
@@ -11,12 +10,6 @@ from snowfall.project.junction.go.service.places.v1 import models_pb2
 from snowfall.service.geodata.v1 import geocoding_pb2, geocoding_pb2_grpc
 from snowfall.stdlib import string
 from snowfall.stdlib.persistence.mongo import mixins, normalizers, repository, resultset
-
-_mongo_id_key = "_id"
-_proto_id_key = "id"
-_location_key = "location"
-
-_NAMESPACE = uuid.UUID("5190984e-4ab7-411e-96f6-2848cc5d63e1")
 
 
 @dataclasses.dataclass(frozen=True)
@@ -58,7 +51,9 @@ class LocationRepository(
     ) -> resultset.ResultSet[models_pb2.Location]:
         return await self._find_with_cursor(
             cur=cursor,
-            filter_={_mongo_id_key: {"$in": identifiers}} if identifiers else None,
+            filter_=(
+                {repository.mongo_id_key: {"$in": identifiers}} if identifiers else None
+            ),
         )
 
     async def find_within_area(
@@ -187,14 +182,17 @@ class PlaceRepository(  # noqa: WPS215
         super().__init__(*args, **kwargs)
 
     async def get_ids(self) -> frozenset[str]:
-        ids = await self._execute(self._collection.distinct, "_id")
+        ids = await self._execute(self._collection.distinct, repository.mongo_id_key)
         return frozenset(str(_id) for _id in ids)
 
     async def get_by_ids(
         self,
         ids: Iterable[str],
     ) -> resultset.ResultSet[models_pb2.Place]:
-        return await self._find_with_cursor("", {"_id": {"$in": tuple(ids)}})
+        return await self._find_with_cursor(
+            "",
+            {repository.mongo_id_key: {"$in": tuple(ids)}},
+        )
 
     async def find(
         self,
@@ -203,7 +201,9 @@ class PlaceRepository(  # noqa: WPS215
     ) -> resultset.ResultSet[models_pb2.Place]:
         return await self._find_with_cursor(
             cur=cursor,
-            filter_={_mongo_id_key: {"$in": identifiers}} if identifiers else None,
+            filter_=(
+                {repository.mongo_id_key: {"$in": identifiers}} if identifiers else None
+            ),
         )
 
     async def create(
@@ -237,11 +237,11 @@ class PlaceRepository(  # noqa: WPS215
 
     async def update(self, resource: models_pb2.Place) -> bool:
         replacement = self._coder.encode(resource)
-        replacement.pop("_id")
+        replacement.pop(repository.mongo_id_key)
 
         update: results.UpdateResult = await self._execute(
             self._collection.replace_one,
-            filter={_mongo_id_key: resource.location.id},
+            filter={repository.mongo_id_key: resource.location.id},
             replacement=replacement,
         )
 
@@ -250,7 +250,7 @@ class PlaceRepository(  # noqa: WPS215
     async def delete(self, identifier: str) -> None:
         await self._execute(
             self._collection.delete_one,
-            filter={_mongo_id_key: identifier},
+            filter={repository.mongo_id_key: identifier},
         )
 
 

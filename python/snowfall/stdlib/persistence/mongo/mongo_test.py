@@ -12,10 +12,10 @@ from snowfall.stdlib.v1 import testing_pb2
 
 async def test_result_set(mock_repository: conftest.MockRepository) -> None:
     await asyncio.gather(
-        mock_repository.insert({"_id": "foobar_foobar"}),
-        mock_repository.insert({"_id": "bazqux_foobar"}),
-        mock_repository.insert({"_id": "foobar_bazqux"}),
-        mock_repository.insert({"_id": "bazqux_bazqux"}),
+        mock_repository.insert({repository.mongo_id_key: "foobar_foobar"}),
+        mock_repository.insert({repository.mongo_id_key: "bazqux_foobar"}),
+        mock_repository.insert({repository.mongo_id_key: "foobar_bazqux"}),
+        mock_repository.insert({repository.mongo_id_key: "bazqux_bazqux"}),
     )
 
     documents = await mock_repository.all_()
@@ -40,7 +40,7 @@ async def test_result_set(mock_repository: conftest.MockRepository) -> None:
 async def test_documents_are_not_duplicated_during_pagination(
     mock_repository: conftest.MockRepository,
 ) -> None:
-    await mock_repository.insert({"_id": "aaaaa"})
+    await mock_repository.insert({repository.mongo_id_key: "aaaaa"})
 
     documents = await mock_repository.all_()
 
@@ -54,7 +54,7 @@ async def test_documents_are_not_duplicated_during_pagination(
 async def test_pagination_is_not_reset_on_no_documents(  # noqa: WPS217
     mock_repository: conftest.MockRepository,
 ) -> None:
-    await mock_repository.insert({"_id": "aaaaa"})
+    await mock_repository.insert({repository.mongo_id_key: "aaaaa"})
 
     documents = await mock_repository.all_()
     assert len([doc async for doc in documents]) == 1
@@ -63,7 +63,7 @@ async def test_pagination_is_not_reset_on_no_documents(  # noqa: WPS217
         documents = await mock_repository.all_(await documents.cursor())
         assert not len([doc async for doc in documents])
 
-    await mock_repository.insert({"_id": "bbbbb"})
+    await mock_repository.insert({repository.mongo_id_key: "bbbbb"})
 
     assert (
         len(
@@ -75,14 +75,18 @@ async def test_pagination_is_not_reset_on_no_documents(  # noqa: WPS217
 
 async def test_cursor_filters(mock_repository: conftest.MockRepository) -> None:
     await asyncio.gather(
-        mock_repository.insert({"_id": "foobar_foobar"}),
+        mock_repository.insert({repository.mongo_id_key: "foobar_foobar"}),
     )
 
     documents = await mock_repository.find_subset(["bazqux_foobar"])
-    assert "foobar_foobar" not in {document["_id"] async for document in documents}
+    assert "foobar_foobar" not in {
+        document[repository.mongo_id_key] async for document in documents
+    }
 
     documents = await mock_repository.find_subset(["foobar_foobar"])
-    assert "foobar_foobar" in {document["_id"] async for document in documents}
+    assert "foobar_foobar" in {
+        document[repository.mongo_id_key] async for document in documents
+    }
 
 
 async def test_proto_repository(
@@ -100,8 +104,8 @@ async def test_proto_repository(
 
 _TEST_DATA = (
     (None, ["1", "2", "3", "4"]),
-    (("_id", pymongo.ASCENDING), ["1", "2", "3", "4"]),
-    (("_id", pymongo.DESCENDING), ["4", "3", "2", "1"]),
+    ((repository.mongo_id_key, pymongo.ASCENDING), ["1", "2", "3", "4"]),
+    ((repository.mongo_id_key, pymongo.DESCENDING), ["4", "3", "2", "1"]),
     (("field", pymongo.ASCENDING), ["2", "4", "1", "3"]),
     (("field", pymongo.DESCENDING), ["3", "1", "2", "4"]),
     (("created", pymongo.ASCENDING), ["1", "2", "3", "4"]),
@@ -119,7 +123,7 @@ class TestSorting(object):
     ) -> None:
         documents = await sorting_repository.all_(sort=sort)
         documents.limit(4)
-        resolved = [document["_id"] async for document in documents]
+        resolved = [document[repository.mongo_id_key] async for document in documents]
         assert resolved == expected
 
     async def test_unknown_field_raises_error(
@@ -164,7 +168,9 @@ class TestSorting(object):
         for subset in more_itertools.chunked(expected, limit):
             documents = await sorting_repository.all_(cursor=cursor, sort=sort)
             documents.limit(limit)
-            assert subset == [document["_id"] async for document in documents]
+            assert subset == [
+                document[repository.mongo_id_key] async for document in documents
+            ]
             cursor = await documents.cursor()
             assert cursor != ""
 
@@ -179,7 +185,7 @@ class TestNestedSorting(object):
     ) -> None:
         documents = await nested_sorting_repository.all_(sort=sort)
         documents.limit(4)
-        resolved = [document["_id"] async for document in documents]
+        resolved = [document[repository.mongo_id_key] async for document in documents]
         assert resolved == expected
 
     @pytest.mark.parametrize(("sort", "expected"), _TEST_DATA)
@@ -199,6 +205,8 @@ class TestNestedSorting(object):
         for subset in more_itertools.chunked(expected, limit):
             documents = await nested_sorting_repository.all_(cursor=cursor, sort=sort)
             documents.limit(limit)
-            assert subset == [document["_id"] async for document in documents]
+            assert subset == [
+                document[repository.mongo_id_key] async for document in documents
+            ]
             cursor = await documents.cursor()
             assert cursor != ""

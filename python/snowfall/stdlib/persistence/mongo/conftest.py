@@ -54,7 +54,7 @@ class MockRepository(
         return await self._find_with_cursor(
             "",
             {
-                "_id": {
+                repository.mongo_id_key: {
                     "$in": identifiers,
                 },
             },
@@ -100,10 +100,26 @@ def mock_db_values() -> list[dict[str, Any]]:
     now = datetime.datetime.now(tz=datetime.UTC)
 
     return [
-        {"_id": "2", "field": "A", "created": now - datetime.timedelta(hours=3)},
-        {"_id": "1", "field": "B", "created": now - datetime.timedelta(hours=4)},
-        {"_id": "3", "field": "C", "created": now - datetime.timedelta(hours=2)},
-        {"_id": "4", "field": "A", "created": now - datetime.timedelta(hours=1)},
+        {
+            repository.mongo_id_key: "2",
+            "field": "A",
+            "created": now - datetime.timedelta(hours=3),
+        },
+        {
+            repository.mongo_id_key: "1",
+            "field": "B",
+            "created": now - datetime.timedelta(hours=4),
+        },
+        {
+            repository.mongo_id_key: "3",
+            "field": "C",
+            "created": now - datetime.timedelta(hours=2),
+        },
+        {
+            repository.mongo_id_key: "4",
+            "field": "A",
+            "created": now - datetime.timedelta(hours=1),
+        },
     ]
 
 

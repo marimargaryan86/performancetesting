@@ -41,7 +41,7 @@ class SubscriptionsRepository(
     ) -> Mapping[str, Any]:
         return await self._execute(
             self._collection.find_one_and_update,
-            {"_id": mobile},
+            {repository.mongo_id_key: mobile},
             {"$set": {"subscribed": True}},
         )
 
@@ -51,7 +51,7 @@ class SubscriptionsRepository(
     ) -> None:
         await self._execute(
             self._collection.delete_one,
-            {"_id": mobile},
+            {repository.mongo_id_key: mobile},
         )
 
     async def update_first_order(
@@ -61,7 +61,7 @@ class SubscriptionsRepository(
     ) -> None:
         await self._execute(
             self._collection.update_one,
-            {"_id": mobile},
+            {repository.mongo_id_key: mobile},
             {"$set": {"first_order": order_id}},
         )
 

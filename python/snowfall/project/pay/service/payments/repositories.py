@@ -5,8 +5,6 @@ from typing import Any
 from snowfall.project.pay.service.payments.v1alpha.models_pb2 import Payment
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 
-_mongo_id_key = "_id"
-
 
 class PaymentsRepository(
     repository.ProtoRepository[Payment],

@@ -21,12 +21,8 @@ class UsersRepository(
     ) -> pymongo.results.UpdateResult:
         return await self._execute(
             self._collection.update_one,
-            self._get_filter_by_email(user.email),
-            {
-                "$set": {
-                    "password": password,
-                },
-            },
+            {"email": {"$eq": user.email}},
+            {"$set": {"password": password}},
         )
 
     async def find_user_by_id(
@@ -35,7 +31,7 @@ class UsersRepository(
     ) -> models_pb2.User | None:
         return await self._execute(
             query=self._collection.find_one,
-            filter=self._get_filter_by_id(document_id),
+            filter={repository.mongo_id_key: {"$eq": document_id}},
         )
 
     async def find_user_by_email(
@@ -44,25 +40,5 @@ class UsersRepository(
     ) -> models_pb2.User | None:
         return await self._execute(
             query=self._collection.find_one,
-            filter=self._get_filter_by_email(email),
+            filter={"email": {"$eq": email}},
         )
-
-    def _get_filter_by_email(
-        self,
-        email: str,
-    ) -> dict[str, dict[str, str]]:
-        return {
-            "email": {
-                "$eq": email,
-            },
-        }
-
-    def _get_filter_by_id(
-        self,
-        document_id: str,
-    ) -> dict[str, dict[str, str]]:
-        return {
-            "_id": {
-                "$eq": document_id,
-            },
-        }

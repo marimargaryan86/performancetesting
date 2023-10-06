@@ -124,7 +124,7 @@ class SubscriberRepository(
     async def unsubscribe(self, identifier: str) -> bool:
         update = await self._execute(
             self._collection.update_one,
-            {"_id": identifier},
+            {repository.mongo_id_key: identifier},
             {
                 "$set": {
                     "phone_subscription_status": (
@@ -140,7 +140,7 @@ class SubscriberRepository(
     async def subscribe(self, identifier: str) -> bool:
         update = await self._execute(
             self._collection.update_one,
-            {"_id": identifier},
+            {repository.mongo_id_key: identifier},
             {
                 "$set": {
                     "phone_subscription_status": (
@@ -177,11 +177,11 @@ class ConfigurationVectorRepository(  # noqa: WPS215
         configuration_vector: models_pb2.ConfigurationVector,
     ) -> bool:
         replacement = self._coder.encode(configuration_vector)
-        replacement.pop("_id")
+        replacement.pop(repository.mongo_id_key)
 
         update: pymongo.results.UpdateResult = await self._execute(
             self._collection.update_one,
-            {"_id": configuration_vector.id},
+            {repository.mongo_id_key: configuration_vector.id},
             {"$set": replacement},
             upsert=False,
         )
@@ -240,7 +240,7 @@ class MonitoringRuleRepository(  # noqa: WPS215
     async def update_checkin_reminder(self, identifier: str) -> bool:
         update_result = await self._execute(
             self._collection.update_one,
-            {"_id": identifier},
+            {repository.mongo_id_key: identifier},
             {"$set": {"sent_checkin_reminder": datetime.datetime.now(tz=datetime.UTC)}},
         )
         return update_result.modified_count != 0

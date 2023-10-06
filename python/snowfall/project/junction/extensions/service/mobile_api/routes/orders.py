@@ -31,7 +31,6 @@ MIN_CHARGE = MappingProxyType(
         "SEK": 500,
     },
 )
-_ID = "_id"
 
 
 class MessageOrder(endpoints.HTTPEndpoint):

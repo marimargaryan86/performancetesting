@@ -224,7 +224,7 @@ class OfferAggregateMappingRepository(
                 "$lookup": {
                     "from": "trip_offers",
                     "localField": "offer_result_ids",
-                    "foreignField": "_id",
+                    "foreignField": repository.mongo_id_key,
                     "as": "results",
                 },
             },
@@ -235,7 +235,15 @@ class OfferAggregateMappingRepository(
                     },
                 },
             },
-            {"$sort": {sort[0]: sort[1]} if sort else {"_id": 1}},
+            {
+                "$sort": (
+                    {
+                        sort[0]: sort[1],
+                    }
+                    if sort
+                    else {repository.mongo_id_key: 1}
+                ),
+            },
         ]
 
         return await self._execute(

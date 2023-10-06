@@ -1,7 +1,5 @@
 import stripe
 
-_id_key = "_id"
-
 
 async def capture(
     intent_id: str,

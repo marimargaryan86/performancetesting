@@ -184,7 +184,7 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
         self._valid_sort_fields = [
             index_key for index in self._indexes for index_key in index.document["key"]
         ]
-        self._valid_sort_fields.append("_id")
+        self._valid_sort_fields.append(mongo_id_key)
         self._root_path = "${0}".format((self._nested_path or "").removeprefix("$"))
         self._nested_path_parts = self._root_path.split(".")
         self._clean_path = self._root_path.removeprefix("$")
@@ -363,7 +363,7 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
                 },
                 {
                     "$group": {
-                        "_id": "${0}".format(mongo_id_key),
+                        mongo_id_key: "${0}".format(mongo_id_key),
                         "document": {
                             "$first": "$$ROOT",
                         },

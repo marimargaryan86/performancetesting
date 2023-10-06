@@ -60,7 +60,7 @@ class PriceQuoteRepository(repository.ProtoRepository[models_pb2.PriceQuote]):
     ) -> models_pb2.PriceQuote:
         update = await self._execute(
             self._collection.update_one,
-            filter={"_id": price_quote_container_id},
+            filter={repository.mongo_id_key: price_quote_container_id},
             update={
                 "$push": {
                     "quotes": self._coder.encode(price_quote),

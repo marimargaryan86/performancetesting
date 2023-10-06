@@ -39,7 +39,7 @@ class TransactionsRepository(
     ) -> resultset.ResultSet[models_pb2.Transaction]:
         filter_ = {}
         if filter_by_ids:
-            filter_["_id"] = {
+            filter_[repository.mongo_id_key] = {
                 "$in": list(filter_by_ids),
             }
         if filter_by_bill_ids:
@@ -51,7 +51,7 @@ class TransactionsRepository(
     async def find_by_ids(
         self,
         fields: Sequence[str],
-        selector: str = "_id",
+        selector: str = repository.mongo_id_key,
     ) -> resultset.ResultSet[models_pb2.Transaction]:
         query = {
             selector: {
@@ -79,7 +79,7 @@ class QuotationsRepository(
     ) -> bool:
         update_result = await self._execute(
             self._collection.update_one,
-            filter={"_id": quotation_id},
+            filter={repository.mongo_id_key: quotation_id},
             update={
                 "$set": {
                     "status": status,
@@ -156,7 +156,7 @@ class BillsRepository(
 
         await self._execute(
             self._collection.replace_one,
-            filter={"_id": bill.id},
+            filter={repository.mongo_id_key: bill.id},
             replacement=replacement,
             upsert=False,
         )

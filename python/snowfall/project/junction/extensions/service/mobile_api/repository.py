@@ -133,11 +133,11 @@ class PlacesRepository(
         return response
 
     async def get_ids(self) -> frozenset[str]:
-        ids = await self._execute(self._collection.distinct, "_id")
+        ids = await self._execute(self._collection.distinct, repository.mongo_id_key)
         return frozenset(str(_id) for _id in ids)
 
     async def delete_ids(self, ids: Iterable[str]) -> None:
-        filters = {"_id": {"$in": tuple(ids)}}
+        filters = {repository.mongo_id_key: {"$in": tuple(ids)}}
         await self._execute(self._collection.delete_many, filters)
 
     async def find(self) -> resultset.ResultSet[models_pb2.Place]:
@@ -184,11 +184,11 @@ class PlacesRepository(
 
     async def update(self, resource: models_pb2.Place) -> bool:
         replacement = self._coder.encode(resource)
-        replacement.pop("_id")
+        replacement.pop(repository.mongo_id_key)
 
         update: pymongo.results.UpdateResult = await self._execute(
             self._collection.replace_one,
-            filter={"_id": resource.id},
+            filter={repository.mongo_id_key: resource.id},
             replacement=replacement,
         )
 
@@ -205,7 +205,7 @@ class GuestsRepository(
     async def delete(self, guest_id: str) -> None:
         await self._execute(
             self._collection.delete_one,
-            filter={"_id": guest_id},
+            filter={repository.mongo_id_key: guest_id},
         )
 
 
@@ -221,7 +221,7 @@ class UsersRepository(
         self,
         password: str,
         document_id: str,
-        selector: str = "_id",
+        selector: str = repository.mongo_id_key,
     ) -> None:
         await self._execute(
             self._collection.update_one,
@@ -268,7 +268,7 @@ class UsersRepository(
     async def delete(self, user_id: str, password: str) -> bool:
         user = await self._execute(
             self._collection.find_one,
-            filter={"_id": user_id},
+            filter={repository.mongo_id_key: user_id},
         )
         password_match = bcrypt.checkpw(
             password.encode(),
@@ -278,7 +278,7 @@ class UsersRepository(
             return False
         await self._execute(
             self._collection.delete_one,
-            filter={"_id": user_id},
+            filter={repository.mongo_id_key: user_id},
         )
         await self._execute(
             self._collection.database["users_deleted"].insert_one,
@@ -578,7 +578,7 @@ class UserGroupsRepository(
     async def delete(self, document_id: str, user_id: str) -> int:
         delete = await self._execute(
             self._collection.delete_one,
-            filter={"_id": document_id, "user_id": user_id},
+            filter={repository.mongo_id_key: document_id, "user_id": user_id},
         )
         if not delete.acknowledged:
             raise RuntimeError()
@@ -592,7 +592,7 @@ class UserGroupsRepository(
         input_dict: Mapping[str, Any],
     ) -> None:
         member = dict(copy.deepcopy(input_dict))
-        member["_id"] = member_id
+        member[repository.mongo_id_key] = member_id
         member["created_at"] = datetime.datetime.now(tz=datetime.UTC)
         member["updated_at"] = datetime.datetime.now(tz=datetime.UTC)
         # TODO: check somehow for limit of members from env_var
@@ -610,7 +610,7 @@ class UserGroupsRepository(
         input_dict: Mapping[str, Any],
     ) -> None:
         member = dict(copy.deepcopy(input_dict))
-        member["_id"] = member_id
+        member[repository.mongo_id_key] = member_id
         member["updated_at"] = datetime.datetime.now(tz=datetime.UTC)
         await self._execute(
             self._collection.update_one,
@@ -638,7 +638,7 @@ class UserGroupsRepository(
                 "user_id": user_id,
                 "members._id": member_id,
             },
-            update={"$pull": {"members": {"_id": member_id}}},
+            update={"$pull": {"members": {repository.mongo_id_key: member_id}}},
         )
         return update_result.modified_count > 0
 

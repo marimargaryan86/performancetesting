@@ -135,7 +135,7 @@ class OrderRepository(repository.ProtoRepository[models_pb2.Order]):
         )
         update = await self._execute(
             self._collection.update_one,
-            filter={"_id": journey_id},
+            filter={repository.mongo_id_key: journey_id},
             update={
                 "$push": {
                     "orders": self._coder.encode(order),
@@ -499,7 +499,7 @@ class CancellationRequestsRepository(
 
         update = await self._execute(
             self._collection.replace_one,
-            filter={"_id": replacement["_id"]},
+            filter={repository.mongo_id_key: replacement[repository.mongo_id_key]},
             replacement=replacement,
         )
 

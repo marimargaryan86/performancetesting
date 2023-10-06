@@ -5,6 +5,7 @@ from google.protobuf import json_format, timestamp_pb2
 from snowfall.stdlib.persistence.mongo import normalizers
 from snowfall.stdlib.v1 import latlng_pb2, testing_pb2
 
+_MONGO_ID_KEY = "_id"
 _LATITUDE = 59.85882
 _LONGITUDE = 17.63889
 
@@ -16,7 +17,7 @@ def test_id_normalizer() -> None:
         json_format.MessageToDict(expected, preserving_proto_field_name=True),
     )
 
-    assert normalized == {"_id": "foobar"}
+    assert normalized == {_MONGO_ID_KEY: "foobar"}
 
     actual: testing_pb2.Foobar = json_format.ParseDict(
         normalizers.denormalize(testing_pb2.Foobar.DESCRIPTOR, normalized),
@@ -33,7 +34,7 @@ def test_id_normalizer_nested() -> None:
         json_format.MessageToDict(expected, preserving_proto_field_name=True),
     )
 
-    assert normalized == {"foobars": [{"_id": "foobar"}]}
+    assert normalized == {"foobars": [{_MONGO_ID_KEY: "foobar"}]}
 
     actual: testing_pb2.RepeatedFoobar = json_format.ParseDict(
         normalizers.denormalize(testing_pb2.RepeatedFoobar.DESCRIPTOR, normalized),
