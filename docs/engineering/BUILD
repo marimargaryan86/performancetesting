@@ -4,7 +4,6 @@ files(
 )
 docker_image(
     dependencies=[
-        "//openapi/junction/admin_api:admin_api",
         "//openapi/junction/client_api:client_api",
         "//openapi/junction/data_api:data_api",
         "//openapi/junction/mobile_api:mobile_api",
