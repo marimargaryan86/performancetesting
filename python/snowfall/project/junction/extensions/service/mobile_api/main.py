@@ -46,7 +46,7 @@ def _get_httpx_auth_and_middlewares(
     httpx_auth_method: httpx.Auth
 
     if settings.cookie_auth_enabled:
-        if not settings.authentication_address or settings.junction_private_key:
+        if not settings.authentication_address or not settings.junction_private_key:
             raise RuntimeError("Missing required configuration.")
 
         httpx_auth_method = auth.TemporaryTokenAuth()
