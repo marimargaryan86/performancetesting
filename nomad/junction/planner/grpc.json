@@ -2,13 +2,13 @@
   "development": {
     "variables": {
       "count": 1,
-      "memory_value": 76800
+      "memory_value": 20480
     }
   },
   "production": {
     "variables": {
       "count": 1,
-      "memory_value": 76800
+      "memory_value": 20480
     }
   },
   "sandbox": {
