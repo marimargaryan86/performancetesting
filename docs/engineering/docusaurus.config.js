@@ -37,10 +37,6 @@ const config = {
             spec: 'openapi/junction/mobile_api/openapi.json',
           },
           {
-            id: 'junction-go-admin-api',
-            spec: 'openapi/junction/admin_api/openapi.json',
-          },
-          {
             id: 'junction-go-data-api',
             spec: 'openapi/junction/data_api/openapi.json',
           },

@@ -41,18 +41,6 @@ overrides:
     rules:
       no-numeric-ids: off
   - files:
-      - "junction/pay_admin_api/openapi.json#/components/parameters/company"
-    rules:
-      json-api-no-required-parameters: info
-      json-api-query-parameter-names: info
-  - files:
-      - "junction/admin_api/openapi.json#/components/schemas/LocationFetchable"
-      - "junction/admin_api/openapi.json#/components/schemas/PlaceCreatable"
-      - "junction/admin_api/openapi.json#/components/schemas/PlaceFetchable"
-      - "junction/admin_api/openapi.json#/components/schemas/PlaceUpdatable"
-    rules:
-      json-api-resource-required-fields: info
-  - files:
       - "junction/mobile_api/openapi.json#/components/schemas/PreferenceAttributes"
     rules:
       json-api-ensure-enum-naming: info
