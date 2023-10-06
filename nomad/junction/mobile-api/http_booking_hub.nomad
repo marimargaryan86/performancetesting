@@ -163,7 +163,7 @@ JWT_PUBLIC_KEY={{ .Data.data.jwt_public_key }}
 ORY_CLIENT_SECRET={{ .Data.data.ory_client_secret }}
 {{ end }}
 {{ with secret "kv/data/${var.environment}/authentication" }}
-JWT_PRIVATE_KEY={{ .Data.data.jwt_private_key }}
+JUNCTION_PRIVATE_KEY={{ .Data.data.jwt_private_key }}
 {{ end }}
 EOH
       }
