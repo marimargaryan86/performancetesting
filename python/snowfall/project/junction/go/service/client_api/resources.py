@@ -1139,6 +1139,13 @@ class TripSearchResource(models.Resource):
                 "departureAfter": protobuf.protobuf_to_datetime(
                     trip_search.departure_after,
                 ),
+                "departureBefore": (
+                    protobuf.protobuf_to_datetime(
+                        trip_search.departure_before,
+                    )
+                    if trip_search.HasField("departure_before")
+                    else None
+                ),
                 "status": protobuf.enum_value_to_slug(
                     amqp_pb2.Trackable.Status.DESCRIPTOR,
                     trip_search.status,
@@ -1275,6 +1282,13 @@ class TripCandidateSearchResource(models.Resource):
                         },
                         "departureAfter": protobuf.protobuf_to_datetime(
                             criteria.departure_after,
+                        ),
+                        "departureBefore": (
+                            protobuf.protobuf_to_datetime(
+                                criteria.departure_before,
+                            )
+                            if criteria.HasField("departure_before")
+                            else None
                         ),
                         "maximumConnections": criteria.maximum_connections,
                     }
