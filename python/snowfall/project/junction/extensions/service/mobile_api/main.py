@@ -46,7 +46,7 @@ def _get_httpx_auth_and_middlewares(
     httpx_auth_method: httpx.Auth
 
     if settings.cookie_auth_enabled:
-        if not settings.authentication_address or settings.jwt_private_key:
+        if not settings.authentication_address or settings.junction_private_key:
             raise RuntimeError("Missing required configuration.")
 
         httpx_auth_method = auth.TemporaryTokenAuth()
@@ -68,7 +68,7 @@ def _get_httpx_auth_and_middlewares(
                 middleware.HubHackBackend,
                 jwt_auth=httpx_auth_method,
                 jwt_encoder=jwt.Encoder(
-                    private_key=settings.jwt_private_key,
+                    private_key=settings.junction_private_key,
                     algorithm="RS256",
                 ),
             ),
