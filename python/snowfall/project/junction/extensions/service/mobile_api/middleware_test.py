@@ -1,16 +1,16 @@
-import base64
 from collections.abc import Mapping
 
 import pytest
 from starlette import authentication, requests
 
 from snowfall.project.junction.extensions.service.mobile_api import conftest, middleware
+from snowfall.stdlib.format import jwt
 
 
 @pytest.fixture()
 def auth_backend() -> middleware.AuthenticationBackend:
     return middleware.AuthenticationBackend(
-        public_key=base64.b64decode(conftest.jwt_public_key).decode(),
+        decoder=jwt.Decoder(),
         token_version=conftest.jwt_token_version,
     )
 

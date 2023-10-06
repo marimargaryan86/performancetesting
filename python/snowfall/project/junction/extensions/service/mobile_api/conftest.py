@@ -1,4 +1,3 @@
-import base64
 import copy
 import dataclasses
 import datetime
@@ -12,14 +11,11 @@ from unittest import mock
 import aiofiles
 import aiosmtplib
 import httpx
-import jwt as jwtlib
 import lagom
 import mongomock_motor
 import orjson
 import pytest
 from bson import json_util
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import rsa
 from fakeredis import aioredis as fakeredis
 from starlette import applications
 from starlette.middleware import Middleware, authentication
@@ -39,6 +35,7 @@ from snowfall.project.junction.extensions.service.mobile_api import (
 from snowfall.project.junction.extensions.service.mobile_api.routes import router
 from snowfall.project.junction.extensions.service.mobile_api.v1alpha import models_pb2
 from snowfall.stdlib import string
+from snowfall.stdlib.format import jwt
 from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.v1 import phone_number_pb2
@@ -52,23 +49,6 @@ _RESPONSE_FIXTURES_PATH = "python/snowfall/project/junction/extensions/service/m
 
 jwt_token_version = "1.0.0"
 jwt_payload = {"version": jwt_token_version, "client_id": "test"}
-public_exponent = 65537
-key_size = 2048
-jwt_private_key = rsa.generate_private_key(
-    public_exponent=public_exponent,
-    key_size=key_size,
-)
-
-jwt_token = jwtlib.encode(
-    payload=jwt_payload,
-    key=jwt_private_key,
-    algorithm="RS256",
-)
-jwt_public_key_bytes = jwt_private_key.public_key().public_bytes(
-    encoding=serialization.Encoding.PEM,
-    format=serialization.PublicFormat.SubjectPublicKeyInfo,
-)
-jwt_public_key = base64.b64encode(jwt_public_key_bytes).decode()
 junction_api_address = "https://api.junction.dev"
 plus_api_address = "https://plus.junction.dev"
 
@@ -337,14 +317,8 @@ async def markups_repository(
 @pytest.fixture()
 def jwt_gen() -> jwt_generator.JwtGenerator:
     return jwt_generator.JwtGenerator(
-        base64.b64encode(
-            jwt_private_key.private_bytes(
-                encoding=serialization.Encoding.PEM,
-                format=serialization.PrivateFormat.TraditionalOpenSSL,
-                encryption_algorithm=serialization.NoEncryption(),
-            ),
-        ).decode(),
-        jwt_token_version,
+        encoder=jwt.Encoder(),
+        token_version=jwt_token_version,
     )
 
 
@@ -421,10 +395,8 @@ def app(  # noqa: WPS211
                 Middleware(
                     authentication.AuthenticationMiddleware,
                     backend=middleware.AuthenticationBackend(
+                        decoder=jwt.Decoder(),
                         token_version=jwt_token_version,
-                        public_key=base64.b64decode(
-                            jwt_public_key,
-                        ).decode(),
                     ),
                     on_error=handlers.auth_error_handler,
                 ),

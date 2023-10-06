@@ -1,4 +1,3 @@
-import base64
 import random
 from functools import partial
 
@@ -85,10 +84,11 @@ def _get_httpx_auth_and_middlewares(
             Middleware(
                 authentication.AuthenticationMiddleware,
                 backend=middleware.AuthenticationBackend(
+                    decoder=jwt.Decoder(
+                        public_key=settings.jwt_public_key,
+                        algorithms=["RS256"],
+                    ),
                     token_version=settings.jwt_token_version,
-                    public_key=base64.b64decode(
-                        settings.jwt_public_key.encode(),
-                    ).decode(),
                 ),
                 on_error=handlers.auth_error_handler,
             ),
@@ -140,8 +140,11 @@ async def _http(
         support_email=app.settings.support_email,
     )
     jwt_gen = jwt_generator.JwtGenerator(
-        jwt_private_key=app.settings.jwt_private_key,
-        jwt_token_version=app.settings.jwt_token_version,
+        encoder=jwt.Encoder(
+            private_key=app.settings.jwt_private_key,
+            algorithm="RS256",
+        ),
+        token_version=app.settings.jwt_token_version,
     )
 
     with spec.get_api_spec(cookie_auth=app.settings.cookie_auth_enabled) as spec_path:

@@ -2,7 +2,6 @@ import dataclasses
 from collections.abc import Awaitable, Callable
 
 import jwt as jwtlib
-from cryptography.hazmat.primitives import serialization
 from starlette import applications, authentication, requests, responses
 from starlette.middleware import base
 
@@ -14,10 +13,10 @@ from snowfall.stdlib.transport.http import auth
 class AuthenticationBackend(authentication.AuthenticationBackend):
     def __init__(
         self,
-        public_key: str,
+        decoder: jwt.Decoder,
         token_version: str,
     ) -> None:
-        self._public_key = public_key
+        self._decoder = decoder
         self._token_version = token_version
 
     async def authenticate(
@@ -62,7 +61,7 @@ class AuthenticationBackend(authentication.AuthenticationBackend):
 
     def _get_client_id_from_jwt_token(self, jwt_token: str) -> str:
         try:
-            payload = self._get_payload_from_jwt_token(jwt_token)
+            payload = self._decoder.decode(jwt_token)
         except jwtlib.exceptions.PyJWTError as err:
             raise authentication.AuthenticationError("Invalid JWT token.") from err
 
@@ -77,15 +76,6 @@ class AuthenticationBackend(authentication.AuthenticationBackend):
             )
 
         return payload["client_id"]
-
-    def _get_payload_from_jwt_token(self, jwt_token: str) -> dict[str, str]:
-        key = serialization.load_pem_public_key(self._public_key.encode())
-
-        return jwtlib.decode(
-            jwt=jwt_token,
-            key=key,  # type: ignore[arg-type]
-            algorithms=["RS256"],
-        )
 
 
 @dataclasses.dataclass(kw_only=True, frozen=True)
