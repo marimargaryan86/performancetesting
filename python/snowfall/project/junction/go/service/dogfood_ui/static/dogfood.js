@@ -32,6 +32,17 @@ const redIcon = new L.Icon({
   shadowSize: [41, 41],
 });
 
+const uuidToName = {
+  "4b7d12db-7735-4c67-9645-5fc82f7c4fe8": "ask2go",
+  "f1f884bf-0be6-4ce2-8414-296a775a508d": "ba-ndc",
+  "caefde65-c15c-4b60-b8d9-27638b50b08f": "benerail",
+  "92ada881-f31c-471e-a8b0-01ed48a181d5": "direct-ferries",
+  "30bfba87-7077-4d96-beed-c5769cdc99c7": "distribusion",
+  "5d18e8e1-48e3-4b7c-82b9-62bd97a92f91": "duffel",
+  "a5547dae-9c65-4746-8637-d0601865508e": "save-a-train",
+  "f9ce75d1-2025-4ab5-b5d7-69e4c14c053e": "mock",
+};
+
 function getLang() {
   if (navigator.languages != undefined) return navigator.languages[0];
   return navigator.language;
@@ -415,7 +426,6 @@ function inject_trips(tripSearchId, response, origin, destination, searchOffers)
   for (const [i, trip] of response.data.entries()) {
     let header = document.createElement("h3");
     header.textContent = "Journey #" + (i + 1);
-
     let subtext = document.createElement("small");
 
     subtext.className = "text-muted";
@@ -444,7 +454,10 @@ function inject_trips(tripSearchId, response, origin, destination, searchOffers)
         '<dt class="col-sm-2">Trace ID</dt><dd class="col-sm-10" id="trace-' +
         trip.id +
         '"><div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></dd>';
-
+      infoList.innerHTML +=
+        '<dt class="col-sm-2">Provider(s)</dt><dd class="col-sm-10" id="provider-' +
+        trip.id +
+        '"><div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></dd>';
       infoList.innerHTML +=
         '<dt class="col-sm-2">Offers</dt><dd class="col-sm-10" id="offers-' +
         trip.id +
@@ -661,10 +674,19 @@ function load_places(url = null) {
 
 function inject_offers(response, offerSearchId, tripId, searchStatus) {
   const status = document.getElementById("offers-" + tripId);
-
+  const providers = document.getElementById("provider-" + tripId);
   if (response.data.length > 0) {
     status.innerHTML =
       '<i class="fas fa-check"></i> ' + response.data.length + " offers";
+    let providerIds = [];
+
+    for (const item of response.included) {
+      if (item.meta && item.meta.providerId) {
+        providerIds.push(uuidToName[item.meta.providerId]);
+      }
+    }
+
+    providers.innerHTML = providerIds.join(', ');
   } else {
     status.innerHTML =
       '<i class="fas fa-times-circle"></i> ' + response.data.length + " offers";
@@ -676,7 +698,7 @@ function load_offers(id, tripId) {
     .then((res) => res.json())
     .then((response) => {
       if (response.data.attributes.status == "completed") {
-        fetch("/offers/searches/" + id + "/offers")
+        fetch("/offers/searches/" + id + "/offers?include=groups")
           .then((res) => res.json())
           .then((offersResponse) => {
             inject_offers(
