@@ -50,7 +50,7 @@ job "vector-vector-loki" {
         VECTOR_REQUIRE_HEALTHY = "true"
       }
       resources {
-        memory = 100 # 100MB
+        memory = 200 # 100MB
       }
       template {
         destination   = "local/vector.toml"
