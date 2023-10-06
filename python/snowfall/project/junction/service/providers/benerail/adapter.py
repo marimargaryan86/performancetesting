@@ -68,6 +68,14 @@ def _get_brand_name(comfort_class_name: str, flexibility_value: str) -> str:
     ).strip(" /")
 
 
+def _get_train_number(trip: trips.Trip) -> str:
+    for leg in trip.trip_legs:
+        if isinstance(leg, trips.TimedLeg) and leg.train_numbers:
+            return more_itertools.first(leg.train_numbers)
+
+    return ""
+
+
 class BenerailAdapter(object):  # noqa: WPS214
     def __init__(  # noqa: WPS211
         self,
@@ -146,7 +154,6 @@ class BenerailAdapter(object):  # noqa: WPS214
             ),
             trip_filter_id=create_trip_filter_res.trip_filter_id,
             passengers_info=create_passenger_res.passengers_info,
-            departure_after=search_task.outbound_departure_datetime,
             session_token=search_task.br_session_token,
         )
 
@@ -214,12 +221,11 @@ class BenerailAdapter(object):  # noqa: WPS214
             dialogue_etag=trip_filter_res.etag,
         )
 
-    async def _get_offer_groups(  # noqa: WPS210, WPS211
+    async def _get_offer_groups(  # noqa: WPS210, WPS211, WPS217
         self,
         dialogue_info: helper_models.DialogueInfo,
         trip_filter_id: str,
         passengers_info: Sequence[helper_models.PassengerInfo],
-        departure_after: datetime.datetime,
         session_token: str | None = None,
     ) -> AsyncIterator[offer_models_pb2.OfferGroup]:
         trip_offer_filter = (
@@ -308,7 +314,7 @@ class BenerailAdapter(object):  # noqa: WPS214
                 expires_at=protobuf.datetime_to_protobuf(expires_at_dt),
                 offers=offers,
                 segments=[
-                    self._parse_segment_info(
+                    await self._parse_segment_info(
                         trip=trip_map[trip_id],
                         segment_id=segment_id,
                     ),
@@ -339,26 +345,33 @@ class BenerailAdapter(object):  # noqa: WPS214
             if summary.bookable_status.status_value not in _NON_BOOKABLE_STATES:
                 yield trip_offer
 
-    def _parse_segment_info(
+    async def _get_train_type(self, trip: trips.Trip) -> str:
+        for leg in trip.trip_legs:
+            has_train_type = (
+                isinstance(leg, trips.TimedLeg)
+                and leg.train_type
+                and leg.train_type.train_type
+            )
+
+            if has_train_type:
+                return await self._resolve_rcode_title(
+                    leg.train_type.train_type,  # type: ignore[union-attr]
+                )
+
+        return ""
+
+    async def _parse_segment_info(  # noqa: WPS231
         self,
         trip: trips.Trip,
         segment_id: str,
     ) -> offer_models_pb2.OfferSegment:
-        number = ""
-
-        for leg in trip.trip_legs:
-            if isinstance(leg, trips.TimedLeg) and leg.train_numbers:
-                if leg.train_numbers:
-                    number = more_itertools.first(leg.train_numbers)
-                else:
-                    break
-
         return offer_models_pb2.OfferSegment(
             id=segment_id,
             legs=self._parse_leg_info(trip),
             vehicle=offer_models_pb2.Vehicle(
-                number=number,
+                number=_get_train_number(trip),
             ),
+            vendor=await self._get_train_type(trip),
             type=models_pb2.Schedule.TYPE_RAIL,
         )
 
@@ -447,7 +460,7 @@ class BenerailAdapter(object):  # noqa: WPS214
             ),
         ).protobuf()
         comfort_class_name = (
-            await self._resolve_marketing_name(comfort_class_value)
+            await self._resolve_rcode_title(comfort_class_value)
             if comfort_class_value
             else ""
         )
@@ -494,23 +507,23 @@ class BenerailAdapter(object):  # noqa: WPS214
         )
 
     @asyncstdlib.lru_cache()
-    async def _resolve_marketing_name(self, comfort_class_value: str) -> str:
+    async def _resolve_rcode_title(self, rcode_value: str) -> str:
         try:
-            urn_val = await self._client.rcode_client.get_urn_value(comfort_class_value)
+            urn_val = await self._client.rcode_client.get_urn_value(rcode_value)
         except errors.HttpError:
-            return comfort_class_value
+            return rcode_value
 
         try:
             rcode = urn_val.response_result.rcodes[0]
         except (IndexError, ValueError):
-            return comfort_class_value
+            return rcode_value
 
         try:
-            en_label = rcode.labels["en"]
+            label = rcode.labels.get("en", rcode.labels["*"])
         except KeyError:
-            return comfort_class_value
+            return rcode_value
 
-        return en_label.code_long or comfort_class_value
+        return label.code_long or rcode_value
 
     async def _get_trip_offers(
         self,
