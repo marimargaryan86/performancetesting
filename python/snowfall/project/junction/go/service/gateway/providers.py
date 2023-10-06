@@ -17,6 +17,7 @@ from snowfall.project.junction.provider.v1alpha import (
 from snowfall.project.junction.provider.v2alpha import (
     meta_pb2,
     meta_pb2_grpc,
+    trips_pb2_grpc,
 )
 from snowfall.stdlib import sequence
 from snowfall.stdlib.logging import stdout
@@ -186,6 +187,7 @@ class Connection(object):
         self._bookings = bookings_pb2_grpc.BookingServiceStub(self._channel)
         self._meta = meta_pb2_grpc.MetaServiceStub(self._channel)
         self._offers = offers_pb2_grpc.OfferServiceStub(self._channel)
+        self._trips = trips_pb2_grpc.TripServiceStub(self._channel)
 
     @property
     def bookings(self) -> bookings_pb2_grpc.BookingServiceStub:
@@ -198,6 +200,10 @@ class Connection(object):
     @property
     def offers(self) -> offers_pb2_grpc.OfferServiceStub:
         return self._offers
+
+    @property
+    def trips(self) -> trips_pb2_grpc.TripServiceStub:
+        return self._trips
 
 
 def unmarshal_resource_id(resource_id: str) -> UnmarshalResult:

@@ -131,6 +131,7 @@ requirements = [
     "pytest-asyncio",
     "pytest-cov",
     "pytest-icdiff",
+    "pytest-mock",
     "pytest-socket",
     "pytest-xdist",
 ]

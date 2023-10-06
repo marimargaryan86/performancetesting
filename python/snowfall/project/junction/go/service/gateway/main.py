@@ -13,11 +13,13 @@ from snowfall.project.junction.go.service.gateway import (
     meta,
     offers,
     providers,
+    stops,
     tasks,
     trips,
 )
 from snowfall.project.junction.go.service.gateway.v1 import trips_pb2
 from snowfall.project.junction.go.service.offers.v1 import amqp_pb2
+from snowfall.project.junction.go.service.places.v1 import places_pb2_grpc
 from snowfall.stdlib.service import (
     amqp_factory,
     application,
@@ -35,7 +37,9 @@ class _SharedSettings(application.Settings):
 
 
 class _ConsumeSettings(_SharedSettings):
+    places_address: str
     search_timeout: datetime.timedelta = datetime.timedelta(seconds=30)
+    stops_resolver_timeout: datetime.timedelta = datetime.timedelta(seconds=5)
     trip_search_timeout: datetime.timedelta = datetime.timedelta(seconds=10)
 
 
@@ -102,6 +106,11 @@ async def _consume(app: application.Application[_ConsumeSettings]) -> None:
         await _bootstrap(app)
     )
 
+    places_channel = await grpc_factory.make_insecure_channel(
+        app,
+        app.settings.places_address,
+    )
+
     legacy_offers_queue = offers.Queue(
         name_prefix=app.name,
         providers_list=all_providers,
@@ -111,7 +120,13 @@ async def _consume(app: application.Application[_ConsumeSettings]) -> None:
 
     trips_queue = trips.Queue(
         name_prefix=app.name,
-        providers_list=all_providers,
+        request_generator=trips.RequestGenerator(
+            providers_list=all_providers,
+            stop_resolver=stops.Resolver(
+                stub=places_pb2_grpc.PlacesServiceStub(channel=places_channel),
+                timeout=app.settings.stops_resolver_timeout,
+            ).from_ids,
+        ),
         runner=trip_search_runner,
         timeout=app.settings.trip_search_timeout,
     )
