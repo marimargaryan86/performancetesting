@@ -103,6 +103,10 @@ job "mobile-api-http-booking-hub" {
               local_bind_port  = 8070
               destination_name = "client-api-${var.environment}"
             }
+            upstreams {
+              local_bind_port  = 8010
+              destination_name = "authentication-${var.environment}"
+            }
           }
         }
       }
@@ -137,7 +141,10 @@ job "mobile-api-http-booking-hub" {
       }
 
       vault {
-        policies = ["booking-hub-mobile-api-${var.environment}"]
+        policies = [
+          "booking-hub-mobile-api-${var.environment}",
+          "authentication-${var.environment}",
+        ]
       }
       template {
         destination = "services.env"
@@ -145,6 +152,7 @@ job "mobile-api-http-booking-hub" {
         change_mode = "restart"
         data        = <<EOH
 JUNCTION_API_ADDRESS={{(printf "http://%s" (env "NOMAD_UPSTREAM_ADDR_client-api-${var.environment}"))}}
+AUTHENTICATION_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_authentication-${var.environment}"))}}
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 SMTP_DSN={{range $index, $service := service "smtp"}}smtp://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}{{end}}
@@ -153,6 +161,9 @@ STRIPE_API_KEY={{ .Data.data.stripe_api_key }}
 JWT_PRIVATE_KEY={{ .Data.data.jwt_private_key }}
 JWT_PUBLIC_KEY={{ .Data.data.jwt_public_key }}
 ORY_CLIENT_SECRET={{ .Data.data.ory_client_secret }}
+{{ end }}
+{{ with secret "kv/data/${var.environment}/authentication" }}
+JWT_PRIVATE_KEY={{ .Data.data.jwt_private_key }}
 {{ end }}
 EOH
       }
@@ -187,6 +198,7 @@ EOH
         PLUS_ACTIVATED            = var.plus_activated
         ORY_CLIENT_TOKEN_ENDPOINT = var.ory_client_token_endpoint
         ORY_CLIENT_ID             = var.ory_client_id
+        COOKIE_AUTH_ENABLED       = true
       }
     }
   }
