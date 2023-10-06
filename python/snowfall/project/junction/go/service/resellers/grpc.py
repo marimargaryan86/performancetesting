@@ -10,6 +10,7 @@ from snowfall.project.junction.go.service.resellers.v1 import (
     resellers_pb2_grpc,
 )
 from snowfall.stdlib import string
+from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.transport.grpc import service
 from snowfall.vendor.consul.client import ConsulClient
 
@@ -89,12 +90,20 @@ class ResellerService(  # noqa: WPS214
         request: resellers_pb2.UpdateResellerRequest,
         context: aio.ServicerContext,
     ) -> resellers_pb2.UpdateResellerResponse:
-        if not await self._repository.exists(request.reseller.id):
+        reseller = await self._repository.find_by_id(request.reseller.id)
+
+        if not reseller:
             return await context.abort(StatusCode.NOT_FOUND)
 
-        await self._repository.upsert(request.reseller)
+        new_reseller = protobuf.apply_field_mask(
+            request.update_mask,
+            request.reseller,
+            reseller,
+        )
 
-        return resellers_pb2.UpdateResellerResponse(reseller=request.reseller)
+        await self._repository.upsert(new_reseller)
+
+        return resellers_pb2.UpdateResellerResponse(reseller=new_reseller)
 
     async def PromoteResellerConfig(  # type: ignore[override] # noqa: N802
         self,

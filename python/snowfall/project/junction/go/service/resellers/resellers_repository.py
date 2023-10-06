@@ -6,7 +6,6 @@ from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 
 class ResellerRepository(  # noqa: WPS215
     repository.ProtoRepository[models_pb2.Reseller],
-    mixins.ExistsMixin[models_pb2.Reseller],
     mixins.FindByIdMixin[models_pb2.Reseller],
     mixins.InsertMixin[models_pb2.Reseller],
     mixins.AllMixin[models_pb2.Reseller],

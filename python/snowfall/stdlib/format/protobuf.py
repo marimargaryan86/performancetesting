@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import datetime
 import struct
 import zoneinfo
@@ -11,6 +12,7 @@ from google.protobuf import (
     any_pb2,
     descriptor,
     duration_pb2,
+    field_mask_pb2,
     message,
     symbol_database,
     timestamp_pb2,
@@ -193,3 +195,18 @@ def slug_to_enum_value(
     )
 
     return enum.Value(enum_name)
+
+
+def apply_field_mask(
+    field_mask: field_mask_pb2.FieldMask,
+    source: _Proto,
+    destination: _Proto,
+) -> _Proto:
+    if not field_mask.paths:
+        return copy.deepcopy(source)
+
+    destination = copy.deepcopy(destination)
+
+    field_mask.MergeMessage(source, destination)
+
+    return destination

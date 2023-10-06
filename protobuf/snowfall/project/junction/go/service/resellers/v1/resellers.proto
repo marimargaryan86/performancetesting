@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package snowfall.project.junction.go.service.resellers.v1;
 
+import "google/protobuf/field_mask.proto";
 import "snowfall/project/junction/go/service/resellers/v1/models.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/resellers/v1";
@@ -44,6 +45,7 @@ message UpdateResellerRequest {
   reserved 1, 2, 3, 4;
   reserved "id", "name", "default_currency", "providers";
   Reseller reseller = 5;
+  google.protobuf.FieldMask update_mask = 6;
 }
 
 message UpdateResellerResponse {

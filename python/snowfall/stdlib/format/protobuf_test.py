@@ -4,7 +4,13 @@ import zoneinfo
 import isodate
 import pytest
 from aiofiles import tempfile
-from google.protobuf import duration_pb2, timestamp_pb2
+from google.protobuf import (
+    duration_pb2,
+    field_mask_pb2,
+    json_format,
+    message,
+    timestamp_pb2,
+)
 
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1 import date_pb2, datetime_pb2, testing_pb2
@@ -360,3 +366,42 @@ def test_datetime_to_protobuf_datetime(
 def test_datetime_to_protobuf_datetime_with_naive_datetime() -> None:
     with pytest.raises(RuntimeError):
         protobuf.datetime_to_protobuf_datetime(datetime.datetime.now())  # noqa: DTZ005
+
+
+@pytest.mark.parametrize(
+    ("field_mask", "source", "destination", "expected"),
+    [
+        (
+            field_mask_pb2.FieldMask(paths=["read_only"]),
+            testing_pb2.Foobar(read_only="new_read_only", write_only="new_write_only"),
+            testing_pb2.Foobar(
+                read_only="existing_read_only",
+                write_only="existing_write_only",
+            ),
+            testing_pb2.Foobar(
+                read_only="new_read_only",
+                write_only="existing_write_only",
+            ),
+        ),
+        (
+            field_mask_pb2.FieldMask(),
+            testing_pb2.Foobar(read_only="new_read_only", write_only="new_write_only"),
+            testing_pb2.Foobar(
+                read_only="existing_read_only",
+                write_only="existing_write_only",
+            ),
+            testing_pb2.Foobar(read_only="new_read_only", write_only="new_write_only"),
+        ),
+    ],
+)
+def test_apply_field_mask(
+    field_mask: field_mask_pb2.FieldMask,
+    source: message.Message,
+    destination: message.Message,
+    expected: message.Message,
+) -> None:
+    actual = json_format.MessageToDict(
+        protobuf.apply_field_mask(field_mask, source, destination),
+    )
+
+    assert json_format.MessageToDict(expected) == actual
