@@ -34,6 +34,10 @@ variable "bucket" {
   type = string
 }
 
+variable "realistic_results" {
+  type = string
+}
+
 job "mock-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -139,6 +143,7 @@ EOH
         SENTRY_DSN          = "https://e319b016d1b149299757a338479d7de7@sentry.snowfall.se/28"
         PROMETHEUS_PORT     = "${NOMAD_PORT_prometheus}"
         PROVIDER_COMPANY_ID = "${var.provider_company_id}"
+        REALISTIC_RESULTS   = "${var.realistic_results}"
       }
     }
   }

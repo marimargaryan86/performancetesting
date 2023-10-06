@@ -3,7 +3,8 @@
     "variables": {
       "count": 1,
       "provider_company_id": "8c1617df-5b7c-4a87-a211-518102646502",
-      "bucket": "junction-provider-data-development"
+      "bucket": "junction-provider-data-development",
+      "realistic_results": false
     }
   },
   "production": {
@@ -11,14 +12,16 @@
     "variables": {
       "count": 1,
       "provider_company_id": "???",
-      "bucket": "junction-provider-data-production"
+      "bucket": "junction-provider-data-production",
+      "realistic_results": true
     }
   },
   "sandbox": {
     "variables": {
       "count": 1,
       "provider_company_id": "8c1617df-5b7c-4a87-a211-518102646502",
-      "bucket": "junction-provider-data-sandbox"
+      "bucket": "junction-provider-data-sandbox",
+      "realistic_results": true
     }
   }
 }

@@ -80,7 +80,7 @@ async def searcher(
     app = mock.create_autospec(service.Application)
     app.name = "mock"
     app.settings = mock.create_autospec(main._Settings)  # noqa: SLF001
-    app.settings.reasonable_results = False
+    app.settings.realistic_results = False
     app.settings.ttl = datetime.timedelta(minutes=1)
     implementation = await main._offers_factory(  # noqa: SLF001
         app=app,

@@ -30,6 +30,10 @@ variable "count" {
   type = number
 }
 
+variable "realistic_results" {
+  type = string
+}
+
 job "mock-offers" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -114,6 +118,7 @@ EOH
         PROMETHEUS_PORT     = "${NOMAD_PORT_prometheus}"
         PROVIDER_COMPANY_ID = "${var.provider_company_id}"
         STORAGE_DSN         = "memory://"
+        REALISTIC_RESULTS   = "${var.realistic_results}"
       }
     }
   }

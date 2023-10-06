@@ -2,20 +2,23 @@
   "development": {
     "variables": {
       "count": 1,
-      "provider_company_id": "8c1617df-5b7c-4a87-a211-518102646502"
+      "provider_company_id": "8c1617df-5b7c-4a87-a211-518102646502",
+      "realistic_results": false
     }
   },
   "production": {
     "deploy": false,
     "variables": {
       "count": 1,
-      "provider_company_id": "???"
+      "provider_company_id": "???",
+      "realistic_results": true
     }
   },
   "sandbox": {
     "variables": {
       "count": 1,
-      "provider_company_id": "8c1617df-5b7c-4a87-a211-518102646502"
+      "provider_company_id": "8c1617df-5b7c-4a87-a211-518102646502",
+      "realistic_results": true
     }
   }
 }

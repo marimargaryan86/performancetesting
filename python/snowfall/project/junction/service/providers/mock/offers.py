@@ -126,11 +126,11 @@ def cache_key(search: Criteria) -> str:
 class Generator(object):
     def __init__(
         self,
-        reasonable_results: bool,  # noqa: FBT001
+        realistic_results: bool,  # noqa: FBT001
         option_cache: cache.OptionCache,
         ttl: datetime.timedelta,
     ):
-        self._reasonable_results = reasonable_results
+        self._realistic_results = realistic_results
         self._cache = option_cache
         self._ttl = ttl
 
@@ -146,7 +146,7 @@ class Generator(object):
             string_amount=(fake.numerify(text="%#")),
             currency=money.Currency("EUR"),
         )
-        if self._reasonable_results:
+        if self._realistic_results:
             segments = search.segments
             departure = segments[0].legs[0].departure_at
             arrival = segments[-1].legs[-1].arrival_at
