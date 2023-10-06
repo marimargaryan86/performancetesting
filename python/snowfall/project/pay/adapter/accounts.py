@@ -92,8 +92,10 @@ class DictClient(Client):
         if account is None:
             raise errors.NotFoundError("Account is not found")
         account.status = protobuf.slug_to_enum_value(models_pb2.Status, status)
-        account.updated_at = protobuf.datetime_to_protobuf(  # type: ignore[misc]
-            datetime.datetime.now(tz=datetime.UTC),
+        account.updated_at.CopyFrom(
+            protobuf.datetime_to_protobuf(
+                datetime.datetime.now(tz=datetime.UTC),
+            ),
         )
         self._accounts[document_id] = account
         return account

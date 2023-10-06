@@ -27,6 +27,7 @@ from snowfall.project.pay.adapter import (
     refunds,
     transactions,
 )
+from snowfall.project.pay.service.companies.v1alpha import models_pb2
 from snowfall.project.pay.service.pay_api import authenticator, bootstrap
 from snowfall.project.pay.service.pay_api import repositories as pay_repos
 from snowfall.project.pay.service.pay_api.cache import UserSessionRepository
@@ -320,7 +321,7 @@ def conversions_repository(
 def beneficiaries_client() -> beneficiaries.DictClient:
     return beneficiaries.DictClient(
         (
-            beneficiaries.models_pb2.Beneficiary(  # type: ignore[attr-defined]
+            models_pb2.Beneficiary(
                 id=string.uuid(),
                 external_reference=string.uuid(),
                 account_id=string.uuid(),
