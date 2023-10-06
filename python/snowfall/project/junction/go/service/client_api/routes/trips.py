@@ -338,6 +338,9 @@ def _create_single_criteria(
     )
 
 
+_ANY_DICT_TYPE = dict[str, Any]
+
+
 @dataclasses.dataclass(frozen=True)
 class TripCandidateSearches(object):
     _trip_candidate_searches_client: trip_candidate_searches.Client
@@ -346,6 +349,17 @@ class TripCandidateSearches(object):
     _reseller_pay_companies: Mapping[str, str]
 
     async def post(self, request: messages.Request) -> responses.Response:
+        criteria_dicts = cast(list[_ANY_DICT_TYPE], request.body["criteria"])
+
+        for criteria in criteria_dicts:
+            try:
+                departure_before = parser.isoparse(criteria["departureBefore"])
+            except KeyError:
+                continue
+
+            if departure_before <= parser.isoparse(criteria["departureAfter"]):
+                raise exceptions.HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY)
+
         return await messages.create_response(
             body=models.Body(
                 data=resources.TripCandidateSearchResource.from_proto(
