@@ -16,6 +16,42 @@ and introduce yourself! Cute pet pics more than welcome :cat: :dog:
 You'll also want to make sure you've set up a profile photo in Slack and have
 your name pronunciation and location filled out!
 
+## General stuff
+
+The following tasks are a bit HR-y but are needed to complete your onboarding,
+a few are marked up as UK only, if you're not employed in the UK, don't do them!
+
+### Personio
+
+You'll have been given access to [Personio](https://snowfall.personio.de/),
+please go to `My Profile` on the left and fill out all the fields within `Personal Info`.
+
+### Email Signature
+
+Please take the following linked signature [template][Email Signature], open it
+up in a text editor and replace the following:
+
+```shell
+{{{NAME}}} - Your first name and last name
+{{{JOB_TITLE}}} - Your job title
+{{{PHONE}}} - Your phone number incl international code - for example (+441234567890)
+{{{EMAIL_PRE}}} - Email prefix (first part of your email before @snowfalltravel.com)
+```
+
+Then, depending on your email client, set this as your email signature. Please
+send out an email from your work account to your personal account to check this worked!
+
+### HMRC Form & P45 (UK ONLY 🇬🇧)
+
+If you're in the UK, please fill out [this][HMRC Form] form and send it along with
+your P45 to [`@Jackie`][Jackie] on Slack!
+
+### Vitality Health Insurance (UK ONLY 🇬🇧)
+
+If you're in the UK, you have the option to sign up to our private health insurance
+through [Vitality](https://www.vitality.co.uk/), if you're interested, reach out
+to [`@Jackie`][Jackie] on Slack!
+
 ## Basic access
 
 You will need access to a few things, most systems can be logged into with your
@@ -65,3 +101,7 @@ different things we build, how we build them, and why.
 
 You can find a link to all the current recordings
 [here](https://www.notion.so/Knowledge-Fest-89b12f4c7ac645a18bb41f481f3e272c?pvs=4)
+
+[Email Signature]:https://file.notion.so/f/s/2a36af9a-2025-4237-aafe-a8ff59093676/Untitled.html?id=5c5447c5-4f3c-491e-8a69-5ff59734a307&table=block&spaceId=5b14a1b1-b088-42e9-a68f-d2dd3d227cf1&expirationTimestamp=1696723200000&signature=yYHE2MluaDN5IZSDR0OHLwY2_SF4nNMywCzvgEKJBkU&download=true&downloadName=Template.html
+[HMRC Form]: https://file.notion.so/f/s/efafb1ec-dec6-45bc-875d-15188c236cc8/New_starter_form_.pdf?id=ae2ef22d-c81e-4539-b842-cfaeb3e58387&table=block&spaceId=5b14a1b1-b088-42e9-a68f-d2dd3d227cf1&expirationTimestamp=1696723200000&signature=vCFCWJu7syHW8XNazW6nXKPCtBz1YZXeR8mgEVhVfb8&downloadName=New+starter+form+.pdf
+[Jackie]: https://snowfall.slack.com/team/U04M3C5GBJ6
