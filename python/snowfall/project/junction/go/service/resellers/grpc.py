@@ -3,7 +3,7 @@ from collections.abc import Sequence
 
 from grpc import StatusCode, aio
 
-from snowfall.project.junction.go.service.resellers import resellers_repository
+from snowfall.project.junction.go.service.resellers import persistence
 from snowfall.project.junction.go.service.resellers.v1 import (
     models_pb2,
     resellers_pb2,
@@ -25,7 +25,7 @@ class ResellerService(  # noqa: WPS214
     def __init__(
         self,
         default_page_size: int,
-        resellers_repo: resellers_repository.ResellerRepository,
+        resellers_repo: persistence.ResellerRepository,
         consul_client: ConsulClient,
         environment: str,
     ):

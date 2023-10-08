@@ -6,7 +6,7 @@ import httpx
 import pydantic
 from motor import motor_asyncio
 
-from snowfall.project.junction.go.service.resellers import resellers_repository
+from snowfall.project.junction.go.service.resellers import persistence
 from snowfall.project.junction.go.service.resellers.grpc import ResellerService
 from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.grpc import server as grpc_server
@@ -42,7 +42,7 @@ async def _serve(app: application.Application[_ServeSettings]) -> None:
         app.settings.grpc_port,
         [
             ResellerService(
-                resellers_repo=resellers_repository.ResellerRepository(
+                resellers_repo=persistence.ResellerRepository(
                     collection=mongo.resellers.resellers,
                 ),
                 default_page_size=app.settings.default_page_size,
