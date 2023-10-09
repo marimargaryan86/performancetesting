@@ -19,6 +19,7 @@ from snowfall.project.junction.go.service.orders.zendesk.client import ZendeskCl
 from snowfall.project.junction.go.service.passenger_name_records.v1 import (
     passenger_name_records_pb2_grpc,
 )
+from snowfall.project.junction.go.service.resellers.v1 import resellers_pb2_grpc
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.service import amqp_factory, application
 from snowfall.stdlib.transport.amqp import consumer, producer, types
@@ -35,6 +36,7 @@ class _GrpcSettings(application.Settings):
     grpc_port: int = 50051
     mongo_dsn: Sequence[pydantic.AnyUrl]
     passenger_name_records_address: str
+    resellers_address: str
     zendesk_base_url: pydantic.AnyUrl
     zendesk_api_key: str
 
@@ -81,6 +83,9 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
                 journeys=orders.JourneyRepository(
                     collection=mongo.orders.journeys,
                     passenger_name_records=passenger_name_records_client,
+                    resellers_client=resellers_pb2_grpc.ResellerServiceStub(
+                        client.create_channel(app.settings.resellers_address),
+                    ),
                 ),
                 orders=orders.OrderRepository(
                     collection=mongo.orders.journeys,

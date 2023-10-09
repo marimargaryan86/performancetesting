@@ -81,6 +81,10 @@ job "orders-grpc" {
               local_bind_port  = 8010
               destination_name = "gateway-serve-${var.environment}"
             }
+            upstreams {
+              local_bind_port  = 8030
+              destination_name = "resellers-${var.environment}"
+            }
           }
         }
       }
@@ -117,6 +121,7 @@ AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://
 GATEWAY_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_gateway-serve-${var.environment}"))}}
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 PASSENGER_NAME_RECORDS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_passenger-name-records-${var.environment}"))}}
+RESELLERS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_resellers-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/zendesk" }}
 ZENDESK_API_KEY={{ .Data.data.zendesk_api_key }}
 {{ end }}

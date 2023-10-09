@@ -2,15 +2,19 @@ from __future__ import annotations
 
 import datetime
 from collections.abc import Mapping, Sequence
-from typing import Any
+from typing import Any, cast
 
+import grpc
 import pymongo
 
 from snowfall.project.junction.go.adapter import (
     passenger_name_records as passenger_name_records_adapter,
 )
-from snowfall.project.junction.go.service.orders import mixins as orders_mixins
 from snowfall.project.junction.go.service.orders.v1 import models_pb2
+from snowfall.project.junction.go.service.resellers.v1 import (
+    resellers_pb2,
+    resellers_pb2_grpc,
+)
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
@@ -22,26 +26,34 @@ def _add_reseller_id_to_filter(
     filter_: Mapping[str, Any],
 ) -> dict[str, Any]:
     filter_ = dict(filter_)
+
     if reseller_id:
-        filter_["reseller_id"] = reseller_id
+        filter_["$or"] = [
+            {"reseller_id": reseller_id},
+            {"owner_reseller_ids": {"$in": [reseller_id]}},
+        ]
+
     return filter_
 
 
-class JourneyRepository(
-    repository.ProtoRepository[models_pb2.Journey],
-    orders_mixins.FindByIdMixin[models_pb2.Journey],
-):
+class JourneyRepository(repository.ProtoRepository[models_pb2.Journey]):
     _proto = models_pb2.Journey
-    _indexes = (pymongo.IndexModel("passenger_name_record", background=True),)
+    _indexes = (
+        pymongo.IndexModel("passenger_name_record", background=True),
+        pymongo.IndexModel("reseller_id", background=True),
+        pymongo.IndexModel("owner_reseller_ids", background=True),
+    )
 
     def __init__(
         self,
         *args: Any,
         passenger_name_records: passenger_name_records_adapter.Client,
+        resellers_client: resellers_pb2_grpc.ResellerServiceStub,
         **kwargs: Any,
     ) -> None:
         super().__init__(*args, **kwargs)
         self._passenger_name_records = passenger_name_records
+        self._resellers = resellers_client
 
     async def create(
         self,
@@ -53,6 +65,7 @@ class JourneyRepository(
             passenger_name_record=(await self._passenger_name_records.create()).id,
             contact_details=contact_details,
             reseller_id=reseller_id,
+            owner_reseller_ids=await self._get_journey_owners(reseller_id),
         )
 
         insert = await self._execute(
@@ -64,6 +77,16 @@ class JourneyRepository(
             raise RuntimeError()
 
         return journey
+
+    async def find_by_id(
+        self,
+        document_id: str,
+        reseller_id: str = "",
+    ) -> models_pb2.Journey | None:
+        return await self._execute(
+            self._collection.find_one,
+            _add_reseller_id_to_filter(reseller_id, {"_id": document_id}),
+        )
 
     async def find(
         self,
@@ -108,6 +131,20 @@ class JourneyRepository(
             cur="",
             filter_=filter_,
         )
+
+    async def _get_journey_owners(self, reseller_id: str) -> list[str]:
+        try:
+            # Cast Any to expected response type, we ignore gRPC in Mypy.
+            response = cast(
+                resellers_pb2.GetResellerResponse,
+                await self._resellers.GetReseller(
+                    resellers_pb2.GetResellerRequest(id=reseller_id),
+                ),
+            )
+        except grpc.aio.AioRpcError:
+            return [reseller_id]
+
+        return [reseller_id, *response.reseller.parent_reseller_ids]
 
 
 class OrderRepository(repository.ProtoRepository[models_pb2.Order]):

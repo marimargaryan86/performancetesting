@@ -1,5 +1,7 @@
 import datetime
 from collections.abc import AsyncIterator
+from typing import Any
+from unittest import mock
 
 import httpx
 import pytest
@@ -9,6 +11,10 @@ from snowfall.project.junction.go.adapter import passenger_name_records
 from snowfall.project.junction.go.service.orders import orders
 from snowfall.project.junction.go.service.orders.v1 import models_pb2
 from snowfall.project.junction.go.service.orders.zendesk.client import ZendeskClient
+from snowfall.project.junction.go.service.resellers.v1 import (
+    resellers_pb2,
+    resellers_pb2_grpc,
+)
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 
@@ -19,13 +25,23 @@ def pnr_client() -> passenger_name_records.Client:
 
 
 @pytest.fixture()
+def resellers_client() -> Any:
+    stub = mock.create_autospec(resellers_pb2_grpc.ResellerServiceStub, instance=True)
+    stub.GetReseller = mock.AsyncMock(return_value=resellers_pb2.GetResellerResponse())
+
+    return stub
+
+
+@pytest.fixture()
 def journey_repository(
     mongo_client: core.AgnosticClient,
     pnr_client: passenger_name_records.Client,
+    resellers_client: Any,
 ) -> orders.JourneyRepository:
     return orders.JourneyRepository(
         collection=mongo_client.test.journeys,
         passenger_name_records=pnr_client,
+        resellers_client=resellers_client,
     )
 
 

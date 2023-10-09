@@ -1,11 +1,21 @@
 import asyncio
+from typing import Any
+from unittest import mock
 
+import grpc
 import more_itertools
 import pymongo
 import pytest
 
 from snowfall.project.junction.go.service.orders import orders
 from snowfall.project.junction.go.service.orders.v1 import models_pb2
+from snowfall.project.junction.go.service.resellers.v1 import (
+    models_pb2 as reseller_models_pb2,
+)
+from snowfall.project.junction.go.service.resellers.v1 import resellers_pb2
+
+_RESELLER_ID = "foo"
+_JOURNEY_PARENTS = ("bar", "baz")
 
 
 @pytest.fixture()
@@ -29,7 +39,96 @@ async def cancellation_request(
     )
 
 
+@pytest.fixture()
+async def journey_with_owners(
+    resellers_client: Any,
+    journey_repository: orders.JourneyRepository,
+) -> models_pb2.Journey:
+    resellers_client.GetReseller = mock.AsyncMock(
+        return_value=resellers_pb2.GetResellerResponse(
+            reseller=reseller_models_pb2.Reseller(
+                parent_reseller_ids=_JOURNEY_PARENTS,
+            ),
+        ),
+    )
+    return await journey_repository.create(
+        contact_details=models_pb2.ContactDetails(),
+        reseller_id=_RESELLER_ID,
+    )
+
+
 class TestJourneys(object):
+    async def test_created_journey_has_owners_with_not_found_reseller(
+        self,
+        resellers_client: Any,
+        journey_repository: orders.JourneyRepository,
+    ) -> None:
+        error = grpc.aio.AioRpcError(
+            code=grpc.StatusCode.NOT_FOUND,
+            initial_metadata=grpc.aio.Metadata(),
+            trailing_metadata=grpc.aio.Metadata(),
+        )
+        resellers_client.GetReseller = mock.AsyncMock(side_effect=error)
+        journey = await journey_repository.create(
+            contact_details=models_pb2.ContactDetails(),
+            reseller_id=_RESELLER_ID,
+        )
+        assert len(journey.owner_reseller_ids) == 1
+        assert _RESELLER_ID in journey.owner_reseller_ids
+
+    async def test_created_journey_has_owners_with_reseller_without_parents(
+        self,
+        resellers_client: Any,
+        journey_repository: orders.JourneyRepository,
+    ) -> None:
+        journey = await journey_repository.create(
+            contact_details=models_pb2.ContactDetails(),
+            reseller_id=_RESELLER_ID,
+        )
+        assert len(journey.owner_reseller_ids) == 1
+        assert _RESELLER_ID in journey.owner_reseller_ids
+
+    async def test_created_journey_has_reseller_parents_owners(
+        self,
+        journey_with_owners: models_pb2.Journey,
+    ) -> None:
+        assert len(journey_with_owners.owner_reseller_ids) == 3
+        assert _RESELLER_ID in journey_with_owners.owner_reseller_ids
+
+        for parent in _JOURNEY_PARENTS:
+            assert parent in journey_with_owners.owner_reseller_ids
+
+    @pytest.mark.parametrize(
+        "reseller_id",
+        [
+            _RESELLER_ID,
+            *_JOURNEY_PARENTS,
+        ],
+    )
+    async def test_journey_is_retrievable_by_owners(
+        self,
+        journey_repository: orders.JourneyRepository,
+        journey_with_owners: models_pb2.Journey,
+        reseller_id: str,
+    ) -> None:
+        journey = await journey_repository.find_by_id(
+            journey_with_owners.id,
+            reseller_id,
+        )
+        assert journey
+        assert journey.id == journey_with_owners.id
+
+    async def test_journey_is_not_retrievable_by_unknown_reseller(
+        self,
+        journey_repository: orders.JourneyRepository,
+        journey_with_owners: models_pb2.Journey,
+    ) -> None:
+        journey = await journey_repository.find_by_id(
+            journey_with_owners.id,
+            "qux",
+        )
+        assert not journey
+
     async def test_journey_is_retrievable_by_id(
         self,
         journey_repository: orders.JourneyRepository,
