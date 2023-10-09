@@ -404,12 +404,8 @@ async def plan_selected_trip(  # noqa: WPS211,WPS210
 async def check_in(
     **kwargs: Any,
 ) -> _HandlersResponse:
-    return [
-        {
-            "message": _("Check-in feature is not implemented yet."),
-        },
-        action_menu,
-    ]
+    # TODO: After test change back to unimplemented text message
+    raise RuntimeError("Check-in feature is not implemented yet.")
 
 
 async def handle_unknown(  # noqa: WPS211
