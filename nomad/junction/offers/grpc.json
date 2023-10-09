@@ -8,7 +8,7 @@
   "production": {
     "variables": {
       "count": 2,
-      "use_gateway": false
+      "use_gateway": true
     }
   },
   "sandbox": {
