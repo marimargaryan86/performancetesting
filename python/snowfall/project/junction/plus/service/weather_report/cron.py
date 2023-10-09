@@ -1,5 +1,9 @@
 import datetime
 import time
+import types
+from collections.abc import Mapping
+from gettext import gettext as _
+from typing import Any
 
 from snowfall.project.junction.plus.adapter import errors as errors_adapter
 from snowfall.project.junction.plus.adapter import (
@@ -14,25 +18,38 @@ from snowfall.project.junction.plus.notification_channels.order_utils import (
     compress_flights,
 )
 from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
+from snowfall.project.junction.plus.service.weather_report import open_weather_map
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
 
 _CC_MAX_PAIR_SIZE = 2450
 _TIME_WINDOW_IN_HOURS = 48
+_WEATHER_CONDITION_GROUP_ICONS = types.MappingProxyType(
+    {
+        "Thunderstorm": "\U0001f329",
+        "Drizzle": "\U0001f327",
+        "Rain": "\U0001f327",
+        "Snow": "\U0001f328",
+        "Clear": "\U0001f31e",
+        "Clouds": "\U0001f325",
+    },
+)
 
 
 class WeatherReportCronJob(object):
-    def __init__(
+    def __init__(  # noqa: WPS211
         self,
         monitoring_rules: monitoring_rules_adapter.Client,
         subscribers: subscribers_adapter.Client,
         orders: orders_adapter.Client,
         publisher_client: notification_event_publisher_adapter.Client,
+        open_weather_map_client: open_weather_map.Client,
     ) -> None:
         self._monitoring_rules = monitoring_rules
         self._subscribers = subscribers
         self._orders = orders
         self._publisher_client = publisher_client
+        self._open_weather_map_client = open_weather_map_client
         self._logger = stdout.get_logger()
 
     async def run(self) -> None:  # noqa: WPS231, WPS210, WPS217
@@ -98,12 +115,66 @@ class WeatherReportCronJob(object):
                     return False
         return True
 
-    async def generate_weather_report(
+    async def generate_weather_report(  # noqa: WPS210
         self,
         candidate: models_pb2.MonitoringRule,
     ) -> str:
-        weather_report = "Weather report for flight to {0}".format(
-            candidate.booking.value.destination.name,
+        departure_date = protobuf.protobuf_to_datetime(
+            candidate.booking.value.departure_at,
         )
-        self._logger.info(weather_report)
+        weather_report = _(
+            "Your trip to {destination} is in 2 days!\nHere's what the weather forecast"
+            " looks like for the first three days of your trip:\n\n\U0001f4cd Location:"
+            " {destination}\n\n",
+        ).format(
+            destination=candidate.booking.value.destination.name,
+        )
+        weather_forecast = await self._open_weather_map_client.get_weather_forecast(
+            candidate.booking.value.destination,
+        )
+        weather_report += format_daily_weather(
+            departure_date,
+            weather_forecast,
+        )
+        weather_report += _("Have a great journey! \U0001f31e")
         return weather_report
+
+
+def format_daily_weather(
+    departure_date: datetime.datetime,
+    weather_forecast: Mapping[str, Any],
+) -> str:
+    hourly_weather_forecast = {
+        weather["dt_txt"]: weather for weather in weather_forecast["list"]
+    }
+    daily_weather_report = ""
+    for day_delay in range(3):
+        weather_day = departure_date + datetime.timedelta(
+            days=day_delay,
+        )
+        daily_weather_report += _(
+            "*Day {0}*\n"
+            "\U0001f4c5 {1}\n"
+            "\U0001f321 High: {2}°C | Low: {3}°C\n"
+            "{4} {5}\n\n",
+        ).format(
+            day_delay + 1,
+            weather_day.strftime("%A %d %B"),
+            hourly_weather_forecast[
+                "{0} 15:00:00".format(weather_day.strftime("%Y-%m-%d"))
+            ]["main"]["temp"],
+            hourly_weather_forecast[
+                "{0} 03:00:00".format(weather_day.strftime("%Y-%m-%d"))
+            ]["main"]["temp"],
+            _WEATHER_CONDITION_GROUP_ICONS.get(
+                hourly_weather_forecast[
+                    "{0} 15:00:00".format(weather_day.strftime("%Y-%m-%d"))
+                ]["weather"][0]["main"],
+                "\U0001f325",
+            ),
+            hourly_weather_forecast[
+                "{0} 15:00:00".format(weather_day.strftime("%Y-%m-%d"))
+            ]["weather"][0]["main"],
+        )
+
+    return daily_weather_report

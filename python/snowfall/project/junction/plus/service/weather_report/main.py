@@ -7,6 +7,7 @@ from snowfall.project.junction.plus.adapter import (
 from snowfall.project.junction.plus.service.notifications.v1alpha import (
     grpc_pb2_grpc as notifications_pb2_grpc,
 )
+from snowfall.project.junction.plus.service.weather_report import open_weather_map
 from snowfall.project.junction.plus.service.weather_report.cron import (
     WeatherReportCronJob,
 )
@@ -45,6 +46,10 @@ async def _cron_run(
             notification_event_publisher=notifications_pb2_grpc.NotificationEventPublisherServiceStub(
                 notifications_channel,
             ),
+        ),
+        open_weather_map_client=open_weather_map.OpenWeatherMapClient(
+            api_url=app.settings.owm_url,
+            api_key=app.settings.owm_key,
         ),
     )
 
