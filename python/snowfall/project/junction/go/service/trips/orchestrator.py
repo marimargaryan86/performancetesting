@@ -7,7 +7,7 @@ from typing import NamedTuple
 
 import timezonefinder
 
-from snowfall.project.junction.go.adapter import offer_searches
+from snowfall.project.junction.go.adapter import errors, offer_searches
 from snowfall.project.junction.go.service.offers.v1 import (
     models_pb2 as offer_models_pb2,
 )
@@ -157,10 +157,11 @@ class OfferOrchestrator(object):
 
         for search_id in search_ids:
             if isinstance(search_id, Exception):
-                self._logger.exception(
-                    "Failed to create an offer search",
-                    exception=search_id,
-                )
+                if not isinstance(search_id, errors.ServiceUnavailableError):
+                    self._logger.exception(
+                        "Failed to create an offer search",
+                        exception=search_id,
+                    )
 
                 continue
 
