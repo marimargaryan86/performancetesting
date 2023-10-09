@@ -73,9 +73,16 @@ job "weather-report-cron" {
     task "cron" {
       driver = "docker"
 
+      vault {
+        policies = ["weather-report-cron-${var.environment}"]
+      }
+
       template {
         data        = <<EOH
 NOTIFICATIONS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_notifications-${var.environment}"))}}
+{{ with secret "kv/data/${var.environment}/weather-report-cron" }}
+OWM_KEY={{ .Data.data.owm_key }}
+{{ end }}
 EOH
         destination = "services.env"
         env         = true
@@ -99,6 +106,7 @@ EOH
       env {
         ENV_NAME   = "${var.environment}"
         SENTRY_DSN = "https://193a30c8aed74d2993051f0f406470ce@sentry.snowfall.se/170"
+        OWM_URL    = "https://api.openweathermap.org/data/2.5/forecast"
       }
     }
   }

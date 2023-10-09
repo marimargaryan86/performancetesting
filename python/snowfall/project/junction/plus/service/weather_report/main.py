@@ -15,6 +15,8 @@ from snowfall.stdlib.transport.grpc.client import create_channel
 
 class _CronSettings(application.Settings):
     notifications_address: str
+    owm_key: str
+    owm_url: str
 
 
 async def _cron_run(
