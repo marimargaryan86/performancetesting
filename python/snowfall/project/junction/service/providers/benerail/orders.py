@@ -15,7 +15,7 @@ from snowfall.project.junction.service.providers.benerail import (
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import application
+from snowfall.stdlib.service import amqp_factory, application
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.vendor.benerail import client
 
@@ -35,9 +35,7 @@ def orders_factory(
             )
             logging.register(http_client)
             metrics.register(http_client)
-            amqp_conn = await stack.enter_async_context(
-                types.Connection(str(app.settings.amqp_dsn)),  # nosec
-            )
+            amqp_conn = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
             redis_conn = await stack.enter_async_context(
                 aioredis.from_url(
                     str(app.settings.redis_dsn),

@@ -10,7 +10,7 @@ from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import application
+from snowfall.stdlib.service import amqp_factory, application
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer
 from snowfall.stdlib.transport.amqp import types as amqp_types
@@ -26,9 +26,7 @@ async def price_quotes(
             retry_on_error=[aioredis.ConnectionError],
         ).client(),
     )
-    amqp_connection = await app.stack.enter_async_context(
-        amqp_types.Connection(str(app.settings.amqp_dsn)),
-    )
+    amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
     producer_obj = producer.Producer(
         connection=amqp_connection,
         exchange=amqp_types.Exchange("prices"),

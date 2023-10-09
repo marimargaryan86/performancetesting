@@ -20,7 +20,7 @@ from snowfall.project.junction.go.service.passenger_name_records.v1 import (
     passenger_name_records_pb2_grpc,
 )
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
-from snowfall.stdlib.service import application
+from snowfall.stdlib.service import amqp_factory, application
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.stdlib.transport.grpc import client, server
 from snowfall.vendor.junction.auth import UserAuth
@@ -28,7 +28,7 @@ from snowfall.vendor.junction.pay.client import Client as PayClient
 
 
 class _GrpcSettings(application.Settings):
-    amqp_dsn: pydantic.AnyUrl
+    amqp_dsn: pydantic.AmqpDsn
     default_page_size: int = 100
     gateway_address: str
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
@@ -40,7 +40,7 @@ class _GrpcSettings(application.Settings):
 
 
 class _ImportSettings(pay_integration.Settings, application.Settings):
-    amqp_dsn: pydantic.AnyUrl
+    amqp_dsn: pydantic.AmqpDsn
     mongo_dsn: Sequence[pydantic.AnyUrl]
     passenger_name_records_address: str
     use_pay_to_create_transaction: bool = False
@@ -68,9 +68,7 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
         env=app.environment,
     )
 
-    amqp_connection = await app.stack.enter_async_context(
-        types.Connection(str(app.settings.amqp_dsn)),
-    )
+    amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
     booking_repository = orders.BookingRepository(
         collection=mongo.orders.journeys,
     )
@@ -122,11 +120,7 @@ async def _import(app: application.Application[_ImportSettings]) -> None:
     )
 
     http_client = await app.stack.enter_async_context(httpx.AsyncClient())
-    connection = await app.stack.enter_async_context(
-        types.Connection(
-            str(app.settings.amqp_dsn),
-        ),
-    )
+    connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
 
     logging.register(http_client)
     metrics.register(http_client)

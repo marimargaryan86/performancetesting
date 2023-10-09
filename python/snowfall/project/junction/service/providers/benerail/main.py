@@ -19,6 +19,7 @@ from snowfall.project.junction.service.providers.benerail import (
 from snowfall.project.junction.service.providers.benerail.constant import PROVIDER_ID
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence import filesystem
+from snowfall.stdlib.service import amqp_factory
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import types
 from snowfall.vendor.benerail import client
@@ -71,9 +72,7 @@ async def _notifications(  # noqa: WPS217
     )
     logging.register(http_client)
     metrics.register(http_client)
-    amqp_connection = await app.stack.enter_async_context(
-        types.Connection(str(app.settings.amqp_dsn)),
-    )
+    amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
     notifier = notifications.SmtpNotifier(
         smtp_client=aiosmtplib.SMTP(
             hostname=app.settings.smtp_dsn.host,

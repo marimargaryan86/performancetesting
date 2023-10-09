@@ -6,6 +6,7 @@ import uuid
 from collections.abc import AsyncIterator
 from unittest import mock
 
+import aio_pika
 import faker
 import more_itertools
 import pytest
@@ -26,7 +27,6 @@ from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.transport.amqp import types
 
 
 def generate_offer_search(
@@ -84,7 +84,7 @@ async def searcher(
     app.settings.ttl = datetime.timedelta(minutes=1)
     implementation = await main._offers_factory(  # noqa: SLF001
         app=app,
-        amqp_conn=mock.create_autospec(types.Connection),
+        amqp_conn=mock.create_autospec(aio_pika.Connection),
         redis_conn=redis_client,
         stack=mock.create_autospec(contextlib.AsyncExitStack),
     )

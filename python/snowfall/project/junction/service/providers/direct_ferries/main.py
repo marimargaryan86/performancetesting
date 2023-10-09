@@ -5,6 +5,7 @@ import pathlib
 import random
 
 import httpx
+from aio_pika import abc
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.provider import meta, offers, service
@@ -32,6 +33,7 @@ from snowfall.project.junction.service.providers.direct_ferries.v1alpha import a
 from snowfall.stdlib import h3
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.stdlib.service import amqp_factory
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.vendor.direct_ferries import client
 from snowfall.vendor.direct_ferries.clients import auth, base
@@ -74,7 +76,7 @@ def _create_client(
 
 async def _offers(
     app: service.Application[config.Settings],
-    amqp_conn: types.Connection,
+    amqp_conn: abc.AbstractConnection,
     redis_conn: aioredis.Redis[bytes],
     stack: contextlib.AsyncExitStack,
 ) -> _Impl:
@@ -122,9 +124,7 @@ async def _orders(app: service.Application[config.OrdersSettings]) -> None:
     )
     logging.register(http_client)
     metrics.register(http_client)
-    amqp_conn = await app.stack.enter_async_context(
-        types.Connection(str(app.settings.amqp_dsn)),
-    )
+    amqp_conn = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
     redis_conn = await app.stack.enter_async_context(
         aioredis.from_url(
             str(random.choice(app.settings.redis_dsn)),  # noqa: S311
@@ -169,9 +169,7 @@ async def _price_quotes(
             retry_on_error=[aioredis.ConnectionError],
         ).client(),
     )
-    amqp_connection = await app.stack.enter_async_context(
-        types.Connection(str(app.settings.amqp_dsn)),
-    )
+    amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
 
     await df_consumer.PriceQuoteConsumer(
         consumer_obj=consumer.Consumer(

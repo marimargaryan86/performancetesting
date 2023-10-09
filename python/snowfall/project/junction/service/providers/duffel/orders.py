@@ -20,7 +20,7 @@ from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import application
+from snowfall.stdlib.service import amqp_factory, application
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
@@ -28,7 +28,7 @@ _PROVIDER_NAME = "Duffel"
 
 
 class OrdersSettings(config.DuffelConfig, application.Settings):
-    amqp_dsn: pydantic.AnyUrl
+    amqp_dsn: pydantic.AmqpDsn
     redis_dsn: Sequence[pydantic.AnyUrl]
     smtp_dsn: pydantic.AnyUrl
     smtp_sender: pydantic.EmailStr
@@ -60,9 +60,7 @@ async def orders(  # noqa: WPS217
             retry_on_error=[aioredis.ConnectionError],
         ).client(),
     )
-    amqp_connection = await app.stack.enter_async_context(
-        types.Connection(str(app.settings.amqp_dsn)),
-    )
+    amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
     duffel_client_factory = DuffelClientFactory(
         api_base_url=str(app.settings.api_base_url),
         api_key=app.settings.api_key,

@@ -16,13 +16,13 @@ from snowfall.project.junction.plus.service.notifications.v1alpha import (
 )
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import application
+from snowfall.stdlib.service import amqp_factory, application
 from snowfall.stdlib.transport.amqp import consumer, types
 from snowfall.stdlib.transport.grpc.client import create_channel
 
 
 class _ImportSettings(application.Settings):
-    amqp_dsn: pydantic.AnyUrl
+    amqp_dsn: pydantic.AmqpDsn
     notifications_address: str
     twilio_sid: str
     twilio_token: str
@@ -32,11 +32,7 @@ class _ImportSettings(application.Settings):
 
 async def _import(app: application.Application[_ImportSettings]) -> None:
     http_client = await app.stack.enter_async_context(httpx.AsyncClient())
-    connection = await app.stack.enter_async_context(
-        types.Connection(
-            str(app.settings.amqp_dsn),
-        ),
-    )
+    connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
 
     logging.register(http_client)
     metrics.register(http_client)

@@ -28,7 +28,7 @@ class Settings(DuffelConfig, service.ProviderSettings):
 
 
 class PricingSettings(DuffelConfig, service.Settings):
-    amqp_dsn: pydantic.AnyUrl
+    amqp_dsn: pydantic.AmqpDsn
     redis_dsn: Sequence[pydantic.AnyUrl]
     ttl: datetime.timedelta = datetime.timedelta(minutes=DEFAULT_TTL_IN_MINUTES)
     provider_company_id: str

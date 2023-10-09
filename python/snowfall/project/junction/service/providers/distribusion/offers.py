@@ -3,6 +3,7 @@ from __future__ import annotations
 import contextlib
 
 import httpx
+from aio_pika import abc
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.provider import offers, service
@@ -17,7 +18,6 @@ from snowfall.project.junction.service.providers.distribusion.v1 import amqp_pb2
 from snowfall.stdlib import h3
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.transport.amqp import types
 from snowfall.vendor.distribusion import client
 from snowfall.vendor.distribusion.models import criterias
 from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
@@ -33,7 +33,7 @@ _Impl = offers.OfferSearchImplementation[
 
 async def offers_factory(
     app: service.Application[config.Settings],
-    amqp_connection: types.Connection,
+    amqp_connection: abc.AbstractConnection,
     redis_connection: aioredis.Redis[bytes],
     stack: contextlib.AsyncExitStack,
 ) -> _Impl:

@@ -4,34 +4,12 @@ import enum
 from collections.abc import Mapping
 from typing import Any, Generic, TypeVar
 
-from aio_pika import abc, connection, robust_connection
+from aio_pika import abc
 from google.protobuf import message
 
 from snowfall.stdlib.format import protobuf
 
 _Proto = TypeVar("_Proto", bound=message.Message)
-
-
-class Connection(robust_connection.RobustConnection):
-    def __init__(
-        self,
-        url: str,
-        timeout: datetime.timedelta | None = None,
-        *args: Any,
-        **kwargs: Any,
-    ):
-        self._timeout = timeout
-
-        super().__init__(connection.make_url(url), *args, **kwargs)
-
-    async def __aenter__(self) -> "Connection":
-        await self.connect(
-            timeout=self._timeout.total_seconds() if self._timeout else None,
-        )
-
-        return self
-
-
 ExchangeType = abc.ExchangeType
 
 

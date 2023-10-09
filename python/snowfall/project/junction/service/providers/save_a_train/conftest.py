@@ -8,6 +8,7 @@ import aiofiles
 import httpx
 import orjson
 import pytest
+from aio_pika import Connection, connection
 from motor import core
 from redis import asyncio as aioredis
 
@@ -96,7 +97,7 @@ def save_a_train_adapter(
         ttl=datetime.timedelta(minutes=1),
         notifier=notifications.LogNotifier(),
         notifications_producer=producer.Producer(
-            types.Connection(""),
+            Connection(connection.make_url("")),
             types.Exchange("notifications"),
         ),
         booking_storage=storage,

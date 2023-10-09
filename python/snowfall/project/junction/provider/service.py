@@ -7,13 +7,13 @@ from collections.abc import Awaitable, Callable
 from typing import TYPE_CHECKING, Generic, TypeVar
 
 import pydantic
+from aio_pika import abc
 from google.protobuf import message
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.provider import bookings, meta, offers, trips
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import application
-from snowfall.stdlib.transport.amqp import types
+from snowfall.stdlib.service import amqp_factory, application
 from snowfall.stdlib.transport.grpc import server as grpc_server
 from snowfall.stdlib.transport.grpc import service as grpc_service
 
@@ -25,7 +25,7 @@ Settings = application.Settings
 
 
 class ProviderSettings(application.Settings):
-    amqp_dsn: pydantic.AnyUrl
+    amqp_dsn: pydantic.AmqpDsn
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
     provider_company_id: str
@@ -47,7 +47,7 @@ if TYPE_CHECKING:
     OffersFactory = Callable[
         [
             application.Application[_Settings],
-            types.Connection,
+            abc.AbstractConnection,
             aioredis.Redis[bytes],
             contextlib.AsyncExitStack,
         ],
@@ -90,9 +90,7 @@ def _grpc_command(  # noqa: WPS210, WPS217
                 retry_on_error=[aioredis.ConnectionError],
             ).client(),
         )
-        connection = await app.stack.enter_async_context(
-            types.Connection(str(app.settings.amqp_dsn)),
-        )
+        connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
 
         if offers_factory:
             offers_implementation = await offers_factory(
@@ -154,9 +152,7 @@ def _offers_command(
                 retry_on_error=[aioredis.ConnectionError],
             ).client(),
         )
-        connection = await app.stack.enter_async_context(
-            types.Connection(str(app.settings.amqp_dsn)),
-        )
+        connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
 
         trip_search_consumer = offers.create_trip_offer_search_consumer(
             amqp_connection=connection,

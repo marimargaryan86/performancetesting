@@ -35,14 +35,14 @@ class StaticSettings(DfBaseSettings):
 
 class PriceQuotesSettings(service.PriceQuoteSettings):
     redis_dsn: pydantic.AnyUrl
-    amqp_dsn: pydantic.AnyUrl
+    amqp_dsn: pydantic.AmqpDsn
     ttl: datetime.timedelta = datetime.timedelta(
         minutes=_PRICE_QUOTE_TTL_DEFAULT_MINUTES,
     )
 
 
 class OrdersSettings(DfBaseSettings, service.Settings):
-    amqp_dsn: pydantic.AnyUrl
+    amqp_dsn: pydantic.AmqpDsn
     redis_dsn: Sequence[pydantic.AnyUrl]
 
 

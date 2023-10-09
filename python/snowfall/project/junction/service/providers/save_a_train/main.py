@@ -41,6 +41,7 @@ from snowfall.stdlib import h3
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.stdlib.service import amqp_factory
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer, types
 from snowfall.stdlib.transport.grpc import client as grpc_client
@@ -79,13 +80,13 @@ class _Settings(_SatConfig, service.ProviderSettings):
 
 
 class _PriceQuoteSettings(service.PriceQuoteSettings):
-    amqp_dsn: pydantic.AnyUrl
+    amqp_dsn: pydantic.AmqpDsn
     redis_dsn: Sequence[pydantic.AnyUrl]
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
 
 
 class _OrdersSettings(_SatConfig, service.Settings):
-    amqp_dsn: pydantic.AnyUrl
+    amqp_dsn: pydantic.AmqpDsn
     redis_dsn: Sequence[pydantic.AnyUrl]
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
     smtp_dsn: pydantic.AnyUrl
@@ -97,7 +98,7 @@ class _OrdersSettings(_SatConfig, service.Settings):
 
 
 class _NotificationsSettings(_SatConfig, service.Settings):
-    amqp_dsn: pydantic.AnyUrl
+    amqp_dsn: pydantic.AmqpDsn
     redis_dsn: Sequence[pydantic.AnyUrl]
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
     smtp_dsn: pydantic.AnyUrl
@@ -120,7 +121,7 @@ async def _meta_factory() -> meta.MetaImplementation:
 
 async def _offers_factory(
     app: service.Application[_Settings],
-    amqp_conn: types.Connection,
+    amqp_conn: abc.AbstractConnection,
     redis_conn: aioredis.Redis[bytes],
     stack: contextlib.AsyncExitStack,
 ) -> _Impl:
@@ -231,9 +232,7 @@ async def _orders(  # noqa: WPS217
     )
     logging.register(http_client)
     metrics.register(http_client)
-    amqp_connection = await app.stack.enter_async_context(
-        types.Connection(str(app.settings.amqp_dsn)),
-    )
+    amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
     redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
         aioredis.from_url(
             str(random.choice(app.settings.redis_dsn)),  # noqa: S311
@@ -312,9 +311,7 @@ async def _price_quotes(app: service.Application[_PriceQuoteSettings]) -> None:
             retry_on_error=[aioredis.ConnectionError],
         ).client(),
     )
-    amqp_connection = await app.stack.enter_async_context(
-        types.Connection(str(app.settings.amqp_dsn)),
-    )
+    amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
 
     await consumer.PriceQuoteConsumer(
         consumer_obj=amqp_consumer.Consumer(
@@ -350,9 +347,7 @@ async def _notifications(  # noqa: WPS217
     )
     logging.register(http_client)
     metrics.register(http_client)
-    amqp_connection = await app.stack.enter_async_context(
-        types.Connection(str(app.settings.amqp_dsn)),
-    )
+    amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
     redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
         aioredis.from_url(
             str(random.choice(app.settings.redis_dsn)),  # noqa: S311

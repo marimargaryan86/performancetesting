@@ -6,7 +6,7 @@ from redis import asyncio as aioredis
 from snowfall.project.junction.service.providers.karhoo import cache, config, consumer
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import application
+from snowfall.stdlib.service import amqp_factory, application
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer as amqp_producer
 from snowfall.stdlib.transport.amqp import trackable, types
@@ -23,9 +23,7 @@ async def offers(
     )
     logging.register(http_client)
     metrics.register(http_client)
-    amqp_connection = await app.stack.enter_async_context(
-        types.Connection(str(app.settings.amqp_dsn)),
-    )
+    amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
 
     redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
         aioredis.from_url(

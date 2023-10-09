@@ -6,6 +6,7 @@ import datetime
 from collections.abc import AsyncIterator, Callable, Mapping, Sequence
 from typing import Generic, TypeVar
 
+from aio_pika import abc
 from aiostream import stream
 from google.protobuf import message
 from grpc import aio
@@ -238,7 +239,7 @@ class TripOfferSearchConsumer(Generic[_SearchCriteriaTask, _SearchCriteria]):
 
 
 def create_trip_offer_search_consumer(  # noqa: WPS211
-    amqp_connection: amqp_types.Connection,
+    amqp_connection: abc.AbstractConnection,
     redis_client: redis.Client[bytes],
     implementation: OfferSearchImplementation[_SearchCriteriaTask, _SearchCriteria],
     app_name: str,

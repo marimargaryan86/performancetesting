@@ -28,7 +28,7 @@ from snowfall.project.junction.go.service.offers.grpc import (
 )
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import application
+from snowfall.stdlib.service import amqp_factory, application
 from snowfall.stdlib.transport.amqp import consumer, producer, trackable, types
 from snowfall.stdlib.transport.grpc import client, server
 from snowfall.vendor.junction.auth import UserAuth
@@ -39,7 +39,7 @@ _TRIP_OFFER_SEARCH_GATEWAY_KEY = "offer_searches.trip"
 
 
 class _GrpcSettings(application.Settings):
-    amqp_dsn: pydantic.AnyUrl
+    amqp_dsn: pydantic.AmqpDsn
     default_page_size: int = 100
     default_ttl: datetime.timedelta = datetime.timedelta(minutes=15)
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
@@ -55,7 +55,7 @@ class _PaySettings(application.Settings):
 
 
 class _ImportSettings(pay_integration.Settings, _PaySettings, application.Settings):
-    amqp_dsn: pydantic.AnyUrl
+    amqp_dsn: pydantic.AmqpDsn
     default_ttl: datetime.timedelta = datetime.timedelta(minutes=15)
     mongo_dsn: Sequence[pydantic.AnyUrl]
     redis_dsn: Sequence[pydantic.AnyUrl]
@@ -72,7 +72,7 @@ class _GatherPriceQuoteSettings(
     _PaySettings,
     application.Settings,
 ):
-    amqp_dsn: pydantic.AnyUrl
+    amqp_dsn: pydantic.AmqpDsn
     default_ttl: datetime.timedelta = datetime.timedelta(minutes=15)
     mongo_dsn: Sequence[pydantic.AnyUrl]
 
@@ -81,76 +81,76 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
-    async with types.Connection(str(app.settings.amqp_dsn)) as connection:
-        amqp_producer = producer.Producer(
-            connection=connection,
-            exchange=types.Exchange("offers"),
-        )
-        grpc_server = server.create_server(
-            app.settings.grpc_address,
-            app.settings.grpc_port,
-            [
-                OfferSearchService(
-                    offers_searches=offers.OfferSearchRepository(
-                        mongo.offers.offer_searches,
-                        app.settings.default_ttl,
-                    ),
-                    publisher=OfferSearchProducer(
-                        producer=(
-                            amqp_producer
-                            if app.settings.use_gateway
-                            else trackable.TrackableProducer(
-                                amqp_producer,
-                            )
-                        ),
-                        routing_key=(
-                            _TRIP_OFFER_SEARCH_GATEWAY_KEY
-                            if app.settings.use_gateway
-                            else _TRIP_OFFER_SEARCH_ROUTING_KEY
-                        ),
-                        ttl=app.settings.default_ttl,
-                    ),
-                    default_page_size=app.settings.default_page_size,
+    connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
+    amqp_producer = producer.Producer(
+        connection=connection,
+        exchange=types.Exchange("offers"),
+    )
+    grpc_server = server.create_server(
+        app.settings.grpc_address,
+        app.settings.grpc_port,
+        [
+            OfferSearchService(
+                offers_searches=offers.OfferSearchRepository(
+                    mongo.offers.offer_searches,
+                    app.settings.default_ttl,
                 ),
-                OfferService(
-                    offer_aggregates=offers.OfferAggregateMappingRepository(
-                        mongo.offers.offer_aggregates,
+                publisher=OfferSearchProducer(
+                    producer=(
+                        amqp_producer
+                        if app.settings.use_gateway
+                        else trackable.TrackableProducer(
+                            amqp_producer,
+                        )
                     ),
-                    offer_results=offers.TripOfferRepository(
-                        mongo.offers.trip_offers,
+                    routing_key=(
+                        _TRIP_OFFER_SEARCH_GATEWAY_KEY
+                        if app.settings.use_gateway
+                        else _TRIP_OFFER_SEARCH_ROUTING_KEY
                     ),
-                    offer_group_details=offers.TripOfferGroupDetailsRepository(
-                        mongo.offers.trip_offers,
-                    ),
-                    offer_options=offers.OfferOptionsRepository(
-                        mongo.offers.trip_offers,
-                    ),
-                    offer_option_details=offers.OfferOptionDetailsRepository(
-                        mongo.offers.trip_offers,
-                    ),
-                    default_page_size=app.settings.default_page_size,
+                    ttl=app.settings.default_ttl,
                 ),
-                PriceQuoteService(
-                    price_quotes_repository=price_quotes.PriceQuoteContainerRepository(
-                        mongo.offers.price_quotes,
-                        app.settings.default_ttl,
-                    ),
-                    publisher=PriceQuoteProducer(
-                        producer=producer.Producer(
-                            connection=connection,
-                            exchange=types.Exchange("prices"),
-                        ),
-                        offers_options_repository=offers.OfferOptionsRepository(
-                            mongo.offers.trip_offers,
-                        ),
-                        routing_key="offers.pricing",
-                    ),
+                default_page_size=app.settings.default_page_size,
+            ),
+            OfferService(
+                offer_aggregates=offers.OfferAggregateMappingRepository(
+                    mongo.offers.offer_aggregates,
                 ),
-            ],
-        )
+                offer_results=offers.TripOfferRepository(
+                    mongo.offers.trip_offers,
+                ),
+                offer_group_details=offers.TripOfferGroupDetailsRepository(
+                    mongo.offers.trip_offers,
+                ),
+                offer_options=offers.OfferOptionsRepository(
+                    mongo.offers.trip_offers,
+                ),
+                offer_option_details=offers.OfferOptionDetailsRepository(
+                    mongo.offers.trip_offers,
+                ),
+                default_page_size=app.settings.default_page_size,
+            ),
+            PriceQuoteService(
+                price_quotes_repository=price_quotes.PriceQuoteContainerRepository(
+                    mongo.offers.price_quotes,
+                    app.settings.default_ttl,
+                ),
+                publisher=PriceQuoteProducer(
+                    producer=producer.Producer(
+                        connection=connection,
+                        exchange=types.Exchange("prices"),
+                    ),
+                    offers_options_repository=offers.OfferOptionsRepository(
+                        mongo.offers.trip_offers,
+                    ),
+                    routing_key="offers.pricing",
+                ),
+            ),
+        ],
+    )
 
-        async with grpc_server.serve() as running:
-            await running.wait_for_termination()
+    async with grpc_server.serve() as running:
+        await running.wait_for_termination()
 
 
 async def _import(app: application.Application[_ImportSettings]) -> None:
@@ -160,11 +160,7 @@ async def _import(app: application.Application[_ImportSettings]) -> None:
 
     gateway_channel = client.create_channel(app.settings.gateway_address)
     http_client = await app.stack.enter_async_context(httpx.AsyncClient())
-    connection = await app.stack.enter_async_context(
-        types.Connection(
-            str(app.settings.amqp_dsn),
-        ),
-    )
+    connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
     redis_conn = await app.stack.enter_async_context(
         aioredis.from_url(
             str(random.choice(app.settings.redis_dsn)),  # noqa: S311
@@ -264,11 +260,7 @@ async def _gather_price_quotes(
     )
 
     http_client = await app.stack.enter_async_context(httpx.AsyncClient())
-    connection = await app.stack.enter_async_context(
-        types.Connection(
-            str(app.settings.amqp_dsn),
-        ),
-    )
+    connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
 
     logging.register(http_client)
     metrics.register(http_client)

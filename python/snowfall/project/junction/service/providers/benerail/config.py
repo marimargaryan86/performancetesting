@@ -39,19 +39,19 @@ class Settings(BenerailSettings, service.ProviderSettings):
 
 class PriceQuoteSettings(BenerailSettings, service.Settings):
     redis_dsn: pydantic.AnyUrl
-    amqp_dsn: pydantic.AnyUrl
+    amqp_dsn: pydantic.AmqpDsn
     ttl: datetime.timedelta = datetime.timedelta(minutes=_DEFAULT_TTL_IN_MINUTES)
     provider_company_id: str
 
 
 class OrdersSettings(BenerailSettings, service.Settings):
     redis_dsn: pydantic.AnyUrl
-    amqp_dsn: pydantic.AnyUrl
+    amqp_dsn: pydantic.AmqpDsn
     storage_dsn: service.AnyDsn
 
 
 class NotificationsSettings(BenerailSettings, service.Settings):
-    amqp_dsn: pydantic.AnyUrl
+    amqp_dsn: pydantic.AmqpDsn
     smtp_dsn: pydantic.AnyUrl
     smtp_sender: pydantic.EmailStr
     smtp_recipient: pydantic.EmailStr

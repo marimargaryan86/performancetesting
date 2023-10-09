@@ -11,7 +11,7 @@ from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import application
+from snowfall.stdlib.service import amqp_factory, application
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.vendor.distribusion import client
 from snowfall.vendor.distribusion.models import connections, criterias
@@ -52,9 +52,7 @@ async def price_quotes(  # noqa: WPS210
         http_client=http_client,
         rate_limit_client=rate_limit_client,
     )
-    amqp_connection = await app.stack.enter_async_context(
-        types.Connection(str(app.settings.amqp_dsn)),
-    )
+    amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
     offer_cache = cache.OffersCache(
         client=redis.Client[bytes](redis_connection, prefix=app.name),
     )

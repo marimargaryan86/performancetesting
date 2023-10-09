@@ -4,6 +4,7 @@ import contextlib
 import random
 
 import httpx
+from aio_pika import abc
 from motor import motor_asyncio
 from redis import asyncio as aioredis
 
@@ -31,7 +32,7 @@ _Impl = offers.OfferSearchImplementation[
 
 async def offers_app(
     app: application.Application[config.Settings],
-    amqp_conn: types.Connection,
+    amqp_conn: abc.AbstractConnection,
     redis_conn: aioredis.Redis[bytes],
     stack: contextlib.AsyncExitStack,
 ) -> _Impl:

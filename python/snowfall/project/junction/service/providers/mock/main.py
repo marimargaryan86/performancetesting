@@ -5,6 +5,7 @@ import datetime
 from typing import Any, cast
 
 import pydantic
+from aio_pika import abc
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.provider import bookings as provider_bookings
@@ -22,6 +23,7 @@ from snowfall.project.junction.service.providers.mock import (
 from snowfall.project.junction.service.providers.mock.constant import PROVIDER_ID
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.stdlib.service import amqp_factory
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 
 _PROVIDER_NAME = "Mock"
@@ -34,14 +36,14 @@ class _Settings(service.ProviderSettings):
 
 
 class _PriceQuotesSettings(service.Settings):
-    amqp_dsn: pydantic.AnyUrl
+    amqp_dsn: pydantic.AmqpDsn
     redis_dsn: pydantic.AnyUrl
     provider_company_id: str
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
 
 
 class _BookingsSettings(service.Settings):
-    amqp_dsn: pydantic.AnyUrl
+    amqp_dsn: pydantic.AmqpDsn
     redis_dsn: pydantic.AnyUrl
     storage_dsn: service.AnyDsn
 
@@ -54,9 +56,7 @@ async def _price_quotes(app: service.Application[_PriceQuotesSettings]) -> None:
             retry_on_error=[aioredis.ConnectionError],
         ).client(),
     )
-    amqp_connection = await app.stack.enter_async_context(
-        types.Connection(str(app.settings.amqp_dsn)),
-    )
+    amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
 
     await pricing.Consumer(
         consumer_obj=consumer.Consumer(
@@ -89,9 +89,7 @@ async def _bookings(app: service.Application[_BookingsSettings]) -> None:
             retry_on_error=[aioredis.ConnectionError],
         ).client(),
     )
-    amqp_connection = await app.stack.enter_async_context(
-        types.Connection(str(app.settings.amqp_dsn)),
-    )
+    amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
     storage = await app.stack.enter_async_context(
         filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
     )
@@ -123,7 +121,7 @@ async def _meta_factory() -> meta.MetaImplementation:
 
 async def _offers_factory(
     app: service.Application[_Settings],
-    amqp_conn: types.Connection,
+    amqp_conn: abc.AbstractConnection,
     redis_conn: aioredis.Redis[bytes],
     stack: contextlib.AsyncExitStack,
 ) -> provider_offers.OfferSearchImplementation[offers.Criteria, offers.Criteria]:

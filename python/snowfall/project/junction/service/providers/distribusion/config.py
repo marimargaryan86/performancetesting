@@ -24,7 +24,7 @@ class Settings(service.ProviderSettings, DistribusionConfig):
 
 
 class OrdersSettings(service.Settings, DistribusionConfig):
-    amqp_dsn: pydantic.AnyUrl
+    amqp_dsn: pydantic.AmqpDsn
     redis_dsn: Sequence[pydantic.AnyUrl]
     smtp_dsn: pydantic.AnyUrl
     smtp_sender: pydantic.EmailStr
@@ -34,7 +34,7 @@ class OrdersSettings(service.Settings, DistribusionConfig):
 
 
 class PricingSettings(DistribusionConfig, service.Settings):
-    amqp_dsn: pydantic.AnyUrl
+    amqp_dsn: pydantic.AmqpDsn
     redis_dsn: Sequence[pydantic.AnyUrl]
     ttl: datetime.timedelta = datetime.timedelta(minutes=DEFAULT_TTL_IN_MINUTES)
     provider_company_id: str

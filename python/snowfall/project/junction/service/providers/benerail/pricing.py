@@ -6,7 +6,7 @@ from redis import asyncio as aioredis
 from snowfall.project.junction.service.providers.benerail import cache, config, consumer
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis_types
-from snowfall.stdlib.service import application
+from snowfall.stdlib.service import amqp_factory, application
 from snowfall.stdlib.transport.amqp import consumer as std_consumer
 from snowfall.stdlib.transport.amqp import producer, types
 from snowfall.vendor.benerail import client
@@ -24,9 +24,7 @@ async def price_quotes(app: application.Application[config.PriceQuoteSettings]) 
         offer_cache = cache.OffersCache(
             client=redis_types.Client[bytes](redis_connection, prefix=app.name),
         )
-        amqp_connection = await stack.enter_async_context(
-            types.Connection(str(app.settings.amqp_dsn)),
-        )
+        amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
         http_client = await stack.enter_async_context(
             httpx.AsyncClient(
                 http2=True,

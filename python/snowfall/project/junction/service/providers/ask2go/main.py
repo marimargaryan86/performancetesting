@@ -8,6 +8,7 @@ from collections.abc import Sequence
 import aiosmtplib
 import httpx
 import pydantic
+from aio_pika import abc
 from motor import motor_asyncio
 from redis import asyncio as aioredis
 
@@ -36,6 +37,7 @@ from snowfall.stdlib import h3
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.stdlib.service import amqp_factory
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer, types
 from snowfall.vendor.ask2go import client
@@ -45,7 +47,7 @@ from snowfall.vendor.rate_limiter.config import RateLimitConfig
 
 
 class _OrdersSettings(service.Settings):
-    amqp_dsn: pydantic.AnyUrl
+    amqp_dsn: pydantic.AmqpDsn
     api_base_url: pydantic.AnyUrl
     api_booking_base_url: pydantic.AnyUrl
     redis_dsn: Sequence[pydantic.AnyUrl]
@@ -72,7 +74,7 @@ class _Settings(service.ProviderSettings):
 
 
 class _PriceQuotesSettings(service.PriceQuoteSettings):
-    amqp_dsn: pydantic.AnyUrl
+    amqp_dsn: pydantic.AmqpDsn
     api_base_url: pydantic.AnyUrl
     api_booking_base_url: pydantic.AnyUrl
     redis_dsn: Sequence[pydantic.AnyUrl]
@@ -89,7 +91,7 @@ class _SeatMapsSettings(service.Settings):
     api_base_url: pydantic.AnyUrl
     api_booking_base_url: pydantic.AnyUrl
     redis_dsn: Sequence[pydantic.AnyUrl]
-    amqp_dsn: pydantic.AnyUrl
+    amqp_dsn: pydantic.AmqpDsn
     http_timeout: float = 60.0
 
 
@@ -107,7 +109,7 @@ async def _meta_factory() -> meta.MetaImplementation:
 
 async def _offers(
     app: service.Application[_Settings],
-    amqp_conn: types.Connection,
+    amqp_conn: abc.AbstractConnection,
     redis_conn: aioredis.Redis[bytes],
     stack: contextlib.AsyncExitStack,
 ) -> _Impl:
@@ -192,9 +194,7 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
             retry_on_error=[aioredis.ConnectionError],
         ).client(),
     )
-    amqp_connection = await app.stack.enter_async_context(
-        types.Connection(str(app.settings.amqp_dsn)),
-    )
+    amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
     ask2go_client = client.Ask2GoClient(
         api_base_url=str(app.settings.api_base_url),
         api_booking_base_url=str(app.settings.api_booking_base_url),
@@ -263,9 +263,7 @@ async def _price_quotes(app: service.Application[_PriceQuotesSettings]) -> None:
             retry_on_error=[aioredis.ConnectionError],
         ).client(),
     )
-    amqp_connection = await app.stack.enter_async_context(
-        types.Connection(str(app.settings.amqp_dsn)),
-    )
+    amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
     ask2go_client = client.Ask2GoClient(
         api_base_url=str(app.settings.api_base_url),
         api_booking_base_url=str(app.settings.api_booking_base_url),

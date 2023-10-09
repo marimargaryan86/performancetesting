@@ -25,7 +25,7 @@ from snowfall.project.junction.go.service.trips.grpc import (
     TripService,
 )
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import application
+from snowfall.stdlib.service import amqp_factory, application
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.stdlib.transport.grpc import server
 from snowfall.stdlib.transport.grpc.client import create_channel
@@ -66,25 +66,24 @@ async def _consume(app: application.Application[_ConsumeSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
+    connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
+    trip_search_consumer_obj = TripSearchConsumer(
+        consumer_obj=consumer.Consumer(
+            connection=connection,
+            queue_name="{0}_trip_searches_consumer".format(app.name),
+            binds=[(types.Exchange(_TRIPS), "trips.search")],
+        ),
+        planner=planner_pb2_grpc.PlannerServiceStub(
+            create_channel(app.settings.planner_address),
+        ),
+        trip_search_repository=trips.TripSearchRepository(
+            mongo[_TRIPS]["trip_searches"],
+            app.settings.trip_search_ttl,
+        ),
+        trip_repository=trips.TripRepository(mongo[_TRIPS][_TRIPS]),
+    )
 
-    async with types.Connection(str(app.settings.amqp_dsn)) as connection:
-        trip_search_consumer_obj = TripSearchConsumer(
-            consumer_obj=consumer.Consumer(
-                connection=connection,
-                queue_name="{0}_trip_searches_consumer".format(app.name),
-                binds=[(types.Exchange(_TRIPS), "trips.search")],
-            ),
-            planner=planner_pb2_grpc.PlannerServiceStub(
-                create_channel(app.settings.planner_address),
-            ),
-            trip_search_repository=trips.TripSearchRepository(
-                mongo[_TRIPS]["trip_searches"],
-                app.settings.trip_search_ttl,
-            ),
-            trip_repository=trips.TripRepository(mongo[_TRIPS][_TRIPS]),
-        )
-
-        await trip_search_consumer_obj.consume()
+    await trip_search_consumer_obj.consume()
 
 
 async def _consume_trip_candidate_search_tasks(
@@ -113,40 +112,39 @@ async def _consume_trip_candidate_search_tasks(
     leg_cache_repo = cache.LegCacheRepository(
         trips_db["leg_cache"],
     )
-
-    async with types.Connection(str(app.settings.amqp_dsn)) as connection:
-        consumer_obj = TripCandidateSearchConsumer(
-            consumer_obj=consumer.Consumer(
-                connection=connection,
-                queue_name="{0}_trip_candidate_searches_consumer".format(app.name),
-                binds=[(types.Exchange(_TRIPS), "trip_candidates.search")],
+    connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
+    consumer_obj = TripCandidateSearchConsumer(
+        consumer_obj=consumer.Consumer(
+            connection=connection,
+            queue_name="{0}_trip_candidate_searches_consumer".format(app.name),
+            binds=[(types.Exchange(_TRIPS), "trip_candidates.search")],
+        ),
+        trip_candidate_search_repository=trips.TripCandidateSearchRepository(
+            trips_db["trip_candidate_searches"],
+            app.settings.trip_candidate_search_ttl,
+        ),
+        trip_repository=trip_repository,
+        leg_cache_repository=leg_cache_repo,
+        trip_orchestrator=orchestrator.TripOrchestrator(
+            planner=planner,
+        ),
+        leg_adapter=legs.GrpcClient(
+            schedules_pb2_grpc.ScheduleServiceStub(schedules_channel),
+        ),
+        offer_orchestrator=orchestrator.OfferOrchestrator(
+            offer_search_adapter=offer_searches.GrpcClient(
+                offers_grpc_pb2_grpc.OfferSearchServiceStub(offers_channel),
             ),
-            trip_candidate_search_repository=trips.TripCandidateSearchRepository(
-                trips_db["trip_candidate_searches"],
-                app.settings.trip_candidate_search_ttl,
-            ),
-            trip_repository=trip_repository,
             leg_cache_repository=leg_cache_repo,
-            trip_orchestrator=orchestrator.TripOrchestrator(
-                planner=planner,
-            ),
-            leg_adapter=legs.GrpcClient(
-                schedules_pb2_grpc.ScheduleServiceStub(schedules_channel),
-            ),
-            offer_orchestrator=orchestrator.OfferOrchestrator(
-                offer_search_adapter=offer_searches.GrpcClient(
-                    offers_grpc_pb2_grpc.OfferSearchServiceStub(offers_channel),
-                ),
-                leg_cache_repository=leg_cache_repo,
-            ),
-            max_trip_length_factor=app.settings.max_trip_length_factor,
-            trip_metadata_repository=cache.TripMetadataRepository(
-                client=client,
-                leg_cache_repository=leg_cache_repo,
-            ),
-        )
+        ),
+        max_trip_length_factor=app.settings.max_trip_length_factor,
+        trip_metadata_repository=cache.TripMetadataRepository(
+            client=client,
+            leg_cache_repository=leg_cache_repo,
+        ),
+    )
 
-        await consumer_obj.consume()
+    await consumer_obj.consume()
 
 
 async def _serve(app: application.Application[_GrpcSettings]) -> None:
@@ -157,55 +155,54 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
     offers_channel = create_channel(app.settings.offers_address)
 
     trips_db = mongo[_TRIPS]
+    connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
+    producer_obj = producer.Producer(
+        connection=connection,
+        exchange=types.Exchange(_TRIPS),
+    )
+    grpc_server = server.create_server(
+        app.settings.grpc_address,
+        app.settings.grpc_port,
+        [
+            TripService(
+                segments=trips.SegmentRepository(trips_db[_TRIPS]),
+                trips_repository=trips.TripRepository(trips_db[_TRIPS]),
+                default_page_size=app.settings.default_page_size,
+            ),
+            TripSearchService(
+                repository=trips.TripSearchRepository(
+                    trips_db["trip_searches"],
+                    app.settings.trip_search_ttl,
+                ),
+                producer_obj=producer_obj,
+            ),
+            TripCandidateSearchService(
+                repository=trips.TripCandidateSearchRepository(
+                    trips_db["trip_candidate_searches"],
+                    app.settings.trip_search_ttl,
+                ),
+                producer_obj=producer_obj,
+                offer_search_adapter=offer_searches.GrpcClient(
+                    offers_grpc_pb2_grpc.OfferSearchServiceStub(offers_channel),
+                ),
+            ),
+            TripCandidateService(
+                offers_adapter=offers.GrpcClient(
+                    offers=offers_grpc_pb2_grpc.OfferServiceStub(
+                        offers_channel,
+                    ),
+                ),
+                repository=trips.TripCandidateSearchRepository(
+                    trips_db["trip_candidate_searches"],
+                    app.settings.trip_search_ttl,
+                ),
+                default_page_size=app.settings.default_page_size,
+            ),
+        ],
+    )
 
-    async with types.Connection(str(app.settings.amqp_dsn)) as connection:
-        producer_obj = producer.Producer(
-            connection=connection,
-            exchange=types.Exchange(_TRIPS),
-        )
-        grpc_server = server.create_server(
-            app.settings.grpc_address,
-            app.settings.grpc_port,
-            [
-                TripService(
-                    segments=trips.SegmentRepository(trips_db[_TRIPS]),
-                    trips_repository=trips.TripRepository(trips_db[_TRIPS]),
-                    default_page_size=app.settings.default_page_size,
-                ),
-                TripSearchService(
-                    repository=trips.TripSearchRepository(
-                        trips_db["trip_searches"],
-                        app.settings.trip_search_ttl,
-                    ),
-                    producer_obj=producer_obj,
-                ),
-                TripCandidateSearchService(
-                    repository=trips.TripCandidateSearchRepository(
-                        trips_db["trip_candidate_searches"],
-                        app.settings.trip_search_ttl,
-                    ),
-                    producer_obj=producer_obj,
-                    offer_search_adapter=offer_searches.GrpcClient(
-                        offers_grpc_pb2_grpc.OfferSearchServiceStub(offers_channel),
-                    ),
-                ),
-                TripCandidateService(
-                    offers_adapter=offers.GrpcClient(
-                        offers=offers_grpc_pb2_grpc.OfferServiceStub(
-                            offers_channel,
-                        ),
-                    ),
-                    repository=trips.TripCandidateSearchRepository(
-                        trips_db["trip_candidate_searches"],
-                        app.settings.trip_search_ttl,
-                    ),
-                    default_page_size=app.settings.default_page_size,
-                ),
-            ],
-        )
-
-        async with grpc_server.serve() as running:
-            await running.wait_for_termination()
+    async with grpc_server.serve() as running:
+        await running.wait_for_termination()
 
 
 if __name__ == "__main__":
