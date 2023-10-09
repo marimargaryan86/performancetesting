@@ -4,40 +4,29 @@ from collections.abc import AsyncGenerator, Callable
 from typing import Any
 
 import httpx
-from motor import motor_asyncio
 from redis import asyncio as aioredis
 from starlette import applications
 from starlette.middleware import Middleware, authentication
 
 from snowfall.adapter import authentication as auth_adapter
 from snowfall.project.junction.go.adapter import errors
-from snowfall.project.pay.adapter import accounts as accounts_adapter
 from snowfall.project.pay.adapter import (
     beneficiaries,
-    contacts,
-    conversions,
+    companies,
     currencies,
     payments,
     quotations,
-    refunds,
     transactions,
 )
-from snowfall.project.pay.adapter import companies as companies_adapter
 from snowfall.project.pay.service.companies.v1alpha import (
     grpc_pb2_grpc as companies_grpc_pb2,
 )
 from snowfall.project.pay.service.currencies.v1alpha import currencies_pb2_grpc
 from snowfall.project.pay.service.pay_api import authenticator, bootstrap
 from snowfall.project.pay.service.pay_api.cache import UserSessionRepository
-from snowfall.project.pay.service.pay_api.repositories import (
-    ConversionRepository,
-)
 from snowfall.project.pay.service.pay_api.routes import router
 from snowfall.project.pay.service.payments.v1alpha.payments_pb2_grpc import (
     PaymentsServiceStub,
-)
-from snowfall.project.pay.service.refunds.v1alpha.grpc_pb2_grpc import (
-    RefundsServiceStub,
 )
 from snowfall.project.pay.service.transactions.v1alpha import (
     grpc_pb2_grpc as transactions_pb2_grpc,
@@ -72,9 +61,6 @@ def _lifespan(
 async def _http(
     app: application.Application[bootstrap.Settings],
 ) -> None:
-    mongo = motor_asyncio.AsyncIOMotorClient(
-        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
-    )
     redis_client = redis.Client[str](
         aioredis.from_url(
             str(random.choice(app.settings.redis_dsn)),  # noqa: S311
@@ -83,7 +69,6 @@ async def _http(
         ).client(),
         prefix=app.name,
     )
-
     authentication_channel = create_channel(
         app.settings.authentication_address,
     )
@@ -126,14 +111,10 @@ async def _http(
         ],
         routes=router.get_routes(
             bootstrap.create_dependencies(
-                payment_client=client.PaymentClient(
-                    base_url=app.settings.cc_address,
-                    auth=client.CurrencyCloudAuth(
-                        base_url=app.settings.cc_address,
-                        login_id=app.settings.cc_login,
-                        api_key=app.settings.cc_api_key,
+                quotations_client=quotations.GrpcClient(
+                    transactions_pb2_grpc.QuotationsServiceStub(
+                        transactions_channel,
                     ),
-                    client=metrics.register(httpx.AsyncClient()),
                 ),
                 currencies_client=currencies.GrpcClient(
                     currencies_pb2_grpc.CurrencyServiceStub(
@@ -144,22 +125,14 @@ async def _http(
                     redis_client=redis_client,
                     cache_ttl=datetime.timedelta(minutes=15),
                 ),
-                conversions_repository=ConversionRepository(
-                    mongo.conversions.conversions,
+                companies_client=companies.GrpcClient(
+                    companies_grpc_pb2.CompaniesServiceStub(
+                        companies_channel,
+                    ),
                 ),
                 transactions_client=transactions.GrpcClient(
                     transactions_pb2_grpc.TransactionsServiceStub(
                         transactions_channel,
-                    ),
-                ),
-                quotations_client=quotations.GrpcClient(
-                    transactions_pb2_grpc.QuotationsServiceStub(
-                        transactions_channel,
-                    ),
-                ),
-                companies_client=companies_adapter.GrpcClient(
-                    companies_grpc_pb2.CompaniesServiceStub(
-                        companies_channel,
                     ),
                 ),
             ),
@@ -189,9 +162,6 @@ async def _http(
 async def _admin_http(
     app: application.Application[bootstrap.AdminSettings],
 ) -> None:
-    mongo = motor_asyncio.AsyncIOMotorClient(
-        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
-    )
     authentication_channel = create_channel(
         app.settings.authentication_address,
     )
@@ -203,12 +173,6 @@ async def _admin_http(
     )
     transactions_channel = create_channel(
         app.settings.transactions_address,
-    )
-    currencies_channel = create_channel(
-        app.settings.currencies_address,
-    )
-    refunds_channel = create_channel(
-        app.settings.refunds_address,
     )
     cc_payment_client = client.PaymentClient(
         base_url=app.settings.cc_address,
@@ -257,32 +221,13 @@ async def _admin_http(
         ],
         routes=router.get_admin_routes(
             bootstrap.create_admin_dependencies(
-                cc_payment_client=cc_payment_client,
                 authentication_client=auth_adapter.GrpcClient(
                     authentication_pb2_grpc.AuthenticationServiceStub(
                         authentication_channel,
                     ),
                 ),
-                conversions_repository=ConversionRepository(
-                    mongo.conversions.conversions,
-                ),
                 beneficiaries_client=beneficiaries.GrpcClient(
                     companies_grpc_pb2.BeneficiariesServiceStub(
-                        companies_channel,
-                    ),
-                ),
-                accounts_client=accounts_adapter.GrpcClient(
-                    companies_grpc_pb2.AccountsServiceStub(
-                        companies_channel,
-                    ),
-                ),
-                companies_client=companies_adapter.GrpcClient(
-                    companies_grpc_pb2.CompaniesServiceStub(
-                        companies_channel,
-                    ),
-                ),
-                contacts_client=contacts.GrpcClient(
-                    companies_grpc_pb2.ContactsServiceStub(
                         companies_channel,
                     ),
                 ),
@@ -291,24 +236,9 @@ async def _admin_http(
                         transactions_channel,
                     ),
                 ),
-                conversions_client=conversions.GrpcClient(
-                    transactions_pb2_grpc.ConversionsServiceStub(
-                        transactions_channel,
-                    ),
-                ),
-                currencies_client=currencies.GrpcClient(
-                    currencies_pb2_grpc.CurrencyServiceStub(
-                        currencies_channel,
-                    ),
-                ),
                 payments_client=payments.GrpcClient(
                     PaymentsServiceStub(
                         payments_channel,
-                    ),
-                ),
-                refunds_client=refunds.GrpcClient(
-                    RefundsServiceStub(
-                        refunds_channel,
                     ),
                 ),
             ),

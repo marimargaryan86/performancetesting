@@ -24,3 +24,13 @@ class TestCompanies(object):
             url="/companies/accountless",
             expected_ids=ACCOUNTLESS_COMPANIES,
         )
+
+    async def test_get_all_accountless_companies_with_filters(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        await testing.test_list_and_view_endpoints(
+            client=client,
+            url="/companies/accountless?filter[type][eq]=reseller,provider",
+            expected_ids=ACCOUNTLESS_COMPANIES,
+        )

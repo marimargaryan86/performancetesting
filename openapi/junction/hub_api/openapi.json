@@ -5544,7 +5544,8 @@
                       "fxQuote",
                       "fxBuffer",
                       "salesMarkup",
-                      "fxMarkup"
+                      "fxMarkup",
+                      "processingMarkup"
                     ],
                     "properties": {
                       "fxQuote": {
@@ -5574,12 +5575,20 @@
                         "example": 1.02,
                         "readOnly": true,
                         "description": "The percentage Junction PAY adds to foreign exchange"
+                      },
+                      "processingMarkup": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 1.02,
+                        "readOnly": true,
+                        "description": "The percentage incurred by the business"
                       }
                     },
                     "readOnly": true
                   },
                   "paymentType": {
                     "type": "string",
+                    "readOnly": true,
                     "enum": [
                       "unspecified",
                       "card",
@@ -5589,6 +5598,7 @@
                   },
                   "paymentMethod": {
                     "type": "string",
+                    "readOnly": true,
                     "enum": [
                       "unspecified",
                       "transactional",
@@ -5600,7 +5610,8 @@
               },
               "relationships": {
                 "required": [
-                  "quotation"
+                  "quotation",
+                  "order"
                 ],
                 "properties": {
                   "quotation": {
@@ -5682,6 +5693,19 @@
                     },
                     "readOnly": true,
                     "description": "The ID used to determine who Junction PAY owes a monetary value to"
+                  },
+                  "order": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/OrderIdentifier"
+                      }
+                    },
+                    "writeOnly": true,
+                    "description": "The ID used to determine what is the order of the transaction"
                   }
                 }
               }

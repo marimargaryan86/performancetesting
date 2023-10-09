@@ -278,66 +278,6 @@
       }
     },
     "/transactions": {
-      "get": {
-        "summary": "List Transactions",
-        "tags": [
-          "transactions"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/page-cursor"
-          },
-          {
-            "$ref": "#/components/parameters/page-limit"
-          },
-          {
-            "$ref": "#/components/parameters/sortTransaction"
-          },
-          {
-            "$ref": "#/components/parameters/filterIds"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/vnd.api+json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "type": "array",
-                          "uniqueItems": true,
-                          "minItems": 0,
-                          "items": {
-                            "$ref": "#/components/schemas/Transaction"
-                          }
-                        }
-                      },
-                      "required": [
-                        "data"
-                      ]
-                    },
-                    {
-                      "$ref": "#/components/schemas/NextLink"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          }
-        },
-        "operationId": "get-transactions",
-        "description": "Get transactions"
-      },
       "post": {
         "summary": "Create transactions",
         "description": "Create transactions if quotation is valid",
@@ -397,64 +337,6 @@
   },
   "components": {
     "parameters": {
-      "page-cursor": {
-        "name": "page[cursor]",
-        "in": "query",
-        "required": false,
-        "schema": {
-          "type": "string",
-          "example": "1"
-        },
-        "description": "Pagination cursor that defines your place in the list."
-      },
-      "page-limit": {
-        "name": "page[limit]",
-        "in": "query",
-        "required": false,
-        "schema": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 100,
-          "default": 20,
-          "example": 20
-        },
-        "description": "A limit on the number of objects to be returned, between 1 and 100."
-      },
-      "sortTransaction": {
-        "name": "sort",
-        "in": "query",
-        "style": "form",
-        "explode": false,
-        "required": false,
-        "schema": {
-          "type": "string",
-          "enum": [
-            "createdAt",
-            "-createdAt"
-          ],
-          "example": "createdAt",
-          "default": "createdAt"
-        },
-        "description": "Sorting based on field"
-      },
-      "filterIds": {
-        "name": "filter[ids][eq]",
-        "in": "query",
-        "required": false,
-        "description": "Filters transactions based on the ids",
-        "style": "form",
-        "explode": false,
-        "schema": {
-          "type": "array",
-          "example": [
-            "271f6d54-9e59-407e-a860-b0771d9e3d26"
-          ],
-          "items": {
-            "type": "string",
-            "format": "uuid"
-          }
-        }
-      },
       "transactionId": {
         "name": "transactionId",
         "in": "path",
@@ -1113,30 +995,6 @@
             "readOnly": true
           }
         }
-      },
-      "NextLink": {
-        "title": "Next Link",
-        "type": "object",
-        "properties": {
-          "links": {
-            "type": "object",
-            "required": [
-              "next"
-            ],
-            "properties": {
-              "next": {
-                "type": "string",
-                "format": "uri",
-                "example": "https://example.com/resource/?page%5Bcursor%5D=MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D&page%5Blimit%5D=20",
-                "readOnly": true
-              }
-            },
-            "readOnly": true
-          }
-        },
-        "required": [
-          "links"
-        ]
       },
       "Error": {
         "title": "Error",

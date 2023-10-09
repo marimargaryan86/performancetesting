@@ -72,6 +72,36 @@ class Refund(endpoints.HTTPEndpoint):
 class Refunds(endpoints.HTTPEndpoint):
     _default_page_size = 20
 
+    async def get(
+        self,
+        request: requests.Request,
+        refunds_client: refunds_adapter.Client = lagom.injectable,
+    ) -> models.JsonApiResponse:
+        pagination = pagination_helpers.get_pagination(request)
+
+        response = await refunds_client.find(
+            limit=pagination.limit or self._default_page_size,
+            cursor=pagination.cursor,
+        )
+
+        return await messages.create_response(
+            body=models.Body(
+                data=[
+                    resources.RefundsResource.from_proto(
+                        refund=refund,
+                        request=request,
+                    )
+                    for refund in response.refunds
+                ],
+                links=pagination_helpers.get_next_url(
+                    request.url_for("Refunds"),
+                    response.next_page_token,
+                    pagination,
+                ),
+            ),
+            request=request,
+        )
+
     @routes_handlers.grpc_errors_handler
     async def post(
         self,
@@ -104,36 +134,6 @@ class Refunds(endpoints.HTTPEndpoint):
             ),
             request=request,
             status_code=status.HTTP_201_CREATED,
-        )
-
-    async def get(
-        self,
-        request: requests.Request,
-        refunds_client: refunds_adapter.Client = lagom.injectable,
-    ) -> models.JsonApiResponse:
-        pagination = pagination_helpers.get_pagination(request)
-
-        response = await refunds_client.find(
-            limit=pagination.limit or self._default_page_size,
-            cursor=pagination.cursor,
-        )
-
-        return await messages.create_response(
-            body=models.Body(
-                data=[
-                    resources.RefundsResource.from_proto(
-                        refund=refund,
-                        request=request,
-                    )
-                    for refund in response.refunds
-                ],
-                links=pagination_helpers.get_next_url(
-                    request.url_for("Refunds"),
-                    response.next_page_token,
-                    pagination,
-                ),
-            ),
-            request=request,
         )
 
 

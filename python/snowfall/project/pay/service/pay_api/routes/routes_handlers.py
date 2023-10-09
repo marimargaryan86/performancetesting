@@ -33,7 +33,7 @@ async def _handle_invalid_argument(
     }
     rich_error = list(rich_status.iter_rich_statuses(err))
     if not rich_error:
-        raise errors.NotFoundError(  # noqa: WPS220
+        raise errors.NotFoundError(
             err.details(),
         ) from err
     grpc_error = rich_error[0].field_violations[0]  # type: ignore[attr-defined]

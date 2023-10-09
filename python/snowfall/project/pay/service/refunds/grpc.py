@@ -238,7 +238,7 @@ class RefundsService(  # noqa: WPS214
             money.Currency(detailed_rate.client_buy_currency),
         ).protobuf()
 
-    async def _get_detailed_rate(  # noqa: WPS211
+    async def _get_detailed_rate(
         self,
         refunded_by_provider: money_pb2.Money,
         refunded_to_reseller: money_pb2.Money,

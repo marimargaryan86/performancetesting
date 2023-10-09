@@ -1,6 +1,7 @@
 import lagom
 
 from snowfall.project.junction.go.adapter import orders, resellers
+from snowfall.project.junction.hub.service.hub_api import includes
 from snowfall.project.pay.adapter import (  # noqa: WPS235
     accounts,
     beneficiaries,
@@ -45,5 +46,7 @@ def create_dependencies(  # noqa: WPS211
     container[bills.Client] = bills_client  # type: ignore[type-abstract]
     container[refunds.Client] = refunds_client  # type: ignore[type-abstract]
     container[resellers.Client] = resellers_client  # type: ignore[type-abstract]
+
+    includes.register_resolvers(transactions_client)
 
     return container

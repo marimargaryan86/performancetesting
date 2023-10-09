@@ -2,8 +2,8 @@ from collections.abc import Sequence
 
 from starlette import requests
 
+from snowfall.project.junction.hub.service.hub_api import resources
 from snowfall.project.pay.adapter import transactions
-from snowfall.project.pay.service.pay_api import resources
 from snowfall.stdlib.integration.starlette import includes
 
 
