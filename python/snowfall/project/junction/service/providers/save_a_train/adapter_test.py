@@ -129,7 +129,7 @@ async def test_perform_general_search_route_not_allowed(
         json=expected_error_message,
     )
 
-    with pytest.raises(adapter.RouteNotAllowedError) as excinfo:
+    with pytest.raises(adapter.RouteError) as excinfo:
         await save_a_train_adapter.perform_general_search(
             search_request=request.GeneralSearchResultsRequest(
                 origin_id=_ORIGIN,

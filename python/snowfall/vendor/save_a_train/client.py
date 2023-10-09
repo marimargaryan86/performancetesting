@@ -11,7 +11,10 @@ from snowfall.stdlib.transport.http import client as http_client
 from snowfall.stdlib.transport.http import errors
 from snowfall.stdlib.transport.http import errors as http_errors
 from snowfall.vendor.save_a_train.enums import PassengerType
-from snowfall.vendor.save_a_train.exceptions import SATValidationError, SATValueError
+from snowfall.vendor.save_a_train.exceptions import (
+    SATValidationError,
+    SATValueError,
+)
 from snowfall.vendor.save_a_train.models import booking
 from snowfall.vendor.save_a_train.models.general_search import GeneralSearchResponse
 from snowfall.vendor.save_a_train.models.misc import (
@@ -378,7 +381,7 @@ class _SATSearchApiClient(http_client.HttpClient):
             )
 
         response_data = response.json()
-        if "errors" in response_data:
+        if "errors" in response_data or "message" in response_data:
             raise SATValidationError(response_data)
 
         return GeneralSearchResponse(**response_data)

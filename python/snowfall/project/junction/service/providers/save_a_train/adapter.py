@@ -73,8 +73,8 @@ class BookingError(SaveATrainAdapterError):
     """Raised when a booking error is encountered."""
 
 
-class RouteNotAllowedError(SaveATrainAdapterError):
-    """Raised when a route is not available for valid stations."""
+class RouteError(SaveATrainAdapterError):
+    """Raised when a route/trains are unavailable for valid stations or valid route."""
 
 
 _CABIN_MAPPING = types.MappingProxyType(
@@ -166,8 +166,8 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                         departure_date=search_criteria.departure_datetime.date(),
                     ),
                 )
-            except RouteNotAllowedError:
-                self._logger.info("This route is not allowed", exc_info=True)
+            except RouteError:
+                self._logger.exception("SAT routing error occurred")
 
         try:
             search_response = await self._client.api_client.create_search(
@@ -305,11 +305,11 @@ class SaveATrainAdapter(object):  # noqa: WPS214
             await self._client.search_api_client.get_general_search_results(
                 request=search_request,
             )
-        except exceptions.SATValidationError as no_route_error:
-            raise RouteNotAllowedError(no_route_error) from no_route_error
+        except exceptions.SATValidationError as route_error:
+            raise RouteError(route_error) from route_error
 
         except errors.TimeOutError:
-            self._logger.info("SAT timeout error occurred.", exc_info=True)
+            self._logger.exception("SAT timeout error occurred.")
 
         except errors.HttpStatusError as http_status_error:
             status_code = http_status_error.response.status_code
