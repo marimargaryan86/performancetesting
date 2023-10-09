@@ -43,7 +43,6 @@ jinja2==3.1.2
 json_api_doc==0.15.0
 jsonschema==4.19.1
 lagom==2.5.0
-locust==2.16.1
 lupa==2.0
 lxml-stubs==0.4.0
 mongomock-motor==0.0.21
