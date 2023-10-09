@@ -12,6 +12,9 @@ from snowfall.project.junction.go.service.passenger_name_records.v1 import (
 from snowfall.project.junction.go.service.places.v1 import (
     models_pb2 as place_models_pb2,
 )
+from snowfall.project.junction.go.service.resellers.v1 import (
+    models_pb2 as resellers_pb2,
+)
 from snowfall.project.junction.go.service.trips.v1alpha import trips_pb2
 from snowfall.project.junction.go.v1 import models_pb2, seat_maps_pb2
 from snowfall.stdlib import money, string
@@ -103,6 +106,10 @@ BOOKINGS = (
 BOOKING_DETAILS = (
     "5a93b5ae-9590-4561-a664-fbaead485e96",
     "d184081a-92bd-4ec8-af9a-1faaa8dfbbeb",
+)
+RESELLERS = (
+    "effb6d65-2ddc-4a26-9b57-af79d44254cb",
+    "6bd5e38b-f9b1-48d7-b92b-3c2d26231003",
 )
 CANCELLATION_REQUESTS = ("0a4f4726-df18-4d50-b7ae-17eec528265c",)
 BOOKING_CANCELLATIONS = ("af359732-2f45-4939-8bbd-b981eb181b09",)
@@ -601,4 +608,19 @@ def get_seat_maps() -> Sequence[seat_maps_pb2.SeatMapResult]:
                 ),
             ],
         ),
+    ]
+
+
+def get_resellers() -> Sequence[resellers_pb2.Reseller]:
+    return [
+        resellers_pb2.Reseller(
+            id=reseller_id,
+            name="Res {0}".format(index),
+            default_currency="USD_{0}".format(index),
+            company_id=string.uuid(),
+            provider_ids=[
+                string.uuid(),
+            ],
+        )
+        for index, reseller_id in enumerate(RESELLERS)
     ]

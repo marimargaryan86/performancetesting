@@ -15,6 +15,7 @@ from snowfall.project.junction.go.adapter import (
     passenger_name_records,
     places,
     price_quotes,
+    resellers,
     schedules,
     seat_maps,
     segments,
@@ -166,3 +167,8 @@ async def trip_candidate_search_request() -> (
         pay_company_id=None,
         session_token="random",
     )
+
+
+@pytest.fixture()
+def resellers_client() -> resellers.Client:
+    return resellers.DictClient(fixtures.get_resellers())

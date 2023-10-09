@@ -152,6 +152,11 @@
       "x-displayName": "Refunds"
     },
     {
+      "name": "resellers",
+      "description": "Reseller related actions",
+      "x-displayName": "Resellers"
+    },
+    {
       "name": "transactions",
       "description": "Transaction related actions.",
       "x-displayName": "Transactions"
@@ -2831,6 +2836,229 @@
         "operationId": "get-currencies-id",
         "description": "Used to get currency details"
       }
+    },
+    "/resellers": {
+      "post": {
+        "summary": "Create reseller",
+        "description": "Create reseller",
+        "tags": [
+          "resellers"
+        ],
+        "operationId": "post-resellers",
+        "responses": {
+          "201": {
+            "description": "Reseller is created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Reseller"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/ResellerCreatable"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "List Resellers",
+        "tags": [
+          "resellers"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "minItems": 0,
+                          "items": {
+                            "$ref": "#/components/schemas/Reseller"
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "operationId": "get-resellers",
+        "description": "Get resellers"
+      }
+    },
+    "/resellers/{resellerId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/resellerId"
+        }
+      ],
+      "patch": {
+        "summary": "Update reseller",
+        "description": "Update reseller data",
+        "tags": [
+          "resellers"
+        ],
+        "operationId": "patch-resellers-id",
+        "responses": {
+          "200": {
+            "description": "Reseller is updated",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Reseller"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/Reseller"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Get Reseller",
+        "tags": [
+          "resellers"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Reseller"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-resellers-id",
+        "description": "Get reseller"
+      },
+      "delete": {
+        "summary": "Delete Reseller",
+        "operationId": "delete-resellers-id",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "tags": [
+          "resellers"
+        ],
+        "description": "Delete a Reseller."
+      }
     }
   },
   "components": {
@@ -3379,6 +3607,17 @@
           "example": "USD"
         },
         "description": "Currency name"
+      },
+      "resellerId": {
+        "name": "resellerId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+          "format": "uuid"
+        },
+        "description": "Reseller Identifier"
       }
     },
     "responses": {
@@ -6354,6 +6593,100 @@
           }
         ],
         "description": "Currency details."
+      },
+      "Reseller": {
+        "title": "Reseller",
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "attributes"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "04f83af5-10bb-4a0f-1881-03e1e690f0f5",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "resellers"
+            ],
+            "example": "resellers"
+          },
+          "attributes": {
+            "properties": {
+              "name": {
+                "type": "string",
+                "example": "Phoenix Res"
+              },
+              "providers": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "example": "effb6d65-2ddc-4a26-9b57-af79d44254cb"
+                },
+                "example": [
+                  "effb6d65-2ddc-4a26-9b57-af79d44254cb"
+                ]
+              }
+            }
+          },
+          "relationships": {
+            "type": "object",
+            "properties": {
+              "company": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/CompanyIdentifier"
+                  }
+                }
+              },
+              "currency": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/CurrencyIdentifier"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "ResellerCreatable": {
+        "title": "Reseller (Creatable)",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Reseller"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "attributes": {
+                "required": [
+                  "name",
+                  "providers"
+                ]
+              },
+              "relationships": {
+                "required": [
+                  "company",
+                  "currency"
+                ]
+              }
+            }
+          }
+        ]
       }
     },
     "securitySchemes": {

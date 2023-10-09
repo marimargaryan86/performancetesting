@@ -66,9 +66,24 @@ job "resellers-grpc" {
     }
 
     service {
-      name = "${JOB}-${var.environment}"
+      name = "resellers-${var.environment}"
       port = "grpc"
       tags = ["grpc"]
+
+      connect {
+        sidecar_service {
+          proxy {
+            upstreams {
+              local_bind_port  = 8030
+              destination_name = "currencies-${var.environment}"
+            }
+            upstreams {
+              local_bind_port  = 8040
+              destination_name = "companies-${var.environment}"
+            }
+          }
+        }
+      }
 
       check {
         type     = "grpc"
@@ -77,7 +92,7 @@ job "resellers-grpc" {
       }
     }
     service {
-      name = "${JOB}-${var.environment}"
+      name = "resellers-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
 
@@ -101,6 +116,8 @@ job "resellers-grpc" {
         env         = true
         change_mode = "restart"
         data        = <<EOH
+COMPANIES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_companies-${var.environment}"))}}
+CURRENCIES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_currencies-${var.environment}"))}}
 MONGO_DSN={{range $index, $service := service (printf "mongodb-%s" (env "NOMAD_NAMESPACE"))}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 {{ with secret "kv/data/${var.environment}/resellers" }}
 CONSUL_API_TOKEN={{ .Data.data.consul_api_token }}

@@ -8,7 +8,7 @@ from starlette import applications, middleware
 from starlette.middleware import authentication as auth_middleware
 
 from snowfall.project.junction.go import fixtures
-from snowfall.project.junction.go.adapter import errors, orders
+from snowfall.project.junction.go.adapter import errors, orders, resellers
 from snowfall.project.junction.hub.service.hub_api import bootstrap, router
 from snowfall.project.pay import fixtures as pay_fixtures
 from snowfall.project.pay.adapter import (
@@ -354,6 +354,11 @@ def bills_client() -> bills.Client:
     )
 
 
+@pytest.fixture()
+def resellers_client() -> resellers.Client:
+    return resellers.DictClient(fixtures.get_resellers())
+
+
 def _create_app(  # noqa: WPS211
     orders_client: orders.Client,
     companies_client: companies.Client,
@@ -367,6 +372,7 @@ def _create_app(  # noqa: WPS211
     quotations_client: quotations.Client,
     bills_client: bills.Client,
     refunds_client: refunds.Client,
+    resellers_client: resellers.Client,
 ) -> applications.Starlette:
     asgi_app = application.create_starlette_app(
         routes=router.get_routes(
@@ -383,6 +389,7 @@ def _create_app(  # noqa: WPS211
                 quotations_client=quotations_client,
                 bills_client=bills_client,
                 refunds_client=refunds_client,
+                resellers_client=resellers_client,
             ),
         ),
         openapi_path=filesystem.resource_path("junction.hub_api", "openapi.json"),
@@ -435,6 +442,7 @@ def app(  # noqa: WPS211
     quotations_client: quotations.Client,
     bills_client: bills.Client,
     refunds_client: refunds.Client,
+    resellers_client: resellers.Client,
 ) -> applications.Starlette:
     return _create_app(
         orders_client=orders_client,
@@ -449,4 +457,5 @@ def app(  # noqa: WPS211
         quotations_client=quotations_client,
         bills_client=bills_client,
         refunds_client=refunds_client,
+        resellers_client=resellers_client,
     )

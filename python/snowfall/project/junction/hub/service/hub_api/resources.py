@@ -14,6 +14,9 @@ from snowfall.project.junction.go.service.offers.v1 import (
 from snowfall.project.junction.go.service.orders.v1 import (
     models_pb2 as order_models_pb2,
 )
+from snowfall.project.junction.go.service.resellers.v1 import (
+    models_pb2 as reseller_models_pb2,
+)
 from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.project.pay.service.companies.v1alpha import (
     models_pb2 as companies_models_pb2,
@@ -1021,6 +1024,47 @@ class CurrenciesResource(models.Resource):
                     request.url_for(
                         "Currencies",
                         currencyId=currency.code,
+                    ),
+                ),
+            },
+        )
+
+
+class ResellerResource(models.Resource):
+    api_type: ClassVar[str] = "resellers"
+
+    @classmethod
+    def from_proto(
+        cls,
+        reseller: reseller_models_pb2.Reseller,
+        request: requests.Request,
+    ) -> ResellerResource:
+        return cls(
+            id=reseller.id,
+            type=ResellerResource.api_type,
+            attributes={
+                "name": reseller.name,
+                "providers": list(reseller.provider_ids),
+            },
+            relationships={
+                "company": {
+                    _RELATIONSHIPS_FIELD: models.ResourceIdentifier(
+                        id=reseller.company_id,
+                        type="companies",
+                    ),
+                },
+                "currency": {
+                    _RELATIONSHIPS_FIELD: models.ResourceIdentifier(
+                        id=reseller.default_currency,
+                        type="currencies",
+                    ),
+                },
+            },
+            links={
+                _SELF_HREF: str(
+                    request.url_for(
+                        "Reseller",
+                        resellerId=reseller.id,
                     ),
                 ),
             },

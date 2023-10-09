@@ -3,15 +3,18 @@ from collections.abc import Sequence
 
 from grpc import StatusCode, aio
 
+from snowfall.project.junction.go.adapter.errors import NotFoundError
 from snowfall.project.junction.go.service.resellers import persistence
 from snowfall.project.junction.go.service.resellers.v1 import (
     models_pb2,
     resellers_pb2,
     resellers_pb2_grpc,
 )
+from snowfall.project.pay.adapter import companies as companies_adapter
+from snowfall.project.pay.adapter import currencies as currencies_adapter
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.transport.grpc import service
+from snowfall.stdlib.transport.grpc import rich_status, service
 from snowfall.vendor.consul.client import ConsulClient
 
 _PROVIDERS_KEY = "{0}/providers/reseller-providers"
@@ -22,18 +25,22 @@ class ResellerService(  # noqa: WPS214
     service.Service,
     resellers_pb2_grpc.ResellerServiceServicer,
 ):
-    def __init__(
+    def __init__(  # noqa: WPS211
         self,
         default_page_size: int,
         resellers_repo: persistence.ResellerRepository,
         consul_client: ConsulClient,
         environment: str,
+        company_client: companies_adapter.Client,
+        currency_client: currencies_adapter.Client,
     ):
         self._default_page_size = default_page_size
         self._repository = resellers_repo
         self._client = consul_client
         self._reseller_providers_key = _PROVIDERS_KEY.format(environment)
         self._reseller_currencies_key = _CURRENCIES_KEY.format(environment)
+        self._company_client = company_client
+        self._currency_client = currency_client
 
     def get_name(self) -> str:
         return models_pb2.DESCRIPTOR.services_by_name["ResellerService"].full_name
@@ -46,6 +53,27 @@ class ResellerService(  # noqa: WPS214
         request: resellers_pb2.CreateResellerRequest,
         context: aio.ServicerContext,
     ) -> resellers_pb2.CreateResellerResponse:
+        try:
+            await self._company_client.get(request.reseller.company_id)
+        except NotFoundError:
+            await rich_status.abort_with_rich_status(
+                context=context,
+                status=rich_status.build_bad_request(
+                    field_name="company",
+                    field_description="Company is not found",
+                ),
+            )
+
+        try:
+            await self._currency_client.get(request.reseller.default_currency)
+        except NotFoundError:
+            await rich_status.abort_with_rich_status(
+                context=context,
+                status=rich_status.build_bad_request(
+                    field_name="currency",
+                    field_description="Currency is not found",
+                ),
+            )
         request.reseller.id = string.uuid()
 
         return resellers_pb2.CreateResellerResponse(
@@ -85,7 +113,7 @@ class ResellerService(  # noqa: WPS214
             next_page_token=await resellers_res.cursor(),
         )
 
-    async def UpdateReseller(  # type: ignore[override] # noqa: N802
+    async def UpdateReseller(  # type: ignore[override] # noqa: N802, WPS217
         self,
         request: resellers_pb2.UpdateResellerRequest,
         context: aio.ServicerContext,
@@ -94,6 +122,30 @@ class ResellerService(  # noqa: WPS214
 
         if not reseller:
             return await context.abort(StatusCode.NOT_FOUND)
+
+        if request.reseller.company_id:
+            try:
+                await self._company_client.get(request.reseller.company_id)
+            except NotFoundError:
+                await rich_status.abort_with_rich_status(
+                    context=context,
+                    status=rich_status.build_bad_request(
+                        field_name="company",
+                        field_description="Company is not found",
+                    ),
+                )
+
+        if request.reseller.default_currency:
+            try:
+                await self._currency_client.get(request.reseller.default_currency)
+            except NotFoundError:
+                await rich_status.abort_with_rich_status(
+                    context=context,
+                    status=rich_status.build_bad_request(
+                        field_name="currency",
+                        field_description="Currency is not found",
+                    ),
+                )
 
         new_reseller = protobuf.apply_field_mask(
             request.update_mask,

@@ -3,8 +3,9 @@ from starlette import middleware
 from starlette.middleware import authentication as auth_middleware
 
 from snowfall.adapter import authentication as auth_adapter
-from snowfall.project.junction.go.adapter import errors, orders
+from snowfall.project.junction.go.adapter import errors, orders, resellers
 from snowfall.project.junction.go.service.orders.v1 import orders_pb2_grpc
+from snowfall.project.junction.go.service.resellers.v1 import resellers_pb2_grpc
 from snowfall.project.junction.hub.service.hub_api import bootstrap, router
 from snowfall.project.pay.adapter import (
     accounts as accounts_adapter,
@@ -56,6 +57,7 @@ class Settings(starlette.Settings):
     transactions_address: str
     currencies_address: str
     refunds_address: str
+    resellers_address: str
 
 
 async def _http(app: application.Application[Settings]) -> None:
@@ -68,6 +70,7 @@ async def _http(app: application.Application[Settings]) -> None:
     transactions_channel = client.create_channel(app.settings.transactions_address)
     currencies_channel = client.create_channel(app.settings.currencies_address)
     refunds_channel = client.create_channel(app.settings.refunds_address)
+    resellers_channel = client.create_channel(app.settings.resellers_address)
     cc_payment_client = PaymentClient(
         base_url=app.settings.cc_address,
         auth=CurrencyCloudAuth(
@@ -135,6 +138,11 @@ async def _http(app: application.Application[Settings]) -> None:
                 refunds_client=refunds.GrpcClient(
                     RefundsServiceStub(
                         refunds_channel,
+                    ),
+                ),
+                resellers_client=resellers.GrpcClient(
+                    resellers_pb2_grpc.ResellerServiceStub(
+                        resellers_channel,
                     ),
                 ),
             ),
