@@ -1,6 +1,6 @@
 import dataclasses
 import datetime
-import random
+import secrets
 import types
 from collections.abc import AsyncIterator, Callable, Sequence
 from typing import Any
@@ -98,7 +98,7 @@ def _calculate_reasonable_price(  # noqa: WPS210
             min_time, max_time = cost_range
             if min_time <= travel_time_hours < max_time:
                 min_cost, max_cost = map(int, _AVERAGE_COSTS[travel_type][time_range])
-                return random.randint(min_cost, max_cost)  # noqa: S311
+                return secrets.SystemRandom().randint(min_cost, max_cost)
         return None
     return None
 

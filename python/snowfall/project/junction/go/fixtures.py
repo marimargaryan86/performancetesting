@@ -1,5 +1,5 @@
 import datetime
-import random
+import secrets
 from collections.abc import Sequence
 
 from snowfall.project.junction.go.service.offers.v1 import models_pb2 as offers_pb2
@@ -122,12 +122,13 @@ def get_locations() -> list[place_models_pb2.Location]:
 
 
 def generate_location(identifier: str) -> place_models_pb2.Location:
+    random = secrets.SystemRandom()
     return place_models_pb2.Location(
         id=identifier,
         name="Foobar",
         coordinates=latlng_pb2.LatLng(
-            latitude=random.uniform(*LATITUDE_RANGE),  # noqa: S311
-            longitude=random.uniform(*LONGITUDE_RANGE),  # noqa: S311
+            latitude=random.uniform(*LATITUDE_RANGE),
+            longitude=random.uniform(*LONGITUDE_RANGE),
         ),
         country_code="SE",
         time_zone="Europe/Stockholm",

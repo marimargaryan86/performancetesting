@@ -1,4 +1,4 @@
-import random
+import secrets
 from collections.abc import AsyncIterator, Mapping, Sequence
 from unittest import mock
 
@@ -315,7 +315,7 @@ def cc_payment_client(
     )
 
     detailed_rate = mock.Mock()
-    detailed_rate.client_buy_amount = random.randint(1, 10000)  # noqa: S311, WPS432
+    detailed_rate.client_buy_amount = secrets.randbelow(9999) + 1  # noqa: WPS432
     payment_client.get_detailed_rates = mock.AsyncMock(
         return_value=detailed_rate,
     )

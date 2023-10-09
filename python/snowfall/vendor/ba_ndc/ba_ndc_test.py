@@ -2,7 +2,7 @@ import datetime
 import decimal
 import enum
 import os
-import random
+import secrets
 import uuid
 
 import pytest
@@ -48,7 +48,7 @@ async def test_get_offers(ba_ndc_client: client.BaNdcClient) -> None:
 @disable_by_default
 async def test_get_offer(ba_ndc_client: client.BaNdcClient) -> None:
     offer_searches_rs = await call_get_offers(ba_ndc_client, "LHR", "MAN")
-    offer = random.choice(offer_searches_rs.get_offers())  # noqa: S311
+    offer = secrets.choice(offer_searches_rs.get_offers())
     offer_search_rs = await ba_ndc_client.get_offer(offer.identifier)
 
     assert offer_search_rs is not None
@@ -210,7 +210,7 @@ async def test_get_services_by_offer(ba_ndc_client: client.BaNdcClient) -> None:
     assert offer_searches_rs is not None
     assert offer_searches_rs.get_offers()
 
-    offer = random.choice(offer_searches_rs.get_offers())  # noqa: S311
+    offer = secrets.choice(offer_searches_rs.get_offers())
     offer_service_rs = await ba_ndc_client.get_services(offer_id=offer.identifier)
     assert offer_service_rs is not None
     assert offer_service_rs.offers
@@ -235,7 +235,7 @@ async def test_get_seats_by_offer(ba_ndc_client: client.BaNdcClient) -> None:
     assert offer_searches_rs is not None
     assert offer_searches_rs.get_offers()
 
-    offer = random.choice(offer_searches_rs.get_offers())  # noqa: S311
+    offer = secrets.choice(offer_searches_rs.get_offers())
     offer_search_rs = await ba_ndc_client.get_offer(offer.identifier)
     seats_rs = await ba_ndc_client.get_seats(offer_id=offer_search_rs.offer.identifier)
     assert seats_rs is not None
@@ -263,8 +263,8 @@ async def test_add_seat(ba_ndc_client: client.BaNdcClient) -> None:
 
     seats_rs = await ba_ndc_client.get_seats(order_id=order_rs.identifier)
     assert seats_rs.seat_maps
-    seat = random.choice(  # noqa: S311
-        random.choice(random.choice(seats_rs.seat_maps).cabins).seats,  # noqa: S311
+    seat = secrets.choice(
+        secrets.choice(secrets.choice(seats_rs.seat_maps).cabins).seats,
     )
 
     request = request_add_seat_schemas.AddSeats(
@@ -349,7 +349,7 @@ async def generate_order(
     payment_method: PaymentMethod = PaymentMethod.none,
 ) -> response_order_schemas.OrderResponse:
     offer_searches_rs = await call_get_offers(ba_ndc_client, origin, destination)
-    offer = random.choice(offer_searches_rs.get_offers())  # noqa: S311
+    offer = secrets.choice(offer_searches_rs.get_offers())
     offer_search_rs = await ba_ndc_client.get_offer(offer.identifier)
     residence_country_code = "NOR" if set_residence_country_code else None
 
