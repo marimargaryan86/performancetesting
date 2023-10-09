@@ -2,7 +2,7 @@ import datetime
 from typing import TypeVar
 
 import pydantic
-from aio_pika import abc, robust_connection
+from aio_pika import abc, connect_robust
 
 from snowfall.stdlib.service import application
 
@@ -15,7 +15,7 @@ async def make_connection(
     timeout: datetime.timedelta | None = None,
 ) -> abc.AbstractConnection:
     return await app.stack.enter_async_context(
-        await robust_connection.connect_robust(
+        await connect_robust(
             url=str(dsn),
             timeout=timeout.total_seconds() if timeout else None,
         ),

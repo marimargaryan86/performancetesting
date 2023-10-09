@@ -4,7 +4,7 @@ import asyncio
 from collections.abc import MutableMapping
 from typing import Any, Generic, TypeVar
 
-from aio_pika import Message, abc, connect
+from aio_pika import Message, abc, connect_robust
 from google.protobuf import message
 
 from snowfall.stdlib import string
@@ -35,10 +35,7 @@ class RpcClient(Generic[_Proto]):
         self._loop = asyncio.get_running_loop()
 
     async def connect(self) -> RpcClient[_Proto]:
-        self._connection = await connect(
-            self._address,
-            loop=self._loop,
-        )
+        self._connection = await connect_robust(self._address)
         self._channel = await self._connection.channel()
         self._callback_queue = await self._channel.declare_queue(exclusive=True)
         await self._callback_queue.consume(self._on_response)

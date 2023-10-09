@@ -1,6 +1,6 @@
 import uuid
 
-from aio_pika import Message, connect
+from aio_pika import Message, connect_robust
 from aio_pika.abc import AbstractIncomingMessage
 
 from snowfall.project.junction.go.service.offers.v1 import amqp_pb2 as offers_amqp_pb2
@@ -132,7 +132,7 @@ class SeatMapRpcServer(object):
 
     async def consume(self) -> None:  # noqa: WPS217, WPS210
         # TODO: refactor to rpc_server class
-        connection = await connect(self._address)
+        connection = await connect_robust(self._address)
         channel = await connection.channel()
 
         queue = await channel.declare_queue(self._queue_name)
