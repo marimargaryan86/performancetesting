@@ -907,12 +907,6 @@
                           },
                           {
                             "$ref": "#/components/schemas/TripBookingDetails"
-                          },
-                          {
-                            "$ref": "#/components/schemas/CabinClass"
-                          },
-                          {
-                            "$ref": "#/components/schemas/LegType"
                           }
                         ]
                       }
@@ -1073,12 +1067,6 @@
                               },
                               {
                                 "$ref": "#/components/schemas/TripBookingDetails"
-                              },
-                              {
-                                "$ref": "#/components/schemas/CabinClass"
-                              },
-                              {
-                                "$ref": "#/components/schemas/LegType"
                               }
                             ]
                           }
@@ -1159,12 +1147,6 @@
                           },
                           {
                             "$ref": "#/components/schemas/TripBookingDetails"
-                          },
-                          {
-                            "$ref": "#/components/schemas/CabinClass"
-                          },
-                          {
-                            "$ref": "#/components/schemas/LegType"
                           }
                         ]
                       }
@@ -1228,12 +1210,6 @@
                           },
                           {
                             "$ref": "#/components/schemas/TripBookingDetails"
-                          },
-                          {
-                            "$ref": "#/components/schemas/CabinClass"
-                          },
-                          {
-                            "$ref": "#/components/schemas/LegType"
                           }
                         ]
                       }
@@ -1308,12 +1284,6 @@
                           },
                           {
                             "$ref": "#/components/schemas/TripBookingDetails"
-                          },
-                          {
-                            "$ref": "#/components/schemas/CabinClass"
-                          },
-                          {
-                            "$ref": "#/components/schemas/LegType"
                           }
                         ]
                       }
@@ -1381,12 +1351,6 @@
                           },
                           {
                             "$ref": "#/components/schemas/TripBookingDetails"
-                          },
-                          {
-                            "$ref": "#/components/schemas/CabinClass"
-                          },
-                          {
-                            "$ref": "#/components/schemas/LegType"
                           }
                         ]
                       }
@@ -1509,12 +1473,6 @@
                           },
                           {
                             "$ref": "#/components/schemas/TripBooking"
-                          },
-                          {
-                            "$ref": "#/components/schemas/CabinClass"
-                          },
-                          {
-                            "$ref": "#/components/schemas/LegType"
                           }
                         ]
                       }
@@ -1593,12 +1551,6 @@
                           },
                           {
                             "$ref": "#/components/schemas/TripBooking"
-                          },
-                          {
-                            "$ref": "#/components/schemas/CabinClass"
-                          },
-                          {
-                            "$ref": "#/components/schemas/LegType"
                           }
                         ]
                       }
@@ -3176,9 +3128,7 @@
             "enum": [
               "journey",
               "bookings",
-              "bookings.details",
-              "bookings.details.cabinClass",
-              "bookings.details.legType"
+              "bookings.details"
             ]
           },
           "example": [
@@ -3341,9 +3291,7 @@
             "enum": [
               "orders",
               "orders.bookings",
-              "orders.bookings.details",
-              "orders.bookings.details.cabinClass",
-              "orders.bookings.details.legType"
+              "orders.bookings.details"
             ]
           },
           "example": [
@@ -3395,9 +3343,7 @@
             "enum": [
               "order",
               "order.journey",
-              "details",
-              "details.cabinClass",
-              "details.legType"
+              "details"
             ]
           },
           "example": [
@@ -3446,13 +3392,11 @@
             "enum": [
               "booking",
               "booking.order",
-              "booking.order.journey",
-              "cabinClass",
-              "legType"
+              "booking.order.journey"
             ]
           },
           "example": [
-            "cabinClass"
+            "booking"
           ]
         },
         "description": "Customize which related resources to return.",
@@ -3526,9 +3470,7 @@
               "bookings",
               "bookings.order",
               "bookings.order.journey",
-              "bookings.details",
-              "bookings.details.cabinClass",
-              "bookings.details.legType"
+              "bookings.details"
             ]
           },
           "example": [
@@ -3728,49 +3670,6 @@
           "attributes": {}
         }
       },
-      "CabinClass": {
-        "title": "Cabin Class",
-        "allOf": [
-          {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string",
-                "example": "airport",
-                "readOnly": true
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "cabin-classes"
-                ],
-                "example": "cabin-classes"
-              },
-              "attributes": {
-                "type": "object",
-                "required": [
-                  "name"
-                ],
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "example": "economy"
-                  }
-                }
-              }
-            },
-            "required": [
-              "id",
-              "type",
-              "attributes"
-            ]
-          },
-          {
-            "$ref": "#/components/schemas/SelfLink"
-          }
-        ],
-        "description": "Indicates the cabins class, such as \"economy\" or \"business\"."
-      },
       "CabinClassIdentifier": {
         "title": "Cabin Class Identifier",
         "type": "object",
@@ -3832,49 +3731,6 @@
           "longitude",
           "timeZone"
         ]
-      },
-      "LegType": {
-        "title": "Leg Type",
-        "allOf": [
-          {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string",
-                "example": "air",
-                "readOnly": true
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "leg-types"
-                ],
-                "example": "leg-types"
-              },
-              "attributes": {
-                "type": "object",
-                "required": [
-                  "name"
-                ],
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "example": "air"
-                  }
-                }
-              }
-            },
-            "required": [
-              "id",
-              "type",
-              "attributes"
-            ]
-          },
-          {
-            "$ref": "#/components/schemas/SelfLink"
-          }
-        ],
-        "description": "Indicates the type of the leg, such as \"air\" or \"rail\"."
       },
       "LegTypeIdentifier": {
         "title": "Leg Type Identifier",
@@ -6106,12 +5962,6 @@
             },
             {
               "$ref": "#/components/schemas/TripBookingDetails"
-            },
-            {
-              "$ref": "#/components/schemas/CabinClass"
-            },
-            {
-              "$ref": "#/components/schemas/LegType"
             }
           ],
           "discriminator": {
@@ -6120,9 +5970,7 @@
               "orders": "#/components/schemas/Order",
               "journeys": "#/components/schemas/Journey",
               "trip-bookings": "#/components/schemas/TripBooking",
-              "trip-booking-details": "#/components/schemas/TripBookingDetails",
-              "cabin-classes": "#/components/schemas/CabinClass",
-              "leg-types": "#/components/schemas/LegType"
+              "trip-booking-details": "#/components/schemas/TripBookingDetails"
             }
           }
         }

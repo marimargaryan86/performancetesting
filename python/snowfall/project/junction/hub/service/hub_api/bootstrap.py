@@ -47,6 +47,9 @@ def create_dependencies(  # noqa: WPS211
     container[refunds.Client] = refunds_client  # type: ignore[type-abstract]
     container[resellers.Client] = resellers_client  # type: ignore[type-abstract]
 
-    includes.register_resolvers(transactions_client)
+    includes.register_resolvers(
+        orders_client=orders_client,
+        transactions_client=transactions_client,
+    )
 
     return container
