@@ -74,7 +74,7 @@ def go_image(  # type: ignore[no-untyped-def]
     )
 
     # latest
-    tag_sha = "46c5b9bd3e3efff512e28350766b54355fce6337a0b44ba3f822ab918eca4520"
+    tag_sha = "a35b6525fde5572656e24109064dd147fbaedc26e5a7ccd147ff3ed3a4308c21"
 
     docker_image(  # type: ignore[name-defined]  # noqa: F821
         name="{name}_docker".format(name=name),
