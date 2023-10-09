@@ -15,10 +15,34 @@ We aim to have you ready to be working in your team as soon as we can, please
 let us know if any steps are out of date - The best way to do this is to raise a
 Merge Request against this project!
 
+## Snowfall
+
+You can read all about Snowfall including why we're here, our values,
+our teams, and all the other juicy stuff [here][Snowfall Page]. For now, here's
+a TL;DR:
+
+### Why are we here? 🤔
+
+To shape a new golden age of travel.
+
+### What drives us? 🚀
+
+A passion for improving travel; creating and championing technology that
+delivers the best possible traveller experience.
+
+### What do we believe? ☀️
+
+Travellers should:
+
+* Have greater choice over their access to & scope of travel
+* Have greater control over how they get from A to B
+* Be able to travel with confidence, simply & seamlessly
+
 ## Junction
 
 Junction is an ecosystem of various services, all aiming to provide the consumer
-the most options in the easiest manner for travelling from origin to destination.
+the most options in the easiest manner for travelling from origin to
+destination.
 
 ![Junction Ecosystem](./assets/junction-ecosystem.jpg)
 
@@ -43,7 +67,8 @@ the most options in the easiest manner for travelling from origin to destination
 
 **SUPERAPP**
 
-> Whitelabel app used to demonstrate the capabilities of Junction as an ecosystem
+> Whitelabel app used to demonstrate the capabilities of Junction as an
+> ecosystem
 
 **PLUS**
 
@@ -80,3 +105,5 @@ Below are some of the most useful channels and what they represent:
 | [#severities](https://snowfall.slack.com/archives/C053BG6S06S)                      | All Snowfall severities and incident management                                        |
 | [#the-lounge](https://snowfall.slack.com/archives/C09LX8UUC)                        | Snowfall wide general chat                                                             |
 | [#we_are_all_snowfall](https://snowfall.slack.com/archives/CU2EZ5CHL)               | Company announcements                                                                  |
+
+[Snowfall Page]:https://www.notion.so/Snowfall-Home-NEW-531d14ec929c4433b622def19dc24879?pvs=4#7152725d6ef145e78fcde2fdb4990f0f
