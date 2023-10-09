@@ -1,10 +1,10 @@
 import abc
 import contextlib
 from collections.abc import Mapping
-from typing import Any, Generic, TypeVar, cast
+from typing import Any, Generic, Protocol, TypeGuard, TypeVar, cast
 
 import orjson
-from google.protobuf import json_format, message
+from google.protobuf import json_format, message, timestamp_pb2
 from pydantic import v1 as pydantic
 
 from snowfall.stdlib.persistence.mongo import normalizers
@@ -12,6 +12,10 @@ from snowfall.stdlib.persistence.mongo import normalizers
 Model = TypeVar("Model", bound=pydantic.BaseModel)
 Proto = TypeVar("Proto", bound=message.Message)
 Record = TypeVar("Record")
+
+
+class _ProtoWithCreatedAt(Protocol):
+    created_at: timestamp_pb2.Timestamp
 
 
 class BaseCoder(Generic[Record], abc.ABC):
@@ -43,16 +47,12 @@ class ProtoCoder(Generic[Proto], BaseCoder[Proto]):
         return json_format.ParseDict(as_dict, proto, ignore_unknown_fields=True)
 
     def encode(self, proto: Proto) -> dict[str, Any]:
-        fields = proto.DESCRIPTOR.fields_by_name.keys()
-
         # Only set created if it hasn't been set already.
-        if (  # noqa: WPS337
-            "created_at" in fields and proto.created_at.seconds == 0  # type: ignore[attr-defined]
-        ):
-            proto.created_at.GetCurrentTime()  # type: ignore[attr-defined]
+        if self._is_new(proto):
+            proto.created_at.GetCurrentTime()
 
-        if "updated_at" in fields:
-            proto.updated_at.GetCurrentTime()  # type: ignore[attr-defined]
+        if hasattr(proto, "updated_at"):  # noqa: WPS421
+            proto.updated_at.GetCurrentTime()
 
         as_dict = json_format.MessageToDict(
             proto,
@@ -62,6 +62,12 @@ class ProtoCoder(Generic[Proto], BaseCoder[Proto]):
         )
 
         return normalizers.normalize(proto.DESCRIPTOR, as_dict)
+
+    def _is_new(self, proto: Proto) -> TypeGuard[_ProtoWithCreatedAt]:
+        return (
+            hasattr(proto, "created_at")  # noqa: WPS421
+            and proto.created_at.seconds == 0
+        )
 
 
 class PydanticCoder(Generic[Model], BaseCoder[Model]):
