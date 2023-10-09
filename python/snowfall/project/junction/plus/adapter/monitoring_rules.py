@@ -15,7 +15,7 @@ from snowfall.project.junction.plus.service.notifications.v1alpha import (
 from snowfall.stdlib.format import protobuf
 
 
-class Client(abc.ABC):
+class Client(abc.ABC):  # noqa: WPS214
     @abc.abstractmethod
     async def get(
         self,
@@ -45,8 +45,9 @@ class Client(abc.ABC):
         """Update Monitoring Rule."""
 
     @abc.abstractmethod
-    async def get_checkin_candidates(
+    async def get_rules_for_upcoming_events(
         self,
+        sent_flag: str,
     ) -> Sequence[notifications_models_pb2.MonitoringRule]:
         """Fetch candidates for checkin reminder."""
 
@@ -57,8 +58,15 @@ class Client(abc.ABC):
     ) -> None:
         """Update sent_checkin_reminder flag for monitoring rules."""
 
+    @abc.abstractmethod
+    async def sent_weather_report(
+        self,
+        rule_id: str,
+    ) -> None:
+        """Update sent_weather_report flag for monitoring rules."""
 
-class DictClient(Client):
+
+class DictClient(Client):  # noqa: WPS214
     def __init__(
         self,
         monitoring_rules: Sequence[notifications_models_pb2.MonitoringRule],
@@ -114,8 +122,9 @@ class DictClient(Client):
             monitoring_rule
         )
 
-    async def get_checkin_candidates(
+    async def get_rules_for_upcoming_events(
         self,
+        sent_flag: str,
     ) -> Sequence[notifications_models_pb2.MonitoringRule]:
         return list(self._monitoring_rules_id.values())
 
@@ -125,8 +134,14 @@ class DictClient(Client):
     ) -> None:
         """Send reminder."""
 
+    async def sent_weather_report(
+        self,
+        rule_id: str,
+    ) -> None:
+        """Send weather report."""
 
-class GrpcClient(Client):
+
+class GrpcClient(Client):  # noqa: WPS214
     def __init__(
         self,
         monitoring_rules: notifications_pb2_grpc.MonitoringRuleServiceStub,
@@ -201,13 +216,15 @@ class GrpcClient(Client):
         if not response.is_success:
             raise errors.UnprocessableEntityError()
 
-    async def get_checkin_candidates(
+    async def get_rules_for_upcoming_events(
         self,
+        sent_flag: str,
     ) -> Sequence[notifications_models_pb2.MonitoringRule]:
         request = notifications_grpc_pb2.FindMonitoringRulesRequest(
             departure_after=protobuf.datetime_to_protobuf_datetime(
                 datetime.datetime.now(datetime.UTC),
             ),
+            sent_flag=sent_flag,
         )
         response = await errors.handle_grpc_errors(
             self._monitoring_rules.FindMonitoringRules(
@@ -227,6 +244,23 @@ class GrpcClient(Client):
         )
         response = await errors.handle_grpc_errors(
             self._monitoring_rules.UpdateCheckinReminder(
+                request,
+                timeout=self._timeout,
+            ),
+        )
+
+        if not response.is_success:
+            raise errors.UnprocessableEntityError()
+
+    async def sent_weather_report(
+        self,
+        rule_id: str,
+    ) -> None:
+        request = notifications_grpc_pb2.UpdateWeatherReportRequest(
+            identifier=rule_id,
+        )
+        response = await errors.handle_grpc_errors(
+            self._monitoring_rules.UpdateWeatherReport(
                 request,
                 timeout=self._timeout,
             ),

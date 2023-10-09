@@ -293,8 +293,9 @@ class MonitoringRuleService(  # noqa: WPS214
     ) -> notifications_pb2.FindMonitoringRulesResponse:
         monitoring_rules = [
             monitoring_rule
-            async for monitoring_rule in await self._monitoring_rules.find_checkin_candidates(
+            async for monitoring_rule in await self._monitoring_rules.find_rules_for_upcoming_events(
                 request.departure_after,
+                request.sent_flag,
             )
         ]
         return notifications_pb2.FindMonitoringRulesResponse(
@@ -310,6 +311,18 @@ class MonitoringRuleService(  # noqa: WPS214
             request.identifier,
         )
         return notifications_pb2.UpdateCheckinReminderResponse(
+            is_success=update_status,
+        )
+
+    async def UpdateWeatherReport(  # type: ignore[override] # noqa: N802
+        self,
+        request: notifications_pb2.UpdateWeatherReportRequest,
+        context: aio.ServicerContext,
+    ) -> notifications_pb2.UpdateWeatherReportResponse:
+        update_status = await self._monitoring_rules.update_weather_report(
+            request.identifier,
+        )
+        return notifications_pb2.UpdateWeatherReportResponse(
             is_success=update_status,
         )
 

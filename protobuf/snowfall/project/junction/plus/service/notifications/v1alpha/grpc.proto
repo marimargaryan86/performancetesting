@@ -32,6 +32,7 @@ service MonitoringRuleService {
   rpc CreateMonitoringRule(CreateMonitoringRuleRequest) returns (CreateMonitoringRuleResponse) {}
   rpc UpdateMonitoringRule(UpdateMonitoringRuleRequest) returns (UpdateMonitoringRuleResponse) {}
   rpc UpdateCheckinReminder(UpdateCheckinReminderRequest) returns (UpdateCheckinReminderResponse) {}
+  rpc UpdateWeatherReport(UpdateWeatherReportRequest) returns (UpdateWeatherReportResponse) {}
   rpc FindMonitoringRules(FindMonitoringRulesRequest) returns (FindMonitoringRulesResponse) {}
 }
 
@@ -158,9 +159,16 @@ message UpdateCheckinReminderRequest {
 message UpdateCheckinReminderResponse {
   bool is_success = 1;
 }
+message UpdateWeatherReportRequest {
+  string identifier = 1;
+}
+message UpdateWeatherReportResponse {
+  bool is_success = 1;
+}
 
 message FindMonitoringRulesRequest {
   snowfall.stdlib.v1.DateTime departure_after = 5;
+  string sent_flag = 6;
 }
 
 message FindMonitoringRulesResponse {

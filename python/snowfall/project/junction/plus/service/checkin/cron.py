@@ -36,7 +36,10 @@ class CheckinCronJob(object):
 
     async def run(self) -> None:  # noqa: WPS231,WPS210
         self._logger.info("Started check-in reminder as a cron job")
-        for candidate in await self._monitoring_rules.get_checkin_candidates():
+        candidates = await self._monitoring_rules.get_rules_for_upcoming_events(
+            sent_flag="sent_checkin_reminder",
+        )
+        for candidate in candidates:
             checkin_window = generate_checkin_window_start(
                 carrier=candidate.booking.value.route_identifier.carrier,
             )

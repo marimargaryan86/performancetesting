@@ -1,6 +1,7 @@
 from snowfall.project.junction.plus.adapter import (
     monitoring_rules,
     notification_event_publisher,
+    orders,
     subscribers,
 )
 from snowfall.project.junction.plus.service.notifications.v1alpha import (
@@ -32,6 +33,11 @@ async def _cron_run(
         ),
         subscribers=subscribers.GrpcClient(
             subscribers=notifications_pb2_grpc.SubscriberServiceStub(
+                notifications_channel,
+            ),
+        ),
+        orders=orders.GrpcClient(
+            orders=notifications_pb2_grpc.OrderServiceStub(
                 notifications_channel,
             ),
         ),

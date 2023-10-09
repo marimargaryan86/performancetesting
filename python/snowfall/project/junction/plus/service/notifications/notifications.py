@@ -223,9 +223,10 @@ class MonitoringRuleRepository(  # noqa: WPS215
             },
         )
 
-    async def find_checkin_candidates(
+    async def find_rules_for_upcoming_events(
         self,
         departure_after: datetime_pb2.DateTime,
+        sent_flag: str,
     ) -> resultset.ResultSet[models_pb2.MonitoringRule]:
         return await self._execute(
             self._collection.find,
@@ -233,7 +234,7 @@ class MonitoringRuleRepository(  # noqa: WPS215
                 "booking.value.departure_at": {
                     "$gt": protobuf.protobuf_to_datetime(departure_after),
                 },
-                "sent_checkin_reminder": {"$exists": False},
+                sent_flag: {"$exists": False},
             },
         )
 
@@ -242,5 +243,13 @@ class MonitoringRuleRepository(  # noqa: WPS215
             self._collection.update_one,
             {repository.mongo_id_key: identifier},
             {"$set": {"sent_checkin_reminder": datetime.datetime.now(tz=datetime.UTC)}},
+        )
+        return update_result.modified_count != 0
+
+    async def update_weather_report(self, identifier: str) -> bool:
+        update_result = await self._execute(
+            self._collection.update_one,
+            {"_id": identifier},
+            {"$set": {"sent_weather_report": datetime.datetime.now(tz=datetime.UTC)}},
         )
         return update_result.modified_count != 0
