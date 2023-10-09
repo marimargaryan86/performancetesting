@@ -160,7 +160,11 @@ class OfferOrchestrator(object):
                 if not isinstance(search_id, errors.ServiceUnavailableError):
                     self._logger.exception(
                         "Failed to create an offer search",
-                        exception=search_id,
+                        exc_info=(
+                            type(search_id),
+                            search_id,
+                            search_id.__traceback__,
+                        ),
                     )
 
                 continue
