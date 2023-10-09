@@ -50,7 +50,7 @@ job "vector-vector-loki" {
         VECTOR_REQUIRE_HEALTHY = "true"
       }
       resources {
-        memory = 200 # 100MB
+        memory = 200 # 200MB
       }
       template {
         destination   = "local/vector.toml"
@@ -75,10 +75,6 @@ job "vector-vector-loki" {
           """
           [sources.logs]
             type = "docker_logs"
-          [sinks.out]
-            type = "console"
-            inputs = [ "relabel_docker_logs" ]
-            encoding.codec = "json"
           [sinks.loki]
             type = "loki"
             inputs = ["relabel_docker_logs"]
