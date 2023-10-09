@@ -3,9 +3,8 @@
 Fetches the datasets listed in datasets.json.
 
 Basic auth credentials can be passed with environment variables.
-PIPELINE_[name]_USERNAME and PIPELINE_[name]_PASSWORD, where name
-is defined in datasets.json. For example:
-PIPELINE_GTFS_DE_USERNAME=some_user
+PIPELINE_[name]_USERNAME and PIPELINE_[name]_PASSWORD, where name is defined in
+datasets.json. For example: PIPELINE_GTFS_DE_USERNAME=some_user
 """
 import asyncio
 import json

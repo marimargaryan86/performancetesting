@@ -222,8 +222,8 @@ class AsyncSoapClient(object):
     def prepare_payload(self, rq_obj: Any) -> Any:
         """Prepare and serialize payload to be sent.
 
-        :raises ClientValueError: If the config input type doesn't match the given
-            input.
+        :raises ClientValueError: If the config input type doesn't match the
+            given input.
         """
         if isinstance(rq_obj, dict):
             rq_obj = self.dict_converter.convert(rq_obj, self.config.input)

@@ -832,14 +832,15 @@ class SATClient(object):  # noqa: WPS214
     ) -> None:
         """Construct Save A Train API client library.
 
-        :param email: Email that identifies agent user, under whose privileges the
-            requested operation executes
+        :param email: Email that identifies agent user, under whose privileges
+            the requested operation executes
         :type email: str
         :param password: Password used to generate token for API requests
         :type password: str
         :param password_search: Password used to authorize Search API requests
         :type: str
-        :param token: Secret key specific to each agent, used to authorize API requests
+        :param token: Secret key specific to each agent, used to authorize API
+            requests
         :type token: str
         :param api_url: API base URL
         :type api_url: str

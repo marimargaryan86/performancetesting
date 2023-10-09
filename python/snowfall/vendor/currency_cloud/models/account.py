@@ -22,7 +22,7 @@ class Account(CamelCaseBaseModel):
 
 
 class AccountRequest(Account):
-    """account request pydantic model."""
+    """Account request pydantic model."""
 
 
 class StatusEnum(Enum):

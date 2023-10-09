@@ -65,7 +65,6 @@ ignore_errors = true
 
 [[tool.mypy.overrides]]
 module = [
-    "aiostream.*", # https://github.com/vxgmichel/aiostream/issues/36
     "allure.*", # https://github.com/allure-framework/allure-python/issues/731
     "authlib.*", # https://github.com/lepture/authlib/issues/460
     "fsspec.*", # https://github.com/fsspec/filesystem_spec/issues/625

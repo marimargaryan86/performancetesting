@@ -96,14 +96,15 @@ class TripOfferSearcher(Generic[_SearchCriteriaTask, _SearchCriteria]):
         search: legacy_offers_pb2.TripOfferSearch,
     ) -> AsyncIterator[legacy_offers_pb2.OfferGroup]:
         search_criterion_tasks = self._search_criteria_task_generator(search)
-        generators = stream.merge(
-            *(
-                self._process_search_criterion_task(search_criterion_task)
-                for search_criterion_task in search_criterion_tasks
-            ),
-        )
+        generators = [
+            self._process_search_criterion_task(search_criterion_task)
+            for search_criterion_task in search_criterion_tasks
+        ]
 
-        async with generators.stream() as offer_groups:
+        if not generators:
+            return
+
+        async with stream.merge(*generators).stream() as offer_groups:
             async for offer_group in offer_groups:
                 yield offer_group
 
