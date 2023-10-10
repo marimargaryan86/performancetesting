@@ -147,9 +147,7 @@ class DFDataConverter(object):  # noqa: WPS214
                     tt.departure_time.isoformat(),
                     tt.arrival_time.isoformat(),
                 ),
-                date=tt.departure_time.strftime(  # type: ignore[arg-type]
-                    "%Y%m%d",
-                ),
+                date=tt.departure_time.date(),
                 exception_type=_EXCEPTION_TYPE,
             )
             for timetable_response in self._timetable_responses
