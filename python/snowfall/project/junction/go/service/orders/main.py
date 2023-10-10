@@ -1,3 +1,4 @@
+import asyncio
 import ipaddress
 import random
 from collections.abc import Sequence
@@ -21,9 +22,9 @@ from snowfall.project.junction.go.service.passenger_name_records.v1 import (
 )
 from snowfall.project.junction.go.service.resellers.v1 import resellers_pb2_grpc
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
-from snowfall.stdlib.service import amqp_factory, application
+from snowfall.stdlib.service import amqp_factory, application, grpc_factory
 from snowfall.stdlib.transport.amqp import consumer, producer, types
-from snowfall.stdlib.transport.grpc import client, server
+from snowfall.stdlib.transport.grpc import server
 from snowfall.vendor.junction.auth import UserAuth
 from snowfall.vendor.junction.pay.client import Client as PayClient
 
@@ -55,7 +56,10 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
 
     passenger_name_records_client = passenger_name_records.GrpcClient(
         passenger_name_records=passenger_name_records_pb2_grpc.PassengerNameRecordServiceStub(
-            client.create_channel(app.settings.passenger_name_records_address),
+            await grpc_factory.make_insecure_channel(
+                app,
+                app.settings.passenger_name_records_address,
+            ),
         ),
     )
 
@@ -75,6 +79,17 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
         collection=mongo.orders.journeys,
     )
 
+    resellers_channel, gateway_channel = await asyncio.gather(
+        grpc_factory.make_insecure_channel(
+            app,
+            app.settings.resellers_address,
+        ),
+        grpc_factory.make_insecure_channel(
+            app,
+            app.settings.gateway_address,
+        ),
+    )
+
     grpc_server = server.create_server(
         app.settings.grpc_address,
         app.settings.grpc_port,
@@ -84,7 +99,7 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
                     collection=mongo.orders.journeys,
                     passenger_name_records=passenger_name_records_client,
                     resellers_client=resellers_pb2_grpc.ResellerServiceStub(
-                        client.create_channel(app.settings.resellers_address),
+                        resellers_channel,
                     ),
                 ),
                 orders=orders.OrderRepository(
@@ -92,7 +107,7 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
                 ),
                 booking_handler=bookings.BookingHandler(
                     gateway=bookings_pb2_grpc.BookingServiceStub(
-                        client.create_channel(app.settings.gateway_address),
+                        gateway_channel,
                     ),
                     fallback_bookings=booking_repository,
                 ),

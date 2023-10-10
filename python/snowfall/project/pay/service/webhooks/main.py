@@ -5,14 +5,14 @@ from snowfall.project.pay.service.payments.v1alpha import payments_pb2_grpc
 from snowfall.project.pay.service.webhooks import bootstrap, routers
 from snowfall.project.pay.service.webhooks.middlewares import HmacHeaderMiddleware
 from snowfall.stdlib.integration.starlette import application as starlette
-from snowfall.stdlib.service import application
-from snowfall.stdlib.transport.grpc.client import create_channel
+from snowfall.stdlib.service import application, grpc_factory
 
 
 async def _http(
     app: application.Application[bootstrap.Settings],
 ) -> None:
-    payments_channel = create_channel(
+    payments_channel = await grpc_factory.make_insecure_channel(
+        app,
         app.settings.payments_address,
     )
     grpc_payment_client = GrpcClient(

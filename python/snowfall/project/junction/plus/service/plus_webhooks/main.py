@@ -32,8 +32,7 @@ from snowfall.project.junction.plus.service.plus_webhooks.shortener import (
 )
 from snowfall.stdlib.integration.starlette import application as starlette
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import application
-from snowfall.stdlib.transport.grpc.client import create_channel
+from snowfall.stdlib.service import application, grpc_factory
 
 
 async def _http(
@@ -41,7 +40,10 @@ async def _http(
 ) -> None:
     openai.api_key = app.settings.openai_api_key
     openai.organization = app.settings.openai_org
-    notifications_channel = create_channel(app.settings.notifications_address)
+    notifications_channel = await grpc_factory.make_insecure_channel(
+        app,
+        app.settings.notifications_address,
+    )
     redis_client = redis.Client[str](
         aioredis.from_url(
             str(

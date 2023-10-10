@@ -20,9 +20,8 @@ from snowfall.project.pay.service.transactions.grpc import (
     TransactionsService,
 )
 from snowfall.stdlib.instrumentation.httpx import metrics
-from snowfall.stdlib.service import application, redis_factory
+from snowfall.stdlib.service import application, grpc_factory, redis_factory
 from snowfall.stdlib.transport.grpc import server
-from snowfall.stdlib.transport.grpc.client import create_channel
 from snowfall.vendor.currency_cloud.client import CurrencyCloudAuth, PaymentClient
 
 
@@ -73,7 +72,10 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
                 ),
                 companies_client=companies.GrpcClient(
                     companies_grpc_pb2.CompaniesServiceStub(
-                        create_channel(app.settings.companies_address),
+                        await grpc_factory.make_insecure_channel(
+                            app,
+                            app.settings.companies_address,
+                        ),
                     ),
                 ),
             ),
@@ -87,7 +89,10 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
                 ),
                 currencies_client=currencies.GrpcClient(
                     currencies_pb2_grpc.CurrencyServiceStub(
-                        create_channel(app.settings.currencies_address),
+                        await grpc_factory.make_insecure_channel(
+                            app,
+                            app.settings.currencies_address,
+                        ),
                     ),
                 ),
             ),

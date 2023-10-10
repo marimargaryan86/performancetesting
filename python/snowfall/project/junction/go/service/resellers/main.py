@@ -14,9 +14,8 @@ from snowfall.project.pay.service.companies.v1alpha import (
     grpc_pb2_grpc as companies_grpc,
 )
 from snowfall.project.pay.service.currencies.v1alpha import currencies_pb2_grpc
-from snowfall.stdlib.service import application
+from snowfall.stdlib.service import application, grpc_factory
 from snowfall.stdlib.transport.grpc import server as grpc_server
-from snowfall.stdlib.transport.grpc.client import create_channel
 from snowfall.vendor.consul.client import ConsulClient
 
 
@@ -46,7 +45,8 @@ async def _serve(app: application.Application[_ServeSettings]) -> None:
         httpx_client=http_client,
     )
 
-    companies_channel = create_channel(
+    companies_channel = await grpc_factory.make_insecure_channel(
+        app,
         app.settings.companies_address,
     )
 
@@ -56,7 +56,8 @@ async def _serve(app: application.Application[_ServeSettings]) -> None:
         ),
     )
 
-    currencies_channel = create_channel(
+    currencies_channel = await grpc_factory.make_insecure_channel(
+        app,
         app.settings.currencies_address,
     )
     currency_client = currencies_adapter.GrpcClient(

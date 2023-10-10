@@ -2,6 +2,8 @@ import asyncio
 import datetime
 from typing import ClassVar
 
+from grpc import aio
+
 from snowfall.project.junction.go.service.offers.v1 import (
     grpc_pb2 as offers_grpc_pb2,
 )
@@ -15,7 +17,6 @@ from snowfall.project.junction.go.v1 import models_pb2 as go_models_pb2
 from snowfall.service.deploy.verifiers import protocols
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.transport.grpc import client
 from snowfall.stdlib.v1 import amqp_pb2 as stdlib_amqp_pb2
 from snowfall.stdlib.v1 import latlng_pb2
 
@@ -31,7 +32,7 @@ class OfferSearchFlow(object):
         dependencies: protocols.ResolvedDependencies,
     ) -> None:
         offer_searches = offers_grpc_pb2_grpc.OfferSearchServiceStub(
-            client.create_channel(
+            aio.insecure_channel(
                 "{0}:{1}".format(
                     dependencies[("offers", "grpc")][0],
                     dependencies[("offers", "grpc")][1],

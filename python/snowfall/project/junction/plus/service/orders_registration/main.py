@@ -13,9 +13,8 @@ from snowfall.project.junction.plus.service.orders_registration import (
     importer,
 )
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
-from snowfall.stdlib.service import amqp_factory, application
+from snowfall.stdlib.service import amqp_factory, application, grpc_factory
 from snowfall.stdlib.transport.amqp import consumer, producer, types
-from snowfall.stdlib.transport.grpc.client import create_channel
 
 
 class _ImportSettings(application.Settings):
@@ -33,7 +32,10 @@ async def _import(app: application.Application[_ImportSettings]) -> None:
 
     logging.register(http_client)
     metrics.register(http_client)
-    notifications_channel = create_channel(app.settings.notifications_address)
+    notifications_channel = await grpc_factory.make_insecure_channel(
+        app,
+        app.settings.notifications_address,
+    )
     order_importer = importer.OrderImporter(
         consumer_obj=consumer.Consumer(
             connection=connection,

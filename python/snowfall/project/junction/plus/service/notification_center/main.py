@@ -16,9 +16,8 @@ from snowfall.project.junction.plus.service.notifications.v1alpha import (
 )
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import amqp_factory, application
+from snowfall.stdlib.service import amqp_factory, application, grpc_factory
 from snowfall.stdlib.transport.amqp import consumer, types
-from snowfall.stdlib.transport.grpc.client import create_channel
 
 
 class _ImportSettings(application.Settings):
@@ -36,7 +35,10 @@ async def _import(app: application.Application[_ImportSettings]) -> None:
 
     logging.register(http_client)
     metrics.register(http_client)
-    notifications_channel = create_channel(app.settings.notifications_address)
+    notifications_channel = await grpc_factory.make_insecure_channel(
+        app,
+        app.settings.notifications_address,
+    )
     redis_client = redis.Client[str](
         aioredis.from_url(
             str(random.choice(app.settings.redis_dsn)),  # noqa: S311

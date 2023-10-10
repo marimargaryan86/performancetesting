@@ -9,10 +9,16 @@ from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.logging import stdout
-from snowfall.stdlib.service import amqp_factory, application, redis_factory
+from snowfall.stdlib.service import (
+    amqp_factory,
+    application,
+    grpc_factory,
+    redis_factory,
+)
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.vendor.distribusion import client
 from snowfall.vendor.distribusion.models import connections, criterias
+from snowfall.vendor.rate_limiter import gubernator_pb2_grpc
 from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
 
@@ -30,11 +36,14 @@ async def price_quotes(  # noqa: WPS210
     )
     logging.register(http_client)
     metrics.register(http_client)
-    rate_limit_client = await app.stack.enter_async_context(
-        RateLimitClient(
-            app.settings.rate_limiter_grpc_host,
-            app.settings.rate_limiter_service_configs["distribusion"],
+    rate_limit_client = RateLimitClient(
+        gubernator_pb2_grpc.V1Stub(
+            await grpc_factory.make_insecure_channel(
+                app,
+                app.settings.rate_limiter_grpc_host,
+            ),
         ),
+        app.settings.rate_limiter_service_configs["distribusion"],
     )
     redis_client = await redis_factory.make_client(
         app=app,

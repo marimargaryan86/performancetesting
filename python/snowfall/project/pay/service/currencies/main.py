@@ -8,9 +8,8 @@ from snowfall.project.pay.service.currencies.grpc import CurrencyService
 from snowfall.project.pay.service.currencies.repositories import CurrencyRepository
 from snowfall.project.pay.service.rates.v1alpha import rates_pb2_grpc
 from snowfall.stdlib import money
-from snowfall.stdlib.service import application
+from snowfall.stdlib.service import application, grpc_factory
 from snowfall.stdlib.transport.grpc import server
-from snowfall.stdlib.transport.grpc.client import create_channel
 
 
 class _Settings(application.Settings):
@@ -22,7 +21,10 @@ class _Settings(application.Settings):
 
 
 async def _main(app: application.Application[_Settings]) -> None:
-    rates_channel = create_channel(app.settings.rates_address)
+    rates_channel = await grpc_factory.make_insecure_channel(
+        app,
+        app.settings.rates_address,
+    )
 
     grpc_server = server.create_server(
         app.settings.grpc_address,

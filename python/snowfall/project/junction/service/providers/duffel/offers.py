@@ -17,6 +17,8 @@ from snowfall.stdlib import h3
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.stdlib.service import grpc_factory
+from snowfall.vendor.rate_limiter import gubernator_pb2_grpc
 from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
 _Impl = offers.OfferSearchImplementation[
@@ -38,11 +40,14 @@ async def offers_factory(
     )
     logging.register(http_client)
     metrics.register(http_client)
-    rate_limit_client = await stack.enter_async_context(
-        RateLimitClient(
-            app.settings.rate_limiter_grpc_host,
-            app.settings.rate_limiter_service_configs["duffel"],
+    rate_limit_client = RateLimitClient(
+        gubernator_pb2_grpc.V1Stub(
+            await grpc_factory.make_insecure_channel(
+                app,
+                app.settings.rate_limiter_grpc_host,
+            ),
         ),
+        app.settings.rate_limiter_service_configs["duffel"],
     )
     offer_client_factory = DuffelClientFactory(
         api_base_url=str(app.settings.api_base_url),

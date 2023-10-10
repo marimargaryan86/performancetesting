@@ -12,9 +12,8 @@ from snowfall.project.pay.service.transactions.v1alpha import (
     grpc_pb2_grpc as transactions_pb2_grpc,
 )
 from snowfall.stdlib.instrumentation.httpx import metrics
-from snowfall.stdlib.service import application
+from snowfall.stdlib.service import application, grpc_factory
 from snowfall.stdlib.transport.grpc import server
-from snowfall.stdlib.transport.grpc.client import create_channel
 from snowfall.vendor.currency_cloud.client import CurrencyCloudAuth, PaymentClient
 
 
@@ -32,7 +31,8 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
-    transactions_channel = create_channel(
+    transactions_channel = await grpc_factory.make_insecure_channel(
+        app,
         app.settings.transactions_address,
     )
     grpc_server = server.create_server(

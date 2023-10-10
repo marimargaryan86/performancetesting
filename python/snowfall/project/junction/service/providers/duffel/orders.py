@@ -15,8 +15,14 @@ from snowfall.project.junction.service.providers.duffel.client_factory import (
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence import filesystem
-from snowfall.stdlib.service import amqp_factory, application, redis_factory
+from snowfall.stdlib.service import (
+    amqp_factory,
+    application,
+    grpc_factory,
+    redis_factory,
+)
 from snowfall.stdlib.transport.amqp import consumer, producer, types
+from snowfall.vendor.rate_limiter import gubernator_pb2_grpc
 from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
 _PROVIDER_NAME = "Duffel"
@@ -42,11 +48,14 @@ async def orders(  # noqa: WPS217
     )
     logging.register(http_client)
     metrics.register(http_client)
-    rate_limit_client = await app.stack.enter_async_context(
-        RateLimitClient(
-            app.settings.rate_limiter_grpc_host,
-            app.settings.rate_limiter_service_configs["duffel"],
+    rate_limit_client = RateLimitClient(
+        gubernator_pb2_grpc.V1Stub(
+            await grpc_factory.make_insecure_channel(
+                app,
+                app.settings.rate_limiter_grpc_host,
+            ),
         ),
+        app.settings.rate_limiter_service_configs["duffel"],
     )
     redis_client = await redis_factory.make_client(
         app=app,

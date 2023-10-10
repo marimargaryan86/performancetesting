@@ -1,4 +1,8 @@
+import asyncio
+from typing import NamedTuple
+
 import httpx
+from grpc import aio
 from starlette import middleware
 from starlette.middleware import authentication as auth_middleware
 
@@ -42,8 +46,7 @@ from snowfall.stdlib.instrumentation.httpx import metrics
 from snowfall.stdlib.integration.starlette import application as starlette
 from snowfall.stdlib.integration.starlette import authentication, handlers
 from snowfall.stdlib.persistence import filesystem
-from snowfall.stdlib.service import application
-from snowfall.stdlib.transport.grpc import client
+from snowfall.stdlib.service import application, grpc_factory
 from snowfall.vendor.currency_cloud.client import CurrencyCloudAuth, PaymentClient
 
 
@@ -60,17 +63,49 @@ class Settings(starlette.Settings):
     resellers_address: str
 
 
+class _Channels(NamedTuple):
+    orders: aio.Channel
+    companies: aio.Channel
+    transactions: aio.Channel
+    currencies: aio.Channel
+    refunds: aio.Channel
+    resellers: aio.Channel
+
+
 async def _http(app: application.Application[Settings]) -> None:
-    authentication_channel = client.create_channel(
+    authentication_channel = await grpc_factory.make_insecure_channel(
+        app,
         app.settings.authentication_address,
     )
     session_client = sessions_pb2_grpc.SessionServiceStub(authentication_channel)
-    orders_channel = client.create_channel(app.settings.orders_address)
-    companies_channel = client.create_channel(app.settings.companies_address)
-    transactions_channel = client.create_channel(app.settings.transactions_address)
-    currencies_channel = client.create_channel(app.settings.currencies_address)
-    refunds_channel = client.create_channel(app.settings.refunds_address)
-    resellers_channel = client.create_channel(app.settings.resellers_address)
+    channels = _Channels(
+        *await asyncio.gather(
+            grpc_factory.make_insecure_channel(
+                app,
+                app.settings.orders_address,
+            ),
+            grpc_factory.make_insecure_channel(
+                app,
+                app.settings.companies_address,
+            ),
+            grpc_factory.make_insecure_channel(
+                app,
+                app.settings.transactions_address,
+            ),
+            grpc_factory.make_insecure_channel(
+                app,
+                app.settings.currencies_address,
+            ),
+            grpc_factory.make_insecure_channel(
+                app,
+                app.settings.refunds_address,
+            ),
+            grpc_factory.make_insecure_channel(
+                app,
+                app.settings.resellers_address,
+            ),
+        ),
+    )
     cc_payment_client = PaymentClient(
         base_url=app.settings.cc_address,
         auth=CurrencyCloudAuth(
@@ -86,63 +121,63 @@ async def _http(app: application.Application[Settings]) -> None:
             bootstrap.create_dependencies(
                 orders_client=orders.GrpcClient(
                     orders_pb2_grpc.OrderServiceStub(
-                        orders_channel,
+                        channels.orders,
                     ),
                 ),
                 accounts_client=accounts_adapter.GrpcClient(
                     AccountsServiceStub(
-                        companies_channel,
+                        channels.companies,
                     ),
                 ),
                 companies_client=companies.GrpcClient(
                     CompaniesServiceStub(
-                        companies_channel,
+                        channels.companies,
                     ),
                 ),
                 contacts_client=contacts.GrpcClient(
                     ContactsServiceStub(
-                        companies_channel,
+                        channels.companies,
                     ),
                 ),
                 beneficiaries_client=beneficiaries.GrpcClient(
                     BeneficiariesServiceStub(
-                        companies_channel,
+                        channels.companies,
                     ),
                 ),
                 conversions_client=conversions.GrpcClient(
                     transactions_pb2_grpc.ConversionsServiceStub(
-                        transactions_channel,
+                        channels.transactions,
                     ),
                 ),
                 transactions_client=transactions.GrpcClient(
                     transactions_pb2_grpc.TransactionsServiceStub(
-                        transactions_channel,
+                        channels.transactions,
                     ),
                 ),
                 currencies_client=currencies.GrpcClient(
                     currencies_pb2_grpc.CurrencyServiceStub(
-                        currencies_channel,
+                        channels.currencies,
                     ),
                 ),
                 cc_payment_client=cc_payment_client,
                 quotations_client=quotations.GrpcClient(
                     QuotationsServiceStub(
-                        transactions_channel,
+                        channels.transactions,
                     ),
                 ),
                 bills_client=bills.GrpcClient(
                     transactions_pb2_grpc.BillsServiceStub(
-                        transactions_channel,
+                        channels.transactions,
                     ),
                 ),
                 refunds_client=refunds.GrpcClient(
                     RefundsServiceStub(
-                        refunds_channel,
+                        channels.refunds,
                     ),
                 ),
                 resellers_client=resellers.GrpcClient(
                     resellers_pb2_grpc.ResellerServiceStub(
-                        resellers_channel,
+                        channels.resellers,
                     ),
                 ),
             ),

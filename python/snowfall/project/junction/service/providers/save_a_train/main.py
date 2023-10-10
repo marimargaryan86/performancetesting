@@ -40,10 +40,9 @@ from snowfall.stdlib import h3
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import amqp_factory, redis_factory
+from snowfall.stdlib.service import amqp_factory, grpc_factory, redis_factory
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer, types
-from snowfall.stdlib.transport.grpc import client as grpc_client
 from snowfall.vendor.save_a_train import client
 from snowfall.vendor.save_a_train.models import request
 
@@ -468,7 +467,7 @@ async def _dump_stations(app: service.Application[_DumpStationsSettings]) -> Non
         client=http_client,
     )
     geocoder = geocoding_pb2_grpc.GeocodingServiceStub(
-        grpc_client.create_channel(app.settings.geodata_address),
+        await grpc_factory.make_insecure_channel(app, app.settings.geodata_address),
     )
 
     await train_stations.dump_sat_stations(

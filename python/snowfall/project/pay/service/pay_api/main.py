@@ -1,8 +1,10 @@
+import asyncio
 import datetime
 from collections.abc import AsyncGenerator, Callable
-from typing import Any
+from typing import Any, NamedTuple
 
 import httpx
+from grpc import aio
 from starlette import applications
 from starlette.middleware import Middleware, authentication
 
@@ -37,8 +39,7 @@ from snowfall.stdlib.integration.starlette import authentication as stdlib_auth
 from snowfall.stdlib.integration.starlette import handlers
 from snowfall.stdlib.persistence import cursor, filesystem
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import application, redis_factory
-from snowfall.stdlib.transport.grpc.client import create_channel
+from snowfall.stdlib.service import application, grpc_factory, redis_factory
 from snowfall.vendor.currency_cloud import client
 
 
@@ -56,6 +57,13 @@ def _lifespan(
     return decorator
 
 
+class _HttpChannels(NamedTuple):
+    authentication: aio.Channel
+    transactions: aio.Channel
+    currencies: aio.Channel
+    companies: aio.Channel
+
+
 async def _http(
     app: application.Application[bootstrap.Settings],
 ) -> None:
@@ -64,17 +72,26 @@ async def _http(
         dsn=app.settings.redis_dsn,
         decode_responses=True,
     )
-    authentication_channel = create_channel(
-        app.settings.authentication_address,
-    )
-    transactions_channel = create_channel(
-        app.settings.transactions_address,
-    )
-    currencies_channel = create_channel(
-        app.settings.currencies_address,
-    )
-    companies_channel = create_channel(
-        app.settings.companies_address,
+
+    channels = _HttpChannels(
+        *await asyncio.gather(
+            grpc_factory.make_insecure_channel(
+                app,
+                app.settings.authentication_address,
+            ),
+            grpc_factory.make_insecure_channel(
+                app,
+                app.settings.transactions_address,
+            ),
+            grpc_factory.make_insecure_channel(
+                app,
+                app.settings.currencies_address,
+            ),
+            grpc_factory.make_insecure_channel(
+                app,
+                app.settings.companies_address,
+            ),
+        ),
     )
     asgi_app = starlette.create_starlette_app(
         custom_middlewares=[
@@ -96,7 +113,7 @@ async def _http(
                         ).get_user_id_from_jwt,
                         client_resolver=auth_adapter.oauth_client_resolver(
                             oauth_client=oauth_pb2_grpc.OAuthServiceStub(
-                                authentication_channel,
+                                channels.authentication,
                             ),
                         ),
                     ).get_owner_from_jwt,
@@ -108,12 +125,12 @@ async def _http(
             bootstrap.create_dependencies(
                 quotations_client=quotations.GrpcClient(
                     transactions_pb2_grpc.QuotationsServiceStub(
-                        transactions_channel,
+                        channels.transactions,
                     ),
                 ),
                 currencies_client=currencies.GrpcClient(
                     currencies_pb2_grpc.CurrencyServiceStub(
-                        currencies_channel,
+                        channels.currencies,
                     ),
                 ),
                 redis_client=UserSessionRepository(
@@ -122,12 +139,12 @@ async def _http(
                 ),
                 companies_client=companies.GrpcClient(
                     companies_grpc_pb2.CompaniesServiceStub(
-                        companies_channel,
+                        channels.companies,
                     ),
                 ),
                 transactions_client=transactions.GrpcClient(
                     transactions_pb2_grpc.TransactionsServiceStub(
-                        transactions_channel,
+                        channels.transactions,
                     ),
                 ),
             ),
@@ -154,20 +171,35 @@ async def _http(
     )
 
 
+class _AdminHttpChannels(NamedTuple):
+    authentication: aio.Channel
+    companies: aio.Channel
+    payments: aio.Channel
+    transactions: aio.Channel
+
+
 async def _admin_http(
     app: application.Application[bootstrap.AdminSettings],
 ) -> None:
-    authentication_channel = create_channel(
-        app.settings.authentication_address,
-    )
-    companies_channel = create_channel(
-        app.settings.companies_address,
-    )
-    payments_channel = create_channel(
-        app.settings.payments_address,
-    )
-    transactions_channel = create_channel(
-        app.settings.transactions_address,
+    channels = _AdminHttpChannels(
+        *await asyncio.gather(
+            grpc_factory.make_insecure_channel(
+                app,
+                app.settings.authentication_address,
+            ),
+            grpc_factory.make_insecure_channel(
+                app,
+                app.settings.companies_address,
+            ),
+            grpc_factory.make_insecure_channel(
+                app,
+                app.settings.payments_address,
+            ),
+            grpc_factory.make_insecure_channel(
+                app,
+                app.settings.transactions_address,
+            ),
+        ),
     )
     cc_payment_client = client.PaymentClient(
         base_url=app.settings.cc_address,
@@ -203,7 +235,7 @@ async def _admin_http(
                         ).get_user_id_from_jwt,
                         client_resolver=auth_adapter.oauth_client_resolver(
                             oauth_client=oauth_pb2_grpc.OAuthServiceStub(
-                                authentication_channel,
+                                channels.authentication,
                             ),
                         ),
                     ).get_owner_from_jwt,
@@ -215,22 +247,22 @@ async def _admin_http(
             bootstrap.create_admin_dependencies(
                 authentication_client=auth_adapter.GrpcClient(
                     authentication_pb2_grpc.AuthenticationServiceStub(
-                        authentication_channel,
+                        channels.authentication,
                     ),
                 ),
                 beneficiaries_client=beneficiaries.GrpcClient(
                     companies_grpc_pb2.BeneficiariesServiceStub(
-                        companies_channel,
+                        channels.companies,
                     ),
                 ),
                 transactions_client=transactions.GrpcClient(
                     transactions_pb2_grpc.TransactionsServiceStub(
-                        transactions_channel,
+                        channels.transactions,
                     ),
                 ),
                 payments_client=payments.GrpcClient(
                     PaymentsServiceStub(
-                        payments_channel,
+                        channels.payments,
                     ),
                 ),
             ),

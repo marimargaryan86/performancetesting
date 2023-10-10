@@ -1,3 +1,7 @@
+import asyncio
+from typing import NamedTuple
+
+from grpc import aio
 from starlette.middleware import Middleware, authentication
 
 from snowfall.adapter import authentication as auth_adapter
@@ -35,21 +39,51 @@ from snowfall.stdlib.integration.starlette import application as starlette
 from snowfall.stdlib.integration.starlette import authentication as stdlib_auth
 from snowfall.stdlib.integration.starlette import handlers
 from snowfall.stdlib.persistence import cursor, filesystem
-from snowfall.stdlib.service import application
-from snowfall.stdlib.transport.grpc.client import create_channel
+from snowfall.stdlib.service import application, grpc_factory
+
+
+class _Channels(NamedTuple):
+    places: aio.Channel
+    orders: aio.Channel
+    offers: aio.Channel
+    trips: aio.Channel
+    schedules: aio.Channel
+    authentication: aio.Channel
 
 
 async def _http(
     app: application.Application[bootstrap.Settings],
 ) -> None:
-    places_channel = create_channel(app.settings.places_address)
-    orders_channel = create_channel(app.settings.orders_address)
-    offers_channel = create_channel(app.settings.offers_address)
-    trips_channel = create_channel(app.settings.trips_address)
-    schedules_channel = create_channel(app.settings.schedules_address)
-    authentication_channel = create_channel(app.settings.authentication_address)
+    channels = _Channels(
+        *await asyncio.gather(
+            grpc_factory.make_insecure_channel(
+                app,
+                app.settings.places_address,
+            ),
+            grpc_factory.make_insecure_channel(
+                app,
+                app.settings.orders_address,
+            ),
+            grpc_factory.make_insecure_channel(
+                app,
+                app.settings.offers_address,
+            ),
+            grpc_factory.make_insecure_channel(
+                app,
+                app.settings.trips_address,
+            ),
+            grpc_factory.make_insecure_channel(
+                app,
+                app.settings.schedules_address,
+            ),
+            grpc_factory.make_insecure_channel(
+                app,
+                app.settings.authentication_address,
+            ),
+        ),
+    )
     oath_client = oauth_pb2_grpc.OAuthServiceStub(
-        authentication_channel,
+        channels.authentication,
     )
 
     asgi_app = starlette.create_starlette_app(
@@ -57,61 +91,61 @@ async def _http(
             bootstrap.create_dependencies(
                 authentication_client=auth_adapter.GrpcClient(
                     authentication_pb2_grpc.AuthenticationServiceStub(
-                        authentication_channel,
+                        channels.authentication,
                     ),
                 ),
                 legs_client=legs.GrpcClient(
                     schedules=schedules_pb2_grpc.ScheduleServiceStub(
-                        schedules_channel,
+                        channels.schedules,
                     ),
                 ),
                 locations_client=locations.GrpcClient(
-                    places_pb2_grpc.LocationsServiceStub(places_channel),
+                    places_pb2_grpc.LocationsServiceStub(channels.places),
                 ),
                 places_client=places.GrpcClient(
-                    places_pb2_grpc.PlacesServiceStub(places_channel),
+                    places_pb2_grpc.PlacesServiceStub(channels.places),
                 ),
                 price_quotes_client=price_quotes.GrpcClient(
                     price_quotes=grpc_pb2_grpc.PriceQuoteServiceStub(
-                        offers_channel,
+                        channels.offers,
                     ),
                 ),
                 trip_searches_client=trip_searches.GrpcClient(
-                    trips=trips_pb2_grpc.TripServiceStub(trips_channel),
+                    trips=trips_pb2_grpc.TripServiceStub(channels.trips),
                     trip_searches=trips_pb2_grpc.TripSearchServiceStub(
-                        trips_channel,
+                        channels.trips,
                     ),
                 ),
                 trips_client=trips.GrpcClient(
-                    trips_pb2_grpc.TripServiceStub(trips_channel),
+                    trips_pb2_grpc.TripServiceStub(channels.trips),
                 ),
                 trip_candidate_searches_client=trip_candidate_searches.GrpcClient(
                     trip_candidate_searches=trips_pb2_grpc.TripCandidateSearchServiceStub(
-                        trips_channel,
+                        channels.trips,
                     ),
                 ),
                 trip_candidates_client=trip_candidates.GrpcClient(
                     trip_candidates=trips_pb2_grpc.TripCandidateServiceStub(
-                        trips_channel,
+                        channels.trips,
                     ),
                 ),
                 offers_client=offers.GrpcClient(
-                    offers=grpc_pb2_grpc.OfferServiceStub(offers_channel),
+                    offers=grpc_pb2_grpc.OfferServiceStub(channels.offers),
                 ),
                 offer_searches_client=offer_searches.GrpcClient(
                     offer_searches=grpc_pb2_grpc.OfferSearchServiceStub(
-                        offers_channel,
+                        channels.offers,
                     ),
                 ),
                 orders_client=orders.GrpcClient(
-                    orders=orders_pb2_grpc.OrderServiceStub(orders_channel),
+                    orders=orders_pb2_grpc.OrderServiceStub(channels.orders),
                 ),
                 segments_client=segments.GrpcClient(
-                    segments=trips_pb2_grpc.TripServiceStub(trips_channel),
+                    segments=trips_pb2_grpc.TripServiceStub(channels.trips),
                 ),
                 schedules_client=schedules.GrpcClient(
                     schedules=schedules_pb2_grpc.ScheduleServiceStub(
-                        schedules_channel,
+                        channels.schedules,
                     ),
                 ),
             ),

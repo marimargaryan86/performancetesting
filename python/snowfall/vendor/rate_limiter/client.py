@@ -1,10 +1,7 @@
 import asyncio
 import time
-from types import TracebackType
-from typing import Self
 
 from snowfall.stdlib.logging import stdout
-from snowfall.stdlib.transport.grpc.client import create_channel
 from snowfall.vendor.rate_limiter.config import (
     RateLimitConfig,
     RateLimitConfigsApi,
@@ -26,11 +23,10 @@ SECOND = 1000
 class Client(object):
     def __init__(
         self,
-        grpc_host: str,
+        stub: V1Stub,
         config: RateLimitConfig,
     ):
-        self._channel = create_channel(grpc_host)
-        self._stub = V1Stub(self._channel)
+        self._stub = stub
         self._config: RateLimitConfigsApi
         self._logger = stdout.get_logger()
 
@@ -52,22 +48,6 @@ class Client(object):
             duration=duration,
             algorithm=algorithm,
             behavior=behavior,
-        )
-
-    async def __aenter__(self) -> Self:
-        await self._channel.__aenter__()
-        return self
-
-    async def __aexit__(
-        self,
-        exc_type: type[BaseException] | None,
-        exc_value: BaseException | None,
-        traceback: TracebackType | None,
-    ) -> None:
-        await self._channel.__aexit__(
-            exc_type,
-            exc_value,
-            traceback,
         )
 
     async def rate_limit(self, timeout: float = 0, hits: int = 1) -> None:

@@ -20,9 +20,8 @@ from snowfall.project.junction.go.service.places.grpc import (
 )
 from snowfall.service.geodata.v1 import geocoding_pb2_grpc
 from snowfall.stdlib.persistence import filesystem
-from snowfall.stdlib.service import application
+from snowfall.stdlib.service import application, grpc_factory
 from snowfall.stdlib.transport.grpc import server
-from snowfall.stdlib.transport.grpc.client import create_channel
 
 
 class _CitiesSettings(application.Settings):
@@ -44,7 +43,7 @@ async def _generate_cities(app: application.Application[_CitiesSettings]) -> Non
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
     geocoding_service = geocoding_pb2_grpc.GeocodingServiceStub(
-        create_channel(app.settings.geodata_address),
+        await grpc_factory.make_insecure_channel(app, app.settings.geodata_address),
     )
 
     cities_csv_path = filesystem.resource_path(
@@ -116,7 +115,7 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
     geocoding_service = geocoding_pb2_grpc.GeocodingServiceStub(
-        create_channel(app.settings.geodata_address),
+        await grpc_factory.make_insecure_channel(app, app.settings.geodata_address),
     )
     grpc_server = server.create_server(
         app.settings.grpc_address,

@@ -26,9 +26,14 @@ from snowfall.project.junction.go.service.offers.grpc import (
     PriceQuoteService,
 )
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
-from snowfall.stdlib.service import amqp_factory, application, redis_factory
+from snowfall.stdlib.service import (
+    amqp_factory,
+    application,
+    grpc_factory,
+    redis_factory,
+)
 from snowfall.stdlib.transport.amqp import consumer, producer, trackable, types
-from snowfall.stdlib.transport.grpc import client, server
+from snowfall.stdlib.transport.grpc import server
 from snowfall.vendor.junction.auth import UserAuth
 from snowfall.vendor.junction.pay.client import Client as PayClient
 
@@ -156,7 +161,10 @@ async def _import(app: application.Application[_ImportSettings]) -> None:
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
 
-    gateway_channel = client.create_channel(app.settings.gateway_address)
+    gateway_channel = await grpc_factory.make_insecure_channel(
+        app,
+        app.settings.gateway_address,
+    )
     http_client = await app.stack.enter_async_context(httpx.AsyncClient())
     connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
     redis_client = await redis_factory.make_client(

@@ -8,8 +8,7 @@ import httpx
 from snowfall.project.junction.service.providers.benerail import config
 from snowfall.service.geodata.v1 import geocoding_pb2, geocoding_pb2_grpc
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
-from snowfall.stdlib.service import application
-from snowfall.stdlib.transport.grpc import client as grpc_client
+from snowfall.stdlib.service import application, grpc_factory
 from snowfall.stdlib.v1 import latlng_pb2
 from snowfall.vendor.benerail import client
 from snowfall.vendor.benerail.models.enumeration import position, response
@@ -34,7 +33,7 @@ async def dump_stations(
 
         place_responses = await benerail_client.place.get_all_places("SEARCHABLE_BS:Y")
         geocoder = geocoding_pb2_grpc.GeocodingServiceStub(
-            grpc_client.create_channel(app.settings.geodata_address),
+            await grpc_factory.make_insecure_channel(app, app.settings.geodata_address),
         )
         await _to_stations(
             station_responses=place_responses,

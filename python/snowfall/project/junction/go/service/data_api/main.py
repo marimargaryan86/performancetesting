@@ -3,15 +3,14 @@ from snowfall.project.junction.go.service.data_api.routes import router
 from snowfall.service.geodata.v1 import geocoding_pb2_grpc
 from snowfall.stdlib.integration.starlette import application as starlette
 from snowfall.stdlib.persistence import filesystem
-from snowfall.stdlib.service import application
-from snowfall.stdlib.transport.grpc import client as grpc_client
+from snowfall.stdlib.service import application, grpc_factory
 
 
 async def _http(
     app: application.Application[bootstrap.Settings],
 ) -> None:
     geocoder = geocoding_pb2_grpc.GeocodingServiceStub(
-        grpc_client.create_channel(app.settings.geodata_address),
+        await grpc_factory.make_insecure_channel(app, app.settings.geodata_address),
     )
     asgi_app = starlette.create_starlette_app(
         routes=router.get_routes(

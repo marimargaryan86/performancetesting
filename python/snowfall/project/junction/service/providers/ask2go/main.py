@@ -37,7 +37,7 @@ from snowfall.stdlib import h3
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import amqp_factory, redis_factory
+from snowfall.stdlib.service import amqp_factory, grpc_factory, redis_factory
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer, types
 from snowfall.vendor.ask2go import client
@@ -120,11 +120,12 @@ async def _offers(
     )
     logging.register(http_client)
     metrics.register(http_client)
-    rate_limit_client = await stack.enter_async_context(
-        RateLimitClient(
+    rate_limit_client = RateLimitClient(
+        await grpc_factory.make_insecure_channel(
+            app,
             app.settings.rate_limiter_grpc_host,
-            app.settings.rate_limiter_service_configs["ask2go"],
         ),
+        app.settings.rate_limiter_service_configs["ask2go"],
     )
 
     ask2go_client = client.Ask2GoClient(
@@ -247,11 +248,12 @@ async def _price_quotes(app: service.Application[_PriceQuotesSettings]) -> None:
     )
     logging.register(http_client)
     metrics.register(http_client)
-    rate_limit_client = await app.stack.enter_async_context(
-        RateLimitClient(
+    rate_limit_client = RateLimitClient(
+        await grpc_factory.make_insecure_channel(
+            app,
             app.settings.rate_limiter_grpc_host,
-            app.settings.rate_limiter_service_configs["ask2go"],
         ),
+        app.settings.rate_limiter_service_configs["ask2go"],
     )
 
     redis_client = await redis_factory.make_client(

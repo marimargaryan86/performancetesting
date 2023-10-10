@@ -14,8 +14,10 @@ from snowfall.stdlib import h3
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.stdlib.service import grpc_factory
 from snowfall.vendor.ba_ndc import client
 from snowfall.vendor.ba_ndc.models import request_offer_search_schemas
+from snowfall.vendor.rate_limiter import gubernator_pb2_grpc
 from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
 _Impl = offers.OfferSearchImplementation[
@@ -38,17 +40,23 @@ async def offers_factory(  # noqa: WPS210
             timeout=app.settings.http_timeout,
         ),
     )
-    rate_limit_client = await stack.enter_async_context(
-        RateLimitClient(
-            app.settings.rate_limiter_grpc_host,
-            app.settings.rate_limiter_service_configs["ba-ndc"],
+    rate_limit_client = RateLimitClient(
+        gubernator_pb2_grpc.V1Stub(
+            await grpc_factory.make_insecure_channel(
+                app,
+                app.settings.rate_limiter_grpc_host,
+            ),
         ),
+        app.settings.rate_limiter_service_configs["ba-ndc"],
     )
-    rate_limit_client_daily = await stack.enter_async_context(
-        RateLimitClient(
-            app.settings.rate_limiter_grpc_host,
-            app.settings.rate_limiter_service_configs["ba-ndc-daily"],
+    rate_limit_client_daily = RateLimitClient(
+        gubernator_pb2_grpc.V1Stub(
+            await grpc_factory.make_insecure_channel(
+                app,
+                app.settings.rate_limiter_grpc_host,
+            ),
         ),
+        app.settings.rate_limiter_service_configs["ba-ndc-daily"],
     )
     logging.register(http_client)
     metrics.register(http_client)

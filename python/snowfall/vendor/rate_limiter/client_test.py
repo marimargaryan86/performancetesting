@@ -3,7 +3,9 @@ import time
 from unittest import mock
 
 import pytest
+from grpc import aio
 
+from snowfall.vendor.rate_limiter import gubernator_pb2_grpc
 from snowfall.vendor.rate_limiter.client import SECOND
 from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 from snowfall.vendor.rate_limiter.config import RateLimitConfig
@@ -33,7 +35,10 @@ def create_response(status: str, offset: float = 10) -> GetRateLimitsResp:
 
 
 async def test_rates_limit_was_under_limit() -> None:
-    client = RateLimitClient("dummy_host:1111", config)
+    client = RateLimitClient(
+        gubernator_pb2_grpc.V1Stub(aio.insecure_channel("")),
+        config,
+    )
 
     with mock.patch.object(
         client._stub,  # noqa: SLF001
@@ -46,7 +51,10 @@ async def test_rates_limit_was_under_limit() -> None:
 
 
 async def test_rates_limit_was_over_limit() -> None:
-    client = RateLimitClient("dummy_host:1111", config)
+    client = RateLimitClient(
+        gubernator_pb2_grpc.V1Stub(aio.insecure_channel("")),
+        config,
+    )
 
     first_resp = create_response("OVER_LIMIT", 1)
     second_resp = create_response("UNDER_LIMIT")
@@ -62,7 +70,10 @@ async def test_rates_limit_was_over_limit() -> None:
 
 
 async def test_rates_limit_raises_an_exception() -> None:
-    client = RateLimitClient("dummy_host:1111", config)
+    client = RateLimitClient(
+        gubernator_pb2_grpc.V1Stub(aio.insecure_channel("")),
+        config,
+    )
 
     with mock.patch.object(
         client._stub,  # noqa: SLF001
@@ -79,7 +90,10 @@ async def test_rates_limit_raises_an_exception() -> None:
 async def test_rate_limit_raises_smaller_reset(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
-    client = RateLimitClient("dummy_host:1111", config)
+    client = RateLimitClient(
+        gubernator_pb2_grpc.V1Stub(aio.insecure_channel("")),
+        config,
+    )
     sleep = asyncio.sleep
 
     with mock.patch.object(
@@ -101,7 +115,10 @@ async def test_rate_limit_raises_smaller_reset(
 async def test_rate_limit_no_timeout(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
-    client = RateLimitClient("dummy_host:1111", config)
+    client = RateLimitClient(
+        gubernator_pb2_grpc.V1Stub(aio.insecure_channel("")),
+        config,
+    )
 
     with mock.patch.object(
         client._stub,  # noqa: SLF001

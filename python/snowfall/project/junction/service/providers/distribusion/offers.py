@@ -18,8 +18,10 @@ from snowfall.project.junction.service.providers.distribusion.v1 import amqp_pb2
 from snowfall.stdlib import h3
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.stdlib.service import grpc_factory
 from snowfall.vendor.distribusion import client
 from snowfall.vendor.distribusion.models import criterias
+from snowfall.vendor.rate_limiter import gubernator_pb2_grpc
 from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
 _OFFERS = "offers"
@@ -44,11 +46,14 @@ async def offers_factory(
     )
     logging.register(http_client)
     metrics.register(http_client)
-    rate_limit_client = await stack.enter_async_context(
-        RateLimitClient(
-            app.settings.rate_limiter_grpc_host,
-            app.settings.rate_limiter_service_configs["distribusion"],
+    rate_limit_client = RateLimitClient(
+        gubernator_pb2_grpc.V1Stub(
+            await grpc_factory.make_insecure_channel(
+                app,
+                app.settings.rate_limiter_grpc_host,
+            ),
         ),
+        app.settings.rate_limiter_service_configs["distribusion"],
     )
 
     distribusion_client = client.DistribusionClient(

@@ -5,8 +5,7 @@ import pydantic
 from snowfall.project.junction.service.routes import nodes, repositories
 from snowfall.service.geodata.v1 import geocoding_pb2_grpc
 from snowfall.stdlib.persistence import filesystem
-from snowfall.stdlib.service import application, mongo_factory
-from snowfall.stdlib.transport.grpc import client
+from snowfall.stdlib.service import application, grpc_factory, mongo_factory
 
 
 class ImportSettings(application.Settings):
@@ -16,7 +15,7 @@ class ImportSettings(application.Settings):
 
 async def import_nodes(app: application.Application[ImportSettings]) -> None:
     geocoding_service = geocoding_pb2_grpc.GeocodingServiceStub(
-        client.create_channel(app.settings.geodata_address),
+        await grpc_factory.make_insecure_channel(app, app.settings.geodata_address),
     )
     node_importer = nodes.NodeImporter(
         geodata=geocoding_service,

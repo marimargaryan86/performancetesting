@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import ipaddress
 import random
@@ -23,10 +24,14 @@ from snowfall.project.junction.go.service.trips.grpc import (
     TripSearchService,
     TripService,
 )
-from snowfall.stdlib.service import amqp_factory, application, redis_factory
+from snowfall.stdlib.service import (
+    amqp_factory,
+    application,
+    grpc_factory,
+    redis_factory,
+)
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.stdlib.transport.grpc import server
-from snowfall.stdlib.transport.grpc.client import create_channel
 
 _TRIPS = "trips"
 _DEFAULT_TTL = datetime.timedelta(minutes=15)
@@ -72,7 +77,7 @@ async def _consume(app: application.Application[_ConsumeSettings]) -> None:
             binds=[(types.Exchange(_TRIPS), "trips.search")],
         ),
         planner=planner_pb2_grpc.PlannerServiceStub(
-            create_channel(app.settings.planner_address),
+            await grpc_factory.make_insecure_channel(app, app.settings.planner_address),
         ),
         trip_search_repository=trips.TripSearchRepository(
             mongo[_TRIPS]["trip_searches"],
@@ -95,10 +100,18 @@ async def _consume_trip_candidate_search_tasks(
         dsn=app.settings.redis_dsn,
         decode_responses=False,
     )
-    offers_channel = create_channel(app.settings.offers_address)
-    schedules_channel = create_channel(app.settings.schedules_address)
+    offers_channel, schedules_channel = await asyncio.gather(
+        grpc_factory.make_insecure_channel(
+            app,
+            app.settings.offers_address,
+        ),
+        grpc_factory.make_insecure_channel(
+            app,
+            app.settings.schedules_address,
+        ),
+    )
     planner = planner_pb2_grpc.PlannerServiceStub(
-        create_channel(app.settings.planner_address),
+        await grpc_factory.make_insecure_channel(app, app.settings.planner_address),
     )
     trips_db = mongo[_TRIPS]
     trip_repository = trips.TripRepository(trips_db[_TRIPS])
@@ -145,7 +158,10 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
 
-    offers_channel = create_channel(app.settings.offers_address)
+    offers_channel = await grpc_factory.make_insecure_channel(
+        app,
+        app.settings.offers_address,
+    )
 
     trips_db = mongo[_TRIPS]
     connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)

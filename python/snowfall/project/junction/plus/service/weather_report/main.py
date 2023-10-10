@@ -11,8 +11,7 @@ from snowfall.project.junction.plus.service.weather_report import open_weather_m
 from snowfall.project.junction.plus.service.weather_report.cron import (
     WeatherReportCronJob,
 )
-from snowfall.stdlib.service import application
-from snowfall.stdlib.transport.grpc.client import create_channel
+from snowfall.stdlib.service import application, grpc_factory
 
 
 class _CronSettings(application.Settings):
@@ -24,7 +23,10 @@ class _CronSettings(application.Settings):
 async def _cron_run(
     app: application.Application[_CronSettings],
 ) -> None:
-    notifications_channel = create_channel(app.settings.notifications_address)
+    notifications_channel = await grpc_factory.make_insecure_channel(
+        app,
+        app.settings.notifications_address,
+    )
 
     job = WeatherReportCronJob(
         monitoring_rules=monitoring_rules.GrpcClient(

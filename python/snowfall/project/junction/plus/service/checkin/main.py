@@ -10,9 +10,8 @@ from snowfall.project.junction.plus.service.checkin.grpc import CheckinService
 from snowfall.project.junction.plus.service.notifications.v1alpha import (
     grpc_pb2_grpc as notifications_pb2_grpc,
 )
-from snowfall.stdlib.service import application
+from snowfall.stdlib.service import application, grpc_factory
 from snowfall.stdlib.transport.grpc import server
-from snowfall.stdlib.transport.grpc.client import create_channel
 
 
 class _GrpcSettings(application.Settings):
@@ -40,7 +39,10 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
 async def _cron_run(
     app: application.Application[_CronSettings],
 ) -> None:
-    notifications_channel = create_channel(app.settings.notifications_address)
+    notifications_channel = await grpc_factory.make_insecure_channel(
+        app,
+        app.settings.notifications_address,
+    )
 
     job = CheckinCronJob(
         monitoring_rules=monitoring_rules.GrpcClient(

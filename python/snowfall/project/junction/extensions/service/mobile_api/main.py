@@ -1,5 +1,6 @@
 import random
 from functools import partial
+from typing import cast
 
 import aiosmtplib
 import httpx
@@ -30,20 +31,22 @@ from snowfall.stdlib.instrumentation.httpx import metrics
 from snowfall.stdlib.integration.starlette import application as starlette
 from snowfall.stdlib.integration.starlette import authentication as starlette_auth
 from snowfall.stdlib.integration.starlette import handlers
-from snowfall.stdlib.service import application, redis_factory
-from snowfall.stdlib.transport.grpc import client as grpc_transport_client
+from snowfall.stdlib.service import application, grpc_factory, redis_factory
 from snowfall.stdlib.transport.http import auth
 from snowfall.vendor.junction import client as base_client
 from snowfall.vendor.junction.go import client
 
 
-def _get_httpx_auth_and_middlewares(
-    settings: bootstrap.Settings,
+async def _get_httpx_auth_and_middlewares(
+    app: application.Application[bootstrap.Settings],
 ) -> tuple[httpx.Auth, list[Middleware]]:
     httpx_auth_method: httpx.Auth
 
-    if settings.cookie_auth_enabled:
-        if not settings.authentication_address or not settings.junction_private_key:
+    if app.settings.cookie_auth_enabled:
+        is_configured = (
+            app.settings.authentication_address and app.settings.junction_private_key
+        )
+        if not is_configured:
             raise RuntimeError("Missing required configuration.")
 
         httpx_auth_method = auth.TemporaryTokenAuth()
@@ -53,8 +56,9 @@ def _get_httpx_auth_and_middlewares(
                 backend=starlette_auth.CookieAuthenticationBackend(
                     cookie_to_user=auth_adapter.session_cookie_resolver(
                         session_client=sessions_pb2_grpc.SessionServiceStub(
-                            grpc_transport_client.create_channel(
-                                settings.authentication_address,
+                            await grpc_factory.make_insecure_channel(
+                                app,
+                                cast(str, app.settings.authentication_address),
                             ),
                         ),
                     ),
@@ -65,7 +69,7 @@ def _get_httpx_auth_and_middlewares(
                 middleware.HubHackBackend,
                 jwt_auth=httpx_auth_method,
                 jwt_encoder=jwt.Encoder(
-                    private_key=settings.junction_private_key,
+                    private_key=app.settings.junction_private_key,
                     algorithm="RS256",
                 ),
             ),
@@ -73,20 +77,20 @@ def _get_httpx_auth_and_middlewares(
     else:
         httpx_auth_method = auth.ClientCredentialsAuth(
             client=httpx_client.AsyncOAuth2Client(
-                client_id=settings.ory_client_id,
-                client_secret=settings.ory_client_secret,
+                client_id=app.settings.ory_client_id,
+                client_secret=app.settings.ory_client_secret,
             ),
-            token_endpoint=str(settings.ory_client_token_endpoint),
+            token_endpoint=str(app.settings.ory_client_token_endpoint),
         )
         custom_middlewares = [
             Middleware(
                 authentication.AuthenticationMiddleware,
                 backend=middleware.AuthenticationBackend(
                     decoder=jwt.Decoder(
-                        public_key=settings.jwt_public_key,
+                        public_key=app.settings.jwt_public_key,
                         algorithms=["RS256"],
                     ),
-                    token_version=settings.jwt_token_version,
+                    token_version=app.settings.jwt_token_version,
                 ),
                 on_error=handlers.auth_error_handler,
             ),
@@ -99,7 +103,7 @@ async def _http(
     app: application.Application[bootstrap.Settings],
 ) -> None:
     stripe.api_key = app.settings.stripe_api_key
-    httpx_auth, custom_middlewares = _get_httpx_auth_and_middlewares(app.settings)
+    httpx_auth, custom_middlewares = await _get_httpx_auth_and_middlewares(app)
     junction_httpx_client = base_client.create_httpx_client(
         base_url=app.settings.junction_api_address,
         auth=httpx_auth,
