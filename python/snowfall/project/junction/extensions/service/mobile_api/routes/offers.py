@@ -4,6 +4,7 @@ import re
 import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
+from snowfall.project.junction.extensions.service.mobile_api import handlers
 from snowfall.stdlib.integration.starlette import (
     models,
     pagination_helpers,
@@ -83,8 +84,10 @@ class OfferSearch(endpoints.HTTPEndpoint):
             ),
         )
         response_body = models.Body(data=offer_search["data"])
+
         if offer_search.get("included"):
-            response_body.included = offer_search.get("included")
+            response_body.included = handlers.get_includes_from_response(offer_search)
+
         return models.JsonApiResponse(response_body)
 
 
@@ -127,6 +130,10 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
                 ),
             },
         )
+
         if offers_response.get("included"):
-            response_body.included = offers_response.get("included")
+            response_body.included = handlers.get_includes_from_response(
+                offers_response,
+            )
+
         return models.JsonApiResponse(response_body)

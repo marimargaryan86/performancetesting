@@ -1,7 +1,10 @@
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
+from typing import Any
 
 import httpx
 from starlette import requests, responses
+
+from snowfall.stdlib.integration.starlette import models
 
 
 def go_status_error_handler(
@@ -15,3 +18,12 @@ def go_status_error_handler(
             exc.response.status_code,
         )
     raise exc
+
+
+def get_includes_from_response(
+    response: Mapping[str, Any],
+) -> list[models.Resource]:
+    if not response.get("included"):
+        return []
+
+    return [models.Resource(**include) for include in response.get("included", [])]

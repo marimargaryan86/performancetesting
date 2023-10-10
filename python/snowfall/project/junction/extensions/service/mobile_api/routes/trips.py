@@ -4,6 +4,7 @@ import lagom
 from dateutil import parser
 from starlette import endpoints, requests, responses, status
 
+from snowfall.project.junction.extensions.service.mobile_api import handlers
 from snowfall.stdlib.integration.starlette import (
     models,
     pagination_helpers,
@@ -71,6 +72,8 @@ class TripSearchesTrips(endpoints.HTTPEndpoint):
                 ),
             },
         )
+
         if trip_search.get("included"):
-            response_body.included = trip_search.get("included")
+            response_body.included = handlers.get_includes_from_response(trip_search)
+
         return models.JsonApiResponse(response_body)

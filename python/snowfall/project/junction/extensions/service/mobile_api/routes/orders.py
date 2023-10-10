@@ -10,6 +10,7 @@ from starlette import endpoints, exceptions, requests, responses, status
 from starlette.background import BackgroundTask
 
 from snowfall.project.junction.extensions.service.mobile_api import (
+    handlers,
     payments,
     plus_client,
     repository,
@@ -101,7 +102,10 @@ class Order(endpoints.HTTPEndpoint):
         response_body = stdlib_models.Body(data=order_response["data"])
 
         if order_response.get("included"):
-            response_body.included = order_response.get("included")
+            response_body.included = handlers.get_includes_from_response(
+                order_response,
+            )
+
         return stdlib_models.JsonApiResponse(response_body)
 
 
@@ -139,12 +143,15 @@ class Orders(endpoints.HTTPEndpoint):
         )
         for order_response in resps:
             user_orders["data"].append(order_response["data"])
-            included = order_response.get("included")
-            if included:
-                user_orders["included"].extend(included)
+            user_orders["included"].extend(
+                handlers.get_includes_from_response(order_response),
+            )
 
         response_body = stdlib_models.Body(data=user_orders["data"])
-        response_body.included = user_orders["included"] or None
+
+        if user_orders["included"]:
+            response_body.included = user_orders["included"]
+
         return stdlib_models.JsonApiResponse(response_body)
 
     @validators.voucher_validator
@@ -312,8 +319,11 @@ class CancellationRequest(endpoints.HTTPEndpoint):
             ),
         )
         response_body = stdlib_models.Body(data=cancellation_response["data"])
+
         if cancellation_response.get("included"):
-            response_body.included = cancellation_response.get("included")
+            response_body.included = handlers.get_includes_from_response(
+                cancellation_response,
+            )
 
         return stdlib_models.JsonApiResponse(
             response_body,
