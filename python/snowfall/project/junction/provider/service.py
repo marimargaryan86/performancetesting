@@ -13,7 +13,7 @@ from redis import asyncio as aioredis
 
 from snowfall.project.junction.provider import bookings, meta, offers, trips
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import amqp_factory, application
+from snowfall.stdlib.service import amqp_factory, application, redis_factory
 from snowfall.stdlib.transport.grpc import server as grpc_server
 from snowfall.stdlib.transport.grpc import service as grpc_service
 
@@ -29,7 +29,7 @@ class ProviderSettings(application.Settings):
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
     provider_company_id: str
-    redis_dsn: pydantic.AnyUrl
+    redis_dsn: pydantic.RedisDsn
     reseller_providers: dict[str, list[str]]
 
 
@@ -48,7 +48,7 @@ if TYPE_CHECKING:
         [
             application.Application[_Settings],
             abc.AbstractConnection,
-            aioredis.Redis[bytes],
+            aioredis.Redis[bytes],  # TODO: accept Redis client instead.
             contextlib.AsyncExitStack,
         ],
         Awaitable[
@@ -83,12 +83,10 @@ def _grpc_command(  # noqa: WPS210, WPS217
                 provider_name=meta_implementation.name,
             ),
         ]
-        redis_conn: aioredis.Redis[bytes] = await app.stack.enter_async_context(
-            aioredis.from_url(
-                str(app.settings.redis_dsn),
-                decode_responses=False,
-                retry_on_error=[aioredis.ConnectionError],
-            ).client(),
+        redis_conn = await redis_factory.make_connection(
+            app=app,
+            dsn=app.settings.redis_dsn,
+            decode_responses=False,
         )
         connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
 
@@ -145,12 +143,10 @@ def _offers_command(
 ) -> application.Callback[_Settings]:
     async def wrapper(app: application.Application[_Settings]) -> None:
         meta_implementation = await meta_factory()
-        redis_conn: aioredis.Redis[bytes] = await app.stack.enter_async_context(
-            aioredis.from_url(
-                str(app.settings.redis_dsn),
-                decode_responses=False,
-                retry_on_error=[aioredis.ConnectionError],
-            ).client(),
+        redis_conn = await redis_factory.make_connection(
+            app=app,
+            dsn=app.settings.redis_dsn,
+            decode_responses=False,
         )
         connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
 

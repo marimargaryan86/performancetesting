@@ -5,16 +5,13 @@ from collections.abc import Sequence
 import httpx
 from motor import motor_asyncio
 from pydantic import AnyUrl, RedisDsn
-from redis import asyncio as aioredis
 
 from snowfall.project.pay.service.rates import cache
 from snowfall.project.pay.service.rates.backup_rates_cron import UpdateBackUpRatesJob
 from snowfall.project.pay.service.rates.grpc import RatesService
 from snowfall.project.pay.service.rates.rates import BackUpRatesRepository
 from snowfall.stdlib.instrumentation.httpx import metrics
-from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import application
-from snowfall.stdlib.service.redis_factory import make_connection
+from snowfall.stdlib.service import application, redis_factory
 from snowfall.stdlib.transport.grpc import server
 from snowfall.vendor.currency_cloud.client import CurrencyCloudAuth, PaymentClient
 
@@ -23,7 +20,7 @@ class _GrpcSettings(application.Settings):
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
     mongo_dsn: Sequence[AnyUrl]
-    redis_dsn: Sequence[AnyUrl]
+    redis_dsn: RedisDsn
 
 
 class _BackUpCronJobSettings(application.Settings):
@@ -39,13 +36,10 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
-    redis_client = redis.Client[str](
-        aioredis.from_url(
-            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
-            decode_responses=True,
-            retry_on_error=[aioredis.ConnectionError],
-        ).client(),
-        prefix=app.name,
+    redis_client = await redis_factory.make_client(
+        app=app,
+        dsn=app.settings.redis_dsn,
+        decode_responses=True,
     )
     grpc_server = server.create_server(
         app.settings.grpc_address,
@@ -68,14 +62,10 @@ async def _backup_rates_cron_run(
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
-    redis_conn = await make_connection(
-        app,
-        app.settings.redis_dsn,
+    redis_client = await redis_factory.make_client(
+        app=app,
+        dsn=app.settings.redis_dsn,
         decode_responses=True,
-    )
-    redis_client = redis.Client[str](
-        redis_conn,
-        prefix=app.name,
     )
 
     job = UpdateBackUpRatesJob(

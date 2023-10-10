@@ -1,12 +1,8 @@
-import random
-
 import httpx
-from redis import asyncio as aioredis
 
 from snowfall.project.junction.service.providers.karhoo import cache, config, consumer
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
-from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import amqp_factory, application
+from snowfall.stdlib.service import amqp_factory, application, redis_factory
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer as amqp_producer
 from snowfall.stdlib.transport.amqp import trackable, types
@@ -25,12 +21,10 @@ async def offers(
     metrics.register(http_client)
     amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
 
-    redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
-        aioredis.from_url(
-            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
-            decode_responses=False,
-            retry_on_error=[aioredis.ConnectionError],
-        ).client(),
+    redis_client = await redis_factory.make_client(
+        app=app,
+        dsn=app.settings.redis_dsn,
+        decode_responses=False,
     )
     karhoo_client = client.KarhooClient(
         base_url=str(app.settings.api_base_url),
@@ -59,13 +53,10 @@ async def offers(
             exchange=types.Exchange("offers"),
         ),
         karhoo_client=karhoo_client,
-        redis=redis.Client[bytes](
-            redis=redis_connection,
-            prefix=app.name,
-        ),
+        redis=redis_client,
         ttl=app.settings.ttl,
         offers_cache=cache.OffersCache(
-            client=redis.Client(redis_connection, prefix=app.name),
+            client=redis_client,
         ),
         polling_wait_time_in_seconds=app.settings.polling_wait_time_seconds,
         polling_retries_attempts=app.settings.polling_retries_attempts,

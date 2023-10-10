@@ -1,10 +1,6 @@
-import random
-from collections.abc import Sequence
-
 import aiosmtplib
 import httpx
 import pydantic
-from redis import asyncio as aioredis
 
 from snowfall.project.junction.go.service.orders.v1 import amqp_pb2
 from snowfall.project.junction.service.providers.ba_ndc import (
@@ -16,8 +12,7 @@ from snowfall.project.junction.service.providers.ba_ndc import (
 from snowfall.project.junction.service.providers.ba_ndc.booking import BookingHandler
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence import filesystem
-from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import amqp_factory, application
+from snowfall.stdlib.service import amqp_factory, application, redis_factory
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.vendor.ba_ndc import client
 from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
@@ -26,7 +21,7 @@ from snowfall.vendor.rate_limiter.config import RateLimitConfig
 
 class OrdersSettings(config.BaNdcConfig, application.Settings):
     amqp_dsn: pydantic.AmqpDsn
-    redis_dsn: Sequence[pydantic.AnyUrl]
+    redis_dsn: pydantic.RedisDsn
     smtp_dsn: pydantic.AnyUrl
     smtp_sender: pydantic.EmailStr
     smtp_recipient: pydantic.EmailStr
@@ -45,12 +40,10 @@ async def orders(  # noqa: WPS210, WPS217
     )
     logging.register(http_client)
     metrics.register(http_client)
-    redis_connection = await app.stack.enter_async_context(
-        aioredis.from_url(
-            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
-            decode_responses=False,
-            retry_on_error=[aioredis.ConnectionError],
-        ).client(),
+    redis_client = await redis_factory.make_client(
+        app=app,
+        dsn=app.settings.redis_dsn,
+        decode_responses=False,
     )
     amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
     rate_limit_client = await app.stack.enter_async_context(
@@ -101,7 +94,7 @@ async def orders(  # noqa: WPS210, WPS217
             booking_storage=storage,
         ),
         offer_cache=cache.OfferCache(
-            client=redis.Client(redis_connection, prefix=app.name),
+            client=redis_client,
         ),
     ).consume()
 

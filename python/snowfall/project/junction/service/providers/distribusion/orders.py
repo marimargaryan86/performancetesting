@@ -1,8 +1,5 @@
-import random
-
 import aiosmtplib
 import httpx
-from redis import asyncio as aioredis
 
 from snowfall.project.junction.go.service.orders.v1 import amqp_pb2
 from snowfall.project.junction.service.providers.distribusion import (
@@ -16,8 +13,7 @@ from snowfall.project.junction.service.providers.distribusion.booking import (
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence import filesystem
-from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import amqp_factory, application
+from snowfall.stdlib.service import amqp_factory, application, redis_factory
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer, types
 from snowfall.vendor.distribusion import client
@@ -42,12 +38,10 @@ async def orders(  # noqa: WPS217, WPS210
             app.settings.rate_limiter_service_configs["distribusion"],
         ),
     )
-    redis_connection = await app.stack.enter_async_context(
-        aioredis.from_url(
-            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
-            decode_responses=False,
-            retry_on_error=[aioredis.ConnectionError],
-        ).client(),
+    redis_client = await redis_factory.make_client(
+        app=app,
+        dsn=app.settings.redis_dsn,
+        decode_responses=False,
     )
     amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
     distribusion_client = client.DistribusionClient(
@@ -87,7 +81,7 @@ async def orders(  # noqa: WPS217, WPS210
             booking_storage=booking_storage,
         ),
         offer_cache=cache.OffersCache(
-            client=redis.Client(redis_connection, prefix=app.name),
+            client=redis_client,
         ),
     ).consume()
 

@@ -7,7 +7,6 @@ import os
 import pathlib
 import pkgutil
 import random
-from collections.abc import Sequence
 from typing import cast
 
 import aiosmtplib
@@ -41,7 +40,7 @@ from snowfall.stdlib import h3
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import amqp_factory
+from snowfall.stdlib.service import amqp_factory, redis_factory
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer, types
 from snowfall.stdlib.transport.grpc import client as grpc_client
@@ -81,13 +80,13 @@ class _Settings(_SatConfig, service.ProviderSettings):
 
 class _PriceQuoteSettings(service.PriceQuoteSettings):
     amqp_dsn: pydantic.AmqpDsn
-    redis_dsn: Sequence[pydantic.AnyUrl]
+    redis_dsn: pydantic.RedisDsn
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
 
 
 class _OrdersSettings(_SatConfig, service.Settings):
     amqp_dsn: pydantic.AmqpDsn
-    redis_dsn: Sequence[pydantic.AnyUrl]
+    redis_dsn: pydantic.RedisDsn
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
     smtp_dsn: pydantic.AnyUrl
     smtp_sender: pydantic.EmailStr
@@ -99,7 +98,7 @@ class _OrdersSettings(_SatConfig, service.Settings):
 
 class _NotificationsSettings(_SatConfig, service.Settings):
     amqp_dsn: pydantic.AmqpDsn
-    redis_dsn: Sequence[pydantic.AnyUrl]
+    redis_dsn: pydantic.RedisDsn
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
     smtp_dsn: pydantic.AnyUrl
     smtp_sender: pydantic.EmailStr
@@ -233,12 +232,10 @@ async def _orders(  # noqa: WPS217
     logging.register(http_client)
     metrics.register(http_client)
     amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
-    redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
-        aioredis.from_url(
-            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
-            decode_responses=False,
-            retry_on_error=[aioredis.ConnectionError],
-        ).client(),
+    redis_client = await redis_factory.make_client(
+        app=app,
+        dsn=app.settings.redis_dsn,
+        decode_responses=False,
     )
 
     save_a_train_client = client.SATClient(
@@ -254,7 +251,7 @@ async def _orders(  # noqa: WPS217
     )
     # TODO: do we need to call get_token on the save_a_train_client?
     offer_cache = cache.OffersCache(
-        client=redis.Client(redis_connection, prefix=app.name),
+        client=redis_client,
     )
     booking_storage = await app.stack.enter_async_context(
         filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
@@ -304,12 +301,10 @@ async def _orders(  # noqa: WPS217
 
 
 async def _price_quotes(app: service.Application[_PriceQuoteSettings]) -> None:
-    redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
-        aioredis.from_url(
-            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
-            decode_responses=False,
-            retry_on_error=[aioredis.ConnectionError],
-        ).client(),
+    redis_client = await redis_factory.make_client(
+        app=app,
+        dsn=app.settings.redis_dsn,
+        decode_responses=False,
     )
     amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
 
@@ -324,10 +319,10 @@ async def _price_quotes(app: service.Application[_PriceQuoteSettings]) -> None:
             exchange=types.Exchange("prices"),
         ),
         offer_cache=cache.OffersCache(
-            client=redis.Client(redis_connection, prefix=app.name),
+            client=redis_client,
         ),
         price_cache=cache.PriceQuoteCache(
-            client=redis.Client(redis_connection, prefix=app.name),
+            client=redis_client,
         ),
         price_ttl=app.settings.ttl,
         provider_company_id=app.settings.provider_company_id,
@@ -348,12 +343,10 @@ async def _notifications(  # noqa: WPS217
     logging.register(http_client)
     metrics.register(http_client)
     amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
-    redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
-        aioredis.from_url(
-            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
-            decode_responses=False,
-            retry_on_error=[aioredis.ConnectionError],
-        ).client(),
+    redis_client = await redis_factory.make_client(
+        app=app,
+        dsn=app.settings.redis_dsn,
+        decode_responses=False,
     )
     notifier = notifications.SmtpNotifier(
         smtp_client=aiosmtplib.SMTP(
@@ -385,7 +378,7 @@ async def _notifications(  # noqa: WPS217
             train_stations=await _load_train_stations(),
         ),
         offers_cache=cache.OffersCache(
-            client=redis.Client(redis_connection, prefix=app.name),
+            client=redis_client,
         ),
         ttl=app.settings.ttl,
         notifier=notifier,

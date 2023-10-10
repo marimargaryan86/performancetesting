@@ -23,7 +23,7 @@ from snowfall.project.junction.service.providers.mock import (
 from snowfall.project.junction.service.providers.mock.constant import PROVIDER_ID
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import amqp_factory
+from snowfall.stdlib.service import amqp_factory, redis_factory
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 
 _PROVIDER_NAME = "Mock"
@@ -37,24 +37,22 @@ class _Settings(service.ProviderSettings):
 
 class _PriceQuotesSettings(service.Settings):
     amqp_dsn: pydantic.AmqpDsn
-    redis_dsn: pydantic.AnyUrl
+    redis_dsn: pydantic.RedisDsn
     provider_company_id: str
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
 
 
 class _BookingsSettings(service.Settings):
     amqp_dsn: pydantic.AmqpDsn
-    redis_dsn: pydantic.AnyUrl
+    redis_dsn: pydantic.RedisDsn
     storage_dsn: service.AnyDsn
 
 
 async def _price_quotes(app: service.Application[_PriceQuotesSettings]) -> None:
-    redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
-        aioredis.from_url(
-            str(app.settings.redis_dsn),
-            decode_responses=False,
-            retry_on_error=[aioredis.ConnectionError],
-        ).client(),
+    redis_client = await redis_factory.make_client(
+        app=app,
+        dsn=app.settings.redis_dsn,
+        decode_responses=False,
     )
     amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
 
@@ -70,10 +68,10 @@ async def _price_quotes(app: service.Application[_PriceQuotesSettings]) -> None:
         ),
         quoter=pricing.Quoter(
             option_cache=cache.OptionCache(
-                client=redis.Client(redis_connection, prefix=app.name),
+                client=redis_client,
             ),
             price_quote_cache=cache.PriceQuoteCache(
-                client=redis.Client(redis_connection, prefix=app.name),
+                client=redis_client,
             ),
             ttl=app.settings.ttl,
         ),
@@ -82,12 +80,10 @@ async def _price_quotes(app: service.Application[_PriceQuotesSettings]) -> None:
 
 
 async def _bookings(app: service.Application[_BookingsSettings]) -> None:
-    redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
-        aioredis.from_url(
-            str(app.settings.redis_dsn),
-            decode_responses=False,
-            retry_on_error=[aioredis.ConnectionError],
-        ).client(),
+    redis_client = await redis_factory.make_client(
+        app=app,
+        dsn=app.settings.redis_dsn,
+        decode_responses=False,
     )
     amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
     storage = await app.stack.enter_async_context(
@@ -106,7 +102,7 @@ async def _bookings(app: service.Application[_BookingsSettings]) -> None:
         ),
         booker=bookings.Booker(
             price_quote_cache=cache.PriceQuoteCache(
-                client=redis.Client(redis_connection, prefix=app.name),
+                client=redis_client,
             ),
             booking_storage=storage,
             provider_id=PROVIDER_ID,

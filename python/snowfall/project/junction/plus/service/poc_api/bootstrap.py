@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 
 import lagom
-from pydantic import AnyUrl
+from pydantic import AnyUrl, RedisDsn
 
 from snowfall.project.junction.plus.service.poc_api import (
     ai_utils,
@@ -28,7 +28,7 @@ class Settings(application.Settings):
     icoupon_client_secret: str
     aws_access_key: str
     aws_secret_key: str
-    redis_dsn: Sequence[AnyUrl]
+    redis_dsn: RedisDsn
     mongo_dsn: Sequence[AnyUrl]
     mongo_db: str
     twilio_sid: str

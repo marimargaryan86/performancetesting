@@ -1,5 +1,4 @@
 import datetime
-from collections.abc import Sequence
 
 import pydantic
 
@@ -19,7 +18,7 @@ class KarhooConfig(pydantic.BaseModel):
 
 class OfferSettings(application.Settings, KarhooConfig):
     amqp_dsn: pydantic.AmqpDsn
-    redis_dsn: Sequence[pydantic.AnyUrl]
+    redis_dsn: pydantic.RedisDsn
     ttl: datetime.timedelta = datetime.timedelta(minutes=_DEFAULT_TTL_IN_MINUTES)
     polling_wait_time_seconds: int = 10
     polling_retries_attempts: int = 4
@@ -29,7 +28,7 @@ class OfferSettings(application.Settings, KarhooConfig):
 
 class OrderSettings(application.Settings, KarhooConfig):
     amqp_dsn: pydantic.AmqpDsn
-    redis_dsn: Sequence[pydantic.AnyUrl]
+    redis_dsn: pydantic.RedisDsn
     ttl: datetime.timedelta = datetime.timedelta(minutes=_DEFAULT_TTL_IN_MINUTES)
     smtp_dsn: pydantic.AnyUrl
     smtp_sender: pydantic.EmailStr

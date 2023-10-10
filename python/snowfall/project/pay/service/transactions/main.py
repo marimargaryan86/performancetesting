@@ -6,7 +6,6 @@ from collections.abc import Sequence
 import httpx
 import pydantic
 from motor import motor_asyncio
-from redis import asyncio as aioredis
 
 from snowfall.project.pay.adapter import companies, currencies
 from snowfall.project.pay.service.companies.v1alpha import (
@@ -21,8 +20,7 @@ from snowfall.project.pay.service.transactions.grpc import (
     TransactionsService,
 )
 from snowfall.stdlib.instrumentation.httpx import metrics
-from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import application
+from snowfall.stdlib.service import application, redis_factory
 from snowfall.stdlib.transport.grpc import server
 from snowfall.stdlib.transport.grpc.client import create_channel
 from snowfall.vendor.currency_cloud.client import CurrencyCloudAuth, PaymentClient
@@ -32,7 +30,7 @@ class _GrpcSettings(application.Settings):
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
     mongo_dsn: Sequence[pydantic.AnyUrl]
-    redis_dsn: Sequence[pydantic.AnyUrl]
+    redis_dsn: pydantic.RedisDsn
     currencies_address: str
     companies_address: str
     cc_login: str
@@ -44,16 +42,10 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
-    redis_conn = await app.stack.enter_async_context(
-        aioredis.from_url(
-            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
-            decode_responses=True,
-            retry_on_error=[aioredis.ConnectionError],
-        ).client(),
-    )
-    redis_client = redis.Client[str](
-        redis_conn,
-        prefix=app.name,
+    redis_client = await redis_factory.make_client(
+        app=app,
+        dsn=app.settings.redis_dsn,
+        decode_responses=True,
     )
 
     grpc_server = server.create_server(

@@ -4,8 +4,7 @@ import random
 from collections.abc import Sequence
 
 from motor import motor_asyncio
-from pydantic import AnyUrl
-from redis import asyncio as aioredis
+from pydantic import AnyUrl, RedisDsn
 
 from snowfall.project.junction.go.adapter import legs, offer_searches, offers
 from snowfall.project.junction.go.service.offers.v1 import (
@@ -24,8 +23,7 @@ from snowfall.project.junction.go.service.trips.grpc import (
     TripSearchService,
     TripService,
 )
-from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import amqp_factory, application
+from snowfall.stdlib.service import amqp_factory, application, redis_factory
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.stdlib.transport.grpc import server
 from snowfall.stdlib.transport.grpc.client import create_channel
@@ -43,7 +41,7 @@ class _ConsumeSettings(application.Settings):
 
 class _ConsumeTripCandidateSearchSettings(application.Settings):
     amqp_dsn: AnyUrl
-    redis_dsn: AnyUrl
+    redis_dsn: RedisDsn
     planner_address: str
     offers_address: str
     schedules_address: str
@@ -92,15 +90,10 @@ async def _consume_trip_candidate_search_tasks(
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
-    redis_connection = await app.stack.enter_async_context(
-        aioredis.from_url(
-            str(app.settings.redis_dsn),
-            decode_responses=False,
-        ).client(),
-    )
-    client = redis.Client[bytes](
-        redis_connection,
-        prefix=app.name,
+    client = await redis_factory.make_client(
+        app=app,
+        dsn=app.settings.redis_dsn,
+        decode_responses=False,
     )
     offers_channel = create_channel(app.settings.offers_address)
     schedules_channel = create_channel(app.settings.schedules_address)

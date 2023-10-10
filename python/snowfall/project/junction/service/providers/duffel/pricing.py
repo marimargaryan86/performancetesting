@@ -1,10 +1,8 @@
 import datetime
-import random
 from collections.abc import Mapping
 from typing import Any
 
 import httpx
-from redis import asyncio as aioredis
 
 from snowfall.project.junction.go.service.offers.v1 import amqp_pb2 as offers_amqp_pb2
 from snowfall.project.junction.service.providers.duffel import (
@@ -21,8 +19,7 @@ from snowfall.project.junction.service.providers.duffel.search.parser import (
 )
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.logging import stdout
-from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import amqp_factory, application
+from snowfall.stdlib.service import amqp_factory, application, redis_factory
 from snowfall.stdlib.transport.amqp import consumer, producer
 from snowfall.stdlib.transport.amqp import types as amqp_types
 from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
@@ -44,12 +41,10 @@ async def price_quotes(  # noqa: WPS210
             app.settings.rate_limiter_service_configs["duffel"],
         ),
     )
-    redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
-        aioredis.from_url(
-            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
-            decode_responses=False,
-            retry_on_error=[aioredis.ConnectionError],
-        ).client(),
+    redis_client = await redis_factory.make_client(
+        app=app,
+        dsn=app.settings.redis_dsn,
+        decode_responses=False,
     )
     amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
     duffel_client_factory = DuffelClientFactory(
@@ -61,7 +56,7 @@ async def price_quotes(  # noqa: WPS210
         resellers_map=app.settings.resellers_map,
     )
     offer_cache = cache.OfferCache(
-        client=redis.Client[bytes](redis_connection, prefix=app.name),
+        client=redis_client,
     )
     await PriceQuoteConsumer(
         consumer_obj=consumer.Consumer(

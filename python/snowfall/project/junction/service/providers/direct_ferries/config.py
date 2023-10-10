@@ -1,5 +1,4 @@
 import datetime
-from collections.abc import Sequence
 from pathlib import Path
 
 import pydantic
@@ -34,7 +33,7 @@ class StaticSettings(DfBaseSettings):
 
 
 class PriceQuotesSettings(service.PriceQuoteSettings):
-    redis_dsn: pydantic.AnyUrl
+    redis_dsn: pydantic.RedisDsn
     amqp_dsn: pydantic.AmqpDsn
     ttl: datetime.timedelta = datetime.timedelta(
         minutes=_PRICE_QUOTE_TTL_DEFAULT_MINUTES,
@@ -43,7 +42,7 @@ class PriceQuotesSettings(service.PriceQuoteSettings):
 
 class OrdersSettings(DfBaseSettings, service.Settings):
     amqp_dsn: pydantic.AmqpDsn
-    redis_dsn: Sequence[pydantic.AnyUrl]
+    redis_dsn: pydantic.RedisDsn
 
 
 class GtfsSetting(DfBaseSettings, service.Settings):

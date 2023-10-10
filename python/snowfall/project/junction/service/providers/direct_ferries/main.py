@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import contextlib
 import pathlib
-import random
 
 import httpx
 from aio_pika import abc
@@ -33,7 +32,7 @@ from snowfall.project.junction.service.providers.direct_ferries.v1alpha import a
 from snowfall.stdlib import h3
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import amqp_factory
+from snowfall.stdlib.service import amqp_factory, redis_factory
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.vendor.direct_ferries import client
 from snowfall.vendor.direct_ferries.clients import auth, base
@@ -125,16 +124,14 @@ async def _orders(app: service.Application[config.OrdersSettings]) -> None:
     logging.register(http_client)
     metrics.register(http_client)
     amqp_conn = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
-    redis_conn = await app.stack.enter_async_context(
-        aioredis.from_url(
-            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
-            decode_responses=True,
-            retry_on_error=[aioredis.ConnectionError],
-        ).client(),
+    redis_client = await redis_factory.make_client(
+        app=app,
+        dsn=app.settings.redis_dsn,
+        decode_responses=False,
     )
 
     offers_cache = cache.OffersCache(
-        client=redis.Client(redis_conn, prefix=app.name),
+        client=redis_client,
     )
 
     orders_consumer = df_consumer.OrdersConsumer(
@@ -162,12 +159,10 @@ async def _orders(app: service.Application[config.OrdersSettings]) -> None:
 async def _price_quotes(
     app: service.Application[config.PriceQuotesSettings],
 ) -> None:
-    redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
-        aioredis.from_url(
-            str(app.settings.redis_dsn),
-            decode_responses=False,
-            retry_on_error=[aioredis.ConnectionError],
-        ).client(),
+    redis_client = await redis_factory.make_client(
+        app=app,
+        dsn=app.settings.redis_dsn,
+        decode_responses=False,
     )
     amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
 
@@ -182,7 +177,7 @@ async def _price_quotes(
             exchange=types.Exchange("prices"),
         ),
         offer_cache=cache.OffersCache(
-            client=redis.Client(redis_connection, prefix=app.name),
+            client=redis_client,
         ),
         price_ttl=app.settings.ttl,
         provider_company_id=app.settings.provider_company_id,

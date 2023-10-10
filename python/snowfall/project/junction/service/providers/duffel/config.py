@@ -1,5 +1,4 @@
 import datetime
-from collections.abc import Sequence
 from typing import Any
 
 import pydantic
@@ -29,6 +28,6 @@ class Settings(DuffelConfig, service.ProviderSettings):
 
 class PricingSettings(DuffelConfig, service.Settings):
     amqp_dsn: pydantic.AmqpDsn
-    redis_dsn: Sequence[pydantic.AnyUrl]
+    redis_dsn: pydantic.RedisDsn
     ttl: datetime.timedelta = datetime.timedelta(minutes=DEFAULT_TTL_IN_MINUTES)
     provider_company_id: str

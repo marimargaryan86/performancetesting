@@ -1,10 +1,8 @@
 import datetime
-import random
 from collections.abc import AsyncGenerator, Callable
 from typing import Any
 
 import httpx
-from redis import asyncio as aioredis
 from starlette import applications
 from starlette.middleware import Middleware, authentication
 
@@ -39,7 +37,7 @@ from snowfall.stdlib.integration.starlette import authentication as stdlib_auth
 from snowfall.stdlib.integration.starlette import handlers
 from snowfall.stdlib.persistence import cursor, filesystem
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import application
+from snowfall.stdlib.service import application, redis_factory
 from snowfall.stdlib.transport.grpc.client import create_channel
 from snowfall.vendor.currency_cloud import client
 
@@ -61,13 +59,10 @@ def _lifespan(
 async def _http(
     app: application.Application[bootstrap.Settings],
 ) -> None:
-    redis_client = redis.Client[str](
-        aioredis.from_url(
-            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
-            decode_responses=True,
-            retry_on_error=[aioredis.ConnectionError],
-        ).client(),
-        prefix=app.name,
+    redis_client = await redis_factory.make_client(
+        app=app,
+        dsn=app.settings.redis_dsn,
+        decode_responses=True,
     )
     authentication_channel = create_channel(
         app.settings.authentication_address,
@@ -183,13 +178,10 @@ async def _admin_http(
         ),
         client=metrics.register(httpx.AsyncClient()),
     )
-    redis_client = redis.Client[str](
-        aioredis.from_url(
-            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
-            decode_responses=True,
-            retry_on_error=[aioredis.ConnectionError],
-        ).client(),
-        prefix=app.name,
+    redis_client = await redis_factory.make_client(
+        app=app,
+        dsn=app.settings.redis_dsn,
+        decode_responses=True,
     )
     asgi_app = starlette.create_starlette_app(
         custom_middlewares=[

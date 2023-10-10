@@ -3,7 +3,7 @@ from collections.abc import Sequence
 
 import httpx
 import lagom
-from pydantic import AnyUrl, HttpUrl
+from pydantic import AnyUrl, HttpUrl, RedisDsn
 
 from snowfall.project.junction.extensions.service.mobile_api import (
     jwt_generator,
@@ -27,7 +27,7 @@ class Settings(application.Settings):
     ory_client_secret: str
     plus_api_address: str = ""
     plus_activated: bool = False
-    redis_dsn: Sequence[AnyUrl]
+    redis_dsn: RedisDsn
     places_cache_ttl: datetime.timedelta = datetime.timedelta(hours=1)
     otp_cache_ttl: datetime.timedelta = datetime.timedelta(minutes=2)
     smtp_dsn: AnyUrl

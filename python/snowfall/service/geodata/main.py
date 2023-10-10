@@ -7,7 +7,6 @@ import shapefile
 from snowfall.service.geodata import geocoding, reverse_geocoding
 from snowfall.service.geodata.grpc import GeocodingService
 from snowfall.stdlib.persistence import filesystem
-from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.service import application, redis_factory
 from snowfall.stdlib.transport.grpc import server
 
@@ -27,7 +26,7 @@ async def _main(app: application.Application[_Settings]) -> None:
         "EEZ_land_union_v3_202003.zip",
     )
     shp_file = shapefile.Reader(shp_path)
-    redis_conn = await redis_factory.make_connection(
+    redis_client = await redis_factory.make_client(
         app,
         app.settings.redis_dsn,
         decode_responses=True,
@@ -38,7 +37,7 @@ async def _main(app: application.Application[_Settings]) -> None:
         app.settings.grpc_port,
         [
             GeocodingService(
-                redis.Client(redis_conn),
+                redis_client,
                 geocoder=geocoding.Geocoder(
                     shp_file,
                     app.user_agent,

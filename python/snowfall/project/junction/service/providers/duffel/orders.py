@@ -1,10 +1,6 @@
-import random
-from collections.abc import Sequence
-
 import aiosmtplib
 import httpx
 import pydantic
-from redis import asyncio as aioredis
 
 from snowfall.project.junction.go.service.orders.v1 import amqp_pb2
 from snowfall.project.junction.service.providers.duffel import (
@@ -19,8 +15,7 @@ from snowfall.project.junction.service.providers.duffel.client_factory import (
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence import filesystem
-from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import amqp_factory, application
+from snowfall.stdlib.service import amqp_factory, application, redis_factory
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
@@ -29,7 +24,7 @@ _PROVIDER_NAME = "Duffel"
 
 class OrdersSettings(config.DuffelConfig, application.Settings):
     amqp_dsn: pydantic.AmqpDsn
-    redis_dsn: Sequence[pydantic.AnyUrl]
+    redis_dsn: pydantic.RedisDsn
     smtp_dsn: pydantic.AnyUrl
     smtp_sender: pydantic.EmailStr
     smtp_recipient: pydantic.EmailStr
@@ -53,12 +48,10 @@ async def orders(  # noqa: WPS217
             app.settings.rate_limiter_service_configs["duffel"],
         ),
     )
-    redis_connection = await app.stack.enter_async_context(
-        aioredis.from_url(
-            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
-            decode_responses=False,
-            retry_on_error=[aioredis.ConnectionError],
-        ).client(),
+    redis_client = await redis_factory.make_client(
+        app=app,
+        dsn=app.settings.redis_dsn,
+        decode_responses=False,
     )
     amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
     duffel_client_factory = DuffelClientFactory(
@@ -99,7 +92,7 @@ async def orders(  # noqa: WPS217
             ),
         ),
         offer_cache=cache.OfferCache(
-            client=redis.Client(redis_connection, prefix=app.name),
+            client=redis_client,
         ),
     ).consume()
 

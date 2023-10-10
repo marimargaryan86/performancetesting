@@ -39,14 +39,14 @@ class Settings(BenerailSettings, service.ProviderSettings):
 
 
 class PriceQuoteSettings(BenerailSettings, service.Settings):
-    redis_dsn: pydantic.AnyUrl
+    redis_dsn: pydantic.RedisDsn
     amqp_dsn: pydantic.AmqpDsn
     ttl: datetime.timedelta = datetime.timedelta(minutes=_DEFAULT_TTL_IN_MINUTES)
     provider_company_id: str
 
 
 class OrdersSettings(BenerailSettings, service.Settings):
-    redis_dsn: pydantic.AnyUrl
+    redis_dsn: pydantic.RedisDsn
     amqp_dsn: pydantic.AmqpDsn
     storage_dsn: service.AnyDsn
 

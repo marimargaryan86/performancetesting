@@ -6,7 +6,6 @@ from collections.abc import Sequence
 import httpx
 import pydantic
 from motor import motor_asyncio
-from redis import asyncio as aioredis
 
 from snowfall.project.junction.go import pay_integration
 from snowfall.project.junction.go.service.gateway.v1 import offers_pb2_grpc
@@ -27,8 +26,7 @@ from snowfall.project.junction.go.service.offers.grpc import (
     PriceQuoteService,
 )
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
-from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import amqp_factory, application
+from snowfall.stdlib.service import amqp_factory, application, redis_factory
 from snowfall.stdlib.transport.amqp import consumer, producer, trackable, types
 from snowfall.stdlib.transport.grpc import client, server
 from snowfall.vendor.junction.auth import UserAuth
@@ -58,7 +56,7 @@ class _ImportSettings(pay_integration.Settings, _PaySettings, application.Settin
     amqp_dsn: pydantic.AmqpDsn
     default_ttl: datetime.timedelta = datetime.timedelta(minutes=15)
     mongo_dsn: Sequence[pydantic.AnyUrl]
-    redis_dsn: Sequence[pydantic.AnyUrl]
+    redis_dsn: pydantic.RedisDsn
     reseller_disabled_operators: importer.RESELLERS_TO_PROVIDER_OPERATORS = (
         pydantic.Field(default_factory=dict)
     )
@@ -161,12 +159,10 @@ async def _import(app: application.Application[_ImportSettings]) -> None:
     gateway_channel = client.create_channel(app.settings.gateway_address)
     http_client = await app.stack.enter_async_context(httpx.AsyncClient())
     connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
-    redis_conn = await app.stack.enter_async_context(
-        aioredis.from_url(
-            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
-            decode_responses=True,
-            retry_on_error=[aioredis.ConnectionError],
-        ).client(),
+    redis_client = await redis_factory.make_client(
+        app=app,
+        dsn=app.settings.redis_dsn,
+        decode_responses=True,
     )
 
     logging.register(http_client)
@@ -195,25 +191,16 @@ async def _import(app: application.Application[_ImportSettings]) -> None:
                 mongo.offers.offer_aggregates,
             ),
             offer_buckets=aggregator.OfferBucketRepository(
-                redis_client=redis.Client(
-                    redis=redis_conn,
-                    prefix=app.name,
-                ),
+                redis_client=redis_client,
             ),
             offer_searches=offers.OfferSearchRepository(
                 mongo.offers.offer_searches,
                 app.settings.default_ttl,
             ),
         ),
-        redis=redis.Client(
-            redis=redis_conn,
-            prefix=app.name,
-        ),
+        redis=redis_client,
         status_handler=importer.StatusHandler(
-            redis=redis.Client(
-                redis=redis_conn,
-                prefix=app.name,
-            ),
+            redis=redis_client,
             repository=offers.OfferSearchRepository(
                 mongo.offers.offer_searches,
                 app.settings.default_ttl,

@@ -4,7 +4,6 @@ from functools import partial
 import httpx
 import openai
 from motor import motor_asyncio
-from redis import asyncio as aioredis
 
 from snowfall.project.junction.plus.service.poc_api import (
     ai_utils,
@@ -20,8 +19,7 @@ from snowfall.project.junction.plus.service.poc_api import (
 from snowfall.project.junction.plus.service.poc_api.routes import router
 from snowfall.stdlib.integration.starlette import application as starlette
 from snowfall.stdlib.persistence import filesystem
-from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import application
+from snowfall.stdlib.service import application, redis_factory
 from snowfall.stdlib.transport.http import auth
 from snowfall.vendor.junction.go import client
 
@@ -53,13 +51,10 @@ async def _http(app: application.Application[bootstrap.Settings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )[app.settings.mongo_db]
-    redis_client = redis.Client[str](
-        aioredis.from_url(
-            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
-            decode_responses=True,
-            retry_on_error=[aioredis.ConnectionError],
-        ).client(),
-        prefix=app.name,
+    redis_client = await redis_factory.make_client(
+        app=app,
+        dsn=app.settings.redis_dsn,
+        decode_responses=True,
     )
 
     asgi_app = starlette.create_starlette_app(

@@ -37,7 +37,7 @@ from snowfall.stdlib import h3
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import amqp_factory
+from snowfall.stdlib.service import amqp_factory, redis_factory
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer, types
 from snowfall.vendor.ask2go import client
@@ -50,7 +50,7 @@ class _OrdersSettings(service.Settings):
     amqp_dsn: pydantic.AmqpDsn
     api_base_url: pydantic.AnyUrl
     api_booking_base_url: pydantic.AnyUrl
-    redis_dsn: Sequence[pydantic.AnyUrl]
+    redis_dsn: pydantic.RedisDsn
     smtp_dsn: pydantic.AnyUrl
     smtp_sender: pydantic.EmailStr
     smtp_recipient: pydantic.EmailStr
@@ -77,7 +77,7 @@ class _PriceQuotesSettings(service.PriceQuoteSettings):
     amqp_dsn: pydantic.AmqpDsn
     api_base_url: pydantic.AnyUrl
     api_booking_base_url: pydantic.AnyUrl
-    redis_dsn: Sequence[pydantic.AnyUrl]
+    redis_dsn: pydantic.RedisDsn
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
     http_timeout: float = 20.0
     poll_retries_limit: int = 10
@@ -90,7 +90,7 @@ class _PriceQuotesSettings(service.PriceQuoteSettings):
 class _SeatMapsSettings(service.Settings):
     api_base_url: pydantic.AnyUrl
     api_booking_base_url: pydantic.AnyUrl
-    redis_dsn: Sequence[pydantic.AnyUrl]
+    redis_dsn: pydantic.RedisDsn
     amqp_dsn: pydantic.AmqpDsn
     http_timeout: float = 60.0
 
@@ -187,12 +187,10 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
     )
     logging.register(http_client)
     metrics.register(http_client)
-    redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
-        aioredis.from_url(
-            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
-            decode_responses=False,
-            retry_on_error=[aioredis.ConnectionError],
-        ).client(),
+    redis_client = await redis_factory.make_client(
+        app=app,
+        dsn=app.settings.redis_dsn,
+        decode_responses=False,
     )
     amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
     ask2go_client = client.Ask2GoClient(
@@ -231,7 +229,7 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
             override_double_booking_check=app.settings.override_double_booking_check,
         ),
         price_quote_cache=cache.PriceQuoteCache(
-            client=redis.Client(redis_connection, prefix=app.name),
+            client=redis_client,
         ),
         provider_id=PROVIDER_ID,
         provider_name=_PROVIDER_NAME,
@@ -256,12 +254,10 @@ async def _price_quotes(app: service.Application[_PriceQuotesSettings]) -> None:
         ),
     )
 
-    redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
-        aioredis.from_url(
-            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
-            decode_responses=False,
-            retry_on_error=[aioredis.ConnectionError],
-        ).client(),
+    redis_client = await redis_factory.make_client(
+        app=app,
+        dsn=app.settings.redis_dsn,
+        decode_responses=False,
     )
     amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
     ask2go_client = client.Ask2GoClient(
@@ -282,7 +278,7 @@ async def _price_quotes(app: service.Application[_PriceQuotesSettings]) -> None:
             exchange=types.Exchange("prices"),
         ),
         offer_cache=cache.OfferCache(
-            client=redis.Client(redis_connection, prefix=app.name),
+            client=redis_client,
         ),
         offer_transformer=transformer.OfferTransformer(
             airport_repository=airports.AirportRepository(
@@ -294,10 +290,10 @@ async def _price_quotes(app: service.Application[_PriceQuotesSettings]) -> None:
                 mongo.ask2go.provider_cabin_mapping,
             ),
             offer_cache=cache.OfferCache(
-                client=redis.Client[bytes](redis_connection, prefix=app.name),
+                client=redis_client,
             ),
             price_cache=cache.PriceQuoteCache(
-                client=redis.Client[bytes](redis_connection, prefix=app.name),
+                client=redis_client,
             ),
             offer_ttl=app.settings.ttl,
         ),
@@ -311,12 +307,10 @@ async def _price_quotes(app: service.Application[_PriceQuotesSettings]) -> None:
 
 
 async def _seat_maps(app: service.Application[_SeatMapsSettings]) -> None:
-    redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
-        aioredis.from_url(
-            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
-            decode_responses=False,
-            retry_on_error=[aioredis.ConnectionError],
-        ).client(),
+    redis_client = await redis_factory.make_client(
+        app=app,
+        dsn=app.settings.redis_dsn,
+        decode_responses=False,
     )
     http_client = await app.stack.enter_async_context(
         httpx.AsyncClient(
@@ -337,7 +331,7 @@ async def _seat_maps(app: service.Application[_SeatMapsSettings]) -> None:
         routing_key="seat.maps",
         ask2go_client=ask2go_client,
         offer_cache=cache.OfferCache(
-            client=redis.Client[bytes](redis_connection, prefix=app.name),
+            client=redis_client,
         ),
     ).consume()
 

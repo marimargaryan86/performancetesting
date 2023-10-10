@@ -1,5 +1,4 @@
 import datetime
-from collections.abc import Sequence
 
 import pydantic
 
@@ -25,7 +24,7 @@ class Settings(service.ProviderSettings, DistribusionConfig):
 
 class OrdersSettings(service.Settings, DistribusionConfig):
     amqp_dsn: pydantic.AmqpDsn
-    redis_dsn: Sequence[pydantic.AnyUrl]
+    redis_dsn: pydantic.RedisDsn
     smtp_dsn: pydantic.AnyUrl
     smtp_sender: pydantic.EmailStr
     smtp_recipient: pydantic.EmailStr
@@ -35,6 +34,6 @@ class OrdersSettings(service.Settings, DistribusionConfig):
 
 class PricingSettings(DistribusionConfig, service.Settings):
     amqp_dsn: pydantic.AmqpDsn
-    redis_dsn: Sequence[pydantic.AnyUrl]
+    redis_dsn: pydantic.RedisDsn
     ttl: datetime.timedelta = datetime.timedelta(minutes=DEFAULT_TTL_IN_MINUTES)
     provider_company_id: str

@@ -2,7 +2,6 @@ import contextlib
 from collections.abc import Awaitable, Callable
 
 import httpx
-from redis import asyncio as aioredis
 
 from snowfall.project.junction.service.providers.benerail import (
     booking,
@@ -14,8 +13,7 @@ from snowfall.project.junction.service.providers.benerail import (
 )
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence import filesystem
-from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import amqp_factory, application
+from snowfall.stdlib.service import amqp_factory, application, redis_factory
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.vendor.benerail import client
 
@@ -36,12 +34,10 @@ def orders_factory(
             logging.register(http_client)
             metrics.register(http_client)
             amqp_conn = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
-            redis_conn = await stack.enter_async_context(
-                aioredis.from_url(
-                    str(app.settings.redis_dsn),
-                    decode_responses=True,
-                    retry_on_error=[aioredis.ConnectionError],
-                ).client(),
+            redis_client = await redis_factory.make_client(
+                app=app,
+                dsn=app.settings.redis_dsn,
+                decode_responses=False,
             )
 
             orders_consumer = benerail_consumer.OrdersConsumer(
@@ -69,7 +65,7 @@ def orders_factory(
                     ),
                 ),
                 offers_cache=cache.OffersCache(
-                    client=redis.Client(redis_conn, prefix=app.name),
+                    client=redis_client,
                 ),
                 provider_id=provider_id,
             )

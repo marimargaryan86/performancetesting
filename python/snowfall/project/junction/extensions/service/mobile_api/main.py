@@ -6,7 +6,6 @@ import httpx
 import stripe
 from authlib.integrations import httpx_client
 from motor import motor_asyncio
-from redis import asyncio as aioredis
 from starlette.middleware import Middleware, authentication
 
 from snowfall.adapter import authentication as auth_adapter
@@ -31,8 +30,7 @@ from snowfall.stdlib.instrumentation.httpx import metrics
 from snowfall.stdlib.integration.starlette import application as starlette
 from snowfall.stdlib.integration.starlette import authentication as starlette_auth
 from snowfall.stdlib.integration.starlette import handlers
-from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import application
+from snowfall.stdlib.service import application, redis_factory
 from snowfall.stdlib.transport.grpc import client as grpc_transport_client
 from snowfall.stdlib.transport.http import auth
 from snowfall.vendor.junction import client as base_client
@@ -117,13 +115,10 @@ async def _http(
         activated=app.settings.plus_activated,
         client=metrics.register(httpx.AsyncClient()),
     )
-    redis_client = redis.Client[str](
-        aioredis.from_url(
-            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
-            decode_responses=True,
-            retry_on_error=[aioredis.ConnectionError],
-        ).client(),
-        prefix=app.name,
+    redis_client = await redis_factory.make_client(
+        app=app,
+        dsn=app.settings.redis_dsn,
+        decode_responses=True,
     )
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311

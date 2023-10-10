@@ -2,7 +2,7 @@ import datetime
 from collections.abc import Sequence
 
 import lagom
-from pydantic import AnyUrl
+from pydantic import AnyUrl, RedisDsn
 
 from snowfall.adapter import authentication
 from snowfall.project.pay.adapter import (
@@ -27,7 +27,7 @@ class _Settings(application.Settings):
     jwt_public_key: str
     ory_jwk_ttl: datetime.timedelta = datetime.timedelta(hours=1)
     mongo_dsn: Sequence[AnyUrl]
-    redis_dsn: Sequence[AnyUrl]
+    redis_dsn: RedisDsn
 
 
 class Settings(_Settings):

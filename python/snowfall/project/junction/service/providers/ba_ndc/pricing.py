@@ -1,7 +1,4 @@
 import datetime
-import random
-
-from redis import asyncio as aioredis
 
 from snowfall.project.junction.go.service.offers.v1 import amqp_pb2 as offers_amqp_pb2
 from snowfall.project.junction.service.providers.ba_ndc import (
@@ -10,8 +7,7 @@ from snowfall.project.junction.service.providers.ba_ndc import (
     config,
     pricing_transformer,
 )
-from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import amqp_factory, application
+from snowfall.stdlib.service import amqp_factory, application, redis_factory
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer
 from snowfall.stdlib.transport.amqp import types as amqp_types
@@ -20,16 +16,14 @@ from snowfall.stdlib.transport.amqp import types as amqp_types
 async def price_quotes(
     app: application.Application[config.PricingSettings],
 ) -> None:
-    redis_connection: aioredis.Redis[bytes] = await app.stack.enter_async_context(
-        aioredis.from_url(
-            str(random.choice(app.settings.redis_dsn)),  # noqa: S311
-            decode_responses=False,
-            retry_on_error=[aioredis.ConnectionError],
-        ).client(),
+    redis_client = await redis_factory.make_client(
+        app=app,
+        dsn=app.settings.redis_dsn,
+        decode_responses=False,
     )
     amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
     offer_cache = cache.OfferCache(
-        client=redis.Client[bytes](redis_connection, prefix=app.name),
+        client=redis_client,
     )
     await PriceQuoteConsumer(
         consumer_obj=amqp_consumer.Consumer(
