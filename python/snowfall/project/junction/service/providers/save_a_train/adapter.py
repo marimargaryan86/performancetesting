@@ -167,7 +167,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                     ),
                 )
             except RouteError:
-                self._logger.exception("SAT routing error occurred")
+                self._logger.info("SAT routing error occurred", exc_info=True)
 
         try:
             search_response = await self._client.api_client.create_search(
@@ -309,7 +309,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
             raise RouteError(route_error) from route_error
 
         except errors.TimeOutError:
-            self._logger.exception("SAT timeout error occurred.")
+            self._logger.info("SAT timeout error occurred.", exc_info=True)
 
         except errors.HttpStatusError as http_status_error:
             status_code = http_status_error.response.status_code
