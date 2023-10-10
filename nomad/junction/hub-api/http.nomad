@@ -22,14 +22,6 @@ variable "datacenter" {
   type = string
 }
 
-variable "traefik_entrypoints" {
-  type = string
-}
-
-variable "traaefik_host_URL" {
-  type = string
-}
-
 variable "count" {
   type = number
 }
@@ -77,11 +69,7 @@ job "hub-api-http" {
       name = "hub-api-${var.environment}"
       port = "http"
       tags = [
-        "http",
-        "traefik.enable=true",
-        "traefik.consulcatalog.connect=true",
-        "traefik.http.routers.hub-api-${var.environment}.entrypoints=${var.traefik_entrypoints}",
-        "traefik.http.routers.hub-api-${var.environment}.rule=Host(`${var.traaefik_host_URL}`)"
+        "http"
       ]
 
       connect {
@@ -165,7 +153,6 @@ CC_API_KEY={{ .Data.data.cc_api_key }}
 {{ end }}
 EOH
       }
-
 
       config {
         image = var.docker_image

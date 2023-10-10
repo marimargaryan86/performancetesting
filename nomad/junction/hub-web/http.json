@@ -4,9 +4,6 @@
       "count": 1,
       "traefik_entrypoints": "websecure",
       "traefik_host_URL": "hub.junction.dev",
-      "client_api_base_url": "https://api.junction.dev",
-      "booking_hub_api_base_url": "https://booking-hub-mobile-api.junction.dev",
-      "hub_api_base_url": "https://api.hub.junction.dev",
       "ory_base_url": "https://optimistic-tereshkova-36hc6vayw4.projects.oryapis.com"
     }
   },
@@ -16,9 +13,6 @@
       "count": 2,
       "traefik_entrypoints": "web",
       "traefik_host_URL": "hub.junction.travel",
-      "client_api_base_url": "https://api.junction.travel",
-      "booking_hub_api_base_url": "https://booking-hub-mobile-api.junction.travel",
-      "hub_api_base_url": "https://api.hub.junction.travel",
       "ory_base_url": "https://optimistic-tereshkova-36hc6vayw4.projects.oryapis.com"
     }
   },
@@ -27,9 +21,6 @@
       "count": 1,
       "traefik_entrypoints": "websecure",
       "traefik_host_URL": "hub.sandbox.junction.dev",
-      "client_api_base_url": "https://api.sandbox.junction.dev",
-      "booking_hub_api_base_url": "https://booking-hub-mobile-api.sandbox.junction.dev",
-      "hub_api_base_url": "https://api.hub.sandbox.junction.dev",
       "ory_base_url": "https://optimistic-tereshkova-36hc6vayw4.projects.oryapis.com"
     }
   }

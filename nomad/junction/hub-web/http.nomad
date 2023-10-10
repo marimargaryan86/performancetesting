@@ -34,18 +34,6 @@ variable "count" {
   type = number
 }
 
-variable "client_api_base_url" {
-  type = string
-}
-
-variable "booking_hub_api_base_url" {
-  type = string
-}
-
-variable "hub_api_base_url" {
-  type = string
-}
-
 variable "ory_base_url" {
   type = string
 }
@@ -95,7 +83,22 @@ job "hub-web-http" {
       ]
 
       connect {
-        sidecar_service {}
+        sidecar_service {
+          proxy {
+            upstreams {
+              local_bind_port  = 8010
+              destination_name = "client-api-${var.environment}"
+            }
+            upstreams {
+              local_bind_port  = 8020
+              destination_name = "booking-hub-mobile-api-${var.environment}"
+            }
+            upstreams {
+              local_bind_port  = 8030
+              destination_name = "hub-api-${var.environment}"
+            }
+          }
+        }
       }
 
       check {
@@ -123,6 +126,9 @@ CLIENT_API_KEY={{ .Data.data.client_api_key }}
 PUBLIC_STRIPE_KEY={{ .Data.data.public_stripe_key }}
 BOOKING_HUB_API_KEY={{ .Data.data.booking_hub_api_key }}
 {{ end }}
+CLIENT_API_BASE_URL={{(printf "http://%s" (env "NOMAD_UPSTREAM_ADDR_client-api-${var.environment}"))}}
+HUB_API_BASE_URL={{(printf "http://%s" (env "NOMAD_UPSTREAM_ADDR_hub-api-${var.environment}"))}}
+BOOKING_HUB_API_BASE_URL={{(printf "http://%s" (env "NOMAD_UPSTREAM_ADDR_booking-hub-mobile-api-${var.environment}"))}}
 EOH
       }
 
@@ -138,13 +144,10 @@ EOH
       }
 
       env {
-        ENV_NAME                 = "${var.environment}"
-        PORT                     = "${NOMAD_PORT_http}"
-        CLIENT_API_BASE_URL      = "${var.client_api_base_url}"
-        BOOKING_HUB_API_BASE_URL = "${var.booking_hub_api_base_url}"
-        ORY_BASE_URL             = "${var.ory_base_url}"
-        HUB_API_BASE_URL         = "${var.hub_api_base_url}"
-        PUBLIC_SENTRY_DSN        = "https://33b134d137c04fb8ba77aabdbd60304c@sentry.snowfall.se/68"
+        ENV_NAME          = "${var.environment}"
+        PORT              = "${NOMAD_PORT_http}"
+        ORY_BASE_URL      = "${var.ory_base_url}"
+        PUBLIC_SENTRY_DSN = "https://33b134d137c04fb8ba77aabdbd60304c@sentry.snowfall.se/68"
       }
     }
   }
