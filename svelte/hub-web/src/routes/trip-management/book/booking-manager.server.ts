@@ -11,6 +11,8 @@ import type {
 import { paymentIntentModel } from "integration/junction-mobile-api/schemas/payment";
 import routeConfig from "routeConfig";
 import { priceModel } from "integration/junction-mobile-api/schemas/price";
+import { getSession } from "utils/auth";
+import type { SessionModel } from "models/user";
 
 const SEARCH_TOKEN = "search-token";
 const JWT_SECRET = "jwt-secret";
@@ -104,7 +106,13 @@ function deleteSearchData(event: RequestEvent): void {
   event.cookies.delete(SEARCH_TOKEN, COOKIE_OPTIONS);
 }
 
-async function getTripCandidates(data: SearchDataModel): Promise<{
+async function getTripCandidates({
+  session,
+  data,
+}: {
+  session: SessionModel;
+  data: SearchDataModel;
+}): Promise<{
   sessionToken: string;
   tripCandidates: TripCandidatesSearchModel;
 }> {
@@ -112,9 +120,10 @@ async function getTripCandidates(data: SearchDataModel): Promise<{
 
   if (data.tripCandidatesId) {
     try {
-      tripCandidates = await integrationInstances.junctionMobileApi.trips.getTripCandidatesSearch(
-        data.tripCandidatesId,
-      );
+      tripCandidates = await integrationInstances.junctionMobileApi.trips.getTripCandidatesSearch({
+        session,
+        id: data.tripCandidatesId,
+      });
     } catch {
       //
     }
@@ -126,19 +135,22 @@ async function getTripCandidates(data: SearchDataModel): Promise<{
     sessionToken = getRandomAlphaNumericString(32);
 
     tripCandidates = await integrationInstances.junctionMobileApi.trips.createTripCandidatesSearch({
-      criteria: [
-        {
-          departureAfter: data.outbound,
-          origin: { ...data.origin, precision: data.origin.precise ? "precise" : undefined },
-          destination: {
-            ...data.destination,
-            precision: data.destination.precise ? "precise" : undefined,
+      session,
+      data: {
+        criteria: [
+          {
+            departureAfter: data.outbound,
+            origin: { ...data.origin, precision: data.origin.precise ? "precise" : undefined },
+            destination: {
+              ...data.destination,
+              precision: data.destination.precise ? "precise" : undefined,
+            },
           },
-        },
-      ],
-      sessionToken,
-      passengers: parsePassengers(data.passengers),
-      allowedLegTypeIds: ["rail"],
+        ],
+        sessionToken,
+        passengers: parsePassengers(data.passengers),
+        allowedLegTypeIds: ["rail"],
+      },
     });
   }
 
@@ -148,10 +160,15 @@ async function getTripCandidates(data: SearchDataModel): Promise<{
   };
 }
 
-async function getOffers(
-  data: SearchDataModel,
-  event: RequestEvent,
-): Promise<{
+async function getOffers({
+  session,
+  data,
+  event,
+}: {
+  session: SessionModel;
+  data: SearchDataModel;
+  event: RequestEvent;
+}): Promise<{
   sessionToken: string;
   tripCandidatesId: string;
   expiresAt: Date;
@@ -159,10 +176,11 @@ async function getOffers(
   offers: OfferModel[];
 }> {
   try {
-    const { tripCandidates, sessionToken } = await getTripCandidates(data);
-    const offers = await integrationInstances.junctionMobileApi.trips.getTripCandidatesOffers(
-      tripCandidates.id,
-    );
+    const { tripCandidates, sessionToken } = await getTripCandidates({ session, data });
+    const offers = await integrationInstances.junctionMobileApi.trips.getTripCandidatesOffers({
+      session,
+      id: tripCandidates.id,
+    });
 
     if (tripCandidates.expiresAt < new Date()) {
       throw new Error("Trip candidates expired");
@@ -184,11 +202,14 @@ async function getPriceQuote(
   searchData: SearchDataModel,
   event: RequestEvent,
 ): Promise<TripOfferPriceQuoteModel> {
+  const session = getSession(event);
+
   if (searchData.priceQuoteId) {
     try {
-      return await integrationInstances.junctionMobileApi.offers.getPriceQuote(
-        searchData.priceQuoteId,
-      );
+      return await integrationInstances.junctionMobileApi.offers.getPriceQuote({
+        session,
+        id: searchData.priceQuoteId,
+      });
     } catch {
       //
     }
@@ -200,9 +221,12 @@ async function getPriceQuote(
 
   try {
     return integrationInstances.junctionMobileApi.offers.createPriceQuote({
-      sessionToken: searchData.sessionToken,
-      offerId: searchData.offerId,
-      optionIds: searchData.optionIds,
+      session,
+      data: {
+        sessionToken: searchData.sessionToken,
+        offerId: searchData.offerId,
+        optionIds: searchData.optionIds,
+      },
     });
   } catch {
     throw rootRedirect(event);
@@ -216,9 +240,13 @@ async function getPaymentIntent(
   try {
     const priceQuote = await getPriceQuote(searchData, event);
 
+    // prettier-ignore
     const paymentIntent =
       !searchData.paymentIntent && priceQuote.price
-        ? await integrationInstances.junctionMobileApi.payments.createPayment(priceQuote.price)
+        ? await integrationInstances.junctionMobileApi.payments.createPayment({
+          session: getSession(event),
+          data: priceQuote.price,
+        })
         : searchData.paymentIntent;
 
     return {

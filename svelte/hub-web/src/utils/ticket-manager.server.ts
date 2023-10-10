@@ -2,15 +2,22 @@ import integrationInstances from "integration-instances";
 import JSZip from "jszip";
 import { extension } from "mime-types";
 import { ensureDefined } from "utils/array";
+import type { SessionModel } from "models/user";
 
-export async function getTicketsZip(
-  orderId: string,
-  bookingId?: string,
-): Promise<{
+type TicketsZipParams = {
+  session: SessionModel;
+  orderId: string;
+  bookingId?: string;
+};
+
+export async function getTicketsZip({ session, orderId, bookingId }: TicketsZipParams): Promise<{
   data: Uint8Array;
   name: string;
 }> {
-  const order = await integrationInstances.junctionMobileApi.orders.getOrder(orderId);
+  const order = await integrationInstances.junctionMobileApi.orders.getOrder({
+    session,
+    id: orderId,
+  });
   const bookings = bookingId
     ? order.bookings.filter((item) => item.id === bookingId)
     : order.bookings;

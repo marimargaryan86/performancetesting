@@ -1,6 +1,7 @@
 import integrationInstances from "integration-instances";
 import type { OrderModel } from "integration/junction-mobile-api/schemas/order";
 import bookingManager from "../booking-manager.server";
+import { getSession } from "utils/auth";
 
 export function load(event): { order: Promise<OrderModel> } {
   const searchData = bookingManager.getSearchData(event);
@@ -10,6 +11,9 @@ export function load(event): { order: Promise<OrderModel> } {
   }
 
   return {
-    order: integrationInstances.junctionMobileApi.orders.getOrder(searchData.orderId),
+    order: integrationInstances.junctionMobileApi.orders.getOrder({
+      session: getSession(event),
+      id: searchData.orderId,
+    }),
   };
 }

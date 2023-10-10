@@ -9,31 +9,49 @@ import JunctionMobileApiService from "./junction-mobile-api-service";
 import type { OfferIncludes, OfferModel, OfferSchema } from "../schemas/offer";
 import { parseOfferSchema } from "../parsers/offer";
 import { parseIncluded } from "../parsers/included";
+import type { SessionModel } from "models/user";
 
 export class TripService extends JunctionMobileApiService {
-  async createTripCandidatesSearch(
-    data: CreateTripCandidatesSearchModel,
-  ): Promise<TripCandidatesSearchModel> {
+  async createTripCandidatesSearch({
+    session,
+    data,
+  }: {
+    session: SessionModel;
+    data: CreateTripCandidatesSearchModel;
+  }): Promise<TripCandidatesSearchModel> {
     const resp = await this.makeRequest<{ data: TripCandidatesSearchSchema }>(
       "/trip-candidates/searches",
       {
         method: "POST",
         data: { data: createTripCandidatesSearchModel.toSchema(data) },
+        session,
       },
     );
 
     return tripCandidatesSearchModel.toModel(resp.json.data);
   }
 
-  async getTripCandidatesSearch(id: string): Promise<TripCandidatesSearchModel> {
+  async getTripCandidatesSearch({
+    session,
+    id,
+  }: {
+    session: SessionModel;
+    id: string;
+  }): Promise<TripCandidatesSearchModel> {
     const resp = await this.makeRequest<{
       data: TripCandidatesSearchSchema;
-    }>(`/trip-candidates/searches/${id}`);
+    }>(`/trip-candidates/searches/${id}`, { session });
 
     return tripCandidatesSearchModel.toModel(resp.json.data);
   }
 
-  async getTripCandidatesOffers(id: string): Promise<OfferModel[]> {
+  async getTripCandidatesOffers({
+    session,
+    id,
+  }: {
+    session: SessionModel;
+    id: string;
+  }): Promise<OfferModel[]> {
     const resp = await this.makeRequest<{
       data: OfferSchema[];
       included?: OfferIncludes[];
@@ -49,6 +67,7 @@ export class TripService extends JunctionMobileApiService {
           "groups.options.details.details",
         ].join(","),
       },
+      session,
     });
 
     const included = parseIncluded(resp.json.included);

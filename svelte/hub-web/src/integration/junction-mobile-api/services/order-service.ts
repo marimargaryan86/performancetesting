@@ -13,12 +13,21 @@ import type { PaginatedData } from "models/common";
 import { parseIncluded } from "../parsers/included";
 import { ensureJunctionError } from "integration/common/junction-error";
 import { z } from "zod";
+import type { SessionModel } from "models/user";
 
 export class OrderService extends JunctionMobileApiService {
-  async listOrders(cursor?: string, limit = 100): Promise<PaginatedData<OrderModel>> {
+  async listOrders({
+    session,
+    cursor,
+    limit = 100,
+  }: {
+    session: SessionModel;
+    cursor?: string;
+    limit?: number;
+  }): Promise<PaginatedData<OrderModel>> {
     const resp = await this.makeRequest<{
       data: OrderSchema[];
-      included?: OrderIncludes[];
+      included?: OrderIncludes[] | null;
       links: { next: string };
     }>("/orders", {
       queryParams: {
@@ -32,6 +41,7 @@ export class OrderService extends JunctionMobileApiService {
         "page[limit]": limit,
         "page[cursor]": cursor,
       },
+      session,
     });
 
     const included = parseIncluded(resp.json.included);
@@ -43,12 +53,19 @@ export class OrderService extends JunctionMobileApiService {
     };
   }
 
-  async createOrder(data: CreateOrderModel): Promise<OrderModel> {
+  async createOrder({
+    session,
+    data,
+  }: {
+    session: SessionModel;
+    data: CreateOrderModel;
+  }): Promise<OrderModel> {
     try {
       const resp = await this.makeRequest<{ data: OrderSchema }>("/orders", {
         method: "POST",
         data: { data: createOrderModel.toSchema(data) },
         headers: { "Session-Token": getRandomAlphaNumericString(32) },
+        session,
       });
 
       return parseOrderSchema(resp.json.data);
@@ -73,7 +90,7 @@ export class OrderService extends JunctionMobileApiService {
     }
   }
 
-  async getOrder(id: string): Promise<OrderModel> {
+  async getOrder({ session, id }: { session: SessionModel; id: string }): Promise<OrderModel> {
     const resp = await this.makeRequest<{
       data: OrderSchema;
       included?: OrderIncludes[];
@@ -87,6 +104,7 @@ export class OrderService extends JunctionMobileApiService {
           "bookings.details.legType",
         ].join(","),
       },
+      session,
     });
 
     const included = parseIncluded(resp.json.included);

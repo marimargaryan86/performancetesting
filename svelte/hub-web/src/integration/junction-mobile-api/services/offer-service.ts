@@ -8,21 +8,35 @@ import {
 } from "../schemas/offer";
 import JunctionMobileApiService from "./junction-mobile-api-service";
 import { parseIncluded } from "../parsers/included";
+import type { SessionModel } from "models/user";
 
 export class OfferService extends JunctionMobileApiService {
-  async createPriceQuote(data: CreateTripOfferPriceQuoteModel): Promise<TripOfferPriceQuoteModel> {
+  async createPriceQuote({
+    session,
+    data,
+  }: {
+    session: SessionModel;
+    data: CreateTripOfferPriceQuoteModel;
+  }): Promise<TripOfferPriceQuoteModel> {
     const resp = await this.makeRequest<{ data: TripOfferPriceQuoteSchema }>("/offers/quotes", {
       method: "POST",
       data: {
         data: createTripOfferPriceQuoteModel.toSchema(data),
       },
       headers: { "Session-Token": data.sessionToken },
+      session,
     });
 
     return parsePriceQuoteSchema(resp.json.data);
   }
 
-  async getPriceQuote(id: string): Promise<TripOfferPriceQuoteModel> {
+  async getPriceQuote({
+    id,
+    session,
+  }: {
+    session: SessionModel;
+    id: string;
+  }): Promise<TripOfferPriceQuoteModel> {
     const resp = await this.makeRequest<{
       data: TripOfferPriceQuoteSchema;
       included?: TripOfferPriceQuoteIncludes[];
@@ -39,6 +53,7 @@ export class OfferService extends JunctionMobileApiService {
           "options.details.details",
         ].join(","),
       },
+      session,
     });
 
     const included = parseIncluded(resp.json.included);

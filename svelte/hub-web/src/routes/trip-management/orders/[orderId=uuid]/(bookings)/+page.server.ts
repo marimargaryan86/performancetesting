@@ -2,6 +2,7 @@ import { ActionFailure, fail } from "@sveltejs/kit";
 import integrationInstances from "integration-instances";
 import { ensureJunctionError } from "integration/common/junction-error";
 import type { CancellationRequestModel } from "integration/junction-mobile-api/schemas/cancellation-request";
+import { getSession } from "utils/auth";
 import { getActionRequestJsonData } from "utils/common";
 import { z } from "zod";
 
@@ -17,9 +18,10 @@ export const actions = {
 
       return {
         cancellation:
-          await integrationInstances.junctionMobileApi.cancellations.createCancellationRequest(
+          await integrationInstances.junctionMobileApi.cancellations.createCancellationRequest({
+            session: getSession(event),
             data,
-          ),
+          }),
       };
     } catch (err) {
       if (ensureJunctionError(err)) {

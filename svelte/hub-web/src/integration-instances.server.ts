@@ -8,27 +8,12 @@ const junctionHubCompanyService = new junctionHubApi.CompanyService(env.HUB_API_
 
 export default {
   junctionMobileApi: {
-    places: new junctionMobileApi.PlaceService(
-      env.BOOKING_HUB_API_BASE_URL,
-      env.BOOKING_HUB_API_KEY,
-    ),
-    trips: new junctionMobileApi.TripService(env.BOOKING_HUB_API_BASE_URL, env.BOOKING_HUB_API_KEY),
-    offers: new junctionMobileApi.OfferService(
-      env.BOOKING_HUB_API_BASE_URL,
-      env.BOOKING_HUB_API_KEY,
-    ),
-    orders: new junctionMobileApi.OrderService(
-      env.BOOKING_HUB_API_BASE_URL,
-      env.BOOKING_HUB_API_KEY,
-    ),
-    payments: new junctionMobileApi.PaymentService(
-      env.BOOKING_HUB_API_BASE_URL,
-      env.BOOKING_HUB_API_KEY,
-    ),
-    cancellations: new junctionMobileApi.CancellationRequestService(
-      env.BOOKING_HUB_API_BASE_URL,
-      env.BOOKING_HUB_API_KEY,
-    ),
+    places: new junctionMobileApi.PlaceService(env.BOOKING_HUB_API_BASE_URL),
+    trips: new junctionMobileApi.TripService(env.BOOKING_HUB_API_BASE_URL),
+    offers: new junctionMobileApi.OfferService(env.BOOKING_HUB_API_BASE_URL),
+    orders: new junctionMobileApi.OrderService(env.BOOKING_HUB_API_BASE_URL),
+    payments: new junctionMobileApi.PaymentService(env.BOOKING_HUB_API_BASE_URL),
+    cancellations: new junctionMobileApi.CancellationRequestService(env.BOOKING_HUB_API_BASE_URL),
   },
   junctionHubApi: {
     accounts: new junctionHubApi.AccountService(env.HUB_API_BASE_URL),

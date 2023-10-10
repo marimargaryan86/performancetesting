@@ -9,6 +9,8 @@ import type { CreateOrderModel, OrderModel } from "integration/junction-mobile-a
 import bookingManager, { type SearchDataModel } from "../booking-manager.server";
 import { z } from "zod";
 import { getActionRequestJsonData } from "utils/common";
+import type { SessionModel } from "models/user";
+import { getSession } from "utils/auth";
 
 export type ActionPollReturnType = {
   priceQuote: TripOfferPriceQuoteModel;
@@ -31,26 +33,33 @@ function getBookingDataModel(required: TripOfferPriceQuoteModel["required"]): z.
 
 type BookingData = z.infer<ReturnType<typeof getBookingDataModel>>;
 
-function createOrder(data: BookingData, paymentId: string): Promise<OrderModel> {
+function createOrder(
+  session: SessionModel,
+  data: BookingData,
+  paymentId: string,
+): Promise<OrderModel> {
   return integrationInstances.junctionMobileApi.orders.createOrder({
-    contactDetails: {
-      address: {
-        addressLines: [data.contact.address.line1, data.contact.address.line2].filter(
-          ensureDefined,
-        ),
-        city: data.contact.city,
-        countryCode: data.contact.countryCode,
-        postalCode: data.contact.postcode,
+    session,
+    data: {
+      contactDetails: {
+        address: {
+          addressLines: [data.contact.address.line1, data.contact.address.line2].filter(
+            ensureDefined,
+          ),
+          city: data.contact.city,
+          countryCode: data.contact.countryCode,
+          postalCode: data.contact.postcode,
+        },
+        email: data.contact.email,
+        phone: {
+          countryCode: data.contact.phone.code,
+          number: data.contact.phone.number,
+        },
       },
-      email: data.contact.email,
-      phone: {
-        countryCode: data.contact.phone.code,
-        number: data.contact.phone.number,
-      },
+      passengers: data.passengers,
+      paymentId,
+      priceQuoteId: data.priceQuoteId,
     },
-    passengers: data.passengers,
-    paymentId,
-    priceQuoteId: data.priceQuoteId,
   });
 }
 
@@ -116,7 +125,7 @@ export const actions = {
       );
 
       try {
-        const order = await createOrder(bookingData, paymentIntent.id);
+        const order = await createOrder(getSession(event), bookingData, paymentIntent.id);
 
         bookingManager.setSearchData({ ...searchData, orderId: order.id }, event);
       } catch (err) {

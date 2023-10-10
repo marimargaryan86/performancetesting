@@ -63,7 +63,7 @@ type IncludeModels = {
 };
 
 function separateIncluded(
-  data?: (OrderIncludes | TripOfferPriceQuoteIncludes | OfferIncludes)[],
+  data?: (OrderIncludes | TripOfferPriceQuoteIncludes | OfferIncludes)[] | null,
 ): IncludeSchemas {
   const result: IncludeSchemas = {
     legTypes: [],
@@ -107,7 +107,7 @@ function separateIncluded(
 }
 
 export function parseIncluded(
-  data?: (OrderIncludes | TripOfferPriceQuoteIncludes | OfferIncludes)[],
+  data?: (OrderIncludes | TripOfferPriceQuoteIncludes | OfferIncludes)[] | null,
 ): IncludeModels {
   const mapping = separateIncluded(data);
 

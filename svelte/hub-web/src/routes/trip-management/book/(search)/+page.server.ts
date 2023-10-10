@@ -4,6 +4,7 @@ import { getActionRequestJsonData } from "utils/common";
 import { tripSearchData } from "../../components/trip-search/trip-search.svelte";
 import { ActionFailure, fail } from "@sveltejs/kit";
 import bookingManager from "../booking-manager.server";
+import { getSession } from "utils/auth";
 
 function requiresPrecision(place: PlaceModel): boolean {
   return !(place.types.includes("city") || place.types.includes("unspecified"));
@@ -11,11 +12,19 @@ function requiresPrecision(place: PlaceModel): boolean {
 
 export const actions = {
   async search(event): Promise<void | ActionFailure> {
+    const session = getSession(event);
+
     try {
       const searchData = await getActionRequestJsonData(event, tripSearchData);
       const [origin, destination] = await Promise.all([
-        integrationInstances.junctionMobileApi.places.getPlace(searchData.originId),
-        integrationInstances.junctionMobileApi.places.getPlace(searchData.destinationId),
+        integrationInstances.junctionMobileApi.places.getPlace({
+          session,
+          id: searchData.originId,
+        }),
+        integrationInstances.junctionMobileApi.places.getPlace({
+          session,
+          id: searchData.destinationId,
+        }),
       ]);
 
       bookingManager.setSearchData(
@@ -49,7 +58,10 @@ export const actions = {
     }
 
     return {
-      places: await integrationInstances.junctionMobileApi.places.listPlaces(query),
+      places: await integrationInstances.junctionMobileApi.places.listPlaces({
+        session: getSession(event),
+        query,
+      }),
     };
   },
 };

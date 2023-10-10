@@ -7,6 +7,7 @@ import bookingManager, { type SearchDataModel } from "../booking-manager.server"
 import { getActionRequestJsonData } from "utils/common";
 import { z } from "zod";
 import { priceModel } from "integration/junction-mobile-api/schemas/price";
+import { getSession } from "utils/auth";
 
 type LoadReturnType = {
   searchData: {
@@ -26,13 +27,17 @@ type LoadReturnType = {
 };
 
 export async function load(event): Promise<LoadReturnType> {
+  const session = getSession(event);
   const searchData = bookingManager.getSearchData(event);
 
   try {
     const [origin, destination, result] = await Promise.all([
-      integrationInstances.junctionMobileApi.places.getPlace(searchData.origin.id),
-      integrationInstances.junctionMobileApi.places.getPlace(searchData.destination.id),
-      bookingManager.getOffers(searchData, event),
+      integrationInstances.junctionMobileApi.places.getPlace({ session, id: searchData.origin.id }),
+      integrationInstances.junctionMobileApi.places.getPlace({
+        session,
+        id: searchData.destination.id,
+      }),
+      bookingManager.getOffers({ session, data: searchData, event }),
     ]);
 
     bookingManager.setSearchData(
@@ -76,7 +81,11 @@ export const actions = {
   async poll(event): Promise<{ status: ResourceStatus; offers: OfferModel[] }> {
     try {
       const searchData = bookingManager.getSearchData(event);
-      const result = await bookingManager.getOffers(searchData, event);
+      const result = await bookingManager.getOffers({
+        session: getSession(event),
+        data: searchData,
+        event,
+      });
 
       return {
         status: result.status,
