@@ -1,3 +1,6 @@
+_BASE_IMAGE_SHA = "d97b08245cdceb142b25e9be03c8cea4d4e96b1d7e14bef64ca87a1f3212d23f"
+
+
 def nomad_template(  # noqa: WPS210
     commands: list[str],  # noqa: SF20
     service_entry_point: str = "",
@@ -73,16 +76,17 @@ def go_image(  # type: ignore[no-untyped-def]
         ),
     )
 
-    # latest
-    tag_sha = "a35b6525fde5572656e24109064dd147fbaedc26e5a7ccd147ff3ed3a4308c21"
-
     docker_image(  # type: ignore[name-defined]  # noqa: F821
         name="{name}_docker".format(name=name),
         dependencies=[":{name}".format(name=name)],
         image_tags=["{build_args.VERSION}"],
         instructions=[
-            "FROM gcr.io/distroless/base-debian11@sha256:{hash} AS runtime".format(
-                hash=tag_sha,
+            "FROM cgr.dev/chainguard/wolfi-base:latest@sha256:{hash} AS runtime".format(
+                hash=_BASE_IMAGE_SHA,
+            ),
+            (
+                "RUN apk update && apk add --no-cache --update-cache"
+                " glibc~=2.38 tzdata~=2023c"
             ),
             "COPY {namespace}/{name} /bin/{name}".format(
                 namespace=".".join(
@@ -162,11 +166,11 @@ def python_image(  # type: ignore[no-untyped-def]
         image_tags=["{build_args.VERSION}"],
         instructions=[
             "FROM cgr.dev/chainguard/wolfi-base:latest@sha256:{hash} AS runtime".format(
-                hash="f73a3360466ecc4d6df3f451d7d5c4c49663096e158848ddbc9603c52a47bffe",
+                hash=_BASE_IMAGE_SHA,
             ),
             (
                 "RUN apk update && apk add --no-cache --update-cache"
-                " python-3.11~=3.11.5 tzdata~=2023c"
+                " python-3.11~=3.11.6 tzdata~=2023c"
             ),
             "ENV PYTHONUNBUFFERED 1",
             "COPY {namespace}/{name}.pex /bin/{name}".format(
