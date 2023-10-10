@@ -11,24 +11,24 @@ from snowfall.stdlib.persistence.redis.repository import (
 from snowfall.stdlib.persistence.redis.repository import RedisRecord
 
 
-class TestRecord(RedisRecord):
+class FooRecord(RedisRecord):
     test_id: str
     created_at: datetime.datetime
 
 
-class TestRepository(RedisRepository[TestRecord]):
+class FooRepository(RedisRepository[FooRecord]):
     """Test repository."""
 
-    _record_type: type[TestRecord] = TestRecord
+    _record_type: type[FooRecord] = FooRecord
 
 
 async def test_record_can_be_created(
     redis_client: aioredis.Redis[bytes],
 ) -> None:
-    repository = TestRepository(
+    repository = FooRepository(
         client=redis.Client(redis_client),
     )
-    record = TestRecord(
+    record = FooRecord(
         test_id="test",
         created_at=datetime.datetime.now(tz=datetime.UTC),
     )
@@ -40,10 +40,10 @@ async def test_record_can_be_created(
 async def test_record_can_be_created_with_custom_id(
     redis_client: aioredis.Redis[bytes],
 ) -> None:
-    repository = TestRepository(
+    repository = FooRepository(
         client=redis.Client(redis_client),
     )
-    record = TestRecord(
+    record = FooRecord(
         test_id="test",
         created_at=datetime.datetime.now(tz=datetime.UTC),
     )
