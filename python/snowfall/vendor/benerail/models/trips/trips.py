@@ -1,7 +1,7 @@
 from pydantic.v1 import Field
 
 from snowfall.vendor.benerail.models.base import BenerailBaseModel
-from snowfall.vendor.benerail.models.bookings.train import TrainType
+from snowfall.vendor.benerail.models.bookings.train import TrainType1
 from snowfall.vendor.benerail.models.place import Place
 from snowfall.vendor.benerail.models.trip_offers.link import TripResourceLink
 
@@ -37,7 +37,7 @@ class TimedLeg(BenerailBaseModel):
         description="ISO-8601 timestamp showing date time and timezone",
     )
     duration: str = Field(..., description="ISO-8601 period.", example="PT25M")
-    train_type: TrainType | None = None
+    train_type: TrainType1 | None = None
     train_numbers: list[str] | None = None
 
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import dataclasses
 import datetime
 import types as std_types
@@ -33,6 +34,7 @@ from snowfall.stdlib.v1 import latlng_pb2
 from snowfall.vendor.benerail import client
 from snowfall.vendor.benerail.models import types
 from snowfall.vendor.benerail.models.dialogue import dialogue, passenger
+from snowfall.vendor.benerail.models.enumeration import rcode
 from snowfall.vendor.benerail.models.trip_offers import link, offer
 from snowfall.vendor.benerail.models.trip_offers import response as trip_offer_response
 from snowfall.vendor.benerail.models.trips import trips
@@ -61,6 +63,10 @@ class _CreateTripFilterResponse(object):
     dialogue_etag: str
 
 
+class RCodeLabelNotFoundError(Exception):
+    """Raised when rcode retrieval fails."""
+
+
 def _get_brand_name(comfort_class_name: str, flexibility_value: str) -> str:
     return "{0} / {1}".format(
         comfort_class_name,
@@ -74,6 +80,15 @@ def _get_train_number(trip: trips.Trip) -> str:
             return more_itertools.first(leg.train_numbers)
 
     return ""
+
+
+def _get_rcode_label(
+    labels: Mapping[str, rcode.RcoderesultLabels],
+) -> rcode.RcoderesultLabels:
+    try:
+        return labels["en"]
+    except KeyError:
+        return labels["*"]
 
 
 class BenerailAdapter(object):  # noqa: WPS214
@@ -350,13 +365,18 @@ class BenerailAdapter(object):  # noqa: WPS214
             has_train_type = (
                 isinstance(leg, trips.TimedLeg)
                 and leg.train_type
-                and leg.train_type.train_type
+                and leg.train_type.train_type_value
             )
 
             if has_train_type:
-                return await self._resolve_rcode_title(
-                    leg.train_type.train_type,  # type: ignore[union-attr]
-                )
+                train_type = leg.train_type.train_type_value  # type: ignore[union-attr]
+
+                try:
+                    return await self._resolve_rcode_title(
+                        train_type,
+                    )
+                except RCodeLabelNotFoundError:
+                    return train_type.rsplit(":", 1)[-1]  # type: ignore[union-attr]
 
         return ""
 
@@ -459,11 +479,16 @@ class BenerailAdapter(object):  # noqa: WPS214
                 offer_obj.price.currency.upper(),
             ),
         ).protobuf()
-        comfort_class_name = (
-            await self._resolve_rcode_title(comfort_class_value)
-            if comfort_class_value
-            else ""
-        )
+
+        if comfort_class_value:
+            try:
+                comfort_class_name = await self._resolve_rcode_title(
+                    comfort_class_value,
+                )
+            except RCodeLabelNotFoundError:
+                comfort_class_name = comfort_class_value
+        else:
+            comfort_class_name = ""
 
         return offer_models_pb2.Offer(
             id=await self._offers_cache.store(
@@ -507,23 +532,30 @@ class BenerailAdapter(object):  # noqa: WPS214
         )
 
     @asyncstdlib.lru_cache()
-    async def _resolve_rcode_title(self, rcode_value: str) -> str:
+    async def _resolve_rcode_title(self, rcode_value: str) -> str:  # noqa: WPS238
         try:
             urn_val = await self._client.rcode_client.get_urn_value(rcode_value)
-        except errors.HttpError:
-            return rcode_value
+        except errors.HttpError as http_error_ex:
+            raise RCodeLabelNotFoundError from http_error_ex
 
-        try:
-            rcode = urn_val.response_result.rcodes[0]
-        except (IndexError, ValueError):
-            return rcode_value
+        label_obj = None
 
-        try:
-            label = rcode.labels.get("en", rcode.labels["*"])
-        except KeyError:
-            return rcode_value
+        for rcode_obj in urn_val.response_result.rcodes:
+            with contextlib.suppress(KeyError):
+                label_obj = _get_rcode_label(rcode_obj.labels)
 
-        return label.code_long or rcode_value
+            if label_obj:
+                break
+
+        if not label_obj:
+            raise RCodeLabelNotFoundError
+
+        label = label_obj.code_long or label_obj.code_short
+
+        if not label:
+            raise RCodeLabelNotFoundError
+
+        return label
 
     async def _get_trip_offers(
         self,
