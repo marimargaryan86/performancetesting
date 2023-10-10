@@ -1,4 +1,4 @@
-from pydantic import v1 as pydantic
+import pydantic
 
 from snowfall.vendor.ask2go.models import offers
 from snowfall.vendor.ask2go.models.base import CamelCaseBaseModel

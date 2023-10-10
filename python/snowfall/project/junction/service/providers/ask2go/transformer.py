@@ -174,7 +174,7 @@ class OfferTransformer(object):  # noqa: WPS214
     ) -> set[offers_pb2.PriceQuote.Required.ValueType]:
         required = set[offers_pb2.PriceQuote.Required.ValueType]()
 
-        for doc in offer_price_docs or []:
+        for doc in offer_price_docs:
             required.update(self._get_offer_price_doc_requirements(doc))
 
         return required
@@ -201,8 +201,8 @@ class OfferTransformer(object):  # noqa: WPS214
                     else "LOWEST FARE AVAILABLE"
                 ),
                 features=[
-                    offers.BrandedPriceInformationfeature(
-                        baggage=offer.trips[0].baggage_allowance or [],
+                    offers.BrandedPriceInformationFeature(
+                        baggage=offer.trips[0].baggage_allowance,
                     ),
                 ],
             ),
@@ -269,7 +269,7 @@ class OfferTransformer(object):  # noqa: WPS214
         segment_baggage_allowances = {
             segment_index: list(baggage_allowances)
             for segment_index, baggage_allowances in itertools.groupby(
-                [baggage for trip in trips for baggage in trip.baggage_allowance or []],
+                [baggage for trip in trips for baggage in trip.baggage_allowance],
                 lambda baggage: baggage.segment_index,
             )
         }

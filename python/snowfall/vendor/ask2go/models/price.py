@@ -1,6 +1,8 @@
 import datetime
 from typing import Any
 
+import pydantic
+
 from snowfall.vendor.ask2go import enums
 from snowfall.vendor.ask2go.models import booking, offers
 from snowfall.vendor.ask2go.models.base import CamelCaseBaseModel
@@ -27,13 +29,13 @@ class PricingResponseInformation(CamelCaseBaseModel):
 
 class PenaltyInformation(CamelCaseBaseModel):
     penalty_type: enums.PenaltyType
-    changeable: bool | None
+    changeable: bool | None = None
     refundable: bool
     applicability: enums.Applicability
-    amount: str | None
-    currency: str | None
-    last_date_time_to_book: datetime.datetime | None
-    last_date_time_to_purchase: datetime.datetime | None
+    amount: str | None = None
+    currency: str | None = None
+    last_date_time_to_book: datetime.datetime | None = None
+    last_date_time_to_purchase: datetime.datetime | None = None
 
 
 class PricePenalty(CamelCaseBaseModel):
@@ -45,9 +47,9 @@ class OfferPriceResponse(CamelCaseBaseModel):
     id: str  # noqa: A003
     information: booking.Information
     itinerary: offers.Offer
-    docs: list[OfferPriceDoc] | None
+    docs: list[OfferPriceDoc] = pydantic.Field(default_factory=list)
     fare_rules: list[booking.FareRules]
-    penalties: list[PricePenalty] | None
+    penalties: list[PricePenalty] = pydantic.Field(default_factory=list)
     extras: dict[str, Any]
     pricing_response_information: PricingResponseInformation
     has_finished: bool

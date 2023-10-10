@@ -32,10 +32,10 @@ class CreateSearchCriteria(CamelCaseBaseModel):
     origin_iata: str
     destination_iata: str
     outbound_date: datetime.datetime | datetime.date
-    affiliate_id: int | None
-    outbound_departure_window: tuple[datetime.time, datetime.time] | None
-    inbound_date: datetime.datetime | datetime.date | None
-    inbound_departure_window: tuple[datetime.time, datetime.time] | None
+    affiliate_id: int | None = None
+    outbound_departure_window: tuple[datetime.time, datetime.time] | None = None
+    inbound_date: datetime.datetime | datetime.date | None = None
+    inbound_departure_window: tuple[datetime.time, datetime.time] | None = None
     cabin_class: AirCabinClassType = AirCabinClassType.any_
     adults: int = 0
     children: int = 0

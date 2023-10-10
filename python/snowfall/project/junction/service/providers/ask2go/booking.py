@@ -135,13 +135,12 @@ class BookingHandler(object):
                     record_locator=more_itertools.first(
                         booking_result.information.record_locators or [""],
                     ),
-                    operator_booking_references=booking_result.information.check_in_locators
-                    or [],
+                    operator_booking_references=booking_result.information.check_in_locators,
                     created_at=protobuf.datetime_to_protobuf(
                         datetime.datetime.now(tz=datetime.UTC),
                     ),
                 ),
-                raw_data=booking_result.json(),
+                raw_data=booking_result.model_dump_json(),
             ),
         )
 

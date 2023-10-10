@@ -1,5 +1,7 @@
 from typing import Any
 
+import pydantic
+
 from snowfall.vendor.ask2go.models import offers
 from snowfall.vendor.ask2go.models.base import CamelCaseBaseModel
 
@@ -10,13 +12,13 @@ class InformationError(CamelCaseBaseModel):
 
 
 class Information(CamelCaseBaseModel):
-    record_locators: list[str] | None
-    check_in_locators: list[str] | None
+    record_locators: list[str] = pydantic.Field(default_factory=list)
+    check_in_locators: list[str] = pydantic.Field(default_factory=list)
     booking_id: int
-    display_booking_id: str | None
+    display_booking_id: str | None = None
     status: str
-    errors: list[InformationError] | None
-    warnings: str | None
+    errors: list[InformationError] = pydantic.Field(default_factory=list)
+    warnings: list[str] = pydantic.Field(default_factory=list)
 
 
 class ContactDetailsAddress(CamelCaseBaseModel):
@@ -53,7 +55,7 @@ class Booking(CamelCaseBaseModel):
     price_information: dict[str, Any]
     travelers: list[dict[str, Any]]
     fare_rules: list[FareRules]
-    contact_details: ContactDetails | None
+    contact_details: ContactDetails | None = None
     transaction_id: str
     pricing_id: str
     search_id: str

@@ -34,9 +34,7 @@ Travel departure date : {departure_at}
     @property
     def subject(self) -> str:
         return "ACTION REQUIRED : BOOKING {sabre_pnr}".format(
-            sabre_pnr=more_itertools.first(
-                self._booking.information.check_in_locators or [],
-            ),
+            sabre_pnr=more_itertools.first(self._booking.information.check_in_locators),
         )
 
     @property
@@ -48,8 +46,8 @@ Travel departure date : {departure_at}
             "order_id": self._metadata.order_id,
             "booking_id": self._metadata.booking_id,
             "spnr": self._metadata.passenger_name_record,
-            "sabre_pnr": ", ".join(self._booking.information.record_locators or []),
-            "checkin_pnr": ", ".join(self._booking.information.check_in_locators or []),
+            "sabre_pnr": ", ".join(self._booking.information.record_locators),
+            "checkin_pnr": ", ".join(self._booking.information.check_in_locators),
             "first_name": first_passenger.get("firstName", ""),
             "last_name": first_passenger.get("lastName", ""),
             "created_at": datetime.datetime.now(
