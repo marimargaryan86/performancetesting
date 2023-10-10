@@ -4,16 +4,29 @@
  */
 
 .heroBanner {
-  padding: 4rem 0;
+  padding: 169px 0 78px;
   text-align: center;
   position: relative;
   overflow: hidden;
+  background-color: #1c4030;
+  background-image: url("/img/homepage-background.svg");
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
-@media screen and (max-width: 996px) {
-  .heroBanner {
-    padding: 2rem;
-  }
+.heroBanner h1 {
+  font-family: Raleway, sans-serif;
+  font-size: 57px;
+  line-height: 64px;
+  margin-bottom: 28px;
+}
+
+.heroBanner p {
+  font-family: Inter, sans-serif;
+  font-size: 18px;
+  line-height: 28px;
+  margin-bottom: 37px;
+  max-width: 551px;
 }
 
 .buttons {
@@ -23,11 +36,111 @@
 }
 
 .welcomeText {
-  padding: 4rem 0;
   text-align: center;
+  padding: 0 24px 55px;
+  background-color: #F5F7F6;
+  background-image: url("/img/welcome-background.svg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  flex: 1;
 }
 
 ul {
     text-align: center;
     list-style-position: inside;
+}
+
+.heroContainer {
+  width: 705px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 auto;
+  color: #FFF;
+}
+
+.benefitSection {
+  display: flex;
+  flex-direction: row;
+  row-gap: 56px;
+  column-gap: 33px;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 1061px;
+  margin: 0 auto;
+  padding-bottom: 63px;
+}
+
+.benefit {
+  display: flex;
+  flex-direction: row;
+  gap: 24px;
+  max-width: 514px;
+  width: 50%;
+  font-family: Raleway, sans-serif;
+  font-size: 24px;
+  line-height: 32px;
+  color: #17372F;
+}
+
+.benefitText {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: start;
+}
+
+.benefitTitle {
+  font-weight: 700;
+}
+
+.benefitNumber {
+  font-weight: 400;
+}
+
+.benefitDescription {
+  font-family: Inter, sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 24px;
+  color: #5F716C;
+}
+
+.headerSection {
+  margin: 0 auto;
+  text-align: center;
+}
+
+.headerSection h1 {
+  font-family: Raleway, sans-serif;
+  font-size: 45px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 52px;
+  margin: 24px;
+  color: #17372F;
+}
+
+.headerSection p {
+  font-family: Inter, sans-serif;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 28px;
+  margin: 0;
+  color: #17372F;
+}
+
+.mailLink {
+  text-decoration: underline;
+  font-weight: 600;
+  color: #17372F;
+}
+
+.mailLink:hover {
+  color: #3eb49c;
+}
+
+.container {
+  padding: 0 24px;
 }

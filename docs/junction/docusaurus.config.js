@@ -6,8 +6,8 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'Junction',
-  tagline: 'docs.junction.travel',
+  title: 'WELCOME TO THE DEVELOPER PORTAL',
+  tagline: 'Within this portal you will find documentation, specifications, and guides on how best to integrate against Junction APIs.',
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here

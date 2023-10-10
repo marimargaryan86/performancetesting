@@ -1,66 +1,86 @@
 import React from 'react';
 import clsx from 'clsx';
-import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import Layout from '@theme/Layout';
+import Button from '../components/Button';
+import Dots from '../components/Dots';
+import HeaderMenu from '../components/HeaderMenu';
 
 import styles from './index.module.css';
 
 function HomepageHeader() {
     const {siteConfig} = useDocusaurusContext();
     return (
-        <div>
-            <header className={clsx('hero hero--primary', styles.heroBanner)}>
-                <div className="container">
-                    <h1 className="hero__title">{siteConfig.title}</h1>
-                    <p className="hero__subtitle">{siteConfig.tagline}</p>
-                </div>
-            </header>
-        </div>
+        <header className={styles.heroBanner}>
+            <div className={styles.heroContainer}>
+                <h1>{siteConfig.title}</h1>
+                <p>{siteConfig.tagline}</p>
+                <Button text="Reseller Documentation" variant="outline" icon="img/arrow.svg" href="/docs/resellers/introduction" />
+            </div>
+        </header>
     );
 }
 
 function WelcomeText() {
     return (
-        <div className={styles.welcomeText}>
-            <h1>Welcome to the Junction Developer Portal!</h1>
+        <section className={styles.welcomeText}>
+            <Dots label="How to get in touch"/>
+            <section className={styles.headerSection}>
+                <h1>Experiencing an issue?</h1>
+                <p>
+                    Please contact <a className={styles.mailLink} href="mailto:support@snowfalltravel.com">support@snowfalltravel.com</a> if you experience any issues or have questions.
+                </p>
+                <p>
+                    When getting in touch please include the following:
+                </p>
+            </section>
             <br/>
-            <p>
-                Within this portal you will find documentation, specifications,
-                and guides on how best to integrate against Junction APIs.
-            </p>
             <br/>
-
-            Please contact <Link
-            href={"mailto:support@snowfalltravel.com"}>support@snowfalltravel.com</Link> if
-            you experience any issues or have questions.
-            <br/>
-            <br/>
-            <p>
-                Please include:
-                <ul>
-                    <li>A description of the problem, and the behavior you
-                        expected instead.
-                    </li>
-                    <li>A list of steps and a small snippet of sample code that
-                        can be used to reproduce the problem.
-                    </li>
-                    <li>A description of the output you expect and what actually
-                        occurred. Include any error messages you receive.
-                    </li>
-                    <li>Information about your development environment</li>
-                </ul>
-            </p>
-        </div>
+            <section className={styles.benefitSection}>
+                <article className={styles.benefit}>
+                    <span className={styles.benefitNumber}>01.</span>
+                    <aside className={styles.benefitText}>
+                        <span className={styles.benefitTitle}>Description of the problem</span>
+                        <span className={styles.benefitDescription}>A description of the problem, and the behavior you expected instead.</span>
+                    </aside>
+                </article>
+                <article className={styles.benefit}>
+                    <span className={styles.benefitNumber}>02.</span>
+                    <aside className={styles.benefitText}>
+                        <span className={styles.benefitTitle}>Describe your dev enviroment</span>
+                        <span className={styles.benefitDescription}>Any information regarding your development environment </span>
+                    </aside>
+                </article>
+                <article className={styles.benefit}>
+                    <span className={styles.benefitNumber}>03.</span>
+                    <aside className={styles.benefitText}>
+                        <span className={styles.benefitTitle}>A snippet of code</span>
+                        <span className={styles.benefitDescription}>A list of steps and a small snippet of sample code that can be used to reproduce the problem.</span>
+                    </aside>
+                </article>
+                <article className={styles.benefit}>
+                    <span className={styles.benefitNumber}>04.</span>
+                    <aside className={styles.benefitText}>
+                        <span className={styles.benefitTitle}>Output and error messages</span>
+                        <span className={styles.benefitDescription}>A description of the expected output and what occurred. Include any error messages you receive.</span>
+                    </aside>
+                </article>
+            </section>
+            <Button
+                text="View Reseller Documentation"
+                variant="filled"
+                icon="img/arrow.svg"
+                href="/docs/resellers/introduction"
+            />
+        </section>
     )
 }
 
 export default function Home(): JSX.Element {
     return (
-        <Layout>
+        <>
+            <HeaderMenu/>
             <HomepageHeader/>
-            <WelcomeText></WelcomeText>
-            <main></main>
-        </Layout>
+            <WelcomeText/>
+        </>
     );
 }
