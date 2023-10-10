@@ -1,5 +1,6 @@
 import base64
 import datetime
+import pathlib
 import tempfile
 
 import pydantic
@@ -28,7 +29,7 @@ class BenerailSettings(pydantic.BaseModel):
 
 class DumpStationsSettings(BenerailSettings, service.Settings):
     geodata_address: str
-    output_dir: pydantic.DirectoryPath = "."  # type: ignore[assignment]
+    output_dir: pydantic.DirectoryPath = pathlib.Path()
 
 
 class Settings(BenerailSettings, service.ProviderSettings):
