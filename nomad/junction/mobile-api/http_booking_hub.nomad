@@ -143,7 +143,7 @@ job "mobile-api-http-booking-hub" {
       vault {
         policies = [
           "booking-hub-mobile-api-${var.environment}",
-          "authentication-${var.environment}",
+          "client-api-${var.environment}",
         ]
       }
       template {
@@ -162,7 +162,7 @@ JWT_PRIVATE_KEY={{ .Data.data.jwt_private_key }}
 JWT_PUBLIC_KEY={{ .Data.data.jwt_public_key }}
 ORY_CLIENT_SECRET={{ .Data.data.ory_client_secret }}
 {{ end }}
-{{ with secret "kv/data/${var.environment}/authentication" }}
+{{ with secret "kv/data/${var.environment}/client-api" }}
 JUNCTION_PRIVATE_KEY={{ .Data.data.jwt_private_key }}
 {{ end }}
 EOH
