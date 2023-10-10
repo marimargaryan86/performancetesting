@@ -6,13 +6,7 @@ import pydantic
 from snowfall.stdlib import money
 
 
-class CamelCaseBaseModel(pydantic.BaseModel):
-    class Config(object):
-        allow_population_by_field_name = True
-        extra = pydantic.Extra.forbid
-
-
-class Payment(CamelCaseBaseModel):
+class Payment(pydantic.BaseModel):
     identifier: str = pydantic.Field(..., alias="id")
     amount: float
     failure_returned_amount: float
