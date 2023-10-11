@@ -29,6 +29,9 @@ job "prometheus-prometheus" {
     }
 
     task "prometheus" {
+      resources {
+        memory = 500 # 500MB
+      }
       template {
         change_mode = "restart"
         destination = "${NOMAD_TASK_DIR}/prometheus.yml"
