@@ -97,7 +97,20 @@ warn_untyped_fields = true
 
 
 [tool.pytest.ini_options]
-addopts = "--import-mode=importlib --asyncio-mode=auto -W ignore::DeprecationWarning:aioredis.connection: -W ignore::DeprecationWarning:jsonschema.validators: -W ignore::DeprecationWarning:openapi_core.unmarshalling.schemas.unmarshallers: -W ignore::DeprecationWarning:openapi_spec_validator.validators: -W ignore::DeprecationWarning:openapi_spec_validator.factories: -W ignore::DeprecationWarning:openapi_schema_validator.validators: -W ignore::DeprecationWarning:openapi_schema_validator.validators: -W ignore::DeprecationWarning:pkg_resources: -W ignore::DeprecationWarning:google.rpc:"
+filterwarnings = [
+  "error",
+  "ignore::DeprecationWarning:xdist.plugin",
+  "ignore::DeprecationWarning:unittest.mock",
+  "ignore::DeprecationWarning:mongomock.__version__:1",
+  "ignore::DeprecationWarning:pkg_resources",
+  "ignore::DeprecationWarning:google.rpc",
+  "ignore::DeprecationWarning:openapi_core.deserializing.parameters.deserializers",
+  "ignore::DeprecationWarning:openapi_core.validation.request.validators",
+  "ignore::DeprecationWarning:pydantic._internal._generate_schema",
+  "ignore::DeprecationWarning:pydantic._internal._model_construction",
+]
+
+addopts = "--import-mode=importlib --asyncio-mode=auto"
 
 [tool.ruff]
 external = [
