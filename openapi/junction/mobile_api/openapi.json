@@ -1853,6 +1853,9 @@
           },
           "400": {
             "$ref": "./../client_api/openapi.json#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Unauthorized"
           }
         },
         "operationId": "get-places",
