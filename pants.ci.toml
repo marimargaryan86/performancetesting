@@ -10,10 +10,7 @@ global_report = true
 report = ["console", "xml"]
 
 [docker]
-env_vars = [
-    "DOCKER_CONFIG",
-    "DOCKER_HOST",
-]
+env_vars = ["DOCKER_CONFIG", "DOCKER_HOST"]
 
 [test]
 report = true

@@ -1,3 +1,4 @@
+---
 rules:
   redundant-path-ids:
     severity: error

@@ -15,10 +15,7 @@ omit = ["*_pb2.py", "*_pb2_grpc.py"]
 relative_files = true
 
 [tool.mypy]
-plugins = [
-    "pydantic.mypy",
-    "pydantic.v1.mypy",
-]
+plugins = ["pydantic.mypy", "pydantic.v1.mypy"]
 check_untyped_defs = true
 disallow_any_generics = true
 disallow_incomplete_defs = true
@@ -27,13 +24,13 @@ disallow_untyped_calls = true
 disallow_untyped_decorators = true
 disallow_untyped_defs = true
 enable_error_code = [
-    "ignore-without-code",
-    "possibly-undefined",
-    "redundant-expr",
-    "redundant-self",
-    "truthy-bool",
-    "truthy-iterable",
-    "unused-awaitable",
+  "ignore-without-code",
+  "possibly-undefined",
+  "redundant-expr",
+  "redundant-self",
+  "truthy-bool",
+  "truthy-iterable",
+  "unused-awaitable",
 ]
 explicit_package_bases = true
 extra_checks = true
@@ -60,35 +57,35 @@ warn_no_return = true
 
 [[tool.mypy.overrides]]
 module = [
-    "snowfall.vendor.rate_limiter.gubernator_pb2",
-    "snowfall.vendor.rate_limiter.gubernator_pb2_grpc",
+  "snowfall.vendor.rate_limiter.gubernator_pb2",
+  "snowfall.vendor.rate_limiter.gubernator_pb2_grpc",
 ]
 ignore_errors = true
 
 [[tool.mypy.overrides]]
 module = [
-    "allure.*", # https://github.com/allure-framework/allure-python/issues/731
-    "authlib.*", # https://github.com/lepture/authlib/issues/460
-    "fsspec.*", # https://github.com/fsspec/filesystem_spec/issues/625
-    "furl.*", # https://github.com/gruns/furl/issues/148
-    "geopy.*",
-    "google.rpc.*", # https://github.com/nipunn1313/mypy-protobuf/issues/507
-    "grpc.*", # https://github.com/nipunn1313/mypy-protobuf/issues/507
-    "grpc_health.*", # https://github.com/nipunn1313/mypy-protobuf/issues/507
-    "grpc_reflection.*", # https://github.com/nipunn1313/mypy-protobuf/issues/507
-    "grpc_status.*", # https://github.com/nipunn1313/mypy-protobuf/issues/507
-    "h3.*", # https://github.com/uber/h3-py/pull/216
-    "hvac.*", # https://github.com/hvac/hvac/issues/800
-    "isodate.*",
-    "json_api_doc.*",
-    "mongomock_motor.*", # https://github.com/michaelkryukov/mongomock_motor/issues/29
-    "pandas.*",
-    "pycountry.*", # https://github.com/flyingcircusio/pycountry/issues/135
-    "qrcode.*", # https://github.com/lincolnloop/python-qrcode/pull/321
-    "rfc3339_validator.*",
-    "s3fs.*", # https://github.com/fsspec/s3fs/issues/383
-    "shapefile.*",
-    "shapely.*", # https://github.com/shapely/shapely/issues/721
+  "allure.*",            # https://github.com/allure-framework/allure-python/issues/731
+  "authlib.*",           # https://github.com/lepture/authlib/issues/460
+  "fsspec.*",            # https://github.com/fsspec/filesystem_spec/issues/625
+  "furl.*",              # https://github.com/gruns/furl/issues/148
+  "geopy.*",
+  "google.rpc.*",        # https://github.com/nipunn1313/mypy-protobuf/issues/507
+  "grpc.*",              # https://github.com/nipunn1313/mypy-protobuf/issues/507
+  "grpc_health.*",       # https://github.com/nipunn1313/mypy-protobuf/issues/507
+  "grpc_reflection.*",   # https://github.com/nipunn1313/mypy-protobuf/issues/507
+  "grpc_status.*",       # https://github.com/nipunn1313/mypy-protobuf/issues/507
+  "h3.*",                # https://github.com/uber/h3-py/pull/216
+  "hvac.*",              # https://github.com/hvac/hvac/issues/800
+  "isodate.*",
+  "json_api_doc.*",
+  "mongomock_motor.*",   # https://github.com/michaelkryukov/mongomock_motor/issues/29
+  "pandas.*",
+  "pycountry.*",         # https://github.com/flyingcircusio/pycountry/issues/135
+  "qrcode.*",            # https://github.com/lincolnloop/python-qrcode/pull/321
+  "rfc3339_validator.*",
+  "s3fs.*",              # https://github.com/fsspec/s3fs/issues/383
+  "shapefile.*",
+  "shapely.*",           # https://github.com/shapely/shapely/issues/721
 ]
 ignore_missing_imports = true
 
@@ -104,137 +101,137 @@ addopts = "--import-mode=importlib --asyncio-mode=auto -W ignore::DeprecationWar
 
 [tool.ruff]
 external = [
-    "P103", # other string does contain unindexed parameters
-    "SF10", # All dataclasses should be frozen
-    "SF20", # Found mutable argument type
-    "WPS110", # Forbid blacklisted variable names
-    "WPS111", # Forbid short variable or module names
-    "WPS114", # Forbid names with underscored numbers pattern
-    "WPS115", # Require snake_case for naming class attributes
-    "WPS117", # Found name reserved for first argument
-    "WPS118", # Forbid long variable or module names
-    "WPS204", # Forbid overused expressions in a module, function or method
-    "WPS210", # Forbid too many local variables in the unit of code
-    "WPS211", # Forbid too many arguments for a function or method
-    "WPS213", # Forbid putting too many expressions in a single function
-    "WPS214", # Forbid too many methods in a single class
-    "WPS215", # Restrict the maximum number of base classes
-    "WPS217", # Forbid placing too many await expressions in a function
-    "WPS218", # Forbid placing too many assert statements into a function
-    "WPS219", # Forbid consecutive expressions with too deep access level
-    "WPS220", # Forbid nesting blocks too deep
-    "WPS221", # Forbid complex lines
-    "WPS223", # Forbid too many elif branches
-    "WPS224", # Forbid too many for statements within a comprehension
-    "WPS229", # Forbid try blocks with bodies that are too long
-    "WPS231", # Forbid functions with too much cognitive complexity
-    "WPS235", # Forbid from ... import ... with too many imported names
-    "WPS238", # Forbids too many raise statements in a function
-    "WPS306", # Forbid writing classes without base classes
-    "WPS320", # Forbid multi-line function type annotations.
-    "WPS336", # Forbid explicit string concatanation in favour of .format method
-    "WPS337", # Forbid multiline conditions
-    "WPS348", # Forbid starting lines with a dot
-    "WPS352", # Forbid multiline loops
-    "WPS421", # Forbid calling some built-in functions
-    "WPS430", # Forbid nested functions
-    "WPS431", # Forbid nested classes
-    "WPS432", # Forbid magic numbers
-    "WPS436", # Forbid importing protected modules
-    "WPS441", # Forbid control variables after the block body
-    "WPS450", # Forbid importing protected objects from modules
-    "WPS465", # Forbid comparisons between bitwise and boolean expressions
-    "WPS473", # Limit empty lines in functions or methods body
-    "WPS505", # Forbid nested try blocks
-    "WPS601", # Forbid shadowing class level attributes with instance level attributes
-    "WPS609", # Forbid directly calling certain magic attributes and methods
+  "P103",   # other string does contain unindexed parameters
+  "SF10",   # All dataclasses should be frozen
+  "SF20",   # Found mutable argument type
+  "WPS110", # Forbid blacklisted variable names
+  "WPS111", # Forbid short variable or module names
+  "WPS114", # Forbid names with underscored numbers pattern
+  "WPS115", # Require snake_case for naming class attributes
+  "WPS117", # Found name reserved for first argument
+  "WPS118", # Forbid long variable or module names
+  "WPS204", # Forbid overused expressions in a module, function or method
+  "WPS210", # Forbid too many local variables in the unit of code
+  "WPS211", # Forbid too many arguments for a function or method
+  "WPS213", # Forbid putting too many expressions in a single function
+  "WPS214", # Forbid too many methods in a single class
+  "WPS215", # Restrict the maximum number of base classes
+  "WPS217", # Forbid placing too many await expressions in a function
+  "WPS218", # Forbid placing too many assert statements into a function
+  "WPS219", # Forbid consecutive expressions with too deep access level
+  "WPS220", # Forbid nesting blocks too deep
+  "WPS221", # Forbid complex lines
+  "WPS223", # Forbid too many elif branches
+  "WPS224", # Forbid too many for statements within a comprehension
+  "WPS229", # Forbid try blocks with bodies that are too long
+  "WPS231", # Forbid functions with too much cognitive complexity
+  "WPS235", # Forbid from ... import ... with too many imported names
+  "WPS238", # Forbids too many raise statements in a function
+  "WPS306", # Forbid writing classes without base classes
+  "WPS320", # Forbid multi-line function type annotations.
+  "WPS336", # Forbid explicit string concatanation in favour of .format method
+  "WPS337", # Forbid multiline conditions
+  "WPS348", # Forbid starting lines with a dot
+  "WPS352", # Forbid multiline loops
+  "WPS421", # Forbid calling some built-in functions
+  "WPS430", # Forbid nested functions
+  "WPS431", # Forbid nested classes
+  "WPS432", # Forbid magic numbers
+  "WPS436", # Forbid importing protected modules
+  "WPS441", # Forbid control variables after the block body
+  "WPS450", # Forbid importing protected objects from modules
+  "WPS465", # Forbid comparisons between bitwise and boolean expressions
+  "WPS473", # Limit empty lines in functions or methods body
+  "WPS505", # Forbid nested try blocks
+  "WPS601", # Forbid shadowing class level attributes with instance level attributes
+  "WPS609", # Forbid directly calling certain magic attributes and methods
 ]
 ignore = [
-    "D100", # Missing docstring in public module
-    "D101", # Missing docstring in public class
-    "D102", # Missing docstring in public method
-    "D103", # Missing docstring in public function
-    "D104", # Missing docstring in public package
-    "D105", # Missing docstring in magic method
-    "D106", # Missing docstring in public nested class
-    "D107", # Missing docstring in `__init__
-    "D418", # Function decorated with `@overload` shouldn't contain a docstring
-    "ANN101", # Missing type annotation for self in method
-    "ANN102", # Missing type annotation for cls in classmethod
-    "ANN401", # Dynamically typed expressions (typing.Any) are disallowed
-    "E203", # Whitespace before ':'
-    "E501", # Line too long
-    "PLC1901", # can be simplified as an empty string is falsey
-    "PLR0913", # Too many arguments to function call # TODO: fix
-    "PLR2004", # Magic value used in comparison, consider replacing with a constant variable # TODO: fix
-    "PLR6301", # Method could be a function or static method
-    "PLR0904", # Too many public methods
-    "TD002", # Missing author in TODO; try: `# TODO(<author_name>): ...` or `# TODO @<author_name>: ...`
-    "TD003", # Missing issue link on the line following this TODO
-    "TRY003", # Avoid specifying long messages outside the exception class # TODO: fix
-    "UP004", # Class inherits from `object`
-    "UP030", # Use implicit references for positional format fields
-    "UP032", # Use f-string instead of `format` call
+  "D100",    # Missing docstring in public module
+  "D101",    # Missing docstring in public class
+  "D102",    # Missing docstring in public method
+  "D103",    # Missing docstring in public function
+  "D104",    # Missing docstring in public package
+  "D105",    # Missing docstring in magic method
+  "D106",    # Missing docstring in public nested class
+  "D107",    # Missing docstring in `__init__
+  "D418",    # Function decorated with `@overload` shouldn't contain a docstring
+  "ANN101",  # Missing type annotation for self in method
+  "ANN102",  # Missing type annotation for cls in classmethod
+  "ANN401",  # Dynamically typed expressions (typing.Any) are disallowed
+  "E203",    # Whitespace before ':'
+  "E501",    # Line too long
+  "PLC1901", # can be simplified as an empty string is falsey
+  "PLR0913", # Too many arguments to function call # TODO: fix
+  "PLR2004", # Magic value used in comparison, consider replacing with a constant variable # TODO: fix
+  "PLR6301", # Method could be a function or static method
+  "PLR0904", # Too many public methods
+  "TD002",   # Missing author in TODO; try: `# TODO(<author_name>): ...` or `# TODO @<author_name>: ...`
+  "TD003",   # Missing issue link on the line following this TODO
+  "TRY003",  # Avoid specifying long messages outside the exception class # TODO: fix
+  "UP004",   # Class inherits from `object`
+  "UP030",   # Use implicit references for positional format fields
+  "UP032",   # Use f-string instead of `format` call
 ]
 select = [
-    "A", # flake8-builtins
-    "AIR", # Airflow
-    "ANN", # flake8-annotations
-    #"ARG", # flake8-unused-arguments
-    "ASYNC", # flake8-async
-    "B", # flake8-bugbear
-    "BLE", # flake8-blind-except
-    "C4", # flake8-comprehensions
-    "C90", # mccabe
-    "COM", # flake8-commas
-    #"CPY", # Copyright-related rules
-    "D", # pydocstyle
-    "DJ", # flake8-django
-    "DTZ", # flake8-datetimez
-    "E", # pycodestyle
-    #"EM", # flake8-errmsg
-    "ERA", # eradicate
-    "EXE", # flake8-executable
-    "F", # Pyflakes
-    "FA", # flake8-future-annotations
-    "FBT", # flake8-boolean-trap
-    #"FIX", # flake8-fixme
-    "FLY", # flynt
-    "FURB", # refurb
-    "G", # flake8-logging-format
-    "I", # isort
-    "ISC", # flake8-implicit-str-concat
-    "ICN", # flake8-import-conventions
-    #"INP", # flake8-no-pep420
-    "INT", # flake8-gettext
-    "LOG", # flake8-logging
-    "N", # pep8-naming
-    "NPY", # NumPy-specific rules
-    "PD", # pandas-vet
-    "PGH", # pygrep-hooks
-    "PIE", # flake8-pie
-    "PL", # Pylint
-    "RET", # flake8-return
-    #"RSE", # flake8-raise
-    "PERF", # Perflint
-    "PT", # flake8-pytest-style
-    "PTH", # flake8-use-pathlib
-    "PYI", # flake8-pyi
-    "Q", # flake8-quotes
-    "RUF", # Ruff-specific rules
-    "S", # flake8-bandit
-    "SIM", # flake8-simplify
-    "SLF", # flake8-self
-    "SLOT", # flake8-slots
-    "T10", # flake8-debugger
-    "T20", # flake8-print
-    #"TCH", # flake8-type-checking
-    "TD", # flake8-todos
-    "TID", # flake8-tidy-imports
-    "TRY", # tryceratops
-    "UP", # pyupgrade
-    "W", # pycodestyle
-    "YTT", # flake8-2020
+  "A",   # flake8-builtins
+  "AIR", # Airflow
+  "ANN", # flake8-annotations
+  #"ARG", # flake8-unused-arguments
+  "ASYNC", # flake8-async
+  "B",     # flake8-bugbear
+  "BLE",   # flake8-blind-except
+  "C4",    # flake8-comprehensions
+  "C90",   # mccabe
+  "COM",   # flake8-commas
+  #"CPY", # Copyright-related rules
+  "D",   # pydocstyle
+  "DJ",  # flake8-django
+  "DTZ", # flake8-datetimez
+  "E",   # pycodestyle
+  #"EM", # flake8-errmsg
+  "ERA", # eradicate
+  "EXE", # flake8-executable
+  "F",   # Pyflakes
+  "FA",  # flake8-future-annotations
+  "FBT", # flake8-boolean-trap
+  #"FIX", # flake8-fixme
+  "FLY",  # flynt
+  "FURB", # refurb
+  "G",    # flake8-logging-format
+  "I",    # isort
+  "ISC",  # flake8-implicit-str-concat
+  "ICN",  # flake8-import-conventions
+  #"INP", # flake8-no-pep420
+  "INT", # flake8-gettext
+  "LOG", # flake8-logging
+  "N",   # pep8-naming
+  "NPY", # NumPy-specific rules
+  "PD",  # pandas-vet
+  "PGH", # pygrep-hooks
+  "PIE", # flake8-pie
+  "PL",  # Pylint
+  "RET", # flake8-return
+  #"RSE", # flake8-raise
+  "PERF", # Perflint
+  "PT",   # flake8-pytest-style
+  "PTH",  # flake8-use-pathlib
+  "PYI",  # flake8-pyi
+  "Q",    # flake8-quotes
+  "RUF",  # Ruff-specific rules
+  "S",    # flake8-bandit
+  "SIM",  # flake8-simplify
+  "SLF",  # flake8-self
+  "SLOT", # flake8-slots
+  "T10",  # flake8-debugger
+  "T20",  # flake8-print
+  #"TCH", # flake8-type-checking
+  "TD",  # flake8-todos
+  "TID", # flake8-tidy-imports
+  "TRY", # tryceratops
+  "UP",  # pyupgrade
+  "W",   # pycodestyle
+  "YTT", # flake8-2020
 ]
 target-version = "py311"
 preview = true
@@ -248,11 +245,21 @@ known-first-party = ["snowfall"]
 [tool.ruff.per-file-ignores]
 "*/conftest.py" = ["S101", "S105", "S106"]
 "*_test.py" = ["S101", "S105", "S106"]
-"python/snowfall/stdlib/integration/starlette/testing.py" = ["S101", "S105", "S106"]
+"python/snowfall/stdlib/integration/starlette/testing.py" = [
+  "S101",
+  "S105",
+  "S106",
+]
 "python/snowfall/stdlib/testing/asserts.py" = ["S101", "S105", "S106"]
 "python/snowfall/vendor/carnect/models/**/*.py" = ["A003"]
 "python/snowfall/vendor/gubernator/gubernator_pb2.py" = ["E402", "ERA001"]
-"python/snowfall/vendor/gubernator/gubernator_pb2_grpc.py" = ["ANN001", "ANN201", "ANN204", "ANN205", "N802"]
+"python/snowfall/vendor/gubernator/gubernator_pb2_grpc.py" = [
+  "ANN001",
+  "ANN201",
+  "ANN204",
+  "ANN205",
+  "N802",
+]
 
 [tool.ruff.pydocstyle]
 convention = "google"

@@ -1,3 +1,4 @@
+---
 version: "3.7"
 services:
   mongo:
@@ -30,7 +31,7 @@ services:
       - GUBER_ADVERTISE_ADDRESS=gubernator-1:81
       # A comma separated list of known gubernator nodes
       - GUBER_MEMBERLIST_KNOWN_NODES=gubernator-1
-      #- GUBER_DATA_CENTER=us-east-1
+      # - GUBER_DATA_CENTER=us-east-1
     ports:
       - "9081:81"
       - "9080:80"

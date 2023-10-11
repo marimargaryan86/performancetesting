@@ -1,20 +1,21 @@
+---
 extends:
   - [spectral:oas, all]
   - https://unpkg.com/@apisyouwonthate/style-guide@1.4.0/dist/ruleset.js
   - https://raw.githubusercontent.com/apisyouwonthate/style-guide/06bd2f71f676edc7ed56b8fbe1c35ba971d16665/openapi.yml
   - rules/snowfall-ruleset.yml
 rules:
-  oas3-api-servers: off
-  api-home: off
-  operation-short-summary: off
-  api-health-format: off
-  request-support-json-oas3: off
+  oas3-api-servers: "off"
+  api-home: "off"
+  operation-short-summary: "off"
+  api-health-format: "off"
+  request-support-json-oas3: "off"
 overrides:
   - files:
       - "junction/client_api/openapi.json#/paths/~1offers~1quotes/post/requestBody/content"
       - "junction/mobile_api/openapi.json#/paths/~1offers~1quotes"
     rules:
-      oas3-valid-schema-example: off
+      oas3-valid-schema-example: "off"
   - files:
       - "junction/data_api/openapi.json#/paths/~1locations"
     rules:
@@ -39,7 +40,7 @@ overrides:
   - files:
       - "junction/pay_api/openapi.json#/components/parameters/currencyId"
     rules:
-      no-numeric-ids: off
+      no-numeric-ids: "off"
   - files:
       - "junction/mobile_api/openapi.json#/components/schemas/PreferenceAttributes"
     rules:

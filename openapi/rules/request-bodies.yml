@@ -1,3 +1,4 @@
+---
 rules:
   request-bodies:
     severity: warn

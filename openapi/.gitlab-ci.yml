@@ -1,3 +1,4 @@
+---
 openapi:breaking:
   stage: test
   image: "${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG}"

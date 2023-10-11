@@ -1,3 +1,4 @@
+---
 rules:
   date-time-names:
     severity: error

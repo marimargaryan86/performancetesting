@@ -1,3 +1,4 @@
+---
 rules:
   query-parameter-names:
     severity: warn

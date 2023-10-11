@@ -1,3 +1,4 @@
+---
 extends:
   - rules/filters.yml
 functions:
@@ -190,4 +191,3 @@ rules:
       function: pattern
       functionOptions:
         match: "^[a-z-]+$"
-

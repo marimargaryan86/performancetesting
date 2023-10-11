@@ -1,3 +1,4 @@
+---
 extends:
   - rules/arrays.yml
   - rules/content.yml

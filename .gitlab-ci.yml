@@ -1,8 +1,9 @@
+---
 workflow:
   rules:
     - if: '$CI_PROJECT_NAMESPACE != "junction" || $CI_PROJECT_NAME != "junction"'
       when: never
-    - when : always
+    - when: always
 
 stages:
   - setup

@@ -1,3 +1,4 @@
+---
 rules:
   oas3minimum:
     given: "$"
