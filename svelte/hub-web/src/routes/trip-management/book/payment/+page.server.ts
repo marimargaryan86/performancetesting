@@ -5,7 +5,11 @@ import { getPassengerValidator } from "./passenger-entry.svelte";
 import { contactInformationData } from "./contact-information.svelte";
 import { priceModel } from "integration/junction-mobile-api/schemas/price";
 import { ensureDefined } from "utils/array";
-import type { CreateOrderModel, OrderModel } from "integration/junction-mobile-api/schemas/order";
+import type {
+  CreateOrderModel,
+  CreateOrderMarkupsModel,
+  OrderModel,
+} from "integration/junction-mobile-api/schemas/order";
 import bookingManager, { type SearchDataModel } from "../booking-manager.server";
 import { z } from "zod";
 import { getActionRequestJsonData } from "utils/common";
@@ -138,6 +142,11 @@ export const actions = {
     } catch {
       return fail(400);
     }
+  },
+  async createOrderMarkups(): Promise<ActionFailure<{
+    error: z.ZodFormattedError<CreateOrderMarkupsModel>;
+  }> | void> {
+    // TODO: implement
   },
   confirmPayment(event): void {
     const searchData = bookingManager.getSearchData(event);

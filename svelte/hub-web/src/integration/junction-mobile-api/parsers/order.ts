@@ -1,4 +1,11 @@
-import { orderModel, type OrderModel, type OrderSchema } from "../schemas/order";
+import {
+  orderMarkupsModel,
+  orderModel,
+  type OrderMarkupsModel,
+  type OrderMarkupsSchema,
+  type OrderModel,
+  type OrderSchema,
+} from "../schemas/order";
 import type { JourneyModel } from "../schemas/journey";
 import type { BookingModel } from "../schemas/booking";
 
@@ -27,5 +34,20 @@ export function parseOrderSchema(
     status: getOrderStatus(bookings),
     bookings,
     journey: included.journeys?.find((item) => item.id === data.relationships.journey.data.id),
+  };
+}
+
+export function parseOrderMarkupsSchema(
+  data: OrderMarkupsSchema,
+  included: {
+    order?: OrderModel;
+  } = {},
+): OrderMarkupsModel {
+  const parsed = orderMarkupsModel.toModel(data);
+  const orderId = included.order?.id ?? "";
+
+  return {
+    ...parsed,
+    orderId,
   };
 }

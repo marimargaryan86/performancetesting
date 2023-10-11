@@ -32,6 +32,7 @@ export default {
               actions: {
                 poll: "/trip-management/book/payment?/poll",
                 createOrder: "/trip-management/book/payment?/createOrder",
+                createOrderMarkups: "/trip-management/book/payment?/createOrderMarkups",
                 confirmPayment: "/trip-management/book/payment?/confirmPayment",
               },
             },

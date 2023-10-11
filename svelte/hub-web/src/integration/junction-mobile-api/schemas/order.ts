@@ -4,6 +4,7 @@ import { z } from "zod";
 import { paymentIntentModel } from "./payment";
 import { journeyModel, type JourneySchema } from "./journey";
 import { bookingModel, type BookingDetailsSchema, type BookingSchema } from "./booking";
+import { priceModel } from "./price";
 
 export const passengerTitle = z.enum(["unspecified", "mr", "mrs", "ms", "miss"]);
 export const passengerGender = z.enum(["unspecified", "male", "female"]);
@@ -218,6 +219,77 @@ export const createOrderModel = getSchemaModel(
 );
 export type CreateOrderModel = Infer<typeof createOrderModel>;
 export type CreateOrderSchema = Infer<typeof createOrderModel, "schema">;
+
+export const orderMarkupsModel = getSchemaModel(
+  z.object({
+    id: z.string().uuid(),
+    type: z.enum(["markups"]),
+    attributes: z.object({
+      servicefee: priceModel.schema,
+      agencyMarkup: priceModel.schema,
+      totalToCollect: priceModel.schema,
+    }),
+    relationships: relationship({
+      order: orderModel.identifier,
+    }),
+    // TODO: check if this will be implemented
+    links: links(["self"]),
+  }),
+  z.object({
+    id: z.string(),
+    servicefee: priceModel.model,
+    agencyMarkup: priceModel.model,
+    totalToCollect: priceModel.model,
+    orderId: z.string(),
+  }),
+  {
+    toModel: (data) => ({
+      id: data.id,
+      servicefee: priceModel.toModel(data.attributes.servicefee),
+      agencyMarkup: priceModel.toModel(data.attributes.agencyMarkup),
+      totalToCollect: priceModel.toModel(data.attributes.totalToCollect),
+      orderId: data.relationships.order.data.id,
+    }),
+  },
+);
+export type OrderMarkupsModel = Infer<typeof orderMarkupsModel>;
+export type OrderMarkupsSchema = Infer<typeof orderMarkupsModel, "schema">;
+export type OrderMarkupsIdentifier = Infer<typeof orderMarkupsModel, "identifier">;
+
+export const createOrderMarkupsModel = getSchemaModel(
+  z.object({
+    type: z.enum(["markups"]),
+    attributes: z.object({
+      servicefee: priceModel.schema,
+      agencyMarkup: priceModel.schema,
+      totalToCollect: priceModel.schema,
+    }),
+    relationships: relationship({
+      order: orderModel.identifier,
+    }),
+  }),
+  z.object({
+    servicefee: priceModel.model,
+    agencyMarkup: priceModel.model,
+    totalToCollect: priceModel.model,
+    orderId: z.string(),
+  }),
+  {
+    toSchema: (data) => ({
+      type: "markups" as const,
+      attributes: {
+        servicefee: priceModel.toSchema(data.servicefee),
+        agencyMarkup: priceModel.toSchema(data.agencyMarkup),
+        totalToCollect: priceModel.toSchema(data.totalToCollect),
+      },
+      relationships: {
+        order: { data: { id: data.orderId, type: "orders" as const } },
+      },
+    }),
+  },
+);
+export type CreateOrderMarkupsModel = Infer<typeof createOrderModel>;
+export type CreateOrderMarkupsSchema = Infer<typeof createOrderModel, "schema">;
 
 export type OrderIncludes =
   | JourneySchema

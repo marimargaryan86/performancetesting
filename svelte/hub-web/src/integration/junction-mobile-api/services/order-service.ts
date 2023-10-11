@@ -1,14 +1,18 @@
 import JunctionMobileApiService from "./junction-mobile-api-service";
 import {
   createOrderModel,
+  createOrderMarkupsModel,
+  type CreateOrderMarkupsModel,
   type CreateOrderModel,
   type CreateOrderSchema,
   type OrderIncludes,
+  type OrderMarkupsModel,
+  type OrderMarkupsSchema,
   type OrderModel,
   type OrderSchema,
 } from "../schemas/order";
 import { getRandomAlphaNumericString } from "utils/random";
-import { parseOrderSchema } from "../parsers/order";
+import { parseOrderMarkupsSchema, parseOrderSchema } from "../parsers/order";
 import type { PaginatedData } from "models/common";
 import { parseIncluded } from "../parsers/included";
 import { ensureJunctionError } from "integration/common/junction-error";
@@ -90,7 +94,38 @@ export class OrderService extends JunctionMobileApiService {
     }
   }
 
-  async getOrder({ session, id }: { session: SessionModel; id: string }): Promise<OrderModel> {
+  /**
+   * TODO: Docs here.
+   */
+  async createOrderMarkups({
+    session,
+    data,
+  }: {
+    session: SessionModel;
+    data: CreateOrderMarkupsModel;
+  }): Promise<OrderMarkupsModel> {
+    try {
+      const resp = await this.makeRequest<{ data: OrderMarkupsSchema }>("/orders/markups", {
+        method: "POST",
+        data: { data: createOrderMarkupsModel.toSchema(data) },
+        session,
+      });
+
+      return parseOrderMarkupsSchema(resp.json.data);
+    } catch (err) {
+      if (ensureJunctionError<{ data: CreateOrderSchema }>(err)) {
+        const error = new z.ZodError<CreateOrderModel>([]);
+
+        err.json?.errors.map(() => {
+          throw error;
+        });
+      }
+
+      throw err;
+    }
+  }
+
+  async getOrder({ id, session }: { id: string; session: SessionModel }): Promise<OrderModel> {
     const resp = await this.makeRequest<{
       data: OrderSchema;
       included?: OrderIncludes[];
