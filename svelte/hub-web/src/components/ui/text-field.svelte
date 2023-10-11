@@ -27,6 +27,9 @@
   export let helpText: string | undefined = undefined;
   export let clearable = false;
   export let maxLength: number | undefined = undefined;
+  export let min: string | number | undefined = undefined;
+  export let max: string | number | undefined = undefined;
+  export let step: string | number | undefined = undefined;
 
   let inputRef: HTMLInputElement;
 
@@ -85,6 +88,9 @@
       {readonly}
       {placeholder}
       maxlength={maxLength}
+      {min}
+      {max}
+      {step}
       value={displayValue}
       on:click
       on:focus

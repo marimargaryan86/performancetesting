@@ -55,6 +55,8 @@
   };
   let errors: z.ZodFormattedError<z.infer<typeof bookingDetailsValidator>> | undefined = undefined;
   let { priceQuote, paymentIntent } = data;
+  // TODO: type this
+  let orderMarkup: object;
 
   $: bookingDetailsValidator = z.object({
     passengers: z.array(getPassengerValidator(priceQuote.required)),
@@ -191,7 +193,7 @@
 
     <div class="column payment">
       <Summary {priceQuote} passengers={data.searchData.passengers} />
-      <Fees />
+      <Fees {priceQuote} bind:orderMarkup />
       <Payment bind:this={payment} {paymentIntent} />
       <ContactInformation
         countries={data.countries}

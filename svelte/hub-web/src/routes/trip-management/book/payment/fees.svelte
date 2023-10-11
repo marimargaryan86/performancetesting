@@ -1,22 +1,73 @@
+<script lang="ts" context="module">
+  const feeTypes = ["flat-rate", "percentage"] as const;
+  const feeType = z.enum(feeTypes);
+  type FeeType = z.infer<typeof feeType>;
+
+  const FALLBACK_CURRENCY = "EUR";
+
+  function roundCurrency(num: number): number {
+    return Math.round((num + Number.EPSILON) * 100) / 100;
+  }
+</script>
+
 <script lang="ts">
+  import { z } from "zod";
   import { dev } from "$app/environment";
-  import { formatAmount } from "formatting/currency";
   import { slideFade } from "transitions/slide-fade";
   import Collapsible from "../../components/collapsible.svelte";
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import SelectField from "components/ui/select-field.svelte";
   import TextField from "components/ui/text-field.svelte";
+  import { formatAmount } from "formatting/currency";
+  import type { TripOfferPriceQuoteModel } from "integration/junction-mobile-api/schemas/offer";
 
-  const mockedTotalFees = { currency: "EUR", amount: 100 };
-  const mockedFeesBreakdown = [
-    { type: "Service fee", fee: { currency: "EUR", amount: 75 } },
-    { type: "Agency Mark-up", fee: { currency: "EUR", amount: 25 } },
-  ];
-
+  export let priceQuote: TripOfferPriceQuoteModel | undefined = undefined;
+  export let orderMarkup;
   let collapsible: Collapsible | undefined;
+  let serviceFeeType: FeeType;
+  let agencyMarkupType: FeeType;
 
-  $: feesBreakdown = mockedFeesBreakdown;
-  $: totalFees = mockedTotalFees;
+  function formatFeeType(option?: FeeType): string {
+    return option
+      ? {
+          "flat-rate": currency,
+          percentage: "%",
+        }[option]
+      : "";
+  }
+
+  function calcFeeAmount(type: FeeType, amount: number, totalPriceAmount: number): number {
+    switch (type) {
+      case "flat-rate":
+        return roundCurrency(amount);
+
+      case "percentage":
+        return roundCurrency((amount / 100) * totalPriceAmount);
+
+      default:
+        return NaN;
+    }
+  }
+
+  $: totalPrice = priceQuote?.price ?? { currency, amount: 0 };
+  $: currency = priceQuote?.price?.currency ?? FALLBACK_CURRENCY;
+  $: serviceFeeType = feeType.Enum["flat-rate"];
+  $: serviceFeeAmount = 0;
+  $: agencyMarkupType = feeType.Enum["flat-rate"];
+  $: agencyMarkupAmount = 0;
+  $: calculatedServiceFeeAmount = calcFeeAmount(
+    serviceFeeType,
+    serviceFeeAmount,
+    totalPrice.amount,
+  );
+  $: calculatedAgencyMarkupAmount = calcFeeAmount(
+    agencyMarkupType,
+    agencyMarkupAmount,
+    totalPrice.amount,
+  );
+  $: totalToCollectAmount =
+    totalPrice.amount + calculatedServiceFeeAmount + calculatedAgencyMarkupAmount;
+  $: orderMarkup = {};
 </script>
 
 {#if !dev}
@@ -24,50 +75,68 @@
 {:else}
   <Collapsible bind:this={collapsible} title="Fees">
     <div class="details">
-      {#if feesBreakdown}
-        {#each feesBreakdown as item}
-          <div class="input-wrapper">
-            <TextField
-              bind:value={item.fee.amount}
-              type="number"
-              placeholder="Enter amount"
-              label={item.type}
-            />
+      <div class="input-wrapper">
+        <TextField
+          bind:value={serviceFeeAmount}
+          type="number"
+          min="0"
+          step="0.01"
+          placeholder="Enter amount"
+          label="Service fee"
+        />
 
-            <SelectField
-              options={["EUR", "USD"]}
-              bind:value={item.fee.currency}
-              placeholder="Select currency"
-              label="&nbsp;"
-            />
-          </div>
-        {/each}
-      {/if}
+        <SelectField
+          formatter={formatFeeType}
+          options={feeTypes}
+          bind:value={serviceFeeType}
+          placeholder="Select fee type"
+          label="&nbsp;"
+        />
+
+        <TextField
+          bind:value={agencyMarkupAmount}
+          type="number"
+          min="0"
+          step="0.01"
+          placeholder="Enter amount"
+          label="Agency mark-up"
+        />
+
+        <SelectField
+          formatter={formatFeeType}
+          options={feeTypes}
+          bind:value={agencyMarkupType}
+          placeholder="Select fee type"
+          label="&nbsp;"
+        />
+      </div>
     </div>
 
     <div class="fees" slot="content-after" let:expanded let:transitionTimeMs>
       {#if expanded}
         <div transition:slideFade={{ duration: transitionTimeMs }} class="fees-breakdown">
-          {#if feesBreakdown}
-            <ul>
-              {#each feesBreakdown as item}
-                <li>
-                  <span class="typography label-medium">{item.type}</span>
-                  <span class="typography body-small bold">
-                    {formatAmount(item.fee, undefined, true)}
-                  </span>
-                </li>
-              {/each}
-            </ul>
-          {/if}
+          <ul>
+            <li>
+              <span class="typography label-medium">Service fee</span>
+              <span class="typography body-small bold">
+                {formatAmount({ currency, amount: calculatedServiceFeeAmount }, undefined, true)}
+              </span>
+            </li>
+            <li>
+              <span class="typography label-medium">Agency mark-up</span>
+              <span class="typography body-small bold">
+                {formatAmount({ currency, amount: calculatedAgencyMarkupAmount }, undefined, true)}
+              </span>
+            </li>
+          </ul>
         </div>
       {/if}
 
       <div class="total">
         <span class="typography body-large bold">Total to collect</span>
         <em class="typography body-large bold">
-          {#if totalFees}
-            {formatAmount(totalFees, undefined, true)}
+          {#if priceQuote?.price}
+            {formatAmount({ currency, amount: totalToCollectAmount }, undefined, true)}
           {:else}
             <LoadingIcon size="16px" />
           {/if}
