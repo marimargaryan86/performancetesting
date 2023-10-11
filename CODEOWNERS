@@ -16,10 +16,6 @@
 /svelte/**/package.json
 /svelte/**/tsconfig.json
 
-[Documentation]
-/docs/engineering/ @platform-engineers
-/docs/engineering/docs/projects/ @architects
-
 [Platform] @platform-engineers
 /golang/cmd/snowman/
 /golang/go.mod
