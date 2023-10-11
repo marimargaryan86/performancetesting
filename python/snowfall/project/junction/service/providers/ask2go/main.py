@@ -42,6 +42,7 @@ from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer, types
 from snowfall.vendor.ask2go import client
 from snowfall.vendor.ask2go.models import search as search_models
+from snowfall.vendor.rate_limiter import gubernator_pb2_grpc
 from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 from snowfall.vendor.rate_limiter.config import RateLimitConfig
 
@@ -121,9 +122,11 @@ async def _offers(
     logging.register(http_client)
     metrics.register(http_client)
     rate_limit_client = RateLimitClient(
-        await grpc_factory.make_insecure_channel(
-            app,
-            app.settings.rate_limiter_grpc_host,
+        gubernator_pb2_grpc.V1Stub(
+            await grpc_factory.make_insecure_channel(
+                app,
+                app.settings.rate_limiter_grpc_host,
+            ),
         ),
         app.settings.rate_limiter_service_configs["ask2go"],
     )
@@ -249,9 +252,11 @@ async def _price_quotes(app: service.Application[_PriceQuotesSettings]) -> None:
     logging.register(http_client)
     metrics.register(http_client)
     rate_limit_client = RateLimitClient(
-        await grpc_factory.make_insecure_channel(
-            app,
-            app.settings.rate_limiter_grpc_host,
+        gubernator_pb2_grpc.V1Stub(
+            await grpc_factory.make_insecure_channel(
+                app,
+                app.settings.rate_limiter_grpc_host,
+            ),
         ),
         app.settings.rate_limiter_service_configs["ask2go"],
     )
