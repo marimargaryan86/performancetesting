@@ -55,6 +55,41 @@ After the `~/.gitignore` is complete, add it to your `~/.gitconfig` with:
 git config --global core.excludesfile "~/.gitignore"
 ```
 
+### SSH
+
+To generate a new SSH key:
+
+```shell
+ssh-keygen -t ed25519 -C "your.email@snowfalltravel.com"
+```
+
+When you're prompted to "Enter a file in which to save the key", you can press Enter to accept the default file location. Default filename would be `id_ed25519`. Remember the filepath of where you saved it (usually current working directory).
+
+For a more detailed instruction, read [external Github docs](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent)
+
+
+### Add SSH key to gitconfig
+
+Edit the `~/.gitconfig` file with the editor of your choice.
+
+Then add the following to the `[core]` section:
+
+```
+sshCommand = ssh -i ~/path-to-ssh-key/id_ed25519
+```
+
+### Add SSH to Gitlab account
+
+Go to your Gitlab Preferences > SSH Keys > Add new Key
+
+Copy your pub key:
+
+```shell
+pbcopy < ~/path-to-ssh-key/id_ed25519.pub
+```
+
+Now paste the pub key output into the text field and click Add key.
+
 ### Git Up
 
 It's **highly** recommended to also add the `git up` alias, since this makes
