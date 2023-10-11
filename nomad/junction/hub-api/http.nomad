@@ -22,6 +22,14 @@ variable "datacenter" {
   type = string
 }
 
+variable "traefik_entrypoints" {
+  type = string
+}
+
+variable "traefik_host_URL" {
+  type = string
+}
+
 variable "count" {
   type = number
 }
@@ -69,7 +77,14 @@ job "hub-api-http" {
       name = "hub-api-${var.environment}"
       port = "http"
       tags = [
-        "http"
+        "http",
+        "traefik.enable=true",
+        "traefik.consulcatalog.connect=true",
+        "traefik.http.routers.hub-api-${var.environment}.middlewares=hub-api-vpn-only-${var.environment}",
+        "traefik.http.routers.hub-api-${var.environment}.entrypoints=${var.traefik_entrypoints}",
+        "traefik.http.routers.hub-api-${var.environment}.rule=Host(`${var.traefik_host_URL}`)",
+        "traefik.http.middlewares.hub-api-vpn-only-${var.environment}.ipwhitelist.sourcerange=52.56.69.33",
+        "traefik.http.middlewares.hub-api-vpn-only-${var.environment}.ipwhitelist.ipstrategy.excludedips=172.16.0.0/16"
       ]
 
       connect {

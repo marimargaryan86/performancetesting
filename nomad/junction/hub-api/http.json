@@ -3,6 +3,8 @@
     "deploy": true,
     "variables": {
       "count": 2,
+      "traefik_entrypoints": "websecure",
+      "traefik_host_URL": "api.hub.junction.dev",
       "cc_address": "https://devapi.currencycloud.com/v2"
     }
   },
@@ -10,6 +12,8 @@
     "deploy": false,
     "variables": {
       "count": 2,
+      "traefik_entrypoints": "web",
+      "traefik_host_URL": "api.hub.junction.travel",
       "cc_address": "https://api.currencycloud.com/v2"
     }
   },
@@ -17,6 +21,8 @@
     "deploy": true,
     "variables": {
       "count": 1,
+      "traefik_entrypoints": "websecure",
+      "traefik_host_URL": "api.hub.sandbox.junction.dev",
       "cc_address": "https://devapi.currencycloud.com/v2"
     }
   }
