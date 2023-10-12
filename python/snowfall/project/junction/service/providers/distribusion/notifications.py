@@ -114,13 +114,15 @@ Travel departure date : {departure_at}
                 "created_at": datetime.datetime.now(
                     tz=datetime.UTC,
                 ).isoformat(timespec="seconds"),
-                "departure_at": (
-                    datetime.datetime.fromisoformat(
-                        first_segment.departure_time or "",
-                    )
-                    .replace(tzinfo=datetime.UTC)  # noqa: WPS348
-                    .isoformat(timespec="seconds")  # noqa: WPS348
-                    or ""
-                ),
+                "departure_at": _parse_iso_datetime(first_segment.departure_time),
             }
         return {}
+
+
+def _parse_iso_datetime(iso_date_time: str | None) -> str:
+    if not iso_date_time:
+        return ""
+
+    parsed = datetime.datetime.fromisoformat(iso_date_time).replace(tzinfo=datetime.UTC)
+
+    return parsed.isoformat(timespec="seconds")

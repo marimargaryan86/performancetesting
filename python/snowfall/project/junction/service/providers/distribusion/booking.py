@@ -122,34 +122,18 @@ class BookingHandler(object):
         first_segment = first_trip_details.segment.legs[0]
         last_segment = last_trip_details.segment.legs[-1]
 
-        departure_time = (
+        departure_time = _datetime_to_tz_without_tz(
             protobuf.protobuf_to_datetime(
                 first_segment.departure_at,
-            )
-            .astimezone(  # noqa: WPS348
-                zoneinfo.ZoneInfo(first_segment.origin.time_zone),
-            )
-            .replace(  # noqa: WPS348
-                tzinfo=None,
-            )
-            .isoformat(  # noqa: WPS348
-                timespec="minutes",
-            )
+            ),
+            zoneinfo.ZoneInfo(first_segment.origin.time_zone),
         )
 
-        arrival_time = (
+        arrival_time = _datetime_to_tz_without_tz(
             protobuf.protobuf_to_datetime(
                 last_segment.arrival_at,
-            )
-            .astimezone(  # noqa: WPS348
-                zoneinfo.ZoneInfo(last_segment.destination.time_zone),
-            )
-            .replace(  # noqa: WPS348
-                tzinfo=None,
-            )
-            .isoformat(  # noqa: WPS348
-                timespec="minutes",
-            )
+            ),
+            zoneinfo.ZoneInfo(last_segment.destination.time_zone),
         )
 
         order_create_response = await self._client.create_order(
@@ -157,8 +141,8 @@ class BookingHandler(object):
                 marketing_carrier=first_trip_details.segment.vendor,
                 departure_station=first_segment.origin.ref,
                 arrival_station=last_segment.destination.ref,
-                departure_time=departure_time,
-                arrival_time=arrival_time,
+                departure_time=departure_time.isoformat(timespec="minutes"),
+                arrival_time=arrival_time.isoformat(timespec="minutes"),
                 title=protobuf.enum_value_to_slug(
                     enum_descriptor=models_pb2.Passenger.Title.DESCRIPTOR,
                     enum_value=booker.title,
@@ -284,3 +268,10 @@ class Transformer(object):
             created_at=created_at,
             # TODO: No idea how to get updated_at from the booking model.
         )
+
+
+def _datetime_to_tz_without_tz(
+    date_time: datetime.datetime,
+    zone_info: zoneinfo.ZoneInfo,
+) -> datetime.datetime:
+    return date_time.astimezone(zone_info).replace(tzinfo=None)

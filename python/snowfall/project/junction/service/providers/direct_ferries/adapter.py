@@ -73,11 +73,11 @@ class DfAdapter(object):
             leg.LegBase(
                 is_return_leg=False,
                 route_id=search_task.criteria.outbound_route_id,
-                departure_date_time=protobuf.protobuf_to_datetime(
-                    search_task.criteria.outbound_departure_datetime,
-                )
-                .astimezone(datetime.UTC)  # noqa: WPS348
-                .replace(tzinfo=None),  # noqa: WPS348
+                departure_date_time=_datetime_to_utc_without_tz(
+                    protobuf.protobuf_to_datetime(
+                        search_task.criteria.outbound_departure_datetime,
+                    ),
+                ),
                 passengers=passengers,
             ),
         ]
@@ -87,11 +87,11 @@ class DfAdapter(object):
                 leg.LegBase(
                     is_return_leg=True,
                     route_id=search_task.criteria.inbound_route_id,
-                    departure_date_time=protobuf.protobuf_to_datetime(
-                        search_task.criteria.inbound_departure_datetime,
-                    )
-                    .astimezone(datetime.UTC)  # noqa: WPS348
-                    .replace(tzinfo=None),  # noqa: WPS348
+                    departure_date_time=_datetime_to_utc_without_tz(
+                        protobuf.protobuf_to_datetime(
+                            search_task.criteria.inbound_departure_datetime,
+                        ),
+                    ),
                     passengers=passengers,
                 ),
             )
@@ -240,3 +240,7 @@ class DfAdapter(object):
                 segments=segments,
                 provider_id=str(PROVIDER_ID),
             )
+
+
+def _datetime_to_utc_without_tz(date_time: datetime.datetime) -> datetime.datetime:
+    return date_time.astimezone(datetime.UTC).replace(tzinfo=None)

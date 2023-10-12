@@ -144,7 +144,6 @@ external = [
   "WPS320", # Forbid multi-line function type annotations.
   "WPS336", # Forbid explicit string concatanation in favour of .format method
   "WPS337", # Forbid multiline conditions
-  "WPS348", # Forbid starting lines with a dot
   "WPS352", # Forbid multiline loops
   "WPS421", # Forbid calling some built-in functions
   "WPS430", # Forbid nested functions
