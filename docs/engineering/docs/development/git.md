@@ -57,6 +57,8 @@ git config --global core.excludesfile "~/.gitignore"
 
 ### SSH
 
+We are required to set up SSH keys for Gitlab access.
+
 To generate a new SSH key:
 
 ```shell
@@ -65,10 +67,10 @@ ssh-keygen -t ed25519 -C "your.email@snowfalltravel.com"
 
 When you're prompted to "Enter a file in which to save the key", you can press Enter to accept the default file location. Default filename would be `id_ed25519`. Remember the filepath of where you saved it (usually current working directory).
 
-For a more detailed instruction, read [external Github docs](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent)
+For a more detailed instruction, read [external Gitlab docs](https://docs.gitlab.com/ee/user/ssh.html#generate-an-ssh-key-pair)
 
 
-### Add SSH key to gitconfig
+#### Add SSH key to gitconfig
 
 Edit the `~/.gitconfig` file with the editor of your choice.
 
@@ -78,7 +80,7 @@ Then add the following to the `[core]` section:
 sshCommand = ssh -i ~/path-to-ssh-key/id_ed25519
 ```
 
-### Add SSH to Gitlab account
+#### Add SSH to Gitlab account
 
 Go to your Gitlab Preferences > SSH Keys > Add new Key
 
