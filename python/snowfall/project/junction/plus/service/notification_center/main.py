@@ -7,8 +7,9 @@ import pydantic
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.plus.adapter import configuration_vectors, subscribers
-from snowfall.project.junction.plus.notification_channels.whatsapp import (
-    ProviderChannel,
+from snowfall.project.junction.plus.notification_channels import (
+    push_notification,
+    whatsapp,
 )
 from snowfall.project.junction.plus.service.notification_center import importer, states
 from snowfall.project.junction.plus.service.notifications.v1alpha import (
@@ -64,12 +65,13 @@ async def _import(app: application.Application[_ImportSettings]) -> None:
             ),
         ),
         channels=states.Channels(
-            whatsapp_channel=ProviderChannel(
+            whatsapp_channel=whatsapp.ProviderChannel(
                 sid=app.settings.twilio_sid,
                 token=app.settings.twilio_token,
                 redis_client=redis_client,
                 templates_root_path=pathlib.Path(),
             ),
+            push_notification_channel=push_notification.ProviderChannel(),
         ),
     )
     await notification_event_importer.consume()

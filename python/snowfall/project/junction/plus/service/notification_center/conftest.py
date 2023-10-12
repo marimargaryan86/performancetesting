@@ -7,7 +7,10 @@ from snowfall.project.junction.plus.adapter import (
     configuration_vectors,
     subscribers,
 )
-from snowfall.project.junction.plus.notification_channels import whatsapp
+from snowfall.project.junction.plus.notification_channels import (
+    push_notification,
+    whatsapp,
+)
 from snowfall.project.junction.plus.service.notification_center import (
     importer,
     states,
@@ -68,9 +71,18 @@ def whatsapp_channel() -> whatsapp.Channel:
 
 
 @pytest.fixture()
-def channels(whatsapp_channel: whatsapp.Channel) -> states.Channels:
+def push_notification_channel() -> push_notification.Channel:
+    return push_notification.MockChannel()
+
+
+@pytest.fixture()
+def channels(
+    whatsapp_channel: whatsapp.Channel,
+    push_notification_channel: push_notification.Channel,
+) -> states.Channels:
     return states.Channels(
         whatsapp_channel=whatsapp_channel,
+        push_notification_channel=push_notification_channel,
     )
 
 

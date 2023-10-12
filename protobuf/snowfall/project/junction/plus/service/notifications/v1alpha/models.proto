@@ -106,6 +106,7 @@ enum Channel {
   CHANNEL_UNSPECIFIED = 0;
   CHANNEL_EMAIL = 1;
   CHANNEL_WHATSAPP = 2;
+  CHANNEL_PUSH_NOTIFICATION = 3;
 }
 
 message MonitoringRule {
