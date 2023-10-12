@@ -8,9 +8,6 @@ from snowfall.project.junction.extensions.service.mobile_api import (
 from snowfall.project.junction.extensions.service.mobile_api.models import (
     user as user_model,
 )
-from snowfall.project.junction.extensions.service.mobile_api.models import (
-    user_group as user_group_model,
-)
 from snowfall.project.junction.extensions.service.mobile_api.v1alpha import models_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.integration.starlette import models, request_helpers
@@ -76,11 +73,11 @@ class UserGroup(endpoints.HTTPEndpoint):
         user_groups_repository: repository.UserGroupsRepository = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
-        group = user_group_model.UserGroup(**body)
+        group = user_model.UserGroup(**body)
         await user_groups_repository.update(
             request.path_params["groupId"],
             request.user.username,
-            group.dict(exclude_unset=True),
+            group.model_dump(),
         )
         return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -111,14 +108,14 @@ class UserGroupMembers(endpoints.HTTPEndpoint):
             member_id,
             request.path_params["groupId"],
             request.user.username,
-            member.dict(exclude_unset=True),
+            member.model_dump(exclude_unset=True),
         )
         return models.JsonApiResponse(
             models.Body(
                 data=resources.UserResource.from_dict(
                     member_id,
                     "user-group-members",
-                    member.dict(exclude_unset=True),
+                    member.model_dump(exclude_unset=True),
                 ),
             ),
             status.HTTP_201_CREATED,
@@ -158,7 +155,7 @@ class UserGroupMember(endpoints.HTTPEndpoint):
         await user_groups_repository.update_member(
             request.user.username,
             request.path_params["memberId"],
-            member.dict(exclude_unset=True),
+            member.model_dump(exclude_unset=True),
         )
         return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
 

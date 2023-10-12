@@ -2,10 +2,8 @@ import enum
 from collections.abc import Mapping, Sequence
 from typing import Any
 
-from pydantic import v1 as pydantic
+import pydantic
 from starlette import exceptions, status
-
-from snowfall.stdlib import string
 
 _REF_KEY = "ref"
 _VALUE_KEY = "value"
@@ -18,18 +16,12 @@ _IMAGE_BASE_URL = (
 )
 
 
-class CamelModel(pydantic.BaseModel):
-    class Config(object):
-        alias_generator = string.to_lower_camel
-        allow_population_by_field_name = True
-
-
-class BooleanCollectionItem(CamelModel):
+class BooleanCollectionItem(pydantic.BaseModel):
     ref: str
     value: bool  # noqa: WPS110
 
 
-class Preference(CamelModel):
+class Preference(pydantic.BaseModel):
     ref: str
     value: bool | int | Sequence[BooleanCollectionItem]  # noqa: WPS110
 
@@ -81,7 +73,7 @@ def get_preference(input_dict: Mapping[str, Any]) -> dict[str, Any]:
     if not check_preference_value(preference, Refs[input_dict[_REF_KEY]].value):
         # TODO: change to include error message with value_type missmatch indicator.
         raise exceptions.HTTPException(status.HTTP_400_BAD_REQUEST)
-    return preference.dict()
+    return preference.model_dump()
 
 
 preference_defaults = [

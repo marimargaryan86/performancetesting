@@ -1,28 +1,33 @@
 import datetime
 from collections.abc import Mapping, Sequence
-from typing import Any
+from typing import Any, Self
 
-from pydantic import v1 as pydantic
+import pydantic
 
 from snowfall.stdlib import string
 
 
-class User(pydantic.BaseModel):
-    first_name: str | None
-    last_name: str | None
-    phone: Mapping[str, str] | None
-    gender: str | None
-    country_code: str | None
-    date_of_birth: Mapping[str, int] | None
-    title: str | None
-    loyalty_programs: Sequence[Mapping[str, str]] | None
+class UserGroup(pydantic.BaseModel):
+    name: str | None
 
-    class Config(object):
-        alias_generator = string.to_lower_camel
-        allow_population_by_field_name = True
+
+class User(pydantic.BaseModel):
+    model_config = pydantic.ConfigDict(
+        alias_generator=string.to_lower_camel,
+        populate_by_name=True,
+    )
+
+    first_name: str | None = None
+    last_name: str | None = None
+    phone: Mapping[str, str] | None = None
+    gender: str | None = None
+    country_code: str | None = None
+    date_of_birth: Mapping[str, int] | None = None
+    title: str | None = None
+    loyalty_programs: Sequence[Mapping[str, str]] | None = None
 
     @classmethod
-    def from_dict(cls, input_dict: Mapping[str, Any]) -> "User":
+    def from_dict(cls, input_dict: Mapping[str, Any]) -> Self:
         out_dict: dict[str, Any] = {}
         for key, attribute in input_dict.items():
             if key == "phone":
@@ -40,4 +45,4 @@ class User(pydantic.BaseModel):
 
 
 class UserGroupMember(User):
-    email: str | None
+    email: str | None = None
