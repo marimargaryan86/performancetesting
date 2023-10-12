@@ -4,11 +4,11 @@ import datetime
 import functools
 from collections.abc import Mapping
 from enum import IntEnum
-from typing import Any, TypeVar, cast
+from typing import Any, TypeGuard, TypeVar, cast
 
+import pydantic
 from dateutil import parser
 from google.protobuf import descriptor, timestamp_pb2
-from pydantic import v1 as pydantic
 
 from snowfall.stdlib.v1 import latlng_pb2
 
@@ -245,7 +245,9 @@ def _protobuf_to_types_map(model: descriptor.Descriptor) -> _TypesMap:
 
 
 @functools.cache
-def _pydantic_to_types_map(model: type[pydantic.BaseModel]) -> _TypesMap:
+def _pydantic_to_types_map(  # noqa: WPS210
+    model: type[pydantic.BaseModel],
+) -> _TypesMap:
     queue = collections.deque([model])
     types_map: dict[str, dict[str, str]] = {}
 
@@ -258,12 +260,18 @@ def _pydantic_to_types_map(model: type[pydantic.BaseModel]) -> _TypesMap:
 
         types_map[model_type] = {}
 
-        for field in model.__fields__.values():
-            if issubclass(field.type_, pydantic.BaseModel):
-                types_map[model_type][field.name] = _class_fqn(field.type_)
-                queue.append(field.type_)
+        for field_name, field in model.model_fields.items():
+            if _is_pydantic_model(field.annotation):
+                types_map[model_type][field_name] = _class_fqn(field.annotation)
+                queue.append(field.annotation)
 
     return types_map
+
+
+def _is_pydantic_model(
+    annotation: type[pydantic.BaseModel] | None,
+) -> TypeGuard[type[pydantic.BaseModel]]:
+    return annotation is not None and issubclass(annotation, pydantic.BaseModel)
 
 
 def _metadata_to_types_map(metadata: _Metadata) -> _TypesMap:

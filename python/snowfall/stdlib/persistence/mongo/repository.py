@@ -5,11 +5,11 @@ import types
 from collections.abc import Callable, Mapping
 from typing import Any, Generic, Protocol, TypeVar, cast
 
+import pydantic
 import pymongo
 from bson import json_util
 from google.protobuf.message import Message
 from motor import core, motor_asyncio
-from pydantic.v1 import BaseModel
 
 from snowfall.stdlib.persistence import cursor
 from snowfall.stdlib.persistence.mongo import coders, resultset
@@ -18,7 +18,7 @@ from snowfall.stdlib.v1 import cursor_pb2
 _proto_id_key = "id"
 mongo_id_key = "_id"
 
-Model = TypeVar("Model", bound=BaseModel)
+Model = TypeVar("Model", bound=pydantic.BaseModel)
 Proto = TypeVar("Proto", bound=Message)
 Record = TypeVar("Record")
 _MongoDict = dict[str, Any]

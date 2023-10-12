@@ -1,6 +1,6 @@
 import datetime
 
-from pydantic import v1 as pydantic
+import pydantic
 
 from snowfall.stdlib.persistence.mongo import coders
 from snowfall.stdlib.v1 import testing_pb2
