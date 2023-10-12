@@ -76,11 +76,12 @@ yarn run dev
 
 ## Notes
 
-- Please format and lint before committing:
+- Please format, lint, and check before committing:
 
 ```bash
 yarn run format
 yarn run lint
+yarn run check
 ```
 
 - Feel free to contribute and run unit tests:
