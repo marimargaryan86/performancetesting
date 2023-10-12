@@ -2,6 +2,11 @@ import { URLExtended } from "utils/url";
 import { throwIfError } from "./junction-error";
 import type { SessionModel } from "models/user";
 
+/**
+ * This abstract base class is a foundational service layer for making RESTful
+ * HTTP requests to Junction APIs; a specific API service `extends` from this.
+ * Included are handlers for requests, errors, and authentication.
+ */
 export default abstract class JunctionService {
   private readonly baseUrl: string;
 
@@ -9,6 +14,13 @@ export default abstract class JunctionService {
     this.baseUrl = baseUrl ?? "";
   }
 
+  /**
+   * Gets pagination cursors from API response data.
+   *
+   * @static
+   * @param {{ data: unknown[]; links: { next: string } }} data - The API response data.
+   * @returns {string | undefined} The cursor value or undefined if not found.
+   */
   protected static getCursor(data: {
     data: unknown[];
     links: { next: string };
@@ -20,6 +32,16 @@ export default abstract class JunctionService {
     return new URL(data.links.next).searchParams.get("page[cursor]") ?? undefined;
   }
 
+  /**
+   * Makes an HTTP request to the API.
+   *
+   * @protected
+   * @async
+   * @template TResp - The expected response data type.
+   * @param {string} resource - The API resource or endpoint.
+   * @param {RequestOptions} [options={}] - Request options, including method, query parameters, headers, data, session, and token.
+   * @returns {Promise<Omit<Response, "json"> & { json: TResp }>} A promise with the response and parsed JSON data.
+   */
   protected async makeRequest<TResp = unknown>(
     resource: string,
     options: {
