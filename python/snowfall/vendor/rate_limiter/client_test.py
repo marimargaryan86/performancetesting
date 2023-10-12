@@ -101,7 +101,7 @@ async def test_rate_limit_raises_smaller_reset(
         "GetRateLimits",
         new=mock.AsyncMock(),
     ) as mock_obj:
-        mock_obj.side_effect = lambda _: create_response("OVER_LIMIT", 0.4)
+        mock_obj.side_effect = lambda _: create_response("OVER_LIMIT", 0.35)
 
         target = "snowfall.vendor.rate_limiter.client.asyncio.sleep"
         with mock.patch(target, autospec=True, spec_set=True) as sleep_mock:
