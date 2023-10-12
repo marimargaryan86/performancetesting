@@ -68,17 +68,6 @@ def _get_cancellation_request_request() -> dict[str, Any]:
     }
 
 
-def _update_booking_cancellation_status_request() -> dict[str, Any]:
-    return {
-        "data": {
-            "type": "booking-cancellation",
-            "attributes": {
-                "status": "completed",
-            },
-        },
-    }
-
-
 class TestJourneys(object):
     async def test_journeys_are_found(self, client: httpx.AsyncClient) -> None:
         await testing.test_list_and_view_endpoints(
@@ -181,30 +170,6 @@ class TestBookingsCancellation(object):
     ) -> None:
         response = await client.get(
             "/bookings/{id}/cancellation".format(id=fixtures.NOT_FOUND),
-        )
-
-        assert response.status_code == status.HTTP_404_NOT_FOUND
-
-    async def test_booking_cancellation_status_can_be_updated(
-        self,
-        client: httpx.AsyncClient,
-    ) -> None:
-        response = await client.patch(
-            "/bookings/cancellations/{id}".format(id=fixtures.BOOKING_CANCELLATIONS[0]),
-            json=_update_booking_cancellation_status_request(),
-            headers={"Content-Type": "application/vnd.api+json"},
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-
-    async def test_patch_booking_cancellation_status_not_found(
-        self,
-        client: httpx.AsyncClient,
-    ) -> None:
-        response = await client.patch(
-            "/bookings/cancellations/{id}".format(id=fixtures.NOT_FOUND),
-            json=_update_booking_cancellation_status_request(),
-            headers={"Content-Type": "application/vnd.api+json"},
         )
 
         assert response.status_code == status.HTTP_404_NOT_FOUND

@@ -22,7 +22,7 @@ service OrderService {
   rpc CreateCancellationRequest(CreateCancellationRequestRequest) returns (CreateCancellationRequestResponse) {}
   rpc GetCancellationRequest(GetCancellationRequestRequest) returns (GetCancellationRequestResponse) {}
   rpc GetBookingCancellation(GetBookingCancellationRequest) returns (GetBookingCancellationResponse) {}
-  rpc UpdateBookingCancellation(UpdateBookingCancellationRequest) returns (UpdateBookingCancellationResponse) {}
+  rpc HandleCancellationTicketCompleted(HandleCancellationTicketCompletedRequest) returns (HandleCancellationTicketCompletedResponse) {}
 }
 
 message CreateJourneyRequest {
@@ -174,17 +174,10 @@ message GetBookingCancellationResponse {
   BookingCancellation booking_cancellation = 1;
 }
 
-message UpdateBookingCancellationRequest {
-  string id = 1;
-  enum Status {
-    STATUS_UNSPECIFIED = 0;
-    STATUS_PENDING = 1;
-    STATUS_COMPLETED = 2;
-  }
-  Status status = 2;
-  string reseller_id = 3;
+message HandleCancellationTicketCompletedRequest {
+  string ticket_id = 1;
 }
 
-message UpdateBookingCancellationResponse {
+message HandleCancellationTicketCompletedResponse {
   BookingCancellation booking_cancellation = 1;
 }

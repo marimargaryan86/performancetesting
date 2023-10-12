@@ -516,28 +516,3 @@ class BookingCancellationByBooking(endpoints.HTTPEndpoint):
             ),
             request=request,
         )
-
-
-class BookingCancellation(endpoints.HTTPEndpoint):
-    async def patch(
-        self,
-        request: requests.Request,
-        client: orders.Client = lagom.injectable,
-    ) -> responses.Response:
-        body = await request_helpers.flatten_request(request)
-
-        cancellation = await client.update_booking_cancellation_status(
-            identifier=request.path_params["bookingCancellationId"],
-            status=body["status"],
-            reseller_id=request.user.username,
-        )
-
-        return await messages.create_response(
-            body=models.Body(
-                data=resources.BookingCancellationResource.from_proto(
-                    booking_cancellation=cancellation,
-                    request=request,
-                ),
-            ),
-            request=request,
-        )

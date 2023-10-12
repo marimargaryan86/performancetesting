@@ -1678,65 +1678,6 @@
         "description": "Used to lookup data for a Cancellation Request Identifier."
       }
     },
-    "/bookings/cancellations/{bookingCancellationId}": {
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/bookingCancellationId"
-        }
-      ],
-      "patch": {
-        "summary": "Update Booking Cancellation Status",
-        "tags": [
-          "journeys"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/vnd.api+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "data": {
-                    "$ref": "#/components/schemas/BookingCancellationUpdatable"
-                  }
-                },
-                "required": [
-                  "data"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/vnd.api+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "$ref": "#/components/schemas/BookingCancellation"
-                    }
-                  },
-                  "required": [
-                    "data"
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          }
-        },
-        "operationId": "patch-bookings-cancellations-id",
-        "description": "Used to update a Booking Cancellation by identifier"
-      }
-    },
     "/companies": {
       "post": {
         "summary": "Create company",
@@ -3480,17 +3421,6 @@
         "description": "Customize which related resources to return.",
         "style": "form",
         "explode": false
-      },
-      "bookingCancellationId": {
-        "name": "bookingCancellationId",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
-          "format": "uuid"
-        },
-        "description": "Booking Cancellation identifier"
       },
       "companyId": {
         "name": "companyId",
@@ -5974,48 +5904,6 @@
             }
           }
         }
-      },
-      "BookingCancellationUpdatable": {
-        "title": "Booking Cancellation Updatable",
-        "description": "Updatable Booking Cancellation for a single Booking.",
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "example": "d6cfe9e8-bbc9-485f-912f-7ba97ab2cf34",
-            "readOnly": true
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "booking-cancellation"
-            ],
-            "example": "booking-cancellation"
-          },
-          "attributes": {
-            "type": "object",
-            "required": [
-              "status"
-            ],
-            "properties": {
-              "status": {
-                "type": "string",
-                "enum": [
-                  "unspecified",
-                  "pending",
-                  "completed"
-                ],
-                "example": "completed"
-              }
-            }
-          }
-        },
-        "required": [
-          "id",
-          "type",
-          "attributes"
-        ]
       },
       "Company": {
         "title": "Company Details",
