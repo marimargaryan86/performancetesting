@@ -15,7 +15,7 @@ from snowfall.project.junction.go.service.resellers.v1 import (
     resellers_pb2,
     resellers_pb2_grpc,
 )
-from snowfall.stdlib import money
+from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 
 
@@ -77,6 +77,15 @@ def cancellation_requests_repository(
     mongo_client: core.AgnosticClient,
 ) -> orders.CancellationRequestsRepository:
     return orders.CancellationRequestsRepository(
+        collection=mongo_client.test.order_cancellations,
+    )
+
+
+@pytest.fixture()
+def booking_cancellations_repository(
+    mongo_client: core.AgnosticClient,
+) -> orders.BookingCancellationsRepository:
+    return orders.BookingCancellationsRepository(
         collection=mongo_client.test.order_cancellations,
     )
 
@@ -144,5 +153,28 @@ async def booking() -> models_pb2.Booking:
         trip_result=models_pb2.TripBooking(provider_booking_reference="bar"),
         updated_at=protobuf.datetime_to_protobuf(
             datetime.datetime.now(datetime.UTC),
+        ),
+    )
+
+
+@pytest.fixture()
+async def cancellation_request(
+    cancellation_requests_repository: orders.CancellationRequestsRepository,
+    order: models_pb2.Order,
+) -> models_pb2.CancellationRequest:
+    ticket_ids = iter(["12345", "56789"])
+    return await cancellation_requests_repository.insert(
+        models_pb2.CancellationRequest(
+            booking_cancellations=[
+                models_pb2.BookingCancellation(
+                    id=string.uuid(),
+                    booking_id=booking.id,
+                    ticket_id=next(ticket_ids),
+                    status=models_pb2.BookingCancellation.STATUS_PENDING,
+                )
+                for booking in order.bookings
+            ],
+            status=models_pb2.CancellationRequest.STATUS_PENDING,
+            reseller_id="foo",
         ),
     )

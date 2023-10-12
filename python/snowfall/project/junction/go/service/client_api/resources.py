@@ -720,6 +720,7 @@ class TripBookingResource(models.Resource):
     def from_proto(
         cls,
         booking: order_models_pb2.Booking,
+        booking_cancellation: order_models_pb2.BookingCancellation | None,
         request: requests.Request,
     ) -> TripBookingResource:
         return cls(
@@ -757,6 +758,16 @@ class TripBookingResource(models.Resource):
                         )
                         for details in booking.trip_option.details
                     ],
+                },
+                "bookingCancellation": {
+                    _RELATIONSHIPS_FIELD: (
+                        models.ResourceIdentifier(
+                            id=booking_cancellation.id,
+                            type=BookingCancellationResource.api_type,
+                        )
+                        if booking_cancellation
+                        else None
+                    ),
                 },
             },
             links={

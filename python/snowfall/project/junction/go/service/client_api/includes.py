@@ -206,9 +206,20 @@ def _trip_bookings_resolver(
             limit=len(identifiers),
         )
 
+        bookings_and_cancellations = (
+            await orders_client.find_booking_cancellations_for_bookings(
+                bookings=response.bookings,
+                reseller_id=request.user.username,
+            )
+        )
+
         return [
-            resources.TripBookingResource.from_proto(booking, request)
-            for booking in response.bookings
+            resources.TripBookingResource.from_proto(
+                booking,
+                booking_cancellation,
+                request,
+            )
+            for booking, booking_cancellation in bookings_and_cancellations
         ]
 
     return wrapper

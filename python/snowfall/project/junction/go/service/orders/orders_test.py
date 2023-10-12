@@ -19,27 +19,6 @@ _JOURNEY_PARENTS = ("bar", "baz")
 
 
 @pytest.fixture()
-async def cancellation_request(
-    cancellation_requests_repository: orders.CancellationRequestsRepository,
-    order: models_pb2.Order,
-) -> models_pb2.CancellationRequest:
-    ticket_ids = iter(["12345", "56789"])
-    return await cancellation_requests_repository.insert(
-        models_pb2.CancellationRequest(
-            booking_cancellations=[
-                models_pb2.BookingCancellation(
-                    booking_id=booking.id,
-                    ticket_id=next(ticket_ids),
-                    status=models_pb2.BookingCancellation.STATUS_PENDING,
-                )
-                for booking in order.bookings
-            ],
-            status=models_pb2.CancellationRequest.STATUS_PENDING,
-        ),
-    )
-
-
-@pytest.fixture()
 async def journey_with_owners(
     resellers_client: Any,
     journey_repository: orders.JourneyRepository,
@@ -395,3 +374,62 @@ class TestCancellationRequests(object):
         assert updated
         assert updated.id == cancellation_request.id
         assert updated.status == cancellation_request.status
+
+
+class TestBookingCancellations(object):
+    async def test_booking_cancellation_is_retrievable_by_id(
+        self,
+        booking_cancellations_repository: orders.BookingCancellationsRepository,
+        cancellation_request: models_pb2.CancellationRequest,
+    ) -> None:
+        booking_cancellation = more_itertools.first(
+            cancellation_request.booking_cancellations,
+        )
+        retrieved = await booking_cancellations_repository.find_by_id(
+            booking_cancellation.id,
+            cancellation_request.reseller_id,
+        )
+
+        assert retrieved
+        assert retrieved.id == booking_cancellation.id
+        assert retrieved.status == booking_cancellation.status
+
+    async def test_booking_cancellation_is_retrievable_by_booking_id(
+        self,
+        booking_cancellations_repository: orders.BookingCancellationsRepository,
+        cancellation_request: models_pb2.CancellationRequest,
+    ) -> None:
+        booking_cancellation = more_itertools.first(
+            cancellation_request.booking_cancellations,
+        )
+
+        retrieved = await booking_cancellations_repository.find_by_booking_id(
+            booking_cancellation.booking_id,
+            cancellation_request.reseller_id,
+        )
+
+        assert retrieved
+        assert retrieved.id == booking_cancellation.id
+        assert retrieved.status == booking_cancellation.status
+
+    async def test_find_booking_cancellation_by_id_not_found(
+        self,
+        booking_cancellations_repository: orders.BookingCancellationsRepository,
+    ) -> None:
+        retrieved = await booking_cancellations_repository.find_by_id(
+            document_id="",
+            reseller_id="",
+        )
+
+        assert not retrieved
+
+    async def test_find_booking_cancellation_by_booking_id_not_found(
+        self,
+        booking_cancellations_repository: orders.BookingCancellationsRepository,
+    ) -> None:
+        retrieved = await booking_cancellations_repository.find_by_booking_id(
+            document_id="",
+            reseller_id="",
+        )
+
+        assert not retrieved

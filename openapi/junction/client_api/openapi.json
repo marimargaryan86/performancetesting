@@ -6215,7 +6215,8 @@
                 "required": [
                   "order",
                   "status",
-                  "details"
+                  "details",
+                  "bookingCancellation"
                 ],
                 "properties": {
                   "order": {
@@ -6254,6 +6255,24 @@
                         }
                       }
                     }
+                  },
+                  "bookingCancellation": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "required": [
+                          "data"
+                        ],
+                        "properties": {
+                          "data": {
+                            "$ref": "#/components/schemas/BookingCancellationIdentifier"
+                          }
+                        }
+                      },
+                      {
+                        "nullable": true
+                      }
+                    ]
                   }
                 }
               }
@@ -6505,6 +6524,30 @@
           }
         ],
         "description": "Cancellation Request for one or more Bookings."
+      },
+      "BookingCancellationIdentifier": {
+        "title": "Booking Cancellation Identifier",
+        "description": "",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "example": "booking-cancellation",
+            "enum": [
+              "booking-cancellation"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
       },
       "BookingCancellation": {
         "title": "Booking Cancellation",

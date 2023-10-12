@@ -115,6 +115,9 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
                 booking_details=orders.BookingDetailsRepository(
                     collection=mongo.orders.journeys,
                 ),
+                booking_cancellations=orders.BookingCancellationsRepository(
+                    collection=mongo.orders.cancellation_requests,
+                ),
                 cancellation_requests=orders.CancellationRequestsRepository(
                     collection=mongo.orders.cancellation_requests,
                 ),

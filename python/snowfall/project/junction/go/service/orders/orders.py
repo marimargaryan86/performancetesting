@@ -565,3 +565,54 @@ class CancellationRequestsRepository(
         )
 
         return update.acknowledged
+
+
+class BookingCancellationsRepository(
+    repository.ProtoRepository[models_pb2.BookingCancellation],
+):
+    _proto = models_pb2.BookingCancellation
+    _nested_path = "booking_cancellations"
+    _indexes = (
+        pymongo.IndexModel("booking_cancellations._id", background=True),
+        pymongo.IndexModel("booking_cancellations.booking_id", background=True),
+    )
+
+    async def find_by_id(
+        self,
+        document_id: str,
+        reseller_id: str = "",
+    ) -> models_pb2.BookingCancellation | None:
+        filter_ = {
+            "booking_cancellations._id": {
+                "$eq": document_id,
+            },
+        }
+        filter_ = _add_reseller_id_to_filter(reseller_id, filter_)
+        options = await self._find_with_cursor(
+            filter_=filter_,
+        )
+
+        try:
+            return await options.take()
+        except StopAsyncIteration:
+            return None
+
+    async def find_by_booking_id(
+        self,
+        document_id: str,
+        reseller_id: str = "",
+    ) -> models_pb2.BookingCancellation | None:
+        filter_ = {
+            "booking_cancellations.booking_id": {
+                "$eq": document_id,
+            },
+        }
+        filter_ = _add_reseller_id_to_filter(reseller_id, filter_)
+        options = await self._find_with_cursor(
+            filter_=filter_,
+        )
+
+        try:
+            return await options.take()
+        except StopAsyncIteration:
+            return None

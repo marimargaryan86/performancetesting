@@ -7,7 +7,7 @@ import lagom
 import more_itertools
 from starlette import endpoints, requests, responses, status
 
-from snowfall.project.junction.go.adapter import offers, orders, price_quotes
+from snowfall.project.junction.go.adapter import errors, offers, orders, price_quotes
 from snowfall.project.junction.go.service.client_api import resources, validators
 from snowfall.project.junction.go.service.offers.v1 import (
     models_pb2 as offer_models_pb2,
@@ -222,10 +222,19 @@ class Booking(endpoints.HTTPEndpoint):
             reseller_id=request.user.username,
         )
 
+        try:
+            booking_cancellation = await client.get_booking_cancellation_by_booking_id(
+                booking_id=booking.id,
+                reseller_id=request.user.username,
+            )
+        except errors.NotFoundError:
+            booking_cancellation = None
+
         return await messages.create_response(
             body=models.Body(
                 data=resources.TripBookingResource.from_proto(
                     booking=booking,
+                    booking_cancellation=booking_cancellation,
                     request=request,
                 ),
             ),
@@ -239,23 +248,36 @@ class BookingsByOrder(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: orders.Client = lagom.injectable,
     ) -> responses.Response:
-        order_id = request.path_params["orderId"]
         pagination = pagination_helpers.get_pagination(request)
         response = await client.find_bookings_by_order_id(
-            order_id=order_id,
+            order_id=request.path_params["orderId"],
             limit=pagination.limit,
             cursor=pagination.cursor,
             reseller_id=request.user.username,
         )
 
+        bookings_and_cancellations = (
+            await client.find_booking_cancellations_for_bookings(
+                bookings=response.bookings,
+                reseller_id=request.user.username,
+            )
+        )
+
         return await messages.create_response(
             body=models.Body(
                 data=[
-                    resources.TripBookingResource.from_proto(booking, request)
-                    for booking in response.bookings
+                    resources.TripBookingResource.from_proto(
+                        booking,
+                        booking_cancellation,
+                        request,
+                    )
+                    for booking, booking_cancellation in bookings_and_cancellations
                 ],
                 links=pagination_helpers.get_next_url(
-                    request.url_for("ListBookingsByOrder", orderId=order_id),
+                    request.url_for(
+                        "ListBookingsByOrder",
+                        orderId=request.path_params["orderId"],
+                    ),
                     response.next_page_token,
                     pagination,
                 ),

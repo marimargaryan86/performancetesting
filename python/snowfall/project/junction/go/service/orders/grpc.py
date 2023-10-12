@@ -6,6 +6,7 @@ from grpc import StatusCode, aio
 from snowfall.project.junction.go.service.orders import bookings
 from snowfall.project.junction.go.service.orders.amqp import OrderProducer
 from snowfall.project.junction.go.service.orders.orders import (
+    BookingCancellationsRepository,
     BookingDetailsRepository,
     BookingRepository,
     CancellationRequestsRepository,
@@ -39,6 +40,7 @@ class OrderService(  # noqa: WPS214
         booking_handler: bookings.BookingHandler,
         booking_repository: BookingRepository,
         booking_details: BookingDetailsRepository,
+        booking_cancellations: BookingCancellationsRepository,
         cancellation_requests: CancellationRequestsRepository,
         publisher: OrderProducer,
         default_page_size: int,
@@ -50,6 +52,7 @@ class OrderService(  # noqa: WPS214
         self._booking_handler = booking_handler
         self._bookings = booking_repository
         self._booking_details = booking_details
+        self._booking_cancellations = booking_cancellations
         self._cancellation_requests = cancellation_requests
         self._publisher = publisher
         self._zendesk_client = zendesk_client
@@ -307,21 +310,16 @@ class OrderService(  # noqa: WPS214
         request: orders_pb2.GetBookingCancellationRequest,
         context: aio.ServicerContext,
     ) -> orders_pb2.GetBookingCancellationResponse:
-        cancellation = await self._cancellation_requests.find_by_booking_id(
-            booking_id=request.booking_id,
+        booking_cancellation = await self._booking_cancellations.find_by_booking_id(
+            document_id=request.booking_id,
+            reseller_id=request.reseller_id,
         )
 
-        if cancellation is None or cancellation.reseller_id != request.reseller_id:
+        if booking_cancellation is None:
             return await context.abort(StatusCode.NOT_FOUND)
 
-        booking_cancellation_result = next(
-            booking_cancellation
-            for booking_cancellation in cancellation.booking_cancellations
-            if booking_cancellation.booking_id == request.booking_id
-        )
-
         return orders_pb2.GetBookingCancellationResponse(
-            booking_cancellation=booking_cancellation_result,
+            booking_cancellation=booking_cancellation,
         )
 
     async def HandleCancellationTicketCompleted(  # type: ignore[override] # noqa: N802

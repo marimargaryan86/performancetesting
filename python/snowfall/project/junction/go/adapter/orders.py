@@ -162,6 +162,14 @@ class Client(abc.ABC):  # noqa: WPS214
     ) -> orders_pb2.ListBookingDetailsResponse:
         """Fetch all booking details resources related to a booking."""
 
+    @abc.abstractmethod
+    async def find_booking_cancellations_for_bookings(
+        self,
+        bookings: Sequence[models_pb2.Booking],
+        reseller_id: str,
+    ) -> list[tuple[models_pb2.Booking, models_pb2.BookingCancellation | None]]:
+        """Fetch all booking cancellation resources related to bookings."""
+
 
 class DictClient(Client):  # noqa: WPS214
     def __init__(
@@ -468,6 +476,27 @@ class DictClient(Client):  # noqa: WPS214
             details=page.sequence,
             next_page_token=page.cursor,
         )
+
+    async def find_booking_cancellations_for_bookings(
+        self,
+        bookings: Sequence[models_pb2.Booking],
+        reseller_id: str,
+    ) -> list[tuple[models_pb2.Booking, models_pb2.BookingCancellation | None]]:
+        bookings_and_cancellations = []
+        for booking in bookings:
+            try:
+                booking_cancellation = (
+                    await self.get_booking_cancellation_by_booking_id(
+                        booking.id,
+                        reseller_id,
+                    )
+                )
+            except errors.NotFoundError:
+                booking_cancellation = None
+
+            bookings_and_cancellations.append((booking, booking_cancellation))
+
+        return bookings_and_cancellations
 
     def _iterate_orders(self) -> Iterator[models_pb2.Order]:
         for journey in self._journeys.values():
@@ -833,3 +862,24 @@ class GrpcClient(Client):  # noqa: WPS214
         return await errors.handle_grpc_errors(
             self._orders.ListBookingDetails(request, timeout=self._timeout),
         )
+
+    async def find_booking_cancellations_for_bookings(
+        self,
+        bookings: Sequence[models_pb2.Booking],
+        reseller_id: str,
+    ) -> list[tuple[models_pb2.Booking, models_pb2.BookingCancellation | None]]:
+        bookings_and_cancellations = []
+        for booking in bookings:
+            try:
+                booking_cancellation = (
+                    await self.get_booking_cancellation_by_booking_id(
+                        booking_id=booking.id,
+                        reseller_id=reseller_id,
+                    )
+                )
+            except errors.NotFoundError:
+                booking_cancellation = None
+
+            bookings_and_cancellations.append((booking, booking_cancellation))
+
+        return bookings_and_cancellations
