@@ -63,6 +63,7 @@ class TransactionsService(  # noqa:WPS214
             sort=sorting.get_sort(request.sort_by, self._sort),
             filter_by_ids=request.filter_by,
             filter_by_bill_ids=request.filter_by_bill_ids,
+            filter_by_external_reference=request.filter_by_external_reference,
         )
         transactions.limit(
             request.page_size if request.page_size else self._default_page_size,

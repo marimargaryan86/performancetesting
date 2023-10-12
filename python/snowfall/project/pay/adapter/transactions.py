@@ -43,6 +43,7 @@ class Client(abc.ABC):
         self,
         filter_by: Sequence[str],
         filter_by_bill_ids: Sequence[str],
+        filter_by_external_reference: Sequence[str],
         limit: int | None = None,
         cursor: str | None = None,
         sort: sort_pb2.Sort | None = None,
@@ -117,12 +118,22 @@ class DictClient(Client):
         self,
         filter_by: Sequence[str],
         filter_by_bill_ids: Sequence[str],
+        filter_by_external_reference: Sequence[str],
         limit: int | None = None,
         cursor: str | None = None,
         sort: sort_pb2.Sort | None = None,
     ) -> grpc_pb2.ListTransactionsResponse:
+        transactions = list(self._transactions.values())
+        if filter_by_external_reference:
+            transactions = list(
+                filter(
+                    lambda transaction: transaction.external_reference_id
+                    in filter_by_external_reference,
+                    self._transactions.values(),
+                ),
+            )
         page = sequence.paginate(
-            sequence=list(self._transactions.values()),
+            sequence=transactions,
             cursor=cursor,
             limit=limit,
         )
@@ -194,6 +205,7 @@ class GrpcClient(Client):
         self,
         filter_by: Sequence[str],
         filter_by_bill_ids: Sequence[str],
+        filter_by_external_reference: Sequence[str],
         limit: int | None = None,
         cursor: str | None = None,
         sort: sort_pb2.Sort | None = None,
@@ -203,6 +215,7 @@ class GrpcClient(Client):
             sort_by=sort,
             filter_by=filter_by,
             filter_by_bill_ids=filter_by_bill_ids,
+            filter_by_external_reference=filter_by_external_reference,
         )
         if limit is not None:
             request.page_size = limit

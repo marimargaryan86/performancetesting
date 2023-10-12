@@ -36,6 +36,13 @@ class Transactions(endpoints.HTTPEndpoint):
                 [],
             )
         ]
+        filter_by_external_reference = [
+            str(uuid)
+            for uuid in request.scope["parsed_query_string"].get(
+                "filter[externalReference][eq]",
+                [],
+            )
+        ]
 
         response = await client.find(
             limit=pagination.limit or self._default_page_size,
@@ -43,6 +50,7 @@ class Transactions(endpoints.HTTPEndpoint):
             sort=sort,
             filter_by=filter_by,
             filter_by_bill_ids=filter_by_bill_ids,
+            filter_by_external_reference=filter_by_external_reference,
         )
 
         data_resources = []

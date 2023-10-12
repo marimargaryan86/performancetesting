@@ -40,6 +40,7 @@ message ListTransactionsRequest {
   snowfall.stdlib.v1.Sort sort_by = 3;
   repeated string filter_by = 4;
   repeated string filter_by_bill_ids = 5;
+  repeated string filter_by_external_reference = 6;
 }
 
 message ListTransactionsResponse {

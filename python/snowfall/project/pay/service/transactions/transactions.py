@@ -30,11 +30,12 @@ class TransactionsRepository(
             {selector: selection_value},
         )
 
-    async def list_transactions(
+    async def list_transactions(  # noqa: WPS211
         self,
         cursor: str,
         filter_by_ids: Sequence[str],
         filter_by_bill_ids: Sequence[str],
+        filter_by_external_reference: Sequence[str],
         sort: tuple[str, int] | None = None,
     ) -> resultset.ResultSet[models_pb2.Transaction]:
         filter_ = {}
@@ -46,6 +47,11 @@ class TransactionsRepository(
             filter_["bill_id"] = {
                 "$in": list(filter_by_bill_ids),
             }
+        if filter_by_external_reference:
+            filter_["external_reference_id"] = {
+                "$in": list(filter_by_external_reference),
+            }
+
         return await self._find_with_cursor(cur=cursor, sort=sort, filter_=filter_)
 
     async def find_by_ids(
