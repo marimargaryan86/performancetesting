@@ -40,67 +40,46 @@
       icon: DashboardIcon,
     },
     {
-      type: "sub-menu",
-      label: "Trip Management",
-      expanded: $page.url.pathname.startsWith(routeConfig.routes.tripManagement.root),
-      items: [
-        {
-          type: "menu-item",
-          url: routeConfig.routes.tripManagement.routes.book.root,
-          label: "Book",
-          icon: TicketIcon,
-        },
-        {
-          type: "menu-item",
-          url: routeConfig.routes.tripManagement.routes.orders.root,
-          label: "View orders",
-          icon: BookingsIcon,
-        },
-      ],
+      type: "menu-item",
+      url: routeConfig.routes.tripManagement.routes.book.root,
+      label: "Book",
+      icon: TicketIcon,
     },
     {
-      type: "sub-menu",
-      label: "Pay",
-      expanded: $page.url.pathname.startsWith(routeConfig.routes.pay.root),
-      items: [
-        {
-          type: "menu-item",
-          url: routeConfig.routes.pay.routes.activity.root,
-          label: "Activity",
-          icon: ActivityIcon,
-        },
-        {
-          type: "menu-item",
-          url: routeConfig.routes.pay.routes.accounts.root,
-          label: "Accounts",
-          icon: AccountsIcon,
-        },
-        {
-          type: "menu-item",
-          url: routeConfig.routes.pay.routes.beneficiaries.root,
-          label: "Beneficiaries",
-          icon: BeneficiaryIcon,
-        },
-        {
-          type: "menu-item",
-          url: routeConfig.routes.pay.routes.bills.root,
-          label: "Bills",
-          icon: BillIcon,
-        },
-      ],
+      type: "menu-item",
+      url: routeConfig.routes.tripManagement.routes.orders.root,
+      label: "View orders",
+      icon: BookingsIcon,
     },
     {
-      type: "sub-menu",
-      label: "Go",
-      expanded: $page.url.pathname.startsWith(routeConfig.routes.go.root),
-      items: [
-        {
-          type: "menu-item",
-          url: routeConfig.routes.go.routes.bookings.root,
-          label: "Bookings",
-          icon: BookingsIcon,
-        },
-      ],
+      type: "menu-item",
+      url: routeConfig.routes.pay.routes.activity.root,
+      label: "Activity",
+      icon: ActivityIcon,
+    },
+    {
+      type: "menu-item",
+      url: routeConfig.routes.pay.routes.accounts.root,
+      label: "Accounts",
+      icon: AccountsIcon,
+    },
+    {
+      type: "menu-item",
+      url: routeConfig.routes.pay.routes.beneficiaries.root,
+      label: "Beneficiaries",
+      icon: BeneficiaryIcon,
+    },
+    {
+      type: "menu-item",
+      url: routeConfig.routes.pay.routes.bills.root,
+      label: "Bills",
+      icon: BillIcon,
+    },
+    {
+      type: "menu-item",
+      url: routeConfig.routes.go.routes.bookings.root,
+      label: "Bookings",
+      icon: BookingsIcon,
     },
   ];
 
