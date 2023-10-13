@@ -35,15 +35,14 @@
   import type { ComponentType } from "svelte";
   import HeadphonesIcon from "components/icons/headphones-icon.svelte";
 
-  $: ({ prevHref, nextHref } = getHrefs($page.url.pathname));
+  $: ({ prevHref } = getHrefs($page.url.pathname));
   $: activeTab = tabs.find((item) => {
     return item.exact ? $page.url.pathname === item.url : $page.url.pathname.startsWith(item.url);
   });
 
-  function getHrefs(pathname: string): { prevHref?: string; nextHref?: string } {
+  function getHrefs(pathname: string): { prevHref?: string } {
     return {
       prevHref: routes[routes.indexOf(pathname) - 1],
-      nextHref: routes[routes.indexOf(pathname) + 1],
     };
   }
 </script>
@@ -78,16 +77,6 @@
     minWidth="140px"
   >
     Go Back
-  </Button>
-
-  <Button
-    href={nextHref}
-    disabled={!nextHref}
-    size="small"
-    slot="navigation-right"
-    minWidth="140px"
-  >
-    Next
   </Button>
 </StandardLayout>
 
