@@ -45,6 +45,7 @@ class OrderService(  # noqa: WPS214
         publisher: OrderProducer,
         default_page_size: int,
         zendesk_client: ZendeskClient,
+        cancellation_group_id: int,
     ):
         self._default_page_size = default_page_size
         self._journeys = journeys
@@ -56,6 +57,7 @@ class OrderService(  # noqa: WPS214
         self._cancellation_requests = cancellation_requests
         self._publisher = publisher
         self._zendesk_client = zendesk_client
+        self._cancellation_group_id = cancellation_group_id
 
     def get_name(self) -> str:
         return orders_pb2.DESCRIPTOR.services_by_name["OrderService"].full_name
@@ -286,6 +288,7 @@ class OrderService(  # noqa: WPS214
             self._journeys,
             self._cancellation_requests,
             self._zendesk_client,
+            self._cancellation_group_id,
         )
         return await create_cancellation_handler.execute()
 

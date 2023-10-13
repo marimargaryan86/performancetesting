@@ -122,6 +122,7 @@ GATEWAY_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_gateway-serve-${var.env
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 PASSENGER_NAME_RECORDS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_passenger-name-records-${var.environment}"))}}
 RESELLERS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_resellers-${var.environment}"))}}
+ZENDESK_CANCELLATION_GROUP_ID={{key "${var.environment}/zendesk/cancellation_group_id"}}
 {{ with secret "kv/data/${var.environment}/zendesk" }}
 ZENDESK_API_KEY={{ .Data.data.zendesk_api_key }}
 {{ end }}

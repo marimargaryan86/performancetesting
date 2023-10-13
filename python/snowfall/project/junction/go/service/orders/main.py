@@ -40,6 +40,7 @@ class _GrpcSettings(application.Settings):
     resellers_address: str
     zendesk_base_url: pydantic.AnyUrl
     zendesk_api_key: str
+    zendesk_cancellation_group_id: int
 
 
 class _ImportSettings(pay_integration.Settings, application.Settings):
@@ -129,6 +130,7 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
                 ),
                 default_page_size=app.settings.default_page_size,
                 zendesk_client=zendesk_client,
+                cancellation_group_id=app.settings.zendesk_cancellation_group_id,
             ),
         ],
     )

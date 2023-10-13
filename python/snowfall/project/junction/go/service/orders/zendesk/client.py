@@ -42,6 +42,7 @@ class ZendeskClient(client.HttpClient):
         booking: models_pb2.Booking,
         order: models_pb2.Order,
         journey: models_pb2.Journey,
+        group_id: int,
     ) -> dict[str, Any]:
         return {
             "ticket": {
@@ -55,7 +56,7 @@ class ZendeskClient(client.HttpClient):
                 },
                 "subject": "Booking Cancellation Request",
                 "tags": "[BookingCancellationRequest, {0}]".format(self._env),
-                "group_id": 4849404548637,
+                "group_id": group_id,
             },
         }
 

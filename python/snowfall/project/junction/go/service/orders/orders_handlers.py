@@ -21,12 +21,14 @@ class CreateCancellationRequestHandler(object):  # noqa: WPS214
         journeys: JourneyRepository,
         cancellations: CancellationRequestsRepository,
         zendesk_client: ZendeskClient,
+        cancellation_group_id: int,
     ):
         self._request = request
         self._context = context
         self._journeys = journeys
         self._cancellations = cancellations
         self._zendesk_client = zendesk_client
+        self._cancellation_group_id = cancellation_group_id
 
     async def execute(  # noqa: WPS210
         self,
@@ -183,6 +185,7 @@ class CreateCancellationRequestHandler(object):  # noqa: WPS214
                     booking,
                     order,
                     journey,
+                    self._cancellation_group_id,
                 ),
             )
         except HttpStatusError as exc:

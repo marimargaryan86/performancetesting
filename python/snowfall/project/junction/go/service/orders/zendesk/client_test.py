@@ -11,7 +11,7 @@ from snowfall.stdlib.transport.http import errors
 
 
 class TestZendeskClient(object):
-    async def test_create_support_ticket(
+    async def test_create_support_ticket(  # noqa: WPS210
         self,
         httpx_mock: pytest_httpx.HTTPXMock,
         zendesk_client: ZendeskClient,
@@ -24,6 +24,7 @@ class TestZendeskClient(object):
         assert booking
         journey = await journey_repository.find_by_id(order.journey_id)
         assert journey
+        group_id = 123
 
         httpx_mock.add_response(
             url="https://test.api.com/api/v2/tickets",
@@ -45,6 +46,7 @@ class TestZendeskClient(object):
             booking,
             order,
             journey,
+            group_id,
         )
         support_ticket_id = await zendesk_client.create_support_ticket(
             cancel_request_payload,
