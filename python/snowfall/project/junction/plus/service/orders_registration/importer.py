@@ -56,7 +56,6 @@ class OrderImporter(object):
             receiver_id=order.subscriber_id,
             body=order,
             event_type=models_pb2.NotificationEvent.TYPE_ORDER_CONFIRMATION,
-            channel=notifications_models_pb2.Channel.CHANNEL_WHATSAPP,
         )
         await self._producer.publish(notification_event, "plus.events")
 

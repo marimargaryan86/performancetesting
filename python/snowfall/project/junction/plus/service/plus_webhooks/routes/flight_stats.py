@@ -103,7 +103,6 @@ class Alerts(endpoints.HTTPEndpoint):
                     updates=updates,
                 ),
                 event_type=notifications_models_pb2.NotificationEvent.TYPE_FLIGHT_STATS_ALERT,
-                channel=notifications_models_pb2.Channel.CHANNEL_WHATSAPP,
             )
             await notification_event_publisher_client.publish(notification_event)
 

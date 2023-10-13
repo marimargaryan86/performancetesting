@@ -156,7 +156,6 @@ async def valid_message() -> (
                 ],
             ),
             event_type=notifications_models_pb2.NotificationEvent.TYPE_ORDER_CONFIRMATION,
-            channel=notifications_models_pb2.Channel.CHANNEL_WHATSAPP,
         )
         message.processed = False
         message.exchange = None

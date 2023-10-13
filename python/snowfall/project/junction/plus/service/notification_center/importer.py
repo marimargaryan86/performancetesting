@@ -42,15 +42,16 @@ class NotificationEventImporter(object):
         configuration_vector = await self._configuration_vectors.get(
             identifier=message.body.sender_id,
         )
-
-        self._logger.warning(str(configuration_vector))
-        self._logger.warning(str(subscriber))
+        if message.body.channel:
+            channel = message.body.channel
+        else:
+            channel = configuration_vector.channel
         fun = protobuf.enum_value_to_slug(
             enum_descriptor=models_pb2.NotificationEvent.Type.DESCRIPTOR,
             enum_value=message.body.event_type,
         ).replace("-", "_")
         await self._channels.run(
-            message.body.channel,
+            channel,
             fun,
             configuration_vector,
             subscriber,

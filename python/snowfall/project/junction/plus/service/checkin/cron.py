@@ -63,7 +63,6 @@ class CheckinCronJob(object):
                         receiver_id=subscriber_id,
                         preformatted_message=checkin_message,
                         event_type=models_pb2.NotificationEvent.TYPE_PREFORMATTED_MESSAGE,
-                        channel=models_pb2.Channel.CHANNEL_WHATSAPP,
                     )
                     await self._publisher_client.publish(notification_event)
                 await self._monitoring_rules.sent_reminder(candidate.id)
