@@ -66,4 +66,24 @@ message TripSearchCapabilities {
   // Whether or not multi city trip searches are supported by the provider. If
   // not, Junction will issue multiple one way trip searches instead.
   bool supports_multi_city = 5;
+
+  enum PassengerAgeIdentificationMethod {
+    // No value specified.
+    PASSENGER_AGE_IDENTIFICATION_METHOD_UNSPECIFIED = 0;
+
+    // Junction will perform trip searches using the provider's own passenger
+    // types for each passenger.
+    // `snowfall.project.junction.provider.v1alpha.PassengerService` needs to be
+    // implemented in order for Junction to have knowledge about the provider's
+    // passenger types.
+    PASSENGER_AGE_IDENTIFICATION_METHOD_PROVIDER_TYPE = 1;
+
+    // Junction will perform trip searches using the date of birth of each
+    // passenger.
+    PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH = 2;
+  }
+
+  // The passenger age identification method determines how each passenger's age
+  // will be represented in trip searches coming from Junction.
+  PassengerAgeIdentificationMethod passenger_age_identification_method = 6;
 }

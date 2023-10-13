@@ -1,11 +1,9 @@
-from __future__ import annotations
-
 import asyncio
 import datetime
 import itertools
 import time
 from collections.abc import AsyncGenerator, Sequence
-from typing import cast
+from typing import TypeGuard
 
 import prometheus_client
 from grpc import aio
@@ -14,7 +12,9 @@ from snowfall.project.junction.go.service.gateway import providers, stops, tasks
 from snowfall.project.junction.go.service.gateway.v1 import trips_pb2, trips_pb2_grpc
 from snowfall.project.junction.provider.v2alpha import meta_pb2 as provider_meta_pb2
 from snowfall.project.junction.provider.v2alpha import trips_pb2 as provider_trips_pb2
+from snowfall.project.junction.v1 import passenger_type_pb2
 from snowfall.stdlib import string
+from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.instrumentation import prometheus
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.transport.amqp import consumer, protocol, types
@@ -89,18 +89,13 @@ class RequestGenerator(object):
         self,
         task: trips_pb2.TripSearchTask,
     ) -> _RequestGeneratorReturn:
-        passengers = _to_passengers(task)
-
-        if not passengers:
-            return
-
         match task.WhichOneof("search_mode"):
             case "one_way":
-                provider_request_tuple_generator = self._one_way(task, passengers)
+                provider_request_tuple_generator = self._one_way(task)
             case "round_trip":
-                provider_request_tuple_generator = self._round_trip(task, passengers)
+                provider_request_tuple_generator = self._round_trip(task)
             case "multi_city":
-                provider_request_tuple_generator = self._multi_city(task, passengers)
+                provider_request_tuple_generator = self._multi_city(task)
             case _:
                 return
 
@@ -110,7 +105,6 @@ class RequestGenerator(object):
     async def _multi_city(
         self,
         task: trips_pb2.TripSearchTask,
-        passengers: Sequence[provider_trips_pb2.SearchTripsRequest.Passenger],
     ) -> _RequestGeneratorReturn:
         resolved_stops = await self._stop_resolver(
             frozenset(
@@ -138,15 +132,17 @@ class RequestGenerator(object):
                 for criterion in task.multi_city.criteria
             ]
 
-            if not criteria or not all(criteria):
+            if not _criteria_is_valid(criteria):
+                continue
+
+            passengers = _to_passengers(provider, task)
+
+            if not passengers:
                 continue
 
             yield provider, provider_trips_pb2.SearchTripsRequest(
                 multi_city=provider_trips_pb2.SearchTripsRequest.MultiCity(
-                    criteria=cast(
-                        list[provider_trips_pb2.SearchTripsRequest.Criterion],
-                        criteria,
-                    ),
+                    criteria=criteria,
                 ),
                 passengers=passengers,
             )
@@ -154,7 +150,6 @@ class RequestGenerator(object):
     async def _one_way(
         self,
         task: trips_pb2.TripSearchTask,
-        passengers: Sequence[provider_trips_pb2.SearchTripsRequest.Passenger],
     ) -> _RequestGeneratorReturn:
         resolved_stops = await self._stop_resolver(
             frozenset(
@@ -177,6 +172,11 @@ class RequestGenerator(object):
             if not criterion:
                 continue
 
+            passengers = _to_passengers(provider, task)
+
+            if not passengers:
+                continue
+
             yield provider, provider_trips_pb2.SearchTripsRequest(
                 one_way=provider_trips_pb2.SearchTripsRequest.OneWay(
                     criterion=criterion,
@@ -187,7 +187,6 @@ class RequestGenerator(object):
     async def _round_trip(
         self,
         task: trips_pb2.TripSearchTask,
-        passengers: Sequence[provider_trips_pb2.SearchTripsRequest.Passenger],
     ) -> _RequestGeneratorReturn:
         resolved_stops = await self._stop_resolver(
             frozenset(
@@ -210,6 +209,11 @@ class RequestGenerator(object):
             if not criterion:
                 continue
 
+            passengers = _to_passengers(provider, task)
+
+            if not passengers:
+                continue
+
             yield provider, provider_trips_pb2.SearchTripsRequest(
                 round_trip=provider_trips_pb2.SearchTripsRequest.RoundTrip(
                     criterion=criterion,
@@ -227,14 +231,53 @@ class RequestGenerator(object):
 
 
 def _to_passengers(
+    provider: providers.Provider,
     task: trips_pb2.TripSearchTask,
 ) -> list[provider_trips_pb2.SearchTripsRequest.Passenger]:
-    return [
-        provider_trips_pb2.SearchTripsRequest.Passenger(
-            date_of_birth=passenger.date_of_birth,
-        )
-        for passenger in task.passengers
-    ]
+    match provider.trip_search_capabilities.passenger_age_identification_method:
+        case provider_meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_PROVIDER_TYPE:
+            # TODO: implement
+            return []
+        case provider_meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH:
+            return [
+                provider_trips_pb2.SearchTripsRequest.Passenger(
+                    date_of_birth=protobuf.date_to_protobuf(
+                        _passenger_type_to_date_of_birth(passenger.type),
+                    ),
+                )
+                for passenger in task.passengers
+                if passenger.type is not passenger_type_pb2.PASSENGER_TYPE_UNSPECIFIED
+            ]
+
+    return []
+
+
+_ADULT_AGE = 30
+_CHILD_AGE = 8
+_INFANT_AGE = 1
+
+
+def _criteria_is_valid(
+    criteria: Sequence[provider_trips_pb2.SearchTripsRequest.Criterion | None],
+) -> TypeGuard[Sequence[provider_trips_pb2.SearchTripsRequest.Criterion]]:
+    return bool(criteria and all(criteria))
+
+
+def _passenger_type_to_date_of_birth(
+    passenger_type: passenger_type_pb2.PassengerType.ValueType,
+) -> datetime.date:
+    today = datetime.datetime.now(tz=datetime.UTC).date()
+    base_date = today.replace(month=1, day=1)
+
+    match passenger_type:
+        case passenger_type_pb2.PASSENGER_TYPE_ADULT:
+            return base_date.replace(year=base_date.year - _ADULT_AGE)
+        case passenger_type_pb2.PASSENGER_TYPE_CHILD:
+            return base_date.replace(year=base_date.year - _CHILD_AGE)
+        case passenger_type_pb2.PASSENGER_TYPE_INFANT:
+            return base_date.replace(year=base_date.year - _INFANT_AGE)
+        case _:
+            return base_date
 
 
 def _to_provider_criterion(
@@ -257,6 +300,9 @@ def _to_provider_criterion(
     )
 
     match provider.trip_search_capabilities.stop_identification_method:
+        case provider_meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_PROVIDER_IDS:
+            # TODO: implement
+            return None
         case provider_meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_COORDINATES:
             provider_criterion.origin_coordinates.CopyFrom(
                 origin.location.coordinates,

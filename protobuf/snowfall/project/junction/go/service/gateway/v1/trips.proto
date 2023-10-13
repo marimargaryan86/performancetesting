@@ -3,6 +3,7 @@ syntax = "proto3";
 package snowfall.project.junction.go.service.gateway.v1;
 
 import "snowfall/project/junction/provider/v2alpha/trips.proto";
+import "snowfall/project/junction/v1/passenger_type.proto";
 import "snowfall/project/junction/v1/segment_type.proto";
 import "snowfall/stdlib/v1/date.proto";
 
@@ -31,7 +32,7 @@ message Criterion {
 }
 
 message Passenger {
-  snowfall.stdlib.v1.Date date_of_birth = 1;
+  snowfall.project.junction.v1.PassengerType type = 1;
 }
 
 message OneWay {

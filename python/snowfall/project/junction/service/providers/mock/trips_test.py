@@ -9,6 +9,7 @@ from snowfall.project.junction.service.providers.mock import client, trips
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence import filesystem
+from snowfall.stdlib.v1 import date_pb2
 
 
 @pytest.fixture()
@@ -54,9 +55,7 @@ def trip_searcher(
 def passengers() -> list[trips_pb2.SearchTripsRequest.Passenger]:
     return [
         trips_pb2.SearchTripsRequest.Passenger(
-            date_of_birth=protobuf.date_to_protobuf(
-                datetime.date(year=1987, month=5, day=24),
-            ),
+            date_of_birth=date_pb2.Date(year=1990, month=10, day=25),
         ),
     ]
 

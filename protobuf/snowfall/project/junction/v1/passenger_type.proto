@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package snowfall.project.junction.v1;
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/v1";
+
+enum PassengerType {
+  PASSENGER_TYPE_UNSPECIFIED = 0;
+  PASSENGER_TYPE_ADULT = 1;
+  PASSENGER_TYPE_CHILD = 2;
+  PASSENGER_TYPE_INFANT = 3;
+}

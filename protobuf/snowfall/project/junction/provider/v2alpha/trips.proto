@@ -64,9 +64,10 @@ message SearchTripsRequest {
     snowfall.stdlib.v1.Date departure_date = 5;
   }
   message Passenger {
-    // @todo: convert to oneof? It's been discussed to allow DoB, Junction types
-    // and provider types as input.
-    snowfall.stdlib.v1.Date date_of_birth = 1;
+    oneof age {
+      string type = 1;
+      snowfall.stdlib.v1.Date date_of_birth = 2;
+    }
   }
   message OneWay {
     Criterion criterion = 1;

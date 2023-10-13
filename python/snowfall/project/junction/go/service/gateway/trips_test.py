@@ -1,3 +1,4 @@
+import datetime
 from collections.abc import AsyncIterable, Callable
 
 import pytest
@@ -10,6 +11,7 @@ from snowfall.project.junction.go.service.gateway.v1 import trips_pb2
 from snowfall.project.junction.go.service.places.v1 import models_pb2
 from snowfall.project.junction.provider.v2alpha import meta_pb2
 from snowfall.project.junction.provider.v2alpha import trips_pb2 as provider_trips_pb2
+from snowfall.project.junction.v1 import passenger_type_pb2
 from snowfall.stdlib.v1 import date_pb2, latlng_pb2
 
 _ORIGIN_IDENTIFIER = "foobar"
@@ -19,7 +21,6 @@ _DESTINATION_IATA = "BAZ"
 _NO_IATA_IDENTIFIER = "no_iata"
 _DEPARTURE_DATE = date_pb2.Date(year=2023, month=10, day=25)
 _RETURN_DATE = date_pb2.Date(year=2023, month=11, day=25)
-_PASSENGER_DOB = date_pb2.Date(year=1990, month=10, day=25)
 _ORIGIN_COORDINATES = latlng_pb2.LatLng(
     latitude=1,
     longitude=1,
@@ -29,10 +30,14 @@ _DESTINATION_COORDINATES = latlng_pb2.LatLng(
     longitude=-1,
 )
 _TASK_PASSENGER = trips_pb2.Passenger(
-    date_of_birth=_PASSENGER_DOB,
+    type=passenger_type_pb2.PASSENGER_TYPE_ADULT,
 )
 _REQUEST_PASSENGER = provider_trips_pb2.SearchTripsRequest.Passenger(
-    date_of_birth=_PASSENGER_DOB,
+    date_of_birth=date_pb2.Date(
+        year=datetime.datetime.now(tz=datetime.UTC).today().year - 30,
+        month=1,
+        day=1,
+    ),
 )
 _ONE_WAY_TASK = trips_pb2.TripSearchTask(
     one_way=trips_pb2.OneWay(
@@ -128,6 +133,7 @@ class TestRequestGenerator(object):
                 meta_pb2.TripSearchCapabilities(
                     is_supported=True,
                     stop_identification_method=meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_COORDINATES,
+                    passenger_age_identification_method=meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH,
                 ),
                 provider_trips_pb2.SearchTripsRequest(
                     one_way=provider_trips_pb2.SearchTripsRequest.OneWay(
@@ -146,6 +152,7 @@ class TestRequestGenerator(object):
                 meta_pb2.TripSearchCapabilities(
                     is_supported=True,
                     stop_identification_method=meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_IATA_CODES,
+                    passenger_age_identification_method=meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH,
                 ),
                 provider_trips_pb2.SearchTripsRequest(
                     one_way=provider_trips_pb2.SearchTripsRequest.OneWay(
@@ -164,6 +171,7 @@ class TestRequestGenerator(object):
                 meta_pb2.TripSearchCapabilities(
                     is_supported=True,
                     stop_identification_method=meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_COORDINATES,
+                    passenger_age_identification_method=meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH,
                 ),
                 provider_trips_pb2.SearchTripsRequest(
                     multi_city=provider_trips_pb2.SearchTripsRequest.MultiCity(
@@ -189,6 +197,7 @@ class TestRequestGenerator(object):
                 meta_pb2.TripSearchCapabilities(
                     is_supported=True,
                     stop_identification_method=meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_IATA_CODES,
+                    passenger_age_identification_method=meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH,
                 ),
                 provider_trips_pb2.SearchTripsRequest(
                     multi_city=provider_trips_pb2.SearchTripsRequest.MultiCity(
@@ -214,6 +223,7 @@ class TestRequestGenerator(object):
                 meta_pb2.TripSearchCapabilities(
                     is_supported=True,
                     stop_identification_method=meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_COORDINATES,
+                    passenger_age_identification_method=meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH,
                 ),
                 provider_trips_pb2.SearchTripsRequest(
                     round_trip=provider_trips_pb2.SearchTripsRequest.RoundTrip(
@@ -233,6 +243,7 @@ class TestRequestGenerator(object):
                 meta_pb2.TripSearchCapabilities(
                     is_supported=True,
                     stop_identification_method=meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_IATA_CODES,
+                    passenger_age_identification_method=meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH,
                 ),
                 provider_trips_pb2.SearchTripsRequest(
                     round_trip=provider_trips_pb2.SearchTripsRequest.RoundTrip(
@@ -283,6 +294,7 @@ class TestRequestGenerator(object):
                 meta_pb2.TripSearchCapabilities(
                     is_supported=False,
                     stop_identification_method=meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_COORDINATES,
+                    passenger_age_identification_method=meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH,
                 ),
                 id="one way with unsupported provider",
             ),
@@ -291,6 +303,7 @@ class TestRequestGenerator(object):
                 meta_pb2.TripSearchCapabilities(
                     is_supported=False,
                     stop_identification_method=meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_COORDINATES,
+                    passenger_age_identification_method=meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH,
                 ),
                 id="multi city with unsupported provider",
             ),
@@ -299,6 +312,7 @@ class TestRequestGenerator(object):
                 meta_pb2.TripSearchCapabilities(
                     is_supported=False,
                     stop_identification_method=meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_COORDINATES,
+                    passenger_age_identification_method=meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH,
                 ),
                 id="round trip with unsupported provider",
             ),
@@ -316,6 +330,7 @@ class TestRequestGenerator(object):
                 meta_pb2.TripSearchCapabilities(
                     is_supported=True,
                     stop_identification_method=meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_IATA_CODES,
+                    passenger_age_identification_method=meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH,
                 ),
                 id=(
                     "one way with IATA codes identification method and with stop"
@@ -343,6 +358,7 @@ class TestRequestGenerator(object):
                 meta_pb2.TripSearchCapabilities(
                     is_supported=True,
                     stop_identification_method=meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_IATA_CODES,
+                    passenger_age_identification_method=meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH,
                 ),
                 id=(
                     "multi city with IATA codes identification method and with stop"
@@ -364,6 +380,7 @@ class TestRequestGenerator(object):
                 meta_pb2.TripSearchCapabilities(
                     is_supported=True,
                     stop_identification_method=meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_IATA_CODES,
+                    passenger_age_identification_method=meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH,
                 ),
                 id=(
                     "round trip with IATA codes identification method and with stop"
@@ -411,6 +428,7 @@ class TestRequestGenerator(object):
                 meta_pb2.TripSearchCapabilities(
                     is_supported=True,
                     stop_identification_method=meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_COORDINATES,
+                    passenger_age_identification_method=meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH,
                 ),
             ),
             (
@@ -434,6 +452,7 @@ class TestRequestGenerator(object):
                 meta_pb2.TripSearchCapabilities(
                     is_supported=True,
                     stop_identification_method=meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_COORDINATES,
+                    passenger_age_identification_method=meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH,
                 ),
             ),
             (
@@ -451,6 +470,7 @@ class TestRequestGenerator(object):
                 meta_pb2.TripSearchCapabilities(
                     is_supported=True,
                     stop_identification_method=meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_COORDINATES,
+                    passenger_age_identification_method=meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH,
                 ),
             ),
         ],
