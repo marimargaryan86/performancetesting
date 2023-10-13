@@ -1,19 +1,19 @@
-import { getSchemaModel, type Infer } from "integration/common/schema-model.server";
 import { z } from "zod";
 import { moneyModel } from "./money";
+import schemaModel, { type Infer } from "utils/schema-model";
 
-export const addressDetailsModel = getSchemaModel(
-  z.object({
+export const addressDetailsModel = schemaModel.create({
+  schema: z.object({
     addressLines: z.array(z.string()),
     countryCode: z.string(),
     postalCode: z.string(),
     city: z.string(),
   }),
-  z.object({}),
-);
+  model: z.object({}),
+});
 
-export const companyModel = getSchemaModel(
-  z.object({
+export const companyModel = schemaModel.create({
+  schema: z.object({
     id: z.string(),
     type: z.enum(["companies"]),
     attributes: z.object({
@@ -29,17 +29,15 @@ export const companyModel = getSchemaModel(
       defaultCurrenzy: z.string().optional(),
     }),
   }),
-  z.object({
+  model: z.object({
     id: z.string(),
     name: z.string().optional(),
   }),
-  {
-    toModel: (data) => ({
-      id: data.id,
-      name: data.attributes.name,
-    }),
-  },
-);
+  toModel: (data) => ({
+    id: data.id,
+    name: data.attributes.name,
+  }),
+});
 export type CompanyModel = Infer<typeof companyModel>;
 export type CompanySchema = Infer<typeof companyModel, "schema">;
 export type CompanyIdentifier = Infer<typeof companyModel, "identifier">;

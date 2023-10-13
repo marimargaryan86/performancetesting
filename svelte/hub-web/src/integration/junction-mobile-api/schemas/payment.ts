@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { getSchemaModel, type Infer } from "../../common/schema-model.server";
 import { priceModel } from "./price";
+import schemaModel, { type Infer } from "utils/schema-model";
 
-export const paymentIntentModel = getSchemaModel(
-  z.object({
+export const paymentIntentModel = schemaModel.create({
+  schema: z.object({
     id: z.string(),
     type: z.enum(["payments"]),
     attributes: z.object({
@@ -12,29 +12,26 @@ export const paymentIntentModel = getSchemaModel(
       customerId: z.string().optional(),
     }),
   }),
-  z.object({
+  model: z.object({
     id: z.string(),
     clientSecret: z.string(),
     ephemeralKey: z.string().optional(),
     customerId: z.string().optional(),
   }),
-  {
-    toModel: (data) => ({ ...data, ...data.attributes }),
-  },
-);
+  toModel: (data) => ({ ...data, ...data.attributes }),
+});
 export type PaymentIntentModel = Infer<typeof paymentIntentModel>;
 export type PaymentIntentSchema = Infer<typeof paymentIntentModel, "schema">;
 
-export const createPaymentIntentModel = getSchemaModel(
-  z.object({
+export const createPaymentIntentModel = schemaModel.create({
+  schema: z.object({
     type: z.enum(["payments"]),
     attributes: priceModel.schema,
   }),
-  priceModel.model,
-  {
-    toSchema: (data) => ({
-      type: "payments" as const,
+  model: priceModel.model,
+  toSchema: (data) =>
+    ({
+      type: "payments",
       attributes: priceModel.toSchema(data),
-    }),
-  },
-);
+    } as const),
+});

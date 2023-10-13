@@ -1,8 +1,8 @@
-import { getSchemaModel, type Infer } from "integration/common/schema-model.server";
+import schemaModel, { type Infer } from "utils/schema-model";
 import { z } from "zod";
 
-export const loginFormModel = getSchemaModel(
-  z.object({
+export const loginFormModel = schemaModel.create({
+  schema: z.object({
     id: z.string(),
     ui: z.object({
       nodes: z.array(
@@ -34,7 +34,7 @@ export const loginFormModel = getSchemaModel(
       ),
     }),
   }),
-  z.object({
+  model: z.object({
     id: z.string(),
     elements: z.array(
       z.object({
@@ -61,25 +61,23 @@ export const loginFormModel = getSchemaModel(
       }),
     ),
   }),
-  {
-    toModel: (data) => ({
-      id: data.id,
-      elements: data.ui.nodes.map((item) => ({
-        type: item.attributes.node_type,
-        attributes: {
-          name: item.attributes.name,
-          type: item.attributes.type,
-          value: item.attributes.value ?? "",
-          label: item.meta.label?.text,
-        },
-      })),
-    }),
-  },
-);
+  toModel: (data) => ({
+    id: data.id,
+    elements: data.ui.nodes.map((item) => ({
+      type: item.attributes.node_type,
+      attributes: {
+        name: item.attributes.name,
+        type: item.attributes.type,
+        value: item.attributes.value ?? "",
+        label: item.meta.label?.text,
+      },
+    })),
+  }),
+});
 export type LoginFormModel = Infer<typeof loginFormModel>;
 
-export const sessionModel = getSchemaModel(
-  z.object({
+export const sessionModel = schemaModel.create({
+  schema: z.object({
     // eslint-disable-next-line camelcase
     expires_at: z.date({ coerce: true }),
     identity: z.object({
@@ -89,23 +87,21 @@ export const sessionModel = getSchemaModel(
       }),
     }),
   }),
-  z.object({
+  model: z.object({
     data: z.object({
       id: z.string(),
       email: z.string().email(),
       name: z.string(),
     }),
-    expiresAt: z.date(),
+    expiresAt: z.date({ coerce: true }),
   }),
-  {
-    toModel: (data) => ({
-      data: {
-        id: data.identity.id,
-        email: data.identity.traits.email,
-        name: "Unknown",
-      },
-      expiresAt: data.expires_at,
-    }),
-  },
-);
+  toModel: (data) => ({
+    data: {
+      id: data.identity.id,
+      email: data.identity.traits.email,
+      name: "Unknown",
+    },
+    expiresAt: data.expires_at,
+  }),
+});
 export type OrySessionModel = Infer<typeof sessionModel>;

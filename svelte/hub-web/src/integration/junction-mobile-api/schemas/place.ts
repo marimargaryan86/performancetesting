@@ -1,36 +1,32 @@
-import { getSchemaModel, relationship, type Infer } from "../../common/schema-model.server";
+import schemaModel, { type Infer } from "utils/schema-model";
 import { z } from "zod";
 
-export const coordinatesModel = getSchemaModel(
-  z.object({ latitude: z.number(), longitude: z.number() }),
-  z.object({ lat: z.number(), lon: z.number() }),
-  {
-    toModel: (data) => ({ lat: data.latitude, lon: data.longitude }),
-    toSchema: (data) => ({ latitude: data.lat, longitude: data.lon }),
-  },
-);
+export const coordinatesModel = schemaModel.create({
+  schema: z.object({ latitude: z.number(), longitude: z.number() }),
+  model: z.object({ lat: z.number(), lon: z.number() }),
+  toModel: (data) => ({ lat: data.latitude, lon: data.longitude }),
+  toSchema: (data) => ({ latitude: data.lat, longitude: data.lon }),
+});
 
-export const coordinatesSearchableModel = getSchemaModel(
-  coordinatesModel.schema.extend({
+export const coordinatesSearchableModel = schemaModel.create({
+  schema: coordinatesModel.schema.extend({
     precision: z.enum(["area", "precise"]).optional(),
   }),
-  coordinatesModel.model.extend({
+  model: coordinatesModel.model.extend({
     precision: z.enum(["area", "precise"]).optional(),
   }),
-  {
-    toModel: (data) => ({
-      ...coordinatesModel.toModel(data),
-      precision: data.precision,
-    }),
-    toSchema: (data) => ({
-      ...coordinatesModel.toSchema(data),
-      precision: data.precision,
-    }),
-  },
-);
+  toModel: (data) => ({
+    ...coordinatesModel.toModel(data),
+    precision: data.precision,
+  }),
+  toSchema: (data) => ({
+    ...coordinatesModel.toSchema(data),
+    precision: data.precision,
+  }),
+});
 
-export const placeModel = getSchemaModel(
-  z.object({
+export const placeModel = schemaModel.create({
+  schema: z.object({
     id: z.string().uuid(),
     type: z.enum(["places"]),
     attributes: z.object({
@@ -44,11 +40,13 @@ export const placeModel = getSchemaModel(
       population: z.number().optional(),
       minCity: z.string().optional(),
     }),
-    relationships: relationship({
-      types: z.array(z.object({ id: z.string(), type: z.enum(["place-types"]) })),
-    }).optional(),
+    relationships: schemaModel
+      .relationships({
+        types: z.array(z.object({ id: z.string(), type: z.enum(["place-types"]) })),
+      })
+      .optional(),
   }),
-  z.object({
+  model: z.object({
     id: z.string(),
     types: z.array(z.string()),
     name: z.string(),
@@ -60,19 +58,17 @@ export const placeModel = getSchemaModel(
       name: z.string().optional(),
     }),
   }),
-  {
-    toModel: (data) => ({
-      ...data,
-      ...data.attributes,
-      iataCode: data.attributes.iataCode ?? undefined,
-      coordinates: coordinatesModel.toModel(data.attributes),
-      types: data.relationships?.types.data.map((item) => item.id) ?? [],
-      country: {
-        code: data.attributes.countryCode,
-        name: data.attributes.countryName ?? undefined,
-      },
-    }),
-  },
-);
+  toModel: (data) => ({
+    ...data,
+    ...data.attributes,
+    iataCode: data.attributes.iataCode ?? undefined,
+    coordinates: coordinatesModel.toModel(data.attributes),
+    types: data.relationships?.types.data.map((item) => item.id) ?? [],
+    country: {
+      code: data.attributes.countryCode,
+      name: data.attributes.countryName ?? undefined,
+    },
+  }),
+});
 export type PlaceModel = Infer<typeof placeModel>;
 export type PlaceSchema = Infer<typeof placeModel, "schema">;

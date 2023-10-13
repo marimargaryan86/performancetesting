@@ -1,46 +1,42 @@
 import { accountModel } from "./account";
-import { getSchemaModel, relationship, type Infer } from "integration/common/schema-model.server";
 import { priceModel } from "integration/junction-mobile-api/schemas/price";
 import { z } from "zod";
 import { currencyModel } from "./money";
+import schemaModel, { type Infer } from "utils/schema-model";
 
-export const balanceModel = getSchemaModel(
-  z.object({
+export const balanceModel = schemaModel.create({
+  schema: z.object({
     id: z.string(),
     type: z.enum(["balances"]),
     attributes: z.object({ amount: z.number() }),
-    relationships: relationship({
+    relationships: schemaModel.relationships({
       account: accountModel.identifier,
       currency: currencyModel.identifier,
     }),
   }),
-  priceModel.model,
-  {
-    toModel: (data) => ({
-      amount: data.attributes.amount,
-      currency: data.relationships.currency.data.id,
-    }),
-  },
-);
+  model: priceModel.model,
+  toModel: (data) => ({
+    amount: data.attributes.amount,
+    currency: data.relationships.currency.data.id,
+  }),
+});
 export type BalanceSchema = Infer<typeof balanceModel, "schema">;
 
-export const createBalanceModel = getSchemaModel(
-  z.object({
+export const createBalanceModel = schemaModel.create({
+  schema: z.object({
     type: z.enum(["balances"]),
-    relationships: relationship({
+    relationships: schemaModel.relationships({
       currency: z.object({
         id: z.string(),
         type: z.enum(["currencies"]),
       }),
     }),
   }),
-  z.object({ currencyCode: z.string() }),
-  {
-    toSchema: (data) => ({
-      type: "balances" as const,
-      relationships: {
-        currency: { data: { id: data.currencyCode, type: "currencies" as const } },
-      },
-    }),
-  },
-);
+  model: z.object({ currencyCode: z.string() }),
+  toSchema: (data) => ({
+    type: "balances" as const,
+    relationships: {
+      currency: { data: { id: data.currencyCode, type: "currencies" as const } },
+    },
+  }),
+});

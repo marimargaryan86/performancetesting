@@ -1,13 +1,8 @@
+import schemaModel, { type Infer } from "utils/schema-model";
 import { billModel, type BillIdentifier } from "./bill";
 import { companyModel, type CompanyIdentifier } from "./company";
 import { conversionModel, type ConversionIdentifier } from "./conversion";
 import { moneyModel } from "./money";
-import {
-  getSchemaModel,
-  links,
-  relationship,
-  type Infer,
-} from "integration/common/schema-model.server";
 import { z } from "zod";
 
 const transactionRelationships: z.ZodType<{
@@ -15,15 +10,17 @@ const transactionRelationships: z.ZodType<{
   bill?: { data: BillIdentifier | null };
   payer?: { data: CompanyIdentifier };
   beneficiary?: { data: CompanyIdentifier };
-}> = relationship({
-  conversion: z.lazy(() => conversionModel.identifier.nullable()).optional(),
-  bill: z.lazy(() => billModel.identifier.nullable()).optional(),
-  payer: z.lazy(() => companyModel.identifier).optional(),
-  beneficiary: z.lazy(() => companyModel.identifier).optional(),
-});
+}> = z.lazy(() =>
+  schemaModel.relationships({
+    conversion: conversionModel.identifier.nullable().optional(),
+    bill: billModel.identifier.nullable().optional(),
+    payer: companyModel.identifier.optional(),
+    beneficiary: companyModel.identifier.optional(),
+  }),
+);
 
-export const transactionModel = getSchemaModel(
-  z.object({
+export const transactionModel = schemaModel.create({
+  schema: z.object({
     id: z.string(),
     type: z.enum(["transactions"]),
     attributes: z.object({
@@ -48,9 +45,9 @@ export const transactionModel = getSchemaModel(
       paymentMethod: z.enum(["unspecified", "transactional", "invoice"]),
     }),
     relationships: transactionRelationships.optional(),
-    links: links(["self"]),
+    links: schemaModel.links({ self: true }),
   }),
-  z.object({
+  model: z.object({
     id: z.string(),
     bookingId: z.string(),
     createdAt: z.date({ coerce: true }),
@@ -76,36 +73,34 @@ export const transactionModel = getSchemaModel(
     }),
     status: z.enum(["paid", "pending", "cancelled"]),
   }),
-  {
-    toModel: (data) => ({
-      id: data.id,
-      bookingId: data.attributes.externalReference,
-      beneficiary: undefined,
-      payer: undefined,
-      createdAt: data.attributes.createdAt,
-      amounts: {
-        beneficiary: data.attributes.amounts.beneficiary,
-        quotation: data.attributes.amounts.quotation,
-        salesMargin: data.attributes.amounts.salesMargin,
-      },
-      rates: {
-        fxBuffer: data.attributes.rates.fxBuffer,
-        fxMarkup: data.attributes.rates.fxMarkup,
-        fxQuote: data.attributes.rates.fxQuote,
-        salesMarkup: data.attributes.rates.salesMarkup,
-      },
-      billId: data.relationships?.bill?.data?.id,
-      bill: undefined,
-      reference: data.attributes.invoiceReference,
-      payment: {
-        type: data.attributes.paymentType,
-        method: data.attributes.paymentMethod,
-      },
-      // TODO: Use real status.
-      status: "paid" as const,
-    }),
-  },
-);
+  toModel: (data) => ({
+    id: data.id,
+    bookingId: data.attributes.externalReference,
+    beneficiary: undefined,
+    payer: undefined,
+    createdAt: data.attributes.createdAt,
+    amounts: {
+      beneficiary: data.attributes.amounts.beneficiary,
+      quotation: data.attributes.amounts.quotation,
+      salesMargin: data.attributes.amounts.salesMargin,
+    },
+    rates: {
+      fxBuffer: data.attributes.rates.fxBuffer,
+      fxMarkup: data.attributes.rates.fxMarkup,
+      fxQuote: data.attributes.rates.fxQuote,
+      salesMarkup: data.attributes.rates.salesMarkup,
+    },
+    billId: data.relationships?.bill?.data?.id,
+    bill: undefined,
+    reference: data.attributes.invoiceReference,
+    payment: {
+      type: data.attributes.paymentType,
+      method: data.attributes.paymentMethod,
+    },
+    // TODO: Use real status.
+    status: "paid" as const,
+  }),
+});
 export type TransactionModel = Infer<typeof transactionModel>;
 export type TransactionSchema = Infer<typeof transactionModel, "schema">;
 export type TransactionIdentifier = Infer<typeof transactionModel, "identifier">;

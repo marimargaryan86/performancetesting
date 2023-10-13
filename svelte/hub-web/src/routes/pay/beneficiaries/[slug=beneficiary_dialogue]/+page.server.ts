@@ -1,7 +1,7 @@
 import { getSession } from "utils/auth";
 import * as devalue from "devalue";
 import type { RequestEvent } from "./$types";
-import { ActionFailure, fail } from "@sveltejs/kit";
+import { type ActionFailure, fail } from "@sveltejs/kit";
 import { z } from "zod";
 import integrationInstances from "integration-instances";
 import type { AccountModel } from "integration/junction-hub-api/schemas/account";

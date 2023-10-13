@@ -9,7 +9,7 @@ import integrationInstances from "integration-instances";
 export async function authHandle({ event, resolve }: Parameters<Handle>[0]): Promise<Response> {
   try {
     event.locals.user = await integrationInstances.ory.getSession(getSession(event));
-  } catch {
+  } catch (err) {
     deleteSession(event);
 
     if (event.url.pathname !== routeConfig.routes.login.root) {

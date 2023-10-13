@@ -1,12 +1,14 @@
+import schemaModel, { type Infer } from "utils/schema-model";
 import { contactDetailsModel, orderModel, type OrderIdentifier, type OrderModel } from "./order";
-import { getSchemaModel, links, relationship, type Infer } from "../../common/schema-model.server";
 import { z } from "zod";
 
 const journeyRelationships: z.ZodType<{
   orders: { data: OrderIdentifier[] };
-}> = relationship({
-  orders: z.array(z.lazy(() => orderModel.identifier)),
-});
+}> = z.lazy(() =>
+  schemaModel.relationships({
+    orders: z.array(orderModel.identifier),
+  }),
+);
 
 const journeyModelBase = z.object({
   id: z.string(),
@@ -15,12 +17,14 @@ const journeyModelBase = z.object({
 });
 
 const journeyModelExt: z.ZodType<z.infer<typeof journeyModelBase> & { orders: OrderModel[] }> =
-  journeyModelBase.extend({
-    orders: z.array(z.lazy(() => orderModel.model)),
-  });
+  z.lazy(() =>
+    journeyModelBase.extend({
+      orders: z.array(orderModel.model),
+    }),
+  );
 
-export const journeyModel = getSchemaModel(
-  z.object({
+export const journeyModel = schemaModel.create({
+  schema: z.object({
     id: z.string(),
     type: z.enum(["journeys"]),
     attributes: z.object({
@@ -28,31 +32,29 @@ export const journeyModel = getSchemaModel(
       contactDetails: z.lazy(() => contactDetailsModel.schema),
     }),
     relationships: journeyRelationships,
-    links: links(["self"]),
+    links: schemaModel.links({ self: true }),
   }),
-  journeyModelExt,
-  {
-    toModel: (data): z.infer<typeof journeyModelExt> => {
-      const contactDetails = data.attributes.contactDetails;
-      const address = contactDetails.address;
+  model: journeyModelExt,
+  toModel: (data): z.infer<typeof journeyModelExt> => {
+    const contactDetails = data.attributes.contactDetails;
+    const address = contactDetails.address;
 
-      return {
-        id: data.id,
-        reference: data.attributes.reference,
-        contact: {
-          address: {
-            addressLines: address.addressLines,
-            city: address.city,
-            countryCode: address.countryCode,
-            postalCode: address.postalCode,
-          },
-          email: contactDetails.email,
-          phone: { countryCode: "", number: contactDetails.phoneNumber },
+    return {
+      id: data.id,
+      reference: data.attributes.reference,
+      contact: {
+        address: {
+          addressLines: address.addressLines,
+          city: address.city,
+          countryCode: address.countryCode,
+          postalCode: address.postalCode,
         },
-        orders: [],
-      };
-    },
+        email: contactDetails.email,
+        phone: { countryCode: "", number: contactDetails.phoneNumber },
+      },
+      orders: [],
+    };
   },
-);
+});
 export type JourneyModel = Infer<typeof journeyModel>;
 export type JourneySchema = Infer<typeof journeyModel, "schema">;

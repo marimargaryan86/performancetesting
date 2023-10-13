@@ -1,15 +1,10 @@
-import {
-  getSchemaModel,
-  relationship,
-  type Infer,
-  links,
-} from "integration/common/schema-model.server";
 import { priceModel } from "integration/junction-mobile-api/schemas/price";
 import { z } from "zod";
 import { orderModel } from "./order";
+import schemaModel, { type Infer } from "utils/schema-model";
 
-export const billModel = getSchemaModel(
-  z.object({
+export const billModel = schemaModel.create({
+  schema: z.object({
     id: z.string().uuid(),
     type: z.enum(["bills"]),
     attributes: z
@@ -19,12 +14,14 @@ export const billModel = getSchemaModel(
         reconciledAmount: priceModel.schema.nullable().optional(),
       })
       .optional(),
-    relationships: relationship({
-      order: orderModel.identifier.optional(),
-    }).optional(),
-    links: links(["self"]),
+    relationships: schemaModel
+      .relationships({
+        order: orderModel.identifier.optional(),
+      })
+      .optional(),
+    links: schemaModel.links({ self: true }),
   }),
-  z.object({
+  model: z.object({
     id: z.string().uuid(),
     orderId: z.string().uuid().optional(),
     isReconciled: z.boolean(),
@@ -33,22 +30,20 @@ export const billModel = getSchemaModel(
       reconciled: priceModel.model.optional(),
     }),
   }),
-  {
-    toModel: (data) => ({
-      id: data.id,
-      orderId: data.relationships?.order?.data.id,
-      isReconciled: Boolean(data.attributes?.isReconciled),
-      amounts: {
-        total: data.attributes?.totalAmount
-          ? priceModel.toModel(data.attributes.totalAmount)
-          : undefined,
-        reconciled: data.attributes?.reconciledAmount
-          ? priceModel.toModel(data.attributes.reconciledAmount)
-          : undefined,
-      },
-    }),
-  },
-);
+  toModel: (data) => ({
+    id: data.id,
+    orderId: data.relationships?.order?.data.id,
+    isReconciled: Boolean(data.attributes?.isReconciled),
+    amounts: {
+      total: data.attributes?.totalAmount
+        ? priceModel.toModel(data.attributes.totalAmount)
+        : undefined,
+      reconciled: data.attributes?.reconciledAmount
+        ? priceModel.toModel(data.attributes.reconciledAmount)
+        : undefined,
+    },
+  }),
+});
 export type BillModel = Infer<typeof billModel>;
 export type BillSchema = Infer<typeof billModel, "schema">;
 export type BillIdentifier = Infer<typeof billModel, "identifier">;

@@ -1,4 +1,4 @@
-import { ActionFailure, fail } from "@sveltejs/kit";
+import { type ActionFailure, fail } from "@sveltejs/kit";
 import integrationInstances from "integration-instances";
 import type { BookingModel } from "integration/junction-hub-api/schemas/booking";
 import type { TransactionModel } from "integration/junction-hub-api/schemas/transaction";
