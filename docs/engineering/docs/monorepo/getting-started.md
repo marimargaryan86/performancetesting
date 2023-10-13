@@ -15,6 +15,9 @@ your `$PATH`:
 - [scie-pants](https://github.com/pantsbuild/scie-pants)
 - [npm](https://www.npmjs.com/) (For HUB)
 - [yarn](https://yarnpkg.com/) (For HUB)
+- [xz](https://tukaani.org/xz/) (required for pants)
+- [bash](https://www.gnu.org/software/bash/) (Bash version should be 4.0+)
+- [docker](https://www.docker.com/)
 
 Below follows instructions on how to install them on macOS.
 
@@ -47,6 +50,9 @@ brew install pantsbuild/tap/pants
 brew install pyenv
 brew install node
 brew install yarn
+brew install xz
+brew install bash
+brew install --cask docker
 ```
 
 After installing `pyenv`, please [follow their instructions](https://github.com/pyenv/pyenv#set-up-your-shell-environment-for-pyenv)
@@ -59,6 +65,17 @@ monorepo currently requires Python 3.11, so let's install that version through
 ```shell
 pyenv install 3.11
 ```
+
+
+:::info
+Make sure you have <b>Docker</b> running in the background
+
+`CMD + SPACE` and type "docker", then press enter to open Docker
+
+or
+
+Go to all applications, find and click on Docker to open it
+:::
 
 ## Clone the repo
 
