@@ -4,7 +4,6 @@
   import Account from "./account.svelte";
   import Menu from "./menu.svelte";
   import HubLogo from "components/icons/hub-logo.svelte";
-  import SettingsIcon from "components/icons/settings-icon.svelte";
   import InformationIcon from "components/icons/information-icon.svelte";
   import { page } from "$app/stores";
   import routeConfig from "routeConfig";
@@ -35,17 +34,6 @@
   <hr />
 
   <ul>
-    <li>
-      <a
-        class="link typography body-medium"
-        title={expanded ? undefined : "Settings"}
-        href={routeConfig.routes.settings.root}
-        class:active={$page.url.pathname === routeConfig.routes.settings.root}
-      >
-        <SettingsIcon color="var(--color-common-light-strong)" variant="cog" />
-        <span>Settings</span>
-      </a>
-    </li>
     <li>
       <a
         class="link typography body-medium"
