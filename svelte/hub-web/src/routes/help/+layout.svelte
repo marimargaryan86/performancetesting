@@ -22,29 +22,19 @@
       exact: true,
     },
   ];
-
-  const routes = Object.values(tabs).map((item) => item.url);
 </script>
 
 <script lang="ts">
   import type { Tab } from "components/ui/tabs.svelte";
-  import Button from "components/ui/button.svelte";
   import routeConfig from "routeConfig";
   import StandardLayout from "components/page/standard-layout.svelte";
   import { page } from "$app/stores";
   import type { ComponentType } from "svelte";
   import HeadphonesIcon from "components/icons/headphones-icon.svelte";
 
-  $: ({ prevHref } = getHrefs($page.url.pathname));
   $: activeTab = tabs.find((item) => {
     return item.exact ? $page.url.pathname === item.url : $page.url.pathname.startsWith(item.url);
   });
-
-  function getHrefs(pathname: string): { prevHref?: string } {
-    return {
-      prevHref: routes[routes.indexOf(pathname) - 1],
-    };
-  }
 </script>
 
 <svelte:head>
@@ -67,17 +57,6 @@
       </div>
     </div>
   {/key}
-
-  <Button
-    href={prevHref}
-    disabled={!prevHref}
-    size="small"
-    variant="text"
-    slot="navigation-left"
-    minWidth="140px"
-  >
-    Go Back
-  </Button>
 </StandardLayout>
 
 <style>
