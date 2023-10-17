@@ -47,9 +47,18 @@
 
       <Ticket identifier={reservationNo} title="Reservation number" />
 
-      <div class="status typography body-small bold">
-        Booking status
-        <StatusBadge value={data.booking.status} />
+      <div class="statuses">
+        <div class="status typography body-small bold">
+          Booking status
+          <StatusBadge value={data.booking.status} />
+        </div>
+
+        {#if data.booking.cancellationStatus}
+          <div class="status typography body-small bold">
+            Cancellation status
+            <StatusBadge value={data.booking.cancellationStatus} />
+          </div>
+        {/if}
       </div>
     </div>
 
@@ -77,9 +86,16 @@
     gap: 24px;
   }
 
+  .statuses {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+  }
+
   .status {
     display: flex;
     flex-flow: column;
+    flex-grow: 1;
     gap: 8px;
     align-items: flex-start;
   }

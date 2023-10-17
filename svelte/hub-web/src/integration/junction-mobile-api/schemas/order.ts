@@ -137,6 +137,7 @@ export const orderModel = schemaModel.create({
     paymentId: z.string(),
     journeyId: z.string(),
     journey: journeyModel.model.optional(),
+    cancellationStatus: z.enum(["unknown", "pending", "completed"]).optional(),
     status: z.enum([
       "unspecified",
       "pending",

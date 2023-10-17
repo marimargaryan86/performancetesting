@@ -105,6 +105,7 @@
       <Header>Departure Date</Header>
       <Header>Passengers</Header>
       <Header>Total Price</Header>
+      <Header>Cancellation Status</Header>
       <Header>Status</Header>
       <Header />
     </THead>
@@ -150,6 +151,11 @@
               {totalPrice.currency}
             </em>
           </TCol>
+          {#if order.cancellationStatus}
+            <TStatusBadgeCol value={order.cancellationStatus} />
+          {:else}
+            <TCol width="0" />
+          {/if}
           <TStatusBadgeCol value={order.status} />
           <TActionsCol>
             <button class="action">

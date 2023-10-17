@@ -9,16 +9,18 @@ export const cancellationRequestModel = schemaModel.create({
     attributes: z.object({
       status: z.enum(["unspecified", "pending", "completed"]),
     }),
-    relationships: schemaModel.relationships({
-      bookings: z.array(bookingModel.identifier),
-    }),
+    relationships: z.lazy(() =>
+      schemaModel.relationships({
+        bookings: z.array(bookingModel.identifier),
+      }),
+    ),
     links: schemaModel.links({ self: true }),
   }),
   model: z.object({
     id: z.string().uuid(),
     status: z.enum(["unspecified", "pending", "completed"]),
     bookingIds: z.array(z.string().uuid()),
-    bookings: z.array(bookingModel.model),
+    bookings: z.array(z.lazy(() => bookingModel.model)),
   }),
   toModel: (data) => ({
     id: data.id,
@@ -41,3 +43,17 @@ export const createCancellationRequestModel = schemaModel.create({
   }),
 });
 export type CreateCancellationRequestModel = Infer<typeof createCancellationRequestModel>;
+
+export const bookingCancellationModel = schemaModel.create({
+  schema: z.object({
+    id: z.string().uuid(),
+    type: z.literal("booking-cancellation"),
+  }),
+  model: z.object({
+    id: z.string(),
+  }),
+  toModel: (data) => ({
+    id: data.id,
+  }),
+});
+export type BookingCancellationIdentifier = Infer<typeof bookingCancellationModel, "identifier">;

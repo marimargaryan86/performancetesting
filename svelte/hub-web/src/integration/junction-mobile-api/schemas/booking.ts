@@ -10,6 +10,10 @@ import {
 import { orderModel, type OrderIdentifier, type OrderModel } from "./order";
 import { priceModel } from "./price";
 import schemaModel, { type Infer } from "utils/schema-model";
+import {
+  bookingCancellationModel,
+  type BookingCancellationIdentifier,
+} from "./cancellation-request";
 
 const bookingDetailsRelationships: z.ZodType<{
   cabinClass: { data: CabinClassIdentifier };
@@ -93,11 +97,13 @@ const bookingRelationships: z.ZodType<{
   status: { data: z.infer<typeof bookingStatusIdentifier> };
   details: { data: BookingDetailsIdentifier[] };
   order: { data: OrderIdentifier };
+  bookingCancellation: { data: BookingCancellationIdentifier | null };
 }> = z.lazy(() =>
   schemaModel.relationships({
     status: bookingStatusIdentifier,
     details: z.array(bookingDetailsModel.identifier),
     order: orderModel.identifier,
+    bookingCancellation: bookingCancellationModel.identifier.nullable(),
   }),
 );
 
@@ -107,6 +113,7 @@ export const bookingModelBase = z.object({
   operatorBookingReferences: z.array(z.string()),
   externalReference: z.string(),
   ticketUrls: z.array(z.string()).optional(),
+  cancellationStatus: z.enum(["pending", "completed"]).optional(),
   status: bookingStatusIdentifier.shape.id,
   details: z.array(bookingDetailsModel.model),
 });
@@ -135,6 +142,9 @@ export const bookingModel = schemaModel.create({
     operatorBookingReferences: data.attributes.operatorBookingReferences,
     ticketUrls: data.attributes.ticketUrls,
     price: priceModel.toModel(data.attributes.totalPrice),
+    cancellationStatus: data.relationships.bookingCancellation.data
+      ? ("pending" as const)
+      : undefined,
     status: data.relationships.status.data.id,
     order: undefined,
   }),

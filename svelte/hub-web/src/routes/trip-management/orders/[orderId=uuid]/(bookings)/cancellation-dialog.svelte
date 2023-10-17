@@ -14,9 +14,12 @@
   import { scale } from "svelte/transition";
   import routeConfig from "routeConfig";
   import type { CancelBookingsActionData } from "./+page.server";
+  import { createEventDispatcher } from "svelte";
 
   export let orderId: string;
   export let passengers: OrderPassengerModel[];
+
+  const dispatch = createEventDispatcher<{ success: void }>();
 
   let backdrop: Backdrop | undefined;
   let booking: BookingModel | undefined = undefined;
@@ -55,7 +58,14 @@
   }
 
   async function confirm(): Promise<void> {
-    state = (await performCancel()) ? "done" : "failed";
+    const result = await performCancel();
+    state = result ? "done" : "failed";
+
+    if (result && booking) {
+      booking.cancellationStatus = "pending";
+
+      dispatch("success");
+    }
   }
 
   export function open(nextBooking: BookingModel): void {

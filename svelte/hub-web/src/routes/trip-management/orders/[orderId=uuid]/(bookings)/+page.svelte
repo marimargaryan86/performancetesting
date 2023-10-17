@@ -22,6 +22,10 @@
     cancellationDialog?.open(booking);
   }
 
+  function updateOrders(): void {
+    data.order = data.order;
+  }
+
   const orderLink = routeConfig.routes.tripManagement.routes.orders.routes.order(data.order.id);
 </script>
 
@@ -35,6 +39,7 @@
   bind:this={cancellationDialog}
   orderId={data.order.id}
   passengers={data.order.passengers}
+  on:success={updateOrders}
 />
 
 <Table class="bookings-table">
@@ -46,6 +51,7 @@
     <Header>Origin</Header>
     <Header>Destination</Header>
     <Header>Total Price</Header>
+    <Header>Cancellation Status</Header>
     <Header>Booking status</Header>
     <Header />
   </THead>
@@ -82,9 +88,14 @@
         <TCol class="typography bold">{origin?.name ?? "Unknown"}</TCol>
         <TCol class="typography bold">{destination?.name ?? "Unknown"}</TCol>
         <TMoneyCol money={booking.price} />
+        {#if booking.cancellationStatus}
+          <TStatusBadgeCol value={booking.cancellationStatus} />
+        {:else}
+          <TCol width="0" />
+        {/if}
         <TStatusBadgeCol value={booking.status} />
         <TActionsCol>
-          {#if booking.status === "confirmed"}
+          {#if booking.status === "confirmed" && !booking.cancellationStatus}
             <Button
               size="xx-small"
               variant="outline"
