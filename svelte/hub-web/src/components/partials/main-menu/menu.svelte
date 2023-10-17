@@ -6,6 +6,7 @@
     url: string;
     label: string;
     icon: ComponentType<SvelteComponent<{ color?: string }>>;
+    exact?: boolean;
   }
 
   interface SubMenu {
@@ -38,6 +39,7 @@
       url: routeConfig.root,
       label: "Dashboard",
       icon: DashboardIcon,
+      exact: true,
     },
     {
       type: "menu-item",
@@ -94,7 +96,9 @@
   {#each menuItems as item}
     <li>
       {#if item.type === "menu-item"}
-        {@const active = $page.url.pathname === item.url}
+        {@const active = item.exact
+          ? $page.url.pathname === item.url
+          : $page.url.pathname.startsWith(item.url)}
         <a
           href={item.url}
           class="typography body-medium"
