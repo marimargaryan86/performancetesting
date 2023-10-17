@@ -42,6 +42,10 @@ variable "bucket" {
   type = string
 }
 
+variable "memory_value" {
+  type = number
+}
+
 job "duffel-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -114,6 +118,11 @@ job "duffel-grpc" {
 
     task "grpc" {
       driver = "docker"
+
+      resources {
+        memory = var.memory_value // Value in MBs
+      }
+
       vault {
         policies = ["duffel-${var.environment}"]
       }
