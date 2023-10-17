@@ -44,8 +44,6 @@ commits:
       - "openapi/junction/plus_poc_api"
       - "protobuf/snowfall/project/junction/plus"
       - "python/snowfall/project/junction/plus"
-    ory:
-      - "ory"
     protobuf/stdlib:
       - "protobuf/snowfall/stdlib"
     python/stdlib:

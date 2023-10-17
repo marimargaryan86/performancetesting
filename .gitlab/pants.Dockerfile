@@ -22,7 +22,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 && curl -fsSL https://sentry.io/get-cli/ | SENTRY_CLI_VERSION=2.21.2 bash \
 && curl -fsSL https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg \
 && curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg \
-&& curl -fsSL https://raw.githubusercontent.com/ory/meta/master/install.sh | bash /dev/stdin -b ./usr/local/bin ory v0.2.2 \
 && curl -fsSL https://github.com/editorconfig-checker/editorconfig-checker/releases/download/2.7.1/ec-linux-amd64.tar.gz | tar xz -C /usr/local bin/ec-linux-amd64 \
 && mv /usr/local/bin/ec-linux-amd64 /usr/local/bin/editorconfig-checker \
 && curl -sfSL https://github.com/orhun/git-cliff/releases/download/v1.3.1/git-cliff-1.3.1-x86_64-unknown-linux-gnu.tar.gz | tar xz -C /usr/local git-cliff-1.3.1/git-cliff \
