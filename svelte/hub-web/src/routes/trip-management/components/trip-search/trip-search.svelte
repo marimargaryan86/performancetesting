@@ -1,20 +1,4 @@
 <script lang="ts" context="module">
-  export const tripSearchData = z.object({
-    passengers: passengerPickerData,
-    originId: z.string({ required_error: "Origin is mandatory" }).uuid(),
-    destinationId: z.string({ required_error: "Destination is mandatory" }).uuid(),
-    outbound: z.date({ coerce: true, required_error: "Departure date is mandatory" }),
-  });
-
-  export type TripSearchData = z.infer<typeof tripSearchData>;
-
-  export type TripSearchDataResolved = Omit<TripSearchData, "originId" | "destinationId"> & {
-    origin: PlaceModel;
-    destination: PlaceModel;
-  };
-
-  export type PartialTripSearchData = PartiallyPartial<TripSearchDataResolved, "passengers">;
-
   export function formatPlace(place?: PlaceModel): string {
     if (!place) {
       return "";
@@ -26,16 +10,21 @@
 
     return place.name;
   }
+
+  function getPrecision(place: PlaceModel): "precise" | undefined {
+    if (place.types.includes("city") || place.types.includes("unspecified")) {
+      return undefined;
+    }
+
+    return "precise";
+  }
 </script>
 
 <script lang="ts">
   import DatePicker from "components/ui/date-picker/date-picker.svelte";
-  import PassengerPicker, { passengerPickerData } from "./passenger-picker/passenger-picker.svelte";
-  import routeConfig from "routeConfig";
+  import PassengerPicker from "./passenger-picker/passenger-picker.svelte";
   import Button from "components/ui/button.svelte";
   import AutocompleteField from "components/ui/autocomplete-field.svelte";
-  import { callAction, type PartiallyPartial } from "utils/common";
-  import { browser } from "$app/environment";
   import { z } from "zod";
   import SearchIcon from "components/icons/search-icon.svelte";
   import type { PlaceModel } from "integration/junction-mobile-api/schemas/place";
@@ -44,65 +33,59 @@
   import { pendableCall } from "utils/pendable-call";
   import type { DateRange } from "models/date-time";
   import { addToDate, getZeroTimeDate } from "utils/date-time";
+  import tripManagement, {
+    type SearchDataModel,
+  } from "../../../integration/trip-management/trip-management";
+  import routeConfig from "routeConfig";
 
-  export let data: PartialTripSearchData = {
+  export let data: Partial<SearchDataModel> = {
     passengers: {
       adults: 1,
       children: 0,
       infants: 0,
     },
   };
+  export let origin: PlaceModel | undefined = undefined;
+  export let destination: PlaceModel | undefined = undefined;
 
-  let errors: z.ZodFormattedError<TripSearchData> | undefined = undefined;
+  $: data = {
+    ...data,
+    origin: origin
+      ? { id: origin.id, ...origin.coordinates, precision: getPrecision(origin) }
+      : undefined,
+    destination: destination
+      ? { id: destination.id, ...destination.coordinates, precision: getPrecision(destination) }
+      : undefined,
+    passengers,
+  };
+
+  let passengers: SearchDataModel["passengers"] = {
+    adults: 1,
+    children: 0,
+    infants: 0,
+  };
+  let errors: z.ZodFormattedError<SearchDataModel> | undefined = undefined;
   let dateSpan: DateRange = {
     from: getZeroTimeDate(new Date()),
     to: getZeroTimeDate(addToDate(new Date(), { years: 1 })),
   };
 
-  async function listPlaces(query: string): Promise<PlaceModel[]> {
-    if (!browser) {
-      return [];
-    }
-
-    const result = await callAction<{ places: PlaceModel[] }>({
-      action: routeConfig.routes.tripManagement.routes.book.actions.listPlaces,
-      data: { query },
-      apply: false,
-    });
-
-    return result.type === "success" ? result.data?.places ?? [] : [];
-  }
-
   const { pending, func: search } = pendableCall(async () => {
-    const parseResult = tripSearchData.safeParse({
-      ...data,
-      originId: data.origin?.id,
-      destinationId: data.destination?.id,
-    });
+    try {
+      await tripManagement.search({
+        ...data,
+        // Prevent time zone difference
+        outbound: data.outbound?.toLocaleDateString("sv-SE") as unknown as Date,
+      });
 
-    if (!parseResult.success) {
-      errors = parseResult.error.format();
-
-      return;
+      await goto(routeConfig.routes.tripManagement.routes.book.routes.select.root, {
+        invalidateAll: true,
+      });
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        errors = err.format();
+      }
     }
-
-    errors = undefined;
-    const parsedData = parseResult.data;
-
-    await callAction({
-      action: routeConfig.routes.tripManagement.routes.book.actions.search,
-      data: {
-        ...parsedData,
-        // Important, otherwise the machine's local timezone might get in the way.
-        outbound: parsedData.outbound.toUTCString(),
-      },
-      dataType: "json",
-      apply: false,
-    });
-
-    await goto(routeConfig.routes.tripManagement.routes.book.routes.select.root, {
-      invalidateAll: true,
-    });
   });
 </script>
 
@@ -111,20 +94,20 @@
     label="From"
     required
     placeholder="City or Station"
-    bind:value={data.origin}
-    autocomplete={listPlaces}
+    bind:value={origin}
+    autocomplete={tripManagement.listPlaces}
     formatter={formatPlace}
-    error={errors?.originId?._errors}
+    error={errors?.origin?._errors}
     clearable
   />
   <AutocompleteField
     label="To"
     required
     placeholder="City or Station"
-    bind:value={data.destination}
-    autocomplete={listPlaces}
+    bind:value={destination}
+    autocomplete={tripManagement.listPlaces}
     formatter={formatPlace}
-    error={errors?.destinationId?._errors}
+    error={errors?.destination?._errors}
     clearable
   />
 
@@ -147,7 +130,7 @@
   </Button>
 
   <PassengerPicker
-    bind:passengers={data.passengers}
+    bind:passengers
     error={errors?.passengers?.adults?._errors ??
       errors?.passengers?.children?._errors ??
       errors?.passengers?.infants?._errors}

@@ -1,68 +1,46 @@
 <script lang="ts" context="module">
-  export const contactInformationData = z.object({
-    phone: z.object({
-      code: z.string({ required_error: "Country code is required" }),
-      number: z
-        .string({ required_error: "Phone number is required" })
-        .trim()
-        .min(1, "Phone number required"),
+  const partialContactDetailsModel = contactDetailsModel.model.deepPartial().extend({
+    phone: contactDetailsModel.model.shape.phone.partial(),
+    address: contactDetailsModel.model.shape.address.partial().extend({
+      street: contactDetailsModel.model.shape.address.shape.street.partial(),
     }),
-    email: z
-      .string({ required_error: "Email address is required" })
-      .email({ message: "Invalid email address" }),
-    address: z.object({
-      line1: z
-        .string({ required_error: "Street address is required" })
-        .trim()
-        .min(1, "Street address is required"),
-      line2: z.string().trim().optional(),
-    }),
-    city: z.string({ required_error: "City is required" }).trim().min(1, "City is required"),
-    countryCode: z
-      .string({ required_error: "Country is required" })
-      .regex(/^[A-z]{2}$/, "Invalid country code"),
-    postcode: z
-      .string({ required_error: "Post code is required" })
-      .trim()
-      .min(1, "Post code is required"),
   });
-
-  const partialContactInformationData = contactInformationData
-    .omit({ phone: true, address: true })
-    .deepPartial()
-    .extend({
-      phone: contactInformationData.shape.phone.partial(),
-      address: contactInformationData.shape.address.partial(),
-    });
-  export type PartialContactInformationData = z.infer<typeof partialContactInformationData>;
-
-  export type ContactInformationData = z.infer<typeof contactInformationData>;
+  export type PartialContactDetailsModel = z.infer<typeof partialContactDetailsModel>;
 </script>
 
 <script lang="ts">
-  import { z } from "zod";
+  import type { z } from "zod";
   import SelectField from "components/ui/select-field.svelte";
   import TextField from "components/ui/text-field.svelte";
   import { formatCountryOption, formatCountryPhoneOption } from "formatting/location";
   import type { CountryModel } from "models/location";
   import Collapsible from "../../components/collapsible.svelte";
+  import {
+    contactDetailsModel,
+    type ContactDetailsModel,
+  } from "integration/junction-mobile-api/schemas/order";
 
   let countryMap: Map<string, CountryModel>;
   export { countryMap as countries };
-  export let contactInformation: PartialContactInformationData;
-  export let errors: z.ZodFormattedError<ContactInformationData> | undefined = undefined;
+  export let contactDetails: PartialContactDetailsModel;
+  export let errors: z.ZodFormattedError<ContactDetailsModel> | undefined = undefined;
 
   let collapsible: Collapsible | undefined;
   let countries = Array.from(countryMap.values());
-  let country: CountryModel | undefined = countryMap.get(contactInformation.countryCode ?? "");
-  let phoneCountry: CountryModel | undefined = countryMap.get(contactInformation.phone.code ?? "");
+  let country: CountryModel | undefined = countryMap.get(contactDetails.address.countryCode ?? "");
+  let phoneCountry: CountryModel | undefined = countryMap.get(
+    contactDetails.phone.countryCode ?? "",
+  );
 
-  $: contactInformation = {
-    ...contactInformation,
-    countryCode: country?.code,
+  $: contactDetails = {
+    ...contactDetails,
+    address: {
+      ...contactDetails.address,
+      countryCode: country?.code,
+    },
     phone: {
-      ...contactInformation.phone,
-      code: phoneCountry?.phoneCode ? `+${phoneCountry.phoneCode}` : undefined,
+      ...contactDetails.phone,
+      countryCode: phoneCountry?.phoneCode ? `+${phoneCountry.phoneCode}` : undefined,
     },
   };
   $: if (errors) {
@@ -80,7 +58,7 @@
         required
         formatter={formatCountryPhoneOption}
         bind:value={phoneCountry}
-        error={errors?.phone?.code?._errors}
+        error={errors?.phone?.countryCode?._errors}
         dialogMinWidth="240px"
       />
       <TextField
@@ -88,7 +66,7 @@
         type="tel"
         placeholder="Enter phone number"
         required
-        bind:value={contactInformation.phone.number}
+        bind:value={contactDetails.phone.number}
         error={errors?.phone?.number?._errors}
       />
     </div>
@@ -98,20 +76,21 @@
       type="email"
       placeholder="Enter email"
       required
-      bind:value={contactInformation.email}
+      bind:value={contactDetails.email}
       error={errors?.email?._errors}
     />
     <TextField
       label="Address line 1"
       placeholder="Enter address line 1"
       required
-      bind:value={contactInformation.address.line1}
-      error={errors?.address?.line1?._errors}
+      bind:value={contactDetails.address.street.line1}
+      error={errors?.address?.street?.line1?._errors}
     />
     <TextField
       label="Address line 2"
       placeholder="Enter address line 2"
-      bind:value={contactInformation.address.line2}
+      bind:value={contactDetails.address.street.line2}
+      error={errors?.address?.street?.line2?._errors}
     />
 
     <div class="location">
@@ -119,8 +98,8 @@
         label="City"
         placeholder="Enter city"
         required
-        bind:value={contactInformation.city}
-        error={errors?.city?._errors}
+        bind:value={contactDetails.address.city}
+        error={errors?.address?.city?._errors}
       />
       <SelectField
         direction="up"
@@ -130,15 +109,15 @@
         formatter={formatCountryOption}
         required
         bind:value={country}
-        error={errors?.countryCode?._errors}
+        error={errors?.address?.countryCode?._errors}
         dialogMinWidth="240px"
       />
       <TextField
         label="Postcode"
         placeholder="Postcode"
         required
-        bind:value={contactInformation.postcode}
-        error={errors?.postcode?._errors}
+        bind:value={contactDetails.address.postalCode}
+        error={errors?.address?.postalCode?._errors}
       />
     </div>
   </div>

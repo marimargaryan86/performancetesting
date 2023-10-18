@@ -1,19 +1,25 @@
 import integrationInstances from "integration-instances";
 import type { OrderModel } from "integration/junction-mobile-api/schemas/order";
-import bookingManager from "../booking-manager.server";
 import { getSession } from "utils/auth";
+import utils from "../../../integration/trip-management/utils.server";
+import { redirect } from "@sveltejs/kit";
+import routeConfig from "routeConfig";
 
 export function load(event): { order: Promise<OrderModel> } {
-  const searchData = bookingManager.getSearchData(event);
+  try {
+    const bookingSession = utils.getBookingSession(event);
 
-  if (!searchData.orderId) {
-    throw bookingManager.rootRedirect(event);
+    if (!bookingSession.order) {
+      throw new Error();
+    }
+
+    return {
+      order: integrationInstances.junctionMobileApi.orders.getOrder({
+        session: getSession(event),
+        id: bookingSession.order.id,
+      }),
+    };
+  } catch {
+    throw redirect(303, routeConfig.routes.tripManagement.routes.book.root);
   }
-
-  return {
-    order: integrationInstances.junctionMobileApi.orders.getOrder({
-      session: getSession(event),
-      id: searchData.orderId,
-    }),
-  };
 }

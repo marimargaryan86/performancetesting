@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-  function getPassengersPresentation(passengers: PassengerCountData): string {
+  function getPassengersPresentation(passengers: PassengerPickerData): string {
     const { adults, children, infants } = passengers;
 
     return [
@@ -14,7 +14,6 @@
 
 <script lang="ts">
   import type { TripOfferPriceQuoteModel } from "integration/junction-mobile-api/schemas/offer";
-  import type { PassengerCountData } from "../../book/booking-manager.server";
   import { ensureDefined } from "utils/array";
   import { formatAmount, formatPriceBreakdownType } from "formatting/currency";
   import { slideFade } from "transitions/slide-fade";
@@ -22,9 +21,10 @@
   import Collapsible from "../collapsible.svelte";
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import Itinerary from "./itinerary.svelte";
+  import type { PassengerPickerData } from "../trip-search/passenger-picker/passenger-picker.svelte";
 
   export let priceQuote: TripOfferPriceQuoteModel | undefined = undefined;
-  export let passengers: PassengerCountData;
+  export let passengers: PassengerPickerData;
 
   let collapsible: Collapsible | undefined;
 

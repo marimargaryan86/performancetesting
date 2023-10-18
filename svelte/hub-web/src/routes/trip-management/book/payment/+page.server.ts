@@ -1,163 +1,41 @@
-import { fail, type ActionFailure } from "@sveltejs/kit";
+import { redirect } from "@sveltejs/kit";
 import integrationInstances from "integration-instances";
 import type { TripOfferPriceQuoteModel } from "integration/junction-mobile-api/schemas/offer";
-import { getPassengerValidator } from "./passenger-entry.svelte";
-import { contactInformationData } from "./contact-information.svelte";
-import { priceModel } from "integration/junction-mobile-api/schemas/price";
-import { ensureDefined } from "utils/array";
-import type {
-  CreateOrderModel,
-  CreateOrderMarkupsModel,
-  OrderModel,
-} from "integration/junction-mobile-api/schemas/order";
-import bookingManager, { type SearchDataModel } from "../booking-manager.server";
-import { z } from "zod";
-import { getActionRequestJsonData } from "utils/common";
-import type { SessionModel } from "models/user";
 import { getSession } from "utils/auth";
-
-export type ActionPollReturnType = {
-  priceQuote: TripOfferPriceQuoteModel;
-  paymentIntent: SearchDataModel["paymentIntent"];
-};
-
-function getBookingDataModel(required: TripOfferPriceQuoteModel["required"]): z.ZodObject<{
-  priceQuoteId: z.ZodString;
-  contact: typeof contactInformationData;
-  passengers: z.ZodArray<ReturnType<typeof getPassengerValidator>>;
-  price: typeof priceModel.model;
-}> {
-  return z.object({
-    priceQuoteId: z.string().uuid(),
-    contact: contactInformationData,
-    passengers: z.array(getPassengerValidator(required)),
-    price: priceModel.model,
-  });
-}
-
-type BookingData = z.infer<ReturnType<typeof getBookingDataModel>>;
-
-function createOrder(
-  session: SessionModel,
-  data: BookingData,
-  paymentId: string,
-): Promise<OrderModel> {
-  return integrationInstances.junctionMobileApi.orders.createOrder({
-    session,
-    data: {
-      contactDetails: {
-        address: {
-          addressLines: [data.contact.address.line1, data.contact.address.line2].filter(
-            ensureDefined,
-          ),
-          city: data.contact.city,
-          countryCode: data.contact.countryCode,
-          postalCode: data.contact.postcode,
-        },
-        email: data.contact.email,
-        phone: {
-          countryCode: data.contact.phone.code,
-          number: data.contact.phone.number,
-        },
-      },
-      passengers: data.passengers,
-      paymentId,
-      priceQuoteId: data.priceQuoteId,
-    },
-  });
-}
+import utils from "../../../integration/trip-management/utils.server";
+import routeConfig from "routeConfig";
+import type {
+  BookingSessionModel,
+  SearchDataModel,
+} from "../../../integration/trip-management/trip-management";
 
 export async function load(event): Promise<{
-  searchData: Pick<SearchDataModel, "passengers" | "originalPrice">;
+  searchData: SearchDataModel;
   priceQuote: TripOfferPriceQuoteModel;
-  paymentIntent?: SearchDataModel["paymentIntent"];
+  selected: NonNullable<BookingSessionModel["selected"]>;
+  paymentIntent: BookingSessionModel["paymentIntent"];
 }> {
-  const searchData = bookingManager.getSearchData(event);
-  const result = await actions.poll(event);
+  const session = getSession(event);
 
-  if ("priceQuote" in result) {
+  try {
+    const bookingSession = utils.getBookingSession(event);
+
+    if (!(bookingSession.searchData && bookingSession.priceQuote && bookingSession.selected)) {
+      throw redirect(303, routeConfig.routes.tripManagement.routes.book.root);
+    }
+
+    const priceQuote = await integrationInstances.junctionMobileApi.offers.getPriceQuote({
+      session,
+      id: bookingSession.priceQuote.id,
+    });
+
     return {
-      searchData: {
-        passengers: searchData.passengers,
-        originalPrice: searchData.originalPrice,
-      },
-      ...result,
+      searchData: bookingSession.searchData,
+      priceQuote,
+      selected: bookingSession.selected,
+      paymentIntent: bookingSession.paymentIntent,
     };
+  } catch {
+    throw redirect(303, routeConfig.routes.tripManagement.routes.book.root);
   }
-
-  throw bookingManager.rootRedirect(event);
 }
-
-export const actions = {
-  async poll(event): Promise<ActionPollReturnType | ActionFailure> {
-    try {
-      const searchData = bookingManager.getSearchData(event);
-      const { priceQuote, paymentIntent } = await bookingManager.getPaymentIntent(
-        searchData,
-        event,
-      );
-
-      bookingManager.setSearchData(
-        {
-          ...searchData,
-          expiresAt: priceQuote.expiresAt,
-          priceQuoteId: priceQuote.id,
-          paymentIntent,
-        },
-        event,
-      );
-
-      return { priceQuote, paymentIntent };
-    } catch {
-      return fail(400);
-    }
-  },
-  async createOrder(
-    event,
-  ): Promise<ActionFailure<{ error: z.ZodFormattedError<CreateOrderModel> }> | void> {
-    const searchData = bookingManager.getSearchData(event);
-    const { priceQuote, paymentIntent } = await bookingManager.getPaymentIntent(searchData, event);
-
-    try {
-      if (!paymentIntent) {
-        throw new Error("Payment intent missing");
-      }
-
-      const bookingData = await getActionRequestJsonData(
-        event,
-        getBookingDataModel(priceQuote.required),
-      );
-
-      try {
-        const order = await createOrder(getSession(event), bookingData, paymentIntent.id);
-
-        bookingManager.setSearchData({ ...searchData, orderId: order.id }, event);
-      } catch (err) {
-        if (err instanceof z.ZodError) {
-          return fail(400, { error: err.format() });
-        }
-
-        throw err;
-      }
-    } catch {
-      return fail(400);
-    }
-  },
-  async createOrderMarkups(): Promise<ActionFailure<{
-    error: z.ZodFormattedError<CreateOrderMarkupsModel>;
-  }> | void> {
-    // TODO: implement
-  },
-  confirmPayment(event): void {
-    const searchData = bookingManager.getSearchData(event);
-
-    if (!searchData?.paymentIntent) {
-      return;
-    }
-
-    bookingManager.setSearchData(
-      { ...searchData, paymentIntent: { ...searchData.paymentIntent, confirmed: true } },
-      event,
-    );
-  },
-};

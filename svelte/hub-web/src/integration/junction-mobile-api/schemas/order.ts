@@ -5,34 +5,70 @@ import { journeyModel, type JourneySchema } from "./journey";
 import { bookingModel, type BookingDetailsSchema, type BookingSchema } from "./booking";
 import { priceModel } from "./price";
 import schemaModel, { type Infer } from "utils/schema-model";
+import { ensureDefined } from "utils/array";
 
 export const passengerTitle = z.enum(["unspecified", "mr", "mrs", "ms", "miss"]);
 export const passengerGender = z.enum(["unspecified", "male", "female"]);
 
-export const addressModel = z.object({
-  addressLines: z.array(z.string()),
-  countryCode: z.string(),
-  postalCode: z.string(),
-  city: z.string(),
+export const addressModel = schemaModel.create({
+  schema: z.object({
+    addressLines: z.array(z.string()),
+    countryCode: z.string(),
+    postalCode: z.string(),
+    city: z.string(),
+  }),
+  model: z.object({
+    street: z.object({
+      line1: z.string(),
+      line2: z.string().optional(),
+    }),
+    countryCode: z.string(),
+    postalCode: z.string(),
+    city: z.string(),
+  }),
+  toModel: (data) => ({
+    street: {
+      line1: data.addressLines[0] as string,
+      line2: data.addressLines[1],
+    },
+    city: data.city,
+    countryCode: data.countryCode,
+    postalCode: data.postalCode,
+  }),
+  toSchema: (data) => ({
+    addressLines: [data.street.line1, data.street.line2].filter(ensureDefined),
+    city: data.city,
+    countryCode: data.countryCode,
+    postalCode: data.postalCode,
+  }),
 });
 
 export const contactDetailsModel = schemaModel.create({
   schema: z.object({
     email: z.string().email(),
-    address: addressModel,
+    address: addressModel.schema,
     phoneNumber: z.string(),
   }),
   model: z.object({
-    address: addressModel,
+    address: addressModel.model,
     email: z.string().email(),
     phone: z.object({
       countryCode: z.string(),
       number: z.string(),
     }),
   }),
-  toModel: (data) => ({ ...data, phone: { countryCode: "", number: data.phoneNumber } }),
-  toSchema: (data) => ({ ...data, phoneNumber: `${data.phone.countryCode}${data.phone.number}` }),
+  toModel: (data) => ({
+    ...data,
+    phone: { countryCode: "", number: data.phoneNumber },
+    address: addressModel.toModel(data.address),
+  }),
+  toSchema: (data) => ({
+    ...data,
+    phoneNumber: `${data.phone.countryCode}${data.phone.number}`,
+    address: addressModel.toSchema(data.address),
+  }),
 });
+export type ContactDetailsModel = Infer<typeof contactDetailsModel>;
 
 export const passportDocumentModel = schemaModel.create({
   schema: z.object({
@@ -121,7 +157,7 @@ export const orderModel = schemaModel.create({
     type: z.enum(["orders"]),
     attributes: z.object({
       passengers: z.array(orderPassengerModel.schema),
-      residenceAddress: addressModel.optional(),
+      residenceAddress: addressModel.schema.optional(),
     }),
     relationships: schemaModel.relationships({
       payment: paymentIntentModel.identifier,

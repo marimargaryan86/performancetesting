@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-  function getDefaultPassengers(passengers: PassengerCountData): PartialPassengerData[] {
+  function getDefaultPassengers(passengers: PassengerPickerData): PartialPassengerData[] {
     return [
       ...Array(passengers.adults)
         .fill(undefined)
@@ -26,44 +26,57 @@
     type PartialPassengerData,
   } from "./passenger-entry.svelte";
   import ContactInformation, {
-    contactInformationData,
-    type PartialContactInformationData,
+    type PartialContactDetailsModel,
   } from "./contact-information.svelte";
   import Countdown from "../countdown.svelte";
   import { z } from "zod";
-  import type { PassengerCountData } from "../booking-manager.server";
   import { pendableCall } from "utils/pendable-call";
-  import { callAction } from "utils/common";
+  import { sleep } from "utils/common";
   import { goto } from "$app/navigation";
   import { browser } from "$app/environment";
-  import { pollableCall } from "utils/pollable-call";
-  import type { ActionPollReturnType } from "./+page.server";
-  import { onDestroy } from "svelte";
-  import type { CreateOrderModel } from "integration/junction-mobile-api/schemas/order";
+  import { contactDetailsModel } from "integration/junction-mobile-api/schemas/order";
   import PriceDialog from "components/ui/dialogues/price-dialog.svelte";
   import Summary from "../../components/summary/summary.svelte";
+  import tripManagement from "../../../integration/trip-management/trip-management";
+  import type { PassengerPickerData } from "../../components/trip-search/passenger-picker/passenger-picker.svelte";
+  import { onDestroy } from "svelte";
 
   export let data;
 
   let payment: Payment | undefined;
   let bookingData: {
     passengers: PartialPassengerData[];
-    contactInformation: PartialContactInformationData;
+    contactDetails: PartialContactDetailsModel;
   } = {
     passengers: getDefaultPassengers(data.searchData.passengers),
-    contactInformation: { phone: {}, address: {} },
+    contactDetails: { phone: {}, address: { street: {} } },
   };
   let errors: z.ZodFormattedError<z.infer<typeof bookingDetailsValidator>> | undefined = undefined;
   let { priceQuote, paymentIntent } = data;
   // TODO: type this
   let orderMarkup: object;
+  let pollSignal = { cancelled: false };
 
   $: bookingDetailsValidator = z.object({
     passengers: z.array(getPassengerValidator(priceQuote.required)),
-    contactInformation: contactInformationData,
+    contactDetails: contactDetailsModel.model,
   });
   $: if (browser && !paymentIntent) {
-    pollPayment(priceQuote.id);
+    updatePaymentIntentAndPriceQuote();
+  }
+
+  async function updatePaymentIntentAndPriceQuote(): Promise<void> {
+    const nextPriceQuote = await tripManagement.getPriceQuote();
+
+    if (!nextPriceQuote.price && !pollSignal.cancelled) {
+      await sleep(2000);
+
+      return updatePaymentIntentAndPriceQuote();
+    }
+
+    const nextPaymentIntent = await tripManagement.getPaymentIntent();
+
+    [priceQuote, paymentIntent] = [nextPriceQuote, nextPaymentIntent];
   }
 
   function cancel(): void {
@@ -71,6 +84,10 @@
   }
 
   async function createOrder(): Promise<boolean> {
+    if (!paymentIntent) {
+      return false;
+    }
+
     errors = undefined;
     const validationResult = bookingDetailsValidator.safeParse(bookingData);
 
@@ -80,66 +97,35 @@
       return false;
     }
 
-    const result = await callAction<
-      Record<string, unknown>,
-      { error: z.ZodFormattedError<CreateOrderModel> }
-    >({
-      action: routeConfig.routes.tripManagement.routes.book.routes.payment.actions.createOrder,
-      data: {
+    try {
+      const result = await tripManagement.createOrder({
         priceQuoteId: priceQuote.id,
         passengers: validationResult.data.passengers,
-        contact: validationResult.data.contactInformation,
-        price: priceQuote.price,
-      },
-      dataType: "json",
-      apply: false,
-    });
+        contactDetails: validationResult.data.contactDetails,
+        paymentId: paymentIntent.id,
+      });
 
-    if (result.type === "failure" && result.data?.error) {
-      errors = {
-        _errors: [],
-        contactInformation: {
-          _errors: [],
-          phone: {
-            _errors: [],
-            number: result.data.error.contactDetails?.phone?.number,
-          },
-        },
-      };
+      if (result.success) {
+        return true;
+      }
+
+      errors = result.errors;
+
+      return false;
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        errors = err.format();
+      }
 
       return false;
     }
+  }
 
-    if (result.type !== "success") {
-      return false;
-    }
+  async function createOrderMarkups(): Promise<boolean> {
+    await tripManagement.createOrderMarkups();
 
     return true;
   }
-
-  const { cancel: cancelPolling, poll: pollPayment } = pollableCall({
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    func(_: string) {
-      return callAction<ActionPollReturnType>({
-        action: routeConfig.routes.tripManagement.routes.book.routes.payment.actions.poll,
-        apply: false,
-      });
-    },
-    check(result) {
-      if (result.type !== "success") {
-        return { status: "done" };
-      }
-
-      if (result.data?.priceQuote.price && result.data.paymentIntent) {
-        ({ priceQuote, paymentIntent } = result.data);
-
-        return { status: "done" };
-      }
-
-      return { status: "pending" };
-    },
-    sleepMs: 2000,
-  });
 
   const { pending, func: pay } = pendableCall(async () => {
     if (!payment) {
@@ -150,27 +136,27 @@
       return;
     }
 
-    if (paymentIntent) {
-      paymentIntent.confirmed = true;
+    if (!(await createOrder())) {
+      return;
     }
 
-    if (!(await createOrder())) {
+    if (!(await createOrderMarkups())) {
       return;
     }
 
     await goto(routeConfig.routes.tripManagement.routes.book.routes.confirmation.root);
   });
 
-  onDestroy(cancelPolling);
+  onDestroy(() => (pollSignal.cancelled = true));
 </script>
 
 <svelte:head>
   <title>Payment · Book · Trip Management · Junction Hub</title>
 </svelte:head>
 
-{#if data.searchData.originalPrice && priceQuote.price}
+{#if data.selected.originalPrice && priceQuote.price}
   <PriceDialog
-    originalPrice={data.searchData.originalPrice}
+    originalPrice={data.selected.originalPrice}
     newPrice={priceQuote.price}
     on:cancel={cancel}
   />
@@ -194,11 +180,11 @@
     <div class="column payment">
       <Summary {priceQuote} passengers={data.searchData.passengers} />
       <Fees {priceQuote} bind:orderMarkup />
-      <Payment bind:this={payment} {paymentIntent} />
+      <Payment bind:this={payment} bind:paymentIntent />
       <ContactInformation
         countries={data.countries}
-        bind:contactInformation={bookingData.contactInformation}
-        errors={errors?.contactInformation}
+        bind:contactDetails={bookingData.contactDetails}
+        errors={errors?.contactDetails}
       />
     </div>
   </div>

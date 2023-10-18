@@ -15,7 +15,10 @@
     const vendors = Array.from(new Set(offers.flatMap((item) => getVendors(item))));
 
     return {
-      durationSpanM: { start: Math.min(...durations), end: Math.max(...durations) },
+      durationSpanM: {
+        start: durations.length ? Math.min(...durations) : 0,
+        end: durations.length ? Math.max(...durations) : 0,
+      },
       vendors,
     };
   }
@@ -52,34 +55,31 @@
     type SearchOptionsSettings,
   } from "./search-options.svelte";
   import Offer from "./offer/offer.svelte";
-  import { callAction } from "utils/common";
   import routeConfig from "routeConfig";
   import { goto } from "$app/navigation";
   import Button from "components/ui/button.svelte";
   import { fade } from "svelte/transition";
   import { browser } from "$app/environment";
-  import { onDestroy } from "svelte";
   import Countdown from "../countdown.svelte";
   import LoadingSkelton from "./loading-skelton.svelte";
-  import type { ResourceStatus } from "integration/junction-mobile-api/schemas/common";
   import type { OfferModel, OfferOptionModel } from "integration/junction-mobile-api/schemas/offer";
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import { pendableCall } from "utils/pendable-call";
-  import { pollableCall } from "utils/pollable-call";
   import Alert from "components/ui/alert.svelte";
   import { getSortOffersFunc } from "sorting/offer";
   import { getFilterOffersFunc } from "filters/offer";
   import { getOfferDurationM, getVendors } from "utils/offer";
   import type { PriceModel } from "integration/junction-mobile-api/schemas/price";
-  import type { SelectActionData } from "./+page.server";
+  import tripManagement from "../../../integration/trip-management/trip-management";
+  import { onDestroy } from "svelte";
 
   export let data;
 
   let selected = {
-    offerId: data.searchData.offerId,
-    optionIds: data.searchData.optionIds,
+    offerId: data.selectedOffer?.offerId,
+    optionIds: data.selectedOffer?.optionIds,
   };
-  let offers = data.tripCandidates.offers;
+  let offers: OfferModel[] = data.offers.data;
   let searchOptionsSettings = getSearchOptionSettings(offers);
   let searchOptions: SearchOptionsData = {
     sortBy: "price",
@@ -89,57 +89,26 @@
     durationM: searchOptionsSettings.durationSpanM.start,
     vendors: [],
   };
+  let pollSignal = { cancelled: false };
 
-  $: if (browser && data.tripCandidates.status !== "completed") {
-    pollOffers(data.tripCandidates.id);
+  $: if (browser && data.tripCandidates && data.offers.status !== "completed") {
+    getOffers();
   }
   $: sortAndFilter = getSortAndFilteringFunc(searchOptions);
 
-  const { poll: pollOffersAux, cancel: cancelPolling } = pollableCall({
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    func(_: string) {
-      return callAction<{
-        status: ResourceStatus;
-        offers: OfferModel[];
-      }>({
-        action: routeConfig.routes.tripManagement.routes.book.routes.select.actions.poll,
-        apply: false,
-      });
-    },
-    check(result) {
-      if (
-        result.type !== "success" ||
-        result.data?.status === "unspecified" ||
-        result.data?.status === "failed"
-      ) {
-        return { status: "done" };
-      }
+  const { pending: offersPending, func: getOffers } = pendableCall(async () => {
+    offers = [];
 
-      if (result.data) {
-        offers = result.data.offers;
-      }
+    for await (const offer of tripManagement.yieldOffers(pollSignal)) {
+      offers = [...offers, offer];
+    }
 
-      if (offers.length) {
-        searchOptionsSettings = getSearchOptionSettings(offers);
-        searchOptions = {
-          ...searchOptions,
-          durationM: searchOptionsSettings.durationSpanM.start,
-          vendors: [],
-        };
-      }
-
-      // Sometimes the result comes back as completed with an empty set, retry if so.
-      if (result.data?.status === "completed") {
-        return { status: offers.length ? "done" : "retry" };
-      }
-
-      return { status: "pending" };
-    },
-    sleepMs: 2000,
-    retries: 3,
+    searchOptionsSettings = getSearchOptionSettings(offers);
+    searchOptions = {
+      ...searchOptions,
+      durationM: searchOptionsSettings.durationSpanM.start,
+    };
   });
-
-  const { pending: offersPending, func: pollOffers } = pendableCall(pollOffersAux);
 
   function select(event: CustomEvent<{ offerId: string; optionIds: string[] }>): void {
     selected = event.detail;
@@ -151,22 +120,17 @@
     }
 
     const originalPrice = getTotalPrice(getOptions(offers, selected.offerId, selected.optionIds));
-    const actionData: SelectActionData = {
+
+    await tripManagement.selectOffer({
       offerId: selected.offerId,
       optionIds: selected.optionIds,
       originalPrice,
-    };
-
-    await callAction({
-      action: routeConfig.routes.tripManagement.routes.book.routes.select.actions.select,
-      data: actionData,
-      dataType: "json",
     });
 
     await goto(routeConfig.routes.tripManagement.routes.book.routes.payment.root);
   });
 
-  onDestroy(cancelPolling);
+  onDestroy(() => (pollSignal.cancelled = true));
 </script>
 
 <svelte:head>
@@ -174,11 +138,13 @@
 </svelte:head>
 
 <div class="search-wrapper">
-  <TripSearch data={data.searchData} />
+  <TripSearch data={data.searchData} origin={data.origin} destination={data.destination} />
 </div>
 
 <div class="content">
-  <Countdown expiresAt={data.tripCandidates.expiresAt} show={Boolean(offers.length)} />
+  {#if offers[0]?.expiresAt}
+    <Countdown expiresAt={offers[0]?.expiresAt} show />
+  {/if}
 
   <div class="scroll">
     <SearchOptions bind:data={searchOptions} settings={searchOptionsSettings} />

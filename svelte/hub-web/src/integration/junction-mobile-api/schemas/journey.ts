@@ -35,26 +35,12 @@ export const journeyModel = schemaModel.create({
     links: schemaModel.links({ self: true }),
   }),
   model: journeyModelExt,
-  toModel: (data): z.infer<typeof journeyModelExt> => {
-    const contactDetails = data.attributes.contactDetails;
-    const address = contactDetails.address;
-
-    return {
-      id: data.id,
-      reference: data.attributes.reference,
-      contact: {
-        address: {
-          addressLines: address.addressLines,
-          city: address.city,
-          countryCode: address.countryCode,
-          postalCode: address.postalCode,
-        },
-        email: contactDetails.email,
-        phone: { countryCode: "", number: contactDetails.phoneNumber },
-      },
-      orders: [],
-    };
-  },
+  toModel: (data): z.infer<typeof journeyModelExt> => ({
+    id: data.id,
+    reference: data.attributes.reference,
+    contact: contactDetailsModel.toModel(data.attributes.contactDetails),
+    orders: [],
+  }),
 });
 export type JourneyModel = Infer<typeof journeyModel>;
 export type JourneySchema = Infer<typeof journeyModel, "schema">;

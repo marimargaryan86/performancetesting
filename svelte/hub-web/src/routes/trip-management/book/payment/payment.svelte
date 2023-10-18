@@ -38,7 +38,6 @@
 <script lang="ts">
   import routeConfig from "routeConfig";
   import { browser } from "$app/environment";
-  import { callAction } from "utils/common";
   import {
     loadStripe,
     type Stripe,
@@ -48,11 +47,13 @@
   } from "@stripe/stripe-js";
   import { env } from "$env/dynamic/public";
   import LoadingIcon from "components/icons/loading-icon.svelte";
-  import type { SearchDataModel } from "../booking-manager.server";
   import Dialog from "components/ui/dialogues/dialog.svelte";
   import Button from "components/ui/button.svelte";
+  import tripManagement, {
+    type BookingSessionModel,
+  } from "../../../integration/trip-management/trip-management";
 
-  export let paymentIntent: SearchDataModel["paymentIntent"];
+  export let paymentIntent: BookingSessionModel["paymentIntent"];
 
   let dialog: Dialog | undefined = undefined;
   let stripe: Stripe | undefined = undefined;
@@ -108,9 +109,11 @@
       return false;
     }
 
-    await callAction({
-      action: routeConfig.routes.tripManagement.routes.book.routes.payment.actions.confirmPayment,
-    });
+    if (paymentIntent) {
+      paymentIntent.confirmed = true;
+    }
+
+    await tripManagement.confirmPayment();
 
     return true;
   }
