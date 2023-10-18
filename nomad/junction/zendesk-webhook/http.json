@@ -1,0 +1,15 @@
+{
+  "development": {
+    "variables": {
+      "count": 1,
+      "traefik_entrypoints": "websecure",
+      "traefik_host_URL": "webhook-zendesk.junction.dev"
+    }
+  },
+  "production": {
+    "deploy": false
+  },
+  "sandbox": {
+    "deploy": false
+  }
+}
