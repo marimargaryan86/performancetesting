@@ -93,7 +93,7 @@
     },
     {
       "name": "places",
-      "description": "Places are usualy stops that you can travel between.",
+      "description": "A place is a point in space that can serve as an origin or destination.\n\nEach place is identified by a unique placeId.\n\nEach place contains a set of descriptive attributes such as: name, latitude, longitude, country and time zone.\n\n Each place includes a place-type to describe if it is a city, railway station, airport, bus station or ferry port.",
       "x-displayName": "Places"
     },
     {
@@ -155,7 +155,7 @@
           }
         },
         "operationId": "get-places",
-        "description": "The List places endpoint is used to find the origin and destination locations for the Trip Search endpoint.\n\nA place is an indexed reference to a location that Junction might have related content for. It is specified in a trip search to state where a passenger wishes to travel from/to. Each place is allocated a unique identifier.\nA place can be a Rail station or an Airport.\n\nThe List places endpoint purposefully doesn't support filtering and sorting. The API client should fetch the places once, and store them on their side, so that multiple calls to this endpoint are avoided.",
+        "description": "Returns a collection of possible origin and destinations.",
         "parameters": [
           {
             "$ref": "#/components/parameters/placeSort"
@@ -209,7 +209,7 @@
           }
         },
         "operationId": "get-places-id",
-        "description": "Used to lookup information about a place using its Place Identifier."
+        "description": "Returns all information associated to a single placeId. The response includes an attributes object and a place-type object."
       }
     },
     "/places/types": {
@@ -327,7 +327,7 @@
           }
         },
         "operationId": "get-places-types",
-        "description": "Used to retrieve available Place Types.",
+        "description": "Returns a list of all available Place Types (e.g. airport, railway station and city)",
         "parameters": [
           {
             "$ref": "#/components/parameters/placeTypeSort"
@@ -395,7 +395,7 @@
           }
         },
         "operationId": "get-places-types-id",
-        "description": "Used to lookup data for a Place Type Identifier."
+        "description": "Returns all information associated to a single place-type."
       }
     },
     "/passengers/genders": {
@@ -4608,7 +4608,10 @@
             "properties": {
               "precision": {
                 "type": "string",
-                "enum": ["precise", "area"],
+                "enum": [
+                  "precise",
+                  "area"
+                ],
                 "example": "precise",
                 "default": "area"
               }
@@ -4779,16 +4782,16 @@
                   }
                 }
               },
-            "meta": {
-                    "type": "object",
-                    "properties": {
-                        "providerId": {
-                          "type": "string",
-                          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
-                          "readOnly": true
-                        }
-                    }
+              "meta": {
+                "type": "object",
+                "properties": {
+                  "providerId": {
+                    "type": "string",
+                    "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                    "readOnly": true
+                  }
                 }
+              }
             },
             "required": [
               "id",
