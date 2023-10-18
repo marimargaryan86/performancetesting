@@ -16,6 +16,7 @@ from snowfall.project.junction.plus.service.notifications.v1alpha import (
     models_pb2 as notifications_pb2,
 )
 from snowfall.project.junction.plus.service.plus_webhooks import chatbot_handlers
+from snowfall.stdlib.v1.phone_number_pb2 import PhoneNumber
 
 message_maximum_length = 1600
 message_split_point = 1300
@@ -45,8 +46,12 @@ class IncomingMessages(endpoints.HTTPEndpoint):
             )
         except errors.NotFoundError:
             whatsapp_channel.send_message(
-                receiver=message_from,
-                sender_number=cv.mobile_phone.e164_number,
+                receiver=notifications_pb2.Subscriber(
+                    phone_number=PhoneNumber(
+                        e164_number=message_from,
+                    ),
+                ),
+                sender_configuration=cv,
                 body=_(
                     "We couldn't find a subscriber. Please book your flights here: ",
                 )
@@ -59,8 +64,8 @@ class IncomingMessages(endpoints.HTTPEndpoint):
             and str(msg["Body"]).lower() != "subscribe"
         ):
             whatsapp_channel.send_message(
-                receiver=subscriber.phone_number.e164_number,
-                sender_number=cv.mobile_phone.e164_number,
+                receiver=subscriber,
+                sender_configuration=cv,
                 body=_(
                     "You are currently unsubscribed from WhatsApp."
                     " If you wish to receive notifications regarding travel information"
@@ -83,14 +88,14 @@ class IncomingMessages(endpoints.HTTPEndpoint):
                         message_split_point:
                     ].index("\n\n")
                     whatsapp_channel.send_message(
-                        receiver=subscriber.phone_number.e164_number,
-                        sender_number=cv.mobile_phone.e164_number,
+                        receiver=subscriber,
+                        sender_configuration=cv,
                         body=response_message[:split_point],
                     )
                     response_message = response_message[split_point + 1 :]
                 message_id = whatsapp_channel.send_message(
-                    receiver=subscriber.phone_number.e164_number,
-                    sender_number=cv.mobile_phone.e164_number,
+                    receiver=subscriber,
+                    sender_configuration=cv,
                     body=response_message,
                 )
                 reply_cache = reply.get("cache")

@@ -46,11 +46,12 @@ class Channel(AbstractChannel):
     ) -> Sequence[str]:
         raise NotImplementedError()
 
-    def send_message(
+    def send_message(  # noqa: WPS211
         self,
-        receiver: str,
-        sender_number: str,
+        receiver: models_pb2.Subscriber,
+        sender_configuration: models_pb2.ConfigurationVector,
         body: str | None,
+        title: str | None = None,
         media_url: str | None = None,
     ) -> str:
         raise NotImplementedError()
@@ -112,8 +113,8 @@ class ProviderChannel(Channel):
             counter += 1
 
         sid = self.send_message(
-            receiver=receiver.phone_number.e164_number,
-            sender_number=sender_configuration.mobile_phone.e164_number,
+            receiver=receiver,
+            sender_configuration=sender_configuration,
             body=_(
                 "Hi {0},".format(receiver.first_name)
                 + "\nWe are pleased to confirm that your {0}trip is booked:".format(
@@ -141,18 +142,19 @@ class ProviderChannel(Channel):
             if update.HasField("date_field"):
                 try:
                     message = get_message_from_code(
-                        protobuf.enum_value_to_slug(
+                        code=protobuf.enum_value_to_slug(
                             models_pb2.UpdatedDateField.Field.DESCRIPTOR,
                             enum_value=update.date_field.field,
                         ),
+                        channel_type=sender_configuration.channel,
                     )
                 except KeyError:
                     continue
                 message_ids.append(
                     self.send_message(
-                        receiver=receiver.phone_number.e164_number,
-                        sender_number=sender_configuration.mobile_phone.e164_number,
-                        body=message.format(
+                        receiver=receiver,
+                        sender_configuration=sender_configuration,
+                        body=message["body"].format(
                             booking_value.origin.name,
                             booking_value.destination.name,
                             proto_to_format_dt(
@@ -165,18 +167,19 @@ class ProviderChannel(Channel):
             else:
                 try:
                     message = get_message_from_code(
-                        protobuf.enum_value_to_slug(
+                        code=protobuf.enum_value_to_slug(
                             models_pb2.UpdatedTextField.Field.DESCRIPTOR,
                             enum_value=update.text_field.field,
                         ),
+                        channel_type=sender_configuration.channel,
                     )
                 except KeyError:
                     continue
                 message_ids.append(
                     self.send_message(
-                        receiver=receiver.phone_number.e164_number,
-                        sender_number=sender_configuration.mobile_phone.e164_number,
-                        body=message.format(
+                        receiver=receiver,
+                        sender_configuration=sender_configuration,
+                        body=message["body"].format(
                             booking_value.origin.name,
                             booking_value.destination.name,
                             update.text_field.original_text,
@@ -186,8 +189,8 @@ class ProviderChannel(Channel):
                 )
 
         self.send_message(
-            receiver=receiver.phone_number.e164_number,
-            sender_number=sender_configuration.mobile_phone.e164_number,
+            receiver=receiver,
+            sender_configuration=sender_configuration,
             body=_("Please select one of the following options"),
         )
         return message_ids
@@ -199,24 +202,27 @@ class ProviderChannel(Channel):
         sender_configuration: models_pb2.ConfigurationVector,
     ) -> Sequence[str]:
         sid = self.send_message(
-            receiver=receiver.phone_number.e164_number,
-            sender_number=sender_configuration.mobile_phone.e164_number,
+            receiver=receiver,
+            sender_configuration=sender_configuration,
             body=event.preformatted_message,
         )
         return [sid]
 
-    def send_message(
+    def send_message(  # noqa: WPS211
         self,
-        receiver: str,
-        sender_number: str,
+        receiver: models_pb2.Subscriber,
+        sender_configuration: models_pb2.ConfigurationVector,
         body: str | None,
+        title: str | None = None,
         media_url: str | None = None,
     ) -> str:
         response = self._client.messages.create(  # type: ignore[no-untyped-call]
-            from_="whatsapp:{0}".format(sender_number),
+            from_="whatsapp:{0}".format(sender_configuration.mobile_phone.e164_number),
             body=body,
             media_url=media_url,
-            to="whatsapp:{0}".format("".join(receiver.split())),
+            to="whatsapp:{0}".format(
+                "".join(receiver.phone_number.e164_number.split()),
+            ),
         )
         return response.sid
 
@@ -265,11 +271,12 @@ class MockChannel(Channel):
         )
         return [str(event.receiver_id)]
 
-    def send_message(
+    def send_message(  # noqa: WPS211
         self,
-        receiver: str,
-        sender_number: str,
+        receiver: models_pb2.Subscriber,
+        sender_configuration: models_pb2.ConfigurationVector,
         body: str | None,
+        title: str | None = None,
         media_url: str | None = None,
     ) -> str:
         return string.uuid()
