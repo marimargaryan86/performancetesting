@@ -1,4 +1,5 @@
 <script lang="ts">
+  import AlertIcon from "components/icons/alert-icon.svelte";
   import Backdrop from "components/ui/backdrop.svelte";
   import Ticket from "../../../components/ticket.svelte";
   import type { BookingModel } from "integration/junction-mobile-api/schemas/booking";
@@ -23,7 +24,7 @@
 
   let backdrop: Backdrop | undefined;
   let booking: BookingModel | undefined = undefined;
-  let state: "info" | "confirm" | "done" | "failed";
+  let state: "info" | "rules" | "confirm" | "done" | "failed";
 
   $: reservationNo = booking?.operatorBookingReferences.length
     ? booking.operatorBookingReferences.join(", ")
@@ -52,6 +53,14 @@
 
     return false;
   });
+
+  function info(): void {
+    state = "info";
+  }
+
+  function rules(): void {
+    state = "rules";
+  }
 
   function cancelBooking(): void {
     state = "confirm";
@@ -103,7 +112,59 @@
 
       <div class="actions">
         <Button variant="outline" on:click={close}>Return to bookings</Button>
-        <Button on:click={cancelBooking}>Cancel booking</Button>
+        <Button on:click={rules}>Cancel booking</Button>
+      </div>
+    {:else if state === "rules"}
+      <div class="icon-wrapper">
+        <AlertIcon color="var(--color-semantic-error-500)" size="64px" variant="disc" />
+      </div>
+
+      <h3 class="typography display-small bold">Cancellation and refund fees</h3>
+
+      <p class="typography body-small">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quare ad ea primum, si videtur; Si
+        enim ad populum me vocas, eum. Quid enim est a Chrysippo praetermissum in Stoicis? Et ille
+        ridens: Video, inquit, quid agas;
+      </p>
+
+      <p class="typography body-small">
+        Quid, de quo nulla dissensio est? Nobis aliter videtur, recte secusne, postea; Quid nunc
+        honeste dicit? Tibi hoc incredibile, quod beatissimum. Hic ambiguo ludimur. Haec para/doca
+        illi, nos admirabilia dicamus.
+      </p>
+
+      <ul>
+        <li>
+          <p class="typography body-small">
+            – Quod dicit Epicurus etiam de voluptate, quae minime sint voluptates, eas obscurari
+            saepe et obrui.
+          </p>
+        </li>
+        <li>
+          <p class="typography body-small">
+            – Si verbum sequimur, primum longius verbum praepositum quam bonum.
+          </p>
+        </li>
+        <li>
+          <p class="typography body-small">
+            – Ergo ita: non posse honeste vivi, nisi honeste vivatur?
+          </p>
+        </li>
+        <li>
+          <p class="typography body-small">– Nam de isto magna dissensio est.</p>
+        </li>
+      </ul>
+
+      <p class="typography body-small">
+        Duo Reges: constructio interrete. Ita nemo beato beatior. In schola desinis. Certe non
+        potest. Videsne quam sit magna dissensio? Itaque his sapiens semper vacabit.
+      </p>
+
+      <p class="typography body-medium">Do you wish to continue?</p>
+
+      <div class="actions">
+        <Button variant="outline" on:click={info}>Go back</Button>
+        <Button on:click={cancelBooking}>Continue</Button>
       </div>
     {:else if state === "confirm"}
       {#if $pending}
@@ -184,6 +245,11 @@
 
   .dialog > h3 {
     text-align: center;
+  }
+
+  .icon-wrapper {
+    display: flex;
+    justify-content: center;
   }
 
   .actions {
