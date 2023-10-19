@@ -15,6 +15,10 @@ const airPrefixSeconds = 4500
 const airSuffixSeconds = 2700
 const railPrefixSeconds = 1800
 const railSuffixSeconds = 900
+const ferryPrefixSeconds = 3600 // 60 min
+const ferrySuffixSeconds = 3600 // 60 min
+const coachPrefixSeconds = 1800 // 30 min
+const coachSuffixSeconds = 900  // 15 min
 
 type raptor struct {
 	best           map[uint64]uint32                // a map of route stops to earliest possible arrival to them, key type is Stop.Sequence, value type is unix timestamp
@@ -266,6 +270,10 @@ func (r *raptor) routeWorker(wg *sync.WaitGroup, jobs chan uint64, results chan 
 					arrival += airSuffixSeconds
 				case models.Schedule_TYPE_RAIL:
 					arrival += railSuffixSeconds
+				case models.Schedule_TYPE_FERRY:
+					arrival += ferrySuffixSeconds
+				case models.Schedule_TYPE_BUS:
+					arrival += coachSuffixSeconds
 				}
 
 				results <- workerResult{
@@ -336,6 +344,10 @@ func (r *raptor) earliestPossibleDeparture(target *planner.ScheduleStop, previou
 		previousArrival += airPrefixSeconds
 	case models.Schedule_TYPE_RAIL:
 		previousArrival += railPrefixSeconds
+	case models.Schedule_TYPE_FERRY:
+		previousArrival += ferryPrefixSeconds
+	case models.Schedule_TYPE_BUS:
+		previousArrival += coachPrefixSeconds
 	}
 
 	return previousArrival
