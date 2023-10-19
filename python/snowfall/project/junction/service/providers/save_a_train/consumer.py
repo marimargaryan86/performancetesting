@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 
 from snowfall.project.junction.go.service.offers.v1 import amqp_pb2 as offers_amqp_pb2
@@ -20,6 +21,8 @@ from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 
 _PROVIDER_NAME = "Save A Train"
+_RETRY_TTL = datetime.timedelta(hours=1)
+_RETRY_AFTER_SECONDS = 120
 
 
 class NotificationsConsumer(object):
@@ -32,6 +35,7 @@ class NotificationsConsumer(object):
         self._consumer = consumer_obj
         self._adapter = adapter
         self._notifier = notifier
+        self._logger = stdout.get_logger()
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
@@ -54,8 +58,29 @@ class NotificationsConsumer(object):
             await self._notifier.send(
                 notifications.BookingNotification(message.body),
             )
-        else:
+            return
+
+        await self._handle_no_fulfillment(message)
+
+    async def _handle_no_fulfillment(
+        self,
+        message: types.Message[sat_amqp_pb2.BookingNotificationTask],
+    ) -> None:
+        await asyncio.sleep(_RETRY_AFTER_SECONDS)
+
+        created_at = protobuf.protobuf_to_datetime(
+            message.body.created_at,
+        )
+        time_passed = datetime.datetime.now(datetime.UTC) - created_at
+
+        if time_passed > _RETRY_TTL:
+            self._logger.error(
+                "Ticket retrieval limit reached",
+                booking_id=message.body.booking_id,
+            )
             await message.nack()
+        else:
+            await message.requeue()
 
 
 class PriceQuoteConsumer(object):

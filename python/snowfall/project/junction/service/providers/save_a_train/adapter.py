@@ -356,6 +356,9 @@ class SaveATrainAdapter(object):  # noqa: WPS214
                     timespec="seconds",
                 ),
                 ticket_url=booking_responses.get_ticket.url,
+                created_at=protobuf.datetime_to_protobuf(
+                    datetime.datetime.now(datetime.UTC),
+                ),
             ),
             routing_key="notifications",
         )
