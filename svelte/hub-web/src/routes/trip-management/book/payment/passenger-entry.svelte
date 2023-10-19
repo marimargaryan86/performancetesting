@@ -35,7 +35,7 @@
   } {
     const documentFields: {
       [key in keyof PassportDocumentModel]: z.ZodType<PassportDocumentModel[key]>;
-    } = { type: z.enum(["passport"]) };
+    } = { type: z.literal("passport") };
 
     required.forEach((field) => {
       if (field === "expiration-date") {

@@ -28,7 +28,7 @@ export const coordinatesSearchableModel = schemaModel.create({
 export const placeModel = schemaModel.create({
   schema: z.object({
     id: z.string().uuid(),
-    type: z.enum(["places"]),
+    type: z.literal("places"),
     attributes: z.object({
       name: z.string(),
       latitude: z.number(),
@@ -42,7 +42,7 @@ export const placeModel = schemaModel.create({
     }),
     relationships: schemaModel
       .relationships({
-        types: z.array(z.object({ id: z.string(), type: z.enum(["place-types"]) })),
+        types: z.array(z.object({ id: z.string(), type: z.literal("place-types") })),
       })
       .optional(),
   }),

@@ -25,7 +25,7 @@ const conversionModelExt: z.ZodType<
 export const conversionModel = schemaModel.create({
   schema: z.object({
     id: z.string(),
-    type: z.enum(["conversions"]),
+    type: z.literal("conversions"),
     attributes: z.object({
       createdAt: z.date({ coerce: true }).optional(),
       settledAt: z.date({ coerce: true }).optional(),

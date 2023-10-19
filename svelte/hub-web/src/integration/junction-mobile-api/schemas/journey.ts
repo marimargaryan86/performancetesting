@@ -26,7 +26,7 @@ const journeyModelExt: z.ZodType<z.infer<typeof journeyModelBase> & { orders: Or
 export const journeyModel = schemaModel.create({
   schema: z.object({
     id: z.string(),
-    type: z.enum(["journeys"]),
+    type: z.literal("journeys"),
     attributes: z.object({
       reference: z.string(),
       contactDetails: z.lazy(() => contactDetailsModel.schema),

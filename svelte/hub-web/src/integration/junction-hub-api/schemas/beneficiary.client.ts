@@ -20,12 +20,12 @@ export const bankDetailsBase = z.object({
 });
 
 export const bankDetailsIban = bankDetailsBase.extend({
-  type: z.enum(["iban"]),
+  type: z.literal("iban"),
   iban: z.string().trim(),
 });
 
 export const bankDetailsAba = bankDetailsBase.extend({
-  type: z.enum(["aba"]),
+  type: z.literal("aba"),
   accountNumber: z.string().trim(),
   aba: z.string().trim(),
 });

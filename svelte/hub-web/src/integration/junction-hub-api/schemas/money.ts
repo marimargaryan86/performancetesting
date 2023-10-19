@@ -13,7 +13,7 @@ export const moneyModel = schemaModel.create({
 export const currencyModel = schemaModel.create({
   schema: z.object({
     id: z.string(),
-    type: z.enum(["currencies"]),
+    type: z.literal("currencies"),
     attributes: z.object({
       name: z.string(),
       minorUnits: z.number(),

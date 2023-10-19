@@ -110,7 +110,7 @@ export const bankDetails = schemaModel.create({
 export const beneficiaryModel = schemaModel.create({
   schema: z.object({
     id: z.string(),
-    type: z.enum(["beneficiaries"]),
+    type: z.literal("beneficiaries"),
     attributes: z.object({
       bankAccountHolderName: z.string(),
       email: z.string(),

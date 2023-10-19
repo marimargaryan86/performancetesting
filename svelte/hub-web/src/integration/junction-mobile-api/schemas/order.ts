@@ -72,7 +72,7 @@ export type ContactDetailsModel = Infer<typeof contactDetailsModel>;
 
 export const passportDocumentModel = schemaModel.create({
   schema: z.object({
-    documentType: z.enum(["passport"]),
+    documentType: z.literal("passport"),
     documentNumber: z.string().optional(),
     documentIssueCountry: z.string().optional(),
     documentExpirationDate: z.string().optional(),
@@ -81,7 +81,7 @@ export const passportDocumentModel = schemaModel.create({
     residenceCountryCode: z.string().optional(),
   }),
   model: z.object({
-    type: z.enum(["passport"]),
+    type: z.literal("passport"),
     number: z.string().optional(),
     issueCountry: z.string().optional(),
     expirationDate: z.date({ coerce: true }).optional(),
@@ -145,7 +145,7 @@ export type OrderPassengerModel = Infer<typeof orderPassengerModel>;
 export const voucherModel = schemaModel.create({
   schema: z.object({
     id: z.string(),
-    type: z.enum(["vouchers"]),
+    type: z.literal("vouchers"),
   }),
   model: z.object({ id: z.string() }),
   toSchema: (data) => ({ ...data, type: "vouchers" } as const),
@@ -154,7 +154,7 @@ export const voucherModel = schemaModel.create({
 export const orderModel = schemaModel.create({
   schema: z.object({
     id: z.string().uuid(),
-    type: z.enum(["orders"]),
+    type: z.literal("orders"),
     attributes: z.object({
       passengers: z.array(orderPassengerModel.schema),
       residenceAddress: addressModel.schema.optional(),
@@ -204,7 +204,7 @@ export type OrderIdentifier = Infer<typeof orderModel, "identifier">;
 
 export const createOrderModel = schemaModel.create({
   schema: z.object({
-    type: z.enum(["orders"]),
+    type: z.literal("orders"),
     attributes: z.object({
       contactDetails: contactDetailsModel.schema,
       passengers: z.array(orderPassengerModel.schema),
@@ -248,7 +248,7 @@ export type CreateOrderSchema = Infer<typeof createOrderModel, "schema">;
 export const orderMarkupsModel = schemaModel.create({
   schema: z.object({
     id: z.string().uuid(),
-    type: z.enum(["markups"]),
+    type: z.literal("markups"),
     attributes: z.object({
       servicefee: priceModel.schema,
       agencyMarkup: priceModel.schema,
@@ -281,7 +281,7 @@ export type OrderMarkupsIdentifier = Infer<typeof orderMarkupsModel, "identifier
 
 export const createOrderMarkupsModel = schemaModel.create({
   schema: z.object({
-    type: z.enum(["markups"]),
+    type: z.literal("markups"),
     attributes: z.object({
       servicefee: priceModel.schema,
       agencyMarkup: priceModel.schema,

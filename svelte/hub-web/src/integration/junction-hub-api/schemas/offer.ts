@@ -4,7 +4,7 @@ import { z } from "zod";
 export const cabinClassModel = schemaModel.create({
   schema: z.object({
     id: z.string(),
-    type: z.enum(["cabin-classes"]),
+    type: z.literal("cabin-classes"),
     attributes: z.object({ name: z.string() }),
     links: schemaModel.links({ self: true }),
   }),
@@ -17,7 +17,7 @@ export type CabinClassIdentifier = Infer<typeof cabinClassModel, "identifier">;
 export const legTypeModel = schemaModel.create({
   schema: z.object({
     id: z.string(),
-    type: z.enum(["leg-types"]),
+    type: z.literal("leg-types"),
     attributes: z.object({ name: z.string() }),
     links: schemaModel.links({ self: true }),
   }),
@@ -29,5 +29,5 @@ export type LegTypeIdentifier = Infer<typeof legTypeModel, "identifier">;
 
 export const tripOfferPriceQuoteIdentifier = z.object({
   id: z.string(),
-  type: z.enum(["trip-offer-price-quotes"]),
+  type: z.literal("trip-offer-price-quotes"),
 });

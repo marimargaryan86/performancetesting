@@ -7,7 +7,7 @@ import schemaModel, { type Infer } from "utils/schema-model";
 export const tripCandidatesSearchModel = schemaModel.create({
   schema: z.object({
     id: z.string().uuid(),
-    type: z.enum(["trip-candidate-searches"]),
+    type: z.literal("trip-candidate-searches"),
     attributes: z.object({
       expiresAt: z.date({ coerce: true }),
       status: resourceStatus,

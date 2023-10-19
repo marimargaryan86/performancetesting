@@ -2,12 +2,12 @@ import { z } from "zod";
 import { companyModel } from "./company";
 import schemaModel, { type Infer } from "utils/schema-model";
 
-export const contactModel = z.object({ id: z.string(), type: z.enum(["contacts"]) });
+export const contactModel = z.object({ id: z.string(), type: z.literal("contacts") });
 
 export const accountModel = schemaModel.create({
   schema: z.object({
     id: z.string(),
-    type: z.enum(["accounts"]),
+    type: z.literal("accounts"),
     attributes: z.object({
       name: z.string(),
       status: z.string(),

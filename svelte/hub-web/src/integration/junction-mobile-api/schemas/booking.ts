@@ -50,7 +50,7 @@ const bookingDetailsModelExt: z.ZodType<
 export const bookingDetailsModel = schemaModel.create({
   schema: z.object({
     id: z.string().uuid(),
-    type: z.enum(["trip-booking-details"]),
+    type: z.literal("trip-booking-details"),
     attributes: z.object({
       cabinClassName: z.string(),
       vendor: z.string(),
@@ -89,7 +89,7 @@ export const bookingStatusIdentifier = z.object({
     "error",
     "cancelled",
   ]),
-  type: z.enum(["booking-statuses"]),
+  type: z.literal("booking-statuses"),
 });
 export type BookingStatus = z.infer<typeof bookingStatusIdentifier>["id"];
 
@@ -124,7 +124,7 @@ const bookingModelExt: z.ZodType<z.infer<typeof bookingModelBase> & { order?: Or
 export const bookingModel = schemaModel.create({
   schema: z.object({
     id: z.string().uuid(),
-    type: z.enum(["trip-bookings"]),
+    type: z.literal("trip-bookings"),
     attributes: z.object({
       totalPrice: priceModel.schema,
       operatorBookingReferences: z.array(z.string()),

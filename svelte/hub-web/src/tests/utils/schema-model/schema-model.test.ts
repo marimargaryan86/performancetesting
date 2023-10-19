@@ -66,7 +66,7 @@ describe("relationships", () => {
 const sm = create({
   schema: z.object({
     id: z.string(),
-    type: z.enum(["test"]),
+    type: z.literal("test"),
     attributes: z.object({
       name: z.string(),
       dob: z.date().nullable(),

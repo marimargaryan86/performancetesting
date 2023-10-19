@@ -32,7 +32,7 @@ export type OfferSegmentLegModel = Infer<typeof offerSegmentLegModel>;
 export const legTypeModel = schemaModel.create({
   schema: z.object({
     id: z.string(),
-    type: z.enum(["leg-types"]),
+    type: z.literal("leg-types"),
     attributes: z.object({ name: z.string() }),
     links: schemaModel.links({ self: true }),
   }),
@@ -53,7 +53,7 @@ export const routeIdentifierModel = schemaModel.create({
 export const cabinClassModel = schemaModel.create({
   schema: z.object({
     id: z.string(),
-    type: z.enum(["cabin-classes"]),
+    type: z.literal("cabin-classes"),
     attributes: z.object({ name: z.string() }),
     links: schemaModel.links({ self: true }),
   }),
@@ -67,7 +67,7 @@ export type CabinClassIdentifier = Infer<typeof cabinClassModel, "identifier">;
 export const tripOfferGroupDetailsModel = schemaModel.create({
   schema: z.object({
     id: z.string().uuid(),
-    type: z.enum(["trip-offer-group-details"]),
+    type: z.literal("trip-offer-group-details"),
     attributes: z.object({
       legs: z.array(offerSegmentLegModel.schema),
       vendor: z.string(),
@@ -119,7 +119,7 @@ export const offerSegmentDetailAmenitiesModel = z.object({
 export const tripOfferOptionDetailsModel = schemaModel.create({
   schema: z.object({
     id: z.string().uuid(),
-    type: z.enum(["trip-offer-option-details"]),
+    type: z.literal("trip-offer-option-details"),
     attributes: z.object({
       cabinClassName: z.string(),
       amenities: offerSegmentDetailAmenitiesModel,
@@ -166,7 +166,7 @@ export const baggageAllowanceModel = schemaModel.create({
 export const offerOptionModel = schemaModel.create({
   schema: z.object({
     id: z.string().uuid(),
-    type: z.enum(["offer-options"]),
+    type: z.literal("offer-options"),
     attributes: z.object({
       price: priceModel.schema,
       priceBreakdown: z.array(priceBreakdownModel.schema).optional(),
@@ -201,7 +201,7 @@ export type OfferOptionSchema = Infer<typeof offerOptionModel, "schema">;
 export const offerGroupModel = schemaModel.create({
   schema: z.object({
     id: z.string().uuid(),
-    type: z.enum(["offer-groups"]),
+    type: z.literal("offer-groups"),
     attributes: z.record(z.any()),
     relationships: schemaModel.relationships({
       options: z.array(offerOptionModel.identifier),
@@ -222,7 +222,7 @@ export type OfferGroupSchema = Infer<typeof offerGroupModel, "schema">;
 export const offerModel = schemaModel.create({
   schema: z.object({
     id: z.string().uuid(),
-    type: z.enum(["offers"]),
+    type: z.literal("offers"),
     attributes: z.object({ expiresAt: z.date({ coerce: true }) }),
     relationships: schemaModel.relationships({
       groups: z.array(offerGroupModel.identifier),
@@ -290,7 +290,7 @@ export const priceQuoteRequiredPassengerInfoType = z.enum([
 export const tripOfferPriceQuoteModel = schemaModel.create({
   schema: z.object({
     id: z.string().uuid(),
-    type: z.enum(["trip-offer-price-quotes"]),
+    type: z.literal("trip-offer-price-quotes"),
     attributes: z.object({
       expiresAt: z.date({ coerce: true }),
       price: priceModel.schema.nullable(),
@@ -339,7 +339,7 @@ export type TripOfferPriceQuoteSchema = Infer<typeof tripOfferPriceQuoteModel, "
 
 export const createTripOfferPriceQuoteModel = schemaModel.create({
   schema: z.object({
-    type: z.enum(["trip-offer-price-quotes"]),
+    type: z.literal("trip-offer-price-quotes"),
     attributes: z.object({ sessionToken: z.string() }).optional(),
     relationships: schemaModel.relationships({
       offer: offerModel.identifier,

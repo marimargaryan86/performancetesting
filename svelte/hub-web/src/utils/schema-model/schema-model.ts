@@ -177,7 +177,7 @@ export type Infer<
  * ```ts
  * const ident = identifier(z.object({
  *    id: z.string(),
- *    type: z.enum(["test"]),
+ *    type: z.literal("test"),
  *    a: z.number(),
  * }));
  * // Evaluates to
@@ -269,7 +269,7 @@ export function links<TLinks extends Partial<{ self: true; next: true }>>(
  *
  * ```ts
  * const sm = create({
- *    schema: z.object({ id: z.string(), type: z.enum(["test"]), a: z.number() }),
+ *    schema: z.object({ id: z.string(), type: z.literal("test"), a: z.number() }),
  *    model: z.object({ id: z.string(), b: z.number().optional() }),
  *    toModel: (data) => ({
  *      id: data.id,

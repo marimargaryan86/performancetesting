@@ -15,7 +15,7 @@ export const addressDetailsModel = schemaModel.create({
 export const companyModel = schemaModel.create({
   schema: z.object({
     id: z.string(),
-    type: z.enum(["companies"]),
+    type: z.literal("companies"),
     attributes: z.object({
       name: z.string().optional(),
       address: addressDetailsModel.schema.optional(),

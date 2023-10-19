@@ -6,7 +6,7 @@ import schemaModel, { type Infer } from "utils/schema-model";
 export const billModel = schemaModel.create({
   schema: z.object({
     id: z.string().uuid(),
-    type: z.enum(["bills"]),
+    type: z.literal("bills"),
     attributes: z
       .object({
         isReconciled: z.boolean().optional(),

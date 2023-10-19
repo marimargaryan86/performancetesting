@@ -22,7 +22,7 @@ const transactionRelationships: z.ZodType<{
 export const transactionModel = schemaModel.create({
   schema: z.object({
     id: z.string(),
-    type: z.enum(["transactions"]),
+    type: z.literal("transactions"),
     attributes: z.object({
       externalReference: z.string(),
       invoiceReference: z.string().optional(),

@@ -13,7 +13,7 @@ export const orderPassengerModel = schemaModel.create({
     dateOfBirth: z.string(),
     travelerDocument: z
       .object({
-        documentType: z.enum(["passport"]).optional(),
+        documentType: z.literal("passport").optional(),
         documentNumber: z.string().optional(),
         documentIssueCountry: z.string().optional(),
         documentExpirationDate: z.string().optional(),
@@ -31,7 +31,7 @@ export const orderPassengerModel = schemaModel.create({
     dateOfBirth: z.date({ coerce: true }),
     travelerDocument: z
       .object({
-        type: z.enum(["passport"]).optional(),
+        type: z.literal("passport").optional(),
         number: z.string().optional(),
         issueCountry: z.string().optional(),
         expirationDate: z.date({ coerce: true }).optional(),
@@ -91,7 +91,7 @@ const orderExt: z.ZodType<
 export const orderModel = schemaModel.create({
   schema: z.object({
     id: z.string(),
-    type: z.enum(["orders"]),
+    type: z.literal("orders"),
     attributes: z.object({
       passengers: z.array(orderPassengerModel.schema),
     }),

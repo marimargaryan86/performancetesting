@@ -5,7 +5,7 @@ import schemaModel, { type Infer } from "utils/schema-model";
 export const cancellationRequestModel = schemaModel.create({
   schema: z.object({
     id: z.string().uuid(),
-    type: z.enum(["cancellation-request"]),
+    type: z.literal("cancellation-request"),
     attributes: z.object({
       status: z.enum(["unspecified", "pending", "completed"]),
     }),

@@ -7,7 +7,7 @@ import schemaModel, { type Infer } from "utils/schema-model";
 export const balanceModel = schemaModel.create({
   schema: z.object({
     id: z.string(),
-    type: z.enum(["balances"]),
+    type: z.literal("balances"),
     attributes: z.object({ amount: z.number() }),
     relationships: schemaModel.relationships({
       account: accountModel.identifier,
@@ -24,11 +24,11 @@ export type BalanceSchema = Infer<typeof balanceModel, "schema">;
 
 export const createBalanceModel = schemaModel.create({
   schema: z.object({
-    type: z.enum(["balances"]),
+    type: z.literal("balances"),
     relationships: schemaModel.relationships({
       currency: z.object({
         id: z.string(),
-        type: z.enum(["currencies"]),
+        type: z.literal("currencies"),
       }),
     }),
   }),
