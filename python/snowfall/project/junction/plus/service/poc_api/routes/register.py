@@ -48,7 +48,7 @@ class WhatsappRegister(endpoints.HTTPEndpoint):
         # This needs to change after the demo and handle it automatically
         if subscription:
             await orders_repository.insert(order)
-            if "subscribed" in subscription and subscription["subscribed"]:
+            if subscription.get("subscribed"):
                 await chatbot_utils.register_booking_confirmation_agent(
                     junction_client,
                     twilio_client,

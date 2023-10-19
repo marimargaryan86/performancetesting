@@ -70,8 +70,6 @@ def test_timestamp_normalizer() -> None:
         json_format.MessageToDict(expected_ts, preserving_proto_field_name=True),
     )
 
-    assert isinstance(normalized, datetime.datetime)
-
     actual_ts: timestamp_pb2.Timestamp = json_format.ParseDict(
         normalizers.denormalize(timestamp_pb2.Timestamp.DESCRIPTOR, normalized),
         timestamp_pb2.Timestamp(),

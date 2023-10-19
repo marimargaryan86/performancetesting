@@ -42,7 +42,6 @@ pretty = true
 show_column_numbers = true
 show_error_codes = true
 show_error_code_links = true
-strict_concatenate = true
 strict_optional = true
 strict_equality = true
 namespace_packages = true
@@ -247,6 +246,7 @@ select = [
 ]
 target-version = "py311"
 preview = true
+unsafe-fixes = true
 
 [tool.ruff.flake8-annotations]
 mypy-init-return = true
