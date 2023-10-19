@@ -10,4 +10,9 @@ if __name__ == "__main__":
             callback=factories.import_nodes,
             settings_class=factories.ImportSettings,
         ),
+        application.Command(
+            name="import-stops",
+            callback=factories.import_stops,
+            settings_class=factories.GtfsSettings,
+        ),
     )
