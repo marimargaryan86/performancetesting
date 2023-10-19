@@ -16,7 +16,7 @@
       "api_base_url": "https://search.production.ask2go.com/",
       "api_booking_base_url": "https://book.production.ask2go.com/",
       "bucket": "junction-provider-data-production",
-      "email_recipient": "recipient@snowfalltravel.com"
+      "email_recipient": "support@snowfalltravel.com"
     }
   },
   "sandbox": {

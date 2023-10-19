@@ -13,7 +13,7 @@
       "count": 5,
       "api_base_url": "https://ndc.junction.travel",
       "bucket": "junction-provider-data-production",
-      "email_recipient": "recipient@snowfalltravel.com"
+      "email_recipient": "support@snowfalltravel.com"
     }
   },
   "sandbox": {

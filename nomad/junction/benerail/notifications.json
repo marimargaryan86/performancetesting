@@ -12,7 +12,7 @@
     "variables": {
       "count": 2,
       "api_base_url": "",
-      "email_recipient": "recipient@snowfalltravel.com"
+      "email_recipient": "support@snowfalltravel.com"
     }
   },
   "sandbox": {
