@@ -37,6 +37,17 @@ class TestDictClient(object):
         )
         assert len(found_orders.orders) == 2
 
+    async def test_find_booking_cancellations(
+        self,
+        orders_client: orders.Client,
+    ) -> None:
+        response = await orders_client.find_booking_cancellations(
+            identifiers=fixtures.BOOKING_CANCELLATIONS,
+            reseller_id="",
+        )
+
+        assert len(response.booking_cancellations) == 2
+
 
 class TestGrpcClient(object):
     @pytest.mark.parametrize(

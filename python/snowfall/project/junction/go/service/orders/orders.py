@@ -577,6 +577,27 @@ class BookingCancellationsRepository(
         pymongo.IndexModel("booking_cancellations.booking_id", background=True),
     )
 
+    async def find(
+        self,
+        ids: Sequence[str],
+        reseller_id: str = "",
+    ) -> resultset.ResultSet[models_pb2.BookingCancellation]:
+        filter_ = (
+            {
+                "booking_cancellations._id": {
+                    "$in": ids,
+                },
+            }
+            if ids
+            else {}
+        )
+
+        filter_ = _add_reseller_id_to_filter(reseller_id, filter_)
+
+        return await self._find_with_cursor(
+            filter_=filter_,
+        )
+
     async def find_by_id(
         self,
         document_id: str,

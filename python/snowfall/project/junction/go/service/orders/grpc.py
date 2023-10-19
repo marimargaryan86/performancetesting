@@ -325,6 +325,23 @@ class OrderService(  # noqa: WPS214
             booking_cancellation=booking_cancellation,
         )
 
+    async def ListBookingCancellations(  # type: ignore[override] # noqa: N802
+        self,
+        request: orders_pb2.ListBookingCancellationsRequest,
+        context: aio.ServicerContext,
+    ) -> orders_pb2.ListBookingCancellationsResponse:
+        booking_cancellations_result = await self._booking_cancellations.find(
+            ids=list(request.ids.ids),
+            reseller_id=request.reseller_id,
+        )
+
+        return orders_pb2.ListBookingCancellationsResponse(
+            booking_cancellations=[
+                booking_cancellation
+                async for booking_cancellation in booking_cancellations_result
+            ],
+        )
+
     async def HandleCancellationTicketCompleted(  # type: ignore[override] # noqa: N802
         self,
         request: orders_pb2.HandleCancellationTicketCompletedRequest,

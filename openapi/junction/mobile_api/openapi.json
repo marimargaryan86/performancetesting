@@ -1190,6 +1190,9 @@
                               },
                               {
                                 "$ref": "#/components/schemas/LegType"
+                              },
+                              {
+                                "$ref": "./../client_api/openapi.json#/components/schemas/BookingCancellation"
                               }
                             ]
                           }
@@ -1325,6 +1328,9 @@
                           },
                           {
                             "$ref": "./../client_api/openapi.json#/components/schemas/LegType"
+                          },
+                          {
+                            "$ref": "./../client_api/openapi.json#/components/schemas/BookingCancellation"
                           }
                         ]
                       }
@@ -2545,7 +2551,8 @@
               "bookings",
               "bookings.details",
               "bookings.details.cabinClass",
-              "bookings.details.legType"
+              "bookings.details.legType",
+              "bookings.bookingCancellation"
             ]
           },
           "example": [

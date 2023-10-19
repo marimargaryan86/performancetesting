@@ -7246,6 +7246,9 @@
             },
             {
               "$ref": "#/components/schemas/LegType"
+            },
+            {
+              "$ref": "#/components/schemas/BookingCancellation"
             }
           ],
           "discriminator": {
@@ -7255,7 +7258,8 @@
               "trip-bookings": "#/components/schemas/TripBooking",
               "trip-booking-details": "#/components/schemas/TripBookingDetails",
               "cabin-classes": "#/components/schemas/CabinClass",
-              "leg-types": "#/components/schemas/LegType"
+              "leg-types": "#/components/schemas/LegType",
+              "booking-cancellation": "#/components/schemas/BookingCancellation"
             }
           }
         }
@@ -7279,6 +7283,9 @@
             },
             {
               "$ref": "#/components/schemas/LegType"
+            },
+            {
+              "$ref": "#/components/schemas/BookingCancellation"
             }
           ],
           "discriminator": {
@@ -7288,7 +7295,8 @@
               "journeys": "#/components/schemas/Journey",
               "trip-booking-details": "#/components/schemas/TripBookingDetails",
               "cabin-classes": "#/components/schemas/CabinClass",
-              "leg-types": "#/components/schemas/LegType"
+              "leg-types": "#/components/schemas/LegType",
+              "booking-cancellation": "#/components/schemas/BookingCancellation"
             }
           }
         }
@@ -7683,7 +7691,8 @@
               "bookings",
               "bookings.details",
               "bookings.details.cabinClass",
-              "bookings.details.legType"
+              "bookings.details.legType",
+              "bookings.bookingCancellation"
             ]
           },
           "example": [
@@ -8266,7 +8275,8 @@
               "order.journey",
               "details",
               "details.cabinClass",
-              "details.legType"
+              "details.legType",
+              "bookingCancellation"
             ]
           },
           "example": [

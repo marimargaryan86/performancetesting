@@ -291,6 +291,29 @@ def _trip_offer_option_details_resolver(
     return wrapper
 
 
+def _booking_cancellation_resolver(
+    orders_client: orders.Client,
+) -> includes.ResolverFunc:
+    async def wrapper(
+        identifiers: Sequence[str],
+        request: requests.Request,
+    ) -> Sequence[resources.BookingCancellationResource]:
+        response = await orders_client.find_booking_cancellations(
+            identifiers=identifiers,
+            reseller_id=request.user.username,
+        )
+
+        return [
+            resources.BookingCancellationResource.from_proto(
+                booking_cancellation,
+                request,
+            )
+            for booking_cancellation in response.booking_cancellations
+        ]
+
+    return wrapper
+
+
 def register_resolvers(
     legs_client: legs.Client,
     offers_client: offers.Client,
@@ -350,6 +373,10 @@ def register_resolvers(
         includes.Resolver(
             resource=resources.TripOfferOptionDetailsResource,
             func=_trip_offer_option_details_resolver(offers_client),
+        ),
+        includes.Resolver(
+            resource=resources.BookingCancellationResource,
+            func=_booking_cancellation_resolver(orders_client),
         ),
     )
 

@@ -907,6 +907,9 @@
                           },
                           {
                             "$ref": "#/components/schemas/TripBookingDetails"
+                          },
+                          {
+                            "$ref": "#/components/schemas/BookingCancellation"
                           }
                         ]
                       }
@@ -1284,6 +1287,9 @@
                           },
                           {
                             "$ref": "#/components/schemas/TripBookingDetails"
+                          },
+                          {
+                            "$ref": "#/components/schemas/BookingCancellation"
                           }
                         ]
                       }
@@ -3090,7 +3096,8 @@
             "enum": [
               "journey",
               "bookings",
-              "bookings.details"
+              "bookings.details",
+              "bookings.bookingCancellation"
             ]
           },
           "example": [
@@ -3305,7 +3312,8 @@
             "enum": [
               "order",
               "order.journey",
-              "details"
+              "details",
+              "bookingCancellation"
             ]
           },
           "example": [

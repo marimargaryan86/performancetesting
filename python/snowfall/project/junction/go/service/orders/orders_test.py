@@ -433,3 +433,25 @@ class TestBookingCancellations(object):
         )
 
         assert not retrieved
+
+    async def test_find_booking_cancellations_by_ids(
+        self,
+        booking_cancellations_repository: orders.BookingCancellationsRepository,
+        cancellation_request: models_pb2.CancellationRequest,
+    ) -> None:
+        ids = [
+            booking_cancellation.id
+            for booking_cancellation in cancellation_request.booking_cancellations
+        ]
+
+        retrieved = await booking_cancellations_repository.find(
+            ids=ids,
+            reseller_id=cancellation_request.reseller_id,
+        )
+
+        result_count = 0
+        async for booking_cancellation in retrieved:
+            result_count += 1
+            assert booking_cancellation.id in ids
+
+        assert result_count == len(ids)

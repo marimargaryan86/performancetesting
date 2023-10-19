@@ -112,7 +112,10 @@ RESELLERS = (
     "6bd5e38b-f9b1-48d7-b92b-3c2d26231003",
 )
 CANCELLATION_REQUESTS = ("0a4f4726-df18-4d50-b7ae-17eec528265c",)
-BOOKING_CANCELLATIONS = ("af359732-2f45-4939-8bbd-b981eb181b09",)
+BOOKING_CANCELLATIONS = (
+    "af359732-2f45-4939-8bbd-b981eb181b09",
+    "b1df737a-ce6b-4d8c-b178-6734fdcfeed4",
+)
 PASSENGER_NAME_RECORDS = ("4567H3LG",)
 TRIP_SEARCHES = (string.uuid(),)
 
@@ -448,10 +451,10 @@ def get_cancellation_requests() -> list[order_models_pb2.CancellationRequest]:
             id=CANCELLATION_REQUESTS[0],
             booking_cancellations=[
                 order_models_pb2.BookingCancellation(
-                    id=BOOKING_CANCELLATIONS[0],
-                    booking_id=booking_id,
+                    id=BOOKING_CANCELLATIONS[index],
+                    booking_id=BOOKINGS[index],
                 )
-                for booking_id in BOOKINGS
+                for index in range(len(BOOKINGS))
             ],
             status=order_models_pb2.CancellationRequest.STATUS_PENDING,
         ),

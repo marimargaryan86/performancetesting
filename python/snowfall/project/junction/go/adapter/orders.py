@@ -44,6 +44,14 @@ class Client(abc.ABC):  # noqa: WPS214
         """Fetch cancellation request resource."""
 
     @abc.abstractmethod
+    async def find_booking_cancellations(
+        self,
+        identifiers: Sequence[str],
+        reseller_id: str | None = None,
+    ) -> orders_pb2.ListBookingCancellationsResponse:
+        """Fetch booking cancellation resources by identifiers."""
+
+    @abc.abstractmethod
     async def get_booking_cancellation_by_booking_id(
         self,
         booking_id: str,
@@ -238,6 +246,22 @@ class DictClient(Client):  # noqa: WPS214
             raise errors.NotFoundError()
 
         return self._cancellations[identifier]
+
+    async def find_booking_cancellations(
+        self,
+        identifiers: Sequence[str],
+        reseller_id: str | None = None,
+    ) -> orders_pb2.ListBookingCancellationsResponse:
+        booking_cancellations: list[models_pb2.BookingCancellation] = [
+            booking_cancellation
+            for cancellations in self._cancellations.values()
+            for booking_cancellation in cancellations.booking_cancellations
+            if booking_cancellation.id in identifiers
+        ]
+
+        return orders_pb2.ListBookingCancellationsResponse(
+            booking_cancellations=booking_cancellations,
+        )
 
     async def get_booking_cancellation_by_booking_id(
         self,
@@ -626,6 +650,21 @@ class GrpcClient(Client):  # noqa: WPS214
         )
 
         return response.cancellation_request
+
+    async def find_booking_cancellations(
+        self,
+        identifiers: Sequence[str],
+        reseller_id: str | None = None,
+    ) -> orders_pb2.ListBookingCancellationsResponse:
+        return await errors.handle_grpc_errors(
+            self._orders.ListBookingCancellations(
+                orders_pb2.ListBookingCancellationsRequest(
+                    ids=orders_pb2.ListOfIds(ids=identifiers),
+                    reseller_id=reseller_id or "",
+                ),
+                timeout=self._timeout,
+            ),
+        )
 
     async def get_booking_cancellation_by_booking_id(
         self,
