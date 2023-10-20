@@ -5,6 +5,7 @@ import types as python_types
 import uuid
 from collections.abc import Sequence
 
+import more_itertools
 import orjson
 import phonenumbers
 import tenacity
@@ -13,9 +14,6 @@ from snowfall.project.junction.go.service.orders.v1 import (
     amqp_pb2 as order_amqp_pb2,
 )
 from snowfall.project.junction.go.service.orders.v1 import models_pb2
-from snowfall.project.junction.go.service.orders.v1 import (
-    models_pb2 as order_models_pb2,
-)
 from snowfall.project.junction.provider.v1alpha import bookings_pb2
 from snowfall.project.junction.service.providers.benerail import (
     cache,
@@ -36,7 +34,7 @@ from snowfall.vendor.benerail.models.bookings import response as booking_respons
 from snowfall.vendor.benerail.models.bookings import response as bookings_response
 from snowfall.vendor.benerail.models.dialogue import enums as dialogue_enums
 from snowfall.vendor.benerail.models.dialogue import passenger
-from snowfall.vendor.benerail.models.products import enums as product_enums
+from snowfall.vendor.benerail.models.products import enums
 
 _GENDER_MAP = python_types.MappingProxyType(
     {
@@ -45,7 +43,50 @@ _GENDER_MAP = python_types.MappingProxyType(
         models_pb2.Passenger.Gender.GENDER_UNSPECIFIED: dialogue_enums.Gender.other,
     },
 )
-_WAIT_AFTER_PAYMENT_SECONDS = 15
+_WAIT_AFTER_PAYMENT_SECONDS_PER_PAX = 15
+_MAX_WAIT_SECONDS_AFTER_PAYMENT = 60
+_PROVIDER_STATUS_MAPPING: python_types.MappingProxyType[
+    enums.OrderStates,
+    models_pb2.Booking.Status.ValueType,
+] = python_types.MappingProxyType(
+    {
+        enums.OrderStates.bookable: models_pb2.Booking.STATUS_UNSPECIFIED,
+        enums.OrderStates.prebooked: models_pb2.Booking.STATUS_UNSPECIFIED,
+        enums.OrderStates.prerefunded: models_pb2.Booking.STATUS_UNSPECIFIED,
+        enums.OrderStates.refunded_settlement_pending: (
+            models_pb2.Booking.STATUS_UNSPECIFIED
+        ),
+        enums.OrderStates.created: models_pb2.Booking.STATUS_PENDING,
+        enums.OrderStates.info_required: models_pb2.Booking.STATUS_PENDING,
+        enums.OrderStates.payment_pending: models_pb2.Booking.STATUS_PENDING,
+        enums.OrderStates.confirmed: models_pb2.Booking.STATUS_CONFIRMED,
+        enums.OrderStates.ticketed: models_pb2.Booking.STATUS_CONFIRMED,
+        enums.OrderStates.aborted: models_pb2.Booking.STATUS_ERROR,
+        enums.OrderStates.order_error: models_pb2.Booking.STATUS_ERROR,
+        enums.OrderStates.cancelled: models_pb2.Booking.STATUS_CANCELLED,
+    },
+)
+_PROVIDER_BOOKING_STATUS_MAPPING: python_types.MappingProxyType[
+    enums.OrderStates,
+    bookings_pb2.Booking.Status.ValueType,
+] = python_types.MappingProxyType(
+    {
+        enums.OrderStates.bookable: bookings_pb2.Booking.STATUS_UNSPECIFIED,
+        enums.OrderStates.prebooked: bookings_pb2.Booking.STATUS_UNSPECIFIED,
+        enums.OrderStates.prerefunded: bookings_pb2.Booking.STATUS_UNSPECIFIED,
+        enums.OrderStates.refunded_settlement_pending: (
+            bookings_pb2.Booking.STATUS_UNSPECIFIED
+        ),
+        enums.OrderStates.created: bookings_pb2.Booking.STATUS_PENDING,
+        enums.OrderStates.info_required: bookings_pb2.Booking.STATUS_PENDING,
+        enums.OrderStates.payment_pending: bookings_pb2.Booking.STATUS_PENDING,
+        enums.OrderStates.confirmed: bookings_pb2.Booking.STATUS_CONFIRMED,
+        enums.OrderStates.ticketed: bookings_pb2.Booking.STATUS_CONFIRMED,
+        enums.OrderStates.aborted: bookings_pb2.Booking.STATUS_ERROR,
+        enums.OrderStates.order_error: bookings_pb2.Booking.STATUS_ERROR,
+        enums.OrderStates.cancelled: bookings_pb2.Booking.STATUS_CANCELLED,
+    },
+)
 
 
 class Enricher(object):
@@ -53,7 +94,7 @@ class Enricher(object):
         self._client = benerail_client
         self._logger = stdout.get_logger()
 
-    async def add_ticket_urls(
+    async def enrich(
         self,
         booking: bookings_pb2.Booking,
     ) -> bookings_pb2.Booking:
@@ -66,19 +107,40 @@ class Enricher(object):
 
             return booking
 
-        if not booking_res.response_result.fulfillments:
-            return booking
-
-        ticket_urls = (
-            await self._client.bookings_client.get_ticket_urls_from_fulfillment(
-                booking_id=booking_res.response_result.identifier,
-                fulfillment_id=helper_functions.last_id_of_url(
-                    booking_res.response_result.fulfillments[0].href,
-                ),
-            )
+        order_res = await self._client.orders_client.get_order(
+            booking_id=booking.id,
+            order_id=helper_functions.last_id_of_url(
+                more_itertools.first(booking_res.response_result.orders or []).href,
+            ),
         )
 
-        booking.ticket_urls.extend(ticket_urls)
+        booking.MergeFrom(
+            bookings_pb2.Booking(
+                status=(
+                    _PROVIDER_BOOKING_STATUS_MAPPING.get(
+                        enums.OrderStates(order_res.response_result.state),
+                        bookings_pb2.Booking.STATUS_UNSPECIFIED,
+                    )
+                    if order_res.response_result.state
+                    else bookings_pb2.Booking.STATUS_UNSPECIFIED
+                ),
+                updated_at=protobuf.datetime_to_protobuf(
+                    datetime.datetime.now(tz=datetime.UTC),
+                ),
+            ),
+        )
+
+        if booking_res.response_result.fulfillments:
+            ticket_urls = (
+                await self._client.bookings_client.get_ticket_urls_from_fulfillment(
+                    booking_id=booking_res.response_result.identifier,
+                    fulfillment_id=helper_functions.last_id_of_url(
+                        booking_res.response_result.fulfillments[0].href,
+                    ),
+                )
+            )
+
+            booking.ticket_urls.extend(ticket_urls)
 
         return booking
 
@@ -132,36 +194,36 @@ class BookingHandler(object):
     async def create_booking(  # noqa: WPS210, WPS213, WPS217
         self,
         task: order_amqp_pb2.PlaceOrderTask,
-        offer_details: cache.OfferDetails,
-    ) -> order_models_pb2.Booking:
+        booking_offer_details: cache.BookingOfferDetails,
+    ) -> models_pb2.Booking:
         new_booking = task.booking
         etag_data = etag.EtagData(
             passenger_etags={
                 pax_info.identifier: pax_info.etag
-                for pax_info in offer_details.passengers_info
+                for pax_info in booking_offer_details.passengers_info
             },
-            dialogue_etag=offer_details.dialogue_info.etag,
+            dialogue_etag=booking_offer_details.dialogue_info.etag,
         )
 
         await self._update_passengers(
-            dialogue_id=offer_details.dialogue_info.identifier,
+            dialogue_id=booking_offer_details.dialogue_info.identifier,
             passengers=task.passengers,
             contact_details=task.contact_details,
             etag_data=etag_data,
-            br_passengers_info=offer_details.passengers_info,
+            br_passengers_info=booking_offer_details.passengers_info,
         )
 
         booking_res = await self._client.bookings_client.create_booking(
-            dialogue_id=offer_details.dialogue_info.identifier,
+            dialogue_id=booking_offer_details.dialogue_info.identifier,
             etag=etag_data.dialogue_etag,
-            session_token=offer_details.session_token,
+            session_token=booking_offer_details.session_token,
         )
         booking_res.set_etags(etag_data)
 
         order_res = await self._client.bookings_client.create_order(
             booking_id=booking_res.response_result.identifier,
             etag=etag_data.booking_etag,
-            session_token=offer_details.session_token,
+            session_token=booking_offer_details.session_token,
         )
         order_res.set_etags(etag_data)
 
@@ -170,10 +232,10 @@ class BookingHandler(object):
                 booking_id=booking_res.response_result.identifier,
                 order_id=order_res.response_result.identifier,
                 body=offer.SelectedOffersBody(
-                    offer_id=offer_details.offer_id,
+                    offer_id=booking_offer_details.offer_id,
                 ),
                 etag=etag_data.order_etag,
-                session_token=offer_details.session_token,
+                session_token=booking_offer_details.session_token,
             )
         )
         selected_offer_res.set_etags(etag_data)
@@ -183,9 +245,9 @@ class BookingHandler(object):
             order_id=order_res.response_result.identifier,
             order_etag=etag_data.order_etag,
             body=order.OrderIdBody(
-                state=product_enums.OrderStates.prebooked,
+                state=enums.OrderStates.prebooked,
             ),
-            session_token=offer_details.session_token,
+            session_token=booking_offer_details.session_token,
         )
         order_res.set_etags(etag_data)
 
@@ -198,7 +260,7 @@ class BookingHandler(object):
                     payment.PaymentMethod.ac.value,
                 ),
             ),
-            session_token=offer_details.session_token,
+            session_token=booking_offer_details.session_token,
         )
         payment_res.set_etags(etag_data)
 
@@ -212,18 +274,23 @@ class BookingHandler(object):
                     payment.PaymentMethod.ac.value,
                 ),
                 amount=payment.Price(
-                    amount=float(offer_details.price),
-                    currency=offer_details.currency.value,
+                    amount=float(booking_offer_details.price),
+                    currency=booking_offer_details.currency.value,
                 ),
             ),
-            session_token=offer_details.session_token,
+            session_token=booking_offer_details.session_token,
         )
         payment_res.set_etags(etag_data)
-        await asyncio.sleep(_WAIT_AFTER_PAYMENT_SECONDS)
+        await asyncio.sleep(
+            min(
+                _WAIT_AFTER_PAYMENT_SECONDS_PER_PAX * len(task.passengers),
+                _MAX_WAIT_SECONDS_AFTER_PAYMENT,
+            ),
+        )
 
         booking_res, raw_response = await self._get_booking(
             booking_id=booking_res.response_result.identifier,
-            session_token=offer_details.session_token,
+            session_token=booking_offer_details.session_token,
         )
         booking_res.set_etags(etag_data)
         await self._storage.put(
@@ -231,6 +298,10 @@ class BookingHandler(object):
                 booking_res.response_result.identifier,
             ),
             raw_response,
+        )
+        order_res = await self._client.orders_client.get_order(
+            booking_id=booking_res.response_result.identifier,
+            order_id=order_res.response_result.identifier,
         )
 
         await self._notify(
@@ -240,13 +311,13 @@ class BookingHandler(object):
                 booking_id=task.metadata.booking_id,
                 passenger_name_record=task.metadata.passenger_name_record,
                 departure_at=datetime.datetime.fromisoformat(
-                    offer_details.departure_at,
+                    booking_offer_details.departure_at,
                 ).isoformat(
                     timespec="seconds",
                 ),
                 br_booking_id=booking_res.response_result.identifier,
                 br_dnr=booking_res.response_result.dnr,
-                br_session_token=offer_details.session_token,
+                br_session_token=booking_offer_details.session_token,
                 created_at=protobuf.datetime_to_protobuf(
                     datetime.datetime.now(datetime.UTC),
                 ),
@@ -254,13 +325,20 @@ class BookingHandler(object):
         )
 
         new_booking.MergeFrom(
-            order_models_pb2.Booking(
-                status=order_models_pb2.Booking.STATUS_CONFIRMED,
+            models_pb2.Booking(
+                status=(
+                    _PROVIDER_STATUS_MAPPING.get(
+                        enums.OrderStates(order_res.response_result.state),
+                        models_pb2.Booking.STATUS_UNSPECIFIED,
+                    )
+                    if order_res.response_result.state
+                    else models_pb2.Booking.STATUS_UNSPECIFIED
+                ),
                 provider_total_price=money.from_string(
-                    string_amount=offer_details.price,
-                    currency=offer_details.currency,
+                    string_amount=booking_offer_details.price,
+                    currency=booking_offer_details.currency,
                 ).protobuf(),
-                trip_result=order_models_pb2.TripBooking(
+                trip_result=models_pb2.TripBooking(
                     provider_booking_reference=booking_res.response_result.identifier,
                     record_locator=booking_res.response_result.dnr,
                     created_at=protobuf.datetime_to_protobuf(

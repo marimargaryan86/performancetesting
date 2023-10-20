@@ -1,8 +1,6 @@
 import asyncio
 import datetime
 
-import tenacity
-
 from snowfall.project.junction.go.service.offers.v1 import (
     amqp_pb2 as offers_amqp_pb2,
 )
@@ -12,6 +10,7 @@ from snowfall.project.junction.go.service.orders.v1 import (
 )
 from snowfall.project.junction.provider import notifications as base_notifications
 from snowfall.project.junction.service.providers.benerail import (
+    adapter,
     booking,
     cache,
     fare_rules,
@@ -28,7 +27,6 @@ from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.stdlib.transport.http import errors
 from snowfall.vendor.benerail import client
 from snowfall.vendor.benerail.models import etag
-from snowfall.vendor.benerail.models.trip_offers import response
 
 _PROVIDER_NAME = "Benerail"
 _RETRY_TTL = datetime.timedelta(hours=1)
@@ -121,70 +119,76 @@ class PriceQuoteConsumer(object):
         self,
         consumer_obj: consumer.Consumer[offers_amqp_pb2.TripPriceQuoteTask],
         producer_obj: producer.Producer,
-        offer_cache: cache.OffersCache,
+        cache_container: cache.Cache,
         benerail_client: client.BenerailClient,
+        benerail_adapter: adapter.BenerailAdapter,
         price_ttl: datetime.timedelta,
         provider_company_id: str,
     ):
-        self._offer_cache = offer_cache
+        self._offers_cache = cache_container.offers_cache
+        self._booking_offers_cache = cache_container.booking_offers_cache
+
         self._ttl = price_ttl
         self._consumer = consumer_obj
         self._producer = producer_obj
         self._benerail_client = benerail_client
+        self._adapter = benerail_adapter
         self._provider_company_id = provider_company_id
         self._logger = stdout.get_logger()
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
 
-    @tenacity.retry(
-        stop=tenacity.stop_after_attempt(3),
-        retry=tenacity.retry_if_exception_type(errors.HttpError),
-        wait=tenacity.wait_fixed(3),
-        reraise=True,
-    )
-    async def _get_offer_info(
-        self,
-        offer_id: str,
-        session_token: str | None = None,
-    ) -> response.GetOfferResponse:
-        return await self._benerail_client.offers_client.get_offer_info(
-            offer_id=offer_id,
-            session_token=session_token,
-        )
-
     async def _process_message(
         self,
         amqp_message: types.Message[offers_amqp_pb2.TripPriceQuoteTask],
     ) -> None:
-        offer_details = await self._offer_cache.fetch(amqp_message.body.option_id)
+        offer_details = await self._offers_cache.fetch(amqp_message.body.option_id)
 
         if not offer_details:
             return
 
-        expires_at = datetime.datetime.now(tz=datetime.UTC) + self._ttl
-        price_quote_id = await self._offer_cache.store(offer_details, expires_at)
-
         try:
-            offer_info = await self._get_offer_info(
-                offer_id=offer_details.offer_id,
-                session_token=offer_details.session_token,
+            get_offer_res = await self._adapter.find_offer(offer_details)
+        except adapter.OfferNotFoundError as ex:
+            self._logger.exception(
+                "Failed to match offer",
+                offer_details=offer_details.dict(),
+                offers=ex.offers,
+                trip_offer_responses=ex.trip_offer_responses,
             )
+
+            return
         except errors.HttpError:
             self._logger.exception(
                 "Failed to get offer for quotation",
-                offer_id=offer_details.offer_id,
-                br_session_token=offer_details.session_token,
+                offer_details=offer_details.dict(),
             )
 
             return
 
         price_quote_price_proto = money.from_string(
-            str(offer_info.response_result.price.amount),
+            str(get_offer_res.offer_obj.price.amount),
             money.Currency(
-                offer_info.response_result.price.currency.upper(),
+                get_offer_res.offer_obj.price.currency.upper(),
             ),
         ).protobuf()
+
+        expires_at = datetime.datetime.now(tz=datetime.UTC) + self._ttl
+        price_quote_id = await self._booking_offers_cache.store(
+            cache.BookingOfferDetails(
+                offer_id=get_offer_res.offer_obj.identifier,
+                price=str(get_offer_res.offer_obj.price.amount),
+                currency=money.Currency(
+                    get_offer_res.offer_obj.price.currency.upper(),
+                ),
+                dialogue_info=get_offer_res.dialogue_info,
+                passengers_info=get_offer_res.passengers_info,
+                departure_at=get_offer_res.departure_at,
+                session_token=offer_details.session_token,
+            ),
+            expires_at,
+        )
 
         await self._producer.publish(
             offers_amqp_pb2.TripPriceQuoteResult(
@@ -204,7 +208,7 @@ class PriceQuoteConsumer(object):
                     required_documents=[],
                     rules=await fare_rules.get_fare_rules(
                         benerail_client=self._benerail_client,
-                        offer_info=offer_info,
+                        offer_obj=get_offer_res.offer_obj,
                     ),
                 ),
                 provider_company_id=self._provider_company_id,
@@ -217,12 +221,12 @@ class OrdersConsumer(object):
     def __init__(  # noqa: WPS211
         self,
         consumer_obj: consumer.Consumer[orders_amqp_pb2.PlaceOrderTask],
-        offers_cache: cache.OffersCache,
+        booking_offers_cache: cache.BookingOffersCache,
         producer_obj: producer.Producer,
         bookings: booking.BookingHandler,
         provider_id: str,
     ):
-        self._cache = offers_cache
+        self._cache = booking_offers_cache
         self._consumer = consumer_obj
         self._producer = producer_obj
         self._bookings = bookings
@@ -236,13 +240,13 @@ class OrdersConsumer(object):
         self,
         message: types.Message[orders_amqp_pb2.PlaceOrderTask],
     ) -> None:
-        offer_details = await self._cache.fetch(
+        booking_offer_details = await self._cache.fetch(
             message.body.booking.trip_option.price_quote_id,
         )
         message.body.booking.provider_name = _PROVIDER_NAME
         message.body.booking.provider_id = self._provider_id
 
-        if not offer_details:
+        if not booking_offer_details:
             self._logger.warning(
                 "No offer details found for booking",
                 booking_id=message.body.booking.id,
@@ -254,13 +258,13 @@ class OrdersConsumer(object):
         try:
             booking_result = await self._bookings.create_booking(
                 task=message.body,
-                offer_details=offer_details,
+                booking_offer_details=booking_offer_details,
             )
         except errors.HttpError:
             self._logger.exception(
                 "Failed to create booking",
-                br_session_token=offer_details.session_token,
-                br_offer_id=offer_details.offer_id,
+                session_token=booking_offer_details.session_token,
+                br_offer_id=booking_offer_details.offer_id,
                 booking_id=message.body.booking.id,
             )
 

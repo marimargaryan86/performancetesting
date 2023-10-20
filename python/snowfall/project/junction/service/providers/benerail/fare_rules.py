@@ -8,7 +8,7 @@ from snowfall.stdlib.transport.http import errors
 from snowfall.vendor.benerail import client
 from snowfall.vendor.benerail.models.products import enums
 from snowfall.vendor.benerail.models.products import response as product_response
-from snowfall.vendor.benerail.models.trip_offers import response
+from snowfall.vendor.benerail.models.trip_offers import offer, response
 
 _logger = stdout.get_logger()
 
@@ -72,16 +72,16 @@ async def _get_products(
 
 async def get_fare_rules(
     benerail_client: client.BenerailClient,
-    offer_info: response.GetOfferResponse,
+    offer_obj: offer.Offer,
 ) -> list[models_pb2.FareRule]:
     try:
         offer_parts = await asyncio.gather(
             *(
                 benerail_client.offers_client.get_offer_part_info(
-                    offer_id=offer_info.response_result.identifier,
+                    offer_id=offer_obj.identifier,
                     offer_part_id=helper_functions.last_id_of_url(offer_part.href),
                 )
-                for offer_part in offer_info.response_result.offer_parts
+                for offer_part in offer_obj.offer_parts
             ),
         )
     except errors.HttpError:

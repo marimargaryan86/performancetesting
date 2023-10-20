@@ -29,6 +29,8 @@ _STATUS_MAPPING = types.MappingProxyType(
     },
 )
 
+_GATEWAY_GRPC_TIMEOUT_SECONDS = 15
+
 
 class BookingHandler(object):
     def __init__(
@@ -40,7 +42,9 @@ class BookingHandler(object):
         self._gateway = gateway
         self._bookings = fallback_bookings
         self._logger = stdout.get_logger()
-        self._timeout = timeout.total_seconds() if timeout else 10
+        self._timeout = (
+            timeout.total_seconds() if timeout else _GATEWAY_GRPC_TIMEOUT_SECONDS
+        )
 
     async def get_latest(  # noqa: WPS210
         self,
@@ -97,6 +101,8 @@ class BookingHandler(object):
         booking.status = _STATUS_MAPPING[provider_booking.status]
         booking.provider_id = provider_booking.provider.id
         booking.provider_name = provider_booking.provider.name
+        booking.ClearField("ticket_urls")
+        booking.ticket_urls.extend(provider_booking.ticket_urls)
         booking.trip_result.provider_booking_reference = provider_booking.id
         booking.trip_result.record_locator = provider_booking.trip.record_locator
         booking.trip_result.ClearField("operator_booking_references")

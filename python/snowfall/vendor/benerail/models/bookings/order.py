@@ -12,7 +12,7 @@ class Order(BenerailBaseModel):
     state: OrderStates | None = None
     selected_offers: list[ResourceLink] | None = None
     booked_offers: list[ResourceLink] | None = None
-    payment: list[ResourceLink] | None = None
+    payment: ResourceLink | None = None
 
 
 class OrderIdBody(BenerailBaseModel):

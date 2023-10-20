@@ -8,7 +8,7 @@ from aio_pika import abc
 from motor import motor_asyncio
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.provider import cabin_classes, notifications, offers
+from snowfall.project.junction.provider import cabin_classes, offers
 from snowfall.project.junction.service.providers.benerail import (
     adapter,
     cache,
@@ -21,7 +21,6 @@ from snowfall.stdlib import h3
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.service import application
-from snowfall.stdlib.transport.amqp import producer, types
 from snowfall.vendor.benerail import client
 
 _Impl = offers.OfferSearchImplementation[
@@ -56,7 +55,7 @@ async def offers_app(
         http_client=http_client,
     )
 
-    benerail_adapter = adapter.BenerailAdapter(
+    benerail_adapter = adapter.BenerailOffersAdapter(
         benerail_client=benerail_client,
         train_station_repository=train_stations.TrainStationRepository(
             train_stations=stations,
@@ -68,11 +67,6 @@ async def offers_app(
             client=redis.Client(redis_conn, prefix=app.name),
         ),
         ttl=app.settings.ttl,
-        notifier=notifications.LogNotifier(),
-        notifications_producer=producer.Producer(
-            amqp_conn,
-            types.Exchange("notifications"),
-        ),
     )
 
     return offers.OfferSearchImplementation(

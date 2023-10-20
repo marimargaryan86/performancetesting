@@ -64,7 +64,7 @@ def orders_factory(
                         filesystem.Storage.from_dsn(app.settings.storage_dsn),
                     ),
                 ),
-                offers_cache=cache.OffersCache(
+                booking_offers_cache=cache.BookingOffersCache(
                     client=redis_client,
                 ),
                 provider_id=provider_id,

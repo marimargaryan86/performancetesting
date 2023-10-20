@@ -20,13 +20,13 @@ class SearchCriteria(object):
     destination: str
     passenger_dobs: Sequence[datetime.date]
     outbound_departure_datetime: datetime.datetime
-    br_session_token: str
+    session_token: str
 
 
 def _generate_search_criteria(
     trip_criteria: segment_grouper.TripCriteria,
     passenger_dobs: Sequence[date_pb2.Date],
-    br_session_token: str,
+    session_token: str,
 ) -> Iterator[amqp_pb2.SearchCriteriaTask]:
     for origin, destination in trip_criteria.get_combinations():
         hour = trip_criteria.outbound.departure.hour
@@ -48,7 +48,7 @@ def _generate_search_criteria(
                         microsecond=0,
                     ),
                 ),
-                br_session_token=br_session_token,
+                br_session_token=session_token,
             ),
         )
 
@@ -83,7 +83,7 @@ class CriteriaGenerator(object):
                     passenger_dobs=[
                         passenger.date_of_birth for passenger in search.passengers
                     ],
-                    br_session_token=string.uuid(),
+                    session_token=string.uuid(),
                 ),
             )
 
@@ -118,5 +118,5 @@ class SearchCriteriaGenerator(object):
             outbound_departure_datetime=protobuf.protobuf_to_datetime(
                 search_task.criteria.outbound_departure_datetime,
             ),
-            br_session_token=search_task.criteria.br_session_token,
+            session_token=search_task.criteria.br_session_token,
         )

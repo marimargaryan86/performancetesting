@@ -569,8 +569,15 @@ class DictClient(Client):  # noqa: WPS214
             detail.booking_id = booking_id
 
 
+_GRPC_TIMEOUT_SECONDS = 15
+
+
 class GrpcClient(Client):  # noqa: WPS214
-    def __init__(self, orders: orders_pb2_grpc.OrderServiceStub, timeout: int = 10):
+    def __init__(
+        self,
+        orders: orders_pb2_grpc.OrderServiceStub,
+        timeout: int = _GRPC_TIMEOUT_SECONDS,
+    ):
         self._orders = orders
         self._timeout = timeout
 

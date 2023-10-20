@@ -57,7 +57,7 @@ async def _bookings_factory(
         ).raw_to_booking,
         enrich=booking.Enricher(
             benerail_client=benerail_client,
-        ).add_ticket_urls,
+        ).enrich,
     )
 
 
