@@ -10,6 +10,7 @@
 //   ],
 //   "generated_with_requirements": [
 //     "Faker==19.10.0",
+//     "Flake8-pyproject==1.2.3",
 //     "Pillow==10.1.0",
 //     "Shapely==2.0.2",
 //     "add-trailing-comma==3.1.0",
@@ -1677,13 +1678,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "fc465ca5a2eacc9b4ac9f2b5c04555d6b3aae00ab894baf9e66cd784989a031e",
-              "url": "https://files.pythonhosted.org/packages/40/23/9b0f74301a17339831833273753369bf132e22d9c418f8ddf1aa324f18a0/botocore_stubs-1.31.64-py3-none-any.whl"
+              "hash": "2f8c3b6b87c9560d2c161119182deb96e35535da84d9e067e96c8e5d2869c2d7",
+              "url": "https://files.pythonhosted.org/packages/a4/57/c6ca77b0387ebc87a9c747bcf8c7e2741d2df74f2c4cf63fb36b1a950e68/botocore_stubs-1.31.67-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "2b5b1bcef9759cd3202322753cbacd936b36aed03016e52387df32e1aa23330a",
-              "url": "https://files.pythonhosted.org/packages/28/e9/423f503663f0fd7682219657fd777131b3222d845247f157b873f85d17eb/botocore_stubs-1.31.64.tar.gz"
+              "hash": "f08ddaaab2ef82f5a3f06afe99d08865997babed7998ec4b182254aa3ad55ec4",
+              "url": "https://files.pythonhosted.org/packages/d3/72/3744a0b38157297eabb130ce29a92c0b87ecd2d35ec3ae7c5f153496ecf8/botocore_stubs-1.31.67.tar.gz"
             }
           ],
           "project_name": "botocore-stubs",
@@ -1692,7 +1693,7 @@
             "typing-extensions>=4.1.0; python_version < \"3.9\""
           ],
           "requires_python": "<4.0,>=3.7",
-          "version": "1.31.64"
+          "version": "1.31.67"
         },
         {
           "artifacts": [
@@ -2513,6 +2514,25 @@
           "artifacts": [
             {
               "algorithm": "sha256",
+              "hash": "6249fe53545205af5e76837644dc80b4c10037e73a0e5db87ff562d75fb5bd4a",
+              "url": "https://files.pythonhosted.org/packages/5f/1d/635e86f9f3a96b7ea9e9f19b5efe17a987e765c39ca496e4a893bb999112/flake8_pyproject-1.2.3-py3-none-any.whl"
+            }
+          ],
+          "project_name": "flake8-pyproject",
+          "requires_dists": [
+            "Flake8>=5",
+            "TOMLi; python_version < \"3.11\"",
+            "TOMLi<2; python_version < \"3.7\"",
+            "pyTest-cov; extra == \"dev\"",
+            "pyTest; extra == \"dev\""
+          ],
+          "requires_python": ">=3.6",
+          "version": "1.2.3"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
               "hash": "6e26892b632dacba517bf27219c459a8396dcfac0f5e8204904c5a4ba9b480e1",
               "url": "https://files.pythonhosted.org/packages/88/89/7c5a8e671c17ae49e4b89b06d9d2db5608eea7c66b04d70d27390da9ddb9/flake8-quotes-3.3.2.tar.gz"
             }
@@ -2815,13 +2835,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "c286cf298426064079ed96a9e4a9d39e7f3e9bf15ba60701e95f5492f28415c7",
-              "url": "https://files.pythonhosted.org/packages/21/a6/35f83efec687615c711fe0a09b67e58f6d1254db27b1013119de46f450bd/gitdb-4.0.10-py3-none-any.whl"
+              "hash": "81a3407ddd2ee8df444cbacea00e2d038e40150acfa3001696fe0dcf1d3adfa4",
+              "url": "https://files.pythonhosted.org/packages/fd/5b/8f0c4a5bb9fd491c277c21eff7ccae71b47d43c4446c9d0c6cff2fe8c2c4/gitdb-4.0.11-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "6eb990b69df4e15bad899ea868dc46572c3f75339735663b81de79b06f17eb9a",
-              "url": "https://files.pythonhosted.org/packages/4b/47/dc98f3d5d48aa815770e31490893b92c5f1cd6c6cf28dd3a8ae0efffac14/gitdb-4.0.10.tar.gz"
+              "hash": "bf5421126136d6d0af55bc1e7c1af1c397a34f5b7bd79e776cd3e89785c2b04b",
+              "url": "https://files.pythonhosted.org/packages/19/0d/bbb5b5ee188dec84647a4664f3e11b06ade2bde568dbd489d9d64adef8ed/gitdb-4.0.11.tar.gz"
             }
           ],
           "project_name": "gitdb",
@@ -2829,19 +2849,19 @@
             "smmap<6,>=3.0.1"
           ],
           "requires_python": ">=3.7",
-          "version": "4.0.10"
+          "version": "4.0.11"
         },
         {
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "9e98b672ffcb081c2c8d5aa630d4251544fb040fb158863054242f24a2a2ba30",
-              "url": "https://files.pythonhosted.org/packages/3c/ae/044453eacd5a526d3f242ccd77e38ee8219c65e0b132562b551bd67c61a4/GitPython-3.1.38-py3-none-any.whl"
+              "hash": "cf14627d5a8049ffbf49915732e5eddbe8134c3bdb9d476e6182b676fc573f8a",
+              "url": "https://files.pythonhosted.org/packages/8d/c4/82b858fb6483dfb5e338123c154d19c043305b01726a67d89532b8f8f01b/GitPython-3.1.40-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "4d683e8957c8998b58ddb937e3e6cd167215a180e1ffd4da769ab81c620a89fe",
-              "url": "https://files.pythonhosted.org/packages/b3/45/cee7af549b6fa33f04531e402693a772b776cd9f845a2cbeca99cfac3331/GitPython-3.1.38.tar.gz"
+              "hash": "22b126e9ffb671fdd0c129796343a02bf67bf2994b35449ffc9321aa755e18a4",
+              "url": "https://files.pythonhosted.org/packages/0d/b2/37265877ae607a2cbf9a471f4581dbf5ed13a501b90cb4c773f9ccfff3ea/GitPython-3.1.40.tar.gz"
             }
           ],
           "project_name": "gitpython",
@@ -2861,7 +2881,7 @@
             "typing-extensions>=3.7.4.3; python_version < \"3.8\""
           ],
           "requires_python": ">=3.7",
-          "version": "3.1.38"
+          "version": "3.1.40"
         },
         {
           "artifacts": [
@@ -6780,13 +6800,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "94a757d178c9be92ef5539b8840d48dc9cf1b2709c9d6b588232a055c524458b",
-              "url": "https://files.pythonhosted.org/packages/48/fe/a5c6cc46e9fe9171d7ecf0f33ee7aae14642f8d74baa7af4d7840f9358be/urllib3-1.26.17-py2.py3-none-any.whl"
+              "hash": "34b97092d7e0a3a8cf7cd10e386f401b3737364026c45e622aa02903dffe0f07",
+              "url": "https://files.pythonhosted.org/packages/b0/53/aa91e163dcfd1e5b82d8a890ecf13314e3e149c05270cc644581f77f17fd/urllib3-1.26.18-py2.py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "24d6a242c28d29af46c3fae832c36db3bbebcc533dd1bb549172cd739c82df21",
-              "url": "https://files.pythonhosted.org/packages/dd/19/9e5c8b813a8bddbfb035fa2b0c29077836ae7c4def1a55ae4632167b3511/urllib3-1.26.17.tar.gz"
+              "hash": "f8ecc1bba5667413457c529ab955bf8c67b45db799d159066261719e328580a0",
+              "url": "https://files.pythonhosted.org/packages/0c/39/64487bf07df2ed854cc06078c27c0d0abc59bd27b32232876e403c333a08/urllib3-1.26.18.tar.gz"
             }
           ],
           "project_name": "urllib3",
@@ -6804,7 +6824,7 @@
             "urllib3-secure-extra; extra == \"secure\""
           ],
           "requires_python": "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,>=2.7",
-          "version": "1.26.17"
+          "version": "1.26.18"
         },
         {
           "artifacts": [
@@ -7283,6 +7303,7 @@
   "prefer_older_binary": false,
   "requirements": [
     "Faker==19.10.0",
+    "Flake8-pyproject==1.2.3",
     "Pillow==10.1.0",
     "Shapely==2.0.2",
     "add-trailing-comma==3.1.0",

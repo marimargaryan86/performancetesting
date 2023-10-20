@@ -81,11 +81,14 @@ requirements = [
   "flake8-deprecated",
   "flake8-if-expr",
   "flake8-noqa",
+  "Flake8-pyproject",
   "setuptools",
   "wemake-python-styleguide",
 ]
-config = "vendor/setup.cfg"
+config = "vendor/.flake8"
 install_from_resolve = "python-default"
+extra_files = ["vendor/pyproject.toml"]
+args = ["--toml-config", "vendor/pyproject.toml"]
 source_plugins = [
   "python/snowfall/plugin/flake8/immutability.py",
   "python/snowfall/plugin/flake8/imports.py",

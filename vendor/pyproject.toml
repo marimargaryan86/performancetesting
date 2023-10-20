@@ -14,6 +14,92 @@ branch = true
 omit = ["*_pb2.py", "*_pb2_grpc.py"]
 relative_files = true
 
+[tool.flake8]
+format = "wemake"
+show-source = true
+statistics = false
+doctests = true
+extend-exclude = ["gubernator_pb2*"]
+max-complexity = 6
+max-imports = 18
+max-module-members = 12
+max-line-length = 88
+inline-quotes = "\""
+strictness = "long"
+i-control-code = true
+i-dont-control-code = false
+show-violation-links = true
+noqa-require-code = true
+forbidden-inline-ignore = ["SF20", "SF21", "SF22"]
+nested-classes-whitelist = ["Config"]
+select = [
+  "D0",   # flake8-deprecated
+  "I25",  # flake8-tidy-imports
+  "KEK",  # flake8-if-expr
+  "N400", # flake8-broken-line
+  "NQA0", # flake8-noqa
+  "NQA1", # flake8-noqa
+  "P1",   # flake8-string-format
+  "P2",   # flake8-string-format
+  "P3",   # flake8-string-format
+  "RST2", # flake8-rst-docstrings
+  "RST3", # flake8-rst-docstrings
+  "RST4", # flake8-rst-docstrings
+  "SF",   # snowfall.plugin.flake8
+  "WPS",  # wemake-python-styleguide
+]
+ignore = [
+  "NQA101", # noqa has no violations. Disabled due to Ruff incompatibility.
+  "NQA102", # noqa: X000 has no matching violations. Disabled due to Ruff incompatibility.
+  "NQA103", # noqa: X000, X001 has unmatched code(s), remove X001. Disabled due to Ruff incompatibility.
+  "RST303", # Unknown directive type. Disabled due to WPS incompatibility.
+  "RST304", # Unknown interpreted text role. Disabled due to WPS incompatibility.
+  "WPS113", # Found same alias import. Same as I250.
+  "WPS226", # Found string constant over-use. Doesn't really improve the code with current workarounds.
+  "WPS242", # Same as T20.
+  "WPS316", # Found context manager with too many assignments. Conflicts with SIM117.
+  "WPS317", # Found incorrect multi-line parameters. Disabled due to Black incompatibility.
+  "WPS323", # Found `%` string formatting
+  "WPS326", # Found implicit string concatenation
+  "WPS437", # Forbid protected attributes and methods. Same as SLF001.
+  "WPS451", # https://github.com/wemake-services/wemake-python-styleguide/issues/2712
+  "WPS508", # Found incorrect `not` with compare usage. Same as SIM203.
+  "WPS518", # Found implicit `enumerate()` call
+]
+per-file-ignores = [
+  "*_test.py:WPS118,WPS202,WPS204,WPS211,WPS214,WPS432,WPS442",
+  "conftest.py:WPS201,WPS202,WPS203,WPS235,WPS442",
+  "main.py:WPS201,WPS202,WPS210,WPS235,WPS432",
+  "python/snowfall/adapter/authentication.py:WPS202",
+  "python/snowfall/project/junction/extensions/service/mobile_api/repository.py:WPS202",
+  "python/snowfall/project/junction/extensions/service/mobile_api/resources.py:WPS202",
+  "python/snowfall/project/junction/go/fixtures.py:WPS202,WPS204",
+  "python/snowfall/project/junction/go/service/client_api/includes.py:WPS202",
+  "python/snowfall/project/junction/go/service/client_api/resources.py:WPS202",
+  "python/snowfall/project/junction/go/service/client_api/router.py:WPS201",
+  "python/snowfall/project/junction/go/service/client_api/routes/offers.py:WPS202",
+  "python/snowfall/project/junction/go/service/client_api/routes/orders.py:WPS202",
+  "python/snowfall/project/junction/go/service/gateway/trips.py:WPS201",
+  "python/snowfall/project/junction/hub/service/hub_api/resources.py:WPS201,WPS202",
+  "python/snowfall/project/junction/plus/service/poc_api/chatbot_utils.py:WPS202",
+  "python/snowfall/project/junction/provider/offers.py:WPS201",
+  "python/snowfall/project/junction/service/providers/ask2go/booking.py:WPS201",
+  "python/snowfall/project/junction/service/providers/benerail/adapter.py:WPS201",
+  "python/snowfall/project/junction/service/providers/benerail/booking.py:WPS201",
+  "python/snowfall/project/junction/service/providers/benerail/stations.py:WPS232",
+  "python/snowfall/project/junction/service/providers/save_a_train/adapter.py:WPS201",
+  "python/snowfall/project/pay/service/pay_api/resources.py:WPS202",
+  "python/snowfall/stdlib/format/hcl2.py:WPS202",
+  "python/snowfall/stdlib/persistence/filesystem.py:WPS402",
+  "python/snowfall/stdlib/persistence/mongo/normalizers.py:WPS202",
+  "python/snowfall/stdlib/service/application.py:WPS202",
+  "python/snowfall/vendor/ask2go/models/offers.py:WPS202",
+  "python/snowfall/vendor/carnect/models/*.py:SF10,WPS110,WPS114,WPS115,WPS118,WPS202,WPS420,WPS431,WPS604",
+  "python/snowfall/vendor/distribusion/jsonapi_helpers.py:WPS110",
+  "python/snowfall/vendor/distribusion/models/*.py:WPS202",
+  "python/snowfall/vendor/save_a_train/client.py:WPS201",
+]
+
 [tool.mypy]
 plugins = ["pydantic.mypy", "pydantic.v1.mypy"]
 check_untyped_defs = true

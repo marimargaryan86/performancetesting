@@ -1,0 +1,5 @@
+[flake8:local-plugins]
+    extension =
+        SF1 = snowfall.plugin.flake8.immutability:Plugin
+        # SF3 = snowfall.plugin.flake8.imports:Plugin
+        SF2 = snowfall.plugin.flake8.typing:Plugin
