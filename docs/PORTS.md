@@ -30,6 +30,7 @@ The following ports are configured in local environments by default:
 | 8009  | hub/web-api            | HTTP Server       |
 | 8010  | plus/webhooks          | HTTP Server       |
 | 8011  | zendesk_webhook        | HTTP Server       |
+| 8012  | plus-api               | HTTP Server       |
 | 50051 | echo                   | gRPC Server       |
 | 50052 | places                 | gRPC Server       |
 | 50053 | planner                | gRPC Server       |

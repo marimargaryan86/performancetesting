@@ -18,6 +18,7 @@ service SubscriberService {
   rpc GetSubscriberFromReseller(GetSubscriberFromResellerRequest) returns (GetSubscriberFromResellerResponse) {}
   rpc Unsubscribe(UnsubscribeRequest) returns (UnsubscribeResponse) {}
   rpc Subscribe(SubscribeRequest) returns (SubscribeResponse) {}
+  rpc UpdatePushNotificationToken(UpdatePushNotificationTokenRequest) returns (UpdatePushNotificationTokenResponse) {}
 }
 
 service ConfigurationVectorService {
@@ -100,6 +101,16 @@ message SubscribeRequest {
 }
 
 message SubscribeResponse {
+  bool is_success = 1;
+}
+
+message UpdatePushNotificationTokenRequest {
+  string reseller_id = 1;
+  string mobile_phone = 2;
+  string push_notification_token = 3;
+}
+
+message UpdatePushNotificationTokenResponse {
   bool is_success = 1;
 }
 

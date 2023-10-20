@@ -89,6 +89,7 @@ message Subscriber {
   }
   SubscribedStatus phone_subscription_status = 7;
   SubscribedStatus email_subscription_status = 8;
+  string push_notifications_token = 9;
 }
 
 message ConfigurationVector {

@@ -43,6 +43,15 @@ class Client(abc.ABC):
     ) -> bool:
         """Subscribe subscriber."""
 
+    @abc.abstractmethod
+    async def update_notification_token(
+        self,
+        reseller_id: str,
+        mobile_phone: str,
+        token: str,
+    ) -> bool:
+        """Update push notification token for subscriber with reseller_id and phone."""
+
 
 class DictClient(Client):
     def __init__(
@@ -101,6 +110,19 @@ class DictClient(Client):
         subscriber.phone_subscription_status = (
             notifications_models_pb2.Subscriber.SubscribedStatus.SUBSCRIBED_STATUS_SUBSCRIBED
         )
+
+        return True
+
+    async def update_notification_token(
+        self,
+        reseller_id: str,
+        mobile_phone: str,
+        token: str,
+    ) -> bool:
+        subscriber = self._subscribers.get(reseller_id)
+        if not subscriber:
+            raise errors.NotFoundError()
+        subscriber.push_notifications_token = token
 
         return True
 
@@ -166,6 +188,23 @@ class GrpcClient(Client):
             self._subscribers.Subscribe(
                 notifications_grpc_pb2.SubscribeRequest(
                     identifier=identifier,
+                ),
+            ),
+        )
+        return response.is_success
+
+    async def update_notification_token(
+        self,
+        reseller_id: str,
+        mobile_phone: str,
+        token: str,
+    ) -> bool:
+        response = await errors.handle_grpc_errors(
+            self._subscribers.Subscribe(
+                notifications_grpc_pb2.UpdatePushNotificationTokenRequest(
+                    reseller_id=reseller_id,
+                    mobile_phone=mobile_phone,
+                    push_notification_token=token,
                 ),
             ),
         )

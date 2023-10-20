@@ -87,7 +87,7 @@ class OrderService(
         )
 
 
-class SubscriberService(
+class SubscriberService(  # noqa: WPS214
     service.Service,
     notifications_pb2_grpc.SubscriberServiceServicer,
 ):
@@ -154,6 +154,20 @@ class SubscriberService(
         subscribe_status = await self._subscribers.subscribe(request.identifier)
         return notifications_pb2.SubscribeResponse(
             is_success=subscribe_status,
+        )
+
+    async def UpdatePushNotificationToken(  # type: ignore[override]  # noqa: N802
+        self,
+        request: notifications_pb2.UpdatePushNotificationTokenRequest,
+        context: aio.ServicerContext,
+    ) -> notifications_pb2.UpdatePushNotificationTokenResponse:
+        update_status = await self._subscribers.update_push_notifications_token(
+            request.reseller_id,
+            request.mobile_phone,
+            request.push_notification_token,
+        )
+        return notifications_pb2.UpdatePushNotificationTokenResponse(
+            is_success=update_status,
         )
 
 

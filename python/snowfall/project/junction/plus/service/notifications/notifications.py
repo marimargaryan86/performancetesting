@@ -153,6 +153,28 @@ class SubscriberRepository(
 
         return update.matched_count
 
+    async def update_push_notifications_token(
+        self,
+        reseller_id: str,
+        mobile_phone: str,
+        token: str,
+    ) -> bool:
+        update = await self._execute(
+            self._collection.update_one,
+            {
+                "reseller_id": reseller_id,
+                "phone_number.e164_number": mobile_phone,
+            },
+            {
+                "$set": {
+                    "push_notifications_token": token,
+                },
+            },
+            upsert=False,
+        )
+
+        return update.matched_count
+
 
 class ConfigurationVectorRepository(  # noqa: WPS215
     repository.ProtoRepository[models_pb2.ConfigurationVector],

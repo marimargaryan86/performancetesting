@@ -1,0 +1,11 @@
+{
+  "development": {
+    "deploy": false
+  },
+  "sandbox": {
+    "deploy": false
+  },
+  "production": {
+    "deploy": false
+  }
+}
