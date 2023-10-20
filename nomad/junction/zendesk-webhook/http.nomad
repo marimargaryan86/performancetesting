@@ -104,6 +104,15 @@ job "zendesk-webhook-http" {
     task "http" {
       driver = "docker"
 
+      template {
+        data        = <<EOH
+AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
+EOH
+        destination = "services.env"
+        env         = true
+        change_mode = "restart"
+      }
+
       config {
         image = var.docker_image
         ports = ["http", "prometheus"]

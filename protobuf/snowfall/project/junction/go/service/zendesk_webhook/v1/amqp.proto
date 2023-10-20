@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package snowfall.project.junction.go.service.zendesk_webhook.v1;
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/zendesk_webhook/v1";
+
+message TicketChangedEvent {
+  string ticket_id = 1;
+  string category = 2;
+  string status = 3;
+}
