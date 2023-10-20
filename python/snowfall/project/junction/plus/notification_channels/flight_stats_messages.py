@@ -40,35 +40,35 @@ _CODE_TO_MESSAGE: MappingProxyType[int, dict[str, Any]] = MappingProxyType(
         },
         models_pb2.Channel.CHANNEL_PUSH_NOTIFICATION: {
             "DGT": {
-                "title": _("Flight alert"),
+                "title": _("Departure gate has changed!"),
                 "body": _(
                     "Your gate for flight *{0}* > *{1}* has changed from *{2}* to"
                     " *{3}*",
                 ),
             },
             "DTM": {
-                "title": _("Flight alert"),
+                "title": _("Departure terminal has changed!"),
                 "body": _(
                     "Your terminal for flight *{0}* > *{1}* has changed from *{2}* to"
                     " *{3}*",
                 ),
             },
             "EGD": {
-                "title": _("Flight alert"),
+                "title": _("Your flight is getting delayed!"),
                 "body": _(
                     "Your flight *{0}* > *{1}* is delayed.\nOld time of departure:"
                     " {2}\nNew estimated time of departure: {3}",
                 ),
             },
             "DIV": {
-                "title": _("Flight alert"),
+                "title": _("Your flight has been diverted!"),
                 "body": _(
                     "Your flight from *{0}* > *{1}* has been diverted from *{2}* to"
                     " *{3}*",
                 ),
             },
             "BGG": {
-                "title": _("Flight alert"),
+                "title": _("Your bag pickup location has changed!"),
                 "body": _(
                     "Your bag pickup location for your flight from *{0}* > *{1}* has"
                     " changed from *{2}* to *{3}*",
