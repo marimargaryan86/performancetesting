@@ -3,6 +3,7 @@ import datetime
 import itertools
 from collections.abc import Iterable, Iterator, Sequence
 from dataclasses import dataclass
+from typing import Generic
 
 import more_itertools
 
@@ -33,7 +34,7 @@ class TripCriteria(object):
         )
 
 
-class SegmentGrouper(object):
+class SegmentGrouper(Generic[h3.MappedValue]):
     def __init__(self, h3_mapping: h3.H3MappingRepository[h3.MappedValue]):
         self._h3_mapping = h3_mapping
 
@@ -41,7 +42,7 @@ class SegmentGrouper(object):
         self,
         trips: Iterable[models_pb2.Trip],
         type_filter: models_pb2.Schedule.Type.ValueType,
-    ) -> Iterable[SubTrip]:
+    ) -> Iterator[SubTrip]:
         for trip in trips:
             yield from self._trip_to_sub_trips(trip, type_filter)
 
@@ -49,13 +50,13 @@ class SegmentGrouper(object):
         self,
         trip: models_pb2.Trip,
         type_filter: models_pb2.Schedule.Type.ValueType,
-    ) -> Iterable[SubTrip]:
+    ) -> Iterator[SubTrip]:
         segments: list[models_pb2.Segment] = []
 
         for segment in trip.segments:
             if more_itertools.first(segment.legs).type != type_filter:
                 if segments:
-                    yield self._create_sub_trip(trip=trip, segments=segments)
+                    yield from self._create_sub_trip(trip=trip, segments=segments)
                     segments.clear()
 
                 continue
@@ -63,26 +64,47 @@ class SegmentGrouper(object):
             segments.append(segment)
 
         if segments:
-            yield self._create_sub_trip(trip=trip, segments=segments)
+            yield from self._create_sub_trip(trip=trip, segments=segments)
 
-    def _create_sub_trip(
+    def _find_leg(  # noqa: WPS231,WPS210
+        self,
+        segments: Sequence[models_pb2.Segment],
+        *,
+        origin: bool,
+    ) -> tuple[set[h3.MappedValue], models_pb2.Leg | None]:
+        locations: set[h3.MappedValue] = set()
+        found_leg = None
+        while segments and not locations:
+            legs = (
+                segments[0].legs if origin else segments[-1].legs[::-1]  # noqa: WPS221
+            )
+            for leg in legs:
+                points = leg.origin if origin else leg.destination
+                locations = self._h3_mapping.find_mapped_values(
+                    coordinates=points.coordinates,
+                    neighbour_search_radius=1,
+                )
+                if locations:
+                    found_leg = leg
+                    break
+            if not locations:
+                segments = segments[1:] if origin else segments[:-1]
+        return locations, found_leg
+
+    def _create_sub_trip(  # noqa: WPS210
         self,
         trip: models_pb2.Trip,
         segments: Sequence[models_pb2.Segment],
-    ) -> SubTrip:
-        first_leg = more_itertools.first(more_itertools.first(segments).legs)
-        last_leg = more_itertools.last(more_itertools.last(segments).legs)
+    ) -> Iterator[SubTrip]:
+        origins, first_leg = self._find_leg(segments, origin=True)
+        destinations, last_leg = self._find_leg(segments, origin=False)
 
-        origins = self._h3_mapping.find_mapped_values(
-            coordinates=first_leg.origin.coordinates,
-            neighbour_search_radius=1,
-        )
-        destinations = self._h3_mapping.find_mapped_values(
-            coordinates=last_leg.destination.coordinates,
-            neighbour_search_radius=1,
-        )
+        if not origins or not destinations:
+            return
+        assert first_leg is not None  # noqa: S101
+        assert last_leg is not None  # noqa: S101
 
-        return SubTrip(
+        yield SubTrip(
             trip_id=trip.id,
             departure=protobuf.protobuf_to_datetime(
                 first_leg.departure_at,

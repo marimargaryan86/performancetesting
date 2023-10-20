@@ -349,6 +349,111 @@ _MULTISEGMENT_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
     ),
 )
 
+_MULTISEGMENT_NO_MAPPING_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
+    offer_search_id="MULTISEGMENTNOMAPPING",
+    search=models_pb2.TripOfferSearch(
+        trips=[
+            common_models_pb2.Trip(
+                id="TRIP1",
+                segments=[
+                    common_models_pb2.Segment(
+                        id="SEGMENT1",
+                        legs=[
+                            common_models_pb2.Leg(
+                                id="LEG1",
+                                origin=common_models_pb2.Point(
+                                    coordinates=latlng_pb2.LatLng(
+                                        latitude=0,
+                                        longitude=0,
+                                    ),
+                                ),
+                                destination=common_models_pb2.Point(
+                                    coordinates=latlng_pb2.LatLng(
+                                        latitude=57.667778,
+                                        longitude=12.294444,
+                                    ),
+                                ),
+                                departure_at=_IncrementalTime.get_time(),
+                                type=common_models_pb2.Schedule.TYPE_AIR,
+                            ),
+                            common_models_pb2.Leg(
+                                id="LEG2",
+                                origin=common_models_pb2.Point(
+                                    coordinates=latlng_pb2.LatLng(
+                                        latitude=57.667778,
+                                        longitude=12.294444,
+                                    ),
+                                ),
+                                destination=common_models_pb2.Point(
+                                    coordinates=latlng_pb2.LatLng(
+                                        latitude=0,
+                                        longitude=0,
+                                    ),
+                                ),
+                                departure_at=_IncrementalTime.get_time(),
+                                type=common_models_pb2.Schedule.TYPE_AIR,
+                            ),
+                        ],
+                    ),
+                    common_models_pb2.Segment(
+                        id="SEGMENT2",
+                        legs=[
+                            common_models_pb2.Leg(
+                                id="LEG3",
+                                origin=common_models_pb2.Point(
+                                    coordinates=latlng_pb2.LatLng(
+                                        latitude=0,
+                                        longitude=0,
+                                    ),
+                                ),
+                                destination=common_models_pb2.Point(
+                                    coordinates=latlng_pb2.LatLng(
+                                        latitude=51.470311,
+                                        longitude=-0.458118,
+                                    ),
+                                ),
+                                departure_at=_IncrementalTime.get_time(),
+                                type=common_models_pb2.Schedule.TYPE_AIR,
+                            ),
+                        ],
+                    ),
+                    common_models_pb2.Segment(
+                        id="SEGMENT3",
+                        legs=[
+                            common_models_pb2.Leg(
+                                id="LEG4",
+                                origin=common_models_pb2.Point(
+                                    coordinates=latlng_pb2.LatLng(
+                                        latitude=0,
+                                        longitude=0,
+                                    ),
+                                ),
+                                destination=common_models_pb2.Point(
+                                    coordinates=latlng_pb2.LatLng(
+                                        latitude=0,
+                                        longitude=0,
+                                    ),
+                                ),
+                                departure_at=_IncrementalTime.get_time(),
+                                type=common_models_pb2.Schedule.TYPE_AIR,
+                            ),
+                        ],
+                    ),
+                ],
+            ),
+        ],
+        passengers=[
+            models_pb2.Passenger(
+                date_of_birth=date_pb2.Date(
+                    year=2000,
+                    month=1,
+                    day=1,
+                ),
+            ),
+        ],
+    ),
+)
+
 _ROUNDTRIP_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
     offer_search_id="ROUNDTRIP",
     search=models_pb2.TripOfferSearch(
@@ -479,6 +584,17 @@ _ROUNDTRIP_SEARCH_TASK = amqp_pb2.TripOfferSearchTask(
             [
                 {
                     "origin": "ARN",
+                    "destination": "LHR",
+                    "outbound_tz": "Europe/Stockholm",
+                    "inbound_tz": "",
+                },
+            ],
+        ),
+        (
+            _MULTISEGMENT_NO_MAPPING_SEARCH_TASK,
+            [
+                {
+                    "origin": "GOT",
                     "destination": "LHR",
                     "outbound_tz": "Europe/Stockholm",
                     "inbound_tz": "",

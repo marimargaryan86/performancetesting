@@ -39,7 +39,7 @@ def h3_mapping() -> h3.H3MappingRepository[h3.MappedValue]:
 @pytest.fixture()
 def grouper(
     h3_mapping: h3.H3MappingRepository[h3.MappedValue],
-) -> segment_grouper.SegmentGrouper:
+) -> segment_grouper.SegmentGrouper[h3.MappedValue]:
     return segment_grouper.SegmentGrouper(h3_mapping)
 
 
@@ -127,7 +127,7 @@ def _generate_trips(
     ],
 )
 def test_trips_are_broken_into_sub_trips(
-    grouper: segment_grouper.SegmentGrouper,
+    grouper: segment_grouper.SegmentGrouper[h3.MappedValue],
     trips: Iterable[models_pb2.Trip],
     expected: int,
 ) -> None:
@@ -179,7 +179,7 @@ def test_trips_are_broken_into_sub_trips(
     ],
 )
 def test_sub_trips_segments_count(
-    grouper: segment_grouper.SegmentGrouper,
+    grouper: segment_grouper.SegmentGrouper[h3.MappedValue],
     trips: Iterable[models_pb2.Trip],
     expected_segments_count: Sequence[int],
 ) -> None:
