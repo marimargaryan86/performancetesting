@@ -40,6 +40,18 @@ class ResponseMetaData(object):
 class HttpError(Exception):
     """Raised when there is HTTP client-related issue."""
 
+    def __init__(
+        self,
+        message: str,
+        *,
+        request: RequestMetaData | None = None,
+        response: ResponseMetaData | None = None,
+    ):
+        super().__init__(message)
+
+        self.request = request
+        self.response = response
+
 
 class RequestError(HttpError):
     """Raised when a request fails."""
@@ -49,8 +61,9 @@ class RequestError(HttpError):
         message: str,
         request: RequestMetaData,
     ):
-        super().__init__(message)
-        self.request = request
+        self.request: RequestMetaData
+
+        super().__init__(message, request=request)
 
     @classmethod
     def from_error(cls, error: httpx.RequestError) -> RequestError:
@@ -71,11 +84,12 @@ class HttpStatusError(HttpError):
         response: ResponseMetaData,
         raw_response: httpx.Response,
     ):
-        super().__init__(status.description)
+        self.request: RequestMetaData
+        self.response: ResponseMetaData
+
+        super().__init__(status.description, request=request, response=response)
         self.body = body
         self.status = status
-        self.request = request
-        self.response = response
         self.raw_response = raw_response
 
     @classmethod
