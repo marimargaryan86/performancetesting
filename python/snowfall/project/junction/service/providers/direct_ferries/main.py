@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import contextlib
+import logging as core_logging
 import pathlib
 
 import httpx
@@ -186,6 +187,9 @@ async def _price_quotes(
 
 
 async def _create_gtfs(app: service.Application[config.GtfsSetting]) -> None:
+    httpx_logger = core_logging.getLogger("httpx")
+    httpx_logger.setLevel(core_logging.WARNING)
+
     output_path = pathlib.Path(app.settings.output_path)
     output_path.mkdir(parents=True, exist_ok=True)
 
