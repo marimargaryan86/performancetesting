@@ -4,6 +4,7 @@ import time
 from collections.abc import AsyncGenerator, Generator, Sequence
 from typing import Any
 
+import httpx
 import tenacity
 
 from snowfall.stdlib.logging import stdout
@@ -91,6 +92,25 @@ async def routes_for_operators(  # noqa: WPS231
                 yield route_ob
 
 
+@tenacity.retry(
+    stop=tenacity.stop_after_attempt(2),
+    retry=tenacity.retry_if_exception_type(httpx.HTTPError),
+    wait=tenacity.wait_fixed(5),
+    reraise=True,
+)
+async def _get_timetables(
+    df_client: client.DfHttpClient,
+    route_obj: route.Route,
+    date_from: datetime.datetime,
+    date_to: datetime.datetime,
+) -> timetable.TimetableResponse:
+    return await df_client.timetables.get_timetables(
+        route=route_obj,
+        date_from=date_from,
+        date_to=date_to,
+    )
+
+
 async def timetables_from_routes(
     df_client: client.DfClient,
     routes: Sequence[route.Route],
@@ -106,8 +126,8 @@ async def timetables_from_routes(
     return await _request_by_chunks(
         [
             [
-                df_client.timetables.get_timetables,
-                [route_obj, start_date, end_date],
+                _get_timetables,
+                [df_client, route_obj, start_date, end_date],
             ]
             for route_obj in routes
             for start_date, end_date in _chunk_datetime_interval(
