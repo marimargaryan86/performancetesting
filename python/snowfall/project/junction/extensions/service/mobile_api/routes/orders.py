@@ -354,8 +354,8 @@ class Markups(endpoints.HTTPEndpoint):
                 money.Currency(body["serviceFee"]["currency"]),
             ).protobuf(),
             agency_markup=money.from_string(
-                body["serviceFee"]["amount"],
-                money.Currency(body["serviceFee"]["currency"]),
+                body["agencyMarkup"]["amount"],
+                money.Currency(body["agencyMarkup"]["currency"]),
             ).protobuf(),
             total_to_collect=money.from_string(
                 body["totalToCollect"]["amount"],
