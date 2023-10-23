@@ -42,7 +42,7 @@ class TimedLeg(BenerailBaseModel):
 
 
 class Trip(BenerailBaseModel):
-    identifier: str | None = Field(None, alias="id")
+    identifier: str = Field(..., alias="id")
     duration: str | None = Field(
         None,
         description="Overall duration of the trip",

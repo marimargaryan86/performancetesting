@@ -182,7 +182,7 @@ class PriceQuoteConsumer(object):
                 currency=money.Currency(
                     get_offer_res.offer_obj.price.currency.upper(),
                 ),
-                dialogue_info=get_offer_res.dialogue_info,
+                dialogue_id=get_offer_res.dialogue_info.identifier,
                 passengers_info=get_offer_res.passengers_info,
                 departure_at=get_offer_res.departure_at,
                 session_token=offer_details.session_token,

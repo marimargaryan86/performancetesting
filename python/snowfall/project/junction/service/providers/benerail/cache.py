@@ -25,7 +25,7 @@ class BookingOfferDetails(RedisRecord):
     offer_id: str
     price: str
     currency: money.Currency
-    dialogue_info: helper_models.DialogueInfo
+    dialogue_id: str
     passengers_info: Sequence[helper_models.PassengerInfo]
     departure_at: str
     session_token: str | None = None

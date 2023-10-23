@@ -487,6 +487,16 @@ class BenerailOffersAdapter(BenerailAdapter):  # noqa: WPS214
         expires_at_dt = datetime.datetime.now(datetime.UTC) + self._ttl
 
         for trip_id, offer_ids in trip_id_offer_ids:
+            try:
+                trip = trip_map[trip_id]
+            except KeyError:
+                self._logger.warning(
+                    "Trip info not found, skipping offers",
+                    offer_ids=offer_ids,
+                    trip_id=trip_id,
+                )
+
+                continue
             segment_id = string.uuid()
             offers = []
 
@@ -499,8 +509,8 @@ class BenerailOffersAdapter(BenerailAdapter):  # noqa: WPS214
                 await self._offers_cache.store(
                     cache.OfferDetails(
                         passengers_dobs=[pax.date_of_birth for pax in passengers_info],
-                        origin_station=trip_map[trip_id].origin.place_value,
-                        destination_station=trip_map[trip_id].destination.place_value,
+                        origin_station=trip.origin.place_value,
+                        destination_station=trip.destination.place_value,
                         trip_id=trip_id,
                         outbound_departure_datetime=(
                             search_task.outbound_departure_datetime
@@ -525,7 +535,7 @@ class BenerailOffersAdapter(BenerailAdapter):  # noqa: WPS214
                 offers=offers,
                 segments=[
                     await self._parse_segment_info(
-                        trip=trip_map[trip_id],
+                        trip=trip,
                         segment_id=segment_id,
                     ),
                 ],
@@ -718,7 +728,22 @@ class BenerailOffersAdapter(BenerailAdapter):  # noqa: WPS214
             for trip_id in trip_ids
         ]
 
-        return {
-            trip_res.response_result.identifier: trip_res.response_result
-            for trip_res in await asyncio.gather(*get_trip_coroutines)
-        }
+        trip_map = {}
+
+        for get_trip_coroutine in asyncio.as_completed(get_trip_coroutines):
+            try:
+                get_trip_response = await get_trip_coroutine
+            except errors.HttpError as ex:
+                self._logger.warning(
+                    "Failed to get the trip",
+                    request=ex.request,
+                    response=ex.response,
+                )
+
+                continue
+
+            trip_map[get_trip_response.response_result.identifier] = (
+                get_trip_response.response_result
+            )
+
+        return trip_map

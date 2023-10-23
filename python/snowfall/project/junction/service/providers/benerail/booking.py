@@ -197,16 +197,19 @@ class BookingHandler(object):
         booking_offer_details: cache.BookingOfferDetails,
     ) -> models_pb2.Booking:
         new_booking = task.booking
+        dialogue_res = await self._client.dialogue.get_dialogue(
+            booking_offer_details.dialogue_id,
+        )
         etag_data = etag.EtagData(
             passenger_etags={
                 pax_info.identifier: pax_info.etag
                 for pax_info in booking_offer_details.passengers_info
             },
-            dialogue_etag=booking_offer_details.dialogue_info.etag,
+            dialogue_etag=dialogue_res.etag,
         )
 
         await self._update_passengers(
-            dialogue_id=booking_offer_details.dialogue_info.identifier,
+            dialogue_id=booking_offer_details.dialogue_id,
             passengers=task.passengers,
             contact_details=task.contact_details,
             etag_data=etag_data,
@@ -214,7 +217,7 @@ class BookingHandler(object):
         )
 
         booking_res = await self._client.bookings_client.create_booking(
-            dialogue_id=booking_offer_details.dialogue_info.identifier,
+            dialogue_id=booking_offer_details.dialogue_id,
             etag=etag_data.dialogue_etag,
             session_token=booking_offer_details.session_token,
         )
