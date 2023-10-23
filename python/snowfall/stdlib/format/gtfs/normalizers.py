@@ -23,7 +23,10 @@ def normalize_currency(currency: str | None) -> str | None:
     return currency
 
 
-def normalize_date(date: str | None) -> datetime.date | None:
+def normalize_date(date: datetime.date | str | None) -> datetime.date | None:
+    if isinstance(date, datetime.date):
+        return date
+
     if date is None:
         return None
 
