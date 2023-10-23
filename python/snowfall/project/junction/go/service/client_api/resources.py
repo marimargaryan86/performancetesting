@@ -733,6 +733,13 @@ class TripBookingResource(models.Resource):
                 ),
                 "externalReference": booking.trip_result.record_locator,
                 "ticketUrls": list(booking.ticket_urls),
+                "rules": [
+                    {
+                        "title": FareRule.from_proto(booking).title,
+                        "body": FareRule.from_proto(booking).body,
+                    }
+                    for booking in booking.trip_option.rules
+                ],
             },
             relationships={
                 "order": {

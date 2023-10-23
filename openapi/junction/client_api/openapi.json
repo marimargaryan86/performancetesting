@@ -6201,6 +6201,13 @@
                     "type": "string",
                     "example": "HDZEMS"
                   },
+                  "rules": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/OfferSegmentDetailRule"
+                    },
+                    "readOnly": true
+                  },
                   "ticketUrls": {
                     "type": "array",
                     "example": [

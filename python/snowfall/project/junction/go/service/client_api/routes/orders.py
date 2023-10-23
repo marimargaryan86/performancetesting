@@ -471,6 +471,7 @@ def _create_trip_option(
             for offer_segment in group.segments
         ],
         price=price_quote.price,
+        rules=price_quote.rules,
     )
 
 

@@ -119,6 +119,7 @@ message TripOption {
   string pay_quote_id = 6;
   repeated TripOptionDetails details = 2;
   snowfall.stdlib.v1.Money price = 3;
+  repeated snowfall.project.junction.go.service.offers.v1.FareRule rules = 7;
 }
 
 message TripOptionDetails {
