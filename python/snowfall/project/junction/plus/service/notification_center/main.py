@@ -26,6 +26,7 @@ class _ImportSettings(application.Settings):
     notifications_address: str
     twilio_sid: str
     twilio_token: str
+    firebase_key: str
     redis_dsn: Sequence[pydantic.AnyUrl]
     redis_prefix: str
 
@@ -71,7 +72,9 @@ async def _import(app: application.Application[_ImportSettings]) -> None:
                 redis_client=redis_client,
                 templates_root_path=pathlib.Path(),
             ),
-            push_notification_channel=push_notification.ProviderChannel(),
+            push_notification_channel=push_notification.ProviderChannel(
+                credentials=app.settings.firebase_key,
+            ),
         ),
     )
     await notification_event_importer.consume()

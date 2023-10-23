@@ -151,6 +151,7 @@ ignore_errors = true
 module = [
   "allure.*",            # https://github.com/allure-framework/allure-python/issues/731
   "authlib.*",           # https://github.com/lepture/authlib/issues/460
+  "firebase_admin.*",    # https://github.com/firebase/firebase-admin-python/issues/626
   "fsspec.*",            # https://github.com/fsspec/filesystem_spec/issues/625
   "furl.*",              # https://github.com/gruns/furl/issues/148
   "geopy.*",

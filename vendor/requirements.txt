@@ -21,6 +21,7 @@ docformatter==1.7.5
 email-validator==2.0.0.post2
 Faker==19.10.0
 fakeredis[lua]==2.19.0
+firebase-admin==6.2.0
 flake8==6.1.0
 flake8-deprecated==2.1.0
 flake8-if-expr==1.0.4

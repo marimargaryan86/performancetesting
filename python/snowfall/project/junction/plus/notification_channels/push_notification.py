@@ -1,4 +1,13 @@
+import json
 from collections.abc import Sequence
+
+import firebase_admin
+from firebase_admin import (
+    credentials as firebase_credentials,
+)
+from firebase_admin import (
+    messaging as firebase_messaging,
+)
 
 from snowfall.project.junction.plus.notification_channels.channel import AbstractChannel
 from snowfall.project.junction.plus.notification_channels.flight_stats_messages import (
@@ -96,6 +105,13 @@ class MockChannel(Channel):
 
 
 class ProviderChannel(Channel):
+    def __init__(
+        self,
+        credentials: str,
+    ):
+        firebase_cred = firebase_credentials.Certificate(json.loads(credentials))
+        self.firebase_app = firebase_admin.initialize_app(firebase_cred)
+
     async def order_confirmation(
         self,
         event: models_pb2.NotificationEvent,
@@ -181,4 +197,11 @@ class ProviderChannel(Channel):
         title: str | None = None,
         media_url: str | None = None,
     ) -> str:
-        return "Send push notification."
+        message = firebase_messaging.Message(
+            notification=firebase_messaging.Notification(
+                title=title,
+                body=body,
+            ),
+            token=receiver.push_notifications_token,
+        )
+        return firebase_messaging.send(message)
