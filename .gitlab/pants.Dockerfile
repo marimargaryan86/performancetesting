@@ -1,5 +1,5 @@
 ARG REGISTRY
-FROM ${REGISTRY}ubuntu:jammy@sha256:b4b521bfcec90b11d2869e00fe1f2380c21cbfcd799ee35df8bd7ac09e6f63ea
+FROM ${REGISTRY}ubuntu@sha256:b4b521bfcec90b11d2869e00fe1f2380c21cbfcd799ee35df8bd7ac09e6f63ea
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PATH=/usr/local/go/bin:$PATH
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -33,9 +33,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     consul-template=0.33.0-1 \
     docker-ce-cli \
     nomad=1.6.2-1 \
-    python3.9=3.9.18-1+jammy1 \
+    python3.9 \
     python3.9-distutils \
-    python3.11=3.11.5-1+jammy1 \
+    python3.11 \
     python3.11-distutils \
     /tmp/oasdiff.deb \
 && rm -rf /var/lib/apt/lists/* /tmp/oasdiff.deb \
