@@ -18,8 +18,10 @@ class _ResponseHandler(object):
             method=response.request.method,
             status_code=response.status_code,
             request_url=str(response.request.url),
+            request_headers=dict(response.request.headers),
             request=response.request.content,
             response=response.content,
+            response_headers=dict(response.headers),
             source="transport",
         )
 
