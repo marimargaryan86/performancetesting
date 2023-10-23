@@ -54,7 +54,7 @@ def generate_offer_aggregates(
     ]
 
 
-def generate_offer_aggregates_recursive(  # noqa: WPS210
+def generate_offer_aggregates_recursive(
     segment_ids: Sequence[str],
     segment_ids_to_offer_ids: Mapping[str, Sequence[str]],
     offer_ids_to_segment_ids: Mapping[str, Sequence[str]],
@@ -282,7 +282,7 @@ def _override_buckets(
     }
 
 
-def _set_sequence_numbers(  # noqa: WPS210
+def _set_sequence_numbers(
     offer_search: models_pb2.OfferSearch,
     offer: models_pb2.OfferGroup,
 ) -> None:

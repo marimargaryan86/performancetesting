@@ -134,7 +134,7 @@ class DfAdapter(object):
             ),
         )
 
-    async def gather_search_results(  # noqa: WPS210
+    async def gather_search_results(
         self,
         search_criteria: request.QuoteRequest,
     ) -> AsyncIterator[offer_models_pb2.OfferGroup]:

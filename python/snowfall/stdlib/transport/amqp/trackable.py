@@ -231,7 +231,7 @@ class TrackableProducer(protocol.Producer):
     def __init__(self, producer: protocol.Producer) -> None:
         self._producer = producer
 
-    async def publish(  # noqa: WPS211
+    async def publish(
         self,
         msg: message.Message,
         routing_key: str,

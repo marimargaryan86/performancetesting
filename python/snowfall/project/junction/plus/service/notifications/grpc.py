@@ -87,7 +87,7 @@ class OrderService(
         )
 
 
-class SubscriberService(  # noqa: WPS214
+class SubscriberService(
     service.Service,
     notifications_pb2_grpc.SubscriberServiceServicer,
 ):
@@ -232,7 +232,7 @@ class ConfigurationVectorService(
         )
 
 
-class MonitoringRuleService(  # noqa: WPS214
+class MonitoringRuleService(
     service.Service,
     notifications_pb2_grpc.MonitoringRuleServiceServicer,
 ):

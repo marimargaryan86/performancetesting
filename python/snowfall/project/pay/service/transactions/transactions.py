@@ -30,7 +30,7 @@ class TransactionsRepository(
             {selector: selection_value},
         )
 
-    async def list_transactions(  # noqa: WPS211
+    async def list_transactions(
         self,
         cursor: str,
         filter_by_ids: Sequence[str],

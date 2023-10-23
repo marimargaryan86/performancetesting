@@ -4,7 +4,7 @@ from snowfall.project.junction.go.service.resellers.v1 import models_pb2
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 
 
-class ResellerRepository(  # noqa: WPS215
+class ResellerRepository(
     repository.ProtoRepository[models_pb2.Reseller],
     mixins.FindByIdMixin[models_pb2.Reseller],
     mixins.InsertMixin[models_pb2.Reseller],

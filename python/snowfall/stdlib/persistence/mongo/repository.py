@@ -308,7 +308,7 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
             unmarshalled_cursor=unmarshalled_cursor,
         )
 
-    async def _find_nested(  # noqa: WPS210
+    async def _find_nested(
         self,
         filter_: Mapping[str, Any] | None = None,
         cur: str | None = None,

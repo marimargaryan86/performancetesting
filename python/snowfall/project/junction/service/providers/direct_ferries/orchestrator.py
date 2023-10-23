@@ -15,7 +15,7 @@ _DAYS_IN_YEAR = 365
 _DEFAULT_REQUEST_DATE_INTERVAL_DAYS = 30
 
 
-async def _request_by_chunks(  # noqa: WPS210
+async def _request_by_chunks(
     requests: Sequence[Sequence[Any]],
     requests_per_second: int = 59,
 ) -> Sequence[Any]:

@@ -1,7 +1,7 @@
 _BASE_IMAGE_SHA = "d97b08245cdceb142b25e9be03c8cea4d4e96b1d7e14bef64ca87a1f3212d23f"
 
 
-def nomad_template(  # noqa: WPS210
+def nomad_template(
     commands: list[str],  # noqa: SF20
     service_entry_point: str = "",
     name: str = "",

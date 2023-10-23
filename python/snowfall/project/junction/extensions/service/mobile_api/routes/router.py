@@ -4,7 +4,7 @@ from lagom.integrations import starlette
 from starlette import routing
 
 from snowfall.project.junction.extensions.service.mobile_api import repository
-from snowfall.project.junction.extensions.service.mobile_api.routes import (  # noqa: WPS235
+from snowfall.project.junction.extensions.service.mobile_api.routes import (
     enums,
     guests,
     loyalty_programs,

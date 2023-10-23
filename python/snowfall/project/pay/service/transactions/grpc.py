@@ -24,11 +24,11 @@ from snowfall.vendor.currency_cloud.errors import CurrencyCloudError
 from snowfall.vendor.currency_cloud.models import conversion
 
 
-class TransactionsService(  # noqa:WPS214
+class TransactionsService(
     service.Service,
     grpc_pb2_grpc.TransactionsServiceServicer,
 ):
-    def __init__(  # noqa: WPS211
+    def __init__(
         self,
         transactions: TransactionsRepository,
         conversions: ConversionsRepository,
@@ -103,7 +103,7 @@ class TransactionsService(  # noqa:WPS214
             transactions=[transaction async for transaction in transactions],
         )
 
-    async def CreateTransaction(  # type: ignore[override] # noqa: N802, WPS210, WPS217
+    async def CreateTransaction(  # type: ignore[override] # noqa: N802, WPS217
         self,
         request: grpc_pb2.CreateTransactionRequest,
         context: grpc.aio.ServicerContext,
@@ -176,7 +176,7 @@ class TransactionsService(  # noqa:WPS214
         return bill
 
 
-class QuotationsService(  # noqa: WPS214
+class QuotationsService(
     service.Service,
     grpc_pb2_grpc.QuotationsServiceServicer,
 ):
@@ -285,7 +285,7 @@ class QuotationsService(  # noqa: WPS214
 
         return rate
 
-    async def _handle_lock(  # noqa: WPS211
+    async def _handle_lock(
         self,
         session_token: str,
         currency_pair: str,
@@ -379,7 +379,7 @@ class ConversionsService(
         )
 
 
-class BillsService(  # noqa: WPS214
+class BillsService(
     service.Service,
     grpc_pb2_grpc.BillsServiceServicer,
 ):
@@ -425,7 +425,7 @@ class BillsService(  # noqa: WPS214
 
         return grpc_pb2.GetBillResponse(bill=bill)
 
-    async def CreateBill(  # type: ignore[override] # noqa: N802, WPS210
+    async def CreateBill(  # type: ignore[override] # noqa: N802
         self,
         request: grpc_pb2.CreateBillRequest,
         context: grpc.aio.ServicerContext,
@@ -436,7 +436,7 @@ class BillsService(  # noqa: WPS214
 
         return grpc_pb2.CreateBillResponse(bill=inserted_bill)
 
-    async def UpdateBillReconciliation(  # type: ignore[override] # noqa: N802, WPS210
+    async def UpdateBillReconciliation(  # type: ignore[override] # noqa: N802
         self,
         request: grpc_pb2.UpdateBillReconciliationRequest,
         context: grpc.aio.ServicerContext,

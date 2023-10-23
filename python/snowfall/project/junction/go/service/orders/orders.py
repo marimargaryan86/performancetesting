@@ -105,7 +105,7 @@ class JourneyRepository(repository.ProtoRepository[models_pb2.Journey]):
             else {}
         )
 
-        filter_ = _add_reseller_id_to_filter(reseller_id, filter_)  # noqa: WPS204
+        filter_ = _add_reseller_id_to_filter(reseller_id, filter_)
 
         return await self._find_with_cursor(
             cur=cursor,

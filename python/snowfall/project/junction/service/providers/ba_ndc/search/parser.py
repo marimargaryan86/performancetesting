@@ -60,7 +60,7 @@ def free_checked_baggage(
     )
 
 
-def _parse_segment_details(  # noqa: WPS210
+def _parse_segment_details(
     trips: Sequence[response_common_offer_schemas.Trip],
     offer_segments: Sequence[offer_models_pb2.OfferSegment],
     offers_adapter: OffersResponseAdapter,
@@ -155,7 +155,7 @@ def to_offer_penalty(
     )
 
 
-class OfferParser(object):  # noqa: WPS214
+class OfferParser(object):
     def __init__(
         self,
         offer_cache: cache.OfferCache,

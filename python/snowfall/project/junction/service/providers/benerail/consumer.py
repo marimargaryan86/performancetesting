@@ -115,7 +115,7 @@ class NotificationsConsumer(object):
 
 
 class PriceQuoteConsumer(object):
-    def __init__(  # noqa: WPS211
+    def __init__(
         self,
         consumer_obj: consumer.Consumer[offers_amqp_pb2.TripPriceQuoteTask],
         producer_obj: producer.Producer,
@@ -218,7 +218,7 @@ class PriceQuoteConsumer(object):
 
 
 class OrdersConsumer(object):
-    def __init__(  # noqa: WPS211
+    def __init__(
         self,
         consumer_obj: consumer.Consumer[orders_amqp_pb2.PlaceOrderTask],
         booking_offers_cache: cache.BookingOffersCache,

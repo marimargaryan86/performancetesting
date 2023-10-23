@@ -21,7 +21,7 @@ class OrderRepository(
         pymongo.IndexModel("bookings.route_identifier", background=True),
     )
 
-    async def create(  # noqa: WPS211
+    async def create(
         self,
         reseller_id: str,
         external_ref_id: str,
@@ -176,7 +176,7 @@ class SubscriberRepository(
         return update.matched_count
 
 
-class ConfigurationVectorRepository(  # noqa: WPS215
+class ConfigurationVectorRepository(
     repository.ProtoRepository[models_pb2.ConfigurationVector],
     mixins.FindByIdMixin[models_pb2.ConfigurationVector],
     mixins.InsertMixin[models_pb2.ConfigurationVector],
@@ -214,7 +214,7 @@ class ConfigurationVectorRepository(  # noqa: WPS215
         return update.acknowledged
 
 
-class MonitoringRuleRepository(  # noqa: WPS215
+class MonitoringRuleRepository(
     repository.ProtoRepository[models_pb2.MonitoringRule],
     mixins.FindByIdMixin[models_pb2.MonitoringRule],
     mixins.InsertMixin[models_pb2.MonitoringRule],

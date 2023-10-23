@@ -18,7 +18,7 @@ class BaseClient(object):
             client=client,
         )
 
-    async def _make_request(  # noqa: WPS211
+    async def _make_request(
         self,
         method: str,
         url: str,

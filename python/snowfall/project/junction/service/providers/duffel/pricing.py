@@ -31,7 +31,7 @@ from snowfall.vendor.rate_limiter import gubernator_pb2_grpc
 from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
 
-async def price_quotes(  # noqa: WPS210
+async def price_quotes(
     app: application.Application[PricingSettings],
 ) -> None:
     http_client = await app.stack.enter_async_context(
@@ -89,7 +89,7 @@ async def price_quotes(  # noqa: WPS210
 
 
 class PriceQuoteConsumer(object):
-    def __init__(  # noqa: WPS211
+    def __init__(
         self,
         consumer_obj: consumer.Consumer[offers_amqp_pb2.TripPriceQuoteTask],
         producer_obj: producer.Producer,
@@ -114,7 +114,7 @@ class PriceQuoteConsumer(object):
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
 
-    async def _process_message(  # noqa: WPS210
+    async def _process_message(
         self,
         amqp_message: amqp_types.Message[offers_amqp_pb2.TripPriceQuoteTask],
     ) -> None:

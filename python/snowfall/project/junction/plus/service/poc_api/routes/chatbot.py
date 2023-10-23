@@ -18,7 +18,7 @@ from snowfall.vendor.junction.go import client
 
 
 class Whatsapp(endpoints.HTTPEndpoint):
-    async def post(  # noqa: WPS210, WPS213, C901, WPS231, WPS217, WPS211, PLR0912, PLR0915
+    async def post(  # noqa: C901, WPS231, WPS217, PLR0912, PLR0915
         self,
         request: requests.Request,
         orders_repository: repository.OrdersRepository = lagom.injectable,

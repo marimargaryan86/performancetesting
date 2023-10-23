@@ -95,7 +95,7 @@ class PersonNameTypeBuilder(object):
         return self
 
 
-class AddressInfoBuilder(Generic[A]):  # noqa: WPS214
+class AddressInfoBuilder(Generic[A]):
     def __init__(self, address: A) -> None:
         self._address = address
 

@@ -63,7 +63,7 @@ async def _get_args(
     return request_args
 
 
-async def download_url(  # noqa: WPS210,WPS231
+async def download_url(  # noqa: WPS231
     settings: DownloadSettings,
     sess: httpx.AsyncClient,
     dataset: Dataset,

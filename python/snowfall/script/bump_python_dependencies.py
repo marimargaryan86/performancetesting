@@ -152,7 +152,7 @@ def _build_dependency(
     return Dependency(**kwargs, status=Status.available)
 
 
-def _main() -> None:  # noqa: WPS210
+def _main() -> None:
     if len(sys.argv) != 3:
         _log_error(
             "usage: {0} path/to/requirements.txt path/to/constraints.txt".format(

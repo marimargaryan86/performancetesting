@@ -9,7 +9,7 @@ from snowfall.stdlib.format import jsonapi
 
 
 class TestBeneficiary(object):
-    async def test_post_beneficiary(  # noqa: WPS210
+    async def test_post_beneficiary(
         self,
         client: httpx.AsyncClient,
         account: Account,

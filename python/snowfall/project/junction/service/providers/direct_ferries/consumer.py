@@ -26,7 +26,7 @@ TripSearchMessages = offers_amqp_pb2.TripOfferSearchTask | trackable_pb2.Trackab
 
 
 class PriceQuoteConsumer(object):
-    def __init__(  # noqa: WPS211
+    def __init__(
         self,
         consumer_obj: consumer.Consumer[offers_amqp_pb2.TripPriceQuoteTask],
         producer_obj: producer.Producer,

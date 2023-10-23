@@ -107,7 +107,7 @@ class StatusHandler(trackable.AnySizeStatusHandler):
 
 
 class OfferImporter(object):
-    def __init__(  # noqa: WPS211
+    def __init__(
         self,
         consumer_obj: consumer.Consumer[ExpectedMessages],
         trip_offers: offers.TripOfferRepository,

@@ -51,7 +51,7 @@ class MessageHandler(object):
         self._shortener_client = shortener_client
         self._logger = stdout.get_logger()
 
-    async def handle_message(  # noqa: WPS211,WPS210
+    async def handle_message(
         self,
         message: str,
         message_key: str,
@@ -230,7 +230,7 @@ async def trip_details(
     ]
 
 
-async def upcoming_trips(  # noqa: WPS210
+async def upcoming_trips(
     subscriber: models_pb2.Subscriber,
     orders_client: orders.Client,
     redis_client: redis.Client[str],
@@ -340,7 +340,7 @@ async def travel_assistant(
     ]
 
 
-async def plan_selected_trip(  # noqa: WPS211,WPS210
+async def plan_selected_trip(
     subscriber: models_pb2.Subscriber,
     configuration_vector: models_pb2.ConfigurationVector,
     orders_client: orders.Client,
@@ -408,7 +408,7 @@ async def check_in(
     raise RuntimeError("Check-in feature is not implemented yet.")
 
 
-async def handle_unknown(  # noqa: WPS211
+async def handle_unknown(
     subscriber: models_pb2.Subscriber,
     configuration_vector: models_pb2.ConfigurationVector,
     message: str,

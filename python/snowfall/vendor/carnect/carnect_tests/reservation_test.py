@@ -25,7 +25,7 @@ from snowfall.vendor.carnect.models.service import (
 
 
 @disable_by_default
-async def test_reservation(  # noqa: WPS210
+async def test_reservation(
     carnect_client: CarnectClient,
     carnect_config: Config,
     offers: Sequence[VehicleVendorAvailabilityType],
@@ -100,7 +100,7 @@ def _get_test_offer_id_context(
     return None
 
 
-def _init_test_driver(driver: CustomerPrimaryBuilder) -> None:  # noqa: WPS213
+def _init_test_driver(driver: CustomerPrimaryBuilder) -> None:
     driver.surname("Test")
     driver.given_name("Test")
     driver.email("testcheck@carnect.com")

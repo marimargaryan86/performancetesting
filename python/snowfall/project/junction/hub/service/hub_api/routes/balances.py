@@ -41,7 +41,7 @@ class Balances(endpoints.HTTPEndpoint):
             request=request,
         )
 
-    async def post(  # noqa: WPS211, WPS217
+    async def post(  # noqa: WPS217
         self,
         request: requests.Request,
         accounts_client: accounts_adapter.Client = lagom.injectable,

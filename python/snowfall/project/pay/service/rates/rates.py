@@ -11,7 +11,7 @@ from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 VALID_RATE_DAYS = 30
 
 
-class RatesRepository(  # noqa: WPS215
+class RatesRepository(
     repository.ProtoRepository[models_pb2.Rate],
     mixins.AllMixin[models_pb2.Rate],
     mixins.FindByIdMixin[models_pb2.Rate],

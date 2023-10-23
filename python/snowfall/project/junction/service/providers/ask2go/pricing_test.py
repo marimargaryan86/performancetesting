@@ -8,7 +8,7 @@ from snowfall.project.junction.service.providers.ask2go import (
 from snowfall.stdlib import money
 
 
-async def test_search_result_data(  # noqa: WPS218, WPS210
+async def test_search_result_data(  # noqa: WPS218
     pricing_adapter: pricing.Adapter,
     offer_transformer: transformer.OfferTransformer,
     magic_mocker: conftest.MagicMocker,

@@ -191,7 +191,7 @@ class BookingHandler(object):
         self._logger = stdout.get_logger()
         self._storage = booking_storage
 
-    async def create_booking(  # noqa: WPS210, WPS213, WPS217
+    async def create_booking(  # noqa: WPS217
         self,
         task: order_amqp_pb2.PlaceOrderTask,
         booking_offer_details: cache.BookingOfferDetails,
@@ -370,7 +370,7 @@ class BookingHandler(object):
             session_token=session_token,
         )
 
-    async def _update_order_state(  # noqa: WPS211
+    async def _update_order_state(
         self,
         booking_id: str,
         order_id: str,
@@ -401,7 +401,7 @@ class BookingHandler(object):
             session_token=session_token,
         )
 
-    async def _update_passengers(  # noqa: WPS210,WPS211
+    async def _update_passengers(
         self,
         dialogue_id: str,
         passengers: Sequence[models_pb2.Passenger],

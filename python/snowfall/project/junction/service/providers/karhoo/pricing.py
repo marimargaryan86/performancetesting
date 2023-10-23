@@ -42,7 +42,7 @@ async def price_quotes(
 
 
 class PriceQuoteConsumer(object):
-    def __init__(  # noqa: WPS211
+    def __init__(
         self,
         consumer_obj: amqp_consumer.Consumer[offers_amqp_pb2.TripPriceQuoteTask],
         producer_obj: producer.Producer,

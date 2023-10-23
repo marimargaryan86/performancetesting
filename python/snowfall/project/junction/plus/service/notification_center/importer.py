@@ -15,7 +15,7 @@ from snowfall.stdlib.transport.amqp import consumer, types
 
 
 class NotificationEventImporter(object):
-    def __init__(  # noqa: WPS211
+    def __init__(
         self,
         consumer_obj: consumer.Consumer[models_pb2.NotificationEvent],
         configuration_vectors: configuration_vectors_adapter.Client,

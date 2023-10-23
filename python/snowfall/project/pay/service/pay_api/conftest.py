@@ -56,7 +56,7 @@ def custom_middlewares() -> Sequence[Middleware]:
     ]
 
 
-def _create_app(  # noqa: WPS211
+def _create_app(
     quotations_client: quotations.Client,
     redis_repository: UserSessionRepository,
     currencies_client: currencies.Client,
@@ -84,7 +84,7 @@ def _create_app(  # noqa: WPS211
     return app
 
 
-def _create_admin_app(  # noqa: WPS211
+def _create_admin_app(
     authentication_client: auth.Client,
     payment_client: payments.GrpcClient,
     transactions_client: transactions.Client,

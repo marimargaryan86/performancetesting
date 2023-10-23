@@ -16,7 +16,7 @@ from snowfall.stdlib import money, string
 
 class Client(abc.ABC):
     @abc.abstractmethod
-    async def create(  # noqa: WPS211
+    async def create(
         self,
         from_currency: str,
         to_currency: str,
@@ -47,7 +47,7 @@ class DictClient(Client):
             quotation.id: quotation for quotation in quotations
         }
 
-    async def create(  # noqa: WPS211
+    async def create(
         self,
         from_currency: str,
         to_currency: str,
@@ -111,7 +111,7 @@ class GrpcClient(Client):
         self._quotations = quotations
         self._timeout = timeout
 
-    async def create(  # noqa: WPS211
+    async def create(
         self,
         from_currency: str,
         to_currency: str,

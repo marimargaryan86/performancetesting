@@ -105,7 +105,7 @@ tf_availability: dict[str, Any] = {
 }
 
 
-def create_boarding_pass(  # noqa: WPS210, WPS213
+def create_boarding_pass(
     order: Mapping[str, Any],
 ) -> Image.Image:
     width, height = 500, 600

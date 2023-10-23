@@ -76,7 +76,7 @@ class RequestError(HttpError):
 class HttpStatusError(HttpError):
     """Raised when a response is not 2XX."""
 
-    def __init__(  # noqa: WPS211
+    def __init__(
         self,
         body: Any,
         status: http.HTTPStatus,

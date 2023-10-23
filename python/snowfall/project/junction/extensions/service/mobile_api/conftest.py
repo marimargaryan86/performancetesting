@@ -349,7 +349,7 @@ def non_mocked_hosts() -> list[str]:
 
 
 @pytest.fixture()
-def app(  # noqa: WPS211
+def app(
     places_repository: repository.PlacesRepository,
     users_repository: repository.UsersRepository,
     guests_repository: repository.GuestsRepository,

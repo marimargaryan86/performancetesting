@@ -31,7 +31,7 @@ class ConsulClient(HttpClient):
 
         return response.content
 
-    async def put_key(self, key: str, value: bytes) -> bool:  # noqa: WPS110
+    async def put_key(self, key: str, value: bytes) -> bool:
         response = await self._make_request(
             http_client.RequestOptions(
                 method="PUT",

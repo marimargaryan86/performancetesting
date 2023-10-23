@@ -322,7 +322,7 @@ def _exception_message_from_response(response: httpx.Response) -> str:
 
 
 class _SATSearchApiClient(http_client.HttpClient):
-    def __init__(  # noqa: WPS211
+    def __init__(
         self,
         api_url: str,
         client: httpx.AsyncClient,
@@ -387,8 +387,8 @@ class _SATSearchApiClient(http_client.HttpClient):
         return GeneralSearchResponse(**response_data)
 
 
-class _SATApiClient(http_client.HttpClient):  # noqa: WPS214
-    def __init__(  # noqa: WPS211
+class _SATApiClient(http_client.HttpClient):
+    def __init__(
         self,
         api_url: str,
         token: str,
@@ -815,10 +815,10 @@ class _SATApiClient(http_client.HttpClient):  # noqa: WPS214
         }
 
 
-class SATClient(object):  # noqa: WPS214
+class SATClient(object):
     """Save A Train API client library."""
 
-    def __init__(  # noqa: WPS211
+    def __init__(
         self,
         email: str,
         password: str,

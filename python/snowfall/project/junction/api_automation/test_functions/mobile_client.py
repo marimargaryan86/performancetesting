@@ -48,7 +48,7 @@ _RESIDENCE_ADDRESS_KEY = "residenceAddress"
 _ADDRESS_KEY = "address"
 
 
-class MobileApiClient(Client):  # noqa: WPS214
+class MobileApiClient(Client):
     def __init__(
         self,
         base_url: str,
@@ -59,7 +59,7 @@ class MobileApiClient(Client):  # noqa: WPS214
         self.logger = logging.getLogger()
         self.logger.setLevel(logging.DEBUG)
 
-    def generate_curl_command(  # noqa: WPS211
+    def generate_curl_command(
         self,
         method: str,
         url: str,
@@ -131,7 +131,7 @@ class MobileApiClient(Client):  # noqa: WPS214
             payload=body,
         )
 
-    async def create_order(  # noqa: WPS211
+    async def create_order(
         self,
         quote_id: str,
         passengers: Sequence[models.Passenger],
@@ -185,7 +185,7 @@ class MobileApiClient(Client):  # noqa: WPS214
             url="/offers/quotes/{0}".format(offer_price_quote_id),
         )
 
-    async def create_order_with_payment(  # noqa: WPS211
+    async def create_order_with_payment(
         self,
         quote_id: str,
         passengers: Sequence[models.Passenger],
@@ -283,7 +283,7 @@ class MobileApiClient(Client):  # noqa: WPS214
             payload=body,
         )
 
-    async def add_user_group_member(  # noqa: WPS211
+    async def add_user_group_member(
         self,
         group_id: str,
         email: str | None = None,
@@ -324,7 +324,7 @@ class MobileApiClient(Client):  # noqa: WPS214
             payload=body,
         )
 
-    async def update_user_group_member(  # noqa: WPS211
+    async def update_user_group_member(
         self,
         member_id: str,
         email: str | None = None,
@@ -452,7 +452,7 @@ class MobileApiClient(Client):  # noqa: WPS214
             url="/users/groups/members/{0}".format(member_id),
         )
 
-    async def create_users(  # noqa: WPS211
+    async def create_users(
         self,
         first_name: str,
         last_name: str,
@@ -530,7 +530,7 @@ class MobileApiClient(Client):  # noqa: WPS214
             payload=body,
         )
 
-    async def update_user(  # noqa: WPS211
+    async def update_user(
         self,
         email: str | None = None,
         first_name: str | None = None,
@@ -572,7 +572,7 @@ class MobileApiClient(Client):  # noqa: WPS214
             payload=body,
         )
 
-    async def create_trip_candidates_search(  # noqa: WPS211
+    async def create_trip_candidates_search(
         self,
         origin: tuple[float, float],
         destination: tuple[float, float],

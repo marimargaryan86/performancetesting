@@ -25,7 +25,7 @@ class PayQuoteCompanyData(PayBaseModel):
 
 
 class PayQuoteCompany(PayBaseModel):
-    data: PayQuoteCompanyData  # noqa: WPS110
+    data: PayQuoteCompanyData
 
 
 class PayQuoteCurrencyData(PayBaseModel):
@@ -34,7 +34,7 @@ class PayQuoteCurrencyData(PayBaseModel):
 
 
 class PayQuoteCurrency(PayBaseModel):
-    data: PayQuoteCurrencyData  # noqa: WPS110
+    data: PayQuoteCurrencyData
 
 
 class PayQuoteRelationships(PayBaseModel):
@@ -55,8 +55,8 @@ class PayQuoteResponseData(PayQuoteData):
 
 
 class PayQuoteRequest(PayBaseModel):
-    data: PayQuoteData  # noqa: WPS110
+    data: PayQuoteData
 
 
 class PayQuoteResponse(PayBaseModel):
-    data: PayQuoteResponseData  # noqa: WPS110
+    data: PayQuoteResponseData

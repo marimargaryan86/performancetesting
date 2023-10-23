@@ -93,7 +93,7 @@ class LegsClient(base_client.BaseClient):
         return await self._make_request(
             method=_METHOD_GET,
             url="/segments/{0}/legs".format(segment_id),
-            query_parameters=base_client.make_pagination_params(  # noqa: WPS204
+            query_parameters=base_client.make_pagination_params(
                 limit,
                 cursor,
             ),
@@ -241,14 +241,14 @@ class TripsClient(base_client.BaseClient):
             base_client.make_pagination_params(limit, cursor),
         )
         if include:
-            query_parameters["include"] = include  # noqa: WPS204
+            query_parameters["include"] = include
         return await self._make_request(
             method=_METHOD_GET,
             url="/trips/searches/{0}/trips".format(trips_search_id),
             query_parameters=query_parameters,
         )
 
-    async def create_trip_candidates_search(  # noqa: WPS211
+    async def create_trip_candidates_search(
         self,
         origin: tuple[float, float],
         destination: tuple[float, float],
@@ -321,7 +321,7 @@ class TripsClient(base_client.BaseClient):
         )
 
 
-class Client(base_client.BaseClient):  # noqa: WPS214
+class Client(base_client.BaseClient):
     def legs(self) -> LegsClient:
         return LegsClient(base_url=str(self._base_url), client=self._client)
 
@@ -419,7 +419,7 @@ class Client(base_client.BaseClient):  # noqa: WPS214
             payload=body,
         )
 
-    async def get_offers_by_offer_search_id(  # noqa: WPS211
+    async def get_offers_by_offer_search_id(
         self,
         offers_search_id: str,
         cabin_class: Sequence[str] | None,
@@ -679,7 +679,7 @@ class Client(base_client.BaseClient):  # noqa: WPS214
             payload=body,
         )
 
-    async def create_order(  # noqa: WPS211
+    async def create_order(
         self,
         quote_id: str,
         passengers: Sequence[models.Passenger],

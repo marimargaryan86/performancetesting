@@ -31,7 +31,7 @@ class Settings(application.Settings):
     http_port: int = 80
 
 
-def create_starlette_app(  # noqa: WPS211
+def create_starlette_app(
     *,
     routes: Sequence[routing.BaseRoute],
     openapi_path: pathlib.Path | None,

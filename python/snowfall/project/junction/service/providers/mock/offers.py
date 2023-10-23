@@ -84,7 +84,7 @@ _AVERAGE_TIMES = types.MappingProxyType(
 )
 
 
-def _calculate_reasonable_price(  # noqa: WPS210
+def _calculate_reasonable_price(
     travel_type: common_pb2.Schedule.Type.ValueType,
     departure: timestamp_pb2.Timestamp,
     arrival: timestamp_pb2.Timestamp,
@@ -134,7 +134,7 @@ class Generator(object):
         self._cache = option_cache
         self._ttl = ttl
 
-    async def generate(  # noqa: WPS210
+    async def generate(
         self,
         search: Criteria,
     ) -> AsyncIterator[offers_pb2.OfferGroup]:

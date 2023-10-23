@@ -147,7 +147,7 @@ def _validate_residence_address(
     return validation_errors
 
 
-def _validate_passport_information(  # noqa: WPS210
+def _validate_passport_information(
     required_fields: Sequence[Any],
     passengers: Sequence[Any],
     quote_id: str,

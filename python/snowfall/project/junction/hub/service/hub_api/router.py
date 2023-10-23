@@ -2,7 +2,7 @@ import lagom
 from lagom.integrations import starlette
 from starlette import routing
 
-from snowfall.project.junction.hub.service.hub_api.routes import (  # noqa: WPS235
+from snowfall.project.junction.hub.service.hub_api.routes import (
     accounts,
     balances,
     beneficiaries,

@@ -66,7 +66,7 @@ class SegmentGrouper(Generic[h3.MappedValue]):
         if segments:
             yield from self._create_sub_trip(trip=trip, segments=segments)
 
-    def _find_leg(  # noqa: WPS231,WPS210
+    def _find_leg(  # noqa: WPS231
         self,
         segments: Sequence[models_pb2.Segment],
         *,
@@ -75,9 +75,7 @@ class SegmentGrouper(Generic[h3.MappedValue]):
         locations: set[h3.MappedValue] = set()
         found_leg = None
         while segments and not locations:
-            legs = (
-                segments[0].legs if origin else segments[-1].legs[::-1]  # noqa: WPS221
-            )
+            legs = segments[0].legs if origin else segments[-1].legs[::-1]
             for leg in legs:
                 points = leg.origin if origin else leg.destination
                 locations = self._h3_mapping.find_mapped_values(
@@ -91,7 +89,7 @@ class SegmentGrouper(Generic[h3.MappedValue]):
                 segments = segments[1:] if origin else segments[:-1]
         return locations, found_leg
 
-    def _create_sub_trip(  # noqa: WPS210
+    def _create_sub_trip(
         self,
         trip: models_pb2.Trip,
         segments: Sequence[models_pb2.Segment],

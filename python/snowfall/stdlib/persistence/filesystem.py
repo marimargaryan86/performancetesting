@@ -207,7 +207,7 @@ class _AsyncMemoryFile(asyn.AbstractAsyncStreamedFile):
     async def read(self, length: int | None = -1) -> bytes:
         return self._file_handle.read(length)
 
-    async def write(self, data: bytes) -> int:  # noqa: WPS110
+    async def write(self, data: bytes) -> int:
         return self._file_handle.write(data)
 
     async def _fetch_range(self, start: int, end: int) -> Any:
@@ -217,7 +217,7 @@ class _AsyncMemoryFile(asyn.AbstractAsyncStreamedFile):
         raise NotImplementedError
 
 
-class _AsyncMemoryFileSystem(  # noqa: WPS214
+class _AsyncMemoryFileSystem(
     memory.MemoryFileSystem,
     asyn.AsyncFileSystem,
 ):
@@ -241,7 +241,7 @@ class _AsyncMemoryFileSystem(  # noqa: WPS214
     async def _pipe_file(
         self,
         path: str,
-        value: bytes,  # noqa: WPS110
+        value: bytes,
         **kwargs: Any,
     ) -> memory.MemoryFile:
         return self.pipe_file(path, value, **kwargs)
@@ -261,7 +261,7 @@ class _AsyncMemoryFileSystem(  # noqa: WPS214
     async def _get_file(self, rpath: str, lpath: str, **kwargs: Any) -> None:
         return self.get_file(rpath, lpath, **kwargs)
 
-    async def _info(self, path: str, **kwargs: Any) -> dict[str, Any]:  # noqa: WPS110
+    async def _info(self, path: str, **kwargs: Any) -> dict[str, Any]:
         return self.info(path, **kwargs)
 
     async def _ls(

@@ -110,7 +110,7 @@ class Order(endpoints.HTTPEndpoint):
 
 
 class Orders(endpoints.HTTPEndpoint):
-    async def get(  # noqa: WPS210
+    async def get(
         self,
         request: requests.Request,
         orders_repository: repository.OrdersRepository = lagom.injectable,
@@ -155,7 +155,7 @@ class Orders(endpoints.HTTPEndpoint):
         return stdlib_models.JsonApiResponse(response_body)
 
     @validators.voucher_validator
-    async def post(  # noqa: WPS211, WPS210, WPS217
+    async def post(  # noqa: WPS217
         self,
         request: requests.Request,
         voucher: models_pb2.Voucher | None,
@@ -277,7 +277,7 @@ class Orders(endpoints.HTTPEndpoint):
 
 
 class CancellationRequest(endpoints.HTTPEndpoint):
-    async def post(  # noqa: WPS210
+    async def post(
         self,
         request: requests.Request,
         junction_client: client.Client = lagom.injectable,

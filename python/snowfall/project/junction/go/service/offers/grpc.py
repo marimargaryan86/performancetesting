@@ -82,13 +82,13 @@ class OfferSearchService(service.Service, grpc_pb2_grpc.OfferSearchServiceServic
         return grpc_pb2.ListOfferSearchesResponse(offer_searches=searches)
 
 
-class OfferService(service.Service, grpc_pb2_grpc.OfferServiceServicer):  # noqa: WPS214
+class OfferService(service.Service, grpc_pb2_grpc.OfferServiceServicer):
     _sort_mapping: typing.ClassVar = {
         "id": "_id",
         "created_at": "created_at",
     }
 
-    def __init__(  # noqa: WPS211
+    def __init__(
         self,
         offer_aggregates: offers.OfferAggregateMappingRepository,
         offer_results: offers.TripOfferRepository,

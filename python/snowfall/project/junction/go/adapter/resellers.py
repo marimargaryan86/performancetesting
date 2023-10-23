@@ -14,9 +14,9 @@ from snowfall.project.junction.go.service.resellers.v1 import (
 from snowfall.stdlib import sequence, string
 
 
-class Client(abc.ABC):  # noqa: WPS214
+class Client(abc.ABC):
     @abc.abstractmethod
-    async def list_resellers(  # noqa: WPS211
+    async def list_resellers(
         self,
         limit: int | None = None,
         cursor: str | None = None,
@@ -110,7 +110,7 @@ class DictClient(Client):
         return self._resellers[reseller.id]
 
 
-class GrpcClient(Client):  # noqa: WPS214
+class GrpcClient(Client):
     def __init__(
         self,
         resellers: resellers_pb2_grpc.ResellerServiceStub,
@@ -119,7 +119,7 @@ class GrpcClient(Client):  # noqa: WPS214
         self._resellers = resellers
         self._timeout = timeout
 
-    async def list_resellers(  # noqa: WPS211
+    async def list_resellers(
         self,
         limit: int | None = None,
         cursor: str | None = None,

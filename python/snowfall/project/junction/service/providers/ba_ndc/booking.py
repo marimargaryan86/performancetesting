@@ -159,7 +159,7 @@ class BookingHandler(object):
 
         return new_booking
 
-    async def _make_booking(  # noqa: WPS210
+    async def _make_booking(
         self,
         task: amqp_pb2.PlaceOrderTask,
         details: cache.OfferDetails,

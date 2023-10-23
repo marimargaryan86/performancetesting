@@ -23,7 +23,7 @@ message_split_point = 1300
 
 
 class IncomingMessages(endpoints.HTTPEndpoint):
-    async def post(  # noqa: WPS210, WPS211
+    async def post(
         self,
         request: requests.Request,
         orders_client: orders.Client = lagom.injectable,

@@ -27,7 +27,7 @@ from snowfall.stdlib.transport.amqp import consumer, producer, types
 
 
 class OrderImporter(object):
-    def __init__(  # noqa: WPS211
+    def __init__(
         self,
         consumer_obj: consumer.Consumer[amqp_pb2.IncomingOrder],
         producer_obj: producer.Producer,

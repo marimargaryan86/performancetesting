@@ -74,7 +74,7 @@ The year is 2023
     def __init__(self) -> None:
         self._logger = stdout.get_logger()
 
-    async def handle_prompt(  # noqa: WPS211, WPS210, WPS217
+    async def handle_prompt(  # noqa: WPS217
         self,
         message: str,
         mobile_phone: str,
@@ -158,7 +158,7 @@ async def get_place(key: str) -> Any:
         raise RuntimeError("Can't find a place with that name: {0}".format(key))
 
 
-async def fetch_trip_offers_wrapper(  # noqa: WPS211,
+async def fetch_trip_offers_wrapper(  # ,
     departure_loc: str,
     arrival_loc: str,
     departure_at: str,
@@ -184,7 +184,7 @@ async def fetch_trip_offers_wrapper(  # noqa: WPS211,
         )
 
 
-async def fetch_trip_offers(  # noqa: WPS211,WPS217,WPS210
+async def fetch_trip_offers(  # noqa: WPS217
     departure_loc: str,
     arrival_loc: str,
     departure_at: str,

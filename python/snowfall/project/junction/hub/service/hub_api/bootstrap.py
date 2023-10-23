@@ -2,7 +2,7 @@ import lagom
 
 from snowfall.project.junction.go.adapter import orders, resellers
 from snowfall.project.junction.hub.service.hub_api import includes
-from snowfall.project.pay.adapter import (  # noqa: WPS235
+from snowfall.project.pay.adapter import (
     accounts,
     beneficiaries,
     bills,
@@ -17,7 +17,7 @@ from snowfall.project.pay.adapter import (  # noqa: WPS235
 from snowfall.vendor.currency_cloud import client
 
 
-def create_dependencies(  # noqa: WPS211
+def create_dependencies(
     orders_client: orders.Client,
     accounts_client: accounts.Client,
     contacts_client: contacts.Client,

@@ -29,7 +29,7 @@ class PayQuotes(object):
         self._offer_options_repository = offer_options_repository
         self._logger = stdout.get_logger()
 
-    async def get_offer_search_quotes(  # noqa: WPS210
+    async def get_offer_search_quotes(
         self,
         search_result: TripOfferSearchResult,
         session_token: str,
@@ -75,7 +75,7 @@ class PayQuotes(object):
         )
         return search_result
 
-    async def get_price_quote_quotes(  # noqa: WPS210
+    async def get_price_quote_quotes(
         self,
         session_token: str,
         search_result: TripPriceQuoteResult,
@@ -154,7 +154,7 @@ class PayQuotes(object):
 
         return base_fare.amount, tax.amount if tax else None, base_fare.currency.code
 
-    async def _get_quote(  # noqa: WPS211
+    async def _get_quote(
         self,
         amount: int,
         session_token: str,

@@ -39,7 +39,7 @@ class Client(abc.ABC):
         """Fetch a transaction resource."""
 
     @abc.abstractmethod
-    async def find(  # noqa: WPS211
+    async def find(
         self,
         filter_by: Sequence[str],
         filter_by_bill_ids: Sequence[str],
@@ -114,7 +114,7 @@ class DictClient(Client):
             raise errors.NotFoundError()
         return transaction
 
-    async def find(  # noqa: WPS211
+    async def find(
         self,
         filter_by: Sequence[str],
         filter_by_bill_ids: Sequence[str],
@@ -201,7 +201,7 @@ class GrpcClient(Client):
 
         return response.transaction
 
-    async def find(  # noqa: WPS211
+    async def find(
         self,
         filter_by: Sequence[str],
         filter_by_bill_ids: Sequence[str],

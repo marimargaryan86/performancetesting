@@ -13,7 +13,7 @@ class Logger(Protocol):
     def debug(self, event: str, *args: Any, **kw: Any) -> None:
         """Log at **debug** level."""
 
-    def info(self, event: str, *args: Any, **kw: Any) -> None:  # noqa: WPS110
+    def info(self, event: str, *args: Any, **kw: Any) -> None:
         """Log at **info** level."""
 
     def warning(self, event: str, *args: Any, **kw: Any) -> None:

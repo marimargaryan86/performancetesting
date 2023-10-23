@@ -69,7 +69,7 @@ class CompaniesService(
         company = await self._companies.find_by_id(request.id)
 
         if not company:
-            return await context.abort(grpc.StatusCode.NOT_FOUND)  # noqa: WPS204
+            return await context.abort(grpc.StatusCode.NOT_FOUND)
 
         return grpc_pb2.GetCompanyResponse(company=company)
 
@@ -306,13 +306,13 @@ class ContactsService(service.Service, grpc_pb2_grpc.ContactsServiceServicer):
         return grpc_pb2.UpdateContactReferenceResponse(contact=contact)
 
 
-class BeneficiariesService(  # noqa: WPS214
+class BeneficiariesService(
     service.Service,
     grpc_pb2_grpc.BeneficiariesServiceServicer,
-):  # noqa: WPS214
+):
     _default_page_size = 20
 
-    def __init__(  # noqa: WPS211
+    def __init__(
         self,
         beneficiaries: repositories.BeneficiaryRepository,
         companies: repositories.CompaniesRepository,
@@ -332,7 +332,7 @@ class BeneficiariesService(  # noqa: WPS214
     def register(self, server: grpc.aio.Server) -> None:
         grpc_pb2_grpc.add_BeneficiariesServiceServicer_to_server(self, server)
 
-    async def CreateBeneficiary(  # type: ignore[override] # noqa: N802, WPS217, WPS210
+    async def CreateBeneficiary(  # type: ignore[override] # noqa: N802, WPS217
         self,
         request: grpc_pb2.CreateBeneficiaryRequest,
         context: grpc.aio.ServicerContext,
@@ -412,7 +412,7 @@ class BeneficiariesService(  # noqa: WPS214
 
         return grpc_pb2.CreateBeneficiaryResponse(beneficiary=beneficiary)
 
-    async def UpdateBeneficiary(  # type: ignore[override] # noqa: N802, WPS217, WPS210, WPS231, WPS213
+    async def UpdateBeneficiary(  # type: ignore[override] # noqa: N802, WPS217, WPS231
         self,
         request: grpc_pb2.UpdateBeneficiaryRequest,
         context: grpc.aio.ServicerContext,
@@ -517,7 +517,7 @@ class BeneficiariesService(  # noqa: WPS214
             ),
         )
 
-    async def ListBeneficiaries(  # type: ignore[override] # noqa: N802, WPS210, WPS231
+    async def ListBeneficiaries(  # type: ignore[override] # noqa: N802, WPS231
         self,
         request: grpc_pb2.ListBeneficiariesRequest,
         context: grpc.aio.ServicerContext,

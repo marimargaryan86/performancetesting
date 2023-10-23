@@ -40,7 +40,7 @@ def _fares_sort_key(
     return elem.corporate_code or "", elem.tracking_reference or ""
 
 
-def _generate_private_fares_keys(  # noqa: WPS210
+def _generate_private_fares_keys(
     private_fares: Mapping[str, Sequence[PrivateFare]],
 ) -> Sequence[str]:
     return [
@@ -104,7 +104,7 @@ class SearchCriteriaWrapper(object):
 
 
 class DuffelSearchAdapter(object):
-    def __init__(  # noqa: WPS211
+    def __init__(
         self,
         resellers_map: Mapping[str, Mapping[str, Any]],
         duffel_client_factory: DuffelClientFactory,
@@ -190,7 +190,7 @@ class DuffelSearchAdapter(object):
             ),
         )
 
-    async def gather_search_results(  # noqa: WPS210
+    async def gather_search_results(
         self,
         search_criteria_wrapper: SearchCriteriaWrapper,
     ) -> AsyncIterator[offer_models_pb2.OfferGroup]:

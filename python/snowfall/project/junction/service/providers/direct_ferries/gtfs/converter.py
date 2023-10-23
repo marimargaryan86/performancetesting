@@ -33,7 +33,7 @@ class StopTimeFields(pydantic.BaseModel):
     stop_sequence: int
 
 
-class DFDataConverter(object):  # noqa: WPS214
+class DFDataConverter(object):
     def __init__(
         self,
         timetable_responses: Sequence[df_timetable_models.TimetableResponse],

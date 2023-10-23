@@ -164,7 +164,7 @@ def _trip_search_can_be_fulfilled(
 
 
 class TripCandidateSearchConsumer(object):
-    def __init__(  # noqa: WPS211
+    def __init__(
         self,
         consumer_obj: consumer.Consumer[amqp_pb2.TripCandidateSearchTask],
         trip_repository: trips.TripRepository,

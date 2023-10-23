@@ -58,7 +58,7 @@ async def user(
     return user
 
 
-def _create_app(  # noqa: WPS211
+def _create_app(
     authentication_client: auth_adapter.Client,
     legs_client: legs.Client,
     locations_client: locations.Client,
@@ -131,7 +131,7 @@ async def mock_jwt_to_reseller_id(token: str) -> str:
 
 
 @pytest.fixture()
-def app(  # noqa: WPS211
+def app(
     authentication_client: auth_adapter.DictClient,
     legs_client: legs.Client,
     locations_client: locations.Client,

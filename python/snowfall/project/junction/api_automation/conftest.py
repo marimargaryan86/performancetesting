@@ -104,7 +104,7 @@ def host(
 
 def pytest_collection_modifyitems(
     config: pytest.Config,
-    items: Sequence[pytest.Item],  # noqa: WPS110
+    items: Sequence[pytest.Item],
 ) -> None:
     if not config.getoption("-m"):
         skip_integration = pytest.mark.skip(
@@ -171,7 +171,7 @@ def get_variable_from_server(
 
 
 @pytest.fixture(scope="session", autouse=True)
-def add_allure_environment_property(  # noqa: WPS210
+def add_allure_environment_property(
     request: pytest.FixtureRequest,
 ) -> Iterator[Callable[[str, Any], None]]:
     environment_properties = {}

@@ -16,7 +16,7 @@ _Record = TypeVar("_Record")
 
 
 class ResultSet(abc.ABC, Generic[_Record], AsyncIterator[_Record]):
-    def __init__(  # noqa: WPS211
+    def __init__(
         self,
         cur: core.AgnosticBaseCursor,
         coder: coders.BaseCoder[_Record],
@@ -81,7 +81,7 @@ class ResultSet(abc.ABC, Generic[_Record], AsyncIterator[_Record]):
 
 
 class DocumentResultSet(ResultSet[_Record]):
-    def __init__(  # noqa: WPS211
+    def __init__(
         self,
         cur: core.AgnosticCursor,
         coder: coders.BaseCoder[_Record],

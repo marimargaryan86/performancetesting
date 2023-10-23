@@ -30,7 +30,7 @@ class DictClient(Client):
 
 
 class OpenWeatherMapClient(Client):
-    def __init__(  # noqa: WPS211
+    def __init__(
         self,
         api_url: str,
         api_key: str,

@@ -140,7 +140,7 @@ def remove_blank_string(
     }
 
 
-class PaymentClient(object):  # noqa: WPS214
+class PaymentClient(object):
     def __init__(
         self,
         base_url: str,

@@ -16,7 +16,7 @@ async def home_function(*args: Any, **kwargs: Any) -> str:
     return "Do you want to continue with new queries about trip destination?"
 
 
-async def search_flight(  # noqa: WPS211
+async def search_flight(
     search_url: str,
     shortener_client: shortener.Client,
     *args: Any,

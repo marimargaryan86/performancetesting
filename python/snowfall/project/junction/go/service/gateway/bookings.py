@@ -23,7 +23,7 @@ class Service(service.Service, bookings_pb2_grpc.BookingServiceServicer):
     def register(self, server: aio.Server) -> None:
         bookings_pb2_grpc.add_BookingServiceServicer_to_server(self, server)
 
-    async def GetBookings(  # type: ignore[override] # noqa: N802,WPS210
+    async def GetBookings(  # type: ignore[override] # noqa: N802
         self,
         request: bookings_pb2.GetBookingsRequest,
         context: aio.ServicerContext,

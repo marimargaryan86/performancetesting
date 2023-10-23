@@ -20,7 +20,7 @@ class CriteriaGenerator(object):
     def __init__(self, h3_mapping: h3.H3MappingRepository[stations.Station]):
         self._mapping = h3_mapping
 
-    def from_search(  # noqa: WPS210
+    def from_search(
         self,
         search: offer_models_pb2.TripOfferSearch,
     ) -> list[amqp_pb2.SearchCriteriaTask]:

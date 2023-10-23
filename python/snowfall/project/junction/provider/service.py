@@ -67,13 +67,13 @@ if TYPE_CHECKING:
     ]
 
 
-def _grpc_command(  # noqa: WPS210, WPS217
+def _grpc_command(  # noqa: WPS217
     meta_factory: MetaFactory,
     offers_factory: OF[_Settings, _SearchCriteriaTask, _SearchCriteria] | None = None,
     bookings_factory: BookingFactory[_Settings] | None = None,
     trips_factory: TripsFactory[_Settings] | None = None,
 ) -> application.Callback[_Settings]:
-    async def wrapper(  # noqa: WPS210, WPS217
+    async def wrapper(  # noqa: WPS217
         app: application.Application[_Settings],
     ) -> None:
         meta_implementation = await meta_factory()

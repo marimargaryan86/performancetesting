@@ -77,7 +77,7 @@ def to_route(
 
 
 class Proxy(object):
-    def __init__(  # noqa: WPS211
+    def __init__(
         self,
         client: httpx.AsyncClient,
         prefix: str = "",

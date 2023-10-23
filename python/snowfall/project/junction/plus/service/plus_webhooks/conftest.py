@@ -205,7 +205,7 @@ def shortener_client() -> shortener.Client:
 
 
 @pytest.fixture()
-def app(  # noqa: WPS211
+def app(
     secret_key: str,
     monitoring_rules_client: monitoring_rules_adapter.Client,
     subscribers_client: subscribers_adapter.Client,

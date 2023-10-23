@@ -4,7 +4,7 @@ import more_itertools
 from snowfall.vendor.ory import models
 
 
-class OryClient(object):  # noqa: WPS214
+class OryClient(object):
     def __init__(
         self,
         base_url: str,

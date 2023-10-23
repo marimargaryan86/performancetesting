@@ -28,7 +28,7 @@ _SUCCESS_STATUSES = frozenset(
 )
 
 
-async def _handle_new_order_results(  # noqa: WPS211
+async def _handle_new_order_results(
     payment_intent_id: str,
     order: Mapping[str, Any],
     smtp_client: smtp.EmailClient,
@@ -51,7 +51,7 @@ async def _handle_new_order_results(  # noqa: WPS211
     return False
 
 
-async def poll_order_status(  # noqa: WPS211
+async def poll_order_status(
     junction_client: client.Client,
     order_id: str,
     payment_intent_id: str,
@@ -86,7 +86,7 @@ async def poll_order_status(  # noqa: WPS211
     return False
 
 
-async def send_booking_confirmation(  # noqa: WPS210
+async def send_booking_confirmation(
     order: Mapping[str, Any],
     smtp_client: smtp.EmailClient,
     forward_email: str | None = None,

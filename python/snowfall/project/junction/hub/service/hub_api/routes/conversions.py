@@ -53,7 +53,7 @@ class Conversions(endpoints.HTTPEndpoint):
 class ListConversions(endpoints.HTTPEndpoint):
     _default_page_size = 20
 
-    async def get(  # noqa: WPS210
+    async def get(
         self,
         request: requests.Request,
         conversion_client: conversions_adapter.Client = lagom.injectable,

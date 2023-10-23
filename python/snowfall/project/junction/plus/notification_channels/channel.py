@@ -33,7 +33,7 @@ class AbstractChannel(abc.ABC):
         """Send preformatted message."""
 
     @abc.abstractmethod
-    def send_message(  # noqa: WPS211
+    def send_message(
         self,
         receiver: models_pb2.Subscriber,
         sender_configuration: models_pb2.ConfigurationVector,

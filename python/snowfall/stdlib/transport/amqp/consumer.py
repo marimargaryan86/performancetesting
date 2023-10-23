@@ -159,7 +159,7 @@ class Consumer(protocol.Consumer[_Proto]):
         middlewares.auto_ack_and_nack_factory(),
     )
 
-    def __init__(  # noqa: WPS211
+    def __init__(
         self,
         connection: aio_pika.AbstractConnection,
         queue_name: str,

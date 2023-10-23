@@ -21,7 +21,7 @@ from snowfall.vendor.currency_cloud.models.rate import (
 )
 
 
-class RefundsService(  # noqa: WPS214
+class RefundsService(
     service.Service,
     grpc_pb2_grpc.RefundsServiceServicer,
 ):
@@ -210,7 +210,7 @@ class RefundsService(  # noqa: WPS214
 
         return grpc_pb2.CalculateRefundPositionResponse(refund_position=refund_position)
 
-    async def _get_refund_position(  # noqa: WPS211
+    async def _get_refund_position(
         self,
         detailed_rate: DetailedRateResponse,
         refunded_to_reseller: money_pb2.Money,

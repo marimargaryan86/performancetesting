@@ -152,7 +152,7 @@ async def test_order_create(duffel_client: client.DuffelClient) -> None:
 
 
 @disable_by_default
-async def test_offer_after_order_create(  # noqa: WPS210,WPS217
+async def test_offer_after_order_create(  # noqa: WPS217
     duffel_client: client.DuffelClient,
 ) -> None:
     offer_request_create = OffersRequestBuilder()
@@ -266,7 +266,7 @@ async def test_brussels_airline_refresh_offer(
     assert refreshed_offer is not None
 
 
-async def refresh_offer(  # noqa: WPS210
+async def refresh_offer(
     duffel_client: client.DuffelClient,
     offer: Offer,
 ) -> Offer:

@@ -21,7 +21,7 @@ class Channels(object):
         }
         self._logger = stdout.get_logger()
 
-    async def run(  # noqa: WPS211
+    async def run(
         self,
         channel_type: int,
         fun: str,

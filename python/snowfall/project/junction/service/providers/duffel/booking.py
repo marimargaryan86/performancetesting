@@ -66,7 +66,7 @@ class Transformer(object):
         )
 
 
-class BookingHandler(object):  # noqa: WPS214
+class BookingHandler(object):
     _poll_retries_limit = 10
     _wait_time_between_polling = 15
     _adult_years = 18
@@ -85,7 +85,7 @@ class BookingHandler(object):  # noqa: WPS214
         self._price_change_tolerance_percent = price_change_tolerance_percent
         self._storage = booking_storage
 
-    async def book(  # noqa: WPS210
+    async def book(
         self,
         task: amqp_pb2.PlaceOrderTask,
         details: cache.OfferDetails,
@@ -208,7 +208,7 @@ class BookingHandler(object):  # noqa: WPS214
             last_travel_date=details.last_travel_date,
         )
 
-    async def _make_booking(  # noqa: WPS210, WPS231
+    async def _make_booking(  # noqa: WPS231
         self,
         task: amqp_pb2.PlaceOrderTask,
         details: cache.OfferDetails,

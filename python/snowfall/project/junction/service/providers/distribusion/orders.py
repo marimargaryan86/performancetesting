@@ -28,7 +28,7 @@ from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 _PROVIDER_NAME = "Distribusion"
 
 
-async def orders(  # noqa: WPS217, WPS210
+async def orders(  # noqa: WPS217
     app: application.Application[config.OrdersSettings],
 ) -> None:
     http_client = await app.stack.enter_async_context(

@@ -23,7 +23,7 @@ from snowfall.vendor.currency_cloud.models.rate import (
 
 class Client(abc.ABC):
     @abc.abstractmethod
-    async def create(  # noqa: WPS211
+    async def create(
         self,
         note: str,
         refunded_by_provider: money_pb2.Money,
@@ -84,7 +84,7 @@ class DictClient(Client):
         }
         self._payment_client = payment_client
 
-    async def create(  # noqa: WPS211
+    async def create(
         self,
         note: str,
         refunded_by_provider: money_pb2.Money,
@@ -199,7 +199,7 @@ class GrpcClient(Client):
         self._refunds = refunds
         self._timeout = timeout
 
-    async def create(  # noqa: WPS211
+    async def create(
         self,
         note: str,
         refunded_by_provider: money_pb2.Money,

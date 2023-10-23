@@ -22,7 +22,7 @@ from snowfall.stdlib.format.protobuf import datetime_to_protobuf, slug_to_enum_v
 
 
 class Alerts(endpoints.HTTPEndpoint):
-    async def post(  # noqa: WPS210
+    async def post(
         self,
         request: requests.Request,
         monitoring_rules_client: monitoring_rules_adapter.Client = lagom.injectable,

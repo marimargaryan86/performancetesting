@@ -109,7 +109,7 @@ class BookingHandler(object):
 
         return new_booking
 
-    async def _make_booking(  # noqa: WPS210
+    async def _make_booking(
         self,
         task: amqp_pb2.PlaceOrderTask,
         details: cache.OfferDetails,
@@ -232,7 +232,7 @@ class Transformer(object):
         self._provider_id = str(provider_identifier)
         self._provider_name = provider_name
 
-    async def raw_to_booking(self, raw: bytes) -> bookings_pb2.Booking:  # noqa: WPS210
+    async def raw_to_booking(self, raw: bytes) -> bookings_pb2.Booking:
         booking_result = orders.OrderResponse(
             **jsonapi_helpers.flatten_object(orjson.loads(raw)),
         )

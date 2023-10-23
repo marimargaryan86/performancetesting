@@ -42,7 +42,7 @@ class MockResultSet(object):
         return self._offers[self._index - 1]
 
 
-async def test_original_id_is_always_published() -> None:  # noqa: WPS210
+async def test_original_id_is_always_published() -> None:
     mock_producer = create_autospec(Producer, spec_set=True, instance=True)
     mock_offer_options_repository = create_autospec(
         OfferOptionsRepository,

@@ -124,7 +124,7 @@ class Queue(consumer.AbstractQueue[amqp_pb2.TripOfferSearchTask]):
                     self._consume_trip_task(msg.body),
                 )
 
-    async def _consume_trip_task(  # noqa: WPS210
+    async def _consume_trip_task(
         self,
         msg: amqp_pb2.TripOfferSearchTask,
     ) -> AsyncGenerator[amqp_pb2.TripOfferSearchResult, None]:

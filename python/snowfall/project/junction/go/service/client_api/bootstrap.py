@@ -4,7 +4,7 @@ import lagom
 import pydantic
 
 from snowfall.adapter import authentication
-from snowfall.project.junction.go.adapter import (  # noqa: WPS235
+from snowfall.project.junction.go.adapter import (
     legs,
     locations,
     offer_searches,
@@ -37,7 +37,7 @@ class Settings(application.Settings):
     reseller_pay_companies: dict[str, str] = pydantic.Field(default_factory=dict)
 
 
-def create_dependencies(  # noqa: WPS211
+def create_dependencies(
     authentication_client: authentication.Client,
     legs_client: legs.Client,
     locations_client: locations.Client,

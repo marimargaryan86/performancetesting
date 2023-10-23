@@ -101,7 +101,7 @@ async def test_offer_with_stop(
     assert len(offer_groups[0].segments) == 2
 
 
-async def test_airline_validator(  # noqa: WPS210
+async def test_airline_validator(
     httpx_mock: pytest_httpx.HTTPXMock,
     search_adapter_no_ba: adapter.DuffelSearchAdapter,
     search_adapter_ba_only: adapter.DuffelSearchAdapter,
@@ -239,7 +239,7 @@ async def test_private_fares_and_specific_token(
     assert httpx_mock.get_requests()[0].headers["authorization"] == "Bearer token1"
 
 
-async def test_offer_price_breakdown(  # noqa: WPS210, WPS218
+async def test_offer_price_breakdown(  # noqa: WPS218
     httpx_mock: pytest_httpx.HTTPXMock,
     search_adapter: adapter.DuffelSearchAdapter,
 ) -> None:

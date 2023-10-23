@@ -86,11 +86,11 @@ _CABIN_MAPPING = types.MappingProxyType(
 )
 
 
-class SaveATrainAdapter(object):  # noqa: WPS214
+class SaveATrainAdapter(object):
     _poll_retries_limit = 10
     _wait_time_between_polling = 1
 
-    def __init__(  # noqa: WPS211
+    def __init__(
         self,
         save_a_train_client: client.SATClient,
         train_station_repository: train_stations.TrainStationRepository,
@@ -144,7 +144,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
             ),
         )
 
-    async def gather_search_results(  # noqa: WPS210, WPS231
+    async def gather_search_results(  # noqa: WPS231
         self,
         search_criteria: request.CreateSearchRequest,
     ) -> AsyncIterator[offer_models_pb2.OfferGroup]:
@@ -425,7 +425,7 @@ class SaveATrainAdapter(object):  # noqa: WPS214
 
         return models_pb2.CabinClass.TYPE_UNSPECIFIED
 
-    async def _create_booking(  # noqa: WPS217, WPS210
+    async def _create_booking(  # noqa: WPS217
         self,
         task: order_amqp_pb2.PlaceOrderTask,
         offer_details: cache.OfferDetails,
@@ -589,7 +589,7 @@ class Transformer(object):
         self._provider_name = provider_name
         self._url_timeout = url_timeout
 
-    async def raw_to_booking(self, raw: bytes) -> bookings_pb2.Booking:  # noqa: WPS210
+    async def raw_to_booking(self, raw: bytes) -> bookings_pb2.Booking:
         combined = json.loads(raw.decode())
         booking_info = booking.BookingResult(
             **orjson.loads(base64.b64decode(combined["booking_information"])),

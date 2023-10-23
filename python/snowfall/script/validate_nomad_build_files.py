@@ -63,7 +63,7 @@ def _parse_build_file(build_fp: BinaryIO) -> str | None:
     return "".join([relevant_token.string for relevant_token in relevant_tokens])
 
 
-def _validate_build_file(  # noqa: WPS210
+def _validate_build_file(
     build_line: str,
     nomad_files: frozenset[pathlib.Path],
     relative_path: str,

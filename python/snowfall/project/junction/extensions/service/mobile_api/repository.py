@@ -34,7 +34,7 @@ class RedisRepository(object):
         if self._ttl:
             await self._redis.put_expires_at(
                 identifier,
-                datetime.datetime.now(tz=datetime.UTC) + self._ttl,  # noqa: WPS204
+                datetime.datetime.now(tz=datetime.UTC) + self._ttl,
             )
 
 
@@ -79,7 +79,7 @@ class PlacesRepository(
         ),
     )
 
-    async def match(  # noqa: WPS210
+    async def match(
         self,
         search_key: str,
     ) -> resultset.ResultSet[models_pb2.Place]:
@@ -145,7 +145,7 @@ class PlacesRepository(
         response.limit(30)  # noqa: WPS432
         return response
 
-    async def find_non_cities(  # noqa: WPS211
+    async def find_non_cities(
         self,
     ) -> resultset.ResultSet[models_pb2.Place]:
         return await self._execute(
@@ -155,7 +155,7 @@ class PlacesRepository(
             },
         )
 
-    async def find_main_city(  # noqa: WPS211
+    async def find_main_city(
         self,
         longitude: float,
         latitude: float,

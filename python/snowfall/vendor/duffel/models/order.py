@@ -65,7 +65,7 @@ class Order(DuffelBaseModel):
     base_currency: str | None
     booking_reference: str
     cancelled_at: datetime.datetime | None
-    content: str  # noqa: WPS110
+    content: str
     created_at: datetime.datetime
     synced_at: datetime.datetime | None
     documents: list[OrderDocument]

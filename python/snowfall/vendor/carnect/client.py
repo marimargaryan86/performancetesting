@@ -4,7 +4,7 @@ import httpx
 
 from snowfall.vendor.carnect.builders.reservation_builder import ReservationBuilder
 from snowfall.vendor.carnect.config import Config
-from snowfall.vendor.carnect.models.service import (  # noqa: WPS235
+from snowfall.vendor.carnect.models.service import (
     PingRq,
     ServiceSoapGetPing,
     ServiceSoapGetPingInput,
@@ -44,7 +44,7 @@ from snowfall.vendor.carnect.soap.soap_client import (
 )
 
 
-class CarnectClient(object):  # noqa: WPS214
+class CarnectClient(object):
     def __init__(self, http_client: httpx.AsyncClient, config: Config) -> None:
         self._config: Config = config
         self._transport = AsyncSoapTransport(

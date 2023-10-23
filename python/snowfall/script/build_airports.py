@@ -24,18 +24,16 @@ class NoAirportError(ValueError):
     """Failed to get details for new airport."""
 
 
-def dms_to_dec(coord: str) -> float:  # noqa: WPS210
+def dms_to_dec(coord: str) -> float:
     """Convert coordinate formats."""
     deg, *parts, direction = re.split("[°′″]", coord)  # noqa: RUF001
     minutes = parts[0] if parts else 0
     seconds = parts[1] if len(parts) > 1 else 0
     di = -1 if direction in {"W", "S"} else 1
-    return (
-        float(deg) + float(minutes) / 60 + float(seconds) / (60 * 60)  # noqa: WPS221
-    ) * di
+    return (float(deg) + float(minutes) / 60 + float(seconds) / (60 * 60)) * di
 
 
-async def _wiki_new_airport(  # noqa: WPS210
+async def _wiki_new_airport(
     client: httpx.AsyncClient,
     name: Element,
 ) -> tuple[float, float, str]:
@@ -67,7 +65,7 @@ async def _wiki_new_airport(  # noqa: WPS210
     return lat, lon, resp.json()["timeZoneId"]
 
 
-async def _wiki_process_page(  # noqa: WPS210
+async def _wiki_process_page(
     client: httpx.AsyncClient,
     url: str,
     airports: _Airports,
@@ -117,7 +115,7 @@ async def _wiki_process_page(  # noqa: WPS210
         airport["name"] = node.text_content().strip()
 
 
-async def wikipedia_update(airports: _Airports) -> None:  # noqa: WPS210,WPS231
+async def wikipedia_update(airports: _Airports) -> None:  # noqa: WPS231
     """Update the airports from Wikipedia in-place."""
     url = "https://en.wikipedia.org/wiki/List_of_airports_by_IATA_airport_code:_{0}"
     urls = (url.format(pg) for pg in string.ascii_uppercase)
@@ -126,7 +124,7 @@ async def wikipedia_update(airports: _Airports) -> None:  # noqa: WPS210,WPS231
         await asyncio.gather(*(_wiki_process_page(client, ur, airports) for ur in urls))
 
 
-async def duffel_update(airports: _Airports) -> None:  # noqa: WPS210
+async def duffel_update(airports: _Airports) -> None:
     """Use Duffel API to update airports in-place."""
     airport_keys = (
         "iata_code",

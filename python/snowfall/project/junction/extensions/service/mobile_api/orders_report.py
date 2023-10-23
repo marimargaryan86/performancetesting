@@ -66,7 +66,7 @@ async def orders_report(app: application.Application[Settings]) -> None:
     )
 
 
-async def _generate_report(  # noqa: WPS210
+async def _generate_report(
     orders_repository: core.AgnosticCollection,
     junction_client: client.Client,
 ) -> Sequence[Mapping[str, str | int | float]]:

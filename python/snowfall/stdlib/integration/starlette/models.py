@@ -37,9 +37,7 @@ class Links(TypedDict):
 
 class Relationship(TypedDict):
     links: NotRequired[Links]
-    data: NotRequired[  # noqa: WPS110
-        Sequence[ResourceIdentifier] | ResourceIdentifier | None
-    ]
+    data: NotRequired[Sequence[ResourceIdentifier] | ResourceIdentifier | None]
 
 
 Relationships = Mapping[str, Relationship]

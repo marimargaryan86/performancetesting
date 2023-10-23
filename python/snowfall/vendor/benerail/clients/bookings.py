@@ -10,7 +10,7 @@ from snowfall.vendor.benerail.models.products import response as product_respons
 _BASE_PATH = "/bookings/bookings"
 
 
-class BookingsClient(base.BenerailBaseClient):  # noqa: WPS214
+class BookingsClient(base.BenerailBaseClient):
     async def create_booking(
         self,
         dialogue_id: str,
@@ -40,7 +40,7 @@ class BookingsClient(base.BenerailBaseClient):  # noqa: WPS214
         response = await self._make_request(
             client.RequestOptions(
                 method="GET",
-                path="{base_path}/{booking_id}".format(  # noqa: WPS204
+                path="{base_path}/{booking_id}".format(
                     base_path=_BASE_PATH,
                     booking_id=booking_id,
                 ),
@@ -94,7 +94,7 @@ class BookingsClient(base.BenerailBaseClient):  # noqa: WPS214
                             base_path=_BASE_PATH,
                             booking_id=booking_id,
                         ),
-                        "/orders/{order_id}".format(order_id=order_id),  # noqa: WPS204
+                        "/orders/{order_id}".format(order_id=order_id),
                         "/booked-offers/{booked_offer_id}".format(
                             booked_offer_id=booked_offer_id,
                         ),
@@ -320,7 +320,7 @@ class OrdersClient(base.BenerailBaseClient):
 
         return response.status_code == http.HTTPStatus.NO_CONTENT
 
-    async def update_order_state(  # noqa: WPS211
+    async def update_order_state(
         self,
         booking_id: str,
         order_id: str,
@@ -350,7 +350,7 @@ class OrdersClient(base.BenerailBaseClient):
             booking_etag=response.headers.get("etag", "").replace('"', ""),
         )
 
-    async def add_selected_offer_to_order(  # noqa: WPS211
+    async def add_selected_offer_to_order(
         self,
         booking_id: str,
         order_id: str,
@@ -522,7 +522,7 @@ class SelectedOffersClient(base.BenerailBaseClient):
         )
         return booking_response.GetSelectedOfferPartResponse(**response.json())
 
-    async def update_selected_offer_part(  # noqa: WPS211
+    async def update_selected_offer_part(
         self,
         booking_id: str,
         order_id: str,
@@ -557,7 +557,7 @@ class SelectedOffersClient(base.BenerailBaseClient):
 
 
 class PaymentsClient(base.BenerailBaseClient):
-    async def create_payment_info_for_order(  # noqa: WPS211
+    async def create_payment_info_for_order(
         self,
         booking_id: str,
         order_id: str,
@@ -615,7 +615,7 @@ class PaymentsClient(base.BenerailBaseClient):
             order_etag=response.headers.get("etag").replace('"', ""),
         )
 
-    async def confirm_order_payment(  # noqa: WPS211
+    async def confirm_order_payment(
         self,
         booking_id: str,
         order_id: str,

@@ -29,7 +29,7 @@ class Settings(application.Settings):
     shortener_domain: str
 
 
-def create_dependencies(  # noqa: WPS211
+def create_dependencies(
     monitoring_rules_client: monitoring_rules.Client,
     subscribers_client: subscribers.Client,
     orders_client: orders.Client,

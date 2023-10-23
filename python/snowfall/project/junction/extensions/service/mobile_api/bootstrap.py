@@ -45,7 +45,7 @@ class Settings(application.Settings):
     junction_private_key: str | None = None
 
 
-def create_dependencies(  # noqa: WPS211
+def create_dependencies(
     orders_repository: repository.OrdersRepository,
     junction_client: client.Client,
     httpx_client: httpx.AsyncClient,

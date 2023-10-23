@@ -124,11 +124,11 @@ def _get_trip_offer_response(
     )
 
 
-class BenerailAdapter(object):  # noqa: WPS214
+class BenerailAdapter(object):
     def __init__(self, benerail_client: client.BenerailClient) -> None:
         self._client = benerail_client
 
-    async def find_offer(  # noqa: WPS210
+    async def find_offer(
         self,
         offer_details: cache.OfferDetails,
     ) -> GetOfferResponse:
@@ -184,7 +184,7 @@ class BenerailAdapter(object):  # noqa: WPS214
             offers=offers,
         )
 
-    async def _get_trip_offer_responses_with_passengers(  # noqa: WPS210
+    async def _get_trip_offer_responses_with_passengers(
         self,
         criterion: _TripOfferResponsesWithPassengersCriterion,
     ) -> _TripOfferResponsesWithPassengers:
@@ -320,7 +320,7 @@ class BenerailAdapter(object):  # noqa: WPS214
             dialogue_etag=etag,
         )
 
-    async def _create_trip_filter(  # noqa: WPS211
+    async def _create_trip_filter(
         self,
         dialogue_info: helper_models.DialogueInfo,
         origin: str,
@@ -404,8 +404,8 @@ class BenerailAdapter(object):  # noqa: WPS214
         return [response.response_result for response in responses]
 
 
-class BenerailOffersAdapter(BenerailAdapter):  # noqa: WPS214
-    def __init__(  # noqa: WPS211
+class BenerailOffersAdapter(BenerailAdapter):
+    def __init__(
         self,
         benerail_client: client.BenerailClient,
         train_station_repository: train_stations.TrainStationRepository,
@@ -433,7 +433,7 @@ class BenerailOffersAdapter(BenerailAdapter):  # noqa: WPS214
                 session_token=search_task.session_token,
             )
 
-    async def _get_offer_groups(  # noqa: WPS210, WPS217
+    async def _get_offer_groups(  # noqa: WPS217
         self,
         search_task: criteria.SearchCriteria,
     ) -> AsyncIterator[offer_models_pb2.OfferGroup]:

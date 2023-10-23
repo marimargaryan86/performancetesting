@@ -35,7 +35,7 @@ def validate_name(node: Mapping[str, Any]) -> str | None:
     )
 
 
-def resolve_osm_properties(  # noqa: WPS231, WPS210
+def resolve_osm_properties(  # noqa: WPS231
     properties: Mapping[str, Any],
 ) -> Mapping[str, Any]:
     useful_properties = {

@@ -20,8 +20,8 @@ _AdultMinAge = 18
 _InfantMaxAge = 2
 
 
-class OfferTransformer(object):  # noqa: WPS214
-    def __init__(  # noqa: WPS211
+class OfferTransformer(object):
+    def __init__(
         self,
         airport_repository: airports.AirportRepository,
         cabin_mapping_repository: cabin_classes.CabinMappingRepository,
@@ -259,7 +259,7 @@ class OfferTransformer(object):  # noqa: WPS214
 
         return group_offers
 
-    async def _get_segment_details(  # noqa: WPS210
+    async def _get_segment_details(
         self,
         fare_brand: str | None,
         grouped_trips_segments: Sequence[_GroupedOfferSegment],

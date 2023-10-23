@@ -34,7 +34,7 @@ class CheckinCronJob(object):
         self._publisher_client = publisher_client
         self._logger = stdout.get_logger()
 
-    async def run(self) -> None:  # noqa: WPS231,WPS210
+    async def run(self) -> None:  # noqa: WPS231
         self._logger.info("Started check-in reminder as a cron job")
         candidates = await self._monitoring_rules.get_rules_for_upcoming_events(
             sent_flag="sent_checkin_reminder",

@@ -245,7 +245,7 @@ def _protobuf_to_types_map(model: descriptor.Descriptor) -> _TypesMap:
 
 
 @functools.cache
-def _pydantic_to_types_map(  # noqa: WPS210
+def _pydantic_to_types_map(
     model: type[pydantic.BaseModel],
 ) -> _TypesMap:
     queue = collections.deque([model])

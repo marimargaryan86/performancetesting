@@ -7,7 +7,7 @@ from typing import AnyStr, Generic
 from redis.asyncio import Redis, lock
 
 
-class Hash(Generic[AnyStr]):  # noqa: WPS214
+class Hash(Generic[AnyStr]):
     def __init__(self, redis: Redis[AnyStr], name: str):
         self._name = name
         self._redis: Redis[AnyStr] = redis
@@ -146,7 +146,7 @@ class SortedSet(Generic[AnyStr]):
                 return
 
 
-class Client(Generic[AnyStr]):  # noqa: WPS214
+class Client(Generic[AnyStr]):
     def __init__(self, redis: Redis[AnyStr], prefix: str | None = None):
         self._prefix = "{0}:".format(prefix) if prefix else ""
         self._redis: Redis[AnyStr] = redis
@@ -185,7 +185,7 @@ class Client(Generic[AnyStr]):  # noqa: WPS214
     def sorted_set(self, name: str) -> SortedSet[AnyStr]:
         return SortedSet(self._redis, self._prefix + name)
 
-    def lock(  # noqa: WPS211
+    def lock(
         self,
         name: str,
         *,

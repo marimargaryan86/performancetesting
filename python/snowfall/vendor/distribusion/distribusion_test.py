@@ -223,7 +223,7 @@ async def test_get_booking_by_id(
 
 
 @disable_by_default
-async def test_order_create(  # noqa: WPS210
+async def test_order_create(
     distribusion_client: client.DistribusionClient,
 ) -> None:
     departure_station = "DEBERCBS"

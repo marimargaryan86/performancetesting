@@ -88,7 +88,7 @@ async def get_trips_list(
     return [trip["id"] for trip in response["data"]]
 
 
-async def create_offer_lists(  # noqa: WPS210
+async def create_offer_lists(
     mobile_client: MobileApiClient,
     trips_list: Sequence[str],
 ) -> list[dict[str, Any]]:
@@ -135,7 +135,7 @@ async def create_offer_lists(  # noqa: WPS210
     return offer_list
 
 
-async def create_quote(  # noqa: WPS210
+async def create_quote(
     mobile_client: MobileApiClient,
     offer_id: str,
     option_ids: Sequence[str],
@@ -168,7 +168,7 @@ async def create_payment(
     return resp["data"]
 
 
-async def create_order(  # noqa: WPS210
+async def create_order(
     mobile_client: MobileApiClient,
     quote_id: str,
     payment: str,
@@ -239,7 +239,7 @@ ids = [
 
 @pytest.mark.integration()
 @pytest.mark.parametrize("iata_codes", iata_codes, ids=ids)
-async def test_booking_flow(  # noqa: WPS217, WPS210
+async def test_booking_flow(  # noqa: WPS217
     mobile_client: MobileApiClient,
     departure_after: datetime.datetime,
     iata_codes: str,
@@ -282,7 +282,7 @@ async def test_booking_flow(  # noqa: WPS217, WPS210
 
 @pytest.mark.smoke()
 @pytest.mark.parametrize("iata_codes", iata_codes, ids=ids)
-async def test_booking_flow_smoke(  # noqa: WPS217, WPS210
+async def test_booking_flow_smoke(  # noqa: WPS217
     mobile_client: MobileApiClient,
     departure_after: datetime.datetime,
     iata_codes: str,

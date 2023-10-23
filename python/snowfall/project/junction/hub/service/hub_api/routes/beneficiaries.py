@@ -97,7 +97,7 @@ class Beneficiary(endpoints.HTTPEndpoint):
 
 
 class Beneficiaries(endpoints.HTTPEndpoint):
-    async def get(  # noqa: WPS210
+    async def get(
         self,
         request: requests.Request,
         beneficiaries_client: beneficiaries.Client = lagom.injectable,
@@ -126,7 +126,7 @@ class Beneficiaries(endpoints.HTTPEndpoint):
         )
 
     @routes_handlers.grpc_errors_handler
-    async def post(  # noqa: WPS210, WPS211, WPS217
+    async def post(  # noqa: WPS217
         self,
         request: requests.Request,
         beneficiaries_client: beneficiaries.Client = lagom.injectable,

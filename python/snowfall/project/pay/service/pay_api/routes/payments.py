@@ -47,7 +47,7 @@ class Payment(endpoints.HTTPEndpoint):
 
 class Payments(endpoints.HTTPEndpoint):
     @payments_validators.payment_validator
-    async def post(  # noqa: WPS210, WPS211
+    async def post(
         self,
         request: requests.Request,
         body: Mapping[str, Any],

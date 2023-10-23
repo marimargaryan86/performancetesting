@@ -33,7 +33,7 @@ class DictClient(Client):
 
 
 class FlightStatsClient(Client):
-    def __init__(  # noqa: WPS211
+    def __init__(
         self,
         api_url: str,
         app_id: str,

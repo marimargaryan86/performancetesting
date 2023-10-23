@@ -7,7 +7,7 @@ from hcl2 import api
 
 
 class Template(pydantic.BaseModel):
-    data: str  # noqa: WPS110
+    data: str
     left_delimiter: str = "{{"
     right_delimiter: str = "}}"
 
@@ -57,13 +57,13 @@ class Job(pydantic.BaseModel):
     group: Sequence[Mapping[str, Group]]
 
 
-class Variable(pydantic.BaseModel):  # noqa: WPS110
+class Variable(pydantic.BaseModel):
     """Represent a Nomad variable."""
 
 
 class Specification(pydantic.BaseModel):
     job: Sequence[Mapping[str, Job]]
-    variable: Sequence[Mapping[str, Variable]]  # noqa: WPS110
+    variable: Sequence[Mapping[str, Variable]]
 
 
 def loads(text: str) -> Specification:

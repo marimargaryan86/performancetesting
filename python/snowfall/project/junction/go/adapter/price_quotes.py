@@ -14,7 +14,7 @@ from snowfall.stdlib.format import protobuf
 
 class Client(abc.ABC):
     @abc.abstractmethod
-    async def create(  # noqa: WPS211
+    async def create(
         self,
         offer_id: str,
         option_ids: Sequence[str],
@@ -35,7 +35,7 @@ class DictClient(Client):
             price_quote.id: price_quote for price_quote in price_quotes
         }
 
-    async def create(  # noqa: WPS211
+    async def create(
         self,
         offer_id: str,
         option_ids: Sequence[str],
@@ -92,7 +92,7 @@ class GrpcClient(Client):
         self._price_quotes = price_quotes
         self._timeout = timeout
 
-    async def create(  # noqa: WPS211
+    async def create(
         self,
         offer_id: str,
         option_ids: Sequence[str],

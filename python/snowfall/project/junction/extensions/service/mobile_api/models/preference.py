@@ -18,12 +18,12 @@ _IMAGE_BASE_URL = (
 
 class BooleanCollectionItem(pydantic.BaseModel):
     ref: str
-    value: bool  # noqa: WPS110
+    value: bool
 
 
 class Preference(pydantic.BaseModel):
     ref: str
-    value: bool | int | Sequence[BooleanCollectionItem]  # noqa: WPS110
+    value: bool | int | Sequence[BooleanCollectionItem]
 
 
 class Refs(enum.Enum):

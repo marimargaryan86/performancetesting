@@ -20,9 +20,6 @@ show-source = true
 statistics = false
 doctests = true
 extend-exclude = ["gubernator_pb2*"]
-max-complexity = 6
-max-imports = 18
-max-module-members = 12
 max-line-length = 88
 inline-quotes = "\""
 strictness = "long"
@@ -33,20 +30,215 @@ noqa-require-code = true
 forbidden-inline-ignore = ["SF20", "SF21", "SF22"]
 nested-classes-whitelist = ["Config"]
 select = [
-  "D0",   # flake8-deprecated
-  "I25",  # flake8-tidy-imports
-  "KEK",  # flake8-if-expr
-  "N400", # flake8-broken-line
-  "NQA0", # flake8-noqa
-  "NQA1", # flake8-noqa
-  "P1",   # flake8-string-format
-  "P2",   # flake8-string-format
-  "P3",   # flake8-string-format
-  "RST2", # flake8-rst-docstrings
-  "RST3", # flake8-rst-docstrings
-  "RST4", # flake8-rst-docstrings
-  "SF",   # snowfall.plugin.flake8
-  "WPS",  # wemake-python-styleguide
+  "D0",     # flake8-deprecated
+  "I25",    # flake8-tidy-imports
+  "KEK",    # flake8-if-expr
+  "N400",   # flake8-broken-line
+  "NQA0",   # flake8-noqa
+  "NQA1",   # flake8-noqa
+  "P1",     # flake8-string-format
+  "P2",     # flake8-string-format
+  "P3",     # flake8-string-format
+  "RST2",   # flake8-rst-docstrings
+  "RST3",   # flake8-rst-docstrings
+  "RST4",   # flake8-rst-docstrings
+  "SF",     # snowfall.plugin.flake8
+  "WPS100", # Forbid blacklisted module names.
+  "WPS111", # Forbid short variable or module names.
+  "WPS112", # Forbid private name pattern.
+  "WPS114", # Forbid names with underscored numbers pattern.
+  "WPS115", # Require snake_case for naming class attributes.
+  "WPS116", # Forbid using more than one consecutive underscore in variable names.
+  "WPS117", # Forbid naming variables self, cls, or mcs.
+  "WPS118", # Forbid long variable or module names.
+  "WPS119", # Forbid unicode names.
+  "WPS120", # Forbid trailing _ for names that do not need it.
+  "WPS121", # Forbid using variables that are marked as unused.
+  "WPS122", # Forbid explicit unused variables.
+  "WPS123", # Forbid unused variables with multiple underscores.
+  "WPS124", # Forbid variable or module names which could be difficult to read.
+  "WPS200", # Forbid modules with complex lines.
+  "WPS216", # Restrict the maximum number of decorators.
+  "WPS217", # Forbid placing too many await expressions in a function.
+  "WPS218", # Forbid placing too many assert statements into a function.
+  "WPS219", # Forbid consecutive expressions with too deep access level.
+  "WPS220", # Forbid nesting blocks too deep.
+  "WPS222", # Forbid conditions with too many logical operators.
+  "WPS223", # Forbid too many elif branches.
+  "WPS224", # Forbid too many for statements within a comprehension.
+  "WPS225", # Forbid too many except cases in a single try clause.
+  "WPS227", # Forbid returning or yielding tuples that are too long.
+  "WPS228", # Forbid compare expressions that are too long.
+  "WPS229", # Forbid try blocks with bodies that are too long.
+  "WPS230", # Forbid instances with too many public attributes.
+  "WPS231", # Forbid functions with too much cognitive complexity.
+  "WPS232", # Forbid modules with average cognitive complexity that is too high.
+  "WPS233", # Forbid call chains that are too long.
+  "WPS236", # Forbid using too many variables to unpack a tuple.
+  "WPS237", # Forbids f strings that are too complex.
+  "WPS238", # Forbids too many raise statements in a function.
+  "WPS301", # Forbid imports like import os.path.
+  "WPS303", # Forbid underscores (_) in numbers.
+  "WPS304", # Forbid partial floats like .05 or 23..
+  "WPS305", # Forbid f strings.
+  "WPS306", # Forbid writing classes without base classes.
+  "WPS307", # Forbid multiple if statements inside list comprehensions.
+  "WPS310", # Forbid uppercase X, O, B, and E in numbers.
+  "WPS311", # Forbid comparisons with multiple in checks.
+  "WPS312", # Forbid comparisons of a variable to itself.
+  "WPS314", # Forbid using if statements that use invalid conditionals.
+  "WPS315", # Forbid extra object in parent classes list.
+  "WPS319", # Forbid brackets in the wrong position.
+  "WPS320", # Forbid multi-line function type annotations.
+  "WPS321", # Forbid uppercase string modifiers.
+  "WPS322", # Forbid triple quotes for singleline strings.
+  # "WPS323", # Forbid % formatting on strings. TODO: Fix these before enabling.
+  "WPS325", # Enforce consistent yield statements.
+  "WPS327", # Forbid meaningless continue in loops.
+  "WPS328", # Forbid meaningless nodes.
+  "WPS329", # Forbid meaningless except cases.
+  "WPS330", # Forbid unnecessary operators in your code.
+  "WPS331", # Forbid local variables that are only used in return statements.
+  "WPS332", # Forbid walrus operator.
+  "WPS333", # Forbid implicit complex comparison expressions.
+  "WPS334", # Forbid reversed order complex comparison expressions.
+  "WPS335", # Forbid wrong for loop iter targets.
+  "WPS336", # Forbid explicit string concatanation in favour of .format method.
+  "WPS337", # Forbid multiline conditions.
+  "WPS338", # Forbid incorrect order of methods inside a class.
+  "WPS339", # Forbid meaningless zeros.
+  "WPS340", # Forbid extra + signs in the exponent.
+  "WPS341", # Forbid letters as hex numbers.
+  "WPS342", # Forbid \\ escape sequences inside regular strings.
+  "WPS343", # Forbid uppercase complex number suffix.
+  "WPS344", # Forbid explicit division (or modulo) by zero.
+  "WPS345", # Forbid meaningless math operations with 0 and 1.
+  "WPS346", # Forbid double minus operations.
+  "WPS347", # Forbid imports that may cause confusion outside of the module.
+  "WPS348", # Forbid starting lines with a dot.
+  "WPS349", # Forbid redundant components in a subscript’s slice.
+  "WPS350", # Enforce using augmented assign pattern.
+  "WPS351", # Forbid unnecessary literals in your code.
+  "WPS352", # Forbid multiline loops.
+  "WPS353", # Forbid yield from with several nodes.
+  "WPS354", # Forbid consecutive yield expressions.
+  "WPS355", # Forbid useless blank lines before and after brackets.
+  "WPS356", # Forbid unnecessary iterable unpacking.
+  "WPS357", # Forbid using \r (carriage return) in line breaks.
+  "WPS358", # Forbid using float zeros: 0.0.
+  "WPS359", # Forbids to unpack iterable objects to lists.
+  "WPS360", # Forbid the use of raw strings when there is no backslash in the string.
+  "WPS361", # Forbids inconsistent newlines in comprehensions.
+  "WPS362", # Forbid assignment to a subscript slice.
+  "WPS400", # Restrict various control (such as magic) comments.
+  "WPS401", # Forbid empty doc comments (#:).
+  "WPS402", # Forbid too many # noqa comments.
+  "WPS403", # Forbid too many # pragma: no cover comments.
+  "WPS404", # Forbid complex defaults.
+  "WPS405", # Forbid anything other than ast.Name to define loop variables.
+  "WPS406", # Forbid anything other than ast.Name to define contexts.
+  "WPS407", # Forbid mutable constants on a module level.
+  "WPS408", # Forbid using the same logical conditions in one expression.
+  "WPS409", # Forbid heterogeneous operators in one comparison.
+  "WPS410", # Forbid some module-level variables.
+  "WPS411", # Forbid empty modules.
+  "WPS412", # Forbid logic inside __init__ module.
+  "WPS413", # Forbid __getattr__ and __dir__ module magic methods.
+  "WPS414", # Forbid tuple unpacking with side-effects.
+  "WPS415", # Forbid the same exception class in multiple except blocks.
+  "WPS416", # Forbid yield keyword inside comprehensions.
+  "WPS417", # Forbid duplicate items in hashes.
+  "WPS418", # Forbid exceptions inherited from BaseException.
+  "WPS419", # Forbid multiple returning paths with try / except case.
+  "WPS420", # Forbid some python keywords.
+  "WPS421", # Forbid calling some built-in functions.
+  "WPS423", # Forbid NotImplemented exception.
+  "WPS424", # Forbid BaseException exception.
+  "WPS426", # Forbid lambda inside loops.
+  "WPS427", # Forbid unreachable code.
+  "WPS428", # Forbid statements that do nothing.
+  "WPS429", # Forbid multiple assignments on the same line.
+  "WPS430", # Forbid nested functions.
+  "WPS431", # Forbid nested classes.
+  "WPS432", # Forbid magic numbers. - Partially covered by PLR2004 - TODO: Restrict numbers further.
+  "WPS433", # Forbid imports nested in functions.
+  "WPS434", # Forbid assigning a variable to itself.
+  "WPS435", # Forbid multiplying lists.
+  "WPS436", # Forbid importing protected modules.
+  "WPS438", # Forbid raising StopIteration inside generators.
+  "WPS439", # Forbid Unicode escape sequences in binary strings.
+  "WPS440", # Forbid overlapping local and block variables.
+  "WPS441", # Forbid control variables after the block body.
+  "WPS442", # Forbid shadowing variables from outer scopes.
+  "WPS443", # Forbid explicit unhashable types of asset items and dict keys.
+  "WPS444", # Forbid explicit falsely-evaluated conditions with several keywords.
+  "WPS445", # Forbid incorrectly named keywords in starred dicts.
+  "WPS446", # Forbid approximate constants.
+  "WPS447", # Forbid using the alphabet as a string.
+  "WPS448", # Forbid incorrect order of except.
+  "WPS449", # Forbid float keys.
+  "WPS450", # Forbid importing protected objects from modules.
+  "WPS452", # Forbid break and continue in a finally block.
+  "WPS455", # Forbids using non-trivial expressions as a parameter for except.
+  "WPS456", # Forbids using float("NaN") construct to generate NaN.
+  "WPS457", # Forbids use of infinite while True: loops.
+  "WPS458", # Forbids to import from already imported modules.
+  "WPS459", # Forbids comparisons with float and complex.
+  "WPS460", # Forbids to have single element destructuring.
+  "WPS461", # Forbids to use specific inline ignore violations.
+  "WPS462", # Forbids direct usage of multiline strings.
+  "WPS463", # Forbids to have functions starting with get_ without returning a value.
+  "WPS464", # Forbid empty comments.
+  "WPS465", # Forbid comparisons between bitwise and boolean expressions.
+  "WPS466", # Forbid using complex grammar for using decorators.
+  "WPS467", # Forbid using a bare raise keyword outside of except.
+  "WPS468", # Forbid using a placeholder (_) with enumerate.
+  "WPS469", # Forbid raising an exception from itself.
+  "WPS470", # Forbid kwarg unpacking in class definition.
+  "WPS471", # Forbid consecutive slices.
+  "WPS472", # Forbid getting first element using unpacking.
+  "WPS473", # Limit empty lines in functions or methods body.
+  "WPS501", # Forbid finally in try block without except block.
+  "WPS504", # Forbid negated conditions together with else clause.
+  "WPS505", # Forbid nested try blocks.
+  "WPS506", # Forbid useless proxy lambda expressions.
+  "WPS507", # Forbid unpythonic zero-length compare.
+  "WPS508", # Forbid not with compare expressions.
+  "WPS509", # Forbid nesting ternary expressions in certain places.
+  "WPS510", # Forbid in with static containers except set nodes.
+  "WPS512", # Forbid multiple isinstance calls with single-item tuples.
+  "WPS514", # Forbid multiple equality comparisons with the same variable.
+  "WPS516", # Forbid comparing types with type() function.
+  "WPS517", # Forbid useless starred expressions.
+  "WPS519", # Forbid implicit sum() calls.
+  "WPS520", # Forbid comparing with explicit falsy constants.
+  "WPS521", # Forbid comparing values with constants using is or is not.
+  "WPS522", # Forbid implicit primitives in the form of lambda functions.
+  "WPS523", # Forbid unpythonic variable swaps.
+  "WPS524", # Forbid misrefactored self assignment.
+  "WPS525", # Forbid comparisons where in is compared with single item container.
+  "WPS527", # Require tuples as arguments for certain functions.
+  "WPS528", # Forbid implicit .items() iterator.
+  "WPS529", # Forbid implicit .get() dict method.
+  "WPS530", # Forbid implicit negative indexes.
+  "WPS532", # Forbid ast.Is in ast.Compare.ops when it’s size is not zero.
+  "WPS600", # Forbid subclassing lowercase builtins.
+  "WPS601", # Forbid shadowing class level attributes with instance level attributes.
+  "WPS602", # Forbid @staticmethod decorator.
+  "WPS603", # Forbid certain magic methods.
+  "WPS604", # Forbid incorrect nodes inside class definitions.
+  "WPS605", # Forbid methods without any arguments.
+  "WPS606", # Forbid anything other than a class as a base class.
+  "WPS607", # Forbid incorrect __slots__ definition.
+  "WPS608", # Forbid super() with parameters or outside of methods.
+  "WPS609", # Forbid directly calling certain magic attributes and methods.
+  "WPS610", # Forbid certain async magic methods.
+  "WPS611", # Forbid yield inside of certain magic methods.
+  "WPS612", # Forbid useless overwritten methods.
+  "WPS613", # Forbid super() with incorrect method or property access.
+  "WPS614", # Forbids descriptors in regular functions.
+  "WPS615", # Forbids to use getters and setters in objects.
+  "WPS616", # Calling super() in buggy context.
 ]
 ignore = [
   "NQA101", # noqa has no violations. Disabled due to Ruff incompatibility.
@@ -54,50 +246,14 @@ ignore = [
   "NQA103", # noqa: X000, X001 has unmatched code(s), remove X001. Disabled due to Ruff incompatibility.
   "RST303", # Unknown directive type. Disabled due to WPS incompatibility.
   "RST304", # Unknown interpreted text role. Disabled due to WPS incompatibility.
-  "WPS113", # Found same alias import. Same as I250.
-  "WPS226", # Found string constant over-use. Doesn't really improve the code with current workarounds.
-  "WPS242", # Same as T20.
-  "WPS316", # Found context manager with too many assignments. Conflicts with SIM117.
-  "WPS317", # Found incorrect multi-line parameters. Disabled due to Black incompatibility.
-  "WPS323", # Found `%` string formatting
-  "WPS326", # Found implicit string concatenation
-  "WPS437", # Forbid protected attributes and methods. Same as SLF001.
-  "WPS451", # https://github.com/wemake-services/wemake-python-styleguide/issues/2712
-  "WPS508", # Found incorrect `not` with compare usage. Same as SIM203.
-  "WPS518", # Found implicit `enumerate()` call
 ]
 per-file-ignores = [
-  "*_test.py:WPS118,WPS202,WPS204,WPS211,WPS214,WPS432,WPS442",
-  "conftest.py:WPS201,WPS202,WPS203,WPS235,WPS442",
-  "main.py:WPS201,WPS202,WPS210,WPS235,WPS432",
-  "python/snowfall/adapter/authentication.py:WPS202",
-  "python/snowfall/project/junction/extensions/service/mobile_api/repository.py:WPS202",
-  "python/snowfall/project/junction/extensions/service/mobile_api/resources.py:WPS202",
-  "python/snowfall/project/junction/go/fixtures.py:WPS202,WPS204",
-  "python/snowfall/project/junction/go/service/client_api/includes.py:WPS202",
-  "python/snowfall/project/junction/go/service/client_api/resources.py:WPS202",
-  "python/snowfall/project/junction/go/service/client_api/router.py:WPS201",
-  "python/snowfall/project/junction/go/service/client_api/routes/offers.py:WPS202",
-  "python/snowfall/project/junction/go/service/client_api/routes/orders.py:WPS202",
-  "python/snowfall/project/junction/go/service/gateway/trips.py:WPS201",
-  "python/snowfall/project/junction/hub/service/hub_api/resources.py:WPS201,WPS202",
-  "python/snowfall/project/junction/plus/service/poc_api/chatbot_utils.py:WPS202",
-  "python/snowfall/project/junction/provider/offers.py:WPS201",
-  "python/snowfall/project/junction/service/providers/ask2go/booking.py:WPS201",
-  "python/snowfall/project/junction/service/providers/benerail/adapter.py:WPS201",
-  "python/snowfall/project/junction/service/providers/benerail/booking.py:WPS201",
+  "*_test.py:WPS118,WPS432,WPS441,WPS442",
+  "conftest.py:WPS442",
+  "main.py:WPS432",
   "python/snowfall/project/junction/service/providers/benerail/stations.py:WPS232",
-  "python/snowfall/project/junction/service/providers/save_a_train/adapter.py:WPS201",
-  "python/snowfall/project/pay/service/pay_api/resources.py:WPS202",
-  "python/snowfall/stdlib/format/hcl2.py:WPS202",
   "python/snowfall/stdlib/persistence/filesystem.py:WPS402",
-  "python/snowfall/stdlib/persistence/mongo/normalizers.py:WPS202",
-  "python/snowfall/stdlib/service/application.py:WPS202",
-  "python/snowfall/vendor/ask2go/models/offers.py:WPS202",
-  "python/snowfall/vendor/carnect/models/*.py:SF10,WPS110,WPS114,WPS115,WPS118,WPS202,WPS420,WPS431,WPS604",
-  "python/snowfall/vendor/distribusion/jsonapi_helpers.py:WPS110",
-  "python/snowfall/vendor/distribusion/models/*.py:WPS202",
-  "python/snowfall/vendor/save_a_train/client.py:WPS201",
+  "python/snowfall/vendor/carnect/models/*.py:SF10,WPS114,WPS115,WPS118,WPS420,WPS431,WPS604",
 ]
 
 [tool.mypy]
@@ -203,28 +359,19 @@ external = [
   "P103",   # other string does contain unindexed parameters
   "SF10",   # All dataclasses should be frozen
   "SF20",   # Found mutable argument type
-  "WPS110", # Forbid blacklisted variable names
   "WPS111", # Forbid short variable or module names
   "WPS114", # Forbid names with underscored numbers pattern
   "WPS115", # Require snake_case for naming class attributes
   "WPS117", # Found name reserved for first argument
   "WPS118", # Forbid long variable or module names
-  "WPS204", # Forbid overused expressions in a module, function or method
-  "WPS210", # Forbid too many local variables in the unit of code
-  "WPS211", # Forbid too many arguments for a function or method
-  "WPS213", # Forbid putting too many expressions in a single function
-  "WPS214", # Forbid too many methods in a single class
-  "WPS215", # Restrict the maximum number of base classes
   "WPS217", # Forbid placing too many await expressions in a function
   "WPS218", # Forbid placing too many assert statements into a function
   "WPS219", # Forbid consecutive expressions with too deep access level
   "WPS220", # Forbid nesting blocks too deep
-  "WPS221", # Forbid complex lines
   "WPS223", # Forbid too many elif branches
   "WPS224", # Forbid too many for statements within a comprehension
   "WPS229", # Forbid try blocks with bodies that are too long
   "WPS231", # Forbid functions with too much cognitive complexity
-  "WPS235", # Forbid from ... import ... with too many imported names
   "WPS238", # Forbids too many raise statements in a function
   "WPS306", # Forbid writing classes without base classes
   "WPS320", # Forbid multi-line function type annotations.

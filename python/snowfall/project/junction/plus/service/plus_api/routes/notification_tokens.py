@@ -8,7 +8,7 @@ from snowfall.stdlib.integration.starlette import request_helpers
 
 
 class Tokens(endpoints.HTTPEndpoint):
-    async def patch(  # noqa: WPS210, WPS211
+    async def patch(
         self,
         request: requests.Request,
         subscribers_client: subscribers.Client = lagom.injectable,

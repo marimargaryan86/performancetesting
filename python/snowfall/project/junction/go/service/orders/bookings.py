@@ -46,7 +46,7 @@ class BookingHandler(object):
             timeout.total_seconds() if timeout else _GATEWAY_GRPC_TIMEOUT_SECONDS
         )
 
-    async def get_latest(  # noqa: WPS210
+    async def get_latest(
         self,
         bookings: Sequence[models_pb2.Booking],
     ) -> list[models_pb2.Booking]:

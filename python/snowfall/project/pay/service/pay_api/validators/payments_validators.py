@@ -16,11 +16,11 @@ _In = ParamSpec("_In")
 _Out = TypeVar("_Out")
 
 
-def payment_validator(  # noqa: WPS217, WPS210
+def payment_validator(  # noqa: WPS217
     func: Callable[_In, Awaitable[_Out]],
 ) -> Callable[_In, Awaitable[_Out | models.JsonApiResponse]]:
     @functools.wraps(func)
-    async def wrapper(  # noqa: WPS217, WPS210
+    async def wrapper(  # noqa: WPS217
         *args: _In.args,
         **kwargs: _In.kwargs,
     ) -> _Out | models.JsonApiResponse:

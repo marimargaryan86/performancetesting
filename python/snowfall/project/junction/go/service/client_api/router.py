@@ -33,7 +33,7 @@ from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.stdlib.integration.starlette import routes
 
 
-def get_routes(  # noqa: WPS210
+def get_routes(
     dependencies: lagom.Container,
     reseller_currencies: Mapping[str, str],
     reseller_pay_companies: Mapping[str, str],

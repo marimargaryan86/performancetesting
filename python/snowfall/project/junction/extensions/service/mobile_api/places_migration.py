@@ -29,7 +29,7 @@ _CITY_RADIUS_M = int(
 )
 
 
-async def migrate(settings: bootstrap.MigrateSettings) -> None:  # noqa: WPS210, WPS217
+async def migrate(settings: bootstrap.MigrateSettings) -> None:  # noqa: WPS217
     mongo = motor_asyncio.AsyncIOMotorClient(str(settings.mongo_dsn))
     places_repository = repository.PlacesRepository(mongo[settings.mongo_db]["places"])
     osm_data = pd.read_csv(
@@ -56,7 +56,7 @@ async def migrate(settings: bootstrap.MigrateSettings) -> None:  # noqa: WPS210,
     await _main_cities(repo=places_repository)
 
 
-async def _save_enrich_data(  # noqa: WPS210, WPS231
+async def _save_enrich_data(  # noqa: WPS231
     places: AsyncIterable[places_models_pb2.Place],
     repo: repository.PlacesRepository,
     osm_data: pd.DataFrame,

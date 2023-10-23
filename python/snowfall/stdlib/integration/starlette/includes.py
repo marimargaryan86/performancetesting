@@ -38,7 +38,7 @@ class _IncludesResolver(object):
         self._logger = stdout.get_logger()
         self._wanted_includes = wanted_includes
 
-    async def resolve(  # noqa: WPS210
+    async def resolve(
         self,
         resources: Sequence[tuple[str, models.Resource]],
         request: requests.Request,
@@ -69,7 +69,7 @@ class _IncludesResolver(object):
 
         return fetched_resources_map
 
-    async def _fetch_resources(  # noqa: WPS210
+    async def _fetch_resources(
         self,
         relationships: frozenset[tuple[str, str, str]],
         request: requests.Request,
@@ -101,7 +101,7 @@ class _IncludesResolver(object):
             for resource in itertools.chain(*(await asyncio.gather(*awaitables)))
         }
 
-    def _find_wanted_resources(  # noqa: WPS210
+    def _find_wanted_resources(
         self,
         resources: Sequence[tuple[str, models.Resource]],
     ) -> frozenset[tuple[str, str, str]]:

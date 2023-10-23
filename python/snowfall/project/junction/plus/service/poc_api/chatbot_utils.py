@@ -70,7 +70,7 @@ def order_details_by_date(
     return ordered_details
 
 
-async def build_travel_essential(  # noqa: WPS210
+async def build_travel_essential(
     order: Mapping[str, Any],
     delay_webhook_repository: repository.DelayWebhookRepository,
     fs_client: flight_stats_client.FlightStatusClient,
@@ -202,7 +202,7 @@ def home_message() -> str:  # noqa: WPS473
 def journey_signature(doc: Mapping[str, Any], idx: int = 0) -> Mapping[str, Any]:
     origin_details = doc["bookings"][0]["details"][0]
     origin_leg = origin_details["legs"][0]
-    dest_leg = doc["bookings"][-1]["details"][-1]["legs"][-1]  # noqa: WPS221, WPS219
+    dest_leg = doc["bookings"][-1]["details"][-1]["legs"][-1]  # noqa: WPS219
     destination = dest_leg["destination"]
     operator = origin_details["operator"]
     return {

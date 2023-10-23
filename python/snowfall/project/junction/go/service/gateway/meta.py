@@ -18,7 +18,7 @@ class Service(service.Service, meta_pb2_grpc.MetaServiceServicer):
     def register(self, server: aio.Server) -> None:
         meta_pb2_grpc.add_MetaServiceServicer_to_server(self, server)
 
-    async def ListProviders(  # type: ignore[override] # noqa: N802,WPS210
+    async def ListProviders(  # type: ignore[override] # noqa: N802
         self,
         request: meta_pb2.ListProvidersRequest,
         context: aio.ServicerContext,

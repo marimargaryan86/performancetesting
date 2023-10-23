@@ -39,8 +39,8 @@ def _get_response_error_message(response: httpx.Response) -> str:
     return "{0}: {1}".format(status.value, description or status.description)
 
 
-class DistribusionClient(object):  # noqa: WPS214
-    def __init__(  # noqa: WPS211
+class DistribusionClient(object):
+    def __init__(
         self,
         api_base_url: str,
         api_key: str,
@@ -80,7 +80,7 @@ class DistribusionClient(object):  # noqa: WPS214
         )
 
         return marketing_carriers.MarketingCarrierDetails(
-            **jsonapi_helpers.flatten_object(response.json()),  # noqa: WPS204
+            **jsonapi_helpers.flatten_object(response.json()),
         )
 
     async def get_marketing_carrier_booking_schema(
@@ -363,7 +363,7 @@ class DistribusionClient(object):  # noqa: WPS214
             **jsonapi_helpers.flatten_object(response.json()),
         )
 
-    async def _make_request(  # noqa: WPS211
+    async def _make_request(
         self,
         method: str,
         path: str,

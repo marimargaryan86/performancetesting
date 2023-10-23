@@ -33,7 +33,7 @@ class FindOffersByOfferSearchesFilter(object):
     cabin_classes: Sequence[common_pb2.CabinClass.Type.ValueType] | None = None
 
 
-class Client(abc.ABC):  # noqa: WPS214
+class Client(abc.ABC):
     @abc.abstractmethod
     async def get(self, identifier: str) -> models_pb2.OfferAggregate:
         """Fetch an offer resource."""
@@ -110,7 +110,7 @@ class Client(abc.ABC):  # noqa: WPS214
         """Return offer details by ids."""
 
 
-class DictClient(Client):  # noqa: WPS214
+class DictClient(Client):
     def __init__(
         self,
         offer_search_id: str,
@@ -305,7 +305,7 @@ class DictClient(Client):  # noqa: WPS214
         )
 
 
-class GrpcClient(Client):  # noqa: WPS214
+class GrpcClient(Client):
     def __init__(self, offers: grpc_pb2_grpc.OfferServiceStub, timeout: int = 10):
         self._offers = offers
         self._timeout = timeout

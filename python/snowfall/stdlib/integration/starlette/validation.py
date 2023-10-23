@@ -25,14 +25,14 @@ class OpenAPIRequest(object):
     method: str
     body: str | None
     mimetype: str
-    parameters: RequestParameters = dataclasses.field(  # noqa: WPS110
+    parameters: RequestParameters = dataclasses.field(
         default_factory=RequestParameters,
     )
 
 
 @dataclasses.dataclass(frozen=True)
 class OpenAPIResponse(object):
-    data: str  # noqa: WPS110
+    data: str
     status_code: int
     mimetype: str
     headers: Headers = dataclasses.field(default_factory=Headers)

@@ -186,7 +186,7 @@ class OfferSearchService(service.Service, offers_pb2_grpc.OfferServiceServicer):
 
 
 class TripOfferSearchConsumer(Generic[_SearchCriteriaTask, _SearchCriteria]):
-    def __init__(  # noqa: WPS211
+    def __init__(
         self,
         consumer: amqp_consumer.Consumer[offers_amqp_pb2.TripOfferSearchTask],
         producer: amqp_producer.Producer,
@@ -239,7 +239,7 @@ class TripOfferSearchConsumer(Generic[_SearchCriteriaTask, _SearchCriteria]):
             )
 
 
-def create_trip_offer_search_consumer(  # noqa: WPS211
+def create_trip_offer_search_consumer(
     amqp_connection: abc.AbstractConnection,
     redis_client: redis.Client[bytes],
     implementation: OfferSearchImplementation[_SearchCriteriaTask, _SearchCriteria],

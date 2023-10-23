@@ -36,7 +36,7 @@ class OrdersSettings(config.BaNdcConfig, application.Settings):
     storage_dsn: application.AnyDsn
 
 
-async def orders(  # noqa: WPS210, WPS217
+async def orders(  # noqa: WPS217
     app: application.Application[OrdersSettings],
 ) -> None:
     http_client = await app.stack.enter_async_context(

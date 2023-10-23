@@ -11,7 +11,7 @@ from snowfall.vendor.benerail.clients import (
 )
 
 
-class BenerailClient(object):  # noqa: WPS214
+class BenerailClient(object):
     def __init__(
         self,
         subscription_key: str,

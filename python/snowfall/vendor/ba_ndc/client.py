@@ -10,7 +10,7 @@ from snowfall.vendor.ba_ndc import errors
 from snowfall.vendor.ba_ndc.adapters.offers_response_adapter import (
     OffersResponseAdapter,
 )
-from snowfall.vendor.ba_ndc.models import (  # noqa: WPS235
+from snowfall.vendor.ba_ndc.models import (
     request_add_seat_schemas,
     request_name_correction_schemas,
     request_offer_search_schemas,
@@ -33,7 +33,7 @@ def _request_query_params(offer_id: UUID | None, order_id: UUID | None) -> Any:
     return {"orderId": order_id}
 
 
-class BaNdcClient(object):  # noqa: WPS214
+class BaNdcClient(object):
     def __init__(
         self,
         api_base_url: str,
@@ -237,7 +237,7 @@ class BaNdcClient(object):  # noqa: WPS214
             response.content,
         )
 
-    async def _make_request(  # noqa: WPS211
+    async def _make_request(
         self,
         method: str,
         path: str,

@@ -26,7 +26,7 @@ _Impl = offers.OfferSearchImplementation[
 ]
 
 
-async def offers_factory(  # noqa: WPS210
+async def offers_factory(
     app: service.Application[config.Settings],
     amqp_connection: abc.AbstractConnection,
     redis_connection: aioredis.Redis[bytes],

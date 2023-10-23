@@ -7,7 +7,7 @@ from snowfall.vendor.karhoo import parsers
 from snowfall.vendor.karhoo.models import bookings, fares, location, quotes
 
 
-class KarhooClient(client.HttpClient):  # noqa: WPS214
+class KarhooClient(client.HttpClient):
     def __init__(self, api_key: str, base_url: str, http_client: httpx.AsyncClient):
         super().__init__(base_url, http_client)
         self._api_key = api_key

@@ -15,7 +15,7 @@ from snowfall.project.junction.plus.service.notifications.v1alpha import (
 from snowfall.stdlib.format import protobuf
 
 
-class Client(abc.ABC):  # noqa: WPS214
+class Client(abc.ABC):
     @abc.abstractmethod
     async def get(
         self,
@@ -66,7 +66,7 @@ class Client(abc.ABC):  # noqa: WPS214
         """Update sent_weather_report flag for monitoring rules."""
 
 
-class DictClient(Client):  # noqa: WPS214
+class DictClient(Client):
     def __init__(
         self,
         monitoring_rules: Sequence[notifications_models_pb2.MonitoringRule],
@@ -141,7 +141,7 @@ class DictClient(Client):  # noqa: WPS214
         """Send weather report."""
 
 
-class GrpcClient(Client):  # noqa: WPS214
+class GrpcClient(Client):
     def __init__(
         self,
         monitoring_rules: notifications_pb2_grpc.MonitoringRuleServiceStub,

@@ -359,7 +359,7 @@ def resellers_client() -> resellers.Client:
     return resellers.DictClient(fixtures.get_resellers())
 
 
-def _create_app(  # noqa: WPS211
+def _create_app(
     orders_client: orders.Client,
     companies_client: companies.Client,
     accounts_client: accounts.Client,
@@ -429,7 +429,7 @@ async def client(
 
 
 @pytest.fixture()
-def app(  # noqa: WPS211
+def app(
     orders_client: orders.Client,
     companies_client: companies.Client,
     contacts_client: contacts.Client,

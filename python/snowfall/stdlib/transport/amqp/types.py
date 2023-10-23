@@ -27,7 +27,7 @@ class MessageStatus(enum.IntEnum):
 
 
 @dataclasses.dataclass(init=False)  # noqa: SF10
-class Message(Generic[_Proto]):  # noqa: WPS214
+class Message(Generic[_Proto]):
     body: _Proto
     headers: Mapping[str, Any]
     status: MessageStatus

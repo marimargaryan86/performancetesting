@@ -9,7 +9,7 @@ from snowfall.vendor.carnect.builders.common import (
     PosBuilder,
 )
 from snowfall.vendor.carnect.config import Config
-from snowfall.vendor.carnect.models.service import (  # noqa: WPS235
+from snowfall.vendor.carnect.models.service import (
     CompanyNameType,
     CustomerPrimaryAdditionalType,
     CustomerType,
@@ -35,7 +35,7 @@ class AddressBuilder(AddressInfoBuilder[CustomerType.Address]):
         super().__init__(CustomerType.Address())
 
 
-class CustomerBuilder(Generic[C]):  # noqa: WPS214
+class CustomerBuilder(Generic[C]):
     def __init__(self, customer: C) -> None:
         self._customer = customer
 
@@ -108,7 +108,7 @@ class CustomerAdditionalBuilder(
         super().__init__(customer=CustomerPrimaryAdditionalType.Additional())
 
 
-class ReservationBuilder(BaseBuilderRq[VehResRq]):  # noqa: WPS214
+class ReservationBuilder(BaseBuilderRq[VehResRq]):
     def __init__(self, config: Config) -> None:
         self._rq = VehResRq()
         self._pos = PosBuilder()

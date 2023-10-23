@@ -51,7 +51,7 @@ def offer_group_cache_key(task: amqp_pb2.SearchCriteriaTask) -> str:
     )
 
 
-class MarketingCarrierAdapter(object):  # noqa: WPS214
+class MarketingCarrierAdapter(object):
     def __init__(
         self,
         marketing_carrier: connections.MarketingCarrier,
@@ -207,7 +207,7 @@ class MarketingCarrierAdapters(object):
         return adapter
 
 
-class DistribusionSearchAdapter(object):  # noqa: WPS214
+class DistribusionSearchAdapter(object):
     def __init__(
         self,
         distribusion_client: client.DistribusionClient,
@@ -300,7 +300,7 @@ class DistribusionSearchAdapter(object):  # noqa: WPS214
 
                 yield offer_group
 
-    async def _parse_connection(  # noqa: WPS210
+    async def _parse_connection(
         self,
         search_criteria: FindConnectionsCriteria,
         connection: connections.Connection,

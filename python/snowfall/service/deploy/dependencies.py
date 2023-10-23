@@ -35,7 +35,7 @@ class _ResolvedTemplate(object):
     provides: frozenset[str] = dataclasses.field(default_factory=frozenset)
 
 
-async def resolver_from_nomad_templates(  # noqa: WPS210
+async def resolver_from_nomad_templates(
     templates_path: pathlib.Path,
 ) -> Resolver:
     dependency_lookup = defaultdict(set)
@@ -66,7 +66,7 @@ async def resolver_from_nomad_templates(  # noqa: WPS210
     )
 
 
-async def _resolve_from_service(  # noqa: WPS210
+async def _resolve_from_service(
     service: hcl2.Service,
     job_name: str,
 ) -> tuple[frozenset[str], frozenset[str]]:
@@ -92,7 +92,7 @@ async def _resolve_from_service(  # noqa: WPS210
     return frozenset(needs), frozenset(provides)
 
 
-async def _resolve_from_job(  # noqa: WPS210
+async def _resolve_from_job(
     job: hcl2.Job,
     job_name: str,
 ) -> tuple[frozenset[str], frozenset[str]]:
@@ -113,7 +113,7 @@ async def _resolve_from_job(  # noqa: WPS210
     return frozenset(needs), frozenset(provides)
 
 
-async def _resolve_from_nomad_template(  # noqa: WPS210
+async def _resolve_from_nomad_template(
     template_path: pathlib.Path,
 ) -> _ResolvedTemplate:
     async with aiofiles.open(template_path) as template_file:

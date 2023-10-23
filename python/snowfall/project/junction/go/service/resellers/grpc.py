@@ -21,11 +21,11 @@ _PROVIDERS_KEY = "{0}/providers/reseller-providers"
 _CURRENCIES_KEY = "{0}/client-api/reseller-currencies"
 
 
-class ResellerService(  # noqa: WPS214
+class ResellerService(
     service.Service,
     resellers_pb2_grpc.ResellerServiceServicer,
 ):
-    def __init__(  # noqa: WPS211
+    def __init__(
         self,
         default_page_size: int,
         resellers_repo: persistence.ResellerRepository,

@@ -3,7 +3,7 @@ from snowfall.stdlib import string
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 
 
-class PayersRepository(  # noqa: WPS215
+class PayersRepository(
     repository.ProtoRepository[models_pb2.Payer],
     mixins.AllMixin[models_pb2.Payer],
     mixins.FindByIdMixin[models_pb2.Payer],

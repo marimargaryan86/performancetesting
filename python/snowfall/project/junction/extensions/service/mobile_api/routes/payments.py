@@ -44,7 +44,7 @@ async def get_or_create_stripe_customer(
 
 
 class Payments(endpoints.HTTPEndpoint):
-    async def post(  # noqa: WPS210
+    async def post(
         self,
         request: requests.Request,
         users_repository: repository.UsersRepository = lagom.injectable,

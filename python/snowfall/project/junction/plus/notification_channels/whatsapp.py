@@ -46,7 +46,7 @@ class Channel(AbstractChannel):
     ) -> Sequence[str]:
         raise NotImplementedError()
 
-    def send_message(  # noqa: WPS211
+    def send_message(
         self,
         receiver: models_pb2.Subscriber,
         sender_configuration: models_pb2.ConfigurationVector,
@@ -69,7 +69,7 @@ class ProviderChannel(Channel):
         self._redis = redis_client
         self._templates_root_path = templates_root_path
 
-    async def order_confirmation(  # noqa: WPS210
+    async def order_confirmation(
         self,
         event: models_pb2.NotificationEvent,
         receiver: models_pb2.Subscriber,
@@ -208,7 +208,7 @@ class ProviderChannel(Channel):
         )
         return [sid]
 
-    def send_message(  # noqa: WPS211
+    def send_message(
         self,
         receiver: models_pb2.Subscriber,
         sender_configuration: models_pb2.ConfigurationVector,
@@ -271,7 +271,7 @@ class MockChannel(Channel):
         )
         return [str(event.receiver_id)]
 
-    def send_message(  # noqa: WPS211
+    def send_message(
         self,
         receiver: models_pb2.Subscriber,
         sender_configuration: models_pb2.ConfigurationVector,

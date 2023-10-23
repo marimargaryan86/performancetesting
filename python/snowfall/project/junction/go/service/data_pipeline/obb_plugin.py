@@ -47,7 +47,7 @@ class OBBParser(HTMLParser):
         elif tag == "h4":
             self.inside_title = False
 
-    def handle_data(self, data: str) -> None:  # noqa: WPS110
+    def handle_data(self, data: str) -> None:
         if self.inside_title and "GTFS Fahrplan ÖBB" in data and not is_old_name(data):
             self.save_current = True
 

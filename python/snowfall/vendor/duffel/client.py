@@ -35,8 +35,8 @@ def _get_response_error_message(response: httpx.Response) -> str:
     return "{0}: {1}, {2}".format(error_status, error_title, error_message)
 
 
-class DuffelClient(object):  # noqa: WPS214
-    def __init__(  # noqa: WPS211
+class DuffelClient(object):
+    def __init__(
         self,
         api_base_url: str,
         api_key: str,
@@ -157,7 +157,7 @@ class DuffelClient(object):  # noqa: WPS214
 
         return CancelResponse.parse_raw(response.content).response_data
 
-    async def _make_request(  # noqa: WPS211
+    async def _make_request(
         self,
         method: str,
         path: str,

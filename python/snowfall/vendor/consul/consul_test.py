@@ -14,7 +14,7 @@ async def test_get_key_returned(
         content=consul_value,
     )
 
-    value = await consul_client.get_key(  # noqa: WPS110
+    value = await consul_client.get_key(
         "/providers/reseller-providers/",
     )
 
@@ -33,7 +33,7 @@ async def test_put_key_succeeded(
         headers={"Content-Type": ""},
     )
 
-    value = await consul_client.put_key(  # noqa: WPS110
+    value = await consul_client.put_key(
         "/providers/reseller-providers/",
         consul_value,
     )

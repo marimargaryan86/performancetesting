@@ -12,7 +12,7 @@ _EXPIRATION_MINUTES = 15
 
 
 class Quote(object):
-    def __init__(  # noqa: WPS211
+    def __init__(
         self,
         amount: int,
         from_currency: money.Currency,
@@ -76,7 +76,7 @@ class Quote(object):
     def _calculate_fx_buffer_rate(self, buffer_rate: float) -> float:
         return self._rate * buffer_rate / 100
 
-    def _calculate_margins(self) -> dict[str, money.Money]:  # noqa: WPS210, WPS204
+    def _calculate_margins(self) -> dict[str, money.Money]:
         beneficiary = money.Money(self._amount, currency=self._from_currency)
         rate = Decimal(self._rate)
         base_converted = beneficiary.convert(

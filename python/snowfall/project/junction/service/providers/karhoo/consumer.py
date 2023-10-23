@@ -17,8 +17,8 @@ from snowfall.vendor.karhoo import client, errors
 from snowfall.vendor.karhoo.models import location, quotes
 
 
-class TripOfferSearchConsumer(object):  # noqa: WPS214
-    def __init__(  # noqa: WPS211
+class TripOfferSearchConsumer(object):
+    def __init__(
         self,
         consumer_obj: consumer.Consumer[offers_amqp_pb2.TripOfferSearchTask],
         karhoo_client: client.KarhooClient,

@@ -16,7 +16,7 @@ _MOCK_PRICE_UNITS = 13
 _MOCK_PRICE_NANOS = 370000000
 
 
-class Client(abc.ABC):  # noqa: WPS214
+class Client(abc.ABC):
     @abc.abstractmethod
     async def create_journey(
         self,
@@ -100,7 +100,7 @@ class Client(abc.ABC):  # noqa: WPS214
         """Fetch a booking details resource."""
 
     @abc.abstractmethod
-    async def find_journeys(  # noqa: WPS211
+    async def find_journeys(
         self,
         identifiers: Sequence[str] | None = None,
         reseller_id: str | None = None,
@@ -179,7 +179,7 @@ class Client(abc.ABC):  # noqa: WPS214
         """Fetch all booking cancellation resources related to bookings."""
 
 
-class DictClient(Client):  # noqa: WPS214
+class DictClient(Client):
     def __init__(
         self,
         journeys: Sequence[models_pb2.Journey],
@@ -330,7 +330,7 @@ class DictClient(Client):  # noqa: WPS214
 
         raise errors.NotFoundError()
 
-    async def find_journeys(  # noqa: WPS211
+    async def find_journeys(
         self,
         identifiers: Sequence[str] | None = None,
         reseller_id: str | None = None,
@@ -572,7 +572,7 @@ class DictClient(Client):  # noqa: WPS214
 _GRPC_TIMEOUT_SECONDS = 15
 
 
-class GrpcClient(Client):  # noqa: WPS214
+class GrpcClient(Client):
     def __init__(
         self,
         orders: orders_pb2_grpc.OrderServiceStub,
@@ -633,7 +633,7 @@ class GrpcClient(Client):  # noqa: WPS214
             self._orders.GetJourney(
                 orders_pb2.GetJourneyRequest(
                     id=identifier,
-                    reseller_id=reseller_id or "",  # noqa: WPS204
+                    reseller_id=reseller_id or "",
                 ),
                 timeout=self._timeout,
             ),
@@ -767,7 +767,7 @@ class GrpcClient(Client):  # noqa: WPS214
 
         return response.details
 
-    async def find_journeys(  # noqa: WPS211
+    async def find_journeys(
         self,
         identifiers: Sequence[str] | None = None,
         reseller_id: str | None = None,

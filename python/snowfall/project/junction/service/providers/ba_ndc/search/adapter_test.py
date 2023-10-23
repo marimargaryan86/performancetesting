@@ -61,7 +61,7 @@ async def test_adapter(
         assert offer_groups[0].offers[2].brand_name == "PLUS SELECT"
 
 
-async def test_offer_price_breakdown(  # noqa: WPS210, WPS218
+async def test_offer_price_breakdown(  # noqa: WPS218
     httpx_mock: pytest_httpx.HTTPXMock,
     search_adapter: adapter.BaNdcSearchAdapter,
 ) -> None:

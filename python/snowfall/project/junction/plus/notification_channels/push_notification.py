@@ -48,7 +48,7 @@ class Channel(AbstractChannel):
     ) -> Sequence[str]:
         raise NotImplementedError()
 
-    def send_message(  # noqa: WPS211
+    def send_message(
         self,
         receiver: models_pb2.Subscriber,
         sender_configuration: models_pb2.ConfigurationVector,
@@ -93,7 +93,7 @@ class MockChannel(Channel):
     ) -> Sequence[str]:
         raise NotImplementedError()
 
-    def send_message(  # noqa: WPS211
+    def send_message(
         self,
         receiver: models_pb2.Subscriber,
         sender_configuration: models_pb2.ConfigurationVector,
@@ -189,7 +189,7 @@ class ProviderChannel(Channel):
     ) -> Sequence[str]:
         raise NotImplementedError()
 
-    def send_message(  # noqa: WPS211
+    def send_message(
         self,
         receiver: models_pb2.Subscriber,
         sender_configuration: models_pb2.ConfigurationVector,

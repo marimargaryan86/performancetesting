@@ -492,7 +492,7 @@ class PriceQuotes(object):
     _price_quotes_client: price_quotes.Client
     _reseller_pay_companies: Mapping[str, str]
 
-    async def post(  # noqa: WPS210
+    async def post(
         self,
         request: messages.Request,
     ) -> responses.Response:

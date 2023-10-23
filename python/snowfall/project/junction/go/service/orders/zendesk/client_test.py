@@ -11,7 +11,7 @@ from snowfall.stdlib.transport.http import errors
 
 
 class TestZendeskClient(object):
-    async def test_create_support_ticket(  # noqa: WPS210
+    async def test_create_support_ticket(
         self,
         httpx_mock: pytest_httpx.HTTPXMock,
         zendesk_client: ZendeskClient,

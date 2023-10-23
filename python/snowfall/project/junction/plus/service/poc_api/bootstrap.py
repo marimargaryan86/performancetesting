@@ -39,7 +39,7 @@ class Settings(application.Settings):
     openai_api_key: str
 
 
-def create_dependencies(  # noqa: WPS211
+def create_dependencies(
     junction_client: client.Client,
     redis_client: redis.Client[str],
     fs_client: flight_stats_client.FlightStatusClient,

@@ -6,7 +6,7 @@ from snowfall.project.junction.plus.service.notifications.v1alpha import models_
 from snowfall.stdlib.format import protobuf
 
 
-def compress_flights(  # noqa: WPS210
+def compress_flights(
     flights: Sequence[models_pb2.AirBooking],
 ) -> Sequence[models_pb2.AirBooking]:
     if not flights:

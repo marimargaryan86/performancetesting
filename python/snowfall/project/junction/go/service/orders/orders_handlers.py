@@ -13,8 +13,8 @@ from snowfall.stdlib.transport.grpc import rich_status
 from snowfall.stdlib.transport.http.errors import HttpStatusError
 
 
-class CreateCancellationRequestHandler(object):  # noqa: WPS214
-    def __init__(  # noqa: WPS211
+class CreateCancellationRequestHandler(object):
+    def __init__(
         self,
         request: orders_pb2.CreateCancellationRequestRequest,
         context: aio.ServicerContext,
@@ -30,7 +30,7 @@ class CreateCancellationRequestHandler(object):  # noqa: WPS214
         self._zendesk_client = zendesk_client
         self._cancellation_group_id = cancellation_group_id
 
-    async def execute(  # noqa: WPS210
+    async def execute(
         self,
     ) -> orders_pb2.CreateCancellationRequestResponse:
         document = self._request.cancellation_request

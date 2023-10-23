@@ -34,7 +34,7 @@ class ReverseGeocoder(object):
     ):
         self._aws_location_client = aws_location_client
 
-    def get_locations(  # noqa: WPS211
+    def get_locations(
         self,
         text: str,
         limit: int,

@@ -21,7 +21,7 @@ class _Configuration(pydantic.BaseModel):
     sandbox: _Environment
 
 
-def _validate_jobs(  # noqa: WPS210
+def _validate_jobs(
     template_path: pathlib.Path,
     filename: str,
     jobs: Sequence[Mapping[str, hcl2.Job]],

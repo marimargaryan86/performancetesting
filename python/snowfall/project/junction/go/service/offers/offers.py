@@ -275,7 +275,7 @@ class OfferAggregateMappingRepository(
         )
 
 
-class OfferSearchRepository(  # noqa: WPS215
+class OfferSearchRepository(
     repository.ProtoRepository[models_pb2.OfferSearch],
     mixins.AllMixin[models_pb2.OfferSearch],
     mixins.FindByIdMixin[models_pb2.OfferSearch],

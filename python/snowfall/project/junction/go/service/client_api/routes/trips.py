@@ -148,7 +148,7 @@ def _get_departure_after(body: Mapping[str, Any]) -> datetime.datetime:
 
 
 class TripSearches(endpoints.HTTPEndpoint):
-    async def post(  # noqa: WPS210
+    async def post(
         self,
         request: requests.Request,
         locations_client: locations.Client = lagom.injectable,

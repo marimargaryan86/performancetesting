@@ -118,7 +118,7 @@ class TripRepository(
         )
 
 
-class TripSearchRepository(  # noqa: WPS215
+class TripSearchRepository(
     repository.ProtoRepository[trips_pb2.TripSearch],
     mixins.FindByIdMixin[trips_pb2.TripSearch],
     mixins.InsertMixin[trips_pb2.TripSearch],
@@ -184,7 +184,7 @@ class TripSearchRepository(  # noqa: WPS215
         return await super().insert(new_trip_search)
 
 
-class TripCandidateSearchRepository(  # noqa: WPS215
+class TripCandidateSearchRepository(
     repository.ProtoRepository[trips_pb2.TripCandidateSearch],
     mixins.FindByIdMixin[trips_pb2.TripCandidateSearch],
     mixins.InsertMixin[trips_pb2.TripCandidateSearch],

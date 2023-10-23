@@ -15,7 +15,7 @@ from snowfall.vendor.duffel.models.single_offer import SingleOfferResponse
 
 
 class TestPricingTransformer(object):
-    async def test_offer_to_price_quote_price(  # noqa: WPS218, WPS210
+    async def test_offer_to_price_quote_price(  # noqa: WPS218
         self,
         redis_client: aioredis.Redis[bytes],
     ) -> None:

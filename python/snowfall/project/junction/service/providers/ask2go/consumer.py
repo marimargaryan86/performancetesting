@@ -21,7 +21,7 @@ from snowfall.vendor.ask2go.models import seat_map
 
 
 class PriceQuoteConsumer(object):
-    def __init__(  # noqa: WPS211
+    def __init__(
         self,
         consumer_obj: consumer.Consumer[offers_amqp_pb2.TripPriceQuoteTask],
         producer_obj: producer.Producer,
@@ -68,7 +68,7 @@ class PriceQuoteConsumer(object):
 
 
 class OrderConsumer(object):
-    def __init__(  # noqa: WPS211
+    def __init__(
         self,
         consumer_obj: consumer.Consumer[orders_amqp_pb2.PlaceOrderTask],
         producer_obj: producer.Producer,
@@ -114,7 +114,7 @@ class OrderConsumer(object):
 
 
 class SeatMapRpcServer(object):
-    def __init__(  # noqa: WPS211
+    def __init__(
         self,
         address: str,
         exchange: amqp_types.Exchange,
@@ -130,7 +130,7 @@ class SeatMapRpcServer(object):
         self._ask2go_client = ask2go_client
         self._cache = offer_cache
 
-    async def consume(self) -> None:  # noqa: WPS217, WPS210
+    async def consume(self) -> None:  # noqa: WPS217
         # TODO: refactor to rpc_server class
         connection = await connect_robust(self._address)
         channel = await connection.channel()

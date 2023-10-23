@@ -17,7 +17,7 @@ _logger = stdout.get_logger()
 class Transactions(endpoints.HTTPEndpoint):
     _default_page_size = 20
 
-    async def get(  # noqa: WPS210
+    async def get(
         self,
         request: requests.Request,
         client: transactions_adapter.Client = lagom.injectable,

@@ -8,7 +8,7 @@ from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
 
 class DuffelClientFactory(object):
-    def __init__(  # noqa: WPS211
+    def __init__(
         self,
         api_base_url: str,
         api_key: str,

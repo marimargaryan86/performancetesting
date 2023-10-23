@@ -120,7 +120,7 @@ class LocationsService(service.Service, places_pb2_grpc.LocationsServiceServicer
         )
 
 
-class PlacesService(  # noqa: WPS214
+class PlacesService(
     service.Service,
     places_pb2_grpc.PlacesServiceServicer,
 ):

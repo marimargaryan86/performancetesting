@@ -14,7 +14,7 @@ class Price(KarhooBaseModel):
 
 
 class Breakdown(KarhooBaseModel):
-    value: int  # noqa: WPS110
+    value: int
     name: str
     description: str | None
 

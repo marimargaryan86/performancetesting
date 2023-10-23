@@ -114,7 +114,7 @@ class LocationRepository(
 
         return _unique(locations)
 
-    async def find_within_area_by_type(  # noqa: WPS211
+    async def find_within_area_by_type(
         self,
         cursor: str,
         longitude: float,
@@ -160,7 +160,7 @@ class _PlaceNormalizer(normalizers.Normalizer):
         return maybe_dict
 
 
-class PlaceRepository(  # noqa: WPS215
+class PlaceRepository(
     repository.ProtoRepository[models_pb2.Place],
     mixins.FindByIdMixin[models_pb2.Place],
     mixins.InsertMixin[models_pb2.Place],

@@ -117,7 +117,7 @@ class Entrypoint(object):
             },
         )
 
-    def enter_with_commands(  # noqa: WPS211
+    def enter_with_commands(
         self,
         _cmd0: Command[_Settings0],
         _cmd1: Command[_Settings1] | None = None,

@@ -16,7 +16,7 @@ from snowfall.vendor.carnect.models.service import (
 from snowfall.vendor.carnect.xml_datetime_tools import datetime_to_xml
 
 
-class VehicleRentalCoreBuilder(object):  # noqa: WPS214
+class VehicleRentalCoreBuilder(object):
     def __init__(self) -> None:
         self._core_type = VehicleRentalCoreType()
 
@@ -73,7 +73,7 @@ class VehicleRentalCoreBuilder(object):  # noqa: WPS214
         return self
 
 
-class VehAvailRateRqBuilder(BaseBuilderRq[VehAvailRateRq]):  # noqa: WPS214
+class VehAvailRateRqBuilder(BaseBuilderRq[VehAvailRateRq]):
     def __init__(self, config: Config) -> None:
         self._rq = VehAvailRateRq()
         self._rq.version = decimal.Decimal("1.0")

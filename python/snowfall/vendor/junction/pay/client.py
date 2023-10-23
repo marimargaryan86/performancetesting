@@ -7,7 +7,7 @@ _ATTRIBUTES_KEY = "attributes"
 
 
 class Client(BaseClient):
-    async def create_quote(  # noqa: WPS211
+    async def create_quote(
         self,
         amount: int,
         external_reference: str,

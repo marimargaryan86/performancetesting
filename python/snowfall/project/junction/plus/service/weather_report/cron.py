@@ -37,7 +37,7 @@ _WEATHER_CONDITION_GROUP_ICONS = types.MappingProxyType(
 
 
 class WeatherReportCronJob(object):
-    def __init__(  # noqa: WPS211
+    def __init__(
         self,
         monitoring_rules: monitoring_rules_adapter.Client,
         subscribers: subscribers_adapter.Client,
@@ -52,7 +52,7 @@ class WeatherReportCronJob(object):
         self._open_weather_map_client = open_weather_map_client
         self._logger = stdout.get_logger()
 
-    async def run(self) -> None:  # noqa: WPS231, WPS210, WPS217
+    async def run(self) -> None:  # noqa: WPS231, WPS217
         self._logger.info("Started weather reporter as a cron job")
         candidates = await self._monitoring_rules.get_rules_for_upcoming_events(
             sent_flag="sent_weather_report",
@@ -114,7 +114,7 @@ class WeatherReportCronJob(object):
                     return False
         return True
 
-    async def generate_weather_report(  # noqa: WPS210
+    async def generate_weather_report(
         self,
         candidate: models_pb2.MonitoringRule,
     ) -> str:

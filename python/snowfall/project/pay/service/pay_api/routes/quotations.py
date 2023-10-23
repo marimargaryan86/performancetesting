@@ -10,7 +10,7 @@ from snowfall.stdlib.integration.starlette import messages, models, request_help
 
 
 class Quotations(endpoints.HTTPEndpoint):
-    async def post(  # noqa: WPS210,WPS211, WPS217
+    async def post(  # noqa: WPS217
         self,
         request: requests.Request,
         quotations_client: quotations.Client = lagom.injectable,

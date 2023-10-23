@@ -19,7 +19,7 @@ from snowfall.vendor.ask2go.models import (
 from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
 
-class Ask2GoClient(object):  # noqa: WPS214
+class Ask2GoClient(object):
     def __init__(
         self,
         api_base_url: str,
@@ -194,7 +194,7 @@ class Ask2GoClient(object):  # noqa: WPS214
         return price.OfferPriceResponse(**response.json())
 
     # pricing
-    async def create_air_offer_async(  # noqa: WPS211
+    async def create_air_offer_async(
         self,
         search_id: str,
         offer_id: str,
