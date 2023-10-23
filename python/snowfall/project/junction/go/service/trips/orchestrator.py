@@ -58,7 +58,7 @@ class TripOrchestrator(object):
 
         for response in journey_search_responses:
             if isinstance(response, Exception):
-                raise CantFulfillFullTripError()
+                raise CantFulfillFullTripError from response
 
             trip_reference_groups.append(list(response.trips))
 

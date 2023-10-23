@@ -276,6 +276,10 @@ class TripsByTripSearch(endpoints.HTTPEndpoint):
         )
 
 
+class _NoPossibleLocationsCombinationError(Exception):
+    """Raised when there are 0 possible origins and destinations combinations."""
+
+
 def _create_single_criteria(
     search_criteria: Mapping[str, Any],
     locations_per_search: Mapping[CoordinatesSearchable, Sequence[latlng_pb2.LatLng]],
@@ -360,13 +364,20 @@ class TripCandidateSearches(object):
             if departure_before <= parser.isoparse(criteria["departureAfter"]):
                 raise exceptions.HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY)
 
+        try:
+            trip_candidate_search = await self._create_trip_candidate_search(
+                request,
+            )
+        except _NoPossibleLocationsCombinationError:
+            raise exceptions.HTTPException(
+                status.HTTP_422_UNPROCESSABLE_ENTITY,
+            ) from _NoPossibleLocationsCombinationError
+
         return await messages.create_response(
             body=models.Body(
                 data=resources.TripCandidateSearchResource.from_proto(
                     trip_candidate_search=await self._trip_candidate_searches_client.create(
-                        trip_candidate_search=await self._create_trip_candidate_search(
-                            request,
-                        ),
+                        trip_candidate_search=trip_candidate_search,
                     ),
                     request=request.starlette_request,
                 ),
@@ -430,6 +441,9 @@ class TripCandidateSearches(object):
     ) -> list[trips_pb2.TripCandidateSearchCriteria]:
         locations_per_search = await self._get_nearby_locations(criteria)
 
+        if len(locations_per_search) < 2:
+            raise _NoPossibleLocationsCombinationError
+
         return [
             _create_single_criteria(criterion, locations_per_search)
             for criterion in criteria
@@ -465,6 +479,8 @@ class TripCandidateSearches(object):
                     ),
                 ),
             )
+
+        coordinate_pairs = list(set(coordinate_pairs))
 
         nearby_locations = await asyncio.gather(
             *[
