@@ -104,9 +104,16 @@ job "zendesk-webhook-http" {
     task "http" {
       driver = "docker"
 
+      vault {
+        policies = ["zendesk-webhook-${var.environment}"]
+      }
+
       template {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
+{{ with secret "kv/data/${var.environment}/zendesk-webhook" }}
+WEBHOOK_SIGNING_SECRET={{ .Data.data.webhook_signing_secret }}
+{{ end }}
 EOH
         destination = "services.env"
         env         = true

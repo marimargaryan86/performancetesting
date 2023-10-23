@@ -1,10 +1,14 @@
 import datetime
 
 import pydantic
+from starlette import middleware
 
 from snowfall.project.junction.go.service.zendesk_webhook.amqp import EventProducer
 from snowfall.project.junction.go.service.zendesk_webhook.bootstrap import (
     create_dependencies,
+)
+from snowfall.project.junction.go.service.zendesk_webhook.midleware import (
+    ZendeskSignatureValidator,
 )
 from snowfall.project.junction.go.service.zendesk_webhook.router import get_routes
 from snowfall.stdlib.integration.starlette import application as starlette
@@ -14,6 +18,7 @@ from snowfall.stdlib.transport.amqp import producer, types
 
 class _Settings(starlette.Settings):
     amqp_dsn: pydantic.AmqpDsn
+    webhook_signing_secret: str
     default_ttl: datetime.timedelta = datetime.timedelta(days=30)
 
 
@@ -32,6 +37,12 @@ async def _http(app: application.Application[_Settings]) -> None:
                 ),
             ),
         ),
+        custom_middlewares=[
+            middleware.Middleware(
+                ZendeskSignatureValidator,
+                secret=app.settings.webhook_signing_secret,
+            ),
+        ],
         openapi_path=None,
     )
 
