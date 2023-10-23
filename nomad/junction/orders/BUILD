@@ -1,3 +1,4 @@
 nomad_template(
-    ["grpc", "import"], "python/snowfall/project/junction/go/service/orders:main"
+    ["grpc", "import", "consume-ticket-events"],
+    "python/snowfall/project/junction/go/service/orders:main",
 )

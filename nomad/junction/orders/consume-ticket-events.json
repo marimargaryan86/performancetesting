@@ -1,0 +1,20 @@
+{
+  "development": {
+    "deploy": true,
+    "variables": {
+      "count": 2
+    }
+  },
+  "production": {
+    "deploy": false,
+    "variables": {
+      "count": 2
+    }
+  },
+  "sandbox": {
+    "deploy": false,
+    "variables": {
+      "count": 1
+    }
+  }
+}

@@ -12,6 +12,7 @@ from snowfall.project.junction.go.adapter import passenger_name_records
 from snowfall.project.junction.go.service.gateway.v1 import bookings_pb2_grpc
 from snowfall.project.junction.go.service.orders import bookings, importer, orders
 from snowfall.project.junction.go.service.orders.amqp import OrderProducer
+from snowfall.project.junction.go.service.orders.consumer import TicketEventConsumer
 from snowfall.project.junction.go.service.orders.grpc import OrderService
 from snowfall.project.junction.go.service.orders.pay_transactions import (
     PayTransactionCreator,
@@ -48,6 +49,10 @@ class _ImportSettings(pay_integration.Settings, application.Settings):
     mongo_dsn: Sequence[pydantic.AnyUrl]
     passenger_name_records_address: str
     use_pay_to_create_transaction: bool = False
+
+
+class _TicketEventsConsumerSettings(application.Settings):
+    amqp_dsn: pydantic.AmqpDsn
 
 
 async def _serve(app: application.Application[_GrpcSettings]) -> None:
@@ -175,6 +180,21 @@ async def _import(app: application.Application[_ImportSettings]) -> None:
     await booking_importer.consume()
 
 
+async def _consume_ticket_events(
+    app: application.Application[_TicketEventsConsumerSettings],
+) -> None:
+    connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
+
+    event_consumer = TicketEventConsumer(
+        consumer_obj=consumer.Consumer(
+            connection=connection,
+            queue_name="{0}_zendesk_events".format(app.name),
+            binds=[(types.Exchange("zendesk_webhook"), "zendesk_webhook.event")],
+        ),
+    )
+    await event_consumer.consume()
+
+
 if __name__ == "__main__":
     entrypoint = application.Entrypoint(name="orders")
 
@@ -188,5 +208,10 @@ if __name__ == "__main__":
             name="import",
             callback=_import,
             settings_class=_ImportSettings,
+        ),
+        application.Command(
+            name="consume-ticket-events",
+            callback=_consume_ticket_events,
+            settings_class=_TicketEventsConsumerSettings,
         ),
     )
