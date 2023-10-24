@@ -184,7 +184,8 @@ job "traefik-ingress" {
           "--providers.consulcatalog.connectaware=true",
           "--providers.consulcatalog.exposedbydefault=false",
           "--providers.file.directory=local/traefik",
-          "--log.level=DEBUG"
+          "--log.level=DEBUG",
+          "--log.format=json"
           // "--log.level=WARN"
         ]
       }
