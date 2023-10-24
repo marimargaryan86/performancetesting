@@ -1,6 +1,7 @@
 <script lang="ts">
   import ChevronIcon from "components/icons/chevron-icon.svelte";
   import LogoutIcon from "components/icons/logout-icon.svelte";
+  import BugIcon from "components/icons/bug-icon.svelte";
   import Account from "./account.svelte";
   import Menu from "./menu.svelte";
   import HubLogo from "components/icons/hub-logo.svelte";
@@ -20,6 +21,20 @@
   function logout(): void {
     callAction({ action: routeConfig.routes.login.actions.logout });
   }
+
+  $: activeLink = getActiveLink($page.url.pathname);
+
+  function getActiveLink(pathname: string): "help" | "issue" | undefined {
+    if (!pathname.startsWith(routeConfig.routes.help.root)) {
+      return undefined;
+    }
+
+    if (pathname.startsWith(routeConfig.routes.help.routes.customerService.root)) {
+      return "issue";
+    }
+
+    return "help";
+  }
 </script>
 
 <nav class="main-menu" class:expanded style:--transition-time="{transitionTimeMs}ms">
@@ -37,12 +52,27 @@
     <li>
       <a
         class="link typography body-medium"
-        title={expanded ? undefined : "Help"}
+        title="Report an issue"
+        href={routeConfig.routes.help.routes.customerService.root}
+        class:active={activeLink === "issue"}
+      >
+        <BugIcon
+          color="var({activeLink === 'issue'
+            ? '--color-main-primary-500'
+            : '--color-common-light-strong'})"
+        />
+        <span>Report an issue</span>
+      </a>
+    </li>
+    <li>
+      <a
+        class="link typography body-medium"
+        title="Help"
         href={routeConfig.routes.help.routes.privacyPolicy.root}
-        class:active={$page.url.pathname.includes("help")}
+        class:active={activeLink === "help"}
       >
         <InformationIcon
-          color="var({$page.url.pathname.includes('help')
+          color="var({activeLink === 'help'
             ? '--color-main-primary-500'
             : '--color-common-light-strong'})"
         />
@@ -50,11 +80,7 @@
       </a>
     </li>
     <li>
-      <button
-        class="logout typography body-medium"
-        title={expanded ? undefined : "Logout"}
-        on:click={logout}
-      >
+      <button class="logout typography body-medium" title="Logout" on:click={logout}>
         <LogoutIcon color="var(--color-common-light-strong)" />
         <span>Logout</span>
       </button>
@@ -149,6 +175,7 @@
     padding: 10px 8px;
     overflow: hidden;
     color: var(--color-common-light-medium);
+    white-space: nowrap;
     text-decoration: none;
     background-color: transparent;
     border: 0;

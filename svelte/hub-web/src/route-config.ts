@@ -80,6 +80,7 @@ export default {
       },
     },
     help: {
+      root: "/help",
       routes: {
         privacyPolicy: {
           root: "/help/privacy-policy",
