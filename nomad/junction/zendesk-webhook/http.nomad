@@ -75,7 +75,6 @@ job "zendesk-webhook-http" {
       tags = [
         "http",
         "traefik.enable=true",
-        "traefik.consulcatalog.connect=true",
         "traefik.http.routers.zendesk-webhook-${var.environment}.entrypoints=${var.traefik_entrypoints}",
         "traefik.http.routers.zendesk-webhook-${var.environment}.rule=Host(`${var.traefik_host_URL}`)"
       ]
