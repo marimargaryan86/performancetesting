@@ -1218,11 +1218,6 @@
     },
     "/orders": {
       "post": {
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/sessionToken"
-          }
-        ],
         "summary": "Create Order",
         "tags": [
           "orders"
