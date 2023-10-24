@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import abc
 import asyncio
+import contextlib
 import os
-from collections.abc import Awaitable, Callable, Sequence
+from collections.abc import Awaitable, Callable, Hashable, Sequence
 from typing import Generic, TypeVar, cast
 
 from aio_pika import abc as aio_pika
@@ -31,31 +32,33 @@ class QueueConsumer(Generic[_Proto]):
         queues: Sequence[protocol.Queue[_Proto]],
     ):
         self._connection = connection
-        self._exchanges: dict[str, aio_pika.AbstractExchange] = {}
         self._logger = stdout.get_logger()
         self._queues = queues
+        # This is used just to hold references to queues etc. that would be
+        # garbage collected otherwise, due to aio-pika using a WeakSet internally.
+        self._refs: set[Hashable] = set()
 
     async def consume(self) -> None:
-        async with self._connection.channel() as channel:
-            await asyncio.gather(
-                channel.set_qos(
-                    prefetch_count=((os.cpu_count() or 1) * 2) + 1,
-                ),
-                self._declare_exchanges(channel),
-            )
-
+        async with contextlib.AsyncExitStack() as stack:
             for queue in self._queues:
-                declared_queue = await channel.declare_queue(
-                    name=queue.name,
-                    durable=True,
-                    arguments=queue.arguments,
+                channel = cast(
+                    aio_pika.AbstractChannel,
+                    await stack.enter_async_context(self._connection.channel()),  # type: ignore[arg-type]
+                )
+                _, declared_queue = await asyncio.gather(
+                    channel.set_qos(
+                        prefetch_count=((os.cpu_count() or 1) * 2) + 1,
+                        global_=True,
+                    ),
+                    channel.declare_queue(
+                        name=queue.name,
+                        durable=True,
+                        arguments=queue.arguments,
+                    ),
                 )
 
-                for exchange, routing_key in queue.binds:
-                    await declared_queue.bind(
-                        self._exchanges[exchange.name],
-                        routing_key,
-                    )
+                self._refs.add(declared_queue)
+                await self._bind_queue(channel, declared_queue, queue.binds)
                 await declared_queue.consume(self._generate_consumer(queue))
                 self._logger.info(
                     "Queue consumer started.",
@@ -65,14 +68,23 @@ class QueueConsumer(Generic[_Proto]):
 
             await asyncio.Future()
 
-    async def _declare_exchanges(self, channel: aio_pika.AbstractChannel) -> None:
-        exchanges = {exchange for queue in self._queues for exchange, _ in queue.binds}
-
-        for exchange in exchanges:
-            self._exchanges[exchange.name] = await channel.declare_exchange(
+    async def _bind_queue(
+        self,
+        channel: aio_pika.AbstractChannel,
+        queue: aio_pika.AbstractQueue,
+        binds: Sequence[tuple[types.Exchange, str]],
+    ) -> None:
+        for exchange, routing_key in binds:
+            declared_exchange = await channel.declare_exchange(
                 name=exchange.name,
                 type=exchange.type_,
                 durable=True,
+            )
+
+            self._refs.add(declared_exchange)
+            await queue.bind(
+                declared_exchange,
+                routing_key,
             )
 
     def _generate_consumer(
