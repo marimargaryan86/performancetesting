@@ -431,3 +431,42 @@ async def check_payment_amount_and_state(
         pi["amount"] == max(quote_amount, MIN_CHARGE[pi["currency"].upper()]),
         pi["status"] == "requires_capture",
     )
+
+
+class Booking(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        junction_client: client.Client = lagom.injectable,
+    ) -> responses.Response:
+        journey_response = await junction_client.get_booking_by_id(
+            request.path_params["bookingId"],
+        )
+        response_body = stdlib_models.Body(data=journey_response["data"])
+        return stdlib_models.JsonApiResponse(response_body)
+
+
+class BookingDetailsByBooking(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        junction_client: client.Client = lagom.injectable,
+    ) -> responses.Response:
+        journey_response = await junction_client.get_booking_details_by_booking_id(
+            request.path_params["bookingId"],
+        )
+        response_body = stdlib_models.Body(data=journey_response["data"])
+        return stdlib_models.JsonApiResponse(response_body)
+
+
+class BookingDetails(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        junction_client: client.Client = lagom.injectable,
+    ) -> responses.Response:
+        journey_response = await junction_client.get_booking_details_by_id(
+            request.path_params["bookingDetailsId"],
+        )
+        response_body = stdlib_models.Body(data=journey_response["data"])
+        return stdlib_models.JsonApiResponse(response_body)
