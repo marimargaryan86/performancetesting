@@ -8,6 +8,7 @@ import pydantic
 from motor import motor_asyncio
 
 from snowfall.project.junction.go import pay_integration
+from snowfall.project.junction.go.adapter import orders as orders_adapter
 from snowfall.project.junction.go.adapter import passenger_name_records
 from snowfall.project.junction.go.service.gateway.v1 import bookings_pb2_grpc
 from snowfall.project.junction.go.service.orders import bookings, importer, orders
@@ -16,6 +17,9 @@ from snowfall.project.junction.go.service.orders.consumer import TicketEventCons
 from snowfall.project.junction.go.service.orders.grpc import OrderService
 from snowfall.project.junction.go.service.orders.pay_transactions import (
     PayTransactionCreator,
+)
+from snowfall.project.junction.go.service.orders.v1 import (
+    orders_pb2_grpc,
 )
 from snowfall.project.junction.go.service.orders.zendesk.client import ZendeskClient
 from snowfall.project.junction.go.service.passenger_name_records.v1 import (
@@ -53,6 +57,8 @@ class _ImportSettings(pay_integration.Settings, application.Settings):
 
 class _TicketEventsConsumerSettings(application.Settings):
     amqp_dsn: pydantic.AmqpDsn
+    grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
+    grpc_port: int = 50051
 
 
 async def _serve(app: application.Application[_GrpcSettings]) -> None:
@@ -184,6 +190,18 @@ async def _consume_ticket_events(
     app: application.Application[_TicketEventsConsumerSettings],
 ) -> None:
     connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
+    orders_address = ":".join(
+        [str(app.settings.grpc_address), str(app.settings.grpc_port)],
+    )
+
+    orders_client = orders_adapter.GrpcClient(
+        orders=orders_pb2_grpc.OrderServiceStub(
+            await grpc_factory.make_insecure_channel(
+                app,
+                orders_address,
+            ),
+        ),
+    )
 
     event_consumer = TicketEventConsumer(
         consumer_obj=consumer.Consumer(
@@ -191,6 +209,7 @@ async def _consume_ticket_events(
             queue_name="{0}_zendesk_events".format(app.name),
             binds=[(types.Exchange("zendesk_webhook"), "zendesk_webhook.event")],
         ),
+        orders_client=orders_client,
     )
     await event_consumer.consume()
 

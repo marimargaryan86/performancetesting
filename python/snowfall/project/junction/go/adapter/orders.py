@@ -178,6 +178,14 @@ class Client(abc.ABC):
     ) -> list[tuple[models_pb2.Booking, models_pb2.BookingCancellation | None]]:
         """Fetch all booking cancellation resources related to bookings."""
 
+    @abc.abstractmethod
+    async def handle_cancellation_ticket_completed(
+        self,
+        ticket_id: str,
+        status: orders_pb2.Status.ValueType,
+    ) -> None:
+        """Handle cancellation ."""
+
 
 class DictClient(Client):
     def __init__(
@@ -521,6 +529,13 @@ class DictClient(Client):
             bookings_and_cancellations.append((booking, booking_cancellation))
 
         return bookings_and_cancellations
+
+    async def handle_cancellation_ticket_completed(
+        self,
+        ticket_id: str,
+        status: orders_pb2.Status.ValueType,
+    ) -> None:
+        """Handle cancellation ."""
 
     def _iterate_orders(self) -> Iterator[models_pb2.Order]:
         for journey in self._journeys.values():
@@ -929,3 +944,20 @@ class GrpcClient(Client):
             bookings_and_cancellations.append((booking, booking_cancellation))
 
         return bookings_and_cancellations
+
+    async def handle_cancellation_ticket_completed(
+        self,
+        ticket_id: str,
+        status: orders_pb2.Status.ValueType,
+    ) -> None:
+        request = orders_pb2.HandleCancellationTicketCompletedRequest(
+            ticket_id=ticket_id,
+            status=status,
+        )
+
+        await errors.handle_grpc_errors(
+            self._orders.HandleCancellationTicketCompleted(
+                request,
+                timeout=self._timeout,
+            ),
+        )

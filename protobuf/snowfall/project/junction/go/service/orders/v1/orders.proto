@@ -184,8 +184,16 @@ message GetBookingCancellationResponse {
   BookingCancellation booking_cancellation = 1;
 }
 
+enum Status {
+  STATUS_UNSPECIFIED = 0;
+  STATUS_REFUND_DUE = 1;
+  STATUS_REJECTED = 2;
+  STATUS_NO_REFUND = 3;
+}
+
 message HandleCancellationTicketCompletedRequest {
   string ticket_id = 1;
+  Status status = 2;
 }
 
 message HandleCancellationTicketCompletedResponse {
