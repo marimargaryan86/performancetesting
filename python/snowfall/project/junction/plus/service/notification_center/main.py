@@ -1,5 +1,7 @@
+import base64
 import pathlib
 import random
+import tempfile
 from collections.abc import Sequence
 
 import httpx
@@ -19,6 +21,13 @@ from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.service import amqp_factory, application, grpc_factory
 from snowfall.stdlib.transport.amqp import consumer, types
+
+
+def cert_tmp_path(cert_base64: str) -> str:
+    with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
+        tmp_file.write(base64.b64decode(cert_base64))
+
+        return tmp_file.name
 
 
 class _ImportSettings(application.Settings):
@@ -73,7 +82,7 @@ async def _import(app: application.Application[_ImportSettings]) -> None:
                 templates_root_path=pathlib.Path(),
             ),
             push_notification_channel=push_notification.ProviderChannel(
-                credentials=app.settings.firebase_key,
+                credentials=cert_tmp_path(app.settings.firebase_key),
             ),
         ),
     )

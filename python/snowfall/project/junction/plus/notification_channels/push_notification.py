@@ -1,4 +1,3 @@
-import json
 from collections.abc import Sequence
 
 import firebase_admin
@@ -109,7 +108,7 @@ class ProviderChannel(Channel):
         self,
         credentials: str,
     ):
-        firebase_cred = firebase_credentials.Certificate(json.loads(credentials))
+        firebase_cred = firebase_credentials.Certificate(credentials)
         self.firebase_app = firebase_admin.initialize_app(firebase_cred)
 
     async def order_confirmation(
