@@ -93,7 +93,7 @@
     },
     {
       "name": "places",
-      "description": "A place is a point in space that can serve as an origin or destination.\n\nEach place is identified by a unique placeId.\n\nEach place contains a set of descriptive attributes such as: name, latitude, longitude, country and time zone.\n\n Each place includes a place-type to describe if it is a city, railway station, airport, bus station or ferry port.",
+      "description": "A place is a point in space that can serve as an origin or destination.\n\nEach place is identified by a unique Place ID.\n\nEach place contains a set of descriptive attributes such as: name, latitude, longitude, country and time zone.\n\n Each place includes a Place Type to describe if it is a city, railway station, airport, bus station or ferry port.",
       "x-displayName": "Places"
     },
     {
@@ -103,7 +103,7 @@
     },
     {
       "name": "trips",
-      "description": "A trip is series of segments between two places.",
+      "description": "A Trip is a complete end-to-end journey between an origin and destination.\n\n A Trip Candidate is a priced offer that meets a Trip requirement to travel from an origin to a destination.",
       "x-displayName": "Trips"
     }
   ],
@@ -209,7 +209,7 @@
           }
         },
         "operationId": "get-places-id",
-        "description": "Returns all information associated to a single placeId. The response includes an attributes object and a place-type object."
+        "description": "Returns all information associated to a single Place ID. The response includes an Atrributes object and a Place Type object."
       }
     },
     "/places/types": {
@@ -395,7 +395,7 @@
           }
         },
         "operationId": "get-places-types-id",
-        "description": "Returns all information associated to a single place-type."
+        "description": "Returns all information associated to a single Place Type."
       }
     },
     "/passengers/genders": {
@@ -1228,7 +1228,7 @@
             "$ref": "#/components/responses/UnprocessableEntity"
           }
         },
-        "description": "Used to initiate a search for trip candidates based on the provided Trip Candidates Search context.",
+        "description": "Used to initiate a search request for Trip Candidates that meet the requirements of a trip.",
         "requestBody": {
           "required": true,
           "content": {
@@ -1287,7 +1287,7 @@
           }
         },
         "operationId": "get-trip-candidates-searches-id",
-        "description": "Used to lookup data for a Trip Candidates Search Identifier."
+        "description": "Used to check the status of a Trip Candidate Search ID."
       }
     },
     "/trip-candidates/searches/{tripCandidateSearchId}/offers": {
@@ -1349,7 +1349,7 @@
           }
         },
         "operationId": "get-trip-candidates-searches-id-offers",
-        "description": "Used to retrieve all Trip Candidates Offer results for an Trip Candidates Search.",
+        "description": "Returns a collection of Offer IDs that meet the requirements of a Trip Candidates Search ID.",
         "parameters": [
           {
             "$ref": "#/components/parameters/offerSort"
@@ -2663,7 +2663,7 @@
             "$ref": "#/components/responses/UnprocessableEntity"
           }
         },
-        "description": "Create a Price Quote for an Offer, to later place an Order for it.",
+        "description": "Create a Price Quote from an Offer ID and a Offer Option ID.",
         "tags": [
           "offers"
         ],
@@ -2752,7 +2752,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "description": "Get a Price Quote for an Offer.",
+        "description": "Used to obtain the complete and up-to-date information of a Price Quote and an Offer.",
         "tags": [
           "offers"
         ]
@@ -2971,7 +2971,7 @@
             "$ref": "#/components/responses/UnprocessableEntity"
           }
         },
-        "description": "Create an Order for an Offer in an existing Journey container.",
+        "description": "Create an Order for a Offer ID, given a Price Quote ID.",
         "tags": [
           "journeys"
         ],
