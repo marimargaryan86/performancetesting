@@ -106,7 +106,7 @@ EOH
       env {
         ENV_NAME   = "${var.environment}"
         SENTRY_DSN = "https://193a30c8aed74d2993051f0f406470ce@sentry.snowfall.se/170"
-        OWM_URL    = "https://api.openweathermap.org/data/2.5/forecast"
+        OWM_URL    = "https://api.openweathermap.org/data/3.0/onecall"
       }
     }
   }

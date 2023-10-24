@@ -143,8 +143,12 @@ def format_daily_weather(
     departure_date: datetime.datetime,
     weather_forecast: Mapping[str, Any],
 ) -> str:
-    hourly_weather_forecast = {
-        weather["dt_txt"]: weather for weather in weather_forecast["list"]
+    daily_weather_forecast = {
+        datetime.datetime.fromtimestamp(
+            weather["dt"],
+            tz=datetime.UTC,
+        ).strftime("%Y-%m-%d"): weather
+        for weather in weather_forecast["daily"]
     }
     daily_weather_report = ""
     for day_delay in range(3):
@@ -159,21 +163,17 @@ def format_daily_weather(
         ).format(
             day_delay + 1,
             weather_day.strftime("%A %d %B"),
-            hourly_weather_forecast[
-                "{0} 15:00:00".format(weather_day.strftime("%Y-%m-%d"))
-            ]["main"]["temp"],
-            hourly_weather_forecast[
-                "{0} 03:00:00".format(weather_day.strftime("%Y-%m-%d"))
-            ]["main"]["temp"],
+            daily_weather_forecast[weather_day.strftime("%Y-%m-%d")]["temp"]["max"],
+            daily_weather_forecast[weather_day.strftime("%Y-%m-%d")]["temp"]["min"],
             _WEATHER_CONDITION_GROUP_ICONS.get(
-                hourly_weather_forecast[
-                    "{0} 15:00:00".format(weather_day.strftime("%Y-%m-%d"))
-                ]["weather"][0]["main"],
+                daily_weather_forecast[weather_day.strftime("%Y-%m-%d")]["weather"][0][
+                    "main"
+                ],
                 "\U0001f325",
             ),
-            hourly_weather_forecast[
-                "{0} 15:00:00".format(weather_day.strftime("%Y-%m-%d"))
-            ]["weather"][0]["main"],
+            daily_weather_forecast[weather_day.strftime("%Y-%m-%d")]["weather"][0][
+                "main"
+            ],
         )
 
     return daily_weather_report

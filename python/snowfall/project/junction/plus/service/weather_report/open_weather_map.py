@@ -50,6 +50,7 @@ class OpenWeatherMapClient(Client):
             "lon": location.coordinates.longitude,
             "appid": self._api_key,
             "units": "metric",
+            "exclude": "current,minutely,hourly,alerts",
         }
         return await self._make_request(
             method="GET",
