@@ -5,6 +5,7 @@ from starlette import endpoints, requests, responses, status
 
 from snowfall.project.junction.go.adapter import errors, orders
 from snowfall.project.junction.hub.service.hub_api import resources
+from snowfall.project.junction.hub.service.hub_api.permissions import check_permission
 from snowfall.stdlib.integration.starlette import (
     messages,
     models,
@@ -20,6 +21,8 @@ class Booking(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: orders.Client = lagom.injectable,
     ) -> responses.Response:
+        check_permission("booking.view", request.user.permissions)
+
         booking = await client.get_booking(
             request.path_params["bookingId"],
             reseller_id=request.user.username,
@@ -51,6 +54,8 @@ class BookingsByOrder(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: orders.Client = lagom.injectable,
     ) -> responses.Response:
+        check_permission("booking.view", request.user.permissions)
+
         pagination = pagination_helpers.get_pagination(request)
         response = await client.find_bookings_by_order_id(
             order_id=request.path_params["orderId"],
@@ -95,6 +100,8 @@ class DetailsByBooking(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: orders.Client = lagom.injectable,
     ) -> responses.Response:
+        check_permission("booking.view", request.user.permissions)
+
         booking_id = request.path_params["bookingId"]
         pagination = pagination_helpers.get_pagination(request)
         response = await client.find_booking_details_by_booking_id(
@@ -126,6 +133,8 @@ class BookingDetails(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: orders.Client = lagom.injectable,
     ) -> responses.Response:
+        check_permission("booking.view", request.user.permissions)
+
         details = await client.get_booking_details(
             request.path_params["bookingDetailsId"],
             reseller_id=request.user.username,
@@ -155,6 +164,8 @@ class Journeys(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: orders.Client = lagom.injectable,
     ) -> responses.Response:
+        check_permission("booking.view", request.user.permissions)
+
         pagination = pagination_helpers.get_pagination(request)
         response = await client.find_journeys(
             limit=pagination.limit,
@@ -185,6 +196,8 @@ class Journey(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: orders.Client = lagom.injectable,
     ) -> responses.Response:
+        check_permission("booking.view", request.user.permissions)
+
         journey = await client.get_journey(
             request.path_params["journeyId"],
             reseller_id=request.user.username,
@@ -207,6 +220,8 @@ class OrdersByJourney(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: orders.Client = lagom.injectable,
     ) -> responses.Response:
+        check_permission("booking.view", request.user.permissions)
+
         journey_id = request.path_params["journeyId"]
         pagination = pagination_helpers.get_pagination(request)
         response = await client.find_orders_by_journey_id(
@@ -238,6 +253,8 @@ class Order(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: orders.Client = lagom.injectable,
     ) -> responses.Response:
+        check_permission("booking.view", request.user.permissions)
+
         order = await client.get_order(
             request.path_params["orderId"],
             reseller_id=request.user.username,
@@ -260,6 +277,8 @@ class CancellationRequest(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: orders.Client = lagom.injectable,
     ) -> responses.Response:
+        check_permission("cancel.view", request.user.permissions)
+
         cancellation_request = await client.get_cancellation_request(
             identifier=request.path_params["cancellationRequestId"],
             reseller_id=request.user.username,
@@ -280,6 +299,8 @@ class CancellationRequest(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: orders.Client = lagom.injectable,
     ) -> responses.Response:
+        check_permission("cancel.add", request.user.permissions)
+
         body = await request_helpers.flatten_request(request)
         cancellation_request = await client.create_cancellation_request(
             booking_ids=body["bookings"],
@@ -304,6 +325,8 @@ class BookingsCancellationByBooking(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: orders.Client = lagom.injectable,
     ) -> responses.Response:
+        check_permission("cancel.view", request.user.permissions)
+
         cancellation = await client.get_booking_cancellation_by_booking_id(
             booking_id=request.path_params["bookingId"],
             reseller_id=request.user.username,

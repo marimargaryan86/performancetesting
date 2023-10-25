@@ -30,6 +30,10 @@ class UnprocessableEntityError(Exception):
     """Raised when it is not possible to process the request due to rules failure."""
 
 
+class ForbiddenError(Exception):
+    """Raised when a user does not have access to execute the requested operation."""
+
+
 async def handle_grpc_errors(grpc_request: Awaitable[Proto]) -> Proto:
     try:
         return await grpc_request

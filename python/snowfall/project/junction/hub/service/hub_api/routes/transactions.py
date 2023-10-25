@@ -2,6 +2,7 @@ import lagom
 from starlette import endpoints, requests
 
 from snowfall.project.junction.hub.service.hub_api import resources
+from snowfall.project.junction.hub.service.hub_api.permissions import check_permission
 from snowfall.project.pay.adapter import transactions as transactions_adapter
 from snowfall.stdlib.integration.starlette import (
     messages,
@@ -22,6 +23,8 @@ class Transactions(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: transactions_adapter.Client = lagom.injectable,
     ) -> models.JsonApiResponse:
+        check_permission("pay.view", request.user.permissions)
+
         pagination = pagination_helpers.get_pagination(request)
 
         sort = sorting.get_sort(request, {"createdAt": "created_at"})
@@ -84,6 +87,8 @@ class Transaction(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: transactions_adapter.Client = lagom.injectable,
     ) -> models.JsonApiResponse:
+        check_permission("pay.view", request.user.permissions)
+
         transaction = await client.get(request.path_params["transactionId"])
         return await messages.create_response(
             body=models.Body(

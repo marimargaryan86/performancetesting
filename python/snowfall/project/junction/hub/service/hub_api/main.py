@@ -10,7 +10,7 @@ from snowfall.adapter import authentication as auth_adapter
 from snowfall.project.junction.go.adapter import errors, orders, resellers
 from snowfall.project.junction.go.service.orders.v1 import orders_pb2_grpc
 from snowfall.project.junction.go.service.resellers.v1 import resellers_pb2_grpc
-from snowfall.project.junction.hub.service.hub_api import bootstrap, router
+from snowfall.project.junction.hub.service.hub_api import bootstrap, permissions, router
 from snowfall.project.pay.adapter import (
     accounts as accounts_adapter,
 )
@@ -193,6 +193,7 @@ async def _http(app: application.Application[Settings]) -> None:
                 ),
                 on_error=handlers.auth_error_handler,
             ),
+            middleware.Middleware(permissions.PermissionsMiddleware),
         ],
         security_headers=False,
     )
@@ -207,6 +208,10 @@ async def _http(app: application.Application[Settings]) -> None:
     asgi_app.add_exception_handler(
         errors.UnprocessableEntityError,
         handlers.unprocessable_entity_error_handler,
+    )
+    asgi_app.add_exception_handler(
+        errors.ForbiddenError,
+        handlers.forbidden_error_handler,
     )
 
     await starlette.serve(

@@ -66,6 +66,7 @@ class JWTAuthenticationBackend(authentication.AuthenticationBackend):
 class AuthenticatedUser(authentication.BaseUser):
     identifier: str
     email: str
+    permissions: dict[str, Any] = dataclasses.field(default_factory=dict)
     metadata: dict[str, Any] = dataclasses.field(default_factory=dict)
 
     @property

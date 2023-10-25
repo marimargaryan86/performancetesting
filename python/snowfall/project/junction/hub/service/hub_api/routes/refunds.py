@@ -2,6 +2,7 @@ import lagom
 from starlette import endpoints, requests, status
 
 from snowfall.project.junction.hub.service.hub_api import resources
+from snowfall.project.junction.hub.service.hub_api.permissions import check_permission
 from snowfall.project.junction.hub.service.hub_api.routes import routes_handlers
 from snowfall.project.pay.adapter import (
     refunds as refunds_adapter,
@@ -25,6 +26,8 @@ class Refund(endpoints.HTTPEndpoint):
         request: requests.Request,
         refunds_client: refunds_adapter.Client = lagom.injectable,
     ) -> models.JsonApiResponse:
+        check_permission("refund.edit", request.user.permissions)
+
         refund_id = request.path_params["refundId"]
         payload = await request_helpers.flatten_request(request)
 
@@ -56,6 +59,8 @@ class Refund(endpoints.HTTPEndpoint):
         request: requests.Request,
         refunds_client: refunds_adapter.Client = lagom.injectable,
     ) -> models.JsonApiResponse:
+        check_permission("refund.view", request.user.permissions)
+
         refund = await refunds_client.get(request.path_params["refundId"])
 
         return await messages.create_response(
@@ -77,6 +82,8 @@ class Refunds(endpoints.HTTPEndpoint):
         request: requests.Request,
         refunds_client: refunds_adapter.Client = lagom.injectable,
     ) -> models.JsonApiResponse:
+        check_permission("refund.view", request.user.permissions)
+
         pagination = pagination_helpers.get_pagination(request)
 
         response = await refunds_client.find(
@@ -108,6 +115,8 @@ class Refunds(endpoints.HTTPEndpoint):
         request: requests.Request,
         refunds_client: refunds_adapter.Client = lagom.injectable,
     ) -> models.JsonApiResponse:
+        check_permission("refund.add", request.user.permissions)
+
         payload = await request_helpers.flatten_request(request)
 
         refund = await refunds_client.create(
@@ -143,6 +152,8 @@ class RefundPosition(endpoints.HTTPEndpoint):
         request: requests.Request,
         refunds_client: refunds_adapter.Client = lagom.injectable,
     ) -> models.JsonApiResponse:
+        check_permission("refund.edit", request.user.permissions)
+
         refund_id = request.path_params["refundId"]
         body = await request_helpers.flatten_request(request)
 
@@ -177,6 +188,8 @@ class RefundByBooking(endpoints.HTTPEndpoint):
         transactions_client: transactions_adapter.Client = lagom.injectable,
         refunds_client: refunds_adapter.Client = lagom.injectable,
     ) -> models.JsonApiResponse:
+        check_permission("refund.view", request.user.permissions)
+
         transaction = await transactions_client.get(
             request.path_params["bookingId"],
             selector="external_reference_id",

@@ -129,3 +129,10 @@ async def validation_error_handler(
         ),
         status_code=http.HTTPStatus.BAD_REQUEST,
     )
+
+
+async def forbidden_error_handler(
+    request: requests.Request,
+    exc: Exception,
+) -> responses.Response:
+    return error_response_from_status(status.HTTP_403_FORBIDDEN)

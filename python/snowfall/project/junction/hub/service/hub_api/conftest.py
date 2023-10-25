@@ -9,7 +9,7 @@ from starlette.middleware import authentication as auth_middleware
 
 from snowfall.project.junction.go import fixtures
 from snowfall.project.junction.go.adapter import errors, orders, resellers
-from snowfall.project.junction.hub.service.hub_api import bootstrap, router
+from snowfall.project.junction.hub.service.hub_api import bootstrap, permissions, router
 from snowfall.project.pay import fixtures as pay_fixtures
 from snowfall.project.pay.adapter import (
     accounts,
@@ -42,7 +42,11 @@ from snowfall.vendor.currency_cloud.models.beneficiary import BeneficiaryRespons
 
 
 async def mock_cookie_to_user(cookie: str) -> stdlib_auth.User:
-    return stdlib_auth.User(identifier="foo", email="foo@example.com")
+    return stdlib_auth.User(
+        identifier="foo",
+        email="foo@example.com",
+        metadata={"reseller_id": "mock", "role": "snowfall-admin"},
+    )
 
 
 @pytest.fixture()
@@ -401,6 +405,7 @@ def _create_app(
                 ),
                 on_error=handlers.auth_error_handler,
             ),
+            middleware.Middleware(permissions.PermissionsMiddleware),
         ],
         security_headers=False,
     )
