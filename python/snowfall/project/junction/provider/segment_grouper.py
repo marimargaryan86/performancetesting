@@ -35,8 +35,13 @@ class TripCriteria(object):
 
 
 class SegmentGrouper(Generic[h3.MappedValue]):
-    def __init__(self, h3_mapping: h3.H3MappingRepository[h3.MappedValue]):
+    def __init__(
+        self,
+        h3_mapping: h3.H3MappingRepository[h3.MappedValue],
+        min_lower_bound: datetime.timedelta | None = None,
+    ):
         self._h3_mapping = h3_mapping
+        self._min_lower_bound = min_lower_bound
 
     def trips_to_sub_trips(
         self,
@@ -46,7 +51,7 @@ class SegmentGrouper(Generic[h3.MappedValue]):
         for trip in trips:
             yield from self._trip_to_sub_trips(trip, type_filter)
 
-    def _trip_to_sub_trips(
+    def _trip_to_sub_trips(  # noqa: WPS231
         self,
         trip: models_pb2.Trip,
         type_filter: models_pb2.Schedule.Type.ValueType,
@@ -54,12 +59,21 @@ class SegmentGrouper(Generic[h3.MappedValue]):
         segments: list[models_pb2.Segment] = []
 
         for segment in trip.segments:
-            if more_itertools.first(segment.legs).type != type_filter:
+            leg = more_itertools.first(segment.legs)
+            if leg.type != type_filter:
                 if segments:
                     yield from self._create_sub_trip(trip=trip, segments=segments)
                     segments.clear()
 
                 continue
+
+            if self._min_lower_bound:
+                departure_at = protobuf.protobuf_to_datetime(
+                    leg.departure_at,
+                )
+                time_delta = departure_at - datetime.datetime.now(datetime.UTC)
+                if time_delta <= self._min_lower_bound:
+                    continue
 
             segments.append(segment)
 

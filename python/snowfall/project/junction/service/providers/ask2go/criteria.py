@@ -25,10 +25,11 @@ class CriteriaGenerator(object):
         self,
         h3_mapping: h3.H3MappingRepository[airports.Airport],
         reseller_id_affiliate_id_map: Mapping[str, str],
+        min_lower_bound: datetime.timedelta | None = None,
     ):
         self._mapping = h3_mapping
         self._reseller_id_affiliate_id_map = reseller_id_affiliate_id_map
-        self._grouper = segment_grouper.SegmentGrouper(h3_mapping)
+        self._grouper = segment_grouper.SegmentGrouper(h3_mapping, min_lower_bound)
 
     def from_search(
         self,

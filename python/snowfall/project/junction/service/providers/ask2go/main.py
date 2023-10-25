@@ -72,6 +72,7 @@ class _Settings(service.ProviderSettings):
     storage_dsn: service.AnyDsn
     rate_limiter_grpc_host: str
     rate_limiter_service_configs: dict[str, RateLimitConfig]
+    min_lower_bound: datetime.timedelta = datetime.timedelta(hours=24)
 
 
 class _PriceQuotesSettings(service.PriceQuoteSettings):
@@ -151,6 +152,7 @@ async def _offers(
                 resolution=7,
             ),
             reseller_id_affiliate_id_map=app.settings.reseller_affiliate_mapping,
+            min_lower_bound=app.settings.min_lower_bound,
         ).from_search,
         search_criteria_generator=search.search_criteria_generator,
         offer_group_cache_key_generator=search.generate_cache_key,
