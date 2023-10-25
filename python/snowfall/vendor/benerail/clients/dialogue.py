@@ -301,6 +301,7 @@ class PassengersClient(base.BenerailBaseClient):
         passenger_id: str,
         etag: str,
         body: passenger.PassengerRequest,
+        session_token: str | None = None,
     ) -> dialogue_response.GetPassengerResponse:
         response = await self._make_request(
             client.RequestOptions(
@@ -312,8 +313,8 @@ class PassengersClient(base.BenerailBaseClient):
                         passenger_id=passenger_id,
                     )
                 ),
-                payload=body.dict(by_alias=True, exclude_unset=True),
-                headers=self._get_headers(etag),
+                raw_content=body.json(by_alias=True, exclude_unset=True),
+                headers=self._get_headers(etag, session_token),
             ),
         )
 

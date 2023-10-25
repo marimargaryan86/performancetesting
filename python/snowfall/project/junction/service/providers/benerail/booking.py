@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import http
 import pathlib
 import types as python_types
 import uuid
@@ -88,6 +89,14 @@ _PROVIDER_BOOKING_STATUS_MAPPING: python_types.MappingProxyType[
         enums.OrderStates.cancelled: bookings_pb2.Booking.STATUS_CANCELLED,
     },
 )
+
+
+class _BookingError(Exception):
+    """General error class for logical errors during the booking flow."""
+
+
+class _OrderStateUpdateFailedError(_BookingError):
+    """Raised when order status update fails."""
 
 
 class _CreateBookingResponse(NamedTuple):
@@ -210,7 +219,7 @@ class BookingHandler(object):
                 task,
                 booking_offer_details,
             )
-        except errors.HttpError as ex:
+        except (errors.HttpError, _BookingError) as ex:
             self._logger.exception(
                 "Failed to create booking",
                 session_token=booking_offer_details.session_token,
@@ -301,6 +310,7 @@ class BookingHandler(object):
             contact_details=task.contact_details,
             etag_data=etag_data,
             br_passengers_info=booking_offer_details.passengers_info,
+            session_token=booking_offer_details.session_token,
         )
 
         booking_res = await self._client.bookings_client.create_booking(
@@ -426,19 +436,32 @@ class BookingHandler(object):
                 body=body,
                 session_token=session_token,
             )
-        except errors.HttpStatusError as err:
+        except errors.HttpError as err:
             self._logger.info("Failed to update order state", error=str(err))
 
         await asyncio.sleep(5)
 
         order_res = await self._client.orders_client.get_order(booking_id, order_id)
 
-        return await self._client.orders_client.update_order_state(
-            booking_id=booking_id,
-            order_id=order_id,
-            etag=order_res.order_etag,
-            body=body,
-            session_token=session_token,
+        try:
+            return await self._client.orders_client.update_order_state(
+                booking_id=booking_id,
+                order_id=order_id,
+                etag=order_res.order_etag,
+                body=body,
+                session_token=session_token,
+            )
+        except errors.HttpStatusError as status_err:
+            if status_err.status != http.HTTPStatus.CONFLICT:
+                raise
+
+        order_res = await self._client.orders_client.get_order(booking_id, order_id)
+
+        if order_res.response_result.state == enums.OrderStates.prebooked.value:  # type: ignore[comparison-overlap]
+            return order_res
+
+        raise _OrderStateUpdateFailedError(
+            "Current status: {0}".format(order_res.response_result.state),
         )
 
     async def _update_passengers(
@@ -448,6 +471,7 @@ class BookingHandler(object):
         br_passengers_info: Sequence[helper_models.PassengerInfo],
         contact_details: models_pb2.ContactDetails,
         etag_data: etag.EtagData,
+        session_token: str | None = None,
     ) -> None:
         br_pax_ids_sorted = (
             pax_info.identifier
@@ -482,6 +506,7 @@ class BookingHandler(object):
                         ),
                     ),
                 ),
+                session_token=session_token,
             )
             res.set_etags(etag_data)
 
