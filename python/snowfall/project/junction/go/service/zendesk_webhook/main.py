@@ -7,7 +7,7 @@ from snowfall.project.junction.go.service.zendesk_webhook.amqp import EventProdu
 from snowfall.project.junction.go.service.zendesk_webhook.bootstrap import (
     create_dependencies,
 )
-from snowfall.project.junction.go.service.zendesk_webhook.midleware import (
+from snowfall.project.junction.go.service.zendesk_webhook.middleware import (
     ZendeskSignatureValidator,
 )
 from snowfall.project.junction.go.service.zendesk_webhook.router import get_routes

@@ -1,4 +1,5 @@
 from snowfall.project.junction.go.adapter import orders
+from snowfall.project.junction.go.adapter.errors import UnhandledError
 from snowfall.project.junction.go.service.orders.v1.orders_pb2 import Status
 from snowfall.project.junction.go.service.zendesk_webhook.v1 import amqp_pb2
 from snowfall.stdlib.logging import stdout
@@ -28,7 +29,20 @@ class TicketEventConsumer(object):
         self,
         message: types.Message[amqp_pb2.TicketChangedEvent],
     ) -> None:
-        await self._orders_client.handle_cancellation_ticket_completed(
-            ticket_id=message.body.ticket_id,
-            status=status_map[message.body.status],
-        )
+        if message.body.status not in status_map:
+            self._logger.error(
+                "Failed to process TicketChangeEvent, unknown status received: %s",
+                message.body.status,
+            )
+            return
+
+        try:
+            await self._orders_client.handle_cancellation_ticket_completed(
+                ticket_id=message.body.ticket_id,
+                status=status_map[message.body.status],
+            )
+        except UnhandledError:
+            self._logger.exception(
+                "Failed to process TicketChangeEvent: %s",
+                message.body,
+            )

@@ -6,7 +6,7 @@ import pytest
 from starlette import applications, middleware
 
 from snowfall.project.junction.go.service.zendesk_webhook import amqp, bootstrap, router
-from snowfall.project.junction.go.service.zendesk_webhook.midleware import (
+from snowfall.project.junction.go.service.zendesk_webhook.middleware import (
     ZendeskSignatureValidator,
 )
 from snowfall.stdlib.integration.starlette import application
