@@ -1,82 +1,22 @@
-import asyncio
 import datetime
 import itertools
-import time
 from collections.abc import AsyncGenerator, Sequence
 from typing import TypeGuard
 
-import prometheus_client
-from grpc import aio
-
-from snowfall.project.junction.go.service.gateway import providers, stops, tasks
-from snowfall.project.junction.go.service.gateway.v1 import trips_pb2, trips_pb2_grpc
+from snowfall.project.junction.go.service.gateway import providers, stops
+from snowfall.project.junction.go.service.gateway.v1 import trips_pb2
 from snowfall.project.junction.provider.v2alpha import meta_pb2 as provider_meta_pb2
 from snowfall.project.junction.provider.v2alpha import trips_pb2 as provider_trips_pb2
 from snowfall.project.junction.v1 import passenger_type_pb2
-from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.instrumentation import prometheus
-from snowfall.stdlib.logging import stdout
-from snowfall.stdlib.transport.amqp import consumer, protocol, types
-from snowfall.stdlib.transport.grpc import service
 
-
-class Service(service.Service, trips_pb2_grpc.TripServiceServicer):
-    def __init__(
-        self,
-        producer: protocol.Producer,
-        runner: tasks.Runner[trips_pb2.TripSearchResult],
-    ):
-        self._producer = producer
-        self._runner = runner
-
-    def get_name(self) -> str:
-        return trips_pb2.DESCRIPTOR.services_by_name["TripService"].full_name
-
-    def register(self, server: aio.Server) -> None:
-        trips_pb2_grpc.add_TripServiceServicer_to_server(self, server)
-
-    async def EnqueueTripSearch(  # type: ignore[override] # noqa: N802
-        self,
-        request: trips_pb2.EnqueueTripSearchRequest,
-        context: aio.ServicerContext,
-    ) -> trips_pb2.EnqueueTripSearchResponse:
-        trip_search_id = string.uuid()
-
-        await asyncio.gather(
-            self._producer.publish(
-                trips_pb2.TripSearchTask(
-                    id=trip_search_id,
-                    one_way=request.one_way,
-                    round_trip=request.round_trip,
-                    multi_city=request.multi_city,
-                    passengers=request.passengers,
-                ),
-                "tasks.trip_search",
-            ),
-            self._runner.mark_as_in_progress(trip_search_id),
-        )
-
-        return trips_pb2.EnqueueTripSearchResponse(id=trip_search_id)
-
-    async def DrainTripSearchResults(  # type: ignore[override] # noqa: N802
-        self,
-        request: trips_pb2.DrainTripSearchResultsRequest,
-        context: aio.ServicerContext,
-    ) -> trips_pb2.DrainTripSearchResultsResponse:
-        return trips_pb2.DrainTripSearchResultsResponse(
-            is_in_progress=await self._runner.is_in_progress(request.id),
-            results=await self._runner.drain_results(request.id),
-        )
-
-
-_RequestGeneratorReturn = AsyncGenerator[
+_GeneratorReturn = AsyncGenerator[
     tuple[providers.Provider, provider_trips_pb2.SearchTripsRequest],
     None,
 ]
 
 
-class RequestGenerator(object):
+class Generator(object):
     def __init__(
         self,
         providers_list: providers.Collection,
@@ -88,7 +28,7 @@ class RequestGenerator(object):
     async def generate(
         self,
         task: trips_pb2.TripSearchTask,
-    ) -> _RequestGeneratorReturn:
+    ) -> _GeneratorReturn:
         match task.WhichOneof("search_mode"):
             case "one_way":
                 provider_request_tuple_generator = self._one_way(task)
@@ -105,7 +45,7 @@ class RequestGenerator(object):
     async def _multi_city(
         self,
         task: trips_pb2.TripSearchTask,
-    ) -> _RequestGeneratorReturn:
+    ) -> _GeneratorReturn:
         resolved_stops = await self._stop_resolver(
             frozenset(
                 itertools.chain(
@@ -150,7 +90,7 @@ class RequestGenerator(object):
     async def _one_way(
         self,
         task: trips_pb2.TripSearchTask,
-    ) -> _RequestGeneratorReturn:
+    ) -> _GeneratorReturn:
         resolved_stops = await self._stop_resolver(
             frozenset(
                 (
@@ -187,7 +127,7 @@ class RequestGenerator(object):
     async def _round_trip(
         self,
         task: trips_pb2.TripSearchTask,
-    ) -> _RequestGeneratorReturn:
+    ) -> _GeneratorReturn:
         resolved_stops = await self._stop_resolver(
             frozenset(
                 (
@@ -338,105 +278,3 @@ def _provider_criterion_is_valid(
             criterion.destination_coordinates.longitude,
         ],
     )
-
-
-class Queue(consumer.AbstractQueue[trips_pb2.TripSearchTask]):
-    def __init__(
-        self,
-        name_prefix: str,
-        request_generator: RequestGenerator,
-        runner: tasks.Runner[trips_pb2.TripSearchResult],
-        timeout: datetime.timedelta,
-    ):
-        self._request_generator = request_generator
-        self._name_prefix = name_prefix
-        self._runner = runner
-        self._searcher = Searcher(timeout)
-
-    @property
-    def binds(self) -> Sequence[tuple[types.Exchange, str]]:
-        return [
-            (types.Exchange(self._name_prefix), "trips.search.*"),
-        ]
-
-    @property
-    def name(self) -> str:
-        return "{0}_trip_searches".format(self._name_prefix)
-
-    async def on_message(self, msg: types.Message[trips_pb2.TripSearchTask]) -> None:
-        await self._runner.run(msg.body.id, self._on_message(msg.body))
-
-    async def _on_message(
-        self,
-        body: trips_pb2.TripSearchTask,
-    ) -> AsyncGenerator[trips_pb2.TripSearchResult, None]:
-        search_tasks = [
-            self._searcher.search(provider, request)
-            async for provider, request in self._request_generator.generate(body)
-        ]
-
-        for task in asyncio.as_completed(search_tasks):
-            for search_result in (await task).results:
-                yield trips_pb2.TripSearchResult(
-                    id=string.uuid(),
-                    result=search_result,
-                )
-
-
-class Searcher(object):
-    _failed = prometheus_client.Counter(
-        "gateway_failed_trip_searches_total",
-        "Total number of failed trip searches",
-        ["provider_id"],
-    )
-
-    _histogram = prometheus_client.Histogram(
-        "gateway_trip_search_duration_seconds",
-        "Duration of performed trip searches in seconds",
-        ["provider_id", "status"],
-        buckets=prometheus.BUCKETS,
-    )
-
-    _total = prometheus_client.Counter(
-        "gateway_trip_searches_total",
-        "Total number of performed trip searches",
-        ["provider_id", "status"],
-    )
-
-    def __init__(self, timeout: datetime.timedelta):
-        self._logger = stdout.get_logger()
-        self._timeout = timeout
-
-    async def search(
-        self,
-        provider: providers.Provider,
-        request: provider_trips_pb2.SearchTripsRequest,
-    ) -> provider_trips_pb2.SearchTripsResponse:
-        start = time.perf_counter()
-        status = "ok"
-
-        try:
-            response = await provider.connection.trips.SearchTrips(
-                request=request,
-                timeout=self._timeout.total_seconds(),
-            )
-        except aio.AioRpcError:
-            self._failed.labels(provider_id=provider.identifier).inc()
-            response = provider_trips_pb2.SearchTripsResponse()
-            status = "nok"
-        finally:
-            exec_time = time.perf_counter() - start
-
-        self._histogram.labels(provider_id=provider.identifier, status=status).observe(
-            exec_time,
-        )
-        self._total.labels(provider_id=provider.identifier, status=status).inc()
-        self._logger.info(
-            "trip search performed",
-            provider_id=provider.identifier,
-            failed=status == "nok",
-            results=len(response.results),
-            execution_time=exec_time,
-        )
-
-        return response

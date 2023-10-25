@@ -6,7 +6,8 @@ from google.protobuf import json_format
 from grpc import aio
 from pytest_mock import plugin
 
-from snowfall.project.junction.go.service.gateway import providers, stops, trips
+from snowfall.project.junction.go.service.gateway import providers, stops
+from snowfall.project.junction.go.service.gateway.trips import request as trips_request
 from snowfall.project.junction.go.service.gateway.v1 import trips_pb2
 from snowfall.project.junction.go.service.places.v1 import models_pb2
 from snowfall.project.junction.provider.v2alpha import meta_pb2
@@ -274,7 +275,7 @@ class TestRequestGenerator(object):
             _providers_factory(capabilities),
         )
 
-        generator = trips.RequestGenerator(
+        generator = trips_request.Generator(
             providers_list=providers_list,
             stop_resolver=_stop_resolver,
         )
@@ -402,7 +403,7 @@ class TestRequestGenerator(object):
             _providers_factory(capabilities),
         )
 
-        generator = trips.RequestGenerator(
+        generator = trips_request.Generator(
             providers_list=providers_list,
             stop_resolver=_stop_resolver,
         )
@@ -488,7 +489,7 @@ class TestRequestGenerator(object):
             _providers_factory(capabilities),
         )
 
-        generator = trips.RequestGenerator(
+        generator = trips_request.Generator(
             providers_list=providers_list,
             stop_resolver=_stop_resolver,
         )

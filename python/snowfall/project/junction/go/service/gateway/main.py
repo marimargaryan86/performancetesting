@@ -15,8 +15,10 @@ from snowfall.project.junction.go.service.gateway import (
     providers,
     stops,
     tasks,
-    trips,
 )
+from snowfall.project.junction.go.service.gateway.trips import request as trips_request
+from snowfall.project.junction.go.service.gateway.trips import server as trips_server
+from snowfall.project.junction.go.service.gateway.trips import task as trips_task
 from snowfall.project.junction.go.service.gateway.v1 import trips_pb2
 from snowfall.project.junction.go.service.offers.v1 import amqp_pb2
 from snowfall.project.junction.go.service.places.v1 import places_pb2_grpc
@@ -118,9 +120,9 @@ async def _consume(app: application.Application[_ConsumeSettings]) -> None:
         timeout=app.settings.search_timeout,
     )
 
-    trips_queue = trips.Queue(
+    trips_queue = trips_task.Queue(
         name_prefix=app.name,
-        request_generator=trips.RequestGenerator(
+        request_generator=trips_request.Generator(
             providers_list=all_providers,
             stop_resolver=stops.Resolver(
                 stub=places_pb2_grpc.PlacesServiceStub(channel=places_channel),
@@ -128,7 +130,9 @@ async def _consume(app: application.Application[_ConsumeSettings]) -> None:
             ).from_ids,
         ),
         runner=trip_search_runner,
-        timeout=app.settings.trip_search_timeout,
+        searcher=trips_task.Searcher(
+            timeout=app.settings.trip_search_timeout,
+        ),
     )
 
     await consumer.QueueConsumer(
@@ -165,7 +169,7 @@ async def _serve(app: application.Application[_ServeSettings]) -> None:
                 ),
                 runner=trip_offer_search_runner,
             ),
-            trips.Service(
+            trips_server.Service(
                 producer=producer.Producer(
                     connection=amqp_connection,
                     exchange=types.Exchange(name=app.name),
