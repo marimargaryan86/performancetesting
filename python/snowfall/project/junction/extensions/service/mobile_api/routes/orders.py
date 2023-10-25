@@ -21,8 +21,13 @@ from snowfall.project.junction.extensions.service.mobile_api import (
 from snowfall.project.junction.extensions.service.mobile_api.tasks import orders
 from snowfall.project.junction.extensions.service.mobile_api.v1alpha import models_pb2
 from snowfall.stdlib import money, string
-from snowfall.stdlib.integration.starlette import models as stdlib_models
-from snowfall.stdlib.integration.starlette import request_helpers
+from snowfall.stdlib.integration.starlette import (
+    models as stdlib_models,
+)
+from snowfall.stdlib.integration.starlette import (
+    pagination_helpers,
+    request_helpers,
+)
 from snowfall.vendor.junction.go import client
 from snowfall.vendor.junction.go import models as vendor_models
 
@@ -116,9 +121,11 @@ class Orders(endpoints.HTTPEndpoint):
         orders_repository: repository.OrdersRepository = lagom.injectable,
         junction_client: client.Client = lagom.injectable,
     ) -> responses.Response:
-        # TODO: create pagination for this one (!581)
+        pagination = pagination_helpers.get_pagination(request)
         user_mobile_orders = await orders_repository.get_user_orders(
             request.user.username,
+            cursor=pagination.cursor,
+            limit=pagination.limit,
         )
         include = request.scope["parsed_query_string"].get("include", [])
         user_orders: dict[str, list[Any]] = {"data": [], "included": []}
@@ -147,12 +154,17 @@ class Orders(endpoints.HTTPEndpoint):
                 handlers.get_includes_from_response(order_response),
             )
 
-        response_body = stdlib_models.Body(data=user_orders["data"])
-
-        if user_orders["included"]:
-            response_body.included = user_orders["included"]
-
-        return stdlib_models.JsonApiResponse(response_body)
+        return stdlib_models.JsonApiResponse(
+            stdlib_models.Body(
+                data=user_orders["data"],
+                included=user_orders["included"],
+                links=pagination_helpers.get_next_url(
+                    request.url_for("ListOrders"),
+                    await user_mobile_orders.cursor(),
+                    pagination,
+                ),
+            ),
+        )
 
     @validators.voucher_validator
     async def post(  # noqa: WPS217

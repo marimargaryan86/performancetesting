@@ -396,12 +396,16 @@ class OrdersRepository(
         self,
         user_id: str,
         selector: str = "user_id",
+        limit: int | None = None,
+        cursor: str | None = None,
     ) -> resultset.ResultSet[models_pb2.MobileOrder]:
-        orders = await self._execute(
-            self._collection.find,
-            {selector: user_id},
+        query = {selector: user_id}
+        orders = await self._find_with_cursor(
+            cur=cursor or "",
+            filter_=query,
+            sort=("created_at", -1),
         )
-        orders.sort(("created_at", -1))
+        orders.limit(limit or _DEFAULT_PAGE_SIZE)
         return orders
 
 
