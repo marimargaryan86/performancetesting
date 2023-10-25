@@ -19,6 +19,9 @@ class ZendeskSignatureValidator(BaseHTTPMiddleware):
         request: Request,
         call_next: RequestResponseEndpoint,
     ) -> Response:
+        if request.scope["path"].endswith("/health"):
+            return await call_next(request)
+
         signature_is_valid = await self._validate(
             request.headers.get("x-zendesk-webhook-signature", ""),
             request.headers.get("x-zendesk-webhook-signature-timestamp", ""),
