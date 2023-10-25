@@ -3872,7 +3872,7 @@
             "$ref": "#/components/schemas/SelfLink"
           }
         ],
-        "description": "A place is an indexed reference to a location that Junction might have related content for. It is specified in a trip search to state where a passenger wishes to travel from/to. Each place is allocated a unique identifier.\n\nPlaces are curated by feeds from GTFS sources.  A place can be a rail station, Airport...",
+        "description": "A place is an indexed reference to a location that can serve as an origin or destination.",
         "x-examples": {
           "example-1": {
             "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
@@ -3922,7 +3922,7 @@
           "id",
           "type"
         ],
-        "description": ""
+        "description": "A unique identifier for each place."
       },
       "Point": {
         "title": "Point",
@@ -7518,7 +7518,7 @@
           "format": "uuid",
           "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
         },
-        "description": "Place identifier"
+        "description": "Unique identifier for a place"
       },
       "placeSort": {
         "name": "sort",
@@ -7544,7 +7544,7 @@
           "type": "string",
           "example": "airport"
         },
-        "description": "Place Type identifier"
+        "description": "Unique identifier for a place-type."
       },
       "placeTypeSort": {
         "name": "sort",
