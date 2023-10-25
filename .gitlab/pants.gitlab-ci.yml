@@ -7,9 +7,8 @@ pants:setup:
   interruptible: true
   script:
     - docker login -u "${CI_DEPENDENCY_PROXY_USER}" -p "${CI_DEPENDENCY_PROXY_PASSWORD}" "${CI_DEPENDENCY_PROXY_SERVER}"
-    - DOCKER_BUILDKIT=1 docker build --cache-from ${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG} --cache-from ${CI_REGISTRY_IMAGE}/pants:${CI_DEFAULT_BRANCH} --pull --compress -f ".gitlab/pants.Dockerfile" -t "${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG}" --build-arg "REGISTRY=${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/" --build-arg BUILDKIT_INLINE_CACHE=1 .gitlab/
     - docker login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" "${CI_REGISTRY}"
-    - docker push "${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG}"
+    - docker buildx build --cache-to type=inline --cache-from type=registry,ref=${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG} --cache-from type=registry,ref=${CI_REGISTRY_IMAGE}/pants:${CI_DEFAULT_BRANCH} --pull --push --compress -f ".gitlab/pants.Dockerfile" -t "${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG}" --build-arg "REGISTRY=${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/" .gitlab/
   needs: []
   rules:
     - if: '$CI_MERGE_REQUEST_IID || $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'

@@ -39,4 +39,4 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3.11-distutils \
     /tmp/oasdiff.deb \
 && rm -rf /var/lib/apt/lists/* /tmp/oasdiff.deb \
-&& printf "[GLOBAL]\npants_version = \"2.18.0rc2\"" > /tmp/pants.toml && cd /tmp/ && pants --version && rm /tmp/pants.toml
+&& printf "[GLOBAL]\npants_version = \"2.19.0.dev3\"" > /tmp/pants.toml && cd /tmp/ && pants --version && rm /tmp/pants.toml
