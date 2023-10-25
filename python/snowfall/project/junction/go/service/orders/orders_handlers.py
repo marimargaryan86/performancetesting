@@ -231,13 +231,30 @@ class CancellationTicketCompletedHandler(object):
             for booking_cancellation in cancellation_request.booking_cancellations
             if booking_cancellation.ticket_id == self._request.ticket_id
         )
+        ticket_status = self._request.status
 
-        booking_cancellation.status = models_pb2.BookingCancellation.STATUS_COMPLETED
-
-        await self._update_booking_status(booking_id=booking_cancellation.booking_id)
+        match ticket_status:
+            case orders_pb2.Status.STATUS_REJECTED:
+                booking_cancellation.status = (
+                    models_pb2.BookingCancellation.STATUS_REJECTED
+                )
+            case orders_pb2.Status.STATUS_NO_REFUND:
+                booking_cancellation.status = (
+                    models_pb2.BookingCancellation.STATUS_NO_REFUND
+                )
+                await self._update_booking_status(
+                    booking_id=booking_cancellation.booking_id,
+                )
+            case orders_pb2.Status.STATUS_REFUND_DUE:
+                booking_cancellation.status = (
+                    models_pb2.BookingCancellation.STATUS_REFUND_DUE
+                )
+                await self._update_booking_status(
+                    booking_id=booking_cancellation.booking_id,
+                )
+                # TODO: Create refund in PAY.
 
         self._update_overall_cancellation_status(cancellation_request)
-
         await self._cancellations.update(document=cancellation_request)
 
         return orders_pb2.HandleCancellationTicketCompletedResponse(
@@ -263,7 +280,12 @@ class CancellationTicketCompletedHandler(object):
     ) -> None:
         all_bookings_cancelled = all(
             booking_cancellation.status
-            == models_pb2.BookingCancellation.STATUS_COMPLETED
+            in {
+                models_pb2.BookingCancellation.STATUS_COMPLETED,
+                models_pb2.BookingCancellation.STATUS_REJECTED,
+                models_pb2.BookingCancellation.STATUS_REFUND_DUE,
+                models_pb2.BookingCancellation.STATUS_NO_REFUND,
+            }
             for booking_cancellation in cancellation.booking_cancellations
         )
 
