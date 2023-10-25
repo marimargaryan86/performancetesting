@@ -46,6 +46,7 @@
         "types": ["rail"]
     },
     "UIC":{
-        "types": ["rail"]
+        "types": ["rail"],
+        "operators": ["CD", "CFL Voyageurs", "Eurostar I", "MÁV-Start", "PKP Intercity", "RENFE VIAJEROS", "SJ", "TI", "Vy", "WESTbahn", "ZSSK"]
     }
 }
