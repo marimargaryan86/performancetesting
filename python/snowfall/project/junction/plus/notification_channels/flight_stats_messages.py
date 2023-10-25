@@ -42,36 +42,33 @@ _CODE_TO_MESSAGE: MappingProxyType[int, dict[str, Any]] = MappingProxyType(
             "DGT": {
                 "title": _("Departure gate has changed!"),
                 "body": _(
-                    "Your gate for flight *{0}* > *{1}* has changed from *{2}* to"
-                    " *{3}*",
+                    "Your gate for flight {0} > {1} has changed from {2} to {3}",
                 ),
             },
             "DTM": {
                 "title": _("Departure terminal has changed!"),
                 "body": _(
-                    "Your terminal for flight *{0}* > *{1}* has changed from *{2}* to"
-                    " *{3}*",
+                    "Your terminal for flight {0} > {1} has changed from {2} to {3}",
                 ),
             },
             "EGD": {
                 "title": _("Your flight is getting delayed!"),
                 "body": _(
-                    "Your flight *{0}* > *{1}* is delayed.\nOld time of departure:"
+                    "Your flight {0} > {1} is delayed.\nOld time of departure:"
                     " {2}\nNew estimated time of departure: {3}",
                 ),
             },
             "DIV": {
                 "title": _("Your flight has been diverted!"),
                 "body": _(
-                    "Your flight from *{0}* > *{1}* has been diverted from *{2}* to"
-                    " *{3}*",
+                    "Your flight from {0} > {1} has been diverted from {2} to {3}",
                 ),
             },
             "BGG": {
                 "title": _("Your bag pickup location has changed!"),
                 "body": _(
-                    "Your bag pickup location for your flight from *{0}* > *{1}* has"
-                    " changed from *{2}* to *{3}*",
+                    "Your bag pickup location for your flight from {0} > {1} has"
+                    " changed from {2} to {3}",
                 ),
             },
         },
