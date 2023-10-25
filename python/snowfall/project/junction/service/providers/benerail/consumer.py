@@ -255,22 +255,7 @@ class OrdersConsumer(object):
 
             return
 
-        try:
-            booking_result = await self._bookings.create_booking(
-                task=message.body,
-                booking_offer_details=booking_offer_details,
-            )
-        except errors.HttpError:
-            self._logger.exception(
-                "Failed to create booking",
-                session_token=booking_offer_details.session_token,
-                br_offer_id=booking_offer_details.offer_id,
-                booking_id=message.body.booking.id,
-            )
-
-            return
-
         await self._producer.publish(
-            booking_result,
+            await self._bookings.create_booking(message.body, booking_offer_details),
             routing_key="orders.result.offer",
         )

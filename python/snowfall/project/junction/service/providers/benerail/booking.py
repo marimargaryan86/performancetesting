@@ -4,6 +4,7 @@ import pathlib
 import types as python_types
 import uuid
 from collections.abc import Sequence
+from typing import NamedTuple
 
 import more_itertools
 import orjson
@@ -87,6 +88,12 @@ _PROVIDER_BOOKING_STATUS_MAPPING: python_types.MappingProxyType[
         enums.OrderStates.cancelled: bookings_pb2.Booking.STATUS_CANCELLED,
     },
 )
+
+
+class _CreateBookingResponse(NamedTuple):
+    booking_res: booking_response.GetBookingResponse
+    order_res: bookings_response.GetOrderResponse
+    raw_booking_res: bytes
 
 
 class Enricher(object):
@@ -191,12 +198,92 @@ class BookingHandler(object):
         self._logger = stdout.get_logger()
         self._storage = booking_storage
 
-    async def create_booking(  # noqa: WPS217
+    async def create_booking(
         self,
         task: order_amqp_pb2.PlaceOrderTask,
         booking_offer_details: cache.BookingOfferDetails,
     ) -> models_pb2.Booking:
         new_booking = task.booking
+
+        try:
+            create_booking_response = await self._create_booking(
+                task,
+                booking_offer_details,
+            )
+        except errors.HttpError as ex:
+            self._logger.exception(
+                "Failed to create booking",
+                session_token=booking_offer_details.session_token,
+                br_offer_id=booking_offer_details.offer_id,
+                booking_id=task.booking.id,
+            )
+
+            new_booking.status = models_pb2.Booking.STATUS_ERROR
+            new_booking.raw_data = repr(ex)
+
+            return new_booking
+
+        new_booking.MergeFrom(
+            models_pb2.Booking(
+                status=(
+                    _PROVIDER_STATUS_MAPPING.get(
+                        enums.OrderStates(
+                            create_booking_response.order_res.response_result.state,
+                        ),
+                        models_pb2.Booking.STATUS_UNSPECIFIED,
+                    )
+                    if create_booking_response.order_res.response_result.state
+                    else models_pb2.Booking.STATUS_UNSPECIFIED
+                ),
+                provider_total_price=money.from_string(
+                    string_amount=booking_offer_details.price,
+                    currency=booking_offer_details.currency,
+                ).protobuf(),
+                trip_result=models_pb2.TripBooking(
+                    provider_booking_reference=create_booking_response.booking_res.response_result.identifier,
+                    record_locator=create_booking_response.booking_res.response_result.dnr,
+                    created_at=protobuf.datetime_to_protobuf(
+                        datetime.datetime.now(tz=datetime.UTC),
+                    ),
+                ),
+                raw_data=create_booking_response.raw_booking_res.decode(),
+            ),
+        )
+
+        await self._storage.put(
+            pathlib.Path(
+                create_booking_response.booking_res.response_result.identifier,
+            ),
+            create_booking_response.raw_booking_res,
+        )
+
+        await self._notify(
+            amqp_pb2.BookingNotificationTask(
+                journey_id=task.metadata.journey_id,
+                order_id=task.metadata.order_id,
+                booking_id=task.metadata.booking_id,
+                passenger_name_record=task.metadata.passenger_name_record,
+                departure_at=datetime.datetime.fromisoformat(
+                    booking_offer_details.departure_at,
+                ).isoformat(
+                    timespec="seconds",
+                ),
+                br_booking_id=create_booking_response.booking_res.response_result.identifier,
+                br_dnr=create_booking_response.booking_res.response_result.dnr,
+                br_session_token=booking_offer_details.session_token,
+                created_at=protobuf.datetime_to_protobuf(
+                    datetime.datetime.now(datetime.UTC),
+                ),
+            ),
+        )
+
+        return new_booking
+
+    async def _create_booking(  # noqa: WPS217
+        self,
+        task: order_amqp_pb2.PlaceOrderTask,
+        booking_offer_details: cache.BookingOfferDetails,
+    ) -> _CreateBookingResponse:
         dialogue_res = await self._client.dialogue.get_dialogue(
             booking_offer_details.dialogue_id,
         )
@@ -296,63 +383,16 @@ class BookingHandler(object):
             session_token=booking_offer_details.session_token,
         )
         booking_res.set_etags(etag_data)
-        await self._storage.put(
-            pathlib.Path(
-                booking_res.response_result.identifier,
-            ),
-            raw_response,
-        )
         order_res = await self._client.orders_client.get_order(
             booking_id=booking_res.response_result.identifier,
             order_id=order_res.response_result.identifier,
         )
 
-        await self._notify(
-            amqp_pb2.BookingNotificationTask(
-                journey_id=task.metadata.journey_id,
-                order_id=task.metadata.order_id,
-                booking_id=task.metadata.booking_id,
-                passenger_name_record=task.metadata.passenger_name_record,
-                departure_at=datetime.datetime.fromisoformat(
-                    booking_offer_details.departure_at,
-                ).isoformat(
-                    timespec="seconds",
-                ),
-                br_booking_id=booking_res.response_result.identifier,
-                br_dnr=booking_res.response_result.dnr,
-                br_session_token=booking_offer_details.session_token,
-                created_at=protobuf.datetime_to_protobuf(
-                    datetime.datetime.now(datetime.UTC),
-                ),
-            ),
+        return _CreateBookingResponse(
+            booking_res=booking_res,
+            order_res=order_res,
+            raw_booking_res=raw_response,
         )
-
-        new_booking.MergeFrom(
-            models_pb2.Booking(
-                status=(
-                    _PROVIDER_STATUS_MAPPING.get(
-                        enums.OrderStates(order_res.response_result.state),
-                        models_pb2.Booking.STATUS_UNSPECIFIED,
-                    )
-                    if order_res.response_result.state
-                    else models_pb2.Booking.STATUS_UNSPECIFIED
-                ),
-                provider_total_price=money.from_string(
-                    string_amount=booking_offer_details.price,
-                    currency=booking_offer_details.currency,
-                ).protobuf(),
-                trip_result=models_pb2.TripBooking(
-                    provider_booking_reference=booking_res.response_result.identifier,
-                    record_locator=booking_res.response_result.dnr,
-                    created_at=protobuf.datetime_to_protobuf(
-                        datetime.datetime.now(tz=datetime.UTC),
-                    ),
-                ),
-                raw_data=booking_res.json(),
-            ),
-        )
-
-        return new_booking
 
     @tenacity.retry(
         stop=tenacity.stop_after_attempt(2),
@@ -430,6 +470,7 @@ class BookingHandler(object):
                 etag=etag_data.passenger_etags[br_pax_id],
                 body=passenger.PassengerRequest(
                     gender=_GENDER_MAP[order_pax.gender],
+                    date_of_birth=protobuf.protobuf_to_date(order_pax.date_of_birth),
                     details=passenger.PassengerDetail(
                         title=_get_title(order_pax.title),
                         first_name=order_pax.first_name,
