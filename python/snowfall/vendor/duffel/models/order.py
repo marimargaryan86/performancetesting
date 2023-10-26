@@ -1,7 +1,7 @@
 import datetime
 from typing import Any
 
-from pydantic import v1 as pydantic
+import pydantic
 
 from snowfall.vendor.duffel.models.base import DuffelBaseModel
 from snowfall.vendor.duffel.models.common import Airline, LoyaltyProgrammeAccount
@@ -16,7 +16,7 @@ class OrderServiceMetadataSeat(DuffelBaseModel):
 
 
 class OrderServiceMetadataBaggage(DuffelBaseModel):
-    baggage_type: str = pydantic.Field(..., alias="type")
+    baggage_type: str = pydantic.Field(alias="type")
     maximum_weight_kg: int | None
     maximum_height_cm: int | None
     maximum_length_cm: int | None
@@ -24,14 +24,14 @@ class OrderServiceMetadataBaggage(DuffelBaseModel):
 
 
 class OrderService(DuffelBaseModel):
-    identifier: str = pydantic.Field(..., alias="id")
+    identifier: str = pydantic.Field(alias="id")
     metadata: OrderServiceMetadataSeat | OrderServiceMetadataBaggage
     passenger_ids: list[str]
     quantity: int
     segment_ids: list[str]
     total_amount: str
     total_currency: str
-    service_type: str = pydantic.Field(..., alias="type")
+    service_type: str = pydantic.Field(alias="type")
 
 
 class OrderPaymentStatus(DuffelBaseModel):
@@ -41,8 +41,8 @@ class OrderPaymentStatus(DuffelBaseModel):
 
 
 class OrderPassenger(DuffelBaseModel):
-    identifier: str = pydantic.Field(..., alias="id")
-    passenger_type: str = pydantic.Field(..., alias="type")
+    identifier: str = pydantic.Field(alias="id")
+    passenger_type: str = pydantic.Field(alias="type")
     infant_passenger_id: str | None
     given_name: str
     family_name: str
@@ -53,21 +53,21 @@ class OrderPassenger(DuffelBaseModel):
 
 
 class OrderDocument(DuffelBaseModel):
-    document_type: str = pydantic.Field(..., alias="type")
+    document_type: str = pydantic.Field(alias="type")
     unique_identifier: str
 
 
 class Order(DuffelBaseModel):
-    identifier: str = pydantic.Field(..., alias="id")
+    identifier: str = pydantic.Field(alias="id")
     live_mode: bool
     available_actions: list[str]
-    base_amount: str | None
-    base_currency: str | None
+    base_amount: str | None = None
+    base_currency: str | None = None
     booking_reference: str
-    cancelled_at: datetime.datetime | None
+    cancelled_at: datetime.datetime | None = None
     content: str
     created_at: datetime.datetime
-    synced_at: datetime.datetime | None
+    synced_at: datetime.datetime | None = None
     documents: list[OrderDocument]
     passengers: list[OrderPassenger]
     payment_status: OrderPaymentStatus
@@ -76,11 +76,11 @@ class Order(DuffelBaseModel):
     conditions: OrderConditions
     owner: Airline
     tax_amount: str
-    tax_currency: str | None
+    tax_currency: str | None = None
     total_amount: str
     total_currency: str
-    metadata: dict[str, Any] | None
+    metadata: dict[str, Any] | None = None
 
 
 class OrderResponse(DuffelBaseModel):
-    response_data: Order = pydantic.Field(..., alias="data")
+    response_data: Order = pydantic.Field(alias="data")

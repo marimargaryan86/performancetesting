@@ -242,7 +242,7 @@ def segment_to_legs(
     if not segment.stops:
         return [segment]
 
-    legs = [segment.copy()]
+    legs = [segment.model_copy()]
 
     for stop in segment.stops:
         last_leg = legs[-1]
@@ -275,6 +275,6 @@ def dict_to_private_fares(
     private_fares: Mapping[str, Any],
 ) -> Mapping[str, Sequence[PrivateFare]]:
     return {
-        key: [PrivateFare.parse_obj(fare) for fare in fares]
+        key: [PrivateFare.model_validate(fare) for fare in fares]
         for key, fares in private_fares.items()
     }

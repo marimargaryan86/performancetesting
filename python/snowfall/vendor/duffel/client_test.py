@@ -1,5 +1,7 @@
 import datetime
+import urllib
 
+import asyncstdlib
 import pytest
 import pytest_httpx
 
@@ -15,6 +17,7 @@ from snowfall.vendor.duffel.builders.order_request import (
     OrderPassenger,
     OrderPayment,
 )
+from snowfall.vendor.duffel.models.common import Airport
 
 _BASE_URL = "{base_path}{path}"
 
@@ -170,3 +173,86 @@ async def test_order_create(
     response, _ = await duffel_client.order_request(order_request.build())
 
     assert response.identifier
+
+
+async def test_list_airports(
+    duffel_client: client.DuffelClient,
+    httpx_mock: pytest_httpx.HTTPXMock,
+) -> None:
+    query_params = {"limit": 5, "iata_country_code": "HR"}
+
+    httpx_mock.add_response(
+        url=_BASE_URL.format(
+            base_path=conftest.API_BASE_URL,
+            path="/air/airports?{0}".format(urllib.parse.urlencode(query_params)),
+        ),
+        method="GET",
+        json=await conftest.load_file_fixture("list_airports_page1.json"),
+    )
+
+    httpx_mock.add_response(
+        url=_BASE_URL.format(
+            base_path=conftest.API_BASE_URL,
+            path="/air/airports?{0}".format(
+                urllib.parse.urlencode(
+                    {
+                        **query_params,
+                        "after": "g3QAAAACZAACaWRtAAAACmFycF9vc2lfaHJkAARuYW1lbQAAAA5Pc2lqZWsgQWlycG9ydA==",
+                    },
+                ),
+            ),
+        ),
+        method="GET",
+        json=await conftest.load_file_fixture("list_airports_page2.json"),
+    )
+
+    airport_list = await asyncstdlib.list(
+        duffel_client.list_airports(
+            **query_params,
+        ),
+    )
+
+    assert airport_list[3] == Airport(
+        time_zone="Europe/Zagreb",
+        name="Lošinj Airport",
+        longitude=14.392966,
+        latitude=44.56633,
+        identifier="arp_lsz_hr",
+        icao_code="LDLO",
+        iata_country_code="HR",
+        iata_code="LSZ",
+    )
+
+    assert airport_list[8] == Airport(
+        time_zone="Europe/Zagreb",
+        name="Zadar Airport",
+        longitude=15.346689,
+        latitude=44.108218,
+        identifier="arp_zad_hr",
+        icao_code="LDZD",
+        iata_country_code="HR",
+        iata_code="ZAD",
+    )
+
+    assert len(airport_list) == 10
+
+
+async def test_list_webhooks(
+    duffel_client: client.DuffelClient,
+    httpx_mock: pytest_httpx.HTTPXMock,
+) -> None:
+    json_res = await conftest.load_file_fixture("list_webhooks.json")
+
+    httpx_mock.add_response(
+        url=_BASE_URL.format(
+            base_path=conftest.API_BASE_URL,
+            path="/air/webhooks",
+        ),
+        method="GET",
+        json=json_res,
+    )
+
+    webhook_list = await duffel_client.list_webhooks()
+    assert len(webhook_list.data) == 1
+    for webhook in webhook_list.data:
+        assert webhook.identifier == "end_0000AarCWk8kT0Owq8s5fk"

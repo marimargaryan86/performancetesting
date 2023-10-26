@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from pydantic import v1 as pydantic
+import pydantic
 
 from snowfall.vendor.duffel.models.base import DuffelBaseModel
 
@@ -11,11 +11,11 @@ class CancelData(DuffelBaseModel):
     refund_amount: str
     order_id: str
     live_mode: bool
-    identifier: str = pydantic.Field(..., alias="id")
+    identifier: str = pydantic.Field(alias="id")
     expires_at: str | None
     created_at: str
     confirmed_at: str | None
 
 
 class CancelResponse(DuffelBaseModel):
-    response_data: CancelData = pydantic.Field(..., alias="data")
+    response_data: CancelData = pydantic.Field(alias="data")

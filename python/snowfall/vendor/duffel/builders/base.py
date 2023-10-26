@@ -1,6 +1,5 @@
-from pydantic.v1 import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class DuffelRequestBaseModel(BaseModel):
-    class Config(object):
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)

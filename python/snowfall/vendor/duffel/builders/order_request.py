@@ -4,7 +4,7 @@ import datetime
 from collections.abc import Mapping
 from typing import Any
 
-from pydantic import v1 as pydantic
+import pydantic
 
 from snowfall.vendor.duffel.builders.base import DuffelRequestBaseModel
 
@@ -30,8 +30,8 @@ class IdentityDocument(DuffelRequestBaseModel):
 class OrderPassenger(DuffelRequestBaseModel):
     title: str
     phone_number: str
-    infant_passenger_id: str | None
-    identity_documents: list[IdentityDocument] | None
+    infant_passenger_id: str | None = None
+    identity_documents: list[IdentityDocument] | None = None
     passenger_id: str = pydantic.Field(alias="id")
     given_name: str
     gender: str
@@ -46,11 +46,11 @@ class Metadata(DuffelRequestBaseModel):
 
 class OrderDataElements(DuffelRequestBaseModel):
     order_type: str | None = pydantic.Field(alias="type")
-    services: list[OrderService] | None
+    services: list[OrderService] | None = None
     selected_offers: list[str]
     payments: list[OrderPayment]
     passengers: list[OrderPassenger]
-    metadata: Mapping[str, Any] | None
+    metadata: Mapping[str, Any] | None = None
 
 
 class OrderData(DuffelRequestBaseModel):

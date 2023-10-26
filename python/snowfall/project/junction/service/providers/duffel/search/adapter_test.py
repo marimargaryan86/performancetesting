@@ -33,7 +33,7 @@ async def get_search_task_for_fixture(
         json=json,
     )
 
-    offer_response = OfferRequestResponse.parse_obj(json)
+    offer_response = OfferRequestResponse.model_validate(json)
     return search_task_from_offer(offer_response.response_data.offers[0])
 
 
@@ -76,7 +76,7 @@ async def test_offer_with_stop(
         json=json,
     )
 
-    offer_response = OfferRequestResponse.parse_obj(json)
+    offer_response = OfferRequestResponse.model_validate(json)
     offer = offer_response.response_data.offers[0]
     search_task = search_task_from_offer(offer)
 
@@ -117,7 +117,7 @@ async def test_airline_validator(
         json=json,
     )
 
-    offer_response = OfferRequestResponse.parse_obj(json)
+    offer_response = OfferRequestResponse.model_validate(json)
     ba15_offer = next(
         offer
         for offer in offer_response.response_data.offers

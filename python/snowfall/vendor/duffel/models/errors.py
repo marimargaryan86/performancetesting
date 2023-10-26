@@ -1,4 +1,4 @@
-from pydantic import v1 as pydantic
+import pydantic
 
 from snowfall.vendor.duffel.models.base import DuffelBaseModel
 
@@ -14,7 +14,7 @@ class Source(DuffelBaseModel):
 
 
 class Error(DuffelBaseModel):
-    error_type: str | None = pydantic.Field(..., alias="type")
+    error_type: str | None = pydantic.Field(alias="type")
     title: str | None
     source: Source | str | None
     message: str | None

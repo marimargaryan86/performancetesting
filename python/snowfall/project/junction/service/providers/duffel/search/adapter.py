@@ -49,7 +49,7 @@ def _generate_private_fares_keys(
             b"\x00".decode().join(
                 [
                     b"\x00".decode().join(
-                        list(starmap("{0}-{1}".format, fare.dict().items())),
+                        list(starmap("{0}-{1}".format, fare.model_dump().items())),
                     )
                     for fare in sorted(fares, key=_fares_sort_key)
                 ],
@@ -127,7 +127,7 @@ class DuffelSearchAdapter(object):
         search_task: amqp_pb2.SearchCriteriaTask,
     ) -> SearchCriteriaWrapper:
         offer_request_builder = OffersRequestBuilder()
-        outbound_date = protobuf.protobuf_to_datetime(
+        outbound_date = protobuf.protobuf_to_date(
             search_task.criteria.outbound_departure,
         )
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 from collections.abc import Mapping, Sequence
 
-from pydantic import v1 as pydantic
+import pydantic
 
 from snowfall.vendor.duffel.builders.base import DuffelRequestBaseModel
 from snowfall.vendor.duffel.models.offer import Offer, PrivateFare
@@ -18,8 +18,8 @@ class OfferRequestSlice(DuffelRequestBaseModel):
     destination: str
     origin: str
     departure_date: datetime.date
-    arrival_time: OfferRequestSliceTimeRange | None
-    departure_time: OfferRequestSliceTimeRange | None
+    arrival_time: OfferRequestSliceTimeRange | None = None
+    departure_time: OfferRequestSliceTimeRange | None = None
 
 
 class LoyaltyProgrammeAccount(DuffelRequestBaseModel):
@@ -28,17 +28,17 @@ class LoyaltyProgrammeAccount(DuffelRequestBaseModel):
 
 
 class OfferRequestPassenger(DuffelRequestBaseModel):
-    age: int | None
-    pax_type: str | None = pydantic.Field(alias="type")
-    given_name: str | None
-    family_name: str | None
-    loyalty_programme_accounts: list[LoyaltyProgrammeAccount] | None
+    age: int | None = None
+    pax_type: str | None = pydantic.Field(alias="type", default=None)
+    given_name: str | None = None
+    family_name: str | None = None
+    loyalty_programme_accounts: list[LoyaltyProgrammeAccount] | None = None
 
 
 class OfferRequestDataList(DuffelRequestBaseModel):
     passengers: list[OfferRequestPassenger]
     slices: list[OfferRequestSlice]
-    private_fares: Mapping[str, Sequence[PrivateFare]] | None
+    private_fares: Mapping[str, Sequence[PrivateFare]] | None = None
 
 
 class OfferRequestData(DuffelRequestBaseModel):
