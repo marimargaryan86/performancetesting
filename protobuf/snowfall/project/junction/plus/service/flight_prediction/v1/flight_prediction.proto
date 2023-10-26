@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package snowfall.project.junction.plus.service.flight_prediction.v1;
+
+import "snowfall/stdlib/v1/datetime.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/plus/service/flight_prediction/v1";
+
+service FlightPredictionService {
+  rpc PredictFlightDelayInMinutes(PredictFlightDelayInMinutesRequest) returns (PredictFlightDelayInMinutesResponse) {}
+}
+
+message PredictFlightDelayInMinutesRequest {
+  string career_code = 1;
+  string flight_number = 2;
+  snowfall.stdlib.v1.DateTime scheduled_departure_date_time = 3;
+}
+
+message PredictFlightDelayInMinutesResponse {
+  float delay_prediction_in_minutes = 1;
+}

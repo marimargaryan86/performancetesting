@@ -326,8 +326,10 @@ module = [
   "qrcode.*",            # https://github.com/lincolnloop/python-qrcode/pull/321
   "rfc3339_validator.*",
   "s3fs.*",              # https://github.com/fsspec/s3fs/issues/383
+  "sagemaker.*",         # https://github.com/aws/sagemaker-python-sdk/issues/2985
   "shapefile.*",
   "shapely.*",           # https://github.com/shapely/shapely/issues/721
+  "sklearn.*",
 ]
 ignore_missing_imports = true
 
