@@ -26,6 +26,9 @@ OfferGroupGenerator = Callable[
     [_CriteriaType],
     AsyncIterator[offers_pb2.OfferGroup],
 ]
+# This timeout is just a safety mechanism (in case the lock doesn't get
+# released). In reality, it should never occur.
+_CACHE_LOCK_TTL_SECONDS = 180
 
 
 class NoCacheExistsError(Exception):
@@ -39,11 +42,9 @@ class OfferGroupCache(object):
         redis: redis_types.Client[bytes],
     ) -> None:
         self._seen_key = "criteria_cache.seen:{0}".format(cache_key)
-        # This timeout is just a safety mechanism (in case the lock doesn't get
-        # released). In reality, it should never occur.
         self._lock = redis.lock(
             "criteria_cache.locks:{0}".format(cache_key),
-            timeout=60,
+            timeout=_CACHE_LOCK_TTL_SECONDS,
         )
         self._offers = redis.set_("criteria_cache.offers:{0}".format(cache_key))
         self._redis = redis
@@ -58,21 +59,6 @@ class OfferGroupCache(object):
         exc_value: BaseException | None,
         traceback: std_types.TracebackType | None,
     ) -> bool:
-        # only claim to have cached results if we were successful
-        if not exc_type:
-            fallback_expiry = datetime.datetime.now(
-                tz=datetime.UTC,
-            ) + datetime.timedelta(
-                hours=1,
-            )  # TODO: tweak to what we want
-
-            await self._redis.put(self._seen_key, b"\x00")
-            await redis_types.put_expires_at_if_less_than_current(
-                self._redis,
-                self._seen_key,
-                await self._redis.get_expires_at(self._offers) or fallback_expiry,
-            )
-
         await self._lock.__aexit__(exc_type, exc_value, traceback)
 
         return False
@@ -93,6 +79,20 @@ class OfferGroupCache(object):
             self._redis,
             self._offers,
             offer.expires_at.ToDatetime(tzinfo=datetime.UTC),
+        )
+
+    async def mark_as_seen(self) -> None:
+        fallback_expiry = datetime.datetime.now(
+            tz=datetime.UTC,
+        ) + datetime.timedelta(
+            hours=1,
+        )  # TODO: tweak to what we want
+
+        await self._redis.put(self._seen_key, b"\x00")
+        await redis_types.put_expires_at_if_less_than_current(
+            self._redis,
+            self._seen_key,
+            await self._redis.get_expires_at(self._offers) or fallback_expiry,
         )
 
 
@@ -159,4 +159,7 @@ class OfferGroupRepository(Generic[_CriteriaType]):
             self._counter_requests.labels(cached=False).inc()
 
             offer_results.append(offer_result)
+
+        await offer_cache.mark_as_seen()
+
         return offer_results
