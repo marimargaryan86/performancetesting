@@ -30,6 +30,7 @@ class _Settings(application.Settings):
     grpc_port: int = 50064
     aws_access_key_id: str
     aws_secret_access_key: str
+    aws_default_region: str
     aws_sagemaker_endpoint_name: str
     flight_stats_api_url: str
     flight_stats_app_id: str

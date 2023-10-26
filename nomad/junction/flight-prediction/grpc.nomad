@@ -131,6 +131,7 @@ EOH
         SENTRY_DSN                  = "https://6ce65492acd4484caa731dd1073fe114@sentry.snowfall.se/172"
         PROMETHEUS_PORT             = "${NOMAD_PORT_prometheus}"
         FLIGHT_STATS_API_URL        = "https://api.flightstats.com/flex/flightstatus/rest/v2/json/flight/status/"
+        AWS_DEFAULT_REGION          = "eu-west-2"
         AWS_SAGEMAKER_ENDPOINT_NAME = "predictorv2-2"
       }
     }
