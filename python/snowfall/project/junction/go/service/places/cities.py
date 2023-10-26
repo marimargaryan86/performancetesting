@@ -1,5 +1,4 @@
 import datetime
-import logging
 import math
 import os
 import uuid
@@ -11,6 +10,7 @@ from snowfall.project.junction.go.service.places import places
 from snowfall.project.junction.go.service.places.v1 import models_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.v1 import latlng_pb2
 
 _MIN_POPULATION = 20000
@@ -21,7 +21,7 @@ _MAX_DISTANCE_AIRPORT_M = int(
 _MAX_DISTANCE_RAIL_M = int(os.getenv("MAX_DISTANCE_RAIL_M", "10000"))  # noqa: WPS432
 
 
-def calc_distance(
+def _calculate_distance(
     p1: tuple[float, float],
     p2: tuple[float, float],
 ) -> float:
@@ -36,7 +36,7 @@ def calc_distance(
     return distance * radius_of_earth_in_metres
 
 
-def filter_location_by_type(
+def _filter_location_by_type(
     locations: Sequence[models_pb2.Location],
     longitude: float,
     latitude: float,
@@ -59,20 +59,21 @@ def filter_location_by_type(
         models_pb2.Location.Type.TYPE_FERRY_PORT,
         models_pb2.Location.Type.TYPE_BUS_STATION,
     }
+    logger = stdout.get_logger()
 
     for location in locations:
         if unconditional.intersection(location.types):
             valid_locations.append(location.id)
         elif distance.intersection(location.types):
             loc = (location.coordinates.longitude, location.coordinates.latitude)
-            if calc_distance((longitude, latitude), loc) <= _MAX_DISTANCE_RAIL_M:
+            if _calculate_distance((longitude, latitude), loc) <= _MAX_DISTANCE_RAIL_M:
                 # It's close enough, add it.
                 valid_locations.append(location.id)
         else:
-            logging.warning(
-                "Location %s has no known location types: %s",
-                location.name,
-                location.types,
+            logger.warning(
+                "Location has no known location types",
+                name=location.name,
+                types=location.types,
             )
 
     return valid_locations
@@ -94,7 +95,7 @@ async def parse_csv(
             # TODO: only locations in the same country
         ]
 
-        location_ids = filter_location_by_type(
+        location_ids = _filter_location_by_type(
             locations=locations,
             latitude=float(row["latitude"]),
             longitude=float(row["longitude"]),

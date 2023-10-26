@@ -2,7 +2,6 @@
 
 import asyncio
 import json
-import logging
 import re
 import string
 import sys
@@ -12,6 +11,8 @@ from typing import Any, cast
 import httpx
 from lxml.html import Element  # pants: no-infer-dep
 from lxml.html import fromstring as html_fromstring
+
+from snowfall.stdlib.logging import stdout
 
 _Airports = dict[str, dict[str, Any]]
 
@@ -72,6 +73,7 @@ async def _wiki_process_page(
 ) -> None:
     xpath_row = "//table[contains(@class, 'wikitable')]/tbody/tr[not(descendant::th)]"
     geocode_url = "https://maps.googleapis.com/maps/api/geocode/json"
+    logger = stdout.get_logger()
 
     resp = await client.get(url)
     html = html_fromstring(resp.content)
@@ -87,7 +89,7 @@ async def _wiki_process_page(
                 lat, lon, tz = await _wiki_new_airport(client, name)
             except NoAirportError:
                 tc = name.text_content()
-                logging.warning("Skipped: %s - %s", iata, tc)
+                logger.warning("Skipped", iata=iata, content=tc)
                 continue
 
             # Get country code

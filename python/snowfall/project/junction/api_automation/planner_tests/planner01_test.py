@@ -82,13 +82,19 @@ async def save_mct_to_csv(
         )
         for trip_id in trip_ids:
             response = await client.legs().get_legs_by_trip_id(trip_id)
-            logging.info("get_legs_by_trip_id: %s", json.dumps(response, indent=4))
+            logging.info(
+                "get_legs_by_trip_id: %s",  # noqa: WPS323
+                json.dumps(response, indent=4),
+            )
             all_legs_array = sorted(
                 response["data"],
                 key=lambda json_key: json_key["attributes"]["departureAt"],
                 reverse=False,
             )
-            logging.info("all_legs_array %s", json.dumps(all_legs_array, indent=4))
+            logging.info(
+                "all_legs_array %s",  # noqa: WPS323
+                json.dumps(all_legs_array, indent=4),
+            )
             await extract_data_from_legs_for_trip_id(
                 all_legs_array,
                 trip_id,
@@ -181,14 +187,17 @@ async def get_trip_ids_with_minimum_segments(
     )
 
     r2 = await client.trips().get_trips_by_trip_search_id(r1["data"]["id"])
-    logging.info("get_trips_by_trip_search_id: %s", json.dumps(r2, indent=4))
+    logging.info(
+        "get_trips_by_trip_search_id: %s",  # noqa: WPS323
+        json.dumps(r2, indent=4),
+    )
 
     reduced_trip_ids = []
     for trip_item in r2["data"]:
         segments_amount = len(trip_item["relationships"]["segments"]["data"])
         if segments_min_length <= segments_amount <= segments_max_length:
             reduced_trip_ids.append(trip_item["id"])
-    logging.info("reduced_trip_ids: %s", reduced_trip_ids)
+    logging.info("reduced_trip_ids: %s", reduced_trip_ids)  # noqa: WPS323
 
     return reduced_trip_ids
 
@@ -209,10 +218,13 @@ async def return_trip_search_final_response(
         ).astimezone(datetime.UTC),
         allowed_segment_types=[LegType.air],
     )
-    logging.info("trips().create_trip_search: %s", json.dumps(response, indent=4))
+    logging.info(
+        "trips().create_trip_search: %s",  # noqa: WPS323
+        json.dumps(response, indent=4),
+    )
     status = response["data"]["attributes"]["status"]
     while do_condition and safety_counter < 30:
-        logging.info("trip_search status: %s", status)
+        logging.info("trip_search status: %s", status)  # noqa: WPS323
         if status in {"completed", "unspecified", "failed"}:
             do_condition = False
         else:

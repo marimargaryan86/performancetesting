@@ -164,7 +164,7 @@ async def create_payment(
     currency = quote["data"]["attributes"]["price"]["currency"]
     amount = quote["data"]["attributes"]["price"]["amount"]
     resp = await mobile_client.create_payment(currency=currency, amount=amount)
-    logger.info("Get payment data %s", json.dumps(resp, indent=4))
+    logger.info("Get payment data %s", json.dumps(resp, indent=4))  # noqa: WPS323
     return resp["data"]
 
 

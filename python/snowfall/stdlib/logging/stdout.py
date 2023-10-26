@@ -149,7 +149,7 @@ def _configure_standard_logger(
         format_as_json=format_as_json,
     )
     logging.basicConfig(
-        format="%(message)s",
+        format="%(message)s",  # noqa: WPS323
         level=level,
         handlers=[log_handler],
     )

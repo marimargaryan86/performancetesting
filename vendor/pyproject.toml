@@ -92,7 +92,7 @@ select = [
   "WPS320", # Forbid multi-line function type annotations.
   "WPS321", # Forbid uppercase string modifiers.
   "WPS322", # Forbid triple quotes for singleline strings.
-  # "WPS323", # Forbid % formatting on strings. TODO: Fix these before enabling.
+  "WPS323", # Forbid % formatting on strings.
   "WPS325", # Enforce consistent yield statements.
   "WPS327", # Forbid meaningless continue in loops.
   "WPS328", # Forbid meaningless nodes.
@@ -375,6 +375,7 @@ external = [
   "WPS238", # Forbids too many raise statements in a function
   "WPS306", # Forbid writing classes without base classes
   "WPS320", # Forbid multi-line function type annotations.
+  "WPS323", # Forbid % formatting on strings.
   "WPS336", # Forbid explicit string concatanation in favour of .format method
   "WPS337", # Forbid multiline conditions
   "WPS352", # Forbid multiline loops

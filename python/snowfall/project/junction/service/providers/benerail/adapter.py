@@ -34,7 +34,6 @@ from snowfall.vendor.benerail.models.trip_offers import response as t_o_response
 from snowfall.vendor.benerail.models.trips import trips
 
 _NON_BOOKABLE_STATES = frozenset(("NOT_BOOKABLE_NO_SERVICE", "NOT_BOOKABLE_NO_PAST"))
-_DATE_FMT = "%Y%m%d"
 
 
 class OfferNotFoundError(Exception):

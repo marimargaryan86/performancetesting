@@ -12,7 +12,7 @@ _DESTINATION = "SAT_NL_RO_LCHPY"
 _TRIP_TYPE = 1
 _PASSENGER_COUNT = 1
 _DATE = "2023-07-02"
-_EMAIL = "test%40snowfall.com"
+_EMAIL = "test@snowfall.com"
 _PASSWORD = "secret"
 
 

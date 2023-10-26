@@ -1,6 +1,5 @@
 import asyncio
 import dataclasses
-import logging
 from collections.abc import Iterable, Sequence
 from typing import Any
 
@@ -9,6 +8,7 @@ from pymongo import GEOSPHERE, IndexModel, results
 from snowfall.project.junction.go.service.places.v1 import models_pb2
 from snowfall.service.geodata.v1 import geocoding_pb2, geocoding_pb2_grpc
 from snowfall.stdlib import string
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.mongo import mixins, normalizers, repository, resultset
 
 
@@ -254,6 +254,9 @@ class PlaceRepository(
         )
 
 
+_logger = stdout.get_logger()
+
+
 async def create(
     repo: PlaceRepository,
     place: models_pb2.Place,
@@ -263,6 +266,6 @@ async def create(
     """Create, then release the semaphore."""
     async with sem:
         if count % 1000 == 0:
-            logging.info("Places created: %s", count)
+            _logger.info("Places created", count=count)
 
         return await repo.create(place)

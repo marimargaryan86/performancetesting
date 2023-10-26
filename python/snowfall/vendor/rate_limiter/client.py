@@ -27,7 +27,6 @@ class Client(object):
         config: RateLimitConfig,
     ):
         self._stub = stub
-        self._config: RateLimitConfigsApi
         self._logger = stdout.get_logger()
 
         if isinstance(config.duration_s, str):
@@ -57,17 +56,17 @@ class Client(object):
         while limit.status != Status.UNDER_LIMIT:
             if limit.reset_time >= cutoff_time_ms:
                 self._logger.warning(
-                    "Timeout occurred for %s (%ss)",
-                    self._config["name"],
-                    timeout,
+                    "Timeout occurred",
+                    name=self._config["name"],
+                    timeout=timeout,
                 )
                 raise asyncio.TimeoutError()
 
             time_diff_s = (limit.reset_time / SECOND) - time.time()
             self._logger.info(
-                "Rate limit was reached for %s (retry after %.1fs)",
-                self._config["name"],
-                time_diff_s,
+                "Rate limit was reached",
+                name=self._config["name"],
+                retry_after=time_diff_s,
             )
             await asyncio.sleep(time_diff_s)
 

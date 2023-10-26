@@ -1,9 +1,9 @@
 import datetime
-import logging
 import os
 
 import pytest
 
+from snowfall.stdlib.logging import stdout
 from snowfall.vendor.distribusion import client, enums
 from snowfall.vendor.distribusion.models.connections import (
     Connection,
@@ -301,11 +301,12 @@ async def test_order_create(
 
     order = await distribusion_client.create_order(order_create_request)
     assert order.identifier
-    logging.info("Order ID: %s", order.identifier)
+    logger = stdout.get_logger()
+    logger.info("Order created", id=order.identifier)
 
     order_details, raw_data = await distribusion_client.get_order(order.identifier)
     assert order_details.state
-    logging.info("Order state: %s", order_details.state)
+    logger.info("Order retrieved", state=order_details.state)
 
 
 @disable_by_default

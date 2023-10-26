@@ -19,8 +19,8 @@ class TicketEventConsumer(object):
         orders_client: orders.Client,
     ):
         self._consumer = consumer_obj
-        self._logger = stdout.get_logger()
         self._orders_client = orders_client
+        self._logger = stdout.get_logger()
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
@@ -31,8 +31,8 @@ class TicketEventConsumer(object):
     ) -> None:
         if message.body.status not in status_map:
             self._logger.error(
-                "Failed to process TicketChangeEvent, unknown status received: %s",
-                message.body.status,
+                "Failed to process TicketChangeEvent, unknown status received",
+                status=message.body.status,
             )
             return
 
@@ -43,6 +43,6 @@ class TicketEventConsumer(object):
             )
         except UnhandledError:
             self._logger.exception(
-                "Failed to process TicketChangeEvent: %s",
-                message.body,
+                "Failed to process TicketChangeEvent",
+                body=message.body,
             )

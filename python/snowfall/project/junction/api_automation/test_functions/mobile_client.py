@@ -12,8 +12,6 @@ from snowfall.vendor.junction.client import make_pagination_params
 from snowfall.vendor.junction.go import models
 from snowfall.vendor.junction.go.client import Client, LegType
 
-logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
 _OrderIncludes: TypeAlias = Literal[
     "journey",
     "bookings",
@@ -100,7 +98,10 @@ class MobileApiClient(Client):
                 _TYPE_KEY: "payments",
             },
         }
-        self.logger.info("create_payment: %s", json.dumps(body, indent=4))
+        self.logger.info(
+            "create_payment: %s",  # noqa: WPS323
+            json.dumps(body, indent=4),
+        )
         return await self._make_request(
             method=_METHOD_POST,
             url="/payments",
@@ -426,7 +427,7 @@ class MobileApiClient(Client):
             url,
             query_parameters=query_parameters,
         )
-        logger.info(curl_command)
+        self.logger.info(curl_command)
 
         return await self._make_request(
             method=_METHOD_GET,
@@ -693,7 +694,7 @@ class MobileApiClient(Client):
             "/places",
             query_parameters,
         )
-        logger.info(curl_command)
+        self.logger.info(curl_command)
         return await self._make_request(
             method=_METHOD_GET,
             url=url,
@@ -727,7 +728,7 @@ class MobileApiClient(Client):
             url,
             body=body,
         )
-        logger.info(curl_command)
+        self.logger.info(curl_command)
         return await self._make_request(
             method=_METHOD_POST,
             url=url,
@@ -743,7 +744,7 @@ class MobileApiClient(Client):
             _METHOD_GET,
             url,
         )
-        logger.info(curl_command)
+        self.logger.info(curl_command)
         return await self._make_request(
             method=_METHOD_GET,
             url=url,
@@ -783,7 +784,7 @@ class MobileApiClient(Client):
             headers=headers,
             body=body,
         )
-        logger.info(curl_command)
+        self.logger.info(curl_command)
         return await self._make_request(
             method=_METHOD_POST,
             url=url,
