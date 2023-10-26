@@ -1,7 +1,7 @@
 {
   "development": {
     "variables": {
-      "count": 1,
+      "count": 2,
       "traefik_entrypoints": "websecure",
       "traefik_host_URL": "api.pay.junction.dev",
       "traefik_headers_accesscontrolalloworiginlist": "*",
@@ -21,7 +21,7 @@
   },
   "sandbox": {
     "variables": {
-      "count": 1,
+      "count": 2,
       "traefik_entrypoints": "websecure",
       "traefik_host_URL": "api.pay.sandbox.junction.dev",
       "traefik_headers_accesscontrolalloworiginlist": "*",
