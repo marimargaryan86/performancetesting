@@ -24,13 +24,15 @@ from snowfall.project.junction.extensions.service.mobile_api import (
     bootstrap,
     jwt_generator,
     middleware,
-    plus_client,
     repository,
     smtp,
     spec,
 )
 from snowfall.project.junction.extensions.service.mobile_api import (
     handlers as mobile_handlers,
+)
+from snowfall.project.junction.extensions.service.mobile_api import (
+    plus_client as plus_poc_http_client,
 )
 from snowfall.project.junction.extensions.service.mobile_api.routes import router
 from snowfall.project.junction.extensions.service.mobile_api.v1alpha import models_pb2
@@ -41,6 +43,7 @@ from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.v1 import phone_number_pb2
 from snowfall.vendor.junction import client as base_client
 from snowfall.vendor.junction.go import client
+from snowfall.vendor.junction.plus import client as plus_http_client
 
 _FIXTURES_PATH = (
     "python/snowfall/project/junction/extensions/service/mobile_api/fixtures/{path}"
@@ -336,8 +339,13 @@ def junction_client() -> client.Client:
 
 
 @pytest.fixture()
-def plus_http_client() -> plus_client.PlusClient:
-    return plus_client.PlusClient(
+def plus_client() -> plus_http_client.Client:
+    return plus_http_client.Client(base_url=junction_api_address)
+
+
+@pytest.fixture()
+def plus_poc_client() -> plus_poc_http_client.PlusClient:
+    return plus_poc_http_client.PlusClient(
         api_url=plus_api_address,
         activated=True,
     )
@@ -358,7 +366,8 @@ def app(
     smtp_client: smtp.EmailClient,
     orders_repository: repository.OrdersRepository,
     junction_client: client.Client,
-    plus_http_client: plus_client.PlusClient,
+    plus_client: plus_http_client.Client,
+    plus_poc_client: plus_poc_http_client.PlusClient,
     jwt_gen: jwt_generator.JwtGenerator,
     stripe_users_repository: repository.StripeUsersRepository,
     loyalty_programs_repository: repository.LoyaltyProgramsRepository,
@@ -373,8 +382,9 @@ def app(
             dependencies=bootstrap.create_dependencies(
                 orders_repository,
                 junction_client,
+                plus_client,
                 base_client.create_httpx_client(base_url=junction_api_address),
-                plus_http_client,
+                plus_poc_client,
                 places_repository,
                 users_repository,
                 guests_repository,

@@ -4,8 +4,8 @@
       "count": 2,
       "traefik_entrypoints": "websecure",
       "traefik_host_URL": "res-se-mobile-api.junction.dev",
-      "plus_api_address": "https://plus.api.junction.dev",
-      "plus_activated": true,
+      "plus_poc_api_address": "https://plus.poc.junction.dev",
+      "plus_poc_activated": true,
       "ory_client_token_endpoint": "https://optimistic-tereshkova-36hc6vayw4.projects.oryapis.com/oauth2/token",
       "ory_client_id": "2359fff7-e643-4c9e-88a6-4a0c0ef5a0c5"
     }
@@ -15,8 +15,8 @@
       "count": 2,
       "traefik_entrypoints": "web",
       "traefik_host_URL": "res-se-mobile-api.junction.travel",
-      "plus_api_address": "",
-      "plus_activated": false,
+      "plus_poc_api_address": "",
+      "plus_poc_activated": false,
       "ory_client_token_endpoint": "https://optimistic-tereshkova-36hc6vayw4.projects.oryapis.com/oauth2/token",
       "ory_client_id":  "f40c9d55-a9ab-4eda-bc0a-2eb256157e2f"
     }
@@ -26,8 +26,8 @@
       "count": 1,
       "traefik_entrypoints": "websecure",
       "traefik_host_URL": "res-se-mobile-api.sandbox.junction.dev",
-      "plus_api_address": "https://plus.api.sandbox.junction.dev",
-      "plus_activated": true,
+      "plus_poc_api_address": "https://plus.poc.sandbox.junction.dev",
+      "plus_poc_activated": true,
       "ory_client_token_endpoint": "https://optimistic-tereshkova-36hc6vayw4.projects.oryapis.com/oauth2/token",
       "ory_client_id":  "aa1b5ba5-9cba-43f2-afe6-98797ecd0d7e"
     }

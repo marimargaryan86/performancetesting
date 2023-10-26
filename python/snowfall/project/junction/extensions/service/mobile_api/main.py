@@ -16,13 +16,15 @@ from snowfall.project.junction.extensions.service.mobile_api import (
     middleware,
     orders_report,
     places_migration,
-    plus_client,
     repository,
     smtp,
     spec,
 )
 from snowfall.project.junction.extensions.service.mobile_api import (
     handlers as mobile_handlers,
+)
+from snowfall.project.junction.extensions.service.mobile_api import (
+    plus_client as plus_poc_client,
 )
 from snowfall.project.junction.extensions.service.mobile_api.routes import router
 from snowfall.service.authentication.v1 import sessions_pb2_grpc
@@ -34,7 +36,8 @@ from snowfall.stdlib.integration.starlette import handlers
 from snowfall.stdlib.service import application, grpc_factory, redis_factory
 from snowfall.stdlib.transport.http import auth
 from snowfall.vendor.junction import client as base_client
-from snowfall.vendor.junction.go import client
+from snowfall.vendor.junction.go import client as go_client
+from snowfall.vendor.junction.plus import client as plus_client
 
 
 async def _get_httpx_auth_and_middlewares(
@@ -110,13 +113,23 @@ async def _http(
         client=httpx.AsyncClient(timeout=10),
     )
     metrics.register(junction_httpx_client)
-    junction_client = client.Client(
+    junction_client = go_client.Client(
         base_url=app.settings.junction_api_address,
         client=junction_httpx_client,
     )
-    plus_http_client = plus_client.PlusClient(
-        api_url=app.settings.plus_api_address,
-        activated=app.settings.plus_activated,
+    plus_http_client = plus_client.Client(
+        base_url=app.settings.plus_api_address,
+        client=metrics.register(
+            base_client.create_httpx_client(
+                base_url=app.settings.plus_api_address,
+                auth=httpx_auth,
+                client=httpx.AsyncClient(timeout=10),
+            ),
+        ),
+    )
+    plus_poc_http_client = plus_poc_client.PlusClient(
+        api_url=app.settings.plus_poc_api_address,
+        activated=app.settings.plus_poc_activated,
         client=metrics.register(httpx.AsyncClient()),
     )
     redis_client = await redis_factory.make_client(
@@ -193,7 +206,8 @@ async def _http(
                         mongo["markups"],
                     ),
                     junction_client=junction_client,
-                    plus_http_client=plus_http_client,
+                    plus_client=plus_http_client,
+                    plus_poc_client=plus_poc_http_client,
                     jwt_gen=jwt_gen,
                     httpx_client=junction_httpx_client,
                 ),

@@ -12,7 +12,7 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
 
     return [
         integration.route(
-            "/push-notification-tokens",
+            "/push-notifications/tokens",
             notification_tokens.Tokens,
             methods=["PATCH"],
         ),

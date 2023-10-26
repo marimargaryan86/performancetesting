@@ -3,7 +3,7 @@
     "variables": {
       "count": 1,
       "traefik_entrypoints": "websecure",
-      "traefik_host_URL": "plus.api.junction.dev",
+      "traefik_host_URL": "plus.poc.junction.dev",
       "junction_api_address": "https://api.junction.dev",
       "traefik_headers_accesscontrolalloworiginlist": "*",
       "traefik_headers_accesscontrolallowheaders": "*"
@@ -17,7 +17,7 @@
       "count": 1,
       "traefik_entrypoints": "websecure",
       "junction_api_address": "https://api.sandbox.junction.dev",
-      "traefik_host_URL": "plus.api.sandbox.junction.dev",
+      "traefik_host_URL": "plus.poc.sandbox.junction.dev",
       "traefik_headers_accesscontrolalloworiginlist": "*",
       "traefik_headers_accesscontrolallowheaders": "*"
     }

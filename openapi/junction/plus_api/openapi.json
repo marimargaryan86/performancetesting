@@ -1,0 +1,292 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Junction Plus API",
+    "version": "1.0.0",
+    "description": "This API follows the [JSON:API][jsonapi] specification.\n\n[jsonapi]: https://jsonapi.org/",
+    "contact": {
+      "name": "Snowfall",
+      "url": "https://www.snowfalltravel.com",
+      "email": "info@snowfalltravel.com"
+    },
+    "license": {
+      "name": "Junction",
+      "url": "https://www.snowfalltravel.com"
+    }
+  },
+  "x-internal": true,
+  "x-tagGroups": [
+    {
+      "name": "Internal",
+      "tags": [
+        "internal"
+      ]
+    },
+    {
+      "name": "Tokens",
+      "tags": [
+        "tokens"
+      ]
+    }
+  ],
+  "tags": [
+    {
+      "name": "internal",
+      "description": "Endpoints not for public use.",
+      "x-displayName": "Internal"
+    },
+    {
+      "name": "tokens",
+      "description": "Endpoints for registering push notification tokens.",
+      "x-displayName": "Tokens"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "security": [],
+        "summary": "Health",
+        "tags": [
+          "internal"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "description": "",
+                  "type": "object",
+                  "x-examples": {
+                    "example-1": {
+                      "meta": {
+                        "status": "ok"
+                      }
+                    }
+                  },
+                  "properties": {
+                    "meta": {
+                      "type": "object",
+                      "required": [
+                        "status"
+                      ],
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "description": "Health status",
+                          "enum": [
+                            "pass",
+                            "fail",
+                            "warn"
+                          ],
+                          "example": "pass"
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "meta"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-health",
+        "description": "Check the application health.",
+        "x-internal": true
+      }
+    },
+    "/push-notifications/tokens": {
+      "patch": {
+        "summary": "Update push notification token for subscriber",
+        "tags": [
+          "tokens"
+        ],
+        "operationId": "patch-push-notifications-tokens",
+        "description": "Used from the push notification channel.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/PushNotificationToken"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {},
+    "schemas": {
+      "Error": {
+        "title": "Error",
+        "type": "object",
+        "description": "JSON:API error",
+        "properties": {
+          "status": {
+            "type": "string",
+            "pattern": "^[45][0-9]{2}$",
+            "description": "The HTTP status code applicable to this problem, expressed as a string value.",
+            "example": "404"
+          },
+          "title": {
+            "type": "string",
+            "example": "Not Found",
+            "description": "A short, human-readable summary of the problem that SHOULD NOT change from occurrence to occurrence of the problem, except for purposes of localization."
+          },
+          "detail": {
+            "type": "string",
+            "description": "A human-readable explanation specific to this occurrence of the problem. Like `title`, this field’s value can be localized.",
+            "example": "Nothing matches the given URI"
+          },
+          "code": {
+            "type": "string",
+            "example": "required",
+            "description": "An application-specific error code, expressed as a string value."
+          },
+          "source": {
+            "description": "An object containing references to the source of the error.",
+            "properties": {
+              "pointer": {
+                "type": "string",
+                "example": "/data/attributes/title",
+                "description": "A JSON Pointer to the associated entity in the request document."
+              },
+              "parameter": {
+                "type": "string",
+                "example": "page[cursor]",
+                "description": "A string indicating which URI query parameter caused the error."
+              },
+              "header": {
+                "type": "string",
+                "example": "X-Request-Id",
+                "description": "A string indicating the name of a single request header which caused the error."
+              }
+            },
+            "minProperties": 1,
+            "maxProperties": 1,
+            "type": "object"
+          }
+        },
+        "required": [
+          "status",
+          "detail"
+        ]
+      },
+      "PushNotificationToken": {
+        "title": "Token",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "271f6d54-9e59-407e-a860-b0771d9e3d26",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "example": "push-notification-tokens",
+            "enum": [
+              "push-notification-tokens"
+            ]
+          },
+          "attributes": {
+            "type": "object",
+            "properties": {
+              "token": {
+                "type": "string",
+                "example": "EXAMPLE_HERE"
+              },
+              "mobilePhone": {
+                "type": "string",
+                "example": "+991122334455"
+              }
+            },
+            "required": [
+              "token",
+              "mobilePhone"
+            ]
+          }
+        }
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Bad Request",
+        "content": {
+          "application/vnd.api+json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "errors": {
+                  "type": "array",
+                  "uniqueItems": true,
+                  "minItems": 1,
+                  "items": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              },
+              "required": [
+                "errors"
+              ]
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Unauthorized",
+        "content": {
+          "application/vnd.api+json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "errors": {
+                  "type": "array",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              },
+              "required": [
+                "errors"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "jwt": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+
+  },
+    "security": [
+    {
+      "jwt": []
+    }
+  ]
+}

@@ -34,11 +34,11 @@ variable "count" {
   type = number
 }
 
-variable "plus_api_address" {
+variable "plus_poc_api_address" {
   type = string
 }
 
-variable "plus_activated" {
+variable "plus_poc_activated" {
   type = bool
 }
 
@@ -143,6 +143,7 @@ job "mobile-api-http-qa" {
         change_mode = "restart"
         data        = <<EOH
 JUNCTION_API_ADDRESS={{(printf "http://%s" (env "NOMAD_UPSTREAM_ADDR_client-api-${var.environment}"))}}
+PLUS_API_ADDRESS={{(printf "http://%s" (env "NOMAD_UPSTREAM_ADDR_plus-api-${var.environment}"))}}
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 SMTP_DSN={{range $index, $service := service "smtp"}}smtp://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}{{end}}
@@ -181,8 +182,8 @@ EOH
         CLIENT_NAME               = "Snowfall"
         CREATE_STRIPE_CUSTOMERS   = false
         SUPPORT_EMAIL             = "mari.m@snowfalltravel.com"
-        PLUS_API_ADDRESS          = "${var.plus_api_address}"
-        PLUS_ACTIVATED            = var.plus_activated
+        PLUS_POC_API_ADDRESS      = "${var.plus_poc_api_address}"
+        PLUS_POC_ACTIVATED        = var.plus_poc_activated
         ORY_CLIENT_TOKEN_ENDPOINT = var.ory_client_token_endpoint
         ORY_CLIENT_ID             = var.ory_client_id
       }

@@ -814,6 +814,43 @@
         },
         "operationId": "get-push-notifications-tokens",
         "description": "Get all push notification tokens by user"
+      },
+      "patch": {
+        "summary": "Update push notification token by user",
+        "tags": [
+          "notifications"
+        ],
+        "operationId": "patch-push-notifications-tokens",
+        "description": "Used to refresh the push notification token for a given user.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/PushNotificationTokenUpdate"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Token refreshed successfully"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
       }
     },
     "/push-notifications/tokens/{deviceToken}": {

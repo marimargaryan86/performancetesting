@@ -7,12 +7,15 @@ from pydantic import AnyUrl, HttpUrl, RedisDsn
 
 from snowfall.project.junction.extensions.service.mobile_api import (
     jwt_generator,
-    plus_client,
     repository,
     smtp,
 )
+from snowfall.project.junction.extensions.service.mobile_api import (
+    plus_client as plus_poc_http_client,
+)
 from snowfall.stdlib.integration.starlette import application
-from snowfall.vendor.junction.go import client
+from snowfall.vendor.junction.go import client as go_http_client
+from snowfall.vendor.junction.plus import client as plus_http_client
 
 
 class MigrateSettings(application.Settings):
@@ -22,11 +25,12 @@ class MigrateSettings(application.Settings):
 
 class Settings(application.Settings):
     junction_api_address: str
+    plus_api_address: str
     ory_client_token_endpoint: HttpUrl
     ory_client_id: str
     ory_client_secret: str
-    plus_api_address: str = ""
-    plus_activated: bool = False
+    plus_poc_api_address: str = ""
+    plus_poc_activated: bool = False
     redis_dsn: RedisDsn
     places_cache_ttl: datetime.timedelta = datetime.timedelta(hours=1)
     otp_cache_ttl: datetime.timedelta = datetime.timedelta(minutes=2)
@@ -47,9 +51,10 @@ class Settings(application.Settings):
 
 def create_dependencies(
     orders_repository: repository.OrdersRepository,
-    junction_client: client.Client,
+    junction_client: go_http_client.Client,
+    plus_client: plus_http_client.Client,
     httpx_client: httpx.AsyncClient,
-    plus_http_client: plus_client.PlusClient,
+    plus_poc_client: plus_poc_http_client.PlusClient,
     places_repository: repository.PlacesRepository,
     users_repository: repository.UsersRepository,
     guests_repository: repository.GuestsRepository,
@@ -67,9 +72,10 @@ def create_dependencies(
 ) -> lagom.Container:
     container = lagom.Container()
     container[repository.OrdersRepository] = orders_repository
-    container[client.Client] = junction_client
+    container[go_http_client.Client] = junction_client
+    container[plus_http_client.Client] = plus_client
     container[httpx.AsyncClient] = httpx_client
-    container[plus_client.PlusClient] = plus_http_client
+    container[plus_poc_http_client.PlusClient] = plus_poc_client
     container[repository.PlacesRepository] = places_repository
     container[repository.UsersRepository] = users_repository
     container[repository.GuestsRepository] = guests_repository

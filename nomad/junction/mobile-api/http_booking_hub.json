@@ -4,8 +4,8 @@
             "count": 2,
             "traefik_entrypoints": "websecure",
             "traefik_host_URL": "booking-hub-mobile-api.junction.dev",
-            "plus_api_address": "https://plus.api.junction.dev",
-            "plus_activated": false,
+            "plus_poc_api_address": "https://plus.poc.junction.dev",
+            "plus_poc_activated": false,
             "ory_client_token_endpoint": "https://optimistic-tereshkova-36hc6vayw4.projects.oryapis.com/oauth2/token",
             "ory_client_id": "04d95316-bb1e-4ac1-a03d-c96c8ad09213"
         }
@@ -16,8 +16,8 @@
             "count": 2,
             "traefik_entrypoints": "web",
             "traefik_host_URL": "booking-hub-mobile-api.junction.travel",
-            "plus_api_address": "",
-            "plus_activated": false,
+            "plus_poc_api_address": "",
+            "plus_poc_activated": false,
             "ory_client_token_endpoint": "https://optimistic-tereshkova-36hc6vayw4.projects.oryapis.com/oauth2/token",
             "ory_client_id": ""
         }
@@ -28,8 +28,8 @@
             "count": 1,
             "traefik_entrypoints": "websecure",
             "traefik_host_URL": "booking-hub-mobile-api.sandbox.junction.dev",
-            "plus_api_address": "https://plus.api.sandbox.junction.dev",
-            "plus_activated": false,
+            "plus_poc_api_address": "https://plus.poc.sandbox.junction.dev",
+            "plus_poc_activated": false,
             "ory_client_token_endpoint": "https://optimistic-tereshkova-36hc6vayw4.projects.oryapis.com/oauth2/token",
             "ory_client_id": "04d95316-bb1e-4ac1-a03d-c96c8ad09213"
         }

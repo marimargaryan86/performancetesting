@@ -9,6 +9,7 @@ from snowfall.project.junction.extensions.service.mobile_api import (
 from snowfall.project.junction.extensions.service.mobile_api.v1alpha import models_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.integration.starlette import models, request_helpers
+from snowfall.vendor.junction.plus import client as plus_http_client
 
 
 class PushNotificationTokens(endpoints.HTTPEndpoint):
@@ -71,6 +72,23 @@ class PushNotificationTokens(endpoints.HTTPEndpoint):
                 ],
             ),
         )
+
+    async def patch(
+        self,
+        request: requests.Request,
+        users_repository: repository.UsersRepository = lagom.injectable,
+        plus_client: plus_http_client.Client = lagom.injectable,
+    ) -> responses.Response:
+        body = await request_helpers.flatten_request(request)
+        user = await users_repository.find_by_id(request.user.username)
+        if not user:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+        await plus_client.update_push_notification_token(
+            body.get("notificationToken", ""),
+            user.phone.e164_number,
+        )
+
+        return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 class PushNotificationToken(endpoints.HTTPEndpoint):
