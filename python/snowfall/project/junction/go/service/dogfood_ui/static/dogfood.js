@@ -837,14 +837,14 @@ function search_trips(event) {
         for (const type of originRequest.result.relationships.types.data) {
           if (type.id == "city") {
             originCity = true
-            return
+            break
           }
         }
 
         for (const type of destinationRequest.result.relationships.types.data) {
           if (type.id == "city") {
             destinationCity = true
-            return
+            break
           }
         }
 
