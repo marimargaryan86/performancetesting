@@ -10,6 +10,11 @@ from snowfall.project.pay.service.refunds.v1alpha import (
 from snowfall.project.pay.service.transactions.v1alpha import (
     models_pb2 as transactions_models_pb2,
 )
+from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import (
+    QuotationAmounts,
+    QuotationRates,
+    Transaction,
+)
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1 import phone_number_pb2
@@ -118,6 +123,34 @@ def generate_refund(identifier: str) -> refunds_models_pb2.Refund:
         refunded_us_in_payer_currency=gbp.protobuf(),
         refunded_reseller=usd.protobuf(),
         refund_position=gbp.protobuf(),
+    )
+
+
+def generate_transaction(transaction_id: str) -> Transaction:
+    money_usd = money.from_string("1000", money.Currency("USD")).protobuf()
+
+    return Transaction(
+        id=transaction_id,
+        external_reference_id=string.uuid(),
+        invoice_reference_id=string.uuid(),
+        conversion_id=string.uuid(),
+        amounts=QuotationAmounts(
+            beneficiary=money_usd,
+            base_converted=money_usd,
+            fx_margin=money_usd,
+            processing_margin=money_usd,
+            sales_margin=money_usd,
+            quotation=money_usd,
+        ),
+        rates=QuotationRates(
+            fx_quote=float(1),
+            fx_buffer=float(1),
+            fx_markup=float(1),
+            sales_markup=float(1),
+            processing_markup=float(2),
+        ),
+        payer_id=string.uuid(),
+        beneficiary_id=string.uuid(),
     )
 
 

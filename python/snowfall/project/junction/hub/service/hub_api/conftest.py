@@ -29,7 +29,6 @@ from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import (
     Quotation,
     QuotationAmounts,
     QuotationRates,
-    Transaction,
 )
 from snowfall.stdlib import authentication as stdlib_auth
 from snowfall.stdlib import money, string
@@ -122,7 +121,10 @@ def refunds_client(cc_payment_client: mock.Mock) -> refunds.DictClient:
     ]
     return refunds.DictClient(
         refund_data,
-        [get_transaction(refund.transaction_id) for refund in refund_data],
+        [
+            pay_fixtures.generate_transaction(refund.transaction_id)
+            for refund in refund_data
+        ],
         cc_payment_client,
     )
 
@@ -142,40 +144,15 @@ def quotations_ids() -> list[str]:
     ]
 
 
-def get_transaction(transaction_id: str) -> Transaction:
-    money_usd = money.from_string("1000", money.Currency("USD")).protobuf()
-
-    return Transaction(
-        id=transaction_id,
-        external_reference_id=string.uuid(),
-        invoice_reference_id=string.uuid(),
-        conversion_id=string.uuid(),
-        amounts=QuotationAmounts(
-            beneficiary=money_usd,
-            base_converted=money_usd,
-            fx_margin=money_usd,
-            processing_margin=money_usd,
-            sales_margin=money_usd,
-            quotation=money_usd,
-        ),
-        rates=QuotationRates(
-            fx_quote=float(1),
-            fx_buffer=float(1),
-            fx_markup=float(1),
-            sales_markup=float(1),
-            processing_markup=float(2),
-        ),
-        payer_id=string.uuid(),
-        beneficiary_id=string.uuid(),
-    )
-
-
 @pytest.fixture()
 def transactions_client(
     transaction_ids: Sequence[str],
 ) -> transactions.Client:
     return transactions.DictClient(
-        [get_transaction(transaction_id) for transaction_id in transaction_ids],
+        [
+            pay_fixtures.generate_transaction(transaction_id)
+            for transaction_id in transaction_ids
+        ],
     )
 
 

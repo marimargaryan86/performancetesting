@@ -162,7 +162,7 @@ class RefundsService(
             )
             conversion_id = cc_conversion.identifier
 
-        refund.status = models_pb2.Refund.Status.STATUS_EXECUTED
+            refund.status = models_pb2.Refund.Status.STATUS_SUCCEEDED
         refund.conversion_id = conversion_id
         refund.invoice_reference = request.invoice_reference
         refund.refunded_us_in_payer_currency.CopyFrom(
@@ -209,6 +209,19 @@ class RefundsService(
         )
 
         return grpc_pb2.CalculateRefundPositionResponse(refund_position=refund_position)
+
+    async def UpdateRefundStatus(  # type: ignore[override] # noqa: N802, WPS217
+        self,
+        request: grpc_pb2.UpdateRefundStatusRequest,
+        context: grpc.ServicerContext,
+    ) -> grpc_pb2.UpdateRefundStatusResponse:
+        is_updated = await self._refunds.update_status(
+            request.external_reference_id,
+            request.status,
+        )
+        return grpc_pb2.UpdateRefundStatusResponse(
+            is_updated=is_updated,
+        )
 
     async def _get_refund_position(
         self,

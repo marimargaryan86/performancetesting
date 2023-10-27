@@ -52,7 +52,7 @@ class TestPaymentWebhooks(object):
         content_body = json.dumps(payload)
         calculated_hmac = _count_hmac(content_body, secret_key)
         response = await webhook_client.post(
-            "/webhooks/payments",
+            "/cc/payments",
             json=payload,
             headers={
                 "X-Hmac-Digest-Sha-512": calculated_hmac,
@@ -70,7 +70,7 @@ class TestCustomHeaderMiddleware(object):
         with pytest.raises(exceptions.HTTPException):
             (
                 await webhook_client.post(
-                    "/webhooks/payments",
+                    "/cc/payments",
                     json={},
                 )
             ).raise_for_status()

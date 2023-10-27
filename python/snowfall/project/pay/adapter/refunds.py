@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import abc
+import datetime
 from collections.abc import Sequence
 
 from snowfall.project.junction.go.adapter import errors
@@ -13,6 +14,7 @@ from snowfall.project.pay.service.transactions.v1alpha import (
     models_pb2 as transaction_model,
 )
 from snowfall.stdlib import money, sequence, string
+from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1 import money_pb2
 from snowfall.vendor.currency_cloud.client import PaymentClient
 from snowfall.vendor.currency_cloud.models.rate import (
@@ -63,6 +65,10 @@ class Client(abc.ABC):
         refunded_to_reseller: money.Money,
     ) -> money.Money:
         """Calculate refund position."""
+
+    @abc.abstractmethod
+    async def update_status(self, external_reference_id: str, status: str) -> bool:
+        """Updating refund status from webhook."""
 
 
 class DictClient(Client):
@@ -170,6 +176,19 @@ class DictClient(Client):
             money.Currency(refunded_to_reseller.currency.code),
         )
 
+    async def update_status(self, external_reference_id: str, status: str) -> bool:
+        for refund in self._refunds.values():
+            if refund.external_reference_id == external_reference_id:
+                refund.status = protobuf.slug_to_enum_value(
+                    models_pb2.Refund.Status,
+                    status,
+                )
+                refund.updated_at = protobuf.datetime_to_protobuf(  # type: ignore[misc]
+                    datetime.datetime.now(tz=datetime.UTC),
+                )
+                return True
+        return False
+
 
 class GrpcClient(Client):
     def __init__(
@@ -256,3 +275,16 @@ class GrpcClient(Client):
             ),
         )
         return money.from_protobuf(refund_position_response.refund_position)
+
+    async def update_status(self, external_reference_id: str, status: str) -> bool:
+        return (
+            await self._refunds.UpdateRefundStatus(
+                grpc_pb2.UpdateRefundStatusRequest(
+                    external_reference_id=external_reference_id,
+                    status=protobuf.slug_to_enum_value(
+                        models_pb2.Refund.Status,
+                        status,
+                    ),
+                ),
+            )
+        ).is_updated

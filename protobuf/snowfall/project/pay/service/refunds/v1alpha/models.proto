@@ -2,9 +2,12 @@ syntax = "proto3";
 
 package snowfall.project.pay.service.refunds.v1alpha;
 
+import "google/protobuf/timestamp.proto";
 import "snowfall/stdlib/v1/money.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/refunds/v1alpha";
+
+// For credit card refunds in stripe we have the following options
 
 message Refund {
   string id = 1;
@@ -13,7 +16,8 @@ message Refund {
   enum Status {
     STATUS_UNSPECIFIED = 0;
     STATUS_PENDING = 1;
-    STATUS_EXECUTED = 2;
+    STATUS_SUCCEEDED = 2;
+    STATUS_FAILED = 3;
   }
   Status status = 4;
   bool refund_received = 5;
@@ -23,4 +27,6 @@ message Refund {
   snowfall.stdlib.v1.Money refunded_reseller = 9;
   snowfall.stdlib.v1.Money refund_position = 10;
   string invoice_reference = 11;
+  string external_reference_id = 12;
+  google.protobuf.Timestamp updated_at = 13;
 }

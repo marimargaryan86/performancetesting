@@ -87,6 +87,10 @@ job "webhooks-http" {
               local_bind_port  = 8040
               destination_name = "pay-payments-${var.environment}"
             }
+            upstreams {
+              local_bind_port  = 8060
+              destination_name = "refunds-${var.environment}"
+            }
           }
         }
       }
@@ -124,8 +128,11 @@ job "webhooks-http" {
         change_mode = "restart"
         data        = <<EOH
 PAYMENTS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_pay-payments-${var.environment}"))}}
+REFUNDS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_refunds-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/webhooks" }}
 SECRET_KEY={{ .Data.data.secret_key }}
+STRIPE_API_KEY={{ .Data.data.stripe_api_key }}
+STRIPE_SECRET_KEY={{ .Data.data.stripe_secret_key }}
 {{ end }}
 EOH
       }

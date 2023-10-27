@@ -1,3 +1,5 @@
+import datetime
+
 from snowfall.project.pay.service.refunds.v1alpha import models_pb2
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 
@@ -32,6 +34,24 @@ class RefundsRepository(
         )
 
         return refund
+
+    async def update_status(
+        self,
+        external_reference_id: str,
+        status: int,
+    ) -> bool:
+        update_result = await self._execute(
+            self._collection.update_one,
+            filter={"external_reference_id": external_reference_id},
+            update={
+                "$set": {
+                    "status": status,
+                    "updated_at": datetime.datetime.now(tz=datetime.UTC),
+                },
+            },
+            upsert=False,
+        )
+        return update_result.matched_count != 0
 
     async def find(
         self,

@@ -13,6 +13,7 @@ service RefundsService {
   rpc ListRefunds(ListRefundsRequest) returns (ListRefundsResponse) {}
   rpc UpdateRefund(UpdateRefundRequest) returns (UpdateRefundResponse) {}
   rpc CalculateRefundPosition(CalculateRefundPositionRequest) returns (CalculateRefundPositionResponse) {}
+  rpc UpdateRefundStatus(UpdateRefundStatusRequest) returns (UpdateRefundStatusResponse) {}
 }
 
 message GetRefundRequest {
@@ -61,4 +62,13 @@ message CalculateRefundPositionRequest {
 
 message CalculateRefundPositionResponse {
   snowfall.stdlib.v1.Money refund_position = 1;
+}
+
+message UpdateRefundStatusRequest {
+  string external_reference_id = 1;
+  Refund.Status status = 2;
+}
+
+message UpdateRefundStatusResponse {
+  bool is_updated = 1;
 }

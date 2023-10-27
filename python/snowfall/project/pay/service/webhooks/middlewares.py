@@ -1,7 +1,9 @@
 import hashlib
 import hmac
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Mapping
+from typing import Any
 
+import stripe
 from starlette import applications, exceptions, requests, responses, status
 from starlette.middleware.base import BaseHTTPMiddleware
 
@@ -23,9 +25,15 @@ def validate_hmac(
 
 
 class HmacHeaderMiddleware(BaseHTTPMiddleware):
-    def __init__(self, app: applications.Starlette, secret_key: str):
+    def __init__(
+        self,
+        app: applications.Starlette,
+        secret_key: str,
+        stripe_secret_key: str,
+    ):
         super().__init__(app)
         self._secret_key = secret_key
+        self._stripe_secret_key = stripe_secret_key
 
     async def dispatch(
         self,
@@ -35,19 +43,40 @@ class HmacHeaderMiddleware(BaseHTTPMiddleware):
         if request.scope["path"].endswith("health"):
             return await call_next(request)
         resolved_request = await resolve_request(request)
-        received_hmac = request.headers.get("X-Hmac-Digest-Sha-512")
+        payload = await resolved_request.body()
+        is_currency_cloud = self.verify_currency_cloud(payload, request.headers)
+        is_stripe = (
+            False if is_currency_cloud else self.verify_stripe(payload, request.headers)
+        )
+        if not is_currency_cloud and not is_stripe:
+            raise exceptions.HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        return await call_next(resolved_request)
+
+    def verify_currency_cloud(
+        self,
+        payload: bytes,
+        headers: Mapping[str, Any],
+    ) -> bool:
+        received_hmac = headers.get("X-Hmac-Digest-Sha-512")
         if not received_hmac:
-            raise exceptions.HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="hmac value is missing",
-            )
-        json_data = await resolved_request.body()
-        is_valid_hmac = validate_hmac(
-            json_data,
+            return False
+        return validate_hmac(
+            payload,
             self._secret_key.encode(),
             received_hmac.encode(),
         )
-        if not is_valid_hmac:
-            raise exceptions.HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
-        return await call_next(resolved_request)
+    def verify_stripe(
+        self,
+        payload: bytes,
+        headers: Mapping[str, Any],
+    ) -> bool:
+        try:
+            stripe.Webhook.construct_event(
+                payload,
+                headers.get("stripe-signature", ""),
+                self._stripe_secret_key,
+            )
+        except stripe.error.SignatureVerificationError:
+            return False
+        return True
