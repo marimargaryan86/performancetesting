@@ -129,5 +129,5 @@ class GrpcClient(Client):
             request.page_size = limit
 
         return await errors.handle_grpc_errors(
-            self._bills.ListBills(request, timeout=self._timeout, sort_by=sort),
+            self._bills.ListBills(request, timeout=self._timeout),
         )
