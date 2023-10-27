@@ -324,6 +324,39 @@
         "description": "Used to lookup data for a User Identifier."
       }
     },
+    "/users/me" : {
+      "get": {
+        "summary": "Get Information of Logged-in User",
+        "tags": [
+          "users"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "permissions": {
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "permissions"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        },
+        "operationId": "get-users-me",
+        "description": "Used to get information for the logged-in User"
+      }
+    },
     "/accounts/{accountId}": {
       "parameters": [
         {

@@ -164,7 +164,7 @@ class Journeys(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: orders.Client = lagom.injectable,
     ) -> responses.Response:
-        check_permission("booking.view", request.user.permissions)
+        check_permission("journey.view", request.user.permissions)
 
         pagination = pagination_helpers.get_pagination(request)
         response = await client.find_journeys(
@@ -196,7 +196,7 @@ class Journey(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: orders.Client = lagom.injectable,
     ) -> responses.Response:
-        check_permission("booking.view", request.user.permissions)
+        check_permission("journey.view", request.user.permissions)
 
         journey = await client.get_journey(
             request.path_params["journeyId"],
@@ -220,7 +220,7 @@ class OrdersByJourney(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: orders.Client = lagom.injectable,
     ) -> responses.Response:
-        check_permission("booking.view", request.user.permissions)
+        check_permission("order.view", request.user.permissions)
 
         journey_id = request.path_params["journeyId"]
         pagination = pagination_helpers.get_pagination(request)
@@ -253,7 +253,7 @@ class Order(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: orders.Client = lagom.injectable,
     ) -> responses.Response:
-        check_permission("booking.view", request.user.permissions)
+        check_permission("order.view", request.user.permissions)
 
         order = await client.get_order(
             request.path_params["orderId"],

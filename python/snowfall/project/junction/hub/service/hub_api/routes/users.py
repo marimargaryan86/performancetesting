@@ -26,3 +26,10 @@ class Users(object):
                 ),
             ),
         )
+
+
+class UserInformation(object):
+    async def get(self, request: messages.Request) -> responses.Response:
+        return responses.JSONResponse(
+            {"permissions": request.starlette_request.user.permissions},
+        )

@@ -23,7 +23,7 @@ class Transactions(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: transactions_adapter.Client = lagom.injectable,
     ) -> models.JsonApiResponse:
-        check_permission("pay.view", request.user.permissions)
+        check_permission("transaction.view", request.user.permissions)
 
         pagination = pagination_helpers.get_pagination(request)
 
@@ -87,7 +87,7 @@ class Transaction(endpoints.HTTPEndpoint):
         request: requests.Request,
         client: transactions_adapter.Client = lagom.injectable,
     ) -> models.JsonApiResponse:
-        check_permission("pay.view", request.user.permissions)
+        check_permission("transaction.view", request.user.permissions)
 
         transaction = await client.get(request.path_params["transactionId"])
         return await messages.create_response(

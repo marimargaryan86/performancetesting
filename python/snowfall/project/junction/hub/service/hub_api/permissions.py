@@ -19,15 +19,31 @@ UserPermissions = NewType("UserPermissions", dict[str, _Attributes])
 _PERMISSION_MAPPING = types.MappingProxyType(
     {
         "snowfall-admin": ("*",),
-        "snowfall-user": ("booking.*", "cancel.*", "refund.*", "pay.*"),
+        "snowfall-user": (
+            "journey.view",
+            "order.view",
+            "booking.view",
+            "cancel.*",
+            "refund.*",
+            "transaction.*",
+        ),
         "reseller-admin": (
+            "journey.*",
+            "order.*",
             "booking.*",
             "cancel.add",
             "cancel.view",
             "refund.view",
             "user.*",
         ),
-        "reseller-user": ("booking.*", "cancel.add", "cancel.view", "refund.view"),
+        "reseller-user": (
+            "journey.*",
+            "order.*",
+            "booking.*",
+            "cancel.add",
+            "cancel.view",
+            "refund.view",
+        ),
     },
 )
 

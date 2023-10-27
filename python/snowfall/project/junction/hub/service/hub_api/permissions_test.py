@@ -39,6 +39,12 @@ class TestCheckPermissions(object):
     @pytest.mark.parametrize(
         ("action", "expectation"),
         [
+            ("journey.view", does_not_raise()),
+            ("journey.add", does_not_raise()),
+            ("journey.edit", does_not_raise()),
+            ("order.view", does_not_raise()),
+            ("order.add", does_not_raise()),
+            ("order.edit", does_not_raise()),
             ("booking.view", does_not_raise()),
             ("booking.add", does_not_raise()),
             ("booking.edit", does_not_raise()),
@@ -51,9 +57,9 @@ class TestCheckPermissions(object):
             ("user.view", does_not_raise()),
             ("user.add", does_not_raise()),
             ("user.edit", does_not_raise()),
-            ("pay.view", does_not_raise()),
-            ("pay.add", does_not_raise()),
-            ("pay.edit", does_not_raise()),
+            ("transaction.view", does_not_raise()),
+            ("transaction.add", does_not_raise()),
+            ("transaction.edit", does_not_raise()),
         ],
     )
     async def test_check_permissions_snowfall_admin(
@@ -68,9 +74,15 @@ class TestCheckPermissions(object):
     @pytest.mark.parametrize(
         ("action", "expectation"),
         [
+            ("journey.view", does_not_raise()),
+            ("journey.add", pytest.raises(HTTPException)),
+            ("journey.edit", pytest.raises(HTTPException)),
+            ("order.view", does_not_raise()),
+            ("order.add", pytest.raises(HTTPException)),
+            ("order.edit", pytest.raises(HTTPException)),
             ("booking.view", does_not_raise()),
-            ("booking.add", does_not_raise()),
-            ("booking.edit", does_not_raise()),
+            ("booking.add", pytest.raises(HTTPException)),
+            ("booking.edit", pytest.raises(HTTPException)),
             ("cancel.view", does_not_raise()),
             ("cancel.add", does_not_raise()),
             ("cancel.edit", does_not_raise()),
@@ -80,9 +92,9 @@ class TestCheckPermissions(object):
             ("user.view", pytest.raises(HTTPException)),
             ("user.add", pytest.raises(HTTPException)),
             ("user.edit", pytest.raises(HTTPException)),
-            ("pay.view", does_not_raise()),
-            ("pay.add", does_not_raise()),
-            ("pay.edit", does_not_raise()),
+            ("transaction.view", does_not_raise()),
+            ("transaction.add", does_not_raise()),
+            ("transaction.edit", does_not_raise()),
         ],
     )
     async def test_check_permissions_snowfall_user(
@@ -97,6 +109,12 @@ class TestCheckPermissions(object):
     @pytest.mark.parametrize(
         ("action", "expectation"),
         [
+            ("journey.view", does_not_raise()),
+            ("journey.add", does_not_raise()),
+            ("journey.edit", does_not_raise()),
+            ("order.view", does_not_raise()),
+            ("order.add", does_not_raise()),
+            ("order.edit", does_not_raise()),
             ("booking.view", does_not_raise()),
             ("booking.add", does_not_raise()),
             ("booking.edit", does_not_raise()),
@@ -109,9 +127,9 @@ class TestCheckPermissions(object):
             ("user.view", does_not_raise()),
             ("user.add", does_not_raise()),
             ("user.edit", does_not_raise()),
-            ("pay.view", pytest.raises(HTTPException)),
-            ("pay.add", pytest.raises(HTTPException)),
-            ("pay.edit", pytest.raises(HTTPException)),
+            ("transaction.view", pytest.raises(HTTPException)),
+            ("transaction.add", pytest.raises(HTTPException)),
+            ("transaction.edit", pytest.raises(HTTPException)),
         ],
     )
     async def test_check_permissions_reseller_admin(
@@ -126,6 +144,12 @@ class TestCheckPermissions(object):
     @pytest.mark.parametrize(
         ("action", "expectation"),
         [
+            ("journey.view", does_not_raise()),
+            ("journey.add", does_not_raise()),
+            ("journey.edit", does_not_raise()),
+            ("order.view", does_not_raise()),
+            ("order.add", does_not_raise()),
+            ("order.edit", does_not_raise()),
             ("booking.view", does_not_raise()),
             ("booking.add", does_not_raise()),
             ("booking.edit", does_not_raise()),
@@ -138,9 +162,9 @@ class TestCheckPermissions(object):
             ("user.view", pytest.raises(HTTPException)),
             ("user.add", pytest.raises(HTTPException)),
             ("user.edit", pytest.raises(HTTPException)),
-            ("pay.view", pytest.raises(HTTPException)),
-            ("pay.add", pytest.raises(HTTPException)),
-            ("pay.edit", pytest.raises(HTTPException)),
+            ("transaction.view", pytest.raises(HTTPException)),
+            ("transaction.add", pytest.raises(HTTPException)),
+            ("transaction.edit", pytest.raises(HTTPException)),
         ],
     )
     async def test_check_permissions_reseller_user(

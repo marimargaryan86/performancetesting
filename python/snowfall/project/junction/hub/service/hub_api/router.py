@@ -31,6 +31,11 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             name="ListUsers",
         ),
         routes.to_route(
+            "/users/me",
+            users.UserInformation().get,
+            name="ViewUserInformation",
+        ),
+        routes.to_route(
             "/users/{userId}",
             user_handler.view,
             name="ViewUser",
