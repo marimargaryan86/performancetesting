@@ -144,6 +144,10 @@ class BillsRepository(
     mixins.InsertMixin[models_pb2.Bill],
 ):
     _proto = models_pb2.Bill
+    _indexes = (
+        pymongo.IndexModel("updated_at", background=True),
+        pymongo.IndexModel("order_id", background=True, unique=True),
+    )
 
     async def find_by_order_id(
         self,
@@ -172,7 +176,9 @@ class BillsRepository(
     async def find(
         self,
         cursor: str | None,
+        sort: tuple[str, int] | None = None,
     ) -> resultset.ResultSet[models_pb2.Bill]:
         return await self._find_with_cursor(
             cur=cursor or "",
+            sort=sort,
         )

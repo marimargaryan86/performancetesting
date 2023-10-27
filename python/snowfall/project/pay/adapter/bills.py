@@ -10,6 +10,7 @@ from snowfall.project.pay.service.transactions.v1alpha import (
     models_pb2,
 )
 from snowfall.stdlib import sequence
+from snowfall.stdlib.v1 import sort_pb2
 
 
 class Client(abc.ABC):
@@ -31,6 +32,7 @@ class Client(abc.ABC):
         self,
         limit: int | None = None,
         cursor: str | None = None,
+        sort: sort_pb2.Sort | None = None,
     ) -> grpc_pb2.ListBillsResponse:
         """Fetch all bill resources."""
 
@@ -61,6 +63,7 @@ class DictClient(Client):
         self,
         limit: int | None = None,
         cursor: str | None = None,
+        sort: sort_pb2.Sort | None = None,
     ) -> grpc_pb2.ListBillsResponse:
         page = sequence.paginate(
             sequence=list(self._bills.values()),
@@ -115,14 +118,16 @@ class GrpcClient(Client):
         self,
         limit: int | None = None,
         cursor: str | None = None,
+        sort: sort_pb2.Sort | None = None,
     ) -> grpc_pb2.ListBillsResponse:
         # TODO: handle INVALID_ARGUMENT
         request = grpc_pb2.ListBillsRequest(
             page_token=cursor or "",
+            sort_by=sort,
         )
         if limit is not None:
             request.page_size = limit
 
         return await errors.handle_grpc_errors(
-            self._bills.ListBills(request, timeout=self._timeout),
+            self._bills.ListBills(request, timeout=self._timeout, sort_by=sort),
         )

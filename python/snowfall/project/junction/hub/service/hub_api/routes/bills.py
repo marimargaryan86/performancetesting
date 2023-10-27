@@ -8,6 +8,7 @@ from snowfall.stdlib.integration.starlette import (
     models,
     pagination_helpers,
     request_helpers,
+    sorting,
 )
 
 
@@ -61,10 +62,11 @@ class Bills(endpoints.HTTPEndpoint):
         bills_client: bills_adapter.Client = lagom.injectable,
     ) -> models.JsonApiResponse:
         pagination = pagination_helpers.get_pagination(request)
-
+        sort = sorting.get_sort(request, {"updatedAt": "updated_at"})
         response = await bills_client.find(
             limit=pagination.limit or self._default_page_size,
             cursor=pagination.cursor,
+            sort=sort,
         )
 
         return await messages.create_response(

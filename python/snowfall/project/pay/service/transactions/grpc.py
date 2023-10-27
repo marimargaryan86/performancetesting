@@ -389,6 +389,7 @@ class BillsService(
     ):
         self._bills = bills
         self._default_page_size = 20
+        self._sort = {"updated_at": "updated_at"}
 
     def get_name(self) -> str:
         return grpc_pb2.DESCRIPTOR.services_by_name["BillsService"].full_name
@@ -406,6 +407,7 @@ class BillsService(
     ) -> grpc_pb2.ListBillsResponse:
         bills = await self._bills.find(
             cursor=request.page_token,
+            sort=sorting.get_sort(request.sort_by, self._sort),
         )
         bills.limit(
             request.page_size if request.page_size else self._default_page_size,

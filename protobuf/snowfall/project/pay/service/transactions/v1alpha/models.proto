@@ -89,4 +89,6 @@ message Bill {
   optional bool is_reconciled = 3;
   snowfall.stdlib.v1.Money total_amount = 4;
   snowfall.stdlib.v1.Money reconciled_amount = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
 }
