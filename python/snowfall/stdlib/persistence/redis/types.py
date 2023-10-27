@@ -205,8 +205,16 @@ class Client(Generic[AnyStr]):
             thread_local=thread_local,
         )
 
-    async def put(self, name: str, raw_value: bytes | float | str) -> None:
-        await self._redis.set(self._prefix + name, raw_value)
+    async def put(
+        self,
+        name: str,
+        raw_value: bytes | float | str,
+        *,
+        expiry: datetime.datetime | None = None,
+    ) -> None:
+        ttl = expiry - datetime.datetime.now(tz=datetime.UTC) if expiry else None
+
+        await self._redis.set(self._prefix + name, raw_value, px=ttl)
 
     async def put_expires_at(self, name: object, expiry: datetime.datetime) -> None:
         await self._redis.expireat(self._prefix_name(name), expiry)

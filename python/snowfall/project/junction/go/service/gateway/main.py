@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import ipaddress
-from typing import TypeVar, cast
+from typing import NamedTuple, TypeVar, cast
 
 import pydantic
 from aio_pika import abc
@@ -16,12 +16,14 @@ from snowfall.project.junction.go.service.gateway import (
     stops,
     tasks,
 )
+from snowfall.project.junction.go.service.gateway.trips import cache as trips_cache
 from snowfall.project.junction.go.service.gateway.trips import request as trips_request
 from snowfall.project.junction.go.service.gateway.trips import server as trips_server
 from snowfall.project.junction.go.service.gateway.trips import task as trips_task
 from snowfall.project.junction.go.service.gateway.v1 import trips_pb2
 from snowfall.project.junction.go.service.offers.v1 import amqp_pb2
 from snowfall.project.junction.go.service.places.v1 import places_pb2_grpc
+from snowfall.stdlib.persistence.redis import types as redis_types
 from snowfall.stdlib.service import (
     amqp_factory,
     application,
@@ -42,6 +44,7 @@ class _ConsumeSettings(_SharedSettings):
     places_address: str
     search_timeout: datetime.timedelta = datetime.timedelta(seconds=30)
     stops_resolver_timeout: datetime.timedelta = datetime.timedelta(seconds=5)
+    trip_search_cache_ttl: datetime.timedelta = datetime.timedelta(days=1)
     trip_search_timeout: datetime.timedelta = datetime.timedelta(seconds=10)
 
 
@@ -50,12 +53,12 @@ class _ServeSettings(_SharedSettings):
     grpc_port: int = 50051
 
 
-_BootstrapReturn = tuple[
-    abc.AbstractConnection,
-    providers.Collection,
-    tasks.Runner[amqp_pb2.TripOfferSearchResult],
-    tasks.Runner[trips_pb2.TripSearchResult],
-]
+class _BootstrapReturn(NamedTuple):
+    amqp_connection: abc.AbstractConnection
+    redis_client: redis_types.Client[bytes]
+    providers: providers.Collection
+    trip_offer_search_runner: tasks.Runner[amqp_pb2.TripOfferSearchResult]
+    trip_search_runner: tasks.Runner[trips_pb2.TripSearchResult]
 
 
 _SharedSettingsGeneric = TypeVar("_SharedSettingsGeneric", bound=_SharedSettings)
@@ -95,18 +98,17 @@ async def _bootstrap(
         gc_probability=_gc_probability,
     )
 
-    return (
-        amqp_connection,
-        all_providers,
-        trip_offer_search_runner,
-        trip_search_runner,
+    return _BootstrapReturn(
+        amqp_connection=amqp_connection,
+        redis_client=redis_client,
+        providers=all_providers,
+        trip_offer_search_runner=trip_offer_search_runner,
+        trip_search_runner=trip_search_runner,
     )
 
 
 async def _consume(app: application.Application[_ConsumeSettings]) -> None:
-    amqp_connection, all_providers, trip_offer_search_runner, trip_search_runner = (
-        await _bootstrap(app)
-    )
+    bootstrap_return = await _bootstrap(app)
 
     places_channel = await grpc_factory.make_insecure_channel(
         app,
@@ -115,28 +117,32 @@ async def _consume(app: application.Application[_ConsumeSettings]) -> None:
 
     legacy_offers_queue = offers.Queue(
         name_prefix=app.name,
-        providers_list=all_providers,
-        runner=trip_offer_search_runner,
+        providers_list=bootstrap_return.providers,
+        runner=bootstrap_return.trip_offer_search_runner,
         timeout=app.settings.search_timeout,
     )
 
     trips_queue = trips_task.Queue(
         name_prefix=app.name,
         request_generator=trips_request.Generator(
-            providers_list=all_providers,
+            providers_list=bootstrap_return.providers,
             stop_resolver=stops.Resolver(
                 stub=places_pb2_grpc.PlacesServiceStub(channel=places_channel),
                 timeout=app.settings.stops_resolver_timeout,
             ).from_ids,
         ),
-        runner=trip_search_runner,
+        runner=bootstrap_return.trip_search_runner,
         searcher=trips_task.Searcher(
+            cache_factory=trips_cache.Factory(
+                client=bootstrap_return.redis_client,
+                ttl=app.settings.trip_search_cache_ttl,
+            ),
             timeout=app.settings.trip_search_timeout,
         ),
     )
 
     await consumer.QueueConsumer(
-        connection=amqp_connection,
+        connection=bootstrap_return.amqp_connection,
         queues=cast(
             list[protocol.Queue[message.Message]],
             [
@@ -148,33 +154,31 @@ async def _consume(app: application.Application[_ConsumeSettings]) -> None:
 
 
 async def _serve(app: application.Application[_ServeSettings]) -> None:
-    amqp_connection, all_providers, trip_offer_search_runner, trip_search_runner = (
-        await _bootstrap(app)
-    )
+    bootstrap_return = await _bootstrap(app)
 
     server = grpc_server.create_server(
         app.settings.grpc_address,
         app.settings.grpc_port,
         [
             bookings.Service(
-                providers_collection=all_providers,
+                providers_collection=bootstrap_return.providers,
             ),
             meta.Service(
-                providers_collection=all_providers,
+                providers_collection=bootstrap_return.providers,
             ),
             offers.Service(
                 producer=producer.Producer(
-                    connection=amqp_connection,
+                    connection=bootstrap_return.amqp_connection,
                     exchange=types.Exchange(name=app.name),
                 ),
-                runner=trip_offer_search_runner,
+                runner=bootstrap_return.trip_offer_search_runner,
             ),
             trips_server.Service(
                 producer=producer.Producer(
-                    connection=amqp_connection,
+                    connection=bootstrap_return.amqp_connection,
                     exchange=types.Exchange(name=app.name),
                 ),
-                runner=trip_search_runner,
+                runner=bootstrap_return.trip_search_runner,
             ),
         ],
     )

@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package snowfall.project.junction.provider.v2alpha;
 
-import "google/protobuf/duration.proto";
 import "snowfall/project/junction/v1/segment_type.proto";
 import "snowfall/stdlib/v1/date.proto";
 import "snowfall/stdlib/v1/datetime.proto";
@@ -90,9 +89,4 @@ message SearchTripsRequest {
 
 message SearchTripsResponse {
   repeated Result results = 1;
-
-  // The duration Junction is allowed to cache these results for. If Junction
-  // has results for a specific trip search cached, it will reuse the cached
-  // results instead of performing a new trip search towards the provider.
-  google.protobuf.Duration ttl = 2;
 }

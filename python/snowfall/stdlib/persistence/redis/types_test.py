@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 
+import freezegun
 import pytest
 from redis import asyncio as aioredis
 
@@ -242,6 +243,21 @@ class TestClient(object):
         assert await client.get("foo") == b"bar"
         await client.delete("foo")
         assert await client.get("foo") is None
+
+    @pytest.mark.parametrize(*_PREFIX_PARAMETERS)
+    async def test_get_put_with_expiry(
+        self,
+        prefix: str | None,
+        redis_client: aioredis.Redis[bytes],
+    ) -> None:
+        now = datetime.datetime(year=2023, month=10, day=25, tzinfo=datetime.UTC)
+        client = redis.Client(redis_client, prefix=prefix)
+
+        with freezegun.freeze_time(time_to_freeze=now) as frozen_datetime:
+            await client.put("foo", "bar", expiry=now + datetime.timedelta(seconds=1))
+            assert await client.get("foo") == b"bar"
+            frozen_datetime.tick(datetime.timedelta(seconds=2))
+            assert await client.get("foo") is None
 
     @pytest.mark.parametrize(*_PREFIX_PARAMETERS)
     async def test_expiration(
