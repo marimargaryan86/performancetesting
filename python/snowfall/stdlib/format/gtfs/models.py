@@ -125,14 +125,20 @@ class Stop(_BaseModel):
     stop_code: str | None
     stop_name: str | None
     stop_desc: str | None
-    stop_lat: Annotated[
-        float,
-        pydantic.Field(ge=constants.LATITUDE_MIN, le=constants.LATITUDE_MAX),
-    ] | None
-    stop_lon: Annotated[
-        float,
-        pydantic.Field(ge=constants.LONGITUDE_MIN, le=constants.LONGITUDE_MAX),
-    ] | None
+    stop_lat: (
+        Annotated[
+            float,
+            pydantic.Field(ge=constants.LATITUDE_MIN, le=constants.LATITUDE_MAX),
+        ]
+        | None
+    )
+    stop_lon: (
+        Annotated[
+            float,
+            pydantic.Field(ge=constants.LONGITUDE_MIN, le=constants.LONGITUDE_MAX),
+        ]
+        | None
+    )
     zone_id: str | None
     stop_url: pydantic.HttpUrl | None
     location_type: enums.LocationType

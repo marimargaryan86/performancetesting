@@ -1,4 +1,5 @@
 """Contains the API base schema."""
+
 from pydantic import v1 as pydantic
 
 from snowfall.vendor.ba_ndc.models.util import ba_ndc_utils

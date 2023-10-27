@@ -1,4 +1,5 @@
 """Contains offer ref data schemas."""
+
 import datetime
 import uuid
 

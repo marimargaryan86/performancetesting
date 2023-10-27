@@ -101,7 +101,7 @@ def _create_from_pydantic_field(
         envvar=name.upper(),
         help=arg.description,
         hidden=bool(extra.get("hidden", False)),
-        is_flag=arg_type == bool,
+        is_flag=arg_type is bool,
         multiple=is_multi,
         required=arg.is_required(),
         show_default=True,
@@ -115,18 +115,18 @@ def _get_type(
     name: str,
     type_: type,
 ) -> type | click.ParamType:
-    if type_ == dict:
+    if type_ is dict:
         return JSONParameterType()
 
     type_ = next(iter(get_args(arg_types[name])), type_)
 
-    if type_ == bool:
+    if type_ is bool:
         return type_
 
-    if type_ == int:
+    if type_ is int:
         return int
 
-    if type_ == float:
+    if type_ is float:
         return float
 
     return str

@@ -65,9 +65,9 @@ def _unmarshal_email(email: Any) -> str:
 
     try:
         return email_validator.validate_email(
-            email=email,
+            email,
             check_deliverability=False,
-        ).email
+        ).normalized
     except email_validator.EmailNotValidError as err:
         raise ValueError from err
 

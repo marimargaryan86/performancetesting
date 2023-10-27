@@ -1,4 +1,5 @@
 """Contains offer search response schemas."""
+
 import datetime
 import uuid
 

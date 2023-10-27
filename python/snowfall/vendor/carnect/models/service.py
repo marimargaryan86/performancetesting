@@ -5058,7 +5058,9 @@ class VehicleReservationSummaryType(object):
 
 @dataclass
 class AcceptablePaymentCardsInfoType(object):
-    acceptable_payment_cards: ArrayOfAcceptablePaymentCardsInfoTypeAcceptablePaymentCard | None = field(
+    acceptable_payment_cards: (
+        ArrayOfAcceptablePaymentCardsInfoTypeAcceptablePaymentCard | None
+    ) = field(
         default=None,
         metadata={
             "name": "AcceptablePaymentCards",
@@ -5148,7 +5150,9 @@ class ArrayOfVehicleLocationLiabilitiesTypeCoverageCoverageFee(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        vehicles: ArrayOfVehicleLocationLiabilitiesTypeCoverageCoverageFeeVehicle | None = field(
+        vehicles: (
+            ArrayOfVehicleLocationLiabilitiesTypeCoverageCoverageFeeVehicle | None
+        ) = field(
             default=None,
             metadata={
                 "name": "Vehicles",
@@ -5289,7 +5293,10 @@ class ArrayOfVehicleLocationServicesOfferedTypeOffLocationService(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        off_loc_service_charges: ArrayOfVehicleLocationServicesOfferedTypeOffLocationServiceOffLocServiceCharge | None = field(
+        off_loc_service_charges: (
+            ArrayOfVehicleLocationServicesOfferedTypeOffLocationServiceOffLocServiceCharge
+            | None
+        ) = field(
             default=None,
             metadata={
                 "name": "OffLocServiceCharges",
@@ -5338,7 +5345,10 @@ class ArrayOfVehicleLocationServicesOfferedTypeOnLocationService(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        on_loc_service_charges: ArrayOfVehicleLocationServicesOfferedTypeOnLocationServiceOnLocServiceCharge | None = field(
+        on_loc_service_charges: (
+            ArrayOfVehicleLocationServicesOfferedTypeOnLocationServiceOnLocServiceCharge
+            | None
+        ) = field(
             default=None,
             metadata={
                 "name": "OnLocServiceCharges",
@@ -5379,7 +5389,9 @@ class ArrayOfVehicleLocationServicesOfferedTypeSpecialEquipment(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        equip_charges: ArrayOfVehicleLocationServicesOfferedTypeSpecialEquipmentEquipCharge | None = field(
+        equip_charges: (
+            ArrayOfVehicleLocationServicesOfferedTypeSpecialEquipmentEquipCharge | None
+        ) = field(
             default=None,
             metadata={
                 "name": "EquipCharges",
@@ -6256,7 +6268,9 @@ class VehRateRuleRq(object):
                 "type": "Element",
             },
         )
-        special_equip_prefs: ArrayOfOtaVehRateRuleRqrentalInfoSpecialEquipPref | None = field(
+        special_equip_prefs: (
+            ArrayOfOtaVehRateRuleRqrentalInfoSpecialEquipPref | None
+        ) = field(
             default=None,
             metadata={
                 "name": "SpecialEquipPrefs",
@@ -7334,7 +7348,9 @@ class ArrayOfVehicleLocationLiabilitiesTypeCoverage(object):
                 "namespace": "http://www.opentravel.org/OTA/2003/05",
             },
         )
-        coverage_fees: ArrayOfVehicleLocationLiabilitiesTypeCoverageCoverageFee | None = field(
+        coverage_fees: (
+            ArrayOfVehicleLocationLiabilitiesTypeCoverageCoverageFee | None
+        ) = field(
             default=None,
             metadata={
                 "name": "CoverageFees",
@@ -8163,7 +8179,9 @@ class VehicleLocationRequirementsType(object):
 
     @dataclass
     class AdditionalDriver(object):
-        addl_driver_infos: ArrayOfVehicleLocationRequirementsTypeAdditionalDriverAddlDriverInfo | None = field(
+        addl_driver_infos: (
+            ArrayOfVehicleLocationRequirementsTypeAdditionalDriverAddlDriverInfo | None
+        ) = field(
             default=None,
             metadata={
                 "name": "AddlDriverInfos",
@@ -8350,7 +8368,9 @@ class VehicleLocationRequirementsType(object):
 
 @dataclass
 class VehicleLocationServicesOfferedType(object):
-    on_location_services: ArrayOfVehicleLocationServicesOfferedTypeOnLocationService | None = field(
+    on_location_services: (
+        ArrayOfVehicleLocationServicesOfferedTypeOnLocationService | None
+    ) = field(
         default=None,
         metadata={
             "name": "OnLocationServices",
@@ -8358,7 +8378,9 @@ class VehicleLocationServicesOfferedType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    off_location_services: ArrayOfVehicleLocationServicesOfferedTypeOffLocationService | None = field(
+    off_location_services: (
+        ArrayOfVehicleLocationServicesOfferedTypeOffLocationService | None
+    ) = field(
         default=None,
         metadata={
             "name": "OffLocationServices",
@@ -8366,7 +8388,9 @@ class VehicleLocationServicesOfferedType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    special_equipments: ArrayOfVehicleLocationServicesOfferedTypeSpecialEquipment | None = field(
+    special_equipments: (
+        ArrayOfVehicleLocationServicesOfferedTypeSpecialEquipment | None
+    ) = field(
         default=None,
         metadata={
             "name": "SpecialEquipments",
@@ -8689,7 +8713,9 @@ class VehicleLocationAdditionalDetailsType(object):
             "namespace": "http://www.opentravel.org/OTA/2003/05",
         },
     )
-    one_way_drop_locations: ArrayOfVehicleLocationAdditionalDetailsTypeOneWayDropLocation | None = field(
+    one_way_drop_locations: (
+        ArrayOfVehicleLocationAdditionalDetailsTypeOneWayDropLocation | None
+    ) = field(
         default=None,
         metadata={
             "name": "OneWayDropLocations",
@@ -8708,7 +8734,9 @@ class VehicleLocationAdditionalDetailsType(object):
 
     @dataclass
     class Shuttle(object):
-        shuttle_infos: ArrayOfVehicleLocationAdditionalDetailsTypeShuttleShuttleInfo | None = field(
+        shuttle_infos: (
+            ArrayOfVehicleLocationAdditionalDetailsTypeShuttleShuttleInfo | None
+        ) = field(
             default=None,
             metadata={
                 "name": "ShuttleInfos",

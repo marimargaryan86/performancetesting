@@ -32,13 +32,16 @@ class Place(KarhooBaseModel):
     place_id: str
     display_address: str
     position: Position
-    poi_type: Literal[
-        "NOT_SET_POI_TYPE",
-        "ENRICHED",
-        "MEET_AND_GREET",
-        "REGULATED",
-        "NEAREST",
-    ] | None
+    poi_type: (
+        Literal[
+            "NOT_SET_POI_TYPE",
+            "ENRICHED",
+            "MEET_AND_GREET",
+            "REGULATED",
+            "NEAREST",
+        ]
+        | None
+    )
     timezone: str | None
 
 

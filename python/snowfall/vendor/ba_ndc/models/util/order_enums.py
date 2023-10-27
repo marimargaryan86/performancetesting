@@ -1,4 +1,5 @@
 """Contains application enums."""
+
 import enum
 
 

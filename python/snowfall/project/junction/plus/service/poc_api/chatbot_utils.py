@@ -54,11 +54,9 @@ def order_details_by_date(
                     leg["departureAt"],
                 )
             ).seconds,
-            "delayMinutes": (
-                delay_obj[segment["vendor"] + segment["routeIdentifiers"]["vendor"]]
-                if segment["vendor"] + segment["routeIdentifiers"]["vendor"]
-                in delay_obj
-                else 0
+            "delayMinutes": delay_obj.get(
+                segment["vendor"] + segment["routeIdentifiers"]["vendor"],
+                0,
             ),
         }
         for segment in details

@@ -26,10 +26,7 @@ def _validate_email(
     email: str,
 ) -> str:
     try:
-        email_validator.validate_email(
-            email=email,
-            check_deliverability=False,
-        )
+        email_validator.validate_email(email, check_deliverability=False)
     except email_validator.EmailSyntaxError as err:
         return str(err)
     return ""

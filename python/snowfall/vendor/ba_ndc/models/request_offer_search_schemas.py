@@ -1,4 +1,5 @@
 """Contains offer search request schemas."""
+
 import datetime
 
 from pydantic import v1 as pydantic

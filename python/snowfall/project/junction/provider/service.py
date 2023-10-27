@@ -173,11 +173,14 @@ class Entrypoint(
 ):
     settings_class: type[_Settings]
     meta_factory: MetaFactory
-    offers_factory: OffersFactory[
-        _Settings,
-        _SearchCriteriaTask,
-        _SearchCriteria,
-    ] | None = None
+    offers_factory: (
+        OffersFactory[
+            _Settings,
+            _SearchCriteriaTask,
+            _SearchCriteria,
+        ]
+        | None
+    ) = None
     bookings_factory: BookingFactory[_Settings] | None = None
     trips_factory: TripsFactory[_Settings] | None = None
 

@@ -56,12 +56,15 @@ class BookingVehicle(KarhooBaseModel):
 
 
 class BookingQuote(KarhooBaseModel):
-    type: Literal[  # noqa: A003
-        "QUOTE_TYPE_NOT_SET",
-        "FIXED",
-        "METERED",
-        "ESTIMATED",
-    ] | None
+    type: (  # noqa: A003
+        Literal[
+            "QUOTE_TYPE_NOT_SET",
+            "FIXED",
+            "METERED",
+            "ESTIMATED",
+        ]
+        | None
+    )
     currency: str
     gratuity_percent: int | None
     vehicle_class: str | None

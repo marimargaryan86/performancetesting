@@ -1,4 +1,5 @@
 """Contains seat ref data schemas."""
+
 import datetime
 import uuid
 

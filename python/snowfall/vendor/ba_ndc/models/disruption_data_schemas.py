@@ -1,4 +1,5 @@
 """Contains disruption data schemas."""
+
 import uuid
 
 from pydantic import v1 as pydantic
