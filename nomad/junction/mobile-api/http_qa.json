@@ -5,7 +5,7 @@
             "count": 1,
             "traefik_entrypoints": "websecure",
             "traefik_host_URL": "qa-superapp.junction.dev",
-            "plus_poc_api_address": "https://plus.poc.junction.dev",
+            "plus_poc_api_address": "https://poc.plus.junction.dev",
             "plus_poc_activated": false,
             "ory_client_token_endpoint": "https://optimistic-tereshkova-36hc6vayw4.projects.oryapis.com/oauth2/token",
             "ory_client_id": "42633fd4-134f-44f8-a248-c846b94b3134"
@@ -29,7 +29,7 @@
             "count": 1,
             "traefik_entrypoints": "websecure",
             "traefik_host_URL": "qa-superapp.sandbox.junction.dev",
-            "plus_poc_api_address": "https://plus.poc.sandbox.junction.dev",
+            "plus_poc_api_address": "https://poc.plus.sandbox.junction.dev",
             "plus_poc_activated": false,
             "ory_client_token_endpoint": "https://optimistic-tereshkova-36hc6vayw4.projects.oryapis.com/oauth2/token",
             "ory_client_id": "42633fd4-134f-44f8-a248-c846b94b3134"
