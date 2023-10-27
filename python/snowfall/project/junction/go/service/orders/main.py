@@ -26,6 +26,10 @@ from snowfall.project.junction.go.service.passenger_name_records.v1 import (
     passenger_name_records_pb2_grpc,
 )
 from snowfall.project.junction.go.service.resellers.v1 import resellers_pb2_grpc
+from snowfall.project.pay.adapter import refunds as refunds_adapter
+from snowfall.project.pay.service.refunds.v1alpha import (
+    grpc_pb2_grpc as refund_pb2_grpc,
+)
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.service import amqp_factory, application, grpc_factory
 from snowfall.stdlib.transport.amqp import consumer, producer, types
@@ -46,6 +50,7 @@ class _GrpcSettings(application.Settings):
     zendesk_base_url: pydantic.AnyUrl
     zendesk_api_key: str
     zendesk_cancellation_group_id: int
+    refunds_address: str
 
 
 class _ImportSettings(pay_integration.Settings, application.Settings):
@@ -91,7 +96,7 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
         collection=mongo.orders.journeys,
     )
 
-    resellers_channel, gateway_channel = await asyncio.gather(
+    resellers_channel, gateway_channel, refund_channel = await asyncio.gather(
         grpc_factory.make_insecure_channel(
             app,
             app.settings.resellers_address,
@@ -99,6 +104,10 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
         grpc_factory.make_insecure_channel(
             app,
             app.settings.gateway_address,
+        ),
+        grpc_factory.make_insecure_channel(
+            app,
+            app.settings.refunds_address,
         ),
     )
 
@@ -142,6 +151,11 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
                 default_page_size=app.settings.default_page_size,
                 zendesk_client=zendesk_client,
                 cancellation_group_id=app.settings.zendesk_cancellation_group_id,
+                refund_client=refunds_adapter.GrpcClient(
+                    refund_pb2_grpc.RefundsServiceStub(
+                        refund_channel,
+                    ),
+                ),
             ),
         ],
     )

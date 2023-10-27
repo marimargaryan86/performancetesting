@@ -25,13 +25,7 @@ class Client(abc.ABC):
     @abc.abstractmethod
     async def create(
         self,
-        note: str,
-        refunded_by_provider: money_pb2.Money,
-        refunded_to_reseller: money_pb2.Money,
-        invoice_reference: str,
-        transaction_id: str,
-        *,
-        refund_received: bool,
+        refund: models_pb2.Refund,
     ) -> models_pb2.Refund:
         """Create a refund resource."""
 
@@ -86,27 +80,14 @@ class DictClient(Client):
 
     async def create(
         self,
-        note: str,
-        refunded_by_provider: money_pb2.Money,
-        refunded_to_reseller: money_pb2.Money,
-        invoice_reference: str,
-        transaction_id: str,
-        *,
-        refund_received: bool,
+        refund: models_pb2.Refund,
     ) -> models_pb2.Refund:
-        if transaction_id in self._transactions:
-            refund_id = string.uuid()
-            self._refunds[refund_id] = models_pb2.Refund(
-                id=refund_id,
-                refund_received=refund_received,
-                note=note,
-                refunded_us=refunded_by_provider,
-                refunded_reseller=refunded_to_reseller,
-                invoice_reference=invoice_reference,
-                transaction_id=transaction_id,
-                status=models_pb2.Refund.Status.STATUS_PENDING,
-            )
-            return self._refunds[refund_id]
+        if refund.transaction_id in self._transactions:
+            refund.id = string.uuid()
+            self._refunds[refund.id] = refund
+
+            return self._refunds[refund.id]
+
         raise errors.NotFoundError("transaction not found")
 
     async def get(
@@ -201,24 +182,11 @@ class GrpcClient(Client):
 
     async def create(
         self,
-        note: str,
-        refunded_by_provider: money_pb2.Money,
-        refunded_to_reseller: money_pb2.Money,
-        invoice_reference: str,
-        transaction_id: str,
-        *,
-        refund_received: bool,
+        refund: models_pb2.Refund,
     ) -> models_pb2.Refund:
         response = await self._refunds.CreateRefund(
             grpc_pb2.CreateRefundRequest(
-                refund=models_pb2.Refund(
-                    transaction_id=transaction_id,
-                    refund_received=refund_received,
-                    note=note,
-                    refunded_us=refunded_by_provider,
-                    refunded_reseller=refunded_to_reseller,
-                    invoice_reference=invoice_reference,
-                ),
+                refund=refund,
             ),
         )
         return response.refund

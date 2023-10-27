@@ -9,6 +9,8 @@ from snowfall.project.junction.go.service.orders.orders import (
 )
 from snowfall.project.junction.go.service.orders.v1 import models_pb2, orders_pb2
 from snowfall.project.junction.go.service.orders.zendesk.client import ZendeskClient
+from snowfall.project.pay.adapter import refunds as refunds_adapter
+from snowfall.project.pay.service.refunds.v1alpha import models_pb2 as refunds_model_pb2
 from snowfall.stdlib.transport.grpc import rich_status
 from snowfall.stdlib.transport.http.errors import HttpStatusError
 
@@ -212,13 +214,17 @@ class CancellationTicketCompletedHandler(object):
         context: aio.ServicerContext,
         bookings: BookingRepository,
         cancellations: CancellationRequestsRepository,
+        refund_client: refunds_adapter.Client,
     ):
         self._request = request
         self._context = context
         self._bookings = bookings
         self._cancellations = cancellations
+        self._refund_client = refund_client
 
-    async def execute(self) -> orders_pb2.HandleCancellationTicketCompletedResponse:
+    async def execute(  # noqa: WPS217
+        self,
+    ) -> orders_pb2.HandleCancellationTicketCompletedResponse:
         cancellation_request = await self._cancellations.find_by_ticket_id(
             ticket_id=self._request.ticket_id,
         )
@@ -232,6 +238,7 @@ class CancellationTicketCompletedHandler(object):
             if booking_cancellation.ticket_id == self._request.ticket_id
         )
         ticket_status = self._request.status
+        booking = await self._get_booking(booking_id=booking_cancellation.booking_id)
 
         match ticket_status:
             case orders_pb2.Status.STATUS_REJECTED:
@@ -242,17 +249,17 @@ class CancellationTicketCompletedHandler(object):
                 booking_cancellation.status = (
                     models_pb2.BookingCancellation.STATUS_NO_REFUND
                 )
-                await self._update_booking_status(
-                    booking_id=booking_cancellation.booking_id,
-                )
+                await self._update_booking_status(booking)
             case orders_pb2.Status.STATUS_REFUND_DUE:
                 booking_cancellation.status = (
                     models_pb2.BookingCancellation.STATUS_REFUND_DUE
                 )
-                await self._update_booking_status(
-                    booking_id=booking_cancellation.booking_id,
+                await self._update_booking_status(booking)
+                await self._refund_client.create(
+                    refund=refunds_model_pb2.Refund(
+                        transaction_id=booking.transaction_id,
+                    ),
                 )
-                # TODO: Create refund in PAY.
 
         self._update_overall_cancellation_status(cancellation_request)
         await self._cancellations.update(document=cancellation_request)
@@ -261,16 +268,18 @@ class CancellationTicketCompletedHandler(object):
             booking_cancellation=booking_cancellation,
         )
 
-    async def _update_booking_status(
+    async def _get_booking(
         self,
         booking_id: str,
-    ) -> None:
+    ) -> models_pb2.Booking:
         booking = await self._bookings.find_by_id(document_id=booking_id)
 
         if booking is None:
-            await self._context.abort(StatusCode.NOT_FOUND)
-            return
+            return await self._context.abort(StatusCode.NOT_FOUND)
 
+        return booking
+
+    async def _update_booking_status(self, booking: models_pb2.Booking) -> None:
         booking.status = models_pb2.Booking.STATUS_CANCELLED
         await self._bookings.update(booking)
 

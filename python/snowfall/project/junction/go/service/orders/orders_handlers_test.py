@@ -7,6 +7,7 @@ from snowfall.project.junction.go.service.orders.orders_handlers import (
     CancellationTicketCompletedHandler,
 )
 from snowfall.project.junction.go.service.orders.v1 import models_pb2, orders_pb2
+from snowfall.project.pay.adapter import refunds as refunds_adapter
 
 
 class TestCancellationTicketCompletedHandler(object):
@@ -73,11 +74,13 @@ class TestCancellationTicketCompletedHandler(object):
         cancellation_request: models_pb2.CancellationRequest,
     ) -> None:
         booking_cancellation = cancellation_request.booking_cancellations[0]
+        refund_client = mock.AsyncMock()
         handler, _ = self._create_handler(
             ticket_id=booking_cancellation.ticket_id,
             status=orders_pb2.Status.STATUS_REFUND_DUE,
             booking_repository=booking_repository,
             cancellation_requests_repository=cancellation_requests_repository,
+            refund_client=refund_client,
         )
         with mock.patch.object(booking_repository, "update") as update_mock:
             await handler.execute()
@@ -105,6 +108,7 @@ class TestCancellationTicketCompletedHandler(object):
             updated_booking_cancellation.status
             == models_pb2.BookingCancellation.STATUS_REFUND_DUE
         )
+        refund_client.create.assert_awaited()
 
     async def test_ticket_rejected(
         self,
@@ -183,6 +187,7 @@ class TestCancellationTicketCompletedHandler(object):
         status: orders_pb2.Status.ValueType,
         booking_repository: orders.BookingRepository,
         cancellation_requests_repository: orders.CancellationRequestsRepository,
+        refund_client: refunds_adapter.Client | None = None,
     ) -> tuple[CancellationTicketCompletedHandler, mock.AsyncMock]:
         context = mock.AsyncMock()
 
@@ -196,6 +201,7 @@ class TestCancellationTicketCompletedHandler(object):
             context=context,
             bookings=booking_repository,
             cancellations=cancellation_requests_repository,
+            refund_client=refund_client or mock.AsyncMock(),
         )
 
         return handler, context

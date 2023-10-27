@@ -19,6 +19,7 @@ from snowfall.project.junction.go.service.orders.orders_handlers import (
 )
 from snowfall.project.junction.go.service.orders.v1 import orders_pb2, orders_pb2_grpc
 from snowfall.project.junction.go.service.orders.zendesk.client import ZendeskClient
+from snowfall.project.pay.adapter import refunds as refunds_adapter
 from snowfall.stdlib.transport.grpc import rich_status, service, sorting
 
 
@@ -46,6 +47,7 @@ class OrderService(
         default_page_size: int,
         zendesk_client: ZendeskClient,
         cancellation_group_id: int,
+        refund_client: refunds_adapter.Client,
     ):
         self._default_page_size = default_page_size
         self._journeys = journeys
@@ -58,6 +60,7 @@ class OrderService(
         self._publisher = publisher
         self._zendesk_client = zendesk_client
         self._cancellation_group_id = cancellation_group_id
+        self._refund_client = refund_client
 
     def get_name(self) -> str:
         return orders_pb2.DESCRIPTOR.services_by_name["OrderService"].full_name
@@ -352,6 +355,7 @@ class OrderService(
             context,
             self._bookings,
             self._cancellation_requests,
+            self._refund_client,
         )
 
         return await ticket_completed_handler.execute()

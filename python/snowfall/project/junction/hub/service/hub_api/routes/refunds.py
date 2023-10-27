@@ -10,6 +10,7 @@ from snowfall.project.pay.adapter import (
 from snowfall.project.pay.adapter import (
     transactions as transactions_adapter,
 )
+from snowfall.project.pay.service.refunds.v1alpha import models_pb2 as refunds_model_pb2
 from snowfall.stdlib import money
 from snowfall.stdlib.integration.starlette import (
     messages,
@@ -120,18 +121,20 @@ class Refunds(endpoints.HTTPEndpoint):
         payload = await request_helpers.flatten_request(request)
 
         refund = await refunds_client.create(
-            refund_received=payload["refundReceived"],
-            note=payload["note"],
-            refunded_by_provider=money.from_string(
-                str(payload["refundedUs"]["amount"]),
-                money.Currency(payload["refundedUs"]["currency"]),
-            ).protobuf(),
-            refunded_to_reseller=money.from_string(
-                str(payload["refundedReseller"]["amount"]),
-                money.Currency(payload["refundedReseller"]["currency"]),
-            ).protobuf(),
-            invoice_reference=payload["invoiceReference"],
-            transaction_id=payload["transaction"],
+            refunds_model_pb2.Refund(
+                refund_received=payload["refundReceived"],
+                note=payload["note"],
+                refunded_us=money.from_string(
+                    str(payload["refundedUs"]["amount"]),
+                    money.Currency(payload["refundedUs"]["currency"]),
+                ).protobuf(),
+                refunded_reseller=money.from_string(
+                    str(payload["refundedReseller"]["amount"]),
+                    money.Currency(payload["refundedReseller"]["currency"]),
+                ).protobuf(),
+                invoice_reference=payload["invoiceReference"],
+                transaction_id=payload["transaction"],
+            ),
         )
 
         return await messages.create_response(
