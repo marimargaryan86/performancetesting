@@ -91,4 +91,5 @@ message Bill {
   snowfall.stdlib.v1.Money reconciled_amount = 5;
   google.protobuf.Timestamp created_at = 6;
   google.protobuf.Timestamp updated_at = 7;
+  string payment_intent_id = 8;
 }

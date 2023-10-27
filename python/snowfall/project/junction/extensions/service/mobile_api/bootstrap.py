@@ -13,6 +13,7 @@ from snowfall.project.junction.extensions.service.mobile_api import (
 from snowfall.project.junction.extensions.service.mobile_api import (
     plus_client as plus_poc_http_client,
 )
+from snowfall.project.pay.adapter import bills
 from snowfall.stdlib.integration.starlette import application
 from snowfall.vendor.junction.go import client as go_http_client
 from snowfall.vendor.junction.plus import client as plus_http_client
@@ -47,6 +48,7 @@ class Settings(application.Settings):
     cookie_auth_enabled: bool = False
     authentication_address: str | None = None
     junction_private_key: str | None = None
+    transactions_address: str
 
 
 def create_dependencies(
@@ -69,6 +71,7 @@ def create_dependencies(
     notification_tokens_repository: repository.NotificationTokensRepository,
     user_groups_repository: repository.UserGroupsRepository,
     markups_repository: repository.MarkupsRepository,
+    bills_client: bills.Client,
 ) -> lagom.Container:
     container = lagom.Container()
     container[repository.OrdersRepository] = orders_repository
@@ -90,4 +93,5 @@ def create_dependencies(
     container[repository.NotificationTokensRepository] = notification_tokens_repository
     container[repository.UserGroupsRepository] = user_groups_repository
     container[repository.MarkupsRepository] = markups_repository
+    container[bills.Client] = bills_client  # type: ignore[type-abstract]
     return container

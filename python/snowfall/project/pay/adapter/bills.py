@@ -9,11 +9,18 @@ from snowfall.project.pay.service.transactions.v1alpha import (
     grpc_pb2_grpc,
     models_pb2,
 )
-from snowfall.stdlib import sequence
+from snowfall.stdlib import sequence, string
 from snowfall.stdlib.v1 import sort_pb2
 
 
 class Client(abc.ABC):
+    @abc.abstractmethod
+    async def create(
+        self,
+        bill: models_pb2.Bill,
+    ) -> models_pb2.Bill:
+        """Create a bill resource."""
+
     @abc.abstractmethod
     async def get(self, identifier: str) -> models_pb2.Bill:
         """Fetch a bill resource."""
@@ -40,6 +47,19 @@ class Client(abc.ABC):
 class DictClient(Client):
     def __init__(self, bills: Sequence[models_pb2.Bill]):
         self._bills = {bill.id: bill for bill in bills}
+
+    async def create(
+        self,
+        bill: models_pb2.Bill,
+    ) -> models_pb2.Bill:
+        bill = models_pb2.Bill(
+            id=string.uuid(),
+            order_id=string.uuid(),
+            payment_intent_id=string.uuid(),
+        )
+        self._bills[bill.id] = bill
+
+        return bill
 
     async def get(self, bill_id: str) -> models_pb2.Bill:
         try:
@@ -85,6 +105,20 @@ class GrpcClient(Client):
     ):
         self._bills = bills
         self._timeout = timeout
+
+    async def create(
+        self,
+        bill: models_pb2.Bill,
+    ) -> models_pb2.Bill:
+        response = await errors.handle_grpc_errors(
+            self._bills.CreateBill(
+                grpc_pb2.CreateBillRequest(
+                    bill=bill,
+                ),
+            ),
+        )
+
+        return response.bill
 
     async def get(self, bill_id: str) -> models_pb2.Bill:
         response = await errors.handle_grpc_errors(

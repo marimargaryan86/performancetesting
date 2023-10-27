@@ -36,7 +36,12 @@ from snowfall.project.junction.extensions.service.mobile_api import (
 )
 from snowfall.project.junction.extensions.service.mobile_api.routes import router
 from snowfall.project.junction.extensions.service.mobile_api.v1alpha import models_pb2
-from snowfall.stdlib import string
+from snowfall.project.pay import fixtures as pay_fixtures
+from snowfall.project.pay.adapter import bills
+from snowfall.project.pay.service.transactions.v1alpha import (
+    models_pb2 as transactions_models_pb2,
+)
+from snowfall.stdlib import money, string
 from snowfall.stdlib.format import jwt
 from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.persistence.redis import types as redis
@@ -132,6 +137,16 @@ async def load_response_fixture(path: str) -> Response:
         ".*{path_regex}".format(path_regex=response_dict["url"]),
     )
     return response_dict
+
+
+def get_bill(bill_id: str) -> transactions_models_pb2.Bill:
+    money_usd = money.from_string("1000", money.Currency("USD")).protobuf()
+    return transactions_models_pb2.Bill(
+        id=bill_id,
+        order_id=string.uuid(),
+        is_reconciled=False,
+        total_amount=money_usd,
+    )
 
 
 @pytest.fixture()
@@ -339,6 +354,13 @@ def junction_client() -> client.Client:
 
 
 @pytest.fixture()
+def bills_client() -> bills.Client:
+    return bills.DictClient(
+        [get_bill(bill_id) for bill_id in pay_fixtures.BILLS],
+    )
+
+
+@pytest.fixture()
 def plus_client() -> plus_http_client.Client:
     return plus_http_client.Client(base_url=junction_api_address)
 
@@ -376,6 +398,7 @@ def app(
     notification_tokens_repository: repository.NotificationTokensRepository,
     user_groups_repository: repository.UserGroupsRepository,
     markups_repository: repository.MarkupsRepository,
+    bills_client: bills.Client,
 ) -> Iterator[applications.Starlette]:
     with spec.get_api_spec() as temp_spec_path:
         yield _create_app(
@@ -399,6 +422,7 @@ def app(
                 notification_tokens_repository,
                 user_groups_repository,
                 markups_repository,
+                bills_client,
             ),
             openapi_path=temp_spec_path,
             custom_middlewares=[

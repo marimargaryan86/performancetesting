@@ -27,6 +27,10 @@ from snowfall.project.junction.extensions.service.mobile_api import (
     plus_client as plus_poc_client,
 )
 from snowfall.project.junction.extensions.service.mobile_api.routes import router
+from snowfall.project.pay.adapter import bills
+from snowfall.project.pay.service.transactions.v1alpha import (
+    grpc_pb2_grpc as transactions_pb2_grpc,
+)
 from snowfall.service.authentication.v1 import sessions_pb2_grpc
 from snowfall.stdlib.format import jwt
 from snowfall.stdlib.instrumentation.httpx import metrics
@@ -158,7 +162,10 @@ async def _http(
         ),
         token_version=app.settings.jwt_token_version,
     )
-
+    transactions_channel = await grpc_factory.make_insecure_channel(
+        app,
+        app.settings.transactions_address,
+    )
     with spec.get_api_spec(cookie_auth=app.settings.cookie_auth_enabled) as spec_path:
         asgi_app = starlette.create_starlette_app(
             routes=router.get_routes(
@@ -204,6 +211,11 @@ async def _http(
                     ),
                     markups_repository=repository.MarkupsRepository(
                         mongo["markups"],
+                    ),
+                    bills_client=bills.GrpcClient(
+                        transactions_pb2_grpc.BillsServiceStub(
+                            transactions_channel,
+                        ),
                     ),
                     junction_client=junction_client,
                     plus_client=plus_http_client,

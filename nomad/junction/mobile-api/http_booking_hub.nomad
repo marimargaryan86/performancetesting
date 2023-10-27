@@ -100,6 +100,10 @@ job "mobile-api-http-booking-hub" {
         sidecar_service {
           proxy {
             upstreams {
+              local_bind_port  = 8020
+              destination_name = "transactions-${var.environment}"
+            }
+            upstreams {
               local_bind_port  = 8070
               destination_name = "client-api-${var.environment}"
             }
@@ -153,6 +157,7 @@ job "mobile-api-http-booking-hub" {
         data        = <<EOH
 JUNCTION_API_ADDRESS={{(printf "http://%s" (env "NOMAD_UPSTREAM_ADDR_client-api-${var.environment}"))}}
 PLUS_API_ADDRESS={{(printf "http://%s" (env "NOMAD_UPSTREAM_ADDR_plus-api-${var.environment}"))}}
+TRANSACTIONS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_transactions-${var.environment}"))}}
 AUTHENTICATION_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_authentication-${var.environment}"))}}
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}

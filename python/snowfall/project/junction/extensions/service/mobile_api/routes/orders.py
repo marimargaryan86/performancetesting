@@ -20,6 +20,10 @@ from snowfall.project.junction.extensions.service.mobile_api import (
 )
 from snowfall.project.junction.extensions.service.mobile_api.tasks import orders
 from snowfall.project.junction.extensions.service.mobile_api.v1alpha import models_pb2
+from snowfall.project.pay.adapter import bills
+from snowfall.project.pay.service.transactions.v1alpha import (
+    models_pb2 as transactions_models_pb2,
+)
 from snowfall.stdlib import money, string
 from snowfall.stdlib.integration.starlette import (
     models as stdlib_models,
@@ -176,6 +180,7 @@ class Orders(endpoints.HTTPEndpoint):
         plus_http_client: plus_client.PlusClient = lagom.injectable,
         smtp_client: smtp.EmailClient = lagom.injectable,
         vouchers_repository: repository.VouchersRepository = lagom.injectable,
+        bills_client: bills.Client = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
         payment = body["payment"]
@@ -250,6 +255,12 @@ class Orders(endpoints.HTTPEndpoint):
             payment_intent_id=payment,
             user_id=request.user.username,
             mobile_number=contact_details["phoneNumber"],
+        )
+        await bills_client.create(
+            transactions_models_pb2.Bill(
+                order_id=mobile_order.id,
+                payment_intent_id=mobile_order.payment_intent_id,
+            ),
         )
         try:
             spnr = junction_order["included"][0]["attributes"]["reference"]
