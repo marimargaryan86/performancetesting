@@ -20,6 +20,7 @@ from snowfall.project.junction.go.service.orders.orders_handlers import (
 from snowfall.project.junction.go.service.orders.v1 import orders_pb2, orders_pb2_grpc
 from snowfall.project.junction.go.service.orders.zendesk.client import ZendeskClient
 from snowfall.project.pay.adapter import refunds as refunds_adapter
+from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.transport.grpc import rich_status, service, sorting
 
 
@@ -359,3 +360,29 @@ class OrderService(
         )
 
         return await ticket_completed_handler.execute()
+
+    async def UpdateBookingCancellation(  # type: ignore[override] # noqa: N802
+        self,
+        request: orders_pb2.UpdateBookingCancellationRequest,
+        context: aio.ServicerContext,
+    ) -> orders_pb2.UpdateBookingCancellationResponse:
+        booking_cancellation = await self._booking_cancellations.find_by_id(
+            request.booking_cancellation.id,
+        )
+
+        if booking_cancellation is None:
+            return await context.abort(StatusCode.NOT_FOUND)
+
+        booking_cancellation = protobuf.apply_field_mask(
+            request.update_mask,
+            request.booking_cancellation,
+            booking_cancellation,
+        )
+
+        booking_cancellation = await self._booking_cancellations.update(
+            booking_cancellation,
+        )
+
+        return orders_pb2.UpdateBookingCancellationResponse(
+            booking_cancellation=booking_cancellation,
+        )

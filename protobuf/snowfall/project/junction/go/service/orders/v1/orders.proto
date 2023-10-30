@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package snowfall.project.junction.go.service.orders.v1;
 
+import "google/protobuf/field_mask.proto";
 import "snowfall/project/junction/go/service/orders/v1/models.proto";
 import "snowfall/stdlib/v1/postal_address.proto";
 import "snowfall/stdlib/v1/sort.proto";
@@ -24,6 +25,7 @@ service OrderService {
   rpc GetBookingCancellation(GetBookingCancellationRequest) returns (GetBookingCancellationResponse) {}
   rpc ListBookingCancellations(ListBookingCancellationsRequest) returns (ListBookingCancellationsResponse) {}
   rpc HandleCancellationTicketCompleted(HandleCancellationTicketCompletedRequest) returns (HandleCancellationTicketCompletedResponse) {}
+  rpc UpdateBookingCancellation(UpdateBookingCancellationRequest) returns (UpdateBookingCancellationResponse) {}
 }
 
 message CreateJourneyRequest {
@@ -197,5 +199,14 @@ message HandleCancellationTicketCompletedRequest {
 }
 
 message HandleCancellationTicketCompletedResponse {
+  BookingCancellation booking_cancellation = 1;
+}
+
+message UpdateBookingCancellationRequest {
+  BookingCancellation booking_cancellation = 1;
+  google.protobuf.FieldMask update_mask = 2;
+}
+
+message UpdateBookingCancellationResponse {
   BookingCancellation booking_cancellation = 1;
 }

@@ -637,3 +637,26 @@ class BookingCancellationsRepository(
             return await options.take()
         except StopAsyncIteration:
             return None
+
+    async def update(
+        self,
+        booking_cancellation: models_pb2.BookingCancellation,
+    ) -> models_pb2.BookingCancellation:
+        await self._execute(
+            self._collection.update_one,
+            filter={"booking_cancellations._id": booking_cancellation.id},
+            update={
+                "$set": {
+                    "booking_cancellations.$[bookingCancellation]": self._coder.encode(
+                        booking_cancellation,
+                    ),
+                },
+            },
+            array_filters=[
+                {
+                    "bookingCancellation._id": booking_cancellation.id,
+                },
+            ],
+        )
+
+        return booking_cancellation

@@ -140,8 +140,9 @@ message BookingCancellation {
     STATUS_REJECTED = 3;
     STATUS_NO_REFUND = 4;
     STATUS_REFUND_DUE = 5;
+    STATUS_REFUND_ISSUED = 6;
   }
-  Status status = 4 [(snowfall.stdlib.v1.read_only) = true];
+  Status status = 4;
 }
 
 message CancellationRequest {

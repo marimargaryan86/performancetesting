@@ -3,6 +3,8 @@ from __future__ import annotations
 import abc
 from collections.abc import Iterator, Sequence
 
+from google.protobuf.field_mask_pb2 import FieldMask
+
 from snowfall.project.junction.go.adapter import errors
 from snowfall.project.junction.go.service.orders.v1 import (
     models_pb2,
@@ -49,6 +51,13 @@ class Client(abc.ABC):
         identifiers: Sequence[str],
         reseller_id: str | None = None,
     ) -> orders_pb2.ListBookingCancellationsResponse:
+        """Fetch booking cancellation resources by identifiers."""
+
+    @abc.abstractmethod
+    async def update_booking_cancellations(
+        self,
+        booking_cancellation: models_pb2.BookingCancellation,
+    ) -> models_pb2.BookingCancellation:
         """Fetch booking cancellation resources by identifiers."""
 
     @abc.abstractmethod
@@ -270,6 +279,12 @@ class DictClient(Client):
         return orders_pb2.ListBookingCancellationsResponse(
             booking_cancellations=booking_cancellations,
         )
+
+    async def update_booking_cancellations(
+        self,
+        booking_cancellation: models_pb2.BookingCancellation,
+    ) -> models_pb2.BookingCancellation:
+        return booking_cancellation
 
     async def get_booking_cancellation_by_booking_id(
         self,
@@ -687,6 +702,28 @@ class GrpcClient(Client):
                 timeout=self._timeout,
             ),
         )
+
+    async def update_booking_cancellations(
+        self,
+        booking_cancellation: models_pb2.BookingCancellation,
+    ) -> models_pb2.BookingCancellation:
+        response = await errors.handle_grpc_errors(
+            self._orders.UpdateBookingCancellation(
+                orders_pb2.UpdateBookingCancellationRequest(
+                    booking_cancellation=booking_cancellation,
+                    update_mask=FieldMask(
+                        paths=[
+                            field.name
+                            for field in booking_cancellation.DESCRIPTOR.fields
+                            if getattr(booking_cancellation, field.name) is not None
+                        ],
+                    ),
+                ),
+                timeout=self._timeout,
+            ),
+        )
+
+        return response.booking_cancellation
 
     async def get_booking_cancellation_by_booking_id(
         self,
