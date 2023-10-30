@@ -7,161 +7,150 @@
  * @param actions {object} [Key-value pairs of API actions and their URL paths.]
  * @param routes {object} [Additional nested route configurations.]
  */
+/* eslint-disable max-lines-per-function, @typescript-eslint/explicit-function-return-type, no-shadow */
 export default {
   root: "/",
-  routes: {
-    tripManagement: {
-      root: "/trip-management",
-      routes: {
-        book: {
-          root: "/trip-management/book",
-          actions: {
-            search: "/trip-management/book?/search",
-            listPlaces: "/trip-management/book?/listPlaces",
-          },
-          routes: {
-            select: {
-              root: "/trip-management/book/select-offer",
-              actions: {
-                poll: "/trip-management/book/select-offer?/poll",
-                select: "/trip-management/book/select-offer?/select",
+  get routes() {
+    return {
+      tripManagement: {
+        root: "/trip-management",
+        get routes() {
+          return {
+            book: {
+              root: `${this.root}/book`,
+              get routes() {
+                return {
+                  select: { root: `${this.root}/select-offer` },
+                  payment: { root: `${this.root}/payment` },
+                  confirmation: { root: `${this.root}/confirmation` },
+                } as const;
               },
             },
-            payment: {
-              root: "/trip-management/book/payment",
-              actions: {
-                poll: "/trip-management/book/payment?/poll",
-                createOrder: "/trip-management/book/payment?/createOrder",
-                createOrderMarkups: "/trip-management/book/payment?/createOrderMarkups",
-                confirmPayment: "/trip-management/book/payment?/confirmPayment",
-              },
-            },
-            confirmation: {
-              root: "/trip-management/book/confirmation",
-            },
-          },
-        },
-        orders: {
-          root: "/trip-management/orders",
-          routes: {
-            order: <TOrderId extends string>(orderId: TOrderId) =>
-              ({
-                root: `/trip-management/orders/${orderId}`,
-                actions: {
-                  cancelBookings: `/trip-management/orders/${orderId}?/cancelBookings`,
-                },
-                routes: {
-                  tickets: {
-                    root: `/trip-management/orders/${orderId}/tickets`,
-                  },
-                  details: {
-                    root: `/trip-management/orders/${orderId}/details`,
-                  },
-                  booking: <TBookingId extends string>(bookingId: TBookingId) =>
+            orders: {
+              root: `${this.root}/orders`,
+              get routes() {
+                return {
+                  order: <TOrderId extends string>(id: TOrderId) =>
                     ({
-                      root: `/trip-management/orders/${orderId}/${bookingId}`,
-                      routes: {
-                        tickets: {
-                          root: `/trip-management/orders/${orderId}/${bookingId}/tickets`,
-                        },
+                      root: `${this.root}/${id}`,
+                      get actions() {
+                        return { cancelBookings: `${this.root}?/cancelBookings` } as const;
+                      },
+                      get routes() {
+                        return {
+                          tickets: { root: `${this.root}/tickets` },
+                          details: { root: `${this.root}/details` },
+                          booking: <TBookingId extends string>(id: TBookingId) =>
+                            ({
+                              root: `${this.root}/${id}`,
+                              get routes() {
+                                return { tickets: { root: `${this.root}/tickets` } } as const;
+                              },
+                            } as const),
+                        } as const;
                       },
                     } as const),
-                },
-              } as const),
-          },
-        },
-      },
-    },
-    login: {
-      root: "/login",
-      actions: {
-        login: "/login?/login",
-        logout: "/login?/logout",
-      },
-    },
-    help: {
-      root: "/help",
-      routes: {
-        privacyPolicy: {
-          root: "/help/privacy-policy",
-        },
-        termsAndConditions: {
-          root: "/help/terms-and-conditions",
-        },
-        customerService: {
-          root: "/help/customer-service",
-        },
-        conditionsOfCarriage: {
-          root: "/help/conditions-of-carriage",
-        },
-      },
-    },
-    settings: {
-      root: "/settings",
-    },
-    pay: {
-      root: "/pay",
-      routes: {
-        activity: {
-          root: "/pay/activity",
-          actions: {
-            getBooking: "/pay/activity?/getBooking",
-            listTransactions: "/pay/activity?/listTransactions",
-          },
-          routes: {
-            conversions: {
-              root: "/pay/activity/fx",
-              actions: {
-                listConversions: "/pay/activity/fx?/listConversions",
+                } as const;
               },
             },
-          },
-        },
-        accounts: {
-          root: "/pay/accounts",
-          actions: {
-            listAccounts: "/pay/accounts?/listAccounts",
-          },
-          routes: {
-            account: <TAccountId extends string>(accountId: TAccountId) =>
-              ({
-                root: `/pay/accounts/${accountId}`,
-                actions: {
-                  addBalances: `/pay/accounts/${accountId}?/addBalances`,
-                },
-              } as const),
-          },
-        },
-        beneficiaries: {
-          root: "/pay/beneficiaries",
-          actions: {
-            listBeneficiaries: "/pay/beneficiaries?/listBeneficiaries",
-          },
-          routes: {
-            beneficiary: <TBeneficiaryId extends string = "add">(
-              beneficiaryId: TBeneficiaryId = "add" as TBeneficiaryId,
-            ) =>
-              ({
-                root: `/pay/beneficiaries/${beneficiaryId}`,
-              } as const),
-          },
-        },
-        bills: {
-          root: "/pay/bills",
-          actions: {
-            listBills: "/pay/bills?/listBills",
-            toggleReconciliation: "/pay/bills?/toggleReconciliation",
-          },
+          } as const;
         },
       },
-    },
-    go: {
-      root: "/go",
-      routes: {
-        bookings: {
-          root: "/go/bookings",
+      login: {
+        root: "/login",
+        get actions() {
+          return {
+            login: `${this.root}?/login`,
+            logout: `${this.root}?/logout`,
+          } as const;
         },
       },
-    },
+      help: {
+        root: "/help",
+        get routes() {
+          return {
+            privacyPolicy: { root: `${this.root}/privacy-policy` },
+            termsAndConditions: { root: `${this.root}/terms-and-conditions` },
+            customerService: { root: `${this.root}/customer-service` },
+            conditionsOfCarriage: { root: `${this.root}/conditions-of-carriage` },
+          } as const;
+        },
+      },
+      pay: {
+        root: "/pay",
+        get routes() {
+          return {
+            activity: {
+              root: `${this.root}/activity`,
+              get actions() {
+                return {
+                  getBooking: `${this.root}?/getBooking`,
+                  listTransactions: `${this.root}?/listTransactions`,
+                } as const;
+              },
+              get routes() {
+                return {
+                  conversions: {
+                    root: `${this.root}/fx`,
+                    get actions() {
+                      return { listConversions: `${this.root}?/listConversions` } as const;
+                    },
+                  } as const,
+                } as const;
+              },
+            },
+            accounts: {
+              root: `${this.root}/accounts`,
+              get actions() {
+                return { listAccounts: `${this.root}?/listAccounts` } as const;
+              },
+              get routes() {
+                return {
+                  account: <TAccountId extends string>(id: TAccountId) =>
+                    ({
+                      root: `${this.root}/${id}`,
+                      get actions() {
+                        return {
+                          addBalances: `${this.root}?/addBalances`,
+                        } as const;
+                      },
+                    } as const),
+                } as const;
+              },
+            },
+            beneficiaries: {
+              root: `${this.root}/beneficiaries`,
+              get actions() {
+                return { listBeneficiaries: `${this.root}?/listBeneficiaries` } as const;
+              },
+              get routes() {
+                return {
+                  beneficiary: <TBeneficiaryId extends string = "add">(
+                    id: TBeneficiaryId = "add" as TBeneficiaryId,
+                  ) => ({ root: `${this.root}/${id}` } as const),
+                } as const;
+              },
+            },
+            bills: {
+              root: `${this.root}/bills`,
+              get actions() {
+                return {
+                  listBills: `${this.root}?/listBills`,
+                  toggleReconciliation: `${this.root}?/toggleReconciliation`,
+                } as const;
+              },
+            },
+          } as const;
+        },
+      },
+      go: {
+        root: "/go",
+        get routes() {
+          return {
+            bookings: { root: `${this.root}/bookings` },
+          } as const;
+        },
+      },
+    } as const;
   },
 } as const;
