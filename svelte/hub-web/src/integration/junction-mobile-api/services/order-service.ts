@@ -146,4 +146,18 @@ export class OrderService extends JunctionMobileApiService {
 
     return parseOrderSchema(resp.json.data, included);
   }
+
+  async getOrderMarkups({
+    id,
+    session,
+  }: {
+    id: string;
+    session: SessionModel;
+  }): Promise<OrderMarkupsModel> {
+    const resp = await this.makeRequest<{ data: OrderMarkupsSchema }>(`/orders/${id}/markup`, {
+      session,
+    });
+
+    return parseOrderMarkupsSchema(resp.json.data);
+  }
 }

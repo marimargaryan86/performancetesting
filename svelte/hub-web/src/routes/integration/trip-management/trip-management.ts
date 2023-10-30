@@ -22,7 +22,11 @@ import {
   paymentIntentModel,
   type PaymentIntentModel,
 } from "integration/junction-mobile-api/schemas/payment";
-import type { CreateOrderModel, OrderModel } from "integration/junction-mobile-api/schemas/order";
+import type {
+  CreateOrderMarkupsModel,
+  CreateOrderModel,
+  OrderModel,
+} from "integration/junction-mobile-api/schemas/order";
 
 const ROUTE: RouteId = "/integration/trip-management";
 
@@ -62,6 +66,9 @@ export const bookingSessionModel = z
     }),
     paymentIntent: paymentIntentModel.model.extend({ confirmed: z.boolean().optional() }),
     order: z.object({
+      id: z.string(),
+    }),
+    orderMarkups: z.object({
       id: z.string(),
     }),
   })
@@ -202,10 +209,24 @@ async function confirmPayment(): Promise<void> {
   }
 }
 
-async function createOrderMarkups(): Promise<void> {
-  // TODO: Implement
+async function createOrderMarkups(
+  data: CreateOrderMarkupsModel,
+): Promise<
+  | { success: true; order: CreateOrderMarkupsModel }
+  | { success: false; errors: z.ZodFormattedError<unknown> }
+> {
+  const url = new URLExtended(ROUTE, { base: origin, query: { action: "create-order-markups" } });
+  const resp = await fetch(url, { method: "POST", body: devalue.stringify(data) });
 
-  await sleep(1000);
+  if (resp.status === 422) {
+    return { success: false, errors: devalue.parse(await resp.text()) };
+  }
+
+  if (resp.status !== 201) {
+    throw new Error("Failed to create order markups");
+  }
+
+  return { success: true, order: devalue.parse(await resp.text()) };
 }
 
 export default {

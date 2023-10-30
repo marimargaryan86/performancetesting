@@ -34,7 +34,10 @@
   import { sleep } from "utils/common";
   import { goto } from "$app/navigation";
   import { browser } from "$app/environment";
-  import { contactDetailsModel } from "integration/junction-mobile-api/schemas/order";
+  import {
+    contactDetailsModel,
+    type CreateOrderMarkupsModel,
+  } from "integration/junction-mobile-api/schemas/order";
   import PriceDialog from "components/ui/dialogues/price-dialog.svelte";
   import Summary from "../../components/summary/summary.svelte";
   import tripManagement from "../../../integration/trip-management/trip-management";
@@ -53,9 +56,8 @@
   };
   let errors: z.ZodFormattedError<z.infer<typeof bookingDetailsValidator>> | undefined = undefined;
   let { priceQuote, paymentIntent } = data;
-  // TODO: type this
-  let orderMarkup: object;
   let pollSignal = { cancelled: false };
+  let orderMarkups: CreateOrderMarkupsModel;
 
   $: bookingDetailsValidator = z.object({
     passengers: z.array(getPassengerValidator(priceQuote.required)),
@@ -64,6 +66,8 @@
   $: if (browser && !paymentIntent) {
     updatePaymentIntentAndPriceQuote();
   }
+  $: shouldCreateOrderMarkups =
+    orderMarkups?.serviceFee?.amount > 0 && orderMarkups?.agencyMarkup?.amount > 0;
 
   async function updatePaymentIntentAndPriceQuote(): Promise<void> {
     const nextPriceQuote = await tripManagement.getPriceQuote();
@@ -84,6 +88,10 @@
   }
 
   async function createOrder(): Promise<boolean> {
+    if (data.orderId) {
+      return true;
+    }
+
     if (!paymentIntent) {
       return false;
     }
@@ -106,6 +114,7 @@
       });
 
       if (result.success) {
+        data.orderId = result.order.id;
         return true;
       }
 
@@ -122,9 +131,31 @@
   }
 
   async function createOrderMarkups(): Promise<boolean> {
-    await tripManagement.createOrderMarkups();
+    if (!data.orderId) {
+      return false;
+    }
 
-    return true;
+    orderMarkups.orderId = data.orderId;
+
+    // TODO: implement validation
+
+    try {
+      const result = await tripManagement.createOrderMarkups({ ...orderMarkups });
+
+      if (result.success) {
+        return true;
+      }
+
+      errors = result.errors;
+
+      return false;
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        errors = err.format();
+      }
+
+      return false;
+    }
   }
 
   const { pending, func: pay } = pendableCall(async () => {
@@ -140,8 +171,10 @@
       return;
     }
 
-    if (!(await createOrderMarkups())) {
-      return;
+    if (shouldCreateOrderMarkups) {
+      if (!(await createOrderMarkups())) {
+        return;
+      }
     }
 
     await goto(routeConfig.routes.tripManagement.routes.book.routes.confirmation.root);
@@ -179,7 +212,7 @@
 
     <div class="column payment">
       <Summary {priceQuote} passengers={data.searchData.passengers} />
-      <Fees {priceQuote} bind:orderMarkup />
+      <Fees {priceQuote} bind:orderMarkups />
       <Payment bind:this={payment} bind:paymentIntent />
       <ContactInformation
         countries={data.countries}

@@ -23,12 +23,14 @@
   import CloseIcon from "components/icons/close-icon.svelte";
   import AlertIcon from "components/icons/alert-icon.svelte";
   import type { OrderModel } from "integration/junction-mobile-api/schemas/order";
+  import Fees from "./fees.svelte";
 
   export let data;
 
   $: hasTickets = Boolean(
     data.order.bookings.flatMap((item) => item.ticketUrls).filter(ensureDefined).length,
   );
+  $: hasMarkups = Boolean(data.markups);
   $: alertType = getAlertType(data.order.status);
 </script>
 
@@ -77,6 +79,10 @@
         {/if}
 
         <Price bookings={data.order.bookings} />
+
+        {#if hasMarkups}
+          <Fees orderMarkups={data.markups} />
+        {/if}
 
         <Passengers passengers={data.order.passengers} />
 

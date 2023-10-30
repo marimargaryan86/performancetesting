@@ -9,7 +9,10 @@ import type { CreateTripCandidatesSearchModel } from "integration/junction-mobil
 import { getMinDate } from "utils/date-time";
 import utils from "./utils.server";
 import type { MaybePromise } from "@sveltejs/kit";
-import type { CreateOrderModel } from "integration/junction-mobile-api/schemas/order";
+import type {
+  CreateOrderMarkupsModel,
+  CreateOrderModel,
+} from "integration/junction-mobile-api/schemas/order";
 import { z } from "zod";
 
 function parsePassengers(
@@ -257,6 +260,28 @@ async function createOrder(session: SessionModel, event: RequestEvent): Promise<
   }
 }
 
+async function createOrderMarkups(session: SessionModel, event: RequestEvent): Promise<Response> {
+  const bookingSession = utils.getBookingSession(event);
+  const data: CreateOrderMarkupsModel = devalue.parse(await event.request.text());
+
+  try {
+    const orderMarkups = await integrationInstances.junctionMobileApi.orders.createOrderMarkups({
+      session,
+      data,
+    });
+
+    utils.setBookingSession({ ...bookingSession, orderMarkups: { id: orderMarkups.id } }, event);
+
+    return new Response(devalue.stringify(orderMarkups), { status: 201 });
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      return new Response(devalue.stringify(err.format()), { status: 422 });
+    }
+
+    return new Response(undefined, { status: 400 });
+  }
+}
+
 export function GET(event): Promise<Response> {
   const session = getSession(event);
   const action = event.url.searchParams.get("action")?.toString();
@@ -288,6 +313,8 @@ export function POST(event): MaybePromise<Response> {
       return confirmPayment(event);
     case "create-order":
       return createOrder(session, event);
+    case "create-order-markups":
+      return createOrderMarkups(session, event);
     default:
       return new Promise((resolve) => resolve(new Response(undefined, { status: 400 })));
   }

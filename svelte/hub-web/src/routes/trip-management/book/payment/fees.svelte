@@ -1,18 +1,46 @@
 <script lang="ts" context="module">
   const feeTypes = ["flat-rate", "percentage"] as const;
   const feeType = z.enum(feeTypes);
-  type FeeType = z.infer<typeof feeType>;
+  export type FeeType = z.infer<typeof feeType>;
 
   const FALLBACK_CURRENCY = "EUR";
 
-  function roundCurrency(num: number): number {
-    return Math.round((num + Number.EPSILON) * 100) / 100;
+  /**
+   * Given the markup fee type, raw input amount, and the baseline total price,
+   * this returns the correct fee amount. Applies rounding to percentage-based
+   * fees.
+   *
+   * @param {FeeType} type - Supported values are "flat-rate" or "percentage".
+   * @param {number} inputAmount - The amount on which the fee is calculated.
+   * @param {number} baselineAmount - When calculating a percentage, this is the baseline amount.
+   * @returns {number} - The calculated fee rounded to the nearest hundredth. Returns `NaN` for unsupported fee types.
+   *
+   * @example
+   * calcFeeAmount("flat-rate", 150.42, 0);        // returns 150.42
+   * calcFeeAmount("percentage", 2, 1000);         // returns 20
+   * calcFeeAmount("unsupported-type", 200, 1000); // returns NaN, should an incorrect type be passed
+   */
+  export function calcFeeAmount(
+    type: FeeType,
+    inputAmount: number,
+    baselineAmount: number,
+  ): number {
+    switch (type) {
+      case "flat-rate":
+        return roundCurrency(inputAmount);
+
+      case "percentage":
+        return roundCurrency((inputAmount / 100) * baselineAmount);
+
+      default:
+        return NaN;
+    }
   }
 </script>
 
 <script lang="ts">
   import { z } from "zod";
-  import { dev } from "$app/environment";
+  import { roundCurrency } from "utils/money";
   import { slideFade } from "transitions/slide-fade";
   import Collapsible from "../../components/collapsible.svelte";
   import LoadingIcon from "components/icons/loading-icon.svelte";
@@ -20,13 +48,20 @@
   import TextField from "components/ui/text-field.svelte";
   import { formatAmount } from "formatting/currency";
   import type { TripOfferPriceQuoteModel } from "integration/junction-mobile-api/schemas/offer";
+  import type { CreateOrderMarkupsModel } from "integration/junction-mobile-api/schemas/order";
 
   export let priceQuote: TripOfferPriceQuoteModel | undefined = undefined;
-  export let orderMarkup;
+  export let orderMarkups: CreateOrderMarkupsModel;
   let collapsible: Collapsible | undefined;
   let serviceFeeType: FeeType;
   let agencyMarkupType: FeeType;
 
+  /**
+   * Returns a formatted string for the fee type select field. Must stay in
+   * scope in order to access `$currency` and comply with the
+   * `SelectField.formatter` property.
+   *
+   */
   function formatFeeType(option?: FeeType): string {
     return option
       ? {
@@ -34,19 +69,6 @@
           percentage: "%",
         }[option]
       : "";
-  }
-
-  function calcFeeAmount(type: FeeType, amount: number, totalPriceAmount: number): number {
-    switch (type) {
-      case "flat-rate":
-        return roundCurrency(amount);
-
-      case "percentage":
-        return roundCurrency((amount / 100) * totalPriceAmount);
-
-      default:
-        return NaN;
-    }
   }
 
   $: totalPrice = priceQuote?.price ?? { currency, amount: 0 };
@@ -65,86 +87,97 @@
     agencyMarkupAmount,
     totalPrice.amount,
   );
-  $: totalToCollectAmount =
-    totalPrice.amount + calculatedServiceFeeAmount + calculatedAgencyMarkupAmount;
-  $: orderMarkup = {};
+  $: totalToCollectAmount = roundCurrency(
+    totalPrice.amount + calculatedServiceFeeAmount + calculatedAgencyMarkupAmount,
+  );
+  $: orderMarkups = {
+    orderId: "",
+    serviceFee: {
+      currency,
+      amount: calculatedServiceFeeAmount,
+    },
+    agencyMarkup: {
+      currency,
+      amount: calculatedAgencyMarkupAmount,
+    },
+    totalToCollect: {
+      currency,
+      amount: totalToCollectAmount,
+    },
+  };
 </script>
 
-{#if !dev}
-  <div />
-{:else}
-  <Collapsible bind:this={collapsible} title="Fees">
-    <div class="details">
-      <div class="input-wrapper">
-        <TextField
-          bind:value={serviceFeeAmount}
-          type="number"
-          min="0"
-          step="0.01"
-          placeholder="Enter amount"
-          label="Service fee"
-        />
+<Collapsible bind:this={collapsible} title="Fees">
+  <div class="details">
+    <div class="input-wrapper">
+      <TextField
+        bind:value={serviceFeeAmount}
+        type="number"
+        min="0"
+        step="0.01"
+        placeholder="Enter amount"
+        label="Service fee"
+      />
 
-        <SelectField
-          formatter={formatFeeType}
-          options={feeTypes}
-          bind:value={serviceFeeType}
-          placeholder="Select fee type"
-          label="&nbsp;"
-        />
+      <SelectField
+        formatter={formatFeeType}
+        options={feeTypes}
+        bind:value={serviceFeeType}
+        placeholder="Select fee type"
+        label="&nbsp;"
+      />
 
-        <TextField
-          bind:value={agencyMarkupAmount}
-          type="number"
-          min="0"
-          step="0.01"
-          placeholder="Enter amount"
-          label="Agency mark-up"
-        />
+      <TextField
+        bind:value={agencyMarkupAmount}
+        type="number"
+        min="0"
+        step="0.01"
+        placeholder="Enter amount"
+        label="Agency mark-up"
+      />
 
-        <SelectField
-          formatter={formatFeeType}
-          options={feeTypes}
-          bind:value={agencyMarkupType}
-          placeholder="Select fee type"
-          label="&nbsp;"
-        />
-      </div>
+      <SelectField
+        formatter={formatFeeType}
+        options={feeTypes}
+        bind:value={agencyMarkupType}
+        placeholder="Select fee type"
+        label="&nbsp;"
+      />
     </div>
+  </div>
 
-    <div class="fees" slot="content-after" let:expanded let:transitionTimeMs>
-      {#if expanded}
-        <div transition:slideFade={{ duration: transitionTimeMs }} class="fees-breakdown">
-          <ul>
-            <li>
-              <span class="typography label-medium">Service fee</span>
-              <span class="typography body-small bold">
-                {formatAmount({ currency, amount: calculatedServiceFeeAmount }, undefined, true)}
-              </span>
-            </li>
-            <li>
-              <span class="typography label-medium">Agency mark-up</span>
-              <span class="typography body-small bold">
-                {formatAmount({ currency, amount: calculatedAgencyMarkupAmount }, undefined, true)}
-              </span>
-            </li>
-          </ul>
-        </div>
-      {/if}
-
-      <div class="total">
-        <span class="typography body-large bold">Total to collect</span>
-        <em class="typography body-large bold">
-          {#if priceQuote?.price}
-            {formatAmount({ currency, amount: totalToCollectAmount }, undefined, true)}
-          {:else}
-            <LoadingIcon size="16px" />
-          {/if}
-        </em>
+  <div class="fees" slot="content-after" let:expanded let:transitionTimeMs>
+    {#if expanded}
+      <div transition:slideFade={{ duration: transitionTimeMs }} class="fees-breakdown">
+        <ul>
+          <li>
+            <span class="typography label-medium">Service fee</span>
+            <span class="typography body-small bold">
+              {formatAmount({ currency, amount: calculatedServiceFeeAmount }, undefined, true)}
+            </span>
+          </li>
+          <li>
+            <span class="typography label-medium">Agency mark-up</span>
+            <span class="typography body-small bold">
+              {formatAmount({ currency, amount: calculatedAgencyMarkupAmount }, undefined, true)}
+            </span>
+          </li>
+        </ul>
       </div>
+    {/if}
+
+    <div class="total">
+      <span class="typography body-large bold">Total to collect</span>
+      <em class="typography body-large bold">
+        {#if priceQuote?.price}
+          {formatAmount({ currency, amount: totalToCollectAmount }, undefined, true)}
+        {:else}
+          <LoadingIcon size="16px" />
+        {/if}
+      </em>
     </div>
-  </Collapsible>
-{/if}
+  </div>
+</Collapsible>
 
 <style>
   .details {

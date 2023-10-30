@@ -250,26 +250,24 @@ export const orderMarkupsModel = schemaModel.create({
     id: z.string().uuid(),
     type: z.literal("markups"),
     attributes: z.object({
-      servicefee: priceModel.schema,
+      serviceFee: priceModel.schema,
       agencyMarkup: priceModel.schema,
       totalToCollect: priceModel.schema,
     }),
     relationships: schemaModel.relationships({
       order: orderModel.identifier,
     }),
-    // TODO: check if this will be implemented
-    links: schemaModel.links({ self: true }),
   }),
   model: z.object({
     id: z.string(),
-    servicefee: priceModel.model,
+    serviceFee: priceModel.model,
     agencyMarkup: priceModel.model,
     totalToCollect: priceModel.model,
     orderId: z.string(),
   }),
   toModel: (data) => ({
     id: data.id,
-    servicefee: priceModel.toModel(data.attributes.servicefee),
+    serviceFee: priceModel.toModel(data.attributes.serviceFee),
     agencyMarkup: priceModel.toModel(data.attributes.agencyMarkup),
     totalToCollect: priceModel.toModel(data.attributes.totalToCollect),
     orderId: data.relationships.order.data.id,
@@ -283,7 +281,7 @@ export const createOrderMarkupsModel = schemaModel.create({
   schema: z.object({
     type: z.literal("markups"),
     attributes: z.object({
-      servicefee: priceModel.schema,
+      serviceFee: priceModel.schema,
       agencyMarkup: priceModel.schema,
       totalToCollect: priceModel.schema,
     }),
@@ -292,7 +290,7 @@ export const createOrderMarkupsModel = schemaModel.create({
     }),
   }),
   model: z.object({
-    servicefee: priceModel.model,
+    serviceFee: priceModel.model,
     agencyMarkup: priceModel.model,
     totalToCollect: priceModel.model,
     orderId: z.string(),
@@ -300,7 +298,7 @@ export const createOrderMarkupsModel = schemaModel.create({
   toSchema: (data) => ({
     type: "markups" as const,
     attributes: {
-      servicefee: priceModel.toSchema(data.servicefee),
+      serviceFee: priceModel.toSchema(data.serviceFee),
       agencyMarkup: priceModel.toSchema(data.agencyMarkup),
       totalToCollect: priceModel.toSchema(data.totalToCollect),
     },
@@ -309,8 +307,9 @@ export const createOrderMarkupsModel = schemaModel.create({
     },
   }),
 });
-export type CreateOrderMarkupsModel = Infer<typeof createOrderModel>;
-export type CreateOrderMarkupsSchema = Infer<typeof createOrderModel, "schema">;
+
+export type CreateOrderMarkupsModel = Infer<typeof createOrderMarkupsModel>;
+export type CreateOrderMarkupsSchema = Infer<typeof createOrderMarkupsModel, "schema">;
 
 export type OrderIncludes =
   | JourneySchema

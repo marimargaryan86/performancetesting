@@ -14,6 +14,7 @@ export async function load(event): Promise<{
   priceQuote: TripOfferPriceQuoteModel;
   selected: NonNullable<BookingSessionModel["selected"]>;
   paymentIntent: BookingSessionModel["paymentIntent"];
+  orderId?: string;
 }> {
   const session = getSession(event);
 
@@ -34,6 +35,7 @@ export async function load(event): Promise<{
       priceQuote,
       selected: bookingSession.selected,
       paymentIntent: bookingSession.paymentIntent,
+      orderId: bookingSession.order?.id,
     };
   } catch {
     throw redirect(303, routeConfig.routes.tripManagement.routes.book.root);
