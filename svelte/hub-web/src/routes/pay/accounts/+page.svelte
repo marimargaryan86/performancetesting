@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { dev } from "$app/environment";
   import ChevronIcon from "components/icons/chevron-icon.svelte";
   import StandardLayout from "components/page/standard-layout.svelte";
   import EntityAvatar from "components/ui/entity-avatar.svelte";
@@ -40,26 +41,30 @@
   <title>Accounts · Pay · Junction Hub</title>
 </svelte:head>
 
-<StandardLayout pageTitle="Accounts" bind:searchQuery>
-  <div class="wrapper">
-    <h2 class="typography title-medium bold">Sub accounts</h2>
+{#if !dev}
+  <div />
+{:else}
+  <StandardLayout pageTitle="Accounts" bind:searchQuery>
+    <div class="wrapper">
+      <h2 class="typography title-medium bold">Sub accounts</h2>
 
-    <ul class="accounts" data-sveltekit-preload-data="off" use:scrollLoad={{ func: loadMore }}>
-      {#each accounts as account (account.id)}
-        <li>
-          <a
-            href={routeConfig.routes.pay.routes.accounts.routes.account(account.id).root}
-            class="account"
-          >
-            <EntityAvatar name={account.name} size="72px" />
-            <span class="account-name typography body-large">{account.name}</span>
-            <ChevronIcon size="20px" color="var(--color-main-neutral-700)" />
-          </a>
-        </li>
-      {/each}
-    </ul>
-  </div>
-</StandardLayout>
+      <ul class="accounts" data-sveltekit-preload-data="off" use:scrollLoad={{ func: loadMore }}>
+        {#each accounts as account (account.id)}
+          <li>
+            <a
+              href={routeConfig.routes.pay.routes.accounts.routes.account(account.id).root}
+              class="account"
+            >
+              <EntityAvatar name={account.name} size="72px" />
+              <span class="account-name typography body-large">{account.name}</span>
+              <ChevronIcon size="20px" color="var(--color-main-neutral-700)" />
+            </a>
+          </li>
+        {/each}
+      </ul>
+    </div>
+  </StandardLayout>
+{/if}
 
 <style>
   .wrapper {

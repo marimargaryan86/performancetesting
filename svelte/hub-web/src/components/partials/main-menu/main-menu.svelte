@@ -38,7 +38,9 @@
 </script>
 
 <nav class="main-menu" class:expanded style:--transition-time="{transitionTimeMs}ms">
-  <HubLogo showText={expanded} {transitionTimeMs} />
+  <a href={routeConfig.root}>
+    <HubLogo showText={expanded} {transitionTimeMs} />
+  </a>
 
   <button class="toggle" on:click={toggle}>
     <ChevronIcon color="var(--color-common-dark-strong)" direction={expanded ? "left" : "right"} />

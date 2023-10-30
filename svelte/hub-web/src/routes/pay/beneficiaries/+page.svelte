@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { dev } from "$app/environment";
   import Header from "components/ui/table/header.svelte";
   import TBody from "components/ui/table/t-body.svelte";
   import TCol from "components/ui/table/t-col.svelte";
@@ -56,62 +57,66 @@
   <title>Beneficiaries · Pay · Junction Hub</title>
 </svelte:head>
 
-<StandardLayout pageTitle="Beneficiaries" bind:searchQuery>
-  <Button
-    size="small"
-    href={routeConfig.routes.pay.routes.beneficiaries.routes.beneficiary().root}
-    preload={false}
-    slot="actions"
-  >
-    Add Beneficiary
-    <PlusIcon />
-  </Button>
+{#if !dev}
+  <div />
+{:else}
+  <StandardLayout pageTitle="Beneficiaries" bind:searchQuery>
+    <Button
+      size="small"
+      href={routeConfig.routes.pay.routes.beneficiaries.routes.beneficiary().root}
+      preload={false}
+      slot="actions"
+    >
+      Add Beneficiary
+      <PlusIcon />
+    </Button>
 
-  <Table class="beneficiaries-table" {loadMore}>
-    <THead>
-      <Header bind:sortGroup bind:sortDirection sortValue="companyName">Company</Header>
-      <Header>Currency</Header>
-      <Header bind:sortGroup bind:sortDirection sortValue="bankDetails.address.countryCode">
-        Bank Country
-      </Header>
-      <Header>Type</Header>
-      <Header />
-    </THead>
+    <Table class="beneficiaries-table" {loadMore}>
+      <THead>
+        <Header bind:sortGroup bind:sortDirection sortValue="companyName">Company</Header>
+        <Header>Currency</Header>
+        <Header bind:sortGroup bind:sortDirection sortValue="bankDetails.address.countryCode">
+          Bank Country
+        </Header>
+        <Header>Type</Header>
+        <Header />
+      </THead>
 
-    <TBody>
-      {#each beneficiaries as item (item.id)}
-        {@const currency = data.currencies.get(item.currencyCode)}
+      <TBody>
+        {#each beneficiaries as item (item.id)}
+          {@const currency = data.currencies.get(item.currencyCode)}
 
-        <TRow alternatingBackground={false}>
-          <TCol class="company-name typography body-medium bold">{item.companyName}</TCol>
-          <TCol>
-            <div class="currency">
-              <strong class="typography body-medium bold">{item.currencyCode}</strong>
-              <span class="typography body-small">{currency?.name ?? ""}</span>
-            </div>
-          </TCol>
-          <TCol class="typography body-medium bold">{item.bankDetails.address.countryCode}</TCol>
-          <TCol class="typography body-medium">{capitalize(item.bankDetails.paymentType)}</TCol>
-          <TActionsCol>
-            <a
-              href={routeConfig.routes.pay.routes.beneficiaries.routes.beneficiary(item.id).root}
-              data-sveltekit-preload-data="off"
-              class="action"
-            >
-              <EditIcon />
-            </a>
+          <TRow alternatingBackground={false}>
+            <TCol class="company-name typography body-medium bold">{item.companyName}</TCol>
+            <TCol>
+              <div class="currency">
+                <strong class="typography body-medium bold">{item.currencyCode}</strong>
+                <span class="typography body-small">{currency?.name ?? ""}</span>
+              </div>
+            </TCol>
+            <TCol class="typography body-medium bold">{item.bankDetails.address.countryCode}</TCol>
+            <TCol class="typography body-medium">{capitalize(item.bankDetails.paymentType)}</TCol>
+            <TActionsCol>
+              <a
+                href={routeConfig.routes.pay.routes.beneficiaries.routes.beneficiary(item.id).root}
+                data-sveltekit-preload-data="off"
+                class="action"
+              >
+                <EditIcon />
+              </a>
 
-            <button on:click={remove.bind(remove)} class="action">
-              <RemoveIcon variant="trash-can" />
-            </button>
+              <button on:click={remove.bind(remove)} class="action">
+                <RemoveIcon variant="trash-can" />
+              </button>
 
-            <button class="outline action typography body-medium bold">Pay</button>
-          </TActionsCol>
-        </TRow>
-      {/each}
-    </TBody>
-  </Table>
-</StandardLayout>
+              <button class="outline action typography body-medium bold">Pay</button>
+            </TActionsCol>
+          </TRow>
+        {/each}
+      </TBody>
+    </Table>
+  </StandardLayout>
+{/if}
 
 <style>
   :global(.table.beneficiaries-table) {

@@ -33,14 +33,7 @@
   export let expanded: boolean;
   export let transitionTimeMs: number;
 
-  let menuItems: (MenuItem | SubMenu)[] = [
-    {
-      type: "menu-item",
-      url: routeConfig.root,
-      label: "Dashboard",
-      icon: DashboardIcon,
-      exact: true,
-    },
+  let allMenuItems: (MenuItem | SubMenu)[] = [
     {
       type: "menu-item",
       url: routeConfig.routes.tripManagement.routes.book.root,
@@ -61,6 +54,19 @@
     },
     {
       type: "menu-item",
+      url: routeConfig.routes.pay.routes.bills.root,
+      label: "Bills",
+      icon: BillIcon,
+    },
+    {
+      type: "menu-item",
+      url: routeConfig.root,
+      label: "Dashboard",
+      icon: DashboardIcon,
+      exact: true,
+    },
+    {
+      type: "menu-item",
       url: routeConfig.routes.pay.routes.accounts.root,
       label: "Accounts",
       icon: AccountsIcon,
@@ -73,17 +79,14 @@
     },
     {
       type: "menu-item",
-      url: routeConfig.routes.pay.routes.bills.root,
-      label: "Bills",
-      icon: BillIcon,
-    },
-    {
-      type: "menu-item",
       url: routeConfig.routes.go.routes.bookings.root,
       label: "Bookings",
       icon: BookingsIcon,
     },
   ];
+
+  // TODO: We need to eventually prune unused routes and components.
+  let menuItems: (MenuItem | SubMenu)[] = allMenuItems.slice(0, 4);
 
   function toggle(menuItem: SubMenu): void {
     menuItem.expanded = !menuItem.expanded;

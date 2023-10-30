@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { dev } from "$app/environment";
   import Header from "components/ui/table/header.svelte";
   import TBody from "components/ui/table/t-body.svelte";
   import TCol from "components/ui/table/t-col.svelte";
@@ -22,37 +23,41 @@
   <title>All · Bookings · Go · Junction Hub</title>
 </svelte:head>
 
-<Table class="bookings-table">
-  <THead>
-    <Header>Booking Reference</Header>
-    <Header>Passenger Name</Header>
-    <Header>Ticket</Header>
-    <Header bind:sortGroup bind:sortDirection>Departure Date</Header>
-    <Header>Provider</Header>
-    <Header>Reseller</Header>
-    <Header bind:sortGroup bind:sortDirection sortValue="createdAt">Created Date</Header>
-    <Header>Total Price</Header>
-    <Header bind:sortGroup bind:sortDirection sortValue="status">Booking Status</Header>
-    <Header bind:sortGroup bind:sortDirection>Refund Status</Header>
-  </THead>
+{#if !dev}
+  <div />
+{:else}
+  <Table class="bookings-table">
+    <THead>
+      <Header>Booking Reference</Header>
+      <Header>Passenger Name</Header>
+      <Header>Ticket</Header>
+      <Header bind:sortGroup bind:sortDirection>Departure Date</Header>
+      <Header>Provider</Header>
+      <Header>Reseller</Header>
+      <Header bind:sortGroup bind:sortDirection sortValue="createdAt">Created Date</Header>
+      <Header>Total Price</Header>
+      <Header bind:sortGroup bind:sortDirection sortValue="status">Booking Status</Header>
+      <Header bind:sortGroup bind:sortDirection>Refund Status</Header>
+    </THead>
 
-  <TBody>
-    {#each bookings as booking}
-      <TRow alternatingBackground={false}>
-        <TCol maxWidth="96px" copyable class="green">123ABC456{booking}</TCol>
-        <TCol>Jerry Smith</TCol>
-        <TCol class="green">Download</TCol>
-        <TCol>02/11/23</TCol>
-        <TCompanyCol maxWidth="160px" companyName="Renfe" img="/images/renfe-logo.png" />
-        <TCompanyCol maxWidth="160px" companyName="Malaga TA" />
-        <TCol>02/11/23</TCol>
-        <TMoneyCol money={{ amount: 2952.9, currency: "USD" }} />
-        <TStatusBadgeCol value="pending" />
-        <TCol maxWidth="96px" class="green">View</TCol>
-      </TRow>
-    {/each}
-  </TBody>
-</Table>
+    <TBody>
+      {#each bookings as booking}
+        <TRow alternatingBackground={false}>
+          <TCol maxWidth="96px" copyable class="green">123ABC456{booking}</TCol>
+          <TCol>Jerry Smith</TCol>
+          <TCol class="green">Download</TCol>
+          <TCol>02/11/23</TCol>
+          <TCompanyCol maxWidth="160px" companyName="Renfe" img="/images/renfe-logo.png" />
+          <TCompanyCol maxWidth="160px" companyName="Malaga TA" />
+          <TCol>02/11/23</TCol>
+          <TMoneyCol money={{ amount: 2952.9, currency: "USD" }} />
+          <TStatusBadgeCol value="pending" />
+          <TCol maxWidth="96px" class="green">View</TCol>
+        </TRow>
+      {/each}
+    </TBody>
+  </Table>
+{/if}
 
 <style>
   :global(.table.bookings-table) {
