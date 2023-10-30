@@ -6888,6 +6888,14 @@
         "time_zone": "Africa/Lagos"
     },
     {
+        "iata_code": "BNJ",
+        "iata_country_code": "DE",
+        "latitude": 50.731944444444444,
+        "longitude": 7.0969444444444445,
+        "name": "Bonn Hauptbahnhof",
+        "time_zone": "Europe/Berlin"
+    },
+    {
         "iata_code": "BNK",
         "iata_country_code": "AU",
         "latitude": -28.835756,
@@ -16384,6 +16392,14 @@
         "time_zone": "America/New_York"
     },
     {
+        "iata_code": "EEP",
+        "iata_country_code": "ES",
+        "latitude": 42.81666666666667,
+        "longitude": -1.65,
+        "name": "Pamplona",
+        "time_zone": "Europe/Madrid"
+    },
+    {
         "iata_code": "EFD",
         "iata_country_code": "US",
         "latitude": 29.599735,
@@ -19624,6 +19640,14 @@
         "time_zone": "Australia/Perth"
     },
     {
+        "iata_code": "FVS",
+        "iata_country_code": "RU",
+        "latitude": 59.955555555555556,
+        "longitude": 30.35666666666667,
+        "name": "Finland Station",
+        "time_zone": "Europe/Moscow"
+    },
+    {
         "iata_code": "FWA",
         "iata_country_code": "US",
         "latitude": 40.981583,
@@ -20678,6 +20702,14 @@
         "longitude": -106.615002,
         "name": "Glasgow Valley County Airport",
         "time_zone": "America/Denver"
+    },
+    {
+        "iata_code": "GGZ",
+        "iata_country_code": "AT",
+        "latitude": 47.07222222222222,
+        "longitude": 15.417222222222222,
+        "name": "Graz Hauptbahnhof",
+        "time_zone": "Europe/Vienna"
     },
     {
         "iata_code": "GHA",
@@ -23200,6 +23232,14 @@
         "time_zone": "Asia/Rangoon"
     },
     {
+        "iata_code": "HEC",
+        "iata_country_code": "FI",
+        "latitude": 60.17194444444444,
+        "longitude": 24.941388888888888,
+        "name": "Helsinki Central railway station",
+        "time_zone": "Europe/Helsinki"
+    },
+    {
         "iata_code": "HED",
         "iata_country_code": "US",
         "latitude": 55.801397,
@@ -24552,6 +24592,14 @@
         "time_zone": "America/New_York"
     },
     {
+        "iata_code": "HSR",
+        "iata_country_code": "IN",
+        "latitude": 22.388055555555557,
+        "longitude": 71.02833333333334,
+        "name": "Rajkot International Airport",
+        "time_zone": "Asia/Calcutta"
+    },
+    {
         "iata_code": "HSS",
         "iata_country_code": "IN",
         "latitude": 29.178495,
@@ -24974,6 +25022,14 @@
         "longitude": -80.117933,
         "name": "Hartsville Regional Airport",
         "time_zone": "America/New_York"
+    },
+    {
+        "iata_code": "HVT",
+        "iata_country_code": "FI",
+        "latitude": 60.29388888888889,
+        "longitude": 25.045,
+        "name": "Tikkurila railway station",
+        "time_zone": "Europe/Helsinki"
     },
     {
         "iata_code": "HWA",
@@ -26382,6 +26438,14 @@
         "longitude": 20.822398,
         "name": "Ioannina National Airport",
         "time_zone": "Europe/Athens"
+    },
+    {
+        "iata_code": "IOB",
+        "iata_country_code": "AT",
+        "latitude": 47.263888888888886,
+        "longitude": 11.400833333333333,
+        "name": "Innsbruck Hauptbahnhof",
+        "time_zone": "Europe/Vienna"
     },
     {
         "iata_code": "IOK",
@@ -29822,6 +29886,14 @@
         "longitude": 116.164463,
         "name": "Keningau Airport",
         "time_zone": "Asia/Kuching"
+    },
+    {
+        "iata_code": "KGV",
+        "iata_country_code": "AT",
+        "latitude": 46.615833333333335,
+        "longitude": 14.313333333333334,
+        "name": "Klagenfurt Hauptbahnhof",
+        "time_zone": "Europe/Vienna"
     },
     {
         "iata_code": "KGW",
@@ -36454,6 +36526,14 @@
         "longitude": 145.454601,
         "name": "Lizard Island Airport",
         "time_zone": "Australia/Brisbane"
+    },
+    {
+        "iata_code": "LZS",
+        "iata_country_code": "AT",
+        "latitude": 48.29055555555556,
+        "longitude": 14.29111111111111,
+        "name": "Linz Hauptbahnhof",
+        "time_zone": "Europe/Vienna"
     },
     {
         "iata_code": "LZU",
@@ -48967,6 +49047,14 @@
         "time_zone": "America/Sao_Paulo"
     },
     {
+        "iata_code": "POK",
+        "iata_country_code": "AT",
+        "latitude": 48.20805555555556,
+        "longitude": 15.623888888888889,
+        "name": "St. Pölten Hauptbahnhof",
+        "time_zone": "Europe/Vienna"
+    },
+    {
         "iata_code": "POL",
         "iata_country_code": "MZ",
         "latitude": -12.991738,
@@ -50583,6 +50671,38 @@
         "time_zone": "Europe/London"
     },
     {
+        "iata_code": "QDH",
+        "iata_country_code": "GB",
+        "latitude": 51.14361111111111,
+        "longitude": 0.875,
+        "name": "Ashford International",
+        "time_zone": "Europe/London"
+    },
+    {
+        "iata_code": "QDU",
+        "iata_country_code": "DE",
+        "latitude": 51.22027777777778,
+        "longitude": 6.792777777777777,
+        "name": "Düsseldorf Hauptbahnhof",
+        "time_zone": "Europe/Berlin"
+    },
+    {
+        "iata_code": "QFB",
+        "iata_country_code": "DE",
+        "latitude": 47.99777777777778,
+        "longitude": 7.841944444444444,
+        "name": "Freiburg Hauptbahnhof",
+        "time_zone": "Europe/Berlin"
+    },
+    {
+        "iata_code": "QFV",
+        "iata_country_code": "NO",
+        "latitude": 60.390277777777776,
+        "longitude": 5.333055555555555,
+        "name": "Bergen railway station",
+        "time_zone": "Europe/Oslo"
+    },
+    {
         "iata_code": "QHU",
         "iata_country_code": "DE",
         "latitude": 54.50827,
@@ -50591,12 +50711,44 @@
         "time_zone": "Europe/Berlin"
     },
     {
+        "iata_code": "QJZ",
+        "iata_country_code": "FR",
+        "latitude": 47.21666666666667,
+        "longitude": -1.5416666666666665,
+        "name": "Gare de Nantes",
+        "time_zone": "Europe/Paris"
+    },
+    {
+        "iata_code": "QKL",
+        "iata_country_code": "DE",
+        "latitude": 50.942499999999995,
+        "longitude": 6.958055555555556,
+        "name": "Köln Hauptbahnhof",
+        "time_zone": "Europe/Berlin"
+    },
+    {
+        "iata_code": "QLJ",
+        "iata_country_code": "CH",
+        "latitude": 47.05016944444444,
+        "longitude": 8.310161111111112,
+        "name": "Lucerne railway station",
+        "time_zone": "Europe/Zurich"
+    },
+    {
         "iata_code": "QLR",
         "iata_country_code": "PT",
         "latitude": 39.828335,
         "longitude": -8.8875,
         "name": "Air Force Base No. 5 Airport",
         "time_zone": "Europe/Lisbon"
+    },
+    {
+        "iata_code": "QLS",
+        "iata_country_code": "CH",
+        "latitude": 46.51983333333333,
+        "longitude": 6.6335,
+        "name": "Lausanne",
+        "time_zone": "Europe/Zurich"
     },
     {
         "iata_code": "QOW",
@@ -50615,6 +50767,62 @@
         "time_zone": "Asia/Singapore"
     },
     {
+        "iata_code": "QPP",
+        "iata_country_code": "DE",
+        "latitude": 52.525,
+        "longitude": 13.369444444444445,
+        "name": "Berlin Hauptbahnhof",
+        "time_zone": "Europe/Berlin"
+    },
+    {
+        "iata_code": "QQK",
+        "iata_country_code": "GB",
+        "latitude": 51.530833333333334,
+        "longitude": -0.12333333333333334,
+        "name": "King's Cross railway station",
+        "time_zone": "Europe/London"
+    },
+    {
+        "iata_code": "QQN",
+        "iata_country_code": "GB",
+        "latitude": 52.47777777777778,
+        "longitude": -1.8988888888888888,
+        "name": "Birmingham New Street railway station",
+        "time_zone": "Europe/London"
+    },
+    {
+        "iata_code": "QQP",
+        "iata_country_code": "GB",
+        "latitude": 51.51722222222222,
+        "longitude": -0.1775,
+        "name": "Paddington railway station",
+        "time_zone": "Europe/London"
+    },
+    {
+        "iata_code": "QQS",
+        "iata_country_code": "GB",
+        "latitude": 51.53,
+        "longitude": -0.12527777777777777,
+        "name": "St Pancras railway station",
+        "time_zone": "Europe/London"
+    },
+    {
+        "iata_code": "QQU",
+        "iata_country_code": "GB",
+        "latitude": 51.52833333333333,
+        "longitude": -0.13305555555555557,
+        "name": "Euston railway station",
+        "time_zone": "Europe/London"
+    },
+    {
+        "iata_code": "QQY",
+        "iata_country_code": "GB",
+        "latitude": 53.958333333333336,
+        "longitude": -1.0930555555555554,
+        "name": "York railway station",
+        "time_zone": "Europe/London"
+    },
+    {
         "iata_code": "QRA",
         "iata_country_code": "ZA",
         "latitude": -26.242023,
@@ -50631,6 +50839,14 @@
         "time_zone": "America/Santiago"
     },
     {
+        "iata_code": "QRH",
+        "iata_country_code": "NL",
+        "latitude": 51.92444444444444,
+        "longitude": 4.469444444444445,
+        "name": "Rotterdam Centraal railway station",
+        "time_zone": "Europe/Amsterdam"
+    },
+    {
         "iata_code": "QRO",
         "iata_country_code": "MX",
         "latitude": 20.619168,
@@ -50645,6 +50861,14 @@
         "longitude": 5.818531,
         "name": "Warri Airport",
         "time_zone": "Africa/Lagos"
+    },
+    {
+        "iata_code": "QRZ",
+        "iata_country_code": "NL",
+        "latitude": 51.595,
+        "longitude": 4.78,
+        "name": "Breda railway station",
+        "time_zone": "Europe/Amsterdam"
     },
     {
         "iata_code": "QSC",
@@ -50723,8 +50947,24 @@
         "iata_country_code": "FR",
         "latitude": 43.50527777777778,
         "longitude": 5.367222222222222,
-        "name": "Aix-en-Provence Aerodrome",
+        "name": "Aix-en-Provence TGV railway station",
         "time_zone": "Europe/Paris"
+    },
+    {
+        "iata_code": "QXG",
+        "iata_country_code": "FR",
+        "latitude": 47.46472222222223,
+        "longitude": -0.5569444444444445,
+        "name": "Gare d'Angers-Saint-Laud",
+        "time_zone": "Europe/Paris"
+    },
+    {
+        "iata_code": "QYX",
+        "iata_country_code": "SE",
+        "latitude": 59.85861111111111,
+        "longitude": 17.64611111111111,
+        "name": "Uppsala Central Station",
+        "time_zone": "Europe/Stockholm"
     },
     {
         "iata_code": "RAA",
@@ -53239,6 +53479,14 @@
         "time_zone": "America/Montevideo"
     },
     {
+        "iata_code": "RWA",
+        "iata_country_code": "PL",
+        "latitude": 52.228611111111114,
+        "longitude": 21.003055555555555,
+        "name": "Warsaw Central station",
+        "time_zone": "Europe/Warsaw"
+    },
+    {
         "iata_code": "RWF",
         "iata_country_code": "US",
         "latitude": 44.547206,
@@ -53469,6 +53717,14 @@
         "longitude": 44.218935,
         "name": "Sana'a International Airport",
         "time_zone": "Asia/Aden"
+    },
+    {
+        "iata_code": "SAI",
+        "iata_country_code": "KH",
+        "latitude": 13.375278,
+        "longitude": 104.220833,
+        "name": "Siem Reap-Angkor International Airport",
+        "time_zone": "Asia/Phnom_Penh"
     },
     {
         "iata_code": "SAK",
@@ -54637,6 +54893,14 @@
         "longitude": -95.654696,
         "name": "Sugar Land Regional Airport",
         "time_zone": "America/Chicago"
+    },
+    {
+        "iata_code": "SGS",
+        "iata_country_code": "JP",
+        "latitude": 35.62861111111111,
+        "longitude": 139.73916666666665,
+        "name": "Shinagawa Station",
+        "time_zone": "Asia/Tokyo"
     },
     {
         "iata_code": "SGT",
@@ -61759,6 +62023,14 @@
         "time_zone": "Asia/Tokyo"
     },
     {
+        "iata_code": "TTK",
+        "iata_country_code": "GB",
+        "latitude": 51.58833333333334,
+        "longitude": -0.059722222222222225,
+        "name": "Tottenham Hale station",
+        "time_zone": "Europe/London"
+    },
+    {
         "iata_code": "TTL",
         "iata_country_code": "FJ",
         "latitude": -16.966,
@@ -67463,12 +67735,28 @@
         "time_zone": "Africa/Ouagadougou"
     },
     {
+        "iata_code": "XAT",
+        "iata_country_code": "FR",
+        "latitude": 43.58583333333333,
+        "longitude": 7.1194444444444445,
+        "name": "Gare d'Antibes",
+        "time_zone": "Europe/Paris"
+    },
+    {
         "iata_code": "XAU",
         "iata_country_code": "GF",
         "latitude": 3.615923,
         "longitude": -53.203323,
         "name": "Saül Airport",
         "time_zone": "America/Cayenne"
+    },
+    {
+        "iata_code": "XAX",
+        "iata_country_code": "CA",
+        "latitude": 45.44888888888889,
+        "longitude": -73.74138888888889,
+        "name": "Dorval",
+        "time_zone": "America/Toronto"
     },
     {
         "iata_code": "XBB",
@@ -67487,6 +67775,14 @@
         "time_zone": "America/Winnipeg"
     },
     {
+        "iata_code": "XBF",
+        "iata_country_code": "FR",
+        "latitude": 46.109425,
+        "longitude": 5.823483055555555,
+        "name": "Gare de Bellegarde",
+        "time_zone": "Europe/Paris"
+    },
+    {
         "iata_code": "XBG",
         "iata_country_code": "BF",
         "latitude": 12.981037,
@@ -67501,6 +67797,14 @@
         "longitude": 59.29071,
         "name": "Birjand Airport",
         "time_zone": "Asia/Tehran"
+    },
+    {
+        "iata_code": "XBK",
+        "iata_country_code": "FR",
+        "latitude": 46.2,
+        "longitude": 5.214722222222222,
+        "name": "Gare de Bourg-en-Bresse",
+        "time_zone": "Europe/Paris"
     },
     {
         "iata_code": "XBL",
@@ -67533,6 +67837,14 @@
         "longitude": -75.749882,
         "name": "Brockville Regional Tackaberry Airport",
         "time_zone": "America/Toronto"
+    },
+    {
+        "iata_code": "XCG",
+        "iata_country_code": "FR",
+        "latitude": 43.657777777777774,
+        "longitude": 7.148055555555556,
+        "name": "Gare de Cagnes-sur-Mer",
+        "time_zone": "Europe/Paris"
     },
     {
         "iata_code": "XCH",
@@ -67591,12 +67903,76 @@
         "time_zone": "Africa/Ouagadougou"
     },
     {
+        "iata_code": "XDH",
+        "iata_country_code": "CA",
+        "latitude": 52.876111111111115,
+        "longitude": -118.07972222222222,
+        "name": "Jasper railway station",
+        "time_zone": "America/Edmonton"
+    },
+    {
         "iata_code": "XDJ",
         "iata_country_code": "BF",
         "latitude": 14.125655,
         "longitude": -1.624604,
         "name": "Djibo Airport",
         "time_zone": "Africa/Ouagadougou"
+    },
+    {
+        "iata_code": "XDS",
+        "iata_country_code": "CA",
+        "latitude": 45.41638888888889,
+        "longitude": -75.65166666666667,
+        "name": "Ottawa Train Station",
+        "time_zone": "America/Toronto"
+    },
+    {
+        "iata_code": "XDV",
+        "iata_country_code": "CA",
+        "latitude": 53.91916666666666,
+        "longitude": -122.74416666666667,
+        "name": "Prince George railway station",
+        "time_zone": "America/Vancouver"
+    },
+    {
+        "iata_code": "XDW",
+        "iata_country_code": "CA",
+        "latitude": 54.295833333333334,
+        "longitude": -130.35194444444443,
+        "name": "Prince Rupert railway station",
+        "time_zone": "America/Vancouver"
+    },
+    {
+        "iata_code": "XDZ",
+        "iata_country_code": "CA",
+        "latitude": 53.823888888888895,
+        "longitude": -101.24777777777778,
+        "name": "The Pas railway station",
+        "time_zone": "America/Winnipeg"
+    },
+    {
+        "iata_code": "XEA",
+        "iata_country_code": "CA",
+        "latitude": 49.27361111111111,
+        "longitude": -123.09805555555555,
+        "name": "Pacific Central Station",
+        "time_zone": "America/Vancouver"
+    },
+    {
+        "iata_code": "XED",
+        "iata_country_code": "FR",
+        "latitude": 48.87027777777778,
+        "longitude": 2.7827777777777776,
+        "name": "Gare de Marne-la-Vallée – Chessy",
+        "time_zone": "Europe/Paris"
+    },
+    {
+        "iata_code": "XEF",
+        "iata_country_code": "CA",
+        "latitude": 49.888888888888886,
+        "longitude": -97.13416666666667,
+        "name": "Union Station",
+        "time_zone": "America/Winnipeg"
     },
     {
         "iata_code": "XEN",
@@ -67615,12 +67991,36 @@
         "time_zone": "America/Chicago"
     },
     {
+        "iata_code": "XEV",
+        "iata_country_code": "SE",
+        "latitude": 59.330000000000005,
+        "longitude": 18.05611111111111,
+        "name": "Stockholm Central Station",
+        "time_zone": "Europe/Stockholm"
+    },
+    {
+        "iata_code": "XFJ",
+        "iata_country_code": "SE",
+        "latitude": 59.37083333333334,
+        "longitude": 16.509722222222223,
+        "name": "Eskilstuna",
+        "time_zone": "Europe/Stockholm"
+    },
+    {
         "iata_code": "XFN",
         "iata_country_code": "CN",
         "latitude": 32.150045,
         "longitude": 112.292009,
         "name": "Xiangyang Liuji Airport",
         "time_zone": "Asia/Shanghai"
+    },
+    {
+        "iata_code": "XFP",
+        "iata_country_code": "SE",
+        "latitude": 55.60944444444445,
+        "longitude": 13.000833333333333,
+        "name": "Malmö Central Station",
+        "time_zone": "Europe/Stockholm"
     },
     {
         "iata_code": "XFW",
@@ -67639,12 +68039,44 @@
         "time_zone": "Africa/Ouagadougou"
     },
     {
+        "iata_code": "XGB",
+        "iata_country_code": "FR",
+        "latitude": 48.84,
+        "longitude": 2.3186111111111107,
+        "name": "Gare Montparnasse",
+        "time_zone": "Europe/Paris"
+    },
+    {
+        "iata_code": "XGC",
+        "iata_country_code": "SE",
+        "latitude": 55.70527777777778,
+        "longitude": 13.187222222222223,
+        "name": "Lund Central Station",
+        "time_zone": "Europe/Stockholm"
+    },
+    {
         "iata_code": "XGG",
         "iata_country_code": "BF",
         "latitude": 14.455091,
         "longitude": -0.21851,
         "name": "Gorom-Gorom Airport",
         "time_zone": "Africa/Ouagadougou"
+    },
+    {
+        "iata_code": "XGH",
+        "iata_country_code": "NO",
+        "latitude": 60.863055555555555,
+        "longitude": 7.113888888888889,
+        "name": "Flåm Station",
+        "time_zone": "Europe/Oslo"
+    },
+    {
+        "iata_code": "XGJ",
+        "iata_country_code": "CA",
+        "latitude": 43.96805555555556,
+        "longitude": -78.17083333333333,
+        "name": "Cobourg railway station",
+        "time_zone": "America/Toronto"
     },
     {
         "iata_code": "XGN",
@@ -67660,6 +68092,38 @@
         "latitude": 58.711394,
         "longitude": -65.992787,
         "name": "Kangiqsualujjuaq",
+        "time_zone": "America/Toronto"
+    },
+    {
+        "iata_code": "XGZ",
+        "iata_country_code": "AT",
+        "latitude": 47.502885,
+        "longitude": 9.739578888888888,
+        "name": "Bregenz railway station",
+        "time_zone": "Europe/Vienna"
+    },
+    {
+        "iata_code": "XHJ",
+        "iata_country_code": "DE",
+        "latitude": 50.7675,
+        "longitude": 6.091111111111111,
+        "name": "Aachen Hauptbahnhof",
+        "time_zone": "Europe/Berlin"
+    },
+    {
+        "iata_code": "XHK",
+        "iata_country_code": "FR",
+        "latitude": 44.99166666666667,
+        "longitude": 4.978611111111111,
+        "name": "Gare de Valence TGV",
+        "time_zone": "Europe/Paris"
+    },
+    {
+        "iata_code": "XIA",
+        "iata_country_code": "CA",
+        "latitude": 43.54416666666666,
+        "longitude": -80.24694444444445,
+        "name": "Guelph Central Station",
         "time_zone": "America/Toronto"
     },
     {
@@ -67695,6 +68159,14 @@
         "time_zone": "Asia/Kuwait"
     },
     {
+        "iata_code": "XIK",
+        "iata_country_code": "IT",
+        "latitude": 45.486111111111114,
+        "longitude": 9.20361111111111,
+        "name": "Milano Centrale Railway Station",
+        "time_zone": "Europe/Rome"
+    },
+    {
         "iata_code": "XIL",
         "iata_country_code": "CN",
         "latitude": 43.91759,
@@ -67711,12 +68183,28 @@
         "time_zone": "Asia/Shanghai"
     },
     {
+        "iata_code": "XIT",
+        "iata_country_code": "DE",
+        "latitude": 51.34527777777778,
+        "longitude": 12.382222222222223,
+        "name": "Leipzig Hauptbahnhof",
+        "time_zone": "Europe/Berlin"
+    },
+    {
         "iata_code": "XIY",
         "iata_country_code": "CN",
         "latitude": 34.435531,
         "longitude": 108.758129,
         "name": "Xi'an Xianyang International Airport",
         "time_zone": "Asia/Shanghai"
+    },
+    {
+        "iata_code": "XIZ",
+        "iata_country_code": "FR",
+        "latitude": 49.215,
+        "longitude": 3.993888888888889,
+        "name": "Gare de Champagne-Ardenne TGV",
+        "time_zone": "Europe/Paris"
     },
     {
         "iata_code": "XJD",
@@ -67735,6 +68223,14 @@
         "time_zone": "Asia/Karachi"
     },
     {
+        "iata_code": "XJY",
+        "iata_country_code": "FR",
+        "latitude": 48.726111111111116,
+        "longitude": 2.2616666666666667,
+        "name": "Gare de Massy TGV",
+        "time_zone": "Europe/Paris"
+    },
+    {
         "iata_code": "XKA",
         "iata_country_code": "BF",
         "latitude": 12.464387,
@@ -67749,6 +68245,14 @@
         "longitude": 103.160966,
         "name": "Xieng Khouang Airport",
         "time_zone": "Asia/Vientiane"
+    },
+    {
+        "iata_code": "XKL",
+        "iata_country_code": "MY",
+        "latitude": 3.1341666666666668,
+        "longitude": 101.6863888888889,
+        "name": "KL Sentral",
+        "time_zone": "Asia/Kuala_Lumpur"
     },
     {
         "iata_code": "XKS",
@@ -67775,6 +68279,14 @@
         "time_zone": "America/Winnipeg"
     },
     {
+        "iata_code": "XLM",
+        "iata_country_code": "CA",
+        "latitude": 45.49916666666667,
+        "longitude": -73.50722222222223,
+        "name": "Saint-Lambert (AMT)",
+        "time_zone": "America/Toronto"
+    },
+    {
         "iata_code": "XLO",
         "iata_country_code": "VN",
         "latitude": 10.4833,
@@ -67797,6 +68309,14 @@
         "longitude": -2.097971,
         "name": "Leo Airport",
         "time_zone": "Africa/Ouagadougou"
+    },
+    {
+        "iata_code": "XLV",
+        "iata_country_code": "CA",
+        "latitude": 43.10888888888889,
+        "longitude": -79.06333333333333,
+        "name": "Niagara Falls (VIA)",
+        "time_zone": "America/New_York"
     },
     {
         "iata_code": "XLW",
@@ -67943,12 +68463,44 @@
         "time_zone": "Africa/Ouagadougou"
     },
     {
+        "iata_code": "XOC",
+        "iata_country_code": "ES",
+        "latitude": 40.406666666666666,
+        "longitude": -3.6894444444444447,
+        "name": "Atocha railway station",
+        "time_zone": "Europe/Madrid"
+    },
+    {
+        "iata_code": "XOP",
+        "iata_country_code": "FR",
+        "latitude": 46.58222222222223,
+        "longitude": 0.33305555555555555,
+        "name": "Poitiers railway station",
+        "time_zone": "Europe/Paris"
+    },
+    {
         "iata_code": "XPA",
         "iata_country_code": "BF",
         "latitude": 11.255212,
         "longitude": 0.697074,
         "name": "Pama Airport",
         "time_zone": "Africa/Ouagadougou"
+    },
+    {
+        "iata_code": "XPG",
+        "iata_country_code": "FR",
+        "latitude": 48.88111111111111,
+        "longitude": 2.355277777777778,
+        "name": "Gare du Nord",
+        "time_zone": "Europe/Paris"
+    },
+    {
+        "iata_code": "XPH",
+        "iata_country_code": "CA",
+        "latitude": 43.94361111111111,
+        "longitude": -78.29888888888888,
+        "name": "Port Hope railway station",
+        "time_zone": "America/Toronto"
     },
     {
         "iata_code": "XPK",
@@ -67991,6 +68543,14 @@
         "time_zone": "America/Costa_Rica"
     },
     {
+        "iata_code": "XQT",
+        "iata_country_code": "GB",
+        "latitude": 52.68666666666666,
+        "longitude": -1.8002777777777779,
+        "name": "Lichfield Trent Valley railway station",
+        "time_zone": "Europe/London"
+    },
+    {
         "iata_code": "XQU",
         "iata_country_code": "CA",
         "latitude": 49.337796,
@@ -68005,6 +68565,22 @@
         "longitude": 150.781006,
         "name": "Royal Australian Air Force Base Richmond Airport",
         "time_zone": "Australia/Sydney"
+    },
+    {
+        "iata_code": "XRJ",
+        "iata_country_code": "IT",
+        "latitude": 41.90083333333333,
+        "longitude": 12.501944444444444,
+        "name": "Roma Termini railway station",
+        "time_zone": "Europe/Rome"
+    },
+    {
+        "iata_code": "XRK",
+        "iata_country_code": "RU",
+        "latitude": 55.72972222222222,
+        "longitude": 37.63944444444444,
+        "name": "Paveletsky Rail Terminal",
+        "time_zone": "Europe/Moscow"
     },
     {
         "iata_code": "XRQ",
@@ -68061,6 +68637,14 @@
         "longitude": 0.503271,
         "name": "Sebba Airport",
         "time_zone": "Africa/Ouagadougou"
+    },
+    {
+        "iata_code": "XSH",
+        "iata_country_code": "FR",
+        "latitude": 47.39138888888889,
+        "longitude": 0.7288888888888889,
+        "name": "Saint-Pierre-des-Corps",
+        "time_zone": "Europe/Paris"
     },
     {
         "iata_code": "XSI",
@@ -68143,12 +68727,92 @@
         "time_zone": "Asia/Ho_Chi_Minh"
     },
     {
+        "iata_code": "XVQ",
+        "iata_country_code": "IT",
+        "latitude": 45.44083333333333,
+        "longitude": 12.320833333333333,
+        "name": "Venezia Santa Lucia railway station",
+        "time_zone": "Europe/Rome"
+    },
+    {
         "iata_code": "XWA",
         "iata_country_code": "US",
         "latitude": 48.260864,
         "longitude": -103.751138,
         "name": "Williston Basin International Airport",
         "time_zone": "America/Chicago"
+    },
+    {
+        "iata_code": "XWC",
+        "iata_country_code": "AT",
+        "latitude": 48.18666666666666,
+        "longitude": 16.38,
+        "name": "Wien Hauptbahnhof",
+        "time_zone": "Europe/Vienna"
+    },
+    {
+        "iata_code": "XWG",
+        "iata_country_code": "FR",
+        "latitude": 48.585,
+        "longitude": 7.734444444444445,
+        "name": "Gare de Strasbourg",
+        "time_zone": "Europe/Paris"
+    },
+    {
+        "iata_code": "XWK",
+        "iata_country_code": "SE",
+        "latitude": 56.16083333333333,
+        "longitude": 15.586111111111112,
+        "name": "Karlskrona",
+        "time_zone": "Europe/Stockholm"
+    },
+    {
+        "iata_code": "XWL",
+        "iata_country_code": "SE",
+        "latitude": 57.70888888888889,
+        "longitude": 11.973333333333333,
+        "name": "Gothenburg Central Station",
+        "time_zone": "Europe/Stockholm"
+    },
+    {
+        "iata_code": "XWR",
+        "iata_country_code": "SE",
+        "latitude": 59.27388888888889,
+        "longitude": 15.2075,
+        "name": "Örebro",
+        "time_zone": "Europe/Stockholm"
+    },
+    {
+        "iata_code": "XWW",
+        "iata_country_code": "AT",
+        "latitude": 48.196666666666665,
+        "longitude": 16.337777777777777,
+        "name": "Wien Westbahnhof",
+        "time_zone": "Europe/Vienna"
+    },
+    {
+        "iata_code": "XXL",
+        "iata_country_code": "NO",
+        "latitude": 61.11436944444445,
+        "longitude": 10.461302777777776,
+        "name": "Lillehammer Station",
+        "time_zone": "Europe/Oslo"
+    },
+    {
+        "iata_code": "XXQ",
+        "iata_country_code": "HU",
+        "latitude": 47.500277777777775,
+        "longitude": 19.083888888888886,
+        "name": "Keleti Pályaudvar",
+        "time_zone": "Europe/Budapest"
+    },
+    {
+        "iata_code": "XXZ",
+        "iata_country_code": "SE",
+        "latitude": 62.4,
+        "longitude": 17.316666666666666,
+        "name": "Sundsvall",
+        "time_zone": "Europe/Stockholm"
     },
     {
         "iata_code": "XYA",
@@ -68159,12 +68823,44 @@
         "time_zone": "Pacific/Guadalcanal"
     },
     {
+        "iata_code": "XYB",
+        "iata_country_code": "SE",
+        "latitude": 60.48555555555556,
+        "longitude": 15.436388888888889,
+        "name": "Borlänge",
+        "time_zone": "Europe/Stockholm"
+    },
+    {
         "iata_code": "XYE",
         "iata_country_code": "MM",
         "latitude": 15.3,
         "longitude": 97.866997,
         "name": "Ye Airport",
         "time_zone": "Asia/Rangoon"
+    },
+    {
+        "iata_code": "XYG",
+        "iata_country_code": "CZ",
+        "latitude": 50.08305555555556,
+        "longitude": 14.435833333333333,
+        "name": "Praha hlavní nádraží",
+        "time_zone": "Europe/Prague"
+    },
+    {
+        "iata_code": "XYH",
+        "iata_country_code": "SE",
+        "latitude": 56.05,
+        "longitude": 12.716666666666667,
+        "name": "Helsingborg",
+        "time_zone": "Europe/Stockholm"
+    },
+    {
+        "iata_code": "XYL",
+        "iata_country_code": "FR",
+        "latitude": 45.748333333333335,
+        "longitude": 4.825555555555555,
+        "name": "Gare de Lyon-Perrache",
+        "time_zone": "Europe/Paris"
     },
     {
         "iata_code": "XYR",
@@ -68181,6 +68877,54 @@
         "longitude": -0.622362,
         "name": "Zabré Airport",
         "time_zone": "Africa/Ouagadougou"
+    },
+    {
+        "iata_code": "XZI",
+        "iata_country_code": "FR",
+        "latitude": 48.9475,
+        "longitude": 6.169722222222222,
+        "name": "Gare de Lorraine TGV",
+        "time_zone": "Europe/Paris"
+    },
+    {
+        "iata_code": "XZL",
+        "iata_country_code": "CA",
+        "latitude": 53.57888888888889,
+        "longitude": -113.53083333333333,
+        "name": "Edmonton station",
+        "time_zone": "America/Edmonton"
+    },
+    {
+        "iata_code": "XZN",
+        "iata_country_code": "FR",
+        "latitude": 43.92166666666667,
+        "longitude": 4.785833333333334,
+        "name": "Gare d'Avignon TGV",
+        "time_zone": "Europe/Paris"
+    },
+    {
+        "iata_code": "XZO",
+        "iata_country_code": "NO",
+        "latitude": 59.91111111111111,
+        "longitude": 10.750833333333333,
+        "name": "Oslo Central Station",
+        "time_zone": "Europe/Oslo"
+    },
+    {
+        "iata_code": "XZT",
+        "iata_country_code": "NO",
+        "latitude": 63.436388888888885,
+        "longitude": 10.398888888888889,
+        "name": "Trondheim Central Station",
+        "time_zone": "Europe/Oslo"
+    },
+    {
+        "iata_code": "XZV",
+        "iata_country_code": "FR",
+        "latitude": 43.12861111111111,
+        "longitude": 5.929722222222223,
+        "name": "Gare de Toulon",
+        "time_zone": "Europe/Paris"
     },
     {
         "iata_code": "YAA",
@@ -68533,6 +69277,14 @@
         "longitude": -110.744118,
         "name": "Bonnyville Airport",
         "time_zone": "America/Edmonton"
+    },
+    {
+        "iata_code": "YBZ",
+        "iata_country_code": "CA",
+        "latitude": 43.64527777777778,
+        "longitude": -79.38055555555555,
+        "name": "Toronto Union Station",
+        "time_zone": "America/Toronto"
     },
     {
         "iata_code": "YCA",
@@ -69503,6 +70255,22 @@
         "time_zone": "America/Yellowknife"
     },
     {
+        "iata_code": "YJH",
+        "iata_country_code": "ES",
+        "latitude": 43.31777777777778,
+        "longitude": -1.9766666666666668,
+        "name": "San Sebastián railway station",
+        "time_zone": "Europe/Madrid"
+    },
+    {
+        "iata_code": "YJL",
+        "iata_country_code": "ES",
+        "latitude": 43.45916666666667,
+        "longitude": -3.8113888888888887,
+        "name": "Santander railway station",
+        "time_zone": "Europe/Madrid"
+    },
+    {
         "iata_code": "YJN",
         "iata_country_code": "CA",
         "latitude": 45.294656,
@@ -70020,6 +70788,14 @@
         "latitude": 45.672585,
         "longitude": -74.034345,
         "name": "Montréal–Mirabel International Airport",
+        "time_zone": "America/Toronto"
+    },
+    {
+        "iata_code": "YMY",
+        "iata_country_code": "CA",
+        "latitude": 45.499722222222225,
+        "longitude": -73.56666666666666,
+        "name": "Montreal Central Station",
         "time_zone": "America/Toronto"
     },
     {
@@ -71879,6 +72655,14 @@
         "time_zone": "Europe/Paris"
     },
     {
+        "iata_code": "ZAQ",
+        "iata_country_code": "DE",
+        "latitude": 49.44638888888888,
+        "longitude": 11.081944444444444,
+        "name": "Nürnberg Hauptbahnhof",
+        "time_zone": "Europe/Berlin"
+    },
+    {
         "iata_code": "ZAR",
         "iata_country_code": "NG",
         "latitude": 11.131052,
@@ -71901,6 +72685,14 @@
         "longitude": -1.042449,
         "name": "Zaragoza Airport",
         "time_zone": "Europe/Madrid"
+    },
+    {
+        "iata_code": "ZBA",
+        "iata_country_code": "CH",
+        "latitude": 47.5675,
+        "longitude": 7.607222222222222,
+        "name": "Basel Badischer Bahnhof",
+        "time_zone": "Europe/Zurich"
     },
     {
         "iata_code": "ZBE",
@@ -71951,6 +72743,14 @@
         "time_zone": "Australia/Brisbane"
     },
     {
+        "iata_code": "ZBP",
+        "iata_country_code": "US",
+        "latitude": 39.3075,
+        "longitude": -76.61555555555555,
+        "name": "Pennsylvania Station",
+        "time_zone": "America/New_York"
+    },
+    {
         "iata_code": "ZBR",
         "iata_country_code": "IR",
         "latitude": 25.441113,
@@ -71981,6 +72781,30 @@
         "longitude": -72.649951,
         "name": "La Araucanía Airport",
         "time_zone": "America/Santiago"
+    },
+    {
+        "iata_code": "ZDH",
+        "iata_country_code": "CH",
+        "latitude": 47.54694444444444,
+        "longitude": 7.59,
+        "name": "Basel SBB railway station",
+        "time_zone": "Europe/Zurich"
+    },
+    {
+        "iata_code": "ZDJ",
+        "iata_country_code": "CH",
+        "latitude": 46.94881944444444,
+        "longitude": 7.439116666666667,
+        "name": "Bern Railway Station",
+        "time_zone": "Europe/Zurich"
+    },
+    {
+        "iata_code": "ZDU",
+        "iata_country_code": "GB",
+        "latitude": 56.45666666666667,
+        "longitude": -2.971111111111111,
+        "name": "Dundee railway station",
+        "time_zone": "Europe/London"
     },
     {
         "iata_code": "ZDY",
@@ -72031,12 +72855,28 @@
         "time_zone": "Pacific/Port_Moresby"
     },
     {
+        "iata_code": "ZEP",
+        "iata_country_code": "GB",
+        "latitude": 51.49527777777778,
+        "longitude": -0.14416666666666667,
+        "name": "Victoria station",
+        "time_zone": "Europe/London"
+    },
+    {
         "iata_code": "ZER",
         "iata_country_code": "IN",
         "latitude": 27.588317,
         "longitude": 93.828175,
         "name": "Zero Airport",
         "time_zone": "Asia/Calcutta"
+    },
+    {
+        "iata_code": "ZEU",
+        "iata_country_code": "DE",
+        "latitude": 51.53666666666666,
+        "longitude": 9.926944444444445,
+        "name": "Göttingen railway station",
+        "time_zone": "Europe/Berlin"
     },
     {
         "iata_code": "ZFA",
@@ -72055,6 +72895,14 @@
         "time_zone": "America/Regina"
     },
     {
+        "iata_code": "ZFJ",
+        "iata_country_code": "FR",
+        "latitude": 48.10333333333333,
+        "longitude": -1.6724999999999999,
+        "name": "Gare de Rennes",
+        "time_zone": "Europe/Paris"
+    },
+    {
         "iata_code": "ZFM",
         "iata_country_code": "CA",
         "latitude": 67.4076,
@@ -72071,6 +72919,22 @@
         "time_zone": "America/Yellowknife"
     },
     {
+        "iata_code": "ZFQ",
+        "iata_country_code": "FR",
+        "latitude": 44.82555555555556,
+        "longitude": -0.5555555555555556,
+        "name": "Gare de Bordeaux Saint-Jean",
+        "time_zone": "Europe/Paris"
+    },
+    {
+        "iata_code": "ZFV",
+        "iata_country_code": "US",
+        "latitude": 39.95583333333334,
+        "longitude": -75.18194444444445,
+        "name": "30th Street Station",
+        "time_zone": "America/New_York"
+    },
+    {
         "iata_code": "ZFW",
         "iata_country_code": "CA",
         "latitude": 56.081175,
@@ -72085,6 +72949,22 @@
         "longitude": -118.42965,
         "name": "Grand Forks Airport",
         "time_zone": "America/Vancouver"
+    },
+    {
+        "iata_code": "ZGG",
+        "iata_country_code": "GB",
+        "latitude": 55.85805555555556,
+        "longitude": -4.258055555555556,
+        "name": "Glasgow Central station",
+        "time_zone": "Europe/London"
+    },
+    {
+        "iata_code": "ZGH",
+        "iata_country_code": "DK",
+        "latitude": 55.672777777777775,
+        "longitude": 12.564444444444446,
+        "name": "Copenhagen Central Station",
+        "time_zone": "Europe/Copenhagen"
     },
     {
         "iata_code": "ZGI",
@@ -72207,12 +73087,28 @@
         "time_zone": "America/Mexico_City"
     },
     {
+        "iata_code": "ZIN",
+        "iata_country_code": "CH",
+        "latitude": 46.69,
+        "longitude": 7.86888888888889,
+        "name": "Interlaken Ost railway station",
+        "time_zone": "Europe/Zurich"
+    },
+    {
         "iata_code": "ZIS",
         "iata_country_code": "LY",
         "latitude": 31.775023,
         "longitude": 12.250101,
         "name": "Zintan Airport",
         "time_zone": "Africa/Tripoli"
+    },
+    {
+        "iata_code": "ZIV",
+        "iata_country_code": "GB",
+        "latitude": 57.480000000000004,
+        "longitude": -4.223055555555556,
+        "name": "Inverness railway station",
+        "time_zone": "Europe/London"
     },
     {
         "iata_code": "ZIX",
@@ -72270,6 +73166,14 @@
         "time_zone": "Africa/Lusaka"
     },
     {
+        "iata_code": "ZKD",
+        "iata_country_code": "RU",
+        "latitude": 55.77611111111111,
+        "longitude": 37.655277777777776,
+        "name": "Leningradsky Rail Terminal",
+        "time_zone": "Europe/Moscow"
+    },
+    {
         "iata_code": "ZKE",
         "iata_country_code": "CA",
         "latitude": 52.28212,
@@ -72302,12 +73206,28 @@
         "time_zone": "Asia/Srednekolymsk"
     },
     {
+        "iata_code": "ZLN",
+        "iata_country_code": "FR",
+        "latitude": 48.007777777777775,
+        "longitude": 0.1983333333333333,
+        "name": "Le Mans",
+        "time_zone": "Europe/Paris"
+    },
+    {
         "iata_code": "ZLO",
         "iata_country_code": "MX",
         "latitude": 19.145307,
         "longitude": -104.559628,
         "name": "Playa de Oro International Airport",
         "time_zone": "America/Mexico_City"
+    },
+    {
+        "iata_code": "ZLS",
+        "iata_country_code": "GB",
+        "latitude": 51.51861111111111,
+        "longitude": -0.08138888888888889,
+        "name": "Liverpool Street Station",
+        "time_zone": "Europe/London"
     },
     {
         "iata_code": "ZLT",
@@ -72334,6 +73254,22 @@
         "time_zone": "Africa/Khartoum"
     },
     {
+        "iata_code": "ZLY",
+        "iata_country_code": "US",
+        "latitude": 42.64138888888889,
+        "longitude": -73.74111111111111,
+        "name": "Albany–Rensselaer (Amtrak station)",
+        "time_zone": "America/New_York"
+    },
+    {
+        "iata_code": "ZMB",
+        "iata_country_code": "DE",
+        "latitude": 53.55277777777778,
+        "longitude": 10.006388888888889,
+        "name": "Hamburg Hauptbahnhof",
+        "time_zone": "Europe/Berlin"
+    },
+    {
         "iata_code": "ZMD",
         "iata_country_code": "BR",
         "latitude": -9.133106,
@@ -72350,6 +73286,14 @@
         "time_zone": "America/Vancouver"
     },
     {
+        "iata_code": "ZMI",
+        "iata_country_code": "IT",
+        "latitude": 40.831388888888895,
+        "longitude": 14.219166666666666,
+        "name": "Napoli Mergellina railway station",
+        "time_zone": "Europe/Rome"
+    },
+    {
         "iata_code": "ZMM",
         "iata_country_code": "MX",
         "latitude": 20.045,
@@ -72358,12 +73302,28 @@
         "time_zone": "America/Mexico_City"
     },
     {
+        "iata_code": "ZMS",
+        "iata_country_code": "IT",
+        "latitude": 43.77611111111111,
+        "longitude": 11.248055555555554,
+        "name": "Firenze Santa Maria Novella railway station",
+        "time_zone": "Europe/Rome"
+    },
+    {
         "iata_code": "ZMT",
         "iata_country_code": "CA",
         "latitude": 54.024677,
         "longitude": -132.120916,
         "name": "Masset Airport",
         "time_zone": "America/Vancouver"
+    },
+    {
+        "iata_code": "ZMU",
+        "iata_country_code": "DE",
+        "latitude": 48.14083333333333,
+        "longitude": 11.555000000000001,
+        "name": "München Hauptbahnhof",
+        "time_zone": "Europe/Berlin"
     },
     {
         "iata_code": "ZNA",
@@ -72462,6 +73422,14 @@
         "time_zone": "America/Regina"
     },
     {
+        "iata_code": "ZPY",
+        "iata_country_code": "DE",
+        "latitude": 50.79361111111111,
+        "longitude": 7.202777777777778,
+        "name": "Siegburg/Bonn railway station",
+        "time_zone": "Europe/Berlin"
+    },
+    {
         "iata_code": "ZQN",
         "iata_country_code": "NZ",
         "latitude": -45.021035,
@@ -72494,6 +73462,14 @@
         "time_zone": "Asia/Shanghai"
     },
     {
+        "iata_code": "ZRB",
+        "iata_country_code": "DE",
+        "latitude": 50.106944444444444,
+        "longitude": 8.6625,
+        "name": "Frankfurt (Main) Hauptbahnhof",
+        "time_zone": "Europe/Berlin"
+    },
+    {
         "iata_code": "ZRH",
         "iata_country_code": "CH",
         "latitude": 47.461458,
@@ -72518,12 +73494,52 @@
         "time_zone": "America/Winnipeg"
     },
     {
+        "iata_code": "ZRL",
+        "iata_country_code": "US",
+        "latitude": 40.054363888888886,
+        "longitude": -76.30772222222222,
+        "name": "Lancaster (Amtrak station)",
+        "time_zone": "America/New_York"
+    },
+    {
         "iata_code": "ZRM",
         "iata_country_code": "ID",
         "latitude": -1.873462,
         "longitude": 138.753718,
         "name": "Sarmi Orai Airport",
         "time_zone": "Asia/Jayapura"
+    },
+    {
+        "iata_code": "ZRP",
+        "iata_country_code": "US",
+        "latitude": 40.734722222222224,
+        "longitude": -74.16416666666667,
+        "name": "Pennsylvania Station",
+        "time_zone": "America/New_York"
+    },
+    {
+        "iata_code": "ZRT",
+        "iata_country_code": "US",
+        "latitude": 41.76888888888889,
+        "longitude": -72.68166666666667,
+        "name": "Hartford Union Station",
+        "time_zone": "America/New_York"
+    },
+    {
+        "iata_code": "ZRV",
+        "iata_country_code": "US",
+        "latitude": 41.82916666666667,
+        "longitude": -71.41333333333334,
+        "name": "Providence Station",
+        "time_zone": "America/New_York"
+    },
+    {
+        "iata_code": "ZRZ",
+        "iata_country_code": "US",
+        "latitude": 38.948055555555555,
+        "longitude": -76.87194444444444,
+        "name": "New Carrollton station",
+        "time_zone": "America/New_York"
     },
     {
         "iata_code": "ZSA",
@@ -72534,12 +73550,28 @@
         "time_zone": "America/Nassau"
     },
     {
+        "iata_code": "ZSB",
+        "iata_country_code": "AT",
+        "latitude": 47.81305555555555,
+        "longitude": 13.046666666666667,
+        "name": "Salzburg Hauptbahnhof ÖBB station",
+        "time_zone": "Europe/Vienna"
+    },
+    {
         "iata_code": "ZSE",
         "iata_country_code": "RE",
         "latitude": -21.320823,
         "longitude": 55.424314,
         "name": "Pierrefonds Airport",
         "time_zone": "Indian/Reunion"
+    },
+    {
+        "iata_code": "ZSF",
+        "iata_country_code": "US",
+        "latitude": 42.10611111111111,
+        "longitude": -72.59305555555555,
+        "name": "Springfield Union Station",
+        "time_zone": "America/New_York"
     },
     {
         "iata_code": "ZSJ",
@@ -72590,6 +73622,30 @@
         "time_zone": "America/Blanc-Sablon"
     },
     {
+        "iata_code": "ZTD",
+        "iata_country_code": "US",
+        "latitude": 42.81472222222222,
+        "longitude": -73.94277777777778,
+        "name": "Schenectady station",
+        "time_zone": "America/New_York"
+    },
+    {
+        "iata_code": "ZTE",
+        "iata_country_code": "US",
+        "latitude": 43.16361111111111,
+        "longitude": -77.60833333333333,
+        "name": "Louise M. Slaughter Rochester Station",
+        "time_zone": "America/New_York"
+    },
+    {
+        "iata_code": "ZTF",
+        "iata_country_code": "US",
+        "latitude": 41.04694444444444,
+        "longitude": -73.54138888888889,
+        "name": "Stamford (Metro-North station)",
+        "time_zone": "America/New_York"
+    },
+    {
         "iata_code": "ZTH",
         "iata_country_code": "GR",
         "latitude": 37.752671,
@@ -72605,12 +73661,28 @@
         "time_zone": null
     },
     {
+        "iata_code": "ZTJ",
+        "iata_country_code": "US",
+        "latitude": 40.31666666666667,
+        "longitude": -74.62333333333332,
+        "name": "Princeton Junction (NJT station)",
+        "time_zone": "America/New_York"
+    },
+    {
         "iata_code": "ZTM",
         "iata_country_code": "CA",
         "latitude": 55.86251,
         "longitude": -92.081742,
         "name": "Shamattawa Airport",
         "time_zone": "America/Winnipeg"
+    },
+    {
+        "iata_code": "ZTO",
+        "iata_country_code": "US",
+        "latitude": 42.35194444444445,
+        "longitude": -71.05527777777777,
+        "name": "South Station",
+        "time_zone": "America/New_York"
     },
     {
         "iata_code": "ZTR",
@@ -72637,6 +73709,14 @@
         "time_zone": "Asia/Baku"
     },
     {
+        "iata_code": "ZTY",
+        "iata_country_code": "US",
+        "latitude": 42.34722222222222,
+        "longitude": -71.07555555555555,
+        "name": "Back Bay (MBTA station)",
+        "time_zone": "America/New_York"
+    },
+    {
         "iata_code": "ZUC",
         "iata_country_code": "CA",
         "latitude": 49.42971,
@@ -72651,6 +73731,14 @@
         "longitude": -73.796446,
         "name": "Pupelde Airport",
         "time_zone": "America/Santiago"
+    },
+    {
+        "iata_code": "ZUG",
+        "iata_country_code": "US",
+        "latitude": 40.261944444444445,
+        "longitude": -76.87777777777777,
+        "name": "Harrisburg Transportation Center",
+        "time_zone": "America/New_York"
     },
     {
         "iata_code": "ZUH",
@@ -72685,6 +73773,14 @@
         "time_zone": "Indian/Antananarivo"
     },
     {
+        "iata_code": "ZVE",
+        "iata_country_code": "US",
+        "latitude": 41.2975,
+        "longitude": -72.92666666666668,
+        "name": "Union Station",
+        "time_zone": "America/New_York"
+    },
+    {
         "iata_code": "ZVG",
         "iata_country_code": "AU",
         "latitude": -17.786929,
@@ -72701,12 +73797,36 @@
         "time_zone": "Asia/Vientiane"
     },
     {
+        "iata_code": "ZVR",
+        "iata_country_code": "DE",
+        "latitude": 52.37722222222222,
+        "longitude": 9.741666666666665,
+        "name": "Hannover Hauptbahnhof",
+        "time_zone": "Europe/Berlin"
+    },
+    {
         "iata_code": "ZWA",
         "iata_country_code": "MG",
         "latitude": -14.6517,
         "longitude": 49.620601,
         "name": "Andapa Airport",
         "time_zone": "Indian/Antananarivo"
+    },
+    {
+        "iata_code": "ZWC",
+        "iata_country_code": "NO",
+        "latitude": 58.966944444444444,
+        "longitude": 5.731944444444444,
+        "name": "Stavanger station",
+        "time_zone": "Europe/Oslo"
+    },
+    {
+        "iata_code": "ZWI",
+        "iata_country_code": "US",
+        "latitude": 39.736666666666665,
+        "longitude": -75.55111111111111,
+        "name": "Wilmington Station",
+        "time_zone": "America/New_York"
     },
     {
         "iata_code": "ZWL",
@@ -72717,12 +73837,68 @@
         "time_zone": "America/Regina"
     },
     {
+        "iata_code": "ZWS",
+        "iata_country_code": "DE",
+        "latitude": 48.78388888888889,
+        "longitude": 9.181666666666667,
+        "name": "Stuttgart Hauptbahnhof",
+        "time_zone": "Europe/Berlin"
+    },
+    {
+        "iata_code": "ZWU",
+        "iata_country_code": "US",
+        "latitude": 38.89722222222222,
+        "longitude": -77.00638888888889,
+        "name": "Union Station",
+        "time_zone": "America/New_York"
+    },
+    {
+        "iata_code": "ZXA",
+        "iata_country_code": "GB",
+        "latitude": 57.14361111111111,
+        "longitude": -2.0986111111111114,
+        "name": "Aberdeen railway station",
+        "time_zone": "Europe/London"
+    },
+    {
+        "iata_code": "ZXE",
+        "iata_country_code": "GB",
+        "latitude": 55.952222222222225,
+        "longitude": -3.1891666666666665,
+        "name": "Edinburgh Waverley railway station",
+        "time_zone": "Europe/London"
+    },
+    {
+        "iata_code": "ZXS",
+        "iata_country_code": "US",
+        "latitude": 42.87833333333333,
+        "longitude": -78.87388888888889,
+        "name": "Buffalo-Exchange Street Station",
+        "time_zone": "America/New_York"
+    },
+    {
         "iata_code": "ZXT",
         "iata_country_code": "AZ",
         "latitude": 40.495968,
         "longitude": 49.97472,
         "name": "Zabrat Airport",
         "time_zone": "Asia/Baku"
+    },
+    {
+        "iata_code": "ZYA",
+        "iata_country_code": "NL",
+        "latitude": 52.37833333333333,
+        "longitude": 4.9,
+        "name": "Amsterdam Centraal railway station",
+        "time_zone": "Europe/Amsterdam"
+    },
+    {
+        "iata_code": "ZYH",
+        "iata_country_code": "NL",
+        "latitude": 52.08166666666667,
+        "longitude": 4.329166666666667,
+        "name": "Den Haag Centraal railway station",
+        "time_zone": "Europe/Amsterdam"
     },
     {
         "iata_code": "ZYI",
@@ -72739,6 +73915,30 @@
         "longitude": 91.868926,
         "name": "Osmani International Airport",
         "time_zone": "Asia/Dhaka"
+    },
+    {
+        "iata_code": "ZYN",
+        "iata_country_code": "FR",
+        "latitude": 43.8325,
+        "longitude": 4.366388888888888,
+        "name": "Nîmes railway station",
+        "time_zone": "Europe/Paris"
+    },
+    {
+        "iata_code": "ZYP",
+        "iata_country_code": "US",
+        "latitude": 40.75055555555556,
+        "longitude": -73.99388888888889,
+        "name": "Pennsylvania Station",
+        "time_zone": "America/New_York"
+    },
+    {
+        "iata_code": "ZYQ",
+        "iata_country_code": "US",
+        "latitude": 43.07666666666667,
+        "longitude": -76.16916666666667,
+        "name": "William F. Walsh Regional Transportation Center",
+        "time_zone": "America/New_York"
     },
     {
         "iata_code": "ZZE",
