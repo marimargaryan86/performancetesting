@@ -8,7 +8,7 @@ from snowfall.project.junction.provider import airports
 from snowfall.project.junction.service.providers.ba_ndc import ba_ndc_helpers, cache
 from snowfall.project.junction.service.providers.ba_ndc.search import parser
 from snowfall.project.junction.service.providers.ba_ndc.v1alpha import amqp_pb2
-from snowfall.vendor.ba_ndc import client
+from snowfall.vendor.ba_ndc import client, errors
 from snowfall.vendor.ba_ndc.adapters.offers_response_adapter import (
     OffersResponseAdapter,
 )
@@ -160,9 +160,17 @@ class BaNdcSearchAdapter(object):
         self,
         search_criteria: request_offer_search_schemas.OfferSearchRequest,
     ) -> AsyncIterator[offer_models_pb2.OfferGroup]:
-        res = await self._client.get_offers(search_criteria)
+        res = None
 
-        if res.get_offers():
+        try:
+            res = await self._client.get_offers(search_criteria)
+        except errors.RouteAvailabilityError:
+            self._logger.info(
+                "We do not offer availability for this route",
+                exc_info=True,
+            )
+
+        if res and res.get_offers():
             grouped_offers = OfferGrouper.group_offers(res)
 
             for offers in grouped_offers.values():

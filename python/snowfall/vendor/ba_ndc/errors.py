@@ -13,6 +13,10 @@ class ServiceError(BaNdcError):
     """Raised when the BA NDC service is unhealthy."""
 
 
+class RouteAvailabilityError(BaNdcError):
+    """Raised there is no availability for a route."""
+
+
 class AsyncTimeOutError(BaNdcError):
     """Raised when the async function exceeds the timeout duration."""
 

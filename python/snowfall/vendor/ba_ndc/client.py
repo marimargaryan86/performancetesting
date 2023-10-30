@@ -52,16 +52,20 @@ class BaNdcClient(object):
         request: request_offer_search_schemas.OfferSearchRequest,
         rate_limit_timeout: float = 30,
     ) -> OffersResponseAdapter:
-        response = await self._make_request(
-            "POST",
-            "/offers",
-            payload=request.json(
-                exclude_none=True,
-                exclude_unset=True,
-                by_alias=True,
-            ),
-            rate_limit_timeout=rate_limit_timeout,
-        )
+
+        try:
+            response = await self._make_request(
+                "POST",
+                "/offers",
+                payload=request.json(
+                    exclude_none=True,
+                    exclude_unset=True,
+                    by_alias=True,
+                ),
+                rate_limit_timeout=rate_limit_timeout,
+            )
+        except errors.ServiceError as route_error:
+            raise errors.RouteAvailabilityError(route_error) from route_error
 
         return OffersResponseAdapter(
             response_offer_search_schemas.OfferSearchResponse.parse_raw(
