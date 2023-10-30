@@ -59,7 +59,6 @@ def _filter_location_by_type(
         models_pb2.Location.Type.TYPE_FERRY_PORT,
         models_pb2.Location.Type.TYPE_BUS_STATION,
     }
-    logger = stdout.get_logger()
 
     for location in locations:
         if unconditional.intersection(location.types):
@@ -69,12 +68,6 @@ def _filter_location_by_type(
             if _calculate_distance((longitude, latitude), loc) <= _MAX_DISTANCE_RAIL_M:
                 # It's close enough, add it.
                 valid_locations.append(location.id)
-        else:
-            logger.warning(
-                "Location has no known location types",
-                name=location.name,
-                types=location.types,
-            )
 
     return valid_locations
 
@@ -83,6 +76,7 @@ async def parse_csv(
     locations_repository: places.LocationRepository,
     csv_file: protocols.WithAsyncRead,
 ) -> AsyncIterable[models_pb2.Place]:
+    logger = stdout.get_logger()
     async for row in readers.AsyncDictReader(csv_file):
         locations = [
             location
@@ -100,7 +94,12 @@ async def parse_csv(
             latitude=float(row["latitude"]),
             longitude=float(row["longitude"]),
         )
+
         if not location_ids:
+            logger.warning(
+                "Place (city) has no known locations",
+                name=row["name"],
+            )
             continue
 
         yield models_pb2.Place(
