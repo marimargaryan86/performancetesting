@@ -148,7 +148,7 @@ class OfferImporter(object):
                 )
 
                 if not offer_search:
-                    raise SkippedOfferError()
+                    return
 
                 await self._process_trip_offer_search_result(offer_search, message.body)
             case trackable_pb2.Trackable():
@@ -167,7 +167,7 @@ class OfferImporter(object):
         offer_search = await self._searches.find_by_id(message.offer_search_id)
 
         if not offer_search:
-            raise SkippedOfferError()
+            return
 
         await self._searches.mark_as_processing(offer_search.id)
 
