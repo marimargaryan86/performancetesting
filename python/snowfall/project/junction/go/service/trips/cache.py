@@ -1,6 +1,7 @@
 import contextlib
 import datetime
 from collections.abc import Sequence
+from typing import Any
 
 import pymongo
 from pymongo import errors as pymongo_errors
@@ -27,28 +28,31 @@ class LegCacheRepository(
     _chunk_size = 100
     _ttl = datetime.timedelta(hours=1)
 
+    def __init__(self, redis_client: redis.Client[bytes], *args: Any, **kwargs: Any):
+        super().__init__(*args, **kwargs)
+        self._redis = redis_client
+
     async def fetch_many(
         self,
         ids: Sequence[str],
         legs_adapter: legs.GrpcClient,
     ) -> None:
-        missing_ids = list(await self._get_missing_ids(ids))
-
-        if not missing_ids:
+        if not await self._get_missing_ids(ids):
             return
 
-        legs_chunk = await legs_adapter.find_by_ids(
-            identifiers=missing_ids[: self._chunk_size],
-            limit=self._chunk_size,
-        )
-        await self._insert_legs(legs_chunk.legs)
+        async with self._redis.lock("leg_cache_fetch_many:lock"):
+            # Re-check for data in case another process has already fetched it
+            missing_ids = list(await self._get_missing_ids(ids))
+            if not missing_ids:
+                return
 
-        for start in range(self._chunk_size, len(missing_ids), self._chunk_size):
-            legs_chunk = await legs_adapter.find_by_ids(
-                identifiers=missing_ids[start : start + self._chunk_size],
-                limit=self._chunk_size,
-            )
-            await self._insert_legs(legs_chunk.legs)
+            for start in range(0, len(missing_ids), self._chunk_size):
+                chunk = missing_ids[start : start + self._chunk_size]
+                legs_chunk = await legs_adapter.find_by_ids(
+                    identifiers=chunk,
+                    limit=self._chunk_size,
+                )
+                await self._insert_legs(legs_chunk.legs)
 
     async def find(
         self,

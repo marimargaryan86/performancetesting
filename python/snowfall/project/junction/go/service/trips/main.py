@@ -95,7 +95,7 @@ async def _consume_trip_candidate_search_tasks(
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
-    client = await redis_factory.make_client(
+    redis_client = await redis_factory.make_client(
         app=app,
         dsn=app.settings.redis_dsn,
         decode_responses=False,
@@ -116,7 +116,8 @@ async def _consume_trip_candidate_search_tasks(
     trips_db = mongo[_TRIPS]
     trip_repository = trips.TripRepository(trips_db[_TRIPS])
     leg_cache_repo = cache.LegCacheRepository(
-        trips_db["leg_cache"],
+        collection=trips_db["leg_cache"],
+        redis_client=redis_client,
     )
     connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
     consumer_obj = TripCandidateSearchConsumer(
@@ -145,7 +146,7 @@ async def _consume_trip_candidate_search_tasks(
         ),
         max_trip_length_factor=app.settings.max_trip_length_factor,
         trip_metadata_repository=cache.TripMetadataRepository(
-            client=client,
+            client=redis_client,
             leg_cache_repository=leg_cache_repo,
         ),
     )
