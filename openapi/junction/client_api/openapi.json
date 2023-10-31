@@ -6589,7 +6589,11 @@
                     "enum": [
                       "unspecified",
                       "pending",
-                      "completed"
+                      "completed",
+                      "rejected",
+                      "no-refund",
+                      "refund-due",
+                      "refund-issued"
                     ],
                     "example": "pending"
                   }
