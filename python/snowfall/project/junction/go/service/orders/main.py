@@ -62,8 +62,7 @@ class _ImportSettings(pay_integration.Settings, application.Settings):
 
 class _TicketEventsConsumerSettings(application.Settings):
     amqp_dsn: pydantic.AmqpDsn
-    grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
-    grpc_port: int = 50051
+    orders_address: str
 
 
 async def _serve(app: application.Application[_GrpcSettings]) -> None:
@@ -204,15 +203,12 @@ async def _consume_ticket_events(
     app: application.Application[_TicketEventsConsumerSettings],
 ) -> None:
     connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
-    orders_address = ":".join(
-        [str(app.settings.grpc_address), str(app.settings.grpc_port)],
-    )
 
     orders_client = orders_adapter.GrpcClient(
         orders=orders_pb2_grpc.OrderServiceStub(
             await grpc_factory.make_insecure_channel(
                 app,
-                orders_address,
+                app.settings.orders_address,
             ),
         ),
     )

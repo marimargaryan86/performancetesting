@@ -66,6 +66,17 @@ job "orders-consume-ticket-events" {
       port = "prometheus"
       tags = ["metrics"]
 
+      connect {
+        sidecar_service {
+          proxy {
+            upstreams {
+              local_bind_port  = 8010
+              destination_name = "orders-${var.environment}"
+            }
+          }
+        }
+      }
+
       check {
         type     = "http"
         path     = "/"
@@ -78,6 +89,7 @@ job "orders-consume-ticket-events" {
       template {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
+ORDERS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_orders-${var.environment}"))}}
 EOH
         destination = "services.env"
         env         = true
@@ -100,8 +112,6 @@ EOH
 
       env {
         ENV_NAME        = "${var.environment}"
-        GRPC_ADDRESS    = "0.0.0.0"
-        GRPC_PORT       = "${NOMAD_PORT_grpc}"
         SENTRY_DSN      = "https://3b443c2609554d1db9fda2db77884fc9@sentry.snowfall.se/30"
         PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
       }
