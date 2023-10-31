@@ -73,7 +73,7 @@ def train_station_repository() -> train_stations.TrainStationRepository:
 
 
 @pytest.fixture()
-def provider_cabin_class_mapping(
+async def provider_cabin_class_mapping(
     mongo_client: core.AgnosticClient,
 ) -> cabin_classes.CabinMappingRepository:
     return cabin_classes.CabinMappingRepository(collection=mongo_client.test.test)

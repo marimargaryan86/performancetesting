@@ -33,7 +33,7 @@ class MockedBookings(orders.BookingRepository):
 
 
 @pytest.fixture()
-def mock_bookings(
+async def mock_bookings(
     mongo_client: core.AgnosticClient,
 ) -> orders.BookingRepository:
     return MockedBookings(mongo_client.test.test)

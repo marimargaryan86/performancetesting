@@ -195,7 +195,7 @@ def smtp_client() -> smtp.EmailClient:
 
 
 @pytest.fixture()
-def notification_tokens_repository(
+async def notification_tokens_repository(
     mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
 ) -> repository.NotificationTokensRepository:
     return repository.NotificationTokensRepository(
@@ -204,7 +204,7 @@ def notification_tokens_repository(
 
 
 @pytest.fixture()
-def preferences_repository(
+async def preferences_repository(
     mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
 ) -> repository.PreferencesRepository:
     return repository.PreferencesRepository(
@@ -213,7 +213,7 @@ def preferences_repository(
 
 
 @pytest.fixture()
-def vouchers_repository(
+async def vouchers_repository(
     mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
 ) -> repository.VouchersRepository:
     return repository.VouchersRepository(
@@ -222,7 +222,7 @@ def vouchers_repository(
 
 
 @pytest.fixture()
-def loyalty_programs_repository(
+async def loyalty_programs_repository(
     mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
 ) -> repository.LoyaltyProgramsRepository:
     return repository.LoyaltyProgramsRepository(
@@ -231,7 +231,7 @@ def loyalty_programs_repository(
 
 
 @pytest.fixture()
-def orders_repository(
+async def orders_repository(
     mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
 ) -> repository.OrdersRepository:
     return repository.OrdersRepository(
@@ -240,7 +240,7 @@ def orders_repository(
 
 
 @pytest.fixture()
-def user_groups_repository(
+async def user_groups_repository(
     mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
 ) -> repository.UserGroupsRepository:
     return repository.UserGroupsRepository(
@@ -249,7 +249,7 @@ def user_groups_repository(
 
 
 @pytest.fixture()
-def stripe_users_repository(
+async def stripe_users_repository(
     mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
 ) -> repository.StripeUsersRepository:
     return repository.StripeUsersRepository(

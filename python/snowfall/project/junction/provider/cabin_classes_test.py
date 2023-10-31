@@ -6,7 +6,7 @@ from snowfall.project.junction.provider import cabin_classes
 
 
 @pytest.fixture()
-def cabin_class_repo(
+async def cabin_class_repo(
     mongo_client: core.AgnosticClient,
 ) -> cabin_classes.CabinMappingRepository:
     return cabin_classes.CabinMappingRepository(

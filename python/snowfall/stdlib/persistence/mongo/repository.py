@@ -1,4 +1,5 @@
 import abc
+import asyncio
 import datetime
 import functools
 import types
@@ -179,7 +180,6 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
         timeout: datetime.timedelta = _DEFAULT_TIMEOUT,
     ) -> None:
         self._collection = _configure_collection(collection)
-        self._has_created_indexes = False
         self._timeout = timeout.total_seconds() * _MILLISECONDS_MULTIPLIER
         self._valid_sort_fields = [
             index_key for index in self._indexes for index_key in index.document["key"]
@@ -188,17 +188,23 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
         self._root_path = "${0}".format((self._nested_path or "").removeprefix("$"))
         self._nested_path_parts = self._root_path.split(".")
         self._clean_path = self._root_path.removeprefix("$")
+        self.indexes_created_event = asyncio.Event()
+        # TODO: Probably use aiojobs in future to manage this task properly.
+        asyncio.create_task(  # type: ignore[unused-awaitable]  # noqa: RUF006
+            self._create_indexes(),
+        )
 
     async def _create_indexes(self) -> None:
-        self._has_created_indexes = True
-
         if not self._indexes:
+            self.indexes_created_event.set()
             return
 
         await self._execute(
             self._collection.create_indexes,
             list(self._indexes),
+            skip_indexes=True,
         )
+        self.indexes_created_event.set()
 
     @property
     @abc.abstractmethod
@@ -210,11 +216,11 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
         query: Callable[..., Any],
         *args: Any,
         unmarshalled_cursor: cursor_pb2.Cursor | None = None,
+        skip_indexes: bool = False,
         **kwargs: Any,
     ) -> Any:
-        # TODO: can't run this in __init__, but this isn't pretty...
-        if not self._has_created_indexes:
-            await self._create_indexes()
+        if not skip_indexes:
+            await self.indexes_created_event.wait()
 
         timeout_kwarg = self._timeout_kwargs.get(query)
 

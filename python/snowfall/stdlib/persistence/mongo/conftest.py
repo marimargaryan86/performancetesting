@@ -75,21 +75,21 @@ class NestedMockRepository(
 
 
 @pytest.fixture()
-def foobar_repository(
+async def foobar_repository(
     mongo_client: core.AgnosticClient,
 ) -> FoobarRepository:
     return FoobarRepository(mongo_client.test.test)
 
 
 @pytest.fixture()
-def mock_repository(
+async def mock_repository(
     mongo_client: core.AgnosticClient,
 ) -> MockRepository:
     return MockRepository(mongo_client.test.test)
 
 
 @pytest.fixture()
-def nested_mock_repository(
+async def nested_mock_repository(
     mongo_client: core.AgnosticClient,
 ) -> NestedMockRepository:
     return NestedMockRepository(mongo_client.test.test)

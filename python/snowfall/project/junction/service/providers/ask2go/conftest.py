@@ -211,7 +211,7 @@ def booking_handler(
 
 
 @pytest.fixture()
-def provider_cabin_class_mapping(
+async def provider_cabin_class_mapping(
     mongo_client: core.AgnosticClient,
 ) -> cabin_classes.CabinMappingRepository:
     return cabin_classes.CabinMappingRepository(

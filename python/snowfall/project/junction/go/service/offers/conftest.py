@@ -23,21 +23,21 @@ def offer_bucket_repository(
 
 
 @pytest.fixture()
-def trip_offer_repository(
+async def trip_offer_repository(
     mongo_client: core.AgnosticClient,
 ) -> offers.TripOfferRepository:
     return offers.TripOfferRepository(collection=mongo_client.test.trip_offers)
 
 
 @pytest.fixture()
-def offer_options_repository(
+async def offer_options_repository(
     mongo_client: core.AgnosticClient,
 ) -> offers.OfferOptionsRepository:
     return offers.OfferOptionsRepository(collection=mongo_client.test.trip_offers)
 
 
 @pytest.fixture()
-def offer_searches_repository(
+async def offer_searches_repository(
     mongo_client: core.AgnosticClient,
 ) -> offers.OfferSearchRepository:
     return offers.OfferSearchRepository(
@@ -54,7 +54,7 @@ def offer_aggregate_collection(
 
 
 @pytest.fixture()
-def offer_aggregate_repository(
+async def offer_aggregate_repository(
     offer_aggregate_collection: core.AgnosticCollection,
 ) -> offers.OfferAggregateMappingRepository:
     return offers.OfferAggregateMappingRepository(collection=offer_aggregate_collection)

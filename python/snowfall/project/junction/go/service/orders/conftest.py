@@ -33,7 +33,7 @@ def resellers_client() -> Any:
 
 
 @pytest.fixture()
-def journey_repository(
+async def journey_repository(
     mongo_client: core.AgnosticClient,
     pnr_client: passenger_name_records.Client,
     resellers_client: Any,
@@ -46,7 +46,7 @@ def journey_repository(
 
 
 @pytest.fixture()
-def order_repository(
+async def order_repository(
     mongo_client: core.AgnosticClient,
 ) -> orders.OrderRepository:
     return orders.OrderRepository(
@@ -55,7 +55,7 @@ def order_repository(
 
 
 @pytest.fixture()
-def booking_repository(
+async def booking_repository(
     mongo_client: core.AgnosticClient,
 ) -> orders.BookingRepository:
     return orders.BookingRepository(
@@ -64,7 +64,7 @@ def booking_repository(
 
 
 @pytest.fixture()
-def booking_details_repository(
+async def booking_details_repository(
     mongo_client: core.AgnosticClient,
 ) -> orders.BookingDetailsRepository:
     return orders.BookingDetailsRepository(
@@ -73,7 +73,7 @@ def booking_details_repository(
 
 
 @pytest.fixture()
-def cancellation_requests_repository(
+async def cancellation_requests_repository(
     mongo_client: core.AgnosticClient,
 ) -> orders.CancellationRequestsRepository:
     return orders.CancellationRequestsRepository(
@@ -82,7 +82,7 @@ def cancellation_requests_repository(
 
 
 @pytest.fixture()
-def booking_cancellations_repository(
+async def booking_cancellations_repository(
     mongo_client: core.AgnosticClient,
 ) -> orders.BookingCancellationsRepository:
     return orders.BookingCancellationsRepository(
