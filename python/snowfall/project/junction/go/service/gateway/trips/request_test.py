@@ -12,7 +12,7 @@ from snowfall.project.junction.go.service.gateway.v1 import trips_pb2
 from snowfall.project.junction.go.service.places.v1 import models_pb2
 from snowfall.project.junction.provider.v2alpha import meta_pb2
 from snowfall.project.junction.provider.v2alpha import trips_pb2 as provider_trips_pb2
-from snowfall.project.junction.v1 import passenger_type_pb2
+from snowfall.project.junction.v1 import passenger_type_pb2, segment_type_pb2
 from snowfall.stdlib.v1 import date_pb2, latlng_pb2
 
 _ORIGIN_IDENTIFIER = "foobar"
@@ -73,6 +73,48 @@ _ROUND_TRIP_TASK = trips_pb2.TripSearchTask(
             origin=_ORIGIN_IDENTIFIER,
             destination=_DESTINATION_IDENTIFIER,
             departure_date=_DEPARTURE_DATE,
+        ),
+        return_date=_RETURN_DATE,
+    ),
+    passengers=[_TASK_PASSENGER],
+)
+_ONE_WAY_TASK_WITH_AIR_SEGMENT = trips_pb2.TripSearchTask(
+    one_way=trips_pb2.OneWay(
+        criterion=trips_pb2.Criterion(
+            origin=_ORIGIN_IDENTIFIER,
+            destination=_DESTINATION_IDENTIFIER,
+            departure_date=_DEPARTURE_DATE,
+            segment_types=[segment_type_pb2.SEGMENT_TYPE_FLIGHT],
+        ),
+    ),
+    passengers=[_TASK_PASSENGER],
+)
+_MULTI_CITY_TASK_WITH_AIR_AND_BUS_SEGMENT = trips_pb2.TripSearchTask(
+    multi_city=trips_pb2.MultiCity(
+        criteria=[
+            trips_pb2.Criterion(
+                origin=_ORIGIN_IDENTIFIER,
+                destination=_DESTINATION_IDENTIFIER,
+                departure_date=_DEPARTURE_DATE,
+                segment_types=[segment_type_pb2.SEGMENT_TYPE_FLIGHT],
+            ),
+            trips_pb2.Criterion(
+                origin=_DESTINATION_IDENTIFIER,
+                destination=_ORIGIN_IDENTIFIER,
+                departure_date=_RETURN_DATE,
+                segment_types=[segment_type_pb2.SEGMENT_TYPE_BUS],
+            ),
+        ],
+    ),
+    passengers=[_TASK_PASSENGER],
+)
+_ROUND_TRIP_TASK_WITH_AIR_SEGMENT = trips_pb2.TripSearchTask(
+    round_trip=trips_pb2.RoundTrip(
+        criterion=trips_pb2.Criterion(
+            origin=_ORIGIN_IDENTIFIER,
+            destination=_DESTINATION_IDENTIFIER,
+            departure_date=_DEPARTURE_DATE,
+            segment_types=[segment_type_pb2.SEGMENT_TYPE_FLIGHT],
         ),
         return_date=_RETURN_DATE,
     ),
@@ -259,6 +301,90 @@ class TestRequestGenerator(object):
                 ),
                 id="round trip with IATA codes identification method",
             ),
+            pytest.param(
+                _ONE_WAY_TASK_WITH_AIR_SEGMENT,
+                meta_pb2.TripSearchCapabilities(
+                    is_supported=True,
+                    stop_identification_method=meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_COORDINATES,
+                    passenger_age_identification_method=meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH,
+                    supported_segment_types=[
+                        segment_type_pb2.SegmentType.SEGMENT_TYPE_FLIGHT,
+                    ],
+                ),
+                provider_trips_pb2.SearchTripsRequest(
+                    one_way=provider_trips_pb2.SearchTripsRequest.OneWay(
+                        criterion=provider_trips_pb2.SearchTripsRequest.Criterion(
+                            origin_coordinates=_ORIGIN_COORDINATES,
+                            destination_coordinates=_DESTINATION_COORDINATES,
+                            departure_date=_DEPARTURE_DATE,
+                        ),
+                    ),
+                    passengers=[_REQUEST_PASSENGER],
+                ),
+                id=(
+                    "one way with coordinates identification method and air segment"
+                    " type"
+                ),
+            ),
+            pytest.param(
+                _MULTI_CITY_TASK_WITH_AIR_AND_BUS_SEGMENT,
+                meta_pb2.TripSearchCapabilities(
+                    is_supported=True,
+                    stop_identification_method=meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_COORDINATES,
+                    passenger_age_identification_method=meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH,
+                    supported_segment_types=[
+                        segment_type_pb2.SegmentType.SEGMENT_TYPE_FLIGHT,
+                        segment_type_pb2.SegmentType.SEGMENT_TYPE_BUS,
+                    ],
+                ),
+                provider_trips_pb2.SearchTripsRequest(
+                    multi_city=provider_trips_pb2.SearchTripsRequest.MultiCity(
+                        criteria=[
+                            provider_trips_pb2.SearchTripsRequest.Criterion(
+                                origin_coordinates=_ORIGIN_COORDINATES,
+                                destination_coordinates=_DESTINATION_COORDINATES,
+                                departure_date=_DEPARTURE_DATE,
+                            ),
+                            provider_trips_pb2.SearchTripsRequest.Criterion(
+                                origin_coordinates=_DESTINATION_COORDINATES,
+                                destination_coordinates=_ORIGIN_COORDINATES,
+                                departure_date=_RETURN_DATE,
+                            ),
+                        ],
+                    ),
+                    passengers=[_REQUEST_PASSENGER],
+                ),
+                id=(
+                    "multi city with coordinates identification method and air and bus"
+                    " segment types"
+                ),
+            ),
+            pytest.param(
+                _ROUND_TRIP_TASK_WITH_AIR_SEGMENT,
+                meta_pb2.TripSearchCapabilities(
+                    is_supported=True,
+                    stop_identification_method=meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_COORDINATES,
+                    passenger_age_identification_method=meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH,
+                    supported_segment_types=[
+                        segment_type_pb2.SegmentType.SEGMENT_TYPE_FLIGHT,
+                    ],
+                ),
+                provider_trips_pb2.SearchTripsRequest(
+                    round_trip=provider_trips_pb2.SearchTripsRequest.RoundTrip(
+                        criterion=provider_trips_pb2.SearchTripsRequest.Criterion(
+                            origin_coordinates=_ORIGIN_COORDINATES,
+                            destination_coordinates=_DESTINATION_COORDINATES,
+                            departure_date=_DEPARTURE_DATE,
+                        ),
+                        return_date=_RETURN_DATE,
+                    ),
+                    passengers=[_REQUEST_PASSENGER],
+                ),
+                id=(
+                    "round trip with coordinates identification method and air segment"
+                    " type"
+                ),
+            ),
         ],
     )
     async def test_generator_is_generating_correct_requests(
@@ -387,6 +513,43 @@ class TestRequestGenerator(object):
                     "round trip with IATA codes identification method and with stop"
                     " without IATA code"
                 ),
+            ),
+            pytest.param(
+                _ONE_WAY_TASK_WITH_AIR_SEGMENT,
+                meta_pb2.TripSearchCapabilities(
+                    is_supported=True,
+                    stop_identification_method=meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_COORDINATES,
+                    passenger_age_identification_method=meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH,
+                    supported_segment_types=[
+                        segment_type_pb2.SegmentType.SEGMENT_TYPE_BUS,
+                    ],
+                ),
+                id="one way with unsupported segment type",
+            ),
+            pytest.param(
+                _MULTI_CITY_TASK_WITH_AIR_AND_BUS_SEGMENT,
+                meta_pb2.TripSearchCapabilities(
+                    is_supported=True,
+                    stop_identification_method=meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_COORDINATES,
+                    passenger_age_identification_method=meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH,
+                    supported_segment_types=[
+                        segment_type_pb2.SegmentType.SEGMENT_TYPE_FLIGHT,
+                        segment_type_pb2.SegmentType.SEGMENT_TYPE_TRAIN,
+                    ],
+                ),
+                id="multi city with one supported and one unsupported segment type",
+            ),
+            pytest.param(
+                _ROUND_TRIP_TASK_WITH_AIR_SEGMENT,
+                meta_pb2.TripSearchCapabilities(
+                    is_supported=True,
+                    stop_identification_method=meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_COORDINATES,
+                    passenger_age_identification_method=meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH,
+                    supported_segment_types=[
+                        segment_type_pb2.SegmentType.SEGMENT_TYPE_BUS,
+                    ],
+                ),
+                id="round trip with unsupported segment type",
             ),
         ],
     )

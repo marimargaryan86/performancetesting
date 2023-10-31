@@ -61,7 +61,7 @@ class Generator(object):
         )
 
         for provider in await self._eligible_providers():
-            # TODO: use supports_multi_city and supported_segment_types flags
+            # TODO(jyggen): use supports_multi_city flag
 
             criteria = [
                 _to_provider_criterion(
@@ -101,8 +101,6 @@ class Generator(object):
         )
 
         for provider in await self._eligible_providers():
-            # TODO: use supported_segment_types flags
-
             criterion = _to_provider_criterion(
                 provider,
                 resolved_stops,
@@ -138,7 +136,7 @@ class Generator(object):
         )
 
         for provider in await self._eligible_providers():
-            # TODO: use supports_round_trip and supported_segment_types flags
+            # TODO(jyggen): use supports_round_trip flag
 
             criterion = _to_provider_criterion(
                 provider,
@@ -176,7 +174,7 @@ def _to_passengers(
 ) -> list[provider_trips_pb2.SearchTripsRequest.Passenger]:
     match provider.trip_search_capabilities.passenger_age_identification_method:
         case provider_meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_PROVIDER_TYPE:
-            # TODO: implement
+            # TODO(jyggen): implement
             return []
         case provider_meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH:
             return [
@@ -225,6 +223,9 @@ def _to_provider_criterion(
     stops_mapping: stops.ResolvedMap,
     criterion: trips_pb2.Criterion,
 ) -> provider_trips_pb2.SearchTripsRequest.Criterion | None:
+    if not _provider_supports_any_segment_type(provider, criterion):
+        return None
+
     try:
         origin = stops_mapping[criterion.origin]
     except KeyError:
@@ -241,7 +242,7 @@ def _to_provider_criterion(
 
     match provider.trip_search_capabilities.stop_identification_method:
         case provider_meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_PROVIDER_IDS:
-            # TODO: implement
+            # TODO(jyggen): implement
             return None
         case provider_meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_COORDINATES:
             provider_criterion.origin_coordinates.CopyFrom(
@@ -277,4 +278,18 @@ def _provider_criterion_is_valid(
             criterion.destination_coordinates.latitude,
             criterion.destination_coordinates.longitude,
         ],
+    )
+
+
+def _provider_supports_any_segment_type(
+    provider: providers.Provider,
+    criterion: trips_pb2.Criterion,
+) -> bool:
+    if not criterion.segment_types:
+        return True
+
+    return any(
+        True
+        for type_ in criterion.segment_types
+        if type_ in provider.trip_search_capabilities.supported_segment_types
     )
