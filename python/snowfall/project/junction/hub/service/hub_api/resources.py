@@ -901,7 +901,11 @@ class BillResource(models.Resource):
             type=BillResource.api_type,
             attributes={
                 "isReconciled": bill.is_reconciled,
-                "totalAmount": money.from_protobuf(bill.total_amount),
+                "totalAmount": (
+                    money.from_protobuf(bill.total_amount)
+                    if bill.HasField("total_amount")
+                    else None
+                ),
                 "reconciledAmount": (
                     money.from_protobuf(bill.reconciled_amount)
                     if bill.HasField("reconciled_amount")

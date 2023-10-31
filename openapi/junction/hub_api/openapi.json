@@ -3890,11 +3890,15 @@
                     "default": false
                   },
                   "totalAmount": {
-                    "allOf": [
+                    "anyOf": [
                       {
                         "$ref": "#/components/schemas/Money"
+                      },
+                      {
+                        "nullable": true
                       }
                     ],
+                    "nullable": true,
                     "readOnly": true,
                     "description": "The total amount of transactions."
                   },
