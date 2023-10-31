@@ -6,6 +6,7 @@ import httpx
 from motor import motor_asyncio
 from pydantic import AnyUrl
 
+from snowfall.project.pay.adapter import bills as bills_adapter
 from snowfall.project.pay.adapter import transactions as transactions_adapter
 from snowfall.project.pay.service.refunds import grpc, repositories
 from snowfall.project.pay.service.transactions.v1alpha import (
@@ -25,6 +26,7 @@ class _GrpcSettings(application.Settings):
     cc_login: str
     cc_api_key: str
     cc_address: str
+    stripe_api_key: str
 
 
 async def _serve(app: application.Application[_GrpcSettings]) -> None:
@@ -48,6 +50,11 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
                         transactions_channel,
                     ),
                 ),
+                bills_client=bills_adapter.GrpcClient(
+                    transactions_pb2_grpc.BillsServiceStub(
+                        transactions_channel,
+                    ),
+                ),
                 payment_client=PaymentClient(
                     base_url=app.settings.cc_address,
                     auth=CurrencyCloudAuth(
@@ -57,6 +64,7 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
                     ),
                     client=metrics.register(httpx.AsyncClient()),
                 ),
+                stripe_api_key=app.settings.stripe_api_key,
             ),
         ],
     )

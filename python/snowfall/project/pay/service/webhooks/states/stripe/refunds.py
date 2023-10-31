@@ -21,7 +21,7 @@ class RefundsState(object):
         stripe_refund: stripe.Refund,
     ) -> bool:
         return await self._update_refund(
-            stripe_refund.id,
+            stripe_refund.refunds.data[0].id,
             stripe_refund.status,
         )
 

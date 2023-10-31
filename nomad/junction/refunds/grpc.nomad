@@ -84,7 +84,7 @@ job "refunds-grpc" {
       driver = "docker"
 
       vault {
-        policies = ["currencycloud-${var.environment}"]
+        policies = ["currencycloud-${var.environment}", "webhooks-${var.environment}"]
       }
 
       template {
@@ -94,6 +94,9 @@ TRANSACTIONS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_transactions-${var
 {{ with secret "kv/data/${var.environment}/currencycloud" }}
 CC_LOGIN={{ .Data.data.cc_login }}
 CC_API_KEY={{ .Data.data.cc_api_key }}
+{{ end }}
+{{ with secret "kv/data/${var.environment}/webhooks" }}
+STRIPE_API_KEY={{ .Data.data.stripe_api_key }}
 {{ end }}
 EOH
         destination = "services.env"

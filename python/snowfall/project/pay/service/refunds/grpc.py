@@ -1,6 +1,8 @@
 import grpc
+import stripe
 
 from snowfall.project.junction.go.adapter.errors import NotFoundError
+from snowfall.project.pay.adapter import bills as bills_adapter
 from snowfall.project.pay.adapter import transactions as transactions_adapter
 from snowfall.project.pay.service.companies.v1alpha.models_pb2 import PaymentType
 from snowfall.project.pay.service.refunds import repositories
@@ -29,12 +31,16 @@ class RefundsService(
         self,
         refunds: repositories.RefundsRepository,
         transactions_client: transactions_adapter.Client,
+        bills_client: bills_adapter.Client,
         payment_client: PaymentClient,
+        stripe_api_key: str,
     ):
         self._refunds = refunds
         self._transactions_client = transactions_client
         self._payment_client = payment_client
+        self._bills_client = bills_client
         self._default_page_size = 20
+        stripe.api_key = stripe_api_key
 
     def get_name(self) -> str:
         return grpc_pb2.DESCRIPTOR.services_by_name["RefundsService"].full_name
@@ -45,13 +51,15 @@ class RefundsService(
             server,
         )
 
-    async def CreateRefund(  # type: ignore[override] # noqa: N802
+    async def CreateRefund(  # type: ignore[override] # noqa: N802, WPS217
         self,
         request: grpc_pb2.CreateRefundRequest,
         context: grpc.aio.ServicerContext,
     ) -> grpc_pb2.CreateRefundResponse:
         try:
-            await self._transactions_client.get(request.refund.transaction_id)
+            transaction = await self._transactions_client.get(
+                request.refund.transaction_id,
+            )
         except NotFoundError:
             await rich_status.abort_with_rich_status(
                 context=context,
@@ -61,8 +69,23 @@ class RefundsService(
                 ),
             )
 
+        try:
+            bill = await self._bills_client.get(transaction.bill_id)
+        except NotFoundError:
+            return await context.abort(grpc.StatusCode.NOT_FOUND)
+
         request.refund.id = string.uuid()
         request.refund.status = models_pb2.Refund.Status.STATUS_PENDING
+
+        if transaction.payment_type == PaymentType.PAYMENT_TYPE_CARD:
+            try:
+                stripe_refund = stripe.Refund.create(
+                    payment_intent=bill.payment_intent_id,
+                )
+            except stripe.error.StripeError:
+                return await context.abort(grpc.StatusCode.INVALID_ARGUMENT)
+            request.refund.external_reference_id = stripe_refund.stripe_id
+
         refund = await self._refunds.insert(request.refund)
 
         return grpc_pb2.CreateRefundResponse(refund=refund)
