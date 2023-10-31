@@ -169,9 +169,13 @@ class TransactionsService(
         bill: models_pb2.Bill,
         amount: money_pb2.Money,
     ) -> models_pb2.Bill:
-        bill_total_amount = money.from_protobuf(bill.total_amount)
         added_amount = money.from_protobuf(amount)
-        bill.total_amount.MergeFrom(bill_total_amount.add(added_amount).protobuf())
+
+        if bill.HasField("total_amount"):
+            bill_total_amount = money.from_protobuf(bill.total_amount)
+            bill.total_amount.MergeFrom(bill_total_amount.add(added_amount).protobuf())
+        else:
+            bill.total_amount.MergeFrom(added_amount.protobuf())
 
         return bill
 
