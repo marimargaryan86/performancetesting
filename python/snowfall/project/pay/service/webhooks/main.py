@@ -1,10 +1,15 @@
 from starlette.middleware import Middleware
 
-from snowfall.project.pay.adapter import refunds
+from snowfall.project.junction.go.adapter import orders
+from snowfall.project.junction.go.service.orders.v1 import orders_pb2_grpc
+from snowfall.project.pay.adapter import refunds, transactions
 from snowfall.project.pay.adapter.payments import GrpcClient
 from snowfall.project.pay.service.payments.v1alpha import payments_pb2_grpc
 from snowfall.project.pay.service.refunds.v1alpha import (
     grpc_pb2_grpc as refunds_pb2_grpc,
+)
+from snowfall.project.pay.service.transactions.v1alpha import (
+    grpc_pb2_grpc as transactions_pb2_grpc,
 )
 from snowfall.project.pay.service.webhooks import bootstrap, routers
 from snowfall.project.pay.service.webhooks.middlewares import HmacHeaderMiddleware
@@ -24,11 +29,25 @@ async def _http(
         app,
         app.settings.refunds_address,
     )
+    transactions_channel = await grpc_factory.make_insecure_channel(
+        app,
+        app.settings.transactions_address,
+    )
+    orders_channel = await grpc_factory.make_insecure_channel(
+        app,
+        app.settings.orders_address,
+    )
     grpc_payment_client = GrpcClient(
         payments_pb2_grpc.PaymentsServiceStub(payments_channel),
     )
     grpc_refunds_client = refunds.GrpcClient(
         refunds_pb2_grpc.RefundsServiceStub(refunds_channel),
+    )
+    grpc_transactions_client = transactions.GrpcClient(
+        transactions_pb2_grpc.TransactionsServiceStub(transactions_channel),
+    )
+    grpc_orders_client = orders.GrpcClient(
+        orders_pb2_grpc.OrderServiceStub(orders_channel),
     )
     asgi_app = starlette.create_starlette_app(
         routes=routers.get_routes(
@@ -37,6 +56,8 @@ async def _http(
                 refunds_state=RefundsState(
                     app.settings.stripe_api_key,
                     grpc_refunds_client,
+                    grpc_transactions_client,
+                    grpc_orders_client,
                 ),
             ),
         ),

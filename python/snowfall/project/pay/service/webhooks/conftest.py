@@ -6,9 +6,11 @@ import pytest
 from starlette import applications
 from starlette.middleware import Middleware
 
+from snowfall.project.junction.go import fixtures as go_fixtures
+from snowfall.project.junction.go.adapter import orders
 from snowfall.project.pay import fixtures
 from snowfall.project.pay import fixtures as pay_fixtures
-from snowfall.project.pay.adapter import refunds
+from snowfall.project.pay.adapter import refunds, transactions
 from snowfall.project.pay.adapter.payments import DictClient, GrpcClient
 from snowfall.project.pay.service.refunds.v1alpha.models_pb2 import Refund
 from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import (
@@ -74,15 +76,37 @@ def refunds_client(
 
 
 @pytest.fixture()
+def transactions_client(
+    transaction_models: Sequence[Transaction],
+) -> transactions.Client:
+    return transactions.DictClient(transaction_models)
+
+
+@pytest.fixture()
+def orders_client() -> orders.Client:
+    return orders.DictClient(
+        go_fixtures.get_journeys(),
+        go_fixtures.get_cancellation_requests(),
+    )
+
+
+@pytest.fixture()
 def stripe_api_key() -> str:
     return "sk_test_4eC39HqLyjWDarjtT1zdp7dc"
 
 
 @pytest.fixture()
-def refund_state(stripe_api_key: str, refunds_client: refunds.Client) -> RefundsState:
+def refund_state(
+    stripe_api_key: str,
+    refunds_client: refunds.Client,
+    transactions_client: transactions.Client,
+    orders_client: orders.Client,
+) -> RefundsState:
     return RefundsState(
         stripe_api_key,
         refunds_client,
+        transactions_client,
+        orders_client,
     )
 
 

@@ -84,6 +84,14 @@ job "webhooks-http" {
         sidecar_service {
           proxy {
             upstreams {
+              local_bind_port  = 8020
+              destination_name = "transactions-${var.environment}"
+            }
+            upstreams {
+              local_bind_port  = 8030
+              destination_name = "orders-${var.environment}"
+            }
+            upstreams {
               local_bind_port  = 8040
               destination_name = "pay-payments-${var.environment}"
             }
@@ -127,6 +135,8 @@ job "webhooks-http" {
         env         = true
         change_mode = "restart"
         data        = <<EOH
+TRANSACTIONS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_transactions-${var.environment}"))}}
+ORDERS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_orders-${var.environment}"))}}
 PAYMENTS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_pay-payments-${var.environment}"))}}
 REFUNDS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_refunds-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/webhooks" }}

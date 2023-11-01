@@ -8,6 +8,8 @@ from snowfall.stdlib.integration.starlette import application
 class Settings(application.Settings):
     payments_address: str
     refunds_address: str
+    transactions_address: str
+    orders_address: str
     secret_key: str
     stripe_api_key: str
     stripe_secret_key: str
