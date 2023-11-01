@@ -20,13 +20,18 @@
   import { getTotalPriceBreakdown } from "utils/offer";
   import Collapsible from "../collapsible.svelte";
   import LoadingIcon from "components/icons/loading-icon.svelte";
-  import Itinerary from "./itinerary.svelte";
+  import SummaryItinerary from "./summary-itinerary.svelte";
   import type { PassengerPickerData } from "../trip-search/passenger-picker/passenger-picker.svelte";
 
   export let priceQuote: TripOfferPriceQuoteModel | undefined = undefined;
   export let passengers: PassengerPickerData;
 
   let collapsible: Collapsible | undefined;
+
+  function renderFareRulesDialog(): void {
+    // TODO: implement
+    alert("Rule dialog here.");
+  }
 
   $: priceBreakdown = priceQuote ? getTotalPriceBreakdown(priceQuote) : undefined;
   $: totalPrice = priceQuote?.price;
@@ -47,42 +52,59 @@
         </span>
       </p>
 
-      <Itinerary {priceQuote} />
+      <SummaryItinerary {priceQuote} on:showFareRules={renderFareRulesDialog} />
     {:else}
       <LoadingIcon size="24px" />
     {/if}
   </div>
 
-  <div class="price" slot="content-after" let:expanded let:transitionTimeMs>
-    {#if expanded}
-      <div transition:slideFade={{ duration: transitionTimeMs }} class="price-breakdown">
-        <span class="typography body-small">This price is for all passengers</span>
+  <div slot="content-after" let:expanded let:transitionTimeMs>
+    <div class="price">
+      {#if expanded}
+        <div transition:slideFade={{ duration: transitionTimeMs }} class="price-breakdown">
+          <span class="typography body-small">This price is for all passengers</span>
 
-        {#if priceBreakdown}
-          <ul>
-            {#each priceBreakdown as item}
-              <li>
-                <span class="typography label-medium">{formatPriceBreakdownType(item.type)}</span>
-                <span class="typography body-small bold">
-                  {formatAmount(item.price, undefined, true)}
-                </span>
-              </li>
-            {/each}
-          </ul>
-        {/if}
+          {#if priceBreakdown}
+            <ul>
+              {#each priceBreakdown as item}
+                <li>
+                  <span class="typography label-medium">{formatPriceBreakdownType(item.type)}</span>
+                  <span class="typography body-small bold">
+                    {formatAmount(item.price, undefined, true)}
+                  </span>
+                </li>
+              {/each}
+            </ul>
+          {/if}
+        </div>
+      {/if}
+
+      <div class="total">
+        <span class="typography body-large bold">Total to pay</span>
+        <em class="typography body-large bold">
+          {#if totalPrice}
+            {formatAmount(totalPrice, undefined, true)}
+          {:else}
+            <LoadingIcon size="16px" />
+          {/if}
+        </em>
+      </div>
+    </div>
+
+    {#if expanded}
+      <div class="fare-rules-wrapper">
+        <p class="typography body-xsmall">
+          Fares are not guaranteed until full payment is received and tickets are issued. See all
+          the applicable <button class="typography body-xsmall" on:click={renderFareRulesDialog}
+            >Fare Rules</button
+          >
+          and
+          <button class="typography body-xsmall" on:click={renderFareRulesDialog}
+            >Baggage Information</button
+          >.
+        </p>
       </div>
     {/if}
-
-    <div class="total">
-      <span class="typography body-large bold">Total to pay</span>
-      <em class="typography body-large bold">
-        {#if totalPrice}
-          {formatAmount(totalPrice, undefined, true)}
-        {:else}
-          <LoadingIcon size="16px" />
-        {/if}
-      </em>
-    </div>
   </div>
 </Collapsible>
 
@@ -135,5 +157,18 @@
 
   .total > em {
     color: var(--color-main-primary-500);
+  }
+
+  .fare-rules-wrapper {
+    padding-top: 16px;
+  }
+
+  button {
+    padding: 0;
+    color: var(--color-common-light-text-link);
+    text-decoration: none;
+    background-color: transparent;
+    border: 0;
+    cursor: pointer;
   }
 </style>

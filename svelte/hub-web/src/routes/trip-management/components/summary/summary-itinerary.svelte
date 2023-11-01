@@ -23,8 +23,15 @@
   import { getTimeDeltaS } from "utils/date-time";
   import Collapsible from "../collapsible.svelte";
   import { ensureDefined } from "utils/array";
+  import { createEventDispatcher } from "svelte";
 
   export let priceQuote: TripOfferPriceQuoteModel;
+
+  const dispatch = createEventDispatcher<{ showFareRules: void }>();
+
+  function showFareRules(): void {
+    dispatch("showFareRules");
+  }
 
   $: legs = getLegs(priceQuote);
 </script>
@@ -63,7 +70,7 @@
   </ul>
 
   <div class="fare-rules">
-    <button class="typography body-small">View fare rules</button>
+    <button class="typography body-small" on:click={showFareRules}>View fare rules</button>
   </div>
 </Collapsible>
 
