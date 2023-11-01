@@ -39,21 +39,6 @@ def get_routes(
         integration.route("/orders", orders.Orders, name="ListOrders"),
         integration.route("/orders/markups", orders.Markups, name="CreateMarkups"),
         integration.route(
-            "/bookings/{bookingId}",
-            orders.Booking,
-            name="ViewBooking",
-        ),
-        integration.route(
-            "/bookings/{bookingId}/details",
-            orders.BookingDetailsByBooking,
-            name="ListDetailsByBooking",
-        ),
-        integration.route(
-            "/bookings/details/{bookingDetailsId}",
-            orders.BookingDetails,
-            name="ViewBookingDetails",
-        ),
-        integration.route(
             "/orders/{orderId}",
             orders.Order,
             name="ViewOrder",
