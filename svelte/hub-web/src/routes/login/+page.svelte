@@ -9,6 +9,7 @@
   import type { LoginActionData } from "./+page.server";
   import { goto } from "$app/navigation";
   import Checkbox from "components/ui/checkbox.svelte";
+  import passengersImage from "assets/images/passengers.png";
 
   export let data;
 
@@ -48,13 +49,11 @@
 </svelte:head>
 
 <main>
-  <JunctionLogo text={false} size={0.5} />
-
   <section class="intro">
-    <JunctionLogo size={0.5} />
+    <h2 class="typography display-medium bold">Your hub for all things travel related</h2>
+    <h3 class="typography body-large">Junction Hub will be the place to make and view bookings</h3>
 
-    <span>Travel payment made</span>
-    <strong>Simple</strong>
+    <img src={passengersImage} alt="" />
   </section>
 
   <section class="login">
@@ -111,12 +110,6 @@
     padding: 0 16px;
   }
 
-  main > :global(.junction-logo) {
-    position: absolute;
-    top: 16px;
-    left: 16px;
-  }
-
   main::before,
   main::after {
     position: absolute;
@@ -136,42 +129,22 @@
   main::after {
     z-index: -1;
     width: 50%;
-    background-image: url("/images/login-bg.png");
-    background-repeat: no-repeat;
-    background-size: cover;
+    background-color: var(--color-main-primary-50);
   }
 
   .intro {
     display: flex;
     flex-flow: column;
-    justify-content: flex-end;
+    gap: 16px;
     justify-self: flex-end;
     width: 100%;
     max-width: 631px;
-    height: 100%;
-    max-height: 563px;
     padding: 54px 44px;
     color: var(--color-main-neutral-800);
-    background: rgb(255 255 255 / 0.4);
-    border-radius: 20px 0 0 20px;
-    backdrop-filter: blur(12px);
   }
 
-  .intro > span {
-    margin: 54px 0 12px;
-    font-weight: 400;
-    font-size: 24px;
-    font-family: "Red Hat Display", Arial, Helvetica, sans-serif;
-    font-style: normal;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-  }
-
-  .intro > strong {
-    font-weight: 700;
-    font-size: 96px;
-    font-family: Raleway, Arial, Helvetica, sans-serif;
-    font-style: normal;
+  .intro > img {
+    width: 100%;
   }
 
   .login > :global(svg) {
