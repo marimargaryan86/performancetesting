@@ -30,7 +30,6 @@
   $: hasTickets = Boolean(
     data.order.bookings.flatMap((item) => item.ticketUrls).filter(ensureDefined).length,
   );
-  $: hasMarkups = Boolean(data.markups);
   $: alertType = getAlertType(data.order.status);
 </script>
 
@@ -80,7 +79,7 @@
 
         <Price bookings={data.order.bookings} />
 
-        {#if hasMarkups}
+        {#if data.markups}
           <Fees orderMarkups={data.markups} />
         {/if}
 

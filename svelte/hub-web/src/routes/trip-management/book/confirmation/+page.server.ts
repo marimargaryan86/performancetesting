@@ -5,7 +5,10 @@ import utils from "../../../integration/trip-management/utils.server";
 import { redirect } from "@sveltejs/kit";
 import routeConfig from "routeConfig";
 
-export function load(event): { order: Promise<OrderModel>; markups: Promise<OrderMarkupsModel> } {
+export function load(event): {
+  order: Promise<OrderModel>;
+  markups: Promise<OrderMarkupsModel | undefined>;
+} {
   try {
     const bookingSession = utils.getBookingSession(event);
 
@@ -18,10 +21,12 @@ export function load(event): { order: Promise<OrderModel>; markups: Promise<Orde
         session: getSession(event),
         id: bookingSession.order.id,
       }),
-      markups: integrationInstances.junctionMobileApi.orders.getOrderMarkups({
-        session: getSession(event),
-        id: bookingSession.order.id,
-      }),
+      markups: integrationInstances.junctionMobileApi.orders
+        .getOrderMarkups({
+          session: getSession(event),
+          id: bookingSession.order.id,
+        })
+        .catch(() => undefined),
     };
   } catch {
     throw redirect(303, routeConfig.routes.tripManagement.routes.book.root);
