@@ -1,7 +1,7 @@
 {
   "development": {
     "variables": {
-      "count": 1,
+      "count": 2,
       "traefik_entrypoints": "websecure",
       "traefik_host_URL": "superapp.junction.dev",
       "plus_poc_api_address": "https://poc.plus.junction.dev",
@@ -23,7 +23,7 @@
   },
   "sandbox": {
     "variables": {
-      "count": 1,
+      "count": 2,
       "traefik_entrypoints": "websecure",
       "traefik_host_URL": "superapp.sandbox.junction.dev",
       "plus_poc_api_address": "https://poc.plus.sandbox.junction.dev",
