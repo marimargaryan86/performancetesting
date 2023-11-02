@@ -1,16 +1,1 @@
-{
-  "meta": {
-    "status": 500,
-    "request_id": "FzAXnwFidgTV_UAACpCE"
-  },
-  "errors": [
-    {
-      "type": "airline_error",
-      "title": "Internal Airline Error",
-      "source": "travelport",
-      "message": "The airline responded with an internal_error error. Please contact us.",
-      "documentation_url": "https://duffel.com/docs/api/overview/errors",
-      "code": "airline_internal"
-    }
-  ]
-}
+{"meta":{"status":500,"request_id":"FzAXnwFidgTV_UAACpCE"},"errors":[{"type":"airline_error","title":"Internal Airline Error","source":"travelport","message":"The airline responded with an internal_error error. Please contact us.","documentation_url":"https://duffel.com/docs/api/overview/errors","code":"airline_internal"}]}

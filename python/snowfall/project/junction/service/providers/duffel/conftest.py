@@ -234,7 +234,7 @@ async def load_file_fixture(
     file_name: str,
 ) -> Any:
     file_path = filesystem.resource_path(
-        package=__name__,
+        package="snowfall.vendor.duffel.client",
         resource="fixtures/{file_name}".format(
             file_name=file_name,
         ),
