@@ -4240,6 +4240,24 @@
           "arrivalAt"
         ]
       },
+      "OfferSegmentDetailRule": {
+        "title": "Offer Segment Detail Rule",
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Cancellation policy"
+          },
+          "body": {
+            "type": "string",
+            "example": "Tickets can be cancelled until the day of departure without any charges. After that, no refund is possible anymore.  NOTE: the refund delay for Homeprint and Mobile tickets is 2 days. Except for agency fee of 20euro for handling."
+          }
+        },
+        "required": [
+          "title",
+          "body"
+        ]
+      },
       "TripOfferPriceQuoteIdentifier": {
         "properties": {
           "id": {
@@ -4535,6 +4553,23 @@
                   "externalReference": {
                     "type": "string",
                     "example": "HDZEMS"
+                  },
+                  "rules": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/OfferSegmentDetailRule"
+                    },
+                    "readOnly": true
+                  },
+                  "ticketUrls": {
+                    "type": "array",
+                    "example": [
+                      "http://example.com/ticket.pdf"
+                    ],
+                    "items": {
+                      "type": "string",
+                      "example": "http://example.com/ticket.pdf"
+                    }
                   }
                 }
               },

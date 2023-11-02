@@ -170,6 +170,18 @@ class Price(models.BaseModel):
         )
 
 
+class FareRule(models.BaseModel):
+    title: str
+    body: str
+
+    @classmethod
+    def from_proto(cls, rule: offer_models_pb2.FareRule) -> FareRule:
+        return cls(
+            title=rule.title,
+            body=rule.body,
+        )
+
+
 class TripBookingResource(models.Resource):
     api_type: ClassVar[str] = "trip-bookings"
 
@@ -191,6 +203,14 @@ class TripBookingResource(models.Resource):
                     booking.trip_result.operator_booking_references,
                 ),
                 "externalReference": booking.trip_result.record_locator,
+                "ticketUrls": list(booking.ticket_urls),
+                "rules": [
+                    {
+                        "title": FareRule.from_proto(booking).title,
+                        "body": FareRule.from_proto(booking).body,
+                    }
+                    for booking in booking.trip_option.rules
+                ],
             },
             relationships={
                 "order": {
