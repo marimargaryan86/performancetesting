@@ -143,6 +143,10 @@ job "pay-api-http" {
     task "http" {
       driver = "docker"
 
+      resources {
+        memory = 500
+      }
+
       vault {
         policies = ["currencycloud-${var.environment}", "pay-api-${var.environment}"]
       }
