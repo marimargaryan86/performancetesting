@@ -63,7 +63,6 @@ def _trip_bookings_resolver(
         bookings_and_cancellations = (
             await orders_client.find_booking_cancellations_for_bookings(
                 bookings=response.bookings,
-                reseller_id=request.user.username,
             )
         )
 
@@ -129,7 +128,6 @@ def _booking_cancellation_resolver(
     ) -> Sequence[resources.BookingCancellationResource]:
         response = await orders_client.find_booking_cancellations(
             identifiers=identifiers,
-            reseller_id=request.user.username,
         )
 
         return [

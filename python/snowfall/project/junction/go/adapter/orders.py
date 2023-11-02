@@ -183,7 +183,7 @@ class Client(abc.ABC):
     async def find_booking_cancellations_for_bookings(
         self,
         bookings: Sequence[models_pb2.Booking],
-        reseller_id: str,
+        reseller_id: str | None = None,
     ) -> list[tuple[models_pb2.Booking, models_pb2.BookingCancellation | None]]:
         """Fetch all booking cancellation resources related to bookings."""
 
@@ -527,7 +527,7 @@ class DictClient(Client):
     async def find_booking_cancellations_for_bookings(
         self,
         bookings: Sequence[models_pb2.Booking],
-        reseller_id: str,
+        reseller_id: str | None = None,
     ) -> list[tuple[models_pb2.Booking, models_pb2.BookingCancellation | None]]:
         bookings_and_cancellations = []
         for booking in bookings:
@@ -535,7 +535,7 @@ class DictClient(Client):
                 booking_cancellation = (
                     await self.get_booking_cancellation_by_booking_id(
                         booking.id,
-                        reseller_id,
+                        reseller_id or "",
                     )
                 )
             except errors.NotFoundError:
@@ -964,7 +964,7 @@ class GrpcClient(Client):
     async def find_booking_cancellations_for_bookings(
         self,
         bookings: Sequence[models_pb2.Booking],
-        reseller_id: str,
+        reseller_id: str | None = None,
     ) -> list[tuple[models_pb2.Booking, models_pb2.BookingCancellation | None]]:
         bookings_and_cancellations = []
         for booking in bookings:
@@ -972,7 +972,7 @@ class GrpcClient(Client):
                 booking_cancellation = (
                     await self.get_booking_cancellation_by_booking_id(
                         booking_id=booking.id,
-                        reseller_id=reseller_id,
+                        reseller_id=reseller_id or "",
                     )
                 )
             except errors.NotFoundError:
