@@ -450,12 +450,13 @@ class BillsService(
         bill = await self._get_bill(context, request.id)
 
         if request.is_reconciled:
-            bill.MergeFrom(
-                models_pb2.Bill(
-                    reconciled_amount=bill.total_amount,
-                    is_reconciled=request.is_reconciled,
-                ),
-            )
+            bill.is_reconciled = request.is_reconciled
+            if bill.HasField("total_amount"):
+                bill.MergeFrom(
+                    models_pb2.Bill(
+                        reconciled_amount=bill.total_amount,
+                    ),
+                )
         else:
             bill.ClearField("reconciled_amount")
             bill.is_reconciled = request.is_reconciled
