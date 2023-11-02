@@ -145,7 +145,7 @@ class DuffelSearchAdapter(object):
         )
 
         if search_task.criteria.HasField("inbound_departure"):
-            inbound_date = protobuf.protobuf_to_datetime(
+            inbound_date = protobuf.protobuf_to_date(
                 search_task.criteria.inbound_departure,
             )
             offer_request_builder.add_slice(
