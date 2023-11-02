@@ -9,6 +9,8 @@ export const billModel = schemaModel.create({
     type: z.literal("bills"),
     attributes: z
       .object({
+        createdAt: z.date({ coerce: true }).optional(),
+        updatedAt: z.date({ coerce: true }).optional(),
         isReconciled: z.boolean().optional(),
         totalAmount: priceModel.schema.optional(),
         reconciledAmount: priceModel.schema.nullable().optional(),
@@ -24,6 +26,8 @@ export const billModel = schemaModel.create({
   model: z.object({
     id: z.string().uuid(),
     orderId: z.string().uuid().optional(),
+    createdAt: z.date({ coerce: true }).optional(),
+    updatedAt: z.date({ coerce: true }).optional(),
     isReconciled: z.boolean(),
     amounts: z.object({
       total: priceModel.model.optional(),
@@ -33,6 +37,8 @@ export const billModel = schemaModel.create({
   toModel: (data) => ({
     id: data.id,
     orderId: data.relationships?.order?.data.id,
+    createdAt: data.attributes?.createdAt || undefined,
+    updatedAt: data.attributes?.updatedAt || undefined,
     isReconciled: Boolean(data.attributes?.isReconciled),
     amounts: {
       total: data.attributes?.totalAmount

@@ -21,6 +21,7 @@ export class BillService extends JunctionHubApiService {
       queryParams: {
         "page[cursor]": cursor,
         "page[limit]": limit,
+        sort: "-updatedAt",
       },
     });
 
