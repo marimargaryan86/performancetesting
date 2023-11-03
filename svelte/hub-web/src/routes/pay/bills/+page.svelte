@@ -60,7 +60,10 @@
       {#each bills as bill}
         <TRow>
           <TCol>{bill.orderId}</TCol>
-          <TMoneyCol money={bill.amounts.total ?? { amount: 0, currency: "EUR" }} />
+          <TMoneyCol
+            money={bill.amounts.total ?? { amount: 0, currency: "EUR" }}
+            currencies={data.currencies}
+          />
           <TCol width="40px" textAlign="right">
             <Switch
               bind:active={bill.isReconciled}
