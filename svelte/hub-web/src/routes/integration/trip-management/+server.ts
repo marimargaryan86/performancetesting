@@ -19,7 +19,7 @@ function parsePassengers(
   passengers: NonNullable<BookingSessionModel["searchData"]>["passengers"],
 ): CreateTripCandidatesSearchModel["passengers"] {
   const adult = new Date();
-  adult.setFullYear(adult.getFullYear() - 25);
+  adult.setFullYear(adult.getFullYear() - 30);
   const child = new Date();
   child.setFullYear(child.getFullYear() - 7);
   const infant = new Date();
