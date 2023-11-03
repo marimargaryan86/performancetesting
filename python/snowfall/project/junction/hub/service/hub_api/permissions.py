@@ -26,6 +26,7 @@ _PERMISSION_MAPPING = types.MappingProxyType(
             "cancel.*",
             "refund.*",
             "transaction.*",
+            "bill.*",
         ),
         "reseller-admin": (
             "journey.*",

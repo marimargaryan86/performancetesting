@@ -60,6 +60,9 @@ class TestCheckPermissions(object):
             ("transaction.view", does_not_raise()),
             ("transaction.add", does_not_raise()),
             ("transaction.edit", does_not_raise()),
+            ("bill.view", does_not_raise()),
+            ("bill.add", does_not_raise()),
+            ("bill.edit", does_not_raise()),
         ],
     )
     async def test_check_permissions_snowfall_admin(
@@ -95,6 +98,9 @@ class TestCheckPermissions(object):
             ("transaction.view", does_not_raise()),
             ("transaction.add", does_not_raise()),
             ("transaction.edit", does_not_raise()),
+            ("bill.view", does_not_raise()),
+            ("bill.add", does_not_raise()),
+            ("bill.edit", does_not_raise()),
         ],
     )
     async def test_check_permissions_snowfall_user(
@@ -130,6 +136,9 @@ class TestCheckPermissions(object):
             ("transaction.view", pytest.raises(HTTPException)),
             ("transaction.add", pytest.raises(HTTPException)),
             ("transaction.edit", pytest.raises(HTTPException)),
+            ("bill.view", pytest.raises(HTTPException)),
+            ("bill.add", pytest.raises(HTTPException)),
+            ("bill.edit", pytest.raises(HTTPException)),
         ],
     )
     async def test_check_permissions_reseller_admin(
@@ -165,6 +174,9 @@ class TestCheckPermissions(object):
             ("transaction.view", pytest.raises(HTTPException)),
             ("transaction.add", pytest.raises(HTTPException)),
             ("transaction.edit", pytest.raises(HTTPException)),
+            ("bill.view", pytest.raises(HTTPException)),
+            ("bill.add", pytest.raises(HTTPException)),
+            ("bill.edit", pytest.raises(HTTPException)),
         ],
     )
     async def test_check_permissions_reseller_user(

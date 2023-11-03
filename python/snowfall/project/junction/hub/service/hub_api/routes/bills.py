@@ -2,6 +2,7 @@ import lagom
 from starlette import endpoints, requests
 
 from snowfall.project.junction.hub.service.hub_api import resources
+from snowfall.project.junction.hub.service.hub_api.permissions import check_permission
 from snowfall.project.pay.adapter import bills as bills_adapter
 from snowfall.stdlib.integration.starlette import (
     messages,
@@ -18,6 +19,8 @@ class Bill(endpoints.HTTPEndpoint):
         request: requests.Request,
         bills_client: bills_adapter.Client = lagom.injectable,
     ) -> models.JsonApiResponse:
+        check_permission("bill.edit", request.user.permissions)
+
         bill_id = request.path_params["billId"]
         payload = await request_helpers.flatten_request(request)
         bill = await bills_client.update_reconciliation(
@@ -40,6 +43,8 @@ class Bill(endpoints.HTTPEndpoint):
         request: requests.Request,
         bills_client: bills_adapter.Client = lagom.injectable,
     ) -> models.JsonApiResponse:
+        check_permission("bill.view", request.user.permissions)
+
         bill = await bills_client.get(request.path_params["billId"])
 
         return await messages.create_response(
@@ -61,6 +66,8 @@ class Bills(endpoints.HTTPEndpoint):
         request: requests.Request,
         bills_client: bills_adapter.Client = lagom.injectable,
     ) -> models.JsonApiResponse:
+        check_permission("bill.view", request.user.permissions)
+
         pagination = pagination_helpers.get_pagination(request)
         sort = sorting.get_sort(request, {"updatedAt": "updated_at"})
         response = await bills_client.find(
