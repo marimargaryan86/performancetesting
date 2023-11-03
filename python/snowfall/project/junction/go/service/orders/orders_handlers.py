@@ -294,6 +294,7 @@ class CancellationTicketCompletedHandler(object):
                 models_pb2.BookingCancellation.STATUS_REJECTED,
                 models_pb2.BookingCancellation.STATUS_REFUND_DUE,
                 models_pb2.BookingCancellation.STATUS_NO_REFUND,
+                models_pb2.BookingCancellation.STATUS_REFUND_ISSUED,
             }
             for booking_cancellation in cancellation.booking_cancellations
         )
