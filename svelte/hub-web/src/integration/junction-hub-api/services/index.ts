@@ -8,6 +8,8 @@ import BeneficiaryService from "./beneficiary-service";
 import BookingService from "./booking-service";
 import BillService from "./bill-service";
 import JourneyService from "./journey-service";
+import OrderService from "./order-service";
+import CancellationService from "./cancellation-service";
 
 export default {
   AccountService,
@@ -20,4 +22,6 @@ export default {
   BookingService,
   BillService,
   JourneyService,
+  OrderService,
+  CancellationService,
 };

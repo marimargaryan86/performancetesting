@@ -1,13 +1,13 @@
 import { error } from "@sveltejs/kit";
 import integrationInstances from "integration-instances";
-import type { TripBooking } from "integration/junction-mobile-api/schemas/booking";
-import type { Order } from "integration/junction-mobile-api/schemas/order";
+import type { TripBooking } from "integration/junction-hub-api/schemas/booking";
+import type { Order } from "integration/junction-hub-api/schemas/order";
 import { getSession } from "utils/auth";
 
 export async function load(
   event,
 ): Promise<{ order: Order; booking: TripBooking; bookingNo: number }> {
-  const order = await integrationInstances.junctionMobileApi.orders.getOrder({
+  const order = await integrationInstances.junctionHubApi.orders.get({
     session: getSession(event),
     id: event.params.orderId,
   });

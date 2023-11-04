@@ -1,4 +1,9 @@
 <script lang="ts" context="module">
+  import type { TripBooking as MobileTripBooking } from "integration/junction-mobile-api/schemas/booking";
+  import type { TripBooking as HubTripBooking } from "integration/junction-hub-api/schemas/booking";
+
+  type TripBooking = MobileTripBooking | HubTripBooking;
+
   function getOrigDestLegs(booking: TripBooking):
     | {
         originLeg: OfferSegmentLeg;
@@ -24,7 +29,6 @@
   import { getTimeDeltaS } from "utils/date-time";
   import SeatIcon from "components/icons/seat-icon.svelte";
   import EntityAvatar from "components/ui/entity-avatar.svelte";
-  import type { TripBooking } from "integration/junction-mobile-api/schemas/booking";
   import type { OfferSegmentLeg } from "integration/common/schemas/offer-segment-leg";
 
   export let bookings: TripBooking[];

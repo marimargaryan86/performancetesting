@@ -29,6 +29,8 @@ export default {
     balances: new junctionHubApi.BalanceService(env.HUB_API_BASE_URL),
     bills: new junctionHubApi.BillService(env.HUB_API_BASE_URL),
     journeys: new junctionHubApi.JourneyService(env.HUB_API_BASE_URL),
+    orders: new junctionHubApi.OrderService(env.HUB_API_BASE_URL),
+    cancellations: new junctionHubApi.CancellationService(env.HUB_API_BASE_URL),
   },
   common: {
     countries: new common.CountryService(),

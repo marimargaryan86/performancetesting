@@ -8,7 +8,7 @@
   import TMoneyCol from "components/ui/table/t-money-col.svelte";
   import TRow from "components/ui/table/t-row.svelte";
   import Table from "components/ui/table/table.svelte";
-  import type { TripBooking } from "integration/junction-mobile-api/schemas/booking";
+  import type { TripBooking } from "integration/junction-hub-api/schemas/booking";
   import routeConfig from "routeConfig";
   import { getOrigin, getDestination } from "utils/booking";
   import CancellationDialog from "./cancellation-dialog.svelte";

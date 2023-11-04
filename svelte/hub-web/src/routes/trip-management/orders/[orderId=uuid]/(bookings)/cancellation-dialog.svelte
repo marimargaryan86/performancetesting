@@ -2,9 +2,9 @@
   import AlertIcon from "components/icons/alert-icon.svelte";
   import Backdrop from "components/ui/backdrop.svelte";
   import Ticket from "../../../components/ticket.svelte";
-  import type { TripBooking } from "integration/junction-mobile-api/schemas/booking";
+  import type { TripBooking } from "integration/junction-hub-api/schemas/booking";
   import Passengers from "../../../components/passengers.svelte";
-  import type { OrderPassenger } from "integration/junction-mobile-api/schemas/order";
+  import type { OrderPassenger } from "integration/junction-hub-api/schemas/order";
   import Itinerary from "../../../components/itinerary.svelte";
   import Button from "components/ui/button.svelte";
   import PhoneIcon from "components/icons/phone-icon.svelte";
