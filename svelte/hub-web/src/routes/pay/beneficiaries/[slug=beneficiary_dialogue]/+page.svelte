@@ -46,14 +46,14 @@
   import { URLExtended } from "utils/url";
   import StandardLayout from "components/page/standard-layout.svelte";
   import Alert from "components/ui/alert.svelte";
-  import type { CreateBeneficiaryModel } from "integration/junction-hub-api/schemas/beneficiary.client";
+  import type { BeneficiaryPut } from "integration/junction-hub-api/schemas/beneficiary";
 
   export let data;
 
   let stepComponent: BeneficiaryDetails | BankAccountDetails | Summary | undefined;
   let error: string | undefined = undefined;
 
-  const beneficiary = writableCookie<CreateBeneficiaryModel>({
+  const beneficiary = writableCookie<BeneficiaryPut>({
     key: "beneficiary-data",
     value: data.beneficiary,
   });

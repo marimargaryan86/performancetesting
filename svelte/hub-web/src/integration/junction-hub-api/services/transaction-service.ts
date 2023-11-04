@@ -1,11 +1,15 @@
-import { parseTransactionSchema } from "../parsers/transaction";
-import type { TransactionModel, TransactionSchema } from "../schemas/transaction";
 import type CompanyService from "./company-service";
 import JunctionHubApiService from "./junction-hub-api-service";
 import type { PaginatedData } from "models/common";
-import type { CompanyModel } from "../schemas/company";
 import { ensureDefined } from "utils/array";
 import type { SessionModel } from "models/user";
+import {
+  transactionParser,
+  type Transaction,
+  type TransactionSchema,
+} from "../schemas/transaction";
+import type { Company } from "../schemas/company";
+import type { IncludedMapping } from "../schemas/included";
 
 export default class TransactionService extends JunctionHubApiService {
   private readonly companyService: CompanyService;
@@ -19,7 +23,7 @@ export default class TransactionService extends JunctionHubApiService {
   private async getCompanies(data: {
     data: TransactionSchema[];
     session: SessionModel;
-  }): Promise<CompanyModel[]> {
+  }): Promise<Company[]> {
     const companyIds = new Set(
       data.data
         .flatMap((transaction) => [
@@ -46,7 +50,7 @@ export default class TransactionService extends JunctionHubApiService {
     session: SessionModel;
     cursor?: string;
     limit?: number;
-  }): Promise<PaginatedData<TransactionModel>> {
+  }): Promise<PaginatedData<Transaction>> {
     const resp = await this.makeRequest<{ data: TransactionSchema[]; links: { next: string } }>(
       "/transactions",
       {
@@ -58,10 +62,12 @@ export default class TransactionService extends JunctionHubApiService {
       },
     );
 
-    const included = { companies: await this.getCompanies({ data: resp.json.data, session }) };
+    const parsed: IncludedMapping = {
+      companies: await this.getCompanies({ data: resp.json.data, session }),
+    };
 
     return {
-      data: resp.json.data.map((item) => parseTransactionSchema(item, included)),
+      data: resp.json.data.map((item) => transactionParser.toModel(item, parsed)),
       cursor: TransactionService.getCursor(resp.json),
     };
   }

@@ -1,6 +1,6 @@
 import { redirect } from "@sveltejs/kit";
 import integrationInstances from "integration-instances";
-import type { CurrencyModel } from "integration/junction-hub-api/schemas/money";
+import type { Currency } from "integration/junction-hub-api/schemas/currency";
 import type { CountryModel } from "models/location";
 import type { UserModel } from "models/user";
 import routeConfig from "routeConfig";
@@ -11,7 +11,7 @@ export async function load(event): Promise<{
     data: UserModel;
     expiresAt: Date | undefined;
   };
-  currencies: Map<string, CurrencyModel>;
+  currencies: Map<string, Currency>;
   countries: Map<string, CountryModel>;
 }> {
   const user = event.locals.user;

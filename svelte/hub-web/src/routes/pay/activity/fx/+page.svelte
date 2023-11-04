@@ -1,46 +1,19 @@
-<script lang="ts" context="module">
-  import type { DateRange } from "models/date-time";
-  import { writable } from "svelte/store";
-
-  export const dateRange = writable<DateRange | undefined>(undefined);
-  export const status = writable<ConversionStatus[]>([]);
-  export const searchQuery = writable("");
-</script>
-
 <script lang="ts">
-  import { filterConversions } from "filters/conversion";
   import { yymmdd } from "formatting/date-time";
-  import type { DirectionY } from "models/spatial";
-  import { sortConversions } from "sorting/conversion";
-  import { callAction, type FlattenedObject } from "utils/common";
+  import { callAction } from "utils/common";
   import Table from "components/ui/table/table.svelte";
   import THead from "components/ui/table/t-head.svelte";
   import Header from "components/ui/table/header.svelte";
   import TBody from "components/ui/table/t-body.svelte";
   import TRow from "components/ui/table/t-row.svelte";
   import TCol from "components/ui/table/t-col.svelte";
-  import { onMount } from "svelte";
   import routeConfig from "routeConfig";
-  import type {
-    ConversionModel,
-    ConversionStatus,
-  } from "integration/junction-hub-api/schemas/conversion";
   import TStatusBadgeCol from "components/ui/table/t-status-badge-col.svelte";
 
   export let form;
   export let data;
 
-  let sortDirection: DirectionY = "down";
-  let sortGroup: FlattenedObject<ConversionModel> = "createdAt";
-
-  $: conversions = sortConversions(
-    filterConversions(data.conversions.data, {
-      query: $searchQuery,
-      dateRange: $dateRange,
-      status: $status,
-    }),
-    { by: sortGroup, direction: sortDirection },
-  );
+  $: conversions = data.conversions.data;
 
   async function loadMore(): Promise<void> {
     if (!data.conversions.cursor) {
@@ -61,12 +34,6 @@
       };
     }
   }
-
-  onMount(() => {
-    $searchQuery = "";
-    $dateRange = undefined;
-    $status = [];
-  });
 </script>
 
 <svelte:head>
@@ -76,40 +43,38 @@
 <Table class="fx-table" {loadMore}>
   <THead>
     <Header>ID</Header>
-    <Header bind:sortGroup bind:sortDirection sortValue="createdAt">Created</Header>
-    <Header bind:sortGroup bind:sortDirection sortValue="settledAt">Settlement</Header>
-    <Header bind:sortGroup bind:sortDirection sortValue="sellAmount.currency">From</Header>
-    <Header bind:sortGroup bind:sortDirection sortValue="buyAmount.currency">To</Header>
-    <Header bind:sortGroup bind:sortDirection sortValue="transaction.rates.fxQuote">
-      Quote Rate
-    </Header>
-    <Header bind:sortGroup bind:sortDirection sortValue="executedRate">Transaction Rate</Header>
+    <Header>Created</Header>
+    <Header>Settlement</Header>
+    <Header>From</Header>
+    <Header>To</Header>
+    <Header>Quote Rate</Header>
+    <Header>Transaction Rate</Header>
     <Header>FX Delta</Header>
     <Header>FX Buffer</Header>
-    <Header bind:sortGroup bind:sortDirection sortValue="fxStatus">Status</Header>
+    <Header>Status</Header>
   </THead>
 
   <TBody>
     {#each conversions as conversion (conversion.id)}
       <TRow>
-        <TCol maxWidth="96px" copyable>{conversion.transaction?.bookingId ?? ""}</TCol>
-        <TCol class="currency typography bold"
-          >{conversion.createdAt ? yymmdd(conversion.createdAt) : ""}</TCol
-        >
-        <TCol class="currency typography bold"
-          >{conversion.settledAt ? yymmdd(conversion.settledAt) : ""}</TCol
-        >
-        <TCol class="currency typography bold"
-          >{conversion.sellAmount?.currency ? conversion.sellAmount.currency : ""}</TCol
-        >
-        <TCol class="currency typography bold"
-          >{conversion.buyAmount?.currency ? conversion.buyAmount.currency : ""}</TCol
-        >
-        <TCol>{conversion.transaction?.rates.fxQuote ?? ""}</TCol>
+        <TCol maxWidth="96px" copyable>{conversion.transaction?.externalReference ?? ""}</TCol>
+        <TCol class="currency typography bold">
+          {conversion.createdAt ? yymmdd(conversion.createdAt) : ""}
+        </TCol>
+        <TCol class="currency typography bold">
+          {conversion.settledAt ? yymmdd(conversion.settledAt) : ""}
+        </TCol>
+        <TCol class="currency typography bold">
+          {conversion.amounts.sell?.currency ? conversion.amounts.sell.currency : ""}
+        </TCol>
+        <TCol class="currency typography bold">
+          {conversion.amounts.buy?.currency ? conversion.amounts.buy.currency : ""}
+        </TCol>
+        <TCol>{conversion.transaction?.fx.quote ?? ""}</TCol>
         <TCol>{conversion.executedRate}</TCol>
-        <TCol>{conversion.fxDelta ?? ""}</TCol>
-        <TCol>{conversion.transaction?.rates.fxBuffer ?? ""}</TCol>
-        <TStatusBadgeCol value={conversion.fxStatus ?? "unspecified"} />
+        <TCol>{conversion.fx.delta ?? ""}</TCol>
+        <TCol>{conversion.transaction?.fx.buffer ?? ""}</TCol>
+        <TStatusBadgeCol value={conversion.fx.status ?? "unspecified"} />
       </TRow>
     {/each}
   </TBody>

@@ -1,13 +1,12 @@
 <script lang="ts" context="module">
   import type { BookingStatus } from "integration/junction-mobile-api/schemas/booking";
-  import type { ConversionStatus } from "integration/junction-hub-api/schemas/conversion";
-  import type { TransactionStatus } from "integration/junction-hub-api/schemas/transaction";
 
   export type StatusBadgeVariant = "ok" | "warn" | "error";
   export type StatusBadgeValue =
     | BookingStatus
-    | ConversionStatus
-    | TransactionStatus
+    | "unspecified"
+    | "executed"
+    | "failed"
     | "completed"
     | "deleted"
     | "unknown";
@@ -16,7 +15,6 @@
     confirmed: "ok",
     completed: "ok",
     executed: "ok",
-    paid: "ok",
     error: "error",
     rejected: "error",
     deleted: "error",

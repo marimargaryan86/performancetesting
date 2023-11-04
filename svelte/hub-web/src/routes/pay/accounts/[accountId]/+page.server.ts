@@ -1,23 +1,25 @@
 import { getSession } from "utils/auth";
 import integrationInstances from "integration-instances";
-import type { PriceModel } from "integration/junction-mobile-api/schemas/price";
-import type { AccountModel } from "integration/junction-hub-api/schemas/account";
+import type { Account } from "integration/junction-hub-api/schemas/account";
+import type { Balance } from "integration/junction-hub-api/schemas/balance";
 
-export function load(event): {
-  balances: Promise<PriceModel[]>;
-  account: Promise<AccountModel>;
-} {
+export async function load(event): Promise<{
+  balances: Balance[];
+  account: Account;
+}> {
   const { accountId } = event.params;
   const session = getSession(event);
 
-  return {
-    account: integrationInstances.junctionHubApi.accounts.getAccount({ session, id: accountId }),
-    balances: integrationInstances.junctionHubApi.balances.listBalances({ session, accountId }),
-  };
+  const [account, balances] = await Promise.all([
+    integrationInstances.junctionHubApi.accounts.getAccount({ session, id: accountId }),
+    integrationInstances.junctionHubApi.balances.listBalances({ session, accountId }),
+  ]);
+
+  return { account, balances };
 }
 
 export const actions = {
-  async addBalances(event): Promise<{ balances: PriceModel[] }> {
+  async addBalances(event): Promise<{ balances: Balance[] }> {
     const { accountId } = event.params;
     const formData = await event.request.formData();
     const jsonData = JSON.parse(formData.get("json")?.toString() ?? "{}") as {
@@ -30,11 +32,11 @@ export const actions = {
 
     return {
       balances: await Promise.all(
-        jsonData.currencyCodes.map((currencyCode) =>
+        jsonData.currencyCodes.map((currencyId) =>
           integrationInstances.junctionHubApi.balances.addBalance({
             session: getSession(event),
             accountId,
-            currencyCode,
+            data: { currencyId },
           }),
         ),
       ),

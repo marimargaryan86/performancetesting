@@ -1,46 +1,35 @@
-<script lang="ts" context="module">
-  const schema = beneficiaryModel.pick({ currencyCode: true, bankDetails: true });
-</script>
-
 <script lang="ts">
   import SelectField from "components/ui/select-field.svelte";
-  import {
-    beneficiaryModel,
-    type CreateBeneficiaryModel,
-  } from "integration/junction-hub-api/schemas/beneficiary.client";
   import Section from "./section.svelte";
   import TextField from "components/ui/text-field.svelte";
   import RegularPaymentIcon from "components/icons/regular-payment-icon.svelte";
   import PriorityPaymentIcon from "components/icons/priority-payment-icon.svelte";
   import type { CountryModel } from "models/location";
-  import { z } from "zod";
-  import { updateBeneficiaryData } from "./helpers";
   import { formatCountryOption } from "formatting/location";
-  import type { CurrencyModel } from "integration/junction-hub-api/schemas/money";
+  import type { BeneficiaryPut } from "integration/junction-hub-api/schemas/beneficiary";
+  import type { Currency } from "integration/junction-hub-api/schemas/currency";
 
-  export let data: CreateBeneficiaryModel;
-  export let currencies: Map<string, CurrencyModel>;
+  export let data: BeneficiaryPut;
+  export let currencies: Map<string, Currency>;
   export let countries: Map<string, CountryModel>;
 
-  let errors: z.ZodFormattedError<z.infer<typeof schema>> | undefined = undefined;
-  let bankDetails = data.bankDetails ?? {};
-  let address = bankDetails.address ?? {};
-  let addressLine = address.addressLines?.[0];
   let country = countries.get(data.address?.countryCode ?? "");
 
-  $: address = {
-    ...address,
-    addressLines: addressLine ? [addressLine] : [],
-    countryCode: country?.code,
-  };
-  $: bankDetails = {
-    ...bankDetails,
-    address,
-    paymentType: bankDetails.paymentType ?? "regular",
-    type: bankDetails.type ?? "iban",
-    accountType: "checking",
-  };
-  $: data = { ...data, bankDetails };
+  $: data = updateCountry(country);
+
+  function updateCountry(nextCountry?: CountryModel): BeneficiaryPut {
+    if (!nextCountry) {
+      return data;
+    }
+
+    return {
+      ...data,
+      address: {
+        ...data.address,
+        countryCode: nextCountry.code,
+      },
+    };
+  }
 
   function formatCurrencyOption(code?: string): string {
     const currency = currencies.get(code ?? "");
@@ -49,19 +38,7 @@
   }
 
   export function validate(): boolean {
-    errors = undefined;
-
-    try {
-      data = { ...data, ...schema.parse(updateBeneficiaryData(data)) };
-
-      return true;
-    } catch (err) {
-      if (err instanceof z.ZodError) {
-        errors = err.format();
-      }
-    }
-
-    return false;
+    return true;
   }
 </script>
 
@@ -75,16 +52,14 @@
       label="Bank name"
       required
       placeholder="Enter bank name"
-      error={errors?.bankDetails?.name?._errors}
-      bind:value={bankDetails.name}
+      bind:value={data.bankDetails.name}
     />
 
     <TextField
       label="Bank address"
       required
       placeholder="Enter address"
-      error={errors?.bankDetails?.address?.addressLines?._errors}
-      bind:value={addressLine}
+      bind:value={data.bankDetails.address.street.line1}
     />
 
     <SelectField
@@ -93,7 +68,6 @@
       options={Array.from(countries.values())}
       formatter={formatCountryOption}
       required
-      error={errors?.bankDetails?.address?.countryCode?._errors}
       bind:value={country}
     />
     <SelectField
@@ -102,8 +76,7 @@
       options={Array.from(currencies.values()).map((c) => c.code)}
       formatter={formatCurrencyOption}
       required
-      error={errors?.currencyCode?._errors}
-      bind:value={data.currencyCode}
+      bind:value={data.currencyId}
     />
   </form>
 </Section>
@@ -116,7 +89,7 @@
 >
   <form>
     <div class="options">
-      <label class="option" class:selected={bankDetails.paymentType === "regular"}>
+      <label class="option" class:selected={data.bankDetails.paymentType === "regular"}>
         <RegularPaymentIcon />
 
         <div>
@@ -126,9 +99,9 @@
           </span>
         </div>
 
-        <input type="radio" bind:group={bankDetails.paymentType} value="regular" />
+        <input type="radio" bind:group={data.bankDetails.paymentType} value="regular" />
       </label>
-      <label class="option" class:selected={bankDetails.paymentType === "priority"}>
+      <label class="option" class:selected={data.bankDetails.paymentType === "priority"}>
         <PriorityPaymentIcon />
 
         <div>
@@ -139,7 +112,7 @@
           </span>
         </div>
 
-        <input type="radio" bind:group={bankDetails.paymentType} value="priority" />
+        <input type="radio" bind:group={data.bankDetails.paymentType} value="priority" />
       </label>
     </div>
   </form>
@@ -153,15 +126,21 @@
 >
   <form>
     <div class="options">
-      <label class="option typography body-large bold" class:selected={bankDetails.type === "iban"}>
+      <label
+        class="option typography body-large bold"
+        class:selected={data.bankDetails.type === "iban"}
+      >
         IBAN
 
-        <input type="radio" bind:group={bankDetails.type} value="iban" />
+        <input type="radio" bind:group={data.bankDetails.type} value="iban" />
       </label>
-      <label class="option typography body-large bold" class:selected={bankDetails.type === "aba"}>
+      <label
+        class="option typography body-large bold"
+        class:selected={data.bankDetails.type === "aba"}
+      >
         Sort code and account no.
 
-        <input type="radio" bind:group={bankDetails.type} value="aba" />
+        <input type="radio" bind:group={data.bankDetails.type} value="aba" />
       </label>
     </div>
 
@@ -169,38 +148,28 @@
       label="SWIFT/BIC Code"
       required
       placeholder="Enter SWIFT/BIC Code"
-      error={errors?.bankDetails?.bicSwift?._errors}
-      bind:value={bankDetails.bicSwift}
+      bind:value={data.bankDetails.bicSwift}
     />
 
-    {#if bankDetails.type === "iban"}
+    {#if data.bankDetails.type === "iban"}
       <TextField
         label="IBAN Code"
         required
         placeholder="Enter IBAN Code"
-        error={errors?.bankDetails && "iban" in errors.bankDetails
-          ? errors.bankDetails.iban?._errors
-          : undefined}
-        bind:value={bankDetails.iban}
+        bind:value={data.bankDetails.iban}
       />
     {:else}
       <TextField
         label="Sort Code"
         required
         placeholder="00-00-00"
-        error={errors?.bankDetails && "aba" in errors.bankDetails
-          ? errors.bankDetails.aba?._errors
-          : undefined}
-        bind:value={bankDetails.aba}
+        bind:value={data.bankDetails.aba}
       />
       <TextField
         label="Account Number"
         required
         placeholder="00000000"
-        error={errors?.bankDetails && "accountNumber" in errors.bankDetails
-          ? errors.bankDetails.accountNumber?._errors
-          : undefined}
-        bind:value={bankDetails.accountNumber}
+        bind:value={data.bankDetails.accountNumber}
       />
     {/if}
   </form>

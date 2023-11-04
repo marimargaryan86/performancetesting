@@ -6,8 +6,7 @@
   import THead from "components/ui/table/t-head.svelte";
   import TRow from "components/ui/table/t-row.svelte";
   import Table from "components/ui/table/table.svelte";
-  import { callAction, capitalize, type FlattenedObject } from "utils/common";
-  import type { DirectionY } from "models/spatial";
+  import { callAction, capitalize } from "utils/common";
   import Button from "components/ui/button.svelte";
   import PlusIcon from "components/icons/plus-icon.svelte";
   import EditIcon from "components/icons/edit-icon.svelte";
@@ -15,14 +14,9 @@
   import routeConfig from "routeConfig";
   import TActionsCol from "components/ui/table/t-actions-col.svelte";
   import StandardLayout from "components/page/standard-layout.svelte";
-  import type { BeneficiaryModel } from "integration/junction-hub-api/schemas/beneficiary";
 
   export let data;
   export let form;
-
-  let sortGroup: FlattenedObject<BeneficiaryModel> = "companyName";
-  let sortDirection: DirectionY = "down";
-  let searchQuery = "";
 
   $: beneficiaries = data.beneficiaries.data;
 
@@ -60,7 +54,7 @@
 {#if !dev}
   <div />
 {:else}
-  <StandardLayout pageTitle="Beneficiaries" bind:searchQuery>
+  <StandardLayout pageTitle="Beneficiaries">
     <Button
       size="small"
       href={routeConfig.routes.pay.routes.beneficiaries.routes.beneficiary().root}
@@ -73,24 +67,24 @@
 
     <Table class="beneficiaries-table" {loadMore}>
       <THead>
-        <Header bind:sortGroup bind:sortDirection sortValue="companyName">Company</Header>
+        <Header>Company</Header>
         <Header>Currency</Header>
-        <Header bind:sortGroup bind:sortDirection sortValue="bankDetails.address.countryCode">
-          Bank Country
-        </Header>
+        <Header>Bank Country</Header>
         <Header>Type</Header>
         <Header />
       </THead>
 
       <TBody>
         {#each beneficiaries as item (item.id)}
-          {@const currency = data.currencies.get(item.currencyCode)}
+          {@const currency = data.currencies.get(item.currencyId)}
 
           <TRow alternatingBackground={false}>
-            <TCol class="company-name typography body-medium bold">{item.companyName}</TCol>
+            <TCol class="company-name typography body-medium bold">
+              {item.bankAccountHolderName}
+            </TCol>
             <TCol>
               <div class="currency">
-                <strong class="typography body-medium bold">{item.currencyCode}</strong>
+                <strong class="typography body-medium bold">{item.currencyId}</strong>
                 <span class="typography body-small">{currency?.name ?? ""}</span>
               </div>
             </TCol>

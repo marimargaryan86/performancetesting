@@ -5,9 +5,9 @@
   import { formatAmount } from "formatting/currency";
   import AddBalanceDialogue from "./add-balance-dialogue.svelte";
   import Button from "components/ui/button.svelte";
-  import type { PriceModel } from "integration/junction-mobile-api/schemas/price";
   import StandardLayout from "components/page/standard-layout.svelte";
   import routeConfig from "routeConfig";
+  import type { Balance } from "integration/junction-hub-api/schemas/balance";
 
   export let data;
 
@@ -22,14 +22,14 @@
     },
   ];
   $: balances = data.balances
-    .filter((item) => item.currency.toLowerCase().includes(searchQuery.toLowerCase()))
-    .sort((a, b) => 0 - (a.currency < b.currency ? 1 : -1));
+    .filter((item) => item.currencyId.toLowerCase().includes(searchQuery.toLowerCase()))
+    .sort((a, b) => 0 - (a.currencyId < b.currencyId ? 1 : -1));
 
   function openDialogue(): void {
     dialogue.open();
   }
 
-  function addBalances(event: CustomEvent<PriceModel[]>): void {
+  function addBalances(event: CustomEvent<Balance[]>): void {
     data.balances = [...event.detail, ...data.balances];
   }
 </script>
@@ -56,11 +56,14 @@
     {#each balances as balance}
       <li>
         <a href="#top" class="balance">
-          <CurrencyFlag code={balance.currency} />
+          <CurrencyFlag code={balance.currencyId} />
 
           <span>
             <strong class="typography body-large bold">
-              {formatAmount(balance, data.currencies)}
+              {formatAmount(
+                { currency: balance.currencyId, amount: balance.amount },
+                data.currencies,
+              )}
             </strong>
             <span class="typography body-small">{balance.currency}</span>
           </span>

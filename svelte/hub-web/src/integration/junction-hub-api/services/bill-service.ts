@@ -1,7 +1,7 @@
 import type { SessionModel } from "models/user";
 import JunctionHubApiService from "./junction-hub-api-service";
 import type { PaginatedData } from "models/common";
-import { billModel, type BillModel, type BillSchema } from "../schemas/bill";
+import { billParser, type Bill, type BillSchema } from "../schemas/bill";
 
 export class BillService extends JunctionHubApiService {
   async listBills({
@@ -12,7 +12,7 @@ export class BillService extends JunctionHubApiService {
     session: SessionModel;
     cursor?: string;
     limit?: number;
-  }): Promise<PaginatedData<BillModel>> {
+  }): Promise<PaginatedData<Bill>> {
     const resp = await this.makeRequest<{
       data: BillSchema[];
       links: { next: string };
@@ -26,21 +26,15 @@ export class BillService extends JunctionHubApiService {
     });
 
     return {
-      data: resp.json.data.map(billModel.toModel),
+      data: resp.json.data.map((item) => billParser.toModel(item)),
       cursor: BillService.getCursor(resp.json),
     };
   }
 
-  async getBill({
-    session,
-    billId,
-  }: {
-    session: SessionModel;
-    billId: string;
-  }): Promise<BillModel> {
+  async getBill({ session, billId }: { session: SessionModel; billId: string }): Promise<Bill> {
     const resp = await this.makeRequest<{ data: BillSchema }>(`/bills/${billId}`, { session });
 
-    return billModel.toModel(resp.json.data);
+    return billParser.toModel(resp.json.data);
   }
 
   async toggleReconciliation({
@@ -48,21 +42,18 @@ export class BillService extends JunctionHubApiService {
     bill,
   }: {
     session: SessionModel;
-    bill: BillModel;
-  }): Promise<BillModel> {
+    bill: Bill;
+  }): Promise<Bill> {
     const resp = await this.makeRequest<{
       data: BillSchema;
     }>(`/bills/${bill.id}`, {
       session,
       method: "PATCH",
       data: {
-        data: {
-          type: "bills",
-          attributes: { isReconciled: !bill.isReconciled },
-        },
+        data: billParser.toUpdateSchema({ ...bill, reconciled: !bill.reconciled }),
       },
     });
 
-    return billModel.toModel(resp.json.data);
+    return billParser.toModel(resp.json.data);
   }
 }

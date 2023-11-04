@@ -1,57 +1,63 @@
-import schemaModel, { type Infer } from "utils/schema-model";
-import { moneyModel } from "./money";
-import { transactionModel, type TransactionIdentifier, type TransactionModel } from "./transaction";
-import { z } from "zod";
+import type { IncludedMapping } from "./included";
+import { moneyParser, type Money, type MoneySchema } from "./money";
+import type { Transaction, TransactionSchema } from "./transaction";
 
-const conversionRelationships: z.ZodType<{
-  transactions: { data: TransactionIdentifier };
-}> = z.lazy(() => schemaModel.relationships({ transactions: transactionModel.identifier }));
+export type Conversion = {
+  id: string;
+  createdAt?: Date;
+  settledAt?: Date;
+  amounts: {
+    buy?: Money;
+    sell?: Money;
+  };
+  executedRate?: number;
+  fx: {
+    delta?: number;
+    status?: "unspecified" | "executed" | "failed";
+  };
+  transactionId?: string;
+  transaction?: Transaction;
+};
 
-const conversionModelBase = z.object({
-  id: z.string(),
-  createdAt: z.date({ coerce: true }).optional(),
-  settledAt: z.date({ coerce: true }).optional(),
-  sellAmount: moneyModel.model.optional(),
-  buyAmount: moneyModel.model.optional(),
-  executedRate: z.number().optional(),
-  fxDelta: z.number().optional(),
-  fxStatus: z.enum(["executed", "unspecified", "failed"]).optional(),
-});
+export type ConversionSchema = {
+  id: string;
+  type: "conversions";
+  attributes: {
+    createdAt?: string;
+    settledAt?: string;
+    sellAmount?: MoneySchema;
+    buyAmount?: MoneySchema;
+    executedRate?: number;
+    fxDelta?: number | null;
+    fxStatus?: "unspecified" | "executed" | "failed";
+  };
+  relationships?: {
+    transactions: { data: Pick<TransactionSchema, "id" | "type"> };
+  };
+  links: { self: string };
+};
 
-const conversionModelExt: z.ZodType<
-  z.infer<typeof conversionModelBase> & { transaction?: TransactionModel }
-> = z.lazy(() => conversionModelBase.extend({ transaction: transactionModel.model.optional() }));
+export const conversionParser = {
+  toModel: (data: ConversionSchema, included?: IncludedMapping): Conversion => {
+    const transactionId = data.relationships?.transactions.data.id;
 
-export const conversionModel = schemaModel.create({
-  schema: z.object({
-    id: z.string(),
-    type: z.literal("conversions"),
-    attributes: z.object({
-      createdAt: z.date({ coerce: true }).optional(),
-      settledAt: z.date({ coerce: true }).optional(),
-      sellAmount: moneyModel.schema.optional(),
-      buyAmount: moneyModel.schema.optional(),
-      executedRate: z.number().optional(),
-      fxDelta: z.number().nullable().optional(),
-      fxStatus: z.enum(["unspecified", "executed", "failed"]).optional(),
-    }),
-    relationships: conversionRelationships.optional(),
-    links: schemaModel.links({ self: true }),
-  }),
-  model: conversionModelExt,
-  toModel: (data) => ({
-    id: data.id,
-    buyAmount: data.attributes.buyAmount,
-    createdAt: data.attributes.createdAt,
-    executedRate: data.attributes.executedRate,
-    fxDelta: data.attributes.fxDelta ?? undefined,
-    fxStatus: data.attributes.fxStatus,
-    sellAmount: data.attributes.sellAmount,
-    settledAt: data.attributes.settledAt,
-    transaction: undefined,
-  }),
-});
-export type ConversionModel = Infer<typeof conversionModel>;
-export type ConversionSchema = Infer<typeof conversionModel, "schema">;
-export type ConversionIdentifier = Infer<typeof conversionModel, "identifier">;
-export type ConversionStatus = NonNullable<ConversionModel["fxStatus"]>;
+    return {
+      id: data.id,
+      createdAt: data.attributes.createdAt ? new Date(data.attributes.createdAt) : undefined,
+      settledAt: data.attributes.settledAt ? new Date(data.attributes.settledAt) : undefined,
+      amounts: {
+        buy: data.attributes.buyAmount ? moneyParser.toModel(data.attributes.buyAmount) : undefined,
+        sell: data.attributes.sellAmount
+          ? moneyParser.toModel(data.attributes.sellAmount)
+          : undefined,
+      },
+      fx: {
+        delta: data.attributes.fxDelta ?? undefined,
+        status: data.attributes.fxStatus,
+      },
+      executedRate: data.attributes.executedRate,
+      transactionId,
+      transaction: included?.transactions?.find(({ id }) => id === transactionId),
+    };
+  },
+};

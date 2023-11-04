@@ -1,9 +1,9 @@
 import integrationInstances from "integration-instances";
-import type { BillModel } from "integration/junction-hub-api/schemas/bill";
+import type { Bill } from "integration/junction-hub-api/schemas/bill";
 import type { PaginatedData } from "models/common";
 import { getSession } from "utils/auth";
 
-export function load(event): { bills: Promise<PaginatedData<BillModel>> } {
+export function load(event): { bills: Promise<PaginatedData<Bill>> } {
   return {
     bills: integrationInstances.junctionHubApi.bills.listBills({
       session: getSession(event),
@@ -12,7 +12,7 @@ export function load(event): { bills: Promise<PaginatedData<BillModel>> } {
 }
 
 export const actions = {
-  async listBills(event): Promise<{ bills: PaginatedData<BillModel> }> {
+  async listBills(event): Promise<{ bills: PaginatedData<Bill> }> {
     const formData = await event.request.formData();
     const cursor = formData.get("cursor")?.toString();
 

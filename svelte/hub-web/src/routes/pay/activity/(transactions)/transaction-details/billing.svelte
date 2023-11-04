@@ -1,8 +1,8 @@
 <script lang="ts">
   import { formatAmountAndCode } from "formatting/currency";
-  import type { BookingModel } from "integration/junction-hub-api/schemas/booking";
+  import type { TripBooking } from "integration/junction-hub-api/schemas/booking";
 
-  export let booking: BookingModel;
+  export let booking: TripBooking;
 </script>
 
 <div class="billing">
@@ -14,14 +14,14 @@
 
     <span class="typography body-small subtle">Fare</span>
     <span class="typography body-small bold right-align">
-      {formatAmountAndCode(booking.price)}
+      {formatAmountAndCode(booking.price.total)}
     </span>
 
     <hr />
 
     <span class="typography body-large subtle">Total</span>
     <span class="typography body-large bold right-align">
-      {formatAmountAndCode(booking.price)}
+      {formatAmountAndCode(booking.price.total)}
     </span>
   </div>
 </div>

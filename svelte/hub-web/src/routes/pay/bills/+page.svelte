@@ -8,7 +8,7 @@
   import TMoneyCol from "components/ui/table/t-money-col.svelte";
   import TRow from "components/ui/table/t-row.svelte";
   import Table from "components/ui/table/table.svelte";
-  import type { BillModel } from "integration/junction-hub-api/schemas/bill";
+  import type { Bill } from "integration/junction-hub-api/schemas/bill";
   import type { PaginatedData } from "models/common";
   import routeConfig from "routeConfig";
   import { callAction } from "utils/common";
@@ -22,7 +22,7 @@
       return;
     }
 
-    const result = await callAction<{ bills: PaginatedData<BillModel> }>({
+    const result = await callAction<{ bills: PaginatedData<Bill> }>({
       action: routeConfig.routes.pay.routes.bills.actions.listBills,
       data: { cursor: data.bills.cursor },
       apply: false,
@@ -36,7 +36,7 @@
     }
   }
 
-  async function toggleReconciliation(bill: BillModel): Promise<void> {
+  async function toggleReconciliation(bill: Bill): Promise<void> {
     await callAction({
       action: routeConfig.routes.pay.routes.bills.actions.toggleReconciliation,
       apply: false,
@@ -66,7 +66,7 @@
           />
           <TCol width="40px" textAlign="right">
             <Switch
-              bind:active={bill.isReconciled}
+              bind:active={bill.reconciled}
               on:toggle={toggleReconciliation.bind(toggleReconciliation, bill)}
             />
           </TCol>

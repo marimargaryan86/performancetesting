@@ -1,20 +1,20 @@
 <script lang="ts">
   import type { CountryModel } from "models/location";
   import { callAction, capitalize } from "utils/common";
-  import { updateBeneficiaryData } from "./helpers";
   import { page } from "$app/stores";
-  import type { CurrencyModel } from "integration/junction-hub-api/schemas/money";
-  import type { BeneficiaryModel } from "integration/junction-hub-api/schemas/beneficiary";
-  import type { CreateBeneficiaryModel } from "integration/junction-hub-api/schemas/beneficiary.client";
   import type { z } from "zod";
+  import type {
+    Beneficiary,
+    BeneficiaryPut,
+  } from "integration/junction-hub-api/schemas/beneficiary";
+  import type { Currency } from "integration/junction-hub-api/schemas/currency";
 
-  export let data: CreateBeneficiaryModel;
+  export let data: BeneficiaryPut;
   export let countries: Map<string, CountryModel>;
-  export let currencies: Map<string, CurrencyModel>;
+  export let currencies: Map<string, Currency>;
   export let error: string | undefined = undefined;
 
-  $: data = updateBeneficiaryData(data);
-  $: currency = data.currencyCode ? currencies.get(data.currencyCode) : undefined;
+  $: currency = data.currencyId ? currencies.get(data.currencyId) : undefined;
   $: beneficiaryCountry = data.address?.countryCode
     ? countries.get(data.address.countryCode)
     : undefined;
@@ -26,8 +26,8 @@
     error = undefined;
 
     const result = await callAction<
-      { beneficiary: BeneficiaryModel },
-      { validation?: z.ZodFormattedError<BeneficiaryModel>; service?: string }
+      { beneficiary: Beneficiary },
+      { validation?: z.ZodFormattedError<Beneficiary>; service?: string }
     >({ action: $page.url.toString() });
 
     if (result.type === "failure") {
@@ -45,11 +45,14 @@
     <h3 class="typography title-medium bold">Beneficiary Details</h3>
     <div class="table typography body-medium">
       <strong>Personalised name:</strong>
-      <span>{data.companyName ?? "-"}</span>
+      <span>{data.account?.company?.id ?? "-"}</span>
       <strong>Email:</strong>
       <span>{data.email ?? "-"}</span>
       <strong>Address:</strong>
-      <span>{data.address?.addressLines?.join(", ") ?? "-"}</span>
+      <span
+        >{data.address.street.line1}
+        {data.address.street.line2 ?? ""}</span
+      >
       <strong>City:</strong>
       <span>{data.address?.city ?? "-"}</span>
       <strong>Postcode:</strong>
@@ -69,7 +72,9 @@
       <strong>Bank Name:</strong>
       <span>{data.bankDetails.name ?? "-"}</span>
       <strong>Bank Address:</strong>
-      <span>{data.bankDetails.address?.addressLines?.join(", ") ?? "-"}</span>
+      <span
+        >{data.bankDetails.address.street.line1} {data.bankDetails.address.street.line2 ?? ""}</span
+      >
       <strong>Country:</strong>
       <span>
         {bankCountry ? `${bankCountry.name} (${bankCountry.code})` : "-"}

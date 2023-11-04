@@ -1,17 +1,13 @@
 import { getSession } from "utils/auth";
 import * as devalue from "devalue";
 import type { RequestEvent } from "./$types";
-import { type ActionFailure, fail } from "@sveltejs/kit";
+import { type ActionFailure, fail, error } from "@sveltejs/kit";
 import { z } from "zod";
 import integrationInstances from "integration-instances";
-import type { AccountModel } from "integration/junction-hub-api/schemas/account";
-import type { BeneficiaryModel } from "integration/junction-hub-api/schemas/beneficiary";
-import {
-  beneficiaryModel,
-  type CreateBeneficiaryModel,
-} from "integration/junction-hub-api/schemas/beneficiary.client";
+import type { Beneficiary, BeneficiaryPut } from "integration/junction-hub-api/schemas/beneficiary";
+import type { Account } from "integration/junction-hub-api/schemas/account";
 
-function getBeneficiaryData(event: RequestEvent): CreateBeneficiaryModel | undefined {
+function getBeneficiaryData(event: RequestEvent): BeneficiaryPut | undefined {
   const cookieData = event.cookies.get("beneficiary-data");
 
   return cookieData
@@ -20,8 +16,8 @@ function getBeneficiaryData(event: RequestEvent): CreateBeneficiaryModel | undef
 }
 
 export async function load(event): Promise<{
-  beneficiary: CreateBeneficiaryModel;
-  accounts: Promise<AccountModel[]>;
+  beneficiary: BeneficiaryPut;
+  accounts: Promise<Account[]>;
 }> {
   const session = getSession(event);
   const accounts = integrationInstances.junctionHubApi.accounts
@@ -43,20 +39,19 @@ export async function load(event): Promise<{
     event.cookies.delete("beneficiary-data", { path: "/", httpOnly: false, secure: false });
   }
 
-  return {
-    beneficiary: beneficiary ?? {
-      bankDetails: { type: "iban", paymentType: "regular", accountType: "checking" },
-    },
-    accounts,
-  };
+  if (!beneficiary) {
+    throw error(404, { message: "Beneficiary not found" });
+  }
+
+  return { beneficiary, accounts };
 }
 
 export const actions = {
   async default(
     event,
   ): Promise<
-    | { beneficiary: BeneficiaryModel }
-    | ActionFailure<{ validation?: z.ZodFormattedError<BeneficiaryModel>; service?: string }>
+    | { beneficiary: Beneficiary }
+    | ActionFailure<{ validation?: z.ZodFormattedError<Beneficiary>; service?: string }>
   > {
     const beneficiary = getBeneficiaryData(event);
 
@@ -70,7 +65,7 @@ export const actions = {
           beneficiary: await integrationInstances.junctionHubApi.beneficiaries.updateBeneficiary({
             session: getSession(event),
             id: beneficiary.id,
-            beneficiary: beneficiaryModel.parse(beneficiary),
+            data: beneficiary,
           }),
         };
       }
@@ -78,7 +73,7 @@ export const actions = {
       return {
         beneficiary: await integrationInstances.junctionHubApi.beneficiaries.createBeneficiary({
           session: getSession(event),
-          beneficiary: beneficiaryModel.omit({ id: true }).parse(beneficiary),
+          data: beneficiary,
         }),
       };
     } catch (err) {

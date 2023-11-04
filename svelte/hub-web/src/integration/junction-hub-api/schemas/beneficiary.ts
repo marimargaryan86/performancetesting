@@ -1,156 +1,169 @@
-import { z } from "zod";
-import { accountModel } from "./account";
-import { currencyModel } from "./money";
+import type { Partialize, Require } from "integration/ts-helpers";
 import {
-  addressDetails as addressDetailsClient,
-  enhancedAddressDetails as enhancedAddressDetailsClient,
-  bankDetailsBase as bankDetailsBaseModelClient,
-  bankDetailsIban as bankDetailsIbanClient,
-  bankDetailsAba as bankDetailsAbaClient,
-  bankDetails as bankDetailsClient,
-  beneficiaryModel as beneficiaryModelClient,
-} from "./beneficiary.client";
-import schemaModel, { type Infer } from "utils/schema-model";
+  enhancedAddressDetailsParser,
+  type AddressSchema,
+  type EnhancedAddressDetails,
+  type EnhancedAddressDetailsSchema,
+  type Address,
+  addressParser,
+} from "./address";
+import type { Currency, CurrencySchema } from "./currency";
+import type { Account, AccountSchema } from "./account";
+import type { IncludedMapping } from "./included";
 
-const addressDetails = schemaModel.create({
-  schema: z.object({
-    addressLines: z.array(z.string()),
-    countryCode: z.string(),
-  }),
-  model: addressDetailsClient,
-});
+export type BankDetailsBase = {
+  name: string;
+  bicSwift?: string;
+  accountType: "checking" | "savings";
+  paymentType: "priority" | "regular";
+  address: Require<Address, "street" | "countryCode">;
+};
 
-export const enhancedAddressDetails = schemaModel.create({
-  schema: addressDetails.schema.extend({
-    postalCode: z.string().optional(),
-    city: z.string().optional(),
-    state: z.string().nullable().optional(),
-  }),
-  model: enhancedAddressDetailsClient,
-  toModel: (data) => ({
-    addressLines: data.addressLines,
-    countryCode: data.countryCode,
-    city: data.city ?? "",
-    postalCode: data.postalCode ?? "",
-    state: data.state ?? undefined,
-  }),
-  toSchema: (data) => ({
-    addressLines: data.addressLines,
-    countryCode: data.countryCode,
-    city: data.city,
-    postalCode: data.postalCode,
-    state: data.state,
-  }),
-});
+export type BankDetailsAba = {
+  type: "aba";
+  accountNumber?: string;
+  aba?: string;
+};
 
-export const bankDetailsBase = schemaModel.create({
-  schema: z.object({
-    name: z.string(),
-    bicSwift: z.string().nullable().optional(),
-    accountType: z.enum(["checking", "savings"]),
-    paymentTypes: z.enum(["priority", "regular"]),
-    address: addressDetails.schema,
-  }),
-  model: bankDetailsBaseModelClient,
-});
+export type BankDetailsIban = {
+  type: "iban";
+  iban?: string;
+};
 
-export const bankDetailsAba = schemaModel.create({
-  schema: bankDetailsBase.schema.extend({
-    accountNumber: z.string().nullable(),
-    aba: z.string().nullable(),
-  }),
-  model: bankDetailsAbaClient,
-});
+export type BankDetails = BankDetailsBase & (BankDetailsAba | BankDetailsIban);
 
-export const bankDetailsIban = schemaModel.create({
-  schema: bankDetailsBase.schema.extend({
-    iban: z.string().nullable(),
-  }),
-  model: bankDetailsIbanClient,
-});
+export type BankDetailsBaseSchema = {
+  name: string;
+  bicSwift?: string | null;
+  accountType: "checking" | "savings";
+  paymentTypes: "priority" | "regular";
+  address: Require<AddressSchema, "addressLines" | "countryCode">;
+};
 
-export const bankDetails = schemaModel.create({
-  schema: z.union([bankDetailsAba.schema, bankDetailsIban.schema]),
-  model: bankDetailsClient,
-  toModel: (data) => {
-    const base = {
-      accountType: data.accountType,
-      address: data.address,
+export type BankDetailsAbaSchema = {
+  accountNumber: string | null;
+  aba: string | null;
+};
+
+export type BankDetailsIbanSchema = {
+  iban: string | null;
+};
+
+export type BankDetailsSchema = BankDetailsBaseSchema &
+  (BankDetailsAbaSchema | BankDetailsIbanSchema);
+
+export const bankDetailsParser = {
+  toModel: (data: BankDetailsSchema): BankDetails => {
+    const base: BankDetailsBase = {
       name: data.name,
+      accountType: data.accountType,
       paymentType: data.paymentTypes,
-      bicSwift: data.bicSwift ?? "",
+      address: addressParser.toModel(data.address) as BankDetailsBase["address"],
+      bicSwift: data.bicSwift ?? undefined,
     };
 
-    if ("accountNumber" in data) {
+    if (!("iban" in data)) {
       return {
         ...base,
-        type: "aba" as const,
-        accountNumber: data.accountNumber as string,
-        aba: data.aba as string,
+        type: "aba",
+        accountNumber: data.accountNumber ?? undefined,
+        aba: data.aba ?? undefined,
       };
     }
 
-    return { ...base, type: "iban" as const, iban: data.iban as string };
+    return {
+      ...base,
+      type: "iban",
+      iban: data.iban ?? undefined,
+    };
   },
-  toSchema: (data) => ({
-    bicSwift: data.bicSwift,
-    accountType: data.accountType,
-    name: data.name,
-    address: {
-      addressLines: data.address.addressLines,
-      countryCode: data.address.countryCode,
-    },
-    paymentTypes: data.paymentType,
-    ...(data.type === "aba"
-      ? { aba: data.aba, accountNumber: data.accountNumber }
-      : { iban: data.iban }),
-  }),
-});
+  toSchema: (data: BankDetails): BankDetailsSchema => {
+    const base: BankDetailsBaseSchema = {
+      name: data.name,
+      accountType: data.accountType,
+      paymentTypes: data.paymentType,
+      address: addressParser.toSchema(data.address) as BankDetailsBaseSchema["address"],
+      bicSwift: "bicSwift" in data ? data.bicSwift ?? null : undefined,
+    };
 
-export const beneficiaryModel = schemaModel.create({
-  schema: z.object({
-    id: z.string(),
-    type: z.literal("beneficiaries"),
-    attributes: z.object({
-      bankAccountHolderName: z.string(),
-      email: z.string(),
-      beneficiaryAddress: enhancedAddressDetails.schema,
-      bankDetails: bankDetails.schema,
-    }),
-    relationships: schemaModel.relationships({
-      currency: currencyModel.identifier,
-      account: accountModel.identifier,
-    }),
-    links: schemaModel.links({ self: true }),
-  }),
-  model: beneficiaryModelClient,
-  toModel: (data) => ({
-    id: data.id,
-    companyName: data.attributes.bankAccountHolderName,
-    email: data.attributes.email,
-    address: enhancedAddressDetails.toModel(data.attributes.beneficiaryAddress),
-    bankDetails: bankDetails.toModel(data.attributes.bankDetails),
-    accountId: data.relationships.account.data.id,
-    currencyCode: data.relationships.currency.data.id,
-  }),
-});
-export type BeneficiaryModel = Infer<typeof beneficiaryModel>;
-export type BeneficiarySchema = Infer<typeof beneficiaryModel, "schema">;
+    if (data.type === "aba") {
+      return {
+        ...base,
+        accountNumber: data.accountNumber ?? null,
+        aba: data.aba ?? null,
+      };
+    }
 
-export const putBeneficiaryModel = schemaModel.create({
-  schema: beneficiaryModel.schema.omit({ id: true, links: true }),
-  model: beneficiaryModel.model.omit({ id: true }),
-  toSchema: (data) => ({
-    type: "beneficiaries" as const,
+    return {
+      ...base,
+      iban: data.iban ?? null,
+    };
+  },
+};
+
+export type Beneficiary = {
+  id: string;
+  bankAccountHolderName: string;
+  email: string;
+  address: Require<EnhancedAddressDetails, "street" | "countryCode">;
+  bankDetails: BankDetails;
+  currencyId: string;
+  currency?: Currency;
+  accountId: string;
+  account?: Account;
+};
+
+export type BeneficiaryPut = Partialize<Beneficiary, "id">;
+
+export type BeneficiarySchema = {
+  id: string;
+  type: "beneficiaries";
+  attributes: {
+    bankAccountHolderName: string;
+    email: string;
+    beneficiaryAddress: Require<EnhancedAddressDetailsSchema, "addressLines" | "countryCode">;
+    bankDetails: BankDetailsSchema;
+  };
+  relationships: {
+    currency: { data: Pick<CurrencySchema, "id" | "type"> };
+    account: { data: Pick<AccountSchema, "id" | "type"> };
+  };
+};
+
+export type BeneficiaryPutSchema = Pick<BeneficiarySchema, "type" | "relationships" | "attributes">;
+
+export const beneficiaryParser = {
+  toModel: (data: BeneficiarySchema, included?: IncludedMapping): Beneficiary => {
+    const accountId = data.relationships.account.data.id;
+    const currencyId = data.relationships.currency.data.id;
+
+    return {
+      id: data.id,
+      bankAccountHolderName: data.attributes.bankAccountHolderName,
+      address: enhancedAddressDetailsParser.toModel(
+        data.attributes.beneficiaryAddress,
+      ) as Beneficiary["address"],
+      email: data.attributes.email,
+      accountId,
+      account: included?.accounts?.find(({ id }) => id === accountId),
+      currencyId,
+      currency: included?.currencies?.find(({ code }) => code === currencyId),
+      bankDetails: bankDetailsParser.toModel(data.attributes.bankDetails),
+    };
+  },
+  toPutSchema: (data: BeneficiaryPut): BeneficiaryPutSchema => ({
+    type: "beneficiaries",
     attributes: {
-      bankAccountHolderName: data.companyName,
-      bankDetails: bankDetails.toSchema(data.bankDetails),
-      beneficiaryAddress: enhancedAddressDetails.toSchema(data.address),
+      bankAccountHolderName: data.bankAccountHolderName,
       email: data.email,
+      beneficiaryAddress: enhancedAddressDetailsParser.toSchema(
+        data.address,
+      ) as BeneficiaryPutSchema["attributes"]["beneficiaryAddress"],
+      bankDetails: bankDetailsParser.toSchema(data.bankDetails),
     },
     relationships: {
-      account: { data: { type: "accounts" as const, id: data.accountId } },
-      currency: { data: { type: "currencies" as const, id: data.currencyCode } },
+      account: { data: { id: data.accountId, type: "accounts" } },
+      currency: { data: { id: data.currencyId, type: "currencies" } },
     },
   }),
-});
+};

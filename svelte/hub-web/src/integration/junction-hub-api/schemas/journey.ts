@@ -1,58 +1,62 @@
-import { z } from "zod";
-import { orderModel } from "./order";
-import schemaModel, { type Infer } from "utils/schema-model";
+import {
+  enhancedAddressDetailsParser,
+  type EnhancedAddressDetails,
+  type EnhancedAddressDetailsSchema,
+} from "./address";
+import type { IncludedMapping } from "./included";
+import type { Order, OrderSchema } from "./order";
 
-const journeyRelationships: z.ZodType<{
-  orders: { data: Infer<typeof orderModel, "identifier">[] };
-}> = z.lazy(() => schemaModel.relationships({ orders: z.array(orderModel.identifier) }));
+export type ContactDetails = {
+  email: string;
+  address: Required<Omit<EnhancedAddressDetails, "state">>;
+  phone: string;
+};
 
-export const journeyModel = schemaModel.create({
-  schema: z.object({
-    id: z.string(),
-    type: z.literal("journeys"),
-    attributes: z.object({
-      reference: z.string(),
-      contactDetails: z.object({
-        email: z.string(),
-        address: z.object({
-          addressLines: z.array(z.string()),
-          countryCode: z.string(),
-          postalCode: z.string(),
-          city: z.string(),
-        }),
-        phoneNumber: z.string(),
-      }),
-    }),
-    relationships: journeyRelationships,
-    links: schemaModel.links({ self: true }),
+export type ContactDetailsSchema = {
+  email: string;
+  address: Required<Omit<EnhancedAddressDetailsSchema, "state">>;
+  phoneNumber: string;
+};
+
+export const contactDetailsParser = {
+  toModel: (data: ContactDetailsSchema): ContactDetails => ({
+    email: data.email,
+    address: enhancedAddressDetailsParser.toModel(data.address) as ContactDetails["address"],
+    phone: data.phoneNumber,
   }),
-  model: z.object({
-    reference: z.string(),
-    contact: z.object({
-      email: z.string(),
-      address: z.object({
-        addressLines: z.array(z.string()),
-        countryCode: z.string(),
-        postalCode: z.string(),
-        city: z.string(),
-      }),
-      phoneNumber: z.string(),
-    }),
-  }),
-  toModel: (data) => ({
-    reference: data.attributes.reference,
-    contact: {
-      address: {
-        addressLines: data.attributes.contactDetails.address.addressLines.filter(
-          (line) => line.length,
-        ),
-        city: data.attributes.contactDetails.address.city,
-        countryCode: data.attributes.contactDetails.address.countryCode,
-        postalCode: data.attributes.contactDetails.address.postalCode,
-      },
-      email: data.attributes.contactDetails.email,
-      phoneNumber: data.attributes.contactDetails.phoneNumber,
-    },
-  }),
-});
-export type JourneySchema = Infer<typeof journeyModel, "schema">;
+};
+
+export type Journey = {
+  id: string;
+  reference: string;
+  contact: ContactDetails;
+  orderIds: string[];
+  orders: Order[];
+};
+
+export type JourneySchema = {
+  id: string;
+  type: "journeys";
+  attributes: {
+    reference: string;
+    contactDetails: ContactDetailsSchema;
+  };
+  relationships: {
+    orders: { data: Pick<OrderSchema, "id" | "type">[] };
+  };
+  links: { self: string };
+};
+
+export const journeyParser = {
+  toModel: (data: JourneySchema, included?: IncludedMapping): Journey => {
+    const orderIds = data.relationships.orders.data.map(({ id }) => id);
+
+    return {
+      id: data.id,
+      reference: data.attributes.reference,
+      contact: contactDetailsParser.toModel(data.attributes.contactDetails),
+      orderIds,
+      orders: included?.orders?.filter(({ id }) => orderIds.includes(id)) ?? [],
+    };
+  },
+};

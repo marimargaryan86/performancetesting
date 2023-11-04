@@ -1,35 +1,58 @@
-import { priceModel } from "integration/junction-mobile-api/schemas/price";
-import schemaModel, { type Infer } from "utils/schema-model";
-import { z } from "zod";
+export type Money = {
+  currency: string;
+  amount: number;
+};
 
-export const moneyModel = schemaModel.create({
-  schema: z.object({
-    currency: z.string(),
-    amount: z.number(),
-  }),
-  model: priceModel.model,
-});
+export type MoneySchema = {
+  currency: string;
+  amount: number;
+};
 
-export const currencyModel = schemaModel.create({
-  schema: z.object({
-    id: z.string(),
-    type: z.literal("currencies"),
-    attributes: z.object({
-      name: z.string(),
-      minorUnits: z.number(),
-    }),
-    links: schemaModel.links({ self: true }),
+export const moneyParser = {
+  toModel: (data: MoneySchema): Money => ({
+    currency: data.currency,
+    amount: data.amount,
   }),
-  model: z.object({
-    name: z.string(),
-    code: z.string(),
-    minorUnits: z.number(),
+  toSchema: (data: Money): MoneySchema => ({
+    currency: data.currency,
+    amount: data.amount,
   }),
-  toModel: (data) => ({
-    name: data.attributes.name,
-    code: data.id,
-    minorUnits: data.attributes.minorUnits,
+};
+
+export type Price = {
+  amount: number;
+  currency: string;
+};
+
+export type PriceSchema = {
+  amount: string;
+  currency: string;
+};
+
+export const priceParser = {
+  toModel: (data: PriceSchema): Price => ({
+    amount: Number(data.amount),
+    currency: data.currency,
   }),
-});
-export type CurrencyModel = Infer<typeof currencyModel>;
-export type CurrencySchema = Infer<typeof currencyModel, "schema">;
+  toSchema: (data: Price): PriceSchema => ({
+    amount: data.amount.toString(),
+    currency: data.currency,
+  }),
+};
+
+export type PriceBreakdown = {
+  price: Price;
+  type: "base-fare" | "tax" | "reseller-mark-up" | "company-mark-up" | "service-mark-up";
+};
+
+export type PriceBreakdownSchema = {
+  price: PriceSchema;
+  breakdownType: "base-fare" | "tax" | "reseller-mark-up" | "company-mark-up" | "service-mark-up";
+};
+
+export const priceBreakdownParser = {
+  toModel: (data: PriceBreakdownSchema): PriceBreakdown => ({
+    price: priceParser.toModel(data.price),
+    type: data.breakdownType,
+  }),
+};

@@ -1,6 +1,6 @@
 import type { SessionModel } from "models/user";
-import { companyModel, type CompanyModel, type CompanySchema } from "../schemas/company";
 import JunctionHubApiService from "./junction-hub-api-service";
+import { companyParser, type Company, type CompanySchema } from "../schemas/company";
 
 export default class CompanyService extends JunctionHubApiService {
   async getCompanyDetails({
@@ -9,11 +9,11 @@ export default class CompanyService extends JunctionHubApiService {
   }: {
     session: SessionModel;
     id: string;
-  }): Promise<CompanyModel> {
+  }): Promise<Company> {
     const resp = await this.makeRequest<{ data: CompanySchema }>(`/companies/${id}`, {
       session,
     });
 
-    return companyModel.toModel(resp.json.data);
+    return companyParser.toModel(resp.json.data);
   }
 }

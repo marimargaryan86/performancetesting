@@ -8,11 +8,11 @@
   import Button from "components/ui/button.svelte";
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import { createEventDispatcher } from "svelte";
-  import type { TransactionModel } from "integration/junction-hub-api/schemas/transaction";
-  import type { BookingModel } from "integration/junction-hub-api/schemas/booking";
+  import type { TripBooking } from "integration/junction-hub-api/schemas/booking";
+  import type { Transaction } from "integration/junction-hub-api/schemas/transaction";
 
-  export let transaction: TransactionModel;
-  export let bookingRequest: Promise<BookingModel | undefined> | undefined;
+  export let transaction: Transaction;
+  export let bookingRequest: Promise<TripBooking | undefined> | undefined;
 
   const dispatch = createEventDispatcher<{ close: void }>();
 

@@ -1,61 +1,41 @@
-<script lang="ts" context="module">
-  const schema = beneficiaryModel.pick({
-    accountId: true,
-    companyName: true,
-    email: true,
-    address: true,
-  });
-</script>
-
 <script lang="ts">
   import SelectField from "components/ui/select-field.svelte";
   import TextField from "components/ui/text-field.svelte";
   import Section from "./section.svelte";
   import type { CountryModel } from "models/location";
-  import { z } from "zod";
-  import { updateBeneficiaryData } from "./helpers";
   import { formatCountryOption } from "formatting/location";
-  import type { AccountModel } from "integration/junction-hub-api/schemas/account";
-  import {
-    beneficiaryModel,
-    type CreateBeneficiaryModel,
-  } from "integration/junction-hub-api/schemas/beneficiary.client";
+  import type { Account } from "integration/junction-hub-api/schemas/account";
+  import type { BeneficiaryPut } from "integration/junction-hub-api/schemas/beneficiary";
 
-  export let data: CreateBeneficiaryModel;
+  export let data: BeneficiaryPut;
   export let countries: Map<string, CountryModel>;
-  export let accounts: AccountModel[];
+  export let accounts: Account[];
 
-  let errors: z.ZodFormattedError<z.infer<typeof schema>> | undefined = undefined;
-  let address = data.address ?? {};
-  let addressLine = address.addressLines?.[0];
   let country = countries.get(data.address?.countryCode ?? "");
 
   $: accountIds = accounts.map((a) => a.id);
-  $: address = {
-    ...address,
-    addressLines: addressLine ? [addressLine] : [],
-    countryCode: country?.code,
-  };
-  $: data = { ...data, address };
+  $: data = updateCountry(country);
+
+  function updateCountry(nextCountry?: CountryModel): BeneficiaryPut {
+    if (!nextCountry) {
+      return data;
+    }
+
+    return {
+      ...data,
+      address: {
+        ...data.address,
+        countryCode: nextCountry.code,
+      },
+    };
+  }
 
   function formatAccountOption(id?: string): string {
     return accounts.find((a) => a.id === id)?.name ?? "";
   }
 
   export function validate(): boolean {
-    errors = undefined;
-
-    try {
-      data = { ...data, ...schema.parse(updateBeneficiaryData(data)) };
-
-      return true;
-    } catch (err) {
-      if (err instanceof z.ZodError) {
-        errors = err.format();
-      }
-    }
-
-    return false;
+    return true;
   }
 </script>
 
@@ -71,60 +51,43 @@
       placeholder="Select account"
       options={accountIds}
       formatter={formatAccountOption}
-      error={errors?.accountId?._errors}
       bind:value={data.accountId}
     />
     <TextField
       required
       label="Personalised name"
       placeholder="E.g. Air France"
-      error={errors?.companyName?._errors}
-      bind:value={data.companyName}
+      bind:value={data.bankAccountHolderName}
     />
     <TextField
       required
       type="email"
       label="Email"
       placeholder="Enter email"
-      error={errors?.email?._errors}
       bind:value={data.email}
     />
     <TextField
       required
       label="Address"
       placeholder="Enter address"
-      error={errors?.address?.addressLines?._errors}
-      bind:value={addressLine}
+      bind:value={data.address.street.line1}
     />
 
     <div>
-      <TextField
-        required
-        label="City"
-        placeholder="Enter city"
-        error={errors?.address?.city?._errors}
-        bind:value={address.city}
-      />
+      <TextField required label="City" placeholder="Enter city" bind:value={data.address.city} />
       <TextField
         required
         label="Postcode"
         placeholder="Enter postcode"
-        error={errors?.address?.postalCode?._errors}
-        bind:value={address.postalCode}
+        bind:value={data.address.postalCode}
       />
-      <TextField
-        label="State"
-        placeholder="Enter state"
-        error={errors?.address?.state?._errors}
-        bind:value={address.state}
-      />
+      <TextField label="State" placeholder="Enter state" bind:value={data.address.state} />
       <SelectField
         required
         label="Country"
         placeholder="Select country"
         options={Array.from(countries.values())}
         formatter={formatCountryOption}
-        error={errors?.address?.countryCode?._errors}
         bind:value={country}
       />
     </div>

@@ -5,17 +5,17 @@
   import Button from "components/ui/button.svelte";
   import TextField from "components/ui/text-field.svelte";
   import { portal } from "directives/portal";
-  import type { PriceModel } from "integration/junction-mobile-api/schemas/price";
-  import type { CurrencyModel } from "integration/junction-hub-api/schemas/money";
   import routeConfig from "routeConfig";
   import { createEventDispatcher } from "svelte";
   import { fade, fly } from "svelte/transition";
   import { callAction } from "utils/common";
   import { pendableCall } from "utils/pendable-call";
+  import type { Balance } from "integration/junction-hub-api/schemas/balance";
+  import type { Currency } from "integration/junction-hub-api/schemas/currency";
 
   export let accountId: string;
-  export let exclude: PriceModel[];
-  export let currencies: Map<string, CurrencyModel>;
+  export let exclude: Balance[];
+  export let currencies: Map<string, Currency>;
 
   export function close(): void {
     visible = false;
@@ -31,21 +31,21 @@
     inputRef.focus();
   }
 
-  let value: CurrencyModel[] = [];
+  let value: Currency[] = [];
   let searchQuery = "";
   let visible = false;
   let inputRef: TextField<"text">;
 
-  const dispatch = createEventDispatcher<{ addbalances: PriceModel[] }>();
+  const dispatch = createEventDispatcher<{ addbalances: Balance[] }>();
 
   $: filteredBalances = Array.from(currencies.values()).filter(
     (balance) =>
       balance.code.toLowerCase().includes(searchQuery.toLowerCase()) &&
-      !exclude.find((money) => money.currency === balance.code),
+      !exclude.find((money) => money.currencyId === balance.code),
   );
 
   const { pending, func: addBalances } = pendableCall(async () => {
-    const result = await callAction<{ balances: PriceModel[] }>({
+    const result = await callAction<{ balances: Balance[] }>({
       action: routeConfig.routes.pay.routes.accounts.routes.account(accountId).actions.addBalances,
       data: { currencyCodes: value.map((item) => item.code) },
       dataType: "json",

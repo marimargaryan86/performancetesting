@@ -1,8 +1,8 @@
 <script lang="ts">
   import { yymmdd } from "formatting/date-time";
-  import type { OrderPassengerModel } from "integration/junction-hub-api/schemas/order";
+  import type { OrderPassenger } from "integration/junction-hub-api/schemas/order";
 
-  export let passengers: OrderPassengerModel[];
+  export let passengers: OrderPassenger[];
 </script>
 
 <div class="passengers">
@@ -17,7 +17,7 @@
       <strong class="typography body-small bold">{passenger.firstName}</strong>
       <strong class="typography body-small bold">{passenger.lastName}</strong>
       <strong class="typography body-small bold">{passenger.gender}</strong>
-      <strong class="typography body-small bold">{yymmdd(passenger.dateOfBirth)}</strong>
+      <strong class="typography body-small bold">{yymmdd(passenger.birthDate)}</strong>
     {/each}
   </div>
 </div>

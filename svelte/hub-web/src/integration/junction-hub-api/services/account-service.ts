@@ -1,7 +1,7 @@
 import type { SessionModel } from "models/user";
-import { accountModel, type AccountModel, type AccountSchema } from "../schemas/account";
 import JunctionHubApiService from "./junction-hub-api-service";
 import type { PaginatedData } from "models/common";
+import { accountParser, type Account, type AccountSchema } from "../schemas/account";
 
 export default class AccountService extends JunctionHubApiService {
   async listAccounts({
@@ -10,7 +10,7 @@ export default class AccountService extends JunctionHubApiService {
   }: {
     session: SessionModel;
     cursor?: string;
-  }): Promise<PaginatedData<AccountModel>> {
+  }): Promise<PaginatedData<Account>> {
     const resp = await this.makeRequest<{ data: AccountSchema[]; links: { next: string } }>(
       "/accounts",
       {
@@ -20,16 +20,16 @@ export default class AccountService extends JunctionHubApiService {
     );
 
     return {
-      data: resp.json.data.map(accountModel.toModel),
+      data: resp.json.data.map((item) => accountParser.toModel(item)),
       cursor: AccountService.getCursor(resp.json),
     };
   }
 
-  async getAccount({ session, id }: { session: SessionModel; id: string }): Promise<AccountModel> {
+  async getAccount({ session, id }: { session: SessionModel; id: string }): Promise<Account> {
     const resp = await this.makeRequest<{ data: AccountSchema }>(`/accounts/${id}`, {
       session,
     });
 
-    return accountModel.toModel(resp.json.data);
+    return accountParser.toModel(resp.json.data);
   }
 }

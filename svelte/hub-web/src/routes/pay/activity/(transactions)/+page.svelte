@@ -1,11 +1,3 @@
-<script lang="ts" context="module">
-  import type { DateRange } from "models/date-time";
-
-  export const dateRange = writable<DateRange | undefined>(undefined);
-  export const status = writable<TransactionStatus[]>([]);
-  export const searchQuery = writable("");
-</script>
-
 <script lang="ts">
   import Header from "components/ui/table/header.svelte";
   import TBody from "components/ui/table/t-body.svelte";
@@ -14,45 +6,27 @@
   import TRow from "components/ui/table/t-row.svelte";
   import TCol from "components/ui/table/t-col.svelte";
   import { yymmdd } from "formatting/date-time";
-  import { callAction, capitalize, type FlattenedObject } from "utils/common";
-  import type { DirectionY } from "models/spatial";
-  import { sortTransactions } from "sorting/transaction";
-  import { filterTransactions } from "filters/transaction";
-  import { writable } from "svelte/store";
-  import { onMount } from "svelte";
+  import { callAction, capitalize } from "utils/common";
   import TransactionDetails from "./transaction-details/transaction-details.svelte";
   import routeConfig from "routeConfig";
   import TCompanyCol from "components/ui/table/t-company-col.svelte";
   import TMoneyCol from "components/ui/table/t-money-col.svelte";
-  import type {
-    TransactionModel,
-    TransactionStatus,
-  } from "integration/junction-hub-api/schemas/transaction";
-  import type { BookingModel } from "integration/junction-hub-api/schemas/booking";
-  import TStatusBadgeCol from "components/ui/table/t-status-badge-col.svelte";
+  import type { TripBooking } from "integration/junction-hub-api/schemas/booking";
+  import type { Transaction } from "integration/junction-hub-api/schemas/transaction";
 
   export let data;
   export let form;
 
-  let sortGroup: FlattenedObject<TransactionModel> = "createdAt";
-  let sortDirection: DirectionY = "down";
-  let selectedTransaction: TransactionModel | undefined = undefined;
-  let bookingRequest: Promise<BookingModel | undefined> | undefined = undefined;
+  let selectedTransaction: Transaction | undefined = undefined;
+  let bookingRequest: Promise<TripBooking | undefined> | undefined = undefined;
 
-  $: transactions = sortTransactions(
-    filterTransactions(data.transactions.data, {
-      query: $searchQuery,
-      status: $status,
-      dateRange: $dateRange,
-    }),
-    { by: sortGroup, direction: sortDirection },
-  );
+  $: transactions = data.transactions.data;
 
-  function showDetails(transaction: TransactionModel): void {
+  function showDetails(transaction: Transaction): void {
     selectedTransaction = transaction;
 
     if (selectedTransaction) {
-      bookingRequest = getBooking(selectedTransaction.bookingId);
+      bookingRequest = getBooking(selectedTransaction.externalReference);
     }
   }
 
@@ -81,20 +55,14 @@
     }
   }
 
-  async function getBooking(bookingId: string): Promise<BookingModel | undefined> {
+  async function getBooking(externalReference: string): Promise<TripBooking | undefined> {
     await callAction({
       action: routeConfig.routes.pay.routes.activity.actions.getBooking,
-      data: { bookingId },
+      data: { bookingId: externalReference },
     });
 
     return form?.booking;
   }
-
-  onMount(() => {
-    $searchQuery = "";
-    $dateRange = undefined;
-    $status = [];
-  });
 </script>
 
 <svelte:head>
@@ -112,28 +80,21 @@
 <Table class="transactions-table" {loadMore}>
   <THead>
     <Header>ID</Header>
-    <Header bind:sortGroup bind:sortDirection sortValue="createdAt">Created</Header>
+    <Header>Created</Header>
     <Header>Transaction type</Header>
     <Header>Payment type</Header>
-    <Header bind:sortGroup bind:sortDirection sortValue="payer.name">Payer</Header>
-    <Header bind:sortGroup bind:sortDirection sortValue="amounts.quotation.amount">
-      Owed to us
-    </Header>
-    <Header bind:sortGroup bind:sortDirection sortValue="beneficiary.name">Beneficiary</Header>
-    <Header bind:sortGroup bind:sortDirection sortValue="amounts.beneficiary.amount">
-      What we owe
-    </Header>
-    <Header bind:sortGroup bind:sortDirection sortValue="amounts.salesMargin.amount">
-      Sales Profit
-    </Header>
+    <Header>Payer</Header>
+    <Header>Owed to us</Header>
+    <Header>Beneficiary</Header>
+    <Header>What we owe</Header>
+    <Header>Sales Profit</Header>
     <Header>Reference</Header>
-    <Header bind:sortGroup bind:sortDirection sortValue="status">Status</Header>
   </THead>
 
   <TBody>
     {#each transactions as item (item.id)}
       <TRow on:click={showDetails.bind(showDetails, item)}>
-        <TCol maxWidth="96px" copyable>{item.bookingId}</TCol>
+        <TCol maxWidth="96px" copyable>{item.externalReference}</TCol>
         <TCol>{yymmdd(item.createdAt)}</TCol>
         <TCol width="0">{capitalize(item.payment.method)}</TCol>
         <TCol width="0">{capitalize(item.payment.type)}</TCol>
@@ -141,9 +102,8 @@
         <TMoneyCol money={item.amounts.quotation} currencies={data.currencies} />
         <TCompanyCol maxWidth="160px" companyName={item.beneficiary?.name} />
         <TMoneyCol money={item.amounts.beneficiary} currencies={data.currencies} />
-        <TMoneyCol money={item.amounts.salesMargin} currencies={data.currencies} />
-        <TCol maxWidth="96px" copyable copyAlign="right">{item.reference ?? "Unknown"}</TCol>
-        <TStatusBadgeCol value={item.status} />
+        <TMoneyCol money={item.sales.margin} currencies={data.currencies} />
+        <TCol maxWidth="96px" copyable copyAlign="right">{item.invoiceReference ?? "Unknown"}</TCol>
       </TRow>
     {/each}
   </TBody>

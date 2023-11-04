@@ -1,12 +1,14 @@
 <script lang="ts">
   import EntityAvatar from "components/ui/entity-avatar.svelte";
-  import StatusBadge from "components/ui/status-badge.svelte";
+  import StatusBadge, { type StatusBadgeValue } from "components/ui/status-badge.svelte";
   import { yymmdd } from "formatting/date-time";
-  import type { BookingModel } from "integration/junction-hub-api/schemas/booking";
-  import type { TransactionModel } from "integration/junction-hub-api/schemas/transaction";
+  import type { TripBooking } from "integration/junction-hub-api/schemas/booking";
+  import type { Transaction } from "integration/junction-hub-api/schemas/transaction";
 
-  export let booking: BookingModel;
-  export let transaction: TransactionModel;
+  export let booking: TripBooking;
+  export let transaction: Transaction;
+
+  $: status = booking.status as StatusBadgeValue;
 </script>
 
 <div class="summary">
@@ -23,7 +25,7 @@
   <div class="item">
     <strong class="typography body-small">Status</strong>
     <span class="typography body-medium">
-      <StatusBadge value={booking.status} />
+      <StatusBadge value={status} />
     </span>
   </div>
 

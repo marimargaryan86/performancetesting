@@ -1,12 +1,12 @@
 import { type ActionFailure, fail } from "@sveltejs/kit";
 import integrationInstances from "integration-instances";
-import type { BookingModel } from "integration/junction-hub-api/schemas/booking";
-import type { TransactionModel } from "integration/junction-hub-api/schemas/transaction";
+import type { TripBooking } from "integration/junction-hub-api/schemas/booking";
+import type { Transaction } from "integration/junction-hub-api/schemas/transaction";
 import type { PaginatedData } from "models/common";
 import { getSession } from "utils/auth";
 
 export function load(event): {
-  transactions: Promise<PaginatedData<TransactionModel>>;
+  transactions: Promise<PaginatedData<Transaction>>;
 } {
   return {
     transactions: integrationInstances.junctionHubApi.transactions.listTransactions({
@@ -16,7 +16,7 @@ export function load(event): {
 }
 
 export const actions = {
-  async getBooking(event): Promise<{ booking: BookingModel | undefined } | ActionFailure> {
+  async getBooking(event): Promise<{ booking: TripBooking | undefined } | ActionFailure> {
     const formData = await event.request.formData();
     const bookingId = formData.get("bookingId")?.toString();
 
@@ -24,7 +24,7 @@ export const actions = {
       return fail(404);
     }
 
-    let booking: BookingModel | undefined = undefined;
+    let booking: TripBooking | undefined = undefined;
 
     try {
       booking = await integrationInstances.junctionHubApi.bookings.getBooking({
@@ -37,7 +37,7 @@ export const actions = {
 
     return { booking };
   },
-  async listTransactions(event): Promise<{ transactions: PaginatedData<TransactionModel> } | void> {
+  async listTransactions(event): Promise<{ transactions: PaginatedData<Transaction> } | void> {
     const formData = await event.request.formData();
     const cursor = formData.get("cursor")?.toString();
 

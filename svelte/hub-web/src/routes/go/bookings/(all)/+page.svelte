@@ -8,15 +8,9 @@
   import TMoneyCol from "components/ui/table/t-money-col.svelte";
   import TRow from "components/ui/table/t-row.svelte";
   import Table from "components/ui/table/table.svelte";
-  import type { FlattenedObject } from "utils/common";
-  import type { DirectionY } from "models/spatial";
-  import type { TransactionModel } from "integration/junction-hub-api/schemas/transaction";
   import TStatusBadgeCol from "components/ui/table/t-status-badge-col.svelte";
 
   const bookings: string[] = ["a", "b", "c", "d", "e"];
-
-  let sortGroup: FlattenedObject<TransactionModel> = "createdAt";
-  let sortDirection: DirectionY = "down";
 </script>
 
 <svelte:head>
@@ -31,13 +25,13 @@
       <Header>Booking Reference</Header>
       <Header>Passenger Name</Header>
       <Header>Ticket</Header>
-      <Header bind:sortGroup bind:sortDirection>Departure Date</Header>
+      <Header>Departure Date</Header>
       <Header>Provider</Header>
       <Header>Reseller</Header>
-      <Header bind:sortGroup bind:sortDirection sortValue="createdAt">Created Date</Header>
+      <Header>Created Date</Header>
       <Header>Total Price</Header>
-      <Header bind:sortGroup bind:sortDirection sortValue="status">Booking Status</Header>
-      <Header bind:sortGroup bind:sortDirection>Refund Status</Header>
+      <Header>Booking Status</Header>
+      <Header>Refund Status</Header>
     </THead>
 
     <TBody>

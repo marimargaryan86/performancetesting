@@ -1,10 +1,9 @@
-import type { ConversionModel, ConversionSchema } from "../schemas/conversion";
 import JunctionHubApiService from "./junction-hub-api-service";
-import { parseConversionSchema } from "../parsers/conversion";
 import type { PaginatedData } from "models/common";
-import type { TransactionSchema } from "../schemas/transaction";
-import { parseIncluded } from "../parsers/included";
 import type { SessionModel } from "models/user";
+import type { Conversion, ConversionSchema } from "../schemas/conversion";
+import { parseIncluded, type IncludedSchemas } from "../schemas/included";
+import { JunctionError } from "integration/common/junction-error";
 
 export default class ConversionService extends JunctionHubApiService {
   async listConversions({
@@ -15,10 +14,10 @@ export default class ConversionService extends JunctionHubApiService {
     session: SessionModel;
     cursor?: string;
     limit?: number;
-  }): Promise<PaginatedData<ConversionModel>> {
+  }): Promise<PaginatedData<Conversion>> {
     const resp = await this.makeRequest<{
       data: ConversionSchema[];
-      included?: TransactionSchema[];
+      included?: IncludedSchemas;
       links: { next: string };
     }>("/conversions", {
       queryParams: {
@@ -29,10 +28,10 @@ export default class ConversionService extends JunctionHubApiService {
       session,
     });
 
-    const included = parseIncluded(resp.json.included ?? []);
+    const parsed = parseIncluded([...(resp.json.included ?? []), ...resp.json.data]);
 
     return {
-      data: resp.json.data.map((item) => parseConversionSchema(item, included)),
+      data: parsed.conversions ?? [],
       cursor: ConversionService.getCursor(resp.json),
     };
   }
@@ -43,14 +42,19 @@ export default class ConversionService extends JunctionHubApiService {
   }: {
     session: SessionModel;
     id: string;
-  }): Promise<ConversionModel> {
-    const resp = await this.makeRequest<{ data: ConversionSchema; included: TransactionSchema[] }>(
+  }): Promise<Conversion> {
+    const resp = await this.makeRequest<{ data: ConversionSchema; included?: IncludedSchemas }>(
       `/conversions/${id}`,
-      { session },
+      { session, queryParams: { include: "transactions" } },
     );
 
-    const included = parseIncluded(resp.json.included);
+    const parsed = parseIncluded([...(resp.json.included ?? []), resp.json.data]);
+    const conversion = parsed.conversions?.find((item) => item.id === id);
 
-    return parseConversionSchema(resp.json.data, included);
+    if (!conversion) {
+      throw new JunctionError({ status: 404, statusText: "Not found" });
+    }
+
+    return conversion;
   }
 }

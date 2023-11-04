@@ -1,42 +1,50 @@
-import { accountModel } from "./account";
-import { priceModel } from "integration/junction-mobile-api/schemas/price";
-import { z } from "zod";
-import { currencyModel } from "./money";
-import schemaModel, { type Infer } from "utils/schema-model";
+import type { Account, AccountSchema } from "./account";
+import type { Currency, CurrencySchema } from "./currency";
+import type { IncludedMapping } from "./included";
 
-export const balanceModel = schemaModel.create({
-  schema: z.object({
-    id: z.string(),
-    type: z.literal("balances"),
-    attributes: z.object({ amount: z.number() }),
-    relationships: schemaModel.relationships({
-      account: accountModel.identifier,
-      currency: currencyModel.identifier,
-    }),
-  }),
-  model: priceModel.model,
-  toModel: (data) => ({
-    amount: data.attributes.amount,
-    currency: data.relationships.currency.data.id,
-  }),
-});
-export type BalanceSchema = Infer<typeof balanceModel, "schema">;
+export type Balance = {
+  id: string;
+  amount: number;
+  accountId: string;
+  account?: Account;
+  currencyId: string;
+  currency?: Currency;
+};
 
-export const createBalanceModel = schemaModel.create({
-  schema: z.object({
-    type: z.literal("balances"),
-    relationships: schemaModel.relationships({
-      currency: z.object({
-        id: z.string(),
-        type: z.literal("currencies"),
-      }),
-    }),
+export type BalanceAdd = Pick<Balance, "currencyId">;
+
+export type BalanceSchema = {
+  id: string;
+  type: "balances";
+  attributes: {
+    amount: number;
+  };
+  relationships: {
+    account: { data: Pick<AccountSchema, "id" | "type"> };
+    currency: { data: Pick<CurrencySchema, "id" | "type"> };
+  };
+};
+
+export type BalanceAddSchema = Pick<BalanceSchema, "type"> & {
+  relationships: Pick<BalanceSchema["relationships"], "currency">;
+};
+
+export const balanceParser = {
+  toModel: (data: BalanceSchema, included?: IncludedMapping): Balance => {
+    const accountId = data.relationships.account.data.id;
+    const currencyId = data.relationships.currency.data.id;
+
+    return {
+      id: data.id,
+      amount: data.attributes.amount,
+      accountId,
+      account: included?.accounts?.find(({ id }) => id === accountId),
+      currencyId,
+      currency: included?.currencies?.find(({ code }) => code === currencyId),
+    };
+  },
+  toAddSchema: (data: BalanceAdd): BalanceAddSchema => ({
+    type: "balances",
+    relationships: { currency: { data: { id: data.currencyId, type: "currencies" } } },
   }),
-  model: z.object({ currencyCode: z.string() }),
-  toSchema: (data) => ({
-    type: "balances" as const,
-    relationships: {
-      currency: { data: { id: data.currencyCode, type: "currencies" as const } },
-    },
-  }),
-});
+};

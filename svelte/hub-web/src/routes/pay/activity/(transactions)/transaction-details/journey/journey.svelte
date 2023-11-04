@@ -1,33 +1,33 @@
 <script lang="ts">
-  import type { BookingModel } from "integration/junction-hub-api/schemas/booking";
   import Trip from "./trip.svelte";
+  import type { TripBooking } from "integration/junction-hub-api/schemas/booking";
 
-  export let booking: BookingModel;
+  export let booking: TripBooking;
 
-  $: outbound = booking.details?.legs[0];
-  $: inbound = booking.details?.legs[1];
+  $: outbound = booking.detailsList?.[0]?.legs[0];
+  $: inbound = booking.detailsList?.[0]?.legs[1];
 </script>
 
 <div class="journey">
   <h3 class="typography title-medium bold">Trip</h3>
 
   <div class="content">
-    {#if outbound && booking.details}
+    {#if outbound && booking.detailsList?.[0]}
       <Trip
         leg={outbound}
-        operator={booking.details.operator}
-        cabinClass={booking.details.cabinClass}
+        operator={booking.detailsList[0].operator}
+        cabinClass={booking.detailsList[0].cabinClassName}
         direction="Departure"
       />
     {/if}
 
-    {#if inbound && booking.details}
+    {#if inbound && booking.detailsList?.[0]}
       <hr />
 
       <Trip
         leg={inbound}
-        operator={booking.details.operator}
-        cabinClass={booking.details.cabinClass}
+        operator={booking.detailsList[0].operator}
+        cabinClass={booking.detailsList[0].cabinClassName}
         direction="Return"
       />
     {/if}
