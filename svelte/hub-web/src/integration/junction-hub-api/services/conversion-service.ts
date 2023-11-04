@@ -6,7 +6,7 @@ import { parseIncluded, type IncludedSchemas } from "../schemas/included";
 import { JunctionError } from "integration/common/junction-error";
 
 export default class ConversionService extends JunctionHubApiService {
-  async listConversions({
+  async find({
     session,
     cursor,
     limit = 100,
@@ -36,13 +36,7 @@ export default class ConversionService extends JunctionHubApiService {
     };
   }
 
-  async getConversionDetails({
-    session,
-    id,
-  }: {
-    session: SessionModel;
-    id: string;
-  }): Promise<Conversion> {
+  async get({ session, id }: { session: SessionModel; id: string }): Promise<Conversion> {
     const resp = await this.makeRequest<{ data: ConversionSchema; included?: IncludedSchemas }>(
       `/conversions/${id}`,
       { session, queryParams: { include: "transactions" } },

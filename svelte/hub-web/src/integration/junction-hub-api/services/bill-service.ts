@@ -4,7 +4,7 @@ import type { PaginatedData } from "models/common";
 import { billParser, type Bill, type BillSchema } from "../schemas/bill";
 
 export default class BillService extends JunctionHubApiService {
-  async listBills({
+  async find({
     session,
     cursor,
     limit = 100,
@@ -31,8 +31,8 @@ export default class BillService extends JunctionHubApiService {
     };
   }
 
-  async getBill({ session, billId }: { session: SessionModel; billId: string }): Promise<Bill> {
-    const resp = await this.makeRequest<{ data: BillSchema }>(`/bills/${billId}`, { session });
+  async get({ session, id }: { session: SessionModel; id: string }): Promise<Bill> {
+    const resp = await this.makeRequest<{ data: BillSchema }>(`/bills/${id}`, { session });
 
     return billParser.toModel(resp.json.data);
   }

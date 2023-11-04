@@ -1,3 +1,7 @@
+<script lang="ts" context="module">
+  export const LIST_BENEFICIARIES_LIMIT = 20;
+</script>
+
 <script lang="ts">
   import { dev } from "$app/environment";
   import Header from "components/ui/table/header.svelte";
@@ -6,7 +10,7 @@
   import THead from "components/ui/table/t-head.svelte";
   import TRow from "components/ui/table/t-row.svelte";
   import Table from "components/ui/table/table.svelte";
-  import { callAction, capitalize } from "utils/common";
+  import { capitalize } from "utils/common";
   import Button from "components/ui/button.svelte";
   import PlusIcon from "components/icons/plus-icon.svelte";
   import EditIcon from "components/icons/edit-icon.svelte";
@@ -15,8 +19,7 @@
   import TActionsCol from "components/ui/table/t-actions-col.svelte";
   import StandardLayout from "components/page/standard-layout.svelte";
   import type { ScrollLoadFunc } from "directives/scroll-load";
-  import type { PaginatedData } from "models/common";
-  import type { Beneficiary } from "integration/junction-hub-api/schemas/beneficiary";
+  import integrationInstancesClient from "integration-instances-client";
 
   export let data;
 
@@ -27,22 +30,17 @@
       return { depleted: true };
     }
 
-    const result = await callAction<{ beneficiaries: PaginatedData<Beneficiary> }>({
-      action: routeConfig.routes.pay.routes.beneficiaries.actions.listBeneficiaries,
-      data: { cursor: data.beneficiaries.cursor },
-      apply: false,
+    const nextBeneficiaries = await integrationInstancesClient.hub.beneficiaries.find({
+      cursor: data.beneficiaries.cursor,
+      limit: LIST_BENEFICIARIES_LIMIT,
     });
 
-    if (result.type === "success" && result.data) {
-      data.beneficiaries = {
-        cursor: result.data.beneficiaries.cursor,
-        data: [...data.beneficiaries.data, ...result.data.beneficiaries.data],
-      };
+    data.beneficiaries = {
+      data: [...data.beneficiaries.data, ...nextBeneficiaries.data],
+      cursor: nextBeneficiaries.cursor,
+    };
 
-      return { depleted: !data.beneficiaries.cursor };
-    }
-
-    return { depleted: true };
+    return { depleted: !nextBeneficiaries.cursor };
   };
 
   function remove(): void {

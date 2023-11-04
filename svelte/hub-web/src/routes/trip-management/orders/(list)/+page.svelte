@@ -74,10 +74,8 @@
   import routeConfig from "routeConfig";
   import { ensureDefined } from "utils/array";
   import { getZeroTimeDate } from "utils/date-time";
-  import { callAction } from "utils/common";
-  import type { Journey } from "integration/junction-hub-api/schemas/journey";
-  import type { PaginatedData } from "models/common";
   import type { ScrollLoadFunc } from "directives/scroll-load";
+  import integrationInstancesClient from "integration-instances-client";
 
   export let data;
 
@@ -91,22 +89,17 @@
       return { depleted: true };
     }
 
-    const resp = await callAction<{ journeys: PaginatedData<Journey> }>({
-      action: routeConfig.routes.tripManagement.routes.orders.actions.listJourneys,
-      data: { cursor: data.journeys.cursor },
-      apply: false,
+    const resp = await integrationInstancesClient.hub.journeys.find({
+      cursor: data.journeys.cursor,
+      limit: 20,
     });
 
-    if (resp.type === "success" && resp.data) {
-      data.journeys = {
-        cursor: resp.data.journeys.cursor,
-        data: [...data.journeys.data, ...resp.data.journeys.data],
-      };
+    data.journeys = {
+      cursor: resp.cursor,
+      data: [...data.journeys.data, ...resp.data],
+    };
 
-      return { depleted: !resp.data.journeys.cursor };
-    }
-
-    return { depleted: true };
+    return { depleted: !resp.cursor };
   };
 </script>
 

@@ -5,7 +5,7 @@ import { parseIncluded, type IncludedSchemas } from "../schemas/included";
 import { JunctionError } from "integration/common/junction-error";
 
 export default class BookingService extends JunctionHubApiService {
-  async getBooking({ session, id }: { session: SessionModel; id: string }): Promise<TripBooking> {
+  async get({ session, id }: { session: SessionModel; id: string }): Promise<TripBooking> {
     const resp = await this.makeRequest<{
       data: TripBookingSchema;
       included?: IncludedSchemas;

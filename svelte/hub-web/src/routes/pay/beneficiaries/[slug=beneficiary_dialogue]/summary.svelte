@@ -1,13 +1,9 @@
 <script lang="ts">
   import type { CountryModel } from "models/location";
-  import { callAction, capitalize } from "utils/common";
-  import { page } from "$app/stores";
-  import type { z } from "zod";
-  import type {
-    Beneficiary,
-    BeneficiaryPut,
-  } from "integration/junction-hub-api/schemas/beneficiary";
+  import { capitalize } from "utils/common";
+  import type { BeneficiaryPut } from "integration/junction-hub-api/schemas/beneficiary";
   import type { Currency } from "integration/junction-hub-api/schemas/currency";
+  import integrationInstancesClient from "integration-instances-client";
 
   export let data: BeneficiaryPut;
   export let countries: Map<string, CountryModel>;
@@ -25,16 +21,17 @@
   export async function validate(): Promise<boolean> {
     error = undefined;
 
-    const result = await callAction<
-      { beneficiary: Beneficiary },
-      { validation?: z.ZodFormattedError<Beneficiary>; service?: string }
-    >({ action: $page.url.toString() });
+    try {
+      if (data.id) {
+        await integrationInstancesClient.hub.beneficiaries.update({ data, id: data.id });
+      } else {
+        await integrationInstancesClient.hub.beneficiaries.create({ data });
+      }
 
-    if (result.type === "failure") {
-      error = String(result.data?.service ?? result.data?.validation);
+      return true;
+    } catch {
+      return false;
     }
-
-    return result.type === "success";
   }
 </script>
 

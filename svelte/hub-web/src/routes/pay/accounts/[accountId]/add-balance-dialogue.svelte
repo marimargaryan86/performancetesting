@@ -5,13 +5,12 @@
   import Button from "components/ui/button.svelte";
   import TextField from "components/ui/text-field.svelte";
   import { portal } from "directives/portal";
-  import routeConfig from "routeConfig";
   import { createEventDispatcher } from "svelte";
   import { fade, fly } from "svelte/transition";
-  import { callAction } from "utils/common";
   import { pendableCall } from "utils/pendable-call";
   import type { Balance } from "integration/junction-hub-api/schemas/balance";
   import type { Currency } from "integration/junction-hub-api/schemas/currency";
+  import integrationInstancesClient from "integration-instances-client";
 
   export let accountId: string;
   export let exclude: Balance[];
@@ -45,16 +44,16 @@
   );
 
   const { pending, func: addBalances } = pendableCall(async () => {
-    const result = await callAction<{ balances: Balance[] }>({
-      action: routeConfig.routes.pay.routes.accounts.routes.account(accountId).actions.addBalances,
-      data: { currencyCodes: value.map((item) => item.code) },
-      dataType: "json",
-      apply: false,
-    });
+    const balances = await Promise.all(
+      value.map((item) =>
+        integrationInstancesClient.hub.balances.create({
+          accountId,
+          data: { currencyId: item.code },
+        }),
+      ),
+    );
 
-    if (result.type === "success") {
-      dispatch("addbalances", result.data?.balances ?? []);
-    }
+    dispatch("addbalances", balances);
 
     close();
   });

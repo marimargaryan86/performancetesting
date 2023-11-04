@@ -9,8 +9,8 @@ import {
 import { parseIncluded, type IncludedSchemas } from "../schemas/included";
 import { JunctionError } from "integration/common/junction-error";
 
-export class CancellationRequestService extends JunctionMobileApiService {
-  async createCancellationRequest({
+export default class CancellationRequestService extends JunctionMobileApiService {
+  async create({
     session,
     data,
   }: {
@@ -29,13 +29,7 @@ export class CancellationRequestService extends JunctionMobileApiService {
     return cancellationRequestParsers.toModel(resp.json.data);
   }
 
-  async getCancellationRequest({
-    id,
-    session,
-  }: {
-    session: SessionModel;
-    id: string;
-  }): Promise<CancellationRequest> {
+  async get({ id, session }: { session: SessionModel; id: string }): Promise<CancellationRequest> {
     const resp = await this.makeRequest<{
       data: CancellationRequestSchema;
       included?: IncludedSchemas;

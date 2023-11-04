@@ -1,13 +1,15 @@
+<script lang="ts" context="module">
+  export const LIST_ACCOUNTS_LIMIT = 20;
+</script>
+
 <script lang="ts">
   import { dev } from "$app/environment";
   import ChevronIcon from "components/icons/chevron-icon.svelte";
   import StandardLayout from "components/page/standard-layout.svelte";
   import EntityAvatar from "components/ui/entity-avatar.svelte";
   import { scrollLoad, type ScrollLoadFunc } from "directives/scroll-load";
-  import type { Account } from "integration/junction-hub-api/schemas/account";
-  import type { PaginatedData } from "models/common";
+  import integrationInstancesClient from "integration-instances-client";
   import routeConfig from "routeConfig";
-  import { callAction } from "utils/common";
 
   export let data;
 
@@ -22,22 +24,17 @@
       return { depleted: true };
     }
 
-    const result = await callAction<{ accounts: PaginatedData<Account> }>({
-      action: routeConfig.routes.pay.routes.accounts.actions.listAccounts,
-      data: { cursor: data.accounts.cursor },
-      apply: false,
+    const nextAccounts = await integrationInstancesClient.hub.accounts.find({
+      cursor: data.accounts.cursor,
+      limit: LIST_ACCOUNTS_LIMIT,
     });
 
-    if (result.type === "success" && result.data) {
-      data.accounts = {
-        cursor: result.data.accounts.cursor,
-        data: [...data.accounts.data, ...result.data.accounts.data],
-      };
+    data.accounts = {
+      data: [...data.accounts.data, ...nextAccounts.data],
+      cursor: nextAccounts.cursor,
+    };
 
-      return { depleted: !result.data.accounts.cursor };
-    }
-
-    return { depleted: true };
+    return { depleted: !nextAccounts.cursor };
   };
 </script>
 

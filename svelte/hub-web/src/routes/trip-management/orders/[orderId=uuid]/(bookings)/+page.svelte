@@ -37,7 +37,6 @@
 
 <CancellationDialog
   bind:this={cancellationDialog}
-  orderId={data.order.id}
   passengers={data.order.passengers}
   on:success={updateOrders}
 />

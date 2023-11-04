@@ -4,7 +4,7 @@ import type { PaginatedData } from "models/common";
 import { accountParser, type Account, type AccountSchema } from "../schemas/account";
 
 export default class AccountService extends JunctionHubApiService {
-  async listAccounts({
+  async find({
     session,
     cursor,
     limit = 100,
@@ -27,7 +27,7 @@ export default class AccountService extends JunctionHubApiService {
     };
   }
 
-  async getAccount({ session, id }: { session: SessionModel; id: string }): Promise<Account> {
+  async get({ session, id }: { session: SessionModel; id: string }): Promise<Account> {
     const resp = await this.makeRequest<{ data: AccountSchema }>(`/accounts/${id}`, {
       session,
     });

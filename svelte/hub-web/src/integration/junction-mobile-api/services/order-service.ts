@@ -18,8 +18,8 @@ import {
   type MarkupsCreate,
 } from "../schemas/markups";
 
-export class OrderService extends JunctionMobileApiService {
-  async listOrders({
+export default class OrderService extends JunctionMobileApiService {
+  async find({
     session,
     cursor,
     limit = 100,
@@ -55,13 +55,7 @@ export class OrderService extends JunctionMobileApiService {
     };
   }
 
-  async createOrder({
-    session,
-    data,
-  }: {
-    session: SessionModel;
-    data: OrderCreate;
-  }): Promise<Order> {
+  async create({ session, data }: { session: SessionModel; data: OrderCreate }): Promise<Order> {
     try {
       const resp = await this.makeRequest<{ data: OrderSchema }>("/orders", {
         method: "POST",
@@ -91,7 +85,7 @@ export class OrderService extends JunctionMobileApiService {
     }
   }
 
-  async getOrder({ id, session }: { id: string; session: SessionModel }): Promise<Order> {
+  async get({ id, session }: { id: string; session: SessionModel }): Promise<Order> {
     const resp = await this.makeRequest<{
       data: OrderSchema;
       included?: IncludedSchemas;
@@ -119,7 +113,7 @@ export class OrderService extends JunctionMobileApiService {
     return order;
   }
 
-  async createOrderMarkups({
+  async createMarkups({
     session,
     data,
   }: {
@@ -135,8 +129,14 @@ export class OrderService extends JunctionMobileApiService {
     return markupsParser.toModel(resp.json.data);
   }
 
-  async getOrderMarkups({ id, session }: { id: string; session: SessionModel }): Promise<Markups> {
-    const resp = await this.makeRequest<{ data: MarkupsSchema }>(`/orders/${id}/markup`, {
+  async getMarkups({
+    orderId,
+    session,
+  }: {
+    orderId: string;
+    session: SessionModel;
+  }): Promise<Markups> {
+    const resp = await this.makeRequest<{ data: MarkupsSchema }>(`/orders/${orderId}/markup`, {
       session,
     });
 

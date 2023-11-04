@@ -9,8 +9,8 @@ import {
 import { parseIncluded, type IncludedSchemas } from "../schemas/included";
 import { JunctionError } from "integration/common/junction-error";
 
-export class OfferService extends JunctionMobileApiService {
-  async createPriceQuote({
+export default class OfferService extends JunctionMobileApiService {
+  async create({
     session,
     data,
   }: {
@@ -28,13 +28,7 @@ export class OfferService extends JunctionMobileApiService {
     return tripOfferPriceQuoteParser.toModel(resp.json.data);
   }
 
-  async getPriceQuote({
-    id,
-    session,
-  }: {
-    session: SessionModel;
-    id: string;
-  }): Promise<TripOfferPriceQuote> {
+  async get({ id, session }: { session: SessionModel; id: string }): Promise<TripOfferPriceQuote> {
     const resp = await this.makeRequest<{
       data: TripOfferPriceQuoteSchema;
       included?: IncludedSchemas;

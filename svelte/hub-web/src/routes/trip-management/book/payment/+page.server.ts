@@ -25,7 +25,7 @@ export async function load(event): Promise<{
       throw redirect(303, routeConfig.routes.tripManagement.routes.book.root);
     }
 
-    const priceQuote = await integrationInstances.junctionMobileApi.offers.getPriceQuote({
+    const priceQuote = await integrationInstances.junctionMobileApi.offers.get({
       session,
       id: bookingSession.priceQuote.id,
     });

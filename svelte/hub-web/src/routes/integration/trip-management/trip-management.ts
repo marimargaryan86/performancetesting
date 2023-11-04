@@ -1,5 +1,4 @@
 import * as devalue from "devalue";
-import type { Place } from "integration/junction-mobile-api/schemas/place";
 import type { RouteId } from "./$types";
 import { URLExtended } from "utils/url";
 import { z } from "zod";
@@ -61,21 +60,6 @@ export const bookingSessionModel = z
   })
   .partial();
 export type BookingSessionModel = z.infer<typeof bookingSessionModel>;
-
-async function listPlaces(query: string): Promise<Place[]> {
-  if (query.length < 3) {
-    return [];
-  }
-
-  const url = new URLExtended(ROUTE, { base: origin, query: { action: "list-places", query } });
-  const resp = await fetch(url);
-
-  if (resp.status !== 200) {
-    throw new Error("Failed to fetch places");
-  }
-
-  return devalue.parse(await resp.text());
-}
 
 async function search(data: Partial<SearchDataModel>): Promise<void> {
   const parsed = searchDataModel.parse(data);
@@ -214,7 +198,6 @@ async function createOrderMarkups(
 }
 
 export default {
-  listPlaces,
   search,
   getOffers,
   yieldOffers,

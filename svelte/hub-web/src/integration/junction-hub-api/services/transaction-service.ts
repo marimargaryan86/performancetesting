@@ -34,7 +34,7 @@ export default class TransactionService extends JunctionHubApiService {
     );
     const companyRequests = Array.from(companyIds).map((id) =>
       this.companyService
-        .getCompanyDetails({ session: data.session, id })
+        .get({ session: data.session, id })
         .then((item) => item)
         .catch(() => undefined),
     );
@@ -42,7 +42,7 @@ export default class TransactionService extends JunctionHubApiService {
     return (await Promise.all(companyRequests)).filter(ensureDefined);
   }
 
-  async listTransactions({
+  async find({
     session,
     cursor,
     limit = 100,
@@ -70,5 +70,17 @@ export default class TransactionService extends JunctionHubApiService {
       data: resp.json.data.map((item) => transactionParser.toModel(item, parsed)),
       cursor: TransactionService.getCursor(resp.json),
     };
+  }
+
+  async get({ session, id }: { session: SessionModel; id: string }): Promise<Transaction> {
+    const resp = await this.makeRequest<{ data: TransactionSchema }>(`/transactions/${id}`, {
+      session,
+    });
+
+    const parsed: IncludedMapping = {
+      companies: await this.getCompanies({ data: [resp.json.data], session }),
+    };
+
+    return transactionParser.toModel(resp.json.data, parsed);
   }
 }

@@ -10,8 +10,8 @@ import type { Offer, OfferSchema } from "../schemas/offer";
 import type { PaginatedData } from "models/common";
 import { parseIncluded, type IncludedSchemas } from "../schemas/included";
 
-export class TripService extends JunctionMobileApiService {
-  async createTripCandidatesSearch({
+export default class TripService extends JunctionMobileApiService {
+  async create({
     session,
     data,
   }: {
@@ -30,7 +30,7 @@ export class TripService extends JunctionMobileApiService {
     return tripCandidateSearchParser.toModel(resp.json.data);
   }
 
-  async getTripCandidatesSearch({
+  async getTripCandidateSearch({
     session,
     id,
   }: {
@@ -44,7 +44,7 @@ export class TripService extends JunctionMobileApiService {
     return tripCandidateSearchParser.toModel(resp.json.data);
   }
 
-  async getTripCandidatesOffers({
+  async findOffers({
     session,
     id,
     cursor,

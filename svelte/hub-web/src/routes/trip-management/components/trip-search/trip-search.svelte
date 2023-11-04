@@ -37,6 +37,7 @@
     type SearchDataModel,
   } from "../../../integration/trip-management/trip-management";
   import routeConfig from "routeConfig";
+  import integrationInstancesClient from "integration-instances-client";
 
   export let data: Partial<SearchDataModel> = {
     passengers: {
@@ -95,7 +96,7 @@
     required
     placeholder="City or Station"
     bind:value={origin}
-    autocomplete={tripManagement.listPlaces}
+    autocomplete={integrationInstancesClient.mobile.places.find}
     formatter={formatPlace}
     error={errors?.origin?._errors}
     clearable
@@ -105,7 +106,7 @@
     required
     placeholder="City or Station"
     bind:value={destination}
-    autocomplete={tripManagement.listPlaces}
+    autocomplete={integrationInstancesClient.mobile.places.find}
     formatter={formatPlace}
     error={errors?.destination?._errors}
     clearable

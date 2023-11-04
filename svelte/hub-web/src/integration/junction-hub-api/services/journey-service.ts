@@ -5,7 +5,7 @@ import type { Journey, JourneySchema } from "../schemas/journey";
 import { parseIncluded, type IncludedSchemas } from "../schemas/included";
 
 export default class JourneyService extends JunctionHubApiService {
-  async listJourneys({
+  async find({
     session,
     cursor,
     limit = 100,

@@ -42,13 +42,6 @@ function offersEqual(
   );
 }
 
-async function listPlaces(session: SessionModel, event: RequestEvent): Promise<Response> {
-  const query = event.url.searchParams.get("query")?.toString() ?? "";
-  const places = await integrationInstances.junctionMobileApi.places.listPlaces({ session, query });
-
-  return new Response(devalue.stringify(places));
-}
-
 async function search(event: RequestEvent): Promise<Response> {
   const searchData: BookingSessionModel["searchData"] = devalue.parse(await event.request.text());
   utils.setBookingSession({ searchData, sessionToken: getRandomAlphaNumericString(32) }, event);
@@ -70,7 +63,7 @@ async function getTripCandidates(
 
   if (tripCandidates && tripCandidates.expiresAt > new Date()) {
     try {
-      const result = await integrationInstances.junctionMobileApi.trips.getTripCandidatesSearch({
+      const result = await integrationInstances.junctionMobileApi.trips.getTripCandidateSearch({
         session,
         id: tripCandidates.id,
       });
@@ -81,7 +74,7 @@ async function getTripCandidates(
     }
   }
 
-  const result = await integrationInstances.junctionMobileApi.trips.createTripCandidatesSearch({
+  const result = await integrationInstances.junctionMobileApi.trips.create({
     session,
     data: {
       sessionToken,
@@ -102,11 +95,10 @@ async function getOffers(session: SessionModel, event: RequestEvent): Promise<Re
     sessionToken,
     tripCandidates: bookingSession.tripCandidates,
   });
-  const { data: offers } =
-    await integrationInstances.junctionMobileApi.trips.getTripCandidatesOffers({
-      session,
-      id: tripCandidates.id,
-    });
+  const { data: offers } = await integrationInstances.junctionMobileApi.trips.findOffers({
+    session,
+    id: tripCandidates.id,
+  });
 
   utils.setBookingSession(
     {
@@ -135,7 +127,7 @@ async function selectOffer(session: SessionModel, event: RequestEvent): Promise<
     return new Response(undefined, { status: 400 });
   }
 
-  const priceQuote = await integrationInstances.junctionMobileApi.offers.createPriceQuote({
+  const priceQuote = await integrationInstances.junctionMobileApi.offers.create({
     session,
     data: {
       sessionToken: bookingSession.sessionToken,
@@ -170,7 +162,7 @@ async function getPriceQuote(session: SessionModel, event: RequestEvent): Promis
   }
 
   try {
-    const priceQuote = await integrationInstances.junctionMobileApi.offers.getPriceQuote({
+    const priceQuote = await integrationInstances.junctionMobileApi.offers.get({
       session,
       id: bookingSession.priceQuote.id,
     });
@@ -201,7 +193,7 @@ async function getPaymentIntent(session: SessionModel, event: RequestEvent): Pro
   }
 
   try {
-    const priceQuote = await integrationInstances.junctionMobileApi.offers.getPriceQuote({
+    const priceQuote = await integrationInstances.junctionMobileApi.offers.get({
       session,
       id: bookingSession.priceQuote?.id,
     });
@@ -210,7 +202,7 @@ async function getPaymentIntent(session: SessionModel, event: RequestEvent): Pro
       throw new Error();
     }
 
-    const paymentIntent = await integrationInstances.junctionMobileApi.payments.createPayment({
+    const paymentIntent = await integrationInstances.junctionMobileApi.payments.create({
       session,
       data: priceQuote.price.total,
     });
@@ -243,7 +235,7 @@ async function createOrder(session: SessionModel, event: RequestEvent): Promise<
   const data: OrderCreate = devalue.parse(await event.request.text());
 
   try {
-    const order = await integrationInstances.junctionMobileApi.orders.createOrder({
+    const order = await integrationInstances.junctionMobileApi.orders.create({
       session,
       data,
     });
@@ -264,7 +256,7 @@ async function createOrderMarkups(session: SessionModel, event: RequestEvent): P
   const data: MarkupsCreate = devalue.parse(await event.request.text());
 
   try {
-    const orderMarkups = await integrationInstances.junctionMobileApi.orders.createOrderMarkups({
+    const orderMarkups = await integrationInstances.junctionMobileApi.orders.createMarkups({
       session,
       data,
     });
@@ -286,8 +278,6 @@ export function GET(event): Promise<Response> {
   const action = event.url.searchParams.get("action")?.toString();
 
   switch (action) {
-    case "list-places":
-      return listPlaces(session, event);
     case "get-offers":
       return getOffers(session, event);
     case "get-price-quote":

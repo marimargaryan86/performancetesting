@@ -1,3 +1,7 @@
+<script lang="ts" context="module">
+  export const LIST_BILLS_LIMIT = 20;
+</script>
+
 <script lang="ts">
   import StandardLayout from "components/page/standard-layout.svelte";
   import Switch from "components/ui/switch.svelte";
@@ -9,10 +13,8 @@
   import TRow from "components/ui/table/t-row.svelte";
   import Table from "components/ui/table/table.svelte";
   import type { ScrollLoadFunc } from "directives/scroll-load";
+  import integrationInstancesClient from "integration-instances-client";
   import type { Bill } from "integration/junction-hub-api/schemas/bill";
-  import type { PaginatedData } from "models/common";
-  import routeConfig from "routeConfig";
-  import { callAction } from "utils/common";
 
   export let data;
 
@@ -23,30 +25,23 @@
       return { depleted: true };
     }
 
-    const result = await callAction<{ bills: PaginatedData<Bill> }>({
-      action: routeConfig.routes.pay.routes.bills.actions.listBills,
-      data: { cursor: data.bills.cursor },
-      apply: false,
+    const nextBills = await integrationInstancesClient.hub.bills.find({
+      cursor: data.bills.cursor,
+      limit: LIST_BILLS_LIMIT,
     });
 
-    if (result.type === "success" && result.data) {
-      data.bills = {
-        cursor: result.data.bills.cursor,
-        data: [...data.bills.data, ...result.data.bills.data],
-      };
+    data.bills = {
+      data: [...data.bills.data, ...nextBills.data],
+      cursor: nextBills.cursor,
+    };
 
-      return { depleted: !result.data.bills.cursor };
-    }
-
-    return { depleted: true };
+    return { depleted: !nextBills.cursor };
   };
 
   async function toggleReconciliation(bill: Bill): Promise<void> {
-    await callAction({
-      action: routeConfig.routes.pay.routes.bills.actions.toggleReconciliation,
-      data: { billId: bill.id },
-      apply: false,
-    });
+    await integrationInstancesClient.hub.bills.toggleReconciliation({ bill });
+
+    bill.reconciled = !bill.reconciled;
   }
 </script>
 
@@ -71,7 +66,7 @@
           />
           <TCol width="40px" textAlign="right">
             <Switch
-              bind:active={bill.reconciled}
+              active={bill.reconciled}
               on:toggle={toggleReconciliation.bind(toggleReconciliation, bill)}
             />
           </TCol>

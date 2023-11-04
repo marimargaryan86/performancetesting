@@ -20,7 +20,7 @@ export default {
     beneficiaries: new junctionHubApi.BeneficiaryService(env.HUB_API_BASE_URL),
     currencies: new junctionHubApi.CurrencyService(env.HUB_API_BASE_URL),
     conversions: new junctionHubApi.ConversionService(env.HUB_API_BASE_URL),
-    companyService: junctionHubCompanyService,
+    companies: junctionHubCompanyService,
     transactions: new junctionHubApi.TransactionService(
       env.HUB_API_BASE_URL,
       junctionHubCompanyService,
@@ -30,7 +30,7 @@ export default {
     bills: new junctionHubApi.BillService(env.HUB_API_BASE_URL),
     journeys: new junctionHubApi.JourneyService(env.HUB_API_BASE_URL),
     orders: new junctionHubApi.OrderService(env.HUB_API_BASE_URL),
-    cancellations: new junctionHubApi.CancellationService(env.HUB_API_BASE_URL),
+    cancellationRequests: new junctionHubApi.CancellationRequestService(env.HUB_API_BASE_URL),
   },
   common: {
     countries: new common.CountryService(),

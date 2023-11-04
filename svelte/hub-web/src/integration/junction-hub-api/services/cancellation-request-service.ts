@@ -7,7 +7,7 @@ import {
   type CancellationRequestSchema,
 } from "../schemas/cancellation";
 
-export default class CancellationService extends JunctionHubApiService {
+export default class CancellationRequestService extends JunctionHubApiService {
   async create({
     session,
     data,

@@ -77,10 +77,7 @@ export type TransactionSchema = {
 };
 
 export const transactionParser = {
-  toModel: (
-    data: TransactionSchema,
-    included?: Pick<IncludedMapping, "conversions" | "bills" | "companies">,
-  ): Transaction => {
+  toModel: (data: TransactionSchema, included?: IncludedMapping): Transaction => {
     const conversionId = data.relationships?.conversion?.data?.id;
     const billId = data.relationships?.bill?.data?.id;
     const payerId = data.relationships?.payer?.data.id;

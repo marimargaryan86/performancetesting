@@ -21,11 +21,13 @@ export async function load(event): Promise<{
   }
 
   try {
+    const currencies = await integrationInstances.junctionHubApi.currencies.find({
+      session: getSession(event),
+    });
+
     return {
       user,
-      currencies: await integrationInstances.junctionHubApi.currencies.listCurrencies({
-        session: getSession(event),
-      }),
+      currencies: new Map(currencies.data.map((currency) => [currency.code, currency])),
       countries: integrationInstances.common.countries.findCountries(),
     };
   } catch {

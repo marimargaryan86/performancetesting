@@ -9,7 +9,7 @@ import {
 } from "../schemas/beneficiary";
 
 export default class BeneficiaryService extends JunctionHubApiService {
-  async listBeneficiaries({
+  async find({
     session,
     cursor,
     limit = 100,
@@ -32,13 +32,7 @@ export default class BeneficiaryService extends JunctionHubApiService {
     };
   }
 
-  async getBeneficiary({
-    session,
-    id,
-  }: {
-    session: SessionModel;
-    id: string;
-  }): Promise<Beneficiary> {
+  async get({ session, id }: { session: SessionModel; id: string }): Promise<Beneficiary> {
     const resp = await this.makeRequest<{ data: BeneficiarySchema }>(`/beneficiaries/${id}`, {
       session,
     });
@@ -46,7 +40,7 @@ export default class BeneficiaryService extends JunctionHubApiService {
     return beneficiaryParser.toModel(resp.json.data);
   }
 
-  async createBeneficiary({
+  async create({
     session,
     data,
   }: {
@@ -62,7 +56,7 @@ export default class BeneficiaryService extends JunctionHubApiService {
     return beneficiaryParser.toModel(resp.json.data);
   }
 
-  async updateBeneficiary({
+  async update({
     session,
     id,
     data,

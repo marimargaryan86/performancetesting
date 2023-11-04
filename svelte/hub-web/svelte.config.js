@@ -18,6 +18,7 @@ const config = {
       assets: "src/assets",
       integration: "src/integration",
       "integration-instances": "src/integration-instances.server.ts",
+      "integration-instances-client": "src/integration-instances.client.ts",
       models: "src/models",
       config: "src/config",
       utils: "src/utils",

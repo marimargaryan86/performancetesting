@@ -8,22 +8,26 @@ import {
 } from "../schemas/balance";
 
 export default class BalanceService extends JunctionHubApiService {
-  async listBalances({
+  async find({
     session,
     accountId,
+    cursor,
+    limit = 100,
   }: {
     session: SessionModel;
     accountId: string;
+    cursor?: string;
+    limit?: number;
   }): Promise<Balance[]> {
     const resp = await this.makeRequest<{ data: BalanceSchema[] }>(
       `/accounts/${accountId}/balances`,
-      { session },
+      { session, queryParams: { "page[cursor]": cursor, "page[limit]": limit } },
     );
 
     return resp.json.data.map((item) => balanceParser.toModel(item));
   }
 
-  async addBalance({
+  async create({
     session,
     accountId,
     data,

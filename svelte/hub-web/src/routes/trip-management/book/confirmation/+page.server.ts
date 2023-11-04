@@ -18,14 +18,14 @@ export function load(event): {
     }
 
     return {
-      order: integrationInstances.junctionMobileApi.orders.getOrder({
+      order: integrationInstances.junctionMobileApi.orders.get({
         session: getSession(event),
         id: bookingSession.order.id,
       }),
       markups: integrationInstances.junctionMobileApi.orders
-        .getOrderMarkups({
+        .getMarkups({
           session: getSession(event),
-          id: bookingSession.order.id,
+          orderId: bookingSession.order.id,
         })
         .catch(() => undefined),
     };

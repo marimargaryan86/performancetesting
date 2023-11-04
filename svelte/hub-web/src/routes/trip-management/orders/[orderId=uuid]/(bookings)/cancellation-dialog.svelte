@@ -10,14 +10,11 @@
   import PhoneIcon from "components/icons/phone-icon.svelte";
   import EmailIcon from "components/icons/email-icon.svelte";
   import { pendableCall } from "utils/pendable-call";
-  import { callAction } from "utils/common";
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import { scale } from "svelte/transition";
-  import routeConfig from "routeConfig";
-  import type { CancelBookingsActionData } from "./+page.server";
   import { createEventDispatcher } from "svelte";
+  import integrationInstancesClient from "integration-instances-client";
 
-  export let orderId: string;
   export let passengers: OrderPassenger[];
 
   const dispatch = createEventDispatcher<{ success: void }>();
@@ -32,26 +29,16 @@
 
   const { pending, func: performCancel } = pendableCall(async () => {
     if (!booking) {
-      return false;
+      return undefined;
     }
 
-    const actionData: CancelBookingsActionData = {
-      bookingIds: [booking.id],
-    };
-
-    const result = await callAction({
-      action:
-        routeConfig.routes.tripManagement.routes.orders.routes.order(orderId).actions
-          .cancelBookings,
-      data: actionData,
-      dataType: "json",
-    });
-
-    if (result.type === "success") {
-      return true;
+    try {
+      return await integrationInstancesClient.hub.cancellationRequests.create({
+        data: { bookingIds: [booking.id] },
+      });
+    } catch {
+      return undefined;
     }
-
-    return false;
   });
 
   function info(): void {
@@ -74,7 +61,7 @@
       booking.cancellation = {
         bookingId: booking.id,
         id: "",
-        status: "pending",
+        status: result.status,
         booking,
       };
 

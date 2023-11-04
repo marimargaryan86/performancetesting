@@ -3,8 +3,8 @@ import type { SessionModel } from "models/user";
 import type { Price } from "integration/common/schemas/price";
 import { paymentParser, type Payment, type PaymentSchema } from "../schemas/payment";
 
-export class PaymentService extends JunctionMobileApiService {
-  async createPayment({ session, data }: { session: SessionModel; data: Price }): Promise<Payment> {
+export default class PaymentService extends JunctionMobileApiService {
+  async create({ session, data }: { session: SessionModel; data: Price }): Promise<Payment> {
     const resp = await this.makeRequest<{ data: PaymentSchema }>("/payments", {
       method: "POST",
       data: { data: paymentParser.toCreateSchema(data) },

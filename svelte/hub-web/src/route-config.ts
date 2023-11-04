@@ -33,9 +33,6 @@ export default {
                   order: <TOrderId extends string>(id: TOrderId) =>
                     ({
                       root: `${this.root}/${id}`,
-                      get actions() {
-                        return { cancelBookings: `${this.root}?/cancelBookings` } as const;
-                      },
                       get routes() {
                         return {
                           tickets: { root: `${this.root}/tickets` },
@@ -50,11 +47,6 @@ export default {
                         } as const;
                       },
                     } as const),
-                } as const;
-              },
-              get actions() {
-                return {
-                  listJourneys: `${this.root}?/listJourneys`,
                 } as const;
               },
             },
@@ -87,47 +79,27 @@ export default {
           return {
             activity: {
               root: `${this.root}/activity`,
-              get actions() {
-                return {
-                  getBooking: `${this.root}?/getBooking`,
-                  listTransactions: `${this.root}?/listTransactions`,
-                } as const;
-              },
               get routes() {
                 return {
                   conversions: {
                     root: `${this.root}/fx`,
-                    get actions() {
-                      return { listConversions: `${this.root}?/listConversions` } as const;
-                    },
                   } as const,
                 } as const;
               },
             },
             accounts: {
               root: `${this.root}/accounts`,
-              get actions() {
-                return { listAccounts: `${this.root}?/listAccounts` } as const;
-              },
               get routes() {
                 return {
                   account: <TAccountId extends string>(id: TAccountId) =>
                     ({
                       root: `${this.root}/${id}`,
-                      get actions() {
-                        return {
-                          addBalances: `${this.root}?/addBalances`,
-                        } as const;
-                      },
                     } as const),
                 } as const;
               },
             },
             beneficiaries: {
               root: `${this.root}/beneficiaries`,
-              get actions() {
-                return { listBeneficiaries: `${this.root}?/listBeneficiaries` } as const;
-              },
               get routes() {
                 return {
                   beneficiary: <TBeneficiaryId extends string = "add">(
@@ -138,12 +110,6 @@ export default {
             },
             bills: {
               root: `${this.root}/bills`,
-              get actions() {
-                return {
-                  listBills: `${this.root}?/listBills`,
-                  toggleReconciliation: `${this.root}?/toggleReconciliation`,
-                } as const;
-              },
             },
           } as const;
         },

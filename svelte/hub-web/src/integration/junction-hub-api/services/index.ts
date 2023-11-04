@@ -9,7 +9,7 @@ import BookingService from "./booking-service";
 import BillService from "./bill-service";
 import JourneyService from "./journey-service";
 import OrderService from "./order-service";
-import CancellationService from "./cancellation-service";
+import CancellationRequestService from "./cancellation-request-service";
 
 export default {
   AccountService,
@@ -23,5 +23,5 @@ export default {
   BillService,
   JourneyService,
   OrderService,
-  CancellationService,
+  CancellationRequestService,
 };

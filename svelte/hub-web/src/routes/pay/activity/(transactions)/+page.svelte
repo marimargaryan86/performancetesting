@@ -1,3 +1,7 @@
+<script lang="ts" context="module">
+  export const LIST_TRANSACTIONS_LIMIT = 20;
+</script>
+
 <script lang="ts">
   import Header from "components/ui/table/header.svelte";
   import TBody from "components/ui/table/t-body.svelte";
@@ -6,15 +10,14 @@
   import TRow from "components/ui/table/t-row.svelte";
   import TCol from "components/ui/table/t-col.svelte";
   import { yymmdd } from "formatting/date-time";
-  import { callAction, capitalize } from "utils/common";
+  import { capitalize } from "utils/common";
   import TransactionDetails from "./transaction-details/transaction-details.svelte";
-  import routeConfig from "routeConfig";
   import TCompanyCol from "components/ui/table/t-company-col.svelte";
   import TMoneyCol from "components/ui/table/t-money-col.svelte";
   import type { TripBooking } from "integration/junction-hub-api/schemas/booking";
   import type { Transaction } from "integration/junction-hub-api/schemas/transaction";
   import type { ScrollLoadFunc } from "directives/scroll-load";
-  import type { PaginatedData } from "models/common";
+  import integrationInstancesClient from "integration-instances-client";
 
   export let data;
 
@@ -41,36 +44,25 @@
       return { depleted: true };
     }
 
-    const result = await callAction<{ transactions: PaginatedData<Transaction> }>({
-      action: routeConfig.routes.pay.routes.activity.actions.listTransactions,
-      data: { cursor: data.transactions.cursor },
-      apply: false,
+    const nextTransactions = await integrationInstancesClient.hub.transactions.find({
+      cursor: data.transactions.cursor,
+      limit: LIST_TRANSACTIONS_LIMIT,
     });
 
-    if (result.type === "success" && result.data) {
-      data.transactions = {
-        cursor: result.data.transactions.cursor,
-        data: [...data.transactions.data, ...result.data.transactions.data],
-      };
+    data.transactions = {
+      data: [...data.transactions.data, ...nextTransactions.data],
+      cursor: nextTransactions.cursor,
+    };
 
-      return { depleted: !result.data.transactions.cursor };
-    }
-
-    return { depleted: true };
+    return { depleted: !nextTransactions.cursor };
   };
 
   async function getBooking(externalReference: string): Promise<TripBooking | undefined> {
-    const result = await callAction<{ booking: TripBooking }>({
-      action: routeConfig.routes.pay.routes.activity.actions.getBooking,
-      data: { bookingId: externalReference },
-      apply: false,
-    });
-
-    if (result.type === "success") {
-      return result.data?.booking;
+    try {
+      return await integrationInstancesClient.hub.bookings.get({ id: externalReference });
+    } catch {
+      return undefined;
     }
-
-    return undefined;
   }
 </script>
 

@@ -32,8 +32,8 @@ export async function load(event): Promise<{
 
     const [offers, origin, destination] = await Promise.all([
       tripManagement.getOffers(event),
-      integrationInstances.junctionMobileApi.places.getPlace({ session, id: searchData.origin.id }),
-      integrationInstances.junctionMobileApi.places.getPlace({
+      integrationInstances.junctionMobileApi.places.get({ session, id: searchData.origin.id }),
+      integrationInstances.junctionMobileApi.places.get({
         session,
         id: searchData.destination.id,
       }),

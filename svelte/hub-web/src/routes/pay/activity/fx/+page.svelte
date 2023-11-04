@@ -1,17 +1,18 @@
+<script lang="ts" context="module">
+  export const LIST_CONVERSIONS_LIMIT = 20;
+</script>
+
 <script lang="ts">
   import { yymmdd } from "formatting/date-time";
-  import { callAction } from "utils/common";
   import Table from "components/ui/table/table.svelte";
   import THead from "components/ui/table/t-head.svelte";
   import Header from "components/ui/table/header.svelte";
   import TBody from "components/ui/table/t-body.svelte";
   import TRow from "components/ui/table/t-row.svelte";
   import TCol from "components/ui/table/t-col.svelte";
-  import routeConfig from "routeConfig";
   import TStatusBadgeCol from "components/ui/table/t-status-badge-col.svelte";
   import type { ScrollLoadFunc } from "directives/scroll-load";
-  import type { PaginatedData } from "models/common";
-  import type { Conversion } from "integration/junction-hub-api/schemas/conversion";
+  import integrationInstancesClient from "integration-instances-client";
 
   export let data;
 
@@ -22,22 +23,17 @@
       return { depleted: true };
     }
 
-    const result = await callAction<{ conversions: PaginatedData<Conversion> }>({
-      action: routeConfig.routes.pay.routes.activity.routes.conversions.actions.listConversions,
-      data: { cursor: data.conversions.cursor },
-      apply: false,
+    const nextConversions = await integrationInstancesClient.hub.conversions.find({
+      cursor: data.conversions.cursor,
+      limit: LIST_CONVERSIONS_LIMIT,
     });
 
-    if (result.type === "success" && result.data) {
-      data.conversions = {
-        cursor: result.data.conversions.cursor,
-        data: [...data.conversions.data, ...result.data.conversions.data],
-      };
+    data.conversions = {
+      data: [...data.conversions.data, ...nextConversions.data],
+      cursor: nextConversions.cursor,
+    };
 
-      return { depleted: !result.data.conversions.cursor };
-    }
-
-    return { depleted: true };
+    return { depleted: !nextConversions.cursor };
   };
 </script>
 
