@@ -1,67 +1,57 @@
-import schemaModel, { type Infer } from "utils/schema-model";
-import { z } from "zod";
+export type LoginForm = {
+  id: string;
+  elements: {
+    type: "text" | "a" | "img" | "input" | "script";
+    attributes: {
+      label?: string;
+      name: string;
+      value: string;
+      type:
+        | "text"
+        | "password"
+        | "number"
+        | "checkbox"
+        | "hidden"
+        | "email"
+        | "tel"
+        | "submit"
+        | "button"
+        | "datetime-local"
+        | "date"
+        | "url";
+    };
+  }[];
+};
 
-export const loginFormModel = schemaModel.create({
-  schema: z.object({
-    id: z.string(),
-    ui: z.object({
-      nodes: z.array(
-        z.object({
-          attributes: z.object({
-            // eslint-disable-next-line camelcase
-            node_type: z.enum(["text", "a", "img", "input", "script"]),
-            type: z.enum([
-              "text",
-              "password",
-              "number",
-              "checkbox",
-              "hidden",
-              "email",
-              "tel",
-              "submit",
-              "button",
-              "datetime-local",
-              "date",
-              "url",
-            ]),
-            name: z.string(),
-            value: z.string().optional(),
-          }),
-          meta: z.object({
-            label: z.object({ text: z.string() }).optional(),
-          }),
-        }),
-      ),
-    }),
-  }),
-  model: z.object({
-    id: z.string(),
-    elements: z.array(
-      z.object({
-        type: z.enum(["text", "a", "img", "input", "script"]),
-        attributes: z.object({
-          label: z.string().optional(),
-          name: z.string(),
-          value: z.string(),
-          type: z.enum([
-            "text",
-            "password",
-            "number",
-            "checkbox",
-            "hidden",
-            "email",
-            "tel",
-            "submit",
-            "button",
-            "datetime-local",
-            "date",
-            "url",
-          ]),
-        }),
-      }),
-    ),
-  }),
-  toModel: (data) => ({
+export type LoginFormSchema = {
+  id: string;
+  ui: {
+    nodes: {
+      attributes: {
+        node_type: "text" | "a" | "img" | "input" | "script";
+        type:
+          | "text"
+          | "password"
+          | "number"
+          | "checkbox"
+          | "hidden"
+          | "email"
+          | "tel"
+          | "submit"
+          | "button"
+          | "datetime-local"
+          | "date"
+          | "url";
+        name: string;
+        value?: string;
+      };
+      meta: { label?: { text: string } };
+    }[];
+  };
+};
+
+export const loginFormParser = {
+  toModel: (data: LoginFormSchema): LoginForm => ({
     id: data.id,
     elements: data.ui.nodes.map((item) => ({
       type: item.attributes.node_type,
@@ -73,35 +63,34 @@ export const loginFormModel = schemaModel.create({
       },
     })),
   }),
-});
-export type LoginFormModel = Infer<typeof loginFormModel>;
+};
 
-export const sessionModel = schemaModel.create({
-  schema: z.object({
-    // eslint-disable-next-line camelcase
-    expires_at: z.date({ coerce: true }),
-    identity: z.object({
-      id: z.string(),
-      traits: z.object({
-        email: z.string().email(),
-      }),
-    }),
-  }),
-  model: z.object({
-    data: z.object({
-      id: z.string(),
-      email: z.string().email(),
-      name: z.string(),
-    }),
-    expiresAt: z.date({ coerce: true }),
-  }),
-  toModel: (data) => ({
+export type OrySession = {
+  data: {
+    id: string;
+    email: string;
+    name: string;
+  };
+  expiresAt: Date;
+};
+
+export type OrySessionSchema = {
+  expires_at: string;
+  identity: {
+    id: string;
+    traits: {
+      email: string;
+    };
+  };
+};
+
+export const orySessionParser = {
+  toModel: (data: OrySessionSchema): OrySession => ({
     data: {
       id: data.identity.id,
       email: data.identity.traits.email,
       name: "Unknown",
     },
-    expiresAt: data.expires_at,
+    expiresAt: new Date(data.expires_at),
   }),
-});
-export type OrySessionModel = Infer<typeof sessionModel>;
+};

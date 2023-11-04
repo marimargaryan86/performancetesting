@@ -1,12 +1,14 @@
 import { getCookiesFromHeaders, type Cookie } from "utils/cookies";
 import { URLExtended } from "utils/url";
-import {
-  loginFormModel,
-  sessionModel,
-  type LoginFormModel,
-  type OrySessionModel,
-} from "../schemas";
 import type { SessionModel } from "models/user";
+import {
+  loginFormParser,
+  type LoginForm,
+  type LoginFormSchema,
+  orySessionParser,
+  type OrySessionSchema,
+  type OrySession,
+} from "../schemas";
 
 export default class OryService {
   private readonly baseUrl: string;
@@ -74,18 +76,18 @@ export default class OryService {
 
   async getLoginForm(): Promise<{
     cookies: Cookie[];
-    form: LoginFormModel;
+    form: LoginForm;
   }> {
-    const resp = await this.makeRequest("/self-service/login/browser");
+    const resp = await this.makeRequest<LoginFormSchema>("/self-service/login/browser");
 
     return {
       cookies: getCookiesFromHeaders(resp.headers),
-      form: loginFormModel.toModel(await resp.json()),
+      form: loginFormParser.toModel(await resp.json()),
     };
   }
 
-  async getSession(session: SessionModel): Promise<OrySessionModel> {
-    const resp = await this.makeRequest("/sessions/whoami", {
+  async getSession(session: SessionModel): Promise<OrySession> {
+    const resp = await this.makeRequest<OrySessionSchema>("/sessions/whoami", {
       cookies: [{ name: session.id, value: session.token }],
     });
 
@@ -93,6 +95,6 @@ export default class OryService {
       throw new Error("Unauthorized");
     }
 
-    return sessionModel.toModel(await resp.json());
+    return orySessionParser.toModel(await resp.json());
   }
 }

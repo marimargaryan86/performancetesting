@@ -1,12 +1,7 @@
-import { fail, type ActionFailure, redirect } from "@sveltejs/kit";
 import integrationInstances from "integration-instances";
-import type { LoginFormModel } from "integration/ory/schemas";
-import routeConfig from "routeConfig";
-import { deleteSession, setSession } from "utils/auth";
-import { getActionRequestJsonData } from "utils/common";
-import { z } from "zod";
+import type { LoginForm } from "integration/ory/schemas";
 
-export async function load(event): Promise<{ loginFlow: LoginFormModel }> {
+export async function load(event): Promise<{ loginFlow: LoginForm }> {
   const loginForm = await integrationInstances.ory.getLoginForm();
 
   loginForm.cookies.forEach((cookie) =>
@@ -23,32 +18,3 @@ export async function load(event): Promise<{ loginFlow: LoginFormModel }> {
 
   return { loginFlow: loginForm.form };
 }
-
-const loginActionData = z.object({
-  id: z.string().uuid(),
-  data: z.record(z.string()),
-  rememberMe: z.boolean(),
-});
-export type LoginActionData = z.infer<typeof loginActionData>;
-
-export const actions = {
-  async login(event): Promise<void | ActionFailure<{ unauthorized: boolean }>> {
-    try {
-      const data = await getActionRequestJsonData(event, loginActionData);
-      const session = await integrationInstances.ory.authenticate({
-        cookies: event.cookies.getAll(),
-        data: data.data,
-        flowId: data.id,
-      });
-
-      setSession({ id: session.id, token: session.token, rememberMe: data.rememberMe, event });
-    } catch {
-      return fail(401, { unauthorized: true });
-    }
-  },
-  logout(event): void {
-    deleteSession(event);
-
-    throw redirect(303, routeConfig.routes.login.root);
-  },
-};

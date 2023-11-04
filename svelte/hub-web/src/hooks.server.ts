@@ -5,6 +5,7 @@ import { sequence } from "@sveltejs/kit/hooks";
 import { env } from "$env/dynamic/private";
 import { deleteSession, getSession } from "utils/auth";
 import integrationInstances from "integration-instances";
+import { AUTH_ROOT } from "./routes/integration/auth/auth-service";
 
 export async function authHandle({ event, resolve }: Parameters<Handle>[0]): Promise<Response> {
   try {
@@ -12,7 +13,7 @@ export async function authHandle({ event, resolve }: Parameters<Handle>[0]): Pro
   } catch (err) {
     deleteSession(event);
 
-    if (event.url.pathname !== routeConfig.routes.login.root) {
+    if (event.url.pathname !== routeConfig.routes.login.root && event.url.pathname !== AUTH_ROOT) {
       throw redirect(303, routeConfig.routes.login.root);
     }
   }

@@ -4,7 +4,6 @@
  * Routes contain nested configurations that contain the following:
  *
  * @param root {string} The canonical URL path for the route.
- * @param actions {object} [Key-value pairs of API actions and their URL paths.]
  * @param routes {object} [Additional nested route configurations.]
  */
 /* eslint-disable max-lines-per-function, @typescript-eslint/explicit-function-return-type, no-shadow */
@@ -55,12 +54,6 @@ export default {
       },
       login: {
         root: "/login",
-        get actions() {
-          return {
-            login: `${this.root}?/login`,
-            logout: `${this.root}?/logout`,
-          } as const;
-        },
       },
       help: {
         root: "/help",

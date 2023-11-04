@@ -8,9 +8,10 @@
   import { browser } from "$app/environment";
   import routeConfig from "routeConfig";
   import userStore from "stores/user-store";
-  import { callAction } from "utils/common";
   import { getTimeDeltaMs } from "utils/date-time";
   import * as Sentry from "@sentry/sveltekit";
+  import integrationInstancesClient from "integration-instances-client";
+  import { goto } from "$app/navigation";
 
   export let data;
 
@@ -29,9 +30,10 @@
   function setLogoutTimer(timeoutAt: Date): void {
     window.clearTimeout(logoutTimer);
 
-    logoutTimer = window.setTimeout(callAction, getTimeDeltaMs(timeoutAt, new Date()), {
-      action: routeConfig.routes.login.actions.logout,
-    });
+    logoutTimer = window.setTimeout(async () => {
+      await integrationInstancesClient.auth.signOut();
+      await goto(routeConfig.routes.login.root, { invalidateAll: true });
+    }, getTimeDeltaMs(timeoutAt, new Date()));
   }
 </script>
 

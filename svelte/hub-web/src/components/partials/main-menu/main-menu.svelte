@@ -8,7 +8,8 @@
   import InformationIcon from "components/icons/information-icon.svelte";
   import { page } from "$app/stores";
   import routeConfig from "routeConfig";
-  import { callAction } from "utils/common";
+  import integrationInstancesClient from "integration-instances-client";
+  import { goto } from "$app/navigation";
 
   let expanded = true;
 
@@ -18,8 +19,10 @@
     expanded = !expanded;
   }
 
-  function logout(): void {
-    callAction({ action: routeConfig.routes.login.actions.logout });
+  async function logout(): Promise<void> {
+    await integrationInstancesClient.auth.signOut();
+
+    await goto(routeConfig.routes.login.root, { invalidateAll: true });
   }
 
   $: activeLink = getActiveLink($page.url.pathname);

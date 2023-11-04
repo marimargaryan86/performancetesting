@@ -3,13 +3,12 @@
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import Button from "components/ui/button.svelte";
   import TextField from "components/ui/text-field.svelte";
-  import { callAction } from "utils/common";
   import routeConfig from "routeConfig";
   import { pendableCall } from "utils/pendable-call";
-  import type { LoginActionData } from "./+page.server";
   import { goto } from "$app/navigation";
   import Checkbox from "components/ui/checkbox.svelte";
   import passengersImage from "assets/images/passengers.png";
+  import integrationInstancesClient from "integration-instances-client";
 
   export let data;
 
@@ -19,22 +18,15 @@
   const { pending, func: submit } = pendableCall(async () => {
     errors = undefined;
 
-    const actionData: LoginActionData = {
-      id: data.loginFlow.id,
-      data: Object.fromEntries(
-        data.loginFlow.elements.map((item) => [item.attributes.name, item.attributes.value]),
-      ),
-      rememberMe,
-    };
-
-    const result = await callAction({
-      action: routeConfig.routes.login.actions.login,
-      data: actionData,
-      dataType: "json",
-      apply: false,
-    });
-
-    if (result.type === "success") {
+    if (
+      await integrationInstancesClient.auth.signIn({
+        id: data.loginFlow.id,
+        data: Object.fromEntries(
+          data.loginFlow.elements.map((item) => [item.attributes.name, item.attributes.value]),
+        ),
+        rememberMe,
+      })
+    ) {
       await goto(routeConfig.root, { invalidateAll: true });
 
       return;
