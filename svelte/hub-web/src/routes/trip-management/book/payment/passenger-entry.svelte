@@ -12,34 +12,34 @@
   type PassengerGender = z.infer<typeof passengerGender>;
 
   type DocumentValidator = z.ZodObject<{
-    [key in keyof PassportDocumentModel]-?: z.ZodType<PassportDocumentModel[key]>;
+    [key in keyof TravelerDocument]-?: z.ZodType<TravelerDocument[key]>;
   }>;
 
   export type PassengerValidator = z.ZodObject<
-    Omit<
-      { [key in keyof OrderPassengerModel]: z.ZodType<OrderPassengerModel[key]> },
-      "document"
-    > & {
+    Omit<{ [key in keyof OrderPassenger]: z.ZodType<OrderPassenger[key]> }, "document"> & {
       type: typeof passengerType;
       document: DocumentValidator | z.ZodUndefined;
     }
   >;
 
-  export type PartialPassengerData = Omit<Partial<OrderPassengerModel>, "document"> & {
+  export type PartialPassengerData = Omit<Partial<OrderPassenger>, "document"> & {
     type: PassengerType;
-    document?: Partial<PassportDocumentModel>;
+    document?: Require<Partial<TravelerDocument>, "countryCodes">;
   };
 
-  function getDocumentFields(required: TripOfferPriceQuoteModel["required"]): {
-    [key in keyof PassportDocumentModel]: z.ZodType<PassportDocumentModel[key]>;
+  // eslint-disable-next-line
+  function getDocumentFields(required: TripOfferPriceQuote["required"]): {
+    [key in keyof TravelerDocument]: z.ZodType<TravelerDocument[key]>;
   } {
     const documentFields: {
-      [key in keyof PassportDocumentModel]: z.ZodType<PassportDocumentModel[key]>;
+      [key in keyof TravelerDocument]: z.ZodType<TravelerDocument[key]>;
     } = { type: z.literal("passport") };
+
+    let countryCodes = z.object({});
 
     required.forEach((field) => {
       if (field === "expiration-date") {
-        documentFields.expirationDate = z.date({
+        documentFields.expiryDate = z.date({
           coerce: true,
           required_error: "Expiration date is required",
         });
@@ -49,13 +49,19 @@
           required_error: "Issue date is required",
         });
       } else if (field === "issuing-country") {
-        documentFields.issueCountry = z
-          .string({ required_error: "Issuing country is required" })
-          .regex(/^[A-z]{2}$/, "Invalid issuing country code");
+        countryCodes = countryCodes.extend({
+          issue: z
+            .string({ required_error: "Issuing country is required" })
+            .regex(/^[A-z]{2}$/, "Invalid issuing country code"),
+        });
+        documentFields.countryCodes = countryCodes;
       } else if (field === "nationality") {
-        documentFields.nationality = z
-          .string({ required_error: "Nationality is required" })
-          .regex(/^[A-z]{2}$/, "Invalid nationality country code");
+        countryCodes = countryCodes.extend({
+          nationality: z
+            .string({ required_error: "Nationality is required" })
+            .regex(/^[A-z]{2}$/, "Invalid nationality country code"),
+        });
+        documentFields.countryCodes = countryCodes;
       } else if (field === "passport-number") {
         documentFields.number = z
           .string({
@@ -64,9 +70,12 @@
           .trim()
           .min(1, "Passport number is required");
       } else if (field === "residence-country-code") {
-        documentFields.residenceCountryCode = z
-          .string({ required_error: "Residence country code is required" })
-          .regex(/^[A-z]{2}$/, "Invalid residence country code");
+        countryCodes = countryCodes.extend({
+          residence: z
+            .string({ required_error: "Residence country code is required" })
+            .regex(/^[A-z]{2}$/, "Invalid residence country code"),
+        });
+        documentFields.countryCodes = countryCodes;
       } else if (field === "date-of-birth") {
         // Date of birth will always be mandatory
       } else {
@@ -78,7 +87,7 @@
   }
 
   export function getPassengerValidator(
-    required: TripOfferPriceQuoteModel["required"],
+    required: TripOfferPriceQuote["required"],
   ): PassengerValidator {
     const result = z.object({
       type: passengerType,
@@ -91,7 +100,7 @@
         .string({ required_error: "Last name is required" })
         .trim()
         .min(1, "Last name is required"),
-      dateOfBirth: z.date({ coerce: true, required_error: "Date of birth is required" }),
+      birthDate: z.date({ coerce: true, required_error: "Date of birth is required" }),
       gender: passengerGender,
     });
 
@@ -126,20 +135,21 @@
   import DateTextField from "components/ui/date-text-field.svelte";
   import SelectField from "components/ui/select-field.svelte";
   import TextField from "components/ui/text-field.svelte";
-  import type { TripOfferPriceQuoteModel } from "integration/junction-mobile-api/schemas/offer";
   import type {
-    OrderPassengerModel,
-    PassportDocumentModel,
+    OrderPassenger,
+    TravelerDocument,
   } from "integration/junction-mobile-api/schemas/order";
   import Collapsible from "../../components/collapsible.svelte";
+  import type { TripOfferPriceQuote } from "integration/junction-mobile-api/schemas/trip-offer-price-quote";
+  import type { Require } from "integration/ts-helpers";
 
   export let passengerNumber: number;
   export let passenger: PartialPassengerData;
   export let errors: z.ZodFormattedError<PassengerData> | undefined = undefined;
-  export let required: TripOfferPriceQuoteModel["required"];
+  export let required: TripOfferPriceQuote["required"];
 
   let collapsible: Collapsible | undefined;
-  let document = passenger.document ?? {};
+  let document = passenger.document ?? { countryCodes: {} };
 
   $: passenger = { ...passenger, document };
   $: if (errors) {
@@ -183,11 +193,11 @@
     />
 
     <DateTextField
-      bind:value={passenger.dateOfBirth}
+      bind:value={passenger.birthDate}
       placeholder="dd/mm/yyyy"
       label="Birthday"
       required
-      error={errors?.dateOfBirth?._errors}
+      error={errors?.birthDate?._errors}
     />
 
     <SelectField
@@ -223,11 +233,11 @@
       {/if}
       {#if required.includes("expiration-date")}
         <DateTextField
-          bind:value={document.expirationDate}
+          bind:value={document.expiryDate}
           placeholder="dd/mm/yyyy"
           label="Expiration date"
           required
-          error={errors?.document?.expirationDate?._errors}
+          error={errors?.document?.expiryDate?._errors}
         />
       {/if}
       {#if required.includes("issue-date")}
@@ -241,29 +251,29 @@
       {/if}
       {#if required.includes("issuing-country")}
         <TextField
-          bind:value={document.issueCountry}
+          bind:value={document.countryCodes.issue}
           placeholder="Enter issuing country"
           label="Issuing country"
           required
-          error={errors?.document?.issueCountry?._errors}
+          error={errors?.document?.countryCodes?.issue?._errors}
         />
       {/if}
       {#if required.includes("nationality")}
         <TextField
-          bind:value={document.nationality}
+          bind:value={document.countryCodes.nationality}
           placeholder="Enter nationality"
           label="Nationality"
           required
-          error={errors?.document?.nationality?._errors}
+          error={errors?.document?.countryCodes?.nationality?._errors}
         />
       {/if}
       {#if required.includes("residence-country-code")}
         <TextField
-          bind:value={document.residenceCountryCode}
+          bind:value={document.countryCodes.residence}
           placeholder="Enter residence country code"
           label="Residence country code"
           required
-          error={errors?.document?.residenceCountryCode?._errors}
+          error={errors?.document?.countryCodes?.residence?._errors}
         />
       {/if}
     {/if}

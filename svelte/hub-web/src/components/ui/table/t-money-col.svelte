@@ -1,10 +1,10 @@
 <script lang="ts">
   import TCol from "./t-col.svelte";
   import { formatAmount } from "formatting/currency";
+  import type { Price } from "integration/common/schemas/price";
   import type { Currency } from "integration/junction-hub-api/schemas/currency";
-  import type { PriceModel } from "integration/junction-mobile-api/schemas/price";
 
-  export let money: PriceModel;
+  export let money: Price;
   export let currencies: Map<string, Currency> | undefined = undefined;
 </script>
 

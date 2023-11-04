@@ -1,7 +1,7 @@
 import { type ActionFailure, fail } from "@sveltejs/kit";
 import integrationInstances from "integration-instances";
 import { ensureJunctionError } from "integration/common/junction-error";
-import type { CancellationRequestModel } from "integration/junction-mobile-api/schemas/cancellation-request";
+import type { CancellationRequest } from "integration/junction-mobile-api/schemas/cancellation";
 import { getSession } from "utils/auth";
 import { getActionRequestJsonData } from "utils/common";
 import { z } from "zod";
@@ -12,7 +12,7 @@ const cancelBookingsActionData = z.object({
 export type CancelBookingsActionData = z.infer<typeof cancelBookingsActionData>;
 
 export const actions = {
-  async cancelBookings(event): Promise<{ cancellation: CancellationRequestModel } | ActionFailure> {
+  async cancelBookings(event): Promise<{ cancellation: CancellationRequest } | ActionFailure> {
     try {
       const data = await getActionRequestJsonData(event, cancelBookingsActionData);
 

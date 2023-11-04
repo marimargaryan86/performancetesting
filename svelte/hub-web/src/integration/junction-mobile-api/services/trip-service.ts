@@ -1,15 +1,14 @@
-import {
-  tripCandidatesSearchModel,
-  createTripCandidatesSearchModel,
-  type TripCandidatesSearchModel,
-  type TripCandidatesSearchSchema,
-  type CreateTripCandidatesSearchModel,
-} from "../schemas/trip";
 import JunctionMobileApiService from "./junction-mobile-api-service";
-import type { OfferIncludes, OfferModel, OfferSchema } from "../schemas/offer";
-import { parseOfferSchema } from "../parsers/offer";
-import { parseIncluded } from "../parsers/included";
 import type { SessionModel } from "models/user";
+import {
+  tripCandidateSearchParser,
+  type TripCandidateSearch,
+  type TripCandidateSearchSchema,
+  type TripCandidateSearchCreate,
+} from "../schemas/trip-candidate";
+import type { Offer, OfferSchema } from "../schemas/offer";
+import type { PaginatedData } from "models/common";
+import { parseIncluded, type IncludedSchemas } from "../schemas/included";
 
 export class TripService extends JunctionMobileApiService {
   async createTripCandidatesSearch({
@@ -17,18 +16,18 @@ export class TripService extends JunctionMobileApiService {
     data,
   }: {
     session: SessionModel;
-    data: CreateTripCandidatesSearchModel;
-  }): Promise<TripCandidatesSearchModel> {
-    const resp = await this.makeRequest<{ data: TripCandidatesSearchSchema }>(
+    data: TripCandidateSearchCreate;
+  }): Promise<TripCandidateSearch> {
+    const resp = await this.makeRequest<{ data: TripCandidateSearchSchema }>(
       "/trip-candidates/searches",
       {
         method: "POST",
-        data: { data: createTripCandidatesSearchModel.toSchema(data) },
+        data: { data: tripCandidateSearchParser.toCreateSchema(data) },
         session,
       },
     );
 
-    return tripCandidatesSearchModel.toModel(resp.json.data);
+    return tripCandidateSearchParser.toModel(resp.json.data);
   }
 
   async getTripCandidatesSearch({
@@ -37,26 +36,33 @@ export class TripService extends JunctionMobileApiService {
   }: {
     session: SessionModel;
     id: string;
-  }): Promise<TripCandidatesSearchModel> {
+  }): Promise<TripCandidateSearch> {
     const resp = await this.makeRequest<{
-      data: TripCandidatesSearchSchema;
+      data: TripCandidateSearchSchema;
     }>(`/trip-candidates/searches/${id}`, { session });
 
-    return tripCandidatesSearchModel.toModel(resp.json.data);
+    return tripCandidateSearchParser.toModel(resp.json.data);
   }
 
   async getTripCandidatesOffers({
     session,
     id,
+    cursor,
+    limit = 100,
   }: {
     session: SessionModel;
     id: string;
-  }): Promise<OfferModel[]> {
+    cursor?: string;
+    limit?: number;
+  }): Promise<PaginatedData<Offer>> {
     const resp = await this.makeRequest<{
       data: OfferSchema[];
-      included?: OfferIncludes[];
+      included?: IncludedSchemas;
+      links: { next: string };
     }>(`/trip-candidates/searches/${id}/offers`, {
       queryParams: {
+        "page[cursor]": cursor,
+        "page[limit]": limit,
         include: [
           "groups",
           "groups.details",
@@ -70,8 +76,11 @@ export class TripService extends JunctionMobileApiService {
       session,
     });
 
-    const included = parseIncluded(resp.json.included);
+    const parsed = parseIncluded([...(resp.json.included ?? []), ...resp.json.data]);
 
-    return resp.json.data.map((item) => parseOfferSchema(item, included));
+    return {
+      data: parsed.offers ?? [],
+      cursor: TripService.getCursor(resp.json),
+    };
   }
 }

@@ -1,8 +1,8 @@
 <script lang="ts">
   import { formatAmount } from "formatting/currency";
-  import type { OrderMarkupsModel } from "integration/junction-mobile-api/schemas/order";
+  import type { Markups } from "integration/junction-mobile-api/schemas/markups";
 
-  export let orderMarkups: OrderMarkupsModel;
+  export let markups: Markups;
 </script>
 
 <div class="fees">
@@ -11,13 +11,13 @@
       <li>
         <span class="typography label-medium">Service fee</span>
         <span class="typography body-small bold">
-          {formatAmount({ ...orderMarkups.serviceFee }, undefined, true)}
+          {formatAmount({ ...markups.serviceFee }, undefined, true)}
         </span>
       </li>
       <li>
         <span class="typography label-medium">Agency mark-up</span>
         <span class="typography body-small bold">
-          {formatAmount({ ...orderMarkups.agencyMarkup }, undefined, true)}
+          {formatAmount({ ...markups.agencyMarkup }, undefined, true)}
         </span>
       </li>
     </ul>
@@ -26,7 +26,7 @@
   <div class="total">
     <span class="typography body-xlarge bold">Total to collect</span>
     <em class="typography body-xlarge bold total-amount">
-      {formatAmount({ ...orderMarkups.totalToCollect }, undefined, true)}
+      {formatAmount({ ...markups.totalToCollect }, undefined, true)}
     </em>
   </div>
 </div>

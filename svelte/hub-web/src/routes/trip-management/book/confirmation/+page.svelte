@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-  function getAlertType(status: OrderModel["status"]): AlertType {
+  function getAlertType(status: OrderStatus): AlertType {
     if (status === "confirmed") {
       return "success";
     } else if (status === "error" || status === "cancelled" || status === "rejected") {
@@ -22,7 +22,7 @@
   import { ensureDefined } from "utils/array";
   import CloseIcon from "components/icons/close-icon.svelte";
   import AlertIcon from "components/icons/alert-icon.svelte";
-  import type { OrderModel } from "integration/junction-mobile-api/schemas/order";
+  import { getOrderStatus, type OrderStatus } from "integration/junction-mobile-api/schemas/order";
   import Fees from "./fees.svelte";
 
   export let data;
@@ -30,16 +30,12 @@
   $: hasTickets = Boolean(
     data.order.bookings.flatMap((item) => item.ticketUrls).filter(ensureDefined).length,
   );
-  $: alertType = getAlertType(data.order.status);
+  $: alertType = getAlertType(getOrderStatus.status(data.order));
 </script>
 
 <svelte:head>
   <title>Confirmation · Trip Management · Junction Hub</title>
 </svelte:head>
-
-<div style:display="none">
-  {JSON.stringify(data.order)}
-</div>
 
 <div class="content">
   <Alert type={alertType}>
@@ -80,7 +76,7 @@
         <Price bookings={data.order.bookings} />
 
         {#if data.markups}
-          <Fees orderMarkups={data.markups} />
+          <Fees markups={data.markups} />
         {/if}
 
         <Passengers passengers={data.order.passengers} />

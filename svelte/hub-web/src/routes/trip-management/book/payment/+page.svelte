@@ -3,13 +3,13 @@
     return [
       ...Array(passengers.adults)
         .fill(undefined)
-        .map<PartialPassengerData>(() => ({ document: {}, type: "adult" })),
+        .map<PartialPassengerData>(() => ({ document: { countryCodes: {} }, type: "adult" })),
       ...Array(passengers.children)
         .fill(undefined)
-        .map<PartialPassengerData>(() => ({ document: {}, type: "child" })),
+        .map<PartialPassengerData>(() => ({ document: { countryCodes: {} }, type: "child" })),
       ...Array(passengers.infants)
         .fill(undefined)
-        .map<PartialPassengerData>(() => ({ document: {}, type: "infant" })),
+        .map<PartialPassengerData>(() => ({ document: { countryCodes: {} }, type: "infant" })),
     ];
   }
 </script>
@@ -25,43 +25,43 @@
     getPassengerValidator,
     type PartialPassengerData,
   } from "./passenger-entry.svelte";
-  import ContactInformation, {
-    type PartialContactDetailsModel,
-  } from "./contact-information.svelte";
+  import ContactInformation, { contactDetailsModel } from "./contact-information.svelte";
   import Countdown from "../countdown.svelte";
   import { z } from "zod";
   import { pendableCall } from "utils/pendable-call";
   import { sleep } from "utils/common";
   import { goto } from "$app/navigation";
   import { browser } from "$app/environment";
-  import {
-    contactDetailsModel,
-    type CreateOrderMarkupsModel,
-  } from "integration/junction-mobile-api/schemas/order";
+  import type { MarkupsCreate } from "integration/junction-mobile-api/schemas/markups";
   import PriceDialog from "components/ui/dialogues/price-dialog.svelte";
   import Summary from "../../components/summary/summary.svelte";
   import tripManagement from "../../../integration/trip-management/trip-management";
   import type { PassengerPickerData } from "../../components/trip-search/passenger-picker/passenger-picker.svelte";
   import { onDestroy } from "svelte";
+  import type { ContactDetails } from "integration/junction-mobile-api/schemas/journey";
 
   export let data;
 
   let payment: Payment | undefined;
   let bookingData: {
     passengers: PartialPassengerData[];
-    contactDetails: PartialContactDetailsModel;
+    contact: ContactDetails;
   } = {
     passengers: getDefaultPassengers(data.searchData.passengers),
-    contactDetails: { phone: {}, address: { street: {} } },
+    contact: {
+      phone: "",
+      address: { street: { line1: "" }, city: "", countryCode: "", postalCode: "" },
+      email: "",
+    },
   };
   let errors: z.ZodFormattedError<z.infer<typeof bookingDetailsValidator>> | undefined = undefined;
   let { priceQuote, paymentIntent } = data;
   let pollSignal = { cancelled: false };
-  let orderMarkups: CreateOrderMarkupsModel;
+  let orderMarkups: MarkupsCreate;
 
   $: bookingDetailsValidator = z.object({
     passengers: z.array(getPassengerValidator(priceQuote.required)),
-    contactDetails: contactDetailsModel.model,
+    contact: contactDetailsModel,
   });
   $: if (browser && !paymentIntent) {
     updatePaymentIntentAndPriceQuote();
@@ -109,7 +109,7 @@
       const result = await tripManagement.createOrder({
         priceQuoteId: priceQuote.id,
         passengers: validationResult.data.passengers,
-        contactDetails: validationResult.data.contactDetails,
+        contact: validationResult.data.contact,
         paymentId: paymentIntent.id,
       });
 
@@ -187,10 +187,10 @@
   <title>Payment · Book · Trip Management · Junction Hub</title>
 </svelte:head>
 
-{#if data.selected.originalPrice && priceQuote.price}
+{#if data.selected.originalPrice && priceQuote.price.total}
   <PriceDialog
     originalPrice={data.selected.originalPrice}
-    newPrice={priceQuote.price}
+    newPrice={priceQuote.price.total}
     on:cancel={cancel}
   />
 {/if}
@@ -216,8 +216,8 @@
       <Payment bind:this={payment} bind:paymentIntent />
       <ContactInformation
         countries={data.countries}
-        bind:contactDetails={bookingData.contactDetails}
-        errors={errors?.contactDetails}
+        bind:data={bookingData.contact}
+        errors={errors?.contact}
       />
     </div>
   </div>

@@ -3,11 +3,12 @@
   import ChevronIcon from "components/icons/chevron-icon.svelte";
   import StandardLayout from "components/page/standard-layout.svelte";
   import EntityAvatar from "components/ui/entity-avatar.svelte";
-  import { scrollLoad } from "directives/scroll-load";
+  import { scrollLoad, type ScrollLoadFunc } from "directives/scroll-load";
+  import type { Account } from "integration/junction-hub-api/schemas/account";
+  import type { PaginatedData } from "models/common";
   import routeConfig from "routeConfig";
   import { callAction } from "utils/common";
 
-  export let form;
   export let data;
 
   let searchQuery = "";
@@ -16,25 +17,28 @@
     account.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
-  async function loadMore(): Promise<void> {
+  const loadMore: ScrollLoadFunc = async () => {
     if (!data.accounts.cursor) {
-      return;
+      return { depleted: true };
     }
 
-    await callAction({
+    const result = await callAction<{ accounts: PaginatedData<Account> }>({
       action: routeConfig.routes.pay.routes.accounts.actions.listAccounts,
-      data: {
-        cursor: data.accounts.cursor,
-      },
+      data: { cursor: data.accounts.cursor },
+      apply: false,
     });
 
-    if (form?.accounts) {
+    if (result.type === "success" && result.data) {
       data.accounts = {
-        cursor: form.accounts.cursor,
-        data: [...data.accounts.data, ...form.accounts.data],
+        cursor: result.data.accounts.cursor,
+        data: [...data.accounts.data, ...result.data.accounts.data],
       };
+
+      return { depleted: !result.data.accounts.cursor };
     }
-  }
+
+    return { depleted: true };
+  };
 </script>
 
 <svelte:head>

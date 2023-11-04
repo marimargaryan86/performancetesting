@@ -1,14 +1,14 @@
 <script lang="ts">
   import Button from "../button.svelte";
-  import type { PriceModel } from "integration/junction-mobile-api/schemas/price";
   import AlertIcon from "components/icons/alert-icon.svelte";
   import { createEventDispatcher, onDestroy, onMount } from "svelte";
   import { scale } from "svelte/transition";
   import Backdrop from "../backdrop.svelte";
   import { formatAmount } from "formatting/currency";
+  import type { Price } from "integration/common/schemas/price";
 
-  export let originalPrice: PriceModel;
-  export let newPrice: PriceModel;
+  export let originalPrice: Price;
+  export let newPrice: Price;
 
   let backdrop: Backdrop | undefined = undefined;
 

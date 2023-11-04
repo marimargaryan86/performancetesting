@@ -1,36 +1,23 @@
 import * as devalue from "devalue";
-import {
-  coordinatesSearchableModel,
-  type PlaceModel,
-} from "integration/junction-mobile-api/schemas/place";
+import type { Place } from "integration/junction-mobile-api/schemas/place";
 import type { RouteId } from "./$types";
 import { URLExtended } from "utils/url";
 import { z } from "zod";
 import { passengerPickerData } from "../../trip-management/components/trip-search/passenger-picker/passenger-picker.svelte";
-import type {
-  OfferModel,
-  TripOfferPriceQuoteModel,
-} from "integration/junction-mobile-api/schemas/offer";
+import type { Offer } from "integration/junction-mobile-api/schemas/offer";
 import type { RequestEvent } from "@sveltejs/kit";
-import {
-  resourceStatus,
-  type ResourceStatus,
-} from "integration/junction-mobile-api/schemas/common";
 import { sleep } from "utils/common";
-import { priceModel } from "integration/junction-mobile-api/schemas/price";
-import {
-  paymentIntentModel,
-  type PaymentIntentModel,
-} from "integration/junction-mobile-api/schemas/payment";
-import type {
-  CreateOrderMarkupsModel,
-  CreateOrderModel,
-  OrderModel,
-} from "integration/junction-mobile-api/schemas/order";
+import { paymentModel, type Payment } from "integration/junction-mobile-api/schemas/payment";
+import type { OrderCreate, Order } from "integration/junction-mobile-api/schemas/order";
+import type { TripOfferPriceQuote } from "integration/junction-mobile-api/schemas/trip-offer-price-quote";
+import type { MarkupsCreate } from "integration/junction-mobile-api/schemas/markups";
+import { priceModel } from "integration/common/schemas/price";
+import { resourceStatus, type ResourceStatus } from "integration/common/schemas/resource";
+import { coordinatesSearchableModel } from "integration/common/schemas/point";
 
 const ROUTE: RouteId = "/integration/trip-management";
 
-const point = coordinatesSearchableModel.model.extend({
+const point = coordinatesSearchableModel.extend({
   id: z.string(),
 });
 
@@ -54,7 +41,7 @@ export const bookingSessionModel = z
     selected: z.object({
       offerId: z.string(),
       optionIds: z.array(z.string()).min(1),
-      originalPrice: priceModel.model,
+      originalPrice: priceModel,
     }),
     offers: z.object({
       expiresAt: z.date().optional(),
@@ -64,7 +51,7 @@ export const bookingSessionModel = z
       status: resourceStatus,
       expiresAt: z.date(),
     }),
-    paymentIntent: paymentIntentModel.model.extend({ confirmed: z.boolean().optional() }),
+    paymentIntent: paymentModel.extend({ confirmed: z.boolean().optional() }),
     order: z.object({
       id: z.string(),
     }),
@@ -75,7 +62,7 @@ export const bookingSessionModel = z
   .partial();
 export type BookingSessionModel = z.infer<typeof bookingSessionModel>;
 
-async function listPlaces(query: string): Promise<PlaceModel[]> {
+async function listPlaces(query: string): Promise<Place[]> {
   if (query.length < 3) {
     return [];
   }
@@ -100,9 +87,7 @@ async function search(data: Partial<SearchDataModel>): Promise<void> {
   }
 }
 
-async function getOffers(
-  event?: RequestEvent,
-): Promise<{ data: OfferModel[]; status: ResourceStatus }> {
+async function getOffers(event?: RequestEvent): Promise<{ data: Offer[]; status: ResourceStatus }> {
   const url = new URLExtended(ROUTE, {
     base: event?.url.origin ?? origin,
     query: { action: "get-offers" },
@@ -119,7 +104,7 @@ async function getOffers(
 async function* yieldOffersAux(
   signal: { cancelled: boolean },
   ids: string[] = [],
-): AsyncGenerator<OfferModel> {
+): AsyncGenerator<Offer> {
   const result = await getOffers();
   const offers = result.data.filter((item) => !ids.includes(item.id));
   const nextIds = [...ids, ...offers.map((item) => item.id)];
@@ -137,7 +122,7 @@ async function* yieldOffersAux(
   }
 }
 
-function yieldOffers(signal: { cancelled: boolean }): AsyncGenerator<OfferModel> {
+function yieldOffers(signal: { cancelled: boolean }): AsyncGenerator<Offer> {
   return yieldOffersAux(signal);
 }
 
@@ -159,7 +144,7 @@ async function selectOffer(
   }
 }
 
-async function getPriceQuote(): Promise<TripOfferPriceQuoteModel> {
+async function getPriceQuote(): Promise<TripOfferPriceQuote> {
   const url = new URLExtended(ROUTE, { base: origin, query: { action: "get-price-quote" } });
   const resp = await fetch(url);
 
@@ -170,7 +155,7 @@ async function getPriceQuote(): Promise<TripOfferPriceQuoteModel> {
   return devalue.parse(await resp.text());
 }
 
-async function getPaymentIntent(): Promise<PaymentIntentModel> {
+async function getPaymentIntent(): Promise<Payment> {
   const url = new URLExtended(ROUTE, { base: origin, query: { action: "get-payment-intent" } });
   const resp = await fetch(url);
 
@@ -182,9 +167,9 @@ async function getPaymentIntent(): Promise<PaymentIntentModel> {
 }
 
 async function createOrder(
-  data: CreateOrderModel,
+  data: OrderCreate,
 ): Promise<
-  { success: true; order: OrderModel } | { success: false; errors: z.ZodFormattedError<unknown> }
+  { success: true; order: Order } | { success: false; errors: z.ZodFormattedError<unknown> }
 > {
   const url = new URLExtended(ROUTE, { base: origin, query: { action: "create-order" } });
   const resp = await fetch(url, { method: "POST", body: devalue.stringify(data) });
@@ -210,10 +195,9 @@ async function confirmPayment(): Promise<void> {
 }
 
 async function createOrderMarkups(
-  data: CreateOrderMarkupsModel,
+  data: MarkupsCreate,
 ): Promise<
-  | { success: true; order: CreateOrderMarkupsModel }
-  | { success: false; errors: z.ZodFormattedError<unknown> }
+  { success: true; order: MarkupsCreate } | { success: false; errors: z.ZodFormattedError<unknown> }
 > {
   const url = new URLExtended(ROUTE, { base: origin, query: { action: "create-order-markups" } });
   const resp = await fetch(url, { method: "POST", body: devalue.stringify(data) });

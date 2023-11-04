@@ -2,10 +2,10 @@
   import FlightIcon from "components/icons/flight-icon.svelte";
   import EntityAvatar from "components/ui/entity-avatar.svelte";
   import { formatDuration } from "formatting/date-time";
-  import type { OfferSegmentLegModel } from "integration/junction-mobile-api/schemas/offer";
+  import type { OfferSegmentLeg } from "integration/common/schemas/offer-segment-leg";
   import { getTimeDeltaS } from "utils/date-time";
 
-  export let leg: OfferSegmentLegModel;
+  export let leg: OfferSegmentLeg;
   export let operator: string | undefined;
   export let cabinClass: string | undefined;
   export let direction: string;

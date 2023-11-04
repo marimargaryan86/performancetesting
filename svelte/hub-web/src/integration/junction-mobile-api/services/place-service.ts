@@ -1,26 +1,20 @@
 import type { SessionModel } from "models/user";
-import { placeModel, type PlaceModel, type PlaceSchema } from "../schemas/place";
 import JunctionMobileApiService from "./junction-mobile-api-service";
+import { placeParser, type Place, type PlaceSchema } from "../schemas/place";
 
 export class PlaceService extends JunctionMobileApiService {
-  async listPlaces({
-    session,
-    query,
-  }: {
-    session: SessionModel;
-    query: string;
-  }): Promise<PlaceModel[]> {
+  async listPlaces({ session, query }: { session: SessionModel; query: string }): Promise<Place[]> {
     const resp = await this.makeRequest<{ data: PlaceSchema[] }>("/places", {
       queryParams: { "query[name]": query },
       session,
     });
 
-    return resp.json.data.map((item) => placeModel.toModel(item));
+    return resp.json.data.map((item) => placeParser.toModel(item));
   }
 
-  async getPlace({ session, id }: { session: SessionModel; id: string }): Promise<PlaceModel> {
+  async getPlace({ session, id }: { session: SessionModel; id: string }): Promise<Place> {
     const resp = await this.makeRequest<{ data: PlaceSchema }>(`/places/${id}`, { session });
 
-    return placeModel.toModel(resp.json.data);
+    return placeParser.toModel(resp.json.data);
   }
 }

@@ -1,56 +1,39 @@
-import type { CabinClass, CabinClassSchema } from "./cabin-class";
+import type { CabinClass, CabinClassSchema } from "integration/common/schemas/cabin-class";
 import type { BookingCancellation, BookingCancellationSchema } from "./cancellation";
 import type { IncludedMapping } from "./included";
-import type { LegType, LegTypeSchema } from "./leg-type";
+import type { LegType, LegTypeSchema } from "integration/common/schemas/leg-type";
+import type { Order, OrderSchema } from "./order";
+import {
+  offerSegmentLegParser,
+  type OfferSegmentLeg,
+  type OfferSegmentLegSchema,
+} from "integration/common/schemas/offer-segment-leg";
+import {
+  routeIdentifiersParser,
+  type RouteIdentifiers,
+  type RouteIdentifiersSchema,
+} from "integration/common/schemas/route-identifier";
 import {
   priceParser,
+  type PriceSchema,
   type Price,
   type PriceBreakdown,
   type PriceBreakdownSchema,
-  type PriceSchema,
   priceBreakdownParser,
-} from "./money";
-import type { Order, OrderSchema } from "./order";
-import { pointParser, type Point, type PointSchema } from "./point";
+} from "integration/common/schemas/price";
 
-export type OfferSegmentLeg = {
-  origin: Point;
-  destination: Point;
-  departureAt: Date;
-  arrivalAt: Date;
+export type OfferSegmentDetailRule = {
+  title: string;
+  body: string;
 };
 
-export type OfferSegmentLegSchema = {
-  origin: PointSchema;
-  destination: PointSchema;
-  departureAt: string;
-  arrivalAt: string;
+export type OfferSegmentDetailRuleSchema = {
+  title: string;
+  body: string;
 };
 
-export const offerSegmentLegParser = {
-  toModel: (data: OfferSegmentLegSchema): OfferSegmentLeg => ({
-    origin: pointParser.toModel(data.origin),
-    destination: pointParser.toModel(data.destination),
-    arrivalAt: new Date(data.arrivalAt),
-    departureAt: new Date(data.departureAt),
-  }),
-};
-
-export type RouteIdentifiers = {
-  vendor: string;
-  operator?: string;
-};
-
-export type RouteIdentifiersSchema = {
-  vendor: string;
-  operator: string | null;
-};
-
-export const routeIdentifiersParser = {
-  toModel: (data: RouteIdentifiersSchema): RouteIdentifiers => ({
-    vendor: data.vendor,
-    operator: data.operator ?? undefined,
-  }),
+export const offerSegmentDetailRuleParser = {
+  toModel: (data: OfferSegmentDetailRuleSchema): OfferSegmentDetailRule => ({ ...data }),
 };
 
 export type TripBookingDetails = {
@@ -110,7 +93,7 @@ export const tripBookingDetailsParser = {
 };
 
 export type BookingStatusSchema = {
-  id: string;
+  id: "confirmed" | "error" | "not-ticketed" | "cancelled" | "rejected";
   type: "booking-statuses";
 };
 
@@ -122,7 +105,9 @@ export type TripBooking = {
   };
   operatorBookingReferences: string[];
   externalReference: string;
-  status: string;
+  rules: OfferSegmentDetailRule[];
+  ticketUrls: string[];
+  status: BookingStatusSchema["id"];
   orderId: string;
   order?: Order;
   detailsIds: string[];
@@ -139,6 +124,8 @@ export type TripBookingSchema = {
     priceBreakdown?: PriceBreakdownSchema[];
     operatorBookingReferences: string[];
     externalReference: string;
+    rules?: OfferSegmentDetailRuleSchema[];
+    ticketUrls?: string[];
   };
   relationships: {
     order: { data: Pick<OrderSchema, "id" | "type"> };
@@ -163,6 +150,8 @@ export const tripBookingParser = {
       },
       operatorBookingReferences: data.attributes.operatorBookingReferences,
       externalReference: data.attributes.externalReference,
+      rules: data.attributes.rules?.map(offerSegmentDetailRuleParser.toModel) ?? [],
+      ticketUrls: data.attributes.ticketUrls ?? [],
       status: data.relationships.status.data.id,
       orderId,
       order: included?.orders?.find(({ id }) => id === orderId),

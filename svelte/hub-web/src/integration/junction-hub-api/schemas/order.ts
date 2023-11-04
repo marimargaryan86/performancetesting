@@ -2,7 +2,7 @@ import {
   enhancedAddressDetailsParser,
   type EnhancedAddressDetails,
   type EnhancedAddressDetailsSchema,
-} from "./address";
+} from "integration/common/schemas/address";
 import type { TripBooking, TripBookingSchema } from "./booking";
 import type { IncludedMapping } from "./included";
 import type { Journey, JourneySchema } from "./journey";

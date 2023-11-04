@@ -5,19 +5,17 @@ import {
   getLowestPrice,
 } from "utils/offer";
 import type { SearchOptionsData } from "../routes/trip-management/book/select-offer/search-options.svelte";
-import type { OfferModel } from "integration/junction-mobile-api/schemas/offer";
+import type { Offer } from "integration/junction-mobile-api/schemas/offer";
 
-function getArrivalDelta(a: OfferModel, b: OfferModel): number {
+function getArrivalDelta(a: Offer, b: Offer): number {
   return getEarliestArrival(a).getTime() - getEarliestArrival(b).getTime();
 }
 
-function getDepartureDelta(a: OfferModel, b: OfferModel): number {
+function getDepartureDelta(a: Offer, b: Offer): number {
   return getEarliestDeparture(a).getTime() - getEarliestDeparture(b).getTime();
 }
 
-export function getSortOffersFunc(
-  options: SearchOptionsData,
-): (a: OfferModel, b: OfferModel) => number {
+export function getSortOffersFunc(options: SearchOptionsData): (a: Offer, b: Offer) => number {
   return (a, b) => {
     if (options.sortBy === "earliest-arrival") {
       return getArrivalDelta(a, b);

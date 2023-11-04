@@ -1,8 +1,8 @@
 <script lang="ts" context="module">
-  function getDepartureDate(order: OrderModel): Date {
+  function getDepartureDate(order: Order): Date {
     const departureDate = order.bookings
       .flatMap((booking) =>
-        booking.details.flatMap((details) => details.legs.flatMap((leg) => leg.departureAt)),
+        booking.detailsList.flatMap((details) => details.legs.flatMap((leg) => leg.departureAt)),
       )
       .sort()[0];
 
@@ -13,12 +13,12 @@
     return departureDate;
   }
 
-  function getPassengerNames(order: OrderModel): string[] {
+  function getPassengerNames(order: Order): string[] {
     return order.passengers.map((passenger) => `${passenger.firstName} ${passenger.lastName}`);
   }
 
-  function getTotalPrice(order: OrderModel): PriceModel {
-    const prices = order.bookings.flatMap((booking) => booking.price);
+  function getTotalPrice(order: Order): Price {
+    const prices = order.bookings.flatMap((booking) => booking.price.total);
 
     return prices.reduce((prev, curr) => ({
       amount: prev.amount + curr.amount,
@@ -29,7 +29,7 @@
   function getFilterFunction(
     query: string,
     departureAt: DateRange | undefined,
-  ): (order: OrderModel) => boolean {
+  ): (order: Order) => boolean {
     const queryLower = query.toLowerCase();
 
     return (order) => {
@@ -67,17 +67,47 @@
   import TStatusBadgeCol from "components/ui/table/t-status-badge-col.svelte";
   import Table from "components/ui/table/table.svelte";
   import { formatAmount } from "formatting/currency";
-  import type { OrderModel } from "integration/junction-mobile-api/schemas/order";
-  import type { PriceModel } from "integration/junction-mobile-api/schemas/price";
+  import { getOrderStatus } from "integration/junction-mobile-api/schemas/order";
+  import type { Order } from "integration/junction-hub-api/schemas/order";
+  import type { Price } from "integration/common/schemas/price";
   import type { DateRange } from "models/date-time";
   import routeConfig from "routeConfig";
   import { ensureDefined } from "utils/array";
   import { getZeroTimeDate } from "utils/date-time";
+  import { callAction } from "utils/common";
+  import type { Journey } from "integration/junction-hub-api/schemas/journey";
+  import type { PaginatedData } from "models/common";
+  import type { ScrollLoadFunc } from "directives/scroll-load";
 
   export let data;
 
   let searchQuery = "";
   let departureAtDateRange: DateRange | undefined = undefined;
+
+  $: orders = data.journeys.data.flatMap((item) => item.orders);
+
+  const loadMore: ScrollLoadFunc = async () => {
+    if (!data.journeys.cursor) {
+      return { depleted: true };
+    }
+
+    const resp = await callAction<{ journeys: PaginatedData<Journey> }>({
+      action: routeConfig.routes.tripManagement.routes.orders.actions.listJourneys,
+      data: { cursor: data.journeys.cursor },
+      apply: false,
+    });
+
+    if (resp.type === "success" && resp.data) {
+      data.journeys = {
+        cursor: resp.data.journeys.cursor,
+        data: [...data.journeys.data, ...resp.data.journeys.data],
+      };
+
+      return { depleted: !resp.data.journeys.cursor };
+    }
+
+    return { depleted: true };
+  };
 </script>
 
 <svelte:head>
@@ -98,7 +128,7 @@
     slot="filters"
   />
 
-  <Table class="orders-table">
+  <Table class="orders-table" {loadMore}>
     <THead>
       <Header>Order Reference</Header>
       <Header>Ticket(s)</Header>
@@ -111,10 +141,12 @@
     </THead>
 
     <TBody>
-      {#each data.orders.data.filter(getFilterFunction(searchQuery, departureAtDateRange)) as order (order.id)}
+      {#each orders.filter(getFilterFunction(searchQuery, departureAtDateRange)) as order (order.id)}
+        {@const cancellationStatus = getOrderStatus.cancellationStatus(order)}
+        {@const status = getOrderStatus.status(order)}
         {@const totalPrice = getTotalPrice(order)}
         {@const hasTickets = Boolean(
-          order.bookings.flatMap((item) => item.ticketUrls).filter(ensureDefined).length,
+          order.bookings.flatMap((item) => item.cancellation).filter(ensureDefined).length,
         )}
 
         <TRow alternatingBackground={false}>
@@ -151,12 +183,12 @@
               {totalPrice.currency}
             </em>
           </TCol>
-          {#if order.cancellationStatus}
-            <TStatusBadgeCol value={order.cancellationStatus} />
+          {#if cancellationStatus}
+            <TStatusBadgeCol value={cancellationStatus} />
           {:else}
             <TCol width="0" />
           {/if}
-          <TStatusBadgeCol value={order.status} />
+          <TStatusBadgeCol value={status} />
           <TActionsCol>
             <button class="action">
               <span>...</span>

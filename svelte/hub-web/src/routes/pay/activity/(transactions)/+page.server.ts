@@ -5,12 +5,15 @@ import type { Transaction } from "integration/junction-hub-api/schemas/transacti
 import type { PaginatedData } from "models/common";
 import { getSession } from "utils/auth";
 
+const LIST_TRANSACTIONS_LIMIT = 20;
+
 export function load(event): {
   transactions: Promise<PaginatedData<Transaction>>;
 } {
   return {
     transactions: integrationInstances.junctionHubApi.transactions.listTransactions({
       session: getSession(event),
+      limit: LIST_TRANSACTIONS_LIMIT,
     }),
   };
 }
@@ -37,17 +40,18 @@ export const actions = {
 
     return { booking };
   },
-  async listTransactions(event): Promise<{ transactions: PaginatedData<Transaction> } | void> {
+  async listTransactions(event): Promise<{ transactions: PaginatedData<Transaction> }> {
     const formData = await event.request.formData();
     const cursor = formData.get("cursor")?.toString();
 
     if (!cursor) {
-      return;
+      return { transactions: { data: [] } };
     }
 
     return {
       transactions: await integrationInstances.junctionHubApi.transactions.listTransactions({
         session: getSession(event),
+        limit: LIST_TRANSACTIONS_LIMIT,
         cursor,
       }),
     };

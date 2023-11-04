@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-  export function formatPlace(place?: PlaceModel): string {
+  export function formatPlace(place?: Place): string {
     if (!place) {
       return "";
     }
@@ -11,7 +11,7 @@
     return place.name;
   }
 
-  function getPrecision(place: PlaceModel): "precise" | undefined {
+  function getPrecision(place: Place): "precise" | undefined {
     if (place.types.includes("city") || place.types.includes("unspecified")) {
       return undefined;
     }
@@ -27,7 +27,7 @@
   import AutocompleteField from "components/ui/autocomplete-field.svelte";
   import { z } from "zod";
   import SearchIcon from "components/icons/search-icon.svelte";
-  import type { PlaceModel } from "integration/junction-mobile-api/schemas/place";
+  import type { Place } from "integration/junction-mobile-api/schemas/place";
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import { goto } from "$app/navigation";
   import { pendableCall } from "utils/pendable-call";
@@ -45,8 +45,8 @@
       infants: 0,
     },
   };
-  export let origin: PlaceModel | undefined = undefined;
-  export let destination: PlaceModel | undefined = undefined;
+  export let origin: Place | undefined = undefined;
+  export let destination: Place | undefined = undefined;
 
   $: data = {
     ...data,

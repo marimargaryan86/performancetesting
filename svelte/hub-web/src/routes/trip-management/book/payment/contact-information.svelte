@@ -1,48 +1,52 @@
 <script lang="ts" context="module">
-  const partialContactDetailsModel = contactDetailsModel.model.deepPartial().extend({
-    phone: contactDetailsModel.model.shape.phone.partial(),
-    address: contactDetailsModel.model.shape.address.partial().extend({
-      street: contactDetailsModel.model.shape.address.shape.street.partial(),
+  export const contactDetailsModel: z.ZodType<ContactDetails> = z.object({
+    email: z.string().email().trim(),
+    address: z.object({
+      street: z.object({
+        line1: z.string().trim().min(1),
+        line2: z.string().trim().min(1).optional(),
+      }),
+      countryCode: z.string().trim().min(1),
+      postalCode: z.string().trim().min(1),
+      city: z.string().trim().min(1),
     }),
+    phone: z.string().trim().min(1),
   });
-  export type PartialContactDetailsModel = z.infer<typeof partialContactDetailsModel>;
 </script>
 
 <script lang="ts">
-  import type { z } from "zod";
+  import { z } from "zod";
   import SelectField from "components/ui/select-field.svelte";
   import TextField from "components/ui/text-field.svelte";
   import { formatCountryOption, formatCountryPhoneOption } from "formatting/location";
   import type { CountryModel } from "models/location";
   import Collapsible from "../../components/collapsible.svelte";
-  import {
-    contactDetailsModel,
-    type ContactDetailsModel,
-  } from "integration/junction-mobile-api/schemas/order";
+  import type { ContactDetails } from "integration/junction-mobile-api/schemas/journey";
 
   let countryMap: Map<string, CountryModel>;
   export { countryMap as countries };
-  export let contactDetails: PartialContactDetailsModel;
-  export let errors: z.ZodFormattedError<ContactDetailsModel> | undefined = undefined;
+  export let data: ContactDetails;
+  export let errors: z.ZodFormattedError<ContactDetails> | undefined = undefined;
 
   let collapsible: Collapsible | undefined;
   let countries = Array.from(countryMap.values());
-  let country: CountryModel | undefined = countryMap.get(contactDetails.address.countryCode ?? "");
-  let phoneCountry: CountryModel | undefined = countryMap.get(
-    contactDetails.phone.countryCode ?? "",
-  );
+  let country: CountryModel | undefined = countryMap.get(data.address.countryCode ?? "");
 
-  $: contactDetails = {
-    ...contactDetails,
-    address: {
-      ...contactDetails.address,
-      countryCode: country?.code,
-    },
-    phone: {
-      ...contactDetails.phone,
-      countryCode: phoneCountry?.phoneCode ? `+${phoneCountry.phoneCode}` : undefined,
-    },
+  let phone: {
+    country?: CountryModel;
+    number: string;
+  } = {
+    number: "",
   };
+
+  $: if (country) {
+    data.address.countryCode = country.code;
+  }
+
+  $: if (phone.country && phone.number) {
+    data.phone = `+${phone.country.phoneCode}${phone.number}`;
+  }
+
   $: if (errors) {
     collapsible?.open();
   }
@@ -57,8 +61,8 @@
         placeholder="Select"
         required
         formatter={formatCountryPhoneOption}
-        bind:value={phoneCountry}
-        error={errors?.phone?.countryCode?._errors}
+        bind:value={phone.country}
+        error={Boolean(errors?.phone?._errors)}
         dialogMinWidth="240px"
       />
       <TextField
@@ -66,8 +70,8 @@
         type="tel"
         placeholder="Enter phone number"
         required
-        bind:value={contactDetails.phone.number}
-        error={errors?.phone?.number?._errors}
+        bind:value={phone.number}
+        error={errors?.phone?._errors}
       />
     </div>
 
@@ -76,20 +80,20 @@
       type="email"
       placeholder="Enter email"
       required
-      bind:value={contactDetails.email}
+      bind:value={data.email}
       error={errors?.email?._errors}
     />
     <TextField
       label="Address line 1"
       placeholder="Enter address line 1"
       required
-      bind:value={contactDetails.address.street.line1}
+      bind:value={data.address.street.line1}
       error={errors?.address?.street?.line1?._errors}
     />
     <TextField
       label="Address line 2"
       placeholder="Enter address line 2"
-      bind:value={contactDetails.address.street.line2}
+      bind:value={data.address.street.line2}
       error={errors?.address?.street?.line2?._errors}
     />
 
@@ -98,7 +102,7 @@
         label="City"
         placeholder="Enter city"
         required
-        bind:value={contactDetails.address.city}
+        bind:value={data.address.city}
         error={errors?.address?.city?._errors}
       />
       <SelectField
@@ -116,7 +120,7 @@
         label="Postcode"
         placeholder="Postcode"
         required
-        bind:value={contactDetails.address.postalCode}
+        bind:value={data.address.postalCode}
         error={errors?.address?.postalCode?._errors}
       />
     </div>

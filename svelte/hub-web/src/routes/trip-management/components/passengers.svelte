@@ -1,10 +1,10 @@
 <script lang="ts">
   import PassengerIcon from "components/icons/passenger-icon.svelte";
-  import type { OrderPassengerModel } from "integration/junction-mobile-api/schemas/order";
+  import type { OrderPassenger } from "integration/junction-mobile-api/schemas/order";
   import { capitalize } from "utils/common";
   import { getPassengerType } from "utils/passenger";
 
-  export let passengers: OrderPassengerModel[];
+  export let passengers: OrderPassenger[];
 </script>
 
 <ul class="passengers">

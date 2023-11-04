@@ -9,31 +9,36 @@
   import TCol from "components/ui/table/t-col.svelte";
   import routeConfig from "routeConfig";
   import TStatusBadgeCol from "components/ui/table/t-status-badge-col.svelte";
+  import type { ScrollLoadFunc } from "directives/scroll-load";
+  import type { PaginatedData } from "models/common";
+  import type { Conversion } from "integration/junction-hub-api/schemas/conversion";
 
-  export let form;
   export let data;
 
   $: conversions = data.conversions.data;
 
-  async function loadMore(): Promise<void> {
+  const loadMore: ScrollLoadFunc = async () => {
     if (!data.conversions.cursor) {
-      return;
+      return { depleted: true };
     }
 
-    await callAction({
+    const result = await callAction<{ conversions: PaginatedData<Conversion> }>({
       action: routeConfig.routes.pay.routes.activity.routes.conversions.actions.listConversions,
-      data: {
-        cursor: data.conversions.cursor,
-      },
+      data: { cursor: data.conversions.cursor },
+      apply: false,
     });
 
-    if (form?.conversions) {
+    if (result.type === "success" && result.data) {
       data.conversions = {
-        cursor: form.conversions.cursor,
-        data: [...data.conversions.data, ...form.conversions.data],
+        cursor: result.data.conversions.cursor,
+        data: [...data.conversions.data, ...result.data.conversions.data],
       };
+
+      return { depleted: !result.data.conversions.cursor };
     }
-  }
+
+    return { depleted: true };
+  };
 </script>
 
 <svelte:head>

@@ -1,6 +1,6 @@
-import type { PriceModel } from "integration/junction-mobile-api/schemas/price";
+import type { Price } from "integration/common/schemas/price";
 
-export function summarizePrices(...prices: [PriceModel, ...PriceModel[]]): PriceModel {
+export function summarizePrices(...prices: [Price, ...Price[]]): Price {
   if (new Set(prices.flatMap((price) => price.currency)).size !== 1) {
     throw new Error("Currencies do not match");
   }

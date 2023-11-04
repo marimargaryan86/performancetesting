@@ -2,17 +2,17 @@
   import ChevronIcon from "components/icons/chevron-icon.svelte";
   import Button from "components/ui/button.svelte";
   import { formatAmount } from "formatting/currency";
-  import type { OfferOptionModel } from "integration/junction-mobile-api/schemas/offer";
+  import type { OfferOption } from "integration/junction-mobile-api/schemas/offer";
   import { createEventDispatcher } from "svelte";
   import { slide } from "svelte/transition";
 
-  export let options: OfferOptionModel[];
-  export let selectedOptions: OfferOptionModel[];
+  export let options: OfferOption[];
+  export let selectedOptions: OfferOption[];
 
   let expanded = false;
 
   const dispatch = createEventDispatcher<{
-    select: OfferOptionModel;
+    select: OfferOption;
   }>();
 
   function open(): void {
@@ -31,7 +31,7 @@
     }
   }
 
-  function select(option: OfferOptionModel): void {
+  function select(option: OfferOption): void {
     dispatch("select", option);
   }
 </script>
@@ -53,7 +53,7 @@
           <hr />
 
           <span class="typography body-medium bold">
-            {formatAmount(option.price, undefined, true)}
+            {formatAmount(option.price.total, undefined, true)}
           </span>
 
           <Button

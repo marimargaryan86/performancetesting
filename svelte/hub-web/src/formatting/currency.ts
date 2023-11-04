@@ -1,15 +1,15 @@
 import type { Currency } from "integration/junction-hub-api/schemas/currency";
-import type { PriceBreakdownType, PriceModel } from "integration/junction-mobile-api/schemas/price";
+import type { PriceBreakdownType, Price } from "integration/common/schemas/price";
 
 export function formatAmountAndCode(
-  amount: PriceModel,
+  amount: Price,
   currencies: Map<string, Currency> = new Map(),
 ): string {
   return `${formatAmount(amount, currencies)} ${amount.currency.toUpperCase()}`;
 }
 
 export function formatAmount(
-  money: PriceModel,
+  money: Price,
   currencies: Map<string, Currency> = new Map(),
   sign = false,
 ): string {

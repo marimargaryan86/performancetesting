@@ -8,6 +8,7 @@
   import TMoneyCol from "components/ui/table/t-money-col.svelte";
   import TRow from "components/ui/table/t-row.svelte";
   import Table from "components/ui/table/table.svelte";
+  import type { ScrollLoadFunc } from "directives/scroll-load";
   import type { Bill } from "integration/junction-hub-api/schemas/bill";
   import type { PaginatedData } from "models/common";
   import routeConfig from "routeConfig";
@@ -17,9 +18,9 @@
 
   $: ({ data: bills } = data.bills);
 
-  async function loadMore(): Promise<void> {
+  const loadMore: ScrollLoadFunc = async () => {
     if (!data.bills.cursor) {
-      return;
+      return { depleted: true };
     }
 
     const result = await callAction<{ bills: PaginatedData<Bill> }>({
@@ -28,19 +29,23 @@
       apply: false,
     });
 
-    if (result.type === "success" && result.data?.bills) {
+    if (result.type === "success" && result.data) {
       data.bills = {
         cursor: result.data.bills.cursor,
         data: [...data.bills.data, ...result.data.bills.data],
       };
+
+      return { depleted: !result.data.bills.cursor };
     }
-  }
+
+    return { depleted: true };
+  };
 
   async function toggleReconciliation(bill: Bill): Promise<void> {
     await callAction({
       action: routeConfig.routes.pay.routes.bills.actions.toggleReconciliation,
-      apply: false,
       data: { billId: bill.id },
+      apply: false,
     });
   }
 </script>

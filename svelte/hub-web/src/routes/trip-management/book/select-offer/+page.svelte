@@ -23,11 +23,7 @@
     };
   }
 
-  function getOptions(
-    offers: OfferModel[],
-    offerId: string,
-    optionIds: string[],
-  ): OfferOptionModel[] {
+  function getOptions(offers: OfferModel[], offerId: string, optionIds: string[]): OfferOption[] {
     const options =
       offers
         .find(({ id }) => offerId === id)
@@ -37,11 +33,11 @@
     return Array.from(new Set(options));
   }
 
-  function getTotalPrice(options: OfferOptionModel[]): PriceModel {
-    return options.reduce<PriceModel>(
+  function getTotalPrice(options: OfferOption[]): Price {
+    return options.reduce<Price>(
       (prev, curr) => ({
-        currency: curr.price.currency,
-        amount: prev.amount + curr.price.amount,
+        currency: curr.price.total.currency,
+        amount: prev.amount + curr.price.total.amount,
       }),
       { currency: "EUR", amount: 0 },
     );
@@ -62,14 +58,17 @@
   import { browser } from "$app/environment";
   import Countdown from "../countdown.svelte";
   import LoadingSkelton from "./loading-skelton.svelte";
-  import type { OfferModel, OfferOptionModel } from "integration/junction-mobile-api/schemas/offer";
+  import type {
+    Offer as OfferModel,
+    OfferOption,
+  } from "integration/junction-mobile-api/schemas/offer";
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import { pendableCall } from "utils/pendable-call";
   import Alert from "components/ui/alert.svelte";
   import { getSortOffersFunc } from "sorting/offer";
   import { getFilterOffersFunc } from "filters/offer";
   import { getOfferDurationM, getVendors } from "utils/offer";
-  import type { PriceModel } from "integration/junction-mobile-api/schemas/price";
+  import type { Price } from "integration/common/schemas/price";
   import tripManagement from "../../../integration/trip-management/trip-management";
   import { onDestroy } from "svelte";
 

@@ -1,154 +1,137 @@
-import { z } from "zod";
+import type { CabinClass, CabinClassSchema } from "integration/common/schemas/cabin-class";
+import type { IncludedMapping } from "./included";
+import type { LegType, LegTypeSchema } from "integration/common/schemas/leg-type";
+import type { Order, OrderSchema } from "./order";
 import {
-  cabinClassModel,
-  legTypeModel,
-  routeIdentifierModel,
-  offerSegmentLegModel,
-  type LegTypeIdentifier,
-  type CabinClassIdentifier,
-} from "./offer";
-import { orderModel, type OrderIdentifier, type OrderModel } from "./order";
-import { priceModel } from "./price";
-import schemaModel, { type Infer } from "utils/schema-model";
+  offerSegmentLegParser,
+  type OfferSegmentLeg,
+  type OfferSegmentLegSchema,
+} from "integration/common/schemas/offer-segment-leg";
 import {
-  bookingCancellationModel,
-  type BookingCancellationIdentifier,
-} from "./cancellation-request";
+  routeIdentifiersParser,
+  type RouteIdentifiers,
+  type RouteIdentifiersSchema,
+} from "integration/common/schemas/route-identifier";
+import { priceParser, type PriceSchema, type Price } from "integration/common/schemas/price";
+import type { BookingCancellation, BookingCancellationSchema } from "./cancellation";
 
-const bookingDetailsRelationships: z.ZodType<{
-  cabinClass: { data: CabinClassIdentifier };
-  legType: { data: LegTypeIdentifier };
-  booking: { data: BookingIdentifier };
-}> = z.lazy(() =>
-  schemaModel.relationships({
-    cabinClass: cabinClassModel.identifier,
-    legType: legTypeModel.identifier,
-    booking: bookingModel.identifier,
-  }),
-);
+export type TripBookingDetails = {
+  id: string;
+  cabinClassName: string;
+  vendor: string;
+  operator?: string;
+  routeIdentifiers: RouteIdentifiers;
+  legs: OfferSegmentLeg[];
+  bookingId: string;
+  booking?: TripBooking;
+  cabinClassId: string;
+  cabinClass?: CabinClass;
+  legTypeId: string;
+  legType?: LegType;
+};
 
-const bookingDetailsModelBase = z.object({
-  id: z.string(),
-  cabinClassName: z.string(),
-  vendor: z.string(),
-  operator: z.string().optional(),
-  routeIdentifiers: routeIdentifierModel.model,
-  legs: z.array(offerSegmentLegModel.model),
-  bookingId: z.string(),
-  cabinClass: cabinClassModel.model.optional(),
-  legType: legTypeModel.model.optional(),
-});
+export type TripBookingDetailsSchema = {
+  id: string;
+  type: "trip-booking-details";
+  attributes: {
+    cabinClassName: string;
+    vendor: string;
+    operator: string | null;
+    routeIdentifiers: RouteIdentifiersSchema;
+    legs: OfferSegmentLegSchema[];
+  };
+  relationships: {
+    booking: { data: Pick<TripBookingSchema, "id" | "type"> };
+    cabinClass: { data: Pick<CabinClassSchema, "id" | "type"> };
+    legType: { data: Pick<LegTypeSchema, "id" | "type"> };
+  };
+  links: { self: string };
+};
 
-const bookingDetailsModelExt: z.ZodType<
-  z.infer<typeof bookingDetailsModelBase> & { booking?: BookingModel }
-> = z.lazy(() =>
-  bookingDetailsModelBase.extend({
-    booking: bookingModel.model.optional(),
-  }),
-);
+export const tripBookingDetailsParser = {
+  toModel: (data: TripBookingDetailsSchema, included?: IncludedMapping): TripBookingDetails => {
+    const bookingId = data.relationships.booking.data.id;
+    const cabinClassId = data.relationships.cabinClass.data.id;
+    const legTypeId = data.relationships.legType.data.id;
 
-export const bookingDetailsModel = schemaModel.create({
-  schema: z.object({
-    id: z.string().uuid(),
-    type: z.literal("trip-booking-details"),
-    attributes: z.object({
-      cabinClassName: z.string(),
-      vendor: z.string(),
-      operator: z.string().nullable(),
-      routeIdentifiers: routeIdentifierModel.schema,
-      legs: z.array(offerSegmentLegModel.schema),
-    }),
-    relationships: bookingDetailsRelationships,
-    links: schemaModel.links({ self: true }),
-  }),
-  model: bookingDetailsModelExt,
-  toModel: (data): z.infer<typeof bookingDetailsModelExt> => ({
-    id: data.id,
-    cabinClassName: data.attributes.cabinClassName,
-    legs: data.attributes.legs.map(offerSegmentLegModel.toModel),
-    operator: data.attributes.operator ?? undefined,
-    routeIdentifiers: routeIdentifierModel.toModel(data.attributes.routeIdentifiers),
-    vendor: data.attributes.vendor,
-    bookingId: data.relationships.booking.data.id,
-    booking: undefined,
-    cabinClass: undefined,
-    legType: undefined,
-  }),
-});
-export type BookingDetailsModel = Infer<typeof bookingDetailsModel>;
-export type BookingDetailsSchema = Infer<typeof bookingDetailsModel, "schema">;
-export type BookingDetailsIdentifier = Infer<typeof bookingDetailsModel, "identifier">;
+    return {
+      id: data.id,
+      cabinClassName: data.attributes.cabinClassName,
+      vendor: data.attributes.vendor,
+      operator: data.attributes.operator ?? undefined,
+      routeIdentifiers: routeIdentifiersParser.toModel(data.attributes.routeIdentifiers),
+      legs: data.attributes.legs.map(offerSegmentLegParser.toModel),
+      bookingId,
+      booking: included?.tripBookings?.find(({ id }) => id === bookingId),
+      cabinClassId,
+      cabinClass: included?.cabinClasses?.find(({ id }) => id === cabinClassId),
+      legTypeId,
+      legType: included?.legTypes?.find(({ id }) => id === legTypeId),
+    };
+  },
+};
 
-export const bookingStatusIdentifier = z.object({
-  id: z.enum([
-    "unspecified",
-    "pending",
-    "confirmed",
-    "rejected",
-    "not-ticketed",
-    "error",
-    "cancelled",
-  ]),
-  type: z.literal("booking-statuses"),
-});
-export type BookingStatus = z.infer<typeof bookingStatusIdentifier>["id"];
+export type BookingStatusSchema = {
+  id: "confirmed" | "error" | "not-ticketed" | "cancelled" | "rejected";
+  type: "booking-statuses";
+};
 
-const bookingRelationships: z.ZodType<{
-  status: { data: z.infer<typeof bookingStatusIdentifier> };
-  details: { data: BookingDetailsIdentifier[] };
-  order: { data: OrderIdentifier };
-  bookingCancellation: { data: BookingCancellationIdentifier | null };
-}> = z.lazy(() =>
-  schemaModel.relationships({
-    status: bookingStatusIdentifier,
-    details: z.array(bookingDetailsModel.identifier),
-    order: orderModel.identifier,
-    bookingCancellation: bookingCancellationModel.identifier.nullable(),
-  }),
-);
+export type TripBooking = {
+  id: string;
+  price: {
+    total: Price;
+  };
+  ticketUrls: string[];
+  operatorBookingReferences: string[];
+  externalReference: string;
+  status: BookingStatusSchema["id"];
+  orderId: string;
+  order?: Order;
+  detailsIds: string[];
+  detailsList: TripBookingDetails[];
+  cancellationId?: string;
+  cancellation?: BookingCancellation;
+};
 
-export const bookingModelBase = z.object({
-  id: z.string(),
-  price: priceModel.model,
-  operatorBookingReferences: z.array(z.string()),
-  externalReference: z.string(),
-  ticketUrls: z.array(z.string()).optional(),
-  cancellationStatus: z.enum(["pending", "completed"]).optional(),
-  status: bookingStatusIdentifier.shape.id,
-  details: z.array(bookingDetailsModel.model),
-});
+export type TripBookingSchema = {
+  id: string;
+  type: "trip-bookings";
+  attributes: {
+    totalPrice: PriceSchema;
+    operatorBookingReferences: string[];
+    externalReference: string;
+    ticketUrls?: string[];
+  };
+  relationships: {
+    order: { data: Pick<OrderSchema, "id" | "type"> };
+    status: { data: Pick<BookingStatusSchema, "id" | "type"> };
+    details?: { data?: Pick<TripBookingDetailsSchema, "id" | "type">[] };
+    bookingCancellation: { data: Pick<BookingCancellationSchema, "id" | "type"> | null } | null;
+  };
+  links: { self: string };
+};
 
-const bookingModelExt: z.ZodType<z.infer<typeof bookingModelBase> & { order?: OrderModel }> =
-  z.lazy(() => bookingModelBase.extend({ order: orderModel.model.optional() }));
+export const tripBookingParser = {
+  toModel: (data: TripBookingSchema, included?: IncludedMapping): TripBooking => {
+    const orderId = data.relationships.order.data.id;
+    const detailsIds = data.relationships.details?.data?.map(({ id }) => id) ?? [];
+    const cancellationId = data.relationships.bookingCancellation?.data?.id;
 
-export const bookingModel = schemaModel.create({
-  schema: z.object({
-    id: z.string().uuid(),
-    type: z.literal("trip-bookings"),
-    attributes: z.object({
-      totalPrice: priceModel.schema,
-      operatorBookingReferences: z.array(z.string()),
-      externalReference: z.string(),
-      ticketUrls: z.array(z.string()).optional(),
-    }),
-    relationships: bookingRelationships,
-    links: schemaModel.links({ self: true }),
-  }),
-  model: bookingModelExt,
-  toModel: (data): z.infer<typeof bookingModelExt> => ({
-    id: data.id,
-    details: [],
-    externalReference: data.attributes.externalReference,
-    operatorBookingReferences: data.attributes.operatorBookingReferences,
-    ticketUrls: data.attributes.ticketUrls,
-    price: priceModel.toModel(data.attributes.totalPrice),
-    cancellationStatus: data.relationships.bookingCancellation.data
-      ? ("pending" as const)
-      : undefined,
-    status: data.relationships.status.data.id,
-    order: undefined,
-  }),
-});
-export type BookingModel = Infer<typeof bookingModel>;
-export type BookingSchema = Infer<typeof bookingModel, "schema">;
-export type BookingIdentifier = Infer<typeof bookingModel, "identifier">;
+    return {
+      id: data.id,
+      price: {
+        total: priceParser.toModel(data.attributes.totalPrice),
+      },
+      ticketUrls: data.attributes.ticketUrls ?? [],
+      operatorBookingReferences: data.attributes.operatorBookingReferences,
+      externalReference: data.attributes.externalReference,
+      status: data.relationships.status.data.id,
+      orderId,
+      order: included?.orders?.find(({ id }) => id === orderId),
+      detailsIds,
+      detailsList: included?.tripBookingDetails?.filter(({ id }) => detailsIds.includes(id)) ?? [],
+      cancellationId,
+      cancellation: included?.bookingCancellations?.find(({ id }) => id === cancellationId),
+    };
+  },
+};

@@ -1,7 +1,6 @@
 import integrationInstances from "integration-instances";
-import type { ResourceStatus } from "integration/junction-mobile-api/schemas/common";
-import type { OfferModel } from "integration/junction-mobile-api/schemas/offer";
-import type { PlaceModel } from "integration/junction-mobile-api/schemas/place";
+import type { Offer } from "integration/junction-mobile-api/schemas/offer";
+import type { Place } from "integration/junction-mobile-api/schemas/place";
 import { getSession } from "utils/auth";
 import tripManagement, {
   type BookingSessionModel,
@@ -10,12 +9,13 @@ import tripManagement, {
 import utils from "../../../integration/trip-management/utils.server";
 import { redirect } from "@sveltejs/kit";
 import routeConfig from "routeConfig";
+import type { ResourceStatus } from "integration/common/schemas/resource";
 
 export async function load(event): Promise<{
   searchData: SearchDataModel;
-  origin: PlaceModel;
-  destination: PlaceModel;
-  offers: { data: OfferModel[]; status: ResourceStatus };
+  origin: Place;
+  destination: Place;
+  offers: { data: Offer[]; status: ResourceStatus };
   selectedOffer: BookingSessionModel["selected"];
   tripCandidates: BookingSessionModel["tripCandidates"];
 }> {

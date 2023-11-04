@@ -1,12 +1,13 @@
 import type { SessionModel } from "models/user";
-import {
-  type CreateCancellationRequestModel,
-  type CancellationRequestModel,
-  type CancellationRequestSchema,
-  createCancellationRequestModel,
-  cancellationRequestModel,
-} from "../schemas/cancellation-request";
 import JunctionMobileApiService from "./junction-mobile-api-service";
+import {
+  cancellationRequestParsers,
+  type CancellationRequest,
+  type CancellationRequestCreate,
+  type CancellationRequestSchema,
+} from "../schemas/cancellation";
+import { parseIncluded, type IncludedSchemas } from "../schemas/included";
+import { JunctionError } from "integration/common/junction-error";
 
 export class CancellationRequestService extends JunctionMobileApiService {
   async createCancellationRequest({
@@ -14,18 +15,18 @@ export class CancellationRequestService extends JunctionMobileApiService {
     data,
   }: {
     session: SessionModel;
-    data: CreateCancellationRequestModel;
-  }): Promise<CancellationRequestModel> {
+    data: CancellationRequestCreate;
+  }): Promise<CancellationRequest> {
     const resp = await this.makeRequest<{ data: CancellationRequestSchema }>(
       "/cancellations/requests",
       {
         method: "POST",
-        data: { data: createCancellationRequestModel.toSchema(data) },
+        data: { data: cancellationRequestParsers.toCreateSchema(data) },
         session,
       },
     );
 
-    return cancellationRequestModel.toModel(resp.json.data);
+    return cancellationRequestParsers.toModel(resp.json.data);
   }
 
   async getCancellationRequest({
@@ -34,12 +35,31 @@ export class CancellationRequestService extends JunctionMobileApiService {
   }: {
     session: SessionModel;
     id: string;
-  }): Promise<CancellationRequestModel> {
-    const resp = await this.makeRequest<{ data: CancellationRequestSchema }>(
-      `/cancellations/requests/${id}`,
-      { session },
-    );
+  }): Promise<CancellationRequest> {
+    const resp = await this.makeRequest<{
+      data: CancellationRequestSchema;
+      included?: IncludedSchemas;
+    }>(`/cancellations/requests/${id}`, {
+      session,
+      queryParams: {
+        include: [
+          "bookings",
+          "bookings.order",
+          "bookings.order.journey",
+          "bookings.details",
+          "bookings.details.cabinClass",
+          "bookings.details.legType",
+        ].join(","),
+      },
+    });
 
-    return cancellationRequestModel.toModel(resp.json.data);
+    const parsed = parseIncluded([...(resp.json.included ?? []), resp.json.data]);
+    const cancellationRequest = parsed.cancellationRequests?.find((item) => item.id === id);
+
+    if (!cancellationRequest) {
+      throw new JunctionError({ status: 404, statusText: "Not found" });
+    }
+
+    return cancellationRequest;
   }
 }

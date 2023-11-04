@@ -52,6 +52,11 @@ export default {
                     } as const),
                 } as const;
               },
+              get actions() {
+                return {
+                  listJourneys: `${this.root}?/listJourneys`,
+                } as const;
+              },
             },
           } as const;
         },

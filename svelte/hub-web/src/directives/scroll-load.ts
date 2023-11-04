@@ -1,8 +1,11 @@
+import type { MaybePromise } from "@sveltejs/kit";
 import type { ActionReturn } from "svelte/action";
+
+export type ScrollLoadFunc = () => MaybePromise<{ depleted: boolean }>;
 
 interface ScrollLoadParams {
   threshold?: number;
-  func?: () => Promise<void> | void;
+  func?: ScrollLoadFunc;
 }
 
 const DEFAULT_THRESHOLD = 400;
@@ -27,12 +30,20 @@ export function scrollLoad(
       }
 
       pending = true;
-      await func();
+      const result = await func();
       pending = false;
+
+      // Trigger an additional onScroll in case the container isn't fully populated
+      if (!result.depleted) {
+        await onScroll();
+      }
     }
   }
 
   node.addEventListener("scroll", onScroll);
+
+  // Trigger an initial onScroll in case the container isn't fully populated
+  onScroll();
 
   return {
     destroy(): void {

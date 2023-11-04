@@ -1,9 +1,18 @@
 import type { TripBooking, TripBookingSchema } from "./booking";
 import type { IncludedMapping } from "./included";
 
+export type BookingCancellationStatus =
+  | "unspecified"
+  | "pending"
+  | "completed"
+  | "rejected"
+  | "no-refund"
+  | "refund-due"
+  | "refund-issue";
+
 export type BookingCancellation = {
   id: string;
-  status: string;
+  status: BookingCancellationStatus;
   bookingId: string;
   booking?: TripBooking;
 };
@@ -12,7 +21,7 @@ export type BookingCancellationSchema = {
   id: string;
   type: "booking-cancellation";
   attributes: {
-    status: "unspecified" | "pending" | "completed";
+    status: BookingCancellationStatus;
   };
   relationships: {
     booking: { data: Pick<TripBookingSchema, "id" | "type"> };
@@ -40,9 +49,7 @@ export type CancellationRequest = {
   bookings: TripBooking[];
 };
 
-export type CancellationRequestCreate = {
-  bookingIds: string[];
-};
+export type CancellationRequestCreate = Pick<CancellationRequest, "bookingIds">;
 
 export type CancellationRequestSchema = {
   id: string;

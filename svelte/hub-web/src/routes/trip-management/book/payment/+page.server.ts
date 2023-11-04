@@ -1,6 +1,6 @@
 import { redirect } from "@sveltejs/kit";
 import integrationInstances from "integration-instances";
-import type { TripOfferPriceQuoteModel } from "integration/junction-mobile-api/schemas/offer";
+import type { TripOfferPriceQuote } from "integration/junction-mobile-api/schemas/trip-offer-price-quote";
 import { getSession } from "utils/auth";
 import utils from "../../../integration/trip-management/utils.server";
 import routeConfig from "routeConfig";
@@ -11,7 +11,7 @@ import type {
 
 export async function load(event): Promise<{
   searchData: SearchDataModel;
-  priceQuote: TripOfferPriceQuoteModel;
+  priceQuote: TripOfferPriceQuote;
   selected: NonNullable<BookingSessionModel["selected"]>;
   paymentIntent: BookingSessionModel["paymentIntent"];
   orderId?: string;

@@ -6,9 +6,9 @@ import {
   getOfferDurationM,
 } from "utils/offer";
 import type { SearchOptionsData } from "../routes/trip-management/book/select-offer/search-options.svelte";
-import type { OfferModel } from "integration/junction-mobile-api/schemas/offer";
+import type { Offer } from "integration/junction-mobile-api/schemas/offer";
 
-function stopsFulfilled(options: SearchOptionsData, offer: OfferModel): boolean {
+function stopsFulfilled(options: SearchOptionsData, offer: Offer): boolean {
   if (options.stops.includes("direct") && getMinStopCount(offer) > 1) {
     return false;
   }
@@ -16,7 +16,7 @@ function stopsFulfilled(options: SearchOptionsData, offer: OfferModel): boolean 
   return true;
 }
 
-function departureFulfilled(options: SearchOptionsData, offer: OfferModel): boolean {
+function departureFulfilled(options: SearchOptionsData, offer: Offer): boolean {
   const departureTime = getTimeOfDayM(getEarliestDeparture(offer));
 
   return (
@@ -24,30 +24,32 @@ function departureFulfilled(options: SearchOptionsData, offer: OfferModel): bool
   );
 }
 
-function arrivalFulfilled(options: SearchOptionsData, offer: OfferModel): boolean {
+function arrivalFulfilled(options: SearchOptionsData, offer: Offer): boolean {
   const arrivalTime = getTimeOfDayM(getEarliestArrival(offer));
 
   return options.arrivalSpanM.start <= arrivalTime && arrivalTime <= options.arrivalSpanM.end;
 }
 
-function durationFulfilled(options: SearchOptionsData, offer: OfferModel): boolean {
+function durationFulfilled(options: SearchOptionsData, offer: Offer): boolean {
   const duration = getOfferDurationM(offer);
 
   return options.durationM <= duration;
 }
 
-function vendorsFulfilled(options: SearchOptionsData, offer: OfferModel): boolean {
+function vendorsFulfilled(options: SearchOptionsData, offer: Offer): boolean {
   if (!options.vendors.length) {
     return true;
   }
 
-  const vendors = offer.groups.flatMap((group) => group.details.map((details) => details.vendor));
+  const vendors = offer.groups.flatMap((group) =>
+    group.detailsList.map((details) => details.vendor),
+  );
 
   return Boolean(options.vendors.find((item) => vendors.includes(item)));
 }
 
-export function getFilterOffersFunc(options: SearchOptionsData): (offer: OfferModel) => boolean {
-  return (offer: OfferModel): boolean => {
+export function getFilterOffersFunc(options: SearchOptionsData): (offer: Offer) => boolean {
+  return (offer: Offer): boolean => {
     const fulfilled = {
       meep: true,
       stops: stopsFulfilled(options, offer),

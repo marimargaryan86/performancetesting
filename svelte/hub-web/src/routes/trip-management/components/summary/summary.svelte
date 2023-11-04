@@ -13,7 +13,7 @@
 </script>
 
 <script lang="ts">
-  import type { TripOfferPriceQuoteModel } from "integration/junction-mobile-api/schemas/offer";
+  import type { TripOfferPriceQuote } from "integration/junction-mobile-api/schemas/trip-offer-price-quote";
   import { ensureDefined } from "utils/array";
   import { formatAmount, formatPriceBreakdownType } from "formatting/currency";
   import { slideFade } from "transitions/slide-fade";
@@ -23,7 +23,7 @@
   import SummaryItinerary from "./summary-itinerary.svelte";
   import type { PassengerPickerData } from "../trip-search/passenger-picker/passenger-picker.svelte";
 
-  export let priceQuote: TripOfferPriceQuoteModel | undefined = undefined;
+  export let priceQuote: TripOfferPriceQuote | undefined = undefined;
   export let passengers: PassengerPickerData;
 
   let collapsible: Collapsible | undefined;
@@ -34,7 +34,7 @@
   }
 
   $: priceBreakdown = priceQuote ? getTotalPriceBreakdown(priceQuote) : undefined;
-  $: totalPrice = priceQuote?.price;
+  $: totalPrice = priceQuote?.price.total;
 </script>
 
 <Collapsible bind:this={collapsible} title="Summary">

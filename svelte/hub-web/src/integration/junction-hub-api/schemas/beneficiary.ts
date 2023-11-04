@@ -6,7 +6,7 @@ import {
   type EnhancedAddressDetailsSchema,
   type Address,
   addressParser,
-} from "./address";
+} from "integration/common/schemas/address";
 import type { Currency, CurrencySchema } from "./currency";
 import type { Account, AccountSchema } from "./account";
 import type { IncludedMapping } from "./included";

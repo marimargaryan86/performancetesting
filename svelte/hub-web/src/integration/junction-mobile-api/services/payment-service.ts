@@ -1,27 +1,16 @@
-import {
-  paymentIntentModel,
-  createPaymentIntentModel,
-  type PaymentIntentModel,
-  type PaymentIntentSchema,
-} from "../schemas/payment";
 import JunctionMobileApiService from "./junction-mobile-api-service";
-import type { PriceModel } from "../schemas/price";
 import type { SessionModel } from "models/user";
+import type { Price } from "integration/common/schemas/price";
+import { paymentParser, type Payment, type PaymentSchema } from "../schemas/payment";
 
 export class PaymentService extends JunctionMobileApiService {
-  async createPayment({
-    session,
-    data,
-  }: {
-    session: SessionModel;
-    data: PriceModel;
-  }): Promise<PaymentIntentModel> {
-    const resp = await this.makeRequest<{ data: PaymentIntentSchema }>("/payments", {
+  async createPayment({ session, data }: { session: SessionModel; data: Price }): Promise<Payment> {
+    const resp = await this.makeRequest<{ data: PaymentSchema }>("/payments", {
       method: "POST",
-      data: { data: createPaymentIntentModel.toSchema(data) },
+      data: { data: paymentParser.toCreateSchema(data) },
       session,
     });
 
-    return paymentIntentModel.toModel(resp.json.data);
+    return paymentParser.toModel(resp.json.data);
   }
 }

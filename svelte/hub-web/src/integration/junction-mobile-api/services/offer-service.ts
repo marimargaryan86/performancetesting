@@ -1,14 +1,13 @@
-import { parsePriceQuoteSchema } from "../parsers/offer";
-import {
-  createTripOfferPriceQuoteModel,
-  type CreateTripOfferPriceQuoteModel,
-  type TripOfferPriceQuoteIncludes,
-  type TripOfferPriceQuoteModel,
-  type TripOfferPriceQuoteSchema,
-} from "../schemas/offer";
 import JunctionMobileApiService from "./junction-mobile-api-service";
-import { parseIncluded } from "../parsers/included";
 import type { SessionModel } from "models/user";
+import {
+  tripOfferPriceQuoteParser,
+  type TripOfferPriceQuoteCreate,
+  type TripOfferPriceQuote,
+  type TripOfferPriceQuoteSchema,
+} from "../schemas/trip-offer-price-quote";
+import { parseIncluded, type IncludedSchemas } from "../schemas/included";
+import { JunctionError } from "integration/common/junction-error";
 
 export class OfferService extends JunctionMobileApiService {
   async createPriceQuote({
@@ -16,18 +15,17 @@ export class OfferService extends JunctionMobileApiService {
     data,
   }: {
     session: SessionModel;
-    data: CreateTripOfferPriceQuoteModel;
-  }): Promise<TripOfferPriceQuoteModel> {
+    data: TripOfferPriceQuoteCreate;
+  }): Promise<TripOfferPriceQuote> {
     const resp = await this.makeRequest<{ data: TripOfferPriceQuoteSchema }>("/offers/quotes", {
       method: "POST",
       data: {
-        data: createTripOfferPriceQuoteModel.toSchema(data),
+        data: tripOfferPriceQuoteParser.toCreateSchema(data),
       },
-      headers: { "Session-Token": data.sessionToken },
       session,
     });
 
-    return parsePriceQuoteSchema(resp.json.data);
+    return tripOfferPriceQuoteParser.toModel(resp.json.data);
   }
 
   async getPriceQuote({
@@ -36,10 +34,10 @@ export class OfferService extends JunctionMobileApiService {
   }: {
     session: SessionModel;
     id: string;
-  }): Promise<TripOfferPriceQuoteModel> {
+  }): Promise<TripOfferPriceQuote> {
     const resp = await this.makeRequest<{
       data: TripOfferPriceQuoteSchema;
-      included?: TripOfferPriceQuoteIncludes[];
+      included?: IncludedSchemas;
     }>(`/offers/quotes/${id}`, {
       queryParams: {
         include: [
@@ -56,8 +54,13 @@ export class OfferService extends JunctionMobileApiService {
       session,
     });
 
-    const included = parseIncluded(resp.json.included);
+    const parsed = parseIncluded([...(resp.json.included ?? []), resp.json.data]);
+    const priceQuote = parsed.tripOfferPriceQuotes?.find((item) => item.id === id);
 
-    return parsePriceQuoteSchema(resp.json.data, included);
+    if (!priceQuote) {
+      throw new JunctionError({ status: 404, statusText: "Not found" });
+    }
+
+    return priceQuote;
   }
 }

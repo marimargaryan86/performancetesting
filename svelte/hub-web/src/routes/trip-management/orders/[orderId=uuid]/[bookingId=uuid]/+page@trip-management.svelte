@@ -53,10 +53,10 @@
           <StatusBadge value={data.booking.status} />
         </div>
 
-        {#if data.booking.cancellationStatus}
+        {#if data.booking.cancellation?.status}
           <div class="status typography body-small bold">
             Cancellation status
-            <StatusBadge value={data.booking.cancellationStatus} />
+            <StatusBadge value={data.booking.cancellation.status} />
           </div>
         {/if}
       </div>

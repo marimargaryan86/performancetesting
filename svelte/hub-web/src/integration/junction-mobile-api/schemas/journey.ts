@@ -1,46 +1,67 @@
-import schemaModel, { type Infer } from "utils/schema-model";
-import { contactDetailsModel, orderModel, type OrderIdentifier, type OrderModel } from "./order";
-import { z } from "zod";
+import {
+  enhancedAddressDetailsParser,
+  type EnhancedAddressDetails,
+  type EnhancedAddressDetailsSchema,
+} from "integration/common/schemas/address";
+import type { IncludedMapping } from "./included";
+import type { Order, OrderSchema } from "./order";
 
-const journeyRelationships: z.ZodType<{
-  orders: { data: OrderIdentifier[] };
-}> = z.lazy(() =>
-  schemaModel.relationships({
-    orders: z.array(orderModel.identifier),
+export type ContactDetails = {
+  email: string;
+  address: Required<Omit<EnhancedAddressDetails, "state">>;
+  phone: string;
+};
+
+export type ContactDetailsSchema = {
+  email: string;
+  address: Required<Omit<EnhancedAddressDetailsSchema, "state">>;
+  phoneNumber: string;
+};
+
+export const contactDetailsParser = {
+  toModel: (data: ContactDetailsSchema): ContactDetails => ({
+    email: data.email,
+    address: enhancedAddressDetailsParser.toModel(data.address) as ContactDetails["address"],
+    phone: data.phoneNumber,
   }),
-);
-
-const journeyModelBase = z.object({
-  id: z.string(),
-  reference: z.string(),
-  contact: z.lazy(() => contactDetailsModel.model),
-});
-
-const journeyModelExt: z.ZodType<z.infer<typeof journeyModelBase> & { orders: OrderModel[] }> =
-  z.lazy(() =>
-    journeyModelBase.extend({
-      orders: z.array(orderModel.model),
-    }),
-  );
-
-export const journeyModel = schemaModel.create({
-  schema: z.object({
-    id: z.string(),
-    type: z.literal("journeys"),
-    attributes: z.object({
-      reference: z.string(),
-      contactDetails: z.lazy(() => contactDetailsModel.schema),
-    }),
-    relationships: journeyRelationships,
-    links: schemaModel.links({ self: true }),
+  toSchema: (data: ContactDetails): ContactDetailsSchema => ({
+    email: data.email,
+    address: enhancedAddressDetailsParser.toSchema(data.address) as ContactDetailsSchema["address"],
+    phoneNumber: data.phone,
   }),
-  model: journeyModelExt,
-  toModel: (data): z.infer<typeof journeyModelExt> => ({
-    id: data.id,
-    reference: data.attributes.reference,
-    contact: contactDetailsModel.toModel(data.attributes.contactDetails),
-    orders: [],
-  }),
-});
-export type JourneyModel = Infer<typeof journeyModel>;
-export type JourneySchema = Infer<typeof journeyModel, "schema">;
+};
+
+export type Journey = {
+  id: string;
+  reference: string;
+  contact: ContactDetails;
+  orderIds: string[];
+  orders: Order[];
+};
+
+export type JourneySchema = {
+  id: string;
+  type: "journeys";
+  attributes: {
+    reference: string;
+    contactDetails: ContactDetailsSchema;
+  };
+  relationships: {
+    orders: { data: Pick<OrderSchema, "id" | "type">[] };
+  };
+  links: { self: string };
+};
+
+export const journeyParser = {
+  toModel: (data: JourneySchema, included?: IncludedMapping): Journey => {
+    const orderIds = data.relationships.orders.data.map(({ id }) => id);
+
+    return {
+      id: data.id,
+      reference: data.attributes.reference,
+      contact: contactDetailsParser.toModel(data.attributes.contactDetails),
+      orderIds,
+      orders: included?.orders?.filter(({ id }) => orderIds.includes(id)) ?? [],
+    };
+  },
+};

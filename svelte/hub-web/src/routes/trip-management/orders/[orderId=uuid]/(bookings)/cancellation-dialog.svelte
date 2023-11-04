@@ -2,9 +2,9 @@
   import AlertIcon from "components/icons/alert-icon.svelte";
   import Backdrop from "components/ui/backdrop.svelte";
   import Ticket from "../../../components/ticket.svelte";
-  import type { BookingModel } from "integration/junction-mobile-api/schemas/booking";
+  import type { TripBooking } from "integration/junction-mobile-api/schemas/booking";
   import Passengers from "../../../components/passengers.svelte";
-  import type { OrderPassengerModel } from "integration/junction-mobile-api/schemas/order";
+  import type { OrderPassenger } from "integration/junction-mobile-api/schemas/order";
   import Itinerary from "../../../components/itinerary.svelte";
   import Button from "components/ui/button.svelte";
   import PhoneIcon from "components/icons/phone-icon.svelte";
@@ -18,12 +18,12 @@
   import { createEventDispatcher } from "svelte";
 
   export let orderId: string;
-  export let passengers: OrderPassengerModel[];
+  export let passengers: OrderPassenger[];
 
   const dispatch = createEventDispatcher<{ success: void }>();
 
   let backdrop: Backdrop | undefined;
-  let booking: BookingModel | undefined = undefined;
+  let booking: TripBooking | undefined = undefined;
   let state: "info" | "rules" | "confirm" | "done" | "failed";
 
   $: reservationNo = booking?.operatorBookingReferences.length
@@ -71,13 +71,18 @@
     state = result ? "done" : "failed";
 
     if (result && booking) {
-      booking.cancellationStatus = "pending";
+      booking.cancellation = {
+        bookingId: booking.id,
+        id: "",
+        status: "pending",
+        booking,
+      };
 
       dispatch("success");
     }
   }
 
-  export function open(nextBooking: BookingModel): void {
+  export function open(nextBooking: TripBooking): void {
     booking = nextBooking;
     state = "info";
     backdrop?.open();

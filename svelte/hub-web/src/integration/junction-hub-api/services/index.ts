@@ -6,7 +6,8 @@ import BalanceService from "./balance-service";
 import CurrencyService from "./currency-service";
 import BeneficiaryService from "./beneficiary-service";
 import BookingService from "./booking-service";
-import { BillService } from "./bill-service";
+import BillService from "./bill-service";
+import JourneyService from "./journey-service";
 
 export default {
   AccountService,
@@ -18,4 +19,5 @@ export default {
   BeneficiaryService,
   BookingService,
   BillService,
+  JourneyService,
 };

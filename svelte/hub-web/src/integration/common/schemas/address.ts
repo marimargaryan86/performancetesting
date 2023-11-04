@@ -54,6 +54,6 @@ export const enhancedAddressDetailsParser = {
     ...addressParser.toSchema(data),
     postalCode: data.postalCode,
     city: data.city,
-    state: "city" in data ? data.city ?? null : undefined,
+    state: "state" in data ? data.state ?? null : undefined,
   }),
 };

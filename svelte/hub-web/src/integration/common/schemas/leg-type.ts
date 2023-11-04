@@ -1,10 +1,10 @@
 export type LegType = {
-  id: string;
+  id: "unspecified" | "air" | "rail";
   name: string;
 };
 
 export type LegTypeSchema = {
-  id: string;
+  id: "unspecified" | "air" | "rail";
   type: "leg-types";
   attributes: {
     name: string;

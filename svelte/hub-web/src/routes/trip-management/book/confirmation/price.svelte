@@ -1,12 +1,15 @@
 <script lang="ts">
   import { formatAmount } from "formatting/currency";
-  import type { PriceModel } from "integration/junction-mobile-api/schemas/price";
-  import type { BookingModel } from "integration/junction-mobile-api/schemas/booking";
+  import type { Price } from "integration/common/schemas/price";
+  import type { TripBooking } from "integration/junction-mobile-api/schemas/booking";
 
-  export let bookings: BookingModel[];
+  export let bookings: TripBooking[];
 
-  $: totalPrice = bookings.reduce<PriceModel>(
-    (prev, curr) => ({ currency: curr.price.currency, amount: prev.amount + curr.price.amount }),
+  $: totalPrice = bookings.reduce<Price>(
+    (prev, curr) => ({
+      currency: curr.price.total.currency,
+      amount: prev.amount + curr.price.total.amount,
+    }),
     { amount: 0, currency: "EUR" },
   );
 </script>

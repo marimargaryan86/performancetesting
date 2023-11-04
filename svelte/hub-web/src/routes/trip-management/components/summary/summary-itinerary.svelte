@@ -1,13 +1,13 @@
 <script lang="ts" context="module">
   export type OrigDestLegs = {
-    originLeg: OfferSegmentLegModel;
-    destinationLeg: OfferSegmentLegModel;
+    originLeg: OfferSegmentLeg;
+    destinationLeg: OfferSegmentLeg;
   };
 
-  function getLegs(priceQuote: TripOfferPriceQuoteModel): OfferSegmentLegModel[] {
+  function getLegs(priceQuote: TripOfferPriceQuote): OfferSegmentLeg[] {
     return (
       priceQuote.offer?.groups
-        .flatMap((group) => group.details.flatMap((details) => details.legs))
+        .flatMap((group) => group.detailsList.flatMap((details) => details.legs))
         .filter(ensureDefined)
         .sort((a, b) => a.departureAt.getTime() - b.departureAt.getTime()) ?? []
     );
@@ -15,17 +15,15 @@
 </script>
 
 <script lang="ts">
-  import type {
-    OfferSegmentLegModel,
-    TripOfferPriceQuoteModel,
-  } from "integration/junction-mobile-api/schemas/offer";
   import { formatDuration } from "formatting/date-time";
   import { getTimeDeltaS } from "utils/date-time";
   import Collapsible from "../collapsible.svelte";
   import { ensureDefined } from "utils/array";
   import { createEventDispatcher } from "svelte";
+  import type { TripOfferPriceQuote } from "integration/junction-mobile-api/schemas/trip-offer-price-quote";
+  import type { OfferSegmentLeg } from "integration/common/schemas/offer-segment-leg";
 
-  export let priceQuote: TripOfferPriceQuoteModel;
+  export let priceQuote: TripOfferPriceQuote;
 
   const dispatch = createEventDispatcher<{ showFareRules: void }>();
 

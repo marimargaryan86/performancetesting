@@ -47,11 +47,11 @@
   import SelectField from "components/ui/select-field.svelte";
   import TextField from "components/ui/text-field.svelte";
   import { formatAmount } from "formatting/currency";
-  import type { TripOfferPriceQuoteModel } from "integration/junction-mobile-api/schemas/offer";
-  import type { CreateOrderMarkupsModel } from "integration/junction-mobile-api/schemas/order";
+  import type { TripOfferPriceQuote } from "integration/junction-mobile-api/schemas/trip-offer-price-quote";
+  import type { MarkupsCreate } from "integration/junction-mobile-api/schemas/markups";
 
-  export let priceQuote: TripOfferPriceQuoteModel | undefined = undefined;
-  export let orderMarkups: CreateOrderMarkupsModel;
+  export let priceQuote: TripOfferPriceQuote | undefined = undefined;
+  export let orderMarkups: MarkupsCreate;
   let collapsible: Collapsible | undefined;
   let serviceFeeType: FeeType;
   let agencyMarkupType: FeeType;
@@ -71,8 +71,8 @@
       : "";
   }
 
-  $: totalPrice = priceQuote?.price ?? { currency, amount: 0 };
-  $: currency = priceQuote?.price?.currency ?? FALLBACK_CURRENCY;
+  $: totalPrice = priceQuote?.price.total ?? { currency, amount: 0 };
+  $: currency = priceQuote?.price.total?.currency ?? FALLBACK_CURRENCY;
   $: serviceFeeType = feeType.Enum["flat-rate"];
   $: serviceFeeAmount = 0;
   $: agencyMarkupType = feeType.Enum["flat-rate"];

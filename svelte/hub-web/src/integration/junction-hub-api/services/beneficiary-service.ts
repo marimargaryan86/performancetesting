@@ -12,16 +12,18 @@ export default class BeneficiaryService extends JunctionHubApiService {
   async listBeneficiaries({
     session,
     cursor,
+    limit = 100,
   }: {
     session: SessionModel;
     cursor?: string;
+    limit?: number;
   }): Promise<PaginatedData<Beneficiary>> {
     const resp = await this.makeRequest<{
       data: BeneficiarySchema[];
       links: { next: string };
     }>("/beneficiaries", {
       session,
-      queryParams: { "page[cursor]": cursor },
+      queryParams: { "page[cursor]": cursor, "page[limit]": limit },
     });
 
     return {

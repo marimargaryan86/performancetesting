@@ -5,19 +5,17 @@ import type { SessionModel } from "models/user";
 import integrationInstances from "integration-instances";
 import type { BookingSessionModel } from "./trip-management";
 import { getRandomAlphaNumericString } from "utils/random";
-import type { CreateTripCandidatesSearchModel } from "integration/junction-mobile-api/schemas/trip";
+import type { TripCandidateSearchCreate } from "integration/junction-mobile-api/schemas/trip-candidate";
 import { getMinDate } from "utils/date-time";
 import utils from "./utils.server";
 import type { MaybePromise } from "@sveltejs/kit";
-import type {
-  CreateOrderMarkupsModel,
-  CreateOrderModel,
-} from "integration/junction-mobile-api/schemas/order";
+import type { OrderCreate } from "integration/junction-mobile-api/schemas/order";
 import { z } from "zod";
+import type { MarkupsCreate } from "integration/junction-mobile-api/schemas/markups";
 
 function parsePassengers(
   passengers: NonNullable<BookingSessionModel["searchData"]>["passengers"],
-): CreateTripCandidatesSearchModel["passengers"] {
+): TripCandidateSearchCreate["passengers"] {
   const adult = new Date();
   adult.setFullYear(adult.getFullYear() - 30);
   const child = new Date();
@@ -26,9 +24,9 @@ function parsePassengers(
   infant.setFullYear(infant.getFullYear() - 1);
 
   return [
-    ...Array(passengers.adults).fill({ dateOfBirth: adult }),
-    ...Array(passengers.children).fill({ dateOfBirth: child }),
-    ...Array(passengers.infants).fill({ dateOfBirth: infant }),
+    ...Array(passengers.adults).fill({ birthDate: adult }),
+    ...Array(passengers.children).fill({ birthDate: child }),
+    ...Array(passengers.infants).fill({ birthDate: infant }),
   ];
 }
 
@@ -88,7 +86,7 @@ async function getTripCandidates(
     data: {
       sessionToken,
       passengers: parsePassengers(searchData.passengers),
-      allowedLegTypeIds: ["rail"],
+      allowedSegmentTypes: ["rail"],
       criteria: [{ ...searchData, departureAfter: searchData.outbound }],
     },
   });
@@ -104,10 +102,11 @@ async function getOffers(session: SessionModel, event: RequestEvent): Promise<Re
     sessionToken,
     tripCandidates: bookingSession.tripCandidates,
   });
-  const offers = await integrationInstances.junctionMobileApi.trips.getTripCandidatesOffers({
-    session,
-    id: tripCandidates.id,
-  });
+  const { data: offers } =
+    await integrationInstances.junctionMobileApi.trips.getTripCandidatesOffers({
+      session,
+      id: tripCandidates.id,
+    });
 
   utils.setBookingSession(
     {
@@ -207,13 +206,13 @@ async function getPaymentIntent(session: SessionModel, event: RequestEvent): Pro
       id: bookingSession.priceQuote?.id,
     });
 
-    if (!priceQuote.price) {
+    if (!priceQuote.price.total) {
       throw new Error();
     }
 
     const paymentIntent = await integrationInstances.junctionMobileApi.payments.createPayment({
       session,
-      data: priceQuote.price,
+      data: priceQuote.price.total,
     });
 
     utils.setBookingSession({ ...bookingSession, paymentIntent }, event);
@@ -241,7 +240,7 @@ function confirmPayment(event: RequestEvent): Response {
 
 async function createOrder(session: SessionModel, event: RequestEvent): Promise<Response> {
   const bookingSession = utils.getBookingSession(event);
-  const data: CreateOrderModel = devalue.parse(await event.request.text());
+  const data: OrderCreate = devalue.parse(await event.request.text());
 
   try {
     const order = await integrationInstances.junctionMobileApi.orders.createOrder({
@@ -262,7 +261,7 @@ async function createOrder(session: SessionModel, event: RequestEvent): Promise<
 
 async function createOrderMarkups(session: SessionModel, event: RequestEvent): Promise<Response> {
   const bookingSession = utils.getBookingSession(event);
-  const data: CreateOrderMarkupsModel = devalue.parse(await event.request.text());
+  const data: MarkupsCreate = devalue.parse(await event.request.text());
 
   try {
     const orderMarkups = await integrationInstances.junctionMobileApi.orders.createOrderMarkups({

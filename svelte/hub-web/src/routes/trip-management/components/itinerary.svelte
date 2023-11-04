@@ -1,13 +1,13 @@
 <script lang="ts" context="module">
-  function getOrigDestLegs(booking: BookingModel):
+  function getOrigDestLegs(booking: TripBooking):
     | {
-        originLeg: OfferSegmentLegModel;
-        destinationLeg: OfferSegmentLegModel;
+        originLeg: OfferSegmentLeg;
+        destinationLeg: OfferSegmentLeg;
       }
     | undefined {
-    const originLegs = booking.details[0]?.legs;
+    const originLegs = booking.detailsList[0]?.legs;
     const originLeg = originLegs?.[0];
-    const destinationLegs = booking.details[booking.details.length - 1]?.legs;
+    const destinationLegs = booking.detailsList[booking.detailsList.length - 1]?.legs;
     const destinationLeg = destinationLegs?.[destinationLegs.length - 1];
 
     if (originLeg && destinationLeg) {
@@ -24,10 +24,10 @@
   import { getTimeDeltaS } from "utils/date-time";
   import SeatIcon from "components/icons/seat-icon.svelte";
   import EntityAvatar from "components/ui/entity-avatar.svelte";
-  import type { OfferSegmentLegModel } from "integration/junction-mobile-api/schemas/offer";
-  import type { BookingModel } from "integration/junction-mobile-api/schemas/booking";
+  import type { TripBooking } from "integration/junction-mobile-api/schemas/booking";
+  import type { OfferSegmentLeg } from "integration/common/schemas/offer-segment-leg";
 
-  export let bookings: BookingModel[];
+  export let bookings: TripBooking[];
 </script>
 
 <div class="itinerary">
@@ -35,9 +35,9 @@
 
   {#each bookings as booking}
     {@const origDestLegs = getOrigDestLegs(booking)}
-    {@const cabinClasses = booking.details.map((item) => item.cabinClassName)}
-    {@const vendor = booking.details[0]?.vendor}
-    {@const segmentCount = booking.details.length}
+    {@const cabinClasses = booking.detailsList.map((item) => item.cabinClassName)}
+    {@const vendor = booking.detailsList[0]?.vendor}
+    {@const segmentCount = booking.detailsList.length}
 
     {#if origDestLegs}
       {@const { originLeg, destinationLeg } = origDestLegs}

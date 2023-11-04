@@ -3,7 +3,7 @@ import JunctionHubApiService from "./junction-hub-api-service";
 import type { PaginatedData } from "models/common";
 import { billParser, type Bill, type BillSchema } from "../schemas/bill";
 
-export class BillService extends JunctionHubApiService {
+export default class BillService extends JunctionHubApiService {
   async listBills({
     session,
     cursor,

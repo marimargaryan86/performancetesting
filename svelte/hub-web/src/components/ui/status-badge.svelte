@@ -1,14 +1,21 @@
 <script lang="ts" context="module">
-  import type { BookingStatus } from "integration/junction-mobile-api/schemas/booking";
-
   export type StatusBadgeVariant = "ok" | "warn" | "error";
   export type StatusBadgeValue =
-    | BookingStatus
+    | "confirmed"
+    | "error"
+    | "rejected"
+    | "no-refund"
+    | "refund-due"
+    | "refund-issue"
+    | "pending"
+    | "not-ticketed"
+    | "cancelled"
     | "unspecified"
     | "executed"
     | "failed"
     | "completed"
     | "deleted"
+    | "mixed"
     | "unknown";
 
   const statusMapping: Record<StatusBadgeValue, StatusBadgeVariant> = {
@@ -20,7 +27,11 @@
     deleted: "error",
     failed: "error",
     pending: "warn",
+    "no-refund": "warn",
+    "refund-due": "warn",
+    "refund-issue": "warn",
     "not-ticketed": "warn",
+    mixed: "warn",
     cancelled: "warn",
     unspecified: "warn",
     unknown: "warn",

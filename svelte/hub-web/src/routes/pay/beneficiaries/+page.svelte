@@ -14,31 +14,36 @@
   import routeConfig from "routeConfig";
   import TActionsCol from "components/ui/table/t-actions-col.svelte";
   import StandardLayout from "components/page/standard-layout.svelte";
+  import type { ScrollLoadFunc } from "directives/scroll-load";
+  import type { PaginatedData } from "models/common";
+  import type { Beneficiary } from "integration/junction-hub-api/schemas/beneficiary";
 
   export let data;
-  export let form;
 
   $: beneficiaries = data.beneficiaries.data;
 
-  async function loadMore(): Promise<void> {
+  const loadMore: ScrollLoadFunc = async () => {
     if (!data.beneficiaries.cursor) {
-      return;
+      return { depleted: true };
     }
 
-    await callAction({
+    const result = await callAction<{ beneficiaries: PaginatedData<Beneficiary> }>({
       action: routeConfig.routes.pay.routes.beneficiaries.actions.listBeneficiaries,
-      data: {
-        cursor: data.beneficiaries.cursor,
-      },
+      data: { cursor: data.beneficiaries.cursor },
+      apply: false,
     });
 
-    if (form?.beneficiaries) {
+    if (result.type === "success" && result.data) {
       data.beneficiaries = {
-        cursor: form.beneficiaries.cursor,
-        data: [...data.beneficiaries.data, ...form.beneficiaries.data],
+        cursor: result.data.beneficiaries.cursor,
+        data: [...data.beneficiaries.data, ...result.data.beneficiaries.data],
       };
+
+      return { depleted: !data.beneficiaries.cursor };
     }
-  }
+
+    return { depleted: true };
+  };
 
   function remove(): void {
     if (!confirm("Are you sure you want to delete this beneficiary?")) {

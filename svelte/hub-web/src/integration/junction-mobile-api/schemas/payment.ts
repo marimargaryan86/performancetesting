@@ -1,37 +1,53 @@
+import { priceParser, type Price, type PriceSchema } from "integration/common/schemas/price";
 import { z } from "zod";
-import { priceModel } from "./price";
-import schemaModel, { type Infer } from "utils/schema-model";
 
-export const paymentIntentModel = schemaModel.create({
-  schema: z.object({
-    id: z.string(),
-    type: z.literal("payments"),
-    attributes: z.object({
-      clientSecret: z.string(),
-      ephemeralKey: z.string().optional(),
-      customerId: z.string().optional(),
-    }),
-  }),
-  model: z.object({
-    id: z.string(),
-    clientSecret: z.string(),
-    ephemeralKey: z.string().optional(),
-    customerId: z.string().optional(),
-  }),
-  toModel: (data) => ({ ...data, ...data.attributes }),
+export const paymentModel = z.object({
+  id: z.string(),
+  clientSecret: z.string(),
+  ephemeralKey: z.string().optional(),
+  customerId: z.string().optional(),
 });
-export type PaymentIntentModel = Infer<typeof paymentIntentModel>;
-export type PaymentIntentSchema = Infer<typeof paymentIntentModel, "schema">;
 
-export const createPaymentIntentModel = schemaModel.create({
-  schema: z.object({
-    type: z.literal("payments"),
-    attributes: priceModel.schema,
+export type Payment = z.infer<typeof paymentModel>;
+
+export type PaymentSchema = {
+  id: string;
+  type: "payments";
+  attributes: {
+    clientSecret: string;
+    ephemeralKey?: string;
+    customerId?: string;
+  };
+};
+
+export type PaymentCreateSchema = Pick<PaymentSchema, "type"> & {
+  attributes: PriceSchema;
+};
+
+export const paymentParser = {
+  toModel: (data: PaymentSchema): Payment => ({
+    id: data.id,
+    clientSecret: data.attributes.clientSecret,
+    ephemeralKey: data.attributes.ephemeralKey,
+    customerId: data.attributes.customerId,
   }),
-  model: priceModel.model,
-  toSchema: (data) =>
-    ({
-      type: "payments",
-      attributes: priceModel.toSchema(data),
-    } as const),
-});
+  toCreateSchema: (data: Price): PaymentCreateSchema => ({
+    type: "payments",
+    attributes: priceParser.toSchema(data),
+  }),
+};
+
+export type Voucher = {
+  id: string;
+};
+
+export type VoucherSchema = {
+  id: string;
+  type: "vouchers";
+};
+
+export const voucherParser = {
+  toModel: (data: VoucherSchema): Voucher => ({
+    id: data.id,
+  }),
+};

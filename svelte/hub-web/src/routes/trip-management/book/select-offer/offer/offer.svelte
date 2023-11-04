@@ -7,10 +7,10 @@
     });
   }
 
-  function getTotalPrice(options: OfferOptionModel[]): PriceModel {
-    return options.reduce<PriceModel>(
-      (prev, curr) => (prev.amount < curr.price.amount ? prev : curr.price),
-      options[0]?.price ?? { amount: 0, currency: "EUR" },
+  function getTotalPrice(options: OfferOption[]): Price {
+    return options.reduce<Price>(
+      (prev, curr) => (prev.amount < curr.price.total.amount ? prev : curr.price.total),
+      options[0]?.price.total ?? { amount: 0, currency: "EUR" },
     );
   }
 </script>
@@ -23,11 +23,11 @@
   import AlternativeFares from "./alternative-fares.svelte";
   import { createEventDispatcher } from "svelte";
   import { getTimeDeltaS } from "utils/date-time";
-  import type { OfferModel, OfferOptionModel } from "integration/junction-mobile-api/schemas/offer";
-  import type { PriceModel } from "integration/junction-mobile-api/schemas/price";
+  import type { Offer, OfferOption } from "integration/junction-mobile-api/schemas/offer";
+  import type { Price } from "integration/common/schemas/price";
   import { ensureDefined } from "utils/array";
 
-  export let offer: OfferModel;
+  export let offer: Offer;
   export let selectedOptionIds: string[] | undefined;
   export let selected: boolean;
 
@@ -53,7 +53,7 @@
     dispatch("select", { offerId: offer.id, optionIds: selectedOptions.map((item) => item.id) });
   }
 
-  function selectOption(event: CustomEvent<OfferOptionModel>): void {
+  function selectOption(event: CustomEvent<OfferOption>): void {
     const nextSelectedOptions = offer.groups
       .map((group) => {
         if (group.options.find((option) => option.id === event.detail.id)) {
@@ -75,8 +75,8 @@
 
 <div class="offer" class:selected>
   {#each offer.groups as group, groupIdx}
-    {@const vendor = group.details[0]?.vendor ?? "Unknown"}
-    {@const stopCount = group.details[0]?.legs.length ?? 1}
+    {@const vendor = group.detailsList[0]?.vendor ?? "Unknown"}
+    {@const stopCount = group.detailsList[0]?.legs.length ?? 1}
 
     <div class="group">
       <div class="header typography label-medium">
@@ -90,7 +90,7 @@
 
       <div class="info">
         <div class="segments">
-          {#each group.details as details}
+          {#each group.detailsList as details}
             <span class="typography body-small">
               {details.legs[0]?.departureAt.toLocaleDateString("en-GB", {
                 month: "long",

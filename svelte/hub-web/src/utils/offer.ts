@@ -1,31 +1,31 @@
-import type { PriceBreakdownModel } from "integration/junction-mobile-api/schemas/price";
+import type { PriceBreakdown } from "integration/common/schemas/price";
 import { ensureDefined } from "./array";
 import { getMaxDate, getMinDate, getTimeDeltaMs } from "./date-time";
-import type {
-  OfferModel,
-  TripOfferPriceQuoteModel,
-} from "integration/junction-mobile-api/schemas/offer";
+import type { Offer } from "integration/junction-mobile-api/schemas/offer";
 import { summarizePrices } from "./money";
+import type { TripOfferPriceQuote } from "integration/junction-mobile-api/schemas/trip-offer-price-quote";
 
-export function getLowestPrice(offer: OfferModel): number {
+export function getLowestPrice(offer: Offer): number {
   return Math.min(
-    ...offer.groups.flatMap((group) => group.options.flatMap((option) => option.price.amount)),
+    ...offer.groups.flatMap((group) =>
+      group.options.flatMap((option) => option.price.total.amount),
+    ),
   );
 }
 
-export function getMinStopCount(offer: OfferModel): number {
-  return Math.min(...offer.groups.flatMap((group) => group.details.length));
+export function getMinStopCount(offer: Offer): number {
+  return Math.min(...offer.groups.flatMap((group) => group.detailsList.length));
 }
 
-export function getMinLegCount(offer: OfferModel): number {
+export function getMinLegCount(offer: Offer): number {
   return Math.min(
-    ...offer.groups.flatMap((group) => group.details.flatMap((details) => details.legs.length)),
+    ...offer.groups.flatMap((group) => group.detailsList.flatMap((details) => details.legs.length)),
   );
 }
 
-export function getOfferDurationMs(offer: OfferModel): number {
+export function getOfferDurationMs(offer: Offer): number {
   const dates = offer.groups.flatMap((group) =>
-    group.details.flatMap((details) =>
+    group.detailsList.flatMap((details) =>
       details.legs.flatMap((leg) => [leg.arrivalAt, leg.departureAt]),
     ),
   );
@@ -35,43 +35,43 @@ export function getOfferDurationMs(offer: OfferModel): number {
   return getTimeDeltaMs(departureAt, arrivalAt);
 }
 
-export function getOfferDurationS(offer: OfferModel): number {
+export function getOfferDurationS(offer: Offer): number {
   return Math.floor(getOfferDurationMs(offer) / 1000);
 }
 
-export function getOfferDurationM(offer: OfferModel): number {
+export function getOfferDurationM(offer: Offer): number {
   return Math.floor(getOfferDurationS(offer) / 60);
 }
 
-export function getEarliestArrival(offer: OfferModel): Date {
+export function getEarliestArrival(offer: Offer): Date {
   const arrivals = offer.groups.flatMap((group) =>
-    group.details.flatMap((details) => details.legs.map((leg) => leg.arrivalAt)),
+    group.detailsList.flatMap((details) => details.legs.map((leg) => leg.arrivalAt)),
   );
 
   return getMinDate(...arrivals);
 }
 
-export function getEarliestDeparture(offer: OfferModel): Date {
+export function getEarliestDeparture(offer: Offer): Date {
   const departures = offer.groups.flatMap((group) =>
-    group.details.flatMap((details) => details.legs.map((leg) => leg.departureAt)),
+    group.detailsList.flatMap((details) => details.legs.map((leg) => leg.departureAt)),
   );
 
   return getMinDate(...departures);
 }
 
-export function getVendors(offer: OfferModel): string[] {
+export function getVendors(offer: Offer): string[] {
   return Array.from(
-    new Set(offer.groups.flatMap((group) => group.details.flatMap((details) => details.vendor))),
+    new Set(
+      offer.groups.flatMap((group) => group.detailsList.flatMap((details) => details.vendor)),
+    ),
   ).filter(ensureDefined);
 }
 
-export function getTotalPriceBreakdown(
-  priceQuote: TripOfferPriceQuoteModel,
-): PriceBreakdownModel[] {
+export function getTotalPriceBreakdown(priceQuote: TripOfferPriceQuote): PriceBreakdown[] {
   return priceQuote.options
-    .flatMap((option) => option.priceBreakdown)
+    .flatMap((option) => option.price.breakdown)
     .filter(ensureDefined)
-    .reduce<PriceBreakdownModel[]>((prev, curr) => {
+    .reduce<PriceBreakdown[]>((prev, curr) => {
       const existing = prev.find((pb) => pb.type === curr.type);
 
       if (existing) {

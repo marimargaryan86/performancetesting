@@ -13,9 +13,10 @@
   import TMoneyCol from "components/ui/table/t-money-col.svelte";
   import type { TripBooking } from "integration/junction-hub-api/schemas/booking";
   import type { Transaction } from "integration/junction-hub-api/schemas/transaction";
+  import type { ScrollLoadFunc } from "directives/scroll-load";
+  import type { PaginatedData } from "models/common";
 
   export let data;
-  export let form;
 
   let selectedTransaction: Transaction | undefined = undefined;
   let bookingRequest: Promise<TripBooking | undefined> | undefined = undefined;
@@ -35,33 +36,41 @@
     bookingRequest = undefined;
   }
 
-  async function loadMore(): Promise<void> {
+  const loadMore: ScrollLoadFunc = async () => {
     if (!data.transactions.cursor) {
-      return;
+      return { depleted: true };
     }
 
-    await callAction({
+    const result = await callAction<{ transactions: PaginatedData<Transaction> }>({
       action: routeConfig.routes.pay.routes.activity.actions.listTransactions,
-      data: {
-        cursor: data.transactions.cursor,
-      },
+      data: { cursor: data.transactions.cursor },
+      apply: false,
     });
 
-    if (form?.transactions) {
+    if (result.type === "success" && result.data) {
       data.transactions = {
-        cursor: form.transactions.cursor,
-        data: [...data.transactions.data, ...form.transactions.data],
+        cursor: result.data.transactions.cursor,
+        data: [...data.transactions.data, ...result.data.transactions.data],
       };
+
+      return { depleted: !result.data.transactions.cursor };
     }
-  }
+
+    return { depleted: true };
+  };
 
   async function getBooking(externalReference: string): Promise<TripBooking | undefined> {
-    await callAction({
+    const result = await callAction<{ booking: TripBooking }>({
       action: routeConfig.routes.pay.routes.activity.actions.getBooking,
       data: { bookingId: externalReference },
+      apply: false,
     });
 
-    return form?.booking;
+    if (result.type === "success") {
+      return result.data?.booking;
+    }
+
+    return undefined;
   }
 </script>
 

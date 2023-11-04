@@ -8,7 +8,11 @@ import {
   type TripBookingSchema,
   tripBookingParser,
 } from "./booking";
-import { cabinClassParser, type CabinClass, type CabinClassSchema } from "./cabin-class";
+import {
+  cabinClassParser,
+  type CabinClass,
+  type CabinClassSchema,
+} from "integration/common/schemas/cabin-class";
 import {
   bookingCancellationParser,
   type BookingCancellation,
@@ -19,7 +23,11 @@ import { contactParser, type Contact, type ContactSchema } from "./contact";
 import { conversionParser, type Conversion, type ConversionSchema } from "./conversion";
 import { currencyParser, type Currency, type CurrencySchema } from "./currency";
 import { journeyParser, type Journey, type JourneySchema } from "./journey";
-import { legTypeParser, type LegType, type LegTypeSchema } from "./leg-type";
+import {
+  legTypeParser,
+  type LegType,
+  type LegTypeSchema,
+} from "integration/common/schemas/leg-type";
 import { orderParser, type Order, type OrderSchema } from "./order";
 import { transactionParser, type Transaction, type TransactionSchema } from "./transaction";
 

@@ -1,10 +1,10 @@
 <script lang="ts">
   import CheckedIcon from "components/icons/checked-icon.svelte";
-  import type { OrderModel } from "integration/junction-mobile-api/schemas/order";
+  import { type Order, getOrderStatus } from "integration/junction-mobile-api/schemas/order";
   import Ticket from "../../components/ticket.svelte";
   import StatusBadge from "components/ui/status-badge.svelte";
 
-  export let order: OrderModel;
+  export let order: Order;
 </script>
 
 <div class="overview">
@@ -17,7 +17,7 @@
     </span>
     <div>
       <span class="typography body-xsmall">Status</span>
-      <StatusBadge value={order.status} />
+      <StatusBadge value={getOrderStatus.status(order)} />
     </div>
   </div>
 </div>

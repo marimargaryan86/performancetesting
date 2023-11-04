@@ -1,74 +1,71 @@
-import schemaModel, { type Infer } from "utils/schema-model";
-import { z } from "zod";
+import {
+  coordinatesParser,
+  type Coordinates,
+  type CoordinatesSchema,
+} from "integration/common/schemas/point";
 
-export const coordinatesModel = schemaModel.create({
-  schema: z.object({ latitude: z.number(), longitude: z.number() }),
-  model: z.object({ lat: z.number(), lon: z.number() }),
-  toModel: (data) => ({ lat: data.latitude, lon: data.longitude }),
-  toSchema: (data) => ({ latitude: data.lat, longitude: data.lon }),
-});
+export type PlaceType =
+  | "unspecified"
+  | "city"
+  | "railway-station"
+  | "airport"
+  | "bus-station"
+  | "ferry-port";
 
-export const coordinatesSearchableModel = schemaModel.create({
-  schema: coordinatesModel.schema.extend({
-    precision: z.enum(["area", "precise"]).optional(),
-  }),
-  model: coordinatesModel.model.extend({
-    precision: z.enum(["area", "precise"]).optional(),
-  }),
-  toModel: (data) => ({
-    ...coordinatesModel.toModel(data),
-    precision: data.precision,
-  }),
-  toSchema: (data) => ({
-    ...coordinatesModel.toSchema(data),
-    precision: data.precision,
-  }),
-});
+export type PlaceTypeSchema = {
+  id: "unspecified" | "city" | "railway-station" | "airport" | "bus-station" | "ferry-port";
+  type: "place-types";
+};
 
-export const placeModel = schemaModel.create({
-  schema: z.object({
-    id: z.string().uuid(),
-    type: z.literal("places"),
-    attributes: z.object({
-      name: z.string(),
-      latitude: z.number(),
-      longitude: z.number(),
-      countryCode: z.string(),
-      countryName: z.string().nullable().optional(),
-      timeZone: z.string(),
-      iataCode: z.string().nullable().optional(),
-      population: z.number().optional(),
-      minCity: z.string().optional(),
-    }),
-    relationships: schemaModel
-      .relationships({
-        types: z.array(z.object({ id: z.string(), type: z.literal("place-types") })),
-      })
-      .optional(),
-  }),
-  model: z.object({
-    id: z.string(),
-    types: z.array(z.string()),
-    name: z.string(),
-    coordinates: coordinatesModel.model,
-    timeZone: z.string(),
-    iataCode: z.string().optional(),
-    country: z.object({
-      code: z.string(),
-      name: z.string().optional(),
-    }),
-  }),
-  toModel: (data) => ({
-    ...data,
-    ...data.attributes,
-    iataCode: data.attributes.iataCode ?? undefined,
-    coordinates: coordinatesModel.toModel(data.attributes),
-    types: data.relationships?.types.data.map((item) => item.id) ?? [],
+export const placeTypeParser = {
+  toModel: (data: PlaceTypeSchema): PlaceType => data.id,
+};
+
+export type Place = {
+  id: string;
+  types: PlaceType[];
+  name: string;
+  coordinates: Coordinates;
+  country: {
+    code: string;
+    name?: string;
+  };
+  timeZone: string;
+  iataCode?: string;
+  population?: number;
+  mainCity?: string;
+};
+
+export type PlaceSchema = {
+  id: string;
+  type: "places";
+  attributes: CoordinatesSchema & {
+    name: string;
+    countryCode: string;
+    countryName?: string;
+    timeZone: string;
+    iataCode?: string;
+    population?: number;
+    mainCity?: string;
+  };
+  relationships: {
+    types: { data: Pick<PlaceTypeSchema, "id" | "type">[] };
+  };
+};
+
+export const placeParser = {
+  toModel: (data: PlaceSchema): Place => ({
+    id: data.id,
+    types: data.relationships.types.data.map(placeTypeParser.toModel),
+    name: data.attributes.name,
+    coordinates: coordinatesParser.toModel(data.attributes),
     country: {
       code: data.attributes.countryCode,
-      name: data.attributes.countryName ?? undefined,
+      name: data.attributes.countryName,
     },
+    timeZone: data.attributes.timeZone,
+    iataCode: data.attributes.iataCode,
+    population: data.attributes.population,
+    mainCity: data.attributes.mainCity,
   }),
-});
-export type PlaceModel = Infer<typeof placeModel>;
-export type PlaceSchema = Infer<typeof placeModel, "schema">;
+};

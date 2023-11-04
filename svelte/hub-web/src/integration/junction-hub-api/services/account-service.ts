@@ -7,15 +7,17 @@ export default class AccountService extends JunctionHubApiService {
   async listAccounts({
     session,
     cursor,
+    limit = 100,
   }: {
     session: SessionModel;
     cursor?: string;
+    limit?: number;
   }): Promise<PaginatedData<Account>> {
     const resp = await this.makeRequest<{ data: AccountSchema[]; links: { next: string } }>(
       "/accounts",
       {
         session,
-        queryParams: { "page[cursor]": cursor },
+        queryParams: { "page[cursor]": cursor, "page[limit]": limit },
       },
     );
 

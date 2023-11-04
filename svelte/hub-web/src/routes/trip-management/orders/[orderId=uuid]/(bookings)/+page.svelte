@@ -8,7 +8,7 @@
   import TMoneyCol from "components/ui/table/t-money-col.svelte";
   import TRow from "components/ui/table/t-row.svelte";
   import Table from "components/ui/table/table.svelte";
-  import type { BookingModel } from "integration/junction-mobile-api/schemas/booking";
+  import type { TripBooking } from "integration/junction-mobile-api/schemas/booking";
   import routeConfig from "routeConfig";
   import { getOrigin, getDestination } from "utils/booking";
   import CancellationDialog from "./cancellation-dialog.svelte";
@@ -18,7 +18,7 @@
 
   let cancellationDialog: CancellationDialog | undefined;
 
-  function cancelBooking(booking: BookingModel): void {
+  function cancelBooking(booking: TripBooking): void {
     cancellationDialog?.open(booking);
   }
 
@@ -84,18 +84,18 @@
             <span class="not-available">N/A</span>
           {/if}
         </TCol>
-        <TCol>{booking.details[0]?.legs[0]?.departureAt.toLocaleDateString("en-GB")}</TCol>
+        <TCol>{booking.detailsList[0]?.legs[0]?.departureAt.toLocaleDateString("en-GB")}</TCol>
         <TCol class="typography bold">{origin?.name ?? "Unknown"}</TCol>
         <TCol class="typography bold">{destination?.name ?? "Unknown"}</TCol>
-        <TMoneyCol money={booking.price} />
-        {#if booking.cancellationStatus}
-          <TStatusBadgeCol value={booking.cancellationStatus} />
+        <TMoneyCol money={booking.price.total} />
+        {#if booking.cancellation?.status}
+          <TStatusBadgeCol value={booking.cancellation.status} />
         {:else}
           <TCol width="0" />
         {/if}
         <TStatusBadgeCol value={booking.status} />
         <TActionsCol>
-          {#if booking.status === "confirmed" && !booking.cancellationStatus}
+          {#if booking.status === "confirmed" && !booking.cancellation?.status}
             <Button
               size="xx-small"
               variant="outline"
