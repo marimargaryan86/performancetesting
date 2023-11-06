@@ -36,6 +36,7 @@ from snowfall.project.junction.extensions.service.mobile_api import (
 )
 from snowfall.project.junction.extensions.service.mobile_api.routes import router
 from snowfall.project.junction.extensions.service.mobile_api.v1alpha import models_pb2
+from snowfall.project.junction.plus.adapter import flight_delay_predictor
 from snowfall.project.pay import fixtures as pay_fixtures
 from snowfall.project.pay.adapter import bills
 from snowfall.project.pay.service.transactions.v1alpha import (
@@ -361,6 +362,26 @@ def bills_client() -> bills.Client:
 
 
 @pytest.fixture()
+def predictions_client() -> flight_delay_predictor.Client:
+    return flight_delay_predictor.DictClient(
+        predictions=[
+            flight_delay_predictor.Prediction(
+                id="AA1002023-10-30T00:00:01Z",
+                flight_number="AA100",
+                scheduled_departure_at="2023-10-30T00:00:01Z",
+                delay=13.79,  # noqa: WPS432
+            ),
+            flight_delay_predictor.Prediction(
+                id="AA2002023-10-30T00:00:01Z",
+                flight_number="AA200",
+                scheduled_departure_at="2023-11-01T00:00:01Z",
+                delay=-12.75,  # noqa: WPS432
+            ),
+        ],
+    )
+
+
+@pytest.fixture()
 def plus_client() -> plus_http_client.Client:
     return plus_http_client.Client(base_url=junction_api_address)
 
@@ -399,6 +420,7 @@ def app(
     user_groups_repository: repository.UserGroupsRepository,
     markups_repository: repository.MarkupsRepository,
     bills_client: bills.Client,
+    predictions_client: flight_delay_predictor.Client,
 ) -> Iterator[applications.Starlette]:
     with spec.get_api_spec() as temp_spec_path:
         yield _create_app(
@@ -423,6 +445,7 @@ def app(
                 user_groups_repository,
                 markups_repository,
                 bills_client,
+                predictions_client,
             ),
             openapi_path=temp_spec_path,
             custom_middlewares=[

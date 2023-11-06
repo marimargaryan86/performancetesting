@@ -164,6 +164,11 @@
       "x-displayName": "Places"
     },
     {
+      "name": "predictions",
+      "description": "On Time Flight Prediction",
+      "x-displayName": "On Time Flight Prediction"
+    },
+    {
       "name": "preferences",
       "description": "Endpoints for user preferences.",
       "x-displayName": "Preferences"
@@ -2453,6 +2458,69 @@
         "operationId": "get-cancellations-requests-id",
         "description": "Used to lookup data for a Cancellation Request Identifier."
       }
+    },
+    "/flight-delay-prediction": {
+      "post": {
+        "tags": [
+          "predictions"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/FlightPrediction"
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "./../client_api/openapi.json#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Unauthorized"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/FlightPrediction"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "description": ""
+        },
+        "operationId": "post-flight-delay-prediction",
+        "description": "Get prediction of the flight delay in minutes",
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Get Flight Delay Prediction"
+      }
     }
   },
   "components": {
@@ -2673,6 +2741,51 @@
       }
     },
     "schemas": {
+      "FlightPrediction": {
+        "title": "Flight Delay Prediction",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "AA00012019-08-24T14:15:22Z",
+            "description": "Combination of the flightNumber and scheduledDepartureAt",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "flight-delay-prediction"
+            ],
+            "example": "flight-delay-prediction",
+            "readOnly": true
+          },
+          "attributes": {
+            "type": "object",
+            "properties": {
+              "flightNumber": {
+                "type": "string",
+                "example": "AA0001"
+              },
+              "scheduledDepartureAt": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2019-08-24T14:15:22Z"
+              },
+              "delay" : {
+                "type": "number",
+                "format": "float",
+                "example": 6.89,
+                "readOnly": true
+              }
+            },
+            "required": [
+              "flightNumber",
+              "scheduledDepartureAt",
+              "delay"
+            ]
+          }
+        }
+      },
       "ApplicableTo": {
         "title": "Applicable To",
         "type": "object",

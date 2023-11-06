@@ -104,6 +104,10 @@ job "mobile-api-http-res-se" {
               destination_name = "transactions-${var.environment}"
             }
             upstreams {
+              local_bind_port  = 8040
+              destination_name = "flight-prediction-${var.environment}"
+            }
+            upstreams {
               local_bind_port  = 8070
               destination_name = "client-api-${var.environment}"
             }
@@ -151,6 +155,7 @@ job "mobile-api-http-res-se" {
 JUNCTION_API_ADDRESS={{(printf "http://%s" (env "NOMAD_UPSTREAM_ADDR_client-api-${var.environment}"))}}
 PLUS_API_ADDRESS={{(printf "http://%s" (env "NOMAD_UPSTREAM_ADDR_plus-api-${var.environment}"))}}
 TRANSACTIONS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_transactions-${var.environment}"))}}
+FLIGHT_PREDICTION_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_flight-prediction-${var.environment}"))}}
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 SMTP_DSN={{range $index, $service := service "smtp"}}smtp://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}{{end}}

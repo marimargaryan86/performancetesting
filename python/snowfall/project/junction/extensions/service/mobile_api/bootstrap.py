@@ -13,6 +13,9 @@ from snowfall.project.junction.extensions.service.mobile_api import (
 from snowfall.project.junction.extensions.service.mobile_api import (
     plus_client as plus_poc_http_client,
 )
+from snowfall.project.junction.plus.adapter import (
+    flight_delay_predictor as flight_prediction_adapter,
+)
 from snowfall.project.pay.adapter import bills
 from snowfall.stdlib.integration.starlette import application
 from snowfall.vendor.junction.go import client as go_http_client
@@ -37,6 +40,7 @@ class Settings(application.Settings):
     otp_cache_ttl: datetime.timedelta = datetime.timedelta(minutes=2)
     smtp_dsn: AnyUrl
     mongo_dsn: Sequence[AnyUrl]
+    flight_prediction_address: str
     jwt_private_key: str
     jwt_token_version: str
     jwt_public_key: str
@@ -72,6 +76,7 @@ def create_dependencies(
     user_groups_repository: repository.UserGroupsRepository,
     markups_repository: repository.MarkupsRepository,
     bills_client: bills.Client,
+    predictions_client: flight_prediction_adapter.Client,
 ) -> lagom.Container:
     container = lagom.Container()
     container[repository.OrdersRepository] = orders_repository
@@ -94,4 +99,5 @@ def create_dependencies(
     container[repository.UserGroupsRepository] = user_groups_repository
     container[repository.MarkupsRepository] = markups_repository
     container[bills.Client] = bills_client  # type: ignore[type-abstract]
+    container[flight_prediction_adapter.Client] = predictions_client  # type: ignore[type-abstract]
     return container

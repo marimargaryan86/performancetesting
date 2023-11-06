@@ -27,6 +27,10 @@ from snowfall.project.junction.extensions.service.mobile_api import (
     plus_client as plus_poc_client,
 )
 from snowfall.project.junction.extensions.service.mobile_api.routes import router
+from snowfall.project.junction.plus.adapter import flight_delay_predictor
+from snowfall.project.junction.plus.service.flight_prediction.v1 import (
+    flight_prediction_pb2_grpc,
+)
 from snowfall.project.pay.adapter import bills
 from snowfall.project.pay.service.transactions.v1alpha import (
     grpc_pb2_grpc as transactions_pb2_grpc,
@@ -166,6 +170,16 @@ async def _http(
         app,
         app.settings.transactions_address,
     )
+    flight_prediction_channel = await grpc_factory.make_insecure_channel(
+        app,
+        app.settings.flight_prediction_address,
+    )
+    predictions_client = flight_delay_predictor.GrpcClient(
+        flight_prediction_pb2_grpc.FlightPredictionServiceStub(
+            flight_prediction_channel,
+        ),
+    )
+
     with spec.get_api_spec(cookie_auth=app.settings.cookie_auth_enabled) as spec_path:
         asgi_app = starlette.create_starlette_app(
             routes=router.get_routes(
@@ -222,6 +236,7 @@ async def _http(
                     plus_poc_client=plus_poc_http_client,
                     jwt_gen=jwt_gen,
                     httpx_client=junction_httpx_client,
+                    predictions_client=predictions_client,
                 ),
             ),
             custom_middlewares=custom_middlewares,

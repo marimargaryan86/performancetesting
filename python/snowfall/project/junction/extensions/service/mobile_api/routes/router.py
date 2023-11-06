@@ -13,6 +13,7 @@ from snowfall.project.junction.extensions.service.mobile_api.routes import (
     orders,
     payments,
     places,
+    predictions,
     preferences,
     quotes,
     trips,
@@ -133,6 +134,11 @@ def get_routes(
             "/push-notifications/tokens/{deviceToken}",
             notification_tokens.PushNotificationToken,
             name="PushNotificationToken",
+        ),
+        integration.route(
+            "/flight-delay-prediction",
+            predictions.Prediction,
+            name="Prediction",
         ),
         enums.CacheAndListEnum(
             dependencies[client.Client].list_cabin_classes,

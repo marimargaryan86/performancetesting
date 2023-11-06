@@ -8,6 +8,7 @@ from typing import Any, Literal
 from google.protobuf.json_format import MessageToDict
 
 from snowfall.project.junction.extensions.service.mobile_api.v1alpha import models_pb2
+from snowfall.project.junction.plus.adapter.flight_delay_predictor import Prediction
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import models
@@ -324,5 +325,22 @@ class MarkupResource(models.Resource):
                         type="orders",
                     ),
                 },
+            },
+        )
+
+
+class PredictionResource(models.Resource):
+    @classmethod
+    def from_dict(
+        cls,
+        prediction: Prediction,
+    ) -> PredictionResource:
+        return cls(
+            id=prediction.id,
+            type="flight-delay-prediction",
+            attributes={
+                "flightNumber": prediction.flight_number,
+                "scheduledDepartureAt": prediction.scheduled_departure_at,
+                "delay": prediction.delay,
             },
         )

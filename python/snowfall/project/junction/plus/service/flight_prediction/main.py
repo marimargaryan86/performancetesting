@@ -68,27 +68,28 @@ class _FlightPredictionService(
         context: aio.ServicerContext,
     ) -> flight_prediction_pb2.PredictFlightDelayInMinutesResponse:
         flight_stats = await self._flight_stats_client.get_flight_status(
-            carrier=request.career_code,
+            carrier=request.carrier_code,
             flight=request.flight_number,
             departure_at=protobuf.protobuf_to_datetime(
-                request.scheduled_departure_date_time,
+                request.scheduled_departure_at,
             ),
         )
 
         flight_statuses = flight_stats["flightStatuses"][0]
+        op_times = flight_statuses.get("operationalTimes", {})
+        scheduled_departure_at = op_times["scheduledGateDeparture"]["dateLocal"]
 
-        scheduled_departure_at = flight_statuses["operationalTimes"][
-            "scheduledGateDeparture"
-        ]["dateLocal"]
-        departure_off_ground = flight_statuses["operationalTimes"][
-            "scheduledRunwayDeparture"
-        ]["dateLocal"]
-        scheduled_arrival_at = flight_statuses["operationalTimes"][
-            "scheduledGateArrival"
-        ]["dateLocal"]
+        if op_times.get("scheduledRunwayDeparture"):
+            departure_off_ground = op_times["scheduledRunwayDeparture"]["dateLocal"]
+        else:
+            departure_off_ground = scheduled_departure_at
 
-        dep_country = flight_stats["appendix"]["airports"][0]["countryCode"]
-        arrival_country = flight_stats["appendix"]["airports"][1]["countryCode"]
+        scheduled_arrival_at = op_times["scheduledGateArrival"]["dateLocal"]
+        airports = flight_stats["appendix"]["airports"]
+        departure_airport = airports[0]
+        arrival_airport = airports[1]
+        dep_country = departure_airport["countryCode"]
+        arrival_country = arrival_airport["countryCode"]
 
         encoded_info = self._encoder.encode(
             encoder_models.FlightInfo(
