@@ -1,7 +1,7 @@
 import datetime
 
 from snowfall.project.junction.provider import notifications
-from snowfall.project.junction.service.providers.benerail.v1alpha import amqp_pb2
+from snowfall.project.junction.service.providers.benerail.v1 import amqp_pb2
 
 
 class BookingNotification(notifications.Notification):

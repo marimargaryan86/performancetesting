@@ -22,7 +22,7 @@ from snowfall.project.junction.service.providers.benerail import (
     helper_functions,
     helper_models,
 )
-from snowfall.project.junction.service.providers.benerail.v1alpha import amqp_pb2
+from snowfall.project.junction.service.providers.benerail.v1 import amqp_pb2
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout

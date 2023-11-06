@@ -18,6 +18,7 @@ IGNORED_UNSTABLE_RUNNABLES=(
 	"python/snowfall/project/junction/go/service/schedules:main"
 	"python/snowfall/project/junction/go/service/trips:main"
 	"python/snowfall/project/junction/service/providers/ask2go:main"
+	"python/snowfall/project/junction/service/providers/benerail:main"
 	"python/snowfall/project/junction/service/providers/distribusion:main"
 	"python/snowfall/project/junction/service/providers/duffel:main"
 	"python/snowfall/project/junction/service/providers/save_a_train:main"

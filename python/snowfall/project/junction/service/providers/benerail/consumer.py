@@ -17,7 +17,7 @@ from snowfall.project.junction.service.providers.benerail import (
     helper_functions,
     notifications,
 )
-from snowfall.project.junction.service.providers.benerail.v1alpha import (
+from snowfall.project.junction.service.providers.benerail.v1 import (
     amqp_pb2 as br_amqp_pb2,
 )
 from snowfall.stdlib import money

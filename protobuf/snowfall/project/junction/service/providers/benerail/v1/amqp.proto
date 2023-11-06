@@ -1,13 +1,13 @@
 syntax = "proto3";
 
-package snowfall.project.junction.service.providers.benerail.v1alpha;
+package snowfall.project.junction.service.providers.benerail.v1;
 
 import "google/protobuf/timestamp.proto";
 import "snowfall/project/junction/go/v1/models.proto";
 import "snowfall/stdlib/v1/date.proto";
 import "snowfall/stdlib/v1/datetime.proto";
 
-option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/providers/benerail/v1alpha";
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/providers/benerail/v1";
 
 message SearchCriteriaTask {
   repeated snowfall.project.junction.go.v1.Segment segments = 1;

@@ -8,7 +8,7 @@ from snowfall.project.junction.go.service.offers.v1 import (
 from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.project.junction.provider import segment_grouper
 from snowfall.project.junction.service.providers.benerail import train_stations
-from snowfall.project.junction.service.providers.benerail.v1alpha import amqp_pb2
+from snowfall.project.junction.service.providers.benerail.v1 import amqp_pb2
 from snowfall.stdlib import h3, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1 import date_pb2
