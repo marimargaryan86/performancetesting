@@ -1,4 +1,3 @@
-import asyncio
 import inspect
 from collections.abc import Mapping
 from json import dumps as json_dumps
@@ -292,7 +291,7 @@ class DuffelClient(object):
                     "Duffel-Version": self._version,
                 },
             )
-        except (httpx.HTTPError, asyncio.TimeoutError) as raw_exc:
+        except (TimeoutError, httpx.HTTPError) as raw_exc:
             raise errors.ServiceError(inspect.getdoc(raw_exc)) from raw_exc
 
         try:

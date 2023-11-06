@@ -1,4 +1,3 @@
-import asyncio
 import inspect
 from collections.abc import Sequence
 from typing import Any
@@ -308,7 +307,7 @@ class Ask2GoClient(object):
         if self._rate_limit_client:
             try:
                 await self._rate_limit_client.rate_limit(timeout=rate_limit_timeout)
-            except asyncio.TimeoutError as raw_exc:
+            except TimeoutError as raw_exc:
                 raise errors.AsyncTimeOutError(inspect.getdoc(raw_exc)) from raw_exc
         try:
             response = await self._http_client.request(

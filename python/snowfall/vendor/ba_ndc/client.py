@@ -256,7 +256,7 @@ class BaNdcClient(object):
                     for client in self._rate_limit_clients
                 ),
             )
-        except asyncio.TimeoutError as timeout_exc:
+        except TimeoutError as timeout_exc:
             raise errors.AsyncTimeOutError(inspect.getdoc(timeout_exc)) from timeout_exc
 
         try:

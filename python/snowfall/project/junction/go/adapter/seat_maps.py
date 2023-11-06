@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import abc
-import asyncio
 from collections.abc import Sequence
 
 from snowfall.project.junction.go.v1 import seat_maps_pb2
@@ -47,5 +46,5 @@ class RpcClient(Client):
         )
         try:
             return await self._client.call(request)
-        except asyncio.TimeoutError:
+        except TimeoutError:
             return seat_maps_pb2.SeatMapResult()

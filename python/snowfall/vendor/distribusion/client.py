@@ -1,4 +1,3 @@
-import asyncio
 import contextlib
 import http
 import inspect
@@ -374,7 +373,7 @@ class DistribusionClient(object):
         if self._rate_limit_client:
             try:
                 await self._rate_limit_client.rate_limit(timeout=rate_limit_timeout)
-            except asyncio.TimeoutError as timeout_exc:
+            except TimeoutError as timeout_exc:
                 raise errors.AsyncTimeOutError(
                     inspect.getdoc(timeout_exc),
                 ) from timeout_exc

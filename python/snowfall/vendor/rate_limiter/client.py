@@ -60,7 +60,7 @@ class Client(object):
                     name=self._config["name"],
                     timeout=timeout,
                 )
-                raise asyncio.TimeoutError()
+                raise TimeoutError()
 
             time_diff_s = (limit.reset_time / SECOND) - time.time()
             self._logger.info(
