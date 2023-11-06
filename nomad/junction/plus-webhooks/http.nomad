@@ -164,6 +164,8 @@ EOH
         REDIS_PREFIX          = "junction-plus"
         SHORTENER_DOMAIN      = "bdvp.short.gy"
         SHORTENER_URL         = "https://api.short.io/links"
+        MATRIX_HOMESERVER_URL = "127.0.0.1:8008"
+        MATRIX_TOKEN          = "..."
       }
     }
   }

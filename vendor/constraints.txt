@@ -60,6 +60,7 @@
 //     "lagom==2.5.0",
 //     "lupa==2.0",
 //     "lxml-stubs==0.4.0",
+//     "matrix-nio==0.22.1",
 //     "mongomock-motor==0.0.21",
 //     "more-itertools==10.1.0",
 //     "motor==3.3.1",
@@ -372,6 +373,28 @@
           ],
           "requires_python": ">=3.7",
           "version": "2.8.3"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
+              "hash": "94bcff5ef73611c6c6231c2ffc1be4af1599abec90dbd2fdbbd63233ec2fb0ff",
+              "url": "https://files.pythonhosted.org/packages/f3/77/3b0fcab3d5f88822678676e155feb4a28c7bbd97366e1372135af381bf50/aiohttp_socks-0.7.1-py3-none-any.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "2215cac4891ef3fa14b7d600ed343ed0f0a670c23b10e4142aa862b3db20341a",
+              "url": "https://files.pythonhosted.org/packages/83/f0/5b9cbceb80591731fcbf26fd03a44063d405f1b584e5b66462b7c5d27fed/aiohttp_socks-0.7.1.tar.gz"
+            }
+          ],
+          "project_name": "aiohttp-socks",
+          "requires_dists": [
+            "aiohttp>=2.3.2",
+            "attrs>=19.2.0",
+            "python-socks[asyncio]<3.0.0,>=2.0.0"
+          ],
+          "requires_python": null,
+          "version": "0.7.1"
         },
         {
           "artifacts": [
@@ -4371,6 +4394,37 @@
           "artifacts": [
             {
               "algorithm": "sha256",
+              "hash": "36a7175a41b145026db7f3bf004577aa8906d09ed8c53f276452ac06ed8635e4",
+              "url": "https://files.pythonhosted.org/packages/34/58/26c03f6aba0999c1ee42d8e8035667e5488e7a3e061426aeb1d5fad7e750/matrix_nio-0.22.1-py3-none-any.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "65956252c516f0b42b359d5816fbb66e2617a1f2c02ae45f2730257b815656d8",
+              "url": "https://files.pythonhosted.org/packages/d3/3e/6d37d916482cb0213e8f69fe38bca50d4349f471f03424330a19e56785f5/matrix_nio-0.22.1.tar.gz"
+            }
+          ],
+          "project_name": "matrix-nio",
+          "requires_dists": [
+            "aiofiles<24.0.0,>=23.1.0",
+            "aiohttp-socks<0.8.0,>=0.7.0",
+            "aiohttp<4.0.0,>=3.8.3",
+            "atomicwrites<2.0.0,>=1.4.0; extra == \"e2e\"",
+            "cachetools<5.0.0,>=4.2.1; extra == \"e2e\"",
+            "h11<0.15.0,>=0.14.0",
+            "h2<5.0.0,>=4.0.0",
+            "jsonschema<5.0.0,>=4.14.0",
+            "peewee<4.0.0,>=3.14.4; extra == \"e2e\"",
+            "pycryptodome<4.0.0,>=3.10.1",
+            "python-olm<4.0.0,>=3.1.3; extra == \"e2e\"",
+            "unpaddedbase64<3.0.0,>=2.1.0"
+          ],
+          "requires_python": "<4.0.0,>=3.8.0",
+          "version": "0.22.1"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
               "hash": "6c2d30ab6be0e4a46919781807b4f0d834ebdd6c6e3dca0bda5a15f863427b6e",
               "url": "https://files.pythonhosted.org/packages/27/1a/1f68f9ba0c207934b35b86a8ca3aad8395a3d6dd7921c0686e23853ff5a9/mccabe-0.7.0-py2.py3-none-any.whl"
             },
@@ -5683,6 +5737,59 @@
           "artifacts": [
             {
               "algorithm": "sha256",
+              "hash": "5b1986c761258a5b4332a7f94a83f631c1ffca8747d75ab8395bf2e1b93283d9",
+              "url": "https://files.pythonhosted.org/packages/38/84/d429fafe45c0a32dc7d759fbb9b917282944d6852cdaf9e5dc743ea7b0aa/pycryptodome-3.19.0-cp35-abi3-musllinux_1_1_x86_64.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "e249a784cc98a29c77cea9df54284a44b40cafbfae57636dd2f8775b48af2434",
+              "url": "https://files.pythonhosted.org/packages/00/e6/73931df4046e34a6354d323b4a5b5c18e5184f4a08687806ee3353c81a6b/pycryptodome-3.19.0-cp35-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "bc35d463222cdb4dbebd35e0784155c81e161b9284e567e7e933d722e533331e",
+              "url": "https://files.pythonhosted.org/packages/1a/72/acc37a491b95849b51a2cced64df62aaff6a5c82d26aca10bc99dbda025b/pycryptodome-3.19.0.tar.gz"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "61bb3ccbf4bf32ad9af32da8badc24e888ae5231c617947e0f5401077f8b091f",
+              "url": "https://files.pythonhosted.org/packages/20/03/bd639213eba37d29a16d359b42def13def905a456358f8af52107fc4e8a4/pycryptodome-3.19.0-cp35-abi3-macosx_10_9_x86_64.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "d49a6c715d8cceffedabb6adb7e0cbf41ae1a2ff4adaeec9432074a80627dea1",
+              "url": "https://files.pythonhosted.org/packages/2d/8a/a05cb7434cda97da2491bee1418be9651ce99fec74bfe95320e153845853/pycryptodome-3.19.0-cp35-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "139ae2c6161b9dd5d829c9645d781509a810ef50ea8b657e2257c25ca20efe33",
+              "url": "https://files.pythonhosted.org/packages/82/b7/876ced7a574843bf6358da5a2faa910925a8b9eb79bb7f164d070dbf72ae/pycryptodome-3.19.0-cp35-abi3-musllinux_1_1_i686.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "84c3e4fffad0c4988aef0d5591be3cad4e10aa7db264c65fadbc633318d20bde",
+              "url": "https://files.pythonhosted.org/packages/b8/97/243bc2019517abb13051e197f33deaf69493bbe020846e6571c7a485a428/pycryptodome-3.19.0-cp35-abi3-musllinux_1_1_aarch64.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "542f99d5026ac5f0ef391ba0602f3d11beef8e65aae135fa5b762f5ebd9d3bfb",
+              "url": "https://files.pythonhosted.org/packages/d6/df/295e56dca0b4834665626326359c5a1f3092287be56db4b316926df7ad0c/pycryptodome-3.19.0-cp35-abi3-macosx_10_9_universal2.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "d033947e7fd3e2ba9a031cb2d267251620964705a013c5a461fa5233cc025270",
+              "url": "https://files.pythonhosted.org/packages/da/63/43feb85e3183e4bcd0d3780579c8006f37e8bd2438812a210a4738728244/pycryptodome-3.19.0-cp35-abi3-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl"
+            }
+          ],
+          "project_name": "pycryptodome",
+          "requires_dists": [],
+          "requires_python": "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7",
+          "version": "3.19.0"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
               "hash": "bc3ddf669d234f4220e6e1c4d96b061abe0998185a8d7855c0126782b7abc8c1",
               "url": "https://files.pythonhosted.org/packages/73/66/0a72c9fcde42e5650c8d8d5c5c1873b9a3893018020c77ca8eb62708b923/pydantic-2.4.2-py3-none-any.whl"
             },
@@ -6269,6 +6376,29 @@
           ],
           "requires_python": ">=3.7",
           "version": "0.0.6"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
+              "hash": "a57559b3f6073855761cb58b47a71bc5df8b72963d4a7a6e988b39dedd0e7ef2",
+              "url": "https://files.pythonhosted.org/packages/b2/16/6d7521041ceeb70344d5679a2367263840b8a983e547cc7f9e09b490e606/python_socks-2.4.3-py3-none-any.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "135430ae36d582dc834c983696c5f66177aa5b587407f540985d616ef2e0c701",
+              "url": "https://files.pythonhosted.org/packages/0f/d0/f5db931e0ef3b77dcf15266daf761cdcca003be478e4112ddc6eae80cc3a/python-socks-2.4.3.tar.gz"
+            }
+          ],
+          "project_name": "python-socks",
+          "requires_dists": [
+            "anyio<5.0.0,>=3.3.4; extra == \"anyio\"",
+            "async-timeout>=3.0.1; extra == \"asyncio\"",
+            "curio>=1.4; extra == \"curio\"",
+            "trio>=0.16.0; extra == \"trio\""
+          ],
+          "requires_python": null,
+          "version": "2.4.3"
         },
         {
           "artifacts": [
@@ -7798,6 +7928,24 @@
           "artifacts": [
             {
               "algorithm": "sha256",
+              "hash": "485eff129c30175d2cd6f0cd8d2310dff51e666f7f36175f738d75dfdbd0b1c6",
+              "url": "https://files.pythonhosted.org/packages/4c/a7/563b2d8fb7edc07320bf69ac6a7eedcd7a1a9d663a6bb90a4d9bd2eda5f7/unpaddedbase64-2.1.0-py3-none-any.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "7273c60c089de39d90f5d6d4a7883a79e319dc9d9b1c8924a7fab96178a5f005",
+              "url": "https://files.pythonhosted.org/packages/4d/f8/114266b21a7a9e3d09b352bb63c9d61d918bb7aa35d08c722793bfbfd28f/unpaddedbase64-2.1.0.tar.gz"
+            }
+          ],
+          "project_name": "unpaddedbase64",
+          "requires_dists": [],
+          "requires_python": "<4.0,>=3.6",
+          "version": "2.1.0"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
               "hash": "3865dbbbb8efb4bb5eaa72f1be7f3e0be00ea8b7f125c69cbd1f5fda926f37a2",
               "url": "https://files.pythonhosted.org/packages/f7/46/e7cea8159199096e1df52da20a57a6665da80c37fb8aeb848a3e47442c32/untokenize-0.1.1.tar.gz"
             }
@@ -8418,6 +8566,7 @@
     "lagom==2.5.0",
     "lupa==2.0",
     "lxml-stubs==0.4.0",
+    "matrix-nio==0.22.1",
     "mongomock-motor==0.0.21",
     "more-itertools==10.1.0",
     "motor==3.3.1",

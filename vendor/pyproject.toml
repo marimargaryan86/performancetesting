@@ -330,6 +330,7 @@ module = [
   "shapefile.*",
   "shapely.*",           # https://github.com/shapely/shapely/issues/721
   "sklearn.*",
+  "nio.*",               # https://github.com/poljar/matrix-nio/issues/240
 ]
 ignore_missing_imports = true
 

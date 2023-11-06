@@ -36,6 +36,7 @@ python_requirements(
         "python-rapidjson": ["rapidjson"],
         "setuptools": ["easy_install", "pkg_resources", "setuptools"],
         "allure-python-commons": ["allure"],
+        "matrix-nio": ["nio"],
     },
     overrides={
         "fakeredis": {"dependencies": ["#lupa"]},

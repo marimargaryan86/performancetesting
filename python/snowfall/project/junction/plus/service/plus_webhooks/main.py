@@ -3,6 +3,7 @@ import pathlib
 import random
 
 import openai
+from nio import AsyncClient, AsyncClientConfig, RoomMessageText
 from redis import asyncio as aioredis
 from starlette.middleware import Middleware
 from twilio.request_validator import RequestValidator
@@ -25,6 +26,9 @@ from snowfall.project.junction.plus.service.plus_webhooks import (
     chatbot_handlers,
     middlewares,
     open_ai,
+)
+from snowfall.project.junction.plus.service.plus_webhooks.matrix_callbacks import (
+    MatrixCallbacks,
 )
 from snowfall.project.junction.plus.service.plus_webhooks.routes import router
 from snowfall.project.junction.plus.service.plus_webhooks.shortener import (
@@ -116,6 +120,50 @@ async def _http(
     )
 
 
+async def _serve(
+    app: application.Application[bootstrap.Settings],
+) -> None:
+    notifications_channel = await grpc_factory.make_insecure_channel(
+        app,
+        app.settings.notifications_address,
+    )
+    # TODO: Replace with snowfall.stdlib.service.redis_factory.make_client
+    redis_client = redis.Client[str](
+        aioredis.from_url(
+            str(
+                random.choice(app.settings.redis_dsn),  # noqa: S311
+            ),
+            decode_responses=True,
+            retry_on_error=[aioredis.ConnectionError],
+        ).client(),
+        prefix=app.settings.redis_prefix,
+    )
+
+    client_config = AsyncClientConfig(max_limit_exceeded=0, max_timeouts=0)
+    matrix_client = AsyncClient(
+        app.settings.matrix_homeserver_url,
+        config=client_config,
+    )
+    matrix_client.access_token = app.settings.matrix_token
+    callbacks = MatrixCallbacks(
+        matrix_client=matrix_client,
+        redis_client=redis_client,
+        subscribers_client=subscribers.GrpcClient(
+            subscribers=notifications_pb2_grpc.SubscriberServiceStub(
+                notifications_channel,
+            ),
+        ),
+        configuration_vectors_client=configuration_vectors.GrpcClient(
+            configuration_vectors=notifications_pb2_grpc.ConfigurationVectorServiceStub(
+                notifications_channel,
+            ),
+        ),
+    )
+    matrix_client.add_event_callback(callbacks.message_callback, (RoomMessageText,))
+
+    await matrix_client.sync_forever(timeout=30000)
+
+
 if __name__ == "__main__":
     entrypoint = application.Entrypoint(name="plus-webhook")
 
@@ -123,6 +171,14 @@ if __name__ == "__main__":
         application.Command(
             name="http",
             callback=_http,
+            settings_class=bootstrap.Settings,
+        ),
+    )
+
+    entrypoint.enter_with_commands(
+        application.Command(
+            name="serve",
+            callback=_serve,
             settings_class=bootstrap.Settings,
         ),
     )
