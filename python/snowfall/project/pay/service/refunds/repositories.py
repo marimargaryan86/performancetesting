@@ -1,4 +1,6 @@
 import datetime
+from collections.abc import Mapping
+from typing import Any
 
 from snowfall.project.pay.service.refunds.v1alpha import models_pb2
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
@@ -56,7 +58,9 @@ class RefundsRepository(
     async def find(
         self,
         cursor: str | None,
+        filters: Mapping[str, Any] | None = None,
     ) -> resultset.ResultSet[models_pb2.Refund]:
         return await self._find_with_cursor(
             cur=cursor or "",
+            filter_=filters,
         )

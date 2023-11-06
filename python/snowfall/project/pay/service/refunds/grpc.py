@@ -78,9 +78,11 @@ class RefundsService(
         request.refund.status = models_pb2.Refund.Status.STATUS_PENDING
 
         if transaction.payment_type == PaymentType.PAYMENT_TYPE_CARD:
+            refunded_us = money.from_protobuf(request.refund.refunded_us)
             try:
                 stripe_refund = stripe.Refund.create(
                     payment_intent=bill.payment_intent_id,
+                    amount=refunded_us.amount,
                 )
             except stripe.error.StripeError:
                 return await context.abort(grpc.StatusCode.INVALID_ARGUMENT)
@@ -110,8 +112,18 @@ class RefundsService(
         request: grpc_pb2.ListRefundsRequest,
         context: grpc.aio.ServicerContext,
     ) -> grpc_pb2.ListRefundsResponse:
+        filters = {}
+        if request.external_reference_ids:
+            filters["external_reference_id"] = {
+                "$in": list(request.external_reference_ids),
+            }
+        if request.statuses:
+            filters["status"] = {
+                "$in": list(request.statuses),  # type: ignore[arg-type]
+            }
         refunds = await self._refunds.find(
             cursor=request.page_token,
+            filters=filters,
         )
 
         refunds.limit(

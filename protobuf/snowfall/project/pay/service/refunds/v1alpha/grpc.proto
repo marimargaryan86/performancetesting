@@ -28,6 +28,8 @@ message GetRefundResponse {
 message ListRefundsRequest {
   int32 page_size = 1;
   string page_token = 2;
+  repeated string external_reference_ids = 3;
+  repeated Refund.Status statuses = 4;
 }
 
 message ListRefundsResponse {

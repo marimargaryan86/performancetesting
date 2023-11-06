@@ -1,3 +1,4 @@
+from starlette import exceptions
 from starlette.middleware import Middleware
 
 from snowfall.project.junction.go.adapter import orders
@@ -15,6 +16,7 @@ from snowfall.project.pay.service.webhooks import bootstrap, routers
 from snowfall.project.pay.service.webhooks.middlewares import HmacHeaderMiddleware
 from snowfall.project.pay.service.webhooks.states.stripe.refunds import RefundsState
 from snowfall.stdlib.integration.starlette import application as starlette
+from snowfall.stdlib.integration.starlette.handlers import client_error_handler
 from snowfall.stdlib.service import application, grpc_factory
 
 
@@ -70,6 +72,8 @@ async def _http(
         ],
         openapi_path=None,
     )
+
+    asgi_app.add_exception_handler(exceptions.HTTPException, client_error_handler)
 
     await starlette.serve(
         starlette_app=asgi_app,

@@ -6,6 +6,7 @@ from snowfall.project.junction.go.service.orders.v1 import (
     models_pb2 as orders_models_pb2,
 )
 from snowfall.project.pay.adapter import refunds, transactions
+from snowfall.project.pay.service.refunds.v1alpha.models_pb2 import Refund
 from snowfall.stdlib.logging import stdout
 
 logger = stdout.get_logger()
@@ -28,16 +29,37 @@ class RefundsState(object):
         self,
         stripe_refund: stripe.Refund,
     ) -> bool:
-        update_status = await self._update_refund(
-            stripe_refund.refunds.data[0].id,
-            stripe_refund.status,
-        )
-        if update_status and stripe_refund.status == "succeeded":
-            await self._update_booking_cancellation_status(
-                stripe_refund.refunds.data[0].id,
-            )
+        refunds_ids = [refund.id for refund in stripe_refund.refunds.data]
 
-        return update_status
+        all_refunds = await self._refunds_client.find(
+            external_reference_ids=refunds_ids,
+        )
+        id_to_refunds = {refund.id: refund for refund in stripe_refund.refunds.data}
+        for refund in all_refunds.refunds:
+            if refund.status in {  # noqa: WPS337
+                Refund.Status.STATUS_SUCCEEDED,
+                Refund.Status.STATUS_FAILED,
+            }:
+                continue
+            await self._update_refund(
+                refund.external_reference_id,
+                id_to_refunds[refund.external_reference_id].status,
+            )
+            if stripe_refund.status == "succeeded":
+                await self._update_booking_cancellation_status(
+                    refund.external_reference_id,
+                )
+        not_found_refunds = set(refunds_ids) - {
+            _refund.external_reference_id for _refund in all_refunds.refunds
+        }
+        if not_found_refunds:
+            for refind_id in not_found_refunds:
+                logger.error(
+                    "Refund not found",
+                    external_reference_id=refind_id,
+                )
+            return False
+        return True
 
     async def run(self, event: StripeObject) -> bool:
         event_type = event.type.replace(".", "_")

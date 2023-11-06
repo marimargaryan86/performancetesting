@@ -54,6 +54,8 @@ class Client(abc.ABC):
         self,
         limit: int | None = None,
         cursor: str | None = None,
+        external_reference_ids: Sequence[str] | None = None,
+        statuses: Sequence[int] | None = None,
     ) -> grpc_pb2.ListRefundsResponse:
         """Fetch all refund resources."""
 
@@ -126,9 +128,20 @@ class DictClient(Client):
         self,
         limit: int | None = None,
         cursor: str | None = None,
+        external_reference_ids: Sequence[str] | None = None,
+        statuses: Sequence[int] | None = None,
     ) -> grpc_pb2.ListRefundsResponse:
+        refunds = list(self._refunds.values())
+        if external_reference_ids:
+            refunds = [
+                refund
+                for refund in refunds
+                if refund.external_reference_id in external_reference_ids
+            ]
+        if statuses:
+            refunds = [refund for refund in refunds if refund.status in statuses]
         page = sequence.paginate(
-            sequence=list(self._refunds.values()),
+            sequence=refunds,
             cursor=cursor,
             limit=limit,
         )
@@ -247,10 +260,14 @@ class GrpcClient(Client):
         self,
         limit: int | None = None,
         cursor: str | None = None,
+        external_reference_ids: Sequence[str] | None = None,
+        statuses: Sequence[int] | None = None,
     ) -> grpc_pb2.ListRefundsResponse:
         # TODO: handle INVALID_ARGUMENT
         request = grpc_pb2.ListRefundsRequest(
             page_token=cursor or "",
+            external_reference_ids=external_reference_ids,
+            statuses=statuses,  # type: ignore[arg-type]
         )
         if limit is not None:
             request.page_size = limit
