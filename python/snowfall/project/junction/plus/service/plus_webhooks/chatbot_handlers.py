@@ -5,7 +5,11 @@ from collections.abc import Mapping, Sequence
 from gettext import gettext as _
 from typing import Any, TypeAlias
 
-from snowfall.project.junction.plus.adapter import orders, subscribers
+from snowfall.project.junction.plus.adapter import (
+    flight_delay_predictor,
+    orders,
+    subscribers,
+)
 from snowfall.project.junction.plus.notification_channels.order_utils import (
     compress_flights,
 )
@@ -42,6 +46,7 @@ class MessageHandler(object):
         cache_ttl: datetime.timedelta,
         ai_bot: open_ai.AIBot,
         shortener_client: shortener.Client,
+        flight_predictions_client: flight_delay_predictor.Client,
     ) -> None:
         self._redis = redis_client
         # Not going to use it now but in the future we can decide to
@@ -49,6 +54,7 @@ class MessageHandler(object):
         self._default_ttl = cache_ttl
         self._ai_bot = ai_bot
         self._shortener_client = shortener_client
+        self._flight_predictions_client = flight_predictions_client
         self._logger = stdout.get_logger()
 
     async def handle_message(
@@ -88,6 +94,7 @@ class MessageHandler(object):
             response = await message_handler(
                 subscriber=subscriber,
                 configuration_vector=configuration_vector,
+                flight_predictions_client=self._flight_predictions_client,
                 subscribers_client=subscribers_client,
                 orders_client=orders_client,
                 message=message,
@@ -201,6 +208,7 @@ async def trip_details(
     orders_client: orders.Client,
     message_key: str,
     redis_client: redis.Client[str],
+    flight_predictions_client: flight_delay_predictor.Client,
     **kwargs: Any,
 ) -> _HandlersResponse:
     order = None
@@ -293,6 +301,7 @@ async def upcoming_trip_details(
     orders_client: orders.Client,
     message_key: str,
     redis_client: redis.Client[str],
+    flight_predictions_client: flight_delay_predictor.Client,
     **kwargs: Any,
 ) -> _HandlersResponse:
     session = redis_client.hash_("upcoming_trips_{0}".format(subscriber.id))

@@ -18,6 +18,7 @@ from snowfall.stdlib.integration.starlette import application
 class Settings(application.Settings):
     flight_stats_app_key: str
     notifications_address: str
+    flight_prediction_address: str
     twilio_sid: str
     twilio_token: str
     redis_dsn: Sequence[pydantic.AnyUrl]

@@ -87,6 +87,10 @@ job "plus-webhooks-http" {
               local_bind_port  = 8010
               destination_name = "notifications-${var.environment}"
             }
+            upstreams {
+              local_bind_port  = 8040
+              destination_name = "flight-prediction-${var.environment}"
+            }
           }
         }
       }
@@ -125,6 +129,7 @@ job "plus-webhooks-http" {
         data        = <<EOH
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 NOTIFICATIONS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_notifications-${var.environment}"))}}
+FLIGHT_PREDICTION_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_flight-prediction-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/plus-webhooks" }}
 FLIGHT_STATS_APP_KEY={{ .Data.data.flight_stats_app_key }}
 SHORTENER_KEY={{ .Data.data.shortener_key }}

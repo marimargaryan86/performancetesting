@@ -8,7 +8,10 @@ from starlette import applications
 from starlette.middleware import Middleware
 from twilio.request_validator import RequestValidator
 
-from snowfall.project.junction.plus.adapter import configuration_vectors
+from snowfall.project.junction.plus.adapter import (
+    configuration_vectors,
+    flight_delay_predictor,
+)
 from snowfall.project.junction.plus.adapter import (
     monitoring_rules as monitoring_rules_adapter,
 )
@@ -175,6 +178,26 @@ def configuration_vectors_client() -> configuration_vectors.Client:
 
 
 @pytest.fixture()
+def flight_predictions_client() -> flight_delay_predictor.Client:
+    return flight_delay_predictor.DictClient(
+        predictions=[
+            flight_delay_predictor.Prediction(
+                id="AA1002023-10-30T00:00:01Z",
+                flight_number="AA100",
+                scheduled_departure_at="2023-10-30T00:00:01Z",
+                delay=13.79,  # noqa: WPS432
+            ),
+            flight_delay_predictor.Prediction(
+                id="AA2002023-10-30T00:00:01Z",
+                flight_number="AA200",
+                scheduled_departure_at="2023-11-01T00:00:01Z",
+                delay=-12.75,  # noqa: WPS432
+            ),
+        ],
+    )
+
+
+@pytest.fixture()
 def notification_event_publisher_client() -> (
     notification_event_publisher_adapter.Client
 ):
@@ -211,6 +234,7 @@ def app(
     subscribers_client: subscribers_adapter.Client,
     orders_client: orders_adapter.Client,
     configuration_vectors_client: configuration_vectors.Client,
+    flight_predictions_client: flight_delay_predictor.Client,
     notification_event_publisher_client: notification_event_publisher_adapter.Client,
     twilio_validator: RequestValidator,
     ai_bot: open_ai.AIBot,
@@ -238,6 +262,7 @@ def app(
                     cache_ttl=datetime.timedelta(minutes=10),
                     ai_bot=ai_bot,
                     shortener_client=shortener_client,
+                    flight_predictions_client=flight_predictions_client,
                 ),
                 whatsapp_channel=whatsapp_channel,
             ),

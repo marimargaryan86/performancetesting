@@ -10,6 +10,7 @@ from twilio.request_validator import RequestValidator
 
 from snowfall.project.junction.plus.adapter import (
     configuration_vectors,
+    flight_delay_predictor,
     monitoring_rules,
     notification_event_publisher,
     orders,
@@ -17,6 +18,9 @@ from snowfall.project.junction.plus.adapter import (
 )
 from snowfall.project.junction.plus.notification_channels.whatsapp import (
     ProviderChannel,
+)
+from snowfall.project.junction.plus.service.flight_prediction.v1 import (
+    flight_prediction_pb2_grpc,
 )
 from snowfall.project.junction.plus.service.notifications.v1alpha import (
     grpc_pb2_grpc as notifications_pb2_grpc,
@@ -47,6 +51,10 @@ async def _http(
     notifications_channel = await grpc_factory.make_insecure_channel(
         app,
         app.settings.notifications_address,
+    )
+    flight_prediction_channel = await grpc_factory.make_insecure_channel(
+        app,
+        app.settings.flight_prediction_address,
     )
     redis_client = redis.Client[str](
         aioredis.from_url(
@@ -94,6 +102,11 @@ async def _http(
                         shortener_url=app.settings.shortener_url,
                         shortener_domain=app.settings.shortener_domain,
                         shortener_key=app.settings.shortener_key,
+                    ),
+                    flight_predictions_client=flight_delay_predictor.GrpcClient(
+                        flight_prediction_pb2_grpc.FlightPredictionServiceStub(
+                            flight_prediction_channel,
+                        ),
                     ),
                 ),
                 whatsapp_channel=ProviderChannel(
