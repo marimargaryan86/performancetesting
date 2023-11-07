@@ -1,5 +1,6 @@
 import abc
 import asyncio
+import copy
 import datetime
 import functools
 import types
@@ -50,7 +51,7 @@ def with_cursor_filters(
     sort: tuple[str, int] | None = None,
     path: str | None = None,
 ) -> dict[str, Any]:
-    cursor_filter = dict(filter_).copy()
+    cursor_filter = dict(copy.deepcopy(filter_))
 
     if cursor_obj.id == "":
         return cursor_filter
@@ -295,14 +296,14 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
             )
 
         filter_pre_cursor = dict(filter_ or {})
-        cursor_filter = filter_pre_cursor.copy()
+        cursor_filter = copy.deepcopy(filter_pre_cursor)
         unmarshalled_cursor = None
 
         if cur:
             unmarshalled_cursor = cursor.unmarshal(cur, filter_pre_cursor, sort)
             cursor_filter = with_cursor_filters(
                 unmarshalled_cursor,
-                filter_pre_cursor,
+                cursor_filter,
                 sort,
             )
 

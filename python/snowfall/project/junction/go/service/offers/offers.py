@@ -213,7 +213,7 @@ class OfferAggregateMappingRepository(
         if cursor:
             cursor_filter = repository.with_cursor_filters(
                 cursor_module.unmarshal(cursor, filter_pre_cursor),
-                filter_pre_cursor,
+                cursor_filter,
             )
 
         aggregate = [

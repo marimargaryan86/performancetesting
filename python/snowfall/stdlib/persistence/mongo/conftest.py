@@ -50,9 +50,10 @@ class MockRepository(
     async def find_subset(
         self,
         identifiers: Sequence[str],
+        cursor: str | None = None,
     ) -> resultset.ResultSet[Mapping[str, Any]]:
         return await self._find_with_cursor(
-            "",
+            cursor or "",
             {
                 repository.mongo_id_key: {
                     "$in": identifiers,

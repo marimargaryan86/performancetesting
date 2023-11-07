@@ -73,6 +73,33 @@ async def test_pagination_is_not_reset_on_no_documents(  # noqa: WPS217
     )
 
 
+async def test_pagination_with_filter(mock_repository: conftest.MockRepository) -> None:
+    identifiers = [str(identifier) for identifier in range(100)]
+
+    for identifier in identifiers:
+        await mock_repository.insert(
+            {
+                repository.mongo_id_key: identifier,
+            },
+        )
+
+    count = 0
+    length = 1
+    cursor = ""
+
+    while length:
+        documents = await mock_repository.find_subset(
+            cursor=cursor,
+            identifiers=identifiers,
+        )
+        documents.limit(1)
+        length = len([document async for document in documents])
+        count += length
+        cursor = await documents.cursor()
+
+    assert count == len(identifiers)
+
+
 async def test_cursor_filters(mock_repository: conftest.MockRepository) -> None:
     await asyncio.gather(
         mock_repository.insert({repository.mongo_id_key: "foobar_foobar"}),
