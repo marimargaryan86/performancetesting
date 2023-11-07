@@ -16,9 +16,10 @@ export function scrollLoad(
 ): ActionReturn<ScrollLoadParams> {
   let { func, threshold = DEFAULT_THRESHOLD } = params;
   let pending = false;
+  let destroyed = false;
 
   async function onScroll(): Promise<void> {
-    if (!func) {
+    if (destroyed || !func) {
       return;
     }
 
@@ -47,6 +48,7 @@ export function scrollLoad(
 
   return {
     destroy(): void {
+      destroyed = true;
       node.removeEventListener("scroll", onScroll);
     },
     update(p): void {
