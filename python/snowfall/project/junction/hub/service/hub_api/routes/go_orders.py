@@ -25,16 +25,13 @@ class Booking(endpoints.HTTPEndpoint):
 
         booking = await client.get_booking(
             request.path_params["bookingId"],
-            reseller_id=request.user.metadata.get("reseller_id", request.user.username),
+            reseller_id=request.user.metadata.get("reseller_id", ""),
         )
 
         try:
             booking_cancellation = await client.get_booking_cancellation_by_booking_id(
                 booking_id=booking.id,
-                reseller_id=request.user.metadata.get(
-                    "reseller_id",
-                    request.user.username,
-                ),
+                reseller_id=request.user.metadata.get("reseller_id", ""),
             )
         except errors.NotFoundError:
             booking_cancellation = None
@@ -64,16 +61,13 @@ class BookingsByOrder(endpoints.HTTPEndpoint):
             order_id=request.path_params["orderId"],
             limit=pagination.limit,
             cursor=pagination.cursor,
-            reseller_id=request.user.metadata.get("reseller_id", request.user.username),
+            reseller_id=request.user.metadata.get("reseller_id", ""),
         )
 
         bookings_and_cancellations = (
             await client.find_booking_cancellations_for_bookings(
                 bookings=response.bookings,
-                reseller_id=request.user.metadata.get(
-                    "reseller_id",
-                    request.user.username,
-                ),
+                reseller_id=request.user.metadata.get("reseller_id", ""),
             )
         )
 
@@ -112,7 +106,7 @@ class DetailsByBooking(endpoints.HTTPEndpoint):
         pagination = pagination_helpers.get_pagination(request)
         response = await client.find_booking_details_by_booking_id(
             booking_id=booking_id,
-            reseller_id=request.user.metadata.get("reseller_id", request.user.username),
+            reseller_id=request.user.metadata.get("reseller_id", ""),
             limit=pagination.limit,
             cursor=pagination.cursor,
         )
@@ -143,7 +137,7 @@ class BookingDetails(endpoints.HTTPEndpoint):
 
         details = await client.get_booking_details(
             request.path_params["bookingDetailsId"],
-            reseller_id=request.user.metadata.get("reseller_id", request.user.username),
+            reseller_id=request.user.metadata.get("reseller_id", ""),
         )
 
         return await messages.create_response(
@@ -177,7 +171,7 @@ class Journeys(endpoints.HTTPEndpoint):
             limit=pagination.limit,
             cursor=pagination.cursor,
             sort_by=sorting.get_sort(request, self._sort),
-            reseller_id=request.user.metadata.get("reseller_id", request.user.username),
+            reseller_id=request.user.metadata.get("reseller_id", ""),
         )
 
         return await messages.create_response(
@@ -206,7 +200,7 @@ class Journey(endpoints.HTTPEndpoint):
 
         journey = await client.get_journey(
             request.path_params["journeyId"],
-            reseller_id=request.user.metadata.get("reseller_id", request.user.username),
+            reseller_id=request.user.metadata.get("reseller_id", ""),
         )
 
         return await messages.create_response(
@@ -232,7 +226,7 @@ class OrdersByJourney(endpoints.HTTPEndpoint):
         pagination = pagination_helpers.get_pagination(request)
         response = await client.find_orders_by_journey_id(
             journey_id=journey_id,
-            reseller_id=request.user.metadata.get("reseller_id", request.user.username),
+            reseller_id=request.user.metadata.get("reseller_id", ""),
             limit=pagination.limit,
             cursor=pagination.cursor,
         )
@@ -263,7 +257,7 @@ class Order(endpoints.HTTPEndpoint):
 
         order = await client.get_order(
             request.path_params["orderId"],
-            reseller_id=request.user.metadata.get("reseller_id", request.user.username),
+            reseller_id=request.user.metadata.get("reseller_id", ""),
         )
 
         return await messages.create_response(
@@ -287,7 +281,7 @@ class CancellationRequest(endpoints.HTTPEndpoint):
 
         cancellation_request = await client.get_cancellation_request(
             identifier=request.path_params["cancellationRequestId"],
-            reseller_id=request.user.metadata.get("reseller_id", request.user.username),
+            reseller_id=request.user.metadata.get("reseller_id", ""),
         )
 
         return await messages.create_response(
@@ -310,7 +304,7 @@ class CancellationRequest(endpoints.HTTPEndpoint):
         body = await request_helpers.flatten_request(request)
         cancellation_request = await client.create_cancellation_request(
             booking_ids=body["bookings"],
-            reseller_id=request.user.metadata.get("reseller_id", request.user.username),
+            reseller_id=request.user.metadata.get("reseller_id", ""),
         )
 
         return await messages.create_response(
@@ -335,7 +329,7 @@ class BookingsCancellationByBooking(endpoints.HTTPEndpoint):
 
         cancellation = await client.get_booking_cancellation_by_booking_id(
             booking_id=request.path_params["bookingId"],
-            reseller_id=request.user.metadata.get("reseller_id", request.user.username),
+            reseller_id=request.user.metadata.get("reseller_id", ""),
         )
 
         return await messages.create_response(
