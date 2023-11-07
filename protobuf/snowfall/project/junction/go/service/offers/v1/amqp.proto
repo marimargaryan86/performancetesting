@@ -20,6 +20,13 @@ message TripOfferSearchResult {
   string provider_name = 4;
 }
 
+message SimpleTripOfferSearchTask {
+  string offer_search_id = 1;
+  SimpleTripOfferSearch search = 2;
+  string session_token = 3;
+  string reseller_id = 4;
+}
+
 message TripPriceQuoteTask {
   string price_quote_container_id = 1;
   string option_id = 2;
