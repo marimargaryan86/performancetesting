@@ -14,7 +14,7 @@ export async function getTicketsZip({ session, orderId, bookingId }: TicketsZipP
   data: Uint8Array;
   name: string;
 }> {
-  const order = await integrationInstances.junctionMobileApi.orders.get({
+  const order = await integrationInstances.junctionHubApi.orders.get({
     session,
     id: orderId,
   });

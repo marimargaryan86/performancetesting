@@ -71,7 +71,7 @@
           </a>
         </TCol>
         <TCol width="0">
-          {#if booking.ticketUrls?.length}
+          {#if booking.ticketUrls.length}
             <a
               class="typography body-medium"
               href={orderLink.routes.booking(booking.id).routes.tickets.root}

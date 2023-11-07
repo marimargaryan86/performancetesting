@@ -72,7 +72,6 @@
   import type { Price } from "integration/common/schemas/price";
   import type { DateRange } from "models/date-time";
   import routeConfig from "routeConfig";
-  import { ensureDefined } from "utils/array";
   import { getZeroTimeDate } from "utils/date-time";
   import type { ScrollLoadFunc } from "directives/scroll-load";
   import integrationInstancesClient from "integration-instances-client";
@@ -138,9 +137,7 @@
         {@const cancellationStatus = getOrderStatus.cancellationStatus(order)}
         {@const status = getOrderStatus.status(order)}
         {@const totalPrice = getTotalPrice(order)}
-        {@const hasTickets = Boolean(
-          order.bookings.flatMap((item) => item.cancellation).filter(ensureDefined).length,
-        )}
+        {@const hasTickets = Boolean(order.bookings.flatMap((item) => item.ticketUrls).length)}
 
         <TRow alternatingBackground={false}>
           <TCol class="typography body-small" width="0">
