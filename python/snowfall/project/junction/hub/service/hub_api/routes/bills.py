@@ -70,10 +70,20 @@ class Bills(endpoints.HTTPEndpoint):
 
         pagination = pagination_helpers.get_pagination(request)
         sort = sorting.get_sort(request, {"updatedAt": "updated_at"})
+
+        filter_by_order_ids = [
+            str(uuid)
+            for uuid in request.scope["parsed_query_string"].get(
+                "filter[order.id][eq]",
+                [],
+            )
+        ]
+
         response = await bills_client.find(
             limit=pagination.limit or self._default_page_size,
             cursor=pagination.cursor,
             sort=sort,
+            filter_by_order_ids=filter_by_order_ids,
         )
 
         return await messages.create_response(

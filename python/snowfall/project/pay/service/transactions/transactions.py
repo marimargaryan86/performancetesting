@@ -176,9 +176,18 @@ class BillsRepository(
     async def find(
         self,
         cursor: str | None,
+        filter_by_order_ids: Sequence[str],
         sort: tuple[str, int] | None = None,
     ) -> resultset.ResultSet[models_pb2.Bill]:
+        filter_ = {}
+
+        if filter_by_order_ids:
+            filter_["order_id"] = {
+                "$in": list(filter_by_order_ids),
+            }
+
         return await self._find_with_cursor(
             cur=cursor or "",
             sort=sort,
+            filter_=filter_,
         )

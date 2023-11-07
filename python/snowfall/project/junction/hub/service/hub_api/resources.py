@@ -920,6 +920,12 @@ class BillResource(models.Resource):
             id=bill.id,
             type=BillResource.api_type,
             attributes={
+                "createdAt": protobuf.protobuf_to_datetime(
+                    bill.created_at,
+                ),
+                "updatedAt": protobuf.protobuf_to_datetime(
+                    bill.updated_at,
+                ),
                 "isReconciled": bill.is_reconciled,
                 "totalAmount": (
                     money.from_protobuf(bill.total_amount)

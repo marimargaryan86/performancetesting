@@ -2271,6 +2271,9 @@
           },
           {
             "$ref": "#/components/parameters/sortBill"
+          },
+          {
+            "$ref": "#/components/parameters/filterByOrderIds"
           }
         ],
         "operationId": "get-bills",
@@ -3149,6 +3152,24 @@
         "in": "query",
         "required": false,
         "description": "Filters transactions based on the bill ids",
+        "style": "form",
+        "explode": false,
+        "schema": {
+          "type": "array",
+          "example": [
+            "271f6d54-9e59-407e-a860-b0771d9e3d26"
+          ],
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "filterByOrderIds": {
+        "name": "filter[order.id][eq]",
+        "in": "query",
+        "required": false,
+        "description": "Filters bills based on the order ids",
         "style": "form",
         "explode": false,
         "schema": {

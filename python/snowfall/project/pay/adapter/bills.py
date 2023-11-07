@@ -37,6 +37,7 @@ class Client(abc.ABC):
     @abc.abstractmethod
     async def find(
         self,
+        filter_by_order_ids: Sequence[str],
         limit: int | None = None,
         cursor: str | None = None,
         sort: sort_pb2.Sort | None = None,
@@ -81,12 +82,23 @@ class DictClient(Client):
 
     async def find(
         self,
+        filter_by_order_ids: Sequence[str],
         limit: int | None = None,
         cursor: str | None = None,
         sort: sort_pb2.Sort | None = None,
     ) -> grpc_pb2.ListBillsResponse:
+        if filter_by_order_ids:
+            bills = list(
+                filter(
+                    lambda bill: bill.order_id in filter_by_order_ids,
+                    self._bills.values(),
+                ),
+            )
+        else:
+            bills = list(self._bills.values())
+
         page = sequence.paginate(
-            sequence=list(self._bills.values()),
+            sequence=bills,
             cursor=cursor,
             limit=limit,
         )
@@ -150,6 +162,7 @@ class GrpcClient(Client):
 
     async def find(
         self,
+        filter_by_order_ids: Sequence[str],
         limit: int | None = None,
         cursor: str | None = None,
         sort: sort_pb2.Sort | None = None,
@@ -158,6 +171,7 @@ class GrpcClient(Client):
         request = grpc_pb2.ListBillsRequest(
             page_token=cursor or "",
             sort_by=sort,
+            filter_by_order_ids=filter_by_order_ids,
         )
         if limit is not None:
             request.page_size = limit

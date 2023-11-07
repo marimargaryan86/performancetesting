@@ -166,7 +166,8 @@ message UpdateBillReconciliationResponse {
 message ListBillsRequest {
   int32 page_size = 1;
   string page_token = 2;
-  snowfall.stdlib.v1.Sort sort_by = 3;
+  repeated string filter_by_order_ids = 3;
+  snowfall.stdlib.v1.Sort sort_by = 4;
 }
 
 message ListBillsResponse {

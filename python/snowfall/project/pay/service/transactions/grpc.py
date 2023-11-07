@@ -412,6 +412,7 @@ class BillsService(
         bills = await self._bills.find(
             cursor=request.page_token,
             sort=sorting.get_sort(request.sort_by, self._sort),
+            filter_by_order_ids=request.filter_by_order_ids,
         )
         bills.limit(
             request.page_size if request.page_size else self._default_page_size,
