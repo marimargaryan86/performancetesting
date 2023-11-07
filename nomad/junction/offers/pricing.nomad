@@ -38,14 +38,6 @@ variable "use_pay_for_currency_conversions" {
   type = bool
 }
 
-variable "pay_admin_api_base_url" {
-  type = string
-}
-
-variable "api_pay_base_url" {
-  type = string
-}
-
 
 job "offers-pricing" {
   datacenters = ["${var.datacenter}"]
@@ -87,7 +79,18 @@ job "offers-pricing" {
       tags = ["metrics"]
 
       connect {
-        sidecar_service {}
+        sidecar_service {
+          proxy {
+            upstreams {
+              local_bind_port  = 8020
+              destination_name = "pay-api-${var.environment}"
+            }
+            upstreams {
+              local_bind_port  = 8030
+              destination_name = "pay-api-admin-${var.environment}"
+            }
+          }
+        }
       }
 
       check {
@@ -109,6 +112,8 @@ job "offers-pricing" {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
+PUBLIC_PAY_API_DSN={{(printf "http://%s" (env "NOMAD_UPSTREAM_ADDR_pay-api-${var.environment}"))}}
+PUBLIC_PAY_ADMIN_API_DSN={{(printf "http://%s" (env "NOMAD_UPSTREAM_ADDR_pay-api-admin-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/offers" }}
 PAY_ADMIN_USERNAME={{ .Data.data.pay_admin_username }}
 PAY_ADMIN_PASSWORD={{ .Data.data.pay_admin_password }}
@@ -140,8 +145,6 @@ EOH
         PAYER_COMPANY_ID                 = "${var.payer_company_id}"
         PAYER_CURRENCY_CODE              = "${var.payer_currency_code}"
         USE_PAY_FOR_CURRENCY_CONVERSIONS = "${var.use_pay_for_currency_conversions}"
-        PUBLIC_PAY_ADMIN_API_DSN         = "${var.pay_admin_api_base_url}"
-        PUBLIC_PAY_API_DSN               = "${var.api_pay_base_url}"
       }
     }
   }

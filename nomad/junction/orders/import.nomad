@@ -30,14 +30,6 @@ variable "use_pay_to_create_transaction" {
   type = bool
 }
 
-variable "pay_admin_api_base_url" {
-  type = string
-}
-
-variable "api_pay_base_url" {
-  type = string
-}
-
 job "orders-import" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -84,6 +76,14 @@ job "orders-import" {
               local_bind_port  = 8020
               destination_name = "passenger-name-records-${var.environment}"
             }
+            upstreams {
+              local_bind_port  = 8030
+              destination_name = "pay-api-${var.environment}"
+            }
+            upstreams {
+              local_bind_port  = 8040
+              destination_name = "pay-api-admin-${var.environment}"
+            }
           }
         }
       }
@@ -107,6 +107,8 @@ job "orders-import" {
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 PASSENGER_NAME_RECORDS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_passenger-name-records-${var.environment}"))}}
+PUBLIC_PAY_API_DSN={{(printf "http://%s" (env "NOMAD_UPSTREAM_ADDR_pay-api-${var.environment}"))}}
+PUBLIC_PAY_ADMIN_API_DSN={{(printf "http://%s" (env "NOMAD_UPSTREAM_ADDR_pay-api-admin-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/offers" }}
 PAY_ADMIN_USERNAME={{ .Data.data.pay_admin_username }}
 PAY_ADMIN_PASSWORD={{ .Data.data.pay_admin_password }}
@@ -136,8 +138,6 @@ EOH
         SENTRY_DSN                    = "https://7c600c1c458d403e8047091398239f20@sentry.snowfall.se/30"
         PROMETHEUS_PORT               = "${NOMAD_PORT_prometheus}"
         USE_PAY_TO_CREATE_TRANSACTION = "${var.use_pay_to_create_transaction}"
-        PUBLIC_PAY_ADMIN_API_DSN      = "${var.pay_admin_api_base_url}"
-        PUBLIC_PAY_API_DSN            = "${var.api_pay_base_url}"
       }
     }
   }

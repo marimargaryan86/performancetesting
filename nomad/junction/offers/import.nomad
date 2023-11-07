@@ -38,14 +38,6 @@ variable "use_pay_for_currency_conversions" {
   type = bool
 }
 
-variable "pay_admin_api_base_url" {
-  type = string
-}
-
-variable "api_pay_base_url" {
-  type = string
-}
-
 variable "gateway_poll_sleep" {
   type = number
 }
@@ -96,6 +88,14 @@ job "offers-import" {
               local_bind_port  = 8010
               destination_name = "gateway-serve-${var.environment}"
             }
+            upstreams {
+              local_bind_port  = 8020
+              destination_name = "pay-api-${var.environment}"
+            }
+            upstreams {
+              local_bind_port  = 8030
+              destination_name = "pay-api-admin-${var.environment}"
+            }
           }
         }
       }
@@ -122,6 +122,8 @@ AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 GATEWAY_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_gateway-serve-${var.environment}"))}}
+PUBLIC_PAY_API_DSN={{(printf "http://%s" (env "NOMAD_UPSTREAM_ADDR_pay-api-${var.environment}"))}}
+PUBLIC_PAY_ADMIN_API_DSN={{(printf "http://%s" (env "NOMAD_UPSTREAM_ADDR_pay-api-admin-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/offers" }}
 PAY_ADMIN_USERNAME={{ .Data.data.pay_admin_username }}
 PAY_ADMIN_PASSWORD={{ .Data.data.pay_admin_password }}
@@ -154,8 +156,6 @@ EOH
         PAYER_COMPANY_ID                 = "${var.payer_company_id}"
         PAYER_CURRENCY_CODE              = "${var.payer_currency_code}"
         USE_PAY_FOR_CURRENCY_CONVERSIONS = "${var.use_pay_for_currency_conversions}"
-        PUBLIC_PAY_ADMIN_API_DSN         = "${var.pay_admin_api_base_url}"
-        PUBLIC_PAY_API_DSN               = "${var.api_pay_base_url}"
         GATEWAY_POLL_SLEEP               = "${var.gateway_poll_sleep}"
       }
     }
