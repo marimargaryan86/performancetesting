@@ -72,7 +72,7 @@
   async function updatePaymentIntentAndPriceQuote(): Promise<void> {
     const nextPriceQuote = await tripManagement.getPriceQuote();
 
-    if (!nextPriceQuote.price && !pollSignal.cancelled) {
+    if (!nextPriceQuote.price.total && !pollSignal.cancelled) {
       await sleep(2000);
 
       return updatePaymentIntentAndPriceQuote();
