@@ -1112,6 +1112,9 @@
                               },
                               {
                                 "$ref": "#/components/schemas/TripBookingDetails"
+                              },
+                              {
+                                "$ref": "#/components/schemas/BookingCancellation"
                               }
                             ]
                           }
@@ -3385,7 +3388,8 @@
             "enum": [
               "orders",
               "orders.bookings",
-              "orders.bookings.details"
+              "orders.bookings.details",
+              "orders.bookings.bookingCancellation"
             ]
           },
           "example": [
