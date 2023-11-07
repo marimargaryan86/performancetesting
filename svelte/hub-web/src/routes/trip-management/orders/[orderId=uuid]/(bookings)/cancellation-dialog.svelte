@@ -106,51 +106,22 @@
         <Button variant="outline" on:click={close}>Return to bookings</Button>
         <Button on:click={rules}>Cancel booking</Button>
       </div>
-    {:else if state === "rules"}
+    {:else if state === "rules" && booking?.rules}
       <div class="icon-wrapper">
         <AlertIcon color="var(--color-semantic-error-500)" size="64px" variant="disc" />
       </div>
 
-      <h3 class="typography display-small bold">Cancellation and refund fees</h3>
+      <h3 class="typography display-small bold">Rules and Fees</h3>
 
-      <p class="typography body-small">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quare ad ea primum, si videtur; Si
-        enim ad populum me vocas, eum. Quid enim est a Chrysippo praetermissum in Stoicis? Et ille
-        ridens: Video, inquit, quid agas;
+      <p class="typography title-small">
+        Please review the following rules before cancelling, including any applicable fees.
       </p>
 
-      <p class="typography body-small">
-        Quid, de quo nulla dissensio est? Nobis aliter videtur, recte secusne, postea; Quid nunc
-        honeste dicit? Tibi hoc incredibile, quod beatissimum. Hic ambiguo ludimur. Haec para/doca
-        illi, nos admirabilia dicamus.
-      </p>
+      {#each booking.rules as rule}
+        <h3 class="typography display-small">{rule.title}</h3>
 
-      <ul>
-        <li>
-          <p class="typography body-small">
-            – Quod dicit Epicurus etiam de voluptate, quae minime sint voluptates, eas obscurari
-            saepe et obrui.
-          </p>
-        </li>
-        <li>
-          <p class="typography body-small">
-            – Si verbum sequimur, primum longius verbum praepositum quam bonum.
-          </p>
-        </li>
-        <li>
-          <p class="typography body-small">
-            – Ergo ita: non posse honeste vivi, nisi honeste vivatur?
-          </p>
-        </li>
-        <li>
-          <p class="typography body-small">– Nam de isto magna dissensio est.</p>
-        </li>
-      </ul>
-
-      <p class="typography body-small">
-        Duo Reges: constructio interrete. Ita nemo beato beatior. In schola desinis. Certe non
-        potest. Videsne quam sit magna dissensio? Itaque his sapiens semper vacabit.
-      </p>
+        <p class="typography body-small">{rule.body}</p>
+      {/each}
 
       <p class="typography body-medium">Do you wish to continue?</p>
 
