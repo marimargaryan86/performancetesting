@@ -65,15 +65,6 @@ export const loginFormParser = {
   }),
 };
 
-export type OrySession = {
-  data: {
-    id: string;
-    email: string;
-    name: string;
-  };
-  expiresAt: Date;
-};
-
 export type OrySessionSchema = {
   expires_at: string;
   identity: {
@@ -82,15 +73,4 @@ export type OrySessionSchema = {
       email: string;
     };
   };
-};
-
-export const orySessionParser = {
-  toModel: (data: OrySessionSchema): OrySession => ({
-    data: {
-      id: data.identity.id,
-      email: data.identity.traits.email,
-      name: "Unknown",
-    },
-    expiresAt: new Date(data.expires_at),
-  }),
 };

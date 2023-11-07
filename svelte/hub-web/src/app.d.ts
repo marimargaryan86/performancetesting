@@ -6,10 +6,8 @@ declare global {
   namespace App {
     // interface Error {}
     interface Locals {
-      user?: {
-        data: UserModel;
-        expiresAt: Date | undefined;
-      };
+      user?: UserModel;
+      sessionExpiresAt?: Date;
     }
     // interface PageData {}
     // interface Platform {}

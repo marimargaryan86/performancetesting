@@ -2,106 +2,74 @@
   import type { ComponentType, SvelteComponent } from "svelte";
 
   interface MenuItem {
-    type: "menu-item";
     url: string;
     label: string;
     icon: ComponentType<SvelteComponent<{ color?: string }>>;
     exact?: boolean;
+    permissions?: {
+      module: PermissionModule;
+      action?: PermissionAction;
+    };
   }
 
-  interface SubMenu {
-    type: "sub-menu";
-    label: string;
-    expanded: boolean;
-    items: MenuItem[];
-  }
-</script>
-
-<script lang="ts">
-  import AccountsIcon from "components/icons/accounts-icon.svelte";
-  import ActivityIcon from "components/icons/activity-icon.svelte";
-  import DashboardIcon from "components/icons/dashboard-icon.svelte";
-  import TicketIcon from "components/icons/ticket-icon.svelte";
-  import { page } from "$app/stores";
-  import { slide } from "svelte/transition";
-  import ChevronIcon from "components/icons/chevron-icon.svelte";
-  import BeneficiaryIcon from "components/icons/beneficiary-icon.svelte";
-  import routeConfig from "routeConfig";
-  import BookingsIcon from "components/icons/bookings-icon.svelte";
-  import BillIcon from "components/icons/bill-icon.svelte";
-
-  export let expanded: boolean;
-  export let transitionTimeMs: number;
-
-  let allMenuItems: (MenuItem | SubMenu)[] = [
+  const menuItems: MenuItem[] = [
     {
-      type: "menu-item",
       url: routeConfig.routes.tripManagement.routes.book.root,
       label: "Book",
       icon: TicketIcon,
     },
     {
-      type: "menu-item",
       url: routeConfig.routes.tripManagement.routes.orders.root,
       label: "View orders",
       icon: BookingsIcon,
+      permissions: {
+        module: "journey",
+        action: "view",
+      },
     },
     {
-      type: "menu-item",
       url: routeConfig.routes.pay.routes.activity.root,
       label: "Activity",
       icon: ActivityIcon,
+      permissions: {
+        module: "transaction",
+        action: "*",
+      },
     },
     {
-      type: "menu-item",
       url: routeConfig.routes.pay.routes.bills.root,
       label: "Bills",
       icon: BillIcon,
-    },
-    {
-      type: "menu-item",
-      url: routeConfig.root,
-      label: "Dashboard",
-      icon: DashboardIcon,
-      exact: true,
-    },
-    {
-      type: "menu-item",
-      url: routeConfig.routes.pay.routes.accounts.root,
-      label: "Accounts",
-      icon: AccountsIcon,
-    },
-    {
-      type: "menu-item",
-      url: routeConfig.routes.pay.routes.beneficiaries.root,
-      label: "Beneficiaries",
-      icon: BeneficiaryIcon,
-    },
-    {
-      type: "menu-item",
-      url: routeConfig.routes.go.routes.bookings.root,
-      label: "Bookings",
-      icon: BookingsIcon,
+      permissions: {
+        module: "*",
+      },
     },
   ];
+</script>
 
-  // TODO: We need to eventually prune unused routes and components.
-  let menuItems: (MenuItem | SubMenu)[] = allMenuItems.slice(0, 4);
+<script lang="ts">
+  import ActivityIcon from "components/icons/activity-icon.svelte";
+  import TicketIcon from "components/icons/ticket-icon.svelte";
+  import { page } from "$app/stores";
+  import routeConfig from "routeConfig";
+  import BookingsIcon from "components/icons/bookings-icon.svelte";
+  import BillIcon from "components/icons/bill-icon.svelte";
+  import { type PermissionAction, type PermissionModule, permitted } from "utils/permissions";
+  import userStore from "stores/user-store";
 
-  function toggle(menuItem: SubMenu): void {
-    menuItem.expanded = !menuItem.expanded;
+  export let expanded: boolean;
+  export let transitionTimeMs: number;
 
-    menuItems = [...menuItems];
-  }
+  $: user = $userStore;
 </script>
 
 <ul class="menu" class:expanded style:--transition-time="{transitionTimeMs}ms">
   {#each menuItems as item}
-    <li>
-      {#if item.type === "menu-item"}
-        {@const active = item.exact
-          ? $page.url.pathname === item.url
-          : $page.url.pathname.startsWith(item.url)}
+    {#if !item.permissions || permitted(user, item.permissions.module, item.permissions.action)}
+      {@const active = item.exact
+        ? $page.url.pathname === item.url
+        : $page.url.pathname.startsWith(item.url)}
+      <li>
         <a
           href={item.url}
           class="typography body-medium"
@@ -114,45 +82,8 @@
           />
           <span>{item.label}</span>
         </a>
-      {:else}
-        <button
-          class="typography body-small"
-          type="button"
-          title={expanded ? undefined : item.label}
-          on:click={toggle.bind(toggle, item)}
-        >
-          <span>{item.label}</span>
-          <ChevronIcon
-            color="var(--color-main-neutral-400)"
-            direction={item.expanded ? "up" : "down"}
-          />
-        </button>
-
-        {#if item.expanded}
-          <ul transition:slide={{ duration: 250 }}>
-            {#each item.items as subItem}
-              {@const active = $page.url.pathname.startsWith(subItem.url)}
-              <li>
-                <a
-                  class="typography body-medium"
-                  href={subItem.url}
-                  class:active
-                  title={expanded ? undefined : subItem.label}
-                >
-                  <svelte:component
-                    this={subItem.icon}
-                    color="var({active
-                      ? '--color-main-primary-500'
-                      : '--color-common-light-strong'})"
-                  />
-                  <span>{subItem.label}</span>
-                </a>
-              </li>
-            {/each}
-          </ul>
-        {/if}
-      {/if}
-    </li>
+      </li>
+    {/if}
   {/each}
 </ul>
 
@@ -167,8 +98,7 @@
     gap: 2px;
   }
 
-  a,
-  button {
+  a {
     display: flex;
     gap: 8px;
     align-items: center;
@@ -181,11 +111,6 @@
     border: 0;
     border-radius: 8px;
     cursor: pointer;
-  }
-
-  button {
-    color: var(--color-common-light-soft);
-    text-transform: uppercase;
   }
 
   a > :global(svg) {

@@ -17,12 +17,12 @@
 
   let logoutTimer: number | undefined = undefined;
 
-  $: if (browser && data.user?.expiresAt) {
-    setLogoutTimer(data.user.expiresAt);
+  $: if (browser && data.sessionExpiresAt) {
+    setLogoutTimer(data.sessionExpiresAt);
   }
   $: if (data.user) {
-    Sentry.setUser({ email: data.user.data.email, id: data.user.data.id });
-    $userStore = data.user.data;
+    Sentry.setUser({ email: data.user.email, id: data.user.id });
+    $userStore = data.user;
   } else {
     Sentry.setUser(null);
   }

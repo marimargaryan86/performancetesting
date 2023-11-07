@@ -10,6 +10,7 @@ import BillService from "./bill-service";
 import JourneyService from "./journey-service";
 import OrderService from "./order-service";
 import CancellationRequestService from "./cancellation-request-service";
+import UserService from "./user-service";
 
 export default {
   AccountService,
@@ -24,4 +25,5 @@ export default {
   JourneyService,
   OrderService,
   CancellationRequestService,
+  UserService,
 };

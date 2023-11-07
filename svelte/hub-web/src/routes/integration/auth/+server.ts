@@ -16,7 +16,11 @@ export async function POST(event): Promise<Response> {
       flowId: data.id,
     });
 
-    setSession({ id: session.id, token: session.token, rememberMe: data.rememberMe, event });
+    setSession({
+      session,
+      rememberMe: data.rememberMe,
+      event,
+    });
 
     return new Response();
   } catch {

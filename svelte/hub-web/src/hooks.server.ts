@@ -1,15 +1,17 @@
-import { redirect, type Handle } from "@sveltejs/kit";
+import { redirect, type Handle, type MaybePromise } from "@sveltejs/kit";
 import routeConfig from "routeConfig";
 import * as Sentry from "@sentry/sveltekit";
 import { sequence } from "@sveltejs/kit/hooks";
 import { env } from "$env/dynamic/private";
 import { deleteSession, getSession } from "utils/auth";
-import integrationInstances from "integration-instances";
 import { AUTH_ROOT } from "./routes/integration/auth/auth-service";
 
-export async function authHandle({ event, resolve }: Parameters<Handle>[0]): Promise<Response> {
+export function authHandle({ event, resolve }: Parameters<Handle>[0]): MaybePromise<Response> {
   try {
-    event.locals.user = await integrationInstances.ory.getSession(getSession(event));
+    const session = getSession(event);
+
+    event.locals.user = session.user;
+    event.locals.sessionExpiresAt = session.expiresAt;
   } catch (err) {
     deleteSession(event);
 

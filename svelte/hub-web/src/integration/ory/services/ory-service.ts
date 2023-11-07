@@ -1,20 +1,21 @@
 import { getCookiesFromHeaders, type Cookie } from "utils/cookies";
 import { URLExtended } from "utils/url";
-import type { SessionModel } from "models/user";
+import type { SessionModelExtended } from "models/user";
 import {
   loginFormParser,
   type LoginForm,
   type LoginFormSchema,
-  orySessionParser,
   type OrySessionSchema,
-  type OrySession,
 } from "../schemas";
+import type UserService from "integration/junction-hub-api/services/user-service";
 
 export default class OryService {
   private readonly baseUrl: string;
+  private readonly userService: UserService;
 
-  constructor(baseUrl?: string) {
+  constructor(userService: UserService, baseUrl?: string) {
     this.baseUrl = baseUrl ?? "";
+    this.userService = userService;
   }
 
   private makeRequest<TData>(
@@ -52,7 +53,7 @@ export default class OryService {
     cookies: { name: string; value: string }[];
     flowId: string;
     data: Record<string, string>;
-  }): Promise<{ id: string; token: string }> {
+  }): Promise<SessionModelExtended> {
     const resp = await this.makeRequest("/self-service/login", {
       queryParams: { flow: flowId },
       method: "POST",
@@ -71,7 +72,22 @@ export default class OryService {
       throw new Error("Unauthorized");
     }
 
-    return { id: sessionCookie.name, token: sessionCookie.value };
+    const respData = (await resp.json()) as { session: OrySessionSchema };
+    const permissions = await this.userService.getOwnPermissions({
+      session: { id: sessionCookie.name, token: sessionCookie.value },
+    });
+
+    return {
+      id: sessionCookie.name,
+      token: sessionCookie.value,
+      expiresAt: new Date(respData.session.expires_at),
+      user: {
+        id: respData.session.identity.id,
+        email: respData.session.identity.traits.email,
+        name: "Unknown",
+        ...permissions,
+      },
+    };
   }
 
   async getLoginForm(): Promise<{
@@ -84,17 +100,5 @@ export default class OryService {
       cookies: getCookiesFromHeaders(resp.headers),
       form: loginFormParser.toModel(await resp.json()),
     };
-  }
-
-  async getSession(session: SessionModel): Promise<OrySession> {
-    const resp = await this.makeRequest<OrySessionSchema>("/sessions/whoami", {
-      cookies: [{ name: session.id, value: session.token }],
-    });
-
-    if (resp.status !== 200) {
-      throw new Error("Unauthorized");
-    }
-
-    return orySessionParser.toModel(await resp.json());
   }
 }

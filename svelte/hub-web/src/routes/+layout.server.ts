@@ -7,10 +7,8 @@ import routeConfig from "routeConfig";
 import { deleteSession, getSession } from "utils/auth";
 
 export async function load(event): Promise<{
-  user?: {
-    data: UserModel;
-    expiresAt: Date | undefined;
-  };
+  user?: UserModel;
+  sessionExpiresAt?: Date;
   currencies: Map<string, Currency>;
   countries: Map<string, CountryModel>;
 }> {
@@ -21,12 +19,12 @@ export async function load(event): Promise<{
   }
 
   try {
-    const currencies = await integrationInstances.junctionHubApi.currencies.find({
-      session: getSession(event),
-    });
+    const session = getSession(event);
+    const currencies = await integrationInstances.junctionHubApi.currencies.find({ session });
 
     return {
       user,
+      sessionExpiresAt: event.locals.sessionExpiresAt,
       currencies: new Map(currencies.data.map((currency) => [currency.code, currency])),
       countries: integrationInstances.common.countries.findCountries(),
     };
