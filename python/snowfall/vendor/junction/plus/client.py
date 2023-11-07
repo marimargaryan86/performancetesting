@@ -23,7 +23,7 @@ class Client(BaseClient):
         }
 
         return await self._make_request(
-            method="POST",
-            url="/push-notification-tokens",
+            method="PATCH",
+            url="/push-notifications/tokens",
             payload=payload,
         )
