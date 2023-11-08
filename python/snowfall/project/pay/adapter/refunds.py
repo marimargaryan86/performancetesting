@@ -15,7 +15,6 @@ from snowfall.project.pay.service.transactions.v1alpha import (
 )
 from snowfall.stdlib import money, sequence, string
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1 import money_pb2
 from snowfall.vendor.currency_cloud.client import PaymentClient
 from snowfall.vendor.currency_cloud.models.rate import (
     DetailedRateRequest,
@@ -42,10 +41,7 @@ class Client(abc.ABC):
     @abc.abstractmethod
     async def update(
         self,
-        identifier: str,
-        refunded_by_provider: money_pb2.Money,
-        refunded_to_reseller: money_pb2.Money,
-        invoice_reference: str,
+        refund: models_pb2.Refund,
     ) -> models_pb2.Refund:
         """Update a refund resource."""
 
@@ -117,12 +113,9 @@ class DictClient(Client):
 
     async def update(
         self,
-        identifier: str,
-        refunded_by_provider: money_pb2.Money,
-        refunded_to_reseller: money_pb2.Money,
-        invoice_reference: str,
+        refund: models_pb2.Refund,
     ) -> models_pb2.Refund:
-        return self._refunds[identifier]
+        return self._refunds[refund.id]
 
     async def find(
         self,
@@ -239,18 +232,12 @@ class GrpcClient(Client):
 
     async def update(
         self,
-        identifier: str,
-        refunded_by_provider: money_pb2.Money,
-        refunded_to_reseller: money_pb2.Money,
-        invoice_reference: str,
+        refund: models_pb2.Refund,
     ) -> models_pb2.Refund:
         return (
             await self._refunds.UpdateRefund(
                 grpc_pb2.UpdateRefundRequest(
-                    refund_id=identifier,
-                    refunded_by_provider=refunded_by_provider,
-                    refunded_to_reseller=refunded_to_reseller,
-                    invoice_reference=invoice_reference,
+                    refund=refund,
                 ),
                 timeout=self._timeout,
             )

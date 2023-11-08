@@ -995,6 +995,7 @@ class RefundsResource(models.Resource):
                     else None
                 ),
                 "invoiceReference": refund.invoice_reference,
+                "externalReference": refund.external_reference_id,
             },
             relationships={
                 "transaction": {

@@ -1,3 +1,5 @@
+import types
+
 import stripe
 from stripe.stripe_object import StripeObject
 
@@ -10,6 +12,12 @@ from snowfall.project.pay.service.refunds.v1alpha.models_pb2 import Refund
 from snowfall.stdlib.logging import stdout
 
 logger = stdout.get_logger()
+_CANCELLATION_STATUS_MAPPING = types.MappingProxyType(
+    {
+        "succeeded": orders_models_pb2.BookingCancellation.Status.STATUS_REFUND_ISSUED,
+        "failed": orders_models_pb2.BookingCancellation.Status.STATUS_REFUND_FAILED,
+    },
+)
 
 
 class RefundsState(object):
@@ -45,10 +53,11 @@ class RefundsState(object):
                 refund.external_reference_id,
                 id_to_refunds[refund.external_reference_id].status,
             )
-            if stripe_refund.status == "succeeded":
-                await self._update_booking_cancellation_status(
-                    refund.external_reference_id,
-                )
+
+            await self._update_booking_cancellation_status(
+                refund.external_reference_id,
+                stripe_refund.status,
+            )
         not_found_refunds = set(refunds_ids) - {
             _refund.external_reference_id for _refund in all_refunds.refunds
         }
@@ -72,6 +81,7 @@ class RefundsState(object):
     async def _update_booking_cancellation_status(
         self,
         stripe_refund_id: str,
+        stripe_refund_status: str,
     ) -> None:
         refund = await self._refunds_client.get(
             identifier=stripe_refund_id,
@@ -89,7 +99,7 @@ class RefundsState(object):
         await self._orders_client.update_booking_cancellations(
             orders_models_pb2.BookingCancellation(
                 id=booking_cancellation.id,
-                status=orders_models_pb2.BookingCancellation.Status.STATUS_REFUND_ISSUED,
+                status=_CANCELLATION_STATUS_MAPPING[stripe_refund_status],
             ),
         )
 

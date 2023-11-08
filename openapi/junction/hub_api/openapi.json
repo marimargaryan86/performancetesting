@@ -2633,7 +2633,14 @@
                 "type": "object",
                 "properties": {
                   "data": {
-                    "$ref": "#/components/schemas/Refund"
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/Refund"
+                      },
+                      {
+                        "$ref": "#/components/schemas/UpdateRefundExternalReference"
+                      }
+                    ]
                   }
                 },
                 "required": [
@@ -4086,7 +4093,8 @@
                     "readOnly": true,
                     "enum": [
                       "pending",
-                      "executed"
+                      "succeeded",
+                      "failed"
                     ],
                     "example": "pending"
                   },
@@ -4132,6 +4140,11 @@
                     "type": "string",
                     "maxLength": 256,
                     "example": "0c1345da-3465-11ee-be56-0242ac120002"
+                  },
+                  "externalReference": {
+                    "type": "string",
+                    "maxLength": 256,
+                    "example": "re_1O7zifG8rm90iRrPhGNnXm4P"
                   }
                 }
               },
@@ -4174,6 +4187,51 @@
                       }
                     ],
                     "description": "Profit or loss due to conversion the funds to original currency"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ]
+      },
+      "UpdateRefundExternalReference": {
+        "title": "UpdateRefundExternalReference",
+        "description": "Update refund external reference schema",
+        "allOf": [
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "type",
+              "attributes"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "271f6d54-9e59-407e-a860-b0771d9e3d26",
+                "format": "uuid",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "example": "refunds",
+                "enum": [
+                  "refunds"
+                ]
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "externalReference"
+                ],
+                "properties": {
+                  "externalReference": {
+                    "type": "string",
+                    "maxLength": 256,
+                    "example": "re_1O7zifG8rm90iRrPhGNnXm4P"
                   }
                 }
               }
@@ -6134,7 +6192,8 @@
                       "rejected",
                       "no-refund",
                       "refund-due",
-                      "refund-issued"
+                      "refund-issued",
+                      "refund-failed"
                     ],
                     "example": "pending"
                   }

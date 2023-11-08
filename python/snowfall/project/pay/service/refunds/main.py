@@ -6,6 +6,8 @@ import httpx
 from motor import motor_asyncio
 from pydantic import AnyUrl
 
+from snowfall.project.junction.go.adapter import orders
+from snowfall.project.junction.go.service.orders.v1 import orders_pb2_grpc
 from snowfall.project.pay.adapter import bills as bills_adapter
 from snowfall.project.pay.adapter import transactions as transactions_adapter
 from snowfall.project.pay.service.refunds import grpc, repositories
@@ -23,6 +25,7 @@ class _GrpcSettings(application.Settings):
     grpc_port: int = 50051
     mongo_dsn: Sequence[AnyUrl]
     transactions_address: str
+    orders_address: str
     cc_login: str
     cc_api_key: str
     cc_address: str
@@ -36,6 +39,10 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
     transactions_channel = await grpc_factory.make_insecure_channel(
         app,
         app.settings.transactions_address,
+    )
+    orders_channel = await grpc_factory.make_insecure_channel(
+        app,
+        app.settings.orders_address,
     )
     grpc_server = server.create_server(
         app.settings.grpc_address,
@@ -63,6 +70,9 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
                         api_key=app.settings.cc_api_key,
                     ),
                     client=metrics.register(httpx.AsyncClient()),
+                ),
+                orders_client=orders.GrpcClient(
+                    orders_pb2_grpc.OrderServiceStub(orders_channel),
                 ),
                 stripe_api_key=app.settings.stripe_api_key,
             ),

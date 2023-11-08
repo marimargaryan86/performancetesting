@@ -69,6 +69,10 @@ job "refunds-grpc" {
               local_bind_port  = 8020
               destination_name = "transactions-${var.environment}"
             }
+            upstreams {
+              local_bind_port  = 8060
+              destination_name = "orders-${var.environment}"
+            }
           }
         }
       }
@@ -91,6 +95,7 @@ job "refunds-grpc" {
         data        = <<EOH
 MONGO_DSN={{range $index, $service := service (printf "mongodb-%s" (env "NOMAD_NAMESPACE"))}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 TRANSACTIONS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_transactions-${var.environment}"))}}
+ORDERS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_orders-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/currencycloud" }}
 CC_LOGIN={{ .Data.data.cc_login }}
 CC_API_KEY={{ .Data.data.cc_api_key }}

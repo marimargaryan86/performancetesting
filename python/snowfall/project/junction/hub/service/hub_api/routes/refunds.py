@@ -33,16 +33,28 @@ class Refund(endpoints.HTTPEndpoint):
         payload = await request_helpers.flatten_request(request)
 
         refund = await refunds_client.update(
-            identifier=refund_id,
-            refunded_by_provider=money.from_string(
-                str(payload["refundedUs"]["amount"]),
-                money.Currency(payload["refundedUs"]["currency"]),
-            ).protobuf(),
-            refunded_to_reseller=money.from_string(
-                str(payload["refundedReseller"]["amount"]),
-                money.Currency(payload["refundedReseller"]["currency"]),
-            ).protobuf(),
-            invoice_reference=payload["invoiceReference"],
+            refunds_model_pb2.Refund(
+                id=refund_id,
+                note=payload.get("note"),  # type: ignore[arg-type]
+                refunded_us=(
+                    money.from_string(
+                        str(payload["refundedUs"]["amount"]),
+                        money.Currency(payload["refundedUs"]["currency"]),
+                    ).protobuf()
+                    if payload.get("refundedUs")
+                    else None
+                ),
+                refunded_reseller=(
+                    money.from_string(
+                        str(payload["refundedReseller"]["amount"]),
+                        money.Currency(payload["refundedReseller"]["currency"]),
+                    ).protobuf()
+                    if payload.get("refundedReseller")
+                    else None
+                ),
+                invoice_reference=payload.get("invoiceReference"),  # type: ignore[arg-type]
+                external_reference_id=payload.get("externalReference"),  # type: ignore[arg-type]
+            ),
         )
 
         return await messages.create_response(
@@ -119,7 +131,6 @@ class Refunds(endpoints.HTTPEndpoint):
         check_permission("refund.add", request.user.permissions)
 
         payload = await request_helpers.flatten_request(request)
-
         refund = await refunds_client.create(
             refunds_model_pb2.Refund(
                 refund_received=payload["refundReceived"],
