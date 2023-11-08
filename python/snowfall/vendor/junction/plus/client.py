@@ -1,5 +1,3 @@
-from typing import Any
-
 from snowfall.vendor.junction.client import BaseClient
 
 _TYPE_KEY = "type"
@@ -11,7 +9,7 @@ class Client(BaseClient):
         self,
         token: str,
         mobile_phone: str,
-    ) -> dict[str, Any]:
+    ) -> None:
         payload = {
             "data": {
                 _TYPE_KEY: "push-notification-tokens",
@@ -22,8 +20,9 @@ class Client(BaseClient):
             },
         }
 
-        return await self._make_request(
+        response = await self._client.request(
             method="PATCH",
             url="/push-notifications/tokens",
-            payload=payload,
+            json=payload,
         )
+        response.raise_for_status()

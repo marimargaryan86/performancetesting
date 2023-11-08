@@ -38,6 +38,10 @@ variable "plus_poc_api_address" {
   type = string
 }
 
+variable "plus_api_address" {
+  type = string
+}
+
 variable "plus_poc_activated" {
   type = bool
 }
@@ -151,7 +155,6 @@ job "mobile-api-http" {
         change_mode = "restart"
         data        = <<EOH
 JUNCTION_API_ADDRESS={{(printf "http://%s" (env "NOMAD_UPSTREAM_ADDR_client-api-${var.environment}"))}}
-PLUS_API_ADDRESS={{(printf "http://%s" (env "NOMAD_UPSTREAM_ADDR_plus-api-${var.environment}"))}}
 TRANSACTIONS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_transactions-${var.environment}"))}}
 FLIGHT_PREDICTION_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_flight-prediction-${var.environment}"))}}
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
@@ -196,6 +199,7 @@ EOH
         PLUS_POC_ACTIVATED        = var.plus_poc_activated
         ORY_CLIENT_TOKEN_ENDPOINT = var.ory_client_token_endpoint
         ORY_CLIENT_ID             = var.ory_client_id
+        PLUS_API_ADDRESS          = "${var.plus_api_address}"
       }
     }
   }
