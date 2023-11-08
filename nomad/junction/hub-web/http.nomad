@@ -122,9 +122,7 @@ job "hub-web-http" {
         change_mode = "restart"
         data        = <<EOH
 {{ with secret "kv/data/${var.environment}/hub-web" }}
-CLIENT_API_KEY={{ .Data.data.client_api_key }}
 PUBLIC_STRIPE_KEY={{ .Data.data.public_stripe_key }}
-BOOKING_HUB_API_KEY={{ .Data.data.booking_hub_api_key }}
 {{ end }}
 CLIENT_API_BASE_URL={{(printf "http://%s" (env "NOMAD_UPSTREAM_ADDR_client-api-${var.environment}"))}}
 HUB_API_BASE_URL={{(printf "http://%s" (env "NOMAD_UPSTREAM_ADDR_hub-api-${var.environment}"))}}

@@ -9,7 +9,7 @@
     }
   },
   "production": {
-    "deploy": false,
+    "deploy": true,
     "variables": {
       "count": 2,
       "traefik_entrypoints": "web",
