@@ -36,6 +36,7 @@ from snowfall.stdlib.integration.starlette import (
     pagination_helpers,
     request_helpers,
 )
+from snowfall.stdlib.logging import stdout
 from snowfall.vendor.junction.go import client
 from snowfall.vendor.junction.go import models as vendor_models
 
@@ -47,6 +48,7 @@ MIN_CHARGE = MappingProxyType(
         "SEK": 500,
     },
 )
+_logger = stdout.get_logger()
 
 
 class MessageOrder(endpoints.HTTPEndpoint):
@@ -268,8 +270,11 @@ class Orders(endpoints.HTTPEndpoint):
                 ),
             )
         except (ServiceUnavailableError, UnhandledError):
-            await payments.cancel(payment)
-            raise
+            _logger.exception(
+                "failed to create a bill",
+                order_id=mobile_order.id,
+                payment_intent_id=mobile_order.payment_intent_id,
+            )
         try:
             spnr = junction_order["included"][0]["attributes"]["reference"]
         except (KeyError, IndexError):
