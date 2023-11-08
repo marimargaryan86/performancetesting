@@ -32,6 +32,7 @@ class OrderService(
         {
             "id": "_id",
             "passenger_name_record": "passenger_name_record",
+            "created_at": "created_at",
         },
     )
 

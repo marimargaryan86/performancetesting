@@ -156,6 +156,7 @@ class Journeys(endpoints.HTTPEndpoint):
         {
             "id": "id",
             "reference": "passenger_name_record",
+            "createdAt": "created_at",
         },
     )
 

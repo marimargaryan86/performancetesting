@@ -3304,9 +3304,16 @@
               "attributes": {
                 "type": "object",
                 "required": [
+                  "createdAt",
                   "passengers"
                 ],
                 "properties": {
+                  "createdAt": {
+                    "type": "string",
+                    "example": "2023-03-06T14:30:00+00:00",
+                    "format": "date-time",
+                    "readOnly": true
+                  },
                   "passengers": {
                     "type": "array",
                     "uniqueItems": true,
@@ -4115,9 +4122,16 @@
                 "type": "object",
                 "required": [
                   "reference",
-                  "contactDetails"
+                  "contactDetails",
+                  "createdAt"
                 ],
                 "properties": {
+                  "createdAt": {
+                    "type": "string",
+                    "example": "2023-03-06T14:30:00+00:00",
+                    "format": "date-time",
+                    "readOnly": true
+                  },
                   "reference": {
                     "type": "string",
                     "example": "IRKI2XHA"

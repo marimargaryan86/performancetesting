@@ -613,6 +613,7 @@ class JourneyResource(models.Resource):
             id=journey.id,
             type=JourneyResource.api_type,
             attributes={
+                "createdAt": protobuf.protobuf_to_datetime(journey.created_at),
                 "reference": journey.passenger_name_record,
                 "contactDetails": {
                     "email": journey.contact_details.email,
@@ -662,6 +663,7 @@ class OrderResource(models.Resource):
             id=order.id,
             type=OrderResource.api_type,
             attributes={
+                "createdAt": protobuf.protobuf_to_datetime(order.created_at),
                 "passengers": [
                     {
                         "firstName": passenger.first_name,

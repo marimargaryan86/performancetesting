@@ -202,6 +202,43 @@ class TestJourneys(object):
         assert asc_pnr_journeys[0] == desc_pnr_journeys[1]
         assert asc_pnr_journeys[1] == desc_pnr_journeys[0]
 
+    async def test_sorting_by_created_at(
+        self,
+        journey_repository: orders.JourneyRepository,
+    ) -> None:
+        await asyncio.gather(
+            journey_repository.create(
+                contact_details=models_pb2.ContactDetails(),
+                reseller_id="",
+            ),
+            journey_repository.create(
+                contact_details=models_pb2.ContactDetails(),
+                reseller_id="",
+            ),
+        )
+
+        asc_created_at_journeys = [
+            journey.created_at
+            async for journey in await journey_repository.find(
+                ids=[],
+                cursor="",
+                sort=("created_at", pymongo.ASCENDING),
+            )
+        ]
+
+        desc_created_at_journeys = [
+            journey.created_at
+            async for journey in await journey_repository.find(
+                ids=[],
+                cursor="",
+                sort=("created_at", pymongo.DESCENDING),
+            )
+        ]
+
+        assert len(asc_created_at_journeys) == 2
+        assert asc_created_at_journeys[0] == desc_created_at_journeys[1]
+        assert asc_created_at_journeys[1] == desc_created_at_journeys[0]
+
 
 class TestOrders(object):
     async def test_order_is_retrievable_by_id(

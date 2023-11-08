@@ -477,6 +477,9 @@ def generate_journey(
             order_models_pb2.Order(
                 id=order_id,
                 journey_id=journey_id,
+                created_at=protobuf.datetime_to_protobuf(
+                    datetime.datetime.now(tz=datetime.UTC),
+                ),
                 passengers=[
                     order_models_pb2.Passenger(
                         first_name="Foo",
@@ -545,6 +548,9 @@ def generate_journey(
                 ],
             ),
         ],
+        created_at=protobuf.datetime_to_protobuf(
+            datetime.datetime.now(tz=datetime.UTC),
+        ),
         passenger_name_record="FOOBAR",
         contact_details=order_models_pb2.ContactDetails(
             email="example@example.com",
