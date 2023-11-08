@@ -30,9 +30,11 @@ type Stop struct {
 }
 
 var namespace uuid.UUID
+var TransferUuid uuid.UUID
 
 func init() {
 	namespace = uuid.NewSHA1(uuid.MustParse("271aa9c1-70c9-46ca-88a5-597ba261c14b"), []byte("snowfall"))
+	TransferUuid = uuid.MustParse("00000000-0000-0000-0000-000000000000")
 }
 
 func (p *Planner) toJourneySet(destination *planner.Stop, connections map[uint64]map[uint8]interface{}) (*TripSet, error) {
@@ -42,8 +44,13 @@ func (p *Planner) toJourneySet(destination *planner.Stop, connections map[uint64
 		dest := destination
 		segments := make([]*Segment, 0)
 
-		for k > 0 {
-			conn := connections[dest.Sequence][k]
+		for {
+			conn, ok := connections[dest.Sequence][k]
+
+			if !ok {
+				break
+			}
+
 			switch v := conn.(type) {
 			case connection:
 				from := p.data.ScheduleStopBySequence(v.schedule.ScheduleStops[v.from])
@@ -78,6 +85,27 @@ func (p *Planner) toJourneySet(destination *planner.Stop, connections map[uint64
 				dest = org
 				k--
 			case transfer:
+				depart := int64(v.departure)
+				arrival := int64(v.arrival)
+
+				// if this is the first segment of the trip, we readjust it to
+				// arrive just before the next segment departs
+				if k == 0 {
+					next := segments[len(segments)-1]
+					toSs := p.data.ScheduleStopBySequence(uint64(next.Stops[0].Sequence))
+					toS := p.data.StopBySequence(toSs.Stop)
+					arrival = next.Depart.Unix() - int64(toS.TransferTime)
+					depart = arrival - (int64(v.arrival) - depart)
+				}
+
+				segments = append(segments, &Segment{
+					Id:         TransferUuid,
+					ScheduleId: TransferUuid,
+					Stops:      make([]*Stop, 0),
+					Depart:     time.Unix(depart, 0),
+					Arrive:     time.Unix(arrival, 0),
+				})
+
 				dest = v.from
 			}
 		}

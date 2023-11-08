@@ -167,6 +167,10 @@ func (ps *PlannerServiceServer) SearchJourney(context context.Context, req *plan
 		segments := make([]*models.SegmentReference, 0, len(r.Segments))
 
 		for _, s := range r.Segments {
+			if s.Id == raptor.TransferUuid {
+				continue
+			}
+
 			legs := make([]string, 0, len(s.Stops)-1)
 
 			for i := 0; i < len(s.Stops)-1; i++ {
