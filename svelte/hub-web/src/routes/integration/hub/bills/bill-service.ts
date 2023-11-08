@@ -9,11 +9,16 @@ const ROOT = `${HUB_INTEGRATION_ROOT}/bills`;
 async function find({
   limit,
   cursor,
+  filter,
 }: {
   limit?: number;
   cursor?: string;
+  filter?: Parameters<BillService["find"]>[0]["filter"];
 }): ReturnType<BillService["find"]> {
-  const url = new URLExtended(ROOT, { base: origin, query: { limit, cursor, action: "find" } });
+  const url = new URLExtended(ROOT, {
+    base: origin,
+    query: { limit, cursor, orderIds: filter?.orderIds?.join(","), action: "find" },
+  });
   const resp = await fetch(url);
 
   return devalue.parse(await resp.text());

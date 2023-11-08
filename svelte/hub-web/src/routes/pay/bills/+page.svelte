@@ -15,18 +15,39 @@
   import type { ScrollLoadFunc } from "directives/scroll-load";
   import integrationInstancesClient from "integration-instances-client";
   import type { Bill } from "integration/junction-hub-api/schemas/bill";
+  import { match as matchUuid } from "../../../params/uuid";
+  import { browser } from "$app/environment";
 
   export let data;
 
+  let searchQuery = "";
+
   $: ({ data: bills } = data.bills);
+  $: searchQueryUuid = matchUuid(searchQuery) ? searchQuery : undefined;
+  $: if (browser) {
+    searchBills(searchQueryUuid);
+  }
+
+  async function searchBills(query?: string): Promise<void> {
+    data.bills = await integrationInstancesClient.hub.bills.find({
+      filter: { orderIds: query && matchUuid(query) ? [query] : undefined },
+    });
+  }
 
   const loadMore: ScrollLoadFunc = async () => {
     if (!data.bills.cursor) {
       return { depleted: true };
     }
 
+    let orderIds: string[] | undefined;
+
+    if (matchUuid(searchQuery)) {
+      orderIds = [searchQuery];
+    }
+
     const nextBills = await integrationInstancesClient.hub.bills.find({
       cursor: data.bills.cursor,
+      filter: { orderIds },
       limit: LIST_BILLS_LIMIT,
     });
 
@@ -49,7 +70,7 @@
   <title>Bills · Pay · Junction Hub</title>
 </svelte:head>
 
-<StandardLayout pageTitle="Bills" searchQuery="">
+<StandardLayout pageTitle="Bills" bind:searchQuery>
   <Table {loadMore} class="bills-table">
     <THead>
       <Header>Order ID</Header>

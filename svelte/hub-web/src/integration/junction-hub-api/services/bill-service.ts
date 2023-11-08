@@ -8,10 +8,14 @@ export default class BillService extends JunctionHubApiService {
     session,
     cursor,
     limit = 100,
+    filter,
   }: {
     session: SessionModel;
     cursor?: string;
     limit?: number;
+    filter?: {
+      orderIds?: string[];
+    };
   }): Promise<PaginatedData<Bill>> {
     const resp = await this.makeRequest<{
       data: BillSchema[];
@@ -19,6 +23,7 @@ export default class BillService extends JunctionHubApiService {
     }>("/bills", {
       session,
       queryParams: {
+        "filter[order.id][eq]": filter?.orderIds?.join(","),
         "page[cursor]": cursor,
         "page[limit]": limit,
         sort: "-updatedAt",

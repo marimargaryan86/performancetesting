@@ -10,9 +10,13 @@ import type { Bill } from "integration/junction-hub-api/schemas/bill";
 function find(event: RequestEvent): ReturnType<BillService["find"]> {
   const session = getSession(event);
   const pagination = getPagination(event);
+  const filter = {
+    orderIds: event.url.searchParams.get("orderIds")?.toString().split(","),
+  };
 
   return integrationInstances.junctionHubApi.bills.find({
     session,
+    filter,
     ...pagination,
   });
 }
