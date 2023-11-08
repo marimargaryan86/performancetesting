@@ -97,7 +97,7 @@ async function* yieldOffersAux(
     yield offer;
   }
 
-  if (result.status !== "completed" && !signal.cancelled) {
+  if ((result.status === "pending" || result.status === "processing") && !signal.cancelled) {
     await sleep(2000);
 
     for await (const offer of yieldOffersAux(signal, nextIds)) {
