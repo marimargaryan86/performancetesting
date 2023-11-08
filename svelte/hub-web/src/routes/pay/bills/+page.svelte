@@ -74,13 +74,17 @@
   <Table {loadMore} class="bills-table">
     <THead>
       <Header>Order ID</Header>
+      <Header>Created Date</Header>
+      <Header>Updated Date</Header>
       <Header>Owed to us</Header>
       <Header>Reconciled?</Header>
     </THead>
     <TBody>
       {#each bills as bill}
         <TRow>
-          <TCol>{bill.orderId}</TCol>
+          <TCol width="0">{bill.orderId}</TCol>
+          <TCol width="0">{bill.createdAt?.toLocaleDateString("sv-SE") ?? "N/A"}</TCol>
+          <TCol width="0">{bill.updatedAt?.toLocaleDateString("sv-SE") ?? "N/A"}</TCol>
           <TMoneyCol
             money={bill.amounts.total ?? { amount: 0, currency: "EUR" }}
             currencies={data.currencies}
