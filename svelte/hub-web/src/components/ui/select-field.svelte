@@ -15,15 +15,26 @@
   export { className as class };
   export let value: TValue | undefined = undefined;
   export let options: Readonly<(TValue | undefined)[]>;
-  export let formatter: (nextValue?: TValue, selected?: boolean) => string = (nextValue) =>
-    String(nextValue ?? "");
+  export let formatter: (nextValue?: TValue, selected?: boolean) => string | undefined = (
+    nextValue,
+  ) => String(nextValue ?? "");
   export let label: string | undefined = undefined;
   export let placeholder: string | undefined = undefined;
   export let required = false;
   export let error: string | string[] | boolean = false;
   export let dialogMinWidth: string | undefined = undefined;
+  export let search: ((query: string, option?: TValue) => boolean) | undefined = undefined;
 
   let expanded = false;
+  let selectedDisplayValue = formatter(value, true);
+
+  $: filteredOptions = options;
+  $: filter(selectedDisplayValue);
+
+  function input(): void {
+    value = undefined;
+    open();
+  }
 
   function toggleExpanded(): void {
     if (expanded) {
@@ -33,17 +44,26 @@
     }
   }
 
+  function filter(query?: string): void {
+    filteredOptions = query?.length
+      ? options.filter((option) => search?.(query ?? "", option))
+      : options;
+  }
+
   function open(): void {
     expanded = true;
+    filteredOptions = options;
   }
 
   function close(): void {
     expanded = false;
+    selectedDisplayValue = formatter(value, true);
   }
 
   function select(option?: TValue): void {
     error = false;
     value = option;
+    selectedDisplayValue = formatter(value, true);
     dispatch("select", value);
     close();
   }
@@ -58,21 +78,22 @@
     {required}
     {label}
     {placeholder}
-    readonly
+    readonly={!search}
+    on:input={input}
     on:click={toggleExpanded}
-    value={value ? formatter(value, true) : undefined}
+    bind:value={selectedDisplayValue}
     {error}
   >
     <ChevronIcon slot="icon-after" direction={expanded ? "up" : "down"} />
   </TextField>
 
-  {#if expanded}
+  {#if expanded && filteredOptions.length}
     <ul
       class="typography body-medium options"
       transition:scale={{ duration: 150, start: 0.8 }}
       style:min-width={dialogMinWidth}
     >
-      {#each options as option}
+      {#each filteredOptions as option}
         {@const displayValue = formatter(option)}
         <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
         <li class="option" on:click={select.bind(select, option)} title={displayValue}>

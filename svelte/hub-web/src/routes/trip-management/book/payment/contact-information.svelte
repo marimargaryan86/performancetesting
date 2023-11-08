@@ -12,6 +12,16 @@
     }),
     phone: z.string().trim().min(1),
   });
+
+  function findCountry(query: string, country?: CountryModel): boolean {
+    const queryLower = query.toLowerCase().replaceAll("+", "").trim();
+
+    return Boolean(
+      country?.code.toLowerCase().includes(queryLower) ||
+        country?.name.toLowerCase().includes(queryLower) ||
+        country?.phoneCode.toLowerCase().includes(queryLower),
+    );
+  }
 </script>
 
 <script lang="ts">
@@ -56,6 +66,7 @@
   <div class="details">
     <div class="phone">
       <SelectField
+        search={findCountry}
         options={countries}
         label="Country code"
         placeholder="Select"
@@ -106,6 +117,7 @@
         error={errors?.address?.city?._errors}
       />
       <SelectField
+        search={findCountry}
         direction="up"
         options={countries}
         label="Country"
