@@ -2,18 +2,34 @@
   export const LIST_JOURNEYS_LIMIT = 20;
   export const LIST_JOURNEYS_SORT: Parameters<JourneyService["find"]>[0]["sort"] = "-createdAt";
 
+  function getDepartureDateString(order: Order): string {
+    const departureLeg = order.bookings
+      .flatMap((booking) => booking.detailsList.flatMap((details) => details.legs))
+      .sort((a, b) => {
+        return a.departureAt.getTime() - b.departureAt.getTime();
+      })[0];
+
+    if (!departureLeg) {
+      throw new Error("Unknown departure date");
+    }
+
+    return departureLeg.departureAt.toLocaleString("sv-SE", {
+      timeZone: departureLeg.origin.timeZone,
+    });
+  }
+
   function getDepartureDate(order: Order): Date {
-    const departureDate = order.bookings
+    const departureAt = order.bookings
       .flatMap((booking) =>
         booking.detailsList.flatMap((details) => details.legs.flatMap((leg) => leg.departureAt)),
       )
       .sort()[0];
 
-    if (!departureDate) {
+    if (!departureAt) {
       throw new Error("Unknown departure date");
     }
 
-    return departureDate;
+    return departureAt;
   }
 
   function getPassengerNames(order: Order): string[] {
@@ -169,7 +185,7 @@
             {/if}
           </TCol>
           <TCol class="typography body-small">
-            {getDepartureDate(order).toLocaleDateString("sv-SE")}
+            {getDepartureDateString(order)}
           </TCol>
           <TCol class="typography body-small">
             <span class="ellipsis typography bold">{getPassengerNames(order).join(", ")}</span>

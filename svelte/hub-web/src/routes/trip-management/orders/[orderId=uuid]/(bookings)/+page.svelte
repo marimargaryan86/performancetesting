@@ -83,7 +83,11 @@
             <span class="not-available">N/A</span>
           {/if}
         </TCol>
-        <TCol>{booking.detailsList[0]?.legs[0]?.departureAt.toLocaleDateString("en-GB")}</TCol>
+        <TCol>
+          {booking.detailsList[0]?.legs[0]?.departureAt.toLocaleDateString("en-GB", {
+            timeZone: origin?.timeZone,
+          })}
+        </TCol>
         <TCol class="typography bold">{origin?.name ?? "Unknown"}</TCol>
         <TCol class="typography bold">{destination?.name ?? "Unknown"}</TCol>
         <TMoneyCol money={booking.price.total} />

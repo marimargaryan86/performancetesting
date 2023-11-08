@@ -96,6 +96,7 @@
                 month: "long",
                 day: "numeric",
                 year: "numeric",
+                timeZone: details.legs[0]?.origin.timeZone,
               })}
             </span>
 
