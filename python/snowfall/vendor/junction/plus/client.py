@@ -14,7 +14,7 @@ class Client(BaseClient):
     ) -> dict[str, Any]:
         payload = {
             "data": {
-                _TYPE_KEY: "transactions",
+                _TYPE_KEY: "push-notification-tokens",
                 _ATTRIBUTES_KEY: {
                     "token": token,
                     "mobilePhone": mobile_phone,
