@@ -1,5 +1,5 @@
 import datetime
-from collections.abc import AsyncIterable, Callable
+from collections.abc import AsyncIterable, Callable, Sequence
 
 import pytest
 from google.protobuf import json_format
@@ -215,6 +215,7 @@ class TestRequestGenerator(object):
                     is_supported=True,
                     stop_identification_method=meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_COORDINATES,
                     passenger_age_identification_method=meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH,
+                    supports_multi_city=True,
                 ),
                 provider_trips_pb2.SearchTripsRequest(
                     multi_city=provider_trips_pb2.SearchTripsRequest.MultiCity(
@@ -241,6 +242,7 @@ class TestRequestGenerator(object):
                     is_supported=True,
                     stop_identification_method=meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_IATA_CODES,
                     passenger_age_identification_method=meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH,
+                    supports_multi_city=True,
                 ),
                 provider_trips_pb2.SearchTripsRequest(
                     multi_city=provider_trips_pb2.SearchTripsRequest.MultiCity(
@@ -267,6 +269,7 @@ class TestRequestGenerator(object):
                     is_supported=True,
                     stop_identification_method=meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_COORDINATES,
                     passenger_age_identification_method=meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH,
+                    supports_round_trip=True,
                 ),
                 provider_trips_pb2.SearchTripsRequest(
                     round_trip=provider_trips_pb2.SearchTripsRequest.RoundTrip(
@@ -287,6 +290,7 @@ class TestRequestGenerator(object):
                     is_supported=True,
                     stop_identification_method=meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_IATA_CODES,
                     passenger_age_identification_method=meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH,
+                    supports_round_trip=True,
                 ),
                 provider_trips_pb2.SearchTripsRequest(
                     round_trip=provider_trips_pb2.SearchTripsRequest.RoundTrip(
@@ -336,6 +340,7 @@ class TestRequestGenerator(object):
                         segment_type_pb2.SegmentType.SEGMENT_TYPE_FLIGHT,
                         segment_type_pb2.SegmentType.SEGMENT_TYPE_BUS,
                     ],
+                    supports_multi_city=True,
                 ),
                 provider_trips_pb2.SearchTripsRequest(
                     multi_city=provider_trips_pb2.SearchTripsRequest.MultiCity(
@@ -368,6 +373,7 @@ class TestRequestGenerator(object):
                     supported_segment_types=[
                         segment_type_pb2.SegmentType.SEGMENT_TYPE_FLIGHT,
                     ],
+                    supports_round_trip=True,
                 ),
                 provider_trips_pb2.SearchTripsRequest(
                     round_trip=provider_trips_pb2.SearchTripsRequest.RoundTrip(
@@ -486,6 +492,7 @@ class TestRequestGenerator(object):
                     is_supported=True,
                     stop_identification_method=meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_IATA_CODES,
                     passenger_age_identification_method=meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH,
+                    supports_multi_city=True,
                 ),
                 id=(
                     "multi city with IATA codes identification method and with stop"
@@ -508,6 +515,7 @@ class TestRequestGenerator(object):
                     is_supported=True,
                     stop_identification_method=meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_IATA_CODES,
                     passenger_age_identification_method=meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH,
+                    supports_round_trip=True,
                 ),
                 id=(
                     "round trip with IATA codes identification method and with stop"
@@ -536,6 +544,7 @@ class TestRequestGenerator(object):
                         segment_type_pb2.SegmentType.SEGMENT_TYPE_FLIGHT,
                         segment_type_pb2.SegmentType.SEGMENT_TYPE_TRAIN,
                     ],
+                    supports_multi_city=True,
                 ),
                 id="multi city with one supported and one unsupported segment type",
             ),
@@ -548,6 +557,7 @@ class TestRequestGenerator(object):
                     supported_segment_types=[
                         segment_type_pb2.SegmentType.SEGMENT_TYPE_BUS,
                     ],
+                    supports_round_trip=True,
                 ),
                 id="round trip with unsupported segment type",
             ),
@@ -617,6 +627,7 @@ class TestRequestGenerator(object):
                     is_supported=True,
                     stop_identification_method=meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_COORDINATES,
                     passenger_age_identification_method=meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH,
+                    supports_multi_city=True,
                 ),
             ),
             (
@@ -635,6 +646,7 @@ class TestRequestGenerator(object):
                     is_supported=True,
                     stop_identification_method=meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_COORDINATES,
                     passenger_age_identification_method=meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH,
+                    supports_round_trip=True,
                 ),
             ),
         ],
@@ -660,3 +672,100 @@ class TestRequestGenerator(object):
         requests = [request[1] async for request in generator.generate(task)]
 
         assert not requests
+
+    @pytest.mark.parametrize(
+        ("task", "capabilities", "expected"),
+        [
+            pytest.param(
+                _MULTI_CITY_TASK,
+                meta_pb2.TripSearchCapabilities(
+                    is_supported=True,
+                    stop_identification_method=meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_COORDINATES,
+                    passenger_age_identification_method=meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH,
+                    supports_multi_city=False,
+                ),
+                [
+                    provider_trips_pb2.SearchTripsRequest(
+                        one_way=provider_trips_pb2.SearchTripsRequest.OneWay(
+                            criterion=provider_trips_pb2.SearchTripsRequest.Criterion(
+                                origin_coordinates=_ORIGIN_COORDINATES,
+                                destination_coordinates=_DESTINATION_COORDINATES,
+                                departure_date=_DEPARTURE_DATE,
+                            ),
+                        ),
+                        passengers=[_REQUEST_PASSENGER],
+                    ),
+                    provider_trips_pb2.SearchTripsRequest(
+                        one_way=provider_trips_pb2.SearchTripsRequest.OneWay(
+                            criterion=provider_trips_pb2.SearchTripsRequest.Criterion(
+                                origin_coordinates=_DESTINATION_COORDINATES,
+                                destination_coordinates=_ORIGIN_COORDINATES,
+                                departure_date=_RETURN_DATE,
+                            ),
+                        ),
+                        passengers=[_REQUEST_PASSENGER],
+                    ),
+                ],
+                id="multi city should fall back to one one way per trip if unsupported",
+            ),
+            pytest.param(
+                _ROUND_TRIP_TASK,
+                meta_pb2.TripSearchCapabilities(
+                    is_supported=True,
+                    stop_identification_method=meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_COORDINATES,
+                    passenger_age_identification_method=meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH,
+                    supports_round_trip=False,
+                ),
+                [
+                    provider_trips_pb2.SearchTripsRequest(
+                        one_way=provider_trips_pb2.SearchTripsRequest.OneWay(
+                            criterion=provider_trips_pb2.SearchTripsRequest.Criterion(
+                                origin_coordinates=_ORIGIN_COORDINATES,
+                                destination_coordinates=_DESTINATION_COORDINATES,
+                                departure_date=_DEPARTURE_DATE,
+                            ),
+                        ),
+                        passengers=[_REQUEST_PASSENGER],
+                    ),
+                    provider_trips_pb2.SearchTripsRequest(
+                        one_way=provider_trips_pb2.SearchTripsRequest.OneWay(
+                            criterion=provider_trips_pb2.SearchTripsRequest.Criterion(
+                                origin_coordinates=_DESTINATION_COORDINATES,
+                                destination_coordinates=_ORIGIN_COORDINATES,
+                                departure_date=_RETURN_DATE,
+                            ),
+                        ),
+                        passengers=[_REQUEST_PASSENGER],
+                    ),
+                ],
+                id="round trip should fall back to two one ways if unsupported",
+            ),
+        ],
+    )
+    async def test_generator_can_fallback_to_one_way(
+        self,
+        task: trips_pb2.TripSearchTask,
+        capabilities: meta_pb2.TripSearchCapabilities,
+        expected: Sequence[provider_trips_pb2.SearchTripsRequest],
+        mocker: plugin.MockerFixture,
+    ) -> None:
+        providers_list = providers.Collection([])
+        mocker.patch.object(
+            providers_list,
+            "all_healthy",
+            _providers_factory(capabilities),
+        )
+
+        generator = trips_request.Generator(
+            providers_list=providers_list,
+            stop_resolver=_stop_resolver,
+        )
+
+        requests = [request[1] async for request in generator.generate(task)]
+
+        assert len(requests) == len(expected)
+        assert all(
+            json_format.MessageToDict(requests[idx])
+            == json_format.MessageToDict(expected[idx])
+            for idx in range(len(expected))
+        )

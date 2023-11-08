@@ -1,3 +1,4 @@
+import contextlib
 import datetime
 import itertools
 from collections.abc import AsyncGenerator, Sequence
@@ -14,6 +15,94 @@ _GeneratorReturn = AsyncGenerator[
     tuple[providers.Provider, provider_trips_pb2.SearchTripsRequest],
     None,
 ]
+
+
+class BuildError(Exception):
+    """Raise when a request can't be built."""
+
+
+def _build_multi_city(
+    provider: providers.Provider,
+    details: trips_pb2.MultiCity,
+    passengers: Sequence[trips_pb2.Passenger],
+    resolved_stops: stops.ResolvedMap,
+) -> provider_trips_pb2.SearchTripsRequest:
+    criteria = [
+        _to_provider_criterion(
+            provider,
+            resolved_stops,
+            criterion,
+        )
+        for criterion in details.criteria
+    ]
+
+    if not _criteria_is_valid(criteria):
+        raise BuildError
+
+    provider_passengers = _to_passengers(provider, passengers)
+
+    if not provider_passengers:
+        raise BuildError
+
+    return provider_trips_pb2.SearchTripsRequest(
+        multi_city=provider_trips_pb2.SearchTripsRequest.MultiCity(
+            criteria=criteria,
+        ),
+        passengers=provider_passengers,
+    )
+
+
+def _build_one_way(
+    provider: providers.Provider,
+    details: trips_pb2.OneWay,
+    passengers: Sequence[trips_pb2.Passenger],
+    resolved_stops: stops.ResolvedMap,
+) -> provider_trips_pb2.SearchTripsRequest:
+    criterion = _to_provider_criterion(provider, resolved_stops, details.criterion)
+
+    if not criterion:
+        raise BuildError
+
+    provider_passengers = _to_passengers(provider, passengers)
+
+    if not provider_passengers:
+        raise BuildError
+
+    return provider_trips_pb2.SearchTripsRequest(
+        one_way=provider_trips_pb2.SearchTripsRequest.OneWay(
+            criterion=criterion,
+        ),
+        passengers=provider_passengers,
+    )
+
+
+def _build_round_trip(
+    provider: providers.Provider,
+    details: trips_pb2.RoundTrip,
+    passengers: Sequence[trips_pb2.Passenger],
+    resolved_stops: stops.ResolvedMap,
+) -> provider_trips_pb2.SearchTripsRequest:
+    criterion = _to_provider_criterion(
+        provider,
+        resolved_stops,
+        details.criterion,
+    )
+
+    if not criterion:
+        raise BuildError
+
+    provider_passengers = _to_passengers(provider, passengers)
+
+    if not provider_passengers:
+        raise BuildError
+
+    return provider_trips_pb2.SearchTripsRequest(
+        round_trip=provider_trips_pb2.SearchTripsRequest.RoundTrip(
+            criterion=criterion,
+            return_date=details.return_date,
+        ),
+        passengers=provider_passengers,
+    )
 
 
 class Generator(object):
@@ -61,31 +150,24 @@ class Generator(object):
         )
 
         for provider in await self._eligible_providers():
-            # TODO(jyggen): use supports_multi_city flag
-
-            criteria = [
-                _to_provider_criterion(
+            if provider.trip_search_capabilities.supports_multi_city:
+                with contextlib.suppress(BuildError):
+                    yield provider, _build_multi_city(
+                        provider,
+                        task.multi_city,
+                        task.passengers,
+                        resolved_stops,
+                    )
+            else:
+                requests = _multi_city_fallback(
                     provider,
+                    task.multi_city,
+                    task.passengers,
                     resolved_stops,
-                    criterion,
                 )
-                for criterion in task.multi_city.criteria
-            ]
 
-            if not _criteria_is_valid(criteria):
-                continue
-
-            passengers = _to_passengers(provider, task)
-
-            if not passengers:
-                continue
-
-            yield provider, provider_trips_pb2.SearchTripsRequest(
-                multi_city=provider_trips_pb2.SearchTripsRequest.MultiCity(
-                    criteria=criteria,
-                ),
-                passengers=passengers,
-            )
+                for request in requests:
+                    yield provider, request
 
     async def _one_way(
         self,
@@ -101,26 +183,13 @@ class Generator(object):
         )
 
         for provider in await self._eligible_providers():
-            criterion = _to_provider_criterion(
-                provider,
-                resolved_stops,
-                task.one_way.criterion,
-            )
-
-            if not criterion:
-                continue
-
-            passengers = _to_passengers(provider, task)
-
-            if not passengers:
-                continue
-
-            yield provider, provider_trips_pb2.SearchTripsRequest(
-                one_way=provider_trips_pb2.SearchTripsRequest.OneWay(
-                    criterion=criterion,
-                ),
-                passengers=passengers,
-            )
+            with contextlib.suppress(BuildError):
+                yield provider, _build_one_way(
+                    provider,
+                    task.one_way,
+                    task.passengers,
+                    resolved_stops,
+                )
 
     async def _round_trip(
         self,
@@ -136,29 +205,24 @@ class Generator(object):
         )
 
         for provider in await self._eligible_providers():
-            # TODO(jyggen): use supports_round_trip flag
+            if provider.trip_search_capabilities.supports_round_trip:
+                with contextlib.suppress(BuildError):
+                    yield provider, _build_round_trip(
+                        provider,
+                        task.round_trip,
+                        task.passengers,
+                        resolved_stops,
+                    )
+            else:
+                requests = _round_trip_fallback(
+                    provider,
+                    task.round_trip,
+                    task.passengers,
+                    resolved_stops,
+                )
 
-            criterion = _to_provider_criterion(
-                provider,
-                resolved_stops,
-                task.round_trip.criterion,
-            )
-
-            if not criterion:
-                continue
-
-            passengers = _to_passengers(provider, task)
-
-            if not passengers:
-                continue
-
-            yield provider, provider_trips_pb2.SearchTripsRequest(
-                round_trip=provider_trips_pb2.SearchTripsRequest.RoundTrip(
-                    criterion=criterion,
-                    return_date=task.round_trip.return_date,
-                ),
-                passengers=passengers,
-            )
+                for request in requests:
+                    yield provider, request
 
     async def _eligible_providers(self) -> list[providers.Provider]:
         return [
@@ -168,9 +232,56 @@ class Generator(object):
         ]
 
 
+def _multi_city_fallback(
+    provider: providers.Provider,
+    details: trips_pb2.MultiCity,
+    passengers: Sequence[trips_pb2.Passenger],
+    resolved_stops: stops.ResolvedMap,
+) -> Sequence[provider_trips_pb2.SearchTripsRequest]:
+    one_ways = [trips_pb2.OneWay(criterion=criterion) for criterion in details.criteria]
+
+    try:
+        return [
+            _build_one_way(provider, details, passengers, resolved_stops)
+            for details in one_ways
+        ]
+    except BuildError:
+        return []
+
+
+def _round_trip_fallback(
+    provider: providers.Provider,
+    details: trips_pb2.RoundTrip,
+    passengers: Sequence[trips_pb2.Passenger],
+    resolved_stops: stops.ResolvedMap,
+) -> Sequence[provider_trips_pb2.SearchTripsRequest]:
+    one_ways = [
+        trips_pb2.OneWay(
+            criterion=details.criterion,
+        ),
+        trips_pb2.OneWay(
+            criterion=trips_pb2.Criterion(
+                origin=details.criterion.destination,
+                destination=details.criterion.origin,
+                departure_date=details.return_date,
+                segment_types=details.criterion.segment_types,
+                max_connections=details.criterion.max_connections,
+            ),
+        ),
+    ]
+
+    try:
+        return [
+            _build_one_way(provider, details, passengers, resolved_stops)
+            for details in one_ways
+        ]
+    except BuildError:
+        return []
+
+
 def _to_passengers(
     provider: providers.Provider,
-    task: trips_pb2.TripSearchTask,
+    passengers: Sequence[trips_pb2.Passenger],
 ) -> list[provider_trips_pb2.SearchTripsRequest.Passenger]:
     match provider.trip_search_capabilities.passenger_age_identification_method:
         case provider_meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_PROVIDER_TYPE:
@@ -183,7 +294,7 @@ def _to_passengers(
                         _passenger_type_to_date_of_birth(passenger.type),
                     ),
                 )
-                for passenger in task.passengers
+                for passenger in passengers
                 if passenger.type is not passenger_type_pb2.PASSENGER_TYPE_UNSPECIFIED
             ]
 
