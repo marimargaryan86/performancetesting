@@ -1,4 +1,7 @@
 <script lang="ts" context="module">
+  export const LIST_JOURNEYS_LIMIT = 20;
+  export const LIST_JOURNEYS_SORT: Parameters<JourneyService["find"]>[0]["sort"] = "-createdAt";
+
   function getDepartureDate(order: Order): Date {
     const departureDate = order.bookings
       .flatMap((booking) =>
@@ -75,6 +78,7 @@
   import { getZeroTimeDate } from "utils/date-time";
   import type { ScrollLoadFunc } from "directives/scroll-load";
   import integrationInstancesClient from "integration-instances-client";
+  import type JourneyService from "integration/junction-hub-api/services/journey-service.js";
 
   export let data;
 
@@ -90,7 +94,8 @@
 
     const resp = await integrationInstancesClient.hub.journeys.find({
       cursor: data.journeys.cursor,
-      limit: 20,
+      limit: LIST_JOURNEYS_LIMIT,
+      sort: LIST_JOURNEYS_SORT,
     });
 
     data.journeys = {
@@ -123,6 +128,7 @@
   <Table class="orders-table" {loadMore}>
     <THead>
       <Header>Order Reference</Header>
+      <Header>Created Date</Header>
       <Header>Ticket(s)</Header>
       <Header>Departure Date</Header>
       <Header>Passengers</Header>
@@ -144,6 +150,9 @@
             <a href={routeConfig.routes.tripManagement.routes.orders.routes.order(order.id).root}>
               {order.journey?.reference ?? "Unknown"}
             </a>
+          </TCol>
+          <TCol class="typography body-small" width="0">
+            {order.createdAt.toLocaleDateString("sv-SE")}
           </TCol>
           <TCol class="typography body-small" width="0">
             {#if hasTickets}

@@ -76,6 +76,7 @@ export const orderPassengerParser = {
 
 export type Order = {
   id: string;
+  createdAt: Date;
   passengers: OrderPassenger[];
   residenceAddress?: Required<Omit<EnhancedAddressDetails, "state">>;
   journeyId: string;
@@ -88,6 +89,7 @@ export type OrderSchema = {
   id: string;
   type: "orders";
   attributes: {
+    createdAt: string;
     passengers: OrderPassengerSchema[];
     residenceAddress?: Required<Omit<EnhancedAddressDetailsSchema, "state">>;
   };
@@ -105,6 +107,7 @@ export const orderParser = {
 
     return {
       id: data.id,
+      createdAt: new Date(data.attributes.createdAt),
       passengers: data.attributes.passengers.map(orderPassengerParser.toModel),
       residenceAddress: data.attributes.residenceAddress
         ? (enhancedAddressDetailsParser.toModel(

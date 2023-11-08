@@ -9,10 +9,12 @@ export default class JourneyService extends JunctionHubApiService {
     session,
     cursor,
     limit = 100,
+    sort = "id",
   }: {
     session: SessionModel;
     cursor?: string;
     limit?: number;
+    sort?: "id" | "-id" | "reference" | "-reference" | "createdAt" | "-createdAt";
   }): Promise<PaginatedData<Journey>> {
     const resp = await this.makeRequest<{
       data: JourneySchema[];
@@ -23,6 +25,7 @@ export default class JourneyService extends JunctionHubApiService {
       queryParams: {
         "page[cursor]": cursor,
         "page[limit]": limit,
+        sort,
         include: [
           "orders",
           "orders.bookings",

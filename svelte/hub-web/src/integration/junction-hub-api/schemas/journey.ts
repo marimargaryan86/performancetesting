@@ -28,6 +28,7 @@ export const contactDetailsParser = {
 
 export type Journey = {
   id: string;
+  createdAt: Date;
   reference: string;
   contact: ContactDetails;
   orderIds: string[];
@@ -38,6 +39,7 @@ export type JourneySchema = {
   id: string;
   type: "journeys";
   attributes: {
+    createdAt: string;
     reference: string;
     contactDetails: ContactDetailsSchema;
   };
@@ -53,6 +55,7 @@ export const journeyParser = {
 
     return {
       id: data.id,
+      createdAt: new Date(data.attributes.createdAt),
       reference: data.attributes.reference,
       contact: contactDetailsParser.toModel(data.attributes.contactDetails),
       orderIds,

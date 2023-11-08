@@ -9,8 +9,11 @@ import type JourneyService from "integration/junction-hub-api/services/journey-s
 function find(event: RequestEvent): ReturnType<JourneyService["find"]> {
   const session = getSession(event);
   const pagination = getPagination(event);
+  const sort = event.url.searchParams.get("sort")?.toString() as Parameters<
+    JourneyService["find"]
+  >[0]["sort"];
 
-  return integrationInstances.junctionHubApi.journeys.find({ session, ...pagination });
+  return integrationInstances.junctionHubApi.journeys.find({ session, ...pagination, sort });
 }
 
 export async function GET(event): Promise<Response> {
