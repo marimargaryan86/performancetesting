@@ -45,7 +45,6 @@ variable "api_pay_base_url" {
   type = string
 }
 
-
 job "offers-pricing" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -108,8 +107,6 @@ job "offers-pricing" {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
-PUBLIC_PAY_API_DSN={{(printf "http://%s" (env "NOMAD_UPSTREAM_ADDR_pay-api-${var.environment}"))}}
-PUBLIC_PAY_ADMIN_API_DSN={{(printf "http://%s" (env "NOMAD_UPSTREAM_ADDR_pay-api-admin-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/offers" }}
 PAY_ADMIN_USERNAME={{ .Data.data.pay_admin_username }}
 PAY_ADMIN_PASSWORD={{ .Data.data.pay_admin_password }}
