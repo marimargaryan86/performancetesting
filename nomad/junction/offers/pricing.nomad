@@ -37,6 +37,13 @@ variable "payer_currency_code" {
 variable "use_pay_for_currency_conversions" {
   type = bool
 }
+variable "pay_admin_api_base_url" {
+  type = string
+}
+
+variable "api_pay_base_url" {
+  type = string
+}
 
 
 job "offers-pricing" {
@@ -80,19 +87,8 @@ job "offers-pricing" {
 
       connect {
         sidecar_service {
-          proxy {
-            upstreams {
-              local_bind_port  = 8020
-              destination_name = "pay-api-${var.environment}"
-            }
-            upstreams {
-              local_bind_port  = 8030
-              destination_name = "pay-api-admin-${var.environment}"
-            }
-          }
         }
       }
-
       check {
         type     = "http"
         path     = "/"
@@ -144,6 +140,8 @@ EOH
         PROMETHEUS_PORT                  = "${NOMAD_PORT_prometheus}"
         PAYER_COMPANY_ID                 = "${var.payer_company_id}"
         PAYER_CURRENCY_CODE              = "${var.payer_currency_code}"
+        PUBLIC_PAY_ADMIN_API_DSN         = "${var.pay_admin_api_base_url}"
+        PUBLIC_PAY_API_DSN               = "${var.api_pay_base_url}"
         USE_PAY_FOR_CURRENCY_CONVERSIONS = "${var.use_pay_for_currency_conversions}"
       }
     }
