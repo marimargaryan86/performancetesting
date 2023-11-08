@@ -19,7 +19,7 @@ class Tokens(endpoints.HTTPEndpoint):
 
         update_response = await subscribers_client.update_notification_token(
             reseller_id=reseller_id,
-            mobile_phone=body.get("mobile_phone", ""),
+            mobile_phone=body.get("mobilePhone", ""),
             token=body.get("token", ""),
         )
         if update_response:

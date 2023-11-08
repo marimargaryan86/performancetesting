@@ -200,7 +200,7 @@ class GrpcClient(Client):
         token: str,
     ) -> bool:
         response = await errors.handle_grpc_errors(
-            self._subscribers.Subscribe(
+            self._subscribers.UpdatePushNotificationToken(
                 notifications_grpc_pb2.UpdatePushNotificationTokenRequest(
                     reseller_id=reseller_id,
                     mobile_phone=mobile_phone,
