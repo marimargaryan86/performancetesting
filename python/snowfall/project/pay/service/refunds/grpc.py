@@ -15,6 +15,9 @@ from snowfall.project.pay.service.refunds.v1 import (
     grpc_pb2_grpc,
     models_pb2,
 )
+from snowfall.project.pay.service.transactions.v1 import (
+    models_pb2 as transactions_models_pb2,
+)
 from snowfall.stdlib import money, string
 from snowfall.stdlib.transport.grpc import rich_status, service
 from snowfall.stdlib.v1 import money_pb2
@@ -63,7 +66,7 @@ class RefundsService(
         context: grpc.aio.ServicerContext,
     ) -> grpc_pb2.CreateRefundResponse:
         try:
-            transaction = await self._transactions_client.get(
+            await self._transactions_client.get(
                 request.refund.transaction_id,
             )
         except NotFoundError:
@@ -75,24 +78,8 @@ class RefundsService(
                 ),
             )
 
-        try:
-            bill = await self._bills_client.get(transaction.bill_id)
-        except NotFoundError:
-            return await context.abort(grpc.StatusCode.NOT_FOUND)
-
         request.refund.id = string.uuid()
         request.refund.status = models_pb2.Refund.Status.STATUS_PENDING
-
-        if transaction.payment_type == PaymentType.PAYMENT_TYPE_CARD:
-            refunded_us = money.from_protobuf(request.refund.refunded_us)
-            try:
-                stripe_refund = stripe.Refund.create(
-                    payment_intent=bill.payment_intent_id,
-                    amount=refunded_us.amount,
-                )
-            except stripe.error.StripeError:
-                return await context.abort(grpc.StatusCode.INVALID_ARGUMENT)
-            request.refund.external_reference_id = stripe_refund.stripe_id
 
         refund = await self._refunds.insert(request.refund)
 
@@ -141,7 +128,7 @@ class RefundsService(
             next_page_token=await refunds.cursor(),
         )
 
-    async def UpdateRefund(  # type: ignore[override] # noqa: N802, WPS217
+    async def UpdateRefund(  # type: ignore[override] # noqa: N802
         self,
         request: grpc_pb2.UpdateRefundRequest,
         context: grpc.aio.ServicerContext,
@@ -153,77 +140,10 @@ class RefundsService(
         if request.refund.external_reference_id:
             updated_refund = await self._update_refund_status(context, request, refund)
             await self._update_booking_cancellation_status_success(refund)
+        else:
+            updated_refund = await self._execute_refund(context, request, refund)
 
-            return grpc_pb2.UpdateRefundResponse(
-                refund=updated_refund,
-            )
-
-        if (  # noqa: WPS337
-            request.refund.refunded_us.currency_code
-            == request.refund.refunded_reseller.currency_code
-        ):
-            await rich_status.abort_with_rich_status(
-                context=context,
-                status=rich_status.build_bad_request(
-                    field_name="refundedUs",
-                    field_description=(
-                        "refundedUs should not be same as refundedReseller"
-                    ),
-                ),
-            )
-
-        try:
-            transaction = await self._transactions_client.get(refund.transaction_id)
-        except NotFoundError:
-            await rich_status.abort_with_rich_status(
-                context=context,
-                status=rich_status.build_bad_request(
-                    field_name="transaction",
-                    field_description="Transaction ID is not found",
-                ),
-            )
-
-        detailed_rate = await self._get_detailed_rate(
-            request.refund.refunded_us,
-            request.refund.refunded_reseller,
-        )
-
-        refund.refund_position.CopyFrom(
-            await self._get_refund_position(
-                detailed_rate,
-                request.refund.refunded_reseller,
-                transaction.amounts.sales_margin,
-                transaction.amounts.fx_margin,
-                transaction.amounts.processing_margin,
-            ),
-        )
-        conversion_id = ""
-        if transaction.payment_type != PaymentType.PAYMENT_TYPE_CARD:
-            cc_conversion = await self._payment_client.create_conversion(
-                conversion.ConversionRequest(
-                    buy_currency=request.refund.refunded_us.currency_code,
-                    sell_currency=request.refund.refunded_reseller.currency_code,
-                    amount=str(
-                        money.from_protobuf(request.refund.refunded_us),
-                    ),
-                    reason=transaction.id,
-                ),
-            )
-            conversion_id = cc_conversion.identifier
-
-            refund.status = models_pb2.Refund.Status.STATUS_SUCCEEDED
-        refund.conversion_id = conversion_id
-        refund.invoice_reference = request.refund.invoice_reference
-        refund.refunded_us_in_payer_currency.CopyFrom(
-            money.from_string(
-                detailed_rate.client_buy_amount,
-                money.Currency(detailed_rate.client_buy_currency),
-            ).protobuf(),
-        )
-
-        await self._refunds.update(refund)
-
-        return grpc_pb2.UpdateRefundResponse(refund=refund)
+        return grpc_pb2.UpdateRefundResponse(refund=updated_refund)
 
     async def CalculateRefundPosition(  # type: ignore[override] # noqa: N802, WPS217
         self,
@@ -360,3 +280,103 @@ class RefundsService(
                 status=orders_models_pb2.BookingCancellation.Status.STATUS_REFUND_ISSUED,
             ),
         )
+
+    async def _execute_refund(  # noqa: WPS217
+        self,
+        context: grpc.aio.ServicerContext,
+        request: grpc_pb2.UpdateRefundRequest,
+        refund: models_pb2.Refund,
+    ) -> models_pb2.Refund:
+        if (  # noqa: WPS337
+            request.refund.refunded_us.currency_code
+            == request.refund.refunded_reseller.currency_code
+        ):
+            await rich_status.abort_with_rich_status(
+                context=context,
+                status=rich_status.build_bad_request(
+                    field_name="refundedUs",
+                    field_description=(
+                        "refundedUs should not be same as refundedReseller"
+                    ),
+                ),
+            )
+
+        try:
+            transaction = await self._transactions_client.get(refund.transaction_id)
+        except NotFoundError:
+            await rich_status.abort_with_rich_status(
+                context=context,
+                status=rich_status.build_bad_request(
+                    field_name="transaction",
+                    field_description="Transaction ID is not found",
+                ),
+            )
+
+        detailed_rate = await self._get_detailed_rate(
+            request.refund.refunded_us,
+            request.refund.refunded_reseller,
+        )
+
+        refund.refund_position.CopyFrom(
+            await self._get_refund_position(
+                detailed_rate,
+                request.refund.refunded_reseller,
+                transaction.amounts.sales_margin,
+                transaction.amounts.fx_margin,
+                transaction.amounts.processing_margin,
+            ),
+        )
+        conversion_id = ""
+        if transaction.payment_type == PaymentType.PAYMENT_TYPE_CARD:
+            stripe_refund = await self._create_stripe_refund(
+                context,
+                request,
+                transaction,
+            )
+            request.refund.external_reference_id = stripe_refund.stripe_id
+        else:
+            cc_conversion = await self._payment_client.create_conversion(
+                conversion.ConversionRequest(
+                    buy_currency=request.refund.refunded_us.currency_code,
+                    sell_currency=request.refund.refunded_reseller.currency_code,
+                    amount=str(
+                        money.from_protobuf(request.refund.refunded_us),
+                    ),
+                    reason=transaction.id,
+                ),
+            )
+            conversion_id = cc_conversion.identifier
+            refund.status = models_pb2.Refund.Status.STATUS_SUCCEEDED
+
+        refund.conversion_id = conversion_id
+        refund.invoice_reference = request.refund.invoice_reference
+        refund.refunded_us_in_payer_currency.CopyFrom(
+            money.from_string(
+                detailed_rate.client_buy_amount,
+                money.Currency(detailed_rate.client_buy_currency),
+            ).protobuf(),
+        )
+
+        return await self._refunds.update(refund)
+
+    async def _create_stripe_refund(
+        self,
+        context: grpc.aio.ServicerContext,
+        request: grpc_pb2.UpdateRefundRequest,
+        transaction: transactions_models_pb2.Transaction,
+    ) -> stripe.Refund:
+        try:
+            bill = await self._bills_client.get(transaction.bill_id)
+        except NotFoundError:
+            return await context.abort(grpc.StatusCode.NOT_FOUND)
+
+        refunded_us = money.from_protobuf(request.refund.refunded_us)
+        try:
+            stripe_refund = stripe.Refund.create(
+                payment_intent=bill.payment_intent_id,
+                amount=refunded_us.amount,
+            )
+        except stripe.error.StripeError:
+            return await context.abort(grpc.StatusCode.INVALID_ARGUMENT)
+
+        return stripe_refund
