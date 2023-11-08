@@ -1,8 +1,5 @@
 import datetime
 import uuid
-from typing import Any
-
-import pydantic
 
 from snowfall.vendor.ask2go.enums import AirCabinClassType
 from snowfall.vendor.ask2go.models import offers
@@ -25,7 +22,6 @@ class SearchResultsResponse(CamelCaseBaseModel):
     available_flights: int
     flight: list[offers.Offer]
     is_finished: bool
-    filter_information: dict[str, Any] = pydantic.Field(default_factory=dict)
     page_information: SearchResultsPageInformation
     transaction_id: str
 
