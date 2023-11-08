@@ -12,8 +12,8 @@ from snowfall.project.pay import fixtures
 from snowfall.project.pay import fixtures as pay_fixtures
 from snowfall.project.pay.adapter import refunds, transactions
 from snowfall.project.pay.adapter.payments import DictClient, GrpcClient
-from snowfall.project.pay.service.refunds.v1alpha.models_pb2 import Refund
-from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import (
+from snowfall.project.pay.service.refunds.v1.models_pb2 import Refund
+from snowfall.project.pay.service.transactions.v1.models_pb2 import (
     Transaction,
 )
 from snowfall.project.pay.service.webhooks import bootstrap, routers

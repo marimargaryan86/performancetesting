@@ -5,7 +5,7 @@ from collections.abc import Sequence
 
 from snowfall.project.junction.go.adapter import errors
 from snowfall.project.pay.fixtures import ACCOUNTLESS_COMPANIES
-from snowfall.project.pay.service.companies.v1alpha import (
+from snowfall.project.pay.service.companies.v1 import (
     grpc_pb2,
     grpc_pb2_grpc,
     models_pb2,

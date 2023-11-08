@@ -3,7 +3,7 @@ from collections.abc import Mapping, Sequence
 
 import pymongo
 
-from snowfall.project.pay.service.companies.v1alpha import models_pb2
+from snowfall.project.pay.service.companies.v1 import models_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 

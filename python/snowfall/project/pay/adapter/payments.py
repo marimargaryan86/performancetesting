@@ -4,7 +4,7 @@ import abc
 from collections.abc import Sequence
 
 from snowfall.project.junction.go.adapter import errors
-from snowfall.project.pay.service.payments.v1alpha import (
+from snowfall.project.pay.service.payments.v1 import (
     models_pb2,
     payments_pb2,
     payments_pb2_grpc,

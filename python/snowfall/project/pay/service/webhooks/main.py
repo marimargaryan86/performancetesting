@@ -5,11 +5,11 @@ from snowfall.project.junction.go.adapter import orders
 from snowfall.project.junction.go.service.orders.v1 import orders_pb2_grpc
 from snowfall.project.pay.adapter import refunds, transactions
 from snowfall.project.pay.adapter.payments import GrpcClient
-from snowfall.project.pay.service.payments.v1alpha import payments_pb2_grpc
-from snowfall.project.pay.service.refunds.v1alpha import (
+from snowfall.project.pay.service.payments.v1 import payments_pb2_grpc
+from snowfall.project.pay.service.refunds.v1 import (
     grpc_pb2_grpc as refunds_pb2_grpc,
 )
-from snowfall.project.pay.service.transactions.v1alpha import (
+from snowfall.project.pay.service.transactions.v1 import (
     grpc_pb2_grpc as transactions_pb2_grpc,
 )
 from snowfall.project.pay.service.webhooks import bootstrap, routers

@@ -3,10 +3,10 @@ from collections.abc import Sequence
 import pytest
 
 from snowfall.project.pay.adapter import quotations
-from snowfall.project.pay.service.companies.v1alpha.models_pb2 import (
+from snowfall.project.pay.service.companies.v1.models_pb2 import (
     Company,
 )
-from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import (
+from snowfall.project.pay.service.transactions.v1.models_pb2 import (
     Quotation,
     QuotationStatus,
 )

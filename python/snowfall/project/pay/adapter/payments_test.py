@@ -6,7 +6,7 @@ import pytest
 from snowfall.project.junction.go.adapter import errors
 from snowfall.project.pay import fixtures
 from snowfall.project.pay.adapter import payments
-from snowfall.project.pay.service.payments.v1alpha import (
+from snowfall.project.pay.service.payments.v1 import (
     payments_pb2,
     payments_pb2_grpc,
 )

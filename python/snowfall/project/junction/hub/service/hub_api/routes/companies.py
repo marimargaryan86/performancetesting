@@ -3,7 +3,7 @@ from starlette import endpoints, requests, status
 
 from snowfall.project.junction.hub.service.hub_api import resources
 from snowfall.project.pay.adapter import companies as companies_adapter
-from snowfall.project.pay.service.companies.v1alpha import models_pb2
+from snowfall.project.pay.service.companies.v1 import models_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import (
     messages,

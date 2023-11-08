@@ -8,10 +8,10 @@ import pydantic
 from motor import motor_asyncio
 
 from snowfall.project.pay.adapter import companies, currencies
-from snowfall.project.pay.service.companies.v1alpha import (
+from snowfall.project.pay.service.companies.v1 import (
     grpc_pb2_grpc as companies_grpc_pb2,
 )
-from snowfall.project.pay.service.currencies.v1alpha import currencies_pb2_grpc
+from snowfall.project.pay.service.currencies.v1 import currencies_pb2_grpc
 from snowfall.project.pay.service.transactions import cache, transactions
 from snowfall.project.pay.service.transactions.grpc import (
     BillsService,

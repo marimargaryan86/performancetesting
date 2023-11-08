@@ -1,6 +1,6 @@
 import pytest
 
-from snowfall.project.pay.service.companies.v1alpha import models_pb2 as company_models
+from snowfall.project.pay.service.companies.v1 import models_pb2 as company_models
 from snowfall.project.pay.service.transactions.quote import Quote
 from snowfall.stdlib import money
 

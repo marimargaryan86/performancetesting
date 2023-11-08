@@ -10,7 +10,7 @@ from snowfall.project.pay.adapter import (
 from snowfall.project.pay.adapter import (
     transactions as transactions_adapter,
 )
-from snowfall.project.pay.service.refunds.v1alpha import models_pb2 as refunds_model_pb2
+from snowfall.project.pay.service.refunds.v1 import models_pb2 as refunds_model_pb2
 from snowfall.stdlib import money
 from snowfall.stdlib.integration.starlette import (
     messages,

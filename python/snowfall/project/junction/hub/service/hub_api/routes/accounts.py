@@ -6,7 +6,7 @@ from snowfall.project.junction.hub.service.hub_api import resources
 from snowfall.project.pay.adapter import accounts as accounts_adapter
 from snowfall.project.pay.adapter import companies as companies_adapter
 from snowfall.project.pay.adapter import contacts as contacts_adapter
-from snowfall.project.pay.service.companies.v1alpha import models_pb2 as company_models
+from snowfall.project.pay.service.companies.v1 import models_pb2 as company_models
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import (

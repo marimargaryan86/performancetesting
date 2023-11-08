@@ -2,7 +2,7 @@ import datetime
 from collections.abc import Mapping
 from typing import Any
 
-from snowfall.project.pay.service.refunds.v1alpha import models_pb2
+from snowfall.project.pay.service.refunds.v1 import models_pb2
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 
 

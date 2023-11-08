@@ -8,7 +8,7 @@ from pydantic import AnyUrl
 
 from snowfall.project.pay.adapter import currencies
 from snowfall.project.pay.service.companies import cron_jobs, grpc, repositories
-from snowfall.project.pay.service.currencies.v1alpha import currencies_pb2_grpc
+from snowfall.project.pay.service.currencies.v1 import currencies_pb2_grpc
 from snowfall.stdlib import money
 from snowfall.stdlib.instrumentation.httpx import metrics
 from snowfall.stdlib.service import application, grpc_factory

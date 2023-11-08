@@ -1,16 +1,16 @@
 import datetime
 
-from snowfall.project.pay.service.companies.v1alpha import (
+from snowfall.project.pay.service.companies.v1 import (
     models_pb2 as company_model_pb2,
 )
-from snowfall.project.pay.service.payments.v1alpha import models_pb2
-from snowfall.project.pay.service.refunds.v1alpha import (
+from snowfall.project.pay.service.payments.v1 import models_pb2
+from snowfall.project.pay.service.refunds.v1 import (
     models_pb2 as refunds_models_pb2,
 )
-from snowfall.project.pay.service.transactions.v1alpha import (
+from snowfall.project.pay.service.transactions.v1 import (
     models_pb2 as transactions_models_pb2,
 )
-from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import (
+from snowfall.project.pay.service.transactions.v1.models_pb2 import (
     QuotationAmounts,
     QuotationRates,
     Transaction,

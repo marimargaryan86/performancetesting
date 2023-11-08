@@ -9,7 +9,7 @@ from snowfall.project.pay.adapter import transactions as transactions_adapter
 from snowfall.project.pay.adapter.payments import GrpcClient
 from snowfall.project.pay.service.pay_api import resources
 from snowfall.project.pay.service.pay_api.validators import payments_validators
-from snowfall.project.pay.service.payments.v1alpha import models_pb2
+from snowfall.project.pay.service.payments.v1 import models_pb2
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import (

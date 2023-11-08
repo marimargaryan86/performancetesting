@@ -39,7 +39,7 @@ from snowfall.project.junction.extensions.service.mobile_api.v1alpha import mode
 from snowfall.project.junction.plus.adapter import flight_delay_predictor
 from snowfall.project.pay import fixtures as pay_fixtures
 from snowfall.project.pay.adapter import bills
-from snowfall.project.pay.service.transactions.v1alpha import (
+from snowfall.project.pay.service.transactions.v1 import (
     models_pb2 as transactions_models_pb2,
 )
 from snowfall.stdlib import money, string

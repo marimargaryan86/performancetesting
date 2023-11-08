@@ -23,8 +23,8 @@ from snowfall.project.pay.adapter import (
     refunds,
     transactions,
 )
-from snowfall.project.pay.service.companies.v1alpha import models_pb2
-from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import (
+from snowfall.project.pay.service.companies.v1 import models_pb2
+from snowfall.project.pay.service.transactions.v1.models_pb2 import (
     Bill,
     Quotation,
     QuotationAmounts,

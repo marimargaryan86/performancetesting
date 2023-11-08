@@ -1,7 +1,7 @@
 from unittest import mock
 
 from snowfall.project.pay.adapter import currencies
-from snowfall.project.pay.service.currencies.v1alpha import (
+from snowfall.project.pay.service.currencies.v1 import (
     currencies_pb2,
     currencies_pb2_grpc,
 )

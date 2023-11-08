@@ -7,7 +7,7 @@ from starlette import requests, status
 
 from snowfall.project.pay.adapter import transactions as transactions_adapter
 from snowfall.project.pay.service.beneficiaries.v1alpha.models_pb2 import Beneficiary
-from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import Transaction
+from snowfall.project.pay.service.transactions.v1.models_pb2 import Transaction
 from snowfall.stdlib.integration.starlette import messages, models, request_helpers
 from snowfall.stdlib.logging import stdout
 

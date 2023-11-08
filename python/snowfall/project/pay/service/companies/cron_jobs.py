@@ -1,5 +1,5 @@
 from snowfall.project.pay.service.companies.repositories import AccountsRepository
-from snowfall.project.pay.service.companies.v1alpha.models_pb2 import Account, Status
+from snowfall.project.pay.service.companies.v1.models_pb2 import Account, Status
 from snowfall.stdlib import string
 from snowfall.stdlib.format.protobuf import (
     datetime_to_protobuf,

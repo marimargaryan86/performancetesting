@@ -4,11 +4,11 @@ import abc
 from collections.abc import Sequence
 
 from snowfall.project.junction.go.adapter import errors
-from snowfall.project.pay.service.companies.v1alpha import (
+from snowfall.project.pay.service.companies.v1 import (
     models_pb2 as companies_models,
 )
-from snowfall.project.pay.service.transactions.v1alpha import grpc_pb2, grpc_pb2_grpc
-from snowfall.project.pay.service.transactions.v1alpha import (
+from snowfall.project.pay.service.transactions.v1 import grpc_pb2, grpc_pb2_grpc
+from snowfall.project.pay.service.transactions.v1 import (
     models_pb2 as transactions_models,
 )
 from snowfall.stdlib import money, string

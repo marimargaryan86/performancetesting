@@ -5,11 +5,11 @@ import datetime
 from collections.abc import Sequence
 
 from snowfall.project.junction.go.adapter import errors
-from snowfall.project.pay.service.companies.v1alpha.models_pb2 import (
+from snowfall.project.pay.service.companies.v1.models_pb2 import (
     PaymentMethod,
     PaymentType,
 )
-from snowfall.project.pay.service.transactions.v1alpha import (
+from snowfall.project.pay.service.transactions.v1 import (
     grpc_pb2,
     grpc_pb2_grpc,
     models_pb2,

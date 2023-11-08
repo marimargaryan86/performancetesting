@@ -3,7 +3,7 @@ from collections.abc import Sequence
 import httpx
 
 from snowfall.project.pay.adapter import beneficiaries
-from snowfall.project.pay.service.companies.v1alpha.models_pb2 import Account, Company
+from snowfall.project.pay.service.companies.v1.models_pb2 import Account, Company
 from snowfall.stdlib import money
 from snowfall.stdlib.format import jsonapi
 

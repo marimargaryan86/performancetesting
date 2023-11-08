@@ -8,9 +8,9 @@ from snowfall.project.junction.go.service.orders.v1 import (
 )
 from snowfall.project.pay.adapter import bills as bills_adapter
 from snowfall.project.pay.adapter import transactions as transactions_adapter
-from snowfall.project.pay.service.companies.v1alpha.models_pb2 import PaymentType
+from snowfall.project.pay.service.companies.v1.models_pb2 import PaymentType
 from snowfall.project.pay.service.refunds import repositories
-from snowfall.project.pay.service.refunds.v1alpha import (
+from snowfall.project.pay.service.refunds.v1 import (
     grpc_pb2,
     grpc_pb2_grpc,
     models_pb2,

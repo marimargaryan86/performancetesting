@@ -18,14 +18,14 @@ from snowfall.project.junction.go.service.resellers.v1 import (
     models_pb2 as reseller_models_pb2,
 )
 from snowfall.project.junction.go.v1 import models_pb2
-from snowfall.project.pay.service.companies.v1alpha import (
+from snowfall.project.pay.service.companies.v1 import (
     models_pb2 as companies_models_pb2,
 )
-from snowfall.project.pay.service.currencies.v1alpha import (
+from snowfall.project.pay.service.currencies.v1 import (
     models_pb2 as currencies_models_pb2,
 )
-from snowfall.project.pay.service.refunds.v1alpha.models_pb2 import Refund
-from snowfall.project.pay.service.transactions.v1alpha import (
+from snowfall.project.pay.service.refunds.v1.models_pb2 import Refund
+from snowfall.project.pay.service.transactions.v1 import (
     models_pb2 as transaction_models_pb2,
 )
 from snowfall.stdlib import money

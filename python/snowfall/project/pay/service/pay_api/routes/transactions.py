@@ -4,7 +4,7 @@ from starlette import endpoints, requests, status
 from snowfall.project.pay.adapter import quotations
 from snowfall.project.pay.adapter import transactions as transactions_adapter
 from snowfall.project.pay.service.pay_api import resources
-from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import QuotationStatus
+from snowfall.project.pay.service.transactions.v1.models_pb2 import QuotationStatus
 from snowfall.stdlib.integration.starlette import (
     messages,
     models,

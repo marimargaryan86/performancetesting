@@ -4,7 +4,7 @@ from starlette import endpoints, requests, responses, status
 from snowfall.project.junction.go.adapter import errors
 from snowfall.project.pay.adapter import companies as companies_adapter
 from snowfall.project.pay.adapter import currencies, quotations
-from snowfall.project.pay.service.currencies.v1alpha.models_pb2 import Currency
+from snowfall.project.pay.service.currencies.v1.models_pb2 import Currency
 from snowfall.project.pay.service.pay_api import resources
 from snowfall.stdlib.integration.starlette import messages, models, request_helpers
 

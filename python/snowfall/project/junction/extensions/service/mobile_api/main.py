@@ -32,7 +32,7 @@ from snowfall.project.junction.plus.service.flight_prediction.v1 import (
     flight_prediction_pb2_grpc,
 )
 from snowfall.project.pay.adapter import bills
-from snowfall.project.pay.service.transactions.v1alpha import (
+from snowfall.project.pay.service.transactions.v1 import (
     grpc_pb2_grpc as transactions_pb2_grpc,
 )
 from snowfall.service.authentication.v1 import sessions_pb2_grpc

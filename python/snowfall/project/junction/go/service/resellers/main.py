@@ -10,10 +10,10 @@ from snowfall.project.junction.go.service.resellers import persistence
 from snowfall.project.junction.go.service.resellers.grpc import ResellerService
 from snowfall.project.pay.adapter import companies as companies_adapter
 from snowfall.project.pay.adapter import currencies as currencies_adapter
-from snowfall.project.pay.service.companies.v1alpha import (
+from snowfall.project.pay.service.companies.v1 import (
     grpc_pb2_grpc as companies_grpc,
 )
-from snowfall.project.pay.service.currencies.v1alpha import currencies_pb2_grpc
+from snowfall.project.pay.service.currencies.v1 import currencies_pb2_grpc
 from snowfall.stdlib.service import application, grpc_factory
 from snowfall.stdlib.transport.grpc import server as grpc_server
 from snowfall.vendor.consul.client import ConsulClient

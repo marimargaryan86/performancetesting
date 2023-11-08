@@ -3,7 +3,7 @@ import datetime
 import grpc
 
 from snowfall.project.pay.service.payments.repositories import PaymentsRepository
-from snowfall.project.pay.service.payments.v1alpha import (
+from snowfall.project.pay.service.payments.v1 import (
     models_pb2,
     payments_pb2,
     payments_pb2_grpc,

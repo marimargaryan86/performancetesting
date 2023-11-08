@@ -1,13 +1,13 @@
 syntax = "proto3";
 
-package snowfall.project.pay.service.companies.v1alpha;
+package snowfall.project.pay.service.companies.v1;
 
 import "google/protobuf/timestamp.proto";
 import "snowfall/stdlib/v1/money.proto";
 import "snowfall/stdlib/v1/phone_number.proto";
 import "snowfall/stdlib/v1/postal_address.proto";
 
-option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/companies/v1alpha";
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/companies/v1";
 
 enum PaymentMethod {
   PAYMENT_METHOD_UNSPECIFIED = 0;

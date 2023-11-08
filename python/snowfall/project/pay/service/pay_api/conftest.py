@@ -21,11 +21,11 @@ from snowfall.project.pay.adapter import (
     quotations,
     transactions,
 )
-from snowfall.project.pay.service.companies.v1alpha import models_pb2
+from snowfall.project.pay.service.companies.v1 import models_pb2
 from snowfall.project.pay.service.pay_api import authenticator, bootstrap
 from snowfall.project.pay.service.pay_api.cache import UserSessionRepository
 from snowfall.project.pay.service.pay_api.routes import router
-from snowfall.project.pay.service.transactions.v1alpha.models_pb2 import (
+from snowfall.project.pay.service.transactions.v1.models_pb2 import (
     Quotation,
     QuotationAmounts,
     QuotationRates,

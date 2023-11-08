@@ -4,11 +4,11 @@ from starlette import endpoints, requests, responses, status
 from snowfall.project.junction.hub.service.hub_api import resources
 from snowfall.project.junction.hub.service.hub_api.routes import routes_handlers
 from snowfall.project.pay.adapter import beneficiaries
-from snowfall.project.pay.service.companies.v1alpha.models_pb2 import (
+from snowfall.project.pay.service.companies.v1.models_pb2 import (
     BankDetails,
     MetaData,
 )
-from snowfall.project.pay.service.companies.v1alpha.models_pb2 import (
+from snowfall.project.pay.service.companies.v1.models_pb2 import (
     Beneficiary as BeneficiaryModel,
 )
 from snowfall.stdlib.integration.starlette import (

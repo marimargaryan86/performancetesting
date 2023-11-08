@@ -25,20 +25,20 @@ from snowfall.project.pay.adapter import (
     refunds,
     transactions,
 )
-from snowfall.project.pay.service.companies.v1alpha.grpc_pb2_grpc import (
+from snowfall.project.pay.service.companies.v1.grpc_pb2_grpc import (
     AccountsServiceStub,
     BeneficiariesServiceStub,
     CompaniesServiceStub,
     ContactsServiceStub,
 )
-from snowfall.project.pay.service.currencies.v1alpha import currencies_pb2_grpc
-from snowfall.project.pay.service.refunds.v1alpha.grpc_pb2_grpc import (
+from snowfall.project.pay.service.currencies.v1 import currencies_pb2_grpc
+from snowfall.project.pay.service.refunds.v1.grpc_pb2_grpc import (
     RefundsServiceStub,
 )
-from snowfall.project.pay.service.transactions.v1alpha import (
+from snowfall.project.pay.service.transactions.v1 import (
     grpc_pb2_grpc as transactions_pb2_grpc,
 )
-from snowfall.project.pay.service.transactions.v1alpha.grpc_pb2_grpc import (
+from snowfall.project.pay.service.transactions.v1.grpc_pb2_grpc import (
     QuotationsServiceStub,
 )
 from snowfall.service.authentication.v1 import sessions_pb2_grpc

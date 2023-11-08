@@ -3,7 +3,7 @@ from typing import Any
 
 import pymongo
 
-from snowfall.project.pay.service.transactions.v1alpha import models_pb2
+from snowfall.project.pay.service.transactions.v1 import models_pb2
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset

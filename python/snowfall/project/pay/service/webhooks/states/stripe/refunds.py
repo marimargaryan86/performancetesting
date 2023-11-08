@@ -8,7 +8,7 @@ from snowfall.project.junction.go.service.orders.v1 import (
     models_pb2 as orders_models_pb2,
 )
 from snowfall.project.pay.adapter import refunds, transactions
-from snowfall.project.pay.service.refunds.v1alpha.models_pb2 import Refund
+from snowfall.project.pay.service.refunds.v1.models_pb2 import Refund
 from snowfall.stdlib.logging import stdout
 
 logger = stdout.get_logger()

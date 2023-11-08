@@ -7,7 +7,7 @@ from pymongo.errors import DuplicateKeyError
 from snowfall.project.junction.go.adapter.errors import NotFoundError
 from snowfall.project.pay.adapter import currencies
 from snowfall.project.pay.service.companies import repositories
-from snowfall.project.pay.service.companies.v1alpha import (
+from snowfall.project.pay.service.companies.v1 import (
     grpc_pb2,
     grpc_pb2_grpc,
     models_pb2,

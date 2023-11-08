@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package snowfall.project.pay.service.currencies.v1;
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/currencies/v1";
+
+message Quote {
+  uint32 amount = 1;
+  float rate = 2;
+}
+
+message Currency {
+  string code = 1;
+  string name = 2;
+  int32 exponent = 3;
+}

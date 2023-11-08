@@ -18,17 +18,17 @@ from snowfall.project.pay.adapter import (
     quotations,
     transactions,
 )
-from snowfall.project.pay.service.companies.v1alpha import (
+from snowfall.project.pay.service.companies.v1 import (
     grpc_pb2_grpc as companies_grpc_pb2,
 )
-from snowfall.project.pay.service.currencies.v1alpha import currencies_pb2_grpc
+from snowfall.project.pay.service.currencies.v1 import currencies_pb2_grpc
 from snowfall.project.pay.service.pay_api import authenticator, bootstrap
 from snowfall.project.pay.service.pay_api.cache import UserSessionRepository
 from snowfall.project.pay.service.pay_api.routes import router
-from snowfall.project.pay.service.payments.v1alpha.payments_pb2_grpc import (
+from snowfall.project.pay.service.payments.v1.payments_pb2_grpc import (
     PaymentsServiceStub,
 )
-from snowfall.project.pay.service.transactions.v1alpha import (
+from snowfall.project.pay.service.transactions.v1 import (
     grpc_pb2_grpc as transactions_pb2_grpc,
 )
 from snowfall.service.authentication.v1 import authentication_pb2_grpc, oauth_pb2_grpc

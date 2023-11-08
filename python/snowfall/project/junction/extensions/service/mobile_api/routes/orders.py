@@ -25,7 +25,7 @@ from snowfall.project.junction.go.adapter.errors import (
     UnhandledError,
 )
 from snowfall.project.pay.adapter import bills
-from snowfall.project.pay.service.transactions.v1alpha import (
+from snowfall.project.pay.service.transactions.v1 import (
     models_pb2 as transactions_models_pb2,
 )
 from snowfall.stdlib import money, string

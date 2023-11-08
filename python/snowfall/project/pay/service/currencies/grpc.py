@@ -5,7 +5,7 @@ import grpc
 from snowfall.project.junction.go.adapter import errors
 from snowfall.project.pay.adapter import rates
 from snowfall.project.pay.service.currencies.repositories import CurrencyRepository
-from snowfall.project.pay.service.currencies.v1alpha import (
+from snowfall.project.pay.service.currencies.v1 import (
     currencies_pb2,
     currencies_pb2_grpc,
     models_pb2,

@@ -2,8 +2,8 @@ import datetime
 from collections.abc import Sequence
 from decimal import Decimal
 
-from snowfall.project.pay.service.companies.v1alpha import models_pb2 as company_models
-from snowfall.project.pay.service.transactions.v1alpha import models_pb2
+from snowfall.project.pay.service.companies.v1 import models_pb2 as company_models
+from snowfall.project.pay.service.transactions.v1 import models_pb2
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format.protobuf import datetime_to_protobuf
 from snowfall.stdlib.v1 import money_pb2

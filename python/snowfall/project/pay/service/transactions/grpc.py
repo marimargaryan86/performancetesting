@@ -2,7 +2,7 @@ import grpc
 
 from snowfall.project.junction.go.adapter import errors as adapter_errors
 from snowfall.project.pay.adapter import companies, currencies
-from snowfall.project.pay.service.companies.v1alpha.models_pb2 import PaymentType
+from snowfall.project.pay.service.companies.v1.models_pb2 import PaymentType
 from snowfall.project.pay.service.transactions.cache import UserSessionRepository
 from snowfall.project.pay.service.transactions.quote import Quote
 from snowfall.project.pay.service.transactions.transactions import (
@@ -11,7 +11,7 @@ from snowfall.project.pay.service.transactions.transactions import (
     QuotationsRepository,
     TransactionsRepository,
 )
-from snowfall.project.pay.service.transactions.v1alpha import (
+from snowfall.project.pay.service.transactions.v1 import (
     grpc_pb2,
     grpc_pb2_grpc,
     models_pb2,

@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-package snowfall.project.pay.service.companies.v1alpha;
+package snowfall.project.pay.service.companies.v1;
 
-import "snowfall/project/pay/service/companies/v1alpha/models.proto";
+import "snowfall/project/pay/service/companies/v1/models.proto";
 
-option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/companies/v1alpha";
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/companies/v1";
 
 service CompaniesService {
   rpc CreateCompany(CreateCompanyRequest) returns (CreateCompanyResponse) {}

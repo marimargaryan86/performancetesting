@@ -27,7 +27,7 @@ from snowfall.project.junction.go.service.passenger_name_records.v1 import (
 )
 from snowfall.project.junction.go.service.resellers.v1 import resellers_pb2_grpc
 from snowfall.project.pay.adapter import refunds as refunds_adapter
-from snowfall.project.pay.service.refunds.v1alpha import (
+from snowfall.project.pay.service.refunds.v1 import (
     grpc_pb2_grpc as refund_pb2_grpc,
 )
 from snowfall.stdlib.instrumentation.httpx import logging, metrics

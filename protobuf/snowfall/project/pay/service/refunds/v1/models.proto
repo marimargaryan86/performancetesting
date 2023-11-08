@@ -1,11 +1,11 @@
 syntax = "proto3";
 
-package snowfall.project.pay.service.refunds.v1alpha;
+package snowfall.project.pay.service.refunds.v1;
 
 import "google/protobuf/timestamp.proto";
 import "snowfall/stdlib/v1/money.proto";
 
-option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/refunds/v1alpha";
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/refunds/v1";
 
 // For credit card refunds in stripe we have the following options
 

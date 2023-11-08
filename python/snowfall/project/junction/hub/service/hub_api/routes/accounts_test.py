@@ -5,7 +5,7 @@ import httpx
 from starlette import status
 
 from snowfall.project.pay import fixtures
-from snowfall.project.pay.service.companies.v1alpha.models_pb2 import Account
+from snowfall.project.pay.service.companies.v1.models_pb2 import Account
 
 
 class TestAccounts(object):

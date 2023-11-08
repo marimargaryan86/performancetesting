@@ -1,13 +1,13 @@
 syntax = "proto3";
 
-package snowfall.project.pay.service.transactions.v1alpha;
+package snowfall.project.pay.service.transactions.v1;
 
-import "snowfall/project/pay/service/companies/v1alpha/models.proto";
-import "snowfall/project/pay/service/transactions/v1alpha/models.proto";
+import "snowfall/project/pay/service/companies/v1/models.proto";
+import "snowfall/project/pay/service/transactions/v1/models.proto";
 import "snowfall/stdlib/v1/money.proto";
 import "snowfall/stdlib/v1/sort.proto";
 
-option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/transactions/v1alpha";
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/transactions/v1";
 
 service TransactionsService {
   rpc ListTransactions(ListTransactionsRequest) returns (ListTransactionsResponse) {}
@@ -70,8 +70,8 @@ message CreateTransactionRequest {
   Quotation quotation = 1;
   string external_reference = 3;
   string invoice_reference = 4;
-  snowfall.project.pay.service.companies.v1alpha.PaymentMethod payment_method = 5;
-  snowfall.project.pay.service.companies.v1alpha.PaymentType payment_type = 6;
+  snowfall.project.pay.service.companies.v1.PaymentMethod payment_method = 5;
+  snowfall.project.pay.service.companies.v1.PaymentType payment_type = 6;
   string order_id = 7;
 }
 
@@ -83,8 +83,8 @@ message CreateQuotationRequest {
   string from_currency = 1;
   string to_currency = 2;
   int32 amount = 3;
-  snowfall.project.pay.service.companies.v1alpha.Company payer = 4;
-  snowfall.project.pay.service.companies.v1alpha.Company beneficiary_company = 5;
+  snowfall.project.pay.service.companies.v1.Company payer = 4;
+  snowfall.project.pay.service.companies.v1.Company beneficiary_company = 5;
   string session_token = 6;
   int32 tax = 7;
 }

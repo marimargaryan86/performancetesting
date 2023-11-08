@@ -4,7 +4,7 @@ from unittest import mock
 import pytest
 
 from snowfall.project.pay.adapter import accounts, transactions
-from snowfall.project.pay.service.companies.v1alpha.models_pb2 import (
+from snowfall.project.pay.service.companies.v1.models_pb2 import (
     Account,
     Company,
     Status,

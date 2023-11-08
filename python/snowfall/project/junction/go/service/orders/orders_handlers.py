@@ -10,7 +10,7 @@ from snowfall.project.junction.go.service.orders.orders import (
 from snowfall.project.junction.go.service.orders.v1 import models_pb2, orders_pb2
 from snowfall.project.junction.go.service.orders.zendesk.client import ZendeskClient
 from snowfall.project.pay.adapter import refunds as refunds_adapter
-from snowfall.project.pay.service.refunds.v1alpha import models_pb2 as refunds_model_pb2
+from snowfall.project.pay.service.refunds.v1 import models_pb2 as refunds_model_pb2
 from snowfall.stdlib.transport.grpc import rich_status
 from snowfall.stdlib.transport.http.errors import HttpStatusError
 

@@ -1,6 +1,6 @@
 import httpx
 
-from snowfall.project.pay.service.companies.v1alpha.models_pb2 import Account
+from snowfall.project.pay.service.companies.v1.models_pb2 import Account
 from snowfall.stdlib import money
 from snowfall.stdlib.format import jsonapi
 from snowfall.vendor.currency_cloud.models.balance import BalanceResponse
