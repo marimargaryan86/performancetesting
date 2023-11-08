@@ -23,7 +23,12 @@ export default class JourneyService extends JunctionHubApiService {
       queryParams: {
         "page[cursor]": cursor,
         "page[limit]": limit,
-        include: ["orders", "orders.bookings", "orders.bookings.details"].join(","),
+        include: [
+          "orders",
+          "orders.bookings",
+          "orders.bookings.details",
+          "orders.bookings.bookingCancellation",
+        ].join(","),
       },
     });
 
