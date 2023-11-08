@@ -22,15 +22,17 @@
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import SummaryItinerary from "./summary-itinerary.svelte";
   import type { PassengerPickerData } from "../trip-search/passenger-picker/passenger-picker.svelte";
+  import { createEventDispatcher } from "svelte";
 
   export let priceQuote: TripOfferPriceQuote | undefined = undefined;
   export let passengers: PassengerPickerData;
 
   let collapsible: Collapsible | undefined;
 
-  function renderFareRulesDialog(): void {
-    // TODO: implement
-    alert("Rule dialog here.");
+  const dispatch = createEventDispatcher<{ showFareRules: void }>();
+
+  function showFareRules(): void {
+    dispatch("showFareRules");
   }
 
   $: priceBreakdown = priceQuote ? getTotalPriceBreakdown(priceQuote) : undefined;
@@ -52,7 +54,7 @@
         </span>
       </p>
 
-      <SummaryItinerary {priceQuote} on:showFareRules={renderFareRulesDialog} />
+      <SummaryItinerary {priceQuote} on:showFareRules={showFareRules} />
     {:else}
       <LoadingIcon size="24px" />
     {/if}
@@ -95,11 +97,11 @@
       <div class="fare-rules-wrapper">
         <p class="typography body-xsmall">
           Fares are not guaranteed until full payment is received and tickets are issued. See all
-          the applicable <button class="typography body-xsmall" on:click={renderFareRulesDialog}
+          the applicable <button class="typography body-xsmall" on:click={showFareRules}
             >Fare Rules</button
           >
           and
-          <button class="typography body-xsmall" on:click={renderFareRulesDialog}
+          <button class="typography body-xsmall" on:click={showFareRules}
             >Baggage Information</button
           >.
         </p>

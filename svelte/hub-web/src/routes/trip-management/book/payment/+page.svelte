@@ -39,9 +39,11 @@
   import type { PassengerPickerData } from "../../components/trip-search/passenger-picker/passenger-picker.svelte";
   import { onDestroy } from "svelte";
   import type { ContactDetails } from "integration/junction-mobile-api/schemas/journey";
+  import FareRulesDialog from "../../components/fare-rules-dialog.svelte";
 
   export let data;
 
+  let fareRulesDialog: FareRulesDialog | undefined;
   let payment: Payment | undefined;
   let bookingData: {
     passengers: PartialPassengerData[];
@@ -137,8 +139,6 @@
 
     orderMarkups.orderId = data.orderId;
 
-    // TODO: implement validation
-
     try {
       const result = await tripManagement.createOrderMarkups({ ...orderMarkups });
 
@@ -195,6 +195,8 @@
   />
 {/if}
 
+<FareRulesDialog bind:this={fareRulesDialog} {priceQuote} />
+
 <div class="content">
   <Countdown expiresAt={priceQuote.expiresAt} show />
 
@@ -211,7 +213,11 @@
     </div>
 
     <div class="column payment">
-      <Summary {priceQuote} passengers={data.searchData.passengers} />
+      <Summary
+        {priceQuote}
+        on:showFareRules={fareRulesDialog?.open}
+        passengers={data.searchData.passengers}
+      />
       <Fees {priceQuote} bind:orderMarkups />
       <Payment bind:this={payment} bind:paymentIntent />
       <ContactInformation
