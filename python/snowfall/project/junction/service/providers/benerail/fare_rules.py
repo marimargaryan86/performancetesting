@@ -6,7 +6,6 @@ from snowfall.project.junction.service.providers.benerail import helper_function
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.transport.http import errors
 from snowfall.vendor.benerail import client
-from snowfall.vendor.benerail.models.products import enums
 from snowfall.vendor.benerail.models.products import response as product_response
 from snowfall.vendor.benerail.models.trip_offers import offer, response
 
@@ -19,14 +18,6 @@ def _rules_from_products(
     rules = []
 
     for product in products:
-        is_related_to_ticket = any(
-            condition.condition_type == enums.SaleType.ticket_information.value
-            for condition in product.response_result.conditions or []
-        )
-
-        if not is_related_to_ticket:
-            continue
-
         rules.extend(
             [
                 models_pb2.FareRule(
