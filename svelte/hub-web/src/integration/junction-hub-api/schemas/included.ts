@@ -30,6 +30,7 @@ import {
 } from "integration/common/schemas/leg-type";
 import { orderParser, type Order, type OrderSchema } from "./order";
 import { transactionParser, type Transaction, type TransactionSchema } from "./transaction";
+import { refundParser, type Refund, type RefundSchema } from "./refund";
 
 type IncludedBind = {
   companies: { schema: CompanySchema; model: Company };
@@ -46,6 +47,7 @@ type IncludedBind = {
   journeys: { schema: JourneySchema; model: Journey };
   cabinClasses: { schema: CabinClassSchema; model: CabinClass };
   legTypes: { schema: LegTypeSchema; model: LegType };
+  refunds: { schema: RefundSchema; model: Refund };
 };
 
 type IncludedSchemaMapping = { [key in keyof IncludedBind]?: IncludedBind[key]["schema"][] };
@@ -80,6 +82,7 @@ const parserMapping: {
   journeys: { type: "journeys", parser: journeyParser },
   cabinClasses: { type: "cabin-classes", parser: cabinClassParser },
   legTypes: { type: "leg-types", parser: legTypeParser },
+  refunds: { type: "refunds", parser: refundParser },
 };
 
 // eslint-disable-next-line max-lines-per-function
@@ -99,6 +102,7 @@ export function parseIncluded(included?: IncludedSchemas): IncludedMapping {
     journeys: [],
     cabinClasses: [],
     legTypes: [],
+    refunds: [],
   };
 
   const modelMapping: { [key in keyof IncludedMapping]-?: { id: string }[] } = {
@@ -116,6 +120,7 @@ export function parseIncluded(included?: IncludedSchemas): IncludedMapping {
     journeys: [],
     cabinClasses: [],
     legTypes: [],
+    refunds: [],
   };
 
   included?.forEach((item) => {

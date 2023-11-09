@@ -7,27 +7,33 @@
   import Ticket from "../../../components/ticket.svelte";
   import Itinerary from "../../../components/itinerary.svelte";
   import StatusBadge from "components/ui/status-badge.svelte";
+  import { permitted } from "utils/permissions";
+  import userStore from "stores/user-store";
+  import Admin from "./admin.svelte";
+  import Refund from "./refund.svelte";
 
   export let data;
 
   let breadCrumbs: BreadCrumb[] = [];
 
-  $: reservationNo = data.booking?.operatorBookingReferences.length
+  $: order = data.booking.order;
+  $: reservationNo = data.booking.operatorBookingReferences.length
     ? data.booking.operatorBookingReferences.join(", ")
     : undefined;
-  $: orderLink = routeConfig.routes.tripManagement.routes.orders.routes.order(data.order.id);
+  $: orderLink = routeConfig.routes.tripManagement.routes.orders.routes.order(data.booking.orderId);
   $: selfLink = orderLink.routes.booking(data.booking.id);
   $: breadCrumbs = [
     { label: "Orders", url: routeConfig.routes.tripManagement.routes.orders.root },
-    { label: data.order.journey?.reference ?? "Unknown", url: orderLink.root },
+    { label: order?.journey?.reference ?? "Unknown", url: orderLink.root },
     { label: `Booking ${data.bookingNo}` ?? "Unknown", url: selfLink.root },
   ];
+  $: transactionsPermitted = permitted($userStore, "transaction", "view");
 </script>
 
 <svelte:head>
   <title>
-    Booking {data.bookingNo} · {data.order.journey?.reference ?? "Unknown"} · Orders · Trip Management
-    · Junction Hub
+    Booking {data.bookingNo} · {order?.journey?.reference ?? "Unknown"} · Orders · Trip Management ·
+    Junction Hub
   </title>
 </svelte:head>
 
@@ -41,39 +47,58 @@
     </span>
   </svelte:fragment>
 
-  <div class="content">
-    <div class="itinerary">
-      <h3 class="typography title-large bold">Itinerary</h3>
+  <div class="content" style:--grid-columns={transactionsPermitted ? "1fr 1fr" : "1fr"}>
+    <div class="booking">
+      <div class="itinerary">
+        <h3 class="typography title-large bold">Itinerary</h3>
 
-      <Ticket identifier={reservationNo} title="Reservation number" />
+        <Ticket identifier={reservationNo} title="Reservation number" />
 
-      <div class="statuses">
-        <div class="status typography body-small bold">
-          Booking status
-          <StatusBadge value={data.booking.status} />
-        </div>
-
-        {#if data.booking.cancellation?.status}
+        <div class="statuses">
           <div class="status typography body-small bold">
-            Cancellation status
-            <StatusBadge value={data.booking.cancellation.status} />
+            Booking status
+            <StatusBadge value={data.booking.status} />
           </div>
-        {/if}
+
+          {#if data.booking.cancellation?.status}
+            <div class="status typography body-small bold">
+              Cancellation status
+              <StatusBadge value={data.booking.cancellation.status} />
+            </div>
+          {/if}
+        </div>
       </div>
+
+      {#if data.booking.cancellation && permitted($userStore, "refund", "*") && data.booking.refund}
+        <Refund refund={data.booking.refund} currencies={data.currencies} />
+      {/if}
+
+      {#if order}
+        <Passengers passengers={order.passengers} />
+      {/if}
+
+      <Itinerary bookings={[data.booking]} />
     </div>
 
-    <Passengers passengers={data.order.passengers} />
-
-    <Itinerary bookings={[data.booking]} />
+    {#if transactionsPermitted}
+      <Admin bind:booking={data.booking} currencies={data.currencies} />
+    {/if}
   </div>
 </StandardLayout>
 
 <style>
   .content {
+    display: grid;
+    grid-template-columns: var(--grid-columns);
+    gap: 24px;
+    align-items: flex-start;
+    max-width: 1152px;
+  }
+
+  .booking {
     display: flex;
     flex-flow: column;
     gap: 48px;
-    max-width: 1152px;
     padding: 32px 48px 48px;
     color: var(--color-main-primary-900);
     background-color: var(--color-common-background-light-main);

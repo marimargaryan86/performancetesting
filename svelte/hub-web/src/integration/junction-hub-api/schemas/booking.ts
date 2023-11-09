@@ -22,6 +22,7 @@ import {
   priceBreakdownParser,
 } from "integration/common/schemas/price";
 import type { Transaction, TransactionSchema } from "./transaction";
+import type { Refund, RefundSchema } from "./refund";
 
 export type OfferSegmentDetailRule = {
   title: string;
@@ -117,6 +118,8 @@ export type TripBooking = {
   cancellation?: BookingCancellation;
   transactionId?: string;
   transaction?: Transaction;
+  refundId?: string;
+  refund?: Refund;
 };
 
 export type TripBookingSchema = {
@@ -136,6 +139,8 @@ export type TripBookingSchema = {
     details: { data: Pick<TripBookingDetailsSchema, "id" | "type">[] };
     bookingCancellation: { data: Pick<BookingCancellationSchema, "id" | "type"> | null };
     transaction: { data: Pick<TransactionSchema, "id" | "type"> | null };
+    // TODO: Update once BE is done.
+    refund?: { data: Pick<RefundSchema, "id" | "type"> | null };
   };
   links: { self: string };
 };
@@ -146,6 +151,7 @@ export const tripBookingParser = {
     const detailsIds = data.relationships.details.data.map(({ id }) => id);
     const cancellationId = data.relationships.bookingCancellation.data?.id ?? undefined;
     const transactionId = data.relationships.transaction.data?.id ?? undefined;
+    const refundId = data.relationships.refund?.data?.id ?? undefined;
 
     return {
       id: data.id,
@@ -166,6 +172,8 @@ export const tripBookingParser = {
       cancellation: included?.bookingCancellations?.find(({ id }) => id === cancellationId),
       transactionId,
       transaction: included?.transactions?.find(({ id }) => id === transactionId),
+      refundId,
+      refund: included?.refunds?.find(({ id }) => id === refundId),
     };
   },
 };

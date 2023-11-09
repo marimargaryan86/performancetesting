@@ -1,21 +1,20 @@
 import { error } from "@sveltejs/kit";
 import integrationInstances from "integration-instances";
 import type { TripBooking } from "integration/junction-hub-api/schemas/booking";
-import type { Order } from "integration/junction-hub-api/schemas/order";
 import { getSession } from "utils/auth";
 
-export async function load(
-  event,
-): Promise<{ order: Order; booking: TripBooking; bookingNo: number }> {
-  const order = await integrationInstances.junctionHubApi.orders.get({
+export async function load(event): Promise<{ booking: TripBooking; bookingNo: number }> {
+  const booking = await integrationInstances.junctionHubApi.bookings.get({
     session: getSession(event),
-    id: event.params.orderId,
+    id: event.params.bookingId,
   });
-  const booking = order.bookings.find((item) => item.id === event.params.bookingId);
 
   if (!booking) {
     throw error(404, "Booking not found");
   }
 
-  return { order, booking, bookingNo: order.bookings.indexOf(booking) + 1 };
+  return {
+    booking,
+    bookingNo: (booking.order?.bookings.findIndex(({ id }) => id === booking.id) ?? 0) + 1,
+  };
 }
