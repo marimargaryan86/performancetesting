@@ -83,22 +83,6 @@ job "ask2go-order-changes" {
 
     service {
       name = "${JOB}-${var.environment}"
-      port = "grpc"
-      tags = ["grpc"]
-
-      connect {
-        sidecar_service {}
-      }
-
-      check {
-        type     = "grpc"
-        interval = "10s"
-        timeout  = "2s"
-      }
-    }
-
-    service {
-      name = "${JOB}-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
 
