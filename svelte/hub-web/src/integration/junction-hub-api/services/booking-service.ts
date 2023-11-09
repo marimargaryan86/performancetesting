@@ -11,7 +11,13 @@ export default class BookingService extends JunctionHubApiService {
       included?: IncludedSchemas;
     }>(`/bookings/${id}`, {
       queryParams: {
-        include: ["order", "order.journey", "details", "bookingCancellation"].join(","),
+        include: [
+          "order",
+          "order.journey",
+          "details",
+          "bookingCancellation",
+          // "refund", TODO: Uncomment
+        ].join(","),
       },
       session,
     });

@@ -13,6 +13,18 @@
       options[0]?.price.total ?? { amount: 0, currency: "EUR" },
     );
   }
+
+  function getCheapestOption(options: OfferOption[]): OfferOption {
+    const initialOption = options[0];
+
+    if (!initialOption) {
+      throw new Error("No options available");
+    }
+
+    return options.reduce((prev, curr) => {
+      return prev.price.total.amount <= curr.price.total.amount ? prev : curr;
+    }, initialOption);
+  }
 </script>
 
 <script lang="ts">
@@ -35,7 +47,7 @@
     select: { offerId: string; optionIds: string[] };
   }>();
 
-  $: selectedOptions = offer.groups
+  $: selectedOption = offer.groups
     .map((group) => {
       const optionIds = selectedOptionIds;
 
@@ -43,14 +55,14 @@
         return group.options.find((item) => optionIds.includes(item.id));
       }
 
-      return group.options[0];
+      return getCheapestOption(group.options);
     })
     .filter(ensureDefined);
 
-  $: totalPrice = getTotalPrice(selectedOptions);
+  $: totalPrice = getTotalPrice(selectedOption);
 
   function selectOffer(): void {
-    dispatch("select", { offerId: offer.id, optionIds: selectedOptions.map((item) => item.id) });
+    dispatch("select", { offerId: offer.id, optionIds: selectedOption.map((item) => item.id) });
   }
 
   function selectOption(event: CustomEvent<OfferOption>): void {
@@ -60,7 +72,7 @@
           return event.detail;
         }
 
-        return selectedOptions.find((option) =>
+        return selectedOption.find((option) =>
           group.options.find((option2) => option.id === option2.id),
         );
       })
@@ -142,7 +154,11 @@
         {/if}
       </div>
 
-      <AlternativeFares options={group.options} {selectedOptions} on:select={selectOption} />
+      <AlternativeFares
+        options={group.options}
+        selectedOptions={selectedOption}
+        on:select={selectOption}
+      />
     </div>
   {/each}
 </div>

@@ -11,9 +11,13 @@ export default class OrderService extends JunctionHubApiService {
       {
         session,
         queryParams: {
-          include: ["journey", "bookings", "bookings.details", "bookings.bookingCancellation"].join(
-            ",",
-          ),
+          include: [
+            "journey",
+            "bookings",
+            "bookings.details",
+            "bookings.bookingCancellation",
+            // "bookings.refund", TODO: Uncomment
+          ].join(","),
         },
       },
     );
