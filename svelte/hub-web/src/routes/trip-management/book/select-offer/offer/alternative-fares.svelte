@@ -1,3 +1,9 @@
+<script lang="ts" context="module">
+  function sortOptions(a: OfferOption, b: OfferOption): number {
+    return a.price.total.amount - b.price.total.amount;
+  }
+</script>
+
 <script lang="ts">
   import ChevronIcon from "components/icons/chevron-icon.svelte";
   import Button from "components/ui/button.svelte";
@@ -44,7 +50,7 @@
 
   {#if expanded}
     <ul transition:slide={{ duration: 200 }} class="options">
-      {#each options as option}
+      {#each options.sort(sortOptions) as option}
         {@const selected = Boolean(selectedOptions.find((item) => item.id === option.id))}
 
         <li class="option">
@@ -110,6 +116,7 @@
   }
 
   .option > strong {
+    flex-grow: 1;
     color: var(--color-main-primary-700);
   }
 
