@@ -613,7 +613,7 @@ class BenerailOffersAdapter(BenerailAdapter):
                             latitude=destination.latitude,
                             longitude=destination.longitude,
                         ),
-                        time_zone=origin.timezone.key,
+                        time_zone=destination.timezone.key,
                     ),
                     departure_at=(
                         protobuf.datetime_to_protobuf(
