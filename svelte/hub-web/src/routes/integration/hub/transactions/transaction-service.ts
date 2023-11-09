@@ -8,11 +8,26 @@ const ROOT = `${HUB_INTEGRATION_ROOT}/transactions`;
 async function find({
   cursor,
   limit,
+  sort,
+  filter,
 }: {
   cursor?: string;
   limit?: number;
+  sort?: Parameters<TransactionService["find"]>[0]["sort"];
+  filter?: Parameters<TransactionService["find"]>[0]["filter"];
 }): ReturnType<TransactionService["find"]> {
-  const url = new URLExtended(ROOT, { base: origin, query: { cursor, limit, action: "find" } });
+  const url = new URLExtended(ROOT, {
+    base: origin,
+    query: {
+      cursor,
+      limit,
+      action: "find",
+      sort,
+      ids: filter?.ids?.join(","),
+      billIds: filter?.billIds?.join(","),
+      externalReference: filter?.externalReference,
+    },
+  });
   const resp = await fetch(url);
 
   return devalue.parse(await resp.text());

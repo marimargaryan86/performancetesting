@@ -33,6 +33,7 @@ export default {
     orders: new junctionHubApi.OrderService(env.HUB_API_BASE_URL),
     cancellationRequests: new junctionHubApi.CancellationRequestService(env.HUB_API_BASE_URL),
     users: junctionHubUserService,
+    refunds: new junctionHubApi.RefundService(env.HUB_API_BASE_URL),
   },
   common: {
     countries: new common.CountryService(),

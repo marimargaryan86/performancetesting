@@ -21,6 +21,7 @@ import {
   type PriceBreakdownSchema,
   priceBreakdownParser,
 } from "integration/common/schemas/price";
+import type { Transaction, TransactionSchema } from "./transaction";
 
 export type OfferSegmentDetailRule = {
   title: string;
@@ -114,6 +115,8 @@ export type TripBooking = {
   detailsList: TripBookingDetails[];
   cancellationId?: string;
   cancellation?: BookingCancellation;
+  transactionId?: string;
+  transaction?: Transaction;
 };
 
 export type TripBookingSchema = {
@@ -132,6 +135,7 @@ export type TripBookingSchema = {
     status: { data: Pick<BookingStatusSchema, "id" | "type"> };
     details: { data: Pick<TripBookingDetailsSchema, "id" | "type">[] };
     bookingCancellation: { data: Pick<BookingCancellationSchema, "id" | "type"> | null };
+    transaction: { data: Pick<TransactionSchema, "id" | "type"> | null };
   };
   links: { self: string };
 };
@@ -141,6 +145,7 @@ export const tripBookingParser = {
     const orderId = data.relationships.order.data.id;
     const detailsIds = data.relationships.details.data.map(({ id }) => id);
     const cancellationId = data.relationships.bookingCancellation.data?.id ?? undefined;
+    const transactionId = data.relationships.transaction.data?.id ?? undefined;
 
     return {
       id: data.id,
@@ -159,6 +164,8 @@ export const tripBookingParser = {
       detailsList: included?.tripBookingDetails?.filter(({ id }) => detailsIds.includes(id)) ?? [],
       cancellationId,
       cancellation: included?.bookingCancellations?.find(({ id }) => id === cancellationId),
+      transactionId,
+      transaction: included?.transactions?.find(({ id }) => id === transactionId),
     };
   },
 };

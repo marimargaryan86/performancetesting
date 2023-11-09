@@ -46,16 +46,28 @@ export default class TransactionService extends JunctionHubApiService {
     session,
     cursor,
     limit = 100,
+    sort,
+    filter,
   }: {
     session: SessionModel;
     cursor?: string;
     limit?: number;
+    sort?: "createdAt" | "-createdAt";
+    filter?: {
+      ids?: string[];
+      billIds?: string[];
+      externalReference?: string;
+    };
   }): Promise<PaginatedData<Transaction>> {
     const resp = await this.makeRequest<{ data: TransactionSchema[]; links: { next: string } }>(
       "/transactions",
       {
         session,
         queryParams: {
+          sort,
+          "filter[ids][eq]": filter?.ids?.join(","),
+          "filter[bill.id][eq]": filter?.billIds?.join(","),
+          "filter[externalReference][eq]": filter?.externalReference,
           "page[cursor]": cursor,
           "page[limit]": limit,
         },

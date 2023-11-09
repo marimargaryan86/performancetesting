@@ -9,6 +9,7 @@ import conversions from "./conversions/conversion-service";
 import currencies from "./currencies/currency-service";
 import journeys from "./journeys/journey-service";
 import transactions from "./transactions/transaction-service";
+import refunds from "./refunds/refund-service";
 
 export default {
   accounts,
@@ -22,4 +23,5 @@ export default {
   currencies,
   journeys,
   transactions,
+  refunds,
 };

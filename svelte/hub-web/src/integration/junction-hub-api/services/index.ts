@@ -11,6 +11,7 @@ import JourneyService from "./journey-service";
 import OrderService from "./order-service";
 import CancellationRequestService from "./cancellation-request-service";
 import UserService from "./user-service";
+import RefundService from "./refund-service";
 
 export default {
   AccountService,
@@ -26,4 +27,5 @@ export default {
   OrderService,
   CancellationRequestService,
   UserService,
+  RefundService,
 };

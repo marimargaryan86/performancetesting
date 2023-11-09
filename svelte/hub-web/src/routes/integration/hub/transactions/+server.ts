@@ -9,8 +9,19 @@ import type TransactionService from "integration/junction-hub-api/services/trans
 function find(event: RequestEvent): ReturnType<TransactionService["find"]> {
   const session = getSession(event);
   const pagination = getPagination(event);
+  const sort = event.url.searchParams.get("sort")?.toString() as Parameters<
+    TransactionService["find"]
+  >[0]["sort"];
+  const ids = event.url.searchParams.get("ids")?.toString().split(",");
+  const billIds = event.url.searchParams.get("billIds")?.toString().split(",");
+  const externalReference = event.url.searchParams.get("externalReference")?.toString();
 
-  return integrationInstances.junctionHubApi.transactions.find({ session, ...pagination });
+  return integrationInstances.junctionHubApi.transactions.find({
+    session,
+    ...pagination,
+    sort,
+    filter: { ids, billIds, externalReference },
+  });
 }
 
 function get(event: RequestEvent): ReturnType<TransactionService["get"]> {
