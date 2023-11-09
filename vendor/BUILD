@@ -37,8 +37,12 @@ python_requirements(
         "setuptools": ["easy_install", "pkg_resources", "setuptools"],
         "allure-python-commons": ["allure"],
         "matrix-nio": ["nio"],
+        "types-aiobotocore-sqs": ["types_aiobotocore_sqs"],
     },
     overrides={
+        "aiobotocore": {
+            "dependencies": ["#types-aiobotocore", "#types-aiobotocore-sqs"]
+        },
         "fakeredis": {"dependencies": ["#lupa"]},
         "mongomock-motor": {"dependencies": ["#setuptools"]},
         "openapi-core": {"dependencies": ["#setuptools", "#rfc3339-validator"]},

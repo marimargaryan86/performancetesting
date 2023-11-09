@@ -1,5 +1,6 @@
 add-trailing-comma==3.1.0
 aio-pika==9.3.0
+aiobotocore==2.7.0
 aiocsv==1.2.5
 aiofiles==23.2.1
 aiosmtplib==3.0.1
@@ -13,6 +14,8 @@ bcrypt==4.0.1
 black==23.10.1
 boto3==1.28.64  # freeze (s3fs compatibility)
 boto3-stubs[location]==1.28.64  # freeze (s3fs compatibility)
+botocore==1.31.64
+botocore-stubs==1.31.64
 click==8.1.7
 coverage[toml]==7.3.2
 cryptography==41.0.5
@@ -102,6 +105,8 @@ tenacity==8.2.3
 timezonefinder==6.2.0
 twilio==8.10.0
 twilio-stubs==0.2.0
+types-aiobotocore==2.7.0
+types-aiobotocore-sqs==2.7.0
 types-aiofiles==23.2.0.0
 types-jsonschema==4.19.0.4
 types-Pillow==10.1.0.0

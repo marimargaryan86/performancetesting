@@ -1,0 +1,33 @@
+{
+  "development": {
+    "variables": {
+      "count": 2,
+      "api_base_url": "https://search.ask2go.com",
+      "api_booking_base_url": "https://booking.ask2go.com",
+      "queue_name": "Staging-Notifications.fifo",
+      "endpoint_url": "https://sqs.eu-central-1.amazonaws.com/132237775705/Staging-Notifications.fifo",
+      "aws_region": "eu-central-1"
+    }
+  },
+  "production": {
+    "variables": {
+      "count": 2,
+      "api_base_url": "https://search.production.ask2go.com/",
+      "api_booking_base_url": "https://book.production.ask2go.com/",
+      "queue_name": "Production-Notifications.fifo",
+      "endpoint_url": "https://sqs.eu-central-1.amazonaws.com/132237775705/Production-Notifications.fifo",
+      "aws_region": "eu-central-1"
+    }
+  },
+  "sandbox": {
+    "deploy": true,
+    "variables": {
+      "count": 1,
+      "api_base_url": "https://search.ask2go.com",
+      "api_booking_base_url": "https://booking.ask2go.com",
+      "queue_name": "Staging-Notifications.fifo",
+      "endpoint_url": "https://sqs.eu-central-1.amazonaws.com/132237775705/Staging-Notifications.fifo",
+      "aws_region": "eu-central-1"
+    }
+  }
+}

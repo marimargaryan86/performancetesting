@@ -151,7 +151,21 @@ class Ask2GoClient(object):
 
         return booking.Booking(**response.json()), response.content
 
-    async def synchronize_booking(self, booking_id: int) -> None:
+    async def get_synchronize_booking(
+        self,
+        booking_id: int,
+        record_locator: str,
+    ) -> tuple[booking.Booking, bytes]:
+        response = await self._make_request(
+            "GET",
+            self._api_booking_base_url.copy_with(
+                path="/api/Sync",
+                params={"bookingId": booking_id, "recordLocator": record_locator},
+            ),
+        )
+        return booking.Booking(**response.json()), response.content
+
+    async def update_synchronize_booking(self, booking_id: int) -> None:
         await self._make_request(
             "PUT",
             self._api_booking_base_url.copy_with(
@@ -160,13 +174,13 @@ class Ask2GoClient(object):
             ),
         )
 
-    async def cancel_booking(self, booking_id: str | int, record_locator: str) -> None:
+    async def cancel_booking(self, booking_id: int, record_locator: str) -> None:
         await self._make_request(
             "DELETE",
             self._api_booking_base_url.copy_with(
                 path="/api/Booking",
             ),
-            payload={"bookingId": int(booking_id), "recordLocator": record_locator},
+            payload={"bookingId": booking_id, "recordLocator": record_locator},
         )
 
     async def create_air_offer(

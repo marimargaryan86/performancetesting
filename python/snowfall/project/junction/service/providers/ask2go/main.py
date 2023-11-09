@@ -26,6 +26,7 @@ from snowfall.project.junction.service.providers.ask2go import (
     cache,
     consumer,
     criteria,
+    notifications_service,
     pricing,
     search,
     transformer,
@@ -94,6 +95,18 @@ class _SeatMapsSettings(service.Settings):
     api_booking_base_url: pydantic.AnyUrl
     redis_dsn: pydantic.RedisDsn
     amqp_dsn: pydantic.AmqpDsn
+    http_timeout: float = 60.0
+
+
+class _OrderChangesSettings(service.Settings):
+    api_base_url: pydantic.AnyUrl
+    api_booking_base_url: pydantic.AnyUrl
+    queue_name: str
+    endpoint_url: str
+    a2g_sqs_aws_access_key_id: str
+    a2g_sqs_aws_secret_access_key: str
+    aws_region: str
+    wait_time_between_polling: int = 20
     http_timeout: float = 60.0
 
 
@@ -242,6 +255,33 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
     ).consume()
 
 
+async def _order_changes(app: service.Application[_OrderChangesSettings]) -> None:
+    http_client = await app.stack.enter_async_context(
+        httpx.AsyncClient(
+            timeout=app.settings.http_timeout,
+        ),
+    )
+    logging.register(http_client)
+    metrics.register(http_client)
+
+    ask2go_client = client.Ask2GoClient(
+        api_base_url=str(app.settings.api_base_url),
+        api_booking_base_url=str(app.settings.api_booking_base_url),
+        http_client=http_client,
+    )
+
+    await notifications_service.NotificationsServiceConsumer(
+        ask2go_client=ask2go_client,
+        poll_interval=app.settings.wait_time_between_polling,
+    ).start_listening(
+        queue_name=app.settings.queue_name,
+        endpoint_url=app.settings.endpoint_url,
+        aws_access_key_id=app.settings.a2g_sqs_aws_access_key_id,
+        aws_secret_access_key=app.settings.a2g_sqs_aws_secret_access_key,
+        region=app.settings.aws_region,
+    )
+
+
 async def _price_quotes(app: service.Application[_PriceQuotesSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
@@ -385,5 +425,10 @@ if __name__ == "__main__":
             name="seat_maps",
             callback=_seat_maps,
             settings_class=_SeatMapsSettings,
+        ),
+        service.Command(
+            name="order_changes",
+            callback=_order_changes,
+            settings_class=_OrderChangesSettings,
         ),
     )
