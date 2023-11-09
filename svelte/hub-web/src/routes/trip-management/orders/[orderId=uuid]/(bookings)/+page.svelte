@@ -50,8 +50,9 @@
     <Header>Origin</Header>
     <Header>Destination</Header>
     <Header>Total Price</Header>
-    <Header>Cancellation Status</Header>
     <Header>Booking status</Header>
+    <Header>Cancellation Status</Header>
+    <Header>Refund Status</Header>
     <Header />
   </THead>
   <TBody>
@@ -91,12 +92,21 @@
         <TCol class="typography bold">{origin?.name ?? "Unknown"}</TCol>
         <TCol class="typography bold">{destination?.name ?? "Unknown"}</TCol>
         <TMoneyCol money={booking.price.total} />
+
+        <TStatusBadgeCol value={booking.status} />
+
         {#if booking.cancellation?.status}
           <TStatusBadgeCol value={booking.cancellation.status} />
         {:else}
           <TCol width="0" />
         {/if}
-        <TStatusBadgeCol value={booking.status} />
+
+        {#if booking.refund?.status}
+          <TStatusBadgeCol value={booking.refund.status} />
+        {:else}
+          <TCol width="0" />
+        {/if}
+
         <TActionsCol>
           {#if booking.status === "confirmed" && !booking.cancellation?.status}
             <Button

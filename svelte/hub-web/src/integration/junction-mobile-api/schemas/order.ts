@@ -3,7 +3,7 @@ import {
   type EnhancedAddressDetails,
   type EnhancedAddressDetailsSchema,
 } from "integration/common/schemas/address";
-import type { BookingStatusSchema, TripBooking, TripBookingSchema } from "./booking";
+import type { TripBooking, TripBookingSchema } from "./booking";
 import type { IncludedMapping } from "./included";
 import {
   contactDetailsParser,
@@ -14,54 +14,6 @@ import {
 } from "./journey";
 import type { Payment, PaymentSchema, Voucher, VoucherSchema } from "./payment";
 import type { TripOfferPriceQuoteSchema } from "./trip-offer-price-quote";
-import type { BookingCancellationStatus } from "./cancellation";
-import { ensureDefined } from "utils/array";
-
-export type OrderStatus = BookingStatusSchema["id"] | "mixed" | "unknown";
-export type OrderCancellationStatus = BookingCancellationStatus | "mixed" | undefined;
-
-export const getOrderStatus = {
-  cancellationStatus: (order: {
-    bookings: {
-      cancellation?: {
-        status: NonNullable<Order["bookings"][number]["cancellation"]>["status"];
-      };
-    }[];
-  }): OrderCancellationStatus => {
-    const statuses = Array.from(
-      new Set(order.bookings.map((item) => item.cancellation?.status).filter(ensureDefined)),
-    );
-
-    if (!statuses.length) {
-      return undefined;
-    }
-
-    if (statuses.length === 1) {
-      return statuses[0];
-    }
-
-    return "mixed";
-  },
-  status: (order: {
-    bookings: {
-      status: BookingStatusSchema["id"];
-    }[];
-  }): OrderStatus => {
-    const statuses = Array.from(
-      new Set(order.bookings.map((item) => item.status).filter(ensureDefined)),
-    );
-
-    if (!statuses.length) {
-      return "unknown";
-    }
-
-    if (statuses.length === 1) {
-      return statuses[0] as OrderStatus;
-    }
-
-    return "mixed";
-  },
-};
 
 export type TravelerDocument = {
   type?: "passport";

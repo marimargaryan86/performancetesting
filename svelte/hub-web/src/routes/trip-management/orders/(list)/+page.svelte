@@ -86,7 +86,7 @@
   import TStatusBadgeCol from "components/ui/table/t-status-badge-col.svelte";
   import Table from "components/ui/table/table.svelte";
   import { formatAmount } from "formatting/currency";
-  import { getOrderStatus } from "integration/junction-mobile-api/schemas/order";
+  import { getOrderStatus } from "integration/common/schemas/order";
   import type { Order } from "integration/junction-hub-api/schemas/order";
   import type { Price } from "integration/common/schemas/price";
   import type { DateRange } from "models/date-time";
@@ -149,15 +149,17 @@
       <Header>Departure Date</Header>
       <Header>Passengers</Header>
       <Header>Total Price</Header>
+      <Header>Booking Status</Header>
       <Header>Cancellation Status</Header>
-      <Header>Status</Header>
+      <Header>Refund Status</Header>
       <Header />
     </THead>
 
     <TBody>
       {#each orders.filter(getFilterFunction(searchQuery, departureAtDateRange)) as order (order.id)}
-        {@const cancellationStatus = getOrderStatus.cancellationStatus(order)}
-        {@const status = getOrderStatus.status(order)}
+        {@const cancellationStatus = getOrderStatus.cancellation(order)}
+        {@const refundStatus = getOrderStatus.refund(order)}
+        {@const bookingStatus = getOrderStatus.booking(order)}
         {@const totalPrice = getTotalPrice(order)}
         {@const hasTickets = Boolean(order.bookings.flatMap((item) => item.ticketUrls).length)}
 
@@ -198,12 +200,25 @@
               {totalPrice.currency}
             </em>
           </TCol>
+
+          {#if bookingStatus}
+            <TStatusBadgeCol value={bookingStatus} />
+          {:else}
+            <TCol width="0" />
+          {/if}
+
           {#if cancellationStatus}
             <TStatusBadgeCol value={cancellationStatus} />
           {:else}
             <TCol width="0" />
           {/if}
-          <TStatusBadgeCol value={status} />
+
+          {#if refundStatus}
+            <TStatusBadgeCol value={refundStatus} />
+          {:else}
+            <TCol width="0" />
+          {/if}
+
           <TActionsCol>
             <button class="action">
               <span>...</span>

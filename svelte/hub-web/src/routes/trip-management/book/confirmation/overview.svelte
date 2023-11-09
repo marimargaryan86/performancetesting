@@ -1,6 +1,7 @@
 <script lang="ts">
   import CheckedIcon from "components/icons/checked-icon.svelte";
-  import { type Order, getOrderStatus } from "integration/junction-mobile-api/schemas/order";
+  import type { Order } from "integration/junction-mobile-api/schemas/order";
+  import { getOrderStatus } from "integration/common/schemas/order";
   import Ticket from "../../components/ticket.svelte";
   import StatusBadge from "components/ui/status-badge.svelte";
 
@@ -17,7 +18,7 @@
     </span>
     <div>
       <span class="typography body-xsmall">Status</span>
-      <StatusBadge value={getOrderStatus.status(order)} />
+      <StatusBadge value={getOrderStatus.booking(order) ?? "unknown"} />
     </div>
   </div>
 </div>
