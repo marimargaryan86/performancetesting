@@ -14,6 +14,7 @@ from snowfall.project.junction.service.providers.benerail import (
     offers,
     orders,
     pricing,
+    simple_searching,
     stations,
 )
 from snowfall.project.junction.service.providers.benerail.constant import PROVIDER_ID
@@ -161,6 +162,11 @@ if __name__ == "__main__":
             name="dump-stations",
             callback=stations.dump_stations,
             settings_class=config.DumpStationsSettings,
+        ),
+        service.Command(
+            name="simple_search",
+            callback=simple_searching.simple_search,
+            settings_class=config.SimpleSearchSettings,
         ),
         service.Command(
             name="pricing",

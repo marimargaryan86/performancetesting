@@ -38,6 +38,11 @@ class Settings(BenerailSettings, service.ProviderSettings):
     storage_dsn: service.AnyDsn
 
 
+class SimpleSearchSettings(BenerailSettings, service.ProviderSettings):
+    mongo_dsn: tuple[pydantic.AnyUrl]
+    ttl: datetime.timedelta = datetime.timedelta(minutes=_DEFAULT_TTL_IN_MINUTES)
+
+
 class PriceQuoteSettings(BenerailSettings, service.Settings):
     redis_dsn: pydantic.RedisDsn
     amqp_dsn: pydantic.AmqpDsn

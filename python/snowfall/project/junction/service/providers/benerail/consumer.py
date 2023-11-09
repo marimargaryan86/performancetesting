@@ -1,5 +1,8 @@
 import asyncio
 import datetime
+import functools
+import math
+from collections.abc import AsyncIterator
 
 from snowfall.project.junction.go.service.offers.v1 import (
     amqp_pb2 as offers_amqp_pb2,
@@ -8,23 +11,27 @@ from snowfall.project.junction.go.service.offers.v1 import models_pb2 as offers_
 from snowfall.project.junction.go.service.orders.v1 import (
     amqp_pb2 as orders_amqp_pb2,
 )
+from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.project.junction.provider import notifications as base_notifications
 from snowfall.project.junction.service.providers.benerail import (
     adapter,
     booking,
     cache,
+    criteria,
     fare_rules,
     helper_functions,
     notifications,
+    train_stations,
 )
 from snowfall.project.junction.service.providers.benerail.v1 import (
     amqp_pb2 as br_amqp_pb2,
 )
-from snowfall.stdlib import money
+from snowfall.stdlib import h3, money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.stdlib.transport.http import errors
+from snowfall.stdlib.v1 import latlng_pb2
 from snowfall.vendor.benerail import client
 from snowfall.vendor.benerail.models import etag
 
@@ -259,3 +266,103 @@ class OrdersConsumer(object):
             await self._bookings.create_booking(message.body, booking_offer_details),
             routing_key="orders.result.offer",
         )
+
+
+class SimpleSearchConsumer(object):
+    def __init__(
+        self,
+        consumer_obj: consumer.Consumer[offers_amqp_pb2.SimpleTripOfferSearchTask],
+        producer_obj: producer.Producer,
+        benerail_offers_adapter: adapter.BenerailOffersAdapter,
+        h3_mapping: h3.H3MappingRepository[train_stations.TrainStation],
+        provider_company_id: str,
+    ):
+        self._consumer = consumer_obj
+        self._producer = producer_obj
+        self._adapter = benerail_offers_adapter
+        self._station_mapping = h3_mapping
+        self._provider_company_id = provider_company_id
+
+    async def consume(self) -> None:
+        await self._consumer.consume(self._process_message)
+
+    async def _process_message(
+        self,
+        message: types.Message[offers_amqp_pb2.SimpleTripOfferSearchTask],
+    ) -> None:
+        trip_offer_groups = self._gather_simple_search_results(message.body)
+        async for offer_group in trip_offer_groups:
+            await self._producer.publish(
+                msg=offers_amqp_pb2.TripOfferSearchResult(
+                    offer_search_id=offer_group.id,
+                    offer=offer_group,
+                    provider_company_id=self._provider_company_id,
+                ),
+                routing_key="offers.result.trip",
+            )
+
+    async def _gather_simple_search_results(
+        self,
+        trip_offer_search: offers_amqp_pb2.SimpleTripOfferSearchTask,
+    ) -> AsyncIterator[offers_pb2.OfferGroup]:
+        allowed_segment_types = trip_offer_search.search.allowed_segment_types
+        if models_pb2.Schedule.TYPE_RAIL in allowed_segment_types:
+            search_origin = trip_offer_search.search.origin
+            search_destination = trip_offer_search.search.destination
+            origins = self._station_mapping.find_mapped_values(
+                coordinates=search_origin.coordinates,
+                neighbour_search_radius=1,
+            )
+
+            destinations = self._station_mapping.find_mapped_values(
+                coordinates=search_destination.coordinates,
+                neighbour_search_radius=1,
+            )
+            search_criteria = criteria.SearchCriteria(
+                origin=_find_nearest_provider_place(
+                    frozenset(origins),
+                    search_origin.coordinates,
+                ),
+                destination=_find_nearest_provider_place(
+                    frozenset(destinations),
+                    search_destination.coordinates,
+                ),
+                passenger_dobs=[
+                    protobuf.protobuf_to_date(passenger.date_of_birth)
+                    for passenger in trip_offer_search.search.passengers
+                ],
+                outbound_departure_datetime=protobuf.protobuf_to_datetime(
+                    trip_offer_search.search.departure_at,
+                ),
+                session_token=trip_offer_search.session_token,
+            )
+            offer_groups = self._adapter.gather_search_results(search_criteria)
+            async for offer in offer_groups:
+                yield offer
+
+
+def _calculate_distance(
+    p1: tuple[float, float],
+    p2: train_stations.TrainStation,
+) -> float:
+    """Return the great circle distance in meters between two points."""
+    station = p2.latitude, p2.longitude
+    lon1, lat1, lon2, lat2 = map(math.radians, (*p1, *station))
+
+    dlon = math.sin((lon2 - lon1) / 2) ** 2
+    dlat = math.sin((lat2 - lat1) / 2) ** 2
+    hav = dlat + math.cos(lat1) * math.cos(lat2) * dlon
+    distance = 2 * math.asin(math.sqrt(hav))
+    radius_of_earth_in_metres = 6371000
+    return distance * radius_of_earth_in_metres
+
+
+def _find_nearest_provider_place(
+    stations: frozenset[train_stations.TrainStation],
+    coordinates: latlng_pb2.LatLng,
+) -> str:
+    coords = coordinates.latitude, coordinates.longitude
+    return min(
+        stations,
+        key=functools.partial(_calculate_distance, coords),
+    ).identifier
