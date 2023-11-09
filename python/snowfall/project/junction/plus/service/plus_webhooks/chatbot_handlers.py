@@ -5,11 +5,14 @@ from collections.abc import Mapping, Sequence
 from gettext import gettext as _
 from typing import Any, TypeAlias
 
+import grpc
+
 from snowfall.project.junction.plus.adapter import (
     flight_delay_predictor,
     orders,
     subscribers,
 )
+from snowfall.project.junction.plus.adapter.format import proto_to_route_identifier
 from snowfall.project.junction.plus.notification_channels.order_utils import (
     compress_flights,
 )
@@ -102,6 +105,7 @@ class MessageHandler(object):
                 ai_bot=self._ai_bot,
                 redis_client=self._redis,
                 shortener_client=self._shortener_client,
+                logger=self._logger,
             )
         except RuntimeError:
             return [
@@ -209,6 +213,7 @@ async def trip_details(
     message_key: str,
     redis_client: redis.Client[str],
     flight_predictions_client: flight_delay_predictor.Client,
+    logger: stdout.Logger,
     **kwargs: Any,
 ) -> _HandlersResponse:
     order = None
@@ -224,9 +229,26 @@ async def trip_details(
             },
             action_menu,
         ]
+    try:
+        delays = await flight_predictions_client.predict_delays(
+            [
+                flight_delay_predictor.Flight(
+                    flight_number=proto_to_route_identifier(
+                        booking.value.route_identifier,
+                    ),
+                    scheduled_departure_at=protobuf.protobuf_to_datetime(
+                        booking.value.departure_at,
+                    ).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                )
+                for booking in order.bookings
+            ],
+        )
+    except grpc.aio.AioRpcError:
+        logger.exception("Failed to get flight delay prediction")
+        delays = None
     return [
         {
-            "message": transform_trip_details(order),
+            "message": transform_trip_details(order, delays),
         },
         {
             **trip_details_menu,
@@ -302,6 +324,7 @@ async def upcoming_trip_details(
     message_key: str,
     redis_client: redis.Client[str],
     flight_predictions_client: flight_delay_predictor.Client,
+    logger: stdout.Logger,
     **kwargs: Any,
 ) -> _HandlersResponse:
     session = redis_client.hash_("upcoming_trips_{0}".format(subscriber.id))
@@ -312,9 +335,27 @@ async def upcoming_trip_details(
                 "message": _("Invalid option. Please try again"),
             },
         ]
+    order = await orders_client.get(order_id)
+    try:
+        delays = await flight_predictions_client.predict_delays(
+            [
+                flight_delay_predictor.Flight(
+                    flight_number=proto_to_route_identifier(
+                        booking.value.route_identifier,
+                    ),
+                    scheduled_departure_at=protobuf.protobuf_to_datetime(
+                        booking.value.departure_at,
+                    ).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                )
+                for booking in order.bookings
+            ],
+        )
+    except grpc.aio.AioRpcError:
+        logger.exception("Failed to get flight delay prediction")
+        delays = None
     return [
         {
-            "message": transform_trip_details(await orders_client.get(order_id)),
+            "message": transform_trip_details(order, delays),
         },
         {
             **trip_details_menu,

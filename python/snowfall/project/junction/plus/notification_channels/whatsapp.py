@@ -4,6 +4,7 @@ from gettext import gettext as _
 
 from twilio.rest import Client as twilioClient
 
+from snowfall.project.junction.plus.adapter.flight_delay_predictor import Prediction
 from snowfall.project.junction.plus.notification_channels.channel import AbstractChannel
 from snowfall.project.junction.plus.notification_channels.flight_stats_messages import (
     get_message_from_code,
@@ -282,7 +283,10 @@ class MockChannel(Channel):
         return string.uuid()
 
 
-def transform_trip_details(order: models_pb2.PersistedOrder) -> str:
+def transform_trip_details(
+    order: models_pb2.PersistedOrder,
+    delays: Sequence[Prediction] | None,
+) -> str:
     return _(
         "Here are the details of your upcoming trip:\n"
         + "*Booking Reference:* {0}\n".format(order.booking_reference)
@@ -307,7 +311,7 @@ def transform_trip_details(order: models_pb2.PersistedOrder) -> str:
                     + "*Flight Number:* {0}\n".format(
                         proto_to_route_identifier(booking.value.route_identifier),
                     )
-                    + calculate_layover(order.bookings, idx)
+                    + calculate_delay_and_layover(order.bookings, idx, delays)
                 )
                 for idx, booking in enumerate(order.bookings)
             ],
@@ -315,9 +319,18 @@ def transform_trip_details(order: models_pb2.PersistedOrder) -> str:
     )
 
 
-def calculate_layover(bookings: Sequence[models_pb2.Booking], idx: int) -> str:
+def calculate_delay_and_layover(
+    bookings: Sequence[models_pb2.Booking],
+    idx: int,
+    delays: Sequence[Prediction] | None,
+) -> str:
+    message = ""
+    if delays:
+        message = "\n*Predicted flight delay:* {0} mins\n".format(
+            delays[idx].delay,
+        )
     if idx < len(bookings) - 1:
-        return "\nLayover: {0}\n".format(
+        return message + "\nLayover: {0}\n".format(
             protobuf.protobuf_to_datetime(
                 bookings[idx + 1].value.departure_at,
             )
@@ -325,4 +338,4 @@ def calculate_layover(bookings: Sequence[models_pb2.Booking], idx: int) -> str:
                 bookings[idx].value.arrival_at,
             ),
         )
-    return ""
+    return message
