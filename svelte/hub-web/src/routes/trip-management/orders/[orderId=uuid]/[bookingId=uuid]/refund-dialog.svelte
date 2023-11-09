@@ -105,6 +105,7 @@
         placeholder="Amount"
         bind:value={refundData.provider.amount}
         error={errors?.provider?.amount?._errors}
+        step="any"
       />
       <SelectField
         label="&nbsp;"
@@ -125,6 +126,7 @@
         placeholder="Amount"
         bind:value={refundData.reseller.amount}
         error={errors?.reseller?.amount?._errors}
+        step="any"
       />
       <SelectField
         label="&nbsp;"
