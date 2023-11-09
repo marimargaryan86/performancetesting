@@ -1964,6 +1964,69 @@
         }
       }
     },
+    "/offers/simple-searches": {
+      "post": {
+        "summary": "Create Simple Offer Search",
+        "tags": [
+          "offers"
+        ],
+        "operationId": "post-offers-simple-searches",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/SimpleOfferSearch"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "description": "Used to initiate a simple single modal search for offers",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/SimpleOfferSearch"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
     "/offers/searches/{offerSearchId}": {
       "parameters": [
         {
@@ -4575,6 +4638,29 @@
           "departureAfter"
         ]
       },
+      "SimpleOfferSearchCriteria": {
+        "type": "object",
+        "title": "Simple Offer Search Criteria",
+        "description": "Criteria used for a Simple Offer Search",
+        "properties": {
+          "origin": {
+            "$ref": "#/components/schemas/CoordinatesSearchable"
+          },
+          "destination": {
+            "$ref": "#/components/schemas/CoordinatesSearchable"
+          },
+          "departureAfter": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2019-08-24T14:15:22Z"
+          }
+        },
+        "required": [
+          "origin",
+          "destination",
+          "departureAfter"
+        ]
+      },
       "Coordinates": {
         "title": "Coordinates",
         "allOf": [
@@ -5715,6 +5801,109 @@
           }
         ],
         "description": "Context for which Trip-related Offers can be found."
+      },
+      "SimpleOfferSearch": {
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "simple-offer-searches"
+                ],
+                "example": "simple-offer-searches"
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "expiresAt",
+                  "status",
+                  "criteria",
+                  "passengers"
+                ],
+                "properties": {
+                  "sessionToken": {
+                    "type": "string",
+                    "example": "FMSXrOAhIOdvIbxAmfSt7vJtRBkurNbn",
+                    "minLength": 32,
+                    "maxLength": 32,
+                    "pattern": "^[A-Za-z\\d]{32}$",
+                    "writeOnly": true
+                  },
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true,
+                    "example": "2019-08-24T14:15:22Z"
+                  },
+                  "status": {
+                    "type": "string",
+                    "readOnly": true,
+                    "enum": [
+                      "unspecified",
+                      "pending",
+                      "processing",
+                      "completed",
+                      "failed"
+                    ],
+                    "example": "completed"
+                  },
+                  "criteria": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                      "$ref": "#/components/schemas/SimpleOfferSearchCriteria"
+                    }
+                  },
+                  "passengers": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "$ref": "#/components/schemas/Passenger"
+                    }
+                  }
+                }
+              },
+              "relationships": {
+                "type": "object",
+                "properties": {
+                  "allowedSegmentTypes": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "uniqueItems": true,
+                        "items": {
+                          "$ref": "#/components/schemas/LegTypeIdentifier"
+                        }
+                      }
+                    },
+                    "required": [
+                      "data"
+                    ]
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ],
+        "title": "Simple Offer Search",
+        "x-examples": {}
       },
       "TripOfferPriceQuote": {
         "allOf": [
