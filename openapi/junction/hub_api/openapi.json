@@ -949,6 +949,9 @@
                           },
                           {
                             "$ref": "#/components/schemas/BookingCancellation"
+                          },
+                          {
+                            "$ref": "#/components/schemas/Transaction"
                           }
                         ]
                       }
@@ -3472,7 +3475,8 @@
               "order",
               "order.journey",
               "details",
-              "bookingCancellation"
+              "bookingCancellation",
+              "transaction"
             ]
           },
           "example": [
@@ -4687,7 +4691,8 @@
                   "order",
                   "status",
                   "details",
-                  "bookingCancellation"
+                  "bookingCancellation",
+                  "transaction"
                 ],
                 "properties": {
                   "order": {
@@ -4737,6 +4742,24 @@
                         "properties": {
                           "data": {
                             "$ref": "#/components/schemas/BookingCancellationIdentifier"
+                          }
+                        }
+                      },
+                      {
+                        "nullable": true
+                      }
+                    ]
+                  },
+                  "transaction": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "required": [
+                          "data"
+                        ],
+                        "properties": {
+                          "data": {
+                            "$ref": "#/components/schemas/TransactionIdentifier"
                           }
                         }
                       },

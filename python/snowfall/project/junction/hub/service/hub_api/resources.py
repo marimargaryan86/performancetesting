@@ -247,6 +247,16 @@ class TripBookingResource(models.Resource):
                         else None
                     ),
                 },
+                "transaction": {
+                    _RELATIONSHIPS_FIELD: (
+                        models.ResourceIdentifier(
+                            id=booking.transaction_id,
+                            type=Transaction.api_type,
+                        )
+                        if booking.transaction_id
+                        else None
+                    ),
+                },
             },
             links={
                 _SELF_HREF: str(
