@@ -1,5 +1,9 @@
 import asyncio
+import base64
 import datetime
+import pathlib
+
+import orjson
 
 from snowfall.project.junction.go.service.offers.v1 import amqp_pb2 as offers_amqp_pb2
 from snowfall.project.junction.go.service.offers.v1 import models_pb2 as offers_pb2
@@ -18,6 +22,7 @@ from snowfall.project.junction.service.providers.save_a_train.v1 import (
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
+from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 
 _PROVIDER_NAME = "Save A Train"
@@ -31,7 +36,9 @@ class NotificationsConsumer(object):
         consumer_obj: consumer.Consumer[sat_amqp_pb2.BookingNotificationTask],
         adapter: save_a_train_adapter.SaveATrainAdapter,
         notifier: base_notifications.Notifier,
+        booking_storage: filesystem.Storage,
     ):
+        self._booking_storage = booking_storage
         self._consumer = consumer_obj
         self._adapter = adapter
         self._notifier = notifier
@@ -44,23 +51,31 @@ class NotificationsConsumer(object):
         self,
         message: types.Message[sat_amqp_pb2.BookingNotificationTask],
     ) -> None:
-        if message.body.ticket_url:
-            await self._notifier.send(
-                notifications.BookingNotification(message.body),
+        if not message.body.ticket_url:
+            get_ticket_result, raw_ticket = await self._adapter.get_ticket(
+                search_id=message.body.search_identifier,
             )
-            return
 
-        get_ticket_result, raw_ticket = await self._adapter.get_ticket(
-            search_id=message.body.search_identifier,
-        )
-        if get_ticket_result.url:
+            if not get_ticket_result.url:
+                return await self._handle_no_fulfillment(message)
+
             message.body.ticket_url = get_ticket_result.url
-            await self._notifier.send(
-                notifications.BookingNotification(message.body),
-            )
-            return
 
-        await self._handle_no_fulfillment(message)
+        storage_path = pathlib.Path(message.body.search_identifier)
+        raw_data = await self._booking_storage.get(storage_path)
+        combined = orjson.loads(raw_data)
+        combined["ticket_urls"] = base64.b64encode(
+            orjson.dumps([message.body.ticket_url]),
+        )
+
+        await asyncio.gather(
+            self._booking_storage.put(storage_path, orjson.dumps(combined)),
+            self._notifier.send(
+                notifications.BookingNotification(message.body),
+            ),
+        )
+
+        return None
 
     async def _handle_no_fulfillment(
         self,

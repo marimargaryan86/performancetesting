@@ -2,6 +2,7 @@ import asyncio
 import datetime
 import functools
 import math
+import pathlib
 from collections.abc import AsyncIterator
 
 from snowfall.project.junction.go.service.offers.v1 import (
@@ -29,6 +30,7 @@ from snowfall.project.junction.service.providers.benerail.v1 import (
 from snowfall.stdlib import h3, money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
+from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.stdlib.transport.http import errors
 from snowfall.stdlib.v1 import latlng_pb2
@@ -46,7 +48,9 @@ class NotificationsConsumer(object):
         consumer_obj: consumer.Consumer[br_amqp_pb2.BookingNotificationTask],
         benerail_client: client.BenerailClient,
         notifier: base_notifications.Notifier,
+        booking_storage: filesystem.Storage,
     ):
+        self._booking_storage = booking_storage
         self._consumer = consumer_obj
         self._client = benerail_client
         self._notifier = notifier
@@ -88,6 +92,16 @@ class NotificationsConsumer(object):
 
         if not ticket_urls:
             return await self._handle_no_fulfillment(message)
+
+        storage_path = pathlib.Path(booking_res.response_result.identifier)
+        raw_data = await self._booking_storage.get(storage_path)
+        all_results = booking.RawStorageData.parse_from_storage(raw_data)
+        all_results.tickets = list(ticket_urls)
+
+        await self._booking_storage.put(
+            storage_path,
+            all_results.model_dump_json().encode(),
+        )
 
         body.MergeFrom(
             br_amqp_pb2.BookingNotificationTask(

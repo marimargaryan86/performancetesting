@@ -21,11 +21,9 @@ class Implementation(object):
         self,
         storage: filesystem.Storage,
         transformer: Transformer,
-        enrich: Enricher | None = None,
     ):
         self._storage = storage
         self._transformer = transformer
-        self._enrich = enrich
 
     async def get(self, identifier: str) -> bookings_pb2.Booking:
         try:
@@ -33,12 +31,7 @@ class Implementation(object):
         except filesystem.NotFoundError as err:
             raise NotFoundError() from err
 
-        booking_from_provider = await self._transformer(raw_booking)
-
-        if self._enrich:
-            return await self._enrich(booking_from_provider)
-
-        return booking_from_provider
+        return await self._transformer(raw_booking)
 
 
 class BookingService(service.Service, bookings_pb2_grpc.BookingServiceServicer):

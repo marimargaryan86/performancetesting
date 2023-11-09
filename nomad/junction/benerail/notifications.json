@@ -4,7 +4,8 @@
     "variables": {
       "count": 2,
       "api_base_url": "https://benerail-stg-apim.azure-api.net",
-      "email_recipient": "go-dev@snowfalltravel.com"
+      "email_recipient": "go-dev@snowfalltravel.com",
+      "bucket": "junction-provider-data-development"
     }
   },
   "production": {
@@ -12,7 +13,8 @@
     "variables": {
       "count": 2,
       "api_base_url": "https://benerail-prd-apim.azure-api.net",
-      "email_recipient": "support@snowfalltravel.com"
+      "email_recipient": "support@snowfalltravel.com",
+      "bucket": "junction-provider-data-production"
     }
   },
   "sandbox": {
@@ -20,7 +22,8 @@
     "variables": {
       "count": 1,
       "api_base_url": "https://benerail-stg-apim.azure-api.net",
-      "email_recipient": "go-dev@snowfalltravel.com"
+      "email_recipient": "go-dev@snowfalltravel.com",
+      "bucket": "junction-provider-data-sandbox"
     }
   }
 }

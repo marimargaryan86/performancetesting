@@ -194,7 +194,7 @@ async def _bookings_factory(
             timeout=app.settings.api_timeout,
         ),
     )
-    save_a_train_client = client.SATClient(
+    client.SATClient(
         email=app.settings.api_email,
         password=app.settings.api_password,
         password_search=app.settings.api_search_password,
@@ -213,7 +213,6 @@ async def _bookings_factory(
             provider_name=_PROVIDER_NAME,
             url_timeout=app.settings.ticket_link_timeout.seconds,
         ).raw_to_booking,
-        enrich=adapter.Enricher(save_a_train_client).add_ticket_urls,
     )
 
 
@@ -390,7 +389,13 @@ async def _notifications(  # noqa: WPS217
         ),
         booking_storage=booking_storage,
     )
-    await _consume_notifications(app, amqp_connection, sat_adapter, notifier)
+    await _consume_notifications(
+        app,
+        amqp_connection,
+        sat_adapter,
+        notifier,
+        booking_storage,
+    )
 
 
 async def _consume_notifications(
@@ -398,6 +403,7 @@ async def _consume_notifications(
     amqp_connection: abc.AbstractConnection,
     sat_adapter: adapter.SaveATrainAdapter,
     notifier: notifications.SmtpNotifier,
+    booking_storage: filesystem.Storage,
 ) -> None:
     notifications_consumer = consumer.NotificationsConsumer(
         consumer_obj=amqp_consumer.Consumer(
@@ -411,6 +417,7 @@ async def _consume_notifications(
         ),
         adapter=sat_adapter,
         notifier=notifier,
+        booking_storage=booking_storage,
     )
     await _configure_queue(app, amqp_connection)
     await notifications_consumer.consume()

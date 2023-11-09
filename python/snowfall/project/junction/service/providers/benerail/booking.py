@@ -5,11 +5,11 @@ import pathlib
 import types as python_types
 import uuid
 from collections.abc import Sequence
-from typing import NamedTuple
+from typing import NamedTuple, Self
 
-import more_itertools
 import orjson
 import phonenumbers
+import pydantic
 import tenacity
 
 from snowfall.project.junction.go.service.orders.v1 import (
@@ -19,7 +19,6 @@ from snowfall.project.junction.go.service.orders.v1 import models_pb2
 from snowfall.project.junction.provider.v1alpha import bookings_pb2
 from snowfall.project.junction.service.providers.benerail import (
     cache,
-    helper_functions,
     helper_models,
 )
 from snowfall.project.junction.service.providers.benerail.v1 import amqp_pb2
@@ -105,94 +104,56 @@ class _CreateBookingResponse(NamedTuple):
     raw_booking_res: bytes
 
 
-class Enricher(object):
-    def __init__(self, benerail_client: client.BenerailClient):
-        self._client = benerail_client
-        self._logger = stdout.get_logger()
-
-    async def enrich(
-        self,
-        booking: bookings_pb2.Booking,
-    ) -> bookings_pb2.Booking:
-        try:
-            booking_res, _ = await self._client.bookings_client.get_booking(
-                booking_id=booking.id,
-            )
-        except errors.HttpError:
-            self._logger.exception("Failed to fetch the booking")
-
-            return booking
-
-        order_res = await self._client.orders_client.get_order(
-            booking_id=booking.id,
-            order_id=helper_functions.last_id_of_url(
-                more_itertools.first(booking_res.response_result.orders or []).href,
-            ),
-        )
-
-        booking.MergeFrom(
-            bookings_pb2.Booking(
-                status=(
-                    _PROVIDER_BOOKING_STATUS_MAPPING.get(
-                        enums.OrderStates(order_res.response_result.state),
-                        bookings_pb2.Booking.STATUS_UNSPECIFIED,
-                    )
-                    if order_res.response_result.state
-                    else bookings_pb2.Booking.STATUS_UNSPECIFIED
-                ),
-                updated_at=protobuf.datetime_to_protobuf(
-                    datetime.datetime.now(tz=datetime.UTC),
-                ),
-            ),
-        )
-
-        if booking_res.response_result.fulfillments:
-            ticket_urls = (
-                await self._client.bookings_client.get_ticket_urls_from_fulfillment(
-                    booking_id=booking_res.response_result.identifier,
-                    fulfillment_id=helper_functions.last_id_of_url(
-                        booking_res.response_result.fulfillments[0].href,
-                    ),
-                )
-            )
-
-            booking.ticket_urls.extend(ticket_urls)
-
-        return booking
-
-
 class Transformer(object):
     def __init__(self, provider_identifier: uuid.UUID, provider_name: str):
         self._provider_id = str(provider_identifier)
         self._provider_name = provider_name
 
     async def raw_to_booking(self, raw: bytes) -> bookings_pb2.Booking:
-        booking_result = booking_response.GetBookingResponse(
-            **orjson.loads(raw),
-            dialogue_etag="",
-        )
+        all_results = RawStorageData.parse_from_storage(raw)
 
-        # TODO: How to figure out real status?
-        booking_status = bookings_pb2.Booking.STATUS_NOT_TICKETED
+        if all_results.tickets:
+            booking_status = bookings_pb2.Booking.STATUS_CONFIRMED
+        else:
+            booking_status = bookings_pb2.Booking.STATUS_NOT_TICKETED
 
         return bookings_pb2.Booking(
-            id=str(booking_result.response_result.identifier),
+            id=str(all_results.booking.response_result.identifier),
             status=booking_status,
             provider=bookings_pb2.Booking.Provider(
                 id=self._provider_id,
                 name=self._provider_name,
             ),
             trip=bookings_pb2.Booking.Trip(
-                record_locator=booking_result.response_result.dnr,
-                operator_booking_references=[booking_result.response_result.identifier],
+                record_locator=all_results.booking.response_result.dnr,
+                operator_booking_references=[
+                    all_results.booking.response_result.identifier,
+                ],
             ),
             created_at=protobuf.datetime_to_protobuf(
                 datetime.datetime.fromisoformat(
-                    str(booking_result.metadata.responded_at),
+                    str(all_results.booking.metadata.responded_at),
                 ),
             ),
             # TODO: No idea how to get updated_at from the booking model.
         )
+
+
+class RawStorageData(pydantic.BaseModel):
+    booking: booking_response.GetBookingResponse
+    tickets: list[str] | None = None
+
+    @classmethod
+    def parse_from_storage(cls, raw: bytes) -> Self:
+        try:
+            return cls.model_validate_json(raw.decode())
+        except ValueError:
+            return cls(
+                booking=booking_response.GetBookingResponse(
+                    **orjson.loads(raw),
+                    dialogue_etag="",
+                ),
+            )
 
 
 class BookingHandler(object):
@@ -259,11 +220,13 @@ class BookingHandler(object):
             ),
         )
 
+        storage_data = RawStorageData(booking=create_booking_response.booking_res)
+
         await self._storage.put(
             pathlib.Path(
                 create_booking_response.booking_res.response_result.identifier,
             ),
-            create_booking_response.raw_booking_res,
+            storage_data.model_dump_json().encode(),
         )
 
         await self._notify(

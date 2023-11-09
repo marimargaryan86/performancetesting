@@ -598,6 +598,11 @@ class Transformer(object):
             **orjson.loads(base64.b64decode(combined["ticket_information"])),
         )
 
+        try:
+            ticket_urls = orjson.loads(base64.b64decode(combined["ticket_urls"]))
+        except KeyError:
+            ticket_urls = []
+
         return bookings_pb2.Booking(
             id=booking_info.search_identifier,
             status=_PROVIDER_STATUS_MAPPING.get(
@@ -612,26 +617,6 @@ class Transformer(object):
                 record_locator=ticket_info.confirmation_code,
                 operator_booking_references=[booking_info.search_identifier],
             ),
+            ticket_urls=ticket_urls,
             # TODO: No idea how to get created_at or updated_at from the booking model.
         )
-
-
-class Enricher(object):
-    def __init__(
-        self,
-        sat_client: client.SATClient,
-    ):
-        self._client = sat_client
-
-    async def add_ticket_urls(
-        self,
-        sat_booking: bookings_pb2.Booking,
-    ) -> bookings_pb2.Booking:
-        get_ticket_result, _ = await self._client.api_client.get_ticket(
-            sat_booking.id,
-        )
-        ticket_url = get_ticket_result.url
-
-        if ticket_url:
-            sat_booking.ticket_urls.append(ticket_url)
-        return sat_booking
