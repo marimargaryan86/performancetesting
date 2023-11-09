@@ -898,7 +898,7 @@ class GrpcClient(Client):
             request.page_size = limit
 
         return await errors.handle_grpc_errors(
-            self._orders.ListBookings(request, timeout=self._timeout),
+            self._orders.ListBookings(request, timeout=60),
         )
 
     async def find_bookings_by_order_id(
