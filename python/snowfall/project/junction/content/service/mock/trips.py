@@ -69,29 +69,25 @@ def _make_segment(
     segment: client.Segment,
 ) -> trips_pb2.Segment:
     return trips_pb2.Segment(
-        legs=[
-            trips_pb2.Leg(
-                origin=trips_pb2.Location(
-                    ref=segment.origin.identifier,
-                    name=segment.origin.name,
-                    coordinates=latlng_pb2.LatLng(
-                        latitude=segment.origin.latitude,
-                        longitude=segment.origin.longitude,
-                    ),
-                ),
-                destination=trips_pb2.Location(
-                    ref=segment.destination.identifier,
-                    name=segment.destination.name,
-                    coordinates=latlng_pb2.LatLng(
-                        latitude=segment.destination.latitude,
-                        longitude=segment.destination.longitude,
-                    ),
-                ),
-                departure_at=protobuf.datetime_to_protobuf_datetime(
-                    segment.departure_at,
-                ),
-                arrival_at=protobuf.datetime_to_protobuf_datetime(segment.arrival_at),
+        origin=trips_pb2.Location(
+            ref=segment.origin.identifier,
+            name=segment.origin.name,
+            coordinates=latlng_pb2.LatLng(
+                latitude=segment.origin.latitude,
+                longitude=segment.origin.longitude,
             ),
-        ],
+        ),
+        destination=trips_pb2.Location(
+            ref=segment.destination.identifier,
+            name=segment.destination.name,
+            coordinates=latlng_pb2.LatLng(
+                latitude=segment.destination.latitude,
+                longitude=segment.destination.longitude,
+            ),
+        ),
+        departure_at=protobuf.datetime_to_protobuf_datetime(
+            segment.departure_at,
+        ),
+        arrival_at=protobuf.datetime_to_protobuf_datetime(segment.arrival_at),
         type=segment_type_pb2.SEGMENT_TYPE_FLIGHT,
     )

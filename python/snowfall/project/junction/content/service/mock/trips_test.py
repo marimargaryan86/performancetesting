@@ -157,9 +157,10 @@ class TestTrips(object):
         for trip_result in round_trip_response.results:
             first_outbound_segment = trip_result.trips[0].segments[0]
             last_inbound_segment = trip_result.trips[-1].segments[-1]
-            first_leg = first_outbound_segment.legs[0]
-            last_leg = last_inbound_segment.legs[-1]
-            assert first_leg.origin.ref == last_leg.destination.ref
+            assert (
+                first_outbound_segment.origin.ref
+                == last_inbound_segment.destination.ref
+            )
 
     def test_round_trip_contains_fares(
         self,
@@ -180,10 +181,8 @@ class TestTrips(object):
     ) -> None:
         for trip_result in multi_city_response.results:
             for crit, trip in zip(multi_city_criteria, trip_result.trips, strict=True):
-                first_leg = trip.segments[0].legs[0]
-                last_leg = trip.segments[-1].legs[-1]
-                assert crit.origin_identifier == first_leg.origin.ref
-                assert crit.destination_identifier == last_leg.destination.ref
+                assert crit.origin_identifier == trip.segments[0].origin.ref
+                assert crit.destination_identifier == trip.segments[-1].destination.ref
 
     async def test_unknown_search_contains_no_trips(
         self,

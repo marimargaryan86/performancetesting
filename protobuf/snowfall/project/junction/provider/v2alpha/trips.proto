@@ -22,16 +22,19 @@ message Location {
   // the provider might not have this information, complicating the API.
 }
 
-message Leg {
-  Location origin = 1;
-  Location destination = 2;
+message Stop {
+  Location location = 1;
   snowfall.stdlib.v1.DateTime departure_at = 3;
   snowfall.stdlib.v1.DateTime arrival_at = 4;
 }
 
 message Segment {
-  repeated Leg legs = 1;
-  snowfall.project.junction.v1.SegmentType type = 2;
+  Location origin = 1;
+  Location destination = 2;
+  snowfall.stdlib.v1.DateTime departure_at = 3;
+  snowfall.stdlib.v1.DateTime arrival_at = 4;
+  snowfall.project.junction.v1.SegmentType type = 5;
+  repeated Stop stops = 6;
   // @todo: add vendor and operator information
 }
 
