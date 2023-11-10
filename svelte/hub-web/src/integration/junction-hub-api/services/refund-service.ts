@@ -1,7 +1,16 @@
 import type { SessionModel } from "models/user";
 import JunctionHubApiService from "./junction-hub-api-service";
 import type { PaginatedData } from "models/common";
-import { refundParser, type Refund, type RefundSchema, type RefundPut } from "../schemas/refund";
+import {
+  refundParser,
+  type Refund,
+  type RefundSchema,
+  type RefundPut,
+  type RefundPositionSchema,
+  type RefundPositionCreate,
+  type RefundPosition,
+  refundPositionParser,
+} from "../schemas/refund";
 
 export default class RefundService extends JunctionHubApiService {
   async find({
@@ -64,5 +73,26 @@ export default class RefundService extends JunctionHubApiService {
     });
 
     return refundParser.toModel(resp.json.data);
+  }
+
+  async getRefundPosition({
+    session,
+    refundId,
+    data,
+  }: {
+    session: SessionModel;
+    refundId: string;
+    data: RefundPositionCreate;
+  }): Promise<RefundPosition> {
+    const resp = await this.makeRequest<{ data: RefundPositionSchema }>(
+      `/refunds/${refundId}/refund-position`,
+      {
+        session,
+        method: "POST",
+        data: { data: refundPositionParser.toCreateSchema(data) },
+      },
+    );
+
+    return refundPositionParser.toModel(resp.json.data);
   }
 }

@@ -2,7 +2,7 @@ import type RefundService from "integration/junction-hub-api/services/refund-ser
 import { HUB_INTEGRATION_ROOT } from "../common";
 import { URLExtended } from "utils/url";
 import * as devalue from "devalue";
-import type { RefundPut } from "integration/junction-hub-api/schemas/refund";
+import type { RefundPositionCreate, RefundPut } from "integration/junction-hub-api/schemas/refund";
 
 const ROOT = `${HUB_INTEGRATION_ROOT}/refunds`;
 
@@ -58,9 +58,26 @@ async function update({
   return devalue.parse(await resp.text());
 }
 
+async function getRefundPosition({
+  refundId,
+  data,
+}: {
+  refundId: string;
+  data: RefundPositionCreate;
+}): ReturnType<RefundService["getRefundPosition"]> {
+  const url = new URLExtended(ROOT, {
+    base: origin,
+    query: { refundId, action: "getRefundPosition" },
+  });
+  const resp = await fetch(url, { method: "POST", body: devalue.stringify(data) });
+
+  return devalue.parse(await resp.text());
+}
+
 export default {
   find,
   get,
   create,
   update,
+  getRefundPosition,
 };

@@ -16,12 +16,33 @@ export type RefundPositionSchema = {
   };
 };
 
+export type RefundPositionCreate = {
+  refunded: {
+    us: Money;
+    reseller: Money;
+  };
+};
+
+export type RefundPositionCreateSchema = Pick<RefundPositionSchema, "type"> & {
+  attributes: {
+    refundedUs: MoneySchema;
+    refundedReseller: MoneySchema;
+  };
+};
+
 export const refundPositionParser = {
   toModel: (data: RefundPositionSchema): RefundPosition => ({
     id: data.id,
     total: data.attributes.refundPosition
       ? moneyParser.toModel(data.attributes.refundPosition)
       : undefined,
+  }),
+  toCreateSchema: (data: RefundPositionCreate): RefundPositionCreateSchema => ({
+    type: "refund-position",
+    attributes: {
+      refundedReseller: moneyParser.toSchema(data.refunded.reseller),
+      refundedUs: moneyParser.toSchema(data.refunded.us),
+    },
   }),
 };
 

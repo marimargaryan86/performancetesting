@@ -2,7 +2,12 @@ import type RefundService from "integration/junction-hub-api/services/refund-ser
 import * as devalue from "devalue";
 import type { RequestEvent } from "./$types";
 import type { PaginatedData } from "models/common";
-import type { Refund, RefundPut } from "integration/junction-hub-api/schemas/refund";
+import type {
+  Refund,
+  RefundPosition,
+  RefundPositionCreate,
+  RefundPut,
+} from "integration/junction-hub-api/schemas/refund";
 import { getSession } from "utils/auth";
 import { getPagination } from "../../helpers.server";
 import integrationInstances from "integration-instances";
@@ -46,6 +51,19 @@ async function update(event: RequestEvent): Promise<Refund> {
   return integrationInstances.junctionHubApi.refunds.update({ session, data, id });
 }
 
+async function getRefundPosition(event: RequestEvent): Promise<RefundPosition> {
+  const session = getSession(event);
+  const refundId = event.url.searchParams.get("refundId")?.toString();
+
+  if (!refundId) {
+    throw error(404);
+  }
+
+  const data: RefundPositionCreate = devalue.parse(await event.request.text());
+
+  return integrationInstances.junctionHubApi.refunds.getRefundPosition({ session, refundId, data });
+}
+
 export async function GET(event): Promise<Response> {
   const method = event.url.searchParams.get("action")?.toString() as keyof RefundService;
 
@@ -67,6 +85,8 @@ export async function POST(event): Promise<Response> {
       return new Response(devalue.stringify(await create(event)));
     case "update":
       return new Response(devalue.stringify(await update(event)));
+    case "getRefundPosition":
+      return new Response(devalue.stringify(await getRefundPosition(event)));
     default:
       throw error(405);
   }
