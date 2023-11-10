@@ -132,7 +132,7 @@ class TripSearch(endpoints.HTTPEndpoint):
         )
 
 
-def _get_departure_after(body: Mapping[str, Any]) -> datetime.datetime:
+def get_departure_after(body: Mapping[str, Any]) -> datetime.datetime:
     if body.get("departureAfter"):
         departure_after = parser.isoparse(body["departureAfter"])
         current_time = datetime.datetime.now(
@@ -180,7 +180,7 @@ class TripSearches(endpoints.HTTPEndpoint):
                 status.HTTP_422_UNPROCESSABLE_ENTITY,
             ) from key_err
 
-        departure_after = _get_departure_after(body)
+        departure_after = get_departure_after(body)
 
         try:
             departure_before = parser.isoparse(body["departureBefore"])

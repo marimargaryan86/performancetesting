@@ -55,6 +55,14 @@ def get_routes(
         _reseller_currencies=reseller_currencies,
         _reseller_pay_companies=reseller_pay_companies,
     )
+    simple_searches_handler = offers.SimpleOfferSearches(
+        _offer_search_client=(
+            dependencies[offer_searches_adapter.Client]  # type: ignore[type-abstract]
+        ),
+        _reseller_currencies=reseller_currencies,
+        _reseller_pay_companies=reseller_pay_companies,
+    )
+
     price_quotes_handler = offers.PriceQuotes(
         _offers_client=dependencies[offers_adapter.Client],  # type: ignore[type-abstract]
         _price_quotes_client=(
@@ -158,6 +166,11 @@ def get_routes(
         routes.to_route(
             "/offers/searches",
             offer_searches_handler.post,
+            methods=["POST"],
+        ),
+        routes.to_route(
+            "/offers/simple-searches",
+            simple_searches_handler.post,
             methods=["POST"],
         ),
         integration.route(

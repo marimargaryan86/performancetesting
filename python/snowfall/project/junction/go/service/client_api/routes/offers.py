@@ -7,7 +7,7 @@ from collections.abc import Mapping, Sequence
 from typing import Any, ClassVar, cast
 
 import lagom
-from starlette import endpoints, requests, responses, status
+from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.project.junction.go.adapter import (
     errors,
@@ -18,6 +18,9 @@ from snowfall.project.junction.go.adapter import (
     trips,
 )
 from snowfall.project.junction.go.service.client_api import filters, resources
+from snowfall.project.junction.go.service.client_api.routes.trips import (
+    get_departure_after,
+)
 from snowfall.project.junction.go.service.offers.v1 import models_pb2
 from snowfall.project.junction.go.v1 import models_pb2 as common_pb2
 from snowfall.stdlib import sequence, string
@@ -28,6 +31,7 @@ from snowfall.stdlib.integration.starlette import (
     pagination_helpers,
     sorting,
 )
+from snowfall.stdlib.v1 import latlng_pb2
 
 _SESSION_TOKEN_LENGTH = 32
 _Passengers = list[dict[str, str]]
@@ -465,6 +469,100 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
             ),
             request=request,
         )
+
+
+@dataclasses.dataclass(frozen=True)
+class SimpleOfferSearches(object):
+    _offer_search_client: offer_searches.Client
+    _reseller_currencies: Mapping[str, str]
+    _reseller_pay_companies: Mapping[str, str]
+
+    async def post(self, request: messages.Request) -> responses.Response:
+        offer_search = await self._offer_search_client.create(
+            request=await self._create_simple_offer_search(request),
+        )
+        return await messages.create_response(
+            body=models.Body(
+                data=resources.SimpleOfferSearchResource.from_proto(
+                    offer_search=offer_search,
+                    request=request.starlette_request,
+                ),
+            ),
+            request=request.starlette_request,
+            status_code=status.HTTP_201_CREATED,
+        )
+
+    async def _create_simple_offer_search(
+        self,
+        request: messages.Request,
+    ) -> models_pb2.OfferSearch:
+        reseller_id = request.starlette_request.user.username
+        criteria = cast(
+            dict[str, Any],
+            request.body["criteria"],
+        )
+        try:
+            allowed_segment_types = [
+                protobuf.slug_to_enum_value(
+                    enum=common_pb2.Schedule.Type,
+                    name=leg_type,
+                )
+                for leg_type in cast(
+                    list[str],
+                    request.body.get("allowedSegmentTypes", []),
+                )
+            ]
+        except ValueError as key_err:
+            raise exceptions.HTTPException(
+                status.HTTP_422_UNPROCESSABLE_ENTITY,
+            ) from key_err
+        departure_after = get_departure_after(criteria)
+
+        offer_search = models_pb2.OfferSearch(
+            reseller_id=reseller_id,
+            simple_trip=models_pb2.SimpleTripOfferSearch(
+                origin=common_pb2.Point(
+                    coordinates=latlng_pb2.LatLng(
+                        latitude=criteria["origin"]["latitude"],
+                        longitude=criteria["origin"]["longitude"],
+                    ),
+                ),
+                destination=common_pb2.Point(
+                    coordinates=latlng_pb2.LatLng(
+                        latitude=criteria["destination"]["latitude"],
+                        longitude=criteria["destination"]["longitude"],
+                    ),
+                ),
+                departure_at=protobuf.datetime_to_protobuf(departure_after),
+                passengers=[
+                    models_pb2.Passenger(
+                        date_of_birth=protobuf.date_to_protobuf(
+                            datetime.date.fromisoformat(passenger["dateOfBirth"]),
+                        ),
+                    )
+                    for passenger in cast(_Passengers, request.body["passengers"])
+                ],
+                allowed_segment_types=allowed_segment_types,
+            ),
+            session_token=cast(
+                str,
+                request.body.get(
+                    "sessionToken",
+                    string.random(_SESSION_TOKEN_LENGTH),
+                ),
+            ),
+        )
+
+        currency_code = self._reseller_currencies.get(reseller_id)
+        company_id = self._reseller_pay_companies.get(reseller_id)
+
+        if currency_code:
+            offer_search.currency_code = currency_code
+
+        if company_id:
+            offer_search.pay_company_id = company_id
+
+        return offer_search
 
 
 class PriceQuote(endpoints.HTTPEndpoint):

@@ -1236,13 +1236,18 @@ class TripOfferSearchResource(models.Resource):
         cls,
         offer_search: offer_models_pb2.OfferSearch,
     ) -> dict[str, Any]:
+        if offer_search.HasField("simple_trip"):
+            passengers = offer_search.simple_trip.passengers
+        else:
+            passengers = offer_search.trip.passengers
+
         attributes = {
             "expiresAt": protobuf.protobuf_to_datetime(
                 offer_search.expires_at,
             ),
             "passengers": [
                 {"dateOfBirth": protobuf.protobuf_to_date(passenger.date_of_birth)}
-                for passenger in offer_search.trip.passengers
+                for passenger in passengers
             ],
             "status": protobuf.enum_value_to_slug(
                 amqp_pb2.Trackable.Status.DESCRIPTOR,
@@ -1327,6 +1332,67 @@ class TripCandidateSearchResource(models.Resource):
                     request.url_for(
                         "ViewTripCandidateSearch",
                         tripCandidateSearchId=trip_candidate_search.id,
+                    ),
+                ),
+            },
+        )
+
+
+class SimpleOfferSearchResource(models.Resource):
+    api_type: ClassVar[str] = "simple-offer-searches"
+
+    @classmethod
+    def from_proto(
+        cls,
+        offer_search: offer_models_pb2.OfferSearch,
+        request: requests.Request,
+    ) -> SimpleOfferSearchResource:
+        return cls(
+            id=offer_search.id,
+            type=cls.api_type,
+            attributes={
+                "passengers": [
+                    {
+                        "dateOfBirth": protobuf.protobuf_to_date(
+                            passenger.date_of_birth,
+                        ),
+                    }
+                    for passenger in offer_search.simple_trip.passengers
+                ],
+                "criteria": {
+                    "origin": {
+                        "latitude": (
+                            offer_search.simple_trip.origin.coordinates.latitude
+                        ),
+                        "longitude": (
+                            offer_search.simple_trip.origin.coordinates.longitude
+                        ),
+                    },
+                    "destination": {
+                        "latitude": (
+                            offer_search.simple_trip.destination.coordinates.latitude
+                        ),
+                        "longitude": (
+                            offer_search.simple_trip.destination.coordinates.longitude
+                        ),
+                    },
+                    "departureAfter": protobuf.protobuf_to_datetime(
+                        offer_search.simple_trip.departure_at,
+                    ),
+                },
+                "expiresAt": protobuf.protobuf_to_datetime(
+                    offer_search.expires_at,
+                ),
+                "status": protobuf.enum_value_to_slug(
+                    amqp_pb2.Trackable.Status.DESCRIPTOR,
+                    offer_search.status,
+                ),
+            },
+            links={
+                _SELF_HREF: str(
+                    request.url_for(
+                        "ViewOfferSearch",
+                        offerSearchId=offer_search.id,
                     ),
                 ),
             },
