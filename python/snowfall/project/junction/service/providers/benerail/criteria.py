@@ -55,6 +55,9 @@ def _generate_search_criteria(
         yield task
 
 
+_MAX_PAX_NUMBER = 9
+
+
 class CriteriaGenerator(object):
     def __init__(
         self,
@@ -67,6 +70,9 @@ class CriteriaGenerator(object):
         self,
         search: offers_models_pb2.TripOfferSearch,
     ) -> list[amqp_pb2.SearchCriteriaTask]:
+        if len(search.passengers) > _MAX_PAX_NUMBER:
+            return []
+
         sub_trips = self._grouper.trips_to_sub_trips(
             trips=search.trips,
             type_filter=models_pb2.Schedule.TYPE_RAIL,
