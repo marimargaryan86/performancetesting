@@ -14,6 +14,9 @@ export default {
     orders: new junctionMobileApi.OrderService(env.BOOKING_HUB_API_BASE_URL),
     payments: new junctionMobileApi.PaymentService(env.BOOKING_HUB_API_BASE_URL),
     cancellations: new junctionMobileApi.CancellationRequestService(env.BOOKING_HUB_API_BASE_URL),
+    simpleOfferSearches: new junctionMobileApi.SimpleOfferSearchService(
+      env.BOOKING_HUB_API_BASE_URL,
+    ),
   },
   junctionHubApi: {
     accounts: new junctionHubApi.AccountService(env.HUB_API_BASE_URL),
