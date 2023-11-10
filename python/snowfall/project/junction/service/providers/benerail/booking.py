@@ -9,8 +9,8 @@ from typing import NamedTuple, Self
 
 import orjson
 import phonenumbers
-import pydantic
 import tenacity
+from pydantic import v1 as pydantic
 
 from snowfall.project.junction.go.service.orders.v1 import (
     amqp_pb2 as order_amqp_pb2,
@@ -146,7 +146,7 @@ class RawStorageData(pydantic.BaseModel):
     @classmethod
     def parse_from_storage(cls, raw: bytes) -> Self:
         try:
-            return cls.model_validate_json(raw.decode())
+            return cls.parse_raw(raw.decode())
         except ValueError:
             return cls(
                 booking=booking_response.GetBookingResponse(
@@ -226,7 +226,7 @@ class BookingHandler(object):
             pathlib.Path(
                 create_booking_response.booking_res.response_result.identifier,
             ),
-            storage_data.model_dump_json().encode(),
+            storage_data.json().encode(),
         )
 
         await self._notify(

@@ -100,7 +100,7 @@ class NotificationsConsumer(object):
 
         await self._booking_storage.put(
             storage_path,
-            all_results.model_dump_json().encode(),
+            all_results.json().encode(),
         )
 
         body.MergeFrom(
