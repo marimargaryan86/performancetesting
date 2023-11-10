@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 
+from snowfall.project.junction.content.service.mock import client
 from snowfall.project.junction.provider.v2alpha import trips_pb2
-from snowfall.project.junction.service.providers.mock import client
 from snowfall.project.junction.v1 import segment_type_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1 import latlng_pb2

@@ -4,8 +4,8 @@ from typing import Any, cast
 
 import pytest
 
+from snowfall.project.junction.content.service.mock import client, trips
 from snowfall.project.junction.provider.v2alpha import trips_pb2
-from snowfall.project.junction.service.providers.mock import client, trips
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence import filesystem

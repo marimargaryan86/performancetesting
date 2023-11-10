@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import contextlib
 import datetime
-from typing import Any, cast
 
 import pydantic
 from aio_pika import abc
@@ -11,14 +10,11 @@ from redis import asyncio as aioredis
 from snowfall.project.junction.provider import bookings as provider_bookings
 from snowfall.project.junction.provider import meta, service
 from snowfall.project.junction.provider import offers as provider_offers
-from snowfall.project.junction.provider import trips as provider_trips
 from snowfall.project.junction.service.providers.mock import (
     bookings,
     cache,
-    client,
     offers,
     pricing,
-    trips,
 )
 from snowfall.project.junction.service.providers.mock.constant import PROVIDER_ID
 from snowfall.stdlib.persistence import filesystem
@@ -150,30 +146,6 @@ async def _bookings_factory(
     )
 
 
-async def _trips_factory(
-    app: service.Application[_Settings],
-) -> provider_trips.Implementation:
-    stop_repository = client.StopRepository(
-        stops=cast(
-            list[dict[str, Any]],
-            filesystem.PkgLoader(__name__).load("stops.json"),
-        ),
-    )
-    route_repository = client.RouteRepository(
-        stop_repository=stop_repository,
-        routes=cast(
-            list[list[str]],
-            filesystem.PkgLoader(__name__).load("routes.json"),
-        ),
-    )
-    return trips.Trips(
-        search_client=client.MockClient(
-            route_repository=route_repository,
-        ),
-        transformer=trips.Transformer(),
-    ).find
-
-
 if __name__ == "__main__":
     entrypoint = service.Entrypoint(
         name="mock",
@@ -181,7 +153,6 @@ if __name__ == "__main__":
         meta_factory=_meta_factory,
         offers_factory=_offers_factory,
         bookings_factory=_bookings_factory,
-        trips_factory=_trips_factory,
     )
 
     entrypoint.enter_with_commands(

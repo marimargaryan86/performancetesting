@@ -4,7 +4,7 @@ from collections.abc import Mapping, Sequence
 
 import pytest
 
-from snowfall.project.junction.service.providers.mock import client
+from snowfall.project.junction.content.service.mock import client
 
 
 def _generate_mock_trip(
