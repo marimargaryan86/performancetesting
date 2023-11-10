@@ -91,18 +91,17 @@ class Quote(object):
             self._to_currency,
             rate,
         )
+        processing_margin = base_converted.convert(
+            self._to_currency,
+            Decimal(self._company.processing_markup / 100),
+        )
 
         if self._from_currency == self._to_currency:
             fx_margin = money.Money(0, self._to_currency)
-            processing_margin = money.Money(0, self._to_currency)
         else:
             fx_margin = base_converted.convert(
                 self._to_currency,
                 Decimal(self._company.fx_markup / 100),
-            )
-            processing_margin = base_converted.convert(
-                self._to_currency,
-                Decimal(self._company.processing_markup / 100),
             )
 
         service_markup = money.total(

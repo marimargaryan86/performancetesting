@@ -22,7 +22,7 @@ def company() -> company_models.Company:
 async def test_same_currencies(
     company: company_models.Company,
 ) -> None:
-    expected_amount = money.Money(101000, money.Currency("USD"))
+    expected_amount = money.Money(101200, money.Currency("USD"))
 
     quote = Quote(
         100000,
