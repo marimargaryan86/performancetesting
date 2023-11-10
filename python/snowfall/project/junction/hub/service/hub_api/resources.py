@@ -190,6 +190,7 @@ class TripBookingResource(models.Resource):
         cls,
         booking: order_models_pb2.Booking,
         booking_cancellation: order_models_pb2.BookingCancellation | None,
+        refund: Refund | None,
         request: requests.Request,
     ) -> TripBookingResource:
         return cls(
@@ -254,6 +255,16 @@ class TripBookingResource(models.Resource):
                             type=Transaction.api_type,
                         )
                         if booking.transaction_id
+                        else None
+                    ),
+                },
+                "refund": {
+                    _RELATIONSHIPS_FIELD: (
+                        models.ResourceIdentifier(
+                            id=refund.id,
+                            type=RefundsResource.api_type,
+                        )
+                        if refund
                         else None
                     ),
                 },

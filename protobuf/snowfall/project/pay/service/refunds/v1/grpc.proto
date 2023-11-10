@@ -16,6 +16,10 @@ service RefundsService {
   rpc UpdateRefundStatus(UpdateRefundStatusRequest) returns (UpdateRefundStatusResponse) {}
 }
 
+message ListOfIds {
+  repeated string ids = 1;
+}
+
 message GetRefundRequest {
   string id = 1;
   string selector = 2;
@@ -28,8 +32,12 @@ message GetRefundResponse {
 message ListRefundsRequest {
   int32 page_size = 1;
   string page_token = 2;
-  repeated string external_reference_ids = 3;
-  repeated Refund.Status statuses = 4;
+  oneof payload {
+    ListOfIds external_reference_ids = 3;
+    ListOfIds ids = 4;
+    ListOfIds transaction_ids = 5;
+  }
+  repeated Refund.Status statuses = 6;
 }
 
 message ListRefundsResponse {

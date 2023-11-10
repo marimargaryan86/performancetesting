@@ -4,7 +4,7 @@ from starlette import requests
 
 from snowfall.project.junction.go.adapter import orders
 from snowfall.project.junction.hub.service.hub_api import resources
-from snowfall.project.pay.adapter import transactions
+from snowfall.project.pay.adapter import refunds, transactions
 from snowfall.stdlib.integration.starlette import includes
 
 
@@ -50,6 +50,7 @@ def _orders_resolver(
 
 def _trip_bookings_resolver(
     orders_client: orders.Client,
+    refunds_client: refunds.Client,
 ) -> includes.ResolverFunc:
     async def wrapper(
         identifiers: Sequence[str],
@@ -66,11 +67,28 @@ def _trip_bookings_resolver(
             )
         )
 
+        refunds_response = await refunds_client.find(
+            limit=len(response.bookings),
+            transaction_ids=[
+                booking.transaction_id
+                for booking in response.bookings
+                if booking.transaction_id
+            ],
+        )
+
         return [
             resources.TripBookingResource.from_proto(
-                booking,
-                booking_cancellation,
-                request,
+                booking=booking,
+                booking_cancellation=booking_cancellation,
+                refund=next(
+                    (
+                        refund
+                        for refund in refunds_response.refunds
+                        if refund.transaction_id == booking.transaction_id
+                    ),
+                    None,
+                ),
+                request=request,
             )
             for booking, booking_cancellation in bookings_and_cancellations
         ]
@@ -119,6 +137,26 @@ def _transactions_resolver(
     return wrapper
 
 
+def _refunds_resolver(
+    refunds_client: refunds.Client,
+) -> includes.ResolverFunc:
+    async def wrapper(
+        identifiers: Sequence[str],
+        request: requests.Request,
+    ) -> list[resources.RefundsResource]:
+        response = await refunds_client.find_by_ids(
+            limit=len(identifiers),
+            identifiers=identifiers,
+        )
+
+        return [
+            resources.RefundsResource.from_proto(refund, request)
+            for refund in response.refunds
+        ]
+
+    return wrapper
+
+
 def _booking_cancellation_resolver(
     orders_client: orders.Client,
 ) -> includes.ResolverFunc:
@@ -144,6 +182,7 @@ def _booking_cancellation_resolver(
 def register_resolvers(
     orders_client: orders.Client,
     transactions_client: transactions.Client,
+    refunds_client: refunds.Client,
 ) -> None:
     resolvers = (
         includes.Resolver(
@@ -156,7 +195,7 @@ def register_resolvers(
         ),
         includes.Resolver(
             resource=resources.TripBookingResource,
-            func=_trip_bookings_resolver(orders_client),
+            func=_trip_bookings_resolver(orders_client, refunds_client),
         ),
         includes.Resolver(
             resource=resources.TripBookingDetailsResource,
@@ -165,6 +204,10 @@ def register_resolvers(
         includes.Resolver(
             resource=resources.Transaction,
             func=_transactions_resolver(transactions_client),
+        ),
+        includes.Resolver(
+            resource=resources.RefundsResource,
+            func=_refunds_resolver(refunds_client),
         ),
         includes.Resolver(
             resource=resources.BookingCancellationResource,

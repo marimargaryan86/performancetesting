@@ -50,6 +50,7 @@ def create_dependencies(
     includes.register_resolvers(
         orders_client=orders_client,
         transactions_client=transactions_client,
+        refunds_client=refunds_client,
     )
 
     return container

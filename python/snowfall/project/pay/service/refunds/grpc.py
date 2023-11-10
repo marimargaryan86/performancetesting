@@ -106,9 +106,17 @@ class RefundsService(
         context: grpc.aio.ServicerContext,
     ) -> grpc_pb2.ListRefundsResponse:
         filters = {}
-        if request.external_reference_ids:
+        if request.ids.ids:
+            filters["_id"] = {
+                "$in": list(request.ids.ids),
+            }
+        if request.transaction_ids.ids:
+            filters["transaction_id"] = {
+                "$in": list(request.transaction_ids.ids),
+            }
+        if request.external_reference_ids.ids:
             filters["external_reference_id"] = {
-                "$in": list(request.external_reference_ids),
+                "$in": list(request.external_reference_ids.ids),
             }
         if request.statuses:
             filters["status"] = {

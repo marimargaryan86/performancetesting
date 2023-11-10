@@ -46,11 +46,21 @@ class Client(abc.ABC):
         """Update a refund resource."""
 
     @abc.abstractmethod
+    async def find_by_ids(
+        self,
+        limit: int | None = None,
+        cursor: str | None = None,
+        identifiers: Sequence[str] | None = None,
+    ) -> grpc_pb2.ListRefundsResponse:
+        """Fetch all refund resources by identifiers."""
+
+    @abc.abstractmethod
     async def find(
         self,
         limit: int | None = None,
         cursor: str | None = None,
         external_reference_ids: Sequence[str] | None = None,
+        transaction_ids: Sequence[str] | None = None,
         statuses: Sequence[int] | None = None,
     ) -> grpc_pb2.ListRefundsResponse:
         """Fetch all refund resources."""
@@ -117,11 +127,32 @@ class DictClient(Client):
     ) -> models_pb2.Refund:
         return self._refunds[refund.id]
 
+    async def find_by_ids(
+        self,
+        limit: int | None = None,
+        cursor: str | None = None,
+        identifiers: Sequence[str] | None = None,
+    ) -> grpc_pb2.ListRefundsResponse:
+        refunds = list(self._refunds.values())
+        if identifiers:
+            refunds = [refund for refund in refunds if refund.id in identifiers]
+        page = sequence.paginate(
+            sequence=refunds,
+            cursor=cursor,
+            limit=limit,
+        )
+
+        return grpc_pb2.ListRefundsResponse(
+            refunds=page.sequence,
+            next_page_token=page.cursor,
+        )
+
     async def find(
         self,
         limit: int | None = None,
         cursor: str | None = None,
         external_reference_ids: Sequence[str] | None = None,
+        transaction_ids: Sequence[str] | None = None,
         statuses: Sequence[int] | None = None,
     ) -> grpc_pb2.ListRefundsResponse:
         refunds = list(self._refunds.values())
@@ -243,17 +274,36 @@ class GrpcClient(Client):
             )
         ).refund
 
+    async def find_by_ids(
+        self,
+        limit: int | None = None,
+        cursor: str | None = None,
+        identifiers: Sequence[str] | None = None,
+    ) -> grpc_pb2.ListRefundsResponse:
+        request = grpc_pb2.ListRefundsRequest(
+            page_token=cursor or "",
+            ids=grpc_pb2.ListOfIds(ids=identifiers or []),
+        )
+        if limit is not None:
+            request.page_size = limit
+
+        return await errors.handle_grpc_errors(
+            self._refunds.ListRefunds(request, timeout=self._timeout),
+        )
+
     async def find(
         self,
         limit: int | None = None,
         cursor: str | None = None,
         external_reference_ids: Sequence[str] | None = None,
+        transaction_ids: Sequence[str] | None = None,
         statuses: Sequence[int] | None = None,
     ) -> grpc_pb2.ListRefundsResponse:
         # TODO: handle INVALID_ARGUMENT
         request = grpc_pb2.ListRefundsRequest(
             page_token=cursor or "",
-            external_reference_ids=external_reference_ids,
+            external_reference_ids=grpc_pb2.ListOfIds(ids=external_reference_ids or []),
+            transaction_ids=grpc_pb2.ListOfIds(ids=transaction_ids or []),
             statuses=statuses,  # type: ignore[arg-type]
         )
         if limit is not None:

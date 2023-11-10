@@ -952,6 +952,9 @@
                           },
                           {
                             "$ref": "#/components/schemas/Transaction"
+                          },
+                          {
+                            "$ref": "#/components/schemas/Refund"
                           }
                         ]
                       }
@@ -1118,6 +1121,12 @@
                               },
                               {
                                 "$ref": "#/components/schemas/BookingCancellation"
+                              },
+                              {
+                                "$ref": "#/components/schemas/Transaction"
+                              },
+                              {
+                                "$ref": "#/components/schemas/Refund"
                               }
                             ]
                           }
@@ -1201,6 +1210,15 @@
                           },
                           {
                             "$ref": "#/components/schemas/TripBookingDetails"
+                          },
+                          {
+                            "$ref": "#/components/schemas/BookingCancellation"
+                          },
+                          {
+                            "$ref": "#/components/schemas/Transaction"
+                          },
+                          {
+                            "$ref": "#/components/schemas/Refund"
                           }
                         ]
                       }
@@ -1347,6 +1365,12 @@
                           },
                           {
                             "$ref": "#/components/schemas/BookingCancellation"
+                          },
+                          {
+                            "$ref": "#/components/schemas/Transaction"
+                          },
+                          {
+                            "$ref": "#/components/schemas/Refund"
                           }
                         ]
                       }
@@ -1417,6 +1441,15 @@
                           },
                           {
                             "$ref": "#/components/schemas/TripBookingDetails"
+                          },
+                          {
+                            "$ref": "#/components/schemas/BookingCancellation"
+                          },
+                          {
+                            "$ref": "#/components/schemas/Transaction"
+                          },
+                          {
+                            "$ref": "#/components/schemas/Refund"
                           }
                         ]
                       }
@@ -3256,7 +3289,9 @@
               "journey",
               "bookings",
               "bookings.details",
-              "bookings.bookingCancellation"
+              "bookings.bookingCancellation",
+              "bookings.transaction",
+              "bookings.refund"
             ]
           },
           "example": [
@@ -3420,7 +3455,9 @@
               "orders",
               "orders.bookings",
               "orders.bookings.details",
-              "orders.bookings.bookingCancellation"
+              "orders.bookings.bookingCancellation",
+              "orders.bookings.transaction",
+              "orders.bookings.refund"
             ]
           },
           "example": [
@@ -3476,7 +3513,8 @@
               "order.journey",
               "details",
               "bookingCancellation",
-              "transaction"
+              "transaction",
+              "refund"
             ]
           },
           "example": [
@@ -4700,7 +4738,8 @@
                   "status",
                   "details",
                   "bookingCancellation",
-                  "transaction"
+                  "transaction",
+                  "refund"
                 ],
                 "properties": {
                   "order": {
@@ -4768,6 +4807,24 @@
                         "properties": {
                           "data": {
                             "$ref": "#/components/schemas/TransactionIdentifier"
+                          }
+                        }
+                      },
+                      {
+                        "nullable": true
+                      }
+                    ]
+                  },
+                  "refund": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "required": [
+                          "data"
+                        ],
+                        "properties": {
+                          "data": {
+                            "$ref": "#/components/schemas/RefundIdentifier"
                           }
                         }
                       },
@@ -5892,6 +5949,28 @@
               "transactions"
             ],
             "example": "transactions"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "RefundIdentifier": {
+        "title": "Refund Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "04f83af5-10bb-4a0f-1881-03e1e690f0f5",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "refunds"
+            ],
+            "example": "refunds"
           }
         },
         "required": [

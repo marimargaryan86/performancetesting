@@ -6,6 +6,7 @@ from starlette import endpoints, requests, responses, status
 from snowfall.project.junction.go.adapter import errors, orders
 from snowfall.project.junction.hub.service.hub_api import resources
 from snowfall.project.junction.hub.service.hub_api.permissions import check_permission
+from snowfall.project.pay.adapter import refunds
 from snowfall.stdlib.integration.starlette import (
     messages,
     models,
@@ -20,6 +21,7 @@ class Booking(endpoints.HTTPEndpoint):
         self,
         request: requests.Request,
         client: orders.Client = lagom.injectable,
+        refunds_client: refunds.Client = lagom.injectable,
     ) -> responses.Response:
         check_permission("booking.view", request.user.permissions)
 
@@ -36,11 +38,24 @@ class Booking(endpoints.HTTPEndpoint):
         except errors.NotFoundError:
             booking_cancellation = None
 
+        try:
+            refund = (
+                await refunds_client.get(
+                    identifier=booking.transaction_id,
+                    selector="transaction_id",
+                )
+                if booking.transaction_id
+                else None
+            )
+        except errors.NotFoundError:
+            refund = None
+
         return await messages.create_response(
             body=models.Body(
                 data=resources.TripBookingResource.from_proto(
                     booking=booking,
                     booking_cancellation=booking_cancellation,
+                    refund=refund,
                     request=request,
                 ),
             ),
@@ -53,6 +68,7 @@ class BookingsByOrder(endpoints.HTTPEndpoint):
         self,
         request: requests.Request,
         client: orders.Client = lagom.injectable,
+        refunds_client: refunds.Client = lagom.injectable,
     ) -> responses.Response:
         check_permission("booking.view", request.user.permissions)
 
@@ -71,13 +87,30 @@ class BookingsByOrder(endpoints.HTTPEndpoint):
             )
         )
 
+        refunds_response = await refunds_client.find(
+            limit=len(response.bookings),
+            transaction_ids=[
+                booking.transaction_id
+                for booking in response.bookings
+                if booking.transaction_id
+            ],
+        )
+
         return await messages.create_response(
             body=models.Body(
                 data=[
                     resources.TripBookingResource.from_proto(
-                        booking,
-                        booking_cancellation,
-                        request,
+                        booking=booking,
+                        booking_cancellation=booking_cancellation,
+                        refund=next(
+                            (
+                                refund
+                                for refund in refunds_response.refunds
+                                if refund.transaction_id == booking.transaction_id
+                            ),
+                            None,
+                        ),
+                        request=request,
                     )
                     for booking, booking_cancellation in bookings_and_cancellations
                 ],
