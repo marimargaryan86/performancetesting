@@ -39,13 +39,7 @@
   import routeConfig from "routeConfig";
   import integrationInstancesClient from "integration-instances-client";
 
-  export let data: Partial<SearchDataModel> = {
-    passengers: {
-      adults: 1,
-      children: 0,
-      infants: 0,
-    },
-  };
+  export let data: Partial<SearchDataModel> = {};
   export let origin: Place | undefined = undefined;
   export let destination: Place | undefined = undefined;
 
@@ -60,7 +54,7 @@
     passengers,
   };
 
-  let passengers: SearchDataModel["passengers"] = {
+  let passengers: SearchDataModel["passengers"] = data.passengers ?? {
     adults: 1,
     children: 0,
     infants: 0,
