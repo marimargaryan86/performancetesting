@@ -988,9 +988,15 @@ class RefundsResource(models.Resource):
                 ),
                 "refundReceived": refund.refund_received,
                 "note": refund.note,
-                "refundedUs": Money.from_proto(refund.refunded_us),
-                "refundedReseller": Money.from_proto(
-                    refund.refunded_reseller,
+                "refundedUs": (
+                    Money.from_proto(refund.refunded_us)
+                    if refund.HasField("refunded_us")
+                    else None
+                ),
+                "refundedReseller": (
+                    Money.from_proto(refund.refunded_reseller)
+                    if refund.HasField("refunded_reseller")
+                    else None
                 ),
                 "refundedUsInPayerCurrency": (
                     Money.from_proto(

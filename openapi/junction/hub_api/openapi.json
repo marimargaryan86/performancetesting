@@ -4114,9 +4114,13 @@
                     "example": "Refund reason"
                   },
                   "refundedUs": {
-                    "allOf": [
+                    "nullable": true,
+                    "anyOf": [
                       {
                         "$ref": "#/components/schemas/Money"
+                      },
+                      {
+                        "nullable": true
                       }
                     ],
                     "description": "The amount, we receive from provider "
@@ -4135,9 +4139,13 @@
                     "description": "The amount, we receive from provider in reseller currency"
                   },
                   "refundedReseller": {
-                    "allOf": [
+                    "nullable": true,
+                    "anyOf": [
                       {
                         "$ref": "#/components/schemas/Money"
+                      },
+                      {
+                        "nullable": true
                       }
                     ],
                     "description": "The amount, we pay to reseller"
