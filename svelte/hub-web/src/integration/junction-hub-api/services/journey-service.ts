@@ -31,7 +31,8 @@ export default class JourneyService extends JunctionHubApiService {
           "orders.bookings",
           "orders.bookings.details",
           "orders.bookings.bookingCancellation",
-          // "orders.bookings.refund", TODO: Uncomment
+          "orders.bookings.transaction",
+          "orders.bookings.refund",
         ].join(","),
       },
     });

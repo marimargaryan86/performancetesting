@@ -16,7 +16,8 @@ export default class OrderService extends JunctionHubApiService {
             "bookings",
             "bookings.details",
             "bookings.bookingCancellation",
-            // "bookings.refund", TODO: Uncomment
+            "bookings.transaction",
+            "bookings.refund",
           ].join(","),
         },
       },

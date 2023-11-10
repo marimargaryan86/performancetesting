@@ -16,7 +16,7 @@
 
   <div class="typography body-xlarge bold amount">
     <strong>Total refunded</strong>
-    <span>{formatAmount(refund.refunded.reseller, true)}</span>
+    <span>{refund.refunded.reseller ? formatAmount(refund.refunded.reseller, true) : "N/A"}</span>
   </div>
 </div>
 
@@ -24,7 +24,11 @@
   .refund {
     display: flex;
     flex-flow: column;
-    gap: 16px;
+    gap: 32px;
+    padding: 32px 48px 48px;
+    color: var(--color-main-primary-900);
+    background-color: var(--color-common-background-light-main);
+    border-radius: 16px;
   }
 
   h3 {

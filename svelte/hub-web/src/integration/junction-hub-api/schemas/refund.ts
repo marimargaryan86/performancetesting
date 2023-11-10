@@ -52,9 +52,9 @@ export type Refund = {
   received: boolean;
   note: string;
   refunded: {
-    us: Money;
+    us?: Money;
     usInPayerCurrency?: Money;
-    reseller: Money;
+    reseller?: Money;
   };
   invoiceReference: string;
   externalReference?: string;
@@ -79,9 +79,9 @@ export type RefundSchema = {
     status: "pending" | "executed";
     refundReceived: boolean;
     note: string;
-    refundedUs: MoneySchema;
+    refundedUs: MoneySchema | null;
     refundedUsInPayerCurrency?: MoneySchema | null;
-    refundedReseller: MoneySchema;
+    refundedReseller: MoneySchema | null;
     invoiceReference: string;
     externalReference?: string;
   };
@@ -110,11 +110,15 @@ export const refundParser = {
       received: data.attributes.refundReceived,
       note: data.attributes.note,
       refunded: {
-        us: moneyParser.toModel(data.attributes.refundedUs),
+        us: data.attributes.refundedUs
+          ? moneyParser.toModel(data.attributes.refundedUs)
+          : undefined,
         usInPayerCurrency: data.attributes.refundedUsInPayerCurrency
           ? moneyParser.toModel(data.attributes.refundedUsInPayerCurrency)
           : undefined,
-        reseller: moneyParser.toModel(data.attributes.refundedReseller),
+        reseller: data.attributes.refundedReseller
+          ? moneyParser.toModel(data.attributes.refundedReseller)
+          : undefined,
       },
       invoiceReference: data.attributes.invoiceReference,
       externalReference: data.attributes.externalReference,
@@ -130,8 +134,10 @@ export const refundParser = {
     attributes: {
       refundReceived: data.received,
       note: data.note,
-      refundedUs: moneyParser.toSchema(data.refunded.us),
-      refundedReseller: moneyParser.toSchema(data.refunded.reseller),
+      refundedUs: data.refunded.us ? moneyParser.toSchema(data.refunded.us) : null,
+      refundedReseller: data.refunded.reseller
+        ? moneyParser.toSchema(data.refunded.reseller)
+        : null,
       invoiceReference: data.invoiceReference,
       externalReference: data.externalReference,
     },
