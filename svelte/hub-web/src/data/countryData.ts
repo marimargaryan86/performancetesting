@@ -1,4 +1,6 @@
-export default [
+import type { CountryModel } from "models/location";
+
+const list = [
   { name: "Afghanistan", phoneCode: "93", code: "AF" },
   { name: "Albania", phoneCode: "355", code: "AL" },
   { name: "Algeria", phoneCode: "213", code: "DZ" },
@@ -239,4 +241,14 @@ export default [
   { name: "Yemen", phoneCode: "967", code: "YE" },
   { name: "Zambia", phoneCode: "260", code: "ZM" },
   { name: "Zimbabwe", phoneCode: "263", code: "ZW" },
-];
+] as const;
+
+const mapping = Object.fromEntries(list.map((country) => [country.code, country])) as Record<
+  string,
+  CountryModel
+>;
+
+export default {
+  list,
+  mapping,
+};

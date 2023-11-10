@@ -5,7 +5,7 @@
   import type { Currency } from "integration/junction-hub-api/schemas/currency";
 
   export let money: Price;
-  export let currencies: Map<string, Currency> | undefined = undefined;
+  export let currencies: Record<string, Currency> | undefined = undefined;
 </script>
 
 <TCol>

@@ -108,26 +108,14 @@
   <div class="wrapper">
     {#if step === "beneficiary"}
       <BeneficiaryDetails
-        countries={data.countries}
         accounts={data.accounts}
         bind:this={stepComponent}
         bind:data={$beneficiary}
       />
     {:else if step === "account"}
-      <BankAccountDetails
-        countries={data.countries}
-        currencies={data.currencies}
-        bind:this={stepComponent}
-        bind:data={$beneficiary}
-      />
+      <BankAccountDetails bind:this={stepComponent} bind:data={$beneficiary} />
     {:else if step === "summary"}
-      <Summary
-        countries={data.countries}
-        currencies={data.currencies}
-        bind:this={stepComponent}
-        bind:data={$beneficiary}
-        bind:error
-      />
+      <Summary bind:this={stepComponent} bind:data={$beneficiary} bind:error />
     {/if}
   </div>
 

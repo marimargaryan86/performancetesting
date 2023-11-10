@@ -7,13 +7,12 @@
   import type { CountryModel } from "models/location";
   import { formatCountryOption } from "formatting/location";
   import type { BeneficiaryPut } from "integration/junction-hub-api/schemas/beneficiary";
-  import type { Currency } from "integration/junction-hub-api/schemas/currency";
+  import countryData from "data/countryData";
+  import currencyData from "data/currencyData";
 
   export let data: BeneficiaryPut;
-  export let currencies: Map<string, Currency>;
-  export let countries: Map<string, CountryModel>;
 
-  let country = countries.get(data.address?.countryCode ?? "");
+  let country = countryData.mapping[data.address?.countryCode ?? ""];
 
   $: data = updateCountry(country);
 
@@ -32,7 +31,7 @@
   }
 
   function formatCurrencyOption(code?: string): string {
-    const currency = currencies.get(code ?? "");
+    const currency = currencyData.mapping[code ?? ""];
 
     return currency ? `${currency.name} (${currency.code})` : "";
   }
@@ -65,7 +64,7 @@
     <SelectField
       label="Country"
       placeholder="Select country"
-      options={Array.from(countries.values())}
+      options={countryData.list}
       formatter={formatCountryOption}
       required
       bind:value={country}
@@ -73,7 +72,7 @@
     <SelectField
       label="Currency"
       placeholder="Select currency"
-      options={Array.from(currencies.values()).map((c) => c.code)}
+      options={Object.keys(currencyData.mapping)}
       formatter={formatCurrencyOption}
       required
       bind:value={data.currencyId}

@@ -3,17 +3,17 @@ import type { PriceBreakdownType, Price } from "integration/common/schemas/price
 
 export function formatAmountAndCode(
   amount: Price,
-  currencies: Map<string, Currency> = new Map(),
+  currencies: Record<string, Currency> = {},
 ): string {
   return `${formatAmount(amount, currencies)} ${amount.currency.toUpperCase()}`;
 }
 
 export function formatAmount(
   money: Price,
-  currencies: Map<string, Currency> = new Map(),
+  currencies: Record<string, Currency> = {},
   sign = false,
 ): string {
-  const currency = currencies.get(money.currency);
+  const currency = currencies[money.currency];
   let finalAmount = money.amount;
 
   if (currency) {

@@ -1,7 +1,6 @@
 import { env } from "$env/dynamic/private";
 import junctionMobileApi from "integration/junction-mobile-api/services";
 import junctionHubApi from "integration/junction-hub-api/services";
-import common from "integration/common/services";
 import ory from "integration/ory/services";
 
 const junctionHubCompanyService = new junctionHubApi.CompanyService(env.HUB_API_BASE_URL);
@@ -34,9 +33,6 @@ export default {
     cancellationRequests: new junctionHubApi.CancellationRequestService(env.HUB_API_BASE_URL),
     users: junctionHubUserService,
     refunds: new junctionHubApi.RefundService(env.HUB_API_BASE_URL),
-  },
-  common: {
-    countries: new common.CountryService(),
   },
   ory: new ory.OryService(junctionHubUserService, env.ORY_BASE_URL),
 };

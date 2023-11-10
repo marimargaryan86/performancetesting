@@ -220,11 +220,7 @@
       />
       <Fees {priceQuote} bind:orderMarkups />
       <Payment bind:this={payment} bind:paymentIntent />
-      <ContactInformation
-        countries={data.countries}
-        bind:data={bookingData.contact}
-        errors={errors?.contact}
-      />
+      <ContactInformation bind:data={bookingData.contact} errors={errors?.contact} />
     </div>
   </div>
 </div>

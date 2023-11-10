@@ -8,6 +8,7 @@
   import StandardLayout from "components/page/standard-layout.svelte";
   import routeConfig from "routeConfig";
   import type { Balance } from "integration/junction-hub-api/schemas/balance";
+  import currencyData from "data/currencyData";
 
   export let data;
 
@@ -39,7 +40,6 @@
 </svelte:head>
 
 <AddBalanceDialogue
-  currencies={data.currencies}
   exclude={balances}
   accountId={data.account.id}
   on:addbalances={addBalances}
@@ -62,7 +62,7 @@
             <strong class="typography body-large bold">
               {formatAmount(
                 { currency: balance.currencyId, amount: balance.amount },
-                data.currencies,
+                currencyData.mapping,
               )}
             </strong>
             <span class="typography body-small">{balance.currency}</span>

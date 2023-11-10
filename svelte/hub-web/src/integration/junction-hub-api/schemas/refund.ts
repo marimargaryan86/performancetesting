@@ -36,6 +36,7 @@ export type Refund = {
     reseller: Money;
   };
   invoiceReference: string;
+  externalReference?: string;
   transactionId?: string;
   transaction?: Transaction;
   conversionId?: string;
@@ -43,7 +44,10 @@ export type Refund = {
   refundPosition?: RefundPosition;
 };
 
-export type RefundPut = Pick<Refund, "received" | "note" | "invoiceReference" | "transactionId"> & {
+export type RefundPut = Pick<
+  Refund,
+  "received" | "note" | "invoiceReference" | "externalReference" | "transactionId"
+> & {
   refunded: Pick<Refund["refunded"], "reseller" | "us">;
 };
 
@@ -58,6 +62,7 @@ export type RefundSchema = {
     refundedUsInPayerCurrency?: MoneySchema | null;
     refundedReseller: MoneySchema;
     invoiceReference: string;
+    externalReference?: string;
   };
   relationships: {
     transaction: { data?: Pick<TransactionSchema, "id" | "type"> };
@@ -91,6 +96,7 @@ export const refundParser = {
         reseller: moneyParser.toModel(data.attributes.refundedReseller),
       },
       invoiceReference: data.attributes.invoiceReference,
+      externalReference: data.attributes.externalReference,
       transactionId,
       transaction: included?.transactions?.find(({ id }) => id === transactionId),
       conversionId,
@@ -103,9 +109,10 @@ export const refundParser = {
     attributes: {
       refundReceived: data.received,
       note: data.note,
-      refundedUs: data.refunded.us,
-      refundedReseller: data.refunded.reseller,
+      refundedUs: moneyParser.toSchema(data.refunded.us),
+      refundedReseller: moneyParser.toSchema(data.refunded.reseller),
       invoiceReference: data.invoiceReference,
+      externalReference: data.externalReference,
     },
     relationships: {
       transaction: {

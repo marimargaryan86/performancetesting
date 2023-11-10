@@ -20,6 +20,7 @@
   import StandardLayout from "components/page/standard-layout.svelte";
   import type { ScrollLoadFunc } from "directives/scroll-load";
   import integrationInstancesClient from "integration-instances-client";
+  import currencyData from "data/currencyData";
 
   export let data;
 
@@ -79,7 +80,7 @@
 
       <TBody>
         {#each beneficiaries as item (item.id)}
-          {@const currency = data.currencies.get(item.currencyId)}
+          {@const currency = currencyData.mapping[item.currencyId]}
 
           <TRow alternatingBackground={false}>
             <TCol class="company-name typography body-medium bold">

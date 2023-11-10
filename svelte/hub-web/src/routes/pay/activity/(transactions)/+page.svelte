@@ -18,6 +18,7 @@
   import type { Transaction } from "integration/junction-hub-api/schemas/transaction";
   import type { ScrollLoadFunc } from "directives/scroll-load";
   import integrationInstancesClient from "integration-instances-client";
+  import currencyData from "data/currencyData";
 
   export let data;
 
@@ -100,10 +101,10 @@
         <TCol width="0">{capitalize(item.payment.method)}</TCol>
         <TCol width="0">{capitalize(item.payment.type)}</TCol>
         <TCompanyCol maxWidth="160px" companyName={item.payer?.name} />
-        <TMoneyCol money={item.amounts.quotation} currencies={data.currencies} />
+        <TMoneyCol money={item.amounts.quotation} currencies={currencyData.mapping} />
         <TCompanyCol maxWidth="160px" companyName={item.beneficiary?.name} />
-        <TMoneyCol money={item.amounts.beneficiary} currencies={data.currencies} />
-        <TMoneyCol money={item.sales.margin} currencies={data.currencies} />
+        <TMoneyCol money={item.amounts.beneficiary} currencies={currencyData.mapping} />
+        <TMoneyCol money={item.sales.margin} currencies={currencyData.mapping} />
         <TCol maxWidth="96px" copyable copyAlign="right">{item.invoiceReference ?? "Unknown"}</TCol>
       </TRow>
     {/each}

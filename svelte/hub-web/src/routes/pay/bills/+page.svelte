@@ -17,6 +17,7 @@
   import type { Bill } from "integration/junction-hub-api/schemas/bill";
   import { match as matchUuid } from "../../../params/uuid";
   import { browser } from "$app/environment";
+  import currencyData from "data/currencyData";
 
   export let data;
 
@@ -87,7 +88,7 @@
           <TCol width="0">{bill.updatedAt?.toLocaleDateString("sv-SE") ?? "N/A"}</TCol>
           <TMoneyCol
             money={bill.amounts.total ?? { amount: 0, currency: "EUR" }}
-            currencies={data.currencies}
+            currencies={currencyData.mapping}
           />
           <TCol width="40px" textAlign="right">
             <Switch

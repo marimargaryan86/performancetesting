@@ -5,13 +5,11 @@
   import { permitted } from "utils/permissions";
   import userStore from "stores/user-store";
   import type { Transaction as TransactionModel } from "integration/junction-hub-api/schemas/transaction";
-  import type { Currency } from "integration/junction-hub-api/schemas/currency";
   import { onMount } from "svelte";
   import integrationInstancesClient from "integration-instances-client";
   import type { MaybePromise } from "@sveltejs/kit";
 
   export let booking: TripBooking;
-  export let currencies: Map<string, Currency>;
 
   let transactionTask: MaybePromise<TransactionModel | undefined> | undefined;
 
@@ -30,7 +28,7 @@
   {#if booking.cancellation && permitted($userStore, "refund", "*")}
     {#await transactionTask then transaction}
       {#if transaction && !booking.refund}
-        <RefundDialog bind:booking {transaction} {currencies} />
+        <RefundDialog bind:booking {transaction} />
       {/if}
     {/await}
   {/if}

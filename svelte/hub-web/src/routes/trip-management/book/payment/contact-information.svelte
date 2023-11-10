@@ -32,15 +32,13 @@
   import type { CountryModel } from "models/location";
   import Collapsible from "../../components/collapsible.svelte";
   import type { ContactDetails } from "integration/junction-mobile-api/schemas/journey";
+  import countryData from "data/countryData";
 
-  let countryMap: Map<string, CountryModel>;
-  export { countryMap as countries };
   export let data: ContactDetails;
   export let errors: z.ZodFormattedError<ContactDetails> | undefined = undefined;
 
   let collapsible: Collapsible | undefined;
-  let countries = Array.from(countryMap.values());
-  let country: CountryModel | undefined = countryMap.get(data.address.countryCode ?? "");
+  let country: CountryModel | undefined = countryData.mapping[data.address.countryCode ?? ""];
 
   let phone: {
     country?: CountryModel;
@@ -67,7 +65,7 @@
     <div class="phone">
       <SelectField
         search={findCountry}
-        options={countries}
+        options={countryData.list}
         label="Country code"
         placeholder="Select"
         required
@@ -119,7 +117,7 @@
       <SelectField
         search={findCountry}
         direction="up"
-        options={countries}
+        options={countryData.list}
         label="Country"
         placeholder="Select country"
         formatter={formatCountryOption}

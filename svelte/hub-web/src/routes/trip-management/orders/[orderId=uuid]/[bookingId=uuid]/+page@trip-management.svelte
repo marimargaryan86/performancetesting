@@ -70,7 +70,7 @@
       </div>
 
       {#if data.booking.cancellation && permitted($userStore, "refund", "*") && data.booking.refund}
-        <Refund refund={data.booking.refund} currencies={data.currencies} />
+        <Refund refund={data.booking.refund} />
       {/if}
 
       {#if order}
@@ -81,7 +81,7 @@
     </div>
 
     {#if transactionsPermitted}
-      <Admin bind:booking={data.booking} currencies={data.currencies} />
+      <Admin bind:booking={data.booking} />
     {/if}
   </div>
 </StandardLayout>

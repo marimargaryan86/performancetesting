@@ -11,10 +11,10 @@
   import type { Balance } from "integration/junction-hub-api/schemas/balance";
   import type { Currency } from "integration/junction-hub-api/schemas/currency";
   import integrationInstancesClient from "integration-instances-client";
+  import currencyData from "data/currencyData";
 
   export let accountId: string;
   export let exclude: Balance[];
-  export let currencies: Map<string, Currency>;
 
   export function close(): void {
     visible = false;
@@ -37,7 +37,7 @@
 
   const dispatch = createEventDispatcher<{ addbalances: Balance[] }>();
 
-  $: filteredBalances = Array.from(currencies.values()).filter(
+  $: filteredBalances = currencyData.list.filter(
     (balance) =>
       balance.code.toLowerCase().includes(searchQuery.toLowerCase()) &&
       !exclude.find((money) => money.currencyId === balance.code),

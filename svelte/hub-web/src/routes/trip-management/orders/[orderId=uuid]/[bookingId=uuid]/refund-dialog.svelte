@@ -29,6 +29,7 @@
   import Button from "components/ui/button.svelte";
   import SelectField from "components/ui/select-field.svelte";
   import TextField from "components/ui/text-field.svelte";
+  import currencyData from "data/currencyData";
   import integrationInstancesClient from "integration-instances-client";
   import type { TripBooking } from "integration/junction-hub-api/schemas/booking";
   import type { Currency } from "integration/junction-hub-api/schemas/currency";
@@ -37,8 +38,6 @@
   import { pendableCall } from "utils/pendable-call";
   import { z } from "zod";
 
-  let currencyMap: Map<string, Currency>;
-  export { currencyMap as currencies };
   export let transaction: Transaction;
   export let booking: TripBooking;
 
@@ -51,8 +50,6 @@
     provider: {},
     reseller: {},
   };
-
-  $: currencies = Array.from(currencyMap.values());
 
   const { pending, func: refund } = pendableCall(async () => {
     errors = undefined;
@@ -112,7 +109,7 @@
         search={findCurrencyOption}
         formatter={formatCurrencyOption}
         placeholder="Currency"
-        options={currencies}
+        options={currencyData.list}
         bind:value={refundData.provider.currency}
         error={errors?.provider?.currency?._errors}
       />
@@ -133,7 +130,7 @@
         search={findCurrencyOption}
         formatter={formatCurrencyOption}
         placeholder="Currency"
-        options={currencies}
+        options={currencyData.list}
         bind:value={refundData.reseller.currency}
         error={errors?.reseller?.currency?._errors}
       />

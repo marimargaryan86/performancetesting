@@ -1,12 +1,11 @@
 <script lang="ts">
   import StatusBadge from "components/ui/status-badge.svelte";
+  import currencyData from "data/currencyData";
   import { formatAmount } from "formatting/currency";
-  import type { Currency } from "integration/junction-hub-api/schemas/currency";
   import type { Refund } from "integration/junction-hub-api/schemas/refund";
   import { slideFade } from "transitions/slide-fade";
 
   export let refund: Refund;
-  export let currencies: Map<string, Currency>;
 </script>
 
 <div class="refund" transition:slideFade={{ duration: 300 }}>
@@ -18,7 +17,7 @@
 
   <div class="typography body-xlarge bold amount">
     <strong>Total refunded</strong>
-    <span>{formatAmount(refund.refunded.reseller, currencies, true)}</span>
+    <span>{formatAmount(refund.refunded.reseller, currencyData.mapping, true)}</span>
   </div>
 </div>
 

@@ -1,21 +1,19 @@
 <script lang="ts">
-  import type { CountryModel } from "models/location";
   import { capitalize } from "utils/common";
   import type { BeneficiaryPut } from "integration/junction-hub-api/schemas/beneficiary";
-  import type { Currency } from "integration/junction-hub-api/schemas/currency";
   import integrationInstancesClient from "integration-instances-client";
+  import countryData from "data/countryData";
+  import currencyData from "data/currencyData";
 
   export let data: BeneficiaryPut;
-  export let countries: Map<string, CountryModel>;
-  export let currencies: Map<string, Currency>;
   export let error: string | undefined = undefined;
 
-  $: currency = data.currencyId ? currencies.get(data.currencyId) : undefined;
+  $: currency = currencyData.mapping[data.currencyId];
   $: beneficiaryCountry = data.address?.countryCode
-    ? countries.get(data.address.countryCode)
+    ? countryData.mapping[data.address.countryCode]
     : undefined;
   $: bankCountry = data.bankDetails.address?.countryCode
-    ? countries.get(data.bankDetails.address.countryCode)
+    ? countryData.mapping[data.bankDetails.address.countryCode]
     : undefined;
 
   export async function validate(): Promise<boolean> {

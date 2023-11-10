@@ -16,6 +16,7 @@ const config = {
     alias: {
       components: "src/components",
       assets: "src/assets",
+      data: "src/data",
       integration: "src/integration",
       "integration-instances": "src/integration-instances.server.ts",
       "integration-instances-client": "src/integration-instances.client.ts",

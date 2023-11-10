@@ -6,12 +6,12 @@
   import { formatCountryOption } from "formatting/location";
   import type { Account } from "integration/junction-hub-api/schemas/account";
   import type { BeneficiaryPut } from "integration/junction-hub-api/schemas/beneficiary";
+  import countryData from "data/countryData";
 
   export let data: BeneficiaryPut;
-  export let countries: Map<string, CountryModel>;
   export let accounts: Account[];
 
-  let country = countries.get(data.address?.countryCode ?? "");
+  let country = countryData.mapping[data.address?.countryCode ?? ""];
 
   $: accountIds = accounts.map((a) => a.id);
   $: data = updateCountry(country);
@@ -86,7 +86,7 @@
         required
         label="Country"
         placeholder="Select country"
-        options={Array.from(countries.values())}
+        options={countryData.list}
         formatter={formatCountryOption}
         bind:value={country}
       />
