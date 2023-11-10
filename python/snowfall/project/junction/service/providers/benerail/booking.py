@@ -135,6 +135,7 @@ class Transformer(object):
                     str(all_results.booking.metadata.responded_at),
                 ),
             ),
+            ticket_urls=all_results.tickets,
             # TODO: No idea how to get updated_at from the booking model.
         )
 
