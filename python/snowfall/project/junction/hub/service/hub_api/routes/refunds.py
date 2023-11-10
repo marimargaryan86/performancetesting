@@ -135,12 +135,12 @@ class Refunds(endpoints.HTTPEndpoint):
             refunds_model_pb2.Refund(
                 refund_received=payload["refundReceived"],
                 note=payload["note"],
-                refunded_us=money.from_string(
-                    str(payload["refundedUs"]["amount"]),
+                refunded_us=money.Money(
+                    payload["refundedUs"]["amount"],
                     money.Currency(payload["refundedUs"]["currency"]),
                 ).protobuf(),
-                refunded_reseller=money.from_string(
-                    str(payload["refundedReseller"]["amount"]),
+                refunded_reseller=money.Money(
+                    payload["refundedReseller"]["amount"],
                     money.Currency(payload["refundedReseller"]["currency"]),
                 ).protobuf(),
                 invoice_reference=payload["invoiceReference"],
