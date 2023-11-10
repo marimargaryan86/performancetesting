@@ -13,7 +13,7 @@
       throw new Error("Unknown departure date");
     }
 
-    return departureLeg.departureAt.toLocaleString("sv-SE", {
+    return departureLeg.departureAt.toLocaleDateString("sv-SE", {
       timeZone: departureLeg.origin.timeZone,
     });
   }
@@ -186,13 +186,13 @@
               <span class="not-available">N/A</span>
             {/if}
           </TCol>
-          <TCol class="typography body-small">
+          <TCol class="typography body-small" width="0">
             {getDepartureDateString(order)}
           </TCol>
-          <TCol class="typography body-small">
-            <span class="ellipsis typography bold">{getPassengerNames(order).join(", ")}</span>
+          <TCol class="typography body-small bold" maxWidth="240px">
+            {getPassengerNames(order).join(", ")}
           </TCol>
-          <TCol class="typography body-small">
+          <TCol class="typography body-small" width="0">
             <strong>
               {formatAmount(totalPrice)}
             </strong>
