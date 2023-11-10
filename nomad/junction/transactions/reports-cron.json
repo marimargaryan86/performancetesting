@@ -1,0 +1,11 @@
+{
+  "development": {
+    "variables": {}
+  },
+  "production": {
+    "variables": {}
+  },
+  "sandbox": {
+    "variables": {}
+  }
+}

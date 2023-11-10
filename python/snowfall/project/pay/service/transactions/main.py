@@ -19,6 +19,7 @@ from snowfall.project.pay.service.transactions.grpc import (
     QuotationsService,
     TransactionsService,
 )
+from snowfall.project.pay.service.transactions.reports_cron import NetsuiteReportJob
 from snowfall.stdlib.instrumentation.httpx import metrics
 from snowfall.stdlib.service import application, grpc_factory, redis_factory
 from snowfall.stdlib.transport.grpc import server
@@ -35,6 +36,10 @@ class _GrpcSettings(application.Settings):
     cc_login: str
     cc_api_key: str
     cc_address: str
+
+
+class _ReportsSettings(application.Settings):
+    """Reports settings."""
 
 
 async def _serve(app: application.Application[_GrpcSettings]) -> None:
@@ -113,9 +118,22 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
         await running.wait_for_termination()
 
 
+async def _reports_cron_run(
+    app: application.Application[_ReportsSettings],
+) -> None:
+    job = NetsuiteReportJob()
+
+    await job.run()
+
+
 if __name__ == "__main__":
     entrypoint = application.Entrypoint(name="transactions")
 
     entrypoint.enter_with_commands(
         application.Command(name="grpc", callback=_serve, settings_class=_GrpcSettings),
+        application.Command(
+            name="reports_cron",
+            callback=_reports_cron_run,
+            settings_class=_ReportsSettings,
+        ),
     )
