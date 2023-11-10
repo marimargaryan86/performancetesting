@@ -4644,10 +4644,10 @@
         "description": "Criteria used for a Simple Offer Search",
         "properties": {
           "origin": {
-            "$ref": "#/components/schemas/CoordinatesSearchable"
+            "$ref": "#/components/schemas/Coordinates"
           },
           "destination": {
-            "$ref": "#/components/schemas/CoordinatesSearchable"
+            "$ref": "#/components/schemas/Coordinates"
           },
           "departureAfter": {
             "type": "string",
@@ -5856,11 +5856,7 @@
                     "example": "completed"
                   },
                   "criteria": {
-                    "type": "array",
-                    "uniqueItems": true,
-                    "items": {
-                      "$ref": "#/components/schemas/SimpleOfferSearchCriteria"
-                    }
+                    "$ref": "#/components/schemas/SimpleOfferSearchCriteria"
                   },
                   "passengers": {
                     "type": "array",
