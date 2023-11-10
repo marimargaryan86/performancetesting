@@ -287,19 +287,6 @@ class RefundsService(
         request: grpc_pb2.UpdateRefundRequest,
         refund: models_pb2.Refund,
     ) -> models_pb2.Refund:
-        if (  # noqa: WPS337
-            request.refund.refunded_us.currency_code
-            == request.refund.refunded_reseller.currency_code
-        ):
-            await rich_status.abort_with_rich_status(
-                context=context,
-                status=rich_status.build_bad_request(
-                    field_name="refundedUs",
-                    field_description=(
-                        "refundedUs should not be same as refundedReseller"
-                    ),
-                ),
-            )
 
         try:
             transaction = await self._transactions_client.get(refund.transaction_id)

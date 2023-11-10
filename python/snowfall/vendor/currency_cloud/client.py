@@ -324,6 +324,12 @@ class PaymentClient(object):
         self,
         detailed_rates_request: DetailedRateRequest,
     ) -> DetailedRateResponse:
+        if detailed_rates_request.sell_currency == detailed_rates_request.buy_currency:
+            return DetailedRateResponse(
+                client_buy_currency=detailed_rates_request.buy_currency,
+                client_sell_currency=detailed_rates_request.sell_currency,
+                client_buy_amount=detailed_rates_request.amount,
+            )
         return DetailedRateResponse(
             **await self._make_request(
                 method=_METHOD_GET,

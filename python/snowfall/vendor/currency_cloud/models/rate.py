@@ -33,11 +33,11 @@ class DetailedRateRequest(CamelCaseBaseModel):
 
 
 class DetailedRateResponse(CamelCaseBaseModel):
-    settlement_cut_off_time: datetime.datetime
-    currency_pair: str
+    settlement_cut_off_time: datetime.datetime | None = None
+    currency_pair: str | None = None
     client_buy_currency: str
     client_sell_currency: str
     client_buy_amount: str
-    client_sell_amount: str
-    fixed_side: FixedSideEnum
-    client_rate: str
+    client_sell_amount: str | None = None
+    fixed_side: FixedSideEnum = FixedSideEnum.buy
+    client_rate: str | None = None
