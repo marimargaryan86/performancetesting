@@ -329,9 +329,14 @@ def calculate_delay_and_layover(
     if delays:
         with suppress(IndexError):
             delay = int(delays[idx].delay)
-            message = "\n*Predicted flight delay:* {0} mins\n".format(
-                delay if delay >= 0 else 0,
-            )
+            if delay < 0:
+                message = "\n*Predicted arrival early* by {0} mins\n".format(
+                    -delay,
+                )
+            else:
+                message = "\n*Predicted arrival delay* by {0} mins\n".format(
+                    delay,
+                )
 
     if idx < len(bookings) - 1:
         return message + "\nLayover: {0}\n".format(
