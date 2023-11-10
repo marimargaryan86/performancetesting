@@ -39,6 +39,7 @@ trip_details_menu = {
     ),
 }
 
+_TIME_WINDOW_IN_HOURS = 48
 _HandlersResponse: TypeAlias = Sequence[Mapping[str, Any]]
 
 
@@ -229,6 +230,11 @@ async def trip_details(
             },
             action_menu,
         ]
+    flight_prediction_window = datetime.datetime.now(
+        tz=datetime.UTC,
+    ) + datetime.timedelta(
+        hours=_TIME_WINDOW_IN_HOURS,
+    )
     try:
         delays = await flight_predictions_client.predict_delays(
             [
@@ -241,6 +247,8 @@ async def trip_details(
                     ).strftime("%Y-%m-%dT%H:%M:%SZ"),
                 )
                 for booking in order.bookings
+                if protobuf.protobuf_to_datetime(booking.value.departure_at)
+                < flight_prediction_window
             ],
         )
     except grpc.aio.AioRpcError:
@@ -336,6 +344,11 @@ async def upcoming_trip_details(
             },
         ]
     order = await orders_client.get(order_id)
+    flight_prediction_window = datetime.datetime.now(
+        tz=datetime.UTC,
+    ) + datetime.timedelta(
+        hours=_TIME_WINDOW_IN_HOURS,
+    )
     try:
         delays = await flight_predictions_client.predict_delays(
             [
@@ -348,6 +361,8 @@ async def upcoming_trip_details(
                     ).strftime("%Y-%m-%dT%H:%M:%SZ"),
                 )
                 for booking in order.bookings
+                if protobuf.protobuf_to_datetime(booking.value.departure_at)
+                < flight_prediction_window
             ],
         )
     except grpc.aio.AioRpcError:

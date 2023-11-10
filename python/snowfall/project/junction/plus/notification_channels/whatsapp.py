@@ -1,5 +1,6 @@
 import pathlib
 from collections.abc import Sequence
+from contextlib import suppress
 from gettext import gettext as _
 
 from twilio.rest import Client as twilioClient
@@ -326,9 +327,12 @@ def calculate_delay_and_layover(
 ) -> str:
     message = ""
     if delays:
-        message = "\n*Predicted flight delay:* {0} mins\n".format(
-            delays[idx].delay,
-        )
+        with suppress(IndexError):
+            delay = int(delays[idx].delay)
+            message = "\n*Predicted flight delay:* {0} mins\n".format(
+                delay if delay >= 0 else 0,
+            )
+
     if idx < len(bookings) - 1:
         return message + "\nLayover: {0}\n".format(
             protobuf.protobuf_to_datetime(
