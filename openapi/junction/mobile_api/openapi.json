@@ -1494,6 +1494,9 @@
         }
       }
     },
+    "/offers/simple-searches": {
+      "$ref": "./../client_api/openapi.json#/paths/~1offers~1simple-searches"
+    },
     "/offers/searches": {
       "post": {
         "parameters": [
