@@ -2,15 +2,13 @@
   import TCol from "./t-col.svelte";
   import { formatAmount } from "formatting/currency";
   import type { Price } from "integration/common/schemas/price";
-  import type { Currency } from "integration/junction-hub-api/schemas/currency";
 
   export let money: Price;
-  export let currencies: Record<string, Currency> | undefined = undefined;
 </script>
 
 <TCol>
   <div class="money">
-    <span>{formatAmount(money, currencies)}</span>
+    <span>{formatAmount(money)}</span>
     <strong class="typography body-small">{money.currency}</strong>
   </div>
 </TCol>

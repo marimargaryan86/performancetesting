@@ -153,13 +153,13 @@
           <li>
             <span class="typography label-medium">Service fee</span>
             <span class="typography body-small bold">
-              {formatAmount({ currency, amount: calculatedServiceFeeAmount }, undefined, true)}
+              {formatAmount({ currency, amount: calculatedServiceFeeAmount }, true)}
             </span>
           </li>
           <li>
             <span class="typography label-medium">Agency mark-up</span>
             <span class="typography body-small bold">
-              {formatAmount({ currency, amount: calculatedAgencyMarkupAmount }, undefined, true)}
+              {formatAmount({ currency, amount: calculatedAgencyMarkupAmount }, true)}
             </span>
           </li>
         </ul>
@@ -170,7 +170,7 @@
       <span class="typography body-large bold">Total to collect</span>
       <em class="typography body-large bold">
         {#if priceQuote?.price}
-          {formatAmount({ currency, amount: totalToCollectAmount }, undefined, true)}
+          {formatAmount({ currency, amount: totalToCollectAmount }, true)}
         {:else}
           <LoadingIcon size="16px" />
         {/if}

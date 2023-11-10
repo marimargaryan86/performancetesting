@@ -72,7 +72,7 @@
                 <li>
                   <span class="typography label-medium">{formatPriceBreakdownType(item.type)}</span>
                   <span class="typography body-small bold">
-                    {formatAmount(item.price, undefined, true)}
+                    {formatAmount(item.price, true)}
                   </span>
                 </li>
               {/each}
@@ -85,7 +85,7 @@
         <span class="typography body-large bold">Total to pay</span>
         <em class="typography body-large bold">
           {#if totalPrice}
-            {formatAmount(totalPrice, undefined, true)}
+            {formatAmount(totalPrice, true)}
           {:else}
             <LoadingIcon size="16px" />
           {/if}

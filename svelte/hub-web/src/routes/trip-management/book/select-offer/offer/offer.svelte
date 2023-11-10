@@ -145,7 +145,7 @@
             <span>
               <em class="typography label-medium">From</em>
               <strong class="typography title-large bold">
-                {formatAmount(totalPrice, undefined, true)}
+                {formatAmount(totalPrice, true)}
               </strong>
             </span>
 

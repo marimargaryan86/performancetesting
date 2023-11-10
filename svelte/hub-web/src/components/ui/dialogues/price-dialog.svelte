@@ -46,11 +46,10 @@
 
     <p class="typography body-medium">
       We have noticed a price change; the initial price was
-      <strong class="typography body-medium bold"
-        >{formatAmount(originalPrice, undefined, true)}</strong
-      >, and the new price is
-      <strong class="typography body-medium bold">{formatAmount(newPrice, undefined, true)}</strong
-      >. Do you wish to continue?
+      <strong class="typography body-medium bold">{formatAmount(originalPrice, true)}</strong>, and
+      the new price is
+      <strong class="typography body-medium bold">{formatAmount(newPrice, true)}</strong>. Do you
+      wish to continue?
     </p>
 
     <div class="actions">

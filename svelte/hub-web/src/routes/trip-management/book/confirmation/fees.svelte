@@ -11,13 +11,13 @@
       <li>
         <span class="typography label-medium">Service fee</span>
         <span class="typography body-small bold">
-          {formatAmount({ ...markups.serviceFee }, undefined, true)}
+          {formatAmount({ ...markups.serviceFee }, true)}
         </span>
       </li>
       <li>
         <span class="typography label-medium">Agency mark-up</span>
         <span class="typography body-small bold">
-          {formatAmount({ ...markups.agencyMarkup }, undefined, true)}
+          {formatAmount({ ...markups.agencyMarkup }, true)}
         </span>
       </li>
     </ul>
@@ -26,7 +26,7 @@
   <div class="total">
     <span class="typography body-xlarge bold">Total to collect</span>
     <em class="typography body-xlarge bold total-amount">
-      {formatAmount({ ...markups.totalToCollect }, undefined, true)}
+      {formatAmount({ ...markups.totalToCollect }, true)}
     </em>
   </div>
 </div>

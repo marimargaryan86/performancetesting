@@ -59,7 +59,7 @@
           <hr />
 
           <span class="typography body-medium bold">
-            {formatAmount(option.price.total, undefined, true)}
+            {formatAmount(option.price.total, true)}
           </span>
 
           <Button

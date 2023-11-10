@@ -8,7 +8,6 @@
   import StandardLayout from "components/page/standard-layout.svelte";
   import routeConfig from "routeConfig";
   import type { Balance } from "integration/junction-hub-api/schemas/balance";
-  import currencyData from "data/currencyData";
 
   export let data;
 
@@ -60,10 +59,7 @@
 
           <span>
             <strong class="typography body-large bold">
-              {formatAmount(
-                { currency: balance.currencyId, amount: balance.amount },
-                currencyData.mapping,
-              )}
+              {formatAmount({ currency: balance.currencyId, amount: balance.amount })}
             </strong>
             <span class="typography body-small">{balance.currency}</span>
           </span>

@@ -1,26 +1,11 @@
-import type { Currency } from "integration/junction-hub-api/schemas/currency";
 import type { PriceBreakdownType, Price } from "integration/common/schemas/price";
 
-export function formatAmountAndCode(
-  amount: Price,
-  currencies: Record<string, Currency> = {},
-): string {
-  return `${formatAmount(amount, currencies)} ${amount.currency.toUpperCase()}`;
+export function formatAmountAndCode(amount: Price): string {
+  return `${formatAmount(amount)} ${amount.currency.toUpperCase()}`;
 }
 
-export function formatAmount(
-  money: Price,
-  currencies: Record<string, Currency> = {},
-  sign = false,
-): string {
-  const currency = currencies[money.currency];
-  let finalAmount = money.amount;
-
-  if (currency) {
-    finalAmount /= 10 ** currency.minorUnits;
-  }
-
-  return finalAmount.toLocaleString("en-US", {
+export function formatAmount(money: Price, sign = false): string {
+  return money.amount.toLocaleString("en-US", {
     minimumFractionDigits: 2,
     style: sign ? "currency" : undefined,
     currency: sign ? money.currency : undefined,

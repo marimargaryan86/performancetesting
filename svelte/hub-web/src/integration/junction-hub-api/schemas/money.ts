@@ -1,3 +1,5 @@
+import currencyData from "data/currencyData";
+
 export type Money = {
   currency: string;
   amount: number;
@@ -9,12 +11,30 @@ export type MoneySchema = {
 };
 
 export const moneyParser = {
-  toModel: (data: MoneySchema): Money => ({
-    currency: data.currency,
-    amount: data.amount,
-  }),
-  toSchema: (data: Money): MoneySchema => ({
-    currency: data.currency,
-    amount: data.amount,
-  }),
+  toModel: (data: MoneySchema): Money => {
+    const currency = currencyData.mapping[data.currency];
+    let finalAmount = data.amount;
+
+    if (currency) {
+      finalAmount /= 10 ** currency.minorUnits;
+    }
+
+    return {
+      currency: data.currency,
+      amount: finalAmount,
+    };
+  },
+  toSchema: (data: Money): MoneySchema => {
+    const currency = currencyData.mapping[data.currency];
+    let finalAmount = data.amount;
+
+    if (currency) {
+      finalAmount *= 10 ** currency.minorUnits;
+    }
+
+    return {
+      currency: data.currency,
+      amount: Math.round(finalAmount),
+    };
+  },
 };

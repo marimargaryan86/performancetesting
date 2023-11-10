@@ -20,14 +20,14 @@
     <li>
       <span>Base fare + taxes</span>
       <strong class="typography bold">
-        {formatAmount(totalPrice, undefined, true)}
+        {formatAmount(totalPrice, true)}
       </strong>
     </li>
 
     <li class="typography body-xlarge bold">
       <span>Total paid</span>
       <strong>
-        {formatAmount(totalPrice, undefined, true)}
+        {formatAmount(totalPrice, true)}
       </strong>
     </li>
   </ul>
