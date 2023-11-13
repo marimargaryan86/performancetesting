@@ -369,9 +369,9 @@ class BookingHandler(object):
         )
 
     @tenacity.retry(
-        stop=tenacity.stop_after_attempt(2),
+        stop=tenacity.stop_after_attempt(3),
         retry=tenacity.retry_if_exception_type(errors.HttpStatusError),
-        wait=tenacity.wait_fixed(5),
+        wait=tenacity.wait_fixed(10),
         reraise=True,
     )
     async def _get_booking(
