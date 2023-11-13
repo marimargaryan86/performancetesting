@@ -10,7 +10,6 @@ from snowfall.project.junction.go.service.places import places
 from snowfall.project.junction.go.service.places.v1 import models_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.v1 import latlng_pb2
 
 _MIN_POPULATION = 20000
@@ -76,7 +75,6 @@ async def parse_csv(
     locations_repository: places.LocationRepository,
     csv_file: protocols.WithAsyncRead,
 ) -> AsyncIterable[models_pb2.Place]:
-    logger = stdout.get_logger()
     async for row in readers.AsyncDictReader(csv_file):
         locations = [
             location
@@ -96,10 +94,6 @@ async def parse_csv(
         )
 
         if not location_ids:
-            logger.warning(
-                "Place (city) has no known locations",
-                name=row["name"],
-            )
             continue
 
         yield models_pb2.Place(
