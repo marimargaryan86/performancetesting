@@ -167,7 +167,10 @@ class PlaceRepository(
     mixins.UpsertMixin[models_pb2.Place],
 ):
     _proto = models_pb2.Place
-    _indexes = (IndexModel([("location.coordinates", GEOSPHERE)], background=True),)
+    _indexes = (
+        IndexModel([("location.coordinates", GEOSPHERE)], background=True),
+        IndexModel("location.name", background=True),
+    )
 
     def __init__(
         self,
