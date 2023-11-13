@@ -163,6 +163,10 @@ directferries:
   - mkdir "/planner-efs/$PREFIX-$CI_PIPELINE_ID"
   - cp /planner-efs/$PREFIX/*.bin "/planner-efs/$PREFIX-$CI_PIPELINE_ID/"
   - cp data-export/*.bin "/planner-efs/$PREFIX/"
+  - |
+    for n in $(ls /planner-efs/ | sed -nr "s/${PREFIX}-([0-9]+)\$/\1/p" | sort -nr | tail -n '+3'); do
+        rm -r "/planner-efs/${PREFIX}-${n}"
+    done
   # Get existing allocs
   - mapfile -t allocation_ids < <(nomad job status planner-grpc | awk '/Allocations/{flag=1; next} flag && $6=="running" && !/^ID/{print $1}')
   # Get job spec and increase count by one
@@ -170,15 +174,25 @@ directferries:
   - cat job.json | jq '.Job.TaskGroups[0].Count += 1' > newjob.json
   - nomad job run -json newjob.json
   - |
-    mongosh "${MONGODSN}/places" --eval '
-      let now = new Date().toISOString().replaceAll("-", "").replaceAll(":", "").split(".")[0];
-      try {db.places.renameCollection("places_backup_" + now);} catch (e) {}
-      db.places_import.renameCollection("places");
-      try {db.locations.renameCollection("locations_backup_" + now);} catch (e) {}
-      db.locations_import.renameCollection("locations");
-      db = db.getMongo().getDB("schedules");
-      try {db.schedules.renameCollection("schedules_backup_" + now);} catch (e) {}
-      db.schedules_import.renameCollection("schedules");'
+    mongosh "${MONGODSN}/places" --eval "
+      try {db.places.renameCollection('places_backup_${CI_PIPELINE_ID}');} catch (e) {}
+      db.places_import.renameCollection('places');
+      try {db.locations.renameCollection('locations_backup_${CI_PIPELINE_ID}');} catch (e) {}
+      db.locations_import.renameCollection('locations');
+      let names = db.getCollectionNames();
+      let toDelete = names.filter((c) => /^places_backup_\d+\$/.test(c)).map((c) => parseInt(c.split('_').at(-1))).sort((a, b) => a - b).slice(0, -2);
+      for (let num of toDelete)
+          db[\`places_backup_\${num}\`].drop();
+      toDelete = names.filter((c) => /^locations_backup_\d+\$/.test(c)).map((c) => parseInt(c.split('_').at(-1))).sort((a, b) => a - b).slice(0, -2);
+      for (let num of toDelete)
+          db[\`locations_backup_\${num}\`].drop();
+      db = db.getMongo().getDB('schedules');
+      try {db.schedules.renameCollection('schedules_backup_${CI_PIPELINE_ID}');} catch (e) {}
+      db.schedules_import.renameCollection('schedules');
+      names = db.getCollectionNames();
+      toDelete = names.filter((c) => /^schedules_backup_\d+\$/.test(c)).map((c) => parseInt(c.split('_').at(-1))).sort((a, b) => a - b).slice(0, -2);
+      for (let num of toDelete)
+          db[\`schedules_backup_\${num}\`].drop();"
   - |
     for element in "${allocation_ids[@]}"; do
         nomad alloc restart "${element}"
@@ -249,7 +263,7 @@ import-to-sandbox:
 deploy-in-sandbox:
   extends: [".deploy-in-server", ".sandbox"]
   stage: dev-deploy
-  needs: ["dev-export", "import-to-sandbox", "dev-validate"]
+  needs: ["import-to-sandbox", "deploy-in-dev"]
 
 prod-import:
   extends: [".import", ".prod"]
