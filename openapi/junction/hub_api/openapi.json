@@ -83,6 +83,12 @@
       ]
     },
     {
+      "name": "Resellers",
+      "tags": [
+        "resellers"
+      ]
+    },
+    {
       "name": "Transactions",
       "tags": [
         "transactions"
