@@ -34,6 +34,10 @@ variable "count" {
   type = number
 }
 
+variable "matrix_homeserver_url" {
+  type = string
+}
+
 job "plus-webhooks-http" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -119,7 +123,7 @@ job "plus-webhooks-http" {
     task "http" {
       driver = "docker"
       vault {
-        policies = ["plus-webhooks-${var.environment}", "notification-center-${var.environment}", "poc-api-${var.environment}"]
+        policies = ["plus-webhooks-${var.environment}", "notification-center-${var.environment}", "poc-api-${var.environment}", "matrix-bot-${var.environment}"]
       }
 
       template {
@@ -141,6 +145,10 @@ TWILIO_TOKEN={{ .Data.data.twilio_token }}
 {{ with secret "kv/data/${var.environment}/poc-api" }}
 OPENAI_API_KEY={{ .Data.data.openai_api_key }}
 OPENAI_ORG={{ .Data.data.openai_org }}
+{{ end }}
+{{ with secret "kv/data/${var.environment}/matrix-bot" }}
+MATRIX_USER={{ .Data.data.matrix_user }}
+MATRIX_PASSWORD={{ .Data.data.matrix_password }}
 {{ end }}
 EOH
       }
@@ -169,8 +177,7 @@ EOH
         REDIS_PREFIX          = "junction-plus"
         SHORTENER_DOMAIN      = "bdvp.short.gy"
         SHORTENER_URL         = "https://api.short.io/links"
-        MATRIX_HOMESERVER_URL = "127.0.0.1:8008"
-        MATRIX_TOKEN          = "..."
+        MATRIX_HOMESERVER_URL = "${var.matrix_homeserver_url}"
       }
     }
   }

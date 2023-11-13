@@ -29,7 +29,8 @@ class Settings(application.Settings):
     shortener_url: str
     shortener_domain: str
     matrix_homeserver_url: str
-    matrix_token: str
+    matrix_user: str
+    matrix_password: str
 
 
 def create_dependencies(

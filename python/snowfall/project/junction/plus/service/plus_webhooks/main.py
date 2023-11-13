@@ -3,7 +3,6 @@ import pathlib
 import random
 
 import openai
-from nio import AsyncClient, AsyncClientConfig, RoomMessageText
 from redis import asyncio as aioredis
 from starlette.middleware import Middleware
 from twilio.request_validator import RequestValidator
@@ -32,7 +31,7 @@ from snowfall.project.junction.plus.service.plus_webhooks import (
     open_ai,
 )
 from snowfall.project.junction.plus.service.plus_webhooks.matrix_callbacks import (
-    MatrixCallbacks,
+    MatrixChatbot,
 )
 from snowfall.project.junction.plus.service.plus_webhooks.routes import router
 from snowfall.project.junction.plus.service.plus_webhooks.shortener import (
@@ -151,15 +150,9 @@ async def _serve(
         ).client(),
         prefix=app.settings.redis_prefix,
     )
-
-    client_config = AsyncClientConfig(max_limit_exceeded=0, max_timeouts=0)
-    matrix_client = AsyncClient(
-        app.settings.matrix_homeserver_url,
-        config=client_config,
-    )
-    matrix_client.access_token = app.settings.matrix_token
-    callbacks = MatrixCallbacks(
-        matrix_client=matrix_client,
+    matrix_chatbot = MatrixChatbot(
+        homeserver=app.settings.matrix_homeserver_url,
+        user=app.settings.matrix_user,
         redis_client=redis_client,
         subscribers_client=subscribers.GrpcClient(
             subscribers=notifications_pb2_grpc.SubscriberServiceStub(
@@ -172,9 +165,7 @@ async def _serve(
             ),
         ),
     )
-    matrix_client.add_event_callback(callbacks.message_callback, (RoomMessageText,))
-
-    await matrix_client.sync_forever(timeout=30000)
+    await matrix_chatbot.run_bot(app.settings.matrix_password)
 
 
 if __name__ == "__main__":
