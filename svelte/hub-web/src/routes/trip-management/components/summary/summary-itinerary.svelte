@@ -22,8 +22,13 @@
   import { createEventDispatcher } from "svelte";
   import type { TripOfferPriceQuote } from "integration/junction-mobile-api/schemas/trip-offer-price-quote";
   import type { OfferSegmentLeg } from "integration/common/schemas/offer-segment-leg";
+  import EntityAvatar from "components/ui/entity-avatar.svelte";
 
   export let priceQuote: TripOfferPriceQuote;
+
+  $: vendor = priceQuote.options[0]?.detailsList[0]?.details?.vendor ?? "Unknown";
+  $: segmentCount = priceQuote.options[0]?.detailsList.length ?? 1;
+  $: departureLeg = priceQuote.options[0]?.detailsList[0]?.details?.legs[0];
 
   const dispatch = createEventDispatcher<{ showFareRules: void }>();
 
@@ -35,6 +40,23 @@
 </script>
 
 <Collapsible class="itinerary" title="Itinerary">
+  <div class="trip-info typography body-small">
+    <div>
+      <EntityAvatar name={vendor} size="24px" />
+      {vendor} • {segmentCount === 1 ? "Direct" : `${segmentCount} stops`}
+    </div>
+    <span>
+      {#if departureLeg}
+        {departureLeg.departureAt.toLocaleDateString("sv-SE", {
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+          timeZone: departureLeg.origin.timeZone,
+        })}
+      {/if}
+    </span>
+  </div>
+
   <ul class="segments">
     {#each legs as leg}
       <li class="segment typography label-large bold">
@@ -77,6 +99,18 @@
     --border-radius: 0;
     --padding: 0;
     --background-color: transparent;
+  }
+
+  .trip-info {
+    display: flex;
+    flex-flow: column;
+    gap: 8px;
+  }
+
+  .trip-info > div {
+    display: flex;
+    gap: 8px;
+    align-items: center;
   }
 
   .segments {
