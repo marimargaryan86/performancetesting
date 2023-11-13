@@ -4194,6 +4194,19 @@
                     ],
                     "description": "The amount, we pay to reseller"
                   },
+                  "refundPosition": {
+                    "readOnly": true,
+                    "nullable": true,
+                    "anyOf": [
+                      {
+                        "$ref": "#/components/schemas/Money"
+                      },
+                      {
+                        "nullable": true
+                      }
+                    ],
+                    "description": "Profit or loss due to conversion the funds to original currency"
+                  },
                   "invoiceReference": {
                     "type": "string",
                     "maxLength": 256,
@@ -4236,15 +4249,6 @@
                         "nullable": true
                       }
                     }
-                  },
-                  "refundPosition": {
-                    "readOnly": true,
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/RefundPosition"
-                      }
-                    ],
-                    "description": "Profit or loss due to conversion the funds to original currency"
                   }
                 }
               }
