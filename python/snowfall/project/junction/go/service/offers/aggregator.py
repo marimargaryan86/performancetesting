@@ -190,8 +190,8 @@ class OfferAggregator(object):
         search_result: amqp_pb2.TripOfferSearchResult,
     ) -> None:
         offer_search = await self._get_offer_search(search_result)
-
-        _set_sequence_numbers(offer_search, search_result.offer)
+        if offer_search.HasField("trip"):
+            _set_sequence_numbers(offer_search, search_result.offer)
 
         buckets = _override_buckets(
             search_result,
@@ -200,11 +200,14 @@ class OfferAggregator(object):
 
         await self._buckets.add_offer(offer_search.id, search_result.offer)
 
-        segments = itertools.chain(*[trip.segments for trip in offer_search.trip.trips])
+        if offer_search.HasField("trip"):
+            segments = itertools.chain(
+                *[trip.segments for trip in offer_search.trip.trips],
+            )
 
-        # check if all segments can be fulfilled by offers gotten so far
-        if any(segment.id not in buckets for segment in segments):
-            return
+            # check if all segments can be fulfilled by offers gotten so far
+            if any(segment.id not in buckets for segment in segments):
+                return
 
         try:
             expires_at = await self._buckets.get_bucket_list_expiry(offer_search)

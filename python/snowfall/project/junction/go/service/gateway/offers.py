@@ -73,8 +73,20 @@ class Service(service.Service, offers_pb2_grpc.OfferServiceServicer):
                         request.trip_offer_search_task.offer_search_id,
                     ),
                 )
-
                 identifier = request.trip_offer_search_task.offer_search_id
+
+            case "simple_offer_search_task":
+                await asyncio.gather(
+                    self._producer.publish(
+                        request.simple_offer_search_task,
+                        "offers.search.trip",
+                    ),
+                    self._runner.mark_as_in_progress(
+                        request.simple_offer_search_task.offer_search_id,
+                    ),
+                )
+                identifier = request.simple_offer_search_task.offer_search_id
+
             case _:
                 return await context.abort(StatusCode.UNIMPLEMENTED)
 
@@ -93,7 +105,11 @@ class Service(service.Service, offers_pb2_grpc.OfferServiceServicer):
         )
 
 
-class Queue(consumer.AbstractQueue[amqp_pb2.TripOfferSearchTask]):
+class Queue(
+    consumer.AbstractQueue[
+        amqp_pb2.TripOfferSearchTask | amqp_pb2.SimpleTripOfferSearchTask
+    ],
+):
     def __init__(
         self,
         name_prefix: str,
@@ -116,9 +132,19 @@ class Queue(consumer.AbstractQueue[amqp_pb2.TripOfferSearchTask]):
     def name(self) -> str:
         return "{0}_offer_searches".format(self._name_prefix)
 
-    async def on_message(self, msg: amqp.Message[amqp_pb2.TripOfferSearchTask]) -> None:
+    async def on_message(
+        self,
+        msg: amqp.Message[  # noqa: WPS320
+            amqp_pb2.TripOfferSearchTask | amqp_pb2.SimpleTripOfferSearchTask
+        ],
+    ) -> None:
         match msg.body:
             case amqp_pb2.TripOfferSearchTask():
+                await self._runner.run(
+                    msg.body.offer_search_id,
+                    self._consume_trip_task(msg.body),
+                )
+            case amqp_pb2.SimpleTripOfferSearchTask():
                 await self._runner.run(
                     msg.body.offer_search_id,
                     self._consume_trip_task(msg.body),
@@ -126,10 +152,10 @@ class Queue(consumer.AbstractQueue[amqp_pb2.TripOfferSearchTask]):
 
     async def _consume_trip_task(
         self,
-        msg: amqp_pb2.TripOfferSearchTask,
+        msg: amqp_pb2.TripOfferSearchTask | amqp_pb2.SimpleTripOfferSearchTask,
     ) -> AsyncGenerator[amqp_pb2.TripOfferSearchResult, None]:
         search_tasks = [
-            _do_trip_offer_search(provider, msg, self._timeout)
+            _do_offer_search(provider, msg, self._timeout)
             async for provider in self._providers.all_healthy()
         ]
 
@@ -140,19 +166,30 @@ class Queue(consumer.AbstractQueue[amqp_pb2.TripOfferSearchTask]):
                 yield offer
 
 
-async def _do_trip_offer_search(
+async def _do_offer_search(
     provider: providers.Provider,
-    msg: amqp_pb2.TripOfferSearchTask,
+    msg: amqp_pb2.TripOfferSearchTask | amqp_pb2.SimpleTripOfferSearchTask,
     timeout: datetime.timedelta,
 ) -> providers_pb2.SearchOffersResponse:
     start = time.perf_counter()
     status = "ok"
 
     try:
-        response = await provider.connection.offers.SearchOffers(
-            providers_pb2.SearchOffersRequest(trip_offer_search_task=msg),
-            timeout=timeout.total_seconds(),
-        )
+        if isinstance(msg, amqp_pb2.SimpleTripOfferSearchTask):
+            response = await provider.connection.simple_search.SimpleSearchOffers(
+                providers_pb2.SimpleSearchOffersRequest(
+                    simple_offer_search_task=msg,
+                ),
+                timeout=timeout.total_seconds(),
+            )
+        else:
+            response = await provider.connection.offers.SearchOffers(
+                providers_pb2.SearchOffersRequest(
+                    trip_offer_search_task=msg,
+                ),
+                timeout=timeout.total_seconds(),
+            )
+
     except aio.AioRpcError:
         _failed.labels(provider_id=provider.identifier).inc()
         response = providers_pb2.SearchOffersResponse()
@@ -163,7 +200,7 @@ async def _do_trip_offer_search(
     _histogram.labels(provider_id=provider.identifier, status=status).observe(exec_time)
     _total.labels(provider_id=provider.identifier, status=status).inc()
     _logger.info(
-        "trip offer search performed",
+        "offer search performed",
         provider_id=provider.identifier,
         failed=status == "nok",
         results=len(response.trip_offer_search_results.results),

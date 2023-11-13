@@ -33,6 +33,7 @@ ExpectedMessages = (
     amqp_pb2.TripOfferSearchResult
     | trackable_pb2.Trackable
     | amqp_pb2.TripOfferSearchTask
+    | amqp_pb2.SimpleTripOfferSearchTask
 )
 _PROVIDERS_TO_DISABLED_OPERATORS = dict[str, list[str]]
 RESELLERS_TO_PROVIDER_OPERATORS = dict[str, _PROVIDERS_TO_DISABLED_OPERATORS]
@@ -137,7 +138,7 @@ class OfferImporter(object):
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
 
-    async def _process_message(
+    async def _process_message(  # noqa: WPS217
         self,
         message: amqp_types.Message[ExpectedMessages],
     ) -> None:
@@ -159,10 +160,16 @@ class OfferImporter(object):
                 except Exception:
                     await self._searches.mark_as_failed(message.body.offer_search_id)
                     raise
+            case amqp_pb2.SimpleTripOfferSearchTask():
+                try:
+                    await self._process_trip_offer_search(message.body)
+                except Exception:
+                    await self._searches.mark_as_failed(message.body.offer_search_id)
+                    raise
 
     async def _process_trip_offer_search(  # noqa: WPS217
         self,
-        message: amqp_pb2.TripOfferSearchTask,
+        message: amqp_pb2.TripOfferSearchTask | amqp_pb2.SimpleTripOfferSearchTask,
     ) -> None:
         offer_search = await self._searches.find_by_id(message.offer_search_id)
 
@@ -171,13 +178,20 @@ class OfferImporter(object):
 
         await self._searches.mark_as_processing(offer_search.id)
 
-        response = await self._gateway_stubs.EnqueueOfferSearch(
-            offers_pb2.EnqueueOfferSearchRequest(
-                trip_offer_search_task=message,
-            ),
-            timeout=self._gateway_timeout.total_seconds(),
-        )
-
+        if isinstance(message, amqp_pb2.SimpleTripOfferSearchTask):
+            response = await self._gateway_stubs.EnqueueOfferSearch(
+                offers_pb2.EnqueueOfferSearchRequest(
+                    simple_offer_search_task=message,
+                ),
+                timeout=self._gateway_timeout.total_seconds(),
+            )
+        else:
+            response = await self._gateway_stubs.EnqueueOfferSearch(
+                offers_pb2.EnqueueOfferSearchRequest(
+                    trip_offer_search_task=message,
+                ),
+                timeout=self._gateway_timeout.total_seconds(),
+            )
         # should be identical to what we've already
         # got, but let's not make any assumptions.
         gw_offer_search_id = response.id

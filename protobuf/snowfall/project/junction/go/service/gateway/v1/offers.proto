@@ -14,6 +14,7 @@ service OfferService {
 message EnqueueOfferSearchRequest {
   oneof offer_search_task {
     snowfall.project.junction.go.service.offers.v1.TripOfferSearchTask trip_offer_search_task = 1;
+    snowfall.project.junction.go.service.offers.v1.SimpleTripOfferSearchTask simple_offer_search_task = 2;
   }
 }
 

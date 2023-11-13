@@ -21,12 +21,21 @@ class OfferSearchProducer(object):
         self,
         offer_search: models_pb2.OfferSearch,
     ) -> None:
-        msg = amqp_pb2.TripOfferSearchTask(
-            offer_search_id=offer_search.id,
-            search=offer_search.trip,
-            session_token=offer_search.session_token,
-            reseller_id=offer_search.reseller_id,
-        )
+        msg: amqp_pb2.TripOfferSearchTask | amqp_pb2.SimpleTripOfferSearchTask
+        if offer_search.HasField("simple_trip"):
+            msg = amqp_pb2.SimpleTripOfferSearchTask(
+                offer_search_id=offer_search.id,
+                search=offer_search.simple_trip,
+                session_token=offer_search.session_token,
+                reseller_id=offer_search.reseller_id,
+            )
+        else:
+            msg = amqp_pb2.TripOfferSearchTask(
+                offer_search_id=offer_search.id,
+                search=offer_search.trip,
+                session_token=offer_search.session_token,
+                reseller_id=offer_search.reseller_id,
+            )
 
         if isinstance(self._producer, trackable.TrackableProducer):
             await self._producer.publish(

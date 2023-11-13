@@ -11,7 +11,13 @@ from aio_pika import abc
 from google.protobuf import message
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.provider import bookings, meta, offers
+from snowfall.project.junction.provider import (
+    bookings,
+    meta,
+    offers,
+    simple_offers,
+    trips,
+)
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.service import amqp_factory, application, redis_factory
 from snowfall.stdlib.transport.grpc import server as grpc_server
@@ -55,18 +61,40 @@ if TYPE_CHECKING:
             offers.OfferSearchImplementation[_SearchCriteriaTask, _SearchCriteria]
         ],
     ]
-
+    SimpleOffersFactory = Callable[
+        [
+            application.Application[_Settings],
+            abc.AbstractConnection,
+            aioredis.Redis[bytes],  # TODO: accept Redis client instead.
+            contextlib.AsyncExitStack,
+        ],
+        Awaitable[
+            simple_offers.SimpleOfferSearchImplementation[
+                _SearchCriteriaTask,
+                _SearchCriteria,
+            ]
+        ],
+    ]
     OF = OffersFactory[_Settings, _SearchCriteriaTask, _SearchCriteria]
+    SF = SimpleOffersFactory[_Settings, _SearchCriteriaTask, _SearchCriteria]
     BookingFactory = Callable[
         [application.Application[_Settings]],
         Awaitable[bookings.Implementation],
+    ]
+    TripsFactory = Callable[
+        [application.Application[_Settings]],
+        Awaitable[trips.Implementation],
     ]
 
 
 def _grpc_command(  # noqa: WPS217
     meta_factory: MetaFactory,
     offers_factory: OF[_Settings, _SearchCriteriaTask, _SearchCriteria] | None = None,
+    simple_offers_factory: (  # noqa: WPS320
+        SF[_Settings, _SearchCriteriaTask, _SearchCriteria] | None
+    ) = None,
     bookings_factory: BookingFactory[_Settings] | None = None,
+    trips_factory: TripsFactory[_Settings] | None = None,
 ) -> application.Callback[_Settings]:
     async def wrapper(  # noqa: WPS217
         app: application.Application[_Settings],
@@ -108,10 +136,39 @@ def _grpc_command(  # noqa: WPS217
                 ),
             )
 
+        if simple_offers_factory:
+            simple_offers_implementation = await simple_offers_factory(
+                app,
+                connection,
+                redis_conn,
+                app.stack,
+            )
+            services.append(
+                simple_offers.SimpleSearchService(
+                    simple_offers.SimpleOfferSearcher.from_implementation(
+                        implementation=simple_offers_implementation,
+                        redis_client=redis.Client[bytes](redis_conn, prefix=app.name),
+                    ),
+                    enabled_resellers=[
+                        reseller_id
+                        for reseller_id, providers in app.settings.reseller_providers.items()
+                        if str(meta_implementation.identifier) in providers
+                    ],
+                    provider_company_id=app.settings.provider_company_id,
+                    provider_name=meta_implementation.name,
+                ),
+            )
+
         if bookings_factory:
             bookings_implementation = await bookings_factory(app)
             services.append(
                 bookings.BookingService(implementation=bookings_implementation),
+            )
+
+        if trips_factory:
+            trips_implementation = await trips_factory(app)
+            services.append(
+                trips.TripService(implementation=trips_implementation),
             )
 
         server = grpc_server.create_server(
@@ -155,6 +212,44 @@ def _offers_command(
     return wrapper
 
 
+def _simple_offers_command(
+    meta_factory: MetaFactory,
+    simple_offers_factory: SimpleOffersFactory[  # noqa: WPS320
+        _Settings,
+        _SearchCriteriaTask,
+        _SearchCriteria,
+    ],
+) -> application.Callback[_Settings]:
+    async def wrapper(app: application.Application[_Settings]) -> None:
+        meta_implementation = await meta_factory()
+        redis_conn = await redis_factory.make_connection(
+            app=app,
+            dsn=app.settings.redis_dsn,
+            decode_responses=False,
+        )
+        connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
+
+        trip_search_consumer = simple_offers.create_trip_offer_search_consumer(
+            amqp_connection=connection,
+            redis_client=redis.Client[bytes](redis_conn, prefix=app.name),
+            implementation=await simple_offers_factory(
+                app,
+                connection,
+                redis_conn,
+                app.stack,
+            ),
+            app_name=app.name,
+            pay_company_id=app.settings.provider_company_id,
+            provider_name=meta_implementation.name,
+            provider_id=str(meta_implementation.identifier),
+            reseller_providers=app.settings.reseller_providers,
+        )
+
+        await trip_search_consumer.consume()
+
+    return wrapper
+
+
 @dataclasses.dataclass(frozen=True, kw_only=True)
 class Entrypoint(
     Generic[_Settings, _SearchCriteriaTask, _SearchCriteria],
@@ -170,7 +265,16 @@ class Entrypoint(
         ]
         | None
     ) = None
+    simple_offers_factory: (
+        SimpleOffersFactory[
+            _Settings,
+            _SearchCriteriaTask,
+            _SearchCriteria,
+        ]
+        | None
+    ) = None
     bookings_factory: BookingFactory[_Settings] | None = None
+    trips_factory: TripsFactory[_Settings] | None = None
 
     def __post_init__(self) -> None:
         super().__post_init__()
@@ -180,7 +284,9 @@ class Entrypoint(
                 callback=_grpc_command(
                     self.meta_factory,
                     self.offers_factory,
+                    self.simple_offers_factory,
                     self.bookings_factory,
+                    self.trips_factory,
                 ),
                 settings_class=self.settings_class,
             ),
@@ -192,6 +298,19 @@ class Entrypoint(
                 application.Command(
                     name="offers",
                     callback=_offers_command(self.meta_factory, self.offers_factory),
+                    settings_class=self.settings_class,
+                ),
+            )
+
+        # backwards compatibility
+        if self.simple_offers_factory:
+            self.add_command(
+                application.Command(
+                    name="simple-offers",
+                    callback=_simple_offers_command(
+                        self.meta_factory,
+                        self.simple_offers_factory,
+                    ),
                     settings_class=self.settings_class,
                 ),
             )

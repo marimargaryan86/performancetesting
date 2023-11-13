@@ -187,6 +187,7 @@ class Connection(object):
         self._bookings = bookings_pb2_grpc.BookingServiceStub(self._channel)
         self._meta = meta_pb2_grpc.MetaServiceStub(self._channel)
         self._offers = offers_pb2_grpc.OfferServiceStub(self._channel)
+        self._simple_search = offers_pb2_grpc.SimpleOfferServiceStub(self._channel)
         self._trips = trips_pb2_grpc.TripServiceStub(self._channel)
 
     @property
@@ -200,6 +201,10 @@ class Connection(object):
     @property
     def offers(self) -> offers_pb2_grpc.OfferServiceStub:
         return self._offers
+
+    @property
+    def simple_search(self) -> offers_pb2_grpc.SimpleOfferServiceStub:
+        return self._simple_search
 
     @property
     def trips(self) -> trips_pb2_grpc.TripServiceStub:

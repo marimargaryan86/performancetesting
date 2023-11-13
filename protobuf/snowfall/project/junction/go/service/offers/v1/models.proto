@@ -39,6 +39,7 @@ message SimpleTripOfferSearch {
   google.protobuf.Timestamp departure_at = 3;
   repeated Passenger passengers = 4;
   repeated snowfall.project.junction.go.v1.Schedule.Type allowed_segment_types = 6;
+  string session_token = 7;
 }
 
 message Passenger {

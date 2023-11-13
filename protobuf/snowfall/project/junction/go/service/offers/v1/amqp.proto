@@ -6,6 +6,13 @@ import "snowfall/project/junction/go/service/offers/v1/models.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/offers/v1";
 
+message SimpleTripOfferSearchTask {
+  string offer_search_id = 1;
+  SimpleTripOfferSearch search = 2;
+  string session_token = 3;
+  string reseller_id = 4;
+}
+
 message TripOfferSearchTask {
   string offer_search_id = 1;
   TripOfferSearch search = 2;
@@ -18,13 +25,6 @@ message TripOfferSearchResult {
   OfferGroup offer = 2;
   string provider_company_id = 3;
   string provider_name = 4;
-}
-
-message SimpleTripOfferSearchTask {
-  string offer_search_id = 1;
-  SimpleTripOfferSearch search = 2;
-  string session_token = 3;
-  string reseller_id = 4;
 }
 
 message TripPriceQuoteTask {
