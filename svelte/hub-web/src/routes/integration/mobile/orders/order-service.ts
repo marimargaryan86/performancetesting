@@ -14,6 +14,10 @@ async function create({ data }: { data: OrderCreate }): ReturnType<OrderService[
   });
   const resp = await fetch(url, { method: "POST", body: devalue.stringify(data) });
 
+  if (resp.status !== 200) {
+    throw new Error("An unexpected error occurred");
+  }
+
   return devalue.parse(await resp.text());
 }
 
@@ -26,6 +30,10 @@ async function find({
 }): ReturnType<OrderService["find"]> {
   const url = new URLExtended(ROOT, { base: origin, query: { cursor, limit, action: "find" } });
   const resp = await fetch(url);
+
+  if (resp.status !== 200) {
+    throw new Error("An unexpected error occurred");
+  }
 
   return devalue.parse(await resp.text());
 }

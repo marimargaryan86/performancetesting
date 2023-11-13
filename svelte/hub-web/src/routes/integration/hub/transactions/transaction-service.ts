@@ -30,12 +30,20 @@ async function find({
   });
   const resp = await fetch(url);
 
+  if (resp.status !== 200) {
+    throw new Error("An unexpected error occurred");
+  }
+
   return devalue.parse(await resp.text());
 }
 
 async function get({ id }: { id: string }): ReturnType<TransactionService["get"]> {
   const url = new URLExtended(ROOT, { base: origin, query: { id, action: "get" } });
   const resp = await fetch(url);
+
+  if (resp.status !== 200) {
+    throw new Error("Transaction not found");
+  }
 
   return devalue.parse(await resp.text());
 }

@@ -21,6 +21,10 @@ async function find({
   });
   const resp = await fetch(url);
 
+  if (resp.status !== 200) {
+    throw new Error("An unexpected error occurred");
+  }
+
   return devalue.parse(await resp.text());
 }
 
@@ -42,6 +46,10 @@ async function toggleReconciliation({
 }): ReturnType<BillService["toggleReconciliation"]> {
   const url = new URLExtended(ROOT, { base: origin, query: { action: "toggleReconciliation" } });
   const resp = await fetch(url, { method: "POST", body: devalue.stringify(bill) });
+
+  if (resp.status !== 200) {
+    throw new Error("An unexpected error occurred");
+  }
 
   return devalue.parse(await resp.text());
 }

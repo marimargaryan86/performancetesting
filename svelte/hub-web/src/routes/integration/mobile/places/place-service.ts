@@ -16,6 +16,10 @@ async function find(query: string): ReturnType<PlaceService["find"]> {
   });
   const resp = await fetch(url);
 
+  if (resp.status !== 200) {
+    throw new Error("An unexpected error occurred");
+  }
+
   return devalue.parse(await resp.text());
 }
 

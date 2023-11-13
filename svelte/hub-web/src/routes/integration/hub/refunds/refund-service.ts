@@ -19,6 +19,10 @@ async function find({
   });
   const resp = await fetch(url);
 
+  if (resp.status !== 200) {
+    throw new Error("An unexpected error occurred");
+  }
+
   return devalue.parse(await resp.text());
 }
 
@@ -29,6 +33,10 @@ async function get({ id }: { id: string }): ReturnType<RefundService["get"]> {
   });
   const resp = await fetch(url);
 
+  if (resp.status !== 200) {
+    throw new Error("Refund not found");
+  }
+
   return devalue.parse(await resp.text());
 }
 
@@ -38,6 +46,10 @@ async function create({ data }: { data: RefundPut }): ReturnType<RefundService["
     query: { action: "create" },
   });
   const resp = await fetch(url, { method: "POST", body: devalue.stringify(data) });
+
+  if (resp.status !== 200) {
+    throw new Error("An unexpected error occurred");
+  }
 
   return devalue.parse(await resp.text());
 }
@@ -55,6 +67,10 @@ async function update({
   });
   const resp = await fetch(url, { method: "POST", body: devalue.stringify(data) });
 
+  if (resp.status !== 200) {
+    throw new Error("An unexpected error occurred");
+  }
+
   return devalue.parse(await resp.text());
 }
 
@@ -70,6 +86,10 @@ async function getRefundPosition({
     query: { refundId, action: "getRefundPosition" },
   });
   const resp = await fetch(url, { method: "POST", body: devalue.stringify(data) });
+
+  if (resp.status !== 200) {
+    throw new Error("An unexpected error occurred");
+  }
 
   return devalue.parse(await resp.text());
 }
