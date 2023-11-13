@@ -1,4 +1,4 @@
 nomad_template(
-    ["offers", "pricing", "orders", "notifications", "grpc", "simple_search"],
+    ["offers", "pricing", "orders", "notifications", "grpc", "simple_offers"],
     "python/snowfall/project/junction/service/providers/benerail:main",
 )

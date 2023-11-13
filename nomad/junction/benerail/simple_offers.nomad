@@ -34,7 +34,11 @@ variable "api_base_url" {
   type = string
 }
 
-job "benerail-simple-search" {
+variable "bucket" {
+  type = string
+}
+
+job "benerail-simple-offers" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 
@@ -47,7 +51,7 @@ job "benerail-simple-search" {
     progress_deadline = "4m"
   }
 
-  group "simple-search" {
+  group "simple-offers" {
     count = "${var.count}"
 
     restart {
@@ -84,7 +88,7 @@ job "benerail-simple-search" {
         timeout  = "2s"
       }
     }
-    task "simple-search" {
+    task "simple-offers" {
       driver = "docker"
       vault {
         policies = ["benerail-${var.environment}"]
@@ -96,6 +100,7 @@ AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 {{ with secret "kv/data/${var.environment}/benerail" }}
+STORAGE_DSN=s3://{{ .Data.data.aws_access_key_id }}:{{ .Data.data.aws_secret_access_key | urlquery }}@/${var.bucket}/benerail
 SUBSCRIPTION_KEY={{ .Data.data.subscription_key }}
 CERT_BASE64={{ .Data.data.cert_base64 }}
 {{ end }}
@@ -110,7 +115,7 @@ EOH
         image = var.docker_image
         ports = ["prometheus"]
         args = [
-          "simple_search",
+          "simple_offers",
         ]
 
         auth {

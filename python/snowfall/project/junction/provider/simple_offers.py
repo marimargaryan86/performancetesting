@@ -8,7 +8,6 @@ from typing import Generic, TypeVar
 
 from aio_pika import abc
 from aiostream import stream
-from google.protobuf import message
 from grpc import aio
 
 from snowfall.project.junction.go.service.offers.v1 import amqp_pb2 as offers_amqp_pb2
@@ -25,13 +24,12 @@ from snowfall.stdlib.transport.amqp import trackable
 from snowfall.stdlib.transport.amqp import types as amqp_types
 from snowfall.stdlib.transport.grpc import service
 
-_SearchCriteriaTask = TypeVar("_SearchCriteriaTask", bound=message.Message)
 _SearchCriteria = TypeVar("_SearchCriteria", bound=object)
 SimpleSearchCriteriaTaskGenerator = Callable[
     [legacy_offers_pb2.SimpleTripOfferSearch],
-    list[_SearchCriteriaTask],
+    list[_SearchCriteria],
 ]
-SimpleSearchCriteriaGenerator = Callable[[_SearchCriteriaTask], _SearchCriteria]
+SimpleSearchCriteriaGenerator = Callable[[_SearchCriteria], _SearchCriteria]
 OfferGroupGenerator = Callable[
     [_SearchCriteria],
     AsyncIterator[legacy_offers_pb2.OfferGroup],
@@ -40,29 +38,21 @@ _DEFAULT_ALLOWED_WINDOW_TD = datetime.timedelta(minutes=0)
 
 
 @dataclasses.dataclass(frozen=True)
-class SimpleOfferSearchImplementation(Generic[_SearchCriteriaTask, _SearchCriteria]):
-    search_criteria_task_generator: SimpleSearchCriteriaTaskGenerator[
-        _SearchCriteriaTask
-    ]
-    search_criteria_generator: SimpleSearchCriteriaGenerator[
-        _SearchCriteriaTask,
-        _SearchCriteria,
-    ]
+class SimpleOfferSearchImplementation(Generic[_SearchCriteria]):
+    search_criteria_task_generator: SimpleSearchCriteriaTaskGenerator[_SearchCriteria]
+    search_criteria_generator: SimpleSearchCriteriaGenerator[_SearchCriteria]
     offer_group_cache_key_generator: repository.CacheKeyGenerator[_SearchCriteria]
     offer_group_generator: repository.OfferGroupGenerator[_SearchCriteria]
     allowed_window_td: datetime.timedelta = _DEFAULT_ALLOWED_WINDOW_TD
 
 
-class SimpleOfferSearcher(Generic[_SearchCriteriaTask, _SearchCriteria]):
+class SimpleOfferSearcher(Generic[_SearchCriteria]):
     _search_timeout_s = 50  # noqa: WPS432
 
     def __init__(
         self,
-        task_generator: SimpleSearchCriteriaTaskGenerator[_SearchCriteriaTask],
-        criteria_generator: SimpleSearchCriteriaGenerator[  # noqa: WPS320
-            _SearchCriteriaTask,
-            _SearchCriteria,
-        ],
+        task_generator: SimpleSearchCriteriaTaskGenerator[_SearchCriteria],
+        criteria_generator: SimpleSearchCriteriaGenerator[_SearchCriteria],
         offer_group_repository: repository.OfferGroupRepository[_SearchCriteria],
         allowed_window_td: datetime.timedelta = _DEFAULT_ALLOWED_WINDOW_TD,
     ):
@@ -75,12 +65,9 @@ class SimpleOfferSearcher(Generic[_SearchCriteriaTask, _SearchCriteria]):
     @classmethod
     def from_implementation(
         cls,
-        implementation: SimpleOfferSearchImplementation[  # noqa: WPS320
-            _SearchCriteriaTask,
-            _SearchCriteria,
-        ],
+        implementation: SimpleOfferSearchImplementation[_SearchCriteria],
         redis_client: redis.Client[bytes],
-    ) -> SimpleOfferSearcher[_SearchCriteriaTask, _SearchCriteria]:
+    ) -> SimpleOfferSearcher[_SearchCriteria]:
         return cls(
             task_generator=implementation.search_criteria_task_generator,
             criteria_generator=implementation.search_criteria_generator,
@@ -111,7 +98,7 @@ class SimpleOfferSearcher(Generic[_SearchCriteriaTask, _SearchCriteria]):
 
     async def _process_simple_search_task(
         self,
-        task: _SearchCriteriaTask,
+        task: _SearchCriteria,
     ) -> AsyncIterator[legacy_offers_pb2.OfferGroup]:
         search_criteria = self._search_criteria_generator(task)
         offer_groups = self._offer_group_repository.find(search_criteria)
@@ -128,10 +115,7 @@ class SimpleOfferSearcher(Generic[_SearchCriteriaTask, _SearchCriteria]):
 class SimpleSearchService(service.Service, offers_pb2_grpc.SimpleOfferServiceServicer):
     def __init__(
         self,
-        simple_offer_searcher: SimpleOfferSearcher[  # noqa: WPS320
-            _SearchCriteriaTask,
-            _SearchCriteria,
-        ],
+        simple_offer_searcher: SimpleOfferSearcher[_SearchCriteria],
         enabled_resellers: Sequence[str],
         provider_company_id: str,
         provider_name: str,
@@ -175,15 +159,12 @@ class SimpleSearchService(service.Service, offers_pb2_grpc.SimpleOfferServiceSer
         )
 
 
-class SimpleOfferSearchConsumer(Generic[_SearchCriteriaTask, _SearchCriteria]):
+class SimpleOfferSearchConsumer(Generic[_SearchCriteria]):
     def __init__(
         self,
         consumer: amqp_consumer.Consumer[offers_amqp_pb2.SimpleTripOfferSearchTask],
         producer: amqp_producer.Producer,
-        simple_offer_searcher: SimpleOfferSearcher[  # noqa: WPS320
-            _SearchCriteriaTask,
-            _SearchCriteria,
-        ],
+        simple_offer_searcher: SimpleOfferSearcher[_SearchCriteria],
         pay_company_id: str,
         provider_name: str,
         provider_id: str,
@@ -235,16 +216,13 @@ class SimpleOfferSearchConsumer(Generic[_SearchCriteriaTask, _SearchCriteria]):
 def create_trip_offer_search_consumer(
     amqp_connection: abc.AbstractConnection,
     redis_client: redis.Client[bytes],
-    implementation: SimpleOfferSearchImplementation[  # noqa: WPS320
-        _SearchCriteriaTask,
-        _SearchCriteria,
-    ],
+    implementation: SimpleOfferSearchImplementation[_SearchCriteria],
     app_name: str,
     pay_company_id: str,
     provider_name: str,
     provider_id: str,
     reseller_providers: Mapping[str, Sequence[str]],
-) -> SimpleOfferSearchConsumer[_SearchCriteriaTask, _SearchCriteria]:
+) -> SimpleOfferSearchConsumer[_SearchCriteria]:
     producer = amqp_producer.Producer(
         connection=amqp_connection,
         exchange=amqp_types.Exchange("offers"),

@@ -14,6 +14,10 @@ message SearchCriteriaTask {
   Criteria criteria = 2;
 }
 
+message SimpleSearchCriteriaTask {
+  Criteria criteria = 1;
+}
+
 message Criteria {
   string origin_id = 1;
   string destination_id = 2;

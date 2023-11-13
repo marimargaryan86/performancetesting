@@ -45,7 +45,6 @@ class PriceQuoteSettings(application.Settings):
 
 _SearchCriteriaTask = TypeVar("_SearchCriteriaTask", bound=message.Message)
 _SearchCriteria = TypeVar("_SearchCriteria", bound=object)
-
 _Settings = TypeVar("_Settings", bound=ProviderSettings)
 
 if TYPE_CHECKING:
@@ -68,15 +67,10 @@ if TYPE_CHECKING:
             aioredis.Redis[bytes],  # TODO: accept Redis client instead.
             contextlib.AsyncExitStack,
         ],
-        Awaitable[
-            simple_offers.SimpleOfferSearchImplementation[
-                _SearchCriteriaTask,
-                _SearchCriteria,
-            ]
-        ],
+        Awaitable[simple_offers.SimpleOfferSearchImplementation[_SearchCriteria,]],
     ]
     OF = OffersFactory[_Settings, _SearchCriteriaTask, _SearchCriteria]
-    SF = SimpleOffersFactory[_Settings, _SearchCriteriaTask, _SearchCriteria]
+    SF = SimpleOffersFactory[_Settings, _SearchCriteria]
     BookingFactory = Callable[
         [application.Application[_Settings]],
         Awaitable[bookings.Implementation],
@@ -90,9 +84,7 @@ if TYPE_CHECKING:
 def _grpc_command(  # noqa: WPS217
     meta_factory: MetaFactory,
     offers_factory: OF[_Settings, _SearchCriteriaTask, _SearchCriteria] | None = None,
-    simple_offers_factory: (  # noqa: WPS320
-        SF[_Settings, _SearchCriteriaTask, _SearchCriteria] | None
-    ) = None,
+    simple_offers_factory: SF[_Settings, _SearchCriteria] | None = None,
     bookings_factory: BookingFactory[_Settings] | None = None,
     trips_factory: TripsFactory[_Settings] | None = None,
 ) -> application.Callback[_Settings]:
@@ -214,11 +206,7 @@ def _offers_command(
 
 def _simple_offers_command(
     meta_factory: MetaFactory,
-    simple_offers_factory: SimpleOffersFactory[  # noqa: WPS320
-        _Settings,
-        _SearchCriteriaTask,
-        _SearchCriteria,
-    ],
+    simple_offers_factory: SimpleOffersFactory[_Settings, _SearchCriteria],
 ) -> application.Callback[_Settings]:
     async def wrapper(app: application.Application[_Settings]) -> None:
         meta_implementation = await meta_factory()
@@ -265,14 +253,7 @@ class Entrypoint(
         ]
         | None
     ) = None
-    simple_offers_factory: (
-        SimpleOffersFactory[
-            _Settings,
-            _SearchCriteriaTask,
-            _SearchCriteria,
-        ]
-        | None
-    ) = None
+    simple_offers_factory: SimpleOffersFactory[_Settings, _SearchCriteria] | None = None
     bookings_factory: BookingFactory[_Settings] | None = None
     trips_factory: TripsFactory[_Settings] | None = None
 
@@ -306,7 +287,7 @@ class Entrypoint(
         if self.simple_offers_factory:
             self.add_command(
                 application.Command(
-                    name="simple-offers",
+                    name="simple_offers",
                     callback=_simple_offers_command(
                         self.meta_factory,
                         self.simple_offers_factory,
