@@ -6,7 +6,7 @@ from snowfall.service.deploy import consul, dependencies, verify
 from snowfall.service.deploy.verifiers import junction_go, protocols
 from snowfall.stdlib.service import application
 
-_verifiers: tuple[protocols.Verifier, ...] = (junction_go.OfferSearchFlow(),)
+_verifiers: tuple[protocols.Verifier, ...] = (junction_go.OrdersFlow(),)
 
 
 class _VerifySettings(application.Settings):
