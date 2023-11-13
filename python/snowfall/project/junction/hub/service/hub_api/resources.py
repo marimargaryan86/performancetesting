@@ -1068,8 +1068,7 @@ class RefundPosition(models.Resource):
             id=refund_id,
             type=RefundPosition.api_type,
             attributes={
-                "currency": refund_position.currency.code,
-                "amount": refund_position.amount,
+                "refundPosition": refund_position,
             },
         )
 
