@@ -6,13 +6,13 @@
     }
   },
   "production": {
-    "deploy": false,
+    "deploy": true,
     "variables": {
       "count": 2
     }
   },
   "sandbox": {
-    "deploy": false,
+    "deploy": true,
     "variables": {
       "count": 1
     }

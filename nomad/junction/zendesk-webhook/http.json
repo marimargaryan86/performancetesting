@@ -7,9 +7,17 @@
     }
   },
   "production": {
-    "deploy": false
+    "variables": {
+      "count": 1,
+      "traefik_entrypoints": "websecure",
+      "traefik_host_URL": "webhook-zendesk.junction.travel"
+    }
   },
   "sandbox": {
-    "deploy": false
+    "variables": {
+      "count": 1,
+      "traefik_entrypoints": "websecure",
+      "traefik_host_URL": "webhook-zendesk.sandbox.junction.dev"
+    }
   }
 }
