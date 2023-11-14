@@ -234,17 +234,19 @@
     margin-top: 8px;
     color: #fe4e4e;
     font-weight: 400;
-    font-size: 10px;
+    font-size: 12px;
     font-family: Poppins, Arial, Helvetica, sans-serif;
     font-style: normal;
     line-height: 16px;
   }
 
   .help-text {
+    margin-top: 8px;
     color: var(--color-common-light-medium);
     font-weight: 400;
     font-size: 12px;
-    font-family: Inter, Arial, Helvetica, sans-serif;
-    line-height: 1.3;
+    font-family: Poppins, Arial, Helvetica, sans-serif;
+    font-style: normal;
+    line-height: 16px;
   }
 </style>

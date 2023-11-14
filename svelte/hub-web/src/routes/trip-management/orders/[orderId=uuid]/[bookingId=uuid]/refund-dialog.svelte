@@ -1,9 +1,18 @@
 <script lang="ts" context="module">
-  const refundDataModel = z.object({
-    us: z.number().min(0),
-    reseller: z.number().min(0),
-    externalReference: z.string().optional(),
-  });
+  const refundDataModel = z.discriminatedUnion("type", [
+    z.object({
+      type: z.literal("automatic"),
+      externalReference: z.string().trim().min(1).optional(),
+      us: z.number().min(0),
+      reseller: z.number().min(0),
+    }),
+    z.object({
+      type: z.literal("manual"),
+      externalReference: z.string().trim().min(1),
+      us: z.number().min(0).optional(),
+      reseller: z.number().min(0).optional(),
+    }),
+  ]);
 
   type RefundData = z.infer<typeof refundDataModel>;
 </script>
@@ -14,6 +23,7 @@
   import TextField from "components/ui/text-field.svelte";
   import integrationInstancesClient from "integration-instances-client";
   import type { TripBooking } from "integration/junction-hub-api/schemas/booking";
+  import type { Refund } from "integration/junction-hub-api/schemas/refund";
   import type { Transaction } from "integration/junction-hub-api/schemas/transaction";
   import { slideFade } from "transitions/slide-fade";
   import { pendableCall } from "utils/pendable-call";
@@ -24,16 +34,25 @@
 
   let errors: z.ZodFormattedError<z.infer<typeof refundDataModel>> | undefined;
   let refundType: "with-amount" | "no-amount" = "no-amount";
+  let refundData = getDefaultRefundData(booking.refund);
   let refundPosition = booking.refund?.refundPosition;
-  let refundData: RefundData = { us: 0, reseller: 0 };
   let refundDataDirty = true;
 
   $: if (refundType === "no-amount") {
-    refundPosition = undefined;
-    refundData = { us: 0, reseller: 0 };
+    refundPosition = booking.refund?.refundPosition;
+    refundData = getDefaultRefundData(booking.refund);
   }
+  $: refundData, (refundDataDirty = refundData.type === "automatic");
 
-  $: refundData, (refundDataDirty = true);
+  function getDefaultRefundData(refund?: Refund): RefundData {
+    return refund?.status === "failed"
+      ? { type: "manual", externalReference: "" }
+      : {
+          type: "automatic",
+          us: refund?.refunded.us?.amount ?? 0,
+          reseller: refund?.refunded.reseller?.amount ?? 0,
+        };
+  }
 
   const { pending: refreshPending, func: refreshRefundPosition } = pendableCall(
     async (): Promise<void> => {
@@ -46,6 +65,10 @@
       const parseResult = refundDataModel.safeParse(refundData);
 
       if (!parseResult.success) {
+        return;
+      }
+
+      if (parseResult.data.type === "manual") {
         return;
       }
 
@@ -78,6 +101,7 @@
     },
   );
 
+  // eslint-disable-next-line complexity
   const { pending, func: refund } = pendableCall(async () => {
     if (!(booking.refund && transaction.invoiceReference)) {
       return;
@@ -94,6 +118,7 @@
     }
 
     if (
+      parseResult.data.type === "automatic" &&
       parseResult.data.us === 0 &&
       parseResult.data.reseller === 0 &&
       !confirm("Are you sure you want to create a refund with no amounts?")
@@ -103,24 +128,33 @@
 
     booking.refund = await integrationInstancesClient.hub.refunds.update({
       id: booking.refund.id,
-      data: {
-        transactionId: transaction.id,
-        invoiceReference: transaction.invoiceReference,
-        externalReference: parseResult.data.externalReference,
-        received: true,
-        refunded: {
-          reseller: {
-            currency: transaction.amounts.quotation.currency,
-            amount: parseResult.data.reseller,
-          },
-          us: {
-            currency: transaction.amounts.beneficiary.currency,
-            amount: parseResult.data.us,
-          },
-        },
-        note: "",
-      },
+      data:
+        parseResult.data.type === "automatic"
+          ? {
+              type: "automatic",
+              transactionId: transaction.id,
+              invoiceReference: transaction.invoiceReference,
+              externalReference: parseResult.data.externalReference,
+              received: true,
+              refunded: {
+                reseller: {
+                  currency: transaction.amounts.quotation.currency,
+                  amount: parseResult.data.reseller ?? 0,
+                },
+                us: {
+                  currency: transaction.amounts.beneficiary.currency,
+                  amount: parseResult.data.us ?? 0,
+                },
+              },
+              note: "",
+            }
+          : {
+              type: "manual",
+              externalReference: parseResult.data.externalReference,
+            },
     });
+
+    refundData = getDefaultRefundData(booking.refund);
   });
 </script>
 
@@ -136,14 +170,13 @@
     </label>
   </div>
 
-  {#if refundType === "no-amount"}
-    <Button on:click={refund} variant="outline">Refund with no amount</Button>
-  {:else}
-    <form on:submit|preventDefault={refund}>
+  <form on:submit|preventDefault={refund}>
+    {#if refundType === "with-amount"}
       <div>
         <TextField
           label="Provider - how much we get back"
-          required
+          required={refundData.type === "automatic"}
+          readonly={refundData.type === "manual"}
           type="number"
           placeholder="Amount"
           bind:value={refundData.us}
@@ -159,7 +192,8 @@
       <div>
         <TextField
           label="Reseller - how much we give back"
-          required
+          required={refundData.type === "automatic"}
+          readonly={refundData.type === "manual"}
           type="number"
           placeholder="Amount"
           bind:value={refundData.reseller}
@@ -175,7 +209,7 @@
       <div>
         <TextField
           label="Refund position"
-          required
+          required={refundData.type === "automatic"}
           readonly
           type="number"
           placeholder="Amount"
@@ -187,20 +221,35 @@
           </span>
         </TextField>
       </div>
+    {/if}
 
-      {#if refundDataDirty || $refreshPending}
-        <Button on:click={refreshRefundPosition}>
-          Calculate refund position
-          {#if $refreshPending}<LoadingIcon />{/if}
-        </Button>
-      {:else}
-        <Button type="submit">
-          Issue refund
-          {#if $pending}<LoadingIcon />{/if}
-        </Button>
-      {/if}
-    </form>
-  {/if}
+    {#if refundData.type === "manual"}
+      <div transition:slideFade={{ duration: 300 }}>
+        <TextField
+          label="Refund reference"
+          required
+          placeholder="Enter refund reference"
+          bind:value={refundData.externalReference}
+          error={errors?.externalReference?._errors}
+          helpText="The refund has to be handled manually, please do so and enter the refund reference above"
+        />
+      </div>
+    {/if}
+
+    {#if refundType === "no-amount"}
+      <Button type="submit" variant="outline">Refund with no amount</Button>
+    {:else if refundDataDirty || $refreshPending}
+      <Button on:click={refreshRefundPosition}>
+        Calculate refund position
+        {#if $refreshPending}<LoadingIcon />{/if}
+      </Button>
+    {:else}
+      <Button type="submit">
+        Issue refund
+        {#if $pending}<LoadingIcon />{/if}
+      </Button>
+    {/if}
+  </form>
 </div>
 
 <style>
@@ -236,6 +285,12 @@
     display: flex;
     flex-flow: column;
     gap: 16px;
+  }
+
+  form > div {
+    display: flex;
+    flex-flow: column;
+    gap: 8px;
   }
 
   form > div > :global(.text-field) {

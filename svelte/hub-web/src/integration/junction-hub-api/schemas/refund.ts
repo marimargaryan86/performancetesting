@@ -65,12 +65,15 @@ export type Refund = {
   refundPosition?: MoneySchema;
 };
 
-export type RefundPut = Pick<
-  Refund,
-  "received" | "note" | "invoiceReference" | "externalReference" | "transactionId"
-> & {
-  refunded: Pick<Refund["refunded"], "reseller" | "us">;
-};
+export type RefundPut =
+  | (Pick<
+      Refund,
+      "received" | "note" | "invoiceReference" | "externalReference" | "transactionId"
+    > & {
+      type: "automatic";
+      refunded: Pick<Refund["refunded"], "reseller" | "us">;
+    })
+  | (Required<Pick<Refund, "externalReference">> & { type: "manual" });
 
 export type RefundSchema = {
   id: string;
@@ -93,10 +96,16 @@ export type RefundSchema = {
   links: { self: string };
 };
 
-export type RefundPutSchema = Pick<RefundSchema, "type"> & {
-  attributes: Omit<RefundSchema["attributes"], "status" | "refundedUsInPayerCurrency">;
-  relationships: Pick<RefundSchema["relationships"], "transaction">;
-};
+export type RefundPutSchema = Pick<RefundSchema, "type"> &
+  (
+    | {
+        attributes: Omit<RefundSchema["attributes"], "status" | "refundedUsInPayerCurrency">;
+        relationships: Pick<RefundSchema["relationships"], "transaction">;
+      }
+    | {
+        attributes: Pick<RefundSchema["attributes"], "externalReference">;
+      }
+  );
 
 export const refundParser = {
   toModel: (data: RefundSchema, included?: IncludedMapping): Refund => {
@@ -130,22 +139,31 @@ export const refundParser = {
         : undefined,
     };
   },
-  toPutSchema: (data: RefundPut): RefundPutSchema => ({
-    type: "refunds",
-    attributes: {
-      refundReceived: data.received,
-      note: data.note,
-      refundedUs: data.refunded.us ? moneyParser.toSchema(data.refunded.us) : null,
-      refundedReseller: data.refunded.reseller
-        ? moneyParser.toSchema(data.refunded.reseller)
-        : null,
-      invoiceReference: data.invoiceReference,
-      externalReference: data.externalReference,
-    },
-    relationships: {
-      transaction: {
-        data: data.transactionId ? { id: data.transactionId, type: "transactions" } : undefined,
-      },
-    },
-  }),
+  toPutSchema: (data: RefundPut): RefundPutSchema => {
+    if (data.type === "automatic") {
+      return {
+        type: "refunds",
+        attributes: {
+          refundReceived: data.received,
+          note: data.note,
+          refundedUs: data.refunded.us ? moneyParser.toSchema(data.refunded.us) : null,
+          refundedReseller: data.refunded.reseller
+            ? moneyParser.toSchema(data.refunded.reseller)
+            : null,
+          invoiceReference: data.invoiceReference,
+          externalReference: data.externalReference,
+        },
+        relationships: {
+          transaction: {
+            data: data.transactionId ? { id: data.transactionId, type: "transactions" } : undefined,
+          },
+        },
+      };
+    }
+
+    return {
+      type: "refunds",
+      attributes: { externalReference: data.externalReference },
+    };
+  },
 };
