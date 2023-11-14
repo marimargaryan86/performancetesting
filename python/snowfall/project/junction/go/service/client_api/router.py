@@ -169,7 +169,7 @@ def get_routes(
             methods=["POST"],
         ),
         routes.to_route(
-            "/offers/simple-searches",
+            "/simple-offers/searches",
             simple_searches_handler.post,
             methods=["POST"],
         ),

@@ -194,8 +194,9 @@ class OfferAggregator(object):
             _set_sequence_numbers(offer_search, search_result.offer)
 
         buckets = _override_buckets(
-            search_result,
-            await self._buckets.get_offer_buckets(offer_search.id),
+            search_result=search_result,
+            buckets=await self._buckets.get_offer_buckets(offer_search.id),
+            simple_trip=bool(offer_search.HasField("simple_trip")),
         )
 
         await self._buckets.add_offer(offer_search.id, search_result.offer)
@@ -260,6 +261,7 @@ class OfferAggregator(object):
 def _override_buckets(
     search_result: amqp_pb2.TripOfferSearchResult,
     buckets: Mapping[str, Sequence[str]],
+    simple_trip: bool,  # noqa: FBT001
 ) -> dict[str, list[str]]:
     # this overrides the true bucket values for segments that this offer
     # group covers, so that we only generate offer aggregates with this
@@ -276,8 +278,10 @@ def _override_buckets(
             *unqualified_offers,
             *mutable_buckets.get(offer_segment.segment_id, set()),
         }
-
         mutable_buckets[offer_segment.segment_id] = [search_result.offer.id]
+
+    if simple_trip:
+        return {idx: list(bucket) for idx, bucket in mutable_buckets.items()}
 
     return {
         idx: [offer_id for offer_id in bucket if offer_id not in unqualified_offers]
