@@ -172,6 +172,32 @@ class RefundsService(
                 ),
             )
 
+        if (  # noqa: WPS337
+            request.refunded_by_provider.currency_code
+            != transaction.amounts.beneficiary.currency_code
+        ):
+            await rich_status.abort_with_rich_status(
+                context=context,
+                status=rich_status.build_bad_request(
+                    field_name="refunded_to_provider",
+                    field_description=(
+                        "Refund currencies do not match the original transaction"
+                    ),
+                ),
+            )
+        if (  # noqa: WPS337
+            request.refunded_to_reseller.currency_code
+            != transaction.amounts.base_converted.currency_code
+        ):
+            await rich_status.abort_with_rich_status(
+                context=context,
+                status=rich_status.build_bad_request(
+                    field_name="refunded_to_reseller",
+                    field_description=(
+                        "Refund currencies do not match the original transaction"
+                    ),
+                ),
+            )
         detailed_rate = await self._get_detailed_rate(
             request.refunded_by_provider,
             request.refunded_to_reseller,

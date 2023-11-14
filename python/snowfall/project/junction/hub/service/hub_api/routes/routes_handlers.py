@@ -30,6 +30,12 @@ async def _handle_invalid_argument(
         "refundedUs": models.ErrorSourcePointer(
             pointer="/data/attributes/currency",
         ),
+        "refunded_to_reseller": models.ErrorSourcePointer(
+            pointer="/data/attributes/refundedReseller",
+        ),
+        "refunded_to_provider": models.ErrorSourcePointer(
+            pointer="/data/attributes/refundedUs",
+        ),
     }
     rich_error = list(rich_status.iter_rich_statuses(err))
     if not rich_error:

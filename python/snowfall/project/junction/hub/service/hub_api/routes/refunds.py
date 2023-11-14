@@ -161,6 +161,7 @@ class Refunds(endpoints.HTTPEndpoint):
 
 
 class RefundPosition(endpoints.HTTPEndpoint):
+    @routes_handlers.grpc_errors_handler
     async def post(
         self,
         request: requests.Request,

@@ -319,13 +319,11 @@ class GrpcClient(Client):
         refunded_by_provider: money.Money,
         refunded_to_reseller: money.Money,
     ) -> money.Money:
-        refund_position_response = await errors.handle_grpc_errors(
-            self._refunds.CalculateRefundPosition(
-                grpc_pb2.CalculateRefundPositionRequest(
-                    refund_id=refund_id,
-                    refunded_by_provider=refunded_by_provider.protobuf(),
-                    refunded_to_reseller=refunded_to_reseller.protobuf(),
-                ),
+        refund_position_response = await self._refunds.CalculateRefundPosition(
+            grpc_pb2.CalculateRefundPositionRequest(
+                refund_id=refund_id,
+                refunded_by_provider=refunded_by_provider.protobuf(),
+                refunded_to_reseller=refunded_to_reseller.protobuf(),
             ),
         )
         return money.from_protobuf(refund_position_response.refund_position)
