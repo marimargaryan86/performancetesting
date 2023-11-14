@@ -8,7 +8,8 @@ export type BookingCancellationStatus =
   | "rejected"
   | "no-refund"
   | "refund-due"
-  | "refund-issue";
+  | "refund-issued"
+  | "refund-failed";
 
 export type BookingCancellation = {
   id: string;

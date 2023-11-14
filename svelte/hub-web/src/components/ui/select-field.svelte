@@ -24,6 +24,7 @@
   export let error: string | string[] | boolean = false;
   export let dialogMinWidth: string | undefined = undefined;
   export let search: ((query: string, option?: TValue) => boolean) | undefined = undefined;
+  export let readonly = false;
 
   let expanded = false;
   let selectedDisplayValue = formatter(value, true);
@@ -78,7 +79,7 @@
     {required}
     {label}
     {placeholder}
-    readonly={!search}
+    readonly={readonly ?? !search}
     on:input={input}
     on:click={toggleExpanded}
     bind:value={selectedDisplayValue}

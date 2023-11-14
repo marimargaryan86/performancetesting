@@ -10,22 +10,33 @@ export type Transaction = {
   invoiceReference?: string;
   createdAt: Date;
   amounts: {
+    /** This is how much Junction PAY will need to pay out */
     beneficiary: Money;
+    /** The amount that Junction PAY will be owed */
     quotation: Money;
+    /** The amount Junction PAY will need to collect in the payers currency to cover what Junction PAY owes to a beneficiary */
     baseConverted: Money;
   };
   fx: {
+    /** The monetary value of the fx markup for a specific transaction for Junction PAY */
     margin: Money;
+    /** The percentage Junction PAY adds to foreign exchange */
     markup: number;
+    /** The FX rate Junction PAY provided during the quotation call */
     quote: number;
+    /** The amount the exchange rate can move between quotation and transaction before Junction PAY loose money on the trade */
     buffer: number;
   };
   processing: {
+    /** The monetary value of the provider markup for a specific transaction */
     margin: Money;
+    /** The percentage incurred by the business */
     markup: number;
   };
   sales: {
+    /** The monetary value of the sales markup for a specific transaction */
     margin: Money;
+    /** The percentage Junction PAY adds as a sales fee */
     markup: number;
   };
   payment: {

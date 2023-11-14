@@ -6,8 +6,10 @@
     | "rejected"
     | "no-refund"
     | "refund-due"
-    | "refund-issue"
+    | "refund-issued"
+    | "refund-failed"
     | "pending"
+    | "succeeded"
     | "not-ticketed"
     | "cancelled"
     | "unspecified"
@@ -22,14 +24,16 @@
     confirmed: "ok",
     completed: "ok",
     executed: "ok",
+    succeeded: "ok",
     error: "error",
     rejected: "error",
     deleted: "error",
     failed: "error",
+    "refund-failed": "error",
     pending: "warn",
     "no-refund": "warn",
     "refund-due": "warn",
-    "refund-issue": "warn",
+    "refund-issued": "warn",
     "not-ticketed": "warn",
     mixed: "warn",
     cancelled: "warn",

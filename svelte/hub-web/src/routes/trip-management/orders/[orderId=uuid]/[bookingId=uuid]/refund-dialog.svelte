@@ -1,38 +1,19 @@
 <script lang="ts" context="module">
   const refundDataModel = z.object({
-    provider: z.object({
-      currency: z.string(),
-      amount: z.number().min(0),
-    }),
-    reseller: z.object({
-      currency: z.string(),
-      amount: z.number().min(0),
-    }),
+    us: z.number().min(0),
+    reseller: z.number().min(0),
+    externalReference: z.string().optional(),
   });
 
-  function formatCurrencyOption(currency?: Currency): string | undefined {
-    return currency?.code;
-  }
-
-  function findCurrencyOption(query: string, option?: Currency): boolean {
-    const queryLower = query.toLowerCase();
-
-    return Boolean(
-      option?.code.toLowerCase().includes(queryLower) ||
-        option?.name.toLowerCase().includes(queryLower),
-    );
-  }
+  type RefundData = z.infer<typeof refundDataModel>;
 </script>
 
 <script lang="ts">
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import Button from "components/ui/button.svelte";
-  import SelectField from "components/ui/select-field.svelte";
   import TextField from "components/ui/text-field.svelte";
-  import currencyData from "data/currencyData";
   import integrationInstancesClient from "integration-instances-client";
   import type { TripBooking } from "integration/junction-hub-api/schemas/booking";
-  import type { Currency } from "integration/junction-hub-api/schemas/currency";
   import type { Transaction } from "integration/junction-hub-api/schemas/transaction";
   import { slideFade } from "transitions/slide-fade";
   import { pendableCall } from "utils/pendable-call";
@@ -42,28 +23,69 @@
   export let booking: TripBooking;
 
   let errors: z.ZodFormattedError<z.infer<typeof refundDataModel>> | undefined;
+  let refundType: "with-amount" | "no-amount" = "no-amount";
+  let refundPosition = booking.refund?.refundPosition;
+  let refundData: RefundData = { us: 0, reseller: 0 };
+  let refundDataDirty = true;
 
-  let refundData: {
-    provider: { currency?: Currency; amount?: number };
-    reseller: { currency?: Currency; amount?: number };
-  } = {
-    provider: {},
-    reseller: {},
-  };
+  $: if (refundType === "no-amount") {
+    refundPosition = undefined;
+    refundData = { us: 0, reseller: 0 };
+  }
+
+  $: refundData, (refundDataDirty = true);
+
+  const { pending: refreshPending, func: refreshRefundPosition } = pendableCall(
+    async (): Promise<void> => {
+      if (!(booking.refund && refundDataDirty)) {
+        return;
+      }
+
+      refundDataDirty = false;
+
+      const parseResult = refundDataModel.safeParse(refundData);
+
+      if (!parseResult.success) {
+        return;
+      }
+
+      if (parseResult.data.reseller === 0 && parseResult.data.us === 0) {
+        refundPosition = {
+          amount: 0,
+          currency: transaction.amounts.beneficiary.currency,
+        };
+
+        return;
+      }
+
+      refundPosition = (
+        await integrationInstancesClient.hub.refunds.getRefundPosition({
+          refundId: booking.refund.id,
+          data: {
+            refunded: {
+              reseller: {
+                currency: transaction.amounts.quotation.currency,
+                amount: parseResult.data.reseller,
+              },
+              us: {
+                currency: transaction.amounts.beneficiary.currency,
+                amount: parseResult.data.us,
+              },
+            },
+          },
+        })
+      ).total;
+    },
+  );
 
   const { pending, func: refund } = pendableCall(async () => {
+    if (!(booking.refund && transaction.invoiceReference)) {
+      return;
+    }
+
     errors = undefined;
 
-    const parseResult = refundDataModel.safeParse({
-      provider: {
-        currency: refundData.provider.currency?.code,
-        amount: refundData.provider.amount,
-      },
-      reseller: {
-        currency: refundData.reseller.currency?.code,
-        amount: refundData.reseller.amount,
-      },
-    });
+    const parseResult = refundDataModel.safeParse(refundData);
 
     if (!parseResult.success) {
       errors = parseResult.error.format();
@@ -71,18 +93,30 @@
       return;
     }
 
-    if (!transaction.invoiceReference) {
+    if (
+      parseResult.data.us === 0 &&
+      parseResult.data.reseller === 0 &&
+      !confirm("Are you sure you want to create a refund with no amounts?")
+    ) {
       return;
     }
 
-    booking.refund = await integrationInstancesClient.hub.refunds.create({
+    booking.refund = await integrationInstancesClient.hub.refunds.update({
+      id: booking.refund.id,
       data: {
         transactionId: transaction.id,
         invoiceReference: transaction.invoiceReference,
+        externalReference: parseResult.data.externalReference,
         received: true,
         refunded: {
-          reseller: parseResult.data.reseller,
-          us: parseResult.data.provider,
+          reseller: {
+            currency: transaction.amounts.quotation.currency,
+            amount: parseResult.data.reseller,
+          },
+          us: {
+            currency: transaction.amounts.beneficiary.currency,
+            amount: parseResult.data.us,
+          },
         },
         note: "",
       },
@@ -93,54 +127,80 @@
 <div class="refund-dialog" transition:slideFade={{ duration: 300 }}>
   <h3 class="typography title-large bold">Refund</h3>
 
-  <form on:submit|preventDefault={refund}>
-    <div>
-      <TextField
-        label="Provider - how much we get back"
-        required
-        type="number"
-        placeholder="Amount"
-        bind:value={refundData.provider.amount}
-        error={errors?.provider?.amount?._errors}
-        step="any"
-      />
-      <SelectField
-        label="&nbsp;"
-        search={findCurrencyOption}
-        formatter={formatCurrencyOption}
-        placeholder="Currency"
-        options={currencyData.list}
-        bind:value={refundData.provider.currency}
-        error={errors?.provider?.currency?._errors}
-      />
-    </div>
+  <div class="refund-type typography body-medium">
+    <label>
+      <input type="radio" value="no-amount" bind:group={refundType} /> No amounts
+    </label>
+    <label>
+      <input type="radio" value="with-amount" bind:group={refundType} /> With amounts
+    </label>
+  </div>
 
-    <div>
-      <TextField
-        label="Reseller - how much we give back"
-        required
-        type="number"
-        placeholder="Amount"
-        bind:value={refundData.reseller.amount}
-        error={errors?.reseller?.amount?._errors}
-        step="any"
-      />
-      <SelectField
-        label="&nbsp;"
-        search={findCurrencyOption}
-        formatter={formatCurrencyOption}
-        placeholder="Currency"
-        options={currencyData.list}
-        bind:value={refundData.reseller.currency}
-        error={errors?.reseller?.currency?._errors}
-      />
-    </div>
+  {#if refundType === "no-amount"}
+    <Button on:click={refund} variant="outline">Refund with no amount</Button>
+  {:else}
+    <form on:submit|preventDefault={refund}>
+      <div>
+        <TextField
+          label="Provider - how much we get back"
+          required
+          type="number"
+          placeholder="Amount"
+          bind:value={refundData.us}
+          error={errors?.us?._errors}
+          step="any"
+        >
+          <span slot="icon-after" class="icon typography body-small currency">
+            {transaction.amounts.beneficiary.currency}
+          </span>
+        </TextField>
+      </div>
 
-    <Button type="submit">
-      Go
-      {#if $pending}<LoadingIcon />{/if}
-    </Button>
-  </form>
+      <div>
+        <TextField
+          label="Reseller - how much we give back"
+          required
+          type="number"
+          placeholder="Amount"
+          bind:value={refundData.reseller}
+          error={errors?.reseller?._errors}
+          step="any"
+        >
+          <span slot="icon-after" class="icon typography body-small currency">
+            {transaction.amounts.quotation.currency}
+          </span>
+        </TextField>
+      </div>
+
+      <div>
+        <TextField
+          label="Refund position"
+          required
+          readonly
+          type="number"
+          placeholder="Amount"
+          value={refundPosition?.amount}
+          step="any"
+        >
+          <span slot="icon-after" class="icon typography body-small currency">
+            {refundPosition?.currency ?? transaction.amounts.beneficiary.currency}
+          </span>
+        </TextField>
+      </div>
+
+      {#if refundDataDirty || $refreshPending}
+        <Button on:click={refreshRefundPosition}>
+          Calculate refund position
+          {#if $refreshPending}<LoadingIcon />{/if}
+        </Button>
+      {:else}
+        <Button type="submit">
+          Issue refund
+          {#if $pending}<LoadingIcon />{/if}
+        </Button>
+      {/if}
+    </form>
+  {/if}
 </div>
 
 <style>
@@ -154,23 +214,36 @@
     border-radius: 16px;
   }
 
+  .refund-type {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .refund-type > label {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+
+  .currency {
+    display: flex;
+    align-items: center;
+    color: var(--color-common-light-soft);
+  }
+
   form {
     display: flex;
     flex-flow: column;
     gap: 16px;
   }
 
-  form > div {
-    display: grid;
-    grid-template-columns: 1fr 130px;
-    gap: 4px;
-  }
-
-  form > div > :global(.text-field),
-  form > div > :global(.select-field) {
+  form > div > :global(.text-field) {
     --label-font-weight: 600;
     --label-font-family: "Inter";
     --label-font-size: 12px;
     --height: 46px;
+
+    width: 100%;
   }
 </style>

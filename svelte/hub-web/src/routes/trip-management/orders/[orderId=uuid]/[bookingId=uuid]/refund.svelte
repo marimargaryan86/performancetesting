@@ -8,16 +8,51 @@
 </script>
 
 <div class="refund" transition:slideFade={{ duration: 300 }}>
-  <h3 class="typography body-large bold">
+  <h3 class="typography title-large bold">
     Refund
 
     <StatusBadge value={refund.status} />
   </h3>
 
-  <div class="typography body-xlarge bold amount">
-    <strong>Total refunded</strong>
-    <span>{refund.refunded.reseller ? formatAmount(refund.refunded.reseller, true) : "N/A"}</span>
-  </div>
+  <ul class="money">
+    {#if refund.refunded.us}
+      <li class="typography body-medium amount">
+        <strong>To us</strong>
+        <span class="typography bold" class:negative={refund.refunded.us.amount < 0}>
+          {formatAmount(refund.refunded.us, true)}
+        </span>
+      </li>
+    {/if}
+
+    {#if refund.refunded.usInPayerCurrency}
+      <li class="typography body-medium amount">
+        <strong>To us <em>(Payer currency)</em></strong>
+        <span class="typography bold" class:negative={refund.refunded.usInPayerCurrency.amount < 0}>
+          {refund.refunded.usInPayerCurrency
+            ? formatAmount(refund.refunded.usInPayerCurrency, true)
+            : "N/A"}
+        </span>
+      </li>
+    {/if}
+
+    {#if refund.refunded.reseller}
+      <li class="typography body-medium amount">
+        <strong>To reseller</strong>
+        <span class="typography bold" class:negative={refund.refunded.reseller.amount < 0}>
+          {formatAmount(refund.refunded.reseller, true)}
+        </span>
+      </li>
+    {/if}
+
+    {#if refund.refundPosition}
+      <li class="typography body-medium amount">
+        <strong>Refund position</strong>
+        <span class="typography bold" class:negative={refund.refundPosition.amount < 0}>
+          {formatAmount(refund.refundPosition, true)}
+        </span>
+      </li>
+    {/if}
+  </ul>
 </div>
 
 <style>
@@ -37,6 +72,12 @@
     justify-content: space-between;
   }
 
+  .money {
+    display: flex;
+    flex-flow: column;
+    gap: 8px;
+  }
+
   .amount {
     display: flex;
     align-items: center;
@@ -44,6 +85,14 @@
   }
 
   .amount > span {
-    color: var(--color-main-primary-500);
+    color: var(--color-main-primary-600);
+  }
+
+  .amount > span.negative {
+    color: var(--color-semantic-error-600);
+  }
+
+  .amount > strong > em {
+    color: var(--color-main-neutral-500);
   }
 </style>

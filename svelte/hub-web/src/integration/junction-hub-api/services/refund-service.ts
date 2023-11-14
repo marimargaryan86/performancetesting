@@ -47,16 +47,6 @@ export default class RefundService extends JunctionHubApiService {
     return refundParser.toModel(resp.json.data);
   }
 
-  async create({ session, data }: { session: SessionModel; data: RefundPut }): Promise<Refund> {
-    const resp = await this.makeRequest<{ data: RefundSchema }>("/refunds", {
-      session,
-      data: { data: refundParser.toPutSchema(data) },
-      method: "POST",
-    });
-
-    return refundParser.toModel(resp.json.data);
-  }
-
   async update({
     session,
     data,

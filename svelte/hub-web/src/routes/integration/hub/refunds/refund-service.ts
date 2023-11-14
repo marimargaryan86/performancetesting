@@ -40,20 +40,6 @@ async function get({ id }: { id: string }): ReturnType<RefundService["get"]> {
   return devalue.parse(await resp.text());
 }
 
-async function create({ data }: { data: RefundPut }): ReturnType<RefundService["create"]> {
-  const url = new URLExtended(ROOT, {
-    base: origin,
-    query: { action: "create" },
-  });
-  const resp = await fetch(url, { method: "POST", body: devalue.stringify(data) });
-
-  if (resp.status !== 200) {
-    throw new Error("An unexpected error occurred");
-  }
-
-  return devalue.parse(await resp.text());
-}
-
 async function update({
   id,
   data,
@@ -97,7 +83,6 @@ async function getRefundPosition({
 export default {
   find,
   get,
-  create,
   update,
   getRefundPosition,
 };

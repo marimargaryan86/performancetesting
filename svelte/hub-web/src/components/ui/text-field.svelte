@@ -160,18 +160,21 @@
     transition: border 150ms ease;
   }
 
-  .wrapper > :global(svg) {
+  .wrapper > :global(svg),
+  .wrapper > :global(.icon) {
     position: absolute;
     width: 20px;
     height: 20px;
     pointer-events: none;
   }
 
-  .wrapper > :global(svg:first-child) {
+  .wrapper > :global(svg:first-child),
+  .wrapper > :global(.icon:first-child) {
     left: var(--x-icon-padding);
   }
 
-  .wrapper > :global(svg:last-child) {
+  .wrapper > :global(svg:last-child),
+  .wrapper > :global(.icon:last-child) {
     right: var(--x-icon-padding);
   }
 

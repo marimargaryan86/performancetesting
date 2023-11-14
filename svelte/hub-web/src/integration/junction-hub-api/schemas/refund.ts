@@ -48,7 +48,7 @@ export const refundPositionParser = {
 
 export type Refund = {
   id: string;
-  status: "pending" | "executed";
+  status: "unspecified" | "pending" | "succeeded" | "failed";
   received: boolean;
   note: string;
   refunded: {
@@ -62,7 +62,7 @@ export type Refund = {
   transaction?: Transaction;
   conversionId?: string;
   conversion?: Conversion;
-  refundPosition?: RefundPosition;
+  refundPosition?: MoneySchema;
 };
 
 export type RefundPut = Pick<
@@ -76,19 +76,19 @@ export type RefundSchema = {
   id: string;
   type: "refunds";
   attributes: {
-    status: "pending" | "executed";
+    status: "unspecified" | "pending" | "succeeded" | "failed";
     refundReceived: boolean;
     note: string;
     refundedUs: MoneySchema | null;
     refundedUsInPayerCurrency?: MoneySchema | null;
     refundedReseller: MoneySchema | null;
+    refundPosition?: MoneySchema | null;
     invoiceReference: string;
     externalReference?: string;
   };
   relationships: {
     transaction: { data?: Pick<TransactionSchema, "id" | "type"> };
-    conversion: { data?: Pick<ConversionSchema, "id" | "type"> | null };
-    refundPosition?: RefundPositionSchema;
+    conversion?: { data?: Pick<ConversionSchema, "id" | "type"> | null };
   };
   links: { self: string };
 };
@@ -101,8 +101,7 @@ export type RefundPutSchema = Pick<RefundSchema, "type"> & {
 export const refundParser = {
   toModel: (data: RefundSchema, included?: IncludedMapping): Refund => {
     const transactionId = data.relationships.transaction.data?.id ?? undefined;
-    const conversionId = data.relationships.conversion.data?.id ?? undefined;
-    const refundPosition = data.relationships.refundPosition;
+    const conversionId = data.relationships.conversion?.data?.id ?? undefined;
 
     return {
       id: data.id,
@@ -126,7 +125,9 @@ export const refundParser = {
       transaction: included?.transactions?.find(({ id }) => id === transactionId),
       conversionId,
       conversion: included?.conversions?.find(({ id }) => id === conversionId),
-      refundPosition: refundPosition ? refundPositionParser.toModel(refundPosition) : undefined,
+      refundPosition: data.attributes.refundPosition
+        ? moneyParser.toModel(data.attributes.refundPosition)
+        : undefined,
     };
   },
   toPutSchema: (data: RefundPut): RefundPutSchema => ({

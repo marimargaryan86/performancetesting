@@ -8,6 +8,7 @@
   import { onMount } from "svelte";
   import integrationInstancesClient from "integration-instances-client";
   import type { MaybePromise } from "@sveltejs/kit";
+  import Refund from "./refund.svelte";
 
   export let booking: TripBooking;
 
@@ -25,12 +26,16 @@
 <div class="admin">
   <Transaction {booking} {transactionTask} />
 
-  {#if booking.cancellation && permitted($userStore, "refund", "*")}
-    {#await transactionTask then transaction}
-      {#if transaction && !booking.refund}
-        <RefundDialog bind:booking {transaction} />
-      {/if}
-    {/await}
+  {#if booking.refund && permitted($userStore, "refund", "*")}
+    {#if booking.refund.status === "succeeded"}
+      <Refund refund={booking.refund} />
+    {:else}
+      {#await transactionTask then transaction}
+        {#if transaction}
+          <RefundDialog bind:booking {transaction} />
+        {/if}
+      {/await}
+    {/if}
   {/if}
 </div>
 

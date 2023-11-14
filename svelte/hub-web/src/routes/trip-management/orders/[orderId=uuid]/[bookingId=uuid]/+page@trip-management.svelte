@@ -10,7 +10,6 @@
   import { permitted } from "utils/permissions";
   import userStore from "stores/user-store";
   import Admin from "./admin.svelte";
-  import Refund from "./refund.svelte";
 
   export let data;
 
@@ -68,10 +67,6 @@
           {/if}
         </div>
       </div>
-
-      {#if data.booking.cancellation && permitted($userStore, "refund", "*") && data.booking.refund}
-        <Refund refund={data.booking.refund} />
-      {/if}
 
       {#if order}
         <Passengers passengers={order.passengers} />

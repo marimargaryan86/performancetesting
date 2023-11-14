@@ -31,13 +31,6 @@ function get(event: RequestEvent): Promise<Refund> {
   return integrationInstances.junctionHubApi.refunds.get({ session, id });
 }
 
-async function create(event: RequestEvent): Promise<Refund> {
-  const session = getSession(event);
-  const data: RefundPut = devalue.parse(await event.request.text());
-
-  return integrationInstances.junctionHubApi.refunds.create({ session, data });
-}
-
 async function update(event: RequestEvent): Promise<Refund> {
   const session = getSession(event);
   const id = event.url.searchParams.get("id")?.toString();
@@ -81,8 +74,6 @@ export async function POST(event): Promise<Response> {
   const method = event.url.searchParams.get("action")?.toString() as keyof RefundService;
 
   switch (method) {
-    case "create":
-      return new Response(devalue.stringify(await create(event)));
     case "update":
       return new Response(devalue.stringify(await update(event)));
     case "getRefundPosition":
