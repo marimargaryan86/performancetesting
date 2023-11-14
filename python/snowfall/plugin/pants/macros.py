@@ -1,4 +1,4 @@
-_BASE_IMAGE_SHA = "d97b08245cdceb142b25e9be03c8cea4d4e96b1d7e14bef64ca87a1f3212d23f"
+_BASE_IMAGE_SHA = "5fd82be4dfccc650c1985d57847f1af556bf23a8a5d86ec5fddf7d417ab147a4"
 
 
 def nomad_template(
