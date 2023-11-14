@@ -6,6 +6,7 @@ from gettext import gettext as _
 from typing import Any, TypeAlias
 
 import grpc
+from openai.types import chat
 
 from snowfall.project.junction.plus.adapter import (
     flight_delay_predictor,
@@ -415,54 +416,75 @@ async def plan_selected_trip(
     shortener_client: shortener.Client,
     **kwargs: Any,
 ) -> _HandlersResponse:
-    if message_key:
-        session = redis_client.hash_("message_id_order_id")
-        order_id = await session.get(message_key) or ""
-        if order_id:
-            order = await orders_client.get(order_id)
-            processed_bookings = compress_flights(
-                [
-                    booking.value
-                    for booking in order.bookings
-                    if booking.value.DESCRIPTOR.name == "AirBooking"
-                    and booking.value.departure_at.seconds > int(time.time())
-                ],
-            )
-            if processed_bookings:
-                session = redis_client.hash_("ai_assistant_state")
-                ai_chat_history = [
-                    {"role": "system", "content": ai_bot.generate_system_setup()},
-                    {
-                        "role": "user",
-                        "content": "Airport - {0}".format(
-                            processed_bookings[0].destination.name,
-                        ),
-                    },
-                ]
-                assistant_message = await ai_bot.handle_prompt(
-                    messages=ai_chat_history,
-                    search_url=configuration_vector.search_url,
-                    shortener_client=shortener_client,
-                )
-                ai_chat_history.append(assistant_message)
-                state = {
-                    "ai_chat_history": ai_chat_history,
-                    "ai_enabled": True,
-                }
-                await session.put(
-                    subscriber.phone_number.e164_number,
-                    json.dumps(state),
-                )
-                return [
-                    {
-                        "message": _(assistant_message["content"]),
-                    },
-                ]
+    if not message_key:
+        return [
+            {
+                "message": _("Sorry, this trip can't be planned"),
+            },
+            action_menu,
+        ]
+
+    session = redis_client.hash_("message_id_order_id")
+    order_id = await session.get(message_key) or ""
+    if not order_id:
+        return [
+            {
+                "message": _("Sorry, this trip can't be planned"),
+            },
+            action_menu,
+        ]
+
+    order = await orders_client.get(order_id)
+    processed_bookings = compress_flights(
+        [
+            booking.value
+            for booking in order.bookings
+            if booking.value.DESCRIPTOR.name == "AirBooking"
+            and booking.value.departure_at.seconds > int(time.time())
+        ],
+    )
+    if not processed_bookings:
+        return [
+            {
+                "message": _("Sorry, this trip can't be planned"),
+            },
+            action_menu,
+        ]
+
+    session = redis_client.hash_("ai_assistant_state")
+    ai_chat_history: list[chat.ChatCompletionMessageParam] = [
+        {"role": "system", "content": ai_bot.generate_system_setup()},
+        {
+            "role": "user",
+            "content": "Airport - {0}".format(
+                processed_bookings[0].destination.name,
+            ),
+        },
+    ]
+    assistant_message = await ai_bot.handle_prompt(
+        messages=ai_chat_history,
+        search_url=configuration_vector.search_url,
+        shortener_client=shortener_client,
+    )
+    ai_chat_history.append(assistant_message)
+    state = {
+        "ai_chat_history": ai_chat_history,
+        "ai_enabled": True,
+    }
+    await session.put(
+        subscriber.phone_number.e164_number,
+        json.dumps(state),
+    )
     return [
         {
-            "message": _("Sorry, this trip can't be planned"),
+            "message": _(
+                (
+                    assistant_message["content"]
+                    if isinstance(assistant_message["content"], str)
+                    else ""
+                ),
+            ),
         },
-        action_menu,
     ]
 
 
@@ -484,39 +506,54 @@ async def handle_unknown(
 ) -> _HandlersResponse:
     session = redis_client.hash_("ai_assistant_state")
     state_str = await session.get(subscriber.phone_number.e164_number)
-    if state_str:
-        state: Mapping[str, Any] = json.loads(state_str) or {}
-        if state.get("ai_enabled"):
-            # We should associate with message id to not bind those keywords, but we can do it after refactoring and async reply on chatbot.
-            if message.lower() in {"i need more help", "that's all for now"}:
-                await session.delete(subscriber.phone_number.e164_number)
-                if message.lower() == "i need more help":
-                    return await travel_assistant(subscriber, ai_bot, redis_client)
-                return [
-                    {
-                        "message": _("Great! We are here"),
-                    },
-                    action_menu,
-                ]
-            ai_chat_history = state.get("ai_chat_history", [])
-            ai_chat_history.append({"role": "user", "content": message})
-            assistant_message = await ai_bot.handle_prompt(
-                messages=ai_chat_history,
-                search_url=configuration_vector.search_url,
-                shortener_client=shortener_client,
-            )
-            ai_chat_history.append(assistant_message)
-            await session.put(subscriber.phone_number.e164_number, json.dumps(state))
-            return [
-                {
-                    "message": _(assistant_message["content"]),
-                },
-            ]
+    if not state_str:
+        return [
+            {
+                "message": _("Sorry I didn't understand your message."),
+            },
+            action_menu,
+        ]
+
+    state: Mapping[str, Any] = json.loads(state_str) or {}
+
+    if not state.get("ai_enabled"):
+        return [
+            {
+                "message": _("Sorry I didn't understand your message."),
+            },
+            action_menu,
+        ]
+
+    # We should associate with message id to not bind those keywords, but we can do it after refactoring and async reply on chatbot.
+    if message.lower() in {"i need more help", "that's all for now"}:
+        await session.delete(subscriber.phone_number.e164_number)
+        if message.lower() == "i need more help":
+            return await travel_assistant(subscriber, ai_bot, redis_client)
+        return [
+            {
+                "message": _("Great! We are here"),
+            },
+            action_menu,
+        ]
+    ai_chat_history = state.get("ai_chat_history", [])
+    ai_chat_history.append({"role": "user", "content": message})
+    assistant_message = await ai_bot.handle_prompt(
+        messages=ai_chat_history,
+        search_url=configuration_vector.search_url,
+        shortener_client=shortener_client,
+    )
+    ai_chat_history.append(assistant_message)
+    await session.put(subscriber.phone_number.e164_number, json.dumps(state))
     return [
         {
-            "message": _("Sorry I didn't understand your message."),
+            "message": _(
+                (
+                    assistant_message["content"]
+                    if isinstance(assistant_message["content"], str)
+                    else ""
+                ),
+            ),
         },
-        action_menu,
     ]
 
 

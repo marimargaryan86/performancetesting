@@ -58,7 +58,7 @@ mypy==1.6.1
 mypy-boto3-location==1.28.63  # freeze (s3fs compatibility)
 mypy-protobuf==3.4.0  # freeze (regression)
 numpy==1.26.1
-openai==0.28.1
+openai==1.2.2
 openapi-core==0.18.1
 openapi-schema-validator==0.6.2
 orjson==3.9.10

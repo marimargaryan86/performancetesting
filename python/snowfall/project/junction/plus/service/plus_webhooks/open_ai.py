@@ -1,12 +1,13 @@
 import datetime
 import json
-from collections.abc import Mapping, Sequence
+from collections.abc import Sequence
 from contextlib import suppress
 from gettext import gettext as _
-from typing import Any, ClassVar
+from typing import Any, ClassVar, cast
 
 import httpx
 import openai
+from openai.types import chat
 
 from snowfall.project.junction.plus.service.plus_webhooks import shortener
 from snowfall.stdlib.logging import stdout
@@ -30,6 +31,9 @@ async def search_flight(
             short_link = await shortener_client.shorten_link(search_url)
 
     return _("Please book your flights here: ") + short_link
+
+
+_TEMPERATURE = 0.2
 
 
 class AIBot(object):
@@ -89,7 +93,8 @@ class AIBot(object):
         "search_flight": search_flight,
     }
 
-    def __init__(self) -> None:
+    def __init__(self, ai_client: openai.AsyncClient) -> None:
+        self._ai_client = ai_client
         self._logger = stdout.get_logger()
 
     def generate_system_setup(self) -> str:
@@ -99,23 +104,22 @@ class AIBot(object):
 
     async def handle_prompt(
         self,
-        messages: Sequence[Mapping[str, str]],
+        messages: Sequence[chat.ChatCompletionMessageParam],
         search_url: str,
         shortener_client: shortener.Client,
-    ) -> dict[str, str]:
+    ) -> chat.ChatCompletionMessageParam:
         """Get message history from state, append message and send to openai."""
-        ai_response = await openai.ChatCompletion.acreate(
-            # type: ignore[no-untyped-call]
+        ai_response = await self._ai_client.chat.completions.create(
             model="gpt-3.5-turbo",
-            messages=messages,
+            messages=list(messages),
             functions=self.functions,
-            temperature=0.2,  # noqa: WPS432
+            temperature=_TEMPERATURE,
         )
-        assistant_message = ai_response["choices"][0]["message"].to_dict()
-        if assistant_message.get("function_call"):
-            function_name = assistant_message["function_call"]["name"]
+        assistant_message = ai_response.choices[0].message
+        if assistant_message.function_call:
+            function_name = assistant_message.function_call.name
             assistant_arguments = json.loads(
-                assistant_message["function_call"]["arguments"],
+                assistant_message.function_call.arguments,
             )
             return {
                 "content": await self.available_functions[function_name](
@@ -125,4 +129,4 @@ class AIBot(object):
                 ),
                 "role": "assistant",
             }
-        return assistant_message
+        return cast(chat.ChatCompletionMessageParam, assistant_message.model_dump())

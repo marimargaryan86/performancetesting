@@ -25,7 +25,7 @@ from snowfall.vendor.junction.go import client
 
 
 async def _http(app: application.Application[bootstrap.Settings]) -> None:
-    openai.api_key = app.settings.openai_api_key
+    openai_client = openai.AsyncOpenAI(api_key=app.settings.openai_api_key)
     junction_client = client.Client(
         base_url=app.settings.junction_api_address,
         auth=auth.TokenAuth(app.settings.junction_api_token),
@@ -66,7 +66,7 @@ async def _http(app: application.Application[bootstrap.Settings]) -> None:
                 icoupon_client=icoupon_client,
                 s3_client=s3_client,
                 tf_client=tf_client,
-                ai_bot=ai_utils.AIBot(),
+                ai_bot=ai_utils.AIBot(ai_client=openai_client),
                 twilio_client=twilio.TwilioClient(
                     sid=app.settings.twilio_sid,
                     token=app.settings.twilio_token,

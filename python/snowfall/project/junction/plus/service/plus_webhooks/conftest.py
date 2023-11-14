@@ -2,6 +2,7 @@ import datetime
 from collections.abc import AsyncIterator, Mapping
 
 import httpx
+import openai
 import pytest
 from fakeredis import aioredis as fakeredis
 from starlette import applications
@@ -219,7 +220,7 @@ def whatsapp_channel() -> whatsapp.Channel:
 
 @pytest.fixture()
 def ai_bot() -> open_ai.AIBot:
-    return open_ai.AIBot()
+    return open_ai.AIBot(ai_client=openai.AsyncClient(api_key="foobar"))
 
 
 @pytest.fixture()

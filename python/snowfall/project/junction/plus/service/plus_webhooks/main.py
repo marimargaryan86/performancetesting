@@ -45,8 +45,10 @@ from snowfall.stdlib.service import application, grpc_factory
 async def _http(
     app: application.Application[bootstrap.Settings],
 ) -> None:
-    openai.api_key = app.settings.openai_api_key
-    openai.organization = app.settings.openai_org
+    ai_client = openai.AsyncOpenAI(
+        api_key=app.settings.openai_api_key,
+        organization=app.settings.openai_org,
+    )
     notifications_channel = await grpc_factory.make_insecure_channel(
         app,
         app.settings.notifications_address,
@@ -96,7 +98,7 @@ async def _http(
                 message_handler=chatbot_handlers.MessageHandler(
                     redis_client=redis_client,
                     cache_ttl=datetime.timedelta(minutes=15),
-                    ai_bot=open_ai.AIBot(),
+                    ai_bot=open_ai.AIBot(ai_client=ai_client),
                     shortener_client=ShortenerClient(
                         shortener_url=app.settings.shortener_url,
                         shortener_domain=app.settings.shortener_domain,

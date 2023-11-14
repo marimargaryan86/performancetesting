@@ -18,6 +18,9 @@ from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.vendor.junction.go import client
 
+_TEMPERATURE = 0.6
+_TWILIO_BODY_LENGTH = 1600
+
 
 class AIBot(object):
     system_setup = """
@@ -71,7 +74,8 @@ The year is 2023
         },
     ]
 
-    def __init__(self) -> None:
+    def __init__(self, ai_client: openai.AsyncClient) -> None:
+        self._ai_client = ai_client
         self._logger = stdout.get_logger()
 
     async def handle_prompt(  # noqa: WPS217
@@ -91,19 +95,19 @@ The year is 2023
             message_history = [{"role": "system", "content": self.system_setup}]
 
         message_history.append({"role": "user", "content": message})
-        ai_response = await openai.ChatCompletion.acreate(  # type: ignore[no-untyped-call]
+        ai_response = await self._ai_client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=message_history,
             functions=self.functions,
-            temperature=0.6,  # noqa: WPS432
+            temperature=_TEMPERATURE,
         )
-        assistant_message = ai_response["choices"][0]["message"].to_dict()
-        if assistant_message.get("function_call"):
+        assistant_message = ai_response.choices[0].message
+        if assistant_message.function_call:
             await redis_client.delete(
                 "ai_message_history:{0}".format(mobile_phone),
             )
             try:
-                arguments = json.loads(assistant_message["function_call"]["arguments"])
+                arguments = json.loads(assistant_message.function_call.arguments)
             except json.JSONDecodeError:
                 arguments = {
                     "departureLoc": "Athens",
@@ -120,7 +124,7 @@ The year is 2023
                 twilio_client,
                 mobile_phone,
             )
-        elif assistant_message["content"] == "irrelevant prompt":
+        elif assistant_message.content == "irrelevant prompt":
             await redis_client.delete(
                 "ai_message_history:{0}".format(mobile_phone),
             )
@@ -129,13 +133,17 @@ The year is 2023
                 receiver=mobile_phone,
             )
         else:
-            message_history.append(assistant_message)
+            message_history.append(assistant_message.model_dump())
             await redis_client.put(
                 "ai_message_history:{0}".format(mobile_phone),
                 json.dumps(message_history),
             )
             twilio_client.send_message(
-                body=assistant_message["content"][:1600],  # noqa: WPS432
+                body=(
+                    assistant_message.content[:_TWILIO_BODY_LENGTH]
+                    if assistant_message.content
+                    else ""
+                ),
                 receiver=mobile_phone,
             )
 
