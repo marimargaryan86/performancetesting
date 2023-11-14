@@ -3,7 +3,16 @@ from __future__ import annotations
 import datetime
 import pathlib
 from collections.abc import Callable, Mapping, Sequence
-from typing import Any, TypeGuard, TypeVar, cast, get_args, get_origin, get_type_hints
+from typing import (
+    Any,
+    TypeAlias,
+    TypeGuard,
+    TypeVar,
+    cast,
+    get_args,
+    get_origin,
+    get_type_hints,
+)
 
 import click
 import isodate
@@ -13,7 +22,8 @@ import pydantic_core
 
 from snowfall.stdlib import sequence, types
 
-_Callback = Callable[[click.Context, click.Parameter, Any], Any]
+Callback: TypeAlias = Callable[[click.Context, click.Parameter, Any], Any]
+Callbacks: TypeAlias = dict[str, Callback]
 
 
 class JSONParameterType(click.ParamType):
@@ -43,20 +53,23 @@ class JSONParameterType(click.ParamType):
 def create_from_pydantic_model(
     model: type[pydantic.BaseModel],
 ) -> list[click.Parameter]:
+    field_types = get_type_hints(model)
     fields: list[tuple[str, pydantic.fields.FieldInfo]] = list(
         model.model_fields.items(),
     )
-    field_types = get_type_hints(model)
+
+    callbacks = model.callbacks if hasattr(model, "callbacks") else {}  # noqa: WPS421
 
     return [
-        _create_from_pydantic_field(name, field, field_types) for name, field in fields
+        _create_from_pydantic_field(name, field, field_types, callbacks.get(name))
+        for name, field in fields
     ]
 
 
 def _custom_callback(
     field: pydantic.fields.FieldInfo,
-    callback: _Callback,
-) -> _Callback:
+    callback: Callback,
+) -> Callback:
     validator = _validate_option(field)
 
     def decorator(
@@ -75,11 +88,11 @@ def _create_from_pydantic_field(
     name: str,
     arg: pydantic.fields.FieldInfo,
     arg_types: Mapping[str, type],
+    callback: Callback | None,
 ) -> click.Parameter:
     arg_type = get_origin(arg_types[name]) or arg_types[name]
     is_multi = arg_type in {Sequence, list, set, tuple}
     extra = arg.json_schema_extra if isinstance(arg.json_schema_extra, dict) else {}
-    callback = extra.get("callback")
 
     if extra.get("argument", False):
         return click.Argument(
@@ -137,7 +150,7 @@ _ValueType = TypeVar("_ValueType")
 
 def _validate_option(
     field: pydantic.fields.FieldInfo,
-) -> _Callback:
+) -> Callback:
     validator = pydantic.TypeAdapter(field.annotation)
 
     def decorator(

@@ -540,7 +540,7 @@ class BeneficiariesService(
         gathers = await asyncio.gather(*coroutines, return_exceptions=True)
         response_beneficiaries = []
         for beneficiary, cc_beneficiary in zip(beneficiaries, gathers, strict=True):
-            if isinstance(cc_beneficiary, errors.CurrencyCloudError):
+            if isinstance(cc_beneficiary, BaseException):
                 continue
 
             beneficiary.meta_data.CopyFrom(self._build_meta_data_model(cc_beneficiary))

@@ -156,7 +156,7 @@ class OfferOrchestrator(object):
         offer_search_ids = []
 
         for search_id in search_ids:
-            if isinstance(search_id, Exception):
+            if isinstance(search_id, BaseException):
                 if not isinstance(search_id, errors.ServiceUnavailableError):
                     self._logger.exception(
                         "Failed to create an offer search",

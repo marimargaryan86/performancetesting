@@ -481,7 +481,9 @@ def _assert_price_breakdown(  # noqa: WPS218
             case models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_SERVICE_MARK_UP:
                 assert breakdown.price.units == 1
                 assert breakdown.price.currency_code == "SEK"
-            case models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_RESELLER_MARK_UP:
+            case (
+                models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_RESELLER_MARK_UP
+            ):
                 assert breakdown.price.units == 1
                 assert breakdown.price.currency_code == "SEK"
             case models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_COMPANY_MARK_UP:

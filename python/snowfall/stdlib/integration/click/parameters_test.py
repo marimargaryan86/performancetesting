@@ -1,6 +1,7 @@
 import datetime
 import uuid
 from collections.abc import Mapping, Sequence
+from typing import ClassVar
 
 import click
 import pydantic
@@ -26,9 +27,10 @@ def test_json_parameter_type_invalid() -> None:
 class _TestCallbackModel(pydantic.BaseModel):
     no_callback: int
     no_callback_list: list[bool]
-    custom_callback: str = pydantic.Field(
-        json_schema_extra={"callback": lambda *args: "foobar"},
-    )
+    custom_callback: str
+    callbacks: ClassVar[parameters.Callbacks] = {
+        "custom_callback": lambda *args: "foobar",
+    }
 
 
 @pytest.fixture()

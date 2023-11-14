@@ -32,7 +32,7 @@ class Client(abc.ABC):
         self,
         coordinates: latlng_pb2.LatLng,
         precision: places_pb2.SearchPrecision | None = None,
-    ) -> models_pb2.Location:
+    ) -> list[models_pb2.Location]:
         """Fetch all nearby locations."""
 
 
@@ -74,8 +74,8 @@ class DictClient(Client):
         self,
         coordinates: latlng_pb2.LatLng,
         precision: places_pb2.SearchPrecision | None = None,
-    ) -> models_pb2.Location:
-        return models_pb2.Location()
+    ) -> list[models_pb2.Location]:
+        return [models_pb2.Location()]
 
 
 class GrpcClient(Client):
@@ -119,7 +119,7 @@ class GrpcClient(Client):
         self,
         coordinates: latlng_pb2.LatLng,
         precision: places_pb2.SearchPrecision | None = None,
-    ) -> models_pb2.Location:
+    ) -> list[models_pb2.Location]:
         response = await errors.handle_grpc_errors(
             self._locations.ListNearbyLocations(
                 request=places_pb2.ListNearbyLocationsRequest(

@@ -52,7 +52,7 @@ class NotificationsConsumer(object):
         message: types.Message[sat_amqp_pb2.BookingNotificationTask],
     ) -> None:
         if not message.body.ticket_url:
-            get_ticket_result, raw_ticket = await self._adapter.get_ticket(
+            get_ticket_result, _ = await self._adapter.get_ticket(
                 search_id=message.body.search_identifier,
             )
 

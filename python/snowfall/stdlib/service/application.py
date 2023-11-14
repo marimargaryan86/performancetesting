@@ -4,7 +4,7 @@ import asyncio
 import contextlib
 import dataclasses
 from collections.abc import Awaitable, Callable
-from typing import Annotated, Any, Generic, Protocol, TypeVar, cast
+from typing import Annotated, Any, ClassVar, Generic, Protocol, TypeVar, cast
 
 import click
 import orjson
@@ -57,7 +57,6 @@ class SentrySettings(object):
 class _GlobalSettings(Settings):
     debug_info: bool = pydantic.Field(
         default=False,
-        json_schema_extra={"callback": _print_debug_info},
     )
     env_name: str = pydantic.Field(default="local", json_schema_extra={"hidden": True})
     json_output: bool = True
@@ -65,6 +64,9 @@ class _GlobalSettings(Settings):
     prometheus_port: int | None = None
     sentry_dsn: str = ""
     version: str = pydantic.Field(default="dev", json_schema_extra={"hidden": True})
+    callbacks: ClassVar[parameters.Callbacks] = {
+        "debug_info": _print_debug_info,
+    }
 
 
 @dataclasses.dataclass(frozen=True)

@@ -87,7 +87,7 @@ class Middleware(base.BaseHTTPMiddleware):
 
 def _get_path_template(request: requests.Request) -> tuple[str, bool]:
     for route in request.app.routes:
-        match, child_scope = route.matches(request.scope)
+        match, _ = route.matches(request.scope)
         if match == routing.Match.FULL:
             return route.path, True
 
