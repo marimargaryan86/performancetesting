@@ -235,7 +235,7 @@
       Previous
     </Button>
     <Button size="small" on:click={pay} disabled={!paymentIntent}>
-      Next
+      Book
 
       {#if $pending}
         <LoadingIcon />
