@@ -1494,8 +1494,8 @@
         }
       }
     },
-    "/offers/simple-searches": {
-      "$ref": "./../client_api/openapi.json#/paths/~1offers~1simple-searches"
+    "/simple-offers/searches": {
+      "$ref": "./../client_api/openapi.json#/paths/~1simple-offers~1searches"
     },
     "/offers/searches": {
       "post": {

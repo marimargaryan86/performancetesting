@@ -1964,13 +1964,13 @@
         }
       }
     },
-    "/offers/simple-searches": {
+    "/simple-offers/searches": {
       "post": {
         "summary": "Create Simple Offer Search",
         "tags": [
           "offers"
         ],
-        "operationId": "post-offers-simple-searches",
+        "operationId": "post-simple-offers-searches",
         "responses": {
           "201": {
             "description": "Created",
