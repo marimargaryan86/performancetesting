@@ -30,15 +30,15 @@
             {{passenger.lastName.upper()}} {{passenger.firstName.upper()}}<br>
           {% endfor %}
           <br>
-          Airline check-in reference/locator:
-          {% for reference in operator_booking_references %}
-          {{reference}}
+          Operator/check-in reference:
+          {% for locator in record_locators %}
+          {{locator}}
           {% endfor %}
           <br>
           <br>
           Our reference
-          {% for locator in record_locators %}
-          {{locator}}
+          {% for reference in operator_booking_references %}
+          {{reference}}
           {% endfor %}
           <br>
         </div>
