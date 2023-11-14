@@ -3,21 +3,21 @@
     "variables": {
       "count": 2,
       "traefik_entrypoints": "websecure",
-      "traaefik_host_URL": "api.junction.dev"
+      "traefik_host_URL": "api.junction.dev"
     }
   },
   "production": {
     "variables": {
       "count": 2,
       "traefik_entrypoints": "web",
-      "traaefik_host_URL": "api.junction.travel"
+      "traefik_host_URL": "api.junction.travel"
     }
   },
   "sandbox": {
     "variables": {
       "count": 1,
       "traefik_entrypoints": "websecure",
-      "traaefik_host_URL": "api.sandbox.junction.dev"
+      "traefik_host_URL": "api.sandbox.junction.dev"
     }
   }
 }
