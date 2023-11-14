@@ -9,7 +9,7 @@
   "production": {
     "variables": {
       "count": 1,
-      "traefik_entrypoints": "websecure",
+      "traefik_entrypoints": "web",
       "traefik_host_URL": "webhook-zendesk.junction.travel"
     }
   },
