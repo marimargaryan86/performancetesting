@@ -7,7 +7,6 @@
   import type { OrderPassenger } from "integration/junction-hub-api/schemas/order";
   import Itinerary from "../../../components/itinerary.svelte";
   import Button from "components/ui/button.svelte";
-  import PhoneIcon from "components/icons/phone-icon.svelte";
   import EmailIcon from "components/icons/email-icon.svelte";
   import { pendableCall } from "utils/pendable-call";
   import LoadingIcon from "components/icons/loading-icon.svelte";
@@ -162,10 +161,6 @@
       </div>
 
       <div class="support typography body-medium">
-        <strong>
-          <PhoneIcon />
-          0208 203 2034
-        </strong>
         <strong>
           <EmailIcon />
           <a href="mailto:support@snowfalltravel.com">support@snowfalltravel.com</a>
