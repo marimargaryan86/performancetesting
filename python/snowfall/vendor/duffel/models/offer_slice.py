@@ -39,7 +39,7 @@ class Stop(DuffelBaseModel):
 
 class OfferSliceSegment(DuffelBaseModel):
     identifier: str = pydantic.Field(alias="id")
-    stops: list[Stop] | None = None
+    stops: list[Stop] = pydantic.Field(default_factory=list)
     aircraft: Aircraft | None = None
     arriving_at: datetime.datetime
     departing_at: datetime.datetime

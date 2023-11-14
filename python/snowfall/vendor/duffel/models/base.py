@@ -2,10 +2,12 @@
 from collections.abc import AsyncIterator, Awaitable, Callable, Sequence
 from typing import Any, Generic, TypeVar
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import ConfigDict
+
+from snowfall.stdlib.integration.pydantic import model
 
 
-class DuffelBaseModel(BaseModel):
+class DuffelBaseModel(model.DefaultingBaseModel):
     model_config = ConfigDict(populate_by_name=True, arbitrary_types_allowed=True)
 
 

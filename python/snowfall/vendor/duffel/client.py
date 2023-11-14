@@ -48,7 +48,7 @@ class DuffelClient(object):
         api_key: str,
         version: str,
         http_client: httpx.AsyncClient,
-        rate_limit_client: RateLimitClient,
+        rate_limit_client: RateLimitClient | None = None,
     ) -> None:
         self._token = api_key
         self._version = version
@@ -276,7 +276,8 @@ class DuffelClient(object):
                     },
                 )
 
-            await self._rate_limit_client.rate_limit(timeout=rate_limit_timeout)
+            if self._rate_limit_client:
+                await self._rate_limit_client.rate_limit(timeout=rate_limit_timeout)
 
             response = await self._http_client.request(
                 method=method,
