@@ -3,7 +3,7 @@ from typing import TypeVar
 from grpc import aio
 
 from snowfall.stdlib.service import application
-from snowfall.stdlib.transport.grpc import metrics, tracing
+from snowfall.stdlib.transport.grpc import metrics
 
 _Settings = TypeVar("_Settings", bound=application.Settings)
 
@@ -15,7 +15,6 @@ async def make_insecure_channel(
     channel = aio.insecure_channel(
         target,
         interceptors=[
-            tracing.TracingClientInterceptor(),
             metrics.MetricsClientInterceptor(),
         ],
     )

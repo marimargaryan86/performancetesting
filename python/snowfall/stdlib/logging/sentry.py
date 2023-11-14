@@ -51,4 +51,8 @@ def _with_additional_integrations(integrations: Integrations) -> Integrations:
         pymongo_module = import_module("sentry_sdk.integrations.pymongo")
         integrations = [*integrations, pymongo_module.PyMongoIntegration()]
 
+    if util.find_spec("grpc"):
+        grpc_module = import_module("sentry_sdk.integrations.grpc")
+        integrations = [*integrations, grpc_module.GRPCIntegration()]
+
     return integrations
