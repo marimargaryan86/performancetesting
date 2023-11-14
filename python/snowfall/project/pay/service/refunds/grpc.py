@@ -371,6 +371,8 @@ class RefundsService(
 
         refund.conversion_id = conversion_id
         refund.invoice_reference = request.refund.invoice_reference
+        refund.note = request.refund.note
+        refund.refund_received = request.refund.refund_received
         refund.refunded_us_in_payer_currency.CopyFrom(
             money.from_string(
                 detailed_rate.client_buy_amount,

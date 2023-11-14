@@ -37,16 +37,16 @@ class Refund(endpoints.HTTPEndpoint):
                 id=refund_id,
                 note=payload.get("note"),  # type: ignore[arg-type]
                 refunded_us=(
-                    money.from_string(
-                        str(payload["refundedUs"]["amount"]),
+                    money.Money(
+                        payload["refundedUs"]["amount"],
                         money.Currency(payload["refundedUs"]["currency"]),
                     ).protobuf()
                     if payload.get("refundedUs")
                     else None
                 ),
                 refunded_reseller=(
-                    money.from_string(
-                        str(payload["refundedReseller"]["amount"]),
+                    money.Money(
+                        payload["refundedReseller"]["amount"],
                         money.Currency(payload["refundedReseller"]["currency"]),
                     ).protobuf()
                     if payload.get("refundedReseller")
