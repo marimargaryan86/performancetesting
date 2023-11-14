@@ -496,13 +496,18 @@ class BenerailOffersAdapter(BenerailAdapter):
                 )
 
                 continue
-            segment_id = string.uuid()
+
+            timed_legs_count = len(
+                [leg for leg in trip.trip_legs if isinstance(leg, trips.TimedLeg)],
+            )
+            segment_ids = [string.uuid() for _ in range(timed_legs_count)]
+
             offers = []
 
             for offer_id in offer_ids:
                 offer_model = await self._parse_offer(
                     offer_obj=offer_map[offer_id],
-                    offer_segment_id=segment_id,
+                    offer_segment_ids=segment_ids,
                 )
 
                 await self._offers_cache.store(
@@ -532,114 +537,100 @@ class BenerailOffersAdapter(BenerailAdapter):
                 id=string.uuid(),
                 expires_at=protobuf.datetime_to_protobuf(expires_at_dt),
                 offers=offers,
-                segments=[
-                    await self._parse_segment_info(
-                        trip=trip,
-                        segment_id=segment_id,
-                    ),
-                ],
+                segments=await self._parse_segments(trip, segment_ids),
                 provider_id=str(PROVIDER_ID),
             )
 
-    async def _get_train_type(self, trip: trips.Trip) -> str:
-        for leg in trip.trip_legs:
-            has_train_type = (
-                isinstance(leg, trips.TimedLeg)
-                and leg.train_type
-                and leg.train_type.train_type_value
-            )
+    async def _get_train_type(self, leg: trips.TimedLeg) -> str:
+        if leg.train_type and leg.train_type.train_type_value:
+            train_type = leg.train_type.train_type_value
 
-            if has_train_type:
-                train_type = leg.train_type.train_type_value  # type: ignore[union-attr]
-
-                try:
-                    return await self._resolve_rcode_title(
-                        train_type,
-                    )
-                except RCodeLabelNotFoundError:
-                    return train_type.rsplit(":", 1)[-1]  # type: ignore[union-attr]
+            try:
+                return await self._resolve_rcode_title(
+                    train_type,
+                )
+            except RCodeLabelNotFoundError:
+                return train_type.rsplit(":", 1)[-1]
 
         return ""
 
-    async def _parse_segment_info(
+    async def _parse_segments(
         self,
         trip: trips.Trip,
-        segment_id: str,
-    ) -> offer_models_pb2.OfferSegment:
-        return offer_models_pb2.OfferSegment(
-            id=segment_id,
-            legs=self._parse_leg_info(trip),
-            vehicle=offer_models_pb2.Vehicle(
-                number=helper_functions.get_train_number(trip),
-            ),
-            vendor=await self._get_train_type(trip),
-            type=models_pb2.Schedule.TYPE_RAIL,
-        )
+        segment_ids: Sequence[str],
+    ) -> list[offer_models_pb2.OfferSegment]:
+        segments = []
+        timed_legs = [leg for leg in trip.trip_legs if isinstance(leg, trips.TimedLeg)]
 
-    def _parse_leg_info(
-        self,
-        trip: trips.Trip,
-    ) -> list[offer_models_pb2.OfferSegmentLeg]:
-        legs = []
-
-        for leg_info in trip.trip_legs:
-            if not isinstance(leg_info, trips.TimedLeg):
-                continue
-
-            origin = self._train_stations.resolve_place_with_urn(
-                leg_info.origin.place_value,
-            )
-
-            destination = self._train_stations.resolve_place_with_urn(
-                leg_info.destination.place_value,
-            )
-
-            legs.append(
-                offer_models_pb2.OfferSegmentLeg(
-                    id=string.uuid(),
-                    origin=models_pb2.Point(
-                        ref=origin.identifier,
-                        name=origin.name.title() if origin.name else "",
-                        coordinates=latlng_pb2.LatLng(
-                            latitude=origin.latitude,
-                            longitude=origin.longitude,
-                        ),
-                        time_zone=origin.timezone.key,
+        for idx, leg in enumerate(timed_legs):
+            segments.append(
+                offer_models_pb2.OfferSegment(
+                    id=segment_ids[idx],
+                    legs=[self._parse_leg_info(leg)],
+                    vehicle=offer_models_pb2.Vehicle(
+                        number=helper_functions.get_train_number(leg),
                     ),
-                    destination=models_pb2.Point(
-                        ref=destination.identifier,
-                        name=destination.name.title() if destination.name else "",
-                        coordinates=latlng_pb2.LatLng(
-                            latitude=destination.latitude,
-                            longitude=destination.longitude,
-                        ),
-                        time_zone=destination.timezone.key,
-                    ),
-                    departure_at=(
-                        protobuf.datetime_to_protobuf(
-                            datetime.datetime.strptime(
-                                leg_info.departure_at,
-                                "%Y-%m-%dT%H:%M:%S%z",
-                            ),
-                        )
-                    ),
-                    arrival_at=(
-                        protobuf.datetime_to_protobuf(
-                            datetime.datetime.strptime(
-                                leg_info.arrival_at,
-                                "%Y-%m-%dT%H:%M:%S%z",
-                            ),
-                        )
-                    ),
+                    vendor=await self._get_train_type(leg),
+                    type=models_pb2.Schedule.TYPE_RAIL,
                 ),
             )
 
-        return legs
+        return segments
+
+    def _parse_leg_info(
+        self,
+        timed_leg: trips.TimedLeg,
+    ) -> offer_models_pb2.OfferSegmentLeg:
+        origin = self._train_stations.resolve_place_with_urn(
+            timed_leg.origin.place_value,
+        )
+
+        destination = self._train_stations.resolve_place_with_urn(
+            timed_leg.destination.place_value,
+        )
+
+        return offer_models_pb2.OfferSegmentLeg(
+            id=string.uuid(),
+            origin=models_pb2.Point(
+                ref=origin.identifier,
+                name=origin.name.title() if origin.name else "",
+                coordinates=latlng_pb2.LatLng(
+                    latitude=origin.latitude,
+                    longitude=origin.longitude,
+                ),
+                time_zone=origin.timezone.key,
+            ),
+            destination=models_pb2.Point(
+                ref=destination.identifier,
+                name=destination.name.title() if destination.name else "",
+                coordinates=latlng_pb2.LatLng(
+                    latitude=destination.latitude,
+                    longitude=destination.longitude,
+                ),
+                time_zone=destination.timezone.key,
+            ),
+            departure_at=(
+                protobuf.datetime_to_protobuf(
+                    datetime.datetime.strptime(
+                        timed_leg.departure_at,
+                        "%Y-%m-%dT%H:%M:%S%z",
+                    ),
+                )
+            ),
+            arrival_at=(
+                protobuf.datetime_to_protobuf(
+                    datetime.datetime.strptime(
+                        timed_leg.arrival_at,
+                        "%Y-%m-%dT%H:%M:%S%z",
+                    ),
+                )
+            ),
+        )
 
     async def _parse_offer(
         self,
         offer_obj: offer.Offer,
-        offer_segment_id: str,
+        offer_segment_ids: Sequence[str],
     ) -> offer_models_pb2.Offer:
         comfort_class_value = helper_functions.get_comfort_class_value(offer_obj)
 
@@ -673,7 +664,8 @@ class BenerailOffersAdapter(BenerailAdapter):
                         ),
                         marketing_name=comfort_class_name,
                     ),
-                ),
+                )
+                for offer_segment_id in offer_segment_ids
             ],
             price=price_proto,
             price_breakdown=[

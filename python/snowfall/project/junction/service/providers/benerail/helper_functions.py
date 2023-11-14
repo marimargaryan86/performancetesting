@@ -2,7 +2,6 @@ import types
 from collections.abc import Mapping
 from gettext import gettext as _
 
-import more_itertools
 from pydantic import v1 as pydantic
 
 from snowfall.vendor.benerail.models.enumeration import rcode
@@ -47,10 +46,9 @@ def get_brand_name(comfort_class_name: str, flexibility_value: str) -> str:
     ).strip(" /")
 
 
-def get_train_number(trip: trips.Trip) -> str:
-    for leg in trip.trip_legs:
-        if isinstance(leg, trips.TimedLeg) and leg.train_numbers:
-            return more_itertools.first(leg.train_numbers)
+def get_train_number(leg: trips.TimedLeg) -> str:
+    if leg.train_numbers:
+        return ", ".join(leg.train_numbers)
 
     return ""
 
