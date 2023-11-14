@@ -237,7 +237,10 @@
     {/if}
 
     {#if refundType === "no-amount"}
-      <Button type="submit" variant="outline">Refund with no amount</Button>
+      <Button type="submit" variant="outline">
+        Refund with no amount
+        {#if $pending}<LoadingIcon />{/if}
+      </Button>
     {:else if refundDataDirty || $refreshPending}
       <Button on:click={refreshRefundPosition}>
         Calculate refund position
