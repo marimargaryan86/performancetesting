@@ -10,6 +10,7 @@
   import { permitted } from "utils/permissions";
   import userStore from "stores/user-store";
   import Admin from "./admin.svelte";
+  import { formatAmount } from "formatting/currency";
 
   export let data;
 
@@ -68,6 +69,22 @@
         </div>
       </div>
 
+      {#if data.booking.refund}
+        <div class="refund typography body-medium bold">
+          <h3 class="typography body-large bold">
+            Refund
+
+            <StatusBadge value={data.booking.refund.status} />
+          </h3>
+          <strong>Total</strong>
+          <span>
+            {data.booking.refund.refunded.reseller
+              ? formatAmount(data.booking.refund.refunded.reseller, true)
+              : "N/A"}
+          </span>
+        </div>
+      {/if}
+
       {#if order}
         <Passengers passengers={order.passengers} />
       {/if}
@@ -118,5 +135,23 @@
     flex-grow: 1;
     gap: 8px;
     align-items: flex-start;
+  }
+
+  .refund {
+    display: flex;
+    flex-flow: row wrap;
+    gap: 16px 8px;
+    justify-content: space-between;
+  }
+
+  .refund > h3 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .refund > span {
+    color: var(--color-main-primary-500);
   }
 </style>
