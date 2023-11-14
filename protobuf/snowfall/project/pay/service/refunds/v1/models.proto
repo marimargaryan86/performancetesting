@@ -18,6 +18,7 @@ message Refund {
     STATUS_PENDING = 1;
     STATUS_SUCCEEDED = 2;
     STATUS_FAILED = 3;
+    STATUS_SUBMITTED = 4;
   }
   Status status = 4;
   bool refund_received = 5;

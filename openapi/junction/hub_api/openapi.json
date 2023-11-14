@@ -4144,7 +4144,8 @@
                     "enum": [
                       "pending",
                       "succeeded",
-                      "failed"
+                      "failed",
+                      "submitted"
                     ],
                     "example": "pending"
                   },

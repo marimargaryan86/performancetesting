@@ -322,6 +322,15 @@ class RefundsService(
         refund: models_pb2.Refund,
     ) -> models_pb2.Refund:
 
+        if refund.status == models_pb2.Refund.Status.STATUS_SUBMITTED:
+            await rich_status.abort_with_rich_status(
+                context=context,
+                status=rich_status.build_bad_request(
+                    field_name="status",
+                    field_description="Refund already submitted",
+                ),
+            )
+
         try:
             transaction = await self._transactions_client.get(refund.transaction_id)
         except NotFoundError:
@@ -354,7 +363,8 @@ class RefundsService(
                 request,
                 transaction,
             )
-            request.refund.external_reference_id = stripe_refund.stripe_id
+            refund.external_reference_id = stripe_refund.stripe_id
+            refund.status = models_pb2.Refund.Status.STATUS_SUBMITTED
         else:
             cc_conversion = await self._payment_client.create_conversion(
                 conversion.ConversionRequest(
