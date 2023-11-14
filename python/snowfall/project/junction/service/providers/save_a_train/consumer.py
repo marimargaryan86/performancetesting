@@ -66,7 +66,7 @@ class NotificationsConsumer(object):
         combined = orjson.loads(raw_data)
         combined["ticket_urls"] = base64.b64encode(
             orjson.dumps([message.body.ticket_url]),
-        )
+        ).decode()
 
         await asyncio.gather(
             self._booking_storage.put(storage_path, orjson.dumps(combined)),
