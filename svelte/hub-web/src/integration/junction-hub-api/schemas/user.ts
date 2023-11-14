@@ -1,5 +1,11 @@
 export type UserPermissions = UserPermissionsSchema;
 
+/**
+ * The set of all possible permissions key-value pairs returned by the Junction
+ * permissions API. Does not implement negative permissions, but allows for
+ * negative permission filters.
+ *
+ */
 export type UserPermissionsSchema = {
   permissions: {
     "*"?: object;
