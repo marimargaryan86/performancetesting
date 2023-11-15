@@ -229,7 +229,7 @@
   <div class="wrapper">
     <Button
       size="small"
-      variant="text"
+      variant="outline"
       href={routeConfig.routes.tripManagement.routes.book.routes.select.root}
     >
       Previous
