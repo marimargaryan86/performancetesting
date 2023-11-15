@@ -48,7 +48,7 @@ export const refundPositionParser = {
 
 export type Refund = {
   id: string;
-  status: "unspecified" | "pending" | "succeeded" | "failed";
+  status: "unspecified" | "pending" | "succeeded" | "submitted" | "failed";
   received: boolean;
   note: string;
   refunded: {
@@ -79,7 +79,7 @@ export type RefundSchema = {
   id: string;
   type: "refunds";
   attributes: {
-    status: "unspecified" | "pending" | "succeeded" | "failed";
+    status: "unspecified" | "pending" | "succeeded" | "submitted" | "failed";
     refundReceived: boolean;
     note: string;
     refundedUs: MoneySchema | null;

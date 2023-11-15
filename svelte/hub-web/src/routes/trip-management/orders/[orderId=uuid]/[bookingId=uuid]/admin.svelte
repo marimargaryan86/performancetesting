@@ -27,7 +27,7 @@
   <Transaction {booking} {transactionTask} />
 
   {#if booking.refund && permitted($userStore, "refund", "*")}
-    {#if booking.refund.status === "succeeded"}
+    {#if booking.refund.status === "succeeded" || booking.refund.status === "submitted"}
       <Refund refund={booking.refund} />
     {:else}
       {#await transactionTask then transaction}

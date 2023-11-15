@@ -9,6 +9,7 @@
     | "refund-issued"
     | "refund-failed"
     | "pending"
+    | "submitted"
     | "succeeded"
     | "not-ticketed"
     | "cancelled"
@@ -31,6 +32,7 @@
     failed: "error",
     "refund-failed": "error",
     pending: "warn",
+    submitted: "warn",
     "no-refund": "warn",
     "refund-due": "warn",
     "refund-issued": "warn",
