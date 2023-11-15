@@ -140,6 +140,10 @@ class CriteriaGenerator(object):
                 coordinates=search.destination.coordinates,
                 neighbour_search_radius=1,
             )
+
+            if not origins or not destinations:
+                return []
+
             return create_criteria_time_windows(
                 frozenset(origins),
                 frozenset(destinations),
