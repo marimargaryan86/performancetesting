@@ -1,8 +1,4 @@
 <script lang="ts" context="module">
-  const passengerTypes = ["adult", "child", "infant"] as const;
-  const passengerType = z.enum(passengerTypes);
-  type PassengerType = z.infer<typeof passengerType>;
-
   const passengerTitles = ["unspecified", "mr", "mrs", "ms", "miss"] as const;
   const passengerTitle = z.enum(passengerTitles, { required_error: "Title is required" });
   type PassengerTitle = z.infer<typeof passengerTitle>;
@@ -17,13 +13,13 @@
 
   export type PassengerValidator = z.ZodObject<
     Omit<{ [key in keyof OrderPassenger]: z.ZodType<OrderPassenger[key]> }, "document"> & {
-      type: typeof passengerType;
+      type: z.ZodString;
       document: DocumentValidator | z.ZodUndefined;
     }
   >;
 
   export type PartialPassengerData = Omit<Partial<OrderPassenger>, "document"> & {
-    type: PassengerType;
+    type: string;
     document?: Require<Partial<TravelerDocument>, "countryCodes">;
   };
 
@@ -90,7 +86,7 @@
     required: TripOfferPriceQuote["required"],
   ): PassengerValidator {
     const result = z.object({
-      type: passengerType,
+      type: z.string(),
       title: passengerTitle,
       firstName: z
         .string({ required_error: "First name is required" })

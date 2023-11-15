@@ -52,9 +52,14 @@
   };
 
   let passengers: SearchDataModel["passengers"] = data.passengers ?? {
+    seniors65: 0,
+    seniors60: 0,
     adults: 1,
-    children: 0,
-    infants: 0,
+    youths15: 0,
+    youths12: 0,
+    children6: 0,
+    children4: 0,
+    children0: 0,
   };
   let errors: z.ZodFormattedError<SearchDataModel> | undefined = undefined;
   let dateSpan: DateRange = {
@@ -121,12 +126,7 @@
     {/if}
   </Button>
 
-  <PassengerPicker
-    bind:passengers
-    error={errors?.passengers?.adults?._errors ??
-      errors?.passengers?.children?._errors ??
-      errors?.passengers?.infants?._errors}
-  />
+  <PassengerPicker bind:passengers error={errors?.passengers?._errors} />
 </form>
 
 <style>

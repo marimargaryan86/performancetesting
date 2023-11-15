@@ -12,20 +12,34 @@ import type { OrderCreate } from "integration/junction-mobile-api/schemas/order"
 import { z } from "zod";
 import type { MarkupsCreate } from "integration/junction-mobile-api/schemas/markups";
 
+function getBirthDate(age: number): Date {
+  const result = new Date();
+  result.setFullYear(result.getFullYear() - age);
+
+  return result;
+}
+
 function parsePassengers(
   passengers: NonNullable<BookingSessionModel["searchData"]>["passengers"],
 ): TripCandidateSearchCreate["passengers"] {
-  const adult = new Date();
-  adult.setFullYear(adult.getFullYear() - 30);
-  const child = new Date();
-  child.setFullYear(child.getFullYear() - 7);
-  const infant = new Date();
-  infant.setFullYear(infant.getFullYear() - 1);
+  const senior65 = getBirthDate(66);
+  const senior60 = getBirthDate(61);
+  const adult = getBirthDate(27);
+  const youth15 = getBirthDate(17);
+  const youth12 = getBirthDate(13);
+  const child6 = getBirthDate(7);
+  const child4 = getBirthDate(5);
+  const child0 = getBirthDate(1);
 
   return [
+    ...Array(passengers.seniors65).fill({ birthDate: senior65 }),
+    ...Array(passengers.seniors60).fill({ birthDate: senior60 }),
     ...Array(passengers.adults).fill({ birthDate: adult }),
-    ...Array(passengers.children).fill({ birthDate: child }),
-    ...Array(passengers.infants).fill({ birthDate: infant }),
+    ...Array(passengers.youths15).fill({ birthDate: youth15 }),
+    ...Array(passengers.youths12).fill({ birthDate: youth12 }),
+    ...Array(passengers.children6).fill({ birthDate: child6 }),
+    ...Array(passengers.children4).fill({ birthDate: child4 }),
+    ...Array(passengers.children0).fill({ birthDate: child0 }),
   ];
 }
 

@@ -1,11 +1,18 @@
 <script lang="ts" context="module">
+  // eslint-disable-next-line complexity
   function getPassengersPresentation(passengers: PassengerPickerData): string {
-    const { adults, children, infants } = passengers;
+    const { seniors65, seniors60, adults, youths15, youths12, children6, children4, children0 } =
+      passengers;
 
     return [
-      adults ? `${adults} Adult${adults === 1 ? "" : "s"}` : undefined,
-      children ? `${children} Child${children === 1 ? "" : "ren"}` : undefined,
-      infants ? `${infants} Infant${infants === 1 ? "" : "s"}` : undefined,
+      seniors65 ? `${seniors65} Senior${seniors65 === 1 ? "" : "s"} (65+)` : undefined,
+      seniors60 ? `${seniors60} Senior${seniors60 === 1 ? "" : "s"} (60-64)` : undefined,
+      adults ? `${adults} Adult${adults === 1 ? "" : "s"} (26-59)` : undefined,
+      youths15 ? `${youths15} Youth${youths15 === 1 ? "" : "s"} (15-25)` : undefined,
+      youths12 ? `${youths12} Youth${youths12 === 1 ? "" : "s"} (12-14)` : undefined,
+      children6 ? `${children6} Child${children6 === 1 ? "" : "ren"} (6-11)` : undefined,
+      children4 ? `${children4} Child${children4 === 1 ? "" : "ren"} (4-5)` : undefined,
+      children0 ? `${children0} Child${children0 === 1 ? "" : "ren"} (0-3)` : undefined,
     ]
       .filter(ensureDefined)
       .join(", ");

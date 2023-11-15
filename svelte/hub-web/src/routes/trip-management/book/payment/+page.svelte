@@ -1,15 +1,20 @@
 <script lang="ts" context="module">
+  function getPassengers(count: number, type: string): PartialPassengerData[] {
+    return Array(count)
+      .fill(undefined)
+      .map<PartialPassengerData>(() => ({ document: { countryCodes: {} }, type }));
+  }
+
   function getDefaultPassengers(passengers: PassengerPickerData): PartialPassengerData[] {
     return [
-      ...Array(passengers.adults)
-        .fill(undefined)
-        .map<PartialPassengerData>(() => ({ document: { countryCodes: {} }, type: "adult" })),
-      ...Array(passengers.children)
-        .fill(undefined)
-        .map<PartialPassengerData>(() => ({ document: { countryCodes: {} }, type: "child" })),
-      ...Array(passengers.infants)
-        .fill(undefined)
-        .map<PartialPassengerData>(() => ({ document: { countryCodes: {} }, type: "infant" })),
+      ...getPassengers(passengers.seniors65, "Senior (65+)"),
+      ...getPassengers(passengers.seniors60, "Senior (60-64)"),
+      ...getPassengers(passengers.adults, "Adult (26-59)"),
+      ...getPassengers(passengers.youths15, "Youth (15-25)"),
+      ...getPassengers(passengers.youths12, "Youth (12-14)"),
+      ...getPassengers(passengers.children6, "Child (6-11)"),
+      ...getPassengers(passengers.children4, "Child (4-5)"),
+      ...getPassengers(passengers.children0, "Child (0-3)"),
     ];
   }
 </script>

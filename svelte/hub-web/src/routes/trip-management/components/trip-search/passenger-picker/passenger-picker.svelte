@@ -1,9 +1,20 @@
 <script lang="ts" context="module">
-  export const passengerPickerData = z.object({
-    adults: z.number().min(1, "At least one adult is mandatory"),
-    children: z.number().min(0),
-    infants: z.number().min(0),
-  });
+  export const passengerPickerData = z
+    .object({
+      seniors65: z.number().min(0),
+      seniors60: z.number().min(0),
+      adults: z.number().min(0),
+      youths15: z.number().min(0),
+      youths12: z.number().min(0),
+      children6: z.number().min(0),
+      children4: z.number().min(0),
+      children0: z.number().min(0),
+    })
+    .superRefine((arg, ctx) => {
+      if (Object.values(arg).reduce((prev, curr) => prev + curr, 0) === 0) {
+        ctx.addIssue({ message: "At least one passenger is mandatory", code: "custom" });
+      }
+    });
 
   export type PassengerPickerData = z.infer<typeof passengerPickerData>;
 </script>
@@ -15,27 +26,14 @@
   import { scale } from "svelte/transition";
   import { z } from "zod";
   import { slideFade } from "transitions/slide-fade";
-  import { ensureDefined } from "utils/array";
 
   export let passengers: PassengerPickerData;
   export let error: string | string[] | boolean = false;
 
   let expanded = false;
 
-  $: passengerInfo = [
-    passengers.adults
-      ? `${passengers.adults} Adult${passengers.adults === 1 ? "" : "s"}`
-      : undefined,
-    passengers.children
-      ? `${passengers.children} Child${passengers.children === 1 ? "" : "ren"}`
-      : undefined,
-    passengers.infants
-      ? `${passengers.infants} Infant${passengers.infants === 1 ? "" : "s"}`
-      : undefined,
-  ]
-    .filter(ensureDefined)
-    .join(", ");
   $: totalPassengerCount = Object.values(passengers).reduce((prev, curr) => prev + curr, 0);
+  $: passengerInfo = `${totalPassengerCount} Passenger${totalPassengerCount === 1 ? "" : "s"}`;
   $: displayError = error instanceof Array ? error.join(", ") : error;
   $: passengers, (error = false);
 
@@ -59,11 +57,7 @@
 <div class="passenger-picker" use:clickOutside={close}>
   <button on:click={toggle} type="button">
     <span class="typography title-small bold title-small bold">
-      {#if totalPassengerCount > 0}
-        {passengerInfo}
-      {:else}
-        Passengers
-      {/if}
+      {passengerInfo}
     </span>
 
     <ChevronIcon direction={expanded ? "up" : "down"} color="var(--color-main-primary-500)" />
@@ -78,9 +72,14 @@
       <div class="header typography title-medium bold title-medium bold">Passengers</div>
 
       <div class="counters">
-        <PassengerCounter label="Adult" bind:amount={passengers.adults} />
-        <PassengerCounter label="Children (2-11)" bind:amount={passengers.children} />
-        <PassengerCounter label="Infants (under 2)" bind:amount={passengers.infants} />
+        <PassengerCounter label="Senior (65+)" bind:amount={passengers.seniors65} />
+        <PassengerCounter label="Senior (60-64)" bind:amount={passengers.seniors60} />
+        <PassengerCounter label="Adult (26-59)" bind:amount={passengers.adults} />
+        <PassengerCounter label="Youth (15-25)" bind:amount={passengers.youths15} />
+        <PassengerCounter label="Youth (12-14)" bind:amount={passengers.youths12} />
+        <PassengerCounter label="Child (6-11)" bind:amount={passengers.children6} />
+        <PassengerCounter label="Child (4-5)" bind:amount={passengers.children4} />
+        <PassengerCounter label="Child (0-3)" bind:amount={passengers.children0} />
       </div>
     </div>
   {/if}
@@ -137,11 +136,10 @@
   }
 
   .error-message {
-    display: block;
     margin-top: 8px;
     color: #fe4e4e;
     font-weight: 400;
-    font-size: 10px;
+    font-size: 12px;
     font-family: Poppins, Arial, Helvetica, sans-serif;
     font-style: normal;
     line-height: 16px;

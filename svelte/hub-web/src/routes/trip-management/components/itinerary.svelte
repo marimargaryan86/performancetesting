@@ -39,7 +39,9 @@
 
   {#each bookings as booking}
     {@const origDestLegs = getOrigDestLegs(booking)}
-    {@const cabinClasses = booking.detailsList.map((item) => item.cabinClassName)}
+    {@const cabinClasses = Array.from(
+      new Set(booking.detailsList.map((item) => item.cabinClassName)),
+    )}
     {@const vendor = booking.detailsList[0]?.vendor}
     {@const segmentCount = booking.detailsList.length}
 
