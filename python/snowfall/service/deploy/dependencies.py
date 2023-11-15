@@ -16,13 +16,21 @@ class Resolver(object):
     _dependency_lookup: Mapping[str, frozenset[str]]
     _service_dependencies: Mapping[str, frozenset[str]]
 
-    def get_transitive_dependencies_for(self, service: str) -> frozenset[str]:
+    def get_transitive_dependencies_for(
+        self,
+        service: str,
+        skip: Sequence[str] | None = None,
+    ) -> frozenset[str]:
         dependencies = self._dependency_lookup.get(service, frozenset()).copy()
-
+        if skip is None:
+            skip = []
         for providing_service in self._dependency_lookup.get(service, []):
             for dependency in self._service_dependencies.get(providing_service, []):
+                if dependency in skip:
+                    continue
+                skip = [*skip, dependency]
                 dependencies = dependencies.union(
-                    self.get_transitive_dependencies_for(dependency),
+                    self.get_transitive_dependencies_for(dependency, skip),
                 )
 
         return frozenset(dependencies)

@@ -2,6 +2,7 @@ import asyncio
 import datetime
 from typing import ClassVar
 
+import more_itertools
 from grpc import aio
 
 from snowfall.project.junction.go.service.offers.v1 import (
@@ -13,17 +14,24 @@ from snowfall.project.junction.go.service.offers.v1 import (
 from snowfall.project.junction.go.service.offers.v1 import (
     models_pb2 as offers_models_pb2,
 )
+from snowfall.project.junction.go.service.orders.v1 import (
+    models_pb2 as orders_models_pb2,
+)
+from snowfall.project.junction.go.service.orders.v1 import orders_pb2, orders_pb2_grpc
 from snowfall.project.junction.go.v1 import models_pb2 as go_models_pb2
 from snowfall.service.deploy.verifiers import protocols
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.v1 import amqp_pb2 as stdlib_amqp_pb2
-from snowfall.stdlib.v1 import latlng_pb2
+from snowfall.stdlib.v1 import latlng_pb2, postal_address_pb2
 
 
 class OrdersFlow(object):
-    dependencies: ClassVar[protocols.Dependencies] = {("offers", "grpc")}
+    dependencies: ClassVar[protocols.Dependencies] = {
+        ("offers", "grpc"),
+        ("orders", "grpc"),
+    }
     environments: ClassVar[protocols.Environments] = {"development"}
     _cutoff = datetime.timedelta(seconds=30)  # noqa: WPS432
     _logger = stdout.get_logger()
@@ -46,8 +54,9 @@ class OrdersFlow(object):
             )
         self._logger.info("OfferSearch step: SUCCEEDED")
 
-        self._logger.info("Retrieving Offer and option...")
-        offer, option = await self._get_offer_and_option(offer_search)
+        self._logger.info("Retrieving Offer, Group and Option...")
+        offer = await self._get_offer(offer_search)
+        group, option = self._extract_group_and_option(offer)
 
         self._logger.info("Verifying PriceQuote step...")
         price_quote = await self._prepare_price_quote(offer, option)
@@ -60,17 +69,83 @@ class OrdersFlow(object):
             )
         self._logger.info("PriceQuote step: SUCCEEDED")
 
+        self._logger.info("Creating Journey...")
+        journey = await self._create_journey()
+
+        trip_option = self._generate_trip_option(option, group, price_quote.quotes[0])
+        self._logger.info("Verifying Order Flow...")
+        order = await self._prepare_order(journey.id, trip_option)
+        if order.bookings[0].status != orders_models_pb2.Booking.STATUS_CONFIRMED:
+            self._logger.error("Prepare Order step: FAILED")
+            raise RuntimeError(
+                "Order Flow failed! Empty bookings: {0}".format(
+                    order,
+                ),
+            )
+        self._logger.info("Order step: SUCCEEDED")
+
     def _initialize(self, dependencies: protocols.ResolvedDependencies) -> None:
-        channel = aio.insecure_channel(
+        offers_channel = aio.insecure_channel(
             "{0}:{1}".format(
                 dependencies[("offers", "grpc")][0],
                 dependencies[("offers", "grpc")][1],
             ),
         )
-        self._price_quotes_stub = offers_grpc_pb2_grpc.PriceQuoteServiceStub(channel)
-        self._offer_searches_stub = offers_grpc_pb2_grpc.OfferSearchServiceStub(channel)
-        self._offers_stub = offers_grpc_pb2_grpc.OfferServiceStub(channel)
+        orders_channel = aio.insecure_channel(
+            "{0}:{1}".format(
+                dependencies[("orders", "grpc")][0],
+                dependencies[("orders", "grpc")][1],
+            ),
+        )
+        self._price_quotes_stub = offers_grpc_pb2_grpc.PriceQuoteServiceStub(
+            offers_channel,
+        )
+        self._offer_searches_stub = offers_grpc_pb2_grpc.OfferSearchServiceStub(
+            offers_channel,
+        )
+        self._offers_stub = offers_grpc_pb2_grpc.OfferServiceStub(offers_channel)
+        self._orders_stub = orders_pb2_grpc.OrderServiceStub(orders_channel)
         self._generated_offer_search = _generate_offer_search()
+        self._timeout = 10
+
+    async def _prepare_order(
+        self,
+        journey_id: str,
+        trip_option: orders_models_pb2.TripOption,
+    ) -> orders_models_pb2.Order:
+        order = (
+            await self._orders_stub.PlaceOrder(
+                orders_pb2.PlaceOrderRequest(
+                    journey_id=journey_id,
+                    passengers=[],
+                    residence_address=postal_address_pb2.PostalAddress(
+                        address_lines=["Street name 7"],
+                        region_code="GB",
+                        postal_code="12345",
+                        locality="London",
+                    ),
+                    options=[
+                        orders_pb2.PlaceOrderRequest.Option(
+                            trip_option=trip_option,
+                        ),
+                    ],
+                ),
+                timeout=self._timeout,
+            )
+        ).order
+
+        cutoff = datetime.datetime.now(tz=datetime.UTC) + self._cutoff
+        while _wait_for_order(cutoff, order):
+            await asyncio.sleep(1)
+            order = (
+                await self._orders_stub.GetOrder(
+                    orders_pb2.GetOrderRequest(
+                        id=order.id,
+                    ),
+                    timeout=self._timeout,
+                )
+            ).order
+        return order
 
     async def _prepare_price_quote(
         self,
@@ -86,6 +161,7 @@ class OrdersFlow(object):
                     pay_company_id=self._generated_offer_search.pay_company_id,
                     reseller_id=self._generated_offer_search.reseller_id,
                 ),
+                timeout=self._timeout,
             )
         ).price_quote
 
@@ -97,14 +173,15 @@ class OrdersFlow(object):
                     offers_grpc_pb2.GetPriceQuoteRequest(
                         id=price_quote.id,
                     ),
+                    timeout=self._timeout,
                 )
             ).price_quote
         return price_quote
 
-    async def _get_offer_and_option(
+    async def _get_offer(
         self,
         offer_search: offers_models_pb2.OfferSearch,
-    ) -> tuple[offers_models_pb2.OfferAggregate, offers_models_pb2.Offer]:
+    ) -> offers_models_pb2.OfferAggregate:
         aggregates = (
             await self._offers_stub.ListOffers(
                 offers_grpc_pb2.ListOffersRequest(
@@ -113,7 +190,7 @@ class OrdersFlow(object):
                         ids=[offer_search.id],
                     ),
                 ),
-                timeout=10,
+                timeout=self._timeout,
             )
         ).offers
 
@@ -122,19 +199,7 @@ class OrdersFlow(object):
             raise RuntimeError(
                 "No OfferAggregate was found for: {0}".format(offer_search),
             )
-        aggregate = aggregates[0]
-
-        if not aggregate.groups:
-            self._logger.error("No OfferGroup was found for Offer")
-            raise RuntimeError("No Offer Group was found for: {0}".format(aggregate))
-        group = aggregate.groups[0]
-
-        if not group.offers:
-            self._logger.error("No Offer was found for OfferGroup")
-            raise RuntimeError(
-                "No Offer was found for OfferGroup: {0}".format(aggregate),
-            )
-        return aggregate, group.offers[0]
+        return aggregates[0]
 
     async def _prepare_offer_search(self) -> offers_models_pb2.OfferSearch:
         offer_search = (
@@ -142,6 +207,7 @@ class OrdersFlow(object):
                 offers_grpc_pb2.EnqueueOfferSearchRequest(
                     search=self._generated_offer_search,
                 ),
+                timeout=self._timeout,
             )
         ).search
         cutoff = datetime.datetime.now(tz=datetime.UTC) + self._cutoff
@@ -153,9 +219,64 @@ class OrdersFlow(object):
                     offers_grpc_pb2.GetOfferSearchRequest(
                         id=offer_search.id,
                     ),
+                    timeout=self._timeout,
                 )
             ).search
         return offer_search
+
+    async def _create_journey(self) -> orders_models_pb2.Journey:
+        return (
+            await self._orders_stub.CreateJourney(
+                orders_pb2.CreateJourneyRequest(
+                    contact_details=orders_models_pb2.ContactDetails(),
+                    reseller_id=self._generated_offer_search.reseller_id,
+                ),
+                timeout=self._timeout,
+            )
+        ).journey
+
+    def _extract_group_and_option(
+        self,
+        offer: offers_models_pb2.OfferAggregate,
+    ) -> tuple[offers_models_pb2.OfferGroup, offers_models_pb2.Offer]:
+        if not offer.groups:
+            self._logger.error("No OfferGroup was found for Offer")
+            raise RuntimeError("No Offer Group was found for: {0}".format(offer))
+        group = offer.groups[0]
+
+        if not group.offers:
+            self._logger.error("No Offer was found for OfferGroup")
+            raise RuntimeError(
+                "No Offer was found for OfferGroup: {0}".format(offer),
+            )
+        return group, group.offers[0]
+
+    def _generate_trip_option(
+        self,
+        option: offers_models_pb2.Offer,
+        group: offers_models_pb2.OfferGroup,
+        price_quote: offers_models_pb2.PriceQuote,
+    ) -> orders_models_pb2.TripOption:
+        return orders_models_pb2.TripOption(
+            id=option.id,
+            price_quote_id=price_quote.id,
+            pay_quote_id=price_quote.pay_quote_id,
+            details=[
+                orders_models_pb2.TripOptionDetails(
+                    segment=offer_segment,
+                    cabin_class=more_itertools.first(
+                        [
+                            detail.cabin_class
+                            for detail in option.segment_details
+                            if detail.offer_segment_id == offer_segment.id
+                        ],
+                    ),
+                )
+                for offer_segment in group.segments
+            ],
+            price=price_quote.price,
+            rules=price_quote.rules,
+        )
 
 
 def _wait_for_offer_search(
@@ -180,6 +301,19 @@ def _wait_for_price_quote(
         )
         < cutoff
         and not price_quote.quotes
+    )
+
+
+def _wait_for_order(
+    cutoff: datetime.datetime,
+    order: orders_models_pb2.Order,
+) -> bool:
+    return (
+        datetime.datetime.now(
+            tz=datetime.UTC,
+        )
+        < cutoff
+        and order.bookings[0].status == orders_models_pb2.Booking.STATUS_PENDING
     )
 
 
