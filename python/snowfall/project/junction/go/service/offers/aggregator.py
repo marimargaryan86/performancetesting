@@ -190,8 +190,7 @@ class OfferAggregator(object):
         search_result: amqp_pb2.TripOfferSearchResult,
     ) -> None:
         offer_search = await self._get_offer_search(search_result)
-        if offer_search.HasField("trip"):
-            _set_sequence_numbers(offer_search, search_result.offer)
+        _set_sequence_numbers(offer_search, search_result.offer)
 
         buckets = _override_buckets(
             search_result=search_result,
@@ -289,11 +288,20 @@ def _override_buckets(
     }
 
 
+def _set_sequence_numbers_for_simple_offer(offer: models_pb2.OfferGroup) -> None:
+    for segment_seq, segment in enumerate(offer.segments, 1):
+        segment.trip_sequence = 1
+        segment.segment_sequence = segment_seq
+
+
 def _set_sequence_numbers(
     offer_search: models_pb2.OfferSearch,
     offer: models_pb2.OfferGroup,
 ) -> None:
     sequence_mapping: dict[str, tuple[int, int]] = {}
+
+    if not offer_search.HasField("trip"):
+        return _set_sequence_numbers_for_simple_offer(offer)
 
     for trip_idx, trip in enumerate(offer_search.trip.trips):
         for segment_idx, trip_segment in enumerate(trip.segments):
@@ -303,3 +311,4 @@ def _set_sequence_numbers(
         trip_sequence, segment_sequence = sequence_mapping[segment.segment_id]
         segment.trip_sequence = trip_sequence
         segment.segment_sequence = segment_sequence
+    return None
