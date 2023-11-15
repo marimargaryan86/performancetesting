@@ -6,6 +6,7 @@ import * as devalue from "devalue";
 import { getPagination } from "../../helpers.server";
 import type BillService from "integration/junction-hub-api/services/bill-service";
 import type { Bill } from "integration/junction-hub-api/schemas/bill";
+import { ensureJunctionError } from "integration/common/junction-error";
 
 function find(event: RequestEvent): ReturnType<BillService["find"]> {
   const session = getSession(event);
@@ -14,11 +15,7 @@ function find(event: RequestEvent): ReturnType<BillService["find"]> {
     orderIds: event.url.searchParams.get("orderIds")?.toString().split(","),
   };
 
-  return integrationInstances.junctionHubApi.bills.find({
-    session,
-    filter,
-    ...pagination,
-  });
+  return integrationInstances.junctionHubApi.bills.find({ session, filter, ...pagination });
 }
 
 function get(event: RequestEvent): ReturnType<BillService["get"]> {
@@ -29,11 +26,7 @@ function get(event: RequestEvent): ReturnType<BillService["get"]> {
     throw error(404);
   }
 
-  try {
-    return integrationInstances.junctionHubApi.bills.get({ session, id });
-  } catch {
-    throw error(404);
-  }
+  return integrationInstances.junctionHubApi.bills.get({ session, id });
 }
 
 async function toggleReconciliation(
@@ -46,25 +39,41 @@ async function toggleReconciliation(
 }
 
 export async function GET(event): Promise<Response> {
-  const method = event.url.searchParams.get("action")?.toString() as keyof BillService;
+  try {
+    const method = event.url.searchParams.get("action")?.toString() as keyof BillService;
 
-  switch (method) {
-    case "find":
-      return new Response(devalue.stringify(await find(event)));
-    case "get":
-      return new Response(devalue.stringify(await get(event)));
-    default:
-      throw error(405);
+    switch (method) {
+      case "find":
+        return new Response(devalue.stringify(await find(event)));
+      case "get":
+        return new Response(devalue.stringify(await get(event)));
+      default:
+        throw new Error("An unexpected error occured");
+    }
+  } catch (err) {
+    if (ensureJunctionError(err)) {
+      throw error(err.status, { message: err.message });
+    }
+
+    throw error(500);
   }
 }
 
 export async function POST(event): Promise<Response> {
-  const method = event.url.searchParams.get("action")?.toString() as keyof BillService;
+  try {
+    const method = event.url.searchParams.get("action")?.toString() as keyof BillService;
 
-  switch (method) {
-    case "toggleReconciliation":
-      return new Response(devalue.stringify(await toggleReconciliation(event)));
-    default:
-      throw error(405);
+    switch (method) {
+      case "toggleReconciliation":
+        return new Response(devalue.stringify(await toggleReconciliation(event)));
+      default:
+        throw new Error("An unexpected error occured");
+    }
+  } catch (err) {
+    if (ensureJunctionError(err)) {
+      throw error(err.status, { message: err.message });
+    }
+
+    throw error(500);
   }
 }

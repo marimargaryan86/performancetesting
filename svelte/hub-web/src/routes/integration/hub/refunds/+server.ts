@@ -12,6 +12,7 @@ import { getSession } from "utils/auth";
 import { getPagination } from "../../helpers.server";
 import integrationInstances from "integration-instances";
 import { error } from "@sveltejs/kit";
+import { ensureJunctionError } from "integration/common/junction-error";
 
 function find(event: RequestEvent): Promise<PaginatedData<Refund>> {
   const session = getSession(event);
@@ -58,27 +59,43 @@ async function getRefundPosition(event: RequestEvent): Promise<RefundPosition> {
 }
 
 export async function GET(event): Promise<Response> {
-  const method = event.url.searchParams.get("action")?.toString() as keyof RefundService;
+  try {
+    const method = event.url.searchParams.get("action")?.toString() as keyof RefundService;
 
-  switch (method) {
-    case "find":
-      return new Response(devalue.stringify(await find(event)));
-    case "get":
-      return new Response(devalue.stringify(await get(event)));
-    default:
-      throw error(405);
+    switch (method) {
+      case "find":
+        return new Response(devalue.stringify(await find(event)));
+      case "get":
+        return new Response(devalue.stringify(await get(event)));
+      default:
+        throw new Error("An unexpected error occured");
+    }
+  } catch (err) {
+    if (ensureJunctionError(err)) {
+      throw error(err.status, { message: err.message });
+    }
+
+    throw error(500);
   }
 }
 
 export async function POST(event): Promise<Response> {
-  const method = event.url.searchParams.get("action")?.toString() as keyof RefundService;
+  try {
+    const method = event.url.searchParams.get("action")?.toString() as keyof RefundService;
 
-  switch (method) {
-    case "update":
-      return new Response(devalue.stringify(await update(event)));
-    case "getRefundPosition":
-      return new Response(devalue.stringify(await getRefundPosition(event)));
-    default:
-      throw error(405);
+    switch (method) {
+      case "update":
+        return new Response(devalue.stringify(await update(event)));
+      case "getRefundPosition":
+        return new Response(devalue.stringify(await getRefundPosition(event)));
+      default:
+        throw new Error("An unexpected error occured");
+    }
+  } catch (err) {
+    if (ensureJunctionError(err)) {
+      throw error(err.status, { message: err.message });
+    }
+
+    throw error(500);
   }
 }

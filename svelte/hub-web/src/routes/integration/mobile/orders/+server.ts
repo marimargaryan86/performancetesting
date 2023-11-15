@@ -7,6 +7,7 @@ import type OrderService from "integration/junction-mobile-api/services/order-se
 import type { OrderCreate } from "integration/junction-mobile-api/schemas/order";
 import { getPagination } from "../../helpers.server";
 import type { MarkupsCreate } from "integration/junction-mobile-api/schemas/markups";
+import { ensureJunctionError } from "integration/common/junction-error";
 
 async function create(event: RequestEvent): ReturnType<OrderService["create"]> {
   const session = getSession(event);
@@ -37,11 +38,7 @@ function get(event: RequestEvent): ReturnType<OrderService["get"]> {
     throw error(404);
   }
 
-  try {
-    return integrationInstances.junctionMobileApi.orders.get({ session, id });
-  } catch {
-    throw error(404);
-  }
+  return integrationInstances.junctionMobileApi.orders.get({ session, id });
 }
 
 function getMarkups(event: RequestEvent): ReturnType<OrderService["getMarkups"]> {
@@ -52,37 +49,49 @@ function getMarkups(event: RequestEvent): ReturnType<OrderService["getMarkups"]>
     throw error(404);
   }
 
-  try {
-    return integrationInstances.junctionMobileApi.orders.getMarkups({ session, orderId });
-  } catch {
-    throw error(404);
-  }
+  return integrationInstances.junctionMobileApi.orders.getMarkups({ session, orderId });
 }
 
 export async function GET(event): Promise<Response> {
-  const method = event.url.searchParams.get("action")?.toString() as keyof OrderService;
+  try {
+    const method = event.url.searchParams.get("action")?.toString() as keyof OrderService;
 
-  switch (method) {
-    case "find":
-      return new Response(devalue.stringify(await find(event)));
-    case "get":
-      return new Response(devalue.stringify(await get(event)));
-    case "getMarkups":
-      return new Response(devalue.stringify(await getMarkups(event)));
-    default:
-      throw error(405);
+    switch (method) {
+      case "find":
+        return new Response(devalue.stringify(await find(event)));
+      case "get":
+        return new Response(devalue.stringify(await get(event)));
+      case "getMarkups":
+        return new Response(devalue.stringify(await getMarkups(event)));
+      default:
+        throw new Error("An unexpected error occured");
+    }
+  } catch (err) {
+    if (ensureJunctionError(err)) {
+      throw error(err.status, { message: err.message });
+    }
+
+    throw error(500);
   }
 }
 
 export async function POST(event): Promise<Response> {
-  const method = event.url.searchParams.get("action")?.toString() as keyof OrderService;
+  try {
+    const method = event.url.searchParams.get("action")?.toString() as keyof OrderService;
 
-  switch (method) {
-    case "create":
-      return new Response(devalue.stringify(await create(event)));
-    case "createMarkups":
-      return new Response(devalue.stringify(await createMarkups(event)));
-    default:
-      throw error(405);
+    switch (method) {
+      case "create":
+        return new Response(devalue.stringify(await create(event)));
+      case "createMarkups":
+        return new Response(devalue.stringify(await createMarkups(event)));
+      default:
+        throw new Error("An unexpected error occured");
+    }
+  } catch (err) {
+    if (ensureJunctionError(err)) {
+      throw error(err.status, { message: err.message });
+    }
+
+    throw error(500);
   }
 }

@@ -4,6 +4,7 @@ import type { RequestEvent } from "./$types";
 import { error } from "@sveltejs/kit";
 import * as devalue from "devalue";
 import type PlaceService from "integration/junction-mobile-api/services/place-service";
+import { ensureJunctionError } from "integration/common/junction-error";
 
 function find(event: RequestEvent): ReturnType<PlaceService["find"]> {
   const session = getSession(event);
@@ -20,22 +21,26 @@ function get(event: RequestEvent): ReturnType<PlaceService["get"]> {
     throw error(404);
   }
 
-  try {
-    return integrationInstances.junctionMobileApi.places.get({ session, id });
-  } catch {
-    throw error(404);
-  }
+  return integrationInstances.junctionMobileApi.places.get({ session, id });
 }
 
 export async function GET(event): Promise<Response> {
-  const method = event.url.searchParams.get("action")?.toString() as keyof PlaceService;
+  try {
+    const method = event.url.searchParams.get("action")?.toString() as keyof PlaceService;
 
-  switch (method) {
-    case "find":
-      return new Response(devalue.stringify(await find(event)));
-    case "get":
-      return new Response(devalue.stringify(await get(event)));
-    default:
-      throw error(405);
+    switch (method) {
+      case "find":
+        return new Response(devalue.stringify(await find(event)));
+      case "get":
+        return new Response(devalue.stringify(await get(event)));
+      default:
+        throw new Error("An unexpected error occured");
+    }
+  } catch (err) {
+    if (ensureJunctionError(err)) {
+      throw error(err.status, { message: err.message });
+    }
+
+    throw error(500);
   }
 }
