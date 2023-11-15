@@ -182,5 +182,13 @@ export function parseIncluded(included?: IncludedSchemas): IncludedMapping {
     },
   );
 
-  return modelMapping as unknown as IncludedMapping;
+  const result = modelMapping as unknown as IncludedMapping;
+
+  result.offers?.forEach((offer) => {
+    offer.groups.forEach((group) => {
+      group.detailsList.sort((a, b) => a.sequences.segment - b.sequences.segment);
+    });
+  });
+
+  return result;
 }
