@@ -79,7 +79,7 @@
     {required}
     {label}
     {placeholder}
-    readonly={readonly ?? !search}
+    readonly={readonly || !search}
     on:input={input}
     on:click={toggleExpanded}
     bind:value={selectedDisplayValue}
