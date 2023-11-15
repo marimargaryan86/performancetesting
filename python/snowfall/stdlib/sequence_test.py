@@ -1,5 +1,4 @@
 from collections.abc import Sequence
-from typing import Any
 
 import pytest
 
@@ -15,7 +14,7 @@ from snowfall.stdlib import sequence, string
         (b"foobar", [b"foobar"]),
     ],
 )
-def test_ensure(input_data: Any, expected: Sequence[Any]) -> None:
+def test_ensure(input_data: object, expected: Sequence[object]) -> None:
     assert sequence.ensure(input_data) == expected
 
 

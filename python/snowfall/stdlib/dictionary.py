@@ -1,13 +1,12 @@
 import copy
-from collections.abc import Awaitable, Callable, Mapping, Sequence
-from typing import Any
+from collections.abc import Callable, Mapping, Sequence
 
 
 def set_nested_value(
-    input_dict: Mapping[str, Any],
+    input_dict: Mapping[str, object],
     path: Sequence[str],
-    function: Callable[[Any], Any],
-) -> dict[str, Any]:
+    function: Callable[[object], object],
+) -> dict[str, object]:
     dict_copy = dict(copy.deepcopy(input_dict))
     path = list(path)
     key = path.pop(0)
@@ -26,10 +25,10 @@ def set_nested_value(
 
 
 def _recurse_children(
-    parent: Any,
+    parent: object,
     path: Sequence[str],
-    function: Callable[[Any], Awaitable[Any]],
-) -> list[Any] | dict[str, Any]:
+    function: Callable[[object], object],
+) -> object | dict[str, object] | list[object]:
     if not isinstance(parent, list):
         if isinstance(parent, dict):
             return set_nested_value(parent, path, function)

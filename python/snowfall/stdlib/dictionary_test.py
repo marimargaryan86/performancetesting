@@ -1,13 +1,12 @@
 from collections.abc import Mapping
-from typing import Any
 
 import pytest
 
 from snowfall.stdlib import dictionary
 
 
-def _transform(dict_value: str) -> str:
-    return dict_value.upper()
+def _transform(dict_value: object) -> object:
+    return dict_value.upper() if isinstance(dict_value, str) else dict_value
 
 
 @pytest.mark.parametrize(
@@ -24,9 +23,9 @@ def _transform(dict_value: str) -> str:
     ],
 )
 def test_set_nested_value(
-    input_dict: Mapping[str, Any],
+    input_dict: Mapping[str, object],
     path: str,
-    expected: Mapping[str, Any],
+    expected: Mapping[str, object],
 ) -> None:
     new_dict = dictionary.set_nested_value(
         input_dict,

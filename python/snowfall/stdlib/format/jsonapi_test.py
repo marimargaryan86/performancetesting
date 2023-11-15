@@ -1,5 +1,4 @@
-from collections.abc import Mapping
-from typing import Any
+from collections.abc import Mapping, Sequence
 
 import pytest
 
@@ -95,7 +94,7 @@ from snowfall.stdlib.format import jsonapi
     ],
 )
 def test_resource_is_flattened(
-    resource: Mapping[str, Any],
-    expected: Mapping[str, Any],
+    resource: jsonapi.Resource,
+    expected: Mapping[str, object | str | Sequence[str] | None],
 ) -> None:
     assert jsonapi.flatten_resource(resource) == expected

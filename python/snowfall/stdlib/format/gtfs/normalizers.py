@@ -2,7 +2,6 @@ import contextlib
 import datetime
 import zoneinfo
 from collections.abc import Callable, Sequence
-from typing import Any
 
 import phonenumbers
 import pycountry
@@ -118,6 +117,6 @@ def normalize_time_zone(tz: str | None) -> str | None:
 
 def normalizer(
     properties: Sequence[str],
-    func: Callable[[str | None], Any],
+    func: Callable[[str | None], object],
 ) -> "typing.AnyClassMethod":
     return validator(*properties, pre=True, allow_reuse=True)(func)

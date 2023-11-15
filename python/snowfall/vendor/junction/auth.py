@@ -59,4 +59,5 @@ class UserAuth(base_client.BaseClient, httpx.Auth):
         response.raise_for_status()
 
         response_data = jsonapi.flatten_resource(response.json()["data"])
-        return response_data["token"]
+
+        return response_data["token"] if isinstance(response_data["token"], str) else ""

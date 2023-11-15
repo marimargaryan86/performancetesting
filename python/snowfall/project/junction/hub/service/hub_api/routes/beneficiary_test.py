@@ -17,7 +17,7 @@ class TestBeneficiary(object):
         available_currencies: Sequence[money.Currency],
         beneficiaries_client: beneficiaries.Client,
     ) -> None:
-        request = {
+        request: dict[str, jsonapi.Resource] = {
             "data": {
                 "type": "beneficiaries",
                 "attributes": {
