@@ -137,6 +137,10 @@ async def _http(
 async def _serve(
     app: application.Application[bootstrap.Settings],
 ) -> None:
+    ai_client = openai.AsyncOpenAI(
+        api_key=app.settings.openai_api_key,
+        organization=app.settings.openai_org,
+    )
     notifications_channel = await grpc_factory.make_insecure_channel(
         app,
         app.settings.notifications_address,
@@ -166,6 +170,12 @@ async def _serve(
                 notifications_channel,
             ),
         ),
+        ai_bot=open_ai.AIBot(ai_client=ai_client),
+        shortener_client=ShortenerClient(
+            shortener_url=app.settings.shortener_url,
+            shortener_domain=app.settings.shortener_domain,
+            shortener_key=app.settings.shortener_key,
+        ),
     )
     await matrix_chatbot.run_bot(app.settings.matrix_password)
 
@@ -179,9 +189,6 @@ if __name__ == "__main__":
             callback=_http,
             settings_class=bootstrap.Settings,
         ),
-    )
-
-    entrypoint.enter_with_commands(
         application.Command(
             name="serve",
             callback=_serve,
