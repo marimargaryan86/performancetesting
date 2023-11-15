@@ -1,5 +1,4 @@
 import * as devalue from "devalue";
-import { getSession } from "utils/auth";
 import type { RequestEvent } from "./$types";
 import type { SessionModel } from "models/user";
 import integrationInstances from "integration-instances";
@@ -275,7 +274,7 @@ async function createOrderMarkups(session: SessionModel, event: RequestEvent): P
 }
 
 export function GET(event): Promise<Response> {
-  const session = getSession(event);
+  const session = event.locals.session;
   const action = event.url.searchParams.get("action")?.toString();
 
   switch (action) {
@@ -291,7 +290,7 @@ export function GET(event): Promise<Response> {
 }
 
 export function POST(event): MaybePromise<Response> {
-  const session = getSession(event);
+  const session = event.locals.session;
   const action = event.url.searchParams.get("action")?.toString();
 
   switch (action) {

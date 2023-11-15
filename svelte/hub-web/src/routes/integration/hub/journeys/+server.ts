@@ -1,5 +1,4 @@
 import integrationInstances from "integration-instances";
-import { getSession } from "utils/auth";
 import type { RequestEvent } from "./$types";
 import { error } from "@sveltejs/kit";
 import * as devalue from "devalue";
@@ -8,7 +7,7 @@ import type JourneyService from "integration/junction-hub-api/services/journey-s
 import { ensureJunctionError } from "integration/common/junction-error";
 
 function find(event: RequestEvent): ReturnType<JourneyService["find"]> {
-  const session = getSession(event);
+  const session = event.locals.session;
   const pagination = getPagination(event);
   const sort = event.url.searchParams.get("sort")?.toString() as Parameters<
     JourneyService["find"]

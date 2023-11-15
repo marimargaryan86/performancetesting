@@ -1,7 +1,6 @@
 import integrationInstances from "integration-instances";
 import type { Beneficiary } from "integration/junction-hub-api/schemas/beneficiary";
 import type { PaginatedData } from "models/common";
-import { getSession } from "utils/auth";
 import { LIST_BENEFICIARIES_LIMIT } from "./+page.svelte";
 
 export function load(event): {
@@ -9,7 +8,7 @@ export function load(event): {
 } {
   return {
     beneficiaries: integrationInstances.junctionHubApi.beneficiaries.find({
-      session: getSession(event),
+      session: event.locals.session,
       limit: LIST_BENEFICIARIES_LIMIT,
     }),
   };

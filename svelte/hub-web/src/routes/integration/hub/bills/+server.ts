@@ -1,5 +1,4 @@
 import integrationInstances from "integration-instances";
-import { getSession } from "utils/auth";
 import type { RequestEvent } from "./$types";
 import { error } from "@sveltejs/kit";
 import * as devalue from "devalue";
@@ -9,7 +8,7 @@ import type { Bill } from "integration/junction-hub-api/schemas/bill";
 import { ensureJunctionError } from "integration/common/junction-error";
 
 function find(event: RequestEvent): ReturnType<BillService["find"]> {
-  const session = getSession(event);
+  const session = event.locals.session;
   const pagination = getPagination(event);
   const filter = {
     orderIds: event.url.searchParams.get("orderIds")?.toString().split(","),
@@ -19,7 +18,7 @@ function find(event: RequestEvent): ReturnType<BillService["find"]> {
 }
 
 function get(event: RequestEvent): ReturnType<BillService["get"]> {
-  const session = getSession(event);
+  const session = event.locals.session;
   const id = event.url.searchParams.get("id")?.toString();
 
   if (!id) {
@@ -32,7 +31,7 @@ function get(event: RequestEvent): ReturnType<BillService["get"]> {
 async function toggleReconciliation(
   event: RequestEvent,
 ): ReturnType<BillService["toggleReconciliation"]> {
-  const session = getSession(event);
+  const session = event.locals.session;
   const data: Bill = devalue.parse(await event.request.text());
 
   return integrationInstances.junctionHubApi.bills.toggleReconciliation({ session, bill: data });

@@ -1,11 +1,10 @@
-import { getSession } from "utils/auth";
 import { getTicketsZip } from "utils/ticket-manager.server";
 
 export async function GET(event): Promise<Response> {
   const { orderId, bookingId } = event.params;
 
   try {
-    const zip = await getTicketsZip({ session: getSession(event), orderId, bookingId });
+    const zip = await getTicketsZip({ session: event.locals.session, orderId, bookingId });
 
     return new Response(zip.data, {
       status: 200,

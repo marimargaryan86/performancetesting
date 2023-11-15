@@ -1,5 +1,4 @@
 import integrationInstances from "integration-instances";
-import { getSession } from "utils/auth";
 import type { RequestEvent } from "./$types";
 import { error } from "@sveltejs/kit";
 import * as devalue from "devalue";
@@ -10,28 +9,28 @@ import type { MarkupsCreate } from "integration/junction-mobile-api/schemas/mark
 import { ensureJunctionError } from "integration/common/junction-error";
 
 async function create(event: RequestEvent): ReturnType<OrderService["create"]> {
-  const session = getSession(event);
+  const session = event.locals.session;
   const data: OrderCreate = devalue.parse(await event.request.text());
 
   return integrationInstances.junctionMobileApi.orders.create({ session, data });
 }
 
 async function createMarkups(event: RequestEvent): ReturnType<OrderService["createMarkups"]> {
-  const session = getSession(event);
+  const session = event.locals.session;
   const data: MarkupsCreate = devalue.parse(await event.request.text());
 
   return integrationInstances.junctionMobileApi.orders.createMarkups({ session, data });
 }
 
 function find(event: RequestEvent): ReturnType<OrderService["find"]> {
-  const session = getSession(event);
+  const session = event.locals.session;
   const pagination = getPagination(event);
 
   return integrationInstances.junctionMobileApi.orders.find({ session, ...pagination });
 }
 
 function get(event: RequestEvent): ReturnType<OrderService["get"]> {
-  const session = getSession(event);
+  const session = event.locals.session;
   const id = event.url.searchParams.get("id")?.toString();
 
   if (!id) {
@@ -42,7 +41,7 @@ function get(event: RequestEvent): ReturnType<OrderService["get"]> {
 }
 
 function getMarkups(event: RequestEvent): ReturnType<OrderService["getMarkups"]> {
-  const session = getSession(event);
+  const session = event.locals.session;
   const orderId = event.url.searchParams.get("orderId")?.toString();
 
   if (!orderId) {

@@ -1,5 +1,4 @@
 import integrationInstances from "integration-instances";
-import { getSession } from "utils/auth";
 import type { RequestEvent } from "./$types";
 import { error } from "@sveltejs/kit";
 import * as devalue from "devalue";
@@ -9,7 +8,7 @@ import type { BalanceAdd } from "integration/junction-hub-api/schemas/balance";
 import { ensureJunctionError } from "integration/common/junction-error";
 
 function find(event: RequestEvent): ReturnType<BalanceService["find"]> {
-  const session = getSession(event);
+  const session = event.locals.session;
   const accountId = event.url.searchParams.get("accountId")?.toString();
 
   if (!accountId) {
@@ -22,7 +21,7 @@ function find(event: RequestEvent): ReturnType<BalanceService["find"]> {
 }
 
 async function create(event: RequestEvent): ReturnType<BalanceService["create"]> {
-  const session = getSession(event);
+  const session = event.locals.session;
   const accountId = event.url.searchParams.get("accountId")?.toString();
 
   if (!accountId) {

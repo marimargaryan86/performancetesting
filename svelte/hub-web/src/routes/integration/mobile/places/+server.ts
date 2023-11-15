@@ -1,5 +1,4 @@
 import integrationInstances from "integration-instances";
-import { getSession } from "utils/auth";
 import type { RequestEvent } from "./$types";
 import { error } from "@sveltejs/kit";
 import * as devalue from "devalue";
@@ -7,14 +6,14 @@ import type PlaceService from "integration/junction-mobile-api/services/place-se
 import { ensureJunctionError } from "integration/common/junction-error";
 
 function find(event: RequestEvent): ReturnType<PlaceService["find"]> {
-  const session = getSession(event);
+  const session = event.locals.session;
   const query = event.url.searchParams.get("query")?.toString();
 
   return integrationInstances.junctionMobileApi.places.find({ session, query: query ?? "" });
 }
 
 function get(event: RequestEvent): ReturnType<PlaceService["get"]> {
-  const session = getSession(event);
+  const session = event.locals.session;
   const id = event.url.searchParams.get("id")?.toString();
 
   if (!id) {

@@ -12,6 +12,7 @@ export function authHandle({ event, resolve }: Parameters<Handle>[0]): MaybeProm
 
     event.locals.user = session.user;
     event.locals.sessionExpiresAt = session.expiresAt;
+    event.locals.session = { id: session.id, token: session.token };
   } catch (err) {
     deleteSession(event);
 

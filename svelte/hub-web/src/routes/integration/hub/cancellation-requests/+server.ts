@@ -1,5 +1,4 @@
 import integrationInstances from "integration-instances";
-import { getSession } from "utils/auth";
 import type { RequestEvent } from "./$types";
 import { error } from "@sveltejs/kit";
 import * as devalue from "devalue";
@@ -8,7 +7,7 @@ import type { CancellationRequestCreate } from "integration/junction-hub-api/sch
 import { ensureJunctionError } from "integration/common/junction-error";
 
 async function create(event: RequestEvent): ReturnType<CancellationRequestService["create"]> {
-  const session = getSession(event);
+  const session = event.locals.session;
   const data: CancellationRequestCreate = devalue.parse(await event.request.text());
 
   return integrationInstances.junctionHubApi.cancellationRequests.create({ session, data });

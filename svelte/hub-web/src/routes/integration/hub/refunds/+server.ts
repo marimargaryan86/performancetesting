@@ -8,21 +8,20 @@ import type {
   RefundPositionCreate,
   RefundPut,
 } from "integration/junction-hub-api/schemas/refund";
-import { getSession } from "utils/auth";
 import { getPagination } from "../../helpers.server";
 import integrationInstances from "integration-instances";
 import { error } from "@sveltejs/kit";
 import { ensureJunctionError } from "integration/common/junction-error";
 
 function find(event: RequestEvent): Promise<PaginatedData<Refund>> {
-  const session = getSession(event);
+  const session = event.locals.session;
   const pagination = getPagination(event);
 
   return integrationInstances.junctionHubApi.refunds.find({ session, ...pagination });
 }
 
 function get(event: RequestEvent): Promise<Refund> {
-  const session = getSession(event);
+  const session = event.locals.session;
   const id = event.url.searchParams.get("id")?.toString();
 
   if (!id) {
@@ -33,7 +32,7 @@ function get(event: RequestEvent): Promise<Refund> {
 }
 
 async function update(event: RequestEvent): Promise<Refund> {
-  const session = getSession(event);
+  const session = event.locals.session;
   const id = event.url.searchParams.get("id")?.toString();
 
   if (!id) {
@@ -46,7 +45,7 @@ async function update(event: RequestEvent): Promise<Refund> {
 }
 
 async function getRefundPosition(event: RequestEvent): Promise<RefundPosition> {
-  const session = getSession(event);
+  const session = event.locals.session;
   const refundId = event.url.searchParams.get("refundId")?.toString();
 
   if (!refundId) {

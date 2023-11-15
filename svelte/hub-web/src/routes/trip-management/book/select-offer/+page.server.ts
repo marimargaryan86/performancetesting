@@ -1,7 +1,6 @@
 import integrationInstances from "integration-instances";
 import type { Offer } from "integration/junction-mobile-api/schemas/offer";
 import type { Place } from "integration/junction-mobile-api/schemas/place";
-import { getSession } from "utils/auth";
 import tripManagement, {
   type BookingSessionModel,
   type SearchDataModel,
@@ -19,7 +18,7 @@ export async function load(event): Promise<{
   selectedOffer: BookingSessionModel["selected"];
   tripCandidates: BookingSessionModel["tripCandidates"];
 }> {
-  const session = getSession(event);
+  const session = event.locals.session;
 
   try {
     let bookingSession = utils.getBookingSession(event);

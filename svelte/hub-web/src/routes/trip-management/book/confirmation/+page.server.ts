@@ -1,6 +1,5 @@
 import integrationInstances from "integration-instances";
 import type { Order } from "integration/junction-mobile-api/schemas/order";
-import { getSession } from "utils/auth";
 import utils from "../../../integration/trip-management/utils.server";
 import { redirect } from "@sveltejs/kit";
 import routeConfig from "routeConfig";
@@ -19,12 +18,12 @@ export function load(event): {
 
     return {
       order: integrationInstances.junctionMobileApi.orders.get({
-        session: getSession(event),
+        session: event.locals.session,
         id: bookingSession.order.id,
       }),
       markups: integrationInstances.junctionMobileApi.orders
         .getMarkups({
-          session: getSession(event),
+          session: event.locals.session,
           orderId: bookingSession.order.id,
         })
         .catch(() => undefined),

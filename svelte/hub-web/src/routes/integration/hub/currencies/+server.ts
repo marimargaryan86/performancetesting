@@ -1,5 +1,4 @@
 import integrationInstances from "integration-instances";
-import { getSession } from "utils/auth";
 import type { RequestEvent } from "./$types";
 import { error } from "@sveltejs/kit";
 import * as devalue from "devalue";
@@ -8,7 +7,7 @@ import { getPagination } from "../../helpers.server";
 import { ensureJunctionError } from "integration/common/junction-error";
 
 function find(event: RequestEvent): ReturnType<CurrencyService["find"]> {
-  const session = getSession(event);
+  const session = event.locals.session;
   const pagination = getPagination(event);
 
   return integrationInstances.junctionHubApi.currencies.find({ session, ...pagination });

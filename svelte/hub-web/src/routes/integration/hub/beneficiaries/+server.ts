@@ -1,5 +1,4 @@
 import integrationInstances from "integration-instances";
-import { getSession } from "utils/auth";
 import type { RequestEvent } from "./$types";
 import { error } from "@sveltejs/kit";
 import * as devalue from "devalue";
@@ -9,14 +8,14 @@ import type { BeneficiaryPut } from "integration/junction-hub-api/schemas/benefi
 import { ensureJunctionError } from "integration/common/junction-error";
 
 function find(event: RequestEvent): ReturnType<BeneficiaryService["find"]> {
-  const session = getSession(event);
+  const session = event.locals.session;
   const pagination = getPagination(event);
 
   return integrationInstances.junctionHubApi.beneficiaries.find({ session, ...pagination });
 }
 
 function get(event: RequestEvent): ReturnType<BeneficiaryService["get"]> {
-  const session = getSession(event);
+  const session = event.locals.session;
   const id = event.url.searchParams.get("id")?.toString();
 
   if (!id) {
@@ -27,14 +26,14 @@ function get(event: RequestEvent): ReturnType<BeneficiaryService["get"]> {
 }
 
 async function create(event: RequestEvent): ReturnType<BeneficiaryService["create"]> {
-  const session = getSession(event);
+  const session = event.locals.session;
   const data: BeneficiaryPut = devalue.parse(await event.request.text());
 
   return integrationInstances.junctionHubApi.beneficiaries.create({ session, data });
 }
 
 async function update(event: RequestEvent): ReturnType<BeneficiaryService["create"]> {
-  const session = getSession(event);
+  const session = event.locals.session;
   const id = event.url.searchParams.get("id")?.toString();
 
   if (!id) {

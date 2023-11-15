@@ -1,5 +1,4 @@
 import integrationInstances from "integration-instances";
-import { getSession } from "utils/auth";
 import type { RequestEvent } from "./$types";
 import { error } from "@sveltejs/kit";
 import * as devalue from "devalue";
@@ -9,7 +8,7 @@ import { getPagination } from "../../helpers.server";
 import { ensureJunctionError } from "integration/common/junction-error";
 
 async function create(event: RequestEvent): ReturnType<TripService["create"]> {
-  const session = getSession(event);
+  const session = event.locals.session;
   const data: TripCandidateSearchCreate = devalue.parse(await event.request.text());
 
   return integrationInstances.junctionMobileApi.trips.create({ session, data });
@@ -18,7 +17,7 @@ async function create(event: RequestEvent): ReturnType<TripService["create"]> {
 function getTripCandidateSearch(
   event: RequestEvent,
 ): ReturnType<TripService["getTripCandidateSearch"]> {
-  const session = getSession(event);
+  const session = event.locals.session;
   const id = event.url.searchParams.get("id")?.toString();
 
   if (!id) {
@@ -29,7 +28,7 @@ function getTripCandidateSearch(
 }
 
 function findOffers(event: RequestEvent): ReturnType<TripService["findOffers"]> {
-  const session = getSession(event);
+  const session = event.locals.session;
   const id = event.url.searchParams.get("id")?.toString();
 
   if (!id) {

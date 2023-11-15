@@ -1,4 +1,3 @@
-import { getSession } from "utils/auth";
 import * as devalue from "devalue";
 import type { RequestEvent } from "./$types";
 import { error } from "@sveltejs/kit";
@@ -18,7 +17,7 @@ export async function load(event): Promise<{
   beneficiary: BeneficiaryPut;
   accounts: Promise<Account[]>;
 }> {
-  const session = getSession(event);
+  const session = event.locals.session;
   const accounts = integrationInstances.junctionHubApi.accounts
     .find({ session })
     .then((data) => data.data);

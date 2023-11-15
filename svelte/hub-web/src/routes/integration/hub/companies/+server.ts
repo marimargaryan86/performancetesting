@@ -1,5 +1,4 @@
 import integrationInstances from "integration-instances";
-import { getSession } from "utils/auth";
 import type { RequestEvent } from "./$types";
 import { error } from "@sveltejs/kit";
 import * as devalue from "devalue";
@@ -7,7 +6,7 @@ import type CompanyService from "integration/junction-hub-api/services/company-s
 import { ensureJunctionError } from "integration/common/junction-error";
 
 function get(event: RequestEvent): ReturnType<CompanyService["get"]> {
-  const session = getSession(event);
+  const session = event.locals.session;
   const id = event.url.searchParams.get("id")?.toString();
 
   if (!id) {

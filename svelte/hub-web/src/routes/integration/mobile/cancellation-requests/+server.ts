@@ -1,5 +1,4 @@
 import integrationInstances from "integration-instances";
-import { getSession } from "utils/auth";
 import type { RequestEvent } from "./$types";
 import { error } from "@sveltejs/kit";
 import * as devalue from "devalue";
@@ -8,14 +7,14 @@ import type { CancellationRequestCreate } from "integration/junction-mobile-api/
 import { ensureJunctionError } from "integration/common/junction-error";
 
 async function create(event: RequestEvent): ReturnType<CancellationRequestService["create"]> {
-  const session = getSession(event);
+  const session = event.locals.session;
   const data: CancellationRequestCreate = devalue.parse(await event.request.text());
 
   return integrationInstances.junctionMobileApi.cancellations.create({ session, data });
 }
 
 function get(event: RequestEvent): ReturnType<CancellationRequestService["get"]> {
-  const session = getSession(event);
+  const session = event.locals.session;
   const id = event.url.searchParams.get("id")?.toString();
 
   if (!id) {
