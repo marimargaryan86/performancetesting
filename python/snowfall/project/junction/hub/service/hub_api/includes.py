@@ -129,17 +129,13 @@ def _transactions_resolver(
     async def wrapper(
         identifiers: Sequence[str],
         request: requests.Request,
-    ) -> Sequence[resources.Transaction]:
-        included_transactions = []
-        for identifier in identifiers:
-            transaction = await transactions_client.get(identifier)
-            included_transactions.append(
-                resources.Transaction.from_proto(
-                    transaction=transaction,
-                    request=request,
-                ),
-            )
-        return included_transactions
+    ) -> list[resources.Transaction]:
+        response = await transactions_client.find_by_ids(fields=identifiers)
+
+        return [
+            resources.Transaction.from_proto(transaction, request)
+            for transaction in response.transactions
+        ]
 
     return wrapper
 
