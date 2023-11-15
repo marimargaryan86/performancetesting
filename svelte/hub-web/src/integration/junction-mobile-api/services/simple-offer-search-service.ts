@@ -9,8 +9,21 @@ import {
 import type { PaginatedData } from "models/common";
 import type { Offer, OfferSchema } from "../schemas/offer";
 import { parseIncluded, type IncludedSchemas } from "../schemas/included";
+import {
+  tripOfferSearchParser,
+  type TripOfferSearch,
+  type TripOfferSearchSchema,
+} from "../schemas/offer-search";
 
 export default class SimpleOfferSearchService extends JunctionMobileApiService {
+  async get({ id, session }: { id: string; session: SessionModel }): Promise<TripOfferSearch> {
+    const resp = await this.makeRequest<{ data: TripOfferSearchSchema }>(`/offers/searches/${id}`, {
+      session,
+    });
+
+    return tripOfferSearchParser.toModel(resp.json.data);
+  }
+
   async create({
     session,
     data,
@@ -19,8 +32,9 @@ export default class SimpleOfferSearchService extends JunctionMobileApiService {
     data: SimpleOfferSearchCreate;
   }): Promise<SimpleOfferSearch> {
     const resp = await this.makeRequest<{ data: SimpleOfferSearchSchema }>(
-      "/offers/simple-searches",
+      "/simple-offers/searches",
       {
+        method: "POST",
         session,
         data: { data: simpleOffserSearchParser.toCreateSchema(data) },
       },
@@ -41,7 +55,7 @@ export default class SimpleOfferSearchService extends JunctionMobileApiService {
     simpleOfferSearchId: string;
     cursor?: string;
     limit?: number;
-    sort: "createdAt" | "id";
+    sort?: "createdAt" | "id";
     filter?: {
       cabinClass?: string;
     };
@@ -50,7 +64,7 @@ export default class SimpleOfferSearchService extends JunctionMobileApiService {
       data: OfferSchema[];
       included?: IncludedSchemas;
       links: { next: string };
-    }>(`/offers/searches/${simpleOfferSearchId}`, {
+    }>(`/offers/searches/${simpleOfferSearchId}/offers`, {
       session,
       queryParams: {
         sort,

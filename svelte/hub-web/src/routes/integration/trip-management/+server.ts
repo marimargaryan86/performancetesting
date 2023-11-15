@@ -63,9 +63,9 @@ async function getTripCandidates(
 
   if (tripCandidates && tripCandidates.expiresAt > new Date()) {
     try {
-      const result = await integrationInstances.junctionMobileApi.trips.getTripCandidateSearch({
-        session,
+      const result = await integrationInstances.junctionMobileApi.simpleOfferSearches.get({
         id: tripCandidates.id,
+        session,
       });
 
       return { id: result.id, expiresAt: result.expiresAt, status: result.status };
@@ -74,13 +74,13 @@ async function getTripCandidates(
     }
   }
 
-  const result = await integrationInstances.junctionMobileApi.trips.create({
+  const result = await integrationInstances.junctionMobileApi.simpleOfferSearches.create({
     session,
     data: {
       sessionToken,
       passengers: parsePassengers(searchData.passengers),
       allowedSegmentTypes: ["rail"],
-      criteria: [{ ...searchData, departureAfter: searchData.outbound }],
+      criteria: { ...searchData, departureAfter: searchData.outbound },
     },
   });
 
@@ -95,10 +95,11 @@ async function getOffers(session: SessionModel, event: RequestEvent): Promise<Re
     sessionToken,
     tripCandidates: bookingSession.tripCandidates,
   });
-  const { data: offers } = await integrationInstances.junctionMobileApi.trips.findOffers({
-    session,
-    id: tripCandidates.id,
-  });
+  const { data: offers } =
+    await integrationInstances.junctionMobileApi.simpleOfferSearches.findOffers({
+      session,
+      simpleOfferSearchId: tripCandidates.id,
+    });
 
   utils.setBookingSession(
     {
