@@ -1,5 +1,6 @@
 import itertools
 import pathlib
+import re
 import sys
 from collections.abc import Mapping, Sequence
 
@@ -192,6 +193,44 @@ def _log_error(msg: str) -> None:
     print(msg, file=sys.stderr)  # noqa: T201,WPS421
 
 
+def strip_suffix(input_str: str, suffix: str = "-${var.environment}") -> str:
+    if input_str.endswith(suffix):
+        return input_str[: -len(suffix)]
+    return input_str
+
+
+def _validate_vault_policy(
+    hcl_config: Sequence[str],
+    filename: str,
+) -> bool:
+    lf_content = "\n".join(hcl_config)
+    policies = []
+    match = re.search(r"policies\s*=\s*\[(.*?)\]", lf_content, re.DOTALL)
+    if match:
+        policies_raw = [
+            policy.strip().replace('"', "") for policy in match.group(1).split(",")
+        ]
+        policies = [strip_suffix(policy) for policy in policies_raw]
+
+    for hcl_line in hcl_config:
+        match = re.search(
+            r'with secret "kv/data/(\${var.environment}/[a-zA-Z0-9_-]+)"',
+            hcl_line,
+        )
+        if match:
+            secret_lookup = match.group(1)
+            corresponding_policy = secret_lookup.split("/")[-1]
+            if corresponding_policy not in policies:
+                _log_error(
+                    "ERROR: No policy [{0}] in file [{1}]".format(
+                        corresponding_policy,
+                        filename,
+                    ),
+                )
+                return True
+    return False
+
+
 def _main() -> bool:
     if len(sys.argv) < 2:
         _log_error(
@@ -213,6 +252,11 @@ def _main() -> bool:
             if _validate_variables(path, parsed.variable):
                 errors = True
 
+        with path.open() as hcl:
+            hcl_contents = hcl.readlines()
+
+            if _validate_vault_policy(hcl_contents, str(path)):
+                errors = True
     return errors
 
 
