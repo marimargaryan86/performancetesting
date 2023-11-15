@@ -45,6 +45,7 @@
 
   const dispatch = createEventDispatcher<{
     select: { offerId: string; optionIds: string[] };
+    markSelection: { offerId: string; optionIds: string[] };
   }>();
 
   $: selectedOption = offer.groups
@@ -78,7 +79,7 @@
       })
       .filter(ensureDefined);
 
-    dispatch("select", {
+    dispatch("markSelection", {
       offerId: offer.id,
       optionIds: nextSelectedOptions.map((item) => item.id),
     });

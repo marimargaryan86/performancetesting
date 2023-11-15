@@ -110,6 +110,15 @@
   });
 
   function select(event: CustomEvent<{ offerId: string; optionIds: string[] }>): void {
+    if ($pending) {
+      return;
+    }
+
+    markSelection(event);
+    selectOffer();
+  }
+
+  function markSelection(event: CustomEvent<{ offerId: string; optionIds: string[] }>): void {
     selected = event.detail;
   }
 
@@ -156,6 +165,7 @@
             selected={selected.offerId === offer.id}
             selectedOptionIds={selected.offerId === offer.id ? selected.optionIds : undefined}
             on:select={select}
+            on:markSelection={markSelection}
           />
         </li>
       {:else}
