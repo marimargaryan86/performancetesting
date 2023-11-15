@@ -6,6 +6,7 @@
   import { scale } from "svelte/transition";
   import { clickOutside } from "directives/click-outside";
   import { createEventDispatcher } from "svelte";
+  import { keyboard } from "directives/keyboard";
 
   let className: string | undefined = undefined;
 
@@ -28,16 +29,22 @@
 
   let expanded = false;
   let selectedDisplayValue = formatter(value, true);
+  let dialog: HTMLUListElement | undefined;
+  let textField: TextField | undefined;
 
   $: filteredOptions = options;
+  $: hoveredIndex = filteredOptions.indexOf(value);
   $: filter(selectedDisplayValue);
+  $: if (dialog) {
+    scrollToOption();
+  }
 
   function input(): void {
     value = undefined;
     open();
   }
 
-  function toggleExpanded(): void {
+  function toggle(): void {
     if (expanded) {
       close();
     } else {
@@ -46,9 +53,12 @@
   }
 
   function filter(query?: string): void {
-    filteredOptions = query?.length
-      ? options.filter((option) => search?.(query ?? "", option))
-      : options;
+    if (!expanded) {
+      return;
+    }
+
+    filteredOptions =
+      search && query?.length ? options.filter((option) => search?.(query ?? "", option)) : options;
   }
 
   function open(): void {
@@ -59,6 +69,7 @@
   function close(): void {
     expanded = false;
     selectedDisplayValue = formatter(value, true);
+    setHoveredIndex(value);
   }
 
   function select(option?: TValue): void {
@@ -67,13 +78,53 @@
     selectedDisplayValue = formatter(value, true);
     dispatch("select", value);
     close();
+    textField?.focus();
   }
+
+  function scrollToOption(): void {
+    dialog?.children[hoveredIndex]?.scrollIntoView({ block: "nearest" });
+  }
+
+  function setHoveredIndex(option?: TValue): void {
+    hoveredIndex = filteredOptions.indexOf(option);
+  }
+
+  const keyMapping = {
+    ArrowUp: (): void => {
+      hoveredIndex = Math.max(0, hoveredIndex - 1);
+
+      if (expanded) {
+        scrollToOption();
+      } else {
+        select(filteredOptions[hoveredIndex]);
+      }
+    },
+    ArrowDown: (): void => {
+      hoveredIndex = Math.min(filteredOptions.length - 1, hoveredIndex + 1);
+
+      if (expanded) {
+        scrollToOption();
+      } else {
+        select(filteredOptions[hoveredIndex]);
+      }
+    },
+    " ": open,
+    Enter: (): void => {
+      if (expanded) {
+        return select(filteredOptions[hoveredIndex]);
+      }
+
+      open();
+    },
+    Escape: close,
+  };
 </script>
 
 <div
   class="select-field {className ? className : ''}"
-  use:clickOutside={close}
   class:direction-up={direction === "up"}
+  use:clickOutside={close}
+  use:keyboard={keyMapping}
 >
   <TextField
     {required}
@@ -81,8 +132,10 @@
     {placeholder}
     readonly={readonly || !search}
     on:input={input}
-    on:click={toggleExpanded}
+    on:click={toggle}
+    on:blur={close}
     bind:value={selectedDisplayValue}
+    bind:this={textField}
     {error}
   >
     <ChevronIcon slot="icon-after" direction={expanded ? "up" : "down"} />
@@ -91,13 +144,22 @@
   {#if expanded && filteredOptions.length}
     <ul
       class="typography body-medium options"
-      transition:scale={{ duration: 150, start: 0.8 }}
       style:min-width={dialogMinWidth}
+      transition:scale={{ duration: 150, start: 0.8 }}
+      bind:this={dialog}
+      tabindex="-1"
     >
-      {#each filteredOptions as option}
+      {#each filteredOptions as option, idx}
         {@const displayValue = formatter(option)}
         <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
-        <li class="option" on:click={select.bind(select, option)} title={displayValue}>
+        <li
+          class="option"
+          on:click={select.bind(select, option)}
+          on:pointerover={setHoveredIndex.bind(setHoveredIndex, option)}
+          title={displayValue}
+          class:selected={option === value}
+          class:hovered={hoveredIndex === idx}
+        >
           {displayValue}
         </li>
       {/each}
@@ -149,6 +211,14 @@
     text-overflow: ellipsis;
     cursor: pointer;
     user-select: none;
+  }
+
+  .option.selected {
+    background-color: var(--color-main-neutral-50);
+  }
+
+  .option.hovered {
+    background-color: var(--color-main-primary-50);
   }
 
   .option:not(:last-child) {
