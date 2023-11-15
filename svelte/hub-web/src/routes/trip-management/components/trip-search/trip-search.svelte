@@ -4,11 +4,7 @@
       return "";
     }
 
-    if (place.country.name) {
-      return `${place.name}, ${place.country.name}`;
-    }
-
-    return place.name;
+    return [place.name, place.mainCity, place.country.name].filter(ensureDefined).join(", ");
   }
 
   function getPrecision(place: Place): "precise" | undefined {
@@ -38,6 +34,7 @@
   } from "../../../integration/trip-management/trip-management";
   import routeConfig from "routeConfig";
   import integrationInstancesClient from "integration-instances-client";
+  import { ensureDefined } from "utils/array";
 
   export let data: Partial<SearchDataModel> = {};
   export let origin: Place | undefined = undefined;
