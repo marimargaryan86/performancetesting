@@ -1,4 +1,6 @@
-python_sources(dependencies=[":cities", ":nodes"])
+python_sources(
+    dependencies=[":cities", ":nodes", ":benerail_stations", ":train_stations"]
+)
 python_image(
     name="main",
     entry_point="main.py",
@@ -20,5 +22,25 @@ resource(
         len=101574333,
         sha256="dcc421f8da7c34e8d00ff1f835c4bf81c5a225ead3c562434981203c5dd06d68",
         filename="nodes.json",
+    ),
+)
+
+resource(
+    name="benerail_stations",
+    source=http_source(
+        url="https://junction-build-artifacts.s3.eu-west-2.amazonaws.com/benerail_stations-107f14cfe0c5c023ee429c82f795b21f7028dda6510e36068ebe284dd29d4605.json",
+        len=2321430,
+        sha256="107f14cfe0c5c023ee429c82f795b21f7028dda6510e36068ebe284dd29d4605",
+        filename="benerail_stations.json",
+    ),
+)
+
+resource(
+    name="train_stations",
+    source=http_source(
+        url="https://junction-build-artifacts.s3.eu-west-2.amazonaws.com/train_stations-0562010d12ea37fe4c3f0805e6217953db63089ab67fe37d135a4a2b36d22494.json",
+        len=1342307,
+        sha256="0562010d12ea37fe4c3f0805e6217953db63089ab67fe37d135a4a2b36d22494",
+        filename="train_stations.json",
     ),
 )

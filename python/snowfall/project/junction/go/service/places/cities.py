@@ -1,12 +1,12 @@
 import datetime
-import math
 import os
 import uuid
 from collections.abc import AsyncIterable, Sequence
 
 from aiocsv import protocols, readers
 
-from snowfall.project.junction.go.service.places import places
+from snowfall.project.junction.go.service.places import handlers, places
+from snowfall.project.junction.go.service.places.typing import ProviderTypedDict
 from snowfall.project.junction.go.service.places.v1 import models_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
@@ -14,25 +14,10 @@ from snowfall.stdlib.v1 import latlng_pb2
 
 _MIN_POPULATION = 20000
 _NAMESPACE = uuid.UUID("105eba69-b787-48ba-9159-6078e0b76e46")
-_MAX_DISTANCE_AIRPORT_M = int(
+_MAX_AIRPORT_M = int(
     os.getenv("MAX_DISTANCE_AIRPORT_M", "50000"),  # noqa: WPS432
 )
-_MAX_DISTANCE_RAIL_M = int(os.getenv("MAX_DISTANCE_RAIL_M", "10000"))  # noqa: WPS432
-
-
-def _calculate_distance(
-    p1: tuple[float, float],
-    p2: tuple[float, float],
-) -> float:
-    """Return the great circle distance in meters between two points."""
-    lon1, lat1, lon2, lat2 = map(math.radians, (*p1, *p2))
-
-    dlon = math.sin((lon2 - lon1) / 2) ** 2
-    dlat = math.sin((lat2 - lat1) / 2) ** 2
-    hav = dlat + math.cos(lat1) * math.cos(lat2) * dlon
-    distance = 2 * math.asin(math.sqrt(hav))
-    radius_of_earth_in_metres = 6371000
-    return distance * radius_of_earth_in_metres
+_MAX_RAIL_M = int(os.getenv("MAX_DISTANCE_RAIL_M", "10000"))  # noqa: WPS432
 
 
 def _filter_location_by_type(
@@ -64,16 +49,17 @@ def _filter_location_by_type(
             valid_locations.append(location.id)
         elif distance.intersection(location.types):
             loc = (location.coordinates.longitude, location.coordinates.latitude)
-            if _calculate_distance((longitude, latitude), loc) <= _MAX_DISTANCE_RAIL_M:
+            if handlers.calculate_distance((longitude, latitude), loc) <= _MAX_RAIL_M:
                 # It's close enough, add it.
                 valid_locations.append(location.id)
 
     return valid_locations
 
 
-async def parse_csv(
+async def parse_csv(  # noqa: WPS231
     locations_repository: places.LocationRepository,
     csv_file: protocols.WithAsyncRead,
+    provider_jsons: ProviderTypedDict,
 ) -> AsyncIterable[models_pb2.Place]:
     async for row in readers.AsyncDictReader(csv_file):
         locations = [
@@ -82,7 +68,7 @@ async def parse_csv(
                 cursor="",
                 latitude=float(row["latitude"]),
                 longitude=float(row["longitude"]),
-                max_distance_meters=_MAX_DISTANCE_AIRPORT_M,
+                max_distance_meters=_MAX_AIRPORT_M,
             )
             # TODO: only locations in the same country
         ]
@@ -96,6 +82,27 @@ async def parse_csv(
         if not location_ids:
             continue
 
+        provider_places = []
+
+        for provider in provider_jsons.values():
+            for provider_id, json_bytes in provider.items():
+                provider_data = handlers.find_nearest_provider_places(
+                    provider_json=json_bytes,
+                    coordinates=(float(row["latitude"]), float(row["longitude"])),
+                    radius=_MAX_AIRPORT_M,
+                )
+                if provider_data:
+                    provider_places.append((provider_id, provider_data))
+
+        place_attributes = models_pb2.PlaceAttributes(
+            provider_ids=[
+                models_pb2.ProviderIds(
+                    provider_id=provider_identifier,
+                    place_ids=provider_place,
+                )
+                for provider_identifier, provider_place in provider_places
+            ],
+        )
         yield models_pb2.Place(
             merged_ids=location_ids,
             location=models_pb2.Location(
@@ -111,4 +118,5 @@ async def parse_csv(
                 ),
                 source_ref="cities",
             ),
+            place_attributes=place_attributes,
         )

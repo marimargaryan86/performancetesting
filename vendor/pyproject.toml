@@ -252,6 +252,8 @@ per-file-ignores = [
   "conftest.py:WPS442",
   "main.py:WPS432",
   "python/snowfall/project/junction/service/providers/benerail/stations.py:WPS232",
+  "python/snowfall/project/junction/go/service/places/cities.py:WPS232",
+  "python/snowfall/project/junction/go/service/places/locations.py:WPS232",
   "python/snowfall/stdlib/persistence/filesystem.py:WPS402",
   "python/snowfall/vendor/carnect/models/*.py:SF10,WPS114,WPS115,WPS118,WPS420,WPS431,WPS604",
 ]

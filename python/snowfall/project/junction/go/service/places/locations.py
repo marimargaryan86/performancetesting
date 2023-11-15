@@ -3,7 +3,8 @@ import uuid
 from collections.abc import AsyncIterable, Mapping, Sequence
 from typing import Any
 
-from snowfall.project.junction.go.service.places import places
+from snowfall.project.junction.go.service.places import handlers, places
+from snowfall.project.junction.go.service.places.typing import ProviderTypedDict
 from snowfall.project.junction.go.service.places.v1 import models_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
@@ -66,6 +67,7 @@ def resolve_osm_properties(  # noqa: WPS231
 async def node_to_place(  # noqa: WPS231
     locations_repository: places.LocationRepository,
     nodes: Sequence[Mapping[str, Any]],
+    provider_jsons: ProviderTypedDict,
 ) -> AsyncIterable[models_pb2.Place]:
     for node in nodes:
         name = validate_name(node)
@@ -90,6 +92,35 @@ async def node_to_place(  # noqa: WPS231
             if not locations:
                 continue
 
+            provider_places = []
+            for provider_type, provider in provider_jsons.items():
+                if provider_type != types:
+                    continue
+                for provider_id, json_bytes in provider.items():
+                    provider_data = (  # noqa: WPS220
+                        handlers.find_nearest_provider_place(
+                            provider_json=json_bytes,
+                            coordinates=(
+                                float(node["geometry"]["coordinates"][1]),
+                                float(node["geometry"]["coordinates"][0]),
+                            ),
+                        )
+                    )
+                    provider_places.append(  # noqa: WPS220
+                        (provider_id, [provider_data]),
+                    )
+
+            place_attributes = models_pb2.PlaceAttributes(
+                iata=properties["iata"],
+                provider_ids=[
+                    models_pb2.ProviderIds(
+                        provider_id=provider_identifier,
+                        place_ids=provider_place,
+                    )
+                    for provider_identifier, provider_place in provider_places
+                ],
+            )
+
             yield models_pb2.Place(
                 location=models_pb2.Location(
                     id=string.to_uuid(node["id"], _NAMESPACE),
@@ -105,7 +136,5 @@ async def node_to_place(  # noqa: WPS231
                     ),
                 ),
                 merged_ids=locations,
-                place_attributes=models_pb2.PlaceAttributes(
-                    iata=properties["iata"],
-                ),
+                place_attributes=place_attributes,
             )

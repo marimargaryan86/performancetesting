@@ -18,10 +18,15 @@ from snowfall.project.junction.go.service.places.grpc import (
     LocationsService,
     PlacesService,
 )
+from snowfall.project.junction.go.service.places.typing import ProviderTypedDict
+from snowfall.project.junction.go.service.places.v1 import models_pb2
 from snowfall.service.geodata.v1 import geocoding_pb2_grpc
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.service import application, grpc_factory
 from snowfall.stdlib.transport.grpc import server
+
+_BENERAIL_ID = "caefde65-c15c-4b60-b8d9-27638b50b08f"
+_SAT_ID = "a5547dae-9c65-4746-8637-d0601865508e"
 
 
 class _CitiesSettings(application.Settings):
@@ -39,6 +44,8 @@ class _GrpcSettings(application.Settings):
 
 
 async def _generate_cities(app: application.Application[_CitiesSettings]) -> None:
+    # As a script, we don't need to worry about blocking the event loop.
+    asyncio.get_running_loop().slow_callback_duration = 1
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
@@ -59,6 +66,29 @@ async def _generate_cities(app: application.Application[_CitiesSettings]) -> Non
         "snowfall.project.junction.go.service.places.main",
         "nodes.json",
     )
+
+    benerail_json = pkgutil.get_data(
+        "snowfall.project.junction.go.service.places.main",
+        "benerail_stations.json",
+    )
+
+    sat_json = pkgutil.get_data(
+        "snowfall.project.junction.go.service.places.main",
+        "train_stations.json",
+    )
+
+    provider_json: ProviderTypedDict = {
+        models_pb2.Location.TYPE_RAILWAY_STATION: {
+            _BENERAIL_ID: (
+                json.loads(
+                    benerail_json.decode("utf-8"),
+                )
+                if benerail_json
+                else []
+            ),
+            _SAT_ID: json.loads(sat_json.decode("utf-8")) if sat_json else [],
+        },
+    }
 
     filesystem.resource_path(
         "snowfall.project.junction.go.service.places.main",
@@ -82,7 +112,7 @@ async def _generate_cities(app: application.Application[_CitiesSettings]) -> Non
     count = 1
     async with asyncio.TaskGroup() as tg:
         async with aiofiles.open(cities_csv_path) as csv_file:
-            async for city in cities.parse_csv(locations_repo, csv_file):
+            async for city in cities.parse_csv(locations_repo, csv_file, provider_json):
                 count += 1
                 cache = places_cache.get(city.location.id)
                 if cache:
@@ -90,9 +120,16 @@ async def _generate_cities(app: application.Application[_CitiesSettings]) -> Non
                     city.location.country_code = cache["location"]["country_code"]
                     city.location.time_zone = cache["location"]["time_zone"]
 
-                tg.create_task(places.create(places_repository, city, sem, count))  # type: ignore[unused-awaitable]
+                tg.create_task(  # type: ignore[unused-awaitable]
+                    places.create(
+                        places_repository,
+                        city,
+                        sem,
+                        count,
+                    ),
+                )
 
-        async for node in locations.node_to_place(locations_repo, nodes):
+        async for node in locations.node_to_place(locations_repo, nodes, provider_json):
             count += 1
             cache = places_cache.get(node.location.id)
             if cache:
@@ -100,7 +137,14 @@ async def _generate_cities(app: application.Application[_CitiesSettings]) -> Non
                 node.location.country_code = cache["location"]["country_code"]
                 node.location.time_zone = cache["location"]["time_zone"]
 
-            tg.create_task(places.create(places_repository, node, sem, count))  # type: ignore[unused-awaitable]
+            tg.create_task(  # type: ignore[unused-awaitable]
+                places.create(
+                    places_repository,
+                    node,
+                    sem,
+                    count,
+                ),
+            )
 
     logging.info("Generate places completed.")
     places_count = await places_collection.count_documents({})
