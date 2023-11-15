@@ -7,7 +7,8 @@ import structlog
 from sentry_sdk.integrations import logging as sentry_logging
 
 Integrations = Sequence[sentry_sdk.integrations.Integration]
-_DEFAULT_TRACE_SAMPLE_RATE = 0.05
+_DEFAULT_PROFILES_SAMPLE_RATE = 1
+_DEFAULT_TRACES_SAMPLE_RATE = 0.1
 
 
 def sentry_trace_processor(
@@ -40,7 +41,14 @@ def configure_sentry(
         default_integrations=True,
         auto_enabling_integrations=True,
         integrations=_with_additional_integrations(integrations),
-        traces_sample_rate=kwargs.get("trace_sample_rate", _DEFAULT_TRACE_SAMPLE_RATE),
+        traces_sample_rate=kwargs.get(
+            "traces_sample_rate",
+            _DEFAULT_TRACES_SAMPLE_RATE,
+        ),
+        profiles_sample_rate=kwargs.get(
+            "profiles_sample_rate",
+            _DEFAULT_PROFILES_SAMPLE_RATE,
+        ),
         in_app_include=["snowfall"],
         **kwargs,
     )
