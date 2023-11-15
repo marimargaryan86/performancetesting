@@ -8,6 +8,8 @@ commits:
       - "protobuf/snowfall/project/junction/extensions"
       - "python/snowfall/project/junction/api_automation/mobile_api_tests"
       - "python/snowfall/project/junction/extensions"
+    junction/content:
+      - "python/snowfall/project/junction/content"
     junction/go:
       - ".gitlab/junction"
       - "golang/cmd/gtfs-import"
