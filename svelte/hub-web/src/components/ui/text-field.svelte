@@ -101,7 +101,7 @@
     />
 
     {#if clearable && value}
-      <button type="button" on:click={clear} class="clear">
+      <button type="button" on:click={clear} class="clear" tabindex="-1">
         <RemoveIcon color="var(--color-common-dark-strong)" />
       </button>
     {/if}

@@ -1,9 +1,8 @@
 <script lang="ts" generics="TValue">
-  import { clickOutside } from "directives/click-outside";
-
-  import { scale } from "svelte/transition";
-
   /* global TValue */
+  import { keyboard } from "directives/keyboard";
+  import { clickOutside } from "directives/click-outside";
+  import { scale } from "svelte/transition";
   import type { MaybePromise } from "@sveltejs/kit";
   import TextField from "./text-field.svelte";
 
@@ -18,7 +17,10 @@
 
   let items: TValue[] = [];
   let query = formatter(value);
+  let dialog: HTMLUListElement | undefined;
+  let textField: TextField | undefined;
 
+  $: hoveredIndex = value ? items.indexOf(value) : -1;
   $: expanded = items.length;
 
   async function search(event: CustomEvent<HTMLInputElement>): Promise<void> {
@@ -30,6 +32,7 @@
     value = item;
     query = formatter(item);
     items = [];
+    textField?.focus();
   }
 
   function clear(): void {
@@ -37,11 +40,60 @@
   }
 
   function close(): void {
+    query = formatter(value);
     items = [];
   }
+
+  function scrollToOption(): void {
+    dialog?.children[hoveredIndex]?.scrollIntoView({ block: "nearest" });
+  }
+
+  function setHoveredIndex(option?: TValue): void {
+    hoveredIndex = option ? items.indexOf(option) : -1;
+  }
+
+  const keyMapping = {
+    ArrowUp: (): void => {
+      hoveredIndex = Math.max(0, hoveredIndex - 1);
+
+      if (expanded) {
+        scrollToOption();
+      } else {
+        const nextValue = items[hoveredIndex];
+        if (nextValue) {
+          select(nextValue);
+        }
+      }
+    },
+    ArrowDown: (): void => {
+      hoveredIndex = Math.min(items.length - 1, hoveredIndex + 1);
+
+      if (expanded) {
+        scrollToOption();
+      } else {
+        const nextValue = items[hoveredIndex];
+
+        if (nextValue) {
+          select(nextValue);
+        }
+      }
+    },
+    Enter: (): void => {
+      if (expanded) {
+        const nextValue = items[hoveredIndex];
+
+        if (nextValue) {
+          return select(nextValue);
+        }
+
+        close();
+      }
+    },
+    Escape: close,
+  };
 </script>
 
-<div class="autocomplete-field" use:clickOutside={close}>
+<div class="autocomplete-field" use:clickOutside={close} use:keyboard={keyMapping}>
   <TextField
     {label}
     {required}
@@ -51,13 +103,28 @@
     {error}
     on:clear={clear}
     on:input={search}
+    on:blur={close}
+    bind:this={textField}
   />
 
   {#if expanded}
-    <ul class="options typography body-medium" transition:scale={{ duration: 150, start: 0.8 }}>
-      {#each items as item}
+    <ul
+      class="options typography body-medium"
+      transition:scale={{ duration: 150, start: 0.8 }}
+      bind:this={dialog}
+      tabindex="-1"
+    >
+      {#each items as item, idx}
         <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-        <li class="option" on:click={select.bind(select, item)} on:keypress>{formatter(item)}</li>
+        <li
+          class="option"
+          on:pointerover={setHoveredIndex.bind(setHoveredIndex, item)}
+          on:mousedown={select.bind(select, item)}
+          class:selected={item === value}
+          class:hovered={hoveredIndex === idx}
+        >
+          {formatter(item)}
+        </li>
       {/each}
     </ul>
   {/if}
@@ -95,6 +162,14 @@
     padding: 16px;
     cursor: pointer;
     user-select: none;
+  }
+
+  .option.selected {
+    background-color: var(--color-main-neutral-50);
+  }
+
+  .option.hovered {
+    background-color: var(--color-main-primary-50);
   }
 
   .option:not(:last-child) {
