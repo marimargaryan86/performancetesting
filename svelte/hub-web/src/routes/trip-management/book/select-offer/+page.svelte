@@ -1,4 +1,6 @@
 <script lang="ts" context="module">
+  const OFFER_POLL_TIMEOUT_MS = 60000;
+
   function getSortAndFilteringFunc(
     options: SearchOptionsData,
   ): (offers: OfferModel[]) => OfferModel[] {
@@ -91,23 +93,33 @@
   let pollSignal = { cancelled: false };
 
   $: if (browser && data.tripCandidates && data.offers.status !== "completed") {
-    getOffers();
+    pollOffers();
   }
   $: sortAndFilter = getSortAndFilteringFunc(searchOptions);
 
-  const { pending: offersPending, func: getOffers } = pendableCall(async () => {
-    offers = [];
+  const { pending: offersPending, func: getOffers } = pendableCall(
+    async (signal: { cancelled: boolean }) => {
+      offers = [];
 
-    for await (const offer of tripManagement.yieldOffers(pollSignal)) {
-      offers = [...offers, offer];
-    }
+      for await (const offer of tripManagement.yieldOffers(signal)) {
+        offers = [...offers, offer];
+      }
 
-    searchOptionsSettings = getSearchOptionSettings(offers);
-    searchOptions = {
-      ...searchOptions,
-      durationM: searchOptionsSettings.durationSpanM.start,
-    };
-  });
+      searchOptionsSettings = getSearchOptionSettings(offers);
+      searchOptions = {
+        ...searchOptions,
+        durationM: searchOptionsSettings.durationSpanM.start,
+      };
+    },
+  );
+
+  function pollOffers(): void {
+    pollSignal.cancelled = true;
+    pollSignal = { cancelled: false };
+
+    setTimeout(() => (pollSignal.cancelled = true), OFFER_POLL_TIMEOUT_MS);
+    getOffers(pollSignal);
+  }
 
   function select(event: CustomEvent<{ offerId: string; optionIds: string[] }>): void {
     if ($pending) {
