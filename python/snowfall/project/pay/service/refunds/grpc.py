@@ -403,11 +403,11 @@ class RefundsService(
         except NotFoundError:
             return await context.abort(grpc.StatusCode.NOT_FOUND)
 
-        refunded_us = money.from_protobuf(request.refund.refunded_us)
+        refunded_reseller = money.from_protobuf(request.refund.refunded_reseller)
         try:
             stripe_refund = stripe.Refund.create(
                 payment_intent=bill.payment_intent_id,
-                amount=refunded_us.amount,
+                amount=refunded_reseller.amount,
             )
         except stripe.error.StripeError:
             return await context.abort(grpc.StatusCode.INVALID_ARGUMENT)
