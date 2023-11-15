@@ -80,9 +80,9 @@ class BookingsByOrder(endpoints.HTTPEndpoint):
             reseller_id=request.user.metadata.get("reseller_id", ""),
         )
 
-        bookings_and_cancellations = (
-            await client.find_booking_cancellations_for_bookings(
-                bookings=response.bookings,
+        booking_cancellations_response = (
+            await client.find_booking_cancellations_by_booking_ids(
+                booking_ids=[booking.id for booking in response.bookings],
                 reseller_id=request.user.metadata.get("reseller_id", ""),
             )
         )
@@ -101,7 +101,14 @@ class BookingsByOrder(endpoints.HTTPEndpoint):
                 data=[
                     resources.TripBookingResource.from_proto(
                         booking=booking,
-                        booking_cancellation=booking_cancellation,
+                        booking_cancellation=next(
+                            (
+                                booking_cancellation
+                                for booking_cancellation in booking_cancellations_response.booking_cancellations
+                                if booking_cancellation.booking_id == booking.id
+                            ),
+                            None,
+                        ),
                         refund=next(
                             (
                                 refund
@@ -112,7 +119,7 @@ class BookingsByOrder(endpoints.HTTPEndpoint):
                         ),
                         request=request,
                     )
-                    for booking, booking_cancellation in bookings_and_cancellations
+                    for booking in response.bookings
                 ],
                 links=pagination_helpers.get_next_url(
                     request.url_for(

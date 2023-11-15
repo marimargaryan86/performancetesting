@@ -492,3 +492,25 @@ class TestBookingCancellations(object):
             assert booking_cancellation.id in ids
 
         assert result_count == len(ids)
+
+    async def test_find_booking_cancellations_by_booking_ids(
+        self,
+        booking_cancellations_repository: orders.BookingCancellationsRepository,
+        cancellation_request: models_pb2.CancellationRequest,
+    ) -> None:
+        booking_ids = [
+            booking_cancellation.booking_id
+            for booking_cancellation in cancellation_request.booking_cancellations
+        ]
+
+        retrieved = await booking_cancellations_repository.find_by_booking_ids(
+            booking_ids=booking_ids,
+            reseller_id=cancellation_request.reseller_id,
+        )
+
+        result_count = 0
+        async for booking_cancellation in retrieved:
+            result_count += 1
+            assert booking_cancellation.booking_id in booking_ids
+
+        assert result_count == len(booking_ids)

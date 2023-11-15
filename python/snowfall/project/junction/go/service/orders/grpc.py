@@ -335,10 +335,18 @@ class OrderService(
         request: orders_pb2.ListBookingCancellationsRequest,
         context: aio.ServicerContext,
     ) -> orders_pb2.ListBookingCancellationsResponse:
-        booking_cancellations_result = await self._booking_cancellations.find(
-            ids=list(request.ids.ids),
-            reseller_id=request.reseller_id,
-        )
+        if request.HasField("booking_ids"):
+            booking_cancellations_result = (
+                await self._booking_cancellations.find_by_booking_ids(
+                    booking_ids=list(request.booking_ids.ids),
+                    reseller_id=request.reseller_id,
+                )
+            )
+        else:
+            booking_cancellations_result = await self._booking_cancellations.find(
+                ids=list(request.ids.ids),
+                reseller_id=request.reseller_id,
+            )
 
         return orders_pb2.ListBookingCancellationsResponse(
             booking_cancellations=[

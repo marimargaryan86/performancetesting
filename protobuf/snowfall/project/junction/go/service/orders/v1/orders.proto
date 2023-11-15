@@ -169,8 +169,11 @@ message GetCancellationRequestResponse {
 }
 
 message ListBookingCancellationsRequest {
-  ListOfIds ids = 1;
-  string reseller_id = 2;
+  oneof payload {
+    ListOfIds ids = 1;
+    ListOfIds booking_ids = 2;
+  }
+  string reseller_id = 3;
 }
 
 message ListBookingCancellationsResponse {

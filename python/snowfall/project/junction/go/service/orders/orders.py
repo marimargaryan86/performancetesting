@@ -583,20 +583,17 @@ class BookingCancellationsRepository(
         ids: Sequence[str],
         reseller_id: str = "",
     ) -> resultset.ResultSet[models_pb2.BookingCancellation]:
-        filter_ = (
-            {
-                "booking_cancellations._id": {
-                    "$in": ids,
-                },
-            }
-            if ids
-            else {}
-        )
+        return await self._find(ids=ids, reseller_id=reseller_id)
 
-        filter_ = _add_reseller_id_to_filter(reseller_id, filter_)
-
-        return await self._find_with_cursor(
-            filter_=filter_,
+    async def find_by_booking_ids(
+        self,
+        booking_ids: Sequence[str],
+        reseller_id: str = "",
+    ) -> resultset.ResultSet[models_pb2.BookingCancellation]:
+        return await self._find(
+            ids=booking_ids,
+            reseller_id=reseller_id,
+            selector="booking_id",
         )
 
     async def find_by_id(
@@ -661,3 +658,25 @@ class BookingCancellationsRepository(
         )
 
         return booking_cancellation
+
+    async def _find(
+        self,
+        ids: Sequence[str],
+        reseller_id: str = "",
+        selector: str = "_id",
+    ) -> resultset.ResultSet[models_pb2.BookingCancellation]:
+        filter_ = (
+            {
+                "booking_cancellations.{0}".format(selector): {
+                    "$in": ids,
+                },
+            }
+            if ids
+            else {}
+        )
+
+        filter_ = _add_reseller_id_to_filter(reseller_id, filter_)
+
+        return await self._find_with_cursor(
+            filter_=filter_,
+        )

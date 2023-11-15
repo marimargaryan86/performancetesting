@@ -61,9 +61,9 @@ def _trip_bookings_resolver(
             limit=len(identifiers),
         )
 
-        bookings_and_cancellations = (
-            await orders_client.find_booking_cancellations_for_bookings(
-                bookings=response.bookings,
+        booking_cancellations_response = (
+            await orders_client.find_booking_cancellations_by_booking_ids(
+                booking_ids=[booking.id for booking in response.bookings],
             )
         )
 
@@ -79,7 +79,14 @@ def _trip_bookings_resolver(
         return [
             resources.TripBookingResource.from_proto(
                 booking=booking,
-                booking_cancellation=booking_cancellation,
+                booking_cancellation=next(
+                    (
+                        booking_cancellation
+                        for booking_cancellation in booking_cancellations_response.booking_cancellations
+                        if booking_cancellation.booking_id == booking.id
+                    ),
+                    None,
+                ),
                 refund=next(
                     (
                         refund
@@ -90,7 +97,7 @@ def _trip_bookings_resolver(
                 ),
                 request=request,
             )
-            for booking, booking_cancellation in bookings_and_cancellations
+            for booking in response.bookings
         ]
 
     return wrapper

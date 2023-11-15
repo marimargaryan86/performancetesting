@@ -180,12 +180,12 @@ class Client(abc.ABC):
         """Fetch all booking details resources related to a booking."""
 
     @abc.abstractmethod
-    async def find_booking_cancellations_for_bookings(
+    async def find_booking_cancellations_by_booking_ids(
         self,
-        bookings: Sequence[models_pb2.Booking],
+        booking_ids: Sequence[str],
         reseller_id: str | None = None,
-    ) -> list[tuple[models_pb2.Booking, models_pb2.BookingCancellation | None]]:
-        """Fetch all booking cancellation resources related to bookings."""
+    ) -> orders_pb2.ListBookingCancellationsResponse:
+        """Fetch all booking cancellation resources for a list of booking ids."""
 
     @abc.abstractmethod
     async def handle_cancellation_ticket_completed(
@@ -524,26 +524,21 @@ class DictClient(Client):
             next_page_token=page.cursor,
         )
 
-    async def find_booking_cancellations_for_bookings(
+    async def find_booking_cancellations_by_booking_ids(
         self,
-        bookings: Sequence[models_pb2.Booking],
+        booking_ids: Sequence[str],
         reseller_id: str | None = None,
-    ) -> list[tuple[models_pb2.Booking, models_pb2.BookingCancellation | None]]:
-        bookings_and_cancellations = []
-        for booking in bookings:
-            try:
-                booking_cancellation = (
-                    await self.get_booking_cancellation_by_booking_id(
-                        booking.id,
-                        reseller_id or "",
-                    )
-                )
-            except errors.NotFoundError:
-                booking_cancellation = None
+    ) -> orders_pb2.ListBookingCancellationsResponse:
+        booking_cancellations: list[models_pb2.BookingCancellation] = [
+            booking_cancellation
+            for cancellations in self._cancellations.values()
+            for booking_cancellation in cancellations.booking_cancellations
+            if booking_cancellation.booking_id in booking_ids
+        ]
 
-            bookings_and_cancellations.append((booking, booking_cancellation))
-
-        return bookings_and_cancellations
+        return orders_pb2.ListBookingCancellationsResponse(
+            booking_cancellations=booking_cancellations,
+        )
 
     async def handle_cancellation_ticket_completed(
         self,
@@ -961,26 +956,20 @@ class GrpcClient(Client):
             self._orders.ListBookingDetails(request, timeout=self._timeout),
         )
 
-    async def find_booking_cancellations_for_bookings(
+    async def find_booking_cancellations_by_booking_ids(
         self,
-        bookings: Sequence[models_pb2.Booking],
+        booking_ids: Sequence[str],
         reseller_id: str | None = None,
-    ) -> list[tuple[models_pb2.Booking, models_pb2.BookingCancellation | None]]:
-        bookings_and_cancellations = []
-        for booking in bookings:
-            try:
-                booking_cancellation = (
-                    await self.get_booking_cancellation_by_booking_id(
-                        booking_id=booking.id,
-                        reseller_id=reseller_id or "",
-                    )
-                )
-            except errors.NotFoundError:
-                booking_cancellation = None
-
-            bookings_and_cancellations.append((booking, booking_cancellation))
-
-        return bookings_and_cancellations
+    ) -> orders_pb2.ListBookingCancellationsResponse:
+        return await errors.handle_grpc_errors(
+            self._orders.ListBookingCancellations(
+                orders_pb2.ListBookingCancellationsRequest(
+                    booking_ids=orders_pb2.ListOfIds(ids=booking_ids),
+                    reseller_id=reseller_id or "",
+                ),
+                timeout=self._timeout,
+            ),
+        )
 
     async def handle_cancellation_ticket_completed(
         self,
