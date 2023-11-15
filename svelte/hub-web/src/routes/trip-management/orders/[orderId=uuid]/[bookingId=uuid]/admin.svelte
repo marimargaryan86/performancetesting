@@ -16,9 +16,9 @@
 
   onMount(() => {
     if (booking.transactionId) {
-      transactionTask =
-        booking.transaction ??
-        integrationInstancesClient.hub.transactions.get({ id: booking.transactionId });
+      transactionTask = integrationInstancesClient.hub.transactions.get({
+        id: booking.transactionId,
+      });
     }
   });
 </script>
