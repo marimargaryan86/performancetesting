@@ -1,4 +1,4 @@
-import type { SessionModel, UserModel } from "models/user";
+import type { Session, User } from "integration/ory/schemas";
 
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
@@ -6,9 +6,9 @@ declare global {
   namespace App {
     // interface Error {}
     interface Locals {
-      user?: UserModel;
+      user?: User;
       sessionExpiresAt?: Date;
-      session: SessionModel;
+      session: Session;
     }
     // interface PageData {}
     // interface Platform {}

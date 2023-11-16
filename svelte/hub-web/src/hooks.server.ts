@@ -5,10 +5,10 @@ import { sequence } from "@sveltejs/kit/hooks";
 import { env } from "$env/dynamic/private";
 import { deleteSession, getSession } from "utils/auth";
 import { AUTH_ROOT } from "./routes/integration/auth/auth-service";
-import type { SessionModelExtended } from "models/user";
+import type { SessionExtended } from "integration/ory/schemas";
 
 export function authHandle({ event, resolve }: Parameters<Handle>[0]): MaybePromise<Response> {
-  let session: SessionModelExtended | undefined;
+  let session: SessionExtended | undefined;
 
   try {
     session = getSession(event);

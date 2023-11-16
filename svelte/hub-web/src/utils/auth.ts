@@ -1,8 +1,8 @@
 import { dev } from "$app/environment";
 import { error, type RequestEvent } from "@sveltejs/kit";
-import type { SessionModelExtended } from "models/user";
 import * as jwt from "jsonwebtoken";
 import { env } from "$env/dynamic/private";
+import type { SessionExtended } from "integration/ory/schemas";
 
 const SESSION_TOKEN = "session-token";
 const COOKIE_OPTIONS = {
@@ -13,12 +13,12 @@ const COOKIE_OPTIONS = {
 // Two weeks, as set by the Legal team. Do not modify.
 const EXPIRY_MAX_AGE = 1209600;
 
-export function getSession(event: RequestEvent): SessionModelExtended {
+export function getSession(event: RequestEvent): SessionExtended {
   const token = event.cookies.get(SESSION_TOKEN);
 
   try {
     if (token) {
-      const data = jwt.verify(token, env.JWT_SECRET ?? "secret") as SessionModelExtended;
+      const data = jwt.verify(token, env.JWT_SECRET ?? "secret") as SessionExtended;
       return { ...data, expiresAt: new Date(data.expiresAt) };
     }
   } catch (err) {
@@ -33,7 +33,7 @@ export function setSession({
   rememberMe = false,
   event,
 }: {
-  session: SessionModelExtended;
+  session: SessionExtended;
   rememberMe?: boolean;
   event: RequestEvent;
 }): void {

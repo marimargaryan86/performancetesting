@@ -6,8 +6,8 @@ import type { SearchOptionsData } from "../../routes/trip-management/book/select
 const foo = {
   groups: [
     {
-      options: [{ price: { amount: 100 } }],
-      details: [
+      options: [{ price: { total: { amount: 100 } } }],
+      detailsList: [
         {
           legs: [
             {
@@ -24,8 +24,8 @@ const foo = {
 const bar = {
   groups: [
     {
-      options: [{ price: { amount: 200 } }],
-      details: [
+      options: [{ price: { total: { amount: 200 } } }],
+      detailsList: [
         {
           legs: [
             {

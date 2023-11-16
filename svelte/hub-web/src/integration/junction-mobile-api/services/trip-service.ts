@@ -1,5 +1,5 @@
 import JunctionMobileApiService from "./junction-mobile-api-service";
-import type { SessionModel } from "models/user";
+import type { Session } from "integration/ory/schemas";
 import {
   tripCandidateSearchParser,
   type TripCandidateSearch,
@@ -15,7 +15,7 @@ export default class TripService extends JunctionMobileApiService {
     session,
     data,
   }: {
-    session: SessionModel;
+    session: Session;
     data: TripCandidateSearchCreate;
   }): Promise<TripCandidateSearch> {
     const resp = await this.makeRequest<{ data: TripCandidateSearchSchema }>(
@@ -34,7 +34,7 @@ export default class TripService extends JunctionMobileApiService {
     session,
     id,
   }: {
-    session: SessionModel;
+    session: Session;
     id: string;
   }): Promise<TripCandidateSearch> {
     const resp = await this.makeRequest<{
@@ -50,7 +50,7 @@ export default class TripService extends JunctionMobileApiService {
     cursor,
     limit = 100,
   }: {
-    session: SessionModel;
+    session: Session;
     id: string;
     cursor?: string;
     limit?: number;

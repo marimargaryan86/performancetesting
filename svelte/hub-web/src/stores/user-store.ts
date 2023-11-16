@@ -1,4 +1,4 @@
+import type { User } from "integration/ory/schemas";
 import { writable } from "svelte/store";
-import type { UserModel } from "models/user";
 
-export default writable<UserModel>(undefined);
+export default writable<User>(undefined);

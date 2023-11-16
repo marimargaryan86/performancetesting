@@ -1,9 +1,9 @@
-import type { SessionModel } from "models/user";
+import type { Session } from "integration/ory/schemas";
 import JunctionHubApiService from "./junction-hub-api-service";
 import { companyParser, type Company, type CompanySchema } from "../schemas/company";
 
 export default class CompanyService extends JunctionHubApiService {
-  async get({ session, id }: { session: SessionModel; id: string }): Promise<Company> {
+  async get({ session, id }: { session: Session; id: string }): Promise<Company> {
     const resp = await this.makeRequest<{ data: CompanySchema }>(`/companies/${id}`, {
       session,
     });

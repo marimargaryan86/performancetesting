@@ -1,13 +1,7 @@
 import type { PaginatedData } from "models/common";
-import {
-  userParser,
-  type User,
-  type UserSchema,
-  type UserPermissions,
-  type UserPermissionsSchema,
-} from "../schemas/user";
+import { userParser, type User, type UserSchema } from "../schemas/user";
 import JunctionHubApiService from "./junction-hub-api-service";
-import type { SessionModel } from "models/user";
+import type { Session } from "integration/ory/schemas";
 
 export default class UserService extends JunctionHubApiService {
   async find({
@@ -15,7 +9,7 @@ export default class UserService extends JunctionHubApiService {
     cursor,
     limit = 100,
   }: {
-    session: SessionModel;
+    session: Session;
     cursor?: string;
     limit?: number;
   }): Promise<PaginatedData<User>> {
@@ -29,15 +23,9 @@ export default class UserService extends JunctionHubApiService {
     };
   }
 
-  async get({ session, id }: { session: SessionModel; id: string }): Promise<User> {
+  async get({ session, id }: { session: Session; id: string }): Promise<User> {
     const resp = await this.makeRequest<{ data: UserSchema }>(`/users/${id}`, { session });
 
     return userParser.toModel(resp.json.data);
-  }
-
-  async getOwnPermissions({ session }: { session: SessionModel }): Promise<UserPermissions> {
-    const resp = await this.makeRequest<UserPermissionsSchema>("/users/me", { session });
-
-    return resp.json;
   }
 }

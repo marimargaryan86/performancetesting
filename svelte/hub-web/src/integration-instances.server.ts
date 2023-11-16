@@ -4,7 +4,6 @@ import junctionHubApi from "integration/junction-hub-api/services";
 import ory from "integration/ory/services";
 
 const junctionHubCompanyService = new junctionHubApi.CompanyService(env.HUB_API_BASE_URL);
-const junctionHubUserService = new junctionHubApi.UserService(env.HUB_API_BASE_URL);
 
 export default {
   junctionMobileApi: {
@@ -34,8 +33,8 @@ export default {
     journeys: new junctionHubApi.JourneyService(env.HUB_API_BASE_URL),
     orders: new junctionHubApi.OrderService(env.HUB_API_BASE_URL),
     cancellationRequests: new junctionHubApi.CancellationRequestService(env.HUB_API_BASE_URL),
-    users: junctionHubUserService,
+    users: new junctionHubApi.UserService(env.HUB_API_BASE_URL),
     refunds: new junctionHubApi.RefundService(env.HUB_API_BASE_URL),
   },
-  ory: new ory.OryService(junctionHubUserService, env.ORY_BASE_URL),
+  ory: new ory.OryService(env.ORY_BASE_URL),
 };

@@ -65,12 +65,81 @@ export const loginFormParser = {
   }),
 };
 
-export type OrySessionSchema = {
-  expires_at: string;
-  identity: {
+export type UserRole = "reseller-user" | "reseller-admin" | "snowfall-user" | "snowfall-admin";
+
+export type User = {
+  id: string;
+  email: string;
+  name: string;
+  role: UserRole;
+};
+
+export type UserSchema = {
+  session: {
     id: string;
-    traits: {
-      email: string;
+    active: boolean;
+    expires_at: string;
+    authenticated_at: string;
+    authenticator_assurance_level: "aal1";
+    authentication_methods: {
+      method: "password";
+      aal: "aal1";
+      completed_at: string;
+    }[];
+    issued_at: string;
+    identity: {
+      id: string;
+      schema_id: string;
+      schema_url: string;
+      state: "active";
+      state_changed_at: string;
+      traits: { email: string };
+      verifiable_addresses: {
+        id: string;
+        value: string;
+        verified: boolean;
+        via: "email";
+        status: "completed";
+        verified_at: string;
+        created_at: string;
+        updated_at: string;
+      }[];
+      recovery_addresses: {
+        id: string;
+        value: string;
+        via: "email";
+        created_at: string;
+        updated_at: string;
+      }[];
+      metadata_public: { role: UserRole };
+      created_at: string;
+      updated_at: string;
+      organization_id: unknown | null;
     };
+    devices: {
+      id: string;
+      ip_address: string;
+      user_agent: "undici";
+      location: string;
+    }[];
   };
+};
+
+export const userParser = {
+  toModel: (data: UserSchema): User => ({
+    id: data.session.identity.id,
+    email: data.session.identity.traits.email,
+    name: "Unknown",
+    role: data.session.identity.metadata_public.role,
+  }),
+};
+
+export type Session = {
+  id: string;
+  token: string;
+};
+
+export type SessionExtended = Session & {
+  user: User;
+  expiresAt: Date;
 };

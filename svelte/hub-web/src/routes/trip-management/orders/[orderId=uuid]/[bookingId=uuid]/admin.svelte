@@ -26,10 +26,12 @@
 <div class="admin">
   <Transaction {booking} {transactionTask} />
 
-  {#if booking.refund && permitted($userStore, "refund", "*")}
+  {#if booking.refund}
     {#if booking.refund.status === "succeeded" || booking.refund.status === "submitted"}
-      <Refund refund={booking.refund} />
-    {:else}
+      {#if permitted($userStore, "refund.view")}
+        <Refund refund={booking.refund} />
+      {/if}
+    {:else if permitted($userStore, "refund.add")}
       {#await transactionTask then transaction}
         {#if transaction}
           <RefundDialog bind:booking {transaction} />

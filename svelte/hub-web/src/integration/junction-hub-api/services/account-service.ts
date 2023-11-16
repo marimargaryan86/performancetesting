@@ -1,4 +1,4 @@
-import type { SessionModel } from "models/user";
+import type { Session } from "integration/ory/schemas";
 import JunctionHubApiService from "./junction-hub-api-service";
 import type { PaginatedData } from "models/common";
 import { accountParser, type Account, type AccountSchema } from "../schemas/account";
@@ -9,7 +9,7 @@ export default class AccountService extends JunctionHubApiService {
     cursor,
     limit = 100,
   }: {
-    session: SessionModel;
+    session: Session;
     cursor?: string;
     limit?: number;
   }): Promise<PaginatedData<Account>> {
@@ -27,7 +27,7 @@ export default class AccountService extends JunctionHubApiService {
     };
   }
 
-  async get({ session, id }: { session: SessionModel; id: string }): Promise<Account> {
+  async get({ session, id }: { session: Session; id: string }): Promise<Account> {
     const resp = await this.makeRequest<{ data: AccountSchema }>(`/accounts/${id}`, {
       session,
     });

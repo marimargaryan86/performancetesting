@@ -27,7 +27,7 @@
     { label: order?.journey?.reference ?? "Unknown", url: orderLink.root },
     { label: `Booking ${data.bookingNo}` ?? "Unknown", url: selfLink.root },
   ];
-  $: transactionsPermitted = permitted($userStore, "transaction", "view");
+  $: canViewTransactions = permitted($userStore, "transaction.view");
 </script>
 
 <svelte:head>
@@ -47,7 +47,7 @@
     </span>
   </svelte:fragment>
 
-  <div class="content" style:--grid-columns={transactionsPermitted ? "1fr 1fr" : "1fr"}>
+  <div class="content" style:--grid-columns={canViewTransactions ? "1fr 1fr" : "1fr"}>
     <div class="booking">
       <div class="itinerary">
         <h3 class="typography title-large bold">Itinerary</h3>
@@ -92,7 +92,7 @@
       <Itinerary bookings={[data.booking]} />
     </div>
 
-    {#if transactionsPermitted}
+    {#if canViewTransactions}
       <Admin bind:booking={data.booking} />
     {/if}
   </div>

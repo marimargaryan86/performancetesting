@@ -1,4 +1,4 @@
-import type { SessionModel } from "models/user";
+import type { Session } from "integration/ory/schemas";
 import JunctionHubApiService from "./junction-hub-api-service";
 import {
   balanceParser,
@@ -14,7 +14,7 @@ export default class BalanceService extends JunctionHubApiService {
     cursor,
     limit = 100,
   }: {
-    session: SessionModel;
+    session: Session;
     accountId: string;
     cursor?: string;
     limit?: number;
@@ -32,7 +32,7 @@ export default class BalanceService extends JunctionHubApiService {
     accountId,
     data,
   }: {
-    session: SessionModel;
+    session: Session;
     accountId: string;
     data: BalanceAdd;
   }): Promise<Balance> {

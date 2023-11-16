@@ -1,5 +1,5 @@
 import JunctionMobileApiService from "./junction-mobile-api-service";
-import type { SessionModel } from "models/user";
+import type { Session } from "integration/ory/schemas";
 import {
   tripOfferPriceQuoteParser,
   type TripOfferPriceQuoteCreate,
@@ -14,7 +14,7 @@ export default class OfferService extends JunctionMobileApiService {
     session,
     data,
   }: {
-    session: SessionModel;
+    session: Session;
     data: TripOfferPriceQuoteCreate;
   }): Promise<TripOfferPriceQuote> {
     const resp = await this.makeRequest<{ data: TripOfferPriceQuoteSchema }>("/offers/quotes", {
@@ -28,7 +28,7 @@ export default class OfferService extends JunctionMobileApiService {
     return tripOfferPriceQuoteParser.toModel(resp.json.data);
   }
 
-  async get({ id, session }: { session: SessionModel; id: string }): Promise<TripOfferPriceQuote> {
+  async get({ id, session }: { session: Session; id: string }): Promise<TripOfferPriceQuote> {
     const resp = await this.makeRequest<{
       data: TripOfferPriceQuoteSchema;
       included?: IncludedSchemas;

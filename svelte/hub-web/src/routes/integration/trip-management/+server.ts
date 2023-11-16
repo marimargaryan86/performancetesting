@@ -1,6 +1,6 @@
 import * as devalue from "devalue";
 import type { RequestEvent } from "./$types";
-import type { SessionModel } from "models/user";
+import type { Session } from "integration/ory/schemas";
 import integrationInstances from "integration-instances";
 import type { BookingSessionModel } from "./trip-management";
 import { getRandomAlphaNumericString } from "utils/random";
@@ -52,7 +52,7 @@ async function search(event: RequestEvent): Promise<Response> {
 }
 
 async function getOfferSearch(
-  session: SessionModel,
+  session: Session,
   {
     searchData,
     offerSearch,
@@ -89,7 +89,7 @@ async function getOfferSearch(
   return { id: result.id, expiresAt: result.expiresAt, status: result.status };
 }
 
-async function getOffers(session: SessionModel, event: RequestEvent): Promise<Response> {
+async function getOffers(session: Session, event: RequestEvent): Promise<Response> {
   const bookingSession = utils.getBookingSession(event);
   const sessionToken = bookingSession.sessionToken ?? getRandomAlphaNumericString(32);
   const offerSearch = await getOfferSearch(session, {
@@ -118,7 +118,7 @@ async function getOffers(session: SessionModel, event: RequestEvent): Promise<Re
   return new Response(devalue.stringify({ data: offers, status: offerSearch.status }));
 }
 
-async function selectOffer(session: SessionModel, event: RequestEvent): Promise<Response> {
+async function selectOffer(session: Session, event: RequestEvent): Promise<Response> {
   const bookingSession = utils.getBookingSession(event);
   const selected: BookingSessionModel["selected"] = devalue.parse(await event.request.text());
 
@@ -157,7 +157,7 @@ async function selectOffer(session: SessionModel, event: RequestEvent): Promise<
   return new Response(undefined, { status: 204 });
 }
 
-async function getPriceQuote(session: SessionModel, event: RequestEvent): Promise<Response> {
+async function getPriceQuote(session: Session, event: RequestEvent): Promise<Response> {
   const bookingSession = utils.getBookingSession(event);
 
   if (!bookingSession.priceQuote) {
@@ -188,7 +188,7 @@ async function getPriceQuote(session: SessionModel, event: RequestEvent): Promis
   }
 }
 
-async function getPaymentIntent(session: SessionModel, event: RequestEvent): Promise<Response> {
+async function getPaymentIntent(session: Session, event: RequestEvent): Promise<Response> {
   const bookingSession = utils.getBookingSession(event);
 
   if (!bookingSession.priceQuote) {
@@ -233,7 +233,7 @@ function confirmPayment(event: RequestEvent): Response {
   return new Response();
 }
 
-async function createOrder(session: SessionModel, event: RequestEvent): Promise<Response> {
+async function createOrder(session: Session, event: RequestEvent): Promise<Response> {
   const bookingSession = utils.getBookingSession(event);
   const data: OrderCreate = devalue.parse(await event.request.text());
 
@@ -254,7 +254,7 @@ async function createOrder(session: SessionModel, event: RequestEvent): Promise<
   }
 }
 
-async function createOrderMarkups(session: SessionModel, event: RequestEvent): Promise<Response> {
+async function createOrderMarkups(session: Session, event: RequestEvent): Promise<Response> {
   const bookingSession = utils.getBookingSession(event);
   const data: MarkupsCreate = devalue.parse(await event.request.text());
 

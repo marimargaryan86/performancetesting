@@ -6,10 +6,7 @@
     label: string;
     icon: ComponentType<SvelteComponent<{ color?: string }>>;
     exact?: boolean;
-    permissions?: {
-      module: PermissionModule;
-      action?: PermissionAction;
-    };
+    permission?: Action;
   }
 
   const menuItems: MenuItem[] = [
@@ -22,27 +19,19 @@
       url: routeConfig.routes.tripManagement.routes.orders.root,
       label: "View orders",
       icon: BookingsIcon,
-      permissions: {
-        module: "journey",
-        action: "view",
-      },
+      permission: "journey.view",
     },
     {
       url: routeConfig.routes.pay.routes.activity.root,
       label: "Activity",
       icon: ActivityIcon,
-      permissions: {
-        module: "transaction",
-        action: "*",
-      },
+      permission: "transaction.view",
     },
     {
       url: routeConfig.routes.pay.routes.bills.root,
       label: "Bills",
       icon: BillIcon,
-      permissions: {
-        module: "*",
-      },
+      permission: "*",
     },
   ];
 </script>
@@ -54,7 +43,7 @@
   import routeConfig from "routeConfig";
   import BookingsIcon from "components/icons/bookings-icon.svelte";
   import BillIcon from "components/icons/bill-icon.svelte";
-  import { type PermissionAction, type PermissionModule, permitted } from "utils/permissions";
+  import { permitted, type Action } from "utils/permissions";
   import userStore from "stores/user-store";
 
   export let expanded: boolean;
@@ -65,7 +54,7 @@
 
 <ul class="menu" class:expanded style:--transition-time="{transitionTimeMs}ms">
   {#each menuItems as item}
-    {#if !item.permissions || permitted(user, item.permissions.module, item.permissions.action)}
+    {#if !item.permission || permitted(user, item.permission)}
       {@const active = item.exact
         ? $page.url.pathname === item.url
         : $page.url.pathname.startsWith(item.url)}

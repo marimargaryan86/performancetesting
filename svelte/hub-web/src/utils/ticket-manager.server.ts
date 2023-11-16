@@ -2,10 +2,10 @@ import integrationInstances from "integration-instances";
 import JSZip from "jszip";
 import { extension } from "mime-types";
 import { ensureDefined } from "utils/array";
-import type { SessionModel } from "models/user";
+import type { Session } from "integration/ory/schemas";
 
 type TicketsZipParams = {
-  session: SessionModel;
+  session: Session;
   orderId: string;
   bookingId?: string;
 };

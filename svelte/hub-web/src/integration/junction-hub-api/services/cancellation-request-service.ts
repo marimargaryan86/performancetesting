@@ -1,4 +1,4 @@
-import type { SessionModel } from "models/user";
+import type { Session } from "integration/ory/schemas";
 import JunctionHubApiService from "./junction-hub-api-service";
 import {
   cancellationRequestParsers,
@@ -12,7 +12,7 @@ export default class CancellationRequestService extends JunctionHubApiService {
     session,
     data,
   }: {
-    session: SessionModel;
+    session: Session;
     data: CancellationRequestCreate;
   }): Promise<CancellationRequest> {
     const resp = await this.makeRequest<{ data: CancellationRequestSchema }>(

@@ -1,61 +1,94 @@
-import type { UserPermissions } from "integration/junction-hub-api/schemas/user";
-import type { UserModel } from "models/user";
+import type { User, UserRole } from "integration/ory/schemas";
 
 /**
- * Represents a resource in the Junction Mobile or Hub API. Extracts the
- * `resource` part from permission strings (format: "resource.action") in
- * `UserPermissions`, including the superadmin wildcard `"*"`.
- *
+ * Base permissions, this list should be expanded upon as more permissions are created
  */
-export type PermissionModule =
-  | "*"
-  | Exclude<
-      {
-        [key in keyof UserPermissions["permissions"]]: key extends `${infer module}.${string}`
-          ? module
-          : never;
-      }[keyof UserPermissions["permissions"]],
-      undefined
-    >;
+const BASE_PERMISSIONS = {
+  "journey.view": 2,
+  "journey.add": 2 ** 2,
+  "order.view": 2 ** 3,
+  "order.add": 2 ** 4,
+  "booking.view": 2 ** 5,
+  "booking.add": 2 ** 6,
+  "cancel.view": 2 ** 7,
+  "cancel.add": 2 ** 8,
+  "refund.view": 2 ** 9,
+  "refund.add": 2 ** 10,
+  "transaction.view": 2 ** 11,
+  "transaction.add": 2 ** 12,
+  "user.view": 2 ** 13,
+  "user.add": 2 ** 14,
+};
+
+const PERMISSIONS = {
+  ...BASE_PERMISSIONS,
+  "*": Object.values(BASE_PERMISSIONS).reduce((prev, curr) => prev | curr) | 1,
+};
+
+export type Action = keyof typeof PERMISSIONS;
 
 /**
- * Represents an action in the Junction Mobile or Hub API. Extracts the
- * `action` part from permission strings (format: "resource.action") in
- * `UserPermissions`, including the superadmin wildcard `"*"`.
- *
+ * Get the number identifying a permission
+ * @param actions Actions to generate the number identifier from
+ * @returns A uniquely identifying number for the permission
  */
-export type PermissionAction = Exclude<
-  {
-    [key in keyof UserPermissions["permissions"]]: key extends `${string}.${infer action}`
-      ? action
-      : never;
-  }[keyof UserPermissions["permissions"]],
-  undefined
->;
-
-/**
- * Checks if a user has the specified permission for a resource and action.
- *
- * @param {UserModel} user - The `user` object, including its `permissions`.
- * @param {PermissionModule} resource - The resource part of the permission to check.
- * @param {PermissionAction} [action] - The action part of the permission to check. Optional.
- * @returns {boolean} - `true` if the user has the specified permission, `false` otherwise.
- *
- * @example
- * permitted(user, "booking", "view") // Checks if the user has permission for "booking.view".
- * permitted(user, "booking") // Checks if the user has any permission for the "booking" resource.
- */
-export function permitted(
-  user: UserModel,
-  module: PermissionModule,
-  action?: PermissionAction,
-): boolean {
-  const wildCardPermission = `${module}.*`;
-  const permission = `${module}${action ? `.${action}` : ""}`;
-
-  return (
-    "*" in user.permissions ||
-    wildCardPermission in user.permissions ||
-    permission in user.permissions
+function getPermission(...actions: Action[]): number {
+  return Object.entries(PERMISSIONS).reduce(
+    (prev, [key, val]) => prev | (actions.includes(key as Action) ? val : 0),
+    0,
   );
+}
+
+/**
+ * Mapping between the user role and its permissions.
+ */
+const ROLE_MAPPING: Record<UserRole, number> = {
+  "snowfall-admin": getPermission("*"),
+  "snowfall-user": getPermission(
+    "journey.view",
+    "order.view",
+    "booking.view",
+    "cancel.view",
+    "cancel.add",
+    "refund.view",
+    "refund.add",
+    "transaction.view",
+    "transaction.add",
+  ),
+  "reseller-admin": getPermission(
+    "journey.view",
+    "journey.add",
+    "order.view",
+    "order.add",
+    "booking.view",
+    "booking.add",
+    "cancel.view",
+    "cancel.add",
+    "refund.view",
+    "user.view",
+    "user.add",
+  ),
+  "reseller-user": getPermission(
+    "journey.view",
+    "journey.add",
+    "order.view",
+    "order.add",
+    "booking.view",
+    "booking.add",
+    "cancel.view",
+    "cancel.add",
+    "refund.view",
+  ),
+};
+
+/**
+ * Check whether or not a user is permitted to perform an action
+ * @param user The user in question
+ * @param actions Actions that the user must be permitted to perform
+ * @returns true if the user is permitted, otherwise false
+ */
+export function permitted(user: User, ...actions: Action[]): boolean {
+  const permission = getPermission(...actions);
+
+  return (permission & ROLE_MAPPING[user.role]) === permission;
 }

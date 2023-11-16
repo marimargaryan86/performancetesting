@@ -1,4 +1,4 @@
-import type { SessionModel } from "models/user";
+import type { Session } from "integration/ory/schemas";
 import JunctionMobileApiService from "./junction-mobile-api-service";
 import {
   simpleOffserSearchParser,
@@ -16,7 +16,7 @@ import {
 } from "../schemas/offer-search";
 
 export default class SimpleOfferSearchService extends JunctionMobileApiService {
-  async get({ id, session }: { id: string; session: SessionModel }): Promise<TripOfferSearch> {
+  async get({ id, session }: { id: string; session: Session }): Promise<TripOfferSearch> {
     const resp = await this.makeRequest<{ data: TripOfferSearchSchema }>(`/offers/searches/${id}`, {
       session,
     });
@@ -28,7 +28,7 @@ export default class SimpleOfferSearchService extends JunctionMobileApiService {
     session,
     data,
   }: {
-    session: SessionModel;
+    session: Session;
     data: SimpleOfferSearchCreate;
   }): Promise<SimpleOfferSearch> {
     const resp = await this.makeRequest<{ data: SimpleOfferSearchSchema }>(
@@ -51,7 +51,7 @@ export default class SimpleOfferSearchService extends JunctionMobileApiService {
     sort,
     filter,
   }: {
-    session: SessionModel;
+    session: Session;
     simpleOfferSearchId: string;
     cursor?: string;
     limit?: number;

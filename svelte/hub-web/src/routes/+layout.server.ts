@@ -1,9 +1,9 @@
 import { redirect } from "@sveltejs/kit";
-import type { UserModel } from "models/user";
+import type { User } from "integration/ory/schemas";
 import routeConfig from "routeConfig";
 import { deleteSession } from "utils/auth";
 
-export function load(event): { user?: UserModel; sessionExpiresAt?: Date } {
+export function load(event): { user?: User; sessionExpiresAt?: Date } {
   const user = event.locals.user;
 
   if (!user) {

@@ -1,4 +1,4 @@
-import type { SessionModel } from "models/user";
+import type { Session } from "integration/ory/schemas";
 import JunctionHubApiService from "./junction-hub-api-service";
 import type { PaginatedData } from "models/common";
 import type { Journey, JourneySchema } from "../schemas/journey";
@@ -11,7 +11,7 @@ export default class JourneyService extends JunctionHubApiService {
     limit = 100,
     sort = "id",
   }: {
-    session: SessionModel;
+    session: Session;
     cursor?: string;
     limit?: number;
     sort?: "id" | "-id" | "reference" | "-reference" | "createdAt" | "-createdAt";

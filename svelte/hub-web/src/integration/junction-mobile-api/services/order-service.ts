@@ -2,7 +2,7 @@ import JunctionMobileApiService from "./junction-mobile-api-service";
 import type { PaginatedData } from "models/common";
 import { JunctionError, ensureJunctionError } from "integration/common/junction-error";
 import { z } from "zod";
-import type { SessionModel } from "models/user";
+import type { Session } from "integration/ory/schemas";
 import {
   orderParser,
   type Order,
@@ -24,7 +24,7 @@ export default class OrderService extends JunctionMobileApiService {
     cursor,
     limit = 100,
   }: {
-    session: SessionModel;
+    session: Session;
     cursor?: string;
     limit?: number;
   }): Promise<PaginatedData<Order>> {
@@ -55,7 +55,7 @@ export default class OrderService extends JunctionMobileApiService {
     };
   }
 
-  async create({ session, data }: { session: SessionModel; data: OrderCreate }): Promise<Order> {
+  async create({ session, data }: { session: Session; data: OrderCreate }): Promise<Order> {
     try {
       const resp = await this.makeRequest<{ data: OrderSchema }>("/orders", {
         method: "POST",
@@ -85,7 +85,7 @@ export default class OrderService extends JunctionMobileApiService {
     }
   }
 
-  async get({ id, session }: { id: string; session: SessionModel }): Promise<Order> {
+  async get({ id, session }: { id: string; session: Session }): Promise<Order> {
     const resp = await this.makeRequest<{
       data: OrderSchema;
       included?: IncludedSchemas;
@@ -117,7 +117,7 @@ export default class OrderService extends JunctionMobileApiService {
     session,
     data,
   }: {
-    session: SessionModel;
+    session: Session;
     data: MarkupsCreate;
   }): Promise<Markups> {
     const resp = await this.makeRequest<{ data: MarkupsSchema }>("/orders/markups", {
@@ -129,13 +129,7 @@ export default class OrderService extends JunctionMobileApiService {
     return markupsParser.toModel(resp.json.data);
   }
 
-  async getMarkups({
-    orderId,
-    session,
-  }: {
-    orderId: string;
-    session: SessionModel;
-  }): Promise<Markups> {
+  async getMarkups({ orderId, session }: { orderId: string; session: Session }): Promise<Markups> {
     const resp = await this.makeRequest<{ data: MarkupsSchema }>(`/orders/${orderId}/markup`, {
       session,
     });

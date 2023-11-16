@@ -1,87 +1,54 @@
 import { describe, expect, it } from "vitest";
 import { permitted } from "../../utils/permissions";
-import type { UserModel } from "../../models/user";
+import type { User } from "integration/ory/schemas";
 
-const adminUser: UserModel = {
+const adminUser: User = {
   id: "0001",
   email: "admin@example.com",
   name: "admin",
-  permissions: {
-    "*": {},
-  },
+  role: "snowfall-admin",
 };
 
-const snowfallUser: UserModel = {
+const snowfallUser: User = {
   id: "0002",
   email: "user@example.com",
   name: "snowfall-user",
-  permissions: {
-    "journey.view": {},
-    "order.view": {},
-    "booking.view": {},
-    "cancel.*": {},
-    "refund.*": {},
-    "transaction.*": {},
-  },
+  role: "snowfall-user",
 };
 
-const resellerUser: UserModel = {
+const resellerUser: User = {
   id: "0003",
   email: "reseller.user@example.com",
   name: "reseller-user",
-  permissions: {
-    "journey.*": {
-      "attributes.resellerId": ["~", ["0042"]],
-    },
-    "order.*": {
-      "attributes.resellerId": ["~", ["0042"]],
-    },
-    "booking.*": {
-      "attributes.resellerId": ["~", ["0042"]],
-    },
-    "cancel.add": {
-      "attributes.resellerId": ["~", ["0042"]],
-    },
-    "cancel.view": {
-      "attributes.resellerId": ["~", ["0042"]],
-    },
-    "refund.view": {
-      "attributes.resellerId": ["~", ["0042"]],
-    },
-  },
+  role: "reseller-user",
 };
 
-const resellerAdmin: UserModel = {
+const resellerAdmin: User = {
   id: "0004",
   email: "reseller.admin@example.com",
   name: "reseller-admin",
-  permissions: {
-    ...resellerUser.permissions,
-    "user.*": {
-      "attributes.resellerId": ["~", ["0042"]],
-    },
-  },
+  role: "reseller-admin",
 };
 
 describe("permitted", () => {
   it("returns true for specific permission", () => {
-    expect(permitted(snowfallUser, "booking", "view")).toBe(true);
+    expect(permitted(snowfallUser, "booking.view")).toBe(true);
   });
 
   it("returns true for wildcard module permission", () => {
-    expect(permitted(resellerAdmin, "order", "view")).toBe(true);
+    expect(permitted(resellerAdmin, "order.view")).toBe(true);
   });
 
   it("returns true for global permission", () => {
-    expect(permitted(adminUser, "transaction", "view")).toBe(true);
+    expect(permitted(adminUser, "transaction.view")).toBe(true);
   });
 
   it("returns false when user has no permission", () => {
-    expect(permitted(resellerUser, "user", "view")).toBe(false);
+    expect(permitted(resellerUser, "user.view")).toBe(false);
   });
 
   it("handles undefined action parameter", () => {
-    expect(permitted(resellerAdmin, "user")).toBe(true);
-    expect(permitted(resellerUser, "user")).toBe(false);
+    expect(permitted(resellerAdmin, "user.add", "user.view")).toBe(true);
+    expect(permitted(resellerUser, "user.add", "user.view")).toBe(false);
   });
 });
