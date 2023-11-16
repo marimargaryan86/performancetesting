@@ -42,7 +42,8 @@
     {@const cabinClasses = Array.from(
       new Set(booking.detailsList.map((item) => item.cabinClassName)),
     )}
-    {@const vendor = booking.detailsList[0]?.vendor}
+    {@const vendor = booking.detailsList[0]?.vendor ?? "Unknown"}
+    {@const trainNumber = booking.detailsList[0]?.routeIdentifiers.vendor ?? ""}
     {@const segmentCount = booking.detailsList.length}
 
     {#if origDestLegs}
@@ -68,9 +69,8 @@
         <div class="vendor">
           <EntityAvatar name={vendor} />
           <span class="typography label-medium">
-            {vendor?.length ? vendor : "Unknown"}
-            •
-            {segmentCount === 1 ? "Direct" : `${segmentCount} stops`}
+            {vendor}
+            {trainNumber} • {segmentCount === 1 ? "Direct" : `${segmentCount} stops`}
           </span>
         </div>
 

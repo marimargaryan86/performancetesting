@@ -89,6 +89,7 @@
 <div class="offer" class:selected>
   {#each offer.groups as group, groupIdx}
     {@const vendor = group.detailsList[0]?.vendor ?? "Unknown"}
+    {@const trainNumber = group.detailsList[0]?.routeIdentifiers.vendor ?? ""}
     {@const stopCount = group.detailsList[0]?.legs.length ?? 1}
 
     <div class="group">
@@ -96,8 +97,7 @@
         <EntityAvatar name={vendor} size="24px" />
         <span>
           {vendor}
-          •
-          {stopCount === 1 ? "Direct" : `${stopCount} stops`}
+          {trainNumber} • {stopCount === 1 ? "Direct" : `${stopCount} stops`}
         </span>
       </div>
 

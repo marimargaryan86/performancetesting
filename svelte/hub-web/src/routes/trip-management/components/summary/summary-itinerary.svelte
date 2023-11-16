@@ -27,6 +27,7 @@
   export let priceQuote: TripOfferPriceQuote;
 
   $: vendor = priceQuote.options[0]?.detailsList[0]?.details?.vendor ?? "Unknown";
+  $: trainNumber = priceQuote.options[0]?.detailsList[0]?.details?.routeIdentifiers.vendor ?? ";";
   $: segmentCount = priceQuote.options[0]?.detailsList.length ?? 1;
   $: departureLeg = priceQuote.options[0]?.detailsList[0]?.details?.legs[0];
 
@@ -43,7 +44,8 @@
   <div class="trip-info typography body-small">
     <div>
       <EntityAvatar name={vendor} size="24px" />
-      {vendor} • {segmentCount === 1 ? "Direct" : `${segmentCount} stops`}
+      {vendor}
+      {trainNumber} • {segmentCount === 1 ? "Direct" : `${segmentCount} stops`}
     </div>
     <span>
       {#if departureLeg}
