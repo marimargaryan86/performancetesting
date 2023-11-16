@@ -117,7 +117,7 @@
       </p>
 
       {#each booking.rules as rule}
-        <h3 class="typography display-small">{rule.title}</h3>
+        <h3 class="typography headline-medium">{rule.title}</h3>
 
         <p class="typography body-small">{rule.body}</p>
       {/each}
