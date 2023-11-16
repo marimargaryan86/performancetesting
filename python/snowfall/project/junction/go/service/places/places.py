@@ -3,6 +3,7 @@ import dataclasses
 from collections.abc import Iterable, Sequence
 from typing import Any
 
+from google.protobuf import json_format
 from pymongo import GEOSPHERE, IndexModel, results
 
 from snowfall.project.junction.go.service.places.v1 import models_pb2
@@ -255,6 +256,24 @@ class PlaceRepository(
             self._collection.delete_one,
             filter={repository.mongo_id_key: identifier},
         )
+
+    async def find_by_coordinates(
+        self,
+        latitude: float,
+        longitude: float,
+    ) -> models_pb2.Place | None:
+        place = await self._execute(
+            query=self._collection.find_one,
+            filter={
+                "location.coordinates.coordinates": [longitude, latitude],
+            },
+        )
+        if place:
+            normalised_place = models_pb2.Place()
+            place = json_format.MessageToDict(place)
+            json_format.ParseDict(place, normalised_place)
+            return normalised_place
+        return None
 
 
 _logger = stdout.get_logger()

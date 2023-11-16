@@ -58,6 +58,7 @@ service PlacesService {
   rpc CreatePlace(CreatePlaceRequest) returns (CreatePlaceResponse) {}
   rpc DeletePlace(DeletePlaceRequest) returns (DeletePlaceResponse) {}
   rpc UpdatePlace(UpdatePlaceRequest) returns (UpdatePlaceResponse) {}
+  rpc GetPlaceByCoordinate(GetPlaceByCoordinateRequest) returns (GetPlaceByCoordinateResponse) {}
 }
 
 message CreatePlaceRequest {
@@ -101,4 +102,12 @@ message ListPlacesRequest {
 message ListPlacesResponse {
   repeated Place places = 1;
   string next_page_token = 2;
+}
+
+message GetPlaceByCoordinateRequest {
+  snowfall.stdlib.v1.LatLng coordinates = 1;
+}
+
+message GetPlaceByCoordinateResponse {
+  Place place = 1;
 }

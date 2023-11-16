@@ -59,6 +59,7 @@ def get_routes(
         _offer_search_client=(
             dependencies[offer_searches_adapter.Client]  # type: ignore[type-abstract]
         ),
+        _places_client=(dependencies[places_adapter.Client]),  # type: ignore[type-abstract]
         _reseller_currencies=reseller_currencies,
         _reseller_pay_companies=reseller_pay_companies,
     )

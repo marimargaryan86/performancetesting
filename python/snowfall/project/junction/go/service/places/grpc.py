@@ -199,3 +199,17 @@ class PlacesService(
         return places_pb2.UpdatePlaceResponse(
             place=request.place,
         )
+
+    async def GetPlaceByCoordinate(  # type: ignore[override] # noqa: N802
+        self,
+        request: places_pb2.GetPlaceByCoordinateRequest,
+        context: aio.ServicerContext,
+    ) -> places_pb2.GetPlaceByCoordinateResponse:
+        place_found = await self._places.find_by_coordinates(
+            latitude=request.coordinates.latitude,
+            longitude=request.coordinates.longitude,
+        )
+
+        return places_pb2.GetPlaceByCoordinateResponse(
+            place=place_found,
+        )

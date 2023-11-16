@@ -10,6 +10,7 @@ from snowfall.project.junction.go.service.places.v1 import (
     places_pb2_grpc,
 )
 from snowfall.stdlib import sequence, string
+from snowfall.stdlib.v1 import latlng_pb2
 
 
 class Client(abc.ABC):
@@ -37,10 +38,24 @@ class Client(abc.ABC):
     ) -> places_pb2.ListPlacesResponse:
         """Fetch all place resources."""
 
+    @abc.abstractmethod
+    async def find_by_coordinates(
+        self,
+        coordinates: latlng_pb2.LatLng,
+    ) -> places_pb2.GetPlaceByCoordinateResponse:
+        """Fetch one place resource by coordinates."""
+
 
 class DictClient(Client):
     def __init__(self, places: Sequence[models_pb2.Place]):
         self._places = {place.location.id: place for place in places}
+        self._places_coords = {
+            (
+                place.location.coordinates.longitude,
+                place.location.coordinates.latitude,
+            ): place
+            for place in places
+        }
 
     async def create(self, place: models_pb2.Place) -> models_pb2.Place:
         new_place = models_pb2.Place()
@@ -81,6 +96,16 @@ class DictClient(Client):
         return places_pb2.ListPlacesResponse(
             places=page.sequence,
             next_page_token=page.cursor,
+        )
+
+    async def find_by_coordinates(
+        self,
+        coordinates: latlng_pb2.LatLng,
+    ) -> places_pb2.GetPlaceByCoordinateResponse:
+        return places_pb2.GetPlaceByCoordinateResponse(
+            place=self._places_coords.get(
+                (coordinates.longitude, coordinates.latitude),
+            ),
         )
 
 
@@ -144,4 +169,17 @@ class GrpcClient(Client):
 
         return await errors.handle_grpc_errors(
             self._places.ListPlaces(request, timeout=self._timeout),
+        )
+
+    async def find_by_coordinates(
+        self,
+        coordinates: latlng_pb2.LatLng,
+    ) -> places_pb2.GetPlaceByCoordinateResponse:
+        return await errors.handle_grpc_errors(
+            self._places.GetPlaceByCoordinate(
+                request=places_pb2.GetPlaceByCoordinateRequest(
+                    coordinates=coordinates,
+                ),
+                timeout=self._timeout,
+            ),
         )

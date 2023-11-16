@@ -14,6 +14,7 @@ from snowfall.project.junction.go.adapter import (
     legs,
     offer_searches,
     offers,
+    places,
     price_quotes,
     trips,
 )
@@ -474,6 +475,7 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
 @dataclasses.dataclass(frozen=True)
 class SimpleOfferSearches(object):
     _offer_search_client: offer_searches.Client
+    _places_client: places.Client
     _reseller_currencies: Mapping[str, str]
     _reseller_pay_companies: Mapping[str, str]
 
@@ -517,21 +519,32 @@ class SimpleOfferSearches(object):
                 status.HTTP_422_UNPROCESSABLE_ENTITY,
             ) from key_err
         departure_after = get_departure_after(criteria)
+        origin_coords = latlng_pb2.LatLng(
+            latitude=criteria["origin"]["latitude"],
+            longitude=criteria["origin"]["longitude"],
+        )
+
+        destination_coords = latlng_pb2.LatLng(
+            latitude=criteria["destination"]["latitude"],
+            longitude=criteria["destination"]["longitude"],
+        )
+
+        origin_ids = await self._get_provider_ids_by_coordinates(
+            origin_coords,
+        )
+
+        destination_ids = await self._get_provider_ids_by_coordinates(
+            destination_coords,
+        )
 
         offer_search = models_pb2.OfferSearch(
             reseller_id=reseller_id,
             simple_trip=models_pb2.SimpleTripOfferSearch(
                 origin=common_pb2.Point(
-                    coordinates=latlng_pb2.LatLng(
-                        latitude=criteria["origin"]["latitude"],
-                        longitude=criteria["origin"]["longitude"],
-                    ),
+                    coordinates=origin_coords,
                 ),
                 destination=common_pb2.Point(
-                    coordinates=latlng_pb2.LatLng(
-                        latitude=criteria["destination"]["latitude"],
-                        longitude=criteria["destination"]["longitude"],
-                    ),
+                    coordinates=destination_coords,
                 ),
                 departure_at=protobuf.datetime_to_protobuf(departure_after),
                 passengers=[
@@ -543,6 +556,8 @@ class SimpleOfferSearches(object):
                     for passenger in cast(_Passengers, request.body["passengers"])
                 ],
                 allowed_segment_types=allowed_segment_types,
+                origin_provider_ids=origin_ids,
+                destination_provider_ids=destination_ids,
             ),
             session_token=cast(
                 str,
@@ -563,6 +578,19 @@ class SimpleOfferSearches(object):
             offer_search.pay_company_id = company_id
 
         return offer_search
+
+    async def _get_provider_ids_by_coordinates(
+        self,
+        coords: latlng_pb2.LatLng,
+    ) -> list[models_pb2.ProviderIds]:
+        place = await self._places_client.find_by_coordinates(coordinates=coords)
+        return [
+            models_pb2.ProviderIds(
+                provider_id=provider.provider_id,
+                place_ids=list(provider.place_ids),
+            )
+            for provider in place.place.place_attributes.provider_ids
+        ]
 
 
 class PriceQuote(endpoints.HTTPEndpoint):

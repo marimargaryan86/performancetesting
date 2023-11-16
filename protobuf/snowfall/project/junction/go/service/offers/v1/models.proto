@@ -40,6 +40,13 @@ message SimpleTripOfferSearch {
   repeated Passenger passengers = 4;
   repeated snowfall.project.junction.go.v1.Schedule.Type allowed_segment_types = 6;
   string session_token = 7;
+  repeated ProviderIds origin_provider_ids = 8;
+  repeated ProviderIds destination_provider_ids = 9;
+}
+
+message ProviderIds {
+  string provider_id = 1;
+  repeated string place_ids = 2;
 }
 
 message Passenger {
