@@ -1,5 +1,7 @@
 <script lang="ts" context="module">
   export const LIST_TRANSACTIONS_LIMIT = 20;
+  export const LIST_TRANSACTIONS_SORT: Parameters<TransactionService["find"]>[0]["sort"] =
+    "-createdAt";
 </script>
 
 <script lang="ts">
@@ -18,6 +20,7 @@
   import type { Transaction } from "integration/junction-hub-api/schemas/transaction";
   import type { ScrollLoadFunc } from "directives/scroll-load";
   import integrationInstancesClient from "integration-instances-client";
+  import type TransactionService from "integration/junction-hub-api/services/transaction-service";
 
   export let data;
 
@@ -47,6 +50,7 @@
     const nextTransactions = await integrationInstancesClient.hub.transactions.find({
       cursor: data.transactions.cursor,
       limit: LIST_TRANSACTIONS_LIMIT,
+      sort: LIST_TRANSACTIONS_SORT,
     });
 
     data.transactions = {
