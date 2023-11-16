@@ -92,7 +92,7 @@
   };
   let pollSignal = { cancelled: false };
 
-  $: if (browser && data.tripCandidates && data.offers.status !== "completed") {
+  $: if (browser && data.offerSearch && data.offers.status !== "completed") {
     pollOffers();
   }
   $: sortAndFilter = getSortAndFilteringFunc(searchOptions);

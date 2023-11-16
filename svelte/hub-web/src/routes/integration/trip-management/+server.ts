@@ -62,22 +62,22 @@ async function search(event: RequestEvent): Promise<Response> {
   return new Response(undefined, { status: 204 });
 }
 
-async function getTripCandidates(
+async function getOfferSearch(
   session: SessionModel,
   {
     searchData,
-    tripCandidates,
+    offerSearch,
     sessionToken,
-  }: Pick<BookingSessionModel, "searchData" | "tripCandidates" | "sessionToken">,
-): Promise<NonNullable<BookingSessionModel["tripCandidates"]>> {
+  }: Pick<BookingSessionModel, "searchData" | "offerSearch" | "sessionToken">,
+): Promise<NonNullable<BookingSessionModel["offerSearch"]>> {
   if (!(searchData && sessionToken)) {
     throw new Error("Missing data");
   }
 
-  if (tripCandidates && tripCandidates.expiresAt > new Date()) {
+  if (offerSearch && offerSearch.expiresAt > new Date()) {
     try {
       const result = await integrationInstances.junctionMobileApi.simpleOfferSearches.get({
-        id: tripCandidates.id,
+        id: offerSearch.id,
         session,
       });
 
@@ -103,15 +103,15 @@ async function getTripCandidates(
 async function getOffers(session: SessionModel, event: RequestEvent): Promise<Response> {
   const bookingSession = utils.getBookingSession(event);
   const sessionToken = bookingSession.sessionToken ?? getRandomAlphaNumericString(32);
-  const tripCandidates = await getTripCandidates(session, {
+  const offerSearch = await getOfferSearch(session, {
     searchData: bookingSession.searchData,
     sessionToken,
-    tripCandidates: bookingSession.tripCandidates,
+    offerSearch: bookingSession.offerSearch,
   });
   const { data: offers } =
     await integrationInstances.junctionMobileApi.simpleOfferSearches.findOffers({
       session,
-      simpleOfferSearchId: tripCandidates.id,
+      simpleOfferSearchId: offerSearch.id,
     });
 
   utils.setBookingSession(
@@ -120,13 +120,13 @@ async function getOffers(session: SessionModel, event: RequestEvent): Promise<Re
       offers: offers.length
         ? { expiresAt: getMinDate(...offers.map((item) => item.expiresAt)) }
         : undefined,
-      tripCandidates,
+      offerSearch,
       sessionToken,
     },
     event,
   );
 
-  return new Response(devalue.stringify({ data: offers, status: tripCandidates.status }));
+  return new Response(devalue.stringify({ data: offers, status: offerSearch.status }));
 }
 
 async function selectOffer(session: SessionModel, event: RequestEvent): Promise<Response> {

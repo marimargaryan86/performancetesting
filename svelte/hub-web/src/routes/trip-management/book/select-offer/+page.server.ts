@@ -16,7 +16,7 @@ export async function load(event): Promise<{
   destination: Place;
   offers: { data: Offer[]; status: ResourceStatus };
   selectedOffer: BookingSessionModel["selected"];
-  tripCandidates: BookingSessionModel["tripCandidates"];
+  offerSearch: BookingSessionModel["offerSearch"];
 }> {
   const session = event.locals.session;
 
@@ -46,7 +46,7 @@ export async function load(event): Promise<{
       destination,
       offers,
       selectedOffer: bookingSession.selected,
-      tripCandidates: bookingSession.tripCandidates,
+      offerSearch: bookingSession.offerSearch,
     };
   } catch {
     throw redirect(303, routeConfig.routes.tripManagement.routes.book.root);

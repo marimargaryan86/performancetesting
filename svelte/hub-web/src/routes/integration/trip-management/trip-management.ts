@@ -32,7 +32,7 @@ export const bookingSessionModel = z
   .object({
     sessionToken: z.string(),
     searchData: searchDataModel,
-    tripCandidates: z.object({
+    offerSearch: z.object({
       id: z.string(),
       expiresAt: z.date(),
       status: resourceStatus,
