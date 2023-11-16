@@ -82,6 +82,7 @@ class Order(endpoints.HTTPEndpoint):
         self,
         request: requests.Request,
         orders_repository: repository.OrdersRepository = lagom.injectable,
+        markups_repository: repository.MarkupsRepository = lagom.injectable,
         junction_client: client.Client = lagom.injectable,
     ) -> responses.Response:
         mobile_order = await orders_repository.find_by_id(
@@ -114,6 +115,20 @@ class Order(endpoints.HTTPEndpoint):
                 },
             }
 
+        markup = await markups_repository.find_by_order_id(
+            order_id=request.path_params["orderId"],
+        )
+        order_response["data"]["relationships"]["markup"] = {
+            "data": (
+                {
+                    "id": markup.id,
+                    "type": "markups",
+                }
+                if markup
+                else None
+            ),
+        }
+
         response_body = stdlib_models.Body(data=order_response["data"])
 
         if order_response.get("included"):
@@ -129,6 +144,7 @@ class Orders(endpoints.HTTPEndpoint):
         self,
         request: requests.Request,
         orders_repository: repository.OrdersRepository = lagom.injectable,
+        markups_repository: repository.MarkupsRepository = lagom.injectable,
         junction_client: client.Client = lagom.injectable,
     ) -> responses.Response:
         pagination = pagination_helpers.get_pagination(request)
@@ -158,7 +174,26 @@ class Orders(endpoints.HTTPEndpoint):
         resps = await asyncio.gather(
             *[get_order_response(mo) async for mo in user_mobile_orders],
         )
+
+        markups = {
+            markup.order_id: markup
+            async for markup in await markups_repository.find_by_order_ids(
+                order_ids=[order["data"]["id"] for order in resps],
+            )
+        }
+
         for order_response in resps:
+            markup = markups.get(order_response["data"]["id"])
+            order_response["data"]["relationships"]["markup"] = {
+                "data": (
+                    {
+                        "id": markup.id,
+                        "type": "markups",
+                    }
+                    if markup
+                    else None
+                ),
+            }
             user_orders["data"].append(order_response["data"])
             user_orders["included"].extend(
                 handlers.get_includes_from_response(order_response),
@@ -305,6 +340,7 @@ class Orders(endpoints.HTTPEndpoint):
                 "type": "payments",
             },
         }
+        junction_order["data"]["relationships"]["markup"] = {"data": None}
         return stdlib_models.JsonApiResponse(
             stdlib_models.Body(data=junction_order["data"]),
             status.HTTP_201_CREATED,

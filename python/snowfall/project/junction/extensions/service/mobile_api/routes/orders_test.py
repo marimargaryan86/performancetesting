@@ -141,6 +141,24 @@ class TestOrders(object):
         ]["id"]
         assert response.status_code == 200
 
+    async def test_get_order_with_markup(
+        self,
+        authenticated_http_client: httpx.AsyncClient,
+        httpx_mock: pytest_httpx.HTTPXMock,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        await self.create_order(authenticated_http_client, httpx_mock, monkeypatch)
+        await _create_markups(authenticated_http_client)
+
+        response = await authenticated_http_client.get(
+            "/orders/{0}".format(_ORDER_ID),
+        )
+
+        assert response.json()["data"]["relationships"]["markup"][  # noqa: WPS219
+            "data"
+        ]["id"]
+        assert response.status_code == 200
+
     async def test_get_user_orders(
         self,
         authenticated_http_client: httpx.AsyncClient,
@@ -154,6 +172,24 @@ class TestOrders(object):
         )
 
         assert response.json()["data"][0]["relationships"]["payment"][  # noqa: WPS219
+            "data"
+        ]["id"]
+        assert response.status_code == 200
+
+    async def test_get_user_orders_with_markup(
+        self,
+        authenticated_http_client: httpx.AsyncClient,
+        httpx_mock: pytest_httpx.HTTPXMock,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        await self.create_order(authenticated_http_client, httpx_mock, monkeypatch)
+        await _create_markups(authenticated_http_client)
+
+        response = await authenticated_http_client.get(
+            "/orders",
+        )
+
+        assert response.json()["data"][0]["relationships"]["markup"][  # noqa: WPS219
             "data"
         ]["id"]
         assert response.status_code == 200

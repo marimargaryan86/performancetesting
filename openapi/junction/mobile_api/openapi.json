@@ -3336,7 +3336,8 @@
                   "quote",
                   "journey",
                   "bookings",
-                  "payment"
+                  "payment",
+                  "markup"
                 ],
                 "properties": {
                   "payment": {
@@ -3402,6 +3403,25 @@
                         }
                       }
                     },
+                    "readOnly": true
+                  },
+                  "markup": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "required": [
+                          "data"
+                        ],
+                        "properties": {
+                          "data": {
+                            "$ref": "#/components/schemas/MarkupIdentifier"
+                          }
+                        }
+                      },
+                      {
+                        "nullable": true
+                      }
+                    ],
                     "readOnly": true
                   }
                 }
@@ -4071,6 +4091,29 @@
               "vouchers"
             ],
             "example": "vouchers"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "MarkupIdentifier": {
+        "title": "Markup Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "markups"
+            ],
+            "example": "markups"
           }
         },
         "required": [

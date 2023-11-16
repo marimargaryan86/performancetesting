@@ -1,7 +1,7 @@
 import copy
 import datetime
 import re
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable, Mapping, Sequence
 from typing import Any
 
 import bcrypt
@@ -658,3 +658,20 @@ class MarkupsRepository(
 
     async def find_by_order_id(self, order_id: str) -> models_pb2.Markup | None:
         return await self._execute(self._collection.find_one, {"order_id": order_id})
+
+    async def find_by_order_ids(
+        self,
+        order_ids: Sequence[str],
+    ) -> resultset.ResultSet[models_pb2.Markup]:
+        return await self._execute(
+            self._collection.find,
+            (
+                {
+                    "order_id": {
+                        "$in": order_ids,
+                    },
+                }
+                if order_ids
+                else {}
+            ),
+        )
