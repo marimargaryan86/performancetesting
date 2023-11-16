@@ -7,7 +7,7 @@ import grpc
 from grpc_reflection.v1alpha import reflection
 
 from snowfall.stdlib.logging import stdout
-from snowfall.stdlib.transport.grpc import handler, logging, metrics, options
+from snowfall.stdlib.transport.grpc import handler, logging, metrics, options, tracing
 from snowfall.stdlib.transport.grpc.service import HealthService, Service
 
 
@@ -35,6 +35,7 @@ def create_server(
 ) -> Server:
     server = grpc.aio.server(
         interceptors=[
+            tracing.TracingServerInterceptor(),
             metrics.MetricsServerInterceptor(),
             logging.LoggingServerInterceptor(),
             handler.ErrorHandlerServerInterceptor(),
