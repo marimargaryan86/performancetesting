@@ -97,7 +97,7 @@ class PlacesRepository(
                 main_city_regex = compile_regex(search_keys[1])
             else:
                 # Match "Heathrow, London" etc.
-                main_city_regex = country_regex
+                main_city_regex = country_regex  # noqa: F841
             query: dict[str, Any] = {
                 "$and": [
                     {
@@ -111,7 +111,8 @@ class PlacesRepository(
                         "$or": [
                             {"country_name": country_regex},
                             {"country_code": country_regex},
-                            {"main_city": main_city_regex},
+                            # TODO: Fix areas in places to better match main_city.
+                            # {"main_city": main_city_regex},  # noqa: ERA001
                         ],
                     },
                 ],
@@ -124,7 +125,7 @@ class PlacesRepository(
                     {"country_name": name_regex},
                     {"country_code": name_regex},
                     {"iata": name_regex},
-                    {"main_city": name_regex},
+                    # {"main_city": name_regex},  # noqa: ERA001
                 ],
             }
         response = await self._execute(self._collection.find, query)
