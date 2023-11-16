@@ -24,8 +24,11 @@ from snowfall.stdlib.v1 import latlng_pb2
 _SERVICE_NAME = "mobile-api"
 _ATTRIBUTES_KEY = "attributes"
 
-_CITY_RADIUS_M = int(
-    os.getenv("_CITY_RADIUS_M", "50000"),  # noqa: WPS432
+_CITY_AIRPORT_RADIUS_M = int(
+    os.getenv("_CITY_AIRPORT_RADIUS_M", "25000"),  # noqa: WPS432
+)
+_CITY_TRANSPORT_RADIUS_M = int(
+    os.getenv("_CITY_STATION_RADIUS_M", "10000"),  # noqa: WPS432
 )
 
 
@@ -120,12 +123,20 @@ async def _main_cities(
     repo: repository.PlacesRepository,
 ) -> None:
     async for place in await repo.find_non_cities():
-        place_main_city = await repo.find_main_city(
-            latitude=place.coordinates.latitude,
-            longitude=place.coordinates.longitude,
-            max_distance_meters=_CITY_RADIUS_M,
-            types=models_pb2.Place.TYPE_CITY,
-        )
+        if place.types == [models_pb2.Place.TYPE_AIRPORT]:
+            place_main_city = await repo.find_main_city(
+                latitude=place.coordinates.latitude,
+                longitude=place.coordinates.longitude,
+                max_distance_meters=_CITY_AIRPORT_RADIUS_M,
+                types=models_pb2.Place.TYPE_CITY,
+            )
+        else:
+            place_main_city = await repo.find_main_city(
+                latitude=place.coordinates.latitude,
+                longitude=place.coordinates.longitude,
+                max_distance_meters=_CITY_AIRPORT_RADIUS_M,
+                types=models_pb2.Place.TYPE_CITY,
+            )
 
         if place_main_city and place_main_city.name != place.main_city:
             place.main_city = place_main_city.name
