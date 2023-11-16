@@ -126,9 +126,7 @@ class Transformer(object):
             ),
             trip=bookings_pb2.Booking.Trip(
                 record_locator=all_results.booking.response_result.dnr,
-                operator_booking_references=[
-                    all_results.booking.response_result.identifier,
-                ],
+                operator_booking_references=[],  # TODO: Fix once we can retrieve the booking ref from benerail
             ),
             created_at=protobuf.datetime_to_protobuf(
                 datetime.datetime.fromisoformat(

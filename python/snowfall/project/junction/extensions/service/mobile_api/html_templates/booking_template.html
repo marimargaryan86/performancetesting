@@ -31,15 +31,23 @@
           {% endfor %}
           <br>
           Operator/check-in reference:
-          {% for locator in record_locators %}
-          {{locator}}
-          {% endfor %}
+          {% if operator_booking_references %}
+            {% for reference in operator_booking_references %}
+              {{reference}}
+            {% endfor %}
+          {% else %}
+            N/A
+          {% endif %}
           <br>
           <br>
           Our reference
-          {% for reference in operator_booking_references %}
-          {{reference}}
-          {% endfor %}
+          {% if record_locators %}
+            {% for locator in record_locators %}
+              {{locator}}
+            {% endfor %}
+          {% else %}
+            N/A
+          {% endif %}
           <br>
         </div>
     </body>
