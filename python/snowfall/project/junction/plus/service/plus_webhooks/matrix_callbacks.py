@@ -1,4 +1,5 @@
 import json
+import re
 from collections.abc import Mapping
 from typing import Any
 
@@ -36,39 +37,40 @@ class MatrixChatbot(AsyncClient):
         room: MatrixRoom,
         event: Event | RoomMessageText,
     ) -> None:
-        session = self._redis.hash_("ai_assistant_state")
-        state_str = await session.get(room.room_id)
-        if state_str:
-            state: Mapping[str, Any] = json.loads(state_str) or {}
-            ai_chat_history = state.get("ai_chat_history", [])
-        else:
-            ai_chat_history = [
-                {"role": "system", "content": self._ai_bot.generate_system_setup()},
-            ]
-            state = {
-                "ai_chat_history": ai_chat_history,
-            }
-        ai_chat_history.append({"role": "user", "content": event.body})
-        assistant_message = await self._ai_bot.handle_prompt(
-            messages=ai_chat_history,
-            search_url="",
-            shortener_client=self.shortener_client,
-        )
-        ai_chat_history.append(assistant_message)
-        await session.put(room.room_id, json.dumps(state))
+        if event.sender != room.own_user_id:
+            session = self._redis.hash_("ai_assistant_state")
+            state_str = await session.get(room.room_id)
+            if state_str:
+                state: Mapping[str, Any] = json.loads(state_str) or {}
+                ai_chat_history = state.get("ai_chat_history", [])
+            else:
+                ai_chat_history = [
+                    {"role": "system", "content": self._ai_bot.generate_system_setup()},
+                ]
+                state = {
+                    "ai_chat_history": ai_chat_history,
+                }
+            ai_chat_history.append({"role": "user", "content": event.body})
+            assistant_message = await self._ai_bot.handle_prompt(
+                messages=ai_chat_history,
+                search_url="",
+                shortener_client=self.shortener_client,
+            )
+            ai_chat_history.append(assistant_message)
+            await session.put(room.room_id, json.dumps(state))
 
-        await self.room_send(
-            room_id=room.room_id,
-            message_type="m.room.message",
-            content={
-                "msgtype": "m.text",
-                "body": (
-                    assistant_message["content"]
-                    if isinstance(assistant_message["content"], str)
-                    else ""
-                ),
-            },
-        )
+            await self.room_send(
+                room_id=room.room_id,
+                message_type="m.room.message",
+                content={
+                    "msgtype": "m.text",
+                    "body": (
+                        assistant_message["content"]
+                        if isinstance(assistant_message["content"], str)
+                        else ""
+                    ),
+                },
+            )
 
         self._logger.info("Message received")
 
@@ -77,6 +79,15 @@ class MatrixChatbot(AsyncClient):
         room: MatrixRoom,
         event: Event,
     ) -> None:
+        username = re.findall("@(.*?):", event.sender)[0]
+        cv = await self._configuration_vectors.get(
+            identifier=username,
+            selector="in_app_notification_user",
+        )
+        subscriber = await self._subscribers.find_from_reseller(
+            cv.reseller_id,
+            room.name,
+        )
         await self.join(room.room_id)
         session = self._redis.hash_("ai_assistant_state")
         ai_chat_history = [
@@ -95,7 +106,12 @@ class MatrixChatbot(AsyncClient):
                 "body": self._ai_bot.initial_message,
             },
         )
-        self._logger.info("Joined room", room_name=room.name, room_id=room.room_id)
+        self._logger.info(
+            "Joined room",
+            room_name=room.name,
+            room_id=room.room_id,
+            subscriber=subscriber.id,
+        )
 
     async def login_bot(self, bot_password: str) -> None:
         self._logger.info(str(await self.login(bot_password)))

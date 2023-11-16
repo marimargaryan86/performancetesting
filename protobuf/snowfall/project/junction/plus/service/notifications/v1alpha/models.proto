@@ -101,6 +101,7 @@ message ConfigurationVector {
   string search_url = 6;
   google.protobuf.Timestamp created_at = 7;
   google.protobuf.Timestamp updated_at = 8;
+  string in_app_notification_user = 9;
 }
 
 enum Channel {
