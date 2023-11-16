@@ -457,7 +457,6 @@ class BookingDetailsRepository(
 
 class CancellationRequestsRepository(
     repository.ProtoRepository[models_pb2.CancellationRequest],
-    mixins.FindByIdMixin[models_pb2.CancellationRequest],
     mixins.InsertMixin[models_pb2.CancellationRequest],
 ):
     _proto = models_pb2.CancellationRequest
@@ -479,6 +478,16 @@ class CancellationRequestsRepository(
         return await self._find_with_cursor(
             cur="",
             filter_=filter_,
+        )
+
+    async def find_by_id(
+        self,
+        document_id: str,
+        reseller_id: str = "",
+    ) -> models_pb2.CancellationRequest | None:
+        return await self._execute(
+            self._collection.find_one,
+            _add_reseller_id_to_filter(reseller_id, {"_id": document_id}),
         )
 
     async def find_by_booking_id(

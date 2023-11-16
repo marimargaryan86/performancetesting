@@ -304,9 +304,10 @@ class OrderService(
     ) -> orders_pb2.GetCancellationRequestResponse:
         cancellation = await self._cancellation_requests.find_by_id(
             document_id=request.id,
+            reseller_id=request.reseller_id,
         )
 
-        if cancellation is None or cancellation.reseller_id != request.reseller_id:
+        if cancellation is None:
             return await context.abort(StatusCode.NOT_FOUND)
 
         return orders_pb2.GetCancellationRequestResponse(

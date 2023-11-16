@@ -60,6 +60,8 @@ class CreateCancellationRequestHandler(object):
             cancellation.status = models_pb2.BookingCancellation.STATUS_PENDING
 
         document.status = models_pb2.CancellationRequest.STATUS_PENDING
+        if not document.reseller_id:
+            document.reseller_id = journeys[0].reseller_id
         cancellation_request = await self._cancellations.insert(
             document,
         )
@@ -95,17 +97,18 @@ class CreateCancellationRequestHandler(object):
         journeys: Sequence[models_pb2.Journey],
     ) -> None:
         reseller_id = self._request.cancellation_request.reseller_id
-        bookings_belong_to_reseller = all(
-            reseller_id == journey.reseller_id for journey in journeys
-        )
-        if not bookings_belong_to_reseller:
-            await rich_status.abort_with_rich_status(
-                context=self._context,
-                status=rich_status.build_precondition_failure(
-                    subject="booking_ids",
-                    description="Some of the bookings aren't found",
-                ),
+        if reseller_id:
+            bookings_belong_to_reseller = all(
+                reseller_id == journey.reseller_id for journey in journeys
             )
+            if not bookings_belong_to_reseller:
+                await rich_status.abort_with_rich_status(
+                    context=self._context,
+                    status=rich_status.build_precondition_failure(
+                        subject="booking_ids",
+                        description="Some of the bookings aren't found",
+                    ),
+                )
 
     async def _validate_bookings_exist(
         self,
