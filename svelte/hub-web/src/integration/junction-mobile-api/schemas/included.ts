@@ -115,6 +115,50 @@ const parserMapping: {
   bookingCancellations: { type: "booking-cancellation", parser: bookingCancellationParser },
 };
 
+function orderIncluded(included: IncludedMapping): IncludedMapping {
+  // TripBookingDetails legs (must be sorted before Booking details)
+  included.tripBookingDetails?.forEach((details) => {
+    details.legs.sort((a, b) => a.departureAt.getTime() - b.departureAt.getTime());
+  });
+
+  // Booking details (must be sorted before Order bookings)
+  included.tripBookings?.forEach((booking) => {
+    booking.detailsList.sort(
+      (a, b) => (a.legs[0]?.departureAt.getTime() ?? 0) - (b.legs[0]?.departureAt.getTime() ?? 0),
+    );
+  });
+
+  // Order bookings (must be sorted before Order journeys)
+  included.orders?.forEach((order) => {
+    order.bookings.sort(
+      (a, b) =>
+        (a.detailsList[0]?.legs[0]?.departureAt.getTime() ?? 0) -
+        (b.detailsList[0]?.legs[0]?.departureAt.getTime() ?? 0),
+    );
+  });
+
+  // Journey orders
+  included.journeys?.forEach((journey) => {
+    journey.orders.sort(
+      (a, b) =>
+        (a.bookings[0]?.detailsList[0]?.legs[0]?.departureAt.getTime() ?? 0) -
+        (b.bookings[0]?.detailsList[0]?.legs[0]?.departureAt.getTime() ?? 0),
+    );
+  });
+
+  // TripOfferGroupDetails legs
+  included.tripOfferGroupDetails?.forEach((details) => {
+    details.legs.sort((a, b) => a.departureAt.getTime() - b.departureAt.getTime());
+  });
+
+  // OfferGroup segments
+  included.groups?.forEach((group) => {
+    group.detailsList.sort((a, b) => a.sequences.segment - b.sequences.segment);
+  });
+
+  return included;
+}
+
 // eslint-disable-next-line max-lines-per-function
 export function parseIncluded(included?: IncludedSchemas): IncludedMapping {
   const schemaMapping: Required<IncludedSchemaMapping> = {
@@ -182,13 +226,5 @@ export function parseIncluded(included?: IncludedSchemas): IncludedMapping {
     },
   );
 
-  const result = modelMapping as unknown as IncludedMapping;
-
-  result.offers?.forEach((offer) => {
-    offer.groups.forEach((group) => {
-      group.detailsList.sort((a, b) => a.sequences.segment - b.sequences.segment);
-    });
-  });
-
-  return result;
+  return orderIncluded(modelMapping as unknown as IncludedMapping);
 }
