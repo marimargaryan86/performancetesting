@@ -232,9 +232,9 @@ func (mr *mergeRequest) expectedReviewers() ([]int, error) {
 		reviewers, err = callback(reviewers)
 
 		if err != nil {
-			return sliceutil.Unique(reviewers), err
+			return sliceutil.Without(sliceutil.Unique(reviewers), mr.snowman.ID, mr.object.Author.ID), err
 		}
 	}
 
-	return sliceutil.Unique(reviewers), nil
+	return sliceutil.Without(sliceutil.Unique(reviewers), mr.snowman.ID, mr.object.Author.ID), nil
 }
