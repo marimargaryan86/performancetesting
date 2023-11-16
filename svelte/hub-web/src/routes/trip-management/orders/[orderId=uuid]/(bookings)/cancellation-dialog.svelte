@@ -163,7 +163,7 @@
       <div class="support typography body-medium">
         <strong>
           <EmailIcon />
-          <a href="mailto:support@snowfalltravel.com?subject=GG&#32;-&#32;"
+          <a href="mailto:support@snowfalltravel.com?subject=GG%20-%20"
             >support@snowfalltravel.com</a
           >
         </strong>
