@@ -242,11 +242,12 @@ class ContactsService(service.Service, grpc_pb2_grpc.ContactsServiceServicer):
         company = await self._companies.find_by_id(request.contact.company_id)
 
         if not company:
-            await rich_status.abort_with_rich_status(
-                context=context,
-                status=rich_status.build_bad_request(
-                    field_name="company_id",
-                    field_description="Company is not found",
+            return await context.abort(
+                code=grpc.StatusCode.NOT_FOUND,
+                details="Company not found",
+                trailing_metadata=(
+                    ("field_name", "company_id"),
+                    ("field_description", "Company is not found"),
                 ),
             )
 
@@ -291,11 +292,12 @@ class ContactsService(service.Service, grpc_pb2_grpc.ContactsServiceServicer):
         contact = await self._contacts.find_by_id(request.contact_id)
 
         if not contact:
-            await rich_status.abort_with_rich_status(
-                context=context,
-                status=rich_status.build_bad_request(
-                    field_name="contact_id",
-                    field_description="Contact is not found",
+            return await context.abort(
+                code=grpc.StatusCode.NOT_FOUND,
+                details="Contact not found",
+                trailing_metadata=(
+                    ("field_name", "contact_id"),
+                    ("field_description", "Contact is not found"),
                 ),
             )
 
@@ -349,22 +351,24 @@ class BeneficiariesService(
             )
         account = await self._accounts.find_by_id(request.beneficiary.account_id)
         if not account:
-            await rich_status.abort_with_rich_status(
-                context=context,
-                status=rich_status.build_bad_request(
-                    field_name="account_id",
-                    field_description="Account not found",
+            return await context.abort(
+                code=grpc.StatusCode.NOT_FOUND,
+                details="Account not found",
+                trailing_metadata=(
+                    ("field_name", "account_id"),
+                    ("field_description", "Account is not found"),
                 ),
             )
 
         company = await self._companies.find_by_id(account.company_id)
 
         if not company:
-            await rich_status.abort_with_rich_status(
-                context=context,
-                status=rich_status.build_bad_request(
-                    field_name="account.company_id",
-                    field_description="Company not found",
+            return await context.abort(
+                code=grpc.StatusCode.NOT_FOUND,
+                details="Company not found",
+                trailing_metadata=(
+                    ("field_name", "account.company_id"),
+                    ("field_description", "Company not found"),
                 ),
             )
 
@@ -442,21 +446,23 @@ class BeneficiariesService(
         ):
             account = await self._accounts.find_by_id(request.beneficiary.account_id)
             if not account:
-                await rich_status.abort_with_rich_status(
-                    context=context,
-                    status=rich_status.build_bad_request(
-                        field_name="account_id",
-                        field_description="Account not found",
+                return await context.abort(
+                    code=grpc.StatusCode.NOT_FOUND,
+                    details="Account not found",
+                    trailing_metadata=(
+                        ("field_name", "account_id"),
+                        ("field_description", "Account is not found"),
                     ),
                 )
 
             company = await self._companies.find_by_id(account.company_id)
             if not company:
-                await rich_status.abort_with_rich_status(
-                    context=context,
-                    status=rich_status.build_bad_request(
-                        field_name="account.company_id",
-                        field_description="Company not found",
+                return await context.abort(
+                    code=grpc.StatusCode.NOT_FOUND,
+                    details="Company not found",
+                    trailing_metadata=(
+                        ("field_name", "account.company_id"),
+                        ("field_description", "Company not found"),
                     ),
                 )
             company_name = company.name

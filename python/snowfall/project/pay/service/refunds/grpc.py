@@ -70,11 +70,12 @@ class RefundsService(
                 request.refund.transaction_id,
             )
         except NotFoundError:
-            await rich_status.abort_with_rich_status(
-                context=context,
-                status=rich_status.build_bad_request(
-                    field_name="transaction",
-                    field_description="Transaction ID is not found",
+            return await context.abort(
+                code=grpc.StatusCode.NOT_FOUND,
+                details="transaction not found",
+                trailing_metadata=(
+                    ("field_name", "transaction"),
+                    ("field_description", "Transaction ID is not found"),
                 ),
             )
 
@@ -164,40 +165,22 @@ class RefundsService(
         try:
             transaction = await self._transactions_client.get(refund.transaction_id)
         except NotFoundError:
-            await rich_status.abort_with_rich_status(
-                context=context,
-                status=rich_status.build_bad_request(
-                    field_name="transaction_id",
-                    field_description="Transactions ID is not found",
+            return await context.abort(
+                code=grpc.StatusCode.NOT_FOUND,
+                details="transaction not found",
+                trailing_metadata=(
+                    ("field_name", "transaction_id"),
+                    ("field_description", "Transaction ID is not found"),
                 ),
             )
-
-        if (  # noqa: WPS337
-            request.refunded_by_provider.currency_code
-            != transaction.amounts.beneficiary.currency_code
-        ):
-            await rich_status.abort_with_rich_status(
-                context=context,
-                status=rich_status.build_bad_request(
-                    field_name="refunded_to_provider",
-                    field_description=(
-                        "Refund currencies do not match the original transaction"
-                    ),
-                ),
-            )
-        if (  # noqa: WPS337
-            request.refunded_to_reseller.currency_code
-            != transaction.amounts.base_converted.currency_code
-        ):
-            await rich_status.abort_with_rich_status(
-                context=context,
-                status=rich_status.build_bad_request(
-                    field_name="refunded_to_reseller",
-                    field_description=(
-                        "Refund currencies do not match the original transaction"
-                    ),
-                ),
-            )
+        await self._check_preconditions_for_refund_position(
+            request.refunded_by_provider,
+            request.refunded_to_reseller,
+            transaction.amounts.beneficiary,
+            transaction.amounts.base_converted,
+            transaction.amounts.total_amount,
+            context,
+        )
         detailed_rate = await self._get_detailed_rate(
             request.refunded_by_provider,
             request.refunded_to_reseller,
@@ -334,13 +317,23 @@ class RefundsService(
         try:
             transaction = await self._transactions_client.get(refund.transaction_id)
         except NotFoundError:
-            await rich_status.abort_with_rich_status(
-                context=context,
-                status=rich_status.build_bad_request(
-                    field_name="transaction",
-                    field_description="Transaction ID is not found",
+            return await context.abort(
+                code=grpc.StatusCode.NOT_FOUND,
+                details="transaction not found",
+                trailing_metadata=(
+                    ("field_name", "transaction"),
+                    ("field_description", "Transaction ID is not found"),
                 ),
             )
+
+        await self._check_preconditions_for_refund_position(
+            request.refund.refunded_us,
+            request.refund.refunded_reseller,
+            transaction.amounts.beneficiary,
+            transaction.amounts.base_converted,
+            transaction.amounts.total_amount,
+            context,
+        )
 
         detailed_rate = await self._get_detailed_rate(
             request.refund.refunded_us,
@@ -413,3 +406,51 @@ class RefundsService(
             return await context.abort(grpc.StatusCode.INVALID_ARGUMENT)
 
         return stripe_refund
+
+    async def _check_preconditions_for_refund_position(
+        self,
+        refunded_by_provider: money_pb2.Money,
+        refunded_to_reseller: money_pb2.Money,
+        beneficiary: money_pb2.Money,
+        base_converted: money_pb2.Money,
+        total_amount: money_pb2.Money,
+        context: grpc.aio.ServicerContext,
+    ) -> None:
+        if (  # noqa: WPS337
+            refunded_by_provider.currency_code != beneficiary.currency_code
+        ):
+            await rich_status.abort_with_rich_status(
+                context=context,
+                status=rich_status.build_bad_request(
+                    field_name="refunded_to_provider",
+                    field_description=(
+                        "Refund currencies do not match the original transaction"
+                    ),
+                ),
+            )
+        if (  # noqa: WPS337
+            refunded_to_reseller.currency_code != base_converted.currency_code
+        ):
+            await rich_status.abort_with_rich_status(
+                context=context,
+                status=rich_status.build_bad_request(
+                    field_name="refunded_to_reseller",
+                    field_description=(
+                        "Refund currencies do not match the original transaction"
+                    ),
+                ),
+            )
+
+        if (  # noqa: WPS337
+            money.from_protobuf(refunded_to_reseller).amount
+            > money.from_protobuf(total_amount).amount
+        ):
+            await rich_status.abort_with_rich_status(
+                context=context,
+                status=rich_status.build_bad_request(
+                    field_name="refunded_to_reseller",
+                    field_description=(
+                        "Refund to reseller should not be bigger than total amount"
+                    ),
+                ),
+            )
