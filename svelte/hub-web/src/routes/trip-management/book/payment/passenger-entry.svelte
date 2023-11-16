@@ -23,7 +23,7 @@
     document?: Require<Partial<TravelerDocument>, "countryCodes">;
   };
 
-  // eslint-disable-next-line
+  // eslint-disable-next-line max-lines-per-function
   function getDocumentFields(required: TripOfferPriceQuote["required"]): {
     [key in keyof TravelerDocument]: z.ZodType<TravelerDocument[key]>;
   } {

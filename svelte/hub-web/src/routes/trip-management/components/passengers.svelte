@@ -1,10 +1,30 @@
+<script lang="ts" context="module">
+  function getPassengerLabel(passenger: OrderPassenger, createdAt: Date): string {
+    const age = getAge(passenger.birthDate, createdAt);
+
+    const def = Object.values(PASSENGER_DEFINITIONS).find((item) => {
+      if (item.span.from <= age) {
+        return age <= (item.span.to ?? Number.MAX_SAFE_INTEGER);
+      }
+
+      return false;
+    });
+
+    return def ? getPassengerFullLabel(def) : "Unknown";
+  }
+</script>
+
 <script lang="ts">
   import PassengerIcon from "components/icons/passenger-icon.svelte";
   import type { OrderPassenger } from "integration/junction-mobile-api/schemas/order";
-  import { capitalize } from "utils/common";
-  import { getPassengerType } from "utils/passenger";
+  import { getAge } from "utils/date-time";
+  import {
+    PASSENGER_DEFINITIONS,
+    getPassengerFullLabel,
+  } from "./trip-search/passenger-picker/passenger-picker.svelte";
 
   export let passengers: OrderPassenger[];
+  export let orderCreatedAt: Date = new Date();
 </script>
 
 <ul class="passengers">
@@ -15,7 +35,7 @@
         <PassengerIcon color="var(--color-main-primary-600" />
       </span>
       <strong class="typography bold">{passenger.firstName} {passenger.lastName}</strong>
-      <em>{capitalize(getPassengerType(passenger))}</em>
+      <em>{getPassengerLabel(passenger, orderCreatedAt)}</em>
     </li>
   {/each}
 </ul>

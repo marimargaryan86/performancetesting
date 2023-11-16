@@ -1,13 +1,16 @@
 <script lang="ts">
+  import { MAX_TOTAL_COUNT } from "./passenger-picker.svelte";
+
   export let label: string;
-  export let amount: number;
+  export let count: number;
+  export let totalCount: number;
 
   function increment(): void {
-    amount = Math.min(20, amount + 1);
+    count = Math.min(MAX_TOTAL_COUNT, count + 1);
   }
 
   function decrement(): void {
-    amount = Math.max(0, amount - 1);
+    count = Math.max(0, count - 1);
   }
 </script>
 
@@ -15,11 +18,15 @@
   <strong class="typography label-large">{label}</strong>
 
   <div class="counter">
-    <button class="counter-btn" on:click={decrement} type="button"> - </button>
+    <button class="counter-btn" on:click={decrement} type="button" disabled={count === 0}>
+      -
+    </button>
 
-    <span class="typography body-medium">{amount}</span>
+    <span class="typography body-medium">{count}</span>
 
-    <button on:click={increment} type="button"> + </button>
+    <button on:click={increment} type="button" disabled={totalCount === MAX_TOTAL_COUNT}>
+      +
+    </button>
   </div>
 </div>
 
@@ -53,9 +60,14 @@
     border: 0;
     border-radius: 8px;
     cursor: pointer;
+    transition: background-color 300ms ease;
   }
 
   button:hover {
     background-color: var(--color-main-primary-600);
+  }
+
+  button:disabled {
+    background-color: var(--color-main-neutral-200);
   }
 </style>

@@ -6,16 +6,9 @@
   }
 
   function getDefaultPassengers(passengers: PassengerPickerData): PartialPassengerData[] {
-    return [
-      ...getPassengers(passengers.seniors65, "Senior (65+)"),
-      ...getPassengers(passengers.seniors60, "Senior (60-64)"),
-      ...getPassengers(passengers.adults, "Adult (26-59)"),
-      ...getPassengers(passengers.youths15, "Youth (15-25)"),
-      ...getPassengers(passengers.youths12, "Youth (12-14)"),
-      ...getPassengers(passengers.children6, "Child (6-11)"),
-      ...getPassengers(passengers.children4, "Child (4-5)"),
-      ...getPassengers(passengers.children0, "Child (0-3)"),
-    ];
+    return (Object.keys(passengers) as unknown as (keyof PassengerPickerData)[]).flatMap((key) =>
+      getPassengers(passengers[key], getPassengerFullLabel(PASSENGER_DEFINITIONS[key])),
+    );
   }
 </script>
 
@@ -41,7 +34,11 @@
   import PriceDialog from "components/ui/dialogues/price-dialog.svelte";
   import Summary from "../../components/summary/summary.svelte";
   import tripManagement from "../../../integration/trip-management/trip-management";
-  import type { PassengerPickerData } from "../../components/trip-search/passenger-picker/passenger-picker.svelte";
+  import {
+    getPassengerFullLabel,
+    PASSENGER_DEFINITIONS,
+    type PassengerPickerData,
+  } from "../../components/trip-search/passenger-picker/passenger-picker.svelte";
   import { onDestroy } from "svelte";
   import type { ContactDetails } from "integration/junction-mobile-api/schemas/journey";
   import FareRulesDialog from "../../components/fare-rules-dialog.svelte";

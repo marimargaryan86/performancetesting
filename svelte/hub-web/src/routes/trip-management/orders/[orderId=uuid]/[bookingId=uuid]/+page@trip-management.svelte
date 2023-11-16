@@ -86,7 +86,7 @@
       {/if}
 
       {#if order}
-        <Passengers passengers={order.passengers} />
+        <Passengers passengers={order.passengers} orderCreatedAt={order.createdAt} />
       {/if}
 
       <Itinerary bookings={[data.booking]} />

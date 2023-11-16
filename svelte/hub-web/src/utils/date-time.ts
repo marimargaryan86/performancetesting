@@ -201,3 +201,14 @@ export function addToDate(
 
   return nextDate;
 }
+
+export function getAge(date: Date, today = new Date()): number {
+  const age = today.getFullYear() - date.getFullYear();
+  const month = today.getMonth() - date.getMonth();
+
+  if (month < 0 || (month === 0 && today.getDate() < date.getDate())) {
+    return age - 1;
+  }
+
+  return age;
+}

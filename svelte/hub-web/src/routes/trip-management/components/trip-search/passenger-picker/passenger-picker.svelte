@@ -1,4 +1,25 @@
 <script lang="ts" context="module">
+  export const MAX_TOTAL_COUNT = 9;
+  export const PASSENGER_DEFINITIONS: Record<
+    keyof PassengerPickerData,
+    { label: string; span: { from: number; to?: number } }
+  > = {
+    seniors65: { label: "Senior", span: { from: 65 } },
+    seniors60: { label: "Senior", span: { from: 60, to: 64 } },
+    adults: { label: "Adult", span: { from: 26, to: 59 } },
+    youths15: { label: "Youth", span: { from: 15, to: 25 } },
+    youths12: { label: "Youth", span: { from: 12, to: 14 } },
+    children6: { label: "Child", span: { from: 6, to: 11 } },
+    children4: { label: "Child", span: { from: 4, to: 5 } },
+    children0: { label: "Child", span: { from: 0, to: 3 } },
+  };
+
+  export function getPassengerFullLabel(
+    def: (typeof PASSENGER_DEFINITIONS)[keyof PassengerPickerData],
+  ): string {
+    return `${def.label} (${def.span.from}${def.span.to === undefined ? "+" : `-${def.span.to}`})`;
+  }
+
   export const passengerPickerData = z
     .object({
       seniors65: z.number().min(0),
@@ -30,10 +51,11 @@
   export let passengers: PassengerPickerData;
   export let error: string | string[] | boolean = false;
 
+  const passengerKeys = Object.keys(passengers) as unknown as (keyof PassengerPickerData)[];
+
   let expanded = false;
 
-  $: totalPassengerCount = Object.values(passengers).reduce((prev, curr) => prev + curr, 0);
-  $: passengerInfo = `${totalPassengerCount} Passenger${totalPassengerCount === 1 ? "" : "s"}`;
+  $: totalCount = Object.values(passengers).reduce((prev, curr) => prev + curr, 0);
   $: displayError = error instanceof Array ? error.join(", ") : error;
   $: passengers, (error = false);
 
@@ -57,7 +79,7 @@
 <div class="passenger-picker" use:clickOutside={close}>
   <button on:click={toggle} type="button">
     <span class="typography title-small bold title-small bold">
-      {passengerInfo}
+      {`${totalCount} Passenger${totalCount === 1 ? "" : "s"}`}
     </span>
 
     <ChevronIcon direction={expanded ? "up" : "down"} color="var(--color-main-primary-500)" />
@@ -72,14 +94,13 @@
       <div class="header typography title-medium bold title-medium bold">Passengers</div>
 
       <div class="counters">
-        <PassengerCounter label="Senior (65+)" bind:amount={passengers.seniors65} />
-        <PassengerCounter label="Senior (60-64)" bind:amount={passengers.seniors60} />
-        <PassengerCounter label="Adult (26-59)" bind:amount={passengers.adults} />
-        <PassengerCounter label="Youth (15-25)" bind:amount={passengers.youths15} />
-        <PassengerCounter label="Youth (12-14)" bind:amount={passengers.youths12} />
-        <PassengerCounter label="Child (6-11)" bind:amount={passengers.children6} />
-        <PassengerCounter label="Child (4-5)" bind:amount={passengers.children4} />
-        <PassengerCounter label="Child (0-3)" bind:amount={passengers.children0} />
+        {#each passengerKeys as key}
+          <PassengerCounter
+            label={getPassengerFullLabel(PASSENGER_DEFINITIONS[key])}
+            bind:count={passengers[key]}
+            {totalCount}
+          />
+        {/each}
       </div>
     </div>
   {/if}
