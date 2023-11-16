@@ -7,12 +7,12 @@ sidebar_position: 1
 ## Prerequisites
 
 The monorepo currently requires these tools to be installed and available in
-your `$PATH`:
+your `$PATH` (installation notes by OS are included below the links):
 
 - [git](https://git-scm.com/)
 - [jq](https://github.com/stedolan/jq)
 - [Python](https://www.python.org/) (3.11.x)
-- [scie-pants](https://github.com/pantsbuild/scie-pants)
+- [scie-pants](https://github.com/pantsbuild/scie-pants) (this is now the standard way of installing pants, so for MacOS `brew install pantsbuild/tap/pants`)
 - [npm](https://www.npmjs.com/) (For HUB)
 - [yarn](https://yarnpkg.com/) (For HUB)
 - [xz](https://tukaani.org/xz/) (required for pants)

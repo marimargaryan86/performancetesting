@@ -19,7 +19,7 @@ in PyCharm to do this automatically.
 :::
 
 Once we have our environment exported, we need to configure PyCharm to use it.
-In your project settings, add `dist/export/python/virtualenvs/python-default/3.11.2/bin/python`
+In your project settings, add `<path/to/project>/dist/export/python/virtualenvs/python-default/3.11.2/bin/python`
 as the project interpreter.
 
 :::info
