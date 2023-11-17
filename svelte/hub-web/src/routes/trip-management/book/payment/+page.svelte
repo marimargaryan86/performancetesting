@@ -1,13 +1,9 @@
 <script lang="ts" context="module">
-  function getPassengers(count: number, type: string): PartialPassengerData[] {
-    return Array(count)
-      .fill(undefined)
-      .map<PartialPassengerData>(() => ({ document: { countryCodes: {} }, type }));
-  }
-
   function getDefaultPassengers(passengers: PassengerPickerData): PartialPassengerData[] {
-    return (Object.keys(passengers) as unknown as (keyof PassengerPickerData)[]).flatMap((key) =>
-      getPassengers(passengers[key], getPassengerFullLabel(PASSENGER_DEFINITIONS[key])),
+    return (Object.keys(passengers) as unknown as (keyof PassengerPickerData)[]).flatMap((type) =>
+      Array(passengers[type])
+        .fill(undefined)
+        .map<PartialPassengerData>(() => ({ type })),
     );
   }
 </script>
@@ -18,11 +14,7 @@
   import routeConfig from "routeConfig";
   import Payment from "./payment.svelte";
   import Fees from "./fees.svelte";
-
-  import PassengerEntry, {
-    getPassengerValidator,
-    type PartialPassengerData,
-  } from "./passenger-entry.svelte";
+  import PassengerEntry, { type PartialPassengerData } from "./passenger-entry.svelte";
   import ContactInformation, { contactDetailsModel } from "./contact-information.svelte";
   import Countdown from "../countdown.svelte";
   import { z } from "zod";
@@ -34,14 +26,11 @@
   import PriceDialog from "components/ui/dialogues/price-dialog.svelte";
   import Summary from "../../components/summary/summary.svelte";
   import tripManagement from "../../../integration/trip-management/trip-management";
-  import {
-    getPassengerFullLabel,
-    PASSENGER_DEFINITIONS,
-    type PassengerPickerData,
-  } from "../../components/trip-search/passenger-picker/passenger-picker.svelte";
+  import type { PassengerPickerData } from "../../components/trip-search/passenger-picker/passenger-picker.svelte";
   import { onDestroy } from "svelte";
   import type { ContactDetails } from "integration/junction-mobile-api/schemas/journey";
   import FareRulesDialog from "../../components/fare-rules-dialog.svelte";
+  import { getPassengerValidator } from "utils/passenger";
 
   export let data;
 

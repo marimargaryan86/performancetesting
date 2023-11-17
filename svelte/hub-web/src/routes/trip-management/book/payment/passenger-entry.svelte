@@ -1,132 +1,28 @@
 <script lang="ts" context="module">
-  const passengerTitles = ["unspecified", "mr", "mrs", "ms", "miss"] as const;
-  const passengerTitle = z.enum(passengerTitles, { required_error: "Title is required" });
-  type PassengerTitle = z.infer<typeof passengerTitle>;
-
-  const passengerGenders = ["unspecified", "male", "female"] as const;
-  const passengerGender = z.enum(passengerGenders, { required_error: "Gender is required" });
-  type PassengerGender = z.infer<typeof passengerGender>;
-
-  type DocumentValidator = z.ZodObject<{
-    [key in keyof TravelerDocument]-?: z.ZodType<TravelerDocument[key]>;
-  }>;
-
-  export type PassengerValidator = z.ZodObject<
-    Omit<{ [key in keyof OrderPassenger]: z.ZodType<OrderPassenger[key]> }, "document"> & {
-      type: z.ZodString;
-      document: DocumentValidator | z.ZodUndefined;
-    }
-  >;
+  const passengerTitles: OrderPassenger["title"][] = ["unspecified", "mr", "mrs", "ms", "miss"];
+  const passengerGenders: OrderPassenger["gender"][] = ["unspecified", "male", "female"];
+  const travelerDocumentTypes: NonNullable<TravelerDocument["type"]>[] = ["passport"];
 
   export type PartialPassengerData = Omit<Partial<OrderPassenger>, "document"> & {
-    type: string;
+    type: keyof PassengerPickerData;
     document?: Require<Partial<TravelerDocument>, "countryCodes">;
   };
 
-  // eslint-disable-next-line max-lines-per-function
-  function getDocumentFields(required: TripOfferPriceQuote["required"]): {
-    [key in keyof TravelerDocument]: z.ZodType<TravelerDocument[key]>;
-  } {
-    const documentFields: {
-      [key in keyof TravelerDocument]: z.ZodType<TravelerDocument[key]>;
-    } = { type: z.literal("passport") };
-
-    let countryCodes = z.object({});
-
-    required.forEach((field) => {
-      if (field === "expiration-date") {
-        documentFields.expiryDate = z.date({
-          coerce: true,
-          required_error: "Expiration date is required",
-        });
-      } else if (field === "issue-date") {
-        documentFields.issueDate = z.date({
-          coerce: true,
-          required_error: "Issue date is required",
-        });
-      } else if (field === "issuing-country") {
-        countryCodes = countryCodes.extend({
-          issue: z
-            .string({ required_error: "Issuing country is required" })
-            .regex(/^[A-z]{2}$/, "Invalid issuing country code"),
-        });
-        documentFields.countryCodes = countryCodes;
-      } else if (field === "nationality") {
-        countryCodes = countryCodes.extend({
-          nationality: z
-            .string({ required_error: "Nationality is required" })
-            .regex(/^[A-z]{2}$/, "Invalid nationality country code"),
-        });
-        documentFields.countryCodes = countryCodes;
-      } else if (field === "passport-number") {
-        documentFields.number = z
-          .string({
-            required_error: "Passport number is required",
-          })
-          .trim()
-          .min(1, "Passport number is required");
-      } else if (field === "residence-country-code") {
-        countryCodes = countryCodes.extend({
-          residence: z
-            .string({ required_error: "Residence country code is required" })
-            .regex(/^[A-z]{2}$/, "Invalid residence country code"),
-        });
-        documentFields.countryCodes = countryCodes;
-      } else if (field === "date-of-birth") {
-        // Date of birth will always be mandatory
-      } else {
-        throw new Error(`Unhandled field type ${field}`);
-      }
-    });
-
-    return documentFields;
-  }
-
-  export function getPassengerValidator(
-    required: TripOfferPriceQuote["required"],
-  ): PassengerValidator {
-    const result = z.object({
-      type: z.string(),
-      title: passengerTitle,
-      firstName: z
-        .string({ required_error: "First name is required" })
-        .trim()
-        .min(1, "First name is required"),
-      lastName: z
-        .string({ required_error: "Last name is required" })
-        .trim()
-        .min(1, "Last name is required"),
-      birthDate: z.date({ coerce: true, required_error: "Date of birth is required" }),
-      gender: passengerGender,
-    });
-
-    const documentFields = getDocumentFields(required);
-
-    return (Object.keys(documentFields).length > 1
-      ? result.extend({ document: z.object({ ...documentFields }) })
-      : result) as unknown as PassengerValidator;
-  }
-
-  export type PassengerData = z.infer<PassengerValidator>;
-
-  const travelerDocumentTypes = ["passport"] as const;
-  type TravelerDocumentType = (typeof travelerDocumentTypes)[number];
-
-  function formatTitleOption(option?: PassengerTitle): string {
+  function formatTitleOption(option?: OrderPassenger["title"]): string {
     return option ? capitalize(option) : "";
   }
 
-  function formatGenderOption(option?: PassengerGender): string {
+  function formatGenderOption(option?: OrderPassenger["gender"]): string {
     return option ? capitalize(option) : "";
   }
 
-  function formatTravelerDocumentOption(option?: TravelerDocumentType): string {
+  function formatTravelerDocumentOption(option?: NonNullable<TravelerDocument["type"]>): string {
     return option ? capitalize(option) : "None";
   }
 </script>
 
 <script lang="ts">
-  import { z } from "zod";
+  import type { z } from "zod";
   import { capitalize } from "utils/common";
   import DateTextField from "components/ui/date-text-field.svelte";
   import SelectField from "components/ui/select-field.svelte";
@@ -138,10 +34,15 @@
   import Collapsible from "../../components/collapsible.svelte";
   import type { TripOfferPriceQuote } from "integration/junction-mobile-api/schemas/trip-offer-price-quote";
   import type { Require } from "integration/ts-helpers";
+  import {
+    getPassengerFullLabel,
+    PASSENGER_DEFINITIONS,
+    type PassengerPickerData,
+  } from "../../components/trip-search/passenger-picker/passenger-picker.svelte";
 
   export let passengerNumber: number;
   export let passenger: PartialPassengerData;
-  export let errors: z.ZodFormattedError<PassengerData> | undefined = undefined;
+  export let errors: z.ZodFormattedError<OrderPassenger> | undefined = undefined;
   export let required: TripOfferPriceQuote["required"];
 
   let collapsible: Collapsible | undefined;
@@ -156,7 +57,9 @@
 <Collapsible expandedOnMount bind:this={collapsible}>
   <h2 slot="title">
     <strong class="typography title-medium bold">Passenger {passengerNumber}</strong>
-    <span class="typography title-small">{capitalize(passenger.type)}</span>
+    <span class="typography title-small">
+      {getPassengerFullLabel(PASSENGER_DEFINITIONS[passenger.type])}
+    </span>
   </h2>
 
   <div class="details">
