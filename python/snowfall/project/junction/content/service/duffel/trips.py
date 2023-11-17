@@ -1,7 +1,9 @@
 import zoneinfo
+from collections.abc import Iterable
+from typing import NamedTuple
 
 from snowfall.project.junction.provider.v2alpha import trips_pb2
-from snowfall.project.junction.v1 import segment_type_pb2
+from snowfall.project.junction.v1 import fare_type_pb2, segment_type_pb2
 from snowfall.stdlib import time
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1 import latlng_pb2
@@ -14,6 +16,11 @@ class MissingIataError(Exception):
     """Raised when an airport is missing an IATA."""
 
 
+class CabinClass(NamedTuple):
+    cabin_type: fare_type_pb2.FareType.ValueType
+    marketing_name: str
+
+
 class Transformer(object):
     def to_results(
         self,
@@ -23,18 +30,23 @@ class Transformer(object):
 
         for offer in offer_result.offers:
             result = trips_pb2.Result(
-                trips=[
-                    trips_pb2.Trip(
-                        segments=[
-                            self.segment_to_proto(segment) for segment in trip.segments
-                        ],
-                    )
-                    for trip in offer.slices
-                ],
+                trips=[self.trip_to_proto(trip) for trip in offer.slices],
             )
             results[calculate_result_hash(result)] = result
 
         return list(results.values())
+
+    def trip_to_proto(self, trip: offer_slice.OfferSlice) -> trips_pb2.Trip:
+        highest_cabin_class = self._get_highest_cabin_class(trip.segments)
+
+        return trips_pb2.Trip(
+            segments=[self.segment_to_proto(segment) for segment in trip.segments],
+            fare=trips_pb2.Trip.Fare(
+                type=highest_cabin_class.cabin_type,
+                marketing_name=trip.fare_brand_name
+                or highest_cabin_class.marketing_name,
+            ),
+        )
 
     def segment_to_proto(
         self,
@@ -89,6 +101,36 @@ class Transformer(object):
                 latitude=location.latitude,
             ),
         )
+
+    def _get_highest_cabin_class(
+        self,
+        segments: Iterable[offer_slice.OfferSliceSegment],
+    ) -> CabinClass:
+        passenger_with_highest_cabin = max(
+            (passenger for segment in segments for passenger in segment.passengers),
+            key=self._resolve_passenger_cabin_class,
+        )
+
+        return CabinClass(
+            cabin_type=self._resolve_passenger_cabin_class(
+                passenger_with_highest_cabin,
+            ),
+            marketing_name=passenger_with_highest_cabin.cabin_class_marketing_name,
+        )
+
+    def _resolve_passenger_cabin_class(
+        self,
+        passenger: offer_slice.OfferSliceSegmentPassenger,
+    ) -> fare_type_pb2.FareType.ValueType:
+        match passenger.cabin_class:
+            case "first":
+                return fare_type_pb2.FARE_TYPE_FIRST
+            case "business":
+                return fare_type_pb2.FARE_TYPE_BUSINESS
+            case "economy" | "premium_economy":
+                return fare_type_pb2.FARE_TYPE_ECONOMY
+
+        return fare_type_pb2.FARE_TYPE_UNSPECIFIED
 
 
 class Trips(object):

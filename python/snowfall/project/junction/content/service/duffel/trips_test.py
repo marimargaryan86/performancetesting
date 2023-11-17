@@ -106,13 +106,13 @@ async def trip_search_response(
 
 
 class TestTripSearcher(object):
-    async def test_one_way_contains_results(
+    def test_one_way_contains_results(
         self,
         trip_search_response: trips_pb2.SearchTripsResponse,
     ) -> None:
         assert len(trip_search_response.results)
 
-    async def test_one_way_contains_no_duplicates(
+    def test_one_way_contains_no_duplicates(
         self,
         trip_search_response: trips_pb2.SearchTripsResponse,
     ) -> None:
@@ -122,6 +122,22 @@ class TestTripSearcher(object):
             signature = trips.calculate_result_hash(result)
             assert signature not in result_signatures, "Duplicate result found"
             result_signatures.add(signature)
+
+    def test_trips_have_fare_type(
+        self,
+        trip_search_response: trips_pb2.SearchTripsResponse,
+    ) -> None:
+        for result in trip_search_response.results:
+            for trip in result.trips:
+                assert trip.fare.type
+
+    def test_trips_have_fare_marketing_name(
+        self,
+        trip_search_response: trips_pb2.SearchTripsResponse,
+    ) -> None:
+        for result in trip_search_response.results:
+            for trip in result.trips:
+                assert trip.fare.marketing_name
 
 
 @pytest.fixture()
