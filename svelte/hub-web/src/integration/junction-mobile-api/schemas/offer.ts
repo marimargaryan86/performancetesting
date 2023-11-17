@@ -224,7 +224,10 @@ export const offerOptionParser = {
       id: data.id,
       price: {
         total: priceParser.toModel(data.attributes.price),
-        breakdown: data.attributes.priceBreakdown?.map(priceBreakdownParser.toModel) ?? [],
+        breakdown:
+          data.attributes.priceBreakdown
+            ?.filter((pb) => pb.breakdownType !== "service-mark-up")
+            ?.map(priceBreakdownParser.toModel) ?? [],
       },
       brandName: data.attributes.brandName,
       baggageAllowance: data.attributes.baggageAllowances.map(

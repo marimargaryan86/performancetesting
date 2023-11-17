@@ -132,7 +132,10 @@ export const tripOfferPriceQuoteParser = {
       expiresAt: new Date(data.attributes.expiresAt),
       price: {
         total: data.attributes.price ? priceParser.toModel(data.attributes.price) : undefined,
-        breakdown: data.attributes.priceBreakdown?.map(priceBreakdownParser.toModel) ?? [],
+        breakdown:
+          data.attributes.priceBreakdown
+            ?.filter((pb) => pb.breakdownType !== "service-mark-up")
+            ?.map(priceBreakdownParser.toModel) ?? [],
       },
       penalties: data.attributes.penalties.map(tripOfferOptionPenaltyParser.toModel),
       required: data.attributes.required,

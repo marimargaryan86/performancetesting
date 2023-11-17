@@ -156,7 +156,10 @@ export const tripBookingParser = {
       id: data.id,
       price: {
         total: priceParser.toModel(data.attributes.totalPrice),
-        breakdown: data.attributes.priceBreakdown?.map(priceBreakdownParser.toModel) ?? [],
+        breakdown:
+          data.attributes.priceBreakdown
+            ?.filter((pb) => pb.breakdownType !== "service-mark-up")
+            ?.map(priceBreakdownParser.toModel) ?? [],
       },
       operatorBookingReferences: data.attributes.operatorBookingReferences,
       externalReference: data.attributes.externalReference,
