@@ -111,6 +111,10 @@ job "mobile-api-http-res-se" {
               local_bind_port  = 8070
               destination_name = "client-api-${var.environment}"
             }
+            upstreams {
+              local_bind_port  = 8060
+              destination_name = "plus-api-${var.environment}"
+            }
           }
         }
       }

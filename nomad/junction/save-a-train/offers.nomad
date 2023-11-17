@@ -81,17 +81,6 @@ job "save-a-train-offers" {
       port = "prometheus"
       tags = ["metrics"]
 
-      connect {
-        sidecar_service {
-          proxy {
-            upstreams {
-              local_bind_port  = 8020
-              destination_name = "geodata-${var.environment}"
-            }
-          }
-        }
-      }
-
       check {
         type     = "http"
         path     = "/"

@@ -112,6 +112,10 @@ job "mobile-api-http-booking-hub" {
               destination_name = "client-api-${var.environment}"
             }
             upstreams {
+              local_bind_port  = 8060
+              destination_name = "plus-api-${var.environment}"
+            }
+            upstreams {
               local_bind_port  = 8010
               destination_name = "authentication-${var.environment}"
             }
