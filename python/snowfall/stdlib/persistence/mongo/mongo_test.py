@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 from collections.abc import Sequence
 
 import more_itertools
@@ -200,6 +201,36 @@ class TestSorting(object):
             ]
             cursor = await documents.cursor()
             assert cursor != ""
+
+    @pytest.mark.parametrize(("sort", "expected"), _TEST_DATA)
+    @pytest.mark.parametrize(
+        "limit",
+        [1, 2, 3, 4],
+    )
+    async def test_pagination_with_or_filter(
+        self,
+        sorting_repository: conftest.MockRepository,
+        sort: tuple[str, int] | None,
+        limit: int,
+        expected: Sequence[str],
+    ) -> None:
+        cursor = ""
+
+        for subset in more_itertools.chunked(expected, limit):
+            documents = await sorting_repository.find(
+                field="1",
+                created_after=datetime.datetime.fromtimestamp(0, tz=datetime.UTC),
+                cursor=cursor,
+                sort=sort,
+            )
+            documents.limit(limit)
+            assert subset == [
+                document[repository.mongo_id_key] async for document in documents
+            ]
+            new_cursor = await documents.cursor()
+            assert new_cursor != cursor
+
+            cursor = new_cursor
 
 
 class TestNestedSorting(object):

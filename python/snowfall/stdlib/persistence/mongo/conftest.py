@@ -61,6 +61,25 @@ class MockRepository(
             },
         )
 
+    async def find(
+        self,
+        field: str,
+        created_after: datetime.datetime,
+        cursor: str | None = None,
+        sort: tuple[str, int] | None = None,
+    ) -> resultset.ResultSet[Mapping[str, Any]]:
+        filter_ = {
+            "$or": [
+                {"field": field},
+                {"created": {"$gt": created_after}},
+            ],
+        }
+        return await self._find_with_cursor(
+            cur=cursor,
+            filter_=filter_,
+            sort=sort,
+        )
+
 
 class NestedMockRepository(
     repository.DefaultRepository,

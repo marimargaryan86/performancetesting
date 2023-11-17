@@ -66,22 +66,28 @@ def with_cursor_filters(
         prefixed_id = mongo_id_key
 
     if sort[0] != prefixed_id:
+        or_block: list[Any] = []
         if "$or" not in cursor_filter:
-            cursor_filter["$or"] = []
-
+            cursor_filter["$or"] = or_block
+        else:
+            cursor_filter["$and"] = [
+                {
+                    "$or": cursor_filter.pop("$or"),
+                },
+                {
+                    "$or": or_block,
+                },
+            ]
         sort_value = json_util.loads(cursor_obj.sort_value)
 
-        cursor_filter["$or"].append(
-            {
-                sort[0]: {_DIRECTIONS[sort[1]]: sort_value},
-            },
-        )
-
-        cursor_filter["$or"].append(
-            {
-                sort[0]: sort_value,
-                prefixed_id: {_DIRECTIONS[pymongo.ASCENDING]: cursor_obj.id},
-            },
+        or_block.extend(
+            (
+                {sort[0]: {_DIRECTIONS[sort[1]]: sort_value}},
+                {
+                    sort[0]: sort_value,
+                    prefixed_id: {_DIRECTIONS[pymongo.ASCENDING]: cursor_obj.id},
+                },
+            ),
         )
 
         return cursor_filter
