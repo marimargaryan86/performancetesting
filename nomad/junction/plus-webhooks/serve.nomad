@@ -55,7 +55,6 @@ job "plus-webhooks-serve" {
 
     network {
       mode = "bridge"
-      port "grpc" {}
       port "prometheus" {}
     }
 
@@ -67,8 +66,6 @@ job "plus-webhooks-serve" {
 
     service {
       name = "plus-webhooks-${var.environment}"
-      port = "grpc"
-      tags = ["grpc"]
 
       connect {
         sidecar_service {
@@ -83,12 +80,6 @@ job "plus-webhooks-serve" {
             }
           }
         }
-      }
-
-      check {
-        type     = "grpc"
-        interval = "30s"
-        timeout  = "4s"
       }
     }
     service {
@@ -139,7 +130,7 @@ EOH
 
       config {
         image = var.docker_image
-        ports = ["grpc", "prometheus"]
+        ports = ["prometheus"]
         args = [
           "serve",
         ]
