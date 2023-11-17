@@ -43,6 +43,9 @@ class MatrixChatbot(AsyncClient):
             if state_str:
                 state: Mapping[str, Any] = json.loads(state_str) or {}
                 ai_chat_history = state.get("ai_chat_history", [])
+                for elem in ai_chat_history:
+                    elem.pop("function_call", None)
+                    elem.pop("tool_calls", None)
             else:
                 ai_chat_history = [
                     {"role": "system", "content": self._ai_bot.generate_system_setup()},

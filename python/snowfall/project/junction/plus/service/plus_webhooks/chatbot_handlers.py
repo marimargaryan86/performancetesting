@@ -536,6 +536,9 @@ async def handle_unknown(
             action_menu,
         ]
     ai_chat_history = state.get("ai_chat_history", [])
+    for elem in ai_chat_history:
+        elem.pop("function_call", None)
+        elem.pop("tool_calls", None)
     ai_chat_history.append({"role": "user", "content": message})
     assistant_message = await ai_bot.handle_prompt(
         messages=ai_chat_history,
