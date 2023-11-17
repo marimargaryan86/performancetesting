@@ -4,7 +4,7 @@ from snowfall.project.junction.content.service.mock import client
 from snowfall.project.junction.provider.v2alpha import trips_pb2
 from snowfall.project.junction.v1 import segment_type_pb2
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1 import latlng_pb2
+from snowfall.stdlib.v1 import latlng_pb2, money_pb2
 
 
 class Transformer(object):
@@ -14,11 +14,18 @@ class Transformer(object):
     ) -> trips_pb2.SearchTripsResponse:
         return trips_pb2.SearchTripsResponse(
             results=[
-                self._make_result(search_result) for search_result in search_results
+                self._make_result(search_result, fare)
+                for search_result in search_results
+                for fare in search_result.fares
             ],
         )
 
-    def _make_result(self, search_result: client.SearchResult) -> trips_pb2.Result:
+    def _make_result(
+        self,
+        search_result: client.SearchResult,
+        fare: client.Fare,
+    ) -> trips_pb2.Result:
+        price = fare.price.protobuf()
         return trips_pb2.Result(
             trips=[
                 trips_pb2.Trip(
@@ -28,14 +35,9 @@ class Transformer(object):
                 )
                 for trip in search_result.trips
             ],
-            fares=[
-                trips_pb2.Fare(
-                    reference=fare.reference,
-                    price=fare.price.protobuf(),
-                    brand_name=fare.brand_name,
-                )
-                for fare in search_result.fares
-            ],
+            base_amount=price,
+            tax_amount=money_pb2.Money(currency_code=price.currency_code),
+            total_amount=price,
         )
 
 

@@ -5,6 +5,7 @@ from collections.abc import Mapping, Sequence
 import pytest
 
 from snowfall.project.junction.content.service.mock import client
+from snowfall.project.junction.provider.v2alpha import trips_pb2
 
 
 def _generate_mock_trip(
@@ -42,6 +43,26 @@ def _generate_stop(ref: str) -> client.Stop:
         longitude=0,
         timezone=zoneinfo.ZoneInfo("UTC"),
     )
+
+
+class TestClient(object):
+    def test_one_way_contains_results(
+        self,
+        mock_client: client.MockClient,
+        one_way_request: trips_pb2.SearchTripsRequest,
+    ) -> None:
+        results = mock_client.find_one_way(one_way_request.one_way)
+        assert len(results)
+
+    def test_round_trip_contains_power_of_results(
+        self,
+        mock_client: client.MockClient,
+        one_way_request: trips_pb2.SearchTripsRequest,
+        roundtrip_request: trips_pb2.SearchTripsRequest,
+    ) -> None:
+        one_way_results = mock_client.find_one_way(one_way_request.one_way)
+        roundtrip_results = mock_client.find_round_trip(roundtrip_request.round_trip)
+        assert len(roundtrip_results) == len(one_way_results) ** 2
 
 
 class TestFarePrices(object):

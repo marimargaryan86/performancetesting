@@ -44,13 +44,9 @@ message Trip {
 
 message Result {
   repeated Trip trips = 1;
-  repeated Fare fares = 2;
-}
-
-message Fare {
-  string reference = 1;
-  snowfall.stdlib.v1.Money price = 2;
-  string brand_name = 3;
+  snowfall.stdlib.v1.Money base_amount = 2;
+  snowfall.stdlib.v1.Money tax_amount = 3;
+  snowfall.stdlib.v1.Money total_amount = 4;
 }
 
 message SearchTripsRequest {

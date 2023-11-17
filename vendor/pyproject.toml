@@ -249,7 +249,7 @@ ignore = [
 ]
 per-file-ignores = [
   "*_test.py:WPS118,WPS432,WPS441,WPS442",
-  "conftest.py:WPS442",
+  "conftest.py:WPS432,WPS442",
   "main.py:WPS432",
   "python/snowfall/project/junction/service/providers/benerail/stations.py:WPS232",
   "python/snowfall/project/junction/go/service/places/cities.py:WPS232",
