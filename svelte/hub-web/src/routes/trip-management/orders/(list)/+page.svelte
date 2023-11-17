@@ -94,7 +94,7 @@
   import { getZeroTimeDate } from "utils/date-time";
   import type { ScrollLoadFunc } from "directives/scroll-load";
   import integrationInstancesClient from "integration-instances-client";
-  import type JourneyService from "integration/junction-hub-api/services/journey-service.js";
+  import type JourneyService from "integration/junction-hub-api/services/journey-service";
 
   export let data;
 

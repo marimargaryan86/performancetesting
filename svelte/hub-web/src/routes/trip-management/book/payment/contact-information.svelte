@@ -32,7 +32,7 @@
   import type { CountryModel } from "models/location";
   import Collapsible from "../../components/collapsible.svelte";
   import type { ContactDetails } from "integration/junction-mobile-api/schemas/journey";
-  import countryData from "data/countryData";
+  import countryData from "data/country-data";
 
   export let data: ContactDetails;
   export let errors: z.ZodFormattedError<ContactDetails> | undefined = undefined;

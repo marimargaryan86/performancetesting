@@ -11,7 +11,7 @@
   import type { Balance } from "integration/junction-hub-api/schemas/balance";
   import type { Currency } from "integration/junction-hub-api/schemas/currency";
   import integrationInstancesClient from "integration-instances-client";
-  import currencyData from "data/currencyData";
+  import currencyData from "data/currency-data";
 
   export let accountId: string;
   export let exclude: Balance[];

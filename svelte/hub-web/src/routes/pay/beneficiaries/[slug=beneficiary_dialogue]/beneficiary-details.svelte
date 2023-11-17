@@ -6,7 +6,7 @@
   import { formatCountryOption } from "formatting/location";
   import type { Account } from "integration/junction-hub-api/schemas/account";
   import type { BeneficiaryPut } from "integration/junction-hub-api/schemas/beneficiary";
-  import countryData from "data/countryData";
+  import countryData from "data/country-data";
 
   export let data: BeneficiaryPut;
   export let accounts: Account[];

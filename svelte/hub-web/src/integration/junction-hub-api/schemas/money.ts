@@ -1,4 +1,4 @@
-import currencyData from "data/currencyData";
+import currencyData from "data/currency-data";
 
 export type Money = {
   currency: string;

@@ -20,7 +20,7 @@
   import StandardLayout from "components/page/standard-layout.svelte";
   import type { ScrollLoadFunc } from "directives/scroll-load";
   import integrationInstancesClient from "integration-instances-client";
-  import currencyData from "data/currencyData";
+  import currencyData from "data/currency-data";
 
   export let data;
 
