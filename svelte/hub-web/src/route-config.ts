@@ -42,10 +42,10 @@ export default {
                               get routes() {
                                 return { tickets: { root: `${this.root}/tickets` } } as const;
                               },
-                            } as const),
+                            }) as const,
                         } as const;
                       },
-                    } as const),
+                    }) as const,
                 } as const;
               },
             },
@@ -87,7 +87,7 @@ export default {
                   account: <TAccountId extends string>(id: TAccountId) =>
                     ({
                       root: `${this.root}/${id}`,
-                    } as const),
+                    }) as const,
                 } as const;
               },
             },
@@ -97,7 +97,7 @@ export default {
                 return {
                   beneficiary: <TBeneficiaryId extends string = "add">(
                     id: TBeneficiaryId = "add" as TBeneficiaryId,
-                  ) => ({ root: `${this.root}/${id}` } as const),
+                  ) => ({ root: `${this.root}/${id}` }) as const,
                 } as const;
               },
             },

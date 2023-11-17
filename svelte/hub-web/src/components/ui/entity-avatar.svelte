@@ -31,7 +31,9 @@
     object-position: center;
     color: var(--color-common-dark-strong);
     font-size: calc(var(--size) * 0.4);
-    text-shadow: 0 0 1px rgb(0 0 0 / 1), 0 0 2px rgb(0 0 0 / 1);
+    text-shadow:
+      0 0 1px rgb(0 0 0 / 1),
+      0 0 2px rgb(0 0 0 / 1);
     border-radius: 50%;
     box-shadow: 0 4px 20px rgb(0 0 0 / 0.05);
     user-select: none;

@@ -107,7 +107,9 @@
     overflow: hidden auto;
     background-color: var(--color-common-background-light-main);
     border-right: var(--color-main-neutral-50) 1px solid;
-    transition: width var(--transition-time) ease, padding var(--transition-time) ease;
+    transition:
+      width var(--transition-time) ease,
+      padding var(--transition-time) ease;
   }
 
   .home {

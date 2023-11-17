@@ -47,7 +47,9 @@
     padding: 16px;
     border: 1px solid transparent;
     border-radius: 16px;
-    transition: border-color 200ms ease, background-color 200ms ease;
+    transition:
+      border-color 200ms ease,
+      background-color 200ms ease;
   }
 
   .alert.success {

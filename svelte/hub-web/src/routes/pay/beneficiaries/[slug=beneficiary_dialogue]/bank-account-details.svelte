@@ -198,7 +198,10 @@
     border: var(--color-common-line-medium) 1px solid;
     border-radius: 8px;
     cursor: pointer;
-    transition: border 250ms ease, box-shadow 250ms ease, background-color 250ms ease;
+    transition:
+      border 250ms ease,
+      box-shadow 250ms ease,
+      background-color 250ms ease;
     user-select: none;
   }
 

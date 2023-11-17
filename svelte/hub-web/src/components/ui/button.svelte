@@ -50,7 +50,11 @@
     outline: 0;
     box-shadow: 0 0 0 var(--border-width) var(--border-color) inset;
     cursor: pointer;
-    transition: padding 150ms ease, color 150ms ease, background-color 150ms ease, border 150ms ease,
+    transition:
+      padding 150ms ease,
+      color 150ms ease,
+      background-color 150ms ease,
+      border 150ms ease,
       box-shadow 150ms ease;
   }
 

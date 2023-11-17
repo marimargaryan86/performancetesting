@@ -68,7 +68,6 @@
     justify-content: center;
     padding: 4px 8px;
     color: var(--color-common-dark-strong);
-    color: var(--color-main-neutral-900);
     border: 1px solid #d8dadd;
     border-radius: 4px;
   }

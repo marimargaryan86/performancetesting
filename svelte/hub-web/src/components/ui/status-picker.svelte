@@ -126,7 +126,9 @@
     background: #ffffff;
     border: var(--color-main-neutral-200) 1px solid;
     border-radius: 8px;
-    box-shadow: 0 4px 6px rgb(17 24 39 / 0.05), 0 12px 16px rgb(17 24 39 / 0.1);
+    box-shadow:
+      0 4px 6px rgb(17 24 39 / 0.05),
+      0 12px 16px rgb(17 24 39 / 0.1);
     transform-origin: top left;
   }
 

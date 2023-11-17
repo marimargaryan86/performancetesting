@@ -30,10 +30,13 @@
   function setLogoutTimer(timeoutAt: Date): void {
     window.clearTimeout(logoutTimer);
 
-    logoutTimer = window.setTimeout(async () => {
-      await integrationInstancesClient.auth.signOut();
-      await goto(routeConfig.routes.login.root, { invalidateAll: true });
-    }, getTimeDeltaMs(timeoutAt, new Date()));
+    logoutTimer = window.setTimeout(
+      async () => {
+        await integrationInstancesClient.auth.signOut();
+        await goto(routeConfig.routes.login.root, { invalidateAll: true });
+      },
+      getTimeDeltaMs(timeoutAt, new Date()),
+    );
   }
 </script>
 

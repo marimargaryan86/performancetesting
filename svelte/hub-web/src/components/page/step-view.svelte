@@ -57,7 +57,10 @@
     height: 24px;
     border: var(--color-main-primary-200) 1px solid;
     border-radius: 50%;
-    transition: background 150ms ease, border 150ms ease, color 150ms ease;
+    transition:
+      background 150ms ease,
+      border 150ms ease,
+      color 150ms ease;
   }
 
   .active > .number-badge {

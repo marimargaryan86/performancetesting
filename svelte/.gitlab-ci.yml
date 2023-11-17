@@ -1,6 +1,6 @@
 .svelte:lint:
   stage: test
-  image: node:19-bullseye-slim
+  image: node:20-bullseye-slim
   interruptible: true
   before_script:
     - cd "${PROJECT_PATH}"
