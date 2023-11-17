@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package snowfall.project.junction.v1;
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/v1";
+
+enum FareType {
+  FARE_TYPE_UNSPECIFIED = 0;
+  FARE_TYPE_ECONOMY = 1;
+  FARE_TYPE_BUSINESS = 2;
+  FARE_TYPE_FIRST = 3;
+}
