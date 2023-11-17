@@ -39,12 +39,17 @@ from snowfall.vendor.currency_cloud.errors import CurrencyCloudError
 from snowfall.vendor.currency_cloud.models.balance import BalanceResponse
 from snowfall.vendor.currency_cloud.models.beneficiary import BeneficiaryResponse
 
+RESELLER_ID = "effb6d65-2ddc-4a26-9b57-af79d44254cb"
+
 
 async def mock_cookie_to_user(cookie: str) -> stdlib_auth.User:
     return stdlib_auth.User(
         identifier="foo",
         email="foo@example.com",
-        metadata={"reseller_id": "mock", "role": "snowfall-admin"},
+        metadata={
+            "reseller_id": RESELLER_ID,
+            "role": "snowfall-admin",
+        },
     )
 
 
@@ -310,11 +315,20 @@ def accounts_client() -> accounts.DictClient:
 
 
 @pytest.fixture()
-def contacts_client() -> contacts.DictClient:
+def bad_contacts_client() -> contacts.DictClient:
     return contacts.DictClient(
         [
             pay_fixtures.generate_contact(pay_fixtures.CONTACTS[0]),
             pay_fixtures.generate_contact_with_bad_company_id(pay_fixtures.CONTACTS[1]),
+        ],
+    )
+
+
+@pytest.fixture()
+def contacts_client() -> contacts.DictClient:
+    return contacts.DictClient(
+        [
+            pay_fixtures.generate_contact(pay_fixtures.CONTACTS[0]),
         ],
     )
 
@@ -411,7 +425,54 @@ async def client(
 
 
 @pytest.fixture()
+async def users_client(
+    users_app: applications.Starlette,
+    headers: Mapping[str, str],
+) -> AsyncIterator[httpx.AsyncClient]:
+    async with httpx.AsyncClient(
+        app=users_app,
+        base_url="https://example.com",
+    ) as client:
+        client.headers.update(dict(headers))
+
+        yield client
+
+
+@pytest.fixture()
 def app(
+    orders_client: orders.Client,
+    companies_client: companies.Client,
+    bad_contacts_client: contacts.Client,
+    accounts_client: accounts.Client,
+    conversions_client: conversions.Client,
+    beneficiaries_client: beneficiaries.Client,
+    transactions_client: transactions.Client,
+    currencies_client: currencies.Client,
+    cc_payment_client: PaymentClient,
+    quotations_client: quotations.Client,
+    bills_client: bills.Client,
+    refunds_client: refunds.Client,
+    resellers_client: resellers.Client,
+) -> applications.Starlette:
+    return _create_app(
+        orders_client=orders_client,
+        companies_client=companies_client,
+        contacts_client=bad_contacts_client,
+        accounts_client=accounts_client,
+        conversions_client=conversions_client,
+        beneficiaries_client=beneficiaries_client,
+        transactions_client=transactions_client,
+        currencies_client=currencies_client,
+        cc_payment_client=cc_payment_client,
+        quotations_client=quotations_client,
+        bills_client=bills_client,
+        refunds_client=refunds_client,
+        resellers_client=resellers_client,
+    )
+
+
+@pytest.fixture()
+def users_app(
     orders_client: orders.Client,
     companies_client: companies.Client,
     contacts_client: contacts.Client,

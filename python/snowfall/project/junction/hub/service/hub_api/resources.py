@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import zoneinfo
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 from typing import Any, ClassVar, Literal
 
 import pydantic
@@ -1137,5 +1137,41 @@ class ResellerResource(models.Resource):
                         resellerId=reseller.id,
                     ),
                 ),
+            },
+        )
+
+
+class UsersProfileResource(models.Resource):
+    api_type: ClassVar[str] = "users-profiles"
+
+    @classmethod
+    def from_proto(
+        cls,
+        reseller_id: str,
+        company: companies_models_pb2.Company,
+        contacts: Sequence[companies_models_pb2.Contact],
+    ) -> UsersProfileResource:
+        return cls(
+            id=reseller_id,
+            type=UsersProfileResource.api_type,
+            attributes={
+                "company": {
+                    "name": company.name,
+                    "address": {
+                        "addressLines": list(company.address.address_lines),
+                        "countryCode": company.address.region_code,
+                        "postalCode": company.address.postal_code,
+                        "city": company.address.locality,
+                    },
+                },
+                "contacts": [
+                    {
+                        "firstName": contact.first_name,
+                        "lastName": contact.last_name,
+                        "emailAddress": contact.email,
+                        "phoneNumber": contact.phone_number.e164_number,
+                    }
+                    for contact in contacts
+                ],
             },
         )

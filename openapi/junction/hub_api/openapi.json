@@ -344,12 +344,12 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "permissions": {
-                      "type": "object"
+                    "data": {
+                      "$ref": "#/components/schemas/UsersProfile"
                     }
                   },
                   "required": [
-                    "permissions"
+                    "data"
                   ]
                 }
               }
@@ -3859,6 +3859,41 @@
           "attributes": {}
         }
       },
+      "UsersProfile": {
+        "title": "Users Profile",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "04f83af5-10bb-4a0f-1881-03e1e690f0f5",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "users-profiles"
+            ],
+            "example": "users-profiles"
+          },
+          "attributes": {
+            "type": "object",
+            "properties": {
+              "company": {
+                "$ref": "#/components/schemas/UsersProfileCompany"
+              },
+              "contacts": {
+                  "type": "array",
+                  "minItems": 0,
+                  "uniqueItems": true,
+                  "items": {
+                    "$ref": "#/components/schemas/UsersProfileContact"
+                  }
+              }
+            }
+          }
+        }
+      },
       "CabinClassIdentifier": {
         "title": "Cabin Class Identifier",
         "type": "object",
@@ -6399,6 +6434,19 @@
           }
         }
       },
+      "UsersProfileCompany": {
+        "title": "Users Profile Company",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Company"
+          },
+          "address": {
+            "$ref": "#/components/schemas/EnhancedAddressDetails"
+          }
+        }
+      },
       "Company": {
         "title": "Company Details",
         "type": "object",
@@ -6610,6 +6658,37 @@
             "type": "string",
             "format": "country",
             "example": "GB"
+          }
+        }
+      },
+      "UsersProfileContact": {
+        "title": "Users Profile Contact",
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "example": "John",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Doe",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "emailAddress": {
+            "type": "string",
+            "example": "example@email.com",
+            "format": "email",
+            "maxLength": 255
+          },
+          "phoneNumber": {
+            "type": "string",
+            "example": "+123456789",
+            "format": "phone",
+            "minLength": 1,
+            "maxLength": 100
           }
         }
       },

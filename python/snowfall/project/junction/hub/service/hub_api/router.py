@@ -30,9 +30,9 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             user_handler.list_,
             name="ListUsers",
         ),
-        routes.to_route(
+        integration.route(
             "/users/me",
-            users.UserInformation().get,
+            users.UserInformation,
             name="ViewUserInformation",
         ),
         routes.to_route(
