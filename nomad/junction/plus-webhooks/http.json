@@ -4,7 +4,7 @@
       "count": 1,
       "traefik_entrypoints": "websecure",
       "traefik_host_URL": "webhooks.plus.junction.dev",
-      "matrix_homeserver_url": "synapse.junction.dev"
+      "matrix_homeserver_url": "https://synapse.junction.dev"
     }
   },
   "production": {
