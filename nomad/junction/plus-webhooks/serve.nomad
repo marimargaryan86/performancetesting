@@ -120,7 +120,7 @@ OPENAI_ORG={{ .Data.data.openai_org }}
 {{ end }}
 {{ with secret "kv/data/${var.environment}/matrix-bot" }}
 MATRIX_USER={{ .Data.data.matrix_user }}
-MATRIX_PASSWORD=\"{{ .Data.data.matrix_password }}\"
+MATRIX_PASSWORD="{{ .Data.data.matrix_password }}"
 {{ end }}
 EOH
         destination = "services.env"
