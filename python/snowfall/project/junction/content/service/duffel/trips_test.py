@@ -139,6 +139,12 @@ class TestTripSearcher(object):
             for trip in result.trips:
                 assert trip.fare.marketing_name
 
+    async def test_results_are_priced(
+        self,
+        trip_search_response: trips_pb2.SearchTripsResponse,
+    ) -> None:
+        _assert_result_prices(trip_search_response)
+
 
 @pytest.fixture()
 def trip_result(
@@ -223,3 +229,14 @@ def test_slice_is_added_to_request(
     assert first_slice.origin == _ORIGIN
     assert first_slice.destination == _DESTINATION
     assert first_slice.departure_date == _DEPARTURE_DATE
+
+
+def _assert_result_prices(response: trips_pb2.SearchTripsResponse) -> None:
+    for trip_result in response.results:
+        assert (
+            trip_result.base_amount.currency_code
+        ), "Results should have a base amount"
+        assert trip_result.tax_amount.currency_code, "Results should have a tax amount"
+        assert (
+            trip_result.total_amount.currency_code
+        ), "Results should have a total amount"

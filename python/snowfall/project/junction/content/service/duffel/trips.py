@@ -4,9 +4,9 @@ from typing import NamedTuple
 
 from snowfall.project.junction.provider.v2alpha import trips_pb2
 from snowfall.project.junction.v1 import fare_type_pb2, segment_type_pb2
-from snowfall.stdlib import time
+from snowfall.stdlib import money, time
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1 import latlng_pb2
+from snowfall.stdlib.v1 import latlng_pb2, money_pb2
 from snowfall.vendor.duffel import client
 from snowfall.vendor.duffel.builders import offer_request as request
 from snowfall.vendor.duffel.models import common, offer_request, offer_slice
@@ -31,6 +31,18 @@ class Transformer(object):
         for offer in offer_result.offers:
             result = trips_pb2.Result(
                 trips=[self.trip_to_proto(trip) for trip in offer.slices],
+                base_amount=self._amount_to_proto(
+                    offer.base_amount,
+                    offer.base_currency,
+                ),
+                tax_amount=self._amount_to_proto(
+                    offer.tax_amount,
+                    offer.tax_currency or offer.total_currency,
+                ),
+                total_amount=self._amount_to_proto(
+                    offer.total_amount,
+                    offer.total_currency,
+                ),
             )
             results[calculate_result_hash(result)] = result
 
@@ -131,6 +143,16 @@ class Transformer(object):
                 return fare_type_pb2.FARE_TYPE_ECONOMY
 
         return fare_type_pb2.FARE_TYPE_UNSPECIFIED
+
+    def _amount_to_proto(
+        self,
+        amount: str | None,
+        currency: str,
+    ) -> money_pb2.Money:
+        if not amount:
+            return money.Money(0, money.Currency(currency)).protobuf()
+
+        return money.from_string(amount, money.Currency(currency)).protobuf()
 
 
 class Trips(object):
