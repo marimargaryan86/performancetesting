@@ -248,9 +248,6 @@ async def _orders(  # noqa: WPS217
         client=http_client,
     )
     # TODO: do we need to call get_token on the save_a_train_client?
-    offer_cache = cache.OffersCache(
-        client=redis_client,
-    )
     booking_storage = await app.stack.enter_async_context(
         filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
     )
@@ -272,7 +269,9 @@ async def _orders(  # noqa: WPS217
             provider_cabin_class_mapping=cabin_classes.CabinMappingRepository(
                 mongo.sat.provider_cabin_mapping,
             ),
-            offers_cache=offer_cache,
+            offers_cache=cache.OffersCache(
+                client=redis_client,
+            ),
             ttl=app.settings.ttl,
             notifier=notifications.SmtpNotifier(
                 smtp_client=aiosmtplib.SMTP(
@@ -291,7 +290,9 @@ async def _orders(  # noqa: WPS217
             ),
             booking_storage=booking_storage,
         ),
-        offers_cache=offer_cache,
+        price_quote_cache=cache.PriceQuoteCache(
+            client=redis_client,
+        ),
         provider_id=str(PROVIDER_ID),
     )
 
@@ -319,7 +320,7 @@ async def _price_quotes(app: service.Application[_PriceQuoteSettings]) -> None:
         offer_cache=cache.OffersCache(
             client=redis_client,
         ),
-        price_cache=cache.PriceQuoteCache(
+        price_quote_cache=cache.PriceQuoteCache(
             client=redis_client,
         ),
         price_ttl=app.settings.ttl,

@@ -321,12 +321,12 @@ class SaveATrainAdapter(object):
     async def create_booking(
         self,
         task: order_amqp_pb2.PlaceOrderTask,
-        offer_details: cache.OfferDetails,
+        price_quote: cache.PriceQuote,
     ) -> order_models_pb2.Booking:
         new_booking = task.booking
 
         try:
-            booking_responses = await self._create_booking(task, offer_details)
+            booking_responses = await self._create_booking(task, price_quote)
         except (
             phonenumbers.NumberParseException,
             BookingError,
@@ -428,10 +428,10 @@ class SaveATrainAdapter(object):
     async def _create_booking(  # noqa: WPS217
         self,
         task: order_amqp_pb2.PlaceOrderTask,
-        offer_details: cache.OfferDetails,
+        price_quote: cache.PriceQuote,
     ) -> models.CombinedBookingResults:
         search_id, seat_code = self._extract_search_id_and_seat_preference_code(
-            await self._select_search_result(offer_details),
+            await self._select_search_result(price_quote),
         )
         booking_result, raw_information = await self._make_booking(
             contact_details=task.contact_details,
@@ -458,15 +458,15 @@ class SaveATrainAdapter(object):
 
     async def _select_search_result(
         self,
-        offer_details: cache.OfferDetails,
+        price_quote: cache.PriceQuote,
     ) -> search_result_selection.SearchResultSelectionResponse:
         try:
             return await self._client.api_client.select_search_result(
                 request.SelectSearchResultRequest(
-                    search_id=offer_details.search_id,
-                    search_result_id=offer_details.search_result_id,
-                    transfer_id=offer_details.transfer_id,
-                    fare_id=offer_details.fare_id,
+                    search_id=price_quote.search_id,
+                    search_result_id=price_quote.search_result_id,
+                    transfer_id=price_quote.transfer_id,
+                    fare_id=price_quote.fare_id,
                 ),
             )
         except exceptions.SATValidationError as search_error:

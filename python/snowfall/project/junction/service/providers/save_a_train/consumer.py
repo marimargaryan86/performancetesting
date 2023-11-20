@@ -104,12 +104,12 @@ class PriceQuoteConsumer(object):
         consumer_obj: consumer.Consumer[offers_amqp_pb2.TripPriceQuoteTask],
         producer_obj: producer.Producer,
         offer_cache: cache.OffersCache,
-        price_cache: cache.PriceQuoteCache,
+        price_quote_cache: cache.PriceQuoteCache,
         price_ttl: datetime.timedelta,
         provider_company_id: str,
     ):
         self._offer_cache = offer_cache
-        self._price_cache = price_cache
+        self._price_quote_cache = price_quote_cache
         self._ttl = price_ttl
         self._consumer = consumer_obj
         self._logger = stdout.get_logger()
@@ -130,7 +130,14 @@ class PriceQuoteConsumer(object):
 
         expires_at = datetime.datetime.now(tz=datetime.UTC) + self._ttl
 
-        price_quote_id = await self._offer_cache.store(offer_details, expires_at)
+        price_quote = cache.PriceQuote(
+            search_id=offer_details.search_id,
+            search_result_id=offer_details.search_result_id,
+            transfer_id=offer_details.transfer_id,
+            fare_id=offer_details.fare_id,
+        )
+
+        price_quote_id = await self._price_quote_cache.store(price_quote, expires_at)
 
         price_quote_price = money.from_string(
             offer_details.price,
@@ -163,12 +170,12 @@ class OrdersConsumer(object):
     def __init__(
         self,
         consumer_obj: consumer.Consumer[orders_amqp_pb2.PlaceOrderTask],
-        offers_cache: cache.OffersCache,
+        price_quote_cache: cache.PriceQuoteCache,
         producer_obj: producer.Producer,
         adapter: save_a_train_adapter.SaveATrainAdapter,
         provider_id: str,
     ):
-        self._cache = offers_cache
+        self._price_quote_cache = price_quote_cache
         self._consumer = consumer_obj
         self._producer = producer_obj
         self._adapter = adapter
@@ -182,24 +189,23 @@ class OrdersConsumer(object):
         self,
         message: types.Message[orders_amqp_pb2.PlaceOrderTask],
     ) -> None:
-        offer_details = await self._cache.fetch(
+        price_quote = await self._price_quote_cache.fetch(
             message.body.booking.trip_option.price_quote_id,
         )
         message.body.booking.provider_name = _PROVIDER_NAME
         message.body.booking.provider_id = self._provider_id
 
-        if not offer_details:
+        if not price_quote:
             self._logger.warning(
                 "No offer details found for booking",
                 booking_id=message.body.booking.id,
                 key=message.body.booking.trip_option.id,
             )
-
             return
 
         booking_result = await self._adapter.create_booking(
             task=message.body,
-            offer_details=offer_details,
+            price_quote=price_quote,
         )
 
         await self._producer.publish(

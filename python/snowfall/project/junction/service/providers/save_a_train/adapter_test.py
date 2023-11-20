@@ -92,13 +92,11 @@ async def test_booking_can_be_placed(
     await _mock_responses(httpx_mock)
     booking_proto = await save_a_train_adapter.create_booking(
         task=_ORDER_TASK,
-        offer_details=cache.OfferDetails(
+        price_quote=cache.PriceQuote(
             fare_id=1,
             search_id="4Q5lMS",
             search_result_id=2,
             transfer_id=3,
-            price="13.37",
-            currency="EUR",
         ),
     )
     total_price = money.from_protobuf(booking_proto.provider_total_price)
