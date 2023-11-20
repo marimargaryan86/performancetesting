@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 from collections.abc import MutableMapping
 from typing import Any, Generic, TypeVar
 
@@ -9,6 +10,7 @@ from google.protobuf import message
 
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.service.amqp_factory import SkipConnectionLostFilter
 from snowfall.stdlib.transport.amqp import types
 
 _Proto = TypeVar("_Proto", bound=message.Message)
@@ -31,6 +33,7 @@ class RpcClient(Generic[_Proto]):
         self._routing_key = routing_key
         self._timeout = timeout
         self._futures: MutableMapping[str, asyncio.Future[Any]] = {}
+        logging.getLogger("aiormq.connection").addFilter(SkipConnectionLostFilter())
 
         self._loop = asyncio.get_running_loop()
 

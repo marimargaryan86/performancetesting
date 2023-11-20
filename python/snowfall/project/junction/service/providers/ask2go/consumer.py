@@ -1,3 +1,4 @@
+import logging
 import uuid
 
 from aio_pika import Message, connect_robust
@@ -14,6 +15,7 @@ from snowfall.project.junction.service.providers.ask2go import (
 )
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
+from snowfall.stdlib.service.amqp_factory import SkipConnectionLostFilter
 from snowfall.stdlib.transport.amqp import consumer, producer
 from snowfall.stdlib.transport.amqp import types as amqp_types
 from snowfall.vendor.ask2go import client
@@ -129,6 +131,7 @@ class SeatMapRpcServer(object):
         self._routing_key = routing_key
         self._ask2go_client = ask2go_client
         self._cache = offer_cache
+        logging.getLogger("aiormq.connection").addFilter(SkipConnectionLostFilter())
 
     async def consume(self) -> None:  # noqa: WPS217
         # TODO: refactor to rpc_server class
