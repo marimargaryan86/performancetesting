@@ -22,7 +22,7 @@ export async function POST(event): Promise<Response> {
       event,
     });
 
-    return new Response();
+    return new Response(devalue.stringify(session.user));
   } catch {
     throw error(401);
   }

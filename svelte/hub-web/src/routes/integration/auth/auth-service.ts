@@ -1,3 +1,4 @@
+import type { User } from "integration/ory/schemas";
 import { INTEGRATION_ROOT } from "../common";
 import * as devalue from "devalue";
 
@@ -7,15 +8,15 @@ async function signIn(data: {
   id: string;
   data: Record<string, string>;
   rememberMe: boolean;
-}): Promise<boolean> {
+}): Promise<User> {
   const url = new URL(AUTH_ROOT, origin);
   const resp = await fetch(url, { method: "POST", body: devalue.stringify(data) });
 
-  if (resp.status === 200) {
-    return true;
+  if (resp.status !== 200) {
+    throw new Error("Unauthorized");
   }
 
-  return false;
+  return devalue.parse(await resp.text());
 }
 
 async function signOut(): Promise<void> {

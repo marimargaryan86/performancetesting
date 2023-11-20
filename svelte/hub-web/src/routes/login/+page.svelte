@@ -18,21 +18,24 @@
   const { pending, func: submit } = pendableCall(async () => {
     errors = undefined;
 
-    if (
-      await integrationInstancesClient.auth.signIn({
+    try {
+      const user = await integrationInstancesClient.auth.signIn({
         id: data.loginFlow.id,
         data: Object.fromEntries(
           data.loginFlow.elements.map((item) => [item.attributes.name, item.attributes.value]),
         ),
         rememberMe,
-      })
-    ) {
-      await goto(routeConfig.root, { invalidateAll: true });
+      });
 
-      return;
+      const redirect =
+        user.role === "reseller-admin" || user.role === "reseller-user"
+          ? routeConfig.routes.tripManagement.routes.book.root
+          : routeConfig.root;
+
+      await goto(redirect, { invalidateAll: true });
+    } catch {
+      errors = "Invalid credentials";
     }
-
-    errors = "Invalid credentials";
   });
 </script>
 
