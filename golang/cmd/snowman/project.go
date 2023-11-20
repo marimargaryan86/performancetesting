@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-const commitTemplate = "%{title}"
+const commitTemplate = "%{title}\n\n%{description}\n\n%{co_authored_by}\n%{reviewed_by}\n%{approved_by}\nRefs: %{reference}"
 const mergeRequestTemplate = ""
 const suggestionCommitMessage = "fix: apply review suggestions"
 
