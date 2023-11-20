@@ -68423,6 +68423,14 @@
         "time_zone": "America/Chicago"
     },
     {
+        "iata_code": "XNB",
+        "iata_country_code": "AE",
+        "latitude": 25.196040,
+        "longitude": 55.262029,
+        "name": "Etihad Luxury Coach Bus Station",
+        "time_zone": "Asia/Dubai"
+    },
+    {
         "iata_code": "XNG",
         "iata_country_code": "VN",
         "latitude": 15.115635,
