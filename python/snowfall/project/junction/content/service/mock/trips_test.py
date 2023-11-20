@@ -52,11 +52,17 @@ class TestTrips(object):
     ) -> None:
         assert len(one_way_response.results)
 
-    def test_one_way_contains_fares(
+    def test_one_way_contains_prices(
         self,
         one_way_response: trips_pb2.SearchTripsResponse,
     ) -> None:
         _assert_result_prices(one_way_response)
+
+    def test_one_way_contains_fares(
+        self,
+        one_way_response: trips_pb2.SearchTripsResponse,
+    ) -> None:
+        _assert_result_trip_fares(one_way_response)
 
     def test_round_trip_contains_power_of_results(
         self,
@@ -77,7 +83,7 @@ class TestTrips(object):
                 == last_inbound_segment.destination.ref
             )
 
-    def test_round_trip_contains_fares(
+    def test_round_trip_contains_prices(
         self,
         round_trip_response: trips_pb2.SearchTripsResponse,
     ) -> None:
@@ -131,3 +137,10 @@ def _assert_result_prices(response: trips_pb2.SearchTripsResponse) -> None:
         assert (
             trip_result.total_amount.currency_code
         ), "Results should have a total amount"
+
+
+def _assert_result_trip_fares(response: trips_pb2.SearchTripsResponse) -> None:
+    for trip_result in response.results:
+        for trip in trip_result.trips:
+            assert trip.fare.type, "Trips should have a fare type"
+            assert trip.fare.marketing_name, "Trips should have a fare marketing name"

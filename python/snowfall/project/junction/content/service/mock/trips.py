@@ -32,6 +32,10 @@ class Transformer(object):
                     segments=[
                         _make_segment(segment=segment) for segment in trip.segments
                     ],
+                    fare=trips_pb2.Trip.Fare(
+                        type=fare.brand_type,
+                        marketing_name=fare.brand_name,
+                    ),
                 )
                 for trip in search_result.trips
             ],

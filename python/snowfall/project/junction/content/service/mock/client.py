@@ -9,6 +9,7 @@ from collections.abc import Iterable, Iterator, Mapping, Sequence
 from typing import Any, Self
 
 from snowfall.project.junction.provider.v2alpha import trips_pb2
+from snowfall.project.junction.v1 import fare_type_pb2
 from snowfall.stdlib import h3, money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1 import date_pb2
@@ -148,6 +149,7 @@ class Trip(object):
 class Fare(object):
     reference: str
     price: money.Money
+    brand_type: fare_type_pb2.FareType.ValueType
     brand_name: str
 
 
@@ -171,9 +173,9 @@ class FakeFareGenerator(object):
     _air_fare_modifier = 0.065
     _round_trip_rebate = 0.7
     _air_fare_classes = (
-        ("Basic", 1.0),
-        ("Premium", 1.4),
-        ("Business", 2.7),
+        (fare_type_pb2.FARE_TYPE_ECONOMY, "Basic", 1.0),
+        (fare_type_pb2.FARE_TYPE_ECONOMY, "Premium", 1.4),
+        (fare_type_pb2.FARE_TYPE_BUSINESS, "Business", 2.7),
     )
 
     def __init__(
@@ -190,9 +192,10 @@ class FakeFareGenerator(object):
                     str(self._calculate_trips_price(markup)),
                     currency=money.Currency("EUR"),
                 ),
-                brand_name=brand,
+                brand_type=fare_type,
+                brand_name=marketing_name,
             )
-            for brand, markup in self._air_fare_classes
+            for fare_type, marketing_name, markup in self._air_fare_classes
         ]
 
     def _get_rebate(self) -> float:
