@@ -8,11 +8,16 @@ from snowfall.project.junction.go.service.orders.orders import (
     JourneyRepository,
 )
 from snowfall.project.junction.go.service.orders.v1 import models_pb2, orders_pb2
-from snowfall.project.junction.go.service.orders.zendesk.client import ZendeskClient
 from snowfall.project.pay.adapter import refunds as refunds_adapter
 from snowfall.project.pay.service.refunds.v1 import models_pb2 as refunds_model_pb2
+from snowfall.stdlib import money
+from snowfall.stdlib.format.protobuf import protobuf_to_datetime
 from snowfall.stdlib.transport.grpc import rich_status
 from snowfall.stdlib.transport.http.errors import HttpStatusError
+from snowfall.vendor.zendesk.client import ZendeskClient
+from snowfall.vendor.zendesk.models import (
+    cancellation_request as cancellation_request_models,
+)
 
 
 class CreateCancellationRequestHandler(object):
@@ -178,6 +183,65 @@ class CreateCancellationRequestHandler(object):
             if booking.id in booking_ids
         }
 
+    def _create_booking_model(
+        self,
+        booking: models_pb2.Booking,
+    ) -> cancellation_request_models.Booking:
+        total_price = money.from_protobuf(booking.total_price)
+        return cancellation_request_models.Booking(
+            booking_id=booking.id,
+            price=cancellation_request_models.Price(
+                amount=str(total_price),
+                currency=total_price.currency.code,
+            ),
+            provider_name=booking.provider_name,
+            trip_reference=booking.trip_result.record_locator,
+            operator_booking_references=[
+                cancellation_request_models.OperatorBookingReference(
+                    operator_booking_reference=booking_ref,
+                )
+                for booking_ref in booking.trip_result.operator_booking_references
+            ],
+            trip_options=[
+                cancellation_request_models.Segment(
+                    operator=trip_option.segment.operator,
+                    legs=[
+                        cancellation_request_models.Leg(
+                            origin_name=leg.origin.name,
+                            destination_name=leg.destination.name,
+                            departure_date=str(protobuf_to_datetime(leg.departure_at)),
+                        )
+                        for leg in trip_option.segment.legs
+                    ],
+                )
+                for trip_option in booking.trip_option.details
+            ],
+        )
+
+    def _create_order_model(
+        self,
+        order: models_pb2.Order,
+    ) -> cancellation_request_models.Order:
+        return cancellation_request_models.Order(
+            order_id=order.id,
+            passengers=[
+                cancellation_request_models.Passengers(
+                    first_name=passenger.first_name,
+                    last_name=passenger.last_name,
+                )
+                for passenger in order.passengers
+            ],
+        )
+
+    def _create_journey_model(
+        self,
+        journey: models_pb2.Journey,
+    ) -> cancellation_request_models.Journey:
+        return cancellation_request_models.Journey(
+            reseller_id=journey.reseller_id,
+            passenger_name_record=journey.passenger_name_record,
+        )
+
     async def _create_zendesk_support_ticket(
         self,
         booking: models_pb2.Booking,
@@ -187,10 +251,10 @@ class CreateCancellationRequestHandler(object):
         try:
             ticket_id = await self._zendesk_client.create_support_ticket(
                 payload=self._zendesk_client.create_cancel_request_payload(
-                    booking,
-                    order,
-                    journey,
-                    self._cancellation_group_id,
+                    booking=self._create_booking_model(booking),
+                    order=self._create_order_model(order),
+                    journey=self._create_journey_model(journey),
+                    group_id=self._cancellation_group_id,
                 ),
             )
         except HttpStatusError as exc:

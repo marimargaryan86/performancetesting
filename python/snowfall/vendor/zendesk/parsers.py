@@ -1,34 +1,34 @@
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from typing import Any
 
-from snowfall.project.junction.go.service.offers.v1.models_pb2 import OfferSegment
-from snowfall.project.junction.go.service.orders.v1 import models_pb2
-from snowfall.stdlib import money
-from snowfall.stdlib.format.protobuf import protobuf_to_datetime
+from snowfall.vendor.zendesk.models import (
+    cancellation_request as cancellation_request_models,
+)
 
 
-def parse_booking_and_order_for_cancel_request(
-    booking: models_pb2.Booking,
-    order: models_pb2.Order,
-    journey: models_pb2.Journey,
+def parse_cancellation_request_models(
+    booking: cancellation_request_models.Booking,
+    order: cancellation_request_models.Order,
+    journey: cancellation_request_models.Journey,
     *,
     convert_to_html: bool = True,
 ) -> dict[str, Any] | str:
-    total_price = money.from_protobuf(booking.total_price)
     parsed_details = {
-        "Booking ID": booking.id,
-        "Order ID": order.id,
+        "Booking ID": booking.booking_id,
+        "Order ID": order.order_id,
         "Reseller ID": journey.reseller_id,
         "Super PNR": journey.passenger_name_record,
         "Provider Name": booking.provider_name,
-        "Trip Reference": booking.trip_result.record_locator,
-        "Operator Booking References": _parse_operator_booking_references(booking),
-        "Total Price": "{0} {1}".format(
-            str(total_price),
-            total_price.currency.code,
+        "Trip Reference": booking.trip_reference,
+        "Operator Booking References": _parse_operator_booking_references(
+            booking.operator_booking_references,
         ),
-        "Passengers": _parse_passengers(order),
-        "Trip Details": _parse_trip_options(booking),
+        "Total Price": "{0} {1}".format(
+            booking.price.amount,
+            booking.price.currency,
+        ),
+        "Passengers": _parse_passengers(order.passengers),
+        "Trip Details": _parse_trip_options(booking.trip_options),
     }
 
     if convert_to_html:
@@ -38,17 +38,19 @@ def parse_booking_and_order_for_cancel_request(
 
 
 def _parse_operator_booking_references(
-    booking: models_pb2.Booking,
+    booking_references: Sequence[cancellation_request_models.OperatorBookingReference],
 ) -> list[dict[str, Any]]:
     return [
         {
-            "Operator Booking Reference": booking_ref,
+            "Operator Booking Reference": booking_ref.operator_booking_reference,
         }
-        for booking_ref in booking.trip_result.operator_booking_references
+        for booking_ref in booking_references
     ]
 
 
-def _parse_passengers(order: models_pb2.Order) -> list[dict[str, Any]]:
+def _parse_passengers(
+    passengers: Sequence[cancellation_request_models.Passengers],
+) -> list[dict[str, Any]]:
     return [
         {
             "Name": "{0}, {1}".format(
@@ -56,36 +58,38 @@ def _parse_passengers(order: models_pb2.Order) -> list[dict[str, Any]]:
                 passenger.first_name,
             ),
         }
-        for passenger in order.passengers
+        for passenger in passengers
     ]
 
 
 def _parse_trip_options(
-    booking: models_pb2.Booking,
+    trip_options: Sequence[cancellation_request_models.Segment],
 ) -> list[dict[str, Any]]:
     return [
         {
             "Segment": {
-                "Operator": trip_option.segment.operator,
-                "Legs": _parse_legs(trip_option.segment),
+                "Operator": trip_option.operator,
+                "Legs": _parse_legs(trip_option.legs),
             },
         }
-        for trip_option in booking.trip_option.details
+        for trip_option in trip_options
     ]
 
 
-def _parse_legs(segment: OfferSegment) -> list[dict[str, Any]]:
+def _parse_legs(
+    legs: Sequence[cancellation_request_models.Leg],
+) -> list[dict[str, Any]]:
     return [
         {
             "Leg": {
                 "Route": "{0} --> {1}".format(
-                    leg.origin.name,
-                    leg.destination.name,
+                    leg.origin_name,
+                    leg.destination_name,
                 ),
-                "Departure Date": str(protobuf_to_datetime(leg.departure_at)),
+                "Departure Date": leg.departure_date,
             },
         }
-        for leg in segment.legs
+        for leg in legs
     ]
 
 

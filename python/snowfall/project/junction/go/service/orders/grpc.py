@@ -18,10 +18,10 @@ from snowfall.project.junction.go.service.orders.orders_handlers import (
     CreateCancellationRequestHandler,
 )
 from snowfall.project.junction.go.service.orders.v1 import orders_pb2, orders_pb2_grpc
-from snowfall.project.junction.go.service.orders.zendesk.client import ZendeskClient
 from snowfall.project.pay.adapter import refunds as refunds_adapter
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.transport.grpc import rich_status, service, sorting
+from snowfall.vendor.zendesk.client import ZendeskClient
 
 
 class OrderService(

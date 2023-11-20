@@ -10,7 +10,6 @@ from motor import core
 from snowfall.project.junction.go.adapter import passenger_name_records
 from snowfall.project.junction.go.service.orders import orders
 from snowfall.project.junction.go.service.orders.v1 import models_pb2
-from snowfall.project.junction.go.service.orders.zendesk.client import ZendeskClient
 from snowfall.project.junction.go.service.resellers.v1 import (
     resellers_pb2,
     resellers_pb2_grpc,
@@ -94,16 +93,6 @@ async def booking_cancellations_repository(
 async def httpx_client() -> AsyncIterator[httpx.AsyncClient]:
     async with httpx.AsyncClient() as http_client:
         yield http_client
-
-
-@pytest.fixture()
-def zendesk_client(httpx_client: httpx.AsyncClient) -> ZendeskClient:
-    return ZendeskClient(
-        base_url="https://test.api.com",
-        api_key="somefakeapikey123",
-        http_client=httpx_client,
-        env="local",
-    )
 
 
 @pytest.fixture()

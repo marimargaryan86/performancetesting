@@ -3,9 +3,11 @@ from typing import Any
 
 import httpx
 
-from snowfall.project.junction.go.service.orders.v1 import models_pb2
-from snowfall.project.junction.go.service.orders.zendesk import parsers
 from snowfall.stdlib.transport.http import client
+from snowfall.vendor.zendesk import parsers
+from snowfall.vendor.zendesk.models import (
+    cancellation_request as cancellation_request_models,
+)
 
 
 class ZendeskClient(client.HttpClient):
@@ -39,15 +41,15 @@ class ZendeskClient(client.HttpClient):
 
     def create_cancel_request_payload(
         self,
-        booking: models_pb2.Booking,
-        order: models_pb2.Order,
-        journey: models_pb2.Journey,
+        booking: cancellation_request_models.Booking,
+        order: cancellation_request_models.Order,
+        journey: cancellation_request_models.Journey,
         group_id: int,
     ) -> dict[str, Any]:
         return {
             "ticket": {
                 "comment": {
-                    "html_body": parsers.parse_booking_and_order_for_cancel_request(
+                    "html_body": parsers.parse_cancellation_request_models(
                         booking=booking,
                         order=order,
                         journey=journey,

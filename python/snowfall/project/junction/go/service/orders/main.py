@@ -21,7 +21,6 @@ from snowfall.project.junction.go.service.orders.pay_transactions import (
 from snowfall.project.junction.go.service.orders.v1 import (
     orders_pb2_grpc,
 )
-from snowfall.project.junction.go.service.orders.zendesk.client import ZendeskClient
 from snowfall.project.junction.go.service.passenger_name_records.v1 import (
     passenger_name_records_pb2_grpc,
 )
@@ -36,6 +35,7 @@ from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.stdlib.transport.grpc import server
 from snowfall.vendor.junction.auth import UserAuth
 from snowfall.vendor.junction.pay.client import Client as PayClient
+from snowfall.vendor.zendesk.client import ZendeskClient
 
 
 class _GrpcSettings(application.Settings):
