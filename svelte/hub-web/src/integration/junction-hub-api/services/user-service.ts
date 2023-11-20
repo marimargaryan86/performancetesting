@@ -1,5 +1,12 @@
 import type { PaginatedData } from "models/common";
-import { userParser, type User, type UserSchema } from "../schemas/user";
+import {
+  userParser,
+  type User,
+  type UserSchema,
+  type UserProfile,
+  type UserProfileSchema,
+  userProfileParser,
+} from "../schemas/user";
 import JunctionHubApiService from "./junction-hub-api-service";
 import type { Session } from "integration/ory/schemas";
 
@@ -27,5 +34,11 @@ export default class UserService extends JunctionHubApiService {
     const resp = await this.makeRequest<{ data: UserSchema }>(`/users/${id}`, { session });
 
     return userParser.toModel(resp.json.data);
+  }
+
+  async getProfile({ session }: { session: Session }): Promise<UserProfile> {
+    const resp = await this.makeRequest<{ data: UserProfileSchema }>("/users/me", { session });
+
+    return userProfileParser.toModel(resp.json.data);
   }
 }

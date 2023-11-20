@@ -7,12 +7,14 @@ import type {
   BookingSessionModel,
   SearchDataModel,
 } from "../../../integration/trip-management/trip-management";
+import type { UserProfile } from "integration/junction-hub-api/schemas/user";
 
 export async function load(event): Promise<{
   searchData: SearchDataModel;
   priceQuote: TripOfferPriceQuote;
   selected: NonNullable<BookingSessionModel["selected"]>;
   paymentIntent: BookingSessionModel["paymentIntent"];
+  profile: UserProfile;
   orderId?: string;
 }> {
   const session = event.locals.session;
@@ -24,16 +26,20 @@ export async function load(event): Promise<{
       throw redirect(303, routeConfig.routes.tripManagement.routes.book.root);
     }
 
-    const priceQuote = await integrationInstances.junctionMobileApi.offers.get({
-      session,
-      id: bookingSession.priceQuote.id,
-    });
+    const [priceQuote, profile] = await Promise.all([
+      integrationInstances.junctionMobileApi.offers.get({
+        session,
+        id: bookingSession.priceQuote.id,
+      }),
+      integrationInstances.junctionHubApi.users.getProfile({ session }),
+    ]);
 
     return {
       searchData: bookingSession.searchData,
       priceQuote,
       selected: bookingSession.selected,
       paymentIntent: bookingSession.paymentIntent,
+      profile,
       orderId: bookingSession.order?.id,
     };
   } catch {

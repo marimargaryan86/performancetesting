@@ -42,9 +42,17 @@
   } = {
     passengers: getDefaultPassengers(data.searchData.passengers),
     contact: {
-      phone: "",
-      address: { street: { line1: "" }, city: "", countryCode: "", postalCode: "" },
-      email: "",
+      phone: data.profile.contacts[0]?.phone ?? "",
+      address: {
+        street: {
+          line1: data.profile.company.address.street?.line1 ?? "",
+          line2: data.profile.company.address.street?.line2,
+        },
+        city: data.profile.company.address.city ?? "",
+        countryCode: data.profile.company.address.countryCode ?? "",
+        postalCode: data.profile.company.address.postalCode ?? "",
+      },
+      email: data.profile.contacts[0]?.email ?? "",
     },
   };
   let errors: z.ZodFormattedError<z.infer<typeof bookingDetailsValidator>> | undefined = undefined;
