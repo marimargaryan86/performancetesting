@@ -32688,6 +32688,14 @@
         "time_zone": "America/Anchorage"
     },
     {
+        "iata_code": "KYN",
+        "iata_country_code": "GB",
+        "latitude": 52.056013,
+        "longitude": -0.698697,
+        "name": "Milton Keynes Coachway",
+        "time_zone": "Europe/London"
+    },
+    {
         "iata_code": "KYO",
         "iata_country_code": "US",
         "latitude": 28.221278,
