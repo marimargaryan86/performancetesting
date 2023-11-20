@@ -138,6 +138,20 @@ for f in "${NOMAD_FILES[@]}"; do
 				continue
 			fi
 
+			traefik_entrypoints=$(jq -r ".${e}.variables.traefik_entrypoints" "${CONFIG}")
+
+			if [[ $traefik_entrypoints == 'null' ]]; then
+				continue
+			fi
+
+			if [[ "${e}" == "production" && "${traefik_entrypoints}" != "web" ]]; then
+				echo "Error: In production, traefik_entrypoints must be 'web'. Found: '${traefik_entrypoints}'"
+				FAILURE=1
+			elif { [[ "${e}" == "development" || "${e}" == "sandbox" ]] && [[ "${traefik_entrypoints}" != "websecure" ]]; }; then
+				echo "Error: In ${e}, traefik_entrypoints must be 'websecure'. Found: '${traefik_entrypoints}'"
+				FAILURE=1
+			fi
+
 			VARIABLES=$(jq -e "select(.${e}.variables != null).${e}.variables" "${CONFIG}") || FAILURE=1
 		fi
 
