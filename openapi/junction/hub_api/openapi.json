@@ -3878,6 +3878,10 @@
           },
           "attributes": {
             "type": "object",
+            "required": [
+              "company",
+              "contacts"
+            ],
             "properties": {
               "company": {
                 "$ref": "#/components/schemas/UsersProfileCompany"
@@ -3892,7 +3896,12 @@
               }
             }
           }
-        }
+        },
+        "required": [
+          "id",
+          "type",
+          "attributes"
+        ]
       },
       "CabinClassIdentifier": {
         "title": "Cabin Class Identifier",
@@ -6437,6 +6446,10 @@
       "UsersProfileCompany": {
         "title": "Users Profile Company",
         "type": "object",
+        "required": [
+          "name",
+          "address"
+        ],
         "properties": {
           "name": {
             "type": "string",
@@ -6664,6 +6677,12 @@
       "UsersProfileContact": {
         "title": "Users Profile Contact",
         "type": "object",
+        "required": [
+          "firstName",
+          "lastName",
+          "emailAddress",
+          "phoneNumber"
+        ],
         "properties": {
           "firstName": {
             "type": "string",
