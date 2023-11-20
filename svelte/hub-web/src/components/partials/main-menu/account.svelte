@@ -1,6 +1,15 @@
+<script lang="ts" context="module">
+  import type { UserRole } from "integration/ory/schemas";
+
+  function formatRole(role: UserRole): string {
+    return capitalize(role.replaceAll("-", " "));
+  }
+</script>
+
 <script lang="ts">
   import md5 from "md5";
   import userStore from "stores/user-store";
+  import { capitalize } from "utils/common";
 
   export let transitionTimeMs: number;
   export let expanded: boolean;
@@ -12,8 +21,8 @@
   <img src="https://www.gravatar.com/avatar/{gravatarHash}?s=40&d=retro" alt="" />
 
   <div class="info">
-    <strong class="typography body-small bold">{$userStore.name}</strong>
-    <span class="typography body-small">{$userStore.email}</span>
+    <strong class="typography body-small bold">{$userStore.email}</strong>
+    <span class="typography body-small">{formatRole($userStore.role)}</span>
   </div>
 </div>
 

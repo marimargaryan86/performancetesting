@@ -5,28 +5,24 @@ import type { User } from "integration/ory/schemas";
 const adminUser: User = {
   id: "0001",
   email: "admin@example.com",
-  name: "admin",
   role: "snowfall-admin",
 };
 
 const snowfallUser: User = {
   id: "0002",
   email: "user@example.com",
-  name: "snowfall-user",
   role: "snowfall-user",
 };
 
 const resellerUser: User = {
   id: "0003",
   email: "reseller.user@example.com",
-  name: "reseller-user",
   role: "reseller-user",
 };
 
 const resellerAdmin: User = {
   id: "0004",
   email: "reseller.admin@example.com",
-  name: "reseller-admin",
   role: "reseller-admin",
 };
 

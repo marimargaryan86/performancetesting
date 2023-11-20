@@ -70,7 +70,6 @@ export type UserRole = "reseller-user" | "reseller-admin" | "snowfall-user" | "s
 export type User = {
   id: string;
   email: string;
-  name: string;
   role: UserRole;
 };
 
@@ -129,7 +128,6 @@ export const userParser = {
   toModel: (data: UserSchema): User => ({
     id: data.session.identity.id,
     email: data.session.identity.traits.email,
-    name: "Unknown",
     role: data.session.identity.metadata_public.role,
   }),
 };
