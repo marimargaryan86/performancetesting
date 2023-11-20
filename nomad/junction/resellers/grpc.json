@@ -7,7 +7,7 @@
     }
   },
   "production": {
-    "deploy": false,
+    "deploy": true,
     "variables": {
       "count": 1,
       "consul_api_base_url": "https://consul.junction.travel"
