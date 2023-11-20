@@ -322,6 +322,12 @@ func ProcessFlightLeg(v *ssim.FlightLeg, serviceIds map[string]struct{}, zipWrit
 	}
 
 	routeId := getRouteId(v)
+	var routeType uint
+	if v.AircraftType == "BUS" {
+		routeType = 3
+	} else {
+		routeType = 1100
+	}
 
 	if _, ok = routeIds[routeId]; !ok {
 		routeIds[routeId] = struct{}{}
@@ -329,7 +335,7 @@ func ProcessFlightLeg(v *ssim.FlightLeg, serviceIds map[string]struct{}, zipWrit
 			Id:                routeId,
 			AgencyId:          v.AirlineDesignator,
 			ShortName:         routeId,
-			Type:              1100,
+			Type:              routeType,
 			ContinuousPickup:  1,
 			ContinuousDropOff: 1,
 		}))
