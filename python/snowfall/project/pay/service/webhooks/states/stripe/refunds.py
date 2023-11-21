@@ -64,7 +64,7 @@ class RefundsState(object):
         if not_found_refunds:
             for refind_id in not_found_refunds:
                 logger.error(
-                    "Refund not found",
+                    "Refund not found in our system",
                     external_reference_id=refind_id,
                 )
             return False

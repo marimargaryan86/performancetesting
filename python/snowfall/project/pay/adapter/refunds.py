@@ -299,13 +299,21 @@ class GrpcClient(Client):
         transaction_ids: Sequence[str] | None = None,
         statuses: Sequence[int] | None = None,
     ) -> grpc_pb2.ListRefundsResponse:
+        if external_reference_ids and transaction_ids:
+            raise ValueError(
+                "Should provide only one parameter 'external_reference_ids' or"
+                " 'transaction_ids'",
+            )
         # TODO: handle INVALID_ARGUMENT
         request = grpc_pb2.ListRefundsRequest(
             page_token=cursor or "",
-            external_reference_ids=grpc_pb2.ListOfIds(ids=external_reference_ids or []),
-            transaction_ids=grpc_pb2.ListOfIds(ids=transaction_ids or []),
             statuses=statuses,  # type: ignore[arg-type]
         )
+        if external_reference_ids:
+            request.external_reference_ids.ids.extend(external_reference_ids)
+        elif transaction_ids:
+            request.transaction_ids.ids.extend(transaction_ids)
+
         if limit is not None:
             request.page_size = limit
 
