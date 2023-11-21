@@ -1,10 +1,13 @@
 <script lang="ts" generics="TValue">
   /* global TValue */
+  import { writable } from "svelte/store";
+  import { slideFade } from "transitions/slide-fade";
   import { keyboard } from "directives/keyboard";
   import { clickOutside } from "directives/click-outside";
   import { scale } from "svelte/transition";
   import type { MaybePromise } from "@sveltejs/kit";
   import TextField from "./text-field.svelte";
+  import LoadingIcon from "components/icons/loading-icon.svelte";
 
   export let value: TValue | undefined;
   export let required = false;
@@ -19,13 +22,27 @@
   let query = formatter(value);
   let dialog: HTMLUListElement | undefined;
   let textField: TextField | undefined;
+  let searchTask: MaybePromise<TValue[]> | undefined = undefined;
+
+  const pending = writable(false);
 
   $: hoveredIndex = value ? items.indexOf(value) : -1;
-  $: expanded = items.length;
+  $: expanded = items.length || $pending;
 
   async function search(event: CustomEvent<HTMLInputElement>): Promise<void> {
+    $pending = true;
     value = undefined;
-    items = await autocomplete(event.detail.value);
+
+    const nextSearchTask = autocomplete(event.detail.value);
+    searchTask = nextSearchTask;
+
+    // Make sure the last query is the one that counts
+    const nextItems = await nextSearchTask;
+
+    if (searchTask === nextSearchTask) {
+      items = nextItems;
+      $pending = false;
+    }
   }
 
   function select(item: TValue): void {
@@ -114,6 +131,11 @@
       bind:this={dialog}
       tabindex="-1"
     >
+      {#if $pending}
+        <li class="loading" transition:slideFade={{ duration: 200 }}>
+          <LoadingIcon color="var(--color-main-primary-600)" />
+        </li>
+      {/if}
       {#each items as item, idx}
         <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
         <li
@@ -172,7 +194,15 @@
     background-color: var(--color-main-primary-50);
   }
 
-  .option:not(:last-child) {
+  .loading {
+    display: flex;
+    align-items: ceter;
+    justify-content: center;
+    padding: 16px;
+  }
+
+  .option:not(:last-child),
+  .loading:not(:last-child) {
     border-bottom: 1px solid var(--color-common-line-soft);
   }
 </style>
