@@ -36,7 +36,13 @@ message Segment {
   snowfall.stdlib.v1.DateTime arrival_at = 4;
   snowfall.project.junction.v1.SegmentType type = 5;
   repeated Stop stops = 6;
-  // @todo: add vendor and operator information
+  message Company {
+    string route_number = 1; // Flight/train/bus number
+    string code = 2; // Carrier IATA / Train company code
+    string name = 3;
+  }
+  Company marketed_by = 7;
+  Company operated_by = 8;
 }
 
 message Trip {
