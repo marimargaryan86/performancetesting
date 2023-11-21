@@ -147,7 +147,7 @@ func verifyLabels(client *gitlab.Client, logger *zap.SugaredLogger, p *gitlab.Pr
 	}
 }
 
-func verifyProjectSettings(client *gitlab.Client, logger *zap.SugaredLogger, p *gitlab.Project) {
+func verifyProjectSettings(client *gitlab.Client, logger *zap.SugaredLogger, p *gitlab.Project, config common.Configuration) {
 	empty := gitlab.EditProjectOptions{}
 	changed := gitlab.EditProjectOptions{}
 	trueFlag := func() *bool { b := true; return &b }()
@@ -211,6 +211,24 @@ func verifyProjectSettings(client *gitlab.Client, logger *zap.SugaredLogger, p *
 		changed.SuggestionCommitMessage = func() *string { s := suggestionCommitMessage; return &s }()
 	}
 
+	if config.UseMergeTrain {
+		if p.MergeTrainsEnabled != true {
+			changed.MergePipelinesEnabled = trueFlag
+		}
+
+		if p.MergePipelinesEnabled != true {
+			changed.MergePipelinesEnabled = trueFlag
+		}
+	} else {
+		if p.MergeTrainsEnabled != false {
+			changed.MergePipelinesEnabled = falseFlag
+		}
+
+		if p.MergePipelinesEnabled != false {
+			changed.MergePipelinesEnabled = falseFlag
+		}
+	}
+
 	if changed != empty {
 		_, _, err := client.Projects.EditProject(p.ID, &changed)
 
@@ -238,7 +256,16 @@ func manageMemberships(client *gitlab.Client, logger *zap.SugaredLogger, snowman
 	for _, p := range projects {
 		pLogger := logger.With("project", p.ID, "name", p.Name)
 
-		verifyProjectSettings(client, pLogger, p)
+		var config common.Configuration
+
+		config, err = common.LoadConfiguration(client, p.ID)
+
+		if err != nil {
+			pLogger.Error(err)
+			continue
+		}
+
+		verifyProjectSettings(client, pLogger, p, config)
 		verifyApprovalRules(client, pLogger, p, snowman)
 		verifyLabels(client, pLogger, p)
 

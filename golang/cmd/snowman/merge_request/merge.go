@@ -34,27 +34,40 @@ func (mr *mergeRequest) merge() error {
 		}
 	}
 
-	_, resp, err := mr.client.MergeRequests.AcceptMergeRequest(
-		mr.object.ProjectID,
-		mr.object.IID,
-		&gitlab.AcceptMergeRequestOptions{
-			Squash:                    func() *bool { b := true; return &b }(),
-			ShouldRemoveSourceBranch:  func() *bool { b := true; return &b }(),
-			MergeWhenPipelineSucceeds: func() *bool { b := true; return &b }(),
-			SHA:                       func() *string { s := mr.object.SHA; return &s }(),
-		},
-	)
+	var resp *gitlab.Response
 
-	if resp.StatusCode == http.StatusNotAcceptable || resp.StatusCode == http.StatusUnprocessableEntity {
-		_, err = mr.client.MergeRequests.RebaseMergeRequest(
+	if mr.configuration.UseMergeTrain {
+		_, resp, err = mr.client.MergeTrains.AddMergeRequestToMergeTrain(
 			mr.object.ProjectID,
 			mr.object.IID,
+			&gitlab.AddMergeRequestToMergeTrainOptions{
+				SHA:                  func() *string { s := mr.object.SHA; return &s }(),
+				Squash:               func() *bool { b := true; return &b }(),
+				WhenPipelineSucceeds: func() *bool { b := true; return &b }(),
+			},
+		)
+	} else {
+		_, resp, err = mr.client.MergeRequests.AcceptMergeRequest(
+			mr.object.ProjectID,
+			mr.object.IID,
+			&gitlab.AcceptMergeRequestOptions{
+				Squash:                    func() *bool { b := true; return &b }(),
+				MergeWhenPipelineSucceeds: func() *bool { b := true; return &b }(),
+				SHA:                       func() *string { s := mr.object.SHA; return &s }(),
+			},
 		)
 
-		mr.hasChanged = true
-		mr.logger.Info("Rebased.")
+		if resp.StatusCode == http.StatusNotAcceptable || resp.StatusCode == http.StatusUnprocessableEntity {
+			_, err = mr.client.MergeRequests.RebaseMergeRequest(
+				mr.object.ProjectID,
+				mr.object.IID,
+			)
 
-		return err
+			mr.hasChanged = true
+			mr.logger.Info("Rebased.")
+
+			return err
+		}
 	}
 
 	if err != nil {

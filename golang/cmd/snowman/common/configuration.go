@@ -19,8 +19,9 @@ type ReviewersConfiguration struct {
 }
 
 type Configuration struct {
-	Commits   CommitsConfiguration   `yaml:"commits"`
-	Reviewers ReviewersConfiguration `yaml:"reviewers"`
+	Commits       CommitsConfiguration   `yaml:"commits"`
+	Reviewers     ReviewersConfiguration `yaml:"reviewers"`
+	UseMergeTrain bool                   `yaml:"use_merge_train"`
 }
 
 func defaultConfiguration() Configuration {
