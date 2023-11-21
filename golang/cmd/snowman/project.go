@@ -213,7 +213,7 @@ func verifyProjectSettings(client *gitlab.Client, logger *zap.SugaredLogger, p *
 
 	if config.UseMergeTrain {
 		if p.MergeTrainsEnabled != true {
-			changed.MergePipelinesEnabled = trueFlag
+			changed.MergeTrainsEnabled = trueFlag
 		}
 
 		if p.MergePipelinesEnabled != true {
@@ -221,7 +221,7 @@ func verifyProjectSettings(client *gitlab.Client, logger *zap.SugaredLogger, p *
 		}
 	} else {
 		if p.MergeTrainsEnabled != false {
-			changed.MergePipelinesEnabled = falseFlag
+			changed.MergeTrainsEnabled = falseFlag
 		}
 
 		if p.MergePipelinesEnabled != false {
