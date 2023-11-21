@@ -78,6 +78,16 @@ class Transformer(object):
             arrival_at=protobuf.datetime_to_protobuf_datetime(arrival_at),
             stops=self._stops_to_proto(segment),
             type=segment_type_pb2.SEGMENT_TYPE_FLIGHT,
+            marketed_by=trips_pb2.Segment.Company(
+                route_number=segment.marketing_carrier_flight_number,
+                code=segment.marketing_carrier.iata_code or "",
+                name=segment.marketing_carrier.name,
+            ),
+            operated_by=trips_pb2.Segment.Company(
+                route_number=segment.operating_carrier_flight_number or "",
+                code=segment.operating_carrier.iata_code or "",
+                name=segment.operating_carrier.name,
+            ),
         )
 
     def _stops_to_proto(

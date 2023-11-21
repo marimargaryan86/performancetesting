@@ -182,6 +182,14 @@ class TestSegmentModel(object):
             assert segment.departure_at.year
             assert segment.arrival_at.year
 
+    def test_segment_has_companies(
+        self,
+        segments_results: Iterable[trips_pb2.Segment],
+    ) -> None:
+        for segment in segments_results:
+            self._assert_company(segment.marketed_by)
+            self._assert_company(segment.operated_by)
+
     def test_segment_has_stops(
         self,
         segment_with_stops: trips_pb2.Segment,
@@ -204,10 +212,15 @@ class TestSegmentModel(object):
             assert stop.departure_at.year
 
     def _assert_location(self, location: trips_pb2.Location) -> None:
-        assert location.ref
-        assert location.name
-        assert location.coordinates.longitude
-        assert location.coordinates.latitude
+        assert location.ref, "Locations should have a ref"
+        assert location.name, "Locations should have a name"
+        assert location.coordinates.longitude, "Locations should have longitude"
+        assert location.coordinates.latitude, "Locations should have latitude"
+
+    def _assert_company(self, company: trips_pb2.Segment.Company) -> None:
+        assert company.code, "Companies should have a code"
+        assert company.name, "Companies should have a name"
+        assert company.route_number, "Companies should have a route number"
 
 
 def test_passenger_with_age_is_added_to_request(
