@@ -15,6 +15,32 @@
   ]);
 
   type RefundData = z.infer<typeof refundDataModel>;
+
+  function getRefundPutData(data: RefundData, transaction: Transaction): RefundPut {
+    return data.type === "automatic"
+      ? {
+          type: "automatic",
+          transactionId: transaction.id,
+          invoiceReference: transaction.invoiceReference ?? "",
+          externalReference: data.externalReference,
+          received: true,
+          refunded: {
+            reseller: {
+              currency: transaction.amounts.quotation.currency,
+              amount: data.reseller ?? 0,
+            },
+            us: {
+              currency: transaction.amounts.beneficiary.currency,
+              amount: data.us ?? 0,
+            },
+          },
+          note: "",
+        }
+      : {
+          type: "manual",
+          externalReference: data.externalReference,
+        };
+  }
 </script>
 
 <script lang="ts">
@@ -23,10 +49,10 @@
   import TextField from "components/ui/text-field.svelte";
   import integrationInstancesClient from "integration-instances-client";
   import type { TripBooking } from "integration/junction-hub-api/schemas/booking";
-  import type { Refund } from "integration/junction-hub-api/schemas/refund";
+  import type { Refund, RefundPut } from "integration/junction-hub-api/schemas/refund";
   import type { Transaction } from "integration/junction-hub-api/schemas/transaction";
+  import { writable } from "svelte/store";
   import { slideFade } from "transitions/slide-fade";
-  import { pendableCall } from "utils/pendable-call";
   import { z } from "zod";
 
   export let transaction: Transaction;
@@ -37,6 +63,9 @@
   let refundData = getDefaultRefundData(booking.refund);
   let refundPosition = booking.refund?.refundPosition;
   let refundDataDirty = true;
+
+  const refreshPending = writable(false);
+  const refundPending = writable(false);
 
   $: if (refundType === "no-amount") {
     refundPosition = booking.refund?.refundPosition;
@@ -54,8 +83,14 @@
         };
   }
 
-  const { pending: refreshPending, func: refreshRefundPosition } = pendableCall(
-    async (): Promise<void> => {
+  async function refreshRefundPosition(): Promise<void> {
+    if ($refreshPending) {
+      return;
+    }
+
+    try {
+      $refreshPending = true;
+
       if (!(booking.refund && refundDataDirty)) {
         return;
       }
@@ -98,64 +133,51 @@
           },
         })
       ).total;
-    },
-  );
+    } finally {
+      $refreshPending = false;
+    }
+  }
 
-  // eslint-disable-next-line complexity
-  const { pending, func: refund } = pendableCall(async () => {
-    if (!(booking.refund && transaction.invoiceReference)) {
+  async function performRefund(): Promise<void> {
+    if ($refundPending) {
       return;
     }
 
-    errors = undefined;
+    try {
+      $refundPending = true;
+      errors = undefined;
 
-    const parseResult = refundDataModel.safeParse(refundData);
+      if (!booking.refund) {
+        return;
+      }
 
-    if (!parseResult.success) {
-      errors = parseResult.error.format();
+      const parseResult = refundDataModel.safeParse(refundData);
 
-      return;
+      if (!parseResult.success) {
+        errors = parseResult.error.format();
+
+        return;
+      }
+
+      if (
+        parseResult.data.type === "automatic" &&
+        parseResult.data.us === 0 &&
+        parseResult.data.reseller === 0 &&
+        !confirm("Are you sure you want to create a refund with no amounts?")
+      ) {
+        return;
+      }
+
+      booking.refund = await integrationInstancesClient.hub.refunds.update({
+        id: booking.refund.id,
+        data: getRefundPutData(parseResult.data, transaction),
+      });
+
+      refundData = getDefaultRefundData(booking.refund);
+    } finally {
+      $refundPending = false;
     }
-
-    if (
-      parseResult.data.type === "automatic" &&
-      parseResult.data.us === 0 &&
-      parseResult.data.reseller === 0 &&
-      !confirm("Are you sure you want to create a refund with no amounts?")
-    ) {
-      return;
-    }
-
-    booking.refund = await integrationInstancesClient.hub.refunds.update({
-      id: booking.refund.id,
-      data:
-        parseResult.data.type === "automatic"
-          ? {
-              type: "automatic",
-              transactionId: transaction.id,
-              invoiceReference: transaction.invoiceReference,
-              externalReference: parseResult.data.externalReference,
-              received: true,
-              refunded: {
-                reseller: {
-                  currency: transaction.amounts.quotation.currency,
-                  amount: parseResult.data.reseller ?? 0,
-                },
-                us: {
-                  currency: transaction.amounts.beneficiary.currency,
-                  amount: parseResult.data.us ?? 0,
-                },
-              },
-              note: "",
-            }
-          : {
-              type: "manual",
-              externalReference: parseResult.data.externalReference,
-            },
-    });
-
-    refundData = getDefaultRefundData(booking.refund);
-  });
+  }
 </script>
 
 <div class="refund-dialog" transition:slideFade={{ duration: 300 }}>
@@ -170,7 +192,7 @@
     </label>
   </div>
 
-  <form on:submit|preventDefault={refund}>
+  <form on:submit|preventDefault={performRefund}>
     {#if refundType === "with-amount"}
       <div>
         <TextField
@@ -239,7 +261,7 @@
     {#if refundType === "no-amount"}
       <Button type="submit" variant="outline">
         Refund with no amount
-        {#if $pending}<LoadingIcon />{/if}
+        {#if $refundPending}<LoadingIcon />{/if}
       </Button>
     {:else if refundDataDirty || $refreshPending}
       <Button on:click={refreshRefundPosition}>
@@ -249,7 +271,7 @@
     {:else}
       <Button type="submit">
         Issue refund
-        {#if $pending}<LoadingIcon />{/if}
+        {#if $refundPending}<LoadingIcon />{/if}
       </Button>
     {/if}
   </form>

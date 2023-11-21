@@ -8,11 +8,12 @@
   import Itinerary from "../../../components/itinerary.svelte";
   import Button from "components/ui/button.svelte";
   import EmailIcon from "components/icons/email-icon.svelte";
-  import { pendableCall } from "utils/pendable-call";
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import { scale } from "svelte/transition";
   import { createEventDispatcher } from "svelte";
   import integrationInstancesClient from "integration-instances-client";
+  import { writable } from "svelte/store";
+  import type { CancellationRequest } from "integration/junction-hub-api/schemas/cancellation";
 
   export let passengers: OrderPassenger[];
 
@@ -22,23 +23,33 @@
   let booking: TripBooking | undefined = undefined;
   let state: "info" | "rules" | "confirm" | "done" | "failed";
 
+  const pending = writable(false);
+
   $: reservationNo = booking?.operatorBookingReferences.length
     ? booking.operatorBookingReferences.join(", ")
     : undefined;
 
-  const { pending, func: performCancel } = pendableCall(async () => {
-    if (!booking) {
-      return undefined;
+  async function performCancel(): Promise<CancellationRequest | undefined> {
+    if ($pending) {
+      return;
     }
 
     try {
+      $pending = true;
+
+      if (!booking) {
+        return undefined;
+      }
+
       return await integrationInstancesClient.hub.cancellationRequests.create({
         data: { bookingIds: [booking.id] },
       });
     } catch {
       return undefined;
+    } finally {
+      $pending = false;
     }
-  });
+  }
 
   function info(): void {
     state = "info";
@@ -53,6 +64,10 @@
   }
 
   async function confirm(): Promise<void> {
+    if ($pending) {
+      return;
+    }
+
     const result = await performCancel();
     state = result ? "done" : "failed";
 

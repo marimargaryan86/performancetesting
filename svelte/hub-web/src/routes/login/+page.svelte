@@ -4,21 +4,28 @@
   import Button from "components/ui/button.svelte";
   import TextField from "components/ui/text-field.svelte";
   import routeConfig from "routeConfig";
-  import { pendableCall } from "utils/pendable-call";
   import { goto } from "$app/navigation";
   import Checkbox from "components/ui/checkbox.svelte";
   import passengersImage from "assets/images/passengers.png";
   import integrationInstancesClient from "integration-instances-client";
+  import { writable } from "svelte/store";
 
   export let data;
 
   let errors: string | undefined;
   let rememberMe = false;
 
-  const { pending, func: submit } = pendableCall(async () => {
-    errors = undefined;
+  const pending = writable(false);
+
+  async function submit(): Promise<void> {
+    if ($pending) {
+      return;
+    }
 
     try {
+      $pending = true;
+      errors = undefined;
+
       const user = await integrationInstancesClient.auth.signIn({
         id: data.loginFlow.id,
         data: Object.fromEntries(
@@ -35,8 +42,10 @@
       await goto(redirect, { invalidateAll: true });
     } catch {
       errors = "Invalid credentials";
+    } finally {
+      $pending = false;
     }
-  });
+  }
 </script>
 
 <svelte:head>

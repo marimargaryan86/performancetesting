@@ -63,7 +63,6 @@
     OfferOption,
   } from "integration/junction-mobile-api/schemas/offer";
   import LoadingIcon from "components/icons/loading-icon.svelte";
-  import { pendableCall } from "utils/pendable-call";
   import Alert from "components/ui/alert.svelte";
   import { getSortOffersFunc } from "sorting/offer";
   import { getFilterOffersFunc } from "filters/offer";
@@ -71,6 +70,7 @@
   import type { Price } from "integration/common/schemas/price";
   import tripManagement from "../../../integration/trip-management/trip-management";
   import { onDestroy } from "svelte";
+  import { writable } from "svelte/store";
 
   export let data;
 
@@ -90,31 +90,43 @@
   };
   let pollSignal = { cancelled: false };
 
+  const offersPending = writable(false);
+  const selectOfferPending = writable(false);
+
   $: if (browser && data.offerSearch && data.offers.status !== "completed") {
     getOffers();
   }
   $: sortAndFilter = getSortAndFilteringFunc(searchOptions);
 
-  const { pending: offersPending, func: getOffers } = pendableCall(async () => {
-    offers = [];
-
-    // Cancel any ongoing polls
-    pollSignal.cancelled = true;
-    pollSignal = { cancelled: false };
-
-    for await (const offer of tripManagement.yieldOffers(pollSignal)) {
-      offers = [...offers, offer];
+  async function getOffers(): Promise<void> {
+    if ($offersPending) {
+      return;
     }
 
-    searchOptionsSettings = getSearchOptionSettings(offers);
-    searchOptions = {
-      ...searchOptions,
-      durationM: searchOptionsSettings.durationSpanM.start,
-    };
-  });
+    try {
+      $offersPending = true;
+      offers = [];
+
+      // Cancel any ongoing polls
+      pollSignal.cancelled = true;
+      pollSignal = { cancelled: false };
+
+      for await (const offer of tripManagement.yieldOffers(pollSignal)) {
+        offers = [...offers, offer];
+      }
+
+      searchOptionsSettings = getSearchOptionSettings(offers);
+      searchOptions = {
+        ...searchOptions,
+        durationM: searchOptionsSettings.durationSpanM.start,
+      };
+    } finally {
+      $offersPending = false;
+    }
+  }
 
   function select(event: CustomEvent<{ offerId: string; optionIds: string[] }>): void {
-    if ($pending) {
+    if ($selectOfferPending) {
       return;
     }
 
@@ -126,21 +138,29 @@
     selected = event.detail;
   }
 
-  const { pending, func: selectOffer } = pendableCall(async () => {
-    if (!(selected.offerId && selected.optionIds)) {
+  async function selectOffer(): Promise<void> {
+    if ($selectOfferPending) {
       return;
     }
 
-    const originalPrice = getTotalPrice(getOptions(offers, selected.offerId, selected.optionIds));
+    try {
+      $selectOfferPending = true;
 
-    await tripManagement.selectOffer({
-      offerId: selected.offerId,
-      optionIds: selected.optionIds,
-      originalPrice,
-    });
+      if (!(selected.offerId && selected.optionIds)) {
+        return;
+      }
 
-    await goto(routeConfig.routes.tripManagement.routes.book.routes.payment.root);
-  });
+      await tripManagement.selectOffer({
+        offerId: selected.offerId,
+        optionIds: selected.optionIds,
+        originalPrice: getTotalPrice(getOptions(offers, selected.offerId, selected.optionIds)),
+      });
+
+      await goto(routeConfig.routes.tripManagement.routes.book.routes.payment.root);
+    } finally {
+      $selectOfferPending = false;
+    }
+  }
 
   onDestroy(() => (pollSignal.cancelled = true));
 </script>
@@ -204,7 +224,7 @@
       <Button on:click={selectOffer} size="small">
         Next
 
-        {#if $pending}
+        {#if $selectOfferPending}
           <LoadingIcon />
         {/if}
       </Button>

@@ -7,11 +7,11 @@
   import { portal } from "directives/portal";
   import { createEventDispatcher } from "svelte";
   import { fade, fly } from "svelte/transition";
-  import { pendableCall } from "utils/pendable-call";
   import type { Balance } from "integration/junction-hub-api/schemas/balance";
   import type { Currency } from "integration/junction-hub-api/schemas/currency";
   import integrationInstancesClient from "integration-instances-client";
   import currencyData from "data/currency-data";
+  import { writable } from "svelte/store";
 
   export let accountId: string;
   export let exclude: Balance[];
@@ -36,6 +36,7 @@
   let inputRef: TextField<"text">;
 
   const dispatch = createEventDispatcher<{ addbalances: Balance[] }>();
+  const pending = writable(false);
 
   $: filteredBalances = currencyData.list.filter(
     (balance) =>
@@ -43,20 +44,30 @@
       !exclude.find((money) => money.currencyId === balance.code),
   );
 
-  const { pending, func: addBalances } = pendableCall(async () => {
-    const balances = await Promise.all(
-      value.map((item) =>
-        integrationInstancesClient.hub.balances.create({
-          accountId,
-          data: { currencyId: item.code },
-        }),
-      ),
-    );
+  async function addBalances(): Promise<void> {
+    if ($pending) {
+      return;
+    }
 
-    dispatch("addbalances", balances);
+    try {
+      $pending = true;
 
-    close();
-  });
+      const balances = await Promise.all(
+        value.map((item) =>
+          integrationInstancesClient.hub.balances.create({
+            accountId,
+            data: { currencyId: item.code },
+          }),
+        ),
+      );
+
+      dispatch("addbalances", balances);
+
+      close();
+    } finally {
+      $pending = false;
+    }
+  }
 </script>
 
 {#if visible}

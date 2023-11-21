@@ -18,7 +18,6 @@
   import ContactInformation, { contactDetailsModel } from "./contact-information.svelte";
   import Countdown from "../countdown.svelte";
   import { z } from "zod";
-  import { pendableCall } from "utils/pendable-call";
   import { sleep } from "utils/common";
   import { goto } from "$app/navigation";
   import { browser } from "$app/environment";
@@ -31,6 +30,7 @@
   import type { ContactDetails } from "integration/junction-mobile-api/schemas/journey";
   import FareRulesDialog from "../../components/fare-rules-dialog.svelte";
   import { getPassengerValidator } from "utils/passenger";
+  import { writable } from "svelte/store";
 
   export let data;
 
@@ -59,6 +59,8 @@
   let { priceQuote, paymentIntent } = data;
   let pollSignal = { cancelled: false };
   let orderMarkups: MarkupsCreate;
+
+  const pending = writable(false);
 
   $: bookingDetailsValidator = z.object({
     passengers: z.array(getPassengerValidator(priceQuote.required)),
@@ -157,27 +159,35 @@
     }
   }
 
-  const { pending, func: pay } = pendableCall(async () => {
-    if (!payment) {
+  async function pay(): Promise<void> {
+    if ($pending) {
       return;
     }
 
-    if (!(await payment.pay())) {
-      return;
-    }
+    try {
+      $pending = true;
 
-    if (!(await createOrder())) {
-      return;
-    }
-
-    if (shouldCreateOrderMarkups) {
-      if (!(await createOrderMarkups())) {
+      if (!payment) {
         return;
       }
-    }
 
-    await goto(routeConfig.routes.tripManagement.routes.book.routes.confirmation.root);
-  });
+      if (!(await payment.pay())) {
+        return;
+      }
+
+      if (!(await createOrder())) {
+        return;
+      }
+
+      if (shouldCreateOrderMarkups && !(await createOrderMarkups())) {
+        return;
+      }
+
+      await goto(routeConfig.routes.tripManagement.routes.book.routes.confirmation.root);
+    } finally {
+      $pending = false;
+    }
+  }
 
   onDestroy(() => (pollSignal.cancelled = true));
 </script>

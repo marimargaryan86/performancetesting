@@ -26,7 +26,6 @@
   import type { Place } from "integration/junction-mobile-api/schemas/place";
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import { goto } from "$app/navigation";
-  import { pendableCall } from "utils/pendable-call";
   import type { DateRange } from "models/date-time";
   import { addToDate, getZeroTimeDate } from "utils/date-time";
   import tripManagement, {
@@ -35,21 +34,11 @@
   import routeConfig from "routeConfig";
   import integrationInstancesClient from "integration-instances-client";
   import { ensureDefined } from "utils/array";
+  import { writable } from "svelte/store";
 
   export let data: Partial<SearchDataModel> = {};
   export let origin: Place | undefined = undefined;
   export let destination: Place | undefined = undefined;
-
-  $: data = {
-    ...data,
-    origin: origin
-      ? { id: origin.id, ...origin.coordinates, precision: getPrecision(origin) }
-      : undefined,
-    destination: destination
-      ? { id: destination.id, ...destination.coordinates, precision: getPrecision(destination) }
-      : undefined,
-    passengers,
-  };
 
   let passengers: SearchDataModel["passengers"] = data.passengers ?? {
     seniors65: 0,
@@ -67,8 +56,27 @@
     to: getZeroTimeDate(addToDate(new Date(), { years: 1 })),
   };
 
-  const { pending, func: search } = pendableCall(async () => {
+  const pending = writable(false);
+
+  $: data = {
+    ...data,
+    origin: origin
+      ? { id: origin.id, ...origin.coordinates, precision: getPrecision(origin) }
+      : undefined,
+    destination: destination
+      ? { id: destination.id, ...destination.coordinates, precision: getPrecision(destination) }
+      : undefined,
+    passengers,
+  };
+
+  async function search(): Promise<void> {
+    if ($pending) {
+      return;
+    }
+
     try {
+      $pending = true;
+
       await tripManagement.search({
         ...data,
         // Prevent time zone difference
@@ -82,8 +90,10 @@
       if (err instanceof z.ZodError) {
         errors = err.format();
       }
+    } finally {
+      $pending = false;
     }
-  });
+  }
 </script>
 
 <form class="trip-search" on:submit|preventDefault={search}>
