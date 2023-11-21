@@ -34,6 +34,10 @@ variable "ory_application_url" {
   type = string
 }
 
+variable "ory_slug" {
+  type = string
+}
+
 job "authentication-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -140,6 +144,7 @@ EOH
         SENTRY_DSN          = "https://e2ada9cd07e84150b39bfd606d7c4634@sentry.snowfall.se/53"
         JWT_TTL             = var.jwt_ttl
         ORY_APPLICATION_URL = "${var.ory_application_url}"
+        ORY_SLUG            = "${var.ory_slug}"
       }
     }
   }

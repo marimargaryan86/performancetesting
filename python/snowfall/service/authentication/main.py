@@ -22,12 +22,14 @@ class _GrpcSettings(application.Settings):
     mongo_dsn: pydantic.MongoDsn
     ory_application_url: pydantic.HttpUrl
     ory_api_key: pydantic.SecretStr
+    ory_slug: str | None = None
 
 
 async def _serve(app: application.Application[_GrpcSettings]) -> None:
     mongo_db = await mongo_factory.make_database(app, app.settings.mongo_dsn)
     ory_client = client.OryClient(
         base_url=str(app.settings.ory_application_url),
+        slug=str(app.settings.ory_slug),
         auth=stdlib_auth.TokenAuth(token=app.settings.ory_api_key.get_secret_value()),
     )
 

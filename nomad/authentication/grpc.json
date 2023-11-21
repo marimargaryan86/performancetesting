@@ -3,21 +3,24 @@
     "variables": {
       "count": 1,
       "jwt_ttl": "PT24H",
-      "ory_application_url": "https://optimistic-tereshkova-36hc6vayw4.projects.oryapis.com"
+      "ory_application_url": "https://exciting-boyd-kr7iwir8gj.projects.oryapis.com",
+      "ory_slug": "exciting-boyd-kr7iwir8gj"
     }
   },
   "production": {
     "variables": {
       "count": 2,
       "jwt_ttl": "PT1H",
-      "ory_application_url": "https://optimistic-tereshkova-36hc6vayw4.projects.oryapis.com"
+      "ory_application_url": "https://auth.junction.travel",
+      "ory_slug": "optimistic-tereshkova-36hc6vayw4"
     }
   },
   "sandbox": {
     "variables": {
       "count": 1,
       "jwt_ttl": "PT24H",
-      "ory_application_url": "https://optimistic-tereshkova-36hc6vayw4.projects.oryapis.com"
+      "ory_application_url": "https://hardcore-nash-njumtzes9i.projects.oryapis.com",
+      "ory_slug": "hardcore-nash-njumtzes9i"
     }
   }
 }

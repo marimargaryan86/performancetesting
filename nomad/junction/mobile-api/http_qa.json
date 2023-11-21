@@ -7,8 +7,8 @@
             "traefik_host_URL": "qa-superapp.junction.dev",
             "plus_poc_api_address": "https://poc.plus.junction.dev",
             "plus_poc_activated": false,
-            "ory_client_token_endpoint": "https://optimistic-tereshkova-36hc6vayw4.projects.oryapis.com/oauth2/token",
-            "ory_client_id": "42633fd4-134f-44f8-a248-c846b94b3134"
+            "ory_client_token_endpoint": "https://exciting-boyd-kr7iwir8gj.projects.oryapis.com/oauth2/token",
+            "ory_client_id": "fd1f3f85-fbda-45e6-a1e5-b629965157c5"
         }
     },
     "production": {
@@ -19,8 +19,8 @@
             "traefik_host_URL": "qa-superapp.junction.travel",
             "plus_poc_api_address": "",
             "plus_poc_activated": false,
-            "ory_client_token_endpoint": "https://optimistic-tereshkova-36hc6vayw4.projects.oryapis.com/oauth2/token",
-            "ory_client_id": "42633fd4-134f-44f8-a248-c846b94b3134"
+            "ory_client_token_endpoint": "https://auth.junction.travel/oauth2/token",
+            "ory_client_id": ""
         }
     },
     "sandbox": {
@@ -31,8 +31,8 @@
             "traefik_host_URL": "qa-superapp.sandbox.junction.dev",
             "plus_poc_api_address": "https://poc.plus.sandbox.junction.dev",
             "plus_poc_activated": false,
-            "ory_client_token_endpoint": "https://optimistic-tereshkova-36hc6vayw4.projects.oryapis.com/oauth2/token",
-            "ory_client_id": "42633fd4-134f-44f8-a248-c846b94b3134"
+            "ory_client_token_endpoint": "https://hardcore-nash-njumtzes9i.projects.oryapis.com/oauth2/token",
+            "ory_client_id": ""
         }
     }
 }

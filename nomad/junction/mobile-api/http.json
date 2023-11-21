@@ -7,8 +7,8 @@
       "plus_poc_api_address": "https://poc.plus.junction.dev",
       "plus_api_address": "https://plus.api.junction.dev",
       "plus_poc_activated": false,
-      "ory_client_token_endpoint": "https://optimistic-tereshkova-36hc6vayw4.projects.oryapis.com/oauth2/token",
-      "ory_client_id": "69306843-2ae1-4177-82d2-a15fabc77c0b"
+      "ory_client_token_endpoint": "https://exciting-boyd-kr7iwir8gj.projects.oryapis.com/oauth2/token",
+      "ory_client_id": "58d94134-187b-4e17-8a61-285e311a0b72"
     }
   },
   "production": {
@@ -19,7 +19,7 @@
       "plus_poc_api_address": "",
       "plus_api_address": "https://plus.api.junction.dev",
       "plus_poc_activated": false,
-      "ory_client_token_endpoint":  "https://optimistic-tereshkova-36hc6vayw4.projects.oryapis.com/oauth2/token",
+      "ory_client_token_endpoint":  "https://auth.junction.travel/oauth2/token",
       "ory_client_id":  "20022d3a-00a2-414b-be5b-643cb49f3759"
     }
   },
@@ -31,8 +31,8 @@
       "plus_poc_api_address": "https://poc.plus.sandbox.junction.dev",
       "plus_api_address": "https://plus.api.junction.dev",
       "plus_poc_activated": false,
-      "ory_client_token_endpoint":  "https://optimistic-tereshkova-36hc6vayw4.projects.oryapis.com/oauth2/token",
-      "ory_client_id":  "b4f8a92f-b287-4a67-96a9-7500724fa28d"
+      "ory_client_token_endpoint":  "https://hardcore-nash-njumtzes9i.projects.oryapis.com/oauth2/token",
+      "ory_client_id":  "018dcaca-c592-442d-af04-34c2e920784e"
     }
   }
 }

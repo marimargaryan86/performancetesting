@@ -4,7 +4,7 @@
       "count": 1,
       "traefik_entrypoints": "websecure",
       "traefik_host_URL": "hub.junction.dev",
-      "ory_base_url": "https://optimistic-tereshkova-36hc6vayw4.projects.oryapis.com"
+      "ory_base_url": "https://exciting-boyd-kr7iwir8gj.projects.oryapis.com"
     }
   },
   "production": {
@@ -13,7 +13,7 @@
       "count": 2,
       "traefik_entrypoints": "web",
       "traefik_host_URL": "hub.junction.travel",
-      "ory_base_url": "https://optimistic-tereshkova-36hc6vayw4.projects.oryapis.com"
+      "ory_base_url": "https://auth.junction.travel"
     }
   },
   "sandbox": {
@@ -21,7 +21,7 @@
       "count": 1,
       "traefik_entrypoints": "websecure",
       "traefik_host_URL": "hub.sandbox.junction.dev",
-      "ory_base_url": "https://optimistic-tereshkova-36hc6vayw4.projects.oryapis.com"
+      "ory_base_url": "https://hardcore-nash-njumtzes9i.projects.oryapis.com"
     }
   }
 }
