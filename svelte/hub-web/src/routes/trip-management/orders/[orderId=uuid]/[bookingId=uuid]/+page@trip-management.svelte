@@ -11,6 +11,7 @@
   import userStore from "stores/user-store";
   import Admin from "./admin.svelte";
   import { formatAmount } from "formatting/currency";
+  import Fees from "../../../book/confirmation/fees.svelte";
 
   export let data;
 
@@ -53,6 +54,10 @@
         <h3 class="typography title-large bold">Itinerary</h3>
 
         <Ticket identifier={reservationNo} title="Reservation number" />
+
+        {#if data.markups}
+          <Fees markups={data.markups} />
+        {/if}
 
         <div class="statuses">
           <div class="status typography body-small bold">
