@@ -59,3 +59,4 @@ The following ports are configured in local environments by default:
 | 50076 | notifications          | gRPC Server       |
 | 50077 | refunds                | gRPC Server       |
 | 50079 | resellers              | gRPC Server       |
+| 50080 | co2 emissions          | gRPC Server       |

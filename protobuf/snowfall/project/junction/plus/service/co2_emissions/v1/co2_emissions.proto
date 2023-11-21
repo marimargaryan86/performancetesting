@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package snowfall.project.junction.plus.service.co2_emissions.v1;
+
+import "snowfall/stdlib/v1/date.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/plus/service/co2_emissions/v1";
+
+service CO2EmissionsService {
+  rpc GetEmissions(GetEmissionsRequest) returns (GetEmissionsResponse) {}
+}
+
+message Flight {
+  string origin = 1;
+  string destination = 2;
+  string operating_carrier_code = 3;
+  int32 flight_number = 4;
+  snowfall.stdlib.v1.Date departure_date = 7;
+}
+
+message FlightEmission {
+  string origin = 1;
+  string destination = 2;
+  string operating_carrier_code = 3;
+  int32 flight_number = 4;
+  EmissionsPerPax emissions_per_pax = 5;
+  string unit = 6;
+}
+
+message EmissionsPerPax {
+  int32 first = 1;
+  int32 business = 2;
+  int32 premium_economy = 3;
+  int32 economy = 4;
+}
+
+message GetEmissionsRequest {
+  repeated Flight flights = 1;
+}
+
+message GetEmissionsResponse {
+  repeated FlightEmission flight_emissions = 1;
+}
