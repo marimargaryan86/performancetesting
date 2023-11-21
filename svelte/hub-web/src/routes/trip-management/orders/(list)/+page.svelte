@@ -62,11 +62,11 @@
 
       return Boolean(
         order.journey?.reference.toLowerCase().includes(queryLower) ||
-          order.passengers.find(
-            (item) =>
-              item.firstName.toLowerCase().includes(queryLower) ||
-              item.lastName.toLowerCase().includes(queryLower),
-          ),
+          order.passengers.find((item) => {
+            const fullName = `${item.firstName.toLowerCase()} ${item.lastName.toLowerCase()}`;
+
+            return fullName.includes(queryLower);
+          }),
       );
     };
   }
