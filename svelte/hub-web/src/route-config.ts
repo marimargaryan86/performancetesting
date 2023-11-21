@@ -107,14 +107,6 @@ export default {
           } as const;
         },
       },
-      go: {
-        root: "/go",
-        get routes() {
-          return {
-            bookings: { root: `${this.root}/bookings` },
-          } as const;
-        },
-      },
     } as const;
   },
 } as const;
