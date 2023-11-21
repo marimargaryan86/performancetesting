@@ -3,11 +3,15 @@ package common
 import "testing"
 
 func TestDecodeConfiguration(t *testing.T) {
-	testFile := "commits:\n  scopes:\n    golang:\n      - \"golang\"\n    junction/base:\n      - \"python/snowfall/project/pss\""
+	testFile := "use_merge_train: true\ncommits:\n  scopes:\n    golang:\n      - \"golang\"\n    junction/base:\n      - \"python/snowfall/project/pss\""
 	config, err := decodeConfiguration([]byte(testFile))
 
 	if err != nil {
 		t.Error(err)
+	}
+
+	if config.UseMergeTrain != true {
+		t.Error("merge train is not enabled")
 	}
 
 	if len(config.Commits.Scopes) != 2 {
