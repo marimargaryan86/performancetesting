@@ -240,7 +240,7 @@ func verifyProjectSettings(client *gitlab.Client, logger *zap.SugaredLogger, p *
 	}
 }
 
-func manageMemberships(client *gitlab.Client, logger *zap.SugaredLogger, snowman *gitlab.User, hookUrl string, hookSecret string) {
+func manageMemberships(client *gitlab.Client, logger *zap.SugaredLogger, snowman *gitlab.User, loader *common.Loader, hookUrl string, hookSecret string) {
 	projects, _, err := client.Projects.ListProjects(&gitlab.ListProjectsOptions{
 		Archived:                 func() *bool { b := false; return &b }(),
 		Membership:               func() *bool { b := true; return &b }(),
@@ -258,7 +258,7 @@ func manageMemberships(client *gitlab.Client, logger *zap.SugaredLogger, snowman
 
 		var config common.Configuration
 
-		config, err = common.LoadConfiguration(client, p.ID)
+		config, err = loader.Load(p.ID)
 
 		if err != nil {
 			pLogger.Error(err)

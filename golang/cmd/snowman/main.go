@@ -135,12 +135,14 @@ func serve(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	mr := merge_request.NewPlugin(client, sugar, snowman)
+	loader := common.NewLoader(client, time.Minute*10)
 
-	manageMemberships(client, sugar.Named("cron"), snowman, viper.GetString("snowman_hook_url"), viper.GetString("gitlab_webhook_secret"))
+	mr := merge_request.NewPlugin(client, sugar, snowman, loader)
+
+	manageMemberships(client, sugar.Named("cron"), snowman, loader, viper.GetString("snowman_hook_url"), viper.GetString("gitlab_webhook_secret"))
 
 	if _, err = c.AddFunc("*/10 * * * *", func() {
-		manageMemberships(client, sugar.Named("cron"), snowman, viper.GetString("snowman_hook_url"), viper.GetString("gitlab_webhook_secret"))
+		manageMemberships(client, sugar.Named("cron"), snowman, loader, viper.GetString("snowman_hook_url"), viper.GetString("gitlab_webhook_secret"))
 	}); err != nil {
 		return err
 	}

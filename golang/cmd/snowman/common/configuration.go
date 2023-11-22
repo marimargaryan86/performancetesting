@@ -4,6 +4,7 @@ import (
 	"github.com/xanzy/go-gitlab"
 	"gopkg.in/yaml.v2"
 	"net/http"
+	"time"
 )
 
 type ScopesConfiguration map[string][]string
@@ -55,7 +56,7 @@ func decodeConfiguration(data []byte) (Configuration, error) {
 	return config, nil
 }
 
-func LoadConfiguration(client *gitlab.Client, pid int) (Configuration, error) {
+func loadConfiguration(client *gitlab.Client, pid int) (Configuration, error) {
 	p, _, err := client.Projects.GetProject(pid, &gitlab.GetProjectOptions{})
 
 	if err != nil {
@@ -75,4 +76,39 @@ func LoadConfiguration(client *gitlab.Client, pid int) (Configuration, error) {
 	}
 
 	return decodeConfiguration(file)
+}
+
+type cacheItem struct {
+	value     Configuration
+	fetchedAt time.Time
+}
+
+type Loader struct {
+	cache  map[int]cacheItem
+	client *gitlab.Client
+	ttl    time.Duration
+}
+
+func NewLoader(client *gitlab.Client, ttl time.Duration) *Loader {
+	return &Loader{
+		client: client,
+		ttl:    ttl,
+	}
+}
+
+func (l *Loader) Load(pid int) (Configuration, error) {
+	now := time.Now()
+	val, found := l.cache[pid]
+
+	if found && now.Sub(val.fetchedAt) < l.ttl {
+		return val.value, nil
+	}
+
+	config, err := loadConfiguration(l.client, pid)
+	l.cache[pid] = cacheItem{
+		value:     config,
+		fetchedAt: now,
+	}
+
+	return config, err
 }

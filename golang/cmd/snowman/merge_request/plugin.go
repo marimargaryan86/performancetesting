@@ -8,34 +8,27 @@ import (
 	"time"
 )
 
-type configCacheItem struct {
-	value     common.Configuration
-	fetchedAt time.Time
-}
-
 type timerKey struct {
 	projectId      int
 	mergeRequestId int
 }
 
 type MergeRequestPlugin struct {
-	client              *gitlab.Client
-	logger              *zap.SugaredLogger
-	mu                  sync.Mutex
-	timers              map[timerKey]*time.Timer
-	snowman             *gitlab.User
-	configCache         map[int]configCacheItem
-	configCacheDuration time.Duration
+	client  *gitlab.Client
+	config  *common.Loader
+	logger  *zap.SugaredLogger
+	mu      sync.Mutex
+	timers  map[timerKey]*time.Timer
+	snowman *gitlab.User
 }
 
-func NewPlugin(client *gitlab.Client, logger *zap.SugaredLogger, snowman *gitlab.User) *MergeRequestPlugin {
+func NewPlugin(client *gitlab.Client, logger *zap.SugaredLogger, snowman *gitlab.User, config *common.Loader) *MergeRequestPlugin {
 	return &MergeRequestPlugin{
-		client:              client,
-		logger:              logger.Named("merge_request"),
-		timers:              make(map[timerKey]*time.Timer, 0),
-		snowman:             snowman,
-		configCache:         make(map[int]configCacheItem, 0),
-		configCacheDuration: time.Minute * 10,
+		client:  client,
+		config:  config,
+		logger:  logger.Named("merge_request"),
+		timers:  make(map[timerKey]*time.Timer, 0),
+		snowman: snowman,
 	}
 }
 
@@ -66,23 +59,10 @@ func (plugin *MergeRequestPlugin) onTimer(pid int, iid int) {
 	}
 
 	logger := plugin.logger.With("project", mr.ProjectID, "IID", mr.IID)
-	val, found := plugin.configCache[mr.ProjectID]
+	config, err := plugin.config.Load(mr.ProjectID)
 
-	var config common.Configuration
-
-	if !found || time.Now().Sub(val.fetchedAt) > plugin.configCacheDuration {
-		config, err = common.LoadConfiguration(plugin.client, mr.ProjectID)
-
-		if err != nil {
-			logger.Error(err)
-		} else {
-			plugin.configCache[mr.ProjectID] = configCacheItem{
-				value:     config,
-				fetchedAt: time.Now(),
-			}
-		}
-	} else {
-		config = val.value
+	if err != nil {
+		logger.Error(err)
 	}
 
 	wrapper := &mergeRequest{
