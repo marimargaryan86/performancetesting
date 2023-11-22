@@ -6,7 +6,7 @@ import itertools
 import math
 import zoneinfo
 from collections.abc import Iterable, Iterator, Mapping, Sequence
-from typing import Any, Self
+from typing import Any, NamedTuple, Self
 
 from snowfall.project.junction.provider.v2alpha import trips_pb2
 from snowfall.project.junction.v1 import fare_type_pb2
@@ -19,6 +19,15 @@ _TRAVEL_SPEED = 880
 _TAXI_TIME = 15
 _NEAREST_MINUTE = 5
 _LAYOVER = datetime.timedelta(hours=1)
+
+
+class Airline(NamedTuple):
+    iata: str
+    name: str
+
+
+_MARKETING_AIRLINE = Airline("XZ", "Snowfall Airlines")
+_OPERATING_AIRLINE = Airline("XX", "Icey Airways")
 
 
 @dataclasses.dataclass(frozen=True)
@@ -79,11 +88,20 @@ class RouteRepository(object):
 
 
 @dataclasses.dataclass(frozen=True)
+class Company(object):
+    flight_number: str
+    name: str
+    code: str
+
+
+@dataclasses.dataclass(frozen=True)
 class Segment(object):
     origin: Stop
     destination: Stop
     departure_at: datetime.datetime
     arrival_at: datetime.datetime
+    marketed_by: Company
+    operated_by: Company
 
     @classmethod
     def new(
@@ -97,6 +115,18 @@ class Segment(object):
             destination=destination,
             departure_at=departure_at,
             arrival_at=departure_at + cls._calculate_travel_time(origin, destination),
+            marketed_by=cls._generate_company(
+                airline=_MARKETING_AIRLINE,
+                origin=origin,
+                destination=destination,
+                departure_at=departure_at,
+            ),
+            operated_by=cls._generate_company(
+                airline=_OPERATING_AIRLINE,
+                origin=origin,
+                destination=destination,
+                departure_at=departure_at,
+            ),
         )
 
     def get_next(self, destination: Stop) -> Segment:
@@ -109,7 +139,55 @@ class Segment(object):
             destination=destination,
             departure_at=departure_at,
             arrival_at=arrival_at,
+            marketed_by=self._generate_company(
+                airline=_MARKETING_AIRLINE,
+                origin=origin,
+                destination=destination,
+                departure_at=departure_at,
+            ),
+            operated_by=self._generate_company(
+                airline=_OPERATING_AIRLINE,
+                origin=origin,
+                destination=destination,
+                departure_at=departure_at,
+            ),
         )
+
+    @classmethod
+    def _generate_company(
+        cls,
+        airline: Airline,
+        origin: Stop,
+        destination: Stop,
+        departure_at: datetime.datetime,
+    ) -> Company:
+        return Company(
+            flight_number=cls._generate_flight_number(
+                origin=origin,
+                destination=destination,
+                departure_at=departure_at,
+                airline_iata=airline.iata,
+            ),
+            name=airline.name,
+            code=airline.iata,
+        )
+
+    @classmethod
+    def _generate_flight_number(
+        cls,
+        airline_iata: str,
+        origin: Stop,
+        destination: Stop,
+        departure_at: datetime.datetime,
+    ) -> str:
+        route_signature = "{airline}:{origin}:{destination}:{time}".format(
+            airline=airline_iata,
+            origin=origin.identifier,
+            destination=destination.identifier,
+            time=departure_at.time(),
+        )
+
+        return str(hash(route_signature))[-3:].lstrip("0") or "1"
 
     @classmethod
     def _calculate_travel_time(

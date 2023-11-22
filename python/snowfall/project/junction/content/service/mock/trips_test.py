@@ -64,6 +64,12 @@ class TestTrips(object):
     ) -> None:
         _assert_result_trip_fares(one_way_response)
 
+    def test_one_way_contains_companies(
+        self,
+        one_way_response: trips_pb2.SearchTripsResponse,
+    ) -> None:
+        _assert_result_company_info(one_way_response)
+
     def test_round_trip_contains_power_of_results(
         self,
         round_trip_response: trips_pb2.SearchTripsResponse,
@@ -144,3 +150,17 @@ def _assert_result_trip_fares(response: trips_pb2.SearchTripsResponse) -> None:
         for trip in trip_result.trips:
             assert trip.fare.type, "Trips should have a fare type"
             assert trip.fare.marketing_name, "Trips should have a fare marketing name"
+
+
+def _assert_result_company_info(response: trips_pb2.SearchTripsResponse) -> None:
+    for trip_result in response.results:
+        for trip in trip_result.trips:
+            for segment in trip.segments:
+                _assert_segment_company(segment.marketed_by)
+                _assert_segment_company(segment.operated_by)
+
+
+def _assert_segment_company(company: trips_pb2.Segment.Company) -> None:
+    assert company.route_number, "Segment company should have a route number"
+    assert company.code, "Segment company should have a code"
+    assert company.name, "Segment company should have a name"

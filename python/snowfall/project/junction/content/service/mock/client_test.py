@@ -27,6 +27,16 @@ def _generate_mock_trip(
                 destination=_generate_stop("bar"),
                 departure_at=departure_at,
                 arrival_at=arrival_at,
+                marketed_by=client.Company(
+                    flight_number="123",
+                    name="Foo",
+                    code="foo",
+                ),
+                operated_by=client.Company(
+                    flight_number="234",
+                    name="Bar",
+                    code="bar",
+                ),
             ),
         ],
     )

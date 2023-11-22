@@ -96,4 +96,14 @@ def _make_segment(
         ),
         arrival_at=protobuf.datetime_to_protobuf_datetime(segment.arrival_at),
         type=segment_type_pb2.SEGMENT_TYPE_FLIGHT,
+        marketed_by=trips_pb2.Segment.Company(
+            route_number=segment.marketed_by.flight_number,
+            code=segment.marketed_by.code,
+            name=segment.marketed_by.name,
+        ),
+        operated_by=trips_pb2.Segment.Company(
+            route_number=segment.operated_by.flight_number,
+            code=segment.operated_by.code,
+            name=segment.operated_by.name,
+        ),
     )
