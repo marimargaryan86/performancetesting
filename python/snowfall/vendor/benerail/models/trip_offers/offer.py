@@ -29,7 +29,7 @@ class OfferPartCommon(BenerailBaseModel):
     price: Price | None = None
     flexibility: Flexibility | None = None
     comfort_class: ComfortClass | None = None
-    product: ProductResourceLink
+    product: ProductResourceLink | None = None
     passengers: list[PassengerResourceLink] | None = None
     trip_leg_sequence: list[int] | None = None
     is_required_in_offer: bool | None = None

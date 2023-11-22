@@ -39,24 +39,20 @@ async def _get_products(
     coros = []
 
     for offer_part in offer_parts:
-        product_ref = offer_part.response_result.offer_part_common.product.href
+        product = offer_part.response_result.offer_part_common.product
+        product_ref = product.href if product else None
 
-        if not product_ref.path:
-            continue
+        if product_ref and product_ref.path:
+            tariff_ref = helper_functions.last_id_of_url(product_ref)
 
-        tariff_ref = helper_functions.last_id_of_url(product_ref)
-
-        if tariff_ref in seen:
-            continue
-
-        coros.append(
-            benerail_client.trip_offers_client.get_product_in_trip_offer_collection(
-                trip_offer_collection_id=product_ref.path.rsplit("/", 3)[-3],
-                tariff_ref=tariff_ref,
-            ),
-        )
-
-        seen.add(tariff_ref)
+            if tariff_ref not in seen:
+                coros.append(
+                    benerail_client.trip_offers_client.get_product_in_trip_offer_collection(
+                        trip_offer_collection_id=product_ref.path.rsplit("/", 3)[-3],
+                        tariff_ref=tariff_ref,
+                    ),
+                )
+                seen.add(tariff_ref)
 
     return await asyncio.gather(*coros)
 
