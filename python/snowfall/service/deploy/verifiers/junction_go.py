@@ -17,14 +17,24 @@ from snowfall.project.junction.go.service.offers.v1 import (
 from snowfall.project.junction.go.service.orders.v1 import (
     models_pb2 as orders_models_pb2,
 )
-from snowfall.project.junction.go.service.orders.v1 import orders_pb2, orders_pb2_grpc
+from snowfall.project.junction.go.service.orders.v1 import (
+    orders_pb2,
+    orders_pb2_grpc,
+)
 from snowfall.project.junction.go.v1 import models_pb2 as go_models_pb2
 from snowfall.service.deploy.verifiers import protocols
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
-from snowfall.stdlib.v1 import amqp_pb2 as stdlib_amqp_pb2
-from snowfall.stdlib.v1 import latlng_pb2, postal_address_pb2
+from snowfall.stdlib.v1 import (
+    amqp_pb2 as stdlib_amqp_pb2,
+)
+from snowfall.stdlib.v1 import (
+    date_pb2,
+    latlng_pb2,
+    phone_number_pb2,
+    postal_address_pb2,
+)
 
 
 class OrdersFlow(object):
@@ -117,7 +127,19 @@ class OrdersFlow(object):
             await self._orders_stub.PlaceOrder(
                 orders_pb2.PlaceOrderRequest(
                     journey_id=journey_id,
-                    passengers=[],
+                    passengers=[
+                        orders_models_pb2.Passenger(
+                            first_name="Foo",
+                            last_name="Bar",
+                            title=orders_models_pb2.Passenger.TITLE_MR,
+                            gender=orders_models_pb2.Passenger.Gender.GENDER_UNSPECIFIED,
+                            date_of_birth=date_pb2.Date(
+                                year=1987,  # noqa: WPS432
+                                month=5,
+                                day=24,
+                            ),
+                        ),
+                    ],
                     residence_address=postal_address_pb2.PostalAddress(
                         address_lines=["Street name 7"],
                         region_code="GB",
@@ -228,7 +250,18 @@ class OrdersFlow(object):
         return (
             await self._orders_stub.CreateJourney(
                 orders_pb2.CreateJourneyRequest(
-                    contact_details=orders_models_pb2.ContactDetails(),
+                    contact_details=orders_models_pb2.ContactDetails(
+                        email="example@example.com",
+                        address=postal_address_pb2.PostalAddress(
+                            address_lines=["Street 7"],
+                            region_code="GB",
+                            postal_code="10000",
+                            locality="London",
+                        ),
+                        phone=phone_number_pb2.PhoneNumber(
+                            e164_number="+385996666666",
+                        ),
+                    ),
                     reseller_id=self._generated_offer_search.reseller_id,
                 ),
                 timeout=self._timeout,
