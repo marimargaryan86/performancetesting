@@ -110,10 +110,10 @@ class PricedOfferResponse(BaseSchema):
         description="Price guarantee expiration date time",
     )
     offer: Offer = pydantic.Field(description="Offer details")
-    passengers: list[response_common_passenger_schemas.PassengerSimple] = (
-        pydantic.Field(
-            description="Passenger definitions",
-        )
+    passengers: list[
+        response_common_passenger_schemas.PassengerSimple
+    ] = pydantic.Field(
+        description="Passenger definitions",
     )
     segments: list[response_common_offer_schemas.Segment] = pydantic.Field(
         description="Journey segment definitions",

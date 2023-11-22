@@ -76,7 +76,8 @@ async def _generate_report(
             "created_at": {
                 "$gt": datetime.datetime.now(
                     tz=datetime.UTC,
-                ) - relativedelta.relativedelta(months=1),
+                )
+                - relativedelta.relativedelta(months=1),
             },
         },
     )

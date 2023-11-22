@@ -152,11 +152,14 @@ class Generator(object):
         for provider in await self._eligible_providers():
             if provider.trip_search_capabilities.supports_multi_city:
                 with contextlib.suppress(BuildError):
-                    yield provider, _build_multi_city(
+                    yield (
                         provider,
-                        task.multi_city,
-                        task.passengers,
-                        resolved_stops,
+                        _build_multi_city(
+                            provider,
+                            task.multi_city,
+                            task.passengers,
+                            resolved_stops,
+                        ),
                     )
             else:
                 requests = _multi_city_fallback(
@@ -184,11 +187,14 @@ class Generator(object):
 
         for provider in await self._eligible_providers():
             with contextlib.suppress(BuildError):
-                yield provider, _build_one_way(
+                yield (
                     provider,
-                    task.one_way,
-                    task.passengers,
-                    resolved_stops,
+                    _build_one_way(
+                        provider,
+                        task.one_way,
+                        task.passengers,
+                        resolved_stops,
+                    ),
                 )
 
     async def _round_trip(
@@ -207,11 +213,14 @@ class Generator(object):
         for provider in await self._eligible_providers():
             if provider.trip_search_capabilities.supports_round_trip:
                 with contextlib.suppress(BuildError):
-                    yield provider, _build_round_trip(
+                    yield (
                         provider,
-                        task.round_trip,
-                        task.passengers,
-                        resolved_stops,
+                        _build_round_trip(
+                            provider,
+                            task.round_trip,
+                            task.passengers,
+                            resolved_stops,
+                        ),
                     )
             else:
                 requests = _round_trip_fallback(
@@ -284,14 +293,10 @@ def _to_passengers(
     passengers: Sequence[trips_pb2.Passenger],
 ) -> list[provider_trips_pb2.SearchTripsRequest.Passenger]:
     match provider.trip_search_capabilities.passenger_age_identification_method:
-        case (
-            provider_meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_PROVIDER_TYPE
-        ):
+        case provider_meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_PROVIDER_TYPE:
             # TODO(jyggen): implement
             return []
-        case (
-            provider_meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH
-        ):
+        case provider_meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH:
             return [
                 provider_trips_pb2.SearchTripsRequest.Passenger(
                     date_of_birth=protobuf.date_to_protobuf(
@@ -356,23 +361,17 @@ def _to_provider_criterion(
     )
 
     match provider.trip_search_capabilities.stop_identification_method:
-        case (
-            provider_meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_PROVIDER_IDS
-        ):
+        case provider_meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_PROVIDER_IDS:
             # TODO(jyggen): implement
             return None
-        case (
-            provider_meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_COORDINATES
-        ):
+        case provider_meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_COORDINATES:
             provider_criterion.origin_coordinates.CopyFrom(
                 origin.location.coordinates,
             )
             provider_criterion.destination_coordinates.CopyFrom(
                 destination.location.coordinates,
             )
-        case (
-            provider_meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_IATA_CODES
-        ):
+        case provider_meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_IATA_CODES:
             provider_criterion.origin_identifier = origin.place_attributes.iata
             provider_criterion.destination_identifier = (
                 destination.place_attributes.iata

@@ -223,12 +223,12 @@ class DistribusionClient(object):
             query_params["fare_class"] = criteria.fare_class
 
         if criteria.return_departure_time and criteria.return_arrival_time:
-            query_params["return_departure_time"] = (
-                criteria.return_departure_time.isoformat(timespec="minutes")
-            )
-            query_params["return_arrival_time"] = (
-                criteria.return_arrival_time.isoformat(timespec="minutes")
-            )
+            query_params[
+                "return_departure_time"
+            ] = criteria.return_departure_time.isoformat(timespec="minutes")
+            query_params[
+                "return_arrival_time"
+            ] = criteria.return_arrival_time.isoformat(timespec="minutes")
 
         response = await self._make_request(
             "GET",

@@ -94,9 +94,7 @@ class DictClient(Client):
         subscriber = self._subscribers.get(identifier)
         if not subscriber:
             raise errors.NotFoundError()
-        subscriber.phone_subscription_status = (
-            notifications_models_pb2.Subscriber.SubscribedStatus.SUBSCRIBED_STATUS_UNSUBSCRIBED
-        )
+        subscriber.phone_subscription_status = notifications_models_pb2.Subscriber.SubscribedStatus.SUBSCRIBED_STATUS_UNSUBSCRIBED
 
         return True
 
@@ -107,9 +105,7 @@ class DictClient(Client):
         subscriber = self._subscribers.get(identifier)
         if not subscriber:
             raise errors.NotFoundError()
-        subscriber.phone_subscription_status = (
-            notifications_models_pb2.Subscriber.SubscribedStatus.SUBSCRIBED_STATUS_SUBSCRIBED
-        )
+        subscriber.phone_subscription_status = notifications_models_pb2.Subscriber.SubscribedStatus.SUBSCRIBED_STATUS_SUBSCRIBED
 
         return True
 

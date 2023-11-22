@@ -398,6 +398,8 @@ external = [
   "WPS609", # Forbid directly calling certain magic attributes and methods
 ]
 ignore = [
+  "COM812",  # Trailing comma missing. Incompatible with Ruff's formatter.
+  "COM819",  # Trailing comma prohibited. Incompatible with Ruff's formatter.
   "D100",    # Missing docstring in public module
   "D101",    # Missing docstring in public class
   "D102",    # Missing docstring in public method
@@ -406,23 +408,35 @@ ignore = [
   "D105",    # Missing docstring in magic method
   "D106",    # Missing docstring in public nested class
   "D107",    # Missing docstring in `__init__
+  "D206",    # Docstring should be indented with spaces, not tabs. Incompatible with Ruff's formatter.
+  "D300",    # Use triple double quotes """. Incompatible with Ruff's formatter.
   "D418",    # Function decorated with `@overload` shouldn't contain a docstring
   "ANN101",  # Missing type annotation for self in method
   "ANN102",  # Missing type annotation for cls in classmethod
   "ANN401",  # Dynamically typed expressions (typing.Any) are disallowed
-  "E203",    # Whitespace before ':'
-  "E501",    # Line too long
+  "E111",    # Indentation is not a multiple of. Incompatible with Ruff's formatter.
+  "E114",    # Indentation is not a multiple of {indent_size} (comment). Incompatible with Ruff's formatter.
+  "E117",    # Over-indented (comment). Incompatible with Ruff's formatter.
+  "E203",    # Whitespace before ':'. Incompatible with Ruff's formatter.
+  "E501",    # Line too long. Incompatible with Ruff's formatter.
+  "ISC001",  # Implicitly concatenated string literals on one line. Incompatible with Ruff's formatter.
+  "ISC002",  # Implicitly concatenated string literals over multiple lines. Incompatible with Ruff's formatter.
   "PLC1901", # can be simplified as an empty string is falsey
   "PLR0913", # Too many arguments to function call # TODO: fix
   "PLR2004", # Magic value used in comparison, consider replacing with a constant variable # TODO: fix
   "PLR6301", # Method could be a function or static method
   "PLR0904", # Too many public methods
+  "Q000",    # Single quotes found but double quotes preferred. Incompatible with Ruff's formatter.
+  "Q001",    # Single quote multiline found but double quotes preferred. Incompatible with Ruff's formatter.
+  "Q002",    # Single quote docstring found but double quotes preferred. Incompatible with Ruff's formatter.
+  "Q003",    # Change outer quotes to avoid escaping inner quotes. Incompatible with Ruff's formatter.
   "TD002",   # Missing author in TODO; try: `# TODO(<author_name>): ...` or `# TODO @<author_name>: ...`
   "TD003",   # Missing issue link on the line following this TODO
   "TRY003",  # Avoid specifying long messages outside the exception class # TODO: fix
   "UP004",   # Class inherits from `object`
   "UP030",   # Use implicit references for positional format fields
   "UP032",   # Use f-string instead of `format` call
+  "W191",    # Indentation contains tabs. Incompatible with Ruff's formatter.
 ]
 select = [
   "A",   # flake8-builtins
@@ -490,6 +504,9 @@ unsafe-fixes = true
 
 [tool.ruff.flake8-annotations]
 mypy-init-return = true
+
+[tool.ruff.format]
+preview = true
 
 [tool.ruff.isort]
 known-first-party = ["snowfall"]

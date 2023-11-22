@@ -25,9 +25,12 @@ class TestTransactions(object):
             if record.msg["level"] == "error"  # type: ignore[index]
         ]
         for event_log in event_logs:
-            assert event_log["event"] == (  # type: ignore[index]
-                "Conversion of GBP equivalent 0.89 is"
-                " less than your lower limit of 1.00"
+            assert (
+                event_log["event"]  # type: ignore[index]
+                == (
+                    "Conversion of GBP equivalent 0.89 is"
+                    " less than your lower limit of 1.00"
+                )
             )
 
     async def test_booked_quote_handled(

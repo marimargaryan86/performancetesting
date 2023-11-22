@@ -136,9 +136,7 @@ class TestOrders(object):
             "/orders/{0}".format(_ORDER_ID),
         )
 
-        assert response.json()["data"]["relationships"]["payment"][  # noqa: WPS219
-            "data"
-        ]["id"]
+        assert response.json()["data"]["relationships"]["payment"]["data"]["id"]  # noqa: WPS219
         assert response.status_code == 200
 
     async def test_get_order_with_markup(
@@ -154,9 +152,7 @@ class TestOrders(object):
             "/orders/{0}".format(_ORDER_ID),
         )
 
-        assert response.json()["data"]["relationships"]["markup"][  # noqa: WPS219
-            "data"
-        ]["id"]
+        assert response.json()["data"]["relationships"]["markup"]["data"]["id"]  # noqa: WPS219
         assert response.status_code == 200
 
     async def test_get_user_orders(
@@ -171,9 +167,7 @@ class TestOrders(object):
             "/orders",
         )
 
-        assert response.json()["data"][0]["relationships"]["payment"][  # noqa: WPS219
-            "data"
-        ]["id"]
+        assert response.json()["data"][0]["relationships"]["payment"]["data"]["id"]  # noqa: WPS219
         assert response.status_code == 200
 
     async def test_get_user_orders_with_markup(
@@ -189,9 +183,7 @@ class TestOrders(object):
             "/orders",
         )
 
-        assert response.json()["data"][0]["relationships"]["markup"][  # noqa: WPS219
-            "data"
-        ]["id"]
+        assert response.json()["data"][0]["relationships"]["markup"]["data"]["id"]  # noqa: WPS219
         assert response.status_code == 200
 
     async def test_create_cancellation_request(

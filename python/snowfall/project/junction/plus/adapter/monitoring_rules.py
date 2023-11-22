@@ -108,9 +108,9 @@ class DictClient(Client):
         monitoring_rule: notifications_models_pb2.MonitoringRule,
     ) -> notifications_models_pb2.MonitoringRule:
         self._monitoring_rules_id[monitoring_rule.id] = monitoring_rule
-        self._monitoring_rules_booking[monitoring_rule.booking.value.id] = (
-            monitoring_rule
-        )
+        self._monitoring_rules_booking[
+            monitoring_rule.booking.value.id
+        ] = monitoring_rule
         return monitoring_rule
 
     async def update(
@@ -118,9 +118,9 @@ class DictClient(Client):
         monitoring_rule: notifications_models_pb2.MonitoringRule,
     ) -> None:
         self._monitoring_rules_id[monitoring_rule.id] = monitoring_rule
-        self._monitoring_rules_booking[monitoring_rule.booking.value.id] = (
-            monitoring_rule
-        )
+        self._monitoring_rules_booking[
+            monitoring_rule.booking.value.id
+        ] = monitoring_rule
 
     async def get_rules_for_upcoming_events(
         self,

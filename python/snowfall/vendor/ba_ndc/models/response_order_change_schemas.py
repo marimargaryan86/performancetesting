@@ -63,10 +63,10 @@ class RepriceResponse(BaseSchema):
     offers: list[RepriceOffer] = pydantic.Field(
         description="Offers matching search criteria",
     )
-    passengers: list[response_common_passenger_schemas.PassengerSimple] = (
-        pydantic.Field(
-            description="Passenger definitions",
-        )
+    passengers: list[
+        response_common_passenger_schemas.PassengerSimple
+    ] = pydantic.Field(
+        description="Passenger definitions",
     )
     segments: list[response_common_offer_schemas.Segment] = pydantic.Field(
         description="Segment definitions",

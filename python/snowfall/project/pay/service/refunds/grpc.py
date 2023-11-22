@@ -304,7 +304,6 @@ class RefundsService(
         request: grpc_pb2.UpdateRefundRequest,
         refund: models_pb2.Refund,
     ) -> models_pb2.Refund:
-
         if refund.status == models_pb2.Refund.Status.STATUS_SUBMITTED:
             await rich_status.abort_with_rich_status(
                 context=context,

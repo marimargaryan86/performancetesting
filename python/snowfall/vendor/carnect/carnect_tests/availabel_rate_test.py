@@ -23,8 +23,7 @@ async def test_avail_rate(
         datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(days=10),
     )
     rental_core.return_date(
-        datetime.datetime.now(tz=datetime.UTC)
-        + datetime.timedelta(days=15),  # noqa: WPS432
+        datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(days=15),  # noqa: WPS432
     )
     rental_core.add_pick_up_location("LHR", "2")
     rental_core.return_location("LHR", "2")

@@ -52,7 +52,6 @@ class BaNdcClient(object):
         request: request_offer_search_schemas.OfferSearchRequest,
         rate_limit_timeout: float = 30,
     ) -> OffersResponseAdapter:
-
         try:
             response = await self._make_request(
                 "POST",

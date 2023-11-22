@@ -142,9 +142,9 @@ class OrderResponse(BaseSchema):
     segments: list[response_common_offer_schemas.Segment] = pydantic.Field(
         description="Segment definitions",
     )
-    origin_destinations: list[response_common_order_schemas.OriginDestination] = (
-        pydantic.Field(description="Origin destinations")
-    )
+    origin_destinations: list[
+        response_common_order_schemas.OriginDestination
+    ] = pydantic.Field(description="Origin destinations")
     penalties: list[response_common_order_schemas.Penalty] = pydantic.Field(
         description="Penalty definitions",
     )

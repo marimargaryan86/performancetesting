@@ -432,9 +432,9 @@ class Client(base_client.BaseClient):
             base_client.make_pagination_params(limit, cursor),
         )
         if cabin_class:
-            query_parameters["filter[groups.options.details.cabinClass][eq]"] = (
-                cabin_class
-            )
+            query_parameters[
+                "filter[groups.options.details.cabinClass][eq]"
+            ] = cabin_class
         if include:
             query_parameters["include"] = ",".join(include)
         return await self._make_request(

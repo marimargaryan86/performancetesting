@@ -236,9 +236,7 @@ def filter_future_orders(
         document
         for document in documents
         if datetime.datetime.fromisoformat(
-            document["bookings"][0]["details"][0]["legs"][0][  # noqa: WPS219
-                "departureAt"
-            ],
+            document["bookings"][0]["details"][0]["legs"][0]["departureAt"],  # noqa: WPS219
         )
         > datetime.datetime.now(tz=datetime.UTC)
     ]
