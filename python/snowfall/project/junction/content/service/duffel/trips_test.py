@@ -190,6 +190,13 @@ class TestSegmentModel(object):
             self._assert_company(segment.marketed_by)
             self._assert_company(segment.operated_by)
 
+    def test_segment_has_vehicles(
+        self,
+        segments_results: Iterable[trips_pb2.Segment],
+    ) -> None:
+        for segment in segments_results:
+            self._assert_vehicle(segment.vehicle)
+
     def test_segment_has_stops(
         self,
         segment_with_stops: trips_pb2.Segment,
@@ -221,6 +228,10 @@ class TestSegmentModel(object):
         assert company.code, "Companies should have a code"
         assert company.name, "Companies should have a name"
         assert company.route_number, "Companies should have a route number"
+
+    def _assert_vehicle(self, vehicle: trips_pb2.Segment.Vehicle) -> None:
+        assert vehicle.code, "Vehicles should have a code"
+        assert vehicle.name, "Vehicles should have a name"
 
 
 def test_passenger_with_age_is_added_to_request(

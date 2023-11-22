@@ -88,6 +88,7 @@ class Transformer(object):
                 code=segment.operating_carrier.iata_code or "",
                 name=segment.operating_carrier.name,
             ),
+            vehicle=self._aircraft_to_proto(segment),
         )
 
     def _stops_to_proto(
@@ -163,6 +164,18 @@ class Transformer(object):
             return money.Money(0, money.Currency(currency)).protobuf()
 
         return money.from_string(amount, money.Currency(currency)).protobuf()
+
+    def _aircraft_to_proto(
+        self,
+        segment: offer_slice.OfferSliceSegment,
+    ) -> trips_pb2.Segment.Vehicle | None:
+        if not segment.aircraft:
+            return None
+
+        return trips_pb2.Segment.Vehicle(
+            code=segment.aircraft.iata_code,
+            name=segment.aircraft.name,
+        )
 
 
 class Trips(object):
