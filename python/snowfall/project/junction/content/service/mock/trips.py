@@ -106,4 +106,8 @@ def _make_segment(
             code=segment.operated_by.code,
             name=segment.operated_by.name,
         ),
+        vehicle=trips_pb2.Segment.Vehicle(
+            code="77W",
+            name="Boeing 777-300ER",
+        ),
     )
