@@ -89,6 +89,9 @@ class Transformer(object):
                 name=segment.operating_carrier.name,
             ),
             vehicle=self._aircraft_to_proto(segment),
+            passengers=[
+                self._passenger_to_proto(passenger) for passenger in segment.passengers
+            ],
         )
 
     def _stops_to_proto(
@@ -175,6 +178,17 @@ class Transformer(object):
         return trips_pb2.Segment.Vehicle(
             code=segment.aircraft.iata_code,
             name=segment.aircraft.name,
+        )
+
+    def _passenger_to_proto(
+        self,
+        passenger: offer_slice.OfferSliceSegmentPassenger,
+    ) -> trips_pb2.Segment.Passenger:
+        return trips_pb2.Segment.Passenger(
+            seating=trips_pb2.Segment.Passenger.Seating(
+                type=self._resolve_passenger_cabin_class(passenger),
+                marketing_name=passenger.cabin_class_marketing_name,
+            ),
         )
 
 

@@ -197,6 +197,16 @@ class TestSegmentModel(object):
         for segment in segments_results:
             self._assert_vehicle(segment.vehicle)
 
+    def test_segment_has_passenger_seating(
+        self,
+        segments_results: Iterable[trips_pb2.Segment],
+    ) -> None:
+        for segment in segments_results:
+            assert segment.passengers, "Segments must have passengers"
+
+            for passenger in segment.passengers:
+                self._assert_passenger_seating(passenger)
+
     def test_segment_has_stops(
         self,
         segment_with_stops: trips_pb2.Segment,
@@ -232,6 +242,10 @@ class TestSegmentModel(object):
     def _assert_vehicle(self, vehicle: trips_pb2.Segment.Vehicle) -> None:
         assert vehicle.code, "Vehicles should have a code"
         assert vehicle.name, "Vehicles should have a name"
+
+    def _assert_passenger_seating(self, passenger: trips_pb2.Segment.Passenger) -> None:
+        assert passenger.seating.type, "Passenger seating should have a type"
+        assert passenger.seating.marketing_name, "Passenger seating should have a name"
 
 
 def test_passenger_with_age_is_added_to_request(
