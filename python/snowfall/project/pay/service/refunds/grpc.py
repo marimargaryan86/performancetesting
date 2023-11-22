@@ -375,6 +375,8 @@ class RefundsService(
         refund.invoice_reference = request.refund.invoice_reference
         refund.note = request.refund.note
         refund.refund_received = request.refund.refund_received
+        refund.refunded_us.CopyFrom(request.refund.refunded_us)
+        refund.refunded_reseller.CopyFrom(request.refund.refunded_reseller)
         refund.refunded_us_in_payer_currency.CopyFrom(
             money.from_string(
                 detailed_rate.client_buy_amount,
