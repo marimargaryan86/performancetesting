@@ -76,6 +76,12 @@ class TestTrips(object):
     ) -> None:
         _assert_result_vehicle_info(one_way_response)
 
+    def test_one_way_contains_passenger_seating(
+        self,
+        one_way_response: trips_pb2.SearchTripsResponse,
+    ) -> None:
+        _assert_result_passenger_seating(one_way_response)
+
     def test_round_trip_contains_power_of_results(
         self,
         round_trip_response: trips_pb2.SearchTripsResponse,
@@ -178,3 +184,18 @@ def _assert_result_vehicle_info(response: trips_pb2.SearchTripsResponse) -> None
             for segment in trip.segments:
                 assert segment.vehicle.code, "Segment vehicle should have a code"
                 assert segment.vehicle.name, "Segment vehicle should have a name"
+
+
+def _assert_result_passenger_seating(response: trips_pb2.SearchTripsResponse) -> None:
+    for trip_result in response.results:
+        for trip in trip_result.trips:
+            for segment in trip.segments:
+                assert segment.passengers, "Segments must have passengers"
+
+                for passenger in segment.passengers:
+                    _assert_passenger_seating(passenger)
+
+
+def _assert_passenger_seating(passenger: trips_pb2.Segment.Passenger) -> None:
+    assert passenger.seating.type, "Passenger seating should have a type"
+    assert passenger.seating.marketing_name, "Passenger seating should have a name"

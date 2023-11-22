@@ -30,7 +30,7 @@ class Transformer(object):
             trips=[
                 trips_pb2.Trip(
                     segments=[
-                        _make_segment(segment=segment) for segment in trip.segments
+                        _make_segment(segment, fare) for segment in trip.segments
                     ],
                     fare=trips_pb2.Trip.Fare(
                         type=fare.brand_type,
@@ -73,6 +73,7 @@ class Trips(object):
 
 def _make_segment(
     segment: client.Segment,
+    fare: client.Fare,
 ) -> trips_pb2.Segment:
     return trips_pb2.Segment(
         origin=trips_pb2.Location(
@@ -110,4 +111,12 @@ def _make_segment(
             code="77W",
             name="Boeing 777-300ER",
         ),
+        passengers=[
+            trips_pb2.Segment.Passenger(
+                seating=trips_pb2.Segment.Passenger.Seating(
+                    type=fare.brand_type,
+                    marketing_name=fare.brand_name,
+                ),
+            ),
+        ],
     )
