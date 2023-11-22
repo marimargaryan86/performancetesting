@@ -43,6 +43,15 @@ message Segment {
   }
   Company marketed_by = 7;
   Company operated_by = 8;
+  message Passenger {
+    string id = 1;
+    message Seating {
+      snowfall.project.junction.v1.FareType type = 1;
+      string marketing_name = 2;
+    }
+    Seating seating = 2;
+  }
+  repeated Passenger passengers = 9;
 }
 
 message Trip {
