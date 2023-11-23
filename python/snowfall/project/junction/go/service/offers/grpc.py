@@ -145,21 +145,34 @@ class OfferService(service.Service, grpc_pb2_grpc.OfferServiceServicer):
             request.page_size if request.page_size else self._default_page_size,
         )
 
-        offer_list = []
+        aggregates = []
+        offer_result_ids = []
+        async for offer_aggregate in offer_aggregates:
+            aggregates.append(offer_aggregate)
+            offer_result_ids.extend(list(offer_aggregate.offer_result_ids))
 
-        async for aggregate in offer_aggregates:
-            offer_results = await self._offers_results.find(
-                ids=list(aggregate.offer_result_ids),
-                cursor="",
+        offer_results = await self._offers_results.find(
+            ids=offer_result_ids,
+            cursor="",
+        )
+
+        result_map = {
+            offer_result.id: offer_result async for offer_result in offer_results
+        }
+
+        offer_list = [
+            models_pb2.OfferAggregate(
+                id=aggregate.id,
+                created_at=aggregate.created_at,
+                expires_at=aggregate.expires_at,
+                groups=[
+                    result_map[result_id]
+                    for result_id in aggregate.offer_result_ids
+                    if result_id in result_map
+                ],
             )
-            offer_list.append(
-                models_pb2.OfferAggregate(
-                    id=aggregate.id,
-                    created_at=aggregate.created_at,
-                    expires_at=aggregate.expires_at,
-                    groups=[offer_result async for offer_result in offer_results],
-                ),
-            )
+            for aggregate in aggregates
+        ]
 
         return grpc_pb2.ListOffersResponse(
             offers=offer_list,
