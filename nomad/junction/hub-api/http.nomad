@@ -83,8 +83,8 @@ job "hub-api-http" {
         "traefik.http.routers.hub-api-${var.environment}.middlewares=hub-api-vpn-only-${var.environment}",
         "traefik.http.routers.hub-api-${var.environment}.entrypoints=${var.traefik_entrypoints}",
         "traefik.http.routers.hub-api-${var.environment}.rule=Host(`${var.traefik_host_URL}`)",
-        "traefik.http.middlewares.hub-api-vpn-only-${var.environment}.ipwhitelist.sourcerange=52.56.69.33",
-        "traefik.http.middlewares.hub-api-vpn-only-${var.environment}.ipwhitelist.ipstrategy.excludedips=172.16.0.0/16"
+        "traefik.http.middlewares.hub-api-vpn-only-${var.environment}.ipwhitelist.sourcerange=52.56.69.33,13.42.170.234",
+        "traefik.http.middlewares.hub-api-vpn-only-${var.environment}.ipwhitelist.ipstrategy.excludedips=172.16.0.0/16,10.255.0.0/16"
       ]
 
       connect {
