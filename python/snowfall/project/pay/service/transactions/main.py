@@ -3,6 +3,7 @@ import ipaddress
 import random
 from collections.abc import Sequence
 
+import aiosmtplib
 import httpx
 import pydantic
 from motor import motor_asyncio
@@ -12,7 +13,7 @@ from snowfall.project.pay.service.companies.v1 import (
     grpc_pb2_grpc as companies_grpc_pb2,
 )
 from snowfall.project.pay.service.currencies.v1 import currencies_pb2_grpc
-from snowfall.project.pay.service.transactions import cache, transactions
+from snowfall.project.pay.service.transactions import cache, smtp, transactions
 from snowfall.project.pay.service.transactions.grpc import (
     BillsService,
     ConversionsService,
@@ -39,7 +40,9 @@ class _GrpcSettings(application.Settings):
 
 
 class _ReportsSettings(application.Settings):
-    """Reports settings."""
+    smtp_dsn: pydantic.AnyUrl
+    pay_email: str
+    finance_email: str
 
 
 async def _serve(app: application.Application[_GrpcSettings]) -> None:
@@ -121,7 +124,18 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
 async def _reports_cron_run(
     app: application.Application[_ReportsSettings],
 ) -> None:
-    job = NetsuiteReportJob()
+    job = NetsuiteReportJob(
+        email_client=smtp.EmailClient(
+            aiosmtplib.SMTP(
+                hostname=app.settings.smtp_dsn.host,
+                port=int(app.settings.smtp_dsn.port or 0) or None,
+                username=app.settings.smtp_dsn.username,
+                password=app.settings.smtp_dsn.password,
+            ),
+            from_email=app.settings.pay_email,
+            to_email=app.settings.finance_email,
+        ),
+    )
 
     await job.run()
 

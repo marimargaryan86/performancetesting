@@ -44,6 +44,15 @@ job "transactions-reports-cron" {
     task "reports-cron" {
       driver = "docker"
 
+      template {
+        data        = <<EOH
+SMTP_DSN={{range $index, $service := service "smtp"}}smtp://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}{{end}}
+EOH
+        destination = "services.env"
+        env         = true
+        change_mode = "restart"
+      }
+
       config {
         image = var.docker_image
         args = [
@@ -59,8 +68,10 @@ job "transactions-reports-cron" {
 
 
       env {
-        ENV_NAME   = "${var.environment}"
-        SENTRY_DSN = "https://0c052cf147584d4391a5243202168e20@sentry.snowfall.se/153"
+        ENV_NAME      = "${var.environment}"
+        SENTRY_DSN    = "https://0c052cf147584d4391a5243202168e20@sentry.snowfall.se/153"
+        PAY_EMAIL     = "pay@snowfalltravel.com"
+        FINANCE_EMAIL = "finance@snowfalltravel.com"
       }
     }
   }
