@@ -133,23 +133,20 @@ for f in "${NOMAD_FILES[@]}"; do
 
 	for e in "${ENVIRONMENTS[@]}"; do
 		if [[ -f "${CONFIG}" ]]; then
-
 			if [[ $(jq ".${e} | if has(\"deploy\") then .deploy else true end" "${CONFIG}") == "false" ]]; then
 				continue
 			fi
 
 			traefik_entrypoints=$(jq -r ".${e}.variables.traefik_entrypoints" "${CONFIG}")
 
-			if [[ $traefik_entrypoints == 'null' ]]; then
-				continue
-			fi
-
-			if [[ "${e}" == "production" && "${traefik_entrypoints}" != "web" ]]; then
-				echo "Error: In production, traefik_entrypoints must be 'web'. Found: '${traefik_entrypoints}'"
-				FAILURE=1
-			elif { [[ "${e}" == "development" || "${e}" == "sandbox" ]] && [[ "${traefik_entrypoints}" != "websecure" ]]; }; then
-				echo "Error: In ${e}, traefik_entrypoints must be 'websecure'. Found: '${traefik_entrypoints}'"
-				FAILURE=1
+			if [[ $traefik_entrypoints != 'null' ]]; then
+				if [[ "${e}" == "production" && "${traefik_entrypoints}" != "web" ]]; then
+					echo "${f}: traefik_entrypoints must be 'web' for ${e}"
+					FAILURE=1
+				elif { [[ "${e}" == "development" || "${e}" == "sandbox" ]] && [[ "${traefik_entrypoints}" != "websecure" ]]; }; then
+					echo "${f}: traefik_entrypoints must be 'websecure' for ${e}"
+					FAILURE=1
+				fi
 			fi
 
 			VARIABLES=$(jq -e "select(.${e}.variables != null).${e}.variables" "${CONFIG}") || FAILURE=1
