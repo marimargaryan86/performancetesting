@@ -52,14 +52,14 @@ class BookingHandler(object):
     async def book(
         self,
         task: amqp_pb2.PlaceOrderTask,
-        details: cache.OfferDetails,
+        price_quote: cache.PriceQuote,
     ) -> models_pb2.Booking:
         new_booking = task.booking
 
         try:
             booking_result = await self._make_booking(
                 task=task,
-                details=details,
+                price_quote=price_quote,
                 send_customer_email=self._send_customer_email,
             )
         except errors.ServiceError as error:
@@ -112,7 +112,7 @@ class BookingHandler(object):
     async def _make_booking(
         self,
         task: amqp_pb2.PlaceOrderTask,
-        details: cache.OfferDetails,
+        price_quote: cache.PriceQuote,
         *,
         send_customer_email: bool = True,
     ) -> orders.OrderResponse:
@@ -156,20 +156,20 @@ class BookingHandler(object):
                 street_and_number="\n".join(task.contact_details.address.address_lines),
                 execute_payment=True,
                 payment_method=enums.PaymentMethod.demand_note,
-                total_price=details.price,
-                currency=details.currency,
+                total_price=price_quote.price,
+                currency=price_quote.currency,
                 locale="en",
                 pax=len(task.passengers),
                 terms_accepted=True,
                 send_customer_email=send_customer_email,
-                fare_class=details.fare_class,
+                fare_class=price_quote.fare_class,
                 passengers=[
                     criterias.Passenger(
                         first_name=passenger.first_name,
                         last_name=passenger.last_name,
                         passenger_type=self._get_passenger_type(
                             first_segment,
-                            details,
+                            price_quote,
                             passenger,
                         ),
                     )
@@ -213,14 +213,14 @@ class BookingHandler(object):
     def _get_passenger_type(
         self,
         first_segment: OfferSegmentLeg,
-        details: cache.OfferDetails,
+        price_quote: cache.PriceQuote,
         passenger: models_pb2.Passenger,
     ) -> str:
         departure_date = protobuf.protobuf_to_date(first_segment.departure_at)
         birth_date = protobuf.protobuf_to_date(passenger.date_of_birth)
         age = relativedelta(departure_date, birth_date)
 
-        for pax_type in details.passenger_types:
+        for pax_type in price_quote.passenger_types:
             if pax_type.min_age <= age.years <= pax_type.max_age:
                 return pax_type.type_code
 

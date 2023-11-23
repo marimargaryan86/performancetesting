@@ -129,7 +129,7 @@ class Connection(DistribusionBaseModel):
 
 class ConnectionVacancy(DistribusionBaseModel):
     identifier: str = pydantic.Field(..., alias="id")
-    total_price: int | None
+    total_price: int
     vacant: bool
     fees: dict[str, Any] | None
     currency: str

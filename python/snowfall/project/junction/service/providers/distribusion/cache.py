@@ -41,3 +41,17 @@ class OffersCache(RedisRepository[OfferDetails]):
     """Stores offer details in cache."""
 
     _record_type: type[OfferDetails] = OfferDetails
+
+
+class PriceQuote(RedisRecord):
+    expires_at: datetime.datetime
+    price: int
+    currency: str
+    passenger_types: list[PassengerType]
+    fare_class: str
+
+
+class PriceQuoteCache(RedisRepository[PriceQuote]):
+    """Stores price quotes in the cache."""
+
+    _record_type: type[PriceQuote] = PriceQuote

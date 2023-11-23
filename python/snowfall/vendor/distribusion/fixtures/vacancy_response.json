@@ -1,0 +1,47 @@
+{
+    "data": {
+        "attributes": {
+            "total_price": 2731,
+            "vacant": true
+        },
+        "id": "VICA-DEBERCBS-FRPARPGB-2021-08-20T13:20-2021-08-20T15:40",
+        "relationships": {
+            "fees": {
+                "data": {}
+            }
+        },
+        "type": "vacancies"
+    },
+    "included": [
+        {
+            "id": "BAG",
+            "type": "ancillary_options",
+            "attributes": {
+                "code": "BAG",
+                "name": "Luggage",
+                "description": "Additional carry-on for 1 passenger",
+                "mandatory_for_admission": false,
+                "segment_relation": "all",
+                "pax_relation": 1,
+                "refundable": false,
+                "refundability_offset": null,
+                "price": 100
+            },
+            "relationships": {
+                "custom_attributes": {
+                    "data": [
+                        {
+                            "key": "string"
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "jsonapi": {
+        "version": "1.0"
+    },
+    "meta": {
+        "currency": "GBP"
+    }
+}

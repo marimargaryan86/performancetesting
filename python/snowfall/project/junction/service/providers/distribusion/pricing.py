@@ -58,9 +58,7 @@ async def price_quotes(
         rate_limit_client=rate_limit_client,
     )
     amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
-    offer_cache = cache.OffersCache(
-        client=redis_client,
-    )
+
     await PriceQuoteConsumer(
         distribusion_client=distribusion_client,
         consumer_obj=consumer.Consumer(
@@ -72,7 +70,10 @@ async def price_quotes(
             connection=amqp_connection,
             exchange=types.Exchange("prices"),
         ),
-        offer_cache=offer_cache,
+        offer_cache=cache.OffersCache(
+            client=redis_client,
+        ),
+        price_quote_cache=cache.PriceQuoteCache(client=redis_client),
         provider_company_id=app.settings.provider_company_id,
         ttl=app.settings.ttl,
     ).consume()
@@ -85,11 +86,13 @@ class PriceQuoteConsumer(object):
         consumer_obj: consumer.Consumer[offers_amqp_pb2.TripPriceQuoteTask],
         producer_obj: producer.Producer,
         offer_cache: cache.OffersCache,
+        price_quote_cache: cache.PriceQuoteCache,
         provider_company_id: str,
         ttl: datetime.timedelta,
     ):
         self._client = distribusion_client
-        self._cache = offer_cache
+        self._offer_cache = offer_cache
+        self._price_quote_cache = price_quote_cache
         self._consumer = consumer_obj
         self._logger = stdout.get_logger()
         self._producer = producer_obj
@@ -103,24 +106,34 @@ class PriceQuoteConsumer(object):
         self,
         amqp_message: types.Message[offers_amqp_pb2.TripPriceQuoteTask],
     ) -> None:
-        offer_details = await self._cache.fetch(amqp_message.body.option_id)
+        offer_details = await self._offer_cache.fetch(amqp_message.body.option_id)
 
         if not offer_details:
             return
 
-        connection_vacancy = await self._vacancy(offer_details)
+        connection_vacancy: connections.ConnectionVacancy = await self._vacancy(
+            offer_details,
+        )
 
         if not connection_vacancy.vacant:
             raise NoPricingError("Pricing did not succeed.")
 
-        offer_details.price = connection_vacancy.total_price or offer_details.price
-        offer_details.currency = connection_vacancy.currency
-        expires_at = datetime.datetime.now(tz=datetime.UTC) + self._ttl
-        price_quote_id = await self._cache.store(offer_details, expires_at)
+        price_quote = cache.PriceQuote(
+            expires_at=datetime.datetime.now(tz=datetime.UTC) + self._ttl,
+            price=connection_vacancy.total_price,
+            currency=connection_vacancy.currency,
+            passenger_types=offer_details.passenger_types,
+            fare_class=offer_details.fare_class,
+        )
+
+        price_quote_id = await self._price_quote_cache.store(
+            record=price_quote,
+            expires_at=price_quote.expires_at,
+        )
 
         price_quote_price = money.Money(
-            amount=offer_details.price,
-            currency=money.Currency(offer_details.currency),
+            amount=price_quote.price,
+            currency=money.Currency(price_quote.currency),
         ).protobuf()
 
         await self._producer.publish(
@@ -131,7 +144,7 @@ class PriceQuoteConsumer(object):
                     id=price_quote_id,
                     option_id=amqp_message.body.option_id,
                     expires_at=protobuf.datetime_to_protobuf(
-                        offer_details.expires_at,
+                        price_quote.expires_at,
                     ),
                     price=price_quote_price,
                     price_breakdown=[
