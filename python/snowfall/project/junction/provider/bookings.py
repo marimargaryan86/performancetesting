@@ -3,13 +3,14 @@ from collections.abc import Awaitable, Callable
 
 import grpc
 
+from snowfall.project.junction.go.service.orders.v1 import models_pb2
 from snowfall.project.junction.provider.v1alpha import bookings_pb2, bookings_pb2_grpc
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.transport.grpc import service
 
 Transformer = Callable[[bytes], Awaitable[bookings_pb2.Booking]]
-Enricher = Callable[[bookings_pb2.Booking], Awaitable[bookings_pb2.Booking]]
+CancellationHandler = Callable[[str], Awaitable[models_pb2.BookingCancellation]]
 
 
 class NotFoundError(Exception):
@@ -21,9 +22,11 @@ class Implementation(object):
         self,
         storage: filesystem.Storage,
         transformer: Transformer,
+        cancellation_handler: CancellationHandler | None = None,
     ):
         self._storage = storage
         self._transformer = transformer
+        self._cancellation_handler = cancellation_handler
 
     async def get(self, identifier: str) -> bookings_pb2.Booking:
         try:
@@ -32,6 +35,15 @@ class Implementation(object):
             raise NotFoundError() from err
 
         return await self._transformer(raw_booking)
+
+    async def cancel(self, identifier: str) -> models_pb2.BookingCancellation:
+        if self._cancellation_handler is None:
+            raise RuntimeError()
+
+        return await self._cancellation_handler(identifier)
+
+    def supports_cancellation(self) -> bool:
+        return self._cancellation_handler is not None
 
 
 class BookingService(service.Service, bookings_pb2_grpc.BookingServiceServicer):
@@ -66,3 +78,15 @@ class BookingService(service.Service, bookings_pb2_grpc.BookingServiceServicer):
         context: grpc.aio.ServicerContext,
     ) -> bookings_pb2.MakeBookingResponse:
         return context.abort(grpc.StatusCode.UNIMPLEMENTED)
+
+    async def CancelBooking(  # type: ignore[override] # noqa: N802
+        self,
+        request: bookings_pb2.CancelBookingRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> bookings_pb2.CancelBookingResponse:
+        if self._implementation.supports_cancellation():
+            return bookings_pb2.CancelBookingResponse(
+                cancellation=await self._implementation.cancel(request.booking_id),
+            )
+
+        return await context.abort(grpc.StatusCode.UNIMPLEMENTED)

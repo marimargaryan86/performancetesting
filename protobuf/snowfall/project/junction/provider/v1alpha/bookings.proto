@@ -3,6 +3,7 @@ syntax = "proto3";
 package snowfall.project.junction.provider.v1alpha;
 
 import "google/protobuf/timestamp.proto";
+import "snowfall/project/junction/go/service/orders/v1/models.proto";
 import "snowfall/stdlib/v1/money.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/provider/v1alpha";
@@ -10,6 +11,7 @@ option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/
 service BookingService {
   rpc GetBookings(GetBookingsRequest) returns (GetBookingsResponse) {}
   rpc MakeBooking(MakeBookingRequest) returns (MakeBookingResponse) {}
+  rpc CancelBooking(CancelBookingRequest) returns (CancelBookingResponse) {}
 }
 
 message GetBookingsRequest {
@@ -62,4 +64,12 @@ message Booking {
   google.protobuf.Timestamp created_at = 6;
   google.protobuf.Timestamp updated_at = 7;
   repeated string ticket_urls = 9;
+}
+
+message CancelBookingRequest {
+  string booking_id = 1;
+}
+
+message CancelBookingResponse {
+  snowfall.project.junction.go.service.orders.v1.BookingCancellation cancellation = 1;
 }
