@@ -6,7 +6,7 @@ import pytest
 from google.protobuf import message, symbol_database
 from google.rpc import error_details_pb2, status_pb2
 
-from snowfall.project.junction.provider import trips as provider_trips
+from snowfall.project.junction.content import trips as provider_trips
 from snowfall.project.junction.provider.v2alpha import trips_pb2
 
 

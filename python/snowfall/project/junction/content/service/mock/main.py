@@ -4,12 +4,12 @@ import ipaddress
 import uuid
 from typing import Any, cast
 
+from snowfall.project.junction.content import meta
+from snowfall.project.junction.content import trips as provider_trips
 from snowfall.project.junction.content.service.mock import (
     client,
     trips,
 )
-from snowfall.project.junction.provider import meta
-from snowfall.project.junction.provider import trips as provider_trips
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.service import application
 from snowfall.stdlib.transport.grpc import server

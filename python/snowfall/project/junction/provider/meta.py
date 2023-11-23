@@ -29,11 +29,7 @@ class MetaService(service.Service, meta_pb2_grpc.MetaServiceServicer):
         request: meta_pb2.GetCapabilitiesRequest,
         context: aio.ServicerContext,
     ) -> meta_pb2.GetCapabilitiesResponse:
-        return meta_pb2.GetCapabilitiesResponse(
-            trip_search_capabilities=meta_pb2.TripSearchCapabilities(
-                is_supported=True,
-            ),
-        )
+        return meta_pb2.GetCapabilitiesResponse()
 
     async def GetIdentity(  # type: ignore[override] # noqa: N802
         self,

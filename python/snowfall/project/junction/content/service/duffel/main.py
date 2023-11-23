@@ -3,9 +3,9 @@ import uuid
 
 import pydantic
 
+from snowfall.project.junction.content import meta
+from snowfall.project.junction.content import trips as provider_trips
 from snowfall.project.junction.content.service.duffel import trips
-from snowfall.project.junction.provider import meta
-from snowfall.project.junction.provider import trips as provider_trips
 from snowfall.stdlib.service import application, grpc_factory, httpx_factory
 from snowfall.stdlib.transport.grpc import server
 from snowfall.vendor.duffel import client
