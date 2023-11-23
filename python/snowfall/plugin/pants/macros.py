@@ -76,21 +76,23 @@ def go_image(  # type: ignore[no-untyped-def]
         ),
     )
 
+    repository = "{base_url}/{namespace}/{name}".format(
+        base_url=env("CI_PROJECT_PATH", ""),  # type: ignore[name-defined]  # noqa: F821
+        namespace="-".join(
+            [
+                part.replace("_", "-")
+                for part in build_file_dir().parent.parts  # type: ignore[name-defined]  # noqa: F821
+                if part not in {"golang", "cmd"}
+            ],
+        ),
+        name=build_file_dir().name.replace("_", "-"),  # type: ignore[name-defined]  # noqa: F821
+    )
+
     docker_image(  # type: ignore[name-defined]  # noqa: F821
         name="{name}_docker".format(name=name),
         dependencies=[":{name}".format(name=name)],
         image_tags=["{build_args.VERSION}"],
-        repository="{base_url}/{namespace}/{name}".format(
-            base_url=env("CI_PROJECT_PATH", ""),  # type: ignore[name-defined]  # noqa: F821
-            namespace="-".join(
-                [
-                    part.replace("_", "-")
-                    for part in build_file_dir().parent.parts  # type: ignore[name-defined]  # noqa: F821
-                    if part not in {"golang", "cmd"}
-                ],
-            ),
-            name=build_file_dir().name.replace("_", "-"),  # type: ignore[name-defined]  # noqa: F821
-        ).lstrip("/"),
+        repository=repository.replace("//", "/").strip("/"),
         instructions=[
             "FROM cgr.dev/chainguard/wolfi-base:latest@sha256:{hash} AS runtime".format(
                 hash=_BASE_IMAGE_SHA,
@@ -171,21 +173,23 @@ def python_image(  # type: ignore[no-untyped-def]
         ),
     )
 
+    repository = "{base_url}/{namespace}/{name}".format(
+        base_url=env("CI_PROJECT_PATH", "").strip("/"),  # type: ignore[name-defined]  # noqa: F821
+        namespace="-".join(
+            [
+                part.replace("_", "-")
+                for part in build_file_dir().parent.parts  # type: ignore[name-defined]  # noqa: F821
+                if part not in {"python", "snowfall", "project", "service"}
+            ],
+        ).strip("/"),
+        name=build_file_dir().name.replace("_", "-").strip("/"),  # type: ignore[name-defined]  # noqa: F821
+    )
+
     docker_image(  # type: ignore[name-defined]  # noqa: F821
         name="{name}_docker".format(name=name),
         dependencies=[":{name}".format(name=name)],
         image_tags=["{build_args.VERSION}"],
-        repository="{base_url}/{namespace}/{name}".format(
-            base_url=env("CI_PROJECT_PATH", ""),  # type: ignore[name-defined]  # noqa: F821
-            namespace="-".join(
-                [
-                    part.replace("_", "-")
-                    for part in build_file_dir().parent.parts  # type: ignore[name-defined]  # noqa: F821
-                    if part not in {"python", "snowfall", "project", "service"}
-                ],
-            ),
-            name=build_file_dir().name.replace("_", "-"),  # type: ignore[name-defined]  # noqa: F821
-        ).lstrip("/"),
+        repository=repository.strip("/").replace("//", "/"),
         instructions=[
             "FROM cgr.dev/chainguard/wolfi-base:latest@sha256:{hash} AS runtime".format(
                 hash=_BASE_IMAGE_SHA,
