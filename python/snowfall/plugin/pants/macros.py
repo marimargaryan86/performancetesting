@@ -80,8 +80,8 @@ def go_image(  # type: ignore[no-untyped-def]
         name="{name}_docker".format(name=name),
         dependencies=[":{name}".format(name=name)],
         image_tags=["{build_args.VERSION}"],
-        repository=env("CI_PROJECT_PATH", "")  # type: ignore[name-defined]  # noqa: F821
-        + "/{namespace}/{name}".format(
+        repository="{base_url}/{namespace}/{name}".format(
+            base_url=env("CI_PROJECT_PATH", ""),  # type: ignore[name-defined]  # noqa: F821
             namespace="-".join(
                 [
                     part.replace("_", "-")
@@ -175,8 +175,8 @@ def python_image(  # type: ignore[no-untyped-def]
         name="{name}_docker".format(name=name),
         dependencies=[":{name}".format(name=name)],
         image_tags=["{build_args.VERSION}"],
-        repository=env("CI_PROJECT_PATH", "")  # type: ignore[name-defined]  # noqa: F821
-        + "/{namespace}/{name}".format(
+        repository="{base_url}/{namespace}/{name}".format(
+            base_url=env("CI_PROJECT_PATH", ""),  # type: ignore[name-defined]  # noqa: F821
             namespace="-".join(
                 [
                     part.replace("_", "-")
