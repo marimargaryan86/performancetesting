@@ -9,6 +9,7 @@ from snowfall.project.junction.go.service.gateway.v1 import trips_pb2
 from snowfall.project.junction.provider.v2alpha import meta_pb2 as provider_meta_pb2
 from snowfall.project.junction.provider.v2alpha import trips_pb2 as provider_trips_pb2
 from snowfall.project.junction.v1 import passenger_type_pb2
+from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
 
 _GeneratorReturn = AsyncGenerator[
@@ -299,6 +300,7 @@ def _to_passengers(
         case provider_meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH:
             return [
                 provider_trips_pb2.SearchTripsRequest.Passenger(
+                    id=string.uuid(),
                     date_of_birth=protobuf.date_to_protobuf(
                         _passenger_type_to_date_of_birth(passenger.type),
                     ),

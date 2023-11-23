@@ -88,6 +88,7 @@ message SearchTripsRequest {
     snowfall.stdlib.v1.Date departure_date = 5;
   }
   message Passenger {
+    string id = 3;
     oneof age {
       string type = 1;
       snowfall.stdlib.v1.Date date_of_birth = 2;
