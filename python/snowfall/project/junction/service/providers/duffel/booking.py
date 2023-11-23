@@ -88,13 +88,13 @@ class BookingHandler(object):
     async def book(
         self,
         task: amqp_pb2.PlaceOrderTask,
-        details: cache.OfferDetails,
+        details: cache.PriceQuote,
     ) -> models_pb2.Booking:
         new_booking = task.booking
         duffel_client = self._duffel_client_factory.for_reseller(task.reseller_id)
 
         try:
-            updated_details: cache.OfferDetails = await self._refresh_details(
+            updated_details: cache.PriceQuote = await self._refresh_details(
                 details,
                 duffel_client,
             )
@@ -194,16 +194,16 @@ class BookingHandler(object):
 
     async def _refresh_details(
         self,
-        details: cache.OfferDetails,
+        details: cache.PriceQuote,
         duffel_client: client.DuffelClient,
-    ) -> cache.OfferDetails:
-        offer = await duffel_client.get_single_offer(details.offer_id)
+    ) -> cache.PriceQuote:
+        price_quote = await duffel_client.get_single_offer(details.offer_id)
 
-        return cache.OfferDetails(
+        return cache.PriceQuote(
             offer_id=details.offer_id,
             passengers=details.passengers,
-            total_amount=offer.total_amount,
-            currency=offer.total_currency,
+            total_amount=price_quote.total_amount,
+            currency=price_quote.total_currency,
             doc_required=details.doc_required,
             last_travel_date=details.last_travel_date,
         )
@@ -211,7 +211,7 @@ class BookingHandler(object):
     async def _make_booking(  # noqa: WPS231
         self,
         task: amqp_pb2.PlaceOrderTask,
-        details: cache.OfferDetails,
+        details: cache.PriceQuote,
         duffel_client: client.DuffelClient,
     ) -> tuple[Order, bytes]:
         number = phonenumbers.parse(task.contact_details.phone.e164_number)
@@ -276,7 +276,7 @@ class BookingHandler(object):
     def _is_infant(
         self,
         passenger: models_pb2.Passenger,
-        details: cache.OfferDetails,
+        details: cache.PriceQuote,
     ) -> bool:
         return (
             relativedelta(
@@ -289,7 +289,7 @@ class BookingHandler(object):
     def _is_adult(
         self,
         passenger: models_pb2.Passenger,
-        details: cache.OfferDetails,
+        details: cache.PriceQuote,
     ) -> bool:
         return (
             relativedelta(

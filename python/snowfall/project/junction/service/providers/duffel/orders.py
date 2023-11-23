@@ -100,7 +100,7 @@ async def orders(  # noqa: WPS217
                 filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
             ),
         ),
-        offer_cache=cache.OfferCache(
+        price_quote_cache=cache.PriceQuoteCache(
             client=redis_client,
         ),
     ).consume()
@@ -112,12 +112,12 @@ class OrderConsumer(object):
         consumer_obj: consumer.Consumer[amqp_pb2.PlaceOrderTask],
         producer_obj: producer.Producer,
         booking_handler: BookingHandler,
-        offer_cache: cache.OfferCache,
+        price_quote_cache: cache.PriceQuoteCache,
     ):
         self._consumer = consumer_obj
         self._producer = producer_obj
         self._booking = booking_handler
-        self._cache = offer_cache
+        self._price_quote_cache = price_quote_cache
         self._logger = stdout.get_logger()
 
     async def consume(self) -> None:
@@ -127,12 +127,12 @@ class OrderConsumer(object):
         self,
         amqp_message: types.Message[amqp_pb2.PlaceOrderTask],
     ) -> None:
-        offer_details = await self._cache.fetch(
+        price_quote = await self._price_quote_cache.fetch(
             amqp_message.body.booking.trip_option.price_quote_id,
         )
         amqp_message.body.booking.provider_name = _PROVIDER_NAME
 
-        if not offer_details:
+        if not price_quote:
             self._logger.warning(
                 "No offer details found for booking",
                 booking_id=amqp_message.body.booking.id,
@@ -142,6 +142,6 @@ class OrderConsumer(object):
             return
 
         await self._producer.publish(
-            await self._booking.book(task=amqp_message.body, details=offer_details),
+            await self._booking.book(task=amqp_message.body, details=price_quote),
             routing_key="orders.result.offer",
         )
