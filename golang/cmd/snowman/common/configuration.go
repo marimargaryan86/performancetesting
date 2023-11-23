@@ -91,6 +91,7 @@ type Loader struct {
 
 func NewLoader(client *gitlab.Client, ttl time.Duration) *Loader {
 	return &Loader{
+		cache:  make(map[int]cacheItem),
 		client: client,
 		ttl:    ttl,
 	}
