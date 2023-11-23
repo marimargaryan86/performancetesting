@@ -3,12 +3,12 @@
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import Button from "components/ui/button.svelte";
   import TextField from "components/ui/text-field.svelte";
-  import routeConfig from "routeConfig";
-  import { goto } from "$app/navigation";
   import Checkbox from "components/ui/checkbox.svelte";
   import passengersImage from "assets/images/passengers.png";
-  import integrationInstancesClient from "integration-instances-client";
   import { writable } from "svelte/store";
+  import integrationInstancesClient from "integration-instances-client";
+  import routeConfig from "routeConfig";
+  import { goto } from "$app/navigation";
 
   export let data;
 
@@ -17,7 +17,9 @@
 
   const pending = writable(false);
 
-  async function submit(): Promise<void> {
+  async function submit(
+    event: Event & { currentTarget: EventTarget & HTMLFormElement },
+  ): Promise<void> {
     if ($pending) {
       return;
     }
@@ -26,11 +28,9 @@
       $pending = true;
       errors = undefined;
 
-      const user = await integrationInstancesClient.auth.signIn({
-        id: data.loginFlow.id,
-        data: Object.fromEntries(
-          data.loginFlow.elements.map((item) => [item.attributes.name, item.attributes.value]),
-        ),
+      const user = await integrationInstancesClient.ory.auth.login({
+        id: data.flow.id,
+        data: Object.fromEntries(new FormData(event.currentTarget)),
         rememberMe,
       });
 
@@ -64,30 +64,35 @@
     <JunctionLogo snowfallTechnology poweredBy />
 
     <form on:submit|preventDefault={submit}>
-      {#each data.loginFlow.elements as element}
-        {#if element.type === "input"}
-          {#if element.attributes.type === "text" || element.attributes.type === "password"}
+      {#each Object.values(data.flow.ui.groups).flat() as node}
+        {#if node.type === "input"}
+          {#if node.attributes.type === "hidden"}
+            <input type="hidden" value={node.attributes.value} name={node.attributes.name} />
+          {:else if node.attributes.type === "text" || node.attributes.type === "password"}
             <TextField
-              label={element.attributes.label}
-              type={element.attributes.type}
-              name={element.attributes.name}
-              bind:value={element.attributes.value}
-              placeholder={element.attributes.label
-                ? `Enter ${element.attributes.label}`
-                : undefined}
-              error={element.attributes.type === "password" ? errors : undefined}
+              autocomplete={node.attributes.autocomplete}
+              disabled={node.attributes.disabled}
+              required={node.attributes.required}
+              label={node.meta.label?.text}
+              type={node.attributes.type}
+              name={node.attributes.name}
+              value={node.attributes.value ?? ""}
+              placeholder={node.meta.label?.text ? `Enter ${node.meta.label.text}` : undefined}
+              error={node.attributes.type === "password" ? errors : undefined}
             />
+          {:else if node.attributes.type === "submit"}
+            <input type="hidden" value={node.attributes.value} name={node.attributes.name} />
+
+            <Button type="submit">
+              {node.meta.label?.text ?? "Login"}
+
+              {#if $pending}
+                <LoadingIcon />
+              {/if}
+            </Button>
           {/if}
         {/if}
       {/each}
-
-      <Button type="submit">
-        Login
-
-        {#if $pending}
-          <LoadingIcon />
-        {/if}
-      </Button>
 
       <p class="typography body-small">
         We store some strictly necessary cookies. These cookies are used for Authentication and

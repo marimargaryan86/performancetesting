@@ -1,6 +1,6 @@
 import * as devalue from "devalue";
 import type { RequestEvent } from "./$types";
-import type { Session } from "integration/ory/schemas";
+import type { Session } from "integration/ory/schemas/authentication";
 import integrationInstances from "integration-instances";
 import type { BookingSessionModel } from "./trip-management";
 import { getRandomAlphaNumericString } from "utils/random";

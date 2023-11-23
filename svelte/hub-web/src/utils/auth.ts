@@ -2,7 +2,7 @@ import { dev } from "$app/environment";
 import { error, type RequestEvent } from "@sveltejs/kit";
 import * as jwt from "jsonwebtoken";
 import { env } from "$env/dynamic/private";
-import type { SessionExtended } from "integration/ory/schemas";
+import type { SessionExtended } from "integration/ory/schemas/authentication";
 
 const SESSION_TOKEN = "session-token";
 const COOKIE_OPTIONS = {

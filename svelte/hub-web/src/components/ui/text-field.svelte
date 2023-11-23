@@ -30,6 +30,8 @@
   export let min: string | number | undefined = undefined;
   export let max: string | number | undefined = undefined;
   export let step: string | number | undefined = undefined;
+  export let autocomplete: string | undefined = undefined;
+  export let disabled = false;
 
   let inputRef: HTMLInputElement;
 
@@ -91,6 +93,8 @@
       {min}
       {max}
       {step}
+      {autocomplete}
+      {disabled}
       value={displayValue}
       on:click
       on:focus

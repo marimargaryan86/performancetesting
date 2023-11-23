@@ -4,8 +4,8 @@ import * as Sentry from "@sentry/sveltekit";
 import { sequence } from "@sveltejs/kit/hooks";
 import { env } from "$env/dynamic/private";
 import { deleteSession, getSession } from "utils/auth";
-import { AUTH_ROOT } from "./routes/integration/auth/auth-service";
-import type { SessionExtended } from "integration/ory/schemas";
+import { ROOT as AUTH_ROOT } from "./routes/integration/ory/auth/auth-service";
+import type { SessionExtended } from "integration/ory/schemas/authentication";
 
 export function authHandle({ event, resolve }: Parameters<Handle>[0]): MaybePromise<Response> {
   let session: SessionExtended | undefined;

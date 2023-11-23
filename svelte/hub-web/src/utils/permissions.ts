@@ -1,4 +1,4 @@
-import type { User, UserRole } from "integration/ory/schemas";
+import type { User, UserRole } from "integration/ory/schemas/authentication";
 
 /**
  * Base permissions, this list should be expanded upon as more permissions are created

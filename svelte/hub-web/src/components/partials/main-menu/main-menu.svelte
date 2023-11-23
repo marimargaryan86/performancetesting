@@ -20,7 +20,7 @@
   }
 
   async function logout(): Promise<void> {
-    await integrationInstancesClient.auth.signOut();
+    await integrationInstancesClient.ory.auth.logout();
 
     await goto(routeConfig.routes.login.root, { invalidateAll: true });
   }

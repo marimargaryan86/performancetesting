@@ -1,20 +1,19 @@
+import { dev } from "$app/environment";
+import { env } from "$env/dynamic/private";
 import integrationInstances from "integration-instances";
-import type { LoginForm } from "integration/ory/schemas";
+import type { LoginFlow } from "integration/ory/schemas/login-flow";
+import jwt from "jsonwebtoken";
 
-export async function load(event): Promise<{ loginFlow: LoginForm }> {
-  const loginForm = await integrationInstances.ory.getLoginForm();
+const COOKIE_OPTIONS = {
+  path: "/",
+  httpOnly: true,
+  secure: !dev,
+};
 
-  loginForm.cookies.forEach((cookie) =>
-    event.cookies.set(cookie.name, cookie.value, {
-      expires: cookie.expires,
-      httpOnly: cookie.httpOnly,
-      maxAge: cookie.maxAge,
-      path: "/",
-      priority: cookie.priority,
-      sameSite: cookie.sameSite,
-      secure: cookie.secure,
-    }),
-  );
+export async function load(event): Promise<{ flow: LoginFlow }> {
+  const { flow, cookies } = await integrationInstances.ory.loginFlow.create();
 
-  return { loginFlow: loginForm.form };
+  event.cookies.set("login-token", jwt.sign(cookies, env.JWT_SECRET ?? "secret"), COOKIE_OPTIONS);
+
+  return { flow };
 }

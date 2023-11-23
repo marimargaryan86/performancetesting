@@ -32,7 +32,7 @@
 
     logoutTimer = window.setTimeout(
       async () => {
-        await integrationInstancesClient.auth.signOut();
+        await integrationInstancesClient.ory.auth.logout();
         await goto(routeConfig.routes.login.root, { invalidateAll: true });
       },
       getTimeDeltaMs(timeoutAt, new Date()),

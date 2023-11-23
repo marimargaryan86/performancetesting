@@ -1,4 +1,4 @@
-import type { Session } from "integration/ory/schemas";
+import type { Session } from "integration/ory/schemas/authentication";
 import JunctionHubApiService from "./junction-hub-api-service";
 import { companyParser, type Company, type CompanySchema } from "../schemas/company";
 

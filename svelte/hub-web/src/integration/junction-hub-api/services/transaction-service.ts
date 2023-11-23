@@ -2,7 +2,7 @@ import type CompanyService from "./company-service";
 import JunctionHubApiService from "./junction-hub-api-service";
 import type { PaginatedData } from "models/common";
 import { ensureDefined } from "utils/array";
-import type { Session } from "integration/ory/schemas";
+import type { Session } from "integration/ory/schemas/authentication";
 import {
   transactionParser,
   type Transaction,

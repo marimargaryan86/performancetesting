@@ -1,6 +1,6 @@
 import { URLExtended } from "utils/url";
 import { throwIfError } from "./junction-error";
-import type { Session } from "integration/ory/schemas";
+import type { Session } from "integration/ory/schemas/authentication";
 
 /**
  * This abstract base class is a foundational service layer for making RESTful

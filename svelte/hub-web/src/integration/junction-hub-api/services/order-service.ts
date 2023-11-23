@@ -1,4 +1,4 @@
-import type { Session } from "integration/ory/schemas";
+import type { Session } from "integration/ory/schemas/authentication";
 import { parseIncluded, type IncludedSchemas } from "../schemas/included";
 import type { OrderSchema, Order } from "../schemas/order";
 import JunctionHubApiService from "./junction-hub-api-service";

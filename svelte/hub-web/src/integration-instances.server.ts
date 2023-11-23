@@ -36,5 +36,8 @@ export default {
     users: new junctionHubApi.UserService(env.HUB_API_BASE_URL),
     refunds: new junctionHubApi.RefundService(env.HUB_API_BASE_URL),
   },
-  ory: new ory.OryService(env.ORY_BASE_URL),
+  ory: {
+    loginFlow: new ory.LoginFlowService(env.ORY_BASE_URL),
+    auth: new ory.AuthenticationService(env.ORY_BASE_URL),
+  },
 };

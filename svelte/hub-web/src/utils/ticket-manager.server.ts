@@ -2,7 +2,7 @@ import integrationInstances from "integration-instances";
 import JSZip from "jszip";
 import { extension } from "mime-types";
 import { ensureDefined } from "utils/array";
-import type { Session } from "integration/ory/schemas";
+import type { Session } from "integration/ory/schemas/authentication";
 
 type TicketsZipParams = {
   session: Session;

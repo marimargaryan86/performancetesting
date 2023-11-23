@@ -1,4 +1,4 @@
-import type { Session, User } from "integration/ory/schemas";
+import type { Session, User } from "integration/ory/schemas/authentication";
 
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces

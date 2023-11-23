@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-  import type { UserRole } from "integration/ory/schemas";
+  import type { UserRole } from "integration/ory/schemas/authentication";
 
   function formatRole(role: UserRole): string {
     return capitalize(role.replaceAll("-", " "));

@@ -19,7 +19,7 @@ This is a server side rendered SvelteKit application that allows users to intera
   ```bash
   brew install ory/tap/cli
   ```
-- Sign up for ORY credentials [here](https://optimistic-tereshkova-36hc6vayw4.projects.oryapis.com/ui)
+- Sign up for ORY credentials [here](https://exciting-boyd-kr7iwir8gj.projects.oryapis.com/ui)
 
 ## Running a local `hub-web` development instance
 
@@ -53,7 +53,7 @@ ORY_BASE_URL=https://example.com
 3. Open a terminal instance and run an ORY instance locally:
 
 ```bash
-ory tunnel --dev --project optimistic-tereshkova-36hc6vayw4 http://localhost:4000
+ory tunnel --dev --project exciting-boyd-kr7iwir8gj http://localhost:4000
 ```
 
 4. Open a separate terminal instance and install dependencies:

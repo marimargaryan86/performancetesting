@@ -8,7 +8,7 @@ import {
   userProfileParser,
 } from "../schemas/user";
 import JunctionHubApiService from "./junction-hub-api-service";
-import type { Session } from "integration/ory/schemas";
+import type { Session } from "integration/ory/schemas/authentication";
 
 export default class UserService extends JunctionHubApiService {
   async find({

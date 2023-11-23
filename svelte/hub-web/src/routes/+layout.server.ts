@@ -1,5 +1,5 @@
 import { redirect } from "@sveltejs/kit";
-import type { User } from "integration/ory/schemas";
+import type { User } from "integration/ory/schemas/authentication";
 import routeConfig from "routeConfig";
 import { deleteSession } from "utils/auth";
 
