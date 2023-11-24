@@ -31,6 +31,7 @@
   import FareRulesDialog from "../../components/fare-rules-dialog.svelte";
   import { getPassengerValidator } from "utils/passenger";
   import { writable } from "svelte/store";
+  import { formatAmount } from "formatting/currency";
 
   export let data;
 
@@ -243,6 +244,20 @@
     >
       Previous
     </Button>
+
+    <div class="total">
+      <div>
+        <span class="typography body-large bold">Total to pay</span>
+      </div>
+      <em class="typography body-large bold">
+        {#if priceQuote?.price.total}
+          {formatAmount(priceQuote?.price.total, true)}
+        {:else}
+          <LoadingIcon size="14px" />
+        {/if}
+      </em>
+    </div>
+
     <Button size="small" on:click={pay} disabled={!paymentIntent}>
       Book
 
@@ -304,9 +319,23 @@
   .actions > .wrapper {
     display: flex;
     gap: 16px;
+    align-items: center;
     justify-content: space-between;
     width: 100%;
     max-width: 1104px;
+  }
+
+  .total {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+    padding: 8px;
+    background-color: var(--color-main-primary-50);
+    border-radius: 8px;
+  }
+
+  .total > em {
+    color: var(--color-main-primary-500);
   }
 
   .actions::after {
