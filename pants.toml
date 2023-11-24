@@ -82,17 +82,12 @@ requirements = [
   "flake8-noqa",
   "Flake8-pyproject",
   "setuptools",
+  "snowfall.plugin.flake8",
   "wemake-python-styleguide",
 ]
-config = "vendor/.flake8"
 install_from_resolve = "python-default"
 extra_files = ["vendor/pyproject.toml"]
 args = ["--toml-config", "vendor/pyproject.toml"]
-source_plugins = [
-  "python/snowfall/plugin/flake8/immutability.py",
-  "python/snowfall/plugin/flake8/imports.py",
-  "python/snowfall/plugin/flake8/typing.py",
-]
 
 [generate-lockfiles]
 diff = true
@@ -156,6 +151,12 @@ use_rust_parser = true
 
 [python-protobuf]
 mypy_plugin = true
+
+[python-repos]
+indexes.add = [
+  "https://gitlab+deploy-token-124:kNkm3XvTkUiWo86sa5EW@git.snowfall.se/api/v4/projects/677/packages/pypi/simple",
+]
+
 
 [regex-lint]
 config = "@vendor/regexes.json"
