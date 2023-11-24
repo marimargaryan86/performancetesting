@@ -26,9 +26,9 @@ class Refunds(endpoints.HTTPEndpoint):
         event_status = await refund_state.run(event)
         if event_status:
             raise exceptions.HTTPException(
-                status_code=status.HTTP_202_ACCEPTED,
+                status_code=status.HTTP_200_OK,
                 detail="Accepted",
             )
         raise exceptions.HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_404_NOT_FOUND,
         )

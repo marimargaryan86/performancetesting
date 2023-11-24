@@ -2,7 +2,7 @@ import lagom
 from lagom.integrations import starlette
 from starlette import routing
 
-from snowfall.project.pay.service.webhooks import payments, refunds
+from snowfall.project.pay.service.webhooks.routes import payments, refunds
 
 
 def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:

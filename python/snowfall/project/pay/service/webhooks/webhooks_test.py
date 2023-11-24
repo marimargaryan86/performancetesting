@@ -59,7 +59,7 @@ class TestPaymentWebhooks(object):
             },
         )
 
-        assert response.status_code == status.HTTP_202_ACCEPTED
+        assert response.status_code == status.HTTP_200_OK
 
 
 class TestCustomHeaderMiddleware(object):

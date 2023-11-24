@@ -6,7 +6,9 @@ from starlette import endpoints, exceptions, requests, status
 
 from snowfall.project.pay.adapter.payments import GrpcClient
 from snowfall.project.pay.service.webhooks.models import payment
-from snowfall.project.pay.service.webhooks.states.payments import PaymentState
+from snowfall.project.pay.service.webhooks.states.currency_cloud.payments import (
+    PaymentState,
+)
 
 
 class Payment(endpoints.HTTPEndpoint):
@@ -38,6 +40,6 @@ class Payment(endpoints.HTTPEndpoint):
             )
 
         raise exceptions.HTTPException(
-            status_code=status.HTTP_202_ACCEPTED,
+            status_code=status.HTTP_200_OK,
             detail="Accepted",
         )
