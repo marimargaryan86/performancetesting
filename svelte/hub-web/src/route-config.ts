@@ -54,6 +54,11 @@ export default {
       },
       login: {
         root: "/login",
+        get routes() {
+          return {
+            accountRecovery: { root: `${this.root}/account-recovery` },
+          } as const;
+        },
       },
       help: {
         root: "/help",
@@ -106,6 +111,9 @@ export default {
             },
           } as const;
         },
+      },
+      account: {
+        root: "/account",
       },
     } as const;
   },

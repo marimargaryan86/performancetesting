@@ -3,6 +3,7 @@ import {
   oryKratosIdentityParser,
   type AuthenticationSchema,
   type User,
+  type Session,
 } from "../schemas/authentication";
 import OryService from "./ory-service";
 
@@ -42,5 +43,23 @@ export default class AuthenticationService extends OryService {
         getCookiesFromHeaders(resp.headers).map(({ name, value }) => [name, value]),
       ),
     };
+  }
+
+  async getLoggedInUser({ session }: { session: Session }): Promise<{
+    user: User;
+    expiresAt: Date;
+  }> {
+    const resp = await this.makeRequest<AuthenticationSchema["session"]>("/sessions/whoami", {
+      cookies: { [session.id]: session.token },
+    });
+
+    if (resp.status === 200) {
+      return {
+        user: oryKratosIdentityParser.toModel(resp.json.identity),
+        expiresAt: new Date(resp.json.expires_at),
+      };
+    }
+
+    throw new Error("UNAUTHORIZED");
   }
 }

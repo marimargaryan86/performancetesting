@@ -1,9 +1,10 @@
-import { deleteSession, setSession } from "utils/auth";
+import { error } from "@sveltejs/kit";
 import * as devalue from "devalue";
 import integrationInstances from "integration-instances";
-import jwt from "jsonwebtoken";
-import { dev } from "$app/environment";
-import { error } from "@sveltejs/kit";
+import { cookieStore } from "stores/cookie-store.server";
+
+// Two weeks, as set by the Legal team. Do not modify.
+const EXPIRY_MAX_AGE = 1209600;
 
 export async function POST(event): Promise<Response> {
   const data: {
@@ -15,7 +16,7 @@ export async function POST(event): Promise<Response> {
   try {
     const { user, expiresAt, cookies } = await integrationInstances.ory.auth.login({
       ...data,
-      cookies: jwt.decode(event.cookies.get("login-token") ?? "") as Record<string, string>,
+      cookies: cookieStore.loginToken.get(event) ?? {},
     });
 
     const sessionCookie = Object.entries(cookies).find(([key]) => key.startsWith("ory_session"));
@@ -24,18 +25,15 @@ export async function POST(event): Promise<Response> {
       throw error(401);
     }
 
-    setSession({
-      session: {
-        id: sessionCookie[0],
-        token: sessionCookie[1],
-        expiresAt,
-        user,
-      },
-      rememberMe: data.rememberMe,
-      event,
-    });
+    const cookieOpts = { maxAge: data.rememberMe ? EXPIRY_MAX_AGE : undefined };
 
-    event.cookies.delete("login-token", { path: "/", httpOnly: true, secure: !dev });
+    cookieStore.sessionToken.set(
+      { id: sessionCookie[0], token: sessionCookie[1] },
+      event,
+      cookieOpts,
+    );
+    cookieStore.sessionMetaToken.set({ user, expiresAt }, event, cookieOpts);
+    cookieStore.loginToken.delete(event);
 
     return new Response(devalue.stringify(user));
   } catch (err) {
@@ -48,7 +46,7 @@ export async function POST(event): Promise<Response> {
 }
 
 export function DELETE(event): Response {
-  deleteSession(event);
+  cookieStore.sessionToken.delete(event);
 
   return new Response(undefined, { status: 204 });
 }

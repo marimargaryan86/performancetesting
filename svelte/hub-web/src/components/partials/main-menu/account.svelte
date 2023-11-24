@@ -8,6 +8,7 @@
 
 <script lang="ts">
   import md5 from "md5";
+  import routeConfig from "routeConfig";
   import userStore from "stores/user-store";
   import { capitalize } from "utils/common";
 
@@ -18,7 +19,9 @@
 </script>
 
 <div class="account" style:--transition-time="{transitionTimeMs}ms" class:expanded>
-  <img src="https://www.gravatar.com/avatar/{gravatarHash}?s=40&d=retro" alt="" />
+  <a href={routeConfig.routes.account.root}>
+    <img src="https://www.gravatar.com/avatar/{gravatarHash}?s=40&d=retro" alt="" />
+  </a>
 
   <div class="info">
     <strong class="typography body-small bold">{$userStore.email}</strong>
@@ -64,9 +67,5 @@
 
   .account:not(.expanded) > .info {
     opacity: 0;
-  }
-
-  .account:not(.expanded) > img {
-    margin-left: -1px;
   }
 </style>

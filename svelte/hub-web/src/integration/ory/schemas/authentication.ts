@@ -106,7 +106,7 @@ export type Session = {
   token: string;
 };
 
-export type SessionExtended = Session & {
+export type SessionMeta = {
   user: User;
   expiresAt: Date;
 };

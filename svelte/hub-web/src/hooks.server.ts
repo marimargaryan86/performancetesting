@@ -3,30 +3,30 @@ import routeConfig from "routeConfig";
 import * as Sentry from "@sentry/sveltekit";
 import { sequence } from "@sveltejs/kit/hooks";
 import { env } from "$env/dynamic/private";
-import { deleteSession, getSession } from "utils/auth";
-import { ROOT as AUTH_ROOT } from "./routes/integration/ory/auth/auth-service";
-import type { SessionExtended } from "integration/ory/schemas/authentication";
+import { ORY_INTEGRATION_ROOT } from "./routes/integration/ory/common";
+import { cookieStore } from "stores/cookie-store.server";
 
 export function authHandle({ event, resolve }: Parameters<Handle>[0]): MaybePromise<Response> {
-  let session: SessionExtended | undefined;
+  const session = cookieStore.sessionToken.get(event);
+  const sessionMeta = cookieStore.sessionMetaToken.get(event);
 
-  try {
-    session = getSession(event);
-  } catch {
-    deleteSession(event);
+  if (session && sessionMeta) {
+    event.locals.user = sessionMeta.user;
+    event.locals.sessionExpiresAt = sessionMeta.expiresAt;
+    event.locals.session = session;
 
-    if (event.url.pathname !== routeConfig.routes.login.root && event.url.pathname !== AUTH_ROOT) {
-      throw redirect(303, routeConfig.routes.login.root);
-    }
-  }
-
-  if (session) {
-    event.locals.user = session.user;
-    event.locals.sessionExpiresAt = session.expiresAt;
-    event.locals.session = { id: session.id, token: session.token };
-
-    if (event.url.pathname === routeConfig.routes.login.root) {
+    if (event.url.pathname.startsWith(routeConfig.routes.login.root)) {
       throw redirect(303, routeConfig.root);
+    }
+  } else {
+    cookieStore.sessionToken.delete(event);
+    cookieStore.sessionMetaToken.delete(event);
+
+    if (
+      !event.url.pathname.startsWith(routeConfig.routes.login.root) &&
+      !event.url.pathname.startsWith(ORY_INTEGRATION_ROOT)
+    ) {
+      throw redirect(303, routeConfig.routes.login.root);
     }
   }
 

@@ -1,7 +1,7 @@
 import { redirect } from "@sveltejs/kit";
 import type { User } from "integration/ory/schemas/authentication";
 import routeConfig from "routeConfig";
-import { deleteSession } from "utils/auth";
+import { cookieStore } from "stores/cookie-store.server";
 
 export function load(event): { user?: User; sessionExpiresAt?: Date } {
   const user = event.locals.user;
@@ -16,7 +16,7 @@ export function load(event): { user?: User; sessionExpiresAt?: Date } {
       sessionExpiresAt: event.locals.sessionExpiresAt,
     };
   } catch {
-    deleteSession(event);
+    cookieStore.sessionToken.delete(event);
 
     throw redirect(303, routeConfig.routes.login.root);
   }

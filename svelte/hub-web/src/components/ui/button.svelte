@@ -7,16 +7,21 @@
   export let minWidth: string | undefined = undefined;
   export let preload = true;
   export let download: string | boolean | undefined = undefined;
+  export let value: string | undefined = undefined;
+  export let name: string | undefined = undefined;
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <svelte:element
   this={href ? "a" : "button"}
   {href}
-  data-sveltekit-preload-data={!href || preload ? undefined : "off"}
-  on:click
   {type}
   {disabled}
+  {download}
+  {value}
+  {name}
+  data-sveltekit-preload-data={!href || preload ? undefined : "off"}
+  on:click
   style:min-width={minWidth}
   class="typography bold"
   class:body-large={size === "large" || size === "medium"}
@@ -29,7 +34,6 @@
   class:small={size === "small"}
   class:x-small={size === "x-small"}
   class:xx-small={size === "xx-small"}
-  {download}
 >
   <slot />
 </svelte:element>
