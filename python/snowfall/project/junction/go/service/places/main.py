@@ -14,6 +14,7 @@ from motor import motor_asyncio
 from pydantic import AnyUrl
 
 from snowfall.project.junction.go.service.places import cities, locations, places
+from snowfall.project.junction.go.service.places.constant import BENERAIL_ID, SAT_ID
 from snowfall.project.junction.go.service.places.grpc import (
     LocationsService,
     PlacesService,
@@ -24,9 +25,6 @@ from snowfall.service.geodata.v1 import geocoding_pb2_grpc
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.service import application, grpc_factory
 from snowfall.stdlib.transport.grpc import server
-
-_BENERAIL_ID = "caefde65-c15c-4b60-b8d9-27638b50b08f"
-_SAT_ID = "a5547dae-9c65-4746-8637-d0601865508e"
 
 
 class _CitiesSettings(application.Settings):
@@ -79,14 +77,14 @@ async def _generate_cities(app: application.Application[_CitiesSettings]) -> Non
 
     provider_json: ProviderTypedDict = {
         models_pb2.Location.TYPE_RAILWAY_STATION: {
-            _BENERAIL_ID: (
+            BENERAIL_ID: (
                 json.loads(
                     benerail_json.decode("utf-8"),
                 )
                 if benerail_json
                 else []
             ),
-            _SAT_ID: json.loads(sat_json.decode("utf-8")) if sat_json else [],
+            SAT_ID: json.loads(sat_json.decode("utf-8")) if sat_json else [],
         },
     }
 

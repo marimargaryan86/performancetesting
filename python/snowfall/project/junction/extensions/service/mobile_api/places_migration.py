@@ -1,6 +1,7 @@
 import datetime
 import os
 from collections.abc import AsyncIterable
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -13,6 +14,7 @@ from snowfall.project.junction.extensions.service.mobile_api import (
     bootstrap,
     repository,
 )
+from snowfall.project.junction.extensions.service.mobile_api.constant import BENERAIL_ID
 from snowfall.project.junction.extensions.service.mobile_api.v1alpha import models_pb2
 from snowfall.project.junction.go.service.places.places import PlaceRepository
 from snowfall.project.junction.go.service.places.v1 import (
@@ -30,10 +32,44 @@ _CITY_AIRPORT_RADIUS_M = int(
 _CITY_TRANSPORT_RADIUS_M = int(
     os.getenv("_CITY_STATION_RADIUS_M", "10000"),  # noqa: WPS432
 )
+mongo_id_key = "_id"
+
+
+class MobileAPIPlaceRepository(PlaceRepository):
+    def __init__(self, geocoding: Any | None = None, collection: Any | None = None):
+        super().__init__(geocoding, collection)
+        self._db_name: str | None = None
+
+    @property
+    def db_name(self) -> str:
+        """Getter for db_name."""
+        if self._db_name is None:
+            raise ValueError("Database name is not set.")
+        return self._db_name
+
+    @db_name.setter
+    def db_name(self, value: str) -> None:
+        """Setter for db_name."""
+        self._db_name = value
+
+    async def get_ids(self) -> frozenset[str]:
+        db_name = self.db_name
+        query = {}
+        if db_name == "booking-hub-mobile-api":
+            query = {
+                "place_attributes.provider_ids.provider_id": str(BENERAIL_ID),
+            }
+        ids = await self._execute(
+            self._collection.distinct,
+            mongo_id_key,
+            filter=query,
+        )
+        return frozenset(str(_id) for _id in ids)
 
 
 async def migrate(settings: bootstrap.MigrateSettings) -> None:  # noqa: WPS217
     mongo = motor_asyncio.AsyncIOMotorClient(str(settings.mongo_dsn))
+    db_name = mongo[settings.mongo_db].name
     places_repository = repository.PlacesRepository(mongo[settings.mongo_db]["places"])
     osm_data = pd.read_csv(
         filesystem.resource_path(
@@ -45,14 +81,12 @@ async def migrate(settings: bootstrap.MigrateSettings) -> None:  # noqa: WPS217
         encoding="utf8",
         on_bad_lines="skip",
     )
-
-    go_repo = PlaceRepository(geocoding=None, collection=mongo.places.places)
-
+    go_repo = MobileAPIPlaceRepository(geocoding=None, collection=mongo.places.places)
+    go_repo.db_name = str(db_name)
     ids_from_go = await go_repo.get_ids()
     existing_ids = await places_repository.get_ids()
     to_add = ids_from_go - existing_ids
     to_remove = existing_ids - ids_from_go
-
     places_to_add = await go_repo.get_by_ids(to_add)
     await _save_enrich_data(places_to_add, places_repository, osm_data)
     await places_repository.delete_ids(to_remove)
