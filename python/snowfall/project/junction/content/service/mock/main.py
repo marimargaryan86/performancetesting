@@ -37,6 +37,12 @@ async def _serve(app: application.Application[_Settings]) -> None:
             filesystem.PkgLoader(__name__).load("routes.json"),
         ),
     )
+    trip_searcher = trips.Trips(
+        search_client=client.MockClient(
+            route_repository=route_repository,
+        ),
+        transformer=trips.Transformer(),
+    )
 
     grpc_server = server.create_server(
         app.settings.grpc_address,
@@ -47,12 +53,9 @@ async def _serve(app: application.Application[_Settings]) -> None:
                 provider_name=_PROVIDER_NAME,
             ),
             provider_trips.TripService(
-                implementation=trips.Trips(
-                    search_client=client.MockClient(
-                        route_repository=route_repository,
-                    ),
-                    transformer=trips.Transformer(),
-                ).find,
+                one_way=trip_searcher.find_one_way,
+                round_trip=trip_searcher.find_round_trip,
+                multi_city=trip_searcher.find_multi_city,
             ),
         ],
     )

@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from typing import NoReturn
 from unittest import mock
 
@@ -34,15 +35,16 @@ def _abort_context(
     )
 
 
-async def _mock_implementation(
-    trip_request: trips_pb2.SearchTripsRequest,
+async def _mock_one_way_implementation(
+    one_way: trips_pb2.SearchTripsRequest.OneWay,
+    passengers: Iterable[trips_pb2.SearchTripsRequest.Passenger],
 ) -> trips_pb2.SearchTripsResponse:
     return trips_pb2.SearchTripsResponse()
 
 
 @pytest.fixture()
 def trip_service() -> provider_trips.TripService:
-    return provider_trips.TripService(implementation=_mock_implementation)
+    return provider_trips.TripService(one_way=_mock_one_way_implementation)
 
 
 @pytest.fixture()

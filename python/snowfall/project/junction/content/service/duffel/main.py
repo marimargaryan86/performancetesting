@@ -47,7 +47,7 @@ async def _serve(app: application.Application[_Settings]) -> None:
                 provider_name=_PROVIDER_NAME,
             ),
             provider_trips.TripService(
-                implementation=trips.Trips(
+                one_way=trips.Trips(
                     search_client=client.DuffelClient(
                         http_client=httpx_client,
                         api_base_url=str(app.settings.api_base_url),
@@ -56,7 +56,7 @@ async def _serve(app: application.Application[_Settings]) -> None:
                         rate_limit_client=rate_limit_client,
                     ),
                     transformer=trips.Transformer(),
-                ).find,
+                ).find_one_way,
             ),
         ],
     )

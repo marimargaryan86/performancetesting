@@ -197,12 +197,13 @@ class Trips(object):
         self._client = search_client
         self._transformer = transformer
 
-    async def find(
+    async def find_one_way(
         self,
-        trip_request: trips_pb2.SearchTripsRequest,
+        one_way: trips_pb2.SearchTripsRequest.OneWay,
+        passengers: Iterable[trips_pb2.SearchTripsRequest.Passenger],
     ) -> trips_pb2.SearchTripsResponse:
         result = await self._client.create_offer_request(
-            offer_request_data=trip_search_to_offer_request(trip_request),
+            offer_request_data=one_way_to_offer_request(one_way, passengers),
         )
 
         return trips_pb2.SearchTripsResponse(
@@ -210,15 +211,11 @@ class Trips(object):
         )
 
 
-def trip_search_to_offer_request(
-    trip_request: trips_pb2.SearchTripsRequest,
+def one_way_to_offer_request(
+    one_way: trips_pb2.SearchTripsRequest.OneWay,
+    passengers: Iterable[trips_pb2.SearchTripsRequest.Passenger],
 ) -> request.OfferRequestData:
-    match trip_request.WhichOneof("search_mode"):
-        case "one_way":
-            last_travel_date = trip_request.one_way.criterion.departure_date
-            criterion = trip_request.one_way.criterion
-        case _:
-            raise NotImplementedError("Search mode not supported")
+    criterion = one_way.criterion
 
     return request.OfferRequestData(
         offer_data=request.OfferRequestDataList(
@@ -228,10 +225,10 @@ def trip_search_to_offer_request(
                         date_of_birth=protobuf.protobuf_to_date(
                             passenger.date_of_birth,
                         ),
-                        at_date=protobuf.protobuf_to_date(last_travel_date),
+                        at_date=protobuf.protobuf_to_date(criterion.departure_date),
                     ),
                 )
-                for passenger in trip_request.passengers
+                for passenger in passengers
             ],
             slices=[
                 request.OfferRequestSlice(

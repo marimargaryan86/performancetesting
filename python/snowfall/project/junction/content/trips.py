@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Iterable
 from typing import TYPE_CHECKING
 
 import grpc
@@ -9,15 +9,39 @@ from snowfall.project.junction.provider.v2alpha import trips_pb2, trips_pb2_grpc
 from snowfall.stdlib.transport.grpc import rich_status, service
 
 if TYPE_CHECKING:
-    Implementation = Callable[
-        [trips_pb2.SearchTripsRequest],
+    OneWayImplementation = Callable[
+        [
+            trips_pb2.SearchTripsRequest.OneWay,
+            Iterable[trips_pb2.SearchTripsRequest.Passenger],
+        ],
+        Awaitable[trips_pb2.SearchTripsResponse],
+    ]
+    RoundTripImplementation = Callable[
+        [
+            trips_pb2.SearchTripsRequest.RoundTrip,
+            Iterable[trips_pb2.SearchTripsRequest.Passenger],
+        ],
+        Awaitable[trips_pb2.SearchTripsResponse],
+    ]
+    MultiCityImplementation = Callable[
+        [
+            trips_pb2.SearchTripsRequest.MultiCity,
+            Iterable[trips_pb2.SearchTripsRequest.Passenger],
+        ],
         Awaitable[trips_pb2.SearchTripsResponse],
     ]
 
 
 class TripService(service.Service, trips_pb2_grpc.TripServiceServicer):
-    def __init__(self, implementation: Implementation):
-        self._implementation = implementation
+    def __init__(
+        self,
+        one_way: OneWayImplementation,
+        round_trip: RoundTripImplementation | None = None,
+        multi_city: MultiCityImplementation | None = None,
+    ):
+        self._one_way = one_way
+        self._round_trip = round_trip
+        self._multi_city = multi_city
 
     def get_name(self) -> str:
         return trips_pb2.DESCRIPTOR.services_by_name["TripService"].full_name
@@ -30,6 +54,15 @@ class TripService(service.Service, trips_pb2_grpc.TripServiceServicer):
         request: trips_pb2.SearchTripsRequest,
         context: grpc.aio.ServicerContext,
     ) -> trips_pb2.SearchTripsResponse:
+        await self._validate_request(request, context)
+
+        return await self._perform_search(request, context)
+
+    async def _validate_request(
+        self,
+        request: trips_pb2.SearchTripsRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> None:
         if not request.WhichOneof("search_mode"):
             await rich_status.abort_with_rich_status(
                 context=context,
@@ -50,4 +83,37 @@ class TripService(service.Service, trips_pb2_grpc.TripServiceServicer):
                 ),
             )
 
-        return await self._implementation(request)
+    async def _perform_search(
+        self,
+        request: trips_pb2.SearchTripsRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> trips_pb2.SearchTripsResponse:
+        match request.WhichOneof("search_mode"):
+            case "one_way":
+                response = await self._one_way(request.one_way, request.passengers)
+            case "round_trip":
+                if not self._round_trip:
+                    return await context.abort(
+                        grpc.StatusCode.UNIMPLEMENTED,
+                        "Roundtrip searches are not implemented.",
+                    )
+
+                response = await self._round_trip(
+                    request.round_trip,
+                    request.passengers,
+                )
+            case "multi_city":
+                if not self._multi_city:
+                    return await context.abort(
+                        grpc.StatusCode.UNIMPLEMENTED,
+                        "Multi-city searches are not implemented.",
+                    )
+
+                response = await self._multi_city(
+                    request.multi_city,
+                    request.passengers,
+                )
+            case _:
+                response = trips_pb2.SearchTripsResponse()
+
+        return response

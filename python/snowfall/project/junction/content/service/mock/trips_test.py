@@ -26,7 +26,10 @@ async def one_way_response(
     trip_searcher: trips.Trips,
     one_way_request: trips_pb2.SearchTripsRequest,
 ) -> trips_pb2.SearchTripsResponse:
-    return await trip_searcher.find(one_way_request)
+    return await trip_searcher.find_one_way(
+        one_way_request.one_way,
+        one_way_request.passengers,
+    )
 
 
 @pytest.fixture()
@@ -34,7 +37,10 @@ async def round_trip_response(
     trip_searcher: trips.Trips,
     roundtrip_request: trips_pb2.SearchTripsRequest,
 ) -> trips_pb2.SearchTripsResponse:
-    return await trip_searcher.find(roundtrip_request)
+    return await trip_searcher.find_round_trip(
+        roundtrip_request.round_trip,
+        roundtrip_request.passengers,
+    )
 
 
 @pytest.fixture()
@@ -42,7 +48,10 @@ async def multi_city_response(
     trip_searcher: trips.Trips,
     multi_city_request: trips_pb2.SearchTripsRequest,
 ) -> trips_pb2.SearchTripsResponse:
-    return await trip_searcher.find(multi_city_request)
+    return await trip_searcher.find_multi_city(
+        multi_city_request.multi_city,
+        multi_city_request.passengers,
+    )
 
 
 class TestTrips(object):
@@ -128,19 +137,17 @@ class TestTrips(object):
         trip_searcher: trips.Trips,
         passengers: Sequence[trips_pb2.SearchTripsRequest.Passenger],
     ) -> None:
-        response = await trip_searcher.find(
-            trips_pb2.SearchTripsRequest(
-                one_way=trips_pb2.SearchTripsRequest.OneWay(
-                    criterion=trips_pb2.SearchTripsRequest.Criterion(
-                        origin_identifier="XXX",
-                        destination_identifier="YYY",
-                        departure_date=protobuf.date_to_protobuf(
-                            datetime.date(year=2023, month=9, day=6),
-                        ),
+        response = await trip_searcher.find_one_way(
+            one_way=trips_pb2.SearchTripsRequest.OneWay(
+                criterion=trips_pb2.SearchTripsRequest.Criterion(
+                    origin_identifier="XXX",
+                    destination_identifier="YYY",
+                    departure_date=protobuf.date_to_protobuf(
+                        datetime.date(year=2023, month=9, day=6),
                     ),
                 ),
-                passengers=passengers,
             ),
+            passengers=passengers,
         )
 
         assert not len(response.results)

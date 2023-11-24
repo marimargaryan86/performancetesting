@@ -1,4 +1,4 @@
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
 
 from snowfall.project.junction.content.service.mock import client
 from snowfall.project.junction.provider.v2alpha import trips_pb2
@@ -50,25 +50,32 @@ class Trips(object):
         self._client = search_client
         self._transformer = transformer
 
-    async def find(
+    async def find_one_way(
         self,
-        trip_request: trips_pb2.SearchTripsRequest,
+        one_way: trips_pb2.SearchTripsRequest.OneWay,
+        passengers: Iterable[trips_pb2.SearchTripsRequest.Passenger],
     ) -> trips_pb2.SearchTripsResponse:
-        match trip_request.WhichOneof("search_mode"):
-            case "one_way":
-                return self._transformer.to_proto(
-                    self._client.find_one_way(trip_request.one_way),
-                )
-            case "round_trip":
-                return self._transformer.to_proto(
-                    self._client.find_round_trip(trip_request.round_trip),
-                )
-            case "multi_city":
-                return self._transformer.to_proto(
-                    self._client.find_multi_city(trip_request.multi_city),
-                )
+        return self._transformer.to_proto(
+            self._client.find_one_way(one_way),
+        )
 
-        return trips_pb2.SearchTripsResponse()
+    async def find_round_trip(
+        self,
+        round_trip: trips_pb2.SearchTripsRequest.RoundTrip,
+        passengers: Iterable[trips_pb2.SearchTripsRequest.Passenger],
+    ) -> trips_pb2.SearchTripsResponse:
+        return self._transformer.to_proto(
+            self._client.find_round_trip(round_trip),
+        )
+
+    async def find_multi_city(
+        self,
+        multi_city: trips_pb2.SearchTripsRequest.MultiCity,
+        passengers: Iterable[trips_pb2.SearchTripsRequest.Passenger],
+    ) -> trips_pb2.SearchTripsResponse:
+        return self._transformer.to_proto(
+            self._client.find_multi_city(multi_city),
+        )
 
 
 def _make_segment(
