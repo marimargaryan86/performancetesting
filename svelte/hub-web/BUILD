@@ -7,8 +7,8 @@ relocated_files(
     dest="",
 )
 
-docker_image(
+custom_image(
+    prefix="junction-hub",
     name="docker",
     dependencies=[":relocated_files"],
-    image_tags=["{build_args.VERSION}"],
 )

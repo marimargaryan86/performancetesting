@@ -62,6 +62,28 @@ def nomad_template(
             )
 
 
+def custom_image(prefix=None, **kwargs) -> None:  # type: ignore[no-untyped-def]  # noqa: ANN001,ANN003
+    repository = "{base_url}/{prefix}/{namespace}/{name}".format(
+        base_url=env("CI_PROJECT_PATH", ""),  # type: ignore[name-defined]  # noqa: F821
+        prefix=prefix or "",
+        namespace="-".join(
+            [
+                part.replace("_", "-")
+                for part in build_file_dir().parent.parts[1:]  # type: ignore[name-defined]  # noqa: F821
+            ],
+        ),
+        name=build_file_dir().name.replace("_", "-"),  # type: ignore[name-defined]  # noqa: F821
+    )
+
+    docker_image(  # type: ignore[name-defined]  # noqa: F821
+        **{
+            **kwargs,
+            "image_tags": ["{build_args.VERSION}"],
+            "repository": repository.replace("//", "/").strip("/"),
+        },
+    )
+
+
 def go_image(  # type: ignore[no-untyped-def]
     name: str,
     **kwargs,  # noqa: ANN003

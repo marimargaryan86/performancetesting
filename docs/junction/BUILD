@@ -2,9 +2,9 @@ files(
     name="source_files",
     sources=["**/*", "!build/**/*", "!node_modules/**/*", "!openapi/**/*"],
 )
-docker_image(
+custom_image(
+    prefix="docs",
     dependencies=["//openapi/junction/client_api:client_api", ":source_files"],
-    image_tags=["{build_args.VERSION}"],
     instructions=[
         "ARG REGISTRY",
         (
