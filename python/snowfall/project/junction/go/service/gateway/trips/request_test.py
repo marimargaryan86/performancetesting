@@ -13,7 +13,6 @@ from snowfall.project.junction.go.service.places.v1 import models_pb2
 from snowfall.project.junction.provider.v2alpha import meta_pb2
 from snowfall.project.junction.provider.v2alpha import trips_pb2 as provider_trips_pb2
 from snowfall.project.junction.v1 import passenger_type_pb2, segment_type_pb2
-from snowfall.stdlib import string
 from snowfall.stdlib.v1 import date_pb2, latlng_pb2
 
 _ORIGIN_IDENTIFIER = "foobar"
@@ -23,7 +22,6 @@ _DESTINATION_IATA = "BAZ"
 _NO_IATA_IDENTIFIER = "no_iata"
 _DEPARTURE_DATE = date_pb2.Date(year=2023, month=10, day=25)
 _RETURN_DATE = date_pb2.Date(year=2023, month=11, day=25)
-_PASSENGER_ID = string.uuid()
 _ORIGIN_COORDINATES = latlng_pb2.LatLng(
     latitude=1,
     longitude=1,
@@ -36,7 +34,6 @@ _TASK_PASSENGER = trips_pb2.Passenger(
     type=passenger_type_pb2.PASSENGER_TYPE_ADULT,
 )
 _REQUEST_PASSENGER = provider_trips_pb2.SearchTripsRequest.Passenger(
-    id=_PASSENGER_ID,
     date_of_birth=date_pb2.Date(
         year=datetime.datetime.now(tz=datetime.UTC).today().year - 30,
         month=1,
@@ -404,7 +401,6 @@ class TestRequestGenerator(object):
         mocker: plugin.MockerFixture,
     ) -> None:
         providers_list = providers.Collection([])
-        mocker.patch("snowfall.stdlib.string.uuid", return_value=_PASSENGER_ID)
         mocker.patch.object(
             providers_list,
             "all_healthy",
@@ -574,7 +570,6 @@ class TestRequestGenerator(object):
         mocker: plugin.MockerFixture,
     ) -> None:
         providers_list = providers.Collection([])
-        mocker.patch("snowfall.stdlib.string.uuid", return_value=_PASSENGER_ID)
         mocker.patch.object(
             providers_list,
             "all_healthy",
@@ -663,7 +658,6 @@ class TestRequestGenerator(object):
         mocker: plugin.MockerFixture,
     ) -> None:
         providers_list = providers.Collection([])
-        mocker.patch("snowfall.stdlib.string.uuid", return_value=_PASSENGER_ID)
         mocker.patch.object(
             providers_list,
             "all_healthy",
@@ -756,7 +750,6 @@ class TestRequestGenerator(object):
         mocker: plugin.MockerFixture,
     ) -> None:
         providers_list = providers.Collection([])
-        mocker.patch("snowfall.stdlib.string.uuid", return_value=_PASSENGER_ID)
         mocker.patch.object(
             providers_list,
             "all_healthy",

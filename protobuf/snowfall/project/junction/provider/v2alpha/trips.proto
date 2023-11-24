@@ -44,12 +44,11 @@ message Segment {
   Company marketed_by = 7;
   Company operated_by = 8;
   message Passenger {
-    string id = 1;
     message Seating {
       snowfall.project.junction.v1.FareType type = 1;
       string marketing_name = 2;
     }
-    Seating seating = 2;
+    Seating seating = 1;
   }
   repeated Passenger passengers = 9;
   message Vehicle {
@@ -88,7 +87,6 @@ message SearchTripsRequest {
     snowfall.stdlib.v1.Date departure_date = 5;
   }
   message Passenger {
-    string id = 3;
     oneof age {
       string type = 1;
       snowfall.stdlib.v1.Date date_of_birth = 2;
