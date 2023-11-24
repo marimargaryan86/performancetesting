@@ -7,6 +7,7 @@ from snowfall.stdlib.transport.amqp import consumer, types
 
 status_map: dict[str, Status.ValueType] = {
     "Solved": Status.STATUS_REFUND_DUE,
+    "Refund Due": Status.STATUS_REFUND_DUE,
     "Rejected": Status.STATUS_REJECTED,
     "No Refund": Status.STATUS_NO_REFUND,
 }
