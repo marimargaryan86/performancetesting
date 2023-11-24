@@ -43,6 +43,7 @@ class JourneyRepository(repository.ProtoRepository[models_pb2.Journey]):
         pymongo.IndexModel("reseller_id", background=True),
         pymongo.IndexModel("owner_reseller_ids", background=True),
         pymongo.IndexModel("created_at", background=True),
+        pymongo.IndexModel("updated_at", background=True),
     )
 
     def __init__(
