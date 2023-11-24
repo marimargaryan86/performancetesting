@@ -27,8 +27,9 @@ class Refunds(endpoints.HTTPEndpoint):
         if event_status:
             raise exceptions.HTTPException(
                 status_code=status.HTTP_200_OK,
-                detail="Accepted",
+                detail="Refund is updated",
             )
         raise exceptions.HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=status.HTTP_202_ACCEPTED,
+            detail="Refund not found",
         )
