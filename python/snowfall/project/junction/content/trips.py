@@ -1,33 +1,40 @@
 from __future__ import annotations
 
 from collections.abc import Awaitable, Callable, Iterable
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, NamedTuple
 
 import grpc
 
 from snowfall.project.junction.provider.v2alpha import trips_pb2, trips_pb2_grpc
 from snowfall.stdlib.transport.grpc import rich_status, service
 
+
+class OneWayRequest(NamedTuple):
+    request: trips_pb2.SearchTripsRequest.OneWay
+    passengers: Iterable[trips_pb2.SearchTripsRequest.Passenger]
+
+
+class RoundTripRequest(NamedTuple):
+    request: trips_pb2.SearchTripsRequest.RoundTrip
+    passengers: Iterable[trips_pb2.SearchTripsRequest.Passenger]
+
+
+class MultiCityRequest(NamedTuple):
+    request: trips_pb2.SearchTripsRequest.MultiCity
+    passengers: Iterable[trips_pb2.SearchTripsRequest.Passenger]
+
+
 if TYPE_CHECKING:
     OneWayImplementation = Callable[
-        [
-            trips_pb2.SearchTripsRequest.OneWay,
-            Iterable[trips_pb2.SearchTripsRequest.Passenger],
-        ],
+        [OneWayRequest],
         Awaitable[trips_pb2.SearchTripsResponse],
     ]
     RoundTripImplementation = Callable[
-        [
-            trips_pb2.SearchTripsRequest.RoundTrip,
-            Iterable[trips_pb2.SearchTripsRequest.Passenger],
-        ],
+        [RoundTripRequest],
         Awaitable[trips_pb2.SearchTripsResponse],
     ]
     MultiCityImplementation = Callable[
-        [
-            trips_pb2.SearchTripsRequest.MultiCity,
-            Iterable[trips_pb2.SearchTripsRequest.Passenger],
-        ],
+        [MultiCityRequest],
         Awaitable[trips_pb2.SearchTripsResponse],
     ]
 
@@ -90,7 +97,9 @@ class TripService(service.Service, trips_pb2_grpc.TripServiceServicer):
     ) -> trips_pb2.SearchTripsResponse:
         match request.WhichOneof("search_mode"):
             case "one_way":
-                response = await self._one_way(request.one_way, request.passengers)
+                response = await self._one_way(
+                    OneWayRequest(request.one_way, request.passengers),
+                )
             case "round_trip":
                 if not self._round_trip:
                     return await context.abort(
@@ -99,8 +108,10 @@ class TripService(service.Service, trips_pb2_grpc.TripServiceServicer):
                     )
 
                 response = await self._round_trip(
-                    request.round_trip,
-                    request.passengers,
+                    RoundTripRequest(
+                        request.round_trip,
+                        request.passengers,
+                    ),
                 )
             case "multi_city":
                 if not self._multi_city:
@@ -110,8 +121,10 @@ class TripService(service.Service, trips_pb2_grpc.TripServiceServicer):
                     )
 
                 response = await self._multi_city(
-                    request.multi_city,
-                    request.passengers,
+                    MultiCityRequest(
+                        request.multi_city,
+                        request.passengers,
+                    ),
                 )
             case _:
                 response = trips_pb2.SearchTripsResponse()

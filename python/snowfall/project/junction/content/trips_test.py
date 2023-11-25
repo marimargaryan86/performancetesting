@@ -1,4 +1,3 @@
-from collections.abc import Iterable
 from typing import NoReturn
 from unittest import mock
 
@@ -36,8 +35,7 @@ def _abort_context(
 
 
 async def _mock_one_way_implementation(
-    one_way: trips_pb2.SearchTripsRequest.OneWay,
-    passengers: Iterable[trips_pb2.SearchTripsRequest.Passenger],
+    request: provider_trips.OneWayRequest,
 ) -> trips_pb2.SearchTripsResponse:
     return trips_pb2.SearchTripsResponse()
 

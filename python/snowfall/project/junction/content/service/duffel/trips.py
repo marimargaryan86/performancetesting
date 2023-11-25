@@ -2,6 +2,7 @@ import zoneinfo
 from collections.abc import Iterable
 from typing import NamedTuple
 
+from snowfall.project.junction.content import trips
 from snowfall.project.junction.provider.v2alpha import trips_pb2
 from snowfall.project.junction.v1 import fare_type_pb2, segment_type_pb2
 from snowfall.stdlib import money, time
@@ -199,11 +200,10 @@ class Trips(object):
 
     async def find_one_way(
         self,
-        one_way: trips_pb2.SearchTripsRequest.OneWay,
-        passengers: Iterable[trips_pb2.SearchTripsRequest.Passenger],
+        one_way: trips.OneWayRequest,
     ) -> trips_pb2.SearchTripsResponse:
         result = await self._client.create_offer_request(
-            offer_request_data=one_way_to_offer_request(one_way, passengers),
+            offer_request_data=one_way_to_offer_request(one_way),
         )
 
         return trips_pb2.SearchTripsResponse(
@@ -212,10 +212,9 @@ class Trips(object):
 
 
 def one_way_to_offer_request(
-    one_way: trips_pb2.SearchTripsRequest.OneWay,
-    passengers: Iterable[trips_pb2.SearchTripsRequest.Passenger],
+    one_way: trips.OneWayRequest,
 ) -> request.OfferRequestData:
-    criterion = one_way.criterion
+    criterion = one_way.request.criterion
 
     return request.OfferRequestData(
         offer_data=request.OfferRequestDataList(
@@ -228,7 +227,7 @@ def one_way_to_offer_request(
                         at_date=protobuf.protobuf_to_date(criterion.departure_date),
                     ),
                 )
-                for passenger in passengers
+                for passenger in one_way.passengers
             ],
             slices=[
                 request.OfferRequestSlice(

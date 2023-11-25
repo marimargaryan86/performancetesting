@@ -1,5 +1,6 @@
-from collections.abc import Iterable, Sequence
+from collections.abc import Sequence
 
+from snowfall.project.junction.content import trips
 from snowfall.project.junction.content.service.mock import client
 from snowfall.project.junction.provider.v2alpha import trips_pb2
 from snowfall.project.junction.v1 import segment_type_pb2
@@ -52,29 +53,26 @@ class Trips(object):
 
     async def find_one_way(
         self,
-        one_way: trips_pb2.SearchTripsRequest.OneWay,
-        passengers: Iterable[trips_pb2.SearchTripsRequest.Passenger],
+        one_way: trips.OneWayRequest,
     ) -> trips_pb2.SearchTripsResponse:
         return self._transformer.to_proto(
-            self._client.find_one_way(one_way),
+            self._client.find_one_way(one_way.request),
         )
 
     async def find_round_trip(
         self,
-        round_trip: trips_pb2.SearchTripsRequest.RoundTrip,
-        passengers: Iterable[trips_pb2.SearchTripsRequest.Passenger],
+        round_trip: trips.RoundTripRequest,
     ) -> trips_pb2.SearchTripsResponse:
         return self._transformer.to_proto(
-            self._client.find_round_trip(round_trip),
+            self._client.find_round_trip(round_trip.request),
         )
 
     async def find_multi_city(
         self,
-        multi_city: trips_pb2.SearchTripsRequest.MultiCity,
-        passengers: Iterable[trips_pb2.SearchTripsRequest.Passenger],
+        multi_city: trips.MultiCityRequest,
     ) -> trips_pb2.SearchTripsResponse:
         return self._transformer.to_proto(
-            self._client.find_multi_city(multi_city),
+            self._client.find_multi_city(multi_city.request),
         )
 
 

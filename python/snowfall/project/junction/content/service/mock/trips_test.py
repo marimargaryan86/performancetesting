@@ -3,6 +3,7 @@ from collections.abc import Sequence
 
 import pytest
 
+from snowfall.project.junction.content import trips as provider_trips
 from snowfall.project.junction.content.service.mock import client, trips
 from snowfall.project.junction.provider.v2alpha import trips_pb2
 from snowfall.stdlib.format import protobuf
@@ -27,8 +28,10 @@ async def one_way_response(
     one_way_request: trips_pb2.SearchTripsRequest,
 ) -> trips_pb2.SearchTripsResponse:
     return await trip_searcher.find_one_way(
-        one_way_request.one_way,
-        one_way_request.passengers,
+        provider_trips.OneWayRequest(
+            one_way_request.one_way,
+            one_way_request.passengers,
+        ),
     )
 
 
@@ -38,8 +41,10 @@ async def round_trip_response(
     roundtrip_request: trips_pb2.SearchTripsRequest,
 ) -> trips_pb2.SearchTripsResponse:
     return await trip_searcher.find_round_trip(
-        roundtrip_request.round_trip,
-        roundtrip_request.passengers,
+        provider_trips.RoundTripRequest(
+            roundtrip_request.round_trip,
+            roundtrip_request.passengers,
+        ),
     )
 
 
@@ -49,8 +54,10 @@ async def multi_city_response(
     multi_city_request: trips_pb2.SearchTripsRequest,
 ) -> trips_pb2.SearchTripsResponse:
     return await trip_searcher.find_multi_city(
-        multi_city_request.multi_city,
-        multi_city_request.passengers,
+        provider_trips.MultiCityRequest(
+            multi_city_request.multi_city,
+            multi_city_request.passengers,
+        ),
     )
 
 
@@ -138,16 +145,18 @@ class TestTrips(object):
         passengers: Sequence[trips_pb2.SearchTripsRequest.Passenger],
     ) -> None:
         response = await trip_searcher.find_one_way(
-            one_way=trips_pb2.SearchTripsRequest.OneWay(
-                criterion=trips_pb2.SearchTripsRequest.Criterion(
-                    origin_identifier="XXX",
-                    destination_identifier="YYY",
-                    departure_date=protobuf.date_to_protobuf(
-                        datetime.date(year=2023, month=9, day=6),
+            provider_trips.OneWayRequest(
+                trips_pb2.SearchTripsRequest.OneWay(
+                    criterion=trips_pb2.SearchTripsRequest.Criterion(
+                        origin_identifier="XXX",
+                        destination_identifier="YYY",
+                        departure_date=protobuf.date_to_protobuf(
+                            datetime.date(year=2023, month=9, day=6),
+                        ),
                     ),
                 ),
+                passengers,
             ),
-            passengers=passengers,
         )
 
         assert not len(response.results)
