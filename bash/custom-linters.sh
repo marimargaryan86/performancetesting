@@ -35,8 +35,11 @@ while read -r project id; do
 	SENTRY_PROJECTS["$project"]="$id"
 done <<<"$(sentry-cli projects list | awk 'NR>4 {print last} {last=$4" "$2}')"
 
+DOCKER_IMAGES=$(pants --filter-target-type='docker_image' peek ::)
+
 mapfile -t NOMAD_FILES < <(pants --filter-address-regex='_nomad$' peek :: | jq -r ".[] | .sources[0]")
-mapfile -t DOCKER_IMAGES < <(pants --filter-target-type='docker_image' peek :: | jq -r ".[] | .address")
+mapfile -t DOCKER_ADDRESSES < <(echo "${DOCKER_IMAGES}" | jq -r ".[] | .address")
+mapfile -t DOCKER_REPOSITORIES < <(echo "${DOCKER_IMAGES}" | jq -r ".[] | select(.repository != null) | .repository")
 mapfile -t PROTOBUF_FILES < <(pants --filter-target-type="protobuf_source" list ::)
 mapfile -t VALID_DEBUG_INFO_ADDRESSES < <(pants --filter-address-regex='_debug_info$' peek :: | jq -r '.[] | .address')
 mapfile -t UNSTABLE_PROTOS < <(pants --filter-target-type="protobuf_source" list :: | grep -P -e "${UNSTABLE_REGEX}" | xargs pants dependents --transitive)
@@ -56,7 +59,7 @@ for f in "${PROTOBUF_FILES[@]}"; do
 	fi
 done
 
-for i in "${DOCKER_IMAGES[@]}"; do
+for i in "${DOCKER_ADDRESSES[@]}"; do
 	SERVICE_NAME=$(basename "${i%:*}")
 	SERVICE_NAME="${SERVICE_NAME//_/-}"
 
@@ -116,6 +119,19 @@ for RUNNABLE in "${RUNNABLES[@]}"; do
 done
 
 for f in "${NOMAD_FILES[@]}"; do
+	if grep -q -e "^variable \"docker_image\" {$" "${f}"; then
+		EXPECTED_REPOSITORY=$(dirname "${f#nomad/}" | sed -r 's|/|:|g; s|:([^:]*)$|/\1|; s|:|-|g')
+
+		if [[ -n ${CI_PROJECT_PATH+x} ]]; then
+			EXPECTED_REPOSITORY="${CI_PROJECT_PATH}/${EXPECTED_REPOSITORY}"
+		fi
+
+		# shellcheck disable=SC2076
+		if [[ ! " ${DOCKER_REPOSITORIES[*]} " =~ " ${EXPECTED_REPOSITORY} " ]]; then
+			echo "${f}: expected docker_image \"${EXPECTED_REPOSITORY}\" does not exist"
+			FAILURE=1
+		fi
+	fi
 
 	if [[ "${SENTRY_PROJECTS[$(basename "${f%/*}")]-0}" -ne 0 ]]; then
 
