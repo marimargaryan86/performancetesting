@@ -1,11 +1,19 @@
 {
   "development": {
-    "variables": {}
+    "variables": {
+      "bucket": "junction-pay-development"
+    }
   },
   "production": {
-    "variables": {}
+    "deploy": false,
+    "variables": {
+      "bucket": "junction-pay-production"
+    }
   },
   "sandbox": {
-    "variables": {}
+    "deploy": true,
+    "variables": {
+      "bucket": "junction-pay-sandbox"
+    }
   }
 }

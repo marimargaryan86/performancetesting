@@ -22,6 +22,7 @@ from snowfall.project.pay.service.transactions.grpc import (
 )
 from snowfall.project.pay.service.transactions.reports_cron import NetsuiteReportJob
 from snowfall.stdlib.instrumentation.httpx import metrics
+from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.service import application, grpc_factory, redis_factory
 from snowfall.stdlib.transport.grpc import server
 from snowfall.vendor.currency_cloud.client import CurrencyCloudAuth, PaymentClient
@@ -43,6 +44,7 @@ class _ReportsSettings(application.Settings):
     smtp_dsn: pydantic.AnyUrl
     pay_email: str
     finance_email: str
+    storage_dsn: application.AnyDsn
 
 
 async def _serve(app: application.Application[_GrpcSettings]) -> None:
@@ -124,6 +126,9 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
 async def _reports_cron_run(
     app: application.Application[_ReportsSettings],
 ) -> None:
+    storage = await app.stack.enter_async_context(
+        filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
+    )
     job = NetsuiteReportJob(
         email_client=smtp.EmailClient(
             aiosmtplib.SMTP(
@@ -135,6 +140,7 @@ async def _reports_cron_run(
             from_email=app.settings.pay_email,
             to_email=app.settings.finance_email,
         ),
+        storage=storage,
     )
 
     await job.run()
