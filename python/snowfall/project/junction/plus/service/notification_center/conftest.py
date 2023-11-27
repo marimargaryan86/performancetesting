@@ -8,6 +8,7 @@ from snowfall.project.junction.plus.adapter import (
     subscribers,
 )
 from snowfall.project.junction.plus.notification_channels import (
+    http_webhook,
     push_notification,
     whatsapp,
 )
@@ -76,13 +77,20 @@ def push_notification_channel() -> push_notification.Channel:
 
 
 @pytest.fixture()
+def http_webhook_channel() -> http_webhook.Channel:
+    return http_webhook.MockChannel()
+
+
+@pytest.fixture()
 def channels(
     whatsapp_channel: whatsapp.Channel,
     push_notification_channel: push_notification.Channel,
+    http_webhook_channel: http_webhook.Channel,
 ) -> states.Channels:
     return states.Channels(
         whatsapp_channel=whatsapp_channel,
         push_notification_channel=push_notification_channel,
+        http_webhook_channel=http_webhook_channel,
     )
 
 

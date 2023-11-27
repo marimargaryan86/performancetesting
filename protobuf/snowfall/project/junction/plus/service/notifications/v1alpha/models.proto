@@ -75,6 +75,11 @@ message RouteIdentifier {
   int32 flight_number = 2;
 }
 
+message WebhookEndpoint {
+  string path = 1;
+  string encryption_key = 2;
+}
+
 message Subscriber {
   string id = 1;
   string reseller_id = 2;
@@ -90,6 +95,7 @@ message Subscriber {
   SubscribedStatus phone_subscription_status = 7;
   SubscribedStatus email_subscription_status = 8;
   string push_notifications_token = 9;
+  WebhookEndpoint webhook_endpoint = 10;
 }
 
 message ConfigurationVector {
@@ -109,6 +115,7 @@ enum Channel {
   CHANNEL_EMAIL = 1;
   CHANNEL_WHATSAPP = 2;
   CHANNEL_PUSH_NOTIFICATION = 3;
+  CHANNEL_HTTP_WEBHOOK = 4;
 }
 
 message MonitoringRule {

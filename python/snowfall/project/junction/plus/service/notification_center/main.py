@@ -10,6 +10,7 @@ from redis import asyncio as aioredis
 
 from snowfall.project.junction.plus.adapter import configuration_vectors, subscribers
 from snowfall.project.junction.plus.notification_channels import (
+    http_webhook,
     push_notification,
     whatsapp,
 )
@@ -84,6 +85,7 @@ async def _import(app: application.Application[_ImportSettings]) -> None:
             push_notification_channel=push_notification.ProviderChannel(
                 credentials=cert_tmp_path(app.settings.firebase_key),
             ),
+            http_webhook_channel=http_webhook.ProviderChannel(),
         ),
     )
     await notification_event_importer.consume()

@@ -2,6 +2,7 @@ from collections.abc import Mapping
 
 from snowfall.project.junction.plus.notification_channels import (
     channel,
+    http_webhook,
     push_notification,
     whatsapp,
 )
@@ -14,10 +15,12 @@ class Channels(object):
         self,
         whatsapp_channel: whatsapp.Channel,
         push_notification_channel: push_notification.Channel,
+        http_webhook_channel: http_webhook.Channel,
     ):
         self._channels: Mapping[int, channel.AbstractChannel] = {
             models_pb2.Channel.CHANNEL_WHATSAPP: whatsapp_channel,
             models_pb2.Channel.CHANNEL_PUSH_NOTIFICATION: push_notification_channel,
+            models_pb2.Channel.CHANNEL_HTTP_WEBHOOK: http_webhook_channel,
         }
         self._logger = stdout.get_logger()
 
