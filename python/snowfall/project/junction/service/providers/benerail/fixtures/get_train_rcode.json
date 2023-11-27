@@ -1,0 +1,77 @@
+{
+  "metadata": {
+    "apiVersion": "0.6.1",
+    "buildVersion": "mr67.0",
+    "environment": "accept-c03",
+    "respondedAt": "2023-11-21T08:36:06.067+01:00",
+    "resourceType": "RcodesResult"
+  },
+  "result": {
+    "links": {
+      "self": "https://benerail-stg-apim.azure-api.net/rcode/rcode/value/urn:itti:train_type:ICD/",
+      "parent": "https://benerail-stg-apim.azure-api.net/rcode/rcode-type/train_type"
+    },
+    "rcodes": [
+      {
+        "links": {
+          "self": "https://benerail-stg-apim.azure-api.net/rcode/rcode/id/4029/109"
+        },
+        "id": "4029#109#1692035505000",
+        "codeId": 109,
+        "typeId": "TRAIN_TYPE",
+        "sortingTag": 0,
+        "metadata": {
+          "lastUpdateAt": "2023-08-14T17:51:45Z",
+          "validity": {
+            "startsAt": "2001-12-31",
+            "travel": {
+              "startsAt": "2001-12-31",
+              "endsAt": "2999-12-31"
+            }
+          }
+        },
+        "labels": {
+          "en": {
+            "codeShort": "ICD",
+            "codeLong": "Intercity direct",
+            "text": "Intercity direct"
+          },
+          "*": {
+            "codeShort": "ICD",
+            "codeLong": "Intercity direct",
+            "text": "Intercity direct"
+          },
+          "fr": {
+            "codeShort": "ICD",
+            "codeLong": "Intercity direct",
+            "text": "Intercity direct"
+          },
+          "nl": {
+            "codeShort": "ICD",
+            "codeLong": "Intercity direct",
+            "text": "Intercity direct"
+          }
+        },
+        "codes": {
+          "bdws": "urn:bdws:train_type:ICD",
+          "rtb": "urn:rtb:train_type:ICD",
+          "tam": "urn:tam:train_type:ICD",
+          "itti": "urn:itti:train_type:ICD",
+          "csta": "urn:csta:train_type:ICD",
+          "bnds": "urn:bnds:train_type:ICD",
+          "epa": "urn:epa:train_type:40",
+          "uic": "urn:uic:train_type:ICD",
+          "taco": "urn:taco:train_type:ICD",
+          "trl": "urn:trl:train_type:ICD"
+        },
+        "_links": {
+          "self": "https://benerail-stg-apim.azure-api.net/rcode/rcode/id/4029/109"
+        }
+      }
+    ],
+    "_links": {
+      "self": "https://benerail-stg-apim.azure-api.net/rcode/rcode/value/urn:itti:train_type:ICD/",
+      "parent": "https://benerail-stg-apim.azure-api.net/rcode/rcode-type/train_type"
+    }
+  }
+}
