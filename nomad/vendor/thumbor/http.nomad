@@ -35,7 +35,7 @@ job "thumbor-http" {
   }
 
   group "http" {
-    count = 1
+    count = 2
 
     network {
       port "http" {
@@ -59,7 +59,7 @@ job "thumbor-http" {
       driver = "docker"
 
       resources {
-        memory = 1024
+        memory = 512
       }
       vault {
         policies = ["thumbor-${var.environment}"]
