@@ -27,7 +27,10 @@ from snowfall.project.junction.extensions.service.mobile_api import (
     plus_client as plus_poc_client,
 )
 from snowfall.project.junction.extensions.service.mobile_api.routes import router
-from snowfall.project.junction.plus.adapter import flight_delay_predictor
+from snowfall.project.junction.plus.adapter import co2_emissions, flight_delay_predictor
+from snowfall.project.junction.plus.service.co2_emissions.v1 import (
+    co2_emissions_pb2_grpc,
+)
 from snowfall.project.junction.plus.service.flight_prediction.v1 import (
     flight_prediction_pb2_grpc,
 )
@@ -110,7 +113,7 @@ async def _get_httpx_auth_and_middlewares(
     return httpx_auth_method, custom_middlewares
 
 
-async def _http(
+async def _http(  # noqa: WPS217
     app: application.Application[bootstrap.Settings],
 ) -> None:
     stripe.api_key = app.settings.stripe_api_key
@@ -179,6 +182,15 @@ async def _http(
             flight_prediction_channel,
         ),
     )
+    co2_emissions_channel = await grpc_factory.make_insecure_channel(
+        app,
+        app.settings.co2_emissions_address,
+    )
+    co2_emissions_client = co2_emissions.GrpcClient(
+        co2_emissions_pb2_grpc.CO2EmissionsServiceStub(
+            co2_emissions_channel,
+        ),
+    )
 
     with spec.get_api_spec(cookie_auth=app.settings.cookie_auth_enabled) as spec_path:
         asgi_app = starlette.create_starlette_app(
@@ -237,6 +249,7 @@ async def _http(
                     jwt_gen=jwt_gen,
                     httpx_client=junction_httpx_client,
                     predictions_client=predictions_client,
+                    co2_emissions_client=co2_emissions_client,
                 ),
             ),
             custom_middlewares=custom_middlewares,

@@ -5,6 +5,7 @@ from starlette import routing
 
 from snowfall.project.junction.extensions.service.mobile_api import repository
 from snowfall.project.junction.extensions.service.mobile_api.routes import (
+    co2_emissions,
     enums,
     guests,
     loyalty_programs,
@@ -134,6 +135,11 @@ def get_routes(
             "/push-notifications/tokens/{deviceToken}",
             notification_tokens.PushNotificationToken,
             name="PushNotificationToken",
+        ),
+        integration.route(
+            "/co2-emissions",
+            co2_emissions.Co2Emission,
+            name="Co2Emission",
         ),
         integration.route(
             "/flight-delay-prediction",

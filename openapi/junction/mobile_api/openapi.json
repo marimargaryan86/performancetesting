@@ -114,6 +114,11 @@
       "x-displayName": "Cabins"
     },
     {
+      "name": "emissions",
+      "description": "Flight CO2 Emissions",
+      "x-displayName": "Flight CO2 Emissions"
+    },
+    {
       "name": "groups",
       "description": "Endpoints for user groups.",
       "x-displayName": "Groups"
@@ -2524,6 +2529,66 @@
         ],
         "summary": "Get Flight Delay Prediction"
       }
+    },
+    "/co2-emissions": {
+      "post": {
+        "tags": [
+          "emissions"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Emissions"
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "./../client_api/openapi.json#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Unauthorized"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/Flights"
+                  }
+                }
+              }
+            }
+          },
+          "description": ""
+        },
+        "operationId": "post-co2-emissions",
+        "description": "Get CO2 emissions of the flight",
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Create CO2 emissions calculation request"
+      }
     }
   },
   "components": {
@@ -2788,6 +2853,137 @@
             ]
           }
         }
+      },
+      "Flights": {
+        "title": "Flights",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "560c2f2d-874e-4f59-993e-a47eb9fddc76",
+            "description": "Unique ID for request",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "emissions"
+            ],
+            "example": "emissions",
+            "readOnly": true
+          },
+          "attributes": {
+            "type": "object",
+            "properties": {
+              "flights": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Flight"
+                }
+              }
+            },
+            "required": [
+              "flights"
+            ]
+          }
+        }
+      },
+      "Emissions": {
+        "title": "CO2 Emissions",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "AA00012019-08-24T14:15:22Z",
+            "description": "Combination of the operatingCarrierCode and flightNumber",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "emissions"
+            ],
+            "example": "emissions",
+            "readOnly": true
+          },
+          "attributes": {
+            "type": "object",
+            "properties": {
+              "flight": {
+                "$ref": "#/components/schemas/Flight"
+              },
+              "emissions": {
+                "$ref": "#/components/schemas/Emission"
+              }
+            },
+            "required": [
+              "flight"
+            ]
+          }
+        }
+      },
+      "Flight": {
+        "title": "Flight body",
+        "type": "object",
+        "properties": {
+          "origin": {
+            "type": "string",
+            "example": "LHR",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "destination": {
+            "type": "string",
+            "example": "ATH",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "operatingCarrierCode": {
+            "type": "string",
+            "example": "AA"
+          },
+          "flightNumber": {
+            "type": "number",
+            "example": 803
+          },
+          "departureDate": {
+            "type": "string",
+            "format": "date",
+            "example": "2019-08-24"
+          }
+        },
+        "required": [
+          "origin",
+          "destination",
+          "operatingCarrierCode",
+          "flightNumber",
+          "departureDate"
+        ]
+      },
+      "Emission": {
+        "title": "Emission body",
+        "type": "object",
+        "properties": {
+          "first": {
+            "type": "number",
+            "example": 80
+          },
+          "business": {
+            "type": "number",
+            "example": 80
+          },
+          "premiumEconomy": {
+            "type": "number",
+            "example": 80
+          },
+          "economy": {
+            "type": "number",
+            "example": 80
+          },
+          "units": {
+            "type": "string",
+            "example": "KG"
+          }
+        },
+        "readOnly": true
       },
       "ApplicableTo": {
         "title": "Applicable To",

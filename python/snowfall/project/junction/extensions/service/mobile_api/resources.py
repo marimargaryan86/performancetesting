@@ -9,6 +9,9 @@ from google.protobuf.json_format import MessageToDict
 
 from snowfall.project.junction.extensions.service.mobile_api.v1alpha import models_pb2
 from snowfall.project.junction.plus.adapter.flight_delay_predictor import Prediction
+from snowfall.project.junction.plus.service.co2_emissions.v1 import (
+    co2_emissions_pb2,
+)
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import models
@@ -342,5 +345,37 @@ class PredictionResource(models.Resource):
                 "flightNumber": prediction.flight_number,
                 "scheduledDepartureAt": prediction.scheduled_departure_at,
                 "delay": prediction.delay,
+            },
+        )
+
+
+class Co2EmissionsResource(models.Resource):
+    @classmethod
+    def from_proto(
+        cls,
+        co2_emission: co2_emissions_pb2.FlightEmission,
+        departure_date: str,
+    ) -> Co2EmissionsResource:
+        return cls(
+            id="{0}{1}".format(
+                co2_emission.operating_carrier_code,
+                co2_emission.flight_number,
+            ),
+            type="emissions",
+            attributes={
+                "flight": {
+                    "origin": co2_emission.origin,
+                    "destination": co2_emission.destination,
+                    "operatingCarrierCode": co2_emission.operating_carrier_code,
+                    "flightNumber": co2_emission.flight_number,
+                    "departureDate": departure_date,
+                },
+                "emissions": {
+                    "first": co2_emission.emissions_per_pax.first,
+                    "business": co2_emission.emissions_per_pax.business,
+                    "premiumEconomy": co2_emission.emissions_per_pax.premium_economy,
+                    "economy": co2_emission.emissions_per_pax.economy,
+                    "unit": co2_emission.unit,
+                },
             },
         )

@@ -14,6 +14,9 @@ from snowfall.project.junction.extensions.service.mobile_api import (
     plus_client as plus_poc_http_client,
 )
 from snowfall.project.junction.plus.adapter import (
+    co2_emissions as co2_emissions_adapter,
+)
+from snowfall.project.junction.plus.adapter import (
     flight_delay_predictor as flight_prediction_adapter,
 )
 from snowfall.project.pay.adapter import bills
@@ -41,6 +44,7 @@ class Settings(application.Settings):
     smtp_dsn: AnyUrl
     mongo_dsn: Sequence[AnyUrl]
     flight_prediction_address: str
+    co2_emissions_address: str
     jwt_private_key: str
     jwt_token_version: str
     jwt_public_key: str
@@ -77,6 +81,7 @@ def create_dependencies(
     markups_repository: repository.MarkupsRepository,
     bills_client: bills.Client,
     predictions_client: flight_prediction_adapter.Client,
+    co2_emissions_client: co2_emissions_adapter.Client,
 ) -> lagom.Container:
     container = lagom.Container()
     container[repository.OrdersRepository] = orders_repository
@@ -100,4 +105,5 @@ def create_dependencies(
     container[repository.MarkupsRepository] = markups_repository
     container[bills.Client] = bills_client  # type: ignore[type-abstract]
     container[flight_prediction_adapter.Client] = predictions_client  # type: ignore[type-abstract]
+    container[co2_emissions_adapter.Client] = co2_emissions_client  # type: ignore[type-abstract]
     return container

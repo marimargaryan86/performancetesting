@@ -108,6 +108,10 @@ job "mobile-api-http-booking-hub" {
               destination_name = "flight-prediction-${var.environment}"
             }
             upstreams {
+              local_bind_port  = 8050
+              destination_name = "co2-emissions-grpc-${var.environment}"
+            }
+            upstreams {
               local_bind_port  = 8070
               destination_name = "client-api-${var.environment}"
             }
@@ -167,6 +171,7 @@ JUNCTION_API_ADDRESS={{(printf "http://%s" (env "NOMAD_UPSTREAM_ADDR_client-api-
 PLUS_API_ADDRESS={{(printf "http://%s" (env "NOMAD_UPSTREAM_ADDR_plus-api-${var.environment}"))}}
 TRANSACTIONS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_transactions-${var.environment}"))}}
 FLIGHT_PREDICTION_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_flight-prediction-${var.environment}"))}}
+CO2_EMISSIONS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_co2-emissions-grpc-${var.environment}"))}}
 AUTHENTICATION_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_authentication-${var.environment}"))}}
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
