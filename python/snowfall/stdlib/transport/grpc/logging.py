@@ -18,7 +18,7 @@ class LoggingServerInterceptor(interceptor.ServerInterceptor):
         request: Message,
         context: aio.ServicerContext,
     ) -> Message:
-        async with self._log(continuation.__name__, context):
+        async with self._log(continuation.__name__, context, request):
             return await continuation(request, context)
 
     @contextlib.asynccontextmanager
@@ -26,6 +26,7 @@ class LoggingServerInterceptor(interceptor.ServerInterceptor):
         self,
         name: str,
         context: aio.ServicerContext,
+        request: Message,
     ) -> AsyncIterator[None]:
         try:
             yield
@@ -49,4 +50,5 @@ class LoggingServerInterceptor(interceptor.ServerInterceptor):
                 "Request processed.",
                 name=name,
                 status=status.value[1].replace(" ", "_"),
+                response_size=request.ByteSize(),
             )
