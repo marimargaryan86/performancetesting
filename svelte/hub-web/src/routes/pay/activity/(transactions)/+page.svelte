@@ -13,34 +13,15 @@
   import TCol from "components/ui/table/t-col.svelte";
   import { yymmdd } from "formatting/date-time";
   import { capitalize } from "utils/common";
-  import TransactionDetails from "./transaction-details/transaction-details.svelte";
   import TCompanyCol from "components/ui/table/t-company-col.svelte";
   import TMoneyCol from "components/ui/table/t-money-col.svelte";
-  import type { TripBooking } from "integration/junction-hub-api/schemas/booking";
-  import type { Transaction } from "integration/junction-hub-api/schemas/transaction";
   import type { ScrollLoadFunc } from "directives/scroll-load";
   import integrationInstancesClient from "integration-instances-client";
   import type TransactionService from "integration/junction-hub-api/services/transaction-service";
 
   export let data;
 
-  let selectedTransaction: Transaction | undefined = undefined;
-  let bookingRequest: Promise<TripBooking | undefined> | undefined = undefined;
-
   $: transactions = data.transactions.data;
-
-  function showDetails(transaction: Transaction): void {
-    selectedTransaction = transaction;
-
-    if (selectedTransaction) {
-      bookingRequest = getBooking(selectedTransaction.externalReference);
-    }
-  }
-
-  function deselectTransaction(): void {
-    selectedTransaction = undefined;
-    bookingRequest = undefined;
-  }
 
   const loadMore: ScrollLoadFunc = async () => {
     if (!data.transactions.cursor) {
@@ -60,27 +41,11 @@
 
     return { depleted: !nextTransactions.cursor };
   };
-
-  async function getBooking(externalReference: string): Promise<TripBooking | undefined> {
-    try {
-      return await integrationInstancesClient.hub.bookings.get({ id: externalReference });
-    } catch {
-      return undefined;
-    }
-  }
 </script>
 
 <svelte:head>
   <title>Transactions · Activity · Pay · Junction Hub</title>
 </svelte:head>
-
-{#if selectedTransaction}
-  <TransactionDetails
-    transaction={selectedTransaction}
-    {bookingRequest}
-    on:close={deselectTransaction}
-  />
-{/if}
 
 <Table class="transactions-table" {loadMore}>
   <THead>
@@ -98,7 +63,7 @@
 
   <TBody>
     {#each transactions as item (item.id)}
-      <TRow on:click={showDetails.bind(showDetails, item)}>
+      <TRow>
         <TCol maxWidth="96px" copyable>{item.externalReference}</TCol>
         <TCol>{yymmdd(item.createdAt)}</TCol>
         <TCol width="0">{capitalize(item.payment.method)}</TCol>
