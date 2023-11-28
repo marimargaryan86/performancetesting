@@ -23,7 +23,7 @@ class _MetricsInterceptor(abc.ABC):
         rpc_name: str,
         status_code: StatusCode,
         request: Message,
-        response: Message | None,
+        response: aio.UnaryUnaryCall | Message | None,
         start: float,
     ) -> None:
         self._total.labels(
@@ -39,7 +39,7 @@ class _MetricsInterceptor(abc.ABC):
             status=status_code.name,
         ).observe(request.ByteSize())
 
-        if response:
+        if isinstance(response, Message):
             self._response_bytes.labels(
                 rpc=rpc_name,
                 status=status_code.name,
