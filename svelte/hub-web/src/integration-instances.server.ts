@@ -40,5 +40,6 @@ export default {
     loginFlow: new ory.LoginFlowService(env.ORY_BASE_URL),
     recoveryFlow: new ory.RecoveryFlowService(env.ORY_BASE_URL),
     auth: new ory.AuthenticationService(env.ORY_BASE_URL),
+    settingsFlow: new ory.SettingsFlowService(env.ORY_BASE_URL),
   },
 };

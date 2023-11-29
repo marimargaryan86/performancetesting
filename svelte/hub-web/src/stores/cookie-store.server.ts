@@ -69,6 +69,9 @@ function createCookie<TValue>(
 export const cookieStore = {
   loginToken: createCookie<Record<string, string>>("login-token"),
   recoveryToken: createCookie<{ id: string; cookies: Record<string, string> }>("recovery-token"),
+  userSettingsToken: createCookie<{ id: string; cookies: Record<string, string> }>(
+    "user-settings-token",
+  ),
   sessionToken: createCookie<Session>("session-token"),
   sessionMetaToken: createCookie<SessionMeta>("session-meta-token"),
   searchToken: createCookie<BookingSessionModel>("search-token"),

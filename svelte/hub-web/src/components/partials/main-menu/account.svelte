@@ -1,16 +1,8 @@
-<script lang="ts" context="module">
-  import type { UserRole } from "integration/ory/schemas/authentication";
-
-  function formatRole(role: UserRole): string {
-    return capitalize(role.replaceAll("-", " "));
-  }
-</script>
-
 <script lang="ts">
+  import { formatRole } from "formatting/user";
   import md5 from "md5";
   import routeConfig from "routeConfig";
   import userStore from "stores/user-store";
-  import { capitalize } from "utils/common";
 
   export let transitionTimeMs: number;
   export let expanded: boolean;
