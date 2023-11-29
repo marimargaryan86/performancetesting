@@ -4,7 +4,7 @@
     const { seniors65, seniors60, adults, youths15, youths12, children6, children4, children0 } =
       passengers;
 
-    return [
+    let result = [
       seniors65 ? `${seniors65} Senior${seniors65 === 1 ? "" : "s"} (65+)` : undefined,
       seniors60 ? `${seniors60} Senior${seniors60 === 1 ? "" : "s"} (60-64)` : undefined,
       adults ? `${adults} Adult${adults === 1 ? "" : "s"} (26-59)` : undefined,
@@ -16,6 +16,10 @@
     ]
       .filter(ensureDefined)
       .join(", ");
+
+    tripStore.update((store) => ({ ...store, passengersPresentation: result }));
+
+    return result;
   }
 </script>
 
@@ -30,6 +34,7 @@
   import SummaryItinerary from "./summary-itinerary.svelte";
   import type { PassengerPickerData } from "../trip-search/passenger-picker/passenger-picker.svelte";
   import { createEventDispatcher } from "svelte";
+  import { tripStore } from "../../../../stores/tripStore";
 
   export let priceQuote: TripOfferPriceQuote | undefined = undefined;
   export let passengers: PassengerPickerData;
@@ -44,13 +49,14 @@
 
   $: priceBreakdown = priceQuote ? getTotalPriceBreakdown(priceQuote) : undefined;
   $: totalPrice = priceQuote?.price.total;
+  $: passengersPresentation = getPassengersPresentation(passengers);
 </script>
 
 <Collapsible bind:this={collapsible} title="Summary">
   <div class="details">
     {#if priceQuote}
       <p class="typography label-large">
-        Passengers <span class="typography bold">{getPassengersPresentation(passengers)}</span>
+        Passengers <span class="typography bold">{passengersPresentation}</span>
       </p>
 
       <p class="typography label-large">

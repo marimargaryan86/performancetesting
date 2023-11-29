@@ -32,7 +32,7 @@
   import { getPassengerValidator } from "utils/passenger";
   import { writable } from "svelte/store";
   import { formatAmount } from "formatting/currency";
-
+  import TripBanner from "../../components/trip-banner.svelte";
   export let data;
 
   let fareRulesDialog: FareRulesDialog | undefined;
@@ -208,8 +208,10 @@
 <FareRulesDialog bind:this={fareRulesDialog} {priceQuote} />
 
 <div class="content">
+  <div class="trip-banner">
+    <TripBanner {priceQuote} />
+  </div>
   <Countdown expiresAt={priceQuote.expiresAt} show />
-
   <div class="wrapper">
     <div class="column passengers">
       {#each bookingData.passengers as passenger, idx}
@@ -282,6 +284,9 @@
 
   .content > :global(.countdown) {
     max-width: 1104px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   .wrapper {
@@ -336,6 +341,10 @@
 
   .total > em {
     color: var(--color-main-primary-500);
+  }
+
+  .trip-banner {
+    max-width: 1104px;
   }
 
   .actions::after {

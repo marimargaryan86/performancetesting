@@ -4,6 +4,7 @@ import { getMaxDate, getMinDate, getTimeDeltaMs } from "./date-time";
 import type { Offer } from "integration/junction-mobile-api/schemas/offer";
 import { summarizePrices } from "./money";
 import type { TripOfferPriceQuote } from "integration/junction-mobile-api/schemas/trip-offer-price-quote";
+import type { OfferSegmentLeg } from "integration/common/schemas/offer-segment-leg";
 
 export function getLowestPrice(offer: Offer): number {
   return Math.min(
@@ -83,4 +84,14 @@ export function getTotalPriceBreakdown(priceQuote: TripOfferPriceQuote): PriceBr
 
       return [...prev, curr];
     }, []);
+}
+
+export function getLegsFromPriceQuote(priceQuote: TripOfferPriceQuote): OfferSegmentLeg[] {
+  if (!priceQuote || !priceQuote.offer) {
+    return [];
+  }
+  return priceQuote.offer.groups
+    .flatMap((group) => group.detailsList.flatMap((details) => details.legs))
+    .filter(ensureDefined)
+    .sort((a, b) => a.departureAt.getTime() - b.departureAt.getTime());
 }
