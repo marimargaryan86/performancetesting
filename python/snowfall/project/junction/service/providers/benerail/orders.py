@@ -50,7 +50,7 @@ def orders_factory(
                     connection=amqp_conn,
                     exchange=types.Exchange("orders"),
                 ),
-                bookings=booking.BookingHandler(
+                bookings=booking.BookingCreationHandler(
                     benerail_client=client.BenerailClient(
                         subscription_key=app.settings.subscription_key,
                         base_url=str(app.settings.api_base_url),

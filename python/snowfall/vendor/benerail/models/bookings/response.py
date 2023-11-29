@@ -21,107 +21,75 @@ from snowfall.vendor.benerail.models.link import Link
 from snowfall.vendor.benerail.models.metadata import Metadata
 
 
-class GetBookingResponse(BenerailBaseModel):
+class BaseResponse(BenerailBaseModel):
     metadata: Metadata
-    response_result: Booking = Field(..., alias="result")
     links: list[Link] | None = None
-    dialogue_etag: str
 
     @property
-    def booking_etag(self) -> str:
-        return self.metadata.resource_etag or ""
+    def etag(self) -> str:
+        return getattr(self.metadata, "resource_etag", "")
+
+
+class GetBookingResponse(BaseResponse):
+    response_result: Booking = Field(..., alias="result")
+    dialogue_etag: str
 
     def set_etags(self, etag_data: etag_models.EtagData) -> None:
         etag_data.dialogue_etag = self.dialogue_etag
-        etag_data.booking_etag = self.booking_etag
+        etag_data.booking_etag = self.etag
 
 
-class GetOrderResponse(BenerailBaseModel):
-    metadata: Metadata
+class GetOrderResponse(BaseResponse):
     response_result: Order = Field(..., alias="result")
-    links: list[Link] | None = None
     booking_etag: str
-
-    @property
-    def order_etag(self) -> str:
-        return self.metadata.resource_etag or ""
 
     def set_etags(self, etag_data: etag_models.EtagData) -> None:
         etag_data.booking_etag = self.booking_etag
-        etag_data.order_etag = self.order_etag
+        etag_data.order_etag = self.etag
 
 
-class GetSelectedOfferResponse(BenerailBaseModel):
-    metadata: Metadata
+class GetSelectedOfferResponse(BaseResponse):
     response_result: SelectedOffer | None = Field(None, alias="result")
-    links: list[Link] | None = None
-
     order_etag: str
-
-    @property
-    def selected_offer_etag(self) -> str:
-        return self.metadata.resource_etag or ""
 
     def set_etags(self, etag_data: etag_models.EtagData) -> None:
         etag_data.order_etag = self.order_etag
-        etag_data.selected_offer_etag = self.selected_offer_etag
+        etag_data.selected_offer_etag = self.etag
 
 
-class GetSelectedOfferPartResponse(BenerailBaseModel):
-    metadata: Metadata | None = None
+class GetSelectedOfferPartResponse(BaseResponse):
     response_result: SelectedOfferPart | None = Field(None, alias="result")
-    links: list[Link] | None = None
 
 
-class GetBookedOfferResponse(BenerailBaseModel):
-    metadata: Metadata | None = None
+class GetBookedOfferResponse(BaseResponse):
     response_result: BookedOffer | None = Field(None, alias="result")
-    links: list[Link] | None = None
 
 
-class GetBookedOfferPartResponse(BenerailBaseModel):
-    metadata: Metadata | None = None
+class GetBookedOfferPartResponse(BaseResponse):
     response_result: BookedOfferPart | None = Field(None, alias="result")
-    links: list[Link] | None = None
 
 
-class GetBookedTripResponse(BenerailBaseModel):
-    metadata: Metadata | None = None
+class GetBookedTripResponse(BaseResponse):
     response_result: BookedTrip | None = Field(None, alias="result")
-    links: list[Link] | None = None
 
 
-class GetPaymentResourceResponse(BenerailBaseModel):
-    metadata: Metadata
+class GetPaymentResourceResponse(BaseResponse):
     response_result: Payment = Field(..., alias="result")
-    links: list[Link] | None = None
     order_etag: str
 
-    @property
-    def payment_etag(self) -> str:
-        return self.metadata.resource_etag or ""
-
     def set_etags(self, etag_data: etag.EtagData) -> None:
-        etag_data.payment_etag = self.payment_etag
+        etag_data.payment_etag = self.etag
         etag_data.order_etag = self.order_etag
 
 
-class GetFulfillmentResponse(BenerailBaseModel):
-    metadata: Metadata
+class GetFulfillmentResponse(BaseResponse):
     response_result: Fulfillment = Field(..., alias="result")
-    links: list[Link] | None = None
     booking_etag: str
-
-    @property
-    def fulfillments_etag(self) -> str:
-        return self.metadata.resource_etag or ""
 
     def set_etags(self, etag_data: etag.EtagData) -> None:
         etag_data.booking_etag = self.booking_etag
-        etag_data.fulfillments_etag = self.fulfillments_etag
+        etag_data.fulfillments_etag = self.etag
 
 
-class GetRefundOfferResponse(BenerailBaseModel):
-    metadata: Metadata | None = None
-    response_result: RefundOffer | None = Field(None, alias="result")
-    links: list[Link] | None = None
+class GetRefundOfferResponse(BaseResponse):
+    response_result: RefundOffer = Field(..., alias="result")

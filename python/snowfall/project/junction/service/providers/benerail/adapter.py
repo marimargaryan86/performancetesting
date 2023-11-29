@@ -113,9 +113,7 @@ def _get_trip_offer_response(
     trip_id: str,
 ) -> t_o_response.GetTripOfferResponse:
     for trip_offer in trip_offer_responses:
-        trip_href = trip_offer.response_result.trip.href
-
-        if helper_functions.last_id_of_url(trip_href) == trip_id:
+        if trip_offer.response_result.trip.identifier == trip_id:
             return trip_offer
 
     raise OfferNotFoundError(
@@ -153,7 +151,7 @@ class BenerailAdapter(object):
 
         offers = await self._get_offers(
             offer_ids=[
-                helper_functions.last_id_of_url(offer_ref.href)
+                offer_ref.identifier
                 for offer_ref in trip_offer_obj.response_result.offers
             ],
             session_token=offer_details.session_token,
@@ -216,8 +214,7 @@ class BenerailAdapter(object):
         )
 
         trip_offer_ids = [
-            helper_functions.last_id_of_url(trip_offer.href)
-            async for trip_offer in trip_offers_iterator
+            trip_offer.identifier async for trip_offer in trip_offers_iterator
         ]
         dialogue_info = helper_models.DialogueInfo(
             identifier=trip_filter_creation.dialogue_id,
@@ -455,11 +452,9 @@ class BenerailOffersAdapter(BenerailAdapter):
 
         trip_id_offer_ids = tuple(
             (
-                helper_functions.last_id_of_url(
-                    trip_offer_res.response_result.trip.href,
-                ),
+                trip_offer_res.response_result.trip.identifier,
                 tuple(
-                    helper_functions.last_id_of_url(offer_link.href)
+                    offer_link.identifier
                     for offer_link in trip_offer_res.response_result.offers
                 ),
             )

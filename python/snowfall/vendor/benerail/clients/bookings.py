@@ -409,6 +409,34 @@ class OrdersClient(base.BenerailBaseClient):
 
         return response.status_code == http.HTTPStatus.NO_CONTENT
 
+    async def get_refund_offer(
+        self,
+        booking_id: str,
+        order_id: str,
+        refund_offer_id: str,
+        etag: str,
+    ) -> booking_response.GetRefundOfferResponse:
+        response = await self._make_request(
+            client.RequestOptions(
+                method="POST",
+                path="".join(
+                    [
+                        "{base_path}/{booking_id}".format(
+                            base_path=_BASE_PATH,
+                            booking_id=booking_id,
+                        ),
+                        "/orders/{order_id}".format(order_id=order_id),
+                        "/refund-offers/{refund_offer_id}".format(
+                            refund_offer_id=refund_offer_id,
+                        ),
+                    ],
+                ),
+                headers=self._get_headers(etag),
+            ),
+        )
+
+        return booking_response.GetRefundOfferResponse(**response.json())
+
     async def add_refund_to_order(
         self,
         booking_id: str,
@@ -463,6 +491,35 @@ class OrdersClient(base.BenerailBaseClient):
         )
 
         return response.status_code == http.HTTPStatus.NO_CONTENT
+
+    async def accept_refund_offer(
+        self,
+        booking_id: str,
+        order_id: str,
+        refund_offer_id: str,
+        etag: str,
+    ) -> booking_response.GetRefundOfferResponse:
+        response = await self._make_request(
+            client.RequestOptions(
+                method="PATCH",
+                path="".join(
+                    [
+                        "{base_path}/{booking_id}".format(
+                            base_path=_BASE_PATH,
+                            booking_id=booking_id,
+                        ),
+                        "/orders/{order_id}".format(order_id=order_id),
+                        "/refund-offers/{refund_offer_id}".format(
+                            refund_offer_id=refund_offer_id,
+                        ),
+                    ],
+                ),
+                headers=self._get_headers(etag),
+                payload={},
+            ),
+        )
+
+        return booking_response.GetRefundOfferResponse(**response.json())
 
 
 class SelectedOffersClient(base.BenerailBaseClient):

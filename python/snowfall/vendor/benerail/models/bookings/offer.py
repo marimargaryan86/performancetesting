@@ -5,6 +5,7 @@ from snowfall.vendor.benerail.models.bookings.booking import BookingInformation
 from snowfall.vendor.benerail.models.bookings.enums import BookedOfferStatus
 from snowfall.vendor.benerail.models.bookings.payment import Price
 from snowfall.vendor.benerail.models.link import RcodeLink, ResourceLink
+from snowfall.vendor.benerail.models.trip_offers.link import OfferPartResourceLink
 
 
 class BookedOffer(BenerailBaseModel):
@@ -43,15 +44,9 @@ class SelectedOffersBody(BenerailBaseModel):
     offer_id: str
 
 
-class RefundOfferPart(BenerailBaseModel):
-    identifier: str | None = Field(None, alias="id")
-    fulfillment: str | None = None
-    original_price: Price | None = None
-    proposed_carrier_fee: Price | None = None
-    refunded_amount: Price | None = None
-
-
 class RefundOffer(BenerailBaseModel):
-    identifier: str | None = Field(None, alias="id")
+    identifier: str = Field(..., alias="id")
     state: str | None = None
-    refund_offer_parts: list[RefundOfferPart] | None = None
+    total_original_amount: Price | None = None
+    total_refund_amount: Price | None = None
+    refund_offer_parts: list[OfferPartResourceLink] | None = None

@@ -1,33 +1,23 @@
-from pydantic.v1 import AnyUrl
-
-from snowfall.vendor.benerail.models.base import BenerailBaseModel
 from snowfall.vendor.benerail.models.dialogue.summary import (
     BookerSummary,
     BookingSummary,
     TripFilterSummary,
     TripOfferFilterSummary,
 )
+from snowfall.vendor.benerail.models.link import ResourceLink
 
 
-class TripFilterResourceLink(BenerailBaseModel):
-    href: AnyUrl | None = None
-    title: str | None = None
+class TripFilterResourceLink(ResourceLink):
     summary: TripFilterSummary | None = None
 
 
-class TripOfferFilterResourceLink(BenerailBaseModel):
-    href: AnyUrl | None = None
-    title: str | None = None
+class TripOfferFilterResourceLink(ResourceLink):
     summary: TripOfferFilterSummary | None = None
 
 
-class BookerResourceLink(BenerailBaseModel):
-    href: AnyUrl | None = None
-    title: str | None = None
+class BookerResourceLink(ResourceLink):
     summary: BookerSummary | None = None
 
 
-class BookingResourceLink(BenerailBaseModel):
-    href: AnyUrl | None = None
-    title: str | None = None
+class BookingResourceLink(ResourceLink):
     summary: BookingSummary | None = None

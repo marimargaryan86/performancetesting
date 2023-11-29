@@ -20,7 +20,6 @@ from snowfall.project.junction.service.providers.benerail import (
     cache,
     criteria,
     fare_rules,
-    helper_functions,
     notifications,
     train_stations,
 )
@@ -84,9 +83,7 @@ class NotificationsConsumer(object):
         ticket_urls = (
             await self._client.bookings_client.get_ticket_urls_from_fulfillment(
                 booking_id=booking_res.response_result.identifier,
-                fulfillment_id=helper_functions.last_id_of_url(
-                    booking_res.response_result.fulfillments[0].href,
-                ),
+                fulfillment_id=booking_res.response_result.fulfillments[0].identifier,
             )
         )
 
@@ -244,7 +241,7 @@ class OrdersConsumer(object):
         consumer_obj: consumer.Consumer[orders_amqp_pb2.PlaceOrderTask],
         booking_offers_cache: cache.BookingOffersCache,
         producer_obj: producer.Producer,
-        bookings: booking.BookingHandler,
+        bookings: booking.BookingCreationHandler,
         provider_id: str,
     ):
         self._cache = booking_offers_cache

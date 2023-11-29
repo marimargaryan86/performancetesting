@@ -1,5 +1,6 @@
 from pydantic.v1 import AnyUrl, ConstrainedStr, Field
 
+from snowfall.vendor.benerail import helper_functions
 from snowfall.vendor.benerail.models.base import BenerailBaseModel
 from snowfall.vendor.benerail.models.enums import Format, RequestType
 
@@ -10,6 +11,10 @@ class ResourceLink(BenerailBaseModel):
         None,
         description="human-readable string representing the linked resource",
     )
+
+    @property
+    def identifier(self) -> str:
+        return helper_functions.last_id_of_url(self.href)
 
 
 class LinkToRcode(BenerailBaseModel):

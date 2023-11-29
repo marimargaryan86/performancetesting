@@ -1,6 +1,4 @@
-from pydantic.v1 import AnyUrl, Field
-
-from snowfall.vendor.benerail.models.base import BenerailBaseModel
+from snowfall.vendor.benerail.models.link import ResourceLink
 from snowfall.vendor.benerail.models.trip_offers.summary import (
     OfferPartSummary,
     OfferSummary,
@@ -11,55 +9,25 @@ from snowfall.vendor.benerail.models.trip_offers.summary import (
 )
 
 
-class TripOfferResourceLink(BenerailBaseModel):
-    href: AnyUrl = Field(..., description="callable url")
-    title: str = Field(
-        ...,
-        description="human-readable string representing the linked resource",
-    )
+class TripOfferResourceLink(ResourceLink):
     summary: TripOfferSummary | None = None
 
 
-class TripResourceLink(BenerailBaseModel):
-    href: AnyUrl
-    title: str | None = Field(
-        None,
-        description="human-readable string representing the linked resource",
-    )
+class TripResourceLink(ResourceLink):
     summary: TripSummary | None = None
 
 
-class PassengerResourceLink(BenerailBaseModel):
-    href: AnyUrl
-    title: str | None = Field(
-        None,
-        description="human-readable string representing the linked resource",
-    )
+class PassengerResourceLink(ResourceLink):
     summary: PassengerResourceLinkSummary | None = None
 
 
-class ProductResourceLink(BenerailBaseModel):
-    href: AnyUrl
-    title: str | None = Field(
-        None,
-        description="human-readable string representing the linked resource",
-    )
+class ProductResourceLink(ResourceLink):
     summary: ProductSummary | None = None
 
 
-class OfferResourceLink(BenerailBaseModel):
-    href: AnyUrl
-    title: str | None = Field(
-        None,
-        description="human-readable string representing the linked resource",
-    )
+class OfferResourceLink(ResourceLink):
     summary: OfferSummary | None = None
 
 
-class OfferPartResourceLink(BenerailBaseModel):
-    href: AnyUrl
-    title: str | None = Field(
-        None,
-        description="human-readable string representing the linked resource",
-    )
+class OfferPartResourceLink(ResourceLink):
     summary: OfferPartSummary | None = None

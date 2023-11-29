@@ -2,7 +2,6 @@ import asyncio
 from collections.abc import Iterable, Sequence
 
 from snowfall.project.junction.go.service.offers.v1 import models_pb2
-from snowfall.project.junction.service.providers.benerail import helper_functions
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.transport.http import errors
 from snowfall.vendor.benerail import client
@@ -40,15 +39,13 @@ async def _get_products(
 
     for offer_part in offer_parts:
         product = offer_part.response_result.offer_part_common.product
-        product_ref = product.href if product else None
-
-        if product_ref and product_ref.path:
-            tariff_ref = helper_functions.last_id_of_url(product_ref)
+        if product and product.href.path:
+            tariff_ref = product.identifier
 
             if tariff_ref not in seen:
                 coros.append(
                     benerail_client.trip_offers_client.get_product_in_trip_offer_collection(
-                        trip_offer_collection_id=product_ref.path.rsplit("/", 3)[-3],
+                        trip_offer_collection_id=product.href.path.rsplit("/", 3)[-3],
                         tariff_ref=tariff_ref,
                     ),
                 )
@@ -66,7 +63,7 @@ async def get_fare_rules(
             *(
                 benerail_client.offers_client.get_offer_part_info(
                     offer_id=offer_obj.identifier,
-                    offer_part_id=helper_functions.last_id_of_url(offer_part.href),
+                    offer_part_id=offer_part.identifier,
                 )
                 for offer_part in offer_obj.offer_parts
             ),

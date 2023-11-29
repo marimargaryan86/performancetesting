@@ -35,8 +35,25 @@ async def _meta_factory() -> meta.MetaImplementation:
 async def _bookings_factory(
     app: service.Application[config.Settings],
 ) -> bookings.Implementation:
+    http_client = await app.stack.enter_async_context(
+        httpx.AsyncClient(
+            timeout=app.settings.api_timeout.total_seconds(),
+            cert=config.cert_tmp_path(app.settings.cert_base64),
+        ),
+    )
+    logging.register(http_client)
+    metrics.register(http_client)
+    benerail_client = client.BenerailClient(
+        subscription_key=app.settings.subscription_key,
+        base_url=str(app.settings.api_base_url),
+        http_client=http_client,
+    )
+
     storage = await app.stack.enter_async_context(
         filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
+    )
+    cancellation_handler = booking.BookingCancellationHandler(
+        benerail_client=benerail_client,
     )
 
     return bookings.Implementation(
@@ -45,6 +62,7 @@ async def _bookings_factory(
             provider_identifier=PROVIDER_ID,
             provider_name=_PROVIDER_NAME,
         ).raw_to_booking,
+        cancellation_handler=cancellation_handler.cancel_booking,
     )
 
 

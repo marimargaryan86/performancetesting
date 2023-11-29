@@ -61,6 +61,6 @@ class Payment(BenerailBaseModel):
     payment_method: FormOfPayment | None = None
     payment_date: str | None = None
     payment_webhook: UrlRegex | None = None
-    payment_amount: Price | None = None
+    amount_to_pay: Price | None = None
     result_balance: float | None = None
     state: PaymentStates | None = None

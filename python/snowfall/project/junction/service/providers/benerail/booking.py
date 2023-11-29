@@ -29,9 +29,9 @@ from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.transport.amqp import producer
 from snowfall.stdlib.transport.http import errors
 from snowfall.vendor.benerail import client
+from snowfall.vendor.benerail.errors import BenerailError
 from snowfall.vendor.benerail.models import etag
 from snowfall.vendor.benerail.models.bookings import offer, order, payment
-from snowfall.vendor.benerail.models.bookings import response as booking_response
 from snowfall.vendor.benerail.models.bookings import response as bookings_response
 from snowfall.vendor.benerail.models.dialogue import enums as dialogue_enums
 from snowfall.vendor.benerail.models.dialogue import passenger
@@ -99,7 +99,7 @@ class _OrderStateUpdateFailedError(_BookingError):
 
 
 class _CreateBookingResponse(NamedTuple):
-    booking_res: booking_response.GetBookingResponse
+    booking_res: bookings_response.GetBookingResponse
     order_res: bookings_response.GetOrderResponse
     raw_booking_res: bytes
 
@@ -139,7 +139,7 @@ class Transformer(object):
 
 
 class RawStorageData(pydantic.BaseModel):
-    booking: booking_response.GetBookingResponse
+    booking: bookings_response.GetBookingResponse
     tickets: list[str] | None = None
 
     @classmethod
@@ -148,14 +148,14 @@ class RawStorageData(pydantic.BaseModel):
             return cls.parse_raw(raw.decode())
         except ValueError:
             return cls(
-                booking=booking_response.GetBookingResponse(
+                booking=bookings_response.GetBookingResponse(
                     **orjson.loads(raw),
                     dialogue_etag="",
                 ),
             )
 
 
-class BookingHandler(object):
+class BookingCreationHandler(object):
     def __init__(
         self,
         benerail_client: client.BenerailClient,
@@ -409,7 +409,7 @@ class BookingHandler(object):
             return await self._client.orders_client.update_order_state(
                 booking_id=booking_id,
                 order_id=order_id,
-                etag=order_res.order_etag,
+                etag=order_res.etag,
                 body=body,
                 session_token=session_token,
             )
@@ -476,6 +476,95 @@ class BookingHandler(object):
         await self._notifications_producer.publish(
             msg=msg,
             routing_key="benerail.notifications",
+        )
+
+
+class BookingCancellationHandler(object):
+    def __init__(
+        self,
+        benerail_client: client.BenerailClient,
+    ) -> None:
+        self._client = benerail_client
+        self._logger = stdout.get_logger()
+
+    async def cancel_booking(self, booking_id: str) -> models_pb2.BookingCancellation:
+        try:
+            return await self._cancel_booking(booking_id)
+        except errors.HttpError:
+            self._logger.exception(
+                "Booking cancellation failed",
+                booking_id=booking_id,
+            )
+
+            return models_pb2.BookingCancellation(
+                booking_id=booking_id,
+                status=models_pb2.BookingCancellation.STATUS_REFUND_FAILED,
+            )
+
+    async def _cancel_booking(  # noqa: WPS217
+        self,
+        booking_id: str,
+    ) -> models_pb2.BookingCancellation:
+        booking_res = (
+            await self._client.bookings_client.get_booking(
+                booking_id=booking_id,
+                session_token="",
+            )
+        )[0]
+        refund_order_res = await self._client.bookings_client.create_order(
+            booking_id=booking_res.response_result.identifier,
+            etag=booking_res.etag,
+        )
+        refund_offer_res = await self._client.orders_client.add_refund_to_order(
+            booking_id=booking_res.response_result.identifier,
+            order_id=refund_order_res.response_result.identifier,
+            etag=refund_order_res.etag,
+            body=order.OrderIdRefundOffersBody(
+                fulfillment_ids=[
+                    fulfillment.identifier
+                    for fulfillment in booking_res.response_result.fulfillments
+                ]
+                if booking_res.response_result.fulfillments
+                else [],
+            ),
+        )
+        refund_offer_res = await self._client.orders_client.accept_refund_offer(
+            booking_id=booking_id,
+            order_id=refund_order_res.response_result.identifier,
+            refund_offer_id=refund_offer_res.response_result.identifier,
+            etag=refund_offer_res.etag,
+        )
+
+        # Retrieve the order again (with updated payment resource)
+        refund_order_res = await self._client.orders_client.get_order(
+            booking_id=booking_id,
+            order_id=refund_order_res.response_result.identifier,
+        )
+
+        if refund_order_res.response_result.payment is None:
+            raise BenerailError("Payment resource is missing from the refund order")
+
+        payment_res = await self._client.payments_client.get_payment_resource(
+            booking_id=booking_id,
+            order_id=refund_order_res.response_result.identifier,
+            payment_id=refund_order_res.response_result.payment.identifier,
+        )
+        payment_res = await self._client.payments_client.confirm_order_payment(
+            booking_id=booking_id,
+            order_id=refund_order_res.response_result.identifier,
+            payment_id=payment_res.response_result.identifier,
+            etag=payment_res.etag,
+            body=payment.PaymentIdBody(
+                payment_method=payment.PaymentMethodProp(
+                    payment.PaymentMethod.ac.value,
+                ),
+                amount=payment_res.response_result.amount_to_pay,
+            ),
+        )
+
+        return models_pb2.BookingCancellation(
+            booking_id=booking_id,
+            status=models_pb2.BookingCancellation.STATUS_REFUND_DUE,
         )
 
 
