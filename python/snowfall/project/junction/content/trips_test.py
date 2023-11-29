@@ -6,8 +6,9 @@ import pytest
 from google.protobuf import message, symbol_database
 from google.rpc import error_details_pb2, status_pb2
 
-from snowfall.project.junction.content import trips as provider_trips
-from snowfall.project.junction.provider.v2alpha import trips_pb2
+from snowfall.project.junction.content import trips
+from snowfall.project.junction.provider.v2alpha import meta_pb2, trips_pb2
+from snowfall.project.junction.v1 import segment_type_pb2
 
 
 class _AbortError(grpc.RpcError):
@@ -35,14 +36,21 @@ def _abort_context(
 
 
 async def _mock_one_way_implementation(
-    request: provider_trips.OneWayRequest,
+    request: trips.OneWayRequest,
 ) -> trips_pb2.SearchTripsResponse:
     return trips_pb2.SearchTripsResponse()
 
 
 @pytest.fixture()
-def trip_service() -> provider_trips.TripService:
-    return provider_trips.TripService(one_way=_mock_one_way_implementation)
+def trip_service() -> trips.TripService:
+    return trips.TripService(
+        implementation=trips.TripSearchImplementation(
+            passenger_age_identification_method=meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH,
+            stop_identification_method=meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_PROVIDER_IDS,
+            supported_segment_types=[segment_type_pb2.SEGMENT_TYPE_FLIGHT],
+            one_way=_mock_one_way_implementation,
+        ),
+    )
 
 
 @pytest.fixture()
@@ -56,7 +64,7 @@ def grpc_context() -> grpc.aio.ServicerContext:
 class TestService(object):
     async def test_empty_search_mode_is_aborted(
         self,
-        trip_service: provider_trips.TripService,
+        trip_service: trips.TripService,
         grpc_context: grpc.aio.ServicerContext,
     ) -> None:
         with pytest.raises(_AbortError) as exc_info:
@@ -73,7 +81,7 @@ class TestService(object):
 
     async def test_empty_passengers_is_aborted(
         self,
-        trip_service: provider_trips.TripService,
+        trip_service: trips.TripService,
         grpc_context: grpc.aio.ServicerContext,
     ) -> None:
         with pytest.raises(_AbortError) as exc_info:

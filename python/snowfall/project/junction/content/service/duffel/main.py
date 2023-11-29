@@ -3,8 +3,7 @@ import uuid
 
 import pydantic
 
-from snowfall.project.junction.content import meta
-from snowfall.project.junction.content import trips as provider_trips
+from snowfall.project.junction.content import bootstrap
 from snowfall.project.junction.content.service.duffel import trips
 from snowfall.project.junction.provider.v2alpha import meta_pb2
 from snowfall.project.junction.v1 import segment_type_pb2
@@ -54,23 +53,18 @@ async def _serve(app: application.Application[_Settings]) -> None:
     grpc_server = server.create_server(
         app.settings.grpc_address,
         app.settings.grpc_port,
-        [
-            meta.MetaService(
-                meta.MetaImplementation(
-                    identifier=_PROVIDER_ID,
-                    name=_PROVIDER_NAME,
-                    trip_search_capabilities=meta_pb2.TripSearchCapabilities(
-                        is_supported=True,
-                        stop_identification_method=meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_IATA_CODES,
-                        supported_segment_types=[segment_type_pb2.SEGMENT_TYPE_FLIGHT],
-                        passenger_age_identification_method=meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH,
-                    ),
+        bootstrap.create_grpc_services(
+            bootstrap.ProviderConfiguration(
+                provider_id=_PROVIDER_ID,
+                provider_name=_PROVIDER_NAME,
+                trip_search_implementation=bootstrap.TripSearchImplementation(
+                    stop_identification_method=meta_pb2.TripSearchCapabilities.STOP_IDENTIFICATION_METHOD_IATA_CODES,
+                    supported_segment_types=[segment_type_pb2.SEGMENT_TYPE_FLIGHT],
+                    passenger_age_identification_method=meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH,
+                    one_way=trip_searcher.find_one_way,
                 ),
             ),
-            provider_trips.TripService(
-                one_way=trip_searcher.find_one_way,
-            ),
-        ],
+        ),
     )
 
     async with grpc_server.serve() as running:
