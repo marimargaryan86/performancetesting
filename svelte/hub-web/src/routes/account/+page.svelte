@@ -75,10 +75,6 @@
         reqData[submitter.name] = submitter.value;
       }
 
-      if (submitter?.name === "email") {
-        delete reqData.code;
-      }
-
       data.flow = await integrationInstancesClient.ory.userSettings.complete(reqData);
     } finally {
       $pending = undefined;

@@ -1,21 +1,27 @@
-import type { User } from "integration/ory/schemas/authentication";
 import { ORY_INTEGRATION_ROOT } from "../common";
 import * as devalue from "devalue";
+import type { User } from "integration/ory/schemas/authentication";
+import type { LoginFlow } from "integration/ory/schemas/login-flow";
+import { URLExtended } from "utils/url";
 
 export const ROOT = `${ORY_INTEGRATION_ROOT}/auth`;
 
+async function resetLogin(): Promise<void> {
+  await fetch(new URLExtended(ROOT, { base: origin, query: { action: "reset" } }), {
+    method: "DELETE",
+  });
+}
+
 async function login({
-  id,
   data,
   rememberMe,
 }: {
-  id: string;
   data: Record<string, unknown>;
   rememberMe?: boolean;
-}): Promise<User> {
+}): Promise<{ state: "success"; user: User } | { state: "fail" | "2fa"; flow: LoginFlow }> {
   const resp = await fetch(new URL(ROOT, origin), {
     method: "POST",
-    body: devalue.stringify({ id, data, rememberMe }),
+    body: devalue.stringify({ data, rememberMe }),
   });
 
   if (resp.status !== 200) {
@@ -26,10 +32,13 @@ async function login({
 }
 
 async function logout(): Promise<void> {
-  await fetch(new URL(ROOT, origin), { method: "DELETE" });
+  await fetch(new URLExtended(ROOT, { base: origin, query: { action: "logout" } }), {
+    method: "DELETE",
+  });
 }
 
 export default {
+  resetLogin,
   login,
   logout,
 };
