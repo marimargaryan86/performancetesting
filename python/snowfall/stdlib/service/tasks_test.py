@@ -7,8 +7,8 @@ import pytest
 from google.protobuf import json_format
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.go.service.gateway import tasks
 from snowfall.stdlib.persistence.redis import types
+from snowfall.stdlib.service import tasks
 from snowfall.stdlib.testing import asserts
 from snowfall.stdlib.v1 import testing_pb2
 

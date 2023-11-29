@@ -14,7 +14,6 @@ from snowfall.project.junction.go.service.gateway import (
     offers,
     providers,
     stops,
-    tasks,
 )
 from snowfall.project.junction.go.service.gateway.trips import cache as trips_cache
 from snowfall.project.junction.go.service.gateway.trips import request as trips_request
@@ -29,6 +28,7 @@ from snowfall.stdlib.service import (
     application,
     grpc_factory,
     redis_factory,
+    tasks,
 )
 from snowfall.stdlib.transport.amqp import consumer, producer, protocol, types
 from snowfall.stdlib.transport.grpc import server as grpc_server
