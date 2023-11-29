@@ -13,7 +13,6 @@
   let departureDateTime = "";
   let arrivalDateTime = "";
 
-  // Reactive assignments for legs and related data
   $: {
     legs = getLegsFromPriceQuote(priceQuote);
     departureLeg = legs.length > 0 ? legs[0] : undefined;
@@ -25,7 +24,6 @@
       ? formatDateStringFromDate(arrivalLeg.arrivalAt, arrivalLeg.destination.timeZone)
       : "";
 
-    // Update trip store
     tripStore.update((store) => ({
       ...store,
       legs,
@@ -33,19 +31,25 @@
       arrivalLeg,
       departureDateTime,
       arrivalDateTime,
-      departureStationName: departureLeg?.origin.name,
-      arrivalStationName: arrivalLeg?.destination.name,
+      departureStationName: departureLeg?.origin.name ?? "",
+      arrivalStationName: arrivalLeg?.destination.name ?? "",
     }));
   }
 </script>
 
 <div transition:slideFade={{ duration: 300 }}>
   <div class="content">
-    <p class="typography title-medium">{departureDateTime}</p>
-    {#each legs as leg}
-      <p class="typography title-medium">{leg.origin.name} {"→"} {leg.destination.name}</p>
-    {/each}
-    <p class="typography title-medium">{$tripStore.passengersPresentation}</p>
+    {#if departureLeg && arrivalLeg}
+      <p class="typography title-medium">{departureDateTime}</p>
+      <p class="typography title-medium">
+        {departureLeg.origin.name}
+        {"→"}
+        {arrivalLeg.destination.name}
+      </p>
+      <p class="typography title-medium truncate">{$tripStore.passengersPresentation}</p>
+    {:else}
+      <p>Loading trip details...</p>
+    {/if}
   </div>
 </div>
 
@@ -72,5 +76,12 @@
   .content > :global(*) {
     flex-shrink: 0;
     font-size: 16px;
+  }
+
+  .truncate {
+    width: 25%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 </style>
