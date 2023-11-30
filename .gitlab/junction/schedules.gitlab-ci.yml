@@ -263,7 +263,7 @@ import-to-sandbox:
 deploy-in-sandbox:
   extends: [".deploy-in-server", ".sandbox"]
   stage: dev-deploy
-  needs: ["import-to-sandbox", "deploy-in-dev"]
+  needs: ["dev-export", "import-to-sandbox", "deploy-in-dev"]
 
 prod-import:
   extends: [".import", ".prod"]
