@@ -57,6 +57,7 @@
   import { fade } from "svelte/transition";
   import { browser } from "$app/environment";
   import Countdown from "../countdown.svelte";
+  import FareRulesDialog from "../../components/fare-rules-dialog.svelte";
   import LoadingSkelton from "./loading-skelton.svelte";
   import type {
     Offer as OfferModel,
@@ -71,6 +72,7 @@
   import tripManagement from "../../../integration/trip-management/trip-management";
   import { onDestroy } from "svelte";
   import { writable } from "svelte/store";
+  import type { TripOfferPriceQuote } from "integration/junction-mobile-api/schemas/trip-offer-price-quote";
 
   export let data;
 
@@ -89,6 +91,8 @@
     vendors: [],
   };
   let pollSignal = { cancelled: false };
+  let fareRulesDialog: FareRulesDialog | undefined;
+  let selectedPriceQuote: TripOfferPriceQuote | undefined = undefined;
 
   const offersPending = writable(false);
   const selectOfferPending = writable(false);
@@ -172,6 +176,10 @@
 <div class="search-wrapper">
   <TripSearch data={data.searchData} origin={data.origin} destination={data.destination} />
 </div>
+
+{#if selectedPriceQuote}
+  <FareRulesDialog bind:this={fareRulesDialog} priceQuote={selectedPriceQuote} />
+{/if}
 
 <div class="content">
   {#if offers[0]?.expiresAt}

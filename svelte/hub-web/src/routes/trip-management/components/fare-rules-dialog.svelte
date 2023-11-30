@@ -28,8 +28,6 @@
     {#each rules as rule}
       <h3 class="typography title-small bold">{rule.title}</h3>
       <p class="typography body-small">{rule.body}</p>
-    {:else}
-      <p class="typography body-small">N/A</p>
     {/each}
 
     <div class="actions">
@@ -54,6 +52,7 @@
     display: flex;
     flex-flow: column;
     gap: 32px;
+    max-width: minmax(400px, 50vw);
     max-height: calc(100vh - 32px);
     padding: 48px;
     overflow: auto;

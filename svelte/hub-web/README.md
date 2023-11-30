@@ -15,11 +15,7 @@ This is a server side rendered SvelteKit application that allows users to intera
   ```bash
   brew install yarn
   ```
-- Install [ORY CLI](https://www.ory.sh/docs/sdk), our auth provider
-  ```bash
-  brew install ory/tap/cli
-  ```
-- Sign up for ORY credentials [here](https://exciting-boyd-kr7iwir8gj.projects.oryapis.com/ui)
+- Sign up for ORY `dev` environment credentials [here](https://exciting-boyd-kr7iwir8gj.projects.oryapis.com/ui)
 
 ## Running a local `hub-web` development instance
 
@@ -66,14 +62,14 @@ ory tunnel --dev --project exciting-boyd-kr7iwir8gj http://localhost:4000
 yarn install
 ```
 
-5. After install, stand up a local server:
+4. After install, stand up a local server:
 
 ```bash
 yarn run dev
 ```
 
-6. Sign in on your Snowfall VPN.
-7. Sign into the `hub-web` app using your ORY credentials.
+5. Sign in on your Snowfall VPN.
+6. Sign into the `hub-web` app using your ORY credentials.
 
 ## Notes
 

@@ -5,6 +5,7 @@
 </script>
 
 <script lang="ts">
+  import { dev } from "$app/environment";
   import ChevronIcon from "components/icons/chevron-icon.svelte";
   import Button from "components/ui/button.svelte";
   import { formatAmount } from "formatting/currency";
@@ -55,6 +56,10 @@
 
         <li class="option">
           <strong class="typography body-xlarge bold">{option.brandName}</strong>
+
+          {#if dev}
+            <button class="typography body-small fare-rules-btn">View fare rules</button>
+          {/if}
 
           <hr />
 
@@ -155,5 +160,14 @@
     border-bottom-width: 2px;
     transform: translateY(-0.5px) rotateZ(45deg);
     content: "";
+  }
+
+  .fare-rules-btn {
+    padding-left: 0;
+    color: var(--color-common-light-text-link);
+    text-decoration: underline;
+    background-color: transparent;
+    border: 0;
+    cursor: pointer;
   }
 </style>
