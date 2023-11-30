@@ -23,7 +23,7 @@ from snowfall.project.junction.go.service.orders.v1 import (
 from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.project.junction.provider import cabin_classes
 from snowfall.project.junction.provider import notifications as base_notifications
-from snowfall.project.junction.provider.v1alpha import bookings_pb2
+from snowfall.project.junction.provider.v1 import bookings_pb2
 from snowfall.project.junction.service.providers.save_a_train import (
     cache,
     models,

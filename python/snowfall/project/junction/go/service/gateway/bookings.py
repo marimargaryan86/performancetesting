@@ -9,7 +9,7 @@ from snowfall.project.junction.go.service.gateway.v1 import (
     bookings_pb2,
     bookings_pb2_grpc,
 )
-from snowfall.project.junction.provider.v1alpha import bookings_pb2 as providers_pb2
+from snowfall.project.junction.provider.v1 import bookings_pb2 as providers_pb2
 from snowfall.stdlib.transport.grpc import service
 
 

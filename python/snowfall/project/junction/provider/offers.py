@@ -18,7 +18,7 @@ from snowfall.project.junction.go.service.offers.v1 import (
 from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.project.junction.provider import repository
 from snowfall.project.junction.provider.segment_matcher import SegmentMatcher
-from snowfall.project.junction.provider.v1alpha import offers_pb2, offers_pb2_grpc
+from snowfall.project.junction.provider.v1 import offers_pb2, offers_pb2_grpc
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer

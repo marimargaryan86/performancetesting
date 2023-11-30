@@ -16,7 +16,7 @@ from snowfall.project.junction.go.service.orders.v1 import (
     amqp_pb2 as order_amqp_pb2,
 )
 from snowfall.project.junction.go.service.orders.v1 import models_pb2
-from snowfall.project.junction.provider.v1alpha import bookings_pb2
+from snowfall.project.junction.provider.v1 import bookings_pb2
 from snowfall.project.junction.service.providers.benerail import (
     cache,
     helper_models,

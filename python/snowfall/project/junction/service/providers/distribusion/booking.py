@@ -10,7 +10,7 @@ from dateutil.relativedelta import relativedelta
 
 from snowfall.project.junction.go.service.offers.v1.models_pb2 import OfferSegmentLeg
 from snowfall.project.junction.go.service.orders.v1 import amqp_pb2, models_pb2
-from snowfall.project.junction.provider.v1alpha import bookings_pb2
+from snowfall.project.junction.provider.v1 import bookings_pb2
 from snowfall.project.junction.service.providers.distribusion import (
     cache,
     notifications,

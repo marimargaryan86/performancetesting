@@ -4,7 +4,7 @@ import string as pystring
 import uuid
 
 from snowfall.project.junction.go.service.orders.v1 import amqp_pb2, models_pb2
-from snowfall.project.junction.provider.v1alpha import bookings_pb2
+from snowfall.project.junction.provider.v1 import bookings_pb2
 from snowfall.project.junction.service.providers.mock import cache
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf

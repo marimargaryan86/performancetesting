@@ -35,7 +35,7 @@ message TripSearchCapabilities {
     // Junction will perform trip searches using the provider's own IDs for the
     // origin and destination. In cases Junction can't map the origin or
     // destination to the provider's own IDs, the provider will be skipped.
-    // `snowfall.project.junction.provider.v1alpha.StopService` needs to be
+    // `snowfall.project.junction.provider.v1.StopService` needs to be
     // implemented in order for Junction to have knowledge about the provider's
     // IDs.
     STOP_IDENTIFICATION_METHOD_PROVIDER_IDS = 1;
@@ -73,7 +73,7 @@ message TripSearchCapabilities {
 
     // Junction will perform trip searches using the provider's own passenger
     // types for each passenger.
-    // `snowfall.project.junction.provider.v1alpha.PassengerService` needs to be
+    // `snowfall.project.junction.provider.v1.PassengerService` needs to be
     // implemented in order for Junction to have knowledge about the provider's
     // passenger types.
     PASSENGER_AGE_IDENTIFICATION_METHOD_PROVIDER_TYPE = 1;

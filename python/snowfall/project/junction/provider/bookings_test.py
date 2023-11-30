@@ -4,7 +4,7 @@ from collections.abc import AsyncIterator
 import pytest
 
 from snowfall.project.junction.provider import bookings
-from snowfall.project.junction.provider.v1alpha import bookings_pb2
+from snowfall.project.junction.provider.v1 import bookings_pb2
 from snowfall.stdlib.persistence import filesystem
 
 

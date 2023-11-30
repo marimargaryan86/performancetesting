@@ -4,7 +4,7 @@ from collections.abc import Awaitable, Callable
 import grpc
 
 from snowfall.project.junction.go.service.orders.v1 import models_pb2
-from snowfall.project.junction.provider.v1alpha import bookings_pb2, bookings_pb2_grpc
+from snowfall.project.junction.provider.v1 import bookings_pb2, bookings_pb2_grpc
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.transport.grpc import service

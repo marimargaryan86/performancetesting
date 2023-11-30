@@ -10,7 +10,7 @@ from typing import ClassVar, NamedTuple
 import prometheus_client
 from grpc import aio
 
-from snowfall.project.junction.provider.v1alpha import (
+from snowfall.project.junction.provider.v1 import (
     bookings_pb2_grpc,
     offers_pb2_grpc,
 )

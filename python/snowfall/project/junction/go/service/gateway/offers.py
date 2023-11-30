@@ -14,7 +14,7 @@ from snowfall.project.junction.go.service.gateway.v1 import (
     offers_pb2_grpc,
 )
 from snowfall.project.junction.go.service.offers.v1 import amqp_pb2
-from snowfall.project.junction.provider.v1alpha import offers_pb2 as providers_pb2
+from snowfall.project.junction.provider.v1 import offers_pb2 as providers_pb2
 from snowfall.stdlib.instrumentation import prometheus
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.service import tasks
