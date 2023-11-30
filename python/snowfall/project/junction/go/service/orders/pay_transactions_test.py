@@ -1,9 +1,9 @@
-from types import MappingProxyType
-from unittest.mock import create_autospec
+from unittest import mock
 
-import httpx
 import pytest
 
+from snowfall.project.junction.go import fixtures
+from snowfall.project.junction.go.adapter import errors
 from snowfall.project.junction.go.service.orders.pay_transactions import (
     PayTransactionCreationError,
     PayTransactionCreator,
@@ -13,138 +13,122 @@ from snowfall.project.junction.go.service.orders.v1.models_pb2 import (
     TripBooking,
     TripOption,
 )
+from snowfall.project.pay.adapter import quotations, transactions
 from snowfall.stdlib import string
-from snowfall.vendor.junction.pay.client import Client as PayClient
-
-EXTERNAL_REFERENCE = string.uuid()
-INVOICE_REFERENCE = "a-provider-reference"
-
-CREATE_TRANSACTION_RESPONSE = MappingProxyType(
-    {
-        "data": {
-            "id": "a-transaction-id",
-            "type": "transactions",
-            "attributes": {
-                "externalReference": EXTERNAL_REFERENCE,
-                "invoiceReference": EXTERNAL_REFERENCE,
-                "createdAt": "2023-04-05T14:52:25+00:00",
-                "amounts": {
-                    "beneficiary": {
-                        "currency": "USD",
-                        "amount": 1000,
-                    },
-                    "quotation": {
-                        "currency": "SEK",
-                        "amount": 10400,
-                    },
-                    "baseConverted": {
-                        "currency": "SEK",
-                        "amount": 10400,
-                    },
-                    "salesMargin": {
-                        "currency": "SEK",
-                        "amount": 0,
-                    },
-                    "fxMargin": {
-                        "currency": "SEK",
-                        "amount": 0,
-                    },
-                    "processingMargin": {
-                        "currency": "SEK",
-                        "amount": 0,
-                    },
-                },
-                "rates": {
-                    "fxQuote": 10.4,
-                    "fxBuffer": 0,
-                    "salesMarkup": 0,
-                    "fxMarkup": 0,
-                    "processingMarkup": 0,
-                },
-            },
-            "relationships": {
-                "conversion": {
-                    "data": {
-                        "id": "c150562f-70ce-4540-bf4e-6b3b3f7d0b04",
-                        "type": "conversions",
-                    },
-                },
-                "payer": {
-                    "data": {
-                        "id": "25a2ea74-0a5d-4991-9ce0-4996be2bcceb",
-                        "type": "companies",
-                    },
-                },
-                "beneficiary": {
-                    "data": {
-                        "id": "ed48aa95-c449-4100-8ba8-722e882e5dde",
-                        "type": "companies",
-                    },
-                },
-            },
-        },
-    },
-)
+from snowfall.stdlib.logging import stdout
 
 
-async def test_that_transaction_created_and_id_set_in_booking() -> None:
-    mock_pay_client = create_autospec(PayClient, spec_set=True, instance=True)
-    mock_pay_client.create_transactions.return_value = CREATE_TRANSACTION_RESPONSE
-    pay_transactions = PayTransactionCreator(
-        use_pay_to_create_transaction=True,
-        pay_client=mock_pay_client,
-    )
-    booking = Booking(
-        id=EXTERNAL_REFERENCE,
-        order_id="an-id",
-        trip_option=TripOption(pay_quote_id="a-pay-quotation-id"),
+@pytest.fixture()
+def booking() -> Booking:
+    return Booking(
+        id=string.uuid(),
+        order_id=string.uuid(),
+        trip_option=TripOption(pay_quote_id=fixtures.QUOTATIONS[0]),
         status=Booking.Status.STATUS_PENDING,
         provider_name="a-provider",
         total_price=None,
-        trip_result=TripBooking(provider_booking_reference=INVOICE_REFERENCE),
+        trip_result=TripBooking(provider_booking_reference="a-provider-reference"),
         raw_data="raw data",
         created_at=None,
         updated_at=None,
+        transaction_id="",
     )
+
+
+async def test_that_transaction_created_and_id_set_in_booking(
+    transactions_client: transactions.Client,
+    quotations_client: quotations.Client,
+    booking: Booking,
+) -> None:
+    pay_transactions = PayTransactionCreator(
+        use_pay_to_create_transaction=True,
+        transactions_client=transactions_client,
+        quotations_client=quotations_client,
+    )
+
     updated_booking = await pay_transactions.create_transaction_and_set_id(
         booking=booking,
     )
 
-    assert updated_booking.transaction_id == "a-transaction-id"
+    assert updated_booking.transaction_id
 
-    mock_pay_client.create_transactions.assert_called_once_with(
-        external_reference=EXTERNAL_REFERENCE,
-        invoice_reference=INVOICE_REFERENCE,
-        quotation_id="a-pay-quotation-id",
-        order_id="an-id",
+
+async def test_that_transaction_not_created(
+    transactions_client: transactions.Client,
+    quotations_client: quotations.Client,
+    booking: Booking,
+) -> None:
+    pay_transactions = PayTransactionCreator(
+        use_pay_to_create_transaction=False,
+        transactions_client=transactions_client,
+        quotations_client=quotations_client,
     )
 
+    updated_booking = await pay_transactions.create_transaction_and_set_id(
+        booking=booking,
+    )
 
-async def test_that_exception_raised_if_error_creating_transaction_with_client() -> (
-    None
-):
-    mock_pay_client = create_autospec(PayClient, spec_set=True, instance=True)
-    expected_error = httpx.HTTPError("An Error")
-    mock_pay_client.create_transactions.side_effect = expected_error
+    assert not updated_booking.transaction_id
+
+
+async def test_quotation_not_found_raises_error(
+    transactions_client: transactions.Client,
+    quotations_client: quotations.Client,
+    booking: Booking,
+) -> None:
     pay_transactions = PayTransactionCreator(
         use_pay_to_create_transaction=True,
-        pay_client=mock_pay_client,
+        transactions_client=transactions_client,
+        quotations_client=quotations_client,
     )
-    booking = Booking(
-        id=EXTERNAL_REFERENCE,
-        order_id="an-id",
-        trip_option=TripOption(pay_quote_id="pay-quote-id"),
-        status=Booking.Status.STATUS_PENDING,
-        provider_name="a-provider",
-        total_price=None,
-        trip_result=None,
-        raw_data="raw data",
-        created_at=None,
-        updated_at=None,
-    )
-    with pytest.raises(PayTransactionCreationError) as ex:
+
+    booking.trip_option.MergeFrom(TripOption(pay_quote_id=fixtures.NOT_FOUND))
+    with pytest.raises(PayTransactionCreationError):
         await pay_transactions.create_transaction_and_set_id(
             booking=booking,
         )
 
-    assert ex.value.__cause__ == expected_error  # noqa: WPS441
+
+async def test_create_transaction_failed_raises_error(
+    quotations_client: quotations.Client,
+    booking: Booking,
+) -> None:
+    transactions_client = mock.create_autospec(transactions.Client)
+    transactions_client.create = mock.AsyncMock(side_effect=errors.UnhandledError())
+
+    pay_transactions = PayTransactionCreator(
+        use_pay_to_create_transaction=True,
+        transactions_client=transactions_client,
+        quotations_client=quotations_client,
+    )
+
+    with pytest.raises(PayTransactionCreationError):
+        await pay_transactions.create_transaction_and_set_id(
+            booking=booking,
+        )
+
+
+async def test_update_quotation_status_failed_logs_error(
+    transactions_client: transactions.Client,
+    booking: Booking,
+) -> None:
+    quotations_client = mock.create_autospec(quotations.Client)
+    quotations_client.get = mock.AsyncMock(return_value=fixtures.get_quotations()[0])
+    quotations_client.update_status = mock.AsyncMock(return_value=False)
+
+    pay_transactions = PayTransactionCreator(
+        use_pay_to_create_transaction=True,
+        transactions_client=transactions_client,
+        quotations_client=quotations_client,
+    )
+
+    with stdout.capture_logs() as cap_logs:
+        await pay_transactions.create_transaction_and_set_id(
+            booking=booking,
+        )
+
+        assert len(cap_logs) == 1
+
+        for log in cap_logs:
+            assert log["pay_quote_id"] == fixtures.QUOTATIONS[0]
+            assert log["event"] == "Failed to update quotation status in Pay"

@@ -7,7 +7,6 @@ import httpx
 import pydantic
 from motor import motor_asyncio
 
-from snowfall.project.junction.go import pay_integration
 from snowfall.project.junction.go.adapter import orders as orders_adapter
 from snowfall.project.junction.go.adapter import passenger_name_records
 from snowfall.project.junction.go.service.gateway.v1 import bookings_pb2_grpc
@@ -25,16 +24,18 @@ from snowfall.project.junction.go.service.passenger_name_records.v1 import (
     passenger_name_records_pb2_grpc,
 )
 from snowfall.project.junction.go.service.resellers.v1 import resellers_pb2_grpc
+from snowfall.project.pay.adapter import quotations, transactions
 from snowfall.project.pay.adapter import refunds as refunds_adapter
 from snowfall.project.pay.service.refunds.v1 import (
     grpc_pb2_grpc as refund_pb2_grpc,
+)
+from snowfall.project.pay.service.transactions.v1 import (
+    grpc_pb2_grpc as transactions_pb2_grpc,
 )
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.service import amqp_factory, application, grpc_factory
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.stdlib.transport.grpc import server
-from snowfall.vendor.junction.auth import UserAuth
-from snowfall.vendor.junction.pay.client import Client as PayClient
 from snowfall.vendor.zendesk.client import ZendeskClient
 
 
@@ -53,11 +54,12 @@ class _GrpcSettings(application.Settings):
     refunds_address: str
 
 
-class _ImportSettings(pay_integration.Settings, application.Settings):
+class _ImportSettings(application.Settings):
     amqp_dsn: pydantic.AmqpDsn
     mongo_dsn: Sequence[pydantic.AnyUrl]
     passenger_name_records_address: str
     use_pay_to_create_transaction: bool = False
+    transactions_address: str
 
 
 class _TicketEventsConsumerSettings(application.Settings):
@@ -168,11 +170,12 @@ async def _import(app: application.Application[_ImportSettings]) -> None:
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
 
-    http_client = await app.stack.enter_async_context(httpx.AsyncClient())
     connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
 
-    logging.register(http_client)
-    metrics.register(http_client)
+    transactions_channel = grpc_factory.make_insecure_channel(
+        app,
+        app.settings.transactions_address,
+    )
 
     booking_importer = importer.BookingImporter(
         consumer_obj=consumer.Consumer(
@@ -185,14 +188,11 @@ async def _import(app: application.Application[_ImportSettings]) -> None:
         ),
         pay_transaction_creator=PayTransactionCreator(
             use_pay_to_create_transaction=app.settings.use_pay_to_create_transaction,
-            pay_client=PayClient(
-                base_url=str(app.settings.public_pay_api_dsn),
-                auth=UserAuth(
-                    str(app.settings.public_pay_admin_api_dsn),
-                    app.settings.pay_admin_username,
-                    app.settings.pay_admin_password,
-                ),
-                client=http_client,
+            transactions_client=transactions.GrpcClient(
+                transactions_pb2_grpc.TransactionsServiceStub(transactions_channel),
+            ),
+            quotations_client=quotations.GrpcClient(
+                transactions_pb2_grpc.QuotationsServiceStub(transactions_channel),
             ),
         ),
     )

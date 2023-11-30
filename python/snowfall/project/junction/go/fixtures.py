@@ -18,6 +18,9 @@ from snowfall.project.junction.go.service.resellers.v1 import (
 from snowfall.project.junction.go.service.trips.v1alpha import trips_pb2
 from snowfall.project.junction.go.v1 import models_pb2, seat_maps_pb2
 from snowfall.project.pay.fixtures import COMPANIES
+from snowfall.project.pay.service.transactions.v1 import (
+    models_pb2 as transactions_models_pb2,
+)
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1 import (
@@ -119,6 +122,7 @@ BOOKING_CANCELLATIONS = (
 )
 PASSENGER_NAME_RECORDS = ("4567H3LG",)
 TRIP_SEARCHES = (string.uuid(),)
+QUOTATIONS = ("124b9668-7298-42e9-97e2-f0d205083ab8",)
 
 
 def get_locations() -> list[place_models_pb2.Location]:
@@ -635,3 +639,7 @@ def get_resellers() -> Sequence[resellers_pb2.Reseller]:
         )
         for index, reseller_id in enumerate(RESELLERS)
     ]
+
+
+def get_quotations() -> list[transactions_models_pb2.Quotation]:
+    return [transactions_models_pb2.Quotation(id=quotation) for quotation in QUOTATIONS]
