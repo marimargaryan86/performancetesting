@@ -6,8 +6,8 @@ from typing import NamedTuple
 
 from redis.asyncio import lock as aiolock
 
-from snowfall.project.junction.go.service.gateway import providers
 from snowfall.project.junction.provider.v2alpha import trips_pb2 as provider_trips_pb2
+from snowfall.project.junction.service.gateway import providers
 from snowfall.stdlib.persistence.redis import types
 
 

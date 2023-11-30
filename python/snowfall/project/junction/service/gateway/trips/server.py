@@ -2,7 +2,7 @@ import asyncio
 
 from grpc import aio
 
-from snowfall.project.junction.go.service.gateway.v1 import trips_pb2, trips_pb2_grpc
+from snowfall.project.junction.service.gateway.v1 import trips_pb2, trips_pb2_grpc
 from snowfall.stdlib import string
 from snowfall.stdlib.service import tasks
 from snowfall.stdlib.transport.amqp import protocol

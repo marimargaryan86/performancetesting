@@ -1,13 +1,13 @@
 syntax = "proto3";
 
-package snowfall.project.junction.go.service.gateway.v1;
+package snowfall.project.junction.service.gateway.v1;
 
 import "snowfall/project/junction/provider/v2alpha/trips.proto";
 import "snowfall/project/junction/v1/passenger_type.proto";
 import "snowfall/project/junction/v1/segment_type.proto";
 import "snowfall/stdlib/v1/date.proto";
 
-option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/gateway/v1";
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/gateway/v1";
 
 service TripService {
   rpc EnqueueTripSearch(EnqueueTripSearchRequest) returns (EnqueueTripSearchResponse) {}

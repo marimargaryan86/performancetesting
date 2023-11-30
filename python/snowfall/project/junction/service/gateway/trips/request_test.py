@@ -6,12 +6,14 @@ from google.protobuf import json_format
 from grpc import aio
 from pytest_mock import plugin
 
-from snowfall.project.junction.go.service.gateway import providers, stops
-from snowfall.project.junction.go.service.gateway.trips import request as trips_request
-from snowfall.project.junction.go.service.gateway.v1 import trips_pb2
 from snowfall.project.junction.go.service.places.v1 import models_pb2
 from snowfall.project.junction.provider.v2alpha import meta_pb2
 from snowfall.project.junction.provider.v2alpha import trips_pb2 as provider_trips_pb2
+from snowfall.project.junction.service.gateway import providers, stops
+from snowfall.project.junction.service.gateway.trips import (
+    request as trips_request,
+)
+from snowfall.project.junction.service.gateway.v1 import trips_pb2
 from snowfall.project.junction.v1 import passenger_type_pb2, segment_type_pb2
 from snowfall.stdlib.v1 import date_pb2, latlng_pb2
 

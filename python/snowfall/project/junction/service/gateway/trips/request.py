@@ -4,10 +4,10 @@ import itertools
 from collections.abc import AsyncGenerator, Sequence
 from typing import TypeGuard
 
-from snowfall.project.junction.go.service.gateway import providers, stops
-from snowfall.project.junction.go.service.gateway.v1 import trips_pb2
 from snowfall.project.junction.provider.v2alpha import meta_pb2 as provider_meta_pb2
 from snowfall.project.junction.provider.v2alpha import trips_pb2 as provider_trips_pb2
+from snowfall.project.junction.service.gateway import providers, stops
+from snowfall.project.junction.service.gateway.v1 import trips_pb2
 from snowfall.project.junction.v1 import passenger_type_pb2
 from snowfall.stdlib.format import protobuf
 

@@ -12,12 +12,9 @@ from grpc import aio
 
 from snowfall.project.junction.provider.v1 import (
     bookings_pb2_grpc,
-    offers_pb2_grpc,
-)
-from snowfall.project.junction.provider.v2alpha import (
     meta_pb2,
     meta_pb2_grpc,
-    trips_pb2_grpc,
+    offers_pb2_grpc,
 )
 from snowfall.stdlib import sequence
 from snowfall.stdlib.logging import stdout
@@ -99,15 +96,10 @@ class _ProviderWrapper(object):
         if self.provider.identifier != meta_response.id:
             raise IdentifierMismatchError
 
-        capabilities_response = await self.provider.connection.meta.GetCapabilities(
-            meta_pb2.GetCapabilitiesRequest(),
-        )
-
         self.provider = Provider(
             connection=self.provider.connection,
             identifier=meta_response.id,
             name=meta_response.name,
-            trip_search_capabilities=capabilities_response.trip_search_capabilities,
         )
 
 
@@ -173,9 +165,6 @@ class Provider(object):
     connection: Connection
     identifier: str
     name: str = ""
-    trip_search_capabilities: meta_pb2.TripSearchCapabilities = dataclasses.field(
-        default_factory=meta_pb2.TripSearchCapabilities,
-    )
 
     def marshal_resource_id(self, resource_id: str) -> str:
         return sequence.to_composite_id([self.identifier, resource_id])
@@ -188,7 +177,6 @@ class Connection(object):
         self._meta = meta_pb2_grpc.MetaServiceStub(self._channel)
         self._offers = offers_pb2_grpc.OfferServiceStub(self._channel)
         self._simple_search = offers_pb2_grpc.SimpleOfferServiceStub(self._channel)
-        self._trips = trips_pb2_grpc.TripServiceStub(self._channel)
 
     @property
     def bookings(self) -> bookings_pb2_grpc.BookingServiceStub:
@@ -205,10 +193,6 @@ class Connection(object):
     @property
     def simple_search(self) -> offers_pb2_grpc.SimpleOfferServiceStub:
         return self._simple_search
-
-    @property
-    def trips(self) -> trips_pb2_grpc.TripServiceStub:
-        return self._trips
 
 
 def unmarshal_resource_id(resource_id: str) -> UnmarshalResult:

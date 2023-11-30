@@ -11,11 +11,13 @@ from typing import NamedTuple
 import prometheus_client
 from grpc import aio
 
-from snowfall.project.junction.go.service.gateway import providers
-from snowfall.project.junction.go.service.gateway.trips import cache as trips_cache
-from snowfall.project.junction.go.service.gateway.trips import request as trips_request
-from snowfall.project.junction.go.service.gateway.v1 import trips_pb2
 from snowfall.project.junction.provider.v2alpha import trips_pb2 as provider_trips_pb2
+from snowfall.project.junction.service.gateway import providers
+from snowfall.project.junction.service.gateway.trips import cache as trips_cache
+from snowfall.project.junction.service.gateway.trips import (
+    request as trips_request,
+)
+from snowfall.project.junction.service.gateway.v1 import trips_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.instrumentation import prometheus
 from snowfall.stdlib.logging import stdout

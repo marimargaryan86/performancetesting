@@ -37,9 +37,6 @@ class MetaService(service.Service, meta_pb2_grpc.MetaServiceServicer):
         context: aio.ServicerContext,
     ) -> meta_pb2.GetCapabilitiesResponse:
         return meta_pb2.GetCapabilitiesResponse(
-            trip_search_capabilities=meta_pb2.TripSearchCapabilities(
-                is_supported=True,
-            ),
             booking_capabilities=self._booking_capabilities,
         )
 

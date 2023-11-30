@@ -12,7 +12,6 @@ service MetaService {
 message GetCapabilitiesRequest {}
 
 message GetCapabilitiesResponse {
-  TripSearchCapabilities trip_search_capabilities = 1;
   BookingCapabilities booking_capabilities = 2;
 }
 
@@ -21,10 +20,6 @@ message GetIdentityRequest {}
 message GetIdentityResponse {
   string id = 1;
   string name = 2;
-}
-
-message TripSearchCapabilities {
-  bool is_supported = 1;
 }
 
 message BookingCapabilities {
