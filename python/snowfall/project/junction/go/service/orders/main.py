@@ -172,7 +172,7 @@ async def _import(app: application.Application[_ImportSettings]) -> None:
 
     connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
 
-    transactions_channel = grpc_factory.make_insecure_channel(
+    transactions_channel = await grpc_factory.make_insecure_channel(
         app,
         app.settings.transactions_address,
     )
