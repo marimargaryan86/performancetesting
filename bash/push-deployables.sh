@@ -17,14 +17,16 @@ for e in "${ENVIRONMENTS[@]}"; do
 			readarray -t <<<"$(jq -r '.[] | select(.publisher == "docker") | select(.published == true) | .names[0] + "|" + .target' <"dist/deliverables.json")"
 
 			for i in "${MAPFILE[@]}"; do
-				service_name=$(basename "${i#*|}" | sed s/_/-/g)
-				service_name="${service_name%:*}"
+				docker_image="${i%|*}"
+				service_version="${docker_image##*:}"
+				service_name="${docker_image%:*}"
+				service_name="${service_name#"${CI_REGISTRY}/"}"
+				service_name="${service_name#"${CI_PROJECT_PATH}/"}"
+				service_name="${service_name//\//-}"
 
 				echo "--- ${service_name} ---"
 
 				repo_path="repo/templates/${service_name}"
-				docker_image="${i%|*}"
-				service_version="${docker_image##*:}"
 
 				mkdir -p "${repo_path}"
 				echo "${docker_image}" >"${repo_path}/image.txt"
@@ -58,7 +60,7 @@ for e in "${ENVIRONMENTS[@]}"; do
 	for i in nomad/**/*.nomad; do
 		filename=$(basename "${i}")
 		config="${i%.*}.json"
-		service_name=$(basename "$(dirname "${i}")" | sed s/_/-/g)
+		service_name=$(dirname "${i#"nomad/"}" | sed s!/!-!g)
 		template_path="repo/templates/${service_name}"
 
 		mkdir -p "${template_path}"
@@ -77,6 +79,7 @@ for e in "${ENVIRONMENTS[@]}"; do
 	done
 
 	# clean up our past mistakes
+	find repo -type d -empty -delete
 	cd repo && rm -rf !(templates) && cd ..
 
 	cp ".gitlab/deploy.gitlab-ci.yml" "repo/.gitlab-ci.yml"

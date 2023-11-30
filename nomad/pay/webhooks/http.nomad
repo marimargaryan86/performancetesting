@@ -166,7 +166,7 @@ EOH
         FORWARDED_ALLOWED_IPS = "0.0.0.0"
         HTTP_ADDRESS          = "0.0.0.0"
         HTTP_PORT             = "${NOMAD_PORT_http}"
-        SENTRY_DSN            = "https://21175839a3ec41b89f1da88031ec25a8@sentry.snowfall.se/155"
+        SENTRY_DSN            = "https://21175839a3ec41b89f1da88031ec25a8@sentry.snowfall.se/158"
         PROMETHEUS_PORT       = "${NOMAD_PORT_prometheus}"
       }
     }

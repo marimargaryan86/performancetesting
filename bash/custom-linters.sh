@@ -35,11 +35,8 @@ while read -r project id; do
 	SENTRY_PROJECTS["$project"]="$id"
 done <<<"$(sentry-cli projects list | awk 'NR>4 {print last} {last=$4" "$2}')"
 
-DOCKER_IMAGES=$(pants --filter-target-type='docker_image' peek ::)
-
 mapfile -t NOMAD_FILES < <(pants --filter-address-regex='_nomad$' peek :: | jq -r ".[] | .sources[0]")
-mapfile -t DOCKER_ADDRESSES < <(echo "${DOCKER_IMAGES}" | jq -r ".[] | .address")
-mapfile -t DOCKER_REPOSITORIES < <(echo "${DOCKER_IMAGES}" | jq -r ".[] | select(.repository != null) | .repository")
+mapfile -t DOCKER_REPOSITORIES < <(pants --filter-target-type='docker_image' peek :: | jq -r ".[] | select(.repository != null) | .repository")
 mapfile -t PROTOBUF_FILES < <(pants --filter-target-type="protobuf_source" list ::)
 mapfile -t VALID_DEBUG_INFO_ADDRESSES < <(pants --filter-address-regex='_debug_info$' peek :: | jq -r '.[] | .address')
 mapfile -t UNSTABLE_PROTOS < <(pants --filter-target-type="protobuf_source" list :: | grep -P -e "${UNSTABLE_REGEX}" | xargs pants dependents --transitive)
@@ -59,9 +56,12 @@ for f in "${PROTOBUF_FILES[@]}"; do
 	fi
 done
 
-for i in "${DOCKER_ADDRESSES[@]}"; do
-	SERVICE_NAME=$(basename "${i%:*}")
-	SERVICE_NAME="${SERVICE_NAME//_/-}"
+for i in "${DOCKER_REPOSITORIES[@]}"; do
+	SERVICE_NAME="${i//\//-}"
+
+	if [[ -n ${CI_PROJECT_PATH+x} ]]; then
+		SERVICE_NAME="${SERVICE_NAME#"${CI_PROJECT_PATH//\//-}-"}"
+	fi
 
 	if [[ "${SENTRY_PROJECTS[${SERVICE_NAME}]-0}" -eq 0 ]]; then
 		echo "${SERVICE_NAME}: project does not exist in Sentry"
@@ -133,15 +133,17 @@ for f in "${NOMAD_FILES[@]}"; do
 		fi
 	fi
 
-	if [[ "${SENTRY_PROJECTS[$(basename "${f%/*}")]-0}" -ne 0 ]]; then
+	EXPECTED_SENTRY_PROJECT=$(dirname "${f#nomad/}" | sed -r 's|/|:|g; s|:([^:]*)$|/\1|; s|:|-|g')
+	EXPECTED_SENTRY_PROJECT="${EXPECTED_SENTRY_PROJECT//\//-}"
 
-		if grep -q "SENTRY_DSN" "${f}" && ! grep -q "SENTRY_DSN.*\/${SENTRY_PROJECTS[$(basename "${f%/*}")]}\"" "${f}"; then
+	if [[ "${SENTRY_PROJECTS[$EXPECTED_SENTRY_PROJECT]-0}" -ne 0 ]]; then
+		if grep -q "SENTRY_DSN" "${f}" && ! grep -q "SENTRY_DSN.*\/${SENTRY_PROJECTS[$EXPECTED_SENTRY_PROJECT]}\"" "${f}"; then
 			echo "${f}: invalid Sentry DSN"
 			FAILURE=1
 		fi
 
 	elif grep -q "SENTRY_DSN" "${f}"; then
-		echo "${f}: project does not exist in Sentry"
+		echo "${f}: ${EXPECTED_SENTRY_PROJECT} does not exist in Sentry"
 		FAILURE=1
 	fi
 

@@ -119,7 +119,7 @@ EOH
         ENV_NAME        = "${var.environment}"
         GRPC_ADDRESS    = "0.0.0.0"
         GRPC_PORT       = "${NOMAD_PORT_grpc}"
-        SENTRY_DSN      = "https://6f9c5db73a6d45e6b38e64994484dd6f@sentry.snowfall.se/150"
+        SENTRY_DSN      = "https://6f9c5db73a6d45e6b38e64994484dd6f@sentry.snowfall.se/148"
         PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
         CC_ADDRESS      = "${var.cc_address}"
       }

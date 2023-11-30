@@ -74,7 +74,6 @@ for DIR in templates/*; do
 
 	if [ -f "${image_file}" ]; then
 		docker_image=$(cat "${image_file}")
-		service_name=$(basename "${docker_image%:*}" | sed s/_/-/g)
 		service_version="${docker_image##*:}"
 	fi
 
