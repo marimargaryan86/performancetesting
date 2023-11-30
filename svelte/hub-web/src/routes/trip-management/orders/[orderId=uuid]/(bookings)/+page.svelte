@@ -1,7 +1,6 @@
 <script lang="ts">
   import Button from "components/ui/button.svelte";
   import Header from "components/ui/table/header.svelte";
-  import TActionsCol from "components/ui/table/t-actions-col.svelte";
   import TBody from "components/ui/table/t-body.svelte";
   import TCol from "components/ui/table/t-col.svelte";
   import THead from "components/ui/table/t-head.svelte";
@@ -26,6 +25,10 @@
     data.order = data.order;
   }
 
+  function shouldShowCancellationRefundColumns(booking: TripBooking): boolean {
+    return booking.status !== "confirmed";
+  }
+
   const orderLink = routeConfig.routes.tripManagement.routes.orders.routes.order(data.order.id);
 </script>
 
@@ -46,13 +49,17 @@
     <Header>Booking</Header>
     <Header />
     <Header>Ticket</Header>
+
     <Header>Departure Date</Header>
     <Header>Origin</Header>
     <Header>Destination</Header>
     <Header>Total Price</Header>
     <Header>Booking status</Header>
-    <Header>Cancellation Status</Header>
-    <Header>Refund Status</Header>
+    <!-- Placeholders for conditional columns -->
+    <Header />
+    <Header />
+
+    <Header />
     <Header />
   </THead>
   <TBody>
@@ -71,6 +78,7 @@
             View
           </a>
         </TCol>
+
         <TCol width="0">
           {#if booking.ticketUrls.length}
             <a
@@ -84,6 +92,7 @@
             <span class="not-available">N/A</span>
           {/if}
         </TCol>
+
         <TCol>
           {booking.detailsList[0]?.legs[0]?.departureAt.toLocaleDateString("en-GB", {
             timeZone: origin?.timeZone,
@@ -95,10 +104,12 @@
 
         <TStatusBadgeCol value={booking.status} />
 
-        {#if booking.cancellation?.status}
-          <TStatusBadgeCol value={booking.cancellation.status} />
-        {:else}
-          <TCol width="0" />
+        {#if shouldShowCancellationRefundColumns(booking)}
+          {#if booking.cancellation?.status}
+            <TStatusBadgeCol value={booking.cancellation.status} />
+          {:else}
+            <TCol width="0" />
+          {/if}
         {/if}
 
         {#if booking.refund?.status}
@@ -107,8 +118,8 @@
           <TCol width="0" />
         {/if}
 
-        <TActionsCol>
-          {#if booking.status === "confirmed" && !booking.cancellation?.status}
+        {#if booking.status !== "cancelled" && booking.cancellation?.status !== "pending" && booking?.status !== "error"}
+          <TCol width="0">
             <Button
               size="xx-small"
               variant="outline"
@@ -116,8 +127,8 @@
             >
               Cancel
             </Button>
-          {/if}
-        </TActionsCol>
+          </TCol>
+        {/if}
       </TRow>
     {/each}
   </TBody>
