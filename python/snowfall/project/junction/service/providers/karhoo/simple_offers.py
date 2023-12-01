@@ -1,0 +1,56 @@
+from __future__ import annotations
+
+import contextlib
+
+import httpx
+from aio_pika import abc
+from redis import asyncio as aioredis
+
+from snowfall.project.junction.provider import simple_offers
+from snowfall.project.junction.service.providers.karhoo import (
+    adapter,
+    cache,
+    config,
+    criteria,
+)
+from snowfall.project.junction.service.providers.karhoo.v1 import amqp_pb2
+from snowfall.stdlib.instrumentation.httpx import logging, metrics
+from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.stdlib.service import application
+from snowfall.vendor.karhoo import client
+
+_Impl = simple_offers.SimpleOfferSearchImplementation[amqp_pb2.Criteria]
+
+
+async def simple_search_app(
+    app: application.Application[config.Settings],
+    amqp_conn: abc.AbstractConnection,
+    redis_conn: aioredis.Redis[bytes],
+    stack: contextlib.AsyncExitStack,
+) -> _Impl:
+    http_client = await stack.enter_async_context(
+        httpx.AsyncClient(
+            timeout=app.settings.api_timeout.seconds,
+        ),
+    )
+    logging.register(http_client)
+    metrics.register(http_client)
+    karhoo_client = client.KarhooClient(
+        api_key=app.settings.api_key,
+        base_url=str(app.settings.api_base_url),
+        http_client=http_client,
+    )
+    karhoo_adapter = adapter.KarhooOffersAdapter(
+        karhoo_client=karhoo_client,
+        offers_cache=cache.OffersCache(
+            client=redis.Client(redis_conn, prefix=app.name),
+        ),
+        ttl=app.settings.ttl,
+    )
+
+    return simple_offers.SimpleOfferSearchImplementation(
+        search_criteria_task_generator=criteria.simple_search_criteria_task_generator,
+        search_criteria_generator=criteria.simple_search_criteria_generator,
+        offer_group_cache_key_generator=cache.generate_cache_key,
+        offer_group_generator=karhoo_adapter.gather_offer_groups,
+    )

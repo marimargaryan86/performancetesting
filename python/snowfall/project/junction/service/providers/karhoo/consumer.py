@@ -154,6 +154,7 @@ class TripOfferSearchConsumer(object):
                         id=await self._offers_cache.store(
                             cache.OfferDetails(
                                 quote_id=quote_obj.id,
+                                quotes_response_id=quote_id,
                                 expires_at=expires_at,
                                 price=str(quote_obj.price.high),
                                 currency=money.Currency(quote_obj.price.currency_code),

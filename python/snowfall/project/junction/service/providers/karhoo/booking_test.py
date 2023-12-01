@@ -53,6 +53,7 @@ async def test_booking_can_be_placed(
         task=_ORDER_TASK,
         details=cache.OfferDetails(
             quote_id="abc",
+            quotes_response_id="",
             expires_at=datetime.datetime(2022, 1, 1, 12, 0, tzinfo=datetime.UTC),
             price="3550.00",
             currency=money.Currency("GBP"),

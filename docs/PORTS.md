@@ -60,3 +60,4 @@ The following ports are configured in local environments by default:
 | 50077 | refunds                | gRPC Server       |
 | 50079 | resellers              | gRPC Server       |
 | 50080 | co2 emissions          | gRPC Server       |
+| 50081 | karhoo                 | gRPC Server       |

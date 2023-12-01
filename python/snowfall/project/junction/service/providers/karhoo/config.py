@@ -2,6 +2,7 @@ import datetime
 
 import pydantic
 
+from snowfall.project.junction.provider import service
 from snowfall.stdlib.service import application
 
 _DEFAULT_TTL_IN_MINUTES = 45
@@ -14,6 +15,10 @@ class KarhooConfig(pydantic.BaseModel):
     api_timeout: datetime.timedelta = datetime.timedelta(
         seconds=_DEFAULT_API_TIMEOUT_IN_SECONDS,
     )
+
+
+class Settings(KarhooConfig, service.ProviderSettings):
+    ttl: datetime.timedelta = datetime.timedelta(minutes=_DEFAULT_TTL_IN_MINUTES)
 
 
 class OfferSettings(application.Settings, KarhooConfig):

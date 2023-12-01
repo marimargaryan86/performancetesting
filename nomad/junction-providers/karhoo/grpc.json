@@ -1,0 +1,26 @@
+{
+  "development": {
+    "deploy": true,
+    "variables": {
+      "count": 1,
+      "provider_company_id": "4e066f88-e28e-481a-b0b2-aff740df319c",
+      "api_base_url": "https://rest.sandbox.karhoo.com/"
+    }
+  },
+  "production": {
+    "deploy": false,
+    "variables": {
+      "count": 2,
+      "provider_company_id": "5ec95ce4-7947-46e5-a52e-0ef577f5d92d",
+      "api_base_url": ""
+    }
+  },
+  "sandbox": {
+    "deploy": true,
+    "variables": {
+      "count": 1,
+      "provider_company_id": "4e066f88-e28e-481a-b0b2-aff740df319c",
+      "api_base_url": "https://rest.sandbox.karhoo.com/"
+    }
+  }
+}
