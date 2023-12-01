@@ -1,3 +1,6 @@
+import base64
+import hashlib
+import hmac
 from collections.abc import Sequence
 
 import httpx
@@ -119,7 +122,6 @@ class ProviderChannel(Channel):
     ) -> Sequence[str]:
         response = await self.send_webhook_message(
             receiver,
-            sender_configuration,
             event.preformatted_message,
         )
         return [response]
@@ -127,16 +129,19 @@ class ProviderChannel(Channel):
     async def send_webhook_message(
         self,
         receiver: models_pb2.Subscriber,
-        sender_configuration: models_pb2.ConfigurationVector,
-        body: str | None,
-        title: str | None = None,
-        media_url: str | None = None,
+        body: str,
     ) -> str:
-        # TODO: create method for signature header (#5)
+        signature = hmac.new(
+            receiver.webhook_endpoint.encryption_key.encode(),
+            body.encode(),
+            hashlib.sha512,
+        )
+        signature_b64 = base64.b64encode(signature.digest()).decode("utf-8")
         response = await self._client.request(
             method="POST",
             url=receiver.webhook_endpoint.path,
             json=body,
+            headers={"x-junction-signature": signature_b64},
         )
         response.raise_for_status()
         return string.uuid()
