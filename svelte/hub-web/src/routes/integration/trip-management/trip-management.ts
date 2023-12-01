@@ -26,6 +26,7 @@ export const searchDataModel = z.object({
   destination: z.object(point.shape, { required_error: "Destination is mandatory" }),
   outbound: z.date({ coerce: true, required_error: "Departure date is mandatory" }),
   passengers: passengerPickerData,
+  timeZoneOffset: z.number(),
 });
 export type SearchDataModel = z.infer<typeof searchDataModel>;
 

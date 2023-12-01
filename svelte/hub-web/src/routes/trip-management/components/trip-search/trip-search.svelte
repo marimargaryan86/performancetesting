@@ -67,6 +67,7 @@
       ? { id: destination.id, ...destination.coordinates, precision: getPrecision(destination) }
       : undefined,
     passengers,
+    timeZoneOffset: data.outbound?.getTimezoneOffset() ?? 0,
   };
 
   async function search(): Promise<void> {
@@ -77,11 +78,7 @@
     try {
       $pending = true;
 
-      await tripManagement.search({
-        ...data,
-        // Prevent time zone difference
-        outbound: data.outbound?.toLocaleDateString("sv-SE") as unknown as Date,
-      });
+      await tripManagement.search(data);
 
       await goto(routeConfig.routes.tripManagement.routes.book.routes.select.root, {
         invalidateAll: true,

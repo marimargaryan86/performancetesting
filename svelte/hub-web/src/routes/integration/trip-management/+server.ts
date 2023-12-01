@@ -76,13 +76,16 @@ async function getOfferSearch(
     }
   }
 
+  const departureAfter = new Date(searchData.outbound);
+  departureAfter.setMinutes(departureAfter.getMinutes() - searchData.timeZoneOffset);
+
   const result = await integrationInstances.junctionMobileApi.simpleOfferSearches.create({
     session,
     data: {
       sessionToken,
       passengers: parsePassengers(searchData.passengers),
       allowedSegmentTypes: ["rail"],
-      criteria: { ...searchData, departureAfter: searchData.outbound },
+      criteria: { ...searchData, departureAfter },
     },
   });
 
