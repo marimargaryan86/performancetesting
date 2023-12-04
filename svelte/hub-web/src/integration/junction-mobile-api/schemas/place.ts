@@ -66,6 +66,6 @@ export const placeParser = {
     timeZone: data.attributes.timeZone,
     iataCode: data.attributes.iataCode,
     population: data.attributes.population,
-    mainCity: data.attributes.mainCity,
+    mainCity: data.attributes.mainCity?.length ? data.attributes.mainCity : undefined,
   }),
 };
