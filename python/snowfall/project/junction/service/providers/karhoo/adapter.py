@@ -1,11 +1,13 @@
 import asyncio
 import datetime
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Sequence
+from types import MappingProxyType
 
 from snowfall.project.junction.go.service.offers.v1 import (
     models_pb2 as offer_models_pb2,
 )
 from snowfall.project.junction.go.v1 import models_pb2
+from snowfall.project.junction.go.v1 import models_pb2 as common_pb2
 from snowfall.project.junction.service.providers.karhoo import (
     cache,
     constant,
@@ -22,6 +24,18 @@ from snowfall.vendor.karhoo.models import quotes as karhoo_quotes
 
 _KARHOO_STATUS_PROGRESSING = "PROGRESSING"
 _KARHOO_STATUS_COMPLETED = "COMPLETED"
+_QUOTE_TYPE_FIXED = "FIXED"
+_KARHOO_CABIN_CLASSES: MappingProxyType[
+    str,
+    common_pb2.CabinClass.Type.ValueType,
+] = MappingProxyType(
+    {
+        "luxury": common_pb2.CabinClass.TYPE_PREMIUM,
+        "executive": common_pb2.CabinClass.TYPE_BUSINESS,
+        "electric": common_pb2.CabinClass.TYPE_ECONOMY,
+        "hybrid": common_pb2.CabinClass.TYPE_ECONOMY,
+    },
+)
 
 
 class KarhooOffersAdapter(object):
@@ -70,7 +84,7 @@ class KarhooOffersAdapter(object):
             async for quote in self._retrieve_quotes(trip.id, passengers_count):
                 yield await self._create_offer_group(quote, search_task, trip)
 
-    async def _retrieve_quotes(
+    async def _retrieve_quotes(  # noqa: WPS231
         self,
         identity: str,
         passengers_count: int,
@@ -82,6 +96,8 @@ class KarhooOffersAdapter(object):
                 min_passengers=passengers_count,
             )
             for quote in quotes_result.quotes:
+                if quote.quote_type != _QUOTE_TYPE_FIXED:
+                    continue
                 if quote.id not in seen:
                     seen.append(quote.id)
                     yield quote
@@ -131,10 +147,13 @@ class KarhooOffersAdapter(object):
         segment: offer_models_pb2.OfferSegment,
     ) -> offer_models_pb2.Offer:
         offer_price = money.Money(
-            # TODO: Check with Product
             amount=quote.price.high or 0,
             currency=money.Currency(quote.price.currency_code),
         ).protobuf()
+
+        is_baggage_free = True
+        if quote.vehicle and quote.vehicle.luggage_capacity == 0:
+            is_baggage_free = False
 
         return offer_models_pb2.Offer(
             id=string.uuid(),
@@ -143,17 +162,22 @@ class KarhooOffersAdapter(object):
                     id=string.uuid(),
                     offer_segment_id=segment.id,
                     cabin_class=models_pb2.CabinClass(
-                        # TODO: Check with Product
-                        type=models_pb2.CabinClass.TYPE_UNSPECIFIED,
+                        type=self._get_cabin_class_from_tags(
+                            quote.vehicle.tags if quote.vehicle else [],
+                        ),
                         marketing_name=quote.vehicle.type if quote.vehicle else "",
                     ),
+                    baggage_allowances=[
+                        offer_models_pb2.BaggageAllowance(
+                            free=is_baggage_free,
+                        ),
+                    ],
                 ),
             ],
             price=offer_price,
             price_breakdown=[
                 offer_models_pb2.PriceBreakdown(
                     price=offer_price,
-                    # TODO: Check with product
                     breakdown_type=offer_models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_BASE_FARE,
                 ),
             ],
@@ -200,3 +224,15 @@ class KarhooOffersAdapter(object):
                 protobuf.protobuf_to_datetime(search_task.departure_datetime),
             ),
         )
+
+    def _get_cabin_class_from_tags(
+        self,
+        tags: Sequence[str],
+    ) -> common_pb2.CabinClass.Type.ValueType:
+        target_tags = _KARHOO_CABIN_CLASSES.keys()
+
+        for tag in target_tags:
+            if tag in tags:
+                return _KARHOO_CABIN_CLASSES[tag]
+
+        return common_pb2.CabinClass.TYPE_UNSPECIFIED
