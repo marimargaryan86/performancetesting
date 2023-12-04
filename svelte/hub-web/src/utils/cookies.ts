@@ -105,7 +105,7 @@ export function getCookiesFromHeaders(headers: Headers): Cookie[] {
         priority: restAttributes
           .find((attr) => attr[0] === "Priority")?.[1]
           .toString()
-          .toLocaleLowerCase() as Cookie["priority"],
+          .toLowerCase() as Cookie["priority"],
       });
     }
   });
