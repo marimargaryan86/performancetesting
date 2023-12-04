@@ -60,6 +60,29 @@ async def test_list_quotes(
     assert quotes.id == "00000000-0000-0000-0000-000000000000"
 
 
+async def test_list_quotes_with_min_passengers(
+    httpx_mock: pytest_httpx.HTTPXMock,
+    karhoo_client: client.KarhooClient,
+) -> None:
+    httpx_mock.add_response(
+        url="https://test_url/v2/quotes/00000000-0000-0000-0000-000000000000?passengers=3",
+        status_code=200,
+        json={
+            "id": "00000000-0000-0000-0000-000000000000",
+            "availability": {},
+            "quotes": [],
+            "status": "PROGRESSING",
+        },
+    )
+
+    quotes = await karhoo_client.list_quotes(
+        "00000000-0000-0000-0000-000000000000",
+        3,
+    )
+
+    assert quotes.id == "00000000-0000-0000-0000-000000000000"
+
+
 async def test_list_quotes_not_found(
     httpx_mock: pytest_httpx.HTTPXMock,
     karhoo_client: client.KarhooClient,

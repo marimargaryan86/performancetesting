@@ -32,12 +32,17 @@ class KarhooClient(client.HttpClient):
         )
         return quotes.RequestQuotesResponse(**response.json())
 
-    async def list_quotes(self, ident: str) -> quotes.RequestQuotesResponse:
+    async def list_quotes(
+        self,
+        ident: str,
+        min_passengers: int | None = None,
+    ) -> quotes.RequestQuotesResponse:
         response = await self._make_request(
             client.RequestOptions(
                 method="GET",
                 path="/v2/quotes/{ident}".format(ident=ident),
                 headers=self._auth_header,
+                query={"passengers": str(min_passengers)} if min_passengers else {},
             ),
         )
 
