@@ -48,10 +48,11 @@ class CO2EmissionsService(
                 operating_carrier_code=flight_emission.flight.operating_carrier_code,
                 flight_number=flight_emission.flight.flight_number,
                 emissions_per_pax=co2_emissions_pb2.EmissionsPerPax(
-                    first=flight_emission.emissions_grams_per_pax.first,
-                    business=flight_emission.emissions_grams_per_pax.business,
-                    premium_economy=flight_emission.emissions_grams_per_pax.premium_economy,
-                    economy=flight_emission.emissions_grams_per_pax.economy,
+                    first=flight_emission.emissions_grams_per_pax.first // 1000,
+                    business=flight_emission.emissions_grams_per_pax.business // 1000,
+                    premium_economy=flight_emission.emissions_grams_per_pax.premium_economy
+                    // 1000,
+                    economy=flight_emission.emissions_grams_per_pax.economy // 1000,
                 ),
                 unit="KG",
             )
