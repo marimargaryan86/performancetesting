@@ -17,7 +17,7 @@ job "test-automation-pay-api" {
   periodic {
     cron             = "0 8 * * 1-5"
     prohibit_overlap = true
-    time_zone        = "Europe/Warsaw"
+    time_zone        = "UTC"
   }
 
   group "pay-api" {

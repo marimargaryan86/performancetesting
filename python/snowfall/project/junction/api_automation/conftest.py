@@ -1,14 +1,29 @@
+import asyncio
+import base64
 import datetime
 import json
 import logging
-from collections.abc import Callable, Iterator, Mapping, Sequence
+import tempfile
+import time
+import urllib
+from collections.abc import (
+    AsyncGenerator,
+    Callable,
+    Iterator,
+    Mapping,
+    Sequence,
+)
+from io import BytesIO
 from itertools import starmap
 from pathlib import Path
 from typing import Any
 
+import boto3
 import httpx
 import hvac
+import pandas as pd
 import pytest
+from pymongo import MongoClient
 
 from snowfall.project.junction.api_automation.test_functions.mobile_client import (
     MobileApiClient,
@@ -39,6 +54,27 @@ def pytest_configure(config: pytest.Config) -> None:
         "markers",
         "smoke: smoke test that requires environment",
     )
+    config.addinivalue_line(
+        "markers",
+        "manually: only by manually execution",
+    )
+
+
+async def wait_for_response(
+    request_func: Any,
+    error_message: str,
+    max_wait_time_seconds: int = 120,
+    polling_interval: int = 10,
+) -> Any:
+    stopwatch = time.time() + max_wait_time_seconds
+
+    while stopwatch - time.time() > 0:
+        response = await request_func()
+        if response["data"]:
+            return response
+        await asyncio.sleep(polling_interval)
+
+    raise AssertionError(error_message)
 
 
 @pytest.fixture(scope="package")
@@ -61,7 +97,7 @@ def local_config(
         return config
 
 
-@pytest.fixture(scope="package")
+@pytest.fixture(scope="package", autouse=True)
 def api_token(
     local_config: Mapping[str, str],
     request: pytest.FixtureRequest,
@@ -76,13 +112,9 @@ def departure_after(departures_after: Sequence[str]) -> str:
 
 @pytest.fixture(scope="package", autouse=True)
 def departures_after(request: pytest.FixtureRequest) -> Sequence[str]:
-    departures = request.config.getoption("DEPARTURE_AFTER")
-
-    if not departures:
-        departures = (
-            datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(days=1)
-        ).strftime("%Y-%m-%dT00:00:00.000Z")
-
+    departures = (
+        datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(days=1)
+    ).strftime("%Y-%m-%dT08:00:00.000Z")
     return departures.split(",")
 
 
@@ -106,17 +138,18 @@ def pytest_collection_modifyitems(
     config: pytest.Config,
     items: Sequence[pytest.Item],
 ) -> None:
-    if not config.getoption("-m"):
-        skip_integration = pytest.mark.skip(
-            reason="use `-m integration` to run this test",
-        )
-        for i_integration in items:
-            if "integration" in i_integration.keywords:
-                i_integration.add_marker(skip_integration)
-        skip_smoke = pytest.mark.skip(reason="use `-m smoke` to run this test")
-        for i_smoke in items:
-            if "smoke" in i_smoke.keywords:
-                i_smoke.add_marker(skip_smoke)
+    test_markers = [
+        ("integration", "use `-m integration` to run this test"),
+        ("smoke", "use `-m smoke` to run this test"),
+        ("manually", "use `-m manually` to run this test"),
+    ]
+
+    for marker, skip_reason in test_markers:
+        if not config.getoption("-m"):
+            skip_marker = pytest.mark.skip(reason=skip_reason)
+            for test_item in items:
+                if marker in test_item.keywords:
+                    test_item.add_marker(skip_marker)
 
 
 @pytest.fixture()
@@ -209,3 +242,155 @@ def _save_properties_to_allure_file(
         "departures_after",
         departures_after,
     )
+
+
+@pytest.fixture()
+async def mobile_hub_client(
+    api_token: str,
+    host: str,
+) -> AsyncGenerator[MobileApiClient, None]:
+    api_url = "{0}{1}".format(
+        HTTPS_PREFIX,
+        get_variable_value(host, api_token, "mobile_api_hub_host"),
+    )
+    mobile_token = get_variable_value(host, api_token, "mobile_api_hub_token")
+    client_timeout = 20
+    headers = {
+        "Cookie": "ory_kratos_session={0}".format(mobile_token),
+    }
+    async with httpx.AsyncClient(timeout=client_timeout, headers=headers) as client:
+        yield MobileApiClient(base_url=api_url, auth=None, client=client)
+
+
+@pytest.fixture()
+def mongo_client(host: str, api_token: str) -> MongoClient[Any]:
+    mdb_user = get_variable_value(host, api_token, "mongodb_dev_user")
+    mdb_password = get_variable_value(host, api_token, "mongodb_dev_password")
+    mdb_server = get_variable_value(host, api_token, "mongodb_dev_server")
+    mdb_port = get_variable_value(host, api_token, "mongodb_dev_port")
+
+    mongo_uri = "mongodb://{0}:{1}@{2}:{3}/".format(
+        mdb_user,
+        mdb_password,
+        mdb_server,
+        mdb_port,
+    )
+    return MongoClient(mongo_uri)
+
+
+def get_places() -> list[tuple[str, str]]:
+    aws_access_key_id = "AKIA6JO5TGEWJNIU4LNR"
+    aws_secret_access_key = "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"
+    bucket_name = "junctionqa"
+    file_key = "rails_origin_destination.csv"
+
+    s3 = boto3.client(
+        "s3",
+        aws_access_key_id=aws_access_key_id,
+        aws_secret_access_key=aws_secret_access_key,
+    )
+    response = s3.get_object(Bucket=bucket_name, Key=file_key)
+    data = response["Body"].read()
+    o_d_combination = pd.read_csv(BytesIO(data), sep=";")
+    origin_values = o_d_combination["Origin"].tolist()
+    destination_values = o_d_combination["Destination"].tolist()
+    return list(zip(origin_values, destination_values, strict=False))
+
+
+async def get_coordinates_by_place_name(
+    mongo_client: MongoClient[Any],
+    place_pairs: Sequence[tuple[Any, Any]],
+) -> list[tuple[Any, Any]]:
+    place_id_pairs = []
+    for place in place_pairs:
+        place_result = mongo_client["places"]["places"].find_one(
+            filter={"location.name": place},
+        )
+        coordinate0, coordinate1 = None, None
+        if place_result is not None:
+            coordinates = place_result.get("location")
+            if coordinates is not None:
+                coordinate0, coordinate1 = coordinates.get("coordinates").get(
+                    "coordinates",
+                )
+        place_id_pairs.append((coordinate1, coordinate0))
+
+    return place_id_pairs
+
+
+class ConfigurationManager(object):
+    def __init__(self, host: str, api_token: str) -> None:
+        self.host = host
+        self.api_token = api_token
+
+    def get_br_cert(self) -> str:
+        br_base64_cert = get_variable_value(self.host, self.api_token, "br_base64_cert")
+        return str(br_base64_cert)
+
+    def get_br_api_host(self) -> str:
+        br_api_host = get_variable_value(self.host, self.api_token, "br_api_host")
+        return str(br_api_host)
+
+    def get_br_subscription_key(self) -> str:
+        br_subscription_key = get_variable_value(
+            self.host,
+            self.api_token,
+            "br_subscription_key",
+        )
+        return str(br_subscription_key)
+
+
+async def create_br_connection(
+    config_manager: ConfigurationManager,
+) -> AsyncGenerator[httpx.AsyncClient, None]:
+    cert = (config_manager.get_br_cert(),)
+    base64_cert = "-----BEGIN CERTIFICATE-----\n{0}\n-----END CERTIFICATE-----".format(
+        cert[0],
+    )
+    decoded_cert = base64.b64decode(urllib.parse.unquote(base64_cert))
+
+    with tempfile.NamedTemporaryFile(delete=False) as temp_cert_file:
+        temp_cert_file.write(decoded_cert)
+        temp_cert_file_name = temp_cert_file.name
+    async with httpx.AsyncClient(http2=True, cert=temp_cert_file_name) as client:
+        yield client
+
+
+async def make_br_request(
+    config_manager: ConfigurationManager,
+    method: str,
+    endpoint: str,
+    payload: Mapping[str, Any],
+    custom_headers: Mapping[str, Any] | None = None,
+) -> tuple[dict[str, Any], Any]:
+    base_url = config_manager.get_br_api_host()
+    subscription_key = config_manager.get_br_subscription_key()
+    full_url = urllib.parse.urljoin(base_url, endpoint)
+
+    default_headers = {
+        "Cache-Control": "no-cache",
+        "Ocp-Apim-Subscription-Key": subscription_key,
+        "Content-Type": "application/json",
+        "x-bnds-user-token": "ea44f55b-f390-4327-b3a7-9d79668d4f11",
+    }
+    headers = default_headers
+    if custom_headers is not None:
+        headers = {**default_headers, **custom_headers}
+    async for conn in create_br_connection(config_manager):
+        response = await conn.request(
+            method,
+            full_url,
+            json=payload,
+            headers=headers,
+        )
+        response.raise_for_status()
+        response_hearder = response.headers
+        response_data = response.json()
+
+        return response_data, response_hearder
+    raise RuntimeError("Error on Benerail requests")
+
+
+@pytest.fixture()
+def config_manager(host: str, api_token: str) -> ConfigurationManager:
+    return ConfigurationManager(host, api_token)

@@ -12,6 +12,8 @@ from snowfall.vendor.junction.client import make_pagination_params
 from snowfall.vendor.junction.go import models
 from snowfall.vendor.junction.go.client import Client, LegType
 
+logger = logging.getLogger()
+
 _OrderIncludes: TypeAlias = Literal[
     "journey",
     "bookings",
@@ -573,85 +575,6 @@ class MobileApiClient(Client):
             payload=body,
         )
 
-    async def create_trip_candidates_search(
-        self,
-        origin: tuple[float, float],
-        destination: tuple[float, float],
-        departure_after: datetime,
-        passengers_dates_of_birth: Sequence[date],
-        maximum_connections: int | None = None,
-        allowed_segment_types: Sequence[LegType] | None = None,
-    ) -> dict[str, Any]:
-        attributes: dict[str, Any] = {
-            _PASSENGERS_KEY: [
-                {"dateOfBirth": dob.strftime("%Y-%m-%d")}
-                for dob in passengers_dates_of_birth
-            ],
-            "criteria": [  # TODO: replace with _CRITERIA_KEY after #2178 MR merge
-                {
-                    "origin": {
-                        "latitude": origin[0],
-                        "longitude": origin[1],
-                    },
-                    "destination": {
-                        "latitude": destination[0],
-                        "longitude": destination[1],
-                    },
-                    "departureAfter": departure_after.isoformat(),
-                },
-            ],
-        }
-        if maximum_connections:
-            attributes["criteria"][0]["maximumConnections"] = maximum_connections
-        body = {
-            _DATA_KEY: {
-                _ATTRIBUTES_KEY: attributes,
-                _TYPE_KEY: "trip-candidate-searches",
-            },
-        }
-        if allowed_segment_types:
-            body[_DATA_KEY][_RELATIONSHIPS_KEY] = {
-                "allowedSegmentTypes": {
-                    _DATA_KEY: [
-                        {
-                            _ID_KEY: leg_type.value,
-                            "type": "leg-types",
-                        }
-                        for leg_type in allowed_segment_types
-                    ],
-                },
-            }
-        return await self._make_request(
-            method=_METHOD_POST,
-            url="/trip-candidates/searches",
-            payload=body,
-        )
-
-    async def get_trip_candidate_search(
-        self,
-        trip_candidate_search: str,
-    ) -> dict[str, Any]:
-        return await self._make_request(
-            method=_METHOD_GET,
-            url="/trip-candidates/searches/{0}".format(
-                trip_candidate_search,
-            ),
-        )
-
-    async def list_trip_candidates_offers(
-        self,
-        trip_candidate_search_id: str,
-    ) -> dict[str, Any]:
-        return await self._make_request(
-            method=_METHOD_GET,
-            url="/trip-candidates/searches/{0}/offers".format(
-                trip_candidate_search_id,
-            ),
-            query_parameters={
-                "include": "groups.options",
-            },
-        )
-
     async def get_user(
         self,
     ) -> dict[str, Any]:
@@ -724,7 +647,7 @@ class MobileApiClient(Client):
         }
 
         curl_command = self.generate_curl_command(
-            _METHOD_GET,
+            _METHOD_POST,
             url,
             body=body,
         )
@@ -779,7 +702,7 @@ class MobileApiClient(Client):
             "Session-Token": "YMSXrOAhIOdvIbxAmfSt7vJtRBkurNb6",
         }
         curl_command = self.generate_curl_command(
-            _METHOD_GET,
+            _METHOD_POST,
             url,
             headers=headers,
             body=body,
@@ -792,16 +715,207 @@ class MobileApiClient(Client):
             payload=body,
         )
 
+    async def create_trip_candidates_search(
+        self,
+        origin: tuple[float, float],
+        destination: tuple[float, float],
+        departure_after: datetime,
+        passengers_dates_of_birth: Sequence[date],
+        maximum_connections: int | None = None,
+        allowed_segment_types: Sequence[LegType] | None = None,
+    ) -> dict[str, Any]:
+        passengers = [
+            {"dateOfBirth": dob.strftime("%Y-%m-%d")}
+            for dob in passengers_dates_of_birth
+        ]
+
+        sessiontoken = "FMSXrOAhIOdvIbxAmfSt7vJtRBkurNbn"
+        criteria = [
+            {
+                "origin": {
+                    "latitude": origin[0],
+                    "longitude": origin[1],
+                },
+                "destination": {
+                    "latitude": destination[0],
+                    "longitude": destination[1],
+                },
+                "departureAfter": departure_after,
+            },
+        ]
+
+        if maximum_connections is not None:
+            criteria[0]["maximumConnections"] = maximum_connections
+
+        body_data = {
+            "type": "trip-candidate-searches",
+            "attributes": {
+                "sessionToken": sessiontoken,
+                "criteria": criteria,
+                "passengers": passengers,
+            },
+        }
+
+        if allowed_segment_types:
+            body_data["relationships"] = {
+                "allowedSegmentTypes": {
+                    "data": [
+                        {
+                            "id": leg_type.value,
+                            "type": "leg-types",
+                        }
+                        for leg_type in allowed_segment_types
+                    ],
+                },
+            }
+
+        body = {
+            "data": body_data,
+        }
+        url = "/trip-candidates/searches"
+        curl_command = self.generate_curl_command(
+            _METHOD_POST,
+            url=url,
+            body=body,
+        )
+        logger.info(curl_command)
+        return await self._make_request(
+            method=_METHOD_POST,
+            url=url,
+            payload=body,
+        )
+
+    async def get_trip_candidate_search(
+        self,
+        trip_candidate_search: str,
+    ) -> dict[str, Any]:
+        return await self._make_request(
+            method=_METHOD_GET,
+            url="/trip-candidates/searches/{0}".format(
+                trip_candidate_search,
+            ),
+        )
+
+    async def list_trip_candidates_offers(
+        self,
+        trip_candidate_search_id: str,
+    ) -> dict[str, Any]:
+        url = "/trip-candidates/searches/{0}/offers".format(trip_candidate_search_id)
+
+        query_parameters = {"include": "groups.details"}
+
+        curl_command = self.generate_curl_command(
+            _METHOD_GET,
+            url=url,
+            query_parameters=query_parameters,
+        )
+        logger.info(curl_command)
+
+        return await self._make_request(
+            method=_METHOD_GET,
+            url=url,
+            query_parameters=query_parameters,
+        )
+
     async def get_offer_search(
         self,
         offers_search_id: str,
         include: Sequence[_OfferSearchIncludes] | None = None,
     ) -> dict[str, Any]:
         query_parameters = {}
+
         if include:
             query_parameters["include"] = ",".join(include)
         return await self._make_request(
             method=_METHOD_GET,
             url="/offers/searches/{0}".format(offers_search_id),
+            query_parameters=query_parameters,
+        )
+
+    async def create_offer_simple_search(
+        self,
+        origin: tuple[float, float],
+        destination: tuple[float, float],
+        departure_after: datetime,
+        passengers_dates_of_birth: Sequence[date],
+        maximum_connections: int | None = None,
+        allowed_segment_types: Sequence[LegType] | None = None,
+    ) -> dict[str, Any]:
+        passengers = [
+            {"dateOfBirth": dob.strftime("%Y-%m-%d")}
+            for dob in passengers_dates_of_birth
+        ]
+
+        sessiontoken = "FMSXrOAhIOdvIbxAmfSt7vJtRBkurNbn"
+        criteria = {
+            "origin": {
+                "latitude": origin[0],
+                "longitude": origin[1],
+            },
+            "destination": {
+                "latitude": destination[0],
+                "longitude": destination[1],
+            },
+            "departureAfter": departure_after,
+        }
+
+        if maximum_connections is not None:
+            criteria["maximumConnections"] = maximum_connections
+
+        body_data = {
+            "type": "simple-offer-searches",
+            "attributes": {
+                "sessionToken": sessiontoken,
+                "criteria": criteria,
+                "passengers": passengers,
+            },
+        }
+
+        if allowed_segment_types:
+            body_data["relationships"] = {
+                "allowedSegmentTypes": {
+                    "data": [
+                        {
+                            "id": leg_type.value,
+                            "type": "leg-types",
+                        }
+                        for leg_type in allowed_segment_types
+                    ],
+                },
+            }
+
+        body = {
+            "data": body_data,
+        }
+        url = "/simple-offers/searches"
+        curl_command = self.generate_curl_command(
+            _METHOD_POST,
+            url,
+            body=body,
+        )
+        logger.info(curl_command)
+        return await self._make_request(
+            method=_METHOD_POST,
+            url=url,
+            payload=body,
+        )
+
+    async def list_offers_simple_search(
+        self,
+        offer_simple_search_id: str,
+    ) -> dict[str, Any]:
+        url = "/offers/searches/{0}/offers".format(offer_simple_search_id)
+        query_parameters = {"include": "groups.details"}
+
+        curl_command = self.generate_curl_command(
+            _METHOD_GET,
+            url=url,
+            query_parameters=query_parameters,
+        )
+        logger.info(curl_command)
+
+        return await self._make_request(
+            method=_METHOD_GET,
+            url=url,
             query_parameters=query_parameters,
         )

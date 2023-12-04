@@ -26,7 +26,7 @@ job "test-automation-mobile-api" {
   periodic {
     cron             = "${var.execution_cron}"
     prohibit_overlap = true
-    time_zone        = "Asia/Yerevan"
+    time_zone        = "UTC"
   }
 
   group "mobile-api" {
