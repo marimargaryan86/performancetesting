@@ -78,7 +78,6 @@
   import Button from "components/ui/button.svelte";
   import DatePicker from "components/ui/date-picker/date-picker.svelte";
   import Header from "components/ui/table/header.svelte";
-  import TActionsCol from "components/ui/table/t-actions-col.svelte";
   import TBody from "components/ui/table/t-body.svelte";
   import TCol from "components/ui/table/t-col.svelte";
   import THead from "components/ui/table/t-head.svelte";
@@ -152,7 +151,6 @@
       <Header>Booking Status</Header>
       <Header>Cancellation Status</Header>
       <Header>Refund Status</Header>
-      <Header />
     </THead>
 
     <TBody>
@@ -218,12 +216,6 @@
           {:else}
             <TCol width="0" />
           {/if}
-
-          <TActionsCol>
-            <button class="action">
-              <span>...</span>
-            </button>
-          </TActionsCol>
         </TRow>
       {/each}
     </TBody>
@@ -240,8 +232,7 @@
     color: var(--color-common-light-soft);
   }
 
-  a,
-  button {
+  a {
     padding: 0;
     color: var(--color-common-light-text-link);
     text-decoration: none;
@@ -252,13 +243,5 @@
 
   .not-available {
     color: var(--color-common-light-soft);
-  }
-
-  .action {
-    padding: 4px;
-    background-color: transparent;
-    border: 0;
-    transform: rotateZ(90deg);
-    cursor: pointer;
   }
 </style>

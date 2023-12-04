@@ -1,9 +1,13 @@
 <script lang="ts">
   import TCol from "./t-col.svelte";
+
+  /** Always show the actions, not only on hover */
+  let isStatic = false;
+  export { isStatic as static };
 </script>
 
 <TCol class="actions-col" width="0">
-  <div class="actions">
+  <div class="actions" class:static={isStatic}>
     <slot />
   </div>
 </TCol>

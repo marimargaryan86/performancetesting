@@ -72,9 +72,10 @@
     state = result ? "done" : "failed";
 
     if (result && booking) {
+      booking.cancellationId = result.id;
       booking.cancellation = {
         bookingId: booking.id,
-        id: "",
+        id: result.id,
         status: result.status,
         booking,
       };

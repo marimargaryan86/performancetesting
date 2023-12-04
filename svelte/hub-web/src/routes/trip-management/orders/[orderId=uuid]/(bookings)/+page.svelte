@@ -1,6 +1,7 @@
 <script lang="ts">
   import Button from "components/ui/button.svelte";
   import Header from "components/ui/table/header.svelte";
+  import TActionsCol from "components/ui/table/t-actions-col.svelte";
   import TBody from "components/ui/table/t-body.svelte";
   import TCol from "components/ui/table/t-col.svelte";
   import THead from "components/ui/table/t-head.svelte";
@@ -17,16 +18,18 @@
 
   let cancellationDialog: CancellationDialog | undefined;
 
+  $: showCancellationColumn = data.order.bookings.find((item) => item.cancellationId);
+  $: showRefundColumn = data.order.bookings.find((item) => item.refundId);
+  $: showActionsColumn = data.order.bookings.find(
+    (item) => item.status === "confirmed" && !item.cancellationId,
+  );
+
   function cancelBooking(booking: TripBooking): void {
     cancellationDialog?.open(booking);
   }
 
   function updateOrders(): void {
     data.order = data.order;
-  }
-
-  function shouldShowCancellationRefundColumns(booking: TripBooking): boolean {
-    return booking.status !== "confirmed";
   }
 
   const orderLink = routeConfig.routes.tripManagement.routes.orders.routes.order(data.order.id);
@@ -49,19 +52,16 @@
     <Header>Booking</Header>
     <Header />
     <Header>Ticket</Header>
-
     <Header>Departure Date</Header>
     <Header>Origin</Header>
     <Header>Destination</Header>
     <Header>Total Price</Header>
     <Header>Booking status</Header>
-    <!-- Placeholders for conditional columns -->
-    <Header />
-    <Header />
-
-    <Header />
-    <Header />
+    {#if showCancellationColumn}<Header>Cancellation Status</Header>{/if}
+    {#if showRefundColumn}<Header>Refund Status</Header>{/if}
+    {#if showActionsColumn}<Header />{/if}
   </THead>
+
   <TBody>
     {#each data.order.bookings as booking, idx}
       {@const origin = getOrigin(booking)}
@@ -98,13 +98,13 @@
             timeZone: origin?.timeZone,
           })}
         </TCol>
+
         <TCol class="typography bold">{origin?.name ?? "Unknown"}</TCol>
         <TCol class="typography bold">{destination?.name ?? "Unknown"}</TCol>
         <TMoneyCol money={booking.price.total} />
-
         <TStatusBadgeCol value={booking.status} />
 
-        {#if shouldShowCancellationRefundColumns(booking)}
+        {#if showCancellationColumn}
           {#if booking.cancellation?.status}
             <TStatusBadgeCol value={booking.cancellation.status} />
           {:else}
@@ -112,22 +112,26 @@
           {/if}
         {/if}
 
-        {#if booking.refund?.status}
-          <TStatusBadgeCol value={booking.refund.status} />
-        {:else}
-          <TCol width="0" />
+        {#if showRefundColumn}
+          {#if booking.refund?.status}
+            <TStatusBadgeCol value={booking.refund.status} />
+          {:else}
+            <TCol width="0" />
+          {/if}
         {/if}
 
-        {#if booking.status !== "cancelled" && booking.cancellation?.status !== "pending" && booking?.status !== "error"}
-          <TCol width="0">
-            <Button
-              size="xx-small"
-              variant="outline"
-              on:click={cancelBooking.bind(cancelBooking, booking)}
-            >
-              Cancel
-            </Button>
-          </TCol>
+        {#if showActionsColumn}
+          <TActionsCol static>
+            {#if booking.status === "confirmed" && !booking.cancellation?.status}
+              <Button
+                size="xx-small"
+                variant="outline"
+                on:click={cancelBooking.bind(cancelBooking, booking)}
+              >
+                Cancel
+              </Button>
+            {/if}
+          </TActionsCol>
         {/if}
       </TRow>
     {/each}
