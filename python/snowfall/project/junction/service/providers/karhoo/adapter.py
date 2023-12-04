@@ -65,18 +65,22 @@ class KarhooOffersAdapter(object):
                 search_task.departure_datetime,
             ),
         )
-
+        passengers_count = search_task.passengers_count
         async with asyncio.timeout(self._cut_off):
-            async for quote in self._retrieve_quotes(trip.id):
+            async for quote in self._retrieve_quotes(trip.id, passengers_count):
                 yield await self._create_offer_group(quote, search_task, trip)
 
     async def _retrieve_quotes(
         self,
         identity: str,
+        passengers_count: int,
     ) -> AsyncIterator[karhoo_quotes.Quote]:
         seen = []
         while True:
-            quotes_result = await self._client.list_quotes(ident=identity)
+            quotes_result = await self._client.list_quotes(
+                ident=identity,
+                min_passengers=passengers_count,
+            )
             for quote in quotes_result.quotes:
                 if quote.id not in seen:
                     seen.append(quote.id)
