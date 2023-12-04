@@ -16,6 +16,10 @@ This is a server side rendered SvelteKit application that allows users to intera
   brew install yarn
   ```
 - Sign up for ORY `dev` environment credentials [here](https://exciting-boyd-kr7iwir8gj.projects.oryapis.com/ui)
+- (_Optional_) Install ORY client
+  ```bash
+  brew install ory/tap/cli
+  ```
 
 ## Running a local `hub-web` development instance
 
@@ -46,7 +50,7 @@ ORY_BASE_URL=https://example.com
 
 ```
 
-3. Open a terminal and run an ory development instance:
+3. (_Optional_) Open a terminal and run an ory development instance:
 
 ```bash
 ory tunnel --dev --project exciting-boyd-kr7iwir8gj http://localhost:4000
@@ -55,6 +59,8 @@ ory tunnel --dev --project exciting-boyd-kr7iwir8gj http://localhost:4000
 - **production**: `optimistic-tereshkova-36hc6vayw4`
 - **dev**: `exciting-boyd-kr7iwir8gj`
 - **sandbox**: `hardcore-nash-njumtzes9i`
+
+  _Alternatively, you may point your `.env` file to a deployed ORY instance._
 
 4. Open a separate terminal instance and install dependencies:
 
