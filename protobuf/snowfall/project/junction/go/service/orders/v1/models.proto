@@ -144,6 +144,7 @@ message BookingCancellation {
     STATUS_REFUND_FAILED = 7;
   }
   Status status = 4;
+  snowfall.stdlib.v1.Money refunded_us = 5;
 }
 
 message CancellationRequest {
