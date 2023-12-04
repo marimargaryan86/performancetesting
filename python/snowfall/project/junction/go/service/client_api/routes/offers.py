@@ -7,6 +7,7 @@ from collections.abc import Mapping, Sequence
 from typing import Any, ClassVar, cast
 
 import lagom
+from dateutil import parser
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.project.junction.go.adapter import (
@@ -518,6 +519,12 @@ class SimpleOfferSearches(object):
             raise exceptions.HTTPException(
                 status.HTTP_422_UNPROCESSABLE_ENTITY,
             ) from key_err
+
+        try:
+            departure_before = parser.isoparse(criteria["departureBefore"])
+        except KeyError:
+            departure_before = None
+
         departure_after = get_departure_after(criteria)
         origin_coords = latlng_pb2.LatLng(
             latitude=criteria["origin"]["latitude"],
@@ -546,6 +553,9 @@ class SimpleOfferSearches(object):
                 destination=common_pb2.Point(
                     coordinates=destination_coords,
                 ),
+                departure_before=protobuf.datetime_to_protobuf(departure_before)
+                if departure_before
+                else None,
                 departure_at=protobuf.datetime_to_protobuf(departure_after),
                 passengers=[
                     models_pb2.Passenger(

@@ -1,3 +1,4 @@
+import datetime
 import types
 from collections.abc import Mapping
 from gettext import gettext as _
@@ -55,3 +56,9 @@ def get_comfort_class_value(offer_obj: offer.Offer) -> str:
         return str(offer_obj.comfort_class.comfort_class_value)
 
     return ""
+
+
+def normalize_datetime(dt: datetime.datetime) -> datetime.datetime:
+    if dt.hour % 2 != 0:
+        dt -= datetime.timedelta(hours=1)
+    return dt.replace(minute=0, second=0, microsecond=0)

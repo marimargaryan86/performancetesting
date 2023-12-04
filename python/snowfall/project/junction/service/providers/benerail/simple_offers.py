@@ -22,6 +22,9 @@ from snowfall.project.junction.service.providers.benerail import (
     criteria,
     train_stations,
 )
+from snowfall.project.junction.service.providers.benerail.helper_functions import (
+    normalize_datetime,
+)
 from snowfall.stdlib import h3
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
@@ -158,11 +161,20 @@ def create_criteria_time_windows(
     search: offers_pb2.SimpleTripOfferSearch,
 ) -> list[criteria.SearchCriteria]:
     timestamps = []
-    first_time_window = protobuf.protobuf_to_datetime(search.departure_at)
-    start_window = first_time_window.hour
-    for window in range(start_window, 24, 2):
-        new_timestamp = first_time_window + datetime.timedelta(hours=window)
-        timestamps.append(new_timestamp)
+    departure_at = normalize_datetime(
+        protobuf.protobuf_to_datetime(search.departure_at),
+    )
+
+    if search.HasField("departure_before"):
+        departure_before = protobuf.protobuf_to_datetime(search.departure_before)
+    else:
+        departure_before = departure_at.replace(hour=0)
+        departure_before += datetime.timedelta(days=1)
+
+    while departure_at < departure_before:
+        timestamps.append(departure_at)
+        departure_at += datetime.timedelta(hours=2)
+
     return [
         criteria.SearchCriteria(
             origin=_find_nearest_provider_place(

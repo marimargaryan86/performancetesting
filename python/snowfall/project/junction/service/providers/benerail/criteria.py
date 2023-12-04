@@ -8,6 +8,9 @@ from snowfall.project.junction.go.service.offers.v1 import (
 from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.project.junction.provider import segment_grouper
 from snowfall.project.junction.service.providers.benerail import train_stations
+from snowfall.project.junction.service.providers.benerail.helper_functions import (
+    normalize_datetime,
+)
 from snowfall.project.junction.service.providers.benerail.v1 import amqp_pb2
 from snowfall.stdlib import h3, string
 from snowfall.stdlib.format import protobuf
@@ -29,10 +32,7 @@ def _generate_search_criteria(
     session_token: str,
 ) -> Iterator[amqp_pb2.SearchCriteriaTask]:
     for origin, destination in trip_criteria.get_combinations():
-        hour = trip_criteria.outbound.departure.hour
-
-        if hour % 2:
-            hour = hour - 1
+        departure_dt = normalize_datetime(trip_criteria.outbound.departure)
 
         task = amqp_pb2.SearchCriteriaTask(
             segments=trip_criteria.outbound.segments,
@@ -41,12 +41,7 @@ def _generate_search_criteria(
                 destination_id=destination,
                 passenger_dob=passenger_dobs,
                 outbound_departure_datetime=protobuf.datetime_to_protobuf_datetime(
-                    trip_criteria.outbound.departure.replace(
-                        hour=hour,
-                        minute=0,
-                        second=0,
-                        microsecond=0,
-                    ),
+                    departure_dt,
                 ),
                 br_session_token=session_token,
             ),
