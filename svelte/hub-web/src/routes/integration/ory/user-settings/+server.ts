@@ -19,13 +19,18 @@ export async function POST(event): Promise<Response> {
       data,
     });
 
+    if (!event.locals.user) {
+      // Settings update is part of recovery flow, dont update session meta
+      return new Response(devalue.stringify(flow));
+    }
+
     cookieStore.sessionMetaToken.set(
       await integrationInstances.ory.auth.getLoggedInUser({ session }),
       event,
     );
 
     return new Response(devalue.stringify(flow));
-  } catch {
+  } catch (err) {
     throw error(400);
   }
 }

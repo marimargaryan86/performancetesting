@@ -80,6 +80,12 @@
       $pending = undefined;
     }
   }
+
+  async function logout(): Promise<void> {
+    $pending = "logout";
+    await integrationInstancesClient.ory.auth.logout();
+    $pending = undefined;
+  }
 </script>
 
 <svelte:head>
@@ -88,8 +94,19 @@
 
 <StandardLayout
   pageTitle="Account settings"
-  pageSubTitle={`${$userStore.email} (${formatRole($userStore.role)})`}
+  pageSubTitle={$userStore ? `${$userStore.email} (${formatRole($userStore.role)})` : undefined}
 >
+  <svelte:fragment slot="actions">
+    {#if !$userStore}
+      <Button size="small" on:click={logout}>
+        Go to login
+        {#if $pending === "logout"}
+          <LoadingIcon size="16px" />
+        {/if}
+      </Button>
+    {/if}
+  </svelte:fragment>
+
   <div class="container">
     {#each groupOrder as name}
       {@const nodes = groups[name] ?? []}

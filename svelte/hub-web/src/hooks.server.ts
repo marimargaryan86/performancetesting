@@ -10,15 +10,7 @@ export function authHandle({ event, resolve }: Parameters<Handle>[0]): MaybeProm
   const session = cookieStore.sessionToken.get(event);
   const sessionMeta = cookieStore.sessionMetaToken.get(event);
 
-  if (session && sessionMeta) {
-    event.locals.user = sessionMeta.user;
-    event.locals.sessionExpiresAt = sessionMeta.expiresAt;
-    event.locals.session = session;
-
-    if (event.url.pathname.startsWith(routeConfig.routes.login.root)) {
-      throw redirect(303, routeConfig.root);
-    }
-  } else {
+  if (!session) {
     cookieStore.sessionToken.delete(event);
     cookieStore.sessionMetaToken.delete(event);
 
@@ -26,8 +18,33 @@ export function authHandle({ event, resolve }: Parameters<Handle>[0]): MaybeProm
       !event.url.pathname.startsWith(routeConfig.routes.login.root) &&
       !event.url.pathname.startsWith(ORY_INTEGRATION_ROOT)
     ) {
+      // Only allow the login page and the Ory integration for sessionless users.
       throw redirect(303, routeConfig.routes.login.root);
     }
+
+    return resolve(event);
+  }
+
+  event.locals.session = session;
+
+  if (!sessionMeta) {
+    // Only allow the account settings page and the Ory integration if no session meta is available
+    if (
+      !event.url.pathname.startsWith(routeConfig.routes.account.root) &&
+      !event.url.pathname.startsWith(ORY_INTEGRATION_ROOT)
+    ) {
+      throw redirect(303, routeConfig.routes.account.root);
+    }
+
+    return resolve(event);
+  }
+
+  event.locals.user = sessionMeta.user;
+  event.locals.sessionExpiresAt = sessionMeta.expiresAt;
+
+  if (event.url.pathname.startsWith(routeConfig.routes.login.root)) {
+    // Don't allow logged in users to view the login page
+    throw redirect(303, routeConfig.root);
   }
 
   return resolve(event);

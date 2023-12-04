@@ -1,7 +1,10 @@
+import { goto } from "$app/navigation";
 import { ORY_INTEGRATION_ROOT } from "../common";
 import * as devalue from "devalue";
 import type { User } from "integration/ory/schemas/authentication";
 import type { LoginFlow } from "integration/ory/schemas/login-flow";
+import routeConfig from "routeConfig";
+import userStore from "stores/user-store";
 import { URLExtended } from "utils/url";
 
 export const ROOT = `${ORY_INTEGRATION_ROOT}/auth`;
@@ -35,6 +38,9 @@ async function logout(): Promise<void> {
   await fetch(new URLExtended(ROOT, { base: origin, query: { action: "logout" } }), {
     method: "DELETE",
   });
+
+  await goto(routeConfig.routes.login.root, { invalidateAll: true });
+  userStore.set(undefined as unknown as User);
 }
 
 export default {

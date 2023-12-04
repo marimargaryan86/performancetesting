@@ -9,7 +9,6 @@
   import { page } from "$app/stores";
   import routeConfig from "routeConfig";
   import integrationInstancesClient from "integration-instances-client";
-  import { goto } from "$app/navigation";
 
   let expanded = true;
 
@@ -17,12 +16,6 @@
 
   function toggle(): void {
     expanded = !expanded;
-  }
-
-  async function logout(): Promise<void> {
-    await integrationInstancesClient.ory.auth.logout();
-
-    await goto(routeConfig.routes.login.root, { invalidateAll: true });
   }
 
   $: activeLink = getActiveLink($page.url.pathname);
@@ -85,7 +78,11 @@
       </a>
     </li>
     <li>
-      <button class="logout typography body-medium" title="Logout" on:click={logout}>
+      <button
+        class="logout typography body-medium"
+        title="Logout"
+        on:click={integrationInstancesClient.ory.auth.logout}
+      >
         <LogoutIcon color="var(--color-common-light-strong)" />
         <span>Logout</span>
       </button>

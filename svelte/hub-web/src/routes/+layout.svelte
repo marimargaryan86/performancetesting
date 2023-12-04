@@ -6,12 +6,10 @@
   import "assets/css/typography.css";
   import MainMenu from "components/partials/main-menu/main-menu.svelte";
   import { browser } from "$app/environment";
-  import routeConfig from "routeConfig";
   import userStore from "stores/user-store";
   import { getTimeDeltaMs } from "utils/date-time";
   import * as Sentry from "@sentry/sveltekit";
   import integrationInstancesClient from "integration-instances-client";
-  import { goto } from "$app/navigation";
 
   export let data;
 
@@ -31,10 +29,7 @@
     window.clearTimeout(logoutTimer);
 
     logoutTimer = window.setTimeout(
-      async () => {
-        await integrationInstancesClient.ory.auth.logout();
-        await goto(routeConfig.routes.login.root, { invalidateAll: true });
-      },
+      integrationInstancesClient.ory.auth.logout,
       getTimeDeltaMs(timeoutAt, new Date()),
     );
   }
@@ -48,6 +43,10 @@
       <slot />
     </main>
   </div>
+{:else if data.authenticated}
+  <main>
+    <slot />
+  </main>
 {:else}
   <slot />
 {/if}

@@ -18,10 +18,6 @@ export async function POST(event): Promise<Response> {
       cookieStore.recoveryToken.delete(event);
       cookieStore.loginToken.delete(event);
       cookieStore.sessionToken.set(result.session, event);
-      cookieStore.sessionMetaToken.set(
-        await integrationInstances.ory.auth.getLoggedInUser({ session: result.session }),
-        event,
-      );
 
       return new Response(undefined, { status: 204 });
     }
