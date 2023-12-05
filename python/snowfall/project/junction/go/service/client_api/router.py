@@ -260,7 +260,7 @@ def get_routes(
         integration.route(
             "/orders",
             orders.Orders,
-            name="ListOrders",
+            name="CreateOrders",
         ),
         integration.route(
             "/orders/{orderId}",
