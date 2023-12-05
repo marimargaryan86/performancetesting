@@ -426,6 +426,7 @@ ignore = [
   "PLR2004", # Magic value used in comparison, consider replacing with a constant variable # TODO: fix
   "PLR6301", # Method could be a function or static method
   "PLR0904", # Too many public methods
+  "PLR0917", # Too many positional arguments
   "Q000",    # Single quotes found but double quotes preferred. Incompatible with Ruff's formatter.
   "Q001",    # Single quote multiline found but double quotes preferred. Incompatible with Ruff's formatter.
   "Q002",    # Single quote docstring found but double quotes preferred. Incompatible with Ruff's formatter.

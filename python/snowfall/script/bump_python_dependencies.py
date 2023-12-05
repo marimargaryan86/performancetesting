@@ -152,6 +152,10 @@ def _build_dependency(
     return Dependency(**kwargs, status=Status.available)
 
 
+def _normalize_version(requirement: requirements.Requirement) -> str:
+    return requirement.name.lower().replace("_", "-").replace(".", "-")
+
+
 def _main() -> None:
     if len(sys.argv) != 3:
         _log_error(
@@ -170,6 +174,23 @@ def _main() -> None:
         for line in requirements_file:
             parts = line.strip().split("#", maxsplit=1)
             requirement = requirements.Requirement(parts[0])
+
+            if requirement.name.startswith("snowfall."):
+                dependencies.add(
+                    _build_dependency(
+                        parts=parts,
+                        requirement=requirement,
+                        our_version=version.parse(
+                            versions[_normalize_version(requirement)],
+                        ),
+                        their_version=version.parse(
+                            versions[_normalize_version(requirement)],
+                        ),
+                    ),
+                )
+
+                continue
+
             response = httpx.get(
                 "https://pypi.org/pypi/{0}/json".format(requirement.name),
             )
@@ -181,7 +202,7 @@ def _main() -> None:
                     parts=parts,
                     requirement=requirement,
                     our_version=version.parse(
-                        versions[requirement.name.lower().replace("_", "-")],
+                        versions[_normalize_version(requirement)],
                     ),
                     their_version=version.parse(response.json()["info"]["version"]),
                 ),
