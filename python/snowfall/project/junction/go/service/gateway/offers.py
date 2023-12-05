@@ -139,17 +139,10 @@ class Queue(
             amqp_pb2.TripOfferSearchTask | amqp_pb2.SimpleTripOfferSearchTask
         ],
     ) -> None:
-        match msg.body:
-            case amqp_pb2.TripOfferSearchTask():
-                await self._runner.run(
-                    msg.body.offer_search_id,
-                    self._consume_trip_task(msg.body),
-                )
-            case amqp_pb2.SimpleTripOfferSearchTask():
-                await self._runner.run(
-                    msg.body.offer_search_id,
-                    self._consume_trip_task(msg.body),
-                )
+        await self._runner.run(
+            msg.body.offer_search_id,
+            self._consume_trip_task(msg.body),
+        )
 
     async def _consume_trip_task(
         self,
