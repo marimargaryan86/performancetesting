@@ -274,6 +274,7 @@ class OrdersClient(base.BenerailBaseClient):
         self,
         booking_id: str,
         order_id: str,
+        session_token: str | None = None,
     ) -> booking_response.GetOrderResponse:
         response = await self._make_request(
             client.RequestOptions(
@@ -287,7 +288,7 @@ class OrdersClient(base.BenerailBaseClient):
                         "/orders/{order_id}".format(order_id=order_id),
                     ],
                 ),
-                headers=self._get_headers(),
+                headers=self._get_headers(None, session_token),
             ),
         )
 
@@ -443,6 +444,7 @@ class OrdersClient(base.BenerailBaseClient):
         order_id: str,
         etag: str,
         body: order.OrderIdRefundOffersBody,
+        session_token: str | None = None,
     ) -> booking_response.GetRefundOfferResponse:
         response = await self._make_request(
             client.RequestOptions(
@@ -457,7 +459,7 @@ class OrdersClient(base.BenerailBaseClient):
                         "/refund-offers",
                     ],
                 ),
-                headers=self._get_headers(etag),
+                headers=self._get_headers(etag, session_token),
                 payload=body.dict(by_alias=True, exclude_unset=True),
             ),
         )
@@ -498,6 +500,7 @@ class OrdersClient(base.BenerailBaseClient):
         order_id: str,
         refund_offer_id: str,
         etag: str,
+        session_token: str | None = None,
     ) -> booking_response.GetRefundOfferResponse:
         response = await self._make_request(
             client.RequestOptions(
@@ -514,7 +517,7 @@ class OrdersClient(base.BenerailBaseClient):
                         ),
                     ],
                 ),
-                headers=self._get_headers(etag),
+                headers=self._get_headers(etag, session_token),
                 payload={},
             ),
         )
@@ -649,6 +652,7 @@ class PaymentsClient(base.BenerailBaseClient):
         booking_id: str,
         order_id: str,
         payment_id: str,
+        session_token: str | None = None,
     ) -> booking_response.GetPaymentResourceResponse:
         response = await self._make_request(
             client.RequestOptions(
@@ -663,7 +667,7 @@ class PaymentsClient(base.BenerailBaseClient):
                         "/payments/{payment_id}".format(payment_id=payment_id),
                     ],
                 ),
-                headers=self._get_headers(),
+                headers=self._get_headers(None, session_token),
             ),
         )
 

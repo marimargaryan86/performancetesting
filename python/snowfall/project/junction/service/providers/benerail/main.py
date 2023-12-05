@@ -7,6 +7,7 @@ import httpx
 from aio_pika import abc
 
 from snowfall.project.junction.provider import bookings, meta, notifications, service
+from snowfall.project.junction.provider.v1 import meta_pb2
 from snowfall.project.junction.service.providers.benerail import (
     booking,
     config,
@@ -29,7 +30,13 @@ _PROVIDER_NAME = "Benerail"
 
 
 async def _meta_factory() -> meta.MetaImplementation:
-    return meta.MetaImplementation(identifier=PROVIDER_ID, name=_PROVIDER_NAME)
+    return meta.MetaImplementation(
+        identifier=PROVIDER_ID,
+        name=_PROVIDER_NAME,
+        booking_capabilities=meta_pb2.BookingCapabilities(
+            supports_cancellation=True,
+        ),
+    )
 
 
 async def _bookings_factory(

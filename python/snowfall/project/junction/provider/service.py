@@ -90,6 +90,7 @@ def _grpc_command(  # noqa: WPS217
             meta.MetaService(
                 provider_id=meta_implementation.identifier,
                 provider_name=meta_implementation.name,
+                booking_capabilities=meta_implementation.booking_capabilities,
             ),
         ]
         redis_conn = await redis_factory.make_connection(

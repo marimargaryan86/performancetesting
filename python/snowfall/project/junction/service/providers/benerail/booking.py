@@ -22,7 +22,7 @@ from snowfall.project.junction.service.providers.benerail import (
     helper_models,
 )
 from snowfall.project.junction.service.providers.benerail.v1 import amqp_pb2
-from snowfall.stdlib import money
+from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence import filesystem
@@ -117,6 +117,11 @@ class Transformer(object):
         else:
             booking_status = bookings_pb2.Booking.STATUS_NOT_TICKETED
 
+        updated_at = None
+
+        if all_results.updated_at:
+            updated_at = protobuf.datetime_to_protobuf(all_results.updated_at)
+
         return bookings_pb2.Booking(
             id=str(all_results.booking.response_result.identifier),
             status=booking_status,
@@ -134,13 +139,14 @@ class Transformer(object):
                 ),
             ),
             ticket_urls=all_results.tickets,
-            # TODO: No idea how to get updated_at from the booking model.
+            updated_at=updated_at,
         )
 
 
 class RawStorageData(pydantic.BaseModel):
     booking: bookings_response.GetBookingResponse
     tickets: list[str] | None = None
+    updated_at: datetime.datetime | None = None
 
     @classmethod
     def parse_from_storage(cls, raw: bytes) -> Self:
@@ -219,7 +225,10 @@ class BookingCreationHandler(object):
             ),
         )
 
-        storage_data = RawStorageData(booking=create_booking_response.booking_res)
+        storage_data = RawStorageData(
+            booking=create_booking_response.booking_res,
+            updated_at=datetime.datetime.now(tz=datetime.UTC),
+        )
 
         await self._storage.put(
             pathlib.Path(
@@ -403,7 +412,11 @@ class BookingCreationHandler(object):
 
         await asyncio.sleep(5)
 
-        order_res = await self._client.orders_client.get_order(booking_id, order_id)
+        order_res = await self._client.orders_client.get_order(
+            booking_id=booking_id,
+            order_id=order_id,
+            session_token=session_token,
+        )
 
         try:
             return await self._client.orders_client.update_order_state(
@@ -417,7 +430,11 @@ class BookingCreationHandler(object):
             if status_err.status != http.HTTPStatus.CONFLICT:
                 raise
 
-        order_res = await self._client.orders_client.get_order(booking_id, order_id)
+        order_res = await self._client.orders_client.get_order(
+            booking_id=booking_id,
+            order_id=order_id,
+            session_token=session_token,
+        )
 
         if order_res.response_result.state == enums.OrderStates.prebooked.value:  # type: ignore[comparison-overlap]
             return order_res
@@ -488,12 +505,15 @@ class BookingCancellationHandler(object):
         self._logger = stdout.get_logger()
 
     async def cancel_booking(self, booking_id: str) -> models_pb2.BookingCancellation:
+        session_token = string.uuid()
+
         try:
-            return await self._cancel_booking(booking_id)
+            return await self._cancel_booking(booking_id, session_token)
         except errors.HttpError:
             self._logger.exception(
                 "Booking cancellation failed",
                 booking_id=booking_id,
+                session_token=session_token,
             )
 
             return models_pb2.BookingCancellation(
@@ -504,16 +524,18 @@ class BookingCancellationHandler(object):
     async def _cancel_booking(  # noqa: WPS217
         self,
         booking_id: str,
+        session_token: str,
     ) -> models_pb2.BookingCancellation:
         booking_res = (
             await self._client.bookings_client.get_booking(
                 booking_id=booking_id,
-                session_token="",
+                session_token=session_token,
             )
         )[0]
         refund_order_res = await self._client.bookings_client.create_order(
             booking_id=booking_res.response_result.identifier,
             etag=booking_res.etag,
+            session_token=session_token,
         )
         refund_offer_res = await self._client.orders_client.add_refund_to_order(
             booking_id=booking_res.response_result.identifier,
@@ -527,18 +549,21 @@ class BookingCancellationHandler(object):
                 if booking_res.response_result.fulfillments
                 else [],
             ),
+            session_token=session_token,
         )
         refund_offer_res = await self._client.orders_client.accept_refund_offer(
             booking_id=booking_id,
             order_id=refund_order_res.response_result.identifier,
             refund_offer_id=refund_offer_res.response_result.identifier,
             etag=refund_offer_res.etag,
+            session_token=session_token,
         )
 
         # Retrieve the order again (with updated payment resource)
         refund_order_res = await self._client.orders_client.get_order(
             booking_id=booking_id,
             order_id=refund_order_res.response_result.identifier,
+            session_token=session_token,
         )
 
         if refund_order_res.response_result.payment is None:
@@ -548,6 +573,7 @@ class BookingCancellationHandler(object):
             booking_id=booking_id,
             order_id=refund_order_res.response_result.identifier,
             payment_id=refund_order_res.response_result.payment.identifier,
+            session_token=session_token,
         )
         payment_res = await self._client.payments_client.confirm_order_payment(
             booking_id=booking_id,
@@ -560,11 +586,31 @@ class BookingCancellationHandler(object):
                 ),
                 amount=payment_res.response_result.amount_to_pay,
             ),
+            session_token=session_token,
         )
+
+        refunded_us = None
+
+        if payment_res.response_result.amount_to_pay:
+            refunded_us = money.from_string(
+                currency=money.Currency(
+                    payment_res.response_result.amount_to_pay.currency.upper(),
+                ),
+                string_amount=str(
+                    payment_res.response_result.amount_to_pay.amount,
+                ),
+            )
+        else:
+            self._logger.error(
+                "Refund amount is missing",
+                payment_res=payment_res,
+                session_token=session_token,
+            )
 
         return models_pb2.BookingCancellation(
             booking_id=booking_id,
             status=models_pb2.BookingCancellation.STATUS_REFUND_DUE,
+            refunded_us=refunded_us.protobuf() if refunded_us else None,
         )
 
 
