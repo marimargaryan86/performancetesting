@@ -117,6 +117,7 @@ class OrderService(
             cursor=request.page_token,
             sort=sorting.get_sort(request.sort_by, self._journey_sort),
             reseller_id=request.reseller_id,
+            filter_by=request.filter_by,
         )
 
         journeys_result.limit(

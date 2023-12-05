@@ -3,6 +3,7 @@ syntax = "proto3";
 package snowfall.project.junction.go.service.orders.v1;
 
 import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
 import "snowfall/project/junction/go/service/orders/v1/models.proto";
 import "snowfall/stdlib/v1/postal_address.proto";
 import "snowfall/stdlib/v1/sort.proto";
@@ -52,6 +53,15 @@ message ListJourneysRequest {
   repeated string ids = 3;
   snowfall.stdlib.v1.Sort sort_by = 4;
   string reseller_id = 5;
+  message JourneyFilter {
+    string operator = 1;
+    oneof value {
+      google.protobuf.Timestamp order_created_at = 2;
+      google.protobuf.Timestamp departure_at = 3;
+      Booking.Status booking_status = 4;
+    }
+  }
+  repeated JourneyFilter filter_by = 6;
 }
 
 message ListJourneysResponse {

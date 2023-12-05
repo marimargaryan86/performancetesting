@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 from typing import Any
 from unittest import mock
 
@@ -7,12 +8,15 @@ import more_itertools
 import pymongo
 import pytest
 
+from snowfall.project.junction.go.service.offers.v1 import models_pb2 as offers_pb2
 from snowfall.project.junction.go.service.orders import orders
-from snowfall.project.junction.go.service.orders.v1 import models_pb2
+from snowfall.project.junction.go.service.orders.v1 import models_pb2, orders_pb2
 from snowfall.project.junction.go.service.resellers.v1 import (
     models_pb2 as reseller_models_pb2,
 )
 from snowfall.project.junction.go.service.resellers.v1 import resellers_pb2
+from snowfall.stdlib import string
+from snowfall.stdlib.format import protobuf
 
 _RESELLER_ID = "foo"
 _JOURNEY_PARENTS = ("bar", "baz")
@@ -34,6 +38,53 @@ async def journey_with_owners(
         contact_details=models_pb2.ContactDetails(),
         reseller_id=_RESELLER_ID,
     )
+
+
+async def create_journeys_with_orders(
+    number_of_journeys: int,
+    journey_repository: orders.JourneyRepository,
+    order_repository: orders.OrderRepository,
+) -> None:
+    for idx in range(number_of_journeys):
+        journey = await journey_repository.create(
+            contact_details=models_pb2.ContactDetails(),
+            reseller_id="",
+        )
+
+        await order_repository.create_from_options(
+            journey_id=journey.id,
+            passengers=[
+                models_pb2.Passenger(),
+            ],
+            options=[
+                models_pb2.TripOption(
+                    details=[
+                        models_pb2.TripOptionDetails(
+                            segment=offers_pb2.OfferSegment(
+                                legs=[
+                                    offers_pb2.OfferSegmentLeg(
+                                        id=string.uuid(),
+                                        departure_at=protobuf.datetime_to_protobuf(
+                                            datetime.datetime.now(
+                                                tz=datetime.UTC,
+                                            )
+                                            + datetime.timedelta(days=idx),
+                                        ),
+                                        arrival_at=protobuf.datetime_to_protobuf(
+                                            datetime.datetime.now(
+                                                tz=datetime.UTC,
+                                            )
+                                            + datetime.timedelta(days=idx + 1),
+                                        ),
+                                    ),
+                                ],
+                            ),
+                        ),
+                    ],
+                ),
+            ],
+            residence_address=None,
+        )
 
 
 class TestJourneys(object):
@@ -238,6 +289,118 @@ class TestJourneys(object):
         assert len(asc_created_at_journeys) == 2
         assert asc_created_at_journeys[0] == desc_created_at_journeys[1]
         assert asc_created_at_journeys[1] == desc_created_at_journeys[0]
+
+    async def test_filter_by_departure_at(
+        self,
+        journey_repository: orders.JourneyRepository,
+        order_repository: orders.OrderRepository,
+    ) -> None:
+        await create_journeys_with_orders(3, journey_repository, order_repository)
+
+        all_journeys = [
+            journey
+            async for journey in await journey_repository.find(ids=[], cursor="")
+        ]
+        assert len(all_journeys) == 3
+
+        filtered_journeys = [
+            journey
+            async for journey in await journey_repository.find(
+                ids=[],
+                cursor="",
+                filter_by=[
+                    orders_pb2.ListJourneysRequest.JourneyFilter(
+                        operator="ge",
+                        departure_at=protobuf.datetime_to_protobuf(
+                            datetime.datetime.now(tz=datetime.UTC)
+                            - datetime.timedelta(days=1),
+                        ),
+                    ),
+                    orders_pb2.ListJourneysRequest.JourneyFilter(
+                        operator="le",
+                        departure_at=protobuf.datetime_to_protobuf(
+                            datetime.datetime.now(tz=datetime.UTC)
+                            + datetime.timedelta(days=1),
+                        ),
+                    ),
+                ],
+            )
+        ]
+        assert len(filtered_journeys) == 2
+
+    async def test_filter_by_created_at(
+        self,
+        journey_repository: orders.JourneyRepository,
+        order_repository: orders.OrderRepository,
+    ) -> None:
+        await create_journeys_with_orders(3, journey_repository, order_repository)
+
+        all_journeys = [
+            journey
+            async for journey in await journey_repository.find(ids=[], cursor="")
+        ]
+        assert len(all_journeys) == 3
+
+        filtered_journeys = [
+            journey
+            async for journey in await journey_repository.find(
+                ids=[],
+                cursor="",
+                filter_by=[
+                    orders_pb2.ListJourneysRequest.JourneyFilter(
+                        operator="le",
+                        order_created_at=protobuf.datetime_to_protobuf(
+                            datetime.datetime.now(tz=datetime.UTC)
+                            - datetime.timedelta(days=1),
+                        ),
+                    ),
+                ],
+            )
+        ]
+        assert not filtered_journeys
+
+    async def test_filter_by_booking_status(
+        self,
+        journey_repository: orders.JourneyRepository,
+        order_repository: orders.OrderRepository,
+    ) -> None:
+        await create_journeys_with_orders(3, journey_repository, order_repository)
+
+        all_journeys = [
+            journey
+            async for journey in await journey_repository.find(ids=[], cursor="")
+        ]
+        assert len(all_journeys) == 3
+
+        filtered_journeys = [
+            journey
+            async for journey in await journey_repository.find(
+                ids=[],
+                cursor="",
+                filter_by=[
+                    orders_pb2.ListJourneysRequest.JourneyFilter(
+                        operator="eq",
+                        booking_status=models_pb2.Booking.Status.STATUS_PENDING,
+                    ),
+                ],
+            )
+        ]
+        assert len(filtered_journeys) == 3
+
+        filtered_journeys = [
+            journey
+            async for journey in await journey_repository.find(
+                ids=[],
+                cursor="",
+                filter_by=[
+                    orders_pb2.ListJourneysRequest.JourneyFilter(
+                        operator="eq",
+                        booking_status=models_pb2.Booking.Status.STATUS_CONFIRMED,
+                    ),
+                ],
+            )
+        ]
+        assert not filtered_journeys
 
 
 class TestOrders(object):
