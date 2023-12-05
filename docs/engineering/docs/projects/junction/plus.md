@@ -432,10 +432,10 @@ The supported notification channels for a particular subscriber should be read f
 A new connection is established with Firebase. The app.settings file will have the Firebase (Secret) key. firebase_admin will provide the firebase credentials and firebase messaging support. firebase_messaging.send() is used to send the message to Firebase.
 
 **Mobile API:**\
-The Mobile API is updated for creating and updating the Notification Token - mobile api: /push-notifications/tokens/{deviceToken}.
-The mobile API database will store the mappig for notification token, device token and userid.
+The Mobile API is updated for creating and updating the Notification Token - mobile api endpoint: /push-notifications/tokens.
+The mobile API database will store the mapping for notification token, device token and userid.
 
-The Mobile API will pass on the task of calling junction plus components to a new plugin - plus client. The new Junction Plus client will forward push notification tokens to plus-api using the new authentication method. Authentication will be done via ORY.
+The Mobile API will pass on the task of calling junction plus functions to a new plugin - plus client. i.e. The MobileAPI endpoint will call the new Junction Plus client and that in turn will forward push-notification tokens to Plus-API. Plus-API will use ORY for authentication to validate the caller.
 
 **Plus Client:**\
 The Plus client will call a listener service in Junction Plus - Plus-api.
@@ -446,7 +446,7 @@ http.nomad: nomad details like docker image, network, scaling , service details,
 under nomad/junction/plus-api/
 
 **Plus-API:**\
-A new REST endpoint is created in plus-api (say /push-notifications/tokens) which will be called from the consumer (which in this case is the plus-client api  and which in turn is called from the Mobile API). This will be a PATCH call, and the body of the call will have the 'Notification token' and the 'Device Token'. As the authentication will be done by ORY, you will get the reseller-id in Request.user.username.
+A new REST endpoint is created in plus-api (say /push-notifications/tokens) which will be called from the consumer (which in this case is the plus-client api  and which in turn is called from the Mobile API). This will be a PATCH call, and the body of the call will have the 'Notification token' and the 'mobile number of the subscriber'. The authentication will be done by ORY and you will get the reseller-id (authenticated token) in Request.user.username.
 For authentication, the JWT token and Authentication address (ORY location) is updated in the env.dist file. Inside the main.py for plus-api the ORY authentication is setup in the middleware so that the incoming call is verified.
 
 **Subscriber Service (gRPC):**\
