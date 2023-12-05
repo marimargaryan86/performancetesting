@@ -30,7 +30,7 @@ variable "provider_company_id" {
   type = string
 }
 
-job "mock-pricing" {
+job "junction-providers-mock-pricing" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

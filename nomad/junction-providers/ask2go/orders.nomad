@@ -46,7 +46,7 @@ variable "email_recipient" {
   type = string
 }
 
-job "ask2go-orders" {
+job "junction-providers-ask2go-orders" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

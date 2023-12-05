@@ -45,7 +45,7 @@ variable "api_pay_base_url" {
   type = string
 }
 
-job "offers-pricing" {
+job "junction-go-offers-pricing" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

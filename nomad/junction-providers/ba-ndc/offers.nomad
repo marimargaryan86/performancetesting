@@ -34,7 +34,7 @@ variable "provider_company_id" {
   type = string
 }
 
-job "ba-ndc-offers" {
+job "junction-providers-ba-ndc-offers" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

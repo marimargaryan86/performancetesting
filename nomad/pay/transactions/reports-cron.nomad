@@ -26,7 +26,7 @@ variable "datacenter" {
   type = string
 }
 
-job "transactions-reports-cron" {
+job "pay-transactions-reports-cron" {
   datacenters = ["${var.datacenter}"]
   type        = "batch"
 

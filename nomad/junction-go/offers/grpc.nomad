@@ -30,7 +30,7 @@ variable "use_gateway" {
   type = bool
 }
 
-job "offers-grpc" {
+job "junction-go-offers-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

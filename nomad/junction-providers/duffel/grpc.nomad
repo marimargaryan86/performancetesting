@@ -46,7 +46,7 @@ variable "memory_value" {
   type = number
 }
 
-job "duffel-grpc" {
+job "junction-providers-duffel-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

@@ -34,7 +34,7 @@ variable "traefik_doc_ui_users" {
   type = list(string)
 }
 
-job "junction-http" {
+job "docs-junction-http" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

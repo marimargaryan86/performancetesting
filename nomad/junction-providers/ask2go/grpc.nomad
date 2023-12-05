@@ -42,7 +42,7 @@ variable "bucket" {
   type = string
 }
 
-job "ask2go-grpc" {
+job "junction-providers-ask2go-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

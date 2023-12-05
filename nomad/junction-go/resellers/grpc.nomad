@@ -30,7 +30,7 @@ variable "consul_api_base_url" {
   type = string
 }
 
-job "resellers-grpc" {
+job "junction-go-resellers-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

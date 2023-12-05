@@ -46,7 +46,7 @@ variable "affiliate_api_url" {
   type = string
 }
 
-job "direct-ferries-pricing" {
+job "junction-providers-direct-ferries-pricing" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

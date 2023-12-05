@@ -38,7 +38,7 @@ variable "ory_base_url" {
   type = string
 }
 
-job "hub-web-http" {
+job "junction-hub-hub-web-http" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

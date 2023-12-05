@@ -54,7 +54,7 @@ variable "ip_whitelist_sourcerange" {
   type = list(string)
 }
 
-job "traefik-ingress" {
+job "vendor-traefik-ingress" {
   datacenters = ["${var.datacenter}"]
   type        = "system"
   namespace   = "network"

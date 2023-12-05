@@ -49,7 +49,7 @@ variable "api_pay_base_url" {
   type = string
 }
 
-job "offers-import" {
+job "junction-go-offers-import" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

@@ -26,7 +26,7 @@ variable "count" {
   type = number
 }
 
-job "trips-consume" {
+job "junction-go-trips-consume" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

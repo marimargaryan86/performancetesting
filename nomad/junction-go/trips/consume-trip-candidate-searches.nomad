@@ -30,7 +30,7 @@ variable "max_trip_length_factor" {
   type = number
 }
 
-job "trips-consume-trip-candidate-searches" {
+job "junction-go-trips-consume-trip-candidate-searches" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

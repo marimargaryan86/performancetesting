@@ -34,7 +34,7 @@ variable "api_base_url" {
   type = string
 }
 
-job "duffel-pricing" {
+job "junction-providers-duffel-pricing" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

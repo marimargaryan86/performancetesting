@@ -34,7 +34,7 @@ variable "count" {
   type = number
 }
 
-job "webhooks-http" {
+job "pay-webhooks-http" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

@@ -42,7 +42,7 @@ variable "bucket" {
   type = string
 }
 
-job "save-a-train-grpc" {
+job "junction-providers-save-a-train-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

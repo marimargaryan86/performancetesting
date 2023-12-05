@@ -42,7 +42,7 @@ locals {
   providers_str = join(";", [for key, provider in var.providers : format("%s#127.0.0.1:%s", provider.uuid, format("80%02d", key))])
 }
 
-job "gateway-consume" {
+job "junction-go-gateway-consume" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

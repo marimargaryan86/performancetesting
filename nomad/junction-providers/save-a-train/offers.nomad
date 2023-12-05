@@ -42,7 +42,7 @@ variable "allowed_window_td" {
   type = string
 }
 
-job "save-a-train-offers" {
+job "junction-providers-save-a-train-offers" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

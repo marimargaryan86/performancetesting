@@ -30,7 +30,7 @@ variable "zendesk_base_url" {
   type = string
 }
 
-job "orders-grpc" {
+job "junction-go-orders-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

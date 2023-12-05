@@ -38,7 +38,7 @@ variable "api_booking_base_url" {
   type = string
 }
 
-job "ask2go-pricing" {
+job "junction-providers-ask2go-pricing" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

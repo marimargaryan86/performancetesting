@@ -22,7 +22,7 @@ variable "datacenter" {
   type = string
 }
 
-job "weather-report-cron" {
+job "junction-plus-weather-report-cron" {
   datacenters = ["${var.datacenter}"]
   type        = "batch"
 

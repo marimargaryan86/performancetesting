@@ -29,6 +29,14 @@ def _validate_jobs(
 ) -> bool:
     errors = False
     expected_job_name = "{0}-{1}".format(template_path.parent.name, filename)
+    parent_path = template_path.parent.parent
+
+    while parent_path.name != "nomad":
+        expected_job_name = "{0}-{1}".format(
+            parent_path.name,
+            expected_job_name,
+        )
+        parent_path = parent_path.parent
 
     for job in jobs:
         for job_name, job_data in job.items():

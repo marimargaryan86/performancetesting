@@ -46,7 +46,7 @@ variable "cc_address" {
   type = string
 }
 
-job "pay-api-http" {
+job "pay-pay-api-http" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

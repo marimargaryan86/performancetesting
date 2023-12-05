@@ -34,7 +34,7 @@ variable "email_recipient" {
   type = string
 }
 
-job "karhoo-orders" {
+job "junction-providers-karhoo-orders" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

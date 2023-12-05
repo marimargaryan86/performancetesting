@@ -34,7 +34,7 @@ variable "realistic_results" {
   type = string
 }
 
-job "mock-offers" {
+job "junction-providers-mock-offers" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

@@ -30,7 +30,7 @@ variable "use_pay_to_create_transaction" {
   type = bool
 }
 
-job "orders-import" {
+job "junction-go-orders-import" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

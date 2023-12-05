@@ -34,7 +34,7 @@ variable "count" {
   type = number
 }
 
-job "zendesk-webhook-http" {
+job "junction-go-zendesk-webhook-http" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

@@ -26,7 +26,7 @@ variable "count" {
   type = number
 }
 
-job "schedules-grpc" {
+job "junction-go-schedules-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

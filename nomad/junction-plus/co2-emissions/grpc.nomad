@@ -30,7 +30,7 @@ variable "google_flights_emissions_address" {
   type = string
 }
 
-job "co2-emissions-grpc" {
+job "junction-plus-co2-emissions-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

@@ -10,7 +10,7 @@ variable "count" {
   type = number
 }
 
-job "rate-limiter-grpc" {
+job "vendor-rate-limiter-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

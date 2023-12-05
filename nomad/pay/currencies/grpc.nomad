@@ -26,7 +26,7 @@ variable "count" {
   type = number
 }
 
-job "currencies-grpc" {
+job "pay-currencies-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

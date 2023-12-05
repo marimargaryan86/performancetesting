@@ -6,7 +6,7 @@ variable "datacenter" {
   type = string
 }
 
-job "autoscaler-autoscaler" {
+job "vendor-autoscaler-autoscaler" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
   namespace   = "monitoring"

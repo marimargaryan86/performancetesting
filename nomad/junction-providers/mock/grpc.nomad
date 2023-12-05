@@ -38,7 +38,7 @@ variable "realistic_results" {
   type = string
 }
 
-job "mock-grpc" {
+job "junction-providers-mock-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

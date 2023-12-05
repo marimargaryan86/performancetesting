@@ -30,7 +30,7 @@ variable "cc_address" {
   type = string
 }
 
-job "companies-grpc" {
+job "pay-companies-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

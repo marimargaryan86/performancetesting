@@ -30,7 +30,7 @@ variable "matrix_homeserver_url" {
   type = string
 }
 
-job "plus-webhooks-serve" {
+job "junction-plus-plus-webhooks-serve" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

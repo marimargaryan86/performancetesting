@@ -26,7 +26,7 @@ variable "cc_address" {
   type = string
 }
 
-job "rates-rates-backup" {
+job "pay-rates-rates-backup" {
   datacenters = ["${var.datacenter}"]
   type        = "batch"
 

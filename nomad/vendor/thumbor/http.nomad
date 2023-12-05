@@ -20,7 +20,7 @@ variable "traefik_entrypoints" {
   type = string
 }
 
-job "thumbor-http" {
+job "vendor-thumbor-http" {
 
   datacenters = ["${var.datacenter}"]
   type        = "service"

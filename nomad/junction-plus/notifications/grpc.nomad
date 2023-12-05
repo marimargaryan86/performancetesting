@@ -26,7 +26,7 @@ variable "count" {
   type = number
 }
 
-job "notifications-grpc" {
+job "junction-plus-notifications-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

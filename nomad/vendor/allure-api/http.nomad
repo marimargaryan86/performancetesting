@@ -14,7 +14,7 @@ variable "traefik_host_URL" {
   type = string
 }
 
-job "allure-api-http" {
+job "vendor-allure-api-http" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

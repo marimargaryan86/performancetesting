@@ -50,7 +50,7 @@ variable "provider_company_id" {
   type = string
 }
 
-job "direct-ferries-offers" {
+job "junction-providers-direct-ferries-offers" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

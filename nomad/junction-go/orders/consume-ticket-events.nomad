@@ -27,7 +27,7 @@ variable "count" {
 }
 
 
-job "orders-consume-ticket-events" {
+job "junction-go-orders-consume-ticket-events" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

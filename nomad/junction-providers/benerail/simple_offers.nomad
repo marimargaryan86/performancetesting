@@ -38,7 +38,7 @@ variable "bucket" {
   type = string
 }
 
-job "benerail-simple-offers" {
+job "junction-providers-benerail-simple-offers" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

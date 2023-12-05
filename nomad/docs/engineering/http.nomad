@@ -30,7 +30,7 @@ variable "traefik_host_URL" {
   type = string
 }
 
-job "engineering-http" {
+job "docs-engineering-http" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

@@ -35,7 +35,7 @@ variable "api_base_url" {
 }
 
 
-job "karhoo-grpc" {
+job "junction-providers-karhoo-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

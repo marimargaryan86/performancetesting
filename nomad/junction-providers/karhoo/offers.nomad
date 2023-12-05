@@ -34,7 +34,7 @@ variable "api_base_url" {
   type = string
 }
 
-job "karhoo-offers" {
+job "junction-providers-karhoo-offers" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

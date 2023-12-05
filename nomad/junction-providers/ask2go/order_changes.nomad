@@ -46,7 +46,7 @@ variable "aws_region" {
   type = string
 }
 
-job "ask2go-order-changes" {
+job "junction-providers-ask2go-order-changes" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

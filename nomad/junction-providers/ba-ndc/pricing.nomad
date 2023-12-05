@@ -34,7 +34,7 @@ variable "api_base_url" {
   type = string
 }
 
-job "ba-ndc-pricing" {
+job "junction-providers-ba-ndc-pricing" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

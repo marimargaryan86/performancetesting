@@ -46,7 +46,7 @@ variable "junction_api_address" {
   type = string
 }
 
-job "poc-api-http" {
+job "junction-plus-poc-api-http" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

@@ -30,7 +30,7 @@ variable "flight_stats_webhook_url" {
   type = string
 }
 
-job "orders-registration-import" {
+job "junction-plus-orders-registration-import" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

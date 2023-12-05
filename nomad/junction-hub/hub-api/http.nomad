@@ -38,7 +38,7 @@ variable "cc_address" {
   type = string
 }
 
-job "hub-api-http" {
+job "junction-hub-hub-api-http" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

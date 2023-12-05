@@ -54,7 +54,7 @@ variable "ory_client_id" {
   type = string
 }
 
-job "mobile-api-http" {
+job "junction-extensions-mobile-api-http" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

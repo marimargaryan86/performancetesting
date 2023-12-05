@@ -26,7 +26,7 @@ variable "count" {
   type = number
 }
 
-job "notification-center-import" {
+job "junction-plus-notification-center-import" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

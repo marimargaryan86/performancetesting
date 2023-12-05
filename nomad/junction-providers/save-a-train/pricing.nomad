@@ -30,7 +30,7 @@ variable "provider_company_id" {
   type = string
 }
 
-job "save-a-train-pricing" {
+job "junction-providers-save-a-train-pricing" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

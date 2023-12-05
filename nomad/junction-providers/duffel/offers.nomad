@@ -38,7 +38,7 @@ variable "disabled_airlines" {
   type = string
 }
 
-job "duffel-offers" {
+job "junction-providers-duffel-offers" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

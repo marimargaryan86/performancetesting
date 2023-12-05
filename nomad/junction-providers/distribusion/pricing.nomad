@@ -38,7 +38,7 @@ variable "retailer_partner_number" {
   type = string
 }
 
-job "distribusion-pricing" {
+job "junction-providers-distribusion-pricing" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

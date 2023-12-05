@@ -30,7 +30,7 @@ variable "bucket" {
   type = string
 }
 
-job "mock-orders" {
+job "junction-providers-mock-orders" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

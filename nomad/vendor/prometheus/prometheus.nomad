@@ -2,7 +2,7 @@ variable "datacenter" {
   type = string
 }
 
-job "prometheus-prometheus" {
+job "vendor-prometheus-prometheus" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
   namespace   = "monitoring"

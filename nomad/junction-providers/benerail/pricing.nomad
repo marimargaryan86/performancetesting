@@ -34,7 +34,7 @@ variable "api_base_url" {
   type = string
 }
 
-job "benerail-pricing" {
+job "junction-providers-benerail-pricing" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

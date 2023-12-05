@@ -7,7 +7,7 @@ variable "datacenter" {
 }
 
 
-job "vector-vector-loki" {
+job "vendor-vector-vector-loki" {
   datacenters = ["${var.datacenter}"]
   namespace   = "monitoring"
   type        = "system"

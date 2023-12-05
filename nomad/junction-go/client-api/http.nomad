@@ -34,7 +34,7 @@ variable "count" {
   type = number
 }
 
-job "client-api-http" {
+job "junction-go-client-api-http" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

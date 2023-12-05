@@ -36,7 +36,7 @@ variable "base_url_URL" {
 
 
 
-job "dogfood-ui-http" {
+job "junction-go-dogfood-ui-http" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 

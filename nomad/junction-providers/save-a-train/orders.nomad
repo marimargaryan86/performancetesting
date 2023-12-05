@@ -42,7 +42,7 @@ variable "email_recipient" {
   type = string
 }
 
-job "save-a-train-orders" {
+job "junction-providers-save-a-train-orders" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 
