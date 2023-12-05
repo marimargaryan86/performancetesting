@@ -1,5 +1,9 @@
 import type { Price } from "integration/common/schemas/price";
 
+export function pricesEqual(a: Price, b: Price): boolean {
+  return a.amount === b.amount && a.currency === b.currency;
+}
+
 export function summarizePrices(...prices: [Price, ...Price[]]): Price {
   if (new Set(prices.flatMap((price) => price.currency)).size !== 1) {
     throw new Error("Currencies do not match");

@@ -2,8 +2,17 @@
   import { formatAmount } from "formatting/currency";
   import type { Refund } from "integration/junction-hub-api/schemas/refund";
   import { slideFade } from "transitions/slide-fade";
+  import { pricesEqual } from "utils/money";
 
   export let refund: Refund;
+
+  // Only display usInPayerCurrency if the currency differs from refundedUs
+  $: usInPayerCurrency =
+    refund.refunded.usInPayerCurrency &&
+    refund.refunded.us &&
+    pricesEqual(refund.refunded.us, refund.refunded.usInPayerCurrency)
+      ? undefined
+      : refund.refunded.usInPayerCurrency;
 </script>
 
 <div class="refund" transition:slideFade={{ duration: 300 }}>
@@ -19,13 +28,11 @@
       </li>
     {/if}
 
-    {#if refund.refunded.usInPayerCurrency}
+    {#if usInPayerCurrency}
       <li class="typography body-medium amount">
         <strong>To us <em>(Payer currency)</em></strong>
-        <span class="typography bold" class:negative={refund.refunded.usInPayerCurrency.amount < 0}>
-          {refund.refunded.usInPayerCurrency
-            ? formatAmount(refund.refunded.usInPayerCurrency, true)
-            : "N/A"}
+        <span class="typography bold" class:negative={usInPayerCurrency.amount < 0}>
+          {formatAmount(usInPayerCurrency, true)}
         </span>
       </li>
     {/if}
