@@ -122,7 +122,7 @@ job "junction-go-orders-grpc" {
       template {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
-GATEWAY_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_gateway-serve-${var.environment}"))}}
+GATEWAY_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_junction-go-gateway-serve-${var.environment}"))}}
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 PASSENGER_NAME_RECORDS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_passenger-name-records-${var.environment}"))}}
 RESELLERS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_resellers-${var.environment}"))}}
