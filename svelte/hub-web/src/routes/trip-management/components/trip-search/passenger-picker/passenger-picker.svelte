@@ -2,22 +2,25 @@
   export const MAX_TOTAL_COUNT = 9;
   export const PASSENGER_DEFINITIONS: Record<
     keyof PassengerPickerData,
-    { label: string; span: { from: number; to?: number } }
+    { label: { singular: string; plural: string }; span: { from: number; to?: number } }
   > = {
-    seniors65: { label: "Senior", span: { from: 65 } },
-    seniors60: { label: "Senior", span: { from: 60, to: 64 } },
-    adults: { label: "Adult", span: { from: 26, to: 59 } },
-    youths15: { label: "Youth", span: { from: 15, to: 25 } },
-    youths12: { label: "Youth", span: { from: 12, to: 14 } },
-    children6: { label: "Child", span: { from: 6, to: 11 } },
-    children4: { label: "Child", span: { from: 4, to: 5 } },
-    children0: { label: "Child", span: { from: 0, to: 3 } },
+    seniors65: { label: { singular: "Senior", plural: "Seniors" }, span: { from: 65 } },
+    seniors60: { label: { singular: "Senior", plural: "Seniors" }, span: { from: 60, to: 64 } },
+    adults: { label: { singular: "Adult", plural: "Adults" }, span: { from: 26, to: 59 } },
+    youths15: { label: { singular: "Youth", plural: "Youths" }, span: { from: 15, to: 25 } },
+    youths12: { label: { singular: "Youth", plural: "Youths" }, span: { from: 12, to: 14 } },
+    children6: { label: { singular: "Child", plural: "Children" }, span: { from: 6, to: 11 } },
+    children4: { label: { singular: "Child", plural: "Children" }, span: { from: 4, to: 5 } },
+    children0: { label: { singular: "Child", plural: "Children" }, span: { from: 0, to: 3 } },
   };
 
   export function getPassengerFullLabel(
     def: (typeof PASSENGER_DEFINITIONS)[keyof PassengerPickerData],
+    which: "singular" | "plural" = "singular",
   ): string {
-    return `${def.label} (${def.span.from}${def.span.to === undefined ? "+" : `-${def.span.to}`})`;
+    return `${def.label[which]} (${def.span.from}${
+      def.span.to === undefined ? "+" : `-${def.span.to}`
+    })`;
   }
 
   export const passengerPickerData = z
@@ -38,6 +41,24 @@
     });
 
   export type PassengerPickerData = z.infer<typeof passengerPickerData>;
+
+  export function getPassengersPresentation(passengers: PassengerPickerData): string {
+    return Object.entries(PASSENGER_DEFINITIONS)
+      .map(([key, val]) => {
+        const type = key as keyof PassengerPickerData;
+
+        if (!passengers[type]) {
+          return undefined;
+        }
+
+        return `${passengers[type]} ${getPassengerFullLabel(
+          val,
+          passengers[type] === 1 ? "singular" : "plural",
+        )}`;
+      })
+      .filter(ensureDefined)
+      .join(", ");
+  }
 </script>
 
 <script lang="ts">
@@ -47,6 +68,7 @@
   import { scale } from "svelte/transition";
   import { z } from "zod";
   import { slideFade } from "transitions/slide-fade";
+  import { ensureDefined } from "utils/array";
 
   export let passengers: PassengerPickerData;
   export let error: string | string[] | boolean = false;

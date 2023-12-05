@@ -87,11 +87,9 @@ export function getTotalPriceBreakdown(priceQuote: TripOfferPriceQuote): PriceBr
 }
 
 export function getLegsFromPriceQuote(priceQuote: TripOfferPriceQuote): OfferSegmentLeg[] {
-  if (!priceQuote || !priceQuote.offer) {
-    return [];
-  }
-  return priceQuote.offer.groups
-    .flatMap((group) => group.detailsList.flatMap((details) => details.legs))
-    .filter(ensureDefined)
-    .sort((a, b) => a.departureAt.getTime() - b.departureAt.getTime());
+  return (
+    priceQuote.offer?.groups
+      .flatMap((group) => group.detailsList.flatMap((details) => details.legs))
+      .sort((a, b) => a.departureAt.getTime() - b.departureAt.getTime()) ?? []
+  );
 }

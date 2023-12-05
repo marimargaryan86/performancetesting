@@ -1,40 +1,16 @@
-<script lang="ts" context="module">
-  // eslint-disable-next-line complexity
-  function getPassengersPresentation(passengers: PassengerPickerData): string {
-    const { seniors65, seniors60, adults, youths15, youths12, children6, children4, children0 } =
-      passengers;
-
-    let result = [
-      seniors65 ? `${seniors65} Senior${seniors65 === 1 ? "" : "s"} (65+)` : undefined,
-      seniors60 ? `${seniors60} Senior${seniors60 === 1 ? "" : "s"} (60-64)` : undefined,
-      adults ? `${adults} Adult${adults === 1 ? "" : "s"} (26-59)` : undefined,
-      youths15 ? `${youths15} Youth${youths15 === 1 ? "" : "s"} (15-25)` : undefined,
-      youths12 ? `${youths12} Youth${youths12 === 1 ? "" : "s"} (12-14)` : undefined,
-      children6 ? `${children6} Child${children6 === 1 ? "" : "ren"} (6-11)` : undefined,
-      children4 ? `${children4} Child${children4 === 1 ? "" : "ren"} (4-5)` : undefined,
-      children0 ? `${children0} Child${children0 === 1 ? "" : "ren"} (0-3)` : undefined,
-    ]
-      .filter(ensureDefined)
-      .join(", ");
-
-    tripStore.update((store) => ({ ...store, passengersPresentation: result }));
-
-    return result;
-  }
-</script>
-
 <script lang="ts">
   import type { TripOfferPriceQuote } from "integration/junction-mobile-api/schemas/trip-offer-price-quote";
-  import { ensureDefined } from "utils/array";
   import { formatAmount, formatPriceBreakdownType } from "formatting/currency";
   import { slideFade } from "transitions/slide-fade";
   import { getTotalPriceBreakdown } from "utils/offer";
   import Collapsible from "../collapsible.svelte";
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import SummaryItinerary from "./summary-itinerary.svelte";
-  import type { PassengerPickerData } from "../trip-search/passenger-picker/passenger-picker.svelte";
+  import {
+    getPassengersPresentation,
+    type PassengerPickerData,
+  } from "../trip-search/passenger-picker/passenger-picker.svelte";
   import { createEventDispatcher } from "svelte";
-  import { tripStore } from "../../../../stores/tripStore";
 
   export let priceQuote: TripOfferPriceQuote | undefined = undefined;
   export let passengers: PassengerPickerData;
@@ -49,14 +25,13 @@
 
   $: priceBreakdown = priceQuote ? getTotalPriceBreakdown(priceQuote) : undefined;
   $: totalPrice = priceQuote?.price.total;
-  $: passengersPresentation = getPassengersPresentation(passengers);
 </script>
 
 <Collapsible bind:this={collapsible} title="Summary">
   <div class="details">
     {#if priceQuote}
       <p class="typography label-large">
-        Passengers <span class="typography bold">{passengersPresentation}</span>
+        Passengers <span class="typography bold">{getPassengersPresentation(passengers)}</span>
       </p>
 
       <p class="typography label-large">

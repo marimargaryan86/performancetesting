@@ -212,20 +212,3 @@ export function getAge(date: Date, today = new Date()): number {
 
   return age;
 }
-
-export function capitalizeFirstLetter(inputString: string): string {
-  return inputString.charAt(0).toUpperCase() + inputString.slice(1);
-}
-
-export function formatDateStringFromDate(date: Date, timezone: string): string {
-  return date
-    .toLocaleDateString("sv-SE", {
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-      timeZone: timezone,
-    })
-    .split(" ")
-    .map(capitalizeFirstLetter)
-    .join(" ");
-}

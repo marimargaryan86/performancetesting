@@ -24,8 +24,6 @@
   import AlertIcon from "components/icons/alert-icon.svelte";
   import { getOrderStatus, type OrderBookingStatus } from "integration/common/schemas/order";
   import Fees from "./fees.svelte";
-  import { clearTripStore } from "stores/tripStore";
-  import { onDestroy } from "svelte";
 
   export let data;
 
@@ -34,10 +32,6 @@
   );
   $: orderStatus = getOrderStatus.booking(data.order);
   $: alertType = orderStatus ? getAlertType(orderStatus) : "warning";
-
-  onDestroy(() => {
-    clearTripStore();
-  });
 </script>
 
 <svelte:head>

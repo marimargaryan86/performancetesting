@@ -1,81 +1,60 @@
 <script lang="ts">
   import type { TripOfferPriceQuote } from "integration/junction-mobile-api/schemas/trip-offer-price-quote";
-  import type { OfferSegmentLeg } from "integration/common/schemas/offer-segment-leg";
-  import { tripStore } from "../../../stores/tripStore";
   import { slideFade } from "transitions/slide-fade";
   import { getLegsFromPriceQuote } from "utils/offer";
-  import { formatDateStringFromDate } from "utils/date-time";
+  import {
+    getPassengersPresentation,
+    type PassengerPickerData,
+  } from "./trip-search/passenger-picker/passenger-picker.svelte";
 
   export let priceQuote: TripOfferPriceQuote;
-  let legs: OfferSegmentLeg[] = [];
-  let departureLeg: OfferSegmentLeg | undefined;
-  let arrivalLeg: OfferSegmentLeg | undefined;
-  let departureDateTime = "";
-  let arrivalDateTime = "";
+  export let passengers: PassengerPickerData;
 
-  $: {
-    legs = getLegsFromPriceQuote(priceQuote);
-    departureLeg = legs.length > 0 ? legs[0] : undefined;
-    arrivalLeg = legs.length > 0 ? legs[legs.length - 1] : undefined;
-    departureDateTime = departureLeg
-      ? formatDateStringFromDate(departureLeg.departureAt, departureLeg.origin.timeZone)
-      : "";
-    arrivalDateTime = arrivalLeg
-      ? formatDateStringFromDate(arrivalLeg.arrivalAt, arrivalLeg.destination.timeZone)
-      : "";
-
-    tripStore.update((store) => ({
-      ...store,
-      legs,
-      departureLeg,
-      arrivalLeg,
-      departureDateTime,
-      arrivalDateTime,
-      departureStationName: departureLeg?.origin.name ?? "",
-      arrivalStationName: arrivalLeg?.destination.name ?? "",
-    }));
-  }
+  $: legs = getLegsFromPriceQuote(priceQuote);
+  $: departureLeg = legs[0];
+  $: arrivalLeg = legs[legs.length - 1];
 </script>
 
-<div transition:slideFade={{ duration: 300 }}>
-  <div class="content">
-    {#if departureLeg && arrivalLeg}
-      <p class="typography title-medium">{departureDateTime}</p>
-      <p class="typography title-medium">
-        {departureLeg.origin.name}
-        {"→"}
-        {arrivalLeg.destination.name}
-      </p>
-      <p class="typography title-medium truncate">{$tripStore.passengersPresentation}</p>
-    {:else}
-      <p>Loading trip details...</p>
-    {/if}
-  </div>
+<div transition:slideFade={{ duration: 300 }} class="trip-banner typography body-large">
+  {#if departureLeg && arrivalLeg}
+    <p>
+      {departureLeg.departureAt.toLocaleDateString("en-GB", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+        timeZone: departureLeg.origin.timeZone,
+      })}
+    </p>
+
+    <p>
+      {departureLeg.origin.name}
+      {"→"}
+      {arrivalLeg.destination.name}
+    </p>
+
+    <p class="truncate">
+      {getPassengersPresentation(passengers)}
+    </p>
+  {:else}
+    <p>Loading trip details...</p>
+  {/if}
 </div>
 
 <style>
-  .content {
+  .trip-banner {
     display: flex;
     flex-wrap: nowrap;
     gap: 8px;
     align-items: center;
     justify-content: space-between;
-    max-width: 100%;
     padding: 16px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
     background-color: var(--color-main-primary-50);
     border: 1px solid transparent;
     border-radius: 16px;
-    transition:
-      border-color 200ms ease,
-      background-color 200ms ease;
   }
 
-  .content > :global(*) {
+  .trip-banner > p {
     flex-shrink: 0;
-    font-size: 16px;
   }
 
   .truncate {

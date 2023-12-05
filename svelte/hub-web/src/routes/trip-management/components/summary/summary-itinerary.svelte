@@ -1,27 +1,18 @@
-<script lang="ts" context="module">
-  export type OrigDestLegs = {
-    originLeg: OfferSegmentLeg;
-    destinationLeg: OfferSegmentLeg;
-  };
-</script>
-
 <script lang="ts">
   import { formatDuration } from "formatting/date-time";
   import { getTimeDeltaS } from "utils/date-time";
   import Collapsible from "../collapsible.svelte";
   import { createEventDispatcher } from "svelte";
   import type { TripOfferPriceQuote } from "integration/junction-mobile-api/schemas/trip-offer-price-quote";
-  import type { OfferSegmentLeg } from "integration/common/schemas/offer-segment-leg";
   import EntityAvatar from "components/ui/entity-avatar.svelte";
   import { getLegsFromPriceQuote } from "utils/offer";
-  import { tripStore } from "stores/tripStore";
 
   export let priceQuote: TripOfferPriceQuote;
 
   $: vendor = priceQuote.options[0]?.detailsList[0]?.details?.vendor ?? "Unknown";
-  $: trainNumber = priceQuote.options[0]?.detailsList[0]?.details?.routeIdentifiers.vendor ?? ";";
+  $: trainNumber = priceQuote.options[0]?.detailsList[0]?.details?.routeIdentifiers.vendor ?? "";
   $: segmentCount = priceQuote.options[0]?.detailsList.length ?? 1;
-  $: departureDateTime = $tripStore.departureDateTime;
+  $: departureLeg = priceQuote.options[0]?.detailsList[0]?.details?.legs[0];
 
   const dispatch = createEventDispatcher<{ showFareRules: void }>();
 
@@ -40,8 +31,13 @@
       {trainNumber} • {segmentCount === 1 ? "Direct" : `${segmentCount} stops`}
     </div>
     <span>
-      {#if departureDateTime}
-        {departureDateTime}
+      {#if departureLeg}
+        {departureLeg.departureAt.toLocaleDateString("en-GB", {
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+          timeZone: departureLeg.origin.timeZone,
+        })}
       {/if}
     </span>
   </div>
