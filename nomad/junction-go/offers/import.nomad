@@ -93,7 +93,7 @@ job "junction-go-offers-import" {
           proxy {
             upstreams {
               local_bind_port  = 8010
-              destination_name = "gateway-serve-${var.environment}"
+              destination_name = "junction-go-gateway-serve-${var.environment}"
             }
           }
         }

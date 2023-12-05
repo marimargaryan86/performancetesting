@@ -79,7 +79,7 @@ job "junction-go-orders-grpc" {
             }
             upstreams {
               local_bind_port  = 8010
-              destination_name = "gateway-serve-${var.environment}"
+              destination_name = "junction-go-gateway-serve-${var.environment}"
             }
             upstreams {
               local_bind_port  = 8030
