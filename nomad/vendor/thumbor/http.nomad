@@ -94,6 +94,9 @@ EOH
           password       = var.registry_password
           server_address = var.registry_address
         }
+        volumes = [
+          "/thumbor-efs/:/thumbor-efs"
+        ]
       }
 
       env {
