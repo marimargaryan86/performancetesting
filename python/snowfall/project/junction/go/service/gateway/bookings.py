@@ -2,7 +2,7 @@ import asyncio
 from collections.abc import Sequence
 from typing import cast
 
-from grpc import aio
+from grpc import StatusCode, aio
 
 from snowfall.project.junction.go.service.gateway import providers
 from snowfall.project.junction.go.service.gateway.v1 import (
@@ -10,12 +10,14 @@ from snowfall.project.junction.go.service.gateway.v1 import (
     bookings_pb2_grpc,
 )
 from snowfall.project.junction.provider.v1 import bookings_pb2 as providers_pb2
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.transport.grpc import service
 
 
 class Service(service.Service, bookings_pb2_grpc.BookingServiceServicer):
     def __init__(self, providers_collection: providers.Collection):
         self._providers = providers_collection
+        self._logger = stdout.get_logger()
 
     def get_name(self) -> str:
         return bookings_pb2.DESCRIPTOR.services_by_name["BookingService"].full_name
@@ -44,6 +46,39 @@ class Service(service.Service, bookings_pb2_grpc.BookingServiceServicer):
             bookings.extend(await task)
 
         return bookings_pb2.GetBookingsResponse(bookings=bookings)
+
+    async def CancelBooking(  # type: ignore[override] # noqa: N802
+        self,
+        request: bookings_pb2.CancelBookingRequest,
+        context: aio.ServicerContext,
+    ) -> bookings_pb2.CancelBookingResponse:
+        ids = providers.unmarshal_resource_id(request.booking_id)
+
+        provider = await self._providers.find_by_id(ids.provider_id)
+
+        if not provider:
+            return context.abort(StatusCode.UNAVAILABLE)
+
+        if not provider.booking_capabilities.supports_cancellation:
+            return context.abort(StatusCode.UNIMPLEMENTED)
+
+        try:
+            response = await provider.connection.bookings.CancelBooking(
+                providers_pb2.CancelBookingRequest(
+                    booking_id=ids.resource_id,
+                ),
+            )
+        except aio.AioRpcError as error:
+            self._logger.exception("Booking cancellation failed")
+
+            return context.abort(
+                code=StatusCode.INTERNAL,
+                details=str(error),
+            )
+
+        return bookings_pb2.CancelBookingResponse(
+            cancellation=response.cancellation,
+        )
 
 
 async def get_bookings(

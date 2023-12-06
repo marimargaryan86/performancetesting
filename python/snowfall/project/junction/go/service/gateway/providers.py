@@ -96,10 +96,15 @@ class _ProviderWrapper(object):
         if self.provider.identifier != meta_response.id:
             raise IdentifierMismatchError
 
+        capabilities_response = await self.provider.connection.meta.GetCapabilities(
+            meta_pb2.GetCapabilitiesRequest(),
+        )
+
         self.provider = Provider(
             connection=self.provider.connection,
             identifier=meta_response.id,
             name=meta_response.name,
+            booking_capabilities=capabilities_response.booking_capabilities,
         )
 
 
@@ -165,6 +170,9 @@ class Provider(object):
     connection: Connection
     identifier: str
     name: str = ""
+    booking_capabilities: meta_pb2.BookingCapabilities = dataclasses.field(
+        default_factory=meta_pb2.BookingCapabilities,
+    )
 
     def marshal_resource_id(self, resource_id: str) -> str:
         return sequence.to_composite_id([self.identifier, resource_id])

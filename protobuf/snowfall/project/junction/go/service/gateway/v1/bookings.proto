@@ -2,12 +2,22 @@ syntax = "proto3";
 
 package snowfall.project.junction.go.service.gateway.v1;
 
+import "snowfall/project/junction/go/service/orders/v1/models.proto";
 import "snowfall/project/junction/provider/v1/bookings.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/gateway/v1";
 
 service BookingService {
   rpc GetBookings(GetBookingsRequest) returns (GetBookingsResponse) {}
+  rpc CancelBooking(CancelBookingRequest) returns (CancelBookingResponse) {}
+}
+
+message CancelBookingRequest {
+  string booking_id = 1;
+}
+
+message CancelBookingResponse {
+  snowfall.project.junction.go.service.orders.v1.BookingCancellation cancellation = 1;
 }
 
 message GetBookingsRequest {
