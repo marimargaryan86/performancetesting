@@ -190,7 +190,7 @@
     <SearchOptions bind:data={searchOptions} settings={searchOptionsSettings} />
 
     <ul class="offer-result">
-      {#each sortAndFilter(offers) as offer}
+      {#each sortAndFilter(offers) as offer (offer.id)}
         <li>
           <Offer
             {offer}
