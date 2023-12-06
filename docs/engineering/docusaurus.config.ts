@@ -1,13 +1,8 @@
-// @ts-check
-// `@type` JSDoc annotations allow editor autocompletion and type checking
-// (when paired with `@ts-check`).
-// There are various equivalent ways to declare your Docusaurus config.
-// See: https://docusaurus.io/docs/api/docusaurus-config
-
 import {themes as prismThemes} from 'prism-react-renderer';
+import type {Config} from '@docusaurus/types';
+import type * as Preset from '@docusaurus/preset-classic';
 
-/** @type {import('@docusaurus/types').Config} */
-const config = {
+const config: Config = {
   title: 'Snowfall Engineering',
   tagline: 'engineering.snowfalltravel.com',
   favicon: 'img/favicon.ico',
@@ -154,4 +149,4 @@ const config = {
     }),
 };
 
-module.exports = config;
+export default config;

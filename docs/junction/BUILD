@@ -13,7 +13,7 @@ custom_image(
         ),
         "WORKDIR /src",
         "COPY docs/junction/package.json docs/junction/package-lock.json /src/",
-        "RUN npm install",
+        "RUN npm ci",
         "COPY docs/junction /src",
         "RUN npm run build",
         "ARG REGISTRY",

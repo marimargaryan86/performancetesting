@@ -24,6 +24,7 @@ include:
   - local: .gitlab/junction/api_automation.gitlab-ci.yml
   - local: .gitlab/pants.gitlab-ci.yml
   - local: .gitlab/junction/planner.gitlab-ci.yml
+  - local: docs/.gitlab-ci.yml
   - local: openapi/.gitlab-ci.yml
   - local: protobuf/.gitlab-ci.yml
   - local: svelte/.gitlab-ci.yml

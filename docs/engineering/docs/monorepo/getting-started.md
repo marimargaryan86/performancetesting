@@ -66,9 +66,8 @@ monorepo currently requires Python 3.11, so let's install that version through
 pyenv install 3.11
 ```
 
-
 :::info
-Make sure you have <b>Docker</b> running in the background
+Make sure you have **Docker** running in the background
 
 `CMD + SPACE` and type "docker", then press enter to open Docker
 

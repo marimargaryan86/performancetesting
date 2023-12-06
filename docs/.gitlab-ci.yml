@@ -1,0 +1,39 @@
+.docs:lint:
+  stage: test
+  image: node:20-bullseye-slim
+  interruptible: true
+  before_script:
+    - cd "${PROJECT_PATH}"
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - npm run lint
+    - npm run typecheck
+    - npm run build
+  cache:
+    paths:
+      - "${PROJECT_PATH}/.npm/"
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+      changes:
+        - "${PROJECT_PATH}/**/*"
+        - "docs/.gitlab-ci.yml"
+  tags:
+    - docker
+
+docs:engineering:
+  extends: .docs:lint
+  cache:
+    key:
+      files:
+        - "docs/engineering/package-lock.json"
+  variables:
+    PROJECT_PATH: docs/engineering
+
+docs:junction:
+  extends: .docs:lint
+  cache:
+    key:
+      files:
+        - "docs/junction/package-lock.json"
+  variables:
+    PROJECT_PATH: docs/junction

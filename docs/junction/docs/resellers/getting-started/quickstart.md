@@ -9,7 +9,7 @@ We will be making a single API request to confirm we have access!
 
 Before starting you should already have:
 1. **Access token**
-2. Our [**key terms guide**](/docs/resellers/key-concepts/making_requests) at hand
+2. Our [**key terms guide**](/docs/resellers/key-concepts/making-requests) at hand
 
 ## Sending your first API request
 
@@ -48,13 +48,13 @@ You should receive a response something similar to this:
 
 **Hooray!**
 
-*If you want to skip to a guide on creating a booking order then follow this [**link here**](/docs/resellers/guides/create_an_order)*
+*If you want to skip to a guide on creating a booking order then follow this [**link here**](/docs/resellers/guides/create-an-order)*
 
 ---
 
 ### Didn't quite work?
 
-Please refer back to the [**previous steps**](/docs/resellers/getting-started/account_setup) to make sure you set up everything correctly or please contact us.
+Please refer back to the previous steps to make sure you set up everything correctly or please contact us.
 
 #### Debugging
 

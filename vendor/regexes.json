@@ -6,8 +6,11 @@
       "no_file_level_ruff_noqa",
       "no_pytest_mark_asyncio"
     ],
+    "documentation_files": [
+      "allowed_filename"
+    ],
     "invalid_pytest_files": [
-      "forbidden_filename"
+      "allowed_filename"
     ]
   },
   "path_patterns": [
@@ -16,13 +19,17 @@
       "pattern": ".+\\.py$"
     },
     {
+      "name": "documentation_files",
+      "pattern": "^docs\\/.+\\/docs\\/([\\/]?.+_.+)\\.md$"
+    },
+    {
       "name": "invalid_pytest_files",
-      "pattern": "test_[^\/]+\\.py$"
+      "pattern": "test_[^\\/]+\\.py$"
     }
   ],
   "content_patterns": [
     {
-      "name": "forbidden_filename",
+      "name": "allowed_filename",
       "pattern": ".*",
       "inverted": true
     },

@@ -21,7 +21,7 @@ The steps to searching for an offer, selecting it, and creating an order go as f
 6. Quote - Retrieve all fare options for an offer
 7. Order - Create an order
 
-If you haven't already, please read the [**Key Concepts**](/docs/resellers/key-concepts/making_requests) section to familiarize yourself with API Requests.
+If you haven't already, please read the [**Key Concepts**](/docs/resellers/key-concepts/making-requests) section to familiarize yourself with API Requests.
 
 ---
 
@@ -169,7 +169,7 @@ curl -X POST 'https://api.junction.dev/trip-candidates/searches' \
 You will need to add a **Request Body** containing data:
 
 :::important
-The `sessionToken` used in the request body should be identical to the one used later in [(5) Offers](/docs/resellers/guides/create_an_order#5-quote---retrieve-all-fare-options-for-an-offer).
+The `sessionToken` used in the request body should be identical to the one used later in [(5) Offers](/docs/resellers/guides/create-an-order#5-quote---retrieve-all-fare-options-for-an-offer).
 
 It is recommended to use 1 session token per user session.
 :::
@@ -512,7 +512,7 @@ You will need to add a **Request Body** containing data:
 </details>
 
 :::important
-The `sessionToken` used in the request body should be identical to the one used previously in [(2) Trip Candidate Search](/docs/resellers/guides/create_an_order#2-trip-candidates---search-for-offers).
+The `sessionToken` used in the request body should be identical to the one used previously in [(2) Trip Candidate Search](/docs/resellers/guides/create-an-order#2-trip-candidates---search-for-offers).
 
 It is recommended to use 1 session token per user session.
 :::

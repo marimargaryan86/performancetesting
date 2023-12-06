@@ -18,6 +18,7 @@
     - if: $CI_MERGE_REQUEST_IID
       changes:
         - "${PROJECT_PATH}/**/*"
+        - "svelte/.gitlab-ci.yml"
   tags:
     - docker
 

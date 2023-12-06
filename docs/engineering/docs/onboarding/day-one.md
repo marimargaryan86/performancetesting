@@ -78,7 +78,7 @@ To be written
 
 :::
 
-## Get to know your Product and Delivery peeps!
+## Get to know your Product and Delivery peeps
 
 We're here to build amazing products with amazing people; your Product and
 Delivery Leads are here to help make sure yourself and your fellow engineers are

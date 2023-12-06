@@ -23,9 +23,9 @@ Remember that some first-party services have dependencies on other first-party s
 
 :::
 
-### Command Line
+## Command Line
 
-#### Pants
+### Pants
 
 ```shell
 bash/run.sh python/snowfall/project/{project}/{subproject}/service/{service}/main.py {task}
@@ -34,4 +34,3 @@ bash/run.sh python/snowfall/project/{project}/{subproject}/service/{service}/mai
 :::info
 Ensure you have the correct `bash` version installed (4.0+).
 :::
-

@@ -22,7 +22,7 @@ custom_image(
         ),
         "WORKDIR /src",
         "COPY docs/engineering/package.json docs/engineering/package-lock.json /src/",
-        "RUN npm install",
+        "RUN npm ci",
         "COPY docs/engineering /src",
         "RUN npm run build",
         "ARG REGISTRY",

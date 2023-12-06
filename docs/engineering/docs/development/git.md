@@ -69,14 +69,13 @@ When you're prompted to "Enter a file in which to save the key", you can press E
 
 For a more detailed instruction, read [external Gitlab docs](https://docs.gitlab.com/ee/user/ssh.html#generate-an-ssh-key-pair)
 
-
 #### Add SSH key to gitconfig
 
 Edit the `~/.gitconfig` file with the editor of your choice.
 
 Then add the following to the `[core]` section:
 
-```
+```ini
 sshCommand = ssh -i ~/path-to-ssh-key/id_ed25519
 ```
 

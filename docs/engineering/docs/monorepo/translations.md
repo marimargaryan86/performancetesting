@@ -46,9 +46,8 @@ For example, we can't simply use the translation function for a global constant,
 otherwise everyone would just see the English translation (the translation
 function must be called for each user request).
 
-If you find yourself with this problem, please refer to the gettext
-documentation for ways to make this work:
-https://docs.python.org/3/library/gettext.html#deferred-translations
+If you find yourself with this problem, please refer to the [gettext
+documentation](https://docs.python.org/3/library/gettext.html#deferred-translations) for ways to make this work.
 
 ## Providing context to translators
 

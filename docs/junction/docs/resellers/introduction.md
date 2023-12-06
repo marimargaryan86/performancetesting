@@ -10,7 +10,6 @@ The Junction Reseller API allows you to search and book multi-modal itineraries.
 
 If you have any questions, spot any mistakes or want to give us any feedback, please contact us.
 
-
 ## Layout of docs guide
 
 ### Getting started

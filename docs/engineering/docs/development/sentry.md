@@ -30,7 +30,7 @@ If something has happened just a few times it is likely not as urgent as
 something that is happening tens or hundreds of times. Look at a short recent
 timeline to see how urgent it is.
 
-### Issues in critical systems over issues in non-critical system.
+### Issues in critical systems over issues in non-critical system
 
 Some systems that are less mission critical are much less prioritized compared
 to the ones that are necessary for the core flow to work.

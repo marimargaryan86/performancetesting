@@ -21,8 +21,6 @@ curl -X GET 'https://api.junction.dev/places/types' \
 
 Example of an access token: `eyJhbGciOiJSUzI1NiIsImtp...`
 
-[<small>Forgot where you get your Access Token?</small>](/docs/resellers/getting-started/account_setup)
-
 ### MIME types (Required)
 
 All responses from the API follow the [**JSON:API**](https://jsonapi.org/) standard. We need to ensure our response is returned as a JSON format.

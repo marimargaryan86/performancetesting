@@ -2,7 +2,7 @@
 sidebar_position: 1
 ---
 
-# Welcome!
+# Welcome
 
 ![Bennie Lego Movie Waving](https://media.giphy.com/media/VeBeB9rR524RW/giphy.gif)
 
@@ -46,31 +46,31 @@ destination.
 
 ![Junction Ecosystem](./assets/junction-ecosystem.jpg)
 
-**GO**
+### Go
 
 > Content platform for Junction services, interacting with and exposing various
 > third party suppliers
 
-**HUB**
+### Hub
 
 > Management system for travel bookings, orders. and payments with a side of an
 > in-house booking flow for rail tickets
 
-**PAY**
+### Pay
 
 > Service for automating invoice processing, currency exchanges, and other
 > financial actions
 
-**ONE**
+### One
 
 > Online booking platform for corporate and reseller customers
 
-**SUPERAPP**
+### SuperApp
 
 > Whitelabel app used to demonstrate the capabilities of Junction as an
 > ecosystem
 
-**PLUS**
+### Plus
 
 > An automated Travel assistant to enhance and simplify travel experience.
 
