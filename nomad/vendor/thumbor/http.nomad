@@ -59,7 +59,8 @@ job "vendor-thumbor-http" {
       driver = "docker"
 
       resources {
-        memory = 512
+        memory     = 512 // Value in MBs
+        memory_max = 2 * 1024
       }
       vault {
         policies = ["thumbor-${var.environment}"]
@@ -95,27 +96,25 @@ EOH
           server_address = var.registry_address
         }
         volumes = [
-          "/thumbor-efs/:/thumbor-efs"
+          "/thumbor-efs:/thumbor-efs"
         ]
       }
 
       env {
 
-        HTTP_LOADER_VALIDATE_CERTS     = "False"
-        PORT                           = "${NOMAD_PORT_http}"
-        ALLOW_UNSAFE_URL               = "True"
-        FORWARDED_ALLOWED_IPS          = "0.0.0.0"
-        ENV_NAME                       = "${NOMAD_NAMESPACE}"
-        HTTP_ADDRESS                   = "0.0.0.0"
-        AUTO_WEBP                      = "True"
-        LOADER                         = "thumbor.loaders.http_loader"
-        STORAGE                        = "thumbor_aws.storage"
-        RESULT_STORAGE                 = "thumbor_aws.result_storage"
-        AWS_STORAGE_REGION_NAME        = "eu-west-2"
-        AWS_STORAGE_ROOT_PATH          = "storage"
-        AWS_RESULT_STORAGE_REGION_NAME = "eu-west-2"
-        AWS_RESULT_STORAGE_ROOT_PATH   = "storage"
-        ALLOW_OLD_URLS                 = "True"
+        HTTP_LOADER_VALIDATE_CERTS            = "False"
+        PORT                                  = "${NOMAD_PORT_http}"
+        ALLOW_UNSAFE_URL                      = "True"
+        FORWARDED_ALLOWED_IPS                 = "0.0.0.0"
+        ENV_NAME                              = "${NOMAD_NAMESPACE}"
+        HTTP_ADDRESS                          = "0.0.0.0"
+        AUTO_WEBP                             = "True"
+        LOADER                                = "thumbor.loaders.http_loader"
+        STORAGE                               = "thumbor.storages.file_storage"
+        FILE_STORAGE_ROOT_PATH                = "/thumbor-efs"
+        RESULT_STORAGE                        = "thumbor.result_storages.file_storage"
+        RESULT_STORAGE_FILE_STORAGE_ROOT_PATH = "/thumbor-efs"
+        ALLOW_OLD_URLS                        = "True"
 
       }
     }
