@@ -1,6 +1,6 @@
 ---
 title: Python Example
-sidebar_position: 5
+sidebar_position: 1
 ---
 
 # Python Example Usage of Reseller API
@@ -40,6 +40,8 @@ Then get all the places from `/places` and store them in a database, then create
 As an example we have hardcoded the following places:
 - `36391863-ed79-5abd-9ed7-eede5677f843` London, UK
 - `94b4b1e0-df99-574c-8727-d1dcad2fad14` Amsterdam, The Netherlands
+
+### /places - Using coordinates directly
 
 Alternatively you can also use coordinates directly without using our collection of places.
 

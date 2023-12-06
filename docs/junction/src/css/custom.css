@@ -31,3 +31,18 @@
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
+
+.hidden {
+  display: none !important;
+}
+
+/* Ensure buttons can be identified */
+button:hover {
+  opacity: 0.7;
+}
+
+/* Buttons with an expand/collapse svg arrow */
+button[aria-label*="expand"]:hover,
+button[aria-label*="collapse"]:hover {
+  text-decoration: underline;
+}
