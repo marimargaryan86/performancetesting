@@ -4,7 +4,10 @@
     address: z.object({
       street: z.object({
         line1: z.string().trim().min(1),
-        line2: z.string().trim().optional(),
+        line2: z
+          .union([z.string().trim().length(0), z.string().trim().min(1)])
+          .optional()
+          .transform((val) => (val?.length ? val : undefined)),
       }),
       countryCode: z.string().trim().min(1),
       postalCode: z.string().trim().min(1),
