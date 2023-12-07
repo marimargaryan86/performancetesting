@@ -94,8 +94,18 @@ export const tripBookingDetailsParser = {
   },
 };
 
+export type BookingStatusId = "cancelled" | "confirmed" | "error" | "not-ticketed" | "rejected";
+
+export const bookingStatusIds: BookingStatusId[] = [
+  "cancelled",
+  "confirmed",
+  "error",
+  "not-ticketed",
+  "rejected",
+];
+
 export type BookingStatusSchema = {
-  id: "confirmed" | "error" | "not-ticketed" | "cancelled" | "rejected";
+  id: BookingStatusId;
   type: "booking-statuses";
 };
 

@@ -1,4 +1,10 @@
 <script lang="ts" context="module">
+  import { capitalize } from "utils/common.js";
+  import {
+    type BookingStatusId,
+    bookingStatusIds,
+  } from "integration/junction-hub-api/schemas/booking.js";
+
   export const LIST_JOURNEYS_LIMIT = 20;
   export const LIST_JOURNEYS_SORT: Parameters<JourneyService["find"]>[0]["sort"] = "-createdAt";
 
@@ -70,13 +76,19 @@
       );
     };
   }
+
+  function formatBookingStatusId(id: BookingStatusId | undefined): string | undefined {
+    return id ? capitalize(id).replaceAll("-", " ") : "——";
+  }
 </script>
 
 <script lang="ts">
+  import { dev } from "$app/environment";
   import PlusIcon from "components/icons/plus-icon.svelte";
   import StandardLayout from "components/page/standard-layout.svelte";
   import Button from "components/ui/button.svelte";
   import DatePicker from "components/ui/date-picker/date-picker.svelte";
+  import SelectField from "components/ui/select-field.svelte";
   import Header from "components/ui/table/header.svelte";
   import TBody from "components/ui/table/t-body.svelte";
   import TCol from "components/ui/table/t-col.svelte";
@@ -99,8 +111,18 @@
 
   let searchQuery = "";
   let departureAtDateRange: DateRange | undefined = undefined;
+  let createdAtDateRange: DateRange | undefined = undefined;
+  let bookingStatusId: BookingStatusId | undefined = undefined;
+  let bookingStatusOptions: Array<BookingStatusId | undefined> = [undefined, ...bookingStatusIds];
 
   $: orders = data.journeys.data.flatMap((item) => item.orders);
+  $: filtersActive = Boolean(departureAtDateRange || createdAtDateRange || bookingStatusId);
+
+  function resetOrderFilters(): void {
+    departureAtDateRange = undefined;
+    createdAtDateRange = undefined;
+    bookingStatusId = undefined;
+  }
 
   const loadMore: ScrollLoadFunc = async () => {
     if (!data.journeys.cursor) {
@@ -126,19 +148,40 @@
   <title>Orders · Trip Management · Junction Hub</title>
 </svelte:head>
 
-<StandardLayout pageTitle="Orders" bind:searchQuery filtersActive={Boolean(departureAtDateRange)}>
+<StandardLayout pageTitle="Orders" bind:searchQuery {filtersActive}>
   <Button size="small" href={routeConfig.routes.tripManagement.routes.book.root} slot="actions">
     New Order
     <PlusIcon />
   </Button>
 
-  <DatePicker
-    bind:value={departureAtDateRange}
-    label="Departure date"
-    range
-    placeholder="Date Range"
-    slot="filters"
-  />
+  <svelte:fragment slot="filters">
+    <DatePicker
+      bind:value={departureAtDateRange}
+      label="Departure date"
+      range
+      placeholder="Date Range"
+    />
+
+    {#if dev}
+      <DatePicker
+        bind:value={createdAtDateRange}
+        label="Created at date"
+        range
+        placeholder="Date Range"
+      />
+
+      <SelectField
+        label="Booking status"
+        bind:value={bookingStatusId}
+        options={bookingStatusOptions}
+        formatter={formatBookingStatusId}
+      />
+
+      <div class="btn-wrapper">
+        <Button size="small" on:click={resetOrderFilters}>Clear</Button>
+      </div>
+    {/if}
+  </svelte:fragment>
 
   <Table class="orders-table" {loadMore}>
     <THead>
@@ -228,6 +271,10 @@
     height: 100%;
   }
 
+  :global(.select-field) {
+    --options-z-index: 21;
+  }
+
   em.body-xsmall {
     color: var(--color-common-light-soft);
   }
@@ -243,5 +290,9 @@
 
   .not-available {
     color: var(--color-common-light-soft);
+  }
+
+  .btn-wrapper {
+    align-self: end;
   }
 </style>

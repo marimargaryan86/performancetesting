@@ -14,9 +14,11 @@
 
   let showFilters = false;
 
+  const hasFilters = Boolean($$slots.filters);
+
   $: hasNavigation = $$slots["navigation-left"] || $$slots["navigation-right"];
-  $: hasFiltersOrTabs = Boolean($$slots.filters || tabs);
-  $: hasActions = $$slots.filters || searchQuery !== undefined || $$slots.actions;
+  $: hasFiltersOrTabs = Boolean(hasFilters || tabs);
+  $: hasActions = hasFilters || searchQuery !== undefined || $$slots.actions;
 
   function toggleFilters(): void {
     showFilters = !showFilters;
@@ -50,7 +52,7 @@
         <SearchField bind:value={searchQuery} clearable />
       {/if}
 
-      {#if $$slots.filters}
+      {#if hasFilters}
         <button on:click={toggleFilters}>
           <FilterIcon color="var(--color-main-primary-500)" active={filtersActive} />
         </button>
