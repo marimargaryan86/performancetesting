@@ -60,6 +60,9 @@ export default {
           } as const;
         },
       },
+      knowledgeHub: {
+        root: "/knowledge-hub",
+      },
       help: {
         root: "/help",
         get routes() {

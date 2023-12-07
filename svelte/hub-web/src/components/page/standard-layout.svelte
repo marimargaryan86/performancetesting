@@ -11,6 +11,7 @@
   export let tabs: Tab[] | undefined = undefined;
   export let filtersActive = false;
   export let searchQuery: string | undefined = undefined;
+  export let backgroundImage = "var(--color-gradient-extensions-horizontal)";
 
   let showFilters = false;
 
@@ -85,7 +86,7 @@
   <slot name="content-before" />
 {/if}
 
-<div class="content">
+<div class="content" style:background-image={backgroundImage}>
   <slot />
 </div>
 
@@ -164,7 +165,7 @@
     flex-grow: 1;
     padding: 24px;
     overflow: auto;
-    background-image: var(--color-gradient-extensions-horizontal);
+    background-color: var(--color-main-primary-50);
   }
 
   .navigation {

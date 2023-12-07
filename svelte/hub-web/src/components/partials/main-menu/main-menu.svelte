@@ -2,6 +2,7 @@
   import ChevronIcon from "components/icons/chevron-icon.svelte";
   import LogoutIcon from "components/icons/logout-icon.svelte";
   import BugIcon from "components/icons/bug-icon.svelte";
+  import KnowledgeIcon from "components/icons/knowledge-icon.svelte";
   import Account from "./account.svelte";
   import Menu from "./menu.svelte";
   import HubLogo from "components/icons/hub-logo.svelte";
@@ -20,16 +21,20 @@
 
   $: activeLink = getActiveLink($page.url.pathname);
 
-  function getActiveLink(pathname: string): "help" | "issue" | undefined {
-    if (!pathname.startsWith(routeConfig.routes.help.root)) {
-      return undefined;
-    }
-
+  function getActiveLink(pathname: string): "help" | "issue" | "knowledge-hub" | undefined {
     if (pathname.startsWith(routeConfig.routes.help.routes.customerService.root)) {
       return "issue";
     }
 
-    return "help";
+    if (pathname.startsWith(routeConfig.routes.help.root)) {
+      return "help";
+    }
+
+    if (pathname.startsWith(routeConfig.routes.knowledgeHub.root)) {
+      return "knowledge-hub";
+    }
+
+    return undefined;
   }
 </script>
 
@@ -47,6 +52,21 @@
   <hr />
 
   <ul>
+    <li>
+      <a
+        class="link typography body-medium"
+        title="Knowledge Hub"
+        href={routeConfig.routes.knowledgeHub.root}
+        class:active={activeLink === "knowledge-hub"}
+      >
+        <KnowledgeIcon
+          color="var({activeLink === 'knowledge-hub'
+            ? '--color-main-primary-500'
+            : '--color-common-light-strong'})"
+        />
+        <span>Knowledge Hub</span>
+      </a>
+    </li>
     <li>
       <a
         class="link typography body-medium"
