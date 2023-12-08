@@ -70,6 +70,10 @@
     timeZoneOffset: data.outbound?.getTimezoneOffset() ?? 0,
   };
 
+  function swapOriginAndDestination(): void {
+    [origin, destination] = [destination, origin];
+  }
+
   async function search(): Promise<void> {
     if ($pending) {
       return;
@@ -104,6 +108,9 @@
     error={errors?.origin?._errors}
     clearable
   />
+
+  <Button variant="outline" on:click={swapOriginAndDestination}>⇄</Button>
+
   <AutocompleteField
     label="To"
     required
@@ -139,7 +146,7 @@
 <style>
   .trip-search {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr max-content;
+    grid-template-columns: 1fr max-content 1fr 1fr max-content;
     gap: 8px;
     align-items: flex-start;
     max-width: 1154px;
