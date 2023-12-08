@@ -67,7 +67,7 @@ EOH
       config {
         image = var.docker_image
         args = [
-          "reports_cron"
+          "reports-cron"
         ]
 
         auth {

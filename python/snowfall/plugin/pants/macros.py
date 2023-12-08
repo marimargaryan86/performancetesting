@@ -1,6 +1,32 @@
 _BASE_IMAGE_SHA = "91f3e08712a854ff4a146b7cca7f1b7581f205bc589a06135f51590e00d2990e"
 
 
+def _generate_repository(build_file_dir, exclude: set[str]) -> str:  # type: ignore[no-untyped-def]  # noqa: ANN001
+    repository = "{base_url}/{namespace}/{name}".format(
+        base_url=env("CI_PROJECT_PATH", "").strip("/"),  # type: ignore[name-defined]  # noqa: F821
+        namespace="-".join(
+            [
+                part.replace("_", "-")
+                for part in build_file_dir.parent.parts
+                if part not in exclude
+            ],
+        ).strip("/"),
+        name=build_file_dir.name.replace("_", "-").strip("/"),
+    )
+
+    return repository.replace("//", "/").strip("/")
+
+
+def _generate_service_name(repository: str) -> str:
+    service_name = repository
+    prefix = env("CI_PROJECT_PATH", "")  # type: ignore[name-defined]  # noqa: F821
+
+    if prefix:
+        service_name = service_name.removeprefix(prefix)
+
+    return service_name.strip("/").replace("/", "-")
+
+
 def nomad_template(
     commands: list[str],  # noqa: SF20
     service_entry_point: str = "",
@@ -9,7 +35,7 @@ def nomad_template(
     if not name:
         name = build_file_dir().name  # type: ignore[name-defined]  # noqa: F821
 
-    cmd = './bash/lint-configuration.sh {command} "{path}/{filename}.nomad" "{config}"'
+    cmd = './bash/lint-configuration.sh {command} "{path}/{filename}.nomad" "{config}" "{entry_point}"'
     config_path = "{path}/debug_info.json".format(
         path=build_file_dir(),  # type: ignore[name-defined]  # noqa: F821
     )
@@ -50,6 +76,7 @@ def nomad_template(
                     filename=filename,
                     path=build_file_dir(),  # type: ignore[name-defined]  # noqa: F821
                     config=config_path,
+                    entry_point=service_entry_point,
                 ),
                 execution_dependencies=[
                     ":{name}_{filename}_config".format(name=name, filename=filename),
@@ -57,7 +84,7 @@ def nomad_template(
                     ":{name}_debug_info".format(name=name),
                     "bash/lint-configuration.sh",
                 ],
-                tools=["bash", "jq", "perl"],
+                tools=["basename", "bash", "dirname", "jq", "perl"],
                 workdir="/",
             )
 
@@ -98,23 +125,17 @@ def go_image(  # type: ignore[no-untyped-def]
         ),
     )
 
-    repository = "{base_url}/{namespace}/{name}".format(
-        base_url=env("CI_PROJECT_PATH", ""),  # type: ignore[name-defined]  # noqa: F821
-        namespace="-".join(
-            [
-                part.replace("_", "-")
-                for part in build_file_dir().parent.parts  # type: ignore[name-defined]  # noqa: F821
-                if part not in {"golang", "cmd"}
-            ],
-        ),
-        name=build_file_dir().name.replace("_", "-"),  # type: ignore[name-defined]  # noqa: F821
+    repository = _generate_repository(
+        build_file_dir(),  # type: ignore[name-defined]  # noqa: F821
+        {"golang", "cmd"},
     )
+    service_name = _generate_service_name(repository)
 
     docker_image(  # type: ignore[name-defined]  # noqa: F821
         name="{name}_docker".format(name=name),
         dependencies=[":{name}".format(name=name)],
         image_tags=["{build_args.VERSION}"],
-        repository=repository.replace("//", "/").strip("/"),
+        repository=repository,
         instructions=[
             "FROM cgr.dev/chainguard/wolfi-base:latest@sha256:{hash} AS runtime".format(
                 hash=_BASE_IMAGE_SHA,
@@ -131,6 +152,9 @@ def go_image(  # type: ignore[no-untyped-def]
             ),
             'ARG VERSION "dev"',
             "ENV VERSION $VERSION",
+            'ENV SENTRY_RELEASE "{service_name}@$VERSION"'.format(
+                service_name=service_name.replace("/", "-"),
+            ),
             'LABEL vendor="Snowfall Limited"',
             "LABEL com.snowfalltravel.version=$VERSION",
             'ENTRYPOINT ["/bin/{0}"]'.format(name),
@@ -195,23 +219,17 @@ def python_image(  # type: ignore[no-untyped-def]
         ),
     )
 
-    repository = "{base_url}/{namespace}/{name}".format(
-        base_url=env("CI_PROJECT_PATH", "").strip("/"),  # type: ignore[name-defined]  # noqa: F821
-        namespace="-".join(
-            [
-                part.replace("_", "-")
-                for part in build_file_dir().parent.parts  # type: ignore[name-defined]  # noqa: F821
-                if part not in {"python", "snowfall", "project", "service"}
-            ],
-        ).strip("/"),
-        name=build_file_dir().name.replace("_", "-").strip("/"),  # type: ignore[name-defined]  # noqa: F821
+    repository = _generate_repository(
+        build_file_dir(),  # type: ignore[name-defined]  # noqa: F821
+        {"python", "snowfall", "project", "service"},
     )
+    service_name = _generate_service_name(repository)
 
     docker_image(  # type: ignore[name-defined]  # noqa: F821
         name="{name}_docker".format(name=name),
         dependencies=[":{name}".format(name=name)],
         image_tags=["{build_args.VERSION}"],
-        repository=repository.strip("/").replace("//", "/"),
+        repository=repository,
         instructions=[
             "FROM cgr.dev/chainguard/wolfi-base:latest@sha256:{hash} AS runtime".format(
                 hash=_BASE_IMAGE_SHA,
@@ -229,6 +247,9 @@ def python_image(  # type: ignore[no-untyped-def]
             ),
             'ARG VERSION "dev"',
             "ENV VERSION $VERSION",
+            'ENV SENTRY_RELEASE "{service_name}@$VERSION"'.format(
+                service_name=service_name.replace("/", "-"),
+            ),
             'LABEL vendor="Snowfall Limited"',
             "LABEL com.snowfalltravel.version=$VERSION",
             'ENTRYPOINT ["python", "-Wdefault", "-Xfaulthandler", "/bin/{0}"]'.format(

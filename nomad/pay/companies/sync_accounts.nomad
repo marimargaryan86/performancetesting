@@ -68,7 +68,7 @@ EOH
       config {
         image = var.docker_image
         args = [
-          "sync_accounts"
+          "sync-accounts"
         ]
 
         auth {

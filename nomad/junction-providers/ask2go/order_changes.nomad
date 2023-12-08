@@ -115,7 +115,7 @@ EOH
         image = var.docker_image
         ports = ["grpc", "prometheus"]
         args = [
-          "order_changes",
+          "order-changes",
         ]
 
         auth {

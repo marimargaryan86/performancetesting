@@ -69,7 +69,7 @@ EOH
       config {
         image = var.docker_image
         args = [
-          "backup_rates_cron"
+          "backup-rates-cron"
         ]
 
         auth {

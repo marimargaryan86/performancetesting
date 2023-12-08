@@ -274,7 +274,7 @@ class Entrypoint(
         if self.simple_offers_factory:
             self.add_command(
                 application.Command(
-                    name="simple_offers",
+                    name="simple-offers",
                     callback=_simple_offers_command(
                         self.meta_factory,
                         self.simple_offers_factory,

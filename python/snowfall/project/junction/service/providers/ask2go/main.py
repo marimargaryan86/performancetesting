@@ -422,12 +422,12 @@ if __name__ == "__main__":
             settings_class=_PriceQuotesSettings,
         ),
         service.Command(
-            name="seat_maps",
+            name="seat-maps",
             callback=_seat_maps,
             settings_class=_SeatMapsSettings,
         ),
         service.Command(
-            name="order_changes",
+            name="order-changes",
             callback=_order_changes,
             settings_class=_OrderChangesSettings,
         ),

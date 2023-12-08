@@ -92,7 +92,7 @@ async def _import(app: application.Application[_ImportSettings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = application.Entrypoint(name="notification_center")
+    entrypoint = application.Entrypoint(name="notification-center")
 
     entrypoint.enter_with_commands(
         application.Command(

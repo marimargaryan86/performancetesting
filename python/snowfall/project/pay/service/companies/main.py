@@ -119,7 +119,7 @@ if __name__ == "__main__":
     entrypoint.enter_with_commands(
         application.Command(name="grpc", callback=_serve, settings_class=_GrpcSettings),
         application.Command(
-            name="sync_accounts",
+            name="sync-accounts",
             callback=_sync_accounts_cron_run,
             settings_class=_AccountSyncSettings,
         ),

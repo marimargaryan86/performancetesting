@@ -65,7 +65,7 @@ async def _import(app: application.Application[_ImportSettings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = application.Entrypoint(name="orders_registration")
+    entrypoint = application.Entrypoint(name="orders-registration")
 
     entrypoint.enter_with_commands(
         application.Command(

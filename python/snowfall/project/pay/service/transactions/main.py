@@ -152,7 +152,7 @@ if __name__ == "__main__":
     entrypoint.enter_with_commands(
         application.Command(name="grpc", callback=_serve, settings_class=_GrpcSettings),
         application.Command(
-            name="reports_cron",
+            name="reports-cron",
             callback=_reports_cron_run,
             settings_class=_ReportsSettings,
         ),

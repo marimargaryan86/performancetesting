@@ -63,6 +63,10 @@ class _GlobalSettings(Settings):
     log_level: str = "INFO"
     prometheus_port: int | None = None
     sentry_dsn: str = ""
+    sentry_release: str | None = pydantic.Field(
+        default=None,
+        json_schema_extra={"hidden": True},
+    )
     version: str = pydantic.Field(default="dev", json_schema_extra={"hidden": True})
     callbacks: ClassVar[parameters.Callbacks] = {
         "debug_info": _print_debug_info,
@@ -189,7 +193,9 @@ def _configure_sentry(
     sentry.configure_sentry(
         dsn=global_settings.sentry_dsn,
         environment=global_settings.env_name,
-        release="{name}@{version}".format(
+        release=global_settings.sentry_release
+        if global_settings.sentry_release
+        else "{name}@{version}".format(
             name=entrypoint.name,
             version=global_settings.version,
         ),

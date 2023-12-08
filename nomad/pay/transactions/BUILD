@@ -1,4 +1,4 @@
 nomad_template(
-    ["grpc", "reports-cron#reports_cron"],
+    ["grpc", "reports-cron"],
     "python/snowfall/project/pay/service/transactions:main",
 )

@@ -109,7 +109,7 @@ EOH
         image = var.docker_image
         ports = ["prometheus"]
         args = [
-          "simple_offers",
+          "simple-offers",
         ]
 
         auth {

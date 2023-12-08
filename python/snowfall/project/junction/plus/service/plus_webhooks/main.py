@@ -181,7 +181,7 @@ async def _serve(
 
 
 if __name__ == "__main__":
-    entrypoint = application.Entrypoint(name="plus-webhook")
+    entrypoint = application.Entrypoint(name="plus-webhooks")
 
     entrypoint.enter_with_commands(
         application.Command(

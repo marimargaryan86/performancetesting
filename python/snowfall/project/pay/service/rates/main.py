@@ -96,7 +96,7 @@ if __name__ == "__main__":
             settings_class=_GrpcSettings,
         ),
         application.Command(
-            name="backup_rates_cron",
+            name="backup-rates-cron",
             callback=_backup_rates_cron_run,
             settings_class=_BackUpCronJobSettings,
         ),

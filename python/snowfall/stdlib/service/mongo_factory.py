@@ -17,4 +17,4 @@ async def make_database(
         tz_aware=True,
     )
 
-    return client[app.name]
+    return client[app.name.replace("-", "_")]

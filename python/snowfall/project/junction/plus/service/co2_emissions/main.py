@@ -34,7 +34,7 @@ async def _main(app: application.Application[_Settings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = application.Entrypoint(name="co2_emissions")
+    entrypoint = application.Entrypoint(name="co2-emissions")
 
     entrypoint.enter_with_commands(
         application.Command(
