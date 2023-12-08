@@ -1,10 +1,4 @@
 <script lang="ts" context="module">
-  import { capitalize } from "utils/common.js";
-  import {
-    type BookingStatusId,
-    bookingStatusIds,
-  } from "integration/junction-hub-api/schemas/booking.js";
-
   export const LIST_JOURNEYS_LIMIT = 20;
   export const LIST_JOURNEYS_SORT: Parameters<JourneyService["find"]>[0]["sort"] = "-createdAt";
 
@@ -24,20 +18,6 @@
     });
   }
 
-  function getDepartureDate(order: Order): Date {
-    const departureAt = order.bookings
-      .flatMap((booking) =>
-        booking.detailsList.flatMap((details) => details.legs.flatMap((leg) => leg.departureAt)),
-      )
-      .sort()[0];
-
-    if (!departureAt) {
-      throw new Error("Unknown departure date");
-    }
-
-    return departureAt;
-  }
-
   function getPassengerNames(order: Order): string[] {
     return order.passengers.map((passenger) => `${passenger.firstName} ${passenger.lastName}`);
   }
@@ -50,45 +30,12 @@
       currency: curr.currency,
     }));
   }
-
-  function getFilterFunction(
-    query: string,
-    departureAt: DateRange | undefined,
-  ): (order: Order) => boolean {
-    const queryLower = query.toLowerCase();
-
-    return (order) => {
-      if (departureAt) {
-        const date = getZeroTimeDate(getDepartureDate(order));
-
-        if (date < departureAt.from || date > departureAt.to) {
-          return false;
-        }
-      }
-
-      return Boolean(
-        order.journey?.reference.toLowerCase().includes(queryLower) ||
-          order.passengers.find((item) => {
-            const fullName = `${item.firstName.toLowerCase()} ${item.lastName.toLowerCase()}`;
-
-            return fullName.includes(queryLower);
-          }),
-      );
-    };
-  }
-
-  function formatBookingStatusId(id: BookingStatusId | undefined): string | undefined {
-    return id ? capitalize(id).replaceAll("-", " ") : "——";
-  }
 </script>
 
 <script lang="ts">
-  import { dev } from "$app/environment";
   import PlusIcon from "components/icons/plus-icon.svelte";
   import StandardLayout from "components/page/standard-layout.svelte";
   import Button from "components/ui/button.svelte";
-  import DatePicker from "components/ui/date-picker/date-picker.svelte";
-  import SelectField from "components/ui/select-field.svelte";
   import Header from "components/ui/table/header.svelte";
   import TBody from "components/ui/table/t-body.svelte";
   import TCol from "components/ui/table/t-col.svelte";
@@ -100,29 +47,19 @@
   import { getOrderStatus } from "integration/common/schemas/order";
   import type { Order } from "integration/junction-hub-api/schemas/order";
   import type { Price } from "integration/common/schemas/price";
-  import type { DateRange } from "models/date-time";
   import routeConfig from "routeConfig";
-  import { getZeroTimeDate } from "utils/date-time";
   import type { ScrollLoadFunc } from "directives/scroll-load";
   import integrationInstancesClient from "integration-instances-client";
   import type JourneyService from "integration/junction-hub-api/services/journey-service";
+  import Filters, { type FilterOptions } from "./filters.svelte";
+  import { ensureDefined } from "utils/array";
 
   export let data;
 
   let searchQuery = "";
-  let departureAtDateRange: DateRange | undefined = undefined;
-  let createdAtDateRange: DateRange | undefined = undefined;
-  let bookingStatusId: BookingStatusId | undefined = undefined;
-  let bookingStatusOptions: Array<BookingStatusId | undefined> = [undefined, ...bookingStatusIds];
+  let filters: FilterOptions = {};
 
   $: orders = data.journeys.data.flatMap((item) => item.orders);
-  $: filtersActive = Boolean(departureAtDateRange || createdAtDateRange || bookingStatusId);
-
-  function resetOrderFilters(): void {
-    departureAtDateRange = undefined;
-    createdAtDateRange = undefined;
-    bookingStatusId = undefined;
-  }
 
   const loadMore: ScrollLoadFunc = async () => {
     if (!data.journeys.cursor) {
@@ -148,40 +85,17 @@
   <title>Orders · Trip Management · Junction Hub</title>
 </svelte:head>
 
-<StandardLayout pageTitle="Orders" bind:searchQuery {filtersActive}>
+<StandardLayout
+  pageTitle="Orders"
+  bind:searchQuery
+  filtersActive={Boolean(Object.values(filters).find(ensureDefined))}
+>
   <Button size="small" href={routeConfig.routes.tripManagement.routes.book.root} slot="actions">
     New Order
     <PlusIcon />
   </Button>
 
-  <svelte:fragment slot="filters">
-    <DatePicker
-      bind:value={departureAtDateRange}
-      label="Departure date"
-      range
-      placeholder="Date Range"
-    />
-
-    {#if dev}
-      <DatePicker
-        bind:value={createdAtDateRange}
-        label="Created at date"
-        range
-        placeholder="Date Range"
-      />
-
-      <SelectField
-        label="Booking status"
-        bind:value={bookingStatusId}
-        options={bookingStatusOptions}
-        formatter={formatBookingStatusId}
-      />
-
-      <div class="btn-wrapper">
-        <Button size="small" on:click={resetOrderFilters}>Clear</Button>
-      </div>
-    {/if}
-  </svelte:fragment>
+  <Filters slot="filters" bind:filters />
 
   <Table class="orders-table" {loadMore}>
     <THead>
@@ -197,7 +111,7 @@
     </THead>
 
     <TBody>
-      {#each orders.filter(getFilterFunction(searchQuery, departureAtDateRange)) as order (order.id)}
+      {#each orders as order (order.id)}
         {@const cancellationStatus = getOrderStatus.cancellation(order)}
         {@const refundStatus = getOrderStatus.refund(order)}
         {@const bookingStatus = getOrderStatus.booking(order)}
@@ -271,10 +185,6 @@
     height: 100%;
   }
 
-  :global(.select-field) {
-    --options-z-index: 21;
-  }
-
   em.body-xsmall {
     color: var(--color-common-light-soft);
   }
@@ -290,9 +200,5 @@
 
   .not-available {
     color: var(--color-common-light-soft);
-  }
-
-  .btn-wrapper {
-    align-self: end;
   }
 </style>

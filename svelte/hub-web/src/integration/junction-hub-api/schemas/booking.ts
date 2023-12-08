@@ -94,18 +94,18 @@ export const tripBookingDetailsParser = {
   },
 };
 
-export type BookingStatusId = "cancelled" | "confirmed" | "error" | "not-ticketed" | "rejected";
-
-export const bookingStatusIds: BookingStatusId[] = [
+export const bookingStatuses = [
   "cancelled",
   "confirmed",
   "error",
   "not-ticketed",
   "rejected",
-];
+] as const;
+
+export type BookingStatus = (typeof bookingStatuses)[number];
 
 export type BookingStatusSchema = {
-  id: BookingStatusId;
+  id: BookingStatus;
   type: "booking-statuses";
 };
 
