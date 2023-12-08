@@ -25,6 +25,7 @@ class Client(BaseClient):
                     "amount": amount,
                     "externalReference": external_reference,
                     **({"tax": tax} if tax else {}),
+                    "feeMultiplier": fee_multiplier,
                 },
                 "relationships": {
                     "fromCurrency": {
@@ -40,7 +41,6 @@ class Client(BaseClient):
                     "toCurrency": {
                         "data": {"id": to_currency, _TYPE_KEY: "currencies"},
                     },
-                    "feeMultiplier": fee_multiplier,
                 },
             },
         }
