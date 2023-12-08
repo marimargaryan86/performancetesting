@@ -70,6 +70,17 @@
   line-height: 36px;
 }
 
+.typography.headline-large {
+  font-size: 32px;
+  font-family: Raleway, Arial, Helvetica, sans-serif;
+  font-style: normal;
+  line-height: 40px;
+}
+
+.typography.headline-large.bold {
+  font-weight: 700;
+}
+
 .typography.display-small {
   font-size: 36px;
   font-family: Raleway, Arial, Helvetica, sans-serif;
