@@ -44,6 +44,7 @@ async def booked_quote(
         beneficiary_company=valid_company,
         session_token=string.uuid(),
         tax=8,
+        fee_multiplier=2,
     )
     await quotations_client.update_status(
         quote.id,
@@ -85,6 +86,7 @@ async def quote_is_less_than_the_limit(
         beneficiary_company=valid_company,
         session_token=string.uuid(),
         tax=8,
+        fee_multiplier=2,
     )
 
 
@@ -103,4 +105,5 @@ async def booked_quote_quoted(
         beneficiary_company=valid_company,
         session_token=string.uuid(),
         tax=8,
+        fee_multiplier=2,
     )

@@ -6506,7 +6506,7 @@
                 "format": "float",
                 "example": 5.6
               },
-              "resellerMarkups": {
+              "feeAmounts": {
                 "type": "array",
                 "uniqueItems": true,
                 "items": {

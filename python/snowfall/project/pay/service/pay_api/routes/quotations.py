@@ -81,6 +81,7 @@ class Quotations(endpoints.HTTPEndpoint):
             beneficiary_company=beneficiary_company,  # type: ignore[possibly-undefined]
             session_token=session_token,
             tax=body.get("tax", 0),
+            fee_multiplier=body["feeMultiplier"],
         )
 
         return await messages.create_response(

@@ -41,7 +41,7 @@ _QUOTE_MOCK_RESPONSE = MappingProxyType(
                 "totalMarkups": 300,
                 "totalAmount": 2000,
                 "serviceMarkup": 100,
-                "resellerMarkup": 100,
+                "feeAmount": 100,
             },
             "relationships": {
                 "fromCurrency": {
@@ -384,7 +384,7 @@ async def test_price_breakdown_when_no_tax_or_markups_returned_by_pay(
     no_tax_or_markups_response = dict[str, Any](_QUOTE_MOCK_RESPONSE)
     no_tax_or_markups_response["data"]["attributes"]["tax"] = 0
     no_tax_or_markups_response["data"]["attributes"]["serviceMarkup"] = 0
-    no_tax_or_markups_response["data"]["attributes"]["resellerMarkup"] = 0
+    no_tax_or_markups_response["data"]["attributes"]["feeAmount"] = 0
     mock_pay_client.create_quote.return_value = no_tax_or_markups_response
 
     price_quote_result = TripPriceQuoteResult(

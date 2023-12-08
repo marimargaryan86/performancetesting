@@ -42,8 +42,8 @@ class QuoteResource(models.Resource):
                 "totalAmount": money.from_protobuf(
                     quotation.amounts.total_amount,
                 ).amount,
-                "resellerMarkup": money.from_protobuf(
-                    quotation.amounts.reseller_markup,
+                "feeAmount": money.from_protobuf(
+                    quotation.amounts.fee_amount,
                 ).amount,
             },
             relationships={

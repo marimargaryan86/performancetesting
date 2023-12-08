@@ -230,6 +230,7 @@ class QuotationsService(
             request.payer,
             request.beneficiary_company.id,
             request.tax,
+            request.fee_multiplier,
         )
 
         quotation = await self._quotations.insert(quote.to_proto())

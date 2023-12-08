@@ -87,6 +87,7 @@ message CreateQuotationRequest {
   snowfall.project.pay.service.companies.v1.Company beneficiary_company = 5;
   string session_token = 6;
   int32 tax = 7;
+  int32 fee_multiplier = 8;
 }
 
 message CreateQuotationResponse {

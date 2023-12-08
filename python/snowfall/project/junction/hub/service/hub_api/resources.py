@@ -554,9 +554,8 @@ class Company(models.Resource):
                 "fxMarkup": round(company.fx_markup, 3),
                 "processingMarkup": round(company.processing_markup, 3),
                 "salesMarkup": round(company.sales_markup, 3),
-                "resellerMarkups": [
-                    Money.from_proto(reseller_markup)
-                    for reseller_markup in company.reseller_markups
+                "feeAmounts": [
+                    Money.from_proto(fee_amount) for fee_amount in company.fee_amounts
                 ],
                 "paymentType": protobuf.enum_value_to_slug(
                     companies_models_pb2.PaymentType.DESCRIPTOR,

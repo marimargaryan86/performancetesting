@@ -480,7 +480,7 @@
                     "description": "Sum of amount, total markups and tax(if provided)",
                     "readOnly": true
                   },
-                  "resellerMarkup": {
+                  "feeAmount": {
                     "allOf": [
                       {
                         "$ref": "#/components/schemas/MoneyAmount"
@@ -493,6 +493,12 @@
                     "type": "string",
                     "example": "FMSXrOAhIOdvIbxAmfSt7vJtRBkurNbn",
                     "description": "A unique session token that ensures rates are locked for the given session"
+                  },
+                  "feeMultiplier": {
+                    "title": "Fee Multiplier",
+                    "type": "integer",
+                    "example": 3,
+                    "minimum": 1
                   }
                 },
                 "required": [
@@ -500,7 +506,8 @@
                   "totalAmount",
                   "totalMarkups",
                   "serviceMarkup",
-                  "resellerMarkup"
+                  "feeAmount",
+                  "feeMultiplier"
                 ]
               },
               "relationships": {

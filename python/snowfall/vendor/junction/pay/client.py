@@ -16,6 +16,7 @@ class Client(BaseClient):
         from_currency: str,
         to_currency: str,
         tax: int | None = None,
+        fee_multiplier: int = 1,
     ) -> dict[str, Any]:
         payload = {
             "data": {
@@ -39,6 +40,7 @@ class Client(BaseClient):
                     "toCurrency": {
                         "data": {"id": to_currency, _TYPE_KEY: "currencies"},
                     },
+                    "feeMultiplier": fee_multiplier,
                 },
             },
         }

@@ -15,7 +15,7 @@ class PayQuoteAttributes(PayBaseModel):
     total_amount: int = Field(alias="totalAmount")
     total_markups: int = Field(alias="totalMarkups")
     service_markup: int = Field(alias="serviceMarkup")
-    reseller_markup: int = Field(alias="resellerMarkup")
+    reseller_markup: int = Field(alias="feeAmount")
     external_reference: str | None = Field(alias="externalReference", default=None)
 
 

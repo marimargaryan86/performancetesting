@@ -12,7 +12,7 @@ def company() -> company_models.Company:
         fx_markup=0.4,
         processing_markup=0.2,
         sales_markup=float(1),
-        reseller_markups=[
+        fee_amounts=[
             money.Money(200, money.Currency("GBP")).protobuf(),  # noqa: WPS432
             money.Money(100, money.Currency("EUR")).protobuf(),  # noqa: WPS432
         ],
@@ -32,6 +32,7 @@ async def test_same_currencies(
         company,
         "beneficiary_id",
         0,
+        2,
     ).to_proto()
 
     assert money.from_protobuf(quote.amounts.quotation).amount == expected_amount.amount
@@ -47,7 +48,7 @@ async def test_calculation(  # noqa: WPS218
         "fx_margin": money.Money(464, money.Currency("EUR")).amount,
         "processing_margin": money.Money(232, money.Currency("EUR")).amount,
         "service_markup": money.Money(1856, money.Currency("EUR")).amount,
-        "total_markups": money.Money(1972, money.Currency("EUR")).amount,
+        "total_markups": money.Money(2088, money.Currency("EUR")).amount,
     }
 
     quote = Quote(
@@ -58,6 +59,7 @@ async def test_calculation(  # noqa: WPS218
         company,
         "beneficiary_id",
         0,
+        2,
     ).to_proto()
 
     assert (
