@@ -3,6 +3,7 @@ from typing import Any
 
 import httpx
 
+from snowfall.stdlib import money
 from snowfall.stdlib.transport.http import client
 from snowfall.vendor.zendesk import parsers
 from snowfall.vendor.zendesk.models import (
@@ -45,6 +46,7 @@ class ZendeskClient(client.HttpClient):
         order: cancellation_request_models.Order,
         journey: cancellation_request_models.Journey,
         group_id: int,
+        refunded_us: money.Money | None = None,
     ) -> dict[str, Any]:
         return {
             "ticket": {
@@ -54,6 +56,7 @@ class ZendeskClient(client.HttpClient):
                         order=order,
                         journey=journey,
                         convert_to_html=True,
+                        refunded_us=refunded_us,
                     ),
                 },
                 "subject": "Booking Cancellation Request",

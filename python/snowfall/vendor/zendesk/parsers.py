@@ -1,6 +1,7 @@
 from collections.abc import Mapping, Sequence
 from typing import Any
 
+from snowfall.stdlib import money
 from snowfall.vendor.zendesk.models import (
     cancellation_request as cancellation_request_models,
 )
@@ -10,6 +11,7 @@ def parse_cancellation_request_models(
     booking: cancellation_request_models.Booking,
     order: cancellation_request_models.Order,
     journey: cancellation_request_models.Journey,
+    refunded_us: money.Money | None = None,
     *,
     convert_to_html: bool = True,
 ) -> dict[str, Any] | str:
@@ -30,6 +32,12 @@ def parse_cancellation_request_models(
         "Passengers": _parse_passengers(order.passengers),
         "Trip Details": _parse_trip_options(booking.trip_options),
     }
+
+    if refunded_us:
+        parsed_details["Refunded Amount"] = "{0} {1}".format(
+            refunded_us.amount,
+            refunded_us.currency,
+        )
 
     if convert_to_html:
         return _dict_to_html_ul(parsed_details)

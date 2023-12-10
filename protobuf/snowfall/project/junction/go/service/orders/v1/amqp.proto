@@ -22,3 +22,7 @@ message OrderMetadata {
   string booking_id = 3;
   string passenger_name_record = 4;
 }
+
+message HandleCancellationTask {
+  string cancellation_request_id = 1;
+}

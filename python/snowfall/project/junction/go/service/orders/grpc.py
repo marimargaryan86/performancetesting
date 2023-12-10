@@ -20,8 +20,8 @@ from snowfall.project.junction.go.service.orders.orders_handlers import (
 from snowfall.project.junction.go.service.orders.v1 import orders_pb2, orders_pb2_grpc
 from snowfall.project.pay.adapter import refunds as refunds_adapter
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.transport.amqp import producer
 from snowfall.stdlib.transport.grpc import rich_status, service, sorting
-from snowfall.vendor.zendesk.client import ZendeskClient
 
 
 class OrderService(
@@ -46,9 +46,8 @@ class OrderService(
         booking_cancellations: BookingCancellationsRepository,
         cancellation_requests: CancellationRequestsRepository,
         publisher: OrderProducer,
+        cancellation_task_producer: producer.Producer,
         default_page_size: int,
-        zendesk_client: ZendeskClient,
-        cancellation_group_id: int,
         refund_client: refunds_adapter.Client,
     ):
         self._default_page_size = default_page_size
@@ -60,8 +59,7 @@ class OrderService(
         self._booking_cancellations = booking_cancellations
         self._cancellation_requests = cancellation_requests
         self._publisher = publisher
-        self._zendesk_client = zendesk_client
-        self._cancellation_group_id = cancellation_group_id
+        self._cancellation_task_producer = cancellation_task_producer
         self._refund_client = refund_client
 
     def get_name(self) -> str:
@@ -293,8 +291,7 @@ class OrderService(
             context,
             self._journeys,
             self._cancellation_requests,
-            self._zendesk_client,
-            self._cancellation_group_id,
+            self._cancellation_task_producer,
         )
         return await create_cancellation_handler.execute()
 

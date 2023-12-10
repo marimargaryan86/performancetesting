@@ -130,7 +130,7 @@ class JourneyRepository(repository.ProtoRepository[models_pb2.Journey]):
             sort=sort,
         )
 
-    async def find_by_booking_id(
+    async def find_by_booking_ids(
         self,
         ids: Sequence[str],
     ) -> resultset.ResultSet[models_pb2.Journey]:

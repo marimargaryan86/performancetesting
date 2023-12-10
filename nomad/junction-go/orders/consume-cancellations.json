@@ -1,0 +1,23 @@
+{
+  "development": {
+    "deploy": true,
+    "variables": {
+      "count": 2,
+      "zendesk_base_url": "https://snowfall.zendesk.com"
+    }
+  },
+  "production": {
+    "deploy": false,
+    "variables": {
+      "count": 2,
+      "zendesk_base_url": "https://snowfall.zendesk.com"
+    }
+  },
+  "sandbox": {
+    "deploy": true,
+    "variables": {
+      "count": 1,
+      "zendesk_base_url": "https://snowfall.zendesk.com"
+    }
+  }
+}

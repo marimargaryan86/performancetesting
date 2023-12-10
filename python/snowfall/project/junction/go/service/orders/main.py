@@ -10,9 +10,14 @@ from motor import motor_asyncio
 from snowfall.project.junction.go.adapter import orders as orders_adapter
 from snowfall.project.junction.go.adapter import passenger_name_records
 from snowfall.project.junction.go.service.gateway.v1 import bookings_pb2_grpc
-from snowfall.project.junction.go.service.orders import bookings, importer, orders
+from snowfall.project.junction.go.service.orders import (
+    bookings,
+    importer,
+    orders,
+    orders_handlers,
+)
+from snowfall.project.junction.go.service.orders import consumer as orders_consumer
 from snowfall.project.junction.go.service.orders.amqp import OrderProducer
-from snowfall.project.junction.go.service.orders.consumer import TicketEventConsumer
 from snowfall.project.junction.go.service.orders.grpc import OrderService
 from snowfall.project.junction.go.service.orders.pay_transactions import (
     PayTransactionCreator,
@@ -48,9 +53,6 @@ class _GrpcSettings(application.Settings):
     mongo_dsn: Sequence[pydantic.AnyUrl]
     passenger_name_records_address: str
     resellers_address: str
-    zendesk_base_url: pydantic.AnyUrl
-    zendesk_api_key: str
-    zendesk_cancellation_group_id: int
     refunds_address: str
 
 
@@ -67,6 +69,18 @@ class _TicketEventsConsumerSettings(application.Settings):
     orders_address: str
 
 
+class _CancellationsConsumerSettings(application.Settings):
+    amqp_dsn: pydantic.AmqpDsn
+    mongo_dsn: Sequence[pydantic.AnyUrl]
+    zendesk_cancellation_group_id: int
+    zendesk_base_url: pydantic.AnyUrl
+    zendesk_api_key: str
+    refunds_address: str
+    gateway_address: str
+    resellers_address: str
+    passenger_name_records_address: str
+
+
 async def _serve(app: application.Application[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
@@ -79,17 +93,6 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
                 app.settings.passenger_name_records_address,
             ),
         ),
-    )
-
-    http_client = await app.stack.enter_async_context(httpx.AsyncClient())
-    logging.register(http_client)
-    metrics.register(http_client)
-
-    zendesk_client = ZendeskClient(
-        base_url=str(app.settings.zendesk_base_url),
-        api_key=app.settings.zendesk_api_key,
-        http_client=http_client,
-        env=app.environment,
     )
 
     amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
@@ -150,12 +153,14 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
                     ),
                 ),
                 default_page_size=app.settings.default_page_size,
-                zendesk_client=zendesk_client,
-                cancellation_group_id=app.settings.zendesk_cancellation_group_id,
                 refund_client=refunds_adapter.GrpcClient(
                     refund_pb2_grpc.RefundsServiceStub(
                         refund_channel,
                     ),
+                ),
+                cancellation_task_producer=producer.Producer(
+                    connection=amqp_connection,
+                    exchange=types.Exchange("orders.cancellations"),
                 ),
             ),
         ],
@@ -213,13 +218,85 @@ async def _consume_ticket_events(
         ),
     )
 
-    event_consumer = TicketEventConsumer(
+    event_consumer = orders_consumer.TicketEventConsumer(
         consumer_obj=consumer.Consumer(
             connection=connection,
             queue_name="{0}_zendesk_events".format(app.name),
             binds=[(types.Exchange("zendesk_webhook"), "zendesk_webhook.event")],
         ),
         orders_client=orders_client,
+    )
+    await event_consumer.consume()
+
+
+async def _consume_cancellations(
+    app: application.Application[_CancellationsConsumerSettings],
+) -> None:
+    connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
+
+    http_client = await app.stack.enter_async_context(httpx.AsyncClient())
+    logging.register(http_client)
+    metrics.register(http_client)
+
+    mongo = motor_asyncio.AsyncIOMotorClient(
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
+    )
+
+    resellers_chan, gateway_chan, refund_chan, pnr_chan = await asyncio.gather(
+        grpc_factory.make_insecure_channel(
+            app,
+            app.settings.resellers_address,
+        ),
+        grpc_factory.make_insecure_channel(
+            app,
+            app.settings.gateway_address,
+        ),
+        grpc_factory.make_insecure_channel(
+            app,
+            app.settings.refunds_address,
+        ),
+        grpc_factory.make_insecure_channel(
+            app,
+            app.settings.passenger_name_records_address,
+        ),
+    )
+
+    event_consumer = orders_consumer.BookingCancellationsConsumer(
+        consumer_obj=consumer.Consumer(
+            connection=connection,
+            queue_name="{0}_cancellations".format(app.name),
+            binds=[(types.Exchange("orders.cancellations"), "orders.cancellations")],
+        ),
+        create_cancellation_task_handler=orders_handlers.CreateCancellationTaskHandler(
+            gateway=bookings_pb2_grpc.BookingServiceStub(gateway_chan),
+            journeys=orders.JourneyRepository(
+                collection=mongo.orders.journeys,
+                passenger_name_records=passenger_name_records.GrpcClient(
+                    passenger_name_records=passenger_name_records_pb2_grpc.PassengerNameRecordServiceStub(
+                        channel=pnr_chan,
+                    ),
+                ),
+                resellers_client=resellers_pb2_grpc.ResellerServiceStub(
+                    resellers_chan,
+                ),
+            ),
+            bookings=orders.BookingRepository(
+                collection=mongo.orders.journeys,
+            ),
+            cancellations=orders.CancellationRequestsRepository(
+                collection=mongo.orders.cancellation_requests,
+            ),
+            zendesk_client=ZendeskClient(
+                base_url=str(app.settings.zendesk_base_url),
+                api_key=app.settings.zendesk_api_key,
+                http_client=http_client,
+                env=app.environment,
+            ),
+            cancellation_group_id=app.settings.zendesk_cancellation_group_id,
+            refund_client=refunds_adapter.GrpcClient(
+                refund_pb2_grpc.RefundsServiceStub(refund_chan),
+            ),
+        ),
     )
     await event_consumer.consume()
 
@@ -242,5 +319,10 @@ if __name__ == "__main__":
             name="consume-ticket-events",
             callback=_consume_ticket_events,
             settings_class=_TicketEventsConsumerSettings,
+        ),
+        application.Command(
+            name="consume-cancellations",
+            callback=_consume_cancellations,
+            settings_class=_CancellationsConsumerSettings,
         ),
     )
