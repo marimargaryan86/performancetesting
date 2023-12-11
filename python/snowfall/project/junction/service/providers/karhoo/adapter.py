@@ -1,6 +1,6 @@
 import asyncio
 import datetime
-from collections.abc import AsyncIterator, Sequence
+from collections.abc import AsyncIterator, Awaitable, Callable, Sequence
 from types import MappingProxyType
 
 from snowfall.project.junction.go.service.offers.v1 import (
@@ -36,6 +36,116 @@ _KARHOO_CABIN_CLASSES: MappingProxyType[
         "hybrid": common_pb2.CabinClass.TYPE_ECONOMY,
     },
 )
+
+
+def _get_cabin_class_from_tags(
+    tags: Sequence[str],
+) -> common_pb2.CabinClass.Type.ValueType:
+    target_tags = _KARHOO_CABIN_CLASSES.keys()
+
+    for tag in target_tags:
+        if tag in tags:
+            return _KARHOO_CABIN_CLASSES[tag]
+
+    return common_pb2.CabinClass.TYPE_UNSPECIFIED
+
+
+async def _retrieve_quotes(  # noqa: WPS231
+    list_quotes: Callable[[str, int], Awaitable[karhoo_quotes.RequestQuotesResponse]],
+    identity: str,
+    passengers_count: int,
+    wait: int,
+) -> AsyncIterator[karhoo_quotes.Quote]:
+    seen = []
+    while True:
+        quotes_result = await list_quotes(
+            identity,
+            passengers_count,
+        )
+        for quote in quotes_result.quotes:
+            if quote.quote_type != _QUOTE_TYPE_FIXED:
+                continue
+            if quote.id not in seen:
+                seen.append(quote.id)
+                yield quote
+
+        if quotes_result.status == _KARHOO_STATUS_COMPLETED:
+            break
+        await asyncio.sleep(wait)
+
+
+class KarhooOfferMatcher(object):
+    def __init__(self, karhoo_client: client.KarhooClient, ttl: datetime.timedelta):
+        self._karhoo_client = karhoo_client
+        self._wait = 1
+        self._cut_off = 30
+        self._ttl = ttl
+
+    async def create_matching_price_quote(
+        self,
+        offer_details: cache.OfferDetails,
+    ) -> cache.PriceQuote | None:
+        quotes_response = await self._karhoo_client.request_quotes(
+            origin=location.Coordinates(
+                latitude=str(offer_details.origin.latitude),
+                longitude=str(offer_details.origin.longitude),
+            ),
+            destination=location.Coordinates(
+                latitude=str(offer_details.destination.latitude),
+                longitude=str(offer_details.destination.longitude),
+            ),
+            departure_at=offer_details.departure_at,
+        )
+
+        quotes = _retrieve_quotes(
+            self._karhoo_client.list_quotes,
+            quotes_response.id,
+            offer_details.passengers_count,
+            self._wait,
+        )
+
+        async with asyncio.timeout(self._cut_off):
+            async for quote in quotes:
+                if self._offer_matches(quote, offer_details):
+                    return self._create_price_quote(quote, quotes_response)
+
+        return None
+
+    def _create_price_quote(
+        self,
+        quote: karhoo_quotes.Quote,
+        quotes_response: karhoo_quotes.RequestQuotesResponse,
+    ) -> cache.PriceQuote:
+        validity = (
+            datetime.timedelta(seconds=quotes_response.validity)
+            if (quotes_response.validity and quotes_response.validity > 0)
+            else self._ttl
+        )
+        currency = money.Currency(
+            quote.price.currency_code,
+        )
+        return cache.PriceQuote(
+            quote_id=quote.id,
+            quotes_response_id=quotes_response.id,
+            expires_at=datetime.datetime.now(datetime.UTC) + validity,
+            price=str(quote.price.high) if quote.price.high else "",
+            currency=currency,
+        )
+
+    def _offer_matches(
+        self,
+        quote: karhoo_quotes.Quote,
+        offer_details: cache.OfferDetails,
+    ) -> bool:
+        cabin_class = cache.CabinClass(
+            type=int(
+                _get_cabin_class_from_tags(
+                    quote.vehicle.tags if quote.vehicle else [],
+                ),
+            ),
+            marketing_name=quote.vehicle.type if quote.vehicle else "",
+        )
+        return cabin_class == offer_details.cabin_class
 
 
 class KarhooOffersAdapter(object):
@@ -80,55 +190,46 @@ class KarhooOffersAdapter(object):
             ),
         )
         passengers_count = search_task.passengers_count
+        quotes = _retrieve_quotes(
+            self._client.list_quotes,
+            trip.id,
+            passengers_count,
+            self._wait,
+        )
         async with asyncio.timeout(self._cut_off):
-            async for quote in self._retrieve_quotes(trip.id, passengers_count):
-                yield await self._create_offer_group(quote, search_task, trip)
-
-    async def _retrieve_quotes(  # noqa: WPS231
-        self,
-        identity: str,
-        passengers_count: int,
-    ) -> AsyncIterator[karhoo_quotes.Quote]:
-        seen = []
-        while True:
-            quotes_result = await self._client.list_quotes(
-                ident=identity,
-                min_passengers=passengers_count,
-            )
-            for quote in quotes_result.quotes:
-                if quote.quote_type != _QUOTE_TYPE_FIXED:
-                    continue
-                if quote.id not in seen:
-                    seen.append(quote.id)
-                    yield quote
-
-            if quotes_result.status == _KARHOO_STATUS_COMPLETED:
-                break
-            await asyncio.sleep(self._wait)
+            async for quote in quotes:
+                yield await self._create_offer_group(quote, search_task)
 
     async def _create_offer_group(
         self,
         quote: karhoo_quotes.Quote,
         search_task: amqp_pb2.Criteria,
-        quotes_response: karhoo_quotes.RequestQuotesResponse,
     ) -> offer_models_pb2.OfferGroup:
         expires_at = datetime.datetime.now(datetime.UTC) + self._ttl
         segment = await self._parse_segment(quote, search_task)
         offer = self._parse_offer(quote, segment)
-        validity = (
-            datetime.timedelta(seconds=quotes_response.validity)
-            if (quotes_response.validity and quotes_response.validity > 0)
-            else self._ttl
-        )
         await self._offers_cache.store(
             cache.OfferDetails(
-                quote_id=quote.id,
-                quotes_response_id=quotes_response.id,
-                expires_at=datetime.datetime.now(datetime.UTC) + validity,
                 currency=money.Currency(
                     quote.price.currency_code,
                 ),
                 price=str(quote.price.high) if quote.price.high else "",
+                origin=cache.Coordinates(
+                    latitude=search_task.origin.latitude,
+                    longitude=search_task.origin.longitude,
+                ),
+                destination=cache.Coordinates(
+                    latitude=search_task.destination.latitude,
+                    longitude=search_task.destination.longitude,
+                ),
+                passengers_count=search_task.passengers_count,
+                cabin_class=cache.CabinClass(
+                    type=int(offer.segment_details[0].cabin_class.type),
+                    marketing_name=offer.segment_details[0].cabin_class.marketing_name,
+                ),
+                departure_at=protobuf.protobuf_to_datetime(
+                    search_task.departure_datetime,
+                ),
             ),
             expires_at=expires_at,
             key=offer.id,
@@ -162,7 +263,7 @@ class KarhooOffersAdapter(object):
                     id=string.uuid(),
                     offer_segment_id=segment.id,
                     cabin_class=models_pb2.CabinClass(
-                        type=self._get_cabin_class_from_tags(
+                        type=_get_cabin_class_from_tags(
                             quote.vehicle.tags if quote.vehicle else [],
                         ),
                         marketing_name=quote.vehicle.type if quote.vehicle else "",
@@ -224,15 +325,3 @@ class KarhooOffersAdapter(object):
                 protobuf.protobuf_to_datetime(search_task.departure_datetime),
             ),
         )
-
-    def _get_cabin_class_from_tags(
-        self,
-        tags: Sequence[str],
-    ) -> common_pb2.CabinClass.Type.ValueType:
-        target_tags = _KARHOO_CABIN_CLASSES.keys()
-
-        for tag in target_tags:
-            if tag in tags:
-                return _KARHOO_CABIN_CLASSES[tag]
-
-        return common_pb2.CabinClass.TYPE_UNSPECIFIED

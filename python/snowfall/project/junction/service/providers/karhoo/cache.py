@@ -8,7 +8,35 @@ from snowfall.stdlib.persistence.redis.repository import (
 from snowfall.stdlib.persistence.redis.repository import RedisRecord
 
 
+class Coordinates(RedisRecord):
+    latitude: float
+    longitude: float
+
+
+class CabinClass(RedisRecord):
+    type: int  # noqa: A003
+    marketing_name: str
+
+
 class OfferDetails(RedisRecord):
+    # TODO: remove quote_id one orders is implemented.
+    quote_id: str = ""
+    departure_at: datetime.datetime
+    price: str
+    currency: money.Currency
+    passengers_count: int
+    origin: Coordinates
+    destination: Coordinates
+    cabin_class: CabinClass
+
+
+class OffersCache(RedisRepository[OfferDetails]):
+    """Stores offer details in the cache."""
+
+    _record_type: type[OfferDetails] = OfferDetails
+
+
+class PriceQuote(RedisRecord):
     quote_id: str
     quotes_response_id: str
     expires_at: datetime.datetime
@@ -16,10 +44,10 @@ class OfferDetails(RedisRecord):
     currency: money.Currency
 
 
-class OffersCache(RedisRepository[OfferDetails]):
-    """Stores offer details in the cache."""
+class PricingCache(RedisRepository[PriceQuote]):
+    """Stores pricing details in the cache."""
 
-    _record_type: type[OfferDetails] = OfferDetails
+    _record_type: type[PriceQuote] = PriceQuote
 
 
 def generate_cache_key(

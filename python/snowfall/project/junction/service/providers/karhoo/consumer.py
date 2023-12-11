@@ -153,11 +153,24 @@ class TripOfferSearchConsumer(object):
                     offer_models_pb2.Offer(
                         id=await self._offers_cache.store(
                             cache.OfferDetails(
-                                quote_id=quote_obj.id,
-                                quotes_response_id=quote_id,
-                                expires_at=expires_at,
                                 price=str(quote_obj.price.high),
                                 currency=money.Currency(quote_obj.price.currency_code),
+                                departure_at=protobuf.protobuf_to_datetime(
+                                    leg.departure_at,
+                                ),
+                                passengers_count=1,
+                                origin=cache.Coordinates(
+                                    latitude=leg.origin.coordinates.latitude,
+                                    longitude=leg.origin.coordinates.longitude,
+                                ),
+                                destination=cache.Coordinates(
+                                    latitude=leg.destination.coordinates.latitude,
+                                    longitude=leg.destination.coordinates.longitude,
+                                ),
+                                cabin_class=cache.CabinClass(
+                                    type=0,
+                                    marketing_name="",
+                                ),
                             ),
                         ),
                         segment_details=[
