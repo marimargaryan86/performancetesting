@@ -1,6 +1,8 @@
 import abc
 from collections.abc import Sequence
 
+from pydantic import BaseModel
+
 from snowfall.project.junction.plus.adapter import errors
 from snowfall.project.junction.plus.service.notifications.v1alpha import (
     grpc_pb2 as notifications_grpc_pb2,
@@ -11,6 +13,11 @@ from snowfall.project.junction.plus.service.notifications.v1alpha import (
 from snowfall.project.junction.plus.service.notifications.v1alpha import (
     models_pb2 as notifications_models_pb2,
 )
+
+
+class PermissionUpdate(BaseModel):
+    enabled: bool
+    name: str
 
 
 class Client(abc.ABC):
@@ -33,6 +40,21 @@ class Client(abc.ABC):
     async def update(
         self,
         configuration_vector: notifications_models_pb2.ConfigurationVector,
+    ) -> None:
+        """Update Reseller configuration vector."""
+
+    @abc.abstractmethod
+    async def get_permissions(
+        self,
+        reseller_id: str,
+    ) -> Sequence[str]:
+        """Update Reseller configuration vector."""
+
+    @abc.abstractmethod
+    async def update_permissions(
+        self,
+        reseller_id: str,
+        updates: Sequence[PermissionUpdate],
     ) -> None:
         """Update Reseller configuration vector."""
 
@@ -86,6 +108,51 @@ class DictClient(Client):
         configuration_vector: notifications_models_pb2.ConfigurationVector,
     ) -> None:
         self._configuration_vectors_id[configuration_vector.id] = configuration_vector
+
+    async def get_permissions(
+        self,
+        reseller_id: str,
+    ) -> Sequence[str]:
+        configuration_vector = next(
+            filter(
+                lambda cv: cv.reseller_id == reseller_id,
+                self._configuration_vectors_id.values(),
+            ),
+            None,
+        )
+
+        if not configuration_vector:
+            raise errors.NotFoundError()
+
+        return configuration_vector.permissions
+
+    async def update_permissions(
+        self,
+        reseller_id: str,
+        updates: Sequence[PermissionUpdate],
+    ) -> None:
+        configuration_vector = next(
+            filter(
+                lambda cv: cv.reseller_id == reseller_id,
+                self._configuration_vectors_id.values(),
+            ),
+            None,
+        )
+
+        if not configuration_vector:
+            raise errors.NotFoundError()
+
+        permissions_to_add = [update.name for update in updates if update.enabled]
+        permissions_to_remove = [
+            update.name for update in updates if not update.enabled
+        ]
+        updated_permissions = set(
+            list(set(configuration_vector.permissions) - set(permissions_to_remove))
+            + list(permissions_to_add),
+        )
+
+        configuration_vector.ClearField("permissions")
+        configuration_vector.permissions.extend(updated_permissions)
 
 
 class GrpcClient(Client):
@@ -143,6 +210,47 @@ class GrpcClient(Client):
                 request,
                 timeout=self._timeout,
             ),
+        )
+
+        if not response.is_success:
+            raise errors.UnprocessableEntityError()
+
+    async def get_permissions(self, reseller_id: str) -> Sequence[str]:
+        request = notifications_grpc_pb2.GetPermissionsRequest(
+            reseller_id=reseller_id,
+        )
+
+        response: notifications_grpc_pb2.GetPermissionsResponse = (
+            await errors.handle_grpc_errors(
+                self._configuration_vectors.GetPermissions(
+                    request,
+                    timeout=self._timeout,
+                ),
+            )
+        )
+
+        return response.permissions
+
+    async def update_permissions(
+        self,
+        reseller_id: str,
+        updates: Sequence[PermissionUpdate],
+    ) -> None:
+        request = notifications_grpc_pb2.UpdatePermissionsRequest(
+            reseller_id=reseller_id,
+            updates=[
+                notifications_models_pb2.PermissionUpdate(**update.model_dump())
+                for update in updates
+            ],
+        )
+
+        response: notifications_grpc_pb2.UpdatePermissionsResponse = (
+            await errors.handle_grpc_errors(
+                self._configuration_vectors.UpdatePermissions(
+                    request,
+                    timeout=self._timeout,
+                ),
+            )
         )
 
         if not response.is_success:
