@@ -438,6 +438,7 @@ class CreateCancellationTaskHandler(object):
         await self._update_statuses(
             cancellation_request=cancellation_request,
             cancellations=new_cancellations,
+            provider_reference_to_ids=bookings_data.provider_reference_to_ids,
         )
 
     async def _handle_automatic_cancellation(  # noqa: WPS231
@@ -601,13 +602,15 @@ class CreateCancellationTaskHandler(object):
         self,
         cancellation_request: models_pb2.CancellationRequest,
         cancellations: Sequence[models_pb2.BookingCancellation],
+        provider_reference_to_ids: Mapping[str, _IdContainer],
     ) -> None:
         for initial_booking_cancellation in cancellation_request.booking_cancellations:
             try:
                 new_booking_cancellation = next(
                     cancel_obj
                     for cancel_obj in cancellations
-                    if cancel_obj.booking_id == initial_booking_cancellation.booking_id
+                    if provider_reference_to_ids[cancel_obj.booking_id].booking_id
+                    == initial_booking_cancellation.booking_id
                 )
             except StopIteration:
                 self._logger.exception(
