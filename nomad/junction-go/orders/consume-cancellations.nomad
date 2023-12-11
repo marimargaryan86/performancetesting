@@ -82,11 +82,11 @@ job "junction-go-orders-consume-cancellations" {
             }
             upstreams {
               local_bind_port  = 8030
-              destination_name = "gateway-${var.environment}"
+              destination_name = "junction-go-gateway-serve-${var.environment}"
             }
             upstreams {
               local_bind_port  = 8040
-              destination_name = "resellers-${var.environment}"
+              destination_name = "junction-go-resellers-${var.environment}"
             }
             upstreams {
               local_bind_port  = 8050
@@ -114,10 +114,10 @@ job "junction-go-orders-consume-cancellations" {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
-REFUNDS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_junction-go-refunds-${var.environment}"))}}
+REFUNDS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_refunds-${var.environment}"))}}
 GATEWAY_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_junction-go-gateway-serve-${var.environment}"))}}
 RESELLERS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_junction-go-resellers-${var.environment}"))}}
-PASSENGER_NAME_RECORDS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_junction-go-passenger-name-records-${var.environment}"))}}
+PASSENGER_NAME_RECORDS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_passenger-name-records-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/zendesk" }}
 ZENDESK_CANCELLATION_GROUP_ID={{ .Data.data.cancellation_group_id }}
 ZENDESK_API_KEY={{ .Data.data.zendesk_api_key }}
