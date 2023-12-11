@@ -571,3 +571,55 @@ flowchart LR
     Matrix-->|Events|MC[Matrix Chatbot]
     MC[Matrix Chatbot]-->|Response|Matrix
 ```
+
+## OTFP (On Time Flight Performance)
+
+The OTFP (On Time Flight Performance) is an flight delay prediction feature developed using Machine Learning. Amazon SageMaker is used as the ML platform. We have built (Trained/Tested/Validated) a ML model based on historical flight data obtained from OAG. This feature attempts to predict the possible delay of a flight arriving at the destination. This should help our customers make informed choice about the flight's reliability and punctuality.
+
+## High Level architecture
+
+```mermaid
+flowchart LR
+    AWS[Amazon SageMaker]
+
+    subgraph OTFP[OTFP]
+        FPSC[FlightPredictionService Client/Adapter]
+        FPS[FlightPrediction gRPC Service]
+        E[Encoder - Helper fn]
+        SMP[SageMaker plugin]
+    end
+
+    MA[Mobile API]
+    J[Junction One, Junction Plus]
+    SA[Super App, RES]
+
+    SA-->MA
+    MA-->FPSC
+    J-->FPSC
+    FPSC-->FPS
+    FPS-->E
+    FPS-->SMP
+    SMP-->AWS
+```
+
+**Amazon SageMaker** is the ML platform which is used to create the flight delay model.The ML model works on various aspects of flight data. The flight data is massaged and formatted and then repeatedly passed through the process of training, testing and validating the model to increase accuracy of the flight delay prediction. It exposes an endpoint for getting the flight delay prediction as the result.
+
+The **FlightPredictionService** : This is the gRPC service which returns the prediction for the given flight information (Flight number, Carrier Code and Schedule) sent as input. We have code module which takes care of setting up the connection and calling the SageMaker Endpoint using the SageMaker SDK provided by AWS. Let us call this - a plugin for SageMaker. FlightPredictionService will call this plugin module to get the results. Having the plug-in module helps in keeping the component calling the ML platform separate from the gRPC service as we can switch to another ML platform later if we choose to do so. We can simply have another specialised (plugin) module for another ML platform and then FlightPrediction gRPC service can call it (rather than the SageMaker plugin).\
+The FlightPredictionService service also interacts with other utility services like the encoder to get all the inputs and parameters ready to make the call to the (SageMaker) plugin module. The response (prediction/inference) will be read and passed on the caller.
+
+These services are stateless and can be scaled out as per demand. We also have a cache for a lookup of  flight-details↔predictions so that we do not make redundant calls for the same flight details.
+
+**Junction One** and any other internal consumer can directly make the call to the FlightPredictionService gRPC service with the flight details.
+
+Currently known ‘external’ (mobile/website) consumers are **SuperApp and RES** . They will use the Mobile API to get the flight prediction.
+
+### Technical Details
+
+The API specification for this feature is at: https://engineering.snowfalltravel.com/docs/specifications/junction/extensions/mobile-api-spec/
+
+To access the AWS SageMaker endpoint from code, we use the boto3 library to configure and get the SageMaker client, and then use the invoke_endpoint() function to make a request and get the response.
+The FlightPredictionService gRPC service gets the data formated and ready to call the AWS SageMaker endpoint. There is a client (adapter) for calling the FlightPredictionService gRPC service and any allowed service can use it. i.e. Any consumer who needs to call the gRPC service can call this client (adapter).
+The OTFP feature is only expose to Junction ONE, SuperApp and RES for now. SuperApp and RES can call the Mobile API which in turn calls the FlightPredictionService gRPC service (through the client/adapter). Junction ONE can call and use the FlightPredictionService gRPC service directly (through the client/adapter).\
+The FlightPredictionService is a shared service which will receive the input i.e. for the flight for which we need the delay prediction, it needs the Flight number, Carrier Code and Flight Schedule and will return a number as response. This response is the flight delay in minutes.
+In case the value received from the model is positive then that indicate the number of minutes of delay the flight will arrive at destination.
+In case the value received from the model is negative then that means the flight will arrived early in the destination by those many minutes.
