@@ -1,3 +1,5 @@
+import type { DateRange } from "models/date-time";
+
 export function getZeroTimeDate(date?: Date): Date {
   const nextDate = new Date(date ?? new Date());
   nextDate.setHours(0);
@@ -211,4 +213,20 @@ export function getAge(date: Date, today = new Date()): number {
   }
 
   return age;
+}
+
+export function parseDateRange(from = "", to = ""): DateRange | undefined {
+  const dateFrom = new Date(from);
+
+  if (isNaN(dateFrom.getTime())) {
+    return undefined;
+  }
+
+  const dateTo = new Date(to);
+
+  if (isNaN(dateTo.getTime())) {
+    return undefined;
+  }
+
+  return { from: getZeroTimeDate(dateFrom), to: getZeroTimeDate(dateTo) };
 }

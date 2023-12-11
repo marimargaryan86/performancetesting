@@ -30,6 +30,23 @@
       currency: curr.currency,
     }));
   }
+
+  const filters = createQueryStore<FilterOptions, FilterOptionsQuery>(
+    (data) => ({
+      "createdAt[from]": data.createdAtRange?.from.toLocaleDateString("sv-SE"),
+      "createdAt[to]": data.createdAtRange?.to.toLocaleDateString("sv-SE"),
+      "departureAt[from]": data.departureAtRange?.from.toLocaleDateString("sv-SE"),
+      "departureAt[to]": data.departureAtRange?.to.toLocaleDateString("sv-SE"),
+      bookingStatus: data.bookingStatus,
+    }),
+    (query) => ({
+      bookingStatus: bookingStatuses.includes(query.bookingStatus as BookingStatus)
+        ? (query.bookingStatus as BookingStatus)
+        : undefined,
+      createdAtRange: parseDateRange(query["createdAt[from]"], query["createdAt[to]"]),
+      departureAtRange: parseDateRange(query["departureAt[from]"], query["departureAt[to]"]),
+    }),
+  );
 </script>
 
 <script lang="ts">
@@ -51,13 +68,18 @@
   import type { ScrollLoadFunc } from "directives/scroll-load";
   import integrationInstancesClient from "integration-instances-client";
   import type JourneyService from "integration/junction-hub-api/services/journey-service";
-  import Filters, { type FilterOptions } from "./filters.svelte";
+  import Filters, { type FilterOptions, type FilterOptionsQuery } from "./filters.svelte";
   import { ensureDefined } from "utils/array";
+  import { createQueryStore } from "utils/url";
+  import {
+    bookingStatuses,
+    type BookingStatus,
+  } from "integration/junction-hub-api/schemas/booking";
+  import { parseDateRange } from "utils/date-time";
 
   export let data;
 
   let searchQuery = "";
-  let filters: FilterOptions = {};
 
   $: orders = data.journeys.data.flatMap((item) => item.orders);
 
@@ -88,14 +110,14 @@
 <StandardLayout
   pageTitle="Orders"
   bind:searchQuery
-  filtersActive={Boolean(Object.values(filters).find(ensureDefined))}
+  filtersActive={Boolean(Object.values($filters).find(ensureDefined))}
 >
   <Button size="small" href={routeConfig.routes.tripManagement.routes.book.root} slot="actions">
     New Order
     <PlusIcon />
   </Button>
 
-  <Filters slot="filters" bind:filters />
+  <Filters slot="filters" bind:filters={$filters} />
 
   <Table class="orders-table" {loadMore}>
     <THead>

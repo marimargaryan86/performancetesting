@@ -5,6 +5,14 @@
     bookingStatus?: BookingStatus;
   };
 
+  export type FilterOptionsQuery = {
+    "departureAt[from]"?: string;
+    "departureAt[to]"?: string;
+    "createdAt[from]"?: string;
+    "createdAt[to]"?: string;
+    bookingStatus?: string;
+  };
+
   function formatBookingStatusOptions(
     bookingStatus: BookingStatus | undefined,
     selected = false,
