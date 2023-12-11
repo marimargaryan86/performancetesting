@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-  import type { UiNodeGroup } from "integration/ory/schemas/ui-node.js";
+  import type { UiNodeGroup } from "integration/ory/schemas/ui-node";
 
   function getOnClick(func: string): () => void {
     // eslint-disable-next-line no-eval

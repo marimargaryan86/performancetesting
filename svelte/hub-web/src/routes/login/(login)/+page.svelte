@@ -8,7 +8,7 @@
   import integrationInstancesClient from "integration-instances-client";
   import routeConfig from "routeConfig";
   import { goto, invalidateAll } from "$app/navigation";
-  import { slideFade } from "transitions/slide-fade.js";
+  import { slideFade } from "transitions/slide-fade";
 
   export let data;
 
