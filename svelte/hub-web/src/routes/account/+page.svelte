@@ -111,70 +111,74 @@
     {#each groupOrder as name}
       {@const nodes = groups[name] ?? []}
 
-      <form on:submit|preventDefault={submit}>
-        <h2 class="typography headline-small bold">{formatGroupName(name)}</h2>
+      {#if nodes.length}
+        <form on:submit|preventDefault={submit}>
+          <h2 class="typography headline-small bold">{formatGroupName(name)}</h2>
 
-        {#each [...nodes, ...(defaultGroup ?? [])] as node}
-          {#if node.type === "input"}
-            {@const nodeError = node.messages
-              .filter(({ type }) => type === "error")
-              .map(({ text }) => text)}
+          {#each [...nodes, ...(defaultGroup ?? [])] as node}
+            {#if node.type === "input"}
+              {@const nodeError = node.messages
+                .filter(({ type }) => type === "error")
+                .map(({ text }) => text)}
 
-            {#if node.attributes.type === "hidden"}
-              <input type="hidden" value={node.attributes.value} name={node.attributes.name} />
-            {:else if node.attributes.type === "email" || node.attributes.type === "text" || node.attributes.type === "password"}
-              <TextField
-                autocomplete={node.attributes.autocomplete}
-                disabled={node.attributes.disabled}
-                label={node.meta.label?.text}
-                name={node.attributes.name}
-                required={node.attributes.required}
+              {#if node.attributes.type === "hidden"}
+                <input type="hidden" value={node.attributes.value} name={node.attributes.name} />
+              {:else if node.attributes.type === "email" || node.attributes.type === "text" || node.attributes.type === "password"}
+                <TextField
+                  autocomplete={node.attributes.autocomplete}
+                  disabled={node.attributes.disabled}
+                  label={node.meta.label?.text}
+                  name={node.attributes.name}
+                  required={node.attributes.required}
+                  type={node.attributes.type}
+                  value={node.attributes.value}
+                  error={nodeError.length ? nodeError : undefined}
+                />
+              {:else if node.attributes.type === "button" || node.attributes.type === "submit"}
+                <Button
+                  type={node.attributes.type}
+                  name={node.attributes.name}
+                  value={node.attributes.value}
+                  on:click={node.attributes.onclick
+                    ? getOnClick(node.attributes.onclick)
+                    : undefined}
+                >
+                  {node.meta.label?.text ?? "Click"}
+
+                  {#if $pending === `${node.attributes.name}:${node.attributes.value}`}
+                    <LoadingIcon />
+                  {/if}
+                </Button>
+              {:else}
+                <div>{node.attributes.type}</div>
+              {/if}
+            {:else if node.type === "script"}
+              <svelte:element
+                this="script"
+                async={node.attributes.async}
+                crossorigin={node.attributes.crossorigin}
+                id={node.attributes.id}
+                integrity={node.attributes.integrity}
+                nonce={node.attributes.nonce}
+                referrerpolicy={node.attributes.referrerPolicy}
+                src={node.attributes.src}
                 type={node.attributes.type}
-                value={node.attributes.value}
-                error={nodeError.length ? nodeError : undefined}
               />
-            {:else if node.attributes.type === "button" || node.attributes.type === "submit"}
-              <Button
-                type={node.attributes.type}
-                name={node.attributes.name}
-                value={node.attributes.value}
-                on:click={node.attributes.onclick ? getOnClick(node.attributes.onclick) : undefined}
-              >
-                {node.meta.label?.text ?? "Click"}
-
-                {#if $pending === `${node.attributes.name}:${node.attributes.value}`}
-                  <LoadingIcon />
-                {/if}
-              </Button>
-            {:else}
-              <div>{node.attributes.type}</div>
+            {:else if node.type === "img"}
+              <img
+                src={node.attributes.src}
+                alt={node.meta.label?.text ?? ""}
+                height={node.attributes.height}
+                width={node.attributes.width}
+                id={node.attributes.id}
+              />
+            {:else if node.type === "text"}
+              <div class="typography body-medium">{node.meta.label?.text}</div>
+              <div class="typography body-medium bold">{node.attributes.text.text}</div>
             {/if}
-          {:else if node.type === "script"}
-            <svelte:element
-              this="script"
-              async={node.attributes.async}
-              crossorigin={node.attributes.crossorigin}
-              id={node.attributes.id}
-              integrity={node.attributes.integrity}
-              nonce={node.attributes.nonce}
-              referrerpolicy={node.attributes.referrerPolicy}
-              src={node.attributes.src}
-              type={node.attributes.type}
-            />
-          {:else if node.type === "img"}
-            <img
-              src={node.attributes.src}
-              alt={node.meta.label?.text ?? ""}
-              height={node.attributes.height}
-              width={node.attributes.width}
-              id={node.attributes.id}
-            />
-          {:else if node.type === "text"}
-            <div>{node.meta.label?.text}</div>
-            <div>{node.attributes.text.text}</div>
-          {/if}
-        {/each}
-      </form>
+          {/each}
+        </form>
+      {/if}
     {/each}
   </div>
 </StandardLayout>
