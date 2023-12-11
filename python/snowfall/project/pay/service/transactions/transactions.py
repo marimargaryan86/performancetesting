@@ -1,3 +1,4 @@
+import datetime
 from collections.abc import Mapping, Sequence
 from typing import Any
 
@@ -32,13 +33,15 @@ class TransactionsRepository(
 
     async def list_transactions(
         self,
-        cursor: str,
-        filter_by_ids: Sequence[str],
-        filter_by_bill_ids: Sequence[str],
-        filter_by_external_reference: Sequence[str],
+        cursor: str = "",
+        filter_by_ids: Sequence[str] = (),
+        filter_by_bill_ids: Sequence[str] = (),
+        filter_by_external_reference: Sequence[str] = (),
+        from_date: datetime.datetime | None = None,
+        to_date: datetime.datetime | None = None,
         sort: tuple[str, int] | None = None,
     ) -> resultset.ResultSet[models_pb2.Transaction]:
-        filter_ = {}
+        filter_: dict[str, Any] = {}
         if filter_by_ids:
             filter_[repository.mongo_id_key] = {
                 "$in": list(filter_by_ids),
@@ -51,6 +54,14 @@ class TransactionsRepository(
             filter_["external_reference_id"] = {
                 "$in": list(filter_by_external_reference),
             }
+
+        filter_by_date = {}
+        if from_date:
+            filter_by_date["$gte"] = from_date
+        if to_date:
+            filter_by_date["$lte"] = to_date
+        if filter_by_date:
+            filter_["created_at"] = filter_by_date
 
         return await self._find_with_cursor(cur=cursor, sort=sort, filter_=filter_)
 

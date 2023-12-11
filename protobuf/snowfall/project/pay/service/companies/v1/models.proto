@@ -90,3 +90,7 @@ message Beneficiary {
   string currency = 7;
   MetaData meta_data = 8;
 }
+
+message ListOfIds {
+  repeated string ids = 1;
+}

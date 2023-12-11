@@ -100,7 +100,10 @@ class ResellerService(
         request: resellers_pb2.ListResellersRequest,
         context: aio.ServicerContext,
     ) -> resellers_pb2.ListResellersResponse:
-        resellers_res = await self._repository.find(cursor=request.page_token)
+        resellers_res = await self._repository.find(
+            identifiers=list(request.ids.ids),
+            cursor=request.page_token,
+        )
 
         resellers_res.limit(
             request.page_size if request.page_size else self._default_page_size,

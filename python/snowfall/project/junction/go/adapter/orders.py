@@ -143,6 +143,7 @@ class Client(abc.ABC):
     async def find_bookings(
         self,
         identifiers: Sequence[str],
+        transaction_ids: Sequence[str] | None = None,
         reseller_id: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
@@ -427,6 +428,7 @@ class DictClient(Client):
     async def find_bookings(
         self,
         identifiers: Sequence[str],
+        transaction_ids: Sequence[str] | None = None,
         reseller_id: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
@@ -437,6 +439,12 @@ class DictClient(Client):
             for booking in order.bookings
             if booking.id in identifiers
         ]
+        if transaction_ids:
+            bookings = [
+                booking
+                for booking in bookings
+                if booking.transaction_id in transaction_ids
+            ]
 
         page = sequence.paginate(
             sequence=bookings,
@@ -878,16 +886,20 @@ class GrpcClient(Client):
 
     async def find_bookings(
         self,
-        identifiers: Sequence[str],
+        identifiers: Sequence[str] | None = None,
+        transaction_ids: Sequence[str] | None = None,
         reseller_id: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
     ) -> orders_pb2.ListBookingsResponse:
         request = orders_pb2.ListBookingsRequest(
-            ids=orders_pb2.ListOfIds(ids=identifiers),
             page_token=cursor or "",
             reseller_id=reseller_id or "",
         )
+        if identifiers:
+            request.ids.ids.extend(identifiers)
+        elif transaction_ids:
+            request.transaction_ids.ids.extend(transaction_ids)
 
         if limit is not None:
             request.page_size = limit

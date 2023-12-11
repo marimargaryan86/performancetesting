@@ -15,7 +15,7 @@ class ResellerRepository(
 
     async def find(
         self,
-        cursor: str,
+        cursor: str = "",
         identifiers: Sequence[str] | None = None,
     ) -> resultset.ResultSet[models_pb2.Reseller]:
         return await self._find_with_cursor(

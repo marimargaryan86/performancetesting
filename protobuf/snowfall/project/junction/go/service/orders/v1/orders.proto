@@ -124,8 +124,9 @@ message ListBookingsRequest {
   oneof payload {
     string order_id = 3;
     ListOfIds ids = 4;
+    ListOfIds transaction_ids = 5;
   }
-  string reseller_id = 5;
+  string reseller_id = 6;
 }
 
 message ListBookingsResponse {

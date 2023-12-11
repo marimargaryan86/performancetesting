@@ -18,6 +18,7 @@ class Client(abc.ABC):
     @abc.abstractmethod
     async def list_resellers(
         self,
+        identifiers: Sequence[str] | None = None,
         limit: int | None = None,
         cursor: str | None = None,
     ) -> resellers_pb2.ListResellersResponse:
@@ -54,10 +55,15 @@ class DictClient(Client):
 
     async def list_resellers(
         self,
+        identifiers: Sequence[str] | None = None,
         limit: int | None = None,
         cursor: str | None = None,
     ) -> resellers_pb2.ListResellersResponse:
         resellers = list(self._resellers.values())
+        if identifiers:
+            resellers = [
+                reseller for reseller in resellers if reseller.id in identifiers
+            ]
 
         page = sequence.paginate(
             sequence=resellers,
@@ -121,10 +127,12 @@ class GrpcClient(Client):
 
     async def list_resellers(
         self,
+        identifiers: Sequence[str] | None = None,
         limit: int | None = None,
         cursor: str | None = None,
     ) -> resellers_pb2.ListResellersResponse:
         request = resellers_pb2.ListResellersRequest(
+            ids=models_pb2.ListOfIds(ids=identifiers or []),
             page_token=cursor or "",
         )
 

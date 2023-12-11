@@ -359,6 +359,7 @@ class BookingRepository(repository.ProtoRepository[models_pb2.Booking]):
     _indexes = (
         pymongo.IndexModel("orders.bookings._id", background=True),
         pymongo.IndexModel("orders.bookings.order_id", background=True),
+        pymongo.IndexModel("orders.bookings.transaction_id", background=True),
     )
 
     async def find_by_id(
@@ -383,19 +384,24 @@ class BookingRepository(repository.ProtoRepository[models_pb2.Booking]):
 
     async def find(
         self,
-        ids: Sequence[str],
-        cursor: str,
+        ids: Sequence[str] | None = None,
+        transaction_ids: Sequence[str] | None = None,
+        cursor: str = "",
         reseller_id: str = "",
     ) -> resultset.ResultSet[models_pb2.Booking]:
-        filter_ = (
-            {
+        filter_ = {}
+        if ids:
+            filter_ = {
                 "orders.bookings._id": {
                     "$in": ids,
                 },
             }
-            if ids
-            else {}
-        )
+        elif transaction_ids:
+            filter_ = {
+                "orders.bookings.transaction_id": {
+                    "$in": transaction_ids,
+                },
+            }
 
         filter_ = _add_reseller_id_to_filter(reseller_id, filter_)
 

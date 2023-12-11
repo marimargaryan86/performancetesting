@@ -221,6 +221,12 @@ class OrderService(
                 cursor=request.page_token,
                 reseller_id=request.reseller_id,
             )
+        elif request.transaction_ids.ids:
+            bookings_result = await self._bookings.find(
+                transaction_ids=list(request.transaction_ids.ids),
+                cursor=request.page_token,
+                reseller_id=request.reseller_id,
+            )
         else:
             bookings_result = await self._bookings.find(
                 ids=list(request.ids.ids),
