@@ -607,10 +607,17 @@ class BookingCancellationHandler(object):
                 session_token=session_token,
             )
 
+        status = models_pb2.BookingCancellation.STATUS_NO_REFUND
+        refunded_us_proto = None
+
+        if refunded_us and refunded_us.amount:
+            status = models_pb2.BookingCancellation.STATUS_REFUND_DUE
+            refunded_us_proto = refunded_us.protobuf()
+
         return models_pb2.BookingCancellation(
             booking_id=booking_id,
-            status=models_pb2.BookingCancellation.STATUS_REFUND_DUE,
-            refunded_us=refunded_us.protobuf() if refunded_us else None,
+            status=status,
+            refunded_us=refunded_us_proto,
         )
 
 

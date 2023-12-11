@@ -431,11 +431,12 @@ class CreateCancellationTaskHandler(object):
             bookings_data=bookings_data,
         )
 
-        new_cancellations.extend(
-            await self._handle_manual_flow(manual_items),
-        )
+        if manual_items:
+            new_cancellations.extend(
+                await self._handle_manual_flow(manual_items),
+            )
 
-        await self._update_statuses(
+        await self._update_statuses_and_refunded_us(
             cancellation_request=cancellation_request,
             cancellations=new_cancellations,
             provider_reference_to_ids=bookings_data.provider_reference_to_ids,
@@ -469,24 +470,30 @@ class CreateCancellationTaskHandler(object):
                 ].booking_id
                 initial_booking_ids.remove(booking_id)
 
-            try:
-                await self._create_pay_refund(
-                    cancellation_response=cancellation_response,
-                    booking=bookings_data.id_to_booking[booking_id],
-                )
-            except aio.AioRpcError:
-                self._logger.exception("Failed to create refund in pay")
+            refund_due = (
+                cancellation_response.cancellation.status
+                == models_pb2.BookingCancellation.STATUS_REFUND_DUE
+            )
 
-                manual_items.append(
-                    _ManualItem(
-                        booking_id=booking_id,
-                        refunded_us=money.from_protobuf(
-                            cancellation_response.cancellation.refunded_us,
+            if refund_due:
+                try:
+                    await self._create_pay_refund(
+                        cancellation_response=cancellation_response,
+                        booking=bookings_data.id_to_booking[booking_id],
+                    )
+                except aio.AioRpcError:
+                    self._logger.exception("Failed to create refund in pay")
+
+                    manual_items.append(
+                        _ManualItem(
+                            booking_id=booking_id,
+                            refunded_us=money.from_protobuf(
+                                cancellation_response.cancellation.refunded_us,
+                            ),
                         ),
-                    ),
-                )
+                    )
 
-                continue
+                    continue
 
             new_cancellations.append(cancellation_response.cancellation)
 
@@ -598,7 +605,7 @@ class CreateCancellationTaskHandler(object):
 
         return booking_id_to_booking
 
-    async def _update_statuses(
+    async def _update_statuses_and_refunded_us(
         self,
         cancellation_request: models_pb2.CancellationRequest,
         cancellations: Sequence[models_pb2.BookingCancellation],
@@ -621,6 +628,16 @@ class CreateCancellationTaskHandler(object):
                 continue
 
             initial_booking_cancellation.status = new_booking_cancellation.status
+
+            refund_due = (
+                new_booking_cancellation.status
+                == models_pb2.BookingCancellation.STATUS_REFUND_DUE
+            )
+
+            if refund_due:
+                initial_booking_cancellation.refunded_us.CopyFrom(
+                    new_booking_cancellation.refunded_us,
+                )
 
         _update_overall_cancellation_status(cancellation_request)
         await self._cancellations.update(document=cancellation_request)
