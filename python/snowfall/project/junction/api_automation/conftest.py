@@ -1,10 +1,8 @@
-import asyncio
 import base64
 import datetime
 import json
 import logging
 import tempfile
-import time
 import urllib
 from collections.abc import (
     AsyncGenerator,
@@ -13,7 +11,6 @@ from collections.abc import (
     Mapping,
     Sequence,
 )
-from io import BytesIO
 from itertools import starmap
 from pathlib import Path
 from typing import Any
@@ -21,7 +18,6 @@ from typing import Any
 import boto3
 import httpx
 import hvac
-import pandas as pd
 import pytest
 from pymongo import MongoClient
 
@@ -58,23 +54,6 @@ def pytest_configure(config: pytest.Config) -> None:
         "markers",
         "manually: only by manually execution",
     )
-
-
-async def wait_for_response(
-    request_func: Any,
-    error_message: str,
-    max_wait_time_seconds: int = 120,
-    polling_interval: int = 10,
-) -> Any:
-    stopwatch = time.time() + max_wait_time_seconds
-
-    while stopwatch - time.time() > 0:
-        response = await request_func()
-        if response["data"]:
-            return response
-        await asyncio.sleep(polling_interval)
-
-    raise AssertionError(error_message)
 
 
 @pytest.fixture(scope="package")
@@ -284,7 +263,7 @@ def mongo_client(host: str, api_token: str) -> MongoClient[Any]:
     return MongoClient(mongo_uri)
 
 
-def get_places() -> list[tuple[str, str]]:
+def connect_to_aws() -> Any:
     aws_access_key_id = "AKIA6JO5TGEWJNIU4LNR"
     aws_secret_access_key = "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"
     bucket_name = "junctionqa"
@@ -296,32 +275,7 @@ def get_places() -> list[tuple[str, str]]:
         aws_secret_access_key=aws_secret_access_key,
     )
     response = s3.get_object(Bucket=bucket_name, Key=file_key)
-    data = response["Body"].read()
-    o_d_combination = pd.read_csv(BytesIO(data), sep=";")
-    origin_values = o_d_combination["Origin"].tolist()
-    destination_values = o_d_combination["Destination"].tolist()
-    return list(zip(origin_values, destination_values, strict=False))
-
-
-async def get_coordinates_by_place_name(
-    mongo_client: MongoClient[Any],
-    place_pairs: Sequence[tuple[Any, Any]],
-) -> list[tuple[Any, Any]]:
-    place_id_pairs = []
-    for place in place_pairs:
-        place_result = mongo_client["places"]["places"].find_one(
-            filter={"location.name": place},
-        )
-        coordinate0, coordinate1 = None, None
-        if place_result is not None:
-            coordinates = place_result.get("location")
-            if coordinates is not None:
-                coordinate0, coordinate1 = coordinates.get("coordinates").get(
-                    "coordinates",
-                )
-        place_id_pairs.append((coordinate1, coordinate0))
-
-    return place_id_pairs
+    return response["Body"].read()
 
 
 class ConfigurationManager(object):

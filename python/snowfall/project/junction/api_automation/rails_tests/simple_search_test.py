@@ -8,7 +8,7 @@ import allure
 import pytest
 from pymongo import MongoClient
 
-from snowfall.project.junction.api_automation.conftest import (
+from snowfall.project.junction.api_automation.test_functions.helper import (
     get_coordinates_by_place_name,
     get_places,
     wait_for_response,

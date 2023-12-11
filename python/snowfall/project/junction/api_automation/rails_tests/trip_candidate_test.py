@@ -10,9 +10,11 @@ from pymongo import MongoClient
 
 from snowfall.project.junction.api_automation.conftest import (
     ConfigurationManager,
+    make_br_request,
+)
+from snowfall.project.junction.api_automation.test_functions.helper import (
     get_coordinates_by_place_name,
     get_places,
-    make_br_request,
     wait_for_response,
 )
 from snowfall.project.junction.api_automation.test_functions.mobile_client import (
