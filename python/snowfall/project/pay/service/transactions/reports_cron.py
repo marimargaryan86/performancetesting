@@ -1,4 +1,8 @@
+import datetime
+from pathlib import Path
+
 from snowfall.project.pay.service.transactions import smtp
+from snowfall.project.pay.service.transactions.generate_csv import CSVGenerator
 from snowfall.stdlib.persistence import filesystem
 
 
@@ -7,9 +11,36 @@ class NetsuiteReportJob(object):
         self,
         email_client: smtp.EmailClient,
         storage: filesystem.Storage,
+        csv_reporter: CSVGenerator,
+        previous_days: int,
     ) -> None:
         self._email_client = email_client
         self._storage = storage
+        self._csv_reporter = csv_reporter
+        self._previous_days = previous_days
 
     async def run(self) -> None:
-        """Run cronjob."""
+        end_date = datetime.datetime.now(tz=datetime.UTC)
+        start_date = end_date - datetime.timedelta(days=self._previous_days)
+        csv_data = await self._csv_reporter.generate_csv(
+            start_date,
+            end_date,
+        )
+        file_name = "netsuite_export_{0}.csv".format(end_date.strftime("%d-%m-%Y"))
+        await self._email_client.send_email(
+            subject="NetSuite export from pay: {0} - {1}".format(
+                start_date.strftime("%d/%m/%Y"),
+                end_date.strftime("%d/%m/%Y"),
+            ),
+            body="NetSuite Report",
+            attachment=smtp.Attachment(
+                payload=csv_data or "",
+                main_type="text",
+                sub_type="csv",
+                file_name=file_name,
+            ),
+        )
+        await self._storage.put(
+            path=Path("/netsuite-exports/{0}".format(file_name)),
+            file_contents=(csv_data or "").encode(),
+        )

@@ -45,6 +45,42 @@ job "pay-transactions-reports-cron" {
       mode     = "delay"
     }
 
+    network {
+      mode = "bridge"
+      port "grpc" {}
+    }
+
+    service {
+      name = "reports-cron-${var.environment}"
+      port = "grpc"
+      tags = ["grpc"]
+
+      connect {
+        sidecar_service {
+          proxy {
+            upstreams {
+              local_bind_port  = 8010
+              destination_name = "orders-${var.environment}"
+            }
+            upstreams {
+              local_bind_port  = 8020
+              destination_name = "companies-${var.environment}"
+            }
+            upstreams {
+              local_bind_port  = 8030
+              destination_name = "resellers-${var.environment}"
+            }
+          }
+        }
+      }
+
+      check {
+        type     = "grpc"
+        interval = "30s"
+        timeout  = "4s"
+      }
+    }
+
     task "reports-cron" {
       driver = "docker"
 
@@ -54,7 +90,12 @@ job "pay-transactions-reports-cron" {
 
       template {
         data        = <<EOH
+MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 SMTP_DSN={{range $index, $service := service "smtp"}}smtp://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}{{end}}
+COMPANIES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_companies-${var.environment}"))}}
+RESELLERS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_resellers-${var.environment}"))}}
+ORDERS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_orders-${var.environment}"))}}
+PREVIOUS_DAYS=7
 {{ with secret "kv/data/${var.environment}/transactions-reports-cron" }}
 STORAGE_DSN=s3://{{ .Data.data.aws_access_key_id }}:{{ .Data.data.aws_secret_access_key | urlquery }}@/${var.bucket}/transactions
 {{ end }}
