@@ -213,6 +213,34 @@ class ConfigurationVectorRepository(
 
         return update.acknowledged
 
+    async def update_permissions(
+        self,
+        reseller_id: str,
+        permissions_to_add: Sequence[str],
+        permissions_to_remove: Sequence[str],
+    ) -> bool:
+        vector = await self.find_by_selector(reseller_id, "reseller_id")
+
+        if vector is None:
+            return False
+
+        updated_permissions = set(
+            list(set(vector.permissions) - set(permissions_to_remove))
+            + list(permissions_to_add),
+        )
+
+        update: pymongo.results.UpdateResult = await self._execute(
+            self._collection.update_one,
+            {"reseller_id": reseller_id},
+            {"$set": {"permissions": list(updated_permissions)}},
+            upsert=False,
+        )
+
+        if not update.acknowledged:
+            raise RuntimeError()
+
+        return update.acknowledged
+
 
 class MonitoringRuleRepository(
     repository.ProtoRepository[models_pb2.MonitoringRule],

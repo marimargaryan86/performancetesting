@@ -108,6 +108,7 @@ message ConfigurationVector {
   google.protobuf.Timestamp created_at = 7;
   google.protobuf.Timestamp updated_at = 8;
   string in_app_notification_user = 9;
+  repeated string permissions = 10;
 }
 
 enum Channel {
@@ -188,4 +189,9 @@ message NotificationEvent {
 message Location {
   string name = 1;
   snowfall.stdlib.v1.LatLng coordinates = 2;
+}
+
+message PermissionUpdate {
+  bool enabled = 1;
+  string name = 2;
 }

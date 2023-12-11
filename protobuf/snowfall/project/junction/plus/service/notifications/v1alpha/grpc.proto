@@ -25,6 +25,8 @@ service ConfigurationVectorService {
   rpc GetConfigurationVector(GetConfigurationVectorRequest) returns (GetConfigurationVectorResponse) {}
   rpc CreateConfigurationVector(CreateConfigurationVectorRequest) returns (CreateConfigurationVectorResponse) {}
   rpc UpdateConfigurationVector(UpdateConfigurationVectorRequest) returns (UpdateConfigurationVectorResponse) {}
+  rpc GetPermissions(GetPermissionsRequest) returns (GetPermissionsResponse) {}
+  rpc UpdatePermissions(UpdatePermissionsRequest) returns (UpdatePermissionsResponse) {}
 }
 
 service MonitoringRuleService {
@@ -190,5 +192,22 @@ message PublishNotificationEventRequest {
   snowfall.project.junction.plus.service.notifications.v1alpha.NotificationEvent event = 1;
 }
 message PublishNotificationEventResponse {
+  bool is_success = 1;
+}
+
+message GetPermissionsRequest {
+  string reseller_id = 1;
+}
+
+message GetPermissionsResponse {
+  repeated string permissions = 1;
+}
+
+message UpdatePermissionsRequest {
+  string reseller_id = 1;
+  repeated snowfall.project.junction.plus.service.notifications.v1alpha.PermissionUpdate updates = 2;
+}
+
+message UpdatePermissionsResponse {
   bool is_success = 1;
 }

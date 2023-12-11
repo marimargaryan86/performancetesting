@@ -231,6 +231,45 @@ class ConfigurationVectorService(
             is_success=update_status,
         )
 
+    async def GetPermissions(  # type: ignore[override] # noqa: N802
+        self,
+        request: notifications_pb2.GetPermissionsRequest,
+        context: aio.ServicerContext,
+    ) -> notifications_pb2.GetPermissionsResponse:
+        configuration_vector = await self._configuration_vectors.find_by_selector(
+            selection_value=request.reseller_id,
+            selector="reseller_id",
+        )
+
+        if configuration_vector is None:
+            return await context.abort(StatusCode.NOT_FOUND)
+
+        return notifications_pb2.GetPermissionsResponse(
+            permissions=configuration_vector.permissions,
+        )
+
+    async def UpdatePermissions(  # type: ignore[override] # noqa: N802
+        self,
+        request: notifications_pb2.UpdatePermissionsRequest,
+        context: aio.ServicerContext,
+    ) -> notifications_pb2.UpdatePermissionsResponse:
+        permissions_to_add = [
+            update.name for update in request.updates if update.enabled
+        ]
+        permissions_to_remove = [
+            update.name for update in request.updates if not update.enabled
+        ]
+
+        update_status = await self._configuration_vectors.update_permissions(
+            reseller_id=request.reseller_id,
+            permissions_to_add=permissions_to_add,
+            permissions_to_remove=permissions_to_remove,
+        )
+
+        return notifications_pb2.UpdatePermissionsResponse(
+            is_success=update_status,
+        )
+
 
 class MonitoringRuleService(
     service.Service,
