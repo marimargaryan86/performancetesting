@@ -167,6 +167,7 @@ def mobile_client(
     return MobileApiClient(
         base_url=api_url,
         auth=auth.TokenAuth(mobile_token),
+        token=mobile_token,
         client=httpx.AsyncClient(timeout=client_timeout),
     )
 
@@ -259,7 +260,12 @@ async def mobile_hub_client(
         "Cookie": "ory_kratos_session={0}".format(mobile_token),
     }
     async with httpx.AsyncClient(timeout=client_timeout, headers=headers) as client:
-        yield MobileApiClient(base_url=api_url, auth=None, client=client)
+        yield MobileApiClient(
+            base_url=api_url,
+            auth=None,
+            token=None,
+            client=client,
+        )
 
 
 @pytest.fixture()

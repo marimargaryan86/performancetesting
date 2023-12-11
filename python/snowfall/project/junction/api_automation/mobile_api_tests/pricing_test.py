@@ -81,19 +81,21 @@ async def test_pricing_flow(
         "Timeout reached and status was not completed.",
     )
     assert quote_data
+    currency = quote_data["attributes"]["price"]["currency"]
+    amount = quote_data["attributes"]["price"]["amount"]
     with allure.step("Step to Create quotes"):
         allure.attach(
             "Quote with currency: {0} and amount {1}".format(
-                quote_data["attributes"]["price"]["currency"],
-                quote_data["attributes"]["price"]["amount"],
+                currency,
+                amount,
             ),
             "text/plain",
         )
 
     payment = await create_payment(
         mobile_client,
-        quote_data["attributes"]["price"]["currency"],
-        quote_data["attributes"]["price"]["amount"],
+        currency,
+        amount,
     )
     assert payment
     with allure.step("Step to Create quotes"):

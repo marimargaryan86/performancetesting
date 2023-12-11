@@ -53,9 +53,13 @@ class MobileApiClient(Client):
         self,
         base_url: str,
         auth: httpx.Auth | None = None,
+        token: str | None = None,
         client: httpx.AsyncClient | None = None,
     ):
         super().__init__(base_url=base_url, auth=auth, client=client)
+        self._token = token
+
+        self._cookie_header = client.headers.get("Cookie") if client else None
         self.logger = logging.getLogger()
         self.logger.setLevel(logging.DEBUG)
 
@@ -63,6 +67,7 @@ class MobileApiClient(Client):
         self,
         method: str,
         url: str,
+        token: str | None = None,
         query_parameters: Mapping[str, str] | None = None,
         body: Mapping[str, Any] | None = None,
         headers: Mapping[str, str] | None = None,
@@ -71,14 +76,26 @@ class MobileApiClient(Client):
         curl_command = 'curl -X "{0}" "{1}"'.format(method, full_url)
 
         if query_parameters:
-            curl_command += ' -d "{0}"'.format(json.dumps(query_parameters))
+            curl_command += ' -d "{0}"'.format(
+                json.dumps(query_parameters).replace('"', r"\""),
+            )
+        header_strings = []
         if headers:
-            header_strings = list(starmap('-H "{0}: {1}"'.format, headers.items()))
-            curl_command += " ".join(header_strings)
+            header_strings.extend(
+                list(starmap(' -H "{0}: {1}"'.format, headers.items())),
+            )
+        if self._cookie_header:
+            header_strings.append(' -H "Cookie: {0}"'.format(self._cookie_header))
 
+        curl_command += " ".join(header_strings)
+
+        if token:
+            curl_command += ' -H "Authorization: Bearer {0}"'.format(token)
         if body:
-            curl_command += " -H \"Content-Type: application/json\" -d '{0}'".format(
-                json.dumps(body),
+            curl_command += (
+                ' -H "Content-Type: application/vnd.api+json" -d "{0}"'.format(
+                    json.dumps(body).replace('"', r"\""),
+                )
             )
 
         return "Curl command for the {0} request:\n{1}".format(method, curl_command)
@@ -424,13 +441,6 @@ class MobileApiClient(Client):
         url = "/offers/searches/{0}/offers".format(offer_search_id)
         query_parameters = {"include": "groups.details"}
 
-        curl_command = self.generate_curl_command(
-            _METHOD_GET,
-            url,
-            query_parameters=query_parameters,
-        )
-        self.logger.info(curl_command)
-
         return await self._make_request(
             method=_METHOD_GET,
             url=url,
@@ -612,12 +622,6 @@ class MobileApiClient(Client):
             "query[name]": name,
         }
         url = "/places"
-        curl_command = self.generate_curl_command(
-            _METHOD_GET,
-            "/places",
-            query_parameters,
-        )
-        self.logger.info(curl_command)
         return await self._make_request(
             method=_METHOD_GET,
             url=url,
@@ -646,12 +650,6 @@ class MobileApiClient(Client):
             },
         }
 
-        curl_command = self.generate_curl_command(
-            _METHOD_POST,
-            url,
-            body=body,
-        )
-        self.logger.info(curl_command)
         return await self._make_request(
             method=_METHOD_POST,
             url=url,
@@ -663,11 +661,6 @@ class MobileApiClient(Client):
         trips_search_id: str,
     ) -> dict[str, Any]:
         url = "/trips/searches/{0}/trips".format(trips_search_id)
-        curl_command = self.generate_curl_command(
-            _METHOD_GET,
-            url,
-        )
-        self.logger.info(curl_command)
         return await self._make_request(
             method=_METHOD_GET,
             url=url,
@@ -701,13 +694,6 @@ class MobileApiClient(Client):
         headers = {
             "Session-Token": "YMSXrOAhIOdvIbxAmfSt7vJtRBkurNb6",
         }
-        curl_command = self.generate_curl_command(
-            _METHOD_POST,
-            url,
-            headers=headers,
-            body=body,
-        )
-        self.logger.info(curl_command)
         return await self._make_request(
             method=_METHOD_POST,
             url=url,
@@ -773,12 +759,6 @@ class MobileApiClient(Client):
             "data": body_data,
         }
         url = "/trip-candidates/searches"
-        curl_command = self.generate_curl_command(
-            _METHOD_POST,
-            url=url,
-            body=body,
-        )
-        logger.info(curl_command)
         return await self._make_request(
             method=_METHOD_POST,
             url=url,
@@ -803,13 +783,6 @@ class MobileApiClient(Client):
         url = "/trip-candidates/searches/{0}/offers".format(trip_candidate_search_id)
 
         query_parameters = {"include": "groups.details"}
-
-        curl_command = self.generate_curl_command(
-            _METHOD_GET,
-            url=url,
-            query_parameters=query_parameters,
-        )
-        logger.info(curl_command)
 
         return await self._make_request(
             method=_METHOD_GET,
@@ -888,12 +861,6 @@ class MobileApiClient(Client):
             "data": body_data,
         }
         url = "/simple-offers/searches"
-        curl_command = self.generate_curl_command(
-            _METHOD_POST,
-            url,
-            body=body,
-        )
-        logger.info(curl_command)
         return await self._make_request(
             method=_METHOD_POST,
             url=url,
@@ -907,15 +874,33 @@ class MobileApiClient(Client):
         url = "/offers/searches/{0}/offers".format(offer_simple_search_id)
         query_parameters = {"include": "groups.details"}
 
-        curl_command = self.generate_curl_command(
-            _METHOD_GET,
-            url=url,
-            query_parameters=query_parameters,
-        )
-        logger.info(curl_command)
-
         return await self._make_request(
             method=_METHOD_GET,
             url=url,
             query_parameters=query_parameters,
+        )
+
+    async def _make_request(
+        self,
+        method: str,
+        url: str,
+        query_parameters: Mapping[str, Any] | None = None,
+        headers: Mapping[str, Any] | None = None,
+        payload: Mapping[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        curl_command = self.generate_curl_command(
+            method,
+            url,
+            self._token,
+            query_parameters=query_parameters,
+            body=payload,
+            headers=headers,
+        )
+        self.logger.info(curl_command)
+        return await super()._make_request(
+            method=method,
+            url=url,
+            query_parameters=query_parameters,
+            headers=headers,
+            payload=payload,
         )
