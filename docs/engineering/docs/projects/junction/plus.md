@@ -257,13 +257,13 @@ flowchart LR
     OC-->Recipient
 ```
 
-### Checkin alert
+## Checkin alert
 
 Currently the checkin alert is implemented for a few (10 to be exact as on 23/10/2023) airlines. i.e. if the user has booked a flight in these supported airlines, they are alerted with a notification message (thorugh WhatsApp) when the checkin window opens. In case of non-supported airlines, the users would be alerted 24 hours in advance of the flight departure time.
 
 There is a new gRPC service (CheckInService) which is created which runs a cron job. This cron job is scheduled to run once per hour, every hour, around the clock, every day of the year. There is a list of lookup data which has the airline code against airline url and checkin window start time. This cron job runs according to schedule and for each upcoming flight booked, it retreives the airline code it checks it against the lookup data. If the checkin window for that flight has opened then it  generates the checkin message. This check-in message has the airline checkin url (if that airline is supported). If the airline is not supported then a generic 'checkin is open' alert is generated. This message is sent to all the subscribers who are associated with this flight,  via the notification channel. Once the notification is sent, mark it so that then next schedule of the cron job does not send the check-in alert again.
 
-### Weather Report
+## Weather Report
 
 Similar to check-in alert, a weather report is sent to the passenger. This is implemented as a scheduled service which runs every hour. Again the list of bookings is looked up to check which flights are due in the next 48 hours. If so then a 3-day weather report is generated for such destination. This weather report is sent to all the subscriber's (passengers for that flight) via the chosen chanel (currently WhatsApp). \
 If the trip has multiple legs then only the final destination is considered and the intermediate stop-overs are skipped. for eg. if user has flight Yerevan -> Athens -> London and Athens is just a transit point (with layover less than 12 hours) we will not providing weather report for Athens (when cron checks Yerevan -> Athens flight)
@@ -353,7 +353,7 @@ User choosed an index (1 for first trip, 2 for second, and so on...) -> Displays
 * **Unsubscribe** -> to unsubscribe from getting notification on Whatsapp
 * **Subscribe** -> To re-subscribe to get notification messages on Whatsapp
 
-### Travel Assistant - Integration with AI (chatGPT 3.5/4.0)
+## Travel Assistant - Integration with AI (chatGPT 3.5/4.0)
 
 If the user does not select an option provided in Whatsapp, for eg. 'Upcoming Trips, Unsubscribe' etc, or selects 'Travel Assistant' then this selection is taken up by a 'Travel Assistant' handler.
 
@@ -385,18 +385,18 @@ flowchart TB
 We have used the official openai library and the async function ChatCompletion.acreate. Focus was on creating the right system prompt in order to give the initial instructions to the GPT model. Also if the recommendations provided by the Travel assistant (AI) is about place or activity then the system message instructs it to always include url for the same. This would help user quickly check the recommendations.
 We used the official playground for testing. The chat history must remain cached per user as it will be used as input for the next message as the point is to build and send the entire conversation. When the user selects Travel assistant, the ai assistant will be enabled and any new incoming message ,if it doesn't fit to the predefined functions, will be prompt to openai. When the user gets the requested info for 1 destination, the conversation should be terminated and the system will reset the user's cached history, disable the travel assistant and send the 'Home' message. In order to distinguish the end of the conversation, we create a custom function and instruct the model (through the system prompt), to call that function only when it understands the completion of the task, so we can use it as a trigger point.
 
-### You could book flights  on RES via travel assistant/WhatsApp
+## You could book flights  on RES via travel assistant/WhatsApp
 
 There is a prompt in chatbot for 'Search Flights'. An equivalent function is available in the travel assistant (openai) handler which handles the formatting of the message to be sent to the reseller's website (RES).
 his has at least 3 required params the Origin, Destination and Date. The reseller should have a customized url:str that will be able to format with those 3 params, shorten the link and send it as a response for the chatbot. 'api.short.io' is used to shorten the URL.
 The reseller will input their url in the configuration vector. This is read and sent to the travel assistant (openai) handler function.
 
-### Book or Search for a Flight
+## Book or Search for a Flight
 
 If the user using the Travel Assistant wants to book/search for a flight then they will be given a search url and they can search or book the flight following that link. \
 The search URL is mentioned in the Configuration_Vector table and retrieved on the search flight or book flight command/option given by the user.
 
-### Provide travel assistance for upcoming trips
+## Provide travel assistance for upcoming trips
 
 The user could see the list of upcoming trips. When the user selects to view a specific upcoming trip X by typing an index number then the user can see the trip details of the upcoming trip X and they can see the following actions:
 
@@ -418,7 +418,7 @@ There is a new function (plan_selected_trip()) in the chatbot_handler for the ch
 It then gets the chat history from another redis cache session - ai_assistant_state. This is the context of the conversation. It then adds the destination airport as the message to initiate the conversation (asking to plan for that airport/city) and Sends the updated chat history to ai calling handle_prompt().
 The AI then responds back with the planned activities for that city. The handler gets the response and return it back to caller (WhatsApp).
 
-### Push travel alerts to any Reseller App
+## Push travel alerts to any Reseller App
 
 The following feature is to push any travel related alerts to any reseller app like the 'SuperApp'.
 
@@ -509,7 +509,7 @@ flowchart
     FB[FireBase]-->|Notification|SA[SuperApp]
 ```
 
-### Open Travel Assistant (chat-bot) to any App (SuperApp)
+## Open Travel Assistant (chat-bot) to any App (SuperApp)
 
 **Implement Matrix client:**
 This will a webhook to receive communication from the Matrix home server.  'nio' is used as the backend python library.
@@ -576,7 +576,7 @@ flowchart LR
 
 The OTFP (On Time Flight Performance) is an flight delay prediction feature developed using Machine Learning. Amazon SageMaker is used as the ML platform. We have built (Trained/Tested/Validated) a ML model based on historical flight data obtained from OAG. This feature attempts to predict the possible delay of a flight arriving at the destination. This should help our customers make informed choice about the flight's reliability and punctuality.
 
-## High Level architecture
+### High Level architecture
 
 ```mermaid
 flowchart LR
@@ -590,7 +590,7 @@ flowchart LR
     end
 
     MA[Mobile API]
-    J[Junction One, Junction Plus]
+    J[Junction One, etc]
     SA[Super App, RES]
 
     SA-->MA
@@ -623,3 +623,34 @@ The OTFP feature is only expose to Junction ONE, SuperApp and RES for now. Super
 The FlightPredictionService is a shared service which will receive the input i.e. for the flight for which we need the delay prediction, it needs the Flight number, Carrier Code and Flight Schedule and will return a number as response. This response is the flight delay in minutes.
 In case the value received from the model is positive then that indicate the number of minutes of delay the flight will arrive at destination.
 In case the value received from the model is negative then that means the flight will arrived early in the destination by those many minutes.
+
+## CO2 Emissions
+
+This features obtains the CO2 emissions for flights (for now). It uses *Google's Travel Impact Model (TIM)* APIs to get this data.
+
+There is a new CO2 emissions gRPC service which will do the specific task of querying Google's TIM API and get the emission values. It will query the https://travelimpactmodel.googleapis.com/v1/flights:computeFlightEmissions endpoint. The input is Origin, Destination, Flight Number and Schedule and the result is the Flight Emissions in KGs.\
+The service is called CO2EmissionsService and the function to get the emissions is 'GetEmissions()'. The gRPC service is under python/snowfall/project/junction/plus/service/co2_emissions/ but the model is under vendor specific directory. In this case it is under python/snowfall/vendor/google_flights/models/. This makes it easy to change the vendor who  provides the CO2 emissions in future. The vendor directory also contains the client for calling the GRPC service.
+
+The CO2EmissionsService gRPC service can be consumed by SuperApp or RES through Mobile API. The API specification for this feature is at: https://engineering.snowfalltravel.com/docs/specifications/junction/extensions/mobile-api-spec/. This will be a POST request to the endpoint /co2-emissions. The consumer can send a array of inputs for all the flight legs (for which we need CO2 emission values) and the gRPC service will return an array of results (CO2 emissions per flight leg). Google's TIM API can return CO2 emission values for upto 1000 flight legs.
+
+### Higher level architecture
+
+```mermaid
+flowchart LR
+    TIM[Google TIM API]
+
+    subgraph CO2E[CO2 Emissions]
+        CA[Vendor specific CO2 emissions Client/Adapter]
+        GRPCS[CO2EmissionsService gRPC Service]
+    end
+
+    MA[Mobile API]
+    J[Junction One, etc]
+    SA[Super App, RES]
+
+    SA-->MA
+    MA-->CA
+    J-->CA
+    CA-->GRPCS
+    GRPCS-->TIM
+```
