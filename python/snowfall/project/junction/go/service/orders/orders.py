@@ -49,6 +49,7 @@ class JourneyRepository(repository.ProtoRepository[models_pb2.Journey]):
         pymongo.IndexModel("orders.bookings.status", background=True),
         pymongo.IndexModel(
             "orders.bookings.trip_option.details.segment.legs.departure_at",
+            name="booking_departure_at",
             background=True,
         ),
     )
