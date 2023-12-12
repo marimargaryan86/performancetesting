@@ -116,6 +116,7 @@ class Client(abc.ABC):
         limit: int | None = None,
         cursor: str | None = None,
         sort_by: sort_pb2.Sort | None = None,
+        filter_by: Sequence[orders_pb2.ListJourneysRequest.JourneyFilter] | None = None,
     ) -> orders_pb2.ListJourneysResponse:
         """Fetch all journey resources."""
 
@@ -361,6 +362,7 @@ class DictClient(Client):
         limit: int | None = None,
         cursor: str | None = None,
         sort_by: sort_pb2.Sort | None = None,
+        filter_by: Sequence[orders_pb2.ListJourneysRequest.JourneyFilter] | None = None,
     ) -> orders_pb2.ListJourneysResponse:
         if identifiers:
             journeys = [
@@ -829,12 +831,14 @@ class GrpcClient(Client):
         limit: int | None = None,
         cursor: str | None = None,
         sort_by: sort_pb2.Sort | None = None,
+        filter_by: Sequence[orders_pb2.ListJourneysRequest.JourneyFilter] | None = None,
     ) -> orders_pb2.ListJourneysResponse:
         request = orders_pb2.ListJourneysRequest(
             ids=identifiers,
             page_token=cursor or "",
             sort_by=sort_by,
             reseller_id=reseller_id or "",
+            filter_by=filter_by,
         )
 
         if limit is not None:

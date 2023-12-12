@@ -4,7 +4,8 @@ import lagom
 from starlette import endpoints, requests, responses, status
 
 from snowfall.project.junction.go.adapter import errors, orders
-from snowfall.project.junction.hub.service.hub_api import resources
+from snowfall.project.junction.go.service.orders.v1 import models_pb2
+from snowfall.project.junction.hub.service.hub_api import filters, resources
 from snowfall.project.junction.hub.service.hub_api.permissions import check_permission
 from snowfall.project.pay.adapter import refunds
 from snowfall.stdlib.integration.starlette import (
@@ -192,13 +193,21 @@ class BookingDetails(endpoints.HTTPEndpoint):
 
 
 class Journeys(endpoints.HTTPEndpoint):
-    _sort = MappingProxyType(
-        {
-            "id": "id",
-            "reference": "passenger_name_record",
-            "createdAt": "created_at",
-        },
-    )
+    _sort = MappingProxyType({
+        "id": "id",
+        "reference": "passenger_name_record",
+        "createdAt": "created_at",
+    })
+
+    _status_mapping = MappingProxyType({
+        "unspecified": models_pb2.Booking.Status.STATUS_UNSPECIFIED,
+        "pending": models_pb2.Booking.Status.STATUS_PENDING,
+        "confirmed": models_pb2.Booking.Status.STATUS_CONFIRMED,
+        "rejected": models_pb2.Booking.Status.STATUS_REJECTED,
+        "notTicketed": models_pb2.Booking.Status.STATUS_NOT_TICKETED,
+        "error": models_pb2.Booking.Status.STATUS_ERROR,
+        "cancelled": models_pb2.Booking.Status.STATUS_CANCELLED,
+    })
 
     async def get(
         self,
@@ -206,13 +215,14 @@ class Journeys(endpoints.HTTPEndpoint):
         client: orders.Client = lagom.injectable,
     ) -> responses.Response:
         check_permission("journey.view", request.user.permissions)
-
         pagination = pagination_helpers.get_pagination(request)
+
         response = await client.find_journeys(
             limit=pagination.limit,
             cursor=pagination.cursor,
             sort_by=sorting.get_sort(request, self._sort),
             reseller_id=request.user.metadata.get("reseller_id", ""),
+            filter_by=filters.get_journey_filters(request, self._status_mapping),
         )
 
         return await messages.create_response(

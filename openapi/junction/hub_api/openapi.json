@@ -1166,18 +1166,31 @@
             "$ref": "#/components/parameters/journeySort"
           },
           {
+            "$ref": "#/components/parameters/journeyInclude"
+          },
+          {
+            "$ref": "#/components/parameters/filterByCreatedAtLe"
+          },
+          {
+            "$ref": "#/components/parameters/filterByCreatedAtGe"
+          },
+          {
+            "$ref": "#/components/parameters/filterByDepartureDateGe"
+          },
+          {
+            "$ref": "#/components/parameters/filterByDepartureDateLe"
+          },
+          {
+            "$ref": "#/components/parameters/filterByStatus"
+          },
+          {
             "$ref": "#/components/parameters/page-cursor"
           },
           {
             "$ref": "#/components/parameters/page-limit"
           }
         ]
-      },
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/journeyInclude"
-        }
-      ]
+      }
     },
     "/journeys/{journeyId}": {
       "parameters": [
@@ -3249,6 +3262,76 @@
             "format": "uuid"
           }
         }
+      },
+      "filterByDepartureDateGe": {
+        "name": "filter[departureDate][ge]",
+        "in": "query",
+        "required": false,
+        "description": "Filter for journeys departing after a specific date.",
+        "schema": {
+          "type": "string",
+          "example": "2023-06-01T00:00:00Z",
+          "format": "date-time"
+        }
+      },
+      "filterByDepartureDateLe": {
+        "name": "filter[departureDate][le]",
+        "in": "query",
+        "required": false,
+        "description": "Filter for journeys departing before a specific date.",
+        "schema": {
+          "type": "string",
+          "example": "2023-06-01T00:00:00Z",
+          "format": "date-time"
+        }
+      },
+      "filterByCreatedAtGe": {
+        "name": "filter[createdAt][ge]",
+        "in": "query",
+        "required": false,
+        "description": "Filter for journeys created after a specific datetime",
+        "schema": {
+          "type": "string",
+          "example": "2023-01-01T00:00:00Z",
+          "format": "date-time"
+        }
+      },
+      "filterByCreatedAtLe": {
+        "name": "filter[createdAt][le]",
+        "in": "query",
+        "required": false,
+        "description": "Filter for journeys created before a specific datetime",
+        "schema": {
+          "type": "string",
+          "example": "2023-01-01T00:00:00Z",
+          "format": "date-time"
+        }
+      },
+      "filterByStatus": {
+        "name": "filter[status][eq]",
+        "in": "query",
+        "required": false,
+        "description": "Filter for journeys based on their status.",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "unspecified",
+              "pending",
+              "confirmed",
+              "rejected",
+              "notTicketed",
+              "error",
+              "cancelled"
+            ]
+          },
+          "example": [
+            "pending"
+          ]
+        },
+        "style": "form",
+        "explode": false
       },
       "transactionId": {
         "name": "transactionId",

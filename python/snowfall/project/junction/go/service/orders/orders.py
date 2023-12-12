@@ -45,6 +45,12 @@ class JourneyRepository(repository.ProtoRepository[models_pb2.Journey]):
         pymongo.IndexModel("owner_reseller_ids", background=True),
         pymongo.IndexModel("created_at", background=True),
         pymongo.IndexModel("updated_at", background=True),
+        pymongo.IndexModel("orders.created_at", background=True),
+        pymongo.IndexModel("orders.bookings.status", background=True),
+        pymongo.IndexModel(
+            "orders.bookings.trip_option.details.segment.legs.departure_at",
+            background=True,
+        ),
     )
 
     _journey_filter_field_mapping = MappingProxyType(
