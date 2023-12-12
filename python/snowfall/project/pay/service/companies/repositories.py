@@ -33,7 +33,19 @@ class CompaniesRepository(
     async def find_all(
         self,
         cursor: str | None,
+        identifiers: Sequence[str] = (),
     ) -> resultset.ResultSet[models_pb2.Company]:
+        if identifiers:
+            filter_ = {
+                repository.mongo_id_key: {
+                    "$in": identifiers,
+                },
+            }
+            return await self._find_with_cursor(
+                cur=cursor or "",
+                filter_=filter_,
+            )
+
         return await self._find_with_cursor(
             cur=cursor or "",
         )

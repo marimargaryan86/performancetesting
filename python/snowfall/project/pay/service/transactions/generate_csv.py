@@ -36,7 +36,7 @@ logger = stdout.get_logger()
 ProtoType = TypeVar("ProtoType", bound=Message)
 
 
-def _convert_amount_to_string(
+def convert_amount_to_string(
     proto_model: Message | None,
     key: str,
 ) -> tuple[str, str]:
@@ -85,6 +85,20 @@ def _get_value(  # noqa: WPS231
     return proto_val  # type: ignore[return-value]
 
 
+def extract_data(
+    field_to_func: Mapping[str, Any],
+    db_model: Message | None,
+    csv_data: dict[str, str],  # noqa: SF20
+) -> None:
+    for field, value_func in field_to_func.items():
+        if value_func.func == convert_amount_to_string:
+            values = value_func(db_model)
+            csv_data[field] = values[0]
+            csv_data[field + " Currency"] = values[1]  # noqa: WPS336
+        else:
+            csv_data[field] = value_func(db_model)
+
+
 class CSVGenerator(object):
     def __init__(
         self,
@@ -96,39 +110,39 @@ class CSVGenerator(object):
         self._transaction_header = {
             "Date Booked": partial(_get_value, key="created_at"),
             "Base Fare in reseller currency": partial(
-                _convert_amount_to_string,
+                convert_amount_to_string,
                 key="amounts.base_converted",
             ),
             "Sales Fee": partial(
-                _convert_amount_to_string,
+                convert_amount_to_string,
                 key="amounts.sales_margin",
             ),
             "FX Fee": partial(
-                _convert_amount_to_string,
+                convert_amount_to_string,
                 key="amounts.fx_margin",
             ),
             "Acquiring Fee": partial(
-                _convert_amount_to_string,
+                convert_amount_to_string,
                 key="amounts.processing_margin",
             ),
             "Total Fees": partial(
-                _convert_amount_to_string,
+                convert_amount_to_string,
                 key="amounts.total_markups",
             ),
             "Offer Without Tax": partial(
-                _convert_amount_to_string,
+                convert_amount_to_string,
                 key="amounts.quotation",
             ),
             "Tax in Reseller currency": partial(
-                _convert_amount_to_string,
+                convert_amount_to_string,
                 key="amounts.tax_converted",
             ),
             "Reseller Owes Snowfall": partial(
-                _convert_amount_to_string,
+                convert_amount_to_string,
                 key="amounts.total_amount",
             ),
             "Snowfall Owes Provider": partial(
-                _convert_amount_to_string,
+                convert_amount_to_string,
                 key="amounts.beneficiary",
             ),
             # TODO: Fixed Fee
@@ -271,26 +285,12 @@ class CSVGenerator(object):
 
             row_data: dict[str, str] = {}
 
-            self._extract_data(self._transaction_header, transaction, row_data)
-            self._extract_data(self._bookings_headers, booking, row_data)
-            self._extract_data(self._company_headers, company, row_data)
-            self._extract_data(self._journeys_headers, journey, row_data)
-            self._extract_data(self._reseller_headers, reseller, row_data)
+            extract_data(self._transaction_header, transaction, row_data)
+            extract_data(self._bookings_headers, booking, row_data)
+            extract_data(self._company_headers, company, row_data)
+            extract_data(self._journeys_headers, journey, row_data)
+            extract_data(self._reseller_headers, reseller, row_data)
 
             csv_data.append(row_data)
 
         return csv_data
-
-    def _extract_data(
-        self,
-        field_to_func: Mapping[str, Any],
-        db_model: Message | None,
-        csv_data: dict[str, str],  # noqa: SF20
-    ) -> None:
-        for field, value_func in field_to_func.items():
-            if value_func.func == _convert_amount_to_string:
-                values = value_func(db_model)
-                csv_data[field] = values[0]
-                csv_data[field + " Currency"] = values[1]  # noqa: WPS336
-            else:
-                csv_data[field] = value_func(db_model)

@@ -114,6 +114,7 @@ class CompaniesService(
             )
         else:
             companies = await self._companies.find_all(
+                identifiers=list(request.ids.ids),
                 cursor=request.page_token,
             )
 
