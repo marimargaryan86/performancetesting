@@ -591,13 +591,13 @@ class BookingCancellationHandler(object):
 
         refunded_us = None
 
-        if payment_res.response_result.amount_to_pay:
+        if refund_offer_res.response_result.total_refund_amount:
             refunded_us = money.from_string(
                 currency=money.Currency(
-                    payment_res.response_result.amount_to_pay.currency.upper(),
+                    refund_offer_res.response_result.total_refund_amount.currency.upper(),
                 ),
                 string_amount=str(
-                    payment_res.response_result.amount_to_pay.amount,
+                    refund_offer_res.response_result.total_refund_amount.amount,
                 ),
             )
         else:
