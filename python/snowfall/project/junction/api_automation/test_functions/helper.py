@@ -5,6 +5,7 @@ from io import BytesIO
 from typing import Any
 
 import pandas as pd
+import stripe
 from pymongo import MongoClient
 
 from snowfall.project.junction.api_automation.conftest import connect_to_aws
@@ -71,3 +72,33 @@ async def get_coordinates_by_place_name(
         place_id_pairs.append((coordinate1, coordinate0))
 
     return place_id_pairs
+
+
+async def stripe_confirmation(
+    payment_intent_id: str,
+    stripe_api_key: str,
+) -> dict[str, str]:
+    payment_method = stripe.PaymentMethod.create(
+        api_key=stripe_api_key,
+        type="card",
+        card={
+            "number": "4242424242424242",
+            "exp_month": 12,
+            "exp_year": 2034,
+            "cvc": "314",
+        },
+    )
+    stripe.PaymentIntent.modify(
+        payment_intent_id,
+        api_key=stripe_api_key,
+        payment_method=payment_method["id"],
+    )
+    stripe.PaymentIntent.confirm(
+        payment_intent_id,
+        api_key=stripe_api_key,
+        return_url="https://example.com/return_url",
+    )
+    return stripe.PaymentIntent.retrieve(
+        payment_intent_id,
+        api_key=stripe_api_key,
+    )

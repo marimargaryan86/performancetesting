@@ -113,6 +113,14 @@ def host(
     return request.config.getoption("HOST") or local_config.get("HOST") or ""
 
 
+@pytest.fixture()
+def stripe_api_key(
+    api_token: str,
+    host: str,
+) -> str:
+    return get_variable_value(host, api_token, "stripe_api_key")
+
+
 def pytest_collection_modifyitems(
     config: pytest.Config,
     items: Sequence[pytest.Item],

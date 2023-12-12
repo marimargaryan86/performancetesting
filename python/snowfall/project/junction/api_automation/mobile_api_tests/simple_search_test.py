@@ -10,6 +10,7 @@ from pymongo import MongoClient
 
 from snowfall.project.junction.api_automation.test_functions.helper import (
     get_coordinates_by_place_name,
+    stripe_confirmation,
     wait_until_completed,
 )
 from snowfall.project.junction.api_automation.test_functions.mobile_client import (
@@ -122,6 +123,7 @@ async def test_simple_search(  # noqa: WPS217, WPS218
     mobile_client: MobileApiClient,
     places_pairs: Sequence[tuple[Any, Any]],
     departure_after: datetime,
+    stripe_api_key: str,
 ) -> None:
     origin_cord, destination_cord = await get_coordinates_by_place_name(
         mongo_client,
@@ -196,7 +198,7 @@ async def test_simple_search(  # noqa: WPS217, WPS218
     assert quote_data
     currency = quote_data["attributes"]["price"]["currency"]
     amount = quote_data["attributes"]["price"]["amount"]
-    with allure.step("Step to Create quotes"):
+    with allure.step("Step to Get quotes"):
         allure.attach(
             "Quote with currency: {0} and amount {1}".format(
                 currency,
@@ -205,14 +207,25 @@ async def test_simple_search(  # noqa: WPS217, WPS218
             "text/plain",
         )
 
-    payment = await create_payment(
+    payment_intent_id = await create_payment(
         mobile_client,
         currency,
         amount,
     )
-    assert payment
-    with allure.step("Step to Create quotes"):
+    assert payment_intent_id
+    with allure.step("Step to Create Payment"):
         allure.attach(
-            "Payment ID: {0}".format(payment),
+            "Payment ID: {0}".format(payment_intent_id),
+            "text/plain",
+        )
+
+    payment_intent = await stripe_confirmation(
+        payment_intent_id=payment_intent_id,
+        stripe_api_key=stripe_api_key,
+    )
+    assert payment_intent["status"] == "requires_capture"
+    with allure.step("Step to Update Stripe Intent and Confirm"):
+        allure.attach(
+            "Payment Intent ID: {0}".format(payment_intent_id),
             "text/plain",
         )
