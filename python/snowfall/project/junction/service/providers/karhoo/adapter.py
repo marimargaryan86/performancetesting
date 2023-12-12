@@ -2,6 +2,7 @@ import asyncio
 import datetime
 from collections.abc import AsyncIterator, Awaitable, Callable, Sequence
 from types import MappingProxyType
+from typing import NamedTuple
 
 from snowfall.project.junction.go.service.offers.v1 import (
     models_pb2 as offer_models_pb2,
@@ -74,6 +75,11 @@ async def _retrieve_quotes(  # noqa: WPS231
         await asyncio.sleep(wait)
 
 
+class QuoteResult(NamedTuple):
+    quote: karhoo_quotes.Quote
+    quotes_response: karhoo_quotes.RequestQuotesResponse
+
+
 class KarhooOfferMatcher(object):
     def __init__(self, karhoo_client: client.KarhooClient, ttl: datetime.timedelta):
         self._karhoo_client = karhoo_client
@@ -81,10 +87,10 @@ class KarhooOfferMatcher(object):
         self._cut_off = 30
         self._ttl = ttl
 
-    async def create_matching_price_quote(
+    async def get_matching_quote(
         self,
         offer_details: cache.OfferDetails,
-    ) -> cache.PriceQuote | None:
+    ) -> QuoteResult | None:
         quotes_response = await self._karhoo_client.request_quotes(
             origin=location.Coordinates(
                 latitude=str(offer_details.origin.latitude),
@@ -107,30 +113,9 @@ class KarhooOfferMatcher(object):
         async with asyncio.timeout(self._cut_off):
             async for quote in quotes:
                 if self._offer_matches(quote, offer_details):
-                    return self._create_price_quote(quote, quotes_response)
+                    return QuoteResult(quote, quotes_response)
 
         return None
-
-    def _create_price_quote(
-        self,
-        quote: karhoo_quotes.Quote,
-        quotes_response: karhoo_quotes.RequestQuotesResponse,
-    ) -> cache.PriceQuote:
-        validity = (
-            datetime.timedelta(seconds=quotes_response.validity)
-            if (quotes_response.validity and quotes_response.validity > 0)
-            else self._ttl
-        )
-        currency = money.Currency(
-            quote.price.currency_code,
-        )
-        return cache.PriceQuote(
-            quote_id=quote.id,
-            quotes_response_id=quotes_response.id,
-            expires_at=datetime.datetime.now(datetime.UTC) + validity,
-            price=str(quote.price.high) if quote.price.high else "",
-            currency=currency,
-        )
 
     def _offer_matches(
         self,

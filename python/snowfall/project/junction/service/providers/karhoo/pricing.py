@@ -15,6 +15,35 @@ from snowfall.stdlib.transport.amqp import producer
 from snowfall.stdlib.transport.amqp import types as amqp_types
 from snowfall.stdlib.transport.http import errors
 from snowfall.vendor.karhoo import client
+from snowfall.vendor.karhoo.models import quotes as karhoo_quotes
+
+_KARHOO_TYPE_BEFORE_PICKUP = "TimeBeforePickup"
+_KARHOO_TYPE_BEFORE_DRIVER_EN_ROUTE = "BeforeDriverEnRoute"
+
+
+def _get_fare_rules(quote: karhoo_quotes.Quote) -> list[offers_pb2.FareRule]:
+    fare_rules = []
+    cancellation_title = "Cancellation conditions"
+    agreements = quote.service_level_agreements
+    if agreements and agreements.free_cancellation:
+        if agreements.free_cancellation.type == _KARHOO_TYPE_BEFORE_PICKUP:
+            fare_rules.append(
+                offers_pb2.FareRule(
+                    title=cancellation_title,
+                    body="Free cancellation for {0} mins before arrival.".format(
+                        agreements.free_cancellation.minutes,
+                    ),
+                ),
+            )
+        elif agreements.free_cancellation.type == _KARHOO_TYPE_BEFORE_DRIVER_EN_ROUTE:
+            fare_rules.append(
+                offers_pb2.FareRule(
+                    title=cancellation_title,
+                    body="Free before driver picks up the request.",
+                ),
+            )
+
+    return fare_rules
 
 
 async def price_quotes(
@@ -97,7 +126,7 @@ class PriceQuoteConsumer(object):
             return
 
         try:
-            price_quote = await self._offer_matcher.create_matching_price_quote(
+            quote_result = await self._offer_matcher.get_matching_quote(
                 offer_details,
             )
         except errors.HttpError:
@@ -107,12 +136,16 @@ class PriceQuoteConsumer(object):
             )
             return
 
-        if price_quote is None:
+        if quote_result is None:
             self._logger.error(
                 "Failed to match offer",
                 offer_details=offer_details.dict(),
             )
             return
+        price_quote = self._create_price_quote(
+            quote_result.quote,
+            quote_result.quotes_response,
+        )
 
         price_quote_id = await self._pricing_cache.store(
             price_quote,
@@ -143,9 +176,30 @@ class PriceQuoteConsumer(object):
                     ],
                     penalties=[],
                     required_documents=[],
-                    rules=[],
+                    rules=_get_fare_rules(quote_result.quote),
                 ),
                 provider_company_id=self._provider_company_id,
             ),
             routing_key="offers.result.price",
+        )
+
+    def _create_price_quote(
+        self,
+        quote: karhoo_quotes.Quote,
+        quotes_response: karhoo_quotes.RequestQuotesResponse,
+    ) -> cache.PriceQuote:
+        validity = (
+            datetime.timedelta(seconds=quotes_response.validity)
+            if (quotes_response.validity and quotes_response.validity > 0)
+            else self._ttl
+        )
+        currency = money.Currency(
+            quote.price.currency_code,
+        )
+        return cache.PriceQuote(
+            quote_id=quote.id,
+            quotes_response_id=quotes_response.id,
+            expires_at=datetime.datetime.now(datetime.UTC) + validity,
+            price=str(quote.price.high) if quote.price.high else "",
+            currency=currency,
         )
