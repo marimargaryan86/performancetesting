@@ -1,4 +1,6 @@
+import copy
 import datetime
+import json
 from collections.abc import Sequence
 
 import pymongo
@@ -8,6 +10,7 @@ from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 from snowfall.stdlib.v1 import datetime_pb2
+from snowfall.vendor.consul.client import ConsulClient
 
 
 class OrderRepository(
@@ -218,6 +221,9 @@ class ConfigurationVectorRepository(
         reseller_id: str,
         permissions_to_add: Sequence[str],
         permissions_to_remove: Sequence[str],
+        cv_permissions: dict[str, list[str]],
+        consul_client: ConsulClient,
+        consul_key: str,
     ) -> bool:
         vector = await self.find_by_selector(reseller_id, "reseller_id")
 
@@ -238,6 +244,14 @@ class ConfigurationVectorRepository(
 
         if not update.acknowledged:
             raise RuntimeError()
+
+        # Update permissions in consul
+        cv_permissions_mapping = copy.deepcopy(cv_permissions)
+        cv_permissions_mapping[reseller_id] = list(updated_permissions)
+        await consul_client.put_key(
+            consul_key,
+            json.dumps(cv_permissions_mapping).encode(),
+        )
 
         return update.acknowledged
 

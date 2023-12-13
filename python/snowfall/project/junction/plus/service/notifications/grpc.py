@@ -14,6 +14,9 @@ from snowfall.project.junction.plus.service.notifications.v1alpha import (
 )
 from snowfall.stdlib.transport.amqp import producer
 from snowfall.stdlib.transport.grpc import service
+from snowfall.vendor.consul.client import ConsulClient
+
+_CV_KEY = "{0}/configuration-vectors/permissions"
 
 
 class OrderService(
@@ -178,8 +181,14 @@ class ConfigurationVectorService(
     def __init__(
         self,
         configuration_vectors: ConfigurationVectorRepository,
+        consul_client: ConsulClient,
+        environment: str,
+        cv_permissions: dict[str, list[str]],
     ):
         self._configuration_vectors = configuration_vectors
+        self._consul_client = consul_client
+        self._cv_permissions_key = _CV_KEY.format(environment)
+        self._cv_permissions = cv_permissions
 
     def get_name(self) -> str:
         return notifications_pb2.DESCRIPTOR.services_by_name[
@@ -236,16 +245,8 @@ class ConfigurationVectorService(
         request: notifications_pb2.GetPermissionsRequest,
         context: aio.ServicerContext,
     ) -> notifications_pb2.GetPermissionsResponse:
-        configuration_vector = await self._configuration_vectors.find_by_selector(
-            selection_value=request.reseller_id,
-            selector="reseller_id",
-        )
-
-        if configuration_vector is None:
-            return await context.abort(StatusCode.NOT_FOUND)
-
         return notifications_pb2.GetPermissionsResponse(
-            permissions=configuration_vector.permissions,
+            permissions=self._cv_permissions.get(request.reseller_id, []),
         )
 
     async def UpdatePermissions(  # type: ignore[override] # noqa: N802
@@ -264,6 +265,9 @@ class ConfigurationVectorService(
             reseller_id=request.reseller_id,
             permissions_to_add=permissions_to_add,
             permissions_to_remove=permissions_to_remove,
+            cv_permissions=self._cv_permissions,
+            consul_client=self._consul_client,
+            consul_key=self._cv_permissions_key,
         )
 
         return notifications_pb2.UpdatePermissionsResponse(

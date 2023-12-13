@@ -92,10 +92,19 @@ job "junction-plus-notifications-grpc" {
     task "grpc" {
       driver = "docker"
 
+      vault {
+        policies = ["resellers-${var.environment}"]
+      }
+
       template {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
+CV_PERMISSIONS={{keyOrDefault "${var.environment}/configuration-vectors/permissions" "{}" | toJSON }}
+CONSUL_API_BASE_URL={{(printf "https://%s" (env "CONSUL_HTTP_ADDR"))}}
+{{ with secret "kv/data/${var.environment}/resellers" }}
+CONSUL_API_TOKEN={{ .Data.data.consul_api_token }}
+{{ end }}
 EOH
         destination = "services.env"
         env         = true
