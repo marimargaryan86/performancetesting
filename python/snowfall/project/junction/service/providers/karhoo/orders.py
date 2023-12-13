@@ -3,9 +3,15 @@ import httpx
 
 from snowfall.project.junction.go.service.orders.v1 import amqp_pb2
 from snowfall.project.junction.provider import notifications
-from snowfall.project.junction.service.providers.karhoo import booking, cache, config
+from snowfall.project.junction.service.providers.karhoo import (
+    booking,
+    cache,
+    config,
+    constant,
+)
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.logging import stdout
+from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.service import amqp_factory, application, redis_factory
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer as amqp_producer
@@ -62,8 +68,11 @@ async def orders(
                 sender=app.settings.smtp_sender,
                 recipient=app.settings.smtp_recipient,
             ),
+            booking_storage=await app.stack.enter_async_context(
+                filesystem.Storage.from_dsn(app.settings.storage_dsn),
+            ),
         ),
-        offer_cache=cache.OffersCache(
+        price_quote_cache=cache.PricingCache(
             client=redis_client,
         ),
     ).consume()
@@ -75,12 +84,12 @@ class OrderConsumer(object):
         consumer_obj: amqp_consumer.Consumer[amqp_pb2.PlaceOrderTask],
         producer_obj: amqp_producer.Producer,
         booking_handler: booking.BookingHandler,
-        offer_cache: cache.OffersCache,
+        price_quote_cache: cache.PricingCache,
     ):
         self._consumer = consumer_obj
         self._producer = producer_obj
         self._booking = booking_handler
-        self._cache = offer_cache
+        self._cache = price_quote_cache
         self._logger = stdout.get_logger()
 
     async def consume(self) -> None:
@@ -90,14 +99,15 @@ class OrderConsumer(object):
         self,
         amqp_message: types.Message[amqp_pb2.PlaceOrderTask],
     ) -> None:
-        offer_details = await self._cache.fetch(
+        price_quote = await self._cache.fetch(
             amqp_message.body.booking.trip_option.price_quote_id,
         )
         amqp_message.body.booking.provider_name = _PROVIDER_NAME
+        amqp_message.body.booking.provider_id = str(constant.PROVIDER_ID)
 
-        if not offer_details:
+        if not price_quote:
             self._logger.warning(
-                "No offer details found for booking",
+                "No price quote found for booking",
                 booking_id=amqp_message.body.booking.id,
                 key=amqp_message.body.booking.trip_option.id,
             )
@@ -105,6 +115,6 @@ class OrderConsumer(object):
             return
 
         await self._producer.publish(
-            await self._booking.book(task=amqp_message.body, details=offer_details),
+            await self._booking.book(task=amqp_message.body, price_quote=price_quote),
             routing_key="orders.result.offer",
         )

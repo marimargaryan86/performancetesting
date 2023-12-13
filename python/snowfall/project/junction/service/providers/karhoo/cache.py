@@ -19,8 +19,6 @@ class CabinClass(RedisRecord):
 
 
 class OfferDetails(RedisRecord):
-    # TODO: remove quote_id one orders is implemented.
-    quote_id: str = ""
     departure_at: datetime.datetime
     price: str
     currency: money.Currency

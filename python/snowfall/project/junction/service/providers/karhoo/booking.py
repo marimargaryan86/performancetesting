@@ -1,4 +1,5 @@
 import datetime
+import pathlib
 
 from snowfall.project.junction.go.service.orders.v1 import amqp_pb2, models_pb2
 from snowfall.project.junction.provider import notifications as base_notifications
@@ -6,6 +7,8 @@ from snowfall.project.junction.service.providers.karhoo import cache, notificati
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
+from snowfall.stdlib.persistence import filesystem
+from snowfall.stdlib.transport.http import errors
 from snowfall.vendor.karhoo import client
 from snowfall.vendor.karhoo.models import bookings, passenger
 
@@ -18,19 +21,36 @@ class BookingHandler(object):
         self,
         karhoo_client: client.KarhooClient,
         notifier: base_notifications.Notifier,
+        booking_storage: filesystem.Storage,
     ):
         self._client = karhoo_client
         self._logger = stdout.get_logger()
         self._notifier = notifier
+        self._storage = booking_storage
 
     async def book(
         self,
         task: amqp_pb2.PlaceOrderTask,
-        details: cache.OfferDetails,
+        price_quote: cache.PriceQuote,
     ) -> models_pb2.Booking:
         new_booking = task.booking
 
-        booking_response = await self._make_booking(task=task, details=details)
+        try:
+            booking_response = await self._make_booking(
+                task=task,
+                price_quote=price_quote,
+            )
+        except errors.HttpError as ex:
+            self._logger.exception(
+                "Failed to create booking",
+                offer_id=price_quote.quote_id,
+                booking_id=task.booking.id,
+            )
+
+            new_booking.status = models_pb2.Booking.STATUS_ERROR
+            new_booking.raw_data = repr(ex)
+
+            return new_booking
 
         new_booking.MergeFrom(
             models_pb2.Booking(
@@ -52,7 +72,7 @@ class BookingHandler(object):
                         (
                             datetime.datetime.strptime(
                                 booking_response.date_booked,
-                                "%Y-%m-%dT%H:%M",
+                                "%Y-%m-%dT%H:%M:%SZ",
                             ).replace(
                                 tzinfo=datetime.UTC,
                             )
@@ -65,15 +85,20 @@ class BookingHandler(object):
             ),
         )
 
+        await self._storage.put(
+            pathlib.Path(booking_response.id),
+            booking_response.json().encode(),
+        )
+
         return new_booking
 
     async def _make_booking(
         self,
         task: amqp_pb2.PlaceOrderTask,
-        details: cache.OfferDetails,
+        price_quote: cache.PriceQuote,
     ) -> bookings.BookingResponse:
         booking = bookings.Booking(
-            quote_id=details.quote_id,
+            quote_id=price_quote.quote_id,
             passengers=passenger.Passengers(
                 additional_passengers=len(task.passengers) - 1,
                 passenger_details=[
@@ -81,7 +106,7 @@ class BookingHandler(object):
                         first_name=passenger_details.first_name,
                         last_name=passenger_details.last_name,
                         email=task.contact_details.email,
-                        phone_number=str(task.contact_details.phone),
+                        phone_number=task.contact_details.phone.e164_number,
                         locale=None,
                     )
                     for passenger_details in task.passengers
@@ -92,7 +117,9 @@ class BookingHandler(object):
                 ),
             ),
         )
+
         booking_result = await self._client.book_trip(booking)
+
         if booking_result.status == "CONFIRMED":
             try:
                 # TODO: this should be handled in a separate service

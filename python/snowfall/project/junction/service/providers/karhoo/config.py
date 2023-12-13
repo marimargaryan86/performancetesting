@@ -38,3 +38,4 @@ class OrderSettings(application.Settings, KarhooConfig):
     smtp_dsn: pydantic.AnyUrl
     smtp_sender: pydantic.EmailStr
     smtp_recipient: pydantic.EmailStr
+    storage_dsn: service.AnyDsn

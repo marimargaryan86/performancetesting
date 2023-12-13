@@ -42,10 +42,18 @@ def karhoo_client(http_client: httpx.AsyncClient) -> client.KarhooClient:
 
 
 @pytest.fixture()
+async def storage() -> AsyncIterator[filesystem.Storage]:
+    async with filesystem.Storage.from_dsn("memory://") as storage_obj:
+        yield storage_obj
+
+
+@pytest.fixture()
 def karhoo_booking_handler(
     karhoo_client: client.KarhooClient,
+    storage: filesystem.Storage,
 ) -> booking.BookingHandler:
     return booking.BookingHandler(
         karhoo_client=karhoo_client,
         notifier=notifications.LogNotifier(),
+        booking_storage=storage,
     )

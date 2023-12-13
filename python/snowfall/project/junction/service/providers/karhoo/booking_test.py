@@ -1,4 +1,5 @@
 import datetime
+import zoneinfo
 
 import pytest_httpx
 
@@ -51,23 +52,19 @@ async def test_booking_can_be_placed(
 
     booking_proto = await karhoo_booking_handler.book(
         task=_ORDER_TASK,
-        details=cache.OfferDetails(
+        price_quote=cache.PriceQuote(
+            quote_id="foo",
+            quotes_response_id="bar",
             price="3550.00",
             currency=money.Currency("GBP"),
-            origin=cache.Coordinates(
-                latitude=50.8356748,
-                longitude=4.3362419,
+            expires_at=datetime.datetime(
+                2022,
+                1,
+                1,
+                11,
+                45,
+                tzinfo=zoneinfo.ZoneInfo("Europe/London"),
             ),
-            destination=cache.Coordinates(
-                latitude=51.19763610627596,
-                longitude=3.2177298798723357,
-            ),
-            cabin_class=cache.CabinClass(
-                type=0,
-                marketing_name="",
-            ),
-            passengers_count=1,
-            departure_at=datetime.datetime(2022, 1, 1, 11, 45, tzinfo=datetime.UTC),
         ),
     )
 
