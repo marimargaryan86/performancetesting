@@ -68,10 +68,6 @@
 <Button class="filter-clear-btn" size="small" on:click={reset}>Clear</Button>
 
 <style>
-  :global(.select-field) {
-    --options-z-index: 21;
-  }
-
   :global(button.filter-clear-btn.filter-clear-btn) {
     align-self: flex-end;
     width: unset;

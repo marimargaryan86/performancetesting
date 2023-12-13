@@ -69,7 +69,6 @@
     position: absolute;
     top: 16px;
     left: 8px;
-    z-index: 10;
     display: flex;
     gap: 4px;
     align-items: center;

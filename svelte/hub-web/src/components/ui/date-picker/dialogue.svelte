@@ -86,7 +86,7 @@
     position: absolute;
     top: 100%;
     left: 0;
-    z-index: 100;
+    z-index: var(--z-index-ui-dialog);
     margin-top: 4px;
     padding: 20px;
     color: var(--color-main-neutral-900);

@@ -37,7 +37,7 @@
   th {
     position: sticky;
     top: 0;
-    z-index: 11;
+    z-index: calc(var(--z-index-ui-dialog) - 1);
     gap: 8px;
     padding: 16px;
     white-space: nowrap;

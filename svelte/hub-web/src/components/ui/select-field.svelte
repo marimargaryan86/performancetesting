@@ -170,7 +170,6 @@
 <style>
   .select-field {
     --x-height: var(--height, 52px);
-    --x-options-z-index: var(--options-z-index, 1);
 
     position: relative;
     display: inline-block;
@@ -186,7 +185,7 @@
     position: absolute;
     top: calc(100% + 4px);
     left: 0;
-    z-index: var(--x-options-z-index);
+    z-index: var(--z-index-ui-dialog);
     width: 100%;
     max-height: 400px;
     overflow-y: auto;

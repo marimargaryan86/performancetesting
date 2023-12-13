@@ -151,7 +151,7 @@
     position: absolute;
     top: var(--x-height);
     left: 0;
-    z-index: 100;
+    z-index: var(--z-index-ui-dialog);
     width: 300px;
     margin-top: 4px;
     padding: 20px;

@@ -114,7 +114,6 @@
 
 <style>
   .main-menu {
-    z-index: 50;
     display: flex;
     flex-flow: column;
     gap: 16px;
