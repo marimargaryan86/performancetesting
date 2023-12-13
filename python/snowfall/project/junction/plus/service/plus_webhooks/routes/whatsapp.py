@@ -16,6 +16,9 @@ from snowfall.project.junction.plus.service.notifications.v1alpha import (
     models_pb2 as notifications_pb2,
 )
 from snowfall.project.junction.plus.service.plus_webhooks import chatbot_handlers
+from snowfall.project.junction.plus.service.plus_webhooks.models import (
+    ServicePermissions,
+)
 from snowfall.stdlib.v1.phone_number_pb2 import PhoneNumber
 
 message_maximum_length = 1600
@@ -23,7 +26,7 @@ message_split_point = 1300
 
 
 class IncomingMessages(endpoints.HTTPEndpoint):
-    async def post(
+    async def post(  # noqa: WPS231
         self,
         request: requests.Request,
         orders_client: orders.Client = lagom.injectable,
@@ -39,6 +42,10 @@ class IncomingMessages(endpoints.HTTPEndpoint):
             message_to,
             "mobile_phone.e164_number",
         )
+
+        if ServicePermissions.whatsapp_chatbot.value not in cv.permissions:
+            raise errors.UnprocessableEntityError
+
         try:
             subscriber = await subscribers_client.find_from_reseller(
                 cv.reseller_id,

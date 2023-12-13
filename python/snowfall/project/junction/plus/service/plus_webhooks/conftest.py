@@ -106,6 +106,7 @@ def subscribers_client() -> subscribers_adapter.Client:
         [
             notifications_models_pb2.Subscriber(
                 id="1",
+                reseller_id="1",
             ),
         ],
     )
@@ -173,6 +174,7 @@ def configuration_vectors_client() -> configuration_vectors.Client:
                 mobile_phone=phone_number_pb2.PhoneNumber(
                     e164_number="9900000001",
                 ),
+                permissions=["flight_stats_alerts", "whatsapp_chatbot"],
             ),
         ],
     )

@@ -3,6 +3,7 @@ import datetime
 import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
+from snowfall.project.junction.plus.adapter import configuration_vectors
 from snowfall.project.junction.plus.adapter import (
     errors as errors_adapter,
 )
@@ -18,16 +19,20 @@ from snowfall.project.junction.plus.adapter import (
 from snowfall.project.junction.plus.service.notifications.v1alpha import (
     models_pb2 as notifications_models_pb2,
 )
+from snowfall.project.junction.plus.service.plus_webhooks.models import (
+    ServicePermissions,
+)
 from snowfall.stdlib.format.protobuf import datetime_to_protobuf, slug_to_enum_value
 
 
 class Alerts(endpoints.HTTPEndpoint):
-    async def post(
+    async def post(  # noqa: WPS231
         self,
         request: requests.Request,
         monitoring_rules_client: monitoring_rules_adapter.Client = lagom.injectable,
         subscribers_client: subscribers_adapter.Client = lagom.injectable,
         notification_event_publisher_client: notification_event_publisher_adapter.Client = lagom.injectable,
+        configuration_vectors_client: configuration_vectors.Client = lagom.injectable,
     ) -> responses.Response:
         alert_body = await request.json()
         for name_value in alert_body["alert"]["rule"]["nameValues"]["nameValue"]:
@@ -93,6 +98,13 @@ class Alerts(endpoints.HTTPEndpoint):
                 subscriber = await subscribers_client.get(subscriber_id=subscriber_id)
             except errors_adapter.NotFoundError:
                 continue
+
+            permissions = await configuration_vectors_client.get_permissions(
+                reseller_id=subscriber.reseller_id,
+            )
+            if ServicePermissions.flight_stats_alerts.value not in permissions:
+                continue
+
             notification_event = notifications_models_pb2.NotificationEvent(
                 sender_id=subscriber.reseller_id,
                 receiver_id=subscriber_id,
