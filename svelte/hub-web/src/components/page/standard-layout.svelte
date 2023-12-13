@@ -32,7 +32,7 @@
 
 <div class="header" class:after-breadcrumbs={breadCrumbs}>
   <h1>
-    <span class="typography headline-small bold">
+    <span class="typography headline-medium bold">
       <slot name="page-title">
         {pageTitle}
       </slot>
@@ -103,7 +103,7 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    padding: 32px 24px;
+    padding: 16px 24px;
     color: var(--color-main-neutral-800);
   }
 
