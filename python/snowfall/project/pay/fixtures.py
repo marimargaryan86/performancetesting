@@ -11,8 +11,10 @@ from snowfall.project.pay.service.transactions.v1 import (
     models_pb2 as transactions_models_pb2,
 )
 from snowfall.project.pay.service.transactions.v1.models_pb2 import (
+    Quotation,
     QuotationAmounts,
     QuotationRates,
+    QuotationStatus,
     Transaction,
 )
 from snowfall.stdlib import money, string
@@ -57,6 +59,8 @@ BILLS = (
     "946a7e4b-519a-4f3d-8169-bcb4dbb3af94",
 )
 
+QUOTATIONS = ("124b9668-7298-42e9-97e2-f0d205083ab8",)
+
 
 def get_payments() -> list[models_pb2.Payment]:
     return [generate_payment(identifier) for identifier in PAYMENTS]
@@ -72,6 +76,10 @@ def get_companies() -> list[company_model_pb2.Company]:
     )
 
     return companies
+
+
+def get_quotations() -> list[Quotation]:
+    return [generate_quotation(identifier) for identifier in QUOTATIONS]
 
 
 def generate_payment(identifier: str) -> models_pb2.Payment:
@@ -210,4 +218,46 @@ def generate_contact_with_bad_company_id(identifier: str) -> company_model_pb2.C
             e164_number="+385996666666",
         ),
         company_id="bad_company_id",
+    )
+
+
+def generate_quotation(identifier: str) -> Quotation:
+    money_usd = money.from_string("1000", money.Currency("USD")).protobuf()
+    return Quotation(
+        id=identifier,
+        amounts=QuotationAmounts(
+            beneficiary=money_usd,
+            base_converted=money_usd,
+            sales_margin=money_usd,
+            quotation=money_usd,
+            fx_margin=money_usd,
+            processing_margin=money_usd,
+            tax_converted=money_usd,
+            total_markups=money_usd,
+            total_amount=money_usd,
+            fee_amount=money_usd,
+            tax=money_usd,
+            service_markup=money_usd,
+        ),
+        rates=QuotationRates(
+            fx_quote=float(1),
+            fx_buffer=float(2),
+            fx_markup=float(3),
+            sales_markup=float(4),
+            processing_markup=float(5),
+            fee_multiplier=1,
+        ),
+        expires_at=protobuf.datetime_to_protobuf(
+            datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(hours=2),
+        ),
+        status=QuotationStatus.QUOTATION_STATUS_QUOTED,
+        payer_id=string.uuid(),
+        beneficiary_id=string.uuid(),
+        transaction_id=string.uuid(),
+        created_at=protobuf.datetime_to_protobuf(
+            datetime.datetime.now(tz=datetime.UTC),
+        ),
+        updated_at=protobuf.datetime_to_protobuf(
+            datetime.datetime.now(tz=datetime.UTC),
+        ),
     )

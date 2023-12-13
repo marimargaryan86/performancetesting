@@ -74,6 +74,9 @@ class DictClient(Client):
                 total_amount=mock_to_amount.protobuf(),
                 total_markups=mock_to_amount.protobuf(),
                 tax=money.Money(tax, money.Currency(from_currency)).protobuf(),
+                tax_converted=money.Money(tax, money.Currency(to_currency)).protobuf(),
+                fee_amount=mock_to_amount.protobuf(),
+                service_markup=mock_to_amount.protobuf(),
             ),
             rates=transactions_models.QuotationRates(
                 fx_quote=1.0,
@@ -81,6 +84,7 @@ class DictClient(Client):
                 fx_markup=1.0,
                 sales_markup=1.0,
                 processing_markup=1.0,
+                fee_multiplier=1,
             ),
             payer_id=payer.id,
             beneficiary_id=beneficiary_company.id,

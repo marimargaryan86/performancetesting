@@ -28,7 +28,8 @@ from snowfall.project.junction.go.service.offers.v1 import (
     models_pb2 as offer_models_pb2,
 )
 from snowfall.project.junction.go.v1 import models_pb2
-from snowfall.project.pay.adapter import quotations, transactions
+from snowfall.project.pay import fixtures as pay_fixtures
+from snowfall.project.pay.adapter import companies, quotations, transactions
 from snowfall.stdlib.v1 import latlng_pb2
 
 
@@ -181,5 +182,10 @@ def transactions_client() -> transactions.Client:
 
 
 @pytest.fixture()
+def companies_client() -> companies.Client:
+    return companies.DictClient(pay_fixtures.get_companies())
+
+
+@pytest.fixture()
 def quotations_client() -> quotations.Client:
-    return quotations.DictClient(fixtures.get_quotations())
+    return quotations.DictClient(pay_fixtures.get_quotations())

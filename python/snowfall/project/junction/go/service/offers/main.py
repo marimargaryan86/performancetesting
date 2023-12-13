@@ -1,13 +1,12 @@
+import asyncio
 import datetime
 import ipaddress
 import random
 from collections.abc import Sequence
 
-import httpx
 import pydantic
 from motor import motor_asyncio
 
-from snowfall.project.junction.go import pay_integration
 from snowfall.project.junction.go.service.gateway.v1 import offers_pb2_grpc
 from snowfall.project.junction.go.service.offers import (
     aggregator,
@@ -25,7 +24,13 @@ from snowfall.project.junction.go.service.offers.grpc import (
     OfferService,
     PriceQuoteService,
 )
-from snowfall.stdlib.instrumentation.httpx import logging, metrics
+from snowfall.project.pay.adapter import companies, quotations
+from snowfall.project.pay.service.companies.v1 import (
+    grpc_pb2_grpc as companies_pb2_grpc,
+)
+from snowfall.project.pay.service.transactions.v1 import (
+    grpc_pb2_grpc as transactions_pb2_grpc,
+)
 from snowfall.stdlib.service import (
     amqp_factory,
     application,
@@ -34,8 +39,6 @@ from snowfall.stdlib.service import (
 )
 from snowfall.stdlib.transport.amqp import consumer, producer, trackable, types
 from snowfall.stdlib.transport.grpc import server
-from snowfall.vendor.junction.auth import UserAuth
-from snowfall.vendor.junction.pay.client import Client as PayClient
 
 _TRIP_OFFER_SEARCH_ROUTING_KEY = "offers.search.trip"
 _TRIP_OFFER_SEARCH_GATEWAY_KEY = "offer_searches.trip"
@@ -55,9 +58,11 @@ class _PaySettings(application.Settings):
     payer_company_id: str
     payer_currency_code: str
     use_pay_for_currency_conversions: bool = False
+    transactions_address: str
+    companies_address: str
 
 
-class _ImportSettings(pay_integration.Settings, _PaySettings, application.Settings):
+class _ImportSettings(_PaySettings, application.Settings):
     amqp_dsn: pydantic.AmqpDsn
     default_ttl: datetime.timedelta = datetime.timedelta(minutes=15)
     mongo_dsn: Sequence[pydantic.AnyUrl]
@@ -70,11 +75,7 @@ class _ImportSettings(pay_integration.Settings, _PaySettings, application.Settin
     gateway_poll_sleep: int = 5
 
 
-class _GatherPriceQuoteSettings(
-    pay_integration.Settings,
-    _PaySettings,
-    application.Settings,
-):
+class _GatherPriceQuoteSettings(_PaySettings, application.Settings):
     amqp_dsn: pydantic.AmqpDsn
     default_ttl: datetime.timedelta = datetime.timedelta(minutes=15)
     mongo_dsn: Sequence[pydantic.AnyUrl]
@@ -161,11 +162,6 @@ async def _import(app: application.Application[_ImportSettings]) -> None:
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
 
-    gateway_channel = await grpc_factory.make_insecure_channel(
-        app,
-        app.settings.gateway_address,
-    )
-    http_client = await app.stack.enter_async_context(httpx.AsyncClient())
     connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
     redis_client = await redis_factory.make_client(
         app=app,
@@ -173,8 +169,11 @@ async def _import(app: application.Application[_ImportSettings]) -> None:
         decode_responses=True,
     )
 
-    logging.register(http_client)
-    metrics.register(http_client)
+    gateway_channel, transactions_channel, companies_channel = await asyncio.gather(
+        grpc_factory.make_insecure_channel(app, app.settings.gateway_address),
+        grpc_factory.make_insecure_channel(app, app.settings.transactions_address),
+        grpc_factory.make_insecure_channel(app, app.settings.companies_address),
+    )
 
     offer_importer = importer.OfferImporter(
         consumer_obj=consumer.Consumer(
@@ -223,14 +222,11 @@ async def _import(app: application.Application[_ImportSettings]) -> None:
                 app.settings.use_pay_for_currency_conversions
             ),
             pay_quotes=pay_quotes.PayQuotes(
-                pay_client=PayClient(
-                    base_url=str(app.settings.public_pay_api_dsn),
-                    auth=UserAuth(
-                        str(app.settings.public_pay_admin_api_dsn),
-                        app.settings.pay_admin_username,
-                        app.settings.pay_admin_password,
-                    ),
-                    client=http_client,
+                quotations_client=quotations.GrpcClient(
+                    transactions_pb2_grpc.QuotationsServiceStub(transactions_channel),
+                ),
+                companies_client=companies.GrpcClient(
+                    companies_pb2_grpc.CompaniesServiceStub(companies_channel),
                 ),
                 offer_options_repository=offers.OfferOptionsRepository(
                     mongo.offers.trip_offers,
@@ -254,11 +250,12 @@ async def _gather_price_quotes(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
 
-    http_client = await app.stack.enter_async_context(httpx.AsyncClient())
     connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
 
-    logging.register(http_client)
-    metrics.register(http_client)
+    transactions_channel, companies_channel = await asyncio.gather(
+        grpc_factory.make_insecure_channel(app, app.settings.transactions_address),
+        grpc_factory.make_insecure_channel(app, app.settings.companies_address),
+    )
 
     price_quote_importer = importer.PriceQuoteImporter(
         consumer_obj=consumer.Consumer(
@@ -278,14 +275,11 @@ async def _gather_price_quotes(
                 app.settings.use_pay_for_currency_conversions
             ),
             pay_quotes=pay_quotes.PayQuotes(
-                pay_client=PayClient(
-                    base_url=str(app.settings.public_pay_api_dsn),
-                    auth=UserAuth(
-                        str(app.settings.public_pay_admin_api_dsn),
-                        app.settings.pay_admin_username,
-                        app.settings.pay_admin_password,
-                    ),
-                    client=http_client,
+                quotations_client=quotations.GrpcClient(
+                    transactions_pb2_grpc.QuotationsServiceStub(transactions_channel),
+                ),
+                companies_client=companies.GrpcClient(
+                    companies_pb2_grpc.CompaniesServiceStub(companies_channel),
                 ),
                 offer_options_repository=offers.OfferOptionsRepository(
                     mongo.offers.trip_offers,

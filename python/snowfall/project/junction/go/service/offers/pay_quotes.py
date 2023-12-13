@@ -1,31 +1,38 @@
 import uuid
 
+from snowfall.project.junction.go.adapter import errors
 from snowfall.project.junction.go.service.offers import offers
-from snowfall.project.junction.go.service.offers.pay_quotes_models import (
-    PayQuoteAttributes,
-    PayQuoteResponse,
-)
 from snowfall.project.junction.go.service.offers.v1 import models_pb2
 from snowfall.project.junction.go.service.offers.v1.amqp_pb2 import (
     TripOfferSearchResult,
     TripPriceQuoteResult,
 )
+from snowfall.project.pay.adapter import companies, quotations
+from snowfall.project.pay.service.companies.v1 import models_pb2 as companies_models_pb2
+from snowfall.project.pay.service.transactions.v1 import (
+    models_pb2 as transactions_models_pb2,
+)
 from snowfall.stdlib import money, string
 from snowfall.stdlib.logging import stdout
-from snowfall.vendor.junction.pay.client import Client as PayClient
 
 
 class SkippedConversionError(Exception):
     """Raised when a conversion is skipped."""
 
 
+class PayCreateQuoteError(Exception):
+    """Raised when an error occurs creating a quote in PAY."""
+
+
 class PayQuotes(object):
     def __init__(
         self,
-        pay_client: PayClient,
+        quotations_client: quotations.Client,
+        companies_client: companies.Client,
         offer_options_repository: offers.OfferOptionsRepository,
     ):
-        self._pay_client = pay_client
+        self._quotations_client = quotations_client
+        self._companies_client = companies_client
         self._offer_options_repository = offer_options_repository
         self._logger = stdout.get_logger()
 
@@ -41,30 +48,27 @@ class PayQuotes(object):
                 offer,
             )
 
-            quote = await self._get_quote(
+            payer_company = await self._get_company(company_id=payer_id)
+            beneficiary_company = await self._get_company(
+                company_id=search_result.provider_company_id,
+            )
+
+            quote = await self._create_quote(
                 amount=amount,
                 session_token=session_token,
-                payer_id=payer_id,
-                beneficiary_id=search_result.provider_company_id,
+                payer_company=payer_company,
+                beneficiary_company=beneficiary_company,
                 from_currency=currency,
                 to_currency=to_currency,
                 tax=tax_amount,
             )
 
-            converted_to_currency = money.Currency(to_currency)
-            converted_total_amount = money.Money(
-                amount=quote.data.attributes.total_amount,
-                currency=converted_to_currency,
-            )
-            offer.price.CopyFrom(converted_total_amount.protobuf())
+            offer.price.CopyFrom(quote.amounts.total_amount)
 
             while offer.price_breakdown:
                 offer.price_breakdown.pop()
             offer.price_breakdown.extend(
-                self._build_converted_price_breakdown(
-                    quote.data.attributes,
-                    converted_to_currency,
-                ),
+                self._build_converted_price_breakdown(quote.amounts),
             )
             offer.initial_offer_id = offer.id
             offer.id = string.to_uuid(session_token, uuid.UUID(offer.id))
@@ -105,34 +109,29 @@ class PayQuotes(object):
 
             raise SkippedConversionError()
 
-        quote = (
-            await self._get_quote(
-                amount=amount,
-                session_token=session_token,
-                payer_id=payer_id,
-                beneficiary_id=search_result.provider_company_id,
-                from_currency=currency,
-                to_currency=offer_option.price.currency_code,
-                tax=tax_amount,
-            )
-        ).data
+        payer_company = await self._get_company(company_id=payer_id)
+        beneficiary_company = await self._get_company(
+            company_id=search_result.provider_company_id,
+        )
+
+        quote = await self._create_quote(
+            amount=amount,
+            session_token=session_token,
+            payer_company=payer_company,
+            beneficiary_company=beneficiary_company,
+            from_currency=currency,
+            to_currency=offer_option.price.currency_code,
+            tax=tax_amount,
+        )
 
         search_result.price_quote.pay_quote_id = quote.id
 
-        converted_to_currency = money.Currency(quote.relationships.to_currency.data.id)
-        converted_total_amount = money.Money(
-            amount=quote.attributes.total_amount,
-            currency=converted_to_currency,
-        )
-        search_result.price_quote.price.CopyFrom(converted_total_amount.protobuf())
+        search_result.price_quote.price.CopyFrom(quote.amounts.total_amount)
 
         while search_result.price_quote.price_breakdown:
             search_result.price_quote.price_breakdown.pop()
         search_result.price_quote.price_breakdown.extend(
-            self._build_converted_price_breakdown(
-                quote.attributes,
-                converted_to_currency,
-            ),
+            self._build_converted_price_breakdown(quote.amounts),
         )
 
         return search_result
@@ -154,73 +153,85 @@ class PayQuotes(object):
 
         return base_fare.amount, tax.amount if tax else None, base_fare.currency.code
 
-    async def _get_quote(
+    async def _get_company(
+        self,
+        company_id: str,
+    ) -> companies_models_pb2.Company:
+        try:
+            return await self._companies_client.get(company_id)
+        except errors.NotFoundError as err:
+            self._logger.exception(
+                "Failed to fetch company in PAY",
+                company_id=company_id,
+            )
+            raise PayCreateQuoteError from err
+
+    async def _create_quote(
         self,
         amount: int,
         session_token: str,
-        payer_id: str,
-        beneficiary_id: str,
+        payer_company: companies_models_pb2.Company,
+        beneficiary_company: companies_models_pb2.Company,
         from_currency: str,
         to_currency: str,
         tax: int | None = None,
-    ) -> PayQuoteResponse:
-        resp = await self._pay_client.create_quote(
-            amount=amount,
-            external_reference=session_token,
-            payer_id=payer_id,
-            beneficiary_id=beneficiary_id,
-            from_currency=from_currency,
-            to_currency=to_currency,
-            tax=tax,
-        )
-        return PayQuoteResponse(**resp)
+    ) -> transactions_models_pb2.Quotation:
+        try:
+            return await self._quotations_client.create(
+                amount=amount,
+                session_token=session_token,
+                payer=payer_company,
+                beneficiary_company=beneficiary_company,
+                from_currency=from_currency,
+                to_currency=to_currency,
+                tax=tax if tax else 0,
+                fee_multiplier=1,
+            )
+        except (errors.NotFoundError, errors.ServiceUnavailableError) as err:
+            self._logger.exception(
+                "Failed to create quote in PAY",
+                amount=amount,
+                session_token=session_token,
+                payer_id=payer_company.id,
+                beneficiary_id=beneficiary_company.id,
+                from_currency=from_currency,
+                to_currency=to_currency,
+            )
+            raise PayCreateQuoteError from err
 
     def _build_converted_price_breakdown(
         self,
-        pay_quote_attributes: PayQuoteAttributes,
-        converted_to_currency: money.Currency,
+        pay_quote_amounts: transactions_models_pb2.QuotationAmounts,
     ) -> list[models_pb2.PriceBreakdown]:
         price_breakdown = list[models_pb2.PriceBreakdown](
             [
                 models_pb2.PriceBreakdown(
-                    price=money.Money(
-                        amount=pay_quote_attributes.amount,
-                        currency=converted_to_currency,
-                    ).protobuf(),
+                    price=pay_quote_amounts.base_converted,
                     breakdown_type=models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_BASE_FARE,
                 ),
             ],
         )
 
-        if pay_quote_attributes.tax:
+        if money.from_protobuf(pay_quote_amounts.tax_converted).amount:
             price_breakdown.append(
                 models_pb2.PriceBreakdown(
-                    price=money.Money(
-                        amount=pay_quote_attributes.tax,
-                        currency=converted_to_currency,
-                    ).protobuf(),
+                    price=pay_quote_amounts.tax_converted,
                     breakdown_type=models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_TAX,
                 ),
             )
 
-        if pay_quote_attributes.service_markup:
+        if money.from_protobuf(pay_quote_amounts.service_markup).amount:
             price_breakdown.append(
                 models_pb2.PriceBreakdown(
-                    price=money.Money(
-                        amount=pay_quote_attributes.service_markup,
-                        currency=converted_to_currency,
-                    ).protobuf(),
+                    price=pay_quote_amounts.service_markup,
                     breakdown_type=models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_SERVICE_MARK_UP,
                 ),
             )
 
-        if pay_quote_attributes.reseller_markup:
+        if money.from_protobuf(pay_quote_amounts.fee_amount).amount:
             price_breakdown.append(
                 models_pb2.PriceBreakdown(
-                    price=money.Money(
-                        amount=pay_quote_attributes.reseller_markup,
-                        currency=converted_to_currency,
-                    ).protobuf(),
+                    price=pay_quote_amounts.fee_amount,
                     breakdown_type=models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_RESELLER_MARK_UP,
                 ),
             )

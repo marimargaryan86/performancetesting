@@ -37,13 +37,6 @@ variable "payer_currency_code" {
 variable "use_pay_for_currency_conversions" {
   type = bool
 }
-variable "pay_admin_api_base_url" {
-  type = string
-}
-
-variable "api_pay_base_url" {
-  type = string
-}
 
 job "junction-go-offers-pricing" {
   datacenters = ["${var.datacenter}"]
@@ -86,6 +79,16 @@ job "junction-go-offers-pricing" {
 
       connect {
         sidecar_service {
+          proxy {
+            upstreams {
+              local_bind_port  = 8020
+              destination_name = "transactions-${var.environment}"
+            }
+            upstreams {
+              local_bind_port  = 8030
+              destination_name = "companies-${var.environment}"
+            }
+          }
         }
       }
       check {
@@ -107,10 +110,8 @@ job "junction-go-offers-pricing" {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
-{{ with secret "kv/data/${var.environment}/offers" }}
-PAY_ADMIN_USERNAME={{ .Data.data.pay_admin_username }}
-PAY_ADMIN_PASSWORD={{ .Data.data.pay_admin_password }}
-{{ end }}
+TRANSACTIONS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_transactions-${var.environment}"))}}
+COMPANIES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_companies-${var.environment}"))}}
 EOH
         destination = "services.env"
         env         = true
@@ -137,8 +138,6 @@ EOH
         PROMETHEUS_PORT                  = "${NOMAD_PORT_prometheus}"
         PAYER_COMPANY_ID                 = "${var.payer_company_id}"
         PAYER_CURRENCY_CODE              = "${var.payer_currency_code}"
-        PUBLIC_PAY_ADMIN_API_DSN         = "${var.pay_admin_api_base_url}"
-        PUBLIC_PAY_API_DSN               = "${var.api_pay_base_url}"
         USE_PAY_FOR_CURRENCY_CONVERSIONS = "${var.use_pay_for_currency_conversions}"
       }
     }
