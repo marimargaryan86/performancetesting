@@ -103,3 +103,29 @@ async def test_timeout_error_message(
         await ask2go_client.get_airports()
 
     assert str(excinfo.value) == inspect.getdoc(httpx.ReadTimeout)  # noqa: WPS441
+
+
+async def test_get_train_stations(
+    httpx_mock: pytest_httpx.HTTPXMock,
+    ask2go_client: client.Ask2GoClient,
+) -> None:
+    httpx_mock.add_response(
+        url="https://test_url/api/TrainStations",
+        status_code=http.HTTPStatus.OK.value,
+        json=[
+            {
+                "id": 19757,
+                "name": "LAROQUEBROU",
+                "code": "V16",
+                "country": "FR",
+                "latitude": 44.9643,
+                "longtitude": 2.19271,
+                "isEnabled": True,
+                "railname": "bene",
+            },
+        ],
+    )
+    stations = await ask2go_client.get_train_stations()
+
+    assert stations
+    assert stations[0].identifier == "19757"

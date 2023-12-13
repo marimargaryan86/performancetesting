@@ -64,3 +64,14 @@ class Passenger(CamelCaseBaseModel):
     type: PassengerType  # noqa: A003
     birth_date: datetime.date
     traveler_document: TravelerDocument | None
+
+
+class TrainStation(CamelCaseBaseModel):
+    identifier: str = pydantic.Field(..., alias="id")
+    name: str
+    code: str
+    country: str
+    latitude: float
+    longtitude: float
+    is_enabled: bool
+    railname: str

@@ -31,6 +31,16 @@ class Ask2GoClient(object):
         self._http_client = http_client
         self._rate_limit_client = rate_limit_client
 
+    async def get_train_stations(self) -> list[common.TrainStation]:
+        response = await self._make_request(
+            "GET",
+            self._api_base_url.copy_with(
+                path="/api/TrainStations",
+            ),
+        )
+
+        return [common.TrainStation(**station) for station in response.json()]
+
     async def get_airports(self) -> list[common.Airport]:
         response = await self._make_request(
             "GET",
