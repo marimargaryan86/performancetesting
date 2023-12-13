@@ -23,6 +23,7 @@
   import AutocompleteField from "components/ui/autocomplete-field.svelte";
   import { z } from "zod";
   import SearchIcon from "components/icons/search-icon.svelte";
+  import SwapIcon from "components/icons/swap-icon.svelte";
   import type { Place } from "integration/junction-mobile-api/schemas/place";
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import { goto } from "$app/navigation";
@@ -39,6 +40,8 @@
   export let data: Partial<SearchDataModel> = {};
   export let origin: Place | undefined = undefined;
   export let destination: Place | undefined = undefined;
+  let isSwapIconRotated = false;
+  let isSwapIconStandard = true;
 
   let passengers: SearchDataModel["passengers"] = data.passengers ?? {
     seniors65: 0,
@@ -71,6 +74,8 @@
   };
 
   function swapOriginAndDestination(): void {
+    isSwapIconRotated = !isSwapIconRotated;
+    isSwapIconStandard = !isSwapIconStandard;
     [origin, destination] = [destination, origin];
   }
 
@@ -109,7 +114,9 @@
     clearable
   />
 
-  <Button variant="outline" on:click={swapOriginAndDestination}>⇄</Button>
+  <Button class="swap-btn" variant="text" on:click={swapOriginAndDestination}>
+    <SwapIcon rotate={isSwapIconRotated} standard={isSwapIconStandard} />
+  </Button>
 
   <AutocompleteField
     label="To"
@@ -166,5 +173,9 @@
     margin-top: 22px;
     padding-right: 16px;
     padding-left: 16px;
+  }
+
+  :global(.swap-btn) {
+    --icon-size: 27px;
   }
 </style>
