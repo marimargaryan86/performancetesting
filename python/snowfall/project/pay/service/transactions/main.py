@@ -144,7 +144,9 @@ async def _reports_cron_run(
     app: application.Application[_ReportsSettings],
 ) -> None:
     storage = await app.stack.enter_async_context(
-        filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
+        filesystem.Storage.from_dsn(
+            "{0}/netsuite-exports/".format(str(app.settings.storage_dsn)),
+        ),
     )
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311

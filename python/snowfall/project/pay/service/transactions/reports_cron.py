@@ -41,6 +41,6 @@ class NetsuiteReportJob(object):
             ),
         )
         await self._storage.put(
-            path=Path("/netsuite-exports/{0}".format(file_name)),
+            path=Path("{0}".format(file_name)),
             file_contents=(csv_data or "").encode(),
         )
