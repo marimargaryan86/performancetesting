@@ -101,7 +101,7 @@ job "junction-plus-notifications-grpc" {
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 CV_PERMISSIONS={{keyOrDefault "${var.environment}/configuration-vectors/permissions" "{}" | toJSON }}
-CONSUL_API_BASE_URL={{(printf "https://%s" (env "CONSUL_HTTP_ADDR"))}}
+CONSUL_API_BASE_URL={{(printf "http://%s:8500" (env "NOMAD_IP_grpc"))}}
 {{ with secret "kv/data/${var.environment}/resellers" }}
 CONSUL_API_TOKEN={{ .Data.data.consul_api_token }}
 {{ end }}
