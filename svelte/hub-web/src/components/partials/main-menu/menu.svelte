@@ -6,13 +6,13 @@
   import routeConfig from "routeConfig";
   import BookingsIcon from "components/icons/bookings-icon.svelte";
   import BillIcon from "components/icons/bill-icon.svelte";
-  import { permitted, type Action } from "utils/permissions";
-  import userStore from "stores/user-store";
+  import { permitted, type Action, getUser } from "utils/permissions";
   import { getLocaleData } from "i18n";
 
   export let expanded: boolean;
   export let transitionTimeMs: number;
 
+  const user = getUser();
   const i18n = getLocaleData();
 
   let menuItems: {
@@ -48,12 +48,11 @@
       permission: "*",
     },
   ];
-  $: user = $userStore;
 </script>
 
 <ul class="menu" class:expanded style:--transition-time="{transitionTimeMs}ms">
   {#each menuItems as item}
-    {#if !item.permission || permitted(user, item.permission)}
+    {#if !item.permission || permitted($user, item.permission)}
       {@const active = item.exact
         ? $page.url.pathname === item.url
         : $page.url.pathname.startsWith(item.url)}

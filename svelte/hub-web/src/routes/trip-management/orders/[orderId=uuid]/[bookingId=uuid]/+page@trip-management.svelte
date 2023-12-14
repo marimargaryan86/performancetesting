@@ -7,14 +7,15 @@
   import Ticket from "../../../components/ticket.svelte";
   import Itinerary from "../../../components/itinerary.svelte";
   import StatusBadge from "components/ui/status-badge.svelte";
-  import { permitted } from "utils/permissions";
-  import userStore from "stores/user-store";
+  import { getUser, permitted } from "utils/permissions";
   import Admin from "./admin.svelte";
   import { formatAmount } from "formatting/currency";
   import Fees from "../../../book/confirmation/fees.svelte";
   import { getPageTitle } from "utils/page-title";
 
   export let data;
+
+  const user = getUser();
 
   let breadCrumbs: BreadCrumb[] = [];
 
@@ -29,7 +30,7 @@
     { label: order?.journey?.reference ?? "Unknown", url: orderLink.root },
     { label: `Booking ${data.bookingNo}` ?? "Unknown", url: selfLink.root },
   ];
-  $: canViewTransactions = permitted($userStore, "transaction.view");
+  $: canViewTransactions = permitted($user, "transaction.view");
 </script>
 
 <svelte:head>

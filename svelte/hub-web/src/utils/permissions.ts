@@ -1,4 +1,6 @@
 import type { User, UserRole } from "integration/ory/schemas/authentication";
+import { getContext, setContext } from "svelte";
+import type { Readable, Writable } from "svelte/store";
 
 /**
  * Base permissions, this list should be expanded upon as more permissions are created
@@ -91,4 +93,21 @@ export function permitted(user: User, ...actions: Action[]): boolean {
   const permission = getPermission(...actions);
 
   return (permission & ROLE_MAPPING[user.role]) === permission;
+}
+
+/**
+ * Create a context for the currently signed in user
+ * @param user The signed in user
+ * @returns A writable store for the signed in user
+ */
+export function setUser(user: Writable<User>): Writable<User> {
+  return setContext("user", user);
+}
+
+/**
+ * Get the currently signed in user
+ * @returns The currently signed in user
+ */
+export function getUser(): Readable<User> {
+  return getContext("user");
 }

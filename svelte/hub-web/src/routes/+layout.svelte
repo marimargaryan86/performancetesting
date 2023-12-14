@@ -6,31 +6,31 @@
   import "assets/css/typography.css";
   import MainMenu from "components/partials/main-menu/main-menu.svelte";
   import { browser } from "$app/environment";
-  import userStore from "stores/user-store";
   import { getTimeDeltaMs } from "utils/date-time";
   import * as Sentry from "@sentry/sveltekit";
   import integrationInstancesClient from "integration-instances-client";
   import { writable } from "svelte/store";
   import { setLocale, setLocaleData, type Locale } from "i18n";
   import { invalidateAll } from "$app/navigation";
+  import type { User } from "integration/ory/schemas/authentication";
+  import { setUser } from "utils/permissions";
 
   export let data;
 
-  const locale = writable(data.locale);
-  const localeData = writable(data.localeData);
-  setLocale(locale);
-  setLocaleData(localeData);
+  const user = setUser(writable<User>(data.user));
+  const locale = setLocale(writable(data.locale));
+  const localeData = setLocaleData(writable(data.localeData));
 
   let logoutTimer: number | undefined = undefined;
   let prevLocale = data.locale;
 
+  $: $user = data.user as unknown as User;
   $: $localeData = data.localeData;
   $: if (browser && data.sessionExpiresAt) {
     setLogoutTimer(data.sessionExpiresAt);
   }
-  $: if (data.user) {
-    Sentry.setUser({ email: data.user.email, id: data.user.id });
-    $userStore = data.user;
+  $: if ($user) {
+    Sentry.setUser({ email: $user.email, id: $user.id });
   } else {
     Sentry.setUser(null);
   }
@@ -54,7 +54,7 @@
   }
 </script>
 
-{#if data.user}
+{#if $user}
   <div class="workspace">
     <MainMenu />
 

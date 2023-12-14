@@ -9,16 +9,16 @@ export type LocaleData = typeof en;
 const LOCALE = "locale";
 const LOCALE_DATA = "localeData";
 
-export function setLocale(locale: Writable<Locale>): void {
-  setContext(LOCALE, locale);
+export function setLocale(locale: Writable<Locale>): Writable<Locale> {
+  return setContext(LOCALE, locale);
 }
 
 export function getLocale(): Writable<Locale> {
   return getContext(LOCALE);
 }
 
-export function setLocaleData(data: Readable<LocaleData>): void {
-  setContext(LOCALE_DATA, data);
+export function setLocaleData(data: Writable<LocaleData>): Writable<LocaleData> {
+  return setContext(LOCALE_DATA, data);
 }
 
 export function getLocaleData(): Readable<LocaleData> {

@@ -2,12 +2,14 @@
   import { formatRole } from "formatting/user";
   import md5 from "md5";
   import routeConfig from "routeConfig";
-  import userStore from "stores/user-store";
+  import { getUser } from "utils/permissions";
 
   export let transitionTimeMs: number;
   export let expanded: boolean;
 
-  $: gravatarHash = md5($userStore.email.trim().toLowerCase());
+  const user = getUser();
+
+  $: gravatarHash = md5($user.email.trim().toLowerCase());
 </script>
 
 <div class="account" style:--transition-time="{transitionTimeMs}ms" class:expanded>
@@ -16,8 +18,8 @@
   </a>
 
   <div class="info">
-    <strong class="typography body-small bold">{$userStore.email}</strong>
-    <span class="typography body-small">{formatRole($userStore.role)}</span>
+    <strong class="typography body-small bold">{$user.email}</strong>
+    <span class="typography body-small">{formatRole($user.role)}</span>
   </div>
 </div>
 

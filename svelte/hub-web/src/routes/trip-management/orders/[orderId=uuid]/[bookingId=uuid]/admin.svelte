@@ -2,8 +2,7 @@
   import type { TripBooking } from "integration/junction-hub-api/schemas/booking";
   import RefundDialog from "./refund-dialog.svelte";
   import Transaction from "./transaction.svelte";
-  import { permitted } from "utils/permissions";
-  import userStore from "stores/user-store";
+  import { getUser, permitted } from "utils/permissions";
   import type { Transaction as TransactionModel } from "integration/junction-hub-api/schemas/transaction";
   import { onMount } from "svelte";
   import integrationInstancesClient from "integration-instances-client";
@@ -11,6 +10,8 @@
   import Refund from "./refund.svelte";
 
   export let booking: TripBooking;
+
+  const user = getUser();
 
   let transactionTask: MaybePromise<TransactionModel | undefined> | undefined;
 
@@ -28,10 +29,10 @@
 
   {#if booking.refund}
     {#if booking.refund.status === "succeeded" || booking.refund.status === "submitted"}
-      {#if permitted($userStore, "refund.view")}
+      {#if permitted($user, "refund.view")}
         <Refund refund={booking.refund} />
       {/if}
-    {:else if permitted($userStore, "refund.add")}
+    {:else if permitted($user, "refund.add")}
       {#await transactionTask then transaction}
         {#if transaction}
           <RefundDialog bind:booking {transaction} />

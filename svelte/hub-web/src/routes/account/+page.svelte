@@ -43,14 +43,15 @@
   import Button from "components/ui/button.svelte";
   import TextField from "components/ui/text-field.svelte";
   import { formatRole } from "formatting/user";
-  import userStore from "stores/user-store";
   import { writable } from "svelte/store";
   import integrationInstancesClient from "integration-instances-client";
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import { getPageTitle } from "utils/page-title";
+  import { getUser } from "utils/permissions";
 
   export let data;
 
+  const user = getUser();
   const pending = writable<string | undefined>();
 
   $: ({ default: defaultGroup, ...groups } = data.flow.ui.groups);
@@ -95,10 +96,10 @@
 
 <StandardLayout
   pageTitle="Account settings"
-  pageSubTitle={$userStore ? `${$userStore.email} (${formatRole($userStore.role)})` : undefined}
+  pageSubTitle={$user ? `${$user.email} (${formatRole($user.role)})` : undefined}
 >
   <svelte:fragment slot="actions">
-    {#if !$userStore}
+    {#if !$user}
       <Button size="small" on:click={logout}>
         Go to login
         {#if $pending === "logout"}
