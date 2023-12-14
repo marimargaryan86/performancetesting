@@ -1,17 +1,20 @@
 <script lang="ts">
+  import { getLocaleData } from "i18n";
   import { getPageTitle } from "utils/page-title";
+
+  const i18n = getLocaleData();
 </script>
 
 <svelte:head>
-  <title>{getPageTitle("Junction Hub", "Dashboard")}</title>
+  <title>{getPageTitle($i18n.title, $i18n.pages.dashboard.title)}</title>
 </svelte:head>
 
 <div class="dashboard">
-  <h1 class="typography headline-medium bold">Dashboard</h1>
+  <h1 class="typography headline-medium bold">{$i18n.pages.dashboard.title}</h1>
 
   <div class="splash">
-    <h2>Welcome to</h2>
-    <h3>Junction Hub</h3>
+    <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+    {@html $i18n.pages.dashboard.intro}
   </div>
 </div>
 
@@ -30,6 +33,8 @@
   }
 
   .splash {
+    display: flex;
+    flex-flow: column;
     padding: 20px 33px 63px;
     color: var(--color-common-dark-strong);
     background-image: url("/images/welcome-bg.png");
@@ -44,7 +49,7 @@
     margin-bottom: 16px;
   }
 
-  h2 {
+  .splash > :global(strong) {
     font-weight: 700;
     font-size: 20px;
     font-family: "Red Hat Display", Arial, Helvetica, sans-serif;
@@ -54,7 +59,7 @@
     text-transform: uppercase;
   }
 
-  h3 {
+  .splash > :global(span) {
     margin-top: 8px;
     font-weight: 800;
     font-size: 46px;

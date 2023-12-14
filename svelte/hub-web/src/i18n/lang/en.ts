@@ -1,6 +1,7 @@
 import type { UserRole } from "integration/ory/schemas/authentication";
 
 export default {
+  title: "Junction Hub",
   roles: {
     "reseller-admin": "Reseller admin",
     "reseller-user": "Reseller user",
@@ -26,6 +27,10 @@ export default {
     copiedToClipboard: "Copied to clipboard",
   },
   pages: {
+    dashboard: {
+      title: "Dashboard",
+      intro: "<strong>Welcome to</strong><span>Junction Hub</span>",
+    },
     knowledgeHub: {
       title: "Knowledge Hub",
     },

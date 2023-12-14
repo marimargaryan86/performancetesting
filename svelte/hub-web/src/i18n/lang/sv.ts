@@ -1,6 +1,7 @@
 import type { LocaleData } from "i18n";
 
 export default {
+  title: "Junction Hub",
   roles: {
     "reseller-admin": "Återförsäljare - administratör",
     "reseller-user": "Återförsäljare",
@@ -26,6 +27,10 @@ export default {
     copiedToClipboard: "Kopierad till urklipp",
   },
   pages: {
+    dashboard: {
+      title: "Instrumentbräda",
+      intro: "<strong>Välkommen till</strong><span>Junction Hub</span>",
+    },
     knowledgeHub: {
       title: "Kunskapshub",
     },
