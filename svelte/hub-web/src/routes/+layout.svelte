@@ -10,11 +10,21 @@
   import { getTimeDeltaMs } from "utils/date-time";
   import * as Sentry from "@sentry/sveltekit";
   import integrationInstancesClient from "integration-instances-client";
+  import { writable } from "svelte/store";
+  import { setLocale, setLocaleData, type Locale } from "i18n";
+  import { invalidateAll } from "$app/navigation";
 
   export let data;
 
-  let logoutTimer: number | undefined = undefined;
+  const locale = writable(data.locale);
+  const localeData = writable(data.localeData);
+  setLocale(locale);
+  setLocaleData(localeData);
 
+  let logoutTimer: number | undefined = undefined;
+  let prevLocale = data.locale;
+
+  $: $localeData = data.localeData;
   $: if (browser && data.sessionExpiresAt) {
     setLogoutTimer(data.sessionExpiresAt);
   }
@@ -23,6 +33,15 @@
     $userStore = data.user;
   } else {
     Sentry.setUser(null);
+  }
+  $: if (browser && prevLocale !== $locale) {
+    prevLocale = $locale;
+    updateLocaleCookie($locale);
+  }
+
+  function updateLocaleCookie(nextLocale: Locale): void {
+    document.cookie = `locale=${nextLocale}; Path=/; MaxAge=31536000; SameSite=Lax`;
+    invalidateAll();
   }
 
   function setLogoutTimer(timeoutAt: Date): void {

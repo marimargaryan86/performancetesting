@@ -33,6 +33,7 @@
   import { writable } from "svelte/store";
   import { formatAmount } from "formatting/currency";
   import TripBanner from "../../components/trip-banner.svelte";
+  import { getPageTitle } from "utils/page-title";
 
   export let data;
 
@@ -195,7 +196,7 @@
 </script>
 
 <svelte:head>
-  <title>Payment · Book · Trip Management · Junction Hub</title>
+  <title>{getPageTitle("Junction Hub", "Trip Management", "Book", "Payment")}</title>
 </svelte:head>
 
 {#if data.selected.originalPrice && priceQuote.price.total}

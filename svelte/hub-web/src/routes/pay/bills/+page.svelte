@@ -17,6 +17,7 @@
   import type { Bill } from "integration/junction-hub-api/schemas/bill";
   import { match as matchUuid } from "../../../params/uuid";
   import { browser } from "$app/environment";
+  import { getPageTitle } from "utils/page-title";
 
   export let data;
 
@@ -67,7 +68,7 @@
 </script>
 
 <svelte:head>
-  <title>Bills · Pay · Junction Hub</title>
+  <title>{getPageTitle("Junction Hub", "Pay", "Bills")}</title>
 </svelte:head>
 
 <StandardLayout pageTitle="Bills" bind:searchQuery>

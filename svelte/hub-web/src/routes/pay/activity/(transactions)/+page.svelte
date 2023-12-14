@@ -18,6 +18,7 @@
   import type { ScrollLoadFunc } from "directives/scroll-load";
   import integrationInstancesClient from "integration-instances-client";
   import type TransactionService from "integration/junction-hub-api/services/transaction-service";
+  import { getPageTitle } from "utils/page-title";
 
   export let data;
 
@@ -44,7 +45,7 @@
 </script>
 
 <svelte:head>
-  <title>Transactions · Activity · Pay · Junction Hub</title>
+  <title>{getPageTitle("Junction Hub", "Pay", "Activity", "Transactions")}</title>
 </svelte:head>
 
 <Table class="transactions-table" {loadMore}>

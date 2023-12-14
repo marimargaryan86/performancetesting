@@ -12,6 +12,7 @@
   import Admin from "./admin.svelte";
   import { formatAmount } from "formatting/currency";
   import Fees from "../../../book/confirmation/fees.svelte";
+  import { getPageTitle } from "utils/page-title";
 
   export let data;
 
@@ -33,7 +34,13 @@
 
 <svelte:head>
   <title>
-    Booking {data.bookingNo} · {order?.journey?.reference ?? "Unknown"} · Orders · Trip Management ·
+    {getPageTitle(
+      "Junction Hub",
+      "Trip Management",
+      "Orders",
+      order?.journey?.reference ?? "Unknown",
+      `Booking ${data.bookingNo}`,
+    )}
     Junction Hub
   </title>
 </svelte:head>

@@ -47,6 +47,7 @@
   import { writable } from "svelte/store";
   import integrationInstancesClient from "integration-instances-client";
   import LoadingIcon from "components/icons/loading-icon.svelte";
+  import { getPageTitle } from "utils/page-title";
 
   export let data;
 
@@ -89,7 +90,7 @@
 </script>
 
 <svelte:head>
-  <title>Account settings · Junction Hub</title>
+  <title>{getPageTitle("Junction Hub", "Account settings")}</title>
 </svelte:head>
 
 <StandardLayout

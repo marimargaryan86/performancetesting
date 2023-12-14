@@ -31,6 +31,7 @@
   import { page } from "$app/stores";
   import type { ComponentType } from "svelte";
   import HeadphonesIcon from "components/icons/headphones-icon.svelte";
+  import { getPageTitle } from "utils/page-title";
 
   $: activeTab = tabs.find((item) => {
     return item.exact ? $page.url.pathname === item.url : $page.url.pathname.startsWith(item.url);
@@ -38,7 +39,7 @@
 </script>
 
 <svelte:head>
-  <title>{activeTab?.label ?? "Unknown"} · Help · Junction Hub</title>
+  <title>{getPageTitle("Junction Hub", "Help", activeTab?.label ?? "Unknown")}</title>
 </svelte:head>
 
 <StandardLayout pageTitle="Help" {tabs} searchQuery="">

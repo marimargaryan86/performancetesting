@@ -24,6 +24,7 @@
   import AlertIcon from "components/icons/alert-icon.svelte";
   import { getOrderStatus, type OrderBookingStatus } from "integration/common/schemas/order";
   import Fees from "./fees.svelte";
+  import { getPageTitle } from "utils/page-title";
 
   export let data;
 
@@ -35,7 +36,7 @@
 </script>
 
 <svelte:head>
-  <title>Confirmation · Trip Management · Junction Hub</title>
+  <title>{getPageTitle("Junction Hub", "Trip Management", "Confirmation")}</title>
 </svelte:head>
 
 <div class="content">

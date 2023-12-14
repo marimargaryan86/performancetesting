@@ -13,6 +13,7 @@
   import TStatusBadgeCol from "components/ui/table/t-status-badge-col.svelte";
   import type { ScrollLoadFunc } from "directives/scroll-load";
   import integrationInstancesClient from "integration-instances-client";
+  import { getPageTitle } from "utils/page-title";
 
   export let data;
 
@@ -38,7 +39,7 @@
 </script>
 
 <svelte:head>
-  <title>FX · Activity · Pay · Junction Hub</title>
+  <title>{getPageTitle("Junction Hub", "Pay", "Activity", "FX")}</title>
 </svelte:head>
 
 <Table class="fx-table" {loadMore}>

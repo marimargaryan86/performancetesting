@@ -13,6 +13,7 @@
   import { getOrigin, getDestination } from "utils/booking";
   import CancellationDialog from "./cancellation-dialog.svelte";
   import TStatusBadgeCol from "components/ui/table/t-status-badge-col.svelte";
+  import { getPageTitle } from "utils/page-title";
 
   export let data;
 
@@ -37,7 +38,13 @@
 
 <svelte:head>
   <title>
-    Bookings · {data.order.journey?.reference ?? "Unknown"} · Orders · Trip Management · Junction Hub
+    {getPageTitle(
+      "Junction Hub",
+      "Trip Management",
+      "Orders",
+      data.order.journey?.reference ?? "Unknown",
+      "Bookings",
+    )}
   </title>
 </svelte:head>
 

@@ -76,6 +76,7 @@
     type BookingStatus,
   } from "integration/junction-hub-api/schemas/booking";
   import { parseDateRange } from "utils/date-time";
+  import { getPageTitle } from "utils/page-title";
 
   export let data;
 
@@ -104,7 +105,7 @@
 </script>
 
 <svelte:head>
-  <title>Orders · Trip Management · Junction Hub</title>
+  <title>{getPageTitle("Junction Hub", "Trip Management", "Orders")}</title>
 </svelte:head>
 
 <StandardLayout

@@ -1,3 +1,4 @@
+import type { Locale } from "i18n";
 import type { Session, User } from "integration/ory/schemas/authentication";
 
 // See https://kit.svelte.dev/docs/types#app
@@ -9,6 +10,7 @@ declare global {
       user?: User;
       sessionExpiresAt?: Date;
       session: Session;
+      locale: Locale;
     }
     // interface PageData {}
     // interface Platform {}

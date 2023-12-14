@@ -2,10 +2,11 @@
   import StandardLayout from "components/page/standard-layout.svelte";
   import Videos from "./videos.svelte";
   import Faq from "./faq.svelte";
+  import { getPageTitle } from "utils/page-title";
 </script>
 
 <svelte:head>
-  <title>Knowledge Hub · Junction Hub</title>
+  <title>{getPageTitle("Junction Hub", "Knowledge Hub")}</title>
 </svelte:head>
 
 <StandardLayout pageTitle="Knowledge Hub" backgroundImage="none">

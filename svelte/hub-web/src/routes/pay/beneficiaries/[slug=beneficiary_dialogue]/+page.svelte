@@ -47,6 +47,7 @@
   import StandardLayout from "components/page/standard-layout.svelte";
   import Alert from "components/ui/alert.svelte";
   import type { BeneficiaryPut } from "integration/junction-hub-api/schemas/beneficiary";
+  import { getPageTitle } from "utils/page-title";
 
   export let data;
 
@@ -91,9 +92,7 @@
 </script>
 
 <svelte:head>
-  <title>
-    {title} · Beneficiaries · Pay · Junction Hub
-  </title>
+  <title>{getPageTitle("Junction Hub", "Pay", "Beneficiaries", title)}</title>
 </svelte:head>
 
 <StandardLayout {breadCrumbs} pageTitle={title}>

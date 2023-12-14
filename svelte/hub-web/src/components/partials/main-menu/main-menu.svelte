@@ -10,9 +10,13 @@
   import { page } from "$app/stores";
   import routeConfig from "routeConfig";
   import integrationInstancesClient from "integration-instances-client";
+  import { getLocale, getLocaleData } from "i18n";
+  import { dev } from "$app/environment";
 
   let expanded = true;
 
+  const locale = getLocale();
+  const i18n = getLocaleData();
   const transitionTimeMs = 250;
 
   function toggle(): void {
@@ -55,7 +59,7 @@
     <li>
       <a
         class="link typography body-medium"
-        title="Knowledge Hub"
+        title={expanded ? undefined : $i18n.pages.knowledgeHub.title}
         href={routeConfig.routes.knowledgeHub.root}
         class:active={activeLink === "knowledge-hub"}
       >
@@ -64,13 +68,13 @@
             ? '--color-main-primary-500'
             : '--color-common-light-strong'})"
         />
-        <span>Knowledge Hub</span>
+        <span>{$i18n.pages.knowledgeHub.title}</span>
       </a>
     </li>
     <li>
       <a
         class="link typography body-medium"
-        title="Report an issue"
+        title={expanded ? undefined : $i18n.sentences.reportAnIssue}
         href={routeConfig.routes.help.routes.customerService.root}
         class:active={activeLink === "issue"}
       >
@@ -79,13 +83,13 @@
             ? '--color-main-primary-500'
             : '--color-common-light-strong'})"
         />
-        <span>Report an issue</span>
+        <span>{$i18n.sentences.reportAnIssue}</span>
       </a>
     </li>
     <li>
       <a
         class="link typography body-medium"
-        title="Help"
+        title={expanded ? undefined : $i18n.words.help}
         href={routeConfig.routes.help.routes.privacyPolicy.root}
         class:active={activeLink === "help"}
       >
@@ -94,17 +98,25 @@
             ? '--color-main-primary-500'
             : '--color-common-light-strong'})"
         />
-        <span>Help</span>
+        <span>{$i18n.words.help}</span>
       </a>
     </li>
+    {#if dev}
+      <li>
+        <select bind:value={$locale}>
+          <option value="en-GB">English (UK)</option>
+          <option value="sv-SE">Svenska</option>
+        </select>
+      </li>
+    {/if}
     <li>
       <button
         class="logout typography body-medium"
-        title="Logout"
+        title={expanded ? undefined : $i18n.actions.logout}
         on:click={integrationInstancesClient.ory.auth.logout}
       >
         <LogoutIcon color="var(--color-common-light-strong)" />
-        <span>Logout</span>
+        <span>{$i18n.actions.logout}</span>
       </button>
     </li>
   </ul>

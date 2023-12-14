@@ -10,6 +10,7 @@
   import { scrollLoad, type ScrollLoadFunc } from "directives/scroll-load";
   import integrationInstancesClient from "integration-instances-client";
   import routeConfig from "routeConfig";
+  import { getPageTitle } from "utils/page-title";
 
   export let data;
 
@@ -39,7 +40,7 @@
 </script>
 
 <svelte:head>
-  <title>Accounts · Pay · Junction Hub</title>
+  <title>{getPageTitle("Junction Hub", "Pay", "Accounts")}</title>
 </svelte:head>
 
 {#if !dev}

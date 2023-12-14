@@ -73,6 +73,7 @@
   import { onDestroy } from "svelte";
   import { writable } from "svelte/store";
   import type { TripOfferPriceQuote } from "integration/junction-mobile-api/schemas/trip-offer-price-quote";
+  import { getPageTitle } from "utils/page-title";
 
   export let data;
 
@@ -170,7 +171,7 @@
 </script>
 
 <svelte:head>
-  <title>Select an offer · Book · Trip Management · Junction Hub</title>
+  <title>{getPageTitle("Junction Hub", "Trip Management", "Book", "Select an offer")}</title>
 </svelte:head>
 
 <div class="search-wrapper">

@@ -8,6 +8,7 @@
   import StandardLayout from "components/page/standard-layout.svelte";
   import routeConfig from "routeConfig";
   import type { Balance } from "integration/junction-hub-api/schemas/balance";
+  import { getPageTitle } from "utils/page-title";
 
   export let data;
 
@@ -35,7 +36,7 @@
 </script>
 
 <svelte:head>
-  <title>Balances · {data.account.name} · Accounts · Pay · Junction Hub</title>
+  <title>{getPageTitle("Junction Hub", "Pay", "Accounts", data.account.name, "Balances")}</title>
 </svelte:head>
 
 <AddBalanceDialogue

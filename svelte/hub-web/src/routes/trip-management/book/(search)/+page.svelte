@@ -1,9 +1,10 @@
 <script lang="ts">
+  import { getPageTitle } from "utils/page-title";
   import TripSearch from "../../components/trip-search/trip-search.svelte";
 </script>
 
 <svelte:head>
-  <title>Search · Book · Trip Management · Junction Hub</title>
+  <title>{getPageTitle("Junction Hub", "Trip Management", "Book", "Search")}</title>
 </svelte:head>
 
 <div class="search-wrapper">

@@ -7,6 +7,7 @@
   import routeConfig from "routeConfig";
   import { writable } from "svelte/store";
   import { slideFade } from "transitions/slide-fade";
+  import { getPageTitle } from "utils/page-title";
 
   export let data;
 
@@ -56,7 +57,7 @@
 </script>
 
 <svelte:head>
-  <title>Account recovery · Junction Hub</title>
+  <title>{getPageTitle("Junction Hub", "Account recovery")}</title>
 </svelte:head>
 
 <section class="account-recovery">

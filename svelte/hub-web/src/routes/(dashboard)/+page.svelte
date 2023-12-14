@@ -1,5 +1,9 @@
+<script lang="ts">
+  import { getPageTitle } from "utils/page-title";
+</script>
+
 <svelte:head>
-  <title>Dashboard · Junction Hub</title>
+  <title>{getPageTitle("Junction Hub", "Dashboard")}</title>
 </svelte:head>
 
 <div class="dashboard">

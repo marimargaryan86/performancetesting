@@ -30,6 +30,7 @@ const config = {
       transitions: "src/transitions",
       routeConfig: "src/route-config.ts",
       stores: "src/stores",
+      i18n: "src/i18n",
     },
   },
 };

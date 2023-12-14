@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { getPageTitle } from "utils/page-title";
   import Passengers from "../../../components/passengers.svelte";
   import Ticket from "../../../components/ticket.svelte";
 
@@ -7,7 +8,13 @@
 
 <svelte:head>
   <title>
-    Details · {data.order.journey?.reference ?? "Unknown"} · Orders · Trip Management · Junction Hub
+    {getPageTitle(
+      "Junction Hub",
+      "Trip Management",
+      "Orders",
+      data.order.journey?.reference ?? "Unknown",
+      "Details",
+    )}
   </title>
 </svelte:head>
 

@@ -9,6 +9,7 @@
   import routeConfig from "routeConfig";
   import { goto, invalidateAll } from "$app/navigation";
   import { slideFade } from "transitions/slide-fade";
+  import { getPageTitle } from "utils/page-title";
 
   export let data;
 
@@ -70,7 +71,7 @@
 </script>
 
 <svelte:head>
-  <title>Login · Junction Hub</title>
+  <title>{getPageTitle("Junction Hub", "Login")}</title>
 </svelte:head>
 
 <section class="login">

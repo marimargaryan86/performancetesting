@@ -1,42 +1,5 @@
-<script lang="ts" context="module">
-  import type { ComponentType, SvelteComponent } from "svelte";
-
-  interface MenuItem {
-    url: string;
-    label: string;
-    icon: ComponentType<SvelteComponent<{ color?: string }>>;
-    exact?: boolean;
-    permission?: Action;
-  }
-
-  const menuItems: MenuItem[] = [
-    {
-      url: routeConfig.routes.tripManagement.routes.book.root,
-      label: "Book",
-      icon: TicketIcon,
-    },
-    {
-      url: routeConfig.routes.tripManagement.routes.orders.root,
-      label: "View orders",
-      icon: BookingsIcon,
-      permission: "journey.view",
-    },
-    {
-      url: routeConfig.routes.pay.routes.activity.root,
-      label: "Activity",
-      icon: ActivityIcon,
-      permission: "transaction.view",
-    },
-    {
-      url: routeConfig.routes.pay.routes.bills.root,
-      label: "Bills",
-      icon: BillIcon,
-      permission: "*",
-    },
-  ];
-</script>
-
 <script lang="ts">
+  import type { ComponentType, SvelteComponent } from "svelte";
   import ActivityIcon from "components/icons/activity-icon.svelte";
   import TicketIcon from "components/icons/ticket-icon.svelte";
   import { page } from "$app/stores";
@@ -45,10 +8,46 @@
   import BillIcon from "components/icons/bill-icon.svelte";
   import { permitted, type Action } from "utils/permissions";
   import userStore from "stores/user-store";
+  import { getLocaleData } from "i18n";
 
   export let expanded: boolean;
   export let transitionTimeMs: number;
 
+  const i18n = getLocaleData();
+
+  let menuItems: {
+    url: string;
+    label: string;
+    icon: ComponentType<SvelteComponent<{ color?: string }>>;
+    exact?: boolean;
+    permission?: Action;
+  }[];
+
+  $: menuItems = [
+    {
+      url: routeConfig.routes.tripManagement.routes.book.root,
+      label: $i18n.pages.tripManagement.pages.book.title,
+      icon: TicketIcon,
+    },
+    {
+      url: routeConfig.routes.tripManagement.routes.orders.root,
+      label: $i18n.pages.tripManagement.pages.orders.title,
+      icon: BookingsIcon,
+      permission: "journey.view",
+    },
+    {
+      url: routeConfig.routes.pay.routes.activity.root,
+      label: $i18n.pages.pay.pages.activity.title,
+      icon: ActivityIcon,
+      permission: "transaction.view",
+    },
+    {
+      url: routeConfig.routes.pay.routes.bills.root,
+      label: $i18n.pages.pay.pages.bills.title,
+      icon: BillIcon,
+      permission: "*",
+    },
+  ];
   $: user = $userStore;
 </script>
 

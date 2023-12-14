@@ -5,8 +5,9 @@ import { sequence } from "@sveltejs/kit/hooks";
 import { env } from "$env/dynamic/private";
 import { ORY_INTEGRATION_ROOT } from "./routes/integration/ory/common";
 import { cookieStore } from "stores/cookie-store.server";
+import type { Locale } from "i18n";
 
-export function authHandle({ event, resolve }: Parameters<Handle>[0]): MaybePromise<Response> {
+function authHandle({ event, resolve }: Parameters<Handle>[0]): MaybePromise<Response> {
   const session = cookieStore.sessionToken.get(event);
   const sessionMeta = cookieStore.sessionMetaToken.get(event);
 
@@ -50,6 +51,29 @@ export function authHandle({ event, resolve }: Parameters<Handle>[0]): MaybeProm
   return resolve(event);
 }
 
+/**
+ * Sets the default locale as `"en-GB"` if not specifed in the cookie.
+ *
+ */
+function localeHandle({ event, resolve }: Parameters<Handle>[0]): MaybePromise<Response> {
+  let locale = event.cookies.get("locale") as Locale | undefined;
+
+  if (!locale) {
+    locale = "en-GB";
+    event.cookies.set("locale", locale, {
+      path: "/",
+      httpOnly: false,
+      secure: false,
+      maxAge: 31536000,
+      sameSite: "lax",
+    });
+  }
+
+  event.locals.locale = locale;
+
+  return resolve(event);
+}
+
 Sentry.init({
   dsn: env.PUBLIC_SENTRY_DSN,
   tracesSampleRate: 0.1,
@@ -57,4 +81,4 @@ Sentry.init({
 
 export const handleError = Sentry.handleErrorWithSentry();
 
-export const handle = sequence(Sentry.sentryHandle(), authHandle);
+export const handle = sequence(Sentry.sentryHandle(), localeHandle, authHandle);

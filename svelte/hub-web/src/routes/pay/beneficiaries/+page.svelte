@@ -21,6 +21,7 @@
   import type { ScrollLoadFunc } from "directives/scroll-load";
   import integrationInstancesClient from "integration-instances-client";
   import currencyData from "data/currency-data";
+  import { getPageTitle } from "utils/page-title";
 
   export let data;
 
@@ -52,7 +53,7 @@
 </script>
 
 <svelte:head>
-  <title>Beneficiaries · Pay · Junction Hub</title>
+  <title>{getPageTitle("Junction Hub", "Pay", "Beneficiaries")}</title>
 </svelte:head>
 
 {#if !dev}
