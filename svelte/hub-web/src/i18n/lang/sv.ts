@@ -18,6 +18,8 @@ export default {
     continue: "Fortsätt",
     cancel: "Avbryt",
     reportAnIssue: "Felrapportera",
+    click: "Klicka",
+    goToLogin: "Gå till login",
   },
   sentences: {
     priceChange: "Prisändring",
@@ -30,6 +32,9 @@ export default {
     dashboard: {
       title: "Instrumentbräda",
       intro: "<strong>Välkommen till</strong><span>Junction Hub</span>",
+    },
+    account: {
+      title: "Kontoinställningar",
     },
     knowledgeHub: {
       title: "Kunskapshub",
@@ -53,6 +58,20 @@ export default {
           title: "Visa ordrar",
         },
       },
+    },
+  },
+  ory: {
+    formGroups: {
+      default: "Standard",
+      password: "Uppdatera lösenord",
+      oidc: "OIDC",
+      profile: "Allmänt",
+      link: "Länk",
+      code: "Kod",
+      totp: "Tvåfaktorsautentisering",
+      // eslint-disable-next-line camelcase
+      lookup_secret: "Återställningskoder",
+      webauthn: "Säkerhetsnycklar",
     },
   },
 } satisfies LocaleData;

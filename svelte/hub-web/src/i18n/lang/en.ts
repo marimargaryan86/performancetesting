@@ -18,6 +18,8 @@ export default {
     continue: "Continue",
     cancel: "Cancel",
     reportAnIssue: "Report an issue",
+    click: "Click",
+    goToLogin: "Go to login",
   },
   sentences: {
     priceChange: "Price change",
@@ -30,6 +32,9 @@ export default {
     dashboard: {
       title: "Dashboard",
       intro: "<strong>Welcome to</strong><span>Junction Hub</span>",
+    },
+    account: {
+      title: "Account settings",
     },
     knowledgeHub: {
       title: "Knowledge Hub",
@@ -53,6 +58,20 @@ export default {
           title: "View orders",
         },
       },
+    },
+  },
+  ory: {
+    formGroups: {
+      default: "Default",
+      password: "Update password",
+      oidc: "OIDC",
+      profile: "General",
+      link: "Link",
+      code: "Code",
+      totp: "Two-factor authentication",
+      // eslint-disable-next-line camelcase
+      lookup_secret: "Backup recovery codes",
+      webauthn: "Security keys",
     },
   },
 };

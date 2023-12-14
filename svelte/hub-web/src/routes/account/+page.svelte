@@ -6,29 +6,6 @@
     return eval(func);
   }
 
-  function formatGroupName(name: string): string {
-    switch (name as UiNodeGroup) {
-      case "profile":
-        return "General";
-      case "code":
-        return "Code";
-      case "default":
-        return "Default";
-      case "link":
-        return "Link";
-      case "lookup_secret":
-        return "Backup recovery codes";
-      case "password":
-        return "Update password";
-      case "totp":
-        return "Two-factor authentication";
-      case "webauthn":
-        return "Security keys";
-      default:
-        return "Unknown";
-    }
-  }
-
   const groupOrder: Exclude<UiNodeGroup, "default">[] = [
     "profile",
     "password",
@@ -92,17 +69,17 @@
 </script>
 
 <svelte:head>
-  <title>{getPageTitle("Junction Hub", "Account settings")}</title>
+  <title>{getPageTitle($i18n.title, $i18n.pages.account.title)}</title>
 </svelte:head>
 
 <StandardLayout
-  pageTitle="Account settings"
+  pageTitle={$i18n.pages.account.title}
   pageSubTitle={$user ? `${$user.email} (${$i18n.roles[$user.role]})` : undefined}
 >
   <svelte:fragment slot="actions">
     {#if !$user}
       <Button size="small" on:click={logout}>
-        Go to login
+        {$i18n.actions.goToLogin}
         {#if $pending === "logout"}
           <LoadingIcon size="16px" />
         {/if}
@@ -116,7 +93,9 @@
 
       {#if nodes.length}
         <form on:submit|preventDefault={submit}>
-          <h2 class="typography headline-small bold">{formatGroupName(name)}</h2>
+          <h2 class="typography headline-small bold">
+            {$i18n.ory.formGroups[name]}
+          </h2>
 
           {#each [...nodes, ...(defaultGroup ?? [])] as node}
             {#if node.type === "input"}
@@ -146,7 +125,7 @@
                     ? getOnClick(node.attributes.onclick)
                     : undefined}
                 >
-                  {node.meta.label?.text ?? "Click"}
+                  {node.meta.label?.text ?? $i18n.actions.click}
 
                   {#if $pending === `${node.attributes.name}:${node.attributes.value}`}
                     <LoadingIcon />
