@@ -48,13 +48,26 @@ class PayTransactionCreator(object):
         quotation_id: str,
     ) -> transactions_models_pb2.Quotation:
         try:
-            return await self._quotations_client.get(identifier=quotation_id)
+            response = await self._quotations_client.get(identifier=quotation_id)
         except errors.NotFoundError as err:
             self._logger.exception(
                 "Failed to fetch quotation in Pay",
                 pay_quote_id=quotation_id,
             )
             raise PayTransactionCreationError from err
+
+        expected_quote_status = (
+            transactions_models_pb2.QuotationStatus.QUOTATION_STATUS_QUOTED
+        )
+        if response.status != expected_quote_status:
+            self._logger.exception(
+                "Quotation is not in a valid status",
+                pay_quote_id=response.id,
+                status=response.status,
+            )
+            raise PayTransactionCreationError
+
+        return response
 
     async def _create_transaction(
         self,

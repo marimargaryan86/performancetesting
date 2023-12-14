@@ -2,7 +2,6 @@ from unittest import mock
 
 import pytest
 
-from snowfall.project.junction.go import fixtures
 from snowfall.project.junction.go.adapter import errors
 from snowfall.project.junction.go.service.orders.pay_transactions import (
     PayTransactionCreationError,
@@ -13,7 +12,11 @@ from snowfall.project.junction.go.service.orders.v1.models_pb2 import (
     TripBooking,
     TripOption,
 )
+from snowfall.project.pay import fixtures as pay_fixtures
 from snowfall.project.pay.adapter import quotations, transactions
+from snowfall.project.pay.service.transactions.v1 import (
+    models_pb2 as transactions_models_pb2,
+)
 from snowfall.stdlib import string
 from snowfall.stdlib.logging import stdout
 
@@ -23,7 +26,7 @@ def booking() -> Booking:
     return Booking(
         id=string.uuid(),
         order_id=string.uuid(),
-        trip_option=TripOption(pay_quote_id=fixtures.QUOTATIONS[0]),
+        trip_option=TripOption(pay_quote_id=pay_fixtures.QUOTATIONS[0]),
         status=Booking.Status.STATUS_PENDING,
         provider_name="a-provider",
         total_price=None,
@@ -82,7 +85,30 @@ async def test_quotation_not_found_raises_error(
         quotations_client=quotations_client,
     )
 
-    booking.trip_option.MergeFrom(TripOption(pay_quote_id=fixtures.NOT_FOUND))
+    booking.trip_option.MergeFrom(TripOption(pay_quote_id=pay_fixtures.NOT_FOUND))
+    with pytest.raises(PayTransactionCreationError):
+        await pay_transactions.create_transaction_and_set_id(
+            booking=booking,
+        )
+
+
+async def test_quotation_not_in_quoted_status_raises_error(
+    transactions_client: transactions.Client,
+    booking: Booking,
+) -> None:
+    quotation = pay_fixtures.get_quotations()[0]
+    quotation.status = (
+        transactions_models_pb2.QuotationStatus.QUOTATION_STATUS_CONFIRMED
+    )
+
+    quotations_client = mock.create_autospec(quotations.Client)
+    quotations_client.get = mock.AsyncMock(return_value=quotation)
+    pay_transactions = PayTransactionCreator(
+        use_pay_to_create_transaction=True,
+        transactions_client=transactions_client,
+        quotations_client=quotations_client,
+    )
+
     with pytest.raises(PayTransactionCreationError):
         await pay_transactions.create_transaction_and_set_id(
             booking=booking,
@@ -113,7 +139,9 @@ async def test_update_quotation_status_failed_logs_error(
     booking: Booking,
 ) -> None:
     quotations_client = mock.create_autospec(quotations.Client)
-    quotations_client.get = mock.AsyncMock(return_value=fixtures.get_quotations()[0])
+    quotations_client.get = mock.AsyncMock(
+        return_value=pay_fixtures.get_quotations()[0],
+    )
     quotations_client.update_status = mock.AsyncMock(return_value=False)
 
     pay_transactions = PayTransactionCreator(
@@ -130,5 +158,5 @@ async def test_update_quotation_status_failed_logs_error(
         assert len(cap_logs) == 1
 
         for log in cap_logs:
-            assert log["pay_quote_id"] == fixtures.QUOTATIONS[0]
+            assert log["pay_quote_id"] == pay_fixtures.QUOTATIONS[0]
             assert log["event"] == "Failed to update quotation status in Pay"
