@@ -12,6 +12,7 @@
   import integrationInstancesClient from "integration-instances-client";
   import { getLocale, getLocaleData } from "i18n";
   import { dev } from "$app/environment";
+  import languages from "i18n/lang/languages";
 
   let expanded = true;
 
@@ -104,8 +105,9 @@
     {#if dev}
       <li>
         <select bind:value={$locale}>
-          <option value="en-GB">English (UK)</option>
-          <option value="sv-SE">Svenska</option>
+          {#each languages as language}
+            <option value={language.locale}>{language.name}</option>
+          {/each}
         </select>
       </li>
     {/if}

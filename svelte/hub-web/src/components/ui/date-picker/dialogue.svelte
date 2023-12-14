@@ -1,7 +1,7 @@
 <script lang="ts" generics="TRange extends boolean">
   /* global TRange */
+  import { getLocale } from "i18n";
   import ChevronIcon from "components/icons/chevron-icon.svelte";
-  import { monthName } from "formatting/date-time";
   import type { DateRange } from "models/date-time";
   import { scale } from "svelte/transition";
   import { addToDate, getZeroTimeDate } from "utils/date-time";
@@ -12,6 +12,8 @@
   export let range: TRange;
   export let value: TValue | undefined;
   export let span: DateRange | undefined = undefined;
+
+  const locale = getLocale();
 
   let viewingMonth = getViewingMonth();
   let month = viewingMonth.getMonth();
@@ -57,7 +59,7 @@
 <div class="dialogue" transition:scale={{ duration: 150, start: 0.8 }}>
   <div class="header">
     <div class="typography body-large bold">
-      {monthName(viewingMonth)}
+      {viewingMonth.toLocaleString($locale, { month: "long" })}
       {viewingMonth.getFullYear()}
     </div>
 

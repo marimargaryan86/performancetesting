@@ -1,5 +1,6 @@
 <script lang="ts" generics="TRange extends boolean">
   /* global TRange */
+  import { getLocale } from "i18n";
   import { createEventDispatcher } from "svelte";
   import type { DateRange } from "models/date-time";
   import { datesEq, getMonthLength, getWeekDays, getZeroTimeDate } from "utils/date-time";
@@ -14,10 +15,11 @@
 
   let dirtyValue: TDirtyValue | undefined = value;
 
+  const locale = getLocale();
   const today = getZeroTimeDate();
-  const weekDays = getWeekDays(undefined, "short");
   const dispatch = createEventDispatcher<{ select: void }>();
 
+  $: weekDays = getWeekDays($locale, "short");
   $: year = viewingMonth.getFullYear();
   $: month = viewingMonth.getMonth();
   $: paddingLeft = (new Date(year, month, 0).getDay() + 1) % 7;

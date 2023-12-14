@@ -1,5 +1,6 @@
 <script lang="ts" generics="TRange extends boolean = false">
   /* global TRange */
+  import { getLocale, type Locale } from "i18n";
   import { getRandomId } from "utils/random";
   import ChevronIcon from "components/icons/chevron-icon.svelte";
   import { clickOutside } from "directives/click-outside";
@@ -18,24 +19,30 @@
   export let error: string | string[] | boolean = false;
   export let span: DateRange | undefined = undefined;
 
+  const locale = getLocale();
+
   let expanded = false;
 
-  $: displayValue = getFormattedValue(value);
+  $: displayValue = getFormattedValue(value, $locale);
   $: value, (error = false);
 
-  function getFormattedValue(nextValue: TValue | undefined): string | undefined {
+  function getFormattedValue(
+    nextValue: TValue | undefined,
+    nextLocale: Locale,
+  ): string | undefined {
     if (!nextValue) {
       return undefined;
     }
 
     if (nextValue instanceof Date) {
-      return nextValue.toLocaleDateString("en-GB");
+      return nextValue.toLocaleDateString(nextLocale);
     }
 
     if (nextValue.from && nextValue.to) {
-      return `${nextValue.from.toLocaleDateString("en-GB")} - ${nextValue.to.toLocaleDateString(
-        "en-GB",
-      )}`;
+      return [
+        nextValue.from.toLocaleDateString(nextLocale),
+        nextValue.to.toLocaleDateString(nextLocale),
+      ].join(" - ");
     }
 
     return undefined;
