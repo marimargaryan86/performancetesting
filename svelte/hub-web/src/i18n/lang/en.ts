@@ -16,13 +16,14 @@ export default {
     logout: "Logout",
     continue: "Continue",
     cancel: "Cancel",
+    reportAnIssue: "Report an issue",
   },
   sentences: {
     priceChange: "Price change",
     priceChangeInfo:
       'We have noticed a price change; the initial price was <strong class="typography body-medium bold">{originalPrice}</strong>, and the new price is <strong class="typography body-medium bold">{newPrice}</strong>. Do you wish to continue?',
-    reportAnIssue: "Report an issue",
     areYouSure: "Are you sure?",
+    copiedToClipboard: "Copied to clipboard",
   },
   pages: {
     knowledgeHub: {

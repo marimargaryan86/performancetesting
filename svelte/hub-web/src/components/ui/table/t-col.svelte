@@ -1,14 +1,16 @@
 <script lang="ts">
   import CopyIcon from "components/icons/copy-icon.svelte";
+  import { getLocaleData } from "i18n";
 
   let className: string | undefined = undefined;
-
   export { className as class };
   export let maxWidth: string | undefined = undefined;
   export let width: string | undefined = undefined;
   export let copyable = false;
   export let copyAlign: "left" | "right" = "left";
   export let textAlign: "left" | "right" = "left";
+
+  const i18n = getLocaleData();
 
   let copyRef: HTMLButtonElement;
   let copied = false;
@@ -39,7 +41,7 @@
       on:click|stopPropagation={copy}
     >
       {#if copied}
-        Copied to clipboard
+        {$i18n.sentences.copiedToClipboard}
       {:else}
         <slot />
 

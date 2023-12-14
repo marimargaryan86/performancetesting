@@ -16,13 +16,14 @@ export default {
     logout: "Logga ut",
     continue: "Fortsätt",
     cancel: "Avbryt",
+    reportAnIssue: "Felrapportera",
   },
   sentences: {
     priceChange: "Prisändring",
     priceChangeInfo:
       'Vi har upptäckt en prisändring; ursprungspriset var <strong class="typography body-medium bold">{originalPrice}</strong> och det nya priset är <strong class="typography body-medium bold">{newPrice}</strong>. Vill du fortsätta?',
-    reportAnIssue: "Felrapportera",
     areYouSure: "Är du säker?",
+    copiedToClipboard: "Kopierad till urklipp",
   },
   pages: {
     knowledgeHub: {

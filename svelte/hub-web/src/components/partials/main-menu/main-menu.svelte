@@ -75,7 +75,7 @@
     <li>
       <a
         class="link typography body-medium"
-        title={expanded ? undefined : $i18n.sentences.reportAnIssue}
+        title={expanded ? undefined : $i18n.actions.reportAnIssue}
         href={routeConfig.routes.help.routes.customerService.root}
         class:active={activeLink === "issue"}
       >
@@ -84,7 +84,7 @@
             ? '--color-main-primary-500'
             : '--color-common-light-strong'})"
         />
-        <span>{$i18n.sentences.reportAnIssue}</span>
+        <span>{$i18n.actions.reportAnIssue}</span>
       </a>
     </li>
     <li>
