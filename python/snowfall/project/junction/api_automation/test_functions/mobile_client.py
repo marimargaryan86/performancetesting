@@ -1,4 +1,3 @@
-import dataclasses
 import json
 import logging
 from collections.abc import Mapping, Sequence
@@ -9,7 +8,6 @@ from typing import Any, Literal, TypeAlias
 import httpx
 
 from snowfall.vendor.junction.client import make_pagination_params
-from snowfall.vendor.junction.go import models
 from snowfall.vendor.junction.go.client import Client, LegType
 
 logger = logging.getLogger()
@@ -151,19 +149,6 @@ class MobileApiClient(Client):
             payload=body,
         )
 
-    async def create_order(
-        self,
-        quote_id: str,
-        passengers: Sequence[models.Passenger],
-        contact_details: models.ContactDetails,
-        residence_address: models.Address | None = None,
-        include: Sequence[_OrderIncludes] | None = None,
-    ) -> dict[str, Any]:
-        raise RuntimeError(
-            "This client cannot create orders without payments. "
-            "Please, use create_order_with_payments",
-        )
-
     async def create_offer_price_quote(
         self,
         offer_id: str,
@@ -207,62 +192,80 @@ class MobileApiClient(Client):
 
     async def create_order_with_payment(
         self,
-        quote_id: str,
-        passengers: Sequence[models.Passenger],
-        contact_details: models.ContactDetails,
-        address: models.Address,
+        passengers_dates_of_birth: Sequence[date],
+        trip_offer_price_quotes: str,
         payment_id: str,
-        voucher_id: str | None = None,
-        include: Sequence[_OrderIncludes] | None = None,
     ) -> dict[str, Any]:
-        body: dict[str, dict[str, Any]]
-        body = {
-            _DATA_KEY: {
-                _ATTRIBUTES_KEY: {
-                    _PASSENGERS_KEY: [
-                        dataclasses.asdict(
-                            passenger,
-                            dict_factory=models.dict_factory_to_camel,
-                        )
-                        for passenger in passengers
-                    ],
-                    _CONTACT_DETAILS_KEY: dataclasses.asdict(
-                        contact_details,
-                        dict_factory=models.dict_factory_to_camel,
-                    ),
-                    _ADDRESS_KEY: dataclasses.asdict(
-                        address,
-                        dict_factory=models.dict_factory_to_camel,
-                    ),
+        passengers = [
+            {
+                "firstName": "John",
+                "lastName": "Smith",
+                "title": "mr",
+                "gender": "male",
+                "dateOfBirth": dob.strftime("%Y-%m-%d"),
+                "travelerDocument": {
+                    "documentType": "passport",
+                    "documentNumber": "1543343434",
+                    "documentIssueCountry": "GB",
+                    "documentExpirationDate": "2025-02-03",
+                    "documentIssueDate": "2025-02-03",
+                    "nationality": "ES",
+                    "residenceCountryCode": "NL",
                 },
-                _RELATIONSHIPS_KEY: {
+            }
+            for dob in passengers_dates_of_birth
+        ]
+
+        body = {
+            "data": {
+                "type": "orders",
+                "attributes": {
+                    "contactDetails": {
+                        "email": "mari.m@snowfalltravel.com",
+                        "address": {
+                            "addressLines": ["Street name 7"],
+                            "countryCode": "GB",
+                            "postalCode": "12345",
+                            "city": "London",
+                        },
+                        "phoneNumber": "+37494229112",
+                    },
+                    "passengers": passengers,
+                },
+                "relationships": {
                     "payment": {
-                        _DATA_KEY: {_TYPE_KEY: "payments", _ID_KEY: payment_id},
+                        "data": {
+                            "id": payment_id,
+                            "type": "payments",
+                        },
                     },
                     "quote": {
-                        _DATA_KEY: {
-                            _TYPE_KEY: "trip-offer-price-quotes",
-                            _ID_KEY: quote_id,
+                        "data": {
+                            "id": trip_offer_price_quotes,
+                            "type": "trip-offer-price-quotes",
                         },
                     },
                 },
-                _TYPE_KEY: "orders",
             },
         }
-        if voucher_id:
-            body[_DATA_KEY][_RELATIONSHIPS_KEY]["voucher"] = {
-                _DATA_KEY: {
-                    _TYPE_KEY: "vouchers",
-                    _ID_KEY: voucher_id,
-                },
-            }
-        query_parameters: dict[str, str] = {}
-        if include:
-            query_parameters["include"] = ",".join(include)
         return await self._make_request(
             method=_METHOD_POST,
             url="/orders",
             payload=body,
+        )
+
+    async def get_order(
+        self,
+        order_id: str,
+        include: Sequence[_OrderIncludes] | None = None,
+    ) -> dict[str, Any]:
+        url = "/orders/{0}".format(order_id)
+        query_parameters = {}
+        if include:
+            query_parameters["include"] = ",".join(include)
+        return await self._make_request(
+            method=_METHOD_GET,
+            url=url,
             query_parameters=query_parameters,
         )
 

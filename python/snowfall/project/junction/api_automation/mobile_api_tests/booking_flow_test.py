@@ -2,53 +2,16 @@ import asyncio
 import datetime
 import json
 import logging
-import time
 from collections.abc import Mapping, Sequence
 from typing import Any
 
 import pytest
 
+from snowfall.project.junction.api_automation.test_functions.helper import (
+    wait_for_response,
+)
 from snowfall.project.junction.api_automation.test_functions.mobile_client import (
     MobileApiClient,
-)
-from snowfall.vendor.junction.go.models import (
-    Address,
-    ContactDetails,
-    Passenger,
-    TravelerDocument,
-)
-
-PASSENGERS = (
-    Passenger(
-        first_name="John",
-        last_name="Smith",
-        title="mr",
-        gender="male",
-        date_of_birth="1980-02-03",
-        traveler_document=TravelerDocument(
-            document_type="passport",
-            document_number="1543343434",
-            document_issue_country="GB",
-            document_expiration_date="2025-02-03",
-            nationality="ES",
-            residence_country_code="NL",
-        ),
-    ),
-    Passenger(
-        first_name="John",
-        last_name="Smith",
-        title="mr",
-        gender="male",
-        date_of_birth="1999-02-03",
-        traveler_document=TravelerDocument(
-            document_type="passport",
-            document_number="9876543211",
-            document_issue_country="GB",
-            document_expiration_date="2029-02-03",
-            nationality="ES",
-            residence_country_code="NL",
-        ),
-    ),
 )
 
 logger = logging.getLogger()
@@ -166,63 +129,6 @@ async def create_payment(
     resp = await mobile_client.create_payment(currency=currency, amount=amount)
     logger.info("Get payment data %s", json.dumps(resp, indent=4))  # noqa: WPS323
     return resp["data"]
-
-
-async def create_order(
-    mobile_client: MobileApiClient,
-    quote_id: str,
-    payment: str,
-) -> Mapping[str, Any]:
-    contact_details = ContactDetails(
-        email="john.smith@example.com",
-        phone_number="+37495878787",
-        address=Address(
-            address_lines=[
-                "Street name 7",
-            ],
-            country_code="GB",
-            postal_code="12345",
-            city="London",
-        ),
-    )
-    residence_address = Address(
-        address_lines=[
-            "Street name 7",
-        ],
-        country_code="GB",
-        postal_code="12345",
-        city="London",
-    )
-
-    order = await mobile_client.create_order_with_payment(
-        quote_id=quote_id,
-        passengers=PASSENGERS,
-        contact_details=contact_details,
-        payment_id=payment,
-        address=residence_address,
-    )
-    return order["data"]
-
-
-async def wait_for_response(
-    request_func: Any,
-    error_message: str,
-    max_wait_time_seconds: int = 60,
-    polling_interval: int = 5,
-) -> Any:
-    stopwatch = time.time()
-
-    while True:
-        response = await request_func()
-
-        if response:
-            return response
-
-        elapsed_time = time.time() - stopwatch
-        if elapsed_time <= max_wait_time_seconds:
-            await asyncio.sleep(polling_interval)
-        else:
-            raise AssertionError(error_message)
 
 
 iata_codes = [

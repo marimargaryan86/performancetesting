@@ -1,4 +1,3 @@
-import asyncio
 import logging
 from collections.abc import Mapping, Sequence
 from datetime import date, datetime
@@ -113,12 +112,37 @@ async def get_quote(
     return get_quotes["data"]
 
 
+async def create_order(
+    mobile_client: MobileApiClient,
+    trip_offer_price_quotes: str,
+    payment_id: str,
+) -> Mapping[str, Any]:
+    year = 1980
+    month = 2
+    day = 3
+    passenger_date_of_birth = [date(year, month, day)]
+
+    order = await mobile_client.create_order_with_payment(
+        passenger_date_of_birth,
+        trip_offer_price_quotes,
+        payment_id,
+    )
+    return order["data"]
+
+
+async def get_order_by_id(
+    mobile_client: MobileApiClient,
+    order_id: str,
+) -> Any:
+    return await mobile_client.get_order(order_id)
+
+
 places_pairs = [["Brussels-Midi", "Rotterdam Centraal"]]
 
 
 @pytest.mark.manually()
 @pytest.mark.parametrize("places_pairs", places_pairs)
-async def test_simple_search(  # noqa: WPS217, WPS218
+async def test_simple_search(  # noqa: WPS217, WPS218, PLR0915
     mongo_client: MongoClient[Any],
     mobile_client: MobileApiClient,
     places_pairs: Sequence[tuple[Any, Any]],
@@ -138,7 +162,6 @@ async def test_simple_search(  # noqa: WPS217, WPS218
 
     assert origin_cord, "Origin not found"
     assert destination_cord, "Destination not found"
-    await asyncio.sleep(10)
     offer_simple_search = await create_offer_simple_search(
         mobile_client,
         departure_after,
@@ -227,5 +250,25 @@ async def test_simple_search(  # noqa: WPS217, WPS218
     with allure.step("Step to Update Stripe Intent and Confirm"):
         allure.attach(
             "Payment Intent ID: {0}".format(payment_intent_id),
+            "text/plain",
+        )
+    trip_offer_price_quotes = quote_data["id"]
+    orders_data = await create_order(
+        mobile_client,
+        trip_offer_price_quotes,
+        payment_intent_id,
+    )
+    assert orders_data
+    order_id = orders_data["id"]
+    with allure.step("Step to Create Order"):
+        allure.attach(
+            "Order ID: {0}".format(order_id),
+            "text/plain",
+        )
+    order_data_by_id = await mobile_client.get_order(order_id)
+    assert order_data_by_id
+    with allure.step("Step to get order"):
+        allure.attach(
+            "Order created successfully",
             "text/plain",
         )
