@@ -1,14 +1,19 @@
 <script lang="ts">
   import SearchIcon from "components/icons/search-icon.svelte";
   import TextField from "./text-field.svelte";
+  import { getLocaleData } from "i18n";
 
+  let placeholderExt: string | undefined = undefined;
+  export { placeholderExt as placeholder };
   export let value = "";
-  export let placeholder = "Search";
   export let clearable = false;
   export let clearValue = "";
 
+  const i18n = getLocaleData();
+
   let focused = false;
 
+  $: placeholder = placeholderExt ?? $i18n.actions.search;
   $: expanded = Boolean(value.length || focused);
 
   function focus(): void {

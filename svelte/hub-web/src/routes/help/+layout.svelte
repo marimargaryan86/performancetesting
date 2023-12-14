@@ -1,8 +1,21 @@
-<script lang="ts" context="module">
-  const tabs: (Tab & { icon?: ComponentType })[] = [
+<script lang="ts">
+  import type { Tab } from "components/ui/tabs.svelte";
+  import routeConfig from "routeConfig";
+  import StandardLayout from "components/page/standard-layout.svelte";
+  import { page } from "$app/stores";
+  import type { ComponentType } from "svelte";
+  import HeadphonesIcon from "components/icons/headphones-icon.svelte";
+  import { getPageTitle } from "utils/page-title";
+  import { getLocaleData } from "i18n";
+
+  const i18n = getLocaleData();
+
+  let tabs: (Tab & { icon?: ComponentType })[];
+
+  $: tabs = [
     {
       url: routeConfig.routes.help.routes.privacyPolicy.root,
-      label: "Privacy Policy",
+      label: $i18n.pages.help.pages.privacyPolicy.title,
       exact: true,
     },
     {
@@ -22,27 +35,18 @@
       exact: true,
     },
   ];
-</script>
-
-<script lang="ts">
-  import type { Tab } from "components/ui/tabs.svelte";
-  import routeConfig from "routeConfig";
-  import StandardLayout from "components/page/standard-layout.svelte";
-  import { page } from "$app/stores";
-  import type { ComponentType } from "svelte";
-  import HeadphonesIcon from "components/icons/headphones-icon.svelte";
-  import { getPageTitle } from "utils/page-title";
-
   $: activeTab = tabs.find((item) => {
     return item.exact ? $page.url.pathname === item.url : $page.url.pathname.startsWith(item.url);
   });
 </script>
 
 <svelte:head>
-  <title>{getPageTitle("Junction Hub", "Help", activeTab?.label ?? "Unknown")}</title>
+  <title>
+    {getPageTitle($i18n.title, $i18n.pages.help.title, activeTab?.label ?? $i18n.words.unknown)}
+  </title>
 </svelte:head>
 
-<StandardLayout pageTitle="Help" {tabs} searchQuery="">
+<StandardLayout pageTitle={$i18n.pages.help.title} {tabs} searchQuery="">
   {#key $page.url.pathname}
     <div class="container">
       {#if activeTab?.icon}
