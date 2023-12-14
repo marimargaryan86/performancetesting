@@ -26,6 +26,33 @@
   "main_city": ""
 },
 {
+  "_id": "0cc58a5c-f519-5430-913c-495fb6ea6e5c",
+  "name": "Aachen-Rothe Erde",
+  "coordinates": {
+    "type": "Point",
+    "coordinates": [
+      6.1161849,
+      50.770064
+    ]
+  },
+  "time_zone": "Europe/Berlin",
+  "country_code": "DE",
+  "country_name": "Germany",
+  "updated_at": {
+    "$date": "2023-12-04T05:21:14.715Z"
+  },
+  "source_ref": "junction",
+  "types": [
+    2
+  ],
+  "no_accent_name": "Aachen-Rothe Erde",
+  "main_city": "Aachen",
+  "population": 0,
+  "local_name": "",
+  "no_accent_local_name": "",
+  "iata": ""
+},
+{
   "_id": "00014b89-ad87-5b9d-ac7d-9beb69980259",
   "name": "Green",
   "coordinates": {

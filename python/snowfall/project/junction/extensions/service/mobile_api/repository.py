@@ -87,7 +87,7 @@ class PlacesRepository(
         # Strip non-alphanumeric characters for improved search results.
         # This also means that re.escape() is not needed to make this safe.
         search_keys = [
-            re.sub(r"[^\w ]", "", key.strip()) for key in search_key.split(",")
+            re.sub(r"[^\w\- ]", "", key.strip()) for key in search_key.split(",")
         ]
         name_regex = compile_regex(search_keys[0])
         if len(search_keys) > 1:
