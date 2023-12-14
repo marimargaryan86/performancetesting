@@ -26,10 +26,6 @@ variable "count" {
   type = number
 }
 
-variable "consul_api_base_url" {
-  type = string
-}
-
 job "junction-go-resellers-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -118,6 +114,7 @@ job "junction-go-resellers-grpc" {
         data        = <<EOH
 COMPANIES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_companies-${var.environment}"))}}
 CURRENCIES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_currencies-${var.environment}"))}}
+CONSUL_API_BASE_URL={{(printf "http://%s:8500" (env "NOMAD_IP_grpc"))}}
 MONGO_DSN={{range $index, $service := service (printf "mongodb-%s" (env "NOMAD_NAMESPACE"))}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 {{ with secret "kv/data/${var.environment}/resellers" }}
 CONSUL_API_TOKEN={{ .Data.data.consul_api_token }}
@@ -140,12 +137,11 @@ EOH
       }
 
       env {
-        ENV_NAME            = "${var.environment}"
-        GRPC_ADDRESS        = "0.0.0.0"
-        GRPC_PORT           = "${NOMAD_PORT_grpc}"
-        SENTRY_DSN          = "https://c3515035e9204278a58312ed58fc6a89@sentry.snowfall.se/168"
-        PROMETHEUS_PORT     = "${NOMAD_PORT_prometheus}"
-        CONSUL_API_BASE_URL = "${var.consul_api_base_url}"
+        ENV_NAME        = "${var.environment}"
+        GRPC_ADDRESS    = "0.0.0.0"
+        GRPC_PORT       = "${NOMAD_PORT_grpc}"
+        SENTRY_DSN      = "https://c3515035e9204278a58312ed58fc6a89@sentry.snowfall.se/168"
+        PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
       }
     }
   }
