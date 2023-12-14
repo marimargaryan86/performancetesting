@@ -6,12 +6,14 @@
   import Backdrop from "../backdrop.svelte";
   import { formatAmount } from "formatting/currency";
   import type { Price } from "integration/common/schemas/price";
+  import { getLocaleData } from "i18n";
 
   export let originalPrice: Price;
   export let newPrice: Price;
 
   let backdrop: Backdrop | undefined = undefined;
 
+  const i18n = getLocaleData();
   const dispatch = createEventDispatcher<{ cancel: void }>();
 
   function close(): void {
@@ -42,19 +44,22 @@
   >
     <AlertIcon color="var(--color-semantic-error-500)" size="64px" variant="disc" />
 
-    <h1 class="typography bold display-small title">Price change</h1>
+    <h1 class="typography bold display-small title">{$i18n.sentences.priceChange}</h1>
 
     <p class="typography body-medium">
-      We have noticed a price change; the initial price was
-      <strong class="typography body-medium bold">{formatAmount(originalPrice, true)}</strong>, and
-      the new price is
-      <strong class="typography body-medium bold">{formatAmount(newPrice, true)}</strong>. Do you
-      wish to continue?
+      <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+      {@html $i18n.sentences.priceChangeInfo
+        .replace("{originalPrice}", formatAmount(originalPrice, true))
+        .replace("{newPrice}", formatAmount(newPrice, true))}
     </p>
 
     <div class="actions">
-      <Button size="small" on:click={close}>Continue</Button>
-      <Button size="small" variant="outline" on:click={cancel} minWidth="80px">Cancel</Button>
+      <Button size="small" on:click={close}>
+        {$i18n.actions.continue}
+      </Button>
+      <Button size="small" variant="outline" on:click={cancel} minWidth="80px">
+        {$i18n.actions.cancel}
+      </Button>
     </div>
   </div>
 </Backdrop>

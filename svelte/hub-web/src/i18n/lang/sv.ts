@@ -8,13 +8,21 @@ export default {
     "snowfall-user": "Snowfall",
   },
   words: {
+    yes: "Ja",
+    no: "Nej",
     help: "Hjälp",
   },
   actions: {
     logout: "Logga ut",
+    continue: "Fortsätt",
+    cancel: "Avbryt",
   },
   sentences: {
+    priceChange: "Prisändring",
+    priceChangeInfo:
+      'Vi har upptäckt en prisändring; ursprungspriset var <strong class="typography body-medium bold">{originalPrice}</strong> och det nya priset är <strong class="typography body-medium bold">{newPrice}</strong>. Vill du fortsätta?',
     reportAnIssue: "Felrapportera",
+    areYouSure: "Är du säker?",
   },
   pages: {
     knowledgeHub: {

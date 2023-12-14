@@ -8,13 +8,21 @@ export default {
     "snowfall-user": "Snowfall user",
   } satisfies Record<UserRole, string>,
   words: {
+    yes: "Yes",
+    no: "No",
     help: "Help",
   },
   actions: {
     logout: "Logout",
+    continue: "Continue",
+    cancel: "Cancel",
   },
   sentences: {
+    priceChange: "Price change",
+    priceChangeInfo:
+      'We have noticed a price change; the initial price was <strong class="typography body-medium bold">{originalPrice}</strong>, and the new price is <strong class="typography body-medium bold">{newPrice}</strong>. Do you wish to continue?',
     reportAnIssue: "Report an issue",
+    areYouSure: "Are you sure?",
   },
   pages: {
     knowledgeHub: {
