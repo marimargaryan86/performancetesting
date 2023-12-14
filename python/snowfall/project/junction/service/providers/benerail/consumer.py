@@ -26,7 +26,7 @@ from snowfall.project.junction.service.providers.benerail import (
 from snowfall.project.junction.service.providers.benerail.v1 import (
     amqp_pb2 as br_amqp_pb2,
 )
-from snowfall.stdlib import h3, money
+from snowfall.stdlib import h3, money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence import filesystem
@@ -166,8 +166,13 @@ class PriceQuoteConsumer(object):
         if not offer_details:
             return
 
+        session_token = string.uuid()
+
         try:
-            get_offer_res = await self._adapter.find_offer(offer_details)
+            get_offer_res = await self._adapter.find_offer(
+                offer_details=offer_details,
+                session_token=session_token,
+            )
         except adapter.OfferNotFoundError as ex:
             self._logger.exception(
                 "Failed to match offer",
@@ -203,7 +208,7 @@ class PriceQuoteConsumer(object):
                 dialogue_id=get_offer_res.dialogue_info.identifier,
                 passengers_info=get_offer_res.passengers_info,
                 departure_at=get_offer_res.departure_at,
-                session_token=offer_details.session_token,
+                session_token=session_token,
             ),
             expires_at,
         )

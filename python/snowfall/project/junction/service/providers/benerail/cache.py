@@ -18,7 +18,6 @@ class OfferDetails(RedisRecord):
     trip_id: str
     comfort_class_value: str
     flexibility_value: str
-    session_token: str | None = None
 
 
 class BookingOfferDetails(RedisRecord):

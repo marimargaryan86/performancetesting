@@ -128,6 +128,7 @@ class BenerailAdapter(object):
     async def find_offer(
         self,
         offer_details: cache.OfferDetails,
+        session_token: str | None = None,
     ) -> GetOfferResponse:
         trip_offer_responses_with_passengers = await self._get_trip_offer_responses_with_passengers(
             _TripOfferResponsesWithPassengersCriterion(
@@ -135,7 +136,7 @@ class BenerailAdapter(object):
                 destination=offer_details.destination_station,
                 outbound_departure_datetime=offer_details.outbound_departure_datetime,
                 passenger_dobs=offer_details.passengers_dobs,
-                session_token=offer_details.session_token,
+                session_token=session_token,
             ),
         )
 
@@ -154,7 +155,7 @@ class BenerailAdapter(object):
                 offer_ref.identifier
                 for offer_ref in trip_offer_obj.response_result.offers
             ],
-            session_token=offer_details.session_token,
+            session_token=session_token,
         )
 
         for offer_obj in offers:
@@ -520,7 +521,6 @@ class BenerailOffersAdapter(BenerailAdapter):
                         flexibility_value=(
                             offer_map[offer_id].flexibility.flexibility_value
                         ),
-                        session_token=search_task.session_token,
                     ),
                     expires_at=expires_at_dt,
                     key=offer_model.id,
