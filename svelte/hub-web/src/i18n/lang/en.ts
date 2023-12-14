@@ -1,4 +1,12 @@
+import type { UserRole } from "integration/ory/schemas/authentication";
+
 export default {
+  roles: {
+    "reseller-admin": "Reseller admin",
+    "reseller-user": "Reseller user",
+    "snowfall-admin": "Snowfall admin",
+    "snowfall-user": "Snowfall user",
+  } satisfies Record<UserRole, string>,
   words: {
     help: "Help",
   },

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { formatRole } from "formatting/user";
+  import { getLocaleData } from "i18n";
   import md5 from "md5";
   import routeConfig from "routeConfig";
   import { getUser } from "utils/permissions";
@@ -7,6 +7,7 @@
   export let transitionTimeMs: number;
   export let expanded: boolean;
 
+  const i18n = getLocaleData();
   const user = getUser();
 
   $: gravatarHash = md5($user.email.trim().toLowerCase());
@@ -19,7 +20,7 @@
 
   <div class="info">
     <strong class="typography body-small bold">{$user.email}</strong>
-    <span class="typography body-small">{formatRole($user.role)}</span>
+    <span class="typography body-small">{$i18n.roles[$user.role]}</span>
   </div>
 </div>
 

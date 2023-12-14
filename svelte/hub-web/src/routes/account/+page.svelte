@@ -42,15 +42,16 @@
   import StandardLayout from "components/page/standard-layout.svelte";
   import Button from "components/ui/button.svelte";
   import TextField from "components/ui/text-field.svelte";
-  import { formatRole } from "formatting/user";
   import { writable } from "svelte/store";
   import integrationInstancesClient from "integration-instances-client";
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import { getPageTitle } from "utils/page-title";
   import { getUser } from "utils/permissions";
+  import { getLocaleData } from "i18n";
 
   export let data;
 
+  const i18n = getLocaleData();
   const user = getUser();
   const pending = writable<string | undefined>();
 
@@ -96,7 +97,7 @@
 
 <StandardLayout
   pageTitle="Account settings"
-  pageSubTitle={$user ? `${$user.email} (${formatRole($user.role)})` : undefined}
+  pageSubTitle={$user ? `${$user.email} (${$i18n.roles[$user.role]})` : undefined}
 >
   <svelte:fragment slot="actions">
     {#if !$user}
