@@ -2,6 +2,9 @@ import datetime
 from pathlib import Path
 
 from snowfall.project.pay.service.transactions import smtp
+from snowfall.project.pay.service.transactions.generate_cancellation_csv import (
+    CSVGeneratorCancellation,
+)
 from snowfall.project.pay.service.transactions.generate_csv import CSVGenerator
 from snowfall.stdlib.persistence import filesystem
 
@@ -11,7 +14,7 @@ class NetsuiteReportJob(object):
         self,
         email_client: smtp.EmailClient,
         storage: filesystem.Storage,
-        csv_reporter: CSVGenerator,
+        csv_reporter: CSVGenerator | CSVGeneratorCancellation,
         previous_days: int,
     ) -> None:
         self._email_client = email_client
@@ -26,9 +29,9 @@ class NetsuiteReportJob(object):
             start_date,
             end_date,
         )
-        file_name = "netsuite_export_{0}.csv".format(end_date.strftime("%d-%m-%Y"))
         await self._email_client.send_email(
-            subject="NetSuite export from pay: {0} - {1}".format(
+            subject="{0}: {1} - {2}".format(
+                self._csv_reporter.report_subject(),
                 start_date.strftime("%d/%m/%Y"),
                 end_date.strftime("%d/%m/%Y"),
             ),
@@ -37,10 +40,10 @@ class NetsuiteReportJob(object):
                 payload=csv_data or "",
                 main_type="text",
                 sub_type="csv",
-                file_name=file_name,
+                file_name=self._csv_reporter.report_name(end_date),
             ),
         )
         await self._storage.put(
-            path=Path("{0}".format(file_name)),
+            path=Path(self._csv_reporter.report_name(end_date)),
             file_contents=(csv_data or "").encode(),
         )

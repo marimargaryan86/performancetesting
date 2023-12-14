@@ -99,6 +99,104 @@ def extract_data(
             csv_data[field] = value_func(db_model)
 
 
+def _order_dict(orders: Sequence[str], _dict: Mapping[str, str]) -> Mapping[str, str]:
+    return {_key: _dict[_key] for _key in orders}
+
+
+_orders = [
+    "Date Booked",
+    "Booking Departure Date",
+    "Base Fare in reseller currency",
+    "Sales Fee",
+    "FX Fee",
+    "Acquiring Fee",
+    "Total Fees",
+    "Offer Without Tax",
+    "Tax in Reseller currency",
+    "Reseller Owes Snowfall",
+    "Reseller Name",
+    "Snowfall Owes Provider",
+    "Provider Name",
+    "Provider Reference",
+    "GO Booking ID",
+    "GO Order ID",
+    "GO SPNR",
+    "Payment Method",
+    "Payment Type",
+    "Sales Fee Percentage",
+    "FX Fee Percentage",
+    "Acquiring Fee Percentage",
+]
+
+
+_transaction_header = {
+    "Date Booked": partial(_get_value, key="created_at"),
+    "Base Fare in reseller currency": partial(
+        convert_amount_to_string,
+        key="amounts.base_converted",
+    ),
+    "Sales Fee": partial(
+        convert_amount_to_string,
+        key="amounts.sales_margin",
+    ),
+    "FX Fee": partial(
+        convert_amount_to_string,
+        key="amounts.fx_margin",
+    ),
+    "Acquiring Fee": partial(
+        convert_amount_to_string,
+        key="amounts.processing_margin",
+    ),
+    "Total Fees": partial(
+        convert_amount_to_string,
+        key="amounts.total_markups",
+    ),
+    "Offer Without Tax": partial(
+        convert_amount_to_string,
+        key="amounts.quotation",
+    ),
+    "Tax in Reseller currency": partial(
+        convert_amount_to_string,
+        key="amounts.tax_converted",
+    ),
+    "Reseller Owes Snowfall": partial(
+        convert_amount_to_string,
+        key="amounts.total_amount",
+    ),
+    "Snowfall Owes Provider": partial(
+        convert_amount_to_string,
+        key="amounts.beneficiary",
+    ),
+    # TODO: add Fixed Fee
+    "Provider Reference": partial(_get_value, key="invoice_reference_id"),
+    "GO Booking ID": partial(_get_value, key="external_reference_id"),
+    "Payment Method": partial(_get_value, key="payment_method"),
+    "Payment Type": partial(_get_value, key="payment_type"),
+    "Sales Fee Percentage": partial(_get_value, key="rates.fx_markup"),
+    "FX Fee Percentage": partial(_get_value, key="rates.sales_markup"),
+    "Acquiring Fee Percentage": partial(
+        _get_value,
+        key="rates.processing_markup",
+    ),
+}
+_bookings_headers = {
+    "GO Order ID": partial(_get_value, key="order_id"),
+    "Booking Departure Date": partial(
+        _get_value,
+        key="trip_option.details.0.segment.legs.0.departure_at",
+    ),
+}
+_journeys_headers = {
+    "GO SPNR": partial(_get_value, key="passenger_name_record"),
+}
+_reseller_headers = {
+    "Reseller Name": partial(_get_value, key="name"),
+}
+_company_headers = {
+    "Provider Name": partial(_get_value, key="name"),
+}
+
+
 class CSVGenerator(object):
     def __init__(
         self,
@@ -107,72 +205,6 @@ class CSVGenerator(object):
         resellers_client: resellers_adapter.GrpcClient,
         companies_client: companies_adapter.GrpcClient,
     ):
-        self._transaction_header = {
-            "Date Booked": partial(_get_value, key="created_at"),
-            "Base Fare in reseller currency": partial(
-                convert_amount_to_string,
-                key="amounts.base_converted",
-            ),
-            "Sales Fee": partial(
-                convert_amount_to_string,
-                key="amounts.sales_margin",
-            ),
-            "FX Fee": partial(
-                convert_amount_to_string,
-                key="amounts.fx_margin",
-            ),
-            "Acquiring Fee": partial(
-                convert_amount_to_string,
-                key="amounts.processing_margin",
-            ),
-            "Total Fees": partial(
-                convert_amount_to_string,
-                key="amounts.total_markups",
-            ),
-            "Offer Without Tax": partial(
-                convert_amount_to_string,
-                key="amounts.quotation",
-            ),
-            "Tax in Reseller currency": partial(
-                convert_amount_to_string,
-                key="amounts.tax_converted",
-            ),
-            "Reseller Owes Snowfall": partial(
-                convert_amount_to_string,
-                key="amounts.total_amount",
-            ),
-            "Snowfall Owes Provider": partial(
-                convert_amount_to_string,
-                key="amounts.beneficiary",
-            ),
-            # TODO: Fixed Fee
-            "Provider Reference": partial(_get_value, key="invoice_reference_id"),
-            "GO Booking ID": partial(_get_value, key="external_reference_id"),
-            "Payment Method": partial(_get_value, key="payment_method"),
-            "Payment Type": partial(_get_value, key="payment_type"),
-            "Sales Fee Percentage": partial(_get_value, key="rates.fx_markup"),
-            "FX Fee Percentage": partial(_get_value, key="rates.sales_markup"),
-            "Acquiring Fee Percentage": partial(
-                _get_value,
-                key="rates.processing_markup",
-            ),
-        }
-        self._bookings_headers = {
-            "GO Order ID": partial(_get_value, key="order_id"),
-            "Booking Departure Date": partial(
-                _get_value,
-                key="trip_option.details.0.segment.legs.0.departure_at",
-            ),
-        }
-        self._journeys_headers = {
-            "GO SPNR": partial(_get_value, key="passenger_name_record"),
-        }
-        self._reseller_headers = {
-            "Reseller Name": partial(_get_value, key="name"),
-        }
-        self._company_headers = {
-            "Provider Name": partial(_get_value, key="name"),
-        }
         self._transactions = transactions_repository
         self._orders_client = orders_client
         self._resellers_client = resellers_client
@@ -189,6 +221,14 @@ class CSVGenerator(object):
         )
         logger.info("Report is ready")
         return pd.DataFrame(csv_data).to_csv()
+
+    def report_name(self, current_date: datetime.datetime) -> str:
+        return "netsuite_exports_{0}.csv".format(
+            current_date.strftime("%d-%m-%Y"),
+        )
+
+    def report_subject(self) -> str:
+        return "NetSuite export from pay"
 
     async def _get_csv_data(  # noqa: WPS217
         self,
@@ -285,12 +325,12 @@ class CSVGenerator(object):
 
             row_data: dict[str, str] = {}
 
-            extract_data(self._transaction_header, transaction, row_data)
-            extract_data(self._bookings_headers, booking, row_data)
-            extract_data(self._company_headers, company, row_data)
-            extract_data(self._journeys_headers, journey, row_data)
-            extract_data(self._reseller_headers, reseller, row_data)
+            extract_data(_transaction_header, transaction, row_data)
+            extract_data(_bookings_headers, booking, row_data)
+            extract_data(_company_headers, company, row_data)
+            extract_data(_journeys_headers, journey, row_data)
+            extract_data(_reseller_headers, reseller, row_data)
 
-            csv_data.append(row_data)
+            csv_data.append(_order_dict(_orders, row_data))
 
         return csv_data

@@ -138,6 +138,14 @@ class CSVGeneratorCancellation(object):
         logger.info("Report is ready")
         return pd.DataFrame(csv_data).to_csv()
 
+    def report_name(self, current_date: datetime.datetime) -> str:
+        return "netsuite_cancellation_exports_{0}.csv".format(
+            current_date.strftime("%d-%m-%Y"),
+        )
+
+    def report_subject(self) -> str:
+        return "NetSuite cancellation export from pay"
+
     async def _get_csv_data(
         self,
         from_date: datetime.datetime | None = None,
