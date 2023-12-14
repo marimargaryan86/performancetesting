@@ -21,7 +21,7 @@
     | "mixed"
     | "unknown";
 
-  const statusMapping: Record<StatusBadgeValue, StatusBadgeVariant> = {
+  const statusMapping = {
     confirmed: "ok",
     completed: "ok",
     executed: "ok",
@@ -41,7 +41,7 @@
     cancelled: "warn",
     unspecified: "warn",
     unknown: "warn",
-  };
+  } satisfies Record<StatusBadgeValue, StatusBadgeVariant>;
 </script>
 
 <script lang="ts">
@@ -49,7 +49,7 @@
 
   export let value: StatusBadgeValue;
 
-  $: variant = statusMapping[value] ?? "ok";
+  $: variant = statusMapping[value];
 </script>
 
 <span
