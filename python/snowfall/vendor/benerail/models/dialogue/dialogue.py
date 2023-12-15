@@ -31,11 +31,15 @@ class DialogueIdTripOfferFiltersReturnTripParams(BenerailBaseModel):
     outward_offer_id: str | None = None
 
 
+class MarketSegment(BenerailBaseModel):
+    code: str | None = Field(None, example="urn:bnds:market_segment_preference:PRF_RIT")
+
+
 class DialogueIdTripofferfiltersBody(BenerailBaseModel):
     trip_filter_id: str | None = None
     passengers: list[str] | None = Field(None, description="array of passengerId's.")
     return_trip_params: DialogueIdTripOfferFiltersReturnTripParams | None = None
-    market_segment: str | None = None
+    market_segment: MarketSegment | None = None
     requested_offer_parts: RequestedOfferParts | None = None
 
 

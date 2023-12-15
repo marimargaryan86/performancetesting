@@ -34,6 +34,7 @@ from snowfall.vendor.benerail.models.trip_offers import response as t_o_response
 from snowfall.vendor.benerail.models.trips import trips
 
 _NON_BOOKABLE_STATES = frozenset(("NOT_BOOKABLE_NO_SERVICE", "NOT_BOOKABLE_NO_PAST"))
+_BENERAIL_PUBLIC_FARES_CODE = "urn:bnds:market_segment_preference:REQ_PUBLIC"
 
 
 class OfferNotFoundError(Exception):
@@ -205,6 +206,7 @@ class BenerailAdapter(object):
                     pax_info.identifier
                     for pax_info in trip_filter_creation.create_passengers_response.passengers_info
                 ],
+                market_segment=dialogue.MarketSegment(code=_BENERAIL_PUBLIC_FARES_CODE),
             ),
             session_token=criterion.session_token,
         )
