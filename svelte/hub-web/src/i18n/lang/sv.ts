@@ -125,6 +125,65 @@ export default {
             },
           ],
         },
+        termsAndConditions: {
+          title: "Villkor",
+          content: [
+            { type: "h2", html: "Användarvillkor för bokning" },
+            {
+              type: "p",
+              html: 'Dessa bokningsvillkor (”Villkoren”) gäller för bokningar gjorda via Junctions onlineklientportal (”Bokningshubben”) som ägs och drivs av Snowfall Limited, ett företag registrerat i England (företagsnummer: 12356236, 10-12 East Parade, Leeds, West Yorkshire, LS1 2BH). Bokningshubben tillhandahålls för att hjälpa till att göra bokningar och/eller på annat sätt göra transaktioner med reseleverantörer. Denna tjänst erbjuds till dig, agenten, under förutsättning att du godkänner, utan ändringar, av alla villkor, villkor och meddelanden som gemensamt anges i dessa villkor, användarvillkoren för Junction Client Booking Hub och villkoren för Snowfall Travel-webbplatsen för Användning och integritetspolicyn (sammantaget "avtalet"). När du gör en bokning via Booking Hub samtycker du till att vara bunden av detta avtal. Dessa villkor kompletterar villkoren för alla avtal som du kan ha med oss, men endast med avseende på bokningar som underlättas genom bokningshubben. I händelse av en direkt konflikt mellan dessa villkor och andra avtal som du kan ha med oss, kommer dessa villkor att styra informationen om bokningen. Termen "Du" hänvisar till kundtjänstagenten som gör bokningen för slutkundens räkning.',
+            },
+            {
+              type: "p",
+              html: "Läs avtalet noggrant. Vi förbehåller oss rätten att när som helst, efter eget gottfinnande, ändra eller på annat sätt modifiera avtalet utan föregående meddelande.",
+            },
+            { type: "h2", html: "Användarvillkor" },
+            {
+              type: "p",
+              html: "Som ett villkor för din användning av bokningshubben garanterar du att (i) du är minst 18 år gammal; (ii) Du har den juridiska behörigheten att skapa en bindande rättslig förpliktelse; (iii) Du kommer att använda bokningshubben för att endast boka i enlighet med tillämpliga villkor och policyer; (iv) Du kommer endast att använda bokningscentralen för att göra reservationer för en annan person för vilken du är juridiskt behörig att agera; (v) Du kommer att informera sådana andra personer om de villkor och villkor som gäller för de reservationer du har gjort för deras räkning, inklusive alla regler och begränsningar som är tillämpliga på dem; (vi) all information som tillhandahålls av dig på bokningshubben är sann, korrekt, aktuell och fullständig, och (vii) om du har ett konto kommer du att skydda din kontoinformation och kommer att övervaka och vara helt ansvarig för all användning av ditt konto av dig och någon annan än dig. Vi förbehåller oss rätten att efter eget gottfinnande neka någon åtkomst till bokningshubben och de tjänster vi erbjuder, när som helst och av vilken anledning som helst, inklusive, men inte begränsat till, för brott mot dessa villkor.",
+            },
+            { type: "h2", html: "Förbjudna aktiviteter" },
+            {
+              type: "p",
+              html: "The content and information on the Booking Hub (including, but not limited to, price and availability of travel services), as well as the infrastructure used to provide such content and information, is proprietary to us or our suppliers and providers. You agree not to: make any speculative, false, or fraudulent reservation or any reservation in anticipation of demand; access, monitor or copy any content or information of this Website using any robot, spider, scraper or other automated means or any manual process for any purpose without our express written permission; violate the restrictions in any robot exclusion headers on this Website or bypass or circumvent other measures employed to prevent or limit access to this Website; take any action that imposes, or may impose, in our discretion, an unreasonable or disproportionately large load on our infrastructure; deep-link to any portion of this Website (including, without limitation, the purchase path for any travel services) for any purpose without our express written permission; or “frame”, “mirror” or otherwise incorporate any part of the Booking Hub into any other Website without our prior written authorisation.",
+            },
+            { type: "h2", html: "Bedrägeri" },
+            {
+              type: "p",
+              html: "Om ett konto visar upprepade tecken på bedrägeri, missbruk, umgänge med en statligt sanktionerad person eller enhet eller annan misstänkt aktivitet kan vi begära extra information från dig.",
+            },
+            {
+              type: "p",
+              html: "Efter granskning av den informationen och om vi rimligen drar slutsatsen att en bokning eller ett konto är associerat med misstänkt aktivitet, kan vi:",
+            },
+            {
+              type: "ul",
+              items: [
+                "- Avbryt alla bokningar som är kopplade till ditt namn, din e-postadress eller ditt konto;",
+                "- Stäng alla associerade konton;",
+                "- Vidta rättsliga åtgärder, inklusive att försöka hålla dig ansvarig för eventuell förlust.",
+              ],
+            },
+            {
+              type: "p",
+              html: "Vänligen kontakta oss om annullering av en bokning eller stängning av ett konto om du tror att ett misstag har inträffat.",
+            },
+            { type: "h2", html: "Göra resebokningar" },
+            {
+              type: "p",
+              html: "Alla resetjänster som du kan hitta och/eller boka via Booking Hub tillhandahålls av tredjepartsleverantörer. Vi är inte ansvariga och har inget ansvar gentemot dig eller slutkunden med avseende på sådana bokningar. Identiteten för den relevanta reseleverantören och de villkor som styr och gäller för bokningen kommer att meddelas dig vid bokningstillfället och du bör se till att du läser och förstår dem till fullo innan du slutför bokningen och kommunicerar dem till slutkund. Du bekräftar att ett brott mot villkoren som meddelats Dig av reseleverantören kan resultera i annullering av biljetter, avbokning av hotellbokningar etc. och medföra ytterligare avgifter för slutkunden.",
+            },
+            { type: "h2", html: "Begränsningar och undantag från ansvar" },
+            {
+              type: "p",
+              html: "När vi driver bokningshubben underlättar vi endast bokningar med tredje part och tar inget ansvar för att tillhandahålla några resealternativ som visas på bokningshubben eller för arrangemang som gjorts med någon tredje part på uppdrag av slutkunden som ett resultat av användningen av Bokningsnav. Eventuella problem och/eller skillnader som kan uppstå med bokning(ar) måste lösas med relevant reseleverantör. I den maximala utsträckning som lagen tillåter, accepterar vi inget ansvar för eventuella felaktigheter eller utelämnanden i innehållet som visas på eller via bokningshubben eller någon Guds handling, olycka, förseningar eller någon speciell, exemplarisk, straffbar, indirekt, tillfällig eller följdförlust eller skada av något slag (inklusive, utan begränsning, förlorad vinst eller förlorade besparingar), oavsett om de är baserade på kontrakt, skadestånd (inklusive vårdslöshet), strikt ansvar eller annat, som ådras dig eller slutkunden till följd av eller i samband med Din åtkomst till, användning av eller oförmåga att få tillgång till eller användning av bokningshubben eller något innehåll som finns däri.",
+            },
+            {
+              type: "p",
+              html: "Vårt maximala samlade ansvar gentemot dig och/eller slutkunden som härrör från eller i samband med dessa villkor eller din tillgång till, användning av eller oförmåga att få tillgång till eller använda, bokningshubben ska begränsas till den maximala omfattning som tillåts av lag. De nuvarande villkoren tillhandahåller hela omfattningen av våra skyldigheter och ansvar med avseende på bokningshubben. Ingenting i dessa villkor ska begränsa eller utesluta (a) vårt ansvar med avseende på dödsfall eller personskada orsakad av vår vårdslöshet eller för vårt bedrägeri eller bedrägliga felaktiga framställningar; (b) något annat ansvar som inte kan uteslutas enligt lag; eller (c) slutkundens lagstadgade rättigheter.",
+            },
+          ],
+        },
       },
     },
     account: {

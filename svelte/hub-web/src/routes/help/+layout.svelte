@@ -20,7 +20,7 @@
     },
     {
       url: routeConfig.routes.help.routes.termsAndConditions.root,
-      label: "Terms and Conditions",
+      label: $i18n.pages.help.pages.termsAndConditions.title,
       exact: true,
     },
     {
