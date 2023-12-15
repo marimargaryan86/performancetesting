@@ -184,6 +184,19 @@ export default {
             },
           ],
         },
+        customerService: {
+          title: "Kundtjänst",
+          content: [
+            {
+              type: "p",
+              html: "Kontakta oss med din begäran om specialiserad hjälp",
+            },
+            {
+              type: "p",
+              html: '<a href="mailto:support@snowfalltravel.com?subject=GG%20-%20">support@snowfalltravel.com</a>',
+            },
+          ],
+        },
       },
     },
     account: {

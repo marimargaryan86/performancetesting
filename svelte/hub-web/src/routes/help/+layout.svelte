@@ -26,7 +26,7 @@
     {
       icon: HeadphonesIcon,
       url: routeConfig.routes.help.routes.customerService.root,
-      label: "Customer Service",
+      label: $i18n.pages.help.pages.customerService.title,
       exact: true,
     },
     {

@@ -192,6 +192,19 @@ export default {
             },
           ] satisfies ContentElement[],
         },
+        customerService: {
+          title: "Customer Service",
+          content: [
+            {
+              type: "p",
+              html: "Contact us with your request for specialised assistance",
+            },
+            {
+              type: "p",
+              html: '<a href="mailto:support@snowfalltravel.com?subject=GG%20-%20">support@snowfalltravel.com</a>',
+            },
+          ] satisfies ContentElement[],
+        },
       },
     },
     knowledgeHub: {

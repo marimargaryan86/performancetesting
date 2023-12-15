@@ -1,16 +1,27 @@
-<p>Contact us with your request for specialised assistance</p>
+<script lang="ts">
+  import { getLocaleData } from "i18n";
 
-<div class="wrapper">
-  <a href="mailto:support@snowfalltravel.com?subject=GG%20-%20">support@snowfalltravel.com</a>
+  const i18n = getLocaleData();
+</script>
+
+<div>
+  {#each $i18n.pages.help.pages.customerService.content as element}
+    {#if element.type === "p"}
+      <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+      {@html element.html}
+    {/if}
+  {/each}
 </div>
 
 <style>
-  a {
-    color: var(--color-common-light-text-link);
-    text-decoration: none;
+  div {
+    display: flex;
+    flex-flow: column;
+    gap: 16px;
   }
 
-  .wrapper {
-    padding: 1rem 0;
+  div :global(a) {
+    color: var(--color-common-light-text-link);
+    text-decoration: none;
   }
 </style>
