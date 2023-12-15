@@ -31,7 +31,7 @@
     },
     {
       url: routeConfig.routes.help.routes.conditionsOfCarriage.root,
-      label: "Conditions of Carriage",
+      label: $i18n.pages.help.pages.conditionsOfCarriage.title,
       exact: true,
     },
   ];

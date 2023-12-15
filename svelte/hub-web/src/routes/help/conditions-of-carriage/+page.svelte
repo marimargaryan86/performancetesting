@@ -69,12 +69,18 @@
   ];
 </script>
 
+<script lang="ts">
+  import { getLocaleData } from "i18n";
+
+  const i18n = getLocaleData();
+</script>
+
 <div>
-  <p>
-    Train operator conditions Your booking of train tickets / rail passes is subject to the
-    transportation terms and conditions of one or more rail operators. Please select and view the
-    carrier conditions applicable to your trip.
-  </p>
+  {#each $i18n.pages.help.pages.conditionsOfCarriage.content as element}
+    {#if element.type === "p"}
+      <p>{element.html}</p>
+    {/if}
+  {/each}
 
   <ul>
     {#each railServices as service}

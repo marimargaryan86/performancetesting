@@ -205,6 +205,15 @@ export default {
             },
           ] satisfies ContentElement[],
         },
+        conditionsOfCarriage: {
+          title: "Conditions of Carriage",
+          content: [
+            {
+              type: "p",
+              html: "Train operator conditions. Your booking of train tickets/ rail passes is subject to the transportation terms and conditions of one or more rail operators. Please select and view the carrier conditions applicable to your trip.",
+            },
+          ] satisfies ContentElement[],
+        },
       },
     },
     knowledgeHub: {

@@ -197,6 +197,15 @@ export default {
             },
           ],
         },
+        conditionsOfCarriage: {
+          title: "Transportvillkor",
+          content: [
+            {
+              type: "p",
+              html: "Tågoperatörsvillkor. Din bokning av tågbiljetter/tågkort är föremål för transportvillkoren för en eller flera järnvägsoperatörer. Vänligen välj och se de transportvillkor som gäller för din resa.",
+            },
+          ],
+        },
       },
     },
     account: {
