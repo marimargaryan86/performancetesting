@@ -140,7 +140,7 @@ async def get_order_by_id(
 places_pairs = [["Brussels-Midi", "Rotterdam Centraal"]]
 
 
-@pytest.mark.manually()
+@pytest.mark.integration()
 @pytest.mark.parametrize("places_pairs", places_pairs)
 async def test_simple_search(  # noqa: WPS217, WPS218, PLR0915
     mongo_client: MongoClient[Any],
@@ -187,14 +187,14 @@ async def test_simple_search(  # noqa: WPS217, WPS218, PLR0915
     assert offer_search_data
     with allure.step("Step to Get offers searches and validate status"):
         allure.attach(
-            "Offer status is complited",
+            "Offer status is completed",
             "text/plain",
         )
     offers_list = await get_offer_list_simple_search(
         mobile_client,
         offer_id_simple_search,
     )
-
+    assert "included" in offers_list
     offer_included = offers_list["included"]
     assert offer_included
     offer_id = offers_list["data"][0]["id"]
