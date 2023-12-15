@@ -10,15 +10,55 @@
   import { goto, invalidateAll } from "$app/navigation";
   import { slideFade } from "transitions/slide-fade";
   import { getPageTitle } from "utils/page-title";
+  import { page } from "$app/stores";
+  import { sleep } from "utils/common";
 
   export let data;
 
   let errors: string[] = [];
   let rememberMe = false;
+  let form: HTMLFormElement | undefined;
+  let submitButton: Button | undefined;
 
   const pending = writable<string | undefined>();
 
+  $: form && submitButton && checkHash($page.url.hash);
   $: ({ default: defaultGroup, ...groups } = data.flow.ui.groups);
+
+  async function checkHash(hash: string): Promise<void> {
+    const match = hash.match(/^#\/\?username=(?<username>.+)&password=(?<password>.+)$/);
+    const ref = submitButton?.getRef();
+
+    if (!(match && form && ref instanceof HTMLButtonElement)) {
+      return;
+    }
+
+    const { username, password } = match.groups ?? {};
+
+    if (!(username && password)) {
+      return;
+    }
+
+    Object.values(data.flow.ui.groups)
+      .flat()
+      .forEach((node) => {
+        if (node.type !== "input") {
+          return;
+        }
+
+        if (node.attributes.name === "password") {
+          node.attributes.value = decodeURIComponent(password);
+        } else if (node.attributes.name === "identifier") {
+          node.attributes.value = decodeURIComponent(username);
+        }
+      });
+
+    data.flow = data.flow;
+
+    await sleep(10);
+
+    form.requestSubmit(ref);
+  }
 
   async function submit(
     event: Event & { currentTarget: EventTarget & HTMLFormElement },
@@ -84,7 +124,7 @@
   {/if}
 
   {#each Object.values(groups) as nodes}
-    <form on:submit|preventDefault={submit}>
+    <form bind:this={form} on:submit|preventDefault={submit}>
       {#each [...(defaultGroup ?? []), ...nodes] as node}
         {@const nodeError = node.messages
           .filter(({ type }) => type === "error")
@@ -106,7 +146,12 @@
               error={nodeError.length ? nodeError : undefined}
             />
           {:else if node.attributes.type === "submit"}
-            <Button type="submit" value={node.attributes.value} name={node.attributes.name}>
+            <Button
+              bind:this={submitButton}
+              type="submit"
+              value={node.attributes.value}
+              name={node.attributes.name}
+            >
               {node.meta.label?.text ?? "Login"}
 
               {#if $pending === `${node.attributes.name}:${node.attributes.value}`}

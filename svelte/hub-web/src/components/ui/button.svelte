@@ -11,11 +11,18 @@
   export let download: string | boolean | undefined = undefined;
   export let value: string | undefined = undefined;
   export let name: string | undefined = undefined;
+
+  let ref: HTMLButtonElement | HTMLAnchorElement | undefined;
+
+  export function getRef(): typeof ref {
+    return ref;
+  }
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <svelte:element
   this={href ? "a" : "button"}
+  bind:this={ref}
   {href}
   {type}
   {disabled}
