@@ -17,8 +17,12 @@ function parseSearchString(search: string): Record<string, string> {
 
 function queryStore(): Writable<Record<string, string>> {
   const store = writable<Record<string, string>>(parseSearchString(window.location.search), () =>
-    page.subscribe(({ url: { searchParams } }) => {
-      (store.set as StoreSetter)(parseSearchParams(searchParams), false);
+    page.subscribe(({ url }) => {
+      if (!url) {
+        return;
+      }
+
+      (store.set as StoreSetter)(parseSearchParams(url.searchParams), false);
     }),
   );
 
