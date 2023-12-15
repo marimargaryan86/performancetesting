@@ -160,7 +160,7 @@ ids = [
 
 @pytest.mark.integration()
 @pytest.mark.parametrize("iata_codes", iata_codes, ids=ids)
-async def test_booking_flow(  # noqa: WPS217
+async def test_offers_old_flow(  # noqa: WPS217
     mobile_client: MobileApiClient,
     departure_after: datetime.datetime,
     iata_codes: str,

@@ -138,10 +138,13 @@ async def get_order_by_id(
 
 
 places_pairs = [["Brussels-Midi", "Rotterdam Centraal"]]
+providers = [
+    "Benerail",
+]
 
 
 @pytest.mark.integration()
-@pytest.mark.parametrize("places_pairs", places_pairs)
+@pytest.mark.parametrize("places_pairs", places_pairs, ids=providers)
 async def test_simple_search(  # noqa: WPS217, WPS218, PLR0915
     mongo_client: MongoClient[Any],
     mobile_client: MobileApiClient,
@@ -194,7 +197,7 @@ async def test_simple_search(  # noqa: WPS217, WPS218, PLR0915
         mobile_client,
         offer_id_simple_search,
     )
-    assert "included" in offers_list
+    assert "included" in offers_list, "no offers"
     offer_included = offers_list["included"]
     assert offer_included
     offer_id = offers_list["data"][0]["id"]
