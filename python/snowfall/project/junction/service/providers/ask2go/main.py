@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import contextlib
 import datetime
+import pathlib
 import random
 from collections.abc import Sequence
 
@@ -29,11 +30,13 @@ from snowfall.project.junction.service.providers.ask2go import (
     notifications_service,
     pricing,
     search,
+    stations,
     transformer,
 )
 from snowfall.project.junction.service.providers.ask2go import offers as a2g_offers
 from snowfall.project.junction.service.providers.ask2go.constant import PROVIDER_ID
 from snowfall.project.junction.service.providers.ask2go.v1 import amqp_pb2
+from snowfall.service.geodata.v1 import geocoding_pb2_grpc
 from snowfall.stdlib import h3
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence import filesystem
@@ -115,11 +118,48 @@ _Impl = offers.OfferSearchImplementation[
     search_models.CreateSearchCriteria,
 ]
 
+
+class DumpStationsSettings(service.Settings):
+    api_base_url: pydantic.AnyUrl
+    api_booking_base_url: pydantic.AnyUrl
+    geodata_address: str
+    output_dir: pydantic.DirectoryPath = pathlib.Path()
+    http_timeout: float = 60.0
+
+
 _PROVIDER_NAME = "Ask2Go"
 
 
 async def _meta_factory() -> meta.MetaImplementation:
     return meta.MetaImplementation(identifier=PROVIDER_ID, name=_PROVIDER_NAME)
+
+
+async def _dump_stations(
+    app: service.Application[DumpStationsSettings],
+) -> None:
+    settings = app.settings
+
+    async with httpx.AsyncClient(
+        timeout=settings.http_timeout,
+    ) as http_client:
+        logging.register(http_client)
+        metrics.register(http_client)
+        ask2go_client = client.Ask2GoClient(
+            api_base_url=str(app.settings.api_base_url),
+            api_booking_base_url=str(app.settings.api_booking_base_url),
+            http_client=http_client,
+        )
+
+        geocoder = geocoding_pb2_grpc.GeocodingServiceStub(
+            await grpc_factory.make_insecure_channel(app, app.settings.geodata_address),
+        )
+        output_file_path = "/".join(
+            [
+                str(settings.output_dir),
+                "ask2go_stations.json",
+            ],
+        )
+        await stations.dump_stations(geocoder, ask2go_client, output_file_path)
 
 
 async def _offers(
@@ -411,6 +451,11 @@ if __name__ == "__main__":
     )
 
     entrypoint.enter_with_commands(
+        service.Command(
+            name="dump-stations",
+            callback=_dump_stations,
+            settings_class=DumpStationsSettings,
+        ),
         service.Command(
             name="orders",
             callback=_orders,
