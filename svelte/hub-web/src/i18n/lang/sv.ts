@@ -213,6 +213,88 @@ export default {
     },
     knowledgeHub: {
       title: "Kunskapshub",
+      videos: {
+        title: "Videohandledning",
+        description:
+          "Lär känna Junction Hub på bara några minuter med våra snabba videohandledningar.",
+        items: [
+          {
+            title: "Sök efter en resa",
+            description: "Ta reda på hur du söker efter tågresor i Junction Hub.",
+            id: "qMTv6kNAIEU",
+            lengthS: 60,
+          },
+          {
+            title: "Välj ett erbjudande",
+            description:
+              "Ta reda på hur du väljer ett erbjudande för din kunds bokning i Junction Hub.",
+            id: "JdfyhZU3kQg",
+            lengthS: 69,
+          },
+          {
+            title: "Lägg till passagerarinformation",
+            description:
+              "Ta reda på hur du lägger till passagerarinformation till en tågbokning i Junction Hub.",
+            id: "Zcidy7py-xY",
+            lengthS: 37,
+          },
+          {
+            title: "Totalt att betala, lägg till provision och se prisregler",
+            description:
+              "Ta reda på hur du visar bokningssaldon, biljettpriser och lägger till avgifter och provisioner.",
+            id: "pB05rIT8N3I",
+            lengthS: 63,
+          },
+          {
+            title: "Bekräfta en bokning",
+            description:
+              "Ta reda på hur du gör en betalning med ditt byråkort och bekräfta en bokning i Junction Hub.",
+            id: "OQMqh6fCczo",
+            lengthS: 69,
+          },
+          {
+            title: "Kontrollera orderstatus",
+            description:
+              "Ta reda på hur du kan se alla dina befintliga beställningar, kontrollera deras status och ladda ner dina kunders biljetter i Junction Hub.",
+            id: "2ZHcdPvcJ-U",
+            lengthS: 47,
+          },
+        ],
+      },
+      faq: {
+        title: "Vanliga frågor",
+        items: [
+          {
+            question: "Vilka tågoperatörer är tillgängliga via Junction Hub?",
+            answer:
+              "Junction Hub ger dig tillgång till en mängd järnvägsresor över hela Europa, ombord på operatörer som Eurostar, SNCF, Thalys, Deutsche Bahn med flera.",
+          },
+          {
+            question: "Kan jag se och jämföra olika restider och priser på ett ställe?",
+            answer:
+              "Genom att söka i Junction Hub kan du enkelt se alla tillgängliga avgångar för dina valda resedatum och jämföra de olika pristyperna och priserna för dina kunders räkning.",
+          },
+          {
+            question: "Vilka betalningsalternativ accepteras?",
+            answer: "För närvarande görs alla bokningsbetalningar med ditt byråkreditkort.",
+          },
+          {
+            question: "Hur avbokar jag bokningar i Junction Hub?",
+            answer:
+              "För att avboka en bokning måste du göra en begäran om avbokning. Ta en titt på vår användarguide, eller titta på vår korta videohandledning, för mer information om hur du avbokar en bokning i Junction Hub.",
+          },
+          {
+            question: "Hur kommer jag åt kundernas tågbiljetter?",
+            answer:
+              'Navigera till fliken "Beställningar", där du kan se alla befintliga beställningar och deras status. För att ladda ner dina kunders biljetter, välj deras beställning och klicka på länken "Ladda ner biljett".',
+          },
+          {
+            question: "Hur kontaktar jag kundsupport?",
+            answer:
+              "Snowfalls supportteam finns till hands för att hjälpa dig om du har några problem. Skicka ett e-postmeddelande till support@snowfalltravel.com.",
+          },
+        ],
+      },
     },
     pay: {
       pages: {
@@ -230,7 +312,7 @@ export default {
           title: "Boka",
         },
         orders: {
-          title: "Visa ordrar",
+          title: "Beställningar",
         },
       },
     },

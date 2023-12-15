@@ -218,6 +218,87 @@ export default {
     },
     knowledgeHub: {
       title: "Knowledge Hub",
+      videos: {
+        title: "Video Tutorials",
+        description:
+          "Get to know Junction Hub in just a few minutes with our quick video tutorials.",
+        items: [
+          {
+            title: "Search for a trip",
+            description: "Find out how to search for rail trips in Junction Hub.",
+            id: "qMTv6kNAIEU",
+            lengthS: 60,
+          },
+          {
+            title: "Select an offer",
+            description:
+              "Find out how to select an offer for your customer’s booking in Junction Hub.",
+            id: "JdfyhZU3kQg",
+            lengthS: 69,
+          },
+          {
+            title: "Add passenger details",
+            description: "Find out how to add passenger details to a rail booking in Junction Hub.",
+            id: "Zcidy7py-xY",
+            lengthS: 37,
+          },
+          {
+            title: "Total to pay, add commission & view fare rules",
+            description:
+              "Find out how to view booking balances, fare rules and add fees and commissions.",
+            id: "pB05rIT8N3I",
+            lengthS: 63,
+          },
+          {
+            title: "Confirm a booking",
+            description:
+              "Find out how to make a payment using your agency card and confirm a booking in Junction Hub.",
+            id: "OQMqh6fCczo",
+            lengthS: 69,
+          },
+          {
+            title: "Check order status",
+            description:
+              "Find out how to view all of your existing orders, check their status and download your customers’ tickets in Junction Hub.",
+            id: "2ZHcdPvcJ-U",
+            lengthS: 47,
+          },
+        ],
+      },
+      faq: {
+        title: "Frequently Asked Questions",
+        items: [
+          {
+            question: "What train operators are available through Junction Hub?",
+            answer:
+              "Junction Hub gives you access to a host of rail journeys across Europe, aboard operators such as Eurostar, SNCF, Thalys, Deutsche Bahn and more.",
+          },
+          {
+            question: "Can I view and compare different journey times and prices in one place?",
+            answer:
+              "By searching in Junction Hub, you can easily see all of the available departures for your chosen travel dates, and compare the different fare types and prices on your customers’ behalf.",
+          },
+          {
+            question: "What payment options are accepted?",
+            answer: "Currently all booking payments are made using your agency credit card.",
+          },
+          {
+            question: "How do I cancel bookings in Junction Hub?",
+            answer:
+              "To cancel a booking, you will need to make a cancellation request. Take a look at our user guide, or watch our short video tutorial, for more information on how to cancel a booking in Junction Hub.",
+          },
+          {
+            question: "How do I access customers’ train tickets?",
+            answer:
+              "Navigate to the “Orders” tab, where you can view all existing orders and their status. To download your customers’ tickets, select their order and click on the “Download ticket” link.",
+          },
+          {
+            question: "How do I contact customer support?",
+            answer:
+              "The Snowfall support team is on hand to help if you have any issues. Simply email support@snowfalltravel.com.",
+          },
+        ],
+      },
     },
     pay: {
       pages: {
@@ -235,7 +316,7 @@ export default {
           title: "Book",
         },
         orders: {
-          title: "View orders",
+          title: "Orders",
         },
       },
     },

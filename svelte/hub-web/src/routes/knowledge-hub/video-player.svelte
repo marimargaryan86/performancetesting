@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-  export type YouTubeVideo = {
+  type YouTubeVideo = {
     title: string;
     description: string;
     id: string;

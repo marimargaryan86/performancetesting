@@ -1,46 +1,4 @@
 <script lang="ts" context="module">
-  const videos: YouTubeVideo[] = [
-    {
-      title: "Search for a trip",
-      description: "Find out how to search for rail trips in Junction Hub.",
-      id: "qMTv6kNAIEU",
-      lengthS: 60,
-    },
-    {
-      title: "Select an offer",
-      description: "Find out how to select an offer for your customer’s booking in Junction Hub.",
-      id: "JdfyhZU3kQg",
-      lengthS: 69,
-    },
-    {
-      title: "Add passenger details",
-      description: "Find out how to add passenger details to a rail booking in Junction Hub.",
-      id: "Zcidy7py-xY",
-      lengthS: 37,
-    },
-    {
-      title: "Total to pay, add commission & view fare rules",
-      description:
-        "Find out how to view booking balances, fare rules and add fees and commissions.",
-      id: "pB05rIT8N3I",
-      lengthS: 63,
-    },
-    {
-      title: "Confirm a booking",
-      description:
-        "Find out how to make a payment using your agency card and confirm a booking in Junction Hub.",
-      id: "OQMqh6fCczo",
-      lengthS: 69,
-    },
-    {
-      title: "Check order status",
-      description:
-        "Find out how to view all of your existing orders, check their status and download your customers’ tickets in Junction Hub.",
-      id: "2ZHcdPvcJ-U",
-      lengthS: 47,
-    },
-  ];
-
   function getDuration(lengthS: number): string {
     const minutes = Math.floor(lengthS / 60);
     const seconds = lengthS % 60;
@@ -52,10 +10,13 @@
 </script>
 
 <script lang="ts">
-  import VideoPlayer, { type YouTubeVideo } from "./video-player.svelte";
+  import VideoPlayer from "./video-player.svelte";
   import PlayIcon from "components/icons/play-icon.svelte";
   import { ensureDefined } from "utils/array";
   import ClockIcon from "components/icons/clock-icon.svelte";
+  import { getLocaleData } from "i18n";
+
+  const i18n = getLocaleData();
 
   let videoPlayer: VideoPlayer | undefined;
 </script>
@@ -63,13 +24,13 @@
 <VideoPlayer bind:this={videoPlayer} />
 
 <section>
-  <h2 class="typography headline-small bold">Video Tutorials</h2>
+  <h2 class="typography headline-small bold">{$i18n.pages.knowledgeHub.videos.title}</h2>
   <p class="typography title-medium">
-    Get to know Junction Hub in just a few minutes with our quick video tutorials.
+    {$i18n.pages.knowledgeHub.videos.description}
   </p>
 
   <div class="videos">
-    {#each videos as video}
+    {#each $i18n.pages.knowledgeHub.videos.items as video}
       {@const action = videoPlayer?.open.bind(videoPlayer.open, video)}
 
       <div class="video">
