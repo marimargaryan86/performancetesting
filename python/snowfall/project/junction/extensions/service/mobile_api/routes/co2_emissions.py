@@ -7,8 +7,8 @@ from snowfall.project.junction.extensions.service.mobile_api import (
     resources,
 )
 from snowfall.project.junction.plus.adapter import co2_emissions
-from snowfall.project.junction.plus.service.co2_emissions.v1 import (
-    co2_emissions_pb2,
+from snowfall.project.junction.plus.service.external_dependencies.v1 import (
+    grpc_pb2 as plus_services_pb2,
 )
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import (
@@ -26,7 +26,7 @@ class Co2Emission(endpoints.HTTPEndpoint):
         body = await request_helpers.flatten_request(request)
         emissions = await emissions_calculator.calculate_emissions(
             [
-                co2_emissions_pb2.Flight(
+                plus_services_pb2.Flight(
                     origin=flight["origin"],
                     destination=flight["destination"],
                     operating_carrier_code=flight["operatingCarrierCode"],

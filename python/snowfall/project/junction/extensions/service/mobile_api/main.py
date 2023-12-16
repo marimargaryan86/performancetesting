@@ -28,8 +28,8 @@ from snowfall.project.junction.extensions.service.mobile_api import (
 )
 from snowfall.project.junction.extensions.service.mobile_api.routes import router
 from snowfall.project.junction.plus.adapter import co2_emissions, flight_delay_predictor
-from snowfall.project.junction.plus.service.co2_emissions.v1 import (
-    co2_emissions_pb2_grpc,
+from snowfall.project.junction.plus.service.external_dependencies.v1.grpc_pb2_grpc import (
+    CO2EmissionsServiceStub,
 )
 from snowfall.project.junction.plus.service.flight_prediction.v1 import (
     flight_prediction_pb2_grpc,
@@ -187,7 +187,7 @@ async def _http(  # noqa: WPS217
         app.settings.co2_emissions_address,
     )
     co2_emissions_client = co2_emissions.GrpcClient(
-        co2_emissions_pb2_grpc.CO2EmissionsServiceStub(
+        CO2EmissionsServiceStub(
             co2_emissions_channel,
         ),
     )

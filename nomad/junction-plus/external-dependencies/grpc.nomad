@@ -30,7 +30,7 @@ variable "google_flights_emissions_address" {
   type = string
 }
 
-job "junction-plus-co2-emissions-grpc" {
+job "junction-plus-external-dependencies-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
 
@@ -66,7 +66,7 @@ job "junction-plus-co2-emissions-grpc" {
     }
 
     service {
-      name = "co2-emissions-grpc-${var.environment}"
+      name = "external-dependencies-grpc-${var.environment}"
       port = "grpc"
       tags = ["grpc"]
 
@@ -82,7 +82,7 @@ job "junction-plus-co2-emissions-grpc" {
     }
 
     service {
-      name = "co2-emissions-prometheus-${var.environment}"
+      name = "external-dependencies-prometheus-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
 
@@ -98,12 +98,12 @@ job "junction-plus-co2-emissions-grpc" {
       driver = "docker"
 
       vault {
-        policies = ["co2-emissions-${var.environment}"]
+        policies = ["external-dependencies-${var.environment}"]
       }
 
       template {
         data        = <<EOH
-{{ with secret "kv/data/${var.environment}/co2-emissions" }}
+{{ with secret "kv/data/${var.environment}/external-dependencies" }}
 GOOGLE_FLIGHTS_EMISSIONS_APP_KEY={{ .Data.data.google_flights_emissions_app_key }}
 {{ end }}
 EOH
@@ -128,7 +128,7 @@ EOH
         ENV_NAME                         = var.environment
         GRPC_ADDRESS                     = "0.0.0.0"
         GRPC_PORT                        = NOMAD_PORT_grpc
-        SENTRY_DSN                       = "https://bd7fba4a4909408ab19c0d780caf956e@sentry.snowfall.se/177"
+        SENTRY_DSN                       = "https://202eca9b6fe37ea1e154b827362ccfa9@sentry.snowfall.se/205"
         PROMETHEUS_PORT                  = NOMAD_PORT_prometheus
         GOOGLE_FLIGHTS_EMISSIONS_ADDRESS = var.google_flights_emissions_address
       }

@@ -1,6 +1,6 @@
 import ipaddress
 
-from snowfall.project.junction.plus.service.co2_emissions.grpc import (
+from snowfall.project.junction.plus.service.external_dependencies.grpc import (
     CO2EmissionsService,
 )
 from snowfall.stdlib.service import application
@@ -34,7 +34,7 @@ async def _main(app: application.Application[_Settings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = application.Entrypoint(name="co2-emissions")
+    entrypoint = application.Entrypoint(name="external-dependencies")
 
     entrypoint.enter_with_commands(
         application.Command(

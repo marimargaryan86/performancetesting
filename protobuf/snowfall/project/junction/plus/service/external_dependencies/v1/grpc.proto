@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-package snowfall.project.junction.plus.service.co2_emissions.v1;
+package snowfall.project.junction.plus.service.external_dependencies.v1;
 
 import "snowfall/stdlib/v1/date.proto";
 
-option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/plus/service/co2_emissions/v1";
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/plus/service/external_dependencies/v1";
 
 service CO2EmissionsService {
   rpc GetEmissions(GetEmissionsRequest) returns (GetEmissionsResponse) {}

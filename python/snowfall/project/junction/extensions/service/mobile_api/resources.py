@@ -9,8 +9,8 @@ from google.protobuf.json_format import MessageToDict
 
 from snowfall.project.junction.extensions.service.mobile_api.v1alpha import models_pb2
 from snowfall.project.junction.plus.adapter.flight_delay_predictor import Prediction
-from snowfall.project.junction.plus.service.co2_emissions.v1 import (
-    co2_emissions_pb2,
+from snowfall.project.junction.plus.service.external_dependencies.v1 import (
+    grpc_pb2 as plus_services_pb2,
 )
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
@@ -353,7 +353,7 @@ class Co2EmissionsResource(models.Resource):
     @classmethod
     def from_proto(
         cls,
-        co2_emission: co2_emissions_pb2.FlightEmission,
+        co2_emission: plus_services_pb2.FlightEmission,
         departure_date: str,
     ) -> Co2EmissionsResource:
         return cls(
