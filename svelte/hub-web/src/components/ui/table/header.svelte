@@ -3,6 +3,7 @@
   import ChevronIcon from "components/icons/chevron-icon.svelte";
   import type { DirectionY } from "models/spatial";
 
+  export let textAlign: "left" | "right" = "left";
   export let sortDirection: DirectionY | undefined = undefined;
   export let sortValue: Readonly<TSortGroup> | undefined = undefined;
   export let sortGroup: TSortGroup | undefined = undefined;
@@ -21,7 +22,7 @@
   }
 </script>
 
-<th class:sortable on:click={sortable ? sort : undefined}>
+<th class:sortable on:click={sortable ? sort : undefined} style:text-align={textAlign}>
   <slot />
 
   {#if sortable}

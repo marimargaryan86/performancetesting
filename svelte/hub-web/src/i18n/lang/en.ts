@@ -35,6 +35,13 @@ export default {
     areYouSure: "Are you sure?",
     copiedToClipboard: "Copied to clipboard",
   },
+  tableHeaders: {
+    orderId: "Order ID",
+    createdDate: "Created Date",
+    updatedDate: "Updated Date",
+    owedToUs: "Owed to us",
+    reconciledQuestion: "Reconciled?",
+  },
   pages: {
     dashboard: {
       title: "Dashboard",
@@ -301,6 +308,7 @@ export default {
       },
     },
     pay: {
+      title: "Pay",
       pages: {
         activity: {
           title: "Activity",

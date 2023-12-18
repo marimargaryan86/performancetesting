@@ -18,10 +18,13 @@
   import { match as matchUuid } from "../../../params/uuid";
   import { browser } from "$app/environment";
   import { getPageTitle } from "utils/page-title";
+  import { getLocaleData } from "i18n";
 
   export let data;
 
   let searchQuery = "";
+
+  const i18n = getLocaleData();
 
   $: ({ data: bills } = data.bills);
   $: searchQueryUuid = matchUuid(searchQuery) ? searchQuery : undefined;
@@ -68,17 +71,19 @@
 </script>
 
 <svelte:head>
-  <title>{getPageTitle("Junction Hub", "Pay", "Bills")}</title>
+  <title>
+    {getPageTitle($i18n.title, $i18n.pages.pay.title, $i18n.pages.pay.pages.bills.title)}
+  </title>
 </svelte:head>
 
-<StandardLayout pageTitle="Bills" bind:searchQuery>
+<StandardLayout pageTitle={$i18n.pages.pay.pages.bills.title} bind:searchQuery>
   <Table {loadMore} class="bills-table">
     <THead>
-      <Header>Order ID</Header>
-      <Header>Created Date</Header>
-      <Header>Updated Date</Header>
-      <Header>Owed to us</Header>
-      <Header>Reconciled?</Header>
+      <Header>{$i18n.tableHeaders.orderId}</Header>
+      <Header>{$i18n.tableHeaders.createdDate}</Header>
+      <Header>{$i18n.tableHeaders.updatedDate}</Header>
+      <Header>{$i18n.tableHeaders.owedToUs}</Header>
+      <Header textAlign="right">{$i18n.tableHeaders.reconciledQuestion}</Header>
     </THead>
     <TBody>
       {#each bills as bill}
@@ -86,7 +91,11 @@
           <TCol width="0">{bill.orderId}</TCol>
           <TCol width="0">{bill.createdAt?.toLocaleDateString("sv-SE") ?? "N/A"}</TCol>
           <TCol width="0">{bill.updatedAt?.toLocaleDateString("sv-SE") ?? "N/A"}</TCol>
-          <TMoneyCol money={bill.amounts.total ?? { amount: 0, currency: "EUR" }} />
+          {#if bill.amounts.total}
+            <TMoneyCol money={bill.amounts.total} />
+          {:else}
+            <TCol width="0" />
+          {/if}
           <TCol width="40px" textAlign="right">
             <Switch
               active={bill.reconciled}

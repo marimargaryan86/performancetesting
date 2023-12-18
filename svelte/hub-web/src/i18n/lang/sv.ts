@@ -30,6 +30,13 @@ export default {
     areYouSure: "Är du säker?",
     copiedToClipboard: "Kopierad till urklipp",
   },
+  tableHeaders: {
+    orderId: "BeställningsID",
+    createdDate: "Skapad Datum",
+    updatedDate: "Uppdaterad Datum",
+    owedToUs: "Skyldig Oss",
+    reconciledQuestion: "Försonad?",
+  },
   pages: {
     dashboard: {
       title: "Instrumentbräda",
@@ -297,6 +304,7 @@ export default {
       },
     },
     pay: {
+      title: "Pay",
       pages: {
         activity: {
           title: "Aktivitet",
