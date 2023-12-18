@@ -1,32 +1,17 @@
-import { URLExtended } from "utils/url";
-import * as devalue from "devalue";
-import { HUB_INTEGRATION_ROOT } from "../common";
 import type JourneyService from "integration/junction-hub-api/services/journey-service";
+import { clientServiceFactory } from "../../framework";
+import type { RouteId } from "./$types";
 
-const ROOT = `${HUB_INTEGRATION_ROOT}/journeys`;
+const factory = clientServiceFactory<JourneyService, RouteId>("/integration/hub/journeys");
 
-async function find({
-  cursor,
-  limit,
-  sort,
-}: {
-  cursor?: string;
-  limit?: number;
-  sort?: Parameters<JourneyService["find"]>[0]["sort"];
-}): ReturnType<JourneyService["find"]> {
-  const url = new URLExtended(ROOT, {
-    base: origin,
-    query: { cursor, limit, sort, action: "find" },
-  });
-  const resp = await fetch(url);
-
-  if (resp.status !== 200) {
-    throw new Error("An unexpected error occurred");
-  }
-
-  return devalue.parse(await resp.text());
-}
-
-export default {
-  find,
-};
+export default factory<{
+  find: [
+    params: {
+      cursor?: string;
+      limit?: number;
+      sort?: Parameters<JourneyService["find"]>[0]["sort"];
+    },
+  ];
+}>({
+  find: true,
+});

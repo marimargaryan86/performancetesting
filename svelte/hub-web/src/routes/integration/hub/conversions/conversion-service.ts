@@ -1,39 +1,13 @@
-import { URLExtended } from "utils/url";
-import * as devalue from "devalue";
-import { HUB_INTEGRATION_ROOT } from "../common";
 import type ConversionService from "integration/junction-hub-api/services/conversion-service";
+import { clientServiceFactory } from "../../framework";
+import type { RouteId } from "./$types";
 
-const ROOT = `${HUB_INTEGRATION_ROOT}/conversions`;
+const factory = clientServiceFactory<ConversionService, RouteId>("/integration/hub/conversions");
 
-async function find({
-  cursor,
-  limit,
-}: {
-  cursor?: string;
-  limit?: number;
-}): ReturnType<ConversionService["find"]> {
-  const url = new URLExtended(ROOT, { base: origin, query: { cursor, limit, action: "find" } });
-  const resp = await fetch(url);
-
-  if (resp.status !== 200) {
-    throw new Error("An unexpected error occurred");
-  }
-
-  return devalue.parse(await resp.text());
-}
-
-async function get({ id }: { id: string }): ReturnType<ConversionService["get"]> {
-  const url = new URLExtended(ROOT, { base: origin, query: { id, action: "get" } });
-  const resp = await fetch(url);
-
-  if (resp.status !== 200) {
-    throw new Error("Conversion not found");
-  }
-
-  return devalue.parse(await resp.text());
-}
-
-export default {
-  find,
-  get,
-};
+export default factory<{
+  find: [params: { cursor?: string; limit?: number }];
+  get: [params: { id: string }];
+}>({
+  find: true,
+  get: true,
+});

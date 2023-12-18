@@ -1,1 +1,1 @@
-export const INTEGRATION_ROOT = "/integration";
+export const INTEGRATION_ROOT = "/integration" as const;

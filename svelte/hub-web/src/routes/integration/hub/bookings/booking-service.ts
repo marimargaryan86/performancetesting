@@ -1,21 +1,9 @@
-import { URLExtended } from "utils/url";
-import * as devalue from "devalue";
 import type BookingService from "integration/junction-hub-api/services/booking-service";
-import { HUB_INTEGRATION_ROOT } from "../common";
+import { clientServiceFactory } from "../../framework";
+import type { RouteId } from "./$types";
 
-const ROOT = `${HUB_INTEGRATION_ROOT}/bookings`;
+const factory = clientServiceFactory<BookingService, RouteId>("/integration/hub/bookings");
 
-async function get({ id }: { id: string }): ReturnType<BookingService["get"]> {
-  const url = new URLExtended(ROOT, { base: origin, query: { id, action: "get" } });
-  const resp = await fetch(url);
-
-  if (resp.status !== 200) {
-    throw new Error("Booking not found");
-  }
-
-  return devalue.parse(await resp.text());
-}
-
-export default {
-  get,
-};
+export default factory<{ get: [params: { id: string }] }>({
+  get: true,
+});

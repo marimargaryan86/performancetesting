@@ -1,27 +1,11 @@
-import { URLExtended } from "utils/url";
-import * as devalue from "devalue";
-import { HUB_INTEGRATION_ROOT } from "../common";
 import type CurrencyService from "integration/junction-hub-api/services/currency-service";
+import { clientServiceFactory } from "../../framework";
+import type { RouteId } from "./$types";
 
-const ROOT = `${HUB_INTEGRATION_ROOT}/currencies`;
+const factory = clientServiceFactory<CurrencyService, RouteId>("/integration/hub/currencies");
 
-async function find({
-  cursor,
-  limit,
-}: {
-  cursor?: string;
-  limit?: number;
-}): ReturnType<CurrencyService["find"]> {
-  const url = new URLExtended(ROOT, { base: origin, query: { cursor, limit, action: "find" } });
-  const resp = await fetch(url);
-
-  if (resp.status !== 200) {
-    throw new Error("An unexpected error occurred");
-  }
-
-  return devalue.parse(await resp.text());
-}
-
-export default {
-  find,
-};
+export default factory<{
+  find: [params: { cursor?: string; limit?: number }];
+}>({
+  find: true,
+});

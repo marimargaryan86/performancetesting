@@ -16,9 +16,9 @@
   import integrationInstancesClient from "integration-instances-client";
   import type { Bill } from "integration/junction-hub-api/schemas/bill";
   import { match as matchUuid } from "../../../params/uuid";
+  import { getLocaleData } from "i18n";
   import { browser } from "$app/environment";
   import { getPageTitle } from "utils/page-title";
-  import { getLocaleData } from "i18n";
 
   export let data;
 
@@ -35,6 +35,7 @@
   async function searchBills(query?: string): Promise<void> {
     data.bills = await integrationInstancesClient.hub.bills.find({
       filter: { orderIds: query && matchUuid(query) ? [query] : undefined },
+      limit: LIST_BILLS_LIMIT,
     });
   }
 

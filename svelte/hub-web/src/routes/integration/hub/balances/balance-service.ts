@@ -1,54 +1,14 @@
-import { URLExtended } from "utils/url";
-import * as devalue from "devalue";
 import type BalanceService from "integration/junction-hub-api/services/balance-service";
+import { clientServiceFactory } from "../../framework";
 import type { BalanceAdd } from "integration/junction-hub-api/schemas/balance";
-import { HUB_INTEGRATION_ROOT } from "../common";
+import type { RouteId } from "./$types";
 
-const ROOT = `${HUB_INTEGRATION_ROOT}/balances`;
+const factory = clientServiceFactory<BalanceService, RouteId>("/integration/hub/balances");
 
-async function find({
-  accountId,
-  limit,
-  cursor,
-}: {
-  accountId: string;
-  limit?: number;
-  cursor?: string;
-}): ReturnType<BalanceService["find"]> {
-  const url = new URLExtended(ROOT, {
-    base: origin,
-    query: { limit, cursor, accountId, action: "find" },
-  });
-  const resp = await fetch(url);
-
-  if (resp.status !== 200) {
-    throw new Error("An unexpected error occurred");
-  }
-
-  return devalue.parse(await resp.text());
-}
-
-async function create({
-  accountId,
-  data,
-}: {
-  accountId: string;
-  data: BalanceAdd;
-}): ReturnType<BalanceService["create"]> {
-  const url = new URLExtended(ROOT, {
-    base: origin,
-    query: { accountId, action: "create" },
-  });
-  const resp = await fetch(url, { method: "POST", body: devalue.stringify(data) });
-
-  if (resp.status !== 200) {
-    throw new Error("An unexpected error occurred");
-  }
-
-  return devalue.parse(await resp.text());
-}
-
-export default {
-  find,
-  create,
-};
+export default factory<{
+  create: [params: { accountId: string; data: BalanceAdd }];
+  find: [params: { accountId: string; limit?: number; cursor?: string }];
+}>({
+  create: true,
+  find: true,
+});

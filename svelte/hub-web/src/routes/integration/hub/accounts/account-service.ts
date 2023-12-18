@@ -1,42 +1,13 @@
 import type AccountService from "integration/junction-hub-api/services/account-service";
-import { URLExtended } from "utils/url";
-import * as devalue from "devalue";
-import { HUB_INTEGRATION_ROOT } from "../common";
+import { clientServiceFactory } from "../../framework";
+import type { RouteId } from "./$types";
 
-const ROOT = `${HUB_INTEGRATION_ROOT}/accounts`;
+const factory = clientServiceFactory<AccountService, RouteId>("/integration/hub/accounts");
 
-async function find({
-  limit,
-  cursor,
-}: {
-  limit?: number;
-  cursor?: string;
-}): ReturnType<AccountService["find"]> {
-  const url = new URLExtended(ROOT, {
-    base: origin,
-    query: { limit, cursor, action: "find" },
-  });
-  const resp = await fetch(url);
-
-  if (resp.status !== 200) {
-    throw new Error("An unexpected error occurred");
-  }
-
-  return devalue.parse(await resp.text());
-}
-
-async function get({ id }: { id: string }): ReturnType<AccountService["get"]> {
-  const url = new URLExtended(ROOT, { base: origin, query: { id, action: "get" } });
-  const resp = await fetch(url);
-
-  if (resp.status !== 200) {
-    throw new Error("Account not found");
-  }
-
-  return devalue.parse(await resp.text());
-}
-
-export default {
-  find,
-  get,
-};
+export default factory<{
+  find: [params: { limit?: number; cursor?: string }];
+  get: [params: { id: string }];
+}>({
+  find: true,
+  get: true,
+});

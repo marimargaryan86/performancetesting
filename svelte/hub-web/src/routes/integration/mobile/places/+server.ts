@@ -1,45 +1,18 @@
 import integrationInstances from "integration-instances";
-import type { RequestEvent } from "./$types";
-import { error } from "@sveltejs/kit";
-import * as devalue from "devalue";
-import type PlaceService from "integration/junction-mobile-api/services/place-service";
-import { ensureJunctionError } from "integration/common/junction-error";
+import { serverServiceFactory } from "../../framework";
+import placeService from "./place-service";
 
-function find(event: RequestEvent): ReturnType<PlaceService["find"]> {
-  const session = event.locals.session;
-  const query = event.url.searchParams.get("query")?.toString();
+const factory = serverServiceFactory(placeService);
 
-  return integrationInstances.junctionMobileApi.places.find({ session, query: query ?? "" });
-}
-
-function get(event: RequestEvent): ReturnType<PlaceService["get"]> {
-  const session = event.locals.session;
-  const id = event.url.searchParams.get("id")?.toString();
-
-  if (!id) {
-    throw error(404);
-  }
-
-  return integrationInstances.junctionMobileApi.places.get({ session, id });
-}
-
-export async function GET(event): Promise<Response> {
-  try {
-    const method = event.url.searchParams.get("action")?.toString() as keyof PlaceService;
-
-    switch (method) {
-      case "find":
-        return new Response(devalue.stringify(await find(event)));
-      case "get":
-        return new Response(devalue.stringify(await get(event)));
-      default:
-        throw new Error("An unexpected error occured");
-    }
-  } catch (err) {
-    if (ensureJunctionError(err)) {
-      throw error(err.status, { message: err.message });
+export const POST = factory({
+  find({ locals: { session } }, query) {
+    if (query.length < 3) {
+      return new Promise((r) => r([]));
     }
 
-    throw error(500);
-  }
-}
+    return integrationInstances.junctionMobileApi.places.find({ session, query });
+  },
+  get({ locals: { session } }, { id }) {
+    return integrationInstances.junctionMobileApi.places.get({ session, id });
+  },
+});
