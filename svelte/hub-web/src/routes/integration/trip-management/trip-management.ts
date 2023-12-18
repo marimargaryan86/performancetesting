@@ -15,7 +15,6 @@ import { resourceStatus, type ResourceStatus } from "integration/common/schemas/
 import { coordinatesSearchableModel } from "integration/common/schemas/point";
 
 const ROUTE: RouteId = "/integration/trip-management";
-const OFFER_POLL_TIMEOUT_MS = 60000;
 
 const point = coordinatesSearchableModel.extend({
   id: z.string(),
@@ -88,7 +87,6 @@ async function getOffers(event?: RequestEvent): Promise<{ data: Offer[]; status:
 }
 
 async function* yieldOffersAux(
-  start: number,
   signal: { cancelled: boolean },
   ids: string[] = [],
 ): AsyncGenerator<Offer> {
@@ -100,25 +98,17 @@ async function* yieldOffersAux(
     yield offer;
   }
 
-  if (
-    result.status !== "completed" &&
-    !ids.length &&
-    new Date().getTime() - start > OFFER_POLL_TIMEOUT_MS
-  ) {
-    signal.cancelled = true;
-  }
-
   if (result.status !== "completed" && !signal.cancelled) {
     await sleep(2000);
 
-    for await (const offer of yieldOffersAux(start, signal, nextIds)) {
+    for await (const offer of yieldOffersAux(signal, nextIds)) {
       yield offer;
     }
   }
 }
 
 function yieldOffers(signal: { cancelled: boolean }): AsyncGenerator<Offer> {
-  return yieldOffersAux(new Date().getTime(), signal);
+  return yieldOffersAux(signal);
 }
 
 async function selectOffer(
