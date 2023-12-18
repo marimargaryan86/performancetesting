@@ -1,17 +1,30 @@
+<script lang="ts" context="module">
+  function formatLanguageOption(option?: Locale): string | undefined {
+    const lang = languages.find((language) => language.locale === option);
+
+    if (!lang) {
+      return "None";
+    }
+
+    return `${lang.flag}   ${lang.name}`;
+  }
+</script>
+
 <script lang="ts">
+  import { dev } from "$app/environment";
   import ChevronIcon from "components/icons/chevron-icon.svelte";
   import LogoutIcon from "components/icons/logout-icon.svelte";
   import BugIcon from "components/icons/bug-icon.svelte";
   import KnowledgeIcon from "components/icons/knowledge-icon.svelte";
   import Account from "./account.svelte";
   import Menu from "./menu.svelte";
+  import SelectField from "components/ui/select-field.svelte";
   import HubLogo from "components/icons/hub-logo.svelte";
   import InformationIcon from "components/icons/information-icon.svelte";
   import { page } from "$app/stores";
   import routeConfig from "routeConfig";
   import integrationInstancesClient from "integration-instances-client";
-  import { getLocale, getLocaleData } from "i18n";
-  import { dev } from "$app/environment";
+  import { getLocale, getLocaleData, type Locale } from "i18n";
   import languages from "i18n/lang/languages";
 
   let expanded = true;
@@ -102,15 +115,6 @@
         <span>{$i18n.words.help}</span>
       </a>
     </li>
-    {#if dev}
-      <li>
-        <select bind:value={$locale}>
-          {#each languages as language}
-            <option value={language.locale}>{language.name}</option>
-          {/each}
-        </select>
-      </li>
-    {/if}
     <li>
       <button
         class="logout typography body-medium"
@@ -121,6 +125,16 @@
         <span>{$i18n.actions.logout}</span>
       </button>
     </li>
+    {#if dev}
+      <li class="language-select">
+        <SelectField
+          options={languages.map((item) => item.locale)}
+          formatter={formatLanguageOption}
+          direction="up"
+          bind:value={$locale}
+        />
+      </li>
+    {/if}
   </ul>
 
   <Account {expanded} {transitionTimeMs} />
@@ -241,5 +255,16 @@
   .active {
     color: var(--color-common-light-strong);
     background-color: var(--color-common-background-light-green);
+  }
+
+  .main-menu :global(.select-field) {
+    --height: 32px;
+    --border-color: transparent;
+    --border-color-focus: transparent;
+    --icon-padding: 10px;
+  }
+
+  .language-select {
+    margin-top: 12px;
   }
 </style>

@@ -131,13 +131,10 @@
     --x-label-font-weight: var(--label-font-weight, 400);
     --x-label-font-family: var(--label-font-family, Poppins);
     --x-border-color: var(--border-color, var(--color-common-line-medium));
+    --x-border-color-focus: var(--border-color-focus, var(--color-common-line-strong));
 
     display: inline-flex;
     flex-flow: column;
-  }
-
-  .text-field:focus-within {
-    --x-border-color: var(--color-common-line-strong);
   }
 
   label {
@@ -162,6 +159,14 @@
     border: 1px solid var(--x-border-color);
     border-radius: 8px;
     transition: border 150ms ease;
+  }
+
+  .error > .wrapper {
+    border-color: #fe4e4e;
+  }
+
+  .text-field:focus-within > .wrapper {
+    border-color: var(--x-border-color-focus);
   }
 
   .wrapper > :global(svg),
@@ -228,10 +233,6 @@
 
   .wrapper.icon-after > input {
     padding-right: calc(var(--x-icon-padding) + 28px);
-  }
-
-  .error > .wrapper {
-    border-color: #fe4e4e;
   }
 
   .error-message {

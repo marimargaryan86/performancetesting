@@ -160,7 +160,7 @@
           class:selected={option === value}
           class:hovered={hoveredIndex === idx}
         >
-          {displayValue}
+          <pre>{displayValue}</pre>
         </li>
       {/each}
     </ul>

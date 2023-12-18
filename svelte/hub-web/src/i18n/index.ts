@@ -1,9 +1,9 @@
 import { getContext, setContext } from "svelte";
 import type { Readable, Writable } from "svelte/store";
-import type lang from "./lang";
 import type en from "./lang/en";
+import type languages from "./lang/languages";
 
-export type Locale = keyof typeof lang;
+export type Locale = (typeof languages)[number]["locale"];
 export type LocaleData = typeof en;
 
 const LOCALE = "locale";
