@@ -165,70 +165,68 @@ async def test_offers_old_flow(  # noqa: WPS217
     departure_after: datetime.datetime,
     iata_codes: str,
 ) -> None:
-    origin, destination = await get_place_id(mobile_client, iata_codes)
     with allure.step("Step to log getting the origin and destination"):
+        origin, destination = await get_place_id(mobile_client, iata_codes)
         allure.attach(
             "origin : {0}, destination : {1}".format(origin, destination),
             "text/plain",
         )
-    create_trip_search_id = await create_trip_search(
-        mobile_client,
-        departure_after,
-        origin,
-        destination,
-    )
 
     with allure.step("Step to log create trip search"):
+        create_trip_search_id = await create_trip_search(
+            mobile_client,
+            departure_after,
+            origin,
+            destination,
+        )
         allure.attach(
             "Trip search ID: {0}".format(create_trip_search_id),
             "text/plain",
         )
-
-    trips_search = await wait_for_response(
-        lambda: get_trips_list(mobile_client, create_trip_search_id),
-        "Timeout reached with no trips found.",
-    )
 
     with allure.step("Step to log get trip search"):
+        trips_search = await wait_for_response(
+            lambda: get_trips_list(mobile_client, create_trip_search_id),
+            "Timeout reached with no trips found.",
+        )
         allure.attach(
             "Trip search ID: {0}".format(create_trip_search_id),
             "text/plain",
         )
 
-    trips_list = [trip["id"] for trip in trips_search["data"]]
-    assert trips_list, "no trips found"
-
-    offer_searches = await create_offer_search(mobile_client, trips_list)
     with allure.step("Step to log create offer search"):
+        trips_list = [trip["id"] for trip in trips_search["data"]]
+        assert trips_list, "no trips found"
+
+        offer_searches = await create_offer_search(mobile_client, trips_list)
         allure.attach(
             "Offer searches: {0}".format(offer_searches),
             "text/plain",
         )
-
-    for offer_id_search in offer_searches:
-        await get_completed_offer_search(mobile_client, offer_id_search)
 
     with allure.step("Step to log get offer search"):
+        for offer_id_search in offer_searches:
+            await get_completed_offer_search(mobile_client, offer_id_search)
         allure.attach(
             "Offer searches: {0}".format(offer_searches),
             "text/plain",
         )
 
-    offer_list = await list_offers_by_offer_search(mobile_client, offer_searches)
     with allure.step("Step to log get offers list by offer search"):
+        offer_list = await list_offers_by_offer_search(mobile_client, offer_searches)
+        assert offer_list, "no offers"
+        keys_to_check = ["offer_id", "groups_id", "option_ids"]
+        assert all(
+            offer.get(key) != "" for offer in offer_list for key in keys_to_check
+        ), "no offers found"
+        offer_id = offer_list[0]["offer_id"]
+        option_id = offer_list[0]["option_ids"]
+        assert offer_id
+        assert option_id
         allure.attach(
             "Offers list by searches: {0}".format(offer_list),
             "text/plain",
         )
-    assert offer_list, "no offers"
-    keys_to_check = ["offer_id", "groups_id", "option_ids"]
-    assert all(
-        offer.get(key) != "" for offer in offer_list for key in keys_to_check
-    ), "no offers found"
-    offer_id = offer_list[0]["offer_id"]
-    option_id = offer_list[0]["option_ids"]
-    assert offer_id
-    assert option_id
 
 
 @pytest.mark.smoke()
@@ -238,67 +236,65 @@ async def test_booking_flow_smoke(  # noqa: WPS217
     departure_after: datetime.datetime,
     iata_codes: str,
 ) -> None:
-    origin, destination = await get_place_id(mobile_client, iata_codes)
     with allure.step("Step to log getting the origin and destination"):
+        origin, destination = await get_place_id(mobile_client, iata_codes)
         allure.attach(
             "origin : {0}, destination : {1}".format(origin, destination),
             "text/plain",
         )
-    create_trip_search_id = await create_trip_search(
-        mobile_client,
-        departure_after,
-        origin,
-        destination,
-    )
 
     with allure.step("Step to log create trip search"):
+        create_trip_search_id = await create_trip_search(
+            mobile_client,
+            departure_after,
+            origin,
+            destination,
+        )
         allure.attach(
             "Trip search ID: {0}".format(create_trip_search_id),
             "text/plain",
         )
-
-    trips_search = await wait_for_response(
-        lambda: get_trips_list(mobile_client, create_trip_search_id),
-        "Timeout reached with no trips found.",
-    )
 
     with allure.step("Step to log get trip search"):
+        trips_search = await wait_for_response(
+            lambda: get_trips_list(mobile_client, create_trip_search_id),
+            "Timeout reached with no trips found.",
+        )
         allure.attach(
             "Trip search ID: {0}".format(create_trip_search_id),
             "text/plain",
         )
 
-    trips_list = [trip["id"] for trip in trips_search["data"]]
-    assert trips_list, "no trips found"
-
-    offer_searches = await create_offer_search(mobile_client, trips_list)
     with allure.step("Step to log create offer search"):
+        trips_list = [trip["id"] for trip in trips_search["data"]]
+        assert trips_list, "no trips found"
+
+        offer_searches = await create_offer_search(mobile_client, trips_list)
         allure.attach(
             "Offer searches: {0}".format(offer_searches),
             "text/plain",
         )
-
-    for offer_id_search in offer_searches:
-        await get_completed_offer_search(mobile_client, offer_id_search)
 
     with allure.step("Step to log get offer search"):
+        for offer_id_search in offer_searches:
+            await get_completed_offer_search(mobile_client, offer_id_search)
         allure.attach(
             "Offer searches: {0}".format(offer_searches),
             "text/plain",
         )
 
-    offer_list = await list_offers_by_offer_search(mobile_client, offer_searches)
     with allure.step("Step to log get offers list by offer search"):
+        offer_list = await list_offers_by_offer_search(mobile_client, offer_searches)
+        assert offer_list, "no offers"
+        keys_to_check = ["offer_id", "groups_id", "option_ids"]
+        assert all(
+            offer.get(key) != "" for offer in offer_list for key in keys_to_check
+        ), "no offers found"
+        offer_id = offer_list[0]["offer_id"]
+        option_id = offer_list[0]["option_ids"]
+        assert offer_id
+        assert option_id
         allure.attach(
             "Offers list by searches: {0}".format(offer_list),
             "text/plain",
         )
-    assert offer_list, "no offers"
-    keys_to_check = ["offer_id", "groups_id", "option_ids"]
-    assert all(
-        offer.get(key) != "" for offer in offer_list for key in keys_to_check
-    ), "no offers found"
-    offer_id = offer_list[0]["offer_id"]
-    option_id = offer_list[0]["option_ids"]
-    assert offer_id
-    assert option_id

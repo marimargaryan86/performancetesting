@@ -139,7 +139,7 @@ async def get_order_by_id(
 
 places_pairs = [["Brussels-Midi", "Rotterdam Centraal"]]
 providers = [
-    "Benerail",
+    "Custom",
 ]
 
 
@@ -152,79 +152,79 @@ async def test_simple_search(  # noqa: WPS217, WPS218, PLR0915
     departure_after: datetime,
     stripe_api_key: str,
 ) -> None:
-    origin_cord, destination_cord = await get_coordinates_by_place_name(
-        mongo_client,
-        places_pairs,
-    )
-
     with allure.step("Step to log the origin and destination coordinates from DB"):
+        origin_cord, destination_cord = await get_coordinates_by_place_name(
+            mongo_client,
+            places_pairs,
+        )
+        assert origin_cord, "Origin not found"
+        assert destination_cord, "Destination not found"
         allure.attach(
             "origin : {0}, destination : {1}".format(origin_cord, destination_cord),
             "text/plain",
         )
 
-    assert origin_cord, "Origin not found"
-    assert destination_cord, "Destination not found"
-    offer_simple_search = await create_offer_simple_search(
-        mobile_client,
-        departure_after,
-        origin_cord,
-        destination_cord,
-        [date(1980, 2, 3)],
-        maximum_connections=2,
-        allowed_segment_types=[LegType.rail],
-    )
-    offer_id_simple_search = offer_simple_search["data"]["id"]
-    assert offer_id_simple_search, "offer is with simpl search wasn't found"
-
     with allure.step("Step to log create offer simple search"):
+        offer_simple_search = await create_offer_simple_search(
+            mobile_client,
+            departure_after,
+            origin_cord,
+            destination_cord,
+            [date(1980, 2, 3)],
+            maximum_connections=2,
+            allowed_segment_types=[LegType.rail],
+        )
+        offer_id_simple_search = offer_simple_search["data"]["id"]
+        assert offer_id_simple_search, "offer is with simpl search wasn't found"
         allure.attach(
             "simple-offer-searches : {0}".format(offer_id_simple_search),
             "text/plain",
         )
-    offer_search_data = await wait_until_completed(
-        lambda: get_search_offers(mobile_client, offer_id_simple_search),
-        "Timeout reached and status was not completed.",
-    )
 
-    assert offer_search_data
     with allure.step("Step to Get offers searches and validate status"):
+        offer_search_data = await wait_until_completed(
+            lambda: get_search_offers(mobile_client, offer_id_simple_search),
+            "Timeout reached and status was not completed.",
+        )
+        assert offer_search_data
         allure.attach(
             "Offer status is completed",
             "text/plain",
         )
-    offers_list = await get_offer_list_simple_search(
-        mobile_client,
-        offer_id_simple_search,
-    )
-    assert "included" in offers_list, "no offers"
-    offer_included = offers_list["included"]
-    assert offer_included
-    offer_id = offers_list["data"][0]["id"]
-    offer_option_id = await get_option_id(offer_id, offers_list)
-    assert offer_id
-    assert offer_option_id
+
     with allure.step("Step to Get log offer id and offer option id"):
+        offers_list = await get_offer_list_simple_search(
+            mobile_client,
+            offer_id_simple_search,
+        )
+        assert "included" in offers_list, "no offers"
+        offer_included = offers_list["included"]
+        assert offer_included
+        offer_id = offers_list["data"][0]["id"]
+        offer_option_id = await get_option_id(offer_id, offers_list)
+        assert offer_id
+        assert offer_option_id
         allure.attach(
             "offer id: {0} and offer option id : {1}".format(offer_id, offer_option_id),
             "text/plain",
         )
 
-    quotes = await create_quote(mobile_client, offer_id, [offer_option_id])
-    assert quotes
     with allure.step("Step to Create quotes"):
+        quotes = await create_quote(mobile_client, offer_id, [offer_option_id])
+        assert quotes
         allure.attach(
             "Quotes ID {0}".format(quotes),
             "text/plain",
         )
-    quote_data = await wait_until_completed(
-        lambda: get_quote(mobile_client, quotes),
-        "Timeout reached and status was not completed.",
-    )
-    assert quote_data
-    currency = quote_data["attributes"]["price"]["currency"]
-    amount = quote_data["attributes"]["price"]["amount"]
+
     with allure.step("Step to Get quotes"):
+        quote_data = await wait_until_completed(
+            lambda: get_quote(mobile_client, quotes),
+            "Timeout reached and status was not completed.",
+        )
+        assert quote_data
+        currency = quote_data["attributes"]["price"]["currency"]
+        amount = quote_data["attributes"]["price"]["amount"]
         allure.attach(
             "Quote with currency: {0} and amount {1}".format(
                 currency,
@@ -233,44 +233,46 @@ async def test_simple_search(  # noqa: WPS217, WPS218, PLR0915
             "text/plain",
         )
 
-    payment_intent_id = await create_payment(
-        mobile_client,
-        currency,
-        amount,
-    )
-    assert payment_intent_id
     with allure.step("Step to Create Payment"):
+        payment_intent_id = await create_payment(
+            mobile_client,
+            currency,
+            amount,
+        )
+        assert payment_intent_id
         allure.attach(
             "Payment ID: {0}".format(payment_intent_id),
             "text/plain",
         )
 
-    payment_intent = await stripe_confirmation(
-        payment_intent_id=payment_intent_id,
-        stripe_api_key=stripe_api_key,
-    )
-    assert payment_intent["status"] == "requires_capture"
     with allure.step("Step to Update Stripe Intent and Confirm"):
+        payment_intent = await stripe_confirmation(
+            payment_intent_id=payment_intent_id,
+            stripe_api_key=stripe_api_key,
+        )
+        assert payment_intent["status"] == "requires_capture"
         allure.attach(
             "Payment Intent ID: {0}".format(payment_intent_id),
             "text/plain",
         )
-    trip_offer_price_quotes = quote_data["id"]
-    orders_data = await create_order(
-        mobile_client,
-        trip_offer_price_quotes,
-        payment_intent_id,
-    )
-    assert orders_data
-    order_id = orders_data["id"]
+
     with allure.step("Step to Create Order"):
+        trip_offer_price_quotes = quote_data["id"]
+        orders_data = await create_order(
+            mobile_client,
+            trip_offer_price_quotes,
+            payment_intent_id,
+        )
+        assert orders_data
+        order_id = orders_data["id"]
         allure.attach(
             "Order ID: {0}".format(order_id),
             "text/plain",
         )
-    order_data_by_id = await mobile_client.get_order(order_id)
-    assert order_data_by_id
+
     with allure.step("Step to get order"):
+        order_data_by_id = await mobile_client.get_order(order_id)
+        assert order_data_by_id
         allure.attach(
             "Order created successfully",
             "text/plain",
