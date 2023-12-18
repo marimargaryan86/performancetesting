@@ -1,3 +1,4 @@
+import type { StatusBadgeValue } from "components/ui/status-badge.svelte";
 import type { UserRole } from "integration/ory/schemas/authentication";
 
 type ContentElement =
@@ -18,6 +19,7 @@ export default {
     no: "No",
     help: "Help",
     unknown: "Unknown",
+    notAvailable: "N/A",
   },
   actions: {
     logout: "Logout",
@@ -27,6 +29,8 @@ export default {
     click: "Click",
     goToLogin: "Go to login",
     search: "Search",
+    newOrder: "New Order",
+    download: "Download",
   },
   sentences: {
     priceChange: "Price change",
@@ -41,7 +45,36 @@ export default {
     updatedDate: "Updated Date",
     owedToUs: "Owed to us",
     reconciledQuestion: "Reconciled?",
+    orderReference: "Order Reference",
+    tickets: "Ticket(s)",
+    departureDate: "Departure Date",
+    passengers: "Passengers",
+    totalPrice: "Total Price",
+    bookingStatus: "Booking Status",
+    cancellationStatus: "Cancellation Status",
+    refundStatus: "Refund Status",
   },
+  statuses: {
+    confirmed: "Confirmed",
+    "no-refund": "No Refund",
+    "not-ticketed": "Not Ticketed",
+    "refund-due": "Refund Due",
+    "refund-failed": "Refund Failed",
+    "refund-issued": "Refund Issued",
+    cancelled: "Cancelled",
+    completed: "Completed",
+    deleted: "Deleted",
+    error: "Error",
+    executed: "Executed",
+    failed: "Failed",
+    mixed: "Mixed",
+    pending: "Pending",
+    rejected: "Rejected",
+    submitted: "Submitted",
+    succeeded: "Succeeded",
+    unknown: "Unknown",
+    unspecified: "Unspecified",
+  } satisfies Record<StatusBadgeValue, string>,
   pages: {
     dashboard: {
       title: "Dashboard",
@@ -319,6 +352,7 @@ export default {
       },
     },
     tripManagement: {
+      title: "Trip Management",
       pages: {
         book: {
           title: "Book",

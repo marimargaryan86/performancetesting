@@ -2,7 +2,7 @@
   export const LIST_JOURNEYS_LIMIT = 20;
   export const LIST_JOURNEYS_SORT: Parameters<JourneyService["find"]>[0]["sort"] = "-createdAt";
 
-  function getDepartureDateString(order: Order): string {
+  function getOrderDepartureDate(order: Order): { date: Date; timeZone: string } {
     const departureLeg = order.bookings
       .flatMap((booking) => booking.detailsList.flatMap((details) => details.legs))
       .sort((a, b) => {
@@ -13,9 +13,10 @@
       throw new Error("Unknown departure date");
     }
 
-    return departureLeg.departureAt.toLocaleDateString("sv-SE", {
+    return {
+      date: departureLeg.departureAt,
       timeZone: departureLeg.origin.timeZone,
-    });
+    };
   }
 
   function getPassengerNames(order: Order): string[] {
@@ -60,7 +61,6 @@
   import TRow from "components/ui/table/t-row.svelte";
   import TStatusBadgeCol from "components/ui/table/t-status-badge-col.svelte";
   import Table from "components/ui/table/table.svelte";
-  import { formatAmount } from "formatting/currency";
   import { getOrderStatus } from "integration/common/schemas/order";
   import type { Order } from "integration/junction-hub-api/schemas/order";
   import type { Price } from "integration/common/schemas/price";
@@ -77,10 +77,15 @@
   } from "integration/junction-hub-api/schemas/booking";
   import { parseDateRange } from "utils/date-time";
   import { getPageTitle } from "utils/page-title";
+  import { getLocale, getLocaleData } from "i18n";
+  import TMoneyCol from "components/ui/table/t-money-col.svelte";
 
   export let data;
 
   let searchQuery = "";
+
+  const i18n = getLocaleData();
+  const locale = getLocale();
 
   $: orders = data.journeys.data.flatMap((item) => item.orders);
 
@@ -105,16 +110,22 @@
 </script>
 
 <svelte:head>
-  <title>{getPageTitle("Junction Hub", "Trip Management", "Orders")}</title>
+  <title>
+    {getPageTitle(
+      $i18n.title,
+      $i18n.pages.tripManagement.title,
+      $i18n.pages.tripManagement.pages.orders.title,
+    )}
+  </title>
 </svelte:head>
 
 <StandardLayout
-  pageTitle="Orders"
+  pageTitle={$i18n.pages.tripManagement.pages.orders.title}
   bind:searchQuery
   filtersActive={Boolean(Object.values($filters).find(ensureDefined))}
 >
   <Button size="small" href={routeConfig.routes.tripManagement.routes.book.root} slot="actions">
-    New Order
+    {$i18n.actions.newOrder}
     <PlusIcon />
   </Button>
 
@@ -122,15 +133,15 @@
 
   <Table class="orders-table" {loadMore}>
     <THead>
-      <Header>Order Reference</Header>
-      <Header>Created Date</Header>
-      <Header>Ticket(s)</Header>
-      <Header>Departure Date</Header>
-      <Header>Passengers</Header>
-      <Header>Total Price</Header>
-      <Header>Booking Status</Header>
-      <Header>Cancellation Status</Header>
-      <Header>Refund Status</Header>
+      <Header>{$i18n.tableHeaders.orderReference}</Header>
+      <Header>{$i18n.tableHeaders.createdDate}</Header>
+      <Header>{$i18n.tableHeaders.tickets}</Header>
+      <Header>{$i18n.tableHeaders.departureDate}</Header>
+      <Header>{$i18n.tableHeaders.passengers}</Header>
+      <Header>{$i18n.tableHeaders.totalPrice}</Header>
+      <Header>{$i18n.tableHeaders.bookingStatus}</Header>
+      <Header>{$i18n.tableHeaders.cancellationStatus}</Header>
+      <Header>{$i18n.tableHeaders.refundStatus}</Header>
     </THead>
 
     <TBody>
@@ -140,15 +151,16 @@
         {@const bookingStatus = getOrderStatus.booking(order)}
         {@const totalPrice = getTotalPrice(order)}
         {@const hasTickets = Boolean(order.bookings.flatMap((item) => item.ticketUrls).length)}
+        {@const departureAt = getOrderDepartureDate(order)}
 
         <TRow alternatingBackground={false}>
           <TCol class="typography body-small" width="0">
             <a href={routeConfig.routes.tripManagement.routes.orders.routes.order(order.id).root}>
-              {order.journey?.reference ?? "Unknown"}
+              {order.journey?.reference ?? $i18n.words.unknown}
             </a>
           </TCol>
           <TCol class="typography body-small" width="0">
-            {order.createdAt.toLocaleDateString("sv-SE")}
+            {order.createdAt.toLocaleDateString($locale)}
           </TCol>
           <TCol class="typography body-small" width="0">
             {#if hasTickets}
@@ -158,26 +170,19 @@
                   .tickets.root}
                 download
               >
-                Download
+                {$i18n.actions.download}
               </a>
             {:else}
-              <span class="not-available">N/A</span>
+              <span class="not-available">{$i18n.words.notAvailable}</span>
             {/if}
           </TCol>
           <TCol class="typography body-small" width="0">
-            {getDepartureDateString(order)}
+            {departureAt.date.toLocaleDateString($locale, { timeZone: departureAt.timeZone })}
           </TCol>
           <TCol class="typography body-small bold" maxWidth="240px">
             {getPassengerNames(order).join(", ")}
           </TCol>
-          <TCol class="typography body-small" width="0">
-            <strong>
-              {formatAmount(totalPrice)}
-            </strong>
-            <em class="typography body-xsmall">
-              {totalPrice.currency}
-            </em>
-          </TCol>
+          <TMoneyCol class="typography body-small" currencySize="x-small" money={totalPrice} />
 
           {#if bookingStatus}
             <TStatusBadgeCol value={bookingStatus} />
@@ -206,10 +211,6 @@
   :global(.table.orders-table) {
     width: 100%;
     height: 100%;
-  }
-
-  em.body-xsmall {
-    color: var(--color-common-light-soft);
   }
 
   a {

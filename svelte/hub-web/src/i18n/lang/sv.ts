@@ -13,6 +13,7 @@ export default {
     no: "Nej",
     help: "Hjälp",
     unknown: "Okänd",
+    notAvailable: "Otillgänglig",
   },
   actions: {
     logout: "Logga ut",
@@ -22,6 +23,8 @@ export default {
     click: "Klicka",
     goToLogin: "Gå till login",
     search: "Sök",
+    newOrder: "Ny Beställning",
+    download: "Ladda Ner",
   },
   sentences: {
     priceChange: "Prisändring",
@@ -36,6 +39,35 @@ export default {
     updatedDate: "Uppdaterad Datum",
     owedToUs: "Skyldig Oss",
     reconciledQuestion: "Försonad?",
+    orderReference: "Beställningsreferens",
+    tickets: "Biljett(er)",
+    departureDate: "Avgångsdatum",
+    passengers: "Passagerare",
+    totalPrice: "Totalt Pris",
+    bookingStatus: "Bokningsstatus",
+    cancellationStatus: "Avbokningsstatus",
+    refundStatus: "Återbetalningsstatus",
+  },
+  statuses: {
+    confirmed: "Bekräftad",
+    "no-refund": "Ingen Återbetalning",
+    "not-ticketed": "Inga Biljetter",
+    "refund-due": "Återbetalning Förfaller",
+    "refund-failed": "Återbetalning Misslyckades",
+    "refund-issued": "Återbetalning Utfärdad",
+    cancelled: "Avbokad",
+    completed: "Klar",
+    deleted: "Borttagen",
+    error: "Felaktig",
+    executed: "Utförd",
+    failed: "Misslyckad",
+    mixed: "Blandad",
+    pending: "Utvärderas",
+    rejected: "Avvisad",
+    submitted: "Inlämnad",
+    succeeded: "Lyckad",
+    unknown: "Okänd",
+    unspecified: "Ospecificerad",
   },
   pages: {
     dashboard: {
@@ -315,6 +347,7 @@ export default {
       },
     },
     tripManagement: {
+      title: "Resehantering",
       pages: {
         book: {
           title: "Boka",

@@ -45,9 +45,11 @@
 </script>
 
 <script lang="ts">
-  import { capitalize } from "utils/common";
+  import { getLocaleData } from "i18n";
 
   export let value: StatusBadgeValue;
+
+  const i18n = getLocaleData();
 
   $: variant = statusMapping[value];
 </script>
@@ -58,7 +60,7 @@
   class:warn={variant === "warn"}
   class:error={variant === "error"}
 >
-  {capitalize(value).replaceAll("-", " ")}
+  {$i18n.statuses[value]}
 </span>
 
 <style>
