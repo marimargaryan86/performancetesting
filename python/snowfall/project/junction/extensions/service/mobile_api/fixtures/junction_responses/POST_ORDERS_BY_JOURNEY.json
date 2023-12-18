@@ -1,0 +1,191 @@
+{
+    "url": "\/journeys\/4c6c0d01-5d9c-407b-a17d-9656a06aac80\/orders",
+    "method": "POST",
+    "status_code": 201,
+    "json": {
+      "data": {
+        "id": "9da41368-5504-48a9-b0de-0a2f3888ac9a",
+        "type": "orders",
+        "attributes": {
+          "createdAt": "2019-08-24T14:15:22Z",
+          "passengers": [
+            {
+              "firstName": "John",
+              "lastName": "Smith",
+              "title": "mr",
+              "gender": "male",
+              "dateOfBirth": "1980-02-03"
+            }
+          ]
+        },
+        "relationships": {
+          "journey": {
+            "data": {
+              "id": "4c6c0d01-5d9c-407b-a17d-9656a06aac80",
+              "type": "journeys"
+            }
+          },
+          "bookings": {
+            "data": [
+              {
+                "id": "baf0d2fa-db70-45bb-adf0-f25eacec0552",
+                "type": "trip-bookings"
+              }
+            ]
+          }
+        },
+        "links": {
+          "self": "https://example.com/resource/9da41368-5504-48a9-b0de-0a2f3888ac9a"
+        }
+      },
+      "included": [
+        {
+          "id": "4c6c0d01-5d9c-407b-a17d-9656a06aac80",
+          "type": "journeys",
+          "attributes": {
+            "createdAt": "2019-08-24T14:15:22Z",
+            "reference": "IRKI2XHA",
+            "contactDetails": {
+              "email": "john.smith@example.com",
+              "address": {
+                "addressLines": [
+                  "Street name 7"
+                ],
+                "countryCode": "GB",
+                "postalCode": "12345",
+                "city": "London"
+              },
+              "phoneNumber": "+123456789"
+            }
+          },
+          "relationships": {
+            "orders": {
+              "data": [
+                {
+                  "id": "9da41368-5504-48a9-b0de-0a2f3888ac9a",
+                  "type": "orders"
+                }
+              ]
+            }
+          },
+          "links": {
+            "self": "https://example.com/resource/9da41368-5504-48a9-b0de-0a2f3888ac9a"
+          }
+        },
+        {
+          "id": "baf0d2fa-db70-45bb-adf0-f25eacec0552",
+          "type": "trip-bookings",
+          "attributes": {
+            "totalPrice": {
+              "currency": "EUR",
+              "amount": "13.37"
+            },
+            "operatorBookingReferences": [
+              "HDZEMS"
+            ]
+          },
+          "relationships": {
+            "order": {
+              "data": {
+                "id": "9da41368-5504-48a9-b0de-0a2f3888ac9a",
+                "type": "orders"
+              }
+            },
+            "status": {
+              "data": {
+                "id": "confirmed",
+                "type": "booking-statuses"
+              }
+            },
+            "details": {
+              "data": [
+                {
+                  "id": "6ea90a1a3-3956-4f60-8388-ca689db32fe1",
+                  "type": "trip-booking-details"
+                }
+              ]
+            }
+          },
+          "links": {
+            "self": "https://example.com/resource/9da41368-5504-48a9-b0de-0a2f3888ac9a"
+          }
+        },
+        {
+          "id": "6ea90a1a3-3956-4f60-8388-ca689db32fe1",
+          "type": "trip-booking-details",
+          "attributes": {
+            "cabinClassName": "Economy",
+            "vendor": "BA",
+            "operator": "BA",
+            "routeIdentifiers": {
+              "vendor": "BA",
+              "operator": "BA"
+            },
+            "legs": [
+              {
+                "origin": {
+                  "ref": "890880d9d63ffff",
+                  "name": "Uppsala Central Station",
+                  "latitude": 59.858611,
+                  "longitude": 17.646111,
+                  "timeZone": "Europe/Stockholm"
+                },
+                "destination": {
+                  "ref": "890880d9d63ffff",
+                  "name": "Uppsala Central Station",
+                  "latitude": 59.858611,
+                  "longitude": 17.646111,
+                  "timeZone": "Europe/Stockholm"
+                },
+                "departureAt": "2019-08-24T14:15:22Z",
+                "arrivalAt": "2019-08-24T14:15:22Z"
+              }
+            ]
+          },
+          "relationships": {
+            "booking": {
+              "data": {
+                "id": "baf0d2fa-db70-45bb-adf0-f25eacec0552",
+                "type": "trip-bookings"
+              }
+            },
+            "cabinClass": {
+              "data": {
+                "id": "economy",
+                "type": "cabin-classes"
+              }
+            },
+            "legType": {
+              "data": {
+                "id": "air",
+                "type": "leg-types"
+              }
+            }
+          },
+          "links": {
+            "self": "https://example.com/resource/9da41368-5504-48a9-b0de-0a2f3888ac9a"
+          }
+        },
+        {
+          "id": "airport",
+          "type": "cabin-classes",
+          "attributes": {
+            "name": "economy"
+          },
+          "links": {
+            "self": "https://example.com/resource/9da41368-5504-48a9-b0de-0a2f3888ac9a"
+          }
+        },
+        {
+          "id": "air",
+          "type": "leg-types",
+          "attributes": {
+            "name": "air"
+          },
+          "links": {
+            "self": "https://example.com/resource/9da41368-5504-48a9-b0de-0a2f3888ac9a"
+          }
+        }
+      ]
+    }
+}

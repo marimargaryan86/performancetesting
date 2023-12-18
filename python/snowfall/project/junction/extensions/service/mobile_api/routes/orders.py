@@ -36,6 +36,7 @@ from snowfall.stdlib.integration.starlette import (
     pagination_helpers,
     request_helpers,
 )
+from snowfall.stdlib.integration.starlette.models import JsonApiResponse
 from snowfall.stdlib.logging import stdout
 from snowfall.vendor.junction.go import client
 from snowfall.vendor.junction.go import models as vendor_models
@@ -139,6 +140,156 @@ class Order(endpoints.HTTPEndpoint):
         return stdlib_models.JsonApiResponse(response_body)
 
 
+async def create_order(  # noqa: WPS217
+    request: requests.Request,
+    voucher: models_pb2.Voucher | None,
+    orders_repository: repository.OrdersRepository,
+    junction_client: client.Client,
+    plus_http_client: plus_client.PlusClient,
+    smtp_client: smtp.EmailClient,
+    vouchers_repository: repository.VouchersRepository,
+    bills_client: bills.Client,
+    order_by_journey: bool = False,  # noqa: FBT001, FBT002
+) -> JsonApiResponse:
+    body = await request_helpers.flatten_request(request)
+    payment = body["payment"]
+    voucher_code = body.get("voucher", "")
+    (correct_amount, correct_state) = await check_payment_amount_and_state(
+        payment,
+        body["quote"],
+        voucher,
+        junction_client,
+    )
+    if not correct_amount:
+        stripe.PaymentIntent.cancel(payment)
+        # TODO: split this into invalid amount & invalid currency. Create err func
+        return stdlib_models.JsonApiResponse(
+            stdlib_models.Body(
+                errors=[
+                    stdlib_models.Error(
+                        status=str(status.HTTP_400_BAD_REQUEST),
+                        code="invalid_amount_or_currency",
+                        detail=(
+                            "Payment's amount or currency doesn't match with order"
+                        ),
+                        source=stdlib_models.ErrorSourcePointer(
+                            pointer="/data/relationships/payment",
+                        ),
+                    ),
+                ],
+            ),
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
+    if not correct_state:
+        return stdlib_models.JsonApiResponse(
+            stdlib_models.Body(
+                errors=[
+                    stdlib_models.Error(
+                        status=str(status.HTTP_400_BAD_REQUEST),
+                        code="invalid_payment_state",
+                        detail="Payment Intent is not confirmed",
+                        source=stdlib_models.ErrorSourcePointer(
+                            pointer="/data/relationships/payment",
+                        ),
+                    ),
+                ],
+            ),
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
+    contact_details = body["contactDetails"]
+    try:
+        if order_by_journey:
+            junction_order = await junction_client.add_order_to_journey(
+                journey_id=request.path_params["journeyId"],
+                quote_id=body["quote"],
+                passengers=[
+                    vendor_models.Passenger(
+                        **vendor_models.dict_factory_to_snake(pax),
+                    )
+                    for pax in body["passengers"]
+                ],
+            )
+        else:
+            junction_order = await junction_client.create_order(
+                body["quote"],
+                [
+                    vendor_models.Passenger(
+                        **vendor_models.dict_factory_to_snake(pax),
+                    )
+                    for pax in body["passengers"]
+                ],
+                vendor_models.ContactDetails(
+                    email=contact_details["email"],
+                    address=vendor_models.Address(
+                        **vendor_models.dict_factory_to_snake(
+                            contact_details["address"],
+                        ),
+                    ),
+                    phone_number=contact_details["phoneNumber"],
+                ),
+                body.get("residenceAddress"),
+                include=["journey"],
+            )
+    except httpx.HTTPStatusError:
+        await payments.cancel(payment)
+        raise
+    mobile_order = models_pb2.MobileOrder(
+        id=junction_order["data"]["id"],
+        payment_intent_id=payment,
+        user_id=request.user.username,
+        mobile_number=contact_details["phoneNumber"],
+    )
+    try:
+        await bills_client.create(
+            transactions_models_pb2.Bill(
+                order_id=mobile_order.id,
+                payment_intent_id=mobile_order.payment_intent_id,
+            ),
+        )
+    except (ServiceUnavailableError, UnhandledError):
+        _logger.exception(
+            "failed to create a bill",
+            order_id=mobile_order.id,
+            payment_intent_id=mobile_order.payment_intent_id,
+        )
+    try:
+        spnr = junction_order["included"][0]["attributes"]["reference"]
+    except (KeyError, IndexError):
+        spnr = "XX"
+    if voucher_code:
+        await vouchers_repository.use_voucher(voucher_code, payment)
+        mobile_order.voucher_code = voucher_code
+    stripe.PaymentIntent.modify(
+        payment,
+        metadata={"order_id": mobile_order.id, "spnr": spnr},
+        receipt_email=contact_details["email"],
+    )
+    mobile_order.spnr = spnr
+    await orders_repository.insert(mobile_order)
+
+    task = BackgroundTask(
+        orders.poll_order_status,
+        junction_client,
+        mobile_order.id,
+        mobile_order.payment_intent_id,
+        smtp_client,
+        vouchers_repository,
+        plus_http_client,
+    )
+    junction_order["data"]["relationships"]["payment"] = {
+        "data": {
+            "id": mobile_order.payment_intent_id,
+            "type": "payments",
+        },
+    }
+    junction_order["data"]["relationships"]["markup"] = {"data": None}
+    return stdlib_models.JsonApiResponse(
+        stdlib_models.Body(data=junction_order["data"]),
+        status.HTTP_201_CREATED,
+        background=task,
+    )
+
+
 class Orders(endpoints.HTTPEndpoint):
     async def get(
         self,
@@ -212,7 +363,7 @@ class Orders(endpoints.HTTPEndpoint):
         )
 
     @validators.voucher_validator
-    async def post(  # noqa: WPS217
+    async def post(
         self,
         request: requests.Request,
         voucher: models_pb2.Voucher | None,
@@ -223,128 +374,41 @@ class Orders(endpoints.HTTPEndpoint):
         vouchers_repository: repository.VouchersRepository = lagom.injectable,
         bills_client: bills.Client = lagom.injectable,
     ) -> responses.Response:
-        body = await request_helpers.flatten_request(request)
-        payment = body["payment"]
-        voucher_code = body.get("voucher", "")
-        (correct_amount, correct_state) = await check_payment_amount_and_state(
-            payment,
-            body["quote"],
+        return await create_order(
+            request,
             voucher,
+            orders_repository,
             junction_client,
-        )
-        if not correct_amount:
-            stripe.PaymentIntent.cancel(payment)
-            # TODO: split this into invalid amount & invalid currency. Create err func
-            return stdlib_models.JsonApiResponse(
-                stdlib_models.Body(
-                    errors=[
-                        stdlib_models.Error(
-                            status=str(status.HTTP_400_BAD_REQUEST),
-                            code="invalid_amount_or_currency",
-                            detail=(
-                                "Payment's amount or currency doesn't match with order"
-                            ),
-                            source=stdlib_models.ErrorSourcePointer(
-                                pointer="/data/relationships/payment",
-                            ),
-                        ),
-                    ],
-                ),
-                status_code=status.HTTP_400_BAD_REQUEST,
-            )
-        if not correct_state:
-            return stdlib_models.JsonApiResponse(
-                stdlib_models.Body(
-                    errors=[
-                        stdlib_models.Error(
-                            status=str(status.HTTP_400_BAD_REQUEST),
-                            code="invalid_payment_state",
-                            detail="Payment Intent is not confirmed",
-                            source=stdlib_models.ErrorSourcePointer(
-                                pointer="/data/relationships/payment",
-                            ),
-                        ),
-                    ],
-                ),
-                status_code=status.HTTP_400_BAD_REQUEST,
-            )
-        contact_details = body["contactDetails"]
-        try:
-            junction_order = await junction_client.create_order(
-                body["quote"],
-                [
-                    vendor_models.Passenger(**vendor_models.dict_factory_to_snake(pax))
-                    for pax in body["passengers"]
-                ],
-                vendor_models.ContactDetails(
-                    email=contact_details["email"],
-                    address=vendor_models.Address(
-                        **vendor_models.dict_factory_to_snake(
-                            contact_details["address"],
-                        ),
-                    ),
-                    phone_number=contact_details["phoneNumber"],
-                ),
-                body.get("residenceAddress"),
-                include=["journey"],
-            )
-        except httpx.HTTPStatusError:
-            await payments.cancel(payment)
-            raise
-        mobile_order = models_pb2.MobileOrder(
-            id=junction_order["data"]["id"],
-            payment_intent_id=payment,
-            user_id=request.user.username,
-            mobile_number=contact_details["phoneNumber"],
-        )
-        try:
-            await bills_client.create(
-                transactions_models_pb2.Bill(
-                    order_id=mobile_order.id,
-                    payment_intent_id=mobile_order.payment_intent_id,
-                ),
-            )
-        except (ServiceUnavailableError, UnhandledError):
-            _logger.exception(
-                "failed to create a bill",
-                order_id=mobile_order.id,
-                payment_intent_id=mobile_order.payment_intent_id,
-            )
-        try:
-            spnr = junction_order["included"][0]["attributes"]["reference"]
-        except (KeyError, IndexError):
-            spnr = "XX"
-        if voucher_code:
-            await vouchers_repository.use_voucher(voucher_code, payment)
-            mobile_order.voucher_code = voucher_code
-        stripe.PaymentIntent.modify(
-            payment,
-            metadata={"order_id": mobile_order.id, "spnr": spnr},
-            receipt_email=contact_details["email"],
-        )
-        mobile_order.spnr = spnr
-        await orders_repository.insert(mobile_order)
-
-        task = BackgroundTask(
-            orders.poll_order_status,
-            junction_client,
-            mobile_order.id,
-            mobile_order.payment_intent_id,
+            plus_http_client,
             smtp_client,
             vouchers_repository,
-            plus_http_client,
+            bills_client,
         )
-        junction_order["data"]["relationships"]["payment"] = {
-            "data": {
-                "id": mobile_order.payment_intent_id,
-                "type": "payments",
-            },
-        }
-        junction_order["data"]["relationships"]["markup"] = {"data": None}
-        return stdlib_models.JsonApiResponse(
-            stdlib_models.Body(data=junction_order["data"]),
-            status.HTTP_201_CREATED,
-            background=task,
+
+
+class OrdersByJourney(endpoints.HTTPEndpoint):
+    @validators.voucher_validator
+    async def post(
+        self,
+        request: requests.Request,
+        voucher: models_pb2.Voucher | None,
+        orders_repository: repository.OrdersRepository = lagom.injectable,
+        junction_client: client.Client = lagom.injectable,
+        plus_http_client: plus_client.PlusClient = lagom.injectable,
+        smtp_client: smtp.EmailClient = lagom.injectable,
+        vouchers_repository: repository.VouchersRepository = lagom.injectable,
+        bills_client: bills.Client = lagom.injectable,
+    ) -> responses.Response:
+        return await create_order(
+            request,
+            voucher,
+            orders_repository,
+            junction_client,
+            plus_http_client,
+            smtp_client,
+            vouchers_repository,
+            bills_client,
+            order_by_journey=True,
         )
 
 

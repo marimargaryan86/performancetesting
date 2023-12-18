@@ -21,14 +21,14 @@
         "relationships": {
           "journey": {
             "data": {
-              "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+              "id": "4c6c0d01-5d9c-407b-a17d-9656a06aac80",
               "type": "journeys"
             }
           },
           "bookings": {
             "data": [
               {
-                "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "id": "94fbe5a6-fbc2-4765-a859-3aca7dd637b9",
                 "type": "trip-bookings"
               }
             ]
@@ -40,7 +40,7 @@
       },
       "included": [
         {
-          "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+          "id": "4c6c0d01-5d9c-407b-a17d-9656a06aac80",
           "type": "journeys",
           "attributes": {
             "createdAt": "2019-08-24T14:15:22Z",
@@ -73,7 +73,7 @@
           }
         },
         {
-          "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+          "id": "94fbe5a6-fbc2-4765-a859-3aca7dd637b9",
           "type": "trip-bookings",
           "attributes": {
             "totalPrice": {
@@ -100,7 +100,7 @@
             "details": {
               "data": [
                 {
-                  "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                  "id": "6eea6c4c-6379-4d92-9e78-5972396dc4d0",
                   "type": "trip-booking-details"
                 }
               ]
@@ -111,7 +111,7 @@
           }
         },
         {
-          "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+          "id": "6eea6c4c-6379-4d92-9e78-5972396dc4d0",
           "type": "trip-booking-details",
           "attributes": {
             "cabinClassName": "Economy",
@@ -145,7 +145,7 @@
           "relationships": {
             "booking": {
               "data": {
-                "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "id": "94fbe5a6-fbc2-4765-a859-3aca7dd637b9",
                 "type": "trip-bookings"
               }
             },

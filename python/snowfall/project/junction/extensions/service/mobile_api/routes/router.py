@@ -39,6 +39,11 @@ def get_routes(
         integration.route("/places", places.Places, name="Places"),
         integration.route("/places/{placeId}", places.Place, name="ViewPlace"),
         integration.route("/orders", orders.Orders, name="ListOrders"),
+        integration.route(
+            "/journeys/{journeyId}/orders",
+            orders.OrdersByJourney,
+            name="ListOrdersByJourney",
+        ),
         integration.route("/orders/markups", orders.Markups, name="CreateMarkups"),
         integration.route(
             "/orders/{orderId}",

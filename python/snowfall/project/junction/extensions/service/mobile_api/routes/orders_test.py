@@ -17,7 +17,7 @@ from snowfall.project.junction.extensions.service.mobile_api.tasks import orders
 _ORDER_ID = "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
 
 
-class TestOrders(object):
+class OrdersBase(object):
     async def create_order(
         self,
         authenticated_http_client: httpx.AsyncClient,
@@ -111,6 +111,8 @@ class TestOrders(object):
             },
         )
 
+
+class TestOrders(OrdersBase):
     async def test_order_created(
         self,
         authenticated_http_client: httpx.AsyncClient,
@@ -331,6 +333,81 @@ class TestOrders(object):
         )
 
         assert response.status_code == 404
+
+
+class TestOrderByJourney(OrdersBase):
+    async def test_create_order_by_journey(
+        self,
+        authenticated_http_client: httpx.AsyncClient,
+        httpx_mock: pytest_httpx.HTTPXMock,
+        monkeypatch: pytest.MonkeyPatch,
+        orders_repository: repository.OrdersRepository,
+    ) -> None:
+        response = await self.create_order(
+            authenticated_http_client,
+            httpx_mock,
+            monkeypatch,
+        )
+        httpx_mock.add_response(
+            **await conftest.load_response_fixture("POST_ORDERS_BY_JOURNEY.json"),
+        )
+        journey = response.json()["data"]["relationships"]["journey"]
+        journey_response = await authenticated_http_client.post(
+            "/journeys/{0}/orders".format(journey["data"]["id"]),
+            json={
+                "data": {
+                    "type": "orders",
+                    "attributes": {
+                        "contactDetails": {
+                            "email": "john.smith@example.com",
+                            "address": {
+                                "addressLines": ["Street name 7"],
+                                "countryCode": "GB",
+                                "postalCode": "12345",
+                                "city": "London",
+                            },
+                            "phoneNumber": "+306946661759",
+                        },
+                        "passengers": [
+                            {
+                                "firstName": "John",
+                                "lastName": "Smith",
+                                "title": "mr",
+                                "gender": "male",
+                                "dateOfBirth": "1980-02-03",
+                                "travelerDocument": {
+                                    "documentType": "passport",
+                                    "documentNumber": "05433434",
+                                    "documentIssueCountry": "GB",
+                                    "documentExpirationDate": "2025-02-03",
+                                    "nationality": "GB",
+                                    "residenceCountryCode": "NL",
+                                },
+                            },
+                        ],
+                    },
+                    "relationships": {
+                        "payment": {
+                            "data": {
+                                "id": "pi_1DseBB2eZvKYlo2Cj8MBORJk",
+                                "type": "payments",
+                            },
+                        },
+                        "quote": {
+                            "data": {
+                                "id": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                                "type": "trip-offer-price-quotes",
+                            },
+                        },
+                    },
+                },
+            },
+        )
+        assert journey_response.status_code == status.HTTP_201_CREATED
+        order_by_journey = await orders_repository.find_by_id(
+            journey_response.json()["data"]["id"],
+        )
+        assert order_by_journey is not None
 
 
 async def _create_markups(

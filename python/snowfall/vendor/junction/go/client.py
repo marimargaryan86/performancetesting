@@ -637,8 +637,7 @@ class Client(base_client.BaseClient):
     async def add_order_to_journey(
         self,
         journey_id: str,
-        offer_aggregate_id: str,
-        offer_ids: Sequence[str],
+        quote_id: str,
         passengers: Sequence[models.Passenger],
     ) -> dict[str, Any]:
         body = {
@@ -653,20 +652,11 @@ class Client(base_client.BaseClient):
                     ],
                 },
                 "relationships": {
-                    "offer": {
+                    "quote": {
                         "data": {
-                            "id": offer_aggregate_id,
-                            "type": "offers",
+                            "id": quote_id,
+                            "type": "trip-offer-price-quotes",
                         },
-                    },
-                    "options": {
-                        "data": [
-                            {
-                                "id": offer_id,
-                                "type": "offer-options",
-                            }
-                            for offer_id in offer_ids
-                        ],
                     },
                 },
                 "type": "orders",
