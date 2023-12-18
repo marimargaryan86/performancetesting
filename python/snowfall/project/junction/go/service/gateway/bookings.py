@@ -65,7 +65,7 @@ class Service(service.Service, bookings_pb2_grpc.BookingServiceServicer):
         try:
             response = await provider.connection.bookings.CancelBooking(
                 providers_pb2.CancelBookingRequest(
-                    booking_id=ids.resource_id,
+                    provider_booking_reference=ids.resource_id,
                 ),
             )
         except aio.AioRpcError as error:

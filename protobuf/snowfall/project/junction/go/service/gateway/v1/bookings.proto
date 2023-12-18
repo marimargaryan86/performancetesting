@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package snowfall.project.junction.go.service.gateway.v1;
 
-import "snowfall/project/junction/go/service/orders/v1/models.proto";
 import "snowfall/project/junction/provider/v1/bookings.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/gateway/v1";
@@ -17,7 +16,7 @@ message CancelBookingRequest {
 }
 
 message CancelBookingResponse {
-  snowfall.project.junction.go.service.orders.v1.BookingCancellation cancellation = 1;
+  snowfall.project.junction.provider.v1.BookingCancellation cancellation = 1;
 }
 
 message GetBookingsRequest {

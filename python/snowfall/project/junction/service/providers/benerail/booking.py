@@ -504,7 +504,7 @@ class BookingCancellationHandler(object):
         self._client = benerail_client
         self._logger = stdout.get_logger()
 
-    async def cancel_booking(self, booking_id: str) -> models_pb2.BookingCancellation:
+    async def cancel_booking(self, booking_id: str) -> bookings_pb2.BookingCancellation:
         session_token = string.uuid()
 
         try:
@@ -516,16 +516,16 @@ class BookingCancellationHandler(object):
                 session_token=session_token,
             )
 
-            return models_pb2.BookingCancellation(
-                booking_id=booking_id,
-                status=models_pb2.BookingCancellation.STATUS_REFUND_FAILED,
+            return bookings_pb2.BookingCancellation(
+                provider_booking_reference=booking_id,
+                status=bookings_pb2.BookingCancellation.STATUS_REFUND_FAILED,
             )
 
     async def _cancel_booking(  # noqa: WPS217
         self,
         booking_id: str,
         session_token: str,
-    ) -> models_pb2.BookingCancellation:
+    ) -> bookings_pb2.BookingCancellation:
         booking_res = (
             await self._client.bookings_client.get_booking(
                 booking_id=booking_id,
@@ -607,15 +607,15 @@ class BookingCancellationHandler(object):
                 session_token=session_token,
             )
 
-        status = models_pb2.BookingCancellation.STATUS_NO_REFUND
+        status = bookings_pb2.BookingCancellation.STATUS_NO_REFUND
         refunded_us_proto = None
 
         if refunded_us and refunded_us.amount:
-            status = models_pb2.BookingCancellation.STATUS_REFUND_DUE
+            status = bookings_pb2.BookingCancellation.STATUS_REFUND_DUE
             refunded_us_proto = refunded_us.protobuf()
 
-        return models_pb2.BookingCancellation(
-            booking_id=booking_id,
+        return bookings_pb2.BookingCancellation(
+            provider_booking_reference=booking_id,
             status=status,
             refunded_us=refunded_us_proto,
         )

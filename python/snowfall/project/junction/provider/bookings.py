@@ -3,14 +3,13 @@ from collections.abc import Awaitable, Callable
 
 import grpc
 
-from snowfall.project.junction.go.service.orders.v1 import models_pb2
 from snowfall.project.junction.provider.v1 import bookings_pb2, bookings_pb2_grpc
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.transport.grpc import service
 
 Transformer = Callable[[bytes], Awaitable[bookings_pb2.Booking]]
-CancellationHandler = Callable[[str], Awaitable[models_pb2.BookingCancellation]]
+CancellationHandler = Callable[[str], Awaitable[bookings_pb2.BookingCancellation]]
 
 
 class NotFoundError(Exception):
@@ -36,7 +35,7 @@ class Implementation(object):
 
         return await self._transformer(raw_booking)
 
-    async def cancel(self, identifier: str) -> models_pb2.BookingCancellation:
+    async def cancel(self, identifier: str) -> bookings_pb2.BookingCancellation:
         if self._cancellation_handler is None:
             raise RuntimeError()
 
@@ -86,7 +85,9 @@ class BookingService(service.Service, bookings_pb2_grpc.BookingServiceServicer):
     ) -> bookings_pb2.CancelBookingResponse:
         if self._implementation.supports_cancellation():
             return bookings_pb2.CancelBookingResponse(
-                cancellation=await self._implementation.cancel(request.booking_id),
+                cancellation=await self._implementation.cancel(
+                    request.provider_booking_reference,
+                ),
             )
 
         return await context.abort(grpc.StatusCode.UNIMPLEMENTED)

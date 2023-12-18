@@ -1,6 +1,8 @@
 import asyncio
+import contextlib
 import dataclasses
-from collections.abc import Awaitable, Iterable, Mapping, Sequence
+from collections.abc import Awaitable, Mapping, Sequence
+from collections.abc import Set as AbstractSet
 from typing import NamedTuple
 
 from grpc import StatusCode, aio
@@ -19,6 +21,7 @@ from snowfall.project.junction.go.service.orders.v1 import (
     models_pb2,
     orders_pb2,
 )
+from snowfall.project.junction.provider.v1 import bookings_pb2 as provider_bookings_pb2
 from snowfall.project.pay.adapter import refunds as refunds_adapter
 from snowfall.project.pay.service.refunds.v1 import models_pb2 as refund_models_pb2
 from snowfall.project.pay.service.refunds.v1 import models_pb2 as refunds_model_pb2
@@ -31,6 +34,8 @@ from snowfall.vendor.zendesk.client import ZendeskClient
 from snowfall.vendor.zendesk.models import (
     cancellation_request as cancellation_request_models,
 )
+
+_logger = stdout.get_logger()
 
 
 async def _extract_bookings_and_orders(
@@ -356,36 +361,103 @@ class _ManualItem(object):
     refunded_us: money.Money | None = None
 
 
+class _BookingTicketInfo(NamedTuple):
+    booking_id: str
+    ticket_id: str
+
+
 class _IdContainer(NamedTuple):
     composite_id: str
     booking_id: str
 
 
-def _map_provider_references_to_ids(
-    booking_cancellations: Sequence[models_pb2.BookingCancellation],
-    bookings_map: dict[str, models_pb2.Booking],
-) -> dict[str, _IdContainer]:
-    mapped_data = {}
+def _update_cancellation_from_provider_cancel(
+    cancellation: models_pb2.BookingCancellation,
+    provider_cancellation: provider_bookings_pb2.BookingCancellation,
+) -> None:
+    cancellation.status = getattr(
+        models_pb2.BookingCancellation.Status,
+        provider_bookings_pb2.BookingCancellation.Status.Name(
+            provider_cancellation.status,
+        ),
+    )
 
-    for booking_cancellation in booking_cancellations:
-        booking = bookings_map[booking_cancellation.booking_id]
-        mapped_data[booking.trip_result.provider_booking_reference] = _IdContainer(
-            composite_id=sequence.to_composite_id(
-                [
-                    booking.provider_id,
-                    booking.trip_result.provider_booking_reference,
-                ],
-            ),
-            booking_id=booking_cancellation.booking_id,
+    if provider_cancellation.HasField("refunded_us"):
+        cancellation.refunded_us.CopyFrom(
+            provider_cancellation.refunded_us,
         )
 
-    return mapped_data
+
+def _find_missing_booking_ids(
+    cancellation_request: models_pb2.CancellationRequest,
+    updated_booking_ids: AbstractSet[str],
+) -> set[str]:
+    return {
+        booking_cancellation.booking_id
+        for booking_cancellation in cancellation_request.booking_cancellations
+    } - updated_booking_ids
 
 
-@dataclasses.dataclass(frozen=True)
-class _BookingsInfo(object):
-    id_to_booking: Mapping[str, models_pb2.Booking]
-    provider_reference_to_ids: Mapping[str, _IdContainer]
+def _booking_id_to_provider_cancellation(
+    provider_cancellations: Sequence[provider_bookings_pb2.BookingCancellation],
+    provider_reference_to_booking_id: Mapping[str, str],
+) -> dict[str, provider_bookings_pb2.BookingCancellation]:
+    booking_id_to_provider_cancellation = {}
+
+    for provider_cancellation in provider_cancellations:
+        booking_id_to_provider_cancellation[
+            provider_reference_to_booking_id[
+                provider_cancellation.provider_booking_reference
+            ]
+        ] = provider_cancellation
+
+    return booking_id_to_provider_cancellation
+
+
+class _BookingsContainer(object):
+    def __init__(
+        self,
+        bookings: Sequence[models_pb2.Booking],
+    ) -> None:
+        self._id_to_booking: dict[str, models_pb2.Booking] = {}
+        self._provider_reference_to_ids = {}
+
+        for booking in bookings:
+            self._id_to_booking[booking.id] = booking
+            self._provider_reference_to_ids[
+                booking.trip_result.provider_booking_reference
+            ] = _IdContainer(
+                composite_id=sequence.to_composite_id(
+                    [
+                        booking.provider_id,
+                        booking.trip_result.provider_booking_reference,
+                    ],
+                ),
+                booking_id=booking.id,
+            )
+
+    @property
+    def booking_ids(self) -> list[str]:
+        return list(self._id_to_booking.keys())
+
+    @property
+    def composite_ids(self) -> list[str]:
+        return [
+            id_container.composite_id
+            for id_container in self._provider_reference_to_ids.values()
+        ]
+
+    def get_by_id(self, booking_id: str) -> models_pb2.Booking:
+        return self._id_to_booking[booking_id]
+
+    def booking_id_from_provider_reference(self, provider_reference: str) -> str:
+        return self._provider_reference_to_ids[provider_reference].booking_id
+
+    def provider_reference_to_booking_id(self) -> dict[str, str]:
+        return {
+            provider_reference: id_container.booking_id
+            for provider_reference, id_container in self._provider_reference_to_ids.items()
+        }
 
 
 class _ProviderCancellationFailedError(Exception):
@@ -412,7 +484,7 @@ class CreateCancellationTaskHandler(object):
         self._cancellation_group_id = cancellation_group_id
         self._logger = stdout.get_logger()
 
-    async def execute(self, cancellation_request_id: str) -> None:
+    async def execute(self, cancellation_request_id: str) -> None:  # noqa: WPS217
         cancellation_request = await self._cancellations.find_by_id(
             document_id=cancellation_request_id,
         )
@@ -425,39 +497,57 @@ class CreateCancellationTaskHandler(object):
 
             return
 
-        bookings_data = await self._get_bookings_data(cancellation_request)
+        await self._mark_cancellations_as_pending(cancellation_request)
 
-        new_cancellations, manual_items = await self._handle_automatic_cancellation(
-            bookings_data=bookings_data,
+        bookings_container = await self._get_bookings_container(cancellation_request)
+
+        (
+            provider_cancellations,
+            manual_items,
+        ) = await self._handle_automatic_cancellation(
+            bookings_container=bookings_container,
         )
+        booking_tickets_info = None
 
         if manual_items:
-            new_cancellations.extend(
-                await self._handle_manual_flow(manual_items),
+            booking_tickets_info = await self._create_zendesk_tickets_for_bookings(
+                manual_items,
             )
 
-        await self._update_statuses_and_refunded_us(
+        await self._update_cancellation_request(
             cancellation_request=cancellation_request,
-            cancellations=new_cancellations,
-            provider_reference_to_ids=bookings_data.provider_reference_to_ids,
+            provider_cancellations=provider_cancellations,
+            provider_reference_to_booking_id=(
+                bookings_container.provider_reference_to_booking_id()
+            ),
+            tickets_info=booking_tickets_info,
         )
+
+    async def _mark_cancellations_as_pending(
+        self,
+        cancellation_request: models_pb2.CancellationRequest,
+    ) -> None:
+        for booking_cancellation in cancellation_request.booking_cancellations:
+            booking_cancellation.status = models_pb2.BookingCancellation.STATUS_PENDING
+
+        await self._cancellations.update(document=cancellation_request)
 
     async def _handle_automatic_cancellation(  # noqa: WPS231
         self,
-        bookings_data: _BookingsInfo,
-    ) -> tuple[list[models_pb2.BookingCancellation], list[_ManualItem]]:
+        bookings_container: _BookingsContainer,
+    ) -> tuple[list[provider_bookings_pb2.BookingCancellation], list[_ManualItem]]:
         coros = tuple(
             self._gateway.CancelBooking(
                 bookings_pb2.CancelBookingRequest(
-                    booking_id=id_container.composite_id,
+                    booking_id=composite_id,
                 ),
             )
-            for id_container in bookings_data.provider_reference_to_ids.values()
+            for composite_id in bookings_container.composite_ids
         )
 
-        new_cancellations = []
+        provider_cancellations = []
         manual_items = []
-        initial_booking_ids = set(bookings_data.id_to_booking.keys())
+        remaining = set(bookings_container.booking_ids)
 
         for coro in asyncio.as_completed(coros):
             try:
@@ -465,21 +555,29 @@ class CreateCancellationTaskHandler(object):
             except _ProviderCancellationFailedError:
                 continue
             else:
-                booking_id = bookings_data.provider_reference_to_ids[
-                    cancellation_response.cancellation.booking_id
-                ].booking_id
-                initial_booking_ids.remove(booking_id)
+                booking_id = bookings_container.booking_id_from_provider_reference(
+                    cancellation_response.cancellation.provider_booking_reference,
+                )
+                remaining.remove(booking_id)
+                provider_cancellations.append(cancellation_response.cancellation)
 
             refund_due = (
                 cancellation_response.cancellation.status
-                == models_pb2.BookingCancellation.STATUS_REFUND_DUE
+                == provider_bookings_pb2.BookingCancellation.STATUS_REFUND_DUE
+            )
+            refunded_us = money.from_protobuf(
+                cancellation_response.cancellation.refunded_us,
             )
 
-            if refund_due:
+            if refund_due and refunded_us.amount:
                 try:
-                    await self._create_pay_refund(
-                        cancellation_response=cancellation_response,
-                        booking=bookings_data.id_to_booking[booking_id],
+                    await self._refund_client.create(
+                        refund_models_pb2.Refund(
+                            refunded_us=cancellation_response.cancellation.refunded_us,
+                            transaction_id=(
+                                bookings_container.get_by_id(booking_id).transaction_id
+                            ),
+                        ),
                     )
                 except aio.AioRpcError:
                     self._logger.exception("Failed to create refund in pay")
@@ -493,15 +591,11 @@ class CreateCancellationTaskHandler(object):
                         ),
                     )
 
-                    continue
-
-            new_cancellations.append(cancellation_response.cancellation)
-
         manual_items.extend(
-            _ManualItem(booking_id=booking_id) for booking_id in initial_booking_ids
+            _ManualItem(booking_id=booking_id) for booking_id in remaining
         )
 
-        return new_cancellations, manual_items
+        return provider_cancellations, manual_items
 
     async def _cancel(
         self,
@@ -517,7 +611,7 @@ class CreateCancellationTaskHandler(object):
 
         failed_by_status = (
             cancellation_response.cancellation.status
-            == models_pb2.BookingCancellation.STATUS_REFUND_FAILED
+            == provider_bookings_pb2.BookingCancellation.STATUS_REFUND_FAILED
         )
 
         if failed_by_status:
@@ -525,10 +619,10 @@ class CreateCancellationTaskHandler(object):
 
         return cancellation_response
 
-    async def _handle_manual_flow(
+    async def _create_zendesk_tickets_for_bookings(
         self,
         manual_items: Sequence[_ManualItem],
-    ) -> list[models_pb2.BookingCancellation]:
+    ) -> list[_BookingTicketInfo]:
         booking_ids = [manual_item.booking_id for manual_item in manual_items]
         journeys = await _get_journeys(
             journey_repository=self._journeys,
@@ -555,7 +649,7 @@ class CreateCancellationTaskHandler(object):
                 ),
             )
         ticket_ids = await asyncio.gather(*coros, return_exceptions=True)
-        cancellations = []
+        tickets_info = []
 
         for idx, ticket_id in enumerate(ticket_ids):
             if isinstance(ticket_id, Exception):
@@ -571,109 +665,103 @@ class CreateCancellationTaskHandler(object):
 
                 continue
 
-            cancellations.append(
-                models_pb2.BookingCancellation(
+            tickets_info.append(
+                _BookingTicketInfo(
                     booking_id=manual_items[idx].booking_id,
                     ticket_id=str(ticket_id),
-                    status=models_pb2.BookingCancellation.STATUS_PENDING,
                 ),
             )
 
-        return cancellations
+        return tickets_info
 
-    async def _booking_id_to_booking(
+    async def _fetch_bookings_from_db(
         self,
-        booking_ids: Iterable[str],
-    ) -> dict[str, models_pb2.Booking]:
-        booking_ids_copy = tuple(booking_ids)
-
+        booking_ids: Sequence[str],
+    ) -> list[models_pb2.Booking]:
+        booking_ids_copy = list(booking_ids)
         bookings_iterator = await self._bookings.find(
             ids=booking_ids_copy,
             cursor="",
         )
-        booking_id_to_booking = {}
+        bookings = []
+        found_ids = []
 
         async for booking in bookings_iterator:
-            booking_id_to_booking[booking.id] = booking
+            found_ids.append(booking.id)
+            bookings.append(booking)
 
-        if len(booking_id_to_booking) != len(booking_ids_copy):
+        if len(bookings) != len(booking_ids_copy):
             self._logger.error(
                 "Some bookings were not found",
-                booking_ids=booking_ids,
-                found_booking_ids=list(booking_id_to_booking.keys()),
+                booking_ids=booking_ids_copy,
+                found_booking_ids=found_ids,
             )
 
-        return booking_id_to_booking
+        return bookings
 
-    async def _update_statuses_and_refunded_us(
+    async def _update_cancellation_request(
         self,
         cancellation_request: models_pb2.CancellationRequest,
-        cancellations: Sequence[models_pb2.BookingCancellation],
-        provider_reference_to_ids: Mapping[str, _IdContainer],
+        provider_cancellations: Sequence[provider_bookings_pb2.BookingCancellation],
+        provider_reference_to_booking_id: Mapping[str, str],
+        tickets_info: Sequence[_BookingTicketInfo] | None = None,
     ) -> None:
+        booking_id_to_ticket_id = (
+            {
+                ticket_info.booking_id: ticket_info.ticket_id
+                for ticket_info in tickets_info
+            }
+            if tickets_info
+            else {}
+        )
+        booking_id_to_provider_cancellation = _booking_id_to_provider_cancellation(
+            provider_cancellations=provider_cancellations,
+            provider_reference_to_booking_id=provider_reference_to_booking_id,
+        )
+
         for initial_booking_cancellation in cancellation_request.booking_cancellations:
-            try:
-                new_booking_cancellation = next(
-                    cancel_obj
-                    for cancel_obj in cancellations
-                    if provider_reference_to_ids[cancel_obj.booking_id].booking_id
-                    == initial_booking_cancellation.booking_id
+            with contextlib.suppress(KeyError):
+                initial_booking_cancellation.ticket_id = booking_id_to_ticket_id[
+                    initial_booking_cancellation.booking_id
+                ]
+
+            with contextlib.suppress(KeyError):
+                _update_cancellation_from_provider_cancel(
+                    initial_booking_cancellation,
+                    booking_id_to_provider_cancellation[
+                        initial_booking_cancellation.booking_id
+                    ],
                 )
-            except StopIteration:
-                self._logger.exception(
-                    "Failed to find an updated cancellation",
-                    initial_booking_cancellation=initial_booking_cancellation,
-                )
 
-                continue
+        updated_booking_ids: set[str] = set()
+        updated_booking_ids.update(booking_id_to_ticket_id.keys())
+        updated_booking_ids.update(booking_id_to_provider_cancellation.keys())
 
-            initial_booking_cancellation.status = new_booking_cancellation.status
-
-            refund_due = (
-                new_booking_cancellation.status
-                == models_pb2.BookingCancellation.STATUS_REFUND_DUE
+        missing_booking_ids = _find_missing_booking_ids(
+            cancellation_request=cancellation_request,
+            updated_booking_ids=updated_booking_ids,
+        )
+        if missing_booking_ids:
+            self._logger.error(
+                "Failed to update one or more booking cancellations",
+                cancellation_request=cancellation_request,
+                provider_cancellations=provider_cancellations,
+                tickets_info=tickets_info,
+                missing_booking_ids=missing_booking_ids,
             )
-
-            if refund_due:
-                initial_booking_cancellation.refunded_us.CopyFrom(
-                    new_booking_cancellation.refunded_us,
-                )
 
         _update_overall_cancellation_status(cancellation_request)
         await self._cancellations.update(document=cancellation_request)
 
-    async def _create_pay_refund(
-        self,
-        cancellation_response: bookings_pb2.CancelBookingResponse,
-        booking: models_pb2.Booking,
-    ) -> None:
-        refunded_us_money = money.from_protobuf(
-            proto=cancellation_response.cancellation.refunded_us,
-        )
-
-        if refunded_us_money.amount:
-            await self._refund_client.create(
-                refund_models_pb2.Refund(
-                    refunded_us=refunded_us_money.protobuf(),
-                    transaction_id=booking.transaction_id,
-                ),
-            )
-
-    async def _get_bookings_data(
+    async def _get_bookings_container(
         self,
         cancellation_request: models_pb2.CancellationRequest,
-    ) -> _BookingsInfo:
-        id_to_booking = await self._booking_id_to_booking(
+    ) -> _BookingsContainer:
+        bookings = await self._fetch_bookings_from_db(
             booking_ids=[
                 booking_cancellation.booking_id
                 for booking_cancellation in cancellation_request.booking_cancellations
             ],
         )
 
-        return _BookingsInfo(
-            id_to_booking=id_to_booking,
-            provider_reference_to_ids=_map_provider_references_to_ids(
-                booking_cancellations=cancellation_request.booking_cancellations,
-                bookings_map=id_to_booking,
-            ),
-        )
+        return _BookingsContainer(bookings)

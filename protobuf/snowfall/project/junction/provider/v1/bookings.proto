@@ -3,7 +3,6 @@ syntax = "proto3";
 package snowfall.project.junction.provider.v1;
 
 import "google/protobuf/timestamp.proto";
-import "snowfall/project/junction/go/service/orders/v1/models.proto";
 import "snowfall/stdlib/v1/money.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/provider/v1";
@@ -67,9 +66,21 @@ message Booking {
 }
 
 message CancelBookingRequest {
-  string booking_id = 1;
+  string provider_booking_reference = 1;
+}
+
+message BookingCancellation {
+  string provider_booking_reference = 1;
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_NO_REFUND = 1;
+    STATUS_REFUND_DUE = 2;
+    STATUS_REFUND_FAILED = 3;
+  }
+  Status status = 2;
+  snowfall.stdlib.v1.Money refunded_us = 3;
 }
 
 message CancelBookingResponse {
-  snowfall.project.junction.go.service.orders.v1.BookingCancellation cancellation = 1;
+  BookingCancellation cancellation = 1;
 }
