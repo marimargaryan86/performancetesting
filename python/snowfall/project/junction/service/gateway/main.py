@@ -41,7 +41,6 @@ class _SharedSettings(application.Settings):
 
 class _ConsumeSettings(_SharedSettings):
     places_address: str
-    search_timeout: datetime.timedelta = datetime.timedelta(seconds=30)
     stops_resolver_timeout: datetime.timedelta = datetime.timedelta(seconds=5)
     trip_search_cache_ttl: datetime.timedelta = datetime.timedelta(days=1)
     trip_search_timeout: datetime.timedelta = datetime.timedelta(seconds=10)

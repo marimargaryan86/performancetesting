@@ -9,3 +9,7 @@ resource(
     name="routes",
     source="routes.json",
 )
+python_image(
+    name="main",
+    entry_point="main.py",
+)
