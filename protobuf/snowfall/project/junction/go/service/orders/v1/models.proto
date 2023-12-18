@@ -96,7 +96,6 @@ message Passenger {
   Gender gender = 4;
   snowfall.stdlib.v1.Date date_of_birth = 5;
   optional DocumentDetails doc_details = 6;
-  ContactDetails contact_details = 7;
 }
 
 message DocumentDetails {
