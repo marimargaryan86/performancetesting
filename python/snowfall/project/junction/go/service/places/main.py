@@ -13,8 +13,12 @@ import bson
 from motor import motor_asyncio
 from pydantic import AnyUrl
 
-from snowfall.project.junction.go.service.places import cities, locations, places
-from snowfall.project.junction.go.service.places.constant import BENERAIL_ID, SAT_ID
+from snowfall.project.junction.go.service.places import (
+    cities,
+    constant,
+    locations,
+    places,
+)
 from snowfall.project.junction.go.service.places.grpc import (
     LocationsService,
     PlacesService,
@@ -41,7 +45,7 @@ class _GrpcSettings(application.Settings):
     mongo_dsn: Sequence[AnyUrl]
 
 
-async def _generate_cities(app: application.Application[_CitiesSettings]) -> None:
+async def _generate_cities(app: application.Application[_CitiesSettings]) -> None:  # noqa: WPS231
     # As a script, we don't need to worry about blocking the event loop.
     asyncio.get_running_loop().slow_callback_duration = 1
     mongo = motor_asyncio.AsyncIOMotorClient(
@@ -75,16 +79,24 @@ async def _generate_cities(app: application.Application[_CitiesSettings]) -> Non
         "train_stations.json",
     )
 
+    ask2go_json = pkgutil.get_data(
+        "snowfall.project.junction.go.service.places.main",
+        "ask2go_stations.json",
+    )
+
     provider_json: ProviderTypedDict = {
         models_pb2.Location.TYPE_RAILWAY_STATION: {
-            BENERAIL_ID: (
+            constant.BENERAIL_ID: (
                 json.loads(
                     benerail_json.decode("utf-8"),
                 )
                 if benerail_json
                 else []
             ),
-            SAT_ID: json.loads(sat_json.decode("utf-8")) if sat_json else [],
+            constant.SAT_ID: json.loads(sat_json.decode("utf-8")) if sat_json else [],
+            constant.ASK2GO_ID: json.loads(ask2go_json.decode("utf-8"))
+            if ask2go_json
+            else [],
         },
     }
 

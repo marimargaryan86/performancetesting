@@ -1,5 +1,11 @@
 python_sources(
-    dependencies=[":cities", ":nodes", ":benerail_stations", ":train_stations"]
+    dependencies=[
+        ":cities",
+        ":nodes",
+        ":benerail_stations",
+        ":train_stations",
+        ":ask2go_stations",
+    ]
 )
 python_image(
     name="main",
@@ -42,5 +48,15 @@ resource(
         len=1342307,
         sha256="0562010d12ea37fe4c3f0805e6217953db63089ab67fe37d135a4a2b36d22494",
         filename="train_stations.json",
+    ),
+)
+
+resource(
+    name="ask2go_stations",
+    source=http_source(
+        url="https://junction-build-artifacts.s3.eu-west-2.amazonaws.com/ask2go_stations-084eca6b645d07a6f51e5cdadcff69a0ca11116e06c5fb22f545e03d11d36708.json",
+        len=1366659,
+        sha256="084eca6b645d07a6f51e5cdadcff69a0ca11116e06c5fb22f545e03d11d36708",
+        filename="ask2go_stations.json",
     ),
 )
