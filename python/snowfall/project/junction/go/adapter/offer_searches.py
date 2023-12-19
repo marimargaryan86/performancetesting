@@ -34,7 +34,12 @@ class Client(abc.ABC):
         """Get an offer search."""
 
     @abc.abstractmethod
-    async def find_by_ids(self, ids: Sequence[str]) -> list[models_pb2.OfferSearch]:
+    async def find_by_ids(
+        self,
+        ids: Sequence[str],
+        limit: int | None = None,
+        cursor: str | None = None,
+    ) -> grpc_pb2.ListOfferSearchesResponse:
         """Get multiple offer searches."""
 
 
@@ -72,12 +77,19 @@ class DictClient(Client):
         except KeyError as err:
             raise errors.NotFoundError() from err
 
-    async def find_by_ids(self, ids: Sequence[str]) -> list[models_pb2.OfferSearch]:
-        return [
-            self._searches[identifier]
-            for identifier in ids
-            if identifier in self._searches
-        ]
+    async def find_by_ids(
+        self,
+        ids: Sequence[str],
+        limit: int | None = None,
+        cursor: str | None = None,
+    ) -> grpc_pb2.ListOfferSearchesResponse:
+        return grpc_pb2.ListOfferSearchesResponse(
+            offer_searches=[
+                self._searches[identifier]
+                for identifier in ids
+                if identifier in self._searches
+            ],
+        )
 
 
 class GrpcClient(Client):
@@ -129,12 +141,20 @@ class GrpcClient(Client):
 
         return response.search
 
-    async def find_by_ids(self, ids: Sequence[str]) -> list[models_pb2.OfferSearch]:
-        response = await errors.handle_grpc_errors(
-            self._offer_searches.ListOfferSearches(
-                grpc_pb2.ListOfferSearchesRequest(ids=ids),
-                timeout=self._timeout,
-            ),
+    async def find_by_ids(
+        self,
+        ids: Sequence[str],
+        limit: int | None = None,
+        cursor: str | None = None,
+    ) -> grpc_pb2.ListOfferSearchesResponse:
+        request = grpc_pb2.ListOfferSearchesRequest(
+            page_token=cursor or "",
+            ids=ids,
         )
 
-        return response.offer_searches
+        if limit is not None:
+            request.page_size = limit
+
+        return await errors.handle_grpc_errors(
+            self._offer_searches.ListOfferSearches(request, timeout=self._timeout),
+        )

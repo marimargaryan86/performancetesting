@@ -59,10 +59,13 @@ message GetOfferSearchResponse {
 
 message ListOfferSearchesRequest {
   repeated string ids = 1;
+  int32 page_size = 2;
+  string page_token = 3;
 }
 
 message ListOfferSearchesResponse {
   repeated OfferSearch offer_searches = 1;
+  string next_page_token = 2;
 }
 
 message GetOfferRequest {

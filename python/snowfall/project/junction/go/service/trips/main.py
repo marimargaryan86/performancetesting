@@ -195,6 +195,7 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
                 offer_search_adapter=offer_searches.GrpcClient(
                     offers_grpc_pb2_grpc.OfferSearchServiceStub(offers_channel),
                 ),
+                default_page_size=app.settings.default_page_size,
             ),
             TripCandidateService(
                 offers_adapter=offers.GrpcClient(

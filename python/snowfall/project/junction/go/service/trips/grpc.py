@@ -173,10 +173,12 @@ class TripCandidateSearchService(
         repository: trips.TripCandidateSearchRepository,
         producer_obj: producer.Producer,
         offer_search_adapter: offer_searches.Client,
+        default_page_size: int,
     ):
         self._repository = repository
         self._offer_search_adapter = offer_search_adapter
         self._producer = producer_obj
+        self._default_page_size = default_page_size
 
     def get_name(self) -> str:
         return trips_pb2.DESCRIPTOR.services_by_name[
@@ -219,15 +221,27 @@ class TripCandidateSearchService(
         offer_search_ids = trip_candidate_search.offer_search_ids
 
         if trip_candidate_search.status not in _FINAL_STATUSES and offer_search_ids:
-            offer_search_objects = await self._offer_search_adapter.find_by_ids(
-                ids=offer_search_ids,
-            )
+            statuses: list[std_amqp_pb2.Trackable.Status.ValueType] = []
+            cursor = ""
+
+            while True:
+                offer_searches_response = await self._offer_search_adapter.find_by_ids(
+                    offer_search_ids,
+                    limit=self._default_page_size,
+                    cursor=cursor,
+                )
+
+                statuses.extend(
+                    offer_search.status
+                    for offer_search in offer_searches_response.offer_searches
+                )
+                cursor = offer_searches_response.next_page_token
+
+                if not offer_searches_response.offer_searches:
+                    break
 
             trip_candidate_search.status = status_from_statuses(
-                statuses=[
-                    offer_search_object.status
-                    for offer_search_object in offer_search_objects
-                ],
+                statuses=statuses,
             )
 
         return trips_pb2.GetTripCandidateSearchDetailsResponse(

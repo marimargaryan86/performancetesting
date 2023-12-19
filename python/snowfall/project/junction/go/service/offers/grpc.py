@@ -72,14 +72,17 @@ class OfferSearchService(service.Service, grpc_pb2_grpc.OfferSearchServiceServic
         request: grpc_pb2.ListOfferSearchesRequest,
         context: grpc.aio.ServicerContext,
     ) -> grpc_pb2.ListOfferSearchesResponse:
-        searches = [
-            offer_search
-            async for offer_search in await self._offers_searches.find(
-                list(request.ids),
-            )
-        ]
+        offer_searches = await self._offers_searches.find(
+            list(request.ids),
+            cursor=request.page_token,
+        )
 
-        return grpc_pb2.ListOfferSearchesResponse(offer_searches=searches)
+        offer_searches.limit(request.page_size)
+
+        return grpc_pb2.ListOfferSearchesResponse(
+            offer_searches=[offer_search async for offer_search in offer_searches],
+            next_page_token=await offer_searches.cursor(),
+        )
 
 
 class OfferService(service.Service, grpc_pb2_grpc.OfferServiceServicer):

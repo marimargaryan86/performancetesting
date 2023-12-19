@@ -315,6 +315,7 @@ class OfferSearchRepository(
     async def find(
         self,
         ids: Sequence[str],
+        cursor: str,
     ) -> resultset.ResultSet[models_pb2.OfferSearch]:
         filter_ = (
             {
@@ -327,6 +328,6 @@ class OfferSearchRepository(
         )
 
         return await self._find_with_cursor(
-            cur="",
+            cur=cursor,
             filter_=filter_,
         )
