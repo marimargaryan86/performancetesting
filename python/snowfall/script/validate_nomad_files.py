@@ -239,6 +239,67 @@ def _validate_vault_policy(
     return False
 
 
+def _validate_upstream(
+    hcl_config: Sequence[str],
+    filename: str,
+) -> bool:
+    errors = False
+
+    hcl_content = "\n".join(hcl_config)
+
+    blocks = re.split(r'dynamic\s+"upstreams"', hcl_content)
+
+    static_blocks = [blocks[0]] + [
+        re.sub(
+            pattern="^.*?}",
+            repl="",
+            string=block,
+            count=1,
+            flags=re.DOTALL,
+        )
+        for block in blocks[1:]
+    ]
+
+    declared_upstreams = set()
+    for block in static_blocks:
+        declared_upstreams.update(
+            re.findall(r'destination_name\s*=\s*"([^"]+)"', block),
+        )
+
+    declared_upstreams = {
+        strip_suffix(upstream, "-${var.environment}") for upstream in declared_upstreams
+    }
+
+    referenced_upstreams_raw = set(
+        re.findall("NOMAD_UPSTREAM_ADDR_([a-zA-Z0-9-_]+)", hcl_content),
+    )
+    referenced_upstreams = {
+        upstream.rstrip("-") for upstream in referenced_upstreams_raw
+    }
+
+    for upstream in declared_upstreams:
+        if upstream not in referenced_upstreams:
+            _log_error(
+                "ERROR: {0} upstream {1} not referenced in template block".format(
+                    filename,
+                    upstream,
+                ),
+            )
+            errors = True
+
+    for ref_upstream in referenced_upstreams:
+        if ref_upstream not in declared_upstreams:
+            _log_error(
+                "ERROR: [{0}] upstream [{1}] not declared in proxy block".format(
+                    filename,
+                    ref_upstream,
+                ),
+            )
+            errors = True
+
+    return errors
+
+
 def _main() -> bool:
     if len(sys.argv) < 2:
         _log_error(
@@ -264,6 +325,9 @@ def _main() -> bool:
             hcl_contents = hcl.readlines()
 
             if _validate_vault_policy(hcl_contents, str(path)):
+                errors = True
+
+            if _validate_upstream(hcl_contents, str(path)):
                 errors = True
     return errors
 
