@@ -57,3 +57,6 @@ class NotificationsSettings(BenerailSettings, service.Settings):
     smtp_sender: pydantic.EmailStr
     smtp_recipient: pydantic.EmailStr
     storage_dsn: service.AnyDsn
+    zendesk_booked_ticket_group_id: int
+    zendesk_base_url: pydantic.AnyUrl
+    zendesk_api_key: str

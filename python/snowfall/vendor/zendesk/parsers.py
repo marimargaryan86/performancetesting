@@ -5,6 +5,9 @@ from snowfall.stdlib import money
 from snowfall.vendor.zendesk.models import (
     cancellation_request as cancellation_request_models,
 )
+from snowfall.vendor.zendesk.models import (
+    ticket_request as ticket_request_models,
+)
 
 
 def parse_cancellation_request_models(
@@ -43,6 +46,23 @@ def parse_cancellation_request_models(
         return _dict_to_html_ul(parsed_details)
 
     return parsed_details
+
+
+def parse_fetch_booked_ticket_body(
+    ticket: ticket_request_models.Ticket,
+) -> str:
+    parsed_details = {
+        "Journey ID": ticket.journey_id,
+        "Order ID": ticket.order_id,
+        "Booking ID": ticket.booking_id,
+        "Benerail Booking ID": ticket.br_booking_id,
+        "DNR": ticket.br_dnr,
+        "Super PNR": ticket.passenger_name_record,
+        "Booking date": ticket.created_at,
+        "Travel departure date": ticket.departure_at,
+    }
+
+    return _dict_to_html_ul(parsed_details)
 
 
 def _parse_operator_booking_references(

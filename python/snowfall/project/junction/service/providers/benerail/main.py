@@ -25,6 +25,7 @@ from snowfall.stdlib.service import amqp_factory
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import types
 from snowfall.vendor.benerail import client
+from snowfall.vendor.zendesk.client import ZendeskClient
 
 _PROVIDER_NAME = "Benerail"
 
@@ -101,6 +102,13 @@ async def _notifications(  # noqa: WPS217
         base_url=str(app.settings.api_base_url),
         http_client=http_client,
     )
+    zendesk_client = ZendeskClient(
+        base_url=str(app.settings.zendesk_base_url),
+        api_key=app.settings.zendesk_api_key,
+        http_client=http_client,
+        env=app.environment,
+    )
+
     booking_storage = await app.stack.enter_async_context(
         filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
     )
@@ -108,6 +116,7 @@ async def _notifications(  # noqa: WPS217
         app,
         amqp_connection,
         benerail_client,
+        zendesk_client,
         notifier,
         booking_storage,
     )
@@ -117,6 +126,7 @@ async def _consume_notifications(
     app: service.Application[config.NotificationsSettings],
     amqp_connection: abc.AbstractConnection,
     benerail_client: client.BenerailClient,
+    zendesk_client: ZendeskClient,
     notifier: notifications.SmtpNotifier,
     booking_storage: filesystem.Storage,
 ) -> None:
@@ -133,6 +143,8 @@ async def _consume_notifications(
             ],
         ),
         benerail_client=benerail_client,
+        zendesk_client=zendesk_client,
+        zendesk_booked_ticket_group_id=app.settings.zendesk_booked_ticket_group_id,
         notifier=notifier,
         booking_storage=booking_storage,
     )

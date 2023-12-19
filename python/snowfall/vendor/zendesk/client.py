@@ -9,6 +9,9 @@ from snowfall.vendor.zendesk import parsers
 from snowfall.vendor.zendesk.models import (
     cancellation_request as cancellation_request_models,
 )
+from snowfall.vendor.zendesk.models import (
+    ticket_request as ticket_request_models,
+)
 
 
 class ZendeskClient(client.HttpClient):
@@ -61,6 +64,24 @@ class ZendeskClient(client.HttpClient):
                 },
                 "subject": "Booking Cancellation Request",
                 "tags": "[BookingCancellationRequest, {0}]".format(self._env),
+                "group_id": group_id,
+            },
+        }
+
+    def create_fetch_booked_ticket_payload(
+        self,
+        ticket: ticket_request_models.Ticket,
+        group_id: int,
+    ) -> dict[str, Any]:
+        return {
+            "ticket": {
+                "subject": "Reservation created by Junction",
+                "comment": {
+                    "html_body": parsers.parse_fetch_booked_ticket_body(
+                        ticket=ticket,
+                    ),
+                },
+                "tags": "[FetchBookedTicketRequest, {0}]".format(self._env),
                 "group_id": group_id,
             },
         }

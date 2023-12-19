@@ -38,6 +38,10 @@ variable "bucket" {
   type = string
 }
 
+variable "zendesk_base_url" {
+  type = string
+}
+
 job "junction-providers-benerail-notifications" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -91,7 +95,7 @@ job "junction-providers-benerail-notifications" {
     task "notifications" {
       driver = "docker"
       vault {
-        policies = ["benerail-${var.environment}"]
+        policies = ["benerail-${var.environment}", "zendesk-${var.environment}"]
       }
 
       template {
@@ -102,6 +106,10 @@ SMTP_DSN={{range $index, $service := service "smtp"}}smtp://{{.ServiceMeta.usern
 STORAGE_DSN=s3://{{ .Data.data.aws_access_key_id }}:{{ .Data.data.aws_secret_access_key | urlquery }}@/${var.bucket}/benerail
 SUBSCRIPTION_KEY={{ .Data.data.subscription_key }}
 CERT_BASE64={{ .Data.data.cert_base64 }}
+{{ end }}
+{{ with secret "kv/data/${var.environment}/zendesk" }}
+ZENDESK_BOOKED_TICKET_GROUP_ID={{ .Data.data.zendesk_booked_ticket_group_id }}
+ZENDESK_API_KEY={{ .Data.data.zendesk_api_key }}
 {{ end }}
 EOH
         destination = "services.env"
@@ -124,12 +132,13 @@ EOH
       }
 
       env {
-        ENV_NAME        = "${var.environment}"
-        SENTRY_DSN      = "https://e0876a2d75114c40a4c5256919067373@sentry.snowfall.se/81"
-        PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
-        API_BASE_URL    = "${var.api_base_url}"
-        SMTP_SENDER     = "sender@snowfalltravel.com"
-        SMTP_RECIPIENT  = "${var.email_recipient}"
+        ENV_NAME         = "${var.environment}"
+        SENTRY_DSN       = "https://e0876a2d75114c40a4c5256919067373@sentry.snowfall.se/81"
+        PROMETHEUS_PORT  = "${NOMAD_PORT_prometheus}"
+        API_BASE_URL     = "${var.api_base_url}"
+        SMTP_SENDER      = "sender@snowfalltravel.com"
+        SMTP_RECIPIENT   = "${var.email_recipient}"
+        ZENDESK_BASE_URL = "${var.zendesk_base_url}"
       }
     }
   }

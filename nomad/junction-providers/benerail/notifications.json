@@ -5,7 +5,8 @@
       "count": 2,
       "api_base_url": "https://benerail-stg-apim.azure-api.net",
       "email_recipient": "go-dev@snowfalltravel.com",
-      "bucket": "junction-provider-data-development"
+      "bucket": "junction-provider-data-development",
+      "zendesk_base_url": "https://snowfall.zendesk.com"
     }
   },
   "production": {
@@ -14,7 +15,8 @@
       "count": 2,
       "api_base_url": "https://benerail-prd-apim.azure-api.net",
       "email_recipient": "support@snowfalltravel.com",
-      "bucket": "junction-provider-data-production"
+      "bucket": "junction-provider-data-production",
+      "zendesk_base_url": "https://snowfall.zendesk.com"
     }
   },
   "sandbox": {
@@ -23,7 +25,8 @@
       "count": 1,
       "api_base_url": "https://benerail-stg-apim.azure-api.net",
       "email_recipient": "go-dev@snowfalltravel.com",
-      "bucket": "junction-provider-data-sandbox"
+      "bucket": "junction-provider-data-sandbox",
+      "zendesk_base_url": "https://snowfall.zendesk.com"
     }
   }
 }

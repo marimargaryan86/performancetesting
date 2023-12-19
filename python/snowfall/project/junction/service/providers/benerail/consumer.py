@@ -35,6 +35,8 @@ from snowfall.stdlib.transport.http import errors
 from snowfall.stdlib.v1 import latlng_pb2
 from snowfall.vendor.benerail import client
 from snowfall.vendor.benerail.models import etag
+from snowfall.vendor.zendesk.client import ZendeskClient
+from snowfall.vendor.zendesk.models import ticket_request as ticket_request_models
 
 _PROVIDER_NAME = "Benerail"
 _RETRY_TTL = datetime.timedelta(hours=1)
@@ -48,11 +50,15 @@ class NotificationsConsumer(object):
         benerail_client: client.BenerailClient,
         notifier: base_notifications.Notifier,
         booking_storage: filesystem.Storage,
+        zendesk_client: ZendeskClient,
+        zendesk_booked_ticket_group_id: int,
     ):
         self._booking_storage = booking_storage
         self._consumer = consumer_obj
         self._client = benerail_client
         self._notifier = notifier
+        self._zendesk_client = zendesk_client
+        self._zendesk_booked_ticket_group_id = zendesk_booked_ticket_group_id
         self._logger = stdout.get_logger()
 
     async def consume(self) -> None:
@@ -72,7 +78,6 @@ class NotificationsConsumer(object):
             )
         except errors.HttpError:
             self._logger.exception("Failed to fetch the booking")
-
             return await self._handle_no_fulfillment(message)
 
         booking_res.set_etags(etag_data)
@@ -127,9 +132,34 @@ class NotificationsConsumer(object):
                 "Ticket retrieval limit reached",
                 booking_id=message.body.booking_id,
             )
+            await self._create_fetch_booked_ticket_support_ticket(message)
             await message.nack()
         else:
             await message.requeue()
+
+    async def _create_fetch_booked_ticket_support_ticket(
+        self,
+        message: types.Message[br_amqp_pb2.BookingNotificationTask],
+    ) -> int:
+        created_at = protobuf.protobuf_to_datetime(message.body.created_at).strftime(
+            "%Y-%m-%d %H:%M:%S",
+        )
+
+        return await self._zendesk_client.create_support_ticket(
+            payload=self._zendesk_client.create_fetch_booked_ticket_payload(
+                ticket=ticket_request_models.Ticket(
+                    journey_id=message.body.journey_id,
+                    order_id=message.body.order_id,
+                    booking_id=message.body.booking_id,
+                    br_booking_id=message.body.br_booking_id,
+                    br_dnr=message.body.br_dnr,
+                    passenger_name_record=message.body.passenger_name_record,
+                    created_at=created_at,
+                    departure_at=message.body.departure_at,
+                ),
+                group_id=self._zendesk_booked_ticket_group_id,
+            ),
+        )
 
 
 class PriceQuoteConsumer(object):

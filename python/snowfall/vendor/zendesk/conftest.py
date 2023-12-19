@@ -1,9 +1,14 @@
 import datetime
 from collections.abc import AsyncIterator
+from unittest import mock
 
 import httpx
 import pytest
 
+from snowfall.project.junction.service.providers.benerail.v1 import (
+    amqp_pb2 as br_amqp_pb2,
+)
+from snowfall.stdlib.transport.amqp import types
 from snowfall.vendor.zendesk.client import ZendeskClient
 from snowfall.vendor.zendesk.models import (
     cancellation_request as cancellation_request_models,
@@ -69,3 +74,21 @@ def journey() -> cancellation_request_models.Journey:
         reseller_id="foo",
         passenger_name_record="FOOBAR123",
     )
+
+
+@pytest.fixture()
+async def message() -> types.Message[br_amqp_pb2.BookingNotificationTask]:
+    with mock.patch("snowfall.stdlib.transport.amqp.types.Message") as mock_message:
+        message = mock_message.return_value
+        message.body.journey_id = "journey_id"
+        message.body.order_id = "order_id"
+        message.body.booking_id = "booking_id"
+        message.body.br_booking_id = "br_booking_id"
+        message.body.br_dnr = "br_dnr"
+        message.body.passenger_name_record = "passenger_name_record"
+        message.body.departure_at = str(
+            datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%d %H:%M:%S"),
+        )
+        message.body.created_at = datetime.datetime.now(datetime.UTC)
+
+        return message
