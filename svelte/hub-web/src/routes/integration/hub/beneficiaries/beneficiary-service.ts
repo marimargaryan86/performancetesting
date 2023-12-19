@@ -5,14 +5,9 @@ import type { RouteId } from "./$types";
 
 const factory = clientServiceFactory<BeneficiaryService, RouteId>("/integration/hub/beneficiaries");
 
-export default factory<{
-  create: [params: { data: BeneficiaryPut }];
-  find: [params: { limit?: number; cursor?: string }];
-  get: [params: { id: string }];
-  update: [params: { id: string; data: BeneficiaryPut }];
-}>({
-  create: true,
-  find: true,
-  get: true,
-  update: true,
+export default factory({
+  create: (params: { data: BeneficiaryPut }) => [params],
+  find: (params: { limit?: number; cursor?: string }) => [params],
+  get: (params: { id: string }) => [params],
+  update: (params: { id: string; data: BeneficiaryPut }) => [params],
 });

@@ -5,18 +5,12 @@ import type { RouteId } from "./$types";
 
 const factory = clientServiceFactory<BillService, RouteId>("/integration/hub/bills");
 
-export default factory<{
-  find: [
-    params: {
-      limit?: number;
-      cursor?: string;
-      filter?: Parameters<BillService["find"]>[0]["filter"];
-    },
-  ];
-  get: [params: { id: string }];
-  toggleReconciliation: [params: { bill: Bill }];
-}>({
-  find: true,
-  get: true,
-  toggleReconciliation: true,
+export default factory({
+  find: (params: {
+    limit?: number;
+    cursor?: string;
+    filter?: Parameters<BillService["find"]>[0]["filter"];
+  }) => [params],
+  get: (params: { id: string }) => [params],
+  toggleReconciliation: (params: { bill: Bill }) => [params],
 });

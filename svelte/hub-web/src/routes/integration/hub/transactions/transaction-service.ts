@@ -4,17 +4,12 @@ import type { RouteId } from "./$types";
 
 const factory = clientServiceFactory<TransactionService, RouteId>("/integration/hub/transactions");
 
-export default factory<{
-  find: [
-    params: {
-      cursor?: string;
-      limit?: number;
-      sort?: Parameters<TransactionService["find"]>[0]["sort"];
-      filter?: Parameters<TransactionService["find"]>[0]["filter"];
-    },
-  ];
-  get: [params: { id: string }];
-}>({
-  find: true,
-  get: true,
+export default factory({
+  find: (params: {
+    cursor?: string;
+    limit?: number;
+    sort?: Parameters<TransactionService["find"]>[0]["sort"];
+    filter?: Parameters<TransactionService["find"]>[0]["filter"];
+  }) => [params],
+  get: (params: { id: string }) => [params],
 });

@@ -4,10 +4,7 @@ import type { RouteId } from "./$types";
 
 const factory = clientServiceFactory<AccountService, RouteId>("/integration/hub/accounts");
 
-export default factory<{
-  find: [params: { limit?: number; cursor?: string }];
-  get: [params: { id: string }];
-}>({
-  find: true,
-  get: true,
+export default factory({
+  find: (params: { limit?: number; cursor?: string }) => [params],
+  get: (params: { id: string }) => [params],
 });

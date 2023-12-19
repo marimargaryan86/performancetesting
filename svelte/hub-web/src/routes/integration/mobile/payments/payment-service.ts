@@ -5,8 +5,6 @@ import type { RouteId } from "./$types";
 
 const factory = clientServiceFactory<PaymentService, RouteId>("/integration/mobile/payments");
 
-export default factory<{
-  create: [params: { data: Price }];
-}>({
-  create: true,
+export default factory({
+  create: (params: { data: Price }) => [params],
 });

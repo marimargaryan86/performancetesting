@@ -7,10 +7,7 @@ const factory = clientServiceFactory<CancellationRequestService, RouteId>(
   "/integration/mobile/cancellation-requests",
 );
 
-export default factory<{
-  create: [params: { data: CancellationRequestCreate }];
-  get: [params: { id: string }];
-}>({
-  create: true,
-  get: true,
+export default factory({
+  create: (params: { data: CancellationRequestCreate }) => [params],
+  get: (params: { id: string }) => [params],
 });

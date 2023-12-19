@@ -6,16 +6,10 @@ import type { RouteId } from "./$types";
 
 const factory = clientServiceFactory<OrderService, RouteId>("/integration/mobile/orders");
 
-export default factory<{
-  create: [params: { data: OrderCreate }];
-  find: [params: { cursor?: string; limit?: number }];
-  get: [params: { id: string }];
-  getMarkups: [params: { orderId: string }];
-  createMarkups: [params: { data: MarkupsCreate }];
-}>({
-  create: true,
-  createMarkups: true,
-  find: true,
-  get: true,
-  getMarkups: true,
+export default factory({
+  create: (params: { data: OrderCreate }) => [params],
+  createMarkups: (params: { data: MarkupsCreate }) => [params],
+  find: (params: { cursor?: string; limit?: number }) => [params],
+  get: (params: { id: string }) => [params],
+  getMarkups: (params: { orderId: string }) => [params],
 });

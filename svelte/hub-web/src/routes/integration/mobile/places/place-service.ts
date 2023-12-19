@@ -4,10 +4,7 @@ import type { RouteId } from "./$types";
 
 const factory = clientServiceFactory<PlaceService, RouteId>("/integration/mobile/places");
 
-export default factory<{
-  find: [query: string];
-  get: [params: { id: string }];
-}>({
-  find: true,
-  get: true,
+export default factory({
+  find: (query: string) => [query],
+  get: (params: { id: string }) => [params],
 });

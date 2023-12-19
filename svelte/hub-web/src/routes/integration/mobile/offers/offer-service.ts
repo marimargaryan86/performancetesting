@@ -5,10 +5,7 @@ import type { RouteId } from "./$types";
 
 const factory = clientServiceFactory<OfferService, RouteId>("/integration/mobile/offers");
 
-export default factory<{
-  create: [params: { data: TripOfferPriceQuoteCreate }];
-  get: [params: { id: string }];
-}>({
-  create: true,
-  get: true,
+export default factory({
+  create: (params: { data: TripOfferPriceQuoteCreate }) => [params],
+  get: (params: { id: string }) => [params],
 });

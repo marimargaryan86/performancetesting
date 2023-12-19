@@ -4,8 +4,6 @@ import type { RouteId } from "./$types";
 
 const factory = clientServiceFactory<CurrencyService, RouteId>("/integration/hub/currencies");
 
-export default factory<{
-  find: [params: { cursor?: string; limit?: number }];
-}>({
-  find: true,
+export default factory({
+  find: (params: { cursor?: string; limit?: number }) => [params],
 });

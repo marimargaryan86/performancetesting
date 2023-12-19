@@ -4,8 +4,6 @@ import type { RouteId } from "./$types";
 
 const factory = clientServiceFactory<CompanyService, RouteId>("/integration/hub/companies");
 
-export default factory<{
-  get: [params: { id: string }];
-}>({
-  get: true,
+export default factory({
+  get: (params: { id: string }) => [params],
 });

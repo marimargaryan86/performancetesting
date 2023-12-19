@@ -1,7 +1,67 @@
 import * as devalue from "devalue";
-import type { RequestEvent } from "../$types";
-import { error } from "@sveltejs/kit";
+import { error, type RequestEvent } from "@sveltejs/kit";
 import { ensureJunctionError } from "integration/common/junction-error";
+import { browser } from "$app/environment";
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyFunc = (...args: any[]) => any;
+
+type ClientMethod<TMethod, TServiceMethod> = TMethod extends AnyFunc
+  ? TServiceMethod extends AnyFunc
+    ? (...args: Parameters<TMethod>) => Promise<Awaited<ReturnType<TServiceMethod>>>
+    : never
+  : never;
+
+type ClientServiceFactory<TService extends object> = <
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TMapping extends { [key in keyof TService]?: (...args: any[]) => any[] },
+>(
+  mapping: TMapping,
+) => {
+  [key in keyof Pick<
+    TService,
+    keyof TMapping extends keyof TService ? keyof TMapping : never
+  >]: ClientMethod<TMapping[key], TService[key]>;
+};
+
+type ServerServiceFactory<TClient extends Record<string, AnyFunc>> = (mapping: {
+  [key in keyof TClient]: (
+    event: RequestEvent,
+    ...args: Parameters<TClient[key]>
+  ) => ReturnType<TClient[key]>;
+}) => (event: RequestEvent) => Promise<Response>;
+
+/**
+ * Get a fetch function for the client service
+ *
+ * @param route Route of the server client
+ * @param action Uniquely identifying action name
+ * @param func Function to determine the fetch payload, must return an array of its own arguments
+ * @returns A client service fetch function
+ */
+function getFetchFunc(route: string, action: string, func: AnyFunc): AnyFunc {
+  if (!browser) {
+    return () => {
+      //
+    };
+  }
+
+  const url = new URL(route, origin);
+  url.searchParams.set("action", action);
+
+  return async (...args) => {
+    const resp = await fetch(url, {
+      method: "POST",
+      body: devalue.stringify(func(...args)),
+    });
+
+    if (resp.status === 200) {
+      return devalue.parse(await resp.text());
+    }
+
+    throw new Error(`Service error (${resp.statusText})`);
+  };
+}
 
 /**
  * This function creates a client-side service for making API calls. You
@@ -11,44 +71,20 @@ import { ensureJunctionError } from "integration/common/junction-error";
  *
  * @template TService - The service interface representing the API methods.
  * @template TRoute - The base API route as a string.
- * @param {TRoute} route - The base URL for the API calls.
+ * @param {TRoute} route - The URL for the API calls.
  * @returns A function that, when called with a mapping object, returns
  *          a service with methods for making SvelteKit API requests.
  */
 export function clientServiceFactory<TService extends object, TRoute extends string>(
   route: TRoute,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): <TMapping extends Record<keyof TService, any[]>>(
-  mapping: Record<keyof TService, true>,
-) => {
-  [key in keyof TService]: (
-    ...params: TMapping[key]
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ) => TService[key] extends (...args: any[]) => infer TReturn ? TReturn : never;
-} {
-  return (mapping) => {
-    const nextMapping = Object.fromEntries(
-      Object.keys(mapping).map((method) => [
+): ClientServiceFactory<TService> {
+  return ((mapping) =>
+    Object.fromEntries(
+      Object.entries(mapping).map(([method, func]) => [
         method,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        async (...args: any[]): Promise<any> => {
-          const url = new URL(route, origin);
-          url.searchParams.set("action", method);
-
-          const resp = await fetch(url, { method: "POST", body: devalue.stringify(args) });
-
-          if (resp.status !== 200) {
-            throw new Error("An unexpected error occurred");
-          }
-
-          return devalue.parse(await resp.text());
-        },
+        getFetchFunc(route, method, func as AnyFunc),
       ]),
-    );
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return nextMapping as any;
-  };
+    )) as ClientServiceFactory<TService>;
 }
 
 /**
@@ -59,50 +95,36 @@ export function clientServiceFactory<TService extends object, TRoute extends str
  * corresponding function, and returns the response.
  *
  * @template TClient - A record type representing the client service interface.
- * @param {TClient} _ - The client interface (used for type inference).
+ * @param {TClient} clientService - The client interface (used for type inference).
  * @returns A function that takes server logic mappings and returns
  *          an async function to handle outgoing Junction API requests.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function serverServiceFactory<TClient extends Record<string, (...args: any[]) => any>>(
+export function serverServiceFactory<TClient extends Record<string, AnyFunc>>(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _: TClient,
-): <
-  TMapping extends {
-    [key in keyof TClient]: (
-      event: RequestEvent,
-      ...args: Parameters<TClient[key]>
-    ) => ReturnType<TClient[key]>;
-  },
->(
-  mapping: TMapping,
-) => (event: RequestEvent) => Promise<Response> {
-  return (mapping) => {
-    return async (event) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const args = devalue.parse(await event.request.text()) as any[];
-      const action = event.url.searchParams.get("action")?.toString();
+  clientService: TClient,
+): ServerServiceFactory<TClient> {
+  return ((mapping) => async (event) => {
+    const action = event.url.searchParams.get("action")?.toString();
+    const method = mapping[action ?? ""];
 
-      if (!action || !(action in mapping)) {
-        throw error(405);
+    if (!method) {
+      throw error(405);
+    }
+
+    try {
+      const result = await method(event, ...devalue.parse(await event.request.text()));
+
+      return new Response(devalue.stringify(result));
+    } catch (err) {
+      if (ensureJunctionError(err)) {
+        throw error(err.status, { message: err.message });
       }
 
-      const func = mapping[action];
-
-      if (!func) {
-        throw error(405);
+      if (err instanceof Error) {
+        throw error(500, { message: err.message });
       }
 
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return new Response(devalue.stringify(await func(event, ...(args as any))));
-      } catch (err) {
-        if (ensureJunctionError(err)) {
-          throw error(err.status, { message: err.message });
-        }
-
-        throw error(500);
-      }
-    };
-  };
+      throw error(500, { message: "An unexpected error occured" });
+    }
+  }) as ServerServiceFactory<TClient>;
 }
