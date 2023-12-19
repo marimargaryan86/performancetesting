@@ -71,7 +71,14 @@ job "junction-content-duffel-grpc" {
       tags = ["grpc"]
 
       connect {
-        sidecar_service {}
+        sidecar_service {
+          proxy {
+            upstreams {
+              local_bind_port  = 9081
+              destination_name = "rate-limiter-grpc-${var.environment}"
+            }
+          }
+        }
       }
 
       check {
