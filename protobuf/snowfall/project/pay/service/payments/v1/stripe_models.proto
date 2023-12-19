@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package snowfall.project.pay.service.payments.v1;
+
+import "snowfall/stdlib/v1/money.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/payments/v1";
+
+message CreditCardPayment {
+  string id = 1;
+  snowfall.stdlib.v1.Money amount = 2;
+  string capture_method = 3;
+  string credit_card_holder_id = 4;
+  bool enable_automatic_payment_method = 5;
+}
+
+message CreditCardHolder {
+  string id = 1;
+  string email = 2;
+  string name = 3;
+  string version = 4;
+}
+
+message Refund {
+  string external_reference_id = 1;
+  string credit_card_payment_id = 2;
+  snowfall.stdlib.v1.Money amount = 3;
+}

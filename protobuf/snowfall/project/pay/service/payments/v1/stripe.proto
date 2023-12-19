@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+package snowfall.project.pay.service.payments.v1;
+
+import "snowfall/project/pay/service/payments/v1/stripe_models.proto";
+import "snowfall/stdlib/v1/money.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/payments/v1";
+
+service CreditCardPaymentService {
+  rpc GetCreditCardPayment(GetCreditCardPaymentRequest) returns (GetCreditCardPaymentResponse) {}
+  rpc CreateCreditCardPayment(CreateCreditCardPaymentRequest) returns (CreateCreditCardPaymentResponse) {}
+  rpc UpdateCreditCardPayment(UpdateCreditCardPaymentRequest) returns (UpdateCreditCardPaymentResponse) {}
+  rpc CancelCreditCardPayment(CancelCreditCardPaymentRequest) returns (CancelCreditCardPaymentResponse) {}
+  rpc GetCreditCardHolder(GetCreditCardHolderRequest) returns (GetCreditCardHolderResponse) {}
+  rpc CreateCreditCardHolder(CreateCreditCardHolderRequest) returns (CreateCreditCardHolderResponse) {}
+  rpc GetRefund(GetRefundRequest) returns (GetRefundResponse) {}
+  rpc CreateRefund(CreateRefundRequest) returns (CreateRefundResponse) {}
+}
+
+message GetCreditCardPaymentRequest {
+  string payment_id = 1;
+}
+
+message GetCreditCardPaymentResponse {
+  CreditCardPayment payment = 1;
+}
+
+message CreateCreditCardPaymentRequest {
+  CreditCardPayment payment = 1;
+}
+
+message CreateCreditCardPaymentResponse {
+  CreditCardPayment payment = 1;
+}
+
+message UpdateCreditCardPaymentRequest {
+  string payment_id = 1;
+  snowfall.stdlib.v1.Money amount = 2;
+}
+
+message UpdateCreditCardPaymentResponse {
+  CreditCardPayment payment = 1;
+}
+
+message CancelCreditCardPaymentRequest {
+  string payment_id = 1;
+}
+
+message CancelCreditCardPaymentResponse {}
+
+message GetCreditCardHolderRequest {
+  string credit_card_holder_id = 1;
+}
+
+message GetCreditCardHolderResponse {
+  CreditCardHolder credit_card_holder = 1;
+  string signature = 2;
+}
+
+message CreateCreditCardHolderRequest {
+  CreditCardHolder credit_card_holder = 1;
+}
+
+message CreateCreditCardHolderResponse {
+  CreditCardHolder credit_card_holder = 1;
+  string signature = 2;
+}
+
+message GetRefundRequest {
+  string refund_id = 1;
+}
+
+message GetRefundResponse {
+  Refund refund = 1;
+}
+
+message CreateRefundRequest {
+  Refund refund = 1;
+}
+
+message CreateRefundResponse {
+  Refund refund = 1;
+}
