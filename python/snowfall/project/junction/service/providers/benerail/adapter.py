@@ -400,7 +400,11 @@ class BenerailAdapter(object):
             ),
         )
 
-        return [response.response_result for response in responses]
+        return [
+            response.response_result
+            for response in responses
+            if response.response_result.price.currency != "?"
+        ]
 
 
 class BenerailOffersAdapter(BenerailAdapter):
