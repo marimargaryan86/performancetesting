@@ -1,44 +1,36 @@
-<script lang="ts" context="module">
-  import type { Tab } from "components/ui/tabs.svelte";
-
-  const tabs: Tab[] = [
-    { url: routeConfig.routes.pay.routes.activity.root, label: "Transactions", exact: true },
-    {
-      url: routeConfig.routes.pay.routes.activity.routes.conversions.root,
-      label: "FX",
-      exact: true,
-    },
-  ];
-</script>
-
 <script lang="ts">
+  import type { Tab } from "components/ui/tabs.svelte";
   import { page } from "$app/stores";
   import routeConfig from "routeConfig";
   import StandardLayout from "components/page/standard-layout.svelte";
+  import { getLocaleData } from "i18n";
+  import { ensureDefined } from "utils/array";
 
-  $: view =
-    $page.url.pathname === routeConfig.routes.pay.routes.activity.root
-      ? ("transactions" as const)
-      : ("conversions" as const);
-  $: viewBreadCrumbs = {
-    transactions: {
+  const i18n = getLocaleData();
+
+  let tabs: Tab[];
+
+  $: tabs = [
+    {
       url: routeConfig.routes.pay.routes.activity.root,
-      label: "Transactions",
+      label: $i18n.pages.pay.pages.activity.pages.transactions.title,
+      exact: true,
     },
-    conversions: {
+    {
       url: routeConfig.routes.pay.routes.activity.routes.conversions.root,
-      label: "FX",
+      label: $i18n.pages.pay.pages.activity.pages.conversions.title,
+      exact: true,
     },
-  }[view];
+  ];
   $: breadCrumbs = [
     {
       url: routeConfig.routes.pay.routes.activity.root,
-      label: "Activity",
+      label: $i18n.pages.pay.pages.activity.title,
     },
-    viewBreadCrumbs,
-  ];
+    tabs.find((item) => item.url === $page.url.pathname),
+  ].filter(ensureDefined);
 </script>
 
-<StandardLayout {breadCrumbs} pageTitle="Activity" {tabs}>
+<StandardLayout {breadCrumbs} pageTitle={$i18n.pages.pay.pages.activity.title} {tabs}>
   <slot />
 </StandardLayout>

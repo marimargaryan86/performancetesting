@@ -1,4 +1,5 @@
 import type { StatusBadgeValue } from "components/ui/status-badge.svelte";
+import type { PaymentMethod, PaymentType } from "integration/junction-hub-api/schemas/transaction";
 import type { UserRole } from "integration/ory/schemas/authentication";
 
 type ContentElement =
@@ -40,6 +41,7 @@ export default {
     copiedToClipboard: "Copied to clipboard",
   },
   tableHeaders: {
+    id: "ID",
     orderId: "Order ID",
     createdDate: "Created Date",
     updatedDate: "Updated Date",
@@ -53,7 +55,29 @@ export default {
     bookingStatus: "Booking Status",
     cancellationStatus: "Cancellation Status",
     refundStatus: "Refund Status",
+    transactionType: "Transaction type",
+    paymentType: "Payment type",
+    payer: "Payer",
+    beneficiary: "Beneficiary",
+    whatWeOwe: "What we owe",
+    salesProfit: "Sales Profit",
+    reference: "Reference",
+    settlement: "Settlement",
+    from: "From",
+    to: "To",
+    quoteRate: "Quote Rate",
+    transactionRate: "Transaction Rate",
+    fxDelta: "FX Delta",
+    fxBuffer: "FX Buffer",
+    status: "Status",
   },
+  types: {
+    "bank-transfer": "Bank Transfer",
+    card: "Card",
+    invoice: "Invoice",
+    transactional: "Transactional",
+    unspecified: "Unspecified",
+  } satisfies Record<PaymentType | PaymentMethod, string>,
   statuses: {
     confirmed: "Confirmed",
     "no-refund": "No Refund",
@@ -345,6 +369,14 @@ export default {
       pages: {
         activity: {
           title: "Activity",
+          pages: {
+            transactions: {
+              title: "Transactions",
+            },
+            conversions: {
+              title: "FX",
+            },
+          },
         },
         bills: {
           title: "Bills",

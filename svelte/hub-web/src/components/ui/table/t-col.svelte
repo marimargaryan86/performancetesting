@@ -71,6 +71,7 @@
     position: absolute;
     top: 16px;
     left: 8px;
+    z-index: 1;
     display: flex;
     gap: 4px;
     align-items: center;

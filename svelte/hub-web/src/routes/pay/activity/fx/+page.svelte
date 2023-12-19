@@ -3,7 +3,6 @@
 </script>
 
 <script lang="ts">
-  import { yymmdd } from "formatting/date-time";
   import Table from "components/ui/table/table.svelte";
   import THead from "components/ui/table/t-head.svelte";
   import Header from "components/ui/table/header.svelte";
@@ -14,8 +13,12 @@
   import type { ScrollLoadFunc } from "directives/scroll-load";
   import integrationInstancesClient from "integration-instances-client";
   import { getPageTitle } from "utils/page-title";
+  import { getLocale, getLocaleData } from "i18n";
 
   export let data;
+
+  const i18n = getLocaleData();
+  const locale = getLocale();
 
   $: conversions = data.conversions.data;
 
@@ -39,38 +42,47 @@
 </script>
 
 <svelte:head>
-  <title>{getPageTitle("Junction Hub", "Pay", "Activity", "FX")}</title>
+  <title>
+    {getPageTitle(
+      $i18n.title,
+      $i18n.pages.pay.title,
+      $i18n.pages.pay.pages.activity.title,
+      $i18n.pages.pay.pages.activity.pages.conversions.title,
+    )}
+  </title>
 </svelte:head>
 
 <Table class="fx-table" {loadMore}>
   <THead>
-    <Header>ID</Header>
-    <Header>Created</Header>
-    <Header>Settlement</Header>
-    <Header>From</Header>
-    <Header>To</Header>
-    <Header>Quote Rate</Header>
-    <Header>Transaction Rate</Header>
-    <Header>FX Delta</Header>
-    <Header>FX Buffer</Header>
-    <Header>Status</Header>
+    <Header>{$i18n.tableHeaders.id}</Header>
+    <Header>{$i18n.tableHeaders.createdDate}</Header>
+    <Header>{$i18n.tableHeaders.settlement}</Header>
+    <Header>{$i18n.tableHeaders.from}</Header>
+    <Header>{$i18n.tableHeaders.to}</Header>
+    <Header>{$i18n.tableHeaders.quoteRate}</Header>
+    <Header>{$i18n.tableHeaders.transactionRate}</Header>
+    <Header>{$i18n.tableHeaders.fxDelta}</Header>
+    <Header>{$i18n.tableHeaders.fxBuffer}</Header>
+    <Header>{$i18n.tableHeaders.status}</Header>
   </THead>
 
   <TBody>
     {#each conversions as conversion (conversion.id)}
       <TRow>
-        <TCol maxWidth="96px" copyable>{conversion.transaction?.externalReference ?? ""}</TCol>
-        <TCol class="currency typography bold">
-          {conversion.createdAt ? yymmdd(conversion.createdAt) : ""}
+        <TCol maxWidth="96px" copyable={Boolean(conversion.transaction?.externalReference)}>
+          {conversion.transaction?.externalReference ?? ""}
         </TCol>
         <TCol class="currency typography bold">
-          {conversion.settledAt ? yymmdd(conversion.settledAt) : ""}
+          {conversion.createdAt?.toLocaleDateString($locale) ?? ""}
         </TCol>
         <TCol class="currency typography bold">
-          {conversion.amounts.sell?.currency ? conversion.amounts.sell.currency : ""}
+          {conversion.settledAt?.toLocaleDateString($locale) ?? ""}
         </TCol>
         <TCol class="currency typography bold">
-          {conversion.amounts.buy?.currency ? conversion.amounts.buy.currency : ""}
+          {conversion.amounts.sell?.currency ?? ""}
+        </TCol>
+        <TCol class="currency typography bold">
+          {conversion.amounts.buy?.currency ?? ""}
         </TCol>
         <TCol>{conversion.transaction?.fx.quote ?? ""}</TCol>
         <TCol>{conversion.executedRate}</TCol>

@@ -4,6 +4,9 @@ import type { Conversion, ConversionSchema } from "./conversion";
 import type { IncludedMapping } from "./included";
 import { moneyParser, type Money, type MoneySchema } from "./money";
 
+export type PaymentType = "unspecified" | "card" | "bank-transfer";
+export type PaymentMethod = "unspecified" | "transactional" | "invoice";
+
 export type Transaction = {
   id: string;
   externalReference: string;
@@ -40,8 +43,8 @@ export type Transaction = {
     markup: number;
   };
   payment: {
-    type: "unspecified" | "card" | "bank-transfer";
-    method: "unspecified" | "transactional" | "invoice";
+    type: PaymentType;
+    method: PaymentMethod;
   };
   conversionId?: string;
   conversion?: Conversion;
@@ -75,8 +78,8 @@ export type TransactionSchema = {
       fxMarkup: number;
       processingMarkup: number;
     };
-    paymentType: "unspecified" | "card" | "bank-transfer";
-    paymentMethod: "unspecified" | "transactional" | "invoice";
+    paymentType: PaymentType;
+    paymentMethod: PaymentMethod;
   };
   relationships?: {
     conversion?: { data: Pick<ConversionSchema, "id" | "type"> | null };

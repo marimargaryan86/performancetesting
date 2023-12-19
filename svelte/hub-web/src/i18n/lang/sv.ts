@@ -34,10 +34,11 @@ export default {
     copiedToClipboard: "Kopierad till urklipp",
   },
   tableHeaders: {
+    id: "ID",
     orderId: "BeställningsID",
-    createdDate: "Skapad Datum",
-    updatedDate: "Uppdaterad Datum",
-    owedToUs: "Skyldig Oss",
+    createdDate: "Skapad datum",
+    updatedDate: "Uppdaterad datum",
+    owedToUs: "Skyldig oss",
     reconciledQuestion: "Försonad?",
     orderReference: "Beställningsreferens",
     tickets: "Biljett(er)",
@@ -47,6 +48,28 @@ export default {
     bookingStatus: "Bokningsstatus",
     cancellationStatus: "Avbokningsstatus",
     refundStatus: "Återbetalningsstatus",
+    transactionType: "Transaktionstyp",
+    paymentType: "Betalningssätt",
+    payer: "Betalare",
+    beneficiary: "Förmånstagare",
+    whatWeOwe: "Vad vi är skyldiga",
+    salesProfit: "Försäljningsvinst",
+    reference: "Referens",
+    settlement: "Uppgörelse",
+    from: "Från",
+    to: "Till",
+    quoteRate: "Offertkurs",
+    transactionRate: "Transaktionskurs",
+    fxDelta: "FX-delta",
+    fxBuffer: "FX-buffert",
+    status: "Status",
+  },
+  types: {
+    "bank-transfer": "Banktransaktion",
+    card: "Kort",
+    invoice: "Faktura",
+    transactional: "Transaktionell",
+    unspecified: "Ospecificerad",
   },
   statuses: {
     confirmed: "Bekräftad",
@@ -340,6 +363,14 @@ export default {
       pages: {
         activity: {
           title: "Aktivitet",
+          pages: {
+            transactions: {
+              title: "Transaktioner",
+            },
+            conversions: {
+              title: "FX",
+            },
+          },
         },
         bills: {
           title: "Räkningar",
