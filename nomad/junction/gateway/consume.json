@@ -3,6 +3,8 @@
     "variables": {
       "count": 1,
       "providers": [
+        {"uuid": "5d18e8e1-48e3-4b7c-82b9-62bd97a92f91", "service_name": "junction-content-duffel-grpc"},
+        {"uuid": "f9ce75d1-2025-4ab5-b5d7-69e4c14c053e", "service_name": "junction-content-mock-grpc"}
       ]
     }
   },

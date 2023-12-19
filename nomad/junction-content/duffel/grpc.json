@@ -1,0 +1,15 @@
+{
+    "development": {
+        "deploy": true,
+        "variables": {
+            "count": 1,
+            "api_base_url": "https://api.duffel.com"
+        }
+    },
+    "production": {
+        "deploy": false
+    },
+    "sandbox": {
+        "deploy": false
+    }
+}
