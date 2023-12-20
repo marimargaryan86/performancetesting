@@ -2,9 +2,9 @@
 
 ## Introduction
 
-Junction Plus provides the traveller with continuous support throughout the entire journey. From the start of exploration, through the journey until returning back home. A virtual travel assistant constantly by traveller’s side providing proactive and reactive support and offers - In Tune on Time.
+Junction Plus provides the traveller with continuous support throughout the entire journey. From the start of exploration, through the journey until returning back home. It would be a virtual travel assistant, constantly by traveller’s side, providing proactive and reactive support and offers - In Tune on Time.
 
-By constantly knowing and monitoring what the traveller has stored in their Journey Container, what additional content Junction has available and factoring in our data models, combined with personal knowledge and external metadata, the Junction platform can provide the below key features, all tightly interconnected. This is what comprises - Junction Plus.
+By constantly knowing and monitoring what the traveller has stored in their *Journey Container*, what additional content Junction has available and factoring in our data models, combined with personal knowledge and external metadata, the Junction platform will provide the below key features, all tightly interconnected. This is what comprises - Junction Plus.
 
 * Automation - performing otherwise mandane and manual steps.
 * Notifications – journey related information like changes, delays and cancellations
@@ -653,4 +653,68 @@ flowchart LR
     J-->CA
     CA-->GRPCS
     GRPCS-->TIM
+```
+
+## Notification Service
+
+This Service serves to be a central Junction service which can be used by any Junction component to send notifications through any (notification) channel. It is agnostic to the sender and receiver.
+
+Junction Plus has created a service which will fulfil that requirement and it is called the '*Notification Service'*.
+This is built on the already available Notification Center that Junction Plus uses to notify travel alerts on WhatsApp and send Push Notifications.
+
+### Process Flow (For a notification from Junction GO)
+
+* Junction GO gets the notification from Provider.
+* Junction GO goes through the bookings where this change applies and gets the list of associated passengers and resellers.
+* For each reseller it sends out the notification in the following manner:
+* Junction GO creates the notification in the required template, specifies Channel, Recipient/Addressee (Reseller ID) and sends the notification message to the 'Notification Broker'(Amazon SQS for Rabbit MQ) at a well-known endpoint. The message will have the right routing key to route it to correct queue for processing. for eg. notification message go to notification queue.
+* The Notification broker has the exchange and routing keys setup, so the message filters through to the notification queue.
+* The 'Notification Service' reads the messages from the Notification Queue. The channel identifier is mentioned in the message and each notification channel (Webhook, Whatsapp, Email) has a specific channel implementation. Based on the channel identfier, the message gets read by the specific NotifierChannel-plugin (module).
+* In case of webhook, it then sets up the configuration to connect and sends the notification message to the registered webhook(Resellers endpoint).
+
+### Implementation
+
+The Channel enum is updated with the new channel type i.e for 'WebHook'.\
+The Subscriber model is updated to have the Webhook endpoint/url and encryption key. Note that, each reseller will be a subscriber (in case of notification service) with a record/document in the subscriber collection.
+There is a new channel implementation created (similar to whatsapp and push notification) for WebHook at python/snowfall/project/junction/plus/notification_channels/http_webhook.py. The send_webhook_message() will send the notification.
+send_webhook_messaage() function does the following:
+
+* Create a signature using the encryption key and body of the message using sha512 encryption algorithm.
+* Base64 encodes the signature
+* Call the webhook url with the specified body and the newly created signature in the header (with header-name 'x-junction-signature'). The signature lets the receiver know it is from junction notification service.
+
+*Note: Each Reseller would have their own encryption key from Junction Hub. So when the message is encrypted with their own encryption key only they can decrypt it to check the match between the message in the signature and the body.*
+
+### High level architecture
+
+```mermaid
+flowchart LR
+
+    P[Provider]
+
+    subgraph Junction
+        JG[Junction Go]
+        NQ[Notification Queue]
+        NS[NotificationService]
+        JH[Junction Hub]
+        subgraph Channels
+            WH[WebHook]
+            PN[Push Notification]
+            WA[WhatsApp]
+        end
+    end
+
+    Resellers-->JH
+    P-->JG
+    JG-->NQ
+    NQ-->NS
+    NS-->WA
+    NS-->WH
+    NS-->PN
+
+    WH-->Resellers
+    WA-->Travellers
+
+    PN-->IAU[In App Users]
+    Resellers-->UVR[Travellers via Resellers]
 ```
