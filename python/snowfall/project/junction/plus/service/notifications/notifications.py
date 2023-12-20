@@ -111,6 +111,24 @@ class SubscriberRepository(
 
         return subscriber
 
+    async def create_for_cv(self, reseller_id: str) -> models_pb2.Subscriber:
+        subscriber = models_pb2.Subscriber(
+            id=reseller_id,
+            reseller_id=reseller_id,
+            webhook_endpoint=models_pb2.WebhookEndpoint(
+                encryption_key=string.uuid().replace("-", ""),
+            ),
+        )
+        insert = await self._execute(
+            self._collection.insert_one,
+            self._coder.encode(subscriber),
+        )
+
+        if not insert.acknowledged:
+            raise RuntimeError()
+
+        return subscriber
+
     async def find_by_reseller(
         self,
         reseller_id: str,
@@ -191,10 +209,41 @@ class ConfigurationVectorRepository(
         self,
         selection_value: str,
         selector: str,
-    ) -> models_pb2.ConfigurationVector | None:
+    ) -> resultset.ResultSet[models_pb2.ConfigurationVector]:
         return await self._execute(
-            self._collection.find_one,
-            {selector: selection_value},
+            self._collection.aggregate,
+            [
+                {
+                    "$match": {
+                        selector: selection_value,
+                    },
+                },
+                {
+                    "$lookup": {
+                        "from": "subscribers",
+                        "localField": "reseller_id",
+                        "foreignField": "_id",
+                        "let": {"id": "$reseller_id"},
+                        "pipeline": [
+                            {"$match": {"$expr": {"$eq": ["$_id", "$$id"]}}},
+                            {
+                                "$project": {
+                                    "encryption_key": "$webhook_endpoint.encryption_key",
+                                    "path": "$webhook_endpoint.path",
+                                    "_id": 0,
+                                },
+                            },
+                        ],
+                        "as": "webhook_endpoint",
+                    },
+                },
+                {
+                    "$unwind": {
+                        "path": "$webhook_endpoint",
+                        "preserveNullAndEmptyArrays": True,
+                    },
+                },
+            ],
         )
 
     async def update(
@@ -225,9 +274,11 @@ class ConfigurationVectorRepository(
         consul_client: ConsulClient,
         consul_key: str,
     ) -> bool:
-        vector = await self.find_by_selector(reseller_id, "reseller_id")
+        result = await self.find_by_selector(reseller_id, "reseller_id")
 
-        if vector is None:
+        try:
+            vector = await result.take()
+        except StopAsyncIteration:
             return False
 
         updated_permissions = set(

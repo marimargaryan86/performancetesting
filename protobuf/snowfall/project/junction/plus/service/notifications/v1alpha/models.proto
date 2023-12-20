@@ -109,6 +109,7 @@ message ConfigurationVector {
   google.protobuf.Timestamp updated_at = 8;
   string in_app_notification_user = 9;
   repeated string permissions = 10;
+  WebhookEndpoint webhook_endpoint = 11;
 }
 
 enum Channel {

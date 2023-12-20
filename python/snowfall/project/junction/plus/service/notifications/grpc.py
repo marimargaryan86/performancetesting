@@ -12,6 +12,7 @@ from snowfall.project.junction.plus.service.notifications.v1alpha import (
 from snowfall.project.junction.plus.service.notifications.v1alpha import (
     grpc_pb2_grpc as notifications_pb2_grpc,
 )
+from snowfall.stdlib import string
 from snowfall.stdlib.transport.amqp import producer
 from snowfall.stdlib.transport.grpc import service
 from snowfall.vendor.consul.client import ConsulClient
@@ -182,11 +183,13 @@ class ConfigurationVectorService(
         self,
         configuration_vectors: ConfigurationVectorRepository,
         consul_client: ConsulClient,
+        subscribers: SubscriberRepository,
         environment: str,
         cv_permissions: dict[str, list[str]],
     ):
         self._configuration_vectors = configuration_vectors
         self._consul_client = consul_client
+        self._subscribers = subscribers
         self._cv_permissions_key = _CV_KEY.format(environment)
         self._cv_permissions = cv_permissions
 
@@ -206,12 +209,13 @@ class ConfigurationVectorService(
         request: notifications_pb2.GetConfigurationVectorRequest,
         context: aio.ServicerContext,
     ) -> notifications_pb2.GetConfigurationVectorResponse:
-        configuration_vector = await self._configuration_vectors.find_by_selector(
+        aggregation_result = await self._configuration_vectors.find_by_selector(
             selection_value=request.identifier,
             selector=request.selector,
         )
-
-        if configuration_vector is None:
+        try:
+            configuration_vector = await aggregation_result.take()
+        except StopAsyncIteration:
             return await context.abort(StatusCode.NOT_FOUND)
 
         return notifications_pb2.GetConfigurationVectorResponse(
@@ -223,7 +227,9 @@ class ConfigurationVectorService(
         request: notifications_pb2.CreateConfigurationVectorRequest,
         context: aio.ServicerContext,
     ) -> notifications_pb2.CreateConfigurationVectorResponse:
+        request.configuration_vector.id = string.uuid()
         await self._configuration_vectors.insert(request.configuration_vector)
+        await self._subscribers.create_for_cv(request.configuration_vector.reseller_id)
         return notifications_pb2.CreateConfigurationVectorResponse(
             configuration_vector=request.configuration_vector,
         )

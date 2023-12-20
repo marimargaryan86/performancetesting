@@ -63,6 +63,7 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
                 consul_client=consul_client,
                 environment=app.environment,
                 cv_permissions=app.settings.cv_permissions,
+                subscribers=SubscriberRepository(mongo.plus.subscribers),
             ),
             SubscriberService(
                 subscribers=SubscriberRepository(mongo.plus.subscribers),
