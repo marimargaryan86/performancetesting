@@ -38,7 +38,7 @@ from snowfall.project.junction.extensions.service.mobile_api.routes import route
 from snowfall.project.junction.extensions.service.mobile_api.v1alpha import models_pb2
 from snowfall.project.junction.plus.adapter import co2_emissions, flight_delay_predictor
 from snowfall.project.junction.plus.service.external_dependencies.v1 import (
-    grpc_pb2 as plus_services_pb2,
+    models_pb2 as plus_services_models_pb2,
 )
 from snowfall.project.pay import fixtures as pay_fixtures
 from snowfall.project.pay.adapter import bills
@@ -388,7 +388,7 @@ def predictions_client() -> flight_delay_predictor.Client:
 def co2_emissions_client() -> co2_emissions.Client:
     return co2_emissions.DictClient(
         emissions=[
-            plus_services_pb2.FlightEmission(
+            plus_services_models_pb2.FlightEmission(
                 origin="LHR",
                 destination="ATH",
                 flight_number=100,

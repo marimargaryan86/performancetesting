@@ -7,6 +7,9 @@ from snowfall.project.junction.plus.service.external_dependencies.v1 import (
 from snowfall.project.junction.plus.service.external_dependencies.v1 import (
     grpc_pb2_grpc as external_dependencies_pb2_grpc,
 )
+from snowfall.project.junction.plus.service.external_dependencies.v1 import (
+    models_pb2 as external_dependencies_models_pb2_grpc,
+)
 from snowfall.stdlib.transport.grpc import service as grpc_service
 from snowfall.vendor.google_flights.co2_emissions import Client as CO2EmissionsClient
 from snowfall.vendor.google_flights.models.emissions import (
@@ -44,12 +47,12 @@ class CO2EmissionsService(
         resp = await self._co2_emissions_client.get_emissions(flights)
 
         flight_emissions = [
-            external_dependencies_pb2.FlightEmission(
+            external_dependencies_models_pb2_grpc.FlightEmission(
                 origin=flight_emission.flight.origin,
                 destination=flight_emission.flight.destination,
                 operating_carrier_code=flight_emission.flight.operating_carrier_code,
                 flight_number=flight_emission.flight.flight_number,
-                emissions_per_pax=external_dependencies_pb2.EmissionsPerPax(
+                emissions_per_pax=external_dependencies_models_pb2_grpc.EmissionsPerPax(
                     first=flight_emission.emissions_grams_per_pax.first // 1000,
                     business=flight_emission.emissions_grams_per_pax.business // 1000,
                     premium_economy=flight_emission.emissions_grams_per_pax.premium_economy

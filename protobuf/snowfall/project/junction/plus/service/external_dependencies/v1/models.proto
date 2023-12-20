@@ -1,0 +1,64 @@
+syntax = "proto3";
+package snowfall.project.junction.plus.service.external_dependencies.v1;
+
+import "snowfall/stdlib/v1/date.proto";
+import "snowfall/stdlib/v1/datetime.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/plus/service/external_dependencies/v1";
+
+message FlightEmission {
+  string origin = 1;
+  string destination = 2;
+  string operating_carrier_code = 3;
+  int32 flight_number = 4;
+  EmissionsPerPax emissions_per_pax = 5;
+  string unit = 6;
+}
+
+message EmissionsPerPax {
+  int32 first = 1;
+  int32 business = 2;
+  int32 premium_economy = 3;
+  int32 economy = 4;
+}
+
+message Flight {
+  string origin = 1;
+  string destination = 2;
+  string operating_carrier_code = 3;
+  int32 flight_number = 4;
+  snowfall.stdlib.v1.Date departure_date = 5;
+}
+
+message UTCAndLocalDates {
+  snowfall.stdlib.v1.DateTime date_utc = 1;
+  snowfall.stdlib.v1.DateTime date_local = 2;
+}
+
+message FlightStatusOperationalTimes {
+  UTCAndLocalDates scheduled_gate_departure = 1;
+  UTCAndLocalDates estimated_gate_departure = 2;
+}
+
+message Airport {
+  string name = 1;
+}
+
+message AirportResources {
+  string departure_terminal = 1;
+  string departure_gate = 2;
+  string arrival_terminal = 3;
+  string arrival_gate = 4;
+  string baggage = 5;
+}
+
+message Delay {
+  int32 departure_runway_delay_minutes = 1;
+  int32 departure_gate_delay_minutes = 2;
+}
+
+message FlightStatus {
+  string status = 1;
+  FlightStatusOperationalTimes operational_times = 2;
+  AirportResources airport_resources = 3;
+}
