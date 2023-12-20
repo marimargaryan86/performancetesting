@@ -14,6 +14,8 @@ export default {
     help: "Hjälp",
     unknown: "Okänd",
     notAvailable: "Otillgänglig",
+    subAccounts: "Underkonton",
+    balances: "Saldon",
   },
   actions: {
     logout: "Logga ut",
@@ -25,6 +27,9 @@ export default {
     search: "Sök",
     newOrder: "Ny Beställning",
     download: "Ladda Ner",
+    addBalance: "Lägg till saldo",
+    addBalances: "Lägg till saldon",
+    add: "Lägg till",
   },
   sentences: {
     priceChange: "Prisändring",
@@ -32,6 +37,8 @@ export default {
       'Vi har upptäckt en prisändring; ursprungspriset var <strong class="typography body-medium bold">{originalPrice}</strong> och det nya priset är <strong class="typography body-medium bold">{newPrice}</strong>. Vill du fortsätta?',
     areYouSure: "Är du säker?",
     copiedToClipboard: "Kopierad till urklipp",
+    noBalancesFound: "Inga saldon funna",
+    findABalance: "Sök saldo",
   },
   tableHeaders: {
     id: "ID",
@@ -361,6 +368,9 @@ export default {
     pay: {
       title: "Pay",
       pages: {
+        accounts: {
+          title: "Konton",
+        },
         activity: {
           title: "Aktivitet",
           pages: {

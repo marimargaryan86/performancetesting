@@ -21,6 +21,8 @@ export default {
     help: "Help",
     unknown: "Unknown",
     notAvailable: "N/A",
+    subAccounts: "Sub accounts",
+    balances: "Balances",
   },
   actions: {
     logout: "Logout",
@@ -32,6 +34,9 @@ export default {
     search: "Search",
     newOrder: "New Order",
     download: "Download",
+    addBalance: "Add Balance",
+    addBalances: "Add Balances",
+    add: "Add",
   },
   sentences: {
     priceChange: "Price change",
@@ -39,6 +44,8 @@ export default {
       'We have noticed a price change; the initial price was <strong class="typography body-medium bold">{originalPrice}</strong>, and the new price is <strong class="typography body-medium bold">{newPrice}</strong>. Do you wish to continue?',
     areYouSure: "Are you sure?",
     copiedToClipboard: "Copied to clipboard",
+    noBalancesFound: "No balances found",
+    findABalance: "Find a balance",
   },
   tableHeaders: {
     id: "ID",
@@ -367,6 +374,9 @@ export default {
     pay: {
       title: "Pay",
       pages: {
+        accounts: {
+          title: "Accounts",
+        },
         activity: {
           title: "Activity",
           pages: {

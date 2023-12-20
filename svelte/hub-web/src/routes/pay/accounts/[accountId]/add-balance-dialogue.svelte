@@ -12,9 +12,12 @@
   import integrationInstancesClient from "integration-instances-client";
   import currencyData from "data/currency-data";
   import { writable } from "svelte/store";
+  import { getLocaleData } from "i18n";
 
   export let accountId: string;
   export let exclude: Balance[];
+
+  const i18n = getLocaleData();
 
   export function close(): void {
     visible = false;
@@ -80,12 +83,12 @@
     transition:fade={{ duration: 200 }}
   >
     <div class="dialogue" transition:fly={{ duration: 200, y: 24 }} on:introend={focusSearch}>
-      <h1 class="typography headline-medium bold">Add Balances</h1>
+      <h1 class="typography headline-medium bold">{$i18n.actions.addBalances}</h1>
 
       <TextField
         type="text"
         bind:value={searchQuery}
-        placeholder="Find a balance"
+        placeholder={$i18n.sentences.findABalance}
         bind:this={inputRef}
       >
         <SearchIcon slot="icon-before" color="var(--color-main-neutral-400)" />
@@ -106,9 +109,11 @@
       </ul>
 
       <div class="actions">
-        <Button on:click={close} variant="outline" size="medium">Cancel</Button>
+        <Button on:click={close} variant="outline" size="medium">
+          {$i18n.actions.cancel}
+        </Button>
         <Button on:click={addBalances} size="medium" disabled={!value.length}>
-          Add
+          {$i18n.actions.add}
 
           {#if $pending}
             <LoadingIcon />

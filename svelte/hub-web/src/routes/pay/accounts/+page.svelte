@@ -8,11 +8,14 @@
   import StandardLayout from "components/page/standard-layout.svelte";
   import EntityAvatar from "components/ui/entity-avatar.svelte";
   import { scrollLoad, type ScrollLoadFunc } from "directives/scroll-load";
+  import { getLocaleData } from "i18n";
   import integrationInstancesClient from "integration-instances-client";
   import routeConfig from "routeConfig";
   import { getPageTitle } from "utils/page-title";
 
   export let data;
+
+  const i18n = getLocaleData();
 
   let searchQuery = "";
 
@@ -40,15 +43,19 @@
 </script>
 
 <svelte:head>
-  <title>{getPageTitle("Junction Hub", "Pay", "Accounts")}</title>
+  <title>
+    {getPageTitle($i18n.title, $i18n.pages.pay.title, $i18n.pages.pay.pages.accounts.title)}
+  </title>
 </svelte:head>
 
 {#if !dev}
   <div />
 {:else}
-  <StandardLayout pageTitle="Accounts" bind:searchQuery>
+  <StandardLayout pageTitle={$i18n.pages.pay.pages.accounts.title} bind:searchQuery>
     <div class="wrapper">
-      <h2 class="typography title-medium bold">Sub accounts</h2>
+      <h2 class="typography title-medium bold">
+        {$i18n.words.subAccounts}
+      </h2>
 
       <ul class="accounts" data-sveltekit-preload-data="off" use:scrollLoad={{ func: loadMore }}>
         {#each accounts as account (account.id)}

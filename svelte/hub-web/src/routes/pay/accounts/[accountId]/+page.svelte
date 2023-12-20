@@ -9,8 +9,11 @@
   import routeConfig from "routeConfig";
   import type { Balance } from "integration/junction-hub-api/schemas/balance";
   import { getPageTitle } from "utils/page-title";
+  import { getLocaleData } from "i18n";
 
   export let data;
+
+  const i18n = getLocaleData();
 
   let searchQuery = "";
   let dialogue: AddBalanceDialogue;
@@ -36,7 +39,15 @@
 </script>
 
 <svelte:head>
-  <title>{getPageTitle("Junction Hub", "Pay", "Accounts", data.account.name, "Balances")}</title>
+  <title>
+    {getPageTitle(
+      $i18n.title,
+      $i18n.pages.pay.title,
+      $i18n.pages.pay.pages.accounts.title,
+      data.account.name,
+      $i18n.words.balances,
+    )}
+  </title>
 </svelte:head>
 
 <AddBalanceDialogue
@@ -46,9 +57,9 @@
   bind:this={dialogue}
 />
 
-<StandardLayout pageTitle="Balances" {breadCrumbs} bind:searchQuery>
+<StandardLayout pageTitle={$i18n.words.balances} {breadCrumbs} bind:searchQuery>
   <Button size="small" on:click={openDialogue} slot="actions">
-    Add Balance
+    {$i18n.actions.addBalance}
     <PlusIcon />
   </Button>
 
@@ -69,7 +80,7 @@
         </a>
       </li>
     {:else}
-      <li class="typography body-large empty">No balances found</li>
+      <li class="typography body-large empty">{$i18n.sentences.noBalancesFound}</li>
     {/each}
   </ul>
 </StandardLayout>
