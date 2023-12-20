@@ -1,22 +1,11 @@
-import { ORY_INTEGRATION_ROOT } from "../common";
-import * as devalue from "devalue";
-import type { SettingsFlow } from "integration/ory/schemas/settings-flow";
+import { clientServiceFactory } from "../../framework";
+import type SettingsFlowService from "integration/ory/services/settings-flow-service";
+import type { RouteId } from "./$types";
 
-export const ROOT = `${ORY_INTEGRATION_ROOT}/user-settings`;
+const factory = clientServiceFactory<SettingsFlowService, RouteId>(
+  "/integration/ory/user-settings",
+);
 
-async function complete(data: Record<string, unknown>): Promise<SettingsFlow> {
-  const resp = await fetch(new URL(ROOT, origin), {
-    method: "POST",
-    body: devalue.stringify(data),
-  });
-
-  if (resp.status === 200) {
-    return devalue.parse(await resp.text());
-  }
-
-  throw new Error("An unexpected error occurred");
-}
-
-export default {
-  complete,
-};
+export default factory({
+  complete: (data: Record<string, string>) => [data],
+});

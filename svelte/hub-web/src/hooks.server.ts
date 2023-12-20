@@ -3,7 +3,6 @@ import routeConfig from "routeConfig";
 import * as Sentry from "@sentry/sveltekit";
 import { sequence } from "@sveltejs/kit/hooks";
 import { env } from "$env/dynamic/private";
-import { ORY_INTEGRATION_ROOT } from "./routes/integration/ory/common";
 import { cookieStore } from "stores/cookie-store.server";
 import type { Locale } from "i18n";
 
@@ -17,7 +16,7 @@ function authHandle({ event, resolve }: Parameters<Handle>[0]): MaybePromise<Res
 
     if (
       !event.url.pathname.startsWith(routeConfig.routes.login.root) &&
-      !event.url.pathname.startsWith(ORY_INTEGRATION_ROOT)
+      !event.url.pathname.startsWith(routeConfig.routes.integration.routes.ory.root)
     ) {
       // Only allow the login page and the Ory integration for sessionless users.
       throw redirect(303, routeConfig.routes.login.root);
@@ -32,7 +31,7 @@ function authHandle({ event, resolve }: Parameters<Handle>[0]): MaybePromise<Res
     // Only allow the account settings page and the Ory integration if no session meta is available
     if (
       !event.url.pathname.startsWith(routeConfig.routes.account.root) &&
-      !event.url.pathname.startsWith(ORY_INTEGRATION_ROOT)
+      !event.url.pathname.startsWith(routeConfig.routes.integration.routes.ory.root)
     ) {
       throw redirect(303, routeConfig.routes.account.root);
     }

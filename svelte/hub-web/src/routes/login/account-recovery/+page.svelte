@@ -31,7 +31,7 @@
     try {
       $pending = submitter?.name;
 
-      let reqData: Record<string, unknown> = Object.fromEntries(new FormData(event.currentTarget));
+      let reqData = Object.fromEntries(new FormData(event.currentTarget)) as Record<string, string>;
 
       if (submitter) {
         reqData[submitter.name] = submitter.value;

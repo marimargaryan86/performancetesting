@@ -118,6 +118,16 @@ export default {
       account: {
         root: "/account",
       },
+      integration: {
+        root: "/integration",
+        get routes() {
+          return {
+            ory: {
+              root: `${this.root}/ory`,
+            },
+          } as const;
+        },
+      },
     } as const;
   },
 } as const;

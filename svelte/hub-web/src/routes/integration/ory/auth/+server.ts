@@ -1,76 +1,63 @@
 import { error } from "@sveltejs/kit";
-import * as devalue from "devalue";
 import integrationInstances from "integration-instances";
 import { cookieStore } from "stores/cookie-store.server";
+import { serverServiceFactory } from "../../framework";
+import authService from "./auth-service";
 
 // Two weeks, as set by the Legal team. Do not modify.
 const EXPIRY_MAX_AGE = 1209600;
 
-export async function POST(event): Promise<Response> {
-  const login = cookieStore.loginToken.get(event);
+const factory = serverServiceFactory(authService);
 
-  if (!login) {
-    throw error(400);
-  }
+export const POST = factory({
+  async login(event, { data, rememberMe }) {
+    const login = cookieStore.loginToken.get(event);
 
-  const data: {
-    data: Record<string, string>;
-    rememberMe?: boolean;
-  } = devalue.parse(await event.request.text());
+    if (!login) {
+      throw error(400);
+    }
 
-  try {
-    const result = await integrationInstances.ory.loginFlow.complete({
-      ...login,
-      data: data.data,
-    });
+    try {
+      const result = await integrationInstances.ory.loginFlow.complete({
+        ...login,
+        data,
+      });
 
-    if (result.state === "success") {
-      const { user, expiresAt, cookies } = result;
-      const sessionCookie = Object.entries(cookies).find(([key]) => key.startsWith("ory_session"));
+      if (result.state === "success") {
+        const { user, expiresAt, cookies } = result;
+        const sessionCookie = Object.entries(cookies).find(([key]) =>
+          key.startsWith("ory_session"),
+        );
 
-      if (!sessionCookie) {
-        throw error(401);
+        if (!sessionCookie) {
+          throw error(401);
+        }
+
+        const cookieOpts = { maxAge: rememberMe ? EXPIRY_MAX_AGE : undefined };
+
+        cookieStore.sessionToken.set(
+          { id: sessionCookie[0], token: sessionCookie[1] },
+          event,
+          cookieOpts,
+        );
+        cookieStore.sessionMetaToken.set({ user, expiresAt }, event, cookieOpts);
+        cookieStore.loginToken.delete(event);
+      } else if (result.state === "2fa") {
+        cookieStore.loginToken.set({ id: result.flow.id, cookies: result.cookies }, event);
       }
 
-      const cookieOpts = { maxAge: data.rememberMe ? EXPIRY_MAX_AGE : undefined };
-
-      cookieStore.sessionToken.set(
-        { id: sessionCookie[0], token: sessionCookie[1] },
-        event,
-        cookieOpts,
-      );
-      cookieStore.sessionMetaToken.set({ user, expiresAt }, event, cookieOpts);
-      cookieStore.loginToken.delete(event);
-
-      return new Response(devalue.stringify({ state: "success", user }));
-    } else if (result.state === "fail") {
-      return new Response(devalue.stringify({ state: "fail", flow: result.flow }));
-    } else if (result.state === "2fa") {
-      cookieStore.loginToken.set({ id: result.flow.id, cookies: result.cookies }, event);
-
-      return new Response(devalue.stringify({ state: "2fa", flow: result.flow }));
+      return result;
+    } catch {
+      throw error(401);
     }
-  } catch {
-    //
-  }
+  },
+  async logout(event) {
+    await integrationInstances.ory.auth.logout({ session: event.locals.session });
+    cookieStore.sessionToken.delete(event);
+  },
+  resetLogin(event) {
+    cookieStore.loginToken.delete(event);
 
-  throw error(401);
-}
-
-export async function DELETE(event): Promise<Response> {
-  const action = event.url.searchParams.get("action")?.toString();
-
-  switch (action) {
-    case "logout":
-      await integrationInstances.ory.auth.logout({ session: event.locals.session });
-      cookieStore.sessionToken.delete(event);
-      break;
-    case "reset":
-      cookieStore.loginToken.delete(event);
-      break;
-    default:
-      throw error(404);
-  }
-
-  return new Response(undefined, { status: 204 });
-}
+    return new Promise((r) => r());
+  },
+});

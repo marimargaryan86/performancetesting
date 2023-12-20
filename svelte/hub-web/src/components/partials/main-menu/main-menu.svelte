@@ -26,6 +26,7 @@
   import integrationInstancesClient from "integration-instances-client";
   import { getLocale, getLocaleData, type Locale } from "i18n";
   import languages from "i18n/lang/languages";
+  import { goto } from "$app/navigation";
 
   let expanded = true;
 
@@ -53,6 +54,11 @@
     }
 
     return undefined;
+  }
+
+  async function logout(): Promise<void> {
+    await integrationInstancesClient.ory.auth.logout();
+    await goto(routeConfig.routes.login.root, { invalidateAll: true });
   }
 </script>
 
@@ -119,7 +125,7 @@
       <button
         class="logout typography body-medium"
         title={expanded ? undefined : $i18n.actions.logout}
-        on:click={integrationInstancesClient.ory.auth.logout}
+        on:click={logout}
       >
         <LogoutIcon color="var(--color-common-light-strong)" />
         <span>{$i18n.actions.logout}</span>

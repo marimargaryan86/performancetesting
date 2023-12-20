@@ -25,6 +25,8 @@
   import { getPageTitle } from "utils/page-title";
   import { getUser } from "utils/permissions";
   import { getLocaleData } from "i18n";
+  import { goto, invalidateAll } from "$app/navigation";
+  import routeConfig from "routeConfig";
 
   export let data;
 
@@ -49,13 +51,14 @@
     try {
       $pending = submitter ? `${submitter.name}:${submitter.value}` : "unknown";
 
-      let reqData: Record<string, unknown> = Object.fromEntries(new FormData(event.currentTarget));
+      let reqData = Object.fromEntries(new FormData(event.currentTarget)) as Record<string, string>;
 
       if (submitter) {
         reqData[submitter.name] = submitter.value;
       }
 
       data.flow = await integrationInstancesClient.ory.userSettings.complete(reqData);
+      await invalidateAll();
     } finally {
       $pending = undefined;
     }
@@ -64,6 +67,7 @@
   async function logout(): Promise<void> {
     $pending = "logout";
     await integrationInstancesClient.ory.auth.logout();
+    await goto(routeConfig.routes.login.root);
     $pending = undefined;
   }
 </script>
