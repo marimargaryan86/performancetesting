@@ -41,7 +41,7 @@ class Queue(consumer.AbstractQueue[trips_pb2.TripSearchTask]):
     @property
     def binds(self) -> Sequence[tuple[types.Exchange, str]]:
         return [
-            (types.Exchange(self._name_prefix), "trips.search.*"),
+            (types.Exchange(self._name_prefix), "tasks.trip_search"),
         ]
 
     @property
