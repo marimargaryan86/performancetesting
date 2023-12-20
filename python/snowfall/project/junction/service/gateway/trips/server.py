@@ -30,14 +30,19 @@ class Service(service.Service, trips_pb2_grpc.TripServiceServicer):
         context: aio.ServicerContext,
     ) -> trips_pb2.EnqueueTripSearchResponse:
         trip_search_id = string.uuid()
+        search_mode = request.WhichOneof("search_mode")
 
         await asyncio.gather(
             self._producer.publish(
                 trips_pb2.TripSearchTask(
                     id=trip_search_id,
-                    one_way=request.one_way,
-                    round_trip=request.round_trip,
-                    multi_city=request.multi_city,
+                    one_way=request.one_way if search_mode == "one_way" else None,
+                    round_trip=request.round_trip
+                    if search_mode == "round_trip"
+                    else None,
+                    multi_city=request.multi_city
+                    if search_mode == "multi_city"
+                    else None,
                     passengers=request.passengers,
                 ),
                 "tasks.trip_search",
