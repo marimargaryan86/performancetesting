@@ -1,16 +1,27 @@
 <script lang="ts" context="module">
-  const steps: { label: string; number: number; title: string }[] = [
-    { label: "Search", number: 1, title: "Search for offers" },
-    { label: "Select", number: 2, title: "Select an offer" },
-    { label: "Payment", number: 3, title: "Payment" },
-    { label: "Confirmation", number: 4, title: "Confirmation" },
+  const pages: (keyof LocaleData["pages"]["tripManagement"]["pages"]["book"]["pages"])[] = [
+    "search",
+    "select",
+    "payment",
+    "confirmation",
   ];
 </script>
 
 <script lang="ts">
   import { page } from "$app/stores";
   import StepView from "components/page/step-view.svelte";
+  import { getLocaleData, type LocaleData } from "i18n";
 
+  const i18n = getLocaleData();
+
+  let steps: { label: string; number: number; title: string }[];
+
+  $: i18nBook = $i18n.pages.tripManagement.pages.book;
+  $: steps = pages.map((item, idx) => ({
+    label: i18nBook.pages[item].title,
+    number: idx + 1,
+    title: i18nBook.pages[item].subTitle,
+  }));
   $: activeStep = getActiveStep($page.route.id);
   $: title = steps.find((step) => step.number === activeStep)?.title;
 

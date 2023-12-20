@@ -1,11 +1,8 @@
 import type { StatusBadgeValue } from "components/ui/status-badge.svelte";
 import type { PaymentMethod, PaymentType } from "integration/junction-hub-api/schemas/transaction";
 import type { UserRole } from "integration/ory/schemas/authentication";
-
-type ContentElement =
-  | { type: "p"; html: string }
-  | { type: "h2"; html: string }
-  | { type: "ul"; items: string[] };
+import type { PassengerType } from "../../routes/trip-management/components/trip-search/passenger-picker/passenger-picker.svelte";
+import type { ContentElement, WordQuantity } from "i18n";
 
 export default {
   title: "Junction Hub",
@@ -23,6 +20,13 @@ export default {
     notAvailable: "N/A",
     subAccounts: "Sub accounts",
     balances: "Balances",
+    from: "From",
+    to: "To",
+    depart: "Depart",
+    passenger: {
+      plural: "Passengers",
+      singular: "Passenger",
+    } satisfies WordQuantity,
   },
   actions: {
     logout: "Logout",
@@ -37,6 +41,7 @@ export default {
     addBalance: "Add Balance",
     addBalances: "Add Balances",
     add: "Add",
+    addDate: "Add date",
   },
   sentences: {
     priceChange: "Price change",
@@ -46,6 +51,7 @@ export default {
     copiedToClipboard: "Copied to clipboard",
     noBalancesFound: "No balances found",
     findABalance: "Find a balance",
+    cityOrStation: "City or Station",
   },
   tableHeaders: {
     id: "ID",
@@ -78,6 +84,24 @@ export default {
     fxBuffer: "FX Buffer",
     status: "Status",
   },
+  passengerTypes: {
+    adult: {
+      plural: "Adults",
+      singular: "Adult",
+    },
+    child: {
+      plural: "Children",
+      singular: "Child",
+    },
+    senior: {
+      plural: "Seniors",
+      singular: "Senior",
+    },
+    youth: {
+      plural: "Youths",
+      singular: "Youth",
+    },
+  } satisfies Record<PassengerType, WordQuantity>,
   types: {
     "bank-transfer": "Bank Transfer",
     card: "Card",
@@ -398,6 +422,24 @@ export default {
       pages: {
         book: {
           title: "Book",
+          pages: {
+            search: {
+              title: "Search",
+              subTitle: "Search for offers",
+            },
+            select: {
+              title: "Select",
+              subTitle: "Select an offer",
+            },
+            payment: {
+              title: "Payment",
+              subTitle: "Payment",
+            },
+            confirmation: {
+              title: "Confirmation",
+              subTitle: "Confirmation",
+            },
+          },
         },
         orders: {
           title: "Orders",

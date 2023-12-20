@@ -1,24 +1,27 @@
 <script lang="ts" context="module">
+  export type PassengerType = "senior" | "adult" | "youth" | "child";
+
   export const MAX_TOTAL_COUNT = 9;
   export const PASSENGER_DEFINITIONS: Record<
     keyof PassengerPickerData,
-    { label: { singular: string; plural: string }; span: { from: number; to?: number } }
+    { type: PassengerType; span: { from: number; to?: number } }
   > = {
-    seniors65: { label: { singular: "Senior", plural: "Seniors" }, span: { from: 65 } },
-    seniors60: { label: { singular: "Senior", plural: "Seniors" }, span: { from: 60, to: 64 } },
-    adults: { label: { singular: "Adult", plural: "Adults" }, span: { from: 26, to: 59 } },
-    youths15: { label: { singular: "Youth", plural: "Youths" }, span: { from: 15, to: 25 } },
-    youths12: { label: { singular: "Youth", plural: "Youths" }, span: { from: 12, to: 14 } },
-    children6: { label: { singular: "Child", plural: "Children" }, span: { from: 6, to: 11 } },
-    children4: { label: { singular: "Child", plural: "Children" }, span: { from: 4, to: 5 } },
-    children0: { label: { singular: "Child", plural: "Children" }, span: { from: 0, to: 3 } },
+    seniors65: { type: "senior", span: { from: 65 } },
+    seniors60: { type: "senior", span: { from: 60, to: 64 } },
+    adults: { type: "adult", span: { from: 26, to: 59 } },
+    youths15: { type: "youth", span: { from: 15, to: 25 } },
+    youths12: { type: "youth", span: { from: 12, to: 14 } },
+    children6: { type: "child", span: { from: 6, to: 11 } },
+    children4: { type: "child", span: { from: 4, to: 5 } },
+    children0: { type: "child", span: { from: 0, to: 3 } },
   };
 
   export function getPassengerFullLabel(
     def: (typeof PASSENGER_DEFINITIONS)[keyof PassengerPickerData],
-    which: "singular" | "plural" = "singular",
+    locale: LocaleData,
+    which: Quantity = "singular",
   ): string {
-    return `${def.label[which]} (${def.span.from}${
+    return `${locale.passengerTypes[def.type][which]} (${def.span.from}${
       def.span.to === undefined ? "+" : `-${def.span.to}`
     })`;
   }
@@ -42,7 +45,10 @@
 
   export type PassengerPickerData = z.infer<typeof passengerPickerData>;
 
-  export function getPassengersPresentation(passengers: PassengerPickerData): string {
+  export function getPassengersPresentation(
+    passengers: PassengerPickerData,
+    locale: LocaleData,
+  ): string {
     return Object.entries(PASSENGER_DEFINITIONS)
       .map(([key, val]) => {
         const type = key as keyof PassengerPickerData;
@@ -53,6 +59,7 @@
 
         return `${passengers[type]} ${getPassengerFullLabel(
           val,
+          locale,
           passengers[type] === 1 ? "singular" : "plural",
         )}`;
       })
@@ -69,10 +76,12 @@
   import { z } from "zod";
   import { slideFade } from "transitions/slide-fade";
   import { ensureDefined } from "utils/array";
+  import { getLocaleData, type LocaleData, type Quantity } from "i18n";
 
   export let passengers: PassengerPickerData;
   export let error: string | string[] | boolean = false;
 
+  const i18n = getLocaleData();
   const passengerKeys = Object.keys(passengers) as unknown as (keyof PassengerPickerData)[];
 
   let expanded = false;
@@ -101,7 +110,8 @@
 <div class="passenger-picker" use:clickOutside={close}>
   <button on:click={toggle} type="button">
     <span class="typography title-small bold title-small bold">
-      {`${totalCount} Passenger${totalCount === 1 ? "" : "s"}`}
+      {totalCount}
+      {$i18n.words.passenger[totalCount === 1 ? "singular" : "plural"]}
     </span>
 
     <ChevronIcon direction={expanded ? "up" : "down"} color="var(--color-main-primary-500)" />
@@ -113,12 +123,14 @@
 
   {#if expanded}
     <div class="dialogue" transition:scale={{ duration: 150, start: 0.8 }}>
-      <div class="header typography title-medium bold title-medium bold">Passengers</div>
+      <div class="header typography title-medium bold title-medium bold">
+        {$i18n.words.passenger.plural}
+      </div>
 
       <div class="counters">
         {#each passengerKeys as key}
           <PassengerCounter
-            label={getPassengerFullLabel(PASSENGER_DEFINITIONS[key])}
+            label={getPassengerFullLabel(PASSENGER_DEFINITIONS[key], $i18n)}
             bind:count={passengers[key]}
             {totalCount}
           />

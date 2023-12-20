@@ -39,11 +39,14 @@
     PASSENGER_DEFINITIONS,
     type PassengerPickerData,
   } from "../../components/trip-search/passenger-picker/passenger-picker.svelte";
+  import { getLocaleData } from "i18n";
 
   export let passengerNumber: number;
   export let passenger: PartialPassengerData;
   export let errors: z.ZodFormattedError<OrderPassenger> | undefined = undefined;
   export let required: TripOfferPriceQuote["required"];
+
+  const i18n = getLocaleData();
 
   let collapsible: Collapsible | undefined;
   let document = passenger.document ?? { countryCodes: {} };
@@ -58,7 +61,7 @@
   <h2 slot="title">
     <strong class="typography title-medium bold">Passenger {passengerNumber}</strong>
     <span class="typography title-small">
-      {getPassengerFullLabel(PASSENGER_DEFINITIONS[passenger.type])}
+      {getPassengerFullLabel(PASSENGER_DEFINITIONS[passenger.type], $i18n)}
     </span>
   </h2>
 

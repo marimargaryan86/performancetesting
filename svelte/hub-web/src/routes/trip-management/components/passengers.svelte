@@ -1,5 +1,9 @@
 <script lang="ts" context="module">
-  function getPassengerLabel(passenger: OrderPassenger, createdAt: Date): string {
+  function getPassengerLabel(
+    passenger: OrderPassenger,
+    createdAt: Date,
+    locale: LocaleData,
+  ): string {
     const age = getAge(passenger.birthDate, createdAt);
 
     const def = Object.values(PASSENGER_DEFINITIONS).find((item) => {
@@ -10,7 +14,7 @@
       return false;
     });
 
-    return def ? getPassengerFullLabel(def) : "Unknown";
+    return def ? getPassengerFullLabel(def, locale) : "Unknown";
   }
 </script>
 
@@ -22,9 +26,12 @@
     PASSENGER_DEFINITIONS,
     getPassengerFullLabel,
   } from "./trip-search/passenger-picker/passenger-picker.svelte";
+  import { getLocaleData, type LocaleData } from "i18n";
 
   export let passengers: OrderPassenger[];
   export let orderCreatedAt: Date = new Date();
+
+  const i18n = getLocaleData();
 </script>
 
 <ul class="passengers">
@@ -35,7 +42,7 @@
         <PassengerIcon color="var(--color-main-primary-600" />
       </span>
       <strong class="typography bold">{passenger.firstName} {passenger.lastName}</strong>
-      <em>{getPassengerLabel(passenger, orderCreatedAt)}</em>
+      <em>{getPassengerLabel(passenger, orderCreatedAt, $i18n)}</em>
     </li>
   {/each}
 </ul>

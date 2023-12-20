@@ -252,6 +252,10 @@
     --height: 40px;
   }
 
+  .search-wrapper > :global(.trip-search > button.swap) {
+    margin-top: 24px;
+  }
+
   .search-wrapper > :global(.trip-search > button) {
     height: 40px;
     padding-right: 12px;

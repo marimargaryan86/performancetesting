@@ -18,7 +18,9 @@
 
 <script lang="ts">
   import DatePicker from "components/ui/date-picker/date-picker.svelte";
-  import PassengerPicker from "./passenger-picker/passenger-picker.svelte";
+  import PassengerPicker, {
+    type PassengerPickerData,
+  } from "./passenger-picker/passenger-picker.svelte";
   import Button from "components/ui/button.svelte";
   import AutocompleteField from "components/ui/autocomplete-field.svelte";
   import { z } from "zod";
@@ -36,14 +38,13 @@
   import integrationInstancesClient from "integration-instances-client";
   import { ensureDefined } from "utils/array";
   import { writable } from "svelte/store";
+  import { getLocaleData } from "i18n";
 
   export let data: Partial<SearchDataModel> = {};
   export let origin: Place | undefined = undefined;
   export let destination: Place | undefined = undefined;
-  let isSwapIconRotated = false;
-  let isSwapIconStandard = true;
 
-  let passengers: SearchDataModel["passengers"] = data.passengers ?? {
+  let passengers: PassengerPickerData = data.passengers ?? {
     seniors65: 0,
     seniors60: 0,
     adults: 1,
@@ -60,6 +61,7 @@
   };
 
   const pending = writable(false);
+  const i18n = getLocaleData();
 
   $: data = {
     ...data,
@@ -74,8 +76,6 @@
   };
 
   function swapOriginAndDestination(): void {
-    isSwapIconRotated = !isSwapIconRotated;
-    isSwapIconStandard = !isSwapIconStandard;
     [origin, destination] = [destination, origin];
   }
 
@@ -104,9 +104,9 @@
 
 <form class="trip-search" on:submit|preventDefault={search}>
   <AutocompleteField
-    label="From"
+    label={$i18n.words.from}
     required
-    placeholder="City or Station"
+    placeholder={$i18n.sentences.cityOrStation}
     bind:value={origin}
     autocomplete={integrationInstancesClient.mobile.places.find}
     formatter={formatPlace}
@@ -114,14 +114,14 @@
     clearable
   />
 
-  <Button class="swap-btn" variant="text" on:click={swapOriginAndDestination}>
-    <SwapIcon rotate={isSwapIconRotated} standard={isSwapIconStandard} />
-  </Button>
+  <button type="button" class="swap" on:click={swapOriginAndDestination}>
+    <SwapIcon />
+  </button>
 
   <AutocompleteField
-    label="To"
+    label={$i18n.words.to}
     required
-    placeholder="City or Station"
+    placeholder={$i18n.sentences.cityOrStation}
     bind:value={destination}
     autocomplete={integrationInstancesClient.mobile.places.find}
     formatter={formatPlace}
@@ -130,10 +130,10 @@
   />
 
   <DatePicker
-    label="Depart"
+    label={$i18n.words.depart}
     bind:value={data.outbound}
     id="depart-date"
-    placeholder="Add date"
+    placeholder={$i18n.actions.addDate}
     error={errors?.outbound?._errors}
     span={dateSpan}
     required
@@ -175,7 +175,11 @@
     padding-left: 16px;
   }
 
-  :global(.swap-btn) {
-    --icon-size: 27px;
+  .trip-search > button.swap {
+    margin-top: 36px;
+    padding: 0;
+    background-color: transparent;
+    border: 0;
+    cursor: pointer;
   }
 </style>

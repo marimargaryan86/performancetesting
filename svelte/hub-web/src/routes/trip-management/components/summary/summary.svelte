@@ -11,12 +11,14 @@
     type PassengerPickerData,
   } from "../trip-search/passenger-picker/passenger-picker.svelte";
   import { createEventDispatcher } from "svelte";
+  import { getLocaleData } from "i18n";
 
   export let priceQuote: TripOfferPriceQuote | undefined = undefined;
   export let passengers: PassengerPickerData;
 
   let collapsible: Collapsible | undefined;
 
+  const i18n = getLocaleData();
   const dispatch = createEventDispatcher<{ showFareRules: void }>();
 
   function showFareRules(): void {
@@ -31,7 +33,8 @@
   <div class="details">
     {#if priceQuote}
       <p class="typography label-large">
-        Passengers <span class="typography bold">{getPassengersPresentation(passengers)}</span>
+        Passengers
+        <span class="typography bold">{getPassengersPresentation(passengers, $i18n)}</span>
       </p>
 
       <p class="typography label-large">

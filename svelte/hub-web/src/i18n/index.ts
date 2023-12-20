@@ -5,6 +5,12 @@ import type languages from "./lang/languages";
 
 export type Locale = (typeof languages)[number]["locale"];
 export type LocaleData = typeof en;
+export type Quantity = "singular" | "plural";
+export type WordQuantity = Record<Quantity, string>;
+export type ContentElement =
+  | { type: "p"; html: string }
+  | { type: "h2"; html: string }
+  | { type: "ul"; items: string[] };
 
 const LOCALE = "locale";
 const LOCALE_DATA = "localeData";

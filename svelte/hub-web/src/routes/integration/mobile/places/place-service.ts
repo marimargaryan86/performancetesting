@@ -4,7 +4,20 @@ import type { RouteId } from "./$types";
 
 const factory = clientServiceFactory<PlaceService, RouteId>("/integration/mobile/places");
 
-export default factory({
+const methods = factory({
   find: (query: string) => [query],
   get: (params: { id: string }) => [params],
 });
+
+type FindMethod = (typeof methods)["find"];
+
+export default {
+  ...methods,
+  find: (...params: Parameters<FindMethod>): ReturnType<FindMethod> => {
+    if (params[0].length < 3) {
+      return new Promise((r) => r([]));
+    }
+
+    return methods.find(...params);
+  },
+};

@@ -16,6 +16,13 @@ export default {
     notAvailable: "Otillgänglig",
     subAccounts: "Underkonton",
     balances: "Saldon",
+    from: "Från",
+    to: "Till",
+    depart: "Avgå",
+    passenger: {
+      plural: "Resenärer",
+      singular: "Resenär",
+    },
   },
   actions: {
     logout: "Logga ut",
@@ -30,6 +37,7 @@ export default {
     addBalance: "Lägg till saldo",
     addBalances: "Lägg till saldon",
     add: "Lägg till",
+    addDate: "Lägg till datum",
   },
   sentences: {
     priceChange: "Prisändring",
@@ -39,6 +47,7 @@ export default {
     copiedToClipboard: "Kopierad till urklipp",
     noBalancesFound: "Inga saldon funna",
     findABalance: "Sök saldo",
+    cityOrStation: "Stad eller station",
   },
   tableHeaders: {
     id: "ID",
@@ -70,6 +79,24 @@ export default {
     fxDelta: "FX-delta",
     fxBuffer: "FX-buffert",
     status: "Status",
+  },
+  passengerTypes: {
+    adult: {
+      plural: "Vuxna",
+      singular: "Vuxen",
+    },
+    child: {
+      plural: "Barn",
+      singular: "Barn",
+    },
+    senior: {
+      plural: "Seniorer",
+      singular: "Senior",
+    },
+    youth: {
+      plural: "Ungdomar",
+      singular: "Ungdom",
+    },
   },
   types: {
     "bank-transfer": "Banktransaktion",
@@ -392,6 +419,24 @@ export default {
       pages: {
         book: {
           title: "Boka",
+          pages: {
+            search: {
+              title: "Sök",
+              subTitle: "Sök efter erbjudanden",
+            },
+            select: {
+              title: "Välj",
+              subTitle: "Välj ett erbjudande",
+            },
+            payment: {
+              title: "Betalning",
+              subTitle: "Betalning",
+            },
+            confirmation: {
+              title: "Bekräftelse",
+              subTitle: "Bekräftelse",
+            },
+          },
         },
         orders: {
           title: "Beställningar",
