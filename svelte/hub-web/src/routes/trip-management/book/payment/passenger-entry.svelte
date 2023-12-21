@@ -59,7 +59,10 @@
 
 <Collapsible expandedOnMount bind:this={collapsible}>
   <h2 slot="title">
-    <strong class="typography title-medium bold">Passenger {passengerNumber}</strong>
+    <strong class="typography title-medium bold">
+      {$i18n.words.passenger.singular}
+      {passengerNumber}
+    </strong>
     <span class="typography title-small">
       {getPassengerFullLabel(PASSENGER_DEFINITIONS[passenger.type], $i18n)}
     </span>
@@ -70,8 +73,8 @@
       options={passengerTitles}
       formatter={formatTitleOption}
       bind:value={passenger.title}
-      placeholder="Select"
-      label="Title"
+      placeholder={$i18n.actions.select}
+      label={$i18n.words.title}
       required
       error={errors?.title?._errors}
     />
@@ -80,16 +83,16 @@
 
     <TextField
       bind:value={passenger.firstName}
-      placeholder="Enter first name"
-      label="First name"
+      placeholder={$i18n.actions.enterFirstName}
+      label={$i18n.words.firstName}
       required
       error={errors?.firstName?._errors}
     />
 
     <TextField
       bind:value={passenger.lastName}
-      placeholder="Enter last name"
-      label="Last name"
+      placeholder={$i18n.actions.enterLastName}
+      label={$i18n.words.lastName}
       required
       error={errors?.lastName?._errors}
     />
@@ -97,7 +100,7 @@
     <DateTextField
       bind:value={passenger.birthDate}
       placeholder="dd/mm/yyyy"
-      label="Birthday"
+      label={$i18n.words.birthdayDate}
       required
       error={errors?.birthDate?._errors}
     />
@@ -106,19 +109,20 @@
       options={passengerGenders}
       formatter={formatGenderOption}
       bind:value={passenger.gender}
-      placeholder="Select"
-      label="Gender"
+      placeholder={$i18n.actions.select}
+      label={$i18n.words.gender}
       required
       error={errors?.gender?._errors}
     />
 
     {#if required.length}
       <SelectField
+        bind:value={document.type}
         options={[undefined, ...travelerDocumentTypes]}
         formatter={formatTravelerDocumentOption}
-        bind:value={document.type}
-        placeholder="Select"
-        label="Document type"
+        placeholder={$i18n.actions.select}
+        label={$i18n.words.documentType}
+        required
         error={errors?.document?.type?._errors}
       />
     {/if}
@@ -127,8 +131,8 @@
       {#if required.includes("passport-number")}
         <TextField
           bind:value={document.number}
-          placeholder="Enter document number"
-          label="Document number"
+          placeholder={$i18n.actions.enterDocumentNumber}
+          label={$i18n.words.documentNumber}
           required
           error={errors?.document?.number?._errors}
         />
@@ -137,7 +141,7 @@
         <DateTextField
           bind:value={document.expiryDate}
           placeholder="dd/mm/yyyy"
-          label="Expiration date"
+          label={$i18n.words.expiryDate}
           required
           error={errors?.document?.expiryDate?._errors}
         />
@@ -146,7 +150,7 @@
         <DateTextField
           bind:value={document.issueDate}
           placeholder="dd/mm/yyyy"
-          label="Issue date"
+          label={$i18n.words.issueDate}
           required
           error={errors?.document?.issueDate?._errors}
         />
@@ -154,8 +158,8 @@
       {#if required.includes("issuing-country")}
         <TextField
           bind:value={document.countryCodes.issue}
-          placeholder="Enter issuing country"
-          label="Issuing country"
+          placeholder={$i18n.actions.enterIssuingCountry}
+          label={$i18n.words.issuingCountry}
           required
           error={errors?.document?.countryCodes?.issue?._errors}
         />
@@ -163,8 +167,8 @@
       {#if required.includes("nationality")}
         <TextField
           bind:value={document.countryCodes.nationality}
-          placeholder="Enter nationality"
-          label="Nationality"
+          placeholder={$i18n.actions.enterNationality}
+          label={$i18n.words.nationality}
           required
           error={errors?.document?.countryCodes?.nationality?._errors}
         />
@@ -172,8 +176,8 @@
       {#if required.includes("residence-country-code")}
         <TextField
           bind:value={document.countryCodes.residence}
-          placeholder="Enter residence country code"
-          label="Residence country code"
+          placeholder={$i18n.actions.enterResidenceCountryCode}
+          label={$i18n.words.residenceCountryCode}
           required
           error={errors?.document?.countryCodes?.residence?._errors}
         />

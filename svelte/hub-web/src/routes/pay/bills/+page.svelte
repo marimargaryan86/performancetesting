@@ -16,7 +16,7 @@
   import integrationInstancesClient from "integration-instances-client";
   import type { Bill } from "integration/junction-hub-api/schemas/bill";
   import { match as matchUuid } from "../../../params/uuid";
-  import { getLocaleData } from "i18n";
+  import { getLocale, getLocaleData } from "i18n";
   import { browser } from "$app/environment";
   import { getPageTitle } from "utils/page-title";
 
@@ -24,6 +24,7 @@
 
   let searchQuery = "";
 
+  const locale = getLocale();
   const i18n = getLocaleData();
 
   $: ({ data: bills } = data.bills);
@@ -90,8 +91,12 @@
       {#each bills as bill}
         <TRow>
           <TCol width="0">{bill.orderId}</TCol>
-          <TCol width="0">{bill.createdAt?.toLocaleDateString("sv-SE") ?? "N/A"}</TCol>
-          <TCol width="0">{bill.updatedAt?.toLocaleDateString("sv-SE") ?? "N/A"}</TCol>
+          <TCol width="0">
+            {bill.createdAt?.toLocaleDateString($locale) ?? $i18n.words.notAvailable}
+          </TCol>
+          <TCol width="0">
+            {bill.updatedAt?.toLocaleDateString($locale) ?? $i18n.words.notAvailable}
+          </TCol>
           {#if bill.amounts.total}
             <TMoneyCol money={bill.amounts.total} />
           {:else}

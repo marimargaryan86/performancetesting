@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { TripOfferPriceQuote } from "integration/junction-mobile-api/schemas/trip-offer-price-quote";
-  import { formatAmount, formatPriceBreakdownType } from "formatting/currency";
+  import { formatAmount } from "formatting/currency";
   import { slideFade } from "transitions/slide-fade";
   import { getTotalPriceBreakdown } from "utils/offer";
   import Collapsible from "../collapsible.svelte";
@@ -29,16 +29,16 @@
   $: totalPrice = priceQuote?.price.total;
 </script>
 
-<Collapsible bind:this={collapsible} title="Summary">
+<Collapsible bind:this={collapsible} title={$i18n.words.summary}>
   <div class="details">
     {#if priceQuote}
       <p class="typography label-large">
-        Passengers
+        {$i18n.words.passenger.plural}
         <span class="typography bold">{getPassengersPresentation(passengers, $i18n)}</span>
       </p>
 
       <p class="typography label-large">
-        Fare Brand{priceQuote.options.length === 1 ? "" : "s"}
+        {$i18n.words.fareBrand[priceQuote.options.length === 1 ? "singular" : "plural"]}
 
         <span class="typography bold">
           {priceQuote.options.map((item) => item.brandName).join(", ")}
@@ -55,13 +55,15 @@
     <div class="price">
       {#if expanded}
         <div transition:slideFade={{ duration: transitionTimeMs }} class="price-breakdown">
-          <span class="typography body-small">This price is for all passengers</span>
+          <span class="typography body-small">{$i18n.sentences.thisPriceIsForAllPassengers}</span>
 
           {#if priceBreakdown}
             <ul>
               {#each priceBreakdown as item}
                 <li>
-                  <span class="typography label-medium">{formatPriceBreakdownType(item.type)}</span>
+                  <span class="typography label-medium">
+                    {$i18n.priceBreakdownTypes[item.type]}
+                  </span>
                   <span class="typography body-small bold">
                     {formatAmount(item.price, true)}
                   </span>
@@ -73,7 +75,7 @@
       {/if}
 
       <div class="total">
-        <span class="typography body-large bold">Total to pay</span>
+        <span class="typography body-large bold">{$i18n.sentences.totalToPay}</span>
         <em class="typography body-large bold">
           {#if totalPrice}
             {formatAmount(totalPrice, true)}
@@ -87,14 +89,13 @@
     {#if expanded}
       <div class="fare-rules-wrapper">
         <p class="typography body-xsmall">
-          Fares are not guaranteed until full payment is received and tickets are issued. See all
-          the applicable <button class="typography body-xsmall" on:click={showFareRules}
-            >Fare Rules</button
-          >
-          and
-          <button class="typography body-xsmall" on:click={showFareRules}
-            >Baggage Information</button
-          >.
+          {#each $i18n.sentences.fareRulesInfo as item}
+            {#if item.type === "text"}
+              {item.value}
+            {:else}
+              <button class="typography body-xsmall" on:click={showFareRules}>{item.value}</button>
+            {/if}
+          {/each}
         </p>
       </div>
     {/if}

@@ -44,9 +44,12 @@
   import Collapsible from "../../components/collapsible.svelte";
   import type { ContactDetails } from "integration/junction-mobile-api/schemas/journey";
   import countryData from "data/country-data";
+  import { getLocaleData } from "i18n";
 
   export let data: ContactDetails;
   export let errors: z.ZodFormattedError<ContactDetails> | undefined = undefined;
+
+  const i18n = getLocaleData();
 
   let collapsible: Collapsible | undefined;
   let country: CountryModel | undefined = countryData.mapping[data.address.countryCode ?? ""];
@@ -69,14 +72,14 @@
   }
 </script>
 
-<Collapsible bind:this={collapsible} title="Contact information" expandedOnMount>
+<Collapsible bind:this={collapsible} title={$i18n.words.contactInformation} expandedOnMount>
   <div class="details">
     <div class="phone">
       <SelectField
         search={findCountry}
         options={countryData.list}
-        label="Country code"
-        placeholder="Select"
+        label={$i18n.words.countryCode}
+        placeholder={$i18n.actions.select}
         required
         formatter={formatCountryPhoneOption}
         bind:value={phone.country}
@@ -84,9 +87,9 @@
         dialogMinWidth="240px"
       />
       <TextField
-        label="Phone number"
+        label={$i18n.words.phoneNumber}
         type="tel"
-        placeholder="Enter phone number"
+        placeholder={$i18n.actions.enterPhoneNumber}
         required
         bind:value={phone.number}
         error={errors?.phone?._errors}
@@ -94,31 +97,31 @@
     </div>
 
     <TextField
-      label="Email"
+      label={$i18n.words.email}
       type="email"
-      placeholder="Enter email"
+      placeholder={$i18n.actions.enterEmail}
       required
       bind:value={data.email}
       error={errors?.email?._errors}
     />
     <TextField
-      label="Address line 1"
-      placeholder="Enter address line 1"
+      label={$i18n.words.addressLine1}
+      placeholder={$i18n.actions.enterAddressLine1}
       required
       bind:value={data.address.street.line1}
       error={errors?.address?.street?.line1?._errors}
     />
     <TextField
-      label="Address line 2"
-      placeholder="Enter address line 2"
+      label={$i18n.words.addressLine2}
+      placeholder={$i18n.actions.enterAddressLine2}
       bind:value={data.address.street.line2}
       error={errors?.address?.street?.line2?._errors}
     />
 
     <div class="location">
       <TextField
-        label="City"
-        placeholder="Enter city"
+        label={$i18n.words.city}
+        placeholder="{$i18n.actions.enterCity},"
         required
         bind:value={data.address.city}
         error={errors?.address?.city?._errors}
@@ -127,8 +130,8 @@
         search={findCountry}
         direction="up"
         options={countryData.list}
-        label="Country"
-        placeholder="Select country"
+        label={$i18n.words.country}
+        placeholder={$i18n.actions.selectCountry}
         formatter={formatCountryOption}
         required
         bind:value={country}
@@ -136,8 +139,8 @@
         dialogMinWidth="240px"
       />
       <TextField
-        label="Postcode"
-        placeholder="Postcode"
+        label={$i18n.words.postcode}
+        placeholder={$i18n.actions.enterPostcode}
         required
         bind:value={data.address.postalCode}
         error={errors?.address?.postalCode?._errors}

@@ -52,8 +52,12 @@
   import tripManagement, {
     type BookingSessionModel,
   } from "../../../integration/trip-management/trip-management";
+  import { getLocale, getLocaleData } from "i18n";
 
   export let paymentIntent: BookingSessionModel["paymentIntent"];
+
+  const locale = getLocale();
+  const i18n = getLocaleData();
 
   let dialog: Dialog | undefined = undefined;
   let stripe: Stripe | undefined = undefined;
@@ -76,7 +80,7 @@
   }
 
   async function createStripe(nextClientSecret: string): Promise<void> {
-    stripe = (await loadStripe(env.PUBLIC_STRIPE_KEY ?? "", { locale: "en-GB" })) ?? undefined;
+    stripe = (await loadStripe(env.PUBLIC_STRIPE_KEY ?? "", { locale: $locale })) ?? undefined;
     stripeElements = stripe?.elements({ appearance, clientSecret: nextClientSecret });
     paymentElement = stripeElements?.create("payment");
   }
@@ -127,15 +131,15 @@
   <div class="dialog">
     <img src={paymentIllustrationImg} alt="" />
     <div>
-      <h3 class="typography display-small bold">Payment declined</h3>
-      <p class="typography body-medium">{error ?? "An unexpected error occured"}</p>
+      <h3 class="typography display-small bold">{$i18n.sentences.paymentDeclined}</h3>
+      <p class="typography body-medium">{error ?? $i18n.sentences.anUnexpectedErrorOccurred}</p>
     </div>
-    <Button size="small" on:click={clearError}>Try again</Button>
+    <Button size="small" on:click={clearError}>{$i18n.actions.tryAgain}</Button>
   </div>
 </Dialog>
 
 <div class="payment">
-  <span class="typography title-medium bold">Payment method</span>
+  <span class="typography title-medium bold">{$i18n.words.paymentMethod}</span>
 
   <div bind:this={stripeContainer} class="stripe-container" class:pending={!paymentIntent}>
     {#if !paymentIntent}
@@ -144,14 +148,23 @@
   </div>
 
   <span class="toc typography body-small">
-    By booking your ticket you accept Snowfall’s
-    <a href={routeConfig.routes.help.routes.termsAndConditions.root} target="_blank">T&amp;Cs</a>,
-    the
-    <a href={routeConfig.routes.help.routes.conditionsOfCarriage.root} target="_blank"
-      >carrier’s conditions of carriage</a
-    >
-    and
-    <a href={routeConfig.routes.help.routes.privacyPolicy.root} target="_blank">privacy policy</a>.
+    {#each $i18n.sentences.paymentInfo as item}
+      {#if item.type === "text"}
+        {item.value}
+      {:else if item.type === "toc"}
+        <a href={routeConfig.routes.help.routes.termsAndConditions.root} target="_blank">
+          {item.value}
+        </a>
+      {:else if item.type === "coc"}
+        <a href={routeConfig.routes.help.routes.conditionsOfCarriage.root} target="_blank">
+          {item.value}
+        </a>
+      {:else if item.type === "privacy"}
+        <a href={routeConfig.routes.help.routes.privacyPolicy.root} target="_blank">
+          {item.value}
+        </a>
+      {/if}
+    {/each}
   </span>
 </div>
 

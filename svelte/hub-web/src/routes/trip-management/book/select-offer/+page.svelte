@@ -242,7 +242,7 @@
   <div class="actions" transition:fade={{ duration: 200 }}>
     <div class="wrapper">
       <Button on:click={selectOffer} size="small">
-        {$i18n.words.proceed}
+        {$i18n.actions.proceed}
 
         {#if $selectOfferPending}
           <LoadingIcon />

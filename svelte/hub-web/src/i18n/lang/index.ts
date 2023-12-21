@@ -4,5 +4,5 @@ import sv from "./sv";
 
 export default {
   "en-GB": en,
-  "sv-SE": sv,
+  sv,
 } satisfies Record<Locale, LocaleData>;

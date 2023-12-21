@@ -6,10 +6,14 @@
   import type { TripOfferPriceQuote } from "integration/junction-mobile-api/schemas/trip-offer-price-quote";
   import EntityAvatar from "components/ui/entity-avatar.svelte";
   import { getLegsFromPriceQuote } from "utils/offer";
+  import { getLocale, getLocaleData } from "i18n";
 
   export let priceQuote: TripOfferPriceQuote;
 
-  $: vendor = priceQuote.options[0]?.detailsList[0]?.details?.vendor ?? "Unknown";
+  const locale = getLocale();
+  const i18n = getLocaleData();
+
+  $: vendor = priceQuote.options[0]?.detailsList[0]?.details?.vendor ?? $i18n.words.unknown;
   $: trainNumber = priceQuote.options[0]?.detailsList[0]?.details?.routeIdentifiers.vendor ?? "";
   $: segmentCount = priceQuote.options[0]?.detailsList.length ?? 1;
   $: departureLeg = priceQuote.options[0]?.detailsList[0]?.details?.legs[0];
@@ -23,16 +27,18 @@
   $: legs = getLegsFromPriceQuote(priceQuote);
 </script>
 
-<Collapsible class="itinerary" title="Itinerary">
+<Collapsible class="itinerary" title={$i18n.words.itinerary}>
   <div class="trip-info typography body-small">
     <div>
       <EntityAvatar name={vendor} size="24px" />
       {vendor}
-      {trainNumber} • {segmentCount === 1 ? "Direct" : `${segmentCount} stops`}
+      {trainNumber} • {segmentCount === 1
+        ? $i18n.words.direct
+        : `${segmentCount} ${$i18n.words.stop.plural}`.toLowerCase()}
     </div>
     <span>
       {#if departureLeg}
-        {departureLeg.departureAt.toLocaleDateString("en-GB", {
+        {departureLeg.departureAt.toLocaleDateString($locale, {
           month: "long",
           day: "numeric",
           year: "numeric",
@@ -47,7 +53,7 @@
       <li class="segment typography label-large bold">
         <span class="circle" />
         <strong>
-          {leg.departureAt.toLocaleTimeString("sv-SE", {
+          {leg.departureAt.toLocaleTimeString("en-GB", {
             hour: "2-digit",
             minute: "2-digit",
             timeZone: leg.origin.timeZone,
@@ -63,7 +69,7 @@
 
         <span class="circle" />
         <strong>
-          {leg.arrivalAt.toLocaleTimeString("sv-SE", {
+          {leg.arrivalAt.toLocaleTimeString("en-GB", {
             hour: "2-digit",
             minute: "2-digit",
             timeZone: leg.destination.timeZone,
@@ -75,7 +81,9 @@
   </ul>
 
   <div class="fare-rules">
-    <button class="typography body-small" on:click={showFareRules}>View fare rules</button>
+    <button class="typography body-small" on:click={showFareRules}>
+      {$i18n.actions.viewFareRules}
+    </button>
   </div>
 </Collapsible>
 

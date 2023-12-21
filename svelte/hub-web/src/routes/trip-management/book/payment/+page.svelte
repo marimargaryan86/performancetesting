@@ -34,6 +34,7 @@
   import { formatAmount } from "formatting/currency";
   import TripBanner from "../../components/trip-banner.svelte";
   import { getPageTitle } from "utils/page-title";
+  import { getLocaleData } from "i18n";
 
   export let data;
 
@@ -63,6 +64,7 @@
   let pollSignal = { cancelled: false };
   let orderMarkups: MarkupsCreate;
 
+  const i18n = getLocaleData();
   const pending = writable(false);
 
   $: bookingDetailsValidator = z.object({
@@ -196,7 +198,14 @@
 </script>
 
 <svelte:head>
-  <title>{getPageTitle("Junction Hub", "Trip Management", "Book", "Payment")}</title>
+  <title>
+    {getPageTitle(
+      $i18n.title,
+      $i18n.pages.tripManagement.title,
+      $i18n.pages.tripManagement.pages.book.title,
+      $i18n.pages.tripManagement.pages.book.pages.payment.title,
+    )}
+  </title>
 </svelte:head>
 
 {#if data.selected.originalPrice && priceQuote.price.total}
@@ -246,12 +255,12 @@
       variant="outline"
       href={routeConfig.routes.tripManagement.routes.book.routes.select.root}
     >
-      Previous
+      {$i18n.actions.goBack}
     </Button>
 
     <div class="total">
       <div>
-        <span class="typography body-large bold">Total to pay</span>
+        <span class="typography body-large bold">{$i18n.sentences.totalToPay}</span>
       </div>
       <em class="typography body-large bold">
         {#if priceQuote?.price.total}
@@ -263,7 +272,7 @@
     </div>
 
     <Button size="small" on:click={pay} disabled={!paymentIntent}>
-      Book
+      {$i18n.actions.book}
 
       {#if $pending}
         <LoadingIcon />

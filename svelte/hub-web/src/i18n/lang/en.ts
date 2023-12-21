@@ -4,6 +4,7 @@ import type { UserRole } from "integration/ory/schemas/authentication";
 import type { PassengerType } from "../../routes/trip-management/components/trip-search/passenger-picker/passenger-picker.svelte";
 import type { ContentElement, WordQuantity } from "i18n";
 import type { SortOption } from "../../routes/trip-management/book/select-offer/search-options.svelte";
+import type { PriceBreakdownType } from "integration/common/schemas/price";
 
 export default {
   title: "Junction Hub",
@@ -28,7 +29,6 @@ export default {
       plural: "Passengers",
       singular: "Passenger",
     } satisfies WordQuantity,
-    proceed: "Next",
     fareRules: "Fare rules",
     stop: {
       plural: "Stops",
@@ -44,6 +44,40 @@ export default {
     selected: "Selected",
     dateRange: "Date Range",
     none: "None",
+    title: "Title",
+    firstName: "First name",
+    lastName: "Last name",
+    birthdayDate: "Birthday",
+    gender: "Gender",
+    documentType: "Document type",
+    documentNumber: "Document number",
+    expiryDate: "Expiration date",
+    issueDate: "Issue date",
+    issuingCountry: "Issuing country",
+    nationality: "Nationality",
+    residenceCountryCode: "Residence country code",
+    summary: "Summary",
+    fareBrand: {
+      plural: "Fare Brands",
+      singular: "Fare Brand",
+    } satisfies WordQuantity,
+    itinerary: "Itinerary",
+    fee: {
+      plural: "Fees",
+      singular: "Fee",
+    } satisfies WordQuantity,
+    serviceFee: "Service fee",
+    agencyMarkup: "Agency mark-up",
+    paymentMethod: "Payment method",
+    contactInformation: "Contact information",
+    countryCode: "Country code",
+    phoneNumber: "Phone number",
+    email: "Email",
+    addressLine1: "Address line 1",
+    addressLine2: "Address line 2",
+    city: "City",
+    country: "Country",
+    postcode: "Postcode",
   },
   actions: {
     logout: "Logout",
@@ -67,6 +101,25 @@ export default {
     viewFareRules: "View fare rules",
     clear: "Clear",
     select: "Select",
+    enterFirstName: "Enter first name",
+    enterLastName: "Enter last name",
+    enterDocumentNumber: "Enter document number",
+    enterIssuingCountry: "Enter issuing country",
+    enterNationality: "Enter nationality",
+    enterResidenceCountryCode: "Enter residence country code",
+    enterAmount: "Enter amount",
+    selectFeeType: "Select fee type",
+    tryAgain: "Try again",
+    enterPhoneNumber: "Enter phone number",
+    enterEmail: "Enter email",
+    enterAddressLine1: "Enter address line 1",
+    enterAddressLine2: "Enter address line 2",
+    enterCity: "Enter city",
+    selectCountry: "Select country",
+    enterPostcode: "Enter postcode",
+    proceed: "Next",
+    goBack: "Previous",
+    book: "Book",
   },
   sentences: {
     priceChange: "Price change",
@@ -83,6 +136,30 @@ export default {
     timeRemainingInfo:
       '{timeLeft} mins to <strong class="typography bold">complete</strong> your booking',
     startingAt: "From",
+    loadingTripDetails: "Loading trip details...",
+    thisPriceIsForAllPassengers: "This price is for all passengers",
+    totalToPay: "Total to pay",
+    fareRulesInfo: [
+      {
+        type: "text",
+        value:
+          "Fares are not guaranteed until full payment is received and tickets are issued. See all the applicable",
+      },
+      { type: "fareRulesButton", value: "Fare Rules" },
+      { type: "text", value: "and" },
+      { type: "fareRulesButton", value: "Baggage Information" },
+    ] satisfies { type: "text" | "fareRulesButton"; value: string }[],
+    totalToCollect: "Total to collect",
+    paymentDeclined: "Payment declined",
+    anUnexpectedErrorOccurred: "An unexpected error occured",
+    paymentInfo: [
+      { type: "text", value: "By booking your ticket you accept Snowfall’s" },
+      { type: "toc", value: "T&C" },
+      { type: "text", value: "the" },
+      { type: "coc", value: "carrier’s conditions of carriage" },
+      { type: "text", value: "and our" },
+      { type: "privacy", value: "privacy policy" },
+    ] satisfies { type: "text" | "toc" | "coc" | "privacy"; value: string }[],
   },
   tableHeaders: {
     id: "ID",
@@ -140,6 +217,13 @@ export default {
     transactional: "Transactional",
     unspecified: "Unspecified",
   } satisfies Record<PaymentType | PaymentMethod, string>,
+  priceBreakdownTypes: {
+    "base-fare": "Base fare",
+    "company-mark-up": "Company mark-up",
+    "reseller-mark-up": "Reseller mark-up",
+    "service-mark-up": "Service mark-up",
+    tax: "Taxes",
+  } satisfies Record<PriceBreakdownType, string>,
   sortOptions: {
     "earliest-arrival": "Earliest arrival",
     "earliest-departure": "Earliest departure",

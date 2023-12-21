@@ -1,7 +1,6 @@
 <script lang="ts" context="module">
   const feeTypes = ["flat-rate", "percentage"] as const;
-  const feeType = z.enum(feeTypes);
-  export type FeeType = z.infer<typeof feeType>;
+  export type FeeType = (typeof feeTypes)[number];
 
   const FALLBACK_CURRENCY = "EUR";
 
@@ -39,7 +38,6 @@
 </script>
 
 <script lang="ts">
-  import { z } from "zod";
   import { roundCurrency } from "utils/money";
   import { slideFade } from "transitions/slide-fade";
   import Collapsible from "../../components/collapsible.svelte";
@@ -49,12 +47,18 @@
   import { formatAmount } from "formatting/currency";
   import type { TripOfferPriceQuote } from "integration/junction-mobile-api/schemas/trip-offer-price-quote";
   import type { MarkupsCreate } from "integration/junction-mobile-api/schemas/markups";
+  import { getLocaleData } from "i18n";
 
   export let priceQuote: TripOfferPriceQuote | undefined = undefined;
   export let orderMarkups: MarkupsCreate;
+
+  const i18n = getLocaleData();
+
   let collapsible: Collapsible | undefined;
-  let serviceFeeType: FeeType;
-  let agencyMarkupType: FeeType;
+  let serviceFeeType: FeeType = feeTypes[0];
+  let agencyMarkupType: FeeType = feeTypes[0];
+  let serviceFeeAmount = 0;
+  let agencyMarkupAmount = 0;
 
   /**
    * Returns a formatted string for the fee type select field. Must stay in
@@ -71,12 +75,8 @@
       : "";
   }
 
-  $: totalPrice = priceQuote?.price.total ?? { currency, amount: 0 };
   $: currency = priceQuote?.price.total?.currency ?? FALLBACK_CURRENCY;
-  $: serviceFeeType = feeType.Enum["flat-rate"];
-  $: serviceFeeAmount = 0;
-  $: agencyMarkupType = feeType.Enum["flat-rate"];
-  $: agencyMarkupAmount = 0;
+  $: totalPrice = priceQuote?.price.total ?? { currency, amount: 0 };
   $: calculatedServiceFeeAmount = calcFeeAmount(
     serviceFeeType,
     serviceFeeAmount,
@@ -107,7 +107,7 @@
   };
 </script>
 
-<Collapsible bind:this={collapsible} title="Fees">
+<Collapsible bind:this={collapsible} title={$i18n.words.fee.plural}>
   <div class="details">
     <div class="input-wrapper">
       <TextField
@@ -115,15 +115,15 @@
         type="number"
         min="0"
         step="0.01"
-        placeholder="Enter amount"
-        label="Service fee"
+        placeholder={$i18n.actions.enterAmount}
+        label={$i18n.words.serviceFee}
       />
 
       <SelectField
         formatter={formatFeeType}
         options={feeTypes}
         bind:value={serviceFeeType}
-        placeholder="Select fee type"
+        placeholder={$i18n.actions.selectFeeType}
         label="&nbsp;"
       />
 
@@ -132,15 +132,15 @@
         type="number"
         min="0"
         step="0.01"
-        placeholder="Enter amount"
-        label="Agency mark-up"
+        placeholder={$i18n.actions.enterAmount}
+        label={$i18n.words.agencyMarkup}
       />
 
       <SelectField
         formatter={formatFeeType}
         options={feeTypes}
         bind:value={agencyMarkupType}
-        placeholder="Select fee type"
+        placeholder={$i18n.actions.selectFeeType}
         label="&nbsp;"
       />
     </div>
@@ -151,13 +151,13 @@
       <div transition:slideFade={{ duration: transitionTimeMs }} class="fees-breakdown">
         <ul>
           <li>
-            <span class="typography label-medium">Service fee</span>
+            <span class="typography label-medium">{$i18n.words.serviceFee}</span>
             <span class="typography body-small bold">
               {formatAmount({ currency, amount: calculatedServiceFeeAmount }, true)}
             </span>
           </li>
           <li>
-            <span class="typography label-medium">Agency mark-up</span>
+            <span class="typography label-medium">{$i18n.words.agencyMarkup}</span>
             <span class="typography body-small bold">
               {formatAmount({ currency, amount: calculatedAgencyMarkupAmount }, true)}
             </span>
@@ -167,7 +167,7 @@
     {/if}
 
     <div class="total">
-      <span class="typography body-large bold">Total to collect</span>
+      <span class="typography body-large bold">{$i18n.sentences.totalToCollect}</span>
       <em class="typography body-large bold">
         {#if priceQuote?.price}
           {formatAmount({ currency, amount: totalToCollectAmount }, true)}

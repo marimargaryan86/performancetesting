@@ -6,11 +6,12 @@
     getPassengersPresentation,
     type PassengerPickerData,
   } from "./trip-search/passenger-picker/passenger-picker.svelte";
-  import { getLocaleData } from "i18n";
+  import { getLocale, getLocaleData } from "i18n";
 
   export let priceQuote: TripOfferPriceQuote;
   export let passengers: PassengerPickerData;
 
+  const locale = getLocale();
   const i18n = getLocaleData();
 
   $: legs = getLegsFromPriceQuote(priceQuote);
@@ -21,7 +22,7 @@
 <div transition:slideFade={{ duration: 300 }} class="trip-banner typography body-large">
   {#if departureLeg && arrivalLeg}
     <p>
-      {departureLeg.departureAt.toLocaleDateString("en-GB", {
+      {departureLeg.departureAt.toLocaleDateString($locale, {
         month: "long",
         day: "numeric",
         year: "numeric",
@@ -39,7 +40,7 @@
       {getPassengersPresentation(passengers, $i18n)}
     </p>
   {:else}
-    <p>Loading trip details...</p>
+    <p>{$i18n.sentences.loadingTripDetails}</p>
   {/if}
 </div>
 
