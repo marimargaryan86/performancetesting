@@ -8,7 +8,6 @@ import pytest
 from pymongo import MongoClient
 
 from snowfall.project.junction.api_automation.test_functions.helper import (
-    get_coordinates_by_place_name,
     stripe_confirmation,
     wait_until_completed,
 )
@@ -19,6 +18,19 @@ from snowfall.vendor.junction.go.client import LegType
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
+
+
+async def get_place_coordinates(
+    mobile_client: MobileApiClient,
+    place_pairs: Sequence[str],
+) -> list[tuple[Any, Any]]:
+    place_id_pairs = []
+    for place in place_pairs:
+        response = await mobile_client.get_places(place)
+        latitude = response["data"][0]["attributes"]["latitude"]
+        longitude = response["data"][0]["attributes"]["longitude"]
+        place_id_pairs.append((latitude, longitude))
+    return place_id_pairs
 
 
 async def create_offer_simple_search(
@@ -137,7 +149,7 @@ async def get_order_by_id(
     return await mobile_client.get_order(order_id)
 
 
-places_pairs = [["Brussels-Midi", "Rotterdam Centraal"]]
+places_pairs = [("Brussels-Midi", "Rotterdam Centraal")]
 providers = [
     "Custom",
 ]
@@ -148,13 +160,13 @@ providers = [
 async def test_simple_search(  # noqa: WPS217, WPS218, PLR0915
     mongo_client: MongoClient[Any],
     mobile_client: MobileApiClient,
-    places_pairs: Sequence[tuple[Any, Any]],
+    places_pairs: Sequence[str],
     departure_after: datetime,
     stripe_api_key: str,
 ) -> None:
-    with allure.step("Step to log the origin and destination coordinates from DB"):
-        origin_cord, destination_cord = await get_coordinates_by_place_name(
-            mongo_client,
+    with allure.step("Step to log the origin and destination coordinates"):
+        origin_cord, destination_cord = await get_place_coordinates(
+            mobile_client,
             places_pairs,
         )
         assert origin_cord, "Origin not found"

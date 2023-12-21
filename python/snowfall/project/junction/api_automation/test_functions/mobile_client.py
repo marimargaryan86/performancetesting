@@ -695,7 +695,7 @@ class MobileApiClient(Client):
             },
         }
         headers = {
-            "Session-Token": "YMSXrOAhIOdvIbxAmfSt7vJtRBkurNb6",
+            "Session-Token": "FMSXrOAhIOdvIbxAmfSt7vJtRBkurNbn",
         }
         return await self._make_request(
             method=_METHOD_POST,
