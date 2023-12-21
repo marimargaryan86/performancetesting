@@ -2,6 +2,7 @@ import asyncio
 from typing import NamedTuple
 
 import httpx
+import stripe
 from grpc import aio
 from starlette import middleware
 from starlette.middleware import authentication as auth_middleware
@@ -61,6 +62,7 @@ class Settings(starlette.Settings):
     currencies_address: str
     refunds_address: str
     resellers_address: str
+    stripe_api_key: str
 
 
 class _Channels(NamedTuple):
@@ -73,6 +75,7 @@ class _Channels(NamedTuple):
 
 
 async def _http(app: application.Application[Settings]) -> None:
+    stripe.api_key = app.settings.stripe_api_key
     authentication_channel = await grpc_factory.make_insecure_channel(
         app,
         app.settings.authentication_address,
