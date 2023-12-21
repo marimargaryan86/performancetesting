@@ -1,17 +1,18 @@
 <script lang="ts">
-  import { invalidateAll } from "$app/navigation";
   import { page } from "$app/stores";
-  import Button from "components/ui/button.svelte";
+  import { getLocaleData } from "i18n";
+  import { getPageTitle } from "utils/page-title";
 
-  function reload(): void {
-    invalidateAll();
-  }
+  const i18n = getLocaleData();
 </script>
+
+<svelte:head>
+  <title>{getPageTitle($i18n.title, $i18n.words.error)}</title>
+</svelte:head>
 
 <main>
   {#if $page.status === 500}
-    <h1 class="typography headline-medium">Oops, something went wrong :(</h1>
-    <Button on:click={reload}>Reload the page</Button>
+    <h1 class="typography headline-medium">{$i18n.sentences.oopsSomethingWentWrong}</h1>
   {:else}
     <h1 class="typography headline-medium">{$page.error?.message}</h1>
   {/if}

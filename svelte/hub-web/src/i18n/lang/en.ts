@@ -78,6 +78,7 @@ export default {
     city: "City",
     country: "Country",
     postcode: "Postcode",
+    error: "Error",
   },
   actions: {
     logout: "Logout",
@@ -160,6 +161,7 @@ export default {
       { type: "text", value: "and our" },
       { type: "privacy", value: "privacy policy" },
     ] satisfies { type: "text" | "toc" | "coc" | "privacy"; value: string }[],
+    oopsSomethingWentWrong: "Oops, something went wrong :(",
   },
   tableHeaders: {
     id: "ID",

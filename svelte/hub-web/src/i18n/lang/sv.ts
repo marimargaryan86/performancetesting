@@ -72,6 +72,7 @@ export default {
     city: "Stad",
     country: "Land",
     postcode: "Postnummer",
+    error: "Fel",
   },
   actions: {
     logout: "Logga ut",
@@ -154,6 +155,7 @@ export default {
       { type: "text", value: "och vår" },
       { type: "privacy", value: "integritetspolicy" },
     ],
+    oopsSomethingWentWrong: "Hoppsan, något gick snett :(",
   },
   tableHeaders: {
     id: "ID",
