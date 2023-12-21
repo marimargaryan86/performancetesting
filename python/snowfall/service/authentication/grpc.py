@@ -2,6 +2,7 @@ import bcrypt
 import email_validator
 import grpc
 import httpx
+from google.protobuf import struct_pb2
 from google.rpc import error_details_pb2
 
 from snowfall.adapter import authentication
@@ -11,6 +12,8 @@ from snowfall.service.authentication.v1 import (
 )
 from snowfall.service.authentication.v1 import authentication_pb2_grpc as auth_pb2_grpc
 from snowfall.service.authentication.v1 import (
+    identities_pb2,
+    identities_pb2_grpc,
     models_pb2,
     oauth_pb2,
     oauth_pb2_grpc,
@@ -20,7 +23,7 @@ from snowfall.service.authentication.v1 import (
 from snowfall.stdlib import string
 from snowfall.stdlib.format import jwt
 from snowfall.stdlib.transport.grpc import rich_status, service
-from snowfall.vendor.ory import client
+from snowfall.vendor.ory import client, models
 
 
 class AuthenticationService(
@@ -274,4 +277,75 @@ class SessionService(service.Service, sessions_pb2_grpc.SessionServiceServicer):
 
         return sessions_pb2.GetSessionResponse(
             session=session,
+        )
+
+
+class IdentitiesService(
+    service.Service,
+    identities_pb2_grpc.IdentitiesServiceServicer,
+):
+    def __init__(self, ory_client: client.OryClient):
+        self._client = ory_client
+
+    def get_name(self) -> str:
+        return identities_pb2.DESCRIPTOR.services_by_name["IdentitiesService"].full_name
+
+    def register(
+        self,
+        server: grpc.aio.Server,
+    ) -> None:
+        identities_pb2_grpc.add_IdentitiesServiceServicer_to_server(self, server)
+
+    async def GetIdentity(  # type: ignore[override] # noqa: N802
+        self,
+        request: identities_pb2.GetIdentityRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> identities_pb2.GetIdentityResponse:
+        try:
+            identity = await self._client.get_identity(request.id)
+        except httpx.HTTPStatusError as err:
+            if err.response.status_code == httpx.codes.NOT_FOUND.value:
+                return await context.abort(grpc.StatusCode.NOT_FOUND)
+
+            return await context.abort(grpc.StatusCode.UNKNOWN)
+
+        metadata_public = struct_pb2.Struct()
+        metadata_public.update(identity.metadata_public)
+
+        return identities_pb2.GetIdentityResponse(
+            identity=identities_pb2.Identity(
+                id=identity.identifier,
+                email=identity.traits.email,
+                metadata_public=metadata_public,
+            ),
+        )
+
+    async def UpdateIdentity(  # type: ignore[override] # noqa: N802
+        self,
+        request: identities_pb2.UpdateIdentityRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> identities_pb2.UpdateIdentityResponse:
+        try:
+            identity = await self._client.update_identity(
+                identity=models.Identity(
+                    id=request.identity.id,
+                    traits=models.Traits(email=request.identity.email),
+                    metadata_public=dict(request.identity.metadata_public.items()),
+                ),
+            )
+        except httpx.HTTPStatusError as err:
+            if err.response.status_code == httpx.codes.NOT_FOUND.value:
+                return await context.abort(grpc.StatusCode.NOT_FOUND)
+
+            return await context.abort(grpc.StatusCode.UNKNOWN)
+
+        metadata_public = struct_pb2.Struct()
+        metadata_public.update(identity.metadata_public)
+
+        return identities_pb2.UpdateIdentityResponse(
+            identity=identities_pb2.Identity(
+                id=identity.identifier,
+                email=identity.traits.email,
+                metadata_public=metadata_public,
+            ),
         )

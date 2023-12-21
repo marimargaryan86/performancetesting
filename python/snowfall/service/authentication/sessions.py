@@ -1,7 +1,7 @@
 import httpx
 from google.protobuf import struct_pb2
 
-from snowfall.service.authentication.v1 import sessions_pb2
+from snowfall.service.authentication.v1 import identities_pb2, sessions_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.vendor.ory import client
 
@@ -34,7 +34,7 @@ class Sessions(object):
             id=session.identifier,
             active=session.active,
             expires_at=protobuf.datetime_to_protobuf(session.expires_at),
-            identity=sessions_pb2.Session.Identity(
+            identity=identities_pb2.Identity(
                 id=session.identity.identifier,
                 email=session.identity.traits.email,
                 metadata_public=metadata_public,

@@ -1,0 +1,181 @@
+from collections.abc import Mapping
+from types import MappingProxyType
+from unittest import mock
+
+import grpc
+import pytest
+from google.protobuf import struct_pb2
+
+from snowfall.adapter import identities
+from snowfall.service.authentication.v1 import (
+    identities_pb2,
+    identities_pb2_grpc,
+)
+
+NOT_FOUND = "924de040-3c88-4d4f-b909-acbe45753b05"
+IDENTITIES = (
+    "2a02cada-8274-4281-8d97-cbf3909a99bb",
+    "b6b581cf-8601-4d5f-85dd-38cc111c4f6e",
+)
+METADATA_PUBLIC = MappingProxyType(
+    {
+        "role": "reseller-admin",
+        "reseller_id": "mock",
+    },
+)
+
+
+@pytest.fixture()
+def identities_client() -> identities.Client:
+    return identities.DictClient(_get_identities())
+
+
+@pytest.fixture()
+def updated_metadata() -> dict[str, str]:
+    new_metadata = METADATA_PUBLIC.copy()
+    new_metadata["some_new_field_name"] = "some_new_value"
+
+    return new_metadata
+
+
+@pytest.fixture()
+def error_stub() -> identities_pb2_grpc.IdentitiesServiceStub:
+    error = grpc.aio.AioRpcError(
+        code=grpc.StatusCode.NOT_FOUND,
+        initial_metadata=grpc.aio.Metadata(),
+        trailing_metadata=grpc.aio.Metadata(),
+    )
+    stub = mock.create_autospec(identities_pb2_grpc.IdentitiesServiceStub)
+    stub.GetIdentity = mock.AsyncMock(side_effect=error)
+    stub.UpdateIdentity = mock.AsyncMock(side_effect=error)
+
+    return stub
+
+
+@pytest.fixture()
+def stub(
+    updated_metadata: Mapping[str, str],
+) -> identities_pb2_grpc.IdentitiesServiceStub:
+    identity = _get_identities()[0]
+    get_identity_response = identities_pb2.GetIdentityResponse(
+        identity=identity,
+    )
+
+    identity.metadata_public.update(updated_metadata)
+    update_identity_response = identities_pb2.UpdateIdentityResponse(
+        identity=identity,
+    )
+
+    stub = mock.create_autospec(identities_pb2_grpc.IdentitiesServiceStub)
+    stub.GetIdentity = mock.AsyncMock(return_value=get_identity_response)
+    stub.UpdateIdentity = mock.AsyncMock(return_value=update_identity_response)
+
+    return stub
+
+
+class TestDictClient(object):
+    async def test_identity_is_retrievable(
+        self,
+        identities_client: identities.Client,
+    ) -> None:
+        identity = await identities_client.get_ory_identity(IDENTITIES[0])
+
+        assert identity.id == IDENTITIES[0]
+
+    async def test_identity_not_found(
+        self,
+        identities_client: identities.Client,
+    ) -> None:
+        with pytest.raises(identities.NotFoundError):
+            await identities_client.get_ory_identity(NOT_FOUND)
+
+    async def test_update_identity(
+        self,
+        identities_client: identities.Client,
+        updated_metadata: Mapping[str, str],
+    ) -> None:
+        identity = _get_identities()[0]
+        identity = await identities_client.update_ory_identity(
+            identifier=identity.id,
+            email=identity.email,
+            metadata=updated_metadata,
+        )
+
+        assert identity.id == IDENTITIES[0]
+        assert dict(identity.metadata_public.items()) == updated_metadata
+
+    async def test_update_identity_not_found(
+        self,
+        identities_client: identities.Client,
+    ) -> None:
+        with pytest.raises(identities.NotFoundError):
+            await identities_client.update_ory_identity(
+                identifier=NOT_FOUND,
+                email="",
+                metadata={},
+            )
+
+
+class TestGrpcClient(object):
+    async def test_identity_is_retrievable(
+        self,
+        stub: identities_pb2_grpc.IdentitiesServiceStub,
+    ) -> None:
+        identities_client = identities.GrpcClient(stub)
+
+        identity = await identities_client.get_ory_identity(IDENTITIES[0])
+
+        assert identity.id == IDENTITIES[0]
+
+    async def test_identity_is_retrievable_not_found(
+        self,
+        error_stub: identities_pb2_grpc.IdentitiesServiceStub,
+    ) -> None:
+        identities_client = identities.GrpcClient(error_stub)
+
+        with pytest.raises(identities.NotFoundError):
+            await identities_client.get_ory_identity(NOT_FOUND)
+
+    async def test_update_identity(
+        self,
+        stub: identities_pb2_grpc.IdentitiesServiceStub,
+        updated_metadata: Mapping[str, str],
+    ) -> None:
+        identities_client = identities.GrpcClient(stub)
+
+        identity = _get_identities()[0]
+        identity = await identities_client.update_ory_identity(
+            identifier=identity.id,
+            email=identity.email,
+            metadata=updated_metadata,
+        )
+
+        assert identity.id == IDENTITIES[0]
+        assert dict(identity.metadata_public.items()) == updated_metadata
+
+    async def test_update_identity_not_found(
+        self,
+        error_stub: identities_pb2_grpc.IdentitiesServiceStub,
+    ) -> None:
+        identities_client = identities.GrpcClient(error_stub)
+
+        with pytest.raises(identities.NotFoundError):
+            await identities_client.update_ory_identity(
+                identifier=NOT_FOUND,
+                email="",
+                metadata={},
+            )
+
+
+def _get_identities() -> list[identities_pb2.Identity]:
+    return [_generate_identities(identifier) for identifier in IDENTITIES]
+
+
+def _generate_identities(identifier: str) -> identities_pb2.Identity:
+    metadata_public = struct_pb2.Struct()
+    metadata_public.update(METADATA_PUBLIC)
+    return identities_pb2.Identity(
+        id=identifier,
+        email="foobar@example.com",
+        metadata_public=metadata_public,
+    )

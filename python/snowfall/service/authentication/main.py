@@ -53,6 +53,7 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
             grpc.SessionService(
                 sessions_client=sessions.Sessions(ory_client=ory_client),
             ),
+            grpc.IdentitiesService(ory_client=ory_client),
         ],
     )
 

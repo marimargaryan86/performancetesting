@@ -7,6 +7,7 @@ from google.protobuf import struct_pb2
 
 from snowfall.adapter import authentication
 from snowfall.service.authentication.v1 import (
+    identities_pb2,
     models_pb2,
     sessions_pb2,
     sessions_pb2_grpc,
@@ -62,7 +63,7 @@ def basic_stub() -> sessions_pb2_grpc.SessionServiceStub:
     response = sessions_pb2.GetSessionResponse(
         session=sessions_pb2.Session(
             active=True,
-            identity=sessions_pb2.Session.Identity(
+            identity=identities_pb2.Identity(
                 id="bar",
                 email="foo@bar.com",
             ),
@@ -80,7 +81,7 @@ def metadata_stub() -> sessions_pb2_grpc.SessionServiceStub:
     response = sessions_pb2.GetSessionResponse(
         session=sessions_pb2.Session(
             active=True,
-            identity=sessions_pb2.Session.Identity(
+            identity=identities_pb2.Identity(
                 id="bar",
                 email="foo@bar.com",
                 metadata_public=some_struct,

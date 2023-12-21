@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package snowfall.service.authentication.v1;
+
+import "google/protobuf/struct.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/service/authentication/v1";
+
+service IdentitiesService {
+  rpc GetIdentity(GetIdentityRequest) returns (GetIdentityResponse);
+  rpc UpdateIdentity(UpdateIdentityRequest) returns (UpdateIdentityResponse);
+}
+
+message GetIdentityRequest {
+  string id = 1;
+}
+
+message GetIdentityResponse {
+  Identity identity = 1;
+}
+
+message UpdateIdentityRequest {
+  Identity identity = 1;
+}
+
+message UpdateIdentityResponse {
+  Identity identity = 1;
+}
+
+message Identity {
+  string id = 1;
+  string email = 2;
+  google.protobuf.Struct metadata_public = 3;
+}
