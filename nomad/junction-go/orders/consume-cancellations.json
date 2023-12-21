@@ -7,7 +7,7 @@
     }
   },
   "production": {
-    "deploy": false,
+    "deploy": true,
     "variables": {
       "count": 2,
       "zendesk_base_url": "https://snowfall.zendesk.com"
