@@ -13,15 +13,16 @@
     bookingStatus?: string;
   };
 
-  function formatBookingStatusOptions(
-    bookingStatus: BookingStatus | undefined,
-    selected = false,
-  ): string | undefined {
-    if (selected && !bookingStatus) {
-      return undefined;
-    }
+  function getBookingStatusOptionFormatter(
+    locale: LocaleData,
+  ): (status?: BookingStatus, selected?: boolean) => string | undefined {
+    return (status, selected) => {
+      if (!status) {
+        return selected ? undefined : locale.words.none;
+      }
 
-    return bookingStatus ? capitalize(bookingStatus).replaceAll("-", " ") : "None";
+      return locale.statuses[status];
+    };
   }
 </script>
 
@@ -29,14 +30,18 @@
   import Button from "components/ui/button.svelte";
   import DatePicker from "components/ui/date-picker/date-picker.svelte";
   import SelectField from "components/ui/select-field.svelte";
+  import { getLocaleData, type LocaleData } from "i18n";
   import {
     bookingStatuses,
     type BookingStatus,
   } from "integration/junction-hub-api/schemas/booking";
   import type { DateRange } from "models/date-time";
-  import { capitalize } from "utils/common";
 
   export let filters: FilterOptions;
+
+  const i18n = getLocaleData();
+
+  $: formatBookingStatusOption = getBookingStatusOptionFormatter($i18n);
 
   function reset(): void {
     filters = {};
@@ -45,27 +50,27 @@
 
 <DatePicker
   bind:value={filters.departureAtRange}
-  label="Departure date"
+  label={$i18n.tableHeaders.departureDate}
   range
-  placeholder="Date Range"
+  placeholder={$i18n.words.dateRange}
 />
 
 <DatePicker
   bind:value={filters.createdAtRange}
-  label="Created date"
+  label={$i18n.tableHeaders.createdDate}
   range
-  placeholder="Date Range"
+  placeholder={$i18n.words.dateRange}
 />
 
 <SelectField
-  label="Booking status"
+  label={$i18n.tableHeaders.bookingStatus}
   bind:value={filters.bookingStatus}
   options={[undefined, ...bookingStatuses]}
-  formatter={formatBookingStatusOptions}
-  placeholder="Select"
+  formatter={formatBookingStatusOption}
+  placeholder={$i18n.actions.select}
 />
 
-<Button class="filter-clear-btn" size="small" on:click={reset}>Clear</Button>
+<Button class="filter-clear-btn" size="small" on:click={reset}>{$i18n.actions.clear}</Button>
 
 <style>
   :global(button.filter-clear-btn.filter-clear-btn) {

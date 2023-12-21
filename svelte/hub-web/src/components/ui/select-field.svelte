@@ -28,10 +28,10 @@
   export let readonly = false;
 
   let expanded = false;
-  let selectedDisplayValue = formatter(value, true);
   let dialog: HTMLUListElement | undefined;
   let textField: TextField | undefined;
 
+  $: selectedDisplayValue = formatter(value, true);
   $: filteredOptions = options;
   $: hoveredIndex = filteredOptions.indexOf(value);
   $: filter(selectedDisplayValue);

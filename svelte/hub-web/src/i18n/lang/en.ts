@@ -42,6 +42,8 @@ export default {
     railwayOperators: "Railway operators",
     alternativeFares: "Alternative fares",
     selected: "Selected",
+    dateRange: "Date Range",
+    none: "None",
   },
   actions: {
     logout: "Logout",
@@ -63,6 +65,7 @@ export default {
     clearAll: "Clear all",
     bookNow: "Book now",
     viewFareRules: "View fare rules",
+    clear: "Clear",
     select: "Select",
   },
   sentences: {

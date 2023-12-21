@@ -37,6 +37,8 @@ export default {
     railwayOperators: "Tågoperatörer",
     alternativeFares: "Resealternativ",
     selected: "Vald",
+    dateRange: "Datumintervall",
+    none: "Ingen",
   },
   actions: {
     logout: "Logga ut",
@@ -58,6 +60,7 @@ export default {
     clearAll: "Rensa alla",
     bookNow: "Boka nu",
     viewFareRules: "Visa färdregler",
+    clear: "Rensa",
     select: "Välj",
   },
   sentences: {
