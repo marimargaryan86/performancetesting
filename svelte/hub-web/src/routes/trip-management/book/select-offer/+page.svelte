@@ -74,6 +74,7 @@
   import { writable } from "svelte/store";
   import type { TripOfferPriceQuote } from "integration/junction-mobile-api/schemas/trip-offer-price-quote";
   import { getPageTitle } from "utils/page-title";
+  import { getLocaleData } from "i18n";
 
   export let data;
 
@@ -84,7 +85,7 @@
   let offers: OfferModel[] = data.offers.data;
   let searchOptionsSettings = getSearchOptionSettings(offers);
   let searchOptions: SearchOptionsData = {
-    sortBy: "price",
+    sortBy: "lowest-price",
     stops: [],
     arrivalSpanM: { start: 0, end: 1440 },
     departureSpanM: { start: 0, end: 1440 },
@@ -95,6 +96,7 @@
   let fareRulesDialog: FareRulesDialog | undefined;
   let selectedPriceQuote: TripOfferPriceQuote | undefined = undefined;
 
+  const i18n = getLocaleData();
   const offersPending = writable(false);
   const selectOfferPending = writable(false);
 
@@ -171,7 +173,14 @@
 </script>
 
 <svelte:head>
-  <title>{getPageTitle("Junction Hub", "Trip Management", "Book", "Select an offer")}</title>
+  <title>
+    {getPageTitle(
+      $i18n.title,
+      $i18n.pages.tripManagement.title,
+      $i18n.pages.tripManagement.pages.book.title,
+      $i18n.pages.tripManagement.pages.book.pages.select.title,
+    )}
+  </title>
 </svelte:head>
 
 <div class="search-wrapper">
@@ -205,7 +214,9 @@
         {#if offers.length}
           <li>
             <Alert type="warning" dismissable={false}>
-              <span class="typography body-medium">No trips matches the filter criteria</span>
+              <span class="typography body-medium">
+                {$i18n.sentences.noTripsMatchesTheFilterCriteria}
+              </span>
             </Alert>
           </li>
         {/if}
@@ -219,7 +230,7 @@
       {:else if !offers.length}
         <li>
           <Alert type="warning" dismissable={false}>
-            <span class="typography body-medium">No trips found</span>
+            <span class="typography body-medium">{$i18n.sentences.noTripsFound}</span>
           </Alert>
         </li>
       {/if}
@@ -231,7 +242,7 @@
   <div class="actions" transition:fade={{ duration: 200 }}>
     <div class="wrapper">
       <Button on:click={selectOffer} size="small">
-        Next
+        {$i18n.words.proceed}
 
         {#if $selectOfferPending}
           <LoadingIcon />

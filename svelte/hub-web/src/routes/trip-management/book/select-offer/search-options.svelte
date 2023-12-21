@@ -1,17 +1,19 @@
 <script lang="ts" context="module">
-  type SortValue =
-    | "price"
-    | "fastest"
-    | "earliest-departure"
-    | "latest-departure"
-    | "earliest-arrival"
-    | "latest-arrival";
-  type SortOption = { label: string; value: SortValue };
+  const sortOptions = [
+    "lowest-price",
+    "fastest",
+    "earliest-departure",
+    "latest-departure",
+    "earliest-arrival",
+    "latest-arrival",
+  ] as const;
+  export type SortOption = (typeof sortOptions)[number];
+
   type StopValue = "direct";
   type TimeSpan = { start: number; end: number };
 
   export type SearchOptionsData = {
-    sortBy: SortValue;
+    sortBy: SortOption;
     stops: StopValue[];
     departureSpanM: TimeSpan;
     arrivalSpanM: TimeSpan;
@@ -24,24 +26,15 @@
     vendors: string[];
   };
 
-  const sortValues: SortOption[] = [
-    { label: "Lowest price", value: "price" },
-    { label: "Fastest", value: "fastest" },
-    { label: "Earliest departure", value: "earliest-departure" },
-    { label: "Latest departure", value: "latest-departure" },
-    { label: "Earliest arrival", value: "earliest-arrival" },
-    { label: "Latest arrival", value: "latest-arrival" },
-  ];
-
-  function formatSortBy(value?: SortOption): string {
-    return value?.label ?? "Price";
-  }
-
   function formatTime(minutes: number): string {
     const hours = Math.floor(minutes / 60);
     const minute = minutes % 60;
 
     return `${hours < 10 ? 0 : ""}${hours}:${minute < 10 ? 0 : ""}${minute}`;
+  }
+
+  function getFormatSortOptionFunc(locale: LocaleData): (value?: SortOption) => string {
+    return (value) => (value ? locale.sortOptions[value] : locale.sortOptions["lowest-price"]);
   }
 </script>
 
@@ -50,13 +43,14 @@
   import RangeField from "components/ui/range-field.svelte";
   import SelectField from "components/ui/select-field.svelte";
   import { formatDuration } from "formatting/date-time";
+  import { getLocaleData, type LocaleData } from "i18n";
 
   export let data: SearchOptionsData;
   export let settings: SearchOptionsSettings;
 
-  let sortBy = sortValues[0] as SortOption;
+  const i18n = getLocaleData();
 
-  $: data.sortBy = sortBy?.value ?? "price";
+  $: formatSortOption = getFormatSortOptionFunc($i18n);
 
   function selectOperators(all: boolean): void {
     if (all) {
@@ -69,17 +63,18 @@
 
 <div class="search-options">
   <div class="sort">
-    <h3 class="typography label-large">Sort by</h3>
-    <SelectField options={sortValues} bind:value={sortBy} formatter={formatSortBy} />
+    <h3 class="typography label-large">{$i18n.actions.sortBy}</h3>
+    <SelectField options={sortOptions} bind:value={data.sortBy} formatter={formatSortOption} />
   </div>
 
   <hr />
 
   <div class="stops">
-    <h3 class="typography label-large">Stops</h3>
+    <h3 class="typography label-large">{$i18n.words.stop.plural}</h3>
     <div class="options typography body-small">
       <label for="stop-direct">
-        <Checkbox id="stop-direct" value="direct" bind:group={data.stops} /> Direct
+        <Checkbox id="stop-direct" value="direct" bind:group={data.stops} />
+        {$i18n.words.direct}
       </label>
     </div>
   </div>
@@ -87,9 +82,9 @@
   <hr />
 
   <div class="departure-time">
-    <h3 class="typography label-large">Departure time</h3>
+    <h3 class="typography label-large">{$i18n.words.departureTime}</h3>
     <div>
-      <h4 class="typography label-medium bold">Departure</h4>
+      <h4 class="typography label-medium bold">{$i18n.words.departure}</h4>
       <span class="typography body-small">
         {formatTime(data.departureSpanM.start)} - {formatTime(data.departureSpanM.end)}
       </span>
@@ -97,7 +92,7 @@
     </div>
 
     <div>
-      <h4 class="typography label-medium bold">Arrival</h4>
+      <h4 class="typography label-medium bold">{$i18n.words.arrival}</h4>
       <span class="typography body-small">
         {formatTime(data.arrivalSpanM.start)} - {formatTime(data.arrivalSpanM.end)}
       </span>
@@ -108,7 +103,7 @@
   <hr />
 
   <div class="duration">
-    <h3 class="typography label-large">Journey duration</h3>
+    <h3 class="typography label-large">{$i18n.words.journeyDuration}</h3>
     <span class="typography body-small">
       {formatDuration(data.durationM * 60)} - {formatDuration(settings.durationSpanM.end * 60)}
     </span>
@@ -123,20 +118,20 @@
 
   {#if settings.vendors.length}
     <div class="operators">
-      <h3 class="typography label-large">Railway operators</h3>
+      <h3 class="typography label-large">{$i18n.words.railwayOperators}</h3>
 
       <div class="actions">
         <button
           class="typography body-small bold"
           on:click={selectOperators.bind(selectOperators, true)}
         >
-          Select all
+          {$i18n.actions.selectAll}
         </button>
         <button
           class="typography body-small bold"
           on:click={selectOperators.bind(selectOperators, false)}
         >
-          Clear all
+          {$i18n.actions.clearAll}
         </button>
       </div>
 

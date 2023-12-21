@@ -1,6 +1,6 @@
 <script lang="ts" context="module">
-  function formatTime(time: Date, timeZone: string): string {
-    return time.toLocaleTimeString("en-GB", {
+  function formatTime(time: Date, timeZone: string, locale: Locale): string {
+    return time.toLocaleTimeString(locale, {
       timeZone,
       minute: "2-digit",
       hour: "2-digit",
@@ -38,11 +38,14 @@
   import type { Offer, OfferOption } from "integration/junction-mobile-api/schemas/offer";
   import type { Price } from "integration/common/schemas/price";
   import { ensureDefined } from "utils/array";
+  import { getLocale, getLocaleData, type Locale } from "i18n";
 
   export let offer: Offer;
   export let selectedOptionIds: string[] | undefined;
   export let selected: boolean;
 
+  const locale = getLocale();
+  const i18n = getLocaleData();
   const dispatch = createEventDispatcher<{
     select: { offerId: string; optionIds: string[] };
     markSelection: { offerId: string; optionIds: string[] };
@@ -88,7 +91,7 @@
 
 <div class="offer" class:selected>
   {#each offer.groups as group, groupIdx}
-    {@const vendor = group.detailsList[0]?.vendor ?? "Unknown"}
+    {@const vendor = group.detailsList[0]?.vendor ?? $i18n.words.unknown}
     {@const trainNumber = group.detailsList[0]?.routeIdentifiers.vendor ?? ""}
     {@const stopCount = group.detailsList[0]?.legs.length ?? 1}
 
@@ -97,7 +100,9 @@
         <EntityAvatar name={vendor} size="24px" />
         <span>
           {vendor}
-          {trainNumber} • {stopCount === 1 ? "Direct" : `${stopCount} stops`}
+          {trainNumber} • {stopCount === 1
+            ? $i18n.words.direct
+            : `${stopCount} ${$i18n.words.stop.plural}`.toLowerCase()}
         </span>
       </div>
 
@@ -105,7 +110,7 @@
         <div class="segments">
           {#each group.detailsList as details}
             <span class="typography body-small">
-              {details.legs[0]?.departureAt.toLocaleDateString("en-GB", {
+              {details.legs[0]?.departureAt.toLocaleDateString($locale, {
                 month: "long",
                 day: "numeric",
                 year: "numeric",
@@ -119,7 +124,7 @@
                   <div class="route">
                     <span class="circle" />
                     <span class="time typography label-large bold">
-                      {formatTime(leg.departureAt, leg.origin.timeZone)}
+                      {formatTime(leg.departureAt, leg.origin.timeZone, $locale)}
                     </span>
                     <span class="location typography label-large bold">{leg.origin.name}</span>
 
@@ -131,7 +136,7 @@
 
                     <span class="circle" />
                     <span class="time typography label-large bold">
-                      {formatTime(leg.arrivalAt, leg.destination.timeZone)}
+                      {formatTime(leg.arrivalAt, leg.destination.timeZone, $locale)}
                     </span>
                     <span class="location typography label-large bold">{leg.destination.name}</span>
                   </div>
@@ -144,13 +149,15 @@
         {#if groupIdx === 0}
           <div class="price">
             <span>
-              <em class="typography label-medium">From</em>
+              <em class="typography label-medium">{$i18n.sentences.startingAt}</em>
               <strong class="typography title-large bold">
                 {formatAmount(totalPrice, true)}
               </strong>
             </span>
 
-            <Button size="x-small" variant="outline" on:click={selectOffer}>Book now</Button>
+            <Button size="x-small" variant="outline" on:click={selectOffer}>
+              {$i18n.actions.bookNow}
+            </Button>
           </div>
         {/if}
       </div>

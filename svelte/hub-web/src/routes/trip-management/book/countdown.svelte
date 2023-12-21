@@ -11,12 +11,15 @@
 <script lang="ts">
   import AlertIcon from "components/icons/alert-icon.svelte";
   import Alert from "components/ui/alert.svelte";
+  import { getLocaleData } from "i18n";
   import { onDestroy, onMount } from "svelte";
   import { sleep } from "utils/common";
   import { getTimeDeltaS } from "utils/date-time";
 
   export let expiresAt: Date;
   export let show = false;
+
+  const i18n = getLocaleData();
 
   let ticking = show;
 
@@ -58,8 +61,9 @@
 
 <Alert {show} type="warning" class="countdown">
   <AlertIcon />
-  <strong class="typography body-medium bold">Time remaining</strong>
+  <strong class="typography body-medium bold">{$i18n.sentences.timeRemaining}</strong>
   <span class="typography body-medium">
-    {timeLeft} mins to <strong class="typography bold">complete</strong> your booking
+    <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+    {@html $i18n.sentences.timeRemainingInfo.replace("{timeLeft}", timeLeft)}
   </span>
 </Alert>

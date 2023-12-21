@@ -63,7 +63,7 @@ describe("getSortOffersFunc", () => {
   const earliestDeparture = { sortBy: "earliest-departure" } as SearchOptionsData;
   const latestDeparture = { sortBy: "latest-departure" } as SearchOptionsData;
   const fastest = { sortBy: "fastest" } as SearchOptionsData;
-  const price = { sortBy: "price" } as SearchOptionsData;
+  const price = { sortBy: "lowest-price" } as SearchOptionsData;
   const invalid = { sortBy: "slowest" } as unknown as SearchOptionsData;
 
   it("returns correct results for valid sort options", () => {

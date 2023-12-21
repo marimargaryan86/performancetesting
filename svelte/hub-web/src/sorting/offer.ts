@@ -44,7 +44,7 @@ export function getSortOffersFunc(options: SearchOptionsData): (a: Offer, b: Off
       return getDepartureDelta(b, a);
     } else if (options.sortBy === "fastest") {
       return getOfferDurationS(a) - getOfferDurationS(b);
-    } else if (options.sortBy === "price") {
+    } else if (options.sortBy === "lowest-price") {
       const priceDiff = getLowestPrice(a) - getLowestPrice(b);
 
       if (priceDiff === 0) {

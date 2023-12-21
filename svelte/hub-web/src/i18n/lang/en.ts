@@ -3,6 +3,7 @@ import type { PaymentMethod, PaymentType } from "integration/junction-hub-api/sc
 import type { UserRole } from "integration/ory/schemas/authentication";
 import type { PassengerType } from "../../routes/trip-management/components/trip-search/passenger-picker/passenger-picker.svelte";
 import type { ContentElement, WordQuantity } from "i18n";
+import type { SortOption } from "../../routes/trip-management/book/select-offer/search-options.svelte";
 
 export default {
   title: "Junction Hub",
@@ -27,6 +28,20 @@ export default {
       plural: "Passengers",
       singular: "Passenger",
     } satisfies WordQuantity,
+    proceed: "Next",
+    fareRules: "Fare rules",
+    stop: {
+      plural: "Stops",
+      singular: "Stop",
+    } satisfies WordQuantity,
+    direct: "Direct",
+    departureTime: "Departure time",
+    departure: "Departure",
+    arrival: "Arrival",
+    journeyDuration: "Journey duration",
+    railwayOperators: "Railway operators",
+    alternativeFares: "Alternative fares",
+    selected: "Selected",
   },
   actions: {
     logout: "Logout",
@@ -42,6 +57,13 @@ export default {
     addBalances: "Add Balances",
     add: "Add",
     addDate: "Add date",
+    returnToBookings: "Return to bookings",
+    sortBy: "Sort by",
+    selectAll: "Select all",
+    clearAll: "Clear all",
+    bookNow: "Book now",
+    viewFareRules: "View fare rules",
+    select: "Select",
   },
   sentences: {
     priceChange: "Price change",
@@ -52,6 +74,12 @@ export default {
     noBalancesFound: "No balances found",
     findABalance: "Find a balance",
     cityOrStation: "City or Station",
+    noTripsMatchesTheFilterCriteria: "No trips matches the filter criteria",
+    noTripsFound: "No trips found",
+    timeRemaining: "Time remaining",
+    timeRemainingInfo:
+      '{timeLeft} mins to <strong class="typography bold">complete</strong> your booking',
+    startingAt: "From",
   },
   tableHeaders: {
     id: "ID",
@@ -109,6 +137,14 @@ export default {
     transactional: "Transactional",
     unspecified: "Unspecified",
   } satisfies Record<PaymentType | PaymentMethod, string>,
+  sortOptions: {
+    "earliest-arrival": "Earliest arrival",
+    "earliest-departure": "Earliest departure",
+    "latest-arrival": "Latest arrival",
+    "latest-departure": "Latest departure",
+    "lowest-price": "Lowest price",
+    fastest: "Fastest",
+  } satisfies Record<SortOption, string>,
   statuses: {
     confirmed: "Confirmed",
     "no-refund": "No Refund",
