@@ -1,7 +1,6 @@
 import types
 
 import stripe
-from stripe.stripe_object import StripeObject
 
 from snowfall.project.junction.go.adapter import orders
 from snowfall.project.junction.go.service.orders.v1 import (
@@ -14,8 +13,8 @@ from snowfall.stdlib.logging import stdout
 logger = stdout.get_logger()
 _CANCELLATION_STATUS_MAPPING = types.MappingProxyType(
     {
-        "succeeded": orders_models_pb2.BookingCancellation.Status.STATUS_REFUND_ISSUED,
-        "failed": orders_models_pb2.BookingCancellation.Status.STATUS_REFUND_FAILED,
+        Refund.Status.STATUS_SUCCEEDED: orders_models_pb2.BookingCancellation.Status.STATUS_REFUND_ISSUED,
+        Refund.Status.STATUS_FAILED: orders_models_pb2.BookingCancellation.Status.STATUS_REFUND_FAILED,
     },
 )
 
@@ -35,8 +34,11 @@ class RefundsState(object):
 
     async def charge_refunded(
         self,
-        stripe_refund: stripe.Refund,
+        stripe_refund: stripe.Charge,
     ) -> bool:
+        if not stripe_refund.refunds:
+            return True
+
         refunds_ids = [refund.id for refund in stripe_refund.refunds.data]
 
         all_refunds = await self._refunds_client.find(
@@ -51,12 +53,12 @@ class RefundsState(object):
                 continue
             await self._update_refund(
                 refund.external_reference_id,
-                id_to_refunds[refund.external_reference_id].status,
+                id_to_refunds[refund.external_reference_id].status or "",
             )
 
             await self._update_booking_cancellation_status(
                 refund.external_reference_id,
-                stripe_refund.status,
+                refund.status,
             )
         not_found_refunds = set(refunds_ids) - {
             _refund.external_reference_id for _refund in all_refunds.refunds
@@ -70,18 +72,18 @@ class RefundsState(object):
             return False
         return True
 
-    async def run(self, event: StripeObject) -> bool:
-        event_type = event.type.replace(".", "_")
+    async def run(self, event: stripe.StripeObject) -> bool:
+        event_type = event["type"].replace(".", "_")
         if hasattr(self, event_type):  # noqa: WPS421
             logger.info("Occurred event", event_name=event_type)
-            return await getattr(self, event_type)(event.data.object)
+            return await getattr(self, event_type)(event["data"]["object"])
         logger.error("Unhandled event", event_name=event_type)
         return False
 
     async def _update_booking_cancellation_status(
         self,
         stripe_refund_id: str,
-        stripe_refund_status: str,
+        stripe_refund_status: Refund.Status.ValueType,
     ) -> None:
         refund = await self._refunds_client.get(
             identifier=stripe_refund_id,

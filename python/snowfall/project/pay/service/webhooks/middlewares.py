@@ -72,11 +72,11 @@ class HmacHeaderMiddleware(BaseHTTPMiddleware):
         headers: Mapping[str, Any],
     ) -> bool:
         try:
-            stripe.Webhook.construct_event(
+            stripe.Webhook.construct_event(  # type: ignore[no-untyped-call]
                 payload,
                 headers.get("stripe-signature", ""),
                 self._stripe_secret_key,
             )
-        except stripe.error.SignatureVerificationError:
+        except stripe.SignatureVerificationError:
             return False
         return True

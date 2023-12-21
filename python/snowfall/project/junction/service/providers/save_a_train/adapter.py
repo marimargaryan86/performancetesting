@@ -543,7 +543,7 @@ class SaveATrainAdapter(object):
                                     contact_details.phone.e164_number,
                                 ).national_number,
                             ),
-                            country=getattr(country, "common_name", country.name),
+                            country=country.name,
                         )
                         for passenger in passengers
                     ],

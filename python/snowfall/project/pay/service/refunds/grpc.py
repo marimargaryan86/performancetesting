@@ -261,7 +261,7 @@ class RefundsService(
             stripe_refund = stripe.Refund.retrieve(
                 request.refund.external_reference_id,
             )
-        except stripe.error.StripeError:
+        except stripe.StripeError:
             return await context.abort(grpc.StatusCode.INVALID_ARGUMENT)
 
         refund.MergeFrom(
@@ -355,7 +355,7 @@ class RefundsService(
                 request,
                 transaction,
             )
-            refund.external_reference_id = stripe_refund.stripe_id
+            refund.external_reference_id = stripe_refund.stripe_id or ""
             refund.status = models_pb2.Refund.Status.STATUS_SUBMITTED
         else:
             cc_conversion = await self._payment_client.create_conversion(
@@ -403,7 +403,7 @@ class RefundsService(
                 payment_intent=bill.payment_intent_id,
                 amount=refunded_reseller.amount,
             )
-        except stripe.error.StripeError:
+        except stripe.StripeError:
             return await context.abort(grpc.StatusCode.INVALID_ARGUMENT)
 
         return stripe_refund

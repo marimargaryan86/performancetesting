@@ -166,7 +166,7 @@ _EnumValue = TypeVar("_EnumValue", bound=int)
 class ListAndViewEnum(object):
     def __init__(
         self,
-        enum: enum_type_wrapper._EnumTypeWrapper[_EnumValue],  # noqa: SLF001
+        enum: enum_type_wrapper._EnumTypeWrapper[_EnumValue],
         resource_factory: Callable[[Any, datastructures.URL], models.Resource],
         path: str,
     ) -> None:

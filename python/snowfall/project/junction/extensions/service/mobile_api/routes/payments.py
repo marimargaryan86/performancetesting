@@ -36,7 +36,7 @@ async def get_or_create_stripe_customer(
             raise exceptions.HTTPException(status.HTTP_502_BAD_GATEWAY)
         api_response_user = stripe.Customer.create()
     stripe_user = models_pb2.StripeUser(
-        id=api_response_user.stripe_id,
+        id=api_response_user.stripe_id or "",
         internal_user_id=user_id,
     )
     await stripe_users_repository.insert(stripe_user)
@@ -65,7 +65,7 @@ class Payments(endpoints.HTTPEndpoint):
                 guests_repository,
                 request.user.username,
             )
-            ephemeral_key_secret = stripe.EphemeralKey.create(
+            ephemeral_key_secret = stripe.EphemeralKey.create(  # type: ignore[no-untyped-call]
                 customer=stripe_user_id,
                 stripe_version=_stripe_version,
             ).secret
@@ -94,7 +94,7 @@ class Payments(endpoints.HTTPEndpoint):
         return models.JsonApiResponse(
             models.Body(
                 data=models.Resource(
-                    id=intent.stripe_id,
+                    id=intent.stripe_id or "",
                     type="payments",
                     attributes=attributes,
                 ),

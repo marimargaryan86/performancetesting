@@ -59,10 +59,10 @@ class SeatsResponse(BaseSchema):
         description="Price guarantee expiration date time",
     )
     seat_maps: list[SeatMap] = pydantic.Field(description="Seat maps")
-    passengers: list[
-        response_common_passenger_schemas.PassengerSimple
-    ] = pydantic.Field(
-        description="Passenger definitions",
+    passengers: list[response_common_passenger_schemas.PassengerSimple] = (
+        pydantic.Field(
+            description="Passenger definitions",
+        )
     )
     disclosures: list[response_common_offer_schemas.Disclosure] = pydantic.Field(
         description="Disclosure definitions",

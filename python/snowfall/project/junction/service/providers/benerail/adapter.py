@@ -734,8 +734,8 @@ class BenerailOffersAdapter(BenerailAdapter):
 
                 continue
 
-            trip_map[
-                get_trip_response.response_result.identifier
-            ] = get_trip_response.response_result
+            trip_map[get_trip_response.response_result.identifier] = (
+                get_trip_response.response_result
+            )
 
         return trip_map

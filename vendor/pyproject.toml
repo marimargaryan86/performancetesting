@@ -324,7 +324,6 @@ module = [
   "json_api_doc.*",
   "mongomock_motor.*",   # https://github.com/michaelkryukov/mongomock_motor/issues/29
   "pandas.*",
-  "pycountry.*",         # https://github.com/flyingcircusio/pycountry/issues/135
   "qrcode.*",            # https://github.com/lincolnloop/python-qrcode/pull/321
   "rfc3339_validator.*",
   "s3fs.*",              # https://github.com/fsspec/s3fs/issues/383

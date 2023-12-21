@@ -186,7 +186,7 @@ _EnumValue = TypeVar("_EnumValue", bound=int)
 
 
 def slug_to_enum_value(
-    enum: enum_type_wrapper._EnumTypeWrapper[_EnumValue],  # noqa: SLF001
+    enum: enum_type_wrapper._EnumTypeWrapper[_EnumValue],
     name: str,
 ) -> _EnumValue:
     enum_name = "{0}_{1}".format(
