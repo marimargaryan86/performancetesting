@@ -25,8 +25,11 @@
   import { getOrderStatus, type OrderBookingStatus } from "integration/common/schemas/order";
   import Fees from "./fees.svelte";
   import { getPageTitle } from "utils/page-title";
+  import { getLocaleData } from "i18n";
 
   export let data;
+
+  const i18n = getLocaleData();
 
   $: hasTickets = Boolean(
     data.order.bookings.flatMap((item) => item.ticketUrls).filter(ensureDefined).length,
@@ -36,7 +39,14 @@
 </script>
 
 <svelte:head>
-  <title>{getPageTitle("Junction Hub", "Trip Management", "Confirmation")}</title>
+  <title>
+    {getPageTitle(
+      $i18n.title,
+      $i18n.pages.tripManagement.title,
+      $i18n.pages.tripManagement.pages.book.title,
+      $i18n.pages.tripManagement.pages.book.pages.confirmation.title,
+    )}
+  </title>
 </svelte:head>
 
 <div class="content">
@@ -45,18 +55,18 @@
       <span class="icon success">
         <CheckedIcon color="var(--color-common-dark-strong)" />
       </span>
-      <span class="typography body-medium bold">Success</span>
-      <span class="typography body-medium">The order was created successfully</span>
+      <span class="typography body-medium bold">{$i18n.words.success}</span>
+      <span class="typography body-medium">{$i18n.sentences.theOrderWasCreatedSuccessfully}</span>
     {:else if alertType === "error"}
       <span class="icon error">
         <CloseIcon color="var(--color-common-dark-strong)" variant="cross" />
       </span>
-      <span class="typography body-medium bold">Error</span>
-      <span class="typography body-medium">The order was created with errors</span>
+      <span class="typography body-medium bold">{$i18n.words.error}</span>
+      <span class="typography body-medium">{$i18n.sentences.theOrderWasCreatedWithErrors}</span>
     {:else}
       <AlertIcon color="var(--color-semantic-warning-600)" />
-      <span class="typography body-medium bold">Warning</span>
-      <span class="typography body-medium">The order is in a pending state</span>
+      <span class="typography body-medium bold">{$i18n.words.warning}</span>
+      <span class="typography body-medium">{$i18n.sentences.theOrderIsInAPendingState}</span>
     {/if}
   </Alert>
 
@@ -71,7 +81,7 @@
               .tickets.root}
             download
           >
-            Download tickets
+            {$i18n.actions.downloadTickets}
           </Button>
         {/if}
 
@@ -92,7 +102,7 @@
 <div class="actions">
   <div class="wrapper">
     <Button size="small" href={routeConfig.routes.tripManagement.routes.book.root}>
-      New search
+      {$i18n.sentences.newSearch}
     </Button>
   </div>
 </div>

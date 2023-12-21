@@ -79,6 +79,12 @@ export default {
     country: "Country",
     postcode: "Postcode",
     error: "Error",
+    success: "Success",
+    warning: "Warning",
+    status: "Status",
+    passengerDetails: "Passenger details",
+    itineraryDetails: "Itinerary details",
+    tripDuration: "Trip duration",
   },
   actions: {
     logout: "Logout",
@@ -121,6 +127,7 @@ export default {
     proceed: "Next",
     goBack: "Previous",
     book: "Book",
+    downloadTickets: "Download tickets",
   },
   sentences: {
     priceChange: "Price change",
@@ -162,6 +169,12 @@ export default {
       { type: "privacy", value: "privacy policy" },
     ] satisfies { type: "text" | "toc" | "coc" | "privacy"; value: string }[],
     oopsSomethingWentWrong: "Oops, something went wrong :(",
+    theOrderWasCreatedSuccessfully: "The order was created successfully",
+    theOrderWasCreatedWithErrors: "The order was created with errors",
+    theOrderIsInAPendingState: "The order is in a pending state",
+    yourOrderHasBeenCreated: "Your order has been created",
+    totalPaid: "Total paid",
+    newSearch: "New search",
   },
   tableHeaders: {
     id: "ID",

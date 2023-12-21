@@ -73,6 +73,12 @@ export default {
     country: "Land",
     postcode: "Postnummer",
     error: "Fel",
+    success: "Lyckad",
+    warning: "Varning",
+    status: "Status",
+    passengerDetails: "Passagerarinformation",
+    itineraryDetails: "Resplandetaljer",
+    tripDuration: "Restid",
   },
   actions: {
     logout: "Logga ut",
@@ -115,6 +121,7 @@ export default {
     proceed: "Gå vidare",
     goBack: "Gå tillbaka",
     book: "Boka",
+    downloadTickets: "Ladda ned biljetter",
   },
   sentences: {
     priceChange: "Prisändring",
@@ -156,6 +163,12 @@ export default {
       { type: "privacy", value: "integritetspolicy" },
     ],
     oopsSomethingWentWrong: "Hoppsan, något gick snett :(",
+    theOrderWasCreatedSuccessfully: "Skapande av beställningen lyckades",
+    theOrderWasCreatedWithErrors: "Beställningen skapades felaktigt",
+    theOrderIsInAPendingState: "Beställningen är i väntande tillstånd",
+    yourOrderHasBeenCreated: "Din beställning har skapats",
+    totalPaid: "Totalt betalt belopp",
+    newSearch: "Ny sökning",
   },
   tableHeaders: {
     id: "ID",

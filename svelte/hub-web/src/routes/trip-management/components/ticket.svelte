@@ -1,8 +1,11 @@
 <script lang="ts">
   import TicketIcon from "components/icons/ticket-icon.svelte";
+  import { getLocaleData } from "i18n";
 
   export let title = "Order reference";
   export let identifier: string | undefined = undefined;
+
+  const i18n = getLocaleData();
 </script>
 
 <div class="ticket">
@@ -13,7 +16,7 @@
   <span>
     <em class="typography body-xsmall">{title}</em>
     <strong class="typography body-medium bold">
-      {identifier ?? "N/A"}
+      {identifier ?? $i18n.words.notAvailable}
     </strong>
   </span>
 </div>

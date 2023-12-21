@@ -30,19 +30,23 @@
   import SeatIcon from "components/icons/seat-icon.svelte";
   import EntityAvatar from "components/ui/entity-avatar.svelte";
   import type { OfferSegmentLeg } from "integration/common/schemas/offer-segment-leg";
+  import { getLocale, getLocaleData } from "i18n";
 
   export let bookings: TripBooking[];
+
+  const locale = getLocale();
+  const i18n = getLocaleData();
 </script>
 
 <div class="itinerary">
-  <h3 class="typography body-large bold">Itinerary details</h3>
+  <h3 class="typography body-large bold">{$i18n.words.itineraryDetails}</h3>
 
   {#each bookings as booking}
     {@const origDestLegs = getOrigDestLegs(booking)}
     {@const cabinClasses = Array.from(
       new Set(booking.detailsList.map((item) => item.cabinClassName)),
     )}
-    {@const vendor = booking.detailsList[0]?.vendor ?? "Unknown"}
+    {@const vendor = booking.detailsList[0]?.vendor ?? $i18n.words.unknown}
     {@const trainNumber = booking.detailsList[0]?.routeIdentifiers.vendor ?? ""}
     {@const segmentCount = booking.detailsList.length}
 
@@ -50,7 +54,7 @@
       {@const { originLeg, destinationLeg } = origDestLegs}
       <div class="booking">
         <em class="typography label-medium">
-          {originLeg.departureAt.toLocaleDateString("en-GB", {
+          {originLeg.departureAt.toLocaleDateString($locale, {
             year: "numeric",
             month: "short",
             day: "numeric",
@@ -60,7 +64,7 @@
 
         <div class="orig-dest">
           <span class="typography title-medium bold">{originLeg.origin.name}</span>
-          <em class="typography title-small">to</em>
+          <em class="typography title-small">{$i18n.words.to.toLowerCase()}</em>
           <span class="typography title-medium bold">
             {destinationLeg.destination.name}
           </span>
@@ -70,15 +74,17 @@
           <EntityAvatar name={vendor} />
           <span class="typography label-medium">
             {vendor}
-            {trainNumber} • {segmentCount === 1 ? "Direct" : `${segmentCount} stops`}
+            {trainNumber} • {segmentCount === 1
+              ? $i18n.words.direct
+              : `${segmentCount} ${$i18n.words.stop.plural}`.toLowerCase()}
           </span>
         </div>
 
         <div class="fare-info">
           <div class="time">
-            <span class="typography body-xsmall">Departure</span>
+            <span class="typography body-xsmall">{$i18n.words.departure}</span>
             <strong class="typography body-xlarge bold">
-              {originLeg.departureAt.toLocaleTimeString("sv-SE", {
+              {originLeg.departureAt.toLocaleTimeString($locale, {
                 hour: "2-digit",
                 minute: "2-digit",
                 timeZone: originLeg.origin.timeZone,
@@ -87,9 +93,9 @@
           </div>
 
           <div class="time">
-            <span class="typography body-xsmall">Arrival</span>
+            <span class="typography body-xsmall">{$i18n.words.arrival}</span>
             <strong class="typography body-xlarge bold">
-              {destinationLeg.arrivalAt.toLocaleTimeString("sv-SE", {
+              {destinationLeg.arrivalAt.toLocaleTimeString($locale, {
                 hour: "2-digit",
                 minute: "2-digit",
                 timeZone: destinationLeg.destination.timeZone,
@@ -103,7 +109,7 @@
             </span>
 
             <div>
-              <em class="typography body-xsmall">Trip duration</em>
+              <em class="typography body-xsmall">{$i18n.words.tripDuration}</em>
               <strong class="typography body-medium bold">
                 {formatDuration(getTimeDeltaS(originLeg.departureAt, destinationLeg.arrivalAt))}
               </strong>
@@ -117,7 +123,7 @@
 
             <div>
               <em class="typography body-xsmall">
-                Fare class{cabinClasses.length === 1 ? "" : "es"}
+                {$i18n.words.fareBrand[cabinClasses.length === 1 ? "singular" : "plural"]}
               </em>
               <strong class="typography body-medium bold">
                 {cabinClasses.join(", ")}

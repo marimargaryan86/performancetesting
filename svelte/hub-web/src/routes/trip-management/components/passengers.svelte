@@ -14,7 +14,7 @@
       return false;
     });
 
-    return def ? getPassengerFullLabel(def, locale) : "Unknown";
+    return def ? getPassengerFullLabel(def, locale) : locale.words.unknown;
   }
 </script>
 
@@ -35,7 +35,7 @@
 </script>
 
 <ul class="passengers">
-  <li class="typography body-large bold">Passenger details</li>
+  <li class="typography body-large bold">{$i18n.words.passengerDetails}</li>
   {#each passengers as passenger}
     <li class="passenger typography body-large">
       <span class="circle">

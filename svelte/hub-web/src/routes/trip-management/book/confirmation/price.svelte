@@ -1,9 +1,12 @@
 <script lang="ts">
   import { formatAmount } from "formatting/currency";
+  import { getLocaleData } from "i18n";
   import type { Price } from "integration/common/schemas/price";
   import type { TripBooking } from "integration/junction-mobile-api/schemas/booking";
 
   export let bookings: TripBooking[];
+
+  const i18n = getLocaleData();
 
   $: totalPrice = bookings.reduce<Price>(
     (prev, curr) => ({
@@ -15,17 +18,17 @@
 </script>
 
 <div class="price typography body-small">
-  <span>The price is for all passengers</span>
+  <span>{$i18n.sentences.thisPriceIsForAllPassengers}</span>
   <ul>
     <li>
-      <span>Base fare + taxes</span>
+      <span>{$i18n.priceBreakdownTypes["base-fare"]} + {$i18n.priceBreakdownTypes.tax}</span>
       <strong class="typography bold">
         {formatAmount(totalPrice, true)}
       </strong>
     </li>
 
     <li class="typography body-xlarge bold">
-      <span>Total paid</span>
+      <span>{$i18n.sentences.totalPaid}</span>
       <strong>
         {formatAmount(totalPrice, true)}
       </strong>
