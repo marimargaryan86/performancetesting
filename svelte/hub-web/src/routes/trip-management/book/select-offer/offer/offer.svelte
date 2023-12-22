@@ -93,7 +93,7 @@
   {#each offer.groups as group, groupIdx}
     {@const vendor = group.detailsList[0]?.vendor ?? $i18n.words.unknown}
     {@const trainNumber = group.detailsList[0]?.routeIdentifiers.vendor ?? ""}
-    {@const stopCount = group.detailsList[0]?.legs.length ?? 1}
+    {@const stopCount = group.detailsList?.length ?? 1}
 
     <div class="group">
       <div class="header typography label-medium">
