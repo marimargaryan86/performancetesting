@@ -34,7 +34,7 @@
   import { formatAmount } from "formatting/currency";
   import TripBanner from "../../components/trip-banner.svelte";
   import { getPageTitle } from "utils/page-title";
-  import { getLocaleData } from "i18n";
+  import { getLocale, getLocaleData } from "i18n";
 
   export let data;
 
@@ -64,6 +64,7 @@
   let pollSignal = { cancelled: false };
   let orderMarkups: MarkupsCreate;
 
+  const locale = getLocale();
   const i18n = getLocaleData();
   const pending = writable(false);
 
@@ -264,7 +265,7 @@
       </div>
       <em class="typography body-large bold">
         {#if priceQuote?.price.total}
-          {formatAmount(priceQuote?.price.total, true)}
+          {formatAmount(priceQuote?.price.total, { locale: $locale, sign: true })}
         {:else}
           <LoadingIcon size="14px" />
         {/if}

@@ -12,10 +12,11 @@
   import { formatAmount } from "formatting/currency";
   import Fees from "../../../book/confirmation/fees.svelte";
   import { getPageTitle } from "utils/page-title";
-  import { getLocaleData } from "i18n";
+  import { getLocale, getLocaleData } from "i18n";
 
   export let data;
 
+  const locale = getLocale();
   const i18n = getLocaleData();
   const user = getUser();
 
@@ -98,7 +99,7 @@
           <strong>{$i18n.words.total}</strong>
           <span>
             {data.booking.refund.refunded.reseller
-              ? formatAmount(data.booking.refund.refunded.reseller, true)
+              ? formatAmount(data.booking.refund.refunded.reseller, { locale: $locale, sign: true })
               : $i18n.words.notAvailable}
           </span>
         </div>

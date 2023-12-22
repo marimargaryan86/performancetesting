@@ -47,11 +47,12 @@
   import { formatAmount } from "formatting/currency";
   import type { TripOfferPriceQuote } from "integration/junction-mobile-api/schemas/trip-offer-price-quote";
   import type { MarkupsCreate } from "integration/junction-mobile-api/schemas/markups";
-  import { getLocaleData } from "i18n";
+  import { getLocale, getLocaleData } from "i18n";
 
   export let priceQuote: TripOfferPriceQuote | undefined = undefined;
   export let orderMarkups: MarkupsCreate;
 
+  const locale = getLocale();
   const i18n = getLocaleData();
 
   let collapsible: Collapsible | undefined;
@@ -153,13 +154,19 @@
           <li>
             <span class="typography label-medium">{$i18n.words.serviceFee}</span>
             <span class="typography body-small bold">
-              {formatAmount({ currency, amount: calculatedServiceFeeAmount }, true)}
+              {formatAmount(
+                { currency, amount: calculatedServiceFeeAmount },
+                { locale: $locale, sign: true },
+              )}
             </span>
           </li>
           <li>
             <span class="typography label-medium">{$i18n.words.agencyMarkup}</span>
             <span class="typography body-small bold">
-              {formatAmount({ currency, amount: calculatedAgencyMarkupAmount }, true)}
+              {formatAmount(
+                { currency, amount: calculatedAgencyMarkupAmount },
+                { locale: $locale, sign: true },
+              )}
             </span>
           </li>
         </ul>
@@ -170,7 +177,10 @@
       <span class="typography body-large bold">{$i18n.sentences.totalToCollect}</span>
       <em class="typography body-large bold">
         {#if priceQuote?.price}
-          {formatAmount({ currency, amount: totalToCollectAmount }, true)}
+          {formatAmount(
+            { currency, amount: totalToCollectAmount },
+            { locale: $locale, sign: true },
+          )}
         {:else}
           <LoadingIcon size="16px" />
         {/if}

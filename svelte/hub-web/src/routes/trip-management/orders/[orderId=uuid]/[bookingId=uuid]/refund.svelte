@@ -1,12 +1,13 @@
 <script lang="ts">
   import { formatAmount } from "formatting/currency";
-  import { getLocaleData } from "i18n";
+  import { getLocale, getLocaleData } from "i18n";
   import type { Refund } from "integration/junction-hub-api/schemas/refund";
   import { slideFade } from "transitions/slide-fade";
   import { pricesEqual } from "utils/money";
 
   export let refund: Refund;
 
+  const locale = getLocale();
   const i18n = getLocaleData();
 
   // Only display usInPayerCurrency if the currency differs from refundedUs
@@ -26,7 +27,7 @@
       <li class="typography body-medium amount">
         <strong>{$i18n.sentences.toUs}</strong>
         <span class="typography bold" class:negative={refund.refunded.us.amount < 0}>
-          {formatAmount(refund.refunded.us, true)}
+          {formatAmount(refund.refunded.us, { locale: $locale, sign: true })}
         </span>
       </li>
     {/if}
@@ -35,7 +36,7 @@
       <li class="typography body-medium amount">
         <strong>{$i18n.sentences.toUs} <em>({$i18n.sentences.payerCurrency})</em></strong>
         <span class="typography bold" class:negative={usInPayerCurrency.amount < 0}>
-          {formatAmount(usInPayerCurrency, true)}
+          {formatAmount(usInPayerCurrency, { locale: $locale, sign: true })}
         </span>
       </li>
     {/if}
@@ -44,7 +45,7 @@
       <li class="typography body-medium amount">
         <strong>{$i18n.sentences.toReseller}</strong>
         <span class="typography bold" class:negative={refund.refunded.reseller.amount < 0}>
-          {formatAmount(refund.refunded.reseller, true)}
+          {formatAmount(refund.refunded.reseller, { locale: $locale, sign: true })}
         </span>
       </li>
     {/if}
@@ -53,7 +54,7 @@
       <li class="typography body-medium amount">
         <strong>{$i18n.words.refundPosition}</strong>
         <span class="typography bold" class:negative={refund.refundPosition.amount < 0}>
-          {formatAmount(refund.refundPosition, true)}
+          {formatAmount(refund.refundPosition, { locale: $locale, sign: true })}
         </span>
       </li>
     {/if}

@@ -6,13 +6,14 @@
   import Backdrop from "../backdrop.svelte";
   import { formatAmount } from "formatting/currency";
   import type { Price } from "integration/common/schemas/price";
-  import { getLocaleData } from "i18n";
+  import { getLocale, getLocaleData } from "i18n";
 
   export let originalPrice: Price;
   export let newPrice: Price;
 
   let backdrop: Backdrop | undefined = undefined;
 
+  const locale = getLocale();
   const i18n = getLocaleData();
   const dispatch = createEventDispatcher<{ cancel: void }>();
 
@@ -49,8 +50,8 @@
     <p class="typography body-medium">
       <!-- eslint-disable-next-line svelte/no-at-html-tags -->
       {@html $i18n.sentences.priceChangeInfo
-        .replace("{originalPrice}", formatAmount(originalPrice, true))
-        .replace("{newPrice}", formatAmount(newPrice, true))}
+        .replace("{originalPrice}", formatAmount(originalPrice, { locale: $locale, sign: true }))
+        .replace("{newPrice}", formatAmount(newPrice, { locale: $locale, sign: true }))}
     </p>
 
     <div class="actions">

@@ -2,7 +2,7 @@
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import EntityAvatar from "components/ui/entity-avatar.svelte";
   import { formatAmount } from "formatting/currency";
-  import { getLocaleData } from "i18n";
+  import { getLocale, getLocaleData } from "i18n";
   import type { Price, PriceBreakdown } from "integration/common/schemas/price";
   import type { Company } from "integration/junction-hub-api/schemas/company";
   import type { Markups } from "integration/junction-mobile-api/schemas/markups";
@@ -13,6 +13,7 @@
   export let breakdownList: PriceBreakdown[];
   export let markupsTask: Promise<Markups | undefined> | undefined = undefined;
 
+  const locale = getLocale();
   const i18n = getLocaleData();
 
   async function getTotal(
@@ -51,7 +52,7 @@
       {#each breakdownList as breakdown}
         <span>{$i18n.priceBreakdownTypes[breakdown.type]}</span>
         <strong>
-          {formatAmount(breakdown.price)}
+          {formatAmount(breakdown.price, { locale: $locale })}
           <em class="typography body-xsmall">{breakdown.price.currency}</em>
         </strong>
       {/each}
@@ -63,7 +64,7 @@
           {#if markups}
             <span>{$i18n.words.markup}</span>
             <strong>
-              {formatAmount(markups.agencyMarkup)}
+              {formatAmount(markups.agencyMarkup, { locale: $locale })}
               <em class="typography body-xsmall">{markups.agencyMarkup.currency}</em>
             </strong>
           {/if}
@@ -76,7 +77,8 @@
         <LoadingIcon size="16px" />
       {:then total}
         <strong>
-          {formatAmount(total)} <em class="typography body-xsmall">{total.currency}</em>
+          {formatAmount(total, { locale: $locale })}
+          <em class="typography body-xsmall">{total.currency}</em>
         </strong>
       {/await}
     </div>

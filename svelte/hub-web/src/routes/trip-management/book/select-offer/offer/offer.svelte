@@ -151,7 +151,7 @@
             <span>
               <em class="typography label-medium">{$i18n.sentences.startingAt}</em>
               <strong class="typography title-large bold">
-                {formatAmount(totalPrice, true)}
+                {formatAmount(totalPrice, { locale: $locale, sign: true })}
               </strong>
             </span>
 

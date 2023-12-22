@@ -11,13 +11,14 @@
     type PassengerPickerData,
   } from "../trip-search/passenger-picker/passenger-picker.svelte";
   import { createEventDispatcher } from "svelte";
-  import { getLocaleData } from "i18n";
+  import { getLocale, getLocaleData } from "i18n";
 
   export let priceQuote: TripOfferPriceQuote | undefined = undefined;
   export let passengers: PassengerPickerData;
 
   let collapsible: Collapsible | undefined;
 
+  const locale = getLocale();
   const i18n = getLocaleData();
   const dispatch = createEventDispatcher<{ showFareRules: void }>();
 
@@ -65,7 +66,7 @@
                     {$i18n.priceBreakdownTypes[item.type]}
                   </span>
                   <span class="typography body-small bold">
-                    {formatAmount(item.price, true)}
+                    {formatAmount(item.price, { locale: $locale, sign: true })}
                   </span>
                 </li>
               {/each}
@@ -78,7 +79,7 @@
         <span class="typography body-large bold">{$i18n.sentences.totalToPay}</span>
         <em class="typography body-large bold">
           {#if totalPrice}
-            {formatAmount(totalPrice, true)}
+            {formatAmount(totalPrice, { locale: $locale, sign: true })}
           {:else}
             <LoadingIcon size="16px" />
           {/if}

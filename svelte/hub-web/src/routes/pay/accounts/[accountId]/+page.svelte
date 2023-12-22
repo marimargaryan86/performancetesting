@@ -9,10 +9,11 @@
   import routeConfig from "routeConfig";
   import type { Balance } from "integration/junction-hub-api/schemas/balance";
   import { getPageTitle } from "utils/page-title";
-  import { getLocaleData } from "i18n";
+  import { getLocale, getLocaleData } from "i18n";
 
   export let data;
 
+  const locale = getLocale();
   const i18n = getLocaleData();
 
   let searchQuery = "";
@@ -71,7 +72,10 @@
 
           <span>
             <strong class="typography body-large bold">
-              {formatAmount({ currency: balance.currencyId, amount: balance.amount })}
+              {formatAmount(
+                { currency: balance.currencyId, amount: balance.amount },
+                { locale: $locale },
+              )}
             </strong>
             <span class="typography body-small">{balance.currency}</span>
           </span>

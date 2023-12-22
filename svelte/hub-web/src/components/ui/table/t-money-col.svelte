@@ -1,17 +1,20 @@
 <script lang="ts">
   import TCol from "./t-col.svelte";
   import { formatAmount } from "formatting/currency";
+  import { getLocale } from "i18n";
   import type { Price } from "integration/common/schemas/price";
 
   let className: string | undefined = undefined;
   export { className as class };
   export let currencySize: "small" | "x-small" = "small";
   export let money: Price;
+
+  const locale = getLocale();
 </script>
 
 <TCol class={className}>
   <div class="money">
-    <span>{formatAmount(money)}</span>
+    <span>{formatAmount(money, { locale: $locale })}</span>
     <strong
       class="typography body-small"
       class:body-small={currencySize === "small"}

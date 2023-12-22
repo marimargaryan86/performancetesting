@@ -9,7 +9,7 @@
   import ChevronIcon from "components/icons/chevron-icon.svelte";
   import Button from "components/ui/button.svelte";
   import { formatAmount } from "formatting/currency";
-  import { getLocaleData } from "i18n";
+  import { getLocale, getLocaleData } from "i18n";
   import type { OfferOption } from "integration/junction-mobile-api/schemas/offer";
   import { createEventDispatcher } from "svelte";
   import { slide } from "svelte/transition";
@@ -19,10 +19,9 @@
 
   let expanded = false;
 
+  const locale = getLocale();
   const i18n = getLocaleData();
-  const dispatch = createEventDispatcher<{
-    select: OfferOption;
-  }>();
+  const dispatch = createEventDispatcher<{ select: OfferOption }>();
 
   function open(): void {
     expanded = true;
@@ -68,7 +67,7 @@
           <hr />
 
           <span class="typography body-medium bold">
-            {formatAmount(option.price.total, true)}
+            {formatAmount(option.price.total, { locale: $locale, sign: true })}
           </span>
 
           <Button
