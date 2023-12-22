@@ -79,6 +79,10 @@ export default {
     passengerDetails: "Passagerarinformation",
     itineraryDetails: "Resplandetaljer",
     tripDuration: "Restid",
+    orderReference: "Beställningsreferens",
+    cancellation: "Annullering",
+    reservationNumber: "Reservationsnummer",
+    orderDetails: "Beställningsdetaljer",
   },
   actions: {
     logout: "Logga ut",
@@ -89,7 +93,7 @@ export default {
     goToLogin: "Gå till login",
     search: "Sök",
     newOrder: "Ny Beställning",
-    download: "Ladda Ner",
+    download: "Ladda ner",
     addBalance: "Lägg till saldo",
     addBalances: "Lägg till saldon",
     add: "Lägg till",
@@ -118,10 +122,14 @@ export default {
     enterCity: "Ange stad",
     selectCountry: "Välj land",
     enterPostcode: "Ange postnummer",
-    proceed: "Gå vidare",
-    goBack: "Gå tillbaka",
+    next: "Nästa",
+    previous: "Föregående",
     book: "Boka",
     downloadTickets: "Ladda ned biljetter",
+    cancelBooking: "Annullera bokning",
+    goBack: "Gå tillbaka",
+    view: "Visa",
+    cancelRequest: "Avboka",
   },
   sentences: {
     priceChange: "Prisändring",
@@ -169,6 +177,17 @@ export default {
     yourOrderHasBeenCreated: "Din beställning har skapats",
     totalPaid: "Totalt betalt belopp",
     newSearch: "Ny sökning",
+    youAreCancellingThisBooking: "Du avbokar denna bokning",
+    rulesAndFees: "Regler och avgifter",
+    pleaseReviewTheFollowingRules:
+      "Läs igenom följande regler innan du avbokar, inklusive eventuella tillämpliga avgifter.",
+    doYouWishToContinue: "Vill du fortsätta?",
+    thisCannotBeUndone: "Detta kan inte göras ogjort.",
+    cancellationRequestReceived: "Avbokningsbegäran mottagen",
+    cancellationRequestFailed: "Avbokningsbegäran misslyckades",
+    cancellationRequestInfo:
+      "Vi har tagit emot din begäran om avbokning. En medlem av vårt supportteam kommer att kontakta dig inom kort med ytterligare information.",
+    contactSnowfallSupport: "Du kan kontakta Snowfallsupport på",
   },
   tableHeaders: {
     id: "ID",
@@ -178,6 +197,7 @@ export default {
     owedToUs: "Skyldig oss",
     reconciledQuestion: "Försonad?",
     orderReference: "Beställningsreferens",
+    ticket: "Biljett",
     tickets: "Biljett(er)",
     departureDate: "Avgångsdatum",
     passengers: "Passagerare",
@@ -200,6 +220,9 @@ export default {
     fxDelta: "FX-delta",
     fxBuffer: "FX-buffert",
     status: "Status",
+    booking: "Bokning",
+    origin: "Ursprung",
+    destination: "Destination",
   },
   passengerTypes: {
     adult: {
@@ -576,6 +599,14 @@ export default {
         },
         orders: {
           title: "Beställningar",
+          pages: {
+            bookings: {
+              title: "Bokningar",
+            },
+            details: {
+              title: "Detaljer",
+            },
+          },
         },
       },
     },

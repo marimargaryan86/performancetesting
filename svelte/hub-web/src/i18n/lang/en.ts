@@ -85,6 +85,10 @@ export default {
     passengerDetails: "Passenger details",
     itineraryDetails: "Itinerary details",
     tripDuration: "Trip duration",
+    orderReference: "Order reference",
+    cancellation: "Cancellation",
+    reservationNumber: "Reservation number",
+    orderDetails: "Order details",
   },
   actions: {
     logout: "Logout",
@@ -124,10 +128,14 @@ export default {
     enterCity: "Enter city",
     selectCountry: "Select country",
     enterPostcode: "Enter postcode",
-    proceed: "Next",
-    goBack: "Previous",
+    next: "Next",
+    previous: "Previous",
     book: "Book",
     downloadTickets: "Download tickets",
+    cancelBooking: "Cancel booking",
+    goBack: "Go back",
+    view: "View",
+    cancelRequest: "Cancel",
   },
   sentences: {
     priceChange: "Price change",
@@ -175,6 +183,17 @@ export default {
     yourOrderHasBeenCreated: "Your order has been created",
     totalPaid: "Total paid",
     newSearch: "New search",
+    youAreCancellingThisBooking: "You are cancelling this booking",
+    rulesAndFees: "Rules and Fees",
+    pleaseReviewTheFollowingRules:
+      "Please review the following rules before cancelling, including any applicable fees.",
+    doYouWishToContinue: "Do you wish to continue?",
+    thisCannotBeUndone: "This cannot be undone.",
+    cancellationRequestReceived: "Cancellation request received",
+    cancellationRequestFailed: "Cancellation request failed",
+    cancellationRequestInfo:
+      "We have received your cancellation request. A member of our support team will contact you shortly with further details.",
+    contactSnowfallSupport: "You can contact Snowfall support on",
   },
   tableHeaders: {
     id: "ID",
@@ -184,6 +203,7 @@ export default {
     owedToUs: "Owed to us",
     reconciledQuestion: "Reconciled?",
     orderReference: "Order Reference",
+    ticket: "Ticket",
     tickets: "Ticket(s)",
     departureDate: "Departure Date",
     passengers: "Passengers",
@@ -206,6 +226,9 @@ export default {
     fxDelta: "FX Delta",
     fxBuffer: "FX Buffer",
     status: "Status",
+    booking: "Booking",
+    origin: "Origin",
+    destination: "Destination",
   },
   passengerTypes: {
     adult: {
@@ -581,6 +604,14 @@ export default {
         },
         orders: {
           title: "Orders",
+          pages: {
+            bookings: {
+              title: "Bookings",
+            },
+            details: {
+              title: "Details",
+            },
+          },
         },
       },
     },

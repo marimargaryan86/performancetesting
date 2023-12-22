@@ -2,24 +2,27 @@
   import { getPageTitle } from "utils/page-title";
   import Passengers from "../../../components/passengers.svelte";
   import Ticket from "../../../components/ticket.svelte";
+  import { getLocaleData } from "i18n";
 
   export let data;
+
+  const i18n = getLocaleData();
 </script>
 
 <svelte:head>
   <title>
     {getPageTitle(
-      "Junction Hub",
-      "Trip Management",
-      "Orders",
-      data.order.journey?.reference ?? "Unknown",
-      "Details",
+      $i18n.title,
+      $i18n.pages.tripManagement.title,
+      $i18n.pages.tripManagement.pages.orders.title,
+      data.order.journey?.reference ?? $i18n.words.unknown,
+      $i18n.pages.tripManagement.pages.orders.pages.details.title,
     )}
   </title>
 </svelte:head>
 
 <div class="content">
-  <h3 class="typography title-large bold">Order details</h3>
+  <h3 class="typography title-large bold">{$i18n.words.orderDetails}</h3>
 
   <Ticket identifier={data.order.journey?.reference} />
 

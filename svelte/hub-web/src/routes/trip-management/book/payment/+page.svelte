@@ -255,7 +255,7 @@
       variant="outline"
       href={routeConfig.routes.tripManagement.routes.book.routes.select.root}
     >
-      {$i18n.actions.goBack}
+      {$i18n.actions.previous}
     </Button>
 
     <div class="total">

@@ -2,10 +2,13 @@
   import TicketIcon from "components/icons/ticket-icon.svelte";
   import { getLocaleData } from "i18n";
 
-  export let title = "Order reference";
+  let titleExt: string | undefined = undefined;
+  export { titleExt as title };
   export let identifier: string | undefined = undefined;
 
   const i18n = getLocaleData();
+
+  $: title = titleExt ?? $i18n.words.orderReference;
 </script>
 
 <div class="ticket">

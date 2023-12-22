@@ -14,8 +14,12 @@
   import CancellationDialog from "./cancellation-dialog.svelte";
   import TStatusBadgeCol from "components/ui/table/t-status-badge-col.svelte";
   import { getPageTitle } from "utils/page-title";
+  import { getLocale, getLocaleData } from "i18n";
 
   export let data;
+
+  const locale = getLocale();
+  const i18n = getLocaleData();
 
   let cancellationDialog: CancellationDialog | undefined;
 
@@ -39,11 +43,11 @@
 <svelte:head>
   <title>
     {getPageTitle(
-      "Junction Hub",
-      "Trip Management",
-      "Orders",
-      data.order.journey?.reference ?? "Unknown",
-      "Bookings",
+      $i18n.title,
+      $i18n.pages.tripManagement.title,
+      $i18n.pages.tripManagement.pages.orders.title,
+      data.order.journey?.reference ?? $i18n.words.unknown,
+      $i18n.pages.tripManagement.pages.orders.pages.bookings.title,
     )}
   </title>
 </svelte:head>
@@ -56,16 +60,16 @@
 
 <Table class="bookings-table">
   <THead>
-    <Header>Booking</Header>
+    <Header>{$i18n.tableHeaders.booking} Booking</Header>
     <Header />
-    <Header>Ticket</Header>
-    <Header>Departure Date</Header>
-    <Header>Origin</Header>
-    <Header>Destination</Header>
-    <Header>Total Price</Header>
-    <Header>Booking status</Header>
-    {#if showCancellationColumn}<Header>Cancellation Status</Header>{/if}
-    {#if showRefundColumn}<Header>Refund Status</Header>{/if}
+    <Header>{$i18n.tableHeaders.ticket}</Header>
+    <Header>{$i18n.tableHeaders.departureDate}</Header>
+    <Header>{$i18n.tableHeaders.origin}</Header>
+    <Header>{$i18n.tableHeaders.destination}</Header>
+    <Header>{$i18n.tableHeaders.totalPrice}</Header>
+    <Header>{$i18n.tableHeaders.bookingStatus}</Header>
+    {#if showCancellationColumn}<Header>{$i18n.tableHeaders.cancellationStatus}</Header>{/if}
+    {#if showRefundColumn}<Header>{$i18n.tableHeaders.refundStatus}</Header>{/if}
     {#if showActionsColumn}<Header />{/if}
   </THead>
 
@@ -82,7 +86,7 @@
               .order(data.order.id)
               .routes.booking(booking.id).root}
           >
-            View
+            {$i18n.actions.view}
           </a>
         </TCol>
 
@@ -93,21 +97,21 @@
               href={orderLink.routes.booking(booking.id).routes.tickets.root}
               download
             >
-              Download
+              {$i18n.actions.download}
             </a>
           {:else}
-            <span class="not-available">N/A</span>
+            <span class="not-available">{$i18n.words.notAvailable}</span>
           {/if}
         </TCol>
 
         <TCol>
-          {booking.detailsList[0]?.legs[0]?.departureAt.toLocaleDateString("en-GB", {
+          {booking.detailsList[0]?.legs[0]?.departureAt.toLocaleDateString($locale, {
             timeZone: origin?.timeZone,
           })}
         </TCol>
 
-        <TCol class="typography bold">{origin?.name ?? "Unknown"}</TCol>
-        <TCol class="typography bold">{destination?.name ?? "Unknown"}</TCol>
+        <TCol class="typography bold">{origin?.name ?? $i18n.words.unknown}</TCol>
+        <TCol class="typography bold">{destination?.name ?? $i18n.words.unknown}</TCol>
         <TMoneyCol money={booking.price.total} />
         <TStatusBadgeCol value={booking.status} />
 
@@ -135,7 +139,7 @@
                 variant="outline"
                 on:click={cancelBooking.bind(cancelBooking, booking)}
               >
-                Cancel
+                {$i18n.actions.cancelRequest}
               </Button>
             {/if}
           </TActionsCol>

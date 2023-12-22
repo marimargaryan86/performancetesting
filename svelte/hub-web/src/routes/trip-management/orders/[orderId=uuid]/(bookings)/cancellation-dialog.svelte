@@ -14,9 +14,11 @@
   import integrationInstancesClient from "integration-instances-client";
   import { writable } from "svelte/store";
   import type { CancellationRequest } from "integration/junction-hub-api/schemas/cancellation";
+  import { getLocaleData } from "i18n";
 
   export let passengers: OrderPassenger[];
 
+  const i18n = getLocaleData();
   const dispatch = createEventDispatcher<{ success: void }>();
 
   let backdrop: Backdrop | undefined;
@@ -106,9 +108,11 @@
   >
     {#if state === "info"}
       <div class="header">
-        <em class="typography body-small">Cancellation</em>
-        <h3 class="typography headline-small bold">You are cancelling this booking</h3>
-        <Ticket identifier={reservationNo} title="Reservation number" />
+        <em class="typography body-small">{$i18n.words.cancellation}</em>
+        <h3 class="typography headline-small bold">
+          {$i18n.sentences.youAreCancellingThisBooking}
+        </h3>
+        <Ticket identifier={reservationNo} title={$i18n.words.reservationNumber} />
       </div>
 
       <Passengers {passengers} />
@@ -118,18 +122,18 @@
       {/if}
 
       <div class="actions">
-        <Button variant="outline" on:click={close}>Return to bookings</Button>
-        <Button on:click={rules}>Cancel booking</Button>
+        <Button variant="outline" on:click={close}>{$i18n.actions.returnToBookings}</Button>
+        <Button on:click={rules}>{$i18n.actions.cancelBooking}</Button>
       </div>
     {:else if state === "rules" && booking?.rules}
       <div class="icon-wrapper">
         <AlertIcon color="var(--color-semantic-error-500)" size="64px" variant="disc" />
       </div>
 
-      <h3 class="typography display-small bold">Rules and Fees</h3>
+      <h3 class="typography display-small bold">{$i18n.sentences.rulesAndFees}</h3>
 
       <p class="typography title-small">
-        Please review the following rules before cancelling, including any applicable fees.
+        {$i18n.sentences.pleaseReviewTheFollowingRules}
       </p>
 
       {#each booking.rules as rule}
@@ -138,11 +142,11 @@
         <p class="typography body-small">{rule.body}</p>
       {/each}
 
-      <p class="typography body-medium">Do you wish to continue?</p>
+      <p class="typography body-medium">{$i18n.sentences.doYouWishToContinue}</p>
 
       <div class="actions">
-        <Button variant="outline" on:click={info}>Go back</Button>
-        <Button on:click={cancelBooking}>Continue</Button>
+        <Button variant="outline" on:click={info}>{$i18n.actions.goBack}</Button>
+        <Button on:click={cancelBooking}>{$i18n.actions.continue}</Button>
       </div>
     {:else if state === "confirm"}
       {#if $pending}
@@ -150,43 +154,44 @@
           <LoadingIcon />
         </div>
       {:else}
-        <h3 class="typography display-small bold">Are you sure?</h3>
-        <p class="typography body-medium">This cannot be undone.</p>
+        <h3 class="typography display-small bold">{$i18n.sentences.areYouSure}</h3>
+        <p class="typography body-medium">{$i18n.sentences.thisCannotBeUndone}</p>
 
         <div class="actions">
-          <Button variant="outline" on:click={close}>No</Button>
-          <Button on:click={confirm}>Yes</Button>
+          <Button variant="outline" on:click={close}>{$i18n.words.no}</Button>
+          <Button on:click={confirm}>{$i18n.words.yes}</Button>
         </div>
       {/if}
     {:else if state === "done" || state === "failed"}
       <h3 class="typography display-small bold">
-        Cancellation request
-
-        {#if state === "done"}received{:else}failed{/if}
+        {#if state === "done"}
+          {$i18n.sentences.cancellationRequestReceived}
+        {:else}
+          {$i18n.sentences.cancellationRequestFailed}
+        {/if}
       </h3>
 
       <div class="typography body-medium info">
         {#if state === "done"}
           <p>
-            We have received your cancellation request. A member of our support team will contact
-            you shortly with further details.
+            {$i18n.sentences.cancellationRequestInfo}
           </p>
         {/if}
 
-        <p>You can contact Snowfall support on:</p>
+        <p>{$i18n.sentences.contactSnowfallSupport}:</p>
       </div>
 
       <div class="support typography body-medium">
         <strong>
           <EmailIcon />
-          <a href="mailto:support@snowfalltravel.com?subject=GG%20-%20"
-            >support@snowfalltravel.com</a
-          >
+          <a href="mailto:support@snowfalltravel.com?subject=GG%20-%20">
+            support@snowfalltravel.com
+          </a>
         </strong>
       </div>
 
       <div class="actions">
-        <Button on:click={close}>Return to bookings</Button>
+        <Button on:click={close}>{$i18n.actions.returnToBookings}</Button>
       </div>
     {/if}
   </div>
