@@ -3,6 +3,7 @@
   generics="TType extends 'text' | 'tel' | 'password' | 'email' | 'number' | 'date' = 'text'"
 >
   /* global TType */
+  import { getLocale } from "i18n";
   import { slideFade } from "transitions/slide-fade";
   import RemoveIcon from "components/icons/remove-icon.svelte";
   import { createEventDispatcher } from "svelte";
@@ -35,6 +36,7 @@
 
   let inputRef: HTMLInputElement;
 
+  const locale = getLocale();
   const dispatch = createEventDispatcher<{ input: HTMLInputElement; clear: void }>();
 
   function onInput(event: InputEvent): void {
@@ -62,7 +64,7 @@
     inputRef.focus();
   }
 
-  $: displayValue = value instanceof Date ? value.toLocaleDateString("sv-SE") : value ?? "";
+  $: displayValue = value instanceof Date ? value.toLocaleDateString($locale) : value ?? "";
   $: displayError = error instanceof Array ? error.join(", ") : error;
 </script>
 

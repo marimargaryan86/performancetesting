@@ -53,7 +53,7 @@
       <li class="segment typography label-large bold">
         <span class="circle" />
         <strong>
-          {leg.departureAt.toLocaleTimeString("en-GB", {
+          {leg.departureAt.toLocaleTimeString($locale, {
             hour: "2-digit",
             minute: "2-digit",
             timeZone: leg.origin.timeZone,
@@ -69,7 +69,7 @@
 
         <span class="circle" />
         <strong>
-          {leg.arrivalAt.toLocaleTimeString("en-GB", {
+          {leg.arrivalAt.toLocaleTimeString($locale, {
             hour: "2-digit",
             minute: "2-digit",
             timeZone: leg.destination.timeZone,
