@@ -3,7 +3,6 @@ from collections.abc import AsyncIterator
 
 from google.protobuf.message import Message
 from grpc import StatusCode, aio
-from grpc_status import rpc_status
 
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.transport.grpc import interceptor
@@ -40,15 +39,11 @@ class LoggingServerInterceptor(interceptor.ServerInterceptor):
 
             await context.abort(StatusCode.INTERNAL)
         finally:
-            status = (
-                rpc_status.code_to_grpc_status_code(context.code())
-                if context.code()
-                else StatusCode.OK
-            )
-
             self._logger.info(
                 "Request processed.",
                 name=name,
-                status=status.value[1].replace(" ", "_"),
+                status=(
+                    context.code() if context.code() else StatusCode.OK
+                ).name.lower(),
                 response_size=request.ByteSize(),
             )

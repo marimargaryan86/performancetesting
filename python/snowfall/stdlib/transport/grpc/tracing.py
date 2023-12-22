@@ -2,8 +2,7 @@ import contextlib
 from collections.abc import Callable, Iterator
 
 from google.protobuf.message import Message
-from grpc import aio
-from grpc_status import rpc_status
+from grpc import StatusCode, aio
 from sentry_sdk import Hub, tracing
 
 from snowfall.stdlib.instrumentation.sentry import get_span
@@ -62,6 +61,6 @@ class TracingServerInterceptor(interceptor.ServerInterceptor):
             try:
                 yield span
             finally:
-                if context.code():
-                    status = rpc_status.code_to_grpc_status_code(context.code())
-                    span.set_status(status.value[1].replace(" ", "_"))
+                span.set_status(
+                    (context.code() if context.code() else StatusCode.OK).name.lower(),
+                )

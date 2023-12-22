@@ -1,7 +1,6 @@
 import abc
 import time
 from collections.abc import Callable
-from types import MappingProxyType
 
 import prometheus_client
 from google.protobuf.message import Message
@@ -28,7 +27,7 @@ class _MetricsInterceptor(abc.ABC):
     ) -> None:
         self._total.labels(
             rpc=rpc_name,
-            status=status_code.name,
+            status=status_code.name.lower(),
         ).inc()
 
         if status_code != StatusCode.OK:
@@ -36,18 +35,18 @@ class _MetricsInterceptor(abc.ABC):
 
         self._request_bytes.labels(
             rpc=rpc_name,
-            status=status_code.name,
+            status=status_code.name.lower(),
         ).observe(request.ByteSize())
 
         if isinstance(response, Message):
             self._response_bytes.labels(
                 rpc=rpc_name,
-                status=status_code.name,
+                status=status_code.name.lower(),
             ).observe(response.ByteSize())
 
         self._histogram.labels(
             rpc=rpc_name,
-            status=status_code.name,
+            status=status_code.name.lower(),
         ).observe(time.perf_counter() - start)
 
 
@@ -142,10 +141,6 @@ class MetricsServerInterceptor(interceptor.ServerInterceptor, _MetricsIntercepto
         buckets=prometheus.BYTE_BUCKETS,
     )
 
-    _status_codes: MappingProxyType[int, StatusCode] = MappingProxyType(
-        {status_code.value[0]: status_code for status_code in StatusCode},
-    )
-
     async def intercept_unary_unary(
         self,
         continuation: interceptor.UnaryUnary,
@@ -165,9 +160,7 @@ class MetricsServerInterceptor(interceptor.ServerInterceptor, _MetricsIntercepto
         finally:
             self._log_metrics(
                 rpc_name=continuation.__name__,
-                status_code=self._status_codes[
-                    context.code() or StatusCode.OK.value[0]
-                ],
+                status_code=context.code() if context.code() else StatusCode.OK,
                 request=request,
                 response=response,
                 start=start,
