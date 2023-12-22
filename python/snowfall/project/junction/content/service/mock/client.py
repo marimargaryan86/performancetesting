@@ -8,13 +8,14 @@ import zoneinfo
 from collections.abc import Iterable, Iterator, Mapping, Sequence
 from typing import Any, NamedTuple, Self
 
+from geopy import distance
+
 from snowfall.project.junction.provider.v2alpha import trips_pb2
 from snowfall.project.junction.v1 import fare_type_pb2
 from snowfall.stdlib import h3, money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1 import date_pb2
 
-_EARTH_RADIUS = 6373.0
 _TRAVEL_SPEED = 880
 _TAXI_TIME = 15
 _NEAREST_MINUTE = 5
@@ -195,27 +196,15 @@ class Segment(object):
         origin: Stop,
         destination: Stop,
     ) -> datetime.timedelta:
-        distance = cls._calculate_distance(origin, destination)
+        kilometers = distance.distance(
+            (origin.latitude, origin.longitude),
+            (destination.latitude, destination.longitude),
+        ).kilometers
         travel_minutes = _NEAREST_MINUTE * round(
-            distance / _TRAVEL_SPEED * 60 / _NEAREST_MINUTE,
+            kilometers / _TRAVEL_SPEED * 60 / _NEAREST_MINUTE,
         )
 
         return datetime.timedelta(minutes=travel_minutes + _TAXI_TIME * 2)
-
-    @classmethod
-    def _calculate_distance(cls, origin: Stop, destination: Stop) -> float:
-        arc = (
-            math.sin((destination.rad_latitude - origin.rad_latitude) / 2) ** 2
-            + math.cos(origin.rad_latitude)
-            * math.cos(destination.rad_latitude)
-            * math.sin(destination.rad_longitude - origin.rad_longitude / 2) ** 2
-        )
-        curve = 2 * math.atan2(
-            math.sqrt(arc),
-            math.sqrt(1 - arc),
-        )
-
-        return _EARTH_RADIUS * curve
 
 
 @dataclasses.dataclass(frozen=True)
