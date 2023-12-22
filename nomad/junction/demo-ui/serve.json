@@ -1,0 +1,14 @@
+{
+  "development": {
+    "variables": {
+      "traefik_entrypoints": "websecure",
+      "traefik_host_URL": "v2.junction.dev"
+    }
+  },
+  "production": {
+    "deploy": false
+  },
+  "sandbox": {
+    "deploy": false
+  }
+}
