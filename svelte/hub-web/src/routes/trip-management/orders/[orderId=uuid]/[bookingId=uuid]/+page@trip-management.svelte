@@ -12,23 +12,30 @@
   import { formatAmount } from "formatting/currency";
   import Fees from "../../../book/confirmation/fees.svelte";
   import { getPageTitle } from "utils/page-title";
+  import { getLocaleData } from "i18n";
 
   export let data;
 
+  const i18n = getLocaleData();
   const user = getUser();
 
-  let breadCrumbs: BreadCrumb[] = [];
+  let breadCrumbs: BreadCrumb[];
 
+  $: i18nOrders = $i18n.pages.tripManagement.pages.orders;
   $: order = data.booking.order;
   $: reservationNo = data.booking.operatorBookingReferences.length
     ? data.booking.operatorBookingReferences.join(", ")
     : undefined;
+  $: bookingTitle = `${$i18n.words.booking} ${data.bookingNo}`;
   $: orderLink = routeConfig.routes.tripManagement.routes.orders.routes.order(data.booking.orderId);
   $: selfLink = orderLink.routes.booking(data.booking.id);
   $: breadCrumbs = [
-    { label: "Orders", url: routeConfig.routes.tripManagement.routes.orders.root },
-    { label: order?.journey?.reference ?? "Unknown", url: orderLink.root },
-    { label: `Booking ${data.bookingNo}` ?? "Unknown", url: selfLink.root },
+    { label: i18nOrders.title, url: routeConfig.routes.tripManagement.routes.orders.root },
+    { label: order?.journey?.reference ?? $i18n.words.unknown, url: orderLink.root },
+    {
+      label: bookingTitle,
+      url: selfLink.root,
+    },
   ];
   $: canViewTransactions = permitted($user, "transaction.view");
 </script>
@@ -36,32 +43,31 @@
 <svelte:head>
   <title>
     {getPageTitle(
-      "Junction Hub",
-      "Trip Management",
-      "Orders",
+      $i18n.title,
+      $i18n.pages.tripManagement.title,
+      $i18n.pages.tripManagement.pages.orders.title,
       order?.journey?.reference ?? "Unknown",
-      `Booking ${data.bookingNo}`,
+      bookingTitle,
     )}
-    Junction Hub
   </title>
 </svelte:head>
 
 <StandardLayout {breadCrumbs}>
   <svelte:fragment slot="page-title">
-    Booking {data.bookingNo}:
+    {bookingTitle}:
     <span class="typography title-large bold">
-      {getOrigin(data.booking)?.name ?? "Unknown"}
-      to
-      {getDestination(data.booking)?.name ?? "Unknown"}
+      {getOrigin(data.booking)?.name ?? $i18n.words.unknown}
+      {$i18n.words.to.toLowerCase()}
+      {getDestination(data.booking)?.name ?? $i18n.words.unknown}
     </span>
   </svelte:fragment>
 
   <div class="content" style:--grid-columns={canViewTransactions ? "1fr 1fr" : "1fr"}>
     <div class="booking">
       <div class="itinerary">
-        <h3 class="typography title-large bold">Itinerary</h3>
+        <h3 class="typography title-large bold">{$i18n.words.itinerary}</h3>
 
-        <Ticket identifier={reservationNo} title="Reservation number" />
+        <Ticket identifier={reservationNo} title={$i18n.words.reservationNumber} />
 
         {#if data.markups}
           <Fees markups={data.markups} />
@@ -69,13 +75,13 @@
 
         <div class="statuses">
           <div class="status typography body-small bold">
-            Booking status
+            {$i18n.words.bookingStatus}
             <StatusBadge value={data.booking.status} />
           </div>
 
           {#if data.booking.cancellation?.status}
             <div class="status typography body-small bold">
-              Cancellation status
+              {$i18n.words.cancellationStatus}
               <StatusBadge value={data.booking.cancellation.status} />
             </div>
           {/if}
@@ -85,15 +91,15 @@
       {#if data.booking.refund}
         <div class="refund typography body-medium bold">
           <h3 class="typography body-large bold">
-            Refund
+            {$i18n.words.refund}
 
             <StatusBadge value={data.booking.refund.status} />
           </h3>
-          <strong>Total</strong>
+          <strong>{$i18n.words.total}</strong>
           <span>
             {data.booking.refund.refunded.reseller
               ? formatAmount(data.booking.refund.refunded.reseller, true)
-              : "N/A"}
+              : $i18n.words.notAvailable}
           </span>
         </div>
       {/if}

@@ -1,7 +1,8 @@
 <script lang="ts">
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import EntityAvatar from "components/ui/entity-avatar.svelte";
-  import { formatAmount, formatPriceBreakdownType } from "formatting/currency";
+  import { formatAmount } from "formatting/currency";
+  import { getLocaleData } from "i18n";
   import type { Price, PriceBreakdown } from "integration/common/schemas/price";
   import type { Company } from "integration/junction-hub-api/schemas/company";
   import type { Markups } from "integration/junction-mobile-api/schemas/markups";
@@ -11,6 +12,8 @@
   export let price: Price;
   export let breakdownList: PriceBreakdown[];
   export let markupsTask: Promise<Markups | undefined> | undefined = undefined;
+
+  const i18n = getLocaleData();
 
   async function getTotal(
     nextPrice: Price,
@@ -46,7 +49,7 @@
 
     <div class="breakdown typography label-medium">
       {#each breakdownList as breakdown}
-        <span>{formatPriceBreakdownType(breakdown.type)}</span>
+        <span>{$i18n.priceBreakdownTypes[breakdown.type]}</span>
         <strong>
           {formatAmount(breakdown.price)}
           <em class="typography body-xsmall">{breakdown.price.currency}</em>
@@ -58,7 +61,7 @@
           <LoadingIcon size="16px" />
         {:then markups}
           {#if markups}
-            <span>Markup</span>
+            <span>{$i18n.words.markup}</span>
             <strong>
               {formatAmount(markups.agencyMarkup)}
               <em class="typography body-xsmall">{markups.agencyMarkup.currency}</em>
@@ -67,7 +70,8 @@
         {/await}
       {/if}
 
-      <span>Total</span>
+      <span>{$i18n.words.total}</span>
+
       {#await totalTask}
         <LoadingIcon size="16px" />
       {:then total}
@@ -77,7 +81,7 @@
       {/await}
     </div>
   {:else}
-    <span class="typography body-small bold">N/A</span>
+    <span class="typography body-small bold">{$i18n.words.notAvailable}</span>
   {/if}
 </div>
 

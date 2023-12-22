@@ -1,10 +1,13 @@
 <script lang="ts">
   import { formatAmount } from "formatting/currency";
+  import { getLocaleData } from "i18n";
   import type { Refund } from "integration/junction-hub-api/schemas/refund";
   import { slideFade } from "transitions/slide-fade";
   import { pricesEqual } from "utils/money";
 
   export let refund: Refund;
+
+  const i18n = getLocaleData();
 
   // Only display usInPayerCurrency if the currency differs from refundedUs
   $: usInPayerCurrency =
@@ -16,12 +19,12 @@
 </script>
 
 <div class="refund" transition:slideFade={{ duration: 300 }}>
-  <h3 class="typography title-large bold">Refund</h3>
+  <h3 class="typography title-large bold">{$i18n.words.refund}</h3>
 
   <ul class="money">
     {#if refund.refunded.us}
       <li class="typography body-medium amount">
-        <strong>To us</strong>
+        <strong>{$i18n.sentences.toUs}</strong>
         <span class="typography bold" class:negative={refund.refunded.us.amount < 0}>
           {formatAmount(refund.refunded.us, true)}
         </span>
@@ -30,7 +33,7 @@
 
     {#if usInPayerCurrency}
       <li class="typography body-medium amount">
-        <strong>To us <em>(Payer currency)</em></strong>
+        <strong>{$i18n.sentences.toUs} <em>({$i18n.sentences.payerCurrency})</em></strong>
         <span class="typography bold" class:negative={usInPayerCurrency.amount < 0}>
           {formatAmount(usInPayerCurrency, true)}
         </span>
@@ -39,7 +42,7 @@
 
     {#if refund.refunded.reseller}
       <li class="typography body-medium amount">
-        <strong>To reseller</strong>
+        <strong>{$i18n.sentences.toReseller}</strong>
         <span class="typography bold" class:negative={refund.refunded.reseller.amount < 0}>
           {formatAmount(refund.refunded.reseller, true)}
         </span>
@@ -48,7 +51,7 @@
 
     {#if refund.refundPosition}
       <li class="typography body-medium amount">
-        <strong>Refund position</strong>
+        <strong>{$i18n.words.refundPosition}</strong>
         <span class="typography bold" class:negative={refund.refundPosition.amount < 0}>
           {formatAmount(refund.refundPosition, true)}
         </span>

@@ -5,13 +5,15 @@
   import type { TripBooking } from "integration/junction-hub-api/schemas/booking";
   import type { Transaction } from "integration/junction-hub-api/schemas/transaction";
   import { onMount } from "svelte";
-  import { capitalize } from "utils/common";
   import Company from "./company.svelte";
   import type { Markups } from "integration/junction-mobile-api/schemas/markups";
   import type { MaybePromise } from "@sveltejs/kit";
+  import { getLocaleData } from "i18n";
 
   export let booking: TripBooking;
   export let transactionTask: MaybePromise<Transaction | undefined> | undefined;
+
+  const i18n = getLocaleData();
 
   let markupsTask: Promise<Markups | undefined> | undefined;
 
@@ -23,7 +25,7 @@
 </script>
 
 <div class="transaction">
-  <h3 class="typography title-large bold">Transaction info</h3>
+  <h3 class="typography title-large bold">{$i18n.words.transactionInfo}</h3>
 
   {#await transactionTask}
     <div class="pending">
@@ -33,16 +35,16 @@
     {#if transaction}
       <div class="content">
         <div>
-          <span class="typography label-large">Transaction type</span>
+          <span class="typography label-large">{$i18n.words.transactionType}</span>
           <strong class="typography body-large bold">
-            {capitalize(transaction.payment.method)}
+            {$i18n.types[transaction.payment.method]}
           </strong>
         </div>
 
         <div>
-          <span class="typography label-large">Payment type</span>
+          <span class="typography label-large">{$i18n.words.paymentType}</span>
           <strong class="typography body-large bold">
-            {capitalize(transaction.payment.type)}
+            {$i18n.types[transaction.payment.type]}
           </strong>
         </div>
 
@@ -50,7 +52,7 @@
           company={transaction.beneficiary}
           price={booking.price.total}
           breakdownList={booking.price.breakdown}
-          title="Provider"
+          title={$i18n.words.provider}
         />
 
         <Company
@@ -58,12 +60,12 @@
           price={booking.price.total}
           breakdownList={booking.price.breakdown}
           {markupsTask}
-          title="Reseller"
+          title={$i18n.words.reseller}
         />
       </div>
     {:else}
       <Alert class="typography body-medium" type="warning" dismissable={false}>
-        Transaction not found
+        {$i18n.sentences.transactionNotFound}
       </Alert>
     {/if}
   {/await}
