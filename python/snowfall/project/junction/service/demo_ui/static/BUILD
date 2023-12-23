@@ -1,1 +1,1 @@
-resources(sources=["*.js"])
+resources(sources=["*.css", "*.js"])

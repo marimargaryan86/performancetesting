@@ -9,7 +9,7 @@ Handlebars.registerHelper('format_time', function (travelAt, departureDate) {
   const departureDateObject = dayjs(new Date(departureDate))
   const travelAtObject = dayjs(new Date(
     travelAt.year,
-    travelAt.month,
+    travelAt.month-1,
     travelAt.day,
     travelAt.hours,
     travelAt.minutes,
@@ -27,6 +27,7 @@ Handlebars.registerHelper('format_time', function (travelAt, departureDate) {
 window.onload = () => {
   const searchForm = document.getElementById("search-form");
   const container = document.getElementById("result");
+  const loader = document.getElementById("loader");
   const source = document.getElementById("journey-template").innerHTML;
   const journeyTemplate = Handlebars.compile(source, {strict: true});
 
@@ -54,6 +55,7 @@ window.onload = () => {
       inject_journeys(departureDate, body.results)
 
       if (!body.isInProgress) {
+        loader.classList.add("invisible");
         return
       }
 
@@ -65,6 +67,7 @@ window.onload = () => {
 
   function search_trips(event) {
     event.preventDefault();
+    loader.classList.remove("invisible");
     container.innerText = ""
 
     const start = dayjs()
@@ -91,7 +94,7 @@ window.onload = () => {
             destination: destination,
             departureDate: {
               year: departureDate.year(),
-              month: departureDate.month(),
+              month: departureDate.month() + 1,
               day: departureDate.date(),
             },
           },
