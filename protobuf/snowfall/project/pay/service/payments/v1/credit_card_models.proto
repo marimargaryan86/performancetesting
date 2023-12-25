@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package snowfall.project.pay.service.payments.v1;
 
+import "google/protobuf/timestamp.proto";
 import "snowfall/stdlib/v1/money.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/payments/v1";
@@ -25,4 +26,10 @@ message Refund {
   string external_reference_id = 1;
   string credit_card_payment_id = 2;
   snowfall.stdlib.v1.Money amount = 3;
+}
+
+message PaymentUser {
+  string id = 1;
+  string internal_user_id = 2;
+  google.protobuf.Timestamp created_at = 3;
 }

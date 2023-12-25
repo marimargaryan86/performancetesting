@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package snowfall.project.pay.service.payments.v1;
 
-import "snowfall/project/pay/service/payments/v1/stripe_models.proto";
+import "snowfall/project/pay/service/payments/v1/credit_card_models.proto";
 import "snowfall/stdlib/v1/money.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/payments/v1";
@@ -60,6 +60,7 @@ message GetCreditCardHolderResponse {
 
 message CreateCreditCardHolderRequest {
   CreditCardHolder credit_card_holder = 1;
+  string user_id = 2;
 }
 
 message CreateCreditCardHolderResponse {
