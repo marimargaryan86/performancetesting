@@ -30,13 +30,19 @@ async def dump_stations(
             base_url=str(settings.api_base_url),
             http_client=http_client,
         )
+        cities_responses = await benerail_client.place.get_all_places(
+            "META_STATION_HAFAS:Y",
+        )
 
-        place_responses = await benerail_client.place.get_all_places("SEARCHABLE_BS:Y")
+        stations_responses = await benerail_client.place.get_all_places(
+            "SEARCHABLE_BS:Y",
+        )
         geocoder = geocoding_pb2_grpc.GeocodingServiceStub(
             await grpc_factory.make_insecure_channel(app, app.settings.geodata_address),
         )
         await _to_stations(
-            station_responses=place_responses,
+            cities_responses=cities_responses,
+            station_responses=stations_responses,
             geocoder=geocoder,
             output_file_path="/".join(
                 [
@@ -47,11 +53,26 @@ async def dump_stations(
         )
 
 
+def get_cities_ids(cities_responses: Sequence[response.PlacesResponse]) -> set[str]:
+    city_ids: set[str] = set()
+    for city_responses in cities_responses:
+        with contextlib.suppress(AttributeError):
+            city_ids.update(
+                place.identifier
+                for place in city_responses.response_result.places or []  # type: ignore[union-attr]
+                if place.identifier is not None
+            )
+    return city_ids
+
+
 async def _to_stations(  # noqa: WPS231
+    cities_responses: Sequence[response.PlacesResponse],
     station_responses: Sequence[response.PlacesResponse],
     geocoder: geocoding_pb2_grpc.GeocodingServiceStub,
     output_file_path: str,
 ) -> None:
+    city_ids: set[str] = get_cities_ids(cities_responses)
+
     stations = []
 
     for response_obj in station_responses:
@@ -75,6 +96,7 @@ async def _to_stations(  # noqa: WPS231
                         if place_result.place.codes
                         else None
                     ),
+                    "is_city": place_result.identifier in city_ids,
                     "name": name,
                     "time_zone": (
                         await geocoder.TimeZoneLookup(
