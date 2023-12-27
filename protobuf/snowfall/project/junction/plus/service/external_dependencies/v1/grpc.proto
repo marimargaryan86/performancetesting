@@ -2,11 +2,16 @@ syntax = "proto3";
 package snowfall.project.junction.plus.service.external_dependencies.v1;
 
 import "snowfall/project/junction/plus/service/external_dependencies/v1/models.proto";
+import "snowfall/stdlib/v1/date.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/plus/service/external_dependencies/v1";
 
 service CO2EmissionsService {
   rpc GetEmissions(GetEmissionsRequest) returns (GetEmissionsResponse) {}
+}
+
+service FlightStatsService {
+  rpc GetFlightStatus(GetFlightStatusRequest) returns (GetFlightStatusResponse) {}
 }
 
 message GetEmissionsResponse {
@@ -15,4 +20,16 @@ message GetEmissionsResponse {
 
 message GetEmissionsRequest {
   repeated Flight flights = 1;
+}
+
+message GetFlightStatusRequest {
+  snowfall.stdlib.v1.Date departure_at = 1;
+  string carrier_code = 2;
+  string flight_number = 3;
+}
+
+message GetFlightStatusResponse {
+  repeated FlightStatus flight_statuses = 1;
+  repeated Airport airports = 2;
+  Delays delays = 3;
 }

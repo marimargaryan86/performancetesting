@@ -13,8 +13,8 @@ async def httpx_client() -> AsyncIterator[httpx.AsyncClient]:
 
 
 @pytest.fixture()
-def flight_stats_client(httpx_client: httpx.AsyncClient) -> client.FlightStatsCilent:
-    return client.FlightStatsCilent(
+def flight_stats_client(httpx_client: httpx.AsyncClient) -> client.FlightStatsClient:
+    return client.FlightStatsClient(
         api_url="https://test_url",
         app_id="app_id",
         app_key="app_key",

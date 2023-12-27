@@ -7,7 +7,7 @@ from snowfall.vendor.flight_stats import client
 
 async def test_get_flight_status(
     httpx_mock: pytest_httpx.HTTPXMock,
-    flight_stats_client: client.FlightStatsCilent,
+    flight_stats_client: client.FlightStatsClient,
 ) -> None:
     httpx_mock.add_response(
         url="https://test_url/AA/100/dep/2023/12/21?appId=app_id&appKey=app_key",

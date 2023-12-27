@@ -52,7 +52,7 @@ message AirportResources {
   string baggage = 5;
 }
 
-message Delay {
+message Delays {
   int32 departure_runway_delay_minutes = 1;
   int32 departure_gate_delay_minutes = 2;
 }

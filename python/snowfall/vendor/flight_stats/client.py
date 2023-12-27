@@ -6,7 +6,7 @@ from snowfall.stdlib.transport.http import client
 from snowfall.vendor.flight_stats.models import flight_stats
 
 
-class FlightStatsCilent(client.HttpClient):
+class FlightStatsClient(client.HttpClient):
     def __init__(
         self,
         api_url: str,

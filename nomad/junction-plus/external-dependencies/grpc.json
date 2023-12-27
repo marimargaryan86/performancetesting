@@ -2,7 +2,8 @@
   "development": {
     "variables": {
       "count": 1,
-      "google_flights_emissions_address": "https://travelimpactmodel.googleapis.com/v1/flights:computeFlightEmissions"
+      "google_flights_emissions_address": "https://travelimpactmodel.googleapis.com/v1/flights:computeFlightEmissions",
+      "flight_stats_api_url": "https://api.flightstats.com"
     }
   },
   "production": {

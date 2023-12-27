@@ -30,6 +30,10 @@ variable "google_flights_emissions_address" {
   type = string
 }
 
+variable "flight_stats_api_url" {
+  type = string
+}
+
 job "junction-plus-external-dependencies-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -105,6 +109,8 @@ job "junction-plus-external-dependencies-grpc" {
         data        = <<EOH
 {{ with secret "kv/data/${var.environment}/external-dependencies" }}
 GOOGLE_FLIGHTS_EMISSIONS_APP_KEY={{ .Data.data.google_flights_emissions_app_key }}
+FLIGHT_STATS_APP_ID={{ .Data.data.flight_stats_app_id }}
+FLIGHT_STATS_APP_KEY={{ .Data.data.flight_stats_app_key }}
 {{ end }}
 EOH
         destination = "services.env"
@@ -131,6 +137,7 @@ EOH
         SENTRY_DSN                       = "https://202eca9b6fe37ea1e154b827362ccfa9@sentry.snowfall.se/205"
         PROMETHEUS_PORT                  = NOMAD_PORT_prometheus
         GOOGLE_FLIGHTS_EMISSIONS_ADDRESS = var.google_flights_emissions_address
+        FLIGHT_STATS_API_URL             = var.flight_stats_api_url
       }
     }
   }
