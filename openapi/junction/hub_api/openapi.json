@@ -77,6 +77,12 @@
       ]
     },
     {
+      "name": "Payments",
+      "tags": [
+        "payments"
+      ]
+    },
+    {
       "name": "Refunds",
       "tags": [
         "refunds"
@@ -151,6 +157,11 @@
       "name": "journeys",
       "description": "Journeys are a collection of placed orders and the bookings they resulted in.",
       "x-displayName": "Journeys"
+    },
+    {
+      "name": "payments",
+      "description": "Payment related actions.",
+      "x-displayName": "Payments"
     },
     {
       "name": "refunds",
@@ -2913,6 +2924,57 @@
         },
         "operationId": "get-currencies-id",
         "description": "Used to get currency details"
+      }
+    },
+    "/payments": {
+      "post": {
+        "summary": "Create Payment Intent",
+        "tags": [
+          "payments"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/PaymentIntent"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/PaymentIntent"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        },
+        "operationId": "post-payments",
+        "description": "Creates a paymentIntent and a stripe customer if there isn't any for this reseller's company"
       }
     },
     "/resellers": {
@@ -7028,6 +7090,93 @@
           }
         ],
         "description": "Currency details."
+      },
+      "PaymentIntent": {
+        "title": "Payment Intent",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "pi_3LI6quJnOM9CmRvL19DPvqwU",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "payments"
+            ],
+            "example": "payments"
+          },
+          "attributes": {
+            "type": "object",
+            "required": [
+              "amount",
+              "currency",
+              "clientSecret"
+            ],
+            "properties": {
+              "amount": {
+                "type": "string",
+                "example": "13.37",
+                "writeOnly": true
+              },
+              "currency": {
+                "type": "string",
+                "format": "currency",
+                "example": "EUR",
+                "writeOnly": true
+              },
+              "clientSecret": {
+                "type": "string",
+                "example": "pi_3MtwBwLkdIwHu7ix28a3tqPa_secret_YrKJUKribcBjcG8HVhfZluoGH",
+                "readOnly": true
+              },
+              "ephemeralKey": {
+                "type": "string",
+                "example": "ek_test_51H2Y5KAsaPdzhb1zOvkPqNd7Z6qHxVcXcukYb9f3f3OoP7pYVcJzbFVXj01",
+                "readOnly": true
+              }
+            }
+          },
+          "relationships": {
+            "type": "object",
+            "properties": {
+              "stripeCustomer": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "example": "cus_NffrFeUfNV2Hib"
+                      },
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "stripe-customer"
+                        ],
+                        "example": "stripe-customer"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "type"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "attributes"
+        ]
       },
       "Reseller": {
         "title": "Reseller",
