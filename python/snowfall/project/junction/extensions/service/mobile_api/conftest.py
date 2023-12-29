@@ -36,7 +36,7 @@ from snowfall.project.junction.extensions.service.mobile_api import (
 )
 from snowfall.project.junction.extensions.service.mobile_api.routes import router
 from snowfall.project.junction.extensions.service.mobile_api.v1alpha import models_pb2
-from snowfall.project.junction.plus.adapter import co2_emissions, flight_delay_predictor
+from snowfall.project.junction.plus.adapter import flight_delay_predictor, trip_info
 from snowfall.project.junction.plus.service.external_dependencies.v1 import (
     models_pb2 as plus_services_models_pb2,
 )
@@ -385,14 +385,30 @@ def predictions_client() -> flight_delay_predictor.Client:
 
 
 @pytest.fixture()
-def co2_emissions_client() -> co2_emissions.Client:
-    return co2_emissions.DictClient(
+def trip_info_client() -> trip_info.Client:
+    return trip_info.DictClient(
         emissions=[
             plus_services_models_pb2.FlightEmission(
                 origin="LHR",
                 destination="ATH",
                 flight_number=100,
                 operating_carrier_code="AA",
+            ),
+        ],
+        flight_statuses=[
+            plus_services_models_pb2.FlightStatus(
+                flight_id=1226913573,
+                carrier_fs_code="AA",
+                flight_number="100",
+                status="L",
+                operational_times=None,
+                airport_resources=plus_services_models_pb2.AirportResources(
+                    departure_terminal="8",
+                    departure_gate="12",
+                    arrival_terminal="3",
+                    arrival_gate="31",
+                    baggage="10",
+                ),
             ),
         ],
     )
@@ -438,7 +454,7 @@ def app(
     markups_repository: repository.MarkupsRepository,
     bills_client: bills.Client,
     predictions_client: flight_delay_predictor.Client,
-    co2_emissions_client: co2_emissions.Client,
+    trip_info_client: trip_info.Client,
 ) -> Iterator[applications.Starlette]:
     with spec.get_api_spec() as temp_spec_path:
         yield _create_app(
@@ -464,7 +480,7 @@ def app(
                 markups_repository,
                 bills_client,
                 predictions_client,
-                co2_emissions_client,
+                trip_info_client,
             ),
             openapi_path=temp_spec_path,
             custom_middlewares=[

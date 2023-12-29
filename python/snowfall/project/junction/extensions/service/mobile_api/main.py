@@ -27,9 +27,10 @@ from snowfall.project.junction.extensions.service.mobile_api import (
     plus_client as plus_poc_client,
 )
 from snowfall.project.junction.extensions.service.mobile_api.routes import router
-from snowfall.project.junction.plus.adapter import co2_emissions, flight_delay_predictor
+from snowfall.project.junction.plus.adapter import flight_delay_predictor, trip_info
 from snowfall.project.junction.plus.service.external_dependencies.v1.grpc_pb2_grpc import (
     CO2EmissionsServiceStub,
+    FlightStatsServiceStub,
 )
 from snowfall.project.junction.plus.service.flight_prediction.v1 import (
     flight_prediction_pb2_grpc,
@@ -182,13 +183,16 @@ async def _http(  # noqa: WPS217
             flight_prediction_channel,
         ),
     )
-    co2_emissions_channel = await grpc_factory.make_insecure_channel(
+    trip_info_channel = await grpc_factory.make_insecure_channel(
         app,
         app.settings.co2_emissions_address,
     )
-    co2_emissions_client = co2_emissions.GrpcClient(
+    trip_info_client = trip_info.GrpcClient(
         CO2EmissionsServiceStub(
-            co2_emissions_channel,
+            trip_info_channel,
+        ),
+        FlightStatsServiceStub(
+            trip_info_channel,
         ),
     )
 
@@ -249,7 +253,7 @@ async def _http(  # noqa: WPS217
                     jwt_gen=jwt_gen,
                     httpx_client=junction_httpx_client,
                     predictions_client=predictions_client,
-                    co2_emissions_client=co2_emissions_client,
+                    trip_info_client=trip_info_client,
                 ),
             ),
             custom_middlewares=custom_middlewares,

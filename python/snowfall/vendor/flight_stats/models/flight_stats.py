@@ -33,6 +33,9 @@ class FlightStatus(CamelCaseBaseModel):
     status: str
     operational_times: FlightStatusOperationalTimes
     airport_resources: AirportResources
+    flight_number: str
+    carrier_fs_code: str
+    flight_id: int
 
 
 class Airport(CamelCaseBaseModel):

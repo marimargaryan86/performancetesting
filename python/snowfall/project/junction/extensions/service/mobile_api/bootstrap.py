@@ -14,10 +14,10 @@ from snowfall.project.junction.extensions.service.mobile_api import (
     plus_client as plus_poc_http_client,
 )
 from snowfall.project.junction.plus.adapter import (
-    co2_emissions as co2_emissions_adapter,
+    flight_delay_predictor as flight_prediction_adapter,
 )
 from snowfall.project.junction.plus.adapter import (
-    flight_delay_predictor as flight_prediction_adapter,
+    trip_info as trip_info_adapter,
 )
 from snowfall.project.pay.adapter import bills
 from snowfall.stdlib.integration.starlette import application
@@ -81,7 +81,7 @@ def create_dependencies(
     markups_repository: repository.MarkupsRepository,
     bills_client: bills.Client,
     predictions_client: flight_prediction_adapter.Client,
-    co2_emissions_client: co2_emissions_adapter.Client,
+    trip_info_client: trip_info_adapter.Client,
 ) -> lagom.Container:
     container = lagom.Container()
     container[repository.OrdersRepository] = orders_repository
@@ -105,5 +105,5 @@ def create_dependencies(
     container[repository.MarkupsRepository] = markups_repository
     container[bills.Client] = bills_client  # type: ignore[type-abstract]
     container[flight_prediction_adapter.Client] = predictions_client  # type: ignore[type-abstract]
-    container[co2_emissions_adapter.Client] = co2_emissions_client  # type: ignore[type-abstract]
+    container[trip_info_adapter.Client] = trip_info_client  # type: ignore[type-abstract]
     return container

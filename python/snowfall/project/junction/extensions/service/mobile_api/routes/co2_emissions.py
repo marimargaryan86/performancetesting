@@ -6,7 +6,7 @@ from starlette import endpoints, requests, responses
 from snowfall.project.junction.extensions.service.mobile_api import (
     resources,
 )
-from snowfall.project.junction.plus.adapter import co2_emissions
+from snowfall.project.junction.plus.adapter import trip_info
 from snowfall.project.junction.plus.service.external_dependencies.v1 import (
     models_pb2 as plus_services_models_pb2,
 )
@@ -21,7 +21,7 @@ class Co2Emission(endpoints.HTTPEndpoint):
     async def post(
         self,
         request: requests.Request,
-        emissions_calculator: co2_emissions.Client = lagom.injectable,
+        emissions_calculator: trip_info.Client = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
         emissions = await emissions_calculator.calculate_emissions(

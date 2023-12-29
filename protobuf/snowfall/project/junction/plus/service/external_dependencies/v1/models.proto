@@ -61,4 +61,7 @@ message FlightStatus {
   string status = 1;
   FlightStatusOperationalTimes operational_times = 2;
   AirportResources airport_resources = 3;
+  string flight_number = 4;
+  string carrier_fs_code = 5;
+  int32 flight_id = 6;
 }

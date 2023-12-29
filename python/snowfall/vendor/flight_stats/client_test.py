@@ -24,6 +24,9 @@ async def test_get_flight_status(
             "flight_statuses": [
                 {
                     "status": "L",
+                    "flight_number": "100",
+                    "carrier_fs_code": "AA",
+                    "flight_id": 1228889328,
                     "operational_times": {
                         "scheduled_gate_departure": {
                             "date_utc": "2023-12-16T23:55:00.000Z",
