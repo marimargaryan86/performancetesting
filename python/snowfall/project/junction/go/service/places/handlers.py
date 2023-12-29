@@ -31,7 +31,13 @@ def coordinates_within_radius(
         <= radius,
         json_data,
     )
-    return [provider_place["id"] for provider_place in filtered]
+    places = []
+    for provider_place in filtered:
+        if provider_place.get("is_city", False):
+            places = [provider_place["id"]]
+            break
+        places.append(provider_place["id"])
+    return places
 
 
 def nearest_coordinates(
