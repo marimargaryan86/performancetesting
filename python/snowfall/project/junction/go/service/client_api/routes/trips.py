@@ -140,7 +140,11 @@ def get_departure_after(body: Mapping[str, Any]) -> datetime.datetime:
         ) - datetime.timedelta(minutes=1)
 
         if departure_after < current_time:
-            raise exceptions.HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY)
+            if departure_after.date() == current_time.date():
+                departure_after = datetime.datetime.now(datetime.UTC)
+            else:
+                raise exceptions.HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY)
+
     else:
         departure_after = datetime.datetime.now(datetime.UTC)
 

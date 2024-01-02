@@ -177,6 +177,48 @@ class TestTripSearches(object):
         )
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
+    async def test_success_on_same_day_search(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        same_day_departure_after = datetime.datetime.now(tz=datetime.UTC).replace(
+            hour=0,
+            minute=0,
+            second=0,
+            microsecond=0,
+        )
+
+        request = {
+            "data": {
+                "attributes": {
+                    "departureAfter": same_day_departure_after.isoformat(
+                        timespec="seconds",
+                    ),
+                },
+                "relationships": {
+                    "origin": {
+                        "data": {
+                            "id": fixtures.PLACES[0],
+                            "type": "places",
+                        },
+                    },
+                    "destination": {
+                        "data": {
+                            "id": fixtures.PLACES[1],
+                            "type": "places",
+                        },
+                    },
+                },
+                "type": "trip-searches",
+            },
+        }
+        response = await client.post(
+            "/trips/searches",
+            json=request,
+            headers={"Content-Type": "application/vnd.api+json"},
+        )
+        assert response.status_code == status.HTTP_201_CREATED
+
     async def test_invalid_segment_types(
         self,
         client: httpx.AsyncClient,
