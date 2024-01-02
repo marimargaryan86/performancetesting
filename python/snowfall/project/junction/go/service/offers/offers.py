@@ -47,6 +47,23 @@ class TripOfferRepository(
             filter_=filter_,
         )
 
+    async def find_by_offer_option(
+        self,
+        offer_option_id: str,
+    ) -> models_pb2.OfferGroup | None:
+        result = await self._find_with_cursor(
+            filter_={
+                "offers._id": {
+                    "$eq": offer_option_id,
+                },
+            },
+        )
+
+        try:
+            return await result.take()
+        except StopAsyncIteration:
+            return None
+
 
 class TripOfferGroupDetailsRepository(
     repository.ProtoRepository[models_pb2.OfferSegment],

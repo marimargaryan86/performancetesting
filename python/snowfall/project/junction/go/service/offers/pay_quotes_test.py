@@ -30,6 +30,7 @@ def pay_quotes(
     offer_options_repository: offers.OfferOptionsRepository,
     offer_searches_repository: offers.OfferSearchRepository,
     offer_aggregate_repository: offers.OfferAggregateMappingRepository,
+    trip_offer_repository: offers.TripOfferRepository,
 ) -> PayQuotes:
     return PayQuotes(
         quotations_client=quotations_client,
@@ -37,6 +38,7 @@ def pay_quotes(
         offer_options_repository=offer_options_repository,
         offer_searches_repository=offer_searches_repository,
         offer_aggregate_repository=offer_aggregate_repository,
+        trip_offer_repository=trip_offer_repository,
     )
 
 
@@ -62,6 +64,7 @@ async def test_create_quote_failed_throws_create_quote_error(
     offer_options_repository: offers.OfferOptionsRepository,
     offer_searches_repository: offers.OfferSearchRepository,
     offer_aggregate_repository: offers.OfferAggregateMappingRepository,
+    trip_offer_repository: offers.TripOfferRepository,
 ) -> None:
     quotations_client = mock.create_autospec(quotations.Client)
     quotations_client.create = mock.AsyncMock(side_effect=errors.NotFoundError)
@@ -71,6 +74,7 @@ async def test_create_quote_failed_throws_create_quote_error(
         offer_options_repository=offer_options_repository,
         offer_searches_repository=offer_searches_repository,
         offer_aggregate_repository=offer_aggregate_repository,
+        trip_offer_repository=trip_offer_repository,
     )
 
     with pytest.raises(PayCreateQuoteError):
@@ -91,6 +95,7 @@ async def test_get_company_failed_throws_create_quote_error(
     offer_options_repository: offers.OfferOptionsRepository,
     offer_searches_repository: offers.OfferSearchRepository,
     offer_aggregate_repository: offers.OfferAggregateMappingRepository,
+    trip_offer_repository: offers.TripOfferRepository,
 ) -> None:
     companies_client = mock.create_autospec(companies.Client)
     companies_client.get = mock.AsyncMock(side_effect=errors.NotFoundError)
@@ -100,6 +105,7 @@ async def test_get_company_failed_throws_create_quote_error(
         offer_options_repository=offer_options_repository,
         offer_searches_repository=offer_searches_repository,
         offer_aggregate_repository=offer_aggregate_repository,
+        trip_offer_repository=trip_offer_repository,
     )
 
     with pytest.raises(PayCreateQuoteError):
@@ -191,6 +197,7 @@ async def test_that_price_in_trip_price_quote_result_replaced_with_conversion(
     pay_quotes: PayQuotes,
     trip_offer_repository: offers.TripOfferRepository,
 ) -> None:
+    fixtures.generate_offer(fixtures.OFFERS[0])
     offer_aggregate_return_value = fixtures.generate_offer_aggregate(
         offer_identifier=fixtures.OFFERS[0],
         offer_search_id=fixtures.OFFER_SEARCHES[0],
@@ -317,6 +324,7 @@ async def test_price_breakdown_when_no_tax_or_markups_returned_by_pay(
             offer_options_repository=offer_options_repository,
             offer_searches_repository=offer_searches_repository,
             offer_aggregate_repository=offer_aggregate_repository,
+            trip_offer_repository=trip_offer_repository,
         )
 
         price_quote_result = TripPriceQuoteResult(

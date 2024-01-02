@@ -36,12 +36,14 @@ class PayQuotes(object):
         offer_options_repository: offers.OfferOptionsRepository,
         offer_searches_repository: offers.OfferSearchRepository,
         offer_aggregate_repository: offers.OfferAggregateMappingRepository,
+        trip_offer_repository: offers.TripOfferRepository,
     ):
         self._quotations_client = quotations_client
         self._companies_client = companies_client
         self._offer_options_repository = offer_options_repository
         self._offer_searches_repository = offer_searches_repository
         self._offer_aggregate_repository = offer_aggregate_repository
+        self._trip_offer_repository = trip_offer_repository
         self._logger = stdout.get_logger()
 
     async def get_offer_search_quotes(
@@ -185,13 +187,22 @@ class PayQuotes(object):
             raise PayCreateQuoteError from err
 
     async def _get_offer_search_id(self, offer_option_id: str) -> str:
-        offers_aggregator = await self._offer_aggregate_repository.find_by_result_id(
+        offer_group = await self._trip_offer_repository.find_by_offer_option(
             offer_option_id,
+        )
+        if offer_group is None:
+            self._logger.exception(
+                "Offer group not found for offer option ID",
+                option_id=offer_option_id,
+            )
+            raise OfferRetrievalError()
+        offers_aggregator = await self._offer_aggregate_repository.find_by_result_id(
+            offer_group.id,
         )
         if offers_aggregator is None:
             self._logger.exception(
-                "Offers aggregator not found for offer option ID",
-                option_id=offer_option_id,
+                "Offers aggregator not found for offer group ID",
+                offer_group_id=offer_group.id,
             )
             raise OfferRetrievalError()
 

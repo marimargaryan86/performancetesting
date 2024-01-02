@@ -238,6 +238,9 @@ async def _import(app: application.Application[_ImportSettings]) -> None:
                 offer_aggregate_repository=offers.OfferAggregateMappingRepository(
                     mongo.offers.offer_aggregates,
                 ),
+                trip_offer_repository=offers.TripOfferRepository(
+                    mongo.offers.trip_offers,
+                ),
             ),
             payer_id=app.settings.payer_company_id,
             payer_currency=app.settings.payer_currency_code,
@@ -297,6 +300,9 @@ async def _gather_price_quotes(
                 ),
                 offer_aggregate_repository=offers.OfferAggregateMappingRepository(
                     mongo.offers.offer_aggregates,
+                ),
+                trip_offer_repository=offers.TripOfferRepository(
+                    mongo.offers.trip_offers,
                 ),
             ),
             payer_id=app.settings.payer_company_id,
