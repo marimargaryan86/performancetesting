@@ -47,6 +47,7 @@ async def offers_app(
             cert=config.cert_tmp_path(app.settings.cert_base64),
         ),
     )
+
     logging.register(http_client)
     metrics.register(http_client)
     benerail_client = client.BenerailClient(

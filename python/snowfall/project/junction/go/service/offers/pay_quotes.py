@@ -24,16 +24,24 @@ class PayCreateQuoteError(Exception):
     """Raised when an error occurs creating a quote in PAY."""
 
 
+class OfferRetrievalError(Exception):
+    """Raised when an error occurs retrieving an offer."""
+
+
 class PayQuotes(object):
     def __init__(
         self,
         quotations_client: quotations.Client,
         companies_client: companies.Client,
         offer_options_repository: offers.OfferOptionsRepository,
+        offer_searches_repository: offers.OfferSearchRepository,
+        offer_aggregate_repository: offers.OfferAggregateMappingRepository,
     ):
         self._quotations_client = quotations_client
         self._companies_client = companies_client
         self._offer_options_repository = offer_options_repository
+        self._offer_searches_repository = offer_searches_repository
+        self._offer_aggregate_repository = offer_aggregate_repository
         self._logger = stdout.get_logger()
 
     async def get_offer_search_quotes(
@@ -43,18 +51,21 @@ class PayQuotes(object):
         payer_id: str,
         to_currency: str,
     ) -> TripOfferSearchResult:
+        passenger_number = await self._get_passenger_number(
+            search_result.offer_search_id,
+        )
         for offer in search_result.offer.offers:
             amount, tax_amount, currency = self._get_amount_tax_and_currency(
                 offer,
             )
-
+            num_segments = len(offer.segment_details)
             payer_company = await self._get_company(company_id=payer_id)
             beneficiary_company = await self._get_company(
                 company_id=search_result.provider_company_id,
             )
-
             quote = await self._create_quote(
                 amount=amount,
+                fee_multiplier=num_segments * passenger_number,
                 session_token=session_token,
                 payer_company=payer_company,
                 beneficiary_company=beneficiary_company,
@@ -79,7 +90,7 @@ class PayQuotes(object):
         )
         return search_result
 
-    async def get_price_quote_quotes(
+    async def get_price_quote_quotes(  # noqa: WPS217
         self,
         session_token: str,
         search_result: TripPriceQuoteResult,
@@ -110,12 +121,19 @@ class PayQuotes(object):
             raise SkippedConversionError()
 
         payer_company = await self._get_company(company_id=payer_id)
+        offer_search_id = await self._get_offer_search_id(
+            search_result.price_quote.option_id,
+        )
+        passenger_number = await self._get_passenger_number(offer_search_id)
+
+        num_segments = len(offer_option.segment_details)
         beneficiary_company = await self._get_company(
             company_id=search_result.provider_company_id,
         )
 
         quote = await self._create_quote(
             amount=amount,
+            fee_multiplier=passenger_number * num_segments,
             session_token=session_token,
             payer_company=payer_company,
             beneficiary_company=beneficiary_company,
@@ -166,9 +184,40 @@ class PayQuotes(object):
             )
             raise PayCreateQuoteError from err
 
+    async def _get_offer_search_id(self, offer_option_id: str) -> str:
+        offers_aggregator = await self._offer_aggregate_repository.find_by_result_id(
+            offer_option_id,
+        )
+        if offers_aggregator is None:
+            self._logger.exception(
+                "Offers aggregator not found for offer option ID",
+                option_id=offer_option_id,
+            )
+            raise OfferRetrievalError()
+
+        return offers_aggregator.offer_search_id
+
+    async def _get_passenger_number(self, offer_search_id: str) -> int:
+        offer_search = await self._offer_searches_repository.find_by_id(offer_search_id)
+        if offer_search is None:
+            self._logger.exception(
+                "Offer search not found for offer search ID",
+                offer_search_id=offer_search_id,
+            )
+            raise OfferRetrievalError()
+
+        if offer_search.HasField("simple_trip"):
+            return len(offer_search.simple_trip.passengers)
+
+        if offer_search.HasField("trip"):
+            return len(offer_search.trip.passengers)
+
+        return 1
+
     async def _create_quote(
         self,
         amount: int,
+        fee_multiplier: int,
         session_token: str,
         payer_company: companies_models_pb2.Company,
         beneficiary_company: companies_models_pb2.Company,
@@ -185,7 +234,7 @@ class PayQuotes(object):
                 from_currency=from_currency,
                 to_currency=to_currency,
                 tax=tax if tax else 0,
-                fee_multiplier=1,
+                fee_multiplier=fee_multiplier,
             )
         except (errors.NotFoundError, errors.ServiceUnavailableError) as err:
             self._logger.exception(

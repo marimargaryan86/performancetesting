@@ -58,6 +58,7 @@ PROVIDER_OFFERS = (
     "b8fabc76-5514-4d95-9af8-740f2cc3a969",
     "91cf7f38-2418-4421-b2f8-87b2d585f6a0",
 )
+OFFER_AGGREGATE = ("cb2c2359-5520-42fc-9bf9-dc78d708cd5e",)
 OFFER_SEARCHES = ("cb2c2359-5520-42fc-9bf9-dc78d708cd5e",)
 OFFERS = (
     "5927b3ce-fbd7-4f8b-b456-b1b7fd44cdad",
@@ -395,6 +396,24 @@ def generate_offer(identifier: str) -> offers_pb2.OfferAggregate:
                 provider_id=PROVIDERS[1],
             ),
         ],
+    )
+
+
+def generate_offer_aggregate(
+    offer_aggregate: str,
+    offer_identifier: str,
+    offer_search_id: str,
+) -> offers_pb2.OfferAggregateMapping:
+    return offers_pb2.OfferAggregateMapping(
+        id=offer_aggregate,
+        offer_search_id=offer_search_id,
+        offer_result_ids=[offer_identifier],
+        expires_at=protobuf.datetime_to_protobuf(
+            datetime.datetime.now(tz=datetime.UTC),
+        ),
+        created_at=protobuf.datetime_to_protobuf(
+            datetime.datetime.now(tz=datetime.UTC),
+        ),
     )
 
 

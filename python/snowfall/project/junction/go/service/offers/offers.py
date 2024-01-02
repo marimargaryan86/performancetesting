@@ -274,6 +274,23 @@ class OfferAggregateMappingRepository(
             sort=sort,
         )
 
+    async def find_by_result_id(
+        self,
+        offer_option_id: str,
+    ) -> models_pb2.OfferAggregateMapping | None:
+        offers = await self._find_with_cursor(
+            filter_={
+                "offer_result_ids": {
+                    "$eq": offer_option_id,
+                },
+            },
+        )
+
+        try:
+            return await offers.take()
+        except StopAsyncIteration:
+            return None
+
 
 class OfferSearchRepository(
     repository.ProtoRepository[models_pb2.OfferSearch],
