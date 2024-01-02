@@ -9,5 +9,6 @@ export default factory({
     cursor?: string;
     limit?: number;
     sort?: Parameters<JourneyService["find"]>[0]["sort"];
+    filter?: Parameters<JourneyService["find"]>[0]["filter"];
   }) => [params],
 });

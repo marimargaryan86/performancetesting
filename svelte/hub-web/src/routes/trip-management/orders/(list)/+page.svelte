@@ -32,7 +32,7 @@
     }));
   }
 
-  const filters = createQueryStore<FilterOptions, FilterOptionsQuery>(
+  const filters = createQueryStore<JourneyFilterOptions, JourneyFilterOptionsQuery>(
     (data) => ({
       "createdAt[from]": data.createdAtRange?.from.toLocaleDateString("sv-SE"),
       "createdAt[to]": data.createdAtRange?.to.toLocaleDateString("sv-SE"),
@@ -68,7 +68,11 @@
   import type { ScrollLoadFunc } from "directives/scroll-load";
   import integrationInstancesClient from "integration-instances-client";
   import type JourneyService from "integration/junction-hub-api/services/journey-service";
-  import Filters, { type FilterOptions, type FilterOptionsQuery } from "./filters.svelte";
+  import type {
+    JourneyFilterOptions,
+    JourneyFilterOptionsQuery,
+  } from "integration/junction-hub-api/schemas/journey";
+  import Filters from "./filters.svelte";
   import { ensureDefined } from "utils/array";
   import { createQueryStore } from "utils/url";
   import {
@@ -98,6 +102,7 @@
       cursor: data.journeys.cursor,
       limit: LIST_JOURNEYS_LIMIT,
       sort: LIST_JOURNEYS_SORT,
+      filter: $filters,
     });
 
     data.journeys = {

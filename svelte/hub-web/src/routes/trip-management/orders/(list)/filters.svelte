@@ -1,18 +1,4 @@
 <script lang="ts" context="module">
-  export type FilterOptions = {
-    departureAtRange?: DateRange;
-    createdAtRange?: DateRange;
-    bookingStatus?: BookingStatus;
-  };
-
-  export type FilterOptionsQuery = {
-    "departureAt[from]"?: string;
-    "departureAt[to]"?: string;
-    "createdAt[from]"?: string;
-    "createdAt[to]"?: string;
-    bookingStatus?: string;
-  };
-
   function getBookingStatusOptionFormatter(
     locale: LocaleData,
   ): (status?: BookingStatus, selected?: boolean) => string | undefined {
@@ -35,9 +21,9 @@
     bookingStatuses,
     type BookingStatus,
   } from "integration/junction-hub-api/schemas/booking";
-  import type { DateRange } from "models/date-time";
+  import type { JourneyFilterOptions } from "integration/junction-hub-api/schemas/journey";
 
-  export let filters: FilterOptions;
+  export let filters: JourneyFilterOptions;
 
   const i18n = getLocaleData();
 
@@ -76,5 +62,6 @@
   :global(button.filter-clear-btn.filter-clear-btn) {
     align-self: flex-end;
     width: unset;
+    min-width: 80px;
   }
 </style>

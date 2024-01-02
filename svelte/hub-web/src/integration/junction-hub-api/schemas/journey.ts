@@ -5,6 +5,8 @@ import {
 } from "integration/common/schemas/address";
 import type { IncludedMapping } from "./included";
 import type { Order, OrderSchema } from "./order";
+import type { DateRange } from "models/date-time";
+import type { BookingStatus } from "../schemas/booking";
 
 export type ContactDetails = {
   email: string;
@@ -47,6 +49,20 @@ export type JourneySchema = {
     orders: { data: Pick<OrderSchema, "id" | "type">[] };
   };
   links: { self: string };
+};
+
+export type JourneyFilterOptions = {
+  departureAtRange?: DateRange;
+  createdAtRange?: DateRange;
+  bookingStatus?: BookingStatus;
+};
+
+export type JourneyFilterOptionsQuery = {
+  "departureAt[from]"?: string;
+  "departureAt[to]"?: string;
+  "createdAt[from]"?: string;
+  "createdAt[to]"?: string;
+  bookingStatus?: string;
 };
 
 export const journeyParser = {

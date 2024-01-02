@@ -3,6 +3,7 @@ import JunctionHubApiService from "./junction-hub-api-service";
 import type { PaginatedData } from "models/common";
 import type { Journey, JourneySchema } from "../schemas/journey";
 import { parseIncluded, type IncludedSchemas } from "../schemas/included";
+import type { JourneyFilterOptions } from "integration/junction-hub-api/schemas/journey";
 
 export default class JourneyService extends JunctionHubApiService {
   async find({
@@ -10,11 +11,13 @@ export default class JourneyService extends JunctionHubApiService {
     cursor,
     limit = 100,
     sort = "id",
+    filter,
   }: {
     session: Session;
     cursor?: string;
     limit?: number;
     sort?: "id" | "-id" | "reference" | "-reference" | "createdAt" | "-createdAt";
+    filter?: JourneyFilterOptions;
   }): Promise<PaginatedData<Journey>> {
     const resp = await this.makeRequest<{
       data: JourneySchema[];
@@ -25,6 +28,11 @@ export default class JourneyService extends JunctionHubApiService {
       queryParams: {
         "page[cursor]": cursor,
         "page[limit]": limit,
+        "filter[createdAt][ge]": filter?.createdAtRange?.from.toISOString(),
+        "filter[createdAt][le]": filter?.createdAtRange?.to.toISOString(),
+        "filter[departureDate][ge]": filter?.departureAtRange?.from.toISOString(),
+        "filter[departureDate][le]": filter?.departureAtRange?.to.toISOString(),
+        "filter[status][eq]": filter?.bookingStatus,
         sort,
         include: [
           "orders",
