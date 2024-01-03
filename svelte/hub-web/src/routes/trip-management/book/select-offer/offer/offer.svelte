@@ -65,6 +65,16 @@
 
   $: totalPrice = getTotalPrice(selectedOption);
 
+  function formatStopCount(stopCount: number): string {
+    if (stopCount === 1) {
+      return $i18n.words.direct;
+    }
+
+    const stopString = stopCount - 1 === 1 ? $i18n.words.stop.singular : $i18n.words.stop.plural;
+
+    return `${stopCount - 1} ${stopString}`.toLowerCase();
+  }
+
   function selectOffer(): void {
     dispatch("select", { offerId: offer.id, optionIds: selectedOption.map((item) => item.id) });
   }
@@ -100,9 +110,8 @@
         <EntityAvatar name={vendor} size="24px" />
         <span>
           {vendor}
-          {trainNumber} • {stopCount === 1
-            ? $i18n.words.direct
-            : `${stopCount} ${$i18n.words.stop.plural}`.toLowerCase()}
+          {trainNumber} •
+          {formatStopCount(stopCount)}
         </span>
       </div>
 
