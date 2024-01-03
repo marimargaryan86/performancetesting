@@ -193,21 +193,25 @@ class BookingDetails(endpoints.HTTPEndpoint):
 
 
 class Journeys(endpoints.HTTPEndpoint):
-    _sort = MappingProxyType({
-        "id": "id",
-        "reference": "passenger_name_record",
-        "createdAt": "created_at",
-    })
+    _sort = MappingProxyType(
+        {
+            "id": "id",
+            "reference": "passenger_name_record",
+            "createdAt": "created_at",
+        },
+    )
 
-    _status_mapping = MappingProxyType({
-        "unspecified": models_pb2.Booking.Status.STATUS_UNSPECIFIED,
-        "pending": models_pb2.Booking.Status.STATUS_PENDING,
-        "confirmed": models_pb2.Booking.Status.STATUS_CONFIRMED,
-        "rejected": models_pb2.Booking.Status.STATUS_REJECTED,
-        "notTicketed": models_pb2.Booking.Status.STATUS_NOT_TICKETED,
-        "error": models_pb2.Booking.Status.STATUS_ERROR,
-        "cancelled": models_pb2.Booking.Status.STATUS_CANCELLED,
-    })
+    _status_mapping = MappingProxyType(
+        {
+            "unspecified": models_pb2.Booking.Status.STATUS_UNSPECIFIED,
+            "pending": models_pb2.Booking.Status.STATUS_PENDING,
+            "confirmed": models_pb2.Booking.Status.STATUS_CONFIRMED,
+            "rejected": models_pb2.Booking.Status.STATUS_REJECTED,
+            "not-ticketed": models_pb2.Booking.Status.STATUS_NOT_TICKETED,
+            "error": models_pb2.Booking.Status.STATUS_ERROR,
+            "cancelled": models_pb2.Booking.Status.STATUS_CANCELLED,
+        },
+    )
 
     async def get(
         self,

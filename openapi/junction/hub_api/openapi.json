@@ -3383,7 +3383,7 @@
               "pending",
               "confirmed",
               "rejected",
-              "notTicketed",
+              "not-ticketed",
               "error",
               "cancelled"
             ]
