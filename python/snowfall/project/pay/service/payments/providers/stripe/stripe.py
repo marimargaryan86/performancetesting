@@ -30,13 +30,14 @@ class Stripe(interfaces.CreditCardProvider):
         )
 
         return credit_card_models_pb2.CreditCardPayment(
-            id=payment_intent.id or "",
+            id=payment_intent.id,
             amount=intent_money.protobuf(),
             capture_method=payment_intent.capture_method,
             credit_card_holder_id=payment_intent.customer or "",  # type: ignore[arg-type]
             enable_automatic_payment_method=payment_intent.automatic_payment_methods[
                 "enabled"
             ],  # type: ignore[index]
+            secret=payment_intent.client_secret or "",
         )
 
     def create_credit_card_payment(
@@ -55,7 +56,8 @@ class Stripe(interfaces.CreditCardProvider):
             },
         )
 
-        payment.id = payment_intent.id or ""
+        payment.id = payment_intent.id
+        payment.secret = payment_intent.client_secret or ""
 
         return payment
 
@@ -68,6 +70,7 @@ class Stripe(interfaces.CreditCardProvider):
         credit_card_holder = credit_card_models_pb2.CreditCardHolder()
         ephemeral_key_secret = ""
         if stripe_user:
+            customer = stripe.Customer.retrieve(stripe_user.id)
             ephemeral_key_secret = stripe.EphemeralKey.create(  # type: ignore[no-untyped-call]
                 customer=stripe_user.id,
                 stripe_version=self._stripe_version,
@@ -75,6 +78,8 @@ class Stripe(interfaces.CreditCardProvider):
 
             credit_card_holder.id = stripe_user.id
             credit_card_holder.version = self._stripe_version
+            credit_card_holder.email = customer.email or ""
+            credit_card_holder.name = customer.name or ""
 
         return credit_card_holder, ephemeral_key_secret
 
@@ -90,7 +95,7 @@ class Stripe(interfaces.CreditCardProvider):
         )
 
         stripe_user = credit_card_models_pb2.PaymentUser(
-            id=customer.id or "",
+            id=customer.id,
             internal_user_id=user_id,
         )
 
@@ -101,7 +106,7 @@ class Stripe(interfaces.CreditCardProvider):
             stripe_version=self._stripe_version,
         ).secret
 
-        credit_card_holder.id = customer.id or ""
+        credit_card_holder.id = customer.id
         credit_card_holder.version = self._stripe_version
 
         return credit_card_holder, ephemeral_key_secret

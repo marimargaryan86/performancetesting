@@ -13,6 +13,7 @@ message CreditCardPayment {
   string capture_method = 3;
   string credit_card_holder_id = 4;
   bool enable_automatic_payment_method = 5;
+  string secret = 6;
 }
 
 message CreditCardHolder {

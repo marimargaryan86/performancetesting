@@ -65,9 +65,9 @@ def _mock_stripe_customer() -> None:
     )
     get_customer = mock.Mock(
         id="44ad8b84-c1d7-45d9-95bb-db725b6340cf",
-        name="test",
         email="test@test.com",
     )
+    get_customer.name = "test"
 
     stripe.Customer.create = mock.Mock(return_value=create_customer)  # type: ignore[method-assign]
     stripe.Customer.retrieve = mock.Mock(return_value=get_customer)  # type: ignore[method-assign]

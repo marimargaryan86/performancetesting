@@ -26,7 +26,7 @@ class CreditCardPaymentService(
             server,
         )
 
-    def GetCreditCardPayment(  # noqa: N802
+    async def GetCreditCardPayment(  # type: ignore[override] # noqa: N802
         self,
         request: credit_card_pb2.GetCreditCardPaymentRequest,
         context: grpc.aio.ServicerContext,
@@ -34,7 +34,7 @@ class CreditCardPaymentService(
         payment = self._provider.get_credit_card_payment(request.payment_id)
         return credit_card_pb2.GetCreditCardPaymentResponse(payment=payment)
 
-    def CreateCreditCardPayment(  # noqa: N802
+    async def CreateCreditCardPayment(  # type: ignore[override] # noqa: N802
         self,
         request: credit_card_pb2.CreateCreditCardPaymentRequest,
         context: grpc.aio.ServicerContext,
