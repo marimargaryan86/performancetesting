@@ -163,13 +163,12 @@ def create_criteria_time_windows(
     timestamps = []
     departure_at = normalize_datetime(
         protobuf.protobuf_to_datetime(search.departure_at),
-    )
+    ).replace(hour=0)
 
     if search.HasField("departure_before"):
         departure_before = protobuf.protobuf_to_datetime(search.departure_before)
     else:
-        departure_before = departure_at.replace(hour=0)
-        departure_before += datetime.timedelta(days=1)
+        departure_before = departure_at + datetime.timedelta(days=1)
 
     while departure_at < departure_before:
         timestamps.append(departure_at)
