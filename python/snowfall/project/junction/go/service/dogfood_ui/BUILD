@@ -22,9 +22,9 @@ python_image(
 resource(
     name="benerail",
     source=http_source(
-        url="https://junction-build-artifacts.s3.eu-west-2.amazonaws.com/benerail_stations-107f14cfe0c5c023ee429c82f795b21f7028dda6510e36068ebe284dd29d4605.json",
-        len=2321430,
-        sha256="107f14cfe0c5c023ee429c82f795b21f7028dda6510e36068ebe284dd29d4605",
+        url="https://junction-build-artifacts.s3.eu-west-2.amazonaws.com/benerail_stations-9638216413d6749c370b7dd5cb21f517fd5ad2ed7ae50a5ad901f6cebbe52f73.json",
+        len=2312063,
+        sha256="9638216413d6749c370b7dd5cb21f517fd5ad2ed7ae50a5ad901f6cebbe52f73",
         filename="benerail.json",
     ),
 )
