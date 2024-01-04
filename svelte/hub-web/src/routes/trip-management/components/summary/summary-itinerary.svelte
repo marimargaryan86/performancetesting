@@ -7,6 +7,7 @@
   import EntityAvatar from "components/ui/entity-avatar.svelte";
   import { getLegsFromPriceQuote } from "utils/offer";
   import { getLocale, getLocaleData } from "i18n";
+  import { formatStopCount } from "formatting/trip";
 
   export let priceQuote: TripOfferPriceQuote;
 
@@ -15,7 +16,7 @@
 
   $: vendor = priceQuote.options[0]?.detailsList[0]?.details?.vendor ?? $i18n.words.unknown;
   $: trainNumber = priceQuote.options[0]?.detailsList[0]?.details?.routeIdentifiers.vendor ?? "";
-  $: segmentCount = priceQuote.options[0]?.detailsList.length ?? 1;
+  $: stopCount = priceQuote.options[0]?.detailsList.length ?? 1;
   $: departureLeg = priceQuote.options[0]?.detailsList[0]?.details?.legs[0];
 
   const dispatch = createEventDispatcher<{ showFareRules: void }>();
@@ -32,9 +33,7 @@
     <div>
       <EntityAvatar name={vendor} size="24px" />
       {vendor}
-      {trainNumber} • {segmentCount === 1
-        ? $i18n.words.direct
-        : `${segmentCount} ${$i18n.words.stop.plural}`.toLowerCase()}
+      {trainNumber} • {formatStopCount(stopCount, $i18n)}
     </div>
     <span>
       {#if departureLeg}

@@ -39,6 +39,7 @@
   import type { Price } from "integration/common/schemas/price";
   import { ensureDefined } from "utils/array";
   import { getLocale, getLocaleData, type Locale } from "i18n";
+  import { formatStopCount } from "formatting/trip";
 
   export let offer: Offer;
   export let selectedOptionIds: string[] | undefined;
@@ -64,16 +65,6 @@
     .filter(ensureDefined);
 
   $: totalPrice = getTotalPrice(selectedOption);
-
-  function formatStopCount(stopCount: number): string {
-    if (stopCount === 1) {
-      return $i18n.words.direct;
-    }
-
-    const stopString = stopCount - 1 === 1 ? $i18n.words.stop.singular : $i18n.words.stop.plural;
-
-    return `${stopCount - 1} ${stopString}`.toLowerCase();
-  }
 
   function selectOffer(): void {
     dispatch("select", { offerId: offer.id, optionIds: selectedOption.map((item) => item.id) });
@@ -110,8 +101,7 @@
         <EntityAvatar name={vendor} size="24px" />
         <span>
           {vendor}
-          {trainNumber} •
-          {formatStopCount(stopCount)}
+          {trainNumber} • {formatStopCount(stopCount, $i18n)}
         </span>
       </div>
 

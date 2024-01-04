@@ -31,6 +31,7 @@
   import EntityAvatar from "components/ui/entity-avatar.svelte";
   import type { OfferSegmentLeg } from "integration/common/schemas/offer-segment-leg";
   import { getLocale, getLocaleData } from "i18n";
+  import { formatStopCount } from "formatting/trip";
 
   export let bookings: TripBooking[];
 
@@ -48,7 +49,7 @@
     )}
     {@const vendor = booking.detailsList[0]?.vendor ?? $i18n.words.unknown}
     {@const trainNumber = booking.detailsList[0]?.routeIdentifiers.vendor ?? ""}
-    {@const segmentCount = booking.detailsList.length}
+    {@const stopCount = booking.detailsList.length}
 
     {#if origDestLegs}
       {@const { originLeg, destinationLeg } = origDestLegs}
@@ -74,9 +75,7 @@
           <EntityAvatar name={vendor} />
           <span class="typography label-medium">
             {vendor}
-            {trainNumber} • {segmentCount === 1
-              ? $i18n.words.direct
-              : `${segmentCount} ${$i18n.words.stop.plural}`.toLowerCase()}
+            {trainNumber} • {formatStopCount(stopCount, $i18n)}
           </span>
         </div>
 
