@@ -1,5 +1,7 @@
+import asyncio
 import json
 from collections.abc import Sequence
+from contextlib import suppress
 
 from grpc import StatusCode, aio
 
@@ -41,6 +43,7 @@ class ResellerService(
         self._reseller_currencies_key = _CURRENCIES_KEY.format(environment)
         self._company_client = company_client
         self._currency_client = currency_client
+        self._promote_task: asyncio.Task[None] | None = None
 
     def get_name(self) -> str:
         return models_pb2.DESCRIPTOR.services_by_name["ResellerService"].full_name
@@ -48,11 +51,14 @@ class ResellerService(
     def register(self, server: aio.Server) -> None:
         resellers_pb2_grpc.add_ResellerServiceServicer_to_server(self, server)
 
-    async def CreateReseller(  # type: ignore[override] # noqa: N802
+    async def CreateReseller(  # type: ignore[override] # noqa: N802,WPS217
         self,
         request: resellers_pb2.CreateResellerRequest,
         context: aio.ServicerContext,
     ) -> resellers_pb2.CreateResellerResponse:
+        if self._promote_task:
+            self._promote_task.cancel()
+
         try:
             await self._company_client.get(request.reseller.company_id)
         except NotFoundError:
@@ -76,11 +82,11 @@ class ResellerService(
             )
         request.reseller.id = string.uuid()
 
-        return resellers_pb2.CreateResellerResponse(
-            reseller=await self._repository.insert(
-                request.reseller,
-            ),
-        )
+        reseller = await self._repository.insert(request.reseller)
+
+        await self._schedule_promote_reseller_config()
+
+        return resellers_pb2.CreateResellerResponse(reseller=reseller)
 
     async def GetReseller(  # type: ignore[override] # noqa: N802
         self,
@@ -121,6 +127,9 @@ class ResellerService(
         request: resellers_pb2.UpdateResellerRequest,
         context: aio.ServicerContext,
     ) -> resellers_pb2.UpdateResellerResponse:
+        if self._promote_task:
+            self._promote_task.cancel()
+
         reseller = await self._repository.find_by_id(request.reseller.id)
 
         if not reseller:
@@ -158,6 +167,8 @@ class ResellerService(
 
         await self._repository.upsert(new_reseller)
 
+        await self._schedule_promote_reseller_config()
+
         return resellers_pb2.UpdateResellerResponse(reseller=new_reseller)
 
     async def PromoteResellerConfig(  # type: ignore[override] # noqa: N802
@@ -165,15 +176,36 @@ class ResellerService(
         request: resellers_pb2.PromoteResellerConfigRequest,
         context: aio.ServicerContext,
     ) -> resellers_pb2.PromoteResellerConfigResponse:
+        try:
+            await self.promote_reseller_config()
+        except ValueError:
+            await context.abort(StatusCode.FAILED_PRECONDITION)
+
+        return resellers_pb2.PromoteResellerConfigResponse()
+
+    async def promote_reseller_config(self) -> None:
         resellers = [reseller async for reseller in await self._repository.all_()]
 
         reseller_config_updated = await self._update_resellers_config(resellers)
         currencies_config_updated = await self._update_currencies_config(resellers)
 
         if not currencies_config_updated or not reseller_config_updated:
-            return await context.abort(StatusCode.FAILED_PRECONDITION)
+            raise ValueError("No config updated")
 
-        return resellers_pb2.PromoteResellerConfigResponse()
+    async def _schedule_promote_reseller_config(self) -> None:
+        """Schedule promotion soon (resetting the timeout if already scheduled)."""
+        task = self._promote_task
+        # Must not have an await between create_task() and .cancel().
+        self._promote_task = asyncio.create_task(self._promote_soon())
+        if task:
+            task.cancel()
+            with suppress(asyncio.CancelledError):
+                await task
+
+    async def _promote_soon(self) -> None:
+        """Delay promotion, so multiple changes can be batched together."""
+        await asyncio.sleep(60)
+        await self.promote_reseller_config()
 
     async def _update_resellers_config(
         self,
@@ -188,7 +220,7 @@ class ResellerService(
 
         return await self._client.put_key(
             self._reseller_providers_key,
-            json.dumps(reseller_providers_mapping).encode(),
+            json.dumps(reseller_providers_mapping, indent=4, sort_keys=True).encode(),
         )
 
     async def _update_currencies_config(

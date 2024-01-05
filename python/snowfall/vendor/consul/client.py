@@ -45,6 +45,4 @@ class ConsulClient(HttpClient):
 
     @property
     def _auth_headers(self) -> dict[str, str]:
-        return {
-            "X-Consul-Token": self._token,
-        }
+        return {}
