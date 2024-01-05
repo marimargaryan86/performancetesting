@@ -2,6 +2,7 @@ from collections.abc import Sequence
 from unittest import mock
 
 import pytest
+from pytest_mock import MockerFixture
 
 from snowfall.project.pay.adapter import accounts, transactions
 from snowfall.project.pay.service.companies.v1.models_pb2 import (
@@ -94,3 +95,45 @@ async def booking_id(
     transactions_client: transactions.Client,
 ) -> str:
     return (await transactions_client.get(transaction_ids[0])).external_reference_id
+
+
+class StripeCustomer(object):
+    def __init__(self) -> None:
+        self.id: str = "mock_stripe_customer_id"
+
+
+class StripeEphemeralKey(object):
+    def __init__(self) -> None:
+        self.secret: str = "mocked_ephemeral_key_secret"
+
+
+@pytest.fixture()
+def stripe_customer(mocker: MockerFixture) -> StripeCustomer:
+    return mocker.patch("stripe.Customer.create", return_value=StripeCustomer())
+
+
+@pytest.fixture()
+def stripe_ephemeral_key(mocker: MockerFixture) -> StripeEphemeralKey:
+    return mocker.patch("stripe.EphemeralKey.create", return_value=StripeEphemeralKey())
+
+
+@pytest.fixture()
+def update_ory_identity(mocker: MockerFixture) -> str:
+    return mocker.patch(
+        "snowfall.adapter.identities.DictClient.update_ory_identity",
+        return_value="yo",
+    )
+
+
+class StripePaymentIntent(object):
+    def __init__(self) -> None:
+        self.client_secret: str = "what_a_time_to_be_alive"
+        self.stripe_id = "mock_stripe_id"
+
+
+@pytest.fixture()
+def create_payment_intent(mocker: MockerFixture) -> StripePaymentIntent:
+    return mocker.patch(
+        "stripe.PaymentIntent.create",
+        return_value=StripePaymentIntent(),
+    )

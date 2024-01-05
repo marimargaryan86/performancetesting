@@ -8,6 +8,7 @@ from starlette import middleware
 from starlette.middleware import authentication as auth_middleware
 
 from snowfall.adapter import authentication as auth_adapter
+from snowfall.adapter import identities
 from snowfall.project.junction.go.adapter import errors, orders, resellers
 from snowfall.project.junction.go.service.orders.v1 import orders_pb2_grpc
 from snowfall.project.junction.go.service.resellers.v1 import resellers_pb2_grpc
@@ -42,7 +43,7 @@ from snowfall.project.pay.service.transactions.v1 import (
 from snowfall.project.pay.service.transactions.v1.grpc_pb2_grpc import (
     QuotationsServiceStub,
 )
-from snowfall.service.authentication.v1 import sessions_pb2_grpc
+from snowfall.service.authentication.v1 import identities_pb2_grpc, sessions_pb2_grpc
 from snowfall.stdlib.instrumentation.httpx import metrics
 from snowfall.stdlib.integration.starlette import application as starlette
 from snowfall.stdlib.integration.starlette import authentication, handlers
@@ -171,6 +172,11 @@ async def _http(app: application.Application[Settings]) -> None:
                 bills_client=bills.GrpcClient(
                     transactions_pb2_grpc.BillsServiceStub(
                         channels.transactions,
+                    ),
+                ),
+                identities_client=identities.GrpcClient(
+                    identities_pb2_grpc.IdentitiesServiceStub(
+                        authentication_channel,
                     ),
                 ),
                 refunds_client=refunds.GrpcClient(

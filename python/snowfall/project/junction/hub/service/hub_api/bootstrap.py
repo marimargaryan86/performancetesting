@@ -1,5 +1,6 @@
 import lagom
 
+from snowfall.adapter import identities
 from snowfall.project.junction.go.adapter import orders, resellers
 from snowfall.project.junction.hub.service.hub_api import includes
 from snowfall.project.pay.adapter import (
@@ -24,6 +25,7 @@ def create_dependencies(
     companies_client: companies.Client,
     conversions_client: conversions.Client,
     beneficiaries_client: beneficiaries.Client,
+    identities_client: identities.Client,
     transactions_client: transactions.Client,
     currencies_client: currencies.Client,
     cc_payment_client: client.PaymentClient,
@@ -39,6 +41,7 @@ def create_dependencies(
     container[companies.Client] = companies_client  # type: ignore[type-abstract]
     container[conversions.Client] = conversions_client  # type: ignore[type-abstract]
     container[beneficiaries.Client] = beneficiaries_client  # type: ignore[type-abstract]
+    container[identities.Client] = identities_client  # type: ignore[type-abstract]
     container[transactions.Client] = transactions_client  # type: ignore[type-abstract]
     container[currencies.Client] = currencies_client  # type: ignore[type-abstract]
     container[client.PaymentClient] = cc_payment_client

@@ -7112,7 +7112,8 @@
             "required": [
               "amount",
               "currency",
-              "clientSecret"
+              "clientSecret",
+              "ephemeralKey"
             ],
             "properties": {
               "amount": {
@@ -7140,6 +7141,7 @@
           },
           "relationships": {
             "type": "object",
+            "readOnly": true,
             "properties": {
               "stripeCustomer": {
                 "type": "object",

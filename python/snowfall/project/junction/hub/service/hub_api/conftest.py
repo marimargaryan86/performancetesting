@@ -7,6 +7,7 @@ import pytest
 from starlette import applications, middleware
 from starlette.middleware import authentication as auth_middleware
 
+from snowfall.adapter import identities
 from snowfall.project.junction.go import fixtures
 from snowfall.project.junction.go.adapter import errors, orders, resellers
 from snowfall.project.junction.hub.service.hub_api import bootstrap, permissions, router
@@ -68,6 +69,11 @@ def orders_client() -> orders.Client:
         fixtures.get_journeys(),
         fixtures.get_cancellation_requests(),
     )
+
+
+@pytest.fixture()
+def identities_client() -> identities.Client:
+    return identities.DictClient([])
 
 
 @pytest.fixture()
@@ -361,6 +367,7 @@ def _create_app(
     contacts_client: contacts.Client,
     beneficiaries_client: beneficiaries.Client,
     conversions_client: conversions.Client,
+    identities_client: identities.Client,
     transactions_client: transactions.Client,
     currencies_client: currencies.Client,
     cc_payment_client: PaymentClient,
@@ -378,6 +385,7 @@ def _create_app(
                 contacts_client=contacts_client,
                 beneficiaries_client=beneficiaries_client,
                 conversions_client=conversions_client,
+                identities_client=identities_client,
                 transactions_client=transactions_client,
                 currencies_client=currencies_client,
                 cc_payment_client=cc_payment_client,
@@ -446,6 +454,7 @@ def app(
     accounts_client: accounts.Client,
     conversions_client: conversions.Client,
     beneficiaries_client: beneficiaries.Client,
+    identities_client: identities.Client,
     transactions_client: transactions.Client,
     currencies_client: currencies.Client,
     cc_payment_client: PaymentClient,
@@ -462,6 +471,7 @@ def app(
         conversions_client=conversions_client,
         beneficiaries_client=beneficiaries_client,
         transactions_client=transactions_client,
+        identities_client=identities_client,
         currencies_client=currencies_client,
         cc_payment_client=cc_payment_client,
         quotations_client=quotations_client,
@@ -479,6 +489,7 @@ def users_app(
     accounts_client: accounts.Client,
     conversions_client: conversions.Client,
     beneficiaries_client: beneficiaries.Client,
+    identities_client: identities.Client,
     transactions_client: transactions.Client,
     currencies_client: currencies.Client,
     cc_payment_client: PaymentClient,
@@ -497,6 +508,7 @@ def users_app(
         transactions_client=transactions_client,
         currencies_client=currencies_client,
         cc_payment_client=cc_payment_client,
+        identities_client=identities_client,
         quotations_client=quotations_client,
         bills_client=bills_client,
         refunds_client=refunds_client,
