@@ -231,6 +231,27 @@ def offer_group_generator(
     return wrapper
 
 
+def simple_criteria_task_generator(
+    search: offers_pb2.SimpleTripOfferSearch,
+) -> list[Criteria]:
+    return [
+        Criteria(
+            segments=[
+                common_pb2.Segment(
+                    legs=[
+                        common_pb2.Leg(
+                            origin=search.origin,
+                            destination=search.destination,
+                            departure_at=search.departure_at,
+                            type=search.allowed_segment_types[0],
+                        ),
+                    ],
+                ),
+            ],
+        ),
+    ]
+
+
 def _trip_to_criteria(
     trip: common_pb2.Trip,
 ) -> list[Criteria]:

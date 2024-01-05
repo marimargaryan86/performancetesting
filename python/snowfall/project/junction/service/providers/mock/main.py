@@ -10,6 +10,7 @@ from redis import asyncio as aioredis
 from snowfall.project.junction.provider import bookings as provider_bookings
 from snowfall.project.junction.provider import meta, service
 from snowfall.project.junction.provider import offers as provider_offers
+from snowfall.project.junction.provider import simple_offers as provider_simple_offers
 from snowfall.project.junction.service.providers.mock import (
     bookings,
     cache,
@@ -133,6 +134,30 @@ async def _offers_factory(
     )
 
 
+async def _simple_search_app(
+    app: service.Application[_Settings],
+    amqp_conn: abc.AbstractConnection,
+    redis_conn: aioredis.Redis[bytes],
+    stack: contextlib.AsyncExitStack,
+) -> provider_simple_offers.SimpleOfferSearchImplementation[offers.Criteria]:
+    offer_group_generator = offers.offer_group_generator(
+        generator=offers.Generator(
+            realistic_results=app.settings.realistic_results,
+            option_cache=cache.OptionCache(
+                client=redis.Client(redis_conn, prefix=app.name),
+            ),
+            ttl=app.settings.ttl,
+        ),
+    )
+
+    return provider_simple_offers.SimpleOfferSearchImplementation(
+        search_criteria_task_generator=offers.simple_criteria_task_generator,
+        search_criteria_generator=offers.criteria_generator,
+        offer_group_cache_key_generator=offers.cache_key,
+        offer_group_generator=offer_group_generator,
+    )
+
+
 async def _bookings_factory(
     app: service.Application[_Settings],
 ) -> provider_bookings.Implementation:
@@ -153,6 +178,7 @@ if __name__ == "__main__":
         meta_factory=_meta_factory,
         offers_factory=_offers_factory,
         bookings_factory=_bookings_factory,
+        simple_offers_factory=_simple_search_app,
     )
 
     entrypoint.enter_with_commands(

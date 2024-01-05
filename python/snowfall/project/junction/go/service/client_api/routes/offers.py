@@ -7,6 +7,7 @@ from collections.abc import Mapping, Sequence
 from typing import Any, ClassVar, cast
 
 import lagom
+import timezonefinder
 from dateutil import parser
 from starlette import endpoints, exceptions, requests, responses, status
 
@@ -37,6 +38,7 @@ from snowfall.stdlib.v1 import latlng_pb2
 
 _SESSION_TOKEN_LENGTH = 32
 _Passengers = list[dict[str, str]]
+_tz_finder = timezonefinder.TimezoneFinder()
 
 
 class Offer(endpoints.HTTPEndpoint):
@@ -531,9 +533,19 @@ class SimpleOfferSearches(object):
             longitude=criteria["origin"]["longitude"],
         )
 
+        origin_timezone = _tz_finder.timezone_at(
+            lng=criteria["origin"]["longitude"],
+            lat=criteria["origin"]["latitude"],
+        )
+
         destination_coords = latlng_pb2.LatLng(
             latitude=criteria["destination"]["latitude"],
             longitude=criteria["destination"]["longitude"],
+        )
+
+        destination_timezone = _tz_finder.timezone_at(
+            lng=criteria["destination"]["longitude"],
+            lat=criteria["destination"]["latitude"],
         )
 
         origin_ids = await self._get_provider_ids_by_coordinates(
@@ -549,9 +561,11 @@ class SimpleOfferSearches(object):
             simple_trip=models_pb2.SimpleTripOfferSearch(
                 origin=common_pb2.Point(
                     coordinates=origin_coords,
+                    time_zone=origin_timezone if origin_timezone else "",
                 ),
                 destination=common_pb2.Point(
                     coordinates=destination_coords,
+                    time_zone=destination_timezone if destination_timezone else "",
                 ),
                 departure_before=protobuf.datetime_to_protobuf(departure_before)
                 if departure_before
