@@ -10,11 +10,12 @@
 </script>
 
 <script lang="ts">
-  import VideoPlayer from "./video-player.svelte";
-  import PlayIcon from "components/icons/play-icon.svelte";
-  import { ensureDefined } from "utils/array";
-  import ClockIcon from "components/icons/clock-icon.svelte";
   import { getLocaleData } from "i18n";
+  import { ensureDefined } from "utils/array";
+  import Card from "components/ui/card.svelte";
+  import ClockIcon from "components/icons/clock-icon.svelte";
+  import PlayIcon from "components/icons/play-icon.svelte";
+  import VideoPlayer from "./video-player.svelte";
 
   const i18n = getLocaleData();
 
@@ -32,27 +33,30 @@
   <div class="videos">
     {#each $i18n.pages.knowledgeHub.videos.items as video}
       {@const action = videoPlayer?.open.bind(videoPlayer.open, video)}
-
-      <div class="video">
+      <Card variant="vertical">
         <button
+          slot="media"
+          class="media-button"
           style:background-image="url(https://img.youtube.com/vi/{video.id}/mqdefault.jpg)"
           on:click={action}
         >
           <PlayIcon variant="circle" />
         </button>
 
-        <span class="chip typography body-medium">
-          <ClockIcon variant="outlined" />
-          {getDuration(video.lengthS)}
-        </span>
+        <svelte:fragment slot="content">
+          <span class="chip typography body-medium">
+            <ClockIcon variant="outlined" />
+            {getDuration(video.lengthS)}
+          </span>
 
-        <div class="info">
-          <h3 class="typography title-large bold">{video.title}</h3>
-          <p class="typography body-large">
-            {video.description}
-          </p>
-        </div>
-      </div>
+          <div class="info">
+            <h3 class="typography title-large bold">{video.title}</h3>
+            <p class="typography body-large">
+              {video.description}
+            </p>
+          </div>
+        </svelte:fragment>
+      </Card>
     {/each}
   </div>
 </section>
@@ -75,26 +79,14 @@
     gap: 16px;
   }
 
-  .video {
-    display: flex;
-    flex-flow: column;
-    gap: 24px;
-    padding: 0 0 24px;
-    overflow: hidden;
-    background-color: var(--color-common-background-light-main);
-    border-radius: 16px;
-  }
-
-  .video > button {
-    display: flex;
-    flex-flow: column;
-    align-items: center;
-    justify-content: center;
+  .media-button {
+    width: 100%;
     height: 190px;
     padding: 0;
     background-repeat: no-repeat;
     background-size: cover;
     border: 0;
+    border-radius: 16px 16px 0 0;
     cursor: pointer;
   }
 
@@ -103,8 +95,9 @@
     gap: 8px;
     align-items: center;
     align-self: flex-start;
+    width: fit-content;
     height: 32px;
-    margin: 0 24px;
+    margin: 0;
     padding: 0 16px;
     color: var(--color-common-light-strong);
     background-color: transparent;
@@ -116,7 +109,7 @@
     display: flex;
     flex-flow: column;
     gap: 16px;
-    padding: 0 24px;
+    padding: 24px 0;
   }
 
   .info > p {
