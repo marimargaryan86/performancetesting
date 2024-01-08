@@ -15,7 +15,12 @@ from snowfall.stdlib.v1 import date_pb2, latlng_pb2
 
 
 class _IncrementalTime(object):
-    _current = datetime.datetime.now(tz=datetime.UTC)
+    _current = datetime.datetime(
+        year=2022,
+        month=4,
+        day=1,
+        tzinfo=datetime.UTC,
+    )
 
     @classmethod
     def get_time(cls) -> timestamp_pb2.Timestamp:
