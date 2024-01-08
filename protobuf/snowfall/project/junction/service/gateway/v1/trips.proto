@@ -64,6 +64,7 @@ message DrainTripSearchResultsResponse {
 message TripSearchResult {
   string id = 1;
   snowfall.project.junction.provider.v2alpha.Result result = 2;
+  string provider_id = 3;
 }
 
 message TripSearchTask {

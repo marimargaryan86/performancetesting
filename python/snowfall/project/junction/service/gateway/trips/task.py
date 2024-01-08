@@ -61,11 +61,8 @@ class Queue(consumer.AbstractQueue[trips_pb2.TripSearchTask]):
         ]
 
         for task in asyncio.as_completed(search_tasks):
-            for search_result in (await task).results:
-                yield trips_pb2.TripSearchResult(
-                    id=string.uuid(),
-                    result=search_result,
-                )
+            for search_result in await task:
+                yield search_result
 
 
 class _Metrics(contextlib.AbstractContextManager["_Metrics"]):
@@ -161,12 +158,19 @@ class Searcher(object):
         self,
         provider: providers.Provider,
         request: provider_trips_pb2.SearchTripsRequest,
-    ) -> provider_trips_pb2.SearchTripsResponse:
+    ) -> list[trips_pb2.TripSearchResult]:
         with _Metrics(provider=provider) as metrics:
             return_tuple = await self._search(provider, request)
             metrics.return_tuple = return_tuple
 
-            return return_tuple.response
+            return [
+                trips_pb2.TripSearchResult(
+                    id=string.uuid(),
+                    provider_id=provider.identifier,
+                    result=result,
+                )
+                for result in return_tuple.response.results
+            ]
 
     async def _search(
         self,
