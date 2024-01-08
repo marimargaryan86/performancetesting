@@ -1,5 +1,7 @@
 from collections.abc import Mapping
 
+import prometheus_client
+
 from snowfall.project.junction.plus.notification_channels import (
     channel,
     http_webhook,
@@ -23,6 +25,11 @@ class Channels(object):
             models_pb2.Channel.CHANNEL_HTTP_WEBHOOK: http_webhook_channel,
         }
         self._logger = stdout.get_logger()
+        self._notifications_metrics = prometheus_client.Counter(
+            "notifications_events_total",
+            "Total number of notifications sent through notification center",
+            ["sender", "receiver", "channel"],
+        )
 
     async def run(
         self,
@@ -34,7 +41,11 @@ class Channels(object):
     ) -> str | None:
         chan = self._get_channel(channel_type)
         if hasattr(chan, fun):  # noqa: WPS421
-            self._logger.warning(str(event))
+            self._notifications_metrics.labels(
+                sender=configuration_vector.reseller_id,
+                receiver=subscriber.id,
+                channel=channel_type,
+            ).inc()
             return await getattr(chan, fun)(
                 sender_configuration=configuration_vector,
                 receiver=subscriber,
