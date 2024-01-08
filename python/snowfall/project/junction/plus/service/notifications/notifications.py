@@ -209,41 +209,10 @@ class ConfigurationVectorRepository(
         self,
         selection_value: str,
         selector: str,
-    ) -> resultset.ResultSet[models_pb2.ConfigurationVector]:
+    ) -> models_pb2.ConfigurationVector | None:
         return await self._execute(
-            self._collection.aggregate,
-            [
-                {
-                    "$match": {
-                        selector: selection_value,
-                    },
-                },
-                {
-                    "$lookup": {
-                        "from": "subscribers",
-                        "localField": "reseller_id",
-                        "foreignField": "_id",
-                        "let": {"id": "$reseller_id"},
-                        "pipeline": [
-                            {"$match": {"$expr": {"$eq": ["$_id", "$$id"]}}},
-                            {
-                                "$project": {
-                                    "encryption_key": "$webhook_endpoint.encryption_key",
-                                    "path": "$webhook_endpoint.path",
-                                    "_id": 0,
-                                },
-                            },
-                        ],
-                        "as": "webhook_endpoint",
-                    },
-                },
-                {
-                    "$unwind": {
-                        "path": "$webhook_endpoint",
-                        "preserveNullAndEmptyArrays": True,
-                    },
-                },
-            ],
+            self._collection.find_one,
+            {selector: selection_value},
         )
 
     async def update(
@@ -274,11 +243,8 @@ class ConfigurationVectorRepository(
         consul_client: ConsulClient,
         consul_key: str,
     ) -> bool:
-        result = await self.find_by_selector(reseller_id, "reseller_id")
-
-        try:
-            vector = await result.take()
-        except StopAsyncIteration:
+        vector = await self.find_by_selector(reseller_id, "reseller_id")
+        if not vector:
             return False
 
         updated_permissions = set(

@@ -209,14 +209,21 @@ class ConfigurationVectorService(
         request: notifications_pb2.GetConfigurationVectorRequest,
         context: aio.ServicerContext,
     ) -> notifications_pb2.GetConfigurationVectorResponse:
-        aggregation_result = await self._configuration_vectors.find_by_selector(
+        configuration_vector = await self._configuration_vectors.find_by_selector(
             selection_value=request.identifier,
             selector=request.selector,
         )
-        try:
-            configuration_vector = await aggregation_result.take()
-        except StopAsyncIteration:
+        if not configuration_vector:
             return await context.abort(StatusCode.NOT_FOUND)
+
+        subscriber = await self._subscribers.find_by_id(request.identifier)
+        if subscriber:
+            configuration_vector.webhook_endpoint.path = (
+                subscriber.webhook_endpoint.path
+            )
+            configuration_vector.webhook_endpoint.encryption_key = (
+                subscriber.webhook_endpoint.encryption_key
+            )
 
         return notifications_pb2.GetConfigurationVectorResponse(
             configuration_vector=configuration_vector,
