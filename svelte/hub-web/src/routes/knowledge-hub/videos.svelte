@@ -109,7 +109,6 @@
     display: flex;
     flex-flow: column;
     gap: 16px;
-    padding: 24px 0;
   }
 
   .info > p {

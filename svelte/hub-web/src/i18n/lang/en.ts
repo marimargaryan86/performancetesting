@@ -105,6 +105,8 @@ export default {
     withAmounts: "With amounts",
     amount: "Amount",
     refundReference: "Refund reference",
+    bookTrip: "Book a Trip",
+    manageTrip: "Manage a Trip",
   },
   actions: {
     logout: "Logout",
@@ -156,6 +158,8 @@ export default {
     calculateRefundPosition: "Calculate refund position",
     issueRefund: "Issue refund",
     enterRefundReference: "Enter refund reference",
+    bookTrip: "Book Trip",
+    findTrip: "Find Trip",
   },
   sentences: {
     priceChange: "Price change",
@@ -223,6 +227,10 @@ export default {
     providerHowMuchWeGetBack: "Provider - how much we get back",
     refundReferenceInfo:
       "The refund has to be handled manually, please do so and enter the refund reference above",
+    bookTrip:
+      "Search, book and pay for multimodal content from thousands of providers and operators – in a single booking.",
+    manageTrip:
+      "Retrieve your trip to change or cancel bookings, view/print itinerary and much more.",
   },
   tableHeaders: {
     id: "ID",

@@ -1,11 +1,13 @@
 <script lang="ts">
   export let variant: "vertical" | "horizontal";
+  export let theme: "light" | "dark" = "light";
 </script>
 
 <div
   class="card"
   class:vertical={variant === "vertical"}
   class:horizontal={variant === "horizontal"}
+  class:dark={theme === "dark"}
 >
   {#if $$slots.media}
     <div
@@ -39,19 +41,27 @@
 
 <style>
   .card {
+    --background-color: var(--color-common-background-light-main);
+
     display: flex;
     gap: 24px;
-    background-color: var(--color-common-background-light-main);
+    background-color: var(--background-color);
     border-radius: 16px;
   }
 
   .card.horizontal {
-    flex-flow: column wrap;
+    flex-flow: row-reverse;
   }
 
   .card.vertical {
-    flex-flow: row wrap;
+    flex-flow: column;
     align-content: flex-start;
+  }
+
+  .card.dark {
+    --background-color: var(--color-main-primary-50);
+
+    background-color: var(--background-color);
   }
 
   .media-wrapper {
@@ -59,10 +69,21 @@
     flex-flow: column wrap;
     align-items: center;
     justify-content: center;
-    width: 100%;
   }
 
   .content-wrapper {
-    padding: 0 24px;
+    display: flex;
+    flex-flow: column;
+    gap: 24px;
+    justify-content: space-between;
+    padding: 24px;
+  }
+
+  .content-wrapper.horizontal {
+    padding-right: 0;
+  }
+
+  .content-wrapper.vertical {
+    padding-top: 0;
   }
 </style>

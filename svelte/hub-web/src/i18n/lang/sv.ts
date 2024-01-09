@@ -99,6 +99,8 @@ export default {
     withAmounts: "Med belopp",
     amount: "Belopp",
     refundReference: "Återbetalningsreferens",
+    bookTrip: "Boka en resa",
+    manageTrip: "Hantera en resa",
   },
   actions: {
     logout: "Logga ut",
@@ -150,6 +152,8 @@ export default {
     calculateRefundPosition: "Beräkna återbetalningsposition",
     issueRefund: "Utfärda återbetalning",
     enterRefundReference: "Ange återbetalningsreferens",
+    bookTrip: "Boka resa",
+    findTrip: "Hitta resa",
   },
   sentences: {
     priceChange: "Prisändring",
@@ -217,6 +221,10 @@ export default {
     providerHowMuchWeGetBack: "Leverantör - hur mycket vi får tillbaka",
     refundReferenceInfo:
       "Återbetalningen måste hanteras manuellt, vänligen gör det och ange återbetalningsreferensen ovan",
+    bookTrip:
+      "Sök, boka och betala för multimodalt innehåll från tusentals leverantörer och operatörer – i en enda bokning.",
+    manageTrip:
+      "Hämta din resa för att ändra eller avboka bokningar, visa/skriva ut resplan och mycket mer.",
   },
   tableHeaders: {
     id: "ID",
