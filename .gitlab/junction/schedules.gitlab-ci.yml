@@ -141,6 +141,7 @@ directferries:
     - autoscaler-XL
 
 .deploy-in-server:
+  timeout: 3h
   environment:
     name: $PREFIX
   resource_group: planner
@@ -197,6 +198,7 @@ directferries:
     for element in "${allocation_ids[@]}"; do
         nomad alloc restart "${element}"
     done
+  - sleep 30
   - |
     while [[ -n $(curl -s ${NOMAD_ADDR%:*}:8500/v1/health/checks/planner-development | jq '.[] | select(.Status != "passing")') ]]; do
         echo "Waiting for restarted service to become healthy. Checking health in 60 seconds"
