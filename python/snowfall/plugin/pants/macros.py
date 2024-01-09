@@ -1,4 +1,4 @@
-_BASE_IMAGE_SHA = "91f3e08712a854ff4a146b7cca7f1b7581f205bc589a06135f51590e00d2990e"
+_BASE_IMAGE_SHA = "5bab300be31cd472c6f45ba7c059415b0bdeb0a49b32ecc12060394d642fd192"
 
 
 def _generate_repository(build_file_dir, exclude: set[str]) -> str:  # type: ignore[no-untyped-def]  # noqa: ANN001

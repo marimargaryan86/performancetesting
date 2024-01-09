@@ -1,5 +1,5 @@
 [GLOBAL]
-pants_version = "2.20.0.dev1"
+pants_version = "2.20.0.dev4"
 level = "warn"
 pantsd_max_memory_usage = "8GiB"
 build_file_prelude_globs = ["python/snowfall/plugin/pants/macros.py"]
@@ -104,12 +104,12 @@ install_from_resolve = "python-default"
 interpreter_constraints = ["CPython==3.11.*"]
 
 [pex-cli]
-version = "v2.1.153"
+version = "v2.1.156"
 known_versions = [
-  "v2.1.153|linux_arm64 |235680f48be659a5d6f2e9e8323be926a4b859bd47c79008fd924cc2e2a87028|4205090",
-  "v2.1.153|linux_x86_64|235680f48be659a5d6f2e9e8323be926a4b859bd47c79008fd924cc2e2a87028|4205090",
-  "v2.1.153|macos_arm64 |235680f48be659a5d6f2e9e8323be926a4b859bd47c79008fd924cc2e2a87028|4205090",
-  "v2.1.153|macos_x86_64|235680f48be659a5d6f2e9e8323be926a4b859bd47c79008fd924cc2e2a87028|4205090",
+  "v2.1.156|linux_arm64 |b606aefcc5da71b16fd483ecf2114703332fb85e279825afdae45c05c975974b|3666831",
+  "v2.1.156|linux_x86_64|b606aefcc5da71b16fd483ecf2114703332fb85e279825afdae45c05c975974b|3666831",
+  "v2.1.156|macos_arm64 |b606aefcc5da71b16fd483ecf2114703332fb85e279825afdae45c05c975974b|3666831",
+  "v2.1.156|macos_x86_64|b606aefcc5da71b16fd483ecf2114703332fb85e279825afdae45c05c975974b|3666831",
 ]
 
 [protoc]
@@ -143,7 +143,7 @@ interpreter_constraints = ["CPython==3.11.*"]
 enable_resolves = true
 tailor_pex_binary_targets = false
 resolves = { python-default = "vendor/constraints.txt" }
-pip_version = "latest"
+pip_version = "23.3.2"
 
 [python-infer]
 unowned_dependency_behavior = "error"
