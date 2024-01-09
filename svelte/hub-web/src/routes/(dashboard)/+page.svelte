@@ -1,19 +1,29 @@
 <script lang="ts">
   import { dev } from "$app/environment";
+  import routeConfig from "routeConfig";
+  import { getLocaleData } from "i18n";
   import Button from "components/ui/button.svelte";
   import Card from "components/ui/card.svelte";
-  import { getLocaleData } from "i18n";
   import { getPageTitle } from "utils/page-title";
+  import FindTripDialog from "./find-trip-dialog.svelte";
   import TripGraphicOne from "assets/images/trip-graphic-1.png";
   import TripGraphicTwo from "assets/images/trip-graphic-2.png";
   import SearchingGraphic from "assets/images/searching.png";
 
   const i18n = getLocaleData();
+
+  let findTripDialog: FindTripDialog | undefined;
+
+  function searchOrders(): void {
+    alert("To be implemented.");
+  }
 </script>
 
 <svelte:head>
   <title>{getPageTitle($i18n.title, $i18n.pages.dashboard.title)}</title>
 </svelte:head>
+
+<FindTripDialog bind:this={findTripDialog} on:search={searchOrders} />
 
 <header>
   <h1 class="typography headline-medium bold">{$i18n.pages.dashboard.title}</h1>
@@ -25,26 +35,28 @@
       {@html $i18n.pages.dashboard.intro}
     </div>
 
-    {#if dev}
-      <div class="widgets">
-        <Card variant="horizontal">
-          <div slot="media" class="media trip-graphic">
-            <img
-              src={TripGraphicOne}
-              alt="Depiction of destinations and date range."
-              class="trip-graphic-1"
-            />
-            <img src={TripGraphicTwo} alt="Depiction of ticket prices." class="trip-graphic-2" />
-          </div>
-          <div slot="content" class="content">
-            <h3 class="typography headline-small bold">{$i18n.words.bookTrip}</h3>
-            <p class="typography label-large">{$i18n.sentences.bookTrip}</p>
-          </div>
-          <div slot="actions">
-            <Button>{$i18n.actions.bookTrip}</Button>
-          </div>
-        </Card>
+    <div class="widgets">
+      <Card variant="horizontal">
+        <div slot="media" class="media trip-graphic">
+          <img
+            src={TripGraphicOne}
+            alt="Depiction of destinations and date range."
+            class="trip-graphic-1"
+          />
+          <img src={TripGraphicTwo} alt="Depiction of ticket prices." class="trip-graphic-2" />
+        </div>
+        <div slot="content" class="content">
+          <h3 class="typography headline-small bold">{$i18n.words.bookTrip}</h3>
+          <p class="typography label-large">{$i18n.sentences.bookTrip}</p>
+        </div>
+        <div slot="actions">
+          <Button href={routeConfig.routes.tripManagement.routes.book.root}
+            >{$i18n.actions.bookTrip}</Button
+          >
+        </div>
+      </Card>
 
+      {#if dev}
         <Card variant="horizontal" theme="dark">
           <div slot="media" class="media searching-graphic-wrapper">
             <img
@@ -58,11 +70,13 @@
             <p class="typography label-large">{$i18n.sentences.manageTrip}</p>
           </div>
           <div slot="actions" class="actions alt">
-            <Button variant="outline">{$i18n.actions.findTrip}</Button>
+            <Button variant="outline" on:click={findTripDialog?.open}
+              >{$i18n.actions.findTrip}</Button
+            >
           </div>
         </Card>
-      </div>
-    {/if}
+      {/if}
+    </div>
   </div>
 </div>
 
@@ -181,6 +195,7 @@
 
   div > :global(button.outline):hover {
     --background-color: var(--color-main-primary-700);
+    --border-color: var(--color-main-primary-700);
     --color: var(--color-common-dark-strong);
   }
 </style>
