@@ -60,4 +60,3 @@ class NotificationsSettings(BenerailSettings, service.Settings):
     zendesk_booked_ticket_group_id: int
     zendesk_base_url: pydantic.AnyUrl
     zendesk_api_key: str
-    retry_ttl: datetime.timedelta = datetime.timedelta(hours=1)

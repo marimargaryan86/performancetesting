@@ -138,7 +138,6 @@ def notifications_consumer(
         booking_storage=booking_storage,
         zendesk_client=zendesk_client,
         zendesk_booked_ticket_group_id=123,
-        retry_ttl=datetime.timedelta(hours=1),
     )
 
 
