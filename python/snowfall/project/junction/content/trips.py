@@ -95,6 +95,16 @@ class TripService(service.Service, trips_pb2_grpc.TripServiceServicer):
 
         return await self._perform_search(request, context)
 
+    async def SearchOffers(  # type: ignore[override] # noqa: N802
+        self,
+        request: trips_pb2.SearchOffersRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> trips_pb2.SearchOffersResponse:
+        return await context.abort(
+            grpc.StatusCode.UNIMPLEMENTED,
+            "Offer searches are not implemented.",
+        )
+
     async def _validate_request(
         self,
         request: trips_pb2.SearchTripsRequest,

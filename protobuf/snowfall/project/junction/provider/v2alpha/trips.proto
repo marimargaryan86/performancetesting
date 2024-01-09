@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package snowfall.project.junction.provider.v2alpha;
 
+import "google/protobuf/timestamp.proto";
 import "snowfall/project/junction/v1/fare_type.proto";
 import "snowfall/project/junction/v1/segment_type.proto";
 import "snowfall/stdlib/v1/date.proto";
@@ -13,6 +14,7 @@ option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/
 
 service TripService {
   rpc SearchTrips(SearchTripsRequest) returns (SearchTripsResponse) {}
+  rpc SearchOffers(SearchOffersRequest) returns (SearchOffersResponse) {}
 }
 
 message Location {
@@ -113,4 +115,49 @@ message SearchTripsRequest {
 
 message SearchTripsResponse {
   repeated Result results = 1;
+}
+
+message Offer {
+  string id = 1;
+  snowfall.stdlib.v1.Money price = 2;
+  google.protobuf.Timestamp expires_at = 3;
+  // @todo: add more information from PriceQuote
+}
+
+message SearchOffersRequest {
+  message Segment {
+    string origin_ref = 1;
+    string destination_ref = 2;
+    snowfall.stdlib.v1.DateTime departure_at = 3;
+    snowfall.stdlib.v1.DateTime arrival_at = 4;
+    snowfall.project.junction.v1.SegmentType type = 5;
+    // @todo: add vendor and operator information
+  }
+  message Trip {
+    repeated Segment segments = 1;
+  }
+  message Passenger {
+    snowfall.stdlib.v1.Date date_of_birth = 1;
+  }
+  message OneWay {
+    Trip trip = 1;
+  }
+  message RoundTrip {
+    Trip outbound = 1;
+    Trip inbound = 2;
+  }
+  message MultiCity {
+    repeated Trip trips = 1;
+  }
+  oneof search_mode {
+    OneWay one_way = 1;
+    RoundTrip round_trip = 2;
+    MultiCity multi_city = 3;
+  }
+  repeated Passenger passengers = 4;
+  // @todo: add custom config data for the provider
+}
+
+message SearchOffersResponse {
+  repeated Offer offers = 1;
 }
