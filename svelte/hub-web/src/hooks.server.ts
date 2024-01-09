@@ -5,6 +5,7 @@ import { sequence } from "@sveltejs/kit/hooks";
 import { env } from "$env/dynamic/private";
 import { cookieStore } from "stores/cookie-store.server";
 import type { Locale } from "i18n";
+import languageData from "i18n/lang";
 
 function authHandle({ event, resolve }: Parameters<Handle>[0]): MaybePromise<Response> {
   const session = cookieStore.sessionToken.get(event);
@@ -57,7 +58,7 @@ function authHandle({ event, resolve }: Parameters<Handle>[0]): MaybePromise<Res
 function localeHandle({ event, resolve }: Parameters<Handle>[0]): MaybePromise<Response> {
   let locale = event.cookies.get("locale") as Locale | undefined;
 
-  if (!locale) {
+  if (!locale || !(locale in languageData)) {
     locale = "en-GB";
     event.cookies.set("locale", locale, {
       path: "/",

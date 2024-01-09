@@ -11,7 +11,6 @@
 </script>
 
 <script lang="ts">
-  import { dev } from "$app/environment";
   import ChevronIcon from "components/icons/chevron-icon.svelte";
   import LogoutIcon from "components/icons/logout-icon.svelte";
   import BugIcon from "components/icons/bug-icon.svelte";
@@ -131,16 +130,14 @@
         <span>{$i18n.actions.logout}</span>
       </button>
     </li>
-    {#if dev}
-      <li class="language-select">
-        <SelectField
-          options={languages.map((item) => item.locale)}
-          formatter={formatLanguageOption}
-          direction="up"
-          bind:value={$locale}
-        />
-      </li>
-    {/if}
+    <li class="language-select">
+      <SelectField
+        options={languages.map((item) => item.locale)}
+        formatter={formatLanguageOption}
+        direction="up"
+        bind:value={$locale}
+      />
+    </li>
   </ul>
 
   <Account {expanded} {transitionTimeMs} />
