@@ -52,6 +52,7 @@ class NotificationsConsumer(object):
         booking_storage: filesystem.Storage,
         zendesk_client: ZendeskClient,
         zendesk_booked_ticket_group_id: int,
+        retry_ttl: datetime.timedelta,
     ):
         self._booking_storage = booking_storage
         self._consumer = consumer_obj
@@ -59,6 +60,7 @@ class NotificationsConsumer(object):
         self._notifier = notifier
         self._zendesk_client = zendesk_client
         self._zendesk_booked_ticket_group_id = zendesk_booked_ticket_group_id
+        self._retry_ttl = retry_ttl
         self._logger = stdout.get_logger()
 
     async def consume(self) -> None:
@@ -127,7 +129,7 @@ class NotificationsConsumer(object):
         )
         time_passed = datetime.datetime.now(datetime.UTC) - created_at
 
-        if time_passed > _RETRY_TTL:
+        if time_passed > self._retry_ttl:
             self._logger.error(
                 "Ticket retrieval limit reached",
                 booking_id=message.body.booking_id,
