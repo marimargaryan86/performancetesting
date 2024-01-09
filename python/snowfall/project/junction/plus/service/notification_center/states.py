@@ -13,6 +13,12 @@ from snowfall.stdlib.logging import stdout
 
 
 class Channels(object):
+    _notifications_metrics = prometheus_client.Counter(
+        "notifications_events_total",
+        "Total number of notifications sent through notification center",
+        ["sender", "receiver", "channel"],
+    )
+
     def __init__(
         self,
         whatsapp_channel: whatsapp.Channel,
@@ -25,11 +31,6 @@ class Channels(object):
             models_pb2.Channel.CHANNEL_HTTP_WEBHOOK: http_webhook_channel,
         }
         self._logger = stdout.get_logger()
-        self._notifications_metrics = prometheus_client.Counter(
-            "notifications_events_total",
-            "Total number of notifications sent through notification center",
-            ["sender", "receiver", "channel"],
-        )
 
     async def run(
         self,
