@@ -19,7 +19,9 @@ from snowfall.project.junction.service.providers.benerail import (
     adapter,
     cache,
     config,
+    constant,
     criteria,
+    id_mapping,
     train_stations,
 )
 from snowfall.project.junction.service.providers.benerail.helper_functions import (
@@ -83,6 +85,9 @@ async def simple_search_app(
                 mapping=stations,
                 resolution=8,
             ),
+            _id_mapping=id_mapping.IdMappingRepository[train_stations.TrainStation](
+                mapping=stations,
+            ),
         ).criteria_task_generator,
         search_criteria_generator=criteria_generator,
         offer_group_cache_key_generator=cache.generate_cache_key,
@@ -126,8 +131,10 @@ class CriteriaGenerator(object):
     def __init__(
         self,
         h3_mapping: h3.H3MappingRepository[train_stations.TrainStation],
+        _id_mapping: id_mapping.IdMappingRepository[train_stations.TrainStation],
     ):
         self._mapping = h3_mapping
+        self._id_mapping = _id_mapping
 
     def criteria_task_generator(
         self,
@@ -135,15 +142,14 @@ class CriteriaGenerator(object):
     ) -> list[criteria.SearchCriteria]:
         allowed_segment_types = search.allowed_segment_types
         if models_pb2.Schedule.TYPE_RAIL in allowed_segment_types:
-            origins = self._mapping.find_mapped_values(
-                coordinates=search.origin.coordinates,
-                neighbour_search_radius=1,
+            origins = self._get_stations(
+                _get_provider_ids(search.origin_provider_ids),
+                search.origin.coordinates,
             )
-            destinations = self._mapping.find_mapped_values(
-                coordinates=search.destination.coordinates,
-                neighbour_search_radius=1,
+            destinations = self._get_stations(
+                _get_provider_ids(search.destination_provider_ids),
+                search.destination.coordinates,
             )
-
             if not origins or not destinations:
                 return []
 
@@ -153,6 +159,31 @@ class CriteriaGenerator(object):
                 search,
             )
         return []
+
+    def _get_stations(
+        self,
+        identifiers: Iterable[str] | None,
+        coordinates: latlng_pb2.LatLng,
+    ) -> set[train_stations.TrainStation]:
+        if identifiers is not None:
+            stations = self._id_mapping.find_mapped_values(
+                identifiers=identifiers,
+            )
+        else:
+            stations = self._mapping.find_mapped_values(
+                coordinates=coordinates,
+                neighbour_search_radius=1,
+            )
+        return stations
+
+
+def _get_provider_ids(
+    provider_ids: Iterable[offers_pb2.ProviderIds],
+) -> Iterable[str] | None:
+    for places_ids in provider_ids:
+        if places_ids.provider_id == str(constant.PROVIDER_ID):
+            return places_ids.place_ids
+    return None
 
 
 def create_criteria_time_windows(
