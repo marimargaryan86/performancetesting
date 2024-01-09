@@ -356,7 +356,7 @@ filterwarnings = [
   "ignore::DeprecationWarning:pydantic._internal._model_construction",
 ]
 
-addopts = "--import-mode=importlib --asyncio-mode=auto"
+addopts = "--import-mode=importlib --asyncio-mode=auto --dist loadscope"
 
 [tool.ruff]
 external = [
