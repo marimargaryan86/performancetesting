@@ -1,6 +1,7 @@
 from abc import abstractmethod
 
 from snowfall.project.pay.service.payments.v1 import credit_card_models_pb2
+from snowfall.stdlib import money
 
 
 class CreditCardProvider(object):
@@ -8,7 +9,7 @@ class CreditCardProvider(object):
     def get_credit_card_payment(
         self,
         payment_id: str,
-    ) -> credit_card_models_pb2.CreditCardPayment:
+    ) -> credit_card_models_pb2.CreditCardPayment | None:
         """Get payment detail."""
 
     @abstractmethod
@@ -17,6 +18,14 @@ class CreditCardProvider(object):
         payment: credit_card_models_pb2.CreditCardPayment,
     ) -> credit_card_models_pb2.CreditCardPayment:
         """Create payment."""
+
+    @abstractmethod
+    def update_credit_card_payment(
+        self,
+        payment_id: str,
+        amount: money.Money,
+    ) -> credit_card_models_pb2.CreditCardPayment | None:
+        """Update payment."""
 
     @abstractmethod
     async def get_credit_card_holder(

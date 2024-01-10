@@ -118,6 +118,10 @@ job "junction-extensions-mobile-api-http" {
               local_bind_port  = 8070
               destination_name = "client-api-${var.environment}"
             }
+            upstreams {
+              local_bind_port  = 8080
+              destination_name = "credit-card-payment-${var.environment}"
+            }
           }
         }
       }
@@ -160,6 +164,7 @@ job "junction-extensions-mobile-api-http" {
         data        = <<EOH
 JUNCTION_API_ADDRESS={{(printf "http://%s" (env "NOMAD_UPSTREAM_ADDR_client-api-${var.environment}"))}}
 TRANSACTIONS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_transactions-${var.environment}"))}}
+CREDIT_CARD_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_credit-card-payment-${var.environment}"))}}
 FLIGHT_PREDICTION_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_flight-prediction-${var.environment}"))}}
 CO2_EMISSIONS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_co2-emissions-grpc-${var.environment}"))}}
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}

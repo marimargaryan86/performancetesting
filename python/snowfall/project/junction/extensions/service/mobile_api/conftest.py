@@ -36,12 +36,13 @@ from snowfall.project.junction.extensions.service.mobile_api import (
 )
 from snowfall.project.junction.extensions.service.mobile_api.routes import router
 from snowfall.project.junction.extensions.service.mobile_api.v1alpha import models_pb2
+from snowfall.project.junction.go.adapter import errors
 from snowfall.project.junction.plus.adapter import flight_delay_predictor, trip_info
 from snowfall.project.junction.plus.service.external_dependencies.v1 import (
     models_pb2 as plus_services_models_pb2,
 )
 from snowfall.project.pay import fixtures as pay_fixtures
-from snowfall.project.pay.adapter import bills
+from snowfall.project.pay.adapter import bills, credit_card_payment
 from snowfall.project.pay.service.transactions.v1 import (
     models_pb2 as transactions_models_pb2,
 )
@@ -180,6 +181,10 @@ def _create_app(
             go_urls=["https://api.junction.dev"],
         ),
     )
+    asgi_app.add_exception_handler(
+        errors.NotFoundError,
+        handlers.not_found_error_handler,
+    )
     return asgi_app
 
 
@@ -249,16 +254,6 @@ async def user_groups_repository(
 ) -> repository.UserGroupsRepository:
     return repository.UserGroupsRepository(
         mongo_test_db["user_groups"],
-    )
-
-
-@pytest.fixture()
-async def stripe_users_repository(
-    mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
-) -> repository.StripeUsersRepository:
-    return repository.StripeUsersRepository(
-        mongo_test_db["stripe_users"],
-        create_stripe_customers=True,
     )
 
 
@@ -385,6 +380,11 @@ def predictions_client() -> flight_delay_predictor.Client:
 
 
 @pytest.fixture()
+def credit_card_payment_client() -> credit_card_payment.Client:
+    return credit_card_payment.DictClient()
+
+
+@pytest.fixture()
 def trip_info_client() -> trip_info.Client:
     return trip_info.DictClient(
         emissions=[
@@ -445,7 +445,6 @@ def app(
     plus_client: plus_http_client.Client,
     plus_poc_client: plus_poc_http_client.PlusClient,
     jwt_gen: jwt_generator.JwtGenerator,
-    stripe_users_repository: repository.StripeUsersRepository,
     loyalty_programs_repository: repository.LoyaltyProgramsRepository,
     preferences_repository: repository.PreferencesRepository,
     vouchers_repository: repository.VouchersRepository,
@@ -455,6 +454,7 @@ def app(
     bills_client: bills.Client,
     predictions_client: flight_delay_predictor.Client,
     trip_info_client: trip_info.Client,
+    credit_card_payment_client: credit_card_payment.Client,
 ) -> Iterator[applications.Starlette]:
     with spec.get_api_spec() as temp_spec_path:
         yield _create_app(
@@ -471,7 +471,7 @@ def app(
                 enums_values_repository,
                 smtp_client,
                 jwt_gen,
-                stripe_users_repository,
+                bootstrap.Switcher(create_stripe_customers=True),
                 loyalty_programs_repository,
                 preferences_repository,
                 vouchers_repository,
@@ -481,6 +481,7 @@ def app(
                 bills_client,
                 predictions_client,
                 trip_info_client,
+                credit_card_payment_client,
             ),
             openapi_path=temp_spec_path,
             custom_middlewares=[

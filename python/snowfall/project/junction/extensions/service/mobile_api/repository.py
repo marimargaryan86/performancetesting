@@ -288,29 +288,6 @@ class UsersRepository(
         return True
 
 
-class StripeUsersRepository(
-    repository.ProtoRepository[models_pb2.StripeUser],
-    mixins.FindByIdMixin[models_pb2.StripeUser],
-    mixins.InsertMixin[models_pb2.StripeUser],
-):
-    _proto = models_pb2.StripeUser
-
-    def __init__(
-        self,
-        *args: Any,
-        create_stripe_customers: bool,
-        **kwargs: Any,
-    ) -> None:
-        super().__init__(*args, **kwargs)
-        self.create_stripe_customers = create_stripe_customers
-
-    async def get(self, user_id: str) -> models_pb2.StripeUser | None:
-        return await self._execute(
-            self._collection.find_one,
-            filter={"internal_user_id": user_id},
-        )
-
-
 class LoyaltyProgramsRepository(
     repository.ProtoRepository[models_pb2.LoyaltyProgram],
 ):

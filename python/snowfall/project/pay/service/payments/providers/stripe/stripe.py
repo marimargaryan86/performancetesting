@@ -21,9 +21,12 @@ class Stripe(interfaces.CreditCardProvider):
     def get_credit_card_payment(
         self,
         payment_id: str,
-    ) -> credit_card_models_pb2.CreditCardPayment:
+    ) -> credit_card_models_pb2.CreditCardPayment | None:
         """Retrieve payment intent."""
-        payment_intent = stripe.PaymentIntent.retrieve(payment_id)
+        try:
+            payment_intent = stripe.PaymentIntent.retrieve(payment_id)
+        except stripe._error.InvalidRequestError:  # noqa: SLF001
+            return None
         intent_money = money.Money(
             payment_intent.amount,
             money.Currency(payment_intent.currency.upper()),
@@ -60,6 +63,30 @@ class Stripe(interfaces.CreditCardProvider):
         payment.secret = payment_intent.client_secret or ""
 
         return payment
+
+    def update_credit_card_payment(
+        self,
+        payment_id: str,
+        amount: money.Money,
+    ) -> credit_card_models_pb2.CreditCardPayment | None:
+        try:
+            updated_payment_intent = stripe.PaymentIntent.modify(
+                payment_id,
+                amount=amount.amount,
+            )
+        except stripe._error.InvalidRequestError:  # noqa: SLF001
+            return None
+
+        return credit_card_models_pb2.CreditCardPayment(
+            id=updated_payment_intent.id,
+            amount=amount.protobuf(),
+            capture_method=updated_payment_intent.capture_method,
+            credit_card_holder_id=updated_payment_intent.customer or "",  # type: ignore[arg-type]
+            enable_automatic_payment_method=updated_payment_intent.automatic_payment_methods[
+                "enabled"
+            ],  # type: ignore[index]
+            secret=updated_payment_intent.client_secret or "",
+        )
 
     async def get_credit_card_holder(
         self,

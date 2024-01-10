@@ -52,5 +52,6 @@ def test_create_and_get_credit_card_payment(
 
     fetched_payment = stripe_client.get_credit_card_payment(created_payment.id)
 
+    assert fetched_payment is not None
     assert created_payment.id == fetched_payment.id
     assert created_payment.amount == fetched_payment.amount

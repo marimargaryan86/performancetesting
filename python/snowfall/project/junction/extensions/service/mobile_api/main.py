@@ -27,6 +27,7 @@ from snowfall.project.junction.extensions.service.mobile_api import (
     plus_client as plus_poc_client,
 )
 from snowfall.project.junction.extensions.service.mobile_api.routes import router
+from snowfall.project.junction.go.adapter import errors
 from snowfall.project.junction.plus.adapter import flight_delay_predictor, trip_info
 from snowfall.project.junction.plus.service.external_dependencies.v1.grpc_pb2_grpc import (
     CO2EmissionsServiceStub,
@@ -35,7 +36,10 @@ from snowfall.project.junction.plus.service.external_dependencies.v1.grpc_pb2_gr
 from snowfall.project.junction.plus.service.flight_prediction.v1 import (
     flight_prediction_pb2_grpc,
 )
-from snowfall.project.pay.adapter import bills
+from snowfall.project.pay.adapter import bills, credit_card_payment
+from snowfall.project.pay.service.payments.v1.credit_card_pb2_grpc import (
+    CreditCardPaymentServiceStub,
+)
 from snowfall.project.pay.service.transactions.v1 import (
     grpc_pb2_grpc as transactions_pb2_grpc,
 )
@@ -187,6 +191,10 @@ async def _http(  # noqa: WPS217
         app,
         app.settings.co2_emissions_address,
     )
+    credit_card_payment_channel = await grpc_factory.make_insecure_channel(
+        app,
+        app.settings.credit_card_address,
+    )
     trip_info_client = trip_info.GrpcClient(
         CO2EmissionsServiceStub(
             trip_info_channel,
@@ -216,8 +224,7 @@ async def _http(  # noqa: WPS217
                     enums_values_repository=repository.EnumsValuesRepository(
                         redis_client=redis_client,
                     ),
-                    stripe_users_repository=repository.StripeUsersRepository(
-                        mongo["stripe_users"],
+                    create_stripe_customers=bootstrap.Switcher(
                         create_stripe_customers=app.settings.create_stripe_customers,
                     ),
                     smtp_client=smtp_cl,
@@ -254,6 +261,11 @@ async def _http(  # noqa: WPS217
                     httpx_client=junction_httpx_client,
                     predictions_client=predictions_client,
                     trip_info_client=trip_info_client,
+                    credit_card_payment_client=credit_card_payment.GrpcClient(
+                        CreditCardPaymentServiceStub(
+                            credit_card_payment_channel,
+                        ),
+                    ),
                 ),
             ),
             custom_middlewares=custom_middlewares,
@@ -266,6 +278,10 @@ async def _http(  # noqa: WPS217
                 mobile_handlers.go_status_error_handler,
                 go_urls=[app.settings.junction_api_address],
             ),
+        )
+        asgi_app.add_exception_handler(
+            errors.NotFoundError,
+            handlers.not_found_error_handler,
         )
 
         await starlette.serve(

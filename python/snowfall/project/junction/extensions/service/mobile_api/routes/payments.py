@@ -1,46 +1,53 @@
 import lagom
-import stripe
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.project.junction.extensions.service.mobile_api import (
     repository,
     validators,
 )
+from snowfall.project.junction.extensions.service.mobile_api.bootstrap import Switcher
 from snowfall.project.junction.extensions.service.mobile_api.routes import orders
 from snowfall.project.junction.extensions.service.mobile_api.v1alpha import models_pb2
+from snowfall.project.pay.adapter import credit_card_payment
 from snowfall.stdlib import money
 from snowfall.stdlib.integration.starlette import models, request_helpers
 
-_stripe_version = "2020-08-27"
-
 
 async def get_or_create_stripe_customer(
-    stripe_users_repository: repository.StripeUsersRepository,
+    credit_card_client: credit_card_payment.Client,
     users_repository: repository.UsersRepository,
     guests_repository: repository.GuestsRepository,
     user_id: str,
-) -> str:
-    stripe_user = await stripe_users_repository.get(user_id)
-    if stripe_user:
-        return stripe_user.id
+) -> tuple[str, str]:
+    stripe_user, ephemeral_key = await credit_card_client.get_credit_card_holder(
+        user_id,
+    )
+    if stripe_user.id:
+        return stripe_user.id, ephemeral_key
 
     user = await users_repository.find_by_id(user_id)
     if user:
-        api_response_user = stripe.Customer.create(
-            email=user.email,
-            name=user.first_name,
+        (
+            api_response_user,
+            ephemeral_key,
+        ) = await credit_card_client.create_credit_card_holder(
+            user_id,
+            user.email,
+            user.first_name,
         )
     else:
         guest = await guests_repository.find_by_id(user_id)
         if not guest:
             raise exceptions.HTTPException(status.HTTP_502_BAD_GATEWAY)
-        api_response_user = stripe.Customer.create()
-    stripe_user = models_pb2.StripeUser(
-        id=api_response_user.stripe_id or "",
-        internal_user_id=user_id,
-    )
-    await stripe_users_repository.insert(stripe_user)
-    return stripe_user.id
+        (
+            api_response_user,
+            ephemeral_key,
+        ) = await credit_card_client.create_credit_card_holder(
+            user_id,
+            "",
+            "",
+        )
+    return api_response_user.id, ephemeral_key
 
 
 class Payments(endpoints.HTTPEndpoint):
@@ -49,7 +56,8 @@ class Payments(endpoints.HTTPEndpoint):
         request: requests.Request,
         users_repository: repository.UsersRepository = lagom.injectable,
         guests_repository: repository.GuestsRepository = lagom.injectable,
-        stripe_users_repository: repository.StripeUsersRepository = lagom.injectable,
+        credit_card_client: credit_card_payment.Client = lagom.injectable,
+        switcher: Switcher = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
         intent_money = money.from_string(
@@ -58,30 +66,22 @@ class Payments(endpoints.HTTPEndpoint):
         )
         stripe_user_id = None
         ephemeral_key_secret = None
-        if stripe_users_repository.create_stripe_customers:
-            stripe_user_id = await get_or_create_stripe_customer(
-                stripe_users_repository,
+        if switcher.create_stripe_customers:
+            stripe_user_id, ephemeral_key_secret = await get_or_create_stripe_customer(
+                credit_card_client,
                 users_repository,
                 guests_repository,
                 request.user.username,
             )
-            ephemeral_key_secret = stripe.EphemeralKey.create(  # type: ignore[no-untyped-call]
-                customer=stripe_user_id,
-                stripe_version=_stripe_version,
-            ).secret
 
-        intent = stripe.PaymentIntent.create(
-            amount=intent_money.amount,
-            currency=intent_money.currency.code,
-            capture_method="manual",
-            customer=stripe_user_id,
-            automatic_payment_methods={
-                "enabled": True,
-            },
+        payment_intent = await credit_card_client.create_credit_card_payment(
+            amount=intent_money,
+            credit_card_holder_id=stripe_user_id or "",
+            enable_automatic_payment_method=True,
         )
 
         attributes = {
-            "clientSecret": intent.client_secret,
+            "clientSecret": payment_intent.secret,
             "ephemeralKey": ephemeral_key_secret,
             "customerId": stripe_user_id,
         }
@@ -94,7 +94,7 @@ class Payments(endpoints.HTTPEndpoint):
         return models.JsonApiResponse(
             models.Body(
                 data=models.Resource(
-                    id=intent.stripe_id or "",
+                    id=payment_intent.id,
                     type="payments",
                     attributes=attributes,
                 ),
@@ -109,20 +109,25 @@ class Payment(endpoints.HTTPEndpoint):
         request: requests.Request,
         voucher: models_pb2.Voucher | None,
         vouchers_repository: repository.VouchersRepository = lagom.injectable,
+        credit_card_client: credit_card_payment.Client = lagom.injectable,
     ) -> responses.Response:
         if voucher:
-            payment_intent = stripe.PaymentIntent.retrieve(
+            payment_intent = await credit_card_client.get_credit_card_payment(
                 request.path_params["paymentIntentId"],
             )
+            intent_amount = money.from_protobuf(payment_intent.amount)
             new_amount = (
-                payment_intent["amount"] - money.from_protobuf(voucher.price).amount
+                intent_amount.amount - money.from_protobuf(voucher.price).amount
             )
-
-            stripe.PaymentIntent.modify(
+            max_amount = max(
+                new_amount,
+                orders.MIN_CHARGE[intent_amount.currency.code],
+            )
+            await credit_card_client.update_credit_card_payment(
                 request.path_params["paymentIntentId"],
-                amount=max(
-                    new_amount,
-                    orders.MIN_CHARGE[payment_intent["currency"].upper()],
+                money.Money(
+                    amount=max_amount,
+                    currency=intent_amount.currency,
                 ),
             )
         return responses.Response(status_code=status.HTTP_204_NO_CONTENT)

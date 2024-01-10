@@ -5,6 +5,7 @@ from snowfall.project.pay.service.payments.v1 import (
     credit_card_pb2,
     credit_card_pb2_grpc,
 )
+from snowfall.stdlib import money
 from snowfall.stdlib.transport.grpc import service
 
 
@@ -32,6 +33,11 @@ class CreditCardPaymentService(
         context: grpc.aio.ServicerContext,
     ) -> credit_card_pb2.GetCreditCardPaymentResponse:
         payment = self._provider.get_credit_card_payment(request.payment_id)
+        if not payment:
+            await context.abort(
+                code=grpc.StatusCode.NOT_FOUND,
+                details="Payment not found",
+            )
         return credit_card_pb2.GetCreditCardPaymentResponse(payment=payment)
 
     async def CreateCreditCardPayment(  # type: ignore[override] # noqa: N802
@@ -43,6 +49,24 @@ class CreditCardPaymentService(
             request.payment,
         )
         return credit_card_pb2.CreateCreditCardPaymentResponse(payment=payment)
+
+    async def UpdateCreditCardPayment(  # type: ignore[override] # noqa: N802
+        self,
+        request: credit_card_pb2.UpdateCreditCardPaymentRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> credit_card_pb2.UpdateCreditCardPaymentResponse:
+        updated_payment = self._provider.update_credit_card_payment(
+            request.payment_id,
+            money.from_protobuf(request.amount),
+        )
+
+        if not updated_payment:
+            await context.abort(
+                code=grpc.StatusCode.NOT_FOUND,
+                details="Payment not found",
+            )
+
+        return credit_card_pb2.UpdateCreditCardPaymentResponse(payment=updated_payment)
 
     async def GetCreditCardHolder(  # type: ignore[override] # noqa: N802
         self,

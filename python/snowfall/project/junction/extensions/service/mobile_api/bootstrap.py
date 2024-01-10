@@ -1,3 +1,4 @@
+import dataclasses
 import datetime
 from collections.abc import Sequence
 
@@ -19,7 +20,7 @@ from snowfall.project.junction.plus.adapter import (
 from snowfall.project.junction.plus.adapter import (
     trip_info as trip_info_adapter,
 )
-from snowfall.project.pay.adapter import bills
+from snowfall.project.pay.adapter import bills, credit_card_payment
 from snowfall.stdlib.integration.starlette import application
 from snowfall.vendor.junction.go import client as go_http_client
 from snowfall.vendor.junction.plus import client as plus_http_client
@@ -28,6 +29,11 @@ from snowfall.vendor.junction.plus import client as plus_http_client
 class MigrateSettings(application.Settings):
     mongo_db: str
     mongo_dsn: AnyUrl
+
+
+@dataclasses.dataclass()
+class Switcher(object):
+    create_stripe_customers: bool
 
 
 class Settings(application.Settings):
@@ -57,6 +63,7 @@ class Settings(application.Settings):
     authentication_address: str | None = None
     junction_private_key: str | None = None
     transactions_address: str
+    credit_card_address: str
 
 
 def create_dependencies(
@@ -72,7 +79,7 @@ def create_dependencies(
     enums_values_repository: repository.EnumsValuesRepository,
     smtp_client: smtp.EmailClient,
     jwt_gen: jwt_generator.JwtGenerator,
-    stripe_users_repository: repository.StripeUsersRepository,
+    create_stripe_customers: Switcher,
     loyalty_programs_repository: repository.LoyaltyProgramsRepository,
     preferences_repository: repository.PreferencesRepository,
     vouchers_repository: repository.VouchersRepository,
@@ -82,6 +89,7 @@ def create_dependencies(
     bills_client: bills.Client,
     predictions_client: flight_prediction_adapter.Client,
     trip_info_client: trip_info_adapter.Client,
+    credit_card_payment_client: credit_card_payment.Client,
 ) -> lagom.Container:
     container = lagom.Container()
     container[repository.OrdersRepository] = orders_repository
@@ -96,7 +104,7 @@ def create_dependencies(
     container[repository.EnumsValuesRepository] = enums_values_repository
     container[smtp.EmailClient] = smtp_client
     container[jwt_generator.JwtGenerator] = jwt_gen
-    container[repository.StripeUsersRepository] = stripe_users_repository
+    container[Switcher] = create_stripe_customers
     container[repository.LoyaltyProgramsRepository] = loyalty_programs_repository
     container[repository.PreferencesRepository] = preferences_repository
     container[repository.VouchersRepository] = vouchers_repository
@@ -106,4 +114,5 @@ def create_dependencies(
     container[bills.Client] = bills_client  # type: ignore[type-abstract]
     container[flight_prediction_adapter.Client] = predictions_client  # type: ignore[type-abstract]
     container[trip_info_adapter.Client] = trip_info_client  # type: ignore[type-abstract]
+    container[credit_card_payment.Client] = credit_card_payment_client  # type: ignore[type-abstract]
     return container
