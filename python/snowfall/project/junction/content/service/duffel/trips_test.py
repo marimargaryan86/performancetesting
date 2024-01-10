@@ -8,7 +8,6 @@ import orjson
 import pytest
 import pytest_httpx
 
-from snowfall.project.junction.content import trips as provider_trips
 from snowfall.project.junction.content.service.duffel import trips
 from snowfall.project.junction.provider.v2alpha import trips_pb2
 from snowfall.stdlib.format import protobuf
@@ -104,10 +103,8 @@ async def trip_search_response(
     )
 
     return await trip_searcher.find_one_way(
-        provider_trips.OneWayRequest(
-            trip_search_one_way.one_way,
-            trip_search_one_way.passengers,
-        ),
+        trip_search_one_way.one_way,
+        trip_search_one_way.passengers,
     )
 
 
@@ -258,10 +255,8 @@ def test_passenger_with_age_is_added_to_request(
     trip_search_one_way: trips_pb2.SearchTripsRequest,
 ) -> None:
     offer_request = trips.one_way_to_offer_request(
-        provider_trips.OneWayRequest(
-            trip_search_one_way.one_way,
-            trip_search_one_way.passengers,
-        ),
+        trip_search_one_way.one_way,
+        trip_search_one_way.passengers,
     )
     passengers = offer_request.offer_data.passengers
     assert passengers
@@ -272,10 +267,8 @@ def test_slice_is_added_to_request(
     trip_search_one_way: trips_pb2.SearchTripsRequest,
 ) -> None:
     offer_request = trips.one_way_to_offer_request(
-        provider_trips.OneWayRequest(
-            trip_search_one_way.one_way,
-            trip_search_one_way.passengers,
-        ),
+        trip_search_one_way.one_way,
+        trip_search_one_way.passengers,
     )
     slices = offer_request.offer_data.slices
     assert slices

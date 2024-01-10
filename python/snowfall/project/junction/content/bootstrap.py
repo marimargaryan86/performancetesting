@@ -12,6 +12,7 @@ from snowfall.stdlib.transport.grpc import server, service
 
 Application = application.Application
 TripSearchImplementation = trips.TripSearchImplementation
+OfferSearchImplementation = trips.OfferSearchImplementation
 
 
 class ConfigurationError(Exception):
@@ -27,6 +28,7 @@ class ProviderConfiguration(NamedTuple):
     provider_id: uuid.UUID
     provider_name: str
     trip_search_implementation: TripSearchImplementation | None = None
+    offer_search_implementation: OfferSearchImplementation | None = None
 
 
 _Settings = TypeVar("_Settings", bound=Settings)
@@ -64,7 +66,8 @@ def create_grpc_services(config: ProviderConfiguration) -> list[service.Service]
             raise ConfigurationError("Trip search has unspecified capabilities.")
 
         trip_service = trips.TripService(
-            implementation=config.trip_search_implementation,
+            trip_search=config.trip_search_implementation,
+            offer_search=config.offer_search_implementation,
         )
 
     return [

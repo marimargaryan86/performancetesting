@@ -13,7 +13,8 @@ _PROVIDER_NAME = "Foo"
 
 
 async def _mock_one_way_implementation(
-    request: trips.OneWayRequest,
+    trip_request: trips_pb2.SearchTripsRequest.OneWay,
+    passengers: Iterable[trips_pb2.SearchTripsRequest.Passenger],
 ) -> trips_pb2.SearchTripsResponse:
     return trips_pb2.SearchTripsResponse()
 
