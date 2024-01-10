@@ -13,6 +13,7 @@
   import Fees from "../../../book/confirmation/fees.svelte";
   import { getPageTitle } from "utils/page-title";
   import { getLocale, getLocaleData } from "i18n";
+  import Price from "../../../components/price.svelte";
 
   export let data;
 
@@ -69,6 +70,10 @@
         <h3 class="typography title-large bold">{$i18n.words.itinerary}</h3>
 
         <Ticket identifier={reservationNo} title={$i18n.words.reservationNumber} />
+
+        {#if order}
+          <Price bookings={order.bookings} />
+        {/if}
 
         {#if data.markups}
           <Fees markups={data.markups} />

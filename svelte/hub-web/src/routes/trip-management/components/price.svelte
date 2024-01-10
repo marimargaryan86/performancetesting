@@ -2,9 +2,10 @@
   import { formatAmount } from "formatting/currency";
   import { getLocale, getLocaleData } from "i18n";
   import type { Price } from "integration/common/schemas/price";
-  import type { TripBooking } from "integration/junction-mobile-api/schemas/booking";
+  import type { TripBooking as MobileTripBooking } from "integration/junction-mobile-api/schemas/booking";
+  import type { TripBooking as HubTripBooking } from "integration/junction-hub-api/schemas/booking";
 
-  export let bookings: TripBooking[];
+  export let bookings: MobileTripBooking[] | HubTripBooking[];
 
   const locale = getLocale();
   const i18n = getLocaleData();
