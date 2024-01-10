@@ -98,7 +98,7 @@ def _get_row_sections(
     seats: Sequence[SeatMapSeat],
     currency: str,
 ) -> Sequence[seat_maps_pb2.SeatMapSection]:
-    # TODO: Separate the sections properly
+    # TODO(nikos.p): Separate the sections properly
     return [
         seat_maps_pb2.SeatMapSection(
             elements=[

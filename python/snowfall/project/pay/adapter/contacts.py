@@ -126,7 +126,7 @@ class GrpcClient(Client):
         cursor: str | None = None,
         limit: int | None = None,
     ) -> grpc_pb2.ListCompanyContactsResponse:
-        # TODO: handle INVALID_ARGUMENT
+        # TODO(sargisa): handle INVALID_ARGUMENT
         request = grpc_pb2.ListCompanyContactsRequest(
             page_token=cursor or "",
             company_id=company_id,

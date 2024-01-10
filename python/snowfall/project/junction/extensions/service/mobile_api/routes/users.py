@@ -152,7 +152,7 @@ class UserLoggedIn(endpoints.HTTPEndpoint):
                             status=str(status.HTTP_401_UNAUTHORIZED),
                             code="wrong_password",
                             detail="Provided password is wrong",
-                            #  TODO: add source parameter and change the models
+                            #  TODO(nikos.p): add source parameter and change the models
                         ),
                     ],
                 ),

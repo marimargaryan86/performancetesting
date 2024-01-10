@@ -86,7 +86,7 @@ class OfferGroupCache(object):
             tz=datetime.UTC,
         ) + datetime.timedelta(
             hours=1,
-        )  # TODO: tweak to what we want
+        )  # TODO(jyggen): tweak to what we want
 
         await self._redis.put(self._seen_key, b"\x00")
         await redis_types.put_expires_at_if_less_than_current(

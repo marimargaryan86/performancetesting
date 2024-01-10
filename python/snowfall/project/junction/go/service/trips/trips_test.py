@@ -65,7 +65,7 @@ async def test_trip_and_segments_repository(
     returned_trips = await trips_repo.find(["trip_1"], cursor="")
 
     assert (await anext(returned_trips)).id == "trip_1"
-    # TODO: test segments repository
+    # TODO(jyggen): test segments repository
 
 
 async def _insert_trip_search(

@@ -439,7 +439,7 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
         offer_search_id = request.path_params["offerSearchId"]
         cabin_classes = filters.get_cabin_class_filter(request)
 
-        # TODO: Check should probably be done in the RPC, but that requires refactoring.
+        # TODO(bolmis): Check should probably be done in the RPC, but that requires refactoring.
         await search_client.get(offer_search_id)
 
         pagination = pagination_helpers.get_pagination(request)

@@ -506,7 +506,7 @@ class SaveATrainAdapter(object):
         search_id: str,
         seat_code: str | None,
     ) -> tuple[booking.BookingResult, bytes]:
-        title_map = {  # TODO: map unspecified to something else?
+        title_map = {  # TODO(mislavv): map unspecified to something else?
             order_models_pb2.Passenger.Title.TITLE_UNSPECIFIED: enums.PassengerTitle.mr,
             order_models_pb2.Passenger.Title.TITLE_MR: enums.PassengerTitle.mr,
             order_models_pb2.Passenger.Title.TITLE_MRS: enums.PassengerTitle.mrs,
@@ -531,7 +531,7 @@ class SaveATrainAdapter(object):
                             date_of_birth=protobuf.protobuf_to_date(
                                 passenger.date_of_birth,
                             ),
-                            gender=(  # TODO: gender unspecified?
+                            gender=(  # TODO(mislavv): gender unspecified?
                                 enums.PassengerGender.male
                                 if passenger.gender
                                 == order_models_pb2.Passenger.GENDER_MALE
@@ -618,5 +618,5 @@ class Transformer(object):
                 operator_booking_references=[booking_info.search_identifier],
             ),
             ticket_urls=ticket_urls,
-            # TODO: No idea how to get created_at or updated_at from the booking model.
+            # TODO(hovhannes.d): No idea how to get created_at or updated_at from the booking model.
         )

@@ -196,7 +196,7 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
         self._nested_path_parts = self._root_path.split(".")
         self._clean_path = self._root_path.removeprefix("$")
         self.indexes_created_event = asyncio.Event()
-        # TODO: Probably use aiojobs in future to manage this task properly.
+        # TODO(sam.b): Probably use aiojobs in future to manage this task properly.
         asyncio.create_task(  # type: ignore[unused-awaitable]  # noqa: RUF006
             self._create_indexes(),
         )

@@ -162,7 +162,7 @@ async def create_order(  # noqa: WPS217
     )
     if not correct_amount:
         stripe.PaymentIntent.cancel(payment)
-        # TODO: split this into invalid amount & invalid currency. Create err func
+        # TODO(nikos.p): split this into invalid amount & invalid currency. Create err func
         return stdlib_models.JsonApiResponse(
             stdlib_models.Body(
                 errors=[

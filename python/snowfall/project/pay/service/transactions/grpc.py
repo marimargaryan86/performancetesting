@@ -208,7 +208,7 @@ class QuotationsService(
         request: grpc_pb2.CreateQuotationRequest,
         context: grpc.aio.ServicerContext,
     ) -> grpc_pb2.CreateQuotationResponse:
-        # TODO: validation for companies and currency when we create the microservices
+        # TODO(nikos.p): validation for companies and currency when we create the microservices
         try:
             rate = await self._get_rate(
                 request.from_currency,

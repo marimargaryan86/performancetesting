@@ -167,7 +167,7 @@ _transaction_header = {
         convert_amount_to_string,
         key="amounts.beneficiary",
     ),
-    # TODO: add Fixed Fee
+    # TODO(grigor.m): add Fixed Fee
     "Provider Reference": partial(_get_value, key="invoice_reference_id"),
     "GO Booking ID": partial(_get_value, key="external_reference_id"),
     "Payment Method": partial(_get_value, key="payment_method"),

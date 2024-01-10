@@ -111,7 +111,7 @@ class BookingHandler(object):
                     )
                     for passenger_details in task.passengers
                 ],
-                # TODO: this should not be hardcoded forever
+                # TODO(reuben.t): this should not be hardcoded forever
                 luggage=passenger.Luggage(
                     total=len(task.passengers),
                 ),
@@ -122,7 +122,7 @@ class BookingHandler(object):
 
         if booking_result.status == "CONFIRMED":
             try:
-                # TODO: this should be handled in a separate service
+                # TODO(reuben.t): this should be handled in a separate service
                 await self._notifier.send(
                     notifications.BookingNotification(task.metadata, booking_result),
                 )

@@ -70,7 +70,7 @@ async def parse_csv(  # noqa: WPS231
                 longitude=float(row["longitude"]),
                 max_distance_meters=_MAX_AIRPORT_M,
             )
-            # TODO: only locations in the same country
+            # TODO(jyggen): only locations in the same country
         ]
 
         location_ids = _filter_location_by_type(

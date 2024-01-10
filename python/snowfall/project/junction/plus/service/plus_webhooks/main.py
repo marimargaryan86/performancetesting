@@ -145,7 +145,7 @@ async def _serve(
         app,
         app.settings.notifications_address,
     )
-    # TODO: Replace with snowfall.stdlib.service.redis_factory.make_client
+    # TODO(arman.h): Replace with snowfall.stdlib.service.redis_factory.make_client
     redis_client = redis.Client[str](
         aioredis.from_url(
             str(

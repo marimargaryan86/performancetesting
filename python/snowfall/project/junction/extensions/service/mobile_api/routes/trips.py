@@ -58,7 +58,7 @@ class TripSearchesTrips(endpoints.HTTPEndpoint):
         response_body = models.Body(
             data=trip_search["data"],
             links={
-                # TODO: make a function inside pagination_helpers for that
+                # TODO(nikos.p): make a function inside pagination_helpers for that
                 "next": re.sub(
                     r"^.+\?",
                     str(

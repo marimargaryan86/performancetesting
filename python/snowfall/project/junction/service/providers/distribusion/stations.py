@@ -90,7 +90,7 @@ async def load_stations() -> list[Station]:
     )
 
     if json_content is None:
-        return []  # TODO: throw exception
+        return []  # TODO(alvaro.g): throw exception
 
     stations = json.loads(json_content.decode("utf-8"))
     return [await _make_station(station) for station in stations]

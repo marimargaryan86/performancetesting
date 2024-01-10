@@ -358,7 +358,7 @@ class OfferTransformer(object):
         origin = self._airports.get_by_iata(segment.origin.airport_code)
         destination = self._airports.get_by_iata(segment.destination.airport_code)
 
-        # TODO: does not handle multi-leg flights?
+        # TODO(jyggen): does not handle multi-leg flights?
         return offers_pb2.OfferSegment(
             id=string.uuid(),
             legs=[

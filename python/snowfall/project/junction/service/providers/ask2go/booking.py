@@ -202,7 +202,7 @@ class BookingHandler(object):
                         protobuf.protobuf_to_date(passenger.date_of_birth),
                         datetime.datetime.now(
                             tz=datetime.UTC,
-                        ).date(),  # TODO: date of travel
+                        ).date(),  # TODO(df): date of travel
                     ),
                     birth_date=protobuf.protobuf_to_date(passenger.date_of_birth),
                     traveler_document=models.traveler_document_from_proto(
@@ -238,7 +238,7 @@ class BookingHandler(object):
         await self._storage.put(pathlib.Path(booking_result.id), raw_response)
 
         try:
-            # TODO: this should be handled in a separate service
+            # TODO(jyggen): this should be handled in a separate service
             await self._notifier.send(
                 notifications.BookingNotification(metadata, booking_result),
             )
@@ -314,5 +314,5 @@ class Transformer(object):
                 ),
                 operator_booking_references=booking_result.information.check_in_locators,
             ),
-            # TODO: No idea how to get created_at or updated_at from the booking model.
+            # TODO(bolmis): No idea how to get created_at or updated_at from the booking model.
         )

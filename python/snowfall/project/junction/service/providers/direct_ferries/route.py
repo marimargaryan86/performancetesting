@@ -38,7 +38,7 @@ def load_routes() -> list[Route]:
     )
 
     if json_content is None:
-        return []  # TODO: throw exception
+        return []  # TODO(aramh): throw exception
 
     routes = json.loads(json_content.decode("utf-8"))
 

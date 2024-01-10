@@ -185,7 +185,7 @@ class BookingHandler(object):
         )
 
         try:
-            # TODO: this should be handled in a separate service
+            # TODO(andriy.n): this should be handled in a separate service
             await self._notifier.send(
                 notifications.BookingNotification(task.metadata, order_response),
             )
@@ -266,7 +266,7 @@ class Transformer(object):
                 operator_booking_references=booking_references,
             ),
             created_at=created_at,
-            # TODO: No idea how to get updated_at from the booking model.
+            # TODO(hovhannes.d): No idea how to get updated_at from the booking model.
         )
 
 

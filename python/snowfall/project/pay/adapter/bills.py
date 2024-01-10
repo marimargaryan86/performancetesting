@@ -167,7 +167,7 @@ class GrpcClient(Client):
         cursor: str | None = None,
         sort: sort_pb2.Sort | None = None,
     ) -> grpc_pb2.ListBillsResponse:
-        # TODO: handle INVALID_ARGUMENT
+        # TODO(sargisa): handle INVALID_ARGUMENT
         request = grpc_pb2.ListBillsRequest(
             page_token=cursor or "",
             sort_by=sort,

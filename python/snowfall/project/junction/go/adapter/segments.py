@@ -70,7 +70,7 @@ class GrpcClient(Client):
         limit: int | None = None,
         cursor: str | None = None,
     ) -> trips_pb2.ListSegmentsResponse:
-        # TODO: handle INVALID_ARGUMENT
+        # TODO(jyggen): handle INVALID_ARGUMENT
         request = trips_pb2.ListSegmentsRequest(
             page_token=cursor or "",
             ids=identifiers or [],

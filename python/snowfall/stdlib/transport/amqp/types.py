@@ -86,7 +86,7 @@ class Message(Generic[_Proto]):
         if self.processed:
             return
 
-        # TODO: make sure we don't requeue forever?
+        # TODO(jyggen): make sure we don't requeue forever?
         await self._message.nack(requeue=True)
         self.status = MessageStatus.requeued
 

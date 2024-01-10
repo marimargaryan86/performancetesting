@@ -157,7 +157,7 @@ class MessageHandler(object):
         await session.delete(hash_key)
 
 
-# TODO: Change this to class method and use it as decorator to register handlers
+# TODO(nikos.p): Change this to class method and use it as decorator to register handlers
 def message_handlers(fun: str) -> Any:
     return {
         "subscribe": subscribe,
@@ -491,7 +491,7 @@ async def plan_selected_trip(
 async def check_in(
     **kwargs: Any,
 ) -> _HandlersResponse:
-    # TODO: After test change back to unimplemented text message
+    # TODO(arman.h): After test change back to unimplemented text message
     raise RuntimeError("Check-in feature is not implemented yet.")
 
 

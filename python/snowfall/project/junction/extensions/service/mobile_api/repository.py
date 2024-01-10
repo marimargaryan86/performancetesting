@@ -111,7 +111,7 @@ class PlacesRepository(
                         "$or": [
                             {"country_name": country_regex},
                             {"country_code": country_regex},
-                            # TODO: Fix areas in places to better match main_city.
+                            # TODO(sam.b): Fix areas in places to better match main_city.
                             # {"main_city": main_city_regex},  # noqa: ERA001
                         ],
                     },
@@ -321,7 +321,7 @@ class PreferencesRepository(repository.DefaultRepository):
         return await self._execute(self._collection.find_one, {"user_id": user_id})
 
     async def update_preferences(self, user_id: str, preferences: Any) -> None:
-        # TODO: check if I can do it in 1 aggregation pipeline
+        # TODO(nikos.p): check if I can do it in 1 aggregation pipeline
         saved_preferences = await self.find_by_user_id(user_id)
         if saved_preferences:
             saved_preferences = dict(saved_preferences)
@@ -535,7 +535,7 @@ class UserGroupsRepository(
     _proto = models_pb2.UserGroup
     _indexes = (pymongo.IndexModel("user_id", background=True),)
 
-    # TODO: Add pagination
+    # TODO(nikos.p): Add pagination
     async def find_by_user(
         self,
         user_id: str,
@@ -577,7 +577,7 @@ class UserGroupsRepository(
         member[repository.mongo_id_key] = member_id
         member["created_at"] = datetime.datetime.now(tz=datetime.UTC)
         member["updated_at"] = datetime.datetime.now(tz=datetime.UTC)
-        # TODO: check somehow for limit of members from env_var
+        # TODO(nikos.p): check somehow for limit of members from env_var
         await self._execute(
             self._collection.update_one,
             {repository.mongo_id_key: group_id, "user_id": user_id},

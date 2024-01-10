@@ -103,7 +103,7 @@ class GrpcClient(Client):
         limit: int | None = None,
         cursor: str | None = None,
     ) -> places_pb2.ListLocationsResponse:
-        # TODO: handle INVALID_ARGUMENT
+        # TODO(jyggen): handle INVALID_ARGUMENT
         request = places_pb2.ListLocationsRequest(
             page_token=cursor or "",
             ids=models_pb2.ListOfIds(ids=identifiers or []),

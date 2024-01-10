@@ -52,7 +52,7 @@ if TYPE_CHECKING:
         [
             application.Application[_Settings],
             abc.AbstractConnection,
-            aioredis.Redis[bytes],  # TODO: accept Redis client instead.
+            aioredis.Redis[bytes],  # TODO(jyggen): accept Redis client instead.
             contextlib.AsyncExitStack,
         ],
         Awaitable[
@@ -63,7 +63,7 @@ if TYPE_CHECKING:
         [
             application.Application[_Settings],
             abc.AbstractConnection,
-            aioredis.Redis[bytes],  # TODO: accept Redis client instead.
+            aioredis.Redis[bytes],  # TODO(reuben.t): accept Redis client instead.
             contextlib.AsyncExitStack,
         ],
         Awaitable[simple_offers.SimpleOfferSearchImplementation[_SearchCriteria,]],

@@ -54,4 +54,4 @@ class VoucherPayment(Payment):
     """Voucher payment schema."""
 
     payment_type: Literal["voucher"] = pydantic.Field(..., alias="type")
-    # TODO: Impl.
+    # TODO(alvaro.g): Impl.

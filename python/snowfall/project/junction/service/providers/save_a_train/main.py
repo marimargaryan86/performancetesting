@@ -148,7 +148,7 @@ async def _offers_factory(
     booking_storage = await stack.enter_async_context(
         filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
     )
-    # TODO: do we need to call get_token on the save_a_train_client?
+    # TODO(mislavv): do we need to call get_token on the save_a_train_client?
     sat_adapter = adapter.SaveATrainAdapter(
         save_a_train_client=save_a_train_client,
         train_station_repository=train_stations.TrainStationRepository(
@@ -247,7 +247,7 @@ async def _orders(  # noqa: WPS217
         api_search_requests_limit=app.settings.api_search_requests_limit,
         client=http_client,
     )
-    # TODO: do we need to call get_token on the save_a_train_client?
+    # TODO(mislavv): do we need to call get_token on the save_a_train_client?
     booking_storage = await app.stack.enter_async_context(
         filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
     )
@@ -492,7 +492,7 @@ async def _load_train_stations() -> list[train_stations.TrainStation]:
     )
 
     if json_content is None:
-        return []  # TODO: throw exception
+        return []  # TODO(mislavv): throw exception
 
     stations = json.loads(json_content.decode("utf-8"))
     return [await train_stations.make_train_station(station) for station in stations]

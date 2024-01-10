@@ -35,7 +35,7 @@ def load_ports() -> list[Port]:
     )
 
     if json_content is None:
-        return []  # TODO: throw exception
+        return []  # TODO(aramh): throw exception
 
     ports = json.loads(json_content.decode("utf-8"))
 

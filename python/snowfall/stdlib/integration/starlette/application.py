@@ -49,7 +49,7 @@ def create_starlette_app(
 
     validation_mode = middlewares.ValidationMode.disabled
 
-    # @todo: pass environment from global application object
+    # TODO(jyggen): pass environment from global application object
     match os.environ.get("ENV_NAME", "local"):
         case "local":
             validation_mode = middlewares.ValidationMode.eager

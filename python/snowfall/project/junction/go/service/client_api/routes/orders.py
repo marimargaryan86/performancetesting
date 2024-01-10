@@ -198,7 +198,7 @@ class OrdersByJourney(endpoints.HTTPEndpoint):
                 body.get("residenceAddress", {}),
             ),
         )
-        # TODO: Expire (delete) the offer the order was placed for.
+        # TODO(bolmis): Expire (delete) the offer the order was placed for.
 
         return await messages.create_response(
             body=models.Body(

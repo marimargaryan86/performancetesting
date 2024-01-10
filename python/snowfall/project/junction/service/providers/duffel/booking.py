@@ -151,7 +151,7 @@ class BookingHandler(object):
             return new_booking
 
         try:
-            # TODO: this should be handled in a separate service
+            # TODO(alexey.c): this should be handled in a separate service
             await self._notifier.send(
                 notifications.BookingNotification(task.metadata, booking_result),
             )

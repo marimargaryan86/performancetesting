@@ -161,7 +161,7 @@ class GrpcClient(Client):
         limit: int | None = None,
         cursor: str | None = None,
     ) -> grpc_pb2.ListCompaniesResponse:
-        # TODO: handle INVALID_ARGUMENT
+        # TODO(sargisa): handle INVALID_ARGUMENT
         request = grpc_pb2.ListCompaniesRequest(
             ids=models_pb2.ListOfIds(ids=identifiers or []),
             page_token=cursor or "",
@@ -178,7 +178,7 @@ class GrpcClient(Client):
         limit: int | None = None,
         cursor: str | None = None,
     ) -> grpc_pb2.ListCompaniesResponse:
-        # TODO: handle INVALID_ARGUMENT
+        # TODO(sargisa): handle INVALID_ARGUMENT
         request = grpc_pb2.ListCompaniesRequest(
             page_token=cursor or "",
             is_accountless=True,

@@ -112,7 +112,7 @@ class TripOfferSearcher(Generic[_SearchCriteriaTask, _SearchCriteria]):
         self,
         task: _SearchCriteriaTask,
     ) -> AsyncIterator[legacy_offers_pb2.OfferGroup]:
-        # TODO: shared protobuf, or type intersection support in Python
+        # TODO(jyggen): shared protobuf, or type intersection support in Python
         if not hasattr(task, "segments"):  # noqa: WPS421
             raise TypeError
 

@@ -71,7 +71,7 @@ def check_preference_ref(input_dict: Mapping[str, Any]) -> bool:
 def get_preference(input_dict: Mapping[str, Any]) -> dict[str, Any]:
     preference = Preference(**input_dict)
     if not check_preference_value(preference, Refs[input_dict[_REF_KEY]].value):
-        # TODO: change to include error message with value_type missmatch indicator.
+        # TODO(nikos.p): change to include error message with value_type missmatch indicator.
         raise exceptions.HTTPException(status.HTTP_400_BAD_REQUEST)
     return preference.model_dump()
 

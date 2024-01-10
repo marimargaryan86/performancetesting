@@ -304,7 +304,7 @@ class GrpcClient(Client):
                 "Should provide only one parameter 'external_reference_ids' or"
                 " 'transaction_ids'",
             )
-        # TODO: handle INVALID_ARGUMENT
+        # TODO(sargisa): handle INVALID_ARGUMENT
         request = grpc_pb2.ListRefundsRequest(
             page_token=cursor or "",
             statuses=statuses,  # type: ignore[arg-type]

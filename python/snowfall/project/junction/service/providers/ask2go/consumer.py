@@ -134,7 +134,7 @@ class SeatMapRpcServer(object):
         logging.getLogger("aiormq.connection").addFilter(SkipConnectionLostFilter())
 
     async def consume(self) -> None:  # noqa: WPS217
-        # TODO: refactor to rpc_server class
+        # TODO(nikos.p): refactor to rpc_server class
         connection = await connect_robust(self._address)
         channel = await connection.channel()
 

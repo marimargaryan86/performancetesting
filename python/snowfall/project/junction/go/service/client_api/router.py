@@ -132,7 +132,7 @@ def get_routes(
             trips.TripSegments,
             name="ListTripSegments",
         ),
-        # TODO: add GET /trips/{tripId}/prices
+        # TODO(bolmis): add GET /trips/{tripId}/prices
         integration.route(
             "/trips/searches/{tripSearchId}",
             trips.TripSearch,
@@ -143,7 +143,7 @@ def get_routes(
             legs.LegsByTripSearchId,
             name="ListLegsByTripSearchId",
         ),
-        # TODO: add GET /trips/searches/{tripSearchId}/segments
+        # TODO(bolmis): add GET /trips/searches/{tripSearchId}/segments
         integration.route(
             "/trips/searches/{tripSearchId}/trips",
             trips.TripsByTripSearch,
@@ -184,7 +184,7 @@ def get_routes(
             offers.OffersByOfferSearch,
             name="ViewOffersByOfferSearch",
         ),
-        # TODO: add GET /offers/searches/{offerSearchId}/related
+        # TODO(bolmis): add GET /offers/searches/{offerSearchId}/related
         routes.to_route(
             "/offers/quotes",
             price_quotes_handler.post,

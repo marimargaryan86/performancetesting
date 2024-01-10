@@ -237,7 +237,7 @@ class Transformer(object):
     async def raw_to_booking(self, raw: bytes) -> bookings_pb2.Booking:
         order_response = response_order_schemas.OrderResponse.parse_raw(raw)
 
-        # TODO: How to figure out real status?
+        # TODO(hovhannes.d): How to figure out real status?
         booking_status = bookings_pb2.Booking.STATUS_NOT_TICKETED
 
         return bookings_pb2.Booking(
@@ -251,5 +251,5 @@ class Transformer(object):
                 record_locator=order_response.order.pnr,
                 operator_booking_references=[order_response.order.pnr],
             ),
-            # TODO: No idea how to get created_at or updated_at from the booking model.
+            # TODO(hovhannes.d): No idea how to get created_at or updated_at from the booking model.
         )

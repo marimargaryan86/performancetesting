@@ -127,7 +127,7 @@ class GrpcClient(Client):
         limit: int | None = None,
         cursor: str | None = None,
     ) -> payments_pb2.ListPaymentsResponse:
-        # TODO: handle INVALID_ARGUMENT
+        # TODO(sargisa): handle INVALID_ARGUMENT
         request = payments_pb2.ListPaymentsRequest(
             page_token=cursor or "",
         )

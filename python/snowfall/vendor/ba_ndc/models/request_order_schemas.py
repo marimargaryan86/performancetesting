@@ -69,7 +69,7 @@ class PassengerPartial(BaseSchema):
         description="Identity documents list associated to this passenger",
     )
 
-    # TODO: Extend
+    # TODO(alvaro.g): Extend
 
 
 class CreateOrderRequest(BaseSchema):

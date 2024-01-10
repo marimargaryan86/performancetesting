@@ -84,7 +84,7 @@ def _validate_groups(
                     ),
                 )
 
-            # TODO: validate services?
+            # TODO(jyggen): validate services?
             has_errors = _validate_tasks(
                 template_path,
                 filename,
