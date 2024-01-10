@@ -565,11 +565,15 @@ class CreateCancellationTaskHandler(object):
                 cancellation_response.cancellation.status
                 == provider_bookings_pb2.BookingCancellation.STATUS_REFUND_DUE
             )
-            refunded_us = money.from_protobuf(
-                cancellation_response.cancellation.refunded_us,
+            refunded_us = (
+                money.from_protobuf(
+                    cancellation_response.cancellation.refunded_us,
+                )
+                if cancellation_response.cancellation.HasField("refunded_us")
+                else None
             )
 
-            if refund_due and refunded_us.amount:
+            if refund_due and refunded_us and refunded_us.amount:
                 try:
                     await self._refund_client.create(
                         refund_models_pb2.Refund(

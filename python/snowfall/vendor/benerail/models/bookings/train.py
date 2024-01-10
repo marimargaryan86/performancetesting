@@ -76,7 +76,7 @@ class ReservationDetails(BenerailBaseModel):
 
 class Admission(BenerailBaseModel):
     reservations: list[ResourceLink] | None = None
-    is_reservation_required: bool
+    is_reservation_required: bool | None = None
     validity_start_date: str | None = None
     validity_end_date: str | None = None
 

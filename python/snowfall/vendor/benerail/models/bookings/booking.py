@@ -16,6 +16,7 @@ from snowfall.vendor.benerail.models.bookings.train import (
 from snowfall.vendor.benerail.models.link import RcodeLink, ResourceLink
 from snowfall.vendor.benerail.models.place import Place
 from snowfall.vendor.benerail.models.products.product import ComfortClass
+from snowfall.vendor.benerail.models.trip_offers.link import OfferPartResourceLink
 
 
 class Fulfillment(BenerailBaseModel):
@@ -31,6 +32,7 @@ class Fulfillment(BenerailBaseModel):
     price: Price | None = None
     issue_language: str | None = None
     documents: list[Document] | None = None
+    offer_parts: list[OfferPartResourceLink] | None = None
 
 
 class Booking(BenerailBaseModel):
@@ -107,8 +109,8 @@ class BookedOfferPartCommon(BenerailBaseModel):
 
 
 class BookedOfferPart(BenerailBaseModel):
-    identifier: str | None = Field(None, alias="id")
-    booked_offer_id: str | None = None
+    identifier: str = Field(..., alias="id")
+    booked_offer_id: str
     offer_part_common: BookedOfferPartCommon | None = None
     offer_part_specific: Reservation | Admission | None = None
 

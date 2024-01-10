@@ -3,7 +3,10 @@ from datetime import datetime
 from pydantic.v1 import AnyUrl, ConstrainedStr, Field
 
 from snowfall.vendor.benerail.models.base import BenerailBaseModel
-from snowfall.vendor.benerail.models.products.enums import ServiceClassType
+from snowfall.vendor.benerail.models.products.enums import (
+    AfterSalesConditionHorizon,
+    ServiceClassType,
+)
 
 
 class ConditionAfterSalesFee(BenerailBaseModel):
@@ -69,3 +72,5 @@ class Product(BenerailBaseModel):
     comfort_class: ComfortClass | None = None
     is_train_bound: bool | None = False
     is_return_product: bool | None = False
+    exchangeable: AfterSalesConditionHorizon
+    refundable: AfterSalesConditionHorizon

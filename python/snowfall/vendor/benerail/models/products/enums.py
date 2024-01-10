@@ -38,3 +38,9 @@ class ProductErrorCodes(Enum):
         "cannot.serialize.provisional.order.to.json"
     )
     product_not_found = "product.not.found"
+
+
+class AfterSalesConditionHorizon(Enum):
+    always = "Always"
+    never = "Never"
+    before_departure = "Before Departure"

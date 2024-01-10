@@ -66,7 +66,7 @@ class GetBookedOfferResponse(BaseResponse):
 
 
 class GetBookedOfferPartResponse(BaseResponse):
-    response_result: BookedOfferPart | None = Field(None, alias="result")
+    response_result: BookedOfferPart = Field(..., alias="result")
 
 
 class GetBookedTripResponse(BaseResponse):

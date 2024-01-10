@@ -4,8 +4,8 @@ import http
 import pathlib
 import types as python_types
 import uuid
-from collections.abc import Sequence
-from typing import NamedTuple, Self
+from collections.abc import Mapping, Sequence
+from typing import ClassVar, NamedTuple, Self
 
 import orjson
 import phonenumbers
@@ -36,6 +36,7 @@ from snowfall.vendor.benerail.models.bookings import response as bookings_respon
 from snowfall.vendor.benerail.models.dialogue import enums as dialogue_enums
 from snowfall.vendor.benerail.models.dialogue import passenger
 from snowfall.vendor.benerail.models.products import enums
+from snowfall.vendor.benerail.models.products import response as products_response
 
 _GENDER_MAP = python_types.MappingProxyType(
     {
@@ -497,6 +498,11 @@ class BookingCreationHandler(object):
 
 
 class BookingCancellationHandler(object):
+    _refundable_statuses: ClassVar[set[str]] = {
+        enums.AfterSalesConditionHorizon.always.value,
+        enums.AfterSalesConditionHorizon.before_departure.value,
+    }
+
     def __init__(
         self,
         benerail_client: client.BenerailClient,
@@ -532,6 +538,23 @@ class BookingCancellationHandler(object):
                 session_token=session_token,
             )
         )[0]
+
+        try:
+            eligible_for_refund = await self._eligible_for_refund(booking_res)
+        except errors.HttpError:
+            self._logger.exception("Failed to check refund eligibility")
+
+            return bookings_pb2.BookingCancellation(
+                provider_booking_reference=booking_id,
+                status=bookings_pb2.BookingCancellation.STATUS_NO_REFUND,
+            )
+
+        if not eligible_for_refund:
+            return bookings_pb2.BookingCancellation(
+                provider_booking_reference=booking_id,
+                status=bookings_pb2.BookingCancellation.STATUS_NO_REFUND,
+            )
+
         refund_order_res = await self._client.bookings_client.create_order(
             booking_id=booking_res.response_result.identifier,
             etag=booking_res.etag,
@@ -619,6 +642,94 @@ class BookingCancellationHandler(object):
             status=status,
             refunded_us=refunded_us_proto,
         )
+
+    async def _eligible_for_refund(
+        self,
+        booking_res: bookings_response.GetBookingResponse,
+    ) -> bool:
+        fulfillment_ids = [
+            fulfillment.identifier
+            for fulfillment in booking_res.response_result.fulfillments or []
+        ]
+
+        if not fulfillment_ids:
+            return False
+
+        fulfillment_responses = await asyncio.gather(
+            *(
+                self._client.bookings_client.get_fulfillment(
+                    booking_id=booking_res.response_result.identifier,
+                    fulfillment_id=fulfillment_id,
+                    etag=booking_res.etag,
+                )
+                for fulfillment_id in fulfillment_ids
+            ),
+        )
+        offer_part_id_to_offer_id = {
+            offer_part.identifier: offer_part.href.path.rsplit("/", 3)[-3]  # type: ignore[union-attr]
+            for fulfillment_res in fulfillment_responses
+            for offer_part in fulfillment_res.response_result.offer_parts or []
+        }
+
+        if not offer_part_id_to_offer_id or not booking_res.response_result.orders:
+            return False
+
+        order_id = booking_res.response_result.orders[0].identifier
+
+        product_responses = await self._product_responses(
+            booking_id=booking_res.response_result.identifier,
+            order_id=order_id,
+            offer_part_id_to_offer_id=offer_part_id_to_offer_id,
+        )
+
+        return (
+            all(
+                product_response.response_result.refundable in self._refundable_statuses  # type: ignore[comparison-overlap]
+                for product_response in product_responses
+            )
+            if product_responses
+            else False
+        )
+
+    async def _product_responses(
+        self,
+        booking_id: str,
+        order_id: str,
+        offer_part_id_to_offer_id: Mapping[str, str],
+    ) -> list[products_response.GetProductResponse]:
+        offer_part_responses = await asyncio.gather(
+            *(
+                self._client.bookings_client.get_booked_offer_parts(
+                    booking_id=booking_id,
+                    order_id=order_id,
+                    booked_offer_id=offer_id,
+                    booked_offer_part_id=offer_part_id,
+                )
+                for offer_part_id, offer_id in offer_part_id_to_offer_id.items()
+            ),
+        )
+
+        coro_map = {}
+
+        for offer_part_res in offer_part_responses:
+            if not offer_part_res.response_result.offer_part_common:
+                continue
+
+            product = offer_part_res.response_result.offer_part_common.product
+
+            if not product:
+                continue
+
+            coro_map[product.identifier] = (
+                self._client.bookings_client.booking_products(
+                    booking_id=booking_id,
+                    order_id=order_id,
+                    booked_offer_id=offer_part_res.response_result.booked_offer_id,
+                    tariff_ref=product.identifier,
+                )
+            )
+
+        return await asyncio.gather(*coro_map.values())
 
 
 def _get_title(title_enum_value: models_pb2.Passenger.Title.ValueType) -> str | None:
