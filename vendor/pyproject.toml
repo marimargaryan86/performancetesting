@@ -307,31 +307,33 @@ ignore_errors = true
 
 [[tool.mypy.overrides]]
 module = [
-  "allure.*",            # https://github.com/allure-framework/allure-python/issues/731
-  "authlib.*",           # https://github.com/lepture/authlib/issues/460
-  "firebase_admin.*",    # https://github.com/firebase/firebase-admin-python/issues/626
-  "fsspec.*",            # https://github.com/fsspec/filesystem_spec/issues/625
-  "furl.*",              # https://github.com/gruns/furl/issues/148
+  "allure.*",                               # https://github.com/allure-framework/allure-python/issues/731
+  "antlr4",                                 # https://github.com/antlr/antlr4/issues/2868
+  "authlib.*",                              # https://github.com/lepture/authlib/issues/460
+  "firebase_admin.*",                       # https://github.com/firebase/firebase-admin-python/issues/626
+  "fsspec.*",                               # https://github.com/fsspec/filesystem_spec/issues/625
+  "furl.*",                                 # https://github.com/gruns/furl/issues/148
   "geopy.*",
-  "google.rpc.*",        # https://github.com/nipunn1313/mypy-protobuf/issues/507
-  "grpc.*",              # https://github.com/nipunn1313/mypy-protobuf/issues/507
-  "grpc_health.*",       # https://github.com/nipunn1313/mypy-protobuf/issues/507
-  "grpc_reflection.*",   # https://github.com/nipunn1313/mypy-protobuf/issues/507
-  "grpc_status.*",       # https://github.com/nipunn1313/mypy-protobuf/issues/507
-  "h3.*",                # https://github.com/uber/h3-py/pull/216
-  "hvac.*",              # https://github.com/hvac/hvac/issues/800
+  "google.rpc.*",                           # https://github.com/nipunn1313/mypy-protobuf/issues/507
+  "grpc.*",                                 # https://github.com/nipunn1313/mypy-protobuf/issues/507
+  "grpc_health.*",                          # https://github.com/nipunn1313/mypy-protobuf/issues/507
+  "grpc_reflection.*",                      # https://github.com/nipunn1313/mypy-protobuf/issues/507
+  "grpc_status.*",                          # https://github.com/nipunn1313/mypy-protobuf/issues/507
+  "h3.*",                                   # https://github.com/uber/h3-py/pull/216
+  "hvac.*",                                 # https://github.com/hvac/hvac/issues/800
   "isodate.*",
   "json_api_doc.*",
-  "mongomock_motor.*",   # https://github.com/michaelkryukov/mongomock_motor/issues/29
+  "mongomock_motor.*",                      # https://github.com/michaelkryukov/mongomock_motor/issues/29
   "pandas.*",
-  "qrcode.*",            # https://github.com/lincolnloop/python-qrcode/pull/321
+  "qrcode.*",                               # https://github.com/lincolnloop/python-qrcode/pull/321
   "rfc3339_validator.*",
-  "s3fs.*",              # https://github.com/fsspec/s3fs/issues/383
-  "sagemaker.*",         # https://github.com/aws/sagemaker-python-sdk/issues/2985
+  "s3fs.*",                                 # https://github.com/fsspec/s3fs/issues/383
+  "sagemaker.*",                            # https://github.com/aws/sagemaker-python-sdk/issues/2985
   "shapefile.*",
-  "shapely.*",           # https://github.com/shapely/shapely/issues/721
+  "shapely.*",                              # https://github.com/shapely/shapely/issues/721
+  "snowfall.stdlib.format.filter_parser.*",
   "sklearn.*",
-  "nio.*",               # https://github.com/poljar/matrix-nio/issues/240
+  "nio.*",                                  # https://github.com/poljar/matrix-nio/issues/240
 ]
 ignore_missing_imports = true
 

@@ -14,6 +14,7 @@ __dependents_rules__(
 
 python_requirements(
     module_mapping={
+        "antlr4-python3-runtime": ["antlr4"],
         "dnspython": ["dns"],
         "googleapis-common-protos": [
             "google.api",

@@ -22,6 +22,7 @@
 //     "aiostream==0.5.2",
 //     "allure-pytest==2.13.2",
 //     "allure-python-commons==2.13.2",
+//     "antlr4-python3-runtime==4.13.1",
 //     "asyncstdlib==3.10.9",
 //     "authlib==1.3.0",
 //     "autoflake==2.2.1",
@@ -108,7 +109,8 @@
 //     "scikit-learn==1.3.2",
 //     "sentry-sdk==1.39.1",
 //     "setuptools==69.0.2",
-//     "snowfall.plugin.flake8==1.0.0",
+//     "snowfall.plugin.flake8==1.1.0",
+//     "snowfall.stdlib.format.filter-parser==1.1.0",
 //     "starlette==0.34.0",
 //     "stripe==7.9.0",
 //     "structlog-sentry==2.0.3",
@@ -564,6 +566,26 @@
           ],
           "requires_python": ">=3.8",
           "version": "0.6.0"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
+              "hash": "78ec57aad12c97ac039ca27403ad61cb98aaec8a3f9bb8144f889aa0fa28b943",
+              "url": "https://files.pythonhosted.org/packages/57/09/0c2874e3e8c53250b40afa7399c70acf7d23cac80138f1792ea3797f7452/antlr4_python3_runtime-4.13.1-py3-none-any.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "3cd282f5ea7cfb841537fe01f143350fdb1c0b1ce7981443a2fa8513fddb6d1a",
+              "url": "https://files.pythonhosted.org/packages/b6/00/7f1cab9b44518ca225a03f4493ac9294aab5935a7a28486ba91a20ea29cf/antlr4-python3-runtime-4.13.1.tar.gz"
+            }
+          ],
+          "project_name": "antlr4-python3-runtime",
+          "requires_dists": [
+            "typing; python_version < \"3.5\""
+          ],
+          "requires_python": null,
+          "version": "4.13.1"
         },
         {
           "artifacts": [
@@ -3137,13 +3159,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "cf14627d5a8049ffbf49915732e5eddbe8134c3bdb9d476e6182b676fc573f8a",
-              "url": "https://files.pythonhosted.org/packages/8d/c4/82b858fb6483dfb5e338123c154d19c043305b01726a67d89532b8f8f01b/GitPython-3.1.40-py3-none-any.whl"
+              "hash": "c36b6634d069b3f719610175020a9aed919421c87552185b085e04fbbdb10b7c",
+              "url": "https://files.pythonhosted.org/packages/45/c6/a637a7a11d4619957cb95ca195168759a4502991b1b91c13d3203ffc3748/GitPython-3.1.41-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "22b126e9ffb671fdd0c129796343a02bf67bf2994b35449ffc9321aa755e18a4",
-              "url": "https://files.pythonhosted.org/packages/0d/b2/37265877ae607a2cbf9a471f4581dbf5ed13a501b90cb4c773f9ccfff3ea/GitPython-3.1.40.tar.gz"
+              "hash": "ed66e624884f76df22c8e16066d567aaa5a37d5b5fa19db2c6df6f7156db9048",
+              "url": "https://files.pythonhosted.org/packages/e5/c2/6e3a26945a7ff7cf2854b8825026cf3f22ac8e18285bc11b6b1ceeb8dc3f/GitPython-3.1.41.tar.gz"
             }
           ],
           "project_name": "gitpython",
@@ -3157,13 +3179,14 @@
             "pre-commit; extra == \"test\"",
             "pytest-cov; extra == \"test\"",
             "pytest-instafail; extra == \"test\"",
-            "pytest-subtests; extra == \"test\"",
+            "pytest-mock; extra == \"test\"",
             "pytest-sugar; extra == \"test\"",
-            "pytest; extra == \"test\"",
+            "pytest>=7.3.1; extra == \"test\"",
+            "sumtypes; extra == \"test\"",
             "typing-extensions>=3.7.4.3; python_version < \"3.8\""
           ],
           "requires_python": ">=3.7",
-          "version": "3.1.40"
+          "version": "3.1.41"
         },
         {
           "artifacts": [
@@ -3198,13 +3221,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "f5e45d9812376deb7e04cda8d8ca5233aa608038bdbf1253ad8f7edcb7f6d595",
-              "url": "https://files.pythonhosted.org/packages/01/72/32f75858bab4dd7e0309482cf0dff750f4e106fe896afe7d866feb337e1a/google_api_python_client-2.112.0-py2.py3-none-any.whl"
+              "hash": "25659d488df6c8a69615b2a510af0e63b4c47ab2cb87d71c1e13b28715906e27",
+              "url": "https://files.pythonhosted.org/packages/39/fe/24b02d442dfef2456f46e0dd9e5b833f2dbfb6a8393602a600153ac3781a/google_api_python_client-2.113.0-py2.py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "c3bcb5fd70d57f4c94b30c0dbeade53c216febfbf1d771eeb1a2fa74bd0d6756",
-              "url": "https://files.pythonhosted.org/packages/74/1d/67bc8344aff1530fed2f8be7f8c82ddabf7316b35c60f62ab9d16875adf9/google-api-python-client-2.112.0.tar.gz"
+              "hash": "bcffbc8ffbad631f699cf85aa91993f3dc03060b234ca9e6e2f9135028bd9b52",
+              "url": "https://files.pythonhosted.org/packages/13/be/92a5451a52fe40720460848e514b53682a120952740d7b68087f870c3241/google-api-python-client-2.113.0.tar.gz"
             }
           ],
           "project_name": "google-api-python-client",
@@ -3216,7 +3239,7 @@
             "uritemplate<5,>=3.0.1"
           ],
           "requires_python": ">=3.7",
-          "version": "2.112.0"
+          "version": "2.113.0"
         },
         {
           "artifacts": [
@@ -4293,13 +4316,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "7d2c221a66a8165f3f81aacb958d26033d40d972fdb70213ab0a2e0627e29c86",
-              "url": "https://files.pythonhosted.org/packages/99/ca/f3532a61dce7dd52fbd38737a12e16cdc7699697e23287eb7addfdd93e3f/lark-1.1.8-py3-none-any.whl"
+              "hash": "a0dd3a87289f8ccbb325901e4222e723e7d745dbfc1803eaf5f3d2ace19cf2db",
+              "url": "https://files.pythonhosted.org/packages/e7/9c/eef7c591e6dc952f3636cfe0df712c0f9916cedf317810a3bb53ccb65cdd/lark-1.1.9-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "7ef424db57f59c1ffd6f0d4c2b705119927f566b68c0fe1942dddcc0e44391a5",
-              "url": "https://files.pythonhosted.org/packages/12/1c/b466b58dacac15ffefce9bcb5128e18948a143849610a7d5300f31920be0/lark-1.1.8.tar.gz"
+              "hash": "15fa5236490824c2c4aba0e22d2d6d823575dcaf4cdd1848e34b6ad836240fba",
+              "url": "https://files.pythonhosted.org/packages/2c/e1/804b6196b3fbdd0f8ba785fc62837b034782a891d6f663eea2f30ca23cfa/lark-1.1.9.tar.gz"
             }
           ],
           "project_name": "lark",
@@ -4310,7 +4333,7 @@
             "regex; extra == \"regex\""
           ],
           "requires_python": ">=3.6",
-          "version": "1.1.8"
+          "version": "1.1.9"
         },
         {
           "artifacts": [
@@ -5891,54 +5914,54 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "7c9e222d0976f68d0cf6409cfea896676ddc1d98485d601e9508f90f60e2b0a2",
-              "url": "https://files.pythonhosted.org/packages/af/cd/ed6e429fb0792ce368f66e83246264dd3a7a045b0b1e63043ed22a063ce5/pycryptodome-3.19.1-cp35-abi3-musllinux_1_1_x86_64.whl"
+              "hash": "210ba1b647837bfc42dd5a813cdecb5b86193ae11a3f5d972b9a0ae2c7e9e4b4",
+              "url": "https://files.pythonhosted.org/packages/b5/bf/798630923b67f4201059c2d690105998f20a6a8fb9b5ab68d221985155b3/pycryptodome-3.20.0-cp35-abi3-musllinux_1_1_x86_64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "1c6273ca5a03b672e504995529b8bae56da0ebb691d8ef141c4aa68f60765700",
-              "url": "https://files.pythonhosted.org/packages/24/9e/320b885ea336c218ff54ec2b276cd70ba6904e4f5a14a771ed39a2c47d59/pycryptodome-3.19.1-cp35-abi3-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl"
+              "hash": "acc2614e2e5346a4a4eab6e199203034924313626f9620b7b4b38e9ad74b7e0c",
+              "url": "https://files.pythonhosted.org/packages/0d/08/01987ab75ca789247a88c8b2f0ce374ef7d319e79589e0842e316a272662/pycryptodome-3.20.0-cp35-abi3-musllinux_1_1_i686.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "27e1efcb68993b7ce5d1d047a46a601d41281bba9f1971e6be4aa27c69ab8065",
-              "url": "https://files.pythonhosted.org/packages/34/dd/332c4c0055527d17dac317ed9f9c864fc047b627d82f4b9a56c110afc6fc/pycryptodome-3.19.1-cp35-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+              "hash": "76658f0d942051d12a9bd08ca1b6b34fd762a8ee4240984f7c06ddfb55eaf15a",
+              "url": "https://files.pythonhosted.org/packages/24/80/56a04e2ae622d7f38c1c01aef46a26c6b73a2ad15c9705a8e008b5befb03/pycryptodome-3.20.0-cp35-abi3-macosx_10_9_x86_64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "f34976c5c8eb79e14c7d970fb097482835be8d410a4220f86260695ede4c3e17",
-              "url": "https://files.pythonhosted.org/packages/45/93/f8450a92cc38541c3ba1f4cb4e267e15ae6d6678ca617476d52c3a3764d4/pycryptodome-3.19.1-cp35-abi3-musllinux_1_1_i686.whl"
+              "hash": "fb3b87461fa35afa19c971b0a2b7456a7b1db7b4eba9a8424666104925b78128",
+              "url": "https://files.pythonhosted.org/packages/30/4b/cbc67cda0efd55d7ddcc98374c4b9c853022a595ed1d78dd15c961bc7f6e/pycryptodome-3.20.0-cp35-abi3-musllinux_1_1_aarch64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "11ddf6c9b52116b62223b6a9f4741bc4f62bb265392a4463282f7f34bb287180",
-              "url": "https://files.pythonhosted.org/packages/67/e6/238c53267fd8d223029c0a0d3730cb1b6594d60f62e40c4184703dc490b1/pycryptodome-3.19.1-cp35-abi3-macosx_10_9_x86_64.whl"
+              "hash": "76cb39afede7055127e35a444c1c041d2e8d2f1f9c121ecef573757ba4cd2c3c",
+              "url": "https://files.pythonhosted.org/packages/af/20/5f29ec45462360e7f61e8688af9fe4a0afae057edfabdada662e11bf97e7/pycryptodome-3.20.0-cp35-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "e3e6f89480616781d2a7f981472d0cdb09b9da9e8196f43c1234eff45c915766",
-              "url": "https://files.pythonhosted.org/packages/7c/87/7181c42c8d5ba89822a4b824830506d0aeec02959bb893614767e3279846/pycryptodome-3.19.1-cp35-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl"
+              "hash": "09609209ed7de61c2b560cc5c8c4fbf892f8b15b1faf7e4cbffac97db1fffda7",
+              "url": "https://files.pythonhosted.org/packages/b9/ed/19223a0a0186b8a91ebbdd2852865839237a21c74f1fbc4b8d5b62965239/pycryptodome-3.20.0.tar.gz"
             },
             {
               "algorithm": "sha256",
-              "hash": "67939a3adbe637281c611596e44500ff309d547e932c449337649921b17b6297",
-              "url": "https://files.pythonhosted.org/packages/a8/ef/4931bc30674f0de0ca0e827b58c8b0c17313a8eae2754976c610b866118b/pycryptodome-3.19.1-cp35-abi3-macosx_10_9_universal2.whl"
+              "hash": "49a4c4dc60b78ec41d2afa392491d788c2e06edf48580fbfb0dd0f828af49d25",
+              "url": "https://files.pythonhosted.org/packages/e5/1f/6bc4beb4adc07b847e5d3fddbec4522c2c3aa05df9e61b91dc4eff6a4946/pycryptodome-3.20.0-cp35-abi3-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "8ae0dd1bcfada451c35f9e29a3e5db385caabc190f98e4a80ad02a61098fb776",
-              "url": "https://files.pythonhosted.org/packages/b1/38/42a8855ff1bf568c61ca6557e2203f318fb7afeadaf2eb8ecfdbde107151/pycryptodome-3.19.1.tar.gz"
+              "hash": "f35d6cee81fa145333137009d9c8ba90951d7d77b67c79cbe5f03c7eb74d8fe2",
+              "url": "https://files.pythonhosted.org/packages/ea/94/82ebfa5c83d980907ceebf79b00909a569d258bdfd9b0264d621fa752cfd/pycryptodome-3.20.0-cp35-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "b0bfe61506795877ff974f994397f0c862d037f6f1c0bfc3572195fc00833b96",
-              "url": "https://files.pythonhosted.org/packages/f4/54/8ae0c43d1257b41bc9d3277c3f875174fd8ad86b9567f0b8609b99c938ee/pycryptodome-3.19.1-cp35-abi3-musllinux_1_1_aarch64.whl"
+              "hash": "ac1c7c0624a862f2e53438a15c9259d1655325fc2ec4392e66dc46cdae24d044",
+              "url": "https://files.pythonhosted.org/packages/ff/96/b0d494defb3346378086848a8ece5ddfd138a66c4a05e038fca873b2518c/pycryptodome-3.20.0-cp35-abi3-macosx_10_9_universal2.whl"
             }
           ],
           "project_name": "pycryptodome",
           "requires_dists": [],
           "requires_python": "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7",
-          "version": "3.19.1"
+          "version": "3.20.0"
         },
         {
           "artifacts": [
@@ -7501,19 +7524,39 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "50258c39b66ec03b2bd638771443835c1dd246a7ddb0635ada84871f61980e4b",
-              "url": "https://git.snowfall.se/api/v4/projects/677/packages/pypi/files/50258c39b66ec03b2bd638771443835c1dd246a7ddb0635ada84871f61980e4b/snowfall.plugin.flake8-1.0.0-py3-none-any.whl"
+              "hash": "37093a901a732305eed97c6ea0c429b3b039c2bda3a63f3560eeb121d54938d9",
+              "url": "https://git.snowfall.se/api/v4/projects/677/packages/pypi/files/37093a901a732305eed97c6ea0c429b3b039c2bda3a63f3560eeb121d54938d9/snowfall.plugin.flake8-1.1.0-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "2c4a6113a8975ddcefc6ab70ba875fc1f3eed7b8ef0aefda0b5a049bc73bdf82",
-              "url": "https://git.snowfall.se/api/v4/projects/677/packages/pypi/files/2c4a6113a8975ddcefc6ab70ba875fc1f3eed7b8ef0aefda0b5a049bc73bdf82/snowfall.plugin.flake8-1.0.0.tar.gz"
+              "hash": "5dfdc7576d8c96ab058686808f45ac022789a37599c0d77f94eccfa75c56915e",
+              "url": "https://git.snowfall.se/api/v4/projects/677/packages/pypi/files/5dfdc7576d8c96ab058686808f45ac022789a37599c0d77f94eccfa75c56915e/snowfall.plugin.flake8-1.1.0.tar.gz"
             }
           ],
           "project_name": "snowfall-plugin-flake8",
           "requires_dists": [],
           "requires_python": "<3.12,>=3.9",
-          "version": "1.0.0"
+          "version": "1.1.0"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
+              "hash": "826f86eae37f6bb5fa2bb1d2fe3a6c22b6a30435a15551fe8c33816856d6a468",
+              "url": "https://git.snowfall.se/api/v4/projects/677/packages/pypi/files/826f86eae37f6bb5fa2bb1d2fe3a6c22b6a30435a15551fe8c33816856d6a468/snowfall.stdlib.format.filter_parser-1.1.0-py3-none-any.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "190cc56edcad34a54456865879fc4136f4541ab4949716311a76b1c73070db7e",
+              "url": "https://git.snowfall.se/api/v4/projects/677/packages/pypi/files/190cc56edcad34a54456865879fc4136f4541ab4949716311a76b1c73070db7e/snowfall.stdlib.format.filter_parser-1.1.0.tar.gz"
+            }
+          ],
+          "project_name": "snowfall-stdlib-format-filter-parser",
+          "requires_dists": [
+            "antlr4-python3-runtime==4.13.1"
+          ],
+          "requires_python": "<3.12,>=3.9",
+          "version": "1.1.0"
         },
         {
           "artifacts": [
@@ -9483,6 +9526,7 @@
     "aiostream==0.5.2",
     "allure-pytest==2.13.2",
     "allure-python-commons==2.13.2",
+    "antlr4-python3-runtime==4.13.1",
     "asyncstdlib==3.10.9",
     "authlib==1.3.0",
     "autoflake==2.2.1",
@@ -9569,7 +9613,8 @@
     "scikit-learn==1.3.2",
     "sentry-sdk==1.39.1",
     "setuptools==69.0.2",
-    "snowfall.plugin.flake8==1.0.0",
+    "snowfall.plugin.flake8==1.1.0",
+    "snowfall.stdlib.format.filter-parser==1.1.0",
     "starlette==0.34.0",
     "stripe==7.9.0",
     "structlog-sentry==2.0.3",
