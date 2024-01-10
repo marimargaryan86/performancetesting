@@ -3,10 +3,13 @@ import asyncio
 import pydantic
 
 from snowfall.service.deploy import consul, dependencies, verify
-from snowfall.service.deploy.verifiers import junction_go, protocols
+from snowfall.service.deploy.verifiers import junction_go, junction_pay, protocols
 from snowfall.stdlib.service import application
 
-_verifiers: tuple[protocols.Verifier, ...] = (junction_go.OrdersFlow(),)
+_verifiers: tuple[protocols.Verifier, ...] = (
+    junction_go.OrdersFlow(),
+    junction_pay.TransactionsFlow(),
+)
 
 
 class _VerifySettings(application.Settings):
