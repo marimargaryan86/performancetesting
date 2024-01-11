@@ -1,4 +1,6 @@
+import dataclasses
 import datetime
+import pathlib
 from collections.abc import Mapping
 from typing import TypeVar
 
@@ -11,6 +13,26 @@ _DefaultTimeout = 5
 _Settings = TypeVar("_Settings", bound=application.Settings)
 
 
+@dataclasses.dataclass
+class Certificate(object):
+    certificate_file: pathlib.Path
+    key_file: pathlib.Path | None = None
+    password: str | None = None
+
+    def to_httpx_argument(self) -> str | tuple[str, str] | tuple[str, str | None, str]:
+        if self.password:
+            return (
+                str(self.certificate_file),
+                str(self.key_file) if self.key_file else None,
+                self.password,
+            )
+
+        if self.key_file:
+            return str(self.certificate_file), str(self.key_file)
+
+        return str(self.certificate_file)
+
+
 async def make_client(
     app: application.Application[_Settings],
     *,
@@ -18,6 +40,7 @@ async def make_client(
     follow_redirects: bool = False,
     headers: Mapping[str, str] | None = None,
     timeout: datetime.timedelta | None = None,
+    cert: Certificate | None = None,
 ) -> httpx.AsyncClient:
     client = httpx.AsyncClient(
         base_url=base_url or "",
@@ -28,6 +51,7 @@ async def make_client(
             if timeout
             else datetime.timedelta(seconds=_DefaultTimeout).total_seconds()
         ),
+        cert=cert.to_httpx_argument() if cert else None,
     )
 
     metrics.register(client)
