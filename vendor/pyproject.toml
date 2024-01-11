@@ -308,7 +308,7 @@ ignore_errors = true
 [[tool.mypy.overrides]]
 module = [
   "allure.*",                               # https://github.com/allure-framework/allure-python/issues/731
-  "antlr4",                                 # https://github.com/antlr/antlr4/issues/2868
+  "antlr4.*",                               # https://github.com/antlr/antlr4/issues/2868
   "authlib.*",                              # https://github.com/lepture/authlib/issues/460
   "firebase_admin.*",                       # https://github.com/firebase/firebase-admin-python/issues/626
   "fsspec.*",                               # https://github.com/fsspec/filesystem_spec/issues/625
