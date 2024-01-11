@@ -117,6 +117,10 @@ export function serverServiceFactory<TClient extends Record<string, AnyFunc>>(
       return new Response(devalue.stringify(result));
     } catch (err) {
       if (ensureJunctionError(err)) {
+        event.setHeaders({
+          "x-request-id": err.requestId ?? "unknown",
+          "x-trace-id": err.traceId ?? "unknown",
+        });
         throw error(err.status, { message: err.message });
       }
 

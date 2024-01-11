@@ -25,6 +25,8 @@ export type ApiError<TSchema> = {
 };
 
 export class JunctionError<TSchema> extends Error {
+  readonly traceId?: string;
+  readonly requestId?: string;
   readonly json?: ApiError<TSchema>;
   readonly status: number;
 
@@ -61,7 +63,13 @@ export class JunctionError<TSchema> extends Error {
   }
 
   constructor(
-    response: { json?: ApiError<TSchema>; status: number; statusText: string },
+    response: {
+      traceId?: string;
+      requestId?: string;
+      json?: ApiError<TSchema>;
+      status: number;
+      statusText: string;
+    },
     options: ErrorOptions = {},
   ) {
     super(
@@ -73,6 +81,8 @@ export class JunctionError<TSchema> extends Error {
       options,
     );
 
+    this.traceId = response.traceId;
+    this.requestId = response.requestId;
     this.json = response.json;
     this.status = response.status;
   }
@@ -91,7 +101,13 @@ export async function createJunctionError<TSchema>(
   }
 
   return new JunctionError(
-    { json, status: response.status, statusText: response.statusText },
+    {
+      traceId: response.headers.get("x-trace-id") ?? undefined,
+      requestId: response.headers.get("x-request-id") ?? undefined,
+      json,
+      status: response.status,
+      statusText: response.statusText,
+    },
     options,
   );
 }
