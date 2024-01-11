@@ -16,9 +16,9 @@ python_sources(dependencies=[":benerail_stations"])
 resource(
     name="benerail_stations",
     source=http_source(
-        url="https://junction-build-artifacts.s3.eu-west-2.amazonaws.com/benerail_stations-9638216413d6749c370b7dd5cb21f517fd5ad2ed7ae50a5ad901f6cebbe52f73.json",
-        len=2312063,
-        sha256="9638216413d6749c370b7dd5cb21f517fd5ad2ed7ae50a5ad901f6cebbe52f73",
+        url="https://junction-build-artifacts.s3.eu-west-2.amazonaws.com/benerail_stations-c6581ed3d4b006240084cd4879e36553037e732f27d90bb9e77563be40fef528.json",
+        len=2646124,
+        sha256="c6581ed3d4b006240084cd4879e36553037e732f27d90bb9e77563be40fef528",
         filename="benerail_stations.json",
     ),
 )

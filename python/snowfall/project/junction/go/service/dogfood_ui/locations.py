@@ -30,7 +30,7 @@ async def load_airports() -> h3.H3MappingRepository[h3.CoordinatesItem]:
 
 @functools.cache
 async def load_benerail() -> h3.H3MappingRepository[h3.CoordinatesItem]:
-    path = filesystem.resource_path(__name__, "benerail.json")
+    path = filesystem.resource_path(__name__, "benerail_stations.json")
 
     async with aiofiles.open(path, "rb") as stations_file:
         stations = orjson.loads(await stations_file.read())
