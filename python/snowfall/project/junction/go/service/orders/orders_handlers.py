@@ -3,7 +3,7 @@ import contextlib
 import dataclasses
 from collections.abc import Awaitable, Mapping, Sequence
 from collections.abc import Set as AbstractSet
-from typing import NamedTuple
+from typing import ClassVar, NamedTuple
 
 from grpc import StatusCode, aio
 
@@ -219,6 +219,14 @@ def _update_overall_cancellation_status(
         cancellation.status = models_pb2.CancellationRequest.STATUS_COMPLETED
 
 
+async def _mark_booking_as_cancelled(
+    booking_repo: BookingRepository,
+    booking: models_pb2.Booking,
+) -> None:
+    booking.status = models_pb2.Booking.STATUS_CANCELLED
+    await booking_repo.update(booking)
+
+
 class CancellationTicketCompletedHandler(object):
     def __init__(
         self,
@@ -261,12 +269,12 @@ class CancellationTicketCompletedHandler(object):
                 booking_cancellation.status = (
                     models_pb2.BookingCancellation.STATUS_NO_REFUND
                 )
-                await self._update_booking_status(booking)
+                await _mark_booking_as_cancelled(self._bookings, booking)
             case orders_pb2.Status.STATUS_REFUND_DUE:
                 booking_cancellation.status = (
                     models_pb2.BookingCancellation.STATUS_REFUND_DUE
                 )
-                await self._update_booking_status(booking)
+                await _mark_booking_as_cancelled(self._bookings, booking)
                 await self._refund_client.create(
                     refund=refunds_model_pb2.Refund(
                         transaction_id=booking.transaction_id,
@@ -290,10 +298,6 @@ class CancellationTicketCompletedHandler(object):
             return await self._context.abort(StatusCode.NOT_FOUND)
 
         return booking
-
-    async def _update_booking_status(self, booking: models_pb2.Booking) -> None:
-        booking.status = models_pb2.Booking.STATUS_CANCELLED
-        await self._bookings.update(booking)
 
 
 def _create_order_model(
@@ -465,6 +469,11 @@ class _ProviderCancellationFailedError(Exception):
 
 
 class CreateCancellationTaskHandler(object):
+    _final_statuses: ClassVar[set[models_pb2.BookingCancellation.Status.ValueType]] = {
+        models_pb2.BookingCancellation.STATUS_REFUND_DUE,
+        models_pb2.BookingCancellation.STATUS_NO_REFUND,
+    }
+
     def __init__(
         self,
         gateway: bookings_pb2_grpc.BookingServiceStub,
@@ -522,6 +531,24 @@ class CreateCancellationTaskHandler(object):
             ),
             tickets_info=booking_tickets_info,
         )
+        await self._update_booking_status_if_needed(
+            cancellation_request=cancellation_request,
+            booking_container=bookings_container,
+        )
+
+    async def _update_booking_status_if_needed(
+        self,
+        cancellation_request: models_pb2.CancellationRequest,
+        booking_container: _BookingsContainer,
+    ) -> None:
+        for cancellation in cancellation_request.booking_cancellations:
+            booking = booking_container.get_by_id(cancellation.booking_id)
+
+            if booking.status == models_pb2.Booking.STATUS_CANCELLED:
+                continue
+
+            if cancellation.status in self._final_statuses:
+                await _mark_booking_as_cancelled(self._bookings, booking)
 
     async def _mark_cancellations_as_pending(
         self,
