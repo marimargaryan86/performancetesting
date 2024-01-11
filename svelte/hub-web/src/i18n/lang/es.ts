@@ -5,8 +5,8 @@ export default {
   roles: {
     "reseller-admin": "Administrador revendedor",
     "reseller-user": "Usuario revendedor",
-    "snowfall-admin": "Administrador de nevadas",
-    "snowfall-user": "Usuario de nevadas",
+    "snowfall-admin": "Administrador Snowfall",
+    "snowfall-user": "Usuario Snowfall",
   },
   words: {
     yes: "Sí",
@@ -30,7 +30,7 @@ export default {
     },
     direct: "Directo",
     departureTime: "Hora de salida",
-    departure: "Partida",
+    departure: "Salida",
     arrival: "Llegada",
     journeyDuration: "Duración del viaje",
     railwayOperators: "Operadores ferroviarios",
@@ -39,27 +39,21 @@ export default {
     dateRange: "Rango de fechas",
     none: "Ninguno",
     title: "Título",
-    firstName: "Nombre de pila",
+    firstName: "Nombre",
     lastName: "Apellido",
-    birthdayDate: "Cumpleaños",
+    birthdayDate: "Fecha de Nacimiento",
     gender: "Género",
     documentType: "Tipo de Documento",
     documentNumber: "Número del Documento",
     expiryDate: "Fecha de caducidad",
-    issueDate: "Fecha de asunto",
+    issueDate: "Fecha de emisión",
     issuingCountry: "País emisor",
     nationality: "Nacionalidad",
     residenceCountryCode: "Código de país de residencia",
     summary: "Resumen",
-    fareBrand: {
-      plural: "Marcas de tarifas",
-      singular: "Marca de tarifa",
-    },
+    fareBrand: { plural: "Marcas de tarifas", singular: "Marca de tarifa" },
     itinerary: "Itinerario",
-    fee: {
-      plural: "Honorarios",
-      singular: "Tarifa",
-    },
+    fee: { plural: "Tarifas", singular: "Tarifa" },
     serviceFee: "Tarifa de servicio",
     agencyMarkup: "margen de agencia",
     paymentMethod: "Método de pago",
@@ -68,18 +62,18 @@ export default {
     phoneNumber: "Número de teléfono",
     email: "Correo electrónico",
     addressLine1: "Dirección Línea 1",
-    addressLine2: "Línea de dirección 2",
+    addressLine2: "Dirección Línea 2",
     city: "Ciudad",
     country: "País",
     postcode: "Código postal",
     error: "Error",
     success: "Éxito",
-    warning: "Advertencia",
+    warning: "Aviso",
     status: "Estado",
     passengerDetails: "Detalles del pasajero",
     itineraryDetails: "Detalles del itinerario",
     tripDuration: "Duración del viaje",
-    orderReference: "Pedir Referencia",
+    orderReference: "Referencia de Pedido",
     cancellation: "Cancelación",
     reservationNumber: "Número de reserva",
     orderDetails: "Detalles del pedido",
@@ -114,43 +108,43 @@ export default {
     download: "Descargar",
     addBalance: "Agregar saldo",
     addBalances: "Agregar saldos",
-    add: "Agregar",
-    addDate: "Agregar fecha",
+    add: "Añadir",
+    addDate: "añadir fecha",
     returnToBookings: "Volver a reservas",
     sortBy: "Ordenar por",
     selectAll: "Seleccionar todo",
     clearAll: "Limpiar todo",
     bookNow: "Reservar ahora",
     viewFareRules: "Ver reglas de tarifas",
-    clear: "Claro",
+    clear: "Limpiar",
     select: "Seleccionar",
-    enterFirstName: "Introduce el nombre",
+    enterFirstName: "Introduzca el nombre",
     enterLastName: "Introduzca el apellido",
     enterDocumentNumber: "Introduzca el número de documento",
     enterIssuingCountry: "Introduzca el país emisor",
     enterNationality: "Introduzca la nacionalidad",
-    enterResidenceCountryCode: "Ingrese el código del país de residencia",
-    enterAmount: "Ingrese la cantidad",
+    enterResidenceCountryCode: "Introduzca el código del país de residencia",
+    enterAmount: "Introduzca la cantidad",
     selectFeeType: "Seleccionar tipo de tarifa",
     tryAgain: "Intentar otra vez",
-    enterPhoneNumber: "Ingresa número telefónico",
-    enterEmail: "Ingrese correo electrónico",
+    enterPhoneNumber: "Introduzca número telefónico",
+    enterEmail: "Introduzca correo electrónico",
     enterAddressLine1: "Introduzca la dirección en la línea 1",
     enterAddressLine2: "Introduzca la dirección en la línea 2",
     enterCity: "Introduce la ciudad",
     selectCountry: "Seleccionar país",
-    enterPostcode: "Introduce el código postal",
+    enterPostcode: "Introduzca el código postal",
     next: "Próximo",
     previous: "Anterior",
-    book: "Libro",
-    downloadTickets: "Descargar entradas",
+    book: "Crear Reserva",
+    downloadTickets: "Descargar Tickets",
     cancelBooking: "Cancelar reserva",
     goBack: "Regresa",
-    view: "Vista",
+    view: "Ver",
     cancelRequest: "Cancelar",
     refundWithNoAmount: "Reembolso sin importe",
     calculateRefundPosition: "Calcular la posición de reembolso",
-    issueRefund: "Reembolso de emisión",
+    issueRefund: "Emitir Reembolso",
     enterRefundReference: "Introduzca la referencia de reembolso",
     bookTrip: "Reservar viaje",
     findTrip: "Buscar viaje",
@@ -160,9 +154,9 @@ export default {
     priceChangeInfo:
       'Hemos notado un cambio de precio;  <strong class="typography body-medium bold">{originalPrice}</strong>, y el nuevo precio es <strong class="typography body-medium bold">{newPrice}</strong>. ',
     areYouSure: "¿Está seguro?",
-    copiedToClipboard: "Copiado al portapapeles",
+    copiedToClipboard: "Copiado",
     noBalancesFound: "No se encontraron saldos",
-    findABalance: "encontrar un equilibrio",
+    findABalance: "encontrar un saldo",
     cityOrStation: "Ciudad o Estación",
     noTripsMatchesTheFilterCriteria: "Ningún viaje coincide con los criterios del filtro",
     noTripsFound: "No se encontraron viajes",
@@ -171,7 +165,7 @@ export default {
       '{timeLeft} minutos para <strong class="typography bold">completo</strong> su reservación',
     startingAt: "De",
     loadingTripDetails: "Cargando detalles del viaje...",
-    thisPriceIsForAllPassengers: "Este precio es para todos los pasajeros.",
+    thisPriceIsForAllPassengers: "Precio para todos pasajeros.",
     totalToPay: "Total a pagar",
     fareRulesInfo: [
       {
@@ -179,47 +173,20 @@ export default {
         value:
           "Las tarifas no están garantizadas hasta que se reciba el pago completo y se emitan los boletos. ",
       },
-      {
-        type: "fareRulesButton",
-        value: "Reglas justas",
-      },
-      {
-        type: "text",
-        value: "y",
-      },
-      {
-        type: "fareRulesButton",
-        value: "Información de equipaje",
-      },
+      { type: "fareRulesButton", value: "Reglas de Tarifas" },
+      { type: "text", value: "y" },
+      { type: "fareRulesButton", value: "Reglas de Tarifas" },
     ],
     totalToCollect: "Total a cobrar",
     paymentDeclined: "Pago rechazado",
     anUnexpectedErrorOccurred: "Ocurrió un error inesperado",
     paymentInfo: [
-      {
-        type: "text",
-        value: "Al reservar tu entrada aceptas las condiciones de Snowfall.",
-      },
-      {
-        type: "toc",
-        value: "t",
-      },
-      {
-        type: "text",
-        value: "el",
-      },
-      {
-        type: "coc",
-        value: "condiciones de transporte del transportista",
-      },
-      {
-        type: "text",
-        value: "y nuestro",
-      },
-      {
-        type: "privacy",
-        value: "política de privacidad",
-      },
+      { type: "text", value: "Al reservar tu entrada aceptas las condiciones de Snowfall." },
+      { type: "toc", value: "t" },
+      { type: "text", value: "el" },
+      { type: "coc", value: "condiciones de transporte del transportista" },
+      { type: "text", value: "y nuestro" },
+      { type: "privacy", value: "política de privacidad" },
     ],
     oopsSomethingWentWrong: "Huy! Algo salió mal :(",
     theOrderWasCreatedSuccessfully: "El pedido fue creado exitosamente.",
@@ -242,7 +209,7 @@ export default {
     toUs: "Para nosotros",
     payerCurrency: "Moneda del pagador",
     toReseller: "al revendedor",
-    createRefundWithoutAmounts: "¿Estás seguro de que deseas crear un reembolso sin montos?",
+    createRefundWithoutAmounts: "Crear reembolso sin cantidad",
     resellerHowMuchWeGiveBack: "Revendedor: cuánto devolvemos",
     providerHowMuchWeGetBack: "Proveedor: cuánto recuperamos",
     refundReferenceInfo:
@@ -254,14 +221,14 @@ export default {
   },
   tableHeaders: {
     id: "IDENTIFICACIÓN",
-    orderId: "Solicitar ID",
+    orderId: "Reserva ID",
     createdDate: "Fecha de creación",
     updatedDate: "Fecha actualizada",
-    owedToUs: "nos lo debemos",
+    owedToUs: "Debido a Nosotros",
     reconciledQuestion: "¿Reconciliado?",
     orderReference: "Pedir Referencia",
-    ticket: "Boleto",
-    tickets: "Entradas)",
+    ticket: "Ticket",
+    tickets: "Tickets",
     departureDate: "Fecha de salida",
     passengers: "Pasajeros",
     totalPrice: "Precio total",
@@ -279,7 +246,7 @@ export default {
     from: "De",
     to: "A",
     quoteRate: "Tarifa de cotización",
-    transactionRate: "Tasa de transacción",
+    transactionRate: "Tarifa de transacción",
     fxDelta: "Delta de divisas",
     fxBuffer: "Búfer de efectos",
     status: "Estado",
@@ -288,22 +255,10 @@ export default {
     destination: "Destino",
   },
   passengerTypes: {
-    adult: {
-      plural: "Adultos",
-      singular: "Adulto",
-    },
-    child: {
-      plural: "Niños",
-      singular: "Niño",
-    },
-    senior: {
-      plural: "personas mayores",
-      singular: "Sénior",
-    },
-    youth: {
-      plural: "Jóvenes",
-      singular: "Juventud",
-    },
+    adult: { plural: "Adultos", singular: "Adulto" },
+    child: { plural: "Niños", singular: "Niño" },
+    senior: { plural: "personas mayores", singular: "persona mayor" },
+    youth: { plural: "Jóvenes", singular: "Jóven" },
   },
   types: {
     "bank-transfer": "Transferencia bancaria",
@@ -314,7 +269,7 @@ export default {
   },
   priceBreakdownTypes: {
     "base-fare": "Tarifa base",
-    "company-mark-up": "margen de beneficio de la empresa",
+    "company-mark-up": "margen de empresa",
     "reseller-mark-up": "Margen de revendedor",
     "service-mark-up": "margen de servicio",
     tax: "Impuestos",
@@ -324,18 +279,18 @@ export default {
     "earliest-departure": "Salida más temprana",
     "latest-arrival": "Última llegada",
     "latest-departure": "Última salida",
-    "lowest-price": "El precio más bajo",
+    "lowest-price": "Precio más bajo",
     fastest: "Lo más rápido",
   },
   statuses: {
     confirmed: "Confirmado",
     "no-refund": "No hay reembolso",
-    "not-ticketed": "No multado",
-    "refund-due": "Reembolso vencido",
+    "not-ticketed": "No boletado",
+    "refund-due": "Reembolso pendiente",
     "refund-failed": "Reembolso fallido",
     "refund-issued": "Reembolso emitido",
     cancelled: "Cancelado",
-    completed: "Terminado",
+    completed: "Realizado",
     deleted: "Eliminado",
     error: "Error",
     executed: "Ejecutado",
@@ -353,23 +308,15 @@ export default {
       title: "Panel",
       intro: "<strong>Bienvenido a</strong><span>Centro de unión</span>",
     },
-    account: {
-      title: "Configuraciones de la cuenta",
-    },
+    account: { title: "Configuraciones de la cuenta" },
     help: {
       title: "Ayuda",
       pages: {
         privacyPolicy: {
           title: "política de privacidad",
           content: [
-            {
-              type: "p",
-              html: "Creemos en proteger la privacidad del cliente final. ",
-            },
-            {
-              type: "h2",
-              html: "Indemnización",
-            },
+            { type: "p", html: "Creemos en proteger la privacidad del cliente final. " },
+            { type: "h2", html: "Indemnización" },
             {
               type: "p",
               html: "Usted acepta defendernos a nosotros y/o a nuestros respectivos proveedores y a cualquiera de sus funcionarios, directores, empleados y agentes de y contra cualquier reclamo, causa de acción, demanda, recuperación, pérdida, daño, multa, penalización u otros costos o gastos. ",
@@ -382,10 +329,7 @@ export default {
                 "- Su uso del Booking Hub.",
               ],
             },
-            {
-              type: "h2",
-              html: "Convertidor de moneda, precio y pago",
-            },
+            { type: "h2", html: "Convertidor de moneda, precio y pago" },
             {
               type: "p",
               html: "Los precios de los servicios de viajes son dinámicos y están sujetos a cambios frecuentes en cualquier momento. ",
@@ -406,10 +350,7 @@ export default {
               type: "p",
               html: "El pago se realiza directamente a Snowfall Limited en nombre del proveedor de viajes únicamente.",
             },
-            {
-              type: "p",
-              html: "El proveedor de viajes suele exigir el pago por adelantado; ",
-            },
+            { type: "p", html: "El proveedor de viajes suele exigir el pago por adelantado; " },
             {
               type: "p",
               html: "Podemos almacenar los detalles del método de pago del cliente final para transacciones futuras si ha obtenido su consentimiento para hacerlo.",
@@ -422,26 +363,17 @@ export default {
               type: "p",
               html: "Como realiza una reserva en nombre de otra persona, acepta la responsabilidad de obtener su permiso antes de proporcionarnos sus datos personales.",
             },
-            {
-              type: "h2",
-              html: "Cancelaciones y Reembolsos",
-            },
+            { type: "h2", html: "Cancelaciones y Reembolsos" },
             {
               type: "p",
               html: "Los gastos de cancelación aplicados a la reserva están sujetos a la política específica establecida por el proveedor respectivo. ",
             },
-            {
-              type: "h2",
-              html: "Terminación de cuenta",
-            },
+            { type: "h2", html: "Terminación de cuenta" },
             {
               type: "p",
               html: "A nuestro exclusivo criterio, podemos cancelar los titulares de cuentas que se consideren infractores reincidentes. ",
             },
-            {
-              type: "h2",
-              html: "General",
-            },
+            { type: "h2", html: "General" },
             {
               type: "p",
               html: "Si se determina que alguna parte de este Acuerdo es inválida, ilegal o inaplicable, la validez, legalidad y aplicabilidad de las disposiciones restantes no se verán afectadas ni perjudicadas de ninguna manera. ",
@@ -454,10 +386,7 @@ export default {
               type: "p",
               html: "Todos los derechos no otorgados expresamente en este documento están reservados.",
             },
-            {
-              type: "h2",
-              html: "Contacto",
-            },
+            { type: "h2", html: "Contacto" },
             {
               type: "p",
               html: 'Todos los comentarios, consultas y solicitudes relacionadas con nuestro uso de su información deben dirigirse a <a href="mailto:legal@snowfalltravel.com">legal@snowfalltravel.com</a>',
@@ -467,38 +396,23 @@ export default {
         termsAndConditions: {
           title: "Términos y condiciones",
           content: [
-            {
-              type: "h2",
-              html: "Condiciones de uso de reserva",
-            },
+            { type: "h2", html: "Condiciones de uso de reserva" },
             {
               type: "p",
               html: 'Estos Términos de reserva (los "Términos") se aplican a las reservas realizadas a través del portal de clientes en línea de Junction (el "Centro de reservas"), que es propiedad y está operado por Snowfall Limited, una empresa registrada en Inglaterra (n.º de empresa: 12356236, 10-12 East ',
             },
-            {
-              type: "p",
-              html: "Lea atentamente el Acuerdo. ",
-            },
-            {
-              type: "h2",
-              html: "Condiciones de Uso",
-            },
+            { type: "p", html: "Lea atentamente el Acuerdo. " },
+            { type: "h2", html: "Condiciones de Uso" },
             {
               type: "p",
               html: "Como condición para su uso del Booking Hub, Usted garantiza que (i) tiene al menos 18 años de edad; ",
             },
-            {
-              type: "h2",
-              html: "Actividades prohibidas",
-            },
+            { type: "h2", html: "Actividades prohibidas" },
             {
               type: "p",
               html: "El contenido y la información del Booking Hub (incluidos, entre otros, el precio y la disponibilidad de los servicios de viaje), así como la infraestructura utilizada para proporcionar dicho contenido e información, son propiedad nuestra o de nuestros proveedores y proveedores. ",
             },
-            {
-              type: "h2",
-              html: "Fraude",
-            },
+            { type: "h2", html: "Fraude" },
             {
               type: "p",
               html: "Si una cuenta muestra signos repetidos de fraude, abuso, asociación con una persona o entidad sancionada por el gobierno u otra actividad sospechosa, podemos solicitarle información adicional.",
@@ -519,18 +433,12 @@ export default {
               type: "p",
               html: "Comuníquese con nosotros sobre la cancelación de una reserva o el cierre de una cuenta si cree que se ha producido un error.",
             },
-            {
-              type: "h2",
-              html: "Hacer reservas de viajes",
-            },
+            { type: "h2", html: "Hacer reservas de viajes" },
             {
               type: "p",
               html: "Todos los servicios de viaje que pueda encontrar y/o reservar a través del Booking Hub son proporcionados por proveedores externos. ",
             },
-            {
-              type: "h2",
-              html: "Limitaciones y exclusiones de responsabilidad",
-            },
+            { type: "h2", html: "Limitaciones y exclusiones de responsabilidad" },
             {
               type: "p",
               html: "Al operar Booking Hub, simplemente facilitamos reservas con terceros y no asumimos ninguna responsabilidad por proporcionar las opciones de viaje mostradas en Booking Hub o por cualquier acuerdo realizado con terceros en nombre del cliente final como resultado del uso de Booking Hub. ",
@@ -544,10 +452,7 @@ export default {
         customerService: {
           title: "Servicio al Cliente",
           content: [
-            {
-              type: "p",
-              html: "Contáctenos con su solicitud de asistencia especializada",
-            },
+            { type: "p", html: "Contáctenos con su solicitud de asistencia especializada" },
             {
               type: "p",
               html: '<a href="mailto:support@snowfalltravel.com?subject=GG%20-%20">soporte@snowfalltravel.com</a>',
@@ -556,12 +461,7 @@ export default {
         },
         conditionsOfCarriage: {
           title: "Condiciones de Transporte",
-          content: [
-            {
-              type: "p",
-              html: "Condiciones del operador del tren. ",
-            },
-          ],
+          content: [{ type: "p", html: "Condiciones del operador del tren. " }],
         },
       },
     },
@@ -654,59 +554,29 @@ export default {
     pay: {
       title: "Pagar",
       pages: {
-        accounts: {
-          title: "Cuentas",
-        },
+        accounts: { title: "Cuentas" },
         activity: {
           title: "Actividad",
-          pages: {
-            transactions: {
-              title: "Actas",
-            },
-            conversions: {
-              title: "divisas",
-            },
-          },
+          pages: { transactions: { title: "Actas" }, conversions: { title: "divisas" } },
         },
-        bills: {
-          title: "Facturas",
-        },
+        bills: { title: "Facturas" },
       },
     },
     tripManagement: {
       title: "Gestión de viajes",
       pages: {
         book: {
-          title: "Libro",
+          title: "Crear Reserva",
           pages: {
-            search: {
-              title: "Buscar",
-              subTitle: "buscar ofertas",
-            },
-            select: {
-              title: "Seleccionar",
-              subTitle: "Seleccione una oferta",
-            },
-            payment: {
-              title: "Pago",
-              subTitle: "Pago",
-            },
-            confirmation: {
-              title: "Confirmación",
-              subTitle: "Confirmación",
-            },
+            search: { title: "Buscar", subTitle: "buscar ofertas" },
+            select: { title: "Seleccionar", subTitle: "Seleccione una oferta" },
+            payment: { title: "Pago", subTitle: "Pago" },
+            confirmation: { title: "Confirmación", subTitle: "Confirmación" },
           },
         },
         orders: {
           title: "Pedidos",
-          pages: {
-            bookings: {
-              title: "Reservaciones",
-            },
-            details: {
-              title: "Detalles",
-            },
-          },
+          pages: { bookings: { title: "Reservaciones" }, details: { title: "Detalles" } },
         },
       },
     },
