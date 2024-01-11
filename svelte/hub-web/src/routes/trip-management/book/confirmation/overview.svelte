@@ -1,10 +1,10 @@
 <script lang="ts">
-  import CheckedIcon from "components/icons/checked-icon.svelte";
   import type { Order } from "integration/junction-mobile-api/schemas/order";
   import { getOrderStatus } from "integration/common/schemas/order";
   import Ticket from "../../components/ticket.svelte";
   import StatusBadge from "components/ui/status-badge.svelte";
   import { getLocaleData } from "i18n";
+  import Icon from "components/icons/icon.svelte";
 
   export let order: Order;
 
@@ -17,7 +17,7 @@
 
   <div class="item">
     <span class="circle target">
-      <CheckedIcon color="var(--color-common-dark-strong)" />
+      <Icon variant="checked" size="16px" color="var(--color-common-dark-strong)" />
     </span>
     <div>
       <span class="typography body-xsmall">{$i18n.words.status}</span>

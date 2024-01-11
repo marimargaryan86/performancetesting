@@ -12,9 +12,6 @@
   import Table from "components/ui/table/table.svelte";
   import { capitalize } from "utils/common";
   import Button from "components/ui/button.svelte";
-  import PlusIcon from "components/icons/plus-icon.svelte";
-  import EditIcon from "components/icons/edit-icon.svelte";
-  import RemoveIcon from "components/icons/remove-icon.svelte";
   import routeConfig from "routeConfig";
   import TActionsCol from "components/ui/table/t-actions-col.svelte";
   import StandardLayout from "components/page/standard-layout.svelte";
@@ -22,6 +19,7 @@
   import integrationInstancesClient from "integration-instances-client";
   import currencyData from "data/currency-data";
   import { getPageTitle } from "utils/page-title";
+  import Icon from "components/icons/icon.svelte";
 
   export let data;
 
@@ -67,7 +65,7 @@
       slot="actions"
     >
       Add Beneficiary
-      <PlusIcon />
+      <Icon variant="plus" size="20px" />
     </Button>
 
     <Table class="beneficiaries-table" {loadMore}>
@@ -101,11 +99,11 @@
                 data-sveltekit-preload-data="off"
                 class="action"
               >
-                <EditIcon />
+                <Icon variant="edit" size="32px" />
               </a>
 
               <button on:click={remove.bind(remove)} class="action">
-                <RemoveIcon variant="trash-can" />
+                <Icon variant="remove-trash" size="32px" />
               </button>
 
               <button class="outline action typography body-medium bold">Pay</button>

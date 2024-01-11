@@ -1,7 +1,7 @@
 <script lang="ts">
-  import SearchIcon from "components/icons/search-icon.svelte";
   import TextField from "./text-field.svelte";
   import { getLocaleData } from "i18n";
+  import Icon from "components/icons/icon.svelte";
 
   let placeholderExt: string | undefined = undefined;
   export { placeholderExt as placeholder };
@@ -35,7 +35,7 @@
   {clearable}
   {clearValue}
 >
-  <SearchIcon slot="icon-before" color="var(--color-main-primary-500)" />
+  <Icon variant="search" size="20px" slot="icon-before" color="var(--color-main-primary-500)" />
 </TextField>
 
 <style>

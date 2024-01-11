@@ -1,13 +1,9 @@
 <script lang="ts">
-  import type { ComponentType, SvelteComponent } from "svelte";
-  import ActivityIcon from "components/icons/activity-icon.svelte";
-  import TicketIcon from "components/icons/ticket-icon.svelte";
   import { page } from "$app/stores";
   import routeConfig from "routeConfig";
-  import BookingsIcon from "components/icons/bookings-icon.svelte";
-  import BillIcon from "components/icons/bill-icon.svelte";
   import { permitted, type Action, getUser } from "utils/permissions";
   import { getLocaleData } from "i18n";
+  import Icon from "components/icons/icon.svelte";
 
   export let expanded: boolean;
   export let transitionTimeMs: number;
@@ -18,7 +14,7 @@
   let menuItems: {
     url: string;
     label: string;
-    icon: ComponentType<SvelteComponent<{ color?: string }>>;
+    icon: Icon["$$prop_def"]["variant"];
     exact?: boolean;
     permission?: Action;
   }[];
@@ -27,24 +23,24 @@
     {
       url: routeConfig.routes.tripManagement.routes.book.root,
       label: $i18n.pages.tripManagement.pages.book.title,
-      icon: TicketIcon,
+      icon: "ticket",
     },
     {
       url: routeConfig.routes.tripManagement.routes.orders.root,
       label: $i18n.pages.tripManagement.pages.orders.title,
-      icon: BookingsIcon,
+      icon: "bookings",
       permission: "journey.view",
     },
     {
       url: routeConfig.routes.pay.routes.activity.root,
       label: $i18n.pages.pay.pages.activity.title,
-      icon: ActivityIcon,
+      icon: "activity",
       permission: "transaction.view",
     },
     {
       url: routeConfig.routes.pay.routes.bills.root,
       label: $i18n.pages.pay.pages.bills.title,
-      icon: BillIcon,
+      icon: "bill",
       permission: "*",
     },
   ];
@@ -63,9 +59,10 @@
           class:active
           title={expanded ? undefined : item.label}
         >
-          <svelte:component
-            this={item.icon}
+          <Icon
+            variant={item.icon}
             color="var({active ? '--color-main-primary-500' : '--color-common-light-strong'})"
+            size="20px"
           />
           <span>{item.label}</span>
         </a>

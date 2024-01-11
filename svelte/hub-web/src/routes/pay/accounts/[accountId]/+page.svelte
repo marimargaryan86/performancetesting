@@ -1,7 +1,6 @@
 <script lang="ts">
   import ChevronIcon from "components/icons/chevron-icon.svelte";
   import CurrencyFlag from "components/icons/currency-flag.svelte";
-  import PlusIcon from "components/icons/plus-icon.svelte";
   import { formatAmount } from "formatting/currency";
   import AddBalanceDialogue from "./add-balance-dialogue.svelte";
   import Button from "components/ui/button.svelte";
@@ -10,6 +9,7 @@
   import type { Balance } from "integration/junction-hub-api/schemas/balance";
   import { getPageTitle } from "utils/page-title";
   import { getLocale, getLocaleData } from "i18n";
+  import Icon from "components/icons/icon.svelte";
 
   export let data;
 
@@ -61,7 +61,7 @@
 <StandardLayout pageTitle={$i18n.words.balances} {breadCrumbs} bind:searchQuery>
   <Button size="small" on:click={openDialogue} slot="actions">
     {$i18n.actions.addBalance}
-    <PlusIcon />
+    <Icon variant="plus" size="20px" />
   </Button>
 
   <ul class="balances">

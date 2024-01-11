@@ -12,20 +12,17 @@
 
 <script lang="ts">
   import ChevronIcon from "components/icons/chevron-icon.svelte";
-  import LogoutIcon from "components/icons/logout-icon.svelte";
-  import BugIcon from "components/icons/bug-icon.svelte";
-  import KnowledgeIcon from "components/icons/knowledge-icon.svelte";
   import Account from "./account.svelte";
   import Menu from "./menu.svelte";
   import SelectField from "components/ui/select-field.svelte";
   import HubLogo from "components/icons/hub-logo.svelte";
-  import InformationIcon from "components/icons/information-icon.svelte";
   import { page } from "$app/stores";
   import routeConfig from "routeConfig";
   import integrationInstancesClient from "integration-instances-client";
   import { getLocale, getLocaleData, type Locale } from "i18n";
   import languages from "i18n/lang/languages";
   import { goto } from "$app/navigation";
+  import Icon from "components/icons/icon.svelte";
 
   let expanded = true;
 
@@ -82,7 +79,9 @@
         href={routeConfig.routes.knowledgeHub.root}
         class:active={activeLink === "knowledge-hub"}
       >
-        <KnowledgeIcon
+        <Icon
+          variant="knowledge"
+          size="20px"
           color="var({activeLink === 'knowledge-hub'
             ? '--color-main-primary-500'
             : '--color-common-light-strong'})"
@@ -97,10 +96,12 @@
         href={routeConfig.routes.help.routes.customerService.root}
         class:active={activeLink === "issue"}
       >
-        <BugIcon
+        <Icon
+          variant="bug"
           color="var({activeLink === 'issue'
             ? '--color-main-primary-500'
             : '--color-common-light-strong'})"
+          size="20px"
         />
         <span>{$i18n.actions.reportAnIssue}</span>
       </a>
@@ -112,7 +113,9 @@
         href={routeConfig.routes.help.routes.privacyPolicy.root}
         class:active={activeLink === "help"}
       >
-        <InformationIcon
+        <Icon
+          variant="information"
+          size="20px"
           color="var({activeLink === 'help'
             ? '--color-main-primary-500'
             : '--color-common-light-strong'})"
@@ -126,7 +129,7 @@
         title={expanded ? undefined : $i18n.actions.logout}
         on:click={logout}
       >
-        <LogoutIcon color="var(--color-common-light-strong)" />
+        <Icon variant="logout" size="20px" color="var(--color-common-light-strong)" />
         <span>{$i18n.actions.logout}</span>
       </button>
     </li>

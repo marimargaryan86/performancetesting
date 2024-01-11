@@ -3,9 +3,9 @@
   generics="TType extends 'text' | 'tel' | 'password' | 'email' | 'number' | 'date' = 'text'"
 >
   /* global TType */
+  import Icon from "components/icons/icon.svelte";
   import { getLocale } from "i18n";
   import { slideFade } from "transitions/slide-fade";
-  import RemoveIcon from "components/icons/remove-icon.svelte";
   import { createEventDispatcher } from "svelte";
   import { getRandomId } from "utils/random";
 
@@ -108,7 +108,7 @@
 
     {#if clearable && value}
       <button type="button" on:click={clear} class="clear" tabindex="-1">
-        <RemoveIcon color="var(--color-common-dark-strong)" />
+        <Icon variant="remove-cross" color="var(--color-common-dark-strong)" size="12px" />
       </button>
     {/if}
 

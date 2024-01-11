@@ -24,7 +24,6 @@
   import Button from "components/ui/button.svelte";
   import AutocompleteField from "components/ui/autocomplete-field.svelte";
   import { z } from "zod";
-  import SearchIcon from "components/icons/search-icon.svelte";
   import SwapIcon from "components/icons/swap-icon.svelte";
   import type { Place } from "integration/junction-mobile-api/schemas/place";
   import LoadingIcon from "components/icons/loading-icon.svelte";
@@ -39,6 +38,7 @@
   import { ensureDefined } from "utils/array";
   import { writable } from "svelte/store";
   import { getLocaleData } from "i18n";
+  import Icon from "components/icons/icon.svelte";
 
   export let data: Partial<SearchDataModel> = {};
   export let origin: Place | undefined = undefined;
@@ -143,7 +143,7 @@
     {#if $pending}
       <LoadingIcon />
     {:else}
-      <SearchIcon color="var(--color-common-dark-strong)" />
+      <Icon variant="search" size="20px" color="var(--color-common-dark-strong)" />
     {/if}
   </Button>
 

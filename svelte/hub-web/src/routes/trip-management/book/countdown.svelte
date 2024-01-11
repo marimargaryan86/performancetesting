@@ -9,7 +9,7 @@
 </script>
 
 <script lang="ts">
-  import AlertIcon from "components/icons/alert-icon.svelte";
+  import Icon from "components/icons/icon.svelte";
   import Alert from "components/ui/alert.svelte";
   import { getLocaleData } from "i18n";
   import { onDestroy, onMount } from "svelte";
@@ -60,7 +60,7 @@
 </script>
 
 <Alert {show} type="warning" class="countdown">
-  <AlertIcon />
+  <Icon variant="alert-triangle" color="var(--color-semantic-warning-600)" />
   <strong class="typography body-medium bold">{$i18n.sentences.timeRemaining}</strong>
   <span class="typography body-medium">
     <!-- eslint-disable-next-line svelte/no-at-html-tags -->

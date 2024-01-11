@@ -3,14 +3,12 @@
   import routeConfig from "routeConfig";
   import StandardLayout from "components/page/standard-layout.svelte";
   import { page } from "$app/stores";
-  import type { ComponentType } from "svelte";
-  import HeadphonesIcon from "components/icons/headphones-icon.svelte";
   import { getPageTitle } from "utils/page-title";
   import { getLocaleData } from "i18n";
 
   const i18n = getLocaleData();
 
-  let tabs: (Tab & { icon?: ComponentType })[];
+  let tabs: (Tab & { icon?: string })[];
 
   $: tabs = [
     {
@@ -24,7 +22,7 @@
       exact: true,
     },
     {
-      icon: HeadphonesIcon,
+      icon: "headphones",
       url: routeConfig.routes.help.routes.customerService.root,
       label: $i18n.pages.help.pages.customerService.title,
       exact: true,
@@ -50,7 +48,7 @@
   {#key $page.url.pathname}
     <div class="container">
       {#if activeTab?.icon}
-        <svelte:component this={activeTab.icon} />
+        <img src="/images/icons/{activeTab.icon}.svg" alt="" />
       {/if}
 
       <h1 class="typography bold title-medium">
@@ -78,6 +76,11 @@
 
   h1 {
     color: var(--color-main-primary-900);
+  }
+
+  img {
+    width: 60px;
+    height: 60px;
   }
 
   .content {

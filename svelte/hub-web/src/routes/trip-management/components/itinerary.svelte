@@ -24,14 +24,13 @@
 </script>
 
 <script lang="ts">
-  import ClockIcon from "components/icons/clock-icon.svelte";
   import { formatDuration } from "formatting/date-time";
   import { getTimeDeltaS } from "utils/date-time";
-  import SeatIcon from "components/icons/seat-icon.svelte";
   import EntityAvatar from "components/ui/entity-avatar.svelte";
   import type { OfferSegmentLeg } from "integration/common/schemas/offer-segment-leg";
   import { getLocale, getLocaleData } from "i18n";
   import { formatStopCount } from "formatting/trip";
+  import Icon from "components/icons/icon.svelte";
 
   export let bookings: TripBooking[];
 
@@ -104,7 +103,7 @@
 
           <div class="info-item">
             <span class="circle">
-              <ClockIcon color="var(--color-main-primary-600)" />
+              <Icon variant="clock-filled" color="var(--color-main-primary-600)" />
             </span>
 
             <div>
@@ -117,7 +116,7 @@
 
           <div class="info-item">
             <span class="circle">
-              <SeatIcon color="var(--color-main-primary-600)" />
+              <Icon variant="seat" color="var(--color-main-primary-600)" />
             </span>
 
             <div>

@@ -3,10 +3,10 @@
   import { scale } from "svelte/transition";
   import { getLocaleData } from "i18n";
   import Backdrop from "components/ui/backdrop.svelte";
-  import CloseIcon from "components/icons/close-icon.svelte";
   import TextField from "components/ui/text-field.svelte";
   import Button from "components/ui/button.svelte";
   import { validateReferenceNumber } from "utils/booking";
+  import Icon from "components/icons/icon.svelte";
 
   const i18n = getLocaleData();
   const dispatch = createEventDispatcher<{ search: void }>();
@@ -47,7 +47,7 @@
     out:scale={{ duration: 150, start: 0.7 }}
   >
     <button class="close-icon" on:click={close}>
-      <CloseIcon variant="cross" />
+      <Icon variant="close" />
     </button>
     <h3 class="typography headline-small bold">{$i18n.actions.findTrip}</h3>
     <div class="fields">

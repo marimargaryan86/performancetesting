@@ -13,9 +13,8 @@
   import { getLocaleData } from "i18n";
   import { ensureDefined } from "utils/array";
   import Card from "components/ui/card.svelte";
-  import ClockIcon from "components/icons/clock-icon.svelte";
-  import PlayIcon from "components/icons/play-icon.svelte";
   import VideoPlayer from "./video-player.svelte";
+  import Icon from "components/icons/icon.svelte";
 
   const i18n = getLocaleData();
 
@@ -40,12 +39,12 @@
           style:background-image="url(https://img.youtube.com/vi/{video.id}/mqdefault.jpg)"
           on:click={action}
         >
-          <PlayIcon variant="circle" />
+          <Icon variant="play-circled" size="80px" />
         </button>
 
         <svelte:fragment slot="content">
           <span class="chip typography body-medium">
-            <ClockIcon variant="outlined" />
+            <Icon variant="clock-outlined" size="16px" color="var(--color-main-primary-500)" />
             {getDuration(video.lengthS)}
           </span>
 

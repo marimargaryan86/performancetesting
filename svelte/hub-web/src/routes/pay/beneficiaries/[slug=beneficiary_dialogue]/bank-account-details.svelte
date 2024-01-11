@@ -2,13 +2,12 @@
   import SelectField from "components/ui/select-field.svelte";
   import Section from "./section.svelte";
   import TextField from "components/ui/text-field.svelte";
-  import RegularPaymentIcon from "components/icons/regular-payment-icon.svelte";
-  import PriorityPaymentIcon from "components/icons/priority-payment-icon.svelte";
   import type { CountryModel } from "models/location";
   import { formatCountryOption } from "formatting/location";
   import type { BeneficiaryPut } from "integration/junction-hub-api/schemas/beneficiary";
   import countryData from "data/country-data";
   import currencyData from "data/currency-data";
+  import Icon from "components/icons/icon.svelte";
 
   export let data: BeneficiaryPut;
 
@@ -89,7 +88,7 @@
   <form>
     <div class="options">
       <label class="option" class:selected={data.bankDetails.paymentType === "regular"}>
-        <RegularPaymentIcon />
+        <Icon variant="regular-payment" />
 
         <div>
           <strong class="typography body-large bold">Regular Payment</strong>
@@ -101,7 +100,7 @@
         <input type="radio" bind:group={data.bankDetails.paymentType} value="regular" />
       </label>
       <label class="option" class:selected={data.bankDetails.paymentType === "priority"}>
-        <PriorityPaymentIcon />
+        <Icon variant="priority-payment" />
 
         <div>
           <strong class="typography body-large bold">Priority Payment</strong>

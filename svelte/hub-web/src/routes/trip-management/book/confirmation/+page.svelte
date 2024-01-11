@@ -14,18 +14,16 @@
   import Button from "components/ui/button.svelte";
   import routeConfig from "routeConfig";
   import Alert, { type AlertType } from "components/ui/alert.svelte";
-  import CheckedIcon from "components/icons/checked-icon.svelte";
   import Passengers from "../../components/passengers.svelte";
   import Price from "../../components/price.svelte";
   import Overview from "./overview.svelte";
   import Itinerary from "../../components/itinerary.svelte";
   import { ensureDefined } from "utils/array";
-  import CloseIcon from "components/icons/close-icon.svelte";
-  import AlertIcon from "components/icons/alert-icon.svelte";
   import { getOrderStatus, type OrderBookingStatus } from "integration/common/schemas/order";
   import Fees from "./fees.svelte";
   import { getPageTitle } from "utils/page-title";
   import { getLocaleData } from "i18n";
+  import Icon from "components/icons/icon.svelte";
 
   export let data;
 
@@ -53,18 +51,18 @@
   <Alert type={alertType}>
     {#if alertType === "success"}
       <span class="icon success">
-        <CheckedIcon color="var(--color-common-dark-strong)" />
+        <Icon variant="checked" size="16px" color="var(--color-common-dark-strong)" />
       </span>
       <span class="typography body-medium bold">{$i18n.words.success}</span>
       <span class="typography body-medium">{$i18n.sentences.theOrderWasCreatedSuccessfully}</span>
     {:else if alertType === "error"}
       <span class="icon error">
-        <CloseIcon color="var(--color-common-dark-strong)" variant="cross" />
+        <Icon color="var(--color-common-dark-strong)" variant="close" />
       </span>
       <span class="typography body-medium bold">{$i18n.words.error}</span>
       <span class="typography body-medium">{$i18n.sentences.theOrderWasCreatedWithErrors}</span>
     {:else}
-      <AlertIcon color="var(--color-semantic-warning-600)" />
+      <Icon variant="alert-triangle" color="var(--color-semantic-warning-600)" />
       <span class="typography body-medium bold">{$i18n.words.warning}</span>
       <span class="typography body-medium">{$i18n.sentences.theOrderIsInAPendingState}</span>
     {/if}

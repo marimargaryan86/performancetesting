@@ -1,5 +1,5 @@
 <script lang="ts">
-  import CheckedIcon from "components/icons/checked-icon.svelte";
+  import Icon from "components/icons/icon.svelte";
 
   export let steps: { label: string; number: number }[];
   export let activeStep: number;
@@ -12,7 +12,7 @@
     <li class:active={activeStep === step.number} class:done>
       <span class="number-badge typography body-small bold">
         {#if done}
-          <CheckedIcon color="var(--color-main-primary-500)" />
+          <Icon variant="checked" size="16px" color="var(--color-main-primary-500)" />
         {:else}
           {step.number}
         {/if}

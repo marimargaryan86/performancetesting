@@ -19,7 +19,6 @@
 </script>
 
 <script lang="ts">
-  import PassengerIcon from "components/icons/passenger-icon.svelte";
   import type { OrderPassenger } from "integration/junction-mobile-api/schemas/order";
   import { getAge } from "utils/date-time";
   import {
@@ -27,6 +26,7 @@
     getPassengerFullLabel,
   } from "./trip-search/passenger-picker/passenger-picker.svelte";
   import { getLocaleData, type LocaleData } from "i18n";
+  import Icon from "components/icons/icon.svelte";
 
   export let passengers: OrderPassenger[];
   export let orderCreatedAt: Date = new Date();
@@ -39,7 +39,7 @@
   {#each passengers as passenger}
     <li class="passenger typography body-large">
       <span class="circle">
-        <PassengerIcon color="var(--color-main-primary-600" />
+        <Icon variant="passenger" size="20px" color="var(--color-main-primary-600" />
       </span>
       <strong class="typography bold">{passenger.firstName} {passenger.lastName}</strong>
       <em>{getPassengerLabel(passenger, orderCreatedAt, $i18n)}</em>

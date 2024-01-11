@@ -1,7 +1,6 @@
 <script lang="ts">
   import CurrencyFlag from "components/icons/currency-flag.svelte";
   import LoadingIcon from "components/icons/loading-icon.svelte";
-  import SearchIcon from "components/icons/search-icon.svelte";
   import Button from "components/ui/button.svelte";
   import TextField from "components/ui/text-field.svelte";
   import { portal } from "directives/portal";
@@ -13,6 +12,7 @@
   import currencyData from "data/currency-data";
   import { writable } from "svelte/store";
   import { getLocaleData } from "i18n";
+  import Icon from "components/icons/icon.svelte";
 
   export let accountId: string;
   export let exclude: Balance[];
@@ -91,7 +91,12 @@
         placeholder={$i18n.sentences.findABalance}
         bind:this={inputRef}
       >
-        <SearchIcon slot="icon-before" color="var(--color-main-neutral-400)" />
+        <Icon
+          variant="search"
+          size="20px"
+          slot="icon-before"
+          color="var(--color-main-neutral-400)"
+        />
       </TextField>
 
       <ul class="balances typography body-large bold">

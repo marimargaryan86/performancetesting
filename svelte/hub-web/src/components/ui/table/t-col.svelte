@@ -1,5 +1,5 @@
 <script lang="ts">
-  import CopyIcon from "components/icons/copy-icon.svelte";
+  import Icon from "components/icons/icon.svelte";
   import { getLocaleData } from "i18n";
 
   let className: string | undefined = undefined;
@@ -45,7 +45,7 @@
       {:else}
         <slot />
 
-        <CopyIcon color="var(--color-common-dark-strong)" />
+        <Icon variant="copy" size="12px" color="var(--color-common-dark-strong)" />
       {/if}
     </button>
   {/if}

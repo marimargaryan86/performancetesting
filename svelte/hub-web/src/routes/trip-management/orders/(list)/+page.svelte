@@ -55,7 +55,6 @@
 </script>
 
 <script lang="ts">
-  import PlusIcon from "components/icons/plus-icon.svelte";
   import StandardLayout from "components/page/standard-layout.svelte";
   import Button from "components/ui/button.svelte";
   import Header from "components/ui/table/header.svelte";
@@ -87,6 +86,7 @@
   import { getPageTitle } from "utils/page-title";
   import { getLocale, getLocaleData } from "i18n";
   import TMoneyCol from "components/ui/table/t-money-col.svelte";
+  import Icon from "components/icons/icon.svelte";
 
   export let data;
 
@@ -135,7 +135,7 @@
 >
   <Button size="small" href={routeConfig.routes.tripManagement.routes.book.root} slot="actions">
     {$i18n.actions.newOrder}
-    <PlusIcon />
+    <Icon variant="plus" size="20px" />
   </Button>
 
   <Filters slot="filters" bind:filters={$filters} />

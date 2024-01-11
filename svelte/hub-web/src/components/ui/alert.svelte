@@ -3,7 +3,7 @@
 </script>
 
 <script lang="ts">
-  import CloseIcon from "components/icons/close-icon.svelte";
+  import Icon from "components/icons/icon.svelte";
   import { slideFade } from "transitions/slide-fade";
 
   export let type: AlertType = "success";
@@ -32,7 +32,7 @@
 
     {#if dismissable}
       <button on:click={close}>
-        <CloseIcon variant="cross" />
+        <Icon variant="close" />
       </button>
     {/if}
   </div>

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import TicketIcon from "components/icons/ticket-icon.svelte";
+  import Icon from "components/icons/icon.svelte";
   import { getLocaleData } from "i18n";
 
   let titleExt: string | undefined = undefined;
@@ -13,7 +13,7 @@
 
 <div class="ticket">
   <div class="icon">
-    <TicketIcon color="var(--color-main-primary-600)" />
+    <Icon variant="ticket" size="20px" color="var(--color-main-primary-600)" />
   </div>
 
   <span>

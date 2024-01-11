@@ -9,7 +9,7 @@
 
 <script lang="ts">
   import { page } from "$app/stores";
-  import CloseIcon from "components/icons/close-icon.svelte";
+  import Icon from "components/icons/icon.svelte";
   import Backdrop from "components/ui/backdrop.svelte";
 
   let backdrop: Backdrop | undefined;
@@ -30,7 +30,7 @@
 
 <Backdrop bind:this={backdrop}>
   <button on:click={close}>
-    <CloseIcon color="var(--color-common-dark-strong)" size="50px" />
+    <Icon variant="close-circled" color="var(--color-common-dark-strong)" size="50px" />
   </button>
 
   {#if video}

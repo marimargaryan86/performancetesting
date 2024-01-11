@@ -1,12 +1,12 @@
 <script lang="ts">
   import Button from "../button.svelte";
-  import AlertIcon from "components/icons/alert-icon.svelte";
   import { createEventDispatcher, onDestroy, onMount } from "svelte";
   import { scale } from "svelte/transition";
   import Backdrop from "../backdrop.svelte";
   import { formatAmount } from "formatting/currency";
   import type { Price } from "integration/common/schemas/price";
   import { getLocale, getLocaleData } from "i18n";
+  import Icon from "components/icons/icon.svelte";
 
   export let originalPrice: Price;
   export let newPrice: Price;
@@ -43,7 +43,7 @@
     in:scale={{ duration: 150, start: 0.7, delay: 100 }}
     out:scale={{ duration: 150, start: 0.7 }}
   >
-    <AlertIcon color="var(--color-semantic-error-500)" size="64px" variant="disc" />
+    <Icon variant="alert-disc" color="var(--color-semantic-error-500)" size="64px" />
 
     <h1 class="typography bold display-small title">{$i18n.sentences.priceChange}</h1>
 

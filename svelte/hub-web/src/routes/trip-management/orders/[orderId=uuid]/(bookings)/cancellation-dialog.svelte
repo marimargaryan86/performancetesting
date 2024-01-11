@@ -1,5 +1,4 @@
 <script lang="ts">
-  import AlertIcon from "components/icons/alert-icon.svelte";
   import Backdrop from "components/ui/backdrop.svelte";
   import Ticket from "../../../components/ticket.svelte";
   import type { TripBooking } from "integration/junction-hub-api/schemas/booking";
@@ -7,7 +6,6 @@
   import type { OrderPassenger } from "integration/junction-hub-api/schemas/order";
   import Itinerary from "../../../components/itinerary.svelte";
   import Button from "components/ui/button.svelte";
-  import EmailIcon from "components/icons/email-icon.svelte";
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import { scale } from "svelte/transition";
   import { createEventDispatcher } from "svelte";
@@ -15,6 +13,7 @@
   import { writable } from "svelte/store";
   import type { CancellationRequest } from "integration/junction-hub-api/schemas/cancellation";
   import { getLocaleData } from "i18n";
+  import Icon from "components/icons/icon.svelte";
 
   export let passengers: OrderPassenger[];
 
@@ -127,7 +126,7 @@
       </div>
     {:else if state === "rules" && booking?.rules}
       <div class="icon-wrapper">
-        <AlertIcon color="var(--color-semantic-error-500)" size="64px" variant="disc" />
+        <Icon color="var(--color-semantic-error-500)" size="64px" variant="alert-disc" />
       </div>
 
       <h3 class="typography display-small bold">{$i18n.sentences.rulesAndFees}</h3>
@@ -183,7 +182,7 @@
 
       <div class="support typography body-medium">
         <strong>
-          <EmailIcon />
+          <Icon variant="email" size="20px" />
           <a href="mailto:support@snowfalltravel.com?subject=GG%20-%20">
             support@snowfalltravel.com
           </a>
