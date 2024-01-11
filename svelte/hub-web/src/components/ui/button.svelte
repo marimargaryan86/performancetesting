@@ -185,15 +185,9 @@
     height: var(--icon-size);
   }
 
-  button :global(*:not(svg)[stroke]),
-  a :global(*:not(svg)[stroke]) {
-    transition: stroke 150ms ease;
-    stroke: var(--icon-color);
-  }
-
-  button :global(*:not(svg)[fill]),
-  a :global(*:not(svg)[fill]) {
-    transition: fill 150ms ease;
-    fill: var(--icon-color);
+  button :global(div.icon),
+  a :global(div.icon) {
+    background-color: var(--icon-color);
+    transition: background-color 150ms ease;
   }
 </style>

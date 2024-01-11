@@ -248,8 +248,8 @@
     cursor: pointer;
   }
 
-  .logout > :global(svg),
-  .link > :global(svg) {
+  .logout > :global(.icon),
+  .link > :global(.icon) {
     flex-shrink: 0;
   }
 

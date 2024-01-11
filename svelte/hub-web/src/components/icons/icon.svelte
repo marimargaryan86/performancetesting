@@ -36,7 +36,7 @@
     | "seat"
     | "ticket";
   export let size = "24px";
-  export let color = "var(--color-common-light-strong)";
+  export let color: string | undefined = undefined;
 
   $: mask = `url("/images/icons/${variant}.svg")`;
 </script>
@@ -56,6 +56,7 @@
     mask-size: contain;
     mask-repeat: no-repeat;
     mask-position: center;
+    background-color: var(--color-common-light-strong);
     /* stylelint-disable property-no-vendor-prefix */
     -webkit-mask-size: contain;
     -webkit-mask-repeat: no-repeat;
