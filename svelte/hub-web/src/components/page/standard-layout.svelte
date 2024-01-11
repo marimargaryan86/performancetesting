@@ -144,13 +144,15 @@
     --height: 40px;
 
     display: flex;
-    gap: 16px;
+    flex-flow: row wrap;
+    gap: 8px 16px;
+    margin: 0 0 16px;
   }
 
   .filters > :global(*) {
     width: 100%;
     max-width: 276px;
-    margin: 16px 0;
+    margin: 16px 0 0;
   }
 
   .filters.tabs-after > :global(*) {

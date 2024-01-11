@@ -39,6 +39,8 @@
       "departureAt[from]": data.departureAtRange?.from.toLocaleDateString("sv-SE"),
       "departureAt[to]": data.departureAtRange?.to.toLocaleDateString("sv-SE"),
       bookingStatus: data.bookingStatus,
+      referenceNumber: data.referenceNumber,
+      passengerLastName: data.passengerLastName,
     }),
     (query) => ({
       bookingStatus: bookingStatuses.includes(query.bookingStatus as BookingStatus)
@@ -46,6 +48,8 @@
         : undefined,
       createdAtRange: parseDateRange(query["createdAt[from]"], query["createdAt[to]"]),
       departureAtRange: parseDateRange(query["departureAt[from]"], query["departureAt[to]"]),
+      referenceNumber: query.referenceNumber,
+      passengerLastName: query.passengerLastName,
     }),
   );
 </script>

@@ -55,6 +55,8 @@ export type JourneyFilterOptions = {
   departureAtRange?: DateRange;
   createdAtRange?: DateRange;
   bookingStatus?: BookingStatus;
+  referenceNumber?: string;
+  passengerLastName?: string;
 };
 
 export type JourneyFilterOptionsQuery = {
@@ -63,6 +65,8 @@ export type JourneyFilterOptionsQuery = {
   "createdAt[from]"?: string;
   "createdAt[to]"?: string;
   bookingStatus?: string;
+  referenceNumber?: string;
+  passengerLastName?: string;
 };
 
 export const journeyParser = {

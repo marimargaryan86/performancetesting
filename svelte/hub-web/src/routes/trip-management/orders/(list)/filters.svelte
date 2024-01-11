@@ -13,9 +13,11 @@
 </script>
 
 <script lang="ts">
+  import { dev } from "$app/environment";
   import Button from "components/ui/button.svelte";
   import DatePicker from "components/ui/date-picker/date-picker.svelte";
   import SelectField from "components/ui/select-field.svelte";
+  import TextField from "components/ui/text-field.svelte";
   import { getLocaleData, type LocaleData } from "i18n";
   import {
     bookingStatuses,
@@ -55,6 +57,22 @@
   formatter={formatBookingStatusOption}
   placeholder={$i18n.actions.select}
 />
+
+{#if dev}
+  <TextField
+    label={$i18n.words.referenceNumber}
+    placeholder={$i18n.sentences.referenceNumberPlaceholder}
+    bind:value={filters.referenceNumber}
+  />
+
+  <TextField
+    label={`${
+      $i18n.words.passenger.singular
+    } ${$i18n.words.lastName.toLowerCase()} (${$i18n.words.optional.toLowerCase()})`}
+    placeholder={$i18n.sentences.passengerLastNamePlaceholder}
+    bind:value={filters.passengerLastName}
+  />
+{/if}
 
 <Button class="filter-clear-btn" size="small" on:click={reset}>{$i18n.actions.clear}</Button>
 
