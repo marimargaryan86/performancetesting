@@ -240,7 +240,7 @@ class OfferImporter(object):
             offer_search=offer_search,
         )
 
-        async with self._redis.lock(redis_lock, timeout=10):
+        async with self._redis.lock(redis_lock, timeout=10, sleep=1):
             try:
                 await self._aggregator.aggregate(message)
             except aggregator.SkippedOfferError:
