@@ -101,6 +101,8 @@ export default {
     refundReference: "Återbetalningsreferens",
     bookTrip: "Boka en resa",
     manageTrip: "Hantera en resa",
+    referenceNumber: "Referensnummer",
+    optional: "Frivillig",
   },
   actions: {
     logout: "Logga ut",
@@ -225,6 +227,9 @@ export default {
       "Sök, boka och betala för multimodalt innehåll från tusentals leverantörer och operatörer – i en enda bokning.",
     manageTrip:
       "Hämta din resa för att ändra eller avboka bokningar, visa/skriva ut resplan och mycket mer.",
+    referenceNumberPlaceholder: "Till exempel: 9A2FDF56",
+    passengerLastNamePlaceholder: "Som på din bokningsbekräftelse",
+    referenceNumberError: "Din referens är en sekvens av åtta bokstäver och/eller siffror.",
   },
   tableHeaders: {
     id: "ID",

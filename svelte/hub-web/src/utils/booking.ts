@@ -11,3 +11,16 @@ export function getDestination(booking: MobileBooking | HubBooking): Point | und
 
   return details?.legs[(details?.legs.length ?? 0) - 1]?.destination;
 }
+
+/**
+ * Validates that the input `Journey.referenceNumber` is an 8 character length
+ * alphanumeric string.
+ *
+ * @param referenceNumber A Journey referenceNumber to search
+ * @returns Boolean indicating if a reference number is valid.
+ */
+export function validateReferenceNumber(referenceNumber: string): boolean {
+  const regex = /^[A-Za-z0-9]{8}$/;
+
+  return regex.test(referenceNumber);
+}

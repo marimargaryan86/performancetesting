@@ -49,8 +49,8 @@
           <h3 class="typography headline-small bold">{$i18n.words.bookTrip}</h3>
           <p class="typography label-large">{$i18n.sentences.bookTrip}</p>
         </div>
-        <div slot="actions">
-          <Button href={routeConfig.routes.tripManagement.routes.book.root}
+        <div slot="actions" class="actions">
+          <Button class="widget-button" href={routeConfig.routes.tripManagement.routes.book.root}
             >{$i18n.actions.bookTrip}</Button
           >
         </div>
@@ -70,7 +70,7 @@
             <p class="typography label-large">{$i18n.sentences.manageTrip}</p>
           </div>
           <div slot="actions" class="actions alt">
-            <Button variant="outline" on:click={findTripDialog?.open}
+            <Button variant="outline" class="widget-button" on:click={findTripDialog?.open}
               >{$i18n.actions.findTrip}</Button
             >
           </div>
@@ -184,16 +184,16 @@
     color: var(--color-common-light-medium);
   }
 
-  :global(button) {
+  .actions > :global(.widget-button) {
     width: 100%;
   }
 
-  div > :global(button.outline) {
+  .actions > :global(.widget-button.outline) {
     --background-color: var(--color-common-background-light-main);
     --color: var(--color-main-primary-400);
   }
 
-  div > :global(button.outline):hover {
+  .actions > :global(.widget-button.outline):hover {
     --background-color: var(--color-main-primary-700);
     --border-color: var(--color-main-primary-700);
     --color: var(--color-common-dark-strong);
