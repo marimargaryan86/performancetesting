@@ -116,6 +116,7 @@ async def send_booking_confirmation(
         company_name=smtp_client.client_name,
         support_email=smtp_client.support_email,
         passengers=order["passengers"],
+        bookings=order["bookings"],
         record_locators=record_locators,
         operator_booking_references=operator_booking_references,
     )
