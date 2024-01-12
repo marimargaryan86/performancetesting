@@ -53,7 +53,7 @@ class Stripe(interfaces.CreditCardProvider):
             amount=intent_money.amount,
             currency=intent_money.currency.code,
             capture_method=payment.capture_method,
-            customer=payment.credit_card_holder_id,
+            customer=payment.credit_card_holder_id or None,
             automatic_payment_methods={
                 "enabled": payment.enable_automatic_payment_method,
             },
