@@ -6,7 +6,7 @@
   import { scale } from "svelte/transition";
   import { clickOutside } from "directives/click-outside";
   import { createEventDispatcher } from "svelte";
-  import { keyboard } from "directives/keyboard";
+  import { keyboard, type KeyboardParams } from "directives/keyboard";
 
   let className: string | undefined = undefined;
 
@@ -30,8 +30,8 @@
   let expanded = false;
   let dialog: HTMLUListElement | undefined;
   let textField: TextField | undefined;
+  let selectedDisplayValue = formatter(value, true);
 
-  $: selectedDisplayValue = formatter(value, true);
   $: filteredOptions = options;
   $: hoveredIndex = filteredOptions.indexOf(value);
   $: filter(selectedDisplayValue);
@@ -90,34 +90,38 @@
   }
 
   const keyMapping = {
-    ArrowUp: (): void => {
+    ArrowUp: (event): void => {
       hoveredIndex = Math.max(0, hoveredIndex - 1);
 
       if (expanded) {
+        event.preventDefault();
         scrollToOption();
       } else {
         select(filteredOptions[hoveredIndex]);
       }
     },
-    ArrowDown: (): void => {
+    ArrowDown: (event): void => {
       hoveredIndex = Math.min(filteredOptions.length - 1, hoveredIndex + 1);
 
       if (expanded) {
+        event.preventDefault();
         scrollToOption();
       } else {
         select(filteredOptions[hoveredIndex]);
       }
     },
     " ": open,
-    Enter: (): void => {
+    Enter: (event): void => {
       if (expanded) {
+        event.preventDefault();
+        event.stopPropagation();
         return select(filteredOptions[hoveredIndex]);
       }
 
       open();
     },
     Escape: close,
-  };
+  } satisfies KeyboardParams;
 </script>
 
 <div

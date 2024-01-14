@@ -2,7 +2,7 @@
   /* global TValue */
   import { writable } from "svelte/store";
   import { slideFade } from "transitions/slide-fade";
-  import { keyboard } from "directives/keyboard";
+  import { keyboard, type KeyboardParams } from "directives/keyboard";
   import { clickOutside } from "directives/click-outside";
   import { scale } from "svelte/transition";
   import type { MaybePromise } from "@sveltejs/kit";
@@ -70,10 +70,11 @@
   }
 
   const keyMapping = {
-    ArrowUp: (): void => {
+    ArrowUp: (event): void => {
       hoveredIndex = Math.max(0, hoveredIndex - 1);
 
       if (expanded) {
+        event.preventDefault();
         scrollToOption();
       } else {
         const nextValue = items[hoveredIndex];
@@ -82,10 +83,11 @@
         }
       }
     },
-    ArrowDown: (): void => {
+    ArrowDown: (event): void => {
       hoveredIndex = Math.min(items.length - 1, hoveredIndex + 1);
 
       if (expanded) {
+        event.preventDefault();
         scrollToOption();
       } else {
         const nextValue = items[hoveredIndex];
@@ -95,8 +97,10 @@
         }
       }
     },
-    Enter: (): void => {
+    Enter: (event): void => {
       if (expanded) {
+        event.preventDefault();
+        event.stopPropagation();
         const nextValue = items[hoveredIndex];
 
         if (nextValue) {
@@ -107,7 +111,7 @@
       }
     },
     Escape: close,
-  };
+  } satisfies KeyboardParams;
 </script>
 
 <div class="autocomplete-field" use:clickOutside={close} use:keyboard={keyMapping}>
