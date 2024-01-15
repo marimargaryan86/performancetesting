@@ -1379,6 +1379,13 @@ class SimpleOfferSearchResource(models.Resource):
                     "departureAfter": protobuf.protobuf_to_datetime(
                         offer_search.simple_trip.departure_at,
                     ),
+                    "arrivalBefore": (
+                        protobuf.protobuf_to_datetime(
+                            offer_search.simple_trip.arrival_at,
+                        )
+                        if offer_search.simple_trip.HasField("arrival_at")
+                        else None
+                    ),
                 },
                 "expiresAt": protobuf.protobuf_to_datetime(
                     offer_search.expires_at,

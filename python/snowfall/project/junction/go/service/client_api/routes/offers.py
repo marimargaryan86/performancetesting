@@ -4,6 +4,7 @@ import dataclasses
 import datetime
 import itertools
 from collections.abc import Mapping, Sequence
+from gettext import gettext as _
 from typing import Any, ClassVar, cast
 
 import lagom
@@ -527,6 +528,8 @@ class SimpleOfferSearches(object):
         except KeyError:
             departure_before = None
 
+        arrival_before = get_arrival_before(criteria, allowed_segment_types)
+
         departure_after = get_departure_after(criteria)
         origin_coords = latlng_pb2.LatLng(
             latitude=criteria["origin"]["latitude"],
@@ -582,6 +585,9 @@ class SimpleOfferSearches(object):
                 allowed_segment_types=allowed_segment_types,
                 origin_provider_ids=origin_ids,
                 destination_provider_ids=destination_ids,
+                arrival_at=protobuf.datetime_to_protobuf(arrival_before)
+                if arrival_before
+                else None,
             ),
             session_token=cast(
                 str,
@@ -864,3 +870,24 @@ def _check_trip_conflicts(trips_list: Sequence[common_pb2.Trip]) -> list[models.
             )
 
     return validation_errors
+
+
+def get_arrival_before(
+    body: Mapping[str, Any],
+    allowed_segment_types: list[common_pb2.Schedule.Type.ValueType],
+) -> datetime.datetime | None:
+    try:
+        arrival_before = parser.isoparse(body["arrivalBefore"])
+    except KeyError:
+        arrival_before = None
+
+    if (  # noqa: WPS337
+        common_pb2.Schedule.Type.TYPE_CAR in allowed_segment_types
+        and not arrival_before
+    ):
+        raise exceptions.HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=_("`arrivalBefore` is required when `car` leg type is provided"),
+        )
+
+    return arrival_before

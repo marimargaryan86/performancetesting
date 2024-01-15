@@ -43,6 +43,7 @@ message SimpleTripOfferSearch {
   string session_token = 7;
   repeated ProviderIds origin_provider_ids = 8;
   repeated ProviderIds destination_provider_ids = 9;
+  google.protobuf.Timestamp arrival_at = 11;
 }
 
 message ProviderIds {
