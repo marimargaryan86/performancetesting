@@ -1,5 +1,6 @@
 <script lang="ts">
   import StandardLayout from "components/page/standard-layout.svelte";
+  import UserManuals from "./user-manuals.svelte";
   import Videos from "./videos.svelte";
   import Faq from "./faq.svelte";
   import { getPageTitle } from "utils/page-title";
@@ -14,6 +15,8 @@
 
 <StandardLayout pageTitle={$i18n.pages.knowledgeHub.title} backgroundImage="none">
   <div class="content">
+    <UserManuals />
+
     <Videos />
 
     <Faq />

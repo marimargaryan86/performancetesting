@@ -34,7 +34,9 @@
     | "remove-trash"
     | "search"
     | "seat"
-    | "ticket";
+    | "ticket"
+    | "download"
+    | "pdf";
   export let size = "24px";
   export let color: string | undefined = undefined;
 

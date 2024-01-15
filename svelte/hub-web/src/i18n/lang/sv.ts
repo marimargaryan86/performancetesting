@@ -510,6 +510,12 @@ export default {
     },
     knowledgeHub: {
       title: "Kunskapshub",
+      userManuals: {
+        title: "Användarmanualer",
+        description:
+          "Hitta allt du behöver för att komma åt och börja använda Junction Hub med vår användbara användarhandbok.",
+        userManual: "Junction Hub - Användarhandbok",
+      },
       videos: {
         title: "Videohandledning",
         description:

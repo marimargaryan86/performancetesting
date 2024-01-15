@@ -516,6 +516,12 @@ export default {
     },
     knowledgeHub: {
       title: "Knowledge Hub",
+      userManuals: {
+        title: "User Manuals",
+        description:
+          "Find everything you need to access and start using Junction Hub with our helpful user guide.",
+        userManual: "Junction Hub - User Manual",
+      },
       videos: {
         title: "Video Tutorials",
         description:

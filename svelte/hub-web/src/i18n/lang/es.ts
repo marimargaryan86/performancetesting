@@ -472,6 +472,12 @@ export default {
     },
     knowledgeHub: {
       title: "Centro de conocimiento",
+      userManuals: {
+        title: "Manuales de usuario",
+        description:
+          "Encuentre todo lo que necesita para acceder y comenzar a usar Junction Hub con nuestra útil guía de usuario.",
+        userManual: "Junction Hub - Manual de usuario",
+      },
       videos: {
         title: "Tutoriales en vídeo",
         description:
