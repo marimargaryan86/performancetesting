@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package snowfall.project.junction.service.providers.carnect.v1;
+
+import "snowfall/project/junction/go/v1/models.proto";
+import "snowfall/stdlib/v1/datetime.proto";
+import "snowfall/stdlib/v1/latlng.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/service/providers/carnect/v1";
+
+message SearchCriteriaTask {
+  repeated snowfall.project.junction.go.v1.Segment segments = 1;
+  Criteria criteria = 2;
+}
+
+message Criteria {
+  snowfall.stdlib.v1.LatLng origin = 1;
+  snowfall.stdlib.v1.LatLng destination = 2;
+  uint32 passengers_count = 3;
+  snowfall.stdlib.v1.DateTime pick_up_datetime = 4;
+  snowfall.stdlib.v1.DateTime return_datetime = 5;
+}
