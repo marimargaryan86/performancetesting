@@ -341,7 +341,7 @@
         "description": "Used to lookup data for a User Identifier."
       }
     },
-    "/users/me" : {
+    "/users/me": {
       "get": {
         "summary": "Get Information of Logged-in User",
         "tags": [
@@ -1193,6 +1193,12 @@
           },
           {
             "$ref": "#/components/parameters/filterByStatus"
+          },
+          {
+            "$ref": "#/components/parameters/filterByPassengerLastName"
+          },
+          {
+            "$ref": "#/components/parameters/filterByPassengerNameRecord"
           },
           {
             "$ref": "#/components/parameters/page-cursor"
@@ -3395,6 +3401,31 @@
         "style": "form",
         "explode": false
       },
+      "filterByPassengerLastName": {
+        "name": "filter[passengerLastName][like]",
+        "in": "query",
+        "required": false,
+        "description": "Filter for journeys based on passenger's last name.",
+        "schema": {
+          "minLength": 3,
+          "type": "string",
+          "example":"Doe"
+        }
+      },
+      "filterByPassengerNameRecord": {
+        "name": "filter[pnr][eq]",
+        "in": "query",
+        "required": false,
+        "description": "Filter for journeys based on passenger name record.",
+        "schema": {
+          "type": "array",
+          "example": [
+            "ABC123"
+          ]
+        },
+        "style": "form",
+        "explode": false
+      },
       "transactionId": {
         "name": "transactionId",
         "in": "path",
@@ -3631,7 +3662,9 @@
             "reference",
             "-reference",
             "createdAt",
-            "-createdAt"
+            "-createdAt",
+            "passengerLastName",
+            "-passengerLastName"
           ],
           "example": "id",
           "default": "id"
@@ -4032,12 +4065,12 @@
                 "$ref": "#/components/schemas/UsersProfileCompany"
               },
               "contacts": {
-                  "type": "array",
-                  "minItems": 0,
-                  "uniqueItems": true,
-                  "items": {
-                    "$ref": "#/components/schemas/UsersProfileContact"
-                  }
+                "type": "array",
+                "minItems": 0,
+                "uniqueItems": true,
+                "items": {
+                  "$ref": "#/components/schemas/UsersProfileContact"
+                }
               }
             }
           }

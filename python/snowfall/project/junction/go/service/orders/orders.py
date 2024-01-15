@@ -52,6 +52,7 @@ class JourneyRepository(repository.ProtoRepository[models_pb2.Journey]):
             name="booking_departure_at",
             background=True,
         ),
+        pymongo.IndexModel("orders.passengers.last_name", background=True),
     )
 
     _journey_filter_field_mapping = MappingProxyType(
@@ -59,10 +60,14 @@ class JourneyRepository(repository.ProtoRepository[models_pb2.Journey]):
             "departure_at": "orders.bookings.trip_option.details.segment.legs.departure_at",
             "booking_status": "orders.bookings.status",
             "order_created_at": "orders.created_at",
+            "last_name": "orders.passengers.last_name",
+            "passenger_name_record": "passenger_name_record",
         },
     )
 
-    _filter_operator = MappingProxyType({"ge": "$gte", "le": "$lte", "eq": "$eq"})
+    _filter_operator = MappingProxyType(
+        {"ge": "$gte", "le": "$lte", "eq": "$eq", "like": "$regex"},
+    )
 
     def __init__(
         self,
@@ -173,24 +178,43 @@ class JourneyRepository(repository.ProtoRepository[models_pb2.Journey]):
     def _get_filter_field_and_value(
         self,
         journey_filter: orders_pb2.ListJourneysRequest.JourneyFilter,
-    ) -> tuple[str, Any]:
-        filter_field: str = ""
-        filter_value: Any = None
+    ) -> tuple[str, Any, Any]:
         if journey_filter.HasField("order_created_at"):
-            filter_field = self._journey_filter_field_mapping["order_created_at"]
-            filter_value = journey_filter.order_created_at.ToDatetime(
-                tzinfo=datetime.UTC,
+            return (
+                self._journey_filter_field_mapping["order_created_at"],
+                journey_filter.order_created_at.ToDatetime(tzinfo=datetime.UTC),
+                None,
             )
-        elif journey_filter.HasField("departure_at"):
-            filter_field = self._journey_filter_field_mapping["departure_at"]
-            filter_value = journey_filter.departure_at.ToDatetime(
-                tzinfo=datetime.UTC,
-            )
-        elif journey_filter.HasField("booking_status"):
-            filter_field = self._journey_filter_field_mapping["booking_status"]
-            filter_value = journey_filter.booking_status
 
-        return (filter_field, filter_value)
+        if journey_filter.HasField("departure_at"):
+            return (
+                self._journey_filter_field_mapping["departure_at"],
+                journey_filter.departure_at.ToDatetime(tzinfo=datetime.UTC),
+                None,
+            )
+
+        if journey_filter.HasField("booking_status"):
+            return (
+                self._journey_filter_field_mapping["booking_status"],
+                journey_filter.booking_status,
+                None,
+            )
+
+        if journey_filter.HasField("last_name"):
+            return (
+                self._journey_filter_field_mapping["last_name"],
+                journey_filter.last_name,
+                "i",
+            )
+
+        if journey_filter.HasField("passenger_name_record"):
+            return (
+                self._journey_filter_field_mapping["passenger_name_record"],
+                journey_filter.passenger_name_record,
+                None,
+            )
+
+        return ("", None, None)
 
     def _add_journey_filters_to_filter(
         self,
@@ -201,20 +225,20 @@ class JourneyRepository(repository.ProtoRepository[models_pb2.Journey]):
 
         journey_filters = []
         for journey_filter in filter_by:
-            filter_field, filter_value = self._get_filter_field_and_value(
-                journey_filter,
+            filter_field, filter_value, options = self._get_filter_field_and_value(
+                journey_filter=journey_filter,
             )
 
             if filter_field and filter_value:
-                journey_filters.append(
-                    {
-                        filter_field: {
-                            self._filter_operator[
-                                journey_filter.operator
-                            ]: filter_value,
-                        },
+                filter_query = {
+                    filter_field: {
+                        self._filter_operator[journey_filter.operator]: filter_value,
                     },
-                )
+                }
+                if options:
+                    filter_query[filter_field]["$options"] = options
+
+                journey_filters.append(filter_query)
 
         if journey_filters:
             filter_["$and"] = journey_filters

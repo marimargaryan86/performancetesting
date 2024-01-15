@@ -59,6 +59,8 @@ message ListJourneysRequest {
       google.protobuf.Timestamp order_created_at = 2;
       google.protobuf.Timestamp departure_at = 3;
       Booking.Status booking_status = 4;
+      string last_name = 5;
+      string passenger_name_record = 6;
     }
   }
   repeated JourneyFilter filter_by = 6;

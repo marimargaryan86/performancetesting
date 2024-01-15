@@ -54,7 +54,7 @@ async def create_journeys_with_orders(
         await order_repository.create_from_options(
             journey_id=journey.id,
             passengers=[
-                models_pb2.Passenger(),
+                models_pb2.Passenger(last_name="Doe {idx}".format(idx=idx)),
             ],
             options=[
                 models_pb2.TripOption(
@@ -401,6 +401,63 @@ class TestJourneys(object):
             )
         ]
         assert not filtered_journeys
+
+    async def test_filter_by_passenger_name_record(
+        self,
+        journey_repository: orders.JourneyRepository,
+        order_repository: orders.OrderRepository,
+    ) -> None:
+        await create_journeys_with_orders(3, journey_repository, order_repository)
+
+        all_journeys = [
+            journey
+            async for journey in await journey_repository.find(ids=[], cursor="")
+        ]
+        assert len(all_journeys) == 3
+
+        filtered_journeys = [
+            journey
+            async for journey in await journey_repository.find(
+                ids=[],
+                cursor="",
+                filter_by=[
+                    orders_pb2.ListJourneysRequest.JourneyFilter(
+                        operator="eq",
+                        passenger_name_record=all_journeys[0].passenger_name_record,
+                    ),
+                ],
+            )
+        ]
+        assert len(filtered_journeys) == 1
+
+    async def test_filter_by_last_name(
+        self,
+        journey_repository: orders.JourneyRepository,
+        order_repository: orders.OrderRepository,
+    ) -> None:
+        await create_journeys_with_orders(3, journey_repository, order_repository)
+
+        all_journeys = [
+            journey
+            async for journey in await journey_repository.find(ids=[], cursor="")
+        ]
+        assert len(all_journeys) == 3
+
+        filtered_journeys = [
+            journey
+            async for journey in await journey_repository.find(
+                ids=[],
+                cursor="",
+                filter_by=[
+                    orders_pb2.ListJourneysRequest.JourneyFilter(
+                        operator="like",
+                        last_name=all_journeys[0].orders[0].passengers[0].last_name,  # noqa:WPS219
+                    ),
+                ],
+            )
+        ]
+
+        assert len(filtered_journeys) == 1
 
 
 class TestOrders(object):

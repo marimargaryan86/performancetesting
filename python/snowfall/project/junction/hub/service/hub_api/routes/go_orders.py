@@ -196,6 +196,7 @@ class Journeys(endpoints.HTTPEndpoint):
     _sort = MappingProxyType(
         {
             "id": "id",
+            "passengerLastName": "orders.passengers.last_name",
             "reference": "passenger_name_record",
             "createdAt": "created_at",
         },
