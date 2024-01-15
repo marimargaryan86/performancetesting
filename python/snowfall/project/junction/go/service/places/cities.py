@@ -79,20 +79,20 @@ async def parse_csv(  # noqa: WPS231
             longitude=float(row["longitude"]),
         )
 
-        if not location_ids:
-            continue
-
         provider_places = []
 
         for provider in provider_jsons.values():
             for provider_id, json_bytes in provider.items():
-                provider_data = handlers.find_nearest_provider_places(
-                    provider_json=json_bytes,
-                    coordinates=(float(row["latitude"]), float(row["longitude"])),
+                provider_data = handlers.coordinates_within_radius(
+                    json_data=json_bytes,
+                    target_coords=(float(row["latitude"]), float(row["longitude"])),
                     radius=_MAX_AIRPORT_M,
                 )
                 if provider_data:
                     provider_places.append((provider_id, provider_data))
+
+        if not location_ids and not provider_places:
+            continue
 
         place_attributes = models_pb2.PlaceAttributes(
             provider_ids=[

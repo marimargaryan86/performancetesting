@@ -89,26 +89,28 @@ async def node_to_place(  # noqa: WPS231
                 )
             ]
 
-            if not locations:
-                continue
-
             provider_places = []
             for provider_type, provider in provider_jsons.items():
                 if provider_type != types:
                     continue
                 for provider_id, json_bytes in provider.items():
                     provider_data = (  # noqa: WPS220
-                        handlers.find_nearest_provider_place(
-                            provider_json=json_bytes,
-                            coordinates=(
+                        handlers.place_within_radius(
+                            json_data=json_bytes,
+                            target_coords=(
                                 float(node["geometry"]["coordinates"][1]),
                                 float(node["geometry"]["coordinates"][0]),
                             ),
+                            radius=_MAX_DISTANCE_AIRPORT_M,
                         )
                     )
-                    provider_places.append(  # noqa: WPS220
-                        (provider_id, [provider_data]),
-                    )
+                    if provider_data:
+                        provider_places.append(  # noqa: WPS220
+                            (provider_id, [provider_data]),
+                        )
+
+            if not locations and not provider_places:
+                continue
 
             place_attributes = models_pb2.PlaceAttributes(
                 iata=properties["iata"],

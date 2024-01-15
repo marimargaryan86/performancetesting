@@ -54,10 +54,13 @@ class MobileAPIPlaceRepository(PlaceRepository):
 
     async def get_ids(self) -> frozenset[str]:
         db_name = self.db_name
-        query = {}
         if db_name == "booking-hub-mobile-api":
             query = {
                 "place_attributes.provider_ids.provider_id": str(BENERAIL_ID),
+            }
+        else:
+            query = {
+                "merged_ids": {"$exists": True, "$ne": []},  # type: ignore[dict-item]
             }
         ids = await self._execute(
             self._collection.distinct,

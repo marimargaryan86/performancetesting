@@ -40,29 +40,20 @@ def coordinates_within_radius(
     return places
 
 
-def nearest_coordinates(
+def place_within_radius(
     target_coords: tuple[float, float],
+    radius: int,
     json_data: Sequence[ProviderJson],
-) -> str:
-    return min(
+) -> str | None:
+    nearest_place = min(
         json_data,
         key=lambda item: calculate_distance(
             target_coords,
             (item["latitude"], item["longitude"]),
         ),
-    )["id"]
+    )
+    nearest_coords = (nearest_place["latitude"], nearest_place["longitude"])
+    if calculate_distance(target_coords, nearest_coords) <= radius:
+        return nearest_place["id"]
 
-
-def find_nearest_provider_place(
-    provider_json: Sequence[ProviderJson],
-    coordinates: tuple[float, float],
-) -> str:
-    return nearest_coordinates(coordinates, provider_json)
-
-
-def find_nearest_provider_places(
-    provider_json: Sequence[ProviderJson],
-    coordinates: tuple[float, float],
-    radius: int,
-) -> list[str]:
-    return coordinates_within_radius(coordinates, radius, provider_json)
+    return None
