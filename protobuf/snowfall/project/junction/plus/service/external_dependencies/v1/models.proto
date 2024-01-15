@@ -50,3 +50,18 @@ message FlightStatus {
   string carrier_fs_code = 5;
   int32 flight_id = 6;
 }
+
+message ServiceIntent {
+  string redirect_uri = 1;
+  string title = 2;
+  string description = 3;
+  string info = 4;
+  int32 fee = 5;
+  string approval_rate = 6;
+  string appliers_count = 7;
+  string expected_processing_time = 8;
+  string stay_duration = 9;
+  string stay_duration_unit = 10;
+  string validity_period = 11;
+  string validity_period_unit = 12;
+}
