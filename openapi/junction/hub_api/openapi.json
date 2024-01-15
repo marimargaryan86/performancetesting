@@ -5929,7 +5929,8 @@
                       "baseConverted",
                       "salesMargin",
                       "fxMargin",
-                      "processingMargin"
+                      "processingMargin",
+                      "totalAmount"
                     ],
                     "properties": {
                       "beneficiary": {
@@ -5985,6 +5986,15 @@
                         ],
                         "readOnly": true,
                         "description": "The monetary value of the provider markup for a specific transaction"
+                      },
+                      "totalAmount": {
+                        "allOf": [
+                          {
+                            "$ref": "#/components/schemas/Money"
+                          }
+                        ],
+                        "readOnly": true,
+                        "description": "The total monetary value for a specific transaction including markups"
                       }
                     },
                     "readOnly": true

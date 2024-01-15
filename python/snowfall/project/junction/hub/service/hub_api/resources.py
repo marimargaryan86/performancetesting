@@ -729,6 +729,9 @@ class Transaction(models.Resource):
                     "processingMargin": Money.from_proto(
                         transaction.amounts.processing_margin,
                     ),
+                    "totalAmount": Money.from_proto(
+                        transaction.amounts.total_amount,
+                    ),
                 },
                 "rates": {
                     "fxQuote": round(transaction.rates.fx_quote, 3),

@@ -149,6 +149,7 @@ def generate_transaction(transaction_id: str) -> Transaction:
             processing_margin=money_usd,
             sales_margin=money_usd,
             quotation=money_usd,
+            total_amount=money_usd,
         ),
         rates=QuotationRates(
             fx_quote=float(1),
