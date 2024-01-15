@@ -149,6 +149,7 @@ def mobile_client(
         get_variable_value(host, api_token, "mobile_api_host"),
     )
     mobile_token = get_variable_value(host, api_token, "mobile_api_token")
+    sentry_url = get_variable_value(host, api_token, "sentry_url")
     client_timeout = 20
 
     return MobileApiClient(
@@ -156,6 +157,7 @@ def mobile_client(
         auth=auth.TokenAuth(mobile_token),
         token=mobile_token,
         client=httpx.AsyncClient(timeout=client_timeout),
+        sentry_url=sentry_url,
     )
 
 

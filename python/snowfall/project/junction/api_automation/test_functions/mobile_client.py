@@ -5,6 +5,7 @@ from datetime import date, datetime
 from itertools import starmap
 from typing import Any, Literal, TypeAlias
 
+import allure
 import httpx
 
 from snowfall.vendor.junction.client import make_pagination_params
@@ -53,10 +54,11 @@ class MobileApiClient(Client):
         auth: httpx.Auth | None = None,
         token: str | None = None,
         client: httpx.AsyncClient | None = None,
+        sentry_url: str | None = None,
     ):
         super().__init__(base_url=base_url, auth=auth, client=client)
         self._token = token
-
+        self._sentry_url = sentry_url
         self._cookie_header = client.headers.get("Cookie") if client else None
         self.logger = logging.getLogger()
         self.logger.setLevel(logging.DEBUG)
@@ -900,10 +902,21 @@ class MobileApiClient(Client):
             headers=headers,
         )
         self.logger.info(curl_command)
-        return await super()._make_request(
-            method=method,
-            url=url,
-            query_parameters=query_parameters,
-            headers=headers,
-            payload=payload,
-        )
+        try:
+            return await super()._make_request(
+                method=method,
+                url=url,
+                query_parameters=query_parameters,
+                headers=headers,
+                payload=payload,
+            )
+        except httpx.HTTPStatusError as err:
+            allure.attach(
+                "{0}?query=trace%3A{1}".format(
+                    self._sentry_url,
+                    err.response.headers["X-Request-Id"],
+                ),
+                "sentry",
+            )
+            allure.attach(curl_command, "curl")
+            raise
