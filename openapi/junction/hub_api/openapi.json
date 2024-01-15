@@ -4058,7 +4058,8 @@
             "type": "object",
             "required": [
               "company",
-              "contacts"
+              "contacts",
+              "permissions"
             ],
             "properties": {
               "company": {
@@ -4071,6 +4072,9 @@
                 "items": {
                   "$ref": "#/components/schemas/UsersProfileContact"
                 }
+              },
+              "permissions": {
+                "type": "object"
               }
             }
           }

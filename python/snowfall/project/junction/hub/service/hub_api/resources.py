@@ -1175,5 +1175,6 @@ class UsersProfileResource(models.Resource):
                     }
                     for contact in contacts
                 ],
+                "permissions": {},
             },
         )

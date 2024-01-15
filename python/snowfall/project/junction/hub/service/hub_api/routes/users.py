@@ -52,13 +52,14 @@ class UserInformation(endpoints.HTTPEndpoint):
             ),
         )
 
+        data = resources.UsersProfileResource.from_proto(
+            reseller_id=reseller_id,
+            company=company,
+            contacts=contacts.contacts,
+        )
+        data.attributes["permissions"].update(request.user.permissions)
+
         return await messages.create_response(
-            body=models.Body(
-                data=resources.UsersProfileResource.from_proto(
-                    reseller_id=reseller_id,
-                    company=company,
-                    contacts=contacts.contacts,
-                ),
-            ),
+            body=models.Body(data=data),
             request=request,
         )
