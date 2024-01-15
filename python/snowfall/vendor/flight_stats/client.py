@@ -3,7 +3,7 @@ import datetime
 import httpx
 
 from snowfall.stdlib.transport.http import client
-from snowfall.vendor.flight_stats.models import flight_stats
+from snowfall.vendor.flight_stats.models import errors, flight_stats
 
 
 class FlightStatsClient(client.HttpClient):
@@ -14,14 +14,6 @@ class FlightStatsClient(client.HttpClient):
         app_key: str,
         http_client: httpx.AsyncClient,
     ):
-        http_client.headers.update(
-            httpx.Headers(
-                {
-                    "Accept": "application/vnd.api+json",
-                    "Content-Type": "application/vnd.api+json",
-                },
-            ),
-        )
         super().__init__(api_url, http_client)
         self._app_id = app_id
         self._app_key = app_key
@@ -51,5 +43,10 @@ class FlightStatsClient(client.HttpClient):
                 query=query_parameters,
             ),
         )
-
-        return flight_stats.GetFlightStatusResponse(**response.json())
+        response_body = response.json()
+        if "error" in response_body:
+            exc = errors.FlightStatsError.from_error(
+                flight_stats.Error.model_validate(response_body.get("error")),
+            )
+            raise exc
+        return flight_stats.GetFlightStatusResponse(**response_body)

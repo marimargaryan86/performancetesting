@@ -1,5 +1,6 @@
 from google.protobuf.json_format import MessageToDict
-from grpc import aio
+from grpc import StatusCode, aio
+from pydantic import ValidationError
 
 from snowfall.project.junction.plus.service.external_dependencies.v1 import (
     grpc_pb2 as external_dependencies_pb2,
@@ -13,6 +14,7 @@ from snowfall.project.junction.plus.service.external_dependencies.v1 import (
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.transport.grpc import service as grpc_service
 from snowfall.vendor.flight_stats import client as flight_stats_client
+from snowfall.vendor.flight_stats.models import errors
 from snowfall.vendor.google_flights import co2_emissions as emissions_client
 from snowfall.vendor.google_flights.models.emissions import (
     Flight,
@@ -97,26 +99,33 @@ class FlightStatsService(
         request: external_dependencies_pb2.GetFlightStatusRequest,
         context: aio.ServicerContext,
     ) -> external_dependencies_pb2.GetFlightStatusResponse:
-        response = await self._http_client.get_flight_status(
-            departure_at=protobuf.protobuf_to_date(request.departure_at),
-            carrier_code=request.carrier_code,
-            flight_number=request.flight_number,
-        )
-
+        try:
+            response = await self._http_client.get_flight_status(
+                departure_at=protobuf.protobuf_to_date(request.departure_at),
+                carrier_code=request.carrier_code,
+                flight_number=request.flight_number,
+            )
+        except errors.FlightStatsError as exc:
+            if exc.http_status_code == 400:  # noqa: WPS432
+                await context.abort(StatusCode.INVALID_ARGUMENT)
+            else:
+                await context.abort(StatusCode.UNKNOWN)
+        except ValidationError:
+            await context.abort(StatusCode.INTERNAL)
         return external_dependencies_pb2.GetFlightStatusResponse(
             flight_statuses=[
                 external_dependencies_models_pb2_grpc.FlightStatus(
-                    **status.model_dump(),
+                    status=flight_status.status,
+                    airport_resources=external_dependencies_models_pb2_grpc.AirportResources(
+                        **flight_status.airport_resources.model_dump(),
+                    ),
+                    flight_number=flight_status.flight_number,
+                    carrier_fs_code=flight_status.carrier_fs_code,
+                    flight_id=flight_status.flight_id,
+                    delays=external_dependencies_models_pb2_grpc.Delays(
+                        **flight_status.delays.model_dump(),
+                    ),
                 )
-                for status in response.flight_statuses
+                for flight_status in response.flight_statuses  # type: ignore[possibly-undefined]
             ],
-            airports=[
-                external_dependencies_models_pb2_grpc.Airport(
-                    **airport.model_dump(),
-                )
-                for airport in response.airports
-            ],
-            delays=external_dependencies_models_pb2_grpc.Delays(
-                **response.delays.model_dump(),
-            ),
         )

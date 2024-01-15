@@ -401,7 +401,6 @@ def trip_info_client() -> trip_info.Client:
                 carrier_fs_code="AA",
                 flight_number="100",
                 status="L",
-                operational_times=None,
                 airport_resources=plus_services_models_pb2.AirportResources(
                     departure_terminal="8",
                     departure_gate="12",

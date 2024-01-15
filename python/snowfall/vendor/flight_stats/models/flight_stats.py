@@ -1,3 +1,4 @@
+import datetime
 from collections.abc import Sequence
 
 from pydantic import BaseModel, ConfigDict, alias_generators
@@ -12,8 +13,8 @@ class CamelCaseBaseModel(BaseModel):
 
 
 class UTCAndLocalDates(CamelCaseBaseModel):
-    date_utc: str
-    date_local: str
+    date_utc: datetime.datetime
+    date_local: datetime.datetime
 
 
 class FlightStatusOperationalTimes(CamelCaseBaseModel):
@@ -22,11 +23,16 @@ class FlightStatusOperationalTimes(CamelCaseBaseModel):
 
 
 class AirportResources(CamelCaseBaseModel):
-    departure_terminal: str
-    departure_gate: str
-    arrival_terminal: str
-    arrival_gate: str
-    baggage: str
+    departure_terminal: str | None = None
+    departure_gate: str | None = None
+    arrival_terminal: str | None = None
+    arrival_gate: str | None = None
+    baggage: str | None = None
+
+
+class Delay(CamelCaseBaseModel):
+    departure_gate_delay_minutes: int
+    arrival_gate_delay_minutes: int
 
 
 class FlightStatus(CamelCaseBaseModel):
@@ -36,18 +42,15 @@ class FlightStatus(CamelCaseBaseModel):
     flight_number: str
     carrier_fs_code: str
     flight_id: int
-
-
-class Airport(CamelCaseBaseModel):
-    name: str
-
-
-class Delay(CamelCaseBaseModel):
-    departure_runway_delay_minutes: int
-    departure_gate_delay_minutes: int
+    delays: Delay
 
 
 class GetFlightStatusResponse(CamelCaseBaseModel):
-    airports: Sequence[Airport]
     flight_statuses: Sequence[FlightStatus]
-    delays: Delay
+
+
+class Error(CamelCaseBaseModel):
+    http_status_code: int
+    error_id: str
+    error_message: str
+    error_code: str

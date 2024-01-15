@@ -30,6 +30,4 @@ message GetFlightStatusRequest {
 
 message GetFlightStatusResponse {
   repeated FlightStatus flight_statuses = 1;
-  repeated Airport airports = 2;
-  Delays delays = 3;
 }

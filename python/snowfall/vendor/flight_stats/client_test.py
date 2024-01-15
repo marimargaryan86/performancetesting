@@ -13,14 +13,6 @@ async def test_get_flight_status(
         url="https://test_url/AA/100/dep/2023/12/21?appId=app_id&appKey=app_key",
         status_code=200,
         json={
-            "airports": [
-                {
-                    "name": "London Heathrow Airport",
-                },
-                {
-                    "name": "John F. Kennedy International Airport",
-                },
-            ],
             "flight_statuses": [
                 {
                     "status": "L",
@@ -44,12 +36,12 @@ async def test_get_flight_status(
                         "arrival_gate": "31",
                         "baggage": "10",
                     },
+                    "delays": {
+                        "arrival_gate_delay_minutes": 7,
+                        "departure_gate_delay_minutes": 10,
+                    },
                 },
             ],
-            "delays": {
-                "departure_runway_delay_minutes": 7,
-                "departure_gate_delay_minutes": 10,
-            },
         },
     )
 
