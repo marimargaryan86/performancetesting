@@ -118,7 +118,7 @@
   <JunctionLogo snowfallTechnology poweredBy />
 
   {#if errors.length}
-    <p class="errors typography body-small" transition:slideFade={{ duration: 300 }}>
+    <p class="errors" typography="body-small" transition:slideFade={{ duration: 300 }}>
       {errors.join(", ")}
     </p>
   {/if}
@@ -164,7 +164,7 @@
     </form>
   {/each}
 
-  <p class="cookie-info typography body-small">
+  <p class="cookie-info" typography="body-small">
     We store some strictly necessary cookies. These cookies are used for Authentication and managing
     form data during a session. We currently do not use cookies for marketing, analytics or any
     other use cases.
@@ -172,10 +172,10 @@
 
   <label for="remember-me" class="remember-me">
     <Checkbox id="remember-me" bind:checked={rememberMe} />
-    <span class="typography body-small">Remember me for 14 days</span>
+    <span typography="body-small">Remember me for 14 days</span>
   </label>
 
-  <div class="actions typography body-medium">
+  <div class="actions" typography="body-medium">
     {#if data.flow.requestedAal !== "aal1"}
       <a href={routeConfig.routes.login.root} on:click={reset}>Sign in to a different account</a>
     {:else}

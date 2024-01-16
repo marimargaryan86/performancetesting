@@ -1,4 +1,5 @@
 <script lang="ts">
+  /* global TypographyWeight Typography */
   import Icon from "components/icons/icon.svelte";
   import { getLocaleData } from "i18n";
 
@@ -9,6 +10,8 @@
   export let copyable = false;
   export let copyAlign: "left" | "right" = "left";
   export let textAlign: "left" | "right" = "left";
+  export let weight: TypographyWeight | undefined = undefined;
+  export let typography: Typography | undefined = undefined;
 
   const i18n = getLocaleData();
 
@@ -25,6 +28,8 @@
 
 <td
   class={className}
+  {weight}
+  {typography}
   style:--max-width={maxWidth}
   style:--width={width}
   style:text-align={textAlign}

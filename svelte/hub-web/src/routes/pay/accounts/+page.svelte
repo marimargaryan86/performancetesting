@@ -53,7 +53,7 @@
 {:else}
   <StandardLayout pageTitle={$i18n.pages.pay.pages.accounts.title} bind:searchQuery>
     <div class="wrapper">
-      <h2 class="typography title-medium bold">
+      <h2 typography="title-medium" weight="bold">
         {$i18n.words.subAccounts}
       </h2>
 
@@ -65,7 +65,7 @@
               class="account"
             >
               <EntityAvatar name={account.name} size="72px" />
-              <span class="account-name typography body-large">{account.name}</span>
+              <span class="account-name" typography="body-large">{account.name}</span>
               <ChevronIcon size="20px" color="var(--color-main-neutral-700)" />
             </a>
           </li>

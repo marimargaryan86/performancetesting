@@ -147,7 +147,8 @@
 
   {#if expanded && filteredOptions.length}
     <ul
-      class="typography body-medium options"
+      typography="body-medium"
+      class="options"
       style:min-width={dialogMinWidth}
       transition:scale={{ duration: 150, start: 0.8 }}
       bind:this={dialog}

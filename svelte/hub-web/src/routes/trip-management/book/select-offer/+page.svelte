@@ -214,7 +214,7 @@
         {#if offers.length}
           <li>
             <Alert type="warning" dismissable={false}>
-              <span class="typography body-medium">
+              <span typography="body-medium">
                 {$i18n.sentences.noTripsMatchesTheFilterCriteria}
               </span>
             </Alert>
@@ -230,7 +230,7 @@
       {:else if !offers.length}
         <li>
           <Alert type="warning" dismissable={false}>
-            <span class="typography body-medium">{$i18n.sentences.noTripsFound}</span>
+            <span typography="body-medium">{$i18n.sentences.noTripsFound}</span>
           </Alert>
         </li>
       {/if}

@@ -107,8 +107,8 @@
   >
     {#if state === "info"}
       <div class="header">
-        <em class="typography body-small">{$i18n.words.cancellation}</em>
-        <h3 class="typography headline-small bold">
+        <em typography="body-small">{$i18n.words.cancellation}</em>
+        <h3 typography="headline-small" weight="bold">
           {$i18n.sentences.youAreCancellingThisBooking}
         </h3>
         <Ticket identifier={reservationNo} title={$i18n.words.reservationNumber} />
@@ -129,19 +129,19 @@
         <Icon color="var(--color-semantic-error-500)" size="64px" variant="alert-disc" />
       </div>
 
-      <h3 class="typography display-small bold">{$i18n.sentences.rulesAndFees}</h3>
+      <h3 typography="display-small" weight="bold">{$i18n.sentences.rulesAndFees}</h3>
 
-      <p class="typography title-small">
+      <p typography="title-small">
         {$i18n.sentences.pleaseReviewTheFollowingRules}
       </p>
 
       {#each booking.rules as rule}
-        <h3 class="typography headline-medium">{rule.title}</h3>
+        <h3 typography="headline-medium">{rule.title}</h3>
 
-        <p class="typography body-small">{rule.body}</p>
+        <p typography="body-small">{rule.body}</p>
       {/each}
 
-      <p class="typography body-medium">{$i18n.sentences.doYouWishToContinue}</p>
+      <p typography="body-medium">{$i18n.sentences.doYouWishToContinue}</p>
 
       <div class="actions">
         <Button variant="outline" on:click={info}>{$i18n.actions.goBack}</Button>
@@ -153,8 +153,8 @@
           <LoadingIcon />
         </div>
       {:else}
-        <h3 class="typography display-small bold">{$i18n.sentences.areYouSure}</h3>
-        <p class="typography body-medium">{$i18n.sentences.thisCannotBeUndone}</p>
+        <h3 typography="display-small" weight="bold">{$i18n.sentences.areYouSure}</h3>
+        <p typography="body-medium">{$i18n.sentences.thisCannotBeUndone}</p>
 
         <div class="actions">
           <Button variant="outline" on:click={close}>{$i18n.words.no}</Button>
@@ -162,7 +162,7 @@
         </div>
       {/if}
     {:else if state === "done" || state === "failed"}
-      <h3 class="typography display-small bold">
+      <h3 typography="display-small" weight="bold">
         {#if state === "done"}
           {$i18n.sentences.cancellationRequestReceived}
         {:else}
@@ -170,7 +170,7 @@
         {/if}
       </h3>
 
-      <div class="typography body-medium info">
+      <div typography="body-medium" class="info">
         {#if state === "done"}
           <p>
             {$i18n.sentences.cancellationRequestInfo}
@@ -180,7 +180,7 @@
         <p>{$i18n.sentences.contactSnowfallSupport}:</p>
       </div>
 
-      <div class="support typography body-medium">
+      <div class="support" typography="body-medium">
         <strong>
           <Icon variant="email" size="20px" />
           <a href="mailto:support@snowfalltravel.com?subject=GG%20-%20">

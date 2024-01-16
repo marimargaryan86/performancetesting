@@ -26,7 +26,7 @@
 <FindTripDialog bind:this={findTripDialog} on:search={searchOrders} />
 
 <header>
-  <h1 class="typography headline-medium bold">{$i18n.pages.dashboard.title}</h1>
+  <h1 typography="headline-medium" weight="bold">{$i18n.pages.dashboard.title}</h1>
 </header>
 <div class="wrapper">
   <div class="dashboard">
@@ -46,8 +46,8 @@
           <img src={TripGraphicTwo} alt="Depiction of ticket prices." class="trip-graphic-2" />
         </div>
         <div slot="content" class="content">
-          <h3 class="typography headline-small bold">{$i18n.words.bookTrip}</h3>
-          <p class="typography label-large">{$i18n.sentences.bookTrip}</p>
+          <h3 typography="headline-small" weight="bold">{$i18n.words.bookTrip}</h3>
+          <p typography="label-large">{$i18n.sentences.bookTrip}</p>
         </div>
         <div slot="actions" class="actions">
           <Button class="widget-button" href={routeConfig.routes.tripManagement.routes.book.root}
@@ -66,8 +66,8 @@
             />
           </div>
           <div slot="content" class="content alt">
-            <h3 class="typography headline-small bold">{$i18n.words.manageTrip}</h3>
-            <p class="typography label-large">{$i18n.sentences.manageTrip}</p>
+            <h3 typography="headline-small" weight="bold">{$i18n.words.manageTrip}</h3>
+            <p typography="label-large">{$i18n.sentences.manageTrip}</p>
           </div>
           <div slot="actions" class="actions alt">
             <Button variant="outline" class="widget-button" on:click={findTripDialog?.open}

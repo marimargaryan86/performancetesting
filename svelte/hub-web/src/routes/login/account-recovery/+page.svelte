@@ -99,7 +99,7 @@
     {/each}
 
     {#if errors.length}
-      <div class="errors typography body-small" transition:slideFade={{ duration: 300 }}>
+      <div class="errors" typography="body-small" transition:slideFade={{ duration: 300 }}>
         {#each errors as error}
           <span>{error}</span>
         {/each}
@@ -107,14 +107,16 @@
     {/if}
 
     {#if info.length}
-      <div class="typography body-small" transition:slideFade={{ duration: 300 }}>
+      <div typography="body-small" transition:slideFade={{ duration: 300 }}>
         {#each info as text}
           <span>{text}</span>
         {/each}
       </div>
     {/if}
 
-    <a class="back typography body-medium" href={routeConfig.routes.login.root}> Back to login </a>
+    <a class="back" typography="body-medium" href={routeConfig.routes.login.root}>
+      Back to login
+    </a>
   </form>
 </section>
 

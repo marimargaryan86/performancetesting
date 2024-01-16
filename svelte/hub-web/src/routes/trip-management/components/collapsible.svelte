@@ -30,7 +30,7 @@
 <div class:collapsible={true} class={className}>
   <button class="toggle" on:click={toggle}>
     <slot name="title" {expanded} {transitionTimeMs}>
-      <span class="typography title-medium bold">{title}</span>
+      <span typography="title-medium" weight="bold">{title}</span>
     </slot>
 
     <ChevronIcon size="20px" direction={expanded ? "up" : "down"} />

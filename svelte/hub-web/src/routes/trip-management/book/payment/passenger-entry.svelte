@@ -59,11 +59,11 @@
 
 <Collapsible expandedOnMount bind:this={collapsible}>
   <h2 slot="title">
-    <strong class="typography title-medium bold">
+    <strong typography="title-medium" weight="bold">
       {$i18n.words.passenger.singular}
       {passengerNumber}
     </strong>
-    <span class="typography title-small">
+    <span typography="title-small">
       {getPassengerFullLabel(PASSENGER_DEFINITIONS[passenger.type], $i18n)}
     </span>
   </h2>

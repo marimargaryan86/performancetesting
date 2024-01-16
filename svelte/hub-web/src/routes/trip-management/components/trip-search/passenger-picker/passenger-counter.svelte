@@ -15,14 +15,14 @@
 </script>
 
 <div class="passenger-counter">
-  <strong class="typography label-large">{label}</strong>
+  <strong typography="label-large">{label}</strong>
 
   <div class="counter">
     <button class="counter-btn" on:click={decrement} type="button" disabled={count === 0}>
       -
     </button>
 
-    <span class="typography body-medium">{count}</span>
+    <span typography="body-medium">{count}</span>
 
     <button on:click={increment} type="button" disabled={totalCount === MAX_TOTAL_COUNT}>
       +

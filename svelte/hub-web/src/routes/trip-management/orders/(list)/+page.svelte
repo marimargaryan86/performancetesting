@@ -163,18 +163,18 @@
         {@const departureAt = getOrderDepartureDate(order)}
 
         <TRow alternatingBackground={false}>
-          <TCol class="typography body-small" width="0">
+          <TCol typography="body-small" width="0">
             <a href={routeConfig.routes.tripManagement.routes.orders.routes.order(order.id).root}>
               {order.journey?.reference ?? $i18n.words.unknown}
             </a>
           </TCol>
-          <TCol class="typography body-small" width="0">
+          <TCol typography="body-small" width="0">
             {order.createdAt.toLocaleDateString($locale)}
           </TCol>
-          <TCol class="typography body-small" width="0">
+          <TCol typography="body-small" width="0">
             {#if hasTickets}
               <a
-                class="typography body-small"
+                typography="body-small"
                 href={routeConfig.routes.tripManagement.routes.orders.routes.order(order.id).routes
                   .tickets.root}
                 download
@@ -185,13 +185,13 @@
               <span class="not-available">{$i18n.words.notAvailable}</span>
             {/if}
           </TCol>
-          <TCol class="typography body-small" width="0">
+          <TCol typography="body-small" width="0">
             {departureAt.date.toLocaleDateString($locale, { timeZone: departureAt.timeZone })}
           </TCol>
-          <TCol class="typography body-small bold" maxWidth="240px">
+          <TCol typography="body-small" weight="bold" maxWidth="240px">
             {getPassengerNames(order).join(", ")}
           </TCol>
-          <TMoneyCol class="typography body-small" currencySize="x-small" money={totalPrice} />
+          <TMoneyCol typography="body-small" currencySize="x-small" money={totalPrice} />
 
           {#if bookingStatus}
             <TStatusBadgeCol value={bookingStatus} />

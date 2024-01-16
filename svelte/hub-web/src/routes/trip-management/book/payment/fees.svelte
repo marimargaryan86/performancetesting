@@ -152,8 +152,8 @@
       <div transition:slideFade={{ duration: transitionTimeMs }} class="fees-breakdown">
         <ul>
           <li>
-            <span class="typography label-medium">{$i18n.words.serviceFee}</span>
-            <span class="typography body-small bold">
+            <span typography="label-medium">{$i18n.words.serviceFee}</span>
+            <span typography="body-small" weight="bold">
               {formatAmount(
                 { currency, amount: calculatedServiceFeeAmount },
                 { locale: $locale, sign: true },
@@ -161,8 +161,8 @@
             </span>
           </li>
           <li>
-            <span class="typography label-medium">{$i18n.words.agencyMarkup}</span>
-            <span class="typography body-small bold">
+            <span typography="label-medium">{$i18n.words.agencyMarkup}</span>
+            <span typography="body-small" weight="bold">
               {formatAmount(
                 { currency, amount: calculatedAgencyMarkupAmount },
                 { locale: $locale, sign: true },
@@ -174,8 +174,8 @@
     {/if}
 
     <div class="total">
-      <span class="typography body-large bold">{$i18n.sentences.totalToCollect}</span>
-      <em class="typography body-large bold">
+      <span typography="body-large" weight="bold">{$i18n.sentences.totalToCollect}</span>
+      <em typography="body-large" weight="bold">
         {#if priceQuote?.price}
           {formatAmount(
             { currency, amount: totalToCollectAmount },

@@ -183,9 +183,9 @@
 </script>
 
 <div class="refund-dialog" transition:slideFade={{ duration: 300 }}>
-  <h3 class="typography title-large bold">{$i18n.words.refund}</h3>
+  <h3 typography="title-large" weight="bold">{$i18n.words.refund}</h3>
 
-  <div class="refund-type typography body-medium">
+  <div class="refund-type" typography="body-medium">
     <label>
       <input type="radio" value="no-amount" bind:group={refundType} />
       {$i18n.words.withoutAmounts}
@@ -209,7 +209,7 @@
           error={errors?.us?._errors}
           step="any"
         >
-          <span slot="icon-after" class="icon typography body-small currency">
+          <span slot="icon-after" class="icon currency" typography="body-small">
             {transaction.amounts.beneficiary.currency}
           </span>
         </TextField>
@@ -226,7 +226,7 @@
           error={errors?.reseller?._errors}
           step="any"
         >
-          <span slot="icon-after" class="icon typography body-small currency">
+          <span slot="icon-after" class="icon currency" typography="body-small">
             {transaction.amounts.quotation.currency}
           </span>
         </TextField>
@@ -242,7 +242,7 @@
           value={refundPosition?.amount}
           step="any"
         >
-          <span slot="icon-after" class="icon typography body-small currency">
+          <span slot="icon-after" class="icon currency" typography="body-small">
             {refundPosition?.currency ?? transaction.amounts.beneficiary.currency}
           </span>
         </TextField>

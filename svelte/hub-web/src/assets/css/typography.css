@@ -1,4 +1,4 @@
-.typography.body-xlarge {
+*[typography="body-xlarge"] {
   font-weight: 400;
   font-size: 18px;
   font-family: Inter, Arial, Helvetica, sans-serif;
@@ -6,7 +6,7 @@
   line-height: 28px;
 }
 
-.typography.body-large {
+*[typography="body-large"] {
   font-weight: 400;
   font-size: 16px;
   font-family: Inter, Arial, Helvetica, sans-serif;
@@ -14,7 +14,7 @@
   line-height: 26px;
 }
 
-.typography.body-medium {
+*[typography="body-medium"] {
   font-weight: 400;
   font-size: 14px;
   font-family: Inter, Arial, Helvetica, sans-serif;
@@ -22,7 +22,7 @@
   line-height: 20px;
 }
 
-.typography.body-small {
+*[typography="body-small"] {
   font-weight: 400;
   font-size: 12px;
   font-family: Inter, Arial, Helvetica, sans-serif;
@@ -30,7 +30,7 @@
   line-height: 16px;
 }
 
-.typography.body-xsmall {
+*[typography="body-xsmall"] {
   font-weight: 400;
   font-size: 10px;
   font-family: Inter, Arial, Helvetica, sans-serif;
@@ -38,7 +38,7 @@
   line-height: 16px;
 }
 
-.typography.label-small {
+*[typography="label-small"] {
   font-weight: 400;
   font-size: 11px;
   font-family: Inter, Arial, Helvetica, sans-serif;
@@ -47,7 +47,7 @@
   letter-spacing: 0.5px;
 }
 
-.typography.label-medium {
+*[typography="label-medium"] {
   font-weight: 400;
   font-size: 12px;
   font-family: Inter, Arial, Helvetica, sans-serif;
@@ -55,7 +55,7 @@
   line-height: 16px;
 }
 
-.typography.label-large {
+*[typography="label-large"] {
   font-weight: 400;
   font-size: 14px;
   font-family: Inter, Arial, Helvetica, sans-serif;
@@ -63,78 +63,78 @@
   line-height: 20px;
 }
 
-.typography.headline-medium {
+*[typography="headline-medium"] {
   font-size: 28px;
   font-family: Raleway, Arial, Helvetica, sans-serif;
   font-style: normal;
   line-height: 36px;
 }
 
-.typography.headline-large {
+*[typography="headline-large"] {
   font-size: 32px;
   font-family: Raleway, Arial, Helvetica, sans-serif;
   font-style: normal;
   line-height: 40px;
 }
 
-.typography.headline-large.bold {
+*[typography="headline-large"][weight="bold"] {
   font-weight: 700;
 }
 
-.typography.display-small {
+*[typography="display-small"] {
   font-size: 36px;
   font-family: Raleway, Arial, Helvetica, sans-serif;
   font-style: normal;
   line-height: 44px;
 }
 
-.typography.display-medium {
+*[typography="display-medium"] {
   font-size: 45px;
   font-family: Raleway, Arial, Helvetica, sans-serif;
   line-height: 52px;
 }
 
-.typography.display-medium.bold {
+*[typography="display-medium"][weight="bold"] {
   font-weight: 700;
 }
 
-.typography.headline-small {
+*[typography="headline-small"] {
   font-size: 24px;
   font-family: Raleway, Arial, Helvetica, sans-serif;
   font-style: normal;
   line-height: 32px;
 }
 
-.typography.headline-medium.bold,
-.typography.headline-small.bold {
+*[typography="headline-medium"][weight="bold"],
+*[typography="headline-small"][weight="bold"] {
   font-weight: 700;
 }
 
-.typography.title-small {
+*[typography="title-small"] {
   font-size: 14px;
   font-family: Inter, Arial, Helvetica, sans-serif;
   font-style: normal;
   line-height: 20px;
 }
 
-.typography.title-medium {
+*[typography="title-medium"] {
   font-size: 18px;
   font-family: Inter, Arial, Helvetica, sans-serif;
   font-style: normal;
   line-height: 24px;
 }
 
-.typography.title-large {
+*[typography="title-large"] {
   font-size: 22px;
   font-family: Inter, Arial, Helvetica, sans-serif;
   font-style: normal;
   line-height: 26px;
 }
 
-.typography.bold {
+*[weight="bold"] {
   font-weight: 600;
 }
 
-.typography.default {
+*[weight="default"] {
   font-weight: 400;
 }

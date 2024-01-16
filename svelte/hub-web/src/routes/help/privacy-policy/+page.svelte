@@ -7,7 +7,7 @@
 <div>
   {#each $i18n.pages.help.pages.privacyPolicy.content as element}
     {#if element.type === "h2"}
-      <h2 class="typography body-large bold">{element.html}</h2>
+      <h2 typography="body-large" weight="bold">{element.html}</h2>
     {:else if element.type === "ul"}
       <ul>
         {#each element.items as item}

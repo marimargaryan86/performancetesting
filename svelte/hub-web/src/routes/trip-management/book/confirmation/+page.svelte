@@ -53,18 +53,18 @@
       <span class="icon success">
         <Icon variant="checked" size="16px" color="var(--color-common-dark-strong)" />
       </span>
-      <span class="typography body-medium bold">{$i18n.words.success}</span>
-      <span class="typography body-medium">{$i18n.sentences.theOrderWasCreatedSuccessfully}</span>
+      <span typography="body-medium" weight="bold">{$i18n.words.success}</span>
+      <span typography="body-medium">{$i18n.sentences.theOrderWasCreatedSuccessfully}</span>
     {:else if alertType === "error"}
       <span class="icon error">
         <Icon color="var(--color-common-dark-strong)" variant="close" />
       </span>
-      <span class="typography body-medium bold">{$i18n.words.error}</span>
-      <span class="typography body-medium">{$i18n.sentences.theOrderWasCreatedWithErrors}</span>
+      <span typography="body-medium" weight="bold">{$i18n.words.error}</span>
+      <span typography="body-medium">{$i18n.sentences.theOrderWasCreatedWithErrors}</span>
     {:else}
       <Icon variant="alert-triangle" color="var(--color-semantic-warning-600)" />
-      <span class="typography body-medium bold">{$i18n.words.warning}</span>
-      <span class="typography body-medium">{$i18n.sentences.theOrderIsInAPendingState}</span>
+      <span typography="body-medium" weight="bold">{$i18n.words.warning}</span>
+      <span typography="body-medium">{$i18n.sentences.theOrderIsInAPendingState}</span>
     {/if}
   </Alert>
 

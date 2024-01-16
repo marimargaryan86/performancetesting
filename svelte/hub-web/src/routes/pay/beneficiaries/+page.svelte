@@ -82,17 +82,19 @@
           {@const currency = currencyData.mapping[item.currencyId]}
 
           <TRow alternatingBackground={false}>
-            <TCol class="company-name typography body-medium bold">
+            <TCol class="company-name" typography="body-medium" weight="bold">
               {item.bankAccountHolderName}
             </TCol>
             <TCol>
               <div class="currency">
-                <strong class="typography body-medium bold">{item.currencyId}</strong>
-                <span class="typography body-small">{currency?.name ?? ""}</span>
+                <strong typography="body-medium" weight="bold">{item.currencyId}</strong>
+                <span typography="body-small">{currency?.name ?? ""}</span>
               </div>
             </TCol>
-            <TCol class="typography body-medium bold">{item.bankDetails.address.countryCode}</TCol>
-            <TCol class="typography body-medium">{capitalize(item.bankDetails.paymentType)}</TCol>
+            <TCol typography="body-medium" weight="bold"
+              >{item.bankDetails.address.countryCode}</TCol
+            >
+            <TCol typography="body-medium">{capitalize(item.bankDetails.paymentType)}</TCol>
             <TActionsCol>
               <a
                 href={routeConfig.routes.pay.routes.beneficiaries.routes.beneficiary(item.id).root}
@@ -106,7 +108,7 @@
                 <Icon variant="remove-trash" size="32px" />
               </button>
 
-              <button class="outline action typography body-medium bold">Pay</button>
+              <button class="outline action" typography="body-medium" weight="bold">Pay</button>
             </TActionsCol>
           </TRow>
         {/each}

@@ -12,7 +12,9 @@
   <img src={imageUrl} alt="" title={name} class="entity-avatar" style:--size={size} />
 {:else}
   <span
-    class="entity-avatar typography body-small bold"
+    typography="body-small"
+    weight="bold"
+    class="entity-avatar"
     style:background-color={color}
     style:--size={size}
   >

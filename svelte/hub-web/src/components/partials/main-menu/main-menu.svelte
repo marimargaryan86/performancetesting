@@ -74,7 +74,8 @@
   <ul>
     <li>
       <a
-        class="link typography body-medium"
+        typography="body-medium"
+        class="link"
         title={expanded ? undefined : $i18n.pages.knowledgeHub.title}
         href={routeConfig.routes.knowledgeHub.root}
         class:active={activeLink === "knowledge-hub"}
@@ -91,7 +92,8 @@
     </li>
     <li>
       <a
-        class="link typography body-medium"
+        typography="body-medium"
+        class="link"
         title={expanded ? undefined : $i18n.actions.reportAnIssue}
         href={routeConfig.routes.help.routes.customerService.root}
         class:active={activeLink === "issue"}
@@ -108,7 +110,8 @@
     </li>
     <li>
       <a
-        class="link typography body-medium"
+        typography="body-medium"
+        class="link"
         title={expanded ? undefined : $i18n.words.help}
         href={routeConfig.routes.help.routes.privacyPolicy.root}
         class:active={activeLink === "help"}
@@ -125,7 +128,8 @@
     </li>
     <li>
       <button
-        class="logout typography body-medium"
+        typography="body-medium"
+        class="logout"
         title={expanded ? undefined : $i18n.actions.logout}
         on:click={logout}
       >

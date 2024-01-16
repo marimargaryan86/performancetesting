@@ -55,7 +55,8 @@
 </script>
 
 <span
-  class="status-badge typography body-small"
+  typography="body-small"
+  class="status-badge"
   class:ok={variant === "ok"}
   class:warn={variant === "warn"}
   class:error={variant === "error"}

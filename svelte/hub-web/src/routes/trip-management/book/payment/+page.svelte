@@ -261,9 +261,9 @@
 
     <div class="total">
       <div>
-        <span class="typography body-large bold">{$i18n.sentences.totalToPay}</span>
+        <span typography="body-large" weight="bold">{$i18n.sentences.totalToPay}</span>
       </div>
-      <em class="typography body-large bold">
+      <em typography="body-large" weight="bold">
         {#if priceQuote?.price.total}
           {formatAmount(priceQuote?.price.total, { locale: $locale, sign: true })}
         {:else}

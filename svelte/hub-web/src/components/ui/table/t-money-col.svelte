@@ -1,4 +1,5 @@
 <script lang="ts">
+  /* global Typography */
   import TCol from "./t-col.svelte";
   import { formatAmount } from "formatting/currency";
   import { getLocale } from "i18n";
@@ -8,18 +9,15 @@
   export { className as class };
   export let currencySize: "small" | "x-small" = "small";
   export let money: Price;
+  export let typography: Typography | undefined = undefined;
 
   const locale = getLocale();
 </script>
 
-<TCol class={className}>
+<TCol class={className} {typography}>
   <div class="money">
     <span>{formatAmount(money, { locale: $locale })}</span>
-    <strong
-      class="typography body-small"
-      class:body-small={currencySize === "small"}
-      class:body-xsmall={currencySize === "x-small"}
-    >
+    <strong typography={currencySize === "small" ? "body-small" : "body-xsmall"}>
       {money.currency}
     </strong>
   </div>

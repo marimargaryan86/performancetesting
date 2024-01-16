@@ -32,14 +32,14 @@
 
 <div class="header" class:after-breadcrumbs={breadCrumbs}>
   <h1>
-    <span class="typography headline-medium bold">
+    <span typography="headline-medium" weight="bold">
       <slot name="page-title">
         {pageTitle}
       </slot>
     </span>
 
     {#if $$slots["page-sub-title"] || pageSubTitle !== undefined}
-      <em class="typography body-small">
+      <em typography="body-small">
         <slot name="page-sub-title">
           {pageSubTitle}
         </slot>

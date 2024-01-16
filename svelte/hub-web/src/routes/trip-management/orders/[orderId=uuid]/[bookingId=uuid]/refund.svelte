@@ -20,40 +20,40 @@
 </script>
 
 <div class="refund" transition:slideFade={{ duration: 300 }}>
-  <h3 class="typography title-large bold">{$i18n.words.refund}</h3>
+  <h3 typography="title-large" weight="bold">{$i18n.words.refund}</h3>
 
   <ul class="money">
     {#if refund.refunded.us}
-      <li class="typography body-medium amount">
+      <li class="amount" typography="body-medium">
         <strong>{$i18n.sentences.toUs}</strong>
-        <span class="typography bold" class:negative={refund.refunded.us.amount < 0}>
+        <span weight="bold" class:negative={refund.refunded.us.amount < 0}>
           {formatAmount(refund.refunded.us, { locale: $locale, sign: true })}
         </span>
       </li>
     {/if}
 
     {#if usInPayerCurrency}
-      <li class="typography body-medium amount">
+      <li class="amount" typography="body-medium">
         <strong>{$i18n.sentences.toUs} <em>({$i18n.sentences.payerCurrency})</em></strong>
-        <span class="typography bold" class:negative={usInPayerCurrency.amount < 0}>
+        <span weight="bold" class:negative={usInPayerCurrency.amount < 0}>
           {formatAmount(usInPayerCurrency, { locale: $locale, sign: true })}
         </span>
       </li>
     {/if}
 
     {#if refund.refunded.reseller}
-      <li class="typography body-medium amount">
+      <li class="amount" typography="body-medium">
         <strong>{$i18n.sentences.toReseller}</strong>
-        <span class="typography bold" class:negative={refund.refunded.reseller.amount < 0}>
+        <span weight="bold" class:negative={refund.refunded.reseller.amount < 0}>
           {formatAmount(refund.refunded.reseller, { locale: $locale, sign: true })}
         </span>
       </li>
     {/if}
 
     {#if refund.refundPosition}
-      <li class="typography body-medium amount">
+      <li class="amount" typography="body-medium">
         <strong>{$i18n.words.refundPosition}</strong>
-        <span class="typography bold" class:negative={refund.refundPosition.amount < 0}>
+        <span weight="bold" class:negative={refund.refundPosition.amount < 0}>
           {formatAmount(refund.refundPosition, { locale: $locale, sign: true })}
         </span>
       </li>

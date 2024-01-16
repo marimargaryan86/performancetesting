@@ -97,7 +97,7 @@
     {@const stopCount = group.detailsList?.length ?? 1}
 
     <div class="group">
-      <div class="header typography label-medium">
+      <div class="header" typography="label-medium">
         <EntityAvatar name={vendor} size="24px" />
         <span>
           {vendor}
@@ -108,7 +108,7 @@
       <div class="info">
         <div class="segments">
           {#each group.detailsList as details}
-            <span class="typography body-small">
+            <span typography="body-small">
               {details.legs[0]?.departureAt.toLocaleDateString($locale, {
                 month: "long",
                 day: "numeric",
@@ -122,22 +122,26 @@
                 <li class="leg">
                   <div class="route">
                     <span class="circle" />
-                    <span class="time typography label-large bold">
+                    <span class="time" typography="label-large" weight="bold">
                       {formatTime(leg.departureAt, leg.origin.timeZone, $locale)}
                     </span>
-                    <span class="location typography label-large bold">{leg.origin.name}</span>
+                    <span class="location" typography="label-large" weight="bold">
+                      {leg.origin.name}
+                    </span>
 
                     <span class="line" />
-                    <span class="duration typography body-small">
+                    <span class="duration" typography="body-small">
                       {formatDuration(getTimeDeltaS(leg.arrivalAt, leg.departureAt))}
                     </span>
                     <span />
 
                     <span class="circle" />
-                    <span class="time typography label-large bold">
+                    <span class="time" typography="label-large" weight="bold">
                       {formatTime(leg.arrivalAt, leg.destination.timeZone, $locale)}
                     </span>
-                    <span class="location typography label-large bold">{leg.destination.name}</span>
+                    <span class="location" typography="label-large" weight="bold">
+                      {leg.destination.name}
+                    </span>
                   </div>
                 </li>
               {/each}
@@ -148,8 +152,8 @@
         {#if groupIdx === 0}
           <div class="price">
             <span>
-              <em class="typography label-medium">{$i18n.sentences.startingAt}</em>
-              <strong class="typography title-large bold">
+              <em typography="label-medium">{$i18n.sentences.startingAt}</em>
+              <strong typography="title-large" weight="bold">
                 {formatAmount(totalPrice, { locale: $locale, sign: true })}
               </strong>
             </span>

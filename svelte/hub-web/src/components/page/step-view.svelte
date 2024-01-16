@@ -10,14 +10,14 @@
     {@const done = activeStep > step.number}
 
     <li class:active={activeStep === step.number} class:done>
-      <span class="number-badge typography body-small bold">
+      <span typography="body-small" weight="bold" class="number-badge">
         {#if done}
           <Icon variant="checked" size="16px" color="var(--color-main-primary-500)" />
         {:else}
           {step.number}
         {/if}
       </span>
-      <span class="typography body-medium">{step.label}</span>
+      <span typography="body-medium">{step.label}</span>
     </li>
   {/each}
 </ul>

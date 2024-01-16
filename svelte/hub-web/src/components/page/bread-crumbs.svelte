@@ -13,7 +13,7 @@
 
 <ul class="bread-crumbs">
   {#each items as item, idx}
-    <li class="bread-crumb typography body-small">
+    <li typography="body-small" class="bread-crumb">
       {#if idx !== items.length - 1}
         <a href={item.url}>{item.label}</a>
 

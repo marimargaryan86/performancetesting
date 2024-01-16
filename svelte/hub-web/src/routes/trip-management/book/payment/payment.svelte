@@ -131,15 +131,15 @@
   <div class="dialog">
     <img src={paymentIllustrationImg} alt="" />
     <div>
-      <h3 class="typography display-small bold">{$i18n.sentences.paymentDeclined}</h3>
-      <p class="typography body-medium">{error ?? $i18n.sentences.anUnexpectedErrorOccurred}</p>
+      <h3 typography="display-small" weight="bold">{$i18n.sentences.paymentDeclined}</h3>
+      <p typography="body-medium">{error ?? $i18n.sentences.anUnexpectedErrorOccurred}</p>
     </div>
     <Button size="small" on:click={clearError}>{$i18n.actions.tryAgain}</Button>
   </div>
 </Dialog>
 
 <div class="payment">
-  <span class="typography title-medium bold">{$i18n.words.paymentMethod}</span>
+  <span typography="title-medium" weight="bold">{$i18n.words.paymentMethod}</span>
 
   <div bind:this={stripeContainer} class="stripe-container" class:pending={!paymentIntent}>
     {#if !paymentIntent}
@@ -147,7 +147,7 @@
     {/if}
   </div>
 
-  <span class="toc typography body-small">
+  <span class="toc" typography="body-small">
     {#each $i18n.sentences.paymentInfo as item}
       {#if item.type === "text"}
         {item.value}

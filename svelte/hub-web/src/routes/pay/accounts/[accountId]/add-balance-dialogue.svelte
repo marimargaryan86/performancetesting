@@ -83,7 +83,7 @@
     transition:fade={{ duration: 200 }}
   >
     <div class="dialogue" transition:fly={{ duration: 200, y: 24 }} on:introend={focusSearch}>
-      <h1 class="typography headline-medium bold">{$i18n.actions.addBalances}</h1>
+      <h1 typography="headline-medium" weight="bold">{$i18n.actions.addBalances}</h1>
 
       <TextField
         type="text"
@@ -99,7 +99,7 @@
         />
       </TextField>
 
-      <ul class="balances typography body-large bold">
+      <ul class="balances" typography="body-large" weight="bold">
         {#each filteredBalances as balance}
           {@const id = `balance-${balance.code}`}
           <li>

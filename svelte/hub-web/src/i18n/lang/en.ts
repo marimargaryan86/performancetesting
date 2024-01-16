@@ -166,7 +166,7 @@ export default {
   sentences: {
     priceChange: "Price change",
     priceChangeInfo:
-      'We have noticed a price change; the initial price was <strong class="typography body-medium bold">{originalPrice}</strong>, and the new price is <strong class="typography body-medium bold">{newPrice}</strong>. Do you wish to continue?',
+      'We have noticed a price change; the initial price was <strong typography="body-medium" weight="bold">{originalPrice}</strong>, and the new price is <strong typography="body-medium" weight="bold">{newPrice}</strong>. Do you wish to continue?',
     areYouSure: "Are you sure?",
     copiedToClipboard: "Copied to clipboard",
     noBalancesFound: "No balances found",
@@ -175,8 +175,7 @@ export default {
     noTripsMatchesTheFilterCriteria: "No trips matches the filter criteria",
     noTripsFound: "No trips found",
     timeRemaining: "Time remaining",
-    timeRemainingInfo:
-      '{timeLeft} mins to <strong class="typography bold">complete</strong> your booking',
+    timeRemainingInfo: '{timeLeft} mins to <strong weight="bold">complete</strong> your booking',
     startingAt: "From",
     loadingTripDetails: "Loading trip details...",
     thisPriceIsForAllPassengers: "This price is for all passengers",

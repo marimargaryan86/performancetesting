@@ -63,15 +63,15 @@
 
 <div class="search-options">
   <div class="sort">
-    <h3 class="typography label-large">{$i18n.actions.sortBy}</h3>
+    <h3 typography="label-large">{$i18n.actions.sortBy}</h3>
     <SelectField options={sortOptions} bind:value={data.sortBy} formatter={formatSortOption} />
   </div>
 
   <hr />
 
   <div class="stops">
-    <h3 class="typography label-large">{$i18n.words.stop.plural}</h3>
-    <div class="options typography body-small">
+    <h3 typography="label-large">{$i18n.words.stop.plural}</h3>
+    <div class="options" typography="body-small">
       <label for="stop-direct">
         <Checkbox id="stop-direct" value="direct" bind:group={data.stops} />
         {$i18n.words.direct}
@@ -82,18 +82,18 @@
   <hr />
 
   <div class="departure-time">
-    <h3 class="typography label-large">{$i18n.words.departureTime}</h3>
+    <h3 typography="label-large">{$i18n.words.departureTime}</h3>
     <div>
-      <h4 class="typography label-medium bold">{$i18n.words.departure}</h4>
-      <span class="typography body-small">
+      <h4 typography="label-medium" weight="bold">{$i18n.words.departure}</h4>
+      <span typography="body-small">
         {formatTime(data.departureSpanM.start)} - {formatTime(data.departureSpanM.end)}
       </span>
       <RangeField bind:value={data.departureSpanM} min={0} max={1440} />
     </div>
 
     <div>
-      <h4 class="typography label-medium bold">{$i18n.words.arrival}</h4>
-      <span class="typography body-small">
+      <h4 typography="label-medium" weight="bold">{$i18n.words.arrival}</h4>
+      <span typography="body-small">
         {formatTime(data.arrivalSpanM.start)} - {formatTime(data.arrivalSpanM.end)}
       </span>
       <RangeField bind:value={data.arrivalSpanM} min={0} max={1440} />
@@ -103,8 +103,8 @@
   <hr />
 
   <div class="duration">
-    <h3 class="typography label-large">{$i18n.words.journeyDuration}</h3>
-    <span class="typography body-small">
+    <h3 typography="label-large">{$i18n.words.journeyDuration}</h3>
+    <span typography="body-small">
       {formatDuration(data.durationM * 60)} - {formatDuration(settings.durationSpanM.end * 60)}
     </span>
     <RangeField
@@ -118,24 +118,26 @@
 
   {#if settings.vendors.length}
     <div class="operators">
-      <h3 class="typography label-large">{$i18n.words.railwayOperators}</h3>
+      <h3 typography="label-large">{$i18n.words.railwayOperators}</h3>
 
       <div class="actions">
         <button
-          class="typography body-small bold"
+          typography="body-small"
+          weight="bold"
           on:click={selectOperators.bind(selectOperators, true)}
         >
           {$i18n.actions.selectAll}
         </button>
         <button
-          class="typography body-small bold"
+          typography="body-small"
+          weight="bold"
           on:click={selectOperators.bind(selectOperators, false)}
         >
           {$i18n.actions.clearAll}
         </button>
       </div>
 
-      <ul class="typography body-small">
+      <ul typography="body-small">
         {#each settings.vendors as vendor, idx}
           <li class="vendor">
             <label for="vendor-{idx}">

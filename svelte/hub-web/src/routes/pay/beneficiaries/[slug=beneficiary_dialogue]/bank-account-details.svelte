@@ -91,8 +91,8 @@
         <Icon variant="regular-payment" />
 
         <div>
-          <strong class="typography body-large bold">Regular Payment</strong>
-          <span class="typography body-small">
+          <strong typography="body-large" weight="bold">Regular Payment</strong>
+          <span typography="body-small">
             A Domestic or SEPA payment, which is cheaper and avoids correspondent banking fees.
           </span>
         </div>
@@ -103,8 +103,8 @@
         <Icon variant="priority-payment" />
 
         <div>
-          <strong class="typography body-large bold">Priority Payment</strong>
-          <span class="typography body-small">
+          <strong typography="body-large" weight="bold">Priority Payment</strong>
+          <span typography="body-small">
             An International wire payment, which is the fastest way to transfer funds, but also the
             most expensive.
           </span>
@@ -125,7 +125,9 @@
   <form>
     <div class="options">
       <label
-        class="option typography body-large bold"
+        class="option"
+        typography="body-large"
+        weight="bold"
         class:selected={data.bankDetails.type === "iban"}
       >
         IBAN
@@ -133,7 +135,9 @@
         <input type="radio" bind:group={data.bankDetails.type} value="iban" />
       </label>
       <label
-        class="option typography body-large bold"
+        class="option"
+        typography="body-large"
+        weight="bold"
         class:selected={data.bankDetails.type === "aba"}
       >
         Sort code and account no.

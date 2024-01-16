@@ -45,9 +45,9 @@
   >
     <Icon variant="alert-disc" color="var(--color-semantic-error-500)" size="64px" />
 
-    <h1 class="typography bold display-small title">{$i18n.sentences.priceChange}</h1>
+    <h1 typography="display-small" weight="bold" class="title">{$i18n.sentences.priceChange}</h1>
 
-    <p class="typography body-medium">
+    <p typography="body-medium">
       <!-- eslint-disable-next-line svelte/no-at-html-tags -->
       {@html $i18n.sentences.priceChangeInfo
         .replace("{originalPrice}", formatAmount(originalPrice, { locale: $locale, sign: true }))

@@ -12,9 +12,9 @@
 
 <main>
   {#if $page.status === 500}
-    <h1 class="typography headline-medium">{$i18n.sentences.oopsSomethingWentWrong}</h1>
+    <h1 typography="headline-medium">{$i18n.sentences.oopsSomethingWentWrong}</h1>
   {:else}
-    <h1 class="typography headline-medium">{$page.error?.message}</h1>
+    <h1 typography="headline-medium">{$page.error?.message}</h1>
   {/if}
 </main>
 

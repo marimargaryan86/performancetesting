@@ -55,7 +55,7 @@
       <li>
         <a
           href={item.url}
-          class="typography body-medium"
+          typography="body-medium"
           class:active
           title={expanded ? undefined : item.label}
         >

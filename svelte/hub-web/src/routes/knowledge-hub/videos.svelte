@@ -24,8 +24,8 @@
 <VideoPlayer bind:this={videoPlayer} />
 
 <section>
-  <h2 class="typography headline-small bold">{$i18n.pages.knowledgeHub.videos.title}</h2>
-  <p class="typography title-medium">
+  <h2 typography="headline-small" weight="bold">{$i18n.pages.knowledgeHub.videos.title}</h2>
+  <p typography="title-medium">
     {$i18n.pages.knowledgeHub.videos.description}
   </p>
 
@@ -43,14 +43,14 @@
         </button>
 
         <svelte:fragment slot="content">
-          <span class="chip typography body-medium">
+          <span class="chip" typography="body-medium">
             <Icon variant="clock-outlined" size="16px" color="var(--color-main-primary-500)" />
             {getDuration(video.lengthS)}
           </span>
 
           <div class="info">
-            <h3 class="typography title-large bold">{video.title}</h3>
-            <p class="typography body-large">
+            <h3 typography="title-large" weight="bold">{video.title}</h3>
+            <p typography="body-large">
               {video.description}
             </p>
           </div>

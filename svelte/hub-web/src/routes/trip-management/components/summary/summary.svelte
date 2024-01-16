@@ -33,15 +33,15 @@
 <Collapsible bind:this={collapsible} title={$i18n.words.summary}>
   <div class="details">
     {#if priceQuote}
-      <p class="typography label-large">
+      <p typography="label-large">
         {$i18n.words.passenger.plural}
-        <span class="typography bold">{getPassengersPresentation(passengers, $i18n)}</span>
+        <span weight="bold">{getPassengersPresentation(passengers, $i18n)}</span>
       </p>
 
-      <p class="typography label-large">
+      <p typography="label-large">
         {$i18n.words.fareBrand[priceQuote.options.length === 1 ? "singular" : "plural"]}
 
-        <span class="typography bold">
+        <span weight="bold">
           {priceQuote.options.map((item) => item.brandName).join(", ")}
         </span>
       </p>
@@ -56,16 +56,16 @@
     <div class="price">
       {#if expanded}
         <div transition:slideFade={{ duration: transitionTimeMs }} class="price-breakdown">
-          <span class="typography body-small">{$i18n.sentences.thisPriceIsForAllPassengers}</span>
+          <span typography="body-small">{$i18n.sentences.thisPriceIsForAllPassengers}</span>
 
           {#if priceBreakdown}
             <ul>
               {#each priceBreakdown as item}
                 <li>
-                  <span class="typography label-medium">
+                  <span typography="label-medium">
                     {$i18n.priceBreakdownTypes[item.type]}
                   </span>
-                  <span class="typography body-small bold">
+                  <span typography="body-small" weight="bold">
                     {formatAmount(item.price, { locale: $locale, sign: true })}
                   </span>
                 </li>
@@ -76,8 +76,8 @@
       {/if}
 
       <div class="total">
-        <span class="typography body-large bold">{$i18n.sentences.totalToPay}</span>
-        <em class="typography body-large bold">
+        <span typography="body-large" weight="bold">{$i18n.sentences.totalToPay}</span>
+        <em typography="body-large" weight="bold">
           {#if totalPrice}
             {formatAmount(totalPrice, { locale: $locale, sign: true })}
           {:else}
@@ -89,12 +89,12 @@
 
     {#if expanded}
       <div class="fare-rules-wrapper">
-        <p class="typography body-xsmall">
+        <p typography="body-xsmall">
           {#each $i18n.sentences.fareRulesInfo as item}
             {#if item.type === "text"}
               {item.value}
             {:else}
-              <button class="typography body-xsmall" on:click={showFareRules}>{item.value}</button>
+              <button typography="body-xsmall" on:click={showFareRules}>{item.value}</button>
             {/if}
           {/each}
         </p>

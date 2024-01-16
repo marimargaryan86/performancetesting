@@ -154,7 +154,7 @@ export default {
   sentences: {
     priceChange: "Cambio de precio",
     priceChangeInfo:
-      'Hemos notado un cambio de precio;  <strong class="typography body-medium bold">{originalPrice}</strong>, y el nuevo precio es <strong class="typography body-medium bold">{newPrice}</strong>. ',
+      'Hemos notado un cambio de precio;  <strong typography="body-medium" weight="bold">{originalPrice}</strong>, y el nuevo precio es <strong typography="body-medium" weight="bold">{newPrice}</strong>. ',
     areYouSure: "¿Está seguro?",
     copiedToClipboard: "Copiado",
     noBalancesFound: "No se encontraron saldos",
@@ -164,7 +164,7 @@ export default {
     noTripsFound: "No se encontraron viajes",
     timeRemaining: "Tiempo restante",
     timeRemainingInfo:
-      '{timeLeft} minutos para <strong class="typography bold">completo</strong> su reservación',
+      '{timeLeft} minutos para <strong weight="bold">completo</strong> su reservación',
     startingAt: "De",
     loadingTripDetails: "Cargando detalles del viaje...",
     thisPriceIsForAllPassengers: "Precio para todos pasajeros.",

@@ -3,6 +3,7 @@
 </script>
 
 <script lang="ts">
+  /* global Typography */
   import Icon from "components/icons/icon.svelte";
   import { slideFade } from "transitions/slide-fade";
 
@@ -11,6 +12,7 @@
   let className: string | undefined = undefined;
   export { className as class };
   export let dismissable = true;
+  export let typography: Typography | undefined = undefined;
 
   function close(): void {
     show = false;
@@ -20,6 +22,7 @@
 {#if show || !dismissable}
   <div
     class={className}
+    {typography}
     class:alert={true}
     class:success={type === "success"}
     class:warning={type === "warning"}

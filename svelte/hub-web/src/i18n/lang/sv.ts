@@ -160,7 +160,7 @@ export default {
   sentences: {
     priceChange: "Prisändring",
     priceChangeInfo:
-      'Vi har upptäckt en prisändring; ursprungspriset var <strong class="typography body-medium bold">{originalPrice}</strong> och det nya priset är <strong class="typography body-medium bold">{newPrice}</strong>. Vill du fortsätta?',
+      'Vi har upptäckt en prisändring; ursprungspriset var <strong typography="body-medium" weight="bold">{originalPrice}</strong> och det nya priset är <strong typography="body-medium" weight="bold">{newPrice}</strong>. Vill du fortsätta?',
     areYouSure: "Är du säker?",
     copiedToClipboard: "Kopierad till urklipp",
     noBalancesFound: "Inga saldon funna",
@@ -170,7 +170,7 @@ export default {
     noTripsFound: "Inga resor hittades",
     timeRemaining: "Återstående tid",
     timeRemainingInfo:
-      '{timeLeft} min kvar att <strong class="typography bold">slutföra</strong> din bokning',
+      '{timeLeft} min kvar att <strong weight="bold">slutföra</strong> din bokning',
     startingAt: "Från",
     loadingTripDetails: "Laddar resedetailjer...",
     thisPriceIsForAllPassengers: "Detta pris gäller för alla passagerare",

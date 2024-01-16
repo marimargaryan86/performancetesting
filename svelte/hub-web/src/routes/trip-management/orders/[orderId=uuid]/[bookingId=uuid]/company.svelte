@@ -40,20 +40,20 @@
 </script>
 
 <div class="company">
-  <span class="typography body-medium">{title}</span>
+  <span typography="body-medium">{title}</span>
 
   {#if company}
-    <span class="typography body-large bold company-name">
+    <span class="company-name" typography="body-large" weight="bold">
       <EntityAvatar name={company.name} size="24px" />
       {company.name}
     </span>
 
-    <div class="breakdown typography label-medium">
+    <div class="breakdown" typography="label-medium">
       {#each breakdownList as breakdown}
         <span>{$i18n.priceBreakdownTypes[breakdown.type]}</span>
         <strong>
           {formatAmount(breakdown.price, { locale: $locale })}
-          <em class="typography body-xsmall">{breakdown.price.currency}</em>
+          <em typography="body-xsmall">{breakdown.price.currency}</em>
         </strong>
       {/each}
 
@@ -65,7 +65,7 @@
             <span>{$i18n.words.markup}</span>
             <strong>
               {formatAmount(markups.agencyMarkup, { locale: $locale })}
-              <em class="typography body-xsmall">{markups.agencyMarkup.currency}</em>
+              <em typography="body-xsmall">{markups.agencyMarkup.currency}</em>
             </strong>
           {/if}
         {/await}
@@ -78,12 +78,12 @@
       {:then total}
         <strong>
           {formatAmount(total, { locale: $locale })}
-          <em class="typography body-xsmall">{total.currency}</em>
+          <em typography="body-xsmall">{total.currency}</em>
         </strong>
       {/await}
     </div>
   {:else}
-    <span class="typography body-small bold">{$i18n.words.notAvailable}</span>
+    <span typography="body-small" weight="bold">{$i18n.words.notAvailable}</span>
   {/if}
 </div>
 

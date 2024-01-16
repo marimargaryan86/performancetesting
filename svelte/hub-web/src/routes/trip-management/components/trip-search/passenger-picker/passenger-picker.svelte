@@ -109,7 +109,7 @@
 
 <div class="passenger-picker" use:clickOutside={close}>
   <button on:click={toggle} type="button">
-    <span class="typography title-small bold title-small bold">
+    <span typography="title-small" weight="bold">
       {totalCount}
       {$i18n.words.passenger[totalCount === 1 ? "singular" : "plural"]}
     </span>
@@ -123,7 +123,7 @@
 
   {#if expanded}
     <div class="dialogue" transition:scale={{ duration: 150, start: 0.8 }}>
-      <div class="header typography title-medium bold title-medium bold">
+      <div class="header" typography="title-medium" weight="bold">
         {$i18n.words.passenger.plural}
       </div>
 

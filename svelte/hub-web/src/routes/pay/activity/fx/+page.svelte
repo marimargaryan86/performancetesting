@@ -72,16 +72,16 @@
         <TCol maxWidth="96px" copyable={Boolean(conversion.transaction?.externalReference)}>
           {conversion.transaction?.externalReference ?? ""}
         </TCol>
-        <TCol class="currency typography bold">
+        <TCol class="currency" weight="bold">
           {conversion.createdAt?.toLocaleDateString($locale) ?? ""}
         </TCol>
-        <TCol class="currency typography bold">
+        <TCol class="currency" weight="bold">
           {conversion.settledAt?.toLocaleDateString($locale) ?? ""}
         </TCol>
-        <TCol class="currency typography bold">
+        <TCol class="currency" weight="bold">
           {conversion.amounts.sell?.currency ?? ""}
         </TCol>
-        <TCol class="currency typography bold">
+        <TCol class="currency" weight="bold">
           {conversion.amounts.buy?.currency ?? ""}
         </TCol>
         <TCol>{conversion.transaction?.fx.quote ?? ""}</TCol>

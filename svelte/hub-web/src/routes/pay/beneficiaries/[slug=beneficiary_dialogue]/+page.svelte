@@ -99,8 +99,8 @@
   <StepView steps={Object.values(steps)} activeStep={steps[step].number} slot="steps" />
 
   <Alert class="error-message" type="error" show={Boolean(error)}>
-    <span class="typography body-medium">
-      <strong class="typography bold">Error</strong> <span>{error}</span>
+    <span typography="body-medium">
+      <strong weight="bold">Error</strong> <span>{error}</span>
     </span>
   </Alert>
 

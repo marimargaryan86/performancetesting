@@ -25,7 +25,7 @@
 </script>
 
 <div class="transaction">
-  <h3 class="typography title-large bold">{$i18n.words.transactionInfo}</h3>
+  <h3 typography="title-large" weight="bold">{$i18n.words.transactionInfo}</h3>
 
   {#await transactionTask}
     <div class="pending">
@@ -35,15 +35,15 @@
     {#if transaction}
       <div class="content">
         <div>
-          <span class="typography label-large">{$i18n.words.transactionType}</span>
-          <strong class="typography body-large bold">
+          <span typography="label-large">{$i18n.words.transactionType}</span>
+          <strong typography="body-large" weight="bold">
             {$i18n.types[transaction.payment.method]}
           </strong>
         </div>
 
         <div>
-          <span class="typography label-large">{$i18n.words.paymentType}</span>
-          <strong class="typography body-large bold">
+          <span typography="label-large">{$i18n.words.paymentType}</span>
+          <strong typography="body-large" weight="bold">
             {$i18n.types[transaction.payment.type]}
           </strong>
         </div>
@@ -64,7 +64,7 @@
         />
       </div>
     {:else}
-      <Alert class="typography body-medium" type="warning" dismissable={false}>
+      <Alert typography="body-medium" type="warning" dismissable={false}>
         {$i18n.sentences.transactionNotFound}
       </Alert>
     {/if}

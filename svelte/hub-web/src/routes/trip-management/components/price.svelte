@@ -19,17 +19,17 @@
   );
 </script>
 
-<div class="price typography body-small">
+<div class="price" typography="body-small">
   <span>{$i18n.sentences.thisPriceIsForAllPassengers}</span>
   <ul>
     <li>
       <span>{$i18n.priceBreakdownTypes["base-fare"]} + {$i18n.priceBreakdownTypes.tax}</span>
-      <strong class="typography bold">
+      <strong weight="bold">
         {formatAmount(totalPrice, { locale: $locale, sign: true })}
       </strong>
     </li>
 
-    <li class="typography body-xlarge bold">
+    <li typography="body-xlarge" weight="bold">
       <span>{$i18n.sentences.totalPaid}</span>
       <strong>
         {formatAmount(totalPrice, { locale: $locale, sign: true })}

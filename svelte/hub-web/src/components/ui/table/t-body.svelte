@@ -1,4 +1,4 @@
-<tbody class="typography body-medium"><slot /></tbody>
+<tbody typography="body-medium"><slot /></tbody>
 
 <style>
   tbody {

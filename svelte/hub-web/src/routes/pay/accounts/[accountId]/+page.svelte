@@ -71,20 +71,20 @@
           <CurrencyFlag code={balance.currencyId} />
 
           <span>
-            <strong class="typography body-large bold">
+            <strong typography="body-large" weight="bold">
               {formatAmount(
                 { currency: balance.currencyId, amount: balance.amount },
                 { locale: $locale },
               )}
             </strong>
-            <span class="typography body-small">{balance.currency}</span>
+            <span typography="body-small">{balance.currency}</span>
           </span>
 
           <ChevronIcon color="var(--color-main-neutral-700)" size="20px" />
         </a>
       </li>
     {:else}
-      <li class="typography body-large empty">{$i18n.sentences.noBalancesFound}</li>
+      <li typography="body-large" class="empty">{$i18n.sentences.noBalancesFound}</li>
     {/each}
   </ul>
 </StandardLayout>

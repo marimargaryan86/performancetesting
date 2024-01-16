@@ -93,7 +93,7 @@
         <TCol width="0">
           {#if booking.ticketUrls.length}
             <a
-              class="typography body-medium"
+              typography="body-medium"
               href={orderLink.routes.booking(booking.id).routes.tickets.root}
               download
             >
@@ -110,8 +110,8 @@
           })}
         </TCol>
 
-        <TCol class="typography bold">{origin?.name ?? $i18n.words.unknown}</TCol>
-        <TCol class="typography bold">{destination?.name ?? $i18n.words.unknown}</TCol>
+        <TCol weight="bold">{origin?.name ?? $i18n.words.unknown}</TCol>
+        <TCol weight="bold">{destination?.name ?? $i18n.words.unknown}</TCol>
         <TMoneyCol money={booking.price.total} />
         <TStatusBadgeCol value={booking.status} />
 

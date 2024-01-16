@@ -39,7 +39,7 @@
 </script>
 
 <div class="itinerary">
-  <h3 class="typography body-large bold">{$i18n.words.itineraryDetails}</h3>
+  <h3 typography="body-large" weight="bold">{$i18n.words.itineraryDetails}</h3>
 
   {#each bookings as booking}
     {@const origDestLegs = getOrigDestLegs(booking)}
@@ -53,7 +53,7 @@
     {#if origDestLegs}
       {@const { originLeg, destinationLeg } = origDestLegs}
       <div class="booking">
-        <em class="typography label-medium">
+        <em typography="label-medium">
           {originLeg.departureAt.toLocaleDateString($locale, {
             year: "numeric",
             month: "short",
@@ -63,16 +63,16 @@
         </em>
 
         <div class="orig-dest">
-          <span class="typography title-medium bold">{originLeg.origin.name}</span>
-          <em class="typography title-small">{$i18n.words.to.toLowerCase()}</em>
-          <span class="typography title-medium bold">
+          <span typography="title-medium" weight="bold">{originLeg.origin.name}</span>
+          <em typography="title-small">{$i18n.words.to.toLowerCase()}</em>
+          <span typography="title-medium" weight="bold">
             {destinationLeg.destination.name}
           </span>
         </div>
 
         <div class="vendor">
           <EntityAvatar name={vendor} />
-          <span class="typography label-medium">
+          <span typography="label-medium">
             {vendor}
             {trainNumber} • {formatStopCount(stopCount, $i18n)}
           </span>
@@ -80,8 +80,8 @@
 
         <div class="fare-info">
           <div class="time">
-            <span class="typography body-xsmall">{$i18n.words.departure}</span>
-            <strong class="typography body-xlarge bold">
+            <span typography="body-xsmall">{$i18n.words.departure}</span>
+            <strong typography="body-xlarge" weight="bold">
               {originLeg.departureAt.toLocaleTimeString($locale, {
                 hour: "2-digit",
                 minute: "2-digit",
@@ -91,8 +91,8 @@
           </div>
 
           <div class="time">
-            <span class="typography body-xsmall">{$i18n.words.arrival}</span>
-            <strong class="typography body-xlarge bold">
+            <span typography="body-xsmall">{$i18n.words.arrival}</span>
+            <strong typography="body-xlarge" weight="bold">
               {destinationLeg.arrivalAt.toLocaleTimeString($locale, {
                 hour: "2-digit",
                 minute: "2-digit",
@@ -107,8 +107,8 @@
             </span>
 
             <div>
-              <em class="typography body-xsmall">{$i18n.words.tripDuration}</em>
-              <strong class="typography body-medium bold">
+              <em typography="body-xsmall">{$i18n.words.tripDuration}</em>
+              <strong typography="body-medium" weight="bold">
                 {formatDuration(getTimeDeltaS(originLeg.departureAt, destinationLeg.arrivalAt))}
               </strong>
             </div>
@@ -120,10 +120,10 @@
             </span>
 
             <div>
-              <em class="typography body-xsmall">
+              <em typography="body-xsmall">
                 {$i18n.words.fareBrand[cabinClasses.length === 1 ? "singular" : "plural"]}
               </em>
-              <strong class="typography body-medium bold">
+              <strong typography="body-medium" weight="bold">
                 {cabinClasses.join(", ")}
               </strong>
             </div>

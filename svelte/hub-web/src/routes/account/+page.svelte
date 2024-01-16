@@ -97,7 +97,7 @@
 
       {#if nodes.length}
         <form on:submit|preventDefault={submit}>
-          <h2 class="typography headline-small bold">
+          <h2 typography="headline-small" weight="bold">
             {$i18n.ory.formGroups[name]}
           </h2>
 
@@ -159,8 +159,8 @@
                 id={node.attributes.id}
               />
             {:else if node.type === "text"}
-              <div class="typography body-medium">{node.meta.label?.text}</div>
-              <div class="typography body-medium bold">{node.attributes.text.text}</div>
+              <div typography="body-medium">{node.meta.label?.text}</div>
+              <div typography="body-medium" weight="bold">{node.attributes.text.text}</div>
             {/if}
           {/each}
         </form>

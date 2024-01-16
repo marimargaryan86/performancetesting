@@ -12,7 +12,7 @@
 </script>
 
 <div class="overview">
-  <h2 class="typography headline-small bold">{$i18n.sentences.yourOrderHasBeenCreated}</h2>
+  <h2 typography="headline-small" weight="bold">{$i18n.sentences.yourOrderHasBeenCreated}</h2>
   <Ticket identifier={order.journey?.reference} />
 
   <div class="item">
@@ -20,7 +20,7 @@
       <Icon variant="checked" size="16px" color="var(--color-common-dark-strong)" />
     </span>
     <div>
-      <span class="typography body-xsmall">{$i18n.words.status}</span>
+      <span typography="body-xsmall">{$i18n.words.status}</span>
       <StatusBadge value={getOrderStatus.booking(order) ?? "unknown"} />
     </div>
   </div>
@@ -48,7 +48,7 @@
     flex-flow: column;
   }
 
-  .item > div > .body-xsmall {
+  .item > div > span[typography="body-xsmall"] {
     color: var(--color-main-primary-700);
   }
 

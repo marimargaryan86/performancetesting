@@ -103,7 +103,7 @@
       on:blur
       on:input={onInput}
       bind:this={inputRef}
-      class="typography body-medium"
+      typography="body-medium"
     />
 
     {#if clearable && value}

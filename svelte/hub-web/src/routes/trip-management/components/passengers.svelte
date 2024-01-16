@@ -35,13 +35,13 @@
 </script>
 
 <ul class="passengers">
-  <li class="typography body-large bold">{$i18n.words.passengerDetails}</li>
+  <li typography="body-large" weight="bold">{$i18n.words.passengerDetails}</li>
   {#each passengers as passenger}
-    <li class="passenger typography body-large">
+    <li class="passenger" typography="body-large">
       <span class="circle">
         <Icon variant="passenger" size="20px" color="var(--color-main-primary-600" />
       </span>
-      <strong class="typography bold">{passenger.firstName} {passenger.lastName}</strong>
+      <strong weight="bold">{passenger.firstName} {passenger.lastName}</strong>
       <em>{getPassengerLabel(passenger, orderCreatedAt, $i18n)}</em>
     </li>
   {/each}

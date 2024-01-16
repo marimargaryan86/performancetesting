@@ -13,7 +13,7 @@
 </script>
 
 <section>
-  <h2 class="typography headline-large bold">{$i18n.pages.knowledgeHub.faq.title}</h2>
+  <h2 typography="headline-large" weight="bold">{$i18n.pages.knowledgeHub.faq.title}</h2>
 
   <ol>
     {#each $i18n.pages.knowledgeHub.faq.items as item, idx}
@@ -21,12 +21,12 @@
 
       <li>
         <div>
-          <strong class="typography title-medium bold">
+          <strong typography="title-medium" weight="bold">
             {idx + 1}. {item.question}
           </strong>
 
           {#if expanded}
-            <p class="typography body-large" transition:slideFade={{ duration: 400 }}>
+            <p typography="body-large" transition:slideFade={{ duration: 400 }}>
               {item.answer}
             </p>
           {/if}

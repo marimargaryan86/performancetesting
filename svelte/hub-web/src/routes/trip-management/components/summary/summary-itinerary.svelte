@@ -29,7 +29,7 @@
 </script>
 
 <Collapsible class="itinerary" title={$i18n.words.itinerary}>
-  <div class="trip-info typography body-small">
+  <div class="trip-info" typography="body-small">
     <div>
       <EntityAvatar name={vendor} size="24px" />
       {vendor}
@@ -49,7 +49,7 @@
 
   <ul class="segments">
     {#each legs as leg}
-      <li class="segment typography label-large bold">
+      <li class="segment" typography="label-large" weight="bold">
         <span class="circle" />
         <strong>
           {leg.departureAt.toLocaleTimeString($locale, {
@@ -61,7 +61,7 @@
         <strong>{leg.origin.name}</strong>
 
         <span class="line" />
-        <em class="typography body-small default">
+        <em typography="body-small" weight="default">
           {formatDuration(getTimeDeltaS(leg.departureAt, leg.arrivalAt))}
         </em>
         <em />
@@ -80,7 +80,7 @@
   </ul>
 
   <div class="fare-rules">
-    <button class="typography body-small" on:click={showFareRules}>
+    <button typography="body-small" on:click={showFareRules}>
       {$i18n.actions.viewFareRules}
     </button>
   </div>

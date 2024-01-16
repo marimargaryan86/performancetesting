@@ -19,8 +19,8 @@
   </a>
 
   <div class="info">
-    <strong class="typography body-small bold">{$user.email}</strong>
-    <span class="typography body-small">{$i18n.roles[$user.role]}</span>
+    <strong typography="body-small" weight="bold">{$user.email}</strong>
+    <span typography="body-small">{$i18n.roles[$user.role]}</span>
   </div>
 </div>
 

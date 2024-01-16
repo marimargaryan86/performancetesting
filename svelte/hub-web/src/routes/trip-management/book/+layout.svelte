@@ -39,7 +39,7 @@
 </script>
 
 <div class="header">
-  <h1 class="typography headline-medium bold">{title}</h1>
+  <h1 typography="headline-medium" weight="bold">{title}</h1>
 </div>
 
 <StepView {steps} {activeStep} />

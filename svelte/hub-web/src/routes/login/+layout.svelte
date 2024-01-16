@@ -4,8 +4,8 @@
 
 <main>
   <section class="intro">
-    <h2 class="typography display-medium bold">Your hub for all things travel related</h2>
-    <h3 class="typography body-large">Junction Hub will be the place to make and view bookings</h3>
+    <h2 typography="display-medium" weight="bold">Your hub for all things travel related</h2>
+    <h3 typography="body-large">Junction Hub will be the place to make and view bookings</h3>
 
     <img src={passengersImage} alt="" />
   </section>

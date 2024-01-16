@@ -34,11 +34,11 @@
 </script>
 
 <div class="summary">
-  <h2 class="typography headline-small bold">Summary</h2>
+  <h2 typography="headline-small" weight="bold">Summary</h2>
 
   <div class="section">
-    <h3 class="typography title-medium bold">Beneficiary Details</h3>
-    <div class="table typography body-medium">
+    <h3 typography="title-medium" weight="bold">Beneficiary Details</h3>
+    <div class="table" typography="body-medium">
       <strong>Personalised name:</strong>
       <span>{data.account?.company?.id ?? "-"}</span>
       <strong>Email:</strong>
@@ -62,8 +62,8 @@
   </div>
 
   <div class="section">
-    <h3 class="typography title-medium bold">Bank Account Details</h3>
-    <div class="table typography body-medium">
+    <h3 typography="title-medium" weight="bold">Bank Account Details</h3>
+    <div class="table" typography="body-medium">
       <strong>Bank Name:</strong>
       <span>{data.bankDetails.name ?? "-"}</span>
       <strong>Bank Address:</strong>
@@ -78,7 +78,7 @@
       <span>{currency ? `${currency.name} (${currency.code})` : "-"}</span>
 
       <hr />
-      <h4 class="typography body-medium bold">
+      <h4 typography="body-medium" weight="bold">
         {capitalize(data.bankDetails.paymentType ?? "")} Payment
       </h4>
 

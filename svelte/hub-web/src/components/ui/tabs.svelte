@@ -12,7 +12,7 @@
   export let items: Tab[];
 </script>
 
-<ul class="tabs typography title-medium bold">
+<ul typography="title-medium" weight="bold" class="tabs">
   {#each items as item}
     {@const active = item.exact
       ? $page.url.pathname === item.url

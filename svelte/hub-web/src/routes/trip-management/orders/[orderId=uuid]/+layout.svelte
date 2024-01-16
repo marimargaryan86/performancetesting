@@ -30,7 +30,7 @@
 <StandardLayout {breadCrumbs} {tabs}>
   <svelte:fragment slot="page-title">
     {$i18n.words.orderReference}:
-    <span class="typography title-large bold">
+    <span typography="title-large" weight="bold">
       {data.order.journey?.reference ?? $i18n.words.unknown}
     </span>
   </svelte:fragment>

@@ -26,11 +26,11 @@
 
 <Backdrop bind:this={backdrop}>
   <div class="dialog">
-    <h2 class="typography display-small bold">{$i18n.words.fareRules}</h2>
+    <h2 typography="display-small" weight="bold">{$i18n.words.fareRules}</h2>
 
     {#each rules as rule}
-      <h3 class="typography title-small bold">{rule.title}</h3>
-      <p class="typography body-small">{rule.body}</p>
+      <h3 typography="title-small" weight="bold">{rule.title}</h3>
+      <p typography="body-small">{rule.body}</p>
     {/each}
 
     <div class="actions">

@@ -57,7 +57,7 @@
 <StandardLayout {breadCrumbs}>
   <svelte:fragment slot="page-title">
     {bookingTitle}:
-    <span class="typography title-large bold">
+    <span typography="title-large" weight="bold">
       {getOrigin(data.booking)?.name ?? $i18n.words.unknown}
       {$i18n.words.to.toLowerCase()}
       {getDestination(data.booking)?.name ?? $i18n.words.unknown}
@@ -67,7 +67,7 @@
   <div class="content" style:--grid-columns={canViewTransactions ? "1fr 1fr" : "1fr"}>
     <div class="booking">
       <div class="itinerary">
-        <h3 class="typography title-large bold">{$i18n.words.itinerary}</h3>
+        <h3 typography="title-large" weight="bold">{$i18n.words.itinerary}</h3>
 
         <Ticket identifier={reservationNo} title={$i18n.words.reservationNumber} />
 
@@ -80,13 +80,13 @@
         {/if}
 
         <div class="statuses">
-          <div class="status typography body-small bold">
+          <div class="status" typography="body-small" weight="bold">
             {$i18n.words.bookingStatus}
             <StatusBadge value={data.booking.status} />
           </div>
 
           {#if data.booking.cancellation?.status}
-            <div class="status typography body-small bold">
+            <div class="status" typography="body-small" weight="bold">
               {$i18n.words.cancellationStatus}
               <StatusBadge value={data.booking.cancellation.status} />
             </div>
@@ -95,8 +95,8 @@
       </div>
 
       {#if data.booking.refund}
-        <div class="refund typography body-medium bold">
-          <h3 class="typography body-large bold">
+        <div class="refund" typography="body-medium" weight="bold">
+          <h3 typography="body-large" weight="bold">
             {$i18n.words.refund}
 
             <StatusBadge value={data.booking.refund.status} />

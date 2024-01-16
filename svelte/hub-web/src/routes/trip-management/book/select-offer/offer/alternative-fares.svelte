@@ -45,7 +45,7 @@
 </script>
 
 <div class="alternative-fares">
-  <button class="toggle typography body-medium bold" on:click={toggle}>
+  <button class="toggle" typography="body-medium" weight="bold" on:click={toggle}>
     {$i18n.words.alternativeFares}
     <ChevronIcon direction={expanded ? "up" : "down"} color="var(--color-main-primary-500)" />
   </button>
@@ -56,17 +56,17 @@
         {@const selected = Boolean(selectedOptions.find((item) => item.id === option.id))}
 
         <li class="option">
-          <strong class="typography body-xlarge bold">{option.brandName}</strong>
+          <strong typography="body-xlarge" weight="bold">{option.brandName}</strong>
 
           {#if dev}
-            <button class="typography body-small fare-rules-btn">
+            <button typography="body-small" class="fare-rules-btn">
               {$i18n.actions.viewFareRules}
             </button>
           {/if}
 
           <hr />
 
-          <span class="typography body-medium bold">
+          <span typography="body-medium" weight="bold">
             {formatAmount(option.price.total, { locale: $locale, sign: true })}
           </span>
 

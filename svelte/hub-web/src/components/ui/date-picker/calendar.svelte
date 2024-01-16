@@ -134,9 +134,9 @@
   }
 </script>
 
-<div class="calendar typography body-small">
+<div typography="body-small" class="calendar">
   {#each Object.values(weekDays) as weekDay}
-    <span class="cell typography body-medium bold">{weekDay}</span>
+    <span typography="body-medium" weight="bold" class="cell">{weekDay}</span>
   {/each}
 
   {#each days as day, idx}

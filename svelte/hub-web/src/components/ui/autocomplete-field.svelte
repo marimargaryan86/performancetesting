@@ -130,7 +130,8 @@
 
   {#if expanded}
     <ul
-      class="options typography body-medium"
+      typography="body-medium"
+      class="options"
       transition:scale={{ duration: 150, start: 0.8 }}
       bind:this={dialog}
       tabindex="-1"

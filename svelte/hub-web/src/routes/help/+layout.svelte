@@ -51,11 +51,11 @@
         <img src="/images/icons/{activeTab.icon}.svg" alt="" />
       {/if}
 
-      <h1 class="typography bold title-medium">
+      <h1 typography="title-medium" weight="bold">
         {activeTab?.label ?? undefined}
       </h1>
 
-      <div class="content typography body-medium">
+      <div typography="body-medium" class="content">
         <slot />
       </div>
     </div>

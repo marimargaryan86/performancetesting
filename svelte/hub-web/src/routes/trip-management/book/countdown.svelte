@@ -61,8 +61,8 @@
 
 <Alert {show} type="warning" class="countdown">
   <Icon variant="alert-triangle" color="var(--color-semantic-warning-600)" />
-  <strong class="typography body-medium bold">{$i18n.sentences.timeRemaining}</strong>
-  <span class="typography body-medium">
+  <strong typography="body-medium" weight="bold">{$i18n.sentences.timeRemaining}</strong>
+  <span typography="body-medium">
     <!-- eslint-disable-next-line svelte/no-at-html-tags -->
     {@html $i18n.sentences.timeRemainingInfo.replace("{timeLeft}", timeLeft)}
   </span>

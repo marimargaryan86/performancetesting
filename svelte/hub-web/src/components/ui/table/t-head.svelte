@@ -1,5 +1,5 @@
 <thead>
-  <tr class="typography body-small bold"><slot /></tr>
+  <tr typography="body-small" weight="bold"><slot /></tr>
 </thead>
 
 <style>

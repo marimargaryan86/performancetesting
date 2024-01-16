@@ -22,7 +22,7 @@
 </svelte:head>
 
 <div class="content">
-  <h3 class="typography title-large bold">{$i18n.words.orderDetails}</h3>
+  <h3 typography="title-large" weight="bold">{$i18n.words.orderDetails}</h3>
 
   <Ticket identifier={data.order.journey?.reference} />
 

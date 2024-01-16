@@ -58,7 +58,7 @@
 
 <div class="dialogue" transition:scale={{ duration: 150, start: 0.8 }}>
   <div class="header">
-    <div class="typography body-large bold">
+    <div typography="body-large" weight="bold">
       {viewingMonth.toLocaleString($locale, { month: "long" })}
       {viewingMonth.getFullYear()}
     </div>

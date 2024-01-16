@@ -19,7 +19,7 @@
   $: arrivalLeg = legs[legs.length - 1];
 </script>
 
-<div transition:slideFade={{ duration: 300 }} class="trip-banner typography body-large">
+<div transition:slideFade={{ duration: 300 }} class="trip-banner" typography="body-large">
   {#if departureLeg && arrivalLeg}
     <p>
       {departureLeg.departureAt.toLocaleDateString($locale, {

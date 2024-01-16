@@ -49,7 +49,7 @@
     <button class="close-icon" on:click={close}>
       <Icon variant="close" />
     </button>
-    <h3 class="typography headline-small bold">{$i18n.actions.findTrip}</h3>
+    <h3 typography="headline-small" weight="bold">{$i18n.actions.findTrip}</h3>
     <div class="fields">
       <TextField
         label={$i18n.words.referenceNumber}

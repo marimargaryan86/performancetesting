@@ -6,13 +6,13 @@
 
 <div class="section">
   {#if title}
-    <h2 class="typography headline-small bold">{title}</h2>
+    <h2 typography="headline-small" weight="bold">{title}</h2>
   {/if}
 
   <div class="layout">
     <aside>
-      <h3 class="typography title-medium bold">{intro}</h3>
-      <p class="typography body-medium">{description}</p>
+      <h3 typography="title-medium" weight="bold">{intro}</h3>
+      <p typography="body-medium">{description}</p>
     </aside>
 
     <slot />

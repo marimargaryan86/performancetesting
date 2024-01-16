@@ -1,4 +1,5 @@
 <script lang="ts">
+  /* global Typography */
   let className: string | undefined = undefined;
   export { className as class };
   export let type: "button" | "reset" | "submit" = "button";
@@ -17,6 +18,16 @@
   export function getRef(): typeof ref {
     return ref;
   }
+
+  $: typography = getTypography(size);
+
+  function getTypography(nextSize: typeof size): Typography {
+    if (nextSize === "large" || nextSize === "medium") {
+      return "body-large";
+    }
+
+    return "body-medium";
+  }
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -33,10 +44,8 @@
   on:click
   style:min-width={minWidth}
   class={className}
-  class:typography={true}
-  class:bold={true}
-  class:body-large={size === "large" || size === "medium"}
-  class:body-medium={size === "small" || size === "x-small"}
+  weight="bold"
+  {typography}
   class:primary={variant === "primary"}
   class:outline={variant === "outline"}
   class:text={variant === "text"}

@@ -17,8 +17,8 @@
   </div>
 
   <span>
-    <em class="typography body-xsmall">{title}</em>
-    <strong class="typography body-medium bold">
+    <em typography="body-xsmall">{title}</em>
+    <strong typography="body-medium" weight="bold">
       {identifier ?? $i18n.words.notAvailable}
     </strong>
   </span>
