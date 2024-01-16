@@ -56,7 +56,6 @@
 
 <script lang="ts">
   import StandardLayout from "components/page/standard-layout.svelte";
-  import Button from "components/ui/button.svelte";
   import Header from "components/ui/table/header.svelte";
   import TBody from "components/ui/table/t-body.svelte";
   import TCol from "components/ui/table/t-col.svelte";
@@ -133,10 +132,15 @@
   bind:searchQuery
   filtersActive={Boolean(Object.values($filters).find(ensureDefined))}
 >
-  <Button size="small" href={routeConfig.routes.tripManagement.routes.book.root} slot="actions">
+  <a
+    variant="primary"
+    size="small"
+    href={routeConfig.routes.tripManagement.routes.book.root}
+    slot="actions"
+  >
     {$i18n.actions.newOrder}
     <Icon variant="plus" size="20px" />
-  </Button>
+  </a>
 
   <Filters slot="filters" bind:filters={$filters} />
 
@@ -222,7 +226,7 @@
     height: 100%;
   }
 
-  a {
+  a:not([variant]) {
     padding: 0;
     color: var(--color-common-light-text-link);
     text-decoration: none;

@@ -11,7 +11,6 @@
   import TRow from "components/ui/table/t-row.svelte";
   import Table from "components/ui/table/table.svelte";
   import { capitalize } from "utils/common";
-  import Button from "components/ui/button.svelte";
   import routeConfig from "routeConfig";
   import TActionsCol from "components/ui/table/t-actions-col.svelte";
   import StandardLayout from "components/page/standard-layout.svelte";
@@ -58,15 +57,16 @@
   <div />
 {:else}
   <StandardLayout pageTitle="Beneficiaries">
-    <Button
+    <a
+      variant="primary"
       size="small"
       href={routeConfig.routes.pay.routes.beneficiaries.routes.beneficiary().root}
-      preload={false}
+      data-sveltekit-preload-data={false}
       slot="actions"
     >
       Add Beneficiary
       <Icon variant="plus" size="20px" />
-    </Button>
+    </a>
 
     <Table class="beneficiaries-table" {loadMore}>
       <THead>

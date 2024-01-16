@@ -34,7 +34,6 @@
 </script>
 
 <script lang="ts">
-  import Button from "components/ui/button.svelte";
   import { page } from "$app/stores";
   import { goto } from "$app/navigation";
   import { writableCookie } from "utils/persistent-store";
@@ -118,7 +117,7 @@
     {/if}
   </div>
 
-  <Button
+  <button
     variant="text"
     size="medium"
     disabled={step === "beneficiary"}
@@ -126,13 +125,13 @@
     slot="navigation-left"
   >
     Previous
-  </Button>
+  </button>
 
   <svelte:fragment slot="navigation-right">
-    <Button variant="outline" size="medium" on:click={cancel}>Cancel</Button>
-    <Button variant="primary" size="medium" on:click={goToNext}>
+    <button variant="outline" size="medium" on:click={cancel}>Cancel</button>
+    <button variant="primary" size="medium" on:click={goToNext}>
       {steps[step].buttonLabel}
-    </Button>
+    </button>
   </svelte:fragment>
 </StandardLayout>
 

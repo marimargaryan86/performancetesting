@@ -11,7 +11,6 @@
 </script>
 
 <script lang="ts">
-  import Button from "components/ui/button.svelte";
   import routeConfig from "routeConfig";
   import Alert, { type AlertType } from "components/ui/alert.svelte";
   import Passengers from "../../components/passengers.svelte";
@@ -74,13 +73,14 @@
         <Overview order={data.order} />
 
         {#if hasTickets}
-          <Button
+          <a
+            variant="primary"
             href={routeConfig.routes.tripManagement.routes.orders.routes.order(data.order.id).routes
               .tickets.root}
             download
           >
             {$i18n.actions.downloadTickets}
-          </Button>
+          </a>
         {/if}
 
         <Price bookings={data.order.bookings} />
@@ -99,9 +99,9 @@
 
 <div class="actions">
   <div class="wrapper">
-    <Button size="small" href={routeConfig.routes.tripManagement.routes.book.root}>
+    <a variant="primary" size="small" href={routeConfig.routes.tripManagement.routes.book.root}>
       {$i18n.sentences.newSearch}
-    </Button>
+    </a>
   </div>
 </div>
 
@@ -193,7 +193,7 @@
     pointer-events: none;
   }
 
-  .actions > .wrapper > :global(button) {
+  .actions > .wrapper > a {
     width: 140px;
   }
 </style>

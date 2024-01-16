@@ -1,6 +1,5 @@
 <script lang="ts">
   import { createEventDispatcher, onDestroy } from "svelte";
-  import Button from "../button.svelte";
   import Dialog from "./dialog.svelte";
   import { getLocaleData } from "i18n";
 
@@ -41,12 +40,12 @@
     </slot>
 
     <div class="actions">
-      <Button size="small" variant="outline" on:click={cancel} minWidth="80px">
+      <button size="small" variant="outline" on:click={cancel} style:min-width="80px">
         {$i18n.words.no}
-      </Button>
-      <Button size="small" on:click={confirm} minWidth="80px">
+      </button>
+      <button size="small" variant="primary" on:click={confirm} style:min-width="80px">
         {$i18n.words.yes}
-      </Button>
+      </button>
     </div>
   </div>
 </Dialog>

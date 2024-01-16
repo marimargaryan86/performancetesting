@@ -21,7 +21,6 @@
   import PassengerPicker, {
     type PassengerPickerData,
   } from "./passenger-picker/passenger-picker.svelte";
-  import Button from "components/ui/button.svelte";
   import AutocompleteField from "components/ui/autocomplete-field.svelte";
   import { z } from "zod";
   import SwapIcon from "components/icons/swap-icon.svelte";
@@ -139,13 +138,13 @@
     required
   />
 
-  <Button on:click={search}>
+  <button variant="primary" on:click={search}>
     {#if $pending}
       <LoadingIcon />
     {:else}
       <Icon variant="search" size="20px" color="var(--color-common-dark-strong)" />
     {/if}
-  </Button>
+  </button>
 
   <PassengerPicker bind:passengers error={errors?.passengers?._errors} />
 </form>
@@ -169,7 +168,7 @@
     --label-font-family: "Inter";
   }
 
-  .trip-search > :global(button) {
+  .trip-search > button[variant] {
     margin-top: 22px;
     padding-right: 16px;
     padding-left: 16px;

@@ -10,7 +10,6 @@
 
 <script lang="ts">
   import LoadingIcon from "components/icons/loading-icon.svelte";
-  import Button from "components/ui/button.svelte";
   import routeConfig from "routeConfig";
   import Payment from "./payment.svelte";
   import Fees from "./fees.svelte";
@@ -251,13 +250,13 @@
 
 <div class="actions">
   <div class="wrapper">
-    <Button
-      size="small"
+    <a
       variant="outline"
+      size="small"
       href={routeConfig.routes.tripManagement.routes.book.routes.select.root}
     >
       {$i18n.actions.previous}
-    </Button>
+    </a>
 
     <div class="total">
       <div>
@@ -272,13 +271,13 @@
       </em>
     </div>
 
-    <Button size="small" on:click={pay} disabled={!paymentIntent}>
+    <button variant="primary" size="small" on:click={pay} disabled={!paymentIntent}>
       {$i18n.actions.book}
 
       {#if $pending}
         <LoadingIcon />
       {/if}
-    </Button>
+    </button>
   </div>
 </div>
 
@@ -365,7 +364,8 @@
     pointer-events: none;
   }
 
-  .actions > .wrapper > :global(button) {
+  .actions > .wrapper > button,
+  .actions > .wrapper > a {
     width: 140px;
   }
 </style>

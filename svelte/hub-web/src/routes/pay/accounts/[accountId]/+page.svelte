@@ -3,7 +3,6 @@
   import CurrencyFlag from "components/icons/currency-flag.svelte";
   import { formatAmount } from "formatting/currency";
   import AddBalanceDialogue from "./add-balance-dialogue.svelte";
-  import Button from "components/ui/button.svelte";
   import StandardLayout from "components/page/standard-layout.svelte";
   import routeConfig from "routeConfig";
   import type { Balance } from "integration/junction-hub-api/schemas/balance";
@@ -59,10 +58,10 @@
 />
 
 <StandardLayout pageTitle={$i18n.words.balances} {breadCrumbs} bind:searchQuery>
-  <Button size="small" on:click={openDialogue} slot="actions">
+  <button variant="primary" size="small" on:click={openDialogue} slot="actions">
     {$i18n.actions.addBalance}
     <Icon variant="plus" size="20px" />
-  </Button>
+  </button>
 
   <ul class="balances">
     {#each balances as balance}

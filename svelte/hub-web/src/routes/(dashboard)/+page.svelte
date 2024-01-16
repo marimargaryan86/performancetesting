@@ -2,7 +2,6 @@
   import { dev } from "$app/environment";
   import routeConfig from "routeConfig";
   import { getLocaleData } from "i18n";
-  import Button from "components/ui/button.svelte";
   import Card from "components/ui/card.svelte";
   import { getPageTitle } from "utils/page-title";
   import FindTripDialog from "./find-trip-dialog.svelte";
@@ -50,9 +49,13 @@
           <p typography="label-large">{$i18n.sentences.bookTrip}</p>
         </div>
         <div slot="actions" class="actions">
-          <Button class="widget-button" href={routeConfig.routes.tripManagement.routes.book.root}
-            >{$i18n.actions.bookTrip}</Button
+          <a
+            variant="primary"
+            class="widget-button"
+            href={routeConfig.routes.tripManagement.routes.book.root}
           >
+            {$i18n.actions.bookTrip}
+          </a>
         </div>
       </Card>
 
@@ -70,9 +73,9 @@
             <p typography="label-large">{$i18n.sentences.manageTrip}</p>
           </div>
           <div slot="actions" class="actions alt">
-            <Button variant="outline" class="widget-button" on:click={findTripDialog?.open}
-              >{$i18n.actions.findTrip}</Button
-            >
+            <button variant="outline" class="widget-button" on:click={findTripDialog?.open}>
+              {$i18n.actions.findTrip}
+            </button>
           </div>
         </Card>
       {/if}

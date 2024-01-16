@@ -48,7 +48,6 @@
   import { env } from "$env/dynamic/public";
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import Dialog from "components/ui/dialogues/dialog.svelte";
-  import Button from "components/ui/button.svelte";
   import tripManagement, {
     type BookingSessionModel,
   } from "../../../integration/trip-management/trip-management";
@@ -134,7 +133,7 @@
       <h3 typography="display-small" weight="bold">{$i18n.sentences.paymentDeclined}</h3>
       <p typography="body-medium">{error ?? $i18n.sentences.anUnexpectedErrorOccurred}</p>
     </div>
-    <Button size="small" on:click={clearError}>{$i18n.actions.tryAgain}</Button>
+    <button variant="primary" size="small" on:click={clearError}>{$i18n.actions.tryAgain}</button>
   </div>
 </Dialog>
 

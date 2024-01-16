@@ -28,7 +28,6 @@
 </script>
 
 <script lang="ts">
-  import Button from "components/ui/button.svelte";
   import EntityAvatar from "components/ui/entity-avatar.svelte";
   import { formatAmount } from "formatting/currency";
   import { formatDuration } from "formatting/date-time";
@@ -158,9 +157,9 @@
               </strong>
             </span>
 
-            <Button size="x-small" variant="outline" on:click={selectOffer}>
+            <button size="x-small" variant="outline" on:click={selectOffer}>
               {$i18n.actions.bookNow}
-            </Button>
+            </button>
           </div>
         {/if}
       </div>

@@ -1,7 +1,6 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import LoadingIcon from "components/icons/loading-icon.svelte";
-  import Button from "components/ui/button.svelte";
   import TextField from "components/ui/text-field.svelte";
   import integrationInstancesClient from "integration-instances-client";
   import routeConfig from "routeConfig";
@@ -87,13 +86,18 @@
             helpText={nodeInfo.length ? nodeInfo.join(", ") : undefined}
           />
         {:else if node.attributes.type === "submit"}
-          <Button type="submit" value={node.attributes.value} name={node.attributes.name}>
+          <button
+            variant="primary"
+            type="submit"
+            value={node.attributes.value}
+            name={node.attributes.name}
+          >
             {node.meta.label?.text ?? "Login"}
 
             {#if $pending === node.attributes.name}
               <LoadingIcon />
             {/if}
-          </Button>
+          </button>
         {/if}
       {/if}
     {/each}

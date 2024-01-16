@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Button from "../button.svelte";
   import { createEventDispatcher, onDestroy, onMount } from "svelte";
   import { scale } from "svelte/transition";
   import Backdrop from "../backdrop.svelte";
@@ -55,12 +54,12 @@
     </p>
 
     <div class="actions">
-      <Button size="small" on:click={close}>
+      <button variant="primary" size="small" on:click={close}>
         {$i18n.actions.continue}
-      </Button>
-      <Button size="small" variant="outline" on:click={cancel} minWidth="80px">
+      </button>
+      <button size="small" variant="outline" on:click={cancel} style:min-width="80px">
         {$i18n.actions.cancel}
-      </Button>
+      </button>
     </div>
   </div>
 </Backdrop>
@@ -87,7 +86,7 @@
     margin-top: 16px;
   }
 
-  .actions > :global(button) {
+  .actions > button {
     height: 48px;
   }
 </style>

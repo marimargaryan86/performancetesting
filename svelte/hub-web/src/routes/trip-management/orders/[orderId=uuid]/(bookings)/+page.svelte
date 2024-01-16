@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Button from "components/ui/button.svelte";
   import Header from "components/ui/table/header.svelte";
   import TActionsCol from "components/ui/table/t-actions-col.svelte";
   import TBody from "components/ui/table/t-body.svelte";
@@ -134,13 +133,13 @@
         {#if showActionsColumn}
           <TActionsCol static>
             {#if booking.status === "confirmed" && !booking.cancellation?.status}
-              <Button
+              <button
                 size="xx-small"
                 variant="outline"
                 on:click={cancelBooking.bind(cancelBooking, booking)}
               >
                 {$i18n.actions.cancelRequest}
-              </Button>
+              </button>
             {/if}
           </TActionsCol>
         {/if}

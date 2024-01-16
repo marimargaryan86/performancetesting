@@ -17,7 +17,6 @@
 
 <script lang="ts">
   import StandardLayout from "components/page/standard-layout.svelte";
-  import Button from "components/ui/button.svelte";
   import TextField from "components/ui/text-field.svelte";
   import { writable } from "svelte/store";
   import integrationInstancesClient from "integration-instances-client";
@@ -82,12 +81,12 @@
 >
   <svelte:fragment slot="actions">
     {#if !$user}
-      <Button size="small" on:click={logout}>
+      <button variant="primary" size="small" on:click={logout}>
         {$i18n.actions.goToLogin}
         {#if $pending === "logout"}
           <LoadingIcon size="16px" />
         {/if}
-      </Button>
+      </button>
     {/if}
   </svelte:fragment>
 
@@ -121,7 +120,8 @@
                   error={nodeError.length ? nodeError : undefined}
                 />
               {:else if node.attributes.type === "button" || node.attributes.type === "submit"}
-                <Button
+                <button
+                  variant="primary"
                   type={node.attributes.type}
                   name={node.attributes.name}
                   value={node.attributes.value}
@@ -134,7 +134,7 @@
                   {#if $pending === `${node.attributes.name}:${node.attributes.value}`}
                     <LoadingIcon />
                   {/if}
-                </Button>
+                </button>
               {:else}
                 <div>{node.attributes.type}</div>
               {/if}

@@ -87,7 +87,7 @@
     cursor: pointer;
   }
 
-  button > :global(svg) {
+  button > :global(.icon) {
     vertical-align: top;
   }
 </style>

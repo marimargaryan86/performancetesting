@@ -4,7 +4,6 @@
   import { getLocaleData } from "i18n";
   import Backdrop from "components/ui/backdrop.svelte";
   import TextField from "components/ui/text-field.svelte";
-  import Button from "components/ui/button.svelte";
   import { validateReferenceNumber } from "utils/booking";
   import Icon from "components/icons/icon.svelte";
 
@@ -66,8 +65,8 @@
       />
     </div>
     <div class="actions">
-      <Button variant="outline" on:click={close}>{$i18n.actions.cancel}</Button>
-      <Button on:click={search}>{$i18n.actions.findTrip}</Button>
+      <button variant="outline" on:click={close}>{$i18n.actions.cancel}</button>
+      <button variant="primary" on:click={search}>{$i18n.actions.findTrip}</button>
     </div>
   </div>
 </Backdrop>
@@ -127,7 +126,7 @@
     justify-content: flex-end;
   }
 
-  .actions > :global(button) {
+  .actions > button {
     width: 125px;
     height: 48px;
   }

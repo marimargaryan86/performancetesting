@@ -1,0 +1,182 @@
+button[variant],
+a[variant] {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  color: var(--color);
+  font-weight: 600;
+  font-family: Inter, Arial, Helvetica, sans-serif;
+  text-decoration: none;
+  background-color: var(--background-color);
+  border: 0;
+  border-radius: 8px;
+  outline: 0;
+  box-shadow: 0 0 0 var(--border-width) var(--border-color) inset;
+  cursor: pointer;
+  transition:
+    padding 150ms ease,
+    color 150ms ease,
+    background-color 150ms ease,
+    border 150ms ease,
+    box-shadow 150ms ease;
+}
+
+button[variant="primary"],
+a[variant="primary"] {
+  --color: var(--color-common-dark-strong);
+  --icon-color: var(--color-common-dark-strong);
+  --background-color: var(--color-main-primary-500);
+  --border-color: transparent;
+  --border-width: 0;
+}
+
+button[variant="primary"]:focus,
+a[variant="primary"]:focus {
+  --border-color: var(--color-main-primary-800);
+  --border-width: 2px;
+}
+
+button[variant="primary"]:hover,
+a[variant="primary"]:hover {
+  --background-color: var(--color-main-primary-700);
+}
+
+button[variant="primary"]:disabled,
+a[variant="primary"]:disabled {
+  --color: var(--color-main-neutral-400);
+  --background-color: var(--color-main-neutral-50);
+  --icon-color: var(--color-main-neutral-400);
+}
+
+button[variant="outline"],
+a[variant="outline"] {
+  --color: var(--color-common-light-strong);
+  --icon-color: var(--color-main-primary-500);
+  --background-color: transparent;
+  --border-color: var(--color-main-primary-400);
+  --border-width: 1px;
+}
+
+button[variant="outline"]:focus,
+a[variant="outline"]:focus {
+  --border-color: var(--color-main-primary-500);
+  --border-width: 2px;
+  --background-color: var(--color-common-background-light-main);
+}
+
+button[variant="outline"]:hover,
+a[variant="outline"]:hover {
+  --border-color: var(--color-main-primary-500);
+  --background-color: rgb(75 182 156 / 0.2);
+}
+
+button[variant="outline"]:disabled,
+a[variant="outline"]:disabled {
+  --color: var(--color-main-neutral-400);
+  --background-color: transparent;
+  --icon-color: var(--color-main-neutral-400);
+  --border-color: var(--color-main-neutral-100);
+}
+
+button[variant="text"],
+a[variant="text"] {
+  --color: var(--color-common-light-strong);
+  --icon-color: var(--color-main-primary-500);
+  --background-color: transparent;
+  --border-color: transparent;
+  --border-width: 0;
+}
+
+button[variant="text"]:focus,
+a[variant="text"]:focus {
+  --background-color: var(--color-main-primary-200);
+}
+
+button[variant="text"]:hover,
+a[variant="text"]:hover {
+  --background-color: rgb(75 182 156 / 0.2);
+}
+
+button[variant="text"]:disabled,
+a[variant="text"]:disabled {
+  --color: var(--color-main-neutral-400);
+  --icon-color: var(--color-main-neutral-400);
+  --background-color: transparent;
+}
+
+button[variant]:not([size]),
+button[variant][size="large"],
+a[variant]:not([size]),
+a[variant][size="large"] {
+  --icon-size: 24px;
+
+  height: 52px;
+  padding: 15px 24px;
+  font-size: 16px;
+  line-height: 26px;
+}
+
+button[variant][size="medium"],
+a[variant][size="medium"] {
+  --icon-size: 20px;
+
+  padding: 11px 24px;
+  font-size: 16px;
+  line-height: 26px;
+}
+
+button[variant][size="small"],
+a[variant][size="small"] {
+  --icon-size: 20px;
+
+  padding: 10px 16px;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+button[variant][size="x-small"],
+a[variant][size="x-small"] {
+  --icon-size: 20px;
+
+  padding: 6px 16px;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+button[variant][size="xx-small"],
+a[variant][size="xx-small"] {
+  --icon-size: 20px;
+
+  padding: 6px 8px;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+button[variant] svg,
+a[variant] svg {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--icon-size);
+  height: var(--icon-size);
+}
+
+button[variant] .icon,
+a[variant] .icon {
+  background-color: var(--icon-color);
+  transition: background-color 150ms ease;
+}
+
+button[variant] :not(svg)[fill],
+a[variant] :not(svg)[fill] {
+  transition: fill 150ms ease;
+  fill: var(--icon-color);
+}
+
+button[variant] :not(svg)[stroke],
+a[variant] :not(svg)[stroke] {
+  transition: stroke 150ms ease;
+  stroke: var(--icon-color);
+}

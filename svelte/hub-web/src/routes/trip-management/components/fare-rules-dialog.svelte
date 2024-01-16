@@ -1,6 +1,5 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
-  import Button from "components/ui/button.svelte";
   import Backdrop from "components/ui/backdrop.svelte";
   import type { TripOfferPriceQuote } from "integration/junction-mobile-api/schemas/trip-offer-price-quote";
   import { getLocaleData } from "i18n";
@@ -34,7 +33,7 @@
     {/each}
 
     <div class="actions">
-      <Button on:click={close}>{$i18n.actions.returnToBookings}</Button>
+      <button variant="primary" on:click={close}>{$i18n.actions.returnToBookings}</button>
     </div>
   </div>
 </Backdrop>

@@ -7,7 +7,6 @@
 <script lang="ts">
   import { dev } from "$app/environment";
   import ChevronIcon from "components/icons/chevron-icon.svelte";
-  import Button from "components/ui/button.svelte";
   import { formatAmount } from "formatting/currency";
   import { getLocale, getLocaleData } from "i18n";
   import type { OfferOption } from "integration/junction-mobile-api/schemas/offer";
@@ -70,7 +69,7 @@
             {formatAmount(option.price.total, { locale: $locale, sign: true })}
           </span>
 
-          <Button
+          <button
             size="x-small"
             variant={selected ? "primary" : "outline"}
             on:click={select.bind(select, option)}
@@ -81,7 +80,7 @@
             {:else}
               {$i18n.actions.select}
             {/if}
-          </Button>
+          </button>
         </li>
       {/each}
     </ul>
@@ -138,7 +137,7 @@
     align-self: flex-end;
   }
 
-  .option > :global(button) {
+  .option > button[variant] {
     display: inline-flex;
     gap: 8px;
     align-items: center;

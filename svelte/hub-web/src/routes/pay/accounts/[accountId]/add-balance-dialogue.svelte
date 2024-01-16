@@ -1,7 +1,6 @@
 <script lang="ts">
   import CurrencyFlag from "components/icons/currency-flag.svelte";
   import LoadingIcon from "components/icons/loading-icon.svelte";
-  import Button from "components/ui/button.svelte";
   import TextField from "components/ui/text-field.svelte";
   import { portal } from "directives/portal";
   import { createEventDispatcher } from "svelte";
@@ -114,16 +113,14 @@
       </ul>
 
       <div class="actions">
-        <Button on:click={close} variant="outline" size="medium">
-          {$i18n.actions.cancel}
-        </Button>
-        <Button on:click={addBalances} size="medium" disabled={!value.length}>
+        <button on:click={close} variant="outline" size="medium">{$i18n.actions.cancel}</button>
+        <button on:click={addBalances} variant="primary" size="medium" disabled={!value.length}>
           {$i18n.actions.add}
 
           {#if $pending}
             <LoadingIcon />
           {/if}
-        </Button>
+        </button>
       </div>
     </div>
   </div>
@@ -202,7 +199,7 @@
     gap: 16px;
   }
 
-  .actions > :global(button) {
+  .actions > button {
     flex-grow: 1;
     height: 48px;
   }

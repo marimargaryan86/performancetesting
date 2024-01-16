@@ -1,7 +1,6 @@
 <script lang="ts">
   import JunctionLogo from "components/icons/junction-logo.svelte";
   import LoadingIcon from "components/icons/loading-icon.svelte";
-  import Button from "components/ui/button.svelte";
   import TextField from "components/ui/text-field.svelte";
   import Checkbox from "components/ui/checkbox.svelte";
   import { writable } from "svelte/store";
@@ -18,7 +17,7 @@
   let errors: string[] = [];
   let rememberMe = false;
   let form: HTMLFormElement | undefined;
-  let submitButton: Button | undefined;
+  let submitButton: HTMLButtonElement | undefined;
 
   const pending = writable<string | undefined>();
 
@@ -27,9 +26,8 @@
 
   async function checkHash(hash: string): Promise<void> {
     const match = hash.match(/^#\/\?username=(?<username>.+)&password=(?<password>.+)$/);
-    const ref = submitButton?.getRef();
 
-    if (!(match && form && ref instanceof HTMLButtonElement)) {
+    if (!(match && form && submitButton instanceof HTMLButtonElement)) {
       return;
     }
 
@@ -57,7 +55,7 @@
 
     await sleep(10);
 
-    form.requestSubmit(ref);
+    form.requestSubmit(submitButton);
   }
 
   async function submit(
@@ -146,8 +144,9 @@
               error={nodeError.length ? nodeError : undefined}
             />
           {:else if node.attributes.type === "submit"}
-            <Button
+            <button
               bind:this={submitButton}
+              variant="primary"
               type="submit"
               value={node.attributes.value}
               name={node.attributes.name}
@@ -157,7 +156,7 @@
               {#if $pending === `${node.attributes.name}:${node.attributes.value}`}
                 <LoadingIcon />
               {/if}
-            </Button>
+            </button>
           {/if}
         {/if}
       {/each}

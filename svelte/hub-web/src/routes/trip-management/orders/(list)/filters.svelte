@@ -14,7 +14,6 @@
 
 <script lang="ts">
   import { dev } from "$app/environment";
-  import Button from "components/ui/button.svelte";
   import DatePicker from "components/ui/date-picker/date-picker.svelte";
   import SelectField from "components/ui/select-field.svelte";
   import TextField from "components/ui/text-field.svelte";
@@ -74,10 +73,10 @@
   />
 {/if}
 
-<Button class="filter-clear-btn" size="small" on:click={reset}>{$i18n.actions.clear}</Button>
+<button class="clear" variant="primary" size="small" on:click={reset}>{$i18n.actions.clear}</button>
 
 <style>
-  :global(button.filter-clear-btn.filter-clear-btn) {
+  .clear {
     align-self: flex-end;
     width: unset;
     min-width: 80px;

@@ -45,7 +45,6 @@
 
 <script lang="ts">
   import LoadingIcon from "components/icons/loading-icon.svelte";
-  import Button from "components/ui/button.svelte";
   import TextField from "components/ui/text-field.svelte";
   import { getLocaleData } from "i18n";
   import integrationInstancesClient from "integration-instances-client";
@@ -263,20 +262,20 @@
     {/if}
 
     {#if refundType === "no-amount"}
-      <Button type="submit" variant="outline">
+      <button type="submit" variant="outline">
         {$i18n.actions.refundWithNoAmount}
         {#if $refundPending}<LoadingIcon />{/if}
-      </Button>
+      </button>
     {:else if refundDataDirty || $refreshPending}
-      <Button on:click={refreshRefundPosition}>
+      <button type="button" variant="primary" on:click={refreshRefundPosition}>
         {$i18n.actions.calculateRefundPosition}
         {#if $refreshPending}<LoadingIcon />{/if}
-      </Button>
+      </button>
     {:else}
-      <Button type="submit">
+      <button type="submit" variant="primary">
         {$i18n.actions.issueRefund}
         {#if $refundPending}<LoadingIcon />{/if}
-      </Button>
+      </button>
     {/if}
   </form>
 </div>

@@ -5,7 +5,6 @@
   import Passengers from "../../../components/passengers.svelte";
   import type { OrderPassenger } from "integration/junction-hub-api/schemas/order";
   import Itinerary from "../../../components/itinerary.svelte";
-  import Button from "components/ui/button.svelte";
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import { scale } from "svelte/transition";
   import { createEventDispatcher } from "svelte";
@@ -121,8 +120,8 @@
       {/if}
 
       <div class="actions">
-        <Button variant="outline" on:click={close}>{$i18n.actions.returnToBookings}</Button>
-        <Button on:click={rules}>{$i18n.actions.cancelBooking}</Button>
+        <button variant="outline" on:click={close}>{$i18n.actions.returnToBookings}</button>
+        <button variant="primary" on:click={rules}>{$i18n.actions.cancelBooking}</button>
       </div>
     {:else if state === "rules" && booking?.rules}
       <div class="icon-wrapper">
@@ -144,8 +143,8 @@
       <p typography="body-medium">{$i18n.sentences.doYouWishToContinue}</p>
 
       <div class="actions">
-        <Button variant="outline" on:click={info}>{$i18n.actions.goBack}</Button>
-        <Button on:click={cancelBooking}>{$i18n.actions.continue}</Button>
+        <button variant="outline" on:click={info}>{$i18n.actions.goBack}</button>
+        <button variant="primary" on:click={cancelBooking}>{$i18n.actions.continue}</button>
       </div>
     {:else if state === "confirm"}
       {#if $pending}
@@ -157,8 +156,8 @@
         <p typography="body-medium">{$i18n.sentences.thisCannotBeUndone}</p>
 
         <div class="actions">
-          <Button variant="outline" on:click={close}>{$i18n.words.no}</Button>
-          <Button on:click={confirm}>{$i18n.words.yes}</Button>
+          <button variant="outline" on:click={close}>{$i18n.words.no}</button>
+          <button variant="primary" on:click={confirm}>{$i18n.words.yes}</button>
         </div>
       {/if}
     {:else if state === "done" || state === "failed"}
@@ -190,7 +189,7 @@
       </div>
 
       <div class="actions">
-        <Button on:click={close}>{$i18n.actions.returnToBookings}</Button>
+        <button variant="primary" on:click={close}>{$i18n.actions.returnToBookings}</button>
       </div>
     {/if}
   </div>

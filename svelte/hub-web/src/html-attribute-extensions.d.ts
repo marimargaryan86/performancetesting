@@ -19,10 +19,18 @@ declare global {
   type TypographyWeight = "bold" | "default";
 }
 
+type ButtonVariant = "primary" | "outline" | "text";
+type ButtonSize = "large" | "medium" | "small" | "x-small" | "xx-small";
+
 declare module "svelte/elements" {
   export interface HTMLButtonAttributes {
-    variant?: "primary" | "outline" | "text";
-    size?: "large" | "medium" | "small" | "x-small" | "xx-small";
+    variant?: ButtonVariant;
+    size?: ButtonSize;
+  }
+
+  export interface HTMLAnchorAttributes {
+    variant?: ButtonVariant;
+    size?: ButtonSize;
   }
 
   export interface HTMLAttributes {

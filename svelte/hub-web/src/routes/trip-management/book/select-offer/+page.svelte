@@ -53,7 +53,6 @@
   import Offer from "./offer/offer.svelte";
   import routeConfig from "routeConfig";
   import { goto } from "$app/navigation";
-  import Button from "components/ui/button.svelte";
   import { fade } from "svelte/transition";
   import { browser } from "$app/environment";
   import Countdown from "../countdown.svelte";
@@ -241,13 +240,13 @@
 {#if selected.offerId && selected.optionIds}
   <div class="actions" transition:fade={{ duration: 200 }}>
     <div class="wrapper">
-      <Button on:click={selectOffer} size="small">
+      <button on:click={selectOffer} variant="primary" size="small">
         {$i18n.actions.next}
 
         {#if $selectOfferPending}
           <LoadingIcon />
         {/if}
-      </Button>
+      </button>
     </div>
   </div>
 {/if}
@@ -361,7 +360,7 @@
     pointer-events: none;
   }
 
-  .actions > .wrapper > :global(button) {
+  .actions > .wrapper > button {
     width: 140px;
   }
 </style>
