@@ -123,6 +123,7 @@ job "junction-hub-hub-web-http" {
         data        = <<EOH
 {{ with secret "kv/data/${var.environment}/hub-web" }}
 PUBLIC_STRIPE_KEY={{ .Data.data.public_stripe_key }}
+PUBLIC_SMARTLOOK_PROJECT_KEY={{ .Data.data.public_smartlook_project_key }}
 {{ end }}
 CLIENT_API_BASE_URL={{(printf "http://%s" (env "NOMAD_UPSTREAM_ADDR_client-api-${var.environment}"))}}
 HUB_API_BASE_URL={{(printf "http://%s" (env "NOMAD_UPSTREAM_ADDR_hub-api-${var.environment}"))}}
