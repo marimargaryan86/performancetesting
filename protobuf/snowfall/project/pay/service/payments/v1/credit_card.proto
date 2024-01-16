@@ -12,6 +12,7 @@ service CreditCardPaymentService {
   rpc CreateCreditCardPayment(CreateCreditCardPaymentRequest) returns (CreateCreditCardPaymentResponse) {}
   rpc UpdateCreditCardPayment(UpdateCreditCardPaymentRequest) returns (UpdateCreditCardPaymentResponse) {}
   rpc CancelCreditCardPayment(CancelCreditCardPaymentRequest) returns (CancelCreditCardPaymentResponse) {}
+  rpc CaptureCreditCardPayment(CaptureCreditCardPaymentRequest) returns (CaptureCreditCardPaymentResponse) {}
   rpc GetCreditCardHolder(GetCreditCardHolderRequest) returns (GetCreditCardHolderResponse) {}
   rpc CreateCreditCardHolder(CreateCreditCardHolderRequest) returns (CreateCreditCardHolderResponse) {}
   rpc GetRefund(GetRefundRequest) returns (GetRefundResponse) {}
@@ -37,6 +38,8 @@ message CreateCreditCardPaymentResponse {
 message UpdateCreditCardPaymentRequest {
   string payment_id = 1;
   snowfall.stdlib.v1.Money amount = 2;
+  PaymentMetaData metadata = 3;
+  string receipt_email = 4;
 }
 
 message UpdateCreditCardPaymentResponse {
@@ -47,7 +50,17 @@ message CancelCreditCardPaymentRequest {
   string payment_id = 1;
 }
 
-message CancelCreditCardPaymentResponse {}
+message CancelCreditCardPaymentResponse {
+  CreditCardPayment payment = 1;
+}
+
+message CaptureCreditCardPaymentRequest {
+  string payment_id = 1;
+}
+
+message CaptureCreditCardPaymentResponse {
+  CreditCardPayment payment = 1;
+}
 
 message GetCreditCardHolderRequest {
   string credit_card_holder_id = 1;

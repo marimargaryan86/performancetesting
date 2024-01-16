@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from collections.abc import Mapping
 
 from snowfall.project.pay.service.payments.v1 import credit_card_models_pb2
 from snowfall.stdlib import money
@@ -24,8 +25,24 @@ class CreditCardProvider(object):
         self,
         payment_id: str,
         amount: money.Money,
+        receipt_email: str | None,
+        metadata: Mapping[str, str] | None,
     ) -> credit_card_models_pb2.CreditCardPayment | None:
         """Update payment."""
+
+    @abstractmethod
+    def cancel_credit_card_payment(
+        self,
+        payment_id: str,
+    ) -> credit_card_models_pb2.CreditCardPayment | None:
+        """Cancel credit card payment."""
+
+    @abstractmethod
+    def capture_credit_card_payment(
+        self,
+        payment_id: str,
+    ) -> credit_card_models_pb2.CreditCardPayment | None:
+        """Capture credit card payment."""
 
     @abstractmethod
     async def get_credit_card_holder(

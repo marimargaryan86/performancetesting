@@ -173,7 +173,6 @@ SMTP_DSN={{range $index, $service := service "smtp"}}smtp://{{.ServiceMeta.usern
 {{ with secret "kv/data/${var.environment}/mobile-api" }}
 JWT_PRIVATE_KEY={{ .Data.data.jwt_private_key }}
 JWT_PUBLIC_KEY={{ .Data.data.jwt_public_key }}
-STRIPE_API_KEY={{ .Data.data.stripe_api_key }}
 ORY_CLIENT_SECRET={{ .Data.data.ory_client_secret }}
 {{ end }}
 EOH

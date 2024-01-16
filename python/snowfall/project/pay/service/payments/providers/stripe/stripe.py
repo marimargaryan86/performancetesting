@@ -1,3 +1,5 @@
+from collections.abc import Mapping
+
 import stripe
 
 from snowfall.project.pay.service.payments.providers import interfaces
@@ -41,6 +43,7 @@ class Stripe(interfaces.CreditCardProvider):
                 "enabled"
             ],  # type: ignore[index]
             secret=payment_intent.client_secret or "",
+            status=payment_intent.status,
         )
 
     def create_credit_card_payment(
@@ -61,6 +64,7 @@ class Stripe(interfaces.CreditCardProvider):
 
         payment.id = payment_intent.id
         payment.secret = payment_intent.client_secret or ""
+        payment.status = payment_intent.status
 
         return payment
 
@@ -68,11 +72,15 @@ class Stripe(interfaces.CreditCardProvider):
         self,
         payment_id: str,
         amount: money.Money,
+        receipt_email: str | None,
+        metadata: Mapping[str, str] | None,
     ) -> credit_card_models_pb2.CreditCardPayment | None:
         try:
             updated_payment_intent = stripe.PaymentIntent.modify(
                 payment_id,
                 amount=amount.amount,
+                receipt_email=receipt_email,  # type: ignore[arg-type]
+                metadata=metadata,  # type: ignore[arg-type]
             )
         except stripe._error.InvalidRequestError:  # noqa: SLF001
             return None
@@ -86,6 +94,59 @@ class Stripe(interfaces.CreditCardProvider):
                 "enabled"
             ],  # type: ignore[index]
             secret=updated_payment_intent.client_secret or "",
+            status=updated_payment_intent.status,
+        )
+
+    def cancel_credit_card_payment(
+        self,
+        payment_id: str,
+    ) -> credit_card_models_pb2.CreditCardPayment | None:
+        try:
+            payment_intent = stripe.PaymentIntent.cancel(payment_id)
+        except stripe.InvalidRequestError:
+            return None
+
+        intent_money = money.Money(
+            payment_intent.amount,
+            money.Currency(payment_intent.currency.upper()),
+        )
+
+        return credit_card_models_pb2.CreditCardPayment(
+            id=payment_intent.id,
+            amount=intent_money.protobuf(),
+            capture_method=payment_intent.capture_method,
+            credit_card_holder_id=payment_intent.customer or "",  # type: ignore[arg-type]
+            enable_automatic_payment_method=payment_intent.automatic_payment_methods[
+                "enabled"
+            ],  # type: ignore[index]
+            secret=payment_intent.client_secret or "",
+            status=payment_intent.status,
+        )
+
+    def capture_credit_card_payment(
+        self,
+        payment_id: str,
+    ) -> credit_card_models_pb2.CreditCardPayment | None:
+        try:
+            payment_intent = stripe.PaymentIntent.capture(payment_id)
+        except stripe.InvalidRequestError:
+            return None
+
+        intent_money = money.Money(
+            payment_intent.amount,
+            money.Currency(payment_intent.currency.upper()),
+        )
+
+        return credit_card_models_pb2.CreditCardPayment(
+            id=payment_intent.id,
+            amount=intent_money.protobuf(),
+            capture_method=payment_intent.capture_method,
+            credit_card_holder_id=payment_intent.customer or "",  # type: ignore[arg-type]
+            enable_automatic_payment_method=payment_intent.automatic_payment_methods[
+                "enabled"
+            ],  # type: ignore[index]
+            secret=payment_intent.client_secret or "",
+            status=payment_intent.status,
         )
 
     async def get_credit_card_holder(

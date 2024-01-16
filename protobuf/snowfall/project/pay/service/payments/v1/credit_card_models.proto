@@ -14,6 +14,7 @@ message CreditCardPayment {
   string credit_card_holder_id = 4;
   bool enable_automatic_payment_method = 5;
   string secret = 6;
+  string status = 7;
 }
 
 message CreditCardHolder {
@@ -33,4 +34,9 @@ message PaymentUser {
   string id = 1;
   string internal_user_id = 2;
   google.protobuf.Timestamp created_at = 3;
+}
+
+message PaymentMetaData {
+  string order_id = 1;
+  string spnr = 2;
 }

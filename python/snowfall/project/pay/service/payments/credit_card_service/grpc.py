@@ -1,4 +1,5 @@
 import grpc
+from google.protobuf.json_format import MessageToDict
 
 from snowfall.project.pay.service.payments.providers import interfaces
 from snowfall.project.pay.service.payments.v1 import (
@@ -55,9 +56,12 @@ class CreditCardPaymentService(
         request: credit_card_pb2.UpdateCreditCardPaymentRequest,
         context: grpc.aio.ServicerContext,
     ) -> credit_card_pb2.UpdateCreditCardPaymentResponse:
+        metadata = MessageToDict(request.metadata, preserving_proto_field_name=True)
         updated_payment = self._provider.update_credit_card_payment(
             request.payment_id,
             money.from_protobuf(request.amount),
+            receipt_email=request.receipt_email or None,
+            metadata=metadata or None,
         )
 
         if not updated_payment:
@@ -95,6 +99,42 @@ class CreditCardPaymentService(
         return credit_card_pb2.CreateCreditCardHolderResponse(
             credit_card_holder=credit_card_holder,
             signature=signature,
+        )
+
+    async def CancelCreditCardPayment(  # type: ignore[override] # noqa: N802
+        self,
+        request: credit_card_pb2.CancelCreditCardPaymentRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> credit_card_pb2.CancelCreditCardPaymentResponse:
+        credit_card_payment = self._provider.cancel_credit_card_payment(
+            request.payment_id,
+        )
+        if not credit_card_payment:
+            await context.abort(
+                code=grpc.StatusCode.NOT_FOUND,
+                details="Payment not canceled",
+            )
+
+        return credit_card_pb2.CancelCreditCardPaymentResponse(
+            payment=credit_card_payment,
+        )
+
+    async def CaptureCreditCardPayment(  # type: ignore[override] # noqa: N802
+        self,
+        request: credit_card_pb2.CaptureCreditCardPaymentRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> credit_card_pb2.CaptureCreditCardPaymentResponse:
+        credit_card_payment = self._provider.capture_credit_card_payment(
+            request.payment_id,
+        )
+        if not credit_card_payment:
+            await context.abort(
+                code=grpc.StatusCode.NOT_FOUND,
+                details="Payment not captured",
+            )
+
+        return credit_card_pb2.CaptureCreditCardPaymentResponse(
+            payment=credit_card_payment,
         )
 
     async def CreateRefund(  # type: ignore[override] # noqa: N802

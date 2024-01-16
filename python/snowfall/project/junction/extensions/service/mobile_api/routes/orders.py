@@ -4,14 +4,12 @@ from typing import Any
 
 import httpx
 import lagom
-import stripe
 from pymongo import errors
 from starlette import endpoints, exceptions, requests, responses, status
 from starlette.background import BackgroundTask
 
 from snowfall.project.junction.extensions.service.mobile_api import (
     handlers,
-    payments,
     plus_client,
     repository,
     resources,
@@ -24,7 +22,7 @@ from snowfall.project.junction.go.adapter.errors import (
     ServiceUnavailableError,
     UnhandledError,
 )
-from snowfall.project.pay.adapter import bills
+from snowfall.project.pay.adapter import bills, credit_card_payment
 from snowfall.project.pay.service.transactions.v1 import (
     models_pb2 as transactions_models_pb2,
 )
@@ -149,19 +147,23 @@ async def create_order(  # noqa: WPS217
     smtp_client: smtp.EmailClient,
     vouchers_repository: repository.VouchersRepository,
     bills_client: bills.Client,
+    credit_card_client: credit_card_payment.Client,
     order_by_journey: bool = False,  # noqa: FBT001, FBT002
 ) -> JsonApiResponse:
     body = await request_helpers.flatten_request(request)
     payment = body["payment"]
     voucher_code = body.get("voucher", "")
     (correct_amount, correct_state) = await check_payment_amount_and_state(
+        credit_card_client,
         payment,
         body["quote"],
         voucher,
         junction_client,
     )
     if not correct_amount:
-        stripe.PaymentIntent.cancel(payment)
+        await credit_card_client.cancel_credit_card_payment(
+            payment,
+        )
         # TODO(nikos.p): split this into invalid amount & invalid currency. Create err func
         return stdlib_models.JsonApiResponse(
             stdlib_models.Body(
@@ -231,7 +233,9 @@ async def create_order(  # noqa: WPS217
                 include=["journey"],
             )
     except httpx.HTTPStatusError:
-        await payments.cancel(payment)
+        await credit_card_client.cancel_credit_card_payment(
+            payment,
+        )
         raise
     mobile_order = models_pb2.MobileOrder(
         id=junction_order["data"]["id"],
@@ -259,10 +263,10 @@ async def create_order(  # noqa: WPS217
     if voucher_code:
         await vouchers_repository.use_voucher(voucher_code, payment)
         mobile_order.voucher_code = voucher_code
-    stripe.PaymentIntent.modify(
+    await credit_card_client.update_credit_card_payment(
         payment,
-        metadata={"order_id": mobile_order.id, "spnr": spnr},
         receipt_email=contact_details["email"],
+        metadata={"order_id": mobile_order.id, "spnr": spnr},
     )
     mobile_order.spnr = spnr
     await orders_repository.insert(mobile_order)
@@ -275,6 +279,7 @@ async def create_order(  # noqa: WPS217
         smtp_client,
         vouchers_repository,
         plus_http_client,
+        credit_card_client,
     )
     junction_order["data"]["relationships"]["payment"] = {
         "data": {
@@ -373,6 +378,7 @@ class Orders(endpoints.HTTPEndpoint):
         smtp_client: smtp.EmailClient = lagom.injectable,
         vouchers_repository: repository.VouchersRepository = lagom.injectable,
         bills_client: bills.Client = lagom.injectable,
+        credit_card_client: credit_card_payment.Client = lagom.injectable,
     ) -> responses.Response:
         return await create_order(
             request,
@@ -383,6 +389,7 @@ class Orders(endpoints.HTTPEndpoint):
             smtp_client,
             vouchers_repository,
             bills_client,
+            credit_card_client,
         )
 
 
@@ -398,6 +405,7 @@ class OrdersByJourney(endpoints.HTTPEndpoint):
         smtp_client: smtp.EmailClient = lagom.injectable,
         vouchers_repository: repository.VouchersRepository = lagom.injectable,
         bills_client: bills.Client = lagom.injectable,
+        credit_card_client: credit_card_payment.Client = lagom.injectable,
     ) -> responses.Response:
         return await create_order(
             request,
@@ -408,6 +416,7 @@ class OrdersByJourney(endpoints.HTTPEndpoint):
             smtp_client,
             vouchers_repository,
             bills_client,
+            credit_card_client,
             order_by_journey=True,
         )
 
@@ -543,12 +552,14 @@ class MarkupByOrder(endpoints.HTTPEndpoint):
 
 
 async def check_payment_amount_and_state(
+    credit_card_client: credit_card_payment.Client,
     payment_intent_id: str,
     quote: str,
     voucher: models_pb2.Voucher | None,
     junction_client: client.Client,
 ) -> tuple[bool, bool]:
-    pi = stripe.PaymentIntent.retrieve(payment_intent_id)
+    payment_intent = await credit_card_client.get_credit_card_payment(payment_intent_id)
+    intent_amount = money.from_protobuf(payment_intent.amount)
 
     quote_response = await junction_client.get_offer_quote_by_id(
         quote,
@@ -564,6 +575,10 @@ async def check_payment_amount_and_state(
     if voucher:
         quote_amount -= money.from_protobuf(voucher.price).amount
     return (
-        pi["amount"] == max(quote_amount, MIN_CHARGE[pi["currency"].upper()]),
-        pi["status"] == "requires_capture",
+        intent_amount.amount
+        == max(
+            quote_amount,
+            MIN_CHARGE[intent_amount.currency.code],
+        ),
+        payment_intent.status == "requires_capture",
     )

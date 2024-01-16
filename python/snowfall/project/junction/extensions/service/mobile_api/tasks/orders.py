@@ -8,12 +8,12 @@ import json_api_doc
 from jinja2 import Template
 
 from snowfall.project.junction.extensions.service.mobile_api import (
-    payments,
     plus_client,
     repository,
     resources,
     smtp,
 )
+from snowfall.project.pay.adapter import credit_card_payment
 from snowfall.stdlib.persistence import filesystem
 from snowfall.vendor.junction.go import client
 
@@ -34,17 +34,18 @@ async def _handle_new_order_results(
     smtp_client: smtp.EmailClient,
     vouchers_repository: repository.VouchersRepository,
     plus_http_client: plus_client.PlusClient,
+    credit_card_client: credit_card_payment.Client,
     order_id: str,
 ) -> bool:
     booking_statuses = {booking["status"]["id"] for booking in order["bookings"]}
     if booking_statuses and not booking_statuses.difference(_SUCCESS_STATUSES):
-        await payments.capture(payment_intent_id)
+        await credit_card_client.capture_credit_card_payment(payment_intent_id)
         await send_booking_confirmation(order, smtp_client)
         await plus_http_client.register_order(order_id)
         return True
 
     if resources.OrderStatus.pending.value not in booking_statuses:
-        await payments.cancel(payment_intent_id)
+        await credit_card_client.cancel_credit_card_payment(payment_intent_id)
         await vouchers_repository.revert_voucher(payment_intent_id)
         return True
 
@@ -58,6 +59,7 @@ async def poll_order_status(
     smtp_client: smtp.EmailClient,
     vouchers_repository: repository.VouchersRepository,
     plus_http_client: plus_client.PlusClient,
+    credit_card_client: credit_card_payment.Client,
 ) -> bool:
     time_spent = 0
     while time_spent <= _ORDER_STATUS_POLLING_TIMEOUT:
@@ -73,6 +75,7 @@ async def poll_order_status(
             smtp_client,
             vouchers_repository,
             plus_http_client,
+            credit_card_client,
             order_id,
         )
         if payment_processed:
@@ -80,8 +83,7 @@ async def poll_order_status(
 
         await asyncio.sleep(_ORDER_STATUS_POLLING_INTERVAL)
         time_spent += _ORDER_STATUS_POLLING_INTERVAL
-
-    await payments.cancel(payment_intent_id)
+    await credit_card_client.cancel_credit_card_payment(payment_intent_id)
     await vouchers_repository.revert_voucher(payment_intent_id)
     return False
 

@@ -54,7 +54,6 @@ class Settings(application.Settings):
     jwt_private_key: str
     jwt_token_version: str
     jwt_public_key: str
-    stripe_api_key: str
     client_name: str
     support_email: str
     create_stripe_customers: bool

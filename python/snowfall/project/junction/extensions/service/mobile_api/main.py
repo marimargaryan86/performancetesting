@@ -4,7 +4,6 @@ from typing import cast
 
 import aiosmtplib
 import httpx
-import stripe
 from authlib.integrations import httpx_client
 from motor import motor_asyncio
 from starlette.middleware import Middleware, authentication
@@ -121,7 +120,6 @@ async def _get_httpx_auth_and_middlewares(
 async def _http(  # noqa: WPS217
     app: application.Application[bootstrap.Settings],
 ) -> None:
-    stripe.api_key = app.settings.stripe_api_key
     httpx_auth, custom_middlewares = await _get_httpx_auth_and_middlewares(app)
     junction_httpx_client = base_client.create_httpx_client(
         base_url=app.settings.junction_api_address,

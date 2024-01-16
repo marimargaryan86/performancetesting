@@ -174,7 +174,6 @@ MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mong
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 SMTP_DSN={{range $index, $service := service "smtp"}}smtp://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}{{end}}
 {{ with secret "kv/data/${var.environment}/res-se-mobile-api" }}
-STRIPE_API_KEY={{ .Data.data.stripe_api_key }}
 JWT_PRIVATE_KEY={{ .Data.data.jwt_private_key }}
 JWT_PUBLIC_KEY={{ .Data.data.jwt_public_key }}
 ORY_CLIENT_SECRET={{ .Data.data.ory_client_secret }}

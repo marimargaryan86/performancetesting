@@ -1,20 +1,32 @@
-from typing import Any
 from unittest import mock
 
 import httpx
 import pytest
 import pytest_httpx
-import stripe
 from starlette import status
 
 from snowfall.project.junction.extensions.service.mobile_api import (
     conftest,
-    payments,
     repository,
 )
 from snowfall.project.junction.extensions.service.mobile_api.tasks import orders
+from snowfall.project.pay.adapter import credit_card_payment
+from snowfall.project.pay.service.payments.v1 import credit_card_models_pb2
+from snowfall.stdlib import money
 
 _ORDER_ID = "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+
+
+async def pre_setup_credit_card(
+    credit_card_payment_client: credit_card_payment.Client,
+) -> credit_card_models_pb2.CreditCardPayment:
+    credit_card_payment = await credit_card_payment_client.create_credit_card_payment(
+        amount=money.Money(1337, money.Currency("EUR")),
+        credit_card_holder_id="credit_card_holder_id",
+        enable_automatic_payment_method=True,
+    )
+    credit_card_payment.status = "requires_capture"
+    return credit_card_payment
 
 
 class OrdersBase(object):
@@ -22,7 +34,7 @@ class OrdersBase(object):
         self,
         authenticated_http_client: httpx.AsyncClient,
         httpx_mock: pytest_httpx.HTTPXMock,
-        monkeypatch: pytest.MonkeyPatch,
+        credit_card_payment: credit_card_models_pb2.CreditCardPayment,
     ) -> httpx.Response:
         httpx_mock.add_response(
             **await conftest.load_response_fixture("POST_ORDERS.json"),
@@ -37,27 +49,7 @@ class OrdersBase(object):
             **await conftest.load_response_fixture("POST_REGISTER.json"),
         )
 
-        payments.cancel = mock.AsyncMock()
-        payments.capture = mock.AsyncMock()
-
         orders.send_booking_confirmation = mock.AsyncMock()
-
-        def mock_stripe_retrieve(  # noqa: WPS430
-            *args: Any,
-            **kwargs: Any,
-        ) -> dict[str, Any]:
-            return {
-                "currency": "EUR",
-                "status": "requires_capture",
-                "amount": 1337,
-            }
-
-        def mock_anything(*args: Any, **kwargs: Any) -> None:  # noqa: WPS430
-            """Do nothing."""
-
-        monkeypatch.setattr(stripe.PaymentIntent, "retrieve", mock_stripe_retrieve)
-        monkeypatch.setattr(stripe.PaymentIntent, "cancel", mock_anything)
-        monkeypatch.setattr(stripe.PaymentIntent, "modify", mock_anything)
 
         return await authenticated_http_client.post(
             "/orders",
@@ -96,7 +88,7 @@ class OrdersBase(object):
                     "relationships": {
                         "payment": {
                             "data": {
-                                "id": "pi_1DseBB2eZvKYlo2Cj8MBORJk",
+                                "id": credit_card_payment.id,
                                 "type": "payments",
                             },
                         },
@@ -117,12 +109,13 @@ class TestOrders(OrdersBase):
         self,
         authenticated_http_client: httpx.AsyncClient,
         httpx_mock: pytest_httpx.HTTPXMock,
-        monkeypatch: pytest.MonkeyPatch,
+        credit_card_payment_client: credit_card_payment.Client,
     ) -> None:
+        payment_intent = await pre_setup_credit_card(credit_card_payment_client)
         response = await self.create_order(
             authenticated_http_client,
             httpx_mock,
-            monkeypatch,
+            payment_intent,
         )
         assert response.status_code == status.HTTP_201_CREATED
 
@@ -131,9 +124,14 @@ class TestOrders(OrdersBase):
         authenticated_http_client: httpx.AsyncClient,
         httpx_mock: pytest_httpx.HTTPXMock,
         orders_repository: repository.OrdersRepository,
-        monkeypatch: pytest.MonkeyPatch,
+        credit_card_payment_client: credit_card_payment.Client,
     ) -> None:
-        await self.create_order(authenticated_http_client, httpx_mock, monkeypatch)
+        payment_intent = await pre_setup_credit_card(credit_card_payment_client)
+        await self.create_order(
+            authenticated_http_client,
+            httpx_mock,
+            payment_intent,
+        )
         response = await authenticated_http_client.get(
             "/orders/{0}".format(_ORDER_ID),
         )
@@ -145,9 +143,14 @@ class TestOrders(OrdersBase):
         self,
         authenticated_http_client: httpx.AsyncClient,
         httpx_mock: pytest_httpx.HTTPXMock,
-        monkeypatch: pytest.MonkeyPatch,
+        credit_card_payment_client: credit_card_payment.Client,
     ) -> None:
-        await self.create_order(authenticated_http_client, httpx_mock, monkeypatch)
+        payment_intent = await pre_setup_credit_card(credit_card_payment_client)
+        await self.create_order(
+            authenticated_http_client,
+            httpx_mock,
+            payment_intent,
+        )
         await _create_markups(authenticated_http_client)
 
         response = await authenticated_http_client.get(
@@ -162,9 +165,14 @@ class TestOrders(OrdersBase):
         authenticated_http_client: httpx.AsyncClient,
         httpx_mock: pytest_httpx.HTTPXMock,
         orders_repository: repository.OrdersRepository,
-        monkeypatch: pytest.MonkeyPatch,
+        credit_card_payment_client: credit_card_payment.Client,
     ) -> None:
-        await self.create_order(authenticated_http_client, httpx_mock, monkeypatch)
+        payment_intent = await pre_setup_credit_card(credit_card_payment_client)
+        await self.create_order(
+            authenticated_http_client,
+            httpx_mock,
+            payment_intent,
+        )
         response = await authenticated_http_client.get(
             "/orders",
         )
@@ -176,9 +184,14 @@ class TestOrders(OrdersBase):
         self,
         authenticated_http_client: httpx.AsyncClient,
         httpx_mock: pytest_httpx.HTTPXMock,
-        monkeypatch: pytest.MonkeyPatch,
+        credit_card_payment_client: credit_card_payment.Client,
     ) -> None:
-        await self.create_order(authenticated_http_client, httpx_mock, monkeypatch)
+        payment_intent = await pre_setup_credit_card(credit_card_payment_client)
+        await self.create_order(
+            authenticated_http_client,
+            httpx_mock,
+            payment_intent,
+        )
         await _create_markups(authenticated_http_client)
 
         response = await authenticated_http_client.get(
@@ -192,7 +205,7 @@ class TestOrders(OrdersBase):
         self,
         authenticated_http_client: httpx.AsyncClient,
         httpx_mock: pytest_httpx.HTTPXMock,
-        monkeypatch: pytest.MonkeyPatch,
+        credit_card_payment_client: credit_card_payment.Client,
     ) -> None:
         httpx_mock.add_response(
             **await conftest.load_response_fixture("GET_BOOKINGS_{ID}.json"),
@@ -200,7 +213,12 @@ class TestOrders(OrdersBase):
         httpx_mock.add_response(
             **await conftest.load_response_fixture("POST_CANCELLATIONS_REQUESTS.json"),
         )
-        await self.create_order(authenticated_http_client, httpx_mock, monkeypatch)
+        payment_intent = await pre_setup_credit_card(credit_card_payment_client)
+        await self.create_order(
+            authenticated_http_client,
+            httpx_mock,
+            payment_intent,
+        )
 
         response = await authenticated_http_client.post(
             "/cancellations/requests",
@@ -276,9 +294,10 @@ class TestOrders(OrdersBase):
         self,
         authenticated_http_client: httpx.AsyncClient,
         httpx_mock: pytest_httpx.HTTPXMock,
-        monkeypatch: pytest.MonkeyPatch,
+        credit_card_payment_client: credit_card_payment.Client,
     ) -> None:
-        await self.create_order(authenticated_http_client, httpx_mock, monkeypatch)
+        payment_intent = await pre_setup_credit_card(credit_card_payment_client)
+        await self.create_order(authenticated_http_client, httpx_mock, payment_intent)
 
         response = await _create_markups(authenticated_http_client)
 
@@ -297,9 +316,10 @@ class TestOrders(OrdersBase):
         self,
         authenticated_http_client: httpx.AsyncClient,
         httpx_mock: pytest_httpx.HTTPXMock,
-        monkeypatch: pytest.MonkeyPatch,
+        credit_card_payment_client: credit_card_payment.Client,
     ) -> None:
-        await self.create_order(authenticated_http_client, httpx_mock, monkeypatch)
+        payment_intent = await pre_setup_credit_card(credit_card_payment_client)
+        await self.create_order(authenticated_http_client, httpx_mock, payment_intent)
 
         await _create_markups(authenticated_http_client)
 
@@ -311,9 +331,10 @@ class TestOrders(OrdersBase):
         self,
         authenticated_http_client: httpx.AsyncClient,
         httpx_mock: pytest_httpx.HTTPXMock,
-        monkeypatch: pytest.MonkeyPatch,
+        credit_card_payment_client: credit_card_payment.Client,
     ) -> None:
-        await self.create_order(authenticated_http_client, httpx_mock, monkeypatch)
+        payment_intent = await pre_setup_credit_card(credit_card_payment_client)
+        await self.create_order(authenticated_http_client, httpx_mock, payment_intent)
 
         await _create_markups(authenticated_http_client)
 
@@ -336,22 +357,26 @@ class TestOrders(OrdersBase):
 
 
 class TestOrderByJourney(OrdersBase):
-    async def test_create_order_by_journey(
+    async def test_create_order_by_journey(  # noqa: WPS217
         self,
         authenticated_http_client: httpx.AsyncClient,
         httpx_mock: pytest_httpx.HTTPXMock,
         monkeypatch: pytest.MonkeyPatch,
         orders_repository: repository.OrdersRepository,
+        credit_card_payment_client: credit_card_payment.Client,
     ) -> None:
+        payment_intent = await pre_setup_credit_card(credit_card_payment_client)
         response = await self.create_order(
             authenticated_http_client,
             httpx_mock,
-            monkeypatch,
+            payment_intent,
         )
         httpx_mock.add_response(
             **await conftest.load_response_fixture("POST_ORDERS_BY_JOURNEY.json"),
         )
         journey = response.json()["data"]["relationships"]["journey"]
+        payment_intent = await pre_setup_credit_card(credit_card_payment_client)
+
         journey_response = await authenticated_http_client.post(
             "/journeys/{0}/orders".format(journey["data"]["id"]),
             json={
@@ -389,7 +414,7 @@ class TestOrderByJourney(OrdersBase):
                     "relationships": {
                         "payment": {
                             "data": {
-                                "id": "pi_1DseBB2eZvKYlo2Cj8MBORJk",
+                                "id": payment_intent.id,
                                 "type": "payments",
                             },
                         },

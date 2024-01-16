@@ -1,5 +1,7 @@
 import abc
 
+from google.protobuf.json_format import ParseDict
+
 from snowfall.project.junction.go.adapter import errors
 from snowfall.project.pay.service.payments.v1 import (
     credit_card_models_pb2,
@@ -47,9 +49,25 @@ class Client(abc.ABC):
     async def update_credit_card_payment(
         self,
         payment_id: str,
-        amount: money.Money,
+        amount: money.Money | None = None,
+        receipt_email: str = "",
+        metadata: dict[str, str] | None = None,
     ) -> credit_card_models_pb2.CreditCardPayment:
         """Update credit card payment."""
+
+    @abc.abstractmethod
+    async def cancel_credit_card_payment(
+        self,
+        payment_id: str,
+    ) -> credit_card_models_pb2.CreditCardPayment | None:
+        """Cancel the credit card payment."""
+
+    @abc.abstractmethod
+    async def capture_credit_card_payment(
+        self,
+        payment_id: str,
+    ) -> credit_card_models_pb2.CreditCardPayment | None:
+        """Capture the credit card payment."""
 
     @abc.abstractmethod
     async def create_refund(
@@ -129,20 +147,47 @@ class DictClient(Client):
     async def update_credit_card_payment(
         self,
         payment_id: str,
-        amount: money.Money,
+        amount: money.Money | None = None,
+        receipt_email: str = "",
+        metadata: dict[str, str] | None = None,
     ) -> credit_card_models_pb2.CreditCardPayment:
         credit_card_payment = self._credit_card_payments.get(payment_id)
         if credit_card_payment:
             new_credit_card_payment = credit_card_models_pb2.CreditCardPayment(
                 id=credit_card_payment.id,
-                amount=amount.protobuf(),
+                amount=credit_card_payment.amount
+                if amount is None
+                else amount.protobuf(),
                 capture_method=credit_card_payment.capture_method,
                 credit_card_holder_id=credit_card_payment.credit_card_holder_id,
                 enable_automatic_payment_method=credit_card_payment.enable_automatic_payment_method,
                 secret=credit_card_payment.secret,
+                status=credit_card_payment.status,
             )
             self._credit_card_payments[payment_id] = new_credit_card_payment
             return new_credit_card_payment
+        raise errors.NotFoundError()
+
+    async def cancel_credit_card_payment(
+        self,
+        payment_id: str,
+    ) -> credit_card_models_pb2.CreditCardPayment:
+        credit_card_payment = self._credit_card_payments.get(payment_id)
+        if credit_card_payment:
+            self._credit_card_payments[payment_id].status = "canceled"
+            return self._credit_card_payments[payment_id]
+
+        raise errors.NotFoundError()
+
+    async def capture_credit_card_payment(
+        self,
+        payment_id: str,
+    ) -> credit_card_models_pb2.CreditCardPayment:
+        credit_card_payment = self._credit_card_payments.get(payment_id)
+        if credit_card_payment:
+            self._credit_card_payments[payment_id].status = "succeeded"
+            return self._credit_card_payments[payment_id]
+
         raise errors.NotFoundError()
 
     async def create_refund(
@@ -263,11 +308,21 @@ class GrpcClient(Client):
     async def update_credit_card_payment(
         self,
         payment_id: str,
-        amount: money.Money,
+        amount: money.Money | None = None,
+        receipt_email: str = "",
+        metadata: dict[str, str] | None = None,
     ) -> credit_card_models_pb2.CreditCardPayment:
+        proto_metadata = None
+        if metadata:
+            proto_metadata = ParseDict(
+                metadata,
+                credit_card_models_pb2.PaymentMetaData(),
+            )
         update_payment_request = credit_card_pb2.UpdateCreditCardPaymentRequest(
             payment_id=payment_id,
-            amount=amount.protobuf(),
+            amount=None if amount is None else amount.protobuf(),
+            receipt_email=receipt_email,
+            metadata=proto_metadata,
         )
 
         updated_payment = await errors.handle_grpc_errors(
@@ -278,6 +333,34 @@ class GrpcClient(Client):
         )
 
         return updated_payment.payment
+
+    async def cancel_credit_card_payment(
+        self,
+        payment_id: str,
+    ) -> credit_card_models_pb2.CreditCardPayment:
+        cancel_response = await errors.handle_grpc_errors(
+            self._client.CancelCreditCardPayment(
+                credit_card_pb2.CancelCreditCardPaymentRequest(
+                    payment_id=payment_id,
+                ),
+                timeout=self._timeout,
+            ),
+        )
+        return cancel_response.payment
+
+    async def capture_credit_card_payment(
+        self,
+        payment_id: str,
+    ) -> credit_card_models_pb2.CreditCardPayment:
+        capture_response = await errors.handle_grpc_errors(
+            self._client.CaptureCreditCardPayment(
+                credit_card_pb2.CancelCreditCardPaymentRequest(
+                    payment_id=payment_id,
+                ),
+                timeout=self._timeout,
+            ),
+        )
+        return capture_response.payment
 
     async def create_refund(
         self,

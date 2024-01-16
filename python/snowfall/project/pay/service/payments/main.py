@@ -55,7 +55,7 @@ async def _serve_credit_card_payment(
         app.settings.grpc_address,
         app.settings.grpc_port,
         [
-            CreditCardPaymentService(  # type: ignore[abstract]
+            CreditCardPaymentService(
                 stripe_provider,
             ),
         ],

@@ -82,6 +82,7 @@ def _mock_stripe_payment_intent() -> None:
     create_payment = mock.Mock(
         id="bcad52bc-fe35-4717-840a-b047d59baa9d",
         client_secret="client_secret",
+        status="requires_payment_method",
     )
     get_payment = mock.Mock(
         id="bcad52bc-fe35-4717-840a-b047d59baa9d",
@@ -91,6 +92,7 @@ def _mock_stripe_payment_intent() -> None:
         customer="cus_PGQkLV2pMZKOxI",
         automatic_payment_methods={"enabled": True},
         client_secret="client_secret",
+        status="requires_payment_method",
     )
     stripe.PaymentIntent.create = mock.Mock(return_value=create_payment)  # type: ignore[method-assign]
     stripe.PaymentIntent.retrieve = mock.Mock(return_value=get_payment)  # type: ignore[method-assign]
