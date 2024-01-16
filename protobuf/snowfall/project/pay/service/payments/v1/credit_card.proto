@@ -77,7 +77,8 @@ message GetRefundResponse {
 }
 
 message CreateRefundRequest {
-  Refund refund = 1;
+  int32 amount = 1;
+  string credit_card_payment_id = 2;
 }
 
 message CreateRefundResponse {

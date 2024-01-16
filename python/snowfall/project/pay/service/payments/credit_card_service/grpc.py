@@ -96,3 +96,32 @@ class CreditCardPaymentService(
             credit_card_holder=credit_card_holder,
             signature=signature,
         )
+
+    async def CreateRefund(  # type: ignore[override] # noqa: N802
+        self,
+        request: credit_card_pb2.CreateRefundRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> credit_card_pb2.CreateRefundResponse:
+        refund = self._provider.create_refund(
+            amount=request.amount,
+            credit_card_payment_id=request.credit_card_payment_id,
+        )
+
+        if refund is None:
+            await context.abort(grpc.StatusCode.INVALID_ARGUMENT)
+
+        return credit_card_pb2.CreateRefundResponse(refund=refund)
+
+    async def GetRefund(  # type: ignore[override] # noqa: N802
+        self,
+        request: credit_card_pb2.GetRefundRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> credit_card_pb2.GetRefundResponse:
+        refund = self._provider.get_refund(
+            external_reference_id=request.refund_id,
+        )
+
+        if refund is None:
+            await context.abort(grpc.StatusCode.NOT_FOUND)
+
+        return credit_card_pb2.GetRefundResponse(refund=refund)

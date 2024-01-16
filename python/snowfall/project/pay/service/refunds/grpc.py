@@ -1,5 +1,4 @@
 import grpc
-import stripe
 
 from snowfall.project.junction.go.adapter import orders as orders_adapter
 from snowfall.project.junction.go.adapter.errors import NotFoundError
@@ -7,8 +6,10 @@ from snowfall.project.junction.go.service.orders.v1 import (
     models_pb2 as orders_models_pb2,
 )
 from snowfall.project.pay.adapter import bills as bills_adapter
+from snowfall.project.pay.adapter import credit_card_payment as credit_card_adapter
 from snowfall.project.pay.adapter import transactions as transactions_adapter
 from snowfall.project.pay.service.companies.v1.models_pb2 import PaymentType
+from snowfall.project.pay.service.payments.v1 import credit_card_models_pb2
 from snowfall.project.pay.service.refunds import repositories
 from snowfall.project.pay.service.refunds.v1 import (
     grpc_pb2,
@@ -41,15 +42,15 @@ class RefundsService(
         bills_client: bills_adapter.Client,
         payment_client: PaymentClient,
         orders_client: orders_adapter.Client,
-        stripe_api_key: str,
+        credit_cards_client: credit_card_adapter.Client,
     ):
         self._refunds = refunds
         self._transactions_client = transactions_client
         self._payment_client = payment_client
         self._bills_client = bills_client
         self._orders_client = orders_client
+        self._credit_cards_client = credit_cards_client
         self._default_page_size = 20
-        stripe.api_key = stripe_api_key
 
     def get_name(self) -> str:
         return grpc_pb2.DESCRIPTOR.services_by_name["RefundsService"].full_name
@@ -257,21 +258,14 @@ class RefundsService(
         request: grpc_pb2.UpdateRefundRequest,
         refund: models_pb2.Refund,
     ) -> models_pb2.Refund:
-        try:
-            stripe_refund = stripe.Refund.retrieve(
-                request.refund.external_reference_id,
-            )
-        except stripe.StripeError:
-            return await context.abort(grpc.StatusCode.INVALID_ARGUMENT)
-
+        external_refund = await self._credit_cards_client.get_refund(
+            request.refund.external_reference_id,
+        )
         refund.MergeFrom(
             models_pb2.Refund(
                 external_reference_id=request.refund.external_reference_id,
                 status=models_pb2.Refund.Status.STATUS_SUCCEEDED,
-                refunded_reseller=money.from_string(
-                    str(stripe_refund["amount"]),
-                    money.Currency(stripe_refund["currency"].upper()),
-                ).protobuf(),
+                refunded_reseller=external_refund.amount,
             ),
         )
         await self._refunds.update(refund)
@@ -355,7 +349,7 @@ class RefundsService(
                 request,
                 transaction,
             )
-            refund.external_reference_id = stripe_refund.stripe_id or ""
+            refund.external_reference_id = stripe_refund.external_reference_id or ""
             refund.status = models_pb2.Refund.Status.STATUS_SUBMITTED
         else:
             cc_conversion = await self._payment_client.create_conversion(
@@ -391,22 +385,18 @@ class RefundsService(
         context: grpc.aio.ServicerContext,
         request: grpc_pb2.UpdateRefundRequest,
         transaction: transactions_models_pb2.Transaction,
-    ) -> stripe.Refund:
+    ) -> credit_card_models_pb2.Refund:
         try:
             bill = await self._bills_client.get(transaction.bill_id)
         except NotFoundError:
             return await context.abort(grpc.StatusCode.NOT_FOUND)
 
         refunded_reseller = money.from_protobuf(request.refund.refunded_reseller)
-        try:
-            stripe_refund = stripe.Refund.create(
-                payment_intent=bill.payment_intent_id,
-                amount=refunded_reseller.amount,
-            )
-        except stripe.StripeError:
-            return await context.abort(grpc.StatusCode.INVALID_ARGUMENT)
 
-        return stripe_refund
+        return await self._credit_cards_client.create_refund(
+            amount=refunded_reseller.amount,
+            credit_card_payment_id=bill.payment_intent_id,
+        )
 
     async def _check_preconditions_for_refund_position(
         self,

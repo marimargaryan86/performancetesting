@@ -137,3 +137,45 @@ class Stripe(interfaces.CreditCardProvider):
         credit_card_holder.version = self._stripe_version
 
         return credit_card_holder, ephemeral_key_secret
+
+    def create_refund(
+        self,
+        amount: int,
+        credit_card_payment_id: str,
+    ) -> credit_card_models_pb2.Refund | None:
+        """Create refund in stripe."""
+        try:
+            stripe_refund = stripe.Refund.create(
+                amount=amount,
+                payment_intent=credit_card_payment_id,
+            )
+        except stripe.StripeError:
+            return None
+
+        return credit_card_models_pb2.Refund(
+            external_reference_id=stripe_refund.stripe_id,  # type: ignore[arg-type]
+            credit_card_payment_id=credit_card_payment_id,
+            amount=money.Money(
+                amount=amount,
+                currency=money.Currency(stripe_refund["currency"].upper()),
+            ).protobuf(),
+        )
+
+    def get_refund(
+        self,
+        external_reference_id: str,
+    ) -> credit_card_models_pb2.Refund | None:
+        """Get refund from stripe."""
+        try:
+            stripe_refund = stripe.Refund.retrieve(external_reference_id)
+        except stripe.StripeError:
+            return None
+
+        return credit_card_models_pb2.Refund(
+            external_reference_id=stripe_refund.stripe_id,  # type: ignore[arg-type]
+            credit_card_payment_id=stripe_refund["payment_intent"],
+            amount=money.Money(
+                amount=int(stripe_refund["amount"]),
+                currency=money.Currency(stripe_refund["currency"].upper()),
+            ).protobuf(),
+        )

@@ -51,11 +51,27 @@ class Client(abc.ABC):
     ) -> credit_card_models_pb2.CreditCardPayment:
         """Update credit card payment."""
 
+    @abc.abstractmethod
+    async def create_refund(
+        self,
+        amount: int,
+        credit_card_payment_id: str,
+    ) -> credit_card_models_pb2.Refund:
+        """Create refund."""
+
+    @abc.abstractmethod
+    async def get_refund(
+        self,
+        external_reference_id: str,
+    ) -> credit_card_models_pb2.Refund:
+        """Get refund."""
+
 
 class DictClient(Client):
     def __init__(self) -> None:
         self._credit_card_payments = {}  # type: ignore[var-annotated]
         self._credit_card_holders = {}  # type: ignore[var-annotated]
+        self._refunds = {}  # type: ignore[var-annotated]
 
     async def get_credit_card_holder(
         self,
@@ -127,6 +143,33 @@ class DictClient(Client):
             )
             self._credit_card_payments[payment_id] = new_credit_card_payment
             return new_credit_card_payment
+        raise errors.NotFoundError()
+
+    async def create_refund(
+        self,
+        amount: int,
+        credit_card_payment_id: str,
+    ) -> credit_card_models_pb2.Refund:
+        external_reference_id = string.uuid()
+        refund = credit_card_models_pb2.Refund(
+            external_reference_id=external_reference_id,
+            credit_card_payment_id=string.uuid(),
+            amount=money.Money(
+                amount=amount,
+                currency=money.Currency("USD"),
+            ).protobuf(),
+        )
+        self._refunds[external_reference_id] = refund
+
+        return refund
+
+    async def get_refund(
+        self,
+        external_reference_id: str,
+    ) -> credit_card_models_pb2.Refund:
+        refund = self._refunds.get(external_reference_id)
+        if refund:
+            return refund
         raise errors.NotFoundError()
 
 
@@ -235,3 +278,35 @@ class GrpcClient(Client):
         )
 
         return updated_payment.payment
+
+    async def create_refund(
+        self,
+        amount: int,
+        credit_card_payment_id: str,
+    ) -> credit_card_models_pb2.Refund:
+        response = await errors.handle_grpc_errors(
+            self._client.CreateRefund(
+                credit_card_pb2.CreateRefundRequest(
+                    amount=amount,
+                    credit_card_payment_id=credit_card_payment_id,
+                ),
+                timeout=self._timeout,
+            ),
+        )
+
+        return response.refund
+
+    async def get_refund(
+        self,
+        external_reference_id: str,
+    ) -> credit_card_models_pb2.Refund:
+        response = await errors.handle_grpc_errors(
+            self._client.GetRefund(
+                credit_card_pb2.GetRefundRequest(
+                    refund_id=external_reference_id,
+                ),
+                timeout=self._timeout,
+            ),
+        )
+
+        return response.refund

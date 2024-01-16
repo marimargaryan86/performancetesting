@@ -9,7 +9,9 @@ from pydantic import AnyUrl
 from snowfall.project.junction.go.adapter import orders
 from snowfall.project.junction.go.service.orders.v1 import orders_pb2_grpc
 from snowfall.project.pay.adapter import bills as bills_adapter
+from snowfall.project.pay.adapter import credit_card_payment as credit_card_adapter
 from snowfall.project.pay.adapter import transactions as transactions_adapter
+from snowfall.project.pay.service.payments.v1 import credit_card_pb2_grpc
 from snowfall.project.pay.service.refunds import grpc, repositories
 from snowfall.project.pay.service.transactions.v1 import (
     grpc_pb2_grpc as transactions_pb2_grpc,
@@ -29,7 +31,7 @@ class _GrpcSettings(application.Settings):
     cc_login: str
     cc_api_key: str
     cc_address: str
-    stripe_api_key: str
+    credit_card_address: str
 
 
 async def _serve(app: application.Application[_GrpcSettings]) -> None:
@@ -44,6 +46,11 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
         app,
         app.settings.orders_address,
     )
+    credit_card_channel = await grpc_factory.make_insecure_channel(
+        app,
+        app.settings.credit_card_address,
+    )
+
     grpc_server = server.create_server(
         app.settings.grpc_address,
         app.settings.grpc_port,
@@ -74,7 +81,11 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
                 orders_client=orders.GrpcClient(
                     orders_pb2_grpc.OrderServiceStub(orders_channel),
                 ),
-                stripe_api_key=app.settings.stripe_api_key,
+                credit_cards_client=credit_card_adapter.GrpcClient(
+                    credit_card_pb2_grpc.CreditCardPaymentServiceStub(
+                        credit_card_channel,
+                    ),
+                ),
             ),
         ],
     )
