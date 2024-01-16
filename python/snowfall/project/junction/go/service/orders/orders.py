@@ -496,6 +496,11 @@ class BookingDetailsRepository(
     _indexes = (
         pymongo.IndexModel("orders.bookings.trip_option._id", background=True),
         pymongo.IndexModel("orders.bookings.trip_option.details._id", background=True),
+        pymongo.IndexModel(
+            "orders.bookings.trip_option.details.segment.legs.departure_at",
+            background=True,
+            name="booking_departure_at",
+        ),
     )
 
     async def find_by_id(
@@ -539,6 +544,10 @@ class BookingDetailsRepository(
         return await self._find_with_cursor(
             cur=cursor,
             filter_=filter_,
+            sort=(
+                "segment.legs.departure_at",
+                pymongo.ASCENDING,
+            ),
         )
 
     async def find_by_booking_id(
