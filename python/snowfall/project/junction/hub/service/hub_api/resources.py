@@ -1131,6 +1131,15 @@ class ResellerResource(models.Resource):
                         type="currencies",
                     ),
                 },
+                "parentResellers": {
+                    _RELATIONSHIPS_FIELD: [
+                        models.ResourceIdentifier(
+                            id=parent_reseller_id,
+                            type="resellers",
+                        )
+                        for parent_reseller_id in reseller.parent_reseller_ids
+                    ],
+                },
             },
             links={
                 _SELF_HREF: str(

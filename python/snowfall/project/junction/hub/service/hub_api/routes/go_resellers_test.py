@@ -36,6 +36,7 @@ async def test_create_reseller(client: httpx.AsyncClient) -> None:
                     "type": "currencies",
                 },
             },
+            "parentResellers": {"data": []},
         },
     }
 

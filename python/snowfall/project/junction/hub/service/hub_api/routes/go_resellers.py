@@ -52,6 +52,7 @@ class Resellers(endpoints.HTTPEndpoint):
                 company_id=body["company"],
                 default_currency=body["currency"],
                 provider_ids=body["providers"],
+                parent_reseller_ids=body["parentResellers"],
             ),
         )
 
@@ -99,9 +100,10 @@ class Reseller(endpoints.HTTPEndpoint):
             models_pb2.Reseller(
                 id=reseller_id,
                 name=payload.get("name"),  # type: ignore[arg-type]
-                default_currency=payload.get("defaultCurrency"),  # type: ignore[arg-type]
+                default_currency=payload.get("currency"),  # type: ignore[arg-type]
                 provider_ids=payload.get("providers"),
                 company_id=payload.get("company"),  # type: ignore[arg-type]
+                parent_reseller_ids=payload.get("parentResellers", []),
             ),
         )
 

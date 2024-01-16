@@ -43,8 +43,8 @@ message ListResellersResponse {
 }
 
 message UpdateResellerRequest {
-  reserved 1, 2, 3, 4;
-  reserved "id", "name", "default_currency", "providers";
+  reserved 1, 2, 3, 4, 7, 8;
+  reserved "id", "name", "default_currency", "providers", "company", "parent_reseller_ids";
   Reseller reseller = 5;
   google.protobuf.FieldMask update_mask = 6;
 }
