@@ -379,3 +379,36 @@ class Co2EmissionsResource(models.Resource):
                 },
             },
         )
+
+
+class AirStatusResource(models.Resource):
+    @classmethod
+    def from_proto(
+        cls,
+        flight_status: plus_services_models_pb2.FlightStatus,
+        departure_date: str,
+    ) -> AirStatusResource:
+        return cls(
+            id="{0}{1}-{2}".format(
+                flight_status.carrier_fs_code,
+                flight_status.flight_number,
+                departure_date,
+            ),
+            type="flight-status",
+            attributes={
+                "carrierCode": flight_status.carrier_fs_code,
+                "flightNumber": int(flight_status.flight_number),
+                "departureAt": departure_date,
+                "delays": {
+                    "departureGateDelayMinutes": flight_status.delays.departure_gate_delay_minutes,
+                    "arrivalGateDelayMinutes": flight_status.delays.arrival_gate_delay_minutes,
+                },
+                "airportInformation": {
+                    "departureTerminal": flight_status.airport_resources.departure_terminal,
+                    "departureGate": flight_status.airport_resources.departure_gate,
+                    "arrivalTerminal": flight_status.airport_resources.arrival_gate,
+                    "arrivalGate": flight_status.airport_resources.arrival_gate,
+                    "baggageBelt": flight_status.airport_resources.baggage,
+                },
+            },
+        )

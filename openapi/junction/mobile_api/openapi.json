@@ -1121,6 +1121,78 @@
         ]
       }
     },
+    "/status/air": {
+      "get": {
+        "summary": "Get Status of Flight",
+        "tags": [
+          "trips"
+        ],
+        "parameters": [
+          {
+            "name": "carrierCode",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "AA"
+            },
+            "required": true,
+            "description": "The carrier code that operates the flight"
+          },
+          {
+            "name": "flightNumber",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "example": 803
+            },
+            "required": true,
+            "description": "The flight number of the flight"
+          },
+          {
+            "name": "departureAt",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2019-08-24"
+            },
+            "required": true,
+            "description": "The date that the flight departs"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/FlightStatus"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-status-air",
+        "description": "Used to get the flight status for an air trip."
+      }
+    },
     "/trip-candidates/searches": {
       "$ref": "./../client_api/openapi.json#/paths/~1trip-candidates~1searches"
     },
@@ -6649,6 +6721,94 @@
                 "type": "string",
                 "format": "email",
                 "example": "user@example.com"
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "attributes"
+        ]
+      },
+      "FlightStatus": {
+        "title": "Flight Status",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "AA803-2019-08-24",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "flight-status"
+            ],
+            "example": "flight-status"
+          },
+          "attributes": {
+            "type": "object",
+            "required": [
+              "carrierCode",
+              "flightNumber",
+              "departureAt",
+              "delays",
+              "airportInformation"
+            ],
+            "properties": {
+              "carrierCode": {
+                "type": "string",
+                "example": "AA"
+              },
+              "flightNumber": {
+                "type": "number",
+                "example": 803
+              },
+              "departureAt": {
+                "type": "string",
+                "format": "date",
+                "example": "2019-08-24"
+              },
+              "delays": {
+                "type": "object",
+                "readOnly": true,
+                "properties": {
+                  "departureGateDelayMinutes": {
+                    "type": "integer",
+                    "example": 10
+                  },
+                  "arrivalGateDelayMinutes": {
+                    "type": "integer",
+                    "example": 10
+                  }
+                }
+              },
+              "airportInformation": {
+                "type": "object",
+                "readOnly": true,
+                "properties": {
+                  "departureTerminal": {
+                    "type": "string",
+                    "example": "1"
+                  },
+                  "departureGate": {
+                    "type": "string",
+                    "example": "B12"
+                  },
+                  "arrivalTerminal": {
+                    "type": "string",
+                    "example": "1"
+                  },
+                  "arrivalGate": {
+                    "type": "string",
+                    "example": "B12"
+                  },
+                  "baggageBelt": {
+                    "type": "string",
+                    "example": "3"
+                  }
+                }
               }
             }
           }

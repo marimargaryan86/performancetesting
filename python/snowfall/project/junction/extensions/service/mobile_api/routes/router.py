@@ -121,6 +121,7 @@ def get_routes(
             name="TripSearchesTrips",
         ),
         integration.route("/trips/searches", trips.TripSearches, name="TripSearches"),
+        integration.route("/status/air", trips.AirStatus, name="AirStatus"),
         integration.route(
             "/loyalty-programs",
             loyalty_programs.Programs,
