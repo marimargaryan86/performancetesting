@@ -3,7 +3,7 @@ import uuid
 import pydantic
 
 from snowfall.project.junction.content import bootstrap
-from snowfall.project.junction.content.service.duffel import trips
+from snowfall.project.junction.content.service.duffel import offers, trips
 from snowfall.project.junction.provider.v2alpha import meta_pb2
 from snowfall.project.junction.v1 import segment_type_pb2
 from snowfall.stdlib.service import application, grpc_factory, httpx_factory
@@ -37,15 +37,20 @@ async def _factory(
         ),
         app.settings.rate_limiter_service_configs["duffel"],
     )
+    duffel_client = client.DuffelClient(
+        http_client=httpx_client,
+        api_base_url=str(app.settings.api_base_url),
+        api_key=app.settings.api_key,
+        version=app.settings.api_version,
+        rate_limit_client=rate_limit_client,
+    )
     trip_searcher = trips.Trips(
-        search_client=client.DuffelClient(
-            http_client=httpx_client,
-            api_base_url=str(app.settings.api_base_url),
-            api_key=app.settings.api_key,
-            version=app.settings.api_version,
-            rate_limit_client=rate_limit_client,
-        ),
+        search_client=duffel_client,
         transformer=trips.Transformer(),
+    )
+    offer_searcher = offers.Offers(
+        search_client=duffel_client,
+        transformer=offers.Transformer(),
     )
 
     return bootstrap.ProviderConfiguration(
@@ -56,6 +61,9 @@ async def _factory(
             supported_segment_types=[segment_type_pb2.SEGMENT_TYPE_FLIGHT],
             passenger_age_identification_method=meta_pb2.TripSearchCapabilities.PASSENGER_AGE_IDENTIFICATION_METHOD_DATE_OF_BIRTH,
             one_way=trip_searcher.find_one_way,
+        ),
+        offer_search_implementation=bootstrap.OfferSearchImplementation(
+            one_way=offer_searcher.find_one_way,
         ),
     )
 
