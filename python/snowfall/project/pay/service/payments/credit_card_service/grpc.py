@@ -59,7 +59,9 @@ class CreditCardPaymentService(
         metadata = MessageToDict(request.metadata, preserving_proto_field_name=True)
         updated_payment = self._provider.update_credit_card_payment(
             request.payment_id,
-            money.from_protobuf(request.amount),
+            money.from_protobuf(request.amount)
+            if request.amount.ListFields()
+            else None,
             receipt_email=request.receipt_email or None,
             metadata=metadata or None,
         )

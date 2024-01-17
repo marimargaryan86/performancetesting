@@ -24,7 +24,7 @@ class CreditCardProvider(object):
     def update_credit_card_payment(
         self,
         payment_id: str,
-        amount: money.Money,
+        amount: money.Money | None,
         receipt_email: str | None,
         metadata: Mapping[str, str] | None,
     ) -> credit_card_models_pb2.CreditCardPayment | None:

@@ -71,14 +71,14 @@ class Stripe(interfaces.CreditCardProvider):
     def update_credit_card_payment(
         self,
         payment_id: str,
-        amount: money.Money,
+        amount: money.Money | None,
         receipt_email: str | None,
         metadata: Mapping[str, str] | None,
     ) -> credit_card_models_pb2.CreditCardPayment | None:
         try:
             updated_payment_intent = stripe.PaymentIntent.modify(
                 payment_id,
-                amount=amount.amount,
+                amount=amount.amount if amount else None,  # type: ignore[arg-type]
                 receipt_email=receipt_email,  # type: ignore[arg-type]
                 metadata=metadata,  # type: ignore[arg-type]
             )
@@ -87,7 +87,7 @@ class Stripe(interfaces.CreditCardProvider):
 
         return credit_card_models_pb2.CreditCardPayment(
             id=updated_payment_intent.id,
-            amount=amount.protobuf(),
+            amount=amount if amount is None else amount.protobuf(),
             capture_method=updated_payment_intent.capture_method,
             credit_card_holder_id=updated_payment_intent.customer or "",  # type: ignore[arg-type]
             enable_automatic_payment_method=updated_payment_intent.automatic_payment_methods[
