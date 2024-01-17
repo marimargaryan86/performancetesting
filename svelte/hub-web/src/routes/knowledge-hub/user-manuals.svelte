@@ -9,15 +9,15 @@
 </script>
 
 <section>
-  <h2 class="typography headline-small bold">{$i18n.pages.knowledgeHub.userManuals.title}</h2>
-  <p class="typography title-medium">
+  <h2 typography="headline-small" weight="bold">{$i18n.pages.knowledgeHub.userManuals.title}</h2>
+  <p typography="title-medium">
     {$i18n.pages.knowledgeHub.userManuals.description}
   </p>
 
   <div class="download-manual">
     <a href={downloadUrl} target="_blank">
       <div class="download-title">
-        <p class="typography title-medium bold" color="var(--color-main-primary-900)">
+        <p typography="title-medium" weight="bold" color="var(--color-main-primary-900)">
           <Icon variant="pdf" color="var(--color-semantic-error-500)" />
           <span class="spacer" />
           {$i18n.pages.knowledgeHub.userManuals.userManual}
@@ -43,7 +43,11 @@
     padding: 16px 0;
   }
 
-  .download-title .title-medium {
+  section > p {
+    color: var(--color-common-light-medium);
+  }
+
+  .download-title > p {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -60,10 +64,6 @@
     gap: 16px;
     margin-bottom: 48px;
     color: var(--color-common-light-strong);
-  }
-
-  section > p {
-    color: var(--color-common-light-medium);
   }
 
   a {
