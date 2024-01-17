@@ -1,5 +1,10 @@
 module.exports = {
   root: true,
+  globals: {
+    ScrollBehavior: "readonly",
+    TypographyWeight: "readonly",
+    Typography: "readonly",
+  },
   parser: "@typescript-eslint/parser",
   extends: [
     "eslint:recommended",
@@ -25,7 +30,7 @@ module.exports = {
   },
   env: {
     browser: true,
-    es2017: true,
+    es2020: true,
     node: true,
   },
   rules: {

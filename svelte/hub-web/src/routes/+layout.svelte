@@ -11,7 +11,7 @@
   import * as Sentry from "@sentry/sveltekit";
   import integrationInstancesClient from "integration-instances-client";
   import { writable } from "svelte/store";
-  import { setLocale, setLocaleData, type Locale } from "i18n";
+  import { setLocale, setLocaleData, type Locale, setTimeFormat } from "i18n";
   import { invalidateAll } from "$app/navigation";
   import type { User } from "integration/ory/schemas/authentication";
   import { setUser } from "utils/permissions";
@@ -21,10 +21,12 @@
   const user = setUser(writable<User>(data.user));
   const locale = setLocale(writable(data.locale));
   const localeData = setLocaleData(writable(data.localeData));
+  const timeFormat = setTimeFormat(writable(data.timeFormat));
 
   let logoutTimer: number | undefined = undefined;
   let prevLocale = data.locale;
 
+  $: $timeFormat = data.timeFormat;
   $: $user = data.user as unknown as User;
   $: $localeData = data.localeData;
   $: if (browser && data.sessionExpiresAt) {

@@ -8,6 +8,7 @@
     | "bill"
     | "bookings"
     | "bug"
+    | "calendar"
     | "checked"
     | "clock-filled"
     | "clock-outlined"
@@ -37,7 +38,7 @@
     | "ticket"
     | "download"
     | "pdf";
-  export let size = "24px";
+  export let size: string | undefined = undefined;
   export let color: string | undefined = undefined;
 
   $: mask = `url("/images/icons/${variant}.svg")`;
@@ -47,18 +48,21 @@
   class="icon"
   style:mask-image={mask}
   style:-webkit-mask-image={mask}
-  style:width={size}
-  style:height={size}
+  style:--size={size}
   style:background-color={color}
 />
 
 <style>
   .icon {
+    --x-size: var(--size, 24px);
+
     display: inline-block;
+    width: var(--x-size);
+    height: var(--x-size);
+    background-color: var(--color-common-light-strong);
     mask-size: contain;
     mask-repeat: no-repeat;
     mask-position: center;
-    background-color: var(--color-common-light-strong);
     /* stylelint-disable property-no-vendor-prefix */
     -webkit-mask-size: contain;
     -webkit-mask-repeat: no-repeat;

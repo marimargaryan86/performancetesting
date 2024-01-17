@@ -27,8 +27,6 @@
   import type { Place } from "integration/junction-mobile-api/schemas/place";
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import { goto } from "$app/navigation";
-  import type { DateRange } from "models/date-time";
-  import { addToDate, getZeroTimeDate } from "utils/date-time";
   import tripManagement, {
     type SearchDataModel,
   } from "../../../integration/trip-management/trip-management";
@@ -53,14 +51,14 @@
     children4: 0,
     children0: 0,
   };
+  let outbound = data.outbound;
   let errors: z.ZodFormattedError<SearchDataModel> | undefined = undefined;
-  let dateSpan: DateRange = {
-    from: getZeroTimeDate(new Date()),
-    to: getZeroTimeDate(addToDate(new Date(), { years: 1 })),
-  };
 
   const pending = writable(false);
   const i18n = getLocaleData();
+  const today = new Date();
+  today.setSeconds(0);
+  today.setMinutes(0);
 
   $: data = {
     ...data,
@@ -72,6 +70,7 @@
       : undefined,
     passengers,
     timeZoneOffset: data.outbound?.getTimezoneOffset() ?? 0,
+    outbound,
   };
 
   function swapOriginAndDestination(): void {
@@ -130,12 +129,11 @@
 
   <DatePicker
     label={$i18n.words.depart}
-    bind:value={data.outbound}
-    id="depart-date"
-    placeholder={$i18n.actions.addDate}
+    bind:value={outbound}
     error={errors?.outbound?._errors}
-    span={dateSpan}
     required
+    min={today}
+    includeTime
   />
 
   <button variant="primary" on:click={search}>

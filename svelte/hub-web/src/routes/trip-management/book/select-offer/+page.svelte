@@ -260,6 +260,7 @@
   .search-wrapper > :global(.trip-search > .autocomplete-field),
   .search-wrapper > :global(.trip-search > .date-picker) {
     --height: 40px;
+    --icon-size: 16px;
   }
 
   .search-wrapper > :global(.trip-search > button.swap) {

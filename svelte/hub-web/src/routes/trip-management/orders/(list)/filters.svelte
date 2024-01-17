@@ -26,6 +26,34 @@
 
   export let filters: JourneyFilterOptions;
 
+  let departureAtFrom: Date | undefined = undefined;
+  let createdAtFrom: Date | undefined = undefined;
+
+  // TODO: Update once date picker range is implemented
+  $: filters = {
+    ...filters,
+    departureAtRange: departureAtFrom
+      ? {
+          from: departureAtFrom,
+          to: new Date(
+            departureAtFrom.getFullYear(),
+            departureAtFrom.getMonth(),
+            departureAtFrom.getDate() + 5,
+          ),
+        }
+      : undefined,
+    createdAtRange: createdAtFrom
+      ? {
+          from: createdAtFrom,
+          to: new Date(
+            createdAtFrom.getFullYear(),
+            createdAtFrom.getMonth(),
+            createdAtFrom.getDate() + 5,
+          ),
+        }
+      : undefined,
+  };
+
   const i18n = getLocaleData();
 
   $: formatBookingStatusOption = getBookingStatusOptionFormatter($i18n);
@@ -35,19 +63,9 @@
   }
 </script>
 
-<DatePicker
-  bind:value={filters.departureAtRange}
-  label={$i18n.tableHeaders.departureDate}
-  range
-  placeholder={$i18n.words.dateRange}
-/>
+<DatePicker bind:value={departureAtFrom} label={$i18n.tableHeaders.departureDate} />
 
-<DatePicker
-  bind:value={filters.createdAtRange}
-  label={$i18n.tableHeaders.createdDate}
-  range
-  placeholder={$i18n.words.dateRange}
-/>
+<DatePicker bind:value={createdAtFrom} label={$i18n.tableHeaders.createdDate} />
 
 <SelectField
   label={$i18n.tableHeaders.bookingStatus}

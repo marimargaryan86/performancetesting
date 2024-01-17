@@ -1,5 +1,4 @@
 <script lang="ts">
-  /* global TypographyWeight Typography */
   import Icon from "components/icons/icon.svelte";
   import { getLocaleData } from "i18n";
 

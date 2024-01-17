@@ -3,7 +3,6 @@
 </script>
 
 <script lang="ts">
-  /* global Typography */
   import Icon from "components/icons/icon.svelte";
   import { slideFade } from "transitions/slide-fade";
 

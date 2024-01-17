@@ -5,6 +5,7 @@ import type languages from "./lang/languages";
 
 export type Locale = (typeof languages)[number]["locale"];
 export type LocaleData = typeof en;
+export type TimeFormat = "12hour" | "24hour";
 export type Quantity = "singular" | "plural";
 export type WordQuantity = Record<Quantity, string>;
 export type ContentElement =
@@ -14,6 +15,7 @@ export type ContentElement =
 
 const LOCALE = "locale";
 const LOCALE_DATA = "localeData";
+const TIME_FORMAT = "timeFormat";
 
 export function setLocale(locale: Writable<Locale>): Writable<Locale> {
   return setContext(LOCALE, locale);
@@ -29,4 +31,12 @@ export function setLocaleData(data: Writable<LocaleData>): Writable<LocaleData> 
 
 export function getLocaleData(): Readable<LocaleData> {
   return getContext(LOCALE_DATA);
+}
+
+export function setTimeFormat(data: Writable<TimeFormat>): Writable<TimeFormat> {
+  return setContext(TIME_FORMAT, data);
+}
+
+export function getTimeFormat(): Readable<TimeFormat> {
+  return getContext(TIME_FORMAT);
 }

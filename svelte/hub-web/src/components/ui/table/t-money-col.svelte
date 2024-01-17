@@ -1,5 +1,4 @@
 <script lang="ts">
-  /* global Typography */
   import TCol from "./t-col.svelte";
   import { formatAmount } from "formatting/currency";
   import { getLocale } from "i18n";
