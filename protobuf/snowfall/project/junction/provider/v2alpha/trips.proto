@@ -69,8 +69,15 @@ message Trip {
   Fare fare = 2;
 }
 
+message Price {
+  snowfall.stdlib.v1.Money base_amount = 1;
+  snowfall.stdlib.v1.Money tax_amount = 2;
+  snowfall.stdlib.v1.Money total_amount = 3;
+}
+
 message Result {
   repeated Trip trips = 1;
+  // TODO(bolmis): switch amounts to Price message
   snowfall.stdlib.v1.Money base_amount = 2;
   snowfall.stdlib.v1.Money tax_amount = 3;
   snowfall.stdlib.v1.Money total_amount = 4;
@@ -119,7 +126,7 @@ message SearchTripsResponse {
 
 message Offer {
   string id = 1;
-  snowfall.stdlib.v1.Money price = 2;
+  Price price = 2;
   google.protobuf.Timestamp expires_at = 3;
   // @todo: add more information from PriceQuote
 }
