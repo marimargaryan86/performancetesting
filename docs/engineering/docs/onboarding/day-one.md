@@ -120,7 +120,7 @@ different things we build, how we build them, and why.
 You can find a link to all the current recordings
 [here](https://www.notion.so/Knowledge-Fest-89b12f4c7ac645a18bb41f481f3e272c?pvs=4)
 
-[Email Signature]:https://file.notion.so/f/s/2a36af9a-2025-4237-aafe-a8ff59093676/Untitled.html?id=5c5447c5-4f3c-491e-8a69-5ff59734a307&table=block&spaceId=5b14a1b1-b088-42e9-a68f-d2dd3d227cf1&expirationTimestamp=1696723200000&signature=yYHE2MluaDN5IZSDR0OHLwY2_SF4nNMywCzvgEKJBkU&download=true&downloadName=Template.html
+[Email Signature]:https://www.notion.so/Email-Signature-Setup-June-2022-d8e677f963814c51b3c34a0b2dd9f274#5c5447c54f3c491e8a695ff59734a307
 
 [HMRC Form]: https://file.notion.so/f/s/efafb1ec-dec6-45bc-875d-15188c236cc8/New_starter_form_.pdf?id=ae2ef22d-c81e-4539-b842-cfaeb3e58387&table=block&spaceId=5b14a1b1-b088-42e9-a68f-d2dd3d227cf1&expirationTimestamp=1696723200000&signature=vCFCWJu7syHW8XNazW6nXKPCtBz1YZXeR8mgEVhVfb8&downloadName=New+starter+form+.pdf
 
