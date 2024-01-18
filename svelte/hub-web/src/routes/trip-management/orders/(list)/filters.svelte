@@ -26,37 +26,32 @@
 
   export let filters: JourneyFilterOptions;
 
-  let departureAtFrom: Date | undefined = undefined;
-  let createdAtFrom: Date | undefined = undefined;
+  let departureAtFrom: Date | undefined = filters.departureAtRange?.from;
+  let createdAtFrom: Date | undefined = filters.createdAtRange?.from;
 
   // TODO: Update once date picker range is implemented
-  $: filters = {
-    ...filters,
-    departureAtRange: departureAtFrom
-      ? {
-          from: departureAtFrom,
-          to: new Date(
-            departureAtFrom.getFullYear(),
-            departureAtFrom.getMonth(),
-            departureAtFrom.getDate() + 5,
-          ),
-        }
-      : undefined,
-    createdAtRange: createdAtFrom
-      ? {
-          from: createdAtFrom,
-          to: new Date(
-            createdAtFrom.getFullYear(),
-            createdAtFrom.getMonth(),
-            createdAtFrom.getDate() + 5,
-          ),
-        }
-      : undefined,
-  };
+  $: filters.departureAtRange = departureAtFrom
+    ? {
+        from: departureAtFrom,
+        to: new Date(
+          departureAtFrom.getFullYear(),
+          departureAtFrom.getMonth(),
+          departureAtFrom.getDate() + 5,
+        ),
+      }
+    : undefined;
+  $: filters.createdAtRange = createdAtFrom
+    ? {
+        from: createdAtFrom,
+        to: new Date(
+          createdAtFrom.getFullYear(),
+          createdAtFrom.getMonth(),
+          createdAtFrom.getDate() + 5,
+        ),
+      }
+    : undefined;
 
   const i18n = getLocaleData();
-
-  $: formatBookingStatusOption = getBookingStatusOptionFormatter($i18n);
 
   function reset(): void {
     filters = {};
@@ -71,7 +66,7 @@
   label={$i18n.tableHeaders.bookingStatus}
   bind:value={filters.bookingStatus}
   options={[undefined, ...bookingStatuses]}
-  formatter={formatBookingStatusOption}
+  formatter={getBookingStatusOptionFormatter($i18n)}
   placeholder={$i18n.actions.select}
 />
 

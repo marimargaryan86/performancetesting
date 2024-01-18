@@ -30,18 +30,18 @@
   let expanded = false;
   let dialog: HTMLUListElement | undefined;
   let textField: TextField | undefined;
-  let selectedDisplayValue = formatter(value, true);
 
+  $: selectedDisplayValue = formatter(value, true);
   $: filteredOptions = options;
   $: hoveredIndex = filteredOptions.indexOf(value);
-  $: filter(selectedDisplayValue);
   $: if (dialog) {
     scrollToOption();
   }
 
-  function input(): void {
+  function input(event: CustomEvent<HTMLInputElement>): void {
     value = undefined;
     open();
+    filter(event.detail.value);
   }
 
   function toggle(): void {
@@ -67,6 +67,10 @@
   }
 
   function close(): void {
+    if (!expanded) {
+      return;
+    }
+
     expanded = false;
     selectedDisplayValue = formatter(value, true);
     setHoveredIndex(value);

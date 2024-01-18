@@ -1,4 +1,14 @@
 <script lang="ts" context="module">
+  export function queryFiltersGetter(value: JourneyFilterOptionsQuery): JourneyFilterOptions {
+    return {
+      bookingStatus: bookingStatuses.find((item) => item === value.bookingStatus),
+      createdAtRange: parseDateRange(value["createdAt[from]"], value["createdAt[to]"]),
+      departureAtRange: parseDateRange(value["departureAt[from]"], value["departureAt[to]"]),
+      passengerLastName: value.passengerLastName,
+      referenceNumber: value.referenceNumber,
+    };
+  }
+
   export const LIST_JOURNEYS_LIMIT = 20;
   export const LIST_JOURNEYS_SORT: Parameters<JourneyService["find"]>[0]["sort"] = "-createdAt";
 
@@ -31,27 +41,6 @@
       currency: curr.currency,
     }));
   }
-
-  const filters = createQueryStore<JourneyFilterOptions, JourneyFilterOptionsQuery>(
-    (data) => ({
-      "createdAt[from]": data.createdAtRange?.from.toLocaleDateString("sv-SE"),
-      "createdAt[to]": data.createdAtRange?.to.toLocaleDateString("sv-SE"),
-      "departureAt[from]": data.departureAtRange?.from.toLocaleDateString("sv-SE"),
-      "departureAt[to]": data.departureAtRange?.to.toLocaleDateString("sv-SE"),
-      bookingStatus: data.bookingStatus,
-      referenceNumber: data.referenceNumber,
-      passengerLastName: data.passengerLastName,
-    }),
-    (query) => ({
-      bookingStatus: bookingStatuses.includes(query.bookingStatus as BookingStatus)
-        ? (query.bookingStatus as BookingStatus)
-        : undefined,
-      createdAtRange: parseDateRange(query["createdAt[from]"], query["createdAt[to]"]),
-      departureAtRange: parseDateRange(query["departureAt[from]"], query["departureAt[to]"]),
-      referenceNumber: query.referenceNumber,
-      passengerLastName: query.passengerLastName,
-    }),
-  );
 </script>
 
 <script lang="ts">
@@ -76,21 +65,34 @@
   } from "integration/junction-hub-api/schemas/journey";
   import Filters from "./filters.svelte";
   import { ensureDefined } from "utils/array";
-  import { createQueryStore } from "utils/url";
-  import {
-    bookingStatuses,
-    type BookingStatus,
-  } from "integration/junction-hub-api/schemas/booking";
+  import { bookingStatuses } from "integration/junction-hub-api/schemas/booking";
   import { parseDateRange } from "utils/date-time";
   import { getPageTitle } from "utils/page-title";
   import { getLocale, getLocaleData } from "i18n";
   import TMoneyCol from "components/ui/table/t-money-col.svelte";
   import Icon from "components/icons/icon.svelte";
+  import { getQueryStore } from "stores/query-store";
 
   export let data;
 
   let searchQuery = "";
 
+  const filters = getQueryStore({
+    get: queryFiltersGetter,
+    set: (value) => ({
+      "createdAt[from]": value.createdAtRange?.from.toLocaleDateString("sv-SE"),
+      "createdAt[to]": value.createdAtRange?.to.toLocaleDateString("sv-SE"),
+      "departureAt[from]": value.departureAtRange?.from.toLocaleDateString("sv-SE"),
+      "departureAt[to]": value.departureAtRange?.to.toLocaleDateString("sv-SE"),
+      bookingStatus: value.bookingStatus,
+      passengerLastName: value.passengerLastName,
+      referenceNumber: value.referenceNumber,
+    }),
+    valid: (value) => ({
+      passengerLastName: !value.passengerLastName || value.passengerLastName.length > 2,
+      referenceNumber: !value.referenceNumber || value.referenceNumber.length > 2,
+    }),
+  });
   const i18n = getLocaleData();
   const locale = getLocale();
 

@@ -1,66 +1,69 @@
-import { browser } from "$app/environment";
 import { goto } from "$app/navigation";
-import { page } from "$app/stores";
-import { writable, type Writable } from "svelte/store";
+import { getContext, setContext } from "svelte";
+import { get, writable, type Writable } from "svelte/store";
+import { URLExtended } from "utils/url";
 
-type StoreSetter = (value: Record<string, string>, navigate?: boolean) => void;
+/**
+ * Set the query store context
+ * @param searchParams Initial search params
+ */
+export function setQueryStore(
+  searchParams: URLSearchParams,
+): Writable<Record<string, string | undefined>> {
+  const store = writable(Object.fromEntries(searchParams));
 
-function parseSearchParams(params: URLSearchParams): Record<string, string> {
-  return Object.fromEntries(
-    Object.entries(Object.fromEntries(params)).filter(([, val]) => val.length),
-  );
-}
-
-function parseSearchString(search: string): Record<string, string> {
-  return parseSearchParams(new URLSearchParams(search));
-}
-
-function queryStore(): Writable<Record<string, string>> {
-  const store = writable<Record<string, string>>(parseSearchString(window.location.search), () =>
-    page.subscribe(({ url }) => {
-      if (!url) {
-        return;
-      }
-
-      (store.set as StoreSetter)(parseSearchParams(url.searchParams), false);
-    }),
-  );
-
-  const { set } = store;
-
-  store.set = (value: Record<string, string>, navigate = true): void => {
-    if (!navigate) {
-      return set(value);
-    }
-
-    const { pathname, origin } = window.location;
-    const url = new URL(pathname, origin);
-
-    Object.entries(value).forEach(([key, val]) => {
-      if (val.length) {
-        url.searchParams.set(key, val);
-      }
-    });
-
-    goto(url, { keepFocus: true, noScroll: true, replaceState: true });
-  };
-
-  return store;
+  return setContext("queryStore", store);
 }
 
 /**
- * A Svelte store that synchronizes URL query parameters with application
- * state. It reads and writes to the URL's query parameters, updating itself
- * based on URL changes and also updates the URL when its values change.
+ * Get the query store context
  *
- * An empty string is treated as `undefined` and removes that key from the URL
- * query parameters.
+ * This store will add the values to the current URLs query parameters as it changes.
+ * It debounces changes by 1000ms which is refreshed every time the store changes.
  *
- * @example
- * // Binding a text input to a query parameter
- * <input type="text" bind:value={$queryStore.username} />
- *
- * // Navigating to `/?username=someone` will prefill the input with "someone".
- * // Typing in the input will update the URL's query parameter accordingly.
+ * @param config Contains a `getter` for parsing query data into a model, a `setter` for parsing
+ * a model into query data and an optional validator for the model. If the validator returns false
+ * for any field when the store updates, no navigation will be performed.
  */
-export default browser ? queryStore() : writable<Record<string, string>>({});
+export function getQueryStore<
+  TData extends Record<string, unknown>,
+  TQuery extends Record<string, string | undefined>,
+>(config: {
+  get: (value: TQuery) => TData;
+  set: (value: TData) => TQuery;
+  valid?: (value: TData) => { [key in keyof TData]?: boolean };
+}): Writable<TData> {
+  const store = getContext<Writable<TQuery>>("queryStore");
+  const result = writable(config.get(get(store)), (set) =>
+    store.subscribe((value) => set(config.get(value))),
+  );
+
+  let triggered = new Date().getTime();
+
+  result.set = (value: TData): void => {
+    const curr = new Date().getTime();
+    triggered = curr;
+    const validated: { [key in keyof TData]?: boolean } = config.valid?.(value) ?? {};
+    const valid = !Object.values(validated).includes(false);
+
+    if (!valid) {
+      return;
+    }
+
+    setTimeout(() => {
+      if (curr !== triggered) {
+        return;
+      }
+
+      goto(
+        new URLExtended(window.location.pathname, {
+          base: window.location.origin,
+          query: config.set(value),
+        }),
+        { keepFocus: true, noScroll: true, replaceState: true, invalidateAll: false },
+      );
+    }, 1000);
+  };
+
+  return result;
+}

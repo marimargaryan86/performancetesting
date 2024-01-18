@@ -15,9 +15,12 @@
   import { invalidateAll } from "$app/navigation";
   import type { User } from "integration/ory/schemas/authentication";
   import { setUser } from "utils/permissions";
+  import { setQueryStore } from "stores/query-store";
+  import { page } from "$app/stores";
 
   export let data;
 
+  const queryStore = setQueryStore($page.url.searchParams);
   const user = setUser(writable<User>(data.user));
   const locale = setLocale(writable(data.locale));
   const localeData = setLocaleData(writable(data.localeData));
@@ -26,6 +29,7 @@
   let logoutTimer: number | undefined = undefined;
   let prevLocale = data.locale;
 
+  $: $queryStore = Object.fromEntries($page.url.searchParams);
   $: $timeFormat = data.timeFormat;
   $: $user = data.user as unknown as User;
   $: $localeData = data.localeData;

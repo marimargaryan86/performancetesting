@@ -1,8 +1,4 @@
 import type { z } from "zod";
-import { get, writable, type Writable } from "svelte/store";
-import { browser } from "$app/environment";
-import queryStore from "stores/query-store";
-import { ensureDefined } from "./array";
 
 export class URLExtended<
   TQuery extends Record<
@@ -46,48 +42,4 @@ export class URLExtended<
       }
     });
   }
-}
-
-type Setter<TData> = (value: TData, navigate?: boolean) => void;
-
-/**
- * Creates a query store
- *
- * @param serialize Serialize the store value into a query compatible structure
- * @param deserialize Serialize the url query to a desired format
- * @returns A writable query store
- */
-export function createQueryStore<
-  TData extends Record<string, unknown>,
-  TQuery extends Record<string, string | undefined>,
->(serialize: (data: TData) => TQuery, deserialize: (query: TQuery) => TData): Writable<TData> {
-  if (!browser) {
-    return writable({} as TData);
-  }
-
-  const store = writable<TData>(deserialize(get(queryStore) as TQuery), () =>
-    queryStore.subscribe((value) => {
-      (store.set as Setter<TData>)(deserialize(value as TQuery), false);
-    }),
-  );
-
-  const { set } = store;
-
-  store.set = (value: TData, navigate = true): void => {
-    if (!navigate) {
-      return set(value);
-    }
-
-    const serialized = serialize(value);
-
-    queryStore.set(
-      Object.fromEntries(
-        Object.entries(serialized)
-          .map(([key, val]) => (val === undefined ? undefined : [key, val]))
-          .filter(ensureDefined),
-      ),
-    );
-  };
-
-  return store;
 }
