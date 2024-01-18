@@ -57,12 +57,12 @@ class OffersRequestBuilder(object):
         private_fares: Mapping[str, Sequence[PrivateFare]] | None = None,
     ) -> OffersRequestBuilder:
         for passenger in offer.passengers:
-            self.add_passenger(
-                OfferRequestPassenger(
-                    pax_type=passenger.passenger_type,
-                    age=passenger.age,
-                ),
+            request_passenger = (
+                OfferRequestPassenger(age=passenger.age)
+                if passenger.age
+                else OfferRequestPassenger(pax_type=passenger.passenger_type)
             )
+            self.add_passenger(request_passenger)
 
         self.private_fares = private_fares
 
