@@ -10,7 +10,7 @@
   export let company: Company | undefined;
   export let title: string;
   export let price: Price;
-  export let breakdownList: PriceBreakdown[];
+  export let breakdownList: PriceBreakdown[] | undefined = undefined;
   export let markupsTask: Promise<Markups | undefined> | undefined = undefined;
 
   const locale = getLocale();
@@ -49,13 +49,15 @@
     </span>
 
     <div class="breakdown" typography="label-medium">
-      {#each breakdownList as breakdown}
-        <span>{$i18n.priceBreakdownTypes[breakdown.type]}</span>
-        <strong>
-          {formatAmount(breakdown.price, { locale: $locale })}
-          <em typography="body-xsmall">{breakdown.price.currency}</em>
-        </strong>
-      {/each}
+      {#if breakdownList}
+        {#each breakdownList as breakdown}
+          <span>{$i18n.priceBreakdownTypes[breakdown.type]}</span>
+          <strong>
+            {formatAmount(breakdown.price, { locale: $locale })}
+            <em typography="body-xsmall">{breakdown.price.currency}</em>
+          </strong>
+        {/each}
+      {/if}
 
       {#if markupsTask}
         {#await markupsTask}

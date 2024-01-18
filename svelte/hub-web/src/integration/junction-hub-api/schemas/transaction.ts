@@ -19,6 +19,8 @@ export type Transaction = {
     quotation: Money;
     /** The amount Junction PAY will need to collect in the payers currency to cover what Junction PAY owes to a beneficiary */
     baseConverted: Money;
+    /** This is the total transaction amount including ticket price and markups */
+    totalAmount: Money;
   };
   fx: {
     /** The monetary value of the fx markup for a specific transaction for Junction PAY */
@@ -70,6 +72,7 @@ export type TransactionSchema = {
       salesMargin: MoneySchema;
       fxMargin: MoneySchema;
       processingMargin: MoneySchema;
+      totalAmount: MoneySchema;
     };
     rates: {
       fxQuote: number;
@@ -106,6 +109,7 @@ export const transactionParser = {
         beneficiary: moneyParser.toModel(data.attributes.amounts.beneficiary),
         quotation: moneyParser.toModel(data.attributes.amounts.quotation),
         baseConverted: moneyParser.toModel(data.attributes.amounts.baseConverted),
+        totalAmount: moneyParser.toModel(data.attributes.amounts.totalAmount),
       },
       fx: {
         margin: moneyParser.toModel(data.attributes.amounts.fxMargin),

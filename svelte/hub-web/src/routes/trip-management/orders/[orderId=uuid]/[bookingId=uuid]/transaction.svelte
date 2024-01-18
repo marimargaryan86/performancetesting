@@ -50,14 +50,13 @@
 
         <Company
           company={transaction.beneficiary}
-          price={booking.price.total}
-          breakdownList={booking.price.breakdown}
+          price={transaction.amounts.beneficiary}
           title={$i18n.words.provider}
         />
 
         <Company
           company={transaction.payer}
-          price={booking.price.total}
+          price={transaction.amounts.totalAmount}
           breakdownList={booking.price.breakdown}
           {markupsTask}
           title={$i18n.words.reseller}
