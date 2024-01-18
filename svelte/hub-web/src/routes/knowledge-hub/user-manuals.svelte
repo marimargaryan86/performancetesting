@@ -5,7 +5,8 @@
 
   const i18n = getLocaleData();
 
-  const downloadUrl = `https://file.notion.so/f/f/5b14a1b1-b088-42e9-a68f-d2dd3d227cf1/042cc0ea-3223-4bff-a022-8715b8e1ff53/Untitled.pdf?id=d08ceb41-73ce-47b7-a338-f1aafb85ba2e&table=block&spaceId=5b14a1b1-b088-42e9-a68f-d2dd3d227cf1&expirationTimestamp=1705406400000&signature=xuI6Wi0S1GTndZ4l2GBTnQn19k3HpmSRg2lZWCssFC8&downloadName=Untitled.pdf`;
+  const downloadUrl =
+    "https://snowfall-public-files.s3.eu-north-1.amazonaws.com/junction/Junction+Hub+-+User+Manual+(ES).pdf";
 </script>
 
 <section>
