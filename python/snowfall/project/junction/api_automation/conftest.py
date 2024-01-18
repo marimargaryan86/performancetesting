@@ -2,11 +2,13 @@ import base64
 import datetime
 import json
 import logging
+import re
 import tempfile
 import urllib
 from collections.abc import (
     AsyncGenerator,
     Callable,
+    Generator,
     Iterator,
     Mapping,
     Sequence,
@@ -15,6 +17,7 @@ from itertools import starmap
 from pathlib import Path
 from typing import Any
 
+import allure
 import boto3
 import httpx
 import hvac
@@ -24,6 +27,7 @@ from pymongo import MongoClient
 from snowfall.project.junction.api_automation.test_functions.mobile_client import (
     MobileApiClient,
 )
+from snowfall.stdlib import string
 from snowfall.stdlib.transport.http import auth
 
 ALLURE_ENVIRONMENT_PROPERTIES_FILE = "environment.properties"
@@ -121,6 +125,14 @@ def stripe_api_key(
     return get_variable_value(host, api_token, "stripe_api_key")
 
 
+@pytest.fixture()
+def sentry_url(
+    api_token: str,
+    host: str,
+) -> str:
+    return get_variable_value(host, api_token, "sentry_url")
+
+
 def pytest_collection_modifyitems(
     config: pytest.Config,
     items: Sequence[pytest.Item],
@@ -143,13 +155,13 @@ def pytest_collection_modifyitems(
 def mobile_client(
     api_token: str,
     host: str,
+    sentry_url: str,
 ) -> MobileApiClient:
     api_url = "{0}{1}".format(
         HTTPS_PREFIX,
         get_variable_value(host, api_token, "mobile_api_host"),
     )
     mobile_token = get_variable_value(host, api_token, "mobile_api_token")
-    sentry_url = get_variable_value(host, api_token, "sentry_url")
     client_timeout = 20
 
     return MobileApiClient(
@@ -232,6 +244,42 @@ def _save_properties_to_allure_file(
         "departures_after",
         departures_after,
     )
+
+
+@pytest.fixture(autouse=True)
+def _generate_sentry_url(
+    sentry_url: str,
+) -> Generator[None, None, None]:
+    while logger.hasHandlers():
+        logger.handlers[0].close()
+        logger.removeHandler(logger.handlers[0])
+    fh = logging.FileHandler("{0}.log".format(string.uuid()))
+    tmp_log_file = fh.baseFilename
+    fh.setLevel(logging.DEBUG)
+    logger.addHandler(fh)
+    yield
+    if logger.root.hasHandlers():
+        logfile_path = Path(tmp_log_file)
+        with logfile_path.open() as log_file:
+            log_history = log_file.read().split("\n")
+            x_request_id_logs = [
+                re.search("(b'X-Request-Id', b'(.+?)')", log_line)
+                for log_line in log_history
+                if "X-Request-Id" in log_line
+            ]
+            trace_ids = [
+                x_request_id.group(2)
+                for x_request_id in x_request_id_logs
+                if x_request_id
+            ]
+        if trace_ids:
+            allure.attach(
+                "{0}?query=trace%3A%5B{1}%5D".format(
+                    sentry_url,
+                    "%2C".join(trace_ids),
+                ),
+                "Sentry for all trace IDs",
+            )
 
 
 @pytest.fixture()
