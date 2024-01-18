@@ -1,5 +1,5 @@
 import * as devalue from "devalue";
-import { error, type RequestEvent } from "@sveltejs/kit";
+import { error, type MaybePromise, type RequestEvent } from "@sveltejs/kit";
 import { ensureJunctionError } from "integration/common/junction-error";
 import { browser } from "$app/environment";
 
@@ -28,7 +28,7 @@ type ServerServiceFactory<TClient extends Record<string, AnyFunc>> = (mapping: {
   [key in keyof TClient]: (
     event: RequestEvent,
     ...args: Parameters<TClient[key]>
-  ) => ReturnType<TClient[key]>;
+  ) => MaybePromise<Awaited<ReturnType<TClient[key]>>>;
 }) => (event: RequestEvent) => Promise<Response>;
 
 /**
@@ -42,7 +42,7 @@ type ServerServiceFactory<TClient extends Record<string, AnyFunc>> = (mapping: {
 function getFetchFunc(route: string, action: string, func: AnyFunc): AnyFunc {
   if (!browser) {
     return () => {
-      //
+      throw new Error("Cannot be called on the server");
     };
   }
 
@@ -59,7 +59,7 @@ function getFetchFunc(route: string, action: string, func: AnyFunc): AnyFunc {
       return devalue.parse(await resp.text());
     }
 
-    throw new Error(`Service error (${resp.statusText})`);
+    throw new Error(`Service error (${resp.statusText}): ${await resp.text()}`);
   };
 }
 

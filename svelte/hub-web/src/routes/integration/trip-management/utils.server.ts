@@ -21,7 +21,20 @@ function getBookingSession(event: RequestEvent): BookingSessionModel {
   }
 }
 
+function offersEqual(
+  offerA: BookingSessionModel["selected"],
+  offerB: BookingSessionModel["selected"],
+): boolean {
+  return Boolean(
+    offerA &&
+      offerB &&
+      offerA.offerId === offerB.offerId &&
+      JSON.stringify(offerA.optionIds) === JSON.stringify(offerB.optionIds),
+  );
+}
+
 export default {
+  offersEqual,
   setBookingSession,
   getBookingSession,
 };

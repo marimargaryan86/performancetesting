@@ -1,14 +1,15 @@
 import integrationInstances from "integration-instances";
 import type { Offer } from "integration/junction-mobile-api/schemas/offer";
 import type { Place } from "integration/junction-mobile-api/schemas/place";
-import tripManagement, {
-  type BookingSessionModel,
-  type SearchDataModel,
+import type {
+  BookingSessionModel,
+  SearchDataModel,
 } from "../../../integration/trip-management/trip-management";
 import utils from "../../../integration/trip-management/utils.server";
 import { redirect } from "@sveltejs/kit";
 import routeConfig from "routeConfig";
 import type { ResourceStatus } from "integration/common/schemas/resource";
+import { getOffers } from "../../../integration/trip-management/trip-management.server";
 
 export async function load(event): Promise<{
   searchData: SearchDataModel;
@@ -30,7 +31,7 @@ export async function load(event): Promise<{
     const { searchData } = bookingSession;
 
     const [offers, origin, destination] = await Promise.all([
-      tripManagement.getOffers(event),
+      getOffers(event),
       integrationInstances.junctionMobileApi.places.get({ session, id: searchData.origin.id }),
       integrationInstances.junctionMobileApi.places.get({
         session,

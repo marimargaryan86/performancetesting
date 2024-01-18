@@ -1,5 +1,4 @@
 import integrationInstances from "integration-instances";
-import { error } from "@sveltejs/kit";
 import { cookieStore } from "stores/cookie-store.server";
 import { serverServiceFactory } from "../../framework";
 import accountRecoveryService from "./account-recovery-service";
@@ -11,7 +10,7 @@ export const POST = factory({
     const recovery = cookieStore.recoveryToken.get(event);
 
     if (!recovery) {
-      throw error(400);
+      throw new Error("Bad request");
     }
 
     try {
@@ -24,9 +23,9 @@ export const POST = factory({
       }
 
       return result;
-    } catch {
+    } catch (err) {
       cookieStore.recoveryToken.delete(event);
-      throw error(400);
+      throw err;
     }
   },
 });

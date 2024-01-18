@@ -1,10 +1,7 @@
-import * as devalue from "devalue";
 import type { RouteId } from "./$types";
-import { URLExtended } from "utils/url";
 import { z } from "zod";
 import { passengerPickerData } from "../../trip-management/components/trip-search/passenger-picker/passenger-picker.svelte";
 import type { Offer } from "integration/junction-mobile-api/schemas/offer";
-import type { RequestEvent } from "@sveltejs/kit";
 import { sleep } from "utils/common";
 import { paymentModel, type Payment } from "integration/junction-mobile-api/schemas/payment";
 import type { OrderCreate, Order } from "integration/junction-mobile-api/schemas/order";
@@ -13,8 +10,7 @@ import type { MarkupsCreate } from "integration/junction-mobile-api/schemas/mark
 import { priceModel } from "integration/common/schemas/price";
 import { resourceStatus, type ResourceStatus } from "integration/common/schemas/resource";
 import { coordinatesSearchableModel } from "integration/common/schemas/point";
-
-const ROUTE: RouteId = "/integration/trip-management";
+import { clientServiceFactory } from "../framework";
 
 const point = coordinatesSearchableModel.extend({
   id: z.string(),
@@ -62,35 +58,44 @@ export const bookingSessionModel = z
   .partial();
 export type BookingSessionModel = z.infer<typeof bookingSessionModel>;
 
-async function search(data: Partial<SearchDataModel>): Promise<void> {
-  const parsed = searchDataModel.parse(data);
-  const url = new URLExtended(ROUTE, { base: origin, query: { action: "search" } });
-  const resp = await fetch(url, { method: "POST", body: devalue.stringify(parsed) });
+type Service = {
+  search(data: SearchDataModel): Promise<void>;
+  getOffers(): Promise<{ data: Offer[]; status: ResourceStatus }>;
+  selectOffer(selectedOffer: NonNullable<BookingSessionModel["selected"]>): Promise<void>;
+  getPriceQuote(): Promise<TripOfferPriceQuote>;
+  getPaymentIntent(): Promise<Payment>;
+  createOrder(
+    data: OrderCreate,
+  ): Promise<
+    { success: true; order: Order } | { success: false; errors: z.ZodFormattedError<unknown> }
+  >;
+  confirmPayment(): Promise<void>;
+  createOrderMarkups(
+    data: MarkupsCreate,
+  ): Promise<
+    | { success: true; order: MarkupsCreate }
+    | { success: false; errors: z.ZodFormattedError<unknown> }
+  >;
+};
 
-  if (resp.status !== 204) {
-    throw new Error("Failed to search");
-  }
-}
+const factory = clientServiceFactory<Service, RouteId>("/integration/trip-management");
 
-async function getOffers(event?: RequestEvent): Promise<{ data: Offer[]; status: ResourceStatus }> {
-  const url = new URLExtended(ROUTE, {
-    base: event?.url.origin ?? origin,
-    query: { action: "get-offers" },
-  });
-  const resp = await (event?.fetch ?? fetch)(url);
-
-  if (resp.status !== 200) {
-    throw new Error("Failed to get offers");
-  }
-
-  return devalue.parse(await resp.text());
-}
+export const methods = factory({
+  confirmPayment: () => [],
+  createOrder: (data: OrderCreate) => [data],
+  createOrderMarkups: (data: MarkupsCreate) => [data],
+  getOffers: () => [],
+  getPaymentIntent: () => [],
+  getPriceQuote: () => [],
+  search: (data: SearchDataModel) => [data],
+  selectOffer: (selectedOffer: NonNullable<BookingSessionModel["selected"]>) => [selectedOffer],
+});
 
 async function* yieldOffersAux(
   signal: { cancelled: boolean },
   ids: string[] = [],
 ): AsyncGenerator<Offer> {
-  const result = await getOffers();
+  const result = await methods.getOffers();
   const offers = result.data.filter((item) => !ids.includes(item.id));
   const nextIds = [...ids, ...offers.map((item) => item.id)];
 
@@ -111,101 +116,19 @@ function yieldOffers(signal: { cancelled: boolean }): AsyncGenerator<Offer> {
   return yieldOffersAux(signal);
 }
 
-async function selectOffer(
-  selectedOffer: NonNullable<BookingSessionModel["selected"]>,
-): Promise<void> {
-  if (!selectedOffer.optionIds.length) {
-    throw new Error("No option selected");
-  }
-
-  const url = new URLExtended(ROUTE, { base: origin, query: { action: "select-offer" } });
-  const resp = await fetch(url, {
-    method: "POST",
-    body: devalue.stringify(selectedOffer),
-  });
-
-  if (resp.status !== 204) {
-    throw new Error("Failed to select offer");
-  }
-}
-
-async function getPriceQuote(): Promise<TripOfferPriceQuote> {
-  const url = new URLExtended(ROUTE, { base: origin, query: { action: "get-price-quote" } });
-  const resp = await fetch(url);
-
-  if (resp.status !== 200) {
-    throw new Error("Failed to get price quote");
-  }
-
-  return devalue.parse(await resp.text());
-}
-
-async function getPaymentIntent(): Promise<Payment> {
-  const url = new URLExtended(ROUTE, { base: origin, query: { action: "get-payment-intent" } });
-  const resp = await fetch(url);
-
-  if (resp.status !== 200) {
-    throw new Error("Failed to get payment intent");
-  }
-
-  return devalue.parse(await resp.text());
-}
-
-async function createOrder(
-  data: OrderCreate,
-): Promise<
-  { success: true; order: Order } | { success: false; errors: z.ZodFormattedError<unknown> }
-> {
-  const url = new URLExtended(ROUTE, { base: origin, query: { action: "create-order" } });
-  const resp = await fetch(url, { method: "POST", body: devalue.stringify(data) });
-
-  if (resp.status === 422) {
-    return { success: false, errors: devalue.parse(await resp.text()) };
-  }
-
-  if (resp.status !== 201) {
-    throw new Error("Failed to create order");
-  }
-
-  return { success: true, order: devalue.parse(await resp.text()) };
-}
-
-async function confirmPayment(): Promise<void> {
-  const url = new URLExtended(ROUTE, { base: origin, query: { action: "confirm-payment" } });
-  const resp = await fetch(url, { method: "POST" });
-
-  if (resp.status !== 200) {
-    throw new Error("Failed to confirm payment");
-  }
-}
-
-async function createOrderMarkups(
-  data: MarkupsCreate,
-): Promise<
-  { success: true; order: MarkupsCreate } | { success: false; errors: z.ZodFormattedError<unknown> }
-> {
-  const url = new URLExtended(ROUTE, { base: origin, query: { action: "create-order-markups" } });
-  const resp = await fetch(url, { method: "POST", body: devalue.stringify(data) });
-
-  if (resp.status === 422) {
-    return { success: false, errors: devalue.parse(await resp.text()) };
-  }
-
-  if (resp.status !== 201) {
-    throw new Error("Failed to create order markups");
-  }
-
-  return { success: true, order: devalue.parse(await resp.text()) };
-}
+type SearchMethod = (typeof methods)["search"];
+type SelectOfferMethod = (typeof methods)["selectOffer"];
 
 export default {
-  search,
-  getOffers,
+  ...methods,
+  search: (data: Partial<SearchDataModel>): ReturnType<SearchMethod> =>
+    methods.search(searchDataModel.parse(data)),
   yieldOffers,
-  selectOffer,
-  getPriceQuote,
-  getPaymentIntent,
-  createOrder,
-  confirmPayment,
-  createOrderMarkups,
+  selectOffer: (...params: Parameters<SelectOfferMethod>): ReturnType<SelectOfferMethod> => {
+    if (!params[0].optionIds.length) {
+      throw new Error("No option selected");
+    }
+
+    return methods.selectOffer(...params);
+  },
 };

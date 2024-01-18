@@ -1,4 +1,3 @@
-import { error } from "@sveltejs/kit";
 import integrationInstances from "integration-instances";
 import { cookieStore } from "stores/cookie-store.server";
 import { serverServiceFactory } from "../../framework";
@@ -14,7 +13,7 @@ export const POST = factory({
     const login = cookieStore.loginToken.get(event);
 
     if (!login) {
-      throw error(400);
+      throw new Error("Bad request");
     }
 
     try {
@@ -30,7 +29,7 @@ export const POST = factory({
         );
 
         if (!sessionCookie) {
-          throw error(401);
+          throw new Error("Unauthorized");
         }
 
         const cookieOpts = { maxAge: rememberMe ? EXPIRY_MAX_AGE : undefined };
@@ -48,7 +47,7 @@ export const POST = factory({
 
       return result;
     } catch {
-      throw error(401);
+      throw new Error("Unauthorized");
     }
   },
   async logout(event) {
