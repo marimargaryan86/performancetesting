@@ -98,6 +98,7 @@ class TestZendeskClient(object):
                 departure_at=message.body.departure_at,
             ),
             group_id=123,
+            provider_name="Mock",
         )
 
         assert fetch_booked_ticket_payload

@@ -72,10 +72,13 @@ class ZendeskClient(client.HttpClient):
         self,
         ticket: ticket_request_models.Ticket,
         group_id: int,
+        provider_name: str,
     ) -> dict[str, Any]:
         return {
             "ticket": {
-                "subject": "Reservation created by Junction",
+                "subject": "Failed Booking Ticket Retrieval - {0}".format(
+                    provider_name,
+                ),
                 "comment": {
                     "html_body": parsers.parse_fetch_booked_ticket_body(
                         ticket=ticket,

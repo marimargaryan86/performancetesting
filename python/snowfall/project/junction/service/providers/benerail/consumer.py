@@ -158,6 +158,7 @@ class NotificationsConsumer(object):
                     departure_at=message.body.departure_at,
                 ),
                 group_id=self._zendesk_booked_ticket_group_id,
+                provider_name=_PROVIDER_NAME,
             ),
         )
 
