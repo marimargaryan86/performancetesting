@@ -18,15 +18,15 @@
   "x-tagGroups": [
     {
       "name": "Internal",
-      "tags": [
-        "internal"
-      ]
+      "tags": ["internal"]
     },
     {
       "name": "Tokens",
-      "tags": [
-        "tokens"
-      ]
+      "tags": ["tokens"]
+    },
+    {
+      "name": "Recommendation",
+      "tags": ["recommendations"]
     }
   ],
   "tags": [
@@ -34,6 +34,11 @@
       "name": "internal",
       "description": "Endpoints not for public use.",
       "x-displayName": "Internal"
+    },
+    {
+      "name": "recommendations",
+      "description": "Endpoints for generating trip recommendations.",
+      "x-displayName": "Recommendation"
     },
     {
       "name": "tokens",
@@ -46,9 +51,7 @@
       "get": {
         "security": [],
         "summary": "Health",
-        "tags": [
-          "internal"
-        ],
+        "tags": ["internal"],
         "responses": {
           "200": {
             "description": "OK",
@@ -67,26 +70,18 @@
                   "properties": {
                     "meta": {
                       "type": "object",
-                      "required": [
-                        "status"
-                      ],
+                      "required": ["status"],
                       "properties": {
                         "status": {
                           "type": "string",
                           "description": "Health status",
-                          "enum": [
-                            "pass",
-                            "fail",
-                            "warn"
-                          ],
+                          "enum": ["pass", "fail", "warn"],
                           "example": "pass"
                         }
                       }
                     }
                   },
-                  "required": [
-                    "meta"
-                  ]
+                  "required": ["meta"]
                 }
               }
             }
@@ -100,9 +95,7 @@
     "/push-notifications/tokens": {
       "patch": {
         "summary": "Update push notification token for subscriber",
-        "tags": [
-          "tokens"
-        ],
+        "tags": ["tokens"],
         "operationId": "patch-push-notifications-tokens",
         "description": "Used from the push notification channel.",
         "requestBody": {
@@ -129,6 +122,54 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/recommendation": {
+      "post": {
+        "summary": "Generate trip recommendation",
+        "tags": ["recommendations"],
+        "operationId": "post-recommendation",
+        "description": "Used to generate a trip itinerary and summary for the caller.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/TripRecommendationBody"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/TripResponseBody"
+                    }
+                  },
+                  "required": ["data"]
+                },
+                "examples": {}
+              }
+            }
+          },
+          "204": {
+            "description": "No content"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           }
         }
       }
@@ -187,10 +228,7 @@
             "type": "object"
           }
         },
-        "required": [
-          "status",
-          "detail"
-        ]
+        "required": ["status", "detail"]
       },
       "PushNotificationToken": {
         "title": "Token",
@@ -204,9 +242,7 @@
           "type": {
             "type": "string",
             "example": "push-notification-tokens",
-            "enum": [
-              "push-notification-tokens"
-            ]
+            "enum": ["push-notification-tokens"]
           },
           "attributes": {
             "type": "object",
@@ -220,10 +256,103 @@
                 "example": "+991122334455"
               }
             },
+            "required": ["token", "mobilePhone"]
+          }
+        }
+      },
+      "TripRecommendationBody": {
+        "title": "RecommendationBody",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "271f6d54-9e59-407e-a860-b0771d9e3d26",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "example": "trip-recommendation-body",
+            "enum": ["trip-recommendation-body"]
+          },
+          "attributes": {
+            "type": "object",
+            "properties": {
+              "preferences": {
+                "type": "array",
+                "example": ["preferences"],
+                "items": {
+                  "type": "string",
+                  "example": "preferences"
+                }
+              },
+              "locations": {
+                "type": "array",
+                "example": ["locations"],
+                "items": {
+                  "type": "string",
+                  "example": "locations"
+                }
+              },
+              "dateFrom": {
+                "type": "string",
+                "example": "2020-01-01",
+                "format": "date"
+              },
+              "dateTo": {
+                "type": "string",
+                "example": "2020-01-01",
+                "format": "date"
+              },
+              "budget": {
+                "type": "number",
+                "example": 20
+              }
+            },
             "required": [
-              "token",
-              "mobilePhone"
+              "budget",
+              "dateFrom",
+              "dateTo",
+              "locations",
+              "preferences"
             ]
+          }
+        }
+      },
+      "TripResponseBody": {
+        "title": "Response Body for Trip",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "271f6d54-9e59-407e-a860-b0771d9e3d26",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "example": "trip-response-body",
+            "enum": ["trip-response-body"]
+          },
+          "attributes": {
+            "type": "object",
+            "properties": {
+              "itinerary": {
+                "type": "array",
+                "example": ["itinerary"],
+                "items": {
+                  "type": "string",
+                  "example": "itinerary"
+                }
+              },
+              "summary": {
+                "type": "array",
+                "example": ["summary"],
+                "items": {
+                  "type": "string",
+                  "example": "summary"
+                }
+              }
+            },
+            "required": ["itinerary", "summary"]
           }
         }
       }
@@ -245,9 +374,7 @@
                   }
                 }
               },
-              "required": [
-                "errors"
-              ]
+              "required": ["errors"]
             }
           }
         }
@@ -268,9 +395,7 @@
                   }
                 }
               },
-              "required": [
-                "errors"
-              ]
+              "required": ["errors"]
             }
           }
         }
@@ -282,9 +407,8 @@
         "scheme": "bearer"
       }
     }
-
   },
-    "security": [
+  "security": [
     {
       "jwt": []
     }
