@@ -28,6 +28,7 @@
 <TextField
   bind:value
   {placeholder}
+  role="searchbox"
   class="search-field {expanded ? 'expanded' : ''}"
   on:focus={focus}
   on:blur={blur}

@@ -115,7 +115,7 @@
                   label={node.meta.label?.text}
                   name={node.attributes.name}
                   required={node.attributes.required}
-                  type={node.attributes.type}
+                  type={node.attributes.name === "identifier" ? "email" : node.attributes.type}
                   value={node.attributes.value}
                   error={nodeError.length ? nodeError : undefined}
                 />

@@ -138,6 +138,7 @@
     {required}
     {label}
     {placeholder}
+    role="combobox"
     readonly={readonly || !search}
     on:input={input}
     on:click={toggle}

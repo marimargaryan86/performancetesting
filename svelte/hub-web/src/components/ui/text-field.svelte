@@ -1,13 +1,11 @@
-<script
-  lang="ts"
-  generics="TType extends 'text' | 'tel' | 'password' | 'email' | 'number' | 'date' = 'text'"
->
+<script lang="ts" generics="TType extends HTMLInputAttributes['type'] = 'text'">
   /* global TType */
   import Icon from "components/icons/icon.svelte";
   import { getLocale } from "i18n";
   import { slideFade } from "transitions/slide-fade";
   import { createEventDispatcher } from "svelte";
   import { getRandomId } from "utils/random";
+  import type { AriaRole, HTMLInputAttributes } from "svelte/elements";
 
   type InputEvent = Event & { currentTarget: EventTarget & HTMLInputElement };
   type TValue = TType extends "number" ? number : TType extends "date" ? Date : string;
@@ -17,24 +15,32 @@
   export { className as class };
   export let id = getRandomId("text-field");
   export let label: string | undefined = undefined;
-  export let placeholder: string | undefined = undefined;
+  export let placeholder: HTMLInputAttributes["placeholder"] = undefined;
   export let type: TType = "text" as TType;
   export let value: TValue | undefined = undefined;
   export let clearValue: TValue | undefined = undefined;
   export let error: string | string[] | boolean = false;
-  export let name: string | undefined = undefined;
+  export let name: HTMLInputAttributes["name"] = undefined;
   export let readonly = false;
   export let required = false;
   export let helpText: string | undefined = undefined;
   export let clearable = false;
-  export let maxLength: number | undefined = undefined;
-  export let min: string | number | undefined = undefined;
-  export let max: string | number | undefined = undefined;
-  export let step: string | number | undefined = undefined;
-  export let autocomplete: string | undefined = undefined;
+  export let maxlength: HTMLInputAttributes["maxlength"] = undefined;
+  export let min: HTMLInputAttributes["min"] = undefined;
+  export let max: HTMLInputAttributes["max"] = undefined;
+  export let step: HTMLInputAttributes["step"] = undefined;
+  export let autocomplete: HTMLInputAttributes["autocomplete"] = undefined;
   export let disabled = false;
+  export let role: AriaRole = "textbox";
+  export let ignorePasswordManagers: boolean | undefined = undefined;
 
   let inputRef: HTMLInputElement;
+
+  // Since type isn't populated directly we need to evaluate it during render
+  let ignorePasswordManagersValue =
+    typeof ignorePasswordManagers === "boolean"
+      ? ignorePasswordManagers
+      : !["password", "email"].includes(type as string);
 
   const locale = getLocale();
   const dispatch = createEventDispatcher<{ input: HTMLInputElement; clear: void }>();
@@ -47,7 +53,9 @@
     } else if (type === "date") {
       const nextValue = new Date(event.currentTarget.value);
 
-      value = isNaN(nextValue.getTime()) ? undefined : (nextValue as TValue);
+      if (!isNaN(nextValue.getTime())) {
+        value = nextValue as TValue;
+      }
     } else {
       value = event.currentTarget.value as TValue;
     }
@@ -66,11 +74,12 @@
 
   $: displayValue = value instanceof Date ? value.toLocaleDateString($locale) : value ?? "";
   $: displayError = error instanceof Array ? error.join(", ") : error;
+  $: ariaDescribedBy = typeof displayError === "string" ? `${id}-error` : `${id}-help-text`;
 </script>
 
 <div class:text-field={true} class={className} class:error>
   {#if label}
-    <label for={id}>
+    <label id="{id}-label" for={id}>
       {label}
       {#if required}
         <span>*</span>
@@ -89,13 +98,13 @@
       {id}
       {type}
       {name}
+      {role}
       {readonly}
       {placeholder}
-      maxlength={maxLength}
+      {maxlength}
       {min}
       {max}
       {step}
-      {autocomplete}
       {disabled}
       value={displayValue}
       on:click
@@ -104,6 +113,19 @@
       on:input={onInput}
       bind:this={inputRef}
       typography="body-medium"
+      autocomplete={autocomplete ?? "off"}
+      list={autocomplete ? "" : "autocompleteOff"}
+      spellcheck={Boolean(autocomplete)}
+      autocapitalize={autocomplete ? "off" : undefined}
+      autocorrect={autocomplete ? "off" : undefined}
+      aria-invalid={typeof displayError === "string" ? "true" : undefined}
+      aria-autocomplete={autocomplete ? "list" : "none"}
+      aria-describedby={ariaDescribedBy}
+      aria-required={required}
+      aria-labelledby={label ? `${id}-label` : undefined}
+      aria-disabled={disabled}
+      data-1p-ignore={ignorePasswordManagersValue}
+      data-lpignore={ignorePasswordManagersValue}
     />
 
     {#if clearable && value}
@@ -116,11 +138,15 @@
   </div>
 
   {#if !displayError && helpText}
-    <span class="help-text" transition:slideFade={{ duration: 300 }}>{helpText}</span>
+    <span id="{id}-help-text" class="help-text" transition:slideFade={{ duration: 300 }}
+      >{helpText}</span
+    >
   {/if}
 
   {#if typeof displayError === "string"}
-    <span class="error-message" transition:slideFade={{ duration: 300 }}>{displayError}</span>
+    <span id="{id}-error" class="error-message" transition:slideFade={{ duration: 300 }}
+      >{displayError}</span
+    >
   {/if}
 </div>
 

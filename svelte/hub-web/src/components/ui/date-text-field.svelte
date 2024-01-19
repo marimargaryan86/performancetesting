@@ -73,6 +73,6 @@
   {label}
   {required}
   {error}
-  maxLength={10}
+  maxlength={10}
   on:input={update}
 />

@@ -78,7 +78,7 @@
             disabled={node.attributes.disabled}
             required={node.attributes.required}
             label={node.meta.label?.text}
-            type={node.attributes.type}
+            type={node.attributes.name === "identifier" ? "email" : node.attributes.type}
             name={node.attributes.name}
             value={node.attributes.value ?? ""}
             placeholder={node.meta.label?.text ? `Enter ${node.meta.label.text}` : undefined}
