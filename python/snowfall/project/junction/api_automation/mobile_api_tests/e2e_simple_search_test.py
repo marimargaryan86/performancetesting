@@ -5,7 +5,6 @@ from typing import Any
 
 import allure
 import pytest
-from pymongo import MongoClient
 
 from snowfall.project.junction.api_automation.test_functions.helper import (
     stripe_confirmation,
@@ -155,10 +154,10 @@ providers = [
 ]
 
 
+@pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
 @pytest.mark.integration()
 @pytest.mark.parametrize("places_pairs", places_pairs, ids=providers)
 async def test_simple_search(  # noqa: WPS217, WPS218, PLR0915
-    mongo_client: MongoClient[Any],
     mobile_client: MobileApiClient,
     places_pairs: Sequence[str],
     departure_after: datetime,

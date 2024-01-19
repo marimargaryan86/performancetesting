@@ -158,6 +158,7 @@ ids = [
 ]
 
 
+@pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
 @pytest.mark.integration()
 @pytest.mark.parametrize("iata_codes", iata_codes, ids=ids)
 async def test_offers_old_flow(  # noqa: WPS217
