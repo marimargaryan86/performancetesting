@@ -79,7 +79,7 @@ def _process_passenger_name_record_filter(
     return [
         orders_pb2.ListJourneysRequest.JourneyFilter(
             operator="eq",
-            passenger_name_record=passenger_name_record_filter,
+            passenger_name_record=passenger_name_record_filter.strip().upper(),
         ),
     ]
 
@@ -87,13 +87,16 @@ def _process_passenger_name_record_filter(
 def _process_last_name_filter(
     request: requests.Request,
 ) -> list[orders_pb2.ListJourneysRequest.JourneyFilter]:
-    last_name_filter = request.query_params.get("filter[passengerLastName][like]")
+    last_name_filter = request.query_params.get(
+        "filter[passengerLastName][eq]",
+    ) or request.query_params.get("filter[passengerLastName][like]")
+
     if last_name_filter is None:
         return []
 
     return [
         orders_pb2.ListJourneysRequest.JourneyFilter(
             operator="like",
-            last_name=last_name_filter,
+            last_name=last_name_filter.strip(),
         ),
     ]

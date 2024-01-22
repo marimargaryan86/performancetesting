@@ -1195,7 +1195,10 @@
             "$ref": "#/components/parameters/filterByStatus"
           },
           {
-            "$ref": "#/components/parameters/filterByPassengerLastName"
+            "$ref": "#/components/parameters/filterByPassengerLastNameLike"
+          },
+          {
+            "$ref": "#/components/parameters/filterByPassengerLastNameEquals"
           },
           {
             "$ref": "#/components/parameters/filterByPassengerNameRecord"
@@ -3401,16 +3404,28 @@
         "style": "form",
         "explode": false
       },
-      "filterByPassengerLastName": {
+      "filterByPassengerLastNameLike": {
         "name": "filter[passengerLastName][like]",
         "in": "query",
         "required": false,
-        "description": "Filter for journeys based on passenger's last name.",
+        "description": "Filter for journeys based on a partial match of the passenger's last name. Use for names with 3 or more characters.",
         "schema": {
           "minLength": 3,
           "type": "string",
           "example":"Doe"
         }
+      },
+      "filterByPassengerLastNameEquals": {
+        "name": "filter[passengerLastName][eq]",
+        "in": "query",
+        "required": false,
+        "description": "Filter for journeys based on an exact match of the passenger's last name. Use for names with fewer than 3 characters.",
+        "schema": {
+          "type": "array",
+          "example":["Li"]
+        },
+        "style": "form",
+        "explode": false
       },
       "filterByPassengerNameRecord": {
         "name": "filter[pnr][eq]",

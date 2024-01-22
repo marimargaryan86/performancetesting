@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import re
 from collections.abc import Mapping, Sequence
 from types import MappingProxyType
 from typing import Any, cast
@@ -201,9 +202,14 @@ class JourneyRepository(repository.ProtoRepository[models_pb2.Journey]):
             )
 
         if journey_filter.HasField("last_name"):
+            last_name_filter = re.escape(journey_filter.last_name)
+            last_name_filter = "^{last_name}".format(last_name=last_name_filter)
+            if len(journey_filter.last_name) < 3:
+                last_name_filter = "{last_name}$".format(last_name=last_name_filter)
+
             return (
                 self._journey_filter_field_mapping["last_name"],
-                journey_filter.last_name,
+                last_name_filter,
                 "i",
             )
 

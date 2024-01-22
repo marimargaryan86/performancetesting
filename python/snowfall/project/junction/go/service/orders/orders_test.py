@@ -44,6 +44,7 @@ async def create_journeys_with_orders(
     number_of_journeys: int,
     journey_repository: orders.JourneyRepository,
     order_repository: orders.OrderRepository,
+    last_name: str = "Doe",
 ) -> None:
     for idx in range(number_of_journeys):
         journey = await journey_repository.create(
@@ -51,10 +52,15 @@ async def create_journeys_with_orders(
             reseller_id="",
         )
 
+        if number_of_journeys > 1:
+            last_name = "{last_name} {idx}".format(last_name=last_name, idx=idx)
+
         await order_repository.create_from_options(
             journey_id=journey.id,
             passengers=[
-                models_pb2.Passenger(last_name="Doe {idx}".format(idx=idx)),
+                models_pb2.Passenger(
+                    last_name=last_name,
+                ),
             ],
             options=[
                 models_pb2.TripOption(
@@ -85,6 +91,29 @@ async def create_journeys_with_orders(
             ],
             residence_address=None,
         )
+
+
+async def find_journeys(
+    journey_repository: orders.JourneyRepository,
+    operator: str,
+    last_name: str = "",
+    passenger_name_record: str = "",
+) -> list[models_pb2.Journey]:
+    journey_filter = orders_pb2.ListJourneysRequest.JourneyFilter(operator=operator)
+    if last_name:
+        journey_filter.last_name = last_name
+    if passenger_name_record:
+        journey_filter.passenger_name_record = passenger_name_record
+    return [
+        journey
+        async for journey in await journey_repository.find(
+            ids=[],
+            cursor="",
+            filter_by=[
+                journey_filter,
+            ],
+        )
+    ]
 
 
 class TestJourneys(object):
@@ -415,49 +444,59 @@ class TestJourneys(object):
         ]
         assert len(all_journeys) == 3
 
-        filtered_journeys = [
-            journey
-            async for journey in await journey_repository.find(
-                ids=[],
-                cursor="",
-                filter_by=[
-                    orders_pb2.ListJourneysRequest.JourneyFilter(
-                        operator="eq",
-                        passenger_name_record=all_journeys[0].passenger_name_record,
-                    ),
-                ],
-            )
-        ]
+        filtered_journeys = await find_journeys(
+            journey_repository=journey_repository,
+            operator="eq",
+            passenger_name_record=all_journeys[0].passenger_name_record,
+        )
         assert len(filtered_journeys) == 1
 
-    async def test_filter_by_last_name(
+    async def test_filter_by_last_name(  # noqa: WPS217
         self,
         journey_repository: orders.JourneyRepository,
         order_repository: orders.OrderRepository,
     ) -> None:
-        await create_journeys_with_orders(3, journey_repository, order_repository)
+        await create_journeys_with_orders(
+            3,
+            journey_repository,
+            order_repository,
+            "Doe",
+        )
+        await create_journeys_with_orders(
+            1,
+            journey_repository,
+            order_repository,
+            "Some other Doe",
+        )
+        await create_journeys_with_orders(
+            1,
+            journey_repository,
+            order_repository,
+            "doe",
+        )
+        await create_journeys_with_orders(
+            1,
+            journey_repository,
+            order_repository,
+            "Smith",
+        )
+        await create_journeys_with_orders(1, journey_repository, order_repository, "Li")
 
         all_journeys = [
             journey
             async for journey in await journey_repository.find(ids=[], cursor="")
         ]
-        assert len(all_journeys) == 3
 
-        filtered_journeys = [
-            journey
-            async for journey in await journey_repository.find(
-                ids=[],
-                cursor="",
-                filter_by=[
-                    orders_pb2.ListJourneysRequest.JourneyFilter(
-                        operator="like",
-                        last_name=all_journeys[0].orders[0].passengers[0].last_name,  # noqa:WPS219
-                    ),
-                ],
-            )
-        ]
+        assert len(all_journeys) == 7
 
-        assert len(filtered_journeys) == 1
+        journeys = await find_journeys(journey_repository, "like", "Doe", "")
+        assert len(journeys) == 4
+        journeys = await find_journeys(journey_repository, "like", "doe", "")
+        assert len(journeys) == 4
+        journeys = await find_journeys(journey_repository, "like", "Li", "")
+        assert len(journeys) == 1
+        journeys = await find_journeys(journey_repository, "like", "li", "")
+        assert len(journeys) == 1
 
 
 class TestOrders(object):
