@@ -1,6 +1,6 @@
 import httpx
 
-from snowfall.stdlib.instrumentation.httpx import _discovery  # noqa: WPS450
+from snowfall.stdlib.instrumentation.httpx import _discovery  # noqa: PLC2701
 from snowfall.stdlib.logging import stdout
 
 

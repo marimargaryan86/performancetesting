@@ -7,7 +7,7 @@ from snowfall.vendor.ask2go.models.base import CamelCaseBaseModel
 
 
 class CreateSearchResponse(CamelCaseBaseModel):
-    id: str  # noqa: A003
+    id: str
     transaction_id: str
 
 
@@ -18,7 +18,7 @@ class SearchResultsPageInformation(CamelCaseBaseModel):
 
 
 class SearchResultsResponse(CamelCaseBaseModel):
-    id: str  # noqa: A003
+    id: str
     available_flights: int
     flight: list[offers.Offer]
     is_finished: bool

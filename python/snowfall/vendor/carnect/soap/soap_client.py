@@ -34,7 +34,7 @@ class Config(NamedTuple):
     location: str
     transport: str
     soap_action: str
-    input: type[Any]  # noqa: A003
+    input: type[Any]
     output: type[Any]
 
     @classmethod

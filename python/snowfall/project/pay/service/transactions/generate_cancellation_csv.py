@@ -46,16 +46,16 @@ def _get_value(
 ) -> str:
     if not proto_model:
         return ""
-    proto_val: str | Message = proto_model
+    proto_val: str | bool | Message | MutableSequence[str] | Timestamp = proto_model
     for field in key.split("."):
         proto_val = getattr(proto_val, field, "")
     if isinstance(proto_val, Timestamp):
         proto_val = str(protobuf_to_datetime(proto_val))
     elif isinstance(proto_val, MutableSequence):
-        proto_val = ", ".join(proto_val)
+        proto_val = ", ".join([str(val) for val in proto_val])
     elif isinstance(proto_val, bool):
         proto_val = "Yes" if proto_val else "No"
-    return proto_val  # type: ignore[return-value]
+    return str(proto_val)
 
 
 _refunds_headers = {

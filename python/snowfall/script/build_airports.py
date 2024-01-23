@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any, cast
 
 import httpx
-from lxml.html import Element  # pants: no-infer-dep
+from lxml.html import Element
 from lxml.html import fromstring as html_fromstring
 
 _Airports = dict[str, dict[str, Any]]

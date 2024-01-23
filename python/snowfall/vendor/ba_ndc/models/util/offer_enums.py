@@ -56,7 +56,7 @@ class RowTypeEnum(enum.Enum):
     """Row type enum."""
 
     # E - Exit row
-    exit = "exit"  # noqa: A003
+    exit = "exit"
     # A - Extra leg room
     extra_leg_room = "extra_leg_room"
     # K - Overwing row
@@ -89,7 +89,7 @@ class SeatTypeEnum(enum.Enum):
     # CC - Center section seat(s)
     center_section = "center_section"
     # E - Exit row seat
-    exit = "exit"  # noqa: A003
+    exit = "exit"
     # H - Seat with facilities for handicapped/incapacitated passenger
     handicapped = "handicapped"
     # I - Seat suitable for adult with an infant

@@ -49,7 +49,7 @@ class ContactDetails(CamelCaseBaseModel):
 
 
 class Booking(CamelCaseBaseModel):
-    id: str  # noqa: A003
+    id: str
     information: Information
     air_itinerary: offers.Offer
     price_information: dict[str, Any]

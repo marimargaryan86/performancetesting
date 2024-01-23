@@ -44,7 +44,7 @@ class PricePenalty(CamelCaseBaseModel):
 
 
 class OfferPriceResponse(CamelCaseBaseModel):
-    id: str  # noqa: A003
+    id: str
     information: booking.Information
     itinerary: offers.Offer
     docs: list[OfferPriceDoc] = pydantic.Field(default_factory=list)
@@ -57,5 +57,5 @@ class OfferPriceResponse(CamelCaseBaseModel):
 
 
 class AsyncOfferPriceResponse(CamelCaseBaseModel):
-    id: str  # noqa: A003
+    id: str
     transaction_id: str

@@ -16,7 +16,7 @@ class Position(KarhooBaseModel):
 
 class MeetingPoint(KarhooBaseModel):
     position: Position
-    type: Literal[  # noqa: A003
+    type: Literal[
         "NOT_SET",
         "DEFAULT",
         "PICK_UP",

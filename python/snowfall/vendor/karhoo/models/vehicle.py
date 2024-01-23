@@ -32,7 +32,7 @@ class Vehicles(KarhooBaseModel):
 
 class Vehicle(KarhooBaseModel):
     qta: Qta | None
-    type: Literal["moto", "standard", "mpv", "bus"]  # noqa: A003
+    type: Literal["moto", "standard", "mpv", "bus"]
     passenger_capacity: int | None
     luggage_capacity: int | None
     tags: list[

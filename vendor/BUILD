@@ -19,6 +19,7 @@ python_requirements(
         "googleapis-common-protos": [
             "google.api",
             "google.cloud",
+            "google.gapic",
             "google.logging",
             "google.longrunning",
             "google.rpc",
@@ -47,6 +48,7 @@ python_requirements(
         "fakeredis": {"dependencies": ["#lupa"]},
         "mongomock-motor": {"dependencies": ["#setuptools"]},
         "openapi-core": {"dependencies": ["#setuptools", "#rfc3339-validator"]},
+        "pandas": {"dependencies": ["#pyarrow"]},
         "protobuf": {"dependencies": ["#types-protobuf"]},
         "pyjwt": {"dependencies": ["#cryptography"]},
         "qrcode": {"dependencies": ["#Pillow"]},

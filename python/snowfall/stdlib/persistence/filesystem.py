@@ -6,7 +6,7 @@ import pathlib
 import pkgutil
 import zipfile
 from collections.abc import AsyncGenerator
-from importlib import _bootstrap, util  # type: ignore[attr-defined] # noqa: WPS450
+from importlib import _bootstrap, util  # type: ignore[attr-defined] # noqa: PLC2701
 from sys import modules
 from typing import Any
 from urllib import parse as urllib_parse

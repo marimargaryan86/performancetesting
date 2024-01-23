@@ -63,7 +63,7 @@ class SegmentAmenities(CamelCaseBaseModel):
 
 
 class TripSegment(CamelCaseBaseModel):
-    id: UUID | None = None  # noqa: A003
+    id: UUID | None = None
     duration: Duration
     distance: float
     cabin: str | None = None
@@ -86,7 +86,7 @@ class TripSegment(CamelCaseBaseModel):
 
 
 class Trip(CamelCaseBaseModel):
-    id: UUID | None = None  # noqa: A003
+    id: UUID | None = None
     duration: Duration
     direction: str
     is_red_eye: bool
@@ -144,7 +144,7 @@ class PassengerPricing(CamelCaseBaseModel):
 
 
 class Offer(CamelCaseBaseModel):
-    id: str | None = None  # noqa: A003
+    id: str | None = None
     is_refundable: bool = False
     docs_required: bool | None = None
     gds: str

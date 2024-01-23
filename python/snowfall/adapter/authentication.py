@@ -212,7 +212,7 @@ class GrpcClient(Client):
 
 @dataclasses.dataclass(frozen=True)
 class _UserInfo(object):
-    id: str  # noqa: A003
+    id: str
     email: str
     metadata: Mapping[str, str] = dataclasses.field(default_factory=dict)
 

@@ -177,7 +177,6 @@ select = [
   "WPS447", # Forbid using the alphabet as a string.
   "WPS448", # Forbid incorrect order of except.
   "WPS449", # Forbid float keys.
-  "WPS450", # Forbid importing protected objects from modules.
   "WPS452", # Forbid break and continue in a finally block.
   "WPS455", # Forbids using non-trivial expressions as a parameter for except.
   "WPS456", # Forbids using float("NaN") construct to generate NaN.
@@ -324,6 +323,7 @@ module = [
   "isodate.*",
   "json_api_doc.*",
   "mongomock_motor.*",                      # https://github.com/michaelkryukov/mongomock_motor/issues/29
+  "nio.*",                                  # https://github.com/poljar/matrix-nio/issues/240
   "pandas.*",
   "qrcode.*",                               # https://github.com/lincolnloop/python-qrcode/pull/321
   "rfc3339_validator.*",
@@ -333,7 +333,6 @@ module = [
   "shapely.*",                              # https://github.com/shapely/shapely/issues/721
   "snowfall.stdlib.format.filter_parser.*",
   "sklearn.*",
-  "nio.*",                                  # https://github.com/poljar/matrix-nio/issues/240
 ]
 ignore_missing_imports = true
 
@@ -391,12 +390,12 @@ external = [
   "WPS432", # Forbid magic numbers
   "WPS436", # Forbid importing protected modules
   "WPS441", # Forbid control variables after the block body
-  "WPS450", # Forbid importing protected objects from modules
   "WPS465", # Forbid comparisons between bitwise and boolean expressions
   "WPS473", # Limit empty lines in functions or methods body
   "WPS505", # Forbid nested try blocks
   "WPS601", # Forbid shadowing class level attributes with instance level attributes
   "WPS609", # Forbid directly calling certain magic attributes and methods
+  "WPS613", # Found incorrect `super()` call context
 ]
 ignore = [
   "COM812",  # Trailing comma missing. Incompatible with Ruff's formatter.
@@ -427,6 +426,7 @@ ignore = [
   "PLR2004", # Magic value used in comparison, consider replacing with a constant variable # TODO: fix
   "PLR6301", # Method could be a function or static method
   "PLR0904", # Too many public methods
+  "PLR0914", # Too many local variables
   "PLR0917", # Too many positional arguments
   "Q000",    # Single quotes found but double quotes preferred. Incompatible with Ruff's formatter.
   "Q001",    # Single quote multiline found but double quotes preferred. Incompatible with Ruff's formatter.

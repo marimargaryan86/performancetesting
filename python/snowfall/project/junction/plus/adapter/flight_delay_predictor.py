@@ -19,7 +19,7 @@ class Flight(BaseModel):
 
 
 class Prediction(BaseModel):
-    id: str  # noqa: A003
+    id: str
     flight_number: str
     scheduled_departure_at: str
     delay: float

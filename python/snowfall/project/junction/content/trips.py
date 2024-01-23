@@ -59,8 +59,12 @@ if TYPE_CHECKING:
 
 
 class TripSearchImplementation(NamedTuple):
-    stop_identification_method: meta_pb2.TripSearchCapabilities.StopIdentificationMethod.ValueType
-    passenger_age_identification_method: meta_pb2.TripSearchCapabilities.PassengerAgeIdentificationMethod.ValueType
+    stop_identification_method: (
+        meta_pb2.TripSearchCapabilities.StopIdentificationMethod.ValueType
+    )
+    passenger_age_identification_method: (
+        meta_pb2.TripSearchCapabilities.PassengerAgeIdentificationMethod.ValueType
+    )
     supported_segment_types: Collection[segment_type_pb2.SegmentType.ValueType]
     one_way: TripSearchOneWayImplementation
     round_trip: TripSearchRoundTripImplementation | None = None

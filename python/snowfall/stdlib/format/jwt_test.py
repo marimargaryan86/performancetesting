@@ -76,7 +76,7 @@ class TestEncoder(object):
             jwt.Encoder(private_key=private_key, algorithm="RS256")
 
     def test_faulty_key_raises_error(self) -> None:
-        with pytest.raises(ValueError, match="Could not deserialize key data"):
+        with pytest.raises(ValueError, match="Unable to load PEM file"):
             jwt.Encoder(private_key="Zm9v", algorithm="RS256")
 
 

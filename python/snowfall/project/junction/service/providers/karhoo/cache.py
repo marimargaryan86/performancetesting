@@ -14,7 +14,7 @@ class Coordinates(RedisRecord):
 
 
 class CabinClass(RedisRecord):
-    type: int  # noqa: A003
+    type: int
     marketing_name: str
 
 

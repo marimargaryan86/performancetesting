@@ -61,7 +61,7 @@ class Passenger(CamelCaseBaseModel):
     last_name: str
     name_title: str
     gender: Gender
-    type: PassengerType  # noqa: A003
+    type: PassengerType
     birth_date: datetime.date
     traveler_document: TravelerDocument | None
 

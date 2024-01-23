@@ -31,7 +31,7 @@ class Agent(KarhooBaseModel):
 class CancelledBy(KarhooBaseModel):
     first_name: str | None
     last_name: str | None
-    id: str | None  # noqa: A003
+    id: str | None
     email: str | None
 
 
@@ -56,7 +56,7 @@ class BookingVehicle(KarhooBaseModel):
 
 
 class BookingQuote(KarhooBaseModel):
-    type: (  # noqa: A003
+    type: (
         Literal[
             "QUOTE_TYPE_NOT_SET",
             "FIXED",
@@ -87,7 +87,7 @@ class BookingFleet(KarhooBaseModel):
 
 
 class BookingResponse(KarhooBaseModel):
-    id: str  # noqa: A003
+    id: str
     passengers: Passengers
     partner_traveller_id: str | None
     status: Literal[

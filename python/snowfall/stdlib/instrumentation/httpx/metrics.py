@@ -2,7 +2,7 @@ import httpx
 import prometheus_client
 
 from snowfall.stdlib.instrumentation import prometheus
-from snowfall.stdlib.instrumentation.httpx import _discovery  # noqa: WPS450
+from snowfall.stdlib.instrumentation.httpx import _discovery  # noqa: PLC2701
 
 
 class _RequestHandler(object):

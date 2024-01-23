@@ -104,8 +104,7 @@ class Entrypoint(object):
     )
 
     def __post_init__(self) -> None:
-        object.__setattr__(  # noqa: WPS609
-            self,
+        super().__setattr__(  # noqa: WPS613
             "_group",
             click.Group(name=self.name, callback=_group),
         )

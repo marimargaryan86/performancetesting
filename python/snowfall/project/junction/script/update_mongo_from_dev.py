@@ -3,7 +3,7 @@
 Note: this drops the mentioned collections before restoring them.
 """
 
-import subprocess
+import subprocess  # noqa: S404
 import sys
 from typing import Any
 

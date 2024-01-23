@@ -206,18 +206,21 @@ async def test_that_price_in_trip_price_quote_result_replaced_with_conversion(
     offer_search_return_value = fixtures.generate_offer_search(
         fixtures.OFFER_SEARCHES[0],
     )
-    with mock.patch.object(
-        offers.OfferAggregateMappingRepository,
-        "find_by_result_id",
-        autospec=True,
-        spec_set=True,
-        return_value=offer_aggregate_return_value,
-    ), mock.patch.object(
-        offers.OfferSearchRepository,
-        "find_by_id",
-        autospec=True,
-        spec_set=True,
-        return_value=offer_search_return_value,
+    with (
+        mock.patch.object(
+            offers.OfferAggregateMappingRepository,
+            "find_by_result_id",
+            autospec=True,
+            spec_set=True,
+            return_value=offer_aggregate_return_value,
+        ),
+        mock.patch.object(
+            offers.OfferSearchRepository,
+            "find_by_id",
+            autospec=True,
+            spec_set=True,
+            return_value=offer_search_return_value,
+        ),
     ):
         price_quote_result = TripPriceQuoteResult(
             price_quote_container_id="an-id",
@@ -305,18 +308,21 @@ async def test_price_breakdown_when_no_tax_or_markups_returned_by_pay(
     offer_search_return_value = fixtures.generate_offer_search(
         fixtures.OFFER_SEARCHES[0],
     )
-    with mock.patch.object(
-        offers.OfferAggregateMappingRepository,
-        "find_by_result_id",
-        autospec=True,
-        spec_set=True,
-        return_value=offer_aggregate_return_value,
-    ), mock.patch.object(
-        offers.OfferSearchRepository,
-        "find_by_id",
-        autospec=True,
-        spec_set=True,
-        return_value=offer_search_return_value,
+    with (
+        mock.patch.object(
+            offers.OfferAggregateMappingRepository,
+            "find_by_result_id",
+            autospec=True,
+            spec_set=True,
+            return_value=offer_aggregate_return_value,
+        ),
+        mock.patch.object(
+            offers.OfferSearchRepository,
+            "find_by_id",
+            autospec=True,
+            spec_set=True,
+            return_value=offer_search_return_value,
+        ),
     ):
         pay_quotes = PayQuotes(
             quotations_client=quotations_client,

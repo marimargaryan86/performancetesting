@@ -10,7 +10,7 @@ class Rating(KarhooBaseModel):
 
 
 class FreeCancellation(KarhooBaseModel):
-    type: Literal["TimeBeforePickup", "BeforeDriverEnRoute"]  # noqa: A003
+    type: Literal["TimeBeforePickup", "BeforeDriverEnRoute"]
     minutes: int | None
 
 
@@ -24,7 +24,7 @@ class ServiceLevelAgreements(KarhooBaseModel):
 
 
 class Fleet(KarhooBaseModel):
-    id: str  # noqa: A003
+    id: str
     name: str
     description: str | None
     rating: Rating | None
@@ -44,7 +44,7 @@ class Fleet(KarhooBaseModel):
 
 
 class Quote(KarhooBaseModel):
-    id: str  # noqa: A003
+    id: str
     price: price.Price
     pick_up_type: Literal["DEFAULT", "MEET_AND_GREET", "CURB_SIDE", "STAND_BY"] | None
     quote_type: Literal["FIXED", "METERED", "ESTIMATED"]
@@ -59,7 +59,7 @@ class Availability(KarhooBaseModel):
 
 
 class RequestQuotesResponse(KarhooBaseModel):
-    id: str  # noqa: A003
+    id: str
     availability: Availability
     quotes: list[Quote]
     status: Literal["PROGRESSING", "COMPLETED"]
