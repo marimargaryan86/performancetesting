@@ -242,7 +242,7 @@
     },
     "/users": {
       "get": {
-        "summary": "List users.",
+        "summary": "List users",
         "tags": [
           "users"
         ],
@@ -291,7 +291,65 @@
           }
         },
         "operationId": "get-users",
-        "description": "Lists all users."
+        "description": "Lists all users"
+      },
+      "post": {
+        "summary": "Create user",
+        "tags": [
+          "users"
+        ],
+        "operationId": "post-users",
+        "responses": {
+          "201": {
+            "description": "User created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "description": "Used to create user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        }
       }
     },
     "/users/{userId}": {
@@ -4031,6 +4089,24 @@
             }
           }
         }
+      },
+      "Conflict": {
+        "description": "Conflict",
+        "content": {
+          "application/vnd.api+json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "errors": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "schemas": {
@@ -4040,7 +4116,9 @@
         "properties": {
           "id": {
             "type": "string",
-            "example": "AQAAAIAADsn2T3KdrRWeaXLeVEyjNx_JfeTsMB0NVCEAnAZoJ-o3nqdlJZAdgcT2oWi1w9pS4wXXOk3O1vsKlGsPyHjV4EJxsu289i3hVO_BUPgP7SFoWAi8BW2v7LvAjQ5NfUPy7a1v9ajT3feIqcUZszWSTqKbJHFYvQqW7wdqhpQq3Wy-et39ZQDWSPLZUzgcjN-6VD2gyKkH0Po7gSm8YSJNSQ"
+            "example": "04f83af5-10bb-4a0f-1881-03e1e690f0f5",
+            "format": "uuid",
+            "readOnly": true
           },
           "type": {
             "type": "string",
@@ -4049,7 +4127,49 @@
             ],
             "example": "users"
           },
-          "attributes": {}
+          "attributes": {
+            "type": "object",
+            "properties": {
+              "email": {
+                "type": "string",
+                "format": "email",
+                "example": "john.smith@example.com"
+              },
+              "role": {
+                "type": "string",
+                "example": "reseller-admin",
+                "enum": [
+                  "snowfall-admin",
+                  "snowfall-user",
+                  "reseller-admin",
+                  "reseller-user"
+                ]
+              }
+            }
+          },
+          "relationships": {
+            "type": "object",
+            "properties": {
+              "reseller": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/ResellerIdentifier"
+                      }
+                    }
+                  },
+                  {
+                    "nullable": true
+                  }
+                ]
+              }
+            }
+          }
         }
       },
       "UsersProfile": {
@@ -4974,11 +5094,11 @@
                   "ticketUrls": {
                     "type": "array",
                     "example": [
-                      "http://example.com/ticket.pdf"
+                      "https://example.com/ticket.pdf"
                     ],
                     "items": {
                       "type": "string",
-                      "example": "http://example.com/ticket.pdf"
+                      "example": "https://example.com/ticket.pdf"
                     }
                   }
                 }
