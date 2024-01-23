@@ -34,6 +34,10 @@ variable "flight_stats_api_url" {
   type = string
 }
 
+variable "fluxir_api_url" {
+  type = string
+}
+
 job "junction-plus-external-dependencies-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -111,6 +115,9 @@ job "junction-plus-external-dependencies-grpc" {
 GOOGLE_FLIGHTS_EMISSIONS_APP_KEY={{ .Data.data.google_flights_emissions_app_key }}
 FLIGHT_STATS_APP_ID={{ .Data.data.flight_stats_app_id }}
 FLIGHT_STATS_APP_KEY={{ .Data.data.flight_stats_app_key }}
+FLUXIR_USERNAME={{ .Data.data.fluxir_username }}
+FLUXIR_PASSWORD={{ .Data.data.fluxir_password }}
+FLUXIR_TENANT_ID={{ .Data.data.fluxir_tenant_id }}
 {{ end }}
 EOH
         destination = "services.env"
@@ -138,6 +145,7 @@ EOH
         PROMETHEUS_PORT                  = NOMAD_PORT_prometheus
         GOOGLE_FLIGHTS_EMISSIONS_ADDRESS = var.google_flights_emissions_address
         FLIGHT_STATS_API_URL             = var.flight_stats_api_url
+        FLUXIR_API_URL                   = var.fluxir_api_url
       }
     }
   }

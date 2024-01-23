@@ -52,7 +52,7 @@ class FluxirAuth(httpx.Auth):
         response = await self._client.request(
             url="connect/token",
             method="POST",
-            data={
+            json={
                 "username": self._username,
                 "password": self._password,
             },

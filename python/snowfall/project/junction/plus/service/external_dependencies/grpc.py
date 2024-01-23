@@ -13,8 +13,11 @@ from snowfall.project.junction.plus.service.external_dependencies.v1 import (
 )
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.transport.grpc import service as grpc_service
+from snowfall.stdlib.transport.http import errors as http_errors
 from snowfall.vendor.flight_stats import client as flight_stats_client
 from snowfall.vendor.flight_stats.models import errors
+from snowfall.vendor.fluxir import client as fluxir_client
+from snowfall.vendor.fluxir.models import travel_services as travel_services_models
 from snowfall.vendor.google_flights import co2_emissions as emissions_client
 from snowfall.vendor.google_flights.models.emissions import (
     Flight,
@@ -127,5 +130,66 @@ class FlightStatsService(
                     ),
                 )
                 for flight_status in response.flight_statuses  # type: ignore[possibly-undefined]
+            ],
+        )
+
+
+class VisaService(
+    grpc_service.Service,
+    external_dependencies_pb2_grpc.VisaServiceServicer,
+):
+    def __init__(
+        self,
+        client: fluxir_client.FluxirClient,
+    ) -> None:
+        self._fluxir_client = client
+
+    def get_name(self) -> str:
+        return external_dependencies_pb2.DESCRIPTOR.services_by_name[
+            "VisaService"
+        ].full_name
+
+    def register(self, server: aio.Server) -> None:
+        external_dependencies_pb2_grpc.add_VisaServiceServicer_to_server(
+            self,
+            server,
+        )
+
+    async def GetVisaRequirements(  # type: ignore[override] # noqa: N802
+        self,
+        request: external_dependencies_pb2.GetVisaRequirementsRequest,
+        context: aio.ServicerContext,
+    ) -> external_dependencies_pb2.GetVisaRequirementsResponse:
+        try:
+            resp = await self._fluxir_client.get_service_intents(
+                travel_services_models.GetServiceIntentsRequest(
+                    **MessageToDict(request),
+                ),
+            )
+        except http_errors.HttpStatusError as exc:
+            if exc.status == 400:  # noqa: WPS432
+                await context.abort(StatusCode.INVALID_ARGUMENT)
+            else:
+                await context.abort(StatusCode.UNKNOWN)
+        except (http_errors.RequestError, ValidationError):
+            await context.abort(StatusCode.INTERNAL)
+
+        return external_dependencies_pb2.GetVisaRequirementsResponse(
+            items=[
+                external_dependencies_models_pb2_grpc.ServiceIntent(
+                    redirect_uri=item.redirect_uri,
+                    title=item.title or "",
+                    description=item.description or "",
+                    info=item.info or "",
+                    fee=item.fee,
+                    approval_rate=item.approval_rate,
+                    appliers_count=item.appliers_count,
+                    expected_processing_time=item.expected_processing_time,
+                    stay_duration=item.stay_duration,
+                    validity_period=item.validity_period or "",
+                    stay_duration_unit=item.stay_duration_unit.value,
+                    validity_period_unit=item.validity_period_unit.value,
+                )
+                for item in resp.items  # type: ignore[possibly-undefined]
             ],
         )
