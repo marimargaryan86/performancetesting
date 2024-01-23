@@ -1,0 +1,33 @@
+{
+    "id": "e01b5f2f-6afc-4194-8578-4cebcf69a4d5",
+    "schema_id": "whateva",
+    "schema_url": "https://playground.projects.oryapis.com/schemas/whateva",
+    "state": "active",
+    "state_changed_at": "2024-01-02T13:38:05.27510048Z",
+    "traits": {
+        "email": "test@test.com"
+    },
+    "metadata_public": {"role": "reseller-admin"},
+    "verifiable_addresses": [
+        {
+            "id": "c6cea2a7-f419-42fe-a610-456bea02aab5",
+            "value": "docs@example.org",
+            "verified": false,
+            "via": "email",
+            "status": "pending",
+            "created_at": "2022-02-24T13:38:05.28581Z",
+            "updated_at": "2022-02-24T13:38:05.28581Z"
+        }
+    ],
+    "recovery_addresses": [
+        {
+            "id": "21ff90e1-a9a9-491e-8194-774172420989",
+            "value": "docs@example.org",
+            "via": "email",
+            "created_at": "2022-02-24T13:38:05.29565Z",
+            "updated_at": "2022-02-24T13:38:05.29565Z"
+        }
+    ],
+    "created_at": "2022-02-24T13:38:05.27892Z",
+    "updated_at": "2022-02-24T13:38:05.27892Z"
+}

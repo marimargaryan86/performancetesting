@@ -9,10 +9,19 @@ from snowfall.service.authentication.v1 import (
     identities_pb2,
     identities_pb2_grpc,
 )
+from snowfall.stdlib import string
 
 
 class NotFoundError(Exception):
     """Raise when the ORY user is not found for the provided identifier."""
+
+
+class InvalidArgumentError(Exception):
+    """Raise when ORY user creation fails for the provided payload."""
+
+
+class AlreadyExistsError(Exception):
+    """Raise when ORY user creation fails because the identity already exists."""
 
 
 class Client(abc.ABC):
@@ -22,6 +31,14 @@ class Client(abc.ABC):
         identifier: str,
     ) -> identities_pb2.Identity:
         """Get an ORY identity."""
+
+    @abc.abstractmethod
+    async def create_ory_identity(
+        self,
+        email: str,
+        metadata: Mapping[str, Any],
+    ) -> identities_pb2.Identity:
+        """Create an ORY identity."""
 
     @abc.abstractmethod
     async def update_ory_identity(
@@ -48,6 +65,25 @@ class DictClient(Client):
 
         if not identity:
             raise NotFoundError()
+
+        return identity
+
+    async def create_ory_identity(
+        self,
+        email: str,
+        metadata: Mapping[str, Any],
+    ) -> identities_pb2.Identity:
+        metadata_public = struct_pb2.Struct()
+        metadata_public.update(metadata)
+
+        identity = identities_pb2.Identity(
+            id=string.uuid(),
+            email=email.lower(),
+            metadata_public=metadata_public,
+        )
+
+        if not identity.email or not identity.metadata_public:
+            raise InvalidArgumentError()
 
         return identity
 
@@ -89,6 +125,33 @@ class GrpcClient(Client):
         except grpc.aio.AioRpcError as exc:
             if exc.code() == grpc.StatusCode.NOT_FOUND:
                 raise NotFoundError(exc.details()) from exc
+
+            raise
+
+        return response.identity
+
+    async def create_ory_identity(
+        self,
+        email: str,
+        metadata: Mapping[str, Any],
+    ) -> identities_pb2.Identity:
+        metadata_public = struct_pb2.Struct()
+        metadata_public.update(metadata)
+
+        try:
+            response = await self._identity_service.CreateIdentity(
+                identities_pb2.CreateIdentityRequest(
+                    identity=identities_pb2.Identity(
+                        email=email,
+                        metadata_public=metadata_public,
+                    ),
+                ),
+            )
+        except grpc.aio.AioRpcError as exc:
+            if exc.code() == grpc.StatusCode.INVALID_ARGUMENT:
+                raise InvalidArgumentError(exc.details()) from exc
+            if exc.code() == grpc.StatusCode.ALREADY_EXISTS:
+                raise AlreadyExistsError(exc.details()) from exc
 
             raise
 

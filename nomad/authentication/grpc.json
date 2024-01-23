@@ -4,6 +4,7 @@
       "count": 1,
       "jwt_ttl": "PT24H",
       "ory_application_url": "https://exciting-boyd-kr7iwir8gj.projects.oryapis.com",
+      "ory_schema_id": "a8bec94261ff8548a82ca9e1a52c9ec621f111d15156cc6138dc6d45b81cfda44932c80c003d227149b4abfd4147424294c770473806aaaad85b655aba746575",
       "ory_slug": "exciting-boyd-kr7iwir8gj"
     }
   },
@@ -12,6 +13,7 @@
       "count": 2,
       "jwt_ttl": "PT1H",
       "ory_application_url": "https://auth.junction.travel",
+      "ory_schema_id": "a8bec94261ff8548a82ca9e1a52c9ec621f111d15156cc6138dc6d45b81cfda44932c80c003d227149b4abfd4147424294c770473806aaaad85b655aba746575",
       "ory_slug": "optimistic-tereshkova-36hc6vayw4"
     }
   },
@@ -20,6 +22,7 @@
       "count": 1,
       "jwt_ttl": "PT24H",
       "ory_application_url": "https://hardcore-nash-njumtzes9i.projects.oryapis.com",
+      "ory_schema_id": "a8bec94261ff8548a82ca9e1a52c9ec621f111d15156cc6138dc6d45b81cfda44932c80c003d227149b4abfd4147424294c770473806aaaad85b655aba746575",
       "ory_slug": "hardcore-nash-njumtzes9i"
     }
   }

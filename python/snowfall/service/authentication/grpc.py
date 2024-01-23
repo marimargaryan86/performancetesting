@@ -320,6 +320,35 @@ class IdentitiesService(
             ),
         )
 
+    async def CreateIdentity(  # type: ignore[override] # noqa: N802
+        self,
+        request: identities_pb2.CreateIdentityRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> identities_pb2.CreateIdentityResponse:
+        try:
+            identity = await self._client.create_identity(
+                email=request.identity.email,
+                metadata=dict(request.identity.metadata_public.items()),
+            )
+        except httpx.HTTPStatusError as err:
+            if err.response.status_code == httpx.codes.BAD_REQUEST.value:
+                return await context.abort(grpc.StatusCode.INVALID_ARGUMENT)
+            if err.response.status_code == httpx.codes.CONFLICT.value:
+                return await context.abort(grpc.StatusCode.ALREADY_EXISTS)
+
+            return await context.abort(grpc.StatusCode.UNKNOWN)
+
+        metadata_public = struct_pb2.Struct()
+        metadata_public.update(identity.metadata_public)
+
+        return identities_pb2.CreateIdentityResponse(
+            identity=identities_pb2.Identity(
+                id=identity.identifier,
+                email=identity.traits.email,
+                metadata_public=metadata_public,
+            ),
+        )
+
     async def UpdateIdentity(  # type: ignore[override] # noqa: N802
         self,
         request: identities_pb2.UpdateIdentityRequest,

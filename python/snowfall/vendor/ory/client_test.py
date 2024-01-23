@@ -28,6 +28,11 @@ async def _load_json_fixture(
 
 
 @pytest.fixture()
+async def mock_identity_response() -> dict[str, Any]:
+    return await _load_json_fixture("mock_identity_response")
+
+
+@pytest.fixture()
 async def session_response() -> dict[str, Any]:
     return await _load_json_fixture("sessions_whoami")
 
@@ -79,6 +84,25 @@ class TestClient(object):
         session = await ory_client.get_session(cookie="valid")
 
         assert session.active
+
+    async def test_create_identity(
+        self,
+        mock_identity_response: dict[str, Any],
+        ory_client: client.OryClient,
+        httpx_mock: pytest_httpx.HTTPXMock,
+    ) -> None:
+        httpx_mock.add_response(method="POST", json=mock_identity_response)
+
+        email: str = mock_identity_response["traits"]["email"]
+        metadata: dict[str, Any] = {"role": "reseller-admin"}
+
+        identity: models.Identity = await ory_client.create_identity(email, metadata)
+
+        assert identity.traits.email == mock_identity_response["traits"]["email"]
+        assert (
+            identity.metadata_public["role"]
+            == mock_identity_response["metadata_public"]["role"]
+        )
 
 
 class TestSessionModel(object):

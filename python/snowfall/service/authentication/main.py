@@ -23,6 +23,7 @@ class _GrpcSettings(application.Settings):
     ory_application_url: pydantic.HttpUrl
     ory_api_key: pydantic.SecretStr
     ory_slug: str | None = None
+    ory_schema_id: str | None = None
 
 
 async def _serve(app: application.Application[_GrpcSettings]) -> None:
@@ -30,6 +31,7 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
     ory_client = client.OryClient(
         base_url=str(app.settings.ory_application_url),
         slug=str(app.settings.ory_slug),
+        schema_id=str(app.settings.ory_schema_id),
         auth=stdlib_auth.TokenAuth(token=app.settings.ory_api_key.get_secret_value()),
     )
 

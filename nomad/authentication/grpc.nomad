@@ -38,6 +38,10 @@ variable "ory_slug" {
   type = string
 }
 
+variable "ory_schema_id" {
+  type = string
+}
+
 job "authentication-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -145,6 +149,7 @@ EOH
         JWT_TTL             = var.jwt_ttl
         ORY_APPLICATION_URL = "${var.ory_application_url}"
         ORY_SLUG            = "${var.ory_slug}"
+        ORY_SCHEMA_ID       = "${var.ory_schema_id}"
       }
     }
   }

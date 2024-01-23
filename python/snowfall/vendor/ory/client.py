@@ -1,3 +1,6 @@
+from collections.abc import Mapping
+from typing import Any
+
 import httpx
 
 from snowfall.vendor.ory import models
@@ -9,6 +12,7 @@ class OryClient(object):
         base_url: str,
         slug: str | None = None,
         auth: httpx.Auth | None = None,
+        schema_id: str | None = None,
         client: httpx.AsyncClient | None = None,
     ):
         self._base_url = httpx.URL(base_url)
@@ -19,6 +23,8 @@ class OryClient(object):
 
         if auth:
             self._client.auth = auth
+
+        self._schema_id = schema_id
 
     @property
     def jwk_url(self) -> str:
@@ -65,6 +71,24 @@ class OryClient(object):
         response = await self._client.patch(
             url="/admin/identities/{0}".format(identity.identifier),
             json=operations,
+        )
+        response.raise_for_status()
+
+        return models.Identity(**response.json())
+
+    async def create_identity(
+        self,
+        email: str,
+        metadata: Mapping[str, Any],
+    ) -> models.Identity:
+        response = await self._client.post(
+            url="/admin/identities/",
+            json={
+                "metadata_public": metadata,
+                "schema_id": self._schema_id,
+                "state": "active",
+                "traits": {"email": email},
+            },
         )
         response.raise_for_status()
 

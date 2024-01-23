@@ -9,6 +9,7 @@ option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/
 service IdentitiesService {
   rpc GetIdentity(GetIdentityRequest) returns (GetIdentityResponse);
   rpc UpdateIdentity(UpdateIdentityRequest) returns (UpdateIdentityResponse);
+  rpc CreateIdentity(CreateIdentityRequest) returns (CreateIdentityResponse);
 }
 
 message GetIdentityRequest {
@@ -16,6 +17,14 @@ message GetIdentityRequest {
 }
 
 message GetIdentityResponse {
+  Identity identity = 1;
+}
+
+message CreateIdentityRequest {
+  Identity identity = 1;
+}
+
+message CreateIdentityResponse {
   Identity identity = 1;
 }
 

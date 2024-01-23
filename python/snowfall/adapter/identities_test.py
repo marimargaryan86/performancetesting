@@ -53,11 +53,41 @@ def error_stub() -> identities_pb2_grpc.IdentitiesServiceStub:
 
 
 @pytest.fixture()
+def invalid_args_stub() -> identities_pb2_grpc.IdentitiesServiceStub:
+    error = grpc.aio.AioRpcError(
+        code=grpc.StatusCode.INVALID_ARGUMENT,
+        initial_metadata=grpc.aio.Metadata(),
+        trailing_metadata=grpc.aio.Metadata(),
+    )
+    stub = mock.create_autospec(identities_pb2_grpc.IdentitiesServiceStub)
+    stub.CreateIdentity = mock.AsyncMock(side_effect=error)
+
+    return stub
+
+
+@pytest.fixture()
+def already_exists_stub() -> identities_pb2_grpc.IdentitiesServiceStub:
+    error = grpc.aio.AioRpcError(
+        code=grpc.StatusCode.ALREADY_EXISTS,
+        initial_metadata=grpc.aio.Metadata(),
+        trailing_metadata=grpc.aio.Metadata(),
+    )
+    stub = mock.create_autospec(identities_pb2_grpc.IdentitiesServiceStub)
+    stub.CreateIdentity = mock.AsyncMock(side_effect=error)
+
+    return stub
+
+
+@pytest.fixture()
 def stub(
     updated_metadata: Mapping[str, str],
 ) -> identities_pb2_grpc.IdentitiesServiceStub:
     identity = _get_identities()[0]
     get_identity_response = identities_pb2.GetIdentityResponse(
+        identity=identity,
+    )
+
+    create_identity_response = identities_pb2.CreateIdentityResponse(
         identity=identity,
     )
 
@@ -68,6 +98,7 @@ def stub(
 
     stub = mock.create_autospec(identities_pb2_grpc.IdentitiesServiceStub)
     stub.GetIdentity = mock.AsyncMock(return_value=get_identity_response)
+    stub.CreateIdentity = mock.AsyncMock(return_value=create_identity_response)
     stub.UpdateIdentity = mock.AsyncMock(return_value=update_identity_response)
 
     return stub
@@ -88,6 +119,29 @@ class TestDictClient(object):
     ) -> None:
         with pytest.raises(identities.NotFoundError):
             await identities_client.get_ory_identity(NOT_FOUND)
+
+    async def test_create_identity(
+        self,
+        identities_client: identities.Client,
+    ) -> None:
+        identity = _get_identities()[0]
+        identity = await identities_client.create_ory_identity(
+            email=identity.email,
+            metadata=dict(identity.metadata_public),
+        )
+
+        assert identity.email == "foobar@example.com"
+        assert dict(identity.metadata_public.items()) == METADATA_PUBLIC
+
+    async def test_create_identity_failure(
+        self,
+        identities_client: identities.Client,
+    ) -> None:
+        with pytest.raises(identities.InvalidArgumentError):
+            await identities_client.create_ory_identity(
+                email="",
+                metadata={},
+            )
 
     async def test_update_identity(
         self,
@@ -135,6 +189,43 @@ class TestGrpcClient(object):
 
         with pytest.raises(identities.NotFoundError):
             await identities_client.get_ory_identity(NOT_FOUND)
+
+    async def test_create_ory_identity(
+        self,
+        stub: identities_pb2_grpc.IdentitiesServiceStub,
+    ) -> None:
+        identities_client = identities.GrpcClient(stub)
+
+        identity = await identities_client.create_ory_identity(
+            email="it does not matter",
+            metadata={"role": "what I put here"},
+        )
+
+        assert identity.id == IDENTITIES[0]
+        assert identity.email == "foobar@example.com"
+        assert dict(identity.metadata_public.items()) == METADATA_PUBLIC
+
+    async def test_create_ory_identity_invalid_arguments(
+        self,
+        invalid_args_stub: identities_pb2_grpc.IdentitiesServiceStub,
+    ) -> None:
+        identities_client = identities.GrpcClient(invalid_args_stub)
+        with pytest.raises(identities.InvalidArgumentError):
+            await identities_client.create_ory_identity(
+                email="",
+                metadata={},
+            )
+
+    async def test_create_ory_identity_already_exists(
+        self,
+        already_exists_stub: identities_pb2_grpc.IdentitiesServiceStub,
+    ) -> None:
+        identities_client = identities.GrpcClient(already_exists_stub)
+        with pytest.raises(identities.AlreadyExistsError):
+            await identities_client.create_ory_identity(
+                email="",
+                metadata={},
+            )
 
     async def test_update_identity(
         self,
