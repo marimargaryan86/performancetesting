@@ -14,7 +14,8 @@
   line-height: 26px;
 }
 
-*[typography="body-medium"] {
+*[typography="body-medium"],
+x-tr {
   font-weight: 400;
   font-size: 14px;
   font-family: Inter, Arial, Helvetica, sans-serif;
@@ -22,7 +23,8 @@
   line-height: 20px;
 }
 
-*[typography="body-small"] {
+*[typography="body-small"],
+x-thead {
   font-weight: 400;
   font-size: 12px;
   font-family: Inter, Arial, Helvetica, sans-serif;
@@ -131,7 +133,8 @@
   line-height: 26px;
 }
 
-*[weight="bold"] {
+*[weight="bold"],
+x-thead {
   font-weight: 600;
 }
 

@@ -1,19 +1,13 @@
 <script lang="ts">
-  import Header from "components/ui/table/header.svelte";
-  import TActionsCol from "components/ui/table/t-actions-col.svelte";
-  import TBody from "components/ui/table/t-body.svelte";
-  import TCol from "components/ui/table/t-col.svelte";
-  import THead from "components/ui/table/t-head.svelte";
-  import TMoneyCol from "components/ui/table/t-money-col.svelte";
-  import TRow from "components/ui/table/t-row.svelte";
-  import Table from "components/ui/table/table.svelte";
   import type { TripBooking } from "integration/junction-hub-api/schemas/booking";
   import routeConfig from "routeConfig";
   import { getOrigin, getDestination } from "utils/booking";
   import CancellationDialog from "./cancellation-dialog.svelte";
-  import TStatusBadgeCol from "components/ui/table/t-status-badge-col.svelte";
   import { getPageTitle } from "utils/page-title";
   import { getLocale, getLocaleData } from "i18n";
+  import { ensureDefined } from "utils/array";
+  import StatusBadge from "components/ui/status-badge.svelte";
+  import { formatAmount } from "formatting/currency";
 
   export let data;
 
@@ -27,6 +21,10 @@
   $: showActionsColumn = data.order.bookings.find(
     (item) => item.status === "confirmed" && !item.cancellationId,
   );
+  $: statusColumns = [showCancellationColumn, showRefundColumn, showActionsColumn].filter(
+    ensureDefined,
+  ).length;
+  $: columns = `repeat(3, min-content) repeat(5, 1fr) repeat(${statusColumns}, min-content)`;
 
   function cancelBooking(booking: TripBooking): void {
     cancellationDialog?.open(booking);
@@ -57,100 +55,97 @@
   on:success={updateOrders}
 />
 
-<Table class="bookings-table">
-  <THead>
-    <Header>{$i18n.tableHeaders.booking} Booking</Header>
-    <Header />
-    <Header>{$i18n.tableHeaders.ticket}</Header>
-    <Header>{$i18n.tableHeaders.departureDate}</Header>
-    <Header>{$i18n.tableHeaders.origin}</Header>
-    <Header>{$i18n.tableHeaders.destination}</Header>
-    <Header>{$i18n.tableHeaders.totalPrice}</Header>
-    <Header>{$i18n.tableHeaders.bookingStatus}</Header>
-    {#if showCancellationColumn}<Header>{$i18n.tableHeaders.cancellationStatus}</Header>{/if}
-    {#if showRefundColumn}<Header>{$i18n.tableHeaders.refundStatus}</Header>{/if}
-    {#if showActionsColumn}<Header />{/if}
-  </THead>
+<x-table class="bookings-table" style:grid-template-columns={columns}>
+  <x-thead>
+    <x-th>{$i18n.tableHeaders.booking} Booking</x-th>
+    <x-th />
+    <x-th>{$i18n.tableHeaders.ticket}</x-th>
+    <x-th>{$i18n.tableHeaders.departureDate}</x-th>
+    <x-th>{$i18n.tableHeaders.origin}</x-th>
+    <x-th>{$i18n.tableHeaders.destination}</x-th>
+    <x-th>{$i18n.tableHeaders.totalPrice}</x-th>
+    <x-th>{$i18n.tableHeaders.bookingStatus}</x-th>
+    {#if showCancellationColumn}<x-th>{$i18n.tableHeaders.cancellationStatus}</x-th>{/if}
+    {#if showRefundColumn}<x-th>{$i18n.tableHeaders.refundStatus}</x-th>{/if}
+    {#if showActionsColumn}<x-th />{/if}
+  </x-thead>
 
-  <TBody>
-    {#each data.order.bookings as booking, idx}
-      {@const origin = getOrigin(booking)}
-      {@const destination = getDestination(booking)}
+  {#each data.order.bookings as booking, idx}
+    {@const origin = getOrigin(booking)}
+    {@const destination = getDestination(booking)}
 
-      <TRow>
-        <TCol width="0">{idx + 1}</TCol>
-        <TCol width="0">
+    <x-tr>
+      <x-td width="0">{idx + 1}</x-td>
+      <x-td width="0">
+        <a
+          href={routeConfig.routes.tripManagement.routes.orders.routes
+            .order(data.order.id)
+            .routes.booking(booking.id).root}
+        >
+          {$i18n.actions.view}
+        </a>
+      </x-td>
+
+      <x-td width="0">
+        {#if booking.ticketUrls.length}
           <a
-            href={routeConfig.routes.tripManagement.routes.orders.routes
-              .order(data.order.id)
-              .routes.booking(booking.id).root}
+            typography="body-medium"
+            href={orderLink.routes.booking(booking.id).routes.tickets.root}
+            download
           >
-            {$i18n.actions.view}
+            {$i18n.actions.download}
           </a>
-        </TCol>
+        {:else}
+          <span class="not-available">{$i18n.words.notAvailable}</span>
+        {/if}
+      </x-td>
 
-        <TCol width="0">
-          {#if booking.ticketUrls.length}
-            <a
-              typography="body-medium"
-              href={orderLink.routes.booking(booking.id).routes.tickets.root}
-              download
-            >
-              {$i18n.actions.download}
-            </a>
-          {:else}
-            <span class="not-available">{$i18n.words.notAvailable}</span>
-          {/if}
-        </TCol>
+      <x-td>
+        {booking.detailsList[0]?.legs[0]?.departureAt.toLocaleDateString($locale, {
+          timeZone: origin?.timeZone,
+        })}
+      </x-td>
 
-        <TCol>
-          {booking.detailsList[0]?.legs[0]?.departureAt.toLocaleDateString($locale, {
-            timeZone: origin?.timeZone,
-          })}
-        </TCol>
+      <x-td weight="bold">{origin?.name ?? $i18n.words.unknown}</x-td>
+      <x-td weight="bold">{destination?.name ?? $i18n.words.unknown}</x-td>
+      <x-td>{formatAmount(booking.price.total, { locale: $locale, sign: true })}</x-td>
+      <x-td><StatusBadge value={booking.status} /></x-td>
 
-        <TCol weight="bold">{origin?.name ?? $i18n.words.unknown}</TCol>
-        <TCol weight="bold">{destination?.name ?? $i18n.words.unknown}</TCol>
-        <TMoneyCol money={booking.price.total} />
-        <TStatusBadgeCol value={booking.status} />
-
-        {#if showCancellationColumn}
+      {#if showCancellationColumn}
+        <x-td>
           {#if booking.cancellation?.status}
-            <TStatusBadgeCol value={booking.cancellation.status} />
-          {:else}
-            <TCol width="0" />
+            <StatusBadge value={booking.cancellation.status} />
           {/if}
-        {/if}
+        </x-td>
+      {/if}
 
-        {#if showRefundColumn}
+      {#if showRefundColumn}
+        <x-td>
           {#if booking.refund?.status}
-            <TStatusBadgeCol value={booking.refund.status} />
-          {:else}
-            <TCol width="0" />
+            <StatusBadge value={booking.refund.status} />
           {/if}
-        {/if}
+        </x-td>
+      {/if}
 
-        {#if showActionsColumn}
-          <TActionsCol static>
-            {#if booking.status === "confirmed" && !booking.cancellation?.status}
-              <button
-                size="xx-small"
-                variant="outline"
-                on:click={cancelBooking.bind(cancelBooking, booking)}
-              >
-                {$i18n.actions.cancelRequest}
-              </button>
-            {/if}
-          </TActionsCol>
-        {/if}
-      </TRow>
-    {/each}
-  </TBody>
-</Table>
+      {#if showActionsColumn}
+        <x-tactions>
+          {#if booking.status === "confirmed" && !booking.cancellation?.status}
+            <button
+              size="xx-small"
+              variant="outline"
+              on:click={cancelBooking.bind(cancelBooking, booking)}
+            >
+              {$i18n.actions.cancelRequest}
+            </button>
+          {/if}
+        </x-tactions>
+      {/if}
+    </x-tr>
+  {/each}
+</x-table>
 
 <style>
-  :global(.table.bookings-table) {
-    width: 100%;
+  .bookings-table {
     height: 100%;
   }
 

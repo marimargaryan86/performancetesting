@@ -23,6 +23,17 @@ type ButtonVariant = "primary" | "outline" | "text";
 type ButtonSize = "large" | "medium" | "small" | "x-small" | "xx-small";
 
 declare module "svelte/elements" {
+  export interface SvelteHTMLElements {
+    "x-table": HTMLAttributes;
+    "x-thead": HTMLAttributes;
+    "x-tbody": HTMLAttributes;
+    "x-tr": HTMLAttributes;
+    "x-td": HTMLAttributes;
+    "x-th": HTMLAttributes;
+    "x-tloading": HTMLAttributes;
+    "x-tactions": HTMLAttributes;
+  }
+
   export interface HTMLButtonAttributes {
     variant?: ButtonVariant;
     size?: ButtonSize;

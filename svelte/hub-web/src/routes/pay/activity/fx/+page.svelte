@@ -3,22 +3,20 @@
 </script>
 
 <script lang="ts">
-  import Table from "components/ui/table/table.svelte";
-  import THead from "components/ui/table/t-head.svelte";
-  import Header from "components/ui/table/header.svelte";
-  import TBody from "components/ui/table/t-body.svelte";
-  import TRow from "components/ui/table/t-row.svelte";
-  import TCol from "components/ui/table/t-col.svelte";
-  import TStatusBadgeCol from "components/ui/table/t-status-badge-col.svelte";
-  import type { ScrollLoadFunc } from "directives/scroll-load";
+  import { scrollLoad, type ScrollLoadFunc } from "directives/scroll-load";
   import integrationInstancesClient from "integration-instances-client";
   import { getPageTitle } from "utils/page-title";
   import { getLocale, getLocaleData } from "i18n";
+  import StatusBadge from "components/ui/status-badge.svelte";
+  import { writable } from "svelte/store";
+  import LoadingIcon from "components/icons/loading-icon.svelte";
+  import { slideFade } from "transitions/slide-fade";
 
   export let data;
 
   const i18n = getLocaleData();
   const locale = getLocale();
+  const pending = writable(false);
 
   $: conversions = data.conversions.data;
 
@@ -52,59 +50,52 @@
   </title>
 </svelte:head>
 
-<Table class="fx-table" {loadMore}>
-  <THead>
-    <Header>{$i18n.tableHeaders.id}</Header>
-    <Header>{$i18n.tableHeaders.createdDate}</Header>
-    <Header>{$i18n.tableHeaders.settlement}</Header>
-    <Header>{$i18n.tableHeaders.from}</Header>
-    <Header>{$i18n.tableHeaders.to}</Header>
-    <Header>{$i18n.tableHeaders.quoteRate}</Header>
-    <Header>{$i18n.tableHeaders.transactionRate}</Header>
-    <Header>{$i18n.tableHeaders.fxDelta}</Header>
-    <Header>{$i18n.tableHeaders.fxBuffer}</Header>
-    <Header>{$i18n.tableHeaders.status}</Header>
-  </THead>
+<x-table
+  class="fx-table"
+  use:scrollLoad={{ func: loadMore, pending }}
+  style:grid-template-columns="repeat(10, minmax(min-content, 1fr))"
+>
+  <x-thead>
+    <x-th>{$i18n.tableHeaders.id}</x-th>
+    <x-th>{$i18n.tableHeaders.createdDate}</x-th>
+    <x-th>{$i18n.tableHeaders.settlement}</x-th>
+    <x-th>{$i18n.tableHeaders.from}</x-th>
+    <x-th>{$i18n.tableHeaders.to}</x-th>
+    <x-th>{$i18n.tableHeaders.quoteRate}</x-th>
+    <x-th>{$i18n.tableHeaders.transactionRate}</x-th>
+    <x-th>{$i18n.tableHeaders.fxDelta}</x-th>
+    <x-th>{$i18n.tableHeaders.fxBuffer}</x-th>
+    <x-th>{$i18n.tableHeaders.status}</x-th>
+  </x-thead>
 
-  <TBody>
-    {#each conversions as conversion (conversion.id)}
-      <TRow>
-        <TCol maxWidth="96px" copyable={Boolean(conversion.transaction?.externalReference)}>
-          {conversion.transaction?.externalReference ?? ""}
-        </TCol>
-        <TCol class="currency" weight="bold">
-          {conversion.createdAt?.toLocaleDateString($locale) ?? ""}
-        </TCol>
-        <TCol class="currency" weight="bold">
-          {conversion.settledAt?.toLocaleDateString($locale) ?? ""}
-        </TCol>
-        <TCol class="currency" weight="bold">
-          {conversion.amounts.sell?.currency ?? ""}
-        </TCol>
-        <TCol class="currency" weight="bold">
-          {conversion.amounts.buy?.currency ?? ""}
-        </TCol>
-        <TCol>{conversion.transaction?.fx.quote ?? ""}</TCol>
-        <TCol>{conversion.executedRate}</TCol>
-        <TCol>{conversion.fx.delta ?? ""}</TCol>
-        <TCol>{conversion.transaction?.fx.buffer ?? ""}</TCol>
-        <TStatusBadgeCol value={conversion.fx.status ?? "unspecified"} />
-      </TRow>
-    {/each}
-  </TBody>
-</Table>
+  {#each conversions as conversion (conversion.id)}
+    <x-tr>
+      <x-td>{conversion.transaction?.externalReference ?? ""}</x-td>
+      <x-td>{conversion.createdAt?.toLocaleDateString($locale) ?? ""}</x-td>
+      <x-td>{conversion.settledAt?.toLocaleDateString($locale) ?? ""}</x-td>
+      <x-td>{conversion.amounts.sell?.currency ?? ""}</x-td>
+      <x-td>{conversion.amounts.buy?.currency ?? ""}</x-td>
+      <x-td>{conversion.transaction?.fx.quote ?? ""}</x-td>
+      <x-td>{conversion.executedRate}</x-td>
+      <x-td>{conversion.fx.delta ?? ""}</x-td>
+      <x-td>{conversion.transaction?.fx.buffer ?? ""}</x-td>
+      <x-td><StatusBadge value={conversion.fx.status ?? "unspecified"} /></x-td>
+    </x-tr>
+  {/each}
+
+  {#if $pending}
+    <x-tloading transition:slideFade={{ duration: 200 }}>
+      <LoadingIcon color="var(--color-main-primary-500)" />
+    </x-tloading>
+  {/if}
+</x-table>
 
 <style>
-  :global(.table.fx-table) {
-    width: 100%;
+  .fx-table {
     height: 100%;
   }
 
-  :global(.table.fx-table .currency) {
-    color: var(--color-main-neutral-600);
-  }
-
-  :global(.table.fx-table .status-badge) {
+  x-td > :global(.status-badge) {
     width: 100%;
   }
 </style>

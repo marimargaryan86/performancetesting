@@ -4,25 +4,23 @@
 
 <script lang="ts">
   import { dev } from "$app/environment";
-  import Header from "components/ui/table/header.svelte";
-  import TBody from "components/ui/table/t-body.svelte";
-  import TCol from "components/ui/table/t-col.svelte";
-  import THead from "components/ui/table/t-head.svelte";
-  import TRow from "components/ui/table/t-row.svelte";
-  import Table from "components/ui/table/table.svelte";
   import { capitalize } from "utils/common";
   import routeConfig from "routeConfig";
-  import TActionsCol from "components/ui/table/t-actions-col.svelte";
   import StandardLayout from "components/page/standard-layout.svelte";
-  import type { ScrollLoadFunc } from "directives/scroll-load";
+  import { scrollLoad, type ScrollLoadFunc } from "directives/scroll-load";
   import integrationInstancesClient from "integration-instances-client";
   import currencyData from "data/currency-data";
   import { getPageTitle } from "utils/page-title";
   import Icon from "components/icons/icon.svelte";
+  import { writable } from "svelte/store";
+  import LoadingIcon from "components/icons/loading-icon.svelte";
+  import { slideFade } from "transitions/slide-fade";
 
   export let data;
 
   $: beneficiaries = data.beneficiaries.data;
+
+  const pending = writable(false);
 
   const loadMore: ScrollLoadFunc = async () => {
     if (!data.beneficiaries.cursor) {
@@ -61,79 +59,81 @@
       variant="primary"
       size="small"
       href={routeConfig.routes.pay.routes.beneficiaries.routes.beneficiary().root}
-      data-sveltekit-preload-data={false}
+      data-sveltekit-preload-data="off"
       slot="actions"
     >
       Add Beneficiary
       <Icon variant="plus" size="20px" />
     </a>
 
-    <Table class="beneficiaries-table" {loadMore}>
-      <THead>
-        <Header>Company</Header>
-        <Header>Currency</Header>
-        <Header>Bank Country</Header>
-        <Header>Type</Header>
-        <Header />
-      </THead>
+    <x-table
+      class="beneficiaries-table"
+      use:scrollLoad={{ func: loadMore, pending }}
+      style:grid-template-columns="2fr repeat(3, 1fr) min-content"
+    >
+      <x-thead>
+        <x-th>Company</x-th>
+        <x-th>Currency</x-th>
+        <x-th>Bank Country</x-th>
+        <x-th>Type</x-th>
+        <x-th />
+      </x-thead>
 
-      <TBody>
-        {#each beneficiaries as item (item.id)}
-          {@const currency = currencyData.mapping[item.currencyId]}
+      {#each beneficiaries as item (item.id)}
+        {@const currency = currencyData.mapping[item.currencyId]}
 
-          <TRow alternatingBackground={false}>
-            <TCol class="company-name" typography="body-medium" weight="bold">
-              {item.bankAccountHolderName}
-            </TCol>
-            <TCol>
-              <div class="currency">
-                <strong typography="body-medium" weight="bold">{item.currencyId}</strong>
-                <span typography="body-small">{currency?.name ?? ""}</span>
-              </div>
-            </TCol>
-            <TCol typography="body-medium" weight="bold"
-              >{item.bankDetails.address.countryCode}</TCol
+        <x-tr>
+          <x-td class="company-name">{item.bankAccountHolderName}</x-td>
+          <x-td class="currency">
+            <strong typography="body-medium" weight="bold">{item.currencyId}</strong>
+            <span typography="body-small">{currency?.name ?? ""}</span>
+          </x-td>
+          <x-td>{item.bankDetails.address.countryCode}</x-td>
+          <x-td>{capitalize(item.bankDetails.paymentType)}</x-td>
+          <x-tactions>
+            <a
+              href={routeConfig.routes.pay.routes.beneficiaries.routes.beneficiary(item.id).root}
+              data-sveltekit-preload-data="off"
+              class="action"
             >
-            <TCol typography="body-medium">{capitalize(item.bankDetails.paymentType)}</TCol>
-            <TActionsCol>
-              <a
-                href={routeConfig.routes.pay.routes.beneficiaries.routes.beneficiary(item.id).root}
-                data-sveltekit-preload-data="off"
-                class="action"
-              >
-                <Icon variant="edit" size="32px" />
-              </a>
+              <Icon variant="edit" size="32px" />
+            </a>
 
-              <button on:click={remove.bind(remove)} class="action">
-                <Icon variant="remove-trash" size="32px" />
-              </button>
+            <button on:click={remove.bind(remove)} class="action">
+              <Icon variant="remove-trash" size="32px" />
+            </button>
 
-              <button class="outline action" typography="body-medium" weight="bold">Pay</button>
-            </TActionsCol>
-          </TRow>
-        {/each}
-      </TBody>
-    </Table>
+            <button class="outline action" typography="body-medium" weight="bold">Pay</button>
+          </x-tactions>
+        </x-tr>
+      {/each}
+
+      {#if $pending}
+        <x-tloading transition:slideFade={{ duration: 200 }}>
+          <LoadingIcon color="var(--color-main-primary-500)" />
+        </x-tloading>
+      {/if}
+    </x-table>
   </StandardLayout>
 {/if}
 
 <style>
-  :global(.table.beneficiaries-table) {
-    width: 100%;
+  .beneficiaries-table {
     height: 100%;
-    color: var(--color-common-light-strong);
   }
 
   .currency {
     display: flex;
     flex-flow: column;
+    padding-top: 8px;
+    padding-bottom: 8px;
   }
 
   .currency > span {
     color: var(--color-common-light-soft);
   }
 
-  :global(tr:hover .company-name) {
+  x-tr:hover .company-name {
     color: var(--color-common-light-text-link);
   }
 
@@ -153,7 +153,7 @@
     border-radius: 8px;
   }
 
-  .action > :global(svg) {
+  .action > :global(.icon) {
     vertical-align: top;
   }
 </style>

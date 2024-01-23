@@ -200,6 +200,7 @@
   }
 
   .popover {
+    z-index: var(--z-index-ui-dialog);
     width: 384px;
     padding: 32px 24px;
     background-color: var(--color-common-background-light-main);

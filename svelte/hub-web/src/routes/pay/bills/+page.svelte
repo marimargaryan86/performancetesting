@@ -5,20 +5,17 @@
 <script lang="ts">
   import StandardLayout from "components/page/standard-layout.svelte";
   import Switch from "components/ui/switch.svelte";
-  import Header from "components/ui/table/header.svelte";
-  import TBody from "components/ui/table/t-body.svelte";
-  import TCol from "components/ui/table/t-col.svelte";
-  import THead from "components/ui/table/t-head.svelte";
-  import TMoneyCol from "components/ui/table/t-money-col.svelte";
-  import TRow from "components/ui/table/t-row.svelte";
-  import Table from "components/ui/table/table.svelte";
-  import type { ScrollLoadFunc } from "directives/scroll-load";
+  import { scrollLoad, type ScrollLoadFunc } from "directives/scroll-load";
   import integrationInstancesClient from "integration-instances-client";
   import type { Bill } from "integration/junction-hub-api/schemas/bill";
   import { match as matchUuid } from "../../../params/uuid";
   import { getLocale, getLocaleData } from "i18n";
   import { browser } from "$app/environment";
   import { getPageTitle } from "utils/page-title";
+  import { formatAmount } from "formatting/currency";
+  import { writable } from "svelte/store";
+  import LoadingIcon from "components/icons/loading-icon.svelte";
+  import { slideFade } from "transitions/slide-fade";
 
   export let data;
 
@@ -26,6 +23,7 @@
 
   const locale = getLocale();
   const i18n = getLocaleData();
+  const pending = writable(false);
 
   $: ({ data: bills } = data.bills);
   $: searchQueryUuid = matchUuid(searchQuery) ? searchQuery : undefined;
@@ -79,43 +77,48 @@
 </svelte:head>
 
 <StandardLayout pageTitle={$i18n.pages.pay.pages.bills.title} bind:searchQuery>
-  <Table {loadMore} class="bills-table">
-    <THead>
-      <Header>{$i18n.tableHeaders.orderId}</Header>
-      <Header>{$i18n.tableHeaders.createdDate}</Header>
-      <Header>{$i18n.tableHeaders.updatedDate}</Header>
-      <Header>{$i18n.tableHeaders.owedToUs}</Header>
-      <Header textAlign="right">{$i18n.tableHeaders.reconciledQuestion}</Header>
-    </THead>
-    <TBody>
-      {#each bills as bill}
-        <TRow>
-          <TCol width="0">{bill.orderId}</TCol>
-          <TCol width="0">
-            {bill.createdAt?.toLocaleDateString($locale) ?? $i18n.words.notAvailable}
-          </TCol>
-          <TCol width="0">
-            {bill.updatedAt?.toLocaleDateString($locale) ?? $i18n.words.notAvailable}
-          </TCol>
+  <x-table
+    class="bills-table"
+    style:grid-template-columns="repeat(4, minmax(max-content, 1fr)) min-content"
+    use:scrollLoad={{ func: loadMore, pending }}
+  >
+    <x-thead>
+      <x-th>{$i18n.tableHeaders.orderId}</x-th>
+      <x-th>{$i18n.tableHeaders.createdDate}</x-th>
+      <x-th>{$i18n.tableHeaders.updatedDate}</x-th>
+      <x-th>{$i18n.tableHeaders.owedToUs}</x-th>
+      <x-th>{$i18n.tableHeaders.reconciledQuestion}</x-th>
+    </x-thead>
+
+    {#each bills as bill}
+      <x-tr>
+        <x-td>{bill.orderId}</x-td>
+        <x-td>{bill.createdAt?.toLocaleDateString($locale) ?? $i18n.words.notAvailable}</x-td>
+        <x-td>{bill.updatedAt?.toLocaleDateString($locale) ?? $i18n.words.notAvailable}</x-td>
+        <x-td>
           {#if bill.amounts.total}
-            <TMoneyCol money={bill.amounts.total} />
-          {:else}
-            <TCol width="0" />
+            {formatAmount(bill.amounts.total, { locale: $locale, sign: true })}
           {/if}
-          <TCol width="40px" textAlign="right">
-            <Switch
-              active={bill.reconciled}
-              on:toggle={toggleReconciliation.bind(toggleReconciliation, bill)}
-            />
-          </TCol>
-        </TRow>
-      {/each}
-    </TBody>
-  </Table>
+        </x-td>
+        <x-tactions>
+          <Switch
+            active={bill.reconciled}
+            on:toggle={toggleReconciliation.bind(toggleReconciliation, bill)}
+          />
+        </x-tactions>
+      </x-tr>
+    {/each}
+
+    {#if $pending}
+      <x-tloading transition:slideFade={{ duration: 200 }}>
+        <LoadingIcon color="var(--color-main-primary-500)" />
+      </x-tloading>
+    {/if}
+  </x-table>
 </StandardLayout>
 
 <style>
-  :global(.table.bills-table) {
+  .bills-table {
     height: 100%;
   }
 </style>

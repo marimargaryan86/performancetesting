@@ -5,24 +5,22 @@
 </script>
 
 <script lang="ts">
-  import Header from "components/ui/table/header.svelte";
-  import TBody from "components/ui/table/t-body.svelte";
-  import THead from "components/ui/table/t-head.svelte";
-  import Table from "components/ui/table/table.svelte";
-  import TRow from "components/ui/table/t-row.svelte";
-  import TCol from "components/ui/table/t-col.svelte";
-  import TCompanyCol from "components/ui/table/t-company-col.svelte";
-  import TMoneyCol from "components/ui/table/t-money-col.svelte";
-  import type { ScrollLoadFunc } from "directives/scroll-load";
+  import { scrollLoad, type ScrollLoadFunc } from "directives/scroll-load";
   import integrationInstancesClient from "integration-instances-client";
   import type TransactionService from "integration/junction-hub-api/services/transaction-service";
+  import EntityAvatar from "components/ui/entity-avatar.svelte";
   import { getPageTitle } from "utils/page-title";
   import { getLocale, getLocaleData } from "i18n";
+  import { writable } from "svelte/store";
+  import { slideFade } from "transitions/slide-fade";
+  import { formatAmount } from "formatting/currency";
+  import LoadingIcon from "components/icons/loading-icon.svelte";
 
   export let data;
 
   const i18n = getLocaleData();
   const locale = getLocale();
+  const pending = writable(false);
 
   $: transactions = data.transactions.data;
 
@@ -57,45 +55,56 @@
   </title>
 </svelte:head>
 
-<Table class="transactions-table" {loadMore}>
-  <THead>
-    <Header>{$i18n.tableHeaders.id}</Header>
-    <Header>{$i18n.tableHeaders.createdDate}</Header>
-    <Header>{$i18n.tableHeaders.transactionType}</Header>
-    <Header>{$i18n.tableHeaders.paymentType}</Header>
-    <Header>{$i18n.tableHeaders.payer}</Header>
-    <Header>{$i18n.tableHeaders.owedToUs}</Header>
-    <Header>{$i18n.tableHeaders.beneficiary}</Header>
-    <Header>{$i18n.tableHeaders.whatWeOwe}</Header>
-    <Header>{$i18n.tableHeaders.salesProfit}</Header>
-    <Header>{$i18n.tableHeaders.reference}</Header>
-  </THead>
+<x-table
+  class="transactions-table"
+  style:grid-template-columns="repeat(10, minmax(max-content, 1fr))"
+  use:scrollLoad={{ func: loadMore, pending }}
+>
+  <x-thead>
+    <x-th>{$i18n.tableHeaders.id}</x-th>
+    <x-th>{$i18n.tableHeaders.createdDate}</x-th>
+    <x-th>{$i18n.tableHeaders.transactionType}</x-th>
+    <x-th>{$i18n.tableHeaders.paymentType}</x-th>
+    <x-th>{$i18n.tableHeaders.payer}</x-th>
+    <x-th>{$i18n.tableHeaders.owedToUs}</x-th>
+    <x-th>{$i18n.tableHeaders.beneficiary}</x-th>
+    <x-th>{$i18n.tableHeaders.whatWeOwe}</x-th>
+    <x-th>{$i18n.tableHeaders.salesProfit}</x-th>
+    <x-th>{$i18n.tableHeaders.reference}</x-th>
+  </x-thead>
 
-  <TBody>
-    {#each transactions as item (item.id)}
-      <TRow>
-        <TCol maxWidth="96px" copyable>{item.externalReference}</TCol>
-        <TCol>{item.createdAt.toLocaleDateString($locale)}</TCol>
-        <TCol width="0">{$i18n.types[item.payment.method]}</TCol>
-        <TCol width="0">{$i18n.types[item.payment.type]}</TCol>
-        <TCompanyCol maxWidth="160px" companyName={item.payer?.name} />
-        <TMoneyCol money={item.amounts.quotation} />
-        <TCompanyCol maxWidth="160px" companyName={item.beneficiary?.name} />
-        <TMoneyCol money={item.amounts.beneficiary} />
-        <TMoneyCol money={item.sales.margin} />
-        <TCol maxWidth="96px" copyable copyAlign="right">{item.invoiceReference ?? "Unknown"}</TCol>
-      </TRow>
-    {/each}
-  </TBody>
-</Table>
+  {#each transactions as item (item.id)}
+    <x-tr>
+      <x-td>{item.externalReference}</x-td>
+      <x-td>{item.createdAt.toLocaleDateString($locale)}</x-td>
+      <x-td>{$i18n.types[item.payment.method]}</x-td>
+      <x-td>{$i18n.types[item.payment.type]}</x-td>
+      <x-td class="company">
+        {#if item.payer}
+          <EntityAvatar name={item.payer.name} size="24px" /> {item.payer.name}
+        {/if}
+      </x-td>
+      <x-td>{formatAmount(item.amounts.quotation, { locale: $locale, sign: true })}</x-td>
+      <x-td class="company">
+        {#if item.beneficiary}
+          <EntityAvatar name={item.beneficiary.name} size="24px" /> {item.beneficiary.name}
+        {/if}
+      </x-td>
+      <x-td>{formatAmount(item.amounts.beneficiary, { locale: $locale, sign: true })}</x-td>
+      <x-td>{formatAmount(item.sales.margin, { locale: $locale, sign: true })}</x-td>
+      <x-td>{item.invoiceReference ?? "Unknown"}</x-td>
+    </x-tr>
+  {/each}
+
+  {#if $pending}
+    <x-tloading transition:slideFade={{ duration: 200 }}>
+      <LoadingIcon color="var(--color-main-primary-500)" />
+    </x-tloading>
+  {/if}
+</x-table>
 
 <style>
-  :global(.table.transactions-table) {
-    width: 100%;
+  .transactions-table {
     height: 100%;
-  }
-
-  :global(.table.transactions-table .status-badge) {
-    width: 100%;
   }
 </style>
