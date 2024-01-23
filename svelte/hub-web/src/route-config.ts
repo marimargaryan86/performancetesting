@@ -29,16 +29,16 @@ export default {
               root: `${this.root}/orders`,
               get routes() {
                 return {
-                  order: <TOrderId extends string>(id: TOrderId) =>
+                  order: <TOrderId extends string>(orderId: TOrderId) =>
                     ({
-                      root: `${this.root}/${id}`,
+                      root: `${this.root}/${orderId}`,
                       get routes() {
                         return {
                           tickets: { root: `${this.root}/tickets` },
                           details: { root: `${this.root}/details` },
-                          booking: <TBookingId extends string>(id: TBookingId) =>
+                          booking: <TBookingId extends string>(bookingId: TBookingId) =>
                             ({
-                              root: `${this.root}/${id}`,
+                              root: `${this.root}/${bookingId}`,
                               get routes() {
                                 return { tickets: { root: `${this.root}/tickets` } } as const;
                               },
