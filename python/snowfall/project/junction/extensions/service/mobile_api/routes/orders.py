@@ -19,8 +19,7 @@ from snowfall.project.junction.extensions.service.mobile_api import (
 from snowfall.project.junction.extensions.service.mobile_api.tasks import orders
 from snowfall.project.junction.extensions.service.mobile_api.v1alpha import models_pb2
 from snowfall.project.junction.go.adapter.errors import (
-    ServiceUnavailableError,
-    UnhandledError,
+    NotFoundError,
 )
 from snowfall.project.pay.adapter import bills, credit_card_payment
 from snowfall.project.pay.service.transactions.v1 import (
@@ -244,18 +243,19 @@ async def create_order(  # noqa: WPS217
         mobile_number=contact_details["phoneNumber"],
     )
     try:
+        await _update_bill(
+            bills_client,
+            mobile_order.id,
+            mobile_order.payment_intent_id,
+        )
+    except NotFoundError:
         await bills_client.create(
             transactions_models_pb2.Bill(
                 order_id=mobile_order.id,
                 payment_intent_id=mobile_order.payment_intent_id,
             ),
         )
-    except (ServiceUnavailableError, UnhandledError):
-        _logger.exception(
-            "failed to create a bill",
-            order_id=mobile_order.id,
-            payment_intent_id=mobile_order.payment_intent_id,
-        )
+
     try:
         spnr = junction_order["included"][0]["attributes"]["reference"]
     except (KeyError, IndexError):
@@ -581,4 +581,16 @@ async def check_payment_amount_and_state(
             MIN_CHARGE[intent_amount.currency.code],
         ),
         payment_intent.status == "requires_capture",
+    )
+
+
+async def _update_bill(
+    bills_client: bills.Client,
+    order_id: str,
+    payment_intent_id: str,
+) -> None:
+    bill = await bills_client.get(order_id, selector="order_id")
+    await bills_client.update_payment_intent(
+        bill.id,
+        payment_intent_id,
     )

@@ -22,7 +22,11 @@ class Client(abc.ABC):
         """Create a bill resource."""
 
     @abc.abstractmethod
-    async def get(self, identifier: str) -> models_pb2.Bill:
+    async def get(
+        self,
+        identifier: str,
+        selector: str | None = None,
+    ) -> models_pb2.Bill:
         """Fetch a bill resource."""
 
     @abc.abstractmethod
@@ -44,6 +48,14 @@ class Client(abc.ABC):
     ) -> grpc_pb2.ListBillsResponse:
         """Fetch all bill resources."""
 
+    @abc.abstractmethod
+    async def update_payment_intent(
+        self,
+        identifier: str,
+        payment_intent_id: str,
+    ) -> models_pb2.Bill:
+        """Create a bill resource."""
+
 
 class DictClient(Client):
     def __init__(self, bills: Sequence[models_pb2.Bill]):
@@ -62,7 +74,7 @@ class DictClient(Client):
 
         return bill
 
-    async def get(self, bill_id: str) -> models_pb2.Bill:
+    async def get(self, bill_id: str, selector: str | None = None) -> models_pb2.Bill:
         try:
             return self._bills[bill_id]
         except KeyError as err:
@@ -108,6 +120,17 @@ class DictClient(Client):
             next_page_token=page.cursor,
         )
 
+    async def update_payment_intent(
+        self,
+        identifier: str,
+        payment_intent_id: str,
+    ) -> models_pb2.Bill:
+        """Create a bill resource."""
+        bill = self._bills[identifier]
+        bill.payment_intent_id = payment_intent_id
+
+        return bill
+
 
 class GrpcClient(Client):
     def __init__(
@@ -132,7 +155,7 @@ class GrpcClient(Client):
 
         return response.bill
 
-    async def get(self, bill_id: str) -> models_pb2.Bill:
+    async def get(self, bill_id: str, selector: str | None = None) -> models_pb2.Bill:
         response = await errors.handle_grpc_errors(
             self._bills.GetBill(
                 grpc_pb2.GetBillRequest(id=bill_id),
@@ -179,3 +202,20 @@ class GrpcClient(Client):
         return await errors.handle_grpc_errors(
             self._bills.ListBills(request, timeout=self._timeout),
         )
+
+    async def update_payment_intent(
+        self,
+        identifier: str,
+        payment_intent_id: str,
+    ) -> models_pb2.Bill:
+        response = await errors.handle_grpc_errors(
+            self._bills.UpdateBillPaymentIntent(
+                grpc_pb2.UpdateBillPaymentIntentRequest(
+                    id=identifier,
+                    payment_intent_id=payment_intent_id,
+                ),
+                timeout=self._timeout,
+            ),
+        )
+
+        return response.bill

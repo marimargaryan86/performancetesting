@@ -32,6 +32,7 @@ service BillsService {
   rpc GetBill(GetBillRequest) returns (GetBillResponse) {}
   rpc UpdateBillReconciliation(UpdateBillReconciliationRequest) returns (UpdateBillReconciliationResponse) {}
   rpc ListBills(ListBillsRequest) returns (ListBillsResponse) {}
+  rpc UpdateBillPaymentIntent(UpdateBillPaymentIntentRequest) returns (UpdateBillPaymentIntentResponse) {}
 }
 
 message ListTransactionsRequest {
@@ -149,6 +150,7 @@ message CreateBillResponse {
 
 message GetBillRequest {
   string id = 1;
+  string selector = 2;
 }
 
 message GetBillResponse {
@@ -174,4 +176,13 @@ message ListBillsRequest {
 message ListBillsResponse {
   string next_page_token = 1;
   repeated Bill bills = 2;
+}
+
+message UpdateBillPaymentIntentRequest {
+  string id = 1;
+  string payment_intent_id = 2;
+}
+
+message UpdateBillPaymentIntentResponse {
+  Bill bill = 1;
 }

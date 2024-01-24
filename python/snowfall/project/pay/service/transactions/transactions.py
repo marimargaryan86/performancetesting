@@ -160,6 +160,16 @@ class BillsRepository(
         pymongo.IndexModel("order_id", background=True, unique=True),
     )
 
+    async def find_by_selector(
+        self,
+        selection_value: str,
+        selector: str,
+    ) -> models_pb2.Bill | None:
+        return await self._execute(
+            self._collection.find_one,
+            {selector: selection_value},
+        )
+
     async def find_by_order_id(
         self,
         order_id: str,

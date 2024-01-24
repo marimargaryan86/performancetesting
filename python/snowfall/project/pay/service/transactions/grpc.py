@@ -426,10 +426,16 @@ class BillsService(
 
     async def GetBill(  # type: ignore[override] # noqa: N802
         self,
-        request: grpc_pb2.GetTransactionRequest,
+        request: grpc_pb2.GetBillRequest,
         context: grpc.aio.ServicerContext,
     ) -> grpc_pb2.GetBillResponse:
-        bill = await self._get_bill(context, request.id)
+        bill = await self._bills.find_by_selector(
+            selection_value=request.id,
+            selector=request.selector if request.selector else "_id",
+        )
+
+        if bill is None:
+            return await context.abort(grpc.StatusCode.NOT_FOUND)
 
         return grpc_pb2.GetBillResponse(bill=bill)
 
@@ -464,6 +470,19 @@ class BillsService(
             bill.is_reconciled = request.is_reconciled
 
         return grpc_pb2.UpdateBillReconciliationResponse(
+            bill=await self._bills.update(bill),
+        )
+
+    async def UpdateBillPaymentIntent(  # type: ignore[override] # noqa: N802
+        self,
+        request: grpc_pb2.UpdateBillPaymentIntentRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.UpdateBillPaymentIntentResponse:
+        bill = await self._get_bill(context, request.id)
+
+        bill.payment_intent_id = request.payment_intent_id
+
+        return grpc_pb2.UpdateBillPaymentIntentResponse(
             bill=await self._bills.update(bill),
         )
 
