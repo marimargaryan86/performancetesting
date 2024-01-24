@@ -109,7 +109,7 @@ job "junction-extensions-mobile-api-http-res-se" {
             }
             upstreams {
               local_bind_port  = 8050
-              destination_name = "co2-emissions-grpc-${var.environment}"
+              destination_name = "external-dependencies-${var.environment}"
             }
             upstreams {
               local_bind_port  = 8070
@@ -169,7 +169,7 @@ PLUS_API_ADDRESS={{(printf "http://%s" (env "NOMAD_UPSTREAM_ADDR_plus-api-${var.
 TRANSACTIONS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_transactions-${var.environment}"))}}
 CREDIT_CARD_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_credit-card-payments-${var.environment}"))}}
 FLIGHT_PREDICTION_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_flight-prediction-${var.environment}"))}}
-CO2_EMISSIONS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_co2-emissions-grpc-${var.environment}"))}}
+EXTERNAL_DEPENDENCIES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_external-dependencies-${var.environment}"))}}
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 SMTP_DSN={{range $index, $service := service "smtp"}}smtp://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}{{end}}

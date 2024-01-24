@@ -50,7 +50,7 @@ class Settings(application.Settings):
     smtp_dsn: AnyUrl
     mongo_dsn: Sequence[AnyUrl]
     flight_prediction_address: str
-    co2_emissions_address: str
+    external_dependencies_address: str
     jwt_private_key: str
     jwt_token_version: str
     jwt_public_key: str

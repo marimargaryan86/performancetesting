@@ -184,9 +184,9 @@ async def _http(  # noqa: WPS217
             flight_prediction_channel,
         ),
     )
-    trip_info_channel = await grpc_factory.make_insecure_channel(
+    external_dependencies_channel = await grpc_factory.make_insecure_channel(
         app,
-        app.settings.co2_emissions_address,
+        app.settings.external_dependencies_address,
     )
     credit_card_payment_channel = await grpc_factory.make_insecure_channel(
         app,
@@ -194,13 +194,13 @@ async def _http(  # noqa: WPS217
     )
     trip_info_client = trip_info.GrpcClient(
         grpc_pb2_grpc.CO2EmissionsServiceStub(
-            trip_info_channel,
+            external_dependencies_channel,
         ),
         grpc_pb2_grpc.FlightStatsServiceStub(
-            trip_info_channel,
+            external_dependencies_channel,
         ),
         grpc_pb2_grpc.VisaServiceStub(
-            trip_info_channel,
+            external_dependencies_channel,
         ),
     )
 
