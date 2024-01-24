@@ -410,6 +410,22 @@ def trip_info_client() -> trip_info.Client:
                 ),
             ),
         ],
+        visa_requirements=[
+            plus_services_models_pb2.ServiceIntent(
+                redirect_uri="https://travel.fluxir.com/applications/external?serviceIntentKey=Visa-Fluxir-ARE-2&from=01-01-2024&to=01-02-2024&origination=JOR&destination=ARE&tokenStoreKey=9910f620-1b29-4136-8e54-14bb82b1ae45",
+                title="United Arab Emirates (the) Tourist one month",
+                description="Single entry - 3 days processing time - Validity 2 Months",
+                info="A one month tourist visa for the United Arab Emirates allows an individual to visit the UAE for a period of up to 30 days. This type of visa is typically issued for single entry, meaning that the holder can only enter the UAE once during the validity of the visa. The purpose of the visit must be tourism or business, and the visa holder is not allowed to work or engage in any other activities that are not related to tourism or business.",
+                fee=96,
+                approval_rate="123",
+                appliers_count="98",
+                expected_processing_time="30",
+                stay_duration="30",
+                validity_period="2",
+                stay_duration_unit="Days",
+                validity_period_unit="Months",
+            ),
+        ],
     )
 
 

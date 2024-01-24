@@ -32,18 +32,27 @@ class Client(abc.ABC):
     ) -> plus_services_pb2.GetFlightStatusResponse:
         """Get status of the flight."""
 
+    @abc.abstractmethod
+    async def get_visa_requirements(
+        self,
+        request: plus_services_pb2.GetVisaRequirementsRequest,
+    ) -> plus_services_pb2.GetVisaRequirementsResponse:
+        """Get visa requirements."""
+
 
 class DictClient(Client):
     def __init__(
         self,
         emissions: Sequence[plus_services_models_pb2.FlightEmission],
         flight_statuses: Sequence[plus_services_models_pb2.FlightStatus],
+        visa_requirements: Sequence[plus_services_models_pb2.ServiceIntent],
     ) -> None:
         self._emissions = {emission.flight_number: emission for emission in emissions}
         self._flight_statuses = {
             status.carrier_fs_code + status.flight_number: status
             for status in flight_statuses
         }
+        self._visa_reqs = visa_requirements
 
     async def calculate_emissions(
         self,
@@ -61,15 +70,25 @@ class DictClient(Client):
             flight_statuses=[self._flight_statuses[carrier_code + flight_number]],
         )
 
+    async def get_visa_requirements(
+        self,
+        request: plus_services_pb2.GetVisaRequirementsRequest,
+    ) -> plus_services_pb2.GetVisaRequirementsResponse:
+        return plus_services_pb2.GetVisaRequirementsResponse(
+            items=self._visa_reqs,
+        )
+
 
 class GrpcClient(Client):
     def __init__(
         self,
         co2_emissions: plus_services_pb2_grpc.CO2EmissionsServiceStub,
         flight_stats: plus_services_pb2_grpc.FlightStatsServiceStub,
+        visas: plus_services_pb2_grpc.VisaServiceStub,
     ):
         self._co2_emissions = co2_emissions
         self._flight_stats = flight_stats
+        self._visas = visas
 
     async def calculate_emissions(
         self,
@@ -98,4 +117,12 @@ class GrpcClient(Client):
                     departure_at=protobuf.date_to_protobuf(departure_at),
                 ),
             ),
+        )
+
+    async def get_visa_requirements(
+        self,
+        request: plus_services_pb2.GetVisaRequirementsRequest,
+    ) -> plus_services_pb2.GetVisaRequirementsResponse:
+        return await errors.handle_grpc_errors(
+            self._visas.GetVisaRequirements(request),
         )

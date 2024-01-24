@@ -28,9 +28,8 @@ from snowfall.project.junction.extensions.service.mobile_api import (
 from snowfall.project.junction.extensions.service.mobile_api.routes import router
 from snowfall.project.junction.go.adapter import errors
 from snowfall.project.junction.plus.adapter import flight_delay_predictor, trip_info
-from snowfall.project.junction.plus.service.external_dependencies.v1.grpc_pb2_grpc import (
-    CO2EmissionsServiceStub,
-    FlightStatsServiceStub,
+from snowfall.project.junction.plus.service.external_dependencies.v1 import (
+    grpc_pb2_grpc,
 )
 from snowfall.project.junction.plus.service.flight_prediction.v1 import (
     flight_prediction_pb2_grpc,
@@ -194,10 +193,13 @@ async def _http(  # noqa: WPS217
         app.settings.credit_card_address,
     )
     trip_info_client = trip_info.GrpcClient(
-        CO2EmissionsServiceStub(
+        grpc_pb2_grpc.CO2EmissionsServiceStub(
             trip_info_channel,
         ),
-        FlightStatsServiceStub(
+        grpc_pb2_grpc.FlightStatsServiceStub(
+            trip_info_channel,
+        ),
+        grpc_pb2_grpc.VisaServiceStub(
             trip_info_channel,
         ),
     )
