@@ -232,8 +232,8 @@ class KarhooOffersAdapter(object):
         quote: karhoo_quotes.Quote,
         segment: offer_models_pb2.OfferSegment,
     ) -> offer_models_pb2.Offer:
-        offer_price = money.Money(
-            amount=quote.price.high or 0,
+        offer_price = money.from_string(
+            string_amount=str(quote.price.high or 0),
             currency=money.Currency(quote.price.currency_code),
         ).protobuf()
 
