@@ -33,6 +33,8 @@ export default class JourneyService extends JunctionHubApiService {
         "filter[departureDate][ge]": filter?.departureAtRange?.from.toISOString(),
         "filter[departureDate][le]": filter?.departureAtRange?.to.toISOString(),
         "filter[status][eq]": filter?.bookingStatus,
+        "filter[passengerLastName][like]": filter?.passengerLastName,
+        "filter[pnr][eq]": filter?.passengerNameRecord,
         sort,
         include: [
           "orders",

@@ -4,8 +4,26 @@
       bookingStatus: bookingStatuses.find((item) => item === value.bookingStatus),
       createdAtRange: parseDateRange(value["createdAt[from]"], value["createdAt[to]"]),
       departureAtRange: parseDateRange(value["departureAt[from]"], value["departureAt[to]"]),
-      passengerLastName: value.passengerLastName,
-      referenceNumber: value.referenceNumber,
+      passengerLastName:
+        value.passengerLastName === undefined || value.passengerLastName.length > 2
+          ? value.passengerLastName
+          : undefined,
+      passengerNameRecord:
+        value.passengerNameRecord === undefined ||
+        validatePassengerNameRecord(value.passengerNameRecord)
+          ? value.passengerNameRecord
+          : undefined,
+    };
+  }
+  export function queryFiltersValid(value: JourneyFilterOptions): {
+    [key in keyof JourneyFilterOptions]?: boolean;
+  } {
+    return {
+      passengerLastName:
+        value.passengerLastName === undefined || value.passengerLastName.length > 2,
+      passengerNameRecord:
+        value.passengerNameRecord === undefined ||
+        validatePassengerNameRecord(value.passengerNameRecord),
     };
   }
 
@@ -69,6 +87,7 @@
   import { slideFade } from "transitions/slide-fade";
   import { formatAmount } from "formatting/currency";
   import StatusBadge from "components/ui/status-badge.svelte";
+  import { validatePassengerNameRecord } from "utils/booking";
 
   export let data;
 
@@ -83,12 +102,9 @@
       "departureAt[to]": value.departureAtRange?.to.toLocaleDateString("sv-SE"),
       bookingStatus: value.bookingStatus,
       passengerLastName: value.passengerLastName,
-      referenceNumber: value.referenceNumber,
+      passengerNameRecord: value.passengerNameRecord,
     }),
-    valid: (value) => ({
-      passengerLastName: !value.passengerLastName || value.passengerLastName.length > 2,
-      referenceNumber: !value.referenceNumber || value.referenceNumber.length > 2,
-    }),
+    valid: queryFiltersValid,
   });
   const i18n = getLocaleData();
   const locale = getLocale();

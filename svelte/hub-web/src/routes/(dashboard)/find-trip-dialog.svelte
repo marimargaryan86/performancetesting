@@ -4,15 +4,16 @@
   import { getLocaleData } from "i18n";
   import Backdrop from "components/ui/backdrop.svelte";
   import TextField from "components/ui/text-field.svelte";
-  import { validateReferenceNumber } from "utils/booking";
+  import { validatePassengerNameRecord } from "utils/booking";
   import Icon from "components/icons/icon.svelte";
+  import type { JourneyFilterOptions } from "integration/junction-hub-api/schemas/journey";
 
   const i18n = getLocaleData();
-  const dispatch = createEventDispatcher<{ search: void }>();
+  const dispatch = createEventDispatcher<{ search: JourneyFilterOptions }>();
   let backdrop: Backdrop | undefined;
-  let referenceNumber: string;
+  let passengerNameRecord: string;
   let passengerLastName: string;
-  let referenceNumberError: string | boolean = false;
+  let passengerNameRecordError: string | boolean = false;
 
   export function open(): void {
     backdrop?.open();
@@ -23,19 +24,19 @@
   }
 
   export function search(): void {
-    referenceNumberError = false;
-    const isReferenceNumberInvalid = !validateReferenceNumber(referenceNumber);
+    passengerNameRecordError = false;
+    const isPassengerNameRecordInvalid = !validatePassengerNameRecord(passengerNameRecord);
 
-    if (isReferenceNumberInvalid) {
-      referenceNumberError = $i18n.sentences.referenceNumberError;
+    if (isPassengerNameRecordInvalid) {
+      passengerNameRecordError = $i18n.sentences.passengerNameRecordError;
 
       return;
     }
 
-    dispatch("search");
+    dispatch("search", { passengerNameRecord, passengerLastName });
   }
 
-  $: referenceNumber = "";
+  $: passengerNameRecord = "";
   $: passengerLastName = "";
 </script>
 
@@ -51,10 +52,10 @@
     <h3 typography="headline-small" weight="bold">{$i18n.actions.findTrip}</h3>
     <div class="fields">
       <TextField
-        label={$i18n.words.referenceNumber}
-        placeholder={$i18n.sentences.referenceNumberPlaceholder}
-        bind:value={referenceNumber}
-        error={referenceNumberError}
+        label={$i18n.words.passengerNameRecord}
+        placeholder={$i18n.sentences.passengerNameRecordPlaceholder}
+        bind:value={passengerNameRecord}
+        error={passengerNameRecordError}
       />
       <TextField
         label={`${

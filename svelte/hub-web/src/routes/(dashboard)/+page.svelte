@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { dev } from "$app/environment";
+  import { goto } from "$app/navigation";
+  import { page } from "$app/stores";
   import routeConfig from "routeConfig";
   import { getLocaleData } from "i18n";
   import Card from "components/ui/card.svelte";
@@ -8,13 +9,22 @@
   import TripGraphicOne from "assets/images/trip-graphic-1.png";
   import TripGraphicTwo from "assets/images/trip-graphic-2.png";
   import SearchingGraphic from "assets/images/searching.png";
+  import type { JourneyFilterOptions } from "integration/junction-hub-api/schemas/journey";
+  import { URLExtended } from "utils/url";
 
   const i18n = getLocaleData();
 
   let findTripDialog: FindTripDialog | undefined;
 
-  function searchOrders(): void {
-    alert("To be implemented.");
+  async function searchOrders(event: CustomEvent<JourneyFilterOptions>): Promise<void> {
+    const { passengerNameRecord, passengerLastName } = event.detail;
+
+    await goto(
+      new URLExtended(routeConfig.routes.tripManagement.routes.orders.root, {
+        base: $page.url,
+        query: { passengerNameRecord, passengerLastName },
+      }),
+    );
   }
 </script>
 
@@ -59,26 +69,20 @@
         </div>
       </Card>
 
-      {#if dev}
-        <Card variant="horizontal" theme="dark">
-          <div slot="media" class="media searching-graphic-wrapper">
-            <img
-              src={SearchingGraphic}
-              alt="Traveler searching with binoculars."
-              class="media searching-graphic"
-            />
-          </div>
-          <div slot="content" class="content alt">
-            <h3 typography="headline-small" weight="bold">{$i18n.words.manageTrip}</h3>
-            <p typography="label-large">{$i18n.sentences.manageTrip}</p>
-          </div>
-          <div slot="actions" class="actions alt">
-            <button variant="outline" class="widget-button" on:click={findTripDialog?.open}>
-              {$i18n.actions.findTrip}
-            </button>
-          </div>
-        </Card>
-      {/if}
+      <Card variant="horizontal" theme="dark">
+        <div slot="media" class="media searching-graphic-wrapper">
+          <img src={SearchingGraphic} alt="" class="media searching-graphic" />
+        </div>
+        <div slot="content" class="content alt">
+          <h3 typography="headline-small" weight="bold">{$i18n.words.manageTrip}</h3>
+          <p typography="label-large">{$i18n.sentences.manageTrip}</p>
+        </div>
+        <div slot="actions" class="actions alt">
+          <button variant="outline" class="widget-button" on:click={findTripDialog?.open}>
+            {$i18n.actions.findTrip}
+          </button>
+        </div>
+      </Card>
     </div>
   </div>
 </div>

@@ -101,7 +101,7 @@ export default {
     refundReference: "Referencia de reembolso",
     bookTrip: "Reservar un viaje",
     manageTrip: "Gestionar un viaje",
-    referenceNumber: "Número de referencia",
+    passengerNameRecord: "Número de referencia",
     optional: "Opcional",
   },
   actions: {
@@ -253,9 +253,9 @@ export default {
       "Busque, reserve y pague contenido multimodal de miles de proveedores y operadores, en una sola reserva.",
     manageTrip:
       "Recupere su viaje para cambiar o cancelar reservas, ver/imprimir itinerario y mucho más.",
-    referenceNumberPlaceholder: "Por ejemplo: 9A2FDF56",
-    passengerLastNamePlaceholder: "Como en la confirmación de su reserva",
-    referenceNumberError: "Su referencia es una secuencia de ocho letras y/o números.",
+    passengerNameRecordPlaceholder: "Por ejemplo: 9A2FDF56",
+    passengerLastNamePlaceholder: "Como en la confirmación de su reserva.",
+    passengerNameRecordError: "Su referencia es una secuencia de ocho letras y/o números.",
   },
   tableHeaders: {
     id: "IDENTIFICACIÓN",

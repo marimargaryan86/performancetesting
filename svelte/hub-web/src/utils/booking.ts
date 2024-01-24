@@ -13,14 +13,18 @@ export function getDestination(booking: MobileBooking | HubBooking): Point | und
 }
 
 /**
- * Validates that the input `Journey.referenceNumber` is an 8 character length
+ * Validates that the input `Journey.passengerNameRecord` is an 8 character length
  * alphanumeric string.
  *
- * @param referenceNumber A Journey referenceNumber to search
+ * @param passengerNameRecord A Journey passengerNameRecord to search
  * @returns Boolean indicating if a reference number is valid.
  */
-export function validateReferenceNumber(referenceNumber: string): boolean {
+export function validatePassengerNameRecord(passengerNameRecord: string | undefined): boolean {
+  if (passengerNameRecord === undefined) {
+    return false;
+  }
+
   const regex = /^[A-Za-z0-9]{8}$/;
 
-  return regex.test(referenceNumber);
+  return regex.test(passengerNameRecord);
 }

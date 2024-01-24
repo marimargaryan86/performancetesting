@@ -107,7 +107,7 @@ export default {
     refundReference: "Refund reference",
     bookTrip: "Book a Trip",
     manageTrip: "Manage a Trip",
-    referenceNumber: "Reference number",
+    passengerNameRecord: "Reference number",
     optional: "Optional",
   },
   actions: {
@@ -232,9 +232,9 @@ export default {
       "Search, book and pay for multimodal content from thousands of providers and operators – in a single booking.",
     manageTrip:
       "Retrieve your trip to change or cancel bookings, view/print itinerary and much more.",
-    referenceNumberPlaceholder: "For example: 9A2FDF56",
+    passengerNameRecordPlaceholder: "For example: 9A2FDF56",
     passengerLastNamePlaceholder: "As on your booking confirmation",
-    referenceNumberError: "Your reference is a sequence of eight letters and/or numbers.",
+    passengerNameRecordError: "Your reference is a sequence of eight letters and/or numbers.",
   },
   tableHeaders: {
     id: "ID",
