@@ -74,7 +74,7 @@ job "junction-plus-external-dependencies-grpc" {
     }
 
     service {
-      name = "external-dependencies-grpc-${var.environment}"
+      name = "external-dependencies-${var.environment}"
       port = "grpc"
       tags = ["grpc"]
 
