@@ -4129,6 +4129,10 @@
           },
           "attributes": {
             "type": "object",
+            "required": [
+              "email",
+              "role"
+            ],
             "properties": {
               "email": {
                 "type": "string",
@@ -4170,7 +4174,13 @@
               }
             }
           }
-        }
+        },
+        "required": [
+          "id",
+          "type",
+          "attributes",
+          "relationships"
+        ]
       },
       "UsersProfile": {
         "title": "Users Profile",
