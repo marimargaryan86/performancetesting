@@ -83,7 +83,7 @@ EOH
       env {
         ENV_NAME   = "${var.environment}"
         SENTRY_DSN = "https://0ab9747b3f7042d9882a664f0e31f229@sentry.snowfall.se/46"
-        CURRENCIES = "SEK GBP EUR USD"
+        CURRENCIES = "SEK GBP EUR USD AED"
         CC_ADDRESS = var.cc_address
       }
     }
