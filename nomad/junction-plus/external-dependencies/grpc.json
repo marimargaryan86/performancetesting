@@ -3,7 +3,7 @@
     "variables": {
       "count": 1,
       "google_flights_emissions_address": "https://travelimpactmodel.googleapis.com/v1/flights:computeFlightEmissions",
-      "flight_stats_api_url": "https://api.flightstats.com",
+      "flight_stats_api_url": "https://api.flightstats.com/flex/flightstatus/rest/v2/json/flight/status",
       "fluxir_api_url": "https://integration.fluxir.com"
     }
   },

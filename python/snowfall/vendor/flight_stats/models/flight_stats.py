@@ -31,8 +31,8 @@ class AirportResources(CamelCaseBaseModel):
 
 
 class Delay(CamelCaseBaseModel):
-    departure_gate_delay_minutes: int
-    arrival_gate_delay_minutes: int
+    departure_gate_delay_minutes: int = 0
+    arrival_gate_delay_minutes: int = 0
 
 
 class FlightStatus(CamelCaseBaseModel):
