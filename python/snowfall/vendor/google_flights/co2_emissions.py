@@ -2,6 +2,7 @@ from collections.abc import Sequence
 
 import httpx
 
+from snowfall.stdlib.persistence.cache import async_cache_ttl
 from snowfall.stdlib.transport.http.client import HttpClient, RequestOptions
 from snowfall.vendor.google_flights.models.emissions import (
     Flight,
@@ -27,6 +28,7 @@ class Client(HttpClient):
         )
         super().__init__(base_url, httpx_client)
 
+    @async_cache_ttl()
     async def get_emissions(
         self,
         flights: Sequence[Flight],

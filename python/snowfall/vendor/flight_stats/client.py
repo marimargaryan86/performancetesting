@@ -2,6 +2,7 @@ import datetime
 
 import httpx
 
+from snowfall.stdlib.persistence.cache import async_cache_ttl
 from snowfall.stdlib.transport.http import client
 from snowfall.vendor.flight_stats.models import errors, flight_stats
 
@@ -18,6 +19,7 @@ class FlightStatsClient(client.HttpClient):
         self._app_id = app_id
         self._app_key = app_key
 
+    @async_cache_ttl(ttl=datetime.timedelta(minutes=10))
     async def get_flight_status(
         self,
         departure_at: datetime.date,
