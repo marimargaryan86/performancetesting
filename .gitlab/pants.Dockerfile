@@ -2,6 +2,7 @@ ARG REGISTRY
 # 3.11.6-slim-bookworm
 FROM ${REGISTRY}python@sha256:233e4c53aebbd019c06f6d927b93de5292cfc5091ae22bcbd9630e600107c750
 ENV PATH=/usr/local/go/bin:$PATH
+ARG PANTS_VERSION
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     ca-certificates \
@@ -34,4 +35,4 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     nomad=1.7.2-1 \
     /tmp/oasdiff.deb \
 && rm -rf /var/lib/apt/lists/* /tmp/oasdiff.deb \
-&& printf "[GLOBAL]\npants_version = \"2.20.0.dev6\"" > /tmp/pants.toml && cd /tmp/ && pants --no-local-cache --no-pantsd --version && rm /tmp/pants.toml
+&& printf "[GLOBAL]\npants_version = \"${PANTS_VERSION}\"" > /tmp/pants.toml && cd /tmp/ && pants --no-local-cache --no-pantsd --version && rm /tmp/pants.toml
