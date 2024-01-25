@@ -1,4 +1,5 @@
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
+from typing import Any
 from unittest import mock
 
 import pytest
@@ -137,3 +138,30 @@ def create_payment_intent(mocker: MockerFixture) -> StripePaymentIntent:
         "stripe.PaymentIntent.create",
         return_value=StripePaymentIntent(),
     )
+
+
+@pytest.fixture()
+def mock_create_user_payload() -> Callable[[str, str, str], dict[str, Any]]:
+    return _mock_create_user_payload
+
+
+def _mock_create_user_payload(
+    email: str = "example@test.com",
+    role: str = "reseller-admin",
+    reseller_id: str = "mock_reseller_id",
+) -> dict[str, Any]:
+    return {
+        "type": "users",
+        "attributes": {
+            "email": email,
+            "role": role,
+        },
+        "relationships": {
+            "reseller": {
+                "data": {
+                    "id": reseller_id,
+                    "type": "resellers",
+                },
+            },
+        },
+    }

@@ -28,6 +28,7 @@ from snowfall.project.pay.service.refunds.v1.models_pb2 import Refund
 from snowfall.project.pay.service.transactions.v1 import (
     models_pb2 as transaction_models_pb2,
 )
+from snowfall.service.authentication.v1 import identities_pb2
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import models
@@ -1148,6 +1149,39 @@ class ResellerResource(models.Resource):
                         resellerId=reseller.id,
                     ),
                 ),
+            },
+        )
+
+
+class UserResource(models.Resource):
+    api_type: ClassVar[str] = "users"
+
+    @classmethod
+    def from_proto(
+        cls,
+        identity: identities_pb2.Identity,
+    ) -> UserResource:
+        metadata = dict(identity.metadata_public.items())
+        role = metadata.get("role", "")
+        reseller_id = str(metadata.get("reseller_id", ""))
+        return cls(
+            id=identity.id,
+            type=UserResource.api_type,
+            attributes={
+                "email": identity.email,
+                "role": role,
+            },
+            relationships={
+                "reseller": {
+                    _RELATIONSHIPS_FIELD: (
+                        models.ResourceIdentifier(
+                            id=reseller_id,
+                            type=ResellerResource.api_type,
+                        )
+                        if reseller_id
+                        else None
+                    ),
+                },
             },
         )
 

@@ -1,7 +1,50 @@
+from typing import Any
+
 import httpx
+import pytest
 from starlette import status
 
 from snowfall.project.junction.hub.service.hub_api.conftest import RESELLER_ID
+
+
+@pytest.mark.parametrize(
+    ("email", "role", "reseller_id", "expected_status", "test_id"),
+    [
+        (
+            "john@doe.com",
+            "reseller-admin",
+            RESELLER_ID,
+            status.HTTP_201_CREATED,
+            "success_case",
+        ),
+        (
+            "bad",
+            "example",
+            "input",
+            status.HTTP_400_BAD_REQUEST,
+            "failure_case",
+        ),
+    ],
+    ids=["Create User - Success", "Create User - Failure"],
+)
+async def test_create_user(
+    client: httpx.AsyncClient,
+    mock_create_user_payload: Any,
+    email: str,
+    role: str,
+    reseller_id: str,
+    expected_status: int,
+    test_id: str,
+) -> None:
+    payload = mock_create_user_payload(email=email, role=role, reseller_id=reseller_id)
+    response = await client.post(
+        "/users",
+        json={"data": payload},
+        headers={"Content-Type": "application/vnd.api+json"},
+    )
+    assert response.status_code == expected_status, "Test ID: {0} failed.".format(
+        test_id,
+    )
 
 
 class TestUserDataIncludesCompanyAndContacts(object):
