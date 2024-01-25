@@ -56,6 +56,10 @@ def pytest_configure(config: pytest.Config) -> None:
     )
     config.addinivalue_line(
         "markers",
+        "verify: verifier test that requires environment",
+    )
+    config.addinivalue_line(
+        "markers",
         "manually: only by manually execution",
     )
 
@@ -140,6 +144,7 @@ def pytest_collection_modifyitems(
     test_markers = [
         ("integration", "use `-m integration` to run this test"),
         ("smoke", "use `-m smoke` to run this test"),
+        ("verify", "use `-m verify` to run this test"),
         ("manually", "use `-m manually` to run this test"),
     ]
 
