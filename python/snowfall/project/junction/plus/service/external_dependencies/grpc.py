@@ -50,7 +50,7 @@ class CO2EmissionsService(
         request: external_dependencies_pb2.GetEmissionsRequest,
         context: aio.ServicerContext,
     ) -> external_dependencies_pb2.GetEmissionsResponse:
-        flights = [Flight(**MessageToDict(flight)) for flight in request.flights]
+        flights = tuple([Flight(**MessageToDict(flight)) for flight in request.flights])
         resp = await self._co2_emissions_client.get_emissions(flights)
 
         flight_emissions = [
@@ -65,7 +65,9 @@ class CO2EmissionsService(
                     premium_economy=flight_emission.emissions_grams_per_pax.premium_economy
                     // 1000,
                     economy=flight_emission.emissions_grams_per_pax.economy // 1000,
-                ),
+                )
+                if flight_emission.emissions_grams_per_pax
+                else None,
                 unit="KG",
             )
             for flight_emission in resp.flight_emissions

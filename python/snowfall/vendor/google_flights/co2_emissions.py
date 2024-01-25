@@ -1,5 +1,3 @@
-from collections.abc import Sequence
-
 import httpx
 
 from snowfall.stdlib.persistence.cache import async_cache_ttl
@@ -31,7 +29,7 @@ class Client(HttpClient):
     @async_cache_ttl()
     async def get_emissions(
         self,
-        flights: Sequence[Flight],
+        flights: tuple[Flight, ...],
     ) -> GetEmissionsResponse:
         response = await self._make_request(
             options=RequestOptions(

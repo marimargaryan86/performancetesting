@@ -18,6 +18,16 @@ class Flight(CamelCaseBaseModel):
     flight_number: int
     departure_date: Mapping[str, int]
 
+    def __hash__(self) -> int:
+        departure_date_hashable = tuple(sorted(self.departure_date.items()))
+        hashable_components = (
+            self.operating_carrier_code,
+            self.flight_number,
+            departure_date_hashable,
+        )
+
+        return hash(hashable_components)
+
 
 class Emission(CamelCaseBaseModel):
     first: int
@@ -28,7 +38,7 @@ class Emission(CamelCaseBaseModel):
 
 class FlightEmission(CamelCaseBaseModel):
     flight: Flight
-    emissions_grams_per_pax: Emission
+    emissions_grams_per_pax: Emission | None = None
 
 
 class GetEmissionsResponse(CamelCaseBaseModel):
