@@ -9,7 +9,7 @@ This guide will outline the steps needed to create your simple search with an ex
 
 ## Overview
 
-This guide covers 5 steps in detail to get you to search a trip and create an order.
+This guide covers 6 steps in detail to get you to search a trip and create an order.
 
 1. Initiate simple offer search for a trip
 2. Poll search status
@@ -33,7 +33,7 @@ endpoint initiates a search request for which Snowfall begins to search for offe
 Example:
 
 ```shell
-curl -X POST 'https://api.junction.dev/simple-offers/searches' \
+curl -X POST 'https://api.sandbox.junction.dev/simple-offers/searches' \
 --header 'Content-Type: application/vnd.api+json' \
 --header 'Authorization: Bearer <YOUR_ACCESS_TOKEN>' \
 --data '<REQUEST_BODY>'
@@ -150,7 +150,7 @@ In case of `taxi` offers will cover the entire trip, as currently multi-modality
             "status": "pending"  // <-- Search is still pending
         },
         "links": {
-            "self": "https://api.junction.dev/offers/searches/7a656c90-3ada-4869-94e3-34ce04dc26d7"
+            "self": "https://api.sandbox.junction.dev/offers/searches/7a656c90-3ada-4869-94e3-34ce04dc26d7"
         }
     }
 }
@@ -168,7 +168,7 @@ is a polling endpoint for you to monitor the search requests status.
 Example:
 
 ```shell
-curl -X GET 'https://api.junction.dev/offers/searches/{offerSearchId}' \
+curl -X GET 'https://api.sandbox.junction.dev/offers/searches/{offerSearchId}' \
 --header 'Content-Type: application/vnd.api+json' \
 --header 'Authorization: Bearer <YOUR_ACCESS_TOKEN>' \
 ```
@@ -200,7 +200,7 @@ The endpoint will return a `status: processing` until it has finished collecting
             }
         },
         "links": {
-            "self": "https://api.junction.dev/offers/searches/c2474ce4-8309-4a90-b431-21f780336b10"
+            "self": "https://api.sandbox.junction.dev/offers/searches/c2474ce4-8309-4a90-b431-21f780336b10"
         }
     }
 }
@@ -222,7 +222,7 @@ We recommend you add the following query param to the request **includes=groups.
 Example:
 
 ```shell
-curl -X GET 'https://api.junction.dev/offers/searches/{offerSearchId}/offers?include=groups.options' \
+curl -X GET 'https://api.sandbox.junction.dev/offers/searches/{offerSearchId}/offers?include=groups.options' \
 --header 'Content-Type: application/vnd.api+json' \
 --header 'Authorization: Bearer <YOUR_ACCESS_TOKEN>' \
 ```
@@ -257,7 +257,7 @@ Furthermore, each offer group includes a list of `Offer Option id`  that represe
         }
       },
       "links": {
-        "self": "https://api.junction.dev/offers/069d56d4-f713-4434-89ed-e664d74765fa"
+        "self": "https://api.sandbox.junction.dev/offers/069d56d4-f713-4434-89ed-e664d74765fa"
       }
     }
   ],
@@ -287,7 +287,7 @@ Furthermore, each offer group includes a list of `Offer Option id`  that represe
         }
       },
       "links": {
-        "self": "https://api.junction.dev/offers/groups/b6023669-b700-5399-82d4-c6657753b912"
+        "self": "https://api.sandbox.junction.dev/offers/groups/b6023669-b700-5399-82d4-c6657753b912"
       },
       "meta": {
         "providerId": "7b13cd40-464d-41fc-a71d-f5c63f9817d3"
@@ -331,7 +331,7 @@ Furthermore, each offer group includes a list of `Offer Option id`  that represe
         }
       },
       "links": {
-        "self": "https://api.junction.dev/offers/options/9f2a31af-ab94-521b-82e2-3fd01fbf2b21"
+        "self": "https://api.sandbox.junction.dev/offers/options/9f2a31af-ab94-521b-82e2-3fd01fbf2b21"
       }
     }
   ]
@@ -352,7 +352,7 @@ The `OFFER_ID` and `OFFER_OPTION_ID` you selected in the previous endpoint are u
 Example:
 
 ```shell
-curl -X POST 'https://api.junction.dev/offers/quotes' \
+curl -X POST 'https://api.sandbox.junction.dev/offers/quotes' \
 --header 'Content-Type: application/vnd.api+json' \
 --header 'Authorization: Bearer <YOUR_ACCESS_TOKEN>' \
 --data '<REQUEST_BODY>'
@@ -435,7 +435,7 @@ The response returns a single `Offer Price Quote ID` for every offer.
             }
         },
         "links": {
-            "self": "https://api.junction.dev/offers/quotes/896045d3-a218-4c76-bdf5-a7c88f92e473"
+            "self": "https://api.sandbox.junction.dev/offers/quotes/896045d3-a218-4c76-bdf5-a7c88f92e473"
         }
     }
 }
@@ -455,7 +455,7 @@ The `OfferPriceQuoteId` is the chosen offer from the response above.
 Example:
 
 ```shell
-curl -x GET 'https://api.junction.dev/offers/quotes/<OfferPriceQuoteId>' \
+curl -x GET 'https://api.sandbox.junction.dev/offers/quotes/<OfferPriceQuoteId>' \
 --header 'Content-Type: application/vnd.api+json' \
 --header 'Authorization: Bearer <YOUR_ACCESS_TOKEN>'
 ```
@@ -521,7 +521,7 @@ The endpoint will return a `status: processing` until it has finished collecting
             }
         },
         "links": {
-            "self": "https://api.junction.dev/offers/quotes/896045d3-a218-4c76-bdf5-a7c88f92e473"
+            "self": "https://api.sandbox.junction.dev/offers/quotes/896045d3-a218-4c76-bdf5-a7c88f92e473"
         }
     }
 }
@@ -541,7 +541,7 @@ A request body is required which will contain the `OFFER_ID`, the `OFFER_OPTION_
 Example:
 
 ```shell
-curl -X POST 'https://api.junction.dev/orders' \
+curl -X POST 'https://api.sandbox.junction.dev/orders' \
 --header 'Content-Type: application/vnd.api+json' \
 --header 'Authorization: Bearer <YOUR_ACCESS_TOKEN>' \
 --data-raw '<YOUR_DATA>'
@@ -651,7 +651,7 @@ Your order should now be complete.
             }
         },
         "links": {
-            "self": "https://api.junction.dev/orders/45d227f5-1db4-4365-9bc6-d232d47b3355"
+            "self": "https://api.sandbox.junction.dev/orders/45d227f5-1db4-4365-9bc6-d232d47b3355"
         }
     }
 }

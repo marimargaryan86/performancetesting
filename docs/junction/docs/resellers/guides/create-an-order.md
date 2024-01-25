@@ -36,7 +36,7 @@ provides a collection of place names, their place type, their coordinates, and o
 Example:
 
 ```shell
-curl -X GET 'https://api.junction.dev/places' \
+curl -X GET 'https://api.sandbox.junction.dev/places' \
 --header 'Authorization: Bearer <YOUR_ACCESS_TOKEN>'
 ```
 
@@ -49,7 +49,7 @@ We can also limit the number of places returned with a **query parameter** `page
 Example:
 
 ```shell
-curl -X GET 'https://api.junction.dev/places?page[limit]=2' \
+curl -X GET 'https://api.sandbox.junction.dev/places?page[limit]=2' \
 --header 'Authorization: Bearer <YOUR_ACCESS_TOKEN>'
 ```
 
@@ -86,7 +86,7 @@ This will return **2** *places* in the response.
                 }
             },
             "links": {
-                "self": "https://api.junction.dev/places/00014ab1-7b5d-5217-b956-daa1e0ac179c"
+                "self": "https://api.sandbox.junction.dev/places/00014ab1-7b5d-5217-b956-daa1e0ac179c"
             }
         },
         {
@@ -112,12 +112,12 @@ This will return **2** *places* in the response.
                 }
             },
             "links": {
-                "self": "https://api.junction.dev/places/00014b89-ad87-5b9d-ac7d-9beb69980259"
+                "self": "https://api.sandbox.junction.dev/places/00014b89-ad87-5b9d-ac7d-9beb69980259"
             }
         }
     ],
     "links": {
-        "next": "https://api.junction.dev/places?page%5Bcursor%5D=MTogIjAwMDE0Yjg5LWFkODctNWI5ZC1hYzdkLTliZWI2OTk4MDI1OSIgMjogIjJkNmYyYTYxNGIzYTRkMWIiIDM6ICJlN2EwOTYyOWE3ZGVmNGUxIiA0OiAiYTJlNjM1NDliMjUwMzBkMiIgNTogIm51bGwi&page%5Blimit%5D=2"
+        "next": "https://api.sandbox.junction.dev/places?page%5Bcursor%5D=MTogIjAwMDE0Yjg5LWFkODctNWI5ZC1hYzdkLTliZWI2OTk4MDI1OSIgMjogIjJkNmYyYTYxNGIzYTRkMWIiIDM6ICJlN2EwOTYyOWE3ZGVmNGUxIiA0OiAiYTJlNjM1NDliMjUwMzBkMiIgNTogIm51bGwi&page%5Blimit%5D=2"
     }
 }
 ```
@@ -133,7 +133,7 @@ After making a request and you receive a successful response, there will be a `l
 ```json
 {
     "links": {
-        "next": "https://api.junction.dev/places?page%5Bcursor%5D=MTogIjAwMDE0Yjg5LWFkODctNWI5ZC1hYzdkLTliZWI2OTk4MDI1OSIgMjogIjJkNmYyYTYxNGIzYTRkMWIiIDM6ICJlN2EwOTYyOWE3ZGVmNGUxIiA0OiAiYTJlNjM1NDliMjUwMzBkMiIgNTogIm51bGwi&page%5Blimit%5D=2"
+        "next": "https://api.sandbox.junction.dev/places?page%5Bcursor%5D=MTogIjAwMDE0Yjg5LWFkODctNWI5ZC1hYzdkLTliZWI2OTk4MDI1OSIgMjogIjJkNmYyYTYxNGIzYTRkMWIiIDM6ICJlN2EwOTYyOWE3ZGVmNGUxIiA0OiAiYTJlNjM1NDliMjUwMzBkMiIgNTogIm51bGwi&page%5Blimit%5D=2"
     }
 }
 ```
@@ -143,7 +143,7 @@ The value in `next` is the next page of your search. Simply, make a request agai
 Example:
 
 ```shell
-curl -X GET --globoff 'https://api.junction.dev/places?page[limit]=2&page[cursor]=MTogIjAwMDE0Yjg5LWFkODctNWI5ZC1hYzdkLTliZWI2OTk4MDI1OSIgMjogIjJkNmYyYTYxNGIzYTRkMWIiIDM6ICJlN2EwOTYyOWE3ZGVmNGUxIiA0OiAiYTJlNjM1NDliMjUwMzBkMiIgNTogIm51bGwi' \
+curl -X GET --globoff 'https://api.sandbox.junction.dev/places?page[limit]=2&page[cursor]=MTogIjAwMDE0Yjg5LWFkODctNWI5ZC1hYzdkLTliZWI2OTk4MDI1OSIgMjogIjJkNmYyYTYxNGIzYTRkMWIiIDM6ICJlN2EwOTYyOWE3ZGVmNGUxIiA0OiAiYTJlNjM1NDliMjUwMzBkMiIgNTogIm51bGwi' \
 --header 'Authorization: Bearer <YOUR_ACCESS_TOKEN>'
 ```
 
@@ -160,7 +160,7 @@ initiates a search request for which Snowfall begins to search for offers that s
 Example:
 
 ```shell
-curl -X POST 'https://api.junction.dev/trip-candidates/searches' \
+curl -X POST 'https://api.sandbox.junction.dev/trip-candidates/searches' \
 --header 'Content-Type: application/vnd.api+json' \
 --header 'Authorization: Bearer <YOUR_ACCESS_TOKEN>' \
 --data '<REQUEST_BODY>'
@@ -292,7 +292,7 @@ The `precision` (default: "area") attribute can be specified to search for eithe
             "status": "pending"  // <-- Search is still pending
         },
         "links": {
-            "self": "https://api.junction.dev/trip-candidates/searches/3e5da7b3-a487-455a-8706-d1b48004ddb7"
+            "self": "https://api.sandbox.junction.dev/trip-candidates/searches/3e5da7b3-a487-455a-8706-d1b48004ddb7"
         }
     }
 }
@@ -310,7 +310,7 @@ is a polling endpoint for you to monitor the search requests status.
 Example:
 
 ```shell
-curl -X GET 'https://api.junction.dev/trip-candidates/searches/{tripCandidateSearchid}' \
+curl -X GET 'https://api.sandbox.junction.dev/trip-candidates/searches/{tripCandidateSearchid}' \
 --header 'Content-Type: application/vnd.api+json' \
 --header 'Authorization: Bearer <YOUR_ACCESS_TOKEN>' \
 ```
@@ -358,7 +358,7 @@ The `precision` (default: "area") attribute can be specified to search for eithe
             "status": "completed"  // <-- Search is now complete
         },
         "links": {
-            "self": "https://api.junction.dev/trip-candidates/searches/3e5da7b3-a487-455a-8706-d1b48004ddb7"
+            "self": "https://api.sandbox.junction.dev/trip-candidates/searches/3e5da7b3-a487-455a-8706-d1b48004ddb7"
         }
     }
 }
@@ -380,7 +380,7 @@ We recommend you add the following query param to the request **includes=groups.
 Example:
 
 ```shell
-curl -X GET 'https://api.junction.dev/trip-candidates/searches/{tripCandidateSearchid}/offers?include=groups.options' \
+curl -X GET 'https://api.sandbox.junction.dev/trip-candidates/searches/{tripCandidateSearchid}/offers?include=groups.options' \
 --header 'Content-Type: application/vnd.api+json' \
 --header 'Authorization: Bearer <YOUR_ACCESS_TOKEN>' \
 ```
@@ -415,12 +415,12 @@ Furthermore, each offer group includes a list of `Offer Option id`  that represe
                 }
             },
             "links": {
-                "self": "https://api.junction.dev/offers/b5231874-8f98-4eb7-9875-591aba73fef2"
+                "self": "https://api.sandbox.junction.dev/offers/b5231874-8f98-4eb7-9875-591aba73fef2"
             }
         },
     ],
     "links": {
-        "next": "https://api.junction.dev/trip-candidates/searches/56a8b0e9-0e47-43f7-8fb8-5c8b532ea4a2/offers?page%5Bcursor%5D=MTogIjZjNjU4YTBiLThkOWYtNGEyYy04MGJjLWUzNTBkMDBmZjFjYyIgMjogImFmODIxM2M5NmE2N2NlZjciIDM6ICI1ODQ0MzU4YzIxMzFjMzBiIiA0OiAiYWRjNzA5NDA1YjFiYWFlNyIgNTogIntcIiRkYXRlXCI6IFwiMjAyMy0xMS0yN1QxMToxNzowMi42MTlaXCJ9Ig%3D%3D&page%5Blimit%5D=20"
+        "next": "https://api.sandbox.junction.dev/trip-candidates/searches/56a8b0e9-0e47-43f7-8fb8-5c8b532ea4a2/offers?page%5Bcursor%5D=MTogIjZjNjU4YTBiLThkOWYtNGEyYy04MGJjLWUzNTBkMDBmZjFjYyIgMjogImFmODIxM2M5NmE2N2NlZjciIDM6ICI1ODQ0MzU4YzIxMzFjMzBiIiA0OiAiYWRjNzA5NDA1YjFiYWFlNyIgNTogIntcIiRkYXRlXCI6IFwiMjAyMy0xMS0yN1QxMToxNzowMi42MTlaXCJ9Ig%3D%3D&page%5Blimit%5D=20"
     },
     "included": [
         {
@@ -448,7 +448,7 @@ Furthermore, each offer group includes a list of `Offer Option id`  that represe
                 }
             },
             "links": {
-                "self": "https://api.junction.dev/offers/groups/05e5d23c-6636-50b0-8726-4d9d0a6d5cf7"
+                "self": "https://api.sandbox.junction.dev/offers/groups/05e5d23c-6636-50b0-8726-4d9d0a6d5cf7"
             },
             "meta": {
                 "providerId": "f9ce75d1-2025-4ab5-b5d7-69e4c14c053e"
@@ -472,7 +472,7 @@ The `OFFER_ID` and `OFFER_OPTION_ID` you selected in the previous endpoint are u
 Example:
 
 ```shell
-curl -X POST 'https://api.junction.dev/offers/quotes' \
+curl -X POST 'https://api.sandbox.junction.dev/offers/quotes' \
 --header 'Content-Type: application/vnd.api+json' \
 --header 'Authorization: Bearer <YOUR_ACCESS_TOKEN>' \
 --data '<REQUEST_BODY>'
@@ -555,7 +555,7 @@ The response returns a single `Offer Price Quote ID` for every offer.
             }
         },
         "links": {
-            "self": "https://api.junction.dev/offers/quotes/896045d3-a218-4c76-bdf5-a7c88f92e473"
+            "self": "https://api.sandbox.junction.dev/offers/quotes/896045d3-a218-4c76-bdf5-a7c88f92e473"
         }
     }
 }
@@ -575,7 +575,7 @@ The `OfferPriceQuoteId` is the chosen offer from the response above.
 Example:
 
 ```shell
-curl -x GET 'https://api.junction.dev/offers/quotes/<OfferPriceQuoteId>' \
+curl -x GET 'https://api.sandbox.junction.dev/offers/quotes/<OfferPriceQuoteId>' \
 --header 'Content-Type: application/vnd.api+json' \
 --header 'Authorization: Bearer <YOUR_ACCESS_TOKEN>'
 ```
@@ -641,7 +641,7 @@ The endpoint will return a `status: processing` until it has finished collecting
             }
         },
         "links": {
-            "self": "https://api.junction.dev/offers/quotes/896045d3-a218-4c76-bdf5-a7c88f92e473"
+            "self": "https://api.sandbox.junction.dev/offers/quotes/896045d3-a218-4c76-bdf5-a7c88f92e473"
         }
     }
 }
@@ -661,7 +661,7 @@ A request body is required which will contain the `OFFER_ID`, the `OFFER_OPTION_
 Example:
 
 ```shell
-curl -X POST 'https://api.junction.dev/orders' \
+curl -X POST 'https://api.sandbox.junction.dev/orders' \
 --header 'Content-Type: application/vnd.api+json' \
 --header 'Authorization: Bearer <YOUR_ACCESS_TOKEN>' \
 --data-raw '<YOUR_DATA>'
@@ -771,7 +771,7 @@ Your order should now be complete.
             }
         },
         "links": {
-            "self": "https://api.junction.dev/orders/45d227f5-1db4-4365-9bc6-d232d47b3355"
+            "self": "https://api.sandbox.junction.dev/orders/45d227f5-1db4-4365-9bc6-d232d47b3355"
         }
     }
 }

@@ -19,11 +19,9 @@ If you do not have any of these, please contact us via [Slack](https://snowfallt
 Once we have provided you with OAuth2 Client Credentials during your onboarding, you
 may use this with instructions we'll provide to generate your **access token**, which can be used to make requests to our API.
 
-Please make one for testing our services too!
-
 ### What are these access tokens?
 
-After you've given them to us to configure the permissions, you'll be able to use them to access our Client API service endpoints.
+They are JSON Web Tokens (JWTs), which are a widely used format for representing claims securely between parties. They can be used as access tokens, which are used to grant access to protected resources, such as APIs.
 
 ### What to do with the access token
 

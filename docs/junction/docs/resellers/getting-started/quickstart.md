@@ -20,7 +20,7 @@ The Snowfall Reseller API connects any origin and destination, including cities,
 ##### Let's try it:
 
 ```shell
-curl -X GET 'https://api.junction.dev/places/types' \
+curl -X GET 'https://api.sandbox.junction.dev/places/types' \
 --header 'Authorization: Bearer <YOUR_ACCESS_TOKEN>'
 ```
 
@@ -36,12 +36,12 @@ You should receive a response something similar to this:
                 "name": "airport"
             },
             "links": {
-                "self": "https://api.junction.dev/places/types/airport"
+                "self": "https://api.sandbox.junction.dev/places/types/airport"
             }
         },
     ],
     "links": {
-        "next": "https://api.junction.dev/places/types?page%5Bcursor%5D=ABC%3D%3D&page%5Blimit%5D=20"
+        "next": "https://api.sandbox.junction.dev/places/types?page%5Bcursor%5D=ABC%3D%3D&page%5Blimit%5D=20"
     }
 }
 ```
@@ -63,7 +63,7 @@ Please refer back to the previous steps to make sure you set up everything corre
     <details>
         <summary>Is your command correct?</summary>
         1. Did you remember to replace `<YOUR_ACCESS_TOKEN>` in the curl command with your generated access token?
-        2. Is the host correct? `https://api.junction.dev`
+        2. Is the host correct? `https://api.sandbox.junction.dev`
     </details>
     </li>
     <li>
