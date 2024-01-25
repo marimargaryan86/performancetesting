@@ -9,13 +9,13 @@ import orjson
 import pytest
 import pytest_httpx
 
-from snowfall.stdlib.persistence import filesystem
+from snowfall.stdlib.persistence import cursor, filesystem
 from snowfall.vendor.ory import client, models
 
 
 async def _load_json_fixture(
     file_name: str,
-) -> dict[str, Any]:
+) -> Any:
     file_path = filesystem.resource_path(
         package="snowfall.vendor.ory.client",
         resource="fixtures/{file_name}.json".format(
@@ -103,6 +103,68 @@ class TestClient(object):
             identity.metadata_public["role"]
             == mock_identity_response["metadata_public"]["role"]
         )
+
+    async def test_list_identities(
+        self,
+        httpx_mock: pytest_httpx.HTTPXMock,
+        ory_client: client.OryClient,
+    ) -> None:
+        httpx_mock.add_response(json=await _load_json_fixture("identities"))
+
+        identities = await ory_client.list_identities()
+
+        assert len(identities.identities) == 2
+
+    async def test_list_identities_by_ids(
+        self,
+        httpx_mock: pytest_httpx.HTTPXMock,
+        ory_client: client.OryClient,
+    ) -> None:
+        json = await _load_json_fixture("identities")
+        next_identity = next(iter(json))
+        ids = [next_identity["id"]]
+
+        httpx_mock.add_response(json=[next_identity])
+
+        identities = await ory_client.list_identities(ids=ids)
+
+        assert len(identities.identities) == 1
+        for identity in identities.identities:
+            assert identity.identifier in ids
+
+    async def test_list_identities_paginated(
+        self,
+        httpx_mock: pytest_httpx.HTTPXMock,
+        ory_client: client.OryClient,
+    ) -> None:
+        json = await _load_json_fixture("identities")
+        httpx_mock.add_response(
+            json=[next(iter(json))],
+            headers={
+                "link": '</admin/identities?page_size=10&page_token=00000000-0000-0000-0000-000000000000>; rel="first",</admin/identities?page_size=10&page_token=2adf410f-8fe1-43db-9fce-e1dab46f224e>; rel="next"',
+            },
+        )
+
+        identities = await ory_client.list_identities(page_size=1)
+
+        assert len(identities.identities) == 1
+        assert identities.next_page_token
+
+        httpx_mock.add_response(
+            json=[next(iter(json))],
+            headers={
+                "link": '</admin/identities?page_size=50&page_token=00000000-0000-0000-0000-000000000000>; rel="first"',
+            },
+        )
+
+        page_token = cursor.marshal(identities.next_page_token)
+        identities = await ory_client.list_identities(
+            page_size=1,
+            page_token=cursor.unmarshal(page_token).id,
+        )
+
+        assert len(identities.identities) == 1
+        assert not identities.next_page_token
 
 
 class TestSessionModel(object):

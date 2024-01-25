@@ -41,6 +41,15 @@ class Client(abc.ABC):
         """Create an ORY identity."""
 
     @abc.abstractmethod
+    async def list_ory_identities(
+        self,
+        page_size: int | None = None,
+        page_token: str | None = None,
+        identifiers: Sequence[str] | None = None,
+    ) -> identities_pb2.ListIdentitiesResponse:
+        """List ORY identities."""
+
+    @abc.abstractmethod
     async def update_ory_identity(
         self,
         identifier: str,
@@ -86,6 +95,16 @@ class DictClient(Client):
             raise InvalidArgumentError()
 
         return identity
+
+    async def list_ory_identities(
+        self,
+        page_size: int | None = None,
+        page_token: str | None = None,
+        identifiers: Sequence[str] | None = None,
+    ) -> identities_pb2.ListIdentitiesResponse:
+        return identities_pb2.ListIdentitiesResponse(
+            identities=list(self._identities.values()),
+        )
 
     async def update_ory_identity(
         self,
@@ -156,6 +175,20 @@ class GrpcClient(Client):
             raise
 
         return response.identity
+
+    async def list_ory_identities(
+        self,
+        page_size: int | None = None,
+        page_token: str | None = None,
+        identifiers: Sequence[str] | None = None,
+    ) -> identities_pb2.ListIdentitiesResponse:
+        return await self._identity_service.ListIdentities(
+            identities_pb2.ListIdentitiesRequest(
+                page_size=page_size or 0,
+                page_token=page_token or "",
+                ids=identifiers,
+            ),
+        )
 
     async def update_ory_identity(
         self,

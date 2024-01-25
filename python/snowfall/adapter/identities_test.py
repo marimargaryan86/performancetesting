@@ -48,6 +48,7 @@ def error_stub() -> identities_pb2_grpc.IdentitiesServiceStub:
     stub = mock.create_autospec(identities_pb2_grpc.IdentitiesServiceStub)
     stub.GetIdentity = mock.AsyncMock(side_effect=error)
     stub.UpdateIdentity = mock.AsyncMock(side_effect=error)
+    stub.ListIdentities = mock.AsyncMock(side_effect=error)
 
     return stub
 
@@ -96,10 +97,15 @@ def stub(
         identity=identity,
     )
 
+    list_identities_response = identities_pb2.ListIdentitiesResponse(
+        identities=_get_identities(),
+    )
+
     stub = mock.create_autospec(identities_pb2_grpc.IdentitiesServiceStub)
     stub.GetIdentity = mock.AsyncMock(return_value=get_identity_response)
     stub.CreateIdentity = mock.AsyncMock(return_value=create_identity_response)
     stub.UpdateIdentity = mock.AsyncMock(return_value=update_identity_response)
+    stub.ListIdentities = mock.AsyncMock(return_value=list_identities_response)
 
     return stub
 
@@ -168,6 +174,14 @@ class TestDictClient(object):
                 email="",
                 metadata={},
             )
+
+    async def test_list_identities(
+        self,
+        identities_client: identities.Client,
+    ) -> None:
+        identities_response = await identities_client.list_ory_identities()
+
+        assert len(identities_response.identities) == 2
 
 
 class TestGrpcClient(object):
@@ -256,6 +270,16 @@ class TestGrpcClient(object):
                 email="",
                 metadata={},
             )
+
+    async def test_list_identities(
+        self,
+        stub: identities_pb2_grpc.IdentitiesServiceStub,
+    ) -> None:
+        identities_client = identities.GrpcClient(stub)
+
+        identities_response = await identities_client.list_ory_identities()
+
+        assert len(identities_response.identities) == 2
 
 
 def _get_identities() -> list[identities_pb2.Identity]:

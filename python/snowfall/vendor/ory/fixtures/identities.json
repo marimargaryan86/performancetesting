@@ -1,0 +1,27 @@
+[
+  {
+      "id": "014717ed-8dc5-4593-8d0d-2a0dab9dffc3",
+      "schema_id": "some-schema-id",
+      "schema_url": "https://example.projects.oryapis.com/schemas/some-schema-url",
+      "state": "active",
+      "traits": {
+          "email": "ory_user1@example.com"
+      },
+      "metadata_public": {
+          "role": "snowfall-admin"
+      }
+  },
+  {
+      "id": "079617e8-3a74-4791-8843-8cd3fd561bae",
+      "schema_id": "some-schema-id",
+      "schema_url": "https://example.projects.oryapis.com/schemas/some-schema-url",
+      "state": "active",
+      "traits": {
+          "email": "ory_user2@example.com"
+      },
+      "metadata_public": {
+          "reseller_id": "7a26d69f-23de-47b4-bdc5-250e7b670d48",
+          "role": "reseller-admin"
+      }
+  }
+]

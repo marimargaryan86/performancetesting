@@ -22,6 +22,7 @@ from snowfall.service.authentication.v1 import (
 )
 from snowfall.stdlib import string
 from snowfall.stdlib.format import jwt
+from snowfall.stdlib.persistence import cursor
 from snowfall.stdlib.transport.grpc import rich_status, service
 from snowfall.vendor.ory import client, models
 
@@ -309,15 +310,8 @@ class IdentitiesService(
 
             return await context.abort(grpc.StatusCode.UNKNOWN)
 
-        metadata_public = struct_pb2.Struct()
-        metadata_public.update(identity.metadata_public)
-
         return identities_pb2.GetIdentityResponse(
-            identity=identities_pb2.Identity(
-                id=identity.identifier,
-                email=identity.traits.email,
-                metadata_public=metadata_public,
-            ),
+            identity=self._create_identity_protobuf_model(identity),
         )
 
     async def CreateIdentity(  # type: ignore[override] # noqa: N802
@@ -338,15 +332,37 @@ class IdentitiesService(
 
             return await context.abort(grpc.StatusCode.UNKNOWN)
 
-        metadata_public = struct_pb2.Struct()
-        metadata_public.update(identity.metadata_public)
-
         return identities_pb2.CreateIdentityResponse(
-            identity=identities_pb2.Identity(
-                id=identity.identifier,
-                email=identity.traits.email,
-                metadata_public=metadata_public,
-            ),
+            identity=self._create_identity_protobuf_model(identity),
+        )
+
+    async def ListIdentities(  # type: ignore[override] # noqa: N802
+        self,
+        request: identities_pb2.ListIdentitiesRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> identities_pb2.ListIdentitiesResponse:
+        if request.page_token:
+            page_token = cursor.unmarshal(request.page_token, list(request.ids)).id
+        else:
+            page_token = ""
+
+        try:
+            identities = await self._client.list_identities(
+                page_size=request.page_size,
+                page_token=page_token,
+                ids=list(request.ids),
+            )
+        except httpx.HTTPStatusError:
+            return await context.abort(grpc.StatusCode.UNKNOWN)
+
+        return identities_pb2.ListIdentitiesResponse(
+            identities=[
+                self._create_identity_protobuf_model(identity)
+                for identity in identities.identities
+            ],
+            next_page_token=cursor.marshal(identities.next_page_token)
+            if identities.next_page_token
+            else "",
         )
 
     async def UpdateIdentity(  # type: ignore[override] # noqa: N802
@@ -368,13 +384,19 @@ class IdentitiesService(
 
             return await context.abort(grpc.StatusCode.UNKNOWN)
 
+        return identities_pb2.UpdateIdentityResponse(
+            identity=self._create_identity_protobuf_model(identity),
+        )
+
+    def _create_identity_protobuf_model(
+        self,
+        identity: models.Identity,
+    ) -> identities_pb2.Identity:
         metadata_public = struct_pb2.Struct()
         metadata_public.update(identity.metadata_public)
 
-        return identities_pb2.UpdateIdentityResponse(
-            identity=identities_pb2.Identity(
-                id=identity.identifier,
-                email=identity.traits.email,
-                metadata_public=metadata_public,
-            ),
+        return identities_pb2.Identity(
+            id=identity.identifier,
+            email=identity.traits.email,
+            metadata_public=metadata_public,
         )

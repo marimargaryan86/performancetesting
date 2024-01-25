@@ -1,8 +1,10 @@
-from collections.abc import Mapping
+from collections.abc import Iterator, Mapping, Sequence
 from typing import Any
 
 import httpx
+from furl import furl
 
+from snowfall.stdlib.persistence import cursor
 from snowfall.vendor.ory import models
 
 
@@ -45,11 +47,39 @@ class OryClient(object):
 
         return models.Session(**response.json())
 
-    async def list_identities(self) -> list[models.Identity]:
-        response = await self._client.get(url="/admin/identities")
+    async def list_identities(
+        self,
+        page_size: int = 0,
+        page_token: str = "",
+        ids: Sequence[str] | None = None,
+    ) -> models.IdentitiesPage:
+        response = await self._client.get(
+            url="/admin/identities",
+            params=list(
+                self._build_list_identities_query_params(
+                    ids=ids,
+                    page_size=page_size,
+                    page_token=page_token,
+                ),
+            ),
+        )
         response.raise_for_status()
 
-        return [models.Identity(**identity) for identity in response.json()]
+        next_page_token = None
+        next_link = response.links.get("next", {})
+        if next_link:
+            url = furl(next_link.get("url"))
+            next_page_token = cursor.new(
+                url.args.get("page_token", ""),
+                ids,
+                None,
+                None,
+            )
+
+        return models.IdentitiesPage(
+            identities=[models.Identity(**identity) for identity in response.json()],
+            next_page_token=next_page_token,
+        )
 
     async def get_identity(self, identifier: str) -> models.Identity:
         response = await self._client.get(
@@ -99,3 +129,17 @@ class OryClient(object):
             return "ory_kratos_session"
 
         return "ory_session_{0}".format(self._slug.replace("-", ""))
+
+    def _build_list_identities_query_params(
+        self,
+        page_size: int = 0,
+        page_token: str = "",
+        ids: Sequence[str] | None = None,
+    ) -> Iterator[tuple[str, str | int]]:
+        if page_size:
+            yield ("page_size", page_size)
+        if page_token:
+            yield ("page_token", page_token)
+        if ids:
+            for identity_id in ids:
+                yield ("ids", identity_id)
