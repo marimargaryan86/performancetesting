@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package snowfall.project.junction.go.service.bridge.v1alpha;
+
+import "snowfall/project/junction/go/service/offers/v1/models.proto";
+import "snowfall/project/junction/go/service/trips/v1alpha/trips.proto";
+import "snowfall/project/junction/go/v1/models.proto";
+import "snowfall/stdlib/v1/sort.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/bridge/v1alpha";
+
+service TripCandidateSearchService {
+  rpc EnqueueTripCandidateSearch(EnqueueTripCandidateSearchRequest) returns (EnqueueTripCandidateSearchResponse) {}
+  rpc GetTripCandidateSearchDetails(GetTripCandidateSearchDetailsRequest) returns (GetTripCandidateSearchDetailsResponse) {}
+}
+
+service TripCandidateService {
+  rpc ListTripCandidates(ListTripCandidatesRequest) returns (ListTripCandidatesResponse) {}
+}
+
+message EnqueueTripCandidateSearchRequest {
+  snowfall.project.junction.go.service.trips.v1alpha.TripCandidateSearch trip_candidate_search = 1;
+}
+
+message EnqueueTripCandidateSearchResponse {
+  snowfall.project.junction.go.service.trips.v1alpha.TripCandidateSearch trip_candidate_search = 1;
+}
+
+message GetTripCandidateSearchDetailsRequest {
+  string id = 1;
+}
+
+message GetTripCandidateSearchDetailsResponse {
+  snowfall.project.junction.go.service.trips.v1alpha.TripCandidateSearch trip_candidate_search = 1;
+}
+
+message ListTripCandidatesRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  oneof payload {
+    string trip_candidate_search_id = 3;
+  }
+  repeated snowfall.project.junction.go.v1.CabinClass.Type cabin_class_types = 4;
+  snowfall.stdlib.v1.Sort sort_by = 5;
+}
+
+message ListTripCandidatesResponse {
+  string next_page_token = 1;
+  repeated snowfall.project.junction.go.service.offers.v1.OfferAggregate offers = 2;
+}
