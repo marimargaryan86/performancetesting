@@ -1,7 +1,11 @@
 from google.protobuf import message
 
 from snowfall.project.junction.provider import meta, service
-from snowfall.project.junction.service.providers.carnect import config, simple_offers
+from snowfall.project.junction.service.providers.carnect import (
+    config,
+    pricing,
+    simple_offers,
+)
 from snowfall.project.junction.service.providers.carnect.constants import PROVIDER_ID
 from snowfall.project.junction.service.providers.carnect.v1 import amqp_pb2
 
@@ -23,4 +27,10 @@ if __name__ == "__main__":
         simple_offers_factory=simple_offers.simple_search_app,
         settings_class=config.Settings,
     )
-    entrypoint.enter()
+    entrypoint.enter_with_commands(
+        service.Command(
+            name="pricing",
+            callback=pricing.price_quotes,
+            settings_class=config.PricingSettings,
+        ),
+    )
